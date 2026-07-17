@@ -7,17 +7,20 @@ from datetime import date, datetime
 
 from fastapi import FastAPI, HTTPException
 
-from . import db, engagement, llm, moderation, persona
+from . import db, engagement, guardian, llm, moderation, persona
 from .models import (
+    BiometricSample,
     ChatRequest,
     ChatResponse,
     EngagementOut,
     Feedback,
+    GuardianEnroll,
     InteractorCreate,
     MessageOut,
     ProfileCreate,
     ProfileOut,
     RelationshipSet,
+    SpecialistRegister,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -363,6 +366,38 @@ def create_app() -> FastAPI:
         )
         conn.commit()
         return {"id": message_id, "status": status}
+
+    # -- JIM-mini / Guardian: personal guidance tandem layer -----------------
+
+    @app.post("/guardian/enroll/{interactor_id}")
+    def guardian_enroll(interactor_id: str, body: GuardianEnroll) -> dict:
+        interactor = _interactor_or_404(interactor_id)
+        if not body.terms_consent:
+            raise HTTPException(403, "consent to terms of use is required to enroll")
+        if interactor["birthdate"] and _age(
+            date.fromisoformat(interactor["birthdate"])
+        ) < 18 and not body.guardian_consent:
+            raise HTTPException(403, "minors require parent/guardian consent")
+        return guardian.enroll(interactor_id, body.model_dump())
+
+    @app.post("/guardian/specialists")
+    def guardian_register_specialist(body: SpecialistRegister) -> dict:
+        _profile_or_404(body.profile_id)
+        return guardian.register_specialist(body.condition, body.profile_id)
+
+    @app.post("/guardian/monitor/{interactor_id}")
+    def guardian_monitor(interactor_id: str, body: BiometricSample) -> dict:
+        _interactor_or_404(interactor_id)
+        if guardian.get_enrollment(interactor_id) is None:
+            raise HTTPException(409, "interactor is not enrolled with Guardian")
+        sample = body.model_dump(exclude_none=True)
+        note = sample.pop("note", None)
+        return guardian.monitor(interactor_id, sample, note)
+
+    @app.get("/guardian/events/{interactor_id}")
+    def guardian_events(interactor_id: str) -> list[dict]:
+        _interactor_or_404(interactor_id)
+        return guardian.events(interactor_id)
 
     return app
 

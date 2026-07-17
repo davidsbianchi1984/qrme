@@ -28,6 +28,7 @@ def build_system_prompt(
     profile: dict,
     relationship: dict | None,
     engagement: dict | None,
+    situation: str | None = None,
 ) -> str:
     parts: list[str] = []
 
@@ -87,6 +88,16 @@ def build_system_prompt(
         parts.append(
             "Adaptation may change style and depth only — never your core "
             "identity or your boundaries."
+        )
+
+    if situation:
+        # Guardian passes a real-time condition note here; the specialist agent
+        # responds to the monitored state (claim 6: biometric/context data
+        # conditions the interaction).
+        parts.append(
+            "Current situation from real-time monitoring: " + situation + " "
+            "Respond supportively and specifically to this. Keep the person safe; "
+            "if they may be in danger, urge them to seek immediate help."
         )
 
     return "\n\n".join(parts)

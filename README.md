@@ -19,12 +19,30 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | Adult content mode (6.7) | Age-gated at both ends: adult owner required to enable, verified 18+ interactor required to chat |
 | In-app chat surface (6.8, v1) | `POST /profiles/{id}/chat` |
 
+### JIM-mini / Guardian — personal guidance tandem layer
+
+QRME pairs with **Guardian** (patent app 19/038,196), an always-on monitor that
+detects a user's known conditions from biometric and contextual signals and
+pulls the matching QRME specialist profile to deliver moderated guidance —
+escalating to an emergency contact when a signal is critical. See
+[docs/guardian.md](docs/guardian.md).
+
+| Guardian capability | Endpoint |
+|---|---|
+| Enroll a user (consent, emergency contact, baseline) | `POST /guardian/enroll/{interactor}` |
+| Register a QRME profile as a condition specialist | `POST /guardian/specialists` |
+| Ingest a biometric/context sample → run the closed loop | `POST /guardian/monitor/{interactor}` |
+| Event timeline (biometric → detection → guidance → escalation) | `GET /guardian/events/{interactor}` |
+
 ## Architecture
 
 - **API**: FastAPI (`qrme/api.py`), app factory `create_app()`.
 - **Storage**: SQLite (`qrme/db.py`), path via `QRME_DB` (default `qrme.db`).
 - **Persona conditioning**: `qrme/persona.py` builds the system prompt from
-  profile identity + relationship + engagement + aging.
+  profile identity + relationship + engagement + aging (+ a real-time situation
+  note when Guardian invokes a specialist).
+- **Guardian tandem layer**: `qrme/conditions.py` (known-condition detection)
+  and `qrme/guardian.py` (enroll → monitor → trigger specialist → escalate).
 - **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-4-8`
   with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.

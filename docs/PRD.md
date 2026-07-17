@@ -1,80 +1,75 @@
 # Product Requirements Document — QRME
 
-**AI Synthetic Profile Platform** · Status: Draft v0.1 · Author: Product/Eng Team
-Related: US Patent Application 19/056,418 (Synthetic User Profile Management)
+Related: US Patent Application 19/056,418 (Synthetic User Profile Management),
+run in tandem with 19/038,196 (Networked Responsive Personal Guidance System
+for Known Conditions — "JIM-mini / Guardian", see [guardian.md](guardian.md)).
 
-## Overview
+## 1. Product Overview
 
-QRME enables generation, customization, and interaction with AI-driven
-synthetic profiles of users, real people (living, historical, or deceased), or
-fictional personas. Profiles, powered by large language models trained on
-demographic, behavioral, and content data, adapt across social, chat, voice,
-video, AR/VR, and robotic interfaces based on relationship context and
-engagement.
+QRME is a platform that creates, adapts, and maintains artificial-intelligence
+(AI) profiles representing real or synthesized persons. Profiles interact in a
+relationship-aware manner, preserve legacy memory, support multi-surface
+presence, and adapt continuously based on engagement. Core themes: adaptive
+synthetic profiles, relationship-conditioned behavior, persistent memory with
+privacy controls, content moderation, and lifecycle continuity.
 
-## Problem / Opportunity
+## 2. Objectives
 
-Social platforms enforce single identities, limiting audience-specific
-presentation. Users seek persistent connections with unreachable individuals.
-Existing AI companions lack personal content ingestion and
-relationship-conditioned behavior.
+- Enable users to generate high-fidelity AI profiles of themselves or others
+  (including legacy/deceased individuals).
+- Condition profile responses on relationship type (family, professional,
+  public, intimate).
+- Continuously refine profiles from interaction data to improve engagement and
+  authenticity.
+- Provide secure multi-surface access (mobile, web, social, future AR/VR) while
+  enforcing privacy, age-gating, and moderation.
+- Support production-ready visual and conversational experiences suitable for
+  marketing, onboarding, and in-app use.
 
-## Goals
+## 3. Target Users / Personas
 
-- Profile creation for self or others.
-- Relationship-aware adaptive interaction (engagement and session trends).
-- Safe moderated interactions (approval rates and SLA).
-- Cross-session memory retention.
-- Multi-surface support.
+Self-Profile Creator; Legacy/Memory User; Fan/Historical User; Moderator/Owner;
+Interactor.
 
-## Non-Goals (v1)
+## 4. Key Features & Functional Requirements
 
-Biometric switching, robotic embodiment, watermarking, and marketplace
-monetization.
+**Profile Generation & Training** — generate an AI profile representing a first
+person or synthesized person based on preferences, demographics, and connected
+social data; a training module operable to modify profile behavior;
+age-verification gate and selective social-account linkage.
 
-## User Personas
+**Relationship-Aware Interaction** — modify responses according to the other
+user's relationship to the represented person (grandchild, colleague, stranger,
+close friend), with distinct tone and style per relationship class.
 
-Self-Profile Creator; Legacy Memory User; Fan/Historical Interaction User;
-Moderator/Owner; Second-Person Interactor.
+**Engagement Adaptation & Memory** — maintain the profile from interactions;
+remember past sessions across logins; refine responses using engagement signals
+(response length, return visits, sentiment); persistent memory with explicit
+view/clear/restrict controls.
 
-## Core Features
+**Content Safety & Moderation** — outbound content passes successive filters:
+community standards, age-appropriateness, owner-approval gate; age-gated
+adult-content mode with clear separation.
 
-Profile creation includes verification, consent, demographics, social import,
-third-party/fictional options, and anonymity. Behavior conditions on
-relationship type with configurable tone and boundaries. Engagement signals
-refine responses without altering core identity. Memory persists per user and
-is manageable. Content generation requires moderation; owners set auto-post or
-approval rules. Profiles support aging and post-death succession. Adult mode
-is age-gated. v1 covers social and in-app chat.
+**Lifecycle & Multi-Surface Presence** — visualize profile aging and
+conversational-style evolution; consistent avatar identity across smartphone
+chat, social feeds, desktop web, and indicated AR/VR surfaces.
 
-## User Flow
+**Personal Guidance (tandem)** — Guardian monitors biometric/contextual signals
+for known conditions and triggers the matching QRME specialist agent, with
+escalation to a live person / emergency contact when critical.
 
-Register, create or select profile, complete verification and settings,
-interact via surfaces, moderate and distribute content, update memory and
-signals; owners adjust settings as needed.
+## 5. Non-Functional Requirements
 
-## Technical Architecture
+High-fidelity, production-ready visual language (restrained indigo/silver/amber
+palette); privacy-by-design (data minimization, user-controlled memory, secure
+multi-device sync); scalable LLM/GPT-based conversation engine with
+owner-configurable parameters; compliant with age-gating and content-moderation
+standards.
 
-AI Profile Server hosts the manager, databases, and fine-tuned LLM. Clients
-provide UI and integrations over public networks. Model: contextual
-transformer conditioned on profile state.
+## 6. Success Metrics
 
-## Trust, Safety & Privacy
-
-Consent required for third-party profiles; anonymity controls; outbound
-moderation; data minimization; age verification.
-
-## Success Metrics
-
-Activation rate; 7-/30-day retention; rising engagement quality; moderation
-false-negative rate below threshold.
-
-## Open Questions
-
-Third-party consent verification; auditable engagement metrics; platform
-API/ToS limits; succession of rights.
-
-## Risks
-
-Impersonation without rights; manipulative engagement patterns; expanded
-moderation load; emotional dependency on legacy profiles.
+- Profile creation completion rate > 70%.
+- Measurable engagement lift after adaptation cycles.
+- Zero critical moderation escapes; high user trust on privacy controls.
+- Consistent avatar recognition across surfaces.
