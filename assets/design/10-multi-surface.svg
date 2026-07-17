@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 720" width="1300" height="720" font-family="Helvetica, Arial, sans-serif">
+  <title>Multi-surface presence — one profile identity across chat, feed, web, and AR/VR</title>
+  <defs>
+    <linearGradient id="bg10" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#262a66"/>
+    </linearGradient>
+    <radialGradient id="ar10" cx="0.5" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.65"/>
+      <stop offset="0.6" stop-color="#E8A34D" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1300" height="720" fill="url(#bg10)"/>
+
+  <!-- AR/VR presence, background -->
+  <g opacity="0.85">
+    <circle cx="1050" cy="240" r="150" fill="url(#ar10)"/>
+    <circle cx="1050" cy="212" r="42" fill="#E8A34D" opacity="0.75"/>
+    <path d="M986 330 C986 268 1014 240 1050 240 C1086 240 1114 268 1114 330 Z" fill="#E8A34D" opacity="0.6"/>
+    <ellipse cx="1050" cy="352" rx="86" ry="10" fill="#E8A34D" opacity="0.2"/>
+    <!-- headset outline -->
+    <g transform="translate(940 430)" stroke="#C9CDD8" stroke-width="3" fill="none" opacity="0.6">
+      <path d="M0 20 q0 -20 24 -20 h172 q24 0 24 20 v36 q0 20 -24 20 h-52 q-16 -24 -34 -24 t-34 24 h-52 q-24 0 -24 -20 z"/>
+    </g>
+    <text x="1050" y="560" text-anchor="middle" fill="#C9CDD8" font-size="14" opacity="0.8">AR / VR — roadmap</text>
+  </g>
+
+  <!-- identity threads linking every surface -->
+  <g stroke="#E8A34D" stroke-opacity="0.45" stroke-width="2" fill="none">
+    <path d="M300 340 Q480 240 640 300"/>
+    <path d="M700 300 Q860 240 990 260"/>
+    <path d="M330 420 Q650 560 900 480"/>
+  </g>
+
+  <!-- smartphone chat -->
+  <g transform="translate(180 160)">
+    <rect width="240" height="420" rx="30" fill="#23255F" stroke="#C9CDD8" stroke-opacity="0.4"/>
+    <rect x="10" y="10" width="220" height="400" rx="22" fill="#F4F5F9"/>
+    <circle cx="52" cy="66" r="22" fill="#E8A34D"/>
+    <path d="M38 62 a14 14 0 0 1 28 0" fill="none" stroke="#161840" stroke-width="2" opacity="0.3"/>
+    <text x="86" y="72" fill="#161840" font-size="14" font-weight="bold">Dana</text>
+    <rect x="34" y="110" width="150" height="44" rx="16" fill="#E8A34D" opacity="0.9"/>
+    <rect x="70" y="170" width="130" height="40" rx="16" fill="#E4E6EE"/>
+    <rect x="34" y="226" width="160" height="44" rx="16" fill="#E8A34D" opacity="0.9"/>
+    <rect x="34" y="350" width="172" height="36" rx="18" fill="#E4E6EE"/>
+    <text x="120" y="440" text-anchor="middle" fill="#C9CDD8" font-size="14">In-app chat — v1</text>
+  </g>
+
+  <!-- social feed card -->
+  <g transform="translate(500 220)">
+    <rect width="260" height="300" rx="18" fill="#F4F5F9"/>
+    <circle cx="42" cy="46" r="20" fill="#E8A34D"/>
+    <text x="74" y="42" fill="#161840" font-size="14" font-weight="bold">Dana</text>
+    <text x="74" y="60" fill="#8B90A8" font-size="11">replied to a post</text>
+    <g stroke="#8B90A8" stroke-width="3" stroke-linecap="round" opacity="0.7">
+      <line x1="30" y1="100" x2="230" y2="100"/><line x1="30" y1="122" x2="200" y2="122"/><line x1="30" y1="144" x2="216" y2="144"/>
+    </g>
+    <rect x="30" y="176" width="200" height="70" rx="12" fill="#E4E6EE"/>
+    <g fill="#8B90A8">
+      <circle cx="46" cy="272" r="7"/><circle cx="86" cy="272" r="7"/><circle cx="126" cy="272" r="7"/>
+    </g>
+    <text x="130" y="330" text-anchor="middle" fill="#C9CDD8" font-size="14">Social feed — v1</text>
+  </g>
+
+  <!-- desktop web -->
+  <g transform="translate(760 400)">
+    <rect width="340" height="210" rx="14" fill="#23255F" stroke="#C9CDD8" stroke-opacity="0.4"/>
+    <rect x="8" y="8" width="324" height="170" rx="8" fill="#F4F5F9"/>
+    <g fill="#C9CDD8"><circle cx="26" cy="24" r="4"/><circle cx="42" cy="24" r="4"/><circle cx="58" cy="24" r="4"/></g>
+    <circle cx="66" cy="94" r="26" fill="#E8A34D"/>
+    <g stroke="#8B90A8" stroke-width="3" stroke-linecap="round" opacity="0.7">
+      <line x1="110" y1="76" x2="300" y2="76"/><line x1="110" y1="98" x2="270" y2="98"/><line x1="110" y1="120" x2="286" y2="120"/>
+    </g>
+    <rect x="130" y="212" width="80" height="10" rx="4" fill="#161840"/>
+    <text x="170" y="252" text-anchor="middle" fill="#C9CDD8" font-size="14">Desktop web</text>
+  </g>
+</svg>

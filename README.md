@@ -67,6 +67,16 @@ curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json
   -d '{"interactor_id": "'$INTERACTOR'", "message": "Tell me about your garden!"}'
 ```
 
+## Design assets
+
+The PRD-derived visual asset brief lives in
+[docs/design/image-prompts.md](docs/design/image-prompts.md) — twelve
+image-generation prompts covering the app icon, hero banner, onboarding flow,
+and feature illustrations. Vector concept renditions of each (shared palette:
+deep indigo / soft silver / warm amber) are in
+[assets/design/](assets/design/), with a browsable
+[gallery](assets/design/gallery.html).
+
 ## Out of scope for v1 (per PRD non-goals)
 
 Biometric persona switching, robotic embodiment, media watermarking/provenance,

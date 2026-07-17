@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" font-family="Helvetica, Arial, sans-serif">
+  <title>Persistent memory and privacy controls — interaction timeline with view / clear / restrict</title>
+  <defs>
+    <linearGradient id="bg7" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F2F3F7"/>
+      <stop offset="1" stop-color="#E6E8F0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="900" height="720" fill="url(#bg7)"/>
+
+  <!-- settings panel -->
+  <g transform="translate(150 60)">
+    <rect width="600" height="600" rx="26" fill="#FFFFFF" stroke="#C9CDD8" stroke-width="1.5"/>
+    <text x="40" y="58" fill="#161840" font-size="22" font-weight="bold">Memory</text>
+    <text x="40" y="86" fill="#8B90A8" font-size="14">What this profile remembers, per person</text>
+
+    <!-- privacy lock -->
+    <g transform="translate(520 36)">
+      <rect x="0" y="12" width="34" height="26" rx="6" fill="#23255F"/>
+      <path d="M6 12 v-4 a11 11 0 0 1 22 0 v4" fill="none" stroke="#23255F" stroke-width="4"/>
+      <circle cx="17" cy="25" r="4" fill="#E8A34D"/>
+    </g>
+
+    <!-- timeline spine -->
+    <line x1="72" y1="130" x2="72" y2="470" stroke="#C9CDD8" stroke-width="2"/>
+
+    <!-- entries -->
+    <g>
+      <g transform="translate(40 120)">
+        <circle cx="32" cy="26" r="7" fill="#E8A34D"/>
+        <rect x="60" y="0" width="460" height="86" rx="14" fill="#F4F5F9"/>
+        <text x="80" y="28" fill="#161840" font-size="15" font-weight="bold">Sam · grandchild</text>
+        <text x="80" y="50" fill="#8B90A8" font-size="13">42 messages · garden stories, school updates</text>
+        <g transform="translate(80 60)" font-size="12">
+          <rect width="58" height="22" rx="11" fill="#23255F"/><text x="29" y="15" text-anchor="middle" fill="#FFF">view</text>
+          <rect x="66" width="58" height="22" rx="11" fill="none" stroke="#23255F"/><text x="95" y="15" text-anchor="middle" fill="#23255F">clear</text>
+          <rect x="132" width="66" height="22" rx="11" fill="none" stroke="#B0433A"/><text x="165" y="15" text-anchor="middle" fill="#B0433A">restrict</text>
+        </g>
+      </g>
+      <g transform="translate(40 226)">
+        <circle cx="32" cy="26" r="7" fill="#C9CDD8"/>
+        <rect x="60" y="0" width="460" height="86" rx="14" fill="#F4F5F9"/>
+        <text x="80" y="28" fill="#161840" font-size="15" font-weight="bold">Priya · close friend</text>
+        <text x="80" y="50" fill="#8B90A8" font-size="13">18 messages · book club, travel plans</text>
+        <g transform="translate(80 60)" font-size="12">
+          <rect width="58" height="22" rx="11" fill="#23255F"/><text x="29" y="15" text-anchor="middle" fill="#FFF">view</text>
+          <rect x="66" width="58" height="22" rx="11" fill="none" stroke="#23255F"/><text x="95" y="15" text-anchor="middle" fill="#23255F">clear</text>
+          <rect x="132" width="66" height="22" rx="11" fill="none" stroke="#B0433A"/><text x="165" y="15" text-anchor="middle" fill="#B0433A">restrict</text>
+        </g>
+      </g>
+      <g transform="translate(40 332)">
+        <circle cx="32" cy="26" r="7" fill="#C9CDD8"/>
+        <rect x="60" y="0" width="460" height="86" rx="14" fill="#F4F5F9"/>
+        <text x="80" y="28" fill="#161840" font-size="15" font-weight="bold">Alex · professional</text>
+        <text x="80" y="50" fill="#8B90A8" font-size="13">7 messages · project timelines</text>
+        <g transform="translate(80 60)" font-size="12">
+          <rect width="58" height="22" rx="11" fill="#23255F"/><text x="29" y="15" text-anchor="middle" fill="#FFF">view</text>
+          <rect x="66" width="58" height="22" rx="11" fill="none" stroke="#23255F"/><text x="95" y="15" text-anchor="middle" fill="#23255F">clear</text>
+          <rect x="132" width="66" height="22" rx="11" fill="none" stroke="#B0433A"/><text x="165" y="15" text-anchor="middle" fill="#B0433A">restrict</text>
+        </g>
+      </g>
+      <g transform="translate(40 438)" opacity="0.55">
+        <circle cx="32" cy="26" r="7" fill="#C9CDD8"/>
+        <rect x="60" y="0" width="460" height="48" rx="14" fill="#F4F5F9"/>
+        <text x="80" y="30" fill="#8B90A8" font-size="13">Guest · stranger — nothing retained</text>
+      </g>
+    </g>
+
+    <!-- data minimization footer -->
+    <g transform="translate(40 530)">
+      <rect width="520" height="46" rx="12" fill="#FFF7EA" stroke="#E8A34D" stroke-opacity="0.6"/>
+      <circle cx="26" cy="23" r="9" fill="none" stroke="#E8A34D" stroke-width="2.5"/>
+      <path d="M22 23 l3 3 l6 -7" stroke="#E8A34D" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <text x="48" y="28" fill="#7A5A22" font-size="13">Data minimization on — memories auto-expire after 12 months of inactivity</text>
+    </g>
+  </g>
+</svg>
