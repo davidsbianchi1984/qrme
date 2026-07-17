@@ -1,152 +1,123 @@
-# QRME Visual Asset Brief — Image-Generation Prompts
+# QRME Image-Generation Prompts
 
-Prompts derived from the QRME PRD for use with modern image-generation models.
-They emphasize a consistent visual language and a professional aesthetic
-aligned with the product's core themes: adaptive synthetic profiles,
-relationship-aware interaction, legacy preservation, and multi-surface
-presence.
+Condensed suite derived from the QRME Product Requirements Document. Prompts
+emphasize clarity, a consistent professional aesthetic, adaptive synthetic
+profiles, relationship-aware interaction, legacy preservation, and
+multi-surface presence. High-fidelity, production-ready results.
 
-**Shared design system** (applies to every asset):
-
-- Palette: deep indigo `#23255F` / `#161840`, soft silver `#C9CDD8`,
-  warm amber `#E8A34D`.
-- Restrained, trustworthy, production-ready; no visual clutter.
-- Vector concept renditions of each prompt live in
-  [`assets/design/`](../../assets/design/) as SVGs.
+**Shared design system**: deep indigo `#23255F` / `#161840`, soft silver
+`#C9CDD8`, warm amber `#E8A34D`. Vector concept renditions of each prompt live
+in [`assets/design/`](../../assets/design/); browse them via
+[`gallery.html`](../../assets/design/gallery.html).
 
 ---
 
 ## 1. App Icon / Logo Mark
 
-A refined, minimal app icon for QRME. Center a subtle geometric abstraction
-of overlapping human silhouettes that morph into soft neural-network nodes
-and data streams. Use a restrained color palette of deep indigo, soft silver,
-and warm amber accents. Clean modern vector style with slight depth and soft
-gradient lighting. Square format, high contrast, suitable for iOS and Android
-app icons. No text.
-
-*Intended use: app icon, favicon.* → `assets/design/01-app-icon.svg`
+Refined minimal app icon. Center subtle geometric abstraction of overlapping
+human silhouettes morphing into soft neural-network nodes and data streams.
+Restrained palette: deep indigo, soft silver, warm amber accents. Clean modern
+vector style with slight depth and soft gradient lighting. Square format, high
+contrast, iOS/Android suitable. No text. → `assets/design/01-app-icon.svg`
 
 ## 2. Hero / Marketing Banner — Core Concept
 
-Wide cinematic hero image for the QRME landing page. A diverse group of
-people of different ages stand in a softly lit contemporary space;
-translucent, luminous AI profile avatars float beside or slightly in front of
-them, connected by delicate glowing threads that adapt in color and density
-according to relationship proximity. Background subtly suggests social media
-feeds, chat interfaces, and abstract memory timelines. Photorealistic yet
-slightly ethereal lighting, professional product-marketing aesthetic, 16:9
-aspect ratio.
-
-*Intended use: landing page hero.* → `assets/design/02-hero-banner.svg`
+Wide cinematic 16:9 hero. Diverse people of different ages in softly lit
+contemporary space; translucent luminous AI profile avatars float beside them,
+connected by delicate glowing threads that adapt in color and density by
+relationship proximity. Background subtly suggests social feeds, chat
+interfaces, and abstract memory timelines. Photorealistic yet ethereal
+lighting, professional marketing aesthetic. → `assets/design/02-hero-banner.svg`
 
 ## 3. Onboarding — Profile Creation Flow
 
-Clean, modern mobile UI illustration of the QRME profile-creation sequence.
-Show progressive stages: age-verification gate, demographic questionnaire
-interface, social-account connection cards with selective toggle switches,
-and a final "persona preview" panel displaying a customizable synthetic
-avatar. Soft neutral background, precise UI elements, subtle
-micro-interactions indicated by soft glows. Flat-to-semi-3D design language
-consistent with contemporary iOS/Android apps.
-
-*Intended use: onboarding screens, docs.* → `assets/design/03-onboarding-flow.svg`
+Clean modern mobile UI illustration of progressive stages: age-verification
+gate, demographic questionnaire, selective social-account connection cards
+(Facebook, Instagram, X, YouTube, TikTok) with toggles, and final
+persona-preview panel with customizable synthetic avatar. Soft neutral
+background, precise UI elements, subtle micro-interaction glows. Flat-to-semi-3D
+contemporary app design language. → `assets/design/03-onboarding-flow.svg`
 
 ## 4. Relationship-Aware Interaction
 
-Elegant illustration depicting relationship-conditioned behavior. In the
-center, a single synthetic profile avatar; radiating outward are distinct
+Elegant conceptual illustration. Central synthetic profile avatar; radiating
 conversation bubbles directed at different people (grandchild, professional
 contact, stranger, close friend). Each bubble differs in tone, visual style,
-and iconography (warm family motifs vs. formal corporate motifs vs. neutral
-public motifs). Soft gradient background transitioning from intimate warm
-tones to cooler public tones. High-end conceptual product illustration style.
-
-*Intended use: feature explainer.* → `assets/design/04-relationship-aware.svg`
+and iconography (warm family vs. formal corporate vs. neutral public). Soft
+gradient background from intimate warm tones to cooler public tones. High-end
+product illustration style. → `assets/design/04-relationship-aware.svg`
 
 ## 5. Legacy / Memory Profile
 
-Poignant yet hopeful illustration of a legacy profile. An elderly person's
-portrait gently dissolves into a luminous, living AI avatar that is
-interacting with a younger family member (grandchild) via chat and voice.
-Soft archival textures, gentle light rays, and subtle timeline elements in
-the background. Emotional but restrained, respectful, and non-sentimental.
-Warm desaturated color palette with selective amber highlights.
-
-*Intended use: legacy-profile marketing.* → `assets/design/05-legacy-profile.svg`
+Poignant yet hopeful scene. Elderly photographic portrait gently dissolves into
+luminous living AI avatar interacting with younger family member via chat and
+voice. Soft archival textures, gentle light rays, subtle timeline elements.
+Emotional but restrained; warm desaturated palette with selective amber
+highlights. → `assets/design/05-legacy-profile.svg`
 
 ## 6. Engagement-Based Adaptation Loop
 
-Abstract yet readable diagram-style illustration showing the engagement
-learning cycle. A synthetic profile at the center receives signals (response
-length, return visits, sentiment icons) that flow into a refining neural
-layer and then return as improved, more personalized responses. Clean
-isometric or layered 3D style with soft data particles and feedback arrows.
-Professional tech-product aesthetic suitable for feature explanation screens.
-
-*Intended use: feature explainer.* → `assets/design/06-engagement-loop.svg`
+Abstract readable diagram. Synthetic profile at center receives signals
+(response length, return visits, sentiment) that flow into refining neural layer
+and return as improved personalized responses. Clean isometric or layered 3D
+style with soft data particles and feedback arrows. Professional tech-product
+aesthetic. → `assets/design/06-engagement-loop.svg`
 
 ## 7. Persistent Memory & Privacy Controls
 
-UI-focused illustration of the memory management interface. A clean settings
-panel displays a scrollable timeline of past interactions with individual
-users; each entry has clear "view / clear / restrict" controls. Soft
-privacy-lock icons and data-minimization visual cues. Modern mobile interface
-design language with generous whitespace and precise typography placeholders.
-
-*Intended use: settings/docs.* → `assets/design/07-memory-privacy.svg`
+UI-focused settings panel. Scrollable timeline of past interactions; each entry
+shows clear view/clear/restrict controls. Soft privacy-lock icons and
+data-minimization cues. Modern mobile interface with generous whitespace and
+precise typography placeholders. → `assets/design/07-memory-privacy.svg`
 
 ## 8. Content Moderation & Safety Pipeline
 
-Clear process illustration of outbound content moderation. A synthetic
-profile generates a social post or reply; the content passes through
-successive translucent filter layers labeled community standards,
-age-appropriateness, and owner-approval gate before reaching public
-visibility. Clean flowchart-inspired composition with soft protective shield
-motifs. Professional, trustworthy visual tone.
-
-*Intended use: trust & safety page.* → `assets/design/08-moderation-pipeline.svg`
+Clear process illustration. Synthetic profile generates post or reply; content
+passes successive translucent filter layers labeled community standards,
+age-appropriateness, and owner-approval gate before public visibility. Clean
+flowchart composition with soft protective shield motifs. Trustworthy
+professional tone. → `assets/design/08-moderation-pipeline.svg`
 
 ## 9. Aging & Lifecycle Visualization
 
-Subtle time-progression illustration. A synthetic profile avatar is shown at
-three stages of maturity along a gentle arc, with corresponding changes in
-posture, expression, and conversational style directed at a growing child who
-becomes a young adult. Soft chronological markers and evolving environmental
-details. Warm, contemplative product illustration style.
+Subtle time-progression. Synthetic profile avatar shown at three maturity
+stages along gentle arc, with corresponding posture, expression, and
+conversational style changes directed at a growing child who becomes a young
+adult. Soft chronological markers and evolving environmental details. Warm
+contemplative style. → `assets/design/09-aging-lifecycle.svg`
 
-*Intended use: feature explainer.* → `assets/design/09-aging-lifecycle.svg`
+## 10. Multi-Surface Presence
 
-## 10. Multi-Surface Presence (V1 + Roadmap)
-
-Composition showing the same synthetic profile appearing across surfaces:
-smartphone chat interface, social media feed, desktop web, and a lightly
-indicated AR/VR headset view in the background. Consistent avatar identity
-with surface-appropriate rendering (2D chat bubble vs. slightly volumetric AR
-presence). Clean, modern product-ecosystem visualization.
-
-*Intended use: roadmap/marketing.* → `assets/design/10-multi-surface.svg`
+Composition of same synthetic profile across surfaces: smartphone chat, social
+media feed, desktop web, lightly indicated AR/VR headset view. Consistent
+avatar identity with surface-appropriate rendering (2D chat bubble vs. slightly
+volumetric AR). Clean modern product-ecosystem visualization.
+→ `assets/design/10-multi-surface.svg`
 
 ## 11. Adult Content Mode (Age-Gated)
 
-Discreet, mature illustration of the age-gated adult interaction mode. A
-clearly marked verification gate opens into a separate, more sophisticated
-visual environment with refined lighting and adult-appropriate but
-non-explicit aesthetic. Strong visual separation from the default experience.
-Professional, restrained treatment that signals exclusivity and consent.
+Discreet mature illustration. Clearly marked verification gate opens into
+separate sophisticated visual environment with refined lighting and
+adult-appropriate but non-explicit aesthetic. Strong visual separation from
+default experience. Professional restrained treatment signaling exclusivity and
+consent. → `assets/design/11-age-gated-mode.svg`
 
-*Intended use: settings/docs.* → `assets/design/11-age-gated-mode.svg`
+## 12. User Persona Set
 
-## 12. User Persona Set (Supporting Illustrations)
+Five consistent semi-realistic character illustrations: Self-Profile Creator
+(professional adult configuring digital twin); Legacy/Memory User (middle-aged
+adult creating deceased relative profile); Fan/Historical Interaction User
+(younger adult with historical/fictional persona); Moderator/Profile Owner
+(focused individual reviewing permissions); Second Person/Interactor (casual
+user chatting with synthetic profile). Unified style, diverse representation,
+soft studio lighting. → `assets/design/12-persona-set.svg`
 
-A set of five consistent character illustrations representing the defined
-personas: Self-Profile Creator (professional adult configuring their own
-digital twin), Legacy/Memory User (middle-aged adult creating a profile of a
-deceased relative), Fan/Historical Interaction User (younger adult engaging
-with a historical or fictional persona), Moderator/Profile Owner (focused
-individual reviewing permissions and boundaries), and Second Person /
-Interactor (casual user chatting with a synthetic profile). Unified
-semi-realistic illustration style, diverse representation, soft studio
-lighting, suitable for onboarding or help documentation.
+## 13. JIM-mini / Guardian — Personal Guidance Tandem
 
-*Intended use: onboarding/help docs.* → `assets/design/12-persona-set.svg`
+Process illustration of the tandem architecture. Wearable biometric signals
+(heart rate, blood oxygen, respiration) flow into a Guardian shield-with-pulse
+monitor that detects a known condition, which triggers the matching QRME
+specialist synthetic-profile avatar to deliver moderated guidance; a distinct
+critical path escalates to an emergency contact / live help. Clean flowchart
+composition in the indigo/silver/amber system, protective and trustworthy tone.
+→ `assets/design/13-guardian-tandem.svg`
