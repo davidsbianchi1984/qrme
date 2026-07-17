@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>QRME app icon — overlapping silhouettes morphing into neural nodes</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2B2D6E"/>
+      <stop offset="1" stop-color="#161840"/>
+    </linearGradient>
+    <linearGradient id="fig1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C9CDD8"/>
+      <stop offset="1" stop-color="#8B90A8" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="fig2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#E8A34D"/>
+      <stop offset="1" stop-color="#C77F2E" stop-opacity="0.9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.45" r="0.6">
+      <stop offset="0" stop-color="#E8A34D" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="240" r="190" fill="url(#glow)"/>
+
+  <!-- silver silhouette (left) -->
+  <g opacity="0.92">
+    <circle cx="212" cy="196" r="58" fill="url(#fig1)"/>
+    <path d="M110 372c0-64 46-104 102-104s102 40 102 104z" fill="url(#fig1)"/>
+  </g>
+
+  <!-- amber silhouette (right), overlapping -->
+  <g opacity="0.88">
+    <circle cx="300" cy="212" r="52" fill="url(#fig2)"/>
+    <path d="M208 380c0-58 42-94 92-94s92 36 92 94z" fill="url(#fig2)"/>
+  </g>
+
+  <!-- silhouettes dissolving into neural nodes and data streams -->
+  <g stroke="#C9CDD8" stroke-width="3" stroke-opacity="0.55" fill="none">
+    <path d="M352 176 Q396 150 420 118"/>
+    <path d="M340 236 Q402 232 438 202"/>
+    <path d="M362 300 Q408 312 432 296"/>
+    <path d="M160 152 Q120 128 96 132"/>
+  </g>
+  <g fill="#E8A34D">
+    <circle cx="420" cy="118" r="9"/>
+    <circle cx="438" cy="202" r="7"/>
+    <circle cx="432" cy="296" r="6"/>
+  </g>
+  <g fill="#C9CDD8">
+    <circle cx="96" cy="132" r="7"/>
+    <circle cx="396" cy="150" r="4" opacity="0.7"/>
+    <circle cx="402" cy="232" r="4" opacity="0.7"/>
+    <circle cx="408" cy="312" r="4" opacity="0.7"/>
+  </g>
+</svg>

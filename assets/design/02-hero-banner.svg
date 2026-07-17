@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <title>QRME hero banner — people with luminous AI avatars linked by relationship threads</title>
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#161840"/>
+      <stop offset="0.7" stop-color="#23255F"/>
+      <stop offset="1" stop-color="#2E3070"/>
+    </linearGradient>
+    <radialGradient id="softlight" cx="0.5" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#C9CDD8" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#C9CDD8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="person" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3A3D80"/>
+      <stop offset="1" stop-color="#1C1E4E"/>
+    </linearGradient>
+    <radialGradient id="avatar" cx="0.5" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.9"/>
+      <stop offset="0.55" stop-color="#E8A34D" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="avatarSilver" cx="0.5" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.85"/>
+      <stop offset="0.55" stop-color="#C9CDD8" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#C9CDD8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <rect width="1600" height="900" fill="url(#softlight)"/>
+
+  <!-- background: faint feed / chat / timeline motifs -->
+  <g opacity="0.14" stroke="#C9CDD8" fill="none" stroke-width="3">
+    <rect x="90" y="120" width="200" height="46" rx="12"/>
+    <rect x="90" y="184" width="150" height="46" rx="12"/>
+    <rect x="1330" y="140" width="180" height="120" rx="14"/>
+    <line x1="1350" y1="176" x2="1490" y2="176"/>
+    <line x1="1350" y1="206" x2="1460" y2="206"/>
+    <line x1="200" y1="640" x2="1400" y2="640" stroke-dasharray="2 14"/>
+  </g>
+  <g opacity="0.35" fill="#E8A34D">
+    <circle cx="400" cy="640" r="5"/><circle cx="800" cy="640" r="5"/><circle cx="1200" cy="640" r="5"/>
+  </g>
+
+  <!-- people (grounded, opaque) -->
+  <g>
+    <g transform="translate(330 430)">
+      <circle cx="0" cy="0" r="46" fill="url(#person)" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
+      <path d="M-84 250 C-84 120 -40 62 0 62 C40 62 84 120 84 250 Z" fill="url(#person)"/>
+    </g>
+    <g transform="translate(770 400)">
+      <circle cx="0" cy="0" r="52" fill="url(#person)" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
+      <path d="M-94 280 C-94 132 -46 68 0 68 C46 68 94 132 94 280 Z" fill="url(#person)"/>
+    </g>
+    <g transform="translate(1210 460) scale(0.78)">
+      <circle cx="0" cy="0" r="46" fill="url(#person)" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
+      <path d="M-84 250 C-84 120 -40 62 0 62 C40 62 84 120 84 250 Z" fill="url(#person)"/>
+    </g>
+  </g>
+
+  <!-- luminous avatars floating beside each person -->
+  <g>
+    <circle cx="470" cy="330" r="86" fill="url(#avatar)"/>
+    <circle cx="470" cy="330" r="34" fill="none" stroke="#E8A34D" stroke-opacity="0.8" stroke-width="2.5"/>
+    <circle cx="920" cy="290" r="98" fill="url(#avatarSilver)"/>
+    <circle cx="920" cy="290" r="38" fill="none" stroke="#C9CDD8" stroke-opacity="0.85" stroke-width="2.5"/>
+    <circle cx="1330" cy="360" r="72" fill="url(#avatar)"/>
+    <circle cx="1330" cy="360" r="28" fill="none" stroke="#E8A34D" stroke-opacity="0.7" stroke-width="2"/>
+  </g>
+
+  <!-- relationship threads: warmer + denser = closer relationship -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M470 330 Q690 250 920 290" stroke="#E8A34D" stroke-width="4" stroke-opacity="0.85"/>
+    <path d="M470 350 Q690 290 920 312" stroke="#E8A34D" stroke-width="2.5" stroke-opacity="0.55"/>
+    <path d="M470 372 Q690 330 920 334" stroke="#E8A34D" stroke-width="1.5" stroke-opacity="0.35"/>
+    <path d="M920 290 Q1130 300 1330 360" stroke="#C9CDD8" stroke-width="2" stroke-opacity="0.5"/>
+    <path d="M470 330 Q900 470 1330 380" stroke="#C9CDD8" stroke-width="1.2" stroke-opacity="0.28"/>
+  </g>
+  <g fill="#F4E3C8">
+    <circle cx="690" cy="268" r="4"/><circle cx="1130" cy="308" r="3" opacity="0.7"/>
+  </g>
+</svg>

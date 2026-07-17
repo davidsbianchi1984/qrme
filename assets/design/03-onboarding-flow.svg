@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 640" width="1400" height="640" font-family="Helvetica, Arial, sans-serif">
+  <title>QRME onboarding — profile creation flow across four mobile screens</title>
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F2F3F7"/>
+      <stop offset="1" stop-color="#E4E6EE"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F4F5F9"/>
+    </linearGradient>
+    <radialGradient id="glow3" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#E8A34D" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1400" height="640" fill="url(#bg3)"/>
+
+  <!-- progress connector -->
+  <g stroke="#23255F" stroke-opacity="0.25" stroke-width="3" stroke-dasharray="1 10" stroke-linecap="round">
+    <line x1="330" y1="320" x2="380" y2="320"/>
+    <line x1="670" y1="320" x2="720" y2="320"/>
+    <line x1="1010" y1="320" x2="1060" y2="320"/>
+  </g>
+
+  <!-- Screen 1: age verification gate -->
+  <g transform="translate(80 70)">
+    <rect width="250" height="500" rx="30" fill="#23255F"/>
+    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
+    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">Verify your age</text>
+    <rect x="80" y="110" width="90" height="90" rx="18" fill="none" stroke="#E8A34D" stroke-width="4"/>
+    <text x="125" y="166" text-anchor="middle" fill="#E8A34D" font-size="30" font-weight="bold">18+</text>
+    <rect x="40" y="250" width="170" height="38" rx="10" fill="#EDEEF4"/>
+    <text x="52" y="274" fill="#8B90A8" font-size="13">Date of birth</text>
+    <rect x="40" y="300" width="170" height="38" rx="10" fill="#EDEEF4"/>
+    <text x="52" y="324" fill="#8B90A8" font-size="13">Guardian consent</text>
+    <rect x="40" y="410" width="170" height="44" rx="22" fill="#23255F"/>
+    <text x="125" y="437" text-anchor="middle" fill="#FFFFFF" font-size="14">Continue</text>
+  </g>
+
+  <!-- Screen 2: demographic questionnaire -->
+  <g transform="translate(420 70)">
+    <rect width="250" height="500" rx="30" fill="#23255F"/>
+    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
+    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">About you</text>
+    <g fill="#EDEEF4">
+      <rect x="40" y="100" width="170" height="34" rx="9"/>
+      <rect x="40" y="146" width="170" height="34" rx="9"/>
+      <rect x="40" y="192" width="170" height="34" rx="9"/>
+      <rect x="40" y="238" width="170" height="34" rx="9"/>
+    </g>
+    <g fill="#8B90A8" font-size="12">
+      <text x="52" y="122">Language</text>
+      <text x="52" y="168">Location</text>
+      <text x="52" y="214">Culture &amp; identity</text>
+      <text x="52" y="260">Maturity level</text>
+    </g>
+    <rect x="40" y="410" width="170" height="44" rx="22" fill="#23255F"/>
+    <text x="125" y="437" text-anchor="middle" fill="#FFFFFF" font-size="14">Continue</text>
+  </g>
+
+  <!-- Screen 3: social account connections with toggles -->
+  <g transform="translate(760 70)">
+    <rect width="250" height="500" rx="30" fill="#23255F"/>
+    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
+    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">Connect sources</text>
+    <g>
+      <g transform="translate(40 96)">
+        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
+        <circle cx="24" cy="22" r="12" fill="#23255F"/>
+        <text x="46" y="27" fill="#4A4E6E" font-size="12">Facebook</text>
+        <rect x="122" y="12" width="38" height="20" rx="10" fill="#E8A34D"/><circle cx="150" cy="22" r="8" fill="#FFF"/>
+      </g>
+      <g transform="translate(40 152)">
+        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
+        <circle cx="24" cy="22" r="12" fill="#8B90A8"/>
+        <text x="46" y="27" fill="#4A4E6E" font-size="12">Instagram</text>
+        <rect x="122" y="12" width="38" height="20" rx="10" fill="#E8A34D"/><circle cx="150" cy="22" r="8" fill="#FFF"/>
+      </g>
+      <g transform="translate(40 208)">
+        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
+        <circle cx="24" cy="22" r="12" fill="#161840"/>
+        <text x="46" y="27" fill="#4A4E6E" font-size="12">X</text>
+        <rect x="122" y="12" width="38" height="20" rx="10" fill="#C9CDD8"/><circle cx="132" cy="22" r="8" fill="#FFF"/>
+      </g>
+      <g transform="translate(40 264)">
+        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
+        <circle cx="24" cy="22" r="12" fill="#B0433A"/>
+        <text x="46" y="27" fill="#4A4E6E" font-size="12">YouTube</text>
+        <rect x="122" y="12" width="38" height="20" rx="10" fill="#E8A34D"/><circle cx="150" cy="22" r="8" fill="#FFF"/>
+      </g>
+      <g transform="translate(40 320)">
+        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
+        <circle cx="24" cy="22" r="12" fill="#2E3070"/>
+        <text x="46" y="27" fill="#4A4E6E" font-size="12">TikTok</text>
+        <rect x="122" y="12" width="38" height="20" rx="10" fill="#C9CDD8"/><circle cx="132" cy="22" r="8" fill="#FFF"/>
+      </g>
+    </g>
+    <rect x="40" y="410" width="170" height="44" rx="22" fill="#23255F"/>
+    <text x="125" y="437" text-anchor="middle" fill="#FFFFFF" font-size="14">Continue</text>
+  </g>
+
+  <!-- Screen 4: persona preview -->
+  <g transform="translate(1100 70)">
+    <rect width="250" height="500" rx="30" fill="#23255F"/>
+    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
+    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">Persona preview</text>
+    <circle cx="125" cy="180" r="72" fill="url(#glow3)"/>
+    <circle cx="125" cy="166" r="34" fill="#E8A34D"/>
+    <path d="M73 262 C73 214 96 192 125 192 C154 192 177 214 177 262 Z" fill="#E8A34D" opacity="0.85"/>
+    <g fill="#EDEEF4">
+      <rect x="40" y="290" width="170" height="26" rx="8"/>
+      <rect x="40" y="326" width="130" height="26" rx="8"/>
+    </g>
+    <g fill="#8B90A8" font-size="11">
+      <text x="52" y="307">Voice: warm, wry</text>
+      <text x="52" y="343">Tone: storyteller</text>
+    </g>
+    <rect x="40" y="410" width="170" height="44" rx="22" fill="#E8A34D"/>
+    <text x="125" y="437" text-anchor="middle" fill="#161840" font-size="14" font-weight="bold">Create profile</text>
+  </g>
+</svg>
