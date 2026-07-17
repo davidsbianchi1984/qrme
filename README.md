@@ -1,5 +1,16 @@
 # QRME — AI Synthetic Profile Platform (v1)
 
+This repository holds **two independent products** that can also run in tandem:
+
+- **QRME** (`qrme/`) — the AI synthetic-profile platform (this document; patent
+  app 19/056,418).
+- **JIM-mini / Guardian** (`jim/`) — a standalone personal-guidance system that
+  monitors known conditions and can *optionally* delegate to QRME specialist
+  profiles. It shares no code with QRME and talks to it only over HTTP. See
+  [jim/README.md](jim/README.md) and [docs/tandem.md](docs/tandem.md).
+
+---
+
 QRME lets a user create, customize, and interact with AI-driven synthetic
 profiles — versions of themselves, another person (with consent/rights
 handling), or a fictional persona. Profiles adapt to *who* they're talking to
@@ -18,21 +29,6 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | Aging & lifecycle (6.6) | `aging_enabled` + `base_age` → effective age evolves with time; `successor_owner` for legacy succession |
 | Adult content mode (6.7) | Age-gated at both ends: adult owner required to enable, verified 18+ interactor required to chat |
 | In-app chat surface (6.8, v1) | `POST /profiles/{id}/chat` |
-
-### JIM-mini / Guardian — personal guidance tandem layer
-
-QRME pairs with **Guardian** (patent app 19/038,196), an always-on monitor that
-detects a user's known conditions from biometric and contextual signals and
-pulls the matching QRME specialist profile to deliver moderated guidance —
-escalating to an emergency contact when a signal is critical. See
-[docs/guardian.md](docs/guardian.md).
-
-| Guardian capability | Endpoint |
-|---|---|
-| Enroll a user (consent, emergency contact, baseline) | `POST /guardian/enroll/{interactor}` |
-| Register a QRME profile as a condition specialist | `POST /guardian/specialists` |
-| Ingest a biometric/context sample → run the closed loop | `POST /guardian/monitor/{interactor}` |
-| Event timeline (biometric → detection → guidance → escalation) | `GET /guardian/events/{interactor}` |
 
 ## Architecture
 

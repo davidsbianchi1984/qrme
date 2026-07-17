@@ -74,39 +74,6 @@ CREATE TABLE IF NOT EXISTS engagement (
     last_seen     TEXT,
     PRIMARY KEY (profile_id, interactor_id)
 );
-
--- JIM-mini / Guardian: the always-on personal guidance layer (tandem system).
-
-CREATE TABLE IF NOT EXISTS specialists (
-    id           TEXT PRIMARY KEY,
-    condition    TEXT NOT NULL,               -- condition domain key (see conditions.py)
-    profile_id   TEXT NOT NULL REFERENCES profiles(id),  -- the QRME specialist agent
-    created_at   TEXT NOT NULL,
-    UNIQUE (condition)
-);
-
-CREATE TABLE IF NOT EXISTS guardian_enrollments (
-    interactor_id      TEXT PRIMARY KEY REFERENCES interactors(id),
-    terms_consent      INTEGER NOT NULL DEFAULT 0,
-    guardian_consent   INTEGER NOT NULL DEFAULT 0,
-    emergency_name     TEXT,
-    emergency_phone    TEXT,
-    contact_consent    INTEGER NOT NULL DEFAULT 0,   -- consent to contact emergency contact
-    device_paired      INTEGER NOT NULL DEFAULT 0,
-    resting_heart_rate INTEGER,
-    goals              TEXT,
-    created_at         TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS guardian_events (
-    id            TEXT PRIMARY KEY,
-    interactor_id TEXT NOT NULL REFERENCES interactors(id),
-    type          TEXT NOT NULL,   -- biometric | detection | guidance | escalation | resolved
-    condition     TEXT,
-    severity      TEXT,
-    detail        TEXT NOT NULL DEFAULT '{}',
-    created_at    TEXT NOT NULL
-);
 """
 
 _local = threading.local()

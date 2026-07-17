@@ -48,13 +48,7 @@ class StubProvider:
         )
         nickname = _extract(system, "Address them as: ")
         tone = _extract(system, "Tone: ") or "warm"
-        situation = _extract(system, "Current situation from real-time monitoring: ")
         greeting = f"{nickname}, " if nickname else ""
-        if situation:
-            return (
-                f"{greeting}I'm here with you. [stub guidance responding to "
-                f"monitored situation: {situation[:140]}]"
-            )
         return (
             f"{greeting}thanks for telling me about that. "
             f"[stub reply in a {tone} tone to: {last_user[:120]}]"

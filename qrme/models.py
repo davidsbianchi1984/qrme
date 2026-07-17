@@ -110,34 +110,3 @@ class EngagementOut(BaseModel):
     sessions: int
     feedback_pos: int
     feedback_neg: int
-
-
-# -- JIM-mini / Guardian ----------------------------------------------------
-
-Condition = Literal[
-    "anxiety", "depression", "financial_stress", "relationship", "physical_distress"
-]
-
-
-class GuardianEnroll(BaseModel):
-    terms_consent: bool
-    guardian_consent: bool = False
-    emergency_name: str | None = None
-    emergency_phone: str | None = None
-    contact_consent: bool = False
-    device_paired: bool = False
-    resting_heart_rate: int | None = None
-    goals: str | None = None
-
-
-class SpecialistRegister(BaseModel):
-    condition: Condition
-    profile_id: str
-
-
-class BiometricSample(BaseModel):
-    heart_rate: int | None = None
-    resting_heart_rate: int | None = None
-    respiratory_rate: int | None = None
-    blood_oxygen: float | None = None
-    note: str | None = None
