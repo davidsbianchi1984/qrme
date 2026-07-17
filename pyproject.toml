@@ -7,6 +7,7 @@ dependencies = [
     "fastapi>=0.110",
     "uvicorn>=0.29",
     "anthropic>=0.117",
+    "cryptography>=41",
 ]
 
 [project.optional-dependencies]
@@ -17,7 +18,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["qrme*", "jim*"]
+include = ["qrme*", "jim*", "pdi*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests", "jim/tests"]
+testpaths = ["tests", "jim/tests", "pdi/tests"]

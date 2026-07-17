@@ -1,13 +1,17 @@
 # QRME — AI Synthetic Profile Platform (v1)
 
-This repository holds **two independent products** that can also run in tandem:
+This repository holds **three independent products** that each run on their own
+and can also interoperate in tandem — sharing no code, only HTTP APIs (see
+[docs/tandem.md](docs/tandem.md)):
 
 - **QRME** (`qrme/`) — the AI synthetic-profile platform (this document; patent
   app 19/056,418).
 - **JIM-mini / Guardian** (`jim/`) — a standalone personal-guidance system that
   monitors known conditions and can *optionally* delegate to QRME specialist
-  profiles. It shares no code with QRME and talks to it only over HTTP. See
-  [jim/README.md](jim/README.md) and [docs/tandem.md](docs/tandem.md).
+  profiles. [jim/README.md](jim/README.md).
+- **Private Data Infrastructure** (`pdi/`) — a standalone secure encrypted-vault
+  + compliance/audit platform that the AI systems can *optionally* run on top of
+  for private, encrypted storage. [pdi/README.md](pdi/README.md).
 
 ---
 
