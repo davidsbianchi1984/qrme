@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" font-family="Helvetica, Arial, sans-serif">
+  <title>QRME — AI synthetic profile platform</title>
+  <defs>
+    <linearGradient id="qbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10123A"/>
+      <stop offset="0.45" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#2B2D6E"/>
+    </linearGradient>
+    <radialGradient id="qvign" cx="0.5" cy="0.5" r="0.75">
+      <stop offset="0.62" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0A0B28" stop-opacity="0.55"/>
+    </radialGradient>
+    <radialGradient id="qcore" cx="0.5" cy="0.42" r="0.62">
+      <stop offset="0" stop-color="#FFF6E6" stop-opacity="0.98"/>
+      <stop offset="0.28" stop-color="#F4E3C8" stop-opacity="0.75"/>
+      <stop offset="0.62" stop-color="#E8A34D" stop-opacity="0.30"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="qfig" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0C98D"/>
+      <stop offset="1" stop-color="#D98F3B"/>
+    </linearGradient>
+    <linearGradient id="qperson" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3E4187"/>
+      <stop offset="1" stop-color="#23255F"/>
+    </linearGradient>
+    <filter id="qsoft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <filter id="qsoft2" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="2"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="640" fill="url(#qbg)"/>
+
+  <!-- distant node constellation -->
+  <g opacity="0.5">
+    <g fill="#C9CDD8">
+      <circle cx="120" cy="90" r="1.6"/><circle cx="240" cy="52" r="1.2"/><circle cx="410" cy="110" r="1.4"/>
+      <circle cx="705" cy="60" r="1.4"/><circle cx="905" cy="95" r="1.2"/><circle cx="1105" cy="66" r="1.6"/>
+      <circle cx="1215" cy="150" r="1.2"/><circle cx="85" cy="300" r="1.2"/><circle cx="65" cy="470" r="1.4"/>
+      <circle cx="1200" cy="420" r="1.4"/><circle cx="1120" cy="555" r="1.2"/><circle cx="330" cy="585" r="1.2"/>
+    </g>
+    <g stroke="#C9CDD8" stroke-width="0.6" stroke-opacity="0.35">
+      <line x1="120" y1="90" x2="240" y2="52"/><line x1="240" y1="52" x2="410" y2="110"/>
+      <line x1="705" y1="60" x2="905" y2="95"/><line x1="905" y1="95" x2="1105" y2="66"/>
+      <line x1="1105" y1="66" x2="1215" y2="150"/>
+    </g>
+  </g>
+
+  <!-- memory timeline arc -->
+  <g>
+    <path d="M60 560 Q640 480 1220 560" fill="none" stroke="#C9CDD8" stroke-opacity="0.28" stroke-width="1.6" stroke-dasharray="1 10" stroke-linecap="round"/>
+    <g fill="#E8A34D">
+      <circle cx="270" cy="537" r="3.6" opacity="0.9"/>
+      <circle cx="520" cy="519" r="3.2" opacity="0.75"/>
+      <circle cx="800" cy="521" r="3.2" opacity="0.75"/>
+      <circle cx="1050" cy="541" r="3.6" opacity="0.9"/>
+    </g>
+    <g fill="#8B90A8" font-size="11" text-anchor="middle" opacity="0.8">
+      <text x="270" y="562">memories</text>
+      <text x="1050" y="566">legacy</text>
+    </g>
+  </g>
+
+  <!-- ===== central synthetic profile ===== -->
+  <g transform="translate(430 280)">
+    <circle r="205" fill="url(#qcore)"/>
+    <!-- identity rings -->
+    <circle r="150" fill="none" stroke="#F4E3C8" stroke-opacity="0.30" stroke-width="1.4"/>
+    <circle r="172" fill="none" stroke="#E8A34D" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="2 12" stroke-linecap="round"/>
+    <circle r="196" fill="none" stroke="#C9CDD8" stroke-opacity="0.16" stroke-width="0.8"/>
+    <!-- ring nodes -->
+    <g fill="#E8A34D">
+      <circle cx="0" cy="-172" r="4.4"/><circle cx="149" cy="86" r="3.6"/><circle cx="-149" cy="86" r="3.6"/>
+    </g>
+    <g fill="#F4E3C8"><circle cx="122" cy="-122" r="2.4" opacity="0.85"/><circle cx="-122" cy="-122" r="2.4" opacity="0.85"/></g>
+
+    <!-- avatar: head + shoulders with soft under-glow -->
+    <g filter="url(#qsoft)" opacity="0.55">
+      <circle cx="0" cy="-34" r="56" fill="#E8A34D"/>
+      <path d="M-92 128 C-92 40 -50 -2 0 -2 C50 -2 92 40 92 128 Z" fill="#E8A34D"/>
+    </g>
+    <circle cx="0" cy="-34" r="52" fill="url(#qfig)"/>
+    <path d="M-86 124 C-86 42 -46 4 0 4 C46 4 86 42 86 124 Z" fill="url(#qfig)"/>
+    <!-- facets dissolving into data -->
+    <g fill="#FFF6E6">
+      <circle cx="66" cy="-72" r="4" opacity="0.9"/><circle cx="92" cy="-96" r="3" opacity="0.7"/>
+      <circle cx="116" cy="-76" r="2.4" opacity="0.55"/><circle cx="98" cy="-42" r="2.8" opacity="0.6"/>
+      <circle cx="132" cy="-112" r="1.8" opacity="0.4"/>
+    </g>
+    <g stroke="#F4E3C8" stroke-width="1" fill="none" opacity="0.5">
+      <path d="M52 -66 Q80 -84 92 -96"/><path d="M60 -50 Q90 -50 98 -42"/>
+    </g>
+  </g>
+
+  <!-- ===== relationship threads to three people ===== -->
+  <!-- close family: warm, dense -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M600 210 C740 150 860 140 950 158" stroke="#E8A34D" stroke-width="3.4" stroke-opacity="0.85"/>
+    <path d="M608 232 C744 182 862 168 952 178" stroke="#E8A34D" stroke-width="2" stroke-opacity="0.5"/>
+    <path d="M614 254 C748 214 864 196 954 198" stroke="#E8A34D" stroke-width="1.2" stroke-opacity="0.3"/>
+    <!-- friend: medium -->
+    <path d="M622 306 C780 306 900 320 1006 352" stroke="#F4E3C8" stroke-width="2" stroke-opacity="0.55"/>
+    <path d="M624 324 C782 330 902 342 1008 368" stroke="#F4E3C8" stroke-width="1" stroke-opacity="0.3"/>
+    <!-- stranger: cool, sparse -->
+    <path d="M606 372 C740 428 850 470 942 496" stroke="#C9CDD8" stroke-width="1.4" stroke-opacity="0.4" stroke-dasharray="4 8"/>
+  </g>
+  <g fill="#FFF6E6"><circle cx="775" cy="163" r="3" opacity="0.9"/><circle cx="860" cy="316" r="2.4" opacity="0.7"/></g>
+
+  <!-- the three people -->
+  <g>
+    <g transform="translate(985 170)">
+      <circle r="30" fill="url(#qperson)" stroke="#E8A34D" stroke-opacity="0.6" stroke-width="1.6"/>
+      <path d="M-52 128 C-52 52 -26 22 0 22 C26 22 52 52 52 128 Z" fill="url(#qperson)"/>
+      <circle r="38" fill="none" stroke="#E8A34D" stroke-opacity="0.35" stroke-width="1"/>
+      <text y="-52" text-anchor="middle" fill="#E8A34D" font-size="12" opacity="0.9">family</text>
+    </g>
+    <g transform="translate(1042 366) scale(0.86)">
+      <circle r="30" fill="url(#qperson)" stroke="#F4E3C8" stroke-opacity="0.5" stroke-width="1.4"/>
+      <path d="M-52 128 C-52 52 -26 22 0 22 C26 22 52 52 52 128 Z" fill="url(#qperson)"/>
+      <text y="-46" text-anchor="middle" fill="#F4E3C8" font-size="13" opacity="0.85">friend</text>
+    </g>
+    <g transform="translate(965 512) scale(0.72)">
+      <circle r="30" fill="url(#qperson)" stroke="#C9CDD8" stroke-opacity="0.45" stroke-width="1.4"/>
+      <path d="M-52 128 C-52 52 -26 22 0 22 C26 22 52 52 52 128 Z" fill="url(#qperson)"/>
+      <text y="-46" text-anchor="middle" fill="#C9CDD8" font-size="14" opacity="0.8">stranger</text>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <g transform="translate(72 96)">
+    <text font-size="58" font-weight="bold" letter-spacing="6" fill="#F4E3C8">QRME</text>
+    <text y="30" font-size="16" fill="#C9CDD8" opacity="0.9">AI synthetic profiles — relationship-aware, remembered, yours</text>
+    <rect x="2" y="44" width="64" height="3" rx="1.5" fill="#E8A34D"/>
+  </g>
+
+  <rect width="1280" height="640" fill="url(#qvign)"/>
+</svg>

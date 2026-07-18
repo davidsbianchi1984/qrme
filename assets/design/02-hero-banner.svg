@@ -1,82 +1,128 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Helvetica, Arial, sans-serif">
   <title>QRME hero banner — people with luminous AI avatars linked by relationship threads</title>
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#161840"/>
-      <stop offset="0.7" stop-color="#23255F"/>
-      <stop offset="1" stop-color="#2E3070"/>
+    <linearGradient id="hbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0E1034"/>
+      <stop offset="0.55" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#2B2D6E"/>
     </linearGradient>
-    <radialGradient id="softlight" cx="0.5" cy="0.35" r="0.7">
-      <stop offset="0" stop-color="#C9CDD8" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#C9CDD8" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="person" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#3A3D80"/>
-      <stop offset="1" stop-color="#1C1E4E"/>
-    </linearGradient>
-    <radialGradient id="avatar" cx="0.5" cy="0.4" r="0.65">
-      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.9"/>
-      <stop offset="0.55" stop-color="#E8A34D" stop-opacity="0.45"/>
+    <radialGradient id="hglow" cx="0.5" cy="0.38" r="0.6">
+      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.5"/>
+      <stop offset="0.4" stop-color="#E8A34D" stop-opacity="0.2"/>
       <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="avatarSilver" cx="0.5" cy="0.4" r="0.65">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.85"/>
-      <stop offset="0.55" stop-color="#C9CDD8" stop-opacity="0.4"/>
-      <stop offset="1" stop-color="#C9CDD8" stop-opacity="0"/>
+    <radialGradient id="hvign" cx="0.5" cy="0.5" r="0.75">
+      <stop offset="0.62" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.55"/>
     </radialGradient>
+    <linearGradient id="hperson" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3E4187"/>
+      <stop offset="1" stop-color="#1B1D4E"/>
+    </linearGradient>
+    <radialGradient id="havatar" cx="0.5" cy="0.4" r="0.75">
+      <stop offset="0" stop-color="#FFF6E6"/>
+      <stop offset="0.45" stop-color="#F0C482"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0.15"/>
+    </radialGradient>
+    <linearGradient id="hground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#12143B" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0B0C2C"/>
+    </linearGradient>
+    <filter id="hsoft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <filter id="hsoft2" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
   </defs>
 
-  <rect width="1600" height="900" fill="url(#sky)"/>
-  <rect width="1600" height="900" fill="url(#softlight)"/>
+  <rect width="1600" height="900" fill="url(#hbg)"/>
+  <ellipse cx="800" cy="330" rx="620" ry="380" fill="url(#hglow)"/>
 
-  <!-- background: faint feed / chat / timeline motifs -->
-  <g opacity="0.14" stroke="#C9CDD8" fill="none" stroke-width="3">
-    <rect x="90" y="120" width="200" height="46" rx="12"/>
-    <rect x="90" y="184" width="150" height="46" rx="12"/>
-    <rect x="1330" y="140" width="180" height="120" rx="14"/>
-    <line x1="1350" y1="176" x2="1490" y2="176"/>
-    <line x1="1350" y1="206" x2="1460" y2="206"/>
-    <line x1="200" y1="640" x2="1400" y2="640" stroke-dasharray="2 14"/>
+  <!-- starfield / node field -->
+  <g fill="#C9CDD8">
+    <circle cx="120" cy="120" r="1.8" opacity="0.7"/><circle cx="260" cy="70" r="1.3" opacity="0.5"/>
+    <circle cx="430" cy="150" r="1.6" opacity="0.6"/><circle cx="620" cy="60" r="1.3" opacity="0.5"/>
+    <circle cx="960" cy="80" r="1.6" opacity="0.6"/><circle cx="1180" cy="130" r="1.3" opacity="0.5"/>
+    <circle cx="1370" cy="80" r="1.8" opacity="0.7"/><circle cx="1500" cy="200" r="1.3" opacity="0.5"/>
+    <circle cx="80" cy="420" r="1.4" opacity="0.5"/><circle cx="1530" cy="470" r="1.4" opacity="0.5"/>
+    <circle cx="200" cy="260" r="1.2" opacity="0.4"/><circle cx="1420" cy="320" r="1.2" opacity="0.4"/>
   </g>
-  <g opacity="0.35" fill="#E8A34D">
-    <circle cx="400" cy="640" r="5"/><circle cx="800" cy="640" r="5"/><circle cx="1200" cy="640" r="5"/>
+  <g stroke="#C9CDD8" stroke-width="0.7" stroke-opacity="0.25">
+    <line x1="120" y1="120" x2="260" y2="70"/><line x1="260" y1="70" x2="430" y2="150"/>
+    <line x1="960" y1="80" x2="1180" y2="130"/><line x1="1180" y1="130" x2="1370" y2="80"/>
   </g>
 
-  <!-- people (grounded, opaque) -->
-  <g>
-    <g transform="translate(330 430)">
-      <circle cx="0" cy="0" r="46" fill="url(#person)" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
-      <path d="M-84 250 C-84 120 -40 62 0 62 C40 62 84 120 84 250 Z" fill="url(#person)"/>
+  <!-- ============ three pairs: person + luminous avatar ============ -->
+  <!-- center pair (largest) -->
+  <g transform="translate(800 0)">
+    <g filter="url(#hsoft)"><circle cx="0" cy="330" r="120" fill="#E8A34D" opacity="0.45"/></g>
+    <circle cx="0" cy="330" r="104" fill="url(#havatar)"/>
+    <circle cx="0" cy="330" r="104" fill="none" stroke="#F4E3C8" stroke-opacity="0.5" stroke-width="1.6"/>
+    <circle cx="0" cy="330" r="126" fill="none" stroke="#E8A34D" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="2 10" stroke-linecap="round"/>
+    <!-- avatar face suggestion -->
+    <circle cx="0" cy="302" r="34" fill="#FFF9EE" opacity="0.9"/>
+    <path d="M-46 388 C-46 336 -24 314 0 314 C24 314 46 336 46 388 Z" fill="#FFF9EE" opacity="0.9"/>
+    <!-- orbiting memory motes -->
+    <circle cx="-96" cy="270" r="4" fill="#FFF6E6"/><circle cx="102" cy="300" r="3" fill="#FFF6E6" opacity="0.8"/>
+    <circle cx="66" cy="424" r="3.4" fill="#F4E3C8" opacity="0.7"/>
+    <!-- person below -->
+    <g transform="translate(0 570)">
+      <circle cx="0" cy="0" r="52" fill="url(#hperson)"/>
+      <path d="M-92 210 C-92 84 -46 38 0 38 C46 38 92 84 92 210 Z" fill="url(#hperson)"/>
+      <path d="M-38 -32 a52 52 0 0 1 72 -6" fill="none" stroke="#E8A34D" stroke-width="2.4" stroke-opacity="0.8" stroke-linecap="round"/>
     </g>
-    <g transform="translate(770 400)">
-      <circle cx="0" cy="0" r="52" fill="url(#person)" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
-      <path d="M-94 280 C-94 132 -46 68 0 68 C46 68 94 132 94 280 Z" fill="url(#person)"/>
-    </g>
-    <g transform="translate(1210 460) scale(0.78)">
-      <circle cx="0" cy="0" r="46" fill="url(#person)" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
-      <path d="M-84 250 C-84 120 -40 62 0 62 C40 62 84 120 84 250 Z" fill="url(#person)"/>
-    </g>
+    <!-- thread person->avatar -->
+    <path d="M0 512 C-14 476 10 458 0 434" fill="none" stroke="#E8A34D" stroke-width="2.6" stroke-opacity="0.8" stroke-linecap="round"/>
   </g>
 
-  <!-- luminous avatars floating beside each person -->
-  <g>
-    <circle cx="470" cy="330" r="86" fill="url(#avatar)"/>
-    <circle cx="470" cy="330" r="34" fill="none" stroke="#E8A34D" stroke-opacity="0.8" stroke-width="2.5"/>
-    <circle cx="920" cy="290" r="98" fill="url(#avatarSilver)"/>
-    <circle cx="920" cy="290" r="38" fill="none" stroke="#C9CDD8" stroke-opacity="0.85" stroke-width="2.5"/>
-    <circle cx="1330" cy="360" r="72" fill="url(#avatar)"/>
-    <circle cx="1330" cy="360" r="28" fill="none" stroke="#E8A34D" stroke-opacity="0.7" stroke-width="2"/>
+  <!-- left pair -->
+  <g transform="translate(360 60) scale(0.78)">
+    <g filter="url(#hsoft)"><circle cx="0" cy="330" r="100" fill="#C9CDD8" opacity="0.35"/></g>
+    <circle cx="0" cy="330" r="88" fill="url(#havatar)" opacity="0.92"/>
+    <circle cx="0" cy="330" r="108" fill="none" stroke="#C9CDD8" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 9"/>
+    <circle cx="0" cy="306" r="28" fill="#FFF9EE" opacity="0.85"/>
+    <path d="M-38 378 C-38 336 -20 318 0 318 C20 318 38 336 38 378 Z" fill="#FFF9EE" opacity="0.85"/>
+    <g transform="translate(0 570)">
+      <circle cx="0" cy="0" r="48" fill="url(#hperson)"/>
+      <path d="M-86 200 C-86 82 -44 38 0 38 C44 38 86 82 86 200 Z" fill="url(#hperson)"/>
+    </g>
+    <path d="M0 516 C12 480 -10 460 0 428" fill="none" stroke="#F4E3C8" stroke-width="2.2" stroke-opacity="0.65" stroke-linecap="round"/>
   </g>
 
-  <!-- relationship threads: warmer + denser = closer relationship -->
+  <!-- right pair -->
+  <g transform="translate(1240 60) scale(0.78)">
+    <g filter="url(#hsoft)"><circle cx="0" cy="330" r="100" fill="#C9CDD8" opacity="0.35"/></g>
+    <circle cx="0" cy="330" r="88" fill="url(#havatar)" opacity="0.92"/>
+    <circle cx="0" cy="330" r="108" fill="none" stroke="#C9CDD8" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 9"/>
+    <circle cx="0" cy="306" r="28" fill="#FFF9EE" opacity="0.85"/>
+    <path d="M-38 378 C-38 336 -20 318 0 318 C20 318 38 336 38 378 Z" fill="#FFF9EE" opacity="0.85"/>
+    <g transform="translate(0 570)">
+      <circle cx="0" cy="0" r="48" fill="url(#hperson)"/>
+      <path d="M-86 200 C-86 82 -44 38 0 38 C44 38 86 82 86 200 Z" fill="url(#hperson)"/>
+    </g>
+    <path d="M0 516 C-12 480 10 460 0 428" fill="none" stroke="#F4E3C8" stroke-width="2.2" stroke-opacity="0.65" stroke-linecap="round"/>
+  </g>
+
+  <!-- relationship threads between avatars -->
   <g fill="none" stroke-linecap="round">
-    <path d="M470 330 Q690 250 920 290" stroke="#E8A34D" stroke-width="4" stroke-opacity="0.85"/>
-    <path d="M470 350 Q690 290 920 312" stroke="#E8A34D" stroke-width="2.5" stroke-opacity="0.55"/>
-    <path d="M470 372 Q690 330 920 334" stroke="#E8A34D" stroke-width="1.5" stroke-opacity="0.35"/>
-    <path d="M920 290 Q1130 300 1330 360" stroke="#C9CDD8" stroke-width="2" stroke-opacity="0.5"/>
-    <path d="M470 330 Q900 470 1330 380" stroke="#C9CDD8" stroke-width="1.2" stroke-opacity="0.28"/>
+    <path d="M470 318 C600 250 700 250 700 302" stroke="#E8A34D" stroke-width="2.6" stroke-opacity="0.7"/>
+    <path d="M900 302 C900 250 1000 250 1130 318" stroke="#E8A34D" stroke-width="2.6" stroke-opacity="0.7"/>
+    <path d="M478 360 C640 420 960 420 1122 360" stroke="#C9CDD8" stroke-width="1.6" stroke-opacity="0.4" stroke-dasharray="3 9"/>
   </g>
-  <g fill="#F4E3C8">
-    <circle cx="690" cy="268" r="4"/><circle cx="1130" cy="308" r="3" opacity="0.7"/>
+  <g fill="#FFF6E6" filter="url(#hsoft2)">
+    <circle cx="600" cy="266" r="4"/><circle cx="1000" cy="266" r="4"/>
   </g>
+
+  <!-- ground fade -->
+  <rect y="700" width="1600" height="200" fill="url(#hground)"/>
+
+  <!-- wordmark -->
+  <g transform="translate(800 130)" text-anchor="middle">
+    <text font-size="72" font-weight="bold" letter-spacing="10" fill="#F4E3C8">QRME</text>
+    <text y="40" font-size="21" fill="#C9CDD8" opacity="0.92" letter-spacing="1">Synthetic profiles that know who they're talking to</text>
+    <rect x="-44" y="58" width="88" height="3.4" rx="1.7" fill="#E8A34D"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#hvign)"/>
 </svg>

@@ -1,88 +1,118 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 620" width="1300" height="620" font-family="Helvetica, Arial, sans-serif">
   <title>Content moderation pipeline — profile output passes through safety filters before visibility</title>
   <defs>
-    <linearGradient id="bg8" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#1B1D4E"/>
-      <stop offset="1" stop-color="#23255F"/>
+    <linearGradient id="pbg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#12143B"/>
+      <stop offset="0.5" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#12143B"/>
     </linearGradient>
-    <radialGradient id="core8" cx="0.5" cy="0.45" r="0.6">
-      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.9"/>
-      <stop offset="0.6" stop-color="#E8A34D" stop-opacity="0.4"/>
-      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    <radialGradient id="pvign" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0.64" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
     </radialGradient>
-    <linearGradient id="filter8" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#C9CDD8" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#C9CDD8" stop-opacity="0.1"/>
+    <linearGradient id="pgate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3E4187"/>
+      <stop offset="1" stop-color="#23255C"/>
     </linearGradient>
-    <marker id="arrow8" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
-      <path d="M0 0 L10 5 L0 10 z" fill="#E8A34D"/>
+    <filter id="pshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="psoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="8"/></filter>
+    <marker id="parrow" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto">
+      <path d="M1 1 L8.5 5 L1 9 Z" fill="#8B90A8"/>
     </marker>
   </defs>
 
-  <rect width="1300" height="620" fill="url(#bg8)"/>
+  <rect width="1300" height="620" fill="url(#pbg)"/>
 
-  <!-- profile generating a reply -->
-  <g transform="translate(140 230)">
-    <circle cx="0" cy="60" r="105" fill="url(#core8)"/>
-    <circle cx="0" cy="44" r="34" fill="#E8A34D"/>
-    <path d="M-52 140 C-52 90 -30 68 0 68 C30 68 52 90 52 140 Z" fill="#E8A34D" opacity="0.9"/>
-    <text x="0" y="200" text-anchor="middle" fill="#C9CDD8" font-size="14">Synthetic profile</text>
+  <text x="650" y="62" text-anchor="middle" font-size="28" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">Every reply passes the gates</text>
+  <text x="650" y="90" text-anchor="middle" font-size="15" fill="#8B90A8">Profile output → safety filters → approved, held for review, or rejected</text>
+
+  <!-- conveyor line -->
+  <line x1="100" y1="330" x2="1200" y2="330" stroke="#3A3D7E" stroke-width="2" stroke-dasharray="8 10" marker-end="url(#parrow)"/>
+
+  <!-- source: profile -->
+  <g transform="translate(150 330)">
+    <g filter="url(#psoft)"><circle r="58" fill="#E8A34D" opacity="0.4"/></g>
+    <circle r="50" fill="#F0C482"/>
+    <circle cy="-14" r="18" fill="#1B1D4E"/>
+    <path d="M-30 34 C-30 6 -16 -2 0 -2 C16 -2 30 6 30 34 Z" fill="#1B1D4E"/>
+    <circle r="50" fill="none" stroke="#FFF6E6" stroke-opacity="0.5" stroke-width="1.4"/>
+    <text y="82" text-anchor="middle" font-size="13" fill="#C9CDD8">profile reply</text>
   </g>
 
-  <!-- draft message card -->
-  <g transform="translate(255 160)">
-    <rect width="150" height="76" rx="14" fill="#FFF7EA"/>
-    <g stroke="#8B90A8" stroke-width="3" stroke-linecap="round">
-      <line x1="20" y1="24" x2="130" y2="24"/><line x1="20" y1="40" x2="110" y2="40"/><line x1="20" y1="56" x2="120" y2="56"/>
+  <!-- message chip approaching -->
+  <g transform="translate(238 296)" filter="url(#pshadow)">
+    <rect width="120" height="40" rx="12" fill="#2E3170"/>
+    <rect width="120" height="40" rx="12" fill="none" stroke="#C9CDD8" stroke-opacity="0.3"/>
+    <g fill="#8B90A8"><rect x="14" y="12" width="70" height="5" rx="2.5"/><rect x="14" y="23" width="92" height="5" rx="2.5"/></g>
+  </g>
+
+  <!-- ===== three filter gates ===== -->
+  <g filter="url(#pshadow)">
+    <g transform="translate(420 190)">
+      <rect width="130" height="280" rx="16" fill="url(#pgate)"/>
+      <rect width="130" height="280" rx="16" fill="none" stroke="#E8A34D" stroke-opacity="0.5" stroke-width="1.4"/>
+      <rect x="24" y="120" width="82" height="46" rx="10" fill="#12143B"/>
+      <rect x="30" y="126" width="70" height="34" rx="7" fill="none" stroke="#E8A34D" stroke-opacity="0.6" stroke-width="1.4"/>
+      <text x="65" y="40" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#F4E3C8">Policy</text>
+      <text x="65" y="58" text-anchor="middle" font-size="11" fill="#8B90A8">platform rules</text>
+      <circle cx="65" cy="240" r="7" fill="#7BC47F"/>
+    </g>
+    <g transform="translate(600 190)">
+      <rect width="130" height="280" rx="16" fill="url(#pgate)"/>
+      <rect width="130" height="280" rx="16" fill="none" stroke="#E8A34D" stroke-opacity="0.5" stroke-width="1.4"/>
+      <rect x="24" y="120" width="82" height="46" rx="10" fill="#12143B"/>
+      <rect x="30" y="126" width="70" height="34" rx="7" fill="none" stroke="#E8A34D" stroke-opacity="0.6" stroke-width="1.4"/>
+      <text x="65" y="40" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#F4E3C8">Safety</text>
+      <text x="65" y="58" text-anchor="middle" font-size="11" fill="#8B90A8">harm &amp; crisis cues</text>
+      <circle cx="65" cy="240" r="7" fill="#7BC47F"/>
+    </g>
+    <g transform="translate(780 190)">
+      <rect width="130" height="280" rx="16" fill="url(#pgate)"/>
+      <rect width="130" height="280" rx="16" fill="none" stroke="#E8A34D" stroke-opacity="0.5" stroke-width="1.4"/>
+      <rect x="24" y="120" width="82" height="46" rx="10" fill="#12143B"/>
+      <rect x="30" y="126" width="70" height="34" rx="7" fill="none" stroke="#E8A34D" stroke-opacity="0.6" stroke-width="1.4"/>
+      <text x="65" y="40" text-anchor="middle" font-size="13.5" font-weight="bold" fill="#F4E3C8">Owner rules</text>
+      <text x="65" y="58" text-anchor="middle" font-size="11" fill="#8B90A8">per-profile bounds</text>
+      <circle cx="65" cy="240" r="7" fill="#E8C34D"/>
     </g>
   </g>
 
-  <!-- flow line -->
-  <g stroke="#E8A34D" stroke-width="3" fill="none">
-    <line x1="405" y1="300" x2="480" y2="300" marker-end="url(#arrow8)"/>
-    <line x1="600" y1="300" x2="660" y2="300" marker-end="url(#arrow8)"/>
-    <line x1="780" y1="300" x2="840" y2="300" marker-end="url(#arrow8)"/>
-    <line x1="960" y1="300" x2="1030" y2="300" marker-end="url(#arrow8)"/>
+  <!-- beams between gates -->
+  <g stroke="#E8A34D" stroke-opacity="0.35" stroke-width="2">
+    <line x1="550" y1="330" x2="600" y2="330"/>
+    <line x1="730" y1="330" x2="780" y2="330"/>
   </g>
 
-  <!-- three translucent filter layers -->
-  <g text-anchor="middle" font-size="14">
-    <g transform="translate(490 130)">
-      <rect width="110" height="340" rx="18" fill="url(#filter8)" stroke="#C9CDD8" stroke-opacity="0.55" stroke-width="2"/>
-      <path d="M55 40 l26 12 v22 c0 22 -12 34 -26 40 c-14 -6 -26 -18 -26 -40 v-22 z" fill="none" stroke="#C9CDD8" stroke-width="2.5"/>
-      <text x="55" y="220" fill="#C9CDD8">Community</text>
-      <text x="55" y="240" fill="#C9CDD8">standards</text>
+  <!-- ===== outcomes ===== -->
+  <g>
+    <path d="M910 300 C980 260 1020 240 1060 226" fill="none" stroke="#7BC47F" stroke-width="2.6" stroke-opacity="0.8" marker-end="url(#parrow)"/>
+    <path d="M910 330 C980 330 1020 330 1058 330" fill="none" stroke="#E8C34D" stroke-width="2.2" stroke-opacity="0.8" marker-end="url(#parrow)"/>
+    <path d="M910 360 C980 400 1020 420 1060 434" fill="none" stroke="#D96A6A" stroke-width="2" stroke-opacity="0.7" marker-end="url(#parrow)"/>
+  </g>
+  <g filter="url(#pshadow)" text-anchor="middle" font-size="13.5">
+    <g transform="translate(1080 196)">
+      <rect width="150" height="58" rx="14" fill="#1E3324"/>
+      <rect width="150" height="58" rx="14" fill="none" stroke="#7BC47F" stroke-opacity="0.6" stroke-width="1.4"/>
+      <text x="75" y="26" fill="#7BC47F" font-weight="bold">✓ Approved</text>
+      <text x="75" y="45" fill="#8FAF93" font-size="11">delivered now</text>
     </g>
-    <g transform="translate(670 130)">
-      <rect width="110" height="340" rx="18" fill="url(#filter8)" stroke="#C9CDD8" stroke-opacity="0.55" stroke-width="2"/>
-      <path d="M55 40 l26 12 v22 c0 22 -12 34 -26 40 c-14 -6 -26 -18 -26 -40 v-22 z" fill="none" stroke="#C9CDD8" stroke-width="2.5"/>
-      <text x="55" y="86" fill="#E8A34D" font-weight="bold">18</text>
-      <text x="55" y="220" fill="#C9CDD8">Age</text>
-      <text x="55" y="240" fill="#C9CDD8">appropriateness</text>
+    <g transform="translate(1080 300)">
+      <rect width="150" height="58" rx="14" fill="#33301C"/>
+      <rect width="150" height="58" rx="14" fill="none" stroke="#E8C34D" stroke-opacity="0.6" stroke-width="1.4"/>
+      <text x="75" y="26" fill="#E8C34D" font-weight="bold">⏸ Held</text>
+      <text x="75" y="45" fill="#B0A878" font-size="11">owner review queue</text>
     </g>
-    <g transform="translate(850 130)">
-      <rect width="110" height="340" rx="18" fill="url(#filter8)" stroke="#E8A34D" stroke-opacity="0.7" stroke-width="2"/>
-      <path d="M55 40 l26 12 v22 c0 22 -12 34 -26 40 c-14 -6 -26 -18 -26 -40 v-22 z" fill="none" stroke="#E8A34D" stroke-width="2.5"/>
-      <path d="M46 82 l7 7 l14 -16" stroke="#E8A34D" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <text x="55" y="220" fill="#E8A34D">Owner</text>
-      <text x="55" y="240" fill="#E8A34D">approval</text>
+    <g transform="translate(1080 404)">
+      <rect width="150" height="58" rx="14" fill="#33201F"/>
+      <rect width="150" height="58" rx="14" fill="none" stroke="#D96A6A" stroke-opacity="0.6" stroke-width="1.4"/>
+      <text x="75" y="26" fill="#D96A6A" font-weight="bold">✕ Rejected</text>
+      <text x="75" y="45" fill="#AF8383" font-size="11">never shown</text>
     </g>
   </g>
 
-  <!-- held-for-review side path -->
-  <g opacity="0.75">
-    <path d="M905 470 Q905 540 990 540" stroke="#C9CDD8" stroke-width="2" fill="none" stroke-dasharray="6 6"/>
-    <rect x="994" y="516" width="180" height="48" rx="12" fill="none" stroke="#C9CDD8" stroke-opacity="0.6"/>
-    <text x="1084" y="545" text-anchor="middle" fill="#C9CDD8" font-size="13">held: pending queue</text>
-  </g>
+  <text x="650" y="560" text-anchor="middle" font-size="14" fill="#8B90A8">Flag reasons are logged with every decision — the queue shows who held what, and why.</text>
 
-  <!-- public visibility -->
-  <g transform="translate(1040 210)">
-    <rect width="190" height="180" rx="20" fill="#2E3070" stroke="#E8A34D" stroke-opacity="0.6" stroke-width="2"/>
-    <circle cx="95" cy="66" r="30" fill="none" stroke="#E8A34D" stroke-width="3"/>
-    <circle cx="95" cy="66" r="12" fill="#E8A34D"/>
-    <path d="M35 66 a60 60 0 0 1 120 0" fill="none" stroke="#C9CDD8" stroke-opacity="0.5" stroke-width="2"/>
-    <text x="95" y="130" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="bold">Visible</text>
-    <text x="95" y="152" text-anchor="middle" fill="#C9CDD8" font-size="13">feeds · chat · replies</text>
-  </g>
+  <rect width="1300" height="620" fill="url(#pvign)"/>
 </svg>

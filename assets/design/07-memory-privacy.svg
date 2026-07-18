@@ -1,78 +1,122 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" font-family="Helvetica, Arial, sans-serif">
   <title>Persistent memory and privacy controls — interaction timeline with view / clear / restrict</title>
   <defs>
-    <linearGradient id="bg7" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F2F3F7"/>
-      <stop offset="1" stop-color="#E6E8F0"/>
+    <linearGradient id="mbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#101235"/>
     </linearGradient>
+    <radialGradient id="mvign" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0.64" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
+    </radialGradient>
+    <linearGradient id="mcard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2E3170"/>
+      <stop offset="1" stop-color="#23255C"/>
+    </linearGradient>
+    <filter id="mshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="msoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
   </defs>
 
-  <rect width="900" height="720" fill="url(#bg7)"/>
+  <rect width="900" height="720" fill="url(#mbg)"/>
 
-  <!-- settings panel -->
-  <g transform="translate(150 60)">
-    <rect width="600" height="600" rx="26" fill="#FFFFFF" stroke="#C9CDD8" stroke-width="1.5"/>
-    <text x="40" y="58" fill="#161840" font-size="22" font-weight="bold">Memory</text>
-    <text x="40" y="86" fill="#8B90A8" font-size="14">What this profile remembers, per person</text>
+  <text x="450" y="60" text-anchor="middle" font-size="28" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">Memory you can see — and control</text>
 
-    <!-- privacy lock -->
-    <g transform="translate(520 36)">
-      <rect x="0" y="12" width="34" height="26" rx="6" fill="#23255F"/>
-      <path d="M6 12 v-4 a11 11 0 0 1 22 0 v4" fill="none" stroke="#23255F" stroke-width="4"/>
-      <circle cx="17" cy="25" r="4" fill="#E8A34D"/>
-    </g>
+  <!-- timeline spine -->
+  <g>
+    <line x1="140" y1="130" x2="140" y2="560" stroke="#3A3D7E" stroke-width="3"/>
+    <line x1="140" y1="130" x2="140" y2="560" stroke="#E8A34D" stroke-width="3" stroke-dasharray="5 9" stroke-opacity="0.5"/>
+  </g>
 
-    <!-- timeline spine -->
-    <line x1="72" y1="130" x2="72" y2="470" stroke="#C9CDD8" stroke-width="2"/>
-
-    <!-- entries -->
-    <g>
-      <g transform="translate(40 120)">
-        <circle cx="32" cy="26" r="7" fill="#E8A34D"/>
-        <rect x="60" y="0" width="460" height="86" rx="14" fill="#F4F5F9"/>
-        <text x="80" y="28" fill="#161840" font-size="15" font-weight="bold">Sam · grandchild</text>
-        <text x="80" y="50" fill="#8B90A8" font-size="13">42 messages · garden stories, school updates</text>
-        <g transform="translate(80 60)" font-size="12">
-          <rect width="58" height="22" rx="11" fill="#23255F"/><text x="29" y="15" text-anchor="middle" fill="#FFF">view</text>
-          <rect x="66" width="58" height="22" rx="11" fill="none" stroke="#23255F"/><text x="95" y="15" text-anchor="middle" fill="#23255F">clear</text>
-          <rect x="132" width="66" height="22" rx="11" fill="none" stroke="#B0433A"/><text x="165" y="15" text-anchor="middle" fill="#B0433A">restrict</text>
-        </g>
-      </g>
-      <g transform="translate(40 226)">
-        <circle cx="32" cy="26" r="7" fill="#C9CDD8"/>
-        <rect x="60" y="0" width="460" height="86" rx="14" fill="#F4F5F9"/>
-        <text x="80" y="28" fill="#161840" font-size="15" font-weight="bold">Priya · close friend</text>
-        <text x="80" y="50" fill="#8B90A8" font-size="13">18 messages · book club, travel plans</text>
-        <g transform="translate(80 60)" font-size="12">
-          <rect width="58" height="22" rx="11" fill="#23255F"/><text x="29" y="15" text-anchor="middle" fill="#FFF">view</text>
-          <rect x="66" width="58" height="22" rx="11" fill="none" stroke="#23255F"/><text x="95" y="15" text-anchor="middle" fill="#23255F">clear</text>
-          <rect x="132" width="66" height="22" rx="11" fill="none" stroke="#B0433A"/><text x="165" y="15" text-anchor="middle" fill="#B0433A">restrict</text>
-        </g>
-      </g>
-      <g transform="translate(40 332)">
-        <circle cx="32" cy="26" r="7" fill="#C9CDD8"/>
-        <rect x="60" y="0" width="460" height="86" rx="14" fill="#F4F5F9"/>
-        <text x="80" y="28" fill="#161840" font-size="15" font-weight="bold">Alex · professional</text>
-        <text x="80" y="50" fill="#8B90A8" font-size="13">7 messages · project timelines</text>
-        <g transform="translate(80 60)" font-size="12">
-          <rect width="58" height="22" rx="11" fill="#23255F"/><text x="29" y="15" text-anchor="middle" fill="#FFF">view</text>
-          <rect x="66" width="58" height="22" rx="11" fill="none" stroke="#23255F"/><text x="95" y="15" text-anchor="middle" fill="#23255F">clear</text>
-          <rect x="132" width="66" height="22" rx="11" fill="none" stroke="#B0433A"/><text x="165" y="15" text-anchor="middle" fill="#B0433A">restrict</text>
-        </g>
-      </g>
-      <g transform="translate(40 438)" opacity="0.55">
-        <circle cx="32" cy="26" r="7" fill="#C9CDD8"/>
-        <rect x="60" y="0" width="460" height="48" rx="14" fill="#F4F5F9"/>
-        <text x="80" y="30" fill="#8B90A8" font-size="13">Guest · stranger — nothing retained</text>
-      </g>
-    </g>
-
-    <!-- data minimization footer -->
-    <g transform="translate(40 530)">
-      <rect width="520" height="46" rx="12" fill="#FFF7EA" stroke="#E8A34D" stroke-opacity="0.6"/>
-      <circle cx="26" cy="23" r="9" fill="none" stroke="#E8A34D" stroke-width="2.5"/>
-      <path d="M22 23 l3 3 l6 -7" stroke="#E8A34D" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <text x="48" y="28" fill="#7A5A22" font-size="13">Data minimization on — memories auto-expire after 12 months of inactivity</text>
+  <!-- memory cards -->
+  <!-- kept -->
+  <g transform="translate(180 118)" filter="url(#mshadow)">
+    <circle cx="-40" cy="26" r="8" fill="#E8A34D"/>
+    <circle cx="-40" cy="26" r="13" fill="none" stroke="#E8A34D" stroke-opacity="0.35" stroke-width="1.4"/>
+    <rect width="520" height="66" rx="14" fill="url(#mcard)"/>
+    <rect width="520" height="66" rx="14" fill="none" stroke="#E8A34D" stroke-opacity="0.4" stroke-width="1.2"/>
+    <text x="18" y="27" font-size="13.5" fill="#F4E3C8" font-weight="bold">Tue · with Maya (family)</text>
+    <text x="18" y="49" font-size="12.5" fill="#C9CDD8">Recital story retold — she loved the ribbon detail</text>
+    <g transform="translate(452 21)">
+      <rect width="52" height="24" rx="12" fill="#E8A34D" opacity="0.18"/>
+      <text x="26" y="16" text-anchor="middle" font-size="11" fill="#E8A34D">kept</text>
     </g>
   </g>
+
+  <!-- kept 2 -->
+  <g transform="translate(180 216)" filter="url(#mshadow)">
+    <circle cx="-40" cy="26" r="8" fill="#E8A34D"/>
+    <circle cx="-40" cy="26" r="13" fill="none" stroke="#E8A34D" stroke-opacity="0.35" stroke-width="1.4"/>
+    <rect width="520" height="66" rx="14" fill="url(#mcard)"/>
+    <rect width="520" height="66" rx="14" fill="none" stroke="#E8A34D" stroke-opacity="0.4" stroke-width="1.2"/>
+    <text x="18" y="27" font-size="13.5" fill="#F4E3C8" font-weight="bold">Wed · with Sam (friend)</text>
+    <text x="18" y="49" font-size="12.5" fill="#C9CDD8">Garden jokes; asked about the August trip</text>
+    <g transform="translate(452 21)">
+      <rect width="52" height="24" rx="12" fill="#E8A34D" opacity="0.18"/>
+      <text x="26" y="16" text-anchor="middle" font-size="11" fill="#E8A34D">kept</text>
+    </g>
+  </g>
+
+  <!-- restricted -->
+  <g transform="translate(180 314)" filter="url(#mshadow)">
+    <circle cx="-40" cy="26" r="8" fill="#C9CDD8"/>
+    <rect width="520" height="66" rx="14" fill="url(#mcard)" opacity="0.9"/>
+    <rect width="520" height="66" rx="14" fill="none" stroke="#C9CDD8" stroke-opacity="0.35" stroke-width="1.2"/>
+    <text x="18" y="27" font-size="13.5" fill="#C9CDD8" font-weight="bold">Thu · health chat</text>
+    <text x="18" y="49" font-size="12.5" fill="#8B90A8">Visible to Dana's owner only — never surfaced to others</text>
+    <g transform="translate(430 21)">
+      <rect width="74" height="24" rx="12" fill="#C9CDD8" opacity="0.14"/>
+      <!-- lock -->
+      <rect x="8" y="8" width="10" height="8" rx="2" fill="#C9CDD8"/>
+      <path d="M10 8 v-2 a3 3 0 0 1 6 0 v2" fill="none" stroke="#C9CDD8" stroke-width="1.6"/>
+      <text x="46" y="16" text-anchor="middle" font-size="11" fill="#C9CDD8">restricted</text>
+    </g>
+  </g>
+
+  <!-- cleared -->
+  <g transform="translate(180 412)">
+    <circle cx="-40" cy="26" r="8" fill="#3A3D7E"/>
+    <g opacity="0.55">
+      <rect width="520" height="66" rx="14" fill="#20224F"/>
+      <rect width="520" height="66" rx="14" fill="none" stroke="#8B90A8" stroke-opacity="0.3" stroke-width="1.2" stroke-dasharray="6 6"/>
+      <text x="18" y="27" font-size="13.5" fill="#8B90A8" font-weight="bold">Fri · off-hand remark</text>
+      <text x="18" y="49" font-size="12.5" fill="#5F6480" text-decoration="line-through">“Forgotten on request”</text>
+    </g>
+    <g transform="translate(444 21)">
+      <rect width="60" height="24" rx="12" fill="#8B90A8" opacity="0.14"/>
+      <text x="30" y="16" text-anchor="middle" font-size="11" fill="#8B90A8">cleared</text>
+    </g>
+    <!-- dissolve particles -->
+    <g fill="#8B90A8" filter="url(#msoft)">
+      <circle cx="536" cy="10" r="3" opacity="0.7"/><circle cx="556" cy="26" r="2.4" opacity="0.5"/><circle cx="544" cy="46" r="2" opacity="0.4"/>
+    </g>
+  </g>
+
+  <!-- kept 3 -->
+  <g transform="translate(180 510)" filter="url(#mshadow)">
+    <circle cx="-40" cy="26" r="8" fill="#E8A34D"/>
+    <circle cx="-40" cy="26" r="13" fill="none" stroke="#E8A34D" stroke-opacity="0.35" stroke-width="1.4"/>
+    <rect width="520" height="66" rx="14" fill="url(#mcard)"/>
+    <rect width="520" height="66" rx="14" fill="none" stroke="#E8A34D" stroke-opacity="0.4" stroke-width="1.2"/>
+    <text x="18" y="27" font-size="13.5" fill="#F4E3C8" font-weight="bold">Sat · with Maya (family)</text>
+    <text x="18" y="49" font-size="12.5" fill="#C9CDD8">Promised to ask about the volcano project next time</text>
+    <g transform="translate(452 21)">
+      <rect width="52" height="24" rx="12" fill="#E8A34D" opacity="0.18"/>
+      <text x="26" y="16" text-anchor="middle" font-size="11" fill="#E8A34D">kept</text>
+    </g>
+  </g>
+
+  <!-- control bar -->
+  <g transform="translate(180 626)" filter="url(#mshadow)">
+    <rect width="520" height="56" rx="28" fill="#12143B"/>
+    <rect width="520" height="56" rx="28" fill="none" stroke="#3A3D7E" stroke-width="1.4"/>
+    <g text-anchor="middle" font-size="14" font-weight="bold">
+      <g><rect x="26" y="12" width="140" height="32" rx="16" fill="#2E3170"/><text x="96" y="33" fill="#C9CDD8">👁 View</text></g>
+      <g><rect x="190" y="12" width="140" height="32" rx="16" fill="#E8A34D"/><text x="260" y="33" fill="#161840">✕ Clear</text></g>
+      <g><rect x="354" y="12" width="140" height="32" rx="16" fill="#2E3170"/><text x="424" y="33" fill="#C9CDD8">🔒 Restrict</text></g>
+    </g>
+  </g>
+
+  <rect width="900" height="720" fill="url(#mvign)"/>
 </svg>

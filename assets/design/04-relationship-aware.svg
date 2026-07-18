@@ -1,75 +1,112 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" font-family="Helvetica, Arial, sans-serif">
   <title>Relationship-aware interaction — one profile, different voices per relationship</title>
   <defs>
-    <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#3D2E4F"/>
-      <stop offset="0.5" stop-color="#23255F"/>
-      <stop offset="1" stop-color="#14204A"/>
+    <linearGradient id="rbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#191B47"/>
+      <stop offset="1" stop-color="#0E1034"/>
     </linearGradient>
-    <radialGradient id="core4" cx="0.5" cy="0.45" r="0.6">
-      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.95"/>
-      <stop offset="0.6" stop-color="#E8A34D" stop-opacity="0.5"/>
+    <radialGradient id="rcore" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0" stop-color="#FFF6E6" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#F0C482" stop-opacity="0.6"/>
       <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="rvign" cx="0.5" cy="0.5" r="0.78">
+      <stop offset="0.64" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
+    </radialGradient>
+    <linearGradient id="rperson" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3E4187"/>
+      <stop offset="1" stop-color="#1E2050"/>
+    </linearGradient>
+    <filter id="rshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="rsoft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
   </defs>
 
-  <rect width="1200" height="800" fill="url(#bg4)"/>
+  <rect width="1200" height="800" fill="url(#rbg)"/>
 
-  <!-- radiating threads -->
-  <g stroke-linecap="round" fill="none">
-    <path d="M600 400 Q420 250 250 190" stroke="#E8A34D" stroke-width="4" stroke-opacity="0.8"/>
-    <path d="M600 400 Q800 240 950 180" stroke="#C9CDD8" stroke-width="3" stroke-opacity="0.6"/>
-    <path d="M600 400 Q420 560 250 620" stroke="#E8A34D" stroke-width="3" stroke-opacity="0.6"/>
-    <path d="M600 400 Q800 560 950 620" stroke="#C9CDD8" stroke-width="2" stroke-opacity="0.4" stroke-dasharray="2 8"/>
+  <text x="600" y="64" text-anchor="middle" font-size="30" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">One profile, three voices</text>
+  <text x="600" y="92" text-anchor="middle" font-size="16" fill="#8B90A8">Dana adapts tone, depth, and disclosure to the relationship</text>
+
+  <!-- central profile -->
+  <g transform="translate(220 420)">
+    <g filter="url(#rsoft)"><circle r="120" fill="#E8A34D" opacity="0.4"/></g>
+    <circle r="150" fill="url(#rcore)"/>
+    <circle r="96" fill="none" stroke="#F4E3C8" stroke-opacity="0.4" stroke-width="1.4"/>
+    <circle r="118" fill="none" stroke="#E8A34D" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 9"/>
+    <circle cy="-26" r="36" fill="#F5C57F"/>
+    <path d="M-60 84 C-60 22 -32 -2 0 -2 C32 -2 60 22 60 84 Z" fill="#F5C57F"/>
+    <circle cy="-26" r="36" fill="none" stroke="#FFF6E6" stroke-opacity="0.6" stroke-width="1.4"/>
+    <text y="128" text-anchor="middle" font-size="17" font-weight="bold" fill="#F4E3C8">Dana</text>
+    <text y="148" text-anchor="middle" font-size="12" fill="#C9CDD8" opacity="0.8">synthetic profile</text>
   </g>
 
-  <!-- central synthetic avatar -->
-  <circle cx="600" cy="400" r="130" fill="url(#core4)"/>
-  <circle cx="600" cy="382" r="44" fill="#E8A34D"/>
-  <path d="M534 500 C534 440 562 412 600 412 C638 412 666 440 666 500 Z" fill="#E8A34D" opacity="0.9"/>
-  <circle cx="600" cy="400" r="130" fill="none" stroke="#F4E3C8" stroke-opacity="0.35" stroke-width="2"/>
-
-  <!-- grandchild: warm family bubble -->
-  <g transform="translate(120 110)">
-    <rect width="270" height="130" rx="26" fill="#E8A34D"/>
-    <path d="M240 130 l26 26 v-26 z" fill="#E8A34D"/>
-    <circle cx="42" cy="46" r="14" fill="#161840" opacity="0.25"/>
-    <path d="M36 44 c0-6 12-6 12 0 c0 5-6 9-6 9 s-6-4-6-9z" fill="#FFF7EA"/>
-    <text x="70" y="52" fill="#161840" font-size="16" font-weight="bold">Grandchild</text>
-    <text x="42" y="88" fill="#161840" font-size="14" opacity="0.85">"Sammy! Come sit, let me tell</text>
-    <text x="42" y="108" fill="#161840" font-size="14" opacity="0.85">you about the summer of '62…"</text>
+  <!-- ===== family lane ===== -->
+  <g>
+    <path d="M370 330 C480 240 560 210 660 206" fill="none" stroke="#E8A34D" stroke-width="4" stroke-opacity="0.85" stroke-linecap="round"/>
+    <path d="M378 352 C486 272 564 240 662 232" fill="none" stroke="#E8A34D" stroke-width="1.6" stroke-opacity="0.4" stroke-linecap="round"/>
+    <text x="470" y="240" font-size="12" fill="#E8A34D" transform="rotate(-18 470 240)" letter-spacing="2">FAMILY</text>
+    <g transform="translate(690 150)" filter="url(#rshadow)">
+      <rect width="360" height="118" rx="18" fill="#2E3170"/>
+      <path d="M-12 52 L2 40 L2 64 Z" fill="#2E3170"/>
+      <rect width="360" height="118" rx="18" fill="none" stroke="#E8A34D" stroke-opacity="0.55" stroke-width="1.6"/>
+      <text x="22" y="34" font-size="14" fill="#F4E3C8" font-weight="bold">To her daughter</text>
+      <text x="22" y="60" font-size="13.5" fill="#C9CDD8">“Sweetheart, I remember that recital like it was</text>
+      <text x="22" y="80" font-size="13.5" fill="#C9CDD8">yesterday — you wore the blue ribbon I gave you.”</text>
+      <g transform="translate(304 96)"><circle r="3" fill="#E8A34D"/><circle cx="12" r="3" fill="#E8A34D" opacity="0.7"/><circle cx="24" r="3" fill="#E8A34D" opacity="0.4"/></g>
+    </g>
+    <g transform="translate(1105 210)">
+      <circle r="24" fill="url(#rperson)" stroke="#E8A34D" stroke-width="1.8" stroke-opacity="0.8"/>
+      <path d="M-40 96 C-40 40 -20 18 0 18 C20 18 40 40 40 96 Z" fill="url(#rperson)"/>
+    </g>
   </g>
 
-  <!-- professional contact: formal corporate bubble -->
-  <g transform="translate(830 100)">
-    <rect width="270" height="130" rx="8" fill="#C9CDD8"/>
-    <path d="M30 130 l-26 26 v-26 z" fill="#C9CDD8"/>
-    <rect x="30" y="32" width="24" height="20" rx="3" fill="#23255F"/>
-    <rect x="36" y="26" width="12" height="8" rx="2" fill="#23255F"/>
-    <text x="66" y="49" fill="#161840" font-size="16" font-weight="bold">Professional</text>
-    <text x="30" y="86" fill="#23255F" font-size="14">"Thank you for the update —</text>
-    <text x="30" y="106" fill="#23255F" font-size="14">I'll review the proposal today."</text>
+  <!-- ===== friend lane ===== -->
+  <g>
+    <path d="M392 420 C540 420 580 420 662 420" fill="none" stroke="#F4E3C8" stroke-width="2.6" stroke-opacity="0.6" stroke-linecap="round"/>
+    <text x="480" y="408" font-size="12" fill="#F4E3C8" opacity="0.8" letter-spacing="2">FRIEND</text>
+    <g transform="translate(690 360)" filter="url(#rshadow)">
+      <rect width="360" height="112" rx="18" fill="#282A5E"/>
+      <path d="M-12 50 L2 38 L2 62 Z" fill="#282A5E"/>
+      <rect width="360" height="112" rx="18" fill="none" stroke="#F4E3C8" stroke-opacity="0.35" stroke-width="1.4"/>
+      <text x="22" y="34" font-size="14" fill="#F4E3C8" font-weight="bold">To an old friend</text>
+      <text x="22" y="60" font-size="13.5" fill="#C9CDD8">“Ha! Still overwatering your tomatoes, I bet.</text>
+      <text x="22" y="80" font-size="13.5" fill="#C9CDD8">Tell me everything since August.”</text>
+    </g>
+    <g transform="translate(1105 420) scale(0.9)">
+      <circle r="24" fill="url(#rperson)" stroke="#F4E3C8" stroke-width="1.6" stroke-opacity="0.6"/>
+      <path d="M-40 96 C-40 40 -20 18 0 18 C20 18 40 40 40 96 Z" fill="url(#rperson)"/>
+    </g>
   </g>
 
-  <!-- close friend: relaxed warm bubble -->
-  <g transform="translate(110 560)">
-    <rect width="270" height="130" rx="34" fill="#D98F63"/>
-    <path d="M240 12 l26 -26 v26 z" fill="#D98F63"/>
-    <circle cx="44" cy="44" r="12" fill="#FFF7EA" opacity="0.9"/>
-    <circle cx="60" cy="44" r="12" fill="#FFF7EA" opacity="0.6"/>
-    <text x="86" y="50" fill="#161840" font-size="16" font-weight="bold">Close friend</text>
-    <text x="40" y="88" fill="#161840" font-size="14" opacity="0.85">"You will NOT believe what</text>
-    <text x="40" y="108" fill="#161840" font-size="14" opacity="0.85">happened at the garden club…"</text>
+  <!-- ===== stranger lane ===== -->
+  <g>
+    <path d="M380 510 C500 590 570 616 660 628" fill="none" stroke="#C9CDD8" stroke-width="1.8" stroke-opacity="0.45" stroke-dasharray="4 9" stroke-linecap="round"/>
+    <text x="462" y="590" font-size="12" fill="#C9CDD8" opacity="0.7" transform="rotate(16 462 590)" letter-spacing="2">STRANGER</text>
+    <g transform="translate(690 566)" filter="url(#rshadow)">
+      <rect width="360" height="104" rx="18" fill="#222452"/>
+      <path d="M-12 46 L2 34 L2 58 Z" fill="#222452"/>
+      <rect width="360" height="104" rx="18" fill="none" stroke="#C9CDD8" stroke-opacity="0.25" stroke-width="1.2"/>
+      <text x="22" y="32" font-size="14" fill="#C9CDD8" font-weight="bold">To a new visitor</text>
+      <text x="22" y="58" font-size="13.5" fill="#8B90A8">“Hello — I'm Dana. Happy to chat about my</text>
+      <text x="22" y="78" font-size="13.5" fill="#8B90A8">public work. Some topics I keep for family.”</text>
+    </g>
+    <g transform="translate(1105 622) scale(0.8)">
+      <circle r="24" fill="url(#rperson)" stroke="#C9CDD8" stroke-width="1.4" stroke-opacity="0.5"/>
+      <path d="M-40 96 C-40 40 -20 18 0 18 C20 18 40 40 40 96 Z" fill="url(#rperson)"/>
+    </g>
   </g>
 
-  <!-- stranger: neutral reserved bubble -->
-  <g transform="translate(830 570)">
-    <rect width="270" height="120" rx="14" fill="none" stroke="#C9CDD8" stroke-width="2.5"/>
-    <path d="M30 0 l-24 -24 v24 z" fill="#14204A" stroke="#C9CDD8" stroke-width="2.5"/>
-    <circle cx="44" cy="40" r="13" fill="none" stroke="#C9CDD8" stroke-width="2.5"/>
-    <text x="44" y="46" text-anchor="middle" fill="#C9CDD8" font-size="15">?</text>
-    <text x="70" y="46" fill="#C9CDD8" font-size="16" font-weight="bold">Stranger</text>
-    <text x="30" y="82" fill="#C9CDD8" font-size="14" opacity="0.85">"Hello — nice to meet you.</text>
-    <text x="30" y="102" fill="#C9CDD8" font-size="14" opacity="0.85">How can I help?"</text>
+  <!-- disclosure legend -->
+  <g transform="translate(84 726)" font-size="12" fill="#8B90A8">
+    <rect x="-4" y="-18" width="360" height="30" rx="8" fill="#12143B" opacity="0.7"/>
+    <circle cx="10" cy="-3" r="4" fill="#E8A34D"/><text x="22" y="1">warm, full memory</text>
+    <circle cx="150" cy="-3" r="4" fill="#F4E3C8"/><text x="162" y="1">casual</text>
+    <circle cx="234" cy="-3" r="4" fill="#C9CDD8"/><text x="246" y="1">guarded, public only</text>
   </g>
+
+  <rect width="1200" height="800" fill="url(#rvign)"/>
 </svg>
