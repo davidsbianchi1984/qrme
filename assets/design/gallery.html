@@ -1,43 +1,105 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QRME — Visual Asset Gallery</title>
+<title>QRME — design asset gallery</title>
 <style>
-  :root { --indigo: #23255F; --dark: #161840; --silver: #C9CDD8; --amber: #E8A34D; }
+  :root {
+    --indigo-deep: #10123A;
+    --indigo: #1B1D4E;
+    --indigo-soft: #2E3170;
+    --silver: #C9CDD8;
+    --amber: #E8A34D;
+    --cream: #F4E3C8;
+    --muted: #8B90A8;
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; font-family: Helvetica, Arial, sans-serif; background: #ECEDF3; color: var(--dark); }
-  header { background: linear-gradient(120deg, var(--dark), var(--indigo)); color: #fff; padding: 2.5rem 2rem; }
-  header h1 { margin: 0 0 .4rem; font-size: 1.6rem; }
-  header p { margin: 0; color: var(--silver); max-width: 60rem; }
-  main { max-width: 1200px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
-  figure { margin: 0; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(22,24,64,.10); }
-  figure img { display: block; width: 100%; height: 240px; object-fit: cover; background: #fff; }
-  figcaption { padding: .9rem 1.1rem 1.1rem; }
-  figcaption strong { display: block; margin-bottom: .2rem; }
-  figcaption span { color: #6b7086; font-size: .85rem; }
+  body {
+    margin: 0;
+    background: linear-gradient(160deg, var(--indigo-deep), var(--indigo) 55%, #23255F);
+    min-height: 100vh;
+    font-family: Helvetica, Arial, sans-serif;
+    color: var(--silver);
+  }
+  header {
+    text-align: center;
+    padding: 56px 24px 8px;
+  }
+  header h1 {
+    color: var(--cream);
+    letter-spacing: 6px;
+    font-size: 40px;
+    margin: 0 0 6px;
+  }
+  header p { color: var(--muted); margin: 0 0 4px; }
+  header .rule {
+    width: 72px; height: 3px; border-radius: 2px;
+    background: var(--amber); margin: 18px auto 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 28px;
+    padding: 40px;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  .card {
+    background: rgba(13, 15, 48, 0.55);
+    border: 1px solid rgba(201, 205, 216, 0.14);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 14px 34px rgba(4, 5, 26, 0.45);
+    transition: transform .18s ease, border-color .18s ease;
+  }
+  .card:hover { transform: translateY(-4px); border-color: rgba(232, 163, 77, 0.5); }
+  .card.wide { grid-column: 1 / -1; }
+  .card img { width: 100%; display: block; background: var(--indigo-deep); }
+  .card .meta { padding: 14px 18px 16px; }
+  .card .meta b { color: var(--cream); font-size: 15px; display: block; }
+  .card .meta span { color: var(--muted); font-size: 12.5px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 8px 0 40px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>QRME — Visual Asset Gallery</h1>
-  <p>Vector concept renditions of the PRD-derived image prompts. Shared palette: deep indigo, soft silver, warm amber. Full prompt text in <code>docs/design/image-prompts.md</code>.</p>
+  <h1>QRME</h1>
+  <p>Design asset gallery — indigo · silver · amber</p>
+  <div class="rule"></div>
 </header>
-<main>
-  <figure><img src="01-app-icon.svg" alt="App icon"><figcaption><strong>1 · App Icon / Logo Mark</strong><span>Overlapping silhouettes morphing into neural nodes</span></figcaption></figure>
-  <figure><img src="02-hero-banner.svg" alt="Hero banner"><figcaption><strong>2 · Hero / Marketing Banner</strong><span>People with luminous avatars linked by relationship threads</span></figcaption></figure>
-  <figure><img src="03-onboarding-flow.svg" alt="Onboarding flow"><figcaption><strong>3 · Onboarding — Profile Creation</strong><span>Verification → demographics → sources → persona preview</span></figcaption></figure>
-  <figure><img src="04-relationship-aware.svg" alt="Relationship-aware interaction"><figcaption><strong>4 · Relationship-Aware Interaction</strong><span>One profile, different voices per relationship</span></figcaption></figure>
-  <figure><img src="05-legacy-profile.svg" alt="Legacy profile"><figcaption><strong>5 · Legacy / Memory Profile</strong><span>A portrait dissolves into a living avatar</span></figcaption></figure>
-  <figure><img src="06-engagement-loop.svg" alt="Engagement loop"><figcaption><strong>6 · Engagement-Based Adaptation Loop</strong><span>Signals in, refined responses out — identity fixed</span></figcaption></figure>
-  <figure><img src="07-memory-privacy.svg" alt="Memory and privacy"><figcaption><strong>7 · Persistent Memory &amp; Privacy</strong><span>Timeline with view / clear / restrict controls</span></figcaption></figure>
-  <figure><img src="08-moderation-pipeline.svg" alt="Moderation pipeline"><figcaption><strong>8 · Content Moderation Pipeline</strong><span>Three filter layers before public visibility</span></figcaption></figure>
-  <figure><img src="09-aging-lifecycle.svg" alt="Aging and lifecycle"><figcaption><strong>9 · Aging &amp; Lifecycle</strong><span>Storyteller → mentor → confidant as the child grows</span></figcaption></figure>
-  <figure><img src="10-multi-surface.svg" alt="Multi-surface presence"><figcaption><strong>10 · Multi-Surface Presence</strong><span>Chat, feed, web — AR/VR on the roadmap</span></figcaption></figure>
-  <figure><img src="11-age-gated-mode.svg" alt="Age-gated mode"><figcaption><strong>11 · Adult Content Mode</strong><span>Verification gate, strongly separated space</span></figcaption></figure>
-  <figure><img src="12-persona-set.svg" alt="Persona set"><figcaption><strong>12 · User Persona Set</strong><span>Five personas in one consistent style</span></figcaption></figure>
-  <figure><img src="13-guardian-tandem.svg" alt="Guardian tandem"><figcaption><strong>13 · JIM-mini / Guardian</strong><span>Biometrics → detect → trigger specialist → escalate</span></figcaption></figure>
-</main>
+
+<div class="grid">
+  <div class="card wide"><img src="00-cover.svg" alt="QRME cover">
+    <div class="meta"><b>00 · Cover</b><span>Repo hero / social preview — one profile, many relationships</span></div></div>
+  <div class="card"><img src="01-app-icon.svg" alt="App icon">
+    <div class="meta"><b>01 · App icon</b><span>Two silhouettes dissolving into a neural web</span></div></div>
+  <div class="card"><img src="02-hero-banner.svg" alt="Hero banner">
+    <div class="meta"><b>02 · Hero banner</b><span>People with luminous avatars, linked by relationship threads</span></div></div>
+  <div class="card wide"><img src="03-onboarding-flow.svg" alt="Onboarding flow">
+    <div class="meta"><b>03 · Onboarding</b><span>Identity → relationships → memory &amp; privacy → go live</span></div></div>
+  <div class="card"><img src="04-relationship-aware.svg" alt="Relationship-aware">
+    <div class="meta"><b>04 · Relationship-aware</b><span>One profile, three voices — family, friend, stranger</span></div></div>
+  <div class="card"><img src="05-legacy-profile.svg" alt="Legacy profile">
+    <div class="meta"><b>05 · Legacy profile</b><span>A portrait becomes a living voice for the family</span></div></div>
+  <div class="card"><img src="06-engagement-loop.svg" alt="Engagement loop">
+    <div class="meta"><b>06 · Engagement loop</b><span>Signals in, adaptation, refined responses out</span></div></div>
+  <div class="card"><img src="07-memory-privacy.svg" alt="Memory and privacy">
+    <div class="meta"><b>07 · Memory &amp; privacy</b><span>Kept, restricted, cleared — the owner decides</span></div></div>
+  <div class="card wide"><img src="08-moderation-pipeline.svg" alt="Moderation pipeline">
+    <div class="meta"><b>08 · Moderation pipeline</b><span>Policy, safety, and owner-rule gates before visibility</span></div></div>
+  <div class="card"><img src="09-aging-lifecycle.svg" alt="Aging lifecycle">
+    <div class="meta"><b>09 · Aging &amp; lifecycle</b><span>The profile grows with its people</span></div></div>
+  <div class="card"><img src="10-multi-surface.svg" alt="Multi-surface">
+    <div class="meta"><b>10 · Multi-surface</b><span>Chat, feed, web, AR/VR — one identity</span></div></div>
+  <div class="card"><img src="11-age-gated-mode.svg" alt="Age-gated mode">
+    <div class="meta"><b>11 · Age-gated mode</b><span>A verified, opt-in, clearly separate space</span></div></div>
+  <div class="card wide"><img src="12-persona-set.svg" alt="Persona set">
+    <div class="meta"><b>12 · Persona set</b><span>Five people QRME is built for</span></div></div>
+  <div class="card wide"><img src="13-guardian-tandem.svg" alt="Guardian tandem">
+    <div class="meta"><b>13 · Guardian tandem</b><span>JIM-mini detection driving a QRME specialist, with escalation</span></div></div>
+</div>
+
+<footer>QRME · synthetic user profile management — assets are hand-built SVG, no external fonts or images</footer>
 </body>
 </html>

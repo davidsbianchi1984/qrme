@@ -1,85 +1,111 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" font-family="Georgia, serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" font-family="Helvetica, Arial, sans-serif">
   <title>Legacy profile — a portrait dissolves into a living avatar talking with a grandchild</title>
   <defs>
-    <linearGradient id="bg5" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2A2438"/>
-      <stop offset="1" stop-color="#161840"/>
+    <linearGradient id="lbg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#141637"/>
+      <stop offset="0.5" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#2B2D6E"/>
     </linearGradient>
-    <linearGradient id="rays" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#E8A34D" stop-opacity="0.22"/>
-      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="photo" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#D9CBB2"/>
-      <stop offset="1" stop-color="#B7A588"/>
-    </linearGradient>
-    <radialGradient id="avatar5" cx="0.5" cy="0.4" r="0.65">
-      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.95"/>
-      <stop offset="0.6" stop-color="#E8A34D" stop-opacity="0.4"/>
-      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    <radialGradient id="lvign" cx="0.5" cy="0.5" r="0.78">
+      <stop offset="0.62" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.55"/>
     </radialGradient>
+    <linearGradient id="lframe" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B90A8"/>
+      <stop offset="0.5" stop-color="#C9CDD8"/>
+      <stop offset="1" stop-color="#6E7390"/>
+    </linearGradient>
+    <linearGradient id="lsepia" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A4058"/>
+      <stop offset="1" stop-color="#2E2840"/>
+    </linearGradient>
+    <radialGradient id="lavatar" cx="0.5" cy="0.42" r="0.72">
+      <stop offset="0" stop-color="#FFF6E6"/>
+      <stop offset="0.5" stop-color="#F0C482"/>
+      <stop offset="1" stop-color="#E8A34D" stop-opacity="0.12"/>
+    </radialGradient>
+    <linearGradient id="lchild" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A4E96"/>
+      <stop offset="1" stop-color="#23255F"/>
+    </linearGradient>
+    <filter id="lsoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="lsoft2" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.5"/></filter>
+    <filter id="lshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#05061C" flood-opacity="0.6"/>
+    </filter>
   </defs>
 
-  <rect width="1200" height="750" fill="url(#bg5)"/>
-  <path d="M0 0 L520 0 L260 750 L0 750 Z" fill="url(#rays)"/>
+  <rect width="1200" height="750" fill="url(#lbg)"/>
 
-  <!-- faint timeline behind -->
-  <g opacity="0.3">
-    <line x1="120" y1="660" x2="1080" y2="660" stroke="#C9CDD8" stroke-width="1.5" stroke-dasharray="2 10"/>
+  <text x="600" y="62" text-anchor="middle" font-size="30" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">A voice that stays in the family</text>
+
+  <!-- ===== framed portrait (past) ===== -->
+  <g transform="translate(150 170)" filter="url(#lshadow)">
+    <rect width="270" height="340" rx="10" fill="url(#lframe)"/>
+    <rect x="14" y="14" width="242" height="312" rx="6" fill="url(#lsepia)"/>
+    <!-- sepia portrait -->
+    <circle cx="135" cy="120" r="52" fill="#B9A48E"/>
+    <path d="M45 300 C45 208 88 172 135 172 C182 172 225 208 225 300 Z" fill="#B9A48E"/>
+    <circle cx="135" cy="120" r="52" fill="none" stroke="#6E5F4E" stroke-width="1.4" stroke-opacity="0.6"/>
+    <rect x="14" y="14" width="242" height="312" rx="6" fill="none" stroke="#0A0B28" stroke-opacity="0.35" stroke-width="2"/>
+    <text x="135" y="330" text-anchor="middle" font-size="12" fill="#3A3148" font-style="italic">Grandpa Joe, 1962</text>
+  </g>
+
+  <!-- dissolving particles: portrait -> avatar -->
+  <g fill="#F4E3C8">
+    <circle cx="452" cy="230" r="3.4" opacity="0.5"/><circle cx="490" cy="204" r="2.6" opacity="0.6"/>
+    <circle cx="530" cy="250" r="3.8" opacity="0.7"/><circle cx="566" cy="212" r="2.4" opacity="0.55"/>
+    <circle cx="600" cy="268" r="4.4" opacity="0.8"/><circle cx="632" cy="228" r="3" opacity="0.7"/>
+    <circle cx="472" cy="300" r="2.6" opacity="0.45"/><circle cx="540" cy="316" r="3" opacity="0.6"/>
+    <circle cx="606" cy="330" r="3.6" opacity="0.75"/>
+  </g>
+  <g stroke="#E8A34D" stroke-width="1.2" fill="none" opacity="0.5" stroke-linecap="round">
+    <path d="M430 260 Q520 220 616 260"/>
+    <path d="M430 320 Q530 340 610 322"/>
+  </g>
+
+  <!-- ===== living avatar (present) ===== -->
+  <g transform="translate(760 330)">
+    <g filter="url(#lsoft)"><circle r="110" fill="#E8A34D" opacity="0.45"/></g>
+    <circle r="140" fill="url(#lavatar)"/>
+    <circle r="92" fill="none" stroke="#F4E3C8" stroke-opacity="0.45" stroke-width="1.4"/>
+    <circle r="112" fill="none" stroke="#E8A34D" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 9"/>
+    <circle cy="-24" r="34" fill="#F5C57F"/>
+    <path d="M-56 82 C-56 24 -30 0 0 0 C30 0 56 24 56 82 Z" fill="#F5C57F"/>
+    <path d="M-24 -46 a34 34 0 0 1 48 -2" fill="none" stroke="#FFF6E6" stroke-width="2.4" stroke-opacity="0.8" stroke-linecap="round"/>
+    <text y="120" text-anchor="middle" font-size="14" fill="#F4E3C8" opacity="0.9">Grandpa Joe · legacy profile</text>
+  </g>
+
+  <!-- grandchild -->
+  <g transform="translate(1050 470)">
+    <circle r="30" fill="url(#lchild)" stroke="#E8A34D" stroke-width="1.6" stroke-opacity="0.7"/>
+    <path d="M-50 130 C-50 54 -26 26 0 26 C26 26 50 54 50 130 Z" fill="url(#lchild)"/>
+  </g>
+
+  <!-- conversation -->
+  <g filter="url(#lshadow)">
+    <g transform="translate(884 170)">
+      <rect width="256" height="86 " rx="16" fill="#2E3170"/>
+      <path d="M22 86 L34 100 L44 86 Z" fill="#2E3170"/>
+      <rect width="256" height="86" rx="16" fill="none" stroke="#E8A34D" stroke-opacity="0.5" stroke-width="1.4"/>
+      <text x="20" y="34" font-size="13.5" fill="#C9CDD8">“Your mom sent me your science-fair</text>
+      <text x="20" y="54" font-size="13.5" fill="#C9CDD8">photos. A volcano! Just like hers, 1989.”</text>
+      <circle cx="228" cy="68" r="3" fill="#E8A34D"/>
+    </g>
+  </g>
+
+  <!-- memory thread arc under scene -->
+  <g>
+    <path d="M180 640 Q600 560 1040 640" fill="none" stroke="#C9CDD8" stroke-opacity="0.3" stroke-width="1.6" stroke-dasharray="1 10" stroke-linecap="round"/>
     <g fill="#E8A34D">
-      <circle cx="260" cy="660" r="4"/><circle cx="520" cy="660" r="4"/><circle cx="800" cy="660" r="4"/><circle cx="1040" cy="660" r="4"/>
+      <circle cx="300" cy="614" r="3.6"/><circle cx="600" cy="580" r="3.2"/><circle cx="900" cy="610" r="3.6"/>
     </g>
-    <g fill="#C9CDD8" font-size="13" text-anchor="middle" font-family="Helvetica, Arial, sans-serif">
-      <text x="260" y="690">1948</text><text x="520" y="690">1975</text><text x="800" y="690">2003</text><text x="1040" y="690">now</text>
-    </g>
-  </g>
-
-  <!-- archival portrait, left -->
-  <g transform="translate(150 130)">
-    <rect x="-18" y="-18" width="296" height="376" rx="4" fill="#EFE6D4"/>
-    <rect width="260" height="340" fill="url(#photo)"/>
-    <circle cx="130" cy="120" r="58" fill="#6E6250"/>
-    <path d="M42 300 C42 214 84 184 130 184 C176 184 218 214 218 300 Z" fill="#6E6250"/>
-    <!-- portrait dissolving into particles toward the avatar -->
-    <g fill="#E8A34D">
-      <circle cx="250" cy="90" r="5" opacity="0.9"/>
-      <circle cx="285" cy="130" r="4" opacity="0.75"/>
-      <circle cx="320" cy="105" r="3.5" opacity="0.6"/>
-      <circle cx="300" cy="180" r="4.5" opacity="0.7"/>
-      <circle cx="345" cy="160" r="3" opacity="0.5"/>
-      <circle cx="365" cy="210" r="3.5" opacity="0.45"/>
-    </g>
-    <g fill="#C9CDD8">
-      <circle cx="268" cy="230" r="3" opacity="0.6"/>
-      <circle cx="330" cy="250" r="2.5" opacity="0.5"/>
-      <circle cx="380" cy="130" r="2.5" opacity="0.4"/>
+    <g fill="#8B90A8" font-size="11" text-anchor="middle">
+      <text x="300" y="638">stories</text><text x="600" y="604">voice &amp; humor</text><text x="900" y="634">memories shared on</text>
     </g>
   </g>
 
-  <!-- living avatar, center-right -->
-  <g transform="translate(640 120)">
-    <circle cx="0" cy="120" r="150" fill="url(#avatar5)"/>
-    <circle cx="0" cy="96" r="50" fill="#E8A34D"/>
-    <path d="M-74 236 C-74 164 -42 130 0 130 C42 130 74 164 74 236 Z" fill="#E8A34D" opacity="0.9"/>
-    <circle cx="0" cy="120" r="150" fill="none" stroke="#F4E3C8" stroke-opacity="0.3" stroke-width="1.5"/>
-  </g>
+  <text x="600" y="712" text-anchor="middle" font-size="15" fill="#8B90A8">Owner-set boundaries decide what a legacy profile may share, and with whom.</text>
 
-  <!-- grandchild with chat + voice -->
-  <g transform="translate(960 320)">
-    <circle cx="0" cy="0" r="40" fill="#3A3D80" stroke="#C9CDD8" stroke-opacity="0.5" stroke-width="2"/>
-    <path d="M-66 190 C-66 86 -34 52 0 52 C34 52 66 86 66 190 Z" fill="#3A3D80"/>
-    <!-- chat bubble -->
-    <g transform="translate(-250 -150)" font-family="Helvetica, Arial, sans-serif">
-      <rect width="230" height="76" rx="18" fill="#F4EFE4"/>
-      <path d="M190 76 l20 20 v-20 z" fill="#F4EFE4"/>
-      <text x="24" y="32" fill="#2A2438" font-size="14">"Tell me again about the</text>
-      <text x="24" y="54" fill="#2A2438" font-size="14">boat you built, Grandpa."</text>
-    </g>
-    <!-- voice waves -->
-    <g stroke="#E8A34D" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.8">
-      <path d="M-96 10 q-10 -12 0 -24"/>
-      <path d="M-112 18 q-16 -20 0 -40"/>
-      <path d="M-128 26 q-22 -28 0 -56"/>
-    </g>
-  </g>
+  <rect width="1200" height="750" fill="url(#lvign)"/>
 </svg>

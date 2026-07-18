@@ -1,106 +1,123 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 560" width="1500" height="560" font-family="Helvetica, Arial, sans-serif">
   <title>QRME user persona set — five consistent character illustrations</title>
   <defs>
-    <linearGradient id="bg12" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F2F3F7"/>
-      <stop offset="1" stop-color="#E6E8F0"/>
+    <linearGradient id="cbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#101235"/>
     </linearGradient>
-    <radialGradient id="studio" cx="0.5" cy="0.35" r="0.7">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.9"/>
-      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    <radialGradient id="cvign" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0.66" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
     </radialGradient>
+    <linearGradient id="ccard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A2C63"/>
+      <stop offset="1" stop-color="#20224F"/>
+    </linearGradient>
+    <filter id="cshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="csoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="8"/></filter>
+    <linearGradient id="cf1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F5C57F"/><stop offset="1" stop-color="#D98F3B"/></linearGradient>
+    <linearGradient id="cf2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DDE1EC"/><stop offset="1" stop-color="#9BA1BC"/></linearGradient>
+    <linearGradient id="cf3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9C4E8"/><stop offset="1" stop-color="#6E8BB8"/></linearGradient>
+    <linearGradient id="cf4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCB8D4"/><stop offset="1" stop-color="#A87BA0"/></linearGradient>
+    <linearGradient id="cf5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B8D8C8"/><stop offset="1" stop-color="#7FA893"/></linearGradient>
   </defs>
 
-  <rect width="1500" height="560" fill="url(#bg12)"/>
+  <rect width="1500" height="560" fill="url(#cbg)"/>
 
-  <!-- 1. Self-Profile Creator: adult configuring their digital twin -->
-  <g transform="translate(150 100)">
-    <circle cx="0" cy="130" r="130" fill="url(#studio)"/>
-    <circle cx="-20" cy="80" r="40" fill="#7A5638"/>
-    <path d="M-80 250 C-80 168 -54 132 -20 132 C14 132 40 168 40 250 Z" fill="#23255F"/>
-    <!-- mirrored translucent twin -->
-    <circle cx="58" cy="92" r="30" fill="#E8A34D" opacity="0.55"/>
-    <path d="M14 236 C14 172 32 144 58 144 C84 144 102 172 102 236 Z" fill="#E8A34D" opacity="0.45"/>
-    <!-- settings slider between them -->
-    <g transform="translate(-46 274)">
-      <rect width="120" height="8" rx="4" fill="#C9CDD8"/>
-      <circle cx="78" cy="4" r="10" fill="#E8A34D"/>
+  <text x="750" y="60" text-anchor="middle" font-size="28" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">Who QRME is for</text>
+
+  <!-- ===== card 1: legacy keeper ===== -->
+  <g transform="translate(60 110)" filter="url(#cshadow)">
+    <rect width="252" height="380" rx="20" fill="url(#ccard)"/>
+    <rect width="252" height="380" rx="20" fill="none" stroke="#E8A34D" stroke-opacity="0.45" stroke-width="1.4"/>
+    <g transform="translate(126 130)">
+      <g filter="url(#csoft)"><circle r="56" fill="#E8A34D" opacity="0.35"/></g>
+      <circle cy="-14" r="34" fill="url(#cf1)"/>
+      <path d="M-52 84 C-52 20 -27 -2 0 -2 C27 -2 52 20 52 84 Z" fill="url(#cf1)"/>
+      <path d="M-24 -34 a34 34 0 0 1 50 -4" fill="none" stroke="#FFF6E6" stroke-width="2.2" stroke-opacity="0.7" stroke-linecap="round"/>
     </g>
-    <text x="0" y="330" text-anchor="middle" fill="#161840" font-size="15" font-weight="bold">Self-Profile Creator</text>
-    <text x="0" y="352" text-anchor="middle" fill="#8B90A8" font-size="12">configures their digital twin</text>
+    <text x="126" y="252" text-anchor="middle" font-size="17" font-weight="bold" fill="#F4E3C8">Rosa, 71</text>
+    <text x="126" y="274" text-anchor="middle" font-size="12.5" fill="#E8A34D">The legacy keeper</text>
+    <g text-anchor="middle" font-size="11.5" fill="#8B90A8">
+      <text x="126" y="304">Builds a profile of her late husband</text>
+      <text x="126" y="322">from letters and voice notes, so the</text>
+      <text x="126" y="340">grandkids can hear his stories.</text>
+    </g>
   </g>
 
-  <!-- 2. Legacy/Memory User: adult holding a framed portrait -->
-  <g transform="translate(450 100)">
-    <circle cx="0" cy="130" r="130" fill="url(#studio)"/>
-    <circle cx="0" cy="78" r="40" fill="#4A3A2E"/>
-    <path d="M-60 250 C-60 166 -34 130 0 130 C34 130 60 166 60 250 Z" fill="#5B4B7A"/>
-    <!-- framed portrait held to chest -->
-    <rect x="-34" y="168" width="68" height="82" rx="4" fill="#EFE6D4" stroke="#B7A588" stroke-width="3"/>
-    <circle cx="0" cy="196" r="14" fill="#8B7A62"/>
-    <path d="M-18 242 C-18 220 -10 212 0 212 C10 212 18 220 18 242 Z" fill="#8B7A62"/>
-    <circle cx="44" cy="150" r="6" fill="#E8A34D" opacity="0.8"/>
-    <circle cx="58" cy="128" r="4" fill="#E8A34D" opacity="0.6"/>
-    <text x="0" y="330" text-anchor="middle" fill="#161840" font-size="15" font-weight="bold">Legacy / Memory User</text>
-    <text x="0" y="352" text-anchor="middle" fill="#8B90A8" font-size="12">preserves a loved one's voice</text>
+  <!-- ===== card 2: the connector ===== -->
+  <g transform="translate(340 110)" filter="url(#cshadow)">
+    <rect width="252" height="380" rx="20" fill="url(#ccard)"/>
+    <rect width="252" height="380" rx="20" fill="none" stroke="#C9CDD8" stroke-opacity="0.3" stroke-width="1.2"/>
+    <g transform="translate(126 130)">
+      <g filter="url(#csoft)"><circle r="56" fill="#C9CDD8" opacity="0.3"/></g>
+      <circle cy="-14" r="34" fill="url(#cf2)"/>
+      <path d="M-52 84 C-52 20 -27 -2 0 -2 C27 -2 52 20 52 84 Z" fill="url(#cf2)"/>
+    </g>
+    <text x="126" y="252" text-anchor="middle" font-size="17" font-weight="bold" fill="#F4E3C8">Marcus, 38</text>
+    <text x="126" y="274" text-anchor="middle" font-size="12.5" fill="#C9CDD8">The busy connector</text>
+    <g text-anchor="middle" font-size="11.5" fill="#8B90A8">
+      <text x="126" y="304">Keeps a warm presence for far-away</text>
+      <text x="126" y="322">family; his profile knows who's kin</text>
+      <text x="126" y="340">and who's a colleague.</text>
+    </g>
   </g>
 
-  <!-- 3. Fan / Historical Interaction User: younger adult with historical figure hologram -->
-  <g transform="translate(750 100)">
-    <circle cx="0" cy="130" r="130" fill="url(#studio)"/>
-    <circle cx="-24" cy="86" r="36" fill="#2E2431"/>
-    <path d="M-78 250 C-78 174 -54 140 -24 140 C6 140 30 174 30 250 Z" fill="#B0433A"/>
-    <!-- phone in hand projecting a small historical figure -->
-    <rect x="18" y="188" width="30" height="52" rx="6" fill="#161840"/>
-    <g opacity="0.75">
-      <circle cx="66" cy="120" r="18" fill="#C9CDD8"/>
-      <path d="M40 186 C40 148 52 134 66 134 C80 134 92 148 92 186 Z" fill="#C9CDD8"/>
-      <!-- period hat suggesting a historical persona -->
-      <rect x="48" y="94" width="36" height="8" rx="3" fill="#8B90A8"/>
-      <rect x="56" y="76" width="20" height="20" rx="3" fill="#8B90A8"/>
+  <!-- ===== card 3: the creator ===== -->
+  <g transform="translate(620 110)" filter="url(#cshadow)">
+    <rect width="252" height="380" rx="20" fill="url(#ccard)"/>
+    <rect width="252" height="380" rx="20" fill="none" stroke="#A9C4E8" stroke-opacity="0.35" stroke-width="1.2"/>
+    <g transform="translate(126 130)">
+      <g filter="url(#csoft)"><circle r="56" fill="#A9C4E8" opacity="0.3"/></g>
+      <circle cy="-14" r="34" fill="url(#cf3)"/>
+      <path d="M-52 84 C-52 20 -27 -2 0 -2 C27 -2 52 20 52 84 Z" fill="url(#cf3)"/>
     </g>
-    <g stroke="#E8A34D" stroke-width="1.5" opacity="0.7">
-      <line x1="34" y1="188" x2="52" y2="150"/><line x1="46" y1="192" x2="76" y2="152"/>
+    <text x="126" y="252" text-anchor="middle" font-size="17" font-weight="bold" fill="#F4E3C8">Yuki, 26</text>
+    <text x="126" y="274" text-anchor="middle" font-size="12.5" fill="#A9C4E8">The creator</text>
+    <g text-anchor="middle" font-size="11.5" fill="#8B90A8">
+      <text x="126" y="304">Runs a public persona for fans with</text>
+      <text x="126" y="322">strict boundaries — private life</text>
+      <text x="126" y="340">stays behind the relationship wall.</text>
     </g>
-    <text x="0" y="330" text-anchor="middle" fill="#161840" font-size="15" font-weight="bold">Fan / Historical User</text>
-    <text x="0" y="352" text-anchor="middle" fill="#8B90A8" font-size="12">talks with a historical persona</text>
   </g>
 
-  <!-- 4. Moderator / Profile Owner: focused person reviewing permissions -->
-  <g transform="translate(1050 100)">
-    <circle cx="0" cy="130" r="130" fill="url(#studio)"/>
-    <circle cx="0" cy="80" r="38" fill="#6E5844"/>
-    <rect x="-30" y="58" width="60" height="10" rx="5" fill="#161840" opacity="0.35"/>
-    <path d="M-62 250 C-62 168 -36 132 0 132 C36 132 62 168 62 250 Z" fill="#1E4D45"/>
-    <!-- checklist panel -->
-    <g transform="translate(46 150)">
-      <rect width="86" height="104" rx="10" fill="#FFFFFF" stroke="#C9CDD8"/>
-      <g stroke-linecap="round">
-        <path d="M14 26 l6 6 l12 -13" stroke="#2E7D5B" stroke-width="3" fill="none"/>
-        <path d="M14 54 l6 6 l12 -13" stroke="#2E7D5B" stroke-width="3" fill="none"/>
-        <line x1="14" y1="82" x2="30" y2="82" stroke="#B0433A" stroke-width="3"/>
-      </g>
-      <g stroke="#C9CDD8" stroke-width="3" stroke-linecap="round">
-        <line x1="42" y1="22" x2="72" y2="22"/><line x1="42" y1="50" x2="72" y2="50"/><line x1="42" y1="82" x2="72" y2="82"/>
-      </g>
+  <!-- ===== card 4: the caregiver ===== -->
+  <g transform="translate(900 110)" filter="url(#cshadow)">
+    <rect width="252" height="380" rx="20" fill="url(#ccard)"/>
+    <rect width="252" height="380" rx="20" fill="none" stroke="#DCB8D4" stroke-opacity="0.35" stroke-width="1.2"/>
+    <g transform="translate(126 130)">
+      <g filter="url(#csoft)"><circle r="56" fill="#DCB8D4" opacity="0.3"/></g>
+      <circle cy="-14" r="34" fill="url(#cf4)"/>
+      <path d="M-52 84 C-52 20 -27 -2 0 -2 C27 -2 52 20 52 84 Z" fill="url(#cf4)"/>
     </g>
-    <text x="0" y="330" text-anchor="middle" fill="#161840" font-size="15" font-weight="bold">Moderator / Owner</text>
-    <text x="0" y="352" text-anchor="middle" fill="#8B90A8" font-size="12">reviews permissions &amp; boundaries</text>
+    <text x="126" y="252" text-anchor="middle" font-size="17" font-weight="bold" fill="#F4E3C8">Priya, 45</text>
+    <text x="126" y="274" text-anchor="middle" font-size="12.5" fill="#DCB8D4">The caregiver</text>
+    <g text-anchor="middle" font-size="11.5" fill="#8B90A8">
+      <text x="126" y="304">Pairs a companion profile with</text>
+      <text x="126" y="322">Guardian monitoring for her father —</text>
+      <text x="126" y="340">reassurance that escalates when real.</text>
+    </g>
   </g>
 
-  <!-- 5. Second Person / Interactor: casual user chatting -->
-  <g transform="translate(1350 100)">
-    <circle cx="0" cy="130" r="130" fill="url(#studio)"/>
-    <circle cx="0" cy="84" r="38" fill="#3B2F26"/>
-    <path d="M-62 250 C-62 170 -36 136 0 136 C36 136 62 170 62 250 Z" fill="#C9CDD8"/>
-    <!-- relaxed chat bubbles -->
-    <g>
-      <rect x="-96" y="10" width="88" height="40" rx="18" fill="#E8A34D"/>
-      <path d="M-26 50 l14 14 v-14 z" fill="#E8A34D"/>
-      <rect x="26" y="-24" width="74" height="36" rx="16" fill="#FFFFFF" stroke="#C9CDD8"/>
-      <g fill="#8B90A8"><circle cx="48" cy="-6" r="4"/><circle cx="63" cy="-6" r="4"/><circle cx="78" cy="-6" r="4"/></g>
+  <!-- ===== card 5: the explorer ===== -->
+  <g transform="translate(1180 110)" filter="url(#cshadow)">
+    <rect width="252" height="380" rx="20" fill="url(#ccard)"/>
+    <rect width="252" height="380" rx="20" fill="none" stroke="#B8D8C8" stroke-opacity="0.35" stroke-width="1.2"/>
+    <g transform="translate(126 130)">
+      <g filter="url(#csoft)"><circle r="56" fill="#B8D8C8" opacity="0.3"/></g>
+      <circle cy="-14" r="34" fill="url(#cf5)"/>
+      <path d="M-52 84 C-52 20 -27 -2 0 -2 C27 -2 52 20 52 84 Z" fill="url(#cf5)"/>
     </g>
-    <text x="0" y="330" text-anchor="middle" fill="#161840" font-size="15" font-weight="bold">Interactor</text>
-    <text x="0" y="352" text-anchor="middle" fill="#8B90A8" font-size="12">chats with a synthetic profile</text>
+    <text x="126" y="252" text-anchor="middle" font-size="17" font-weight="bold" fill="#F4E3C8">Sam, 31</text>
+    <text x="126" y="274" text-anchor="middle" font-size="12.5" fill="#B8D8C8">The explorer</text>
+    <g text-anchor="middle" font-size="11.5" fill="#8B90A8">
+      <text x="126" y="304">Trades stories with profiles across</text>
+      <text x="126" y="322">chat, web, and VR — one identity</text>
+      <text x="126" y="340">follows him to every surface.</text>
+    </g>
   </g>
+
+  <rect width="1500" height="560" fill="url(#cvign)"/>
 </svg>

@@ -1,123 +1,160 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 640" width="1400" height="640" font-family="Helvetica, Arial, sans-serif">
   <title>QRME onboarding — profile creation flow across four mobile screens</title>
   <defs>
-    <linearGradient id="bg3" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F2F3F7"/>
-      <stop offset="1" stop-color="#E4E6EE"/>
+    <linearGradient id="obg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#0F1136"/>
     </linearGradient>
-    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset="1" stop-color="#F4F5F9"/>
+    <linearGradient id="oscreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2E3170"/>
+      <stop offset="1" stop-color="#20224F"/>
     </linearGradient>
-    <radialGradient id="glow3" cx="0.5" cy="0.4" r="0.6">
-      <stop offset="0" stop-color="#E8A34D" stop-opacity="0.45"/>
-      <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
+    <linearGradient id="obody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3A3D7E"/>
+      <stop offset="1" stop-color="#181A44"/>
+    </linearGradient>
+    <radialGradient id="ovign" cx="0.5" cy="0.5" r="0.78">
+      <stop offset="0.66" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
     </radialGradient>
+    <filter id="oshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#05061C" flood-opacity="0.6"/>
+    </filter>
+    <filter id="oglow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
   </defs>
 
-  <rect width="1400" height="640" fill="url(#bg3)"/>
+  <rect width="1400" height="640" fill="url(#obg)"/>
+  <ellipse cx="700" cy="640" rx="760" ry="140" fill="#E8A34D" opacity="0.06"/>
 
-  <!-- progress connector -->
-  <g stroke="#23255F" stroke-opacity="0.25" stroke-width="3" stroke-dasharray="1 10" stroke-linecap="round">
-    <line x1="330" y1="320" x2="380" y2="320"/>
-    <line x1="670" y1="320" x2="720" y2="320"/>
-    <line x1="1010" y1="320" x2="1060" y2="320"/>
-  </g>
+  <text x="700" y="66" text-anchor="middle" font-size="30" font-weight="bold" fill="#F4E3C8" letter-spacing="2">Create a profile in four steps</text>
 
-  <!-- Screen 1: age verification gate -->
-  <g transform="translate(80 70)">
-    <rect width="250" height="500" rx="30" fill="#23255F"/>
-    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
-    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">Verify your age</text>
-    <rect x="80" y="110" width="90" height="90" rx="18" fill="none" stroke="#E8A34D" stroke-width="4"/>
-    <text x="125" y="166" text-anchor="middle" fill="#E8A34D" font-size="30" font-weight="bold">18+</text>
-    <rect x="40" y="250" width="170" height="38" rx="10" fill="#EDEEF4"/>
-    <text x="52" y="274" fill="#8B90A8" font-size="13">Date of birth</text>
-    <rect x="40" y="300" width="170" height="38" rx="10" fill="#EDEEF4"/>
-    <text x="52" y="324" fill="#8B90A8" font-size="13">Guardian consent</text>
-    <rect x="40" y="410" width="170" height="44" rx="22" fill="#23255F"/>
-    <text x="125" y="437" text-anchor="middle" fill="#FFFFFF" font-size="14">Continue</text>
-  </g>
-
-  <!-- Screen 2: demographic questionnaire -->
-  <g transform="translate(420 70)">
-    <rect width="250" height="500" rx="30" fill="#23255F"/>
-    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
-    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">About you</text>
-    <g fill="#EDEEF4">
-      <rect x="40" y="100" width="170" height="34" rx="9"/>
-      <rect x="40" y="146" width="170" height="34" rx="9"/>
-      <rect x="40" y="192" width="170" height="34" rx="9"/>
-      <rect x="40" y="238" width="170" height="34" rx="9"/>
+  <!-- progress rail -->
+  <g>
+    <line x1="255" y1="112" x2="1145" y2="112" stroke="#3A3D7E" stroke-width="3"/>
+    <line x1="255" y1="112" x2="1145" y2="112" stroke="#E8A34D" stroke-width="3" stroke-dasharray="6 8" stroke-opacity="0.6"/>
+    <g text-anchor="middle" font-size="15" font-weight="bold">
+      <g><circle cx="255" cy="112" r="16" fill="#E8A34D"/><text x="255" y="117" fill="#161840">1</text></g>
+      <g><circle cx="552" cy="112" r="16" fill="#E8A34D"/><text x="552" y="117" fill="#161840">2</text></g>
+      <g><circle cx="848" cy="112" r="16" fill="#E8A34D"/><text x="848" y="117" fill="#161840">3</text></g>
+      <g><circle cx="1145" cy="112" r="16" fill="#E8A34D"/><text x="1145" y="117" fill="#161840">4</text></g>
     </g>
-    <g fill="#8B90A8" font-size="12">
-      <text x="52" y="122">Language</text>
-      <text x="52" y="168">Location</text>
-      <text x="52" y="214">Culture &amp; identity</text>
-      <text x="52" y="260">Maturity level</text>
-    </g>
-    <rect x="40" y="410" width="170" height="44" rx="22" fill="#23255F"/>
-    <text x="125" y="437" text-anchor="middle" fill="#FFFFFF" font-size="14">Continue</text>
   </g>
 
-  <!-- Screen 3: social account connections with toggles -->
-  <g transform="translate(760 70)">
-    <rect width="250" height="500" rx="30" fill="#23255F"/>
-    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
-    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">Connect sources</text>
-    <g>
-      <g transform="translate(40 96)">
-        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
-        <circle cx="24" cy="22" r="12" fill="#23255F"/>
-        <text x="46" y="27" fill="#4A4E6E" font-size="12">Facebook</text>
-        <rect x="122" y="12" width="38" height="20" rx="10" fill="#E8A34D"/><circle cx="150" cy="22" r="8" fill="#FFF"/>
-      </g>
-      <g transform="translate(40 152)">
-        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
-        <circle cx="24" cy="22" r="12" fill="#8B90A8"/>
-        <text x="46" y="27" fill="#4A4E6E" font-size="12">Instagram</text>
-        <rect x="122" y="12" width="38" height="20" rx="10" fill="#E8A34D"/><circle cx="150" cy="22" r="8" fill="#FFF"/>
-      </g>
-      <g transform="translate(40 208)">
-        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
-        <circle cx="24" cy="22" r="12" fill="#161840"/>
-        <text x="46" y="27" fill="#4A4E6E" font-size="12">X</text>
-        <rect x="122" y="12" width="38" height="20" rx="10" fill="#C9CDD8"/><circle cx="132" cy="22" r="8" fill="#FFF"/>
-      </g>
-      <g transform="translate(40 264)">
-        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
-        <circle cx="24" cy="22" r="12" fill="#B0433A"/>
-        <text x="46" y="27" fill="#4A4E6E" font-size="12">YouTube</text>
-        <rect x="122" y="12" width="38" height="20" rx="10" fill="#E8A34D"/><circle cx="150" cy="22" r="8" fill="#FFF"/>
-      </g>
-      <g transform="translate(40 320)">
-        <rect width="170" height="44" rx="12" fill="#EDEEF4"/>
-        <circle cx="24" cy="22" r="12" fill="#2E3070"/>
-        <text x="46" y="27" fill="#4A4E6E" font-size="12">TikTok</text>
-        <rect x="122" y="12" width="38" height="20" rx="10" fill="#C9CDD8"/><circle cx="132" cy="22" r="8" fill="#FFF"/>
-      </g>
-    </g>
-    <rect x="40" y="410" width="170" height="44" rx="22" fill="#23255F"/>
-    <text x="125" y="437" text-anchor="middle" fill="#FFFFFF" font-size="14">Continue</text>
-  </g>
-
-  <!-- Screen 4: persona preview -->
-  <g transform="translate(1100 70)">
-    <rect width="250" height="500" rx="30" fill="#23255F"/>
-    <rect x="10" y="10" width="230" height="480" rx="22" fill="url(#screen)"/>
-    <text x="125" y="70" text-anchor="middle" fill="#23255F" font-size="17" font-weight="bold">Persona preview</text>
-    <circle cx="125" cy="180" r="72" fill="url(#glow3)"/>
-    <circle cx="125" cy="166" r="34" fill="#E8A34D"/>
-    <path d="M73 262 C73 214 96 192 125 192 C154 192 177 214 177 262 Z" fill="#E8A34D" opacity="0.85"/>
-    <g fill="#EDEEF4">
-      <rect x="40" y="290" width="170" height="26" rx="8"/>
-      <rect x="40" y="326" width="130" height="26" rx="8"/>
+  <!-- ============ four phones ============ -->
+  <!-- phone 1: identity -->
+  <g transform="translate(160 160)">
+    <rect width="190" height="400" rx="26" fill="url(#obody)" filter="url(#oshadow)"/>
+    <rect x="7" y="7" width="176" height="386" rx="20" fill="url(#oscreen)"/>
+    <rect x="66" y="16" width="58" height="6" rx="3" fill="#12143B"/>
+    <text x="95" y="60" text-anchor="middle" font-size="15" font-weight="bold" fill="#F4E3C8">Identity</text>
+    <circle cx="95" cy="120" r="34" fill="#E8A34D" opacity="0.9"/>
+    <circle cx="95" cy="108" r="13" fill="#1B1D4E"/>
+    <path d="M72 146 C72 126 82 120 95 120 C108 120 118 126 118 146 Z" fill="#1B1D4E"/>
+    <circle cx="95" cy="120" r="42" fill="none" stroke="#F4E3C8" stroke-opacity="0.35" stroke-width="1.2" stroke-dasharray="2 7"/>
+    <g fill="#2A2C63" stroke="#4A4E96" stroke-width="1">
+      <rect x="27" y="184" width="136" height="30" rx="8"/>
+      <rect x="27" y="226" width="136" height="30" rx="8"/>
+      <rect x="27" y="268" width="136" height="52" rx="8"/>
     </g>
     <g fill="#8B90A8" font-size="11">
-      <text x="52" y="307">Voice: warm, wry</text>
-      <text x="52" y="343">Tone: storyteller</text>
+      <text x="36" y="203">Name · Dana</text>
+      <text x="36" y="245">Voice · warm, wry</text>
+      <text x="36" y="287">Backstory…</text>
     </g>
-    <rect x="40" y="410" width="170" height="44" rx="22" fill="#E8A34D"/>
-    <text x="125" y="437" text-anchor="middle" fill="#161840" font-size="14" font-weight="bold">Create profile</text>
+    <rect x="27" y="338" width="136" height="34" rx="17" fill="#E8A34D"/>
+    <text x="95" y="360" text-anchor="middle" font-size="13" font-weight="bold" fill="#161840">Continue</text>
   </g>
+
+  <!-- phone 2: relationships -->
+  <g transform="translate(457 160)">
+    <rect width="190" height="400" rx="26" fill="url(#obody)" filter="url(#oshadow)"/>
+    <rect x="7" y="7" width="176" height="386" rx="20" fill="url(#oscreen)"/>
+    <rect x="66" y="16" width="58" height="6" rx="3" fill="#12143B"/>
+    <text x="95" y="60" text-anchor="middle" font-size="15" font-weight="bold" fill="#F4E3C8">Relationships</text>
+    <!-- mini graph -->
+    <g>
+      <circle cx="95" cy="130" r="17" fill="#E8A34D"/>
+      <circle cx="45" cy="200" r="12" fill="#C9CDD8"/>
+      <circle cx="95" cy="216" r="12" fill="#C9CDD8" opacity="0.8"/>
+      <circle cx="145" cy="200" r="12" fill="#C9CDD8" opacity="0.6"/>
+      <g stroke-linecap="round" fill="none">
+        <path d="M84 143 L52 190" stroke="#E8A34D" stroke-width="3"/>
+        <path d="M95 147 L95 204" stroke="#F4E3C8" stroke-width="2" stroke-opacity="0.7"/>
+        <path d="M106 143 L138 190" stroke="#C9CDD8" stroke-width="1.4" stroke-dasharray="3 5" stroke-opacity="0.7"/>
+      </g>
+    </g>
+    <g font-size="10" fill="#8B90A8" text-anchor="middle">
+      <text x="45" y="228">family</text><text x="95" y="244">friend</text><text x="145" y="228">public</text>
+    </g>
+    <g fill="#2A2C63" stroke="#4A4E96" stroke-width="1">
+      <rect x="27" y="262" width="136" height="26" rx="8"/>
+      <rect x="27" y="296" width="136" height="26" rx="8"/>
+    </g>
+    <g fill="#8B90A8" font-size="11">
+      <text x="36" y="279">Tone per circle</text>
+      <text x="36" y="313">Sharing rules</text>
+    </g>
+    <rect x="27" y="338" width="136" height="34" rx="17" fill="#E8A34D"/>
+    <text x="95" y="360" text-anchor="middle" font-size="13" font-weight="bold" fill="#161840">Continue</text>
+  </g>
+
+  <!-- phone 3: memory & privacy -->
+  <g transform="translate(753 160)">
+    <rect width="190" height="400" rx="26" fill="url(#obody)" filter="url(#oshadow)"/>
+    <rect x="7" y="7" width="176" height="386" rx="20" fill="url(#oscreen)"/>
+    <rect x="66" y="16" width="58" height="6" rx="3" fill="#12143B"/>
+    <text x="95" y="60" text-anchor="middle" font-size="15" font-weight="bold" fill="#F4E3C8">Memory &amp; privacy</text>
+    <!-- memory spiral -->
+    <g fill="none" stroke="#E8A34D" stroke-linecap="round">
+      <path d="M95 140 m-30 0 a30 30 0 1 1 60 0 a30 30 0 0 1 -46 25" stroke-width="2.4" stroke-opacity="0.85"/>
+      <path d="M95 140 m-42 0 a42 42 0 1 1 84 0" stroke-width="1.2" stroke-opacity="0.4" stroke-dasharray="2 7"/>
+    </g>
+    <circle cx="95" cy="140" r="5" fill="#F4E3C8"/>
+    <!-- toggles -->
+    <g>
+      <g transform="translate(27 206)">
+        <text font-size="11" fill="#8B90A8" y="14">Remember chats</text>
+        <rect x="106" width="30" height="17" rx="8.5" fill="#E8A34D"/><circle cx="128" cy="8.5" r="6.5" fill="#161840"/>
+      </g>
+      <g transform="translate(27 238)">
+        <text font-size="11" fill="#8B90A8" y="14">Share across users</text>
+        <rect x="106" width="30" height="17" rx="8.5" fill="#3A3D7E"/><circle cx="114" cy="8.5" r="6.5" fill="#8B90A8"/>
+      </g>
+      <g transform="translate(27 270)">
+        <text font-size="11" fill="#8B90A8" y="14">Owner review</text>
+        <rect x="106" width="30" height="17" rx="8.5" fill="#E8A34D"/><circle cx="128" cy="8.5" r="6.5" fill="#161840"/>
+      </g>
+    </g>
+    <g transform="translate(27 302)" fill="#2A2C63" stroke="#4A4E96" stroke-width="1">
+      <rect width="136" height="24" rx="8"/>
+    </g>
+    <text x="36" y="318" font-size="11" fill="#8B90A8">Clear / restrict anytime</text>
+    <rect x="27" y="338" width="136" height="34" rx="17" fill="#E8A34D"/>
+    <text x="95" y="360" text-anchor="middle" font-size="13" font-weight="bold" fill="#161840">Continue</text>
+  </g>
+
+  <!-- phone 4: go live -->
+  <g transform="translate(1050 160)">
+    <rect width="190" height="400" rx="26" fill="url(#obody)" filter="url(#oshadow)"/>
+    <rect x="7" y="7" width="176" height="386" rx="20" fill="url(#oscreen)"/>
+    <rect x="66" y="16" width="58" height="6" rx="3" fill="#12143B"/>
+    <text x="95" y="60" text-anchor="middle" font-size="15" font-weight="bold" fill="#F4E3C8">Go live</text>
+    <g filter="url(#oglow)"><circle cx="95" cy="150" r="44" fill="#E8A34D" opacity="0.55"/></g>
+    <circle cx="95" cy="150" r="38" fill="#E8A34D"/>
+    <circle cx="95" cy="137" r="14" fill="#161840"/>
+    <path d="M70 178 C70 156 81 150 95 150 C109 150 120 156 120 178 Z" fill="#161840"/>
+    <circle cx="95" cy="150" r="50" fill="none" stroke="#F4E3C8" stroke-opacity="0.5" stroke-width="1.4"/>
+    <circle cx="95" cy="150" r="60" fill="none" stroke="#E8A34D" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 8"/>
+    <g text-anchor="middle">
+      <text x="95" y="242" font-size="13" fill="#F4E3C8" font-weight="bold">Dana is live</text>
+      <text x="95" y="262" font-size="11" fill="#8B90A8">moderation on · memory on</text>
+      <text x="95" y="280" font-size="11" fill="#8B90A8">aging · real-time</text>
+    </g>
+    <rect x="27" y="338" width="136" height="34" rx="17" fill="#F4E3C8"/>
+    <text x="95" y="360" text-anchor="middle" font-size="13" font-weight="bold" fill="#161840">Meet Dana</text>
+  </g>
+
+  <rect width="1400" height="640" fill="url(#ovign)"/>
 </svg>

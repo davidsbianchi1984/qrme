@@ -1,5 +1,7 @@
 # QRME — AI Synthetic Profile Platform (v1)
 
+![QRME — relationship-aware synthetic profiles](assets/design/00-cover.svg)
+
 QRME lets a user create, customize, and interact with AI-driven synthetic
 profiles — versions of themselves, another person (with consent/rights
 handling), or a fictional persona. Profiles adapt to *who* they're talking to

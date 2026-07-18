@@ -1,79 +1,125 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 720" width="1300" height="720" font-family="Helvetica, Arial, sans-serif">
   <title>Multi-surface presence — one profile identity across chat, feed, web, and AR/VR</title>
   <defs>
-    <linearGradient id="bg10" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1B1D4E"/>
-      <stop offset="1" stop-color="#262a66"/>
+    <linearGradient id="sbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#191B47"/>
+      <stop offset="1" stop-color="#0E1034"/>
     </linearGradient>
-    <radialGradient id="ar10" cx="0.5" cy="0.4" r="0.65">
-      <stop offset="0" stop-color="#F4E3C8" stop-opacity="0.65"/>
-      <stop offset="0.6" stop-color="#E8A34D" stop-opacity="0.28"/>
+    <radialGradient id="svign" cx="0.5" cy="0.5" r="0.78">
+      <stop offset="0.64" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
+    </radialGradient>
+    <radialGradient id="score" cx="0.5" cy="0.45" r="0.7">
+      <stop offset="0" stop-color="#FFF6E6" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#F0C482" stop-opacity="0.55"/>
       <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="sdev" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#33367C"/>
+      <stop offset="1" stop-color="#1C1E4B"/>
+    </linearGradient>
+    <filter id="sshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="9" stdDeviation="11" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="ssoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="12"/></filter>
   </defs>
 
-  <rect width="1300" height="720" fill="url(#bg10)"/>
+  <rect width="1300" height="720" fill="url(#sbg)"/>
 
-  <!-- AR/VR presence, background -->
-  <g opacity="0.85">
-    <circle cx="1050" cy="240" r="150" fill="url(#ar10)"/>
-    <circle cx="1050" cy="212" r="42" fill="#E8A34D" opacity="0.75"/>
-    <path d="M986 330 C986 268 1014 240 1050 240 C1086 240 1114 268 1114 330 Z" fill="#E8A34D" opacity="0.6"/>
-    <ellipse cx="1050" cy="352" rx="86" ry="10" fill="#E8A34D" opacity="0.2"/>
-    <!-- headset outline -->
-    <g transform="translate(940 430)" stroke="#C9CDD8" stroke-width="3" fill="none" opacity="0.6">
-      <path d="M0 20 q0 -20 24 -20 h172 q24 0 24 20 v36 q0 20 -24 20 h-52 q-16 -24 -34 -24 t-34 24 h-52 q-24 0 -24 -20 z"/>
+  <text x="650" y="62" text-anchor="middle" font-size="30" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">One identity, every surface</text>
+  <text x="650" y="90" text-anchor="middle" font-size="15" fill="#8B90A8">The same memory, voice, and boundaries follow the profile everywhere</text>
+
+  <!-- identity orb -->
+  <g transform="translate(650 400)">
+    <g filter="url(#ssoft)"><circle r="98" fill="#E8A34D" opacity="0.45"/></g>
+    <circle r="128" fill="url(#score)"/>
+    <circle r="84" fill="none" stroke="#F4E3C8" stroke-opacity="0.45" stroke-width="1.4"/>
+    <circle r="104" fill="none" stroke="#E8A34D" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="2 9"/>
+    <circle cy="-20" r="30" fill="#F5C57F"/>
+    <path d="M-48 68 C-48 18 -26 -2 0 -2 C26 -2 48 18 48 68 Z" fill="#F5C57F"/>
+    <text y="112" text-anchor="middle" font-size="14" fill="#F4E3C8" opacity="0.9">Dana — one identity</text>
+  </g>
+
+  <!-- radiating threads -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M560 320 C440 260 360 240 300 236" stroke="#E8A34D" stroke-width="2.6" stroke-opacity="0.6"/>
+    <path d="M740 320 C860 260 940 240 1000 236" stroke="#E8A34D" stroke-width="2.6" stroke-opacity="0.6"/>
+    <path d="M545 460 C440 510 380 530 320 540" stroke="#C9CDD8" stroke-width="2" stroke-opacity="0.5"/>
+    <path d="M755 460 C860 510 920 530 980 540" stroke="#C9CDD8" stroke-width="2" stroke-opacity="0.5"/>
+  </g>
+  <g fill="#FFF6E6"><circle cx="440" cy="262" r="3"/><circle cx="860" cy="262" r="3"/><circle cx="440" cy="508" r="2.6" opacity="0.8"/><circle cx="860" cy="508" r="2.6" opacity="0.8"/></g>
+
+  <!-- ==== chat (phone, top-left) ==== -->
+  <g transform="translate(120 130)" filter="url(#sshadow)">
+    <rect width="180" height="220" rx="22" fill="url(#sdev)"/>
+    <rect x="7" y="7" width="166" height="206" rx="16" fill="#20224F"/>
+    <rect x="63" y="15" width="54" height="5" rx="2.5" fill="#12143B"/>
+    <text x="90" y="44" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#F4E3C8">Chat</text>
+    <g>
+      <rect x="20" y="60" width="104" height="30" rx="10" fill="#2E3170"/>
+      <g fill="#8B90A8"><rect x="30" y="70" width="58" height="4" rx="2"/><rect x="30" y="79" width="76" height="4" rx="2"/></g>
+      <rect x="56" y="100" width="104" height="30" rx="10" fill="#E8A34D" opacity="0.9"/>
+      <g fill="#161840"><rect x="66" y="110" width="66" height="4" rx="2"/><rect x="66" y="119" width="80" height="4" rx="2"/></g>
+      <rect x="20" y="140" width="88" height="26" rx="10" fill="#2E3170"/>
+      <g fill="#8B90A8"><rect x="30" y="150" width="52" height="4" rx="2"/></g>
     </g>
-    <text x="1050" y="560" text-anchor="middle" fill="#C9CDD8" font-size="14" opacity="0.8">AR / VR — roadmap</text>
+    <circle cx="90" cy="192" r="10" fill="#F5C57F"/>
   </g>
 
-  <!-- identity threads linking every surface -->
-  <g stroke="#E8A34D" stroke-opacity="0.45" stroke-width="2" fill="none">
-    <path d="M300 340 Q480 240 640 300"/>
-    <path d="M700 300 Q860 240 990 260"/>
-    <path d="M330 420 Q650 560 900 480"/>
-  </g>
-
-  <!-- smartphone chat -->
-  <g transform="translate(180 160)">
-    <rect width="240" height="420" rx="30" fill="#23255F" stroke="#C9CDD8" stroke-opacity="0.4"/>
-    <rect x="10" y="10" width="220" height="400" rx="22" fill="#F4F5F9"/>
-    <circle cx="52" cy="66" r="22" fill="#E8A34D"/>
-    <path d="M38 62 a14 14 0 0 1 28 0" fill="none" stroke="#161840" stroke-width="2" opacity="0.3"/>
-    <text x="86" y="72" fill="#161840" font-size="14" font-weight="bold">Dana</text>
-    <rect x="34" y="110" width="150" height="44" rx="16" fill="#E8A34D" opacity="0.9"/>
-    <rect x="70" y="170" width="130" height="40" rx="16" fill="#E4E6EE"/>
-    <rect x="34" y="226" width="160" height="44" rx="16" fill="#E8A34D" opacity="0.9"/>
-    <rect x="34" y="350" width="172" height="36" rx="18" fill="#E4E6EE"/>
-    <text x="120" y="440" text-anchor="middle" fill="#C9CDD8" font-size="14">In-app chat — v1</text>
-  </g>
-
-  <!-- social feed card -->
-  <g transform="translate(500 220)">
-    <rect width="260" height="300" rx="18" fill="#F4F5F9"/>
-    <circle cx="42" cy="46" r="20" fill="#E8A34D"/>
-    <text x="74" y="42" fill="#161840" font-size="14" font-weight="bold">Dana</text>
-    <text x="74" y="60" fill="#8B90A8" font-size="11">replied to a post</text>
-    <g stroke="#8B90A8" stroke-width="3" stroke-linecap="round" opacity="0.7">
-      <line x1="30" y1="100" x2="230" y2="100"/><line x1="30" y1="122" x2="200" y2="122"/><line x1="30" y1="144" x2="216" y2="144"/>
+  <!-- ==== feed (phone, top-right) ==== -->
+  <g transform="translate(1000 130)" filter="url(#sshadow)">
+    <rect width="180" height="220" rx="22" fill="url(#sdev)"/>
+    <rect x="7" y="7" width="166" height="206" rx="16" fill="#20224F"/>
+    <rect x="63" y="15" width="54" height="5" rx="2.5" fill="#12143B"/>
+    <text x="90" y="44" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#F4E3C8">Feed</text>
+    <g>
+      <rect x="20" y="58" width="140" height="64" rx="10" fill="#2E3170"/>
+      <circle cx="38" cy="76" r="9" fill="#F5C57F"/>
+      <g fill="#8B90A8"><rect x="54" y="70" width="60" height="4" rx="2"/><rect x="54" y="79" width="40" height="4" rx="2"/></g>
+      <rect x="28" y="94" width="124" height="20" rx="6" fill="#23255C"/>
+      <rect x="20" y="130" width="140" height="52" rx="10" fill="#2E3170" opacity="0.85"/>
+      <circle cx="38" cy="148" r="9" fill="#F5C57F"/>
+      <g fill="#8B90A8"><rect x="54" y="142" width="68" height="4" rx="2"/><rect x="54" y="151" width="48" height="4" rx="2"/></g>
     </g>
-    <rect x="30" y="176" width="200" height="70" rx="12" fill="#E4E6EE"/>
+  </g>
+
+  <!-- ==== web (browser, bottom-left) ==== -->
+  <g transform="translate(90 480)" filter="url(#sshadow)">
+    <rect width="240" height="160" rx="14" fill="url(#sdev)"/>
+    <rect x="0" y="0" width="240" height="30" rx="14" fill="#2A2C63"/>
+    <rect x="0" y="16" width="240" height="14" fill="#2A2C63"/>
+    <circle cx="20" cy="15" r="4.5" fill="#D96A6A"/><circle cx="36" cy="15" r="4.5" fill="#E8C34D"/><circle cx="52" cy="15" r="4.5" fill="#7BC47F"/>
+    <rect x="70" y="8" width="150" height="14" rx="7" fill="#12143B"/>
+    <text x="78" y="19" font-size="9.5" fill="#8B90A8">qrme.app/dana</text>
+    <rect x="14" y="42" width="212" height="104" rx="10" fill="#20224F"/>
+    <circle cx="46" cy="80" r="18" fill="#F5C57F"/>
     <g fill="#8B90A8">
-      <circle cx="46" cy="272" r="7"/><circle cx="86" cy="272" r="7"/><circle cx="126" cy="272" r="7"/>
+      <rect x="76" y="64" width="120" height="6" rx="3"/><rect x="76" y="78" width="96" height="5" rx="2.5"/>
+      <rect x="76" y="90" width="132" height="5" rx="2.5"/>
     </g>
-    <text x="130" y="330" text-anchor="middle" fill="#C9CDD8" font-size="14">Social feed — v1</text>
+    <rect x="76" y="106" width="76" height="22" rx="11" fill="#E8A34D"/>
+    <text x="114" y="121" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#161840">Say hello</text>
+    <text x="120" y="158" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#F4E3C8">Web</text>
   </g>
 
-  <!-- desktop web -->
-  <g transform="translate(760 400)">
-    <rect width="340" height="210" rx="14" fill="#23255F" stroke="#C9CDD8" stroke-opacity="0.4"/>
-    <rect x="8" y="8" width="324" height="170" rx="8" fill="#F4F5F9"/>
-    <g fill="#C9CDD8"><circle cx="26" cy="24" r="4"/><circle cx="42" cy="24" r="4"/><circle cx="58" cy="24" r="4"/></g>
-    <circle cx="66" cy="94" r="26" fill="#E8A34D"/>
-    <g stroke="#8B90A8" stroke-width="3" stroke-linecap="round" opacity="0.7">
-      <line x1="110" y1="76" x2="300" y2="76"/><line x1="110" y1="98" x2="270" y2="98"/><line x1="110" y1="120" x2="286" y2="120"/>
+  <!-- ==== AR/VR (headset view, bottom-right) ==== -->
+  <g transform="translate(970 480)" filter="url(#sshadow)">
+    <rect width="240" height="160" rx="26" fill="url(#sdev)"/>
+    <path d="M20 80 Q20 34 70 30 L170 30 Q220 34 220 80 Q220 122 176 126 L150 126 Q136 108 120 108 Q104 108 90 126 L64 126 Q20 122 20 80 Z" fill="#20224F" stroke="#4A4E96" stroke-width="1.4"/>
+    <!-- avatar hologram in view -->
+    <g transform="translate(120 76)">
+      <circle r="26" fill="#E8A34D" opacity="0.25"/>
+      <circle cy="-6" r="10" fill="#F5C57F"/>
+      <path d="M-16 26 C-16 6 -8 0 0 0 C8 0 16 6 16 26 Z" fill="#F5C57F"/>
+      <circle r="30" fill="none" stroke="#F4E3C8" stroke-opacity="0.5" stroke-width="1" stroke-dasharray="2 6"/>
     </g>
-    <rect x="130" y="212" width="80" height="10" rx="4" fill="#161840"/>
-    <text x="170" y="252" text-anchor="middle" fill="#C9CDD8" font-size="14">Desktop web</text>
+    <text x="120" y="152" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#F4E3C8">AR / VR</text>
   </g>
+
+  <!-- shared-state footer -->
+  <g transform="translate(650 668)" text-anchor="middle">
+    <text font-size="13.5" fill="#8B90A8">same memory · same relationship rules · same moderation — on every surface</text>
+  </g>
+
+  <rect width="1300" height="720" fill="url(#svign)"/>
 </svg>

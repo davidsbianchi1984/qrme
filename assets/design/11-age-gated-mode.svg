@@ -1,69 +1,97 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 640" width="1300" height="640" font-family="Helvetica, Arial, sans-serif">
   <title>Age-gated adult mode — a verification gate separates a distinct, refined space</title>
   <defs>
-    <linearGradient id="left11" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#F2F3F7"/>
-      <stop offset="1" stop-color="#E1E3ED"/>
+    <linearGradient id="gbgL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#191B47"/>
     </linearGradient>
-    <linearGradient id="right11" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#14122E"/>
-      <stop offset="1" stop-color="#241B3A"/>
+    <linearGradient id="gbgR" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#241A3F"/>
+      <stop offset="1" stop-color="#31204F"/>
     </linearGradient>
-    <radialGradient id="lamp11" cx="0.5" cy="0.3" r="0.7">
-      <stop offset="0" stop-color="#E8A34D" stop-opacity="0.4"/>
+    <radialGradient id="gvign" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0.64" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
+    </radialGradient>
+    <linearGradient id="ggate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A4E96"/>
+      <stop offset="1" stop-color="#23255C"/>
+    </linearGradient>
+    <radialGradient id="gwarm" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0" stop-color="#E8A34D" stop-opacity="0.3"/>
       <stop offset="1" stop-color="#E8A34D" stop-opacity="0"/>
     </radialGradient>
+    <filter id="gshadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="9" stdDeviation="11" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="gsoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="8"/></filter>
   </defs>
 
-  <!-- default experience: light, open -->
-  <rect width="700" height="640" fill="url(#left11)"/>
-  <g opacity="0.7">
-    <rect x="90" y="150" width="220" height="60" rx="18" fill="#FFFFFF" stroke="#C9CDD8"/>
-    <rect x="140" y="240" width="220" height="60" rx="18" fill="#FFFFFF" stroke="#C9CDD8"/>
-    <rect x="90" y="330" width="180" height="60" rx="18" fill="#FFFFFF" stroke="#C9CDD8"/>
-    <circle cx="120" cy="180" r="14" fill="#E8A34D"/>
-    <circle cx="170" cy="270" r="14" fill="#C9CDD8"/>
-    <circle cx="120" cy="360" r="14" fill="#E8A34D"/>
-  </g>
-  <text x="240" y="560" text-anchor="middle" fill="#8B90A8" font-size="16">Default experience</text>
+  <!-- two-tone space -->
+  <rect width="650" height="640" fill="url(#gbgL)"/>
+  <rect x="650" width="650" height="640" fill="url(#gbgR)"/>
 
-  <!-- verification gate -->
-  <g transform="translate(560 90)">
-    <rect width="180" height="460" rx="16" fill="#23255F"/>
-    <rect x="12" y="12" width="156" height="436" rx="10" fill="#2E3070"/>
-    <!-- lock -->
-    <g transform="translate(64 96)">
-      <rect y="22" width="52" height="42" rx="8" fill="#E8A34D"/>
-      <path d="M9 22 v-6 a17 17 0 0 1 34 0 v6" fill="none" stroke="#E8A34D" stroke-width="6"/>
-      <circle cx="26" cy="42" r="6" fill="#161840"/>
-    </g>
-    <rect x="46" y="210" width="88" height="88" rx="16" fill="none" stroke="#E8A34D" stroke-width="3.5"/>
-    <text x="90" y="264" text-anchor="middle" fill="#E8A34D" font-size="28" font-weight="bold">18+</text>
-    <text x="90" y="340" text-anchor="middle" fill="#C9CDD8" font-size="13">Verified age</text>
-    <text x="90" y="362" text-anchor="middle" fill="#C9CDD8" font-size="13">+ explicit consent</text>
-    <rect x="36" y="392" width="108" height="34" rx="17" fill="#E8A34D"/>
-    <text x="90" y="414" text-anchor="middle" fill="#161840" font-size="13" font-weight="bold">Enter</text>
+  <text x="650" y="62" text-anchor="middle" font-size="28" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">A separate, verified space</text>
+  <text x="650" y="90" text-anchor="middle" font-size="15" fill="#8B90A8">Adult mode is opt-in, age-verified, and clearly distinct — never the default</text>
+
+  <!-- ===== standard space (left) ===== -->
+  <g transform="translate(240 350)">
+    <g filter="url(#gsoft)"><circle r="70" fill="#C9CDD8" opacity="0.25"/></g>
+    <circle cy="-24" r="30" fill="#AEB3C6"/>
+    <path d="M-48 70 C-48 16 -26 -4 0 -4 C26 -4 48 16 48 70 Z" fill="#AEB3C6"/>
+    <text y="106" text-anchor="middle" font-size="14.5" fill="#C9CDD8" font-weight="bold">Standard mode</text>
+    <text y="128" text-anchor="middle" font-size="12" fill="#8B90A8">the everyday experience</text>
+  </g>
+  <g transform="translate(120 180)" opacity="0.85" filter="url(#gshadow)">
+    <rect width="240" height="66" rx="14" fill="#2E3170"/>
+    <g fill="#8B90A8"><rect x="18" y="18" width="150" height="6" rx="3"/><rect x="18" y="34" width="190" height="6" rx="3"/></g>
+    <circle cx="214" cy="48" r="4" fill="#C9CDD8"/>
   </g>
 
-  <!-- adult mode: darker, refined, restrained -->
-  <rect x="700" width="600" height="640" fill="url(#right11)"/>
-  <rect x="700" width="600" height="640" fill="url(#lamp11)"/>
-  <g opacity="0.9">
-    <!-- refined lounge lighting: pendant lamp + warm glow -->
-    <line x1="1000" y1="0" x2="1000" y2="120" stroke="#C9CDD8" stroke-opacity="0.4" stroke-width="2"/>
-    <path d="M970 120 h60 l-14 34 h-32 z" fill="#E8A34D" opacity="0.85"/>
-    <ellipse cx="1000" cy="380" rx="200" ry="16" fill="#E8A34D" opacity="0.12"/>
-    <!-- two adult silhouettes in conversation, non-explicit -->
-    <g fill="#3A2F52">
-      <circle cx="900" cy="300" r="34"/>
-      <path d="M840 470 C840 372 868 340 900 340 C932 340 960 372 960 470 Z"/>
-      <circle cx="1105" cy="306" r="32"/>
-      <path d="M1049 470 C1049 378 1075 348 1105 348 C1135 348 1161 378 1161 470 Z"/>
+  <!-- ===== the gate ===== -->
+  <g transform="translate(650 330)" filter="url(#gshadow)">
+    <!-- posts -->
+    <rect x="-96" y="-190" width="26" height="400" rx="10" fill="url(#ggate)"/>
+    <rect x="70" y="-190" width="26" height="400" rx="10" fill="url(#ggate)"/>
+    <rect x="-104" y="-206" width="208" height="30" rx="12" fill="url(#ggate)"/>
+    <!-- shield -->
+    <g>
+      <g filter="url(#gsoft)"><path d="M0 -110 L62 -84 V-16 C62 34 34 66 0 82 C-34 66 -62 34 -62 -16 V-84 Z" fill="#E8A34D" opacity="0.5"/></g>
+      <path d="M0 -104 L56 -80 V-18 C56 28 30 58 0 73 C-30 58 -56 28 -56 -18 V-80 Z" fill="#23255C" stroke="#E8A34D" stroke-width="2.4"/>
+      <!-- check + 18+ -->
+      <text y="-18" text-anchor="middle" font-size="26" font-weight="bold" fill="#E8A34D">18+</text>
+      <path d="M-18 16 L-5 30 L22 0" fill="none" stroke="#7BC47F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
-    <g stroke="#E8A34D" stroke-opacity="0.5" stroke-width="1.5" fill="none">
-      <circle cx="900" cy="300" r="44"/>
-      <circle cx="1105" cy="306" r="42"/>
+    <text y="136" text-anchor="middle" font-size="13.5" fill="#F4E3C8" font-weight="bold">Verification gate</text>
+    <g text-anchor="middle" font-size="11.5" fill="#8B90A8">
+      <text y="158">age check · explicit opt-in</text>
+      <text y="176">both parties verified</text>
     </g>
   </g>
-  <text x="1000" y="560" text-anchor="middle" fill="#C9CDD8" font-size="16" opacity="0.9">Adult mode — separate, consent-gated space</text>
+
+  <!-- ===== refined space (right) ===== -->
+  <ellipse cx="1000" cy="360" rx="260" ry="220" fill="url(#gwarm)"/>
+  <g transform="translate(1030 350)">
+    <g filter="url(#gsoft)"><circle r="70" fill="#E8A34D" opacity="0.35"/></g>
+    <circle cy="-24" r="30" fill="#F0C482"/>
+    <path d="M-48 70 C-48 16 -26 -4 0 -4 C26 -4 48 16 48 70 Z" fill="#F0C482"/>
+    <circle cy="-24" r="38" fill="none" stroke="#E8A34D" stroke-opacity="0.4" stroke-width="1.2" stroke-dasharray="2 8"/>
+    <text y="106" text-anchor="middle" font-size="14.5" fill="#F0C482" font-weight="bold">Adult mode</text>
+    <text y="128" text-anchor="middle" font-size="12" fill="#8B90A8">distinct look · separate memory scope</text>
+  </g>
+  <g transform="translate(940 180)" filter="url(#gshadow)">
+    <rect width="240" height="66" rx="14" fill="#3A2A55"/>
+    <rect width="240" height="66" rx="14" fill="none" stroke="#E8A34D" stroke-opacity="0.4" stroke-width="1.2"/>
+    <g fill="#B99AC9"><rect x="18" y="18" width="160" height="6" rx="3"/><rect x="18" y="34" width="180" height="6" rx="3"/></g>
+    <circle cx="214" cy="48" r="4" fill="#E8A34D"/>
+  </g>
+
+  <!-- baseline safeguards strip -->
+  <g transform="translate(650 576)" text-anchor="middle" filter="url(#gshadow)">
+    <rect x="-330" y="-26" width="660" height="46" rx="23" fill="#12143B"/>
+    <rect x="-330" y="-26" width="660" height="46" rx="23" fill="none" stroke="#3A3D7E" stroke-width="1.4"/>
+    <text y="3" font-size="13" fill="#C9CDD8">moderation still applies · revocable anytime · minors never eligible · activity kept out of shared memory</text>
+  </g>
+
+  <rect width="1300" height="640" fill="url(#gvign)"/>
 </svg>
