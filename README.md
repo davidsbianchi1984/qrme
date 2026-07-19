@@ -38,8 +38,8 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 
 ## Companion features
 
-Inspired by the ambient-companion ideal of Spike Jonze's *Her* — with the
-consent boundaries the film lacked:
+An ambient-companion model, with an explicit consent boundary on each
+feature:
 
 | Feature | Implementation |
 |---|---|
@@ -60,7 +60,7 @@ The profile as a capable personal assistant and creative partner:
 
 | Feature | Implementation |
 |---|---|
-| Triage / curation | `POST /profiles/{id}/assist/triage` — sort a large pile of items and keep the best N by a transparent, auditable score (the "keep the 86 best emails" idea) |
+| Triage / curation | `POST /profiles/{id}/assist/triage` — sort a large pile of items and keep the best N by a transparent, auditable score |
 | Proofread | `POST /profiles/{id}/assist/proofread` — an improved version in the user's voice, plus concrete edit suggestions |
 | Perceive & guide | `POST /profiles/{id}/perceive` — "see" a real-time scene (objects, people, gestures, place) through a camera and give hands-free, step-by-step guidance toward a goal, or just share the moment; perceptions are logged |
 | Compose creative works | `POST /profiles/{id}/assist/compose` — an original music/poem/note/lyric capturing a shared moment, kept as an artifact (`GET …/assist/works`) |

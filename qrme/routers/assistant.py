@@ -1,10 +1,9 @@
 """Assistant & perception: the profile as a capable personal assistant.
 
-Inspired by Samantha's assistant/creative/perceptual roles in *Her*:
+Assistant, creative, and perceptual capabilities:
 
-- **Triage** — sort through a large pile of items and curate the best few
-  (the "keep the 86 best emails" scene). Ranking is transparent and
-  deterministic, not a black box.
+- **Triage** — sort through a large pile of items and curate the best few.
+  Ranking is transparent and deterministic, not a black box.
 - **Proofread** — edit and improve a piece of writing, with concrete
   suggestions.
 - **Perceive** — "see" a real-time scene (objects, people, gestures) through
@@ -154,7 +153,7 @@ def perceive(profile_id: str, body: PerceiveRequest, request: Request) -> dict:
 # --------------------------------------------------------------------------- #
 
 _CREATIVE_BRIEF = {
-    "music": "Compose a short original piano piece — describe its melody, "
+    "music": "Compose a short original musical piece — describe its melody, "
              "tempo, and feeling — that captures this moment.",
     "poem": "Write a short original poem that captures this moment.",
     "note": "Write a short, heartfelt original note about this moment.",
