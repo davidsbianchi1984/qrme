@@ -146,10 +146,15 @@ class GenesisCreate(BaseModel):
     maturity: Maturity = "balanced"
 
 
-class ConverseRequest(BaseModel):
-    other_profile_id: str
-    topic: str
-    turns: int = Field(default=2, ge=1, le=4)   # exchanges per profile
+class ConnectionJoin(BaseModel):
+    interactor_id: str
+    tier: Literal["friendly", "rated"] = "friendly"
+    alias: str | None = None           # anonymous handle shown to the match
+
+
+class ConnectionMessage(BaseModel):
+    interactor_id: str
+    message: str
 
 
 class EmbodimentAdd(BaseModel):

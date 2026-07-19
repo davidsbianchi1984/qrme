@@ -40,15 +40,34 @@ CREATE TABLE IF NOT EXISTS profiles (
     created_at        TEXT NOT NULL
 );
 
--- Profile-to-profile conversations: two synthetic profiles in a moderated
--- exchange, initiated by an owner.
-CREATE TABLE IF NOT EXISTS dialogues (
-    id         TEXT PRIMARY KEY,
-    profile_a  TEXT NOT NULL REFERENCES profiles(id),
-    profile_b  TEXT NOT NULL REFERENCES profiles(id),
-    topic      TEXT,
-    transcript TEXT NOT NULL,   -- JSON turns (moderated content only)
-    created_at TEXT NOT NULL
+-- User-to-user connections: interactors matched for anonymous chat, in a
+-- friendly tier or an 18+-verified rated tier.
+CREATE TABLE IF NOT EXISTS connection_queue (
+    interactor_id TEXT PRIMARY KEY REFERENCES interactors(id),
+    tier          TEXT NOT NULL,   -- friendly | rated
+    alias         TEXT,
+    created_at    TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS connections (
+    id           TEXT PRIMARY KEY,
+    interactor_a TEXT NOT NULL REFERENCES interactors(id),
+    interactor_b TEXT NOT NULL REFERENCES interactors(id),
+    tier         TEXT NOT NULL,
+    alias_a      TEXT,
+    alias_b      TEXT,
+    status       TEXT NOT NULL DEFAULT 'active',  -- active | ended
+    created_at   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS connection_messages (
+    id            TEXT PRIMARY KEY,
+    connection_id TEXT NOT NULL REFERENCES connections(id),
+    sender_id     TEXT NOT NULL REFERENCES interactors(id),
+    content       TEXT NOT NULL,
+    status        TEXT NOT NULL,   -- approved | blocked
+    flag_reason   TEXT,
+    created_at    TEXT NOT NULL
 );
 
 -- Physical embodiments a profile can inhabit: speaker, earpiece, hologram,

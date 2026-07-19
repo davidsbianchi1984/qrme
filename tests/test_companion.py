@@ -1,5 +1,5 @@
 """Companion features: genesis interview, proactive outreach, honesty about
-multiplicity, profile-to-profile dialogue, embodiments, graceful departure."""
+multiplicity, embodiments, graceful departure."""
 
 from tests.test_capabilities import make_interactor, make_profile, pdi_pair  # noqa: F401
 
@@ -58,21 +58,6 @@ def test_transparency_about_multiplicity(client):
     t = client.get(f"/profiles/{p['id']}/transparency").json()
     assert t["active_relationships"] == 2
     assert "truthfully" in t["policy"]
-
-
-def test_profiles_converse_with_each_other(client):
-    dana = make_profile(client)
-    echo = make_profile(client, display_name="Echo", kind="fictional",
-                        persona="A thoughtful fictional conversationalist.")
-    r = client.post(f"/profiles/{dana['id']}/converse", json={
-        "other_profile_id": echo["id"], "topic": "what memory means",
-        "turns": 2})
-    assert r.status_code == 201
-    dialogue = r.json()
-    assert len(dialogue["transcript"]) == 4          # two turns each
-    speakers = {t["speaker"] for t in dialogue["transcript"]}
-    assert speakers == {dana["id"], echo["id"]}
-    assert all(t["content"] for t in dialogue["transcript"])
 
 
 def test_embodiments_including_robots(client):
