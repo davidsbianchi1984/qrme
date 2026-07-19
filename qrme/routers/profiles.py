@@ -7,11 +7,11 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db
+from .. import companion, db
 from ..common import age_of, profile_or_404, profile_out, source_items
 from ..models import (
-    MarketplaceList, ProfileCreate, ProfileOut, ProfileUpdate, SourceAdd,
-    SurfacesSet,
+    EmbodimentAdd, GenesisCreate, MarketplaceList, ProfileCreate, ProfileOut,
+    ProfileUpdate, SourceAdd, SurfacesSet,
 )
 
 router = APIRouter()
@@ -53,9 +53,70 @@ def create_profile(body: ProfileCreate) -> ProfileOut:
     return profile_out(profile_or_404(profile_id))
 
 
+@router.post("/profiles/genesis", response_model=ProfileOut, status_code=201)
+def genesis_profile(body: GenesisCreate) -> ProfileOut:
+    """A profile born from a short interview. Omit ``display_name`` and the
+    profile chooses its own name from the answers."""
+    owner_age = age_of(body.verification.birthdate)
+    if owner_age < 18 and not body.verification.guardian_consent:
+        raise HTTPException(403, "owners under 18 require parent/guardian consent")
+    answers = body.answers.model_dump()
+    name = body.display_name or companion.self_chosen_name(answers)
+    profile_id = db.new_id("prf")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO profiles (id, owner_id, kind, display_name, persona,"
+        " demographics, sources, anonymous, adult_mode, interaction_scope,"
+        " moderation_mode, aging_enabled, base_age, purpose, maturity,"
+        " cloud_contribution, created_at)"
+        " VALUES (?,?,?,?,?,'{}','[]',0,0,?,'auto',0,NULL,?,?,0,?)",
+        (profile_id, body.owner_id, body.kind, name,
+         companion.persona_from_answers(answers), body.interaction_scope,
+         body.purpose, body.maturity, db.utcnow()),
+    )
+    conn.commit()
+    return profile_out(profile_or_404(profile_id))
+
+
 @router.get("/profiles/{profile_id}", response_model=ProfileOut)
 def get_profile(profile_id: str) -> ProfileOut:
     return profile_out(profile_or_404(profile_id))
+
+
+# -- Embodiments: the profile in a physical body -----------------------------
+
+@router.post("/profiles/{profile_id}/embodiments", status_code=201)
+def add_embodiment(profile_id: str, body: EmbodimentAdd) -> dict:
+    profile_or_404(profile_id)
+    conn = db.connect()
+    conn.execute(
+        "INSERT OR REPLACE INTO embodiments (profile_id, name, kind, has_llm,"
+        " created_at) VALUES (?,?,?,?,?)",
+        (profile_id, body.name, body.kind, int(body.has_llm), db.utcnow()),
+    )
+    conn.commit()
+    return {"profile_id": profile_id, "name": body.name, "kind": body.kind,
+            "has_llm": body.has_llm}
+
+
+@router.get("/profiles/{profile_id}/embodiments")
+def list_embodiments(profile_id: str) -> list[dict]:
+    profile_or_404(profile_id)
+    rows = db.connect().execute(
+        "SELECT name, kind, has_llm FROM embodiments WHERE profile_id=?",
+        (profile_id,)).fetchall()
+    return [{**dict(r), "has_llm": bool(r["has_llm"])} for r in rows]
+
+
+# -- Graceful departure ------------------------------------------------------
+
+@router.post("/profiles/{profile_id}/sunset")
+def sunset_profile(profile_id: str, request: Request) -> dict:
+    profile = profile_or_404(profile_id)
+    if profile["status"] == "departed":
+        raise HTTPException(409, "profile has already departed")
+    return companion.sunset(profile, pdi=request.app.state.pdi,
+                            cloud=request.app.state.cloud)
 
 
 @router.patch("/profiles/{profile_id}", response_model=ProfileOut)

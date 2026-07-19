@@ -36,6 +36,20 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | You own it / total control | `PATCH /profiles/{id}` (edit anytime), `GET /profiles/{id}/export` (full data export), `DELETE /profiles/{id}` (erases everything, including vaulted records) |
 | Encrypted at rest (PDI tandem) | With `QRME_PDI_URL` + `QRME_PDI_TOKEN` (or an injected client), source-material content is sealed in PDI's AES-256-GCM vault (`qrme/pdi_client.py`); QRME keeps only key references, resolves them on read, and purges the vault on delete |
 
+## Companion features
+
+Inspired by the ambient-companion ideal of Spike Jonze's *Her* — with the
+consent boundaries the film lacked:
+
+| Feature | Implementation |
+|---|---|
+| Genesis interview | `POST /profiles/genesis` — a profile born from four personal questions; omit `display_name` and it deterministically chooses its own name from the answers |
+| Proactive companionship | `POST /profiles/{id}/proactive/{interactor}` — the profile reaches out first, but only when its owner set `interaction_scope: proactive`; the message is moderated and lands in shared memory |
+| Honesty about multiplicity | `GET /profiles/{id}/transparency` reports active relationships, and every chat prompt instructs the profile to acknowledge them truthfully if asked — disclosure by design |
+| Profile-to-profile dialogue | `POST /profiles/{id}/converse` — two synthetic profiles in a moderated exchange; flagged turns are dropped, never stored |
+| Embodiments — even robots | `POST /profiles/{id}/embodiments` — speaker, earpiece, hologram, robot, humanoid; chat can arrive from an embodiment, and JIM-mini's autonomous devices can host the same profile |
+| Graceful departure | `POST /profiles/{id}/sunset` — a farewell composed for every relationship, memory preserved and exportable, archive sealed in PDI, chat closes with `410` instead of a silent 404 |
+
 ## Cloud model — use a greater model, and contribute to it
 
 With a [Cloud Model Gateway](docs/cloud-model.md) configured, inference
