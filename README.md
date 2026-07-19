@@ -54,6 +54,19 @@ consent boundaries the film lacked:
 | Embodiments — even robots | `POST /profiles/{id}/embodiments` — speaker, earpiece, hologram, robot, humanoid; chat can arrive from an embodiment, and JIM-mini's autonomous devices can host the same profile |
 | Graceful departure | `POST /profiles/{id}/sunset` — a farewell composed for every relationship, memory preserved and exportable, archive sealed in PDI, chat closes with `410` instead of a silent 404 |
 
+## Assistant & perception
+
+The profile as a capable personal assistant and creative partner:
+
+| Feature | Implementation |
+|---|---|
+| Triage / curation | `POST /profiles/{id}/assist/triage` — sort a large pile of items and keep the best N by a transparent, auditable score (the "keep the 86 best emails" idea) |
+| Proofread | `POST /profiles/{id}/assist/proofread` — an improved version in the user's voice, plus concrete edit suggestions |
+| Perceive & guide | `POST /profiles/{id}/perceive` — "see" a real-time scene (objects, people, gestures, place) through a camera and give hands-free, step-by-step guidance toward a goal, or just share the moment; perceptions are logged |
+| Compose creative works | `POST /profiles/{id}/assist/compose` — an original music/poem/note/lyric capturing a shared moment, kept as an artifact (`GET …/assist/works`) |
+
+Every generated result passes the profile's moderation before it is returned.
+
 ## Cloud model — use a greater model, and contribute to it
 
 With a [Cloud Model Gateway](docs/cloud-model.md) configured, inference

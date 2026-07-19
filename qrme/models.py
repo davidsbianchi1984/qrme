@@ -203,6 +203,34 @@ class HandoffCreate(BaseModel):
     consent: bool = False              # explicit user consent required
 
 
+class TriageItem(BaseModel):
+    id: str
+    text: str
+
+
+class TriageRequest(BaseModel):
+    items: list[TriageItem] = Field(min_length=1)
+    keep: int = Field(ge=1)            # how many of the best to keep
+    criteria: str | None = None        # what "best" means to the user
+
+
+class ProofreadRequest(BaseModel):
+    text: str
+
+
+class PerceiveRequest(BaseModel):
+    objects: list[str] = Field(default_factory=list)
+    people: list[str] = Field(default_factory=list)
+    gestures: list[str] = Field(default_factory=list)
+    place: str | None = None
+    goal: str | None = None            # e.g. "guide me to the exit"
+
+
+class ComposeCreative(BaseModel):
+    kind: Literal["music", "poem", "note", "lyric"] = "note"
+    moment: str                        # the moment to capture
+
+
 class HandleSet(BaseModel):
     handle: str = Field(pattern=r"^@?[A-Za-z0-9_]{2,30}$",
                         description="Unique @handle; stored lowercase.")
