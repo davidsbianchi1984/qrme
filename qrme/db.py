@@ -30,7 +30,45 @@ CREATE TABLE IF NOT EXISTS profiles (
     consent_basis     TEXT,                   -- required when kind=other_person
     consent_attestor  TEXT,
     successor_owner   TEXT,                   -- legacy succession
+    purpose           TEXT,                   -- legacy_memorial | family | creator_persona
+                                              -- | social_fan | companion_coach | enterprise_agent
+    maturity          TEXT NOT NULL DEFAULT 'balanced',  -- strict | balanced | open
     created_at        TEXT NOT NULL
+);
+
+-- Source material the profile is built from ("AI builds & trains the
+-- profile"): photos, conversations, writings, voice notes, life events,
+-- knowledge-base entries. Content may live in the PDI vault (pdi_key set).
+CREATE TABLE IF NOT EXISTS source_items (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,   -- photo | conversation | social_post | writing
+                                -- | voice_note | life_event | knowledge | linked_account
+    title      TEXT,
+    content    TEXT,            -- NULL when sealed in the PDI vault
+    pdi_key    TEXT,
+    created_at TEXT NOT NULL
+);
+
+-- Cross-platform presence: the surfaces this profile is live on.
+CREATE TABLE IF NOT EXISTS surfaces (
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    surface    TEXT NOT NULL,   -- chat | feed | web | ar_vr | wearable | social:<name>
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (profile_id, surface)
+);
+
+-- Posts composed in the profile's voice (social & fan engagement), each
+-- through the same moderation pipeline as chat replies.
+CREATE TABLE IF NOT EXISTS posts (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    surface     TEXT,
+    topic       TEXT,
+    content     TEXT NOT NULL,
+    status      TEXT NOT NULL,  -- approved | pending | rejected
+    flag_reason TEXT,
+    created_at  TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS interactors (

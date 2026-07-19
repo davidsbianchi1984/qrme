@@ -39,15 +39,21 @@ def _age_of(birthdate: str | None) -> int | None:
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
-def review(content: str, relationship: dict | None, interactor: dict) -> Verdict:
+def review(content: str, relationship: dict | None, interactor: dict,
+           maturity: str = "balanced") -> Verdict:
+    """``maturity`` is the profile's filter dial (strict | balanced | open).
+    Minors are always held to strict, whatever the profile is set to."""
     for pattern, reason in _DENY_PATTERNS:
         if pattern.search(content):
             return Verdict(False, reason)
 
-    age = _age_of(interactor["birthdate"])
-    if age is not None and age < 18:
+    age = _age_of(interactor.get("birthdate"))
+    strict = maturity == "strict" or (age is not None and age < 18)
+    if strict:
         for pattern, reason in _ADULT_PATTERNS:
             if pattern.search(content):
+                reason = (reason if (age is not None and age < 18)
+                          else "blocked by strict maturity filter")
                 return Verdict(False, reason)
 
     if relationship:
