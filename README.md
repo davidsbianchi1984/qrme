@@ -36,6 +36,29 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | You own it / total control | `PATCH /profiles/{id}` (edit anytime), `GET /profiles/{id}/export` (full data export), `DELETE /profiles/{id}` (erases everything, including vaulted records) |
 | Encrypted at rest (PDI tandem) | With `QRME_PDI_URL` + `QRME_PDI_TOKEN` (or an injected client), source-material content is sealed in PDI's AES-256-GCM vault (`qrme/pdi_client.py`); QRME keeps only key references, resolves them on read, and purges the vault on delete |
 
+## Authentication & access control
+
+Identity is proven by a bearer **capability token**, never by asserting an id
+in a request body.
+
+| Token | Minted by | Grants |
+|---|---|---|
+| **owner** | `POST /profiles` and `POST /profiles/genesis` return `owner_token` **once** | Full control of that profile: edit, sources, surfaces, specialists, grants/tasks, fine-tune, moderation queue, stats, export, erasure, departure, and the assistant/perception endpoints |
+| **interactor** | `POST /interactors` returns `token` | Reading one's own conversation memory (`GET /profiles/{id}/memory/{interactor}`) |
+
+- Send it as `Authorization: Bearer <token>`. A missing/invalid token on a
+  gated endpoint is **401**; a valid token for the wrong resource is **403**.
+- Only the SHA-256 hash of a token is stored (`api_tokens`), so a database
+  leak never yields a usable credential; the raw token is shown exactly once.
+- `owner_id` is now a grouping/display attribute, not a security boundary —
+  holding the profile's owner token is what confers control.
+- **Public by design (no token):** chatting with a profile
+  (`POST /profiles/{id}/chat`), the profile card (`GET /profiles/{id}`),
+  marketplace browsing (`GET /marketplace`, `/marketplace/listings`), and
+  summoning (`GET /summon`, beacon scans). Talking to a synthetic profile is
+  as open as scanning a QR code in the world.
+- Deleting a profile revokes its owner token.
+
 ## Companion features
 
 An ambient-companion model, with an explicit consent boundary on each

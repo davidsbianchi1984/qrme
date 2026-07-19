@@ -5,7 +5,8 @@ tasks over the vault, and offline fine-tuning."""
 import json
 
 from tests.test_capabilities import (
-    FakePDIHttp, make_interactor, make_profile, pdi_pair,  # noqa: F401
+    FakePDIHttp, as_owner, make_interactor, make_profile,  # noqa: F401
+    pdi_pair,
 )
 
 
@@ -61,6 +62,7 @@ def test_specialist_switch_on_biometrics(client):
     calm = make_profile(client, display_name="Dr. Rivera",
                         persona="A calm mental-health specialist.",
                         purpose="companion_coach")
+    as_owner(client, p)   # configure the specialist as p's owner
     client.put(f"/profiles/{p['id']}/specialists", json={
         "domain": "mental_health", "specialist_profile_id": calm["id"]})
     user = make_interactor(client)

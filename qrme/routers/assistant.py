@@ -21,7 +21,7 @@ import json
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import db, llm, moderation, persona
-from ..common import profile_or_404, source_items
+from ..common import profile_or_404, require_owner, source_items
 from ..models import (
     ComposeCreative, PerceiveRequest, ProofreadRequest, TriageRequest,
 )
@@ -52,8 +52,9 @@ def _score(text: str, criteria: str | None) -> float:
 
 
 @router.post("/profiles/{profile_id}/assist/triage")
-def triage(profile_id: str, body: TriageRequest) -> dict:
+def triage(profile_id: str, body: TriageRequest, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     keep = min(body.keep, len(body.items))
     ranked = sorted(
         ({"id": it.id, "score": _score(it.text, body.criteria),
@@ -88,6 +89,7 @@ def _suggestions(text: str) -> list[str]:
 @router.post("/profiles/{profile_id}/assist/proofread")
 def proofread(profile_id: str, body: ProofreadRequest, request: Request) -> dict:
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     system = persona.build_system_prompt(profile, None, None)
     system += ("\n\nYou are proofreading the user's writing. Return an "
                "improved version that keeps their voice: fix grammar, "
@@ -111,6 +113,7 @@ def proofread(profile_id: str, body: ProofreadRequest, request: Request) -> dict
 @router.post("/profiles/{profile_id}/perceive")
 def perceive(profile_id: str, body: PerceiveRequest, request: Request) -> dict:
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     if profile["status"] == "departed":
         raise HTTPException(410, "this profile has departed")
 
@@ -165,6 +168,7 @@ _CREATIVE_BRIEF = {
 def compose_creative(profile_id: str, body: ComposeCreative,
                      request: Request) -> dict:
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     system = persona.build_system_prompt(profile, None, None)
     system += (f"\n\n{_CREATIVE_BRIEF[body.kind]} The moment: {body.moment}. "
                "Make it personal and original.")
@@ -188,8 +192,9 @@ def compose_creative(profile_id: str, body: ComposeCreative,
 
 
 @router.get("/profiles/{profile_id}/assist/works")
-def list_works(profile_id: str) -> list[dict]:
+def list_works(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     rows = db.connect().execute(
         "SELECT * FROM creative_works WHERE profile_id=?"
         " ORDER BY created_at, rowid", (profile_id,)).fetchall()

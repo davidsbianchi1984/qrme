@@ -35,6 +35,7 @@ def test_manual_mode_holds_replies_for_owner_approval(client, interactor_id):
             "verification": ADULT_VERIFICATION,
         },
     ).json()
+    client.headers["authorization"] = f"Bearer {profile['owner_token']}"
 
     response = client.post(
         f"/profiles/{profile['id']}/chat",
@@ -71,6 +72,7 @@ def test_rejecting_a_pending_message(client, interactor_id):
             "verification": ADULT_VERIFICATION,
         },
     ).json()
+    client.headers["authorization"] = f"Bearer {profile['owner_token']}"
     client.post(
         f"/profiles/{profile['id']}/chat",
         json={"interactor_id": interactor_id, "message": "hello"},

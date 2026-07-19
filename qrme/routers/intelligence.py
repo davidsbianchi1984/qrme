@@ -6,7 +6,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import adaptation, db, tasks
-from ..common import profile_or_404
+from ..common import profile_or_404, require_owner
 from ..models import GrantCreate, SpecialistSet, TaskRun
 
 router = APIRouter()
@@ -15,8 +15,10 @@ router = APIRouter()
 # -- Latent persona embeddings (claims 21/22) --------------------------------
 
 @router.get("/profiles/{profile_id}/embedding/{interactor_id}")
-def get_embedding(profile_id: str, interactor_id: str) -> dict:
+def get_embedding(profile_id: str, interactor_id: str,
+                  request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     embedding = adaptation.get(profile_id, interactor_id)
     if embedding is None:
         raise HTTPException(404, "no embedding yet — interact first")
@@ -26,8 +28,10 @@ def get_embedding(profile_id: str, interactor_id: str) -> dict:
 # -- Domain specialists (claim 24) -------------------------------------------
 
 @router.put("/profiles/{profile_id}/specialists")
-def set_specialist(profile_id: str, body: SpecialistSet) -> dict:
+def set_specialist(profile_id: str, body: SpecialistSet,
+                   request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     profile_or_404(body.specialist_profile_id)
     conn = db.connect()
     conn.execute(
@@ -43,8 +47,9 @@ def set_specialist(profile_id: str, body: SpecialistSet) -> dict:
 
 
 @router.get("/profiles/{profile_id}/specialists")
-def get_specialists(profile_id: str) -> list[dict]:
+def get_specialists(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     rows = db.connect().execute(
         "SELECT domain, specialist_profile_id FROM specialists"
         " WHERE profile_id=?", (profile_id,)).fetchall()
@@ -54,21 +59,27 @@ def get_specialists(profile_id: str) -> list[dict]:
 # -- Revocable grants & autonomous tasks (claim 25) --------------------------
 
 @router.post("/profiles/{profile_id}/grants", status_code=201)
-def create_grant(profile_id: str, body: GrantCreate) -> dict:
+def create_grant(profile_id: str, body: GrantCreate, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     return tasks.create_grant(profile_id, body.scope)
 
 
 @router.delete("/grants/{grant_id}")
-def revoke_grant(grant_id: str) -> dict:
-    if not tasks.revoke_grant(grant_id):
+def revoke_grant(grant_id: str, request: Request) -> dict:
+    row = db.connect().execute(
+        "SELECT profile_id FROM grants WHERE id=?", (grant_id,)).fetchone()
+    if row is None:
         raise HTTPException(404, "grant not found")
+    require_owner(row["profile_id"], request)
+    tasks.revoke_grant(grant_id)
     return {"id": grant_id, "revoked": True}
 
 
 @router.post("/profiles/{profile_id}/tasks", status_code=201)
 def run_task(profile_id: str, body: TaskRun, request: Request) -> dict:
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     result = tasks.run(profile, body.kind, body.topic, body.grant_token,
                        pdi=request.app.state.pdi,
                        cloud=request.app.state.cloud)
@@ -78,8 +89,9 @@ def run_task(profile_id: str, body: TaskRun, request: Request) -> dict:
 
 
 @router.get("/profiles/{profile_id}/tasks")
-def list_tasks(profile_id: str) -> list[dict]:
+def list_tasks(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     return tasks.list_tasks(profile_id)
 
 
@@ -88,6 +100,7 @@ def list_tasks(profile_id: str) -> list[dict]:
 @router.post("/profiles/{profile_id}/finetune", status_code=201)
 def finetune(profile_id: str, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     return adaptation.finetune(profile_id, pdi=request.app.state.pdi)
 
 
