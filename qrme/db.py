@@ -308,6 +308,17 @@ CREATE TABLE IF NOT EXISTS interactors (
     created_at   TEXT NOT NULL
 );
 
+-- Capability tokens. Owner control of a profile is proven by holding the
+-- profile's owner token (minted once at creation); interactor identity is
+-- proven by the interactor's own token. Only the SHA-256 hash is stored, so
+-- a database leak never yields a usable credential.
+CREATE TABLE IF NOT EXISTS api_tokens (
+    token_hash TEXT PRIMARY KEY,
+    role       TEXT NOT NULL,   -- owner | interactor
+    subject_id TEXT NOT NULL,   -- profile_id for owner, interactor_id for interactor
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS relationships (
     id                TEXT PRIMARY KEY,
     profile_id        TEXT NOT NULL REFERENCES profiles(id),

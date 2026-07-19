@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 from datetime import date, datetime
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 
-from . import db, persona
+from . import auth, db, persona
 from .models import MessageOut, ProfileOut
 
 
@@ -25,6 +25,32 @@ def profile_or_404(profile_id: str) -> dict:
     if row is None:
         raise HTTPException(404, "profile not found")
     return dict(row)
+
+
+def require_owner(profile_id: str, request: Request) -> None:
+    """Gate an owner-control endpoint: the caller must hold the profile's
+    owner token."""
+    auth.require(request, "owner", profile_id)
+
+
+def require_interactor(interactor_id: str, request: Request) -> None:
+    """Gate a per-interactor private endpoint: the caller must hold that
+    interactor's token."""
+    auth.require(request, "interactor", interactor_id)
+
+
+def require_owner_or_interactor(profile_id: str, interactor_id: str,
+                                request: Request) -> None:
+    """Gate a shared per-interactor surface (a conversation's memory): either
+    the profile's owner or that interactor may access it."""
+    who = auth.principal(request)
+    if who == {"role": "owner", "subject_id": profile_id}:
+        return
+    if who == {"role": "interactor", "subject_id": interactor_id}:
+        return
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    raise HTTPException(403, "not authorized for this resource")
 
 
 def interactor_or_404(interactor_id: str) -> dict:

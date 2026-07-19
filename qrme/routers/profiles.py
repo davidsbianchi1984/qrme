@@ -7,8 +7,10 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import companion, db
-from ..common import age_of, profile_or_404, profile_out, source_items
+from .. import auth, companion, db
+from ..common import (
+    age_of, profile_or_404, profile_out, require_owner, source_items,
+)
 from ..models import (
     EmbodimentAdd, GenesisCreate, MarketplaceList, ProfileCreate, ProfileOut,
     ProfileUpdate, SourceAdd, SurfacesSet,
@@ -17,8 +19,8 @@ from ..models import (
 router = APIRouter()
 
 
-@router.post("/profiles", response_model=ProfileOut, status_code=201)
-def create_profile(body: ProfileCreate) -> ProfileOut:
+@router.post("/profiles", status_code=201)
+def create_profile(body: ProfileCreate) -> dict:
     owner_age = age_of(body.verification.birthdate)
     if owner_age < 18 and not body.verification.guardian_consent:
         raise HTTPException(403, "owners under 18 require parent/guardian consent")
@@ -50,11 +52,13 @@ def create_profile(body: ProfileCreate) -> ProfileOut:
         ),
     )
     conn.commit()
-    return profile_out(profile_or_404(profile_id))
+    token = auth.issue("owner", profile_id)
+    return {**profile_out(profile_or_404(profile_id)).model_dump(),
+            "owner_token": token}
 
 
-@router.post("/profiles/genesis", response_model=ProfileOut, status_code=201)
-def genesis_profile(body: GenesisCreate) -> ProfileOut:
+@router.post("/profiles/genesis", status_code=201)
+def genesis_profile(body: GenesisCreate) -> dict:
     """A profile born from a short interview. Omit ``display_name`` and the
     profile chooses its own name from the answers."""
     owner_age = age_of(body.verification.birthdate)
@@ -75,7 +79,9 @@ def genesis_profile(body: GenesisCreate) -> ProfileOut:
          body.purpose, body.maturity, db.utcnow()),
     )
     conn.commit()
-    return profile_out(profile_or_404(profile_id))
+    token = auth.issue("owner", profile_id)
+    return {**profile_out(profile_or_404(profile_id)).model_dump(),
+            "owner_token": token}
 
 
 @router.get("/profiles/{profile_id}", response_model=ProfileOut)
@@ -86,8 +92,9 @@ def get_profile(profile_id: str) -> ProfileOut:
 # -- Embodiments: the profile in a physical body -----------------------------
 
 @router.post("/profiles/{profile_id}/embodiments", status_code=201)
-def add_embodiment(profile_id: str, body: EmbodimentAdd) -> dict:
+def add_embodiment(profile_id: str, body: EmbodimentAdd, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     conn.execute(
         "INSERT OR REPLACE INTO embodiments (profile_id, name, kind, has_llm,"
@@ -100,8 +107,9 @@ def add_embodiment(profile_id: str, body: EmbodimentAdd) -> dict:
 
 
 @router.get("/profiles/{profile_id}/embodiments")
-def list_embodiments(profile_id: str) -> list[dict]:
+def list_embodiments(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     rows = db.connect().execute(
         "SELECT name, kind, has_llm FROM embodiments WHERE profile_id=?",
         (profile_id,)).fetchall()
@@ -113,6 +121,7 @@ def list_embodiments(profile_id: str) -> list[dict]:
 @router.post("/profiles/{profile_id}/sunset")
 def sunset_profile(profile_id: str, request: Request) -> dict:
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     if profile["status"] == "departed":
         raise HTTPException(409, "profile has already departed")
     return companion.sunset(profile, pdi=request.app.state.pdi,
@@ -120,8 +129,10 @@ def sunset_profile(profile_id: str, request: Request) -> dict:
 
 
 @router.patch("/profiles/{profile_id}", response_model=ProfileOut)
-def update_profile(profile_id: str, body: ProfileUpdate) -> ProfileOut:
+def update_profile(profile_id: str, body: ProfileUpdate,
+                   request: Request) -> ProfileOut:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
     if updates:
         conn = db.connect()
@@ -139,6 +150,7 @@ def update_profile(profile_id: str, body: ProfileUpdate) -> ProfileOut:
 def export_profile(profile_id: str, request: Request) -> dict:
     """Full data export — access everything, anytime (You Own It)."""
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     grab = lambda q: [dict(r) for r in conn.execute(q, (profile_id,)).fetchall()]
     return {
@@ -160,6 +172,7 @@ def export_profile(profile_id: str, request: Request) -> dict:
 def delete_profile(profile_id: str, request: Request) -> dict:
     """Delete the profile and every trace of it — anytime."""
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     pdi = request.app.state.pdi
     conn = db.connect()
     deleted = {}
@@ -182,6 +195,7 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     deleted["profile"] = conn.execute(
         "DELETE FROM profiles WHERE id=?", (profile_id,)).rowcount
     conn.commit()
+    auth.revoke_subject(profile_id)   # the owner token dies with the profile
     return {"deleted": deleted}
 
 
@@ -190,6 +204,7 @@ def delete_profile(profile_id: str, request: Request) -> dict:
 @router.post("/profiles/{profile_id}/sources", status_code=201)
 def add_source(profile_id: str, body: SourceAdd, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     pdi = request.app.state.pdi
     conn = db.connect()
     item_id = db.new_id("src")
@@ -212,14 +227,16 @@ def add_source(profile_id: str, body: SourceAdd, request: Request) -> dict:
 @router.get("/profiles/{profile_id}/sources")
 def list_sources(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     return source_items(profile_id, request.app.state.pdi)
 
 
 # -- Cross-platform surfaces -------------------------------------------------
 
 @router.put("/profiles/{profile_id}/surfaces")
-def set_surfaces(profile_id: str, body: SurfacesSet) -> dict:
+def set_surfaces(profile_id: str, body: SurfacesSet, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     conn.execute("DELETE FROM surfaces WHERE profile_id=?", (profile_id,))
     for surface in body.surfaces:
@@ -242,8 +259,10 @@ def get_surfaces(profile_id: str) -> dict:
 # -- AI Profile Marketplace --------------------------------------------------
 
 @router.post("/profiles/{profile_id}/marketplace", status_code=201)
-def list_on_marketplace(profile_id: str, body: MarketplaceList) -> dict:
+def list_on_marketplace(profile_id: str, body: MarketplaceList,
+                        request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     conn.execute(
         "INSERT INTO marketplace (profile_id, tags, blurb, listed_at)"
@@ -256,7 +275,9 @@ def list_on_marketplace(profile_id: str, body: MarketplaceList) -> dict:
 
 
 @router.delete("/profiles/{profile_id}/marketplace", status_code=204)
-def unlist_from_marketplace(profile_id: str) -> None:
+def unlist_from_marketplace(profile_id: str, request: Request) -> None:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     if not conn.execute("DELETE FROM marketplace WHERE profile_id=?",
                         (profile_id,)).rowcount:
@@ -289,8 +310,9 @@ def browse_marketplace(tag: str | None = None) -> list[dict]:
 # -- Profile health, at a glance ---------------------------------------------
 
 @router.get("/profiles/{profile_id}/stats")
-def profile_stats(profile_id: str) -> dict:
+def profile_stats(profile_id: str, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     one = lambda q: conn.execute(q, (profile_id,)).fetchone()
     eng = one("SELECT COALESCE(SUM(sessions),0) AS sessions,"

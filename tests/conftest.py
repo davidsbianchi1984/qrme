@@ -34,7 +34,10 @@ def profile_id(client):
         },
     )
     assert response.status_code == 201, response.text
-    return response.json()["id"]
+    body = response.json()
+    # Authenticate the client as this profile's owner for owner-only endpoints.
+    client.headers["authorization"] = f"Bearer {body['owner_token']}"
+    return body["id"]
 
 
 @pytest.fixture()

@@ -8,10 +8,11 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, companion, db, engagement, llm, moderation, persona
+from .. import adaptation, auth, companion, db, engagement, llm, moderation, persona
 from ..common import (
     age_of, biometric_domain, interactor_or_404, message_out, profile_or_404,
-    relationship as get_relationship, source_items,
+    relationship as get_relationship, require_owner,
+    require_owner_or_interactor, source_items,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
@@ -34,13 +35,16 @@ def create_interactor(body: InteractorCreate) -> dict:
          body.birthdate.isoformat() if body.birthdate else None, db.utcnow()),
     )
     conn.commit()
-    return {"id": interactor_id, "display_name": body.display_name}
+    token = auth.issue("interactor", interactor_id)
+    return {"id": interactor_id, "display_name": body.display_name,
+            "token": token}
 
 
 @router.put("/profiles/{profile_id}/relationships/{interactor_id}")
 def set_relationship(profile_id: str, interactor_id: str,
-                     body: RelationshipSet) -> dict:
+                     body: RelationshipSet, request: Request) -> dict:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     interactor_or_404(interactor_id)
     conn = db.connect()
     conn.execute(
@@ -218,6 +222,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
 @router.post("/profiles/{profile_id}/compose", status_code=201)
 def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dict:
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     system = persona.build_system_prompt(
         profile, None, None,
         sources=source_items(profile_id, request.app.state.pdi))
@@ -268,6 +273,7 @@ def proactive_checkin(profile_id: str, interactor_id: str,
     """The profile initiates — allowed only when its owner opted in with
     interaction_scope='proactive'."""
     profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     interactor = interactor_or_404(interactor_id)
     if profile["status"] == "departed":
         raise HTTPException(410, "this profile has departed")
@@ -381,8 +387,10 @@ def get_engagement(profile_id: str, interactor_id: str) -> EngagementOut:
 # -- Persistent memory management (PRD 6.4) ----------------------------------
 
 @router.get("/profiles/{profile_id}/memory/{interactor_id}")
-def view_memory(profile_id: str, interactor_id: str) -> list[MessageOut]:
+def view_memory(profile_id: str, interactor_id: str,
+                request: Request) -> list[MessageOut]:
     profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
     rows = db.connect().execute(
         "SELECT * FROM messages WHERE profile_id=? AND interactor_id=?"
         " ORDER BY created_at, rowid",
@@ -392,8 +400,10 @@ def view_memory(profile_id: str, interactor_id: str) -> list[MessageOut]:
 
 
 @router.delete("/profiles/{profile_id}/memory/{interactor_id}", status_code=204)
-def clear_memory(profile_id: str, interactor_id: str) -> None:
+def clear_memory(profile_id: str, interactor_id: str,
+                 request: Request) -> None:
     profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
     conn = db.connect()
     conn.execute("DELETE FROM messages WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))
@@ -405,8 +415,9 @@ def clear_memory(profile_id: str, interactor_id: str) -> None:
 # -- Owner moderation queue (PRD 6.5) ----------------------------------------
 
 @router.get("/profiles/{profile_id}/moderation/queue")
-def moderation_queue(profile_id: str) -> list[dict]:
+def moderation_queue(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     rows = db.connect().execute(
         "SELECT * FROM messages WHERE profile_id=? AND status='pending'"
         " ORDER BY created_at", (profile_id,),
@@ -415,11 +426,12 @@ def moderation_queue(profile_id: str) -> list[dict]:
     return [dict(row) for row in rows]
 
 
-def _resolve_message(message_id: str, status: str) -> dict:
+def _resolve_message(message_id: str, status: str, request: Request) -> dict:
     conn = db.connect()
     row = conn.execute("SELECT * FROM messages WHERE id=?", (message_id,)).fetchone()
     if row is None:
         raise HTTPException(404, "message not found")
+    require_owner(row["profile_id"], request)   # only the owner moderates
     if row["status"] != "pending":
         raise HTTPException(409, f"message is already {row['status']}")
     conn.execute("UPDATE messages SET status=? WHERE id=?", (status, message_id))
@@ -428,10 +440,10 @@ def _resolve_message(message_id: str, status: str) -> dict:
 
 
 @router.post("/moderation/{message_id}/approve")
-def approve_message(message_id: str) -> dict:
-    return _resolve_message(message_id, "approved")
+def approve_message(message_id: str, request: Request) -> dict:
+    return _resolve_message(message_id, "approved", request)
 
 
 @router.post("/moderation/{message_id}/reject")
-def reject_message(message_id: str) -> dict:
-    return _resolve_message(message_id, "rejected")
+def reject_message(message_id: str, request: Request) -> dict:
+    return _resolve_message(message_id, "rejected", request)

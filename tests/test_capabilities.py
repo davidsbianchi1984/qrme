@@ -19,7 +19,22 @@ def make_profile(client, **extra):
     body.update(extra)
     r = client.post("/profiles", json=body)
     assert r.status_code == 201, r.text
-    return r.json()
+    out = r.json()
+    # Hold the owner capability so subsequent owner-only calls authorize. The
+    # most-recently created profile's token becomes the client default; tests
+    # that juggle several owners use as_owner()/auth_header() to switch.
+    client.headers["authorization"] = f"Bearer {out['owner_token']}"
+    return out
+
+
+def auth_header(profile) -> dict:
+    """Authorization header for a profile's owner token."""
+    return {"authorization": f"Bearer {profile['owner_token']}"}
+
+
+def as_owner(client, profile) -> None:
+    """Make ``profile``'s owner the client's default caller."""
+    client.headers["authorization"] = f"Bearer {profile['owner_token']}"
 
 
 def make_interactor(client, name="Maya", birthdate="1996-04-01"):
@@ -222,10 +237,11 @@ def test_marketplace_listing_and_discovery(client):
     dana = make_profile(client, purpose="legacy_memorial")
     ghost = make_profile(client, display_name="Nyx", anonymous=True,
                          kind="fictional", purpose="creator_persona")
-    client.post(f"/profiles/{dana['id']}/marketplace", json={
-        "tags": ["legacy", "family"], "blurb": "Stories from a life well lived."})
-    client.post(f"/profiles/{ghost['id']}/marketplace", json={
-        "tags": ["fiction"], "blurb": "A mystery voice."})
+    client.post(f"/profiles/{dana['id']}/marketplace", headers=auth_header(dana),
+                json={"tags": ["legacy", "family"],
+                      "blurb": "Stories from a life well lived."})
+    client.post(f"/profiles/{ghost['id']}/marketplace", headers=auth_header(ghost),
+                json={"tags": ["fiction"], "blurb": "A mystery voice."})
 
     cards = client.get("/marketplace").json()
     assert len(cards) == 2
@@ -237,5 +253,6 @@ def test_marketplace_listing_and_discovery(client):
     assert [c["profile_id"] for c in family_only] == [dana["id"]]
 
     assert client.delete(
-        f"/profiles/{ghost['id']}/marketplace").status_code == 204
+        f"/profiles/{ghost['id']}/marketplace",
+        headers=auth_header(ghost)).status_code == 204
     assert len(client.get("/marketplace").json()) == 1
