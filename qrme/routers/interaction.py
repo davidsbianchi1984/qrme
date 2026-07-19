@@ -8,14 +8,14 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, db, engagement, llm, moderation, persona
+from .. import adaptation, companion, db, engagement, llm, moderation, persona
 from ..common import (
     age_of, biometric_domain, interactor_or_404, message_out, profile_or_404,
     relationship as get_relationship, source_items,
 )
 from ..models import (
-    ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
-    InteractorCreate, MessageOut, RelationshipSet,
+    ChatRequest, ChatResponse, ComposeRequest, ConverseRequest, EngagementOut,
+    Feedback, InteractorCreate, MessageOut, RelationshipSet,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -81,9 +81,17 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     interactor = interactor_or_404(body.interactor_id)
     pdi, cloud = request.app.state.pdi, request.app.state.cloud
 
+    if profile["status"] == "departed":
+        raise HTTPException(
+            410, "this profile has departed; its memory remains viewable")
+
     if body.surface:
-        registered = [r["surface"] for r in db.connect().execute(
+        conn0 = db.connect()
+        registered = [r["surface"] for r in conn0.execute(
             "SELECT surface FROM surfaces WHERE profile_id=?",
+            (profile_id,)).fetchall()]
+        registered += [r["name"] for r in conn0.execute(
+            "SELECT name FROM embodiments WHERE profile_id=?",
             (profile_id,)).fetchall()]
         if registered and body.surface not in registered:
             raise HTTPException(
@@ -158,6 +166,11 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += ("\n\nCurrent situation from real-time monitoring: "
                    + json.dumps(body.biometrics, sort_keys=True)
                    + ". Respond with appropriate care.")
+    others = companion.other_relationships(profile_id, body.interactor_id)
+    if others:
+        system += (f"\n\nHonesty about multiplicity: you also hold {others} "
+                   "other ongoing relationship(s). If asked, acknowledge "
+                   "this truthfully and kindly — never deny it.")
     reply = llm.get_provider(cloud=cloud).generate(system, llm_messages)
 
     verdict = moderation.review(reply, relationship, interactor,
@@ -245,6 +258,82 @@ def list_posts(profile_id: str) -> list[dict]:
         "SELECT * FROM posts WHERE profile_id=? ORDER BY created_at, rowid",
         (profile_id,)).fetchall()
     return [dict(r) for r in rows]
+
+
+# -- Companion features: proactive check-ins, transparency, AI–AI dialogue ---
+
+@router.post("/profiles/{profile_id}/proactive/{interactor_id}")
+def proactive_checkin(profile_id: str, interactor_id: str,
+                      request: Request) -> dict:
+    """The profile initiates — allowed only when its owner opted in with
+    interaction_scope='proactive'."""
+    profile = profile_or_404(profile_id)
+    interactor = interactor_or_404(interactor_id)
+    if profile["status"] == "departed":
+        raise HTTPException(410, "this profile has departed")
+    if profile["interaction_scope"] != "proactive":
+        raise HTTPException(
+            403, "this profile is reactive-only; its owner has not enabled "
+                 "proactive outreach")
+
+    relationship = get_relationship(profile_id, interactor_id)
+    engagement_state = engagement.get(profile_id, interactor_id)
+    reason = companion.proactive_reason(engagement_state)
+
+    system = persona.build_system_prompt(
+        profile, relationship, engagement_state,
+        sources=source_items(profile_id, request.app.state.pdi))
+    system += ("\n\nYou are reaching out first (" + reason + "): compose one "
+               "brief, warm, unprompted check-in. Reference shared history "
+               "naturally if you have any; never pressure a reply.")
+    content = llm.get_provider(cloud=request.app.state.cloud).generate(
+        system, [{"role": "user", "content": "Reach out."}])
+
+    verdict = moderation.review(content, relationship, interactor,
+                                maturity=profile["maturity"])
+    if not verdict.approved:
+        status, flag_reason = "pending", verdict.reason
+    elif profile["moderation_mode"] == "manual":
+        status, flag_reason = "pending", "owner approval required"
+    else:
+        status, flag_reason = "approved", None
+
+    conn = db.connect()
+    message_id = db.new_id("msg")
+    conn.execute(
+        "INSERT INTO messages (id, profile_id, interactor_id, role, content,"
+        " status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        (message_id, profile_id, interactor_id, "profile", content, status,
+         flag_reason, db.utcnow()),
+    )
+    conn.commit()
+    row = conn.execute("SELECT * FROM messages WHERE id=?",
+                       (message_id,)).fetchone()
+    return {"reason": reason, "message": message_out(dict(row)).model_dump()}
+
+
+@router.get("/profiles/{profile_id}/transparency")
+def transparency(profile_id: str) -> dict:
+    """Honesty by design: how many relationships this profile holds."""
+    profile_or_404(profile_id)
+    return {
+        "profile_id": profile_id,
+        "active_relationships": companion.other_relationships(profile_id),
+        "policy": "the profile acknowledges its other relationships "
+                  "truthfully whenever asked",
+    }
+
+
+@router.post("/profiles/{profile_id}/converse", status_code=201)
+def converse(profile_id: str, body: ConverseRequest, request: Request) -> dict:
+    """Two synthetic profiles in a moderated exchange."""
+    profile_a = profile_or_404(profile_id)
+    profile_b = profile_or_404(body.other_profile_id)
+    for p in (profile_a, profile_b):
+        if p["status"] == "departed":
+            raise HTTPException(410, f"profile {p['id']} has departed")
+    return companion.converse(profile_a, profile_b, body.topic, body.turns,
+                              cloud=request.app.state.cloud)
 
 
 # -- Engagement signals & feedback (PRD 6.3) ---------------------------------

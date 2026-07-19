@@ -36,7 +36,30 @@ CREATE TABLE IF NOT EXISTS profiles (
     cloud_contribution INTEGER NOT NULL DEFAULT 0,  -- opt-in: share rated,
                                                     -- anonymized exchanges to
                                                     -- improve the cloud model
+    status            TEXT NOT NULL DEFAULT 'active',  -- active | departed
     created_at        TEXT NOT NULL
+);
+
+-- Profile-to-profile conversations: two synthetic profiles in a moderated
+-- exchange, initiated by an owner.
+CREATE TABLE IF NOT EXISTS dialogues (
+    id         TEXT PRIMARY KEY,
+    profile_a  TEXT NOT NULL REFERENCES profiles(id),
+    profile_b  TEXT NOT NULL REFERENCES profiles(id),
+    topic      TEXT,
+    transcript TEXT NOT NULL,   -- JSON turns (moderated content only)
+    created_at TEXT NOT NULL
+);
+
+-- Physical embodiments a profile can inhabit: speaker, earpiece, hologram,
+-- robot. Chat may arrive from (and route back to) an embodiment.
+CREATE TABLE IF NOT EXISTS embodiments (
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    name       TEXT NOT NULL,
+    kind       TEXT NOT NULL,   -- speaker | earpiece | hologram | robot | humanoid | other
+    has_llm    INTEGER NOT NULL DEFAULT 0,  -- embodiment runs its own model
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (profile_id, name)
 );
 
 -- Source material the profile is built from ("AI builds & trains the

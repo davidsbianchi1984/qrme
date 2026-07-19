@@ -126,6 +126,39 @@ class SpecialistSet(BaseModel):
     specialist_profile_id: str
 
 
+class GenesisAnswers(BaseModel):
+    """The short interview a profile is born from."""
+
+    social_style: str                  # e.g. "warm but needs quiet evenings"
+    humor: str                         # e.g. "dry, gentle teasing"
+    what_matters: str                  # e.g. "family, honesty, the garden"
+    comfort: str                       # how they comfort someone
+
+
+class GenesisCreate(BaseModel):
+    owner_id: str
+    verification: Verification
+    answers: GenesisAnswers
+    display_name: str | None = None    # omit to let the profile name itself
+    kind: ProfileKind = "fictional"
+    purpose: Purpose | None = "companion_coach"
+    interaction_scope: InteractionScope = "reactive"
+    maturity: Maturity = "balanced"
+
+
+class ConverseRequest(BaseModel):
+    other_profile_id: str
+    topic: str
+    turns: int = Field(default=2, ge=1, le=4)   # exchanges per profile
+
+
+class EmbodimentAdd(BaseModel):
+    name: str                          # e.g. kitchen_speaker, companion_bot
+    kind: Literal["speaker", "earpiece", "hologram", "robot",
+                  "humanoid", "other"]
+    has_llm: bool = False
+
+
 class MarketplaceList(BaseModel):
     tags: list[str] = Field(default_factory=list)
     blurb: str | None = None
