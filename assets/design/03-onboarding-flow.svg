@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 640" width="1400" height="640" font-family="Helvetica, Arial, sans-serif">
-  <title>QRME onboarding — profile creation flow across four mobile screens</title>
+<svg role="img" aria-labelledby="t d" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 640" width="1400" height="640" font-family="Helvetica, Arial, sans-serif">
+  <title id="t">QRME onboarding — profile creation flow across four mobile screens</title>
+  <desc id="d">QRME onboarding — profile creation flow across four mobile screens. Hand-built vector illustration from the QRME product family design system.</desc>
   <defs>
     <linearGradient id="obg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#1B1D4E"/>

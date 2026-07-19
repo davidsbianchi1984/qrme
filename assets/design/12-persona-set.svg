@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 560" width="1500" height="560" font-family="Helvetica, Arial, sans-serif">
-  <title>QRME user persona set — five consistent character illustrations</title>
+<svg role="img" aria-labelledby="t d" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 560" width="1500" height="560" font-family="Helvetica, Arial, sans-serif">
+  <title id="t">QRME user persona set — five consistent character illustrations</title>
+  <desc id="d">QRME user persona set — five consistent character illustrations. Hand-built vector illustration from the QRME product family design system.</desc>
   <defs>
     <linearGradient id="cbg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#1B1D4E"/>
