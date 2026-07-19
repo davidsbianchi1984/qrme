@@ -17,6 +17,7 @@ from .models import (
     Feedback,
     GrantCreate,
     InteractorCreate,
+    MarketplaceList,
     MessageOut,
     ProfileCreate,
     ProfileOut,
@@ -251,7 +252,8 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
                 if app.state.pdi is not None and app.state.pdi.delete(key))
         for table in ("source_items", "relationships", "messages", "engagement",
                       "posts", "surfaces", "persona_embeddings", "specialists",
-                      "biometric_context", "grants", "tasks", "finetune_runs"):
+                      "biometric_context", "grants", "tasks", "finetune_runs",
+                      "marketplace"):
             deleted[table] = conn.execute(
                 f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)
             ).rowcount
@@ -579,6 +581,50 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
     def list_tasks(profile_id: str) -> list[dict]:
         _profile_or_404(profile_id)
         return tasks.list_tasks(profile_id)
+
+    # -- AI Profile Marketplace ---------------------------------------------
+
+    @app.post("/profiles/{profile_id}/marketplace", status_code=201)
+    def list_on_marketplace(profile_id: str, body: MarketplaceList) -> dict:
+        _profile_or_404(profile_id)
+        conn = db.connect()
+        conn.execute(
+            "INSERT INTO marketplace (profile_id, tags, blurb, listed_at)"
+            " VALUES (?,?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
+            " tags=excluded.tags, blurb=excluded.blurb",
+            (profile_id, json.dumps(body.tags), body.blurb, db.utcnow()),
+        )
+        conn.commit()
+        return {"profile_id": profile_id, "listed": True, "tags": body.tags}
+
+    @app.delete("/profiles/{profile_id}/marketplace", status_code=204)
+    def unlist_from_marketplace(profile_id: str) -> None:
+        conn = db.connect()
+        if not conn.execute("DELETE FROM marketplace WHERE profile_id=?",
+                            (profile_id,)).rowcount:
+            raise HTTPException(404, "profile is not listed")
+        conn.commit()
+
+    @app.get("/marketplace")
+    def browse_marketplace(tag: str | None = None) -> list[dict]:
+        """Public discovery cards — display info only, never persona internals."""
+        conn = db.connect()
+        rows = conn.execute(
+            "SELECT m.profile_id, m.tags, m.blurb, p.display_name, p.purpose,"
+            " p.anonymous FROM marketplace m JOIN profiles p ON p.id=m.profile_id"
+            " ORDER BY m.listed_at DESC").fetchall()
+        cards = []
+        for row in rows:
+            tags = json.loads(row["tags"])
+            if tag and tag not in tags:
+                continue
+            cards.append({
+                "profile_id": row["profile_id"],
+                "display_name": ("anonymous persona" if row["anonymous"]
+                                 else row["display_name"]),
+                "purpose": row["purpose"], "tags": tags, "blurb": row["blurb"],
+            })
+        return cards
 
     # -- Offline fine-tuning (claim 26) -------------------------------------
 

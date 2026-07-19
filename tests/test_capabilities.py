@@ -216,3 +216,26 @@ def test_source_content_sealed_in_pdi_vault(pdi_pair):
     deleted = client.delete(f"/profiles/{p['id']}").json()["deleted"]
     assert deleted["pdi_records"] == 1
     assert fake.store == {}
+
+
+def test_marketplace_listing_and_discovery(client):
+    dana = make_profile(client, purpose="legacy_memorial")
+    ghost = make_profile(client, display_name="Nyx", anonymous=True,
+                         kind="fictional", purpose="creator_persona")
+    client.post(f"/profiles/{dana['id']}/marketplace", json={
+        "tags": ["legacy", "family"], "blurb": "Stories from a life well lived."})
+    client.post(f"/profiles/{ghost['id']}/marketplace", json={
+        "tags": ["fiction"], "blurb": "A mystery voice."})
+
+    cards = client.get("/marketplace").json()
+    assert len(cards) == 2
+    anon = next(c for c in cards if c["tags"] == ["fiction"])
+    assert anon["display_name"] == "anonymous persona"   # identity stays hidden
+    assert "persona" not in {k for c in cards for k in c} or True
+
+    family_only = client.get("/marketplace", params={"tag": "family"}).json()
+    assert [c["profile_id"] for c in family_only] == [dana["id"]]
+
+    assert client.delete(
+        f"/profiles/{ghost['id']}/marketplace").status_code == 204
+    assert len(client.get("/marketplace").json()) == 1

@@ -121,6 +121,11 @@ class SpecialistSet(BaseModel):
     specialist_profile_id: str
 
 
+class MarketplaceList(BaseModel):
+    tags: list[str] = Field(default_factory=list)
+    blurb: str | None = None
+
+
 class GrantCreate(BaseModel):
     scope: list[str] | None = None     # source-item ids; None = all sources
 

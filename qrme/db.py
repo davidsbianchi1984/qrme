@@ -113,6 +113,14 @@ CREATE TABLE IF NOT EXISTS tasks (
     created_at  TEXT NOT NULL
 );
 
+-- AI Profile Marketplace: owner-listed profiles discoverable by others.
+CREATE TABLE IF NOT EXISTS marketplace (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    tags       TEXT NOT NULL DEFAULT '[]',
+    blurb      TEXT,
+    listed_at  TEXT NOT NULL
+);
+
 -- Offline fine-tuning runs (claim 26): local-only adaptation passes whose
 -- artifacts are sealed (PDI vault when configured); nothing leaves the host.
 CREATE TABLE IF NOT EXISTS finetune_runs (
