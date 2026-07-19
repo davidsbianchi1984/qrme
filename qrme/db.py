@@ -70,6 +70,26 @@ CREATE TABLE IF NOT EXISTS connection_messages (
     created_at    TEXT NOT NULL
 );
 
+-- @handles: one claimable, unique handle per profile for direct summoning.
+CREATE TABLE IF NOT EXISTS handles (
+    handle     TEXT PRIMARY KEY,   -- lowercase, no leading @
+    profile_id TEXT NOT NULL UNIQUE REFERENCES profiles(id),
+    created_at TEXT NOT NULL
+);
+
+-- Beacons: a profile left behind somewhere in the world. Each beacon is a
+-- placed QR anchor (a bench, a storefront, a memorial) whose code summons
+-- the profile; scans are counted and beacons can be picked back up.
+CREATE TABLE IF NOT EXISTS beacons (
+    id         TEXT PRIMARY KEY,   -- bcn_… — also the QR token
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    label      TEXT NOT NULL,      -- e.g. "Rosa's garden bench"
+    location   TEXT,               -- free-text place
+    scans      INTEGER NOT NULL DEFAULT 0,
+    active     INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+);
+
 -- Physical embodiments a profile can inhabit: speaker, earpiece, hologram,
 -- robot. Chat may arrive from (and route back to) an embodiment.
 CREATE TABLE IF NOT EXISTS embodiments (

@@ -157,6 +157,16 @@ class ConnectionMessage(BaseModel):
     message: str
 
 
+class HandleSet(BaseModel):
+    handle: str = Field(pattern=r"^@?[A-Za-z0-9_]{2,30}$",
+                        description="Unique @handle; stored lowercase.")
+
+
+class BeaconCreate(BaseModel):
+    label: str                         # e.g. "Rosa's garden bench"
+    location: str | None = None        # free-text place description
+
+
 class EmbodimentAdd(BaseModel):
     name: str                          # e.g. kitchen_speaker, companion_bot
     kind: Literal["speaker", "earpiece", "hologram", "robot",
