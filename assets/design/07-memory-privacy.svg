@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" font-family="Helvetica, Arial, sans-serif">
-  <title>Persistent memory and privacy controls — interaction timeline with view / clear / restrict</title>
+<svg role="img" aria-labelledby="t d" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" font-family="Helvetica, Arial, sans-serif">
+  <title id="t">Persistent memory and privacy controls — interaction timeline with view / clear / restrict</title>
+  <desc id="d">Persistent memory and privacy controls — interaction timeline with view / clear / restrict. Hand-built vector illustration from the QRME product family design system.</desc>
   <defs>
     <linearGradient id="mbg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#1B1D4E"/>

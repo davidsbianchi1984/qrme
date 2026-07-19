@@ -68,6 +68,16 @@ Set `ANTHROPIC_API_KEY` (or log in with `ant auth login`) for real model
 replies; otherwise the stub provider answers. Override the model with
 `QRME_MODEL`.
 
+## Configuration
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `QRME_DB` | `qrme.db` | SQLite database path |
+| `QRME_LLM` | auto | `stub` forces the offline deterministic provider; `anthropic` forces the SDK |
+| `QRME_MODEL` | `claude-opus-4-8` | Model used for profile replies |
+| `ANTHROPIC_API_KEY` | — | Enables real model replies |
+| `QRME_PDI_URL` / `QRME_PDI_TOKEN` | — | PDI tandem: seal source material in the encrypted vault |
+
 ## Test
 
 ```bash
@@ -110,3 +120,20 @@ deep indigo / soft silver / warm amber) are in
 Biometric persona switching, robotic embodiment, media watermarking/provenance,
 profile marketplace. Social-platform posting integrations are stubbed as a
 `sources` list only.
+
+## Related projects
+
+Three separate products, each standalone, interoperating only over HTTP —
+see [docs/tandem.md](docs/tandem.md) for the full architecture:
+
+- [**qrme**](https://github.com/davidsbianchi1984/qrme) — AI synthetic
+  profiles: relationship-aware, remembered, moderated.
+- [**jim-mini**](https://github.com/davidsbianchi1984/jim-mini) — Guardian
+  personal guidance: monitor, predict, guide, escalate; can delegate
+  specialist guidance to QRME.
+- [**pdi**](https://github.com/davidsbianchi1984/pdi) — Private Data
+  Infrastructure: the encrypted vault both AI systems can run on top of.
+
+## License
+
+MIT © 2026 David Bianchi — see [LICENSE](LICENSE).

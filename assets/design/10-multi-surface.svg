@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 720" width="1300" height="720" font-family="Helvetica, Arial, sans-serif">
-  <title>Multi-surface presence — one profile identity across chat, feed, web, and AR/VR</title>
+<svg role="img" aria-labelledby="t d" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 720" width="1300" height="720" font-family="Helvetica, Arial, sans-serif">
+  <title id="t">Multi-surface presence — one profile identity across chat, feed, web, and AR/VR</title>
+  <desc id="d">Multi-surface presence — one profile identity across chat, feed, web, and AR/VR. Hand-built vector illustration from the QRME product family design system.</desc>
   <defs>
     <linearGradient id="sbg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#191B47"/>
