@@ -14,6 +14,16 @@ RelationshipType = Literal[
     "family", "grandchild", "friend", "romantic_partner",
     "professional", "fan", "stranger",
 ]
+Purpose = Literal[
+    "legacy_memorial", "family", "creator_persona",
+    "social_fan", "companion_coach", "enterprise_agent",
+]
+Maturity = Literal["strict", "balanced", "open"]
+SourceKind = Literal[
+    "photo", "conversation", "social_post", "writing",
+    "voice_note", "life_event", "knowledge", "linked_account",
+]
+Modality = Literal["text", "voice", "image", "video"]
 
 
 class Verification(BaseModel):
@@ -46,6 +56,21 @@ class ProfileCreate(BaseModel):
     aging_enabled: bool = False
     base_age: int | None = None
     successor_owner: str | None = None
+    purpose: Purpose | None = None
+    maturity: Maturity = "balanced"
+
+
+class ProfileUpdate(BaseModel):
+    """Owner control: edit the profile anytime."""
+
+    display_name: str | None = None
+    persona: str | None = None
+    moderation_mode: ModerationMode | None = None
+    interaction_scope: InteractionScope | None = None
+    purpose: Purpose | None = None
+    maturity: Maturity | None = None
+    aging_enabled: bool | None = None
+    successor_owner: str | None = None
 
 
 class ProfileOut(BaseModel):
@@ -64,6 +89,8 @@ class ProfileOut(BaseModel):
     base_age: int | None
     effective_age: int | None
     successor_owner: str | None
+    purpose: Purpose | None
+    maturity: Maturity
     created_at: str
 
 
@@ -82,6 +109,23 @@ class RelationshipSet(BaseModel):
 class ChatRequest(BaseModel):
     interactor_id: str
     message: str
+    modality: Modality = "text"        # requested output modality
+    surface: str | None = None         # which registered surface this is from
+
+
+class SourceAdd(BaseModel):
+    kind: SourceKind
+    title: str | None = None
+    content: str | None = None         # text body / transcript / description
+
+
+class SurfacesSet(BaseModel):
+    surfaces: list[str] = Field(default_factory=list)
+
+
+class ComposeRequest(BaseModel):
+    topic: str
+    surface: str | None = None
 
 
 class MessageOut(BaseModel):
@@ -96,6 +140,9 @@ class MessageOut(BaseModel):
 class ChatResponse(BaseModel):
     interactor_message: MessageOut
     profile_message: MessageOut
+    # Multi-modal output descriptor: how the reply renders beyond text
+    # (voice basis, image/video treatment). None for plain text.
+    modality: dict | None = None
 
 
 class Feedback(BaseModel):

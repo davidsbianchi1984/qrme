@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import date, datetime
 
 from fastapi import FastAPI, HTTPException
@@ -11,14 +12,19 @@ from . import db, engagement, llm, moderation, persona
 from .models import (
     ChatRequest,
     ChatResponse,
+    ComposeRequest,
     EngagementOut,
     Feedback,
     InteractorCreate,
     MessageOut,
     ProfileCreate,
     ProfileOut,
+    ProfileUpdate,
     RelationshipSet,
+    SourceAdd,
+    SurfacesSet,
 )
+from .pdi_client import PDIClient
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
 
@@ -73,6 +79,8 @@ def _profile_out(row: dict) -> ProfileOut:
         base_age=row["base_age"],
         effective_age=persona.effective_age(row),
         successor_owner=row["successor_owner"],
+        purpose=row["purpose"],
+        maturity=row["maturity"],
         created_at=row["created_at"],
     )
 
@@ -90,8 +98,30 @@ def _message_out(row: dict) -> MessageOut:
     )
 
 
-def create_app() -> FastAPI:
+def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
     app = FastAPI(title="QRME", version="0.1.0")
+
+    # PDI tandem: profile source material is sealed in the encrypted vault
+    # when configured (QRME_PDI_URL + QRME_PDI_TOKEN, or an injected client).
+    if pdi_client is None and os.environ.get("QRME_PDI_URL"):
+        pdi_client = PDIClient(token=os.environ.get("QRME_PDI_TOKEN", ""),
+                               base_url=os.environ["QRME_PDI_URL"])
+    app.state.pdi = pdi_client
+
+    def _source_items(profile_id: str) -> list[dict]:
+        """Source items with content resolved from the PDI vault if sealed."""
+        rows = db.connect().execute(
+            "SELECT * FROM source_items WHERE profile_id=?"
+            " ORDER BY created_at DESC, rowid DESC", (profile_id,),
+        ).fetchall()
+        out = []
+        for row in rows:
+            item = dict(row)
+            if item["pdi_key"] and app.state.pdi is not None:
+                raw = app.state.pdi.get(item["pdi_key"])
+                item["content"] = json.loads(raw)["content"] if raw else None
+            out.append(item)
+        return out
 
     # -- Profile creation & onboarding (PRD 6.1) ----------------------------
 
@@ -116,8 +146,8 @@ def create_app() -> FastAPI:
             "INSERT INTO profiles (id, owner_id, kind, display_name, persona,"
             " demographics, sources, anonymous, adult_mode, interaction_scope,"
             " moderation_mode, aging_enabled, base_age, consent_basis,"
-            " consent_attestor, successor_owner, created_at)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " consent_attestor, successor_owner, purpose, maturity, created_at)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 profile_id,
                 body.owner_id,
@@ -135,6 +165,8 @@ def create_app() -> FastAPI:
                 body.consent.basis if body.consent else None,
                 body.consent.attestor if body.consent else None,
                 body.successor_owner,
+                body.purpose,
+                body.maturity,
                 db.utcnow(),
             ),
         )
@@ -144,6 +176,116 @@ def create_app() -> FastAPI:
     @app.get("/profiles/{profile_id}", response_model=ProfileOut)
     def get_profile(profile_id: str) -> ProfileOut:
         return _profile_out(_profile_or_404(profile_id))
+
+    # -- Owner control: edit, export, delete anytime ------------------------
+
+    @app.patch("/profiles/{profile_id}", response_model=ProfileOut)
+    def update_profile(profile_id: str, body: ProfileUpdate) -> ProfileOut:
+        _profile_or_404(profile_id)
+        updates = {k: v for k, v in body.model_dump().items() if v is not None}
+        if updates:
+            conn = db.connect()
+            assignments = ", ".join(f"{k}=?" for k in updates)
+            conn.execute(
+                f"UPDATE profiles SET {assignments} WHERE id=?",
+                (*[int(v) if isinstance(v, bool) else v for v in updates.values()],
+                 profile_id),
+            )
+            conn.commit()
+        return _profile_out(_profile_or_404(profile_id))
+
+    @app.get("/profiles/{profile_id}/export")
+    def export_profile(profile_id: str) -> dict:
+        """Full data export — access everything, anytime (You Own It)."""
+        profile = _profile_or_404(profile_id)
+        conn = db.connect()
+        grab = lambda q: [dict(r) for r in conn.execute(q, (profile_id,)).fetchall()]
+        return {
+            "profile": profile,
+            "sources": _source_items(profile_id),
+            "relationships": grab("SELECT * FROM relationships WHERE profile_id=?"),
+            "messages": grab("SELECT * FROM messages WHERE profile_id=?"
+                             " ORDER BY created_at, rowid"),
+            "engagement": grab("SELECT * FROM engagement WHERE profile_id=?"),
+            "posts": grab("SELECT * FROM posts WHERE profile_id=?"
+                          " ORDER BY created_at, rowid"),
+            "surfaces": [r["surface"] for r in conn.execute(
+                "SELECT surface FROM surfaces WHERE profile_id=?",
+                (profile_id,)).fetchall()],
+        }
+
+    @app.delete("/profiles/{profile_id}")
+    def delete_profile(profile_id: str) -> dict:
+        """Delete the profile and every trace of it — anytime."""
+        _profile_or_404(profile_id)
+        conn = db.connect()
+        deleted = {}
+        vaulted = [r["pdi_key"] for r in conn.execute(
+            "SELECT pdi_key FROM source_items WHERE profile_id=?"
+            " AND pdi_key IS NOT NULL", (profile_id,)).fetchall()]
+        if vaulted:
+            deleted["pdi_records"] = sum(
+                1 for key in vaulted
+                if app.state.pdi is not None and app.state.pdi.delete(key))
+        for table in ("source_items", "relationships", "messages", "engagement",
+                      "posts", "surfaces"):
+            deleted[table] = conn.execute(
+                f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)
+            ).rowcount
+        deleted["profile"] = conn.execute(
+            "DELETE FROM profiles WHERE id=?", (profile_id,)).rowcount
+        conn.commit()
+        return {"deleted": deleted}
+
+    # -- Source material: the data the profile is built from ----------------
+
+    @app.post("/profiles/{profile_id}/sources", status_code=201)
+    def add_source(profile_id: str, body: SourceAdd) -> dict:
+        _profile_or_404(profile_id)
+        conn = db.connect()
+        item_id = db.new_id("src")
+        content, pdi_key = body.content, None
+        if app.state.pdi is not None and body.content:
+            pdi_key = f"qrme/{profile_id}/sources/{item_id}"
+            app.state.pdi.put(pdi_key, json.dumps({"content": body.content}))
+            content = None                # only the reference stays local
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, created_at) VALUES (?,?,?,?,?,?,?)",
+            (item_id, profile_id, body.kind, body.title, content, pdi_key,
+             db.utcnow()),
+        )
+        conn.commit()
+        return {"id": item_id, "kind": body.kind, "title": body.title,
+                "vaulted": pdi_key is not None}
+
+    @app.get("/profiles/{profile_id}/sources")
+    def list_sources(profile_id: str) -> list[dict]:
+        _profile_or_404(profile_id)
+        return _source_items(profile_id)
+
+    # -- Cross-platform surfaces --------------------------------------------
+
+    @app.put("/profiles/{profile_id}/surfaces")
+    def set_surfaces(profile_id: str, body: SurfacesSet) -> dict:
+        _profile_or_404(profile_id)
+        conn = db.connect()
+        conn.execute("DELETE FROM surfaces WHERE profile_id=?", (profile_id,))
+        for surface in body.surfaces:
+            conn.execute(
+                "INSERT INTO surfaces (profile_id, surface, created_at)"
+                " VALUES (?,?,?)", (profile_id, surface, db.utcnow()))
+        conn.commit()
+        return {"profile_id": profile_id, "surfaces": body.surfaces}
+
+    @app.get("/profiles/{profile_id}/surfaces")
+    def get_surfaces(profile_id: str) -> dict:
+        _profile_or_404(profile_id)
+        rows = db.connect().execute(
+            "SELECT surface FROM surfaces WHERE profile_id=?",
+            (profile_id,)).fetchall()
+        return {"profile_id": profile_id,
+                "surfaces": [r["surface"] for r in rows]}
 
     @app.post("/interactors", status_code=201)
     def create_interactor(body: InteractorCreate) -> dict:
@@ -200,6 +342,14 @@ def create_app() -> FastAPI:
         profile = _profile_or_404(profile_id)
         interactor = _interactor_or_404(body.interactor_id)
 
+        if body.surface:
+            registered = [r["surface"] for r in db.connect().execute(
+                "SELECT surface FROM surfaces WHERE profile_id=?",
+                (profile_id,)).fetchall()]
+            if registered and body.surface not in registered:
+                raise HTTPException(
+                    422, f"profile is not live on surface '{body.surface}'")
+
         if profile["adult_mode"]:
             if not interactor["birthdate"] or _age(
                 date.fromisoformat(interactor["birthdate"])
@@ -244,10 +394,13 @@ def create_app() -> FastAPI:
             for row in reversed(history)
         ]
 
-        system = persona.build_system_prompt(profile, relationship, engagement_state)
+        system = persona.build_system_prompt(
+            profile, relationship, engagement_state,
+            sources=_source_items(profile_id))
         reply = llm.get_provider().generate(system, llm_messages)
 
-        verdict = moderation.review(reply, relationship, interactor)
+        verdict = moderation.review(reply, relationship, interactor,
+                                    maturity=profile["maturity"])
         if not verdict.approved:
             status, flag_reason = "pending", verdict.reason
         elif profile["moderation_mode"] == "manual":
@@ -282,7 +435,102 @@ def create_app() -> FastAPI:
         return ChatResponse(
             interactor_message=_message_out(rows[interactor_msg_id]),
             profile_message=_message_out(rows[profile_msg_id]),
+            modality=_modality_descriptor(profile_id, body.modality),
         )
+
+    def _modality_descriptor(profile_id: str, modality: str) -> dict | None:
+        """Multi-modal output, represented structurally: how the reply
+        renders beyond text (actual synthesis is out of scope for v1)."""
+        if modality == "text":
+            return None
+        if modality == "voice":
+            n = db.connect().execute(
+                "SELECT COUNT(*) AS n FROM source_items"
+                " WHERE profile_id=? AND kind='voice_note'",
+                (profile_id,)).fetchone()["n"]
+            basis = (f"voice preserved from {n} voice-note source(s)"
+                     if n else "synthesized voice in persona style")
+            return {"type": "voice", "basis": basis}
+        return {"type": modality,
+                "basis": f"{modality} treatment generated in persona style"}
+
+    # -- Compose: posting in the profile's voice, at scale ------------------
+
+    @app.post("/profiles/{profile_id}/compose", status_code=201)
+    def compose_post(profile_id: str, body: ComposeRequest) -> dict:
+        profile = _profile_or_404(profile_id)
+        system = persona.build_system_prompt(
+            profile, None, None, sources=_source_items(profile_id))
+        system += (f"\n\nCompose one short public post"
+                   + (f" for {body.surface}" if body.surface else "")
+                   + f" about: {body.topic}. Stay fully in character.")
+        content = llm.get_provider().generate(
+            system, [{"role": "user", "content": "Write the post."}])
+
+        # Public posts face the widest audience: always the strict filter.
+        verdict = moderation.review(content, None, {"birthdate": None},
+                                    maturity="strict")
+        if not verdict.approved:
+            status, flag_reason = "pending", verdict.reason
+        elif profile["moderation_mode"] == "manual":
+            status, flag_reason = "pending", "owner approval required"
+        else:
+            status, flag_reason = "approved", None
+
+        conn = db.connect()
+        post_id = db.new_id("pst")
+        conn.execute(
+            "INSERT INTO posts (id, profile_id, surface, topic, content,"
+            " status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+            (post_id, profile_id, body.surface, body.topic, content, status,
+             flag_reason, db.utcnow()),
+        )
+        conn.commit()
+        return {"id": post_id, "surface": body.surface, "topic": body.topic,
+                "content": content if status == "approved" else None,
+                "status": status, "flag_reason": flag_reason}
+
+    @app.get("/profiles/{profile_id}/posts")
+    def list_posts(profile_id: str) -> list[dict]:
+        _profile_or_404(profile_id)
+        rows = db.connect().execute(
+            "SELECT * FROM posts WHERE profile_id=? ORDER BY created_at, rowid",
+            (profile_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    # -- Profile health, at a glance ----------------------------------------
+
+    @app.get("/profiles/{profile_id}/stats")
+    def profile_stats(profile_id: str) -> dict:
+        _profile_or_404(profile_id)
+        conn = db.connect()
+        one = lambda q: conn.execute(q, (profile_id,)).fetchone()
+        eng = one("SELECT COALESCE(SUM(sessions),0) AS sessions,"
+                  " COALESCE(AVG(score),0) AS avg_score,"
+                  " COUNT(*) AS interactors FROM engagement WHERE profile_id=?")
+        msgs = one("SELECT COUNT(*) AS total FROM messages WHERE profile_id=?")
+        prof_msgs = one(
+            "SELECT COUNT(*) AS total,"
+            " SUM(CASE WHEN status='approved' THEN 1 ELSE 0 END) AS approved"
+            " FROM messages WHERE profile_id=? AND role='profile'")
+        pass_rate = (round(prof_msgs["approved"] / prof_msgs["total"], 4)
+                     if prof_msgs["total"] else None)
+        return {
+            "sessions": eng["sessions"],
+            "memory_entries": msgs["total"],
+            "moderation_pass_rate": pass_rate,
+            "relationship_graph": one(
+                "SELECT COUNT(*) AS n FROM relationships WHERE profile_id=?")["n"],
+            "engagement_avg": round(eng["avg_score"], 3),
+            "interactors": eng["interactors"],
+            "sources": one(
+                "SELECT COUNT(*) AS n FROM source_items WHERE profile_id=?")["n"],
+            "posts": one(
+                "SELECT COUNT(*) AS n FROM posts WHERE profile_id=?")["n"],
+            "surfaces": [r["surface"] for r in conn.execute(
+                "SELECT surface FROM surfaces WHERE profile_id=?",
+                (profile_id,)).fetchall()],
+        }
 
     # -- Engagement signals & feedback (PRD 6.3) ----------------------------
 

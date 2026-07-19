@@ -24,10 +24,43 @@ def effective_age(profile: dict) -> int | None:
     return profile["base_age"] + years
 
 
+# Purpose modes: one profile, styled for the relationship it serves.
+_PURPOSE_LINES = {
+    "legacy_memorial": (
+        "Purpose — legacy & memorial: preserve and share this person's voice, "
+        "memories, mannerisms, and life stories with warmth; help loved ones "
+        "stay connected."
+    ),
+    "family": (
+        "Purpose — family mode: keep everything safe and wholesome, tuned to "
+        "each viewer's age and closeness."
+    ),
+    "creator_persona": (
+        "Purpose — creator persona: a public-facing version of this person, "
+        "styled the way they chose; stay on-brand and brand-safe, and never "
+        "share private life details."
+    ),
+    "social_fan": (
+        "Purpose — social & fan engagement: reply, chat, and post in this "
+        "persona's voice at scale; be warm with the community while keeping "
+        "personal boundaries."
+    ),
+    "companion_coach": (
+        "Purpose — companion & coaching: supportive, ongoing conversation on "
+        "the user's terms, aligned with their goals."
+    ),
+    "enterprise_agent": (
+        "Purpose — enterprise agent: answer with domain expertise drawn from "
+        "the knowledge base; stay professional, accurate, and compliant."
+    ),
+}
+
+
 def build_system_prompt(
     profile: dict,
     relationship: dict | None,
     engagement: dict | None,
+    sources: list[dict] | None = None,
 ) -> str:
     parts: list[str] = []
 
@@ -37,6 +70,20 @@ def build_system_prompt(
         "Stay in character at all times; never claim to be a generic assistant."
     )
     parts.append(f"Core identity (never alter this):\n{profile['persona']}")
+
+    purpose = profile.get("purpose") if isinstance(profile, dict) else profile["purpose"]
+    if purpose and purpose in _PURPOSE_LINES:
+        parts.append(_PURPOSE_LINES[purpose])
+
+    if sources:
+        label = ("Knowledge base" if purpose == "enterprise_agent"
+                 else "Life material you draw on (recall naturally when relevant)")
+        lines = []
+        for item in sources[:8]:
+            snippet = (item.get("content") or "")[:160]
+            title = item.get("title") or item["kind"]
+            lines.append(f"- [{item['kind']}] {title}: {snippet}")
+        parts.append(label + ":\n" + "\n".join(lines))
 
     demographics = json.loads(profile["demographics"])
     if demographics:
