@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 640" width="1500" height="640" font-family="Helvetica, Arial, sans-serif">
+  <title>QRME purpose modes — one profile, six ways to show up</title>
+  <defs>
+    <linearGradient id="ubg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B1D4E"/>
+      <stop offset="1" stop-color="#101235"/>
+    </linearGradient>
+    <radialGradient id="uvign" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0.66" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#090A26" stop-opacity="0.5"/>
+    </radialGradient>
+    <linearGradient id="ucard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A2C63"/>
+      <stop offset="1" stop-color="#20224F"/>
+    </linearGradient>
+    <filter id="ushadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#05061C" flood-opacity="0.55"/>
+    </filter>
+    <filter id="usoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+
+  <rect width="1500" height="640" fill="url(#ubg)"/>
+
+  <text x="750" y="62" text-anchor="middle" font-size="28" font-weight="bold" fill="#F4E3C8" letter-spacing="1.5">One profile. Six ways to show up.</text>
+  <text x="750" y="90" text-anchor="middle" font-size="14.5" fill="#8B90A8">The purpose conditions the persona — the identity underneath never changes</text>
+
+  <!-- row 1 -->
+  <g filter="url(#ushadow)">
+    <!-- legacy & memorial -->
+    <g transform="translate(70 130)">
+      <rect width="430" height="210" rx="18" fill="url(#ucard)"/>
+      <rect width="430" height="210" rx="18" fill="none" stroke="#E8A34D" stroke-opacity="0.5" stroke-width="1.4"/>
+      <g transform="translate(66 88)">
+        <g filter="url(#usoft)"><circle r="34" fill="#E8A34D" opacity="0.4"/></g>
+        <!-- candle -->
+        <rect x="-10" y="-8" width="20" height="34" rx="4" fill="#F4E3C8"/>
+        <path d="M0 -26 C6 -18 6 -12 0 -8 C-6 -12 -6 -18 0 -26 Z" fill="#E8A34D"/>
+        <ellipse cx="0" cy="28" rx="20" ry="5" fill="#12143B"/>
+      </g>
+      <text x="130" y="66" font-size="11" fill="#E8A34D" letter-spacing="2">LEGACY &amp; MEMORIAL</text>
+      <text x="130" y="94" font-size="16" font-weight="bold" fill="#F4E3C8">Stay connected to a loved</text>
+      <text x="130" y="116" font-size="16" font-weight="bold" fill="#F4E3C8">one's voice &amp; memories</text>
+      <text x="130" y="146" font-size="11.5" fill="#8B90A8">voice preservation · memory recall · life stories</text>
+      <g transform="translate(130 172)" font-size="10.5" fill="#C9CDD8">
+        <rect x="-8" y="-13" width="150" height="22" rx="11" fill="#12143B"/>
+        <text y="1">purpose: legacy_memorial</text>
+      </g>
+    </g>
+    <!-- family mode -->
+    <g transform="translate(535 130)">
+      <rect width="430" height="210" rx="18" fill="url(#ucard)"/>
+      <rect width="430" height="210" rx="18" fill="none" stroke="#7BC47F" stroke-opacity="0.5" stroke-width="1.4"/>
+      <g transform="translate(66 88)">
+        <g filter="url(#usoft)"><circle r="34" fill="#7BC47F" opacity="0.35"/></g>
+        <circle cy="-8" r="16" fill="#DDE1EC"/>
+        <path d="M-24 34 C-24 8 -12 0 0 0 C12 0 24 8 24 34 Z" fill="#DDE1EC"/>
+        <circle cx="20" cy="18" r="11" fill="#9DBF8E"/>
+        <path d="M8 40 C8 28 14 24 20 24 C26 24 32 28 32 40 Z" fill="#9DBF8E"/>
+      </g>
+      <text x="130" y="66" font-size="11" fill="#7BC47F" letter-spacing="2">FAMILY MODE</text>
+      <text x="130" y="94" font-size="16" font-weight="bold" fill="#F4E3C8">Tuned to each viewer's</text>
+      <text x="130" y="116" font-size="16" font-weight="bold" fill="#F4E3C8">age and closeness</text>
+      <text x="130" y="146" font-size="11.5" fill="#8B90A8">age-aware · relationship-tuned · safe &amp; wholesome</text>
+      <g transform="translate(130 172)" font-size="10.5" fill="#C9CDD8">
+        <rect x="-8" y="-13" width="110" height="22" rx="11" fill="#12143B"/>
+        <text y="1">purpose: family</text>
+      </g>
+    </g>
+    <!-- creator persona -->
+    <g transform="translate(1000 130)">
+      <rect width="430" height="210" rx="18" fill="url(#ucard)"/>
+      <rect width="430" height="210" rx="18" fill="none" stroke="#DCB8D4" stroke-opacity="0.5" stroke-width="1.4"/>
+      <g transform="translate(66 88)">
+        <g filter="url(#usoft)"><circle r="34" fill="#DCB8D4" opacity="0.35"/></g>
+        <!-- masks -->
+        <path d="M-26 -14 a13 15 0 0 1 26 0 v8 a13 13 0 0 1 -26 0 Z" fill="#A9C4E8"/>
+        <path d="M0 -6 a13 15 0 0 1 26 0 v8 a13 13 0 0 1 -26 0 Z" fill="#E8A34D"/>
+        <circle cx="-18" cy="-12" r="2.2" fill="#12143B"/><circle cx="-8" cy="-12" r="2.2" fill="#12143B"/>
+        <circle cx="8" cy="-4" r="2.2" fill="#12143B"/><circle cx="18" cy="-4" r="2.2" fill="#12143B"/>
+      </g>
+      <text x="130" y="66" font-size="11" fill="#DCB8D4" letter-spacing="2">CREATOR PERSONA</text>
+      <text x="130" y="94" font-size="16" font-weight="bold" fill="#F4E3C8">A public-facing you,</text>
+      <text x="130" y="116" font-size="16" font-weight="bold" fill="#F4E3C8">styled the way you choose</text>
+      <text x="130" y="146" font-size="11.5" fill="#8B90A8">custom style · tone &amp; vibe · brand-safe</text>
+      <g transform="translate(130 172)" font-size="10.5" fill="#C9CDD8">
+        <rect x="-8" y="-13" width="152" height="22" rx="11" fill="#12143B"/>
+        <text y="1">purpose: creator_persona</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- row 2 -->
+  <g filter="url(#ushadow)">
+    <!-- social & fan -->
+    <g transform="translate(70 372)">
+      <rect width="430" height="210" rx="18" fill="url(#ucard)"/>
+      <rect width="430" height="210" rx="18" fill="none" stroke="#9FD8E8" stroke-opacity="0.5" stroke-width="1.4"/>
+      <g transform="translate(66 88)">
+        <g filter="url(#usoft)"><circle r="34" fill="#9FD8E8" opacity="0.3"/></g>
+        <path d="M-26 -18 h52 a10 10 0 0 1 10 10 v20 a10 10 0 0 1 -10 10 h-30 l-14 12 v-12 h-8 a10 10 0 0 1 -10 -10 v-20 a10 10 0 0 1 10 -10 Z" fill="#DDE1EC"/>
+        <circle cx="-10" cy="2" r="3" fill="#12143B"/><circle cx="2" cy="2" r="3" fill="#12143B"/><circle cx="14" cy="2" r="3" fill="#12143B"/>
+      </g>
+      <text x="130" y="66" font-size="11" fill="#9FD8E8" letter-spacing="2">SOCIAL &amp; FAN ENGAGEMENT</text>
+      <text x="130" y="94" font-size="16" font-weight="bold" fill="#F4E3C8">Reply, chat &amp; post in</text>
+      <text x="130" y="116" font-size="16" font-weight="bold" fill="#F4E3C8">your voice, at scale</text>
+      <text x="130" y="146" font-size="11.5" fill="#8B90A8">POST /compose · strict filter on public posts</text>
+      <g transform="translate(130 172)" font-size="10.5" fill="#C9CDD8">
+        <rect x="-8" y="-13" width="130" height="22" rx="11" fill="#12143B"/>
+        <text y="1">purpose: social_fan</text>
+      </g>
+    </g>
+    <!-- companion & coaching -->
+    <g transform="translate(535 372)">
+      <rect width="430" height="210" rx="18" fill="url(#ucard)"/>
+      <rect width="430" height="210" rx="18" fill="none" stroke="#B8D8C8" stroke-opacity="0.5" stroke-width="1.4"/>
+      <g transform="translate(66 88)">
+        <g filter="url(#usoft)"><circle r="34" fill="#B8D8C8" opacity="0.3"/></g>
+        <path d="M0 26 C-8 12 -30 4 -30 -14 C-30 -28 -18 -34 -7 -28 C-3 -26 -1 -24 0 -21 C1 -24 3 -26 7 -28 C18 -34 30 -28 30 -14 C30 4 8 12 0 26 Z" fill="#E8A34D"/>
+      </g>
+      <text x="130" y="66" font-size="11" fill="#B8D8C8" letter-spacing="2">COMPANION &amp; COACHING</text>
+      <text x="130" y="94" font-size="16" font-weight="bold" fill="#F4E3C8">Supportive, ongoing</text>
+      <text x="130" y="116" font-size="16" font-weight="bold" fill="#F4E3C8">conversation, on your terms</text>
+      <text x="130" y="146" font-size="11.5" fill="#8B90A8">understands you · goal-aligned · private &amp; safe</text>
+      <g transform="translate(130 172)" font-size="10.5" fill="#C9CDD8">
+        <rect x="-8" y="-13" width="172" height="22" rx="11" fill="#12143B"/>
+        <text y="1">purpose: companion_coach</text>
+      </g>
+    </g>
+    <!-- enterprise agent -->
+    <g transform="translate(1000 372)">
+      <rect width="430" height="210" rx="18" fill="url(#ucard)"/>
+      <rect width="430" height="210" rx="18" fill="none" stroke="#A9C4E8" stroke-opacity="0.5" stroke-width="1.4"/>
+      <g transform="translate(66 88)">
+        <g filter="url(#usoft)"><circle r="34" fill="#A9C4E8" opacity="0.3"/></g>
+        <rect x="-20" y="-26" width="40" height="54" rx="4" fill="#DDE1EC"/>
+        <g fill="#3A3D7E">
+          <rect x="-13" y="-18" width="8" height="8" rx="1.5"/><rect x="5" y="-18" width="8" height="8" rx="1.5"/>
+          <rect x="-13" y="-5" width="8" height="8" rx="1.5"/><rect x="5" y="-5" width="8" height="8" rx="1.5"/>
+          <rect x="-13" y="8" width="8" height="8" rx="1.5"/><rect x="5" y="8" width="8" height="8" rx="1.5"/>
+        </g>
+      </g>
+      <text x="130" y="66" font-size="11" fill="#A9C4E8" letter-spacing="2">ENTERPRISE AGENT</text>
+      <text x="130" y="94" font-size="16" font-weight="bold" fill="#F4E3C8">Domain expertise,</text>
+      <text x="130" y="116" font-size="16" font-weight="bold" fill="#F4E3C8">deployed for a team</text>
+      <text x="130" y="146" font-size="11.5" fill="#8B90A8">knowledge-base sources · professional · compliant</text>
+      <g transform="translate(130 172)" font-size="10.5" fill="#C9CDD8">
+        <rect x="-8" y="-13" width="166" height="22" rx="11" fill="#12143B"/>
+        <text y="1">purpose: enterprise_agent</text>
+      </g>
+    </g>
+  </g>
+
+  <text x="750" y="622" text-anchor="middle" font-size="12.5" fill="#8B90A8">Set at creation or any time with PATCH /profiles/{id} — identity and boundaries stay fixed underneath.</text>
+
+  <rect width="1500" height="640" fill="url(#uvign)"/>
+</svg>
