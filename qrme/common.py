@@ -1,0 +1,114 @@
+"""Shared request helpers used across the API routers."""
+
+from __future__ import annotations
+
+import json
+from datetime import date, datetime
+
+from fastapi import HTTPException
+
+from . import db, persona
+from .models import MessageOut, ProfileOut
+
+
+def age_of(birthdate: date) -> int:
+    today = datetime.now().date()
+    return today.year - birthdate.year - (
+        (today.month, today.day) < (birthdate.month, birthdate.day)
+    )
+
+
+def profile_or_404(profile_id: str) -> dict:
+    row = db.connect().execute(
+        "SELECT * FROM profiles WHERE id=?", (profile_id,)
+    ).fetchone()
+    if row is None:
+        raise HTTPException(404, "profile not found")
+    return dict(row)
+
+
+def interactor_or_404(interactor_id: str) -> dict:
+    row = db.connect().execute(
+        "SELECT * FROM interactors WHERE id=?", (interactor_id,)
+    ).fetchone()
+    if row is None:
+        raise HTTPException(404, "interactor not found")
+    return dict(row)
+
+
+def relationship(profile_id: str, interactor_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM relationships WHERE profile_id=? AND interactor_id=?",
+        (profile_id, interactor_id),
+    ).fetchone()
+    return dict(row) if row else None
+
+
+def profile_out(row: dict) -> ProfileOut:
+    return ProfileOut(
+        id=row["id"],
+        owner_id=row["owner_id"],
+        kind=row["kind"],
+        display_name=row["display_name"],
+        persona=row["persona"],
+        demographics=json.loads(row["demographics"]),
+        sources=json.loads(row["sources"]),
+        anonymous=bool(row["anonymous"]),
+        adult_mode=bool(row["adult_mode"]),
+        interaction_scope=row["interaction_scope"],
+        moderation_mode=row["moderation_mode"],
+        aging_enabled=bool(row["aging_enabled"]),
+        base_age=row["base_age"],
+        effective_age=persona.effective_age(row),
+        successor_owner=row["successor_owner"],
+        purpose=row["purpose"],
+        maturity=row["maturity"],
+        cloud_contribution=bool(row["cloud_contribution"]),
+        created_at=row["created_at"],
+    )
+
+
+def message_out(row: dict) -> MessageOut:
+    # Unapproved profile content is never shown to interactors (PRD 6.5).
+    visible = row["status"] == "approved" or row["role"] == "interactor"
+    return MessageOut(
+        id=row["id"],
+        role=row["role"],
+        content=row["content"] if visible else None,
+        status=row["status"],
+        flag_reason=row["flag_reason"],
+        created_at=row["created_at"],
+    )
+
+
+def source_items(profile_id: str, pdi=None) -> list[dict]:
+    """Source items with content resolved from the PDI vault if sealed."""
+    rows = db.connect().execute(
+        "SELECT * FROM source_items WHERE profile_id=?"
+        " ORDER BY created_at DESC, rowid DESC", (profile_id,),
+    ).fetchall()
+    out = []
+    for row in rows:
+        item = dict(row)
+        if item["pdi_key"] and pdi is not None:
+            raw = pdi.get(item["pdi_key"])
+            item["content"] = json.loads(raw)["content"] if raw else None
+        out.append(item)
+    return out
+
+
+def biometric_domain(biometrics: dict) -> str | None:
+    """Claim 24: map monitoring signals to the specialist domain they call for."""
+    condition = (biometrics.get("condition") or "").lower()
+    if condition in ("anxiety", "depression", "stress", "phobia"):
+        return "mental_health"
+    if condition in ("physical_distress", "physical_injury"):
+        return "medical"
+    if condition == "financial_stress":
+        return "finance"
+    try:
+        if float(biometrics.get("stress_level") or 0) >= 0.7:
+            return "mental_health"
+    except (TypeError, ValueError):
+        pass
+    return None

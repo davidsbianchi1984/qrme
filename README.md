@@ -36,6 +36,16 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | You own it / total control | `PATCH /profiles/{id}` (edit anytime), `GET /profiles/{id}/export` (full data export), `DELETE /profiles/{id}` (erases everything, including vaulted records) |
 | Encrypted at rest (PDI tandem) | With `QRME_PDI_URL` + `QRME_PDI_TOKEN` (or an injected client), source-material content is sealed in PDI's AES-256-GCM vault (`qrme/pdi_client.py`); QRME keeps only key references, resolves them on read, and purges the vault on delete |
 
+## Cloud model — use a greater model, and contribute to it
+
+With a [Cloud Model Gateway](docs/cloud-model.md) configured, inference
+routes to the hosted tier (the latest, most capable model — e.g.
+`claude-fable-5`) with automatic fallback to the local provider, and
+profiles that opt in (`cloud_contribution`) contribute positively-rated,
+**anonymized** exchanges back to improve the shared model — ids stripped,
+display names replaced, revocable anytime. `GET /cloud/status` reports the
+tier. Contributions land in PDI's encrypted, audited intake.
+
 ## Claims 21–26 (`qrme/adaptation.py`, `qrme/tasks.py`)
 
 | Claim | Implementation |
@@ -77,6 +87,7 @@ replies; otherwise the stub provider answers. Override the model with
 | `QRME_MODEL` | `claude-opus-4-8` | Model used for profile replies |
 | `ANTHROPIC_API_KEY` | — | Enables real model replies |
 | `QRME_PDI_URL` / `QRME_PDI_TOKEN` | — | PDI tandem: seal source material in the encrypted vault |
+| `QRME_CLOUD_URL` / `QRME_CLOUD_TOKEN` | — | Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution ([docs/cloud-model.md](docs/cloud-model.md)) |
 
 ## Test
 
