@@ -62,12 +62,19 @@ def _extract(text: str, marker: str) -> str | None:
     return None
 
 
-def get_provider() -> Provider:
+def get_provider(cloud=None) -> Provider:
+    """``cloud`` is an optional CloudModelClient: when present, inference
+    routes to the gateway's greater model with local fallback."""
     choice = os.environ.get("QRME_LLM")
     if choice == "stub":
-        return StubProvider()
-    if choice == "anthropic" or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get(
+        base: Provider = StubProvider()
+    elif choice == "anthropic" or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get(
         "ANTHROPIC_AUTH_TOKEN"
     ):
-        return AnthropicProvider()
-    return StubProvider()
+        base = AnthropicProvider()
+    else:
+        base = StubProvider()
+    if cloud is not None:
+        from .cloud import CloudProvider
+        return CloudProvider(cloud, fallback=base)
+    return base

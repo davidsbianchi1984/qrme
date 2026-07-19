@@ -58,6 +58,9 @@ class ProfileCreate(BaseModel):
     successor_owner: str | None = None
     purpose: Purpose | None = None
     maturity: Maturity = "balanced"
+    # Opt-in: contribute positively-rated, anonymized exchanges to improve
+    # the shared cloud model. Off by default; revocable anytime.
+    cloud_contribution: bool = False
 
 
 class ProfileUpdate(BaseModel):
@@ -71,6 +74,7 @@ class ProfileUpdate(BaseModel):
     maturity: Maturity | None = None
     aging_enabled: bool | None = None
     successor_owner: str | None = None
+    cloud_contribution: bool | None = None
 
 
 class ProfileOut(BaseModel):
@@ -91,6 +95,7 @@ class ProfileOut(BaseModel):
     successor_owner: str | None
     purpose: Purpose | None
     maturity: Maturity
+    cloud_contribution: bool
     created_at: str
 
 

@@ -46,7 +46,7 @@ def _grant_for(profile_id: str, token: str) -> dict | None:
 
 
 def run(profile: dict, kind: str, topic: str, grant_token: str,
-        pdi=None) -> dict:
+        pdi=None, cloud=None) -> dict:
     """Execute a multi-step task under a revocable grant."""
     profile_id = profile["id"]
     steps: list[dict] = []
@@ -80,7 +80,7 @@ def run(profile: dict, kind: str, topic: str, grant_token: str,
     system = persona.build_system_prompt(profile, None, None, sources=items)
     system += (f"\n\nExecute this task autonomously: {kind} — {topic}. "
                "Produce the finished output only.")
-    output = llm.get_provider().generate(
+    output = llm.get_provider(cloud=cloud).generate(
         system, [{"role": "user", "content": "Execute the task."}])
     steps.append({"step": "compose", "chars": len(output)})
 
