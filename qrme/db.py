@@ -70,6 +70,76 @@ CREATE TABLE IF NOT EXISTS connection_messages (
     created_at    TEXT NOT NULL
 );
 
+-- Rooms: multiparty conversations across channels (chat/voice/video/AR/VR)
+-- whose participants may be any mix of real users and synthetic profiles.
+CREATE TABLE IF NOT EXISTS rooms (
+    id         TEXT PRIMARY KEY,
+    topic      TEXT,
+    channel    TEXT NOT NULL DEFAULT 'chat',  -- chat | voice | video | ar | vr
+    status     TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS room_participants (
+    room_id TEXT NOT NULL REFERENCES rooms(id),
+    kind    TEXT NOT NULL,   -- user | profile
+    ref_id  TEXT NOT NULL,
+    PRIMARY KEY (room_id, ref_id)
+);
+
+CREATE TABLE IF NOT EXISTS room_messages (
+    id          TEXT PRIMARY KEY,
+    room_id     TEXT NOT NULL REFERENCES rooms(id),
+    sender_kind TEXT NOT NULL,   -- user | profile
+    sender_id   TEXT NOT NULL,
+    content     TEXT NOT NULL,
+    status      TEXT NOT NULL,   -- approved | blocked
+    flag_reason TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- General marketplace listings: profiles, content, business expertise, and
+-- services — offered by users or businesses.
+CREATE TABLE IF NOT EXISTS listings (
+    id            TEXT PRIMARY KEY,
+    kind          TEXT NOT NULL,   -- profile | content | expertise | service
+    title         TEXT NOT NULL,
+    blurb         TEXT,
+    tags          TEXT NOT NULL DEFAULT '[]',
+    area          TEXT,            -- e.g. healthcare | finance | relationships
+    provider_name TEXT NOT NULL,
+    business      INTEGER NOT NULL DEFAULT 0,
+    profile_id    TEXT REFERENCES profiles(id),  -- when kind = profile
+    created_at    TEXT NOT NULL
+);
+
+-- Local provider directory: real businesses and practitioners users can be
+-- handed to when AI guidance reaches its limits.
+CREATE TABLE IF NOT EXISTS providers (
+    id         TEXT PRIMARY KEY,
+    name       TEXT NOT NULL,
+    area       TEXT NOT NULL,      -- healthcare | medical | mental_health |
+                                   -- finance | relationships | career | …
+    location   TEXT,
+    contact    TEXT,
+    business   INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+);
+
+-- Consented session handoffs: an AI specialist's session summary packaged
+-- for a local provider, sealed (PDI when configured) behind a revocable token.
+CREATE TABLE IF NOT EXISTS handoffs (
+    id            TEXT PRIMARY KEY,
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    profile_id    TEXT REFERENCES profiles(id),
+    provider_id   TEXT NOT NULL REFERENCES providers(id),
+    package       TEXT,            -- JSON summary; NULL when sealed in PDI
+    pdi_key       TEXT,
+    token         TEXT NOT NULL,   -- provider's revocable access token
+    revoked       INTEGER NOT NULL DEFAULT 0,
+    created_at    TEXT NOT NULL
+);
+
 -- @handles: one claimable, unique handle per profile for direct summoning.
 CREATE TABLE IF NOT EXISTS handles (
     handle     TEXT PRIMARY KEY,   -- lowercase, no leading @
