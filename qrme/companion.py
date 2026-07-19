@@ -1,7 +1,7 @@
 """Companion features: genesis, proactivity, honesty, departure.
 
-Inspired by the ambient-OS companion of Spike Jonze's *Her* — translated
-into product mechanics, each with a consent boundary the film lacked:
+An ambient-companion model, translated into product mechanics with an
+explicit consent boundary on each:
 
 - **Genesis interview** — a profile born from a few personal questions, and
   (optionally) allowed to choose its own name.

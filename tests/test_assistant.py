@@ -5,7 +5,7 @@ from tests.test_capabilities import make_profile
 
 
 def test_triage_keeps_the_best(client):
-    """The 'keep the 86 best' scene: curate a large pile down to the best N."""
+    """Curate a large pile down to the best N."""
     p = make_profile(client)
     items = [{"id": f"e{i}", "text": "ok"} for i in range(20)]
     items += [
@@ -35,7 +35,7 @@ def test_proofread_edits_and_suggests(client):
 
 
 def test_perceive_recognizes_scene_and_guides(client):
-    """The carnival scene: see the world and guide hands-free."""
+    """See a real-time scene and guide hands-free."""
     p = make_profile(client)
     r = client.post(f"/profiles/{p['id']}/perceive", json={
         "objects": ["ticket booth", "carousel", "exit sign"],
@@ -55,7 +55,7 @@ def test_perceive_recognizes_scene_and_guides(client):
 
 
 def test_compose_creative_work(client):
-    """The piano-piece scene: an original work capturing a moment, kept."""
+    """An original work capturing a moment, kept as an artifact."""
     p = make_profile(client)
     music = client.post(f"/profiles/{p['id']}/assist/compose", json={
         "kind": "music",

@@ -28,8 +28,8 @@ def test_genesis_interview_and_self_naming(client):
     # An explicit name is honored instead.
     named = client.post("/profiles/genesis", json={
         "owner_id": "owner-1", "verification": ADULT, "answers": ANSWERS,
-        "display_name": "Samantha"}).json()
-    assert named["display_name"] == "Samantha"
+        "display_name": "Iris"}).json()
+    assert named["display_name"] == "Iris"
 
 
 def test_proactive_requires_owner_opt_in(client):
