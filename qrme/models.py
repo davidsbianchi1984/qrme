@@ -157,6 +157,62 @@ class ConnectionMessage(BaseModel):
     message: str
 
 
+Channel = Literal["chat", "voice", "video", "ar", "vr"]
+
+
+class RoomParticipant(BaseModel):
+    kind: Literal["user", "profile"]
+    id: str
+
+
+class RoomCreate(BaseModel):
+    topic: str
+    channel: Channel = "chat"
+    participants: list[RoomParticipant] = Field(min_length=2, max_length=8)
+
+
+class RoomMessage(BaseModel):
+    sender_id: str                     # must be a user participant
+    message: str
+
+
+class ListingCreate(BaseModel):
+    kind: Literal["profile", "content", "expertise", "service"]
+    title: str
+    blurb: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    area: str | None = None            # healthcare | finance | relationships | …
+    provider_name: str
+    business: bool = False
+    profile_id: str | None = None      # required when kind == "profile"
+
+
+class ProviderCreate(BaseModel):
+    name: str
+    area: str                          # healthcare | medical | mental_health |
+                                       # finance | relationships | career | …
+    location: str | None = None
+    contact: str | None = None
+    business: bool = True
+
+
+class HandoffCreate(BaseModel):
+    interactor_id: str
+    provider_id: str
+    profile_id: str | None = None      # the AI specialist session to package
+    consent: bool = False              # explicit user consent required
+
+
+class HandleSet(BaseModel):
+    handle: str = Field(pattern=r"^@?[A-Za-z0-9_]{2,30}$",
+                        description="Unique @handle; stored lowercase.")
+
+
+class BeaconCreate(BaseModel):
+    label: str                         # e.g. "Rosa's garden bench"
+    location: str | None = None        # free-text place description
+
+
 class EmbodimentAdd(BaseModel):
     name: str                          # e.g. kitchen_speaker, companion_bot
     kind: Literal["speaker", "earpiece", "hologram", "robot",
