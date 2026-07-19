@@ -140,6 +140,28 @@ CREATE TABLE IF NOT EXISTS handoffs (
     created_at    TEXT NOT NULL
 );
 
+-- Creative works a profile composes (music description, poem, note) that
+-- capture a shared moment — kept as artifacts.
+CREATE TABLE IF NOT EXISTS creative_works (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,   -- music | poem | note | lyric
+    moment     TEXT,            -- the moment it captures
+    content    TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+-- Real-time perception events: what a profile "sees" through a camera and
+-- the guidance it gives back (hands-free navigation, shared experiences).
+CREATE TABLE IF NOT EXISTS perceptions (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    scene      TEXT NOT NULL,   -- JSON: objects, people, gestures, place
+    goal       TEXT,            -- e.g. "guide me to the exit"
+    guidance   TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
 -- @handles: one claimable, unique handle per profile for direct summoning.
 CREATE TABLE IF NOT EXISTS handles (
     handle     TEXT PRIMARY KEY,   -- lowercase, no leading @

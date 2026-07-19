@@ -175,7 +175,8 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     for table in ("source_items", "relationships", "messages", "engagement",
                   "posts", "surfaces", "persona_embeddings", "specialists",
                   "biometric_context", "grants", "tasks", "finetune_runs",
-                  "marketplace", "handles", "beacons"):
+                  "marketplace", "handles", "beacons", "creative_works",
+                  "perceptions"):
         deleted[table] = conn.execute(
             f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)).rowcount
     deleted["profile"] = conn.execute(
