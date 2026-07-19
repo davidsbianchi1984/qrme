@@ -14,8 +14,8 @@ from ..common import (
     relationship as get_relationship, source_items,
 )
 from ..models import (
-    ChatRequest, ChatResponse, ComposeRequest, ConverseRequest, EngagementOut,
-    Feedback, InteractorCreate, MessageOut, RelationshipSet,
+    ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
+    InteractorCreate, MessageOut, RelationshipSet,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -260,7 +260,7 @@ def list_posts(profile_id: str) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-# -- Companion features: proactive check-ins, transparency, AI–AI dialogue ---
+# -- Companion features: proactive check-ins and transparency ----------------
 
 @router.post("/profiles/{profile_id}/proactive/{interactor_id}")
 def proactive_checkin(profile_id: str, interactor_id: str,
@@ -322,18 +322,6 @@ def transparency(profile_id: str) -> dict:
         "policy": "the profile acknowledges its other relationships "
                   "truthfully whenever asked",
     }
-
-
-@router.post("/profiles/{profile_id}/converse", status_code=201)
-def converse(profile_id: str, body: ConverseRequest, request: Request) -> dict:
-    """Two synthetic profiles in a moderated exchange."""
-    profile_a = profile_or_404(profile_id)
-    profile_b = profile_or_404(body.other_profile_id)
-    for p in (profile_a, profile_b):
-        if p["status"] == "departed":
-            raise HTTPException(410, f"profile {p['id']} has departed")
-    return companion.converse(profile_a, profile_b, body.topic, body.turns,
-                              cloud=request.app.state.cloud)
 
 
 # -- Engagement signals & feedback (PRD 6.3) ---------------------------------
