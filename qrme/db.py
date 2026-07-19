@@ -58,6 +58,71 @@ CREATE TABLE IF NOT EXISTS surfaces (
     PRIMARY KEY (profile_id, surface)
 );
 
+-- Latent persona embeddings (claim 21): a persistent, per-(profile,
+-- interactor) state vector updated after every interaction to carry
+-- cross-session state into inference conditioning.
+CREATE TABLE IF NOT EXISTS persona_embeddings (
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    vector        TEXT NOT NULL,   -- JSON list of named latent dimensions
+    version       INTEGER NOT NULL DEFAULT 1,
+    updated_at    TEXT NOT NULL,
+    PRIMARY KEY (profile_id, interactor_id)
+);
+
+-- Domain-specialized synthetic agents (claim 24): the profile can hand a
+-- conversation to a specialist profile when monitoring signals call for it.
+CREATE TABLE IF NOT EXISTS specialists (
+    profile_id            TEXT NOT NULL REFERENCES profiles(id),
+    domain                TEXT NOT NULL,   -- mental_health | medical | finance | …
+    specialist_profile_id TEXT NOT NULL REFERENCES profiles(id),
+    created_at            TEXT NOT NULL,
+    PRIMARY KEY (profile_id, domain)
+);
+
+-- Real-time biometric context received during interactions (claim 23).
+CREATE TABLE IF NOT EXISTS biometric_context (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    data          TEXT NOT NULL,   -- JSON signal payload
+    created_at    TEXT NOT NULL
+);
+
+-- Revocable access grants (claim 25): scoped tokens a profile uses to read
+-- vaulted data during a task, without retaining the raw data.
+CREATE TABLE IF NOT EXISTS grants (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    scope      TEXT NOT NULL,      -- JSON list of source-item ids ("*" = all)
+    token      TEXT NOT NULL,
+    revoked    INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+
+-- Autonomous multi-step tasks (claim 25). Step log keeps summaries and
+-- references only — never the raw vaulted data.
+CREATE TABLE IF NOT EXISTS tasks (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    kind        TEXT NOT NULL,
+    grant_id    TEXT,
+    status      TEXT NOT NULL,     -- completed | failed
+    steps       TEXT NOT NULL,     -- JSON step log (summaries only)
+    output      TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- Offline fine-tuning runs (claim 26): local-only adaptation passes whose
+-- artifacts are sealed (PDI vault when configured); nothing leaves the host.
+CREATE TABLE IF NOT EXISTS finetune_runs (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    metrics     TEXT NOT NULL,     -- JSON: messages processed, engagement stats
+    vault_key   TEXT,              -- adaptation artifact location when sealed
+    created_at  TEXT NOT NULL
+);
+
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
 CREATE TABLE IF NOT EXISTS posts (

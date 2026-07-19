@@ -8,13 +8,14 @@ from datetime import date, datetime
 
 from fastapi import FastAPI, HTTPException
 
-from . import db, engagement, llm, moderation, persona
+from . import adaptation, db, engagement, llm, moderation, persona, tasks
 from .models import (
     ChatRequest,
     ChatResponse,
     ComposeRequest,
     EngagementOut,
     Feedback,
+    GrantCreate,
     InteractorCreate,
     MessageOut,
     ProfileCreate,
@@ -22,9 +23,27 @@ from .models import (
     ProfileUpdate,
     RelationshipSet,
     SourceAdd,
+    SpecialistSet,
     SurfacesSet,
+    TaskRun,
 )
 from .pdi_client import PDIClient
+
+# Claim 24: map monitoring signals to the specialist domain they call for.
+def _biometric_domain(biometrics: dict) -> str | None:
+    condition = (biometrics.get("condition") or "").lower()
+    if condition in ("anxiety", "depression", "stress", "phobia"):
+        return "mental_health"
+    if condition in ("physical_distress", "physical_injury"):
+        return "medical"
+    if condition == "financial_stress":
+        return "finance"
+    try:
+        if float(biometrics.get("stress_level") or 0) >= 0.7:
+            return "mental_health"
+    except (TypeError, ValueError):
+        pass
+    return None
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
 
@@ -223,12 +242,16 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
         vaulted = [r["pdi_key"] for r in conn.execute(
             "SELECT pdi_key FROM source_items WHERE profile_id=?"
             " AND pdi_key IS NOT NULL", (profile_id,)).fetchall()]
+        vaulted += [r["vault_key"] for r in conn.execute(
+            "SELECT vault_key FROM finetune_runs WHERE profile_id=?"
+            " AND vault_key IS NOT NULL", (profile_id,)).fetchall()]
         if vaulted:
             deleted["pdi_records"] = sum(
                 1 for key in vaulted
                 if app.state.pdi is not None and app.state.pdi.delete(key))
         for table in ("source_items", "relationships", "messages", "engagement",
-                      "posts", "surfaces"):
+                      "posts", "surfaces", "persona_embeddings", "specialists",
+                      "biometric_context", "grants", "tasks", "finetune_runs"):
             deleted[table] = conn.execute(
                 f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)
             ).rowcount
@@ -379,6 +402,30 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
         )
         relationship = _relationship(profile_id, body.interactor_id)
 
+        # Real-time biometric context (claim 23) + specialist switch (claim 24).
+        handoff = None
+        speaking_profile = profile
+        if body.biometrics:
+            conn.execute(
+                "INSERT INTO biometric_context (id, profile_id, interactor_id,"
+                " data, created_at) VALUES (?,?,?,?,?)",
+                (db.new_id("bio"), profile_id, body.interactor_id,
+                 json.dumps(body.biometrics), db.utcnow()),
+            )
+            conn.commit()
+            domain = _biometric_domain(body.biometrics)
+            if domain:
+                spec = conn.execute(
+                    "SELECT specialist_profile_id FROM specialists"
+                    " WHERE profile_id=? AND domain=?",
+                    (profile_id, domain)).fetchone()
+                if spec:
+                    speaking_profile = _profile_or_404(
+                        spec["specialist_profile_id"])
+                    handoff = {"domain": domain,
+                               "specialist_profile_id": speaking_profile["id"],
+                               "reason": "real-time monitoring signals"}
+
         # Persistent memory: prior turns with this interactor (PRD 6.4).
         history = conn.execute(
             "SELECT role, content FROM messages"
@@ -395,8 +442,17 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
         ]
 
         system = persona.build_system_prompt(
-            profile, relationship, engagement_state,
-            sources=_source_items(profile_id))
+            speaking_profile, relationship if handoff is None else None,
+            engagement_state, sources=_source_items(speaking_profile["id"]))
+        # Attention conditioning from the latent embedding (claims 21/22).
+        attention = adaptation.attention_prompt(
+            adaptation.get(profile_id, body.interactor_id))
+        if attention:
+            system += "\n\n" + attention
+        if body.biometrics:
+            system += ("\n\nCurrent situation from real-time monitoring: "
+                       + json.dumps(body.biometrics, sort_keys=True)
+                       + ". Respond with appropriate care.")
         reply = llm.get_provider().generate(system, llm_messages)
 
         verdict = moderation.review(reply, relationship, interactor,
@@ -432,10 +488,17 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
                 (interactor_msg_id, profile_msg_id),
             )
         }
+        # Persist cross-session state: update the latent embedding (claim 21).
+        adaptation.update(profile_id, body.interactor_id, body.message,
+                          relationship, engagement.get(
+                              profile_id, body.interactor_id),
+                          biometrics=body.biometrics)
+
         return ChatResponse(
             interactor_message=_message_out(rows[interactor_msg_id]),
             profile_message=_message_out(rows[profile_msg_id]),
             modality=_modality_descriptor(profile_id, body.modality),
+            handoff=handoff,
         )
 
     def _modality_descriptor(profile_id: str, modality: str) -> dict | None:
@@ -453,6 +516,76 @@ def create_app(pdi_client: PDIClient | None = None) -> FastAPI:
             return {"type": "voice", "basis": basis}
         return {"type": modality,
                 "basis": f"{modality} treatment generated in persona style"}
+
+    # -- Latent persona embeddings (claims 21/22) ---------------------------
+
+    @app.get("/profiles/{profile_id}/embedding/{interactor_id}")
+    def get_embedding(profile_id: str, interactor_id: str) -> dict:
+        _profile_or_404(profile_id)
+        embedding = adaptation.get(profile_id, interactor_id)
+        if embedding is None:
+            raise HTTPException(404, "no embedding yet — interact first")
+        return embedding
+
+    # -- Domain specialists (claim 24) --------------------------------------
+
+    @app.put("/profiles/{profile_id}/specialists")
+    def set_specialist(profile_id: str, body: SpecialistSet) -> dict:
+        _profile_or_404(profile_id)
+        _profile_or_404(body.specialist_profile_id)
+        conn = db.connect()
+        conn.execute(
+            "INSERT INTO specialists (profile_id, domain,"
+            " specialist_profile_id, created_at) VALUES (?,?,?,?)"
+            " ON CONFLICT (profile_id, domain) DO UPDATE SET"
+            " specialist_profile_id=excluded.specialist_profile_id",
+            (profile_id, body.domain, body.specialist_profile_id, db.utcnow()),
+        )
+        conn.commit()
+        return {"profile_id": profile_id, "domain": body.domain,
+                "specialist_profile_id": body.specialist_profile_id}
+
+    @app.get("/profiles/{profile_id}/specialists")
+    def get_specialists(profile_id: str) -> list[dict]:
+        _profile_or_404(profile_id)
+        rows = db.connect().execute(
+            "SELECT domain, specialist_profile_id FROM specialists"
+            " WHERE profile_id=?", (profile_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    # -- Revocable grants & autonomous tasks (claim 25) ---------------------
+
+    @app.post("/profiles/{profile_id}/grants", status_code=201)
+    def create_grant(profile_id: str, body: GrantCreate) -> dict:
+        _profile_or_404(profile_id)
+        return tasks.create_grant(profile_id, body.scope)
+
+    @app.delete("/grants/{grant_id}")
+    def revoke_grant(grant_id: str) -> dict:
+        if not tasks.revoke_grant(grant_id):
+            raise HTTPException(404, "grant not found")
+        return {"id": grant_id, "revoked": True}
+
+    @app.post("/profiles/{profile_id}/tasks", status_code=201)
+    def run_task(profile_id: str, body: TaskRun) -> dict:
+        profile = _profile_or_404(profile_id)
+        result = tasks.run(profile, body.kind, body.topic, body.grant_token,
+                           pdi=app.state.pdi)
+        if result["status"] == "failed" and "grant" in result.get("reason", ""):
+            raise HTTPException(403, result["reason"])
+        return result
+
+    @app.get("/profiles/{profile_id}/tasks")
+    def list_tasks(profile_id: str) -> list[dict]:
+        _profile_or_404(profile_id)
+        return tasks.list_tasks(profile_id)
+
+    # -- Offline fine-tuning (claim 26) -------------------------------------
+
+    @app.post("/profiles/{profile_id}/finetune", status_code=201)
+    def finetune(profile_id: str) -> dict:
+        _profile_or_404(profile_id)
+        return adaptation.finetune(profile_id, pdi=app.state.pdi)
 
     # -- Compose: posting in the profile's voice, at scale ------------------
 
