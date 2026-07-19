@@ -111,6 +111,29 @@ class ChatRequest(BaseModel):
     message: str
     modality: Modality = "text"        # requested output modality
     surface: str | None = None         # which registered surface this is from
+    # Real-time biometric monitoring context (claim 23): e.g. stress_level
+    # (0..1), heart_rate, condition — typically supplied by JIM-mini.
+    biometrics: dict | None = None
+
+
+class SpecialistSet(BaseModel):
+    domain: str                        # mental_health | medical | finance | …
+    specialist_profile_id: str
+
+
+class MarketplaceList(BaseModel):
+    tags: list[str] = Field(default_factory=list)
+    blurb: str | None = None
+
+
+class GrantCreate(BaseModel):
+    scope: list[str] | None = None     # source-item ids; None = all sources
+
+
+class TaskRun(BaseModel):
+    kind: str = "compose_from_sources"
+    topic: str
+    grant_token: str
 
 
 class SourceAdd(BaseModel):
@@ -143,6 +166,9 @@ class ChatResponse(BaseModel):
     # Multi-modal output descriptor: how the reply renders beyond text
     # (voice basis, image/video treatment). None for plain text.
     modality: dict | None = None
+    # Set when biometric signals routed the reply to a domain specialist
+    # (claim 24): {domain, specialist_profile_id, reason}.
+    handoff: dict | None = None
 
 
 class Feedback(BaseModel):
