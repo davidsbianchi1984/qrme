@@ -59,6 +59,20 @@ in a request body.
   as open as scanning a QR code in the world.
 - Deleting a profile revokes its owner token.
 
+## Objection, takedown & lifecycle states
+
+A real person (or their estate) can contest a profile that represents them —
+`qrme/routers/governance.py`, spec in [docs/design/lifecycle-and-consent.md](docs/design/lifecycle-and-consent.md).
+
+| Endpoint | Who | Effect |
+|---|---|---|
+| `POST /objections` | anyone (proof-of-identity ref) | Opens a case; the profile moves to **restricted** — hidden from the marketplace, un-chattable via summon, and closed to new interactors (an existing relationship may continue) |
+| `POST /profiles/{id}/objections/{obj}/attest` | owner | Re-attest the rights basis within the review window |
+| `POST /objections/{obj}/resolve` | reviewer (`QRME_ADMIN_TOKEN`) | `uphold` → **terminated** (content erased, tombstone left, chat 410); `dismiss` → back to **active** |
+| `POST /objections/{obj}/withdraw` | subject | A `subject_consent` subject withdraws consent — forces **termination**, honored even mid-review |
+
+Profile lifecycle: **active** → `restricted` (objection pending) → `terminated` (erased) or back to active; and **active** → `departed` (memorial, via `/sunset`). `GET /profiles/{id}` reports the current `status`.
+
 ## Companion features
 
 An ambient-companion model, with an explicit consent boundary on each

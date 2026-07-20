@@ -189,7 +189,7 @@ def delete_profile(profile_id: str, request: Request) -> dict:
                   "posts", "surfaces", "persona_embeddings", "specialists",
                   "biometric_context", "grants", "tasks", "finetune_runs",
                   "marketplace", "handles", "beacons", "creative_works",
-                  "perceptions", "active_handoffs", "workflows"):
+                  "perceptions", "active_handoffs", "workflows", "objections"):
         deleted[table] = conn.execute(
             f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)).rowcount
     # Also drop any conversation that had handed off *to* this profile.
@@ -295,6 +295,7 @@ def browse_marketplace(tag: str | None = None) -> list[dict]:
     rows = conn.execute(
         "SELECT m.profile_id, m.tags, m.blurb, p.display_name, p.purpose,"
         " p.anonymous FROM marketplace m JOIN profiles p ON p.id=m.profile_id"
+        " WHERE p.status='active'"        # restricted/terminated stay hidden
         " ORDER BY m.listed_at DESC").fetchall()
     cards = []
     for row in rows:

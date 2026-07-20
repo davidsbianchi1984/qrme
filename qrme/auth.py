@@ -22,6 +22,7 @@ by design, the same way scanning a QR code in the world is.
 from __future__ import annotations
 
 import hashlib
+import os
 import secrets
 
 from fastapi import HTTPException, Request
@@ -76,6 +77,21 @@ def require(request: Request, role: str, subject_id: str) -> None:
         raise HTTPException(401, "authentication required")
     if who["role"] != role or who["subject_id"] != subject_id:
         raise HTTPException(403, "not authorized for this resource")
+
+
+def require_reviewer(request: Request) -> None:
+    """Guard the objection-review path. A dedicated reviewer role sits outside
+    profile ownership (an owner must not adjudicate an objection against their
+    own profile); it is held via ``QRME_ADMIN_TOKEN``. Unset = development mode
+    (open, for local use only), matching PDI's admin convention."""
+    required = os.environ.get("QRME_ADMIN_TOKEN")
+    if not required:
+        return
+    token = bearer(request)
+    if not token:
+        raise HTTPException(401, "reviewer token required")
+    if not secrets.compare_digest(token, required):
+        raise HTTPException(403, "invalid reviewer token")
 
 
 def revoke_subject(subject_id: str) -> None:

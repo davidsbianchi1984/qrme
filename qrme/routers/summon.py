@@ -32,9 +32,20 @@ def _public_base() -> str:
     return os.environ.get("QRME_PUBLIC_URL", "https://qrme.app").rstrip("/")
 
 
+_STATUS_NOTE = {
+    "departed": "this profile has departed; its memory remains with those "
+                "who knew it",
+    "restricted": "this profile is restricted pending an objection review",
+    "terminated": "this profile has been terminated",
+}
+
+
 def _card(profile: dict, handle: str | None = None) -> dict:
     """Public summon card — never persona internals."""
-    departed = profile["status"] == "departed"
+    # Only an active profile is chat-reachable from a public summon; a
+    # restricted profile's public surfaces are off, and departed/terminated
+    # profiles never chat.
+    reachable = profile["status"] == "active"
     return {
         "profile_id": profile["id"],
         "display_name": ("anonymous persona" if profile["anonymous"]
@@ -42,10 +53,8 @@ def _card(profile: dict, handle: str | None = None) -> dict:
         "handle": f"@{handle}" if handle else _handle_of(profile["id"]),
         "purpose": profile["purpose"],
         "status": profile["status"],
-        "chat": (None if departed
-                 else f"/profiles/{profile['id']}/chat"),
-        "note": ("this profile has departed; its memory remains with those "
-                 "who knew it" if departed else None),
+        "chat": (f"/profiles/{profile['id']}/chat" if reachable else None),
+        "note": _STATUS_NOTE.get(profile["status"]),
     }
 
 

@@ -96,6 +96,7 @@ class ProfileOut(BaseModel):
     purpose: Purpose | None
     maturity: Maturity
     cloud_contribution: bool
+    status: str                        # active | restricted | departed | terminated
     created_at: str
 
 
@@ -273,6 +274,16 @@ class WorkflowCreate(BaseModel):
 
 class WorkflowResume(BaseModel):
     input: str                         # the awaited external confirmation
+
+
+class ObjectionOpen(BaseModel):
+    profile_id: str
+    objector_ref: str                  # out-of-band proof-of-identity reference
+    reason: str | None = None
+
+
+class ObjectionResolve(BaseModel):
+    outcome: str                       # uphold | dismiss
 
 
 class SourceAdd(BaseModel):

@@ -18,19 +18,23 @@ otherwise (422). The record captures a `basis` and an `attestor`:
 | `estate_authorization` | a deceased person, authorized by their estate/next of kin |
 | `public_figure_commentary` | a public figure, for commentary/parody within rights limits |
 
-**Objection & takedown flow** **[planned]**: a real person (or their estate)
-can object to a profile that represents them.
+**Objection & takedown flow** **[implemented]** (`qrme/routers/governance.py`):
+a real person (or their estate) can object to a profile that represents them.
 
-1. `POST /objections` with proof-of-identity reference opens a case against a
-   profile; the profile is immediately moved to `restricted` (no public
-   surfaces, no new interactors) pending review.
-2. The owner is notified and must re-attest their `basis` within a window.
-3. Resolution: if the basis fails (consent withdrawn, no estate authority,
-   outside public-figure limits) the profile is **terminated** (see below);
-   if it holds (valid public-figure commentary), it returns to active with
+1. `POST /objections` with a proof-of-identity reference opens a case against a
+   profile (public — the objecting party needs no account); the profile is
+   immediately moved to `restricted` (no public surfaces, no new interactors)
+   pending review.
+2. The owner re-attests their `basis` within the window
+   (`POST /profiles/{id}/objections/{obj}/attest`, owner-gated).
+3. Resolution by a **reviewer** (`POST /objections/{obj}/resolve`, guarded by
+   `QRME_ADMIN_TOKEN` so an owner can't adjudicate their own case): `uphold`
+   **terminates** the profile (see below); `dismiss` returns it to active with
    the objection recorded.
 4. Consent is **revocable**: a `subject_consent` subject can withdraw at any
-   time, which forces termination. Withdrawal is honored even mid-review.
+   time (`POST /objections/{obj}/withdraw`), which forces termination.
+   Withdrawal is honored even mid-review; it is refused for non-subject-consent
+   bases (estate/public-figure go through review).
 
 ## Ownership succession **[implemented + planned]**
 
@@ -44,7 +48,7 @@ original owner dies or is incapacitated:
 - If no successor is named, the profile auto-transitions to **memorial**
   state on a confirmed owner-death signal, frozen rather than orphaned.
 
-## Lifecycle states **[implemented: active/departed; planned: the rest]**
+## Lifecycle states **[implemented: active/restricted/departed/terminated]**
 
 ```
    active ──sunset──▶ departed (memorial)
@@ -61,11 +65,13 @@ original owner dies or is incapacitated:
   memorial state — what stays locked: no new turns, no new relationships, no
   surface changes; what stays open: viewing and exporting memory, beacon
   resolution as a memorial. **[implemented]**
-- **restricted** — objection pending; public surfaces off, no new interactors.
-  **[planned]**
-- **terminated** — `DELETE /profiles/{id}`: erases everything including
-  vaulted records. Distinct from memorial: termination destroys, memorial
-  preserves. **[implemented for the delete; the state label is planned]**
+- **restricted** — objection pending; public surfaces off (hidden from
+  marketplace and un-chattable via summon), no new interactors (only an
+  existing relationship may continue). **[implemented]**
+- **terminated** — content erased with a tombstone left, chat returns 410, not
+  discoverable; reached via an upheld objection or a consent withdrawal, and
+  the owner's `DELETE /profiles/{id}` still removes the row entirely. Distinct
+  from memorial: termination destroys, memorial preserves. **[implemented]**
 
 **Memorial vs. termination decision**: an owner (or successor) chooses at
 end-of-life — sunset to memorial (family keeps the voice) or delete to
