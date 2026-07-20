@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS profiles (
     consent_basis     TEXT,                   -- required when kind=other_person
     consent_attestor  TEXT,
     successor_owner   TEXT,                   -- legacy succession
+    licensed_from     TEXT,                   -- source profile a licensed
+                                              -- specialist agent was derived from
     purpose           TEXT,                   -- legacy_memorial | family | creator_persona
                                               -- | social_fan | companion_coach | enterprise_agent
     maturity          TEXT NOT NULL DEFAULT 'balanced',  -- strict | balanced | open
@@ -294,6 +296,32 @@ CREATE TABLE IF NOT EXISTS tasks (
     steps       TEXT NOT NULL,     -- JSON step log (summaries only)
     output      TEXT,
     created_at  TEXT NOT NULL
+);
+
+-- Training-data licensing: an owner offers their profile's expertise for
+-- license (consult / fine-tune / clone), optionally allowing buyers to derive
+-- their own specialist agent from it. One active offer per profile.
+CREATE TABLE IF NOT EXISTS license_offers (
+    profile_id        TEXT PRIMARY KEY REFERENCES profiles(id),
+    kind              TEXT NOT NULL,          -- consult | finetune | clone
+    price             REAL NOT NULL DEFAULT 0,
+    currency          TEXT NOT NULL DEFAULT 'USD',
+    terms             TEXT,
+    allow_derivatives INTEGER NOT NULL DEFAULT 0,  -- buyer may derive an agent
+    created_at        TEXT NOT NULL
+);
+
+-- A license a buyer holds against a source profile. The token authorizes
+-- licensed use; deriving a specialist agent records the child profile here.
+CREATE TABLE IF NOT EXISTS license_grants (
+    id                 TEXT PRIMARY KEY,
+    profile_id         TEXT NOT NULL REFERENCES profiles(id),   -- licensed source
+    buyer_id           TEXT NOT NULL REFERENCES interactors(id),
+    kind               TEXT NOT NULL,
+    token              TEXT NOT NULL,
+    derived_profile_id TEXT,                  -- set when an agent is derived
+    revoked            INTEGER NOT NULL DEFAULT 0,
+    created_at         TEXT NOT NULL
 );
 
 -- AI Profile Marketplace: owner-listed profiles discoverable by others.

@@ -180,6 +180,7 @@ def profile_out(row: dict) -> ProfileOut:
         maturity=row["maturity"],
         cloud_contribution=bool(row["cloud_contribution"]),
         status=row["status"],
+        licensed_from=row["licensed_from"],
         created_at=row["created_at"],
     )
 
