@@ -237,6 +237,20 @@ CREATE TABLE IF NOT EXISTS specialists (
     PRIMARY KEY (profile_id, domain)
 );
 
+-- Active in-conversation specialist handoff (claim 24, sustained): once
+-- real-time monitoring routes a conversation to a domain specialist, the
+-- handoff persists across turns — even turns that carry no biometrics — until
+-- monitoring shows recovery, so the switch is a real hand-to-hand within one
+-- conversation rather than a single-message detour.
+CREATE TABLE IF NOT EXISTS active_handoffs (
+    profile_id            TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id         TEXT NOT NULL REFERENCES interactors(id),
+    domain                TEXT NOT NULL,
+    specialist_profile_id TEXT NOT NULL REFERENCES profiles(id),
+    since                 TEXT NOT NULL,
+    PRIMARY KEY (profile_id, interactor_id)
+);
+
 -- Real-time biometric context received during interactions (claim 23).
 CREATE TABLE IF NOT EXISTS biometric_context (
     id            TEXT PRIMARY KEY,

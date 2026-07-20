@@ -76,8 +76,26 @@ def test_specialist_switch_on_biometrics(client):
         "biometrics": {"stress_level": 0.9, "condition": "anxiety"}}).json()
     assert stressed["handoff"] == {
         "domain": "mental_health", "specialist_profile_id": calm["id"],
-        "reason": "real-time monitoring signals"}
+        "reason": "real-time monitoring signals", "state": "engaged"}
     assert stressed["profile_message"]["status"] == "approved"
+
+    # The handoff is sustained: a follow-up turn with NO biometrics still
+    # routes to the specialist rather than snapping back to the profile.
+    still = client.post(f"/profiles/{p['id']}/chat", json={
+        "interactor_id": user, "message": "what should I do?"}).json()
+    assert still["handoff"]["state"] == "sustained"
+    assert still["handoff"]["specialist_profile_id"] == calm["id"]
+
+    # Recovery signals hand control back to the primary profile.
+    recovered = client.post(f"/profiles/{p['id']}/chat", json={
+        "interactor_id": user, "message": "feeling better now",
+        "biometrics": {"stress_level": 0.1}}).json()
+    assert recovered["handoff"]["state"] == "returned"
+
+    # And subsequent calm turns speak as the profile again (no handoff).
+    back = client.post(f"/profiles/{p['id']}/chat", json={
+        "interactor_id": user, "message": "thanks"}).json()
+    assert back["handoff"] is None
 
 
 def test_tasks_run_under_revocable_grant(pdi_pair):
