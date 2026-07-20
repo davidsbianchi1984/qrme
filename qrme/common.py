@@ -151,6 +151,25 @@ def clear_awaiting_reply(profile_id: str, interactor_id: str) -> None:
     conn.commit()
 
 
+def anonymized_exchange(profile: dict, profile_id: str,
+                        interactor_id: str) -> list[dict] | None:
+    """The last approved exchange with all identifying strings stripped —
+    ids never included; the persona's display name replaced throughout. This is
+    exactly (and only) what a cloud contribution contains."""
+    rows = db.connect().execute(
+        "SELECT role, content FROM messages WHERE profile_id=?"
+        " AND interactor_id=? AND status='approved'"
+        " ORDER BY created_at DESC, rowid DESC LIMIT 2",
+        (profile_id, interactor_id)).fetchall()
+    if len(rows) < 2:
+        return None
+    exchange = []
+    for row in reversed(rows):
+        content = row["content"].replace(profile["display_name"], "PERSONA")
+        exchange.append({"role": row["role"], "content": content})
+    return exchange
+
+
 def relationship(profile_id: str, interactor_id: str) -> dict | None:
     row = db.connect().execute(
         "SELECT * FROM relationships WHERE profile_id=? AND interactor_id=?",

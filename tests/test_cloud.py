@@ -27,6 +27,11 @@ class FakeCloudHttp:
         if path == "/v1/contributions":
             self.contributions.append(json)
             return _Resp(202, {"accepted": True})
+        if path == "/v1/contributions/revoke":
+            refs = set(json["refs"])
+            self.contributions = [c for c in self.contributions
+                                  if c.get("ref") not in refs]
+            return _Resp(200, {"deleted": True})
         return _Resp(404, {})
 
     def get(self, path, headers=None):

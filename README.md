@@ -130,6 +130,17 @@ profiles that opt in (`cloud_contribution`) contribute positively-rated,
 display names replaced, revocable anytime. `GET /cloud/status` reports the
 tier. Contributions land in PDI's encrypted, audited intake.
 
+The loop is fully transparent to the owner:
+
+- `GET /profiles/{id}/cloud-contribution` — a dry-run **preview of exactly
+  what the next contribution would contain** (nothing is sent), the policy,
+  and a verbatim log of everything that has ever left.
+- Each item carries a random `ref` — the gateway never sees profile ids, and
+  only QRME's local log maps the ref back — so items stay anonymous at the
+  gateway yet remain individually deletable.
+- `POST /profiles/{id}/cloud-contribution/revoke` — turns contribution off
+  **and** deletes everything already contributed at the gateway by those refs.
+
 ## Claims 21–26 (`qrme/adaptation.py`, `qrme/tasks.py`)
 
 | Claim | Implementation |

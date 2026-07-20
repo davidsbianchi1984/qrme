@@ -10,11 +10,12 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import adaptation, auth, companion, db, engagement, llm, moderation, persona
 from ..common import (
-    age_of, biometric_domain, biometrics_recovered, clear_active_handoff,
-    clear_awaiting_reply, get_active_handoff, interactor_or_404, message_out,
-    proactive_gate, profile_or_404, record_proactive_outreach,
-    relationship as get_relationship, require_interactor, require_owner,
-    require_owner_or_interactor, set_active_handoff, source_items,
+    age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
+    clear_active_handoff, clear_awaiting_reply, get_active_handoff,
+    interactor_or_404, message_out, proactive_gate, profile_or_404,
+    record_proactive_outreach, relationship as get_relationship,
+    require_interactor, require_owner, require_owner_or_interactor,
+    set_active_handoff, source_items,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
@@ -396,24 +397,6 @@ def transparency(profile_id: str) -> dict:
 
 # -- Engagement signals & feedback (PRD 6.3) ---------------------------------
 
-def _anonymized_exchange(profile: dict, profile_id: str,
-                         interactor_id: str) -> list[dict] | None:
-    """The last approved exchange with all identifying strings stripped —
-    ids never included; the persona's display name replaced throughout."""
-    rows = db.connect().execute(
-        "SELECT role, content FROM messages WHERE profile_id=?"
-        " AND interactor_id=? AND status='approved'"
-        " ORDER BY created_at DESC, rowid DESC LIMIT 2",
-        (profile_id, interactor_id)).fetchall()
-    if len(rows) < 2:
-        return None
-    exchange = []
-    for row in reversed(rows):
-        content = row["content"].replace(profile["display_name"], "PERSONA")
-        exchange.append({"role": row["role"], "content": content})
-    return exchange
-
-
 @router.post("/profiles/{profile_id}/interactions/{interactor_id}/feedback")
 def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
                   request: Request) -> dict:
@@ -422,20 +405,33 @@ def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
     result = engagement.record_feedback(profile_id, interactor_id, body.rating)
 
     # Opt-in cloud contribution: positively-rated exchanges, anonymized,
-    # improve the shared cloud model (see docs/cloud-model.md).
+    # improve the shared cloud model (see docs/cloud-model.md). The random
+    # ref keeps the item deletable on revocation without identifying anyone
+    # at the gateway; the exact payload is logged locally so the owner can
+    # always see precisely what left.
     cloud = request.app.state.cloud
     result["contributed"] = False
     if (body.rating == "up" and profile["cloud_contribution"]
             and cloud is not None):
-        exchange = _anonymized_exchange(profile, profile_id, interactor_id)
+        exchange = anonymized_exchange(profile, profile_id, interactor_id)
         if exchange:
-            result["contributed"] = cloud.contribute({
+            ref = db.new_id("ctb")
+            payload = {
+                "ref": ref,
                 "source": "qrme",
                 "kind": "rated_exchange",
                 "quality": "positive",
                 "purpose": profile["purpose"],
                 "exchange": exchange,
-            })
+            }
+            result["contributed"] = cloud.contribute(payload)
+            if result["contributed"]:
+                conn = db.connect()
+                conn.execute(
+                    "INSERT INTO contribution_log (ref, profile_id, payload,"
+                    " contributed_at) VALUES (?,?,?,?)",
+                    (ref, profile_id, json.dumps(payload), db.utcnow()))
+                conn.commit()
     return result
 
 

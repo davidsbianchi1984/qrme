@@ -324,6 +324,18 @@ CREATE TABLE IF NOT EXISTS license_grants (
     created_at         TEXT NOT NULL
 );
 
+-- Local log of every cloud contribution: exactly what left, when, under which
+-- opaque ref. The gateway never sees profile ids — the ref is random, and only
+-- this table maps it back — so contributions stay anonymous at the gateway
+-- while remaining individually deletable on revocation.
+CREATE TABLE IF NOT EXISTS contribution_log (
+    ref            TEXT PRIMARY KEY,   -- opaque id sent with the payload
+    profile_id     TEXT NOT NULL REFERENCES profiles(id),
+    payload        TEXT NOT NULL,      -- the exact JSON that was sent
+    revoked        INTEGER NOT NULL DEFAULT 0,
+    contributed_at TEXT NOT NULL
+);
+
 -- AI Profile Marketplace: owner-listed profiles discoverable by others.
 CREATE TABLE IF NOT EXISTS marketplace (
     profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
