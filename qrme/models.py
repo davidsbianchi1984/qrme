@@ -295,6 +295,12 @@ class ObjectionResolve(BaseModel):
     outcome: str                       # uphold | dismiss
 
 
+class SucceedRequest(BaseModel):
+    # Out-of-band verification reference (death certificate / power of
+    # attorney) reviewed before ownership passes.
+    verification_ref: str
+
+
 class LicenseOffer(BaseModel):
     kind: str                          # consult | finetune | clone
     price: float = 0

@@ -13,7 +13,7 @@ from ..common import (
 )
 from ..models import (
     EmbodimentAdd, GenesisCreate, MarketplaceList, ProfileCreate, ProfileOut,
-    ProfileUpdate, SourceAdd, SurfacesSet,
+    ProfileUpdate, SourceAdd, SucceedRequest, SurfacesSet,
 )
 
 router = APIRouter()
@@ -144,6 +144,72 @@ def sunset_profile(profile_id: str, request: Request) -> dict:
         raise HTTPException(409, "profile has already departed")
     return companion.sunset(profile, pdi=request.app.state.pdi,
                             cloud=request.app.state.cloud)
+
+
+@router.post("/profiles/{profile_id}/succeed")
+def succeed_profile(profile_id: str, body: SucceedRequest,
+                    request: Request) -> dict:
+    """Ownership succession on a confirmed owner-death / incapacity signal.
+    Verified by a reviewer (the original owner may be unable to authorize, so
+    the owner token cannot be the gate): with a named ``successor_owner``,
+    control passes to them and a fresh owner token is minted; with none, the
+    profile sunsets to memorial — frozen rather than orphaned."""
+    profile = profile_or_404(profile_id)
+    auth.require_reviewer(request)
+    if profile["status"] in ("departed", "terminated"):
+        raise HTTPException(409, f"profile is already {profile['status']}")
+
+    conn = db.connect()
+    if not profile["successor_owner"]:
+        result = companion.sunset(profile, pdi=request.app.state.pdi,
+                                  cloud=request.app.state.cloud)
+        return {"succeeded": False, "memorial": True,
+                "verification_ref": body.verification_ref, **result}
+
+    conn.execute(
+        "UPDATE profiles SET owner_id=?, successor_owner=NULL WHERE id=?",
+        (profile["successor_owner"], profile_id))
+    conn.commit()
+    auth.revoke_subject(profile_id)            # the old owner token dies here
+    token = auth.issue("owner", profile_id)
+    return {"succeeded": True, "memorial": False,
+            "owner_id": profile["successor_owner"],
+            "verification_ref": body.verification_ref,
+            "owner_token": token}              # shown once, to the successor
+
+
+@router.get("/profiles/{profile_id}/memorial")
+def memorial_view(profile_id: str) -> dict:
+    """Public memorial for a departed profile — what the world may see: the
+    name, the purpose it served, its physical memorial anchors. Never persona
+    internals; memory stays with those who knew it."""
+    profile = profile_or_404(profile_id)
+    if profile["status"] != "departed":
+        raise HTTPException(
+            409, f"this profile is {profile['status']}, not a memorial")
+    conn = db.connect()
+    beacons = [{"label": r["label"], "location": r["location"],
+                "scans": r["scans"]}
+               for r in conn.execute(
+                   "SELECT label, location, scans FROM beacons"
+                   " WHERE profile_id=? AND active=1", (profile_id,)).fetchall()]
+    handle = conn.execute("SELECT handle FROM handles WHERE profile_id=?",
+                          (profile_id,)).fetchone()
+    farewells = conn.execute(
+        "SELECT COUNT(DISTINCT interactor_id) AS n FROM messages"
+        " WHERE profile_id=? AND role='profile'", (profile_id,)).fetchone()["n"]
+    return {
+        "profile_id": profile_id,
+        "display_name": ("anonymous persona" if profile["anonymous"]
+                         else profile["display_name"]),
+        "handle": f"@{handle['handle']}" if handle else None,
+        "purpose": profile["purpose"],
+        "status": "departed",
+        "memorial_anchors": beacons,
+        "relationships_touched": farewells,
+        "note": "this profile has departed; its memory remains with those "
+                "who knew it — viewing and export stay open to them",
+    }
 
 
 @router.patch("/profiles/{profile_id}", response_model=ProfileOut)
