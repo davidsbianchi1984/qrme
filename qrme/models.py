@@ -263,6 +263,18 @@ class TaskRun(BaseModel):
     grant_token: str
 
 
+class WorkflowCreate(BaseModel):
+    goal: str
+    # Ordered phase names from workflows.PHASES; omit for the default plan
+    # (research → draft → review → send → confirm).
+    plan: list[str] | None = None
+    grant_token: str | None = None     # scopes vault reads; revocable mid-run
+
+
+class WorkflowResume(BaseModel):
+    input: str                         # the awaited external confirmation
+
+
 class SourceAdd(BaseModel):
     kind: SourceKind
     title: str | None = None
