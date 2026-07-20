@@ -344,6 +344,22 @@ CREATE TABLE IF NOT EXISTS interactors (
     created_at   TEXT NOT NULL
 );
 
+-- Objections: a real person (or their estate) contesting a profile that
+-- represents them. Opening one moves the profile to 'restricted' (public
+-- surfaces off, no new interactors) pending review; resolution either
+-- terminates the profile or returns it to active. A subject_consent subject
+-- can withdraw consent at any time, which forces termination.
+CREATE TABLE IF NOT EXISTS objections (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    objector_ref TEXT NOT NULL,   -- out-of-band proof-of-identity reference
+    reason       TEXT,
+    status       TEXT NOT NULL DEFAULT 'open',  -- open | upheld | dismissed | withdrawn
+    reattested   INTEGER NOT NULL DEFAULT 0,    -- owner re-attested their basis
+    created_at   TEXT NOT NULL,
+    resolved_at  TEXT
+);
+
 -- Capability tokens. Owner control of a profile is proven by holding the
 -- profile's owner token (minted once at creation); interactor identity is
 -- proven by the interactor's own token. Only the SHA-256 hash is stored, so

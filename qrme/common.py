@@ -120,6 +120,7 @@ def profile_out(row: dict) -> ProfileOut:
         purpose=row["purpose"],
         maturity=row["maturity"],
         cloud_contribution=bool(row["cloud_contribution"]),
+        status=row["status"],
         created_at=row["created_at"],
     )
 

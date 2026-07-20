@@ -89,6 +89,15 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     if profile["status"] == "departed":
         raise HTTPException(
             410, "this profile has departed; its memory remains viewable")
+    if profile["status"] == "terminated":
+        raise HTTPException(410, "this profile has been terminated")
+    if profile["status"] == "restricted":
+        # Public surfaces are off and no *new* interactors may start; only
+        # someone with an existing relationship may continue.
+        if get_relationship(profile_id, body.interactor_id) is None:
+            raise HTTPException(
+                403, "this profile is restricted pending an objection review; "
+                     "it is not accepting new interactors")
 
     if body.surface:
         conn0 = db.connect()
