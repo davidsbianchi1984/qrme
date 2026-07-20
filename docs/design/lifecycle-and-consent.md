@@ -36,17 +36,23 @@ a real person (or their estate) can object to a profile that represents them.
    Withdrawal is honored even mid-review; it is refused for non-subject-consent
    bases (estate/public-figure go through review).
 
-## Ownership succession **[implemented + planned]**
+## Ownership succession **[implemented]**
 
-`successor_owner` is set at creation/update. **[implemented]** When the
-original owner dies or is incapacitated:
+`successor_owner` is set at creation/update. When the original owner dies or
+is incapacitated:
 
-- `POST /profiles/{id}/succeed` **[planned]** transfers ownership to the
-  named `successor_owner` after a verification step (death certificate /
-  power-of-attorney reference held out-of-band). Control (edit, moderation,
-  boundaries, termination) passes to the successor.
-- If no successor is named, the profile auto-transitions to **memorial**
-  state on a confirmed owner-death signal, frozen rather than orphaned.
+- `POST /profiles/{id}/succeed` transfers ownership to the named
+  `successor_owner` after a verification step (a death-certificate /
+  power-of-attorney reference reviewed out-of-band; the endpoint is
+  reviewer-gated via `QRME_ADMIN_TOKEN`, since the original owner may be
+  unable to authorize). The old owner token is revoked and a fresh one is
+  minted for the successor — control (edit, moderation, boundaries,
+  termination) passes with it.
+- If no successor is named, the profile sunsets to **memorial** on the
+  confirmed owner-death signal — farewells sent, frozen rather than orphaned.
+- `GET /profiles/{id}/memorial` (public) is the departed profile's memorial:
+  name, handle, purpose, physical memorial anchors (beacons), and how many
+  relationships it touched — never persona internals.
 
 ## Lifecycle states **[implemented: active/restricted/departed/terminated]**
 
