@@ -98,6 +98,7 @@ class ProfileOut(BaseModel):
     maturity: Maturity
     cloud_contribution: bool
     status: str                        # active | restricted | departed | terminated
+    licensed_from: str | None = None   # source profile if a licensed derivative
     created_at: str
 
 
@@ -292,6 +293,14 @@ class ObjectionOpen(BaseModel):
 
 class ObjectionResolve(BaseModel):
     outcome: str                       # uphold | dismiss
+
+
+class LicenseOffer(BaseModel):
+    kind: str                          # consult | finetune | clone
+    price: float = 0
+    currency: str = "USD"
+    terms: str | None = None
+    allow_derivatives: bool = False    # may a buyer derive their own agent
 
 
 class SourceAdd(BaseModel):

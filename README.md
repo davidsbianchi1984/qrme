@@ -36,6 +36,22 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | You own it / total control | `PATCH /profiles/{id}` (edit anytime), `GET /profiles/{id}/export` (full data export), `DELETE /profiles/{id}` (erases everything, including vaulted records) |
 | Encrypted at rest (PDI tandem) | With `QRME_PDI_URL` + `QRME_PDI_TOKEN` (or an injected client), source-material content is sealed in PDI's AES-256-GCM vault (`qrme/pdi_client.py`); QRME keeps only key references, resolves them on read, and purges the vault on delete |
 
+## Training-data licensing & derivable agents
+
+Owners can license a profile's expertise; buyers can acquire a license and — when
+the terms allow — **derive their own specialist agent** from it, with provenance
+(`qrme/routers/licensing.py`).
+
+| Endpoint | Who | Effect |
+|---|---|---|
+| `PUT`/`GET`/`DELETE /profiles/{id}/license` | owner / public / owner | Offer terms (`consult` \| `finetune` \| `clone`, price, `allow_derivatives`); `GET` is public so buyers see terms |
+| `POST /profiles/{id}/license/acquire` | buyer (interactor token) | Acquire a license → a revocable `lic_…` token |
+| `POST /profiles/{id}/license/{grant}/derive` | buyer | Derive a **new buyer-owned specialist agent** seeded from the source persona; requires `allow_derivatives`, a valid grant, and a verified-adult buyer. Records `licensed_from` provenance and returns the new profile's `owner_token` |
+| `GET /profiles/{id}/licenses` | owner | Who holds a license, and what they derived |
+| `DELETE /licenses/{grant}` | source owner | Revoke a license (blocks further derivation) |
+
+`consult` licenses forbid derivation; `finetune`/`clone` permit it. `GET /profiles/{id}` reports `licensed_from` on a derived agent.
+
 ## Authentication & access control
 
 Identity is proven by a bearer **capability token**, never by asserting an id

@@ -20,7 +20,7 @@ from . import offline
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (assistant, community, connections, governance,
-                      intelligence, interaction, profiles, summon)
+                      intelligence, interaction, licensing, profiles, summon)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -52,6 +52,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(community.router)
     app.include_router(assistant.router)
     app.include_router(governance.router)
+    app.include_router(licensing.router)
     return app
 
 
