@@ -292,6 +292,28 @@ CREATE TABLE IF NOT EXISTS marketplace (
     listed_at  TEXT NOT NULL
 );
 
+-- Autonomous multi-step workflows (claim 25, extended): a named plan of
+-- phases (research → draft → review → send → confirm) executed one at a time.
+-- Each phase's output is carried forward as working memory into the next, so
+-- the profile builds on its own prior work and stays in character; the
+-- workflow persists between calls, so a phase that waits on external
+-- confirmation can resume in a later session. Vault reads run under the same
+-- revocable grant as single-shot tasks.
+CREATE TABLE IF NOT EXISTS workflows (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    goal        TEXT NOT NULL,
+    plan        TEXT NOT NULL,                   -- JSON list of phase names
+    cursor      INTEGER NOT NULL DEFAULT 0,      -- index of the next phase
+    memory      TEXT NOT NULL DEFAULT '{}',      -- JSON: phase -> output so far
+    status      TEXT NOT NULL DEFAULT 'running', -- running | awaiting_input
+                                                 -- | completed | failed | cancelled
+    awaiting    TEXT,                            -- what a paused phase needs
+    grant_id    TEXT,
+    created_at  TEXT NOT NULL,
+    updated_at  TEXT NOT NULL
+);
+
 -- Offline fine-tuning runs (claim 26): local-only adaptation passes whose
 -- artifacts are sealed (PDI vault when configured); nothing leaves the host.
 CREATE TABLE IF NOT EXISTS finetune_runs (

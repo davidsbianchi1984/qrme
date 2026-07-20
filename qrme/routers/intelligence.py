@@ -5,9 +5,11 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, db, tasks
+from .. import adaptation, db, tasks, workflows
 from ..common import profile_or_404, require_owner
-from ..models import GrantCreate, SpecialistSet, TaskRun
+from ..models import (
+    GrantCreate, SpecialistSet, TaskRun, WorkflowCreate, WorkflowResume,
+)
 
 router = APIRouter()
 
@@ -93,6 +95,77 @@ def list_tasks(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     return tasks.list_tasks(profile_id)
+
+
+# -- Autonomous multi-step workflows (claim 25, extended) --------------------
+
+def _workflow_or_404(profile_id: str, workflow_id: str) -> dict:
+    wf = workflows.get(profile_id, workflow_id)
+    if wf is None:
+        raise HTTPException(404, "workflow not found")
+    return wf
+
+
+@router.post("/profiles/{profile_id}/workflows", status_code=201)
+def create_workflow(profile_id: str, body: WorkflowCreate,
+                    request: Request) -> dict:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    grant_id = None
+    if body.grant_token:
+        grant = tasks._grant_for(profile_id, body.grant_token)
+        if grant is None or grant["revoked"]:
+            raise HTTPException(403, "grant revoked or unknown")
+        grant_id = grant["id"]
+    try:
+        return workflows.create(profile_id, body.goal, body.plan, grant_id)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@router.get("/profiles/{profile_id}/workflows")
+def list_workflows(profile_id: str, request: Request) -> list[dict]:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return workflows.list_for(profile_id)
+
+
+@router.get("/profiles/{profile_id}/workflows/{workflow_id}")
+def get_workflow(profile_id: str, workflow_id: str, request: Request) -> dict:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return _workflow_or_404(profile_id, workflow_id)
+
+
+@router.post("/profiles/{profile_id}/workflows/{workflow_id}/advance")
+def advance_workflow(profile_id: str, workflow_id: str,
+                     request: Request) -> dict:
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    wf = _workflow_or_404(profile_id, workflow_id)
+    return workflows.advance(profile, wf, pdi=request.app.state.pdi,
+                             cloud=request.app.state.cloud)
+
+
+@router.post("/profiles/{profile_id}/workflows/{workflow_id}/resume")
+def resume_workflow(profile_id: str, workflow_id: str, body: WorkflowResume,
+                    request: Request) -> dict:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    wf = _workflow_or_404(profile_id, workflow_id)
+    try:
+        return workflows.resume(profile_id, wf, body.input)
+    except ValueError as e:
+        raise HTTPException(409, str(e))
+
+
+@router.post("/profiles/{profile_id}/workflows/{workflow_id}/cancel")
+def cancel_workflow(profile_id: str, workflow_id: str,
+                    request: Request) -> dict:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    wf = _workflow_or_404(profile_id, workflow_id)
+    return workflows.cancel(profile_id, wf)
 
 
 # -- Offline fine-tuning (claim 26) ------------------------------------------
