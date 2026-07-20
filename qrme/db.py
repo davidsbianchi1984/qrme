@@ -36,8 +36,20 @@ CREATE TABLE IF NOT EXISTS profiles (
     cloud_contribution INTEGER NOT NULL DEFAULT 0,  -- opt-in: share rated,
                                                     -- anonymized exchanges to
                                                     -- improve the cloud model
-    status            TEXT NOT NULL DEFAULT 'active',  -- active | departed
+    status            TEXT NOT NULL DEFAULT 'active',  -- active | restricted | departed | terminated
+    proactive_min_interval_hours INTEGER NOT NULL DEFAULT 24,  -- anti-spam rate cap
     created_at        TEXT NOT NULL
+);
+
+-- Anti-spam state for unprompted (proactive) outreach, per (profile,
+-- interactor): the last outreach time enforces the rate cap, and awaiting_reply
+-- suppresses further outreach until the person has replied at least once.
+CREATE TABLE IF NOT EXISTS proactive_state (
+    profile_id       TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id    TEXT NOT NULL REFERENCES interactors(id),
+    last_outreach_at TEXT,
+    awaiting_reply   INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (profile_id, interactor_id)
 );
 
 -- User-to-user connections: interactors matched for anonymous chat, in a
@@ -341,6 +353,8 @@ CREATE TABLE IF NOT EXISTS interactors (
     id           TEXT PRIMARY KEY,
     display_name TEXT NOT NULL,
     birthdate    TEXT,
+    quiet_start  INTEGER,             -- quiet-hours window (UTC hour, inclusive)
+    quiet_end    INTEGER,             -- quiet-hours window (UTC hour, exclusive)
     created_at   TEXT NOT NULL
 );
 

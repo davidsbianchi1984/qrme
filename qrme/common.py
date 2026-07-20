@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 
 from fastapi import HTTPException, Request
 
@@ -88,6 +88,65 @@ def clear_active_handoff(profile_id: str, interactor_id: str) -> None:
     conn = db.connect()
     conn.execute(
         "DELETE FROM active_handoffs WHERE profile_id=? AND interactor_id=?",
+        (profile_id, interactor_id))
+    conn.commit()
+
+
+def _in_quiet_hours(interactor: dict, now: datetime) -> bool:
+    """Whether the recipient's quiet-hours window covers the current UTC hour.
+    A window that wraps midnight (start > end) is handled."""
+    start, end = interactor.get("quiet_start"), interactor.get("quiet_end")
+    if start is None or end is None:
+        return False
+    hour = now.hour
+    if start <= end:
+        return start <= hour < end
+    return hour >= start or hour < end        # overnight window
+
+
+def proactive_gate(profile: dict, interactor: dict) -> str | None:
+    """Anti-spam gate for unprompted outreach. Returns a rejection reason, or
+    None when outreach is allowed. Three rules (see lifecycle-and-consent.md):
+    a per-relationship rate cap, the recipient's quiet hours, and suppression
+    until the recipient has replied at least once."""
+    now = datetime.now(timezone.utc)
+    if _in_quiet_hours(interactor, now):
+        return "the recipient's quiet hours are in effect"
+    row = db.connect().execute(
+        "SELECT last_outreach_at, awaiting_reply FROM proactive_state"
+        " WHERE profile_id=? AND interactor_id=?",
+        (profile["id"], interactor["id"])).fetchone()
+    if row is None:
+        return None
+    if row["awaiting_reply"]:
+        return "awaiting a reply since the last outreach — not sending again"
+    if row["last_outreach_at"]:
+        interval = timedelta(hours=profile["proactive_min_interval_hours"])
+        last = datetime.fromisoformat(row["last_outreach_at"])
+        if now - last < interval:
+            return (f"rate cap: at most one unprompted outreach per "
+                    f"{profile['proactive_min_interval_hours']}h")
+    return None
+
+
+def record_proactive_outreach(profile_id: str, interactor_id: str) -> None:
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO proactive_state (profile_id, interactor_id,"
+        " last_outreach_at, awaiting_reply) VALUES (?,?,?,1)"
+        " ON CONFLICT (profile_id, interactor_id) DO UPDATE SET"
+        " last_outreach_at=excluded.last_outreach_at, awaiting_reply=1",
+        (profile_id, interactor_id, db.utcnow()))
+    conn.commit()
+
+
+def clear_awaiting_reply(profile_id: str, interactor_id: str) -> None:
+    """The recipient replied — lift the suppression so future outreach may
+    resume (subject to the rate cap)."""
+    conn = db.connect()
+    conn.execute(
+        "UPDATE proactive_state SET awaiting_reply=0"
+        " WHERE profile_id=? AND interactor_id=?",
         (profile_id, interactor_id))
     conn.commit()
 

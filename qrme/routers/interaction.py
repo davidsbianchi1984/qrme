@@ -11,13 +11,14 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import adaptation, auth, companion, db, engagement, llm, moderation, persona
 from ..common import (
     age_of, biometric_domain, biometrics_recovered, clear_active_handoff,
-    get_active_handoff, interactor_or_404, message_out, profile_or_404,
-    relationship as get_relationship, require_owner,
+    clear_awaiting_reply, get_active_handoff, interactor_or_404, message_out,
+    proactive_gate, profile_or_404, record_proactive_outreach,
+    relationship as get_relationship, require_interactor, require_owner,
     require_owner_or_interactor, set_active_handoff, source_items,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
-    InteractorCreate, MessageOut, RelationshipSet,
+    InteractorCreate, MessageOut, QuietHoursSet, RelationshipSet,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -39,6 +40,21 @@ def create_interactor(body: InteractorCreate) -> dict:
     token = auth.issue("interactor", interactor_id)
     return {"id": interactor_id, "display_name": body.display_name,
             "token": token}
+
+
+@router.put("/interactors/{interactor_id}/quiet-hours")
+def set_quiet_hours(interactor_id: str, body: QuietHoursSet,
+                    request: Request) -> dict:
+    """The recipient sets a quiet-hours window during which a profile may not
+    reach out unprompted."""
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    conn = db.connect()
+    conn.execute("UPDATE interactors SET quiet_start=?, quiet_end=? WHERE id=?",
+                 (body.quiet_start, body.quiet_end, interactor_id))
+    conn.commit()
+    return {"id": interactor_id, "quiet_start": body.quiet_start,
+            "quiet_end": body.quiet_end}
 
 
 @router.put("/profiles/{profile_id}/relationships/{interactor_id}")
@@ -127,6 +143,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
          body.message, db.utcnow()),
     )
     conn.commit()
+    clear_awaiting_reply(profile_id, body.interactor_id)  # the recipient replied
 
     engagement_state = engagement.record_message(
         profile_id, body.interactor_id, body.message)
@@ -316,6 +333,9 @@ def proactive_checkin(profile_id: str, interactor_id: str,
         raise HTTPException(
             403, "this profile is reactive-only; its owner has not enabled "
                  "proactive outreach")
+    blocked = proactive_gate(profile, interactor)
+    if blocked is not None:
+        raise HTTPException(429, blocked)     # anti-spam: rate cap / quiet / await
 
     relationship = get_relationship(profile_id, interactor_id)
     engagement_state = engagement.get(profile_id, interactor_id)
@@ -348,6 +368,7 @@ def proactive_checkin(profile_id: str, interactor_id: str,
          flag_reason, db.utcnow()),
     )
     conn.commit()
+    record_proactive_outreach(profile_id, interactor_id)  # start the anti-spam clock
     row = conn.execute("SELECT * FROM messages WHERE id=?",
                        (message_id,)).fetchone()
     return {"reason": reason, "message": message_out(dict(row)).model_dump()}
@@ -443,6 +464,8 @@ def clear_memory(profile_id: str, interactor_id: str,
     conn.execute("DELETE FROM messages WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))
     conn.execute("DELETE FROM engagement WHERE profile_id=? AND interactor_id=?",
+                 (profile_id, interactor_id))
+    conn.execute("DELETE FROM proactive_state WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))
     conn.commit()
     clear_active_handoff(profile_id, interactor_id)
