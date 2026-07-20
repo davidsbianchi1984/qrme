@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="560" viewBox="0 0 880 560" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a4458"/>
+    </marker>
+    <marker id="arrb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a6a9a"/>
+    </marker>
+  </defs>
+
+  <rect width="880" height="560" fill="#faf8f4"/>
+  <text x="440" y="38" text-anchor="middle" font-size="22" fill="#2c2836" font-style="italic">Tandem Architecture · Three Products, HTTP Only</text>
+  <text x="440" y="60" text-anchor="middle" font-size="12" fill="#8a8496">each stands alone; no project imports another's code</text>
+
+  <!-- JIM -->
+  <rect x="60" y="100" width="280" height="120" rx="14" fill="#e7f2e4" stroke="#5d8a54" stroke-width="2"/>
+  <text x="200" y="132" text-anchor="middle" font-size="18" fill="#33502d" font-weight="bold">JIM-mini · Guardian</text>
+  <text x="200" y="156" text-anchor="middle" font-size="11.5" fill="#557050">monitor → predict → guide → escalate</text>
+  <text x="200" y="173" text-anchor="middle" font-size="11.5" fill="#557050">ambient jump-ins · life layer · per-user tokens</text>
+  <text x="200" y="190" text-anchor="middle" font-size="11.5" fill="#557050">rolling baselines · sensitivity dial</text>
+
+  <!-- QRME -->
+  <rect x="540" y="100" width="280" height="120" rx="14" fill="#e4ecf5" stroke="#4d6f9c" stroke-width="2"/>
+  <text x="680" y="132" text-anchor="middle" font-size="18" fill="#2c4a6e" font-weight="bold">QRME · Synthetic Profiles</text>
+  <text x="680" y="156" text-anchor="middle" font-size="11.5" fill="#4d6488">personas · memory · moderation · lifecycle</text>
+  <text x="680" y="173" text-anchor="middle" font-size="11.5" fill="#4d6488">specialist handoffs · licensing · embodiments</text>
+  <text x="680" y="190" text-anchor="middle" font-size="11.5" fill="#4d6488">owner capability tokens</text>
+
+  <!-- JIM <-> QRME -->
+  <line x1="340" y1="140" x2="536" y2="140" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="438" y="127" text-anchor="middle" font-size="11.5" fill="#4a4458" font-style="italic">tandem specialist guidance (chat API)</text>
+  <line x1="536" y1="180" x2="340" y2="180" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="438" y="205" text-anchor="middle" font-size="11.5" fill="#4a4458" font-style="italic">shared thread — continuity on any device</text>
+
+  <!-- PDI -->
+  <rect x="180" y="320" width="520" height="110" rx="14" fill="#f2ecdf" stroke="#a08a4a" stroke-width="2"/>
+  <text x="440" y="352" text-anchor="middle" font-size="18" fill="#5c4d1e" font-weight="bold">PDI · Private Data Infrastructure</text>
+  <text x="440" y="376" text-anchor="middle" font-size="11.5" fill="#7a6a34">AES-256-GCM vault · per-tenant isolation · read/write RBAC · tokens hashed at rest</text>
+  <text x="440" y="393" text-anchor="middle" font-size="11.5" fill="#7a6a34">tamper-evident hash-chained audit — every access recorded, user-visible via JIM's access log</text>
+
+  <!-- JIM -> PDI -->
+  <line x1="200" y1="220" x2="300" y2="316" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="184" y="272" text-anchor="end" font-size="11.5" fill="#4a4458" font-style="italic">sealed medical payloads</text>
+  <text x="184" y="287" text-anchor="end" font-size="10.5" fill="#8a8496">jim/{user}/… keys only stay local</text>
+
+  <!-- QRME -> PDI -->
+  <line x1="680" y1="220" x2="580" y2="316" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arr)"/>
+  <text x="696" y="272" font-size="11.5" fill="#4a4458" font-style="italic">sealed profile sources</text>
+  <text x="696" y="287" font-size="10.5" fill="#8a8496">qrme/{profile}/… resolved on read</text>
+
+  <!-- Cloud gateway -->
+  <rect x="310" y="470" width="260" height="60" rx="12" fill="#efe6f2" stroke="#7a6a9a" stroke-width="1.6" stroke-dasharray="6 3"/>
+  <text x="440" y="496" text-anchor="middle" font-size="14" fill="#4c3d63" font-weight="bold">Cloud Model Gateway (optional)</text>
+  <text x="440" y="515" text-anchor="middle" font-size="10.5" fill="#6c5c88">greater model · opt-in anonymized contributions · previewable · revocable by ref</text>
+
+  <line x1="440" y1="430" x2="440" y2="466" stroke="#7a6a9a" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#arrb)"/>
+  <text x="452" y="452" font-size="10.5" fill="#6c5c88" font-style="italic">encrypted, audited intake</text>
+
+  <text x="440" y="552" text-anchor="middle" font-size="11" fill="#8a8496" font-style="italic">Offline mode severs every dotted line: nothing outbound, all inference and adaptation on-host.</text>
+</svg>

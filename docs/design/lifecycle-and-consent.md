@@ -56,6 +56,8 @@ is incapacitated:
 
 ## Lifecycle states **[implemented: active/restricted/departed/terminated]**
 
+![Profile lifecycle](../diagrams/lifecycle.svg)
+
 ```
    active ──sunset──▶ departed (memorial)
      │                   │

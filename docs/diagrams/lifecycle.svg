@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="470" viewBox="0 0 880 470" font-family="Georgia, 'Times New Roman', serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a4458"/>
+    </marker>
+  </defs>
+
+  <rect width="880" height="470" fill="#faf8f4"/>
+  <text x="440" y="40" text-anchor="middle" font-size="22" fill="#2c2836" font-style="italic">QRME · Profile Lifecycle</text>
+  <text x="440" y="62" text-anchor="middle" font-size="12" fill="#8a8496">every state transition is consent-bound and auditable</text>
+
+  <!-- ACTIVE -->
+  <rect x="70" y="110" width="200" height="86" rx="14" fill="#e7f2e4" stroke="#5d8a54" stroke-width="2"/>
+  <text x="170" y="146" text-anchor="middle" font-size="18" fill="#33502d" font-weight="bold">active</text>
+  <text x="170" y="168" text-anchor="middle" font-size="11" fill="#557050">chat · marketplace · summon</text>
+  <text x="170" y="183" text-anchor="middle" font-size="11" fill="#557050">owner token controls everything</text>
+
+  <!-- succession self-loop -->
+  <path d="M 100 110 C 70 60, 200 55, 205 105" fill="none" stroke="#5d8a54" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+  <text x="152" y="80" text-anchor="middle" font-size="11" fill="#557050" font-style="italic">succeed → ownership passes,</text>
+  <text x="152" y="94" text-anchor="middle" font-size="11" fill="#557050" font-style="italic">fresh owner token</text>
+
+  <!-- RESTRICTED -->
+  <rect x="70" y="300" width="200" height="86" rx="14" fill="#fbf0da" stroke="#b98a2f" stroke-width="2"/>
+  <text x="170" y="336" text-anchor="middle" font-size="18" fill="#6d5116" font-weight="bold">restricted</text>
+  <text x="170" y="358" text-anchor="middle" font-size="11" fill="#8a6c2a">objection pending review</text>
+  <text x="170" y="373" text-anchor="middle" font-size="11" fill="#8a6c2a">hidden · no new interactors</text>
+
+  <!-- DEPARTED -->
+  <rect x="580" y="110" width="220" height="86" rx="14" fill="#e4ecf5" stroke="#4d6f9c" stroke-width="2"/>
+  <text x="690" y="140" text-anchor="middle" font-size="18" fill="#2c4a6e" font-weight="bold">departed · memorial</text>
+  <text x="690" y="162" text-anchor="middle" font-size="11" fill="#4d6488">memory viewable &amp; exportable</text>
+  <text x="690" y="177" text-anchor="middle" font-size="11" fill="#4d6488">public memorial · beacons resolve</text>
+
+  <!-- TERMINATED -->
+  <rect x="580" y="300" width="220" height="86" rx="14" fill="#f6e3e0" stroke="#a8544a" stroke-width="2"/>
+  <text x="690" y="336" text-anchor="middle" font-size="18" fill="#6e2c26" font-weight="bold">terminated</text>
+  <text x="690" y="358" text-anchor="middle" font-size="11" fill="#8a4a42">content erased · tombstone kept</text>
+  <text x="690" y="373" text-anchor="middle" font-size="11" fill="#8a4a42">owner token revoked</text>
+
+  <!-- active -> departed -->
+  <line x1="270" y1="145" x2="576" y2="145" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="423" y="132" text-anchor="middle" font-size="12" fill="#4a4458" font-style="italic">sunset — a farewell to every relationship</text>
+  <text x="423" y="162" text-anchor="middle" font-size="10.5" fill="#8a8496">(also: succeed with no successor named)</text>
+
+  <!-- active -> restricted -->
+  <line x1="170" y1="196" x2="170" y2="296" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="182" y="242" font-size="12" fill="#4a4458" font-style="italic">objection opened</text>
+  <text x="182" y="257" font-size="10.5" fill="#8a8496">(proof-of-identity ref)</text>
+
+  <!-- restricted -> active -->
+  <path d="M 76 300 C 30 250, 30 200, 74 168" fill="none" stroke="#5d8a54" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="30" y="240" font-size="11.5" fill="#557050" font-style="italic" transform="rotate(-76 30 240)">dismissed — basis holds</text>
+
+  <!-- restricted -> terminated -->
+  <line x1="270" y1="343" x2="576" y2="343" stroke="#4a4458" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="423" y="330" text-anchor="middle" font-size="12" fill="#4a4458" font-style="italic">upheld — or consent withdrawn by the subject</text>
+  <text x="423" y="360" text-anchor="middle" font-size="10.5" fill="#8a8496">the subject's rights override preservation</text>
+
+  <!-- footnote -->
+  <line x1="70" y1="425" x2="810" y2="425" stroke="#d8d2c8" stroke-width="1"/>
+  <text x="440" y="448" text-anchor="middle" font-size="11.5" fill="#8a8496" font-style="italic">The owner's DELETE erases the row entirely from any state — memorial preserves, termination destroys.</text>
+</svg>
