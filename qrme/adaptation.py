@@ -155,11 +155,14 @@ def finetune(profile_id: str, pdi=None) -> dict:
     if pdi is not None and artifact:
         vault_key = f"qrme/{profile_id}/adaptation/{run_id}"
         pdi.put(vault_key, json.dumps(artifact))
+    from . import offline
     metrics = {
         "interactors": len(interactors),
         "messages_processed": processed,
         "engagement_avg": round(sum(scores) / len(scores), 3) if scores else None,
         "external_transmission": False,
+        "computed": "locally (embeddings recomputed on-host from stored history)",
+        "offline_mode": offline.enabled(),
         "sealed_in_vault": vault_key is not None,
     }
     conn.execute(
