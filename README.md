@@ -36,6 +36,23 @@ their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
 | You own it / total control | `PATCH /profiles/{id}` (edit anytime), `GET /profiles/{id}/export` (full data export), `DELETE /profiles/{id}` (erases everything, including vaulted records) |
 | Encrypted at rest (PDI tandem) | With `QRME_PDI_URL` + `QRME_PDI_TOKEN` (or an injected client), source-material content is sealed in PDI's AES-256-GCM vault (`qrme/pdi_client.py`); QRME keeps only key references, resolves them on read, and purges the vault on delete |
 
+## Your data promise
+
+**No raw user data ever leaves your vault.**
+
+- Profile source material — life stories, writings, conversations, voice
+  notes — lives in QRME's local database or your on-prem PDI vault
+  (AES-256-GCM, tenant-isolated, tamper-evident audit). Never a third party.
+- The cloud model is optional. Contribution is **opt-in per profile**,
+  anonymized (no ids, names replaced), **previewable before anything leaves**
+  (`GET /profiles/{id}/cloud-contribution`), and **revocable** — including
+  deletion of past items at the gateway by their anonymous refs.
+- Offline mode makes it a hard guarantee: with `QRME_OFFLINE=1` there are no
+  model API calls, no gateway calls, nothing outbound — `GET /offline/status`
+  proves the posture.
+- Delete anything, anytime: erasing a profile removes every local trace and
+  purges its vault records; the owner token dies with it.
+
 ## Training-data licensing & derivable agents
 
 Owners can license a profile's expertise; buyers can acquire a license and — when
