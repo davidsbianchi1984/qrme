@@ -10,9 +10,10 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import adaptation, auth, companion, db, engagement, llm, moderation, persona
 from ..common import (
-    age_of, biometric_domain, interactor_or_404, message_out, profile_or_404,
+    age_of, biometric_domain, biometrics_recovered, clear_active_handoff,
+    get_active_handoff, interactor_or_404, message_out, profile_or_404,
     relationship as get_relationship, require_owner,
-    require_owner_or_interactor, source_items,
+    require_owner_or_interactor, set_active_handoff, source_items,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
@@ -122,7 +123,13 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         profile_id, body.interactor_id, body.message)
     relationship = get_relationship(profile_id, body.interactor_id)
 
-    # Real-time biometric context (claim 23) + specialist switch (claim 24).
+    # Real-time biometric context (claim 23) + sustained specialist switch
+    # (claim 24). Once monitoring routes the conversation to a domain
+    # specialist, the handoff persists across turns — including turns with no
+    # biometrics — until a fresh reading shows recovery. State transitions:
+    #   engaged   — this turn switched to the specialist
+    #   sustained — the specialist keeps handling the conversation
+    #   returned  — monitoring recovered; control hands back to the profile
     handoff = None
     speaking_profile = profile
     if body.biometrics:
@@ -133,17 +140,36 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
              json.dumps(body.biometrics), db.utcnow()),
         )
         conn.commit()
-        domain = biometric_domain(body.biometrics)
-        if domain:
-            spec = conn.execute(
-                "SELECT specialist_profile_id FROM specialists"
-                " WHERE profile_id=? AND domain=?",
-                (profile_id, domain)).fetchone()
-            if spec:
-                speaking_profile = profile_or_404(spec["specialist_profile_id"])
-                handoff = {"domain": domain,
-                           "specialist_profile_id": speaking_profile["id"],
-                           "reason": "real-time monitoring signals"}
+
+    active = get_active_handoff(profile_id, body.interactor_id)
+    domain = biometric_domain(body.biometrics) if body.biometrics else None
+    if domain:
+        spec = conn.execute(
+            "SELECT specialist_profile_id FROM specialists"
+            " WHERE profile_id=? AND domain=?",
+            (profile_id, domain)).fetchone()
+        if spec:
+            is_new = active is None or active["domain"] != domain
+            set_active_handoff(profile_id, body.interactor_id, domain,
+                               spec["specialist_profile_id"])
+            speaking_profile = profile_or_404(spec["specialist_profile_id"])
+            handoff = {"domain": domain,
+                       "specialist_profile_id": speaking_profile["id"],
+                       "reason": "real-time monitoring signals",
+                       "state": "engaged" if is_new else "sustained"}
+    elif active:
+        if biometrics_recovered(body.biometrics):
+            clear_active_handoff(profile_id, body.interactor_id)
+            handoff = {"domain": active["domain"],
+                       "specialist_profile_id": active["specialist_profile_id"],
+                       "reason": "monitoring shows recovery",
+                       "state": "returned"}     # the profile speaks again
+        else:
+            speaking_profile = profile_or_404(active["specialist_profile_id"])
+            handoff = {"domain": active["domain"],
+                       "specialist_profile_id": speaking_profile["id"],
+                       "reason": "sustained handoff (monitoring ongoing)",
+                       "state": "sustained"}
 
     # Persistent memory: prior turns with this interactor (PRD 6.4).
     history = conn.execute(
@@ -410,6 +436,7 @@ def clear_memory(profile_id: str, interactor_id: str,
     conn.execute("DELETE FROM engagement WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))
     conn.commit()
+    clear_active_handoff(profile_id, interactor_id)
 
 
 # -- Owner moderation queue (PRD 6.5) ----------------------------------------

@@ -62,6 +62,36 @@ def interactor_or_404(interactor_id: str) -> dict:
     return dict(row)
 
 
+def get_active_handoff(profile_id: str, interactor_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM active_handoffs WHERE profile_id=? AND interactor_id=?",
+        (profile_id, interactor_id)).fetchone()
+    return dict(row) if row else None
+
+
+def set_active_handoff(profile_id: str, interactor_id: str, domain: str,
+                       specialist_profile_id: str) -> None:
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO active_handoffs (profile_id, interactor_id, domain,"
+        " specialist_profile_id, since) VALUES (?,?,?,?,?)"
+        " ON CONFLICT (profile_id, interactor_id) DO UPDATE SET"
+        " domain=excluded.domain,"
+        " specialist_profile_id=excluded.specialist_profile_id,"
+        " since=excluded.since",
+        (profile_id, interactor_id, domain, specialist_profile_id, db.utcnow()),
+    )
+    conn.commit()
+
+
+def clear_active_handoff(profile_id: str, interactor_id: str) -> None:
+    conn = db.connect()
+    conn.execute(
+        "DELETE FROM active_handoffs WHERE profile_id=? AND interactor_id=?",
+        (profile_id, interactor_id))
+    conn.commit()
+
+
 def relationship(profile_id: str, interactor_id: str) -> dict | None:
     row = db.connect().execute(
         "SELECT * FROM relationships WHERE profile_id=? AND interactor_id=?",
@@ -138,3 +168,19 @@ def biometric_domain(biometrics: dict) -> str | None:
     except (TypeError, ValueError):
         pass
     return None
+
+
+def biometrics_recovered(biometrics: dict | None) -> bool:
+    """Whether a fresh biometric reading indicates the episode has passed —
+    the signal to hand a conversation back from a specialist to the primary
+    profile. Recovery requires *positive* evidence: a reading that carries no
+    concerning domain and a low stress level. Absent biometrics are not
+    recovery (the specialist stays engaged until monitoring says otherwise)."""
+    if not biometrics:
+        return False
+    if biometric_domain(biometrics) is not None:
+        return False
+    try:
+        return float(biometrics.get("stress_level") or 0) < 0.4
+    except (TypeError, ValueError):
+        return False

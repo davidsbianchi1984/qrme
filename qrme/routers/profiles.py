@@ -189,9 +189,12 @@ def delete_profile(profile_id: str, request: Request) -> dict:
                   "posts", "surfaces", "persona_embeddings", "specialists",
                   "biometric_context", "grants", "tasks", "finetune_runs",
                   "marketplace", "handles", "beacons", "creative_works",
-                  "perceptions"):
+                  "perceptions", "active_handoffs"):
         deleted[table] = conn.execute(
             f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)).rowcount
+    # Also drop any conversation that had handed off *to* this profile.
+    conn.execute("DELETE FROM active_handoffs WHERE specialist_profile_id=?",
+                 (profile_id,))
     deleted["profile"] = conn.execute(
         "DELETE FROM profiles WHERE id=?", (profile_id,)).rowcount
     conn.commit()
