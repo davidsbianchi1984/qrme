@@ -3,10 +3,12 @@ fine-tuning, and the cloud model tier."""
 
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import adaptation, db, offline, tasks, workflows
-from ..common import profile_or_404, require_owner
+from ..common import anonymized_exchange, profile_or_404, require_owner
 from ..models import (
     GrantCreate, SpecialistSet, TaskRun, WorkflowCreate, WorkflowResume,
 )
@@ -190,6 +192,80 @@ def cloud_status(request: Request) -> dict:
         "fallback": "local provider (Anthropic SDK or offline stub)",
         "contribution": "opt-in per profile via cloud_contribution; "
                         "anonymized rated exchanges only; revocable anytime",
+    }
+
+
+# -- Cloud contribution: preview, history, revoke ----------------------------
+
+@router.get("/profiles/{profile_id}/cloud-contribution")
+def contribution_view(profile_id: str, request: Request) -> dict:
+    """Owner view of the contribution loop: whether it's on, **exactly** what
+    the next contribution would contain (a dry-run preview, nothing is sent),
+    and the log of everything that has ever left."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    conn = db.connect()
+
+    # Dry-run preview: the anonymized exchange that would be contributed if
+    # the most recently active interactor up-rated right now.
+    preview = None
+    latest = conn.execute(
+        "SELECT interactor_id FROM messages WHERE profile_id=?"
+        " AND status='approved' ORDER BY created_at DESC, rowid DESC LIMIT 1",
+        (profile_id,)).fetchone()
+    if latest:
+        exchange = anonymized_exchange(profile, profile_id,
+                                       latest["interactor_id"])
+        if exchange:
+            preview = {"source": "qrme", "kind": "rated_exchange",
+                       "quality": "positive", "purpose": profile["purpose"],
+                       "exchange": exchange}
+
+    history = [{"ref": r["ref"], "at": r["contributed_at"],
+                "revoked": bool(r["revoked"]),
+                "payload": json.loads(r["payload"])}
+               for r in conn.execute(
+                   "SELECT * FROM contribution_log WHERE profile_id=?"
+                   " ORDER BY contributed_at, rowid", (profile_id,)).fetchall()]
+    return {
+        "opted_in": bool(profile["cloud_contribution"]),
+        "policy": "only positively-rated exchanges, anonymized (no profile, "
+                  "owner, or interactor ids; the persona name replaced); "
+                  "each item carries a random ref so it can be deleted at the "
+                  "gateway without identifying anyone",
+        "preview_next": preview,
+        "contributed": history,
+    }
+
+
+@router.post("/profiles/{profile_id}/cloud-contribution/revoke")
+def revoke_contributions(profile_id: str, request: Request) -> dict:
+    """Turn contribution off **and** delete everything already contributed:
+    the gateway is asked to drop each item by its opaque ref."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    conn = db.connect()
+    conn.execute("UPDATE profiles SET cloud_contribution=0 WHERE id=?",
+                 (profile_id,))
+    refs = [r["ref"] for r in conn.execute(
+        "SELECT ref FROM contribution_log WHERE profile_id=? AND revoked=0",
+        (profile_id,)).fetchall()]
+    cloud = request.app.state.cloud
+    if not refs:
+        deleted_at_gateway = True          # nothing ever left
+    elif cloud is None:
+        deleted_at_gateway = False         # nothing to ask; flag still turned off
+    else:
+        deleted_at_gateway = cloud.revoke_contributions(refs)
+    conn.execute("UPDATE contribution_log SET revoked=1 WHERE profile_id=?",
+                 (profile_id,))
+    conn.commit()
+    return {
+        "opted_in": False,
+        "revoked": len(refs),
+        "deleted_at_gateway": bool(deleted_at_gateway),
+        "note": "future contributions stopped; past items were requested "
+                "deleted by their anonymous refs",
     }
 
 
