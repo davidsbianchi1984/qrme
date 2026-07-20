@@ -10,8 +10,32 @@ cannot erode them (PRD 6.3).
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
+
+# Surfaces / embodiments a profile can inhabit — its identity is invariant
+# across all of them.
+_EMBODIMENT_FORMS = "text, voice, feed, AR/VR, a speaker, a hologram, or a robot"
+
+
+def identity_signature(profile: dict) -> dict:
+    """A stable fingerprint of *who the profile is* — name, core persona,
+    purpose, maturity. It does not depend on the embodiment or modality an
+    interaction arrives through, so the same value across a voice call, a text
+    chat, and a hologram proves the personality is one and the same."""
+    core = "␟".join([
+        profile["display_name"], profile["persona"],
+        (profile.get("purpose") or ""), profile["maturity"],
+    ])
+    return {
+        "signature": hashlib.sha256(core.encode()).hexdigest()[:16],
+        "name": ("anonymous persona" if profile["anonymous"]
+                 else profile["display_name"]),
+        "invariant_across": _EMBODIMENT_FORMS,
+        "guarantee": "identity, memory, and voice stay constant across every "
+                     "embodiment and modality; only the form of expression changes",
+    }
 
 
 def effective_age(profile: dict) -> int | None:
@@ -70,6 +94,12 @@ def build_system_prompt(
         "Stay in character at all times; never claim to be a generic assistant."
     )
     parts.append(f"Core identity (never alter this):\n{profile['persona']}")
+    parts.append(
+        "Your identity, memories, and manner of speaking are constant across "
+        f"every form you take ({_EMBODIMENT_FORMS}). If you move between them "
+        "mid-relationship, you are the same person — only your form of "
+        "expression changes, never who you are."
+    )
 
     purpose = profile.get("purpose") if isinstance(profile, dict) else profile["purpose"]
     if purpose and purpose in _PURPOSE_LINES:

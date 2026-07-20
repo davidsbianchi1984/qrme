@@ -115,17 +115,21 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                 403, "this profile is restricted pending an objection review; "
                      "it is not accepting new interactors")
 
+    embodiment_name = None
     if body.surface:
         conn0 = db.connect()
         registered = [r["surface"] for r in conn0.execute(
             "SELECT surface FROM surfaces WHERE profile_id=?",
             (profile_id,)).fetchall()]
-        registered += [r["name"] for r in conn0.execute(
+        embodiment_names = [r["name"] for r in conn0.execute(
             "SELECT name FROM embodiments WHERE profile_id=?",
             (profile_id,)).fetchall()]
+        registered += embodiment_names
         if registered and body.surface not in registered:
             raise HTTPException(
                 422, f"profile is not live on surface '{body.surface}'")
+        if body.surface in embodiment_names:
+            embodiment_name = body.surface
 
     if profile["adult_mode"]:
         if not interactor["birthdate"] or age_of(
@@ -266,6 +270,10 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         profile_message=message_out(rows[profile_msg_id]),
         modality=_modality_descriptor(profile_id, body.modality),
         handoff=handoff,
+        # The addressed profile's identity is invariant across modality and
+        # embodiment — the same signature over voice, text, and a hologram.
+        persona_signature=persona.identity_signature(profile)["signature"],
+        embodiment=embodiment_name,
     )
 
 

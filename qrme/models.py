@@ -336,6 +336,11 @@ class ChatResponse(BaseModel):
     # Set when biometric signals routed the reply to a domain specialist
     # (claim 24): {domain, specialist_profile_id, reason}.
     handoff: dict | None = None
+    # Invariant identity fingerprint of the profile being addressed — the same
+    # across every embodiment/modality, so a client can prove personality
+    # continuity when a relationship moves from voice → text → hologram.
+    persona_signature: str | None = None
+    embodiment: str | None = None      # the embodiment this turn came through
 
 
 class Feedback(BaseModel):
