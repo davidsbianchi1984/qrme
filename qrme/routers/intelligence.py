@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, db, tasks, workflows
+from .. import adaptation, db, offline, tasks, workflows
 from ..common import profile_or_404, require_owner
 from ..models import (
     GrantCreate, SpecialistSet, TaskRun, WorkflowCreate, WorkflowResume,
@@ -191,3 +191,12 @@ def cloud_status(request: Request) -> dict:
         "contribution": "opt-in per profile via cloud_contribution; "
                         "anonymized rated exchanges only; revocable anytime",
     }
+
+
+# -- Offline-first posture ---------------------------------------------------
+
+@router.get("/offline/status")
+def offline_status(request: Request) -> dict:
+    """Report the offline posture: whether the platform is running fully
+    on-host and what that guarantees."""
+    return offline.status(request.app)

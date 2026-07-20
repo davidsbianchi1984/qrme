@@ -16,6 +16,7 @@ import os
 
 from fastapi import FastAPI
 
+from . import offline
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (assistant, community, connections, governance,
@@ -35,11 +36,13 @@ def create_app(pdi_client: PDIClient | None = None,
 
     # Cloud Model Gateway: greater-model inference with local fallback, and
     # the opt-in contribution intake (QRME_CLOUD_URL + QRME_CLOUD_TOKEN).
+    # Offline mode refuses the cloud outright — even an injected client — so no
+    # request can reach an external host.
     if cloud_client is None and os.environ.get("QRME_CLOUD_URL"):
         cloud_client = CloudModelClient(
             token=os.environ.get("QRME_CLOUD_TOKEN", ""),
             base_url=os.environ["QRME_CLOUD_URL"])
-    app.state.cloud = cloud_client
+    app.state.cloud = None if offline.enabled() else cloud_client
 
     app.include_router(profiles.router)
     app.include_router(interaction.router)

@@ -65,6 +65,11 @@ def _extract(text: str, marker: str) -> str | None:
 def get_provider(cloud=None) -> Provider:
     """``cloud`` is an optional CloudModelClient: when present, inference
     routes to the gateway's greater model with local fallback."""
+    from . import offline
+    if offline.enabled():
+        # Hard offline: the only truly local provider, no cloud wrapping. Any
+        # network-bound provider (Anthropic SDK, cloud gateway) is bypassed.
+        return StubProvider()
     choice = os.environ.get("QRME_LLM")
     if choice == "stub":
         base: Provider = StubProvider()
