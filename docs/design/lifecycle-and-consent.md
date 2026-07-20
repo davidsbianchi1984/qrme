@@ -141,10 +141,13 @@ anchor.
 lands in shared memory; the reason is chosen from engagement state
 ("re-connect" when quiet, else "checking in").
 
-**[planned]** limits: a per-relationship rate cap (default: at most one
-unprompted outreach per 24 h, configurable), a user-set quiet-hours schedule,
-and a suppression rule — no further unprompted outreach until the person
-replies at least once, so a silent recipient is never spammed.
+**[implemented]** limits (`qrme/common.proactive_gate`, `proactive_state`
+table): a per-relationship **rate cap** (default one unprompted outreach per
+24 h, configurable via `proactive_min_interval_hours` on the profile), the
+recipient's **quiet-hours** window (`PUT /interactors/{id}/quiet-hours`,
+UTC-hour window, wraps midnight), and a **reply-suppression** rule — no
+further unprompted outreach until the recipient has replied at least once (a
+chat message clears the suppression). A blocked outreach returns `429`.
 
 ## Multi-modal, surfaces, cloud opt-in, maturity enforcement
 

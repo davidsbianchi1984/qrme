@@ -75,6 +75,7 @@ class ProfileUpdate(BaseModel):
     aging_enabled: bool | None = None
     successor_owner: str | None = None
     cloud_contribution: bool | None = None
+    proactive_min_interval_hours: int | None = None   # anti-spam rate cap
 
 
 class ProfileOut(BaseModel):
@@ -103,6 +104,13 @@ class ProfileOut(BaseModel):
 class InteractorCreate(BaseModel):
     display_name: str
     birthdate: date | None = None
+
+
+class QuietHoursSet(BaseModel):
+    # UTC-hour window [start, end) during which no unprompted outreach is sent;
+    # both None clears it. A window may wrap midnight (start > end).
+    quiet_start: int | None = Field(default=None, ge=0, le=23)
+    quiet_end: int | None = Field(default=None, ge=0, le=23)
 
 
 class RelationshipSet(BaseModel):
