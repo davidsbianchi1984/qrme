@@ -37,6 +37,31 @@ npm install
 The backend URL is configurable in the app under **Control Center → API
 connection** (default `http://127.0.0.1:8000`).
 
+## 3. Build the installers (per-OS, in CI)
+
+`.dmg` (macOS), `.exe` (Windows), and `.AppImage` (Linux) can only be built on
+their own OS — you can't cross-build or code-sign a macOS/Windows installer
+from Linux. So the real pipeline is a **GitHub Actions matrix** on macOS,
+Windows, and Linux runners: [`.github/workflows/desktop-release.yml`](../.github/workflows/desktop-release.yml).
+
+- **Cut a release:** push a tag `app-v0.1.0` → the workflow builds all three
+  installers and attaches them to a GitHub Release.
+- **Just build artifacts:** run the workflow manually ("Run workflow") → the
+  installers appear as downloadable Actions artifacts, no Release needed.
+- **Locally, for your own OS only:** `npm run dist` → `release/`.
+
+### Code signing (optional, via repository secrets — never committed)
+
+electron-builder picks these up from the environment automatically:
+
+| Platform | Secrets |
+|---|---|
+| macOS | `CSC_LINK` (base64 of your `.p12`), `CSC_KEY_PASSWORD`; to notarize also `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID` (and set `mac.notarize: true` in `package.json`) |
+| Windows | `CSC_LINK` (base64 of your `.pfx`), `CSC_KEY_PASSWORD` |
+
+Add them under **Settings → Secrets and variables → Actions**. With no secrets
+the build still succeeds — the installers are just unsigned.
+
 ## What it's wired to
 
 | Screen | Endpoints |
