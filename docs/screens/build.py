@@ -1045,6 +1045,35 @@ def render(spec):
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
+    elif hero == "signin":
+        out.append(orb(W / 2, y + 44, 36))
+        out.append(icon("person", W / 2, y + 42, "rgba(255,255,255,0.92)", 1.5))
+        y += 106
+        out.append(text(W / 2, y, "Welcome back, David", 16, "#fff", 750, "middle"))
+        out.append(text(W / 2, y + 20, "Your vault is encrypted and local", 11, C["t2"], 400, "middle"))
+        y += 44
+        out.append(rrect(CX, y, CW, 56, 15, "url(#gCard)", C["line"], 1))
+        out.append(icon("finger", CX + 30, y + 28, C["brandA"], 1.2))
+        out.append(text(CX + 58, y + 24, "Unlock with Face ID", 12.5, C["txt"], 650))
+        out.append(text(CX + 58, y + 40, "or your vault passphrase", 10, C["t2"]))
+        y += 72
+        out.append(button(CX, y, CW, "Sign In", "brand", 44))
+        out.append(button(CX, y + 54, CW, "Use a different profile", "ghost", 42))
+
+    elif hero == "endsession":
+        out.append(orb(W / 2, y + 40, 32))
+        out.append(icon("lock", W / 2, y + 40, "rgba(255,255,255,0.95)", 1.4))
+        y += 92
+        out.append(text(W / 2, y, "Session ended", 16, "#fff", 750, "middle"))
+        out.append(text(W / 2, y + 20, "Your vault is sealed. See you soon.", 11, C["t2"], 400, "middle"))
+        y += 42
+        for ic, col, k, s in [("chat", "brand", "Talked with Ava", "12 messages this session"),
+                              ("lock", "green", "Memories saved & sealed", "AES-256-GCM, on device"),
+                              ("eye", "cyan", "Nothing left your vault", "offline the whole time")]:
+            s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
+            out.append(s2)
+        out.append(button(CX, y + 2, CW, "Sign Out", "brand", 42))
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1171,6 +1200,9 @@ SCREENS = [
         dict(icon="headset", color="pink", k="AR / VR", s="immersive rooms", stat=("OFF", "off")),
         dict(icon="watch", color="cyan", k="Wearable", s="ambient presence", stat=("ON", "on")),
     ]),
+    # ---- session lifecycle (sign-in → … → sign-out) ----
+    dict(num=39, title="Sign In", sub="Welcome back", hero="signin", accent="brand", tab=0),
+    dict(num=40, title="End Session", sub="Your vault is sealed", hero="endsession", accent="green", tab=0),
 ]
 
 
