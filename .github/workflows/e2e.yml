@@ -1,0 +1,44 @@
+name: Full-stack e2e
+
+# Boots PDI + QRME + JIM-mini as three separate containers (docker/) and runs
+# the cross-service end-to-end flow (docker/e2e.py) over real HTTP seams — the
+# booted-services counterpart to the in-process tandem tests.
+#
+# Runs on main and on demand (not per-PR): it needs the sibling repositories,
+# so it requires a repo secret SUITE_REPO_TOKEN — a PAT with read access to
+# davidsbianchi1984/jim-mini and davidsbianchi1984/pdi. The fast per-PR checks
+# stay in ci.yml (pytest + front-end smoke build).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: qrme
+      - uses: actions/checkout@v4
+        with:
+          repository: davidsbianchi1984/jim-mini
+          path: jim-mini
+          token: ${{ secrets.SUITE_REPO_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          repository: davidsbianchi1984/pdi
+          path: pdi
+          token: ${{ secrets.SUITE_REPO_TOKEN }}
+
+      - name: Boot the suite and run the end-to-end flow
+        working-directory: qrme
+        run: >
+          docker compose -f docker/docker-compose.yml up --build
+          --abort-on-container-exit --exit-code-from e2e
+
+      - name: Tear down
+        if: always()
+        working-directory: qrme
+        run: docker compose -f docker/docker-compose.yml down -v

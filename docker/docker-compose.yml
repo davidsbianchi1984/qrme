@@ -1,0 +1,106 @@
+# Full-stack suite harness: boots PDI + QRME + JIM-mini as three separate
+# services on one network, wires them over HTTP, and runs the end-to-end flow
+# (docker/e2e.py) as the verdict container.
+#
+#   docker compose -f docker/docker-compose.yml up --build \
+#       --abort-on-container-exit --exit-code-from e2e
+#
+# Build contexts default to the CI checkout layout (sibling repos qrme /
+# jim-mini / pdi). Override with QRME_CONTEXT / JIM_CONTEXT / PDI_CONTEXT for a
+# different local layout.
+#
+# NOTE: a *test* harness — PDI runs in dev-open admin mode with an ephemeral
+# master key and the stub LLM provider. Not a production topology.
+
+services:
+  pdi:
+    build:
+      context: ${PDI_CONTEXT:-../../pdi}
+    environment:
+      PDI_MASTER_KEY: "${PDI_MASTER_KEY:-Zm9yLXRlc3Qtb25seS0zMi1ieXRlcy1rZXkhISEh}"
+      PDI_DB: /data/pdi.db
+    volumes:
+      - pdi-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8100/health').status==200 else 1)\""]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  bootstrap:
+    build:
+      context: ${QRME_CONTEXT:-..}
+    depends_on:
+      pdi:
+        condition: service_healthy
+    environment:
+      PDI_URL: http://pdi:8100
+    volumes:
+      - shared:/shared
+      - ./:/work:ro
+    command: ["python", "/work/bootstrap.py"]
+    restart: "no"
+
+  qrme:
+    build:
+      context: ${QRME_CONTEXT:-..}
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    environment:
+      QRME_LLM: stub
+      QRME_DB: /data/qrme.db
+      QRME_PDI_URL: http://pdi:8100
+    volumes:
+      - shared:/shared
+      - qrme-data:/data
+    command: ["sh", "-c", ". /shared/qrme.env; exec uvicorn qrme.api:app --host 0.0.0.0 --port 8000"]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/openapi.json').status==200 else 1)\""]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  jim:
+    build:
+      context: ${JIM_CONTEXT:-../../jim-mini}
+    depends_on:
+      qrme:
+        condition: service_healthy
+      bootstrap:
+        condition: service_completed_successfully
+    environment:
+      JIM_LLM: stub
+      JIM_DB: /data/jim.db
+      JIM_QRME_URL: http://qrme:8000
+      JIM_PDI_URL: http://pdi:8100
+    volumes:
+      - shared:/shared
+      - jim-data:/data
+    command: ["sh", "-c", ". /shared/jim.env; exec uvicorn jim.api:app --host 0.0.0.0 --port 8200"]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8200/health').status==200 else 1)\""]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+
+  e2e:
+    build:
+      context: ${QRME_CONTEXT:-..}
+    depends_on:
+      jim:
+        condition: service_healthy
+    environment:
+      QRME_URL: http://qrme:8000
+      JIM_URL: http://jim:8200
+      PDI_URL: http://pdi:8100
+    volumes:
+      - ./:/work:ro
+    command: ["python", "/work/e2e.py"]
+    restart: "no"
+
+volumes:
+  shared:
+  pdi-data:
+  qrme-data:
+  jim-data:
