@@ -191,6 +191,32 @@ Set `ANTHROPIC_API_KEY` (or log in with `ant auth login`) for real model
 replies; otherwise the stub provider answers. Override the model with
 `QRME_MODEL`.
 
+## The suite — one origin, one login
+
+QRME, JIM-mini, and PDI stay three independent apps, but `suite/gateway.py`
+fronts all three behind a **single origin** so the suite runs as one product
+(the [launcher](launcher/) is the desktop shell for it):
+
+```bash
+pip install -e .[dev]        # plus the jim-mini and pdi packages for the full suite
+uvicorn suite.gateway:app    # /qrme/… /jim/… /pdi/… on one origin
+```
+
+On top of the mounted apps it adds a thin, **stateless** cross-cutting layer
+(it fans out over the per-product tokens the caller already holds and stores no
+credential of its own):
+
+| Endpoint | What |
+|---|---|
+| `GET /suite/health` | Which products are mounted and live |
+| `POST /suite/session` | Unified sign-on — provision one identity across all three in a single call |
+| `POST /suite/erase` | Right to be forgotten, suite-wide, with a per-product receipt |
+| `POST /suite/export` | Data portability — one bundle with the identity's data from every product |
+| `PUT /suite/consent` · `POST /suite/consent/read` | Centralized consent, sealed in the PDI vault and enforced across products |
+| `POST /suite/usage` | Usage metering hooks for a suite-wide subscription |
+
+See [docs/tandem.md](docs/tandem.md) for the full cross-product architecture.
+
 ## Configuration
 
 | Variable | Default | Purpose |
