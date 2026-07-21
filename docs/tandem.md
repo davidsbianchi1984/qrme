@@ -100,38 +100,43 @@ database:
   tenant token) — the broker sits *above* this and never widens what crosses
   the wire.
 
-### Data-deletion propagation **[implemented locally + planned cross-app]**
+### Data-deletion propagation **[implemented]**
 
 Within each app, deletion is complete today: QRME `DELETE /profiles/{id}` and
 JIM `DELETE /data/{user_id}` erase every local table **and** purge that
 principal's PDI vault records via tracked keys. **[implemented]**
 
-Cross-app propagation is **user-controlled** **[planned]**: when a user
-deletes in one app they choose the scope —
+Cross-app propagation runs through the **suite gateway** (`suite/gateway.py`):
+`POST /suite/erase` fans the right-to-be-forgotten out to every product the
+identity holds — deleting the profile in QRME, erasing the user in JIM, and
+dropping every sealed record in the PDI tenant — using the per-product tokens
+the caller already holds (the gateway stays stateless, storing no credential
+of its own). It returns a **per-product receipt** so a partial failure is
+visible rather than silently swallowed, and `complete` is true only when every
+product acknowledged. **[implemented]**
 
-- **This app only** (default): the app erases its own data and its own PDI
-  keys; other apps are untouched.
-- **Everywhere**: if accounts are linked, the app emits a signed
-  `deletion_request{subject}` to the broker, which fans out to the linked
-  apps; each performs its own local erasure and PDI purge and acknowledges.
-  Acknowledgements are collected so the user sees a complete-deletion receipt.
+Each product erases with its *own* authority: QRME/JIM with the owner/user
+token, PDI via the tenant's own write token — no admin key needed. PDI never
+initiates deletion — it is the storage layer; the owning app (or the gateway on
+the tenant's behalf) always drives the purge, so there is no orphaned
+ciphertext.
 
-PDI never initiates deletion — it is the storage layer; the owning app always
-drives the purge of its own keys, so there is no orphaned ciphertext.
+### Billing / subscription **[implemented: metering hooks]**
 
-### Billing / subscription **[planned]**
+A single subscription spans the three products, metered per product. The suite
+gateway exposes `POST /suite/usage`, which aggregates a cheap counter from each
+product into one meter (`suite-usage/v1`) a downstream biller reads against the
+linked identity:
 
-A single subscription spans the three products, metered per product:
+- QRME: profile stats (interactions, relationships, sources).
+- JIM-mini: recorded events.
+- PDI: sealed record count (ciphertext bytes / ops/day are also derivable from
+  the audit chain — see PDI `docs/operations.md`).
 
-- QRME: active profiles, interactions, marketplace transactions.
-- JIM-mini: monitored users, guidance sessions, provider handoffs.
-- PDI: tenants, ciphertext bytes, ops/day (derivable from the audit chain —
-  see PDI `docs/operations.md`).
-
-The billing system lives outside the three repos; each exposes a
-usage/metering read (`GET /usage`, admin) that a downstream biller
-aggregates against the linked `subject`. Entitlements (which tiers unlock
-adult mode, cloud model, knowledge packs) are checked at the app boundary.
+Metering hooks are implemented; actual rating/charging and entitlement tiers
+(which unlock adult mode, cloud model, knowledge packs) live in the billing
+system outside the three repos and are checked at the app boundary. **[rating
+out of v1]**
 
 ### Exact tandem data flows & error handling **[implemented]**
 
@@ -162,17 +167,20 @@ adult mode, cloud model, knowledge packs) are checked at the app boundary.
   in memory *before* sealing, so behavior is identical whether or not the seal
   succeeds.
 
-### Consent management **[implemented per-app + planned unified]**
+### Consent management **[implemented]**
 
 Consent lives with the app that collects it today: QRME captures profile
 verification, third-party rights basis, and `cloud_contribution`; JIM captures
 terms/guardian consent, emergency-contact consent, per-source consent,
 `provider_consent`, and `cloud_contribution`. **[implemented]**
 
-A **unified consent center** **[planned]** presents all of a linked
-`subject`'s consents (biometric sources, profile sources, contact, provider
-handoff, cloud contribution, adult mode) in one place, each toggleable, with
-every change written to PDI's audit chain for a regulator-exportable trail.
+A **unified consent center** is backed by the suite gateway:
+`PUT /suite/consent` seals one authoritative consent document in the identity's
+PDI vault (encrypted at rest, recorded on the tamper-evident audit chain, so
+every change is regulator-exportable), and `POST /suite/consent/read` reads it
+back. Consent is **enforced, not just logged** — withdrawing
+`cloud_contribution` also calls QRME's `cloud-contribution/revoke`, so the
+toggle takes effect across products. **[implemented]**
 
 ### Security & compliance **[implemented foundations + planned]**
 
@@ -196,8 +204,10 @@ every change written to PDI's audit chain for a regulator-exportable trail.
 - **User-visible audit**: JIM's `GET /access-log/{user}` shows a user every
   access to their own sealed records — filtered to their namespace,
   verifiable against the chain. **[implemented]**
-- **GDPR**: right-to-erasure = the deletion propagation above; data-portability
-  = each app's `export`. **[planned: the cross-app deletion receipt]**
+- **GDPR**: right-to-erasure = suite-wide `POST /suite/erase` with a
+  per-product deletion receipt; data-portability = `POST /suite/export`, one
+  `suite-export/v1` bundle carrying every product's export (QRME profile export,
+  JIM progress report, PDI ciphertext snapshot). **[implemented]**
 - **HIPAA** (JIM medical data): PHI is sealed in PDI, access is audited and
   user-visible (the access log above), and provider handoff is consent-gated
   and revocable — the technical safeguards are in place; a production

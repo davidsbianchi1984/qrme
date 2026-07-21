@@ -86,3 +86,71 @@ def test_session_is_one_call_across_products(gateway):
     ret = gateway.get("/pdi/retention").json()
     names = [t["name"] for t in ret["record_retention"]]
     assert "suite:Sam" in names
+
+
+def _provision(gateway, name="Erin"):
+    r = gateway.post("/suite/session", json={"display_name": name, "birthdate": "1988-03-03"})
+    assert r.status_code == 201, r.text
+    return r.json()["products"]
+
+
+def test_erase_propagates_across_the_suite(gateway):
+    # Deleting the identity once erases it in all three products.
+    p = _provision(gateway, "Gone")
+    # Seed a PDI record so there's something to erase.
+    gateway.put("/pdi/records", headers={"authorization": f"Bearer {p['pdi']['tenant_token']}"},
+                json={"key": "note/1", "value": "secret"})
+
+    r = gateway.post("/suite/erase", json=p)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["complete"] is True
+    assert body["erased"]["qrme"]["ok"] and body["erased"]["jim"]["ok"]
+    assert body["erased"]["pdi"]["records_erased"] >= 1
+
+    # The profile is really gone from QRME (deleting again 404s).
+    assert gateway.get(f"/qrme/profiles/{p['qrme']['profile_id']}").status_code == 404
+    # And the PDI vault is empty for that tenant.
+    left = gateway.get("/pdi/records",
+                       headers={"authorization": f"Bearer {p['pdi']['tenant_token']}"}).json()
+    assert left["keys"] == []
+
+
+def test_export_bundles_every_product(gateway):
+    p = _provision(gateway, "Portable")
+    r = gateway.post("/suite/export", json=p)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["format"] == "suite-export/v1"
+    # QRME export carries the profile; JIM the report; PDI a (ciphertext) snapshot.
+    assert body["products"]["qrme"]["profile"]["display_name"] == "Portable"
+    assert "jim" in body["products"] and "pdi" in body["products"]
+    assert "records" in body["products"]["pdi"]
+
+
+def test_consent_is_centralized_sealed_and_enforced(gateway):
+    p = _provision(gateway, "Consenting")
+    # Record consent that withdraws cloud contribution.
+    doc = {"cloud_contribution": False, "proactive_outreach": True}
+    r = gateway.put("/suite/consent", json={**p, "consent": doc})
+    assert r.status_code == 200, r.text
+    applied = r.json()["applied"]
+    assert applied["pdi"]["sealed"] is True
+    assert applied["qrme"]["cloud_contribution_revoked"] is True
+
+    # It reads back authoritatively from the vault.
+    got = gateway.post("/suite/consent/read", json=p).json()
+    assert got["consent"] == doc
+
+    # And the withdrawal actually took effect in QRME, not just got logged.
+    cc = gateway.get(f"/qrme/profiles/{p['qrme']['profile_id']}/cloud-contribution").json()
+    assert cc.get("contributing") in (False, None)
+
+
+def test_usage_meters_span_the_suite(gateway):
+    p = _provision(gateway, "Metered")
+    r = gateway.post("/suite/usage", json=p)
+    assert r.status_code == 200, r.text
+    m = r.json()["products"]
+    assert "qrme" in m and "jim" in m
+    assert m["pdi"]["sealed_records"] >= 0
