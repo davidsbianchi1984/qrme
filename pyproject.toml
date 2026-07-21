@@ -19,6 +19,7 @@ dependencies = [
     "uvicorn>=0.29",
     "anthropic>=0.117",
     "segno>=1.6",
+    "httpx>=0.27",          # suite/gateway.py calls the mounted apps in-process
 ]
 
 [project.optional-dependencies]
