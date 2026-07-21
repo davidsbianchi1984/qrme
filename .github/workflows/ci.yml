@@ -15,3 +15,26 @@ jobs:
           python-version: "3.12"
       - run: pip install -e .[dev]
       - run: pytest -q
+
+  # Smoke-test the front-ends: every PR proves the desktop app and the suite
+  # launcher still type-check and build. (Skips the Electron binary download —
+  # the renderer build doesn't need it.)
+  apps:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [app, launcher]
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.dir }}/package-lock.json
+      - run: npm ci
+      - run: npm run build
