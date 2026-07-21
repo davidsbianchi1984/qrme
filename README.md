@@ -235,6 +235,21 @@ curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json
 
 The full QRME product in two form factors — a **desktop app** and a **mobile app** — a screen for every capability, in the app's design language (Deep Indigo · Neon Purple · Warm Amber · Soft Silver, SF-style type, liquid-glass cards). Each is a self-contained, hand-built SVG — no fonts, images, or scripts — so it renders identically here, in a browser, and in any converter.
 
+### Platforms
+
+Every screen ships in each platform's native chrome — mobile in **iOS** (`docs/screens/`) and **Android** (`docs/screens/android/`); desktop in **macOS** (`docs/desktop/`) and **Windows** (`docs/desktop/windows/`). iOS's Dynamic Island + home indicator vs Android's punch-hole + gesture nav; macOS traffic-lights vs the Windows caption bar.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="210" alt="iOS"></a><br><sub>Mobile · <b>iOS</b></sub></td>
+    <td align="center" width="50%"><a href="docs/screens/android/05-profile-home.svg"><img src="docs/screens/android/05-profile-home.svg" width="210" alt="Android"></a><br><sub>Mobile · <b>Android</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/desktop/01-home.svg"><img src="docs/desktop/01-home.svg" width="440" alt="macOS"></a><br><sub>Desktop · <b>macOS</b></sub></td>
+    <td align="center"><a href="docs/desktop/windows/01-home.svg"><img src="docs/desktop/windows/01-home.svg" width="440" alt="Windows"></a><br><sub>Desktop · <b>Windows</b></sub></td>
+  </tr>
+</table>
+
 ### Desktop app
 
 Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation surface with its AI-context panel, the relationship table, and the memory vault. Regenerate with `python3 docs/desktop/build.py`.
