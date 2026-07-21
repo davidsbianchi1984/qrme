@@ -233,93 +233,117 @@ curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json
 
 ## App screens
 
-The full QRME product, screen by screen — a screen for every capability, in the app's design language (Deep Indigo · Neon Purple · Warm Amber · Soft Silver, SF-style type, liquid-glass cards). Each is a self-contained, hand-built SVG — no fonts, images, or scripts — so it renders identically here, in a browser, and in any converter. Regenerate with `python3 docs/screens/build.py`.
+The full QRME product in two form factors — a **desktop app** and a **mobile app** — a screen for every capability, in the app's design language (Deep Indigo · Neon Purple · Warm Amber · Soft Silver, SF-style type, liquid-glass cards). Each is a self-contained, hand-built SVG — no fonts, images, or scripts — so it renders identically here, in a browser, and in any converter.
 
-### Onboarding, identity & control
+### Desktop app
 
-<table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="210" alt="Welcome — Onboarding & consent"></a><br><sub><b>01</b> · Welcome</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="210" alt="Create Profile — Choose who this AI is"></a><br><sub><b>02</b> · Create Profile</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/03-build-your-profile.svg"><img src="docs/screens/03-build-your-profile.svg" width="210" alt="Build Your Profile — Add memories & knowledge"></a><br><sub><b>03</b> · Build Your Profile</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/04-personality.svg"><img src="docs/screens/04-personality.svg" width="210" alt="Personality — Shape how your AI interacts"></a><br><sub><b>04</b> · Personality</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="210" alt="Profile Home — Your AI, at a glance"></a><br><sub><b>05</b> · Profile Home</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/06-chat-with-ava.svg"><img src="docs/screens/06-chat-with-ava.svg" width="210" alt="Chat with Ava — Every response explained"></a><br><sub><b>06</b> · Chat with Ava</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="210" alt="Memory Vault — Your AI remembers"></a><br><sub><b>07</b> · Memory Vault</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/08-relationships.svg"><img src="docs/screens/08-relationships.svg" width="210" alt="Relationships — People in Ava's life"></a><br><sub><b>08</b> · Relationships</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/09-add-relationship.svg"><img src="docs/screens/09-add-relationship.svg" width="210" alt="Add Relationship — Relationship-aware behavior"></a><br><sub><b>09</b> · Add Relationship</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/10-profile-health.svg"><img src="docs/screens/10-profile-health.svg" width="210" alt="Profile Health — At a glance"></a><br><sub><b>10</b> · Profile Health</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/11-marketplace.svg"><img src="docs/screens/11-marketplace.svg" width="210" alt="Marketplace — Discover & connect"></a><br><sub><b>11</b> · Marketplace</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/12-licensing-center.svg"><img src="docs/screens/12-licensing-center.svg" width="210" alt="Licensing Center — License your expertise"></a><br><sub><b>12</b> · Licensing Center</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/13-embodiments.svg"><img src="docs/screens/13-embodiments.svg" width="210" alt="Embodiments — Your AI everywhere"></a><br><sub><b>13</b> · Embodiments</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/14-control-center.svg"><img src="docs/screens/14-control-center.svg" width="210" alt="Control Center — You are in control"></a><br><sub><b>14</b> · Control Center</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/15-design-language.svg"><img src="docs/screens/15-design-language.svg" width="210" alt="Design Language — One world, one system"></a><br><sub><b>15</b> · Design Language</sub></td>
-  </tr>
-</table>
-
-### Companion, summoning & connection
+Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation surface with its AI-context panel, the relationship table, and the memory vault. Regenerate with `python3 docs/desktop/build.py`.
 
 <table>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/16-genesis.svg"><img src="docs/screens/16-genesis.svg" width="210" alt="Genesis — Born from four questions"></a><br><sub><b>16</b> · Genesis</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/17-summon-beacons.svg"><img src="docs/screens/17-summon-beacons.svg" width="210" alt="Summon & Beacons — Leave your AI in the world"></a><br><sub><b>17</b> · Summon & Beacons</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/18-proactive.svg"><img src="docs/screens/18-proactive.svg" width="210" alt="Proactive — It reaches out first"></a><br><sub><b>18</b> · Proactive</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/01-home.svg"><img src="docs/desktop/01-home.svg" width="460" alt="Home"></a><br><sub><b>01</b> · Home</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/02-conversation.svg"><img src="docs/desktop/02-conversation.svg" width="460" alt="Conversation"></a><br><sub><b>02</b> · Conversation</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/19-transparency.svg"><img src="docs/screens/19-transparency.svg" width="210" alt="Transparency — Honest about multiplicity"></a><br><sub><b>19</b> · Transparency</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/20-connections.svg"><img src="docs/screens/20-connections.svg" width="210" alt="Connections — Meet other real people"></a><br><sub><b>20</b> · Connections</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/21-rooms.svg"><img src="docs/screens/21-rooms.svg" width="210" alt="Rooms — Chat, voice, video, AR, VR"></a><br><sub><b>21</b> · Rooms</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/03-relationships.svg"><img src="docs/desktop/03-relationships.svg" width="460" alt="Relationships"></a><br><sub><b>03</b> · Relationships</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/04-memory-vault.svg"><img src="docs/desktop/04-memory-vault.svg" width="460" alt="Memory Vault"></a><br><sub><b>04</b> · Memory Vault</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/22-providers.svg"><img src="docs/screens/22-providers.svg" width="210" alt="Providers — When AI hands off to a human"></a><br><sub><b>22</b> · Providers</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/05-marketplace-licensing.svg"><img src="docs/desktop/05-marketplace-licensing.svg" width="460" alt="Marketplace & Licensing"></a><br><sub><b>05</b> · Marketplace & Licensing</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/06-control-center.svg"><img src="docs/desktop/06-control-center.svg" width="460" alt="Control Center"></a><br><sub><b>06</b> · Control Center</sub></td>
   </tr>
 </table>
 
-### Your data promise, lifecycle & the claims
+### Mobile app
+
+The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
+
+**Onboarding, identity & control**
 
 <table>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/23-cloud-model.svg"><img src="docs/screens/23-cloud-model.svg" width="210" alt="Cloud Model — Greater model, opt-in"></a><br><sub><b>23</b> · Cloud Model</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/24-offline-mode.svg"><img src="docs/screens/24-offline-mode.svg" width="210" alt="Offline Mode — A hard guarantee"></a><br><sub><b>24</b> · Offline Mode</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/25-objection-lifecycle.svg"><img src="docs/screens/25-objection-lifecycle.svg" width="210" alt="Objection & Lifecycle — A real person can contest"></a><br><sub><b>25</b> · Objection & Lifecycle</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="210" alt="Welcome"></a><br><sub><b>01</b> · Welcome</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="210" alt="Create Profile"></a><br><sub><b>02</b> · Create Profile</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/03-build-your-profile.svg"><img src="docs/screens/03-build-your-profile.svg" width="210" alt="Build Your Profile"></a><br><sub><b>03</b> · Build Your Profile</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/26-memorial.svg"><img src="docs/screens/26-memorial.svg" width="210" alt="Memorial — Graceful departure"></a><br><sub><b>26</b> · Memorial</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/27-ai-assistant.svg"><img src="docs/screens/27-ai-assistant.svg" width="210" alt="AI Assistant — A capable creative partner"></a><br><sub><b>27</b> · AI Assistant</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/28-specialists.svg"><img src="docs/screens/28-specialists.svg" width="210" alt="Specialists — Biometric-routed handoff"></a><br><sub><b>28</b> · Specialists</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/04-personality.svg"><img src="docs/screens/04-personality.svg" width="210" alt="Personality"></a><br><sub><b>04</b> · Personality</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="210" alt="Profile Home"></a><br><sub><b>05</b> · Profile Home</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/06-chat-with-ava.svg"><img src="docs/screens/06-chat-with-ava.svg" width="210" alt="Chat with Ava"></a><br><sub><b>06</b> · Chat with Ava</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/29-tasks-grants.svg"><img src="docs/screens/29-tasks-grants.svg" width="210" alt="Tasks & Grants — Autonomous, revocable"></a><br><sub><b>29</b> · Tasks & Grants</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/30-fine-tune.svg"><img src="docs/screens/30-fine-tune.svg" width="210" alt="Fine-Tune — Encrypted, offline (Claim 26)"></a><br><sub><b>30</b> · Fine-Tune</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/31-your-data-promise.svg"><img src="docs/screens/31-your-data-promise.svg" width="210" alt="Your Data Promise — No raw data leaves your vault"></a><br><sub><b>31</b> · Your Data Promise</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="210" alt="Memory Vault"></a><br><sub><b>07</b> · Memory Vault</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/08-relationships.svg"><img src="docs/screens/08-relationships.svg" width="210" alt="Relationships"></a><br><sub><b>08</b> · Relationships</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/09-add-relationship.svg"><img src="docs/screens/09-add-relationship.svg" width="210" alt="Add Relationship"></a><br><sub><b>09</b> · Add Relationship</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/10-profile-health.svg"><img src="docs/screens/10-profile-health.svg" width="210" alt="Profile Health"></a><br><sub><b>10</b> · Profile Health</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/11-marketplace.svg"><img src="docs/screens/11-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>11</b> · Marketplace</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/12-licensing-center.svg"><img src="docs/screens/12-licensing-center.svg" width="210" alt="Licensing Center"></a><br><sub><b>12</b> · Licensing Center</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/13-embodiments.svg"><img src="docs/screens/13-embodiments.svg" width="210" alt="Embodiments"></a><br><sub><b>13</b> · Embodiments</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/14-control-center.svg"><img src="docs/screens/14-control-center.svg" width="210" alt="Control Center"></a><br><sub><b>14</b> · Control Center</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/15-design-language.svg"><img src="docs/screens/15-design-language.svg" width="210" alt="Design Language"></a><br><sub><b>15</b> · Design Language</sub></td>
   </tr>
 </table>
 
-### Moderation, posting & the persona engine
+**Companion, summoning & connection**
 
 <table>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="210" alt="Moderation — Every reply, before it's seen"></a><br><sub><b>32</b> · Moderation</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/33-posts.svg"><img src="docs/screens/33-posts.svg" width="210" alt="Posts — Post in your AI's voice"></a><br><sub><b>33</b> · Posts</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/34-adult-mode.svg"><img src="docs/screens/34-adult-mode.svg" width="210" alt="Adult Mode — Age-gated at both ends"></a><br><sub><b>34</b> · Adult Mode</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/16-genesis.svg"><img src="docs/screens/16-genesis.svg" width="210" alt="Genesis"></a><br><sub><b>16</b> · Genesis</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/17-summon-beacons.svg"><img src="docs/screens/17-summon-beacons.svg" width="210" alt="Summon & Beacons"></a><br><sub><b>17</b> · Summon & Beacons</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/18-proactive.svg"><img src="docs/screens/18-proactive.svg" width="210" alt="Proactive"></a><br><sub><b>18</b> · Proactive</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/35-aging-lifecycle.svg"><img src="docs/screens/35-aging-lifecycle.svg" width="210" alt="Aging & Lifecycle — It evolves with time"></a><br><sub><b>35</b> · Aging & Lifecycle</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/36-multi-modal.svg"><img src="docs/screens/36-multi-modal.svg" width="210" alt="Multi-Modal — Text, voice, image, video"></a><br><sub><b>36</b> · Multi-Modal</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/37-persona-embedding.svg"><img src="docs/screens/37-persona-embedding.svg" width="210" alt="Persona Embedding — Latent state · Claims 21–23"></a><br><sub><b>37</b> · Persona Embedding</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/19-transparency.svg"><img src="docs/screens/19-transparency.svg" width="210" alt="Transparency"></a><br><sub><b>19</b> · Transparency</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/20-connections.svg"><img src="docs/screens/20-connections.svg" width="210" alt="Connections"></a><br><sub><b>20</b> · Connections</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/21-rooms.svg"><img src="docs/screens/21-rooms.svg" width="210" alt="Rooms"></a><br><sub><b>21</b> · Rooms</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/screens/38-surfaces.svg"><img src="docs/screens/38-surfaces.svg" width="210" alt="Surfaces — Cross-platform presence"></a><br><sub><b>38</b> · Surfaces</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/22-providers.svg"><img src="docs/screens/22-providers.svg" width="210" alt="Providers"></a><br><sub><b>22</b> · Providers</sub></td>
   </tr>
 </table>
+
+**Your data promise, lifecycle & the claims**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/23-cloud-model.svg"><img src="docs/screens/23-cloud-model.svg" width="210" alt="Cloud Model"></a><br><sub><b>23</b> · Cloud Model</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/24-offline-mode.svg"><img src="docs/screens/24-offline-mode.svg" width="210" alt="Offline Mode"></a><br><sub><b>24</b> · Offline Mode</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/25-objection-lifecycle.svg"><img src="docs/screens/25-objection-lifecycle.svg" width="210" alt="Objection & Lifecycle"></a><br><sub><b>25</b> · Objection & Lifecycle</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/26-memorial.svg"><img src="docs/screens/26-memorial.svg" width="210" alt="Memorial"></a><br><sub><b>26</b> · Memorial</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/27-ai-assistant.svg"><img src="docs/screens/27-ai-assistant.svg" width="210" alt="AI Assistant"></a><br><sub><b>27</b> · AI Assistant</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/28-specialists.svg"><img src="docs/screens/28-specialists.svg" width="210" alt="Specialists"></a><br><sub><b>28</b> · Specialists</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/29-tasks-grants.svg"><img src="docs/screens/29-tasks-grants.svg" width="210" alt="Tasks & Grants"></a><br><sub><b>29</b> · Tasks & Grants</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/30-fine-tune.svg"><img src="docs/screens/30-fine-tune.svg" width="210" alt="Fine-Tune"></a><br><sub><b>30</b> · Fine-Tune</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/31-your-data-promise.svg"><img src="docs/screens/31-your-data-promise.svg" width="210" alt="Your Data Promise"></a><br><sub><b>31</b> · Your Data Promise</sub></td>
+  </tr>
+</table>
+
+**Moderation, posting & the persona engine**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="210" alt="Moderation"></a><br><sub><b>32</b> · Moderation</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/33-posts.svg"><img src="docs/screens/33-posts.svg" width="210" alt="Posts"></a><br><sub><b>33</b> · Posts</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/34-adult-mode.svg"><img src="docs/screens/34-adult-mode.svg" width="210" alt="Adult Mode"></a><br><sub><b>34</b> · Adult Mode</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/35-aging-lifecycle.svg"><img src="docs/screens/35-aging-lifecycle.svg" width="210" alt="Aging & Lifecycle"></a><br><sub><b>35</b> · Aging & Lifecycle</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/36-multi-modal.svg"><img src="docs/screens/36-multi-modal.svg" width="210" alt="Multi-Modal"></a><br><sub><b>36</b> · Multi-Modal</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/37-persona-embedding.svg"><img src="docs/screens/37-persona-embedding.svg" width="210" alt="Persona Embedding"></a><br><sub><b>37</b> · Persona Embedding</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/38-surfaces.svg"><img src="docs/screens/38-surfaces.svg" width="210" alt="Surfaces"></a><br><sub><b>38</b> · Surfaces</sub></td>
+  </tr>
+</table>
+
 
 ## Design assets
 
