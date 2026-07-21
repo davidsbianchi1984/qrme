@@ -53,6 +53,18 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(assistant.router)
     app.include_router(governance.router)
     app.include_router(licensing.router)
+
+    # Optional CORS for a packaged desktop/mobile front-end that calls the API
+    # from a different origin (e.g. the Electron app in app/). Off by default;
+    # set QRME_CORS_ORIGINS to a comma-separated allowlist, or "*" for any.
+    origins = os.environ.get("QRME_CORS_ORIGINS")
+    if origins:
+        from fastapi.middleware.cors import CORSMiddleware
+        allow = ["*"] if origins.strip() == "*" else [
+            o.strip() for o in origins.split(",") if o.strip()]
+        app.add_middleware(
+            CORSMiddleware, allow_origins=allow, allow_credentials=False,
+            allow_methods=["*"], allow_headers=["*"])
     return app
 
 
