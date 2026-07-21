@@ -230,6 +230,7 @@ curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json
   -d '{"interactor_id": "'$INTERACTOR'", "message": "Tell me about your garden!"}'
 ```
 
+
 ## App screens
 
 The full QRME product, screen by screen — a screen for every capability, in the app's design language (Deep Indigo · Neon Purple · Warm Amber · Soft Silver, SF-style type, liquid-glass cards). Each is a self-contained, hand-built SVG — no fonts, images, or scripts — so it renders identically here, in a browser, and in any converter. Regenerate with `python3 docs/screens/build.py`.
@@ -299,6 +300,24 @@ The full QRME product, screen by screen — a screen for every capability, in th
     <td align="center" width="33%"><a href="docs/screens/29-tasks-grants.svg"><img src="docs/screens/29-tasks-grants.svg" width="210" alt="Tasks & Grants — Autonomous, revocable"></a><br><sub><b>29</b> · Tasks & Grants</sub></td>
     <td align="center" width="33%"><a href="docs/screens/30-fine-tune.svg"><img src="docs/screens/30-fine-tune.svg" width="210" alt="Fine-Tune — Encrypted, offline (Claim 26)"></a><br><sub><b>30</b> · Fine-Tune</sub></td>
     <td align="center" width="33%"><a href="docs/screens/31-your-data-promise.svg"><img src="docs/screens/31-your-data-promise.svg" width="210" alt="Your Data Promise — No raw data leaves your vault"></a><br><sub><b>31</b> · Your Data Promise</sub></td>
+  </tr>
+</table>
+
+### Moderation, posting & the persona engine
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="210" alt="Moderation — Every reply, before it's seen"></a><br><sub><b>32</b> · Moderation</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/33-posts.svg"><img src="docs/screens/33-posts.svg" width="210" alt="Posts — Post in your AI's voice"></a><br><sub><b>33</b> · Posts</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/34-adult-mode.svg"><img src="docs/screens/34-adult-mode.svg" width="210" alt="Adult Mode — Age-gated at both ends"></a><br><sub><b>34</b> · Adult Mode</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/35-aging-lifecycle.svg"><img src="docs/screens/35-aging-lifecycle.svg" width="210" alt="Aging & Lifecycle — It evolves with time"></a><br><sub><b>35</b> · Aging & Lifecycle</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/36-multi-modal.svg"><img src="docs/screens/36-multi-modal.svg" width="210" alt="Multi-Modal — Text, voice, image, video"></a><br><sub><b>36</b> · Multi-Modal</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/37-persona-embedding.svg"><img src="docs/screens/37-persona-embedding.svg" width="210" alt="Persona Embedding — Latent state · Claims 21–23"></a><br><sub><b>37</b> · Persona Embedding</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/38-surfaces.svg"><img src="docs/screens/38-surfaces.svg" width="210" alt="Surfaces — Cross-platform presence"></a><br><sub><b>38</b> · Surfaces</sub></td>
   </tr>
 </table>
 

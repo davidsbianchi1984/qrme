@@ -332,7 +332,7 @@ def head(num, title, sub, accent="brand", locked=False):
     lockmark = "  🔒" if locked else ""
     out.append(text(CX, SY + 66, title, 20, C["txt"], 700, spacing=-0.4))
     if locked:
-        lx = CX + len(title) * 11.4 + 12
+        lx = CX + len(title) * 11.2 + 18
         out.append(icon("lock", lx, SY + 60, C["amber"], 0.66))
     if sub:
         out.append(text(CX, SY + 84, sub, 11.5, C["t2"], 400))
@@ -942,6 +942,63 @@ def render(spec):
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
+    elif hero == "moderation":
+        out.append(rrect(CX, y, CW, 64, 16, "url(#gCard)", C["line"], 1))
+        out.append(icon("chat", CX + 22, y + 22, C["brandA"], 0.8))
+        out.append(text(CX + 40, y + 20, "Ava wants to reply", 11, C["t2"], 600))
+        out.append(pill(CX + CW - 14, y + 20, "HELD", "warn"))
+        out.append(text(CX + 14, y + 44, "“Tell me about your rose garden.”", 11.5, C["txt"], 500))
+        y += 76
+        bw = (CW - 12) / 2
+        out.append(rrect(CX, y, bw, 60, 15, A(C["green"], 0.10), C["green"], 1.4))
+        out.append(icon("shieldok", CX + bw / 2, y + 24, C["green"], 1.1))
+        out.append(text(CX + bw / 2, y + 48, "Approve", 12, C["green"], 700, "middle"))
+        out.append(rrect(CX + bw + 12, y, bw, 60, 15, A(C["red"], 0.10), C["red"], 1.4))
+        out.append(icon("warn", CX + bw + 12 + bw / 2, y + 24, C["red"], 1.1))
+        out.append(text(CX + bw + 12 + bw / 2, y + 48, "Reject", 12, C["red"], 700, "middle"))
+        y += 74
+        for ic, col, k, s, pt in [("list", "amber", "Approval queue", "manual mode holds every reply", ("3", "warn")),
+                                  ("shieldok", "green", "Public posts → strict", "always the strict filter", None)]:
+            c = {"icon": ic, "color": col, "k": k, "s": s, "h": 48}
+            if pt:
+                c["pill"] = pt
+            s2, y = card_block(y, c)
+            out.append(s2)
+
+    elif hero == "embedding":
+        dims = [("Engagement", 0.82, C["brandA"]), ("Warmth", 0.74, C["amber"]),
+                ("Depth", 0.60, C["cyan"]), ("Positivity", 0.70, C["green"]),
+                ("Stress", 0.35, C["red"]), ("Continuity", 0.90, C["pink"])]
+        for lbl, v, col in dims:
+            s, y = statbar(y, lbl, v, f"{v:.2f}", col)
+            out.append(s)
+        y += 4
+        out.append(rrect(CX, y, CW, 50, 14, A(C["brandA"], 0.08), C["brandA"], 1))
+        out.append(icon("bolt", CX + 24, y + 25, C["brandA"], 0.9))
+        out.append(text(CX + 46, y + 22, "EMA-updated every interaction", 11, C["txt"], 600))
+        out.append(text(CX + 46, y + 37, "versioned · conditions attention weighting", 9.5, C["t2"]))
+
+    elif hero == "modal":
+        seg = ["Text", "Voice", "Image", "Video"]
+        out.append(rrect(CX, y, CW, 38, 12, "#0d0a24", C["line"], 1))
+        sw = (CW - 8) / 4
+        for i, lbl in enumerate(seg):
+            on = (i == 1)
+            if on:
+                out.append(rrect(CX + 4 + i * sw, y + 4, sw, 30, 9, "url(#gBrand)"))
+            out.append(text(CX + 4 + i * sw + sw / 2, y + 24, lbl, 11, "#fff" if on else C["t2"], 650, "middle"))
+        y += 50
+        out.append(rrect(CX, y, CW, 60, 15, "url(#gCard)", C["line"], 1))
+        out.append(icon("mic", CX + 26, y + 30, C["pink"], 1.2))
+        out.append(text(CX + 52, y + 26, "Voice reply", 12.5, C["txt"], 650))
+        out.append(text(CX + 52, y + 42, "preserved from your voice-note sources", 9.5, C["t2"]))
+        out.append(pill(CX + CW - 14, y + 24, "PRESERVED", "good"))
+        y += 72
+        for ic, col, k, s in [("photo", "cyan", "Image & video", "a render descriptor on the reply"),
+                              ("shieldok", "green", "Same identity, any form", "persona signature is invariant")]:
+            s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
+            out.append(s2)
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1037,6 +1094,35 @@ SCREENS = [
         dict(icon="eye", color="cyan", k="Every access audited", s="stored · read · erased", pill=("CHAIN OK", "good")),
         dict(icon="finger", color="brand", k="Capability tokens", s="only the SHA-256 hash is stored"),
         dict(icon="warn", color="red", k="Delete anything, anytime", s="local trace + vault records purged"),
+    ]),
+    # ---- moderation, posting & the persona engine ----
+    dict(num=32, title="Moderation", sub="Every reply, before it's seen", hero="moderation", accent="green", tab=0),
+    dict(num=33, title="Posts", sub="Post in your AI's voice", accent="amber", tabs=MARKET, tab=3, cards=[
+        dict(icon="pen", color="amber", k="Compose a post", s="in Ava's voice, then moderated"),
+        dict(icon="chat", color="brand", k="“Tomatoes are in — finally.”", s="posted to the feed", pill=("LIVE", "good")),
+        dict(icon="shieldok", color="green", k="Public posts → strict", s="always the strict filter"),
+        dict(icon="chart", color="cyan", k="12 posts · 3.4k views", s="GET /posts"),
+    ]),
+    dict(num=34, title="Adult Mode", sub="Age-gated at both ends", accent="red", tab=0, locked=True, cards=[
+        dict(icon="lock", color="red", k="Adult content mode", s="an adult owner must enable it", pill=("18+", "crit")),
+        dict(icon="finger", color="green", k="Owner verified 18+", s="required to turn it on", stat=("VERIFIED", "on")),
+        dict(icon="person", color="amber", k="Interactor 18+", s="verified before any chat", stat=("REQUIRED", "avail")),
+        dict(icon="shieldok", color="cyan", k="Minors always strict", s="no exceptions, ever"),
+    ]),
+    dict(num=35, title="Aging & Lifecycle", sub="It evolves with time", accent="cyan", tab=0, cards=[
+        dict(icon="clock", color="cyan", k="Effective age", s="base 41 · +2y elapsed", metric="43"),
+        dict(icon="leaf", color="green", k="Aging enabled", s="grows with real time", stat=("ON", "on")),
+        dict(icon="people", color="amber", k="Successor owner", s="legacy succession set", stat=("SET", "on")),
+        dict(icon="dove", color="pink", k="Or sunsets to memorial", s="never orphaned"),
+    ]),
+    dict(num=36, title="Multi-Modal", sub="Text, voice, image, video", hero="modal", accent="brand", tab=0),
+    dict(num=37, title="Persona Embedding", sub="Latent state · Claims 21–23", hero="embedding", accent="brand", tab=2),
+    dict(num=38, title="Surfaces", sub="Cross-platform presence", accent="cyan", tab=3, cards=[
+        dict(icon="chat", color="brand", k="Chat", s="in-app conversation", stat=("ON", "on")),
+        dict(icon="grid", color="amber", k="Feed", s="posts & stories", stat=("ON", "on")),
+        dict(icon="compass", color="green", k="Web", s="public profile page", stat=("ON", "on")),
+        dict(icon="headset", color="pink", k="AR / VR", s="immersive rooms", stat=("OFF", "off")),
+        dict(icon="watch", color="cyan", k="Wearable", s="ambient presence", stat=("ON", "on")),
     ]),
 ]
 
