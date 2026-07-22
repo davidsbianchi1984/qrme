@@ -19,7 +19,7 @@ from fastapi import FastAPI
 from . import offline
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
-from .routers import (assistant, community, connections, governance,
+from .routers import (apps, assistant, community, connections, governance,
                       intelligence, interaction, licensing, profiles, social,
                       summon)
 
@@ -50,6 +50,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(intelligence.router)
     app.include_router(connections.router)
     app.include_router(social.router)
+    app.include_router(apps.router)
     app.include_router(summon.router)
     app.include_router(community.router)
     app.include_router(assistant.router)

@@ -347,6 +347,26 @@ class SocialPublish(BaseModel):
     topic: str | None = None
 
 
+class AppConnect(BaseModel):
+    provider: str                      # apple | google | microsoft | canva
+    app: str                           # photos | calendar | mail | ...
+    capabilities: list[str] = Field(default_factory=list)  # empty = grant all the app offers
+
+
+class AppItem(BaseModel):
+    content: str
+    title: str | None = None
+
+
+class AppCollect(BaseModel):
+    items: list[AppItem] = Field(default_factory=list)
+
+
+class AppInvoke(BaseModel):
+    capability: str
+    input: str | None = None
+
+
 class ComposeRequest(BaseModel):
     topic: str
     surface: str | None = None
