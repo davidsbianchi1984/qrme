@@ -525,6 +525,29 @@ def qr(qx, qy, qs, seed=7):
     return "".join(out)
 
 
+def apple_mark(x, y, s=0.66, col="#0b0b0f"):
+    return (f'<g transform="translate({x:.1f},{y:.1f}) scale({s})" fill="{col}">'
+            '<path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.49'
+            '-.12-1.15.42-2.35 1.07-3.08.72-.81 2.02-1.47 3.09-1.49z'
+            'M20.5 17.06c-.06.14-.94 3.22-3.1 3.25-1.75.02-2.31-1.04-4.31-1.04-2 0-2.62 1.02-4.28 1.06'
+            '-2.09.08-3.68-3.29-3.74-3.43-.06-.14-1.62-6.18 1.32-9.03.98-.96 2.36-1.5 3.65-1.5'
+            ' 1.75 0 2.82 1.05 4.25 1.05 1.37 0 2.2-1.05 4.28-1.05 1.03 0 2.6.42 3.6 1.66'
+            '-3.16 1.73-2.65 6.24.53 8.03z"/></g>')
+
+
+def google_mark(x, y, s=0.66):
+    return (f'<g transform="translate({x:.1f},{y:.1f}) scale({s})">'
+            '<path fill="#4285F4" d="M23.06 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h6.2a5.3 5.3 0 0 1-2.3 3.48v2.89h3.72c2.18-2 3.44-4.96 3.44-8.38z"/>'
+            '<path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.94-2.91l-3.72-2.89c-1.03.69-2.35 1.1-4.22 1.1-3.25 0-6-2.19-6.98-5.13H1.18v2.98A12 12 0 0 0 12 24z"/>'
+            '<path fill="#FBBC05" d="M5.02 14.27a7.2 7.2 0 0 1 0-4.54V6.75H1.18a12 12 0 0 0 0 10.5l3.84-2.98z"/>'
+            '<path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.3-3.3C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.18 6.75l3.84 2.98C6 6.94 8.75 4.75 12 4.75z"/></g>')
+
+
+def envelope(cx, cy, col):
+    return (f'<rect x="{cx-9:.1f}" y="{cy-6:.1f}" width="18" height="13" rx="2.5" fill="none" stroke="{col}" stroke-width="1.7"/>'
+            f'<path d="M{cx-8:.1f} {cy-4:.1f} L{cx:.1f} {cy+2:.1f} L{cx+8:.1f} {cy-4:.1f}" fill="none" stroke="{col}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>')
+
+
 # --------------------------------------------------------------------------- #
 # screen renderer
 # --------------------------------------------------------------------------- #
@@ -1074,6 +1097,180 @@ def render(spec):
             out.append(s2)
         out.append(button(CX, y + 2, CW, "Sign Out", "brand", 42))
 
+    elif hero == "auth":
+        out.append(orb(W / 2, y + 36, 30, head_profile=True))
+        y += 82
+        out.append(text(W / 2, y, "Create your account", 17, "#fff", 750, "middle", -0.3))
+        out.append(text(W / 2, y + 20, "One login for QRME, JIM-mini & PDI", 11, C["t2"], 400, "middle"))
+        y += 42
+        out.append(rrect(CX, y, CW, 46, 13, "#ffffff"))
+        out.append(apple_mark(CX + 30, y + 12))
+        out.append(text(W / 2 + 10, y + 28, "Continue with Apple", 13, "#0b0b0f", 650, "middle"))
+        y += 54
+        out.append(rrect(CX, y, CW, 46, 13, "#ffffff"))
+        out.append(google_mark(CX + 31, y + 15))
+        out.append(text(W / 2 + 10, y + 28, "Continue with Google", 13, "#1f1f1f", 650, "middle"))
+        y += 54
+        out.append(rrect(CX, y, CW, 46, 13, "rgba(255,255,255,0.06)", C["line"], 1))
+        out.append(envelope(CX + 41, y + 23, C["brandA"]))
+        out.append(text(W / 2 + 10, y + 28, "Continue with Email", 13, C["txt"], 650, "middle"))
+        y += 62
+        out.append(text(W / 2, y, "Age & identity are verified in the next step.", 9.5, C["t3"], 500, "middle"))
+        out.append(text(W / 2, y + 16, "By continuing you agree to the Terms & Privacy Policy.", 9, C["t3"], 500, "middle"))
+
+    elif hero == "verify":
+        out.append(orb(W / 2, y + 36, 28))
+        out.append(icon("finger", W / 2, y + 34, "rgba(255,255,255,0.92)", 1.3))
+        y += 78
+        out.append(text(W / 2, y, "Verify it's really you", 16, "#fff", 750, "middle", -0.3))
+        out.append(text(W / 2, y + 19, "Just once — it protects you and the people", 10.5, C["t2"], 400, "middle"))
+        out.append(text(W / 2, y + 33, "who appear in your profiles.", 10.5, C["t2"], 400, "middle"))
+        y += 52
+        fs = 78
+        fx = W / 2 - fs / 2
+        out.append(rrect(fx, y, fs, fs, 18, A(C["brandA"], 0.06), C["brandA"], 1))
+        for bx, by, dx, dy in [(fx + 12, y + 12, 1, 1), (fx + fs - 12, y + 12, -1, 1),
+                               (fx + 12, y + fs - 12, 1, -1), (fx + fs - 12, y + fs - 12, -1, -1)]:
+            out.append(f'<path d="M{bx} {by+13*dy} L{bx} {by} L{bx+13*dx} {by}" fill="none" '
+                       f'stroke="{C["brandA"]}" stroke-width="2" stroke-linecap="round"/>')
+        out.append(icon("person", W / 2, y + fs / 2, C["brandA"], 1.7))
+        y += fs + 14
+        for ic, col, k, s, badge, tone in [
+                ("shieldok", "green", "Age 18+ confirmed", "unlocks adult profiles", "VERIFIED", "good"),
+                ("finger", "brand", "Face ID liveness", "a real, present person", "PASSED", "good"),
+                ("doc", "cyan", "Government ID", "unlocks third-party use", "OPTIONAL", "info")]:
+            out.append(rrect(CX, y, CW, 50, 14, "url(#gCard)", C["line"], 1))
+            out.append(chip(CX + 10, y + 8, ic, ACCENT[col]))
+            out.append(text(CX + 54, y + 21, k, 12.5, C["txt"], 650))
+            out.append(text(CX + 54, y + 36, s, 10, C["t2"]))
+            out.append(pill(CX + CW - 14, y + 25, badge, tone))
+            y += 58
+        out.append(button(CX, y + 2, CW, "Continue", "brand", 44))
+
+    elif hero == "permissions":
+        out.append(text(CX, y, "Adjust any of these anytime in Settings.", 10.5, C["t2"]))
+        y += 28
+        rows = [("info", "brand", "Notifications", "check-ins & summons", "on"),
+                ("photo", "cyan", "Camera & Mic", "live video & AR/VR", "on"),
+                ("heart", "red", "Health & Motion", "the JIM-mini tandem", "avail"),
+                ("people", "amber", "Contacts", "map to relationships", "off")]
+        for ic, col, k, s, st in rows:
+            out.append(rrect(CX, y, CW, 56, 15, "url(#gCard)", C["line"], 1))
+            out.append(chip(CX + 12, y + 11, ic, ACCENT[col]))
+            out.append(text(CX + 58, y + 24, k, 12.5, C["txt"], 650))
+            out.append(text(CX + 58, y + 40, s, 10.5, C["t2"]))
+            on = st == "on"
+            tx = CX + CW - 48
+            out.append(rrect(tx, y + 18, 40, 22, 11, C["green"] if on else "#0d0a24", C["line"] if not on else None, 1))
+            out.append(f'<circle cx="{tx + (28 if on else 12)}" cy="{y+29}" r="8.5" fill="#fff"/>')
+            y += 64
+        out.append(button(CX, y + 2, CW, "Continue", "brand", 44))
+
+    elif hero == "avatar":
+        out.append(text(CX, y, "A 2D portrait for chat, a 3D avatar for video, AR & VR.", 10.5, C["t2"]))
+        y += 26
+        gw = (CW - 12) / 2
+        # 2D portrait tile
+        out.append(rrect(CX, y, gw, 128, 16, "url(#gCard)", C["line"], 1))
+        out.append(orb(CX + gw / 2, y + 54, 30))
+        out.append(icon("person", CX + gw / 2, y + 52, "rgba(255,255,255,0.92)", 1.4))
+        out.append(pill(CX + gw - 12, y + 20, "2D", "brand"))
+        out.append(text(CX + gw / 2, y + 104, "Portrait", 11.5, C["txt"], 650, "middle"))
+        out.append(text(CX + gw / 2, y + 118, "chat & feed", 9.5, C["t2"], 400, "middle"))
+        # 3D avatar tile
+        gx = CX + gw + 12
+        out.append(rrect(gx, y, gw, 128, 16, "url(#gCard)", C["line"], 1))
+        out.append(ring(gx + gw / 2, y + 54, 30, 0.75, C["cyan"], 4))
+        out.append(orb(gx + gw / 2, y + 54, 24))
+        out.append(icon("person", gx + gw / 2, y + 52, "rgba(255,255,255,0.92)", 1.2))
+        out.append(pill(gx + gw - 12, y + 20, "3D", "info"))
+        out.append(text(gx + gw / 2, y + 104, "Avatar", 11.5, C["txt"], 650, "middle"))
+        out.append(text(gx + gw / 2, y + 118, "video · AR · VR", 9.5, C["t2"], 400, "middle"))
+        y += 142
+        out.append(text(CX, y, "Style", 12, C["txt"], 700))
+        y += 14
+        seg = ["Realistic", "Stylized", "Abstract"]
+        out.append(rrect(CX, y, CW, 38, 12, "#0d0a24", C["line"], 1))
+        sw = (CW - 8) / 3
+        for i, lbl in enumerate(seg):
+            on = i == 1
+            if on:
+                out.append(rrect(CX + 4 + i * sw, y + 4, sw, 30, 9, "url(#gBrand)"))
+            out.append(text(CX + 4 + i * sw + sw / 2, y + 24, lbl, 11.5, "#fff" if on else C["t2"], 650, "middle"))
+        y += 48
+        out.append(button(CX, y, CW, "Generate from my photos", "brand", 44))
+
+    elif hero == "immersive":
+        ph = 188
+        out.append(rrect(CX, y, CW, ph, 18, "url(#gCard)", C["line"], 1))
+        # perspective floor grid
+        fy = y + ph - 20
+        for i in range(-3, 4):
+            out.append(f'<path d="M{W/2} {y+96} L{W/2 + i*70} {fy}" stroke="{A(C["cyan"],0.25)}" stroke-width="1"/>')
+        for j, gy in enumerate([y + 120, y + 142, y + 166]):
+            out.append(f'<line x1="{CX+14}" y1="{gy}" x2="{CX+CW-14}" y2="{gy}" stroke="{A(C["cyan"],0.18)}" stroke-width="1"/>')
+        # avatar standing in the space
+        out.append(orb(W / 2, y + 74, 26))
+        out.append(icon("person", W / 2, y + 72, "rgba(255,255,255,0.95)", 1.3))
+        out.append(f'<ellipse cx="{W/2}" cy="{y+128}" rx="34" ry="7" fill="{A(C["cyan"],0.18)}"/>')
+        out.append(pill(CX + CW - 14, y + 22, "AR HEADSET · LINKED", "info"))
+        out.append(icon("headset", CX + 28, y + 24, C["cyan"], 0.9))
+        y += ph + 14
+        for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Ava stands in your space, life-size"),
+                              ("speaker", "brand", "Spatial audio", "her voice comes from where she is"),
+                              ("eye", "pink", "Passthrough AR or full VR", "your living room, or her world")]:
+            s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
+            out.append(s2)
+
+    elif hero == "video":
+        vh = 196
+        out.append(rrect(CX, y, CW, vh, 18, "url(#orb)", C["line"], 1))
+        out.append(rrect(CX, y, CW, vh, 18, "url(#glow)"))
+        out.append(orb(W / 2, y + vh / 2 - 12, 44))
+        out.append(icon("person", W / 2, y + vh / 2 - 14, "rgba(255,255,255,0.95)", 1.9))
+        # LIVE badge
+        out.append(rrect(CX + 14, y + 14, 58, 20, 10, A(C["red"], 0.9)))
+        out.append(f'<circle cx="{CX+26}" cy="{y+24}" r="3.5" fill="#fff"/>')
+        out.append(text(CX + 34, y + 28, "LIVE", 10.5, "#fff", 750))
+        out.append(text(CX + 14, y + vh - 26, "Ava", 13, "#fff", 700))
+        out.append(text(CX + 14, y + vh - 12, "1080p · end-to-end encrypted", 9.5, "rgba(255,255,255,0.75)"))
+        # self preview tile
+        out.append(rrect(CX + CW - 68, y + vh - 86, 56, 74, 12, "#0d0a24", "rgba(255,255,255,0.18)", 1))
+        out.append(icon("person", CX + CW - 40, y + vh - 52, C["t2"], 1.2))
+        out.append(text(CX + CW - 40, y + vh - 20, "You", 9, C["t2"], 600, "middle"))
+        y += vh + 16
+        # controls
+        ctrls = [("mic", "ghost", C["txt"]), ("photo", "ghost", C["txt"]),
+                 ("speaker", "ghost", C["txt"]), ("phone", "danger", C["red"])]
+        n = len(ctrls)
+        gap = 16
+        d = 52
+        total = n * d + (n - 1) * gap
+        sx = W / 2 - total / 2
+        for i, (ic, kind, icol) in enumerate(ctrls):
+            bx = sx + i * (d + gap)
+            fill = A(C["red"], 0.16) if kind == "danger" else "rgba(255,255,255,0.06)"
+            stroke = C["red"] if kind == "danger" else C["line"]
+            out.append(f'<circle cx="{bx+d/2}" cy="{y+d/2}" r="{d/2}" fill="{fill}" stroke="{stroke}" stroke-width="1"/>')
+            out.append(icon(ic, bx + d / 2, y + d / 2, icol, 1.2))
+        y += d + 14
+        out.append(text(W / 2, y, "Camera & mic stay on your device — the stream is encrypted.", 9.3, C["t3"], 500, "middle"))
+
+    elif hero == "allset":
+        out.append(orb(W / 2, y + 40, 34))
+        out.append(f'<path d="M{W/2-11} {y+40} l7 8 14 -16" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>')
+        y += 100
+        out.append(text(W / 2, y, "You're all set", 18, "#fff", 750, "middle", -0.3))
+        out.append(text(W / 2, y + 21, "Ava is ready to meet the world.", 11, C["t2"], 400, "middle"))
+        y += 44
+        for ic, col, k, s in [("person", "brand", "Profile created", "Ava · AI version of you"),
+                              ("db", "cyan", "Sources added", "1,024 memories sealed in your vault"),
+                              ("sliders", "amber", "Personality set", "warm · balanced boundaries"),
+                              ("mask", "pink", "Avatar ready", "2D portrait + 3D for video & VR")]:
+            s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
+            out.append(s2)
+        out.append(button(CX, y + 2, CW, "Start chatting with Ava", "brand", 44))
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1203,6 +1400,15 @@ SCREENS = [
     # ---- session lifecycle (sign-in → … → sign-out) ----
     dict(num=39, title="Sign In", sub="Welcome back", hero="signin", accent="brand", tab=0),
     dict(num=40, title="End Session", sub="Your vault is sealed", hero="endsession", accent="green", tab=0),
+    # ---- first-run: account, verification & guided setup ----
+    dict(num=41, title="Log In", sub="Apple, Google or email", hero="auth", accent="brand", tab=0),
+    dict(num=42, title="Verify Identity", sub="Real person, once", hero="verify", accent="brand", tab=0),
+    dict(num=43, title="Enable Access", sub="Permissions, your call", hero="permissions", accent="cyan", tab=0),
+    dict(num=44, title="Avatar Studio", sub="A 2D & 3D face for Ava", hero="avatar", accent="brand", tab=0),
+    # ---- immersive surfaces: avatar chat, AR/VR & live video ----
+    dict(num=45, title="Immersive Chat", sub="AR / VR, life-size avatar", hero="immersive", accent="cyan", tab=0),
+    dict(num=46, title="Live Video", sub="Face-to-face with your AI", hero="video", accent="brand", tab=0),
+    dict(num=47, title="All Set", sub="Onboarding complete", hero="allset", accent="green", tab=0),
 ]
 
 
