@@ -2,7 +2,10 @@
 
 ![QRME — relationship-aware synthetic profiles](assets/design/00-cover.svg)
 
-QRME lets a user create, customize, and interact with AI-driven synthetic
+QRME future AI agent management system (**FEB2024 SYNTHETIC USER PROFILE MANAGEMENT United States application or CT international application # 19/056,418 ATTORNEY DOCKET # 526.P002 Patent Pending**). When elected
+to activate these capabilities, the platform will be equipped to deploy intelligent, role-specific AI agents capable of assisting users,
+automating tasks, managing workflows, and enhancing operational decision-making and could potentially run more efficiently, replace
+Mundane Outdated Tasks and or Roles within the company. — all within the same secure, private network environmenlets a user create, customize, and interact with AI-driven synthetic
 profiles — versions of themselves, another person (with consent/rights
 handling), or a fictional persona. Profiles adapt to *who* they're talking to
 (relationship-aware behavior) and *how engaged* that person is, while keeping
