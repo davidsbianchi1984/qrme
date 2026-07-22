@@ -17,7 +17,7 @@ services:
     build:
       context: ${PDI_CONTEXT:-../../pdi}
     environment:
-      PDI_MASTER_KEY: "${PDI_MASTER_KEY:-Zm9yLXRlc3Qtb25seS0zMi1ieXRlcy1rZXkhISEh}"
+      PDI_MASTER_KEY: "${PDI_MASTER_KEY:-cGRpLWUyZS1oYXJuZXNzLXRlc3Qta2V5LTMyYnl0ZXM=}"
       PDI_DB: /data/pdi.db
     volumes:
       - pdi-data:/data
