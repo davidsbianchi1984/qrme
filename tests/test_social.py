@@ -96,6 +96,28 @@ def test_revoke_stops_collection(client, profile_id):
     assert r.status_code == 409
 
 
+def test_all_image_platforms_supported(client, profile_id):
+    # Every platform from the connections set can be connected, and publish
+    # platforms resolve to the right presence URL.
+    platforms = ["instagram", "x", "tiktok", "facebook", "linkedin", "youtube",
+                 "reddit", "threads", "whatsapp", "meta", "mastodon", "twitch",
+                 "snapchat", "roblox", "pinterest", "discord"]
+    for p in platforms:
+        assert _connect(client, profile_id, platform=p, direction="collect")["platform"] == p
+
+    expected = {
+        "twitch": "https://twitch.tv/dana",
+        "discord": "https://discord.com/users/dana",
+        "snapchat": "https://snapchat.com/add/dana",
+        "mastodon": "https://mastodon.social/@dana",
+        "pinterest": "https://pinterest.com/dana",
+        "whatsapp": "https://wa.me/dana",
+    }
+    for p, url in expected.items():
+        conn = _connect(client, profile_id, platform=p, direction="publish", handle="dana")
+        assert client.get(f"/social/{conn['id']}/beacon").json()["presence_url"] == url
+
+
 def test_publish_registers_a_surface(client, profile_id):
     conn = _connect(client, profile_id, platform="youtube", direction="publish")
     surfaces = client.get(f"/profiles/{profile_id}/surfaces").json()["surfaces"]
