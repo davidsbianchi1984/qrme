@@ -229,6 +229,23 @@ CREATE TABLE IF NOT EXISTS surfaces (
     PRIMARY KEY (profile_id, surface)
 );
 
+-- Safe knowledge excursions. When a profile's model needs to study an
+-- unfamiliar topic, it gathers general knowledge from a SANITIZED brief (the
+-- owner's private terms redacted). ``brief`` is exactly what could leave;
+-- ``left_host`` records whether anything actually did (offline: never). Findings
+-- come back as general knowledge and can be folded into a knowledge source.
+CREATE TABLE IF NOT EXISTS excursions (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    topic        TEXT NOT NULL,       -- stays local (owner's data)
+    brief        TEXT NOT NULL,       -- sanitized outbound query
+    redactions   INTEGER NOT NULL DEFAULT 0,
+    left_host    INTEGER NOT NULL DEFAULT 0,
+    findings     TEXT,                -- general knowledge brought back
+    learned_src  TEXT,                -- source_item id once folded in
+    created_at   TEXT NOT NULL
+);
+
 -- Connected-app connectors. Each links a profile to an AI-integrated app from
 -- the catalog (Apple Photos, Google Calendar, Microsoft 365, Canva, …). Its
 -- agents then use it: collect context in, act on the app, or produce media.

@@ -367,6 +367,12 @@ class AppInvoke(BaseModel):
     input: str | None = None
 
 
+class ExcursionStart(BaseModel):
+    topic: str
+    question: str
+    private: list[str] = Field(default_factory=list)  # extra caller-marked private terms
+
+
 class ComposeRequest(BaseModel):
     topic: str
     surface: str | None = None
