@@ -1313,6 +1313,30 @@ def render(spec):
         out.append(text(CX, y, "Posts are moderated · a QR beacon reaches you.",
                         9.5, C["t3"], 500))
 
+    elif hero == "connectedapps":
+        out.append(text(CX, y, "Your profile & agents, plugged into your apps.",
+                        10.5, C["t2"]))
+        y += 24
+        provs = [
+            ("Apple Intelligence", "#e7e7ef", "13 apps",
+             "Photos · Calendar · Mail · Messages · +9"),
+            ("Google Gemini", "#4285F4", "11 apps",
+             "Photos · Gmail · Chrome · Maps · +7"),
+            ("Microsoft Copilot", "#4cc2ff", "8 apps",
+             "Photos · Explorer · 365 · Copilot · +4"),
+            ("Canva Magic Studio", "#00c4cc", "8 tools",
+             "Design · Media · Write · Edit · Layers · +3"),
+        ]
+        for name, col, count, sample in provs:
+            out.append(rrect(CX, y, CW, 56, 15, "url(#gCard)", C["line"], 1))
+            out.append(f'<circle cx="{CX+22}" cy="{y+28}" r="7" fill="{col}"/>')
+            out.append(text(CX + 40, y + 24, name, 12.5, C["txt"], 700))
+            out.append(pill(CX + CW - 12, y + 22, count, "info"))
+            out.append(text(CX + 40, y + 40, sample, 9.5, C["t2"]))
+            y += 64
+        out.append(text(CX, y, "Collect context · act agentically · produce media.",
+                        9.5, C["t3"], 500))
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1452,6 +1476,7 @@ SCREENS = [
     dict(num=46, title="Live Video", sub="Face-to-face with your AI", hero="video", accent="brand", tab=0),
     dict(num=47, title="All Set", sub="Onboarding complete", hero="allset", accent="green", tab=0),
     dict(num=48, title="Social Connections", sub="Collect data · publish & run", hero="social", accent="brand", tab=0),
+    dict(num=49, title="Connected Apps", sub="Apple · Google · Microsoft · Canva", hero="connectedapps", accent="brand", tab=0),
 ]
 
 

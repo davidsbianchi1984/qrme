@@ -24,11 +24,18 @@ import os
 
 from fastapi import APIRouter, HTTPException, Request, Response
 
-from .. import db, moderation
+from .. import catalog, db, moderation
 from ..common import profile_or_404, require_owner, source_items
 from ..models import SocialCollect, SocialConnect, SocialPublish
 
 router = APIRouter()
+
+
+@router.get("/connectors/catalog")
+def connector_catalog() -> dict:
+    """The connected-apps catalog: the AI-integrated apps (Apple, Google,
+    Microsoft, Canva) a profile and its agents can connect to."""
+    return catalog.catalog()
 
 _PLATFORM_URL = {
     "instagram": "https://instagram.com/{h}",
