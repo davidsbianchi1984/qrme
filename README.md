@@ -382,6 +382,31 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
 </table>
 
+**First-run — account, verification & guided setup**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/41-log-in.svg"><img src="docs/screens/41-log-in.svg" width="210" alt="Log In"></a><br><sub><b>41</b> · Log In (Apple · Google · Email)</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/42-verify-identity.svg"><img src="docs/screens/42-verify-identity.svg" width="210" alt="Verify Identity"></a><br><sub><b>42</b> · Verify Identity</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/43-enable-access.svg"><img src="docs/screens/43-enable-access.svg" width="210" alt="Enable Access"></a><br><sub><b>43</b> · Enable Access</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="210" alt="Avatar Studio"></a><br><sub><b>44</b> · Avatar Studio (2D &amp; 3D)</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/47-all-set.svg"><img src="docs/screens/47-all-set.svg" width="210" alt="All Set"></a><br><sub><b>47</b> · All Set</sub></td>
+    <td align="center" width="33%"></td>
+  </tr>
+</table>
+
+**Immersive surfaces — avatar chat, AR / VR & live video**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/45-immersive-chat.svg"><img src="docs/screens/45-immersive-chat.svg" width="210" alt="Immersive Chat"></a><br><sub><b>45</b> · Immersive Chat (AR / VR)</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/46-live-video.svg"><img src="docs/screens/46-live-video.svg" width="210" alt="Live Video"></a><br><sub><b>46</b> · Live Video</sub></td>
+    <td align="center" width="33%"></td>
+  </tr>
+</table>
+
 
 ## Design assets
 
