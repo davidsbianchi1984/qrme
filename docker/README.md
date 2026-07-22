@@ -37,10 +37,10 @@ QRME_CONTEXT=/path/to/qrme PDI_CONTEXT=/path/to/pdi JIM_CONTEXT=/path/to/jim-min
 
 ## CI
 
-`.github/workflows/e2e.yml` runs this on `main` and on demand. Because it pulls
-the sibling repositories, it needs a repository secret **`SUITE_REPO_TOKEN`** —
-a personal-access token with read access to `davidsbianchi1984/jim-mini` and
-`davidsbianchi1984/pdi`.
+`.github/workflows/e2e.yml` runs this on `main` and on demand. It checks out the
+sibling repositories alongside this one; all three are public, so the built-in
+`GITHUB_TOKEN` clones them — no extra secret is required. (If the repos are ever
+made private, add a `token:` with cross-repo read access to those checkouts.)
 
 ## Not a production topology
 
