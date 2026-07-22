@@ -229,6 +229,23 @@ CREATE TABLE IF NOT EXISTS surfaces (
     PRIMARY KEY (profile_id, surface)
 );
 
+-- Connected-app connectors. Each links a profile to an AI-integrated app from
+-- the catalog (Apple Photos, Google Calendar, Microsoft 365, Canva, …). Its
+-- agents then use it: collect context in, act on the app, or produce media.
+CREATE TABLE IF NOT EXISTS app_connectors (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    provider     TEXT NOT NULL,   -- apple | google | microsoft | canva
+    app          TEXT NOT NULL,   -- photos | calendar | mail | ...
+    label        TEXT NOT NULL,
+    capabilities TEXT NOT NULL DEFAULT '[]',  -- granted subset of the app's catalog capabilities
+    directions   TEXT NOT NULL DEFAULT '[]',  -- collect | act | produce (from the catalog)
+    status       TEXT NOT NULL DEFAULT 'active',  -- active | revoked
+    collected    INTEGER NOT NULL DEFAULT 0,   -- context items pulled in
+    actions      INTEGER NOT NULL DEFAULT 0,   -- capabilities invoked
+    created_at   TEXT NOT NULL
+);
+
 -- Social-platform connections. Each links a profile to an external platform in
 -- one of two directions:
 --   collect  — pull the account's content in as source material that BUILDS the
