@@ -229,6 +229,25 @@ CREATE TABLE IF NOT EXISTS surfaces (
     PRIMARY KEY (profile_id, surface)
 );
 
+-- Social-platform connections. Each links a profile to an external platform in
+-- one of two directions:
+--   collect  — pull the account's content in as source material that BUILDS the
+--              profile (each item lands in source_items as a social_post);
+--   publish  — post / run the profile ON the platform, registering a
+--              social:<platform> surface and a QR beacon that reaches it.
+CREATE TABLE IF NOT EXISTS social_connections (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    platform    TEXT NOT NULL,   -- instagram | x | tiktok | facebook | linkedin | youtube | reddit | threads
+    direction   TEXT NOT NULL,   -- collect | publish
+    handle      TEXT,            -- the account handle on that platform
+    scope       TEXT NOT NULL DEFAULT '[]',   -- JSON list: posts, photos, bio, ...
+    status      TEXT NOT NULL DEFAULT 'active',  -- active | revoked
+    collected   INTEGER NOT NULL DEFAULT 0,   -- items ingested (collect)
+    published   INTEGER NOT NULL DEFAULT 0,   -- items posted (publish)
+    created_at  TEXT NOT NULL
+);
+
 -- Latent persona embeddings (claim 21): a persistent, per-(profile,
 -- interactor) state vector updated after every interaction to carry
 -- cross-session state into inference conditioning.

@@ -1271,6 +1271,38 @@ def render(spec):
             out.append(s2)
         out.append(button(CX, y + 2, CW, "Start chatting with Ava", "brand", 44))
 
+    elif hero == "social":
+        out.append(text(CX, y, "Collect to build the profile · publish to run it.",
+                        10.5, C["t2"]))
+        y += 26
+        out.append(text(CX, y, "COLLECTING", 9.5, C["t3"], 700, "start", 0.8))
+        out.append(pill(CX + CW, y + 3, "→ builds profile", "info"))
+        y += 16
+        for ic, col, name, sub in [
+                ("photo", "pink", "Instagram", "@dana.grows · 1,204 posts"),
+                ("chat", "cyan", "X", "@dana · 820 posts")]:
+            out.append(rrect(CX, y, CW, 50, 14, "url(#gCard)", C["line"], 1))
+            out.append(chip(CX + 10, y + 8, ic, C[col]))
+            out.append(text(CX + 54, y + 22, name, 12.5, C["txt"], 650))
+            out.append(text(CX + 54, y + 37, sub, 10, C["t2"]))
+            out.append(pill(CX + CW - 12, y + 25, "COLLECT", "info"))
+            y += 58
+        y += 6
+        out.append(text(CX, y, "PUBLISHING", 9.5, C["t3"], 700, "start", 0.8))
+        out.append(pill(CX + CW, y + 3, "runs on platform", "good"))
+        y += 16
+        ph = 82
+        out.append(rrect(CX, y, CW, ph, 15, "url(#gCard)", C["line"], 1))
+        out.append(chip(CX + 12, y + 12, "star2", C["brandA"]))
+        out.append(text(CX + 54, y + 26, "TikTok", 12.5, C["txt"], 650))
+        out.append(text(CX + 54, y + 42, "@dana.grows", 10, C["t2"]))
+        out.append(status_dot(CX + 150, y + 30, "LIVE", "on"))
+        out.append(text(CX + 54, y + 62, "scan to reach the profile", 9, C["t3"]))
+        out.append(qr(CX + CW - 74, y + 10, 62, seed=11))
+        y += ph + 10
+        out.append(text(CX, y, "Posts are moderated · a QR beacon reaches you.",
+                        9.5, C["t3"], 500))
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1409,6 +1441,7 @@ SCREENS = [
     dict(num=45, title="Immersive Chat", sub="AR / VR, life-size avatar", hero="immersive", accent="cyan", tab=0),
     dict(num=46, title="Live Video", sub="Face-to-face with your AI", hero="video", accent="brand", tab=0),
     dict(num=47, title="All Set", sub="Onboarding complete", hero="allset", accent="green", tab=0),
+    dict(num=48, title="Social Connections", sub="Collect data · publish & run", hero="social", accent="brand", tab=0),
 ]
 
 

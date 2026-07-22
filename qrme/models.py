@@ -319,6 +319,32 @@ class SurfacesSet(BaseModel):
     surfaces: list[str] = Field(default_factory=list)
 
 
+SocialPlatform = Literal[
+    "instagram", "x", "tiktok", "facebook", "linkedin", "youtube", "reddit", "threads",
+]
+
+
+class SocialConnect(BaseModel):
+    platform: SocialPlatform
+    direction: Literal["collect", "publish"]
+    handle: str | None = None          # the account handle on that platform
+    scope: list[str] = Field(default_factory=list)  # posts, photos, bio, ...
+
+
+class SocialItem(BaseModel):
+    content: str                       # the post / caption / bio text
+    title: str | None = None
+
+
+class SocialCollect(BaseModel):
+    items: list[SocialItem] = Field(default_factory=list)
+
+
+class SocialPublish(BaseModel):
+    content: str
+    topic: str | None = None
+
+
 class ComposeRequest(BaseModel):
     topic: str
     surface: str | None = None
