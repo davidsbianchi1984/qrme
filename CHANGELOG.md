@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **First-run onboarding screens** — provider login (Continue with Apple /
+  Google / email), identity & age verification, access permissions, Avatar
+  Studio (2D portrait + 3D avatar), immersive AR/VR chat, live video, and an
+  "all set" summary — the full first-run → profile-building funnel, rendered in
+  both iOS and Android chrome.
+
+### Fixed
+
+- Two text-overflow issues on the onboarding screens (the Verify Identity badge
+  row and the Immersive Chat subtitle).
+
 ## [0.1.0] — 2026-07-21
 
 First public release. QRME is the AI synthetic-profile platform of the
