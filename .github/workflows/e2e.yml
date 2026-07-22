@@ -17,6 +17,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    timeout-minutes: 20   # a stuck compose must fail fast, never hang the runner
     steps:
       - uses: actions/checkout@v4
         with:
@@ -30,11 +31,22 @@ jobs:
           repository: davidsbianchi1984/pdi
           path: pdi
 
-      - name: Boot the suite and run the end-to-end flow
+      # Bring up the long-running services (pdi, qrme, jim) — `bootstrap` runs
+      # to completion first as qrme's dependency — then run the e2e flow as a
+      # one-shot that exits with the flow's status. Avoids
+      # `--abort-on-container-exit`, which deadlocks with the one-shot bootstrap.
+      - name: Boot the suite
         working-directory: qrme
-        run: >
-          docker compose -f docker/docker-compose.yml up --build
-          --abort-on-container-exit --exit-code-from e2e
+        run: docker compose -f docker/docker-compose.yml up -d --build pdi qrme jim
+
+      - name: Run the end-to-end flow
+        working-directory: qrme
+        run: docker compose -f docker/docker-compose.yml run --rm --build e2e
+
+      - name: Dump logs on failure
+        if: failure()
+        working-directory: qrme
+        run: docker compose -f docker/docker-compose.yml logs --no-color
 
       - name: Tear down
         if: always()
