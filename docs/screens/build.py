@@ -1136,7 +1136,7 @@ def render(spec):
         out.append(icon("person", W / 2, y + fs / 2, C["brandA"], 1.7))
         y += fs + 14
         for ic, col, k, s, badge, tone in [
-                ("shieldok", "green", "Age 18+ confirmed", "unlocks adult profiles", "VERIFIED", "good"),
+                ("shieldok", "green", "Age 18+", "unlocks adult profiles", "VERIFIED", "good"),
                 ("finger", "brand", "Face ID liveness", "a real, present person", "PASSED", "good"),
                 ("doc", "cyan", "Government ID", "unlocks third-party use", "OPTIONAL", "info")]:
             out.append(rrect(CX, y, CW, 50, 14, "url(#gCard)", C["line"], 1))
@@ -1216,7 +1216,7 @@ def render(spec):
         out.append(pill(CX + CW - 14, y + 22, "AR HEADSET · LINKED", "info"))
         out.append(icon("headset", CX + 28, y + 24, C["cyan"], 0.9))
         y += ph + 14
-        for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Ava stands in your space, life-size"),
+        for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Ava stands in your space"),
                               ("speaker", "brand", "Spatial audio", "her voice comes from where she is"),
                               ("eye", "pink", "Passthrough AR or full VR", "your living room, or her world")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
