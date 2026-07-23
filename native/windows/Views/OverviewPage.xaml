@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.OverviewPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Ellipse Width="9" Height="9" Fill="{StaticResource QrmeGreenBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="Profile live" Foreground="{StaticResource QrmeGreenBrush}"
+                           FontWeight="Bold" FontSize="12" />
+            </StackPanel>
+            <TextBlock x:Name="Greeting" FontSize="28" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock Text="Your synthetic profile, as the world sees it."
+                       Foreground="{StaticResource QrmeT2Brush}" FontSize="14" TextWrapping="Wrap" />
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Public card" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ProgressRing x:Name="Loading" IsActive="True" Foreground="{StaticResource QrmeBrandABrush}"
+                                  Width="24" Height="24" HorizontalAlignment="Left" />
+                    <ItemsControl x:Name="CardList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="0,4">
+                                    <TextBlock Text="{Binding Label}" Foreground="{StaticResource QrmeTxtBrush}"
+                                               HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding Value}" Foreground="{StaticResource QrmeT2Brush}"
+                                               HorizontalAlignment="Right" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="Empty" Foreground="{StaticResource QrmeT2Brush}" FontSize="13"
+                               Visibility="Collapsed" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
