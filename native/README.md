@@ -13,6 +13,7 @@ idiomatic codebase (native per platform), all talking to the same
 Each target ships the same screens, exercising the real API end to end:
 
 **Create Profile** → `POST /profiles` · **Overview** → `GET /profiles/{id}` ·
+**Chat** → `POST /interactors` + `POST /profiles/{id}/chat` ·
 **Compose** → `POST /profiles/{id}/compose` · **Posts** → `GET /profiles/{id}/posts` ·
 **Robots** → `/robotics/catalog`, `/profiles/{id}/robots`, `/robots/{rid}/command` ·
 **Settings** → model picker (`/models`, `/profiles/{id}/model`) + objections

@@ -17,6 +17,7 @@ public sealed partial class ShellPage : Page
         switch (item.Tag as string)
         {
             case "overview": ContentFrame.Navigate(typeof(OverviewPage)); break;
+            case "chat": ContentFrame.Navigate(typeof(ChatPage)); break;
             case "compose": ContentFrame.Navigate(typeof(ComposePage)); break;
             case "posts": ContentFrame.Navigate(typeof(PostsPage)); break;
             case "robots": ContentFrame.Navigate(typeof(RobotsPage)); break;

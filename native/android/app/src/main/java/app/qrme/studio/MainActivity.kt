@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.GridView
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.qrme.studio.ui.Qrme
 import app.qrme.studio.ui.QrmeTheme
+import app.qrme.studio.ui.ChatScreen
 import app.qrme.studio.ui.ComposeScreen
 import app.qrme.studio.ui.OverviewScreen
 import app.qrme.studio.ui.PostsScreen
@@ -58,10 +60,11 @@ private fun HomeShell(vm: StudioViewModel) {
     var tab by remember { mutableIntStateOf(0) }
     val tabs = listOf(
         Triple("Overview", Icons.Filled.GridView, 0),
-        Triple("Compose", Icons.Filled.Edit, 1),
-        Triple("Posts", Icons.Filled.List, 2),
-        Triple("Robots", Icons.Filled.Face, 3),
-        Triple("Settings", Icons.Filled.Settings, 4),
+        Triple("Chat", Icons.Filled.Chat, 1),
+        Triple("Compose", Icons.Filled.Edit, 2),
+        Triple("Posts", Icons.Filled.List, 3),
+        Triple("Robots", Icons.Filled.Face, 4),
+        Triple("Settings", Icons.Filled.Settings, 5),
     )
     Scaffold(
         containerColor = Qrme.ScrBot,
@@ -88,9 +91,10 @@ private fun HomeShell(vm: StudioViewModel) {
         Box(Modifier.fillMaxSize().background(Qrme.Bg).padding(pad)) {
             when (tab) {
                 0 -> OverviewScreen(vm)
-                1 -> ComposeScreen(vm)
-                2 -> PostsScreen(vm)
-                3 -> RobotsScreen(vm)
+                1 -> ChatScreen(vm)
+                2 -> ComposeScreen(vm)
+                3 -> PostsScreen(vm)
+                4 -> RobotsScreen(vm)
                 else -> SettingsScreen(vm)
             }
         }

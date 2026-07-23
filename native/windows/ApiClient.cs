@@ -67,6 +67,17 @@ public record Objection(
     [property: JsonPropertyName("reason")] string? Reason,
     [property: JsonPropertyName("reattested")] int Reattested);
 
+public record InteractorCreated(
+    [property: JsonPropertyName("id")] string Id);
+
+public record ChatMessage(
+    [property: JsonPropertyName("content")] string? Content,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("flag_reason")] string? FlagReason);
+
+public record ChatReply(
+    [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage);
+
 /// <summary>
 /// Async client for the QRME backend. Windows reaches the local dev server
 /// directly on 127.0.0.1.
@@ -175,4 +186,14 @@ public sealed class ApiClient
         var res = await _http.SendAsync(req);
         res.EnsureSuccessStatusCode();
     }
+
+    // -- chat (the core loop) --
+
+    public Task<InteractorCreated> CreateInteractor(string name) =>
+        Send<InteractorCreated>(Post("/interactors", new { display_name = name }));
+
+    public Task<ChatReply> Chat(string id, string token, string interactorId,
+                                string message) =>
+        Send<ChatReply>(Post($"/profiles/{id}/chat",
+            new { interactor_id = interactorId, message }, token));
 }

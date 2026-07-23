@@ -74,6 +74,21 @@ struct Objection: Decodable {
     let reattested: Int
 }
 
+struct InteractorCreated: Decodable { let id: String }
+
+struct ChatMessage: Decodable {
+    let id: String
+    let role: String
+    let content: String?
+    let status: String
+    let flag_reason: String?
+}
+
+struct ChatReply: Decodable {
+    let interactor_message: ChatMessage
+    let profile_message: ChatMessage
+}
+
 // MARK: - Client
 
 enum ApiError: LocalizedError {
@@ -185,5 +200,19 @@ actor ApiClient {
         let _: Ok = try await request(
             "/profiles/\(id)/objections/\(objectionId)/attest",
             method: "POST", token: token)
+    }
+
+    // MARK: Chat (the core loop: an interactor talks with the profile)
+
+    func createInteractor(name: String) async throws -> InteractorCreated {
+        try await request("/interactors", method: "POST",
+                          body: ["display_name": name])
+    }
+
+    func chat(id: String, token: String, interactorId: String,
+              message: String) async throws -> ChatReply {
+        try await request("/profiles/\(id)/chat", method: "POST",
+                          body: ["interactor_id": interactorId,
+                                 "message": message], token: token)
     }
 }

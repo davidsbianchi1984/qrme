@@ -42,6 +42,7 @@ MSIX loopback restriction and can call `127.0.0.1` without an exemption.
 | `Views/ShellPage.xaml` | `NavigationView` host + sign-out |
 | `Views/WelcomePage` | create-profile form → `/profiles` |
 | `Views/OverviewPage` | public card (`/profiles/{id}`) |
+| `Views/ChatPage` | interactor chat (`/interactors`, `/profiles/{id}/chat`) |
 | `Views/ComposePage` | topic → `/profiles/{id}/compose` |
 | `Views/PostsPage` | feed (`/profiles/{id}/posts`) |
 | `Views/RobotsPage` | bind/command robots (`/robotics/catalog`, `/robots/{rid}/command`) |

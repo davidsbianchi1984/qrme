@@ -18,6 +18,7 @@ data class RobotSpec(val model: String, val label: String, val maker: String, va
 data class Robot(val id: String, val model: String, val name: String, val status: String?, val commands: List<String>)
 data class CommandResult(val command: String, val status: String, val spoken: String?)
 data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
+data class ChatMessage(val content: String?, val status: String, val flagReason: String?)
 
 class ApiException(message: String) : Exception(message)
 
@@ -162,5 +163,23 @@ object ApiClient {
 
     suspend fun attest(id: String, objectionId: String, token: String) {
         request("/profiles/$id/objections/$objectionId/attest", "POST", null, token)
+    }
+
+    // ---- chat (the core loop) ----
+
+    suspend fun createInteractor(name: String): String {
+        val o = JSONObject(request("/interactors", "POST",
+            JSONObject().put("display_name", name)))
+        return o.getString("id")
+    }
+
+    suspend fun chat(id: String, token: String, interactorId: String,
+                     message: String): ChatMessage {
+        val o = JSONObject(request("/profiles/$id/chat", "POST",
+            JSONObject().put("interactor_id", interactorId).put("message", message),
+            token)).getJSONObject("profile_message")
+        return ChatMessage(
+            if (o.isNull("content")) null else o.optString("content", null),
+            o.optString("status", ""), o.optString("flag_reason", null))
     }
 }

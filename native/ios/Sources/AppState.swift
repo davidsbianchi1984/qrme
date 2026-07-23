@@ -7,6 +7,9 @@ final class AppState: ObservableObject {
     @Published var pid: String?
     @Published var token: String?
     @Published var displayName: String = ""
+    // The device owner's interactor identity for the Chat screen, created
+    // lazily on first send and reused across launches.
+    @Published var interactorId: String?
 
     private let d = UserDefaults.standard
 
@@ -14,6 +17,12 @@ final class AppState: ObservableObject {
         pid = d.string(forKey: "qrme.pid")
         token = d.string(forKey: "qrme.token")
         displayName = d.string(forKey: "qrme.name") ?? ""
+        interactorId = d.string(forKey: "qrme.interactor")
+    }
+
+    func rememberInteractor(_ id: String) {
+        interactorId = id
+        d.set(id, forKey: "qrme.interactor")
     }
 
     var isSignedIn: Bool { pid != nil && token != nil }
@@ -27,6 +36,8 @@ final class AppState: ObservableObject {
 
     func signOut() {
         pid = nil; token = nil; displayName = ""
-        ["qrme.pid", "qrme.token", "qrme.name"].forEach { d.removeObject(forKey: $0) }
+        interactorId = nil
+        ["qrme.pid", "qrme.token", "qrme.name",
+         "qrme.interactor"].forEach { d.removeObject(forKey: $0) }
     }
 }

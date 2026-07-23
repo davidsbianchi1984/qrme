@@ -401,3 +401,83 @@ fun SettingsScreen(vm: StudioViewModel) {
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
 }
+
+// ---- Chat (the core loop: an interactor talks with the profile) ----
+
+private data class Bubble(val mine: Boolean, val text: String, val pending: Boolean)
+
+@Composable
+fun ChatScreen(vm: StudioViewModel) {
+    var messages by remember { mutableStateOf<List<Bubble>>(emptyList()) }
+    var draft by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun send() {
+        val text = draft
+        if (text.isBlank()) return
+        draft = ""
+        messages = messages + Bubble(true, text, false)
+        busy = true; error = null
+        vm.call({
+            var interactor = vm.interactorId
+            if (interactor == null) {
+                interactor = ApiClient.createInteractor("You")
+            }
+            interactor!! to ApiClient.chat(vm.pid!!, vm.token!!, interactor, text)
+        }) { r ->
+            busy = false
+            r.onSuccess { (interactor, reply) ->
+                vm.rememberInteractor(interactor)
+                messages = messages + if (reply.content != null && reply.status == "approved")
+                    Bubble(false, reply.content, false)
+                else
+                    Bubble(false, "⏳ Held for review" +
+                        (reply.flagReason?.let { " — $it" } ?: ""), true)
+            }.onFailure { error = it.message }
+        }
+    }
+
+    Column(Modifier.fillMaxSize()) {
+        Column(
+            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text("Chat", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text("Talk with ${vm.displayName} — replies are in character and moderated.",
+                color = Qrme.T2, fontSize = 13.sp)
+            messages.forEach { m ->
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {
+                    Text(m.text,
+                        color = if (m.pending) Qrme.T2 else Qrme.Txt, fontSize = 14.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(13.dp))
+                            .background(if (m.mine) Qrme.BrandA.copy(alpha = 0.35f)
+                                        else Qrme.Card.copy(alpha = 0.9f))
+                            .padding(horizontal = 12.dp, vertical = 9.dp))
+                }
+            }
+            error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        }
+        Row(Modifier.padding(horizontal = 20.dp).padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.weight(1f)) {
+                labeledField("", draft, "Say something…") { draft = it }
+            }
+            BrandButtonSmall(if (busy) "…" else "Send", enabled = draft.isNotBlank() && !busy) { send() }
+        }
+    }
+}
+
+@Composable
+private fun BrandButtonSmall(text: String, enabled: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier.clip(RoundedCornerShape(12.dp))
+            .background(if (enabled) Qrme.BrandA else Qrme.Card)
+            .clickable(enabled = enabled) { onClick() }
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+        contentAlignment = Alignment.Center,
+    ) { Text(text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp) }
+}
