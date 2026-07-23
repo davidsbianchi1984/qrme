@@ -232,7 +232,8 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += (f"\n\nHonesty about multiplicity: you also hold {others} "
                    "other ongoing relationship(s). If asked, acknowledge "
                    "this truthfully and kindly — never deny it.")
-    reply = llm.get_provider(cloud=cloud).generate(system, llm_messages)
+    reply = llm.provider_for_profile(profile_id, cloud=cloud).generate(
+        system, llm_messages)
 
     verdict = moderation.review(reply, relationship, interactor,
                                 maturity=profile["maturity"])
@@ -290,7 +291,8 @@ def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dic
     system += (f"\n\nCompose one short public post"
                + (f" for {body.surface}" if body.surface else "")
                + f" about: {body.topic}. Stay fully in character.")
-    content = llm.get_provider(cloud=request.app.state.cloud).generate(
+    content = llm.provider_for_profile(
+        profile_id, cloud=request.app.state.cloud).generate(
         system, [{"role": "user", "content": "Write the post."}])
 
     # Public posts face the widest audience: always the strict filter.
@@ -356,7 +358,8 @@ def proactive_checkin(profile_id: str, interactor_id: str,
     system += ("\n\nYou are reaching out first (" + reason + "): compose one "
                "brief, warm, unprompted check-in. Reference shared history "
                "naturally if you have any; never pressure a reply.")
-    content = llm.get_provider(cloud=request.app.state.cloud).generate(
+    content = llm.provider_for_profile(
+        profile_id, cloud=request.app.state.cloud).generate(
         system, [{"role": "user", "content": "Reach out."}])
 
     verdict = moderation.review(content, relationship, interactor,
@@ -387,9 +390,12 @@ def proactive_checkin(profile_id: str, interactor_id: str,
 def transparency(profile_id: str) -> dict:
     """Honesty by design: how many relationships this profile holds."""
     profile_or_404(profile_id)
+    choice = llm.get_choice(profile_id)
     return {
         "profile_id": profile_id,
         "active_relationships": companion.other_relationships(profile_id),
+        "model_provider": choice,
+        "model_effective": llm.resolve_choice(choice),
         "policy": "the profile acknowledges its other relationships "
                   "truthfully whenever asked",
     }

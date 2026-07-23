@@ -512,6 +512,15 @@ CREATE TABLE IF NOT EXISTS engagement (
     last_seen     TEXT,
     PRIMARY KEY (profile_id, interactor_id)
 );
+
+-- Per-profile LLM provider preference. 'auto' (or a missing row) defers to the
+-- platform default; any other value is a qrme.llm registry name the owner
+-- picked (anthropic | openai | grok | perplexity | gemini | stub).
+CREATE TABLE IF NOT EXISTS model_prefs (
+    profile_id  TEXT PRIMARY KEY REFERENCES profiles(id),
+    provider    TEXT NOT NULL,
+    updated_at  TEXT NOT NULL
+);
 """
 
 _local = threading.local()
