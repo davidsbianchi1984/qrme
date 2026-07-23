@@ -25,6 +25,8 @@ struct RootView: View {
                     OverviewView().tabItem { Label("Overview", systemImage: "circle.grid.cross") }
                     ComposeView().tabItem { Label("Compose", systemImage: "square.and.pencil") }
                     PostsView().tabItem { Label("Posts", systemImage: "text.bubble") }
+                    RobotsView().tabItem { Label("Robots", systemImage: "figure.walk.motion") }
+                    SettingsView().tabItem { Label("Settings", systemImage: "gearshape") }
                 }
                 .tint(Theme.brandA)
             } else {

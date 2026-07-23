@@ -27,6 +27,46 @@ public record Post(
     [property: JsonPropertyName("content")] string Content,
     [property: JsonPropertyName("status")] string? Status);
 
+public record ProviderInfo(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("configured")] bool Configured);
+
+public record ModelsList(
+    [property: JsonPropertyName("providers")] ProviderInfo[] Providers,
+    [property: JsonPropertyName("default")] string Default);
+
+public record ModelChoice(
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("effective")] string Effective);
+
+public record RobotSpec(
+    [property: JsonPropertyName("model")] string Model,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("maker")] string Maker,
+    [property: JsonPropertyName("kind")] string Kind);
+
+public record RoboticsCatalog(
+    [property: JsonPropertyName("robots")] RobotSpec[] Robots);
+
+public record Robot(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("model")] string Model,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("commands")] string[]? Commands);
+
+public record CommandResult(
+    [property: JsonPropertyName("command")] string Command,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("spoken")] string? Spoken);
+
+public record Objection(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("reason")] string? Reason,
+    [property: JsonPropertyName("reattested")] int Reattested);
+
 /// <summary>
 /// Async client for the QRME backend. Windows reaches the local dev server
 /// directly on 127.0.0.1.
@@ -79,4 +119,60 @@ public sealed class ApiClient
 
     public Task<Post[]> Posts(string id) =>
         Send<Post[]>(new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/posts"));
+
+    // -- model selection --
+
+    public Task<ModelsList> Models() =>
+        Send<ModelsList>(new HttpRequestMessage(HttpMethod.Get, "/models"));
+
+    public Task<ModelChoice> ProfileModel(string id) =>
+        Send<ModelChoice>(new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/model"));
+
+    public Task<ModelChoice> SetModel(string id, string token, string provider)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/model")
+        {
+            Content = JsonContent.Create(new { provider }),
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ModelChoice>(req);
+    }
+
+    // -- robotic embodiment --
+
+    public Task<RoboticsCatalog> Robotics() =>
+        Send<RoboticsCatalog>(new HttpRequestMessage(HttpMethod.Get, "/robotics/catalog"));
+
+    public Task<Robot[]> Robots(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/robots");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<Robot[]>(req);
+    }
+
+    public Task<Robot> BindRobot(string id, string token, string model) =>
+        Send<Robot>(Post($"/profiles/{id}/robots", new { model }, token));
+
+    public Task<CommandResult> CommandRobot(string rid, string token,
+                                            string command, string? arg) =>
+        Send<CommandResult>(Post($"/robots/{rid}/command",
+            arg is { Length: > 0 } ? new { command, arg } : (object)new { command },
+            token));
+
+    // -- objections (governance) --
+
+    public Task<Objection[]> Objections(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/objections");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<Objection[]>(req);
+    }
+
+    public async Task Attest(string id, string objectionId, string token)
+    {
+        var req = Post($"/profiles/{id}/objections/{objectionId}/attest",
+                       new { }, token);
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
 }

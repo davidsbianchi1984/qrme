@@ -10,11 +10,13 @@ idiomatic codebase (native per platform), all talking to the same
 | **Android** | Kotlin + Jetpack Compose | Android Studio emulator | [`android/`](android/) |
 | **Windows** | C# + WinUI 3 | Windows 10/11 desktop | [`windows/`](windows/) |
 
-Each target ships the same first slice of the app — four screens that exercise
-the real API end to end:
+Each target ships the same screens, exercising the real API end to end:
 
 **Create Profile** → `POST /profiles` · **Overview** → `GET /profiles/{id}` ·
-**Compose** → `POST /profiles/{id}/compose` · **Posts** → `GET /profiles/{id}/posts`
+**Compose** → `POST /profiles/{id}/compose` · **Posts** → `GET /profiles/{id}/posts` ·
+**Robots** → `/robotics/catalog`, `/profiles/{id}/robots`, `/robots/{rid}/command` ·
+**Settings** → model picker (`/models`, `/profiles/{id}/model`) + objections
+(`/profiles/{id}/objections`, attest)
 
 They persist the returned `owner_token` so the app resumes signed-in, and share
 one dark-OLED palette so all three feel like one product. See each folder's
