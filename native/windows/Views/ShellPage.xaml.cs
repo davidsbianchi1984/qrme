@@ -1,0 +1,30 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
+namespace QrmeStudio.Views;
+
+public sealed partial class ShellPage : Page
+{
+    public ShellPage()
+    {
+        InitializeComponent();
+        ContentFrame.Navigate(typeof(OverviewPage));
+    }
+
+    private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (args.SelectedItem is not NavigationViewItem item) return;
+        switch (item.Tag as string)
+        {
+            case "overview": ContentFrame.Navigate(typeof(OverviewPage)); break;
+            case "compose": ContentFrame.Navigate(typeof(ComposePage)); break;
+            case "posts": ContentFrame.Navigate(typeof(PostsPage)); break;
+        }
+    }
+
+    private void OnSignOut(object sender, RoutedEventArgs e)
+    {
+        AppState.Current.SignOut();
+        Frame.Navigate(typeof(WelcomePage));
+    }
+}
