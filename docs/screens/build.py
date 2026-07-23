@@ -1337,6 +1337,31 @@ def render(spec):
         out.append(text(CX, y, "Collect context · act agentically · produce media.",
                         9.5, C["t3"], 500))
 
+    elif hero == "excursions":
+        out.append(text(CX, y, "Study a topic safely — your data stays home.",
+                        10.5, C["t2"]))
+        y += 24
+        out.append(rrect(CX, y, CW, 56, 15, "url(#gCard)", C["line"], 1))
+        out.append(chip(CX + 10, y + 11, "search", ACCENT["brand"]))
+        out.append(text(CX + 54, y + 24, "Studying now", 12.5, C["txt"], 700))
+        out.append(text(CX + 54, y + 40, "Managing arthritis", 10, C["t2"]))
+        out.append(pill(CX + CW - 12, y + 24, "SANITIZED", "good"))
+        y += 66
+        out.append(text(CX, y, "OUTBOUND BRIEF", 9.5, C["t3"], 700, "start", 0.8))
+        out.append(pill(CX + CW, y + 3, "2 redactions", "info"))
+        y += 16
+        out.append(rrect(CX, y, CW, 52, 15, "url(#gCard)", C["line"], 1))
+        out.append(text(CX + 14, y + 22, "“help [private] with", 11, C["t2"], 500, mono=True))
+        out.append(text(CX + 14, y + 38, "[private]’s arthritis”", 11, C["t2"], 500, mono=True))
+        y += 62
+        out.append(rrect(CX, y, CW, 44, 14, A(C["green"], 0.10), C["green"], 1))
+        out.append(icon("shieldok", CX + 24, y + 22, C["green"], 0.8))
+        out.append(text(CX + 44, y + 20, "Nothing left the host", 11, C["txt"], 650))
+        out.append(text(CX + 44, y + 34, "local model only", 10, C["t2"]))
+        y += 54
+        out.append(text(CX, y, "Findings folded in as a knowledge source.",
+                        9.5, C["t3"], 500))
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1477,6 +1502,7 @@ SCREENS = [
     dict(num=47, title="All Set", sub="Onboarding complete", hero="allset", accent="green", tab=0),
     dict(num=48, title="Social Connections", sub="Collect data · publish & run", hero="social", accent="brand", tab=0),
     dict(num=49, title="Connected Apps", sub="Apple · Google · Microsoft · Canva", hero="connectedapps", accent="brand", tab=0),
+    dict(num=50, title="Knowledge Excursions", sub="Study safely · private data stays home", hero="excursions", accent="brand", tab=0),
 ]
 
 
