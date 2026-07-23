@@ -1362,6 +1362,24 @@ def render(spec):
         out.append(text(CX, y, "Findings folded in as a knowledge source.",
                         9.5, C["t3"], 500))
 
+    elif hero == "filesphotos":
+        out.append(text(CX, y, "Bring in files & photos from your devices.",
+                        10.5, C["t2"]))
+        y += 26
+        for name, ic in [("iOS", "phone"), ("Android", "phone"), ("Windows", "grid")]:
+            out.append(rrect(CX, y, CW, 54, 14, "url(#gCard)", C["line"], 1))
+            out.append(chip(CX + 12, y + 10, ic, C["brandA"]))
+            out.append(text(CX + 56, y + 31, name, 13, C["txt"], 700))
+            bx = CX + CW - 12
+            for lab, col in [("Photos", C["cyan"]), ("Files", C["brandA"])]:
+                w = 16 + len(lab) * 6.4
+                out.append(rrect(bx - w, y + 16, w, 22, 11, A(col, 0.16), col, 1))
+                out.append(text(bx - w / 2, y + 31, lab, 10, col, 700, "middle"))
+                bx -= w + 8
+            y += 62
+        out.append(text(CX, y, "Only the folders & albums you pick — nothing else is read.",
+                        9.5, C["t3"], 500))
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1503,6 +1521,7 @@ SCREENS = [
     dict(num=48, title="Social Connections", sub="Collect data · publish & run", hero="social", accent="brand", tab=0),
     dict(num=49, title="Connected Apps", sub="Apple · Google · Microsoft · Canva", hero="connectedapps", accent="brand", tab=0),
     dict(num=50, title="Knowledge Excursions", sub="Study safely · private data stays home", hero="excursions", accent="brand", tab=0),
+    dict(num=51, title="Files & Photos", sub="Connect your device files & photos", hero="filesphotos", accent="brand", tab=0),
 ]
 
 
