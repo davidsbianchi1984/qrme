@@ -18,6 +18,12 @@
             <NavigationViewItem Content="Posts" Tag="posts">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="List" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Robots" Tag="robots">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Contact" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="Settings" Tag="settings">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Setting" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
         </NavigationView.MenuItems>
         <NavigationView.PaneFooter>
             <Button Content="Sign out" Margin="12" Click="OnSignOut"

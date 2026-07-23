@@ -12,6 +12,12 @@ import java.net.URL
 data class ProfileCreated(val id: String, val displayName: String, val kind: String, val ownerToken: String)
 data class ProfileCard(val id: String, val displayName: String, val kind: String, val status: String?)
 data class Post(val id: String, val topic: String?, val content: String, val status: String?)
+data class ProviderInfo(val name: String, val label: String, val configured: Boolean)
+data class ModelChoice(val provider: String, val effective: String)
+data class RobotSpec(val model: String, val label: String, val maker: String, val kind: String)
+data class Robot(val id: String, val model: String, val name: String, val status: String?, val commands: List<String>)
+data class CommandResult(val command: String, val status: String, val spoken: String?)
+data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
 
 class ApiException(message: String) : Exception(message)
 
@@ -84,5 +90,77 @@ object ApiClient {
     suspend fun posts(id: String): List<Post> {
         val arr = JSONArray(request("/profiles/$id/posts"))
         return (0 until arr.length()).map { post(arr.getJSONObject(it)) }
+    }
+
+    // ---- model selection ----
+
+    suspend fun models(): List<ProviderInfo> {
+        val arr = JSONObject(request("/models")).getJSONArray("providers")
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            ProviderInfo(o.getString("name"), o.getString("label"), o.optBoolean("configured"))
+        }
+    }
+
+    suspend fun profileModel(id: String): ModelChoice {
+        val o = JSONObject(request("/profiles/$id/model"))
+        return ModelChoice(o.getString("provider"), o.getString("effective"))
+    }
+
+    suspend fun setModel(id: String, token: String, provider: String): ModelChoice {
+        val o = JSONObject(request("/profiles/$id/model", "PUT",
+            JSONObject().put("provider", provider), token))
+        return ModelChoice(o.getString("provider"), o.getString("effective"))
+    }
+
+    // ---- robotic embodiment ----
+
+    private fun robot(o: JSONObject): Robot {
+        val cmds = o.optJSONArray("commands")
+        return Robot(o.getString("id"), o.optString("model", ""),
+            o.optString("name", ""), o.optString("status", null),
+            (0 until (cmds?.length() ?: 0)).map { cmds!!.getString(it) })
+    }
+
+    suspend fun roboticsCatalog(): List<RobotSpec> {
+        val arr = JSONObject(request("/robotics/catalog")).getJSONArray("robots")
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            RobotSpec(o.getString("model"), o.getString("label"),
+                o.getString("maker"), o.getString("kind"))
+        }
+    }
+
+    suspend fun robots(id: String, token: String): List<Robot> {
+        val arr = JSONArray(request("/profiles/$id/robots", token = token))
+        return (0 until arr.length()).map { robot(arr.getJSONObject(it)) }
+    }
+
+    suspend fun bindRobot(id: String, token: String, model: String): Robot {
+        return robot(JSONObject(request("/profiles/$id/robots", "POST",
+            JSONObject().put("model", model), token)))
+    }
+
+    suspend fun commandRobot(rid: String, token: String, command: String, arg: String?): CommandResult {
+        val body = JSONObject().put("command", command)
+        if (!arg.isNullOrBlank()) body.put("arg", arg)
+        val o = JSONObject(request("/robots/$rid/command", "POST", body, token))
+        return CommandResult(o.getString("command"), o.optString("status", ""),
+            o.optString("spoken", null))
+    }
+
+    // ---- objections (governance) ----
+
+    suspend fun objections(id: String, token: String): List<Objection> {
+        val arr = JSONArray(request("/profiles/$id/objections", token = token))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            Objection(o.getString("id"), o.optString("status", ""),
+                o.optString("reason", null), o.optInt("reattested"))
+        }
+    }
+
+    suspend fun attest(id: String, objectionId: String, token: String) {
+        request("/profiles/$id/objections/$objectionId/attest", "POST", null, token)
     }
 }

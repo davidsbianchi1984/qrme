@@ -26,6 +26,54 @@ struct Post: Decodable {
 
 struct Health: Decodable { let status: String }
 
+struct ProviderInfo: Decodable {
+    let name: String
+    let label: String
+    let configured: Bool
+}
+
+struct ModelsList: Decodable {
+    let providers: [ProviderInfo]
+    let defaultName: String
+    enum CodingKeys: String, CodingKey {
+        case providers
+        case defaultName = "default"
+    }
+}
+
+struct ModelChoice: Decodable { let provider: String; let effective: String }
+
+struct RobotSpec: Decodable {
+    let model: String
+    let label: String
+    let maker: String
+    let kind: String
+    let llm_capable: Bool
+}
+
+struct RoboticsCatalog: Decodable { let robots: [RobotSpec] }
+
+struct Robot: Decodable {
+    let id: String
+    let model: String
+    let name: String
+    let status: String?
+    let commands: [String]?
+}
+
+struct CommandResult: Decodable {
+    let command: String
+    let status: String
+    let spoken: String?
+}
+
+struct Objection: Decodable {
+    let id: String
+    let status: String
+    let reason: String?
+    let reattested: Int
+}
+
 // MARK: - Client
 
 enum ApiError: LocalizedError {
@@ -88,5 +136,54 @@ actor ApiClient {
 
     func posts(id: String) async throws -> [Post] {
         try await request("/profiles/\(id)/posts")
+    }
+
+    // MARK: Model selection (which LLM powers the profile)
+
+    func models() async throws -> ModelsList { try await request("/models") }
+
+    func profileModel(id: String) async throws -> ModelChoice {
+        try await request("/profiles/\(id)/model")
+    }
+
+    func setModel(id: String, token: String, provider: String) async throws -> ModelChoice {
+        try await request("/profiles/\(id)/model", method: "PUT",
+                          body: ["provider": provider], token: token)
+    }
+
+    // MARK: Robotic embodiment
+
+    func roboticsCatalog() async throws -> RoboticsCatalog {
+        try await request("/robotics/catalog")
+    }
+
+    func robots(id: String, token: String) async throws -> [Robot] {
+        try await request("/profiles/\(id)/robots", token: token)
+    }
+
+    func bindRobot(id: String, token: String, model: String) async throws -> Robot {
+        try await request("/profiles/\(id)/robots", method: "POST",
+                          body: ["model": model], token: token)
+    }
+
+    func commandRobot(rid: String, token: String, command: String,
+                      arg: String?) async throws -> CommandResult {
+        var body: [String: Any] = ["command": command]
+        if let arg, !arg.isEmpty { body["arg"] = arg }
+        return try await request("/robots/\(rid)/command", method: "POST",
+                                 body: body, token: token)
+    }
+
+    // MARK: Objections (governance)
+
+    func objections(id: String, token: String) async throws -> [Objection] {
+        try await request("/profiles/\(id)/objections", token: token)
+    }
+
+    func attest(id: String, objectionId: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request(
+            "/profiles/\(id)/objections/\(objectionId)/attest",
+            method: "POST", token: token)
     }
 }

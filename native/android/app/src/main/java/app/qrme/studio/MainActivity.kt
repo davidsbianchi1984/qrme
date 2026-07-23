@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -30,6 +32,8 @@ import app.qrme.studio.ui.QrmeTheme
 import app.qrme.studio.ui.ComposeScreen
 import app.qrme.studio.ui.OverviewScreen
 import app.qrme.studio.ui.PostsScreen
+import app.qrme.studio.ui.RobotsScreen
+import app.qrme.studio.ui.SettingsScreen
 import app.qrme.studio.ui.WelcomeScreen
 
 class MainActivity : ComponentActivity() {
@@ -56,6 +60,8 @@ private fun HomeShell(vm: StudioViewModel) {
         Triple("Overview", Icons.Filled.GridView, 0),
         Triple("Compose", Icons.Filled.Edit, 1),
         Triple("Posts", Icons.Filled.List, 2),
+        Triple("Robots", Icons.Filled.Face, 3),
+        Triple("Settings", Icons.Filled.Settings, 4),
     )
     Scaffold(
         containerColor = Qrme.ScrBot,
@@ -83,7 +89,9 @@ private fun HomeShell(vm: StudioViewModel) {
             when (tab) {
                 0 -> OverviewScreen(vm)
                 1 -> ComposeScreen(vm)
-                else -> PostsScreen(vm)
+                2 -> PostsScreen(vm)
+                3 -> RobotsScreen(vm)
+                else -> SettingsScreen(vm)
             }
         }
     }

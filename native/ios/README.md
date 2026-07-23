@@ -36,7 +36,7 @@ plain-http localhost.
 | `Sources/ApiClient.swift` | async `URLSession` client + wire models |
 | `Sources/AppState.swift` | created profile id + owner token, persisted |
 | `Sources/Theme.swift` | the dark-OLED palette |
-| `Sources/Views/*` | Welcome, Overview, Compose, Posts |
+| `Sources/Views/*` | Welcome, Overview, Compose, Posts, Robots, Settings |
 
 ## Not yet wired
 

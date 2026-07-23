@@ -41,7 +41,7 @@ host is allowed via `usesCleartextTraffic` in the manifest.
 | `.../ApiClient.kt` | coroutine client (`HttpURLConnection` + `org.json`) |
 | `.../AppState.kt` | `StudioViewModel` — identity + token, persisted |
 | `.../ui/Theme.kt` | the dark-OLED palette + card modifier |
-| `.../ui/Screens.kt` | Welcome, Overview, Compose, Posts |
+| `.../ui/Screens.kt` | Welcome, Overview, Compose, Posts, Robots, Settings |
 
 ## Versions
 
