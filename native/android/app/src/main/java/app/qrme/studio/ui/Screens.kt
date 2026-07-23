@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.qrme.studio.ApiClient
+import app.qrme.studio.Excursion
 import app.qrme.studio.Objection
 import app.qrme.studio.Post
 import app.qrme.studio.ProfileCard
@@ -480,4 +481,82 @@ private fun BrandButtonSmall(text: String, enabled: Boolean, onClick: () -> Unit
             .padding(horizontal = 18.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,
     ) { Text(text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp) }
+}
+
+// ---- Studio (Compose · Posts · Study behind one tab) ----
+
+@Composable
+fun StudioScreen(vm: StudioViewModel) {
+    var seg by remember { mutableIntStateOf(0) }
+    Column(Modifier.fillMaxSize()) {
+        TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
+            listOf("Compose", "Posts", "Study").forEachIndexed { i, t ->
+                Tab(selected = seg == i, onClick = { seg = i },
+                    text = { Text(t, fontSize = 13.sp) })
+            }
+        }
+        Box(Modifier.weight(1f)) {
+            when (seg) {
+                0 -> ComposeScreen(vm)
+                1 -> PostsScreen(vm)
+                else -> StudyScreen(vm)
+            }
+        }
+    }
+}
+
+// ---- Study (knowledge excursions: private data stays home) ----
+
+@Composable
+fun StudyScreen(vm: StudioViewModel) {
+    var topic by remember { mutableStateOf("") }
+    var question by remember { mutableStateOf("") }
+    var excursions by remember { mutableStateOf<List<Excursion>>(emptyList()) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun reload() { vm.call({ ApiClient.excursions(vm.pid!!, vm.token!!) }) { r -> excursions = r.getOrDefault(emptyList()) } }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Text("Knowledge Excursions", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text("Send your profile out to study. Private names are redacted from everything outbound; findings come home for you to fold in.",
+            color = Qrme.T2, fontSize = 13.sp)
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            labeledField("Topic", topic, "e.g. container gardening") { topic = it }
+            labeledField("Question", question, "What should it find out?") { question = it }
+            BrandButton("Go study", enabled = topic.isNotBlank() && question.isNotBlank(), busy = busy) {
+                busy = true; error = null
+                vm.call({ ApiClient.startExcursion(vm.pid!!, vm.token!!, topic, question) }) { r ->
+                    busy = false
+                    r.onSuccess { topic = ""; question = "" }
+                     .onFailure { error = it.message }
+                    reload()
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+
+        excursions.asReversed().forEach { e ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(e.topic, color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(if (e.leftHost) "left host" else "stayed local",
+                        color = if (e.leftHost) Qrme.Amber else Qrme.Green,
+                        fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+                if (e.redactions > 0)
+                    Text("${e.redactions} private term(s) redacted from the outbound brief",
+                        color = Qrme.T2, fontSize = 12.sp)
+                Text(e.findings, color = Qrme.Txt, fontSize = 13.sp)
+                if (e.learned)
+                    Text("✓ folded into the profile's knowledge", color = Qrme.Green, fontSize = 12.sp)
+                else
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.learn(e.id, vm.token!!) }) { reload() }
+                    }) { Text("Fold into knowledge", color = Qrme.BrandA, fontSize = 13.sp) }
+            }
+        }
+    }
 }

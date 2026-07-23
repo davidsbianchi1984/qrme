@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.StudyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
+            <TextBlock Text="Knowledge Excursions" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock Text="Send your profile out to study. Private names are redacted from everything outbound; findings come home for you to fold in."
+                       Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBox x:Name="TopicBox" Header="Topic" PlaceholderText="e.g. container gardening" />
+                    <TextBox x:Name="QuestionBox" Header="Question" PlaceholderText="What should it find out?"
+                             AcceptsReturn="True" TextWrapping="Wrap" Height="70" />
+                    <Button x:Name="StudyButton" Content="Go study" HorizontalAlignment="Stretch"
+                            Height="42" Foreground="White" Click="OnStudy">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource QrmeBrandA}" Offset="0" />
+                                <GradientStop Color="#FF3AA0FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
+                       TextWrapping="Wrap" Visibility="Collapsed" />
+
+            <ItemsControl x:Name="ExcursionsList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,0,0,8">
+                            <StackPanel Spacing="6">
+                                <Grid>
+                                    <TextBlock Text="{Binding Topic}" FontWeight="Bold"
+                                               Foreground="{StaticResource QrmeTxtBrush}" />
+                                    <TextBlock Text="{Binding Badge}" HorizontalAlignment="Right"
+                                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" />
+                                </Grid>
+                                <TextBlock Text="{Binding Redacted}" Foreground="{StaticResource QrmeT2Brush}"
+                                           FontSize="12" Visibility="{Binding RedactedVisibility}" />
+                                <TextBlock Text="{Binding Findings}" Foreground="{StaticResource QrmeTxtBrush}"
+                                           FontSize="13" TextWrapping="Wrap" />
+                                <TextBlock Text="✓ folded into the profile's knowledge"
+                                           Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
+                                           Visibility="{Binding LearnedVisibility}" />
+                                <Button Content="Fold into knowledge" Tag="{Binding Id}" Click="OnLearn"
+                                        Visibility="{Binding LearnVisibility}"
+                                        Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

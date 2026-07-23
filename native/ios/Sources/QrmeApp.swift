@@ -24,8 +24,7 @@ struct RootView: View {
                 TabView {
                     OverviewView().tabItem { Label("Overview", systemImage: "circle.grid.cross") }
                     ChatView().tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
-                    ComposeView().tabItem { Label("Compose", systemImage: "square.and.pencil") }
-                    PostsView().tabItem { Label("Posts", systemImage: "text.bubble") }
+                    StudioView().tabItem { Label("Studio", systemImage: "square.and.pencil") }
                     RobotsView().tabItem { Label("Robots", systemImage: "figure.walk.motion") }
                     SettingsView().tabItem { Label("Settings", systemImage: "gearshape") }
                 }
