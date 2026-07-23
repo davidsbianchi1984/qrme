@@ -1428,6 +1428,45 @@ def render(spec):
             out.append(text(CX + 34, y + 31, s, 9.5, C["t2"]))
             y += 48
 
+    elif hero == "objectionaudit":
+        red = C.get("red", "#FF3B30")
+        green = C.get("green", "#43E08A")
+        amber = C.get("amber", "#F7B731")
+        # Contested-state banner
+        out.append(rrect(CX, y, CW, 30, 10, A(red, 0.12), red, 1))
+        out.append(f'<circle cx="{CX+16}" cy="{y+15}" r="4" fill="{red}"/>')
+        out.append(text(CX + 28, y + 19, "Restricted · under objection", 11,
+                        red, 700))
+        y += 42
+        # Objection summary card
+        out.append(rrect(CX, y, CW, 46, 12, "url(#gCard)", C["line"], 1))
+        out.append(text(CX + 12, y + 18, "Objection obj_ab12", 11.5, C["txt"], 650))
+        out.append(pill(CX + CW - 10, y + 10, "OPEN", "warn"))
+        out.append(text(CX + 12, y + 35, "basis: subject_consent", 9.5, C["t2"]))
+        y += 58
+        # Timeline (vault-sealed)
+        out.append(text(CX, y, "TIMELINE", 9, C["t3"], 700, "start", 0.6))
+        out.append(text(CX + CW, y, "vault-sealed", 8.5, green, 600, "end"))
+        y += 16
+        for label, actor, dot in [("opened", "objector", green),
+                                   ("reattested", "owner", green),
+                                   ("awaiting review", "reviewer", amber)]:
+            out.append(f'<circle cx="{CX+6}" cy="{y+8}" r="3" fill="{dot}"/>')
+            out.append(text(CX + 18, y + 11, label, 10.5, C["txt"], 600))
+            out.append(text(CX + CW, y + 11, actor, 9, C["t2"], 400, "end"))
+            y += 22
+        y += 8
+        # Action rows per party
+        out.append(text(CX, y, "ACTIONS", 9, C["t3"], 700, "start", 0.6))
+        y += 16
+        for title_, sub in [("Re-attest my basis", "owner · keep the profile"),
+                            ("Uphold  ·  Dismiss", "reviewer · decide"),
+                            ("Withdraw  ·  Revoke", "subject / estate · tear down")]:
+            out.append(rrect(CX, y, CW, 38, 11, "url(#gCard)", C["line"], 1))
+            out.append(text(CX + 12, y + 16, title_, 11, C["txt"], 650))
+            out.append(text(CX + 12, y + 30, sub, 9, C["t2"]))
+            y += 46
+
     else:  # generic stacked cards
         for c in spec["cards"]:
             s, y = card_block(y, c)
@@ -1573,6 +1612,7 @@ SCREENS = [
     dict(num=52, title="Apple Intelligence", sub="13 apps · collect, act, produce", hero="assistant", provider="apple", accent="brand", tab=0),
     dict(num=53, title="Google Gemini", sub="11 apps · collect, act, produce", hero="assistant", provider="google", accent="brand", tab=0),
     dict(num=54, title="Microsoft Copilot", sub="8 apps · collect, act, produce", hero="assistant", provider="microsoft", accent="brand", tab=0),
+    dict(num=55, title="Objection & Revocation", sub="Contested profile · vault-sealed audit", hero="objectionaudit", accent="brand", tab=3),
 ]
 
 

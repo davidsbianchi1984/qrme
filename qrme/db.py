@@ -457,14 +457,30 @@ CREATE TABLE IF NOT EXISTS interactors (
 -- terminates the profile or returns it to active. A subject_consent subject
 -- can withdraw consent at any time, which forces termination.
 CREATE TABLE IF NOT EXISTS objections (
-    id           TEXT PRIMARY KEY,
-    profile_id   TEXT NOT NULL REFERENCES profiles(id),
-    objector_ref TEXT NOT NULL,   -- out-of-band proof-of-identity reference
-    reason       TEXT,
-    status       TEXT NOT NULL DEFAULT 'open',  -- open | upheld | dismissed | withdrawn
-    reattested   INTEGER NOT NULL DEFAULT 0,    -- owner re-attested their basis
-    created_at   TEXT NOT NULL,
-    resolved_at  TEXT
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    objector_ref  TEXT NOT NULL,   -- out-of-band proof-of-identity reference
+    reason        TEXT,
+    status        TEXT NOT NULL DEFAULT 'open',  -- open | upheld | dismissed | withdrawn | revoked
+    reattested    INTEGER NOT NULL DEFAULT 0,    -- owner re-attested their basis
+    prior_status  TEXT,            -- profile status before restriction (active | departed)
+    created_at    TEXT NOT NULL,
+    resolved_at   TEXT
+);
+
+-- Tamper-evident audit trail for the objection / revocation lifecycle. Each
+-- row is also sealed into the PDI vault when configured (pdi_key holds the
+-- vault key); PDI hash-chains every write, so the sealed copy is independently
+-- verifiable and cannot be silently altered.
+CREATE TABLE IF NOT EXISTS objection_events (
+    id            TEXT PRIMARY KEY,
+    objection_id  TEXT NOT NULL,
+    profile_id    TEXT NOT NULL,
+    event         TEXT NOT NULL,   -- opened|reattested|upheld|dismissed|withdrawn|revoked|terminated
+    actor         TEXT NOT NULL,   -- objector|owner|reviewer|subject|estate|system
+    detail        TEXT,            -- JSON
+    pdi_key       TEXT,            -- vault key of the sealed copy, if PDI configured
+    created_at    TEXT NOT NULL
 );
 
 -- Capability tokens. Owner control of a profile is proven by holding the

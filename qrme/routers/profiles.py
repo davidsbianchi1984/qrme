@@ -158,6 +158,14 @@ def succeed_profile(profile_id: str, body: SucceedRequest,
     auth.require_reviewer(request)
     if profile["status"] in ("departed", "terminated"):
         raise HTTPException(409, f"profile is already {profile['status']}")
+    # A contested identity cannot be handed to a new owner until the objection
+    # is resolved (governance.py owns the objection lifecycle).
+    contested = db.connect().execute(
+        "SELECT 1 FROM objections WHERE profile_id=? AND status='open' LIMIT 1",
+        (profile_id,)).fetchone()
+    if contested:
+        raise HTTPException(
+            409, "profile has an open objection; resolve it before succession")
 
     conn = db.connect()
     if not profile["successor_owner"]:
