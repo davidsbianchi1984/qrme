@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.qrme.studio.ApiClient
+import app.qrme.studio.AppConn
+import app.qrme.studio.CatalogApp
 import app.qrme.studio.Excursion
 import app.qrme.studio.Objection
 import app.qrme.studio.Post
@@ -24,6 +26,7 @@ import app.qrme.studio.ProfileCard
 import app.qrme.studio.ProviderInfo
 import app.qrme.studio.Robot
 import app.qrme.studio.RobotSpec
+import app.qrme.studio.SocialConn
 import app.qrme.studio.StudioViewModel
 
 @Composable
@@ -558,5 +561,201 @@ fun StudyScreen(vm: StudioViewModel) {
                     }) { Text("Fold into knowledge", color = Qrme.BrandA, fontSize = 13.sp) }
             }
         }
+    }
+}
+
+// ---- Connect (Social · Apps · Robots behind one tab) ----
+
+@Composable
+fun ConnectScreen(vm: StudioViewModel) {
+    var seg by remember { mutableIntStateOf(0) }
+    Column(Modifier.fillMaxSize()) {
+        TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
+            listOf("Social", "Apps", "Robots").forEachIndexed { i, t ->
+                Tab(selected = seg == i, onClick = { seg = i },
+                    text = { Text(t, fontSize = 13.sp) })
+            }
+        }
+        Box(Modifier.weight(1f)) {
+            when (seg) {
+                0 -> SocialPanel(vm)
+                1 -> AppsPanel(vm)
+                else -> RobotsScreen(vm)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SocialPanel(vm: StudioViewModel) {
+    val platforms = listOf("instagram", "x", "tiktok", "facebook", "linkedin", "youtube",
+        "reddit", "threads", "whatsapp", "meta", "mastodon", "twitch", "snapchat",
+        "roblox", "pinterest", "discord")
+    var platform by remember { mutableStateOf(platforms.first()) }
+    var handle by remember { mutableStateOf("") }
+    var conns by remember { mutableStateOf<List<SocialConn>>(emptyList()) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    fun reload() { vm.call({ ApiClient.socialConnections(vm.pid!!, vm.token!!) }) { r -> conns = r.getOrDefault(emptyList()) } }
+    LaunchedEffect(Unit) { reload() }
+
+    fun connect(direction: String) {
+        error = null; status = null
+        vm.call({ ApiClient.socialConnect(vm.pid!!, vm.token!!, platform, direction, handle) }) { r ->
+            r.onSuccess { handle = "" }.onFailure { error = it.message }
+            reload()
+        }
+    }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Social platforms", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Collect pulls the account's content in to grow the profile; publish runs the profile on the platform (moderated).",
+                color = Qrme.T2, fontSize = 12.sp)
+            platforms.chunked(4).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    row.forEach { pname ->
+                        FilterChip(
+                            selected = platform == pname, onClick = { platform = pname },
+                            label = { Text(pname, fontSize = 11.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Qrme.BrandA,
+                                selectedLabelColor = Color.White, labelColor = Qrme.T2,
+                            ),
+                        )
+                    }
+                }
+            }
+            labeledField("Handle (optional)", handle, "@you") { handle = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SmallAction("Connect to collect") { connect("collect") }
+                SmallAction("Connect to publish") { connect("publish") }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+
+        conns.forEach { c ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("${c.platform} · ${c.direction}", color = Qrme.Txt,
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    c.handle?.let { Text(it, color = Qrme.T3, fontSize = 12.sp) }
+                }
+                Text(if (c.direction == "collect") "${c.collected} item(s) collected"
+                     else "${c.published} post(s) published",
+                    color = Qrme.T2, fontSize = 12.sp)
+                if (c.status == "revoked") {
+                    Text("revoked", color = Qrme.Red, fontSize = 12.sp)
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically) {
+                        if (c.direction == "collect") {
+                            SmallAction("Collect sample") {
+                                vm.call({ ApiClient.socialCollect(c.id, vm.token!!,
+                                    "sample post from ${c.platform}") }) { r ->
+                                    r.onSuccess { status = "collected one item from ${c.platform} — it now feeds training" }
+                                        .onFailure { error = it.message }
+                                    reload()
+                                }
+                            }
+                        } else {
+                            SmallAction("Publish update") {
+                                vm.call({ ApiClient.socialPublish(c.id, vm.token!!,
+                                    "An update from my synthetic profile.") }) { r ->
+                                    r.onSuccess { status = "published to ${c.platform}" }
+                                        .onFailure { error = it.message }
+                                    reload()
+                                }
+                            }
+                        }
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.revokeSocial(c.id, vm.token!!) }) { reload() }
+                        }) { Text("Disconnect", color = Qrme.Red, fontSize = 12.sp) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppsPanel(vm: StudioViewModel) {
+    var catalog by remember { mutableStateOf<List<CatalogApp>>(emptyList()) }
+    var conns by remember { mutableStateOf<List<AppConn>>(emptyList()) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    fun reload() {
+        vm.call({ ApiClient.appsCatalog() }) { r -> catalog = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.appConnections(vm.pid!!, vm.token!!) }) { r -> conns = r.getOrDefault(emptyList()) }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Connected apps", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Apple, Google, Microsoft, and Canva apps the profile's agents can collect from, act through, and produce with.",
+                color = Qrme.T2, fontSize = 12.sp)
+            catalog.take(12).forEach { entry ->
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(entry.label, color = Qrme.Txt, fontSize = 14.sp)
+                        Text(entry.provider, color = Qrme.T3, fontSize = 11.sp)
+                    }
+                    TextButton(onClick = {
+                        error = null
+                        vm.call({ ApiClient.appConnect(vm.pid!!, vm.token!!,
+                            entry.provider, entry.app) }) { r ->
+                            r.onSuccess { status = "connected ${entry.provider}/${entry.app}" }
+                                .onFailure { error = it.message }
+                            reload()
+                        }
+                    }) { Text("Connect", color = Qrme.BrandA, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+
+        conns.forEach { c ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(c.label, color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(c.provider, color = Qrme.T3, fontSize = 12.sp)
+                }
+                if (c.status == "revoked") {
+                    Text("revoked", color = Qrme.Red, fontSize = 12.sp)
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SmallAction("Collect") {
+                            vm.call({ ApiClient.appCollect(c.id, vm.token!!,
+                                "sample context from ${c.app}") }) { r ->
+                                r.onSuccess { status = "collected from ${c.label} — it now feeds training" }
+                                    .onFailure { error = it.message }
+                            }
+                        }
+                        c.capabilities.firstOrNull()?.let { cap ->
+                            SmallAction("Invoke $cap") {
+                                vm.call({ ApiClient.appInvoke(c.id, vm.token!!, cap) }) { r ->
+                                    r.onSuccess { status = it.result }
+                                        .onFailure { error = it.message }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmallAction(text: String, onClick: () -> Unit) {
+    Box(
+        Modifier.clip(RoundedCornerShape(50)).background(Qrme.BrandA)
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text(text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }

@@ -24,6 +24,9 @@
             <NavigationViewItem Content="Study" Tag="study">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Library" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Connect" Tag="connect">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Link" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Robots" Tag="robots">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Contact" /></NavigationViewItem.Icon>
             </NavigationViewItem>

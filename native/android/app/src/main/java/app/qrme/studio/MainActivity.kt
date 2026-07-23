@@ -11,9 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -31,10 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.qrme.studio.ui.Qrme
 import app.qrme.studio.ui.QrmeTheme
 import app.qrme.studio.ui.ChatScreen
-import app.qrme.studio.ui.ComposeScreen
+import app.qrme.studio.ui.ConnectScreen
 import app.qrme.studio.ui.OverviewScreen
-import app.qrme.studio.ui.PostsScreen
-import app.qrme.studio.ui.RobotsScreen
 import app.qrme.studio.ui.StudioScreen
 import app.qrme.studio.ui.SettingsScreen
 import app.qrme.studio.ui.WelcomeScreen
@@ -63,7 +60,7 @@ private fun HomeShell(vm: StudioViewModel) {
         Triple("Overview", Icons.Filled.GridView, 0),
         Triple("Chat", Icons.Filled.Chat, 1),
         Triple("Studio", Icons.Filled.Edit, 2),
-        Triple("Robots", Icons.Filled.Face, 3),
+        Triple("Connect", Icons.Filled.Link, 3),
         Triple("Settings", Icons.Filled.Settings, 4),
     )
     Scaffold(
@@ -93,7 +90,7 @@ private fun HomeShell(vm: StudioViewModel) {
                 0 -> OverviewScreen(vm)
                 1 -> ChatScreen(vm)
                 2 -> StudioScreen(vm)
-                3 -> RobotsScreen(vm)
+                3 -> ConnectScreen(vm)
                 else -> SettingsScreen(vm)
             }
         }

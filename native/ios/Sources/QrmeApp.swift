@@ -25,7 +25,7 @@ struct RootView: View {
                     OverviewView().tabItem { Label("Overview", systemImage: "circle.grid.cross") }
                     ChatView().tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
                     StudioView().tabItem { Label("Studio", systemImage: "square.and.pencil") }
-                    RobotsView().tabItem { Label("Robots", systemImage: "figure.walk.motion") }
+                    ConnectView().tabItem { Label("Connect", systemImage: "link") }
                     SettingsView().tabItem { Label("Settings", systemImage: "gearshape") }
                 }
                 .tint(Theme.brandA)

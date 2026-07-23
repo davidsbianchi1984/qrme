@@ -46,6 +46,7 @@ MSIX loopback restriction and can call `127.0.0.1` without an exemption.
 | `Views/ComposePage` | topic → `/profiles/{id}/compose` |
 | `Views/PostsPage` | feed (`/profiles/{id}/posts`) |
 | `Views/StudyPage` | knowledge excursions (`/profiles/{id}/excursions`, learn) |
+| `Views/ConnectPage` | social / apps (Pivot) → `/profiles/{id}/social`, `/connectors/catalog`, `/profiles/{id}/apps` |
 | `Views/RobotsPage` | bind/command robots (`/robotics/catalog`, `/robots/{rid}/command`) |
 | `Views/SettingsPage` | model picker + objections (attest) |
 | `ApiClient.cs` | `HttpClient` client + records |
