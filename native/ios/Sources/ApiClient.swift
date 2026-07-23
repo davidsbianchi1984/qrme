@@ -89,6 +89,16 @@ struct ChatReply: Decodable {
     let profile_message: ChatMessage
 }
 
+struct Excursion: Decodable {
+    let id: String
+    let topic: String
+    let brief: String
+    let redactions: Int
+    let left_host: Bool
+    let findings: String
+    let learned: Bool
+}
+
 // MARK: - Client
 
 enum ApiError: LocalizedError {
@@ -214,5 +224,24 @@ actor ApiClient {
         try await request("/profiles/\(id)/chat", method: "POST",
                           body: ["interactor_id": interactorId,
                                  "message": message], token: token)
+    }
+
+    // MARK: Knowledge excursions (study safely; private data stays home)
+
+    func excursions(id: String, token: String) async throws -> [Excursion] {
+        try await request("/profiles/\(id)/excursions", token: token)
+    }
+
+    func startExcursion(id: String, token: String, topic: String,
+                        question: String) async throws -> Excursion {
+        try await request("/profiles/\(id)/excursions", method: "POST",
+                          body: ["topic": topic, "question": question],
+                          token: token)
+    }
+
+    func learn(cid: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/excursions/\(cid)/learn",
+                                      method: "POST", token: token)
     }
 }

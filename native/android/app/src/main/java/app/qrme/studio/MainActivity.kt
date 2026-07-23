@@ -35,6 +35,7 @@ import app.qrme.studio.ui.ComposeScreen
 import app.qrme.studio.ui.OverviewScreen
 import app.qrme.studio.ui.PostsScreen
 import app.qrme.studio.ui.RobotsScreen
+import app.qrme.studio.ui.StudioScreen
 import app.qrme.studio.ui.SettingsScreen
 import app.qrme.studio.ui.WelcomeScreen
 
@@ -61,10 +62,9 @@ private fun HomeShell(vm: StudioViewModel) {
     val tabs = listOf(
         Triple("Overview", Icons.Filled.GridView, 0),
         Triple("Chat", Icons.Filled.Chat, 1),
-        Triple("Compose", Icons.Filled.Edit, 2),
-        Triple("Posts", Icons.Filled.List, 3),
-        Triple("Robots", Icons.Filled.Face, 4),
-        Triple("Settings", Icons.Filled.Settings, 5),
+        Triple("Studio", Icons.Filled.Edit, 2),
+        Triple("Robots", Icons.Filled.Face, 3),
+        Triple("Settings", Icons.Filled.Settings, 4),
     )
     Scaffold(
         containerColor = Qrme.ScrBot,
@@ -92,9 +92,8 @@ private fun HomeShell(vm: StudioViewModel) {
             when (tab) {
                 0 -> OverviewScreen(vm)
                 1 -> ChatScreen(vm)
-                2 -> ComposeScreen(vm)
-                3 -> PostsScreen(vm)
-                4 -> RobotsScreen(vm)
+                2 -> StudioScreen(vm)
+                3 -> RobotsScreen(vm)
                 else -> SettingsScreen(vm)
             }
         }

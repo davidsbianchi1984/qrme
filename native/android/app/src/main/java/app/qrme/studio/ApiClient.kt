@@ -19,6 +19,8 @@ data class Robot(val id: String, val model: String, val name: String, val status
 data class CommandResult(val command: String, val status: String, val spoken: String?)
 data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
 data class ChatMessage(val content: String?, val status: String, val flagReason: String?)
+data class Excursion(val id: String, val topic: String, val redactions: Int,
+                     val leftHost: Boolean, val findings: String, val learned: Boolean)
 
 class ApiException(message: String) : Exception(message)
 
@@ -181,5 +183,27 @@ object ApiClient {
         return ChatMessage(
             if (o.isNull("content")) null else o.optString("content", null),
             o.optString("status", ""), o.optString("flag_reason", null))
+    }
+
+    // ---- knowledge excursions (study safely; private data stays home) ----
+
+    private fun excursionOf(o: JSONObject) = Excursion(
+        o.getString("id"), o.optString("topic", ""), o.optInt("redactions"),
+        o.optBoolean("left_host"), o.optString("findings", ""),
+        o.optBoolean("learned"))
+
+    suspend fun excursions(id: String, token: String): List<Excursion> {
+        val arr = JSONArray(request("/profiles/$id/excursions", token = token))
+        return (0 until arr.length()).map { excursionOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun startExcursion(id: String, token: String, topic: String,
+                               question: String): Excursion {
+        return excursionOf(JSONObject(request("/profiles/$id/excursions", "POST",
+            JSONObject().put("topic", topic).put("question", question), token)))
+    }
+
+    suspend fun learn(cid: String, token: String) {
+        request("/excursions/$cid/learn", "POST", null, token)
     }
 }

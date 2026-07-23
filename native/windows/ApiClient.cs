@@ -78,6 +78,14 @@ public record ChatMessage(
 public record ChatReply(
     [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage);
 
+public record Excursion(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("topic")] string Topic,
+    [property: JsonPropertyName("redactions")] int Redactions,
+    [property: JsonPropertyName("left_host")] bool LeftHost,
+    [property: JsonPropertyName("findings")] string Findings,
+    [property: JsonPropertyName("learned")] bool Learned);
+
 /// <summary>
 /// Async client for the QRME backend. Windows reaches the local dev server
 /// directly on 127.0.0.1.
@@ -196,4 +204,25 @@ public sealed class ApiClient
                                 string message) =>
         Send<ChatReply>(Post($"/profiles/{id}/chat",
             new { interactor_id = interactorId, message }, token));
+
+    // -- knowledge excursions (study safely; private data stays home) --
+
+    public Task<Excursion[]> Excursions(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/excursions");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<Excursion[]>(req);
+    }
+
+    public Task<Excursion> StartExcursion(string id, string token,
+                                          string topic, string question) =>
+        Send<Excursion>(Post($"/profiles/{id}/excursions",
+            new { topic, question }, token));
+
+    public async Task Learn(string cid, string token)
+    {
+        var req = Post($"/excursions/{cid}/learn", new { }, token);
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
 }

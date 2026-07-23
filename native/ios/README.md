@@ -36,10 +36,10 @@ plain-http localhost.
 | `Sources/ApiClient.swift` | async `URLSession` client + wire models |
 | `Sources/AppState.swift` | created profile id + owner token, persisted |
 | `Sources/Theme.swift` | the dark-OLED palette |
-| `Sources/Views/*` | Welcome, Overview, Chat, Compose, Posts, Robots, Settings |
+| `Sources/Views/*` | Welcome, Overview, Chat, Studio (Compose/Posts/Study), Robots, Settings |
 
 ## Not yet wired
 
-This is a functional scaffold, not the full screen gallery. Chat, relationships,
-connections, connectors, and knowledge excursions all have backend endpoints
+This is a functional scaffold, not the full screen gallery. Relationships,
+connections, and the social/app connectors still have backend endpoints
 (`qrme/routers/`) ready to add as further screens.
