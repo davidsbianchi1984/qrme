@@ -23,6 +23,7 @@ struct RootView: View {
             if state.isSignedIn {
                 TabView {
                     OverviewView().tabItem { Label("Overview", systemImage: "circle.grid.cross") }
+                    ChatView().tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
                     ComposeView().tabItem { Label("Compose", systemImage: "square.and.pencil") }
                     PostsView().tabItem { Label("Posts", systemImage: "text.bubble") }
                     RobotsView().tabItem { Label("Robots", systemImage: "figure.walk.motion") }

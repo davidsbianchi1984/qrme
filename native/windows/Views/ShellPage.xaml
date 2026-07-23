@@ -12,6 +12,9 @@
             <NavigationViewItem Content="Overview" Tag="overview" IsSelected="True">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Home" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Chat" Tag="chat">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Message" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Compose" Tag="compose">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Edit" /></NavigationViewItem.Icon>
             </NavigationViewItem>

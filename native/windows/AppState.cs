@@ -15,6 +15,14 @@ public sealed class AppState
     public string? Pid { get; set; }
     public string? Token { get; set; }
     public string DisplayName { get; set; } = "";
+    // The device owner's interactor identity for Chat, minted lazily.
+    public string? InteractorId { get; set; }
+
+    public void RememberInteractor(string id)
+    {
+        InteractorId = id;
+        Save();
+    }
 
     public bool IsSignedIn => !string.IsNullOrEmpty(Pid) && !string.IsNullOrEmpty(Token);
 
@@ -30,7 +38,7 @@ public sealed class AppState
 
     public void SignOut()
     {
-        Pid = null; Token = null; DisplayName = "";
+        Pid = null; Token = null; DisplayName = ""; InteractorId = null;
         try { File.Delete(PathOnDisk); } catch { /* ignore */ }
     }
 

@@ -21,8 +21,16 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var displayName by mutableStateOf(prefs.getString("name", "") ?: "")
         private set
+    // The device owner's interactor identity for Chat, minted lazily.
+    var interactorId by mutableStateOf<String?>(prefs.getString("interactor", null))
+        private set
 
     val isSignedIn get() = pid != null && token != null
+
+    fun rememberInteractor(id: String) {
+        interactorId = id
+        prefs.edit().putString("interactor", id).apply()
+    }
 
     fun createProfile(
         name: String, persona: String, kind: String, birthdate: String,
