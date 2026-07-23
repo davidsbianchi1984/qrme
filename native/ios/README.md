@@ -36,10 +36,8 @@ plain-http localhost.
 | `Sources/ApiClient.swift` | async `URLSession` client + wire models |
 | `Sources/AppState.swift` | created profile id + owner token, persisted |
 | `Sources/Theme.swift` | the dark-OLED palette |
-| `Sources/Views/*` | Welcome, Overview, Chat, Studio (Compose/Posts/Study), Robots, Settings |
+| `Sources/Views/*` | Welcome, Overview, Chat, Studio (Compose/Posts/Study), Connect (Social/Apps/Robots), Settings |
 
-## Not yet wired
-
-This is a functional scaffold, not the full screen gallery. Relationships,
-connections, and the social/app connectors still have backend endpoints
-(`qrme/routers/`) ready to add as further screens.
+The tab bar holds five destinations: **Studio** groups Compose / Posts / Study,
+and **Connect** groups the social-platform connections, the connected-apps
+catalog, and robotic embodiment.

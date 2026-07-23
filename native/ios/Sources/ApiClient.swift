@@ -89,6 +89,35 @@ struct ChatReply: Decodable {
     let profile_message: ChatMessage
 }
 
+struct SocialConn: Decodable {
+    let id: String
+    let platform: String
+    let direction: String
+    let handle: String?
+    let status: String?
+    let collected: Int
+    let published: Int
+}
+
+struct CatalogApp: Decodable { let app: String; let label: String; let capabilities: [String] }
+struct CatalogProvider: Decodable { let provider: String; let label: String; let apps: [CatalogApp] }
+struct AppsCatalog: Decodable { let providers: [CatalogProvider] }
+
+struct AppConn: Decodable {
+    let id: String
+    let provider: String
+    let app: String
+    let label: String
+    let capabilities: [String]
+    let status: String?
+}
+
+struct InvokeResult: Decodable {
+    let capability: String
+    let status: String
+    let result: String
+}
+
 struct Excursion: Decodable {
     let id: String
     let topic: String
@@ -197,6 +226,66 @@ actor ApiClient {
         if let arg, !arg.isEmpty { body["arg"] = arg }
         return try await request("/robots/\(rid)/command", method: "POST",
                                  body: body, token: token)
+    }
+
+    // MARK: Connect — social platforms & the connected-apps catalog
+
+    func socialConnections(id: String, token: String) async throws -> [SocialConn] {
+        try await request("/profiles/\(id)/social", token: token)
+    }
+
+    func socialConnect(id: String, token: String, platform: String,
+                       direction: String, handle: String?) async throws -> SocialConn {
+        var body: [String: Any] = ["platform": platform, "direction": direction]
+        if let handle, !handle.isEmpty { body["handle"] = handle }
+        return try await request("/profiles/\(id)/social", method: "POST",
+                                 body: body, token: token)
+    }
+
+    func socialCollect(cid: String, token: String, content: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/social/\(cid)/collect", method: "POST",
+                                      body: ["items": [["content": content]]],
+                                      token: token)
+    }
+
+    func socialPublish(cid: String, token: String, content: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/social/\(cid)/publish", method: "POST",
+                                      body: ["content": content], token: token)
+    }
+
+    func revokeSocial(cid: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/social/\(cid)", method: "DELETE",
+                                      token: token)
+    }
+
+    func appsCatalog() async throws -> AppsCatalog {
+        try await request("/connectors/catalog")
+    }
+
+    func appConnections(id: String, token: String) async throws -> [AppConn] {
+        try await request("/profiles/\(id)/apps", token: token)
+    }
+
+    func appConnect(id: String, token: String, provider: String,
+                    app: String) async throws -> AppConn {
+        try await request("/profiles/\(id)/apps", method: "POST",
+                          body: ["provider": provider, "app": app], token: token)
+    }
+
+    func appCollect(cid: String, token: String, content: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/apps/\(cid)/collect", method: "POST",
+                                      body: ["items": [["content": content]]],
+                                      token: token)
+    }
+
+    func appInvoke(cid: String, token: String,
+                   capability: String) async throws -> InvokeResult {
+        try await request("/apps/\(cid)/invoke", method: "POST",
+                          body: ["capability": capability], token: token)
     }
 
     // MARK: Objections (governance)

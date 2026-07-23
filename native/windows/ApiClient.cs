@@ -78,6 +78,41 @@ public record ChatMessage(
 public record ChatReply(
     [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage);
 
+public record SocialConn(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("platform")] string Platform,
+    [property: JsonPropertyName("direction")] string Direction,
+    [property: JsonPropertyName("handle")] string? Handle,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("collected")] int Collected,
+    [property: JsonPropertyName("published")] int Published);
+
+public record CatalogApp(
+    [property: JsonPropertyName("app")] string App,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("capabilities")] string[] Capabilities);
+
+public record CatalogProvider(
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("apps")] CatalogApp[] Apps);
+
+public record AppsCatalog(
+    [property: JsonPropertyName("providers")] CatalogProvider[] Providers);
+
+public record AppConn(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("app")] string App,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("capabilities")] string[] Capabilities,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record InvokeResult(
+    [property: JsonPropertyName("capability")] string Capability,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("result")] string Result);
+
 public record Excursion(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("topic")] string Topic,
@@ -204,6 +239,69 @@ public sealed class ApiClient
                                 string message) =>
         Send<ChatReply>(Post($"/profiles/{id}/chat",
             new { interactor_id = interactorId, message }, token));
+
+    // -- Connect: social platforms & the connected-apps catalog --
+
+    public Task<SocialConn[]> SocialConnections(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/social");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SocialConn[]>(req);
+    }
+
+    public Task<SocialConn> SocialConnect(string id, string token, string platform,
+                                          string direction, string handle) =>
+        Send<SocialConn>(Post($"/profiles/{id}/social",
+            handle is { Length: > 0 }
+                ? new { platform, direction, handle }
+                : (object)new { platform, direction }, token));
+
+    public async Task SocialCollect(string cid, string token, string content)
+    {
+        var req = Post($"/social/{cid}/collect",
+            new { items = new[] { new { content } } }, token);
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public async Task SocialPublish(string cid, string token, string content)
+    {
+        var req = Post($"/social/{cid}/publish", new { content }, token);
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public async Task RevokeSocial(string cid, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"/social/{cid}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<AppsCatalog> ConnectorCatalog() =>
+        Send<AppsCatalog>(new HttpRequestMessage(HttpMethod.Get, "/connectors/catalog"));
+
+    public Task<AppConn[]> AppConnections(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/apps");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<AppConn[]>(req);
+    }
+
+    public Task<AppConn> AppConnect(string id, string token, string provider, string app) =>
+        Send<AppConn>(Post($"/profiles/{id}/apps", new { provider, app }, token));
+
+    public async Task AppCollect(string cid, string token, string content)
+    {
+        var req = Post($"/apps/{cid}/collect",
+            new { items = new[] { new { content } } }, token);
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<InvokeResult> AppInvoke(string cid, string token, string capability) =>
+        Send<InvokeResult>(Post($"/apps/{cid}/invoke", new { capability }, token));
 
     // -- knowledge excursions (study safely; private data stays home) --
 

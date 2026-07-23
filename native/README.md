@@ -16,9 +16,17 @@ Each target ships the same screens, exercising the real API end to end:
 **Chat** → `POST /interactors` + `POST /profiles/{id}/chat` ·
 **Study** → `/profiles/{id}/excursions` + `/excursions/{cid}/learn` ·
 **Compose** → `POST /profiles/{id}/compose` · **Posts** → `GET /profiles/{id}/posts` ·
-**Robots** → `/robotics/catalog`, `/profiles/{id}/robots`, `/robots/{rid}/command` ·
+**Connect** — social platforms (`/profiles/{id}/social` + collect / publish /
+revoke), the connected-apps catalog (`/connectors/catalog`, `/profiles/{id}/apps`
++ collect / invoke), and **Robots** (`/robotics/catalog`, `/profiles/{id}/robots`,
+`/robots/{rid}/command`) ·
 **Settings** → model picker (`/models`, `/profiles/{id}/model`) + objections
 (`/profiles/{id}/objections`, attest)
+
+On the phone form factors, Social, Apps, and Robots share one **Connect** tab
+(segmented on iOS, a `TabRow` on Android) so the bottom bar stays at five
+destinations; Windows' sidebar keeps Connect (Social / Apps) and Robots as
+separate items.
 
 They persist the returned `owner_token` so the app resumes signed-in, and share
 one dark-OLED palette so all three feel like one product. See each folder's
@@ -44,10 +52,10 @@ On a physical phone, point the client at your machine's LAN IP instead.
 
 ## Scope
 
-This is a functional **scaffold**, not the full screen gallery — enough to
-build, run, create a profile, and round-trip live data on each OS. The wider
-QRME surface (chat, relationships, connections, social/app connectors,
-knowledge excursions, governance) already has backend endpoints under
-[`qrme/routers/`](../qrme/routers/) to grow into further native screens.
+These scaffolds cover the core owner-facing loop end to end: create a profile,
+chat with it, compose and study, connect it to social platforms and apps,
+embody it in a robot, and govern it (model choice, objections). The remaining
+surfaces (relationships, community, licensing, summons) have backend endpoints
+under [`qrme/routers/`](../qrme/routers/) to grow into further native screens.
 
 These native targets are additive and do not change the backend.

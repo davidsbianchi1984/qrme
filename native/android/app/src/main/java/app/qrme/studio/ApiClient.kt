@@ -21,6 +21,13 @@ data class Objection(val id: String, val status: String, val reason: String?, va
 data class ChatMessage(val content: String?, val status: String, val flagReason: String?)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
+data class SocialConn(val id: String, val platform: String, val direction: String,
+                      val handle: String?, val status: String?, val collected: Int,
+                      val published: Int)
+data class CatalogApp(val provider: String, val app: String, val label: String)
+data class AppConn(val id: String, val provider: String, val app: String, val label: String,
+                   val capabilities: List<String>, val status: String?)
+data class InvokeResult(val capability: String, val status: String, val result: String)
 
 class ApiException(message: String) : Exception(message)
 
@@ -205,5 +212,84 @@ object ApiClient {
 
     suspend fun learn(cid: String, token: String) {
         request("/excursions/$cid/learn", "POST", null, token)
+    }
+
+    // ---- Connect: social platforms & the connected-apps catalog ----
+
+    private fun socialConnOf(o: JSONObject) = SocialConn(
+        o.getString("id"), o.optString("platform", ""), o.optString("direction", ""),
+        o.optString("handle", null), o.optString("status", null),
+        o.optInt("collected"), o.optInt("published"))
+
+    suspend fun socialConnections(id: String, token: String): List<SocialConn> {
+        val arr = JSONArray(request("/profiles/$id/social", token = token))
+        return (0 until arr.length()).map { socialConnOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun socialConnect(id: String, token: String, platform: String,
+                              direction: String, handle: String?): SocialConn {
+        val body = JSONObject().put("platform", platform).put("direction", direction)
+        if (!handle.isNullOrBlank()) body.put("handle", handle)
+        return socialConnOf(JSONObject(request("/profiles/$id/social", "POST", body, token)))
+    }
+
+    suspend fun socialCollect(cid: String, token: String, content: String) {
+        request("/social/$cid/collect", "POST",
+            JSONObject().put("items", JSONArray().put(JSONObject().put("content", content))),
+            token)
+    }
+
+    suspend fun socialPublish(cid: String, token: String, content: String) {
+        request("/social/$cid/publish", "POST", JSONObject().put("content", content), token)
+    }
+
+    suspend fun revokeSocial(cid: String, token: String) {
+        request("/social/$cid", "DELETE", null, token)
+    }
+
+    suspend fun appsCatalog(): List<CatalogApp> {
+        val providers = JSONObject(request("/connectors/catalog")).getJSONArray("providers")
+        val out = mutableListOf<CatalogApp>()
+        for (i in 0 until providers.length()) {
+            val p = providers.getJSONObject(i)
+            val apps = p.getJSONArray("apps")
+            for (j in 0 until apps.length()) {
+                val a = apps.getJSONObject(j)
+                out += CatalogApp(p.getString("provider"), a.getString("app"), a.getString("label"))
+            }
+        }
+        return out
+    }
+
+    private fun appConnOf(o: JSONObject): AppConn {
+        val caps = o.optJSONArray("capabilities")
+        return AppConn(
+            o.getString("id"), o.optString("provider", ""), o.optString("app", ""),
+            o.optString("label", ""),
+            (0 until (caps?.length() ?: 0)).map { caps!!.getString(it) },
+            o.optString("status", null))
+    }
+
+    suspend fun appConnections(id: String, token: String): List<AppConn> {
+        val arr = JSONArray(request("/profiles/$id/apps", token = token))
+        return (0 until arr.length()).map { appConnOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun appConnect(id: String, token: String, provider: String, app: String): AppConn {
+        return appConnOf(JSONObject(request("/profiles/$id/apps", "POST",
+            JSONObject().put("provider", provider).put("app", app), token)))
+    }
+
+    suspend fun appCollect(cid: String, token: String, content: String) {
+        request("/apps/$cid/collect", "POST",
+            JSONObject().put("items", JSONArray().put(JSONObject().put("content", content))),
+            token)
+    }
+
+    suspend fun appInvoke(cid: String, token: String, capability: String): InvokeResult {
+        val o = JSONObject(request("/apps/$cid/invoke", "POST",
+            JSONObject().put("capability", capability), token))
+        return InvokeResult(o.optString("capability", ""), o.optString("status", ""),
+            o.optString("result", ""))
     }
 }
