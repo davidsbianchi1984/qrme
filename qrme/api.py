@@ -21,7 +21,7 @@ from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (apps, assistant, community, connections, governance,
                       intelligence, interaction, licensing, models, profiles,
-                      research, social, summon)
+                      research, robots, social, summon)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -58,6 +58,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(governance.router)
     app.include_router(licensing.router)
     app.include_router(models.router)
+    app.include_router(robots.router)
 
     # Optional CORS for a packaged desktop/mobile front-end that calls the API
     # from a different origin (e.g. the Electron app in app/). Off by default;
