@@ -537,6 +537,30 @@ CREATE TABLE IF NOT EXISTS model_prefs (
     provider    TEXT NOT NULL,
     updated_at  TEXT NOT NULL
 );
+
+-- Robot bodies bound to a profile (see qrme/robotics.py for the catalog).
+-- Each binding also creates an embodiments row, so identity consistency and
+-- chat routing treat the robot like any other embodiment.
+CREATE TABLE IF NOT EXISTS robots (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    model        TEXT NOT NULL,   -- robotics.BY_KEY key, e.g. neo, saros_20
+    name         TEXT NOT NULL,   -- the household name, e.g. "kitchen NEO"
+    llm_provider TEXT,            -- qrme.llm registry name loaded onboard
+    status       TEXT NOT NULL DEFAULT 'docked',  -- docked | active | offline
+    created_at   TEXT NOT NULL
+);
+
+-- Every command sent to a robot, for the audit trail (commands are validated
+-- against the per-kind allowlist before they are ever queued).
+CREATE TABLE IF NOT EXISTS robot_commands (
+    id         TEXT PRIMARY KEY,
+    robot_id   TEXT NOT NULL REFERENCES robots(id),
+    command    TEXT NOT NULL,
+    arg        TEXT,
+    result     TEXT,             -- JSON summary of what was queued/said
+    created_at TEXT NOT NULL
+);
 """
 
 _local = threading.local()

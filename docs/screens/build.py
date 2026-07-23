@@ -1613,6 +1613,13 @@ SCREENS = [
     dict(num=53, title="Google Gemini", sub="11 apps · collect, act, produce", hero="assistant", provider="google", accent="brand", tab=0),
     dict(num=54, title="Microsoft Copilot", sub="8 apps · collect, act, produce", hero="assistant", provider="microsoft", accent="brand", tab=0),
     dict(num=55, title="Objection & Revocation", sub="Contested profile · vault-sealed audit", hero="objectionaudit", accent="brand", tab=3),
+    dict(num=56, title="Robotics", sub="Same persona · a physical body", hero=None, accent="brand", tab=0, cards=[
+        dict(icon="person", color="brand", k="NEO · 1X", s="Humanoid · Grok onboard · active"),
+        dict(icon="star2", color="cyan", k="Isaac 1 · Weave", s="Home robot · tidying · docked"),
+        dict(icon="grid", color="green", k="Saros 20 · Roborock", s="Vacuum · mapping · patrol 9pm"),
+        dict(icon="shield", color="amber", k="Command allowlist", s="Per-body limits · say is moderated"),
+        dict(icon="list", color="pink", k="Command log", s="Every order audited"),
+    ], button=("Bind a robot", "brand")),
 ]
 
 
