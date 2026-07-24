@@ -28,7 +28,7 @@ from .routers import (apps, assistant, community, connections, earnings,
 
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
-    app = FastAPI(title="QRME", version="0.1.2")
+    app = FastAPI(title="QRME", version="0.1.3")
 
     @app.get("/terms")
     def terms() -> dict:

@@ -6,6 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.3] — 2026-07-24
+
 ### Added
 
 - **Run it on your phone** — the API serves the built studio at `/app`, so a
@@ -130,5 +134,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.3...HEAD
+[0.1.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.3
+[0.1.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.2
+[0.1.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.1
 [0.1.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.0

@@ -1,11 +1,11 @@
-# QRME v0.1.2 — release notes
+# QRME v0.1.3 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.1.2` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.1.3` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.1.2** — the trust release: everything the platform generates is
+**QRME v0.1.3** — the trust release: everything the platform generates is
 watermarked and verifiable, users accept real terms with a receipt, and
 signed/notarized builds are wired. One of three interoperating products
 (with [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
@@ -13,6 +13,11 @@ signed/notarized builds are wired. One of three interoperating products
 
 ### Highlights
 
+- **Run it on your phone** — the API serves the built studio at `/app`
+  (one origin for UI and API — nothing to configure on the phone);
+  `GET /pair` returns the URL on your local network with a scannable QR,
+  and the studio installs to the home screen as a standalone app with a
+  thumb-reachable bottom tab bar. Local network only, by design.
 - **Watermarking on every AI render** — all AI-generated work, textual or
   visual, is stamped at creation with a verifiable synthetic-media
   credential: chat turns (including proactive check-ins and farewells),
@@ -40,12 +45,12 @@ signed/notarized builds are wired. One of three interoperating products
 
 ### Verification
 
-Backend suite green (QRME 259 tests); live-server smoke flows pass; the
+Backend suite green (QRME 266 tests); live-server smoke flows pass; the
 front-ends build clean; static native checks (XAML/SVG parse, brace
 balance, brush audit) are clean across iOS/Android/Windows sources.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.1.2` tag), or run from source —
-see the README's Quick Start.
+`desktop-release` workflow from the `app-v0.1.3` tag), run from source, or
+open it on your phone — see the README's "Run it on your phone".
