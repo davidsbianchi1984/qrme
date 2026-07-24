@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Synthetic-media watermarking** — public posts and non-text chat
+  modalities are stamped at creation with a verifiable credential
+  (producer, SHA-256, issue time, disclosure); public verification via
+  `GET /watermarks/{id}` and `POST /watermarks/verify` catches altered or
+  substituted media.
+- **macOS notarization wiring** — hardened runtime + entitlements +
+  `notarize` in the electron-builder config, so adding the Apple secrets
+  produces a fully notarized, Gatekeeper-clean build; docs/releasing.md
+  now walks through obtaining the macOS and Windows certificates.
+
 ## [0.1.1] — 2026-07-24
 
 ### Added

@@ -2,7 +2,7 @@
   "name": "qrme-desktop",
   "productName": "QRME",
   "version": "0.1.1",
-  "description": "QRME desktop app — a runnable React front-end wired to the QRME API, packaged with Electron.",
+  "description": "QRME desktop app \u2014 a runnable React front-end wired to the QRME API, packaged with Electron.",
   "author": "David Bianchi",
   "repository": "https://github.com/davidsbianchi1984/qrme",
   "private": true,
@@ -50,7 +50,12 @@
           "arch": "universal"
         }
       ],
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": true
     },
     "win": {
       "target": "nsis"
