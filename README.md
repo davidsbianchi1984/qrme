@@ -224,10 +224,18 @@ this backend — no app store, no second server, nothing to configure on the
 phone.
 
 ```bash
-python -m qrme phone
+python -m qrme          # the launcher menu: choose your device
+python -m qrme phone    # straight to the phone flow
 ```
 
-One command: it builds the studio if it's missing (first run installs the
+Bare `python -m qrme` prints the launcher menu — every way to run QRME,
+one command each, so you pick per device: **phone** (this section),
+**desktop** (`python -m qrme desktop`, the Electron app on this PC),
+**packaged installer** (`.dmg`/`.exe`/`.AppImage` from the releases page —
+no toolchain needed), or **headless API** (`python -m qrme serve`). Same
+backend, same data, same token checks in every form.
+
+`python -m qrme phone` builds the studio if it's missing (first run installs the
 npm dependencies too), prints the phone URL **with a QR code right in the
 terminal**, and starts the API on the network — scan, Add to Home Screen,
 done. Flags: `--port`, `--rebuild`, `--no-build`, `--print-only`.
