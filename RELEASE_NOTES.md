@@ -1,18 +1,26 @@
-# QRME v0.1.3 — release notes
+# QRME v0.1.4 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.1.3` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.1.4` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.1.3** — the trust release: everything the platform generates is
-watermarked and verifiable, users accept real terms with a receipt, and
-signed/notarized builds are wired. One of three interoperating products
-(with [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
+**QRME v0.1.4** — run it your way: one command prints every way to run
+QRME and you pick the device — your phone (scan a QR straight off the
+terminal), this PC, a packaged installer, or the headless API. One of
+three interoperating products (with
+[jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)).
 
 ### Highlights
 
+- **Run it your way — `python -m qrme`** — the launcher menu prints every
+  way to run QRME, one command each, so you pick per device: `phone` (the
+  QR flow below), `desktop` (the Electron app on this PC), the packaged
+  installer (no toolchain needed), or `serve` (the headless API alone).
+  `python -m qrme phone` does the whole phone setup in one command —
+  builds the studio if missing, prints the pairing URL **with a QR code
+  drawn straight into the terminal**, and serves on your local network.
 - **Run it on your phone** — the API serves the built studio at `/app`
   (one origin for UI and API — nothing to configure on the phone);
   `GET /pair` returns the URL on your local network with a scannable QR,
@@ -45,12 +53,12 @@ signed/notarized builds are wired. One of three interoperating products
 
 ### Verification
 
-Backend suite green (QRME 266 tests); live-server smoke flows pass; the
+Backend suite green (QRME 270 tests); live-server smoke flows pass; the
 front-ends build clean; static native checks (XAML/SVG parse, brace
 balance, brush audit) are clean across iOS/Android/Windows sources.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.1.3` tag), run from source, or
-open it on your phone — see the README's "Run it on your phone".
+`desktop-release` workflow from the `app-v0.1.4` tag), run `python -m qrme`
+and pick your device, or open it on your phone — see the README.
