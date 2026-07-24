@@ -156,13 +156,13 @@ def build_system_prompt(
             "but reserved, and share nothing private."
         )
 
-    # Disposition dials (throttle + behavior sliders) ride on the prompt, so
-    # chat, compose, rooms, and robot speech all inherit them — style, pace,
-    # and manner only, never identity or safety.
-    from . import dials
-    dial_line = dials.directive(profile["id"], bool(profile["adult_mode"]))
-    if dial_line:
-        parts.append(dial_line)
+    # Steering dials (throttle + behavior sliders the owner sets) ride on the
+    # prompt, so chat, compose, rooms, and robot speech all inherit them —
+    # style, pace, and manner only, never identity or safety.
+    from . import steering
+    steer_line = steering.directive(profile["id"], bool(profile["adult_mode"]))
+    if steer_line:
+        parts.append(steer_line)
 
     if engagement:
         score = engagement["score"]
