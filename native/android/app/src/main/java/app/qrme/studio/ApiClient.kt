@@ -50,8 +50,12 @@ data class SummonResult(val type: String, val label: String?, val scans: Int?,
 data class Pack(val id: String, val industry: String, val audience: String,
                 val title: String,
                 val blurb: String?, val publisher: String, val price: Double,
-                val currency: String, val free: Boolean, val items: Int,
+                val currency: String, val free: Boolean, val origin: String,
+                val originUrl: String?, val items: Int,
                 val installs: Int)
+data class PackRegistry(val key: String, val name: String, val url: String,
+                        val audience: String, val tagline: String,
+                        val available: Int, val synced: Int)
 data class InstalledPack(val id: String, val title: String, val pricePaid: Double,
                          val robotId: String)
 data class Listing(val id: String, val kind: String, val title: String, val blurb: String?,
@@ -414,8 +418,24 @@ object ApiClient {
                 o.optString("title", ""), o.optString("blurb", null),
                 o.optString("publisher", ""), o.optDouble("price", 0.0),
                 o.optString("currency", "USD"), o.optBoolean("free"),
+                o.optString("origin", "local"), o.optString("origin_url", null),
                 o.optInt("items"), o.optInt("installs"))
         }
+    }
+
+    suspend fun packRegistries(): List<PackRegistry> {
+        val arr = JSONArray(request("/packs/registries"))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            PackRegistry(o.getString("key"), o.optString("name", ""),
+                o.optString("url", ""), o.optString("audience", ""),
+                o.optString("tagline", ""), o.optInt("available"),
+                o.optInt("synced"))
+        }
+    }
+
+    suspend fun syncRegistry(key: String) {
+        request("/packs/registries/$key/sync", "POST")
     }
 
     suspend fun installedPacks(pid: String, token: String): List<InstalledPack> {

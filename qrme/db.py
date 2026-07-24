@@ -411,6 +411,8 @@ CREATE TABLE IF NOT EXISTS knowledge_packs (
     publisher  TEXT NOT NULL,
     price      REAL NOT NULL DEFAULT 0,   -- 0 = free download
     currency   TEXT NOT NULL DEFAULT 'USD',
+    origin     TEXT NOT NULL DEFAULT 'local',  -- local | a registry key
+    origin_url TEXT,                     -- the registry storefront, when federated
     created_at TEXT NOT NULL
 );
 

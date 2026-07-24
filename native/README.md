@@ -32,7 +32,10 @@ quick-browse tag chips), **Packs** — the knowledge-pack shop
 (`/packs` catalog + industry filter, `/packs/{id}/install` to download or
 buy onto the profile, `/profiles/{id}/packs` installed list + uninstall;
 🤖 robot task packs install onto the profile's bound body and are revoked
-via `/robots/{rid}/packs/{pid}`), and **License** (offer terms
+via `/robots/{rid}/packs/{pid}`; the **Pack sources** card lists the
+federated registries — Robotmods.net and LLMmods.com — with one-tap sync
+via `/packs/registries` + `/packs/registries/{key}/sync`), and **License**
+(offer terms
 `/profiles/{id}/license`, grants `/profiles/{id}/licenses`, revoke
 `/licenses/{gid}`)
 

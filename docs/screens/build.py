@@ -1644,6 +1644,12 @@ SCREENS = [
         dict(icon="chart", color="brand", k="Free or priced", s="POST /packs · listed under #pack"),
         dict(icon="people", color="green", k="Installs tracked", s="catalog shows items · installs"),
     ], button=("Publish", "brand")),
+    dict(num=61, title="Pack Registries", sub="Federated mod storefronts", accent="brand", tabs=MARKET, tab=0, cards=[
+        dict(icon="building", color="brand", k="Robotmods.net", s="task mods for robot bodies", pill=("2 PACKS", "info")),
+        dict(icon="building", color="cyan", k="LLMmods.com", s="knowledge mods for LLM personas", pill=("2 PACKS", "info")),
+        dict(icon="shieldok", color="green", k="Origin on every label", s="publisher & storefront URL on the pack"),
+        dict(icon="chart", color="amber", k="Same rules once synced", s="buy flow · capability checks · provenance"),
+    ], button=("Sync sources", "brand")),
 ]
 
 

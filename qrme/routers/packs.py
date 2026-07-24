@@ -40,6 +40,7 @@ def _summary(row: dict) -> dict:
             "title": row["title"], "blurb": row["blurb"],
             "publisher": row["publisher"], "price": row["price"],
             "currency": row["currency"], "free": row["price"] == 0,
+            "origin": row["origin"], "origin_url": row["origin_url"],
             "items": items, "installs": installs}
 
 
@@ -60,6 +61,27 @@ def list_packs(industry: str | None = None,
         f"SELECT * FROM knowledge_packs{where} ORDER BY audience, industry,"
         " price", params).fetchall()
     return [_summary(dict(r)) for r in rows]
+
+
+# Declared before /packs/{pack_id} so the literal path wins the match.
+@router.get("/packs/registries")
+def pack_registries() -> list[dict]:
+    """The federated pack registries — external mod storefronts whose
+    catalogs sync into this marketplace, origin on every label."""
+    from .. import pack_sources
+    return pack_sources.registry_summaries()
+
+
+@router.post("/packs/registries/{key}/sync", status_code=201)
+def sync_registry(key: str) -> dict:
+    """Import a registry's current catalog (idempotent). The imported packs
+    behave exactly like local ones: same buy/download flow, same capability
+    checks for robot mods, same provenance."""
+    from .. import pack_sources
+    result = pack_sources.sync(key)
+    if result is None:
+        raise HTTPException(404, "unknown registry")
+    return result
 
 
 @router.get("/packs/{pack_id}")

@@ -7,6 +7,7 @@ import SwiftUI
 struct PacksSection: View {
     @EnvironmentObject var state: AppState
     @State private var catalog: [Pack] = []
+    @State private var registries: [PackRegistry] = []
     @State private var installed: [String: String] = [:]  // pack id -> robot id ("" = profile)
     @State private var industry = ""
     @State private var status: String?
@@ -29,6 +30,33 @@ struct PacksSection: View {
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 10)
                         .background(Theme.brandA).clipShape(Capsule())
+                }
+            }.card()
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Pack sources").font(.subheadline.bold()).foregroundStyle(Theme.txt)
+                Text("Federated mod storefronts — sync a source and its catalog joins the marketplace, origin on every label.")
+                    .font(.caption2).foregroundStyle(Theme.t3)
+                ForEach(registries, id: \.key) { reg in
+                    HStack(spacing: 8) {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(reg.name).font(.caption.bold()).foregroundStyle(Theme.brandA)
+                            Text(reg.tagline).font(.caption2).foregroundStyle(Theme.t2)
+                            Text("\(reg.synced)/\(reg.available) packs synced")
+                                .font(.caption2).foregroundStyle(Theme.t3)
+                        }
+                        Spacer()
+                        Button(reg.synced >= reg.available ? "Synced" : "Sync") {
+                            sync(reg)
+                        }
+                        .font(.caption.bold())
+                        .foregroundStyle(reg.synced >= reg.available ? Theme.green : .white)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(reg.synced >= reg.available
+                                    ? Theme.green.opacity(0.16) : Theme.brandA)
+                        .clipShape(Capsule())
+                        .disabled(reg.synced >= reg.available)
+                    }
                 }
             }.card()
 
@@ -60,6 +88,9 @@ struct PacksSection: View {
                     }
                     Text("#\(pack.industry) · \(pack.items) items · \(pack.installs) installs · \(pack.publisher)")
                         .font(.caption2).foregroundStyle(Theme.t3)
+                    if let url = pack.origin_url {
+                        Text("from \(url)").font(.caption2).foregroundStyle(Theme.brandA)
+                    }
                     HStack {
                         Spacer()
                         if installed.keys.contains(pack.id) {
@@ -84,7 +115,18 @@ struct PacksSection: View {
         .task { await load() }
     }
 
+    private func sync(_ reg: PackRegistry) {
+        Task {
+            do {
+                try await ApiClient.shared.syncRegistry(key: reg.key)
+                status = "\(reg.name) synced — its packs joined the marketplace"
+            } catch { self.error = error.localizedDescription }
+            await load()
+        }
+    }
+
     private func load() async {
+        registries = (try? await ApiClient.shared.packRegistries()) ?? []
         catalog = (try? await ApiClient.shared.packs(
             industry: industry.trimmingCharacters(in: .whitespaces))) ?? []
         if let pid = state.pid, let token = state.token {
