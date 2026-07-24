@@ -29,6 +29,8 @@ struct PostsView: View {
                             }
                             Text(p.content ?? "· held for review ·")
                                 .font(.subheadline).foregroundStyle(Theme.txt)
+                            Text(p.watermark?.display?.line ?? "✦ AI")
+                                .font(.caption2).foregroundStyle(Theme.t3)
                         }.card()
                     }
                 }

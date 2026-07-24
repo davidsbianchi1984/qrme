@@ -12,15 +12,16 @@ import java.net.URL
 data class ProfileCreated(val id: String, val displayName: String, val kind: String, val ownerToken: String)
 data class ProfileCard(val id: String, val displayName: String, val kind: String, val status: String?)
 data class Post(val id: String, val topic: String?, val content: String?, val status: String?,
-                val provenance: Provenance? = null)
+                val provenance: Provenance? = null, val watermarkLine: String? = null)
 data class ProviderInfo(val name: String, val label: String, val configured: Boolean)
 data class ModelChoice(val provider: String, val effective: String)
+data class WatermarkDesign(val mark: String, val label: String, val line: String, val custom: Boolean)
 data class RobotSpec(val model: String, val label: String, val maker: String, val kind: String)
 data class Robot(val id: String, val model: String, val name: String, val status: String?, val commands: List<String>)
 data class CommandResult(val command: String, val status: String, val spoken: String?)
 data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
 data class ChatMessage(val content: String?, val status: String, val flagReason: String?,
-                       val provenance: Provenance? = null)
+                       val provenance: Provenance? = null, val watermarkLine: String? = null)
 data class Provenance(val generatedBy: String, val sourceItems: Int,
                       val licensedFrom: String?, val moderationStatus: String,
                       val disclaimer: String)
@@ -135,7 +136,12 @@ object ApiClient {
         if (o.isNull("content")) null else o.optString("content", null),
         o.optString("status", null),
         provenanceOf(o.optJSONObject("provenance")),
+        watermarkLineOf(o.optJSONObject("watermark")),
     )
+
+    // The always-displayed watermark line riding on an AI render.
+    private fun watermarkLineOf(o: JSONObject?): String? =
+        o?.optJSONObject("display")?.optString("line", null)
 
     suspend fun createProfile(name: String, persona: String, kind: String, birthdate: String,
                               language: String? = null): ProfileCreated {
@@ -167,6 +173,24 @@ object ApiClient {
     suspend fun posts(id: String): List<Post> {
         val arr = JSONArray(request("/profiles/$id/posts"))
         return (0 until arr.length()).map { post(arr.getJSONObject(it)) }
+    }
+
+    // ---- watermark (the mark every AI render carries) ----
+
+    private fun design(o: JSONObject) = WatermarkDesign(
+        o.optString("mark", "\u2726"), o.optString("label", ""),
+        o.optString("line", ""), o.optBoolean("custom"))
+
+    suspend fun watermarkDesign(id: String): WatermarkDesign =
+        design(JSONObject(request("/profiles/$id/watermark")))
+
+    // Design the profile's watermark; the AI designation is invariant.
+    suspend fun setWatermarkDesign(id: String, token: String, mark: String?,
+                                   label: String?): WatermarkDesign {
+        val body = JSONObject()
+        if (!mark.isNullOrBlank()) body.put("mark", mark)
+        if (!label.isNullOrBlank()) body.put("label", label)
+        return design(JSONObject(request("/profiles/$id/watermark", "PUT", body, token)))
     }
 
     // ---- model selection ----
@@ -345,7 +369,8 @@ object ApiClient {
         return ChatMessage(
             if (o.isNull("content")) null else o.optString("content", null),
             o.optString("status", ""), o.optString("flag_reason", null),
-            provenanceOf(reply.optJSONObject("provenance")))
+            provenanceOf(reply.optJSONObject("provenance")),
+            watermarkLineOf(o.optJSONObject("watermark")))
     }
 
     // ---- language (the profile speaks it everywhere) ----

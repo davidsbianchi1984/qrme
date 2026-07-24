@@ -23,6 +23,7 @@ struct Post: Decodable {
     let status: String?
     let surface: String?
     let provenance: ContentProvenance?
+    let watermark: WatermarkBrief?
 }
 
 struct Health: Decodable { let status: String }
@@ -144,6 +145,22 @@ struct ChatMessage: Decodable {
     let content: String?
     let status: String
     let flag_reason: String?
+    let watermark: WatermarkBrief?
+}
+
+/// The visible mark riding on every AI render (always displayed).
+struct WatermarkDisplay: Decodable { let line: String }
+
+struct WatermarkBrief: Decodable {
+    let watermark_id: String?
+    let display: WatermarkDisplay?
+}
+
+struct WatermarkDesign: Decodable {
+    let mark: String
+    let label: String
+    let line: String
+    let custom: Bool
 }
 
 struct GroundedIn: Decodable { let persona: Bool; let source_items: Int }
@@ -472,6 +489,23 @@ actor ApiClient {
 
     func posts(id: String) async throws -> [Post] {
         try await request("/profiles/\(id)/posts")
+    }
+
+    // MARK: Watermark — the mark every AI render carries
+
+    func watermarkDesign(id: String) async throws -> WatermarkDesign {
+        try await request("/profiles/\(id)/watermark")
+    }
+
+    /// Design the profile's watermark. The AI designation is invariant —
+    /// whatever the label, the rendered line always declares AI.
+    func setWatermarkDesign(id: String, token: String, mark: String?,
+                            label: String?) async throws -> WatermarkDesign {
+        var body: [String: Any] = [:]
+        if let mark, !mark.isEmpty { body["mark"] = mark }
+        if let label, !label.isEmpty { body["label"] = label }
+        return try await request("/profiles/\(id)/watermark", method: "PUT",
+                                 body: body, token: token)
     }
 
     // MARK: Model selection (which LLM powers the profile)

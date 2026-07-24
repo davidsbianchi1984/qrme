@@ -5,11 +5,12 @@ can verify what they're looking at."""
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from .. import watermark
+from ..common import profile_or_404, require_owner
 
 router = APIRouter()
 
@@ -17,6 +18,32 @@ router = APIRouter()
 class WatermarkVerify(BaseModel):
     watermark_id: str
     content: str | None = None         # present it to check for tampering
+
+
+class WatermarkDesignSet(BaseModel):
+    """The owner's custom display watermark. Empty fields fall back to the
+    defaults; clearing both resets to the default design. The AI designation
+    cannot be designed away — a label without "AI" is rendered with it."""
+    mark: str | None = Field(default=None, max_length=8)
+    label: str | None = Field(default=None, max_length=60)
+
+
+@router.get("/profiles/{profile_id}/watermark")
+def get_watermark_design(profile_id: str) -> dict:
+    """The profile's display watermark — public, since every render of the
+    profile's generated work carries it."""
+    profile_or_404(profile_id)
+    return watermark.design(profile_id)
+
+
+@router.put("/profiles/{profile_id}/watermark")
+def set_watermark_design(profile_id: str, body: WatermarkDesignSet,
+                         request: Request) -> dict:
+    """Owner designs the profile's watermark (mark + label). Whatever the
+    design, the rendered line always declares AI."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return watermark.set_design(profile_id, body.mark, body.label)
 
 
 @router.get("/watermarks/{watermark_id}")

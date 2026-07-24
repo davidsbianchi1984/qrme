@@ -44,6 +44,9 @@ CREATE TABLE IF NOT EXISTS profiles (
     proactive_min_interval_hours INTEGER NOT NULL DEFAULT 24,  -- anti-spam rate cap
     terms_version     TEXT,                   -- ToS version accepted at creation
     terms_accepted_at TEXT,
+    watermark_design  TEXT,                   -- JSON {mark, label}: owner-designed
+                                              -- display watermark; the AI
+                                              -- designation itself is invariant
     created_at        TEXT NOT NULL
 );
 
@@ -113,6 +116,7 @@ CREATE TABLE IF NOT EXISTS room_messages (
     content     TEXT NOT NULL,
     status      TEXT NOT NULL,   -- approved | blocked
     flag_reason TEXT,
+    watermark_id TEXT,           -- synthetic-media credential for profile turns
     created_at  TEXT NOT NULL
 );
 
@@ -166,6 +170,7 @@ CREATE TABLE IF NOT EXISTS creative_works (
     kind       TEXT NOT NULL,   -- music | poem | note | lyric
     moment     TEXT,            -- the moment it captures
     content    TEXT NOT NULL,
+    watermark_id TEXT,          -- synthetic-media credential (watermark.py)
     created_at TEXT NOT NULL
 );
 
@@ -353,6 +358,7 @@ CREATE TABLE IF NOT EXISTS tasks (
     status      TEXT NOT NULL,     -- completed | failed
     steps       TEXT NOT NULL,     -- JSON step log (summaries only)
     output      TEXT,
+    watermark_id TEXT,             -- synthetic-media credential (watermark.py)
     created_at  TEXT NOT NULL
 );
 
@@ -582,8 +588,10 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at   TEXT NOT NULL
 );
 
--- Synthetic-media credentials: one row per stamped piece of generated media
--- (posts, non-text chat modalities). The server-side half of the watermark:
+-- Synthetic-media credentials: one row per stamped piece of generated
+-- content — every AI render, textual or visual (chat turns, posts, room
+-- turns, game/robot lines, creative works, task outputs, non-text
+-- modalities). The server-side half of the watermark:
 -- holders of content verify against it, and content that merely *claims* a
 -- watermark fails the lookup.
 CREATE TABLE IF NOT EXISTS media_watermarks (
@@ -666,6 +674,7 @@ CREATE TABLE IF NOT EXISTS messages (
     content       TEXT NOT NULL,
     status        TEXT NOT NULL,   -- approved | pending | rejected
     flag_reason   TEXT,
+    watermark_id  TEXT,            -- synthetic-media credential for profile turns
     created_at    TEXT NOT NULL
 );
 

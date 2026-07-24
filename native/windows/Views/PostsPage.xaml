@@ -27,6 +27,8 @@
                                            FontSize="12" FontWeight="Bold" />
                                 <TextBlock Text="{Binding Content}" Foreground="{StaticResource QrmeTxtBrush}"
                                            FontSize="14" TextWrapping="Wrap" />
+                                <TextBlock Text="{Binding Mark}" Foreground="{StaticResource QrmeT3Brush}"
+                                           FontSize="10" />
                             </StackPanel>
                         </Border>
                     </DataTemplate>

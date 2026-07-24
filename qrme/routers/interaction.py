@@ -252,12 +252,19 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     else:
         status, flag_reason = "approved", None
 
+    # Every approved textual render is stamped — the reply leaves carrying
+    # the producing profile's credential and always-displayed mark.
+    reply_credential = (watermark.stamp(speaking_profile["id"], "chat", reply)
+                        if status == "approved" else None)
     profile_msg_id = db.new_id("msg")
     conn.execute(
         "INSERT INTO messages (id, profile_id, interactor_id, role, content,"
-        " status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        " status, flag_reason, watermark_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
         (profile_msg_id, profile_id, body.interactor_id, "profile", reply,
-         status, flag_reason, db.utcnow()),
+         status, flag_reason,
+         reply_credential["watermark_id"] if reply_credential else None,
+         db.utcnow()),
     )
     conn.commit()
 
@@ -343,7 +350,9 @@ def list_posts(profile_id: str) -> list[dict]:
     rows = db.connect().execute(
         "SELECT * FROM posts WHERE profile_id=? ORDER BY created_at, rowid",
         (profile_id,)).fetchall()
-    return [dict(r) for r in rows]
+    # Every rendered post carries its credential and the profile's mark.
+    return [{**dict(r), "watermark": watermark.brief(r["watermark_id"])}
+            for r in rows]
 
 
 # -- Companion features: proactive check-ins and transparency ----------------
@@ -389,13 +398,17 @@ def proactive_checkin(profile_id: str, interactor_id: str,
     else:
         status, flag_reason = "approved", None
 
+    credential = (watermark.stamp(profile_id, "chat", content)
+                  if status == "approved" else None)
     conn = db.connect()
     message_id = db.new_id("msg")
     conn.execute(
         "INSERT INTO messages (id, profile_id, interactor_id, role, content,"
-        " status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        " status, flag_reason, watermark_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
         (message_id, profile_id, interactor_id, "profile", content, status,
-         flag_reason, db.utcnow()),
+         flag_reason,
+         credential["watermark_id"] if credential else None, db.utcnow()),
     )
     conn.commit()
     record_proactive_outreach(profile_id, interactor_id)  # start the anti-spam clock

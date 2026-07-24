@@ -19,7 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from . import db, llm, moderation, persona
+from . import db, llm, moderation, persona, watermark
 
 SELF_NAMES = ("Sage", "Iris", "Wren", "Nova", "Juno", "Arlo", "Mira", "Rae")
 
@@ -86,12 +86,16 @@ def sunset(profile: dict, pdi=None, cloud=None) -> dict:
             (rel["interactor_id"],)).fetchone()
         verdict = moderation.review(content, dict(rel), dict(interactor),
                                     maturity=profile["maturity"])
+        credential = (watermark.stamp(profile["id"], "chat", content)
+                      if verdict.approved else None)
         conn.execute(
             "INSERT INTO messages (id, profile_id, interactor_id, role,"
-            " content, status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+            " content, status, flag_reason, watermark_id, created_at)"
+            " VALUES (?,?,?,?,?,?,?,?,?)",
             (db.new_id("msg"), profile["id"], rel["interactor_id"], "profile",
              content, "approved" if verdict.approved else "pending",
-             verdict.reason, db.utcnow()),
+             verdict.reason,
+             credential["watermark_id"] if credential else None, db.utcnow()),
         )
         farewells += 1
 

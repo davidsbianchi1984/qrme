@@ -47,6 +47,11 @@ public sealed partial class ChatPage : Page
                     : "⏳ Held for review"
                       + (p.FlagReason is { } fr ? $" — {fr}" : ""),
                 HorizontalAlignment.Left));
+            if (p.Status == "approved")
+                // The watermark rides on every AI render, always visible.
+                _messages.Add(new BubbleRow(
+                    p.Watermark?.Display?.Line ?? "✦ AI",
+                    HorizontalAlignment.Left));
             if (p.Status == "approved" && reply.Provenance is { } prov)
                 _messages.Add(new BubbleRow(
                     $"ⓘ {prov.GeneratedBy} · persona + " +

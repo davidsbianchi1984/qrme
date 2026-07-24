@@ -439,6 +439,9 @@ class MessageOut(BaseModel):
     status: Literal["approved", "pending", "rejected"]
     flag_reason: str | None = None
     created_at: str
+    # Synthetic-media credential riding on profile turns: id, verify path,
+    # disclosure, and the profile's always-displayed watermark design.
+    watermark: dict | None = None
 
 
 class ChatResponse(BaseModel):

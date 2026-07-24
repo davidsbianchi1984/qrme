@@ -67,3 +67,68 @@ def test_unknown_watermark_fails_the_lookup(client):
     r = client.post("/watermarks/verify",
                     json={"watermark_id": "wmk_never_issued", "content": "x"})
     assert r.status_code == 404
+
+def test_every_text_reply_is_watermarked_with_visible_mark(client):
+    pid = _profile(client)
+    i = client.post("/interactors", json={"display_name": "Sam"}).json()
+    r = client.post(f"/profiles/{pid}/chat", json={
+        "interactor_id": i["id"], "message": "tell me about your garden"}).json()
+    wm = r["profile_message"]["watermark"]
+    assert wm is not None and wm["kind"] == "chat"
+    assert "AI" in wm["display"]["line"]
+    assert wm["display"]["always_displayed"] is True
+    assert client.get(f"/watermarks/{wm['watermark_id']}").json()["valid"]
+
+    # The stored history renders with the same mark.
+    client.headers["authorization"] = f"Bearer {i['token']}"
+    history = client.get(
+        f"/profiles/{pid}/memory/{i['id']}").json()
+    profile_turns = [m for m in history if m["role"] == "profile"]
+    assert profile_turns and all(
+        m["watermark"]["display"]["line"].startswith("✦")
+        for m in profile_turns)
+
+    # The interactor's own words are not watermarked — only AI renders are.
+    assert all(m["watermark"] is None
+               for m in history if m["role"] == "interactor")
+
+
+def test_custom_watermark_design_always_declares_ai(client):
+    pid = _profile(client)
+    # The owner designs a custom mark — but the AI designation is invariant.
+    design = client.put(f"/profiles/{pid}/watermark", json={
+        "mark": "🌹", "label": "Dana's Garden"}).json()
+    assert design["custom"] is True
+    assert design["line"] == "🌹 AI · Dana's Garden"
+
+    # Everything generated from now on renders with the custom design.
+    post = client.post(f"/profiles/{pid}/compose",
+                       json={"topic": "roses"}).json()
+    assert post["watermark"]["display"]["line"] == "🌹 AI · Dana's Garden"
+
+    # The design is public (any surface must render it); changing it is not.
+    owner_token = client.headers.pop("authorization")
+    assert client.get(f"/profiles/{pid}/watermark").json()["line"] \
+        == "🌹 AI · Dana's Garden"
+    assert client.put(f"/profiles/{pid}/watermark",
+                      json={"label": "not yours"}).status_code == 401
+    client.headers["authorization"] = owner_token
+
+    # Clearing both fields resets to the default design.
+    reset = client.put(f"/profiles/{pid}/watermark", json={}).json()
+    assert reset["custom"] is False and reset["line"] == "✦ AI · Dana"
+
+
+def test_creative_works_and_guidance_are_stamped(client):
+    pid = _profile(client)
+    work = client.post(f"/profiles/{pid}/assist/compose", json={
+        "kind": "poem", "moment": "first bloom of spring"}).json()
+    assert work["watermark"]["kind"] == "poem"
+    assert "AI" in work["watermark"]["display"]["line"]
+    listed = client.get(f"/profiles/{pid}/assist/works").json()
+    assert listed[0]["watermark"]["watermark_id"] \
+        == work["watermark"]["watermark_id"]
+
+    edited = client.post(f"/profiles/{pid}/assist/proofread",
+                         json={"text": "i think the garden are lovely"}).json()
+    assert edited["watermark"]["kind"] == "proofread"

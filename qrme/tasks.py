@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import secrets
 
-from . import db, llm, moderation, persona
+from . import db, llm, moderation, persona, watermark
 
 
 def create_grant(profile_id: str, scope: list[str] | None) -> dict:
@@ -91,16 +91,21 @@ def run(profile: dict, kind: str, topic: str, grant_token: str,
     steps.append({"step": "moderation",
                   "result": "approved" if verdict.approved else verdict.reason})
 
+    # An autonomous task's finished output is AI-composed work: stamped.
+    credential = (watermark.stamp(profile_id, "task-output", output)
+                  if verdict.approved else None)
     task_id = db.new_id("tsk")
     conn.execute(
         "INSERT INTO tasks (id, profile_id, kind, grant_id, status, steps,"
-        " output, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        " output, watermark_id, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
         (task_id, profile_id, kind, grant["id"], status, json.dumps(steps),
-         output if verdict.approved else None, db.utcnow()),
+         output if verdict.approved else None,
+         credential["watermark_id"] if credential else None, db.utcnow()),
     )
     conn.commit()
     return {"id": task_id, "status": status, "steps": steps,
-            "output": output if verdict.approved else None}
+            "output": output if verdict.approved else None,
+            "watermark": credential}
 
 
 def list_tasks(profile_id: str) -> list[dict]:

@@ -20,7 +20,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, llm, moderation, persona
+from .. import db, llm, moderation, persona, watermark
 from ..common import profile_or_404, require_owner, source_items
 from ..models import (
     ComposeCreative, PerceiveRequest, ProofreadRequest, TriageRequest,
@@ -101,6 +101,9 @@ def proofread(profile_id: str, body: ProofreadRequest, request: Request) -> dict
     return {
         "original": body.text,
         "edited": edited if verdict.approved else None,
+        # The edited version is an AI-composed render of the user's writing.
+        "watermark": (watermark.stamp(profile_id, "proofread", edited)
+                      if verdict.approved else None),
         "suggestions": _suggestions(body.text),
         "status": "approved" if verdict.approved else "blocked",
     }
@@ -147,6 +150,8 @@ def perceive(profile_id: str, body: PerceiveRequest, request: Request) -> dict:
                                 (body.objects, body.people, body.gestures)),
         "goal": body.goal,
         "guidance": guidance if verdict.approved else None,
+        "watermark": (watermark.stamp(profile_id, "guidance", guidance)
+                      if verdict.approved else None),
         "status": "approved" if verdict.approved else "blocked",
     }
 
@@ -179,16 +184,20 @@ def compose_creative(profile_id: str, body: ComposeCreative,
     if not verdict.approved:
         raise HTTPException(422, f"creative work blocked: {verdict.reason}")
 
+    # A creative work is composed by AI to be kept and shared: stamped, and
+    # every render of it carries the profile's mark.
+    credential = watermark.stamp(profile_id, body.kind, content)
     conn = db.connect()
     work_id = db.new_id("wrk")
     conn.execute(
         "INSERT INTO creative_works (id, profile_id, kind, moment, content,"
-        " created_at) VALUES (?,?,?,?,?,?)",
-        (work_id, profile_id, body.kind, body.moment, content, db.utcnow()),
+        " watermark_id, created_at) VALUES (?,?,?,?,?,?,?)",
+        (work_id, profile_id, body.kind, body.moment, content,
+         credential["watermark_id"], db.utcnow()),
     )
     conn.commit()
     return {"id": work_id, "kind": body.kind, "moment": body.moment,
-            "content": content}
+            "content": content, "watermark": credential}
 
 
 @router.get("/profiles/{profile_id}/assist/works")
@@ -198,4 +207,5 @@ def list_works(profile_id: str, request: Request) -> list[dict]:
     rows = db.connect().execute(
         "SELECT * FROM creative_works WHERE profile_id=?"
         " ORDER BY created_at, rowid", (profile_id,)).fetchall()
-    return [dict(r) for r in rows]
+    return [{**dict(r), "watermark": watermark.brief(r["watermark_id"])}
+            for r in rows]

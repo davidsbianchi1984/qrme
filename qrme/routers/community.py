@@ -22,7 +22,7 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, engagement, llm, moderation, persona
+from .. import db, engagement, llm, moderation, persona, watermark
 from ..common import age_of, interactor_or_404, profile_or_404, source_items
 from ..models import (
     HandoffCreate, ListingCreate, ProviderCreate, RoomCreate, RoomMessage,
@@ -82,16 +82,22 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
                         approved, reason) -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
+    # A profile's room turn is an AI render facing the whole room: stamped.
+    credential = (watermark.stamp(sender_id, "room-turn", content)
+                  if approved and sender_kind == "profile" else None)
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
-        " content, status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        " content, status, flag_reason, watermark_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
-         "approved" if approved else "blocked", reason, db.utcnow()),
+         "approved" if approved else "blocked", reason,
+         credential["watermark_id"] if credential else None, db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
+            "watermark": credential,
             "status": "approved" if approved else "blocked"}
 
 
@@ -204,7 +210,9 @@ def room_transcript(room_id: str) -> list[dict]:
         " ORDER BY created_at, rowid", (room_id,)).fetchall()
     return [{"id": r["id"], "sender_kind": r["sender_kind"],
              "from": _display(r["sender_kind"], r["sender_id"]),
-             "content": r["content"], "created_at": r["created_at"]}
+             "content": r["content"],
+             "watermark": watermark.brief(r["watermark_id"]),
+             "created_at": r["created_at"]}
             for r in rows]
 
 
