@@ -13,7 +13,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, robotics
+from .. import db, ledger, robotics
 from ..common import profile_or_404, require_owner
 from ..models import PackInstall, PackPublish
 
@@ -124,11 +124,11 @@ def publish_pack(body: PackPublish) -> dict:
     pack_id = db.new_id("pak")
     conn.execute(
         "INSERT INTO knowledge_packs (id, industry, audience, title, blurb,"
-        " publisher, price, currency, rated, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?)",
+        " publisher, price, currency, rated, publisher_owner_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         (pack_id, body.industry, body.audience, body.title, body.blurb,
          body.publisher, body.price, body.currency, int(body.rated),
-         db.utcnow()))
+         body.publisher_owner_id, db.utcnow()))
     for item in body.items:
         conn.execute(
             "INSERT INTO pack_items (id, pack_id, title, content, task,"
@@ -219,6 +219,9 @@ def install_pack(pack_id: str, body: PackInstall, request: Request) -> dict:
             (pack_id, body.profile_id, body.robot_id, pack["price"],
              db.utcnow()))
         conn.commit()
+        ledger.credit(pack["publisher_owner_id"] or pack["publisher"],
+                      "pack_sale", pack_id, pack["price"], pack["currency"],
+                      memo=pack["title"])
         return {"pack_id": pack_id, "profile_id": body.profile_id,
                 "robot_id": body.robot_id,
                 "installed_tasks": [i["task"] for i in items],
@@ -256,6 +259,9 @@ def install_pack(pack_id: str, body: PackInstall, request: Request) -> dict:
         " price_paid, installed_at) VALUES (?,?,'',?,?)",
         (pack_id, body.profile_id, pack["price"], db.utcnow()))
     conn.commit()
+    ledger.credit(pack["publisher_owner_id"] or pack["publisher"],
+                  "pack_sale", pack_id, pack["price"], pack["currency"],
+                  memo=pack["title"])
     return {"pack_id": pack_id, "profile_id": body.profile_id,
             "installed_items": len(items), "price_paid": pack["price"],
             "currency": pack["currency"],

@@ -437,7 +437,24 @@ CREATE TABLE IF NOT EXISTS knowledge_packs (
     origin     TEXT NOT NULL DEFAULT 'local',  -- local | a registry key
     origin_url TEXT,                     -- the registry storefront, when federated
     rated      INTEGER NOT NULL DEFAULT 0,  -- 18+ commerce: age-gated to buy AND see
+    publisher_owner_id TEXT,           -- who the sale accrues to in the ledger
     created_at TEXT NOT NULL
+);
+
+-- The creator ledger: one row per money event, written at sale time so a
+-- creator's statement is a record, not a reconstruction. Simulated money,
+-- like every payment on the platform — but the accounting is real.
+CREATE TABLE IF NOT EXISTS ledger (
+    id          TEXT PRIMARY KEY,
+    beneficiary TEXT NOT NULL,         -- the earning creator's owner_id
+    kind        TEXT NOT NULL,         -- pack_sale | license_fee
+    ref         TEXT NOT NULL,         -- pack_id / grant_id
+    memo        TEXT,
+    amount      REAL NOT NULL,
+    currency    TEXT NOT NULL DEFAULT 'USD',
+    status      TEXT NOT NULL DEFAULT 'accrued',  -- accrued | paid
+    payout_id   TEXT,                  -- set when swept into a payout
+    created_at  TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pack_items (
