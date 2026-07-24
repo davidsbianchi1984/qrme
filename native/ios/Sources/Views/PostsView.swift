@@ -27,7 +27,8 @@ struct PostsView: View {
                                 Spacer()
                                 if let t = p.topic { Text(t).font(.caption).foregroundStyle(Theme.t3) }
                             }
-                            Text(p.content).font(.subheadline).foregroundStyle(Theme.txt)
+                            Text(p.content ?? "· held for review ·")
+                                .font(.subheadline).foregroundStyle(Theme.txt)
                         }.card()
                     }
                 }

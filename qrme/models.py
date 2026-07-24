@@ -390,6 +390,9 @@ class MessageOut(BaseModel):
 class ChatResponse(BaseModel):
     interactor_message: MessageOut
     profile_message: MessageOut
+    # The verifiable basis of the profile's reply: model, grounding,
+    # licensed lineage, and the moderation verdict (see content_provenance).
+    provenance: dict | None = None
     # Multi-modal output descriptor: how the reply renders beyond text
     # (voice basis, image/video treatment). None for plain text.
     modality: dict | None = None

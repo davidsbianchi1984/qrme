@@ -19,9 +19,10 @@ struct ProfileCard: Decodable {
 struct Post: Decodable {
     let id: String
     let topic: String?
-    let content: String
+    let content: String?
     let status: String?
     let surface: String?
+    let provenance: ContentProvenance?
 }
 
 struct Health: Decodable { let status: String }
@@ -84,10 +85,42 @@ struct ChatMessage: Decodable {
     let flag_reason: String?
 }
 
+struct GroundedIn: Decodable { let persona: Bool; let source_items: Int }
+
+struct ModerationInfo: Decodable {
+    let maturity: String
+    let status: String
+    let flag_reason: String?
+}
+
+struct ContentProvenance: Decodable {
+    let method: String
+    let generated_by: String
+    let language: String
+    let grounded_in: GroundedIn
+    let licensed_from: String?
+    let moderation: ModerationInfo
+    let disclaimer: String
+}
+
 struct ChatReply: Decodable {
     let interactor_message: ChatMessage
     let profile_message: ChatMessage
+    let provenance: ContentProvenance?
 }
+
+struct LanguageInfo: Decodable { let code: String; let label: String }
+
+struct LanguagesList: Decodable {
+    let languages: [LanguageInfo]
+    let defaultCode: String
+    enum CodingKeys: String, CodingKey {
+        case languages
+        case defaultCode = "default"
+    }
+}
+
+struct LanguageChoice: Decodable { let language: String; let label: String }
 
 struct SocialConn: Decodable {
     let id: String
@@ -301,6 +334,17 @@ actor ApiClient {
 
     func profileModel(id: String) async throws -> ModelChoice {
         try await request("/profiles/\(id)/model")
+    }
+
+    func languages() async throws -> LanguagesList { try await request("/languages") }
+
+    func profileLanguage(id: String) async throws -> LanguageChoice {
+        try await request("/profiles/\(id)/language")
+    }
+
+    func setLanguage(id: String, token: String, code: String) async throws -> LanguageChoice {
+        try await request("/profiles/\(id)/language", method: "PUT",
+                          body: ["language": code], token: token)
     }
 
     func setModel(id: String, token: String, provider: String) async throws -> ModelChoice {

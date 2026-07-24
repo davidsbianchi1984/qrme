@@ -18,6 +18,7 @@ public sealed partial class SettingsPage : Page
             CanAttest ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    private LanguageInfo[] _languages = Array.Empty<LanguageInfo>();
     private ProviderInfo[] _providers = Array.Empty<ProviderInfo>();
     private bool _loading;   // suppress SelectionChanged while populating
 
@@ -38,6 +39,12 @@ public sealed partial class SettingsPage : Page
             var idx = Array.FindIndex(_providers, p => p.Name == current.Provider);
             ProviderBox.SelectedIndex = idx >= 0 ? idx : 0;
             EffectiveText.Text = $"Effective now: {current.Effective}";
+
+            _languages = (await ApiClient.Shared.Languages()).Languages;
+            LanguageBox.ItemsSource = _languages.Select(l => l.Label).ToList();
+            var lang = await ApiClient.Shared.ProfileLanguage(s.Pid!);
+            var lidx = Array.FindIndex(_languages, l => l.Code == lang.Language);
+            LanguageBox.SelectedIndex = lidx >= 0 ? lidx : 0;
         }
         catch (Exception ex) { ShowError(ex.Message); }
         finally { _loading = false; }
@@ -56,6 +63,16 @@ public sealed partial class SettingsPage : Page
             NoObjections.Visibility =
                 objections.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnLanguagePicked(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading) return;
+        var idx = LanguageBox.SelectedIndex;
+        if (idx < 0 || idx >= _languages.Length) return;
+        var s = AppState.Current;
+        try { await ApiClient.Shared.SetLanguage(s.Pid!, s.Token!, _languages[idx].Code); }
         catch (Exception ex) { ShowError(ex.Message); }
     }
 

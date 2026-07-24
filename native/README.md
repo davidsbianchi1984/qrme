@@ -39,6 +39,18 @@ They persist the returned `owner_token` so the app resumes signed-in, and share
 one dark-OLED palette so all three feel like one product. See each folder's
 README for the exact build/run commands.
 
+Two cross-cutting guarantees ride on every generated surface:
+
+- **Language** (`/languages`, `/profiles/{id}/language`, picker in Settings):
+  the profile speaks its owner-set language everywhere it appears — chat,
+  composed posts, room turns, robot speech — generated natively in-language
+  via the persona system prompt.
+- **Provenance**: every chat reply and composed post carries a `provenance`
+  block — which model generated it, what it was grounded in (persona + how
+  many consented source items), any licensed-from lineage, and the
+  moderation verdict — rendered under the content so nothing the platform
+  emits is a black box.
+
 ## Start the backend
 
 All three point at the local dev server. From the repo root:

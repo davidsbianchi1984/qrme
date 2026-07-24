@@ -47,6 +47,13 @@ public sealed partial class ChatPage : Page
                     : "⏳ Held for review"
                       + (p.FlagReason is { } fr ? $" — {fr}" : ""),
                 HorizontalAlignment.Left));
+            if (p.Status == "approved" && reply.Provenance is { } prov)
+                _messages.Add(new BubbleRow(
+                    $"ⓘ {prov.GeneratedBy} · persona + " +
+                    $"{prov.GroundedInInfo.SourceItems} source item(s) · " +
+                    $"moderated: {prov.Moderation.Status}" +
+                    (prov.LicensedFrom is { } lf ? $" · licensed from {lf}" : ""),
+                    HorizontalAlignment.Left));
         }
         catch (Exception ex)
         {

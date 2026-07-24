@@ -21,11 +21,42 @@ public record ProfileCard(
     [property: JsonPropertyName("kind")] string Kind,
     [property: JsonPropertyName("status")] string? Status);
 
+public record GroundedIn(
+    [property: JsonPropertyName("persona")] bool Persona,
+    [property: JsonPropertyName("source_items")] int SourceItems);
+
+public record ModerationInfo(
+    [property: JsonPropertyName("maturity")] string Maturity,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("flag_reason")] string? FlagReason);
+
+public record ContentProvenance(
+    [property: JsonPropertyName("method")] string Method,
+    [property: JsonPropertyName("generated_by")] string GeneratedBy,
+    [property: JsonPropertyName("language")] string Language,
+    [property: JsonPropertyName("grounded_in")] GroundedIn GroundedInInfo,
+    [property: JsonPropertyName("licensed_from")] string? LicensedFrom,
+    [property: JsonPropertyName("moderation")] ModerationInfo Moderation,
+    [property: JsonPropertyName("disclaimer")] string Disclaimer);
+
 public record Post(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("topic")] string? Topic,
-    [property: JsonPropertyName("content")] string Content,
-    [property: JsonPropertyName("status")] string? Status);
+    [property: JsonPropertyName("content")] string? Content,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("provenance")] ContentProvenance? Provenance);
+
+public record LanguageInfo(
+    [property: JsonPropertyName("code")] string Code,
+    [property: JsonPropertyName("label")] string Label);
+
+public record LanguagesList(
+    [property: JsonPropertyName("languages")] LanguageInfo[] Languages,
+    [property: JsonPropertyName("default")] string Default);
+
+public record LanguageChoice(
+    [property: JsonPropertyName("language")] string Language,
+    [property: JsonPropertyName("label")] string Label);
 
 public record ProviderInfo(
     [property: JsonPropertyName("name")] string Name,
@@ -76,7 +107,8 @@ public record ChatMessage(
     [property: JsonPropertyName("flag_reason")] string? FlagReason);
 
 public record ChatReply(
-    [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage);
+    [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage,
+    [property: JsonPropertyName("provenance")] ContentProvenance? Provenance);
 
 public record SocialConn(
     [property: JsonPropertyName("id")] string Id,
@@ -279,6 +311,25 @@ public sealed class ApiClient
         };
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<ModelChoice>(req);
+    }
+
+    // -- language (the profile speaks it everywhere) --
+
+    public Task<LanguagesList> Languages() =>
+        Send<LanguagesList>(new HttpRequestMessage(HttpMethod.Get, "/languages"));
+
+    public Task<LanguageChoice> ProfileLanguage(string id) =>
+        Send<LanguageChoice>(new HttpRequestMessage(
+            HttpMethod.Get, $"/profiles/{id}/language"));
+
+    public Task<LanguageChoice> SetLanguage(string id, string token, string code)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/language")
+        {
+            Content = JsonContent.Create(new { language = code }),
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LanguageChoice>(req);
     }
 
     // -- robotic embodiment --

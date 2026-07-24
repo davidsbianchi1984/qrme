@@ -11,14 +11,20 @@ import java.net.URL
 
 data class ProfileCreated(val id: String, val displayName: String, val kind: String, val ownerToken: String)
 data class ProfileCard(val id: String, val displayName: String, val kind: String, val status: String?)
-data class Post(val id: String, val topic: String?, val content: String, val status: String?)
+data class Post(val id: String, val topic: String?, val content: String?, val status: String?,
+                val provenance: Provenance? = null)
 data class ProviderInfo(val name: String, val label: String, val configured: Boolean)
 data class ModelChoice(val provider: String, val effective: String)
 data class RobotSpec(val model: String, val label: String, val maker: String, val kind: String)
 data class Robot(val id: String, val model: String, val name: String, val status: String?, val commands: List<String>)
 data class CommandResult(val command: String, val status: String, val spoken: String?)
 data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
-data class ChatMessage(val content: String?, val status: String, val flagReason: String?)
+data class ChatMessage(val content: String?, val status: String, val flagReason: String?,
+                       val provenance: Provenance? = null)
+data class Provenance(val generatedBy: String, val sourceItems: Int,
+                      val licensedFrom: String?, val moderationStatus: String,
+                      val disclaimer: String)
+data class LanguageInfo(val code: String, val label: String)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
 data class SocialConn(val id: String, val platform: String, val direction: String,
@@ -83,11 +89,23 @@ object ApiClient {
         text
     }
 
+    private fun provenanceOf(o: JSONObject?): Provenance? {
+        if (o == null) return null
+        val grounded = o.optJSONObject("grounded_in")
+        val mod = o.optJSONObject("moderation")
+        return Provenance(o.optString("generated_by", ""),
+            grounded?.optInt("source_items") ?: 0,
+            o.optString("licensed_from", null),
+            mod?.optString("status", "") ?: "",
+            o.optString("disclaimer", ""))
+    }
+
     private fun post(o: JSONObject) = Post(
         o.getString("id"),
         o.optString("topic", null),
-        o.optString("content", ""),
+        if (o.isNull("content")) null else o.optString("content", null),
         o.optString("status", null),
+        provenanceOf(o.optJSONObject("provenance")),
     )
 
     suspend fun createProfile(name: String, persona: String, kind: String, birthdate: String): ProfileCreated {
@@ -202,12 +220,33 @@ object ApiClient {
 
     suspend fun chat(id: String, token: String, interactorId: String,
                      message: String): ChatMessage {
-        val o = JSONObject(request("/profiles/$id/chat", "POST",
+        val reply = JSONObject(request("/profiles/$id/chat", "POST",
             JSONObject().put("interactor_id", interactorId).put("message", message),
-            token)).getJSONObject("profile_message")
+            token))
+        val o = reply.getJSONObject("profile_message")
         return ChatMessage(
             if (o.isNull("content")) null else o.optString("content", null),
-            o.optString("status", ""), o.optString("flag_reason", null))
+            o.optString("status", ""), o.optString("flag_reason", null),
+            provenanceOf(reply.optJSONObject("provenance")))
+    }
+
+    // ---- language (the profile speaks it everywhere) ----
+
+    suspend fun languages(): List<LanguageInfo> {
+        val arr = JSONObject(request("/languages")).getJSONArray("languages")
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            LanguageInfo(o.getString("code"), o.getString("label"))
+        }
+    }
+
+    suspend fun profileLanguage(id: String): String {
+        return JSONObject(request("/profiles/$id/language")).getString("language")
+    }
+
+    suspend fun setLanguage(id: String, token: String, code: String) {
+        request("/profiles/$id/language", "PUT",
+            JSONObject().put("language", code), token)
     }
 
     // ---- knowledge excursions (study safely; private data stays home) ----

@@ -91,6 +91,13 @@ struct ChatView: View {
                 let p = reply.profile_message
                 if let content = p.content, p.status == "approved" {
                     messages.append(Bubble(mine: false, text: content, pending: false))
+                    if let prov = reply.provenance {
+                        messages.append(Bubble(
+                            mine: false,
+                            text: "ⓘ \(prov.generated_by) · persona + \(prov.grounded_in.source_items) source item(s) · moderated: \(prov.moderation.status)"
+                                  + (prov.licensed_from.map { " · licensed from \($0)" } ?? ""),
+                            pending: true))
+                    }
                 } else {
                     messages.append(Bubble(
                         mine: false,

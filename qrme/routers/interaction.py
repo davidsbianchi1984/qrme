@@ -15,7 +15,7 @@ from ..common import (
     interactor_or_404, message_out, proactive_gate, profile_or_404,
     record_proactive_outreach, relationship as get_relationship,
     require_interactor, require_owner, require_owner_or_interactor,
-    set_active_handoff, source_items,
+    set_active_handoff, source_items, content_provenance,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
@@ -215,9 +215,10 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         for row in reversed(history)
     ]
 
+    sources = source_items(speaking_profile["id"], pdi)
     system = persona.build_system_prompt(
         speaking_profile, relationship if handoff is None else None,
-        engagement_state, sources=source_items(speaking_profile["id"], pdi))
+        engagement_state, sources=sources)
     # Attention conditioning from the latent embedding (claims 21/22).
     attention = adaptation.attention_prompt(
         adaptation.get(profile_id, body.interactor_id))
@@ -268,6 +269,8 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                       biometrics=body.biometrics)
 
     return ChatResponse(
+        provenance=content_provenance(speaking_profile, sources, status,
+                                      flag_reason),
         interactor_message=message_out(rows[interactor_msg_id]),
         profile_message=message_out(rows[profile_msg_id]),
         modality=_modality_descriptor(profile_id, body.modality),
@@ -285,9 +288,8 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
 def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dict:
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
-    system = persona.build_system_prompt(
-        profile, None, None,
-        sources=source_items(profile_id, request.app.state.pdi))
+    sources = source_items(profile_id, request.app.state.pdi)
+    system = persona.build_system_prompt(profile, None, None, sources=sources)
     system += (f"\n\nCompose one short public post"
                + (f" for {body.surface}" if body.surface else "")
                + f" about: {body.topic}. Stay fully in character.")
@@ -316,7 +318,9 @@ def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dic
     conn.commit()
     return {"id": post_id, "surface": body.surface, "topic": body.topic,
             "content": content if status == "approved" else None,
-            "status": status, "flag_reason": flag_reason}
+            "status": status, "flag_reason": flag_reason,
+            "provenance": content_provenance(profile, sources, status,
+                                             flag_reason)}
 
 
 @router.get("/profiles/{profile_id}/posts")
