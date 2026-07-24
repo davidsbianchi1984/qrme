@@ -137,6 +137,11 @@ def acquire_license(profile_id: str, request: Request) -> dict:
         (grant_id, profile_id, buyer_id, offer["kind"], token, db.utcnow()),
     )
     conn.commit()
+    # The fee accrues to the source profile's creator at sale time.
+    from .. import ledger
+    ledger.credit(profile["owner_id"], "license_fee", grant_id,
+                  offer["price"], offer["currency"],
+                  memo=f"{offer['kind']} license · {profile['display_name']}")
     return {"grant_id": grant_id, "profile_id": profile_id, "kind": offer["kind"],
             "token": token, "terms": offer["terms"],
             "can_derive": bool(offer["allow_derivatives"])}

@@ -1662,6 +1662,12 @@ SCREENS = [
         dict(icon="people", color="green", k="Funnel", s="resolutions → verified → chatters", metric="25%"),
         dict(icon="shieldok", color="brand", k="Counted, never identified", s="owner-only · no viewer identities"),
     ]),
+    dict(num=64, title="Creator Payouts", sub="One statement, every sale", accent="green", tabs=MARKET, tab=0, cards=[
+        dict(icon="chart", color="green", k="Accrued balance", s="pack sales · license fees", metric="$86"),
+        dict(icon="db", color="amber", k="Distributed Systems Pro", s="pack_sale · $29.99", pill=("ACCRUED", "warn")),
+        dict(icon="pen", color="brand", k="consult license · Priya", s="license_fee · $49.00", pill=("PAID", "good")),
+        dict(icon="shieldok", color="cyan", k="Written at sale time", s="a record, not a reconstruction"),
+    ], button=("Request payout", "brand")),
 ]
 
 

@@ -465,8 +465,8 @@ def seed() -> dict:
                  f"a profile's {industry.replace('_', ' ')} expertise.")
         conn.execute(
             "INSERT INTO knowledge_packs (id, industry, audience, title,"
-            " blurb, publisher, price, currency, created_at)"
-            " VALUES (?,?,'profile',?,?,?,0,'USD',?)",
+            " blurb, publisher, price, currency, publisher_owner_id, created_at)"
+            " VALUES (?,?,'profile',?,?,?,0,'USD','qrme-starter',?)",
             (pack_id, industry, title, blurb, PUBLISHER, db.utcnow()))
         for item_title, content in items:
             conn.execute(
@@ -494,8 +494,8 @@ def seed() -> dict:
                  "checked at install.")
         conn.execute(
             "INSERT INTO knowledge_packs (id, industry, audience, title,"
-            " blurb, publisher, price, currency, created_at)"
-            " VALUES (?,?,'robot',?,?,?,?,'USD',?)",
+            " blurb, publisher, price, currency, publisher_owner_id, created_at)"
+            " VALUES (?,?,'robot',?,?,?,?,'USD','qrme-starter',?)",
             (pack_id, domain, title, blurb, PUBLISHER, price, db.utcnow()))
         for task, item_title, requires, procedure in tasks:
             conn.execute(
@@ -521,8 +521,8 @@ def seed() -> dict:
         pack_id = db.new_id("pak")
         conn.execute(
             "INSERT INTO knowledge_packs (id, industry, audience, title,"
-            " blurb, publisher, price, currency, rated, created_at)"
-            " VALUES (?,?,'profile',?,?,?,?,'USD',1,?)",
+            " blurb, publisher, price, currency, rated, publisher_owner_id,"
+            " created_at) VALUES (?,?,'profile',?,?,?,?,'USD',1,'qrme-starter',?)",
             (pack_id, industry, title,
              f"{len(items)} consent-forward conversation modules for "
              "adult-mode personas. 18+ to see, 18+ to buy.",

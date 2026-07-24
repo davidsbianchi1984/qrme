@@ -149,10 +149,11 @@ def sync(key: str) -> dict | None:
         conn.execute(
             "INSERT INTO knowledge_packs (id, industry, audience, title,"
             " blurb, publisher, price, currency, origin, origin_url,"
-            " created_at) VALUES (?,?,?,?,?,?,?,'USD',?,?,?)",
+            " publisher_owner_id, created_at)"
+            " VALUES (?,?,?,?,?,?,?,'USD',?,?,?,?)",
             (pack_id, pack["industry"], reg["audience"], pack["title"],
              pack["blurb"], reg["name"], pack["price"], key, reg["url"],
-             db.utcnow()))
+             key, db.utcnow()))
         for item in pack["items"]:
             if reg["audience"] == "robot":
                 task, title, requires, procedure = item
