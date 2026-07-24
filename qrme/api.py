@@ -27,7 +27,17 @@ from .routers import (apps, assistant, community, connections, earnings,
 
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
-    app = FastAPI(title="QRME", version="0.1.0")
+    app = FastAPI(title="QRME", version="0.1.1")
+
+    @app.get("/health")
+    def health() -> dict:
+        """Service liveness, sibling-style: which tandems are configured.
+        (JIM-mini and PDI always had one; QRME's front-ends probed
+        /openapi.json instead — now they don't have to.)"""
+        return {"status": "ok",
+                "pdi": app.state.pdi is not None,
+                "cloud": app.state.cloud is not None,
+                "offline": offline.enabled()}
 
     # PDI tandem: profile source material is sealed in the encrypted vault
     # when configured (QRME_PDI_URL + QRME_PDI_TOKEN, or an injected client).

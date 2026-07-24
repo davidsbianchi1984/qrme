@@ -97,7 +97,7 @@ def create_gateway() -> FastAPI:
     _load("jim", "jim.api")
     _load("pdi", "pdi.api")
 
-    gw = FastAPI(title="Suite Gateway", version="0.1.0")
+    gw = FastAPI(title="Suite Gateway", version="0.1.1")
 
     origins = os.environ.get("SUITE_CORS_ORIGINS", "*")
     from fastapi.middleware.cors import CORSMiddleware

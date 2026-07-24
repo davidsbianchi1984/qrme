@@ -68,7 +68,7 @@ export interface MemoryEntry { role: string; content: string; at?: string }
 
 // ---- endpoints ----
 export const api = {
-  health: () => req<{ status?: string }>("/openapi.json").then(() => true).catch(() => false),
+  health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
 
   offlineStatus: () => req<Record<string, unknown>>("/offline/status"),
 
