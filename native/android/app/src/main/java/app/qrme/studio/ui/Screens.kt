@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.qrme.studio.ApiClient
 import app.qrme.studio.AppConn
+import app.qrme.studio.L10n
 import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
@@ -170,13 +172,20 @@ fun WelcomeScreen(vm: StudioViewModel) {
 
 // ---- Overview ----
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverviewScreen(vm: StudioViewModel) {
     var card by remember { mutableStateOf<ProfileCard?>(null) }
     var loaded by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        vm.call({ ApiClient.profile(vm.pid!!) }) { r -> card = r.getOrNull(); loaded = true }
+    var refreshing by remember { mutableStateOf(false) }
+    fun reload() {
+        vm.call({ ApiClient.profile(vm.pid!!) }) { r ->
+            card = r.getOrNull(); loaded = true; refreshing = false
+        }
     }
+    LaunchedEffect(Unit) { reload() }
+    PullToRefreshBox(isRefreshing = refreshing,
+        onRefresh = { refreshing = true; reload() }) {
     screenScroll {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(Modifier.size(8.dp).clip(CircleShape).background(Qrme.Green))
@@ -200,8 +209,9 @@ fun OverviewScreen(vm: StudioViewModel) {
         }
         OutlinedButton(onClick = { vm.signOut() }, modifier = Modifier.fillMaxWidth(),
             border = androidx.compose.foundation.BorderStroke(1.dp, Qrme.Line)) {
-            Text("Sign out", color = Qrme.T2)
+            Text(L10n.t("action.sign_out", vm.language), color = Qrme.T2)
         }
+    }
     }
 }
 
@@ -401,6 +411,7 @@ fun SettingsScreen(vm: StudioViewModel) {
         vm.call({ ApiClient.profileLanguage(vm.pid!!) }) { r ->
             r.getOrNull()?.let { (lang, mode) ->
                 language = lang; preTranslate = mode == "pre"
+                vm.rememberLanguage(lang)   // chrome follows the profile
             }
         }
         vm.call({ ApiClient.profileModel(vm.pid!!) }) { r ->
@@ -413,7 +424,8 @@ fun SettingsScreen(vm: StudioViewModel) {
     LaunchedEffect(Unit) { reload() }
 
     screenScroll {
-        Text("Settings", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.t("tab.settings", vm.language), color = Qrme.Txt, fontSize = 22.sp,
+            fontWeight = FontWeight.Bold)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Model", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -452,6 +464,7 @@ fun SettingsScreen(vm: StudioViewModel) {
                                 vm.call({ ApiClient.setLanguage(vm.pid!!, vm.token!!, l.code,
                                     if (preTranslate) "pre" else "on_demand") }) {
                                     language = l.code
+                                    vm.rememberLanguage(l.code)
                                 }
                             },
                             label = { Text(l.label, fontSize = 11.sp) },
@@ -483,7 +496,7 @@ fun SettingsScreen(vm: StudioViewModel) {
             Text("Translate anything", color = Qrme.Txt, fontSize = 13.sp,
                 fontWeight = FontWeight.Bold)
             labeledField("", translateInput, "Paste or type text…") { translateInput = it }
-            SmallAction("Translate") {
+            SmallAction(L10n.t("action.translate", vm.language)) {
                 if (translateInput.isNotBlank() && language != "en") {
                     vm.call({ ApiClient.translate(vm.pid!!, vm.token!!, translateInput) }) { r ->
                         translated = r.getOrNull()

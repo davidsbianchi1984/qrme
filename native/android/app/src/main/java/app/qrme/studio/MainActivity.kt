@@ -57,11 +57,11 @@ class MainActivity : ComponentActivity() {
 private fun HomeShell(vm: StudioViewModel) {
     var tab by remember { mutableIntStateOf(0) }
     val tabs = listOf(
-        Triple("Overview", Icons.Filled.GridView, 0),
-        Triple("Chat", Icons.Filled.Chat, 1),
-        Triple("Studio", Icons.Filled.Edit, 2),
-        Triple("Connect", Icons.Filled.Link, 3),
-        Triple("Manage", Icons.Filled.Settings, 4),
+        Triple(L10n.t("tab.overview", vm.language), Icons.Filled.GridView, 0),
+        Triple(L10n.t("tab.chat", vm.language), Icons.Filled.Chat, 1),
+        Triple(L10n.t("tab.studio", vm.language), Icons.Filled.Edit, 2),
+        Triple(L10n.t("tab.connect", vm.language), Icons.Filled.Link, 3),
+        Triple(L10n.t("tab.manage", vm.language), Icons.Filled.Settings, 4),
     )
     Scaffold(
         containerColor = Qrme.ScrBot,

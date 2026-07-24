@@ -20,6 +20,14 @@ public sealed class AppState
     // birthdate — the key that opens the rated stranger tier.
     public string? InteractorId { get; set; }
     public bool InteractorVerified { get; set; }
+    // The profile's chosen language also drives the app chrome via L10n.
+    public string Language { get; set; } = "en";
+
+    public void RememberLanguage(string code)
+    {
+        Language = code;
+        Save();
+    }
 
     public void RememberInteractor(string id, bool adult = false)
     {

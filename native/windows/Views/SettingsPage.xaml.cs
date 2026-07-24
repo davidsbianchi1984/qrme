@@ -73,6 +73,7 @@ public sealed partial class SettingsPage : Page
             var lidx = Array.FindIndex(_languages, l => l.Code == lang.Language);
             LanguageBox.SelectedIndex = lidx >= 0 ? lidx : 0;
             PreTranslateToggle.IsOn = (lang.Mode ?? "pre") == "pre";
+            s.RememberLanguage(lang.Language);   // chrome follows the profile
         }
         catch (Exception ex) { ShowError(ex.Message); }
         finally { _loading = false; }
@@ -241,7 +242,11 @@ public sealed partial class SettingsPage : Page
         var idx = LanguageBox.SelectedIndex;
         if (idx < 0 || idx >= _languages.Length) return;
         var s = AppState.Current;
-        try { await ApiClient.Shared.SetLanguage(s.Pid!, s.Token!, _languages[idx].Code, CurrentMode); }
+        try
+        {
+            await ApiClient.Shared.SetLanguage(s.Pid!, s.Token!, _languages[idx].Code, CurrentMode);
+            s.RememberLanguage(_languages[idx].Code);
+        }
         catch (Exception ex) { ShowError(ex.Message); }
     }
 

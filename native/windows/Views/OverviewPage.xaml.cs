@@ -13,6 +13,14 @@ public sealed partial class OverviewPage : Page
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        RefreshButton.Content = L10n.T("action.refresh");
+        await Load();
+    }
+
+    private async void OnRefresh(object sender, RoutedEventArgs e) => await Load();
+
+    private async System.Threading.Tasks.Task Load()
+    {
         var s = AppState.Current;
         Greeting.Text = s.DisplayName;
         try

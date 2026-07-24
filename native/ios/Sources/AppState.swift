@@ -13,6 +13,9 @@ final class AppState: ObservableObject {
     // that opens the rated stranger tier.
     @Published var interactorId: String?
     @Published var interactorVerified = false
+    // The profile's chosen language also drives the app chrome (tab names,
+    // common actions) through L10n.
+    @Published var language = "en"
 
     private let d = UserDefaults.standard
 
@@ -22,6 +25,12 @@ final class AppState: ObservableObject {
         displayName = d.string(forKey: "qrme.name") ?? ""
         interactorId = d.string(forKey: "qrme.interactor")
         interactorVerified = d.bool(forKey: "qrme.interactor.adult")
+        language = d.string(forKey: "qrme.lang") ?? "en"
+    }
+
+    func rememberLanguage(_ code: String) {
+        language = code
+        d.set(code, forKey: "qrme.lang")
     }
 
     func rememberInteractor(_ id: String, adult: Bool = false) {

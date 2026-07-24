@@ -15,6 +15,9 @@
             <TextBlock x:Name="Greeting" FontSize="28" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
             <TextBlock Text="Your synthetic profile, as the world sees it."
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="14" TextWrapping="Wrap" />
+            <Button x:Name="RefreshButton" Content="Refresh" Click="OnRefresh"
+                    Background="Transparent" FontSize="12"
+                    Foreground="{StaticResource QrmeBrandABrush}" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
