@@ -133,6 +133,18 @@ def build_system_prompt(
             "reflect that age."
         )
 
+    # Appearance (steering hub): how the profile looks / presents, consistent
+    # across every surface and embodiment.
+    try:
+        appearance = profile["appearance"]
+    except (KeyError, IndexError):
+        appearance = None
+    if appearance:
+        parts.append(
+            f"Appearance: {appearance}. Present yourself consistently with "
+            "this look across every surface and embodiment."
+        )
+
     if profile["anonymous"]:
         parts.append("Your real identity is hidden; do not reveal who you represent.")
 
