@@ -6,6 +6,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.2] — 2026-07-24
+
 ### Added
 
 - **Watermarking on every AI render** — all AI-generated work, textual or
