@@ -6,7 +6,21 @@ namespace QrmeStudio.Views;
 
 public sealed partial class WelcomePage : Page
 {
+    private LanguageInfo[] _languages = System.Array.Empty<LanguageInfo>();
+
     public WelcomePage() => InitializeComponent();
+
+    protected override async void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        try
+        {
+            _languages = (await ApiClient.Shared.Languages()).Languages;
+            LanguageBox.ItemsSource = System.Linq.Enumerable.ToList(
+                System.Linq.Enumerable.Select(_languages, l => l.Label));
+            LanguageBox.SelectedIndex = 0;   // English
+        }
+        catch { /* backend offline — create will surface the error */ }
+    }
 
     private async void OnStart(object sender, RoutedEventArgs e)
     {
@@ -21,7 +35,12 @@ public sealed partial class WelcomePage : Page
         StartButton.IsEnabled = false;
         try
         {
-            var result = await ApiClient.Shared.CreateProfile(name, persona, kind, BirthBox.Text.Trim());
+            var language = LanguageBox.SelectedIndex >= 0
+                           && LanguageBox.SelectedIndex < _languages.Length
+                ? _languages[LanguageBox.SelectedIndex].Code
+                : null;
+            var result = await ApiClient.Shared.CreateProfile(
+                name, persona, kind, BirthBox.Text.Trim(), language);
             AppState.Current.SignIn(result);
             Frame.Navigate(typeof(ShellPage));
         }

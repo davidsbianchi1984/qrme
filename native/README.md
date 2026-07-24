@@ -41,10 +41,16 @@ README for the exact build/run commands.
 
 Two cross-cutting guarantees ride on every generated surface:
 
-- **Language** (`/languages`, `/profiles/{id}/language`, picker in Settings):
-  the profile speaks its owner-set language everywhere it appears — chat,
-  composed posts, room turns, robot speech — generated natively in-language
-  via the persona system prompt.
+- **Language** (`/languages`, `/profiles/{id}/language`; chosen at the
+  create-profile gateway and changeable in Settings): the profile speaks its
+  owner-set language everywhere it appears — chat, composed posts, room
+  turns, robot speech — generated natively in-language via the persona
+  system prompt. Delivery mode is the owner's choice: **pre-translated**
+  (default — the persona speaks it natively) or **on-demand** (original
+  voice kept). Either way, `POST /profiles/{id}/translate` — the Translate
+  tool in Settings — turns anything the owner runs across into the chosen
+  language via the profile's own model; the offline stub says it cannot
+  rather than pretending.
 - **Provenance**: every chat reply and composed post carries a `provenance`
   block — which model generated it, what it was grounded in (persona + how
   many consented source items), any licensed-from lineage, and the

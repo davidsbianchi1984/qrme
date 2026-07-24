@@ -10,6 +10,9 @@ struct SettingsView: View {
     @State private var objections: [Objection] = []
     @State private var languages: [LanguageInfo] = []
     @State private var language = "en"
+    @State private var preTranslate = true
+    @State private var translateInput = ""
+    @State private var translateResult: TranslateResult?
     @State private var error: String?
 
     var body: some View {
@@ -52,6 +55,36 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu).tint(Theme.brandA)
                     .onChange(of: language) { _ in applyLanguage() }
+                    Toggle(isOn: $preTranslate) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Speak it natively (pre-translate)")
+                                .font(.subheadline).foregroundStyle(Theme.txt)
+                            Text("Off keeps the original voice — translate selectively below.")
+                                .font(.caption2).foregroundStyle(Theme.t2)
+                        }
+                    }
+                    .tint(Theme.green)
+                    .onChange(of: preTranslate) { _ in applyLanguage() }
+                    Divider().overlay(Theme.line)
+                    Text("Translate anything").font(.subheadline.bold()).foregroundStyle(Theme.txt)
+                    TextField("Paste or type text…", text: $translateInput, axis: .vertical)
+                        .lineLimit(1...4).foregroundStyle(Theme.txt)
+                        .padding(10).background(Theme.scrBot)
+                        .clipShape(RoundedRectangle(cornerRadius: 11))
+                        .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
+                    Button("Translate") { runTranslate() }
+                        .font(.caption.bold()).foregroundStyle(.white)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(Theme.brandA).clipShape(Capsule())
+                        .disabled(translateInput.isEmpty || language == "en")
+                    if let r = translateResult {
+                        Text(r.translation).font(.subheadline).foregroundStyle(Theme.txt)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(10).background(Theme.scrBot)
+                            .clipShape(RoundedRectangle(cornerRadius: 9))
+                        Text("engine: \(r.engine)" + (r.note.map { " — \($0)" } ?? ""))
+                            .font(.caption2).foregroundStyle(Theme.t3)
+                    }
                 }.card()
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -107,13 +140,25 @@ struct SettingsView: View {
         languages = (try? await ApiClient.shared.languages())?.languages ?? []
         if let l = try? await ApiClient.shared.profileLanguage(id: pid) {
             language = l.language
+            preTranslate = (l.mode ?? "pre") == "pre"
         }
     }
 
     private func applyLanguage() {
         guard let pid = state.pid, let token = state.token else { return }
-        Task { _ = try? await ApiClient.shared.setLanguage(id: pid, token: token,
-                                                           code: language) }
+        Task {
+            _ = try? await ApiClient.shared.setLanguage(
+                id: pid, token: token, code: language,
+                mode: preTranslate ? "pre" : "on_demand")
+        }
+    }
+
+    private func runTranslate() {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            translateResult = try? await ApiClient.shared.translate(
+                id: pid, token: token, text: translateInput)
+        }
     }
 
     private func choose(_ provider: String) {

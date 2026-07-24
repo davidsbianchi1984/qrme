@@ -32,6 +32,7 @@
                         <ComboBoxItem Content="other_person" />
                         <ComboBoxItem Content="fictional" />
                     </ComboBox>
+                    <ComboBox x:Name="LanguageBox" Header="Language" HorizontalAlignment="Stretch" />
                     <TextBox x:Name="BirthBox" Header="Birthdate (yyyy-MM-dd)" Text="1984-01-01" />
                 </StackPanel>
             </Border>

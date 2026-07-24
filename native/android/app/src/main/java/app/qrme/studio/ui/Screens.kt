@@ -38,6 +38,7 @@ import app.qrme.studio.RoomMsg
 import app.qrme.studio.SocialConn
 import app.qrme.studio.StudioViewModel
 import app.qrme.studio.SummonResult
+import app.qrme.studio.TranslateResult
 
 @Composable
 private fun screenScroll(content: @Composable ColumnScope.() -> Unit) =
@@ -84,6 +85,11 @@ private fun labeledField(label: String, value: String, placeholder: String, onCh
 @Composable
 fun WelcomeScreen(vm: StudioViewModel) {
     var name by remember { mutableStateOf("") }
+    var languages by remember { mutableStateOf<List<LanguageInfo>>(emptyList()) }
+    var language by remember { mutableStateOf("en") }
+    LaunchedEffect(Unit) {
+        runCatching { ApiClient.languages() }.onSuccess { languages = it }
+    }
     var persona by remember { mutableStateOf("") }
     var kind by remember { mutableStateOf("self") }
     var birthdate by remember { mutableStateOf("1984-01-01") }
@@ -121,11 +127,30 @@ fun WelcomeScreen(vm: StudioViewModel) {
                     }
                 }
                 labeledField("Birthdate", birthdate, "yyyy-MM-dd") { birthdate = it }
+                if (languages.isNotEmpty()) {
+                    Text("Language", color = Qrme.T2, fontSize = 12.sp)
+                    languages.chunked(3).forEach { row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            row.forEach { l ->
+                                FilterChip(
+                                    selected = language == l.code,
+                                    onClick = { language = l.code },
+                                    label = { Text(l.label, fontSize = 11.sp) },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = Qrme.BrandA,
+                                        selectedLabelColor = Color.White, labelColor = Qrme.T2,
+                                    ),
+                                )
+                            }
+                        }
+                    }
+                }
             }
             error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
             BrandButton("Create profile", enabled = name.isNotBlank() && persona.isNotBlank(), busy = busy) {
                 error = null
-                vm.createProfile(name, persona, kind, birthdate, onError = { error = it }, onBusy = { busy = it })
+                vm.createProfile(name, persona, kind, birthdate, language,
+                    onError = { error = it }, onBusy = { busy = it })
             }
             Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app",
                 color = Qrme.T3, fontSize = 10.sp)
@@ -355,13 +380,18 @@ fun SettingsScreen(vm: StudioViewModel) {
     var objections by remember { mutableStateOf<List<Objection>>(emptyList()) }
     var languages by remember { mutableStateOf<List<LanguageInfo>>(emptyList()) }
     var language by remember { mutableStateOf("en") }
+    var preTranslate by remember { mutableStateOf(true) }
+    var translateInput by remember { mutableStateOf("") }
+    var translated by remember { mutableStateOf<TranslateResult?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload() {
         vm.call({ ApiClient.models() }) { r -> providers = r.getOrDefault(emptyList()) }
         vm.call({ ApiClient.languages() }) { r -> languages = r.getOrDefault(emptyList()) }
         vm.call({ ApiClient.profileLanguage(vm.pid!!) }) { r ->
-            r.getOrNull()?.let { language = it }
+            r.getOrNull()?.let { (lang, mode) ->
+                language = lang; preTranslate = mode == "pre"
+            }
         }
         vm.call({ ApiClient.profileModel(vm.pid!!) }) { r ->
             r.getOrNull()?.let { current = it.provider; effective = it.effective }
@@ -409,7 +439,8 @@ fun SettingsScreen(vm: StudioViewModel) {
                         FilterChip(
                             selected = language == l.code,
                             onClick = {
-                                vm.call({ ApiClient.setLanguage(vm.pid!!, vm.token!!, l.code) }) {
+                                vm.call({ ApiClient.setLanguage(vm.pid!!, vm.token!!, l.code,
+                                    if (preTranslate) "pre" else "on_demand") }) {
                                     language = l.code
                                 }
                             },
@@ -421,6 +452,40 @@ fun SettingsScreen(vm: StudioViewModel) {
                         )
                     }
                 }
+            }
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Speak it natively (pre-translate)", color = Qrme.Txt, fontSize = 13.sp)
+                    Text("Off keeps the original voice — translate selectively below.",
+                        color = Qrme.T2, fontSize = 10.sp)
+                }
+                Switch(
+                    checked = preTranslate,
+                    onCheckedChange = { on ->
+                        preTranslate = on
+                        vm.call({ ApiClient.setLanguage(vm.pid!!, vm.token!!, language,
+                            if (on) "pre" else "on_demand") }) { }
+                    },
+                    colors = SwitchDefaults.colors(checkedTrackColor = Qrme.Green),
+                )
+            }
+            HorizontalDivider(color = Qrme.Line)
+            Text("Translate anything", color = Qrme.Txt, fontSize = 13.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField("", translateInput, "Paste or type text…") { translateInput = it }
+            SmallAction("Translate") {
+                if (translateInput.isNotBlank() && language != "en") {
+                    vm.call({ ApiClient.translate(vm.pid!!, vm.token!!, translateInput) }) { r ->
+                        translated = r.getOrNull()
+                    }
+                }
+            }
+            translated?.let { t ->
+                Text(t.translation, color = Qrme.Txt, fontSize = 13.sp,
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(9.dp))
+                        .background(Qrme.ScrBot).padding(10.dp))
+                Text("engine: ${t.engine}" + (t.note?.let { " — $it" } ?: ""),
+                    color = Qrme.T3, fontSize = 10.sp)
             }
         }
 

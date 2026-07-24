@@ -34,11 +34,12 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
 
     fun createProfile(
         name: String, persona: String, kind: String, birthdate: String,
+        language: String? = null,
         onError: (String) -> Unit, onBusy: (Boolean) -> Unit,
     ) {
         onBusy(true)
         viewModelScope.launch {
-            runCatching { ApiClient.createProfile(name, persona, kind, birthdate) }
+            runCatching { ApiClient.createProfile(name, persona, kind, birthdate, language) }
                 .onSuccess { r ->
                     pid = r.id; token = r.ownerToken; displayName = r.displayName
                     prefs.edit().putString("pid", r.id).putString("token", r.ownerToken)

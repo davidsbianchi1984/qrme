@@ -45,6 +45,7 @@ public sealed partial class SettingsPage : Page
             var lang = await ApiClient.Shared.ProfileLanguage(s.Pid!);
             var lidx = Array.FindIndex(_languages, l => l.Code == lang.Language);
             LanguageBox.SelectedIndex = lidx >= 0 ? lidx : 0;
+            PreTranslateToggle.IsOn = (lang.Mode ?? "pre") == "pre";
         }
         catch (Exception ex) { ShowError(ex.Message); }
         finally { _loading = false; }
@@ -66,13 +67,42 @@ public sealed partial class SettingsPage : Page
         catch (Exception ex) { ShowError(ex.Message); }
     }
 
+    private string CurrentMode => PreTranslateToggle.IsOn ? "pre" : "on_demand";
+
     private async void OnLanguagePicked(object sender, SelectionChangedEventArgs e)
     {
         if (_loading) return;
         var idx = LanguageBox.SelectedIndex;
         if (idx < 0 || idx >= _languages.Length) return;
         var s = AppState.Current;
-        try { await ApiClient.Shared.SetLanguage(s.Pid!, s.Token!, _languages[idx].Code); }
+        try { await ApiClient.Shared.SetLanguage(s.Pid!, s.Token!, _languages[idx].Code, CurrentMode); }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnModeToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        var idx = LanguageBox.SelectedIndex;
+        if (idx < 0 || idx >= _languages.Length) return;
+        var s = AppState.Current;
+        try { await ApiClient.Shared.SetLanguage(s.Pid!, s.Token!, _languages[idx].Code, CurrentMode); }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnTranslate(object sender, RoutedEventArgs e)
+    {
+        var text = TranslateBox.Text.Trim();
+        if (text.Length == 0) return;
+        var s = AppState.Current;
+        try
+        {
+            var r = await ApiClient.Shared.Translate(s.Pid!, s.Token!, text);
+            TranslateOut.Text = r.Translation;
+            TranslateOut.Visibility = Visibility.Visible;
+            TranslateEngine.Text = $"engine: {r.Engine}" +
+                (r.Note is { } n ? $" — {n}" : "");
+            TranslateEngine.Visibility = Visibility.Visible;
+        }
         catch (Exception ex) { ShowError(ex.Message); }
     }
 

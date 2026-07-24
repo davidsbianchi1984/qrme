@@ -25,6 +25,7 @@ data class Provenance(val generatedBy: String, val sourceItems: Int,
                       val licensedFrom: String?, val moderationStatus: String,
                       val disclaimer: String)
 data class LanguageInfo(val code: String, val label: String)
+data class TranslateResult(val translation: String, val engine: String, val note: String?)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
 data class SocialConn(val id: String, val platform: String, val direction: String,
@@ -108,14 +109,15 @@ object ApiClient {
         provenanceOf(o.optJSONObject("provenance")),
     )
 
-    suspend fun createProfile(name: String, persona: String, kind: String, birthdate: String): ProfileCreated {
+    suspend fun createProfile(name: String, persona: String, kind: String, birthdate: String,
+                              language: String? = null): ProfileCreated {
         val body = JSONObject()
             .put("owner_id", "owner-1")
             .put("kind", kind)
             .put("display_name", name)
             .put("persona", persona)
-            .put("demographics", JSONObject().put("language", "en"))
             .put("verification", JSONObject().put("birthdate", birthdate))
+        if (!language.isNullOrBlank() && language != "en") body.put("language", language)
         val o = JSONObject(request("/profiles", "POST", body))
         return ProfileCreated(o.getString("id"), o.getString("display_name"),
             o.getString("kind"), o.getString("owner_token"))
@@ -240,13 +242,22 @@ object ApiClient {
         }
     }
 
-    suspend fun profileLanguage(id: String): String {
-        return JSONObject(request("/profiles/$id/language")).getString("language")
+    suspend fun profileLanguage(id: String): Pair<String, String> {
+        val o = JSONObject(request("/profiles/$id/language"))
+        return o.getString("language") to o.optString("mode", "pre")
     }
 
-    suspend fun setLanguage(id: String, token: String, code: String) {
+    suspend fun setLanguage(id: String, token: String, code: String,
+                            mode: String = "pre") {
         request("/profiles/$id/language", "PUT",
-            JSONObject().put("language", code), token)
+            JSONObject().put("language", code).put("mode", mode), token)
+    }
+
+    suspend fun translate(id: String, token: String, text: String): TranslateResult {
+        val o = JSONObject(request("/profiles/$id/translate", "POST",
+            JSONObject().put("text", text), token))
+        return TranslateResult(o.optString("translation", ""),
+            o.optString("engine", ""), o.optString("note", null))
     }
 
     // ---- knowledge excursions (study safely; private data stays home) ----

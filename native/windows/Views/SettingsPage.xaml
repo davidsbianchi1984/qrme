@@ -31,6 +31,18 @@
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
                     <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch"
                               SelectionChanged="OnLanguagePicked" />
+                    <ToggleSwitch x:Name="PreTranslateToggle" Header="Speak it natively (pre-translate)"
+                                  OnContent="The persona speaks the language everywhere"
+                                  OffContent="Original voice kept — translate below"
+                                  IsOn="True" Toggled="OnModeToggled" />
+                    <TextBox x:Name="TranslateBox" Header="Translate anything"
+                             PlaceholderText="Paste or type text…" />
+                    <Button Content="Translate" Click="OnTranslate"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                    <TextBlock x:Name="TranslateOut" FontSize="13" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" Visibility="Collapsed" />
+                    <TextBlock x:Name="TranslateEngine" FontSize="10" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" Visibility="Collapsed" />
                 </StackPanel>
             </Border>
 
