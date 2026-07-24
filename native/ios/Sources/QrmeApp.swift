@@ -26,7 +26,7 @@ struct RootView: View {
                     ChatHubView().tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
                     StudioView().tabItem { Label("Studio", systemImage: "square.and.pencil") }
                     ConnectView().tabItem { Label("Connect", systemImage: "link") }
-                    SettingsView().tabItem { Label("Settings", systemImage: "gearshape") }
+                    ManageView().tabItem { Label("Manage", systemImage: "gearshape") }
                 }
                 .tint(Theme.brandA)
             } else {

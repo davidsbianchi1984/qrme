@@ -147,6 +147,74 @@ struct RoomMsg: Decodable {
 struct RoomPost: Decodable { let message: RoomMsg; let replies: [RoomMsg] }
 struct RoomAdvance: Decodable { let replies: [RoomMsg] }
 
+struct HandleClaim: Decodable { let profile_id: String; let handle: String; let summon: String }
+
+struct Beacon: Decodable {
+    let id: String
+    let label: String
+    let location: String?
+    let scans: Int
+    let active: Bool
+}
+
+struct BeaconPlaced: Decodable {
+    let id: String
+    let label: String
+    let location: String?
+    let summon_url: String
+    let qr_svg: String
+}
+
+struct SummonCard: Decodable {
+    let profile_id: String
+    let display_name: String
+    let handle: String?
+    let purpose: String?
+    let status: String
+    let note: String?
+}
+
+struct SummonResult: Decodable {
+    let type: String                   // "handle" | "tag" | "beacon"
+    let ref: String
+    let label: String?                 // beacon only
+    let location: String?
+    let scans: Int?
+    let profile: SummonCard?           // handle / beacon
+    let profiles: [SummonCard]?        // tag
+}
+
+struct Listing: Decodable {
+    let id: String
+    let kind: String
+    let title: String
+    let blurb: String?
+    let tags: [String]
+    let area: String?
+    let provider_name: String?
+    let business: Bool
+    let profile_id: String?
+}
+
+struct ListingCreated: Decodable { let id: String; let kind: String; let title: String }
+
+struct LicenseOffer: Decodable {
+    let profile_id: String
+    let kind: String                   // consult | finetune | clone
+    let price: Double
+    let currency: String
+    let terms: String?
+    let allow_derivatives: Bool
+}
+
+struct LicenseGrant: Decodable {
+    let id: String
+    let buyer_id: String
+    let kind: String
+    let derived_profile_id: String?
+    let revoked: Bool
+}
+
 struct Excursion: Decodable {
     let id: String
     let topic: String
@@ -396,6 +464,94 @@ actor ApiClient {
 
     func roomTranscript(roomId: String) async throws -> [RoomMsg] {
         try await request("/rooms/\(roomId)/messages")
+    }
+
+    // MARK: Reach — summon (@handle + beacons), marketplace, licensing
+
+    func claimHandle(id: String, handle: String) async throws -> HandleClaim {
+        try await request("/profiles/\(id)/handle", method: "PUT",
+                          body: ["handle": handle])
+    }
+
+    func placeBeacon(id: String, label: String,
+                     location: String?) async throws -> BeaconPlaced {
+        var body: [String: Any] = ["label": label]
+        if let location, !location.isEmpty { body["location"] = location }
+        return try await request("/profiles/\(id)/beacons", method: "POST", body: body)
+    }
+
+    func beacons(id: String) async throws -> [Beacon] {
+        try await request("/profiles/\(id)/beacons")
+    }
+
+    func pickUpBeacon(bid: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/beacons/\(bid)", method: "DELETE")
+    }
+
+    func summon(ref: String) async throws -> SummonResult {
+        try await request("/summon", query: ["ref": ref])
+    }
+
+    func createListing(kind: String, title: String, blurb: String?, tags: [String],
+                       area: String?, providerName: String,
+                       profileId: String?) async throws -> ListingCreated {
+        var body: [String: Any] = ["kind": kind, "title": title,
+                                   "tags": tags, "provider_name": providerName]
+        if let blurb, !blurb.isEmpty { body["blurb"] = blurb }
+        if let area, !area.isEmpty { body["area"] = area }
+        if let profileId { body["profile_id"] = profileId }
+        return try await request("/marketplace/listings", method: "POST", body: body)
+    }
+
+    func listings(tag: String?) async throws -> [Listing] {
+        var query: [String: String] = [:]
+        if let tag, !tag.isEmpty { query["tag"] = tag }
+        return try await request("/marketplace/listings",
+                                 query: query.isEmpty ? nil : query)
+    }
+
+    func removeListing(lid: String) async throws {
+        var req = URLRequest(url: base.appendingPathComponent("/marketplace/listings/\(lid)"))
+        req.httpMethod = "DELETE"
+        let (_, resp) = try await URLSession.shared.data(for: req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("remove failed")
+        }
+    }
+
+    func setLicense(id: String, token: String, kind: String, price: Double,
+                    terms: String?) async throws -> LicenseOffer {
+        var body: [String: Any] = ["kind": kind, "price": price]
+        if let terms, !terms.isEmpty { body["terms"] = terms }
+        return try await request("/profiles/\(id)/license", method: "PUT",
+                                 body: body, token: token)
+    }
+
+    func license(id: String) async throws -> LicenseOffer {
+        try await request("/profiles/\(id)/license")
+    }
+
+    func unlistLicense(id: String, token: String) async throws {
+        var req = URLRequest(url: base.appendingPathComponent("/profiles/\(id)/license"))
+        req.httpMethod = "DELETE"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        let (_, resp) = try await URLSession.shared.data(for: req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("unlist failed")
+        }
+    }
+
+    func licenseGrants(id: String, token: String) async throws -> [LicenseGrant] {
+        try await request("/profiles/\(id)/licenses", token: token)
+    }
+
+    func revokeLicense(gid: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/licenses/\(gid)", method: "DELETE",
+                                      token: token)
     }
 
     // MARK: Knowledge excursions (study safely; private data stays home)

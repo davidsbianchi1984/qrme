@@ -23,8 +23,12 @@ advance) ·
 revoke), the connected-apps catalog (`/connectors/catalog`, `/profiles/{id}/apps`
 + collect / invoke), and **Robots** (`/robotics/catalog`, `/profiles/{id}/robots`,
 `/robots/{rid}/command`) ·
-**Settings** → model picker (`/models`, `/profiles/{id}/model`) + objections
-(`/profiles/{id}/objections`, attest)
+**Manage** — settings (model picker `/models`, `/profiles/{id}/model` +
+objections), **Summon** (@handle `/profiles/{id}/handle`, QR beacons
+`/profiles/{id}/beacons`, and the `/summon?ref=` resolver), **Market**
+(`/marketplace/listings` create / browse / remove), and **License**
+(offer terms `/profiles/{id}/license`, grants `/profiles/{id}/licenses`,
+revoke `/licenses/{gid}`)
 
 On the phone form factors, Social, Apps, and Robots share one **Connect** tab
 (segmented on iOS, a `TabRow` on Android) so the bottom bar stays at five
@@ -55,13 +59,17 @@ On a physical phone, point the client at your machine's LAN IP instead.
 
 ## Scope
 
-These scaffolds cover the core owner-facing loop end to end: create a profile,
-chat with it (directly, with strangers, or in rooms), compose and study,
-connect it to social platforms and apps, embody it in a robot, and govern it
-(model choice, objections). The remaining surfaces (marketplace listings,
-licensing, summon handles/beacons) have backend endpoints under
-[`qrme/routers/`](../qrme/routers/) to grow into further native screens. The
-stranger tier is friendly-only in the apps — the rated tier requires age
-verification the apps don't perform.
+These scaffolds now cover the full owner-facing surface of
+[`qrme/routers/`](../qrme/routers/): create a profile, chat with it (directly,
+with strangers, or in rooms), compose and study, connect it to social platforms
+and apps, embody it in a robot, reach it (@handle, QR beacons, marketplace,
+licensing), and govern it (model choice, objections).
+
+Two flows stay deliberately out of the apps because they require identity the
+apps don't carry: the stranger **rated** tier and buyer-side license
+**acquire/derive** both need a verified (18+) interactor identity, while the
+apps mint an anonymous one. The provider directory / consented handoffs
+(`/providers`, `/handoffs`) are a business-facing integration, also
+backend-only.
 
 These native targets are additive and do not change the backend.

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.ReachPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <Pivot MaxWidth="680" Margin="20,12" Foreground="{StaticResource QrmeTxtBrush}">
+
+        <!-- Summon: @handle + placed QR beacons -->
+        <PivotItem Header="Summon">
+            <ScrollViewer>
+                <StackPanel Spacing="12" Padding="4">
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="@handle" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="A unique name anyone can summon the profile by."
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <TextBox x:Name="HandleBox" PlaceholderText="rosa_the_gardener" />
+                            <Button Content="Claim" Click="OnClaim"
+                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                            <TextBlock x:Name="ClaimedText" FontSize="12" Visibility="Collapsed"
+                                       Foreground="{StaticResource QrmeGreenBrush}" />
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Beacons" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="Leave the profile behind somewhere physical — a placed QR that summons it. Pick it back up any time."
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <TextBox x:Name="BeaconLabelBox" Header="Label" PlaceholderText="Rosa's garden bench" />
+                            <TextBox x:Name="BeaconLocationBox" Header="Location (optional)" />
+                            <Button Content="Place beacon" Click="OnPlaceBeacon"
+                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                            <TextBlock x:Name="QrText" FontSize="10" Visibility="Collapsed"
+                                       TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}" />
+                        </StackPanel>
+                    </Border>
+                    <ItemsControl x:Name="BeaconList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,6">
+                                    <StackPanel Spacing="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Label}" FontWeight="Bold"
+                                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                                            <Button Grid.Column="1" Content="Pick up" Tag="{Binding Id}"
+                                                    Click="OnPickUp" Visibility="{Binding ActiveVisibility}"
+                                                    Background="Transparent" FontSize="12"
+                                                    Foreground="{StaticResource QrmeRedBrush}" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding Detail}" FontSize="12"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Try a summon" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBox x:Name="RefBox" PlaceholderText="@handle · #tag · beacon id" />
+                            <Button Content="Summon" Click="OnSummon"
+                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                            <ItemsControl x:Name="SummonList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Spacing="2" Margin="0,4,0,0">
+                                            <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="13"
+                                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                                            <TextBlock Text="{Binding Meta}" FontSize="11"
+                                                       Foreground="{StaticResource QrmeT2Brush}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock x:Name="BeaconMeta" FontSize="11" Visibility="Collapsed"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="SummonError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                </StackPanel>
+            </ScrollViewer>
+        </PivotItem>
+
+        <!-- Marketplace -->
+        <PivotItem Header="Market">
+            <ScrollViewer>
+                <StackPanel Spacing="12" Padding="4">
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="List this profile" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="Share it on the marketplace — discoverable by #tag summons too."
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <TextBox x:Name="TitleBox" Header="Title" />
+                            <TextBox x:Name="BlurbBox" Header="Blurb (optional)" />
+                            <TextBox x:Name="TagsBox" Header="Tags, comma separated" />
+                            <Button Content="Create listing" Click="OnCreateListing"
+                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="MarketError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <TextBlock x:Name="MarketStatus" Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="FilterTagBox" PlaceholderText="filter by tag" Width="240" />
+                        <Button Content="Browse" Click="OnBrowse"
+                                Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    </StackPanel>
+                    <ItemsControl x:Name="ListingList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,6">
+                                    <StackPanel Spacing="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold"
+                                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Kind}" FontSize="12"
+                                                       Foreground="{StaticResource QrmeBrandABrush}" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding Blurb}" FontSize="12" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding TagLine}" FontSize="11"
+                                                       Foreground="{StaticResource QrmeT2Brush}" />
+                                            <Button Grid.Column="1" Content="Remove" Tag="{Binding Id}"
+                                                    Click="OnRemoveListing" Visibility="{Binding MineVisibility}"
+                                                    Background="Transparent" FontSize="12"
+                                                    Foreground="{StaticResource QrmeRedBrush}" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </PivotItem>
+
+        <!-- Licensing -->
+        <PivotItem Header="License">
+            <ScrollViewer>
+                <StackPanel Spacing="12" Padding="4">
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="License this expertise" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="consult = use as-is · finetune / clone = buyers may derive their own agent (provenance recorded). Buyers acquire with their own verified identity, outside this app."
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <ComboBox x:Name="KindBox" Header="Kind" HorizontalAlignment="Stretch" />
+                            <TextBox x:Name="PriceBox" Header="Price (USD)" PlaceholderText="0" />
+                            <TextBox x:Name="TermsBox" Header="Terms (optional)" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Content="Set offer" Click="OnSetLicense"
+                                        Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                                <Button x:Name="UnlistButton" Content="Unlist" Click="OnUnlist"
+                                        Visibility="Collapsed" Background="Transparent" FontSize="12"
+                                        Foreground="{StaticResource QrmeRedBrush}" />
+                            </StackPanel>
+                            <TextBlock x:Name="OfferText" FontSize="12" Visibility="Collapsed"
+                                       Foreground="{StaticResource QrmeGreenBrush}" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="LicenseError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <ItemsControl x:Name="GrantList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,6">
+                                    <StackPanel Spacing="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="13"
+                                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="revoked" FontSize="12"
+                                                           Visibility="{Binding RevokedVisibility}"
+                                                           Foreground="{StaticResource QrmeRedBrush}" />
+                                                <Button Content="Revoke" Tag="{Binding Id}" Click="OnRevokeGrant"
+                                                        Visibility="{Binding ActiveVisibility}"
+                                                        Background="Transparent" FontSize="12"
+                                                        Foreground="{StaticResource QrmeRedBrush}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Text="{Binding Derived}" FontSize="11"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </PivotItem>
+    </Pivot>
+</Page>

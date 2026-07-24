@@ -24,6 +24,7 @@ public sealed partial class ShellPage : Page
             case "study": ContentFrame.Navigate(typeof(StudyPage)); break;
             case "connect": ContentFrame.Navigate(typeof(ConnectPage)); break;
             case "robots": ContentFrame.Navigate(typeof(RobotsPage)); break;
+            case "reach": ContentFrame.Navigate(typeof(ReachPage)); break;
             case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
         }
     }
