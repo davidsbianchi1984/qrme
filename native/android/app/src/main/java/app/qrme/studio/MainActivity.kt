@@ -33,7 +33,7 @@ import app.qrme.studio.ui.ChatHubScreen
 import app.qrme.studio.ui.ConnectScreen
 import app.qrme.studio.ui.OverviewScreen
 import app.qrme.studio.ui.StudioScreen
-import app.qrme.studio.ui.SettingsScreen
+import app.qrme.studio.ui.ManageScreen
 import app.qrme.studio.ui.WelcomeScreen
 
 class MainActivity : ComponentActivity() {
@@ -61,7 +61,7 @@ private fun HomeShell(vm: StudioViewModel) {
         Triple("Chat", Icons.Filled.Chat, 1),
         Triple("Studio", Icons.Filled.Edit, 2),
         Triple("Connect", Icons.Filled.Link, 3),
-        Triple("Settings", Icons.Filled.Settings, 4),
+        Triple("Manage", Icons.Filled.Settings, 4),
     )
     Scaffold(
         containerColor = Qrme.ScrBot,
@@ -91,7 +91,7 @@ private fun HomeShell(vm: StudioViewModel) {
                 1 -> ChatHubScreen(vm)
                 2 -> StudioScreen(vm)
                 3 -> ConnectScreen(vm)
-                else -> SettingsScreen(vm)
+                else -> ManageScreen(vm)
             }
         }
     }

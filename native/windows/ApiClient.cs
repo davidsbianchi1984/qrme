@@ -136,6 +136,72 @@ public record RoomMsg(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("status")] string? Status);
 
+public record HandleClaim(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("handle")] string Handle,
+    [property: JsonPropertyName("summon")] string Summon);
+
+public record Beacon(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("location")] string? Location,
+    [property: JsonPropertyName("scans")] int Scans,
+    [property: JsonPropertyName("active")] bool Active);
+
+public record BeaconPlaced(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("summon_url")] string SummonUrl,
+    [property: JsonPropertyName("qr_svg")] string QrSvg);
+
+public record SummonCard(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("display_name")] string DisplayName,
+    [property: JsonPropertyName("handle")] string? Handle,
+    [property: JsonPropertyName("purpose")] string? Purpose,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record SummonResult(
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("ref")] string Ref,
+    [property: JsonPropertyName("label")] string? Label,
+    [property: JsonPropertyName("location")] string? Location,
+    [property: JsonPropertyName("scans")] int? Scans,
+    [property: JsonPropertyName("profile")] SummonCard? Profile,
+    [property: JsonPropertyName("profiles")] SummonCard[]? Profiles);
+
+public record Listing(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("blurb")] string? Blurb,
+    [property: JsonPropertyName("tags")] string[] Tags,
+    [property: JsonPropertyName("area")] string? Area,
+    [property: JsonPropertyName("provider_name")] string? ProviderName,
+    [property: JsonPropertyName("business")] bool Business,
+    [property: JsonPropertyName("profile_id")] string? ProfileId);
+
+public record ListingCreated(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("title")] string Title);
+
+public record LicenseOffer(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("price")] double Price,
+    [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("terms")] string? Terms,
+    [property: JsonPropertyName("allow_derivatives")] bool AllowDerivatives);
+
+public record LicenseGrant(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("buyer_id")] string BuyerId,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("derived_profile_id")] string? DerivedProfileId,
+    [property: JsonPropertyName("revoked")] bool Revoked);
+
 public record Excursion(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("topic")] string Topic,
@@ -381,6 +447,101 @@ public sealed class ApiClient
 
     public Task<InvokeResult> AppInvoke(string cid, string token, string capability) =>
         Send<InvokeResult>(Post($"/apps/{cid}/invoke", new { capability }, token));
+
+    // -- Reach: summon (@handle + beacons), marketplace, licensing --
+
+    public Task<HandleClaim> ClaimHandle(string id, string handle)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/handle")
+        {
+            Content = JsonContent.Create(new { handle }),
+        };
+        return Send<HandleClaim>(req);
+    }
+
+    public Task<BeaconPlaced> PlaceBeacon(string id, string label, string location) =>
+        Send<BeaconPlaced>(Post($"/profiles/{id}/beacons",
+            location is { Length: > 0 }
+                ? new { label, location }
+                : (object)new { label }));
+
+    public Task<Beacon[]> Beacons(string id) =>
+        Send<Beacon[]>(new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/beacons"));
+
+    public async Task PickUpBeacon(string bid)
+    {
+        var res = await _http.SendAsync(
+            new HttpRequestMessage(HttpMethod.Delete, $"/beacons/{bid}"));
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<SummonResult> Summon(string reference) =>
+        Send<SummonResult>(new HttpRequestMessage(
+            HttpMethod.Get, $"/summon?ref={Uri.EscapeDataString(reference)}"));
+
+    public Task<ListingCreated> CreateListing(string title, string blurb,
+                                              string[] tags, string providerName,
+                                              string profileId) =>
+        Send<ListingCreated>(Post("/marketplace/listings",
+            blurb is { Length: > 0 }
+                ? new { kind = "profile", title, blurb, tags,
+                        provider_name = providerName, profile_id = profileId }
+                : (object)new { kind = "profile", title, tags,
+                                provider_name = providerName, profile_id = profileId }));
+
+    public Task<Listing[]> Listings(string tag) =>
+        Send<Listing[]>(new HttpRequestMessage(HttpMethod.Get,
+            tag is { Length: > 0 }
+                ? $"/marketplace/listings?tag={Uri.EscapeDataString(tag)}"
+                : "/marketplace/listings"));
+
+    public async Task RemoveListing(string lid)
+    {
+        var res = await _http.SendAsync(
+            new HttpRequestMessage(HttpMethod.Delete, $"/marketplace/listings/{lid}"));
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<LicenseOffer> SetLicense(string id, string token, string kind,
+                                         double price, string terms)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/license")
+        {
+            Content = JsonContent.Create(
+                terms is { Length: > 0 }
+                    ? new { kind, price, terms }
+                    : (object)new { kind, price }),
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LicenseOffer>(req);
+    }
+
+    public Task<LicenseOffer> License(string id) =>
+        Send<LicenseOffer>(new HttpRequestMessage(
+            HttpMethod.Get, $"/profiles/{id}/license"));
+
+    public async Task UnlistLicense(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"/profiles/{id}/license");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<LicenseGrant[]> LicenseGrants(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/licenses");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LicenseGrant[]>(req);
+    }
+
+    public async Task RevokeLicense(string gid, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"/licenses/{gid}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
 
     // -- knowledge excursions (study safely; private data stays home) --
 

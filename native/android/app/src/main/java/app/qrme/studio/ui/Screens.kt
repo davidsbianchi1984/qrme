@@ -18,9 +18,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.qrme.studio.ApiClient
 import app.qrme.studio.AppConn
+import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
 import app.qrme.studio.Excursion
+import app.qrme.studio.LicenseGrant
+import app.qrme.studio.LicenseOffer
+import app.qrme.studio.Listing
 import app.qrme.studio.Objection
 import app.qrme.studio.Post
 import app.qrme.studio.ProfileCard
@@ -31,6 +35,7 @@ import app.qrme.studio.RoomCreated
 import app.qrme.studio.RoomMsg
 import app.qrme.studio.SocialConn
 import app.qrme.studio.StudioViewModel
+import app.qrme.studio.SummonResult
 
 @Composable
 private fun screenScroll(content: @Composable ColumnScope.() -> Unit) =
@@ -973,5 +978,265 @@ private fun RoomsPanel(vm: StudioViewModel) {
             }
         }
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+// ---- Manage (General · Summon · Market · License behind one tab) ----
+
+@Composable
+fun ManageScreen(vm: StudioViewModel) {
+    var seg by remember { mutableIntStateOf(0) }
+    Column(Modifier.fillMaxSize()) {
+        TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
+            listOf("General", "Summon", "Market", "License").forEachIndexed { i, t ->
+                Tab(selected = seg == i, onClick = { seg = i },
+                    text = { Text(t, fontSize = 12.sp) })
+            }
+        }
+        Box(Modifier.weight(1f)) {
+            when (seg) {
+                0 -> SettingsScreen(vm)
+                1 -> SummonPanel(vm)
+                2 -> MarketPanel(vm)
+                else -> LicensePanel(vm)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummonPanel(vm: StudioViewModel) {
+    var handle by remember { mutableStateOf("") }
+    var claimed by remember { mutableStateOf<String?>(null) }
+    var label by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var beacons by remember { mutableStateOf<List<Beacon>>(emptyList()) }
+    var lastQr by remember { mutableStateOf<String?>(null) }
+    var ref by remember { mutableStateOf("") }
+    var found by remember { mutableStateOf<SummonResult?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    fun reload() { vm.call({ ApiClient.beacons(vm.pid!!) }) { r -> beacons = r.getOrDefault(emptyList()) } }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("@handle", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("A unique name anyone can summon the profile by.", color = Qrme.T2, fontSize = 12.sp)
+            labeledField("Handle", handle, "rosa_the_gardener") { handle = it }
+            SmallAction("Claim") {
+                if (handle.isNotBlank()) {
+                    error = null
+                    vm.call({ ApiClient.claimHandle(vm.pid!!, handle) }) { r ->
+                        r.onSuccess { claimed = it; handle = "" }
+                            .onFailure { error = it.message }
+                    }
+                }
+            }
+            claimed?.let { Text("claimed $it", color = Qrme.Green, fontSize = 12.sp) }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Beacons", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Leave the profile behind somewhere physical — a placed QR that summons it. Pick it back up any time.",
+                color = Qrme.T2, fontSize = 12.sp)
+            labeledField("Label", label, "Rosa's garden bench") { label = it }
+            labeledField("Location (optional)", location, "the community garden") { location = it }
+            SmallAction("Place beacon") {
+                if (label.isNotBlank()) {
+                    error = null
+                    vm.call({ ApiClient.placeBeacon(vm.pid!!, label, location) }) { r ->
+                        r.onSuccess { lastQr = it.qrSvg; label = ""; location = "" }
+                            .onFailure { error = it.message }
+                        reload()
+                    }
+                }
+            }
+            lastQr?.let { Text("QR: $it", color = Qrme.T3, fontSize = 10.sp) }
+        }
+
+        beacons.forEach { b ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(b.label, color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    if (b.active) {
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.pickUpBeacon(b.id) }) { reload() }
+                        }) { Text("Pick up", color = Qrme.Red, fontSize = 12.sp) }
+                    } else Text("picked up", color = Qrme.T3, fontSize = 12.sp)
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(b.location ?: "", color = Qrme.T2, fontSize = 12.sp)
+                    Text("${b.scans} scan(s)", color = Qrme.T3, fontSize = 12.sp)
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Try a summon", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            labeledField("Reference", ref, "@handle · #tag · beacon id") { ref = it }
+            SmallAction("Summon") {
+                if (ref.isNotBlank()) {
+                    error = null; found = null
+                    vm.call({ ApiClient.summon(ref) }) { r ->
+                        r.onSuccess { found = it }.onFailure { error = it.message }
+                    }
+                }
+            }
+            found?.let { f ->
+                f.cards.forEach { c ->
+                    Column {
+                        Text(c.displayName, color = Qrme.Txt, fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold)
+                        c.handle?.let { Text(it, color = Qrme.BrandA, fontSize = 11.sp) }
+                        Text(c.status, color = Qrme.T2, fontSize = 11.sp)
+                        c.note?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
+                    }
+                }
+                if (f.type == "beacon")
+                    Text("beacon \"${f.label ?: ""}\" · ${f.scans ?: 0} scan(s)",
+                        color = Qrme.T2, fontSize = 11.sp)
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+@Composable
+private fun MarketPanel(vm: StudioViewModel) {
+    var title by remember { mutableStateOf("") }
+    var blurb by remember { mutableStateOf("") }
+    var tags by remember { mutableStateOf("") }
+    var filterTag by remember { mutableStateOf("") }
+    var listings by remember { mutableStateOf<List<Listing>>(emptyList()) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    fun reload() { vm.call({ ApiClient.listings(filterTag) }) { r -> listings = r.getOrDefault(emptyList()) } }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("List this profile", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Share it on the marketplace — discoverable by #tag summons too.",
+                color = Qrme.T2, fontSize = 12.sp)
+            labeledField("Title", title, "Rosa — gardening wisdom") { title = it }
+            labeledField("Blurb (optional)", blurb, "What makes it worth summoning?") { blurb = it }
+            labeledField("Tags, comma separated", tags, "gardening, herbs") { tags = it }
+            SmallAction("Create listing") {
+                if (title.isNotBlank()) {
+                    error = null; status = null
+                    val tagList = tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                    vm.call({ ApiClient.createListing(title, blurb, tagList,
+                        vm.displayName, vm.pid!!) }) { r ->
+                        r.onSuccess { status = "listed — summonable by tag"; title = ""; blurb = ""; tags = "" }
+                            .onFailure { error = it.message }
+                        reload()
+                    }
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            labeledField("Filter by tag", filterTag, "gardening") { filterTag = it }
+            SmallAction("Browse") { reload() }
+        }
+
+        listings.forEach { l ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(l.title, color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(l.kind, color = Qrme.BrandA, fontSize = 12.sp)
+                }
+                l.blurb?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text(l.tags.joinToString(" ") { "#$it" }, color = Qrme.T3, fontSize = 11.sp)
+                    if (l.profileId == vm.pid) {
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.removeListing(l.id) }) { reload() }
+                        }) { Text("Remove", color = Qrme.Red, fontSize = 12.sp) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LicensePanel(vm: StudioViewModel) {
+    val kinds = listOf("consult", "finetune", "clone")
+    var kind by remember { mutableStateOf(kinds.first()) }
+    var price by remember { mutableStateOf("") }
+    var terms by remember { mutableStateOf("") }
+    var offer by remember { mutableStateOf<LicenseOffer?>(null) }
+    var grants by remember { mutableStateOf<List<LicenseGrant>>(emptyList()) }
+    var error by remember { mutableStateOf<String?>(null) }
+    fun reload() {
+        vm.call({ ApiClient.license(vm.pid!!) }) { r -> offer = r.getOrNull() }
+        vm.call({ ApiClient.licenseGrants(vm.pid!!, vm.token!!) }) { r -> grants = r.getOrDefault(emptyList()) }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("License this expertise", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("consult = use as-is · finetune / clone = buyers may derive their own agent (provenance recorded). Buyers acquire with their own verified identity, outside this app.",
+                color = Qrme.T2, fontSize = 12.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                kinds.forEach { k ->
+                    FilterChip(
+                        selected = kind == k, onClick = { kind = k },
+                        label = { Text(k, fontSize = 11.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = Qrme.BrandA,
+                            selectedLabelColor = Color.White, labelColor = Qrme.T2,
+                        ),
+                    )
+                }
+            }
+            labeledField("Price (USD)", price, "0") { price = it }
+            labeledField("Terms (optional)", terms, "attribution required") { terms = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                SmallAction("Set offer") {
+                    error = null
+                    vm.call({ ApiClient.setLicense(vm.pid!!, vm.token!!, kind,
+                        price.toDoubleOrNull() ?: 0.0, terms) }) { r ->
+                        r.onSuccess { offer = it }.onFailure { error = it.message }
+                    }
+                }
+                if (offer != null) {
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.unlistLicense(vm.pid!!, vm.token!!) }) {
+                            offer = null
+                        }
+                    }) { Text("Unlist", color = Qrme.Red, fontSize = 12.sp) }
+                }
+            }
+            offer?.let {
+                Text("offered: ${it.kind} · ${it.currency} ${it.price}" +
+                    if (it.allowDerivatives) " · derivatives allowed" else "",
+                    color = Qrme.Green, fontSize = 12.sp)
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+
+        grants.forEach { g ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text("${g.kind} → ${g.buyerId}", color = Qrme.Txt, fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold)
+                    if (g.revoked) Text("revoked", color = Qrme.Red, fontSize = 12.sp)
+                    else TextButton(onClick = {
+                        vm.call({ ApiClient.revokeLicense(g.id, vm.token!!) }) { reload() }
+                    }) { Text("Revoke", color = Qrme.Red, fontSize = 12.sp) }
+                }
+                g.derivedProfileId?.let {
+                    Text("derived agent: $it", color = Qrme.T2, fontSize = 11.sp)
+                }
+            }
+        }
     }
 }

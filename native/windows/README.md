@@ -49,6 +49,7 @@ MSIX loopback restriction and can call `127.0.0.1` without an exemption.
 | `Views/CommunityPage` | stranger / rooms (Pivot) → `/connections/join` + messages, `/rooms` + messages/advance |
 | `Views/ConnectPage` | social / apps (Pivot) → `/profiles/{id}/social`, `/connectors/catalog`, `/profiles/{id}/apps` |
 | `Views/RobotsPage` | bind/command robots (`/robotics/catalog`, `/robots/{rid}/command`) |
+| `Views/ReachPage` | summon / market / license (Pivot) → `/profiles/{id}/handle` + beacons + `/summon`, `/marketplace/listings`, `/profiles/{id}/license` + grants |
 | `Views/SettingsPage` | model picker + objections (attest) |
 | `ApiClient.cs` | `HttpClient` client + records |
 | `AppState.cs` | identity + token, persisted to LocalAppData |

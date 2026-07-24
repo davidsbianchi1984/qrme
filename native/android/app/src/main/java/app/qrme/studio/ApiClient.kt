@@ -33,6 +33,19 @@ data class ConnMsg(val id: String, val from: String, val content: String, val st
 data class RoomCreated(val id: String, val topic: String, val channel: String)
 data class RoomMsg(val id: String, val senderKind: String, val from: String,
                    val content: String?, val status: String?)
+data class Beacon(val id: String, val label: String, val location: String?,
+                  val scans: Int, val active: Boolean)
+data class BeaconPlaced(val id: String, val label: String, val qrSvg: String)
+data class SummonCard(val profileId: String, val displayName: String, val handle: String?,
+                      val status: String, val note: String?)
+data class SummonResult(val type: String, val label: String?, val scans: Int?,
+                        val cards: List<SummonCard>)
+data class Listing(val id: String, val kind: String, val title: String, val blurb: String?,
+                   val tags: List<String>, val profileId: String?)
+data class LicenseOffer(val kind: String, val price: Double, val currency: String,
+                        val allowDerivatives: Boolean)
+data class LicenseGrant(val id: String, val buyerId: String, val kind: String,
+                        val derivedProfileId: String?, val revoked: Boolean)
 
 class ApiException(message: String) : Exception(message)
 
@@ -273,6 +286,113 @@ object ApiClient {
     suspend fun roomTranscript(roomId: String): List<RoomMsg> {
         val arr = JSONArray(request("/rooms/$roomId/messages"))
         return (0 until arr.length()).map { roomMsgOf(arr.getJSONObject(it)) }
+    }
+
+    // ---- Reach: summon (@handle + beacons), marketplace, licensing ----
+
+    suspend fun claimHandle(id: String, handle: String): String {
+        val o = JSONObject(request("/profiles/$id/handle", "PUT",
+            JSONObject().put("handle", handle)))
+        return o.getString("handle")
+    }
+
+    suspend fun placeBeacon(id: String, label: String, location: String?): BeaconPlaced {
+        val body = JSONObject().put("label", label)
+        if (!location.isNullOrBlank()) body.put("location", location)
+        val o = JSONObject(request("/profiles/$id/beacons", "POST", body))
+        return BeaconPlaced(o.getString("id"), o.optString("label", ""),
+            o.optString("qr_svg", ""))
+    }
+
+    suspend fun beacons(id: String): List<Beacon> {
+        val arr = JSONArray(request("/profiles/$id/beacons"))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            Beacon(o.getString("id"), o.optString("label", ""),
+                o.optString("location", null), o.optInt("scans"),
+                o.optBoolean("active"))
+        }
+    }
+
+    suspend fun pickUpBeacon(bid: String) {
+        request("/beacons/$bid", "DELETE")
+    }
+
+    private fun summonCardOf(o: JSONObject) = SummonCard(
+        o.optString("profile_id", ""), o.optString("display_name", ""),
+        o.optString("handle", null), o.optString("status", ""),
+        o.optString("note", null))
+
+    suspend fun summon(ref: String): SummonResult {
+        val o = JSONObject(request("/summon?ref=" +
+            java.net.URLEncoder.encode(ref, "UTF-8")))
+        val cards = mutableListOf<SummonCard>()
+        o.optJSONObject("profile")?.let { cards += summonCardOf(it) }
+        o.optJSONArray("profiles")?.let { arr ->
+            for (i in 0 until arr.length()) cards += summonCardOf(arr.getJSONObject(i))
+        }
+        return SummonResult(o.optString("type", ""), o.optString("label", null),
+            if (o.has("scans")) o.optInt("scans") else null, cards)
+    }
+
+    suspend fun createListing(title: String, blurb: String?, tags: List<String>,
+                              providerName: String, profileId: String) {
+        val body = JSONObject().put("kind", "profile").put("title", title)
+            .put("tags", JSONArray(tags)).put("provider_name", providerName)
+            .put("profile_id", profileId)
+        if (!blurb.isNullOrBlank()) body.put("blurb", blurb)
+        request("/marketplace/listings", "POST", body)
+    }
+
+    suspend fun listings(tag: String?): List<Listing> {
+        val path = if (tag.isNullOrBlank()) "/marketplace/listings"
+        else "/marketplace/listings?tag=" + java.net.URLEncoder.encode(tag, "UTF-8")
+        val arr = JSONArray(request(path))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            val tagsArr = o.optJSONArray("tags")
+            Listing(o.getString("id"), o.optString("kind", ""), o.optString("title", ""),
+                o.optString("blurb", null),
+                (0 until (tagsArr?.length() ?: 0)).map { tagsArr!!.getString(it) },
+                o.optString("profile_id", null))
+        }
+    }
+
+    suspend fun removeListing(lid: String) {
+        request("/marketplace/listings/$lid", "DELETE")
+    }
+
+    private fun offerOf(o: JSONObject) = LicenseOffer(
+        o.optString("kind", ""), o.optDouble("price", 0.0),
+        o.optString("currency", "USD"), o.optBoolean("allow_derivatives"))
+
+    suspend fun setLicense(id: String, token: String, kind: String,
+                           price: Double, terms: String?): LicenseOffer {
+        val body = JSONObject().put("kind", kind).put("price", price)
+        if (!terms.isNullOrBlank()) body.put("terms", terms)
+        return offerOf(JSONObject(request("/profiles/$id/license", "PUT", body, token)))
+    }
+
+    suspend fun license(id: String): LicenseOffer {
+        return offerOf(JSONObject(request("/profiles/$id/license")))
+    }
+
+    suspend fun unlistLicense(id: String, token: String) {
+        request("/profiles/$id/license", "DELETE", null, token)
+    }
+
+    suspend fun licenseGrants(id: String, token: String): List<LicenseGrant> {
+        val arr = JSONArray(request("/profiles/$id/licenses", token = token))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            LicenseGrant(o.getString("id"), o.optString("buyer_id", ""),
+                o.optString("kind", ""), o.optString("derived_profile_id", null),
+                o.optBoolean("revoked"))
+        }
+    }
+
+    suspend fun revokeLicense(gid: String, token: String) {
+        request("/licenses/$gid", "DELETE", null, token)
     }
 
     // ---- Connect: social platforms & the connected-apps catalog ----
