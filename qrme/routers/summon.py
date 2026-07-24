@@ -169,9 +169,12 @@ def summon(ref: str, request: Request) -> dict:
                            (ref[1:].lower(),)).fetchone()
         if row is None:
             raise HTTPException(404, f"no profile answers to {ref}")
+        profile = profile_or_404(row["profile_id"])
+        if profile["adult_mode"]:
+            rated.record_event(profile["id"], None,
+                               rated.viewer_is_adult(request))
         return {"type": "handle", "ref": ref,
-                "profile": _gated_card(profile_or_404(row["profile_id"]),
-                                       request)}
+                "profile": _gated_card(profile, request)}
 
     if ref.startswith("#"):
         tag = ref[1:].lower()
@@ -199,11 +202,14 @@ def summon(ref: str, request: Request) -> dict:
         raise HTTPException(410, "this beacon has been picked up")
     conn.execute("UPDATE beacons SET scans = scans + 1 WHERE id=?", (ref,))
     conn.commit()
+    profile = profile_or_404(beacon["profile_id"])
+    if profile["adult_mode"]:
+        rated.record_event(profile["id"], beacon["id"],
+                           rated.viewer_is_adult(request))
     return {"type": "beacon", "ref": ref,
             "label": beacon["label"], "location": beacon["location"],
             "scans": beacon["scans"] + 1,
-            "profile": _gated_card(profile_or_404(beacon["profile_id"]),
-                                   request)}
+            "profile": _gated_card(profile, request)}
 
 
 # -- rated (18+) placement: marketing at adult venues ------------------------
@@ -271,6 +277,68 @@ def list_placements(profile_id: str, request: Request) -> list[dict]:
              "venue_name": rated.VENUES.get(r["venue"], {}).get("name",
                                                                r["venue"])}
             for r in rows]
+
+
+@router.get("/profiles/{profile_id}/placements/analytics")
+def placement_analytics(profile_id: str, request: Request) -> dict:
+    """Owner-only: what each venue earns. Per-placement scan counts split
+    into walled vs. verified resolutions with a daily trend, plus the
+    profile-level funnel — scans → verified views → unique chatters — so a
+    creator sees which venue converts. Counts and rates only; viewers are
+    never identified."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    conn = db.connect()
+
+    def _counts(where: str, params: tuple) -> tuple[int, int]:
+        row = conn.execute(
+            f"SELECT SUM(kind='wall') AS walled,"
+            f" SUM(kind='verified_view') AS verified"
+            f" FROM rated_events WHERE {where}", params).fetchone()
+        return row["walled"] or 0, row["verified"] or 0
+
+    venues = []
+    for pl in conn.execute(
+            "SELECT pl.*, b.scans, b.active FROM rated_placements pl"
+            " JOIN beacons b ON b.id = pl.beacon_id WHERE pl.profile_id=?"
+            " ORDER BY pl.created_at, pl.rowid", (profile_id,)).fetchall():
+        walled, verified = _counts("beacon_id=?", (pl["beacon_id"],))
+        by_day = [dict(r) for r in conn.execute(
+            "SELECT substr(at, 1, 10) AS day, COUNT(*) AS scans"
+            " FROM rated_events WHERE beacon_id=? GROUP BY day"
+            " ORDER BY day", (pl["beacon_id"],)).fetchall()]
+        venues.append({
+            "placement_id": pl["id"], "venue": pl["venue"],
+            "venue_name": rated.VENUES.get(pl["venue"], {}).get(
+                "name", pl["venue"]),
+            "label": pl["label"], "active": bool(pl["active"]),
+            "scans": pl["scans"], "walled": walled, "verified": verified,
+            "by_day": by_day,
+        })
+
+    # Direct refs (@handle summons) have no beacon — they are their own row.
+    walled_direct, verified_direct = _counts(
+        "profile_id=? AND beacon_id IS NULL", (profile_id,))
+    total_walled, total_verified = _counts("profile_id=?", (profile_id,))
+    chatters = conn.execute(
+        "SELECT COUNT(DISTINCT interactor_id) AS n FROM messages"
+        " WHERE profile_id=? AND role='interactor'",
+        (profile_id,)).fetchone()["n"]
+    total = total_walled + total_verified
+    return {
+        "profile_id": profile_id,
+        "venues": venues,
+        "direct": {"walled": walled_direct, "verified": verified_direct},
+        "funnel": {
+            "resolutions": total,
+            "verified_views": total_verified,
+            "unique_chatters": chatters,
+            "verified_rate": (round(total_verified / total, 2)
+                              if total else None),
+            "chat_rate": (round(chatters / total_verified, 2)
+                          if total_verified else None),
+        },
+    }
 
 
 @router.delete("/placements/{placement_id}")
