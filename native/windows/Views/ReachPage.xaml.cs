@@ -96,6 +96,70 @@ public sealed partial class ReachPage : Page
         await ReloadListings();
         await ReloadPacks();
         await ReloadLicense();
+        await ReloadEarnings();
+    }
+
+    // -- Earnings: the creator's statement over the ledger --
+
+    public sealed class LedgerVm
+    {
+        public string Kind { get; init; } = "";
+        public string Memo { get; init; } = "";
+        public string Amount { get; init; } = "";
+        public string Status { get; init; } = "";
+    }
+
+    private static string Money(double v, string c) =>
+        (c == "USD" ? "$" : c + " ") + v.ToString("0.00");
+
+    private async System.Threading.Tasks.Task ReloadEarnings()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var st = await ApiClient.Shared.Earnings(s.Pid!, s.Token!);
+            AccruedText.Text = Money(st.Totals.Accrued, st.Currency);
+            PaidText.Text = Money(st.Totals.Paid, st.Currency);
+            LifetimeText.Text = Money(st.Totals.Lifetime, st.Currency);
+            PayoutButton.IsEnabled = st.Totals.Accrued > 0;
+            if (st.Totals.ByKind.Count > 0)
+            {
+                ByKindText.Text = string.Join(" · ", st.Totals.ByKind
+                    .OrderBy(kv => kv.Key)
+                    .Select(kv => $"{kv.Key.Replace('_', ' ')}: {Money(kv.Value, st.Currency)}"));
+                ByKindText.Visibility = Visibility.Visible;
+            }
+            LedgerList.ItemsSource = st.Entries.Take(20).Select(e2 => new LedgerVm
+            {
+                Kind = e2.Kind.Replace('_', ' '),
+                Memo = e2.Memo ?? "",
+                Amount = Money(e2.Amount, st.Currency),
+                Status = e2.Status,
+            }).ToList();
+        }
+        catch (Exception ex)
+        {
+            EarningsError.Text = ex.Message;
+            EarningsError.Visibility = Visibility.Visible;
+        }
+    }
+
+    private async void OnRequestPayout(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            var r = await ApiClient.Shared.RequestPayout(s.Pid!, s.Token!);
+            PayoutText.Text = $"Payout {r.PayoutId}: {Money(r.Total, "USD")} across " +
+                              $"{r.Entries} entries (simulated transfer).";
+            PayoutText.Visibility = Visibility.Visible;
+            await ReloadEarnings();
+        }
+        catch (Exception ex)
+        {
+            EarningsError.Text = ex.Message;
+            EarningsError.Visibility = Visibility.Visible;
+        }
     }
 
     // -- Knowledge packs --

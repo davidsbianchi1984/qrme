@@ -17,9 +17,17 @@
                         <StackPanel Spacing="10">
                             <TextBlock Text="Meet a stranger" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Anonymous, friendly matchmaking — they see only your alias, and either side can end it. (The rated tier needs age verification, which this app doesn't do.)"
+                            <TextBlock Text="Anonymous matchmaking — they see only your alias, and either side can end it."
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
+                            <ComboBox x:Name="TierBox" Header="Tier" HorizontalAlignment="Stretch"
+                                      SelectionChanged="OnTierChanged" />
+                            <TextBlock x:Name="VerifyNote"
+                                       Text="The rated tier needs a verified 18+ identity. Enter your birthdate to verify — both sides of a rated match are verified adults, and messages run under the open filter."
+                                       FontSize="11" TextWrapping="Wrap" Visibility="Collapsed"
+                                       Foreground="{StaticResource QrmeAmberBrush}" />
+                            <TextBox x:Name="BirthdateBox" Header="Birthdate (YYYY-MM-DD)"
+                                     Visibility="Collapsed" />
                             <TextBox x:Name="AliasBox" Header="Alias (optional)" />
                             <Button x:Name="JoinButton" Content="Find a match" Click="OnJoin"
                                     HorizontalAlignment="Stretch"

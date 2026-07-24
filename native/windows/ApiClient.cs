@@ -119,6 +119,58 @@ public record Objection(
 public record InteractorCreated(
     [property: JsonPropertyName("id")] string Id);
 
+public record SteeringDial(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("group")] string Group,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("low")] string Low,
+    [property: JsonPropertyName("high")] string High,
+    [property: JsonPropertyName("min")] int Min,
+    [property: JsonPropertyName("max")] int Max);
+
+public record SteeringAgeBlock(
+    [property: JsonPropertyName("base_age")] int? BaseAge,
+    [property: JsonPropertyName("aging_enabled")] bool AgingEnabled,
+    [property: JsonPropertyName("effective_age")] int? EffectiveAge);
+
+public record SteeringAppearance(
+    [property: JsonPropertyName("description")] string? Description);
+
+public record SteeringHubState(
+    [property: JsonPropertyName("adult_mode")] bool AdultMode,
+    [property: JsonPropertyName("dials")] SteeringDial[] Dials,
+    [property: JsonPropertyName("values")] System.Collections.Generic.Dictionary<string, int> Values,
+    [property: JsonPropertyName("age")] SteeringAgeBlock Age,
+    [property: JsonPropertyName("appearance")] SteeringAppearance Appearance);
+
+public record LedgerEntry(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("memo")] string? Memo,
+    [property: JsonPropertyName("amount")] double Amount,
+    [property: JsonPropertyName("status")] string Status);
+
+public record EarningsTotals(
+    [property: JsonPropertyName("accrued")] double Accrued,
+    [property: JsonPropertyName("paid")] double Paid,
+    [property: JsonPropertyName("lifetime")] double Lifetime,
+    [property: JsonPropertyName("by_kind")] System.Collections.Generic.Dictionary<string, double> ByKind);
+
+public record EarningsStatement(
+    [property: JsonPropertyName("entries")] LedgerEntry[] Entries,
+    [property: JsonPropertyName("totals")] EarningsTotals Totals,
+    [property: JsonPropertyName("currency")] string Currency);
+
+public record PayoutReceipt(
+    [property: JsonPropertyName("payout_id")] string PayoutId,
+    [property: JsonPropertyName("total")] double Total,
+    [property: JsonPropertyName("entries")] int Entries);
+
+public record RelationshipState(
+    [property: JsonPropertyName("relationship_type")] string RelationshipType,
+    [property: JsonPropertyName("nickname")] string? Nickname,
+    [property: JsonPropertyName("tone")] string? Tone);
+
 public record ChatMessage(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("status")] string Status,
@@ -339,6 +391,13 @@ public sealed class ApiClient
         return JsonSerializer.Deserialize<T>(body)!;
     }
 
+    private static HttpRequestMessage Get(string path, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, path);
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return req;
+    }
+
     private static HttpRequestMessage Post(string path, object body, string? token = null)
     {
         var req = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(body) };
@@ -476,8 +535,68 @@ public sealed class ApiClient
 
     // -- chat (the core loop) --
 
-    public Task<InteractorCreated> CreateInteractor(string name) =>
-        Send<InteractorCreated>(Post("/interactors", new { display_name = name }));
+    public Task<InteractorCreated> CreateInteractor(string name,
+                                                    string? birthdate = null) =>
+        Send<InteractorCreated>(Post("/interactors",
+            birthdate is { Length: > 0 }
+                ? new { display_name = name, birthdate }
+                : (object)new { display_name = name }));
+
+    // -- steering: the owner shapes how the profile comes across --
+
+    public Task<SteeringHubState> SteeringHub(string id, string token) =>
+        Send<SteeringHubState>(Get($"/profiles/{id}/steering/hub", token));
+
+    public Task<SteeringHubState> SetSteeringHub(string id, string token,
+        System.Collections.Generic.Dictionary<string, int>? values,
+        int? baseAge, bool? agingEnabled, string? appearance)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, object>();
+        if (values is not null) body["values"] = values;
+        if (baseAge is not null || agingEnabled is not null)
+        {
+            var age = new System.Collections.Generic.Dictionary<string, object>();
+            if (baseAge is { } b) age["base_age"] = b;
+            if (agingEnabled is { } a) age["aging_enabled"] = a;
+            body["age"] = age;
+        }
+        if (appearance is not null)
+            body["appearance"] = new { description = appearance };
+        var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/steering/hub")
+        {
+            Content = JsonContent.Create(body),
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SteeringHubState>(req);
+    }
+
+    // -- earnings: the creator's statement over the ledger --
+
+    public Task<EarningsStatement> Earnings(string id, string token) =>
+        Send<EarningsStatement>(Get($"/profiles/{id}/earnings", token));
+
+    public Task<PayoutReceipt> RequestPayout(string id, string token) =>
+        Send<PayoutReceipt>(Post($"/profiles/{id}/earnings/payout", new { }, token));
+
+    // -- relationship: how the profile relates to you --
+
+    public Task<RelationshipState> SetRelationship(string id, string token,
+        string interactorId, string type, string? nickname, string? tone)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, object>
+        {
+            ["relationship_type"] = type,
+        };
+        if (nickname is { Length: > 0 }) body["nickname"] = nickname;
+        if (tone is { Length: > 0 }) body["tone"] = tone;
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{id}/relationships/{interactorId}")
+        {
+            Content = JsonContent.Create(body),
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RelationshipState>(req);
+    }
 
     public Task<ChatReply> Chat(string id, string token, string interactorId,
                                 string message) =>
@@ -486,11 +605,12 @@ public sealed class ApiClient
 
     // -- community: stranger connections & multiparty rooms --
 
-    public Task<ConnJoin> JoinQueue(string interactorId, string alias) =>
+    public Task<ConnJoin> JoinQueue(string interactorId, string alias,
+                                    string tier = "friendly") =>
         Send<ConnJoin>(Post("/connections/join",
             alias is { Length: > 0 }
-                ? new { interactor_id = interactorId, tier = "friendly", alias }
-                : (object)new { interactor_id = interactorId, tier = "friendly" }));
+                ? new { interactor_id = interactorId, tier, alias }
+                : (object)new { interactor_id = interactorId, tier }));
 
     public Task<ConnMsg[]> ConnectionMessages(string cid, string interactorId) =>
         Send<ConnMsg[]>(new HttpRequestMessage(

@@ -343,5 +343,73 @@
                 </StackPanel>
             </ScrollViewer>
         </PivotItem>
+
+        <PivotItem Header="Earn">
+            <ScrollViewer>
+                <StackPanel Spacing="12" Padding="4">
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Earnings" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="Everything this creator earns — pack sales, license fees, and verified venue-placement views — written to the ledger at transaction time."
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="24">
+                                <StackPanel>
+                                    <TextBlock x:Name="AccruedText" Text="—" FontSize="18" FontWeight="Bold"
+                                               Foreground="{StaticResource QrmeGreenBrush}" />
+                                    <TextBlock Text="Accrued" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock x:Name="PaidText" Text="—" FontSize="18" FontWeight="Bold"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                    <TextBlock Text="Paid" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <TextBlock x:Name="LifetimeText" Text="—" FontSize="18" FontWeight="Bold"
+                                               Foreground="{StaticResource QrmeBrandABrush}" />
+                                    <TextBlock Text="Lifetime" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock x:Name="ByKindText" FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT3Brush}" Visibility="Collapsed" />
+                            <Button x:Name="PayoutButton" Content="Request payout" Click="OnRequestPayout"
+                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                            <TextBlock x:Name="PayoutText" FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeGreenBrush}" Visibility="Collapsed" />
+                        </StackPanel>
+                    </Border>
+                    <ItemsControl x:Name="LedgerList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="4,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Kind}" FontWeight="Bold" FontSize="12"
+                                                   Foreground="{StaticResource QrmeTxtBrush}" />
+                                        <TextBlock Text="{Binding Memo}" FontSize="10"
+                                                   Foreground="{StaticResource QrmeT3Brush}" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <TextBlock Text="{Binding Amount}" FontWeight="Bold" FontSize="12"
+                                                   HorizontalAlignment="Right"
+                                                   Foreground="{StaticResource QrmeGreenBrush}" />
+                                        <TextBlock Text="{Binding Status}" FontSize="10"
+                                                   HorizontalAlignment="Right"
+                                                   Foreground="{StaticResource QrmeT3Brush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="EarningsError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                </StackPanel>
+            </ScrollViewer>
+        </PivotItem>
     </Pivot>
 </Page>

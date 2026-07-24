@@ -16,11 +16,15 @@ public sealed class AppState
     public string? Token { get; set; }
     public string DisplayName { get; set; } = "";
     // The device owner's interactor identity for Chat, minted lazily.
+    // InteractorVerified is true when the identity was minted with an 18+
+    // birthdate — the key that opens the rated stranger tier.
     public string? InteractorId { get; set; }
+    public bool InteractorVerified { get; set; }
 
-    public void RememberInteractor(string id)
+    public void RememberInteractor(string id, bool adult = false)
     {
         InteractorId = id;
+        InteractorVerified = adult;
         Save();
     }
 
@@ -39,6 +43,7 @@ public sealed class AppState
     public void SignOut()
     {
         Pid = null; Token = null; DisplayName = ""; InteractorId = null;
+        InteractorVerified = false;
         try { File.Delete(PathOnDisk); } catch { /* ignore */ }
     }
 

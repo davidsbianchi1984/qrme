@@ -22,14 +22,20 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
     var displayName by mutableStateOf(prefs.getString("name", "") ?: "")
         private set
     // The device owner's interactor identity for Chat, minted lazily.
+    // `interactorVerified` is true when the identity was minted with an 18+
+    // birthdate — the key that opens the rated stranger tier.
     var interactorId by mutableStateOf<String?>(prefs.getString("interactor", null))
+        private set
+    var interactorVerified by mutableStateOf(prefs.getBoolean("interactor_adult", false))
         private set
 
     val isSignedIn get() = pid != null && token != null
 
-    fun rememberInteractor(id: String) {
+    fun rememberInteractor(id: String, adult: Boolean = false) {
         interactorId = id
-        prefs.edit().putString("interactor", id).apply()
+        interactorVerified = adult
+        prefs.edit().putString("interactor", id)
+            .putBoolean("interactor_adult", adult).apply()
     }
 
     fun createProfile(
@@ -52,6 +58,7 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
 
     fun signOut() {
         pid = null; token = null; displayName = ""
+        interactorId = null; interactorVerified = false
         prefs.edit().clear().apply()
     }
 

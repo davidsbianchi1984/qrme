@@ -27,6 +27,17 @@ data class Provenance(val generatedBy: String, val sourceItems: Int,
 data class LanguageInfo(val code: String, val label: String)
 data class FeedbackItem(val category: String, val message: String, val status: String)
 data class FeedbackState(val mine: List<FeedbackItem>, val tally: Map<String, Int>, val total: Int)
+data class SteeringDial(val name: String, val group: String, val label: String,
+                        val low: String, val high: String, val min: Int, val max: Int)
+data class SteeringHubState(val dials: List<SteeringDial>, val values: Map<String, Int>,
+                            val baseAge: Int?, val agingEnabled: Boolean,
+                            val effectiveAge: Int?, val appearance: String?)
+data class LedgerEntry(val id: String, val kind: String, val memo: String?,
+                       val amount: Double, val status: String)
+data class EarningsStatement(val entries: List<LedgerEntry>, val accrued: Double,
+                             val paid: Double, val lifetime: Double,
+                             val byKind: Map<String, Double>, val currency: String)
+data class PayoutReceipt(val payoutId: String, val total: Double, val entries: Int)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
@@ -231,10 +242,97 @@ object ApiClient {
 
     // ---- chat (the core loop) ----
 
-    suspend fun createInteractor(name: String): String {
-        val o = JSONObject(request("/interactors", "POST",
-            JSONObject().put("display_name", name)))
+    suspend fun createInteractor(name: String, birthdate: String? = null): String {
+        val body = JSONObject().put("display_name", name)
+        if (!birthdate.isNullOrBlank()) body.put("birthdate", birthdate)
+        val o = JSONObject(request("/interactors", "POST", body))
         return o.getString("id")
+    }
+
+    // ---- steering: the owner shapes how the profile comes across ----
+
+    suspend fun steeringHub(id: String, token: String): SteeringHubState {
+        val o = JSONObject(request("/profiles/$id/steering/hub", token = token))
+        val dialArr = o.getJSONArray("dials")
+        val dials = (0 until dialArr.length()).map { i ->
+            val d = dialArr.getJSONObject(i)
+            SteeringDial(d.getString("name"), d.getString("group"),
+                d.getString("label"), d.optString("low", ""),
+                d.optString("high", ""), d.optInt("min"), d.optInt("max", 100))
+        }
+        val valuesObj = o.optJSONObject("values") ?: JSONObject()
+        val values = valuesObj.keys().asSequence()
+            .associateWith { valuesObj.optInt(it) }
+        val age = o.optJSONObject("age") ?: JSONObject()
+        val appearance = o.optJSONObject("appearance") ?: JSONObject()
+        return SteeringHubState(
+            dials, values,
+            if (age.isNull("base_age")) null else age.optInt("base_age"),
+            age.optBoolean("aging_enabled"),
+            if (age.isNull("effective_age")) null else age.optInt("effective_age"),
+            if (appearance.isNull("description")) null
+            else appearance.optString("description", null))
+    }
+
+    suspend fun setSteeringHub(id: String, token: String,
+                               values: Map<String, Int>? = null,
+                               baseAge: Int? = null, agingEnabled: Boolean? = null,
+                               appearance: String? = null): SteeringHubState {
+        val body = JSONObject()
+        if (values != null) {
+            val v = JSONObject(); values.forEach { (k, n) -> v.put(k, n) }
+            body.put("values", v)
+        }
+        if (baseAge != null || agingEnabled != null) {
+            val age = JSONObject()
+            if (baseAge != null) age.put("base_age", baseAge)
+            if (agingEnabled != null) age.put("aging_enabled", agingEnabled)
+            body.put("age", age)
+        }
+        if (appearance != null)
+            body.put("appearance", JSONObject().put("description", appearance))
+        request("/profiles/$id/steering/hub", "PUT", body, token)
+        return steeringHub(id, token)
+    }
+
+    // ---- earnings: the creator's statement over the ledger ----
+
+    suspend fun earnings(id: String, token: String): EarningsStatement {
+        val o = JSONObject(request("/profiles/$id/earnings", token = token))
+        val arr = o.optJSONArray("entries")
+        val entries = (0 until (arr?.length() ?: 0)).map { i ->
+            val e = arr!!.getJSONObject(i)
+            LedgerEntry(e.getString("id"), e.optString("kind", ""),
+                e.optString("memo", null), e.optDouble("amount"),
+                e.optString("status", ""))
+        }
+        val t = o.getJSONObject("totals")
+        val byKindObj = t.optJSONObject("by_kind") ?: JSONObject()
+        val byKind = byKindObj.keys().asSequence()
+            .associateWith { byKindObj.optDouble(it) }
+        return EarningsStatement(entries, t.optDouble("accrued"),
+            t.optDouble("paid"), t.optDouble("lifetime"), byKind,
+            o.optString("currency", "USD"))
+    }
+
+    suspend fun requestPayout(id: String, token: String): PayoutReceipt {
+        val o = JSONObject(request("/profiles/$id/earnings/payout", "POST",
+            JSONObject(), token))
+        return PayoutReceipt(o.getString("payout_id"), o.optDouble("total"),
+            o.optInt("entries"))
+    }
+
+    // ---- relationship: how the profile relates to you ----
+
+    suspend fun setRelationship(id: String, token: String, interactorId: String,
+                                type: String, nickname: String?,
+                                tone: String?): String {
+        val body = JSONObject().put("relationship_type", type)
+        if (!nickname.isNullOrBlank()) body.put("nickname", nickname)
+        if (!tone.isNullOrBlank()) body.put("tone", tone)
+        val o = JSONObject(request("/profiles/$id/relationships/$interactorId",
+            "PUT", body, token))
+        return o.optString("relationship_type", type)
     }
 
     suspend fun chat(id: String, token: String, interactorId: String,
@@ -323,8 +421,9 @@ object ApiClient {
 
     // ---- Community: stranger connections & multiparty rooms ----
 
-    suspend fun joinQueue(interactorId: String, alias: String?): ConnJoin {
-        val body = JSONObject().put("interactor_id", interactorId).put("tier", "friendly")
+    suspend fun joinQueue(interactorId: String, alias: String?,
+                          tier: String = "friendly"): ConnJoin {
+        val body = JSONObject().put("interactor_id", interactorId).put("tier", tier)
         if (!alias.isNullOrBlank()) body.put("alias", alias)
         val o = JSONObject(request("/connections/join", "POST", body))
         return ConnJoin(o.getString("status"), o.optString("connection_id", null),

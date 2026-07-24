@@ -30,11 +30,25 @@ public sealed partial class CommunityPage : Page
     private string? _connectionId;
     private string? _roomId;
 
-    public CommunityPage() => InitializeComponent();
+    public CommunityPage()
+    {
+        InitializeComponent();
+        TierBox.ItemsSource = new[] { "Friendly", "Rated 18+" };
+        TierBox.SelectedIndex = 0;
+    }
 
     protected override void OnNavigatedTo(NavigationEventArgs e) =>
         RoomBlurb.Text = $"A group chat with you and {AppState.Current.DisplayName}. " +
                          "Every profile turn is moderated; a room with a minor always runs strict.";
+
+    private string Tier => TierBox.SelectedIndex == 1 ? "rated" : "friendly";
+
+    private void OnTierChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var needsVerify = Tier == "rated" && !AppState.Current.InteractorVerified;
+        VerifyNote.Visibility = needsVerify ? Visibility.Visible : Visibility.Collapsed;
+        BirthdateBox.Visibility = needsVerify ? Visibility.Visible : Visibility.Collapsed;
+    }
 
     /// Mint (and remember) the device owner's interactor identity — the same
     /// one Chat uses.
@@ -54,8 +68,23 @@ public sealed partial class CommunityPage : Page
         StrangerError.Visibility = Visibility.Collapsed;
         try
         {
-            var me = await EnsureInteractor();
-            var r = await ApiClient.Shared.JoinQueue(me, AliasBox.Text.Trim());
+            var s = AppState.Current;
+            string me;
+            var minted = false;
+            if (Tier == "rated" && !s.InteractorVerified)
+            {
+                // Verify 18+: mint a fresh identity carrying the birthdate —
+                // the age wall checks it server-side.
+                var created = await ApiClient.Shared.CreateInteractor(
+                    "You", BirthdateBox.Text.Trim());
+                s.RememberInteractor(created.Id);
+                me = created.Id;
+                minted = true;
+            }
+            else me = await EnsureInteractor();
+            var r = await ApiClient.Shared.JoinQueue(me, AliasBox.Text.Trim(), Tier);
+            // A rated admit proves the 18+ verification stands — remember it.
+            if (minted) s.RememberInteractor(me, adult: true);
             if (r.Status == "matched" && r.ConnectionId is not null)
             {
                 _connectionId = r.ConnectionId;

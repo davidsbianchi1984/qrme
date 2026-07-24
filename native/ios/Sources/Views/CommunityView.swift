@@ -39,6 +39,8 @@ private func ensureInteractor(_ state: AppState) async throws -> String {
 private struct StrangerSection: View {
     @EnvironmentObject var state: AppState
     @State private var alias = ""
+    @State private var tier = "friendly"
+    @State private var birthdate = ""
     @State private var waiting = false
     @State private var connectionId: String?
     @State private var matchedWith: String?
@@ -54,8 +56,21 @@ private struct StrangerSection: View {
                 } else {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Meet a stranger").font(.headline).foregroundStyle(Theme.txt)
-                        Text("Anonymous, friendly matchmaking — they see only your alias, and either side can end it. (The rated tier needs age verification, which this app doesn't do.)")
+                        Text("Anonymous matchmaking — they see only your alias, and either side can end it.")
                             .font(.caption).foregroundStyle(Theme.t2)
+                        Picker("", selection: $tier) {
+                            Text("Friendly").tag("friendly")
+                            Text("Rated 18+").tag("rated")
+                        }.pickerStyle(.segmented)
+                        if tier == "rated" && !state.interactorVerified {
+                            Text("The rated tier needs a verified 18+ identity. Enter your birthdate to verify — both sides of a rated match are verified adults, and messages run under the open filter.")
+                                .font(.caption).foregroundStyle(Theme.amber)
+                            TextField("birthdate (YYYY-MM-DD)", text: $birthdate)
+                                .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
+                                .padding(10).background(Theme.scrBot)
+                                .clipShape(RoundedRectangle(cornerRadius: 11))
+                                .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
+                        }
                         TextField("alias (optional)", text: $alias)
                             .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                             .padding(10).background(Theme.scrBot)
@@ -66,6 +81,8 @@ private struct StrangerSection: View {
                             .frame(maxWidth: .infinity).padding(.vertical, 12)
                             .background(Theme.brand)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .disabled(tier == "rated" && !state.interactorVerified
+                                      && birthdate.isEmpty)
                     }.card()
                 }
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
@@ -121,9 +138,24 @@ private struct StrangerSection: View {
         error = nil
         Task {
             do {
-                let interactor = try await ensureInteractor(state)
+                var interactor = try await ensureInteractor(state)
+                var minted = false
+                if tier == "rated" && !state.interactorVerified {
+                    // Verify 18+: mint a fresh identity carrying the
+                    // birthdate — the age wall checks it server-side.
+                    let created = try await ApiClient.shared.createInteractor(
+                        name: "You", birthdate: birthdate)
+                    state.rememberInteractor(created.id)
+                    interactor = created.id
+                    minted = true
+                }
                 let r = try await ApiClient.shared.joinQueue(
-                    interactorId: interactor, alias: alias)
+                    interactorId: interactor, alias: alias, tier: tier)
+                if minted {
+                    // The server admitted this identity to the rated queue,
+                    // so its verification stands — remember that.
+                    state.rememberInteractor(interactor, adult: true)
+                }
                 if r.status == "matched", let cid = r.connection_id {
                     connectionId = cid
                     matchedWith = r.matched_with
