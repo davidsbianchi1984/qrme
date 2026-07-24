@@ -232,6 +232,16 @@ def create_listing(body: ListingCreate) -> dict:
     return {"id": listing_id, "kind": body.kind, "title": body.title}
 
 
+@router.post("/marketplace/seed", status_code=201)
+def seed_marketplace() -> dict:
+    """Populate the starter collection: one synthetic expert per industry,
+    each with a claimed @handle and a marketplace listing, so a fresh
+    deployment has profiles to immerse with before users publish their own.
+    Idempotent — already-seeded profiles are skipped."""
+    from .. import seed
+    return seed.seed()
+
+
 @router.get("/marketplace/listings")
 def browse_listings(kind: str | None = None, tag: str | None = None,
                     area: str | None = None) -> list[dict]:
