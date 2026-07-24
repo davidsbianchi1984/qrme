@@ -53,6 +53,22 @@ def test_starters_are_summonable_by_handle_and_tag(client):
     assert any(p["display_name"] == "Dr. Amara Osei" for p in r["profiles"])
 
 
+def test_mental_health_trio_is_summonable_for_the_jim_tandem(client):
+    # The trio carries the same named experts JIM registers as starter
+    # specialists; its tandem hookup resolves them by these handles.
+    client.post("/marketplace/seed")
+    for handle, name in [("@dr_lena_whitcomb", "Dr. Lena Whitcomb"),
+                         ("@dr_marcus_adeyemi", "Dr. Marcus Adeyemi"),
+                         ("@dr_priya_nair", "Dr. Priya Nair")]:
+        r = client.get("/summon", params={"ref": handle}).json()
+        assert r["type"] == "handle"
+        assert r["profile"]["display_name"] == name
+        assert r["profile"]["chat"]
+    tagged = client.get("/marketplace/listings",
+                        params={"tag": "mental-health"}).json()
+    assert any("Lena Whitcomb" in l["title"] for l in tagged)
+
+
 def test_visitors_can_immerse_with_a_starter(client):
     client.post("/marketplace/seed")
     pid = client.get("/summon", params={"ref": "@chef_henri_laurent"}
