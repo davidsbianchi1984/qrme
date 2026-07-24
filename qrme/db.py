@@ -441,6 +441,16 @@ CREATE TABLE IF NOT EXISTS knowledge_packs (
     created_at TEXT NOT NULL
 );
 
+-- Pilot controls: the owner's live throttles/sliders for a subject (a
+-- profile or a robot). One JSON blob of dial -> 0..100; absent dials read
+-- as the 50 default. Shapes style/pace/behavior only — never identity,
+-- boundaries, age-gating, or the command allowlist.
+CREATE TABLE IF NOT EXISTS pilot_controls (
+    subject_id TEXT PRIMARY KEY,       -- profile_id or robot_id
+    dials      TEXT NOT NULL DEFAULT '{}',   -- JSON: dial name -> 0..100
+    updated_at TEXT NOT NULL
+);
+
 -- The creator ledger: one row per money event, written at sale time so a
 -- creator's statement is a record, not a reconstruction. Simulated money,
 -- like every payment on the platform — but the accounting is real.
