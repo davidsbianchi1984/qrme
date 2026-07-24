@@ -225,6 +225,32 @@ struct SummonResult: Decodable {
     let profiles: [SummonCard]?        // tag
 }
 
+struct Pack: Decodable {
+    let id: String
+    let industry: String
+    let title: String
+    let blurb: String?
+    let publisher: String
+    let price: Double
+    let currency: String
+    let free: Bool
+    let items: Int
+    let installs: Int
+}
+
+struct InstalledPack: Decodable {
+    let id: String
+    let industry: String
+    let title: String
+    let publisher: String
+    let price_paid: Double
+}
+
+struct PackInstalled: Decodable {
+    let installed_items: Int
+    let price_paid: Double
+}
+
 struct Listing: Decodable {
     let id: String
     let kind: String
@@ -565,6 +591,31 @@ actor ApiClient {
         if let area, !area.isEmpty { body["area"] = area }
         if let profileId { body["profile_id"] = profileId }
         return try await request("/marketplace/listings", method: "POST", body: body)
+    }
+
+    // MARK: knowledge packs — buy/download expertise for the profile
+
+    func packs(industry: String?) async throws -> [Pack] {
+        var query: [String: String] = [:]
+        if let industry, !industry.isEmpty { query["industry"] = industry }
+        return try await request("/packs", query: query.isEmpty ? nil : query)
+    }
+
+    func installedPacks(pid: String, token: String) async throws -> [InstalledPack] {
+        try await request("/profiles/\(pid)/packs", token: token)
+    }
+
+    func installPack(packId: String, pid: String, token: String,
+                     acceptPrice: Bool) async throws -> PackInstalled {
+        try await request("/packs/\(packId)/install", method: "POST",
+                          body: ["profile_id": pid,
+                                 "accept_price": acceptPrice], token: token)
+    }
+
+    func uninstallPack(packId: String, pid: String, token: String) async throws {
+        struct Ok: Decodable { let removed_items: Int }
+        let _: Ok = try await request("/profiles/\(pid)/packs/\(packId)",
+                                      method: "DELETE", token: token)
     }
 
     func listings(tag: String?) async throws -> [Listing] {

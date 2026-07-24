@@ -211,6 +211,27 @@ public record SummonResult(
     [property: JsonPropertyName("profile")] SummonCard? Profile,
     [property: JsonPropertyName("profiles")] SummonCard[]? Profiles);
 
+public record Pack(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("industry")] string Industry,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("blurb")] string? Blurb,
+    [property: JsonPropertyName("publisher")] string Publisher,
+    [property: JsonPropertyName("price")] double Price,
+    [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("free")] bool Free,
+    [property: JsonPropertyName("items")] int Items,
+    [property: JsonPropertyName("installs")] int Installs);
+
+public record InstalledPack(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("price_paid")] double PricePaid);
+
+public record PackInstalled(
+    [property: JsonPropertyName("installed_items")] int InstalledItems,
+    [property: JsonPropertyName("price_paid")] double PricePaid);
+
 public record Listing(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("kind")] string Kind,
@@ -562,6 +583,34 @@ public sealed class ApiClient
                         provider_name = providerName, profile_id = profileId }
                 : (object)new { kind = "profile", title, tags,
                                 provider_name = providerName, profile_id = profileId }));
+
+    // -- knowledge packs: buy/download expertise for the profile --
+
+    public Task<Pack[]> Packs(string industry) =>
+        Send<Pack[]>(new HttpRequestMessage(HttpMethod.Get,
+            industry is { Length: > 0 }
+                ? $"/packs?industry={Uri.EscapeDataString(industry)}"
+                : "/packs"));
+
+    public Task<InstalledPack[]> InstalledPacks(string pid, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{pid}/packs");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<InstalledPack[]>(req);
+    }
+
+    public Task<PackInstalled> InstallPack(string packId, string pid,
+                                           string token, bool acceptPrice) =>
+        Send<PackInstalled>(Post($"/packs/{packId}/install",
+            new { profile_id = pid, accept_price = acceptPrice }, token));
+
+    public async Task UninstallPack(string packId, string pid, string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Delete, $"/profiles/{pid}/packs/{packId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        (await _http.SendAsync(req)).EnsureSuccessStatusCode();
+    }
 
     public Task<Listing[]> Listings(string tag) =>
         Send<Listing[]>(new HttpRequestMessage(HttpMethod.Get,

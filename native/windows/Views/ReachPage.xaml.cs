@@ -36,6 +36,21 @@ public sealed partial class ReachPage : Page
             Mine ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    public sealed class PackVm
+    {
+        public string Id { get; init; } = "";
+        public string Title { get; init; } = "";
+        public string Blurb { get; init; } = "";
+        public string Meta { get; init; } = "";
+        public string PriceLabel { get; init; } = "";
+        public string ActionLabel { get; init; } = "";
+        public bool Installed { get; init; }
+        public Visibility InstalledVisibility =>
+            Installed ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility AvailableVisibility =>
+            Installed ? Visibility.Collapsed : Visibility.Visible;
+    }
+
     public sealed class GrantVm
     {
         public string Id { get; init; } = "";
@@ -69,7 +84,85 @@ public sealed partial class ReachPage : Page
         }).ToList();
         await ReloadBeacons();
         await ReloadListings();
+        await ReloadPacks();
         await ReloadLicense();
+    }
+
+    // -- Knowledge packs --
+
+    private System.Collections.Generic.Dictionary<string, Pack> _packsById = new();
+
+    private async System.Threading.Tasks.Task ReloadPacks()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var catalog = await ApiClient.Shared.Packs(PackIndustryBox.Text.Trim());
+            var installed = (await ApiClient.Shared.InstalledPacks(s.Pid!, s.Token!))
+                .Select(p => p.Id).ToHashSet();
+            _packsById = catalog.ToDictionary(p => p.Id);
+            PackList.ItemsSource = catalog.Select(p => new PackVm
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Blurb = p.Blurb ?? "",
+                Meta = $"#{p.Industry} · {p.Items} items · {p.Installs} installs · {p.Publisher}",
+                PriceLabel = p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}",
+                ActionLabel = p.Free ? "Download" : $"Buy {p.Price:F2} {p.Currency}",
+                Installed = installed.Contains(p.Id),
+            }).ToList();
+            PackError.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception ex)
+        {
+            PackError.Text = ex.Message;
+            PackError.Visibility = Visibility.Visible;
+        }
+    }
+
+    private async void OnBrowsePacks(object sender, RoutedEventArgs e) =>
+        await ReloadPacks();
+
+    private async void OnInstallPack(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string packId) return;
+        if (!_packsById.TryGetValue(packId, out var pack)) return;
+        var s = AppState.Current;
+        PackStatus.Visibility = Visibility.Collapsed;
+        try
+        {
+            // Clicking the priced button is the accept_price consent.
+            var r = await ApiClient.Shared.InstallPack(
+                packId, s.Pid!, s.Token!, acceptPrice: !pack.Free);
+            PackStatus.Text = pack.Free
+                ? $"downloaded — {r.InstalledItems} items now ground this profile"
+                : $"bought for {r.PricePaid:F2} — {r.InstalledItems} items now ground this profile";
+            PackStatus.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            PackError.Text = ex.Message;
+            PackError.Visibility = Visibility.Visible;
+        }
+        await ReloadPacks();
+    }
+
+    private async void OnUninstallPack(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string packId) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.UninstallPack(packId, s.Pid!, s.Token!);
+            PackStatus.Text = "removed — the knowledge base shrank back";
+            PackStatus.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            PackError.Text = ex.Message;
+            PackError.Visibility = Visibility.Visible;
+        }
+        await ReloadPacks();
     }
 
     private async void OnQuickTag(object sender, RoutedEventArgs e)

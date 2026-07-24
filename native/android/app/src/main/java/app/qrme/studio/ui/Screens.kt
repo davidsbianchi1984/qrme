@@ -23,11 +23,13 @@ import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
 import app.qrme.studio.Excursion
+import app.qrme.studio.InstalledPack
 import app.qrme.studio.LanguageInfo
 import app.qrme.studio.LicenseGrant
 import app.qrme.studio.LicenseOffer
 import app.qrme.studio.Listing
 import app.qrme.studio.Objection
+import app.qrme.studio.Pack
 import app.qrme.studio.Post
 import app.qrme.studio.ProfileCard
 import app.qrme.studio.Provenance
@@ -1097,7 +1099,7 @@ fun ManageScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("General", "Summon", "Market", "License").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "License").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1107,6 +1109,7 @@ fun ManageScreen(vm: StudioViewModel) {
                 0 -> SettingsScreen(vm)
                 1 -> SummonPanel(vm)
                 2 -> MarketPanel(vm)
+                3 -> PacksPanel(vm)
                 else -> LicensePanel(vm)
             }
         }
@@ -1293,6 +1296,81 @@ private fun MarketPanel(vm: StudioViewModel) {
                         TextButton(onClick = {
                             vm.call({ ApiClient.removeListing(l.id) }) { reload() }
                         }) { Text("Remove", color = Qrme.Red, fontSize = 12.sp) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PacksPanel(vm: StudioViewModel) {
+    var industry by remember { mutableStateOf("") }
+    var catalog by remember { mutableStateOf<List<Pack>>(emptyList()) }
+    var installed by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var status by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.packs(industry.trim()) }) { r ->
+            catalog = r.getOrDefault(emptyList())
+        }
+        vm.call({ ApiClient.installedPacks(vm.pid!!, vm.token!!) }) { r ->
+            installed = r.getOrDefault(emptyList()).map { it.id }.toSet()
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Knowledge packs", color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text("Make this profile smarter: a pack's curated items join its " +
+                 "source material, grounding what it knows — and every " +
+                 "reply's provenance shows the pack honestly.",
+                color = Qrme.T2, fontSize = 12.sp)
+            labeledField("Filter by industry", industry, "finance") { industry = it }
+            SmallAction("Browse") { reload() }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+
+        catalog.forEach { p ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(p.title, color = Qrme.Txt, fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold)
+                    Text(if (p.free) "FREE" else "%.2f %s".format(p.price, p.currency),
+                        color = if (p.free) Qrme.Green else Qrme.Amber,
+                        fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+                p.blurb?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+                Text("#${p.industry} · ${p.items} items · ${p.installs} installs · ${p.publisher}",
+                    color = Qrme.T3, fontSize = 11.sp)
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    if (p.id in installed) {
+                        Text("Installed", color = Qrme.Green, fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold)
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.uninstallPack(p.id, vm.pid!!, vm.token!!) }) {
+                                status = "removed — the knowledge base shrank back"
+                                reload()
+                            }
+                        }) { Text("Remove", color = Qrme.Red, fontSize = 12.sp) }
+                    } else {
+                        // Tapping the priced button is the accept_price consent.
+                        SmallAction(if (p.free) "Download"
+                                    else "Buy %.2f %s".format(p.price, p.currency)) {
+                            error = null; status = null
+                            vm.call({ ApiClient.installPack(p.id, vm.pid!!,
+                                vm.token!!, !p.free) }) { r ->
+                                r.onSuccess {
+                                    status = "installed — the pack now grounds this profile"
+                                }.onFailure { error = it.message }
+                                reload()
+                            }
+                        }
                     }
                 }
             }

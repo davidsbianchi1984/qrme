@@ -181,6 +181,73 @@
             </ScrollViewer>
         </PivotItem>
 
+        <!-- Knowledge packs -->
+        <PivotItem Header="Packs">
+            <ScrollViewer>
+                <StackPanel Spacing="12" Padding="4">
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Knowledge packs" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly. Free packs download; priced packs are bought."
+                                       FontSize="12" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox x:Name="PackIndustryBox" PlaceholderText="filter by industry" Width="240" />
+                                <Button Content="Browse" Click="OnBrowsePacks"
+                                        Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="PackError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <TextBlock x:Name="PackStatus" Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <ItemsControl x:Name="PackList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                        BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,6">
+                                    <StackPanel Spacing="4">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Title}" FontWeight="Bold"
+                                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PriceLabel}" FontSize="12"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource QrmeAmberBrush}" />
+                                        </Grid>
+                                        <TextBlock Text="{Binding Blurb}" FontSize="12" TextWrapping="Wrap"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
+                                        <TextBlock Text="{Binding Meta}" FontSize="11"
+                                                   Foreground="{StaticResource QrmeT3Brush}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                            <TextBlock Text="Installed" FontSize="12" FontWeight="Bold"
+                                                       Foreground="{StaticResource QrmeGreenBrush}"
+                                                       Visibility="{Binding InstalledVisibility}" />
+                                            <Button Content="Remove" Tag="{Binding Id}" Click="OnUninstallPack"
+                                                    Visibility="{Binding InstalledVisibility}"
+                                                    Background="Transparent" FontSize="12"
+                                                    Foreground="{StaticResource QrmeRedBrush}" />
+                                            <Button Content="{Binding ActionLabel}" Tag="{Binding Id}"
+                                                    Click="OnInstallPack"
+                                                    Visibility="{Binding AvailableVisibility}"
+                                                    Background="{StaticResource QrmeBrandABrush}"
+                                                    Foreground="White" FontSize="12" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </PivotItem>
+
         <!-- Licensing -->
         <PivotItem Header="License">
             <ScrollViewer>

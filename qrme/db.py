@@ -218,6 +218,7 @@ CREATE TABLE IF NOT EXISTS source_items (
     title      TEXT,
     content    TEXT,            -- NULL when sealed in the PDI vault
     pdi_key    TEXT,
+    pack_id    TEXT,            -- set when the item came from a knowledge pack
     created_at TEXT NOT NULL
 );
 
@@ -395,6 +396,37 @@ CREATE TABLE IF NOT EXISTS marketplace (
     tags       TEXT NOT NULL DEFAULT '[]',
     blurb      TEXT,
     listed_at  TEXT NOT NULL
+);
+
+-- Knowledge packs: downloadable clusters of curated expertise sold (or given
+-- away) on the marketplace. Installing a pack copies its items into the
+-- profile's source material, so the persona's knowledge base — and its
+-- provenance trail — genuinely grows.
+CREATE TABLE IF NOT EXISTS knowledge_packs (
+    id         TEXT PRIMARY KEY,
+    industry   TEXT NOT NULL,
+    title      TEXT NOT NULL,
+    blurb      TEXT,
+    publisher  TEXT NOT NULL,
+    price      REAL NOT NULL DEFAULT 0,   -- 0 = free download
+    currency   TEXT NOT NULL DEFAULT 'USD',
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pack_items (
+    id         TEXT PRIMARY KEY,
+    pack_id    TEXT NOT NULL REFERENCES knowledge_packs(id),
+    title      TEXT NOT NULL,
+    content    TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pack_installs (
+    pack_id      TEXT NOT NULL REFERENCES knowledge_packs(id),
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    price_paid   REAL NOT NULL DEFAULT 0,
+    installed_at TEXT NOT NULL,
+    PRIMARY KEY (pack_id, profile_id)
 );
 
 -- Autonomous multi-step workflows (claim 25, extended): a named plan of

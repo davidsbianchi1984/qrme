@@ -47,6 +47,11 @@ data class SummonCard(val profileId: String, val displayName: String, val handle
                       val status: String, val note: String?)
 data class SummonResult(val type: String, val label: String?, val scans: Int?,
                         val cards: List<SummonCard>)
+data class Pack(val id: String, val industry: String, val title: String,
+                val blurb: String?, val publisher: String, val price: Double,
+                val currency: String, val free: Boolean, val items: Int,
+                val installs: Int)
+data class InstalledPack(val id: String, val title: String, val pricePaid: Double)
 data class Listing(val id: String, val kind: String, val title: String, val blurb: String?,
                    val tags: List<String>, val profileId: String?)
 data class LicenseOffer(val kind: String, val price: Double, val currency: String,
@@ -392,6 +397,41 @@ object ApiClient {
             .put("profile_id", profileId)
         if (!blurb.isNullOrBlank()) body.put("blurb", blurb)
         request("/marketplace/listings", "POST", body)
+    }
+
+    // ---- knowledge packs: buy/download expertise for the profile ----
+
+    suspend fun packs(industry: String?): List<Pack> {
+        val path = if (industry.isNullOrBlank()) "/packs"
+        else "/packs?industry=" + java.net.URLEncoder.encode(industry, "UTF-8")
+        val arr = JSONArray(request(path))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            Pack(o.getString("id"), o.optString("industry", ""),
+                o.optString("title", ""), o.optString("blurb", null),
+                o.optString("publisher", ""), o.optDouble("price", 0.0),
+                o.optString("currency", "USD"), o.optBoolean("free"),
+                o.optInt("items"), o.optInt("installs"))
+        }
+    }
+
+    suspend fun installedPacks(pid: String, token: String): List<InstalledPack> {
+        val arr = JSONArray(request("/profiles/$pid/packs", token = token))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            InstalledPack(o.getString("id"), o.optString("title", ""),
+                o.optDouble("price_paid", 0.0))
+        }
+    }
+
+    suspend fun installPack(packId: String, pid: String, token: String,
+                            acceptPrice: Boolean): String =
+        request("/packs/$packId/install", "POST",
+            JSONObject().put("profile_id", pid).put("accept_price", acceptPrice),
+            token)
+
+    suspend fun uninstallPack(packId: String, pid: String, token: String) {
+        request("/profiles/$pid/packs/$packId", "DELETE", null, token)
     }
 
     suspend fun listings(tag: String?): List<Listing> {
