@@ -206,6 +206,10 @@ private struct MarketSection: View {
     @State private var status: String?
     @State private var error: String?
 
+    // Quick-browse tags: the wellbeing starters first, then popular areas.
+    private let quickTags = ["mental-health", "mood", "relationships",
+                             "healthcare", "finance", "fitness", "food"]
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
@@ -237,6 +241,29 @@ private struct MarketSection: View {
 
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
                 if let status { Text(status).font(.caption).foregroundStyle(Theme.green) }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Wellbeing & quick browse")
+                        .font(.caption.bold()).foregroundStyle(Theme.txt)
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(quickTags, id: \.self) { tag in
+                                Button("#\(tag)") {
+                                    filterTag = tag
+                                    Task { await load() }
+                                }
+                                .font(.caption)
+                                .foregroundStyle(filterTag == tag ? .white : Theme.txt)
+                                .padding(.horizontal, 10).padding(.vertical, 6)
+                                .background(filterTag == tag ? Theme.brandA : Theme.scrBot)
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(Theme.line, lineWidth: 1))
+                            }
+                        }
+                    }
+                    Text("The wellbeing starters — Dr. Lena Whitcomb (anxiety), Dr. Marcus Adeyemi (mood), Dr. Priya Nair (relationships) — offer education and support, never a substitute for professional care. In crisis, call or text 988.")
+                        .font(.caption2).foregroundStyle(Theme.t3)
+                }.card()
 
                 HStack(spacing: 8) {
                     TextField("filter by tag", text: $filterTag)

@@ -120,6 +120,23 @@
                                TextWrapping="Wrap" Visibility="Collapsed" />
                     <TextBlock x:Name="MarketStatus" Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
                                TextWrapping="Wrap" Visibility="Collapsed" />
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="12" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Wellbeing &amp; quick browse" FontSize="13" FontWeight="Bold"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <ItemsControl x:Name="QuickTags">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="8" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                            <TextBlock Text="The wellbeing starters — Dr. Lena Whitcomb (anxiety), Dr. Marcus Adeyemi (mood), Dr. Priya Nair (relationships) — offer education and support, never a substitute for professional care. In crisis, call or text 988."
+                                       FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                        </StackPanel>
+                    </Border>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBox x:Name="FilterTagBox" PlaceholderText="filter by tag" Width="240" />
                         <Button Content="Browse" Click="OnBrowse"
