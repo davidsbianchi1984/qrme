@@ -228,6 +228,7 @@ struct SummonResult: Decodable {
 struct Pack: Decodable {
     let id: String
     let industry: String
+    let audience: String               // "profile" | "robot"
     let title: String
     let blurb: String?
     let publisher: String
@@ -244,11 +245,15 @@ struct InstalledPack: Decodable {
     let title: String
     let publisher: String
     let price_paid: Double
+    let robot_id: String?              // non-empty when installed on a body
 }
 
 struct PackInstalled: Decodable {
-    let installed_items: Int
+    let installed_items: Int?          // profile packs: knowledge items added
+    let installed_tasks: [String]?     // robot packs: commandable verbs added
     let price_paid: Double
+
+    var count: Int { installed_items ?? installed_tasks?.count ?? 0 }
 }
 
 struct Listing: Decodable {
@@ -606,15 +611,25 @@ actor ApiClient {
     }
 
     func installPack(packId: String, pid: String, token: String,
-                     acceptPrice: Bool) async throws -> PackInstalled {
-        try await request("/packs/\(packId)/install", method: "POST",
-                          body: ["profile_id": pid,
-                                 "accept_price": acceptPrice], token: token)
+                     acceptPrice: Bool,
+                     robotId: String? = nil) async throws -> PackInstalled {
+        var body: [String: Any] = ["profile_id": pid,
+                                   "accept_price": acceptPrice]
+        if let robotId { body["robot_id"] = robotId }
+        return try await request("/packs/\(packId)/install", method: "POST",
+                                 body: body, token: token)
     }
 
     func uninstallPack(packId: String, pid: String, token: String) async throws {
         struct Ok: Decodable { let removed_items: Int }
         let _: Ok = try await request("/profiles/\(pid)/packs/\(packId)",
+                                      method: "DELETE", token: token)
+    }
+
+    func uninstallRobotPack(packId: String, robotId: String,
+                            token: String) async throws {
+        struct Ok: Decodable { let removed_tasks: Int }
+        let _: Ok = try await request("/robots/\(robotId)/packs/\(packId)",
                                       method: "DELETE", token: token)
     }
 

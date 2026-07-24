@@ -405,6 +405,7 @@ CREATE TABLE IF NOT EXISTS marketplace (
 CREATE TABLE IF NOT EXISTS knowledge_packs (
     id         TEXT PRIMARY KEY,
     industry   TEXT NOT NULL,
+    audience   TEXT NOT NULL DEFAULT 'profile',  -- profile | robot
     title      TEXT NOT NULL,
     blurb      TEXT,
     publisher  TEXT NOT NULL,
@@ -418,15 +419,31 @@ CREATE TABLE IF NOT EXISTS pack_items (
     pack_id    TEXT NOT NULL REFERENCES knowledge_packs(id),
     title      TEXT NOT NULL,
     content    TEXT NOT NULL,
+    task       TEXT,                      -- robot packs: the command verb added
+    requires   TEXT NOT NULL DEFAULT '[]', -- robot packs: capabilities needed
     created_at TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS pack_installs (
     pack_id      TEXT NOT NULL REFERENCES knowledge_packs(id),
     profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    robot_id     TEXT NOT NULL DEFAULT '',  -- set for robot-audience installs
     price_paid   REAL NOT NULL DEFAULT 0,
     installed_at TEXT NOT NULL,
-    PRIMARY KEY (pack_id, profile_id)
+    PRIMARY KEY (pack_id, profile_id, robot_id)
+);
+
+-- Task modules a robot pack installed onto a bound body. Each task becomes a
+-- commandable verb for that robot, alongside its kind's built-in allowlist —
+-- capability-checked at install, audited like every other command.
+CREATE TABLE IF NOT EXISTS robot_skills (
+    robot_id   TEXT NOT NULL REFERENCES robots(id),
+    pack_id    TEXT NOT NULL REFERENCES knowledge_packs(id),
+    task       TEXT NOT NULL,
+    title      TEXT NOT NULL,
+    procedure  TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (robot_id, task)
 );
 
 -- Autonomous multi-step workflows (claim 25, extended): a named plan of

@@ -7,7 +7,7 @@ import SwiftUI
 struct PacksSection: View {
     @EnvironmentObject var state: AppState
     @State private var catalog: [Pack] = []
-    @State private var installed: Set<String> = []
+    @State private var installed: [String: String] = [:]  // pack id -> robot id ("" = profile)
     @State private var industry = ""
     @State private var status: String?
     @State private var error: String?
@@ -17,7 +17,7 @@ struct PacksSection: View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Knowledge packs").font(.headline).foregroundStyle(Theme.txt)
-                Text("Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly.")
+                Text("Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly. 🤖 Robot task packs teach the body this profile embodies new commandable tasks, capability-checked at install.")
                     .font(.caption).foregroundStyle(Theme.t2)
                 HStack(spacing: 8) {
                     TextField("filter by industry (e.g. finance)", text: $industry)
@@ -40,6 +40,13 @@ struct PacksSection: View {
                     HStack {
                         Text(pack.title).font(.subheadline.bold()).foregroundStyle(Theme.txt)
                         Spacer()
+                        if pack.audience == "robot" {
+                            Text("🤖 ROBOT TASKS").font(.caption2.bold())
+                                .padding(.horizontal, 7).padding(.vertical, 3)
+                                .background(Theme.brandA.opacity(0.16))
+                                .foregroundStyle(Theme.brandA)
+                                .clipShape(Capsule())
+                        }
                         Text(pack.free ? "FREE"
                              : String(format: "%.2f %@", pack.price, pack.currency))
                             .font(.caption2.bold())
@@ -55,7 +62,7 @@ struct PacksSection: View {
                         .font(.caption2).foregroundStyle(Theme.t3)
                     HStack {
                         Spacer()
-                        if installed.contains(pack.id) {
+                        if installed.keys.contains(pack.id) {
                             Text("Installed").font(.caption.bold()).foregroundStyle(Theme.green)
                             Button("Remove") { uninstall(pack) }
                                 .font(.caption).foregroundStyle(Theme.red)
@@ -83,7 +90,8 @@ struct PacksSection: View {
         if let pid = state.pid, let token = state.token {
             let mine = (try? await ApiClient.shared.installedPacks(
                 pid: pid, token: token)) ?? []
-            installed = Set(mine.map(\.id))
+            installed = Dictionary(uniqueKeysWithValues:
+                mine.map { ($0.id, $0.robot_id ?? "") })
         }
     }
 
@@ -92,15 +100,30 @@ struct PacksSection: View {
         busyPack = pack.id; error = nil; status = nil
         Task {
             do {
+                // Robot task packs install onto the profile's bound body.
+                var robotId: String? = nil
+                if pack.audience == "robot" {
+                    let robots = try await ApiClient.shared.robots(
+                        id: pid, token: token)
+                    guard let first = robots.first else {
+                        error = "bind a robot first (Robots tab) — task packs install onto a body"
+                        busyPack = nil
+                        return
+                    }
+                    robotId = first.id
+                }
                 // Buying a priced pack is an explicit tap on the priced
                 // button — that tap is the accept_price consent.
                 let r = try await ApiClient.shared.installPack(
                     packId: pack.id, pid: pid, token: token,
-                    acceptPrice: !pack.free)
+                    acceptPrice: !pack.free, robotId: robotId)
+                let what = pack.audience == "robot"
+                    ? "tasks the body can now be commanded with"
+                    : "items now grounding this profile"
                 status = pack.free
-                    ? "downloaded — \(r.installed_items) items now ground this profile"
-                    : String(format: "bought for %.2f — %d items now ground this profile",
-                             r.price_paid, r.installed_items)
+                    ? "downloaded — \(r.count) \(what)"
+                    : String(format: "bought for %.2f — %d %@",
+                             r.price_paid, r.count, what)
             } catch { self.error = error.localizedDescription }
             busyPack = nil
             await load()
@@ -110,9 +133,15 @@ struct PacksSection: View {
     private func uninstall(_ pack: Pack) {
         guard let pid = state.pid, let token = state.token else { return }
         Task {
-            try? await ApiClient.shared.uninstallPack(
-                packId: pack.id, pid: pid, token: token)
-            status = "removed — the knowledge base shrank back"
+            if let robotId = installed[pack.id], !robotId.isEmpty {
+                try? await ApiClient.shared.uninstallRobotPack(
+                    packId: pack.id, robotId: robotId, token: token)
+                status = "removed — the body's tasks were revoked"
+            } else {
+                try? await ApiClient.shared.uninstallPack(
+                    packId: pack.id, pid: pid, token: token)
+                status = "removed — the knowledge base shrank back"
+            }
             await load()
         }
     }

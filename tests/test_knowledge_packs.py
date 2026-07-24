@@ -17,14 +17,18 @@ def test_starter_packs_cover_every_industry():
 
 
 def test_seed_populates_catalog_and_marketplace(client):
+    from qrme.packs import ROBOT_PACKS
+    total = len(STARTER_PACKS) + len(ROBOT_PACKS)
     r = client.post("/packs/seed")
     assert r.status_code == 201, r.text
     out = r.json()
-    assert out["created"] == len(STARTER_PACKS) and out["skipped"] == 0
+    assert out["created"] == total and out["skipped"] == 0
 
     catalog = client.get("/packs").json()
-    assert len(catalog) == len(STARTER_PACKS)
-    assert all(p["free"] and p["items"] >= 3 for p in catalog)
+    assert len(catalog) == total
+    profile_packs = [p for p in catalog if p["audience"] == "profile"]
+    assert len(profile_packs) == len(STARTER_PACKS)
+    assert all(p["free"] and p["items"] >= 3 for p in profile_packs)
 
     # Narrow by industry; detail shows titles, never contents.
     fin = client.get("/packs", params={"industry": "finance"}).json()
@@ -35,11 +39,11 @@ def test_seed_populates_catalog_and_marketplace(client):
 
     # Packs surface in the marketplace browse under the pack tag.
     listings = client.get("/marketplace/listings", params={"tag": "pack"}).json()
-    assert len(listings) == len(STARTER_PACKS)
+    assert len(listings) == total
     assert all(l["kind"] == "expertise" for l in listings)
 
     second = client.post("/packs/seed").json()
-    assert second["created"] == 0 and second["skipped"] == len(STARTER_PACKS)
+    assert second["created"] == 0 and second["skipped"] == total
 
 
 def test_free_install_grows_the_knowledge_base(client, profile_id, interactor_id):
