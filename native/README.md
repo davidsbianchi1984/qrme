@@ -23,12 +23,18 @@ advance) ·
 revoke), the connected-apps catalog (`/connectors/catalog`, `/profiles/{id}/apps`
 + collect / invoke), and **Robots** (`/robotics/catalog`, `/profiles/{id}/robots`,
 `/robots/{rid}/command`) ·
-**Manage** — settings (model picker `/models`, `/profiles/{id}/model` +
+**Manage** — settings (model picker `/models`, `/profiles/{id}/model`,
+language & translate mode `/profiles/{id}/language` + `/translate`, and
 objections), **Summon** (@handle `/profiles/{id}/handle`, QR beacons
 `/profiles/{id}/beacons`, and the `/summon?ref=` resolver), **Market**
-(`/marketplace/listings` create / browse / remove), and **License**
-(offer terms `/profiles/{id}/license`, grants `/profiles/{id}/licenses`,
-revoke `/licenses/{gid}`)
+(`/marketplace/listings` create / browse / remove, with the wellbeing
+quick-browse tag chips), **Packs** — the knowledge-pack shop
+(`/packs` catalog + industry filter, `/packs/{id}/install` to download or
+buy onto the profile, `/profiles/{id}/packs` installed list + uninstall;
+🤖 robot task packs install onto the profile's bound body and are revoked
+via `/robots/{rid}/packs/{pid}`), and **License** (offer terms
+`/profiles/{id}/license`, grants `/profiles/{id}/licenses`, revoke
+`/licenses/{gid}`)
 
 On the phone form factors, Social, Apps, and Robots share one **Connect** tab
 (segmented on iOS, a `TabRow` on Android) so the bottom bar stays at five
