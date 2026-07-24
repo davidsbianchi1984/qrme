@@ -569,14 +569,27 @@ CREATE TABLE IF NOT EXISTS finetune_runs (
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
 CREATE TABLE IF NOT EXISTS posts (
-    id          TEXT PRIMARY KEY,
-    profile_id  TEXT NOT NULL REFERENCES profiles(id),
-    surface     TEXT,
-    topic       TEXT,
-    content     TEXT NOT NULL,
-    status      TEXT NOT NULL,  -- approved | pending | rejected
-    flag_reason TEXT,
-    created_at  TEXT NOT NULL
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    surface      TEXT,
+    topic        TEXT,
+    content      TEXT NOT NULL,
+    status       TEXT NOT NULL,  -- approved | pending | rejected
+    flag_reason  TEXT,
+    watermark_id TEXT,           -- synthetic-media credential (watermark.py)
+    created_at   TEXT NOT NULL
+);
+
+-- Synthetic-media credentials: one row per stamped piece of generated media
+-- (posts, non-text chat modalities). The server-side half of the watermark:
+-- holders of content verify against it, and content that merely *claims* a
+-- watermark fails the lookup.
+CREATE TABLE IF NOT EXISTS media_watermarks (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    kind         TEXT NOT NULL,     -- post | voice | image | video | …
+    content_hash TEXT NOT NULL,     -- sha256 of the content at issue time
+    issued_at    TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS interactors (

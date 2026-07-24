@@ -8,7 +8,8 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, auth, companion, db, engagement, llm, moderation, persona
+from .. import (adaptation, auth, companion, db, engagement, llm, moderation,
+                persona, watermark)
 from ..common import (
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -80,9 +81,11 @@ def set_relationship(profile_id: str, interactor_id: str,
     return get_relationship(profile_id, interactor_id)
 
 
-def _modality_descriptor(profile_id: str, modality: str) -> dict | None:
+def _modality_descriptor(profile_id: str, modality: str,
+                         content: str | None = None) -> dict | None:
     """Multi-modal output, represented structurally: how the reply renders
-    beyond text (actual synthesis is out of scope for v1)."""
+    beyond text (actual synthesis is out of scope for v1). Non-text media
+    leaves the platform carrying a synthetic-media watermark credential."""
     if modality == "text":
         return None
     if modality == "voice":
@@ -92,9 +95,13 @@ def _modality_descriptor(profile_id: str, modality: str) -> dict | None:
             (profile_id,)).fetchone()["n"]
         basis = (f"voice preserved from {n} voice-note source(s)"
                  if n else "synthesized voice in persona style")
-        return {"type": "voice", "basis": basis}
-    return {"type": modality,
-            "basis": f"{modality} treatment generated in persona style"}
+        out = {"type": "voice", "basis": basis}
+    else:
+        out = {"type": modality,
+               "basis": f"{modality} treatment generated in persona style"}
+    if content:
+        out["watermark"] = watermark.stamp(profile_id, modality, content)
+    return out
 
 
 @router.post("/profiles/{profile_id}/chat", response_model=ChatResponse)
@@ -273,7 +280,9 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                                       flag_reason),
         interactor_message=message_out(rows[interactor_msg_id]),
         profile_message=message_out(rows[profile_msg_id]),
-        modality=_modality_descriptor(profile_id, body.modality),
+        modality=_modality_descriptor(
+            profile_id, body.modality,
+            content=reply if status == "approved" else None),
         handoff=handoff,
         # The addressed profile's identity is invariant across modality and
         # embodiment — the same signature over voice, text, and a hologram.
@@ -307,18 +316,23 @@ def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dic
     else:
         status, flag_reason = "approved", None
 
+    # A public post is synthetic media leaving the platform: it carries a
+    # verifiable synthetic-media credential from the moment it exists.
+    credential = watermark.stamp(profile_id, "post", content)
     conn = db.connect()
     post_id = db.new_id("pst")
     conn.execute(
         "INSERT INTO posts (id, profile_id, surface, topic, content,"
-        " status, flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        " status, flag_reason, watermark_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
         (post_id, profile_id, body.surface, body.topic, content, status,
-         flag_reason, db.utcnow()),
+         flag_reason, credential["watermark_id"], db.utcnow()),
     )
     conn.commit()
     return {"id": post_id, "surface": body.surface, "topic": body.topic,
             "content": content if status == "approved" else None,
             "status": status, "flag_reason": flag_reason,
+            "watermark": credential,
             "provenance": content_provenance(profile, sources, status,
                                              flag_reason)}
 
