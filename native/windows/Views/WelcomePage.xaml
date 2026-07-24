@@ -37,6 +37,9 @@
                 </StackPanel>
             </Border>
 
+            <TextBlock Text="By creating a profile you agree to the Terms of Service — profiles are AI-generated synthetic content, never professional advice; you assume the risks of AI interactions. Full terms: GET /terms · docs/terms.md"
+                       Foreground="{StaticResource QrmeT3Brush}" FontSize="10" TextWrapping="Wrap" />
+
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
 

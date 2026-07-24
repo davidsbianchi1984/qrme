@@ -164,6 +164,10 @@ fun WelcomeScreen(vm: StudioViewModel) {
                 vm.createProfile(name, persona, kind, birthdate, language,
                     onError = { error = it }, onBusy = { busy = it })
             }
+            Text("By creating a profile you agree to the Terms of Service — profiles are " +
+                 "AI-generated synthetic content, never professional advice; you assume the " +
+                 "risks of AI interactions. Full terms: GET /terms · docs/terms.md",
+                color = Qrme.T3, fontSize = 9.sp)
             Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app",
                 color = Qrme.T3, fontSize = 10.sp)
         }

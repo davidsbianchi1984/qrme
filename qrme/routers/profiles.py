@@ -7,7 +7,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import auth, companion, db, persona
+from .. import auth, companion, db, persona, terms
 from ..common import (
     age_of, profile_or_404, profile_out, require_owner, source_items,
 )
@@ -21,6 +21,10 @@ router = APIRouter()
 
 @router.post("/profiles", status_code=201)
 def create_profile(body: ProfileCreate) -> dict:
+    if not body.terms_consent:
+        raise HTTPException(
+            403, "acceptance of the Terms of Service is required to create "
+                 "a profile (GET /terms)")
     owner_age = age_of(body.verification.birthdate)
     if owner_age < 18 and not body.verification.guardian_consent:
         raise HTTPException(403, "owners under 18 require parent/guardian consent")
@@ -43,8 +47,8 @@ def create_profile(body: ProfileCreate) -> dict:
         " demographics, sources, anonymous, adult_mode, interaction_scope,"
         " moderation_mode, aging_enabled, base_age, consent_basis,"
         " consent_attestor, successor_owner, purpose, maturity,"
-        " cloud_contribution, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " cloud_contribution, terms_version, terms_accepted_at, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (
             profile_id, body.owner_id, body.kind, body.display_name,
             body.persona, json.dumps(body.demographics),
@@ -54,7 +58,8 @@ def create_profile(body: ProfileCreate) -> dict:
             body.consent.basis if body.consent else None,
             body.consent.attestor if body.consent else None,
             body.successor_owner, body.purpose, body.maturity,
-            int(body.cloud_contribution), db.utcnow(),
+            int(body.cloud_contribution), terms.TERMS_VERSION, db.utcnow(),
+            db.utcnow(),
         ),
     )
     conn.commit()

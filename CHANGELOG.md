@@ -8,6 +8,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Terms of Service** (docs/terms.md, served at `GET /terms`) — assumption
+  of risk and release, no-professional-advice and emergency disclaimers,
+  warranty disclaimer, liability cap, indemnification, creator
+  responsibilities, 18+ terms, and simulated-commerce notice. Profile
+  creation records the accepted version + timestamp (clickwrap with a
+  server-side receipt); an explicit refusal is refused (403); all three
+  apps display the agreement at the create screen.
+
 - **Synthetic-media watermarking** — public posts and non-text chat
   modalities are stamped at creation with a verifiable credential
   (producer, SHA-256, issue time, disclosure); public verification via
