@@ -25,6 +25,18 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
+                    <TextBlock Text="Language" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="The profile speaks this language everywhere it appears — chat, posts, rooms, robot speech."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch"
+                              SelectionChanged="OnLanguagePicked" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
                     <TextBlock Text="Objections" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="NoObjections" Text="No objections — nobody has contested this profile."

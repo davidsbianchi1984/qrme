@@ -264,3 +264,31 @@ def biometrics_recovered(biometrics: dict | None) -> bool:
         return float(biometrics.get("stress_level") or 0) < 0.4
     except (TypeError, ValueError):
         return False
+
+
+def content_provenance(profile: dict, sources: list[dict],
+                       status: str, flag_reason: str | None) -> dict:
+    """The verifiable basis of a piece of persona-generated content: which
+    model produced it, what it was grounded in (the profile's core identity
+    plus its consented source material), any licensed lineage, and the
+    moderation verdict it passed through — so nothing the platform emits is
+    a black box."""
+    from . import i18n, llm
+    kinds: dict[str, int] = {}
+    for item in sources:
+        kinds[item["kind"]] = kinds.get(item["kind"], 0) + 1
+    return {
+        "method": "generated in persona — grounded in the profile's core "
+                  "identity and its consented source material, then "
+                  "moderated before delivery",
+        "generated_by": llm.resolve_choice(llm.get_choice(profile["id"])),
+        "language": i18n.get_language(profile["id"]),
+        "grounded_in": {"persona": True, "source_items": len(sources),
+                        "by_kind": kinds},
+        "licensed_from": profile.get("licensed_from"),
+        "moderation": {"maturity": profile["maturity"], "status": status,
+                       "flag_reason": flag_reason},
+        "disclaimer": "Synthetic-persona content. The grounding and lineage "
+                      "above are the derivation trail — this is a character "
+                      "speaking, not a verified factual source.",
+    }

@@ -94,6 +94,13 @@ def build_system_prompt(
         "Stay in character at all times; never claim to be a generic assistant."
     )
     parts.append(f"Core identity (never alter this):\n{profile['persona']}")
+
+    # The persona speaks its owner-set language everywhere: every surface
+    # that builds a system prompt through here inherits the directive.
+    from . import i18n
+    lang_line = i18n.directive(i18n.get_language(profile["id"]))
+    if lang_line:
+        parts.append(lang_line.strip())
     parts.append(
         "Your identity, memories, and manner of speaking are constant across "
         f"every form you take ({_EMBODIMENT_FORMS}). If you move between them "

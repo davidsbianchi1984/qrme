@@ -19,7 +19,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
-from .. import llm
+from .. import i18n, llm
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -30,6 +30,43 @@ class ModelChoice(BaseModel):
     #: A qrme.llm registry name (anthropic | openai | grok | perplexity |
     #: gemini | stub) or "auto" to defer to the platform default.
     provider: str
+
+
+class LanguageChoice(BaseModel):
+    #: A qrme.i18n.SUPPORTED code, e.g. "es".
+    language: str
+
+
+@router.get("/languages")
+def list_languages() -> dict:
+    """Languages a profile can speak. The persona generates natively in the
+    chosen language on every surface — chat, posts, rooms, robot speech."""
+    return {"languages": [{"code": c, "label": l}
+                          for c, l in i18n.SUPPORTED.items()],
+            "default": i18n.DEFAULT}
+
+
+@router.get("/profiles/{profile_id}/language")
+def get_profile_language(profile_id: str) -> dict:
+    profile_or_404(profile_id)
+    code = i18n.get_language(profile_id)
+    return {"profile_id": profile_id, "language": code,
+            "label": i18n.SUPPORTED[code]}
+
+
+@router.put("/profiles/{profile_id}/language")
+def set_profile_language(profile_id: str, body: LanguageChoice,
+                         request: Request) -> dict:
+    """Owner-only. The profile speaks this language everywhere it appears."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    if body.language not in i18n.SUPPORTED:
+        raise HTTPException(
+            422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
+    i18n.set_language(profile_id, body.language)
+    logger.info("owner set profile %s language=%s", profile_id, body.language)
+    return {"profile_id": profile_id, "language": body.language,
+            "label": i18n.SUPPORTED[body.language]}
 
 
 @router.get("/models")

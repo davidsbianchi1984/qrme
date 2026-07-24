@@ -22,12 +22,14 @@ import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
 import app.qrme.studio.Excursion
+import app.qrme.studio.LanguageInfo
 import app.qrme.studio.LicenseGrant
 import app.qrme.studio.LicenseOffer
 import app.qrme.studio.Listing
 import app.qrme.studio.Objection
 import app.qrme.studio.Post
 import app.qrme.studio.ProfileCard
+import app.qrme.studio.Provenance
 import app.qrme.studio.ProviderInfo
 import app.qrme.studio.Robot
 import app.qrme.studio.RobotSpec
@@ -205,7 +207,8 @@ fun ComposeScreen(vm: StudioViewModel) {
                         color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
                 HorizontalDivider(color = Qrme.Line)
-                Text(p.content, color = Qrme.Txt, fontSize = 14.sp)
+                Text(p.content ?: "· held for review ·", color = Qrme.Txt, fontSize = 14.sp)
+                p.provenance?.let { ProvenanceFooter(it) }
             }
         }
     }
@@ -236,7 +239,7 @@ fun PostsScreen(vm: StudioViewModel) {
                             color = if (p.status == "published") Qrme.Green else Qrme.Amber,
                             fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
-                    Text(p.content, color = Qrme.Txt, fontSize = 14.sp)
+                    Text(p.content ?: "· held for review ·", color = Qrme.Txt, fontSize = 14.sp)
                 }
             }
         }
@@ -350,10 +353,16 @@ fun SettingsScreen(vm: StudioViewModel) {
     var current by remember { mutableStateOf("auto") }
     var effective by remember { mutableStateOf("") }
     var objections by remember { mutableStateOf<List<Objection>>(emptyList()) }
+    var languages by remember { mutableStateOf<List<LanguageInfo>>(emptyList()) }
+    var language by remember { mutableStateOf("en") }
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload() {
         vm.call({ ApiClient.models() }) { r -> providers = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.languages() }) { r -> languages = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.profileLanguage(vm.pid!!) }) { r ->
+            r.getOrNull()?.let { language = it }
+        }
         vm.call({ ApiClient.profileModel(vm.pid!!) }) { r ->
             r.getOrNull()?.let { current = it.provider; effective = it.effective }
         }
@@ -388,6 +397,31 @@ fun SettingsScreen(vm: StudioViewModel) {
             }
             if (effective.isNotEmpty())
                 Text("Effective now: $effective", color = Qrme.T2, fontSize = 12.sp)
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Language", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("The profile speaks this language everywhere it appears — chat, posts, rooms, robot speech.",
+                color = Qrme.T2, fontSize = 12.sp)
+            languages.chunked(3).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    row.forEach { l ->
+                        FilterChip(
+                            selected = language == l.code,
+                            onClick = {
+                                vm.call({ ApiClient.setLanguage(vm.pid!!, vm.token!!, l.code) }) {
+                                    language = l.code
+                                }
+                            },
+                            label = { Text(l.label, fontSize = 11.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Qrme.BrandA,
+                                selectedLabelColor = Color.White, labelColor = Qrme.T2,
+                            ),
+                        )
+                    }
+                }
+            }
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -441,11 +475,20 @@ fun ChatScreen(vm: StudioViewModel) {
             busy = false
             r.onSuccess { (interactor, reply) ->
                 vm.rememberInteractor(interactor)
-                messages = messages + if (reply.content != null && reply.status == "approved")
-                    Bubble(false, reply.content, false)
-                else
+                messages = messages + if (reply.content != null && reply.status == "approved") {
+                    listOfNotNull(
+                        Bubble(false, reply.content, false),
+                        reply.provenance?.let { prov ->
+                            Bubble(false, "ⓘ ${prov.generatedBy} · persona + " +
+                                "${prov.sourceItems} source item(s) · moderated: " +
+                                prov.moderationStatus +
+                                (prov.licensedFrom?.let { " · licensed from $it" } ?: ""),
+                                true)
+                        },
+                    )
+                } else listOf(
                     Bubble(false, "⏳ Held for review" +
-                        (reply.flagReason?.let { " — $it" } ?: ""), true)
+                        (reply.flagReason?.let { " — $it" } ?: ""), true))
             }.onFailure { error = it.message }
         }
     }
@@ -1238,5 +1281,19 @@ private fun LicensePanel(vm: StudioViewModel) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ProvenanceFooter(p: Provenance) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        HorizontalDivider(color = Qrme.Line)
+        Text("Generated by ${p.generatedBy} · grounded in persona + " +
+            "${p.sourceItems} source item(s) · moderation: ${p.moderationStatus}",
+            color = Qrme.T2, fontSize = 10.sp)
+        p.licensedFrom?.let {
+            Text("licensed from $it", color = Qrme.Amber, fontSize = 10.sp)
+        }
+        Text(p.disclaimer, color = Qrme.T3, fontSize = 10.sp)
     }
 }

@@ -538,6 +538,12 @@ CREATE TABLE IF NOT EXISTS model_prefs (
     updated_at  TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS language_prefs (
+    profile_id  TEXT PRIMARY KEY REFERENCES profiles(id),
+    language    TEXT NOT NULL,   -- qrme.i18n.SUPPORTED code, e.g. "es"
+    updated_at  TEXT NOT NULL
+);
+
 -- Robot bodies bound to a profile (see qrme/robotics.py for the catalog).
 -- Each binding also creates an embodiments row, so identity consistency and
 -- chat routing treat the robot like any other embodiment.

@@ -40,7 +40,11 @@ struct ComposeView: View {
                             Text((p.status ?? "draft").capitalized).font(.headline).foregroundStyle(Theme.txt)
                         }
                         Divider().overlay(Theme.line)
-                        Text(p.content).font(.subheadline).foregroundStyle(Theme.txt)
+                        Text(p.content ?? "· held for review ·")
+                            .font(.subheadline).foregroundStyle(Theme.txt)
+                        if let prov = p.provenance {
+                            ProvenanceFooter(provenance: prov)
+                        }
                     }.card()
                 }
             }.padding(20)

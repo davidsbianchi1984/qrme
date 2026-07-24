@@ -8,6 +8,8 @@ struct SettingsView: View {
     @State private var current = "auto"
     @State private var effective = ""
     @State private var objections: [Objection] = []
+    @State private var languages: [LanguageInfo] = []
+    @State private var language = "en"
     @State private var error: String?
 
     var body: some View {
@@ -37,6 +39,19 @@ struct SettingsView: View {
                         Text("Effective now: \(effective)")
                             .font(.caption).foregroundStyle(Theme.t2)
                     }
+                }.card()
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Language").font(.headline).foregroundStyle(Theme.txt)
+                    Text("The profile speaks this language everywhere it appears — chat, posts, rooms, robot speech.")
+                        .font(.caption).foregroundStyle(Theme.t2)
+                    Picker("", selection: $language) {
+                        ForEach(languages, id: \.code) { l in
+                            Text(l.label).tag(l.code)
+                        }
+                    }
+                    .pickerStyle(.menu).tint(Theme.brandA)
+                    .onChange(of: language) { _ in applyLanguage() }
                 }.card()
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -89,6 +104,16 @@ struct SettingsView: View {
         if let token = state.token {
             objections = (try? await ApiClient.shared.objections(id: pid, token: token)) ?? []
         }
+        languages = (try? await ApiClient.shared.languages())?.languages ?? []
+        if let l = try? await ApiClient.shared.profileLanguage(id: pid) {
+            language = l.language
+        }
+    }
+
+    private func applyLanguage() {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task { _ = try? await ApiClient.shared.setLanguage(id: pid, token: token,
+                                                           code: language) }
     }
 
     private func choose(_ provider: String) {
