@@ -74,6 +74,22 @@ def viewer_is_adult(request: Request) -> bool:
     return age_of(date.fromisoformat(row["birthdate"])) >= 18
 
 
+def buyer_is_adult(request: Request) -> bool:
+    """Whether the caller may see and transact rated *commerce*: either a
+    verified-18+ interactor, or the owner of an adult-mode profile (whose
+    adult verification was proven when adult mode was enabled at
+    creation)."""
+    if viewer_is_adult(request):
+        return True
+    who = auth.principal(request)
+    if who is None or who["role"] != "owner":
+        return False
+    row = db.connect().execute(
+        "SELECT adult_mode FROM profiles WHERE id=?",
+        (who["subject_id"],)).fetchone()
+    return bool(row and row["adult_mode"])
+
+
 def age_wall_card(profile_id: str) -> dict:
     """What a non-verified viewer sees instead of a rated profile card —
     existence acknowledged at direct refs, nothing else."""

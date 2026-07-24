@@ -22,8 +22,9 @@ def test_seed_populates_catalog_and_marketplace(client):
     r = client.post("/packs/seed")
     assert r.status_code == 201, r.text
     out = r.json()
-    assert out["created"] == total and out["skipped"] == 0
+    assert out["created"] == total + 1 and out["skipped"] == 0  # +1 rated
 
+    # The rated pack never appears in an unverified catalog.
     catalog = client.get("/packs").json()
     assert len(catalog) == total
     profile_packs = [p for p in catalog if p["audience"] == "profile"]
@@ -43,7 +44,7 @@ def test_seed_populates_catalog_and_marketplace(client):
     assert all(l["kind"] == "expertise" for l in listings)
 
     second = client.post("/packs/seed").json()
-    assert second["created"] == 0 and second["skipped"] == total
+    assert second["created"] == 0 and second["skipped"] == total + 1
 
 
 def test_free_install_grows_the_knowledge_base(client, profile_id, interactor_id):

@@ -330,6 +330,7 @@ class PackPublish(BaseModel):
     price: float = 0                   # 0 = free download
     currency: str = "USD"
     publisher: str = "independent"
+    rated: bool = False                # 18+ commerce: age-gated to see and buy
     items: list[PackItemIn] = Field(default_factory=list)
 
 
