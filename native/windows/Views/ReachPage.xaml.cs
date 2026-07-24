@@ -51,6 +51,16 @@ public sealed partial class ReachPage : Page
             Installed ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    public sealed class RegistryVm
+    {
+        public string Key { get; init; } = "";
+        public string Name { get; init; } = "";
+        public string Tagline { get; init; } = "";
+        public string SyncState { get; init; } = "";
+        public bool CanSync { get; init; }
+        public string ActionLabel => CanSync ? "Sync" : "Synced";
+    }
+
     public sealed class GrantVm
     {
         public string Id { get; init; } = "";
@@ -99,6 +109,15 @@ public sealed partial class ReachPage : Page
         var s = AppState.Current;
         try
         {
+            RegistryList.ItemsSource = (await ApiClient.Shared.PackRegistries())
+                .Select(r => new RegistryVm
+                {
+                    Key = r.Key,
+                    Name = r.Name,
+                    Tagline = r.Tagline,
+                    SyncState = $"{r.Synced}/{r.Available} packs synced",
+                    CanSync = r.Synced < r.Available,
+                }).ToList();
             var catalog = await ApiClient.Shared.Packs(PackIndustryBox.Text.Trim());
             _installedOn = (await ApiClient.Shared.InstalledPacks(s.Pid!, s.Token!))
                 .ToDictionary(p => p.Id, p => p.RobotId ?? "");
@@ -108,7 +127,8 @@ public sealed partial class ReachPage : Page
                 Id = p.Id,
                 Title = p.Title,
                 Blurb = p.Blurb ?? "",
-                Meta = $"#{p.Industry} · {p.Items} items · {p.Installs} installs · {p.Publisher}",
+                Meta = $"#{p.Industry} · {p.Items} items · {p.Installs} installs · {p.Publisher}"
+                       + (p.OriginUrl is { } u ? $" · from {u}" : ""),
                 PriceLabel = (p.Audience == "robot" ? "🤖 ROBOT · " : "")
                              + (p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}"),
                 ActionLabel = p.Free ? "Download" : $"Buy {p.Price:F2} {p.Currency}",
@@ -125,6 +145,23 @@ public sealed partial class ReachPage : Page
 
     private async void OnBrowsePacks(object sender, RoutedEventArgs e) =>
         await ReloadPacks();
+
+    private async void OnSyncRegistry(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string key) return;
+        try
+        {
+            await ApiClient.Shared.SyncRegistry(key);
+            PackStatus.Text = "source synced — its packs joined the marketplace";
+            PackStatus.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            PackError.Text = ex.Message;
+            PackError.Visibility = Visibility.Visible;
+        }
+        await ReloadPacks();
+    }
 
     private async void OnInstallPack(object sender, RoutedEventArgs e)
     {

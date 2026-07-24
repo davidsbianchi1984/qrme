@@ -30,6 +30,7 @@ import app.qrme.studio.LicenseOffer
 import app.qrme.studio.Listing
 import app.qrme.studio.Objection
 import app.qrme.studio.Pack
+import app.qrme.studio.PackRegistry
 import app.qrme.studio.Post
 import app.qrme.studio.ProfileCard
 import app.qrme.studio.Provenance
@@ -1307,12 +1308,16 @@ private fun MarketPanel(vm: StudioViewModel) {
 private fun PacksPanel(vm: StudioViewModel) {
     var industry by remember { mutableStateOf("") }
     var catalog by remember { mutableStateOf<List<Pack>>(emptyList()) }
+    var registries by remember { mutableStateOf<List<PackRegistry>>(emptyList()) }
     // pack id -> robot id ("" when installed on the profile itself)
     var installed by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var status by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload() {
+        vm.call({ ApiClient.packRegistries() }) { r ->
+            registries = r.getOrDefault(emptyList())
+        }
         vm.call({ ApiClient.packs(industry.trim()) }) { r ->
             catalog = r.getOrDefault(emptyList())
         }
@@ -1370,6 +1375,36 @@ private fun PacksPanel(vm: StudioViewModel) {
             labeledField("Filter by industry", industry, "finance") { industry = it }
             SmallAction("Browse") { reload() }
         }
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Pack sources", color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text("Federated mod storefronts — sync a source and its catalog " +
+                 "joins the marketplace, origin on every label.",
+                color = Qrme.T3, fontSize = 10.sp)
+            registries.forEach { reg ->
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Text(reg.name, color = Qrme.BrandA, fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold)
+                        Text(reg.tagline, color = Qrme.T2, fontSize = 10.sp)
+                        Text("${reg.synced}/${reg.available} packs synced",
+                            color = Qrme.T3, fontSize = 10.sp)
+                    }
+                    if (reg.synced >= reg.available)
+                        Text("Synced", color = Qrme.Green, fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold)
+                    else SmallAction("Sync") {
+                        vm.call({ ApiClient.syncRegistry(reg.key) }) {
+                            status = "${reg.name} synced — its packs joined the marketplace"
+                            reload()
+                        }
+                    }
+                }
+            }
+        }
+
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
         status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
 
@@ -1390,6 +1425,9 @@ private fun PacksPanel(vm: StudioViewModel) {
                 p.blurb?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
                 Text("#${p.industry} · ${p.items} items · ${p.installs} installs · ${p.publisher}",
                     color = Qrme.T3, fontSize = 11.sp)
+                p.originUrl?.let {
+                    Text("from $it", color = Qrme.BrandA, fontSize = 10.sp)
+                }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically) {
                     if (p.id in installed) {

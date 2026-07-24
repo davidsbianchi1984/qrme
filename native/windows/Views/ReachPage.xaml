@@ -200,6 +200,40 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
+                    <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="12" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Pack sources" FontSize="13" FontWeight="Bold"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock Text="Federated mod storefronts — sync a source and its catalog joins the marketplace, origin on every label."
+                                       FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT3Brush}" />
+                            <ItemsControl x:Name="RegistryList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Spacing="1">
+                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Bold"
+                                                           Foreground="{StaticResource QrmeBrandABrush}" />
+                                                <TextBlock Text="{Binding Tagline}" FontSize="10" TextWrapping="Wrap"
+                                                           Foreground="{StaticResource QrmeT2Brush}" />
+                                                <TextBlock Text="{Binding SyncState}" FontSize="10"
+                                                           Foreground="{StaticResource QrmeT3Brush}" />
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Content="{Binding ActionLabel}" Tag="{Binding Key}"
+                                                    Click="OnSyncRegistry" FontSize="12"
+                                                    IsEnabled="{Binding CanSync}" VerticalAlignment="Center"
+                                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
                     <TextBlock x:Name="PackError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
                                TextWrapping="Wrap" Visibility="Collapsed" />
                     <TextBlock x:Name="PackStatus" Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"

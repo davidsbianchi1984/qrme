@@ -221,8 +221,19 @@ public record Pack(
     [property: JsonPropertyName("price")] double Price,
     [property: JsonPropertyName("currency")] string Currency,
     [property: JsonPropertyName("free")] bool Free,
+    [property: JsonPropertyName("origin")] string Origin,
+    [property: JsonPropertyName("origin_url")] string? OriginUrl,
     [property: JsonPropertyName("items")] int Items,
     [property: JsonPropertyName("installs")] int Installs);
+
+public record PackRegistry(
+    [property: JsonPropertyName("key")] string Key,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("url")] string Url,
+    [property: JsonPropertyName("audience")] string Audience,
+    [property: JsonPropertyName("tagline")] string Tagline,
+    [property: JsonPropertyName("available")] int Available,
+    [property: JsonPropertyName("synced")] int Synced);
 
 public record InstalledPack(
     [property: JsonPropertyName("id")] string Id,
@@ -597,6 +608,17 @@ public sealed class ApiClient
             industry is { Length: > 0 }
                 ? $"/packs?industry={Uri.EscapeDataString(industry)}"
                 : "/packs"));
+
+    public Task<PackRegistry[]> PackRegistries() =>
+        Send<PackRegistry[]>(new HttpRequestMessage(HttpMethod.Get,
+            "/packs/registries"));
+
+    public async Task SyncRegistry(string key)
+    {
+        var res = await _http.SendAsync(
+            Post($"/packs/registries/{key}/sync", new { }, null));
+        res.EnsureSuccessStatusCode();
+    }
 
     public Task<InstalledPack[]> InstalledPacks(string pid, string token)
     {

@@ -235,8 +235,20 @@ struct Pack: Decodable {
     let price: Double
     let currency: String
     let free: Bool
+    let origin: String                 // "local" | a registry key
+    let origin_url: String?            // the federated storefront
     let items: Int
     let installs: Int
+}
+
+struct PackRegistry: Decodable {
+    let key: String
+    let name: String                   // e.g. "Robotmods.net"
+    let url: String
+    let audience: String
+    let tagline: String
+    let available: Int
+    let synced: Int
 }
 
 struct InstalledPack: Decodable {
@@ -604,6 +616,16 @@ actor ApiClient {
         var query: [String: String] = [:]
         if let industry, !industry.isEmpty { query["industry"] = industry }
         return try await request("/packs", query: query.isEmpty ? nil : query)
+    }
+
+    func packRegistries() async throws -> [PackRegistry] {
+        try await request("/packs/registries")
+    }
+
+    func syncRegistry(key: String) async throws {
+        struct Ok: Decodable { let created: Int }
+        let _: Ok = try await request("/packs/registries/\(key)/sync",
+                                      method: "POST")
     }
 
     func installedPacks(pid: String, token: String) async throws -> [InstalledPack] {
