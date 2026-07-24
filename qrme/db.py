@@ -434,7 +434,8 @@ CREATE TABLE IF NOT EXISTS rated_events (
     profile_id TEXT NOT NULL REFERENCES profiles(id),
     beacon_id  TEXT,
     kind       TEXT NOT NULL,          -- wall | verified_view
-    at         TEXT NOT NULL
+    at         TEXT NOT NULL,
+    pdi_key    TEXT                    -- set when sealed in the PDI vault
 );
 
 -- Knowledge packs: downloadable clusters of curated expertise sold (or given
