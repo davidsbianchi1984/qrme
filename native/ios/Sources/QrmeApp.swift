@@ -22,11 +22,11 @@ struct RootView: View {
             Theme.bg.ignoresSafeArea()
             if state.isSignedIn {
                 TabView {
-                    OverviewView().tabItem { Label("Overview", systemImage: "circle.grid.cross") }
-                    ChatHubView().tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
-                    StudioView().tabItem { Label("Studio", systemImage: "square.and.pencil") }
-                    ConnectView().tabItem { Label("Connect", systemImage: "link") }
-                    ManageView().tabItem { Label("Manage", systemImage: "gearshape") }
+                    OverviewView().tabItem { Label(L10n.t("tab.overview", state.language), systemImage: "circle.grid.cross") }
+                    ChatHubView().tabItem { Label(L10n.t("tab.chat", state.language), systemImage: "bubble.left.and.bubble.right") }
+                    StudioView().tabItem { Label(L10n.t("tab.studio", state.language), systemImage: "square.and.pencil") }
+                    ConnectView().tabItem { Label(L10n.t("tab.connect", state.language), systemImage: "link") }
+                    ManageView().tabItem { Label(L10n.t("tab.manage", state.language), systemImage: "gearshape") }
                 }
                 .tint(Theme.brandA)
             } else {

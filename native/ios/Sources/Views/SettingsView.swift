@@ -18,7 +18,8 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Settings").font(.title2.bold()).foregroundStyle(Theme.txt)
+                Text(L10n.t("tab.settings", state.language))
+                    .font(.title2.bold()).foregroundStyle(Theme.txt)
 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Model").font(.headline).foregroundStyle(Theme.txt)
@@ -72,7 +73,7 @@ struct SettingsView: View {
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    Button("Translate") { runTranslate() }
+                    Button(L10n.t("action.translate", state.language)) { runTranslate() }
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 8)
                         .background(Theme.brandA).clipShape(Capsule())
@@ -131,6 +132,7 @@ struct SettingsView: View {
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
             }.padding(20)
         }
+        .refreshable { await load() }
         .task { await load() }
     }
 
@@ -147,11 +149,13 @@ struct SettingsView: View {
         if let l = try? await ApiClient.shared.profileLanguage(id: pid) {
             language = l.language
             preTranslate = (l.mode ?? "pre") == "pre"
+            state.rememberLanguage(l.language)   // chrome follows the profile
         }
     }
 
     private func applyLanguage() {
         guard let pid = state.pid, let token = state.token else { return }
+        state.rememberLanguage(language)
         Task {
             _ = try? await ApiClient.shared.setLanguage(
                 id: pid, token: token, code: language,

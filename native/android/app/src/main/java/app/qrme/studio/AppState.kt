@@ -28,8 +28,16 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
         private set
     var interactorVerified by mutableStateOf(prefs.getBoolean("interactor_adult", false))
         private set
+    // The profile's chosen language also drives the app chrome via L10n.
+    var language by mutableStateOf(prefs.getString("lang", "en") ?: "en")
+        private set
 
     val isSignedIn get() = pid != null && token != null
+
+    fun rememberLanguage(code: String) {
+        language = code
+        prefs.edit().putString("lang", code).apply()
+    }
 
     fun rememberInteractor(id: String, adult: Boolean = false) {
         interactorId = id

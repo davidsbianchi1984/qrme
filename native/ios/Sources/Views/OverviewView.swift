@@ -37,6 +37,7 @@ struct OverviewView: View {
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.line, lineWidth: 1))
             }.padding(20)
         }
+        .refreshable { await load() }
         .task { await load() }
     }
 

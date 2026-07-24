@@ -34,6 +34,7 @@ struct PostsView: View {
                 }
             }.padding(20)
         }
+        .refreshable { await load() }
         .task { await load() }
         .refreshable { await load() }
     }
