@@ -118,6 +118,35 @@ struct InvokeResult: Decodable {
     let result: String
 }
 
+struct ConnJoin: Decodable {
+    let status: String                 // "matched" | "waiting"
+    let connection_id: String?
+    let tier: String
+    let matched_with: String?
+}
+
+struct ConnMsgResult: Decodable { let id: String; let status: String; let flag_reason: String? }
+
+struct ConnMsg: Decodable {
+    let id: String
+    let from: String                   // "you" or the partner's alias
+    let content: String
+    let status: String?
+}
+
+struct RoomCreated: Decodable { let id: String; let topic: String; let channel: String; let presence: String }
+
+struct RoomMsg: Decodable {
+    let id: String
+    let sender_kind: String            // "user" | "profile"
+    let from: String
+    let content: String?               // nil when blocked
+    let status: String?
+}
+
+struct RoomPost: Decodable { let message: RoomMsg; let replies: [RoomMsg] }
+struct RoomAdvance: Decodable { let replies: [RoomMsg] }
+
 struct Excursion: Decodable {
     let id: String
     let topic: String
@@ -146,8 +175,14 @@ actor ApiClient {
     }
 
     private func request<T: Decodable>(_ path: String, method: String = "GET",
-                                       body: [String: Any]? = nil, token: String? = nil) async throws -> T {
-        var req = URLRequest(url: base.appendingPathComponent(path))
+                                       body: [String: Any]? = nil, token: String? = nil,
+                                       query: [String: String]? = nil) async throws -> T {
+        var url = base.appendingPathComponent(path)
+        if let query, var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            parts.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
+            url = parts.url ?? url
+        }
+        var req = URLRequest(url: url)
         req.httpMethod = method
         req.setValue("application/json", forHTTPHeaderField: "content-type")
         if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
@@ -313,6 +348,54 @@ actor ApiClient {
         try await request("/profiles/\(id)/chat", method: "POST",
                           body: ["interactor_id": interactorId,
                                  "message": message], token: token)
+    }
+
+    // MARK: Community — stranger connections & multiparty rooms
+
+    func joinQueue(interactorId: String, alias: String?) async throws -> ConnJoin {
+        var body: [String: Any] = ["interactor_id": interactorId, "tier": "friendly"]
+        if let alias, !alias.isEmpty { body["alias"] = alias }
+        return try await request("/connections/join", method: "POST", body: body)
+    }
+
+    func connectionMessages(cid: String, interactorId: String) async throws -> [ConnMsg] {
+        try await request("/connections/\(cid)/messages",
+                          query: ["interactor_id": interactorId])
+    }
+
+    func sendConnectionMessage(cid: String, interactorId: String,
+                               message: String) async throws -> ConnMsgResult {
+        try await request("/connections/\(cid)/messages", method: "POST",
+                          body: ["interactor_id": interactorId, "message": message])
+    }
+
+    func endConnection(cid: String, interactorId: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/connections/\(cid)/end", method: "POST",
+                                      query: ["interactor_id": interactorId])
+    }
+
+    func createRoom(topic: String, profileId: String,
+                    interactorId: String) async throws -> RoomCreated {
+        try await request("/rooms", method: "POST", body: [
+            "topic": topic, "channel": "chat",
+            "participants": [["kind": "user", "id": interactorId],
+                             ["kind": "profile", "id": profileId]],
+        ])
+    }
+
+    func roomMessage(roomId: String, senderId: String,
+                     message: String) async throws -> RoomPost {
+        try await request("/rooms/\(roomId)/messages", method: "POST",
+                          body: ["sender_id": senderId, "message": message])
+    }
+
+    func roomAdvance(roomId: String) async throws -> RoomAdvance {
+        try await request("/rooms/\(roomId)/advance", method: "POST")
+    }
+
+    func roomTranscript(roomId: String) async throws -> [RoomMsg] {
+        try await request("/rooms/\(roomId)/messages")
     }
 
     // MARK: Knowledge excursions (study safely; private data stays home)

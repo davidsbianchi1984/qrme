@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import app.qrme.studio.ApiClient
 import app.qrme.studio.AppConn
 import app.qrme.studio.CatalogApp
+import app.qrme.studio.ConnMsg
 import app.qrme.studio.Excursion
 import app.qrme.studio.Objection
 import app.qrme.studio.Post
@@ -26,6 +27,8 @@ import app.qrme.studio.ProfileCard
 import app.qrme.studio.ProviderInfo
 import app.qrme.studio.Robot
 import app.qrme.studio.RobotSpec
+import app.qrme.studio.RoomCreated
+import app.qrme.studio.RoomMsg
 import app.qrme.studio.SocialConn
 import app.qrme.studio.StudioViewModel
 
@@ -757,5 +760,218 @@ private fun SmallAction(text: String, onClick: () -> Unit) {
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Text(text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+// ---- Chat hub (Profile · Stranger · Rooms behind one tab) ----
+
+@Composable
+fun ChatHubScreen(vm: StudioViewModel) {
+    var seg by remember { mutableIntStateOf(0) }
+    Column(Modifier.fillMaxSize()) {
+        TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
+            listOf("Profile", "Stranger", "Rooms").forEachIndexed { i, t ->
+                Tab(selected = seg == i, onClick = { seg = i },
+                    text = { Text(t, fontSize = 13.sp) })
+            }
+        }
+        Box(Modifier.weight(1f)) {
+            when (seg) {
+                0 -> ChatScreen(vm)
+                1 -> StrangerPanel(vm)
+                else -> RoomsPanel(vm)
+            }
+        }
+    }
+}
+
+/// Mint (and remember) the device owner's interactor identity — the same one
+/// Chat uses — before running [block] with it.
+private fun withInteractor(vm: StudioViewModel, onError: (String) -> Unit,
+                           block: (String) -> Unit) {
+    vm.interactorId?.let { return block(it) }
+    vm.call({ ApiClient.createInteractor("You") }) { r ->
+        r.onSuccess { vm.rememberInteractor(it); block(it) }
+            .onFailure { onError(it.message ?: "couldn't create your identity") }
+    }
+}
+
+@Composable
+private fun StrangerPanel(vm: StudioViewModel) {
+    var alias by remember { mutableStateOf("") }
+    var waiting by remember { mutableStateOf(false) }
+    var connectionId by remember { mutableStateOf<String?>(null) }
+    var matchedWith by remember { mutableStateOf<String?>(null) }
+    var messages by remember { mutableStateOf<List<ConnMsg>>(emptyList()) }
+    var draft by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun refresh(cid: String) {
+        val me = vm.interactorId ?: return
+        vm.call({ ApiClient.connectionMessages(cid, me) }) { r ->
+            r.onSuccess { messages = it }
+        }
+    }
+
+    fun join() {
+        error = null
+        withInteractor(vm, { error = it }) { me ->
+            vm.call({ ApiClient.joinQueue(me, alias) }) { r ->
+                r.onSuccess {
+                    if (it.status == "matched" && it.connectionId != null) {
+                        connectionId = it.connectionId
+                        matchedWith = it.matchedWith
+                        waiting = false
+                        refresh(it.connectionId)
+                    } else waiting = true
+                }.onFailure { error = it.message }
+            }
+        }
+    }
+
+    screenScroll {
+        val cid = connectionId
+        if (cid == null) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Meet a stranger", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("Anonymous, friendly matchmaking — they see only your alias, and either side can end it. (The rated tier needs age verification, which this app doesn't do.)",
+                    color = Qrme.T2, fontSize = 12.sp)
+                labeledField("Alias (optional)", alias, "Stranger") { alias = it }
+                BrandButton(if (waiting) "Waiting for a match — check again" else "Find a match") { join() }
+            }
+        } else {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("Talking with ${matchedWith ?: "a stranger"}", color = Qrme.Txt,
+                        fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    TextButton(onClick = {
+                        vm.interactorId?.let { me ->
+                            vm.call({ ApiClient.endConnection(cid, me) }) {
+                                connectionId = null; matchedWith = null
+                                messages = emptyList(); waiting = false
+                            }
+                        }
+                    }) { Text("End", color = Qrme.Red, fontSize = 12.sp) }
+                }
+                messages.forEach { m ->
+                    Column(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                            .background(if (m.from == "you") Qrme.BrandA.copy(alpha = 0.35f)
+                                        else Qrme.Card.copy(alpha = 0.9f))
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Text(m.from, color = Qrme.T3, fontSize = 10.sp)
+                        Text(m.content, color = Qrme.Txt, fontSize = 13.sp)
+                        if (m.status == "blocked")
+                            Text("blocked — only you can see this", color = Qrme.Red, fontSize = 10.sp)
+                    }
+                }
+                labeledField("", draft, "Say something…") { draft = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SmallAction("Send") {
+                        val text = draft
+                        if (text.isNotBlank()) {
+                            draft = ""; error = null
+                            withInteractor(vm, { error = it }) { me ->
+                                vm.call({ ApiClient.sendConnectionMessage(cid, me, text) }) { r ->
+                                    r.onFailure { error = it.message }
+                                    refresh(cid)
+                                }
+                            }
+                        }
+                    }
+                    TextButton(onClick = { refresh(cid) }) {
+                        Text("Refresh", color = Qrme.BrandA, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+@Composable
+private fun RoomsPanel(vm: StudioViewModel) {
+    var topic by remember { mutableStateOf("") }
+    var room by remember { mutableStateOf<RoomCreated?>(null) }
+    var transcript by remember { mutableStateOf<List<RoomMsg>>(emptyList()) }
+    var draft by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun reload(roomId: String) {
+        vm.call({ ApiClient.roomTranscript(roomId) }) { r ->
+            r.onSuccess { transcript = it }
+        }
+    }
+
+    screenScroll {
+        val current = room
+        if (current == null) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Open a room", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("A group chat with you and ${vm.displayName}. Every profile turn is moderated; a room with a minor always runs strict.",
+                    color = Qrme.T2, fontSize = 12.sp)
+                labeledField("Topic", topic, "What's the room about?") { topic = it }
+                BrandButton("Open room", enabled = topic.isNotBlank(), busy = busy) {
+                    busy = true; error = null
+                    withInteractor(vm, { error = it; busy = false }) { me ->
+                        vm.call({ ApiClient.createRoom(topic, vm.pid!!, me) }) { r ->
+                            busy = false
+                            r.onSuccess { room = it; topic = ""; transcript = emptyList() }
+                                .onFailure { error = it.message }
+                        }
+                    }
+                }
+            }
+        } else {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(current.topic, color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    TextButton(onClick = { room = null; transcript = emptyList() }) {
+                        Text("Leave", color = Qrme.Red, fontSize = 12.sp)
+                    }
+                }
+                transcript.forEach { m ->
+                    Column(
+                        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                            .background(Qrme.Card.copy(alpha = 0.9f))
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Text(m.from, fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                            color = if (m.senderKind == "profile") Qrme.BrandA else Qrme.T2)
+                        Text(m.content ?: "· blocked by moderation ·",
+                            color = if (m.content == null) Qrme.T3 else Qrme.Txt, fontSize = 13.sp)
+                    }
+                }
+                labeledField("", draft, "Say something…") { draft = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SmallAction("Send") {
+                        val text = draft
+                        if (text.isNotBlank() && !busy) {
+                            draft = ""; busy = true; error = null
+                            withInteractor(vm, { error = it; busy = false }) { me ->
+                                vm.call({ ApiClient.roomMessage(current.id, me, text) }) { r ->
+                                    busy = false
+                                    r.onFailure { error = it.message }
+                                    reload(current.id)
+                                }
+                            }
+                        }
+                    }
+                    SmallAction("Let them talk") {
+                        if (!busy) {
+                            busy = true; error = null
+                            vm.call({ ApiClient.roomAdvance(current.id) }) { r ->
+                                busy = false
+                                r.onFailure { error = it.message }
+                                reload(current.id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
 }

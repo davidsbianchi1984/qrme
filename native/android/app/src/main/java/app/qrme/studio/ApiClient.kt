@@ -28,6 +28,11 @@ data class CatalogApp(val provider: String, val app: String, val label: String)
 data class AppConn(val id: String, val provider: String, val app: String, val label: String,
                    val capabilities: List<String>, val status: String?)
 data class InvokeResult(val capability: String, val status: String, val result: String)
+data class ConnJoin(val status: String, val connectionId: String?, val matchedWith: String?)
+data class ConnMsg(val id: String, val from: String, val content: String, val status: String?)
+data class RoomCreated(val id: String, val topic: String, val channel: String)
+data class RoomMsg(val id: String, val senderKind: String, val from: String,
+                   val content: String?, val status: String?)
 
 class ApiException(message: String) : Exception(message)
 
@@ -212,6 +217,62 @@ object ApiClient {
 
     suspend fun learn(cid: String, token: String) {
         request("/excursions/$cid/learn", "POST", null, token)
+    }
+
+    // ---- Community: stranger connections & multiparty rooms ----
+
+    suspend fun joinQueue(interactorId: String, alias: String?): ConnJoin {
+        val body = JSONObject().put("interactor_id", interactorId).put("tier", "friendly")
+        if (!alias.isNullOrBlank()) body.put("alias", alias)
+        val o = JSONObject(request("/connections/join", "POST", body))
+        return ConnJoin(o.getString("status"), o.optString("connection_id", null),
+            o.optString("matched_with", null))
+    }
+
+    suspend fun connectionMessages(cid: String, interactorId: String): List<ConnMsg> {
+        val arr = JSONArray(request("/connections/$cid/messages?interactor_id=$interactorId"))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            ConnMsg(o.getString("id"), o.optString("from", ""), o.optString("content", ""),
+                o.optString("status", null))
+        }
+    }
+
+    suspend fun sendConnectionMessage(cid: String, interactorId: String, message: String) {
+        request("/connections/$cid/messages", "POST",
+            JSONObject().put("interactor_id", interactorId).put("message", message))
+    }
+
+    suspend fun endConnection(cid: String, interactorId: String) {
+        request("/connections/$cid/end?interactor_id=$interactorId", "POST")
+    }
+
+    private fun roomMsgOf(o: JSONObject) = RoomMsg(
+        o.getString("id"), o.optString("sender_kind", ""), o.optString("from", ""),
+        if (o.isNull("content")) null else o.optString("content", null),
+        o.optString("status", null))
+
+    suspend fun createRoom(topic: String, profileId: String, interactorId: String): RoomCreated {
+        val body = JSONObject().put("topic", topic).put("channel", "chat")
+            .put("participants", JSONArray()
+                .put(JSONObject().put("kind", "user").put("id", interactorId))
+                .put(JSONObject().put("kind", "profile").put("id", profileId)))
+        val o = JSONObject(request("/rooms", "POST", body))
+        return RoomCreated(o.getString("id"), o.optString("topic", ""), o.optString("channel", ""))
+    }
+
+    suspend fun roomMessage(roomId: String, senderId: String, message: String) {
+        request("/rooms/$roomId/messages", "POST",
+            JSONObject().put("sender_id", senderId).put("message", message))
+    }
+
+    suspend fun roomAdvance(roomId: String) {
+        request("/rooms/$roomId/advance", "POST")
+    }
+
+    suspend fun roomTranscript(roomId: String): List<RoomMsg> {
+        val arr = JSONArray(request("/rooms/$roomId/messages"))
+        return (0 until arr.length()).map { roomMsgOf(arr.getJSONObject(it)) }
     }
 
     // ---- Connect: social platforms & the connected-apps catalog ----

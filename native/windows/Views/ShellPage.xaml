@@ -15,6 +15,9 @@
             <NavigationViewItem Content="Chat" Tag="chat">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Message" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Community" Tag="community">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="People" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Compose" Tag="compose">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Edit" /></NavigationViewItem.Icon>
             </NavigationViewItem>

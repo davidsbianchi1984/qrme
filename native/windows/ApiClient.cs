@@ -113,6 +113,29 @@ public record InvokeResult(
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("result")] string Result);
 
+public record ConnJoin(
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("connection_id")] string? ConnectionId,
+    [property: JsonPropertyName("matched_with")] string? MatchedWith);
+
+public record ConnMsg(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("from")] string From,
+    [property: JsonPropertyName("content")] string Content,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record RoomCreated(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("topic")] string Topic,
+    [property: JsonPropertyName("channel")] string Channel);
+
+public record RoomMsg(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("sender_kind")] string SenderKind,
+    [property: JsonPropertyName("from")] string From,
+    [property: JsonPropertyName("content")] string? Content,
+    [property: JsonPropertyName("status")] string? Status);
+
 public record Excursion(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("topic")] string Topic,
@@ -239,6 +262,62 @@ public sealed class ApiClient
                                 string message) =>
         Send<ChatReply>(Post($"/profiles/{id}/chat",
             new { interactor_id = interactorId, message }, token));
+
+    // -- community: stranger connections & multiparty rooms --
+
+    public Task<ConnJoin> JoinQueue(string interactorId, string alias) =>
+        Send<ConnJoin>(Post("/connections/join",
+            alias is { Length: > 0 }
+                ? new { interactor_id = interactorId, tier = "friendly", alias }
+                : (object)new { interactor_id = interactorId, tier = "friendly" }));
+
+    public Task<ConnMsg[]> ConnectionMessages(string cid, string interactorId) =>
+        Send<ConnMsg[]>(new HttpRequestMessage(
+            HttpMethod.Get, $"/connections/{cid}/messages?interactor_id={interactorId}"));
+
+    public async Task SendConnectionMessage(string cid, string interactorId, string message)
+    {
+        var req = Post($"/connections/{cid}/messages",
+            new { interactor_id = interactorId, message });
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public async Task EndConnection(string cid, string interactorId)
+    {
+        var req = Post($"/connections/{cid}/end?interactor_id={interactorId}", new { });
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<RoomCreated> CreateRoom(string topic, string profileId, string interactorId) =>
+        Send<RoomCreated>(Post("/rooms", new
+        {
+            topic,
+            channel = "chat",
+            participants = new object[]
+            {
+                new { kind = "user", id = interactorId },
+                new { kind = "profile", id = profileId },
+            },
+        }));
+
+    public async Task RoomMessage(string roomId, string senderId, string message)
+    {
+        var req = Post($"/rooms/{roomId}/messages", new { sender_id = senderId, message });
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public async Task RoomAdvance(string roomId)
+    {
+        var req = Post($"/rooms/{roomId}/advance", new { });
+        var res = await _http.SendAsync(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public Task<RoomMsg[]> RoomTranscript(string roomId) =>
+        Send<RoomMsg[]>(new HttpRequestMessage(HttpMethod.Get, $"/rooms/{roomId}/messages"));
 
     // -- Connect: social platforms & the connected-apps catalog --
 

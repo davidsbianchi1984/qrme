@@ -13,7 +13,10 @@ idiomatic codebase (native per platform), all talking to the same
 Each target ships the same screens, exercising the real API end to end:
 
 **Create Profile** → `POST /profiles` · **Overview** → `GET /profiles/{id}` ·
-**Chat** → `POST /interactors` + `POST /profiles/{id}/chat` ·
+**Chat** → `POST /interactors` + `POST /profiles/{id}/chat`, plus **Stranger**
+(anonymous friendly matchmaking: `/connections/join`, messages, end) and
+**Rooms** (multiparty chat with moderated profile turns: `/rooms`, messages,
+advance) ·
 **Study** → `/profiles/{id}/excursions` + `/excursions/{cid}/learn` ·
 **Compose** → `POST /profiles/{id}/compose` · **Posts** → `GET /profiles/{id}/posts` ·
 **Connect** — social platforms (`/profiles/{id}/social` + collect / publish /
@@ -53,9 +56,12 @@ On a physical phone, point the client at your machine's LAN IP instead.
 ## Scope
 
 These scaffolds cover the core owner-facing loop end to end: create a profile,
-chat with it, compose and study, connect it to social platforms and apps,
-embody it in a robot, and govern it (model choice, objections). The remaining
-surfaces (relationships, community, licensing, summons) have backend endpoints
-under [`qrme/routers/`](../qrme/routers/) to grow into further native screens.
+chat with it (directly, with strangers, or in rooms), compose and study,
+connect it to social platforms and apps, embody it in a robot, and govern it
+(model choice, objections). The remaining surfaces (marketplace listings,
+licensing, summon handles/beacons) have backend endpoints under
+[`qrme/routers/`](../qrme/routers/) to grow into further native screens. The
+stranger tier is friendly-only in the apps — the rated tier requires age
+verification the apps don't perform.
 
 These native targets are additive and do not change the backend.

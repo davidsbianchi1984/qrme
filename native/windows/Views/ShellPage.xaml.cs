@@ -18,6 +18,7 @@ public sealed partial class ShellPage : Page
         {
             case "overview": ContentFrame.Navigate(typeof(OverviewPage)); break;
             case "chat": ContentFrame.Navigate(typeof(ChatPage)); break;
+            case "community": ContentFrame.Navigate(typeof(CommunityPage)); break;
             case "compose": ContentFrame.Navigate(typeof(ComposePage)); break;
             case "posts": ContentFrame.Navigate(typeof(PostsPage)); break;
             case "study": ContentFrame.Navigate(typeof(StudyPage)); break;
