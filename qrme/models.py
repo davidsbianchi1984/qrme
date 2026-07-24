@@ -399,6 +399,18 @@ class AppInvoke(BaseModel):
     input: str | None = None
 
 
+class GameSessionCreate(BaseModel):
+    platform: str                      # a catalog gaming app key
+    game: str                          # free-text title
+    role: str = "companion"            # companion | teammate | practice_partner
+    mode: str = "online_multiplayer"   # online_multiplayer | co_op | practice
+
+
+class GameCallout(BaseModel):
+    situation: str                     # what's happening in the match
+    minor_present: bool = False        # a minor in the lobby forces strict
+
+
 class ExcursionStart(BaseModel):
     topic: str
     question: str

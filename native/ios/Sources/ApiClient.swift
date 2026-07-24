@@ -268,6 +268,23 @@ struct PackInstalled: Decodable {
     var count: Int { installed_items ?? installed_tasks?.count ?? 0 }
 }
 
+struct GameSession: Decodable {
+    let id: String
+    let platform: String
+    let platform_label: String?
+    let game: String
+    let role: String
+    let status: String
+    let callouts: Int?
+}
+
+struct GameCalloutResult: Decodable {
+    let status: String                 // "spoken" | "held"
+    let line: String?
+    let flag_reason: String?
+    let role: String
+}
+
 struct Listing: Decodable {
     let id: String
     let kind: String
@@ -653,6 +670,32 @@ actor ApiClient {
         struct Ok: Decodable { let removed_tasks: Int }
         let _: Ok = try await request("/robots/\(robotId)/packs/\(packId)",
                                       method: "DELETE", token: token)
+    }
+
+    // MARK: gaming — a profile plays alongside real players
+
+    func gameSessions(pid: String, token: String) async throws -> [GameSession] {
+        try await request("/profiles/\(pid)/gaming/sessions", token: token)
+    }
+
+    func startGameSession(pid: String, token: String, platform: String,
+                          game: String, role: String) async throws -> GameSession {
+        try await request("/profiles/\(pid)/gaming/sessions", method: "POST",
+                          body: ["platform": platform, "game": game,
+                                 "role": role], token: token)
+    }
+
+    func gameCallout(sid: String, token: String, situation: String,
+                     minorPresent: Bool) async throws -> GameCalloutResult {
+        try await request("/gaming/sessions/\(sid)/callout", method: "POST",
+                          body: ["situation": situation,
+                                 "minor_present": minorPresent], token: token)
+    }
+
+    func endGameSession(sid: String, token: String) async throws {
+        struct Ok: Decodable { let status: String }
+        let _: Ok = try await request("/gaming/sessions/\(sid)/end",
+                                      method: "POST", token: token)
     }
 
     func listings(tag: String?) async throws -> [Listing] {
