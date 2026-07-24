@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.qrme.studio.ui.Qrme
 import app.qrme.studio.ui.QrmeTheme
-import app.qrme.studio.ui.ChatScreen
+import app.qrme.studio.ui.ChatHubScreen
 import app.qrme.studio.ui.ConnectScreen
 import app.qrme.studio.ui.OverviewScreen
 import app.qrme.studio.ui.StudioScreen
@@ -88,7 +88,7 @@ private fun HomeShell(vm: StudioViewModel) {
         Box(Modifier.fillMaxSize().background(Qrme.Bg).padding(pad)) {
             when (tab) {
                 0 -> OverviewScreen(vm)
-                1 -> ChatScreen(vm)
+                1 -> ChatHubScreen(vm)
                 2 -> StudioScreen(vm)
                 3 -> ConnectScreen(vm)
                 else -> SettingsScreen(vm)
