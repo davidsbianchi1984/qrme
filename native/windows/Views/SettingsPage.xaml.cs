@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -30,6 +31,13 @@ public sealed partial class SettingsPage : Page
     private ProviderInfo[] _providers = Array.Empty<ProviderInfo>();
     private bool _loading;   // suppress SelectionChanged while populating
 
+    private static readonly string[] RelationshipTypes =
+        { "family", "grandchild", "friend", "romantic_partner",
+          "professional", "fan", "stranger" };
+
+    private readonly System.Collections.Generic.Dictionary<string, Slider>
+        _dialSliders = new();
+
     public SettingsPage()
     {
         InitializeComponent();
@@ -38,6 +46,9 @@ public sealed partial class SettingsPage : Page
         FeedbackCategory.SelectedIndex = 0;
         FeedbackRating.ItemsSource = new[] { "—", "1", "2", "3", "4", "5" };
         FeedbackRating.SelectedIndex = 0;
+        RelTypeBox.ItemsSource = RelationshipTypes
+            .Select(t => t.Replace('_', ' ')).ToList();
+        RelTypeBox.SelectedIndex = 2;   // friend
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
@@ -83,6 +94,99 @@ public sealed partial class SettingsPage : Page
         catch (Exception ex) { ShowError(ex.Message); }
 
         await LoadFeedback();
+        await LoadSteering();
+    }
+
+    private async System.Threading.Tasks.Task LoadSteering()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var hub = await ApiClient.Shared.SteeringHub(s.Pid!, s.Token!);
+            SteeringDials.Children.Clear();
+            _dialSliders.Clear();
+            string? lastGroup = null;
+            var groupLabels = new System.Collections.Generic.Dictionary<string, string>
+            {
+                ["system"] = "System", ["behavior"] = "Behavior",
+                ["intimacy"] = "Intimacy (18+)",
+            };
+            foreach (var dial in hub.Dials)
+            {
+                if (dial.Group != lastGroup)
+                {
+                    SteeringDials.Children.Add(new TextBlock
+                    {
+                        Text = groupLabels.GetValueOrDefault(dial.Group, dial.Group),
+                        FontSize = 12,
+                        FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                        Foreground = (Microsoft.UI.Xaml.Media.Brush)
+                            Application.Current.Resources["QrmeBrandABrush"],
+                    });
+                    lastGroup = dial.Group;
+                }
+                var slider = new Slider
+                {
+                    Header = $"{dial.Label}  ({dial.Low} ↔ {dial.High})",
+                    Minimum = dial.Min,
+                    Maximum = dial.Max,
+                    Value = hub.Values.GetValueOrDefault(dial.Name, 50),
+                };
+                _dialSliders[dial.Name] = slider;
+                SteeringDials.Children.Add(slider);
+            }
+            AppearanceBox.Text = hub.Appearance.Description ?? "";
+            BaseAgeBox.Text = hub.Age.BaseAge?.ToString() ?? "";
+            AgingToggle.IsOn = hub.Age.AgingEnabled;
+            if (hub.Age.EffectiveAge is { } eff)
+            {
+                EffectiveAgeText.Text = $"Effective age now: {eff}";
+                EffectiveAgeText.Visibility = Visibility.Visible;
+            }
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnApplySteering(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            var values = _dialSliders.ToDictionary(kv => kv.Key,
+                                                   kv => (int)kv.Value.Value);
+            int? baseAge = int.TryParse(BaseAgeBox.Text.Trim(), out var n) ? n : null;
+            var hub = await ApiClient.Shared.SetSteeringHub(
+                s.Pid!, s.Token!, values, baseAge, AgingToggle.IsOn,
+                AppearanceBox.Text.Trim() is { Length: > 0 } a ? a : null);
+            if (hub.Age.EffectiveAge is { } eff)
+            {
+                EffectiveAgeText.Text = $"Effective age now: {eff}";
+                EffectiveAgeText.Visibility = Visibility.Visible;
+            }
+            SteeringStatus.Text = "Steering applied — it rides on every reply.";
+            SteeringStatus.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnSaveRelationship(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            if (s.InteractorId is null)
+            {
+                var created = await ApiClient.Shared.CreateInteractor("You");
+                s.RememberInteractor(created.Id);
+            }
+            var type = RelationshipTypes[Math.Max(0, RelTypeBox.SelectedIndex)];
+            var r = await ApiClient.Shared.SetRelationship(
+                s.Pid!, s.Token!, s.InteractorId!, type,
+                RelNicknameBox.Text.Trim(), RelToneBox.Text.Trim());
+            RelStatus.Text = $"Saved — it now treats you as {r.RelationshipType.Replace('_', ' ')}.";
+            RelStatus.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
     }
 
     private async System.Threading.Tasks.Task LoadFeedback()

@@ -8,8 +8,11 @@ final class AppState: ObservableObject {
     @Published var token: String?
     @Published var displayName: String = ""
     // The device owner's interactor identity for the Chat screen, created
-    // lazily on first send and reused across launches.
+    // lazily on first send and reused across launches. `interactorVerified`
+    // is true when the identity was minted with an 18+ birthdate — the key
+    // that opens the rated stranger tier.
     @Published var interactorId: String?
+    @Published var interactorVerified = false
 
     private let d = UserDefaults.standard
 
@@ -18,11 +21,14 @@ final class AppState: ObservableObject {
         token = d.string(forKey: "qrme.token")
         displayName = d.string(forKey: "qrme.name") ?? ""
         interactorId = d.string(forKey: "qrme.interactor")
+        interactorVerified = d.bool(forKey: "qrme.interactor.adult")
     }
 
-    func rememberInteractor(_ id: String) {
+    func rememberInteractor(_ id: String, adult: Bool = false) {
         interactorId = id
+        interactorVerified = adult
         d.set(id, forKey: "qrme.interactor")
+        d.set(adult, forKey: "qrme.interactor.adult")
     }
 
     var isSignedIn: Bool { pid != nil && token != nil }
@@ -36,8 +42,8 @@ final class AppState: ObservableObject {
 
     func signOut() {
         pid = nil; token = nil; displayName = ""
-        interactorId = nil
+        interactorId = nil; interactorVerified = false
         ["qrme.pid", "qrme.token", "qrme.name",
-         "qrme.interactor"].forEach { d.removeObject(forKey: $0) }
+         "qrme.interactor", "qrme.interactor.adult"].forEach { d.removeObject(forKey: $0) }
     }
 }

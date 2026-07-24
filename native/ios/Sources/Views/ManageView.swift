@@ -4,7 +4,7 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License" }
+    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn" }
     @State private var tab: Tab = .general
 
     var body: some View {
@@ -22,7 +22,112 @@ struct ManageView: View {
             case .packs: ScrollView { PacksSection().padding(20) }
             case .gaming: GamingSection()
             case .license: LicenseSection()
+            case .earnings: EarningsSection()
             }
+        }
+    }
+}
+
+// MARK: Earnings — the creator's statement over the ledger
+
+private struct EarningsSection: View {
+    @EnvironmentObject var state: AppState
+    @State private var statement: EarningsStatement?
+    @State private var receipt: PayoutReceipt?
+    @State private var error: String?
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Earnings").font(.headline).foregroundStyle(Theme.txt)
+                    Text("Everything this creator earns — pack sales, license fees, and verified venue-placement views — written to the ledger at transaction time.")
+                        .font(.caption).foregroundStyle(Theme.t2)
+                    if let s = statement {
+                        HStack(spacing: 12) {
+                            stat("Accrued", s.totals.accrued, s.currency, Theme.green)
+                            stat("Paid", s.totals.paid, s.currency, Theme.t2)
+                            stat("Lifetime", s.totals.lifetime, s.currency, Theme.brandA)
+                        }
+                        if !s.totals.by_kind.isEmpty {
+                            Text(s.totals.by_kind.sorted { $0.key < $1.key }
+                                .map { "\($0.key.replacingOccurrences(of: "_", with: " ")): \(money($0.value, s.currency))" }
+                                .joined(separator: " · "))
+                                .font(.caption2).foregroundStyle(Theme.t3)
+                        }
+                        Button("Request payout") { payout() }
+                            .font(.caption.bold()).foregroundStyle(.white)
+                            .padding(.horizontal, 12).padding(.vertical, 9)
+                            .background(Theme.brandA).clipShape(Capsule())
+                            .disabled(s.totals.accrued <= 0)
+                        if let receipt {
+                            Text("Payout \(receipt.payout_id): \(money(receipt.total, s.currency)) across \(receipt.entries) entries (simulated transfer).")
+                                .font(.caption).foregroundStyle(Theme.green)
+                        }
+                    } else {
+                        ProgressView().tint(Theme.brandA)
+                    }
+                }.card()
+
+                if let s = statement, !s.entries.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Ledger").font(.headline).foregroundStyle(Theme.txt)
+                        ForEach(s.entries.prefix(20)) { e in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(e.kind.replacingOccurrences(of: "_", with: " "))
+                                        .font(.caption.bold()).foregroundStyle(Theme.txt)
+                                    if let memo = e.memo {
+                                        Text(memo).font(.caption2)
+                                            .foregroundStyle(Theme.t3).lineLimit(1)
+                                    }
+                                }
+                                Spacer()
+                                VStack(alignment: .trailing, spacing: 1) {
+                                    Text(money(e.amount, s.currency))
+                                        .font(.caption.bold()).monospacedDigit()
+                                        .foregroundStyle(e.status == "paid" ? Theme.t2 : Theme.green)
+                                    Text(e.status).font(.caption2)
+                                        .foregroundStyle(Theme.t3)
+                                }
+                            }
+                            .padding(.vertical, 3)
+                        }
+                    }.card()
+                }
+                if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
+            }.padding(20)
+        }
+        .task { await load() }
+    }
+
+    private func stat(_ label: String, _ value: Double, _ currency: String,
+                      _ tint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(money(value, currency)).font(.subheadline.bold())
+                .foregroundStyle(tint).monospacedDigit()
+            Text(label).font(.caption2).foregroundStyle(Theme.t2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func money(_ v: Double, _ c: String) -> String {
+        "\(c == "USD" ? "$" : c + " ")" + String(format: "%.2f", v)
+    }
+
+    private func load() async {
+        guard let pid = state.pid, let token = state.token else { return }
+        statement = try? await ApiClient.shared.earnings(id: pid, token: token)
+    }
+
+    private func payout() {
+        guard let pid = state.pid, let token = state.token else { return }
+        error = nil
+        Task {
+            do {
+                receipt = try await ApiClient.shared.requestPayout(id: pid, token: token)
+                await load()
+            } catch { self.error = error.localizedDescription }
         }
     }
 }

@@ -74,6 +74,47 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
+                    <TextBlock Text="Steering" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="Shape how the profile comes across — tone, pace, manner, look, age. Steering, not piloting: it acts on its own within this shape."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <StackPanel x:Name="SteeringDials" Spacing="6" />
+                    <TextBox x:Name="AppearanceBox" Header="Appearance"
+                             PlaceholderText="How they look and present…" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBox x:Name="BaseAgeBox" Header="Base age" Width="90" />
+                        <ToggleSwitch x:Name="AgingToggle" Header="Ages over time"
+                                      OnContent="On" OffContent="Off" />
+                    </StackPanel>
+                    <TextBlock x:Name="EffectiveAgeText" Foreground="{StaticResource QrmeT3Brush}"
+                               FontSize="11" Visibility="Collapsed" />
+                    <Button Content="Apply steering" Click="OnApplySteering"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                    <TextBlock x:Name="SteeringStatus" Foreground="{StaticResource QrmeGreenBrush}"
+                               FontSize="12" TextWrapping="Wrap" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Your relationship" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="How the profile relates to you in chat — its framing, your nickname, the tone it takes."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <ComboBox x:Name="RelTypeBox" Header="Relationship" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="RelNicknameBox" PlaceholderText="Nickname it calls you (optional)" />
+                    <TextBox x:Name="RelToneBox" PlaceholderText="Tone (e.g. gentle, playful) — optional" />
+                    <Button Content="Save relationship" Click="OnSaveRelationship"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                    <TextBlock x:Name="RelStatus" Foreground="{StaticResource QrmeGreenBrush}"
+                               FontSize="12" TextWrapping="Wrap" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
                     <TextBlock Text="Help us improve" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock Text="Tell us how to make this better — an idea, a rough edge, a bug, or what you love. It goes straight to the team."

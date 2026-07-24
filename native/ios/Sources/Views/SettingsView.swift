@@ -122,6 +122,10 @@ struct SettingsView: View {
                     }
                 }.card()
 
+                SteeringCard()
+
+                RelationshipCard()
+
                 FeedbackCard()
 
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }

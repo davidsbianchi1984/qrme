@@ -77,6 +77,67 @@ struct Objection: Decodable {
 
 struct InteractorCreated: Decodable { let id: String }
 
+struct SteeringDial: Decodable, Identifiable {
+    let name: String
+    let group: String        // system | behavior | intimacy
+    let label: String
+    let low: String
+    let high: String
+    let min: Int
+    let max: Int
+    var id: String { name }
+}
+
+struct SteeringAgeBlock: Decodable {
+    let base_age: Int?
+    let aging_enabled: Bool
+    let effective_age: Int?
+}
+
+struct SteeringAppearance: Decodable { let description: String? }
+
+struct SteeringHubState: Decodable {
+    let adult_mode: Bool
+    let dials: [SteeringDial]
+    let values: [String: Int]
+    let age: SteeringAgeBlock
+    let appearance: SteeringAppearance
+}
+
+struct LedgerEntry: Decodable, Identifiable {
+    let id: String
+    let kind: String         // pack_sale | license_fee | placement | …
+    let memo: String?
+    let amount: Double
+    let status: String       // accrued | paid
+    let created_at: String?
+}
+
+struct EarningsTotals: Decodable {
+    let accrued: Double
+    let paid: Double
+    let lifetime: Double
+    let by_kind: [String: Double]
+}
+
+struct EarningsStatement: Decodable {
+    let entries: [LedgerEntry]
+    let totals: EarningsTotals
+    let currency: String
+}
+
+struct PayoutReceipt: Decodable {
+    let payout_id: String
+    let total: Double
+    let entries: Int
+}
+
+struct RelationshipState: Decodable {
+    let relationship_type: String
+    let nickname: String?
+    let tone: String?
+}
+
 struct ChatMessage: Decodable {
     let id: String
     let role: String
@@ -555,9 +616,55 @@ actor ApiClient {
 
     // MARK: Chat (the core loop: an interactor talks with the profile)
 
-    func createInteractor(name: String) async throws -> InteractorCreated {
-        try await request("/interactors", method: "POST",
-                          body: ["display_name": name])
+    func createInteractor(name: String,
+                          birthdate: String? = nil) async throws -> InteractorCreated {
+        var body: [String: Any] = ["display_name": name]
+        if let birthdate, !birthdate.isEmpty { body["birthdate"] = birthdate }
+        return try await request("/interactors", method: "POST", body: body)
+    }
+
+    // MARK: Steering — the owner shapes how the profile comes across
+
+    func steeringHub(id: String, token: String) async throws -> SteeringHubState {
+        try await request("/profiles/\(id)/steering/hub", token: token)
+    }
+
+    func setSteeringHub(id: String, token: String,
+                        values: [String: Int]? = nil,
+                        baseAge: Int? = nil, agingEnabled: Bool? = nil,
+                        appearance: String? = nil) async throws -> SteeringHubState {
+        var body: [String: Any] = [:]
+        if let values { body["values"] = values }
+        var age: [String: Any] = [:]
+        if let baseAge { age["base_age"] = baseAge }
+        if let agingEnabled { age["aging_enabled"] = agingEnabled }
+        if !age.isEmpty { body["age"] = age }
+        if let appearance { body["appearance"] = ["description": appearance] }
+        return try await request("/profiles/\(id)/steering/hub", method: "PUT",
+                                 body: body, token: token)
+    }
+
+    // MARK: Earnings — the creator's statement over the ledger
+
+    func earnings(id: String, token: String) async throws -> EarningsStatement {
+        try await request("/profiles/\(id)/earnings", token: token)
+    }
+
+    func requestPayout(id: String, token: String) async throws -> PayoutReceipt {
+        try await request("/profiles/\(id)/earnings/payout", method: "POST",
+                          token: token)
+    }
+
+    // MARK: Relationship — how the profile relates to you
+
+    func setRelationship(id: String, token: String, interactorId: String,
+                         type: String, nickname: String?,
+                         tone: String?) async throws -> RelationshipState {
+        var body: [String: Any] = ["relationship_type": type]
+        if let nickname, !nickname.isEmpty { body["nickname"] = nickname }
+        if let tone, !tone.isEmpty { body["tone"] = tone }
+        return try await request("/profiles/\(id)/relationships/\(interactorId)",
+                                 method: "PUT", body: body, token: token)
     }
 
     func chat(id: String, token: String, interactorId: String,
@@ -569,8 +676,9 @@ actor ApiClient {
 
     // MARK: Community — stranger connections & multiparty rooms
 
-    func joinQueue(interactorId: String, alias: String?) async throws -> ConnJoin {
-        var body: [String: Any] = ["interactor_id": interactorId, "tier": "friendly"]
+    func joinQueue(interactorId: String, alias: String?,
+                   tier: String = "friendly") async throws -> ConnJoin {
+        var body: [String: Any] = ["interactor_id": interactorId, "tier": tier]
         if let alias, !alias.isEmpty { body["alias"] = alias }
         return try await request("/connections/join", method: "POST", body: body)
     }

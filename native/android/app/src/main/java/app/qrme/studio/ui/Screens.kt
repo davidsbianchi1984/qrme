@@ -22,8 +22,11 @@ import app.qrme.studio.AppConn
 import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
+import app.qrme.studio.EarningsStatement
 import app.qrme.studio.Excursion
 import app.qrme.studio.FeedbackState
+import app.qrme.studio.PayoutReceipt
+import app.qrme.studio.SteeringHubState
 import app.qrme.studio.GameCalloutResult
 import app.qrme.studio.GameSession
 import app.qrme.studio.InstalledPack
@@ -517,9 +520,157 @@ fun SettingsScreen(vm: StudioViewModel) {
             }
         }
 
+        SteeringPanel(vm)
+
+        RelationshipPanel(vm)
+
         FeedbackPanel(vm)
 
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+// ---- Steering: the owner shapes how the profile comes across ----
+
+@Composable
+private fun SteeringPanel(vm: StudioViewModel) {
+    var hub by remember { mutableStateOf<SteeringHubState?>(null) }
+    var values by remember { mutableStateOf<Map<String, Float>>(emptyMap()) }
+    var appearance by remember { mutableStateOf("") }
+    var baseAge by remember { mutableStateOf("") }
+    var agingEnabled by remember { mutableStateOf(false) }
+    var status by remember { mutableStateOf<String?>(null) }
+    val groupLabels = mapOf("system" to "System", "behavior" to "Behavior",
+        "intimacy" to "Intimacy (18+)")
+
+    LaunchedEffect(Unit) {
+        vm.call({ ApiClient.steeringHub(vm.pid!!, vm.token!!) }) { r ->
+            r.getOrNull()?.let { h ->
+                hub = h
+                values = h.values.mapValues { it.value.toFloat() }
+                appearance = h.appearance ?: ""
+                baseAge = h.baseAge?.toString() ?: ""
+                agingEnabled = h.agingEnabled
+            }
+        }
+    }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Steering", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text("Shape how the profile comes across — tone, pace, manner, look, age. " +
+             "Steering, not piloting: it acts on its own within this shape.",
+            color = Qrme.T2, fontSize = 12.sp)
+        hub?.let { h ->
+            listOf("system", "behavior", "intimacy").forEach { group ->
+                val dials = h.dials.filter { it.group == group }
+                if (dials.isNotEmpty()) {
+                    Text(groupLabels[group] ?: group, color = Qrme.BrandA,
+                        fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    dials.forEach { d ->
+                        Column {
+                            Row(Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(d.label, color = Qrme.Txt, fontSize = 13.sp)
+                                Text("${(values[d.name] ?: 50f).toInt()}",
+                                    color = Qrme.BrandA, fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                            Slider(
+                                value = values[d.name] ?: 50f,
+                                onValueChange = { values = values + (d.name to it) },
+                                valueRange = d.min.toFloat()..d.max.toFloat(),
+                                colors = SliderDefaults.colors(
+                                    thumbColor = Qrme.BrandA,
+                                    activeTrackColor = Qrme.BrandA),
+                            )
+                            Row(Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(d.low, color = Qrme.T3, fontSize = 10.sp)
+                                Text(d.high, color = Qrme.T3, fontSize = 10.sp)
+                            }
+                        }
+                    }
+                }
+            }
+            OutlinedTextField(value = appearance, onValueChange = { appearance = it },
+                label = { Text("Appearance — how they look and present") },
+                modifier = Modifier.fillMaxWidth())
+            Row(verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(value = baseAge, onValueChange = { baseAge = it },
+                    label = { Text("Base age") }, modifier = Modifier.width(110.dp))
+                Text("Ages over time", color = Qrme.Txt, fontSize = 13.sp)
+                Switch(checked = agingEnabled, onCheckedChange = { agingEnabled = it },
+                    colors = SwitchDefaults.colors(checkedTrackColor = Qrme.Green))
+            }
+            h.effectiveAge?.let {
+                Text("Effective age now: $it", color = Qrme.T3, fontSize = 11.sp)
+            }
+            SmallAction("Apply steering") {
+                status = null
+                vm.call({
+                    ApiClient.setSteeringHub(vm.pid!!, vm.token!!,
+                        values.mapValues { it.value.toInt() },
+                        baseAge.toIntOrNull(), agingEnabled,
+                        appearance.ifBlank { null })
+                }) { r ->
+                    r.onSuccess { hub = it
+                        status = "Steering applied — it rides on every reply." }
+                     .onFailure { status = it.message }
+                }
+            }
+            status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+        } ?: CircularProgressIndicator(color = Qrme.BrandA, modifier = Modifier.size(22.dp))
+    }
+}
+
+// ---- Relationship: how the profile relates to you ----
+
+@Composable
+private fun RelationshipPanel(vm: StudioViewModel) {
+    val types = listOf("family", "grandchild", "friend", "romantic_partner",
+        "professional", "fan", "stranger")
+    var type by remember { mutableStateOf("friend") }
+    var nickname by remember { mutableStateOf("") }
+    var tone by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf<String?>(null) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Your relationship", color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text("How the profile relates to you in chat — its framing, your nickname, the tone it takes.",
+            color = Qrme.T2, fontSize = 12.sp)
+        Row(Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            types.forEach { t ->
+                val on = type == t
+                Text(t.replace('_', ' '), color = if (on) Color.White else Qrme.Txt,
+                    fontSize = 11.sp,
+                    modifier = Modifier.clip(RoundedCornerShape(50))
+                        .background(if (on) Qrme.BrandA else Qrme.ScrBot)
+                        .clickable { type = t }
+                        .padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+        }
+        OutlinedTextField(value = nickname, onValueChange = { nickname = it },
+            label = { Text("Nickname it calls you (optional)") },
+            modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = tone, onValueChange = { tone = it },
+            label = { Text("Tone (e.g. gentle, playful) — optional") },
+            modifier = Modifier.fillMaxWidth())
+        SmallAction("Save relationship") {
+            status = null
+            vm.call({
+                val interactor = vm.interactorId
+                    ?: ApiClient.createInteractor("You").also { vm.rememberInteractor(it) }
+                ApiClient.setRelationship(vm.pid!!, vm.token!!, interactor,
+                    type, nickname, tone)
+            }) { r ->
+                r.onSuccess { status = "Saved — it now treats you as ${it.replace('_', ' ')}." }
+                 .onFailure { status = it.message }
+            }
+        }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
     }
 }
 
@@ -984,6 +1135,8 @@ private fun withInteractor(vm: StudioViewModel, onError: (String) -> Unit,
 @Composable
 private fun StrangerPanel(vm: StudioViewModel) {
     var alias by remember { mutableStateOf("") }
+    var tier by remember { mutableStateOf("friendly") }
+    var birthdate by remember { mutableStateOf("") }
     var waiting by remember { mutableStateOf(false) }
     var connectionId by remember { mutableStateOf<String?>(null) }
     var matchedWith by remember { mutableStateOf<String?>(null) }
@@ -998,20 +1151,32 @@ private fun StrangerPanel(vm: StudioViewModel) {
         }
     }
 
+    fun joinAs(me: String, minted: Boolean) {
+        vm.call({ ApiClient.joinQueue(me, alias, tier) }) { r ->
+            r.onSuccess {
+                // The server admitted this identity to the queue — a rated
+                // admit proves the 18+ verification stands.
+                if (minted) vm.rememberInteractor(me, adult = true)
+                if (it.status == "matched" && it.connectionId != null) {
+                    connectionId = it.connectionId
+                    matchedWith = it.matchedWith
+                    waiting = false
+                    refresh(it.connectionId)
+                } else waiting = true
+            }.onFailure { error = it.message }
+        }
+    }
+
     fun join() {
         error = null
-        withInteractor(vm, { error = it }) { me ->
-            vm.call({ ApiClient.joinQueue(me, alias) }) { r ->
-                r.onSuccess {
-                    if (it.status == "matched" && it.connectionId != null) {
-                        connectionId = it.connectionId
-                        matchedWith = it.matchedWith
-                        waiting = false
-                        refresh(it.connectionId)
-                    } else waiting = true
-                }.onFailure { error = it.message }
+        if (tier == "rated" && !vm.interactorVerified) {
+            // Verify 18+: mint a fresh identity carrying the birthdate —
+            // the age wall checks it server-side.
+            vm.call({ ApiClient.createInteractor("You", birthdate) }) { r ->
+                r.onSuccess { vm.rememberInteractor(it); joinAs(it, minted = true) }
+                    .onFailure { error = it.message }
             }
-        }
+        } else withInteractor(vm, { error = it }) { me -> joinAs(me, minted = false) }
     }
 
     screenScroll {
@@ -1019,10 +1184,27 @@ private fun StrangerPanel(vm: StudioViewModel) {
         if (cid == null) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Meet a stranger", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("Anonymous, friendly matchmaking — they see only your alias, and either side can end it. (The rated tier needs age verification, which this app doesn't do.)",
+                Text("Anonymous matchmaking — they see only your alias, and either side can end it.",
                     color = Qrme.T2, fontSize = 12.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    listOf("friendly" to "Friendly", "rated" to "Rated 18+").forEach { (t, label) ->
+                        val on = tier == t
+                        Text(label, color = if (on) Color.White else Qrme.Txt, fontSize = 12.sp,
+                            modifier = Modifier.clip(RoundedCornerShape(50))
+                                .background(if (on) Qrme.BrandA else Qrme.ScrBot)
+                                .clickable { tier = t }
+                                .padding(horizontal = 12.dp, vertical = 7.dp))
+                    }
+                }
+                if (tier == "rated" && !vm.interactorVerified) {
+                    Text("The rated tier needs a verified 18+ identity. Enter your birthdate " +
+                         "to verify — both sides of a rated match are verified adults.",
+                        color = Qrme.Amber, fontSize = 11.sp)
+                    labeledField("Birthdate", birthdate, "YYYY-MM-DD") { birthdate = it }
+                }
                 labeledField("Alias (optional)", alias, "Stranger") { alias = it }
-                BrandButton(if (waiting) "Waiting for a match — check again" else "Find a match") { join() }
+                BrandButton(if (waiting) "Waiting for a match — check again" else "Find a match",
+                    enabled = tier != "rated" || vm.interactorVerified || birthdate.isNotBlank()) { join() }
             }
         } else {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1167,8 +1349,9 @@ private fun RoomsPanel(vm: StudioViewModel) {
 fun ManageScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
-        TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License").forEachIndexed { i, t ->
+        ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
+            contentColor = Qrme.BrandA, edgePadding = 0.dp) {
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1180,9 +1363,88 @@ fun ManageScreen(vm: StudioViewModel) {
                 2 -> MarketPanel(vm)
                 3 -> PacksPanel(vm)
                 4 -> GamingPanel(vm)
-                else -> LicensePanel(vm)
+                5 -> LicensePanel(vm)
+                else -> EarningsPanel(vm)
             }
         }
+    }
+}
+
+// ---- Earnings: the creator's statement over the ledger ----
+
+@Composable
+private fun EarningsPanel(vm: StudioViewModel) {
+    var statement by remember { mutableStateOf<EarningsStatement?>(null) }
+    var receipt by remember { mutableStateOf<PayoutReceipt?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun money(v: Double, c: String) =
+        (if (c == "USD") "$" else "$c ") + "%.2f".format(v)
+
+    fun reload() {
+        vm.call({ ApiClient.earnings(vm.pid!!, vm.token!!) }) { r ->
+            statement = r.getOrNull()
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Earnings", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Everything this creator earns — pack sales, license fees, and verified " +
+                 "venue-placement views — written to the ledger at transaction time.",
+                color = Qrme.T2, fontSize = 12.sp)
+            statement?.let { s ->
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    listOf(Triple("Accrued", s.accrued, Qrme.Green),
+                           Triple("Paid", s.paid, Qrme.T2),
+                           Triple("Lifetime", s.lifetime, Qrme.BrandA)).forEach { (l, v, c) ->
+                        Column {
+                            Text(money(v, s.currency), color = c, fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold)
+                            Text(l, color = Qrme.T2, fontSize = 10.sp)
+                        }
+                    }
+                }
+                if (s.byKind.isNotEmpty())
+                    Text(s.byKind.entries.sortedBy { it.key }
+                        .joinToString(" · ") { "${it.key.replace('_', ' ')}: ${money(it.value, s.currency)}" },
+                        color = Qrme.T3, fontSize = 10.sp)
+                BrandButton("Request payout", enabled = s.accrued > 0) {
+                    error = null
+                    vm.call({ ApiClient.requestPayout(vm.pid!!, vm.token!!) }) { r ->
+                        r.onSuccess { receipt = it; reload() }
+                         .onFailure { error = it.message }
+                    }
+                }
+                receipt?.let {
+                    Text("Payout ${it.payoutId}: ${money(it.total, s.currency)} across " +
+                         "${it.entries} entries (simulated transfer).",
+                        color = Qrme.Green, fontSize = 12.sp)
+                }
+            } ?: CircularProgressIndicator(color = Qrme.BrandA, modifier = Modifier.size(22.dp))
+        }
+        statement?.takeIf { it.entries.isNotEmpty() }?.let { s ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Ledger", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                s.entries.take(20).forEach { e ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Column(Modifier.weight(1f)) {
+                            Text(e.kind.replace('_', ' '), color = Qrme.Txt, fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold)
+                            e.memo?.let { Text(it, color = Qrme.T3, fontSize = 10.sp, maxLines = 1) }
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(money(e.amount, s.currency),
+                                color = if (e.status == "paid") Qrme.T2 else Qrme.Green,
+                                fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(e.status, color = Qrme.T3, fontSize = 10.sp)
+                        }
+                    }
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
 }
 
