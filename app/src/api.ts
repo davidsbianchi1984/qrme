@@ -1,10 +1,21 @@
 // Thin typed client for the QRME FastAPI backend.
-// Base URL is configurable (Settings); defaults to the local dev server.
-
-const DEFAULT_BASE = "http://127.0.0.1:8000";
+// Base URL is configurable (Settings).
+//
+// Default base: when the studio is served *by* the API (the phone case —
+// http://<machine>:8000/app/), the backend is the origin we came from, so
+// the phone needs no configuration at all. Only the Electron desktop shell
+// (file://) and the Vite dev server fall back to the local backend.
+const LOOPBACK = "http://127.0.0.1:8000";
+function defaultBase(): string {
+  if (typeof window === "undefined") return LOOPBACK;
+  const { protocol, origin, pathname } = window.location;
+  if (protocol !== "http:" && protocol !== "https:") return LOOPBACK;  // file://
+  if (pathname.startsWith("/app")) return origin;   // served by the API itself
+  return LOOPBACK;                                   // vite dev on :5173
+}
 
 export function getBase(): string {
-  return localStorage.getItem("qrme.base") || DEFAULT_BASE;
+  return localStorage.getItem("qrme.base") || defaultBase();
 }
 export function setBase(url: string) {
   localStorage.setItem("qrme.base", url.replace(/\/+$/, ""));
@@ -67,8 +78,16 @@ export interface Interactor { id: string; display_name: string; token: string }
 export interface MemoryEntry { role: string; content: string; at?: string }
 
 // ---- endpoints ----
+export interface PairInfo {
+  console_url: string; api_url: string; console_built: boolean;
+  reachable: boolean; qr_svg: string; how: string[]; note: string;
+}
+
 export const api = {
   health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
+
+  // How to open this studio on a phone: its URL on the local network.
+  pair: () => req<PairInfo>("/pair"),
 
   offlineStatus: () => req<Record<string, unknown>>("/offline/status"),
 

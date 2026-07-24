@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, getBase, setBase } from "../api";
+import { api, getBase, setBase, type PairInfo } from "../api";
 import { useSession } from "../store";
 
 export function Settings() {
@@ -8,9 +8,11 @@ export function Settings() {
   const [offline, setOffline] = useState<Record<string, unknown> | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pair, setPair] = useState<PairInfo | null>(null);
 
   useEffect(() => {
     api.offlineStatus().then(setOffline).catch(() => setOffline(null));
+    api.pair().then(setPair).catch(() => setPair(null));
   }, []);
 
   function save() {
@@ -46,6 +48,19 @@ export function Settings() {
         )}
       </div>
 
+      {pair && (
+        <div className="card">
+          <h3>Open on your phone</h3>
+          <p className="muted small">{pair.note}</p>
+          <div className="pair">
+            <img className="pair-qr" src={getBase() + pair.qr_svg} alt="QR code for the studio URL on this network" />
+            <div>
+              <div className="mono pair-url">{pair.console_url}</div>
+              <ol className="pair-steps">{pair.how.map((s) => <li key={s}>{s}</li>)}</ol>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="card">
         <h3>Session</h3>
         <div className="muted small">Profile: {session.profileId}</div>
