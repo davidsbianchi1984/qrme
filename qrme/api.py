@@ -14,9 +14,9 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 
-from . import offline
+from . import mobile, offline
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
@@ -47,7 +47,29 @@ def create_app(pdi_client: PDIClient | None = None,
         return {"status": "ok",
                 "pdi": app.state.pdi is not None,
                 "cloud": app.state.cloud is not None,
-                "offline": offline.enabled()}
+                "offline": offline.enabled(),
+                "console": mobile.console_dir() is not None}
+
+    # -- run it from your phone ---------------------------------------------
+
+    @app.get("/pair")
+    def pair(request: Request) -> dict:
+        """How to open the studio on a phone: the console's URL on this
+        local network, ready to type or scan. Same Wi-Fi, no app store."""
+        return mobile.pairing(port=request.url.port or 8000)
+
+    @app.get("/pair/qr.svg")
+    def pair_qr(request: Request) -> Response:
+        """The console URL as a QR code — point the phone's camera at it."""
+        import io
+
+        import segno
+        buf = io.BytesIO()
+        url = mobile.pairing(port=request.url.port or 8000)["console_url"]
+        segno.make(url, error="q").save(
+            buf, kind="svg", scale=8, border=2,
+            dark="#0d0a20", light="#ffffff")
+        return Response(content=buf.getvalue(), media_type="image/svg+xml")
 
     # PDI tandem: profile source material is sealed in the encrypted vault
     # when configured (QRME_PDI_URL + QRME_PDI_TOKEN, or an injected client).
@@ -99,6 +121,16 @@ def create_app(pdi_client: PDIClient | None = None,
         app.add_middleware(
             CORSMiddleware, allow_origins=allow, allow_credentials=False,
             allow_methods=["*"], allow_headers=["*"])
+
+    # The studio itself, served from this API so a phone loads the UI and
+    # calls the API on one origin (no CORS, nothing to configure). Mounted
+    # last so it can never shadow an API route; absent until app/ is built.
+    _console = mobile.console_dir()
+    if _console is not None:
+        from fastapi.staticfiles import StaticFiles
+        app.mount("/app", StaticFiles(directory=str(_console), html=True),
+                  name="console")
+
     return app
 
 

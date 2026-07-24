@@ -217,6 +217,38 @@ Set `ANTHROPIC_API_KEY` (or log in with `ant auth login`) for real model
 replies; otherwise the stub provider answers. Override the model with
 `QRME_MODEL`.
 
+## Run it on your phone
+
+The studio is a web app, so a phone on the same Wi-Fi runs it straight from
+this backend — no app store, no second server, nothing to configure on the
+phone.
+
+```bash
+npm --prefix app install && npm --prefix app run build   # build the studio once
+uvicorn qrme.api:app --host 0.0.0.0                      # listen on the network
+curl localhost:8000/pair                                 # what to open on the phone
+```
+
+`GET /pair` answers with the studio's URL on your local network (and
+`GET /pair/qr.svg` is the same URL as a QR code — the Control Center screen
+shows both, so you can scan it off the laptop). Open that URL on the phone,
+then **Add to Home Screen**: it installs as a standalone app with its own
+icon, runs full-screen, and keeps working through a brief drop in
+connectivity.
+
+Why it needs no setup: the API serves the studio at `/app`, so the UI and
+the API share one origin — the studio simply calls the address it was loaded
+from. The phone layout follows: the sidebar becomes a thumb-reachable bottom
+tab bar, inputs stay at 16px so iOS doesn't zoom, and the layout respects
+the notch and home indicator.
+
+The address is local-network only and deliberately not reachable from the
+internet — your profiles and their memories stay on your own network.
+Everything still requires the owner or interactor bearer token; a phone on
+the LAN is exactly as authorized as a laptop on the LAN. If `/pair` reports
+`reachable: false`, it could only find loopback (which on a phone means the
+phone itself): set `QRME_LAN_HOST` to this machine's address and restart.
+
 ## The suite — one origin, one login
 
 QRME, JIM-mini, and PDI stay three independent apps, but `suite/gateway.py`
