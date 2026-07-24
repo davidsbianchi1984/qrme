@@ -310,6 +310,26 @@ class LicenseOffer(BaseModel):
     allow_derivatives: bool = False    # may a buyer derive their own agent
 
 
+class PackItemIn(BaseModel):
+    title: str
+    content: str
+
+
+class PackPublish(BaseModel):
+    industry: str
+    title: str
+    blurb: str | None = None
+    price: float = 0                   # 0 = free download
+    currency: str = "USD"
+    publisher: str = "independent"
+    items: list[PackItemIn] = Field(default_factory=list)
+
+
+class PackInstall(BaseModel):
+    profile_id: str
+    accept_price: bool = False         # explicit consent to a priced pack
+
+
 class SourceAdd(BaseModel):
     kind: SourceKind
     title: str | None = None
