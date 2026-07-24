@@ -50,15 +50,33 @@ public sealed partial class ReachPage : Page
 
     private static readonly string[] Kinds = { "consult", "finetune", "clone" };
 
+    // Quick-browse tags: the wellbeing starters first, then popular areas.
+    private static readonly string[] QuickBrowseTags =
+        { "mental-health", "mood", "relationships",
+          "healthcare", "finance", "fitness", "food" };
+
     public ReachPage() => InitializeComponent();
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         KindBox.ItemsSource = Kinds.ToList();
         KindBox.SelectedIndex = 0;
+        QuickTags.ItemsSource = QuickBrowseTags.Select(tag =>
+        {
+            var chip = new Button { Content = $"#{tag}", Tag = tag, FontSize = 12 };
+            chip.Click += OnQuickTag;
+            return chip;
+        }).ToList();
         await ReloadBeacons();
         await ReloadListings();
         await ReloadLicense();
+    }
+
+    private async void OnQuickTag(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string tag) return;
+        FilterTagBox.Text = tag;
+        await ReloadListings();
     }
 
     // -- Summon --

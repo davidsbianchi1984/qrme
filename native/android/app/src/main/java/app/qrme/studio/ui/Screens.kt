@@ -2,6 +2,7 @@ package app.qrme.studio.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -1209,6 +1210,10 @@ private fun SummonPanel(vm: StudioViewModel) {
     }
 }
 
+// Quick-browse tags: the wellbeing starters first, then popular areas.
+private val QUICK_TAGS = listOf("mental-health", "mood", "relationships",
+    "healthcare", "finance", "fitness", "food")
+
 @Composable
 private fun MarketPanel(vm: StudioViewModel) {
     var title by remember { mutableStateOf("") }
@@ -1244,6 +1249,30 @@ private fun MarketPanel(vm: StudioViewModel) {
         }
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
         status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Wellbeing & quick browse", color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Row(Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                QUICK_TAGS.forEach { tag ->
+                    val selected = filterTag == tag
+                    Text("#$tag",
+                        color = if (selected) Color.White else Qrme.Txt,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(if (selected) Qrme.BrandA else Qrme.ScrBot)
+                            .clickable { filterTag = tag; reload() }
+                            .padding(horizontal = 10.dp, vertical = 6.dp))
+                }
+            }
+            Text("The wellbeing starters — Dr. Lena Whitcomb (anxiety), " +
+                 "Dr. Marcus Adeyemi (mood), Dr. Priya Nair (relationships) — " +
+                 "offer education and support, never a substitute for " +
+                 "professional care. In crisis, call or text 988.",
+                color = Qrme.T3, fontSize = 10.sp)
+        }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             labeledField("Filter by tag", filterTag, "gardening") { filterTag = it }
