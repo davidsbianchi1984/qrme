@@ -1687,12 +1687,12 @@ SCREENS = [
         dict(icon="shieldok", color="green", k="Fair play, enforced", s="within the rules · never cheats"),
         dict(icon="people", color="cyan", k="Companion · teammate · practice", s="PlayStation · Xbox · Switch · Steam · PC"),
     ], button=("Start a session", "brand")),
-    dict(num=66, title="Pilot Controls", sub="Throttle & sliders, live", accent="brand", tab=2, cards=[
+    dict(num=66, title="Dials", sub="Disposition — throttle & sliders", accent="brand", tab=2, cards=[
         dict(icon="sliders", color="brand", k="Pace", s="throttle — unhurried ⟷ eager", metric="85"),
         dict(icon="sliders", color="cyan", k="Autonomy", s="checks first ⟷ acts alone", metric="40"),
         dict(icon="sliders", color="amber", k="Warmth · Humor · Formality", s="behavior sliders, 0–100"),
         dict(icon="lock", color="red", k="Intimacy · 18+ only", s="adult-mode profiles · within boundaries", pill=("18+", "crit")),
-        dict(icon="shieldok", color="green", k="Style & pace only", s="never identity, boundaries, or safety"),
+        dict(icon="shieldok", color="green", k="How it's tuned, not a remote", s="never identity, boundaries, or safety"),
     ], button=("Apply", "brand")),
 ]
 

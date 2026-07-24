@@ -20,7 +20,7 @@ from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, pilot, robotics, workflows
+from .. import db, dials, robotics, workflows
 from ..common import profile_or_404, require_owner
 from .interaction import approve_message, reject_message
 from .robots import RobotCommand, command_robot
@@ -97,8 +97,8 @@ def watch_face(profile_id: str, request: Request) -> dict:
                     "status": profile["status"], "light": profile_light,
                     "pending_approvals": pending,
                     # The wrist's throttle read-out: pace + autonomy at a
-                    # glance, tunable through PUT /profiles/{id}/pilot.
-                    "throttle": {k: pilot.get(profile_id)[k]
+                    # glance, set through PUT /profiles/{id}/dials.
+                    "throttle": {k: dials.get(profile_id)[k]
                                  for k in ("pace", "autonomy")}},
         "agents": agents,
         "robots": robots,

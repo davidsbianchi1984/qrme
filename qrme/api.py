@@ -19,9 +19,9 @@ from fastapi import FastAPI
 from . import offline
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
-from .routers import (apps, assistant, community, connections, earnings,
-                      gaming, governance, intelligence, interaction, licensing,
-                      models, packs, pilot, profiles, research, robots,
+from .routers import (apps, assistant, community, connections, dials,
+                      earnings, gaming, governance, intelligence, interaction,
+                      licensing, models, packs, profiles, research, robots,
                       social, summon, watch)
 
 
@@ -61,7 +61,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(packs.router)
     app.include_router(earnings.router)
     app.include_router(watch.router)
-    app.include_router(pilot.router)
+    app.include_router(dials.router)
     app.include_router(gaming.router)
     app.include_router(models.router)
     app.include_router(robots.router)

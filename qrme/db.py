@@ -459,11 +459,11 @@ CREATE TABLE IF NOT EXISTS game_sessions (
     created_at TEXT NOT NULL
 );
 
--- Pilot controls: the owner's live throttles/sliders for a subject (a
--- profile or a robot). One JSON blob of dial -> 0..100; absent dials read
--- as the 50 default. Shapes style/pace/behavior only — never identity,
--- boundaries, age-gating, or the command allowlist.
-CREATE TABLE IF NOT EXISTS pilot_controls (
+-- Dials: a subject's disposition (a profile or a robot) — throttle/behavior
+-- sliders as JSON of dial -> 0..100; absent dials read as the 50 default.
+-- Part of who the entity is, not a remote control. Shapes style/pace/
+-- behavior only — never identity, boundaries, age-gating, or the allowlist.
+CREATE TABLE IF NOT EXISTS dial_settings (
     subject_id TEXT PRIMARY KEY,       -- profile_id or robot_id
     dials      TEXT NOT NULL DEFAULT '{}',   -- JSON: dial name -> 0..100
     updated_at TEXT NOT NULL
