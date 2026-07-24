@@ -71,7 +71,37 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Help us improve" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="Tell us how to make this better — an idea, a rough edge, a bug, or what you love. It goes straight to the team."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <ComboBox x:Name="FeedbackCategory" Header="Category" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="FeedbackMessage" PlaceholderText="What's on your mind?"
+                             TextWrapping="Wrap" AcceptsReturn="True" Height="80" />
+                    <ComboBox x:Name="FeedbackRating" Header="Rating (optional)" HorizontalAlignment="Stretch" />
+                    <Button x:Name="FeedbackSend" Content="Send feedback" Click="OnSendFeedback"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                    <TextBlock x:Name="FeedbackThanks" Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <TextBlock x:Name="FeedbackTally" Foreground="{StaticResource QrmeT3Brush}" FontSize="11"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <TextBlock x:Name="FeedbackMineHeader" Text="Yours" FontWeight="Bold" FontSize="12"
+                               Foreground="{StaticResource QrmeTxtBrush}" Visibility="Collapsed" />
+                    <ItemsControl x:Name="FeedbackMine">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" Foreground="{StaticResource QrmeT2Brush}"
+                                           FontSize="11" TextWrapping="Wrap" Margin="0,2" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
         </StackPanel>
     </ScrollViewer>

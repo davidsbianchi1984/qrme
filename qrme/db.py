@@ -393,6 +393,20 @@ CREATE TABLE IF NOT EXISTS contribution_log (
 );
 
 -- AI Profile Marketplace: owner-listed profiles discoverable by others.
+-- Product feedback: "help us improve" — anyone using the app can send an
+-- idea, improvement, bug, or praise. The submitter's role/subject is kept
+-- when they're authenticated (so they can see their own), anonymous
+-- otherwise. Never surfaced to other users; only aggregate tallies are.
+CREATE TABLE IF NOT EXISTS feedback (
+    id         TEXT PRIMARY KEY,
+    submitter  TEXT NOT NULL DEFAULT 'anonymous',  -- role:subject or 'anonymous'
+    category   TEXT NOT NULL,          -- idea | improvement | bug | praise | other
+    message    TEXT NOT NULL,
+    rating     INTEGER,                -- optional 1..5 satisfaction
+    status     TEXT NOT NULL DEFAULT 'received',   -- received | reviewed | planned | shipped
+    created_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS marketplace (
     profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
     tags       TEXT NOT NULL DEFAULT '[]',

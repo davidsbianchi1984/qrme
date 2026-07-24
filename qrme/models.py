@@ -399,6 +399,12 @@ class AppInvoke(BaseModel):
     input: str | None = None
 
 
+class FeedbackSubmit(BaseModel):
+    category: str = "idea"             # idea | improvement | bug | praise | other
+    message: str
+    rating: int | None = None         # optional 1..5 satisfaction
+
+
 class GameSessionCreate(BaseModel):
     platform: str                      # a catalog gaming app key
     game: str                          # free-text title
