@@ -1668,6 +1668,13 @@ SCREENS = [
         dict(icon="pen", color="brand", k="consult license · Priya", s="license_fee · $49.00", pill=("PAID", "good")),
         dict(icon="shieldok", color="cyan", k="Written at sale time", s="a record, not a reconstruction"),
     ], button=("Request payout", "brand")),
+    dict(num=65, title="Watch Remote", sub="Your agents, on your wrist", accent="green", tab=3, cards=[
+        dict(icon="clock", color="green", k="ship the notes · working", s="phase: draft", pill=("GREEN", "good")),
+        dict(icon="clock", color="amber", k="research brief · assist", s="awaiting: external confirmation", pill=("ORANGE", "warn")),
+        dict(icon="clock", color="red", k="second job · stopped", s="cancelled from the wrist", pill=("RED", "crit")),
+        dict(icon="person", color="brand", k="Kitchen NEO", s="quick ring: come here · patrol · dock · stop"),
+        dict(icon="shieldok", color="cyan", k="No new powers, only reach", s="same auth · allowlists · moderation"),
+    ], button=("Assist", "brand")),
 ]
 
 
