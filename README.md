@@ -239,6 +239,16 @@ credential of its own):
 
 See [docs/tandem.md](docs/tandem.md) for the full cross-product architecture.
 
+**One-command smoke check** — `python -m suite.smoke` boots all three
+products in-process (no ports), seeds everything (PDI starter vault + JIM
+tenancy, QRME marketplace/packs/registries, JIM specialists + the tandem
+hookup), then drives one live exchange: a JIM financial-stress detection
+routed to the QRME starter specialist `@marcus_bell`, sealed in the PDI
+vault, and its provenance verified back through JIM's custody window.
+Prints a JSON step report; exit 0 = the suite is green. Also runs as
+`tests/test_suite_smoke.py` (skips cleanly when the siblings aren't
+installed).
+
 ## Configuration
 
 | Variable | Default | Purpose |
