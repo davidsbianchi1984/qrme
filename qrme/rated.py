@@ -21,12 +21,18 @@ adult owner themself) and ``fictional`` personas.
 
 from __future__ import annotations
 
+import json
 from datetime import date
 
 from fastapi import Request
 
-from . import auth, db
+from . import auth, db, ledger
 from .common import age_of
+
+# What one verified view arriving through a venue placement earns the
+# creator — simulated ad/affiliate revenue, credited to the ledger at
+# resolution time. Money is simulated platform-wide; the accounting is real.
+PLACEMENT_VIEW_RATE = 0.25
 
 # venue key -> card. ``hosts`` says what the venue is willing to carry:
 # a linked rated profile, a printed/embedded QR beacon, or both.
@@ -91,17 +97,57 @@ def buyer_is_adult(request: Request) -> bool:
 
 
 def record_event(profile_id: str, beacon_id: str | None,
-                 verified: bool) -> None:
+                 verified: bool, pdi=None) -> None:
     """Log one resolution of a rated profile on a discovery surface — the
     raw material for the owner's placement analytics. Only the outcome and
-    the beacon are stored, never the viewer."""
+    the beacon are stored, never the viewer.
+
+    Two side effects ride on the record:
+    - a *verified* view arriving through a venue placement credits the
+      creator's ledger (kind ``placement``) at ``PLACEMENT_VIEW_RATE``;
+    - when a PDI vault is configured, the event is sealed there too, so a
+      creator's placement history is provable through PDI's tamper-evident
+      audit chain — same custody standard as the tandem exchanges.
+    """
     conn = db.connect()
+    event_id = db.new_id("rev")
+    kind = "verified_view" if verified else "wall"
+    at = db.utcnow()
+
+    placement = None
+    if beacon_id:
+        placement = conn.execute(
+            "SELECT id, venue FROM rated_placements WHERE beacon_id=?",
+            (beacon_id,)).fetchone()
+
+    pdi_key = None
+    if pdi is not None:
+        pdi_key = f"qrme/{profile_id}/rated/events/{event_id}"
+        payload = {"event_id": event_id, "profile_id": profile_id,
+                   "beacon_id": beacon_id, "kind": kind, "at": at}
+        if placement is not None:
+            payload["placement_id"] = placement["id"]
+            payload["venue"] = placement["venue"]
+        try:
+            pdi.put(pdi_key, json.dumps(payload))
+        except Exception:
+            pdi_key = None   # vault unreachable — the local row still stands
+
     conn.execute(
-        "INSERT INTO rated_events (id, profile_id, beacon_id, kind, at)"
-        " VALUES (?,?,?,?,?)",
-        (db.new_id("rev"), profile_id, beacon_id,
-         "verified_view" if verified else "wall", db.utcnow()))
+        "INSERT INTO rated_events (id, profile_id, beacon_id, kind, at,"
+        " pdi_key) VALUES (?,?,?,?,?,?)",
+        (event_id, profile_id, beacon_id, kind, at, pdi_key))
     conn.commit()
+
+    if verified and placement is not None:
+        owner = conn.execute("SELECT owner_id FROM profiles WHERE id=?",
+                             (profile_id,)).fetchone()
+        if owner is not None:
+            venue_name = VENUES.get(placement["venue"], {}).get(
+                "name", placement["venue"])
+            ledger.credit(owner["owner_id"], "placement", placement["id"],
+                          PLACEMENT_VIEW_RATE,
+                          memo=f"verified view via {venue_name}")
 
 
 def age_wall_card(profile_id: str) -> dict:

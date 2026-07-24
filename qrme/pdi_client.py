@@ -79,3 +79,14 @@ class PDIClient:
     def delete(self, key: str) -> bool:
         r = self._do("DELETE", f"/records/{key}")
         return r.status_code == 204
+
+    def audit_verify(self) -> bool | None:
+        """Whether PDI's tamper-evident audit chain verifies intact.
+        None when the vault can't answer."""
+        try:
+            r = self._do("GET", "/audit/verify")
+        except Exception:
+            return None
+        if r.status_code >= 300:
+            return None
+        return bool((r.json() or {}).get("intact"))

@@ -172,7 +172,8 @@ def summon(ref: str, request: Request) -> dict:
         profile = profile_or_404(row["profile_id"])
         if profile["adult_mode"]:
             rated.record_event(profile["id"], None,
-                               rated.viewer_is_adult(request))
+                               rated.viewer_is_adult(request),
+                               pdi=request.app.state.pdi)
         return {"type": "handle", "ref": ref,
                 "profile": _gated_card(profile, request)}
 
@@ -205,7 +206,8 @@ def summon(ref: str, request: Request) -> dict:
     profile = profile_or_404(beacon["profile_id"])
     if profile["adult_mode"]:
         rated.record_event(profile["id"], beacon["id"],
-                           rated.viewer_is_adult(request))
+                           rated.viewer_is_adult(request),
+                           pdi=request.app.state.pdi)
     return {"type": "beacon", "ref": ref,
             "label": beacon["label"], "location": beacon["location"],
             "scans": beacon["scans"] + 1,
@@ -338,6 +340,32 @@ def placement_analytics(profile_id: str, request: Request) -> dict:
             "chat_rate": (round(chatters / total_verified, 2)
                           if total_verified else None),
         },
+    }
+
+
+@router.get("/profiles/{profile_id}/placements/custody")
+def placement_custody(profile_id: str, request: Request) -> dict:
+    """Owner-only: the profile's rated-event custody — every event sealed
+    into the PDI vault (key list, newest first) plus whether PDI's
+    tamper-evident audit chain verifies intact. 409 when no vault is
+    configured — custody can't be claimed without one."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    pdi = request.app.state.pdi
+    if pdi is None:
+        raise HTTPException(
+            409, "no PDI vault configured (set QRME_PDI_URL / QRME_PDI_TOKEN)")
+    rows = db.connect().execute(
+        "SELECT id, kind, at, pdi_key FROM rated_events"
+        " WHERE profile_id=? AND pdi_key IS NOT NULL"
+        " ORDER BY at DESC, rowid DESC", (profile_id,)).fetchall()
+    return {
+        "profile_id": profile_id,
+        "records": [dict(r) for r in rows],
+        "count": len(rows),
+        "chain_intact": pdi.audit_verify(),
+        "note": "each sealed event is provable through PDI's audit chain — "
+                "the same custody standard as tandem exchanges",
     }
 
 
