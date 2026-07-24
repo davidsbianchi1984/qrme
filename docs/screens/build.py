@@ -1650,6 +1650,12 @@ SCREENS = [
         dict(icon="shieldok", color="green", k="Origin on every label", s="publisher & storefront URL on the pack"),
         dict(icon="chart", color="amber", k="Same rules once synced", s="buy flow · capability checks · provenance"),
     ], button=("Sync sources", "brand")),
+    dict(num=62, title="Rated Placement", sub="18+ marketing, walled at the source", accent="red", tabs=MARKET, tab=0, locked=True, cards=[
+        dict(icon="building", color="red", k="Adult venues", s="OnlyFans · Fansly · x-rated directories", pill=("18+", "crit")),
+        dict(icon="grid", color="amber", k="QR · @handle · #tag", s="publish the refs where adults are"),
+        dict(icon="lock", color="green", k="The wall travels", s="every scan resolves through the age gate"),
+        dict(icon="shieldok", color="cyan", k="Never another real person", s="self or fictional personas only"),
+    ], button=("Place at a venue", "brand")),
 ]
 
 

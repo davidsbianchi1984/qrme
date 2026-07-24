@@ -19,11 +19,11 @@ import io
 import json
 import os
 
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Request, Response
 
-from .. import db
-from ..common import profile_or_404
-from ..models import BeaconCreate, HandleSet
+from .. import db, rated
+from ..common import profile_or_404, require_owner
+from ..models import BeaconCreate, HandleSet, RatedPlacementCreate
 
 router = APIRouter()
 
@@ -53,9 +53,21 @@ def _card(profile: dict, handle: str | None = None) -> dict:
         "handle": f"@{handle}" if handle else _handle_of(profile["id"]),
         "purpose": profile["purpose"],
         "status": profile["status"],
+        "rated": bool(profile["adult_mode"]),
         "chat": (f"/profiles/{profile['id']}/chat" if reachable else None),
         "note": _STATUS_NOTE.get(profile["status"]),
     }
+
+
+def _gated_card(profile: dict, request: Request,
+                handle: str | None = None) -> dict:
+    """The summon card, behind the age wall when the profile is rated: a
+    viewer without a verified-18+ interactor token gets the wall, never
+    the card. The wall travels with the profile — it holds no matter where
+    the @handle, #tag, or beacon QR was published."""
+    if profile["adult_mode"] and not rated.viewer_is_adult(request):
+        return rated.age_wall_card(profile["id"])
+    return _card(profile, handle)
 
 
 def _handle_of(profile_id: str) -> str | None:
@@ -145,8 +157,11 @@ def beacon_qr(beacon_id: str) -> Response:
 # -- the summon endpoint -----------------------------------------------------
 
 @router.get("/summon")
-def summon(ref: str) -> dict:
-    """Resolve @handle, #tag, or a beacon token to summonable profiles."""
+def summon(ref: str, request: Request) -> dict:
+    """Resolve @handle, #tag, or a beacon token to summonable profiles.
+    Rated (18+) profiles resolve through the age wall: direct refs (@handle,
+    beacon) answer with a wall card, and #tag browse omits them entirely,
+    unless the viewer presents a verified-18+ interactor token."""
     conn = db.connect()
 
     if ref.startswith("@"):
@@ -155,19 +170,26 @@ def summon(ref: str) -> dict:
         if row is None:
             raise HTTPException(404, f"no profile answers to {ref}")
         return {"type": "handle", "ref": ref,
-                "profile": _card(profile_or_404(row["profile_id"]))}
+                "profile": _gated_card(profile_or_404(row["profile_id"]),
+                                       request)}
 
     if ref.startswith("#"):
         tag = ref[1:].lower()
+        adult_viewer = rated.viewer_is_adult(request)
         rows = conn.execute(
             "SELECT m.profile_id, m.tags FROM marketplace m"
             " JOIN profiles p ON p.id = m.profile_id"
             " ORDER BY m.listed_at DESC").fetchall()
-        cards = [
-            _card(profile_or_404(r["profile_id"]))
-            for r in rows
-            if tag in [t.lower() for t in json.loads(r["tags"])]
-        ]
+        cards = []
+        for r in rows:
+            if tag not in [t.lower() for t in json.loads(r["tags"])]:
+                continue
+            profile = profile_or_404(r["profile_id"])
+            # Browse never even hints at rated profiles to a non-verified
+            # viewer — a list is not a direct ref.
+            if profile["adult_mode"] and not adult_viewer:
+                continue
+            cards.append(_card(profile))
         return {"type": "tag", "ref": ref, "profiles": cards}
 
     beacon = conn.execute("SELECT * FROM beacons WHERE id=?", (ref,)).fetchone()
@@ -180,4 +202,89 @@ def summon(ref: str) -> dict:
     return {"type": "beacon", "ref": ref,
             "label": beacon["label"], "location": beacon["location"],
             "scans": beacon["scans"] + 1,
-            "profile": _card(profile_or_404(beacon["profile_id"]))}
+            "profile": _gated_card(profile_or_404(beacon["profile_id"]),
+                                   request)}
+
+
+# -- rated (18+) placement: marketing at adult venues ------------------------
+
+@router.get("/venues")
+def rated_venues() -> list[dict]:
+    """Adult venues willing to host rated profiles or their beacons. The
+    catalog is structural; the age wall always resolves on QRME's side."""
+    return rated.venue_cards()
+
+
+@router.post("/profiles/{profile_id}/placements", status_code=201)
+def place_rated(profile_id: str, body: RatedPlacementCreate,
+                request: Request) -> dict:
+    """Owner-only: market an adult-mode profile at an adult venue. Mints a
+    beacon (printable / embeddable QR) and returns the summon refs to
+    publish there — every one of which resolves through the age wall."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    venue = rated.VENUES.get(body.venue)
+    if venue is None:
+        raise HTTPException(404, "unknown venue")
+    if not profile["adult_mode"]:
+        raise HTTPException(
+            422, "only adult-mode profiles are placed at adult venues")
+    conn = db.connect()
+    beacon_id = db.new_id("bcn")
+    label = body.label or f"{venue['name']} placement"
+    conn.execute(
+        "INSERT INTO beacons (id, profile_id, label, location, scans,"
+        " active, created_at) VALUES (?,?,?,?,0,1,?)",
+        (beacon_id, profile_id, label, venue["name"], db.utcnow()))
+    placement_id = db.new_id("plc")
+    conn.execute(
+        "INSERT INTO rated_placements (id, profile_id, venue, beacon_id,"
+        " label, created_at) VALUES (?,?,?,?,?,?)",
+        (placement_id, profile_id, body.venue, beacon_id, label,
+         db.utcnow()))
+    conn.commit()
+    return {
+        "placement_id": placement_id,
+        "venue": {"key": body.venue, "name": venue["name"],
+                  "url": venue["url"], "hosts": venue["hosts"]},
+        "beacon_id": beacon_id,
+        "summon_url": f"{_public_base()}/summon?ref={beacon_id}",
+        "qr_svg": f"/beacons/{beacon_id}/qr.svg",
+        "handle": _handle_of(profile_id),
+        "rated": True,
+        "note": "publish the QR or refs at the venue; every scan and summon "
+                "resolves through QRME's 18+ age wall",
+    }
+
+
+@router.get("/profiles/{profile_id}/placements")
+def list_placements(profile_id: str, request: Request) -> list[dict]:
+    """Owner view: where this rated profile is marketed, with scan counts."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    rows = db.connect().execute(
+        "SELECT pl.id, pl.venue, pl.beacon_id, pl.label, pl.created_at,"
+        " b.scans, b.active FROM rated_placements pl JOIN beacons b"
+        " ON b.id = pl.beacon_id WHERE pl.profile_id=?"
+        " ORDER BY pl.created_at, pl.rowid", (profile_id,)).fetchall()
+    return [{**dict(r), "active": bool(r["active"]),
+             "venue_name": rated.VENUES.get(r["venue"], {}).get("name",
+                                                               r["venue"])}
+            for r in rows]
+
+
+@router.delete("/placements/{placement_id}")
+def remove_placement(placement_id: str, request: Request) -> dict:
+    """Owner-only: withdraw a placement — its beacon stops summoning."""
+    conn = db.connect()
+    row = conn.execute("SELECT * FROM rated_placements WHERE id=?",
+                       (placement_id,)).fetchone()
+    if row is None:
+        raise HTTPException(404, "placement not found")
+    require_owner(row["profile_id"], request)
+    conn.execute("UPDATE beacons SET active=0 WHERE id=?",
+                 (row["beacon_id"],))
+    conn.execute("DELETE FROM rated_placements WHERE id=?", (placement_id,))
+    conn.commit()
+    return {"placement_id": placement_id, "removed": True,
+            "beacon_id": row["beacon_id"], "beacon_active": False}

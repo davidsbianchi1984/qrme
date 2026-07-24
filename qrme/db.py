@@ -398,6 +398,17 @@ CREATE TABLE IF NOT EXISTS marketplace (
     listed_at  TEXT NOT NULL
 );
 
+-- Rated (18+) placements: where an adult-mode profile is marketed. Each
+-- placement mints a beacon whose scans resolve through the age wall.
+CREATE TABLE IF NOT EXISTS rated_placements (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    venue      TEXT NOT NULL,
+    beacon_id  TEXT NOT NULL REFERENCES beacons(id),
+    label      TEXT,
+    created_at TEXT NOT NULL
+);
+
 -- Knowledge packs: downloadable clusters of curated expertise sold (or given
 -- away) on the marketplace. Installing a pack copies its items into the
 -- profile's source material, so the persona's knowledge base — and its

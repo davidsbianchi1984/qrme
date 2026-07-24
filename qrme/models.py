@@ -310,6 +310,11 @@ class LicenseOffer(BaseModel):
     allow_derivatives: bool = False    # may a buyer derive their own agent
 
 
+class RatedPlacementCreate(BaseModel):
+    venue: str                         # a key from qrme.rated.VENUES
+    label: str | None = None           # e.g. "pinned post", "bio link"
+
+
 class PackItemIn(BaseModel):
     title: str
     content: str

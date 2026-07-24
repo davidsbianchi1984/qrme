@@ -26,6 +26,12 @@ def create_profile(body: ProfileCreate) -> dict:
         raise HTTPException(403, "owners under 18 require parent/guardian consent")
     if body.adult_mode and owner_age < 18:
         raise HTTPException(403, "adult mode requires a verified adult owner")
+    if body.adult_mode and body.kind == "other_person":
+        # Hard line: never a rated persona of another real person — only
+        # the verified adult owner themself, or a fictional character.
+        raise HTTPException(
+            403, "adult mode is never available for a profile of another "
+                 "real person")
     if body.kind == "other_person" and body.consent is None:
         raise HTTPException(
             422, "profiles of another real person require a consent/rights record")

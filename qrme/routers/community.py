@@ -243,10 +243,15 @@ def seed_marketplace() -> dict:
 
 
 @router.get("/marketplace/listings")
-def browse_listings(kind: str | None = None, tag: str | None = None,
+def browse_listings(request: Request, kind: str | None = None,
+                    tag: str | None = None,
                     area: str | None = None) -> list[dict]:
-    rows = db.connect().execute(
+    from .. import rated
+
+    conn = db.connect()
+    rows = conn.execute(
         "SELECT * FROM listings ORDER BY created_at DESC, rowid DESC").fetchall()
+    adult_viewer = rated.viewer_is_adult(request)
     out = []
     for row in rows:
         tags = json.loads(row["tags"])
@@ -256,6 +261,12 @@ def browse_listings(kind: str | None = None, tag: str | None = None,
             continue
         if area and (row["area"] or "").lower() != area.lower():
             continue
+        if row["profile_id"] and not adult_viewer:
+            # Rated profiles never surface in an unverified browse.
+            p = conn.execute("SELECT adult_mode FROM profiles WHERE id=?",
+                             (row["profile_id"],)).fetchone()
+            if p and p["adult_mode"]:
+                continue
         out.append({"id": row["id"], "kind": row["kind"],
                     "title": row["title"], "blurb": row["blurb"],
                     "tags": tags, "area": row["area"],
