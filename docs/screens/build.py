@@ -1620,6 +1620,30 @@ SCREENS = [
         dict(icon="shield", color="amber", k="Command allowlist", s="Per-body limits · say is moderated"),
         dict(icon="list", color="pink", k="Command log", s="Every order audited"),
     ], button=("Bind a robot", "brand")),
+    # ---- knowledge packs & robot task mods ----
+    dict(num=57, title="Knowledge Packs", sub="Downloadable expertise, per industry", accent="amber", tabs=MARKET, tab=0, cards=[
+        dict(icon="db", color="amber", k="Finance Field Pack", s="3 items · QRME Starter Collection", pill=("FREE", "good")),
+        dict(icon="db", color="brand", k="Distributed Systems Pro", s="priced · explicit accept to buy", pill=("$29.99", "warn")),
+        dict(icon="star2", color="green", k="Install → smarter", s="items join the source material"),
+        dict(icon="eye", color="cyan", k="Provenance counts it", s="grounded_in.by_kind: pack"),
+    ], button=("Download Field Pack", "brand")),
+    dict(num=58, title="Robot Task Packs", sub="Task mods for the body it embodies", accent="cyan", tab=3, cards=[
+        dict(icon="gear", color="cyan", k="Household Tasks Pack", s="sort_laundry · water_plants · set_table", pill=("FREE", "good")),
+        dict(icon="shield", color="green", k="Capability-checked install", s="a vacuum is never sold manipulation"),
+        dict(icon="lock", color="amber", k="Allowlist extended, not opened", s="unknown verbs still refused"),
+        dict(icon="chart", color="pink", k="Every task audited", s="procedure carried in the result"),
+    ], button=("Buy Culinary Assistant · 9.99", "brand")),
+    dict(num=59, title="Embodied Agent", sub="The persona knows its body", accent="brand", tab=3, cards=[
+        dict(icon="person", color="brand", k="Same identity in the body", s="never a second persona"),
+        dict(icon="star2", color="cyan", k="Learned modules in the prompt", s="say knows what the body can do"),
+        dict(icon="grid", color="green", k="Skills list", s="GET /robots/{id}/skills"),
+        dict(icon="shieldok", color="amber", k="Revocable", s="uninstall revokes the verbs instantly"),
+    ]),
+    dict(num=60, title="Publish a Pack", sub="Your expertise, on the market", accent="amber", tabs=MARKET, tab=0, cards=[
+        dict(icon="pen", color="amber", k="Bundle knowledge items", s="or task modules with requirements"),
+        dict(icon="chart", color="brand", k="Free or priced", s="POST /packs · listed under #pack"),
+        dict(icon="people", color="green", k="Installs tracked", s="catalog shows items · installs"),
+    ], button=("Publish", "brand")),
 ]
 
 

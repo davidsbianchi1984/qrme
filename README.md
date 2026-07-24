@@ -185,6 +185,15 @@ The loop is fully transparent to the owner:
 - **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-4-8`
   with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.
+- **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
+  packs, starter content, seeding) with routes in `qrme/routers/packs.py`;
+  `qrme/seed.py` (starter profile collection); `qrme/robotics.py` (robot
+  catalog, per-kind command allowlists) with routes in
+  `qrme/routers/robots.py`.
+- **Native clients**: three idiomatic codebases under [`native/`](native/)
+  (SwiftUI, Jetpack Compose, WinUI 3) exercising the real API — see
+  [native/README.md](native/README.md) for the screen-by-screen endpoint
+  map.
 
 ## Run
 
@@ -427,6 +436,19 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/54-microsoft-copilot.svg"><img src="docs/screens/54-microsoft-copilot.svg" width="210" alt="Microsoft Copilot"></a><br><sub><b>54</b> · Microsoft Copilot</sub></td>
     <td align="center" width="33%"><a href="docs/screens/55-objection-revocation.svg"><img src="docs/screens/55-objection-revocation.svg" width="210" alt="Objection &amp; Revocation"></a><br><sub><b>55</b> · Objection &amp; Revocation</sub></td>
     <td align="center" width="33%"><a href="docs/screens/56-robotics.svg"><img src="docs/screens/56-robotics.svg" width="210" alt="Robotics"></a><br><sub><b>56</b> · Robotics</sub></td>
+  </tr>
+</table>
+
+**Knowledge packs, robot task mods & embodiment**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/57-knowledge-packs.svg"><img src="docs/screens/57-knowledge-packs.svg" width="210" alt="Knowledge Packs"></a><br><sub><b>57</b> · Knowledge Packs</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/58-robot-task-packs.svg"><img src="docs/screens/58-robot-task-packs.svg" width="210" alt="Robot Task Packs"></a><br><sub><b>58</b> · Robot Task Packs</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/59-embodied-agent.svg"><img src="docs/screens/59-embodied-agent.svg" width="210" alt="Embodied Agent"></a><br><sub><b>59</b> · Embodied Agent</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/60-publish-a-pack.svg"><img src="docs/screens/60-publish-a-pack.svg" width="210" alt="Publish a Pack"></a><br><sub><b>60</b> · Publish a Pack</sub></td>
   </tr>
 </table>
 
