@@ -6,6 +6,8 @@ struct WelcomeView: View {
     @State private var name = ""
     @State private var persona = ""
     @State private var kind = "self"
+    @State private var languages: [LanguageInfo] = []
+    @State private var language = "en"
     @State private var birthdate = Date(timeIntervalSince1970: 441_763_200) // 1984-01-01
     @State private var busy = false
     @State private var error: String?
@@ -50,6 +52,14 @@ struct WelcomeView: View {
                         DatePicker("", selection: $birthdate, displayedComponents: .date)
                             .labelsHidden().colorScheme(.dark)
                     }
+                    field("Language") {
+                        Picker("", selection: $language) {
+                            Text("English").tag("en")
+                            ForEach(languages.filter { $0.code != "en" }, id: \.code) { l in
+                                Text(l.label).tag(l.code)
+                            }
+                        }.pickerStyle(.menu).tint(Theme.brandA)
+                    }
                 }.card()
 
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
@@ -66,6 +76,9 @@ struct WelcomeView: View {
                 Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app")
                     .font(.system(size: 10, design: .monospaced)).foregroundStyle(Theme.t3)
             }.padding(20)
+        }
+        .task {
+            languages = (try? await ApiClient.shared.languages())?.languages ?? []
         }
     }
 
@@ -84,7 +97,8 @@ struct WelcomeView: View {
         Task {
             do {
                 let r = try await ApiClient.shared.createProfile(name: name, persona: persona,
-                                                                 kind: kind, birthdate: iso)
+                                                                 kind: kind, birthdate: iso,
+                                                                 language: language)
                 state.signIn(r)
             } catch {
                 self.error = "Couldn't reach QRME — is the backend running? (\(error.localizedDescription))"

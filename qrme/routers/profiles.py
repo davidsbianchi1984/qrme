@@ -52,9 +52,20 @@ def create_profile(body: ProfileCreate) -> dict:
         ),
     )
     conn.commit()
+    # Language chosen at the setup gateway: the profile speaks it from its
+    # very first reply.
+    if body.language:
+        from .. import i18n
+        if body.language not in i18n.SUPPORTED:
+            raise HTTPException(
+                422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
+        i18n.set_language(profile_id, body.language)
     token = auth.issue("owner", profile_id)
-    return {**profile_out(profile_or_404(profile_id)).model_dump(),
-            "owner_token": token}
+    out = {**profile_out(profile_or_404(profile_id)).model_dump(),
+           "owner_token": token}
+    if body.language:
+        out["language"] = body.language
+    return out
 
 
 @router.post("/profiles/genesis", status_code=201)

@@ -541,6 +541,7 @@ CREATE TABLE IF NOT EXISTS model_prefs (
 CREATE TABLE IF NOT EXISTS language_prefs (
     profile_id  TEXT PRIMARY KEY REFERENCES profiles(id),
     language    TEXT NOT NULL,   -- qrme.i18n.SUPPORTED code, e.g. "es"
+    mode        TEXT NOT NULL DEFAULT 'pre',  -- pre | on_demand
     updated_at  TEXT NOT NULL
 );
 

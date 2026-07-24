@@ -120,7 +120,15 @@ struct LanguagesList: Decodable {
     }
 }
 
-struct LanguageChoice: Decodable { let language: String; let label: String }
+struct LanguageChoice: Decodable { let language: String; let label: String; let mode: String? }
+
+struct TranslateResult: Decodable {
+    let text: String
+    let translation: String
+    let language: String
+    let engine: String
+    let note: String?
+}
 
 struct SocialConn: Decodable {
     let id: String
@@ -303,15 +311,17 @@ actor ApiClient {
     /// Create a synthetic profile (the enroll equivalent). `verification.birthdate`
     /// must be an adult past date; the owner token is returned once, here.
     func createProfile(name: String, persona: String, kind: String,
-                       birthdate: String) async throws -> ProfileCreated {
-        try await request("/profiles", method: "POST", body: [
+                       birthdate: String,
+                       language: String? = nil) async throws -> ProfileCreated {
+        var body: [String: Any] = [
             "owner_id": "owner-1",
             "kind": kind,
             "display_name": name,
             "persona": persona,
-            "demographics": ["language": "en"],
             "verification": ["birthdate": birthdate],
-        ])
+        ]
+        if let language, language != "en" { body["language"] = language }
+        return try await request("/profiles", method: "POST", body: body)
     }
 
     func profile(_ id: String) async throws -> ProfileCard {
@@ -342,9 +352,18 @@ actor ApiClient {
         try await request("/profiles/\(id)/language")
     }
 
-    func setLanguage(id: String, token: String, code: String) async throws -> LanguageChoice {
+    func setLanguage(id: String, token: String, code: String,
+                     mode: String = "pre") async throws -> LanguageChoice {
         try await request("/profiles/\(id)/language", method: "PUT",
-                          body: ["language": code], token: token)
+                          body: ["language": code, "mode": mode], token: token)
+    }
+
+    func translate(id: String, token: String, text: String,
+                   to: String? = nil) async throws -> TranslateResult {
+        var body: [String: Any] = ["text": text]
+        if let to { body["to"] = to }
+        return try await request("/profiles/\(id)/translate", method: "POST",
+                                 body: body, token: token)
     }
 
     func setModel(id: String, token: String, provider: String) async throws -> ModelChoice {

@@ -98,7 +98,7 @@ def build_system_prompt(
     # The persona speaks its owner-set language everywhere: every surface
     # that builds a system prompt through here inherits the directive.
     from . import i18n
-    lang_line = i18n.directive(i18n.get_language(profile["id"]))
+    lang_line = i18n.directive(i18n.effective_language(profile["id"]))
     if lang_line:
         parts.append(lang_line.strip())
     parts.append(

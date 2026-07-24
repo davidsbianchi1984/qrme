@@ -282,7 +282,7 @@ def content_provenance(profile: dict, sources: list[dict],
                   "identity and its consented source material, then "
                   "moderated before delivery",
         "generated_by": llm.resolve_choice(llm.get_choice(profile["id"])),
-        "language": i18n.get_language(profile["id"]),
+        "language": i18n.effective_language(profile["id"]),
         "grounded_in": {"persona": True, "source_items": len(sources),
                         "by_kind": kinds},
         "licensed_from": profile.get("licensed_from"),

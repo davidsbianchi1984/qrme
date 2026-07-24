@@ -35,6 +35,13 @@ class ModelChoice(BaseModel):
 class LanguageChoice(BaseModel):
     #: A qrme.i18n.SUPPORTED code, e.g. "es".
     language: str
+    #: "pre" (persona speaks it natively, default) | "on_demand".
+    mode: str = "pre"
+
+
+class TranslateRequest(BaseModel):
+    text: str                          # anything the owner ran across
+    to: str | None = None              # target; None -> profile's language
 
 
 @router.get("/languages")
@@ -49,9 +56,9 @@ def list_languages() -> dict:
 @router.get("/profiles/{profile_id}/language")
 def get_profile_language(profile_id: str) -> dict:
     profile_or_404(profile_id)
-    code = i18n.get_language(profile_id)
+    code, mode = i18n.get_pref(profile_id)
     return {"profile_id": profile_id, "language": code,
-            "label": i18n.SUPPORTED[code]}
+            "label": i18n.SUPPORTED[code], "mode": mode}
 
 
 @router.put("/profiles/{profile_id}/language")
@@ -63,10 +70,30 @@ def set_profile_language(profile_id: str, body: LanguageChoice,
     if body.language not in i18n.SUPPORTED:
         raise HTTPException(
             422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
-    i18n.set_language(profile_id, body.language)
-    logger.info("owner set profile %s language=%s", profile_id, body.language)
+    if body.mode not in i18n.MODES:
+        raise HTTPException(
+            422, f"mode must be one of {', '.join(i18n.MODES)}")
+    i18n.set_language(profile_id, body.language, body.mode)
+    logger.info("owner set profile %s language=%s mode=%s",
+                profile_id, body.language, body.mode)
     return {"profile_id": profile_id, "language": body.language,
-            "label": i18n.SUPPORTED[body.language]}
+            "label": i18n.SUPPORTED[body.language], "mode": body.mode}
+
+
+@router.post("/profiles/{profile_id}/translate")
+def translate_text(profile_id: str, body: TranslateRequest,
+                   request: Request) -> dict:
+    """Owner-only. Translate anything run across — an interactor's message,
+    a room turn, a listing — into the profile's language (or an explicit
+    target), using the profile's own model. The offline stub says it cannot
+    translate rather than pretending."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return i18n.translate(profile_id, body.text, body.to,
+                              cloud=request.app.state.cloud)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
 
 
 @router.get("/models")

@@ -56,7 +56,15 @@ public record LanguagesList(
 
 public record LanguageChoice(
     [property: JsonPropertyName("language")] string Language,
-    [property: JsonPropertyName("label")] string Label);
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("mode")] string? Mode);
+
+public record TranslateResult(
+    [property: JsonPropertyName("text")] string Text,
+    [property: JsonPropertyName("translation")] string Translation,
+    [property: JsonPropertyName("language")] string Language,
+    [property: JsonPropertyName("engine")] string Engine,
+    [property: JsonPropertyName("note")] string? Note);
 
 public record ProviderInfo(
     [property: JsonPropertyName("name")] string Name,
@@ -275,16 +283,27 @@ public sealed class ApiClient
         return req;
     }
 
-    public Task<ProfileCreated> CreateProfile(string name, string persona, string kind, string birthdate) =>
-        Send<ProfileCreated>(Post("/profiles", new
-        {
-            owner_id = "owner-1",
-            kind,
-            display_name = name,
-            persona,
-            demographics = new { language = "en" },
-            verification = new { birthdate },
-        }));
+    public Task<ProfileCreated> CreateProfile(string name, string persona, string kind,
+                                              string birthdate, string? language = null) =>
+        Send<ProfileCreated>(Post("/profiles",
+            language is { Length: > 0 } && language != "en"
+                ? new
+                  {
+                      owner_id = "owner-1",
+                      kind,
+                      display_name = name,
+                      persona,
+                      verification = new { birthdate },
+                      language,
+                  }
+                : (object)new
+                  {
+                      owner_id = "owner-1",
+                      kind,
+                      display_name = name,
+                      persona,
+                      verification = new { birthdate },
+                  }));
 
     public Task<ProfileCard> Profile(string id) =>
         Send<ProfileCard>(new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}"));
@@ -322,15 +341,19 @@ public sealed class ApiClient
         Send<LanguageChoice>(new HttpRequestMessage(
             HttpMethod.Get, $"/profiles/{id}/language"));
 
-    public Task<LanguageChoice> SetLanguage(string id, string token, string code)
+    public Task<LanguageChoice> SetLanguage(string id, string token, string code,
+                                            string mode = "pre")
     {
         var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/language")
         {
-            Content = JsonContent.Create(new { language = code }),
+            Content = JsonContent.Create(new { language = code, mode }),
         };
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<LanguageChoice>(req);
     }
+
+    public Task<TranslateResult> Translate(string id, string token, string text) =>
+        Send<TranslateResult>(Post($"/profiles/{id}/translate", new { text }, token));
 
     // -- robotic embodiment --
 

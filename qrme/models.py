@@ -61,6 +61,7 @@ class ProfileCreate(BaseModel):
     # Opt-in: contribute positively-rated, anonymized exchanges to improve
     # the shared cloud model. Off by default; revocable anytime.
     cloud_contribution: bool = False
+    language: str | None = None        # chosen at the setup gateway
 
 
 class ProfileUpdate(BaseModel):
