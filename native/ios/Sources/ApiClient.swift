@@ -268,6 +268,20 @@ struct PackInstalled: Decodable {
     var count: Int { installed_items ?? installed_tasks?.count ?? 0 }
 }
 
+struct FeedbackReceipt: Decodable { let id: String; let status: String; let note: String? }
+struct FeedbackItem: Decodable {
+    let id: String
+    let category: String
+    let message: String
+    let status: String
+}
+struct FeedbackState: Decodable {
+    let mine: [FeedbackItem]
+    let tally: [String: Int]
+    let total: Int
+    let categories: [String]
+}
+
 struct GameSession: Decodable {
     let id: String
     let platform: String
@@ -416,6 +430,18 @@ actor ApiClient {
                      mode: String = "pre") async throws -> LanguageChoice {
         try await request("/profiles/\(id)/language", method: "PUT",
                           body: ["language": code, "mode": mode], token: token)
+    }
+
+    func submitFeedback(token: String?, category: String, message: String,
+                        rating: Int?) async throws -> FeedbackReceipt {
+        var body: [String: Any] = ["category": category, "message": message]
+        if let rating { body["rating"] = rating }
+        return try await request("/feedback", method: "POST", body: body,
+                                 token: token)
+    }
+
+    func feedback(token: String?) async throws -> FeedbackState {
+        try await request("/feedback", token: token)
     }
 
     func translate(id: String, token: String, text: String,

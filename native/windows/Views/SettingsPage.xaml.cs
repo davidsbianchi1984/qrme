@@ -18,11 +18,27 @@ public sealed partial class SettingsPage : Page
             CanAttest ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    public sealed class FeedbackRow
+    {
+        public string Line { get; init; } = "";
+    }
+
+    private static readonly string[] FeedbackCategories =
+        { "idea", "improvement", "bug", "praise", "other" };
+
     private LanguageInfo[] _languages = Array.Empty<LanguageInfo>();
     private ProviderInfo[] _providers = Array.Empty<ProviderInfo>();
     private bool _loading;   // suppress SelectionChanged while populating
 
-    public SettingsPage() => InitializeComponent();
+    public SettingsPage()
+    {
+        InitializeComponent();
+        FeedbackCategory.ItemsSource = FeedbackCategories
+            .Select(c => char.ToUpper(c[0]) + c[1..]).ToList();
+        FeedbackCategory.SelectedIndex = 0;
+        FeedbackRating.ItemsSource = new[] { "—", "1", "2", "3", "4", "5" };
+        FeedbackRating.SelectedIndex = 0;
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
 
@@ -63,6 +79,52 @@ public sealed partial class SettingsPage : Page
             }).ToList();
             NoObjections.Visibility =
                 objections.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+
+        await LoadFeedback();
+    }
+
+    private async System.Threading.Tasks.Task LoadFeedback()
+    {
+        try
+        {
+            var fb = await ApiClient.Shared.Feedback(AppState.Current.Token);
+            if (fb.Total > 0)
+            {
+                var parts = FeedbackCategories
+                    .Where(c => fb.Tally.TryGetValue(c, out var n) && n > 0)
+                    .Select(c => $"{fb.Tally[c]} {c}");
+                FeedbackTally.Text = "So far: " + string.Join(" · ", parts);
+                FeedbackTally.Visibility = Visibility.Visible;
+            }
+            else FeedbackTally.Visibility = Visibility.Collapsed;
+
+            var mine = fb.Mine.Select(f => new FeedbackRow
+            {
+                Line = $"[{f.Category}] {f.Message}  ·  {f.Status}",
+            }).ToList();
+            FeedbackMine.ItemsSource = mine;
+            var hasMine = mine.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            FeedbackMineHeader.Visibility = hasMine;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnSendFeedback(object sender, RoutedEventArgs e)
+    {
+        var message = FeedbackMessage.Text.Trim();
+        if (message.Length == 0) return;
+        var cat = FeedbackCategories[Math.Max(0, FeedbackCategory.SelectedIndex)];
+        int? rating = FeedbackRating.SelectedIndex >= 1 ? FeedbackRating.SelectedIndex : null;
+        try
+        {
+            await ApiClient.Shared.SubmitFeedback(AppState.Current.Token, cat, message, rating);
+            FeedbackMessage.Text = "";
+            FeedbackRating.SelectedIndex = 0;
+            FeedbackThanks.Text = "Thank you — sent.";
+            FeedbackThanks.Visibility = Visibility.Visible;
+            await LoadFeedback();
         }
         catch (Exception ex) { ShowError(ex.Message); }
     }

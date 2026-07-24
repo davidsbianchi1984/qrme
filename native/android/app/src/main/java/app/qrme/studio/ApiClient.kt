@@ -25,6 +25,8 @@ data class Provenance(val generatedBy: String, val sourceItems: Int,
                       val licensedFrom: String?, val moderationStatus: String,
                       val disclaimer: String)
 data class LanguageInfo(val code: String, val label: String)
+data class FeedbackItem(val category: String, val message: String, val status: String)
+data class FeedbackState(val mine: List<FeedbackItem>, val tally: Map<String, Int>, val total: Int)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
@@ -266,6 +268,28 @@ object ApiClient {
                             mode: String = "pre") {
         request("/profiles/$id/language", "PUT",
             JSONObject().put("language", code).put("mode", mode), token)
+    }
+
+    suspend fun submitFeedback(token: String?, category: String,
+                               message: String, rating: Int?): String {
+        val body = JSONObject().put("category", category).put("message", message)
+        rating?.let { body.put("rating", it) }
+        return request("/feedback", "POST", body, token)
+            .optString("status", "received")
+    }
+
+    suspend fun feedback(token: String?): FeedbackState {
+        val o = request("/feedback", token = token)
+        val mineArr = o.optJSONArray("mine")
+        val mine = (0 until (mineArr?.length() ?: 0)).map { i ->
+            val f = mineArr!!.getJSONObject(i)
+            FeedbackItem(f.optString("category", ""), f.optString("message", ""),
+                f.optString("status", ""))
+        }
+        val t = o.optJSONObject("tally")
+        val tally = listOf("idea", "improvement", "bug", "praise", "other")
+            .associateWith { t?.optInt(it, 0) ?: 0 }
+        return FeedbackState(mine, tally, o.optInt("total"))
     }
 
     suspend fun translate(id: String, token: String, text: String): TranslateResult {

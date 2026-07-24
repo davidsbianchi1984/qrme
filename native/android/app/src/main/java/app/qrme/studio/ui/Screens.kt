@@ -23,6 +23,7 @@ import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
 import app.qrme.studio.Excursion
+import app.qrme.studio.FeedbackState
 import app.qrme.studio.GameCalloutResult
 import app.qrme.studio.GameSession
 import app.qrme.studio.InstalledPack
@@ -515,7 +516,72 @@ fun SettingsScreen(vm: StudioViewModel) {
                 }
             }
         }
+
+        FeedbackPanel(vm)
+
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+@Composable
+private fun FeedbackPanel(vm: StudioViewModel) {
+    val categories = listOf("idea", "improvement", "bug", "praise", "other")
+    var category by remember { mutableStateOf("idea") }
+    var message by remember { mutableStateOf("") }
+    var rating by remember { mutableIntStateOf(0) }
+    var state by remember { mutableStateOf<FeedbackState?>(null) }
+    var status by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.feedback(vm.token) }) { r -> state = r.getOrNull() }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Help us improve", color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text("Tell us how to make this better — an idea, a rough edge, a bug, " +
+             "or what you love. It goes straight to the team.",
+            color = Qrme.T2, fontSize = 12.sp)
+        Row(Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            categories.forEach { c ->
+                val on = category == c
+                Text(c, color = if (on) Color.White else Qrme.Txt, fontSize = 11.sp,
+                    modifier = Modifier.clip(RoundedCornerShape(50))
+                        .background(if (on) Qrme.BrandA else Qrme.ScrBot)
+                        .clickable { category = c }
+                        .padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+        }
+        OutlinedTextField(value = message, onValueChange = { message = it },
+            label = { Text("What's on your mind?") }, minLines = 2,
+            modifier = Modifier.fillMaxWidth())
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            (1..5).forEach { n ->
+                Text(if (n <= rating) "★" else "☆",
+                    color = if (n <= rating) Qrme.Amber else Qrme.T3, fontSize = 18.sp,
+                    modifier = Modifier.clickable { rating = if (rating == n) 0 else n })
+            }
+        }
+        SmallAction("Send feedback") {
+            if (message.isNotBlank())
+                vm.call({ ApiClient.submitFeedback(vm.token, category,
+                    message.trim(), rating.takeIf { it > 0 }) }) {
+                    status = "Thank you — sent."; message = ""; rating = 0
+                    reload()
+                }
+        }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+        state?.takeIf { it.total > 0 }?.let { s ->
+            Text("So far: " + categories.filter { (s.tally[it] ?: 0) > 0 }
+                .joinToString(" · ") { "${s.tally[it]} $it" },
+                color = Qrme.T3, fontSize = 11.sp)
+            s.mine.take(4).forEach { f ->
+                Text("[${f.category}] ${f.message} · ${f.status}",
+                    color = Qrme.T2, fontSize = 11.sp, maxLines = 1)
+            }
+        }
     }
 }
 

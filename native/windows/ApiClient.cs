@@ -54,6 +54,16 @@ public record LanguagesList(
     [property: JsonPropertyName("languages")] LanguageInfo[] Languages,
     [property: JsonPropertyName("default")] string Default);
 
+public record FeedbackItem(
+    [property: JsonPropertyName("category")] string Category,
+    [property: JsonPropertyName("message")] string Message,
+    [property: JsonPropertyName("status")] string Status);
+
+public record FeedbackState(
+    [property: JsonPropertyName("mine")] FeedbackItem[] Mine,
+    [property: JsonPropertyName("tally")] System.Collections.Generic.Dictionary<string, int> Tally,
+    [property: JsonPropertyName("total")] int Total);
+
 public record LanguageChoice(
     [property: JsonPropertyName("language")] string Language,
     [property: JsonPropertyName("label")] string Label,
@@ -389,6 +399,24 @@ public sealed class ApiClient
 
     public Task<LanguagesList> Languages() =>
         Send<LanguagesList>(new HttpRequestMessage(HttpMethod.Get, "/languages"));
+
+    public async Task<string> SubmitFeedback(string? token, string category,
+                                             string message, int? rating)
+    {
+        object body = rating is { } r
+            ? new { category, message, rating = r }
+            : new { category, message };
+        var res = await _http.SendAsync(Post("/feedback", body, token));
+        res.EnsureSuccessStatusCode();
+        return "received";
+    }
+
+    public Task<FeedbackState> Feedback(string? token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, "/feedback");
+        if (token is { Length: > 0 }) req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<FeedbackState>(req);
+    }
 
     public Task<LanguageChoice> ProfileLanguage(string id) =>
         Send<LanguageChoice>(new HttpRequestMessage(
