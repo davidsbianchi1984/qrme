@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS profiles (
     moderation_mode   TEXT NOT NULL DEFAULT 'auto',      -- auto | manual
     aging_enabled     INTEGER NOT NULL DEFAULT 0,
     base_age          INTEGER,
+    appearance        TEXT NOT NULL DEFAULT '',  -- how the profile looks/presents
+                                              -- (steering hub); rides on the prompt
     consent_basis     TEXT,                   -- required when kind=other_person
     consent_attestor  TEXT,
     successor_owner   TEXT,                   -- legacy succession
