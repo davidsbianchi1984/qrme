@@ -81,9 +81,16 @@ def set_license(profile_id: str, body: LicenseOffer, request: Request) -> dict:
 
 
 @router.get("/profiles/{profile_id}/license")
-def get_license(profile_id: str) -> dict:
-    """Public: prospective buyers see the offer terms."""
-    profile_or_404(profile_id)
+def get_license(profile_id: str, request: Request) -> dict:
+    """Public: prospective buyers see the offer terms. A rated profile's
+    offer is itself age-gated — the shop window, not just the sale."""
+    profile = profile_or_404(profile_id)
+    if profile["adult_mode"]:
+        from .. import rated
+        if not rated.buyer_is_adult(request):
+            raise HTTPException(
+                403, "this profile's license is age-restricted (18+); "
+                     "present a verified-18+ interactor token")
     offer = _offer(profile_id)
     if offer is None:
         raise HTTPException(404, "this profile is not offered for license")
@@ -107,9 +114,17 @@ def unlist_license(profile_id: str, request: Request) -> None:
 @router.post("/profiles/{profile_id}/license/acquire", status_code=201)
 def acquire_license(profile_id: str, request: Request) -> dict:
     """A buyer acquires a license against the source profile."""
-    profile_or_404(profile_id)
+    profile = profile_or_404(profile_id)
     buyer_id = _buyer(request)
-    interactor_or_404(buyer_id)
+    buyer = interactor_or_404(buyer_id)
+    if profile["adult_mode"]:
+        # Rated commerce: acquiring a rated profile's license requires a
+        # verified-adult buyer, not just a token.
+        if not buyer["birthdate"] or age_of(
+                date.fromisoformat(buyer["birthdate"])) < 18:
+            raise HTTPException(
+                403, "acquiring a license on a rated profile requires a "
+                     "verified-18+ buyer")
     offer = _offer(profile_id)
     if offer is None:
         raise HTTPException(404, "this profile is not offered for license")

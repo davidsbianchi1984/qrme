@@ -422,6 +422,26 @@ ROBOT_PACKS: dict[str, tuple[str, float, list[tuple[str, str, list[str], str]]]]
 }
 
 
+# The rated (18+) starter pack — commerce that is age-gated even to see.
+# Consent-forward conversational craft for adult-mode personas; the pack
+# teaches boundaries as the foundation, never explicit content. It installs
+# only onto adult-mode profiles and never gets a public marketplace listing.
+RATED_PACK: tuple[str, str, float, list[tuple[str, str]]] = (
+    "after_dark", "After Dark Companion Pack", 6.99, [
+        ("Consent is the frame",
+         "Nothing flirtatious proceeds past a hesitation: check in "
+         "explicitly, take a 'no' or a pause as a full answer, and let the "
+         "other person set the pace and the ceiling."),
+        ("Charm without pressure",
+         "Playful attention flatters; persistence pressures. Offer an "
+         "opening once, gracefully, and let silence close it."),
+        ("Boundaries out loud",
+         "State what the persona will and won't do early and warmly — "
+         "clear lines make the space safer and the conversation freer "
+         "inside them."),
+    ])
+
+
 def seed() -> dict:
     """Create the starter packs (idempotent: an industry that already has a
     starter-published pack is skipped), each listed on the marketplace."""
@@ -491,8 +511,35 @@ def seed() -> dict:
         created.append({"pack_id": pack_id, "industry": domain,
                         "audience": "robot", "title": title,
                         "items": len(tasks)})
+    industry, title, price, items = RATED_PACK
+    exists = conn.execute(
+        "SELECT id FROM knowledge_packs WHERE industry=? AND publisher=?"
+        " AND rated=1", (industry, PUBLISHER)).fetchone()
+    if exists:
+        skipped.append(f"rated:{industry}")
+    else:
+        pack_id = db.new_id("pak")
+        conn.execute(
+            "INSERT INTO knowledge_packs (id, industry, audience, title,"
+            " blurb, publisher, price, currency, rated, created_at)"
+            " VALUES (?,?,'profile',?,?,?,?,'USD',1,?)",
+            (pack_id, industry, title,
+             f"{len(items)} consent-forward conversation modules for "
+             "adult-mode personas. 18+ to see, 18+ to buy.",
+             PUBLISHER, price, db.utcnow()))
+        for item_title, content in items:
+            conn.execute(
+                "INSERT INTO pack_items (id, pack_id, title, content,"
+                " created_at) VALUES (?,?,?,?,?)",
+                (db.new_id("pki"), pack_id, item_title, content, db.utcnow()))
+        conn.commit()
+        # Deliberately no marketplace listing: rated commerce is reachable
+        # only through the age-gated /packs catalog.
+        created.append({"pack_id": pack_id, "industry": industry,
+                        "audience": "profile", "rated": True,
+                        "title": title, "items": len(items)})
     return {"created": len(created), "skipped": len(skipped),
-            "industries": len(STARTER_PACKS) + len(ROBOT_PACKS),
+            "industries": len(STARTER_PACKS) + len(ROBOT_PACKS) + 1,
             "packs": created}
 
 

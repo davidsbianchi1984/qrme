@@ -41,14 +41,19 @@ def _summary(row: dict) -> dict:
             "publisher": row["publisher"], "price": row["price"],
             "currency": row["currency"], "free": row["price"] == 0,
             "origin": row["origin"], "origin_url": row["origin_url"],
+            "rated": bool(row["rated"]),
             "items": items, "installs": installs}
 
 
 @router.get("/packs")
-def list_packs(industry: str | None = None,
+def list_packs(request: Request, industry: str | None = None,
                audience: str | None = None) -> list[dict]:
     """Public catalog of knowledge packs, optionally narrowed by industry
-    and/or audience (profile knowledge vs. robot task packs)."""
+    and/or audience (profile knowledge vs. robot task packs). Rated (18+)
+    packs are omitted entirely unless the caller is age-verified — a
+    verified-18+ interactor or the owner of an adult-mode profile."""
+    from .. import rated as rated_mod
+
     clauses, params = [], []
     if industry:
         clauses.append("industry=?")
@@ -56,6 +61,8 @@ def list_packs(industry: str | None = None,
     if audience:
         clauses.append("audience=?")
         params.append(audience)
+    if not rated_mod.buyer_is_adult(request):
+        clauses.append("rated=0")
     where = f" WHERE {' AND '.join(clauses)}" if clauses else ""
     rows = db.connect().execute(
         f"SELECT * FROM knowledge_packs{where} ORDER BY audience, industry,"
@@ -85,10 +92,17 @@ def sync_registry(key: str) -> dict:
 
 
 @router.get("/packs/{pack_id}")
-def pack_detail(pack_id: str) -> dict:
+def pack_detail(pack_id: str, request: Request) -> dict:
     """Public detail: metadata plus item *titles* — the shop window. The
-    contents are the product; they are delivered by installing."""
+    contents are the product; they are delivered by installing. Rated
+    packs require an age-verified caller even for the shop window."""
+    from .. import rated as rated_mod
+
     pack = _pack_or_404(pack_id)
+    if pack["rated"] and not rated_mod.buyer_is_adult(request):
+        raise HTTPException(
+            403, "this pack is age-restricted (18+); present a verified-18+ "
+                 "interactor token or an adult-mode owner token")
     titles = [r["title"] for r in db.connect().execute(
         "SELECT title FROM pack_items WHERE pack_id=? ORDER BY rowid",
         (pack_id,)).fetchall()]
@@ -110,9 +124,11 @@ def publish_pack(body: PackPublish) -> dict:
     pack_id = db.new_id("pak")
     conn.execute(
         "INSERT INTO knowledge_packs (id, industry, audience, title, blurb,"
-        " publisher, price, currency, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+        " publisher, price, currency, rated, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?)",
         (pack_id, body.industry, body.audience, body.title, body.blurb,
-         body.publisher, body.price, body.currency, db.utcnow()))
+         body.publisher, body.price, body.currency, int(body.rated),
+         db.utcnow()))
     for item in body.items:
         conn.execute(
             "INSERT INTO pack_items (id, pack_id, title, content, task,"
@@ -147,8 +163,13 @@ def install_pack(pack_id: str, body: PackInstall, request: Request) -> dict:
     A priced pack requires explicit accept_price consent (payment simulated,
     like licensing)."""
     pack = _pack_or_404(pack_id)
-    profile_or_404(body.profile_id)
+    profile = profile_or_404(body.profile_id)
     require_owner(body.profile_id, request)
+    if pack["rated"] and not profile["adult_mode"]:
+        # Rated commerce: the target must be an adult-mode profile — its
+        # owner proved 18+ when adult mode was enabled at creation.
+        raise HTTPException(
+            403, "rated packs install only onto adult-mode profiles")
     conn = db.connect()
 
     if pack["audience"] == "robot":
