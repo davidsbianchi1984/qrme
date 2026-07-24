@@ -9,9 +9,9 @@ lobby, so a minor present forces strict, as everywhere).
 
 Fair play is a system rule, not a toggle: the companion coordinates and
 communicates within the game's rules and never claims, offers, or uses cheats,
-exploits, or automation that violates a game's terms. The pilot dials shape
-*how* it talks (assertiveness → shot-caller vs. support; humor → banter), never
-whether it plays fair.
+exploits, or automation that violates a game's terms. The disposition dials
+shape *how* it talks (assertiveness → shot-caller vs. support; humor → banter),
+never whether it plays fair.
 """
 
 from __future__ import annotations

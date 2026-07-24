@@ -1,8 +1,10 @@
-"""Pilot controls: live throttles and sliders for agents, profiles, robots.
+"""Dials: a profile / agent / robot's disposition — how it's tuned.
 
-An owner *pilots* what they run. Each dial is 0–100 (default 50 = as
-written); moving it nudges style, pace, or behavior without ever touching
-core identity or safety. Dials come in three groups:
+Each dial is 0–100 (default 50 = as written); moving it nudges the entity's
+style, pace, or behavior without ever touching core identity or safety.
+These are part of *who it is*, not a remote control — the entity acts on
+its own within its embodiments, and the dials describe its temperament.
+They come in three groups:
 
 - **system** — how the thing *operates*: ``pace`` (the throttle: how fast /
   eager it acts and replies), ``autonomy`` (how much it does before asking),
@@ -67,7 +69,7 @@ def spec(adult: bool) -> list[dict]:
 
 def get(subject_id: str) -> dict[str, int]:
     row = db.connect().execute(
-        "SELECT dials FROM pilot_controls WHERE subject_id=?",
+        "SELECT dials FROM dial_settings WHERE subject_id=?",
         (subject_id,)).fetchone()
     stored = json.loads(row["dials"]) if row else {}
     return {name: int(stored.get(name, DEFAULT)) for name in DIALS}
@@ -89,7 +91,7 @@ def set_dials(subject_id: str, values: dict, adult: bool) -> dict[str, int]:
         current["intimacy"] = 0
     conn = db.connect()
     conn.execute(
-        "INSERT INTO pilot_controls (subject_id, dials, updated_at)"
+        "INSERT INTO dial_settings (subject_id, dials, updated_at)"
         " VALUES (?,?,?) ON CONFLICT (subject_id) DO UPDATE SET"
         " dials=excluded.dials, updated_at=excluded.updated_at",
         (subject_id, json.dumps(current), db.utcnow()))
@@ -116,9 +118,9 @@ def directive(subject_id: str, adult: bool) -> str | None:
         lines.append(f"- {label}: lean {'toward ' + high if band > 0 else 'toward ' + low}")
     if not lines:
         return None
-    head = ("Pilot settings from your owner — adjust style, pace, and manner "
-            "accordingly, but never your core identity, your boundaries, or "
-            "the safety rules:")
+    head = ("How you're currently dialed in — let this shape your style, "
+            "pace, and manner, always within your core identity, your "
+            "boundaries, and the safety rules:")
     if adult and _band(values["intimacy"]) > 0:
         lines.append("- Intimacy is dialed up: you may be more flirtatious "
                      "and affectionate, always within your stated boundaries "
