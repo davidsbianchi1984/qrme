@@ -90,6 +90,20 @@ def buyer_is_adult(request: Request) -> bool:
     return bool(row and row["adult_mode"])
 
 
+def record_event(profile_id: str, beacon_id: str | None,
+                 verified: bool) -> None:
+    """Log one resolution of a rated profile on a discovery surface — the
+    raw material for the owner's placement analytics. Only the outcome and
+    the beacon are stored, never the viewer."""
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO rated_events (id, profile_id, beacon_id, kind, at)"
+        " VALUES (?,?,?,?,?)",
+        (db.new_id("rev"), profile_id, beacon_id,
+         "verified_view" if verified else "wall", db.utcnow()))
+    conn.commit()
+
+
 def age_wall_card(profile_id: str) -> dict:
     """What a non-verified viewer sees instead of a rated profile card —
     existence acknowledged at direct refs, nothing else."""

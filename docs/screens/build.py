@@ -1656,6 +1656,12 @@ SCREENS = [
         dict(icon="lock", color="green", k="The wall travels", s="every scan resolves through the age gate"),
         dict(icon="shieldok", color="cyan", k="Never another real person", s="self or fictional personas only"),
     ], button=("Place at a venue", "brand")),
+    dict(num=63, title="Placement Analytics", sub="What each venue earns", accent="amber", tabs=MARKET, tab=0, locked=True, cards=[
+        dict(icon="chart", color="amber", k="OnlyFans · 3 scans", s="2 walled · 1 verified", extra=("spark", [1, 1, 3, 2, 4], "amber")),
+        dict(icon="chart", color="cyan", k="Fansly · 2 scans", s="0 walled · 2 verified"),
+        dict(icon="people", color="green", k="Funnel", s="resolutions → verified → chatters", metric="25%"),
+        dict(icon="shieldok", color="brand", k="Counted, never identified", s="owner-only · no viewer identities"),
+    ]),
 ]
 
 

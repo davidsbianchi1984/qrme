@@ -409,6 +409,18 @@ CREATE TABLE IF NOT EXISTS rated_placements (
     created_at TEXT NOT NULL
 );
 
+-- Every resolution of a rated profile on a discovery surface: walled or
+-- verified, and through which beacon (NULL = a direct @handle/ref summon).
+-- The raw material for placement analytics — counts and rates only ever
+-- shown to the profile's owner.
+CREATE TABLE IF NOT EXISTS rated_events (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    beacon_id  TEXT,
+    kind       TEXT NOT NULL,          -- wall | verified_view
+    at         TEXT NOT NULL
+);
+
 -- Knowledge packs: downloadable clusters of curated expertise sold (or given
 -- away) on the marketplace. Installing a pack copies its items into the
 -- profile's source material, so the persona's knowledge base — and its
