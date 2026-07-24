@@ -39,12 +39,27 @@ public record ContentProvenance(
     [property: JsonPropertyName("moderation")] ModerationInfo Moderation,
     [property: JsonPropertyName("disclaimer")] string Disclaimer);
 
+// The visible mark riding on every AI render (always displayed).
+public record WatermarkDisplay(
+    [property: JsonPropertyName("line")] string Line);
+
+public record WatermarkBrief(
+    [property: JsonPropertyName("watermark_id")] string? WatermarkId,
+    [property: JsonPropertyName("display")] WatermarkDisplay? Display);
+
+public record WatermarkDesign(
+    [property: JsonPropertyName("mark")] string Mark,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("line")] string Line,
+    [property: JsonPropertyName("custom")] bool Custom);
+
 public record Post(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("topic")] string? Topic,
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("status")] string? Status,
-    [property: JsonPropertyName("provenance")] ContentProvenance? Provenance);
+    [property: JsonPropertyName("provenance")] ContentProvenance? Provenance,
+    [property: JsonPropertyName("watermark")] WatermarkBrief? Watermark);
 
 public record LanguageInfo(
     [property: JsonPropertyName("code")] string Code,
@@ -174,7 +189,8 @@ public record RelationshipState(
 public record ChatMessage(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("status")] string Status,
-    [property: JsonPropertyName("flag_reason")] string? FlagReason);
+    [property: JsonPropertyName("flag_reason")] string? FlagReason,
+    [property: JsonPropertyName("watermark")] WatermarkBrief? Watermark);
 
 public record ChatReply(
     [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage,
@@ -405,6 +421,13 @@ public sealed class ApiClient
         return req;
     }
 
+    private static HttpRequestMessage Put(string path, object body, string? token = null)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, path) { Content = JsonContent.Create(body) };
+        if (token is not null) req.Headers.Add("authorization", $"Bearer {token}");
+        return req;
+    }
+
     public Task<ProfileCreated> CreateProfile(string name, string persona, string kind,
                                               string birthdate, string? language = null) =>
         Send<ProfileCreated>(Post("/profiles",
@@ -438,6 +461,20 @@ public sealed class ApiClient
 
     public Task<Post[]> Posts(string id) =>
         Send<Post[]>(new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/posts"));
+
+    // -- watermark (the mark every AI render carries) --
+
+    public Task<WatermarkDesign> GetWatermarkDesign(string id) =>
+        Send<WatermarkDesign>(new HttpRequestMessage(
+            HttpMethod.Get, $"/profiles/{id}/watermark"));
+
+    // Design the profile's watermark; the AI designation is invariant.
+    public Task<WatermarkDesign> SetWatermarkDesign(
+        string id, string token, string? mark, string? label) =>
+        Send<WatermarkDesign>(Put($"/profiles/{id}/watermark",
+            new { mark = string.IsNullOrWhiteSpace(mark) ? null : mark,
+                  label = string.IsNullOrWhiteSpace(label) ? null : label },
+            token));
 
     // -- model selection --
 

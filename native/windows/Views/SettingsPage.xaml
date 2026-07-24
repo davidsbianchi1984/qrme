@@ -49,6 +49,31 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
+                    <TextBlock Text="Watermark" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="Every piece of work your profile composes or generates carries this mark — on all textual and visual renders, at all times. Design it your way; the AI designation always stays."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <TextBlock x:Name="WatermarkLine" FontSize="12" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox x:Name="WatermarkMarkBox" Header="Mark" PlaceholderText="✦" Width="90" />
+                        <TextBox x:Name="WatermarkLabelBox" Header="Label" PlaceholderText="AI · your profile" Width="220" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="Save design" Click="OnSaveWatermark"
+                                Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                        <Button x:Name="WatermarkResetButton" Content="Reset to default"
+                                Click="OnResetWatermark" Visibility="Collapsed" />
+                        <TextBlock x:Name="WatermarkSaved" Text="✓ saved" FontSize="12"
+                                   Foreground="{StaticResource QrmeGreenBrush}" Visibility="Collapsed"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
                     <TextBlock Text="Objections" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="NoObjections" Text="No objections — nobody has contested this profile."

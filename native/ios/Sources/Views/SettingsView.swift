@@ -125,6 +125,8 @@ struct SettingsView: View {
 
                 SteeringCard()
 
+                WatermarkCard()
+
                 RelationshipCard()
 
                 FeedbackCard()
@@ -189,6 +191,82 @@ struct SettingsView: View {
             try? await ApiClient.shared.attest(id: pid, objectionId: objection.id,
                                                token: token)
             await load()
+        }
+    }
+}
+
+/// Design the profile's watermark — the visible mark that rides on every
+/// AI render, textual or visual. The AI designation itself is invariant.
+struct WatermarkCard: View {
+    @EnvironmentObject var state: AppState
+    @State private var mark = ""
+    @State private var label = ""
+    @State private var line = ""
+    @State private var custom = false
+    @State private var saved = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Watermark").font(.headline).foregroundStyle(Theme.txt)
+            Text("Every piece of work your profile composes or generates carries this mark — on all textual and visual renders, at all times. Design it your way; the AI designation always stays.")
+                .font(.footnote).foregroundStyle(Theme.t2)
+            if !line.isEmpty {
+                Text(line).font(.caption.bold()).foregroundStyle(Theme.t2)
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(Theme.scrBot)
+                    .clipShape(Capsule())
+            }
+            HStack(spacing: 8) {
+                TextField("mark (✦)", text: $mark)
+                    .foregroundStyle(Theme.txt)
+                    .padding(.horizontal, 10).padding(.vertical, 8)
+                    .background(Theme.scrBot)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .frame(width: 90)
+                TextField("label (AI · \(state.displayName))", text: $label)
+                    .foregroundStyle(Theme.txt)
+                    .padding(.horizontal, 10).padding(.vertical, 8)
+                    .background(Theme.scrBot)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            }
+            HStack(spacing: 10) {
+                Button("Save design") { Task { await save() } }
+                    .font(.caption.bold()).foregroundStyle(.white)
+                    .padding(.horizontal, 12).padding(.vertical, 7)
+                    .background(Theme.brand).clipShape(Capsule())
+                if custom {
+                    Button("Reset to default") { Task { await reset() } }
+                        .font(.caption).foregroundStyle(Theme.t2)
+                }
+                if saved {
+                    Text("✓ saved").font(.caption).foregroundStyle(Theme.green)
+                }
+            }
+        }.card()
+        .task { await load() }
+    }
+
+    private func load() async {
+        guard let pid = state.pid else { return }
+        if let d = try? await ApiClient.shared.watermarkDesign(id: pid) {
+            line = d.line; custom = d.custom
+        }
+    }
+
+    private func save() async {
+        guard let pid = state.pid, let token = state.token else { return }
+        if let d = try? await ApiClient.shared.setWatermarkDesign(
+            id: pid, token: token, mark: mark, label: label) {
+            line = d.line; custom = d.custom; saved = true
+        }
+    }
+
+    private func reset() async {
+        guard let pid = state.pid, let token = state.token else { return }
+        if let d = try? await ApiClient.shared.setWatermarkDesign(
+            id: pid, token: token, mark: nil, label: nil) {
+            line = d.line; custom = d.custom
+            mark = ""; label = ""; saved = false
         }
     }
 }

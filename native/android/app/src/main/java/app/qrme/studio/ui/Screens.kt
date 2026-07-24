@@ -257,6 +257,7 @@ fun ComposeScreen(vm: StudioViewModel) {
                 }
                 HorizontalDivider(color = Qrme.Line)
                 Text(p.content ?: "· held for review ·", color = Qrme.Txt, fontSize = 14.sp)
+                Text(p.watermarkLine ?: "✦ AI", color = Qrme.T3, fontSize = 10.sp)
                 p.provenance?.let { ProvenanceFooter(it) }
             }
         }
@@ -289,6 +290,7 @@ fun PostsScreen(vm: StudioViewModel) {
                             fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                     Text(p.content ?: "· held for review ·", color = Qrme.Txt, fontSize = 14.sp)
+                    Text(p.watermarkLine ?: "✦ AI", color = Qrme.T3, fontSize = 10.sp)
                 }
             }
         }
@@ -407,6 +409,11 @@ fun SettingsScreen(vm: StudioViewModel) {
     var preTranslate by remember { mutableStateOf(true) }
     var translateInput by remember { mutableStateOf("") }
     var translated by remember { mutableStateOf<TranslateResult?>(null) }
+    var wmMark by remember { mutableStateOf("") }
+    var wmLabel by remember { mutableStateOf("") }
+    var wmLine by remember { mutableStateOf("") }
+    var wmCustom by remember { mutableStateOf(false) }
+    var wmSaved by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload() {
@@ -423,6 +430,9 @@ fun SettingsScreen(vm: StudioViewModel) {
         }
         vm.call({ ApiClient.objections(vm.pid!!, vm.token!!) }) { r ->
             objections = r.getOrDefault(emptyList())
+        }
+        vm.call({ ApiClient.watermarkDesign(vm.pid!!) }) { r ->
+            r.getOrNull()?.let { wmLine = it.line; wmCustom = it.custom }
         }
     }
     LaunchedEffect(Unit) { reload() }
@@ -513,6 +523,36 @@ fun SettingsScreen(vm: StudioViewModel) {
                         .background(Qrme.ScrBot).padding(10.dp))
                 Text("engine: ${t.engine}" + (t.note?.let { " — $it" } ?: ""),
                     color = Qrme.T3, fontSize = 10.sp)
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Watermark", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Every piece of work your profile composes or generates carries this mark — on all textual and visual renders, at all times. Design it your way; the AI designation always stays.",
+                color = Qrme.T2, fontSize = 12.sp)
+            if (wmLine.isNotEmpty())
+                Text(wmLine, color = Qrme.T2, fontSize = 12.sp, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                        .background(Qrme.ScrBot).padding(horizontal = 10.dp, vertical = 6.dp))
+            labeledField("Mark", wmMark, "✦") { wmMark = it }
+            labeledField("Label", wmLabel, "AI · ${vm.displayName}") { wmLabel = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                SmallAction("Save design") {
+                    vm.call({ ApiClient.setWatermarkDesign(vm.pid!!, vm.token!!, wmMark, wmLabel) }) { r ->
+                        r.onSuccess { wmLine = it.line; wmCustom = it.custom; wmSaved = true }
+                         .onFailure { error = it.message }
+                    }
+                }
+                if (wmCustom) SmallAction("Reset to default") {
+                    vm.call({ ApiClient.setWatermarkDesign(vm.pid!!, vm.token!!, null, null) }) { r ->
+                        r.onSuccess {
+                            wmLine = it.line; wmCustom = it.custom
+                            wmMark = ""; wmLabel = ""; wmSaved = false
+                        }
+                    }
+                }
+                if (wmSaved) Text("✓ saved", color = Qrme.Green, fontSize = 12.sp)
             }
         }
 
@@ -755,7 +795,8 @@ private fun FeedbackPanel(vm: StudioViewModel) {
 
 // ---- Chat (the core loop: an interactor talks with the profile) ----
 
-private data class Bubble(val mine: Boolean, val text: String, val pending: Boolean)
+private data class Bubble(val mine: Boolean, val text: String, val pending: Boolean,
+                          val mark: String? = null)
 
 @Composable
 fun ChatScreen(vm: StudioViewModel) {
@@ -782,7 +823,8 @@ fun ChatScreen(vm: StudioViewModel) {
                 vm.rememberInteractor(interactor)
                 messages = messages + if (reply.content != null && reply.status == "approved") {
                     listOfNotNull(
-                        Bubble(false, reply.content, false),
+                        Bubble(false, reply.content, false,
+                               mark = reply.watermarkLine ?: "\u2726 AI"),
                         reply.provenance?.let { prov ->
                             Bubble(false, "ⓘ ${prov.generatedBy} · persona + " +
                                 "${prov.sourceItems} source item(s) · moderated: " +
@@ -809,13 +851,17 @@ fun ChatScreen(vm: StudioViewModel) {
             messages.forEach { m ->
                 Row(Modifier.fillMaxWidth(),
                     horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {
-                    Text(m.text,
-                        color = if (m.pending) Qrme.T2 else Qrme.Txt, fontSize = 14.sp,
-                        modifier = Modifier
+                    Column(Modifier
                             .clip(RoundedCornerShape(13.dp))
                             .background(if (m.mine) Qrme.BrandA.copy(alpha = 0.35f)
                                         else Qrme.Card.copy(alpha = 0.9f))
-                            .padding(horizontal = 12.dp, vertical = 9.dp))
+                            .padding(horizontal = 12.dp, vertical = 9.dp),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(m.text,
+                            color = if (m.pending) Qrme.T2 else Qrme.Txt, fontSize = 14.sp)
+                        // The watermark rides on every AI render, always visible.
+                        m.mark?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
+                    }
                 }
             }
             error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }

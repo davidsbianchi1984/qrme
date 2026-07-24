@@ -96,6 +96,52 @@ public sealed partial class SettingsPage : Page
 
         await LoadFeedback();
         await LoadSteering();
+        await LoadWatermark();
+    }
+
+    private async System.Threading.Tasks.Task LoadWatermark()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var d = await ApiClient.Shared.GetWatermarkDesign(s.Pid!);
+            WatermarkLine.Text = d.Line;
+            WatermarkResetButton.Visibility =
+                d.Custom ? Visibility.Visible : Visibility.Collapsed;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnSaveWatermark(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            var d = await ApiClient.Shared.SetWatermarkDesign(
+                s.Pid!, s.Token!, WatermarkMarkBox.Text.Trim(),
+                WatermarkLabelBox.Text.Trim());
+            WatermarkLine.Text = d.Line;
+            WatermarkResetButton.Visibility =
+                d.Custom ? Visibility.Visible : Visibility.Collapsed;
+            WatermarkSaved.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnResetWatermark(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            var d = await ApiClient.Shared.SetWatermarkDesign(
+                s.Pid!, s.Token!, null, null);
+            WatermarkLine.Text = d.Line;
+            WatermarkMarkBox.Text = "";
+            WatermarkLabelBox.Text = "";
+            WatermarkResetButton.Visibility = Visibility.Collapsed;
+            WatermarkSaved.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
     }
 
     private async System.Threading.Tasks.Task LoadSteering()

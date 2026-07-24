@@ -8,7 +8,7 @@ namespace QrmeStudio.Views;
 
 public sealed partial class PostsPage : Page
 {
-    public record PostRow(string Status, string Content);
+    public record PostRow(string Status, string Content, string Mark);
 
     public PostsPage() => InitializeComponent();
 
@@ -19,7 +19,8 @@ public sealed partial class PostsPage : Page
         {
             var posts = await ApiClient.Shared.Posts(s.Pid!);
             PostsList.ItemsSource = posts.Select(p => new PostRow(
-                Cap(p.Status ?? "draft"), p.Content)).ToList();
+                Cap(p.Status ?? "draft"), p.Content,
+                p.Watermark?.Display?.Line ?? "✦ AI")).ToList();
             Empty.Visibility = posts.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         catch

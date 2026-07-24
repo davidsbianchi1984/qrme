@@ -29,7 +29,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
-from .. import db, llm, moderation, persona, robotics
+from .. import db, llm, moderation, persona, robotics, watermark
 from ..common import profile_or_404, require_owner, source_items
 
 router = APIRouter()
@@ -184,7 +184,10 @@ def command_robot(robot_id: str, body: RobotCommand, request: Request) -> dict:
             result = {"status": "held", "reason": verdict.reason,
                       "spoken": None}
         else:
-            result = {"status": "spoken", "spoken": line}
+            # A line spoken into a room is an outward AI render: stamped.
+            result = {"status": "spoken", "spoken": line,
+                      "watermark": watermark.stamp(
+                          robot["profile_id"], "robot-line", line)}
     elif skill is not None and body.command not in allowed:
         # A learned task: queued for the bridge with its pack procedure, so
         # the body (and the audit trail) knows exactly what was licensed.

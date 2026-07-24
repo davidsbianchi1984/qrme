@@ -205,8 +205,10 @@ def profile_out(row: dict) -> ProfileOut:
 
 
 def message_out(row: dict) -> MessageOut:
+    from . import watermark
     # Unapproved profile content is never shown to interactors (PRD 6.5).
     visible = row["status"] == "approved" or row["role"] == "interactor"
+    keys = row.keys() if hasattr(row, "keys") else row
     return MessageOut(
         id=row["id"],
         role=row["role"],
@@ -214,6 +216,10 @@ def message_out(row: dict) -> MessageOut:
         status=row["status"],
         flag_reason=row["flag_reason"],
         created_at=row["created_at"],
+        # Every rendered profile turn carries its mark (AI-designated,
+        # owner-designable) alongside the verifiable credential.
+        watermark=(watermark.brief(row["watermark_id"])
+                   if visible and "watermark_id" in keys else None),
     )
 
 

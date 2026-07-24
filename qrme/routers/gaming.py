@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import catalog, db, llm, moderation, persona
+from .. import catalog, db, llm, moderation, persona, watermark
 from ..common import (content_provenance, profile_or_404, require_owner,
                       source_items)
 from ..models import GameSessionCreate, GameCallout
@@ -125,15 +125,20 @@ def callout(session_id: str, body: GameCallout, request: Request) -> dict:
     verdict = moderation.review(line, None, {"birthdate": None},
                                 maturity=maturity)
     status = "spoken" if verdict.approved else "held"
+    credential = None
     if verdict.approved:
         conn = db.connect()
         conn.execute("UPDATE game_sessions SET callouts = callouts + 1"
                      " WHERE id=?", (session_id,))
         conn.commit()
+        # Team comms leaves the platform: it carries the profile's credential
+        # and mark like any other AI render.
+        credential = watermark.stamp(session["profile_id"], "game-line", line)
     return {
         "session_id": session_id, "role": session["role"],
         "status": status,
         "line": line if verdict.approved else None,
+        "watermark": credential,
         "flag_reason": None if verdict.approved else verdict.reason,
         "provenance": content_provenance(
             profile, sources,

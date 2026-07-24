@@ -8,6 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Watermarking on every AI render** — all AI-generated work, textual or
+  visual, is stamped with a verifiable credential and a visible mark:
+  chat turns (including proactive check-ins and farewells), posts, room
+  turns, game and robot lines, creative works, proofreads, perception
+  guidance, and task outputs. Owners **design their profile's watermark**
+  (mark + label, `PUT /profiles/{id}/watermark`, editors in all three
+  native apps); the design rides on every render, always displayed, and
+  the AI designation is invariant — it cannot be designed away. The
+  native apps show the mark on chat bubbles and post cards.
 - **Terms of Service** (docs/terms.md, served at `GET /terms`) — assumption
   of risk and release, no-professional-advice and emergency disclaimers,
   warranty disclaimer, liability cap, indemnification, creator

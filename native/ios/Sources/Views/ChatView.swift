@@ -9,6 +9,8 @@ struct ChatView: View {
         let mine: Bool
         let text: String
         let pending: Bool
+        // The always-displayed watermark line on AI renders (never on yours).
+        var mark: String? = nil
     }
 
     @EnvironmentObject var state: AppState
@@ -29,13 +31,18 @@ struct ChatView: View {
                         ForEach(messages) { m in
                             HStack {
                                 if m.mine { Spacer(minLength: 40) }
-                                Text(m.text)
-                                    .font(.subheadline)
-                                    .foregroundStyle(m.pending ? Theme.t2 : Theme.txt)
-                                    .padding(.horizontal, 12).padding(.vertical, 9)
-                                    .background(m.mine ? Theme.brandA.opacity(0.35)
-                                                       : Theme.card.opacity(0.9))
-                                    .clipShape(RoundedRectangle(cornerRadius: 13))
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(m.text)
+                                        .font(.subheadline)
+                                        .foregroundStyle(m.pending ? Theme.t2 : Theme.txt)
+                                    if let mark = m.mark {
+                                        Text(mark).font(.caption2).foregroundStyle(Theme.t3)
+                                    }
+                                }
+                                .padding(.horizontal, 12).padding(.vertical, 9)
+                                .background(m.mine ? Theme.brandA.opacity(0.35)
+                                                   : Theme.card.opacity(0.9))
+                                .clipShape(RoundedRectangle(cornerRadius: 13))
                                 if !m.mine { Spacer(minLength: 40) }
                             }
                             .id(m.id)
@@ -90,7 +97,9 @@ struct ChatView: View {
                     id: pid, token: token, interactorId: interactor!, message: text)
                 let p = reply.profile_message
                 if let content = p.content, p.status == "approved" {
-                    messages.append(Bubble(mine: false, text: content, pending: false))
+                    messages.append(Bubble(
+                        mine: false, text: content, pending: false,
+                        mark: p.watermark?.display?.line ?? "✦ AI"))
                     if let prov = reply.provenance {
                         messages.append(Bubble(
                             mine: false,
