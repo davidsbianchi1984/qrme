@@ -10,7 +10,18 @@ from fastapi.testclient import TestClient
 # The suite gateway fronts all three products; these tests only run when the
 # jim-mini and pdi packages are installed alongside qrme (the full-suite dev
 # setup). In a qrme-only checkout they're skipped, not failed.
-_missing = [m for m in ("jim.api", "pdi.api") if importlib.util.find_spec(m) is None]
+
+
+def _absent(module: str) -> bool:
+    # find_spec("jim.api") *raises* when the parent package "jim" doesn't
+    # exist at all, which would break collection instead of skipping.
+    try:
+        return importlib.util.find_spec(module) is None
+    except ModuleNotFoundError:
+        return True
+
+
+_missing = [m for m in ("jim.api", "pdi.api") if _absent(m)]
 pytestmark = pytest.mark.skipif(
     bool(_missing), reason=f"suite packages not installed: {_missing}")
 

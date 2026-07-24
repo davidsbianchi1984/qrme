@@ -14,7 +14,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e .[dev]
-      - run: pytest -q
+      # -m form keeps the repo root on sys.path, matching local runs.
+      - run: python -m pytest -q
 
   # Smoke-test the front-ends: every PR proves the desktop app and the suite
   # launcher still type-check and build. (Skips the Electron binary download —
