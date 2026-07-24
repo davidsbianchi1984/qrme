@@ -23,6 +23,8 @@ import app.qrme.studio.Beacon
 import app.qrme.studio.CatalogApp
 import app.qrme.studio.ConnMsg
 import app.qrme.studio.Excursion
+import app.qrme.studio.GameCalloutResult
+import app.qrme.studio.GameSession
 import app.qrme.studio.InstalledPack
 import app.qrme.studio.LanguageInfo
 import app.qrme.studio.LicenseGrant
@@ -1100,7 +1102,7 @@ fun ManageScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("General", "Summon", "Market", "Packs", "License").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1111,7 +1113,129 @@ fun ManageScreen(vm: StudioViewModel) {
                 1 -> SummonPanel(vm)
                 2 -> MarketPanel(vm)
                 3 -> PacksPanel(vm)
+                4 -> GamingPanel(vm)
                 else -> LicensePanel(vm)
+            }
+        }
+    }
+}
+
+@Composable
+private fun GamingPanel(vm: StudioViewModel) {
+    val platforms = listOf("playstation", "xbox", "nintendo", "steam", "pc")
+    val roles = listOf("companion", "teammate", "practice_partner")
+    var platform by remember { mutableStateOf("xbox") }
+    var role by remember { mutableStateOf("teammate") }
+    var game by remember { mutableStateOf("") }
+    var sessions by remember { mutableStateOf<List<GameSession>>(emptyList()) }
+    var openSession by remember { mutableStateOf<String?>(null) }
+    var situation by remember { mutableStateOf("") }
+    var minorPresent by remember { mutableStateOf(false) }
+    var lastLine by remember { mutableStateOf<GameCalloutResult?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.gameSessions(vm.pid!!, vm.token!!) }) { r ->
+            sessions = r.getOrDefault(emptyList())
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Play alongside", color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text("Bring this profile into a game as a companion or teammate. " +
+                 "It talks in character and moderated — and always plays " +
+                 "within the game's rules; it never cheats.",
+                color = Qrme.T2, fontSize = 12.sp)
+            Text("Platform", color = Qrme.T3, fontSize = 11.sp)
+            Row(Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                platforms.forEach { p ->
+                    val on = platform == p
+                    Text(p, color = if (on) Color.White else Qrme.Txt, fontSize = 11.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(50))
+                            .background(if (on) Qrme.BrandA else Qrme.ScrBot)
+                            .clickable { platform = p }
+                            .padding(horizontal = 10.dp, vertical = 6.dp))
+                }
+            }
+            Row(Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                roles.forEach { rl ->
+                    val on = role == rl
+                    Text(rl.replace("_", " "),
+                        color = if (on) Color.White else Qrme.Txt, fontSize = 11.sp,
+                        modifier = Modifier.clip(RoundedCornerShape(50))
+                            .background(if (on) Qrme.BrandA else Qrme.ScrBot)
+                            .clickable { role = rl }
+                            .padding(horizontal = 10.dp, vertical = 6.dp))
+                }
+            }
+            labeledField("Game title", game, "Halo Infinite") { game = it }
+            SmallAction("Start session") {
+                if (game.isNotBlank()) {
+                    error = null
+                    vm.call({ ApiClient.startGameSession(vm.pid!!, vm.token!!,
+                        platform, game, role) }) { r ->
+                        r.onSuccess { game = "" }.onFailure { error = it.message }
+                        reload()
+                    }
+                }
+            }
+        }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+
+        sessions.forEach { s ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("${s.game} · ${s.platform}", color = Qrme.Txt,
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(s.status.uppercase(),
+                        color = if (s.status == "active") Qrme.Green else Qrme.T3,
+                        fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+                Text("${s.role.replace("_", " ")} · ${s.callouts} callouts",
+                    color = Qrme.T2, fontSize = 11.sp)
+                if (s.status == "active") {
+                    if (openSession == s.id) {
+                        labeledField("Situation", situation,
+                            "enemy on the flag, low shields") { situation = it }
+                        Row(Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically) {
+                            Text("Minor in lobby (forces strict)",
+                                color = Qrme.T2, fontSize = 11.sp)
+                            Switch(checked = minorPresent,
+                                onCheckedChange = { minorPresent = it })
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            SmallAction("Call it") {
+                                if (situation.isNotBlank())
+                                    vm.call({ ApiClient.gameCallout(s.id, vm.token!!,
+                                        situation, minorPresent) }) { r ->
+                                        lastLine = r.getOrNull(); reload()
+                                    }
+                            }
+                            TextButton(onClick = {
+                                vm.call({ ApiClient.endGameSession(s.id, vm.token!!) }) {
+                                    openSession = null; reload()
+                                }
+                            }) { Text("End", color = Qrme.Red, fontSize = 12.sp) }
+                        }
+                        lastLine?.let { l ->
+                            if (l.status == "spoken" && l.line != null)
+                                Text("🎙 ${l.line}", color = Qrme.Green, fontSize = 12.sp)
+                            else Text("⚠️ held — ${l.flagReason ?: "moderation"}",
+                                color = Qrme.Amber, fontSize = 11.sp)
+                        }
+                    } else {
+                        TextButton(onClick = { openSession = s.id; lastLine = null }) {
+                            Text("Open", color = Qrme.BrandA, fontSize = 12.sp)
+                        }
+                    }
+                }
             }
         }
     }

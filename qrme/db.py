@@ -441,6 +441,24 @@ CREATE TABLE IF NOT EXISTS knowledge_packs (
     created_at TEXT NOT NULL
 );
 
+-- Gaming: a synthetic profile joins a game as an agent-operated companion
+-- or teammate. Each session is owner-created for a platform + title + role;
+-- the persona produces in-character comms (callouts, coordination, banter)
+-- each turn, moderated like any public surface. Fair play is a system rule,
+-- not a toggle: the companion plays within the game's rules and never claims
+-- or uses cheats.
+CREATE TABLE IF NOT EXISTS game_sessions (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    platform   TEXT NOT NULL,          -- a catalog gaming app key
+    game       TEXT NOT NULL,          -- free-text title
+    role       TEXT NOT NULL,          -- companion | teammate | practice_partner
+    mode       TEXT NOT NULL DEFAULT 'online_multiplayer',
+    status     TEXT NOT NULL DEFAULT 'active',  -- active | ended
+    callouts   INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+
 -- Pilot controls: the owner's live throttles/sliders for a subject (a
 -- profile or a robot). One JSON blob of dial -> 0..100; absent dials read
 -- as the 50 default. Shapes style/pace/behavior only — never identity,

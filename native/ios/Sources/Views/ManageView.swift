@@ -4,7 +4,7 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", license = "License" }
+    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License" }
     @State private var tab: Tab = .general
 
     var body: some View {
@@ -20,6 +20,7 @@ struct ManageView: View {
             case .summon: SummonSection()
             case .market: MarketSection()
             case .packs: ScrollView { PacksSection().padding(20) }
+            case .gaming: GamingSection()
             case .license: LicenseSection()
             }
         }

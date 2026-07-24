@@ -6,8 +6,9 @@ from qrme import catalog
 def test_catalog_endpoint(client):
     body = client.get("/connectors/catalog").json()
     providers = {p["provider"] for p in body["providers"]}
-    assert providers == {"apple", "google", "microsoft", "canva"}
-    assert body["provider_count"] == 4
+    assert providers == {"apple", "google", "microsoft", "canva",
+                         "glasses", "gaming"}
+    assert body["provider_count"] == 6
     assert body["app_count"] == len(catalog.CONNECTORS)
 
 

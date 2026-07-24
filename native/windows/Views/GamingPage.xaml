@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.GamingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="680" Spacing="16" Padding="28" HorizontalAlignment="Left">
+            <TextBlock Text="Gaming" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock Text="Bring this profile into a game as a companion or teammate — agent-operated. It talks in character and moderated, and always plays within the game's rules; it never cheats."
+                       Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <ComboBox x:Name="PlatformBox" Header="Platform" HorizontalAlignment="Stretch" />
+                    <ComboBox x:Name="RoleBox" Header="Role" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="GameBox" Header="Game title" PlaceholderText="Halo Infinite" />
+                    <Button Content="Start session" Click="OnStart"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
+                       TextWrapping="Wrap" Visibility="Collapsed" />
+
+            <ItemsControl x:Name="SessionList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,0,0,6">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                                <TextBlock Text="{Binding Meta}" FontSize="11"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Border x:Name="PlayCard" Background="{StaticResource QrmeCardBrush}"
+                    BorderBrush="{StaticResource QrmeLineBrush}" BorderThickness="1"
+                    CornerRadius="16" Padding="16" Visibility="Collapsed">
+                <StackPanel Spacing="10">
+                    <ComboBox x:Name="ActiveBox" Header="Active session" HorizontalAlignment="Stretch"
+                              SelectionChanged="OnActiveChanged" />
+                    <TextBox x:Name="SituationBox" Header="Situation"
+                             PlaceholderText="enemy on the flag, low shields" />
+                    <CheckBox x:Name="MinorCheck" Content="A minor is in the lobby (forces strict)"
+                              Foreground="{StaticResource QrmeT2Brush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Call it" Click="OnCallout"
+                                Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                        <Button Content="End session" Click="OnEnd"
+                                Background="Transparent" Foreground="{StaticResource QrmeRedBrush}" />
+                    </StackPanel>
+                    <TextBlock x:Name="LineText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeGreenBrush}" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

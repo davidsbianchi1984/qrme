@@ -30,6 +30,9 @@
             <NavigationViewItem Content="Connect" Tag="connect">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Link" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Gaming" Tag="gaming">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Emoji" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Robots" Tag="robots">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Contact" /></NavigationViewItem.Icon>
             </NavigationViewItem>

@@ -58,6 +58,10 @@ data class PackRegistry(val key: String, val name: String, val url: String,
                         val available: Int, val synced: Int)
 data class InstalledPack(val id: String, val title: String, val pricePaid: Double,
                          val robotId: String)
+data class GameSession(val id: String, val platform: String, val game: String,
+                       val role: String, val status: String, val callouts: Int)
+data class GameCalloutResult(val status: String, val line: String?,
+                             val flagReason: String?)
 data class Listing(val id: String, val kind: String, val title: String, val blurb: String?,
                    val tags: List<String>, val profileId: String?)
 data class LicenseOffer(val kind: String, val price: Double, val currency: String,
@@ -462,6 +466,37 @@ object ApiClient {
 
     suspend fun uninstallRobotPack(packId: String, robotId: String, token: String) {
         request("/robots/$robotId/packs/$packId", "DELETE", null, token)
+    }
+
+    // ---- gaming: a profile plays alongside real players ----
+
+    suspend fun gameSessions(pid: String, token: String): List<GameSession> {
+        val arr = JSONArray(request("/profiles/$pid/gaming/sessions", token = token))
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            GameSession(o.getString("id"), o.optString("platform", ""),
+                o.optString("game", ""), o.optString("role", ""),
+                o.optString("status", ""), o.optInt("callouts"))
+        }
+    }
+
+    suspend fun startGameSession(pid: String, token: String, platform: String,
+                                 game: String, role: String): String =
+        request("/profiles/$pid/gaming/sessions", "POST",
+            JSONObject().put("platform", platform).put("game", game)
+                .put("role", role), token)
+
+    suspend fun gameCallout(sid: String, token: String, situation: String,
+                            minorPresent: Boolean): GameCalloutResult {
+        val o = request("/gaming/sessions/$sid/callout", "POST",
+            JSONObject().put("situation", situation)
+                .put("minor_present", minorPresent), token)
+        return GameCalloutResult(o.optString("status", ""),
+            o.optString("line", null), o.optString("flag_reason", null))
+    }
+
+    suspend fun endGameSession(sid: String, token: String) {
+        request("/gaming/sessions/$sid/end", "POST", null, token)
     }
 
     suspend fun listings(tag: String?): List<Listing> {

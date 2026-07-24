@@ -1675,6 +1675,18 @@ SCREENS = [
         dict(icon="person", color="brand", k="Kitchen NEO", s="quick ring: come here · patrol · dock · stop"),
         dict(icon="shieldok", color="cyan", k="No new powers, only reach", s="same auth · allowlists · moderation"),
     ], button=("Assist", "brand")),
+    dict(num=67, title="Smart Glasses", sub="Capture the POV, render to the lens", accent="cyan", tab=3, cards=[
+        dict(icon="eye", color="cyan", k="Ray-Ban Meta", s="capture · livestream · HUD caption", pill=("LINKED", "good")),
+        dict(icon="eye", color="brand", k="Meta Ray-Ban Display", s="POV context · HUD overlay · nav"),
+        dict(icon="compass", color="green", k="Google (Android XR)", s="Gemini POV · live-translation HUD"),
+        dict(icon="photo", color="amber", k="Capture ⟷ render", s="collect the view in · produce to the lens"),
+    ], button=("Connect glasses", "brand")),
+    dict(num=68, title="Gaming Companion", sub="A teammate, synthetically operated", accent="indigo", tab=3, cards=[
+        dict(icon="star2", color="indigo", k="Halo Infinite · Xbox", s="role: teammate · online multiplayer", pill=("LIVE", "good")),
+        dict(icon="chat", color="brand", k="“Enemy on the flag — falling back, cover me”", s="in-character callout, moderated"),
+        dict(icon="shieldok", color="green", k="Fair play, enforced", s="within the rules · never cheats"),
+        dict(icon="people", color="cyan", k="Companion · teammate · practice", s="PlayStation · Xbox · Switch · Steam · PC"),
+    ], button=("Start a session", "brand")),
     dict(num=66, title="Pilot Controls", sub="Throttle & sliders, live", accent="brand", tab=2, cards=[
         dict(icon="sliders", color="brand", k="Pace", s="throttle — unhurried ⟷ eager", metric="85"),
         dict(icon="sliders", color="cyan", k="Autonomy", s="checks first ⟷ acts alone", metric="40"),

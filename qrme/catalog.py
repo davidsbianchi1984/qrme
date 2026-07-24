@@ -94,6 +94,43 @@ _ROWS = [
      ["magic-design", "magic-media", "magic-write", "magic-edit",
       "magic-switch", "magic-layers", "background-remover", "translate"],
      ["act", "produce"]),
+
+    # ---- Smart glasses: capture the wearer's POV, render to the HUD --------
+    # ``collect`` pulls the wearer's point of view (camera, audio, context)
+    # in to inform the profile/agent; ``produce`` renders back to the lens —
+    # a heads-up overlay, captions, or navigation the persona speaks/draws.
+    ("glasses", "rayban_meta", "Ray-Ban Meta",
+     ["capture-photo", "capture-video", "livestream", "pov-context",
+      "voice", "hud-caption"], ["collect", "produce"]),
+    ("glasses", "meta_display", "Meta Ray-Ban Display",
+     ["capture-photo", "capture-video", "pov-context", "hud-overlay",
+      "voice", "navigation-hud"], ["collect", "produce"]),
+    ("glasses", "google_androidxr", "Google (Android XR)",
+     ["capture-photo", "capture-video", "gemini-pov",
+      "live-translation-hud", "navigation-hud"], ["collect", "produce"]),
+    ("glasses", "xreal_air", "XREAL Air",
+     ["capture-video", "ar-overlay", "spatial-display"],
+     ["collect", "produce"]),
+
+    # ---- Gaming consoles & platforms: capture play, produce highlights ----
+    # The console connector captures the wearer's play (clips, screenshots,
+    # session context) and produces highlights; agent-operated companions
+    # play alongside through the gaming module (routers/gaming.py).
+    ("gaming", "playstation", "PlayStation",
+     ["capture-clip", "screenshot", "party-voice", "session-context",
+      "highlight-reel"], ["collect", "produce"]),
+    ("gaming", "xbox", "Xbox",
+     ["capture-clip", "screenshot", "party-voice", "session-context",
+      "highlight-reel"], ["collect", "produce"]),
+    ("gaming", "nintendo", "Nintendo Switch",
+     ["capture-clip", "screenshot", "session-context"],
+     ["collect", "produce"]),
+    ("gaming", "steam", "Steam (PC)",
+     ["capture-clip", "screenshot", "voice", "session-context",
+      "highlight-reel"], ["collect", "produce"]),
+    ("gaming", "pc", "PC (cross-platform)",
+     ["capture-clip", "screenshot", "voice", "session-context",
+      "highlight-reel"], ["collect", "produce"]),
 ]
 
 _PROVIDER_LABEL = {
@@ -101,6 +138,8 @@ _PROVIDER_LABEL = {
     "google": "Google Gemini",
     "microsoft": "Microsoft Copilot",
     "canva": "Canva Magic Studio",
+    "glasses": "Smart Glasses",
+    "gaming": "Gaming Consoles & Platforms",
 }
 
 CONNECTORS = [

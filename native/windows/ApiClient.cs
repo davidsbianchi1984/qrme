@@ -249,6 +249,21 @@ public record PackInstalled(
     public int Count => InstalledItems ?? InstalledTasks?.Length ?? 0;
 }
 
+public record GameSession(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("platform")] string Platform,
+    [property: JsonPropertyName("platform_label")] string? PlatformLabel,
+    [property: JsonPropertyName("game")] string Game,
+    [property: JsonPropertyName("role")] string Role,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("callouts")] int? Callouts);
+
+public record GameCalloutResult(
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("line")] string? Line,
+    [property: JsonPropertyName("flag_reason")] string? FlagReason,
+    [property: JsonPropertyName("role")] string Role);
+
 public record Listing(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("kind")] string Kind,
@@ -650,6 +665,27 @@ public sealed class ApiClient
             HttpMethod.Delete, $"/robots/{robotId}/packs/{packId}");
         req.Headers.Add("authorization", $"Bearer {token}");
         (await _http.SendAsync(req)).EnsureSuccessStatusCode();
+    }
+
+    // -- gaming: a profile plays alongside real players --
+
+    public Task<GameSession[]> GameSessions(string pid, string token) =>
+        Send<GameSession[]>(Get($"/profiles/{pid}/gaming/sessions", token));
+
+    public Task<GameSession> StartGameSession(string pid, string token,
+                                              string platform, string game, string role) =>
+        Send<GameSession>(Post($"/profiles/{pid}/gaming/sessions",
+            new { platform, game, role }, token));
+
+    public Task<GameCalloutResult> GameCallout(string sid, string token,
+                                               string situation, bool minorPresent) =>
+        Send<GameCalloutResult>(Post($"/gaming/sessions/{sid}/callout",
+            new { situation, minor_present = minorPresent }, token));
+
+    public async Task EndGameSession(string sid, string token)
+    {
+        var res = await _http.SendAsync(Post($"/gaming/sessions/{sid}/end", new { }, token));
+        res.EnsureSuccessStatusCode();
     }
 
     public Task<Listing[]> Listings(string tag) =>
