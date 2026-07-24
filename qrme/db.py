@@ -459,11 +459,11 @@ CREATE TABLE IF NOT EXISTS game_sessions (
     created_at TEXT NOT NULL
 );
 
--- Dials: a subject's disposition (a profile or a robot) — throttle/behavior
--- sliders as JSON of dial -> 0..100; absent dials read as the 50 default.
--- Part of who the entity is, not a remote control. Shapes style/pace/
--- behavior only — never identity, boundaries, age-gating, or the allowlist.
-CREATE TABLE IF NOT EXISTS dial_settings (
+-- Steering: how the owner shapes a subject's presentation (a profile or a
+-- robot) — throttle/behavior dials as JSON of dial -> 0..100; absent dials
+-- read as the 50 default. Steering, not piloting: shapes style/pace/behavior
+-- only — never identity, boundaries, age-gating, or the command allowlist.
+CREATE TABLE IF NOT EXISTS steering_settings (
     subject_id TEXT PRIMARY KEY,       -- profile_id or robot_id
     dials      TEXT NOT NULL DEFAULT '{}',   -- JSON: dial name -> 0..100
     updated_at TEXT NOT NULL
