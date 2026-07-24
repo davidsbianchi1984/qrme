@@ -156,6 +156,14 @@ def build_system_prompt(
             "but reserved, and share nothing private."
         )
 
+    # Owner pilot dials (throttle + behavior sliders) ride on the prompt, so
+    # chat, compose, rooms, and robot speech all inherit them — style, pace,
+    # and manner only, never identity or safety.
+    from . import pilot
+    pilot_line = pilot.directive(profile["id"], bool(profile["adult_mode"]))
+    if pilot_line:
+        parts.append(pilot_line)
+
     if engagement:
         score = engagement["score"]
         if score >= 0.7:
