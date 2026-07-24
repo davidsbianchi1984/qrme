@@ -41,6 +41,10 @@ class Consent(BaseModel):
 
 
 class ProfileCreate(BaseModel):
+    # Clickwrap: first-party apps display the Terms (GET /terms) and send an
+    # explicit acceptance; the accepted version + timestamp are recorded on
+    # the profile. An explicit refusal is refused.
+    terms_consent: bool = True
     owner_id: str
     kind: ProfileKind
     display_name: str

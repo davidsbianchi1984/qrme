@@ -454,6 +454,7 @@ actor ApiClient {
             "display_name": name,
             "persona": persona,
             "verification": ["birthdate": birthdate],
+            "terms_consent": true,   // clickwrap: the Welcome screen displays the Terms
         ]
         if let language, language != "en" { body["language"] = language }
         return try await request("/profiles", method: "POST", body: body)

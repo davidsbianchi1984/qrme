@@ -17,6 +17,7 @@ import os
 from fastapi import FastAPI
 
 from . import offline
+from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (apps, assistant, community, connections, earnings,
@@ -28,6 +29,15 @@ from .routers import (apps, assistant, community, connections, earnings,
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
     app = FastAPI(title="QRME", version="0.1.1")
+
+    @app.get("/terms")
+    def terms() -> dict:
+        """The Terms of Service every client displays at the gateway:
+        version, key points, and where the full text lives. Acceptance is
+        recorded (version + timestamp) on profile creation."""
+        return {"version": terms_mod.TERMS_VERSION,
+                "key_points": terms_mod.KEY_POINTS,
+                "document": terms_mod.DOCUMENT}
 
     @app.get("/health")
     def health() -> dict:

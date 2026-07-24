@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS profiles (
                                                     -- improve the cloud model
     status            TEXT NOT NULL DEFAULT 'active',  -- active | restricted | departed | terminated
     proactive_min_interval_hours INTEGER NOT NULL DEFAULT 24,  -- anti-spam rate cap
+    terms_version     TEXT,                   -- ToS version accepted at creation
+    terms_accepted_at TEXT,
     created_at        TEXT NOT NULL
 );
 

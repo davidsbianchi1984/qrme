@@ -417,12 +417,15 @@ public sealed class ApiClient
                       persona,
                       verification = new { birthdate },
                       language,
+                      // clickwrap: the Welcome page displays the Terms
+                      terms_consent = true,
                   }
                 : (object)new
                   {
                       owner_id = "owner-1",
                       kind,
                       display_name = name,
+                      terms_consent = true,
                       persona,
                       verification = new { birthdate },
                   }));

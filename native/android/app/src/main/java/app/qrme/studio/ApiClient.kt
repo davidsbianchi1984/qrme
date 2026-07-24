@@ -145,6 +145,7 @@ object ApiClient {
             .put("display_name", name)
             .put("persona", persona)
             .put("verification", JSONObject().put("birthdate", birthdate))
+            .put("terms_consent", true)   // clickwrap: the Welcome screen displays the Terms
         if (!language.isNullOrBlank() && language != "en") body.put("language", language)
         val o = JSONObject(request("/profiles", "POST", body))
         return ProfileCreated(o.getString("id"), o.getString("display_name"),

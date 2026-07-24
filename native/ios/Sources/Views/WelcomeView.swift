@@ -73,6 +73,9 @@ struct WelcomeView: View {
                 .disabled(name.isEmpty || persona.isEmpty || busy)
                 .opacity(name.isEmpty || persona.isEmpty ? 0.5 : 1)
 
+                Text("By creating a profile you agree to the Terms of Service — profiles are AI-generated synthetic content, never professional advice; you assume the risks of AI interactions. Full terms: GET /terms · docs/terms.md")
+                    .font(.caption2).foregroundStyle(Theme.t3)
+
                 Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app")
                     .font(.system(size: 10, design: .monospaced)).foregroundStyle(Theme.t3)
             }.padding(20)
