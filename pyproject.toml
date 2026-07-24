@@ -1,6 +1,6 @@
 [project]
 name = "qrme"
-version = "0.1.0"
+version = "0.1.1"
 description = "AI synthetic profiles — relationship-aware, remembered, yours"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -6,18 +6,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-07-24
+
 ### Added
 
-- **First-run onboarding screens** — provider login (Continue with Apple /
-  Google / email), identity & age verification, access permissions, Avatar
-  Studio (2D portrait + 3D avatar), immersive AR/VR chat, live video, and an
-  "all set" summary — the full first-run → profile-building funnel, rendered in
-  both iOS and Android chrome.
+- **First-run onboarding screens** — provider login (Apple / Google / email),
+  identity & age verification, access permissions, Avatar Studio, immersive
+  AR/VR chat, live video, and an "all set" summary, in iOS and Android chrome.
+- **Native iOS / Android / Windows apps at full parity** — Chat, Community
+  (stranger matchmaking incl. the verified-18+ rated tier, multiparty rooms),
+  Connect (social platforms + connected apps), Robots, Knowledge Excursions,
+  Reach (summon @handle + QR beacons, marketplace, licensing, **earnings**),
+  Settings (model picker, objections, **steering hub**, **relationship**,
+  feedback), and Gaming — every backend surface reachable from every client.
+- **LLM provider choice** per profile (Claude / OpenAI / Grok / Perplexity /
+  Gemini, offline stub fallback) and **safe knowledge excursions** (study a
+  topic without leaking private data).
+- **Robotic embodiment** — bind catalog robots as physical bodies, per-kind
+  command allowlists, robot task packs; **watch remote** — agents, profile,
+  and robots on the wrist with green/orange/red lights and remote actions.
+- **Steering** (not piloting) — throttle/behavior/intimacy dials that shape
+  how a profile comes across, unified in a hub with age + appearance; rides
+  on every surface and embodiment.
+- **Marketplace growth** — starter collection (30 industries + wellbeing trio),
+  knowledge packs, robot task packs, federated pack registries, creator
+  ledger with payouts; **rated placement** (18+ venues, age wall at the
+  source) with commerce gating, per-venue analytics, **placement earnings**,
+  and **PDI-sealed placement custody**.
+- **Third-party objection & revocation flow** (audit + memorial/succession),
+  per-profile **language & provenance**, translate-anything, gateway language
+  choice; **smart-glasses connectors** and **agent-operated gaming
+  companions**; in-app **"Help us improve" feedback**; **suite smoke** — one
+  command proves the whole tandem stack.
+- **Chrome localization** — the apps' own tab/nav labels and common actions in
+  all 10 supported languages — plus pull-to-refresh and refresh actions.
+- `GET /health` — service liveness with tandem flags (the front-ends
+  previously probed `/openapi.json`).
 
 ### Fixed
 
-- Two text-overflow issues on the onboarding screens (the Verify Identity badge
-  row and the Immersive Chat subtitle).
+- CI collected zero tests (`tests/` was not a package and a fragile
+  `find_spec` guard crashed collection); the suite now runs identically in CI
+  and locally.
+- Two text-overflow issues on the onboarding screens.
 
 ## [0.1.0] — 2026-07-21
 

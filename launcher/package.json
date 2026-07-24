@@ -1,7 +1,7 @@
 {
   "name": "suite-launcher",
   "productName": "Suite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "One launcher, one login — QRME, JIM-mini, and PDI behind a single origin.",
   "private": true,
   "type": "module",
