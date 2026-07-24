@@ -313,10 +313,13 @@ class LicenseOffer(BaseModel):
 class PackItemIn(BaseModel):
     title: str
     content: str
+    task: str | None = None            # robot packs: the command verb added
+    requires: list[str] = Field(default_factory=list)  # capabilities needed
 
 
 class PackPublish(BaseModel):
     industry: str
+    audience: Literal["profile", "robot"] = "profile"
     title: str
     blurb: str | None = None
     price: float = 0                   # 0 = free download
@@ -327,6 +330,7 @@ class PackPublish(BaseModel):
 
 class PackInstall(BaseModel):
     profile_id: str
+    robot_id: str | None = None        # required for robot-audience packs
     accept_price: bool = False         # explicit consent to a priced pack
 
 

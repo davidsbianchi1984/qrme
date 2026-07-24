@@ -47,11 +47,13 @@ data class SummonCard(val profileId: String, val displayName: String, val handle
                       val status: String, val note: String?)
 data class SummonResult(val type: String, val label: String?, val scans: Int?,
                         val cards: List<SummonCard>)
-data class Pack(val id: String, val industry: String, val title: String,
+data class Pack(val id: String, val industry: String, val audience: String,
+                val title: String,
                 val blurb: String?, val publisher: String, val price: Double,
                 val currency: String, val free: Boolean, val items: Int,
                 val installs: Int)
-data class InstalledPack(val id: String, val title: String, val pricePaid: Double)
+data class InstalledPack(val id: String, val title: String, val pricePaid: Double,
+                         val robotId: String)
 data class Listing(val id: String, val kind: String, val title: String, val blurb: String?,
                    val tags: List<String>, val profileId: String?)
 data class LicenseOffer(val kind: String, val price: Double, val currency: String,
@@ -408,6 +410,7 @@ object ApiClient {
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             Pack(o.getString("id"), o.optString("industry", ""),
+                o.optString("audience", "profile"),
                 o.optString("title", ""), o.optString("blurb", null),
                 o.optString("publisher", ""), o.optDouble("price", 0.0),
                 o.optString("currency", "USD"), o.optBoolean("free"),
@@ -420,18 +423,25 @@ object ApiClient {
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             InstalledPack(o.getString("id"), o.optString("title", ""),
-                o.optDouble("price_paid", 0.0))
+                o.optDouble("price_paid", 0.0), o.optString("robot_id", ""))
         }
     }
 
     suspend fun installPack(packId: String, pid: String, token: String,
-                            acceptPrice: Boolean): String =
-        request("/packs/$packId/install", "POST",
-            JSONObject().put("profile_id", pid).put("accept_price", acceptPrice),
-            token)
+                            acceptPrice: Boolean,
+                            robotId: String? = null): String {
+        val body = JSONObject().put("profile_id", pid)
+            .put("accept_price", acceptPrice)
+        robotId?.let { body.put("robot_id", it) }
+        return request("/packs/$packId/install", "POST", body, token)
+    }
 
     suspend fun uninstallPack(packId: String, pid: String, token: String) {
         request("/profiles/$pid/packs/$packId", "DELETE", null, token)
+    }
+
+    suspend fun uninstallRobotPack(packId: String, robotId: String, token: String) {
+        request("/robots/$robotId/packs/$packId", "DELETE", null, token)
     }
 
     suspend fun listings(tag: String?): List<Listing> {

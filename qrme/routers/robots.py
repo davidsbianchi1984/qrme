@@ -142,11 +142,20 @@ def command_robot(robot_id: str, body: RobotCommand, request: Request) -> dict:
     require_owner(robot["profile_id"], request)
 
     allowed = robotics.allowed_commands(robot["model"])
-    if body.command not in allowed:
+    # Installed task packs extend the allowlist: a task module is a new
+    # commandable verb for exactly this body, capability-checked at install
+    # and audited like every built-in command.
+    skill = db.connect().execute(
+        "SELECT s.task, s.title, s.procedure, p.title AS pack_title"
+        " FROM robot_skills s JOIN knowledge_packs p ON p.id = s.pack_id"
+        " WHERE s.robot_id=? AND s.task=?",
+        (robot_id, body.command)).fetchone()
+    if body.command not in allowed and skill is None:
         raise HTTPException(
             422, f"'{body.command}' is not permitted for a "
                  f"{robotics.get(robot['model'])['kind']}; "
-                 f"allowed: {', '.join(allowed)}")
+                 f"allowed: {', '.join(allowed)} — plus any installed "
+                 "task-pack modules")
 
     result: dict
     if body.command == "say":
@@ -157,6 +166,13 @@ def command_robot(robot_id: str, body: RobotCommand, request: Request) -> dict:
             sources=source_items(robot["profile_id"], request.app.state.pdi))
         system += (f"\n\nYou are speaking aloud through your {robot['name']} "
                    f"body. Say one short, natural line about: {body.arg}.")
+        learned = [r["title"] for r in db.connect().execute(
+            "SELECT title FROM robot_skills WHERE robot_id=? ORDER BY task",
+            (robot_id,)).fetchall()]
+        if learned:
+            # The embodied agent knows what its body has learned.
+            system += (" Task modules your body has learned: "
+                       + ", ".join(learned) + ".")
         provider = llm.get_provider(cloud=request.app.state.cloud,
                                     choice=robot["llm_provider"])
         line = provider.generate(
@@ -169,6 +185,15 @@ def command_robot(robot_id: str, body: RobotCommand, request: Request) -> dict:
                       "spoken": None}
         else:
             result = {"status": "spoken", "spoken": line}
+    elif skill is not None and body.command not in allowed:
+        # A learned task: queued for the bridge with its pack procedure, so
+        # the body (and the audit trail) knows exactly what was licensed.
+        db.connect().execute(
+            "UPDATE robots SET status='active' WHERE id=?", (robot_id,))
+        result = {"status": "queued", "action": body.command,
+                  "arg": body.arg, "skill": skill["title"],
+                  "pack": skill["pack_title"],
+                  "procedure": skill["procedure"]}
     else:
         # Motion/utility commands are queued for the vendor bridge; the status
         # flips so the UI can show the body doing something.

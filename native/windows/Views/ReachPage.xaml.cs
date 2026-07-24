@@ -91,6 +91,8 @@ public sealed partial class ReachPage : Page
     // -- Knowledge packs --
 
     private System.Collections.Generic.Dictionary<string, Pack> _packsById = new();
+    // pack id -> robot id ("" when installed on the profile itself)
+    private System.Collections.Generic.Dictionary<string, string> _installedOn = new();
 
     private async System.Threading.Tasks.Task ReloadPacks()
     {
@@ -98,8 +100,8 @@ public sealed partial class ReachPage : Page
         try
         {
             var catalog = await ApiClient.Shared.Packs(PackIndustryBox.Text.Trim());
-            var installed = (await ApiClient.Shared.InstalledPacks(s.Pid!, s.Token!))
-                .Select(p => p.Id).ToHashSet();
+            _installedOn = (await ApiClient.Shared.InstalledPacks(s.Pid!, s.Token!))
+                .ToDictionary(p => p.Id, p => p.RobotId ?? "");
             _packsById = catalog.ToDictionary(p => p.Id);
             PackList.ItemsSource = catalog.Select(p => new PackVm
             {
@@ -107,9 +109,10 @@ public sealed partial class ReachPage : Page
                 Title = p.Title,
                 Blurb = p.Blurb ?? "",
                 Meta = $"#{p.Industry} · {p.Items} items · {p.Installs} installs · {p.Publisher}",
-                PriceLabel = p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}",
+                PriceLabel = (p.Audience == "robot" ? "🤖 ROBOT · " : "")
+                             + (p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}"),
                 ActionLabel = p.Free ? "Download" : $"Buy {p.Price:F2} {p.Currency}",
-                Installed = installed.Contains(p.Id),
+                Installed = _installedOn.ContainsKey(p.Id),
             }).ToList();
             PackError.Visibility = Visibility.Collapsed;
         }
@@ -131,12 +134,28 @@ public sealed partial class ReachPage : Page
         PackStatus.Visibility = Visibility.Collapsed;
         try
         {
+            // Robot task packs install onto the profile's bound body.
+            string? robotId = null;
+            if (pack.Audience == "robot")
+            {
+                var robots = await ApiClient.Shared.Robots(s.Pid!, s.Token!);
+                if (robots.Length == 0)
+                {
+                    PackError.Text = "bind a robot first (Robots page) — task packs install onto a body";
+                    PackError.Visibility = Visibility.Visible;
+                    return;
+                }
+                robotId = robots[0].Id;
+            }
             // Clicking the priced button is the accept_price consent.
             var r = await ApiClient.Shared.InstallPack(
-                packId, s.Pid!, s.Token!, acceptPrice: !pack.Free);
+                packId, s.Pid!, s.Token!, acceptPrice: !pack.Free, robotId: robotId);
+            var what = pack.Audience == "robot"
+                ? "tasks the body can now be commanded with"
+                : "items now grounding this profile";
             PackStatus.Text = pack.Free
-                ? $"downloaded — {r.InstalledItems} items now ground this profile"
-                : $"bought for {r.PricePaid:F2} — {r.InstalledItems} items now ground this profile";
+                ? $"downloaded — {r.Count} {what}"
+                : $"bought for {r.PricePaid:F2} — {r.Count} {what}";
             PackStatus.Visibility = Visibility.Visible;
         }
         catch (Exception ex)
@@ -153,8 +172,17 @@ public sealed partial class ReachPage : Page
         var s = AppState.Current;
         try
         {
-            await ApiClient.Shared.UninstallPack(packId, s.Pid!, s.Token!);
-            PackStatus.Text = "removed — the knowledge base shrank back";
+            var robotId = _installedOn.GetValueOrDefault(packId, "");
+            if (robotId.Length > 0)
+            {
+                await ApiClient.Shared.UninstallRobotPack(packId, robotId, s.Token!);
+                PackStatus.Text = "removed — the body's tasks were revoked";
+            }
+            else
+            {
+                await ApiClient.Shared.UninstallPack(packId, s.Pid!, s.Token!);
+                PackStatus.Text = "removed — the knowledge base shrank back";
+            }
             PackStatus.Visibility = Visibility.Visible;
         }
         catch (Exception ex)

@@ -190,7 +190,7 @@
                         <StackPanel Spacing="10">
                             <TextBlock Text="Knowledge packs" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly. Free packs download; priced packs are bought."
+                            <TextBlock Text="Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly. 🤖 Robot task packs teach the body this profile embodies new commandable tasks, capability-checked at install. Free packs download; priced packs are bought."
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
                             <StackPanel Orientation="Horizontal" Spacing="8">

@@ -1307,7 +1307,8 @@ private fun MarketPanel(vm: StudioViewModel) {
 private fun PacksPanel(vm: StudioViewModel) {
     var industry by remember { mutableStateOf("") }
     var catalog by remember { mutableStateOf<List<Pack>>(emptyList()) }
-    var installed by remember { mutableStateOf<Set<String>>(emptySet()) }
+    // pack id -> robot id ("" when installed on the profile itself)
+    var installed by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var status by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -1316,7 +1317,42 @@ private fun PacksPanel(vm: StudioViewModel) {
             catalog = r.getOrDefault(emptyList())
         }
         vm.call({ ApiClient.installedPacks(vm.pid!!, vm.token!!) }) { r ->
-            installed = r.getOrDefault(emptyList()).map { it.id }.toSet()
+            installed = r.getOrDefault(emptyList()).associate { it.id to it.robotId }
+        }
+    }
+
+    fun install(p: Pack) {
+        error = null; status = null
+        vm.call({
+            // Robot task packs install onto the profile's bound body.
+            val robotId = if (p.audience == "robot") {
+                ApiClient.robots(vm.pid!!, vm.token!!).firstOrNull()?.id
+                    ?: throw IllegalStateException(
+                        "bind a robot first (Robots tab) — task packs install onto a body")
+            } else null
+            // Tapping the priced button is the accept_price consent.
+            ApiClient.installPack(p.id, vm.pid!!, vm.token!!, !p.free, robotId)
+        }) { r ->
+            r.onSuccess {
+                status = if (p.audience == "robot")
+                    "installed — the body can now be commanded with these tasks"
+                else "installed — the pack now grounds this profile"
+            }.onFailure { error = it.message }
+            reload()
+        }
+    }
+
+    fun uninstall(p: Pack) {
+        val robotId = installed[p.id].orEmpty()
+        vm.call({
+            if (robotId.isNotEmpty())
+                ApiClient.uninstallRobotPack(p.id, robotId, vm.token!!)
+            else ApiClient.uninstallPack(p.id, vm.pid!!, vm.token!!)
+        }) {
+            status = if (robotId.isNotEmpty())
+                "removed — the body's tasks were revoked"
+            else "removed — the knowledge base shrank back"
+            reload()
         }
     }
     LaunchedEffect(Unit) { reload() }
@@ -1327,7 +1363,9 @@ private fun PacksPanel(vm: StudioViewModel) {
                 fontWeight = FontWeight.Bold)
             Text("Make this profile smarter: a pack's curated items join its " +
                  "source material, grounding what it knows — and every " +
-                 "reply's provenance shows the pack honestly.",
+                 "reply's provenance shows the pack honestly. 🤖 Robot task " +
+                 "packs teach the body this profile embodies new commandable " +
+                 "tasks, capability-checked at install.",
                 color = Qrme.T2, fontSize = 12.sp)
             labeledField("Filter by industry", industry, "finance") { industry = it }
             SmallAction("Browse") { reload() }
@@ -1340,9 +1378,14 @@ private fun PacksPanel(vm: StudioViewModel) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(p.title, color = Qrme.Txt, fontSize = 14.sp,
                         fontWeight = FontWeight.Bold)
-                    Text(if (p.free) "FREE" else "%.2f %s".format(p.price, p.currency),
-                        color = if (p.free) Qrme.Green else Qrme.Amber,
-                        fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        if (p.audience == "robot")
+                            Text("🤖 ROBOT", color = Qrme.BrandA, fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold)
+                        Text(if (p.free) "FREE" else "%.2f %s".format(p.price, p.currency),
+                            color = if (p.free) Qrme.Green else Qrme.Amber,
+                            fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    }
                 }
                 p.blurb?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
                 Text("#${p.industry} · ${p.items} items · ${p.installs} installs · ${p.publisher}",
@@ -1352,24 +1395,13 @@ private fun PacksPanel(vm: StudioViewModel) {
                     if (p.id in installed) {
                         Text("Installed", color = Qrme.Green, fontSize = 12.sp,
                             fontWeight = FontWeight.Bold)
-                        TextButton(onClick = {
-                            vm.call({ ApiClient.uninstallPack(p.id, vm.pid!!, vm.token!!) }) {
-                                status = "removed — the knowledge base shrank back"
-                                reload()
-                            }
-                        }) { Text("Remove", color = Qrme.Red, fontSize = 12.sp) }
+                        TextButton(onClick = { uninstall(p) }) {
+                            Text("Remove", color = Qrme.Red, fontSize = 12.sp)
+                        }
                     } else {
-                        // Tapping the priced button is the accept_price consent.
                         SmallAction(if (p.free) "Download"
                                     else "Buy %.2f %s".format(p.price, p.currency)) {
-                            error = null; status = null
-                            vm.call({ ApiClient.installPack(p.id, vm.pid!!,
-                                vm.token!!, !p.free) }) { r ->
-                                r.onSuccess {
-                                    status = "installed — the pack now grounds this profile"
-                                }.onFailure { error = it.message }
-                                reload()
-                            }
+                            install(p)
                         }
                     }
                 }

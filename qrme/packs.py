@@ -7,9 +7,18 @@ says — genuinely grows: grounded_in.by_kind counts the ``pack`` items like
 any other consented source. Free packs are downloads; priced packs are
 bought (payment simulated, like licensing).
 
+Packs come in two audiences. ``profile`` packs ground the persona's
+knowledge base (above). ``robot`` packs carry **task modules** for the body
+a profile embodies: each item is a new commandable verb with the
+capabilities it requires and the procedure the embodied agent follows —
+capability-checked at install, so a body is never sold work it cannot do,
+and executed inside the same allowlist + audit safety model as built-in
+commands.
+
 The starter packs — one free Field Pack per industry, matching the Starter
-Collection — fix the cold start. Seeding is idempotent and also lists each
-pack on the marketplace (kind ``expertise``, tagged ``pack``):
+Collection, plus the robot task packs — fix the cold start. Seeding is
+idempotent and also lists each pack on the marketplace (kind ``expertise``,
+tagged ``pack``):
 
     python -m qrme.packs          # or POST /packs/seed
 """
@@ -350,6 +359,69 @@ STARTER_PACKS: dict[str, tuple[str, list[tuple[str, str]]]] = {
 }
 
 
+# Robot task packs: modules for the bodies the profiles embody. Each item is
+# a task — a new command verb for the robot — with the capabilities it needs
+# (checked at install against the robotics catalog, so a vacuum is never sold
+# a manipulation task) and the procedure the embodied agent follows. Tasks
+# stay inside the same safety model as built-in commands: allowlisted,
+# owner-commanded, audited.
+# domain -> (title, price, [(task, item title, [required capabilities],
+#                            procedure), ...])
+ROBOT_PACKS: dict[str, tuple[str, float, list[tuple[str, str, list[str], str]]]] = {
+    "household": ("Household Tasks Pack", 0.0, [
+        ("sort_laundry", "Sort laundry", ["manipulation", "vision"],
+         "Sort items by color and fabric weight into separate baskets; "
+         "anything with a care label you cannot read goes to the ask-first "
+         "pile."),
+        ("water_plants", "Water the plants", ["mobility", "manipulation"],
+         "Visit each registered plant, check soil moisture before pouring, "
+         "and log any plant that looks distressed rather than improvising "
+         "care."),
+        ("set_table", "Set the table", ["manipulation"],
+         "Lay settings for the requested count; carry one item per hand, "
+         "plates before glasses, and nothing sharp handed directly to a "
+         "person."),
+    ]),
+    "care": ("Care Assistance Pack", 0.0, [
+        ("medication_reminder", "Medication reminders", ["voice"],
+         "Announce scheduled reminders and confirm acknowledgement. Reminders "
+         "only: never dispense, handle, or advise on medication — questions "
+         "go to the pharmacist or prescriber."),
+        ("escort_walk", "Escort on walks", ["mobility"],
+         "Accompany at the person's pace, keep to lit routes, and offer "
+         "wayfinding and company only — never physical support; if they "
+         "stumble or feel unwell, stop and summon help."),
+        ("comfort_checkin", "Comfort check-in", ["voice"],
+         "A gentle scheduled hello: ask how they are, listen, relay anything "
+         "concerning to the designated contact. Companionship, not care — "
+         "and never a substitute for human contact."),
+    ]),
+    "safety": ("Sentry Patrol Pack", 0.0, [
+        ("night_patrol", "Night patrol", ["camera_patrol"],
+         "Run the mapped route at low speed and lights off after hours; "
+         "record anomalies with a timestamped snapshot."),
+        ("perimeter_sweep", "Perimeter sweep", ["mapping", "navigation"],
+         "Cover every mapped room edge-first, flag doors and windows that "
+         "differ from the reference map."),
+        ("hazard_scan", "Hazard scan", ["camera_patrol"],
+         "Look for cords across walkways, spills, and blocked exits. Report "
+         "and photograph — never attempt to intervene or move a hazard."),
+    ]),
+    "culinary": ("Culinary Assistant Pack", 9.99, [
+        ("meal_prep_assist", "Meal-prep assistance", ["manipulation", "vision"],
+         "Fetch, rinse, and stage ingredients in recipe order. Never handle "
+         "knives, hot cookware, or anything on a live burner — those stay "
+         "human."),
+        ("pantry_inventory", "Pantry inventory", ["vision"],
+         "Photograph shelves, list items and estimated quantities, and flag "
+         "anything past its printed date for a human decision."),
+        ("timer_watch", "Timer watch", ["voice"],
+         "Track named timers and announce them clearly; repeat once if not "
+         "acknowledged — persistence beats assumption in a busy kitchen."),
+    ]),
+}
+
+
 def seed() -> dict:
     """Create the starter packs (idempotent: an industry that already has a
     starter-published pack is skipped), each listed on the marketplace."""
@@ -357,12 +429,14 @@ def seed() -> dict:
     from .models import ListingCreate
     from .routers.community import create_listing
 
+    import json
+
     conn = db.connect()
     created, skipped = [], []
     for industry, (title, items) in STARTER_PACKS.items():
         exists = conn.execute(
-            "SELECT id FROM knowledge_packs WHERE industry=? AND publisher=?",
-            (industry, PUBLISHER)).fetchone()
+            "SELECT id FROM knowledge_packs WHERE industry=? AND publisher=?"
+            " AND audience='profile'", (industry, PUBLISHER)).fetchone()
         if exists:
             skipped.append(industry)
             continue
@@ -370,9 +444,9 @@ def seed() -> dict:
         blurb = (f"{len(items)} curated knowledge items — install to ground "
                  f"a profile's {industry.replace('_', ' ')} expertise.")
         conn.execute(
-            "INSERT INTO knowledge_packs (id, industry, title, blurb,"
-            " publisher, price, currency, created_at) VALUES (?,?,?,?,?,0,"
-            "'USD',?)",
+            "INSERT INTO knowledge_packs (id, industry, audience, title,"
+            " blurb, publisher, price, currency, created_at)"
+            " VALUES (?,?,'profile',?,?,?,0,'USD',?)",
             (pack_id, industry, title, blurb, PUBLISHER, db.utcnow()))
         for item_title, content in items:
             conn.execute(
@@ -385,9 +459,41 @@ def seed() -> dict:
             tags=[industry.replace("_", "-"), "pack", "knowledge"],
             area=industry, provider_name=PUBLISHER, business=True))
         created.append({"pack_id": pack_id, "industry": industry,
-                        "title": title, "items": len(items)})
+                        "audience": "profile", "title": title,
+                        "items": len(items)})
+    for domain, (title, price, tasks) in ROBOT_PACKS.items():
+        exists = conn.execute(
+            "SELECT id FROM knowledge_packs WHERE industry=? AND publisher=?"
+            " AND audience='robot'", (domain, PUBLISHER)).fetchone()
+        if exists:
+            skipped.append(f"robot:{domain}")
+            continue
+        pack_id = db.new_id("pak")
+        blurb = (f"{len(tasks)} task modules for the robot a profile "
+                 f"embodies — each becomes a commandable verb, capability-"
+                 "checked at install.")
+        conn.execute(
+            "INSERT INTO knowledge_packs (id, industry, audience, title,"
+            " blurb, publisher, price, currency, created_at)"
+            " VALUES (?,?,'robot',?,?,?,?,'USD',?)",
+            (pack_id, domain, title, blurb, PUBLISHER, price, db.utcnow()))
+        for task, item_title, requires, procedure in tasks:
+            conn.execute(
+                "INSERT INTO pack_items (id, pack_id, title, content, task,"
+                " requires, created_at) VALUES (?,?,?,?,?,?,?)",
+                (db.new_id("pki"), pack_id, item_title, procedure, task,
+                 json.dumps(requires), db.utcnow()))
+        conn.commit()
+        create_listing(ListingCreate(
+            kind="expertise", title=title, blurb=blurb,
+            tags=[domain, "pack", "robot-tasks"],
+            area=domain, provider_name=PUBLISHER, business=True))
+        created.append({"pack_id": pack_id, "industry": domain,
+                        "audience": "robot", "title": title,
+                        "items": len(tasks)})
     return {"created": len(created), "skipped": len(skipped),
-            "industries": len(STARTER_PACKS), "packs": created}
+            "industries": len(STARTER_PACKS) + len(ROBOT_PACKS),
+            "packs": created}
 
 
 if __name__ == "__main__":

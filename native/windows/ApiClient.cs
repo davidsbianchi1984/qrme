@@ -214,6 +214,7 @@ public record SummonResult(
 public record Pack(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("industry")] string Industry,
+    [property: JsonPropertyName("audience")] string Audience,
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("blurb")] string? Blurb,
     [property: JsonPropertyName("publisher")] string Publisher,
@@ -226,11 +227,16 @@ public record Pack(
 public record InstalledPack(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("title")] string Title,
-    [property: JsonPropertyName("price_paid")] double PricePaid);
+    [property: JsonPropertyName("price_paid")] double PricePaid,
+    [property: JsonPropertyName("robot_id")] string? RobotId);
 
 public record PackInstalled(
-    [property: JsonPropertyName("installed_items")] int InstalledItems,
-    [property: JsonPropertyName("price_paid")] double PricePaid);
+    [property: JsonPropertyName("installed_items")] int? InstalledItems,
+    [property: JsonPropertyName("installed_tasks")] string[]? InstalledTasks,
+    [property: JsonPropertyName("price_paid")] double PricePaid)
+{
+    public int Count => InstalledItems ?? InstalledTasks?.Length ?? 0;
+}
 
 public record Listing(
     [property: JsonPropertyName("id")] string Id,
@@ -600,14 +606,26 @@ public sealed class ApiClient
     }
 
     public Task<PackInstalled> InstallPack(string packId, string pid,
-                                           string token, bool acceptPrice) =>
+                                           string token, bool acceptPrice,
+                                           string? robotId = null) =>
         Send<PackInstalled>(Post($"/packs/{packId}/install",
-            new { profile_id = pid, accept_price = acceptPrice }, token));
+            robotId is null
+                ? new { profile_id = pid, accept_price = acceptPrice }
+                : (object)new { profile_id = pid, accept_price = acceptPrice,
+                                robot_id = robotId }, token));
 
     public async Task UninstallPack(string packId, string pid, string token)
     {
         var req = new HttpRequestMessage(
             HttpMethod.Delete, $"/profiles/{pid}/packs/{packId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        (await _http.SendAsync(req)).EnsureSuccessStatusCode();
+    }
+
+    public async Task UninstallRobotPack(string packId, string robotId, string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Delete, $"/robots/{robotId}/packs/{packId}");
         req.Headers.Add("authorization", $"Bearer {token}");
         (await _http.SendAsync(req)).EnsureSuccessStatusCode();
     }
