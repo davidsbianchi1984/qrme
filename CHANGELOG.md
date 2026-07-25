@@ -35,6 +35,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   identifying fields at any depth, product-shaped ids, and email addresses,
   and answers 422 naming the field instead of sanitizing: a quiet strip would
   hide the client bug that leaked it.
+- **The native apps are compiled in CI** (`.github/workflows/native.yml`) —
+  iOS via XcodeGen + `xcodebuild` on macOS, Android via `gradle
+  assembleDebug`, Windows via `dotnet build`. Until now the Swift, Kotlin and
+  C# had never been through a compiler here at all: they were checked by
+  reading and by brace/XML well-formedness, which catches a typo and nothing
+  else. Compile only — signing and packaging stay in the release workflow —
+  and it runs only when `native/` changes, since macOS runner minutes are not
+  free.
 - **Profile portraits** — `GET /profiles/{id}/avatar` returns the asset, the
   profile's AI watermark, and the likeness record as one shape, so 2-D, 3-D,
   VR and AR surfaces composite the badge rather than deciding whether to; a
