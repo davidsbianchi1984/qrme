@@ -16,6 +16,7 @@ import os
 
 from fastapi import FastAPI, Request, Response
 
+from . import avatars as avatar_assets
 from . import mobile, offline
 from . import terms as terms_mod
 from .cloud import CloudModelClient
@@ -23,8 +24,8 @@ from .pdi_client import PDIClient
 from .routers import (apps, assistant, avatars, community, connections,
                       earnings, feedback, gaming, governance, intelligence,
                       interaction, licensing, models, packs, profiles,
-                      research, robots, social, steering, summon, watch,
-                      watermarks)
+                      research, robots, signatures, social, steering, summon,
+                      watch, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -111,6 +112,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(gaming.router)
     app.include_router(models.router)
     app.include_router(robots.router)
+    app.include_router(signatures.router)
 
     # Optional CORS for a packaged desktop/mobile front-end that calls the API
     # from a different origin (e.g. the Electron app in app/). Off by default;
@@ -123,6 +125,16 @@ def create_app(pdi_client: PDIClient | None = None,
         app.add_middleware(
             CORSMiddleware, allow_origins=allow, allow_credentials=False,
             allow_methods=["*"], allow_headers=["*"])
+
+    # The starter portraits. Mounted unconditionally: unlike the studio, these
+    # ship inside the package, so if the directory is missing something is
+    # wrong with the install rather than merely unbuilt.
+    _portraits = avatar_assets.portraits_dir()
+    if _portraits.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.ASSET_ROUTE,
+                  StaticFiles(directory=str(_portraits)),
+                  name="portraits")
 
     # The studio itself, served from this API so a phone loads the UI and
     # calls the API on one origin (no CORS, nothing to configure). Mounted

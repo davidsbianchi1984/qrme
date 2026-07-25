@@ -29,6 +29,13 @@ from ..models import BeaconCreate, HandleSet, RatedPlacementCreate
 router = APIRouter()
 
 
+def _absolute(asset: str | None) -> str | None:
+    """Root-relative asset paths become absolute against the public base."""
+    if not asset or not asset.startswith("/"):
+        return asset
+    return f"{_public_base()}{asset}"
+
+
 def _public_base() -> str:
     return os.environ.get("QRME_PUBLIC_URL", "https://qrme.app").rstrip("/")
 
@@ -265,7 +272,10 @@ def beacon_card(beacon_id: str, request: Request) -> dict:
         # The mark travels with the card, so an overlay cannot draw the face
         # without also having been handed the disclosure to draw with it.
         "watermark": art["watermark"]["line"],
-        "portrait": art["asset"],
+        # Absolute, because the overlay is a native client building a URL —
+        # a root-relative path is a valid href in a browser and a broken URL
+        # everywhere else.
+        "portrait": _absolute(art["asset"]),
         "initials": landing._initials(name),
         "label": beacon["label"],
         "shared_room": beacon["room_id"],

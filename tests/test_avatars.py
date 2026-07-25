@@ -120,7 +120,11 @@ def test_briefs_state_their_own_constraints():
         joined = " ".join(brief["constraints"]).lower()
         assert "not a likeness of anyone real" in joined
         assert "trademarked" in joined
-        assert brief["prompt"].endswith(avatars.STYLE)
+        # The rated portrait carries its own treatment (RATED_STYLE): it is
+        # age-walled off every surface the others appear on, so matching the
+        # collection's look would buy nothing.
+        assert brief["prompt"].endswith(brief["style"])
+        assert brief["style"] in (avatars.STYLE, avatars.RATED_STYLE)
 
 
 def test_the_mental_health_trio_are_not_played_for_laughs():
@@ -165,3 +169,76 @@ def test_the_rated_starter_is_age_walled_like_any_other(client):
     card = client.get("/summon", params={"ref": "@vivienne_sable"}).json()
     assert card["profile"].get("rated") is True
     assert card["profile"].get("age_wall") or "18" in str(card["profile"])
+
+
+# --- the shipped collection ----------------------------------------------
+
+def test_every_starter_ships_with_a_portrait():
+    """A starter with no face falls back to initials on the beacon page and
+    in the camera overlay — which is the first thing a stranger ever sees of
+    this product."""
+    missing = [handle for handle in avatars.BRIEFS
+               if avatars.asset_path(handle) is None]
+    assert not missing, f"no portrait file for: {missing}"
+
+
+def _webp_size(raw: bytes) -> tuple[int, int]:
+    """Dimensions straight out of the simple-lossy WebP header.
+
+    Read here rather than through an imaging library so the test suite does
+    not gain a dependency it needs for one assertion — and so what is checked
+    is the shipped container itself, not a library's reading of it.
+    """
+    assert raw[:4] == b"RIFF" and raw[8:12] == b"WEBP", "not a WebP file"
+    assert raw[12:16] == b"VP8 ", f"unexpected WebP chunk {raw[12:16]!r}"
+    assert raw[23:26] == b"\x9d\x01\x2a", "bad VP8 start code"
+    return (int.from_bytes(raw[26:28], "little") & 0x3FFF,
+            int.from_bytes(raw[28:30], "little") & 0x3FFF)
+
+
+def test_the_portraits_are_square_and_small_enough_to_load_on_cellular():
+    """The beacon page renders them in a 1:1 frame, and it opens in a camera
+    app's in-app browser on a cold start."""
+    for path in sorted(avatars.portraits_dir().glob("*.webp")):
+        size = _webp_size(path.read_bytes())
+        assert size == (512, 512), f"{path.name} is {size}"
+        assert path.stat().st_size < 120_000, f"{path.name} is heavy"
+
+
+def test_the_portrait_directory_is_declared_as_package_data():
+    """These files live inside the package, so they vanish on `pip install`
+    unless setuptools is told to carry them. That failure is invisible in the
+    repo and total in the container — the same shape as the /app 404."""
+    import pathlib
+    toml = pathlib.Path(__file__).resolve().parents[1] / "pyproject.toml"
+    text = toml.read_text()
+    assert "[tool.setuptools.package-data]" in text
+    assert "assets/portraits/*.webp" in text
+
+
+def test_seeded_starters_carry_their_portrait(client):
+    from qrme import seed
+    seed.seed()
+    pid = client.get("/summon?ref=@dr_amara_osei").json()["profile"]["profile_id"]
+    art = client.get(f"/profiles/{pid}/avatar").json()
+    assert art["asset"] == "/portraits/dr_amara_osei.webp"
+    assert art["placeholder"] is False
+    # The badge is attached at the source, never left to the surface.
+    assert art["watermark"]["always_displayed"] is True
+
+
+def test_a_portrait_is_actually_served(client):
+    res = client.get("/portraits/coach_dana_reyes.webp")
+    assert res.status_code == 200
+    assert res.headers["content-type"] == "image/webp"
+
+
+def test_a_starters_face_belongs_to_nobody(client):
+    """The whole collection is invented people, so no starter reports a
+    rights holder — that is what makes shipping them everywhere safe."""
+    from qrme import seed
+    seed.seed()
+    pid = client.get("/summon?ref=@otis_marsh").json()["profile"]["profile_id"]
+    art = client.get(f"/profiles/{pid}/avatar").json()
+    assert art["likeness"]["real_person"] is False
+    assert "no rights holder" in art["likeness"]["note"]

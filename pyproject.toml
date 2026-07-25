@@ -20,6 +20,10 @@ dependencies = [
     "anthropic>=0.117",
     "segno>=1.6",
     "httpx>=0.27",          # suite/gateway.py calls the mounted apps in-process
+    # WebAuthn assertion verification (qrme/signatures.py). Not optional: a
+    # signature module that parsed assertions without verifying them would
+    # produce records that only look like evidence.
+    "cryptography>=41",
 ]
 
 [project.optional-dependencies]
@@ -38,6 +42,12 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["qrme*", "cloudgw*"]
+
+# The starter portraits ship inside the package. Without this they exist in
+# the repo and vanish on install — the same failure that made /app 404 in the
+# container, and it would show up as every starter falling back to initials.
+[tool.setuptools.package-data]
+qrme = ["assets/portraits/*.webp"]
 
 [tool.pytest.ini_options]
 filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]

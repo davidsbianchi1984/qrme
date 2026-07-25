@@ -109,6 +109,12 @@ in a request body.
   as open as scanning a QR code in the world.
 - Deleting a profile revokes its owner token.
 
+A bearer token authorises an action; it does not *sign* one. For records that
+get disputed later — a likeness release, a care handoff, a BAA — see
+[docs/signatures.md](docs/signatures.md): the same Face ID gesture through
+WebAuthn/passkeys, returning a cryptographic assertion bound to the enrolled
+account and to the exact document. Specified, not yet built.
+
 ## Objection, takedown & lifecycle states
 
 A real person (or their estate) can contest a profile that represents them —
@@ -149,7 +155,11 @@ reports no rights holder, while a real person's face reports the recorded
 grant, its attestor, and that it can be withdrawn. Starter portraits are all
 invented people — the same promise `seed.py` already makes about the personas
 — and the art direction is published at `GET /avatars/briefs`, generation-
-ready. See [docs/avatars.md](docs/avatars.md).
+ready.
+
+All 34 starters ship **with** their portrait (`/portraits/{handle}.webp`), so
+a beacon scanned by a stranger reveals a face rather than initials. See
+[docs/avatars.md](docs/avatars.md).
 
 ## Companion features
 

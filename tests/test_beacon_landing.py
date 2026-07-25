@@ -243,7 +243,10 @@ def test_the_card_is_small_enough_to_fetch_while_the_camera_runs(client):
 
     card = client.get(f"/b/{b['id']}/card").json()
     assert card["display_name"] == "Marcus Bell"
-    assert card["portrait"] == "/a/m.png"
+    # Absolute, not the stored path. The consumer is a native client building
+    # a URL from this string; a root-relative path is a valid href only in a
+    # browser already on the origin, and the overlay is never that.
+    assert card["portrait"] == "https://qrme.app/a/m.png"
     assert card["initials"] == "MB"
     assert card["age_wall"] is False
     assert set(card) == {"profile_id", "display_name", "watermark", "portrait",

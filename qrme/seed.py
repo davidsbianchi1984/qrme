@@ -266,6 +266,14 @@ def seed() -> dict:
         if portrait:
             conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
                          (portrait, profile["id"]))
+        # The rendered face, when one ships with the package. Set here rather
+        # than left for an owner to attach: a starter with no portrait falls
+        # back to initials on the beacon page and in the camera overlay, which
+        # is the first thing a stranger sees.
+        asset = avatars.asset_path(handle)
+        if asset:
+            conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
+                         (asset, profile["id"]))
         all_tags = list(dict.fromkeys([industry.replace("_", "-"), *tags]))
         blurb = persona.split(". ")[0] + "."
         # Both marketplace surfaces: the generalized listings (browse) and

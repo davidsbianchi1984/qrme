@@ -6,6 +6,75 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The starter collection has faces.** All 34 portraits ship as files in
+  `qrme/assets/portraits/`, served at `/portraits/{handle}.webp` and attached
+  to each starter by `seed.py`. Until now the briefs described portraits that
+  did not exist, so every starter fell back to initials — including on the
+  beacon page and in the camera overlay, which is the first thing a stranger
+  ever sees. 512×512 WebP, declared as package data so they survive
+  `pip install` rather than existing only in the repo. `avatars.STYLE` is
+  rewritten to describe the treatment that actually shipped (a monochrome cyan
+  hologram, not the warm-lit photographic look originally specified), because
+  a shared style whose text disagrees with the assets cannot do the one job it
+  exists for; the rated portrait carries its own `RATED_STYLE`, since it is
+  age-walled off every surface the others appear on.
+- **Signatures that survive being disputed** (`qrme/signatures.py`,
+  `qrme/webauthn.py`, `POST /signatures/*`). The gesture is the same Face ID
+  prompt; what comes back is a WebAuthn assertion rather than a boolean —
+  signed by a key in the Secure Enclave that the app never sees, over a
+  challenge that **is** the SHA-256 of a canonical payload naming the document
+  hash, the stated meaning, the signer, and an expiry. Change one byte of the
+  document and verification fails. `userVerification: "required"` makes the
+  biometric mandatory rather than a presence tap, an envelope signs once,
+  and an assertion made for one document is refused for another. Proofing
+  level is recorded at enrollment and enforced per tier, so a self-asserted
+  credential cannot sign a care handoff; syncable credentials (`be`/`bs`) are
+  reported and barred from the top tier, because a key present on every device
+  in a cloud account is a weaker claim of exclusive possession. The evidence
+  package copies the public key, so revoking a passkey never retroactively
+  unmakes what it signed, and `POST /signatures/verify` checks a package with
+  no token and no lookup — a counterparty should not have to trust this
+  deployment. Every package ships its own limits attached, including that
+  WebAuthn has no trusted display. Adds `cryptography` as a runtime
+  dependency: a module that parsed assertions without verifying them would
+  produce records that only *look* like evidence.
+- **The in-camera beacon overlay on Android** (CameraX + ML Kit), matching the
+  iOS scanner: point the phone at a sticker and the profile is drawn on the
+  code in the live viewfinder, tracking it as the phone moves. ML Kit reports
+  in the analysis image's coordinate space, which is rotated and differently
+  sized from the view, so the box is mapped through the preview's
+  `FILL_CENTER` transform before anything is drawn — without that the portrait
+  lands where the sticker is not. Resolution is guarded by beacon id and an
+  in-flight flag, since the camera delivers ~30 frames a second and every one
+  sees the same sticker. The barcode model is bundled rather than downloaded
+  on demand, so the first scan works without Play Services fetching anything.
+
+### Fixed
+
+- **A beacon card's portrait is now an absolute URL.** `GET /b/{id}/card` was
+  returning the stored asset path unchanged, which is a valid `href` only for
+  a browser already on the origin — and the consumer of that field is a native
+  overlay building a `URL` from the string. It worked while every portrait was
+  an absolute test URL and would have broken the moment real assets landed on
+  a relative path, which is this release.
+
+### Documentation
+
+- **[docs/signatures.md](docs/signatures.md) — the reasoning behind the
+  above**, and the part that is not code: why the obvious `evaluatePolicy`
+  version fails, the identity-proofing ladder, the evidence package,
+  Optic ID on Vision Pro and the cross-device hybrid path for headsets that
+  expose no platform authenticator, and per-product bindings for care
+  handoffs, BAA execution, key release, and likeness releases. Recommends
+  **ESIGN/UETA** grade with 21 CFR Part 11 as a configuration change rather
+  than a rewrite — HIPAA does not require Part 11, and JIM's terms already
+  state the product is not a medical device. Ends with what the scheme does
+  *not* prove, including the absence of a trusted display: WebAuthn cannot
+  attest to what appeared on the screen, and the mitigation is signing on a
+  second device rather than a claim that it can.
+
 ## [0.1.5] — 2026-07-25
 
 ### Added
