@@ -599,24 +599,45 @@ object ApiClient {
 
     // ---- live desks ----
 
-    suspend fun desk(id: String): DeskCard {
-        val o = JSONObject(request("/desks/$id"))
-        val f = o.getJSONObject("feed")
-        val a = o.getJSONObject("attestation")
-        val bell = o.getJSONObject("bell")
+    /**
+     * A desk card. Past an 18+ age wall most of the payload is absent, so
+     * every nested object is read optionally rather than demanded — the wall
+     * is a normal response, not an error.
+     */
+    suspend fun desk(id: String, token: String? = null): DeskCard {
+        val o = JSONObject(request("/desks/$id", token = token))
+        val f = o.optJSONObject("feed")
+        val a = o.optJSONObject("attestation")
+        val bell = o.optJSONObject("bell")
         return DeskCard(
-            o.getString("desk_id"), o.getString("display_name"),
+            o.getString("desk_id"), o.optString("display_name", ""),
             o.optString("trade", ""),
             if (o.isNull("location")) null else o.optString("location"),
             if (o.isNull("blurb")) null else o.optString("blurb"),
-            o.getString("presence"), o.optBoolean("human"),
+            o.optString("presence", "away"), o.optBoolean("human"),
             o.optBoolean("ai"), o.optString("designation", ""),
-            DeskAttestation(a.optString("attestor", ""), a.optString("basis", ""),
-                a.optBoolean("signed"), a.optString("note", "")),
+            a?.let {
+                DeskAttestation(it.optString("attestor", ""),
+                    it.optString("basis", ""), it.optBoolean("signed"),
+                    it.optString("note", ""))
+            },
             if (o.isNull("portrait")) null else o.optString("portrait"),
-            DeskFeed(f.getString("url"), f.optBoolean("live"),
-                f.optString("note", "")),
-            bell.optBoolean("available"), bell.optInt("waiting"))
+            f?.let {
+                DeskFeed(it.getString("url"), it.optBoolean("live"),
+                    it.optString("note", ""))
+            },
+            bell?.optBoolean("available") ?: false,
+            bell?.optInt("waiting") ?: 0,
+            o.optBoolean("rated"), o.optBoolean("age_wall"),
+            if (o.isNull("note")) null else o.optString("note"))
+    }
+
+    /** Join the live stream — the room whoever is watching shares. */
+    suspend fun joinStream(deskId: String, token: String? = null): StreamJoin {
+        val o = JSONObject(request("/desks/$deskId/join", "POST", null, token))
+        return StreamJoin(o.getString("room_id"), o.optString("channel", "video"),
+            o.optString("presence", ""), o.optBoolean("ai"),
+            o.optString("note", ""))
     }
 
     /**
