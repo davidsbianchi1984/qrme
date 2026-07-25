@@ -20,8 +20,9 @@ import json
 import os
 
 from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi.responses import HTMLResponse
 
-from .. import db, rated
+from .. import db, landing, rated
 from ..common import profile_or_404, require_owner
 from ..models import BeaconCreate, HandleSet, RatedPlacementCreate
 
@@ -105,15 +106,35 @@ def place_beacon(profile_id: str, body: BeaconCreate) -> dict:
     profile_or_404(profile_id)
     conn = db.connect()
     beacon_id = db.new_id("bcn")
+    room_id = None
+    if body.mode == "room":
+        # One room, minted with the profile in it, that every scanner joins.
+        # The people who found the same sticker end up talking to the profile
+        # together rather than each in their own private thread.
+        room_id = db.new_id("room")
+        conn.execute(
+            "INSERT INTO rooms (id, topic, channel, status, created_at)"
+            " VALUES (?,?,'chat','active',?)",
+            (room_id, body.topic or body.label, db.utcnow()))
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?, 'profile', ?)", (room_id, profile_id))
     conn.execute(
-        "INSERT INTO beacons (id, profile_id, label, location, scans, active,"
-        " created_at) VALUES (?,?,?,?,0,1,?)",
-        (beacon_id, profile_id, body.label, body.location, db.utcnow()),
+        "INSERT INTO beacons (id, profile_id, label, location, room_id, scans, active,"
+        " created_at) VALUES (?,?,?,?,?,0,1,?)",
+        (beacon_id, profile_id, body.label, body.location, room_id,
+         db.utcnow()),
     )
     conn.commit()
     return {
         "id": beacon_id, "label": body.label, "location": body.location,
+        # summon_url is unchanged: the JSON surface clients already read.
+        # scan_url is the page a phone camera should land on, and is what the
+        # printed QR encodes — sharing or printing that one is the point.
         "summon_url": f"{_public_base()}/summon?ref={beacon_id}",
+        "scan_url": f"{_public_base()}/b/{beacon_id}",
+        "mode": body.mode,
+        "room_id": room_id,
         "qr_svg": f"/beacons/{beacon_id}/qr.svg",
     }
 
@@ -148,10 +169,55 @@ def beacon_qr(beacon_id: str) -> Response:
     import segno
 
     buf = io.BytesIO()
-    segno.make(f"{_public_base()}/summon?ref={beacon_id}",
+    segno.make(f"{_public_base()}/b/{beacon_id}",
                error="q").save(buf, kind="svg", scale=8, border=2,
                                dark="#161840", light="#F4E3C8")
     return Response(content=buf.getvalue(), media_type="image/svg+xml")
+
+
+# -- the scan surface --------------------------------------------------------
+
+@router.get("/b/{beacon_id}", response_class=HTMLResponse)
+def scan_beacon(beacon_id: str, request: Request) -> HTMLResponse:
+    """Where a placed QR actually points.
+
+    A phone's camera app can only open a URL, so this is what "aim it at the
+    sticker and the profile appears" resolves to in practice: one
+    self-contained page that reveals the portrait immediately. Same beacon,
+    same scan count, same age wall as ``/summon?ref=`` — that stays the JSON
+    surface for clients that want data.
+    """
+    conn = db.connect()
+    beacon = conn.execute("SELECT * FROM beacons WHERE id=?",
+                          (beacon_id,)).fetchone()
+    if beacon is None:
+        return HTMLResponse(landing.gone(), status_code=404)
+    if not beacon["active"]:
+        return HTMLResponse(landing.gone(), status_code=410)
+
+    conn.execute("UPDATE beacons SET scans = scans + 1 WHERE id=?", (beacon_id,))
+    conn.commit()
+
+    row = conn.execute("SELECT * FROM profiles WHERE id=?",
+                       (beacon["profile_id"],)).fetchone()
+    if row is None:
+        return HTMLResponse(landing.gone("profile"), status_code=404)
+    profile = dict(row)
+
+    if profile["adult_mode"]:
+        # A stranger scanning a sticker never has a token, so this is the
+        # ordinary path for a rated beacon, not the exception.
+        rated.record_event(profile["id"], beacon["id"],
+                           rated.viewer_is_adult(request),
+                           pdi=request.app.state.pdi)
+        if not rated.viewer_is_adult(request):
+            return HTMLResponse(landing.age_wall(), status_code=200)
+
+    if profile["status"] != "active":
+        return HTMLResponse(landing.gone("profile"), status_code=410)
+
+    return HTMLResponse(landing.profile_page(
+        profile, _public_base(), beacon["label"], beacon["room_id"]))
 
 
 # -- the summon endpoint -----------------------------------------------------
@@ -239,6 +305,9 @@ def place_rated(profile_id: str, body: RatedPlacementCreate,
             422, "only adult-mode profiles are placed at adult venues")
     conn = db.connect()
     beacon_id = db.new_id("bcn")
+    # Rated placements stay one-to-one. A shared room behind an 18+ QR at a
+    # public venue is a different product with different moderation
+    # questions, and is not something to acquire by accident.
     label = body.label or f"{venue['name']} placement"
     conn.execute(
         "INSERT INTO beacons (id, profile_id, label, location, scans,"
@@ -256,7 +325,11 @@ def place_rated(profile_id: str, body: RatedPlacementCreate,
         "venue": {"key": body.venue, "name": venue["name"],
                   "url": venue["url"], "hosts": venue["hosts"]},
         "beacon_id": beacon_id,
+        # summon_url is unchanged: the JSON surface clients already read.
+        # scan_url is the page a phone camera should land on, and is what the
+        # printed QR encodes — sharing or printing that one is the point.
         "summon_url": f"{_public_base()}/summon?ref={beacon_id}",
+        "scan_url": f"{_public_base()}/b/{beacon_id}",
         "qr_svg": f"/beacons/{beacon_id}/qr.svg",
         "handle": _handle_of(profile_id),
         "rated": True,

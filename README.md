@@ -123,6 +123,20 @@ A real person (or their estate) can contest a profile that represents them —
 
 Profile lifecycle: **active** → `restricted` (objection pending) → `terminated` (erased) or back to active; and **active** → `departed` (memorial, via `/sunset`). `GET /profiles/{id}` reports the current `status`.
 
+## Beacons — leaving a profile somewhere
+
+Print a profile's QR and stick it where that profile is actually useful: a
+musician's in the venue's green room, a nutritionist's in the produce aisle, a
+financial planner's in a bank lobby, a sponsor's at the back table of a
+meeting. Scanning it opens the profile's page — portrait, name, and one way in
+— with the AI mark on the portrait itself, since whoever scanned has no
+account and no other way to know.
+
+`mode: "room"` makes one shared conversation instead of a private one, so
+everybody who scans the same sticker is talking to the profile together — a
+class, a workshop, a Q&A after a set. See [docs/beacons.md](docs/beacons.md),
+including what a camera app can and cannot actually do with a QR code.
+
 ## Portraits
 
 A profile can carry a face, and `GET /profiles/{id}/avatar` never returns a
