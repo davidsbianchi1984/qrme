@@ -182,13 +182,26 @@ def test_every_starter_ships_with_a_portrait():
     assert not missing, f"no portrait file for: {missing}"
 
 
+def _webp_size(raw: bytes) -> tuple[int, int]:
+    """Dimensions straight out of the simple-lossy WebP header.
+
+    Read here rather than through an imaging library so the test suite does
+    not gain a dependency it needs for one assertion — and so what is checked
+    is the shipped container itself, not a library's reading of it.
+    """
+    assert raw[:4] == b"RIFF" and raw[8:12] == b"WEBP", "not a WebP file"
+    assert raw[12:16] == b"VP8 ", f"unexpected WebP chunk {raw[12:16]!r}"
+    assert raw[23:26] == b"\x9d\x01\x2a", "bad VP8 start code"
+    return (int.from_bytes(raw[26:28], "little") & 0x3FFF,
+            int.from_bytes(raw[28:30], "little") & 0x3FFF)
+
+
 def test_the_portraits_are_square_and_small_enough_to_load_on_cellular():
     """The beacon page renders them in a 1:1 frame, and it opens in a camera
     app's in-app browser on a cold start."""
-    from PIL import Image
     for path in sorted(avatars.portraits_dir().glob("*.webp")):
-        with Image.open(path) as im:
-            assert im.size == (512, 512), f"{path.name} is {im.size}"
+        size = _webp_size(path.read_bytes())
+        assert size == (512, 512), f"{path.name} is {size}"
         assert path.stat().st_size < 120_000, f"{path.name} is heavy"
 
 
