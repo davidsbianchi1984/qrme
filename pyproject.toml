@@ -43,6 +43,12 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["qrme*", "cloudgw*"]
 
+# The starter portraits ship inside the package. Without this they exist in
+# the repo and vanish on install — the same failure that made /app 404 in the
+# container, and it would show up as every starter falling back to initials.
+[tool.setuptools.package-data]
+qrme = ["assets/portraits/*.webp"]
+
 [tool.pytest.ini_options]
 filterwarnings = ["ignore:Using `httpx` with `starlette.testclient` is deprecated"]
 testpaths = ["tests"]

@@ -8,6 +8,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The starter collection has faces.** All 34 portraits ship as files in
+  `qrme/assets/portraits/`, served at `/portraits/{handle}.webp` and attached
+  to each starter by `seed.py`. Until now the briefs described portraits that
+  did not exist, so every starter fell back to initials — including on the
+  beacon page and in the camera overlay, which is the first thing a stranger
+  ever sees. 512×512 WebP, declared as package data so they survive
+  `pip install` rather than existing only in the repo. `avatars.STYLE` is
+  rewritten to describe the treatment that actually shipped (a monochrome cyan
+  hologram, not the warm-lit photographic look originally specified), because
+  a shared style whose text disagrees with the assets cannot do the one job it
+  exists for; the rated portrait carries its own `RATED_STYLE`, since it is
+  age-walled off every surface the others appear on.
 - **Signatures that survive being disputed** (`qrme/signatures.py`,
   `qrme/webauthn.py`, `POST /signatures/*`). The gesture is the same Face ID
   prompt; what comes back is a WebAuthn assertion rather than a boolean —
@@ -38,6 +50,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   in-flight flag, since the camera delivers ~30 frames a second and every one
   sees the same sticker. The barcode model is bundled rather than downloaded
   on demand, so the first scan works without Play Services fetching anything.
+
+### Fixed
+
+- **A beacon card's portrait is now an absolute URL.** `GET /b/{id}/card` was
+  returning the stored asset path unchanged, which is a valid `href` only for
+  a browser already on the origin — and the consumer of that field is a native
+  overlay building a `URL` from the string. It worked while every portrait was
+  an absolute test URL and would have broken the moment real assets landed on
+  a relative path, which is this release.
 
 ### Documentation
 

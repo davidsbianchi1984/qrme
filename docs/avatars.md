@@ -9,6 +9,33 @@ The briefs themselves live in `qrme/avatars.py` and are served at
 `GET /avatars/briefs`, so a generator, an illustrator, or a contractor can be
 handed the exact text rather than a paraphrase of it.
 
+## The collection ships
+
+All 34 portraits exist as files in `qrme/assets/portraits/`, served at
+`/portraits/{handle}.webp` and attached to each starter by `seed.py`. Before
+this they were briefs with nothing behind them, so every starter fell back to
+initials — on the beacon page and in the camera overlay, which is the first
+thing a stranger ever sees of the product.
+
+Two things worth knowing about them:
+
+* **The art direction changed, and `STYLE` changed with it.** The brief used
+  to ask for warm-lit photographic portraits. What was made is a monochrome
+  cyan hologram treatment, and it reads as one deliberate collection in a way
+  the original would not have. `STYLE` now describes what shipped — otherwise
+  the next portrait generated from these briefs could not sit beside the ones
+  already here, which is the entire reason a shared style exists.
+* **The rated portrait is outside that system on purpose** (`RATED_STYLE`):
+  warm, full colour. It is age-walled off every surface the others appear on,
+  so matching them would buy nothing, and looking different is a second signal
+  that it is different.
+
+The files are 512×512 WebP, well under 120 KB each, because the beacon page
+renders them in a 1:1 frame that opens in a camera app's in-app browser on
+cellular from a cold start. `pyproject.toml` declares them as package data —
+without that they exist in the repo and vanish on `pip install`, which is
+invisible locally and total in a container.
+
 ## The three rules
 
 **1. A starter's face is nobody's.** `qrme/seed.py` opens by promising that

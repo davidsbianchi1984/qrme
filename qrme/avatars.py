@@ -32,13 +32,45 @@ from __future__ import annotations
 
 from . import db, watermark
 
-# Shared direction, so 33 portraits look like one collection rather than 33
+# Shared direction, so 34 portraits look like one collection rather than 34
 # stock photos. Kept separate from the per-profile line below because it is
 # the part a generator should receive verbatim every time.
-STYLE = ("Waist-up character portrait, shallow depth of field, warm key light "
-         "against the QRME night-indigo palette. Photographic but a touch "
-         "heightened — a person who knows they are posing. Plain background, "
-         "no text, no logos, no trademarked costume or uniform.")
+#
+# This text describes the collection that actually shipped, not an earlier
+# intention. It used to specify warm-lit photographic portraits; what was
+# rendered is a monochrome cyan treatment, and it reads as one deliberate
+# collection in a way the original brief would not have. Leaving the old
+# wording in place would have meant the next portrait generated from these
+# briefs could not sit beside the ones already here.
+STYLE = ("Waist-up character portrait rendered as a luminous cyan hologram — "
+         "fine engraved linework, edge-lit, glowing against a near-black "
+         "background, as if projected. Monochrome blue throughout. "
+         "Photographic proportions but heightened, and the subject knows they "
+         "are posing. No text, no logos, no trademarked costume or uniform.")
+
+# The rated portrait is deliberately outside the cyan system: warm practical
+# light, full colour. It is the one profile that never appears in a grid with
+# the others — every discovery surface age-walls it — so matching them would
+# buy nothing, and looking different is a second signal that it is different.
+RATED_STYLE = ("Warm practical light, full colour, old-Hollywood glamour. "
+               "Outside the collection's cyan treatment on purpose.")
+
+# Where the shipped portraits live, and the path they are served at. Resolved
+# against this file rather than the working directory, because after
+# `pip install` the package lives in site-packages and a relative path finds
+# nothing — the same trap that made the studio 404 inside the container.
+ASSET_ROUTE = "/portraits"
+
+
+def portraits_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "portraits"
+
+
+def asset_path(handle: str) -> str | None:
+    """The served path for a starter's portrait, or None if it has no file."""
+    return (f"{ASSET_ROUTE}/{handle}.webp"
+            if (portraits_dir() / f"{handle}.webp").is_file() else None)
 
 # handle -> the portrait, one line, played straight-faced.
 BRIEFS: dict[str, str] = {
@@ -187,12 +219,14 @@ def brief(handle: str) -> dict | None:
     line = BRIEFS.get(handle)
     if line is None:
         return None
+    style = RATED_STYLE if handle == "vivienne_sable" else STYLE
     return {
         "handle": handle,
         "portrait": line,
-        "style": STYLE,
-        "prompt": f"{line} {STYLE}",
+        "style": style,
+        "prompt": f"{line} {style}",
         "tone": "sombre" if handle in SOMBRE else "humorous",
+        "asset": asset_path(handle),
         # Stated in the brief itself so it survives being copied out of here
         # and pasted somewhere else, which is what briefs are for.
         "constraints": [
