@@ -34,7 +34,10 @@ public sealed partial class StudyPage : Page
         try
         {
             var excursions = await ApiClient.Shared.Excursions(s.Pid!, s.Token!);
-            ExcursionsList.ItemsSource = excursions.Reverse().Select(x => new ExcursionRow
+            // Enumerable.Reverse by name: an array converts to Span<T>, so plain
+            // .Reverse() binds to MemoryExtensions' in-place void overload.
+            ExcursionsList.ItemsSource = Enumerable.Reverse(excursions)
+                .Select(x => new ExcursionRow
             {
                 Id = x.Id,
                 Topic = x.Topic,
