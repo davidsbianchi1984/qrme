@@ -533,3 +533,182 @@ def test_a_beacon_needs_a_label_and_a_real_desk(client):
     assert _beacon(client, created, label="  ").status_code == 422
     assert client.post("/desks/dsk_nope/beacons", json={"label": "x"},
                        headers=_token(created)).status_code in (403, 404)
+
+
+# --- coming up on stream -------------------------------------------------
+#
+# Joining has two shapes and they are not the same act. Watching and
+# commenting is something a viewer does; appearing *on* the stream is
+# something the host lets them do. Most of these tests are about keeping that
+# distinction from quietly collapsing into "join".
+
+def _watcher(client, name="Bea", birthdate="1990-01-01"):
+    made = client.post("/interactors", json={
+        "display_name": name, "birthdate": birthdate, "verified": True}).json()
+    return {"authorization": f"Bearer {made['token']}"}
+
+
+def test_joining_as_audience_is_immediate(client):
+    created = _desk(client).json()
+    out = client.post(f"/desks/{created['desk_id']}/join",
+                      json={"mode": "audience"}, headers=_watcher(client)).json()
+    assert out["mode"] == "audience"
+    assert out["on_stream"] is False
+    assert out["room_id"]
+
+
+def test_joining_as_a_guest_only_asks(client):
+    """Returning a room that behaved as if the request had been granted would
+    be the worst possible default."""
+    created = _desk(client).json()
+    out = client.post(f"/desks/{created['desk_id']}/join",
+                      json={"mode": "guest"}, headers=_watcher(client)).json()
+    assert out["mode"] == "guest"
+    assert out["on_stream"] is False
+    assert out["guest_request"]["status"] == "requested"
+
+
+def test_coming_up_needs_an_account(client):
+    """The host is deciding about a person, not an anonymous request."""
+    created = _desk(client).json()
+    assert client.post(f"/desks/{created['desk_id']}/join",
+                       json={"mode": "guest"}).status_code == 401
+    assert client.post(f"/desks/{created['desk_id']}/guests",
+                       json={}).status_code == 401
+
+
+def test_one_hand_up_at_a_time(client):
+    created = _desk(client).json()
+    who = _watcher(client)
+    assert client.post(f"/desks/{created['desk_id']}/guests", json={},
+                       headers=who).status_code == 201
+    again = client.post(f"/desks/{created['desk_id']}/guests", json={},
+                        headers=who)
+    assert again.status_code == 422
+    assert "already have a hand up" in again.json()["detail"]
+
+
+def test_only_the_host_sees_the_queue_or_answers_it(client):
+    """Who asked to appear on someone's stream is theirs to see."""
+    created = _desk(client).json()
+    did = created["desk_id"]
+    who = _watcher(client)
+    req = client.post(f"/desks/{did}/guests", json={}, headers=who).json()
+
+    assert client.get(f"/desks/{did}/guests", headers=who).status_code == 403
+    assert client.get(f"/desks/{did}/guests").status_code == 401
+    assert client.post(f"/desks/{did}/guests/{req['id']}/accept",
+                       headers=who).status_code == 403
+
+    listed = client.get(f"/desks/{did}/guests", headers=_token(created)).json()
+    assert len(listed["guests"]) == 1
+
+
+def test_the_host_can_bring_someone_up(client):
+    created = _desk(client).json()
+    did = created["desk_id"]
+    who = _watcher(client)
+    req = client.post(f"/desks/{did}/guests", json={}, headers=who).json()
+
+    accepted = client.post(f"/desks/{did}/guests/{req['id']}/accept",
+                           headers=_token(created)).json()
+    assert accepted["status"] == "accepted"
+    assert accepted["on_stream"] is True
+    assert len(client.get(f"/desks/{did}/guests",
+                          headers=_token(created)).json()["on_stream"]) == 1
+
+
+def test_a_decision_is_made_once(client):
+    created = _desk(client).json()
+    did = created["desk_id"]
+    req = client.post(f"/desks/{did}/guests", json={},
+                      headers=_watcher(client)).json()
+    client.post(f"/desks/{did}/guests/{req['id']}/accept",
+                headers=_token(created))
+    again = client.post(f"/desks/{did}/guests/{req['id']}/decline",
+                        headers=_token(created))
+    assert again.status_code == 422
+    assert "already accepted" in again.json()["detail"]
+
+
+def test_a_guest_can_always_step_back_down(client):
+    """Needing the host's permission to *stop* being on camera would be the
+    wrong way round."""
+    created = _desk(client).json()
+    did = created["desk_id"]
+    who = _watcher(client)
+    req = client.post(f"/desks/{did}/guests", json={}, headers=who).json()
+    client.post(f"/desks/{did}/guests/{req['id']}/accept",
+                headers=_token(created))
+
+    left = client.request("DELETE", f"/desks/{did}/guests/me", headers=who)
+    assert left.status_code == 200 and left.json()["status"] == "left"
+    assert client.get(f"/desks/{did}/guests",
+                      headers=_token(created)).json()["on_stream"] == []
+
+
+def test_a_rated_desk_gates_guests_too(client):
+    """A guest on a rated stream is a person going live on an 18+ broadcast,
+    not merely watching one."""
+    created = _desk(client, owner_id="perf", attestor="perf",
+                    display_name="Vivienne Marlowe", rated=True,
+                    view_style="stage").json()
+    did = created["desk_id"]
+    minor = _watcher(client, "Kid", "2015-01-01")
+    assert client.post(f"/desks/{did}/guests", json={},
+                       headers=minor).status_code == 403
+    assert client.post(f"/desks/{did}/guests", json={},
+                       headers=_watcher(client)).status_code == 201
+
+
+def test_a_closed_desk_takes_no_hands(client):
+    created = _desk(client).json()
+    client.put(f"/desks/{created['desk_id']}/presence",
+               json={"presence": "closed"}, headers=_token(created))
+    assert client.post(f"/desks/{created['desk_id']}/guests", json={},
+                       headers=_watcher(client)).status_code == 422
+
+
+def test_an_unknown_join_mode_is_refused(client):
+    created = _desk(client).json()
+    out = client.post(f"/desks/{created['desk_id']}/join",
+                      json={"mode": "backstage"}, headers=_watcher(client))
+    assert out.status_code == 422
+
+
+# --- the overlay ---------------------------------------------------------
+
+def test_the_overlay_carries_what_renders_over_the_video(client):
+    """One definition, so every client draws the same layer instead of each
+    inventing its own."""
+    created = _desk(client).json()
+    did = created["desk_id"]
+    who = _watcher(client)
+    client.post(f"/desks/{did}/like", headers=who)
+    client.post(f"/desks/{did}/share", json={})
+    client.post(f"/desks/{did}/gift", json={"amount": 5}, headers=who)
+
+    ov = client.get(f"/desks/{did}/overlay").json()
+    assert ov["likes"] == 1 and ov["shares"] == 1
+    assert ov["gift_total"] == 5.0 and len(ov["gifts"]) == 1
+    # Semi-transparent and over the video — the picture stays readable, which
+    # is the whole reason these live here rather than in a side panel.
+    assert ov["style"]["over_video"] is True
+    assert 0 < ov["style"]["opacity"] < 1
+
+
+def test_the_overlay_is_behind_the_age_wall_on_a_rated_desk(client):
+    created = _desk(client, owner_id="perf", attestor="perf", rated=True,
+                    view_style="stage").json()
+    did = created["desk_id"]
+    assert client.get(f"/desks/{did}/overlay").status_code == 403
+    assert client.get(f"/desks/{did}/overlay",
+                      headers=_watcher(client)).status_code == 200
+
+
+def test_joining_hands_back_the_overlay(client):
+    """So a client can draw the stream and its reactions from one response."""
+    created = _desk(client).json()
+    out = client.post(f"/desks/{created['desk_id']}/join", json={},
+                      headers=_watcher(client)).json()
+    assert "overlay" in out and "style" in out["overlay"]

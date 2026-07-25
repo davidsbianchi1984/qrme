@@ -150,6 +150,63 @@ one is — a camera app's in-app browser, on cellular, from cold. The bell is th
 single script on it, and it posts to a **relative** URL: an absolute public
 base would ring a bell on a different host when the code is scanned over a LAN.
 
+## Two ways into a live room
+
+Joining has two shapes, and conflating them would be the mistake:
+
+- **`audience`** — watch, comment, like, share, gift. Immediate, no permission
+  needed, and the default.
+- **`guest`** — appear **on** the stream. This only *asks*. It returns a
+  pending request rather than a room, because bringing a second person into a
+  broadcast the host is answerable for is the host's call, and a join that
+  behaved as though the request had been granted would be the worst possible
+  default.
+
+```
+POST   /desks/{id}/join            {"mode": "audience"|"guest"}
+POST   /desks/{id}/guests          put a hand up                     (account)
+GET    /desks/{id}/guests          the queue                     (desk token)
+POST   /desks/{id}/guests/{r}/accept    bring them up            (desk token)
+POST   /desks/{id}/guests/{r}/decline   say no                   (desk token)
+DELETE /desks/{id}/guests/me       step back down                    (guest)
+```
+
+Coming up needs an **account** — the host is deciding about a person, not an
+anonymous request — and on a rated desk a **verified adult**, because a guest
+there is someone *going live* on an 18+ stream rather than merely watching one.
+One hand up at a time, so a host reading the queue sees people rather than
+repeats. A decision is made once. And a guest can always step back down
+without asking: needing permission to *stop* being on camera would be the
+wrong way round.
+
+Who asked to appear on someone's stream is theirs to see — the queue is
+owner-only, not part of the public card.
+
+## The overlay: reactions on the picture, not beside it
+
+`GET /desks/{id}/overlay` returns the layer that renders **over** the video —
+recent comments, likes, shares, gifts, and who is currently up.
+
+It lives here rather than in each client for one reason: a live stream's chat
+and reactions belong on top of the picture, because that is where the viewer is
+already looking. Moving their eyes to a side panel means missing the thing they
+came for — and on a stream whose entire premise is *an empty chair with a bell*,
+the reactions are the room.
+
+The layer is **semi-transparent and visible**, not hidden: the plate behind
+each line is see-through so the room stays readable underneath, while the text
+on it is not faded, because chat you have to squint at is chat nobody reads.
+`style.opacity` and `style.over_video` are reported so every client draws the
+same overlay instead of each inventing its own.
+
+One layout note that came out of the artwork: chat is anchored to the **top**
+of the frame. The obvious choice is to stack it up from the bottom the way a
+stream normally does, but the sign is the subject of both shipped frames —
+*ring bell for service, away from the desk*; *be back soon or ring bell* — and
+they sit at different heights in the two photographs, so no bottom anchor
+clears both. Chat over the sign is chat over the whole reason the stream is
+worth watching.
+
 ## Endpoints
 
 ```
@@ -162,7 +219,13 @@ PUT    /desks/{id}/camera            point it at a real camera        (token)
 POST   /desks/{id}/bell              ring it — public, rate limited
 GET    /desks/{id}/rings             who rang                   (desk token)
 POST   /desks/{id}/rings/{ring}/ack  mark one answered          (desk token)
-POST   /desks/{id}/join              join the live stream
+POST   /desks/{id}/join              join — audience, or ask as a guest
+GET    /desks/{id}/overlay           what renders over the video
+POST   /desks/{id}/guests            put a hand up                (account)
+GET    /desks/{id}/guests            the queue                  (desk token)
+POST   /desks/{id}/guests/{r}/accept bring them up              (desk token)
+POST   /desks/{id}/guests/{r}/decline say no                    (desk token)
+DELETE /desks/{id}/guests/me         step back down                 (guest)
 
 POST   /desks/{id}/beacons           print the desk onto something (desk token)
 GET    /desks/{id}/beacons           every code, with its scan count  (token)

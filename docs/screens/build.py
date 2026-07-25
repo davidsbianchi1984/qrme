@@ -589,6 +589,53 @@ def photo(x, y, w, h, data, tag=None, note=None, uid="ph"):
     return "".join(o)
 
 
+def live_overlay(x, y, w, h, comments, ticker, viewers=None):
+    """Chat, likes, shares and gifts drawn *over* the picture.
+
+    This is where a viewer is already looking. Putting the reactions in a
+    panel beside the video means moving their eyes off the thing they came
+    for, and on a stream whose whole premise is an empty chair with a bell,
+    the reactions *are* the room. So they float on the frame at ~80% opacity:
+    legible, and the picture still readable underneath.
+    """
+    o = []
+    if viewers:
+        vw = 14 + len(viewers) * 5.6
+        o.append(rrect(x + w - vw - 10, y + 10, vw, 20, 10, "rgba(8,6,20,0.62)"))
+        o.append(text(x + w - vw / 2 - 10, y + 24, viewers, 9, "#e8e4ff", 650,
+                      "middle"))
+    # The reaction ticker climbs the right edge, the way it does on a stream.
+    ty = y + h - 46
+    for ic, col, label in ticker:
+        cw_ = 30 + len(label) * 5.4
+        o.append(rrect(x + w - cw_ - 10, ty, cw_, 22, 11, "rgba(8,6,20,0.58)"))
+        o.append(icon(ic, x + w - cw_ + 2, ty + 11, ACCENT[col], 0.52))
+        o.append(text(x + w - 18, ty + 15, label, 8.6, "#efecff", 650, "end"))
+        ty -= 26
+    # Chat runs down the top-left, under the LIVE badge, oldest first.
+    #
+    # A stream would normally stack it up from the bottom, and that is what I
+    # built first — but the sign is the subject of both of these frames
+    # ("ring bell for service, away from the desk"; "be back soon or ring
+    # bell"), and they sit at different heights in the two photos, so no
+    # bottom anchor clears both. Chat over the sign is chat over the entire
+    # reason the stream is worth watching. The top strip is empty in both.
+    cy = y + 38
+    n = len(comments)
+    for i, (who, said) in enumerate(comments):
+        line = f"{who}  {said}"
+        lw = min(14 + len(line) * 4.6, w - 104)
+        # The *plate* is transparent so the room stays visible through it;
+        # the text on top is not. Chat you have to squint at is chat nobody
+        # reads, and these lines are the room talking.
+        plate = 0.46 + 0.14 * (i + 1) / n
+        o.append(rrect(x + 10, cy, lw, 19, 9, f"rgba(8,6,20,{plate:.2f})"))
+        o.append(text(x + 18, cy + 13, line, 8.4,
+                      f"rgba(245,242,255,{0.88 + 0.12 * (i + 1) / n:.2f})", 650))
+        cy += 23
+    return "".join(o)
+
+
 def render(spec):
     num = spec["num"]
     out = head(f"{num:02d}", spec["title"], spec.get("sub", ""),
@@ -600,10 +647,16 @@ def render(spec):
     # screen has either a hero or cards, never both — this is the one thing
     # that sits above whichever it is.
     if spec.get("photo"):
-        out.append(photo(CX, y, CW, 148, spec["photo"],
-                         tag=spec.get("photo_tag"), note=spec.get("photo_note"),
+        ph = spec.get("photo_h", 148)
+        out.append(photo(CX, y, CW, ph, spec["photo"],
+                         tag=spec.get("photo_tag"),
+                         note=None if spec.get("overlay") else spec.get("photo_note"),
                          uid=f"{num:02d}"))
-        y += 160
+        if spec.get("overlay"):
+            ov = spec["overlay"]
+            out.append(live_overlay(CX, y, CW, ph, ov.get("comments", []),
+                                    ov.get("ticker", []), ov.get("viewers")))
+        y += ph + 12
 
     if hero == "welcome":
         out.append(orb(W / 2, y + 52, 42, head_profile=True))
@@ -1845,23 +1898,30 @@ SCREENS = [
     # The room a desk's viewers actually share: the bell, and the audience
     # verbs in situ rather than as a summary. Still no AI mark — there is a
     # real person on the other end of this stream.
-    dict(num=75, title="Live Room", sub="Everyone watching is here together",
+    # The reactions ride ON the picture rather than in a panel beside it —
+    # that is where a viewer is already looking, and on a stream whose whole
+    # premise is an empty chair with a bell, the reactions are the room.
+    dict(num=75, title="Live Room", sub="Two ways in — come up, or comment",
          accent="green", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"),
-         photo_note="Bev is away from the desk — ring the bell",
+         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=208,
+         overlay=dict(
+             viewers="14 watching",
+             ticker=[("gift", "amber", "Bea · $5"),
+                     ("heart", "pink", "12"),
+                     ("link", "cyan", "3 shares")],
+             comments=[("Ada", "is she back yet?"),
+                       ("Cy", "ringing it now"),
+                       ("Bea", "are you open till six?")]),
          cards=[
-        dict(icon="eye", color="green", k="Bev Okafor · live",
-             s="one room, not a call per viewer", pill=("LIVE", "good")),
         dict(icon="finger", color="amber", k="Ring the bell",
              s="away — one ring per desk per 30s"),
-        dict(icon="chat", color="brand", k="“Are you open till six?”",
-             s="moderated like any chat turn"),
-        dict(icon="heart", color="pink", k="Likes", s="one per person", metric="12"),
-        dict(icon="gift", color="amber", k="Gift · $5",
-             s="adult only · capped · final", pill=("SENT", "good")),
+        dict(icon="people", color="green", k="Come up as a guest",
+             s="asks the host — they decide", pill=("ASK", "warn")),
+        dict(icon="chat", color="brand", k="Or just comment",
+             s="immediate · moderated like any turn"),
         dict(icon="shieldok", color="cyan", k="No AI mark here",
              s="a real person is on the other end"),
-    ], button=("Join the stream", "green")),
+    ]),
 
     # The other view style. Same mechanic, same bell, behind the deployment's
     # existing verified-adult gate — and with the location withheld even from
@@ -1869,20 +1929,25 @@ SCREENS = [
     # safety matter rather than a detail.
     dict(num=76, title="Rated Stream", sub="18+, and still a real person",
          accent="red", tab=3, locked=True,
-         photo=frames.STAGE, photo_tag=("LIVE", "live"),
-         photo_note="Be back soon — or ring the bell",
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), photo_h=208,
+         overlay=dict(
+             viewers="38 watching",
+             ticker=[("gift", "amber", "Ada · $20"),
+                     ("heart", "pink", "96"),
+                     ("people", "green", "1 up")],
+             comments=[("Bea", "be back soon it says"),
+                       ("Mal", "ring it"),
+                       ("Ada", "worth the wait")]),
          cards=[
         dict(icon="person", color="red", k="Vivienne Marlowe",
              s="Live person — not AI", pill=("18+", "crit")),
-        dict(icon="lock", color="amber", k="Location withheld",
+        dict(icon="people", color="amber", k="Guests need her yes",
+             s="and a verified adult, on a rated desk"),
+        dict(icon="lock", color="brand", k="Location withheld",
              s="withheld even from adults — safety"),
-        dict(icon="shield", color="brand", k="Only she can open it",
-             s="the attestor must be the owner"),
-        dict(icon="gift", color="amber", k="Gifts need an adult",
-             s="capped per gift · never refundable"),
         dict(icon="shieldok", color="green", k="Still no AI mark",
              s="rated changes who watches, not what"),
-    ], button=("Ring the bell", "amber")),
+    ]),
 ]
 
 

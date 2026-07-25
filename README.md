@@ -774,6 +774,14 @@ the whole feature: *ring bell for service, away from the desk*, and *be back
 soon or ring bell*. That is the situation the bell was built for, and it is
 what a visitor is actually looking at while they wait.
 
+On **75** and **76** the chat, likes, shares and gifts render **on** the
+picture rather than in a panel beside it — semi-transparent plates so the room
+stays visible underneath, with the text on them kept fully legible. That is
+where a viewer is already looking, and on a stream whose premise is an empty
+chair with a bell, the reactions are the room. Those screens also show the two
+ways in: **come up as a guest**, which asks the host, or **just comment**,
+which is immediate.
+
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it
 carries the AI badge and the mark is burned into the portrait itself. **69**,
