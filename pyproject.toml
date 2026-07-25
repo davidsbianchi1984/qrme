@@ -23,7 +23,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27"]
+# pyyaml is test-only: the container tests read docker/docker-compose.yml to
+# check the harness and the image agree. Not a runtime dependency.
+dev = ["pytest>=8", "httpx>=0.27", "pyyaml>=6"]
 
 [project.urls]
 Homepage = "https://github.com/davidsbianchi1984/qrme"

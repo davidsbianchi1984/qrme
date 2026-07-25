@@ -10,9 +10,13 @@ a mismatch between two files that nothing else keeps in step.
 import re
 from pathlib import Path
 
+import yaml
+
 from qrme import mobile
 
-DOCKERFILE = (Path(__file__).resolve().parent.parent / "Dockerfile").read_text()
+ROOT = Path(__file__).resolve().parent.parent
+DOCKERFILE = (ROOT / "Dockerfile").read_text()
+COMPOSE = (ROOT / "docker" / "docker-compose.yml").read_text()
 
 
 def _env(name: str) -> str | None:
@@ -60,6 +64,27 @@ def test_service_does_not_run_as_root():
 def test_listens_on_all_interfaces_and_honours_platform_port():
     """Binding to localhost inside a container publishes nothing; and hosts
     that assign a port need it honoured or the health check never passes."""
-    cmd = DOCKERFILE[DOCKERFILE.index("CMD "):]
+    cmd = DOCKERFILE[DOCKERFILE.index("CMD ["):]
     assert "--host 0.0.0.0" in cmd
     assert "${PORT:-8000}" in cmd
+
+
+def test_suite_harness_gives_pdi_an_admin_token():
+    """PDI's dev-open admin mode is open only to callers on the same machine.
+    Every service here reaches it over the compose network, where it fails
+    closed — so the harness has to configure a token and both drivers have to
+    present it. Leaving any one of the three out fails the whole run at
+    tenant creation, which is the first thing it does.
+    """
+    services = yaml.safe_load(COMPOSE)["services"]
+    for name in ("pdi", "bootstrap", "e2e"):
+        assert "PDI_ADMIN_TOKEN" in services[name]["environment"], name
+    # One anchor, so the token PDI requires and the token the drivers send
+    # cannot drift apart.
+    assert (services["pdi"]["environment"]["PDI_ADMIN_TOKEN"]
+            == services["bootstrap"]["environment"]["PDI_ADMIN_TOKEN"]
+            == services["e2e"]["environment"]["PDI_ADMIN_TOKEN"])
+    for driver in ("bootstrap.py", "e2e.py"):
+        source = (ROOT / "docker" / driver).read_text()
+        assert 'os.environ.get("PDI_ADMIN_TOKEN"' in source
+        assert "Bearer" in source or "token=PDI_ADMIN" in source
