@@ -30,6 +30,12 @@ services:
   bootstrap:
     build:
       context: ${QRME_CONTEXT:-..}
+    # The images run as a non-root service user, and the `shared` volume is
+    # created empty and root-owned because no such directory exists in the
+    # image to inherit ownership from. Only this one-shot writes there, so it
+    # takes root rather than the production image carrying a /shared it has no
+    # use for; the env files it leaves are world-readable for qrme and jim.
+    user: "0:0"
     depends_on:
       pdi:
         condition: service_healthy
