@@ -624,15 +624,29 @@ def live_overlay(x, y, w, h, comments, ticker, viewers=None):
     n = len(comments)
     for i, (who, said) in enumerate(comments):
         line = f"{who}  {said}"
-        lw = min(14 + len(line) * 4.6, w - 104)
+        # +26 for the avatar that sits inside the left end of the plate.
+        lw = min(40 + len(line) * 4.6, w - 104)
         # The *plate* is transparent so the room stays visible through it;
         # the text on top is not. Chat you have to squint at is chat nobody
         # reads, and these lines are the room talking.
         plate = 0.46 + 0.14 * (i + 1) / n
-        o.append(rrect(x + 10, cy, lw, 19, 9, f"rgba(8,6,20,{plate:.2f})"))
-        o.append(text(x + 18, cy + 13, line, 8.4,
+        o.append(rrect(x + 10, cy, lw, 22, 11, f"rgba(8,6,20,{plate:.2f})"))
+        # Who said it, as a small avatar on the line — a silhouette, not a
+        # portrait and not an initial. These are viewers rather than
+        # synthetic profiles, so there is no likeness to draw, and drawing
+        # one would be inventing a face for someone who never gave us theirs.
+        # The tint is derived from the name, so the same person keeps the
+        # same colour down the thread.
+        acx, acy, ar = x + 22, cy + 11, 8.0
+        tint = ACCENT[("brand", "cyan", "pink", "amber", "green")[
+            sum(map(ord, who)) % 5]]
+        o.append(f'<circle cx="{acx}" cy="{acy}" r="{ar}" '
+                 f'fill="{A(tint, 0.30)}" stroke="{A(tint, 0.85)}" '
+                 f'stroke-width="1"/>')
+        o.append(icon("person", acx, acy, "rgba(255,255,255,0.92)", 0.42))
+        o.append(text(acx + ar + 6, cy + 15, line, 8.4,
                       f"rgba(245,242,255,{0.88 + 0.12 * (i + 1) / n:.2f})", 650))
-        cy += 23
+        cy += 26
     return "".join(o)
 
 
