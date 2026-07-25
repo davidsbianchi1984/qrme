@@ -681,6 +681,25 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
 </table>
 
+**Live desks, the audience layer & commerce**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/69-live-desks.svg"><img src="docs/screens/69-live-desks.svg" width="210" alt="Live Desks"></a><br><sub><b>69</b> · Live Desks</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/70-desk-beacons.svg"><img src="docs/screens/70-desk-beacons.svg" width="210" alt="Desk Beacons"></a><br><sub><b>70</b> · Desk Beacons</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/71-audience.svg"><img src="docs/screens/71-audience.svg" width="210" alt="Audience"></a><br><sub><b>71</b> · Audience</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/72-gifts-purchases.svg"><img src="docs/screens/72-gifts-purchases.svg" width="210" alt="Gifts &amp; Purchases"></a><br><sub><b>72</b> · Gifts &amp; Purchases</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/73-signatures.svg"><img src="docs/screens/73-signatures.svg" width="210" alt="Signatures"></a><br><sub><b>73</b> · Signatures</sub></td>
+  </tr>
+</table>
+
+Screens **69** and **70** are the only two in this set that carry no AI mark,
+and that is the point: a desk is an actual person, so the badge makes the
+positive claim (*Live person — not AI*) instead of the disclosure every
+synthetic profile carries.
+
 
 ## Design assets
 

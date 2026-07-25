@@ -1695,6 +1695,82 @@ SCREENS = [
         dict(icon="lock", color="red", k="Intimacy · 18+ only", s="adult-mode profiles · within boundaries", pill=("18+", "crit")),
         dict(icon="shieldok", color="green", k="Steering, not piloting", s="shapes presentation · never identity or safety"),
     ], button=("Apply", "brand")),
+
+    # ---- live desks, the audience layer, and commerce (0.1.6 / 0.1.7) ----
+    # The desk screens are the only ones in this set that must NOT show the AI
+    # mark: a desk is an actual person, and stamping "AI" on them would be a
+    # false statement. The badge is the positive claim instead.
+    dict(num=69, title="Live Desks", sub="A real person — never the AI mark",
+         accent="green", tab=3, cards=[
+        dict(icon="person", color="green", k="Bev Okafor · Locksmith",
+             s="Live person — not AI", pill=("HUMAN", "good")),
+        dict(icon="eye", color="cyan", k="You are looking at the desk",
+             s="a camera view, not a portrait — it depicts nobody"),
+        dict(icon="shieldok", color="brand", k="Attested by shop-manager",
+             s="met in person, saw the trade licence · signed"),
+        dict(icon="clock", color="amber", k="Away from the desk",
+             s="the state the bell exists for", pill=("AWAY", "warn")),
+        dict(icon="warn", color="cyan", k="Recorded, not proven",
+             s="QRME stores who vouched — it does not verify a human"),
+    ], button=("🔔 Ring the bell", "amber")),
+
+    dict(num=70, title="Desk Beacons", sub="The sticker on the shop door",
+         accent="cyan", tab=3, cards=[
+        dict(icon="grid", color="cyan", k="shop door · Mill Yard",
+             s="printed code · 24 scans", pill=("LIVE", "good")),
+        dict(icon="person", color="green", k="Scanning reveals a person",
+             s="the profile beacon reveals one who does not exist"),
+        dict(icon="finger", color="amber", k="A stranger can ring it",
+             s="no account needed · one ring per desk every 30s"),
+        dict(icon="lock", color="red", k="An 18+ desk hits the age wall",
+             s="a sticker scan carries no token that could clear it",
+             pill=("18+", "crit")),
+        dict(icon="shield", color="brand", k="Only the owner prints one",
+             s="or anyone could put a stranger's whereabouts on a door"),
+    ], button=("Print a code", "brand")),
+
+    dict(num=71, title="Audience", sub="Like, comment, share, subscribe",
+         accent="pink", tab=0, cards=[
+        dict(icon="heart", color="pink", k="Likes", s="one per person — never a counter", metric="248"),
+        dict(icon="chat", color="brand", k="Comments",
+             s="moderated like a chat turn, at the target's setting"),
+        dict(icon="link", color="cyan", k="Shares",
+             s="no account needed — the gate is at the destination"),
+        dict(icon="star2", color="amber", k="Subscribers",
+             s="free follow · paid tier", metric="31"),
+        dict(icon="warn", color="green", k="A blocked comment is kept",
+             s="shown to its author with the reason, to nobody else"),
+    ], button=("Subscribe", "brand")),
+
+    dict(num=72, title="Gifts & Purchases", sub="Simulated money, real records",
+         accent="amber", tabs=MARKET, tab=0, cards=[
+        dict(icon="gift", color="amber", k="Gift sent · $10",
+             s="verified adult only · capped · not refundable",
+             pill=("SENT", "good")),
+        dict(icon="building", color="brand", k="Pruning, properly · $12.50",
+             s="listing_sale · receipt keeps the title it was bought under"),
+        dict(icon="lock", color="cyan", k="A listing is a shop window",
+             s="an offer is what makes it a shop — no offer, no price"),
+        dict(icon="shieldok", color="green", k="Lands on the creator statement",
+             s="beside pack sales and licence fees · one payout sweep"),
+        dict(icon="warn", color="red", k="No real funds move",
+             s="no spend caps, parental controls, or chargebacks — yet",
+             pill=("SIMULATED", "warn")),
+    ], button=("Send a gift", "amber")),
+
+    dict(num=73, title="Signatures", sub="A signature that survives dispute",
+         accent="indigo", tab=3, cards=[
+        dict(icon="finger", color="indigo", k="Face ID · Windows Hello",
+             s="the passkey signs the document's own hash", pill=("BOUND", "good")),
+        dict(icon="pen", color="brand", k="What you are signing is on screen",
+             s="the system prompt cannot say — so this does, first"),
+        dict(icon="shieldok", color="green", k="Verifiable without an account",
+             s="the evidence package stands on its own arithmetic"),
+        dict(icon="db", color="cyan", k="Sealed into the vault",
+             s="chained, so order rests on more than one table"),
+        dict(icon="lock", color="amber", k="Proofing decides the tier",
+             s="self-asserted · federated · document · in person"),
+    ], button=("Sign", "brand")),
 ]
 
 
