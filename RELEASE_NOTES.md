@@ -1,64 +1,62 @@
-# QRME v0.1.8 — release notes
+# QRME v0.1.9 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.1.8` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.1.9` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.1.8** — the release where a live desk stops being something you watch
-and becomes somewhere you can be. You can ask to come up on the stream, and the
-room's reactions render on the picture rather than beside it. One of three
-interoperating products (with
+**QRME v0.1.9** — a documentation release for this repository, and a real one
+for its siblings. The shared architecture doc had quietly stopped describing the
+architecture, and the three copies of it had stopped agreeing with each other.
+One of three interoperating products (with
 [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at this
 version.
 
 ### Highlights
 
-- **Two ways into a live room, and they are not the same act.** Watching and
-  commenting is something a viewer does; appearing *on* the stream is something
-  the host lets them do. `mode: audience` joins immediately; `mode: guest`
-  **only asks**, returning a pending request rather than a room — a join that
-  behaved as though the request had been granted would be the worst possible
-  default.
+- **The tandem doc was missing an arrow.** For most of this project's life the
+  topology fit in one sentence: every arrow points *into* PDI, because PDI is
+  the bottom layer and a vault whose availability depends on a model provider is
+  a worse vault. PDI's gate agent broke that on purpose — it asks a QRME profile
+  for the words it speaks to somebody standing at a facility door — and the
+  document, its diagram and its section headings all still described the world
+  before that. [docs/tandem.md](docs/tandem.md) now has a `pdi ✕ qrme` section:
+  the flow, the fallbacks, and why the model is the voice and not the decider.
 
-- **Coming up has the gates the act deserves.** It needs an account, because the
-  host is deciding about a person rather than an anonymous request, and on a
-  rated desk a **verified adult**, because a guest there is someone *going live*
-  on an 18+ stream rather than merely watching one. One hand up at a time, a
-  decision made once, an owner-only queue — and a guest can always step back
-  down without asking, since needing permission to *stop* being on camera would
-  be the wrong way round.
+- **Two of the three copies were describing a past release.** JIM's and PDI's
+  still listed the suite gateway's erase, export, consent and metering as
+  `[planned]` when `suite/gateway.py` had shipped them, and the docker-compose
+  end-to-end harness as planned when it runs in CI. A reader in either repo was
+  told cross-app deletion did not exist. The three copies are byte-identical
+  again, and the test counts it cited (*QRME 59, JIM 49, PDI 20*) are now the
+  real ones.
 
-- **The reactions are on the picture.** `GET /desks/{id}/overlay` defines the
-  layer once — comments, likes, shares, gifts, who is up — so every client draws
-  the same one. They belong over the video because that is where the viewer is
-  already looking, and on a stream whose premise is an empty chair with a bell,
-  the reactions *are* the room. Transparent plates so the room stays visible
-  through them; the text on top is not faded, because chat you have to squint at
-  is chat nobody reads.
+- **The beacon family is written down as a family.** Three products now put a
+  printed code on a physical thing and answer three different questions with it
+  — a profile, a person somebody watches over, custody of data. The shared rules
+  were true in three places and recorded in none: a scan is a page and not JSON;
+  a dead code and a code that never existed render identically; the page renders
+  only what the server handed it, so it cannot disclose what the card withheld.
 
-- **The screens show what they had been describing.** Eight new mobile screens
-  and three desktop views cover live desks, desk beacons, the audience layer,
-  commerce and signatures — none of which had a screen at all. Three carry the
-  **real camera frames**, embedded rather than linked, because an SVG rendered
-  through an `<img>` tag cannot fetch external files. The signs in them are the
-  feature: *ring bell for service, away from the desk*.
+- **The diagram is generated.** `tools/build_assets.py` writes
+  `docs/diagrams/tandem-flow.svg` from a block that is identical in all three
+  repositories, so one picture cannot become three that disagree. It replaces a
+  hand-drawn SVG that was cream-and-serif while every other asset in every repo
+  is night-indigo — and that showed two arrows, because it was drawn when there
+  were two.
 
-- **All 34 starter portraits are visible.** In the README, in
-  [docs/avatars.md](docs/avatars.md) beneath the briefs that specify them, and
-  as a grid on the Starter Collection screen — which used to say "seeded with
-  faces" and draw icon chips. No gallery carries a badge of its own: the AI mark
-  is burned into each portrait's own pixels, so it survives a screenshot, a
-  hotlink or a crop and travels into every page that shows one.
+### What changed in the siblings
 
-### Also fixed
+This release's functional work landed next door, closing the two gaps both
+escalating beacons had been carrying:
 
-`[0.1.5]` and `[0.1.6]` in the changelog linked to release tags that were never
-pushed, so both were 404s. They now point at their release-prep commits.
-Deliberately *not* fixed by backfilling those tags — that would fire the
-installer build and publish two superseded releases dated after v0.1.7, at the
-top of the page people download from.
+- **PDI** — a gate hand-off now reaches a person. It used to record the on-call
+  contact's name and tell nobody, so somebody could stand at a door at 2am
+  waiting for someone who did not know they were there.
+- **JIM-mini** — `JIM_SITE_ROSTER` became a rota that knows who is on *now*,
+  and an escalation now actually sends something. A flat list pages the day
+  person at 2am, which is the feature failing in the hour it was built for.
 
 ### Money here is still simulated
 
@@ -72,13 +70,13 @@ endpoints, that list is the work remaining.
 
 ### Verification
 
-500 tests green (14 new this release). 187 routes. 172 SVGs parse. Both
-front-ends build clean, and iOS, Android and Windows all compile in CI.
+523 tests green. 192 routes. Both front-ends build clean, and iOS, Android and
+Windows all compile in CI.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.1.8` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.1.9` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md
