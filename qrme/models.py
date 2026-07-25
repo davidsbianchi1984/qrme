@@ -481,3 +481,31 @@ class EngagementOut(BaseModel):
     sessions: int
     feedback_pos: int
     feedback_neg: int
+
+
+class ListingPlace(BaseModel):
+    """Where a listing is offered — a locality somebody typed, never anything
+    sniffed from a device. Refused for rated listings."""
+
+    locality: str
+    region: str | None = None
+    remote: bool = False               # also served from anywhere
+
+
+class MarketPrefs(BaseModel):
+    """One interactor's saved marketplace settings. Defaults for a search,
+    never a cage: anything passed explicitly to the search wins."""
+
+    locality: str | None = None
+    region: str | None = None
+    scope: Literal["locality", "region", "anywhere"] | None = None
+    include_remote: bool | None = None
+    kinds: list[Literal["profile", "content", "expertise", "service"]] | None = None
+    tags: list[str] | None = None
+
+
+class MarketAssist(BaseModel):
+    """"I don't know what to search for." Returns suggestions for the search
+    box — never results, and nothing is filtered on the caller's behalf."""
+
+    need: str

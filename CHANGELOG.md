@@ -6,6 +6,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Marketplace search: words, place, and a hand with the words** —
+  `qrme/marketplace.py`, [docs/marketplace.md](docs/marketplace.md), 8 routes,
+  23 tests. Browsing meant knowing the vocabulary: exact `kind`, exact `tag`,
+  exact `area`. Fine if you know the tag is `legal`, useless if what you have
+  is *"someone who can help me read a lease"*.
+
+  **Place is not `area`.** `listings.area` was already taken and means a
+  *subject* area — healthcare, finance, legal — so geography went into its own
+  table. Folding them together would have made "near me" quietly mean "in
+  healthcare", which looks like an empty marketplace and is very hard to see.
+
+  **Nothing is sniffed.** No IP geolocation, no GPS, no address parsing. A
+  seller types where they serve; a searcher types where they are. Location a
+  user did not enter is location they did not agree to share. Localities are
+  names, not points — there is no distance maths, which is a real limitation
+  and also the reason there is nothing to leak.
+
+  **A rated listing can never carry a place.** `set_place` refuses one, so no
+  row exists, so no place filter can match it. That is
+  [desks.md](docs/desks.md)'s line — where a performer physically is has
+  nothing to do with browsing them, and a place filter is a way of asking —
+  made structural instead of a check the next filter could forget.
+
+  **Ranking is deterministic and says why.** Field-weighted, with `score` and
+  `matched_on` on every result, so "why am I seeing this?" is answerable.
+  `hidden_by_place` is reported rather than swallowed.
+
+  **The assistant writes the search box and stops.** `POST /marketplace/assist`
+  turns "I don't know what to search for" into two or three candidate
+  searches, and returns **suggestions, never results** — there is deliberately
+  no code path from it into `search()`. Same boundary as PDI's gate agent: a
+  model can change what is in your box and nothing else, so everyone gets the
+  same explainable ranking. It degrades to keywords when no model is reachable,
+  so nobody is stuck behind a provider outage.
+
+  Settings are **defaults, not a cage**: a typed locality always wins over a
+  saved one. Three screens (77 Search & Place, 78 Marketplace Settings,
+  79 Search Assistant).
+
 ### Changed
 
 - **The README cover is generated now** (`tools/build_assets.py`) rather than
@@ -22,6 +63,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   The other sixteen files in `assets/design/` are **deliberately untouched** —
   no README or doc references any of them, so they are an orphaned illustration
   library rather than something going stale in public.
+
+### Fixed
+
+- **An unknown button kind rendered as a faint outline and said nothing.**
+  `docs/screens/build.py`'s `button()` fell through to `ghost` for anything it
+  did not recognise, so a screen's primary action could silently lose its
+  fill — valid SVG either way, which is exactly why only the generator can
+  catch it. It now raises on an unknown kind. Found by rendering two new
+  screens and looking at them.
 
 ## [0.1.8] — 2026-07-25
 

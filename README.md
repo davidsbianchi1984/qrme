@@ -763,6 +763,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/75-live-room.svg"><img src="docs/screens/75-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>75</b> · Live Room</sub></td>
     <td align="center" width="33%"><a href="docs/screens/76-rated-stream.svg"><img src="docs/screens/76-rated-stream.svg" width="210" alt="Rated Stream"></a><br><sub><b>76</b> · Rated Stream (18+)</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/77-search-place.svg"><img src="docs/screens/77-search-place.svg" width="210" alt="Search &amp; Place"></a><br><sub><b>77</b> · Search &amp; Place</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/78-marketplace-settings.svg"><img src="docs/screens/78-marketplace-settings.svg" width="210" alt="Marketplace Settings"></a><br><sub><b>78</b> · Marketplace Settings</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/79-search-assistant.svg"><img src="docs/screens/79-search-assistant.svg" width="210" alt="Search Assistant"></a><br><sub><b>79</b> · Search Assistant</sub></td>
   </tr>
 </table>
 
