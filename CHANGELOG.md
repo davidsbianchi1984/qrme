@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.5] — 2026-07-25
+
 ### Added
 
 - **Published deployments** — `QRME_PUBLIC_URL` makes `GET /pair` advertise
@@ -35,14 +37,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   identifying fields at any depth, product-shaped ids, and email addresses,
   and answers 422 naming the field instead of sanitizing: a quiet strip would
   hide the client bug that leaked it.
+- **Beacons land on a page, not on JSON** — a beacon's QR used to point at
+  `/summon?ref=…`, so a stranger who scanned a sticker got a wall of braces.
+  `GET /b/{beacon_id}` is the page that should have been there: one
+  self-contained document (inline CSS, no scripts, no font fetches — it opens
+  in a camera app's in-app browser, on cellular, from a cold start), the
+  portrait rising into view, and one way in. The AI mark is rendered **on the
+  portrait** rather than in the chrome, because a stranger who screenshots it
+  should carry the disclosure with the image — someone in the studio knows
+  they are looking at a synthetic profile; someone who scanned a sticker in a
+  bathroom does not. A picked-up beacon says so plainly instead of erroring,
+  and a rated profile shows an age wall carrying no name and no face.
+- **Shared-room beacons** — a beacon placed with `mode: "room"` mints a room,
+  and everyone who scans that code lands in the same conversation rather than
+  each in a private thread: a class, a workshop, a meeting, an AA table. The
+  page says so before anyone types, since "others may be here" is not
+  something to discover afterwards. `docs/beacons.md` covers placement, and
+  pairs starters with the places their codes make sense.
+- **See who the sticker is without leaving the camera** — point the QRME iOS
+  app at a beacon and the profile appears *on the sticker*, in the live
+  viewfinder. Vision reads the code, `GET /b/{beacon_id}/card` answers a
+  compact payload, and the portrait is drawn on the quadrilateral Vision
+  reported so it tracks the sticker as the phone moves. The AI mark comes from
+  the same payload as the face and is drawn in the same view, so the two
+  cannot come apart. A rated beacon's card carries `age_wall` **alone** — no
+  name, no portrait — because an overlay renders whatever it is handed, so the
+  withholding happens at the source. Note the boundary honestly: a *stock*
+  camera app can only open a URL, which is the whole of the API surface a QR
+  exposes to a third party; drawing over a viewfinder requires owning it.
 - **The native apps are compiled in CI** (`.github/workflows/native.yml`) —
   iOS via XcodeGen + `xcodebuild` on macOS, Android via `gradle
-  assembleDebug`, Windows via `dotnet build`. Until now the Swift, Kotlin and
+  assembleDebug`, Windows via Visual Studio's MSBuild (not `dotnet build` —
+  the Windows App SDK's PRI packaging task ships with VS and is absent from
+  the standalone .NET SDK at every version). Until now the Swift, Kotlin and
   C# had never been through a compiler here at all: they were checked by
   reading and by brace/XML well-formedness, which catches a typo and nothing
-  else. Compile only — signing and packaging stay in the release workflow —
-  and it runs only when `native/` changes, since macOS runner minutes are not
-  free.
+  else. It found five real defects on its first runs. All three steps
+  re-surface the actual compiler diagnostics on failure, since Gradle prints
+  Kotlin errors above its `FAILURE` block and MSBuild scrolls them past the
+  per-project noise — a red run used to report an exit code and nothing more.
+  Compile only — signing and packaging stay in the release workflow — and it
+  runs only when `native/` changes, since macOS runner minutes are not free.
 - **Profile portraits** — `GET /profiles/{id}/avatar` returns the asset, the
   profile's AI watermark, and the likeness record as one shape, so 2-D, 3-D,
   VR and AR surfaces composite the badge rather than deciding whether to; a
@@ -201,7 +236,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.4...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.5...HEAD
+[0.1.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.5
 [0.1.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.4
 [0.1.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.3
 [0.1.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.2
