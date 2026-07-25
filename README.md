@@ -762,8 +762,17 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/75-live-room.svg"><img src="docs/screens/75-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>75</b> · Live Room</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/76-rated-stream.svg"><img src="docs/screens/76-rated-stream.svg" width="210" alt="Rated Stream"></a><br><sub><b>76</b> · Rated Stream (18+)</sub></td>
   </tr>
 </table>
+
+**69**, **75** and **76** carry the actual camera frames — the real photographs
+that ship as `qrme/assets/desks/*.webp`, embedded into the SVG rather than
+linked, because an SVG loaded through an `<img>` tag cannot fetch an external
+file and a relative path would render as an empty box. The signs in them are
+the whole feature: *ring bell for service, away from the desk*, and *be back
+soon or ring bell*. That is the situation the bell was built for, and it is
+what a visitor is actually looking at while they wait.
 
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it

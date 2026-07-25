@@ -15,6 +15,10 @@ from __future__ import annotations
 import html
 import math
 import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import frames          # generated: tools/encode_desk_frames.py
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -551,12 +555,55 @@ def envelope(cx, cy, col):
 # --------------------------------------------------------------------------- #
 # screen renderer
 # --------------------------------------------------------------------------- #
+def photo(x, y, w, h, data, tag=None, note=None, uid="ph"):
+    """A real camera frame, embedded rather than linked.
+
+    An SVG rendered through an ``<img>`` tag — which is how GitHub shows one in
+    a README — cannot fetch external files, so a relative path to the `.webp`
+    would render as an empty box. The pixels ride inside the file as a data
+    URI; see tools/encode_desk_frames.py.
+
+    Deliberately **no AI watermark**: these are photographs of real rooms
+    belonging to real people. Marking one would be a false statement about
+    both the room and the person who is about to walk back into it.
+    """
+    cid = f"clip{uid}"
+    o = [f'<clipPath id="{cid}"><rect x="{x}" y="{y}" width="{w}" '
+         f'height="{h}" rx="14"/></clipPath>',
+         f'<image x="{x}" y="{y}" width="{w}" height="{h}" '
+         f'preserveAspectRatio="xMidYMid slice" clip-path="url(#{cid})" '
+         f'href="data:image/jpeg;base64,{data}"/>',
+         # A hairline over the photo so it sits in the design language rather
+         # than looking pasted on top of it.
+         rrect(x, y, w, h, 14, "none", A(C["line"], 0.9), 1)]
+    if tag:
+        label, tone = tag
+        col = {"live": C["red"], "sample": C["t2"]}[tone]
+        tw = 16 + len(label) * 6.2
+        o.append(rrect(x + 10, y + 10, tw, 20, 10, "rgba(8,6,20,0.72)"))
+        o.append(f'<circle cx="{x+21}" cy="{y+20}" r="3.4" fill="{col}"/>')
+        o.append(text(x + 29, y + 24, label, 9, "#fff", 750, "start", 0.4))
+    if note:
+        o.append(rrect(x, y + h - 30, w, 30, 0, "rgba(8,6,20,0.66)"))
+        o.append(text(x + 12, y + h - 11, note, 9.2, "#e8e4ff", 600))
+    return "".join(o)
+
+
 def render(spec):
     num = spec["num"]
     out = head(f"{num:02d}", spec["title"], spec.get("sub", ""),
                spec.get("accent", "brand"), spec.get("locked", False))
     y = SY + 100
     hero = spec.get("hero")
+
+    # A camera frame above the cards. Runs before the hero chain because a
+    # screen has either a hero or cards, never both — this is the one thing
+    # that sits above whichever it is.
+    if spec.get("photo"):
+        out.append(photo(CX, y, CW, 148, spec["photo"],
+                         tag=spec.get("photo_tag"), note=spec.get("photo_note"),
+                         uid=f"{num:02d}"))
+        y += 160
 
     if hero == "welcome":
         out.append(orb(W / 2, y + 52, 42, head_profile=True))
@@ -1701,75 +1748,78 @@ SCREENS = [
     # mark: a desk is an actual person, and stamping "AI" on them would be a
     # false statement. The badge is the positive claim instead.
     dict(num=69, title="Live Desks", sub="A real person — never the AI mark",
-         accent="green", tab=3, cards=[
-        dict(icon="person", color="green", k="Bev Okafor · Locksmith",
+         accent="green", tab=3,
+         photo=frames.DESK, photo_tag=("SAMPLE VIEW", "sample"),
+         photo_note="No camera yet — not claimed live",
+         cards=[
+        dict(icon="person", color="green", k="Bev Okafor",
              s="Live person — not AI", pill=("HUMAN", "good")),
-        dict(icon="eye", color="cyan", k="You are looking at the desk",
-             s="a camera view, not a portrait — it depicts nobody"),
+        dict(icon="eye", color="cyan", k="You see the desk",
+             s="a camera view — it depicts nobody"),
         dict(icon="shieldok", color="brand", k="Attested by shop-manager",
-             s="met in person, saw the trade licence · signed"),
-        dict(icon="clock", color="amber", k="Away from the desk",
+             s="met in person · saw the licence"),
+        dict(icon="clock", color="amber", k="Away right now",
              s="the state the bell exists for", pill=("AWAY", "warn")),
         dict(icon="warn", color="cyan", k="Recorded, not proven",
-             s="QRME stores who vouched — it does not verify a human"),
-    ], button=("🔔 Ring the bell", "amber")),
+             s="we record who vouched, not proof"),
+    ], button=("Ring the bell", "amber")),
 
     dict(num=70, title="Desk Beacons", sub="The sticker on the shop door",
          accent="cyan", tab=3, cards=[
-        dict(icon="grid", color="cyan", k="shop door · Mill Yard",
+        dict(icon="grid", color="cyan", k="shop door",
              s="printed code · 24 scans", pill=("LIVE", "good")),
-        dict(icon="person", color="green", k="Scanning reveals a person",
-             s="the profile beacon reveals one who does not exist"),
+        dict(icon="person", color="green", k="Reveals a person",
+             s="a profile beacon reveals nobody real"),
         dict(icon="finger", color="amber", k="A stranger can ring it",
-             s="no account needed · one ring per desk every 30s"),
-        dict(icon="lock", color="red", k="An 18+ desk hits the age wall",
-             s="a sticker scan carries no token that could clear it",
+             s="no account · one ring per 30s"),
+        dict(icon="lock", color="red", k="18+ hits the wall",
+             s="a scan carries no token to clear it",
              pill=("18+", "crit")),
-        dict(icon="shield", color="brand", k="Only the owner prints one",
-             s="or anyone could put a stranger's whereabouts on a door"),
+        dict(icon="shield", color="brand", k="Only the owner prints",
+             s="or anyone could post your address"),
     ], button=("Print a code", "brand")),
 
     dict(num=71, title="Audience", sub="Like, comment, share, subscribe",
          accent="pink", tab=0, cards=[
         dict(icon="heart", color="pink", k="Likes", s="one per person — never a counter", metric="248"),
         dict(icon="chat", color="brand", k="Comments",
-             s="moderated like a chat turn, at the target's setting"),
+             s="moderated at the target's setting"),
         dict(icon="link", color="cyan", k="Shares",
-             s="no account needed — the gate is at the destination"),
+             s="no account — gated at the far end"),
         dict(icon="star2", color="amber", k="Subscribers",
              s="free follow · paid tier", metric="31"),
-        dict(icon="warn", color="green", k="A blocked comment is kept",
-             s="shown to its author with the reason, to nobody else"),
+        dict(icon="warn", color="green", k="Blocked comments kept",
+             s="its author sees it, nobody else"),
     ], button=("Subscribe", "brand")),
 
     dict(num=72, title="Gifts & Purchases", sub="Simulated money, real records",
          accent="amber", tabs=MARKET, tab=0, cards=[
         dict(icon="gift", color="amber", k="Gift sent · $10",
-             s="verified adult only · capped · not refundable",
+             s="adult only · capped · final",
              pill=("SENT", "good")),
-        dict(icon="building", color="brand", k="Pruning, properly · $12.50",
-             s="listing_sale · receipt keeps the title it was bought under"),
-        dict(icon="lock", color="cyan", k="A listing is a shop window",
-             s="an offer is what makes it a shop — no offer, no price"),
-        dict(icon="shieldok", color="green", k="Lands on the creator statement",
-             s="beside pack sales and licence fees · one payout sweep"),
-        dict(icon="warn", color="red", k="No real funds move",
-             s="no spend caps, parental controls, or chargebacks — yet",
+        dict(icon="building", color="brand", k="Pruning, properly",
+             s="listing_sale · receipt keeps the title"),
+        dict(icon="lock", color="cyan", k="A listing is a window",
+             s="an offer is what makes it a shop"),
+        dict(icon="shieldok", color="green", k="Lands on the statement",
+             s="beside pack sales · one payout"),
+        dict(icon="warn", color="red", k="No real funds",
+             s="no spend caps or chargebacks yet",
              pill=("SIMULATED", "warn")),
     ], button=("Send a gift", "amber")),
 
     dict(num=73, title="Signatures", sub="A signature that survives dispute",
          accent="indigo", tab=3, cards=[
-        dict(icon="finger", color="indigo", k="Face ID · Windows Hello",
-             s="the passkey signs the document's own hash", pill=("BOUND", "good")),
-        dict(icon="pen", color="brand", k="What you are signing is on screen",
-             s="the system prompt cannot say — so this does, first"),
-        dict(icon="shieldok", color="green", k="Verifiable without an account",
-             s="the evidence package stands on its own arithmetic"),
+        dict(icon="finger", color="indigo", k="Windows Hello",
+             s="signs the document's own hash", pill=("BOUND", "good")),
+        dict(icon="pen", color="brand", k="Shown before the prompt",
+             s="the prompt cannot say — this does"),
+        dict(icon="shieldok", color="green", k="Verifiable by anyone",
+             s="stands on its own arithmetic"),
         dict(icon="db", color="cyan", k="Sealed into the vault",
-             s="chained, so order rests on more than one table"),
-        dict(icon="lock", color="amber", k="Proofing decides the tier",
-             s="self-asserted · federated · document · in person"),
+             s="chained — the order is protected"),
+        dict(icon="lock", color="amber", k="Proofing sets the tier",
+             s="self · federated · document · person"),
     ], button=("Sign", "brand")),
 
     # The starter collection is the one place a viewer meets many synthetic
@@ -1778,37 +1828,61 @@ SCREENS = [
     # the viewer to infer it from context.
     dict(num=74, title="Starter Collection", sub="33 industries + one rated, seeded with faces",
          accent="brand", tabs=MARKET, tab=0, cards=[
-        dict(icon="people", color="brand", k="One expert per industry",
-             s="healthcare · finance · technology · education · legal …",
+        dict(icon="people", color="brand", k="One per industry",
+             s="healthcare · finance · tech · legal …",
              metric="33"),
-        dict(icon="person", color="cyan", k="Dr. Amara Osei · @dr_amara_osei",
+        dict(icon="person", color="cyan", k="Dr. Amara Osei",
              s="healthcare · listed on the marketplace", pill=("AI", "brand")),
-        dict(icon="photo", color="amber", k="The mark is in the pixels",
-             s="burned into the portrait — it survives a screenshot"),
-        dict(icon="lock", color="red", k="Vivienne Sable · adult",
-             s="hidden from an unverified browse entirely",
+        dict(icon="photo", color="amber", k="The mark is in pixels",
+             s="burned in — survives a screenshot"),
+        dict(icon="lock", color="red", k="Vivienne Sable",
+             s="hidden from unverified browse",
              pill=("18+", "crit")),
         dict(icon="shieldok", color="green", k="Seeding is idempotent",
-             s="already-seeded profiles are skipped, never duplicated"),
+             s="seeding twice never duplicates"),
     ], button=("Browse the collection", "brand")),
 
     # The room a desk's viewers actually share: the bell, and the audience
     # verbs in situ rather than as a summary. Still no AI mark — there is a
     # real person on the other end of this stream.
     dict(num=75, title="Live Room", sub="Everyone watching is here together",
-         accent="green", tab=3, cards=[
+         accent="green", tab=3,
+         photo=frames.DESK, photo_tag=("LIVE", "live"),
+         photo_note="Bev is away from the desk — ring the bell",
+         cards=[
         dict(icon="eye", color="green", k="Bev Okafor · live",
              s="one room, not a call per viewer", pill=("LIVE", "good")),
-        dict(icon="finger", color="amber", k="🔔 Ring the bell",
-             s="they are away — one ring per desk every 30s"),
+        dict(icon="finger", color="amber", k="Ring the bell",
+             s="away — one ring per desk per 30s"),
         dict(icon="chat", color="brand", k="“Are you open till six?”",
-             s="comments moderated like any chat turn"),
+             s="moderated like any chat turn"),
         dict(icon="heart", color="pink", k="Likes", s="one per person", metric="12"),
-        dict(icon="gift", color="amber", k="Gift · $5 from Bea",
-             s="verified adult · capped · not refundable", pill=("SENT", "good")),
-        dict(icon="shieldok", color="cyan", k="No AI mark on this stream",
-             s="there is a real person on the other end of it"),
+        dict(icon="gift", color="amber", k="Gift · $5",
+             s="adult only · capped · final", pill=("SENT", "good")),
+        dict(icon="shieldok", color="cyan", k="No AI mark here",
+             s="a real person is on the other end"),
     ], button=("Join the stream", "green")),
+
+    # The other view style. Same mechanic, same bell, behind the deployment's
+    # existing verified-adult gate — and with the location withheld even from
+    # a viewer who clears it, because whereabouts on an adult listing is a
+    # safety matter rather than a detail.
+    dict(num=76, title="Rated Stream", sub="18+, and still a real person",
+         accent="red", tab=3, locked=True,
+         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         photo_note="Be back soon — or ring the bell",
+         cards=[
+        dict(icon="person", color="red", k="Vivienne Marlowe",
+             s="Live person — not AI", pill=("18+", "crit")),
+        dict(icon="lock", color="amber", k="Location withheld",
+             s="withheld even from adults — safety"),
+        dict(icon="shield", color="brand", k="Only she can open it",
+             s="the attestor must be the owner"),
+        dict(icon="gift", color="amber", k="Gifts need an adult",
+             s="capped per gift · never refundable"),
+        dict(icon="shieldok", color="green", k="Still no AI mark",
+             s="rated changes who watches, not what"),
+    ], button=("Ring the bell", "amber")),
 ]
 
 

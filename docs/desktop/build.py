@@ -522,12 +522,12 @@ def v_desks():
     dx = IX + lw + 38
     dw = rw - 36
     ly = IY + 46
-    o.append(rrect(dx, ly, dw, 58, 11, A(C["green"], 0.08), C["green"], 1))
-    o.append(icon("eye", dx + 26, ly + 29, C["green"], 0.95))
-    o.append(text(dx + 50, ly + 25, "Bev Okafor · live", 12, C["txt"], 700))
-    o.append(text(dx + 50, ly + 42, "one room, not a call per viewer", 9.5,
-                  C["t2"], 500))
-    ly += 70
+    # The actual camera frame, embedded as a data URI. No AI watermark on it,
+    # ever: it is a photograph of a real room belonging to a real person.
+    o.append(pb.photo(dx, ly, dw, round(dw * 0.62), pb.frames.DESK,
+                      tag=("LIVE", "live"),
+                      note="Bev is away — ring the bell", uid="dsk"))
+    ly += round(dw * 0.62) + 14
     feed = [("chat", "brand", "“Are you open till six?”", "moderated like any turn"),
             ("heart", "pink", "12 likes", "one per person — never a counter"),
             ("gift", "amber", "Gift · $5 from Bea", "verified adult · capped"),
