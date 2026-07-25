@@ -50,6 +50,12 @@ jobs:
 
       # Simulator SDK and signing disabled: this asks "does it compile", and
       # nothing here should need an Apple Developer identity to answer.
+      #
+      # -quiet, and a grep for the diagnostics on failure: xcodebuild's default
+      # output is thousands of lines of per-file chatter with the actual error
+      # buried hundreds of lines above the exit, which makes a red run nearly
+      # unreadable in the Actions UI. A build gate you cannot diagnose from the
+      # log is only half a gate.
       - name: Build
         working-directory: native/ios
         run: |
@@ -60,9 +66,15 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             -configuration Debug \
+            -quiet \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=
+            CODE_SIGN_IDENTITY= 2>&1 | tee build.log || {
+              echo "::group::Swift diagnostics"
+              grep -E "(error|warning):" build.log | sort -u || true
+              echo "::endgroup::"
+              exit 1
+            }
 
   android:
     name: Android (Compose)
