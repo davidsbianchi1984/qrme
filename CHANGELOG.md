@@ -22,6 +22,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the two postures (local vs published), why TLS isn't optional, what hosting
   profiles for other people commits you to, and — stated plainly — what the
   deployment does *not* give you (no multi-tenancy, rate limiting, or backups).
+- **Profile portraits** — `GET /profiles/{id}/avatar` returns the asset, the
+  profile's AI watermark, and the likeness record as one shape, so 2-D, 3-D,
+  VR and AR surfaces composite the badge rather than deciding whether to; a
+  profile with no portrait reports `placeholder` instead of an unbadged image.
+  An invented likeness reports no rights holder; a real person's face reports
+  the recorded grant, its attestor, and that it is revocable. Art direction
+  for the whole starter collection ships in `qrme/avatars.py` and is served
+  generation-ready at `GET /avatars/briefs`, with each brief carrying its own
+  constraints (invented person, no trademarked costume) so they survive being
+  pasted elsewhere. The starter briefs double as each profile's `appearance`,
+  so the face and the voice describe the same character — and the three
+  mental-health profiles are marked `sombre` and played straight.
+- **A rated starter** — `@vivienne_sable` seeds the 18+ tier so it isn't an
+  empty shelf either. Fictional by necessity: adult mode is never available
+  for a profile of another real person, and a starter ships everywhere. Every
+  discovery surface age-walls it exactly as before — it is absent from public
+  browse entirely.
 
 ## [0.1.4] — 2026-07-24
 

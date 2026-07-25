@@ -123,6 +123,20 @@ A real person (or their estate) can contest a profile that represents them —
 
 Profile lifecycle: **active** → `restricted` (objection pending) → `terminated` (erased) or back to active; and **active** → `departed` (memorial, via `/sunset`). `GET /profiles/{id}` reports the current `status`.
 
+## Portraits
+
+A profile can carry a face, and `GET /profiles/{id}/avatar` never returns a
+bare one — the asset, the AI watermark, and the likeness record come back
+together, so a 2-D card, a VR nameplate, and an AR overlay all receive the
+disclosure from one place instead of each deciding whether to show it.
+
+Whose face it is, is a rights question the API answers: an invented likeness
+reports no rights holder, while a real person's face reports the recorded
+grant, its attestor, and that it can be withdrawn. Starter portraits are all
+invented people — the same promise `seed.py` already makes about the personas
+— and the art direction is published at `GET /avatars/briefs`, generation-
+ready. See [docs/avatars.md](docs/avatars.md).
+
 ## Companion features
 
 An ambient-companion model, with an explicit consent boundary on each

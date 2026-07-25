@@ -47,6 +47,10 @@ CREATE TABLE IF NOT EXISTS profiles (
     watermark_design  TEXT,                   -- JSON {mark, label}: owner-designed
                                               -- display watermark; the AI
                                               -- designation itself is invariant
+    avatar            TEXT,                   -- rendered portrait (asset ref or
+                                              -- URL); served only through
+                                              -- avatars.render(), which attaches
+                                              -- the AI badge
     created_at        TEXT NOT NULL
 );
 
