@@ -778,6 +778,24 @@ CREATE TABLE IF NOT EXISTS desk_rings (
     acked_at  TEXT
 );
 
+-- Coming up on stream. Joining a live room has two shapes and they are not
+-- the same act: the audience watches and comments, a guest appears *on* the
+-- stream. The second needs the host's yes, because it puts someone into a
+-- broadcast the host is answerable for — and on a rated desk it also needs a
+-- verified adult, since a guest there is a person going live on an 18+ stream
+-- rather than merely watching one.
+CREATE TABLE IF NOT EXISTS desk_guests (
+    id           TEXT PRIMARY KEY,
+    desk_id      TEXT NOT NULL REFERENCES desks(id),
+    guest_id     TEXT NOT NULL,
+    display_name TEXT,
+    note         TEXT,
+    status       TEXT NOT NULL DEFAULT 'requested',  -- requested | accepted
+                                                     -- | declined | left
+    requested_at TEXT NOT NULL,
+    decided_at   TEXT
+);
+
 -- A desk left behind as a printed code — the sticker on the shop door that
 -- says "I'm out back, ring the bell". Deliberately its own table rather than
 -- a nullable desk_id on `beacons`: that column is NOT NULL on every database

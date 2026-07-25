@@ -456,13 +456,119 @@ def scan(beacon_id: str, viewer_adult: bool = False) -> dict | None:
     }
 
 
-def join(desk_id: str) -> dict:
+# --- coming up on stream --------------------------------------------------
+#
+# Joining has two shapes, and conflating them would be the mistake. Watching
+# and commenting is something a viewer simply does. Appearing *on* the stream
+# is something the host lets them do — it puts a second person into a
+# broadcast the host is answerable for, and there is no version of that which
+# should happen without their yes.
+
+JOIN_MODES = ("audience", "guest")
+GUEST_STATES = ("requested", "accepted", "declined", "left")
+
+
+def request_guest(desk_id: str, guest_id: str, display_name: str | None = None,
+                  note: str | None = None) -> dict:
+    """Ask to come up on stream. Nothing happens until the host accepts."""
+    row = _row(desk_id)
+    if row is None:
+        raise DeskError("no such desk")
+    if row["presence"] == "closed":
+        raise DeskError("this stream is closed right now")
+
+    conn = db.connect()
+    open_req = conn.execute(
+        "SELECT id FROM desk_guests WHERE desk_id=? AND guest_id=? AND"
+        " status IN ('requested','accepted')", (desk_id, guest_id)).fetchone()
+    if open_req is not None:
+        raise DeskError(
+            "you already have a hand up on this stream — one at a time, so a "
+            "host reading the queue sees people rather than repeats")
+
+    req_id = db.new_id("gst")
+    conn.execute(
+        "INSERT INTO desk_guests (id, desk_id, guest_id, display_name, note,"
+        " status, requested_at, decided_at)"
+        " VALUES (?,?,?,?,?, 'requested', ?, NULL)",
+        (req_id, desk_id, guest_id, display_name, note, db.utcnow()))
+    conn.commit()
+    return guest_request(req_id)
+
+
+def guest_request(req_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM desk_guests WHERE id=?", (req_id,)).fetchone()
+    if row is None:
+        return None
+    return {
+        "id": row["id"], "desk_id": row["desk_id"], "guest_id": row["guest_id"],
+        "display_name": row["display_name"], "note": row["note"],
+        "status": row["status"], "requested_at": row["requested_at"],
+        "decided_at": row["decided_at"],
+        "on_stream": row["status"] == "accepted",
+    }
+
+
+def guests(desk_id: str, pending_only: bool = False) -> list[dict]:
+    sql = "SELECT id FROM desk_guests WHERE desk_id=?"
+    if pending_only:
+        sql += " AND status='requested'"
+    rows = db.connect().execute(sql + " ORDER BY requested_at, rowid",
+                                (desk_id,)).fetchall()
+    return [guest_request(r["id"]) for r in rows]
+
+
+def decide_guest(desk_id: str, req_id: str, accept: bool) -> dict:
+    """The host's answer. Only they can give it — the router checks the token."""
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT * FROM desk_guests WHERE id=? AND desk_id=?",
+        (req_id, desk_id)).fetchone()
+    if row is None:
+        raise DeskError("no such request")
+    if row["status"] != "requested":
+        raise DeskError(f"this request was already {row['status']}")
+    conn.execute("UPDATE desk_guests SET status=?, decided_at=? WHERE id=?",
+                 ("accepted" if accept else "declined", db.utcnow(), req_id))
+    conn.commit()
+    return guest_request(req_id)
+
+
+def leave_stream(desk_id: str, guest_id: str) -> dict:
+    """Step back down. A guest can always end their own appearance."""
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT id FROM desk_guests WHERE desk_id=? AND guest_id=? AND"
+        " status='accepted'", (desk_id, guest_id)).fetchone()
+    if row is None:
+        raise DeskError("you are not on this stream")
+    conn.execute("UPDATE desk_guests SET status='left', decided_at=?"
+                 " WHERE id=?", (db.utcnow(), row["id"]))
+    conn.commit()
+    return guest_request(row["id"])
+
+
+def on_stream(desk_id: str) -> list[dict]:
+    return [g for g in guests(desk_id) if g["status"] == "accepted"]
+
+
+def join(desk_id: str, mode: str = "audience") -> dict:
     """Join the live stream. Mints the room on first arrival.
 
     A room rather than a one-to-one call because that is what a stream is:
     whoever is here is here together, and the profile-room machinery already
     knows how to carry that.
+
+    ``mode`` picks which of the two joins this is. ``audience`` is immediate.
+    ``guest`` only *asks* — it returns the pending request, and the caller is
+    in the audience until the host says yes. Returning a room that behaved as
+    if the request had been granted would be the worst possible default.
     """
+    if mode not in JOIN_MODES:
+        raise DeskError(
+            f"unknown join mode {mode!r}; expected one of "
+            f"{', '.join(JOIN_MODES)}")
     row = _row(desk_id)
     if row is None:
         raise DeskError("no such desk")
@@ -489,6 +595,47 @@ def join(desk_id: str) -> dict:
         # Never an AI watermark on this stream: there is a real person on the
         # other end of it.
         "ai": False,
+        "mode": mode,
+        # Both joins land in the same room; the difference is whether you are
+        # *on* the stream or watching it. Reported so a client renders the
+        # right thing without inferring it from the absence of something.
+        "on_stream": False,
+        "overlay": overlay(desk_id),
         "note": ("They are here." if row["presence"] == "attended"
                  else "They are away — ring the bell and they will see it."),
+    }
+
+
+def overlay(desk_id: str) -> dict:
+    """What renders *over* the video rather than beside it.
+
+    A live stream's chat, likes and gifts belong on top of the picture — that
+    is where a viewer is already looking, and moving their eyes to a panel
+    means missing the thing they came for. This returns the layer, so every
+    client draws the same one instead of each inventing its own.
+    """
+    from . import audience, commerce
+
+    room = _row(desk_id)
+    room_id = room["room_id"] if room else None
+    comments = []
+    if room_id:
+        rows = db.connect().execute(
+            "SELECT sender_id, content FROM room_messages WHERE room_id=? AND"
+            " status='approved' ORDER BY created_at DESC, rowid DESC LIMIT 6",
+            (room_id,)).fetchall()
+        comments = [{"who": r["sender_id"], "said": r["content"]}
+                    for r in reversed(rows)]
+    return {
+        # Semi-transparent by design: the picture stays readable underneath,
+        # which is the whole reason to put them here rather than in a panel.
+        "style": {"opacity": 0.82, "over_video": True,
+                  "anchor": "bottom-left"},
+        "comments": comments,
+        "likes": audience.likes("desk", desk_id),
+        "shares": audience.share_count("desk", desk_id),
+        "gifts": commerce.gifts_for("desk", desk_id)[:5],
+        "gift_total": commerce.gift_total("desk", desk_id),
+        "on_stream": on_stream(desk_id),
+        "waiting": _waiting(desk_id),
     }

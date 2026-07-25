@@ -522,16 +522,25 @@ def v_desks():
     dx = IX + lw + 38
     dw = rw - 36
     ly = IY + 46
-    o.append(rrect(dx, ly, dw, 58, 11, A(C["green"], 0.08), C["green"], 1))
-    o.append(icon("eye", dx + 26, ly + 29, C["green"], 0.95))
-    o.append(text(dx + 50, ly + 25, "Bev Okafor · live", 12, C["txt"], 700))
-    o.append(text(dx + 50, ly + 42, "one room, not a call per viewer", 9.5,
-                  C["t2"], 500))
-    ly += 70
-    feed = [("chat", "brand", "“Are you open till six?”", "moderated like any turn"),
-            ("heart", "pink", "12 likes", "one per person — never a counter"),
-            ("gift", "amber", "Gift · $5 from Bea", "verified adult · capped"),
-            ("link", "cyan", "Shared to a friend", "the gate is at the destination")]
+    # The actual camera frame, embedded as a data URI. No AI watermark on it,
+    # ever: it is a photograph of a real room belonging to a real person.
+    fh = round(dw * 0.62)
+    o.append(pb.photo(dx, ly, dw, fh, pb.frames.DESK, tag=("LIVE", "live"),
+                      uid="dsk"))
+    # Chat, likes, shares and gifts ride on the picture rather than in a list
+    # beside it — that is where the viewer is already looking.
+    o.append(pb.live_overlay(dx, ly, dw, fh,
+                             [("Ada", "is she back yet?"),
+                              ("Cy", "ringing it now"),
+                              ("Bea", "are you open till six?")],
+                             [("gift", "amber", "Bea · $5"),
+                              ("heart", "pink", "12"),
+                              ("link", "cyan", "3 shares")],
+                             viewers="14 watching"))
+    ly += fh + 14
+    feed = [("people", "green", "Come up as a guest", "asks the host — they decide"),
+            ("chat", "brand", "Or just comment", "immediate · moderated like any turn"),
+            ("finger", "amber", "Ring the bell", "no account · one ring per 30s")]
     for ic, col, k, s in feed:
         o.append(rrect(dx, ly, dw, 52, 11, "rgba(255,255,255,0.03)", C["line"], 1))
         o.append(chip(dx + 12, ly + 9, ic, ACCENT[col]))

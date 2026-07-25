@@ -201,16 +201,126 @@ def ack_ring(desk_id: str, ring_id: str, request: Request) -> dict:
     return acked
 
 
+class JoinIn(BaseModel):
+    # audience: watch and comment, immediate. guest: ask to come up on the
+    # stream, which only the host can grant.
+    mode: str = "audience"
+
+
+class GuestIn(BaseModel):
+    display_name: str | None = Field(default=None, max_length=80)
+    note: str | None = Field(default=None, max_length=200)
+
+
 @router.post("/desks/{desk_id}/join", status_code=201)
-def join_stream(desk_id: str, request: Request) -> dict:
-    """Join the live stream — the room whoever is watching shares."""
+def join_stream(desk_id: str, request: Request,
+                body: JoinIn | None = None) -> dict:
+    """Join the live stream — the room whoever is watching shares.
+
+    Two ways in. `audience` is immediate: watch, comment, like, gift. `guest`
+    asks to appear **on** the stream, and returns a pending request rather
+    than a room, because that is the host's call to make.
+    """
     _gate_rated(desk_id, request)
+    mode = (body.mode if body else "audience")
     try:
-        return desks.join(desk_id)
+        joined = desks.join(desk_id, mode=mode)
     except desks.DeskError as exc:
         if str(exc) == "no such desk":
             raise HTTPException(404, "no such desk") from exc
         raise _fail(exc) from exc
+    if mode == "guest":
+        who = auth.principal(request)
+        if who is None:
+            raise HTTPException(
+                401, "coming up on stream needs an account — the host is "
+                     "deciding about a person, not an anonymous request")
+        try:
+            joined["guest_request"] = desks.request_guest(
+                desk_id, who["subject_id"])
+        except desks.DeskError as exc:
+            raise _fail(exc) from exc
+    return joined
+
+
+@router.post("/desks/{desk_id}/guests", status_code=201)
+def ask_to_come_up(desk_id: str, body: GuestIn, request: Request) -> dict:
+    """Put a hand up. Nothing happens until the host accepts.
+
+    Needs an account, and on a rated desk a verified adult — a guest there is
+    a person *going live* on an 18+ stream, not merely watching one.
+    """
+    _gate_rated(desk_id, request)
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(
+            401, "coming up on stream needs an account — the host is deciding "
+                 "about a person, not an anonymous request")
+    try:
+        return desks.request_guest(desk_id, who["subject_id"],
+                                   body.display_name, body.note)
+    except desks.DeskError as exc:
+        if str(exc) == "no such desk":
+            raise HTTPException(404, "no such desk") from exc
+        raise _fail(exc) from exc
+
+
+@router.get("/desks/{desk_id}/guests")
+def list_guests(desk_id: str, request: Request, pending: bool = False) -> dict:
+    """The queue of raised hands. Owner-only: who asked to appear on someone's
+    stream is theirs to see, not the audience's."""
+    _require_desk(desk_id, request)
+    return {"guests": desks.guests(desk_id, pending_only=pending),
+            "on_stream": desks.on_stream(desk_id)}
+
+
+@router.post("/desks/{desk_id}/guests/{req_id}/accept", status_code=201)
+def accept_guest(desk_id: str, req_id: str, request: Request) -> dict:
+    """Bring them up. Only the host can."""
+    _require_desk(desk_id, request)
+    try:
+        return desks.decide_guest(desk_id, req_id, True)
+    except desks.DeskError as exc:
+        if str(exc) == "no such request":
+            raise HTTPException(404, str(exc)) from exc
+        raise _fail(exc) from exc
+
+
+@router.post("/desks/{desk_id}/guests/{req_id}/decline", status_code=201)
+def decline_guest(desk_id: str, req_id: str, request: Request) -> dict:
+    """Say no. A declined request is kept, so a host can see a pattern."""
+    _require_desk(desk_id, request)
+    try:
+        return desks.decide_guest(desk_id, req_id, False)
+    except desks.DeskError as exc:
+        if str(exc) == "no such request":
+            raise HTTPException(404, str(exc)) from exc
+        raise _fail(exc) from exc
+
+
+@router.delete("/desks/{desk_id}/guests/me")
+def step_down(desk_id: str, request: Request) -> dict:
+    """Step back down into the audience. A guest can always end their own
+    appearance — needing the host's permission to *stop* being on camera
+    would be the wrong way round."""
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    try:
+        return desks.leave_stream(desk_id, who["subject_id"])
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.get("/desks/{desk_id}/overlay")
+def stream_overlay(desk_id: str, request: Request) -> dict:
+    """The layer that renders *over* the video: comments, likes, shares,
+    gifts, and who is currently up. One definition, so every client draws the
+    same overlay instead of each inventing its own."""
+    _gate_rated(desk_id, request)
+    if desks.card(desk_id, viewer_adult=True) is None:
+        raise HTTPException(404, "no such desk")
+    return desks.overlay(desk_id)
 
 
 # --- beacons: the desk as a printed code ----------------------------------
