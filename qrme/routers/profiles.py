@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import json
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .. import auth, companion, db, persona, terms
 from ..common import (
@@ -19,7 +19,12 @@ from ..models import (
 router = APIRouter()
 
 
-@router.post("/profiles", status_code=201)
+# The signup key is a gate on the *HTTP* surface — who may create a profile
+# on this deployment — so it rides as a route dependency. In-process callers
+# (seeding a starter collection) are the operator already and don't pass
+# through it.
+@router.post("/profiles", status_code=201,
+             dependencies=[Depends(auth.require_signup_key)])
 def create_profile(body: ProfileCreate) -> dict:
     if not body.terms_consent:
         raise HTTPException(
