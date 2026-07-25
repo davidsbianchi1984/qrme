@@ -749,6 +749,13 @@ CREATE TABLE IF NOT EXISTS desks (
     location          TEXT,
     blurb             TEXT,
     presence          TEXT NOT NULL DEFAULT 'away',  -- attended | away | closed
+    rated             INTEGER NOT NULL DEFAULT 0,     -- 18+ stream: the existing
+                                       -- verified-adult gate applies to the
+                                       -- card, the view, the bell and joining
+    view_style        TEXT NOT NULL DEFAULT 'desk',   -- desk | stage: which
+                                       -- sample frame stands in until a real
+                                       -- camera is configured
+    room_id           TEXT,            -- the live stream people join
     portrait          TEXT,            -- only ever set by the desk's owner
     camera_url        TEXT,            -- the desk's own camera, when it has one;
                                        -- NULL means the sample frame is served

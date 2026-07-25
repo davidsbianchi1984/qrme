@@ -47,6 +47,11 @@ CALLER_COOLDOWN_SECONDS = 300
 
 DESIGNATION = "Live person — not AI"
 
+# Which sample frame stands in until a desk has a camera of its own. Both are
+# photographs of a real, empty room with a "ring the bell" sign in it — the
+# gesture the whole feature is built around.
+VIEW_STYLES = {"desk": "desk_view.webp", "stage": "stage_view.webp"}
+
 # Said next to the claim, every time. The platform records who vouched; it does
 # not independently verify a human, and pretending otherwise would make this
 # badge exactly as hollow as an unmarked AI card.
@@ -63,12 +68,18 @@ class DeskError(ValueError):
 
 def create(owner_id: str, display_name: str, trade: str,
            attestor: str, basis: str, location: str | None = None,
-           blurb: str | None = None) -> dict:
+           blurb: str | None = None, rated: bool = False,
+           view_style: str = "desk") -> dict:
     """Open a desk. The human attestation is required at creation.
 
     A desk that could be created without one would be an unmarked profile with
     a "not AI" badge on it — strictly worse than no badge, because it would be
     believed.
+
+    ``rated`` puts the stream behind the deployment's existing verified-adult
+    gate. It is not a separate tier and does not get its own weaker check: the
+    same ``rated.viewer_is_adult`` that guards every other 18+ surface guards
+    the card, the view, the bell and joining.
     """
     if not attestor.strip() or not basis.strip():
         raise DeskError(
@@ -76,6 +87,19 @@ def create(owner_id: str, display_name: str, trade: str,
             "without recording who attests that and on what basis")
     if not display_name.strip():
         raise DeskError("a desk needs a name a visitor can read")
+    if view_style not in VIEW_STYLES:
+        raise DeskError(
+            f"unknown view style {view_style!r}; expected one of "
+            f"{', '.join(VIEW_STYLES)}")
+    # The repo's existing hard line is that adult mode is never available for
+    # a profile of *another* real person. A rated stream is a real person by
+    # definition, so the same line lands here as: only they can put themselves
+    # on one. A third party opening an 18+ stream in someone else's name is
+    # the exact shape this refusal exists to prevent.
+    if rated and attestor.strip() != owner_id.strip():
+        raise DeskError(
+            "an 18+ stream can only be opened by the person on it: the "
+            "attestor must be the owner, attesting for themselves")
 
     desk_id = db.new_id("dsk")
     token = auth.issue("desk", desk_id)
@@ -83,11 +107,11 @@ def create(owner_id: str, display_name: str, trade: str,
     conn.execute(
         "INSERT INTO desks (id, owner_id, display_name, trade, location,"
         " blurb, presence, portrait, attestor, attestation_basis,"
-        " attested_at, created_at, last_seen)"
-        " VALUES (?,?,?,?,?,?,'away',NULL,?,?,?,?,?)",
+        " attested_at, created_at, last_seen, rated, view_style)"
+        " VALUES (?,?,?,?,?,?,'away',NULL,?,?,?,?,?,?,?)",
         (desk_id, owner_id, display_name.strip(), trade.strip(), location,
          blurb, attestor.strip(), basis.strip(), db.utcnow(), db.utcnow(),
-         db.utcnow()))
+         db.utcnow(), int(rated), view_style))
     conn.commit()
     return card(desk_id) | {"desk_token": token}
 
@@ -118,12 +142,36 @@ def set_portrait(desk_id: str, asset: str | None) -> dict:
     return card(desk_id)
 
 
-def card(desk_id: str) -> dict | None:
+def age_wall_card(desk_id: str) -> dict:
+    """What an unverified viewer gets instead of an 18+ stream.
+
+    Existence acknowledged, nothing else — no name, no trade, no view, and
+    above all no location. A performer's whereabouts on an adult listing is a
+    safety matter, not a detail.
+    """
+    return {
+        "desk_id": desk_id,
+        "rated": True,
+        "age_wall": True,
+        "human": True,
+        "ai": False,
+        "note": "18+ only — open this with an interactor token whose verified "
+                "birthdate shows 18 or older",
+    }
+
+
+def card(desk_id: str, viewer_adult: bool = False) -> dict | None:
     """What a visitor is shown. Parallel in shape to a profile's card, and
-    deliberately different in the one field that matters."""
+    deliberately different in the one field that matters.
+
+    ``viewer_adult`` comes from the deployment's existing verified-adult check;
+    this module does not implement a second, weaker one.
+    """
     row = _row(desk_id)
     if row is None:
         return None
+    if row["rated"] and not viewer_adult:
+        return age_wall_card(desk_id)
     from . import signatures
 
     signed = signatures.signatures_for("desk_human_attestation", desk_id)
@@ -131,8 +179,12 @@ def card(desk_id: str) -> dict | None:
         "desk_id": row["id"],
         "display_name": row["display_name"],
         "trade": row["trade"],
-        "location": row["location"],
+        # Withheld on an 18+ stream even from a verified adult: where the
+        # performer physically is has nothing to do with watching them.
+        "location": None if row["rated"] else row["location"],
         "blurb": row["blurb"],
+        "rated": bool(row["rated"]),
+        "age_wall": False,
         "presence": row["presence"],
         "last_seen": row["last_seen"],
         # The positive claim, and never an AI watermark. A desk that carried
@@ -156,6 +208,10 @@ def card(desk_id: str) -> dict | None:
             "available": row["presence"] != "closed",
             "waiting": _waiting(desk_id),
         },
+        # The live stream itself. Minted on the first join rather than at
+        # creation, so a desk nobody has visited carries no room.
+        "room_id": row["room_id"],
+        "join": f"/desks/{desk_id}/join",
     }
 
 
@@ -262,11 +318,13 @@ def assets_dir():
 def frame_path(desk_id: str):
     """The image file to serve for this desk right now.
 
-    A desk with its own camera would resolve here; until one is configured
-    every desk falls back to the sample frame, and :func:`card` reports that
-    rather than letting a client assume it is looking at a live view.
+    A desk with its own camera would resolve here; until one is configured it
+    falls back to the sample frame for its view style, and :func:`card` reports
+    ``live: false`` rather than letting a client assume otherwise.
     """
-    return assets_dir() / SAMPLE_FRAME
+    row = _row(desk_id)
+    style = row["view_style"] if row else "desk"
+    return assets_dir() / VIEW_STYLES.get(style, SAMPLE_FRAME)
 
 
 def feed(desk_id: str) -> dict:
@@ -283,6 +341,44 @@ def feed(desk_id: str) -> dict:
         # statement about both.
         "ai": False,
         "watermark": None,
+    }
+
+
+def join(desk_id: str) -> dict:
+    """Join the live stream. Mints the room on first arrival.
+
+    A room rather than a one-to-one call because that is what a stream is:
+    whoever is here is here together, and the profile-room machinery already
+    knows how to carry that.
+    """
+    row = _row(desk_id)
+    if row is None:
+        raise DeskError("no such desk")
+    if row["presence"] == "closed":
+        raise DeskError("this stream is closed right now")
+
+    conn = db.connect()
+    room_id = row["room_id"]
+    if not room_id:
+        room_id = db.new_id("rm")
+        conn.execute(
+            "INSERT INTO rooms (id, topic, channel, status, created_at)"
+            " VALUES (?,?,?,'active',?)",
+            (room_id, f"{row['display_name']} — live", "video", db.utcnow()))
+        conn.execute("UPDATE desks SET room_id=? WHERE id=?",
+                     (room_id, desk_id))
+        conn.commit()
+    return {
+        "desk_id": desk_id,
+        "room_id": room_id,
+        "channel": "video",
+        "presence": row["presence"],
+        "rated": bool(row["rated"]),
+        # Never an AI watermark on this stream: there is a real person on the
+        # other end of it.
+        "ai": False,
+        "note": ("They are here." if row["presence"] == "attended"
+                 else "They are away — ring the bell and they will see it."),
     }
 
 

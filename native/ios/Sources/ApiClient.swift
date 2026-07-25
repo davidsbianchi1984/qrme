@@ -47,18 +47,31 @@ struct DeskBell: Decodable { let available: Bool; let waiting: Int }
 
 struct DeskCard: Decodable {
     let desk_id: String
-    let display_name: String
-    let trade: String
+    // Present only past the age wall — an unverified viewer of an 18+ stream
+    // gets existence and nothing else.
+    let age_wall: Bool?
+    let rated: Bool?
+    let display_name: String?
+    let trade: String?
     let location: String?
     let blurb: String?
-    let presence: String
+    let presence: String?
     let human: Bool
     let ai: Bool
-    let designation: String
-    let attestation: DeskAttestation
+    let designation: String?
+    let attestation: DeskAttestation?
     let portrait: String?
-    let feed: DeskFeed
-    let bell: DeskBell
+    let feed: DeskFeed?
+    let bell: DeskBell?
+    let note: String?
+}
+
+struct StreamJoin: Decodable {
+    let room_id: String
+    let channel: String
+    let presence: String
+    let ai: Bool
+    let note: String
 }
 
 struct RingReceipt: Decodable {
@@ -164,7 +177,7 @@ struct Objection: Decodable {
     let reattested: Int
 }
 
-struct InteractorCreated: Decodable { let id: String }
+struct InteractorCreated: Decodable { let id: String; let token: String? }
 
 struct SteeringDial: Decodable, Identifiable {
     let name: String
@@ -1026,19 +1039,27 @@ actor ApiClient {
 
     // MARK: Live desks
 
-    func desk(_ id: String) async throws -> DeskCard {
-        try await request("/desks/\(id)")
+    func desk(_ id: String, token: String? = nil) async throws -> DeskCard {
+        try await request("/desks/\(id)", token: token)
     }
 
     /// Ring the bell at an unattended desk. No token: the visitor standing in
     /// front of an empty chair is exactly the person who has no account.
     func ringBell(deskId: String, callerId: String? = nil,
-                  note: String? = nil) async throws -> RingReceipt {
+                  note: String? = nil,
+                  token: String? = nil) async throws -> RingReceipt {
         var body: [String: Any] = [:]
         if let callerId { body["caller_id"] = callerId }
         if let note { body["note"] = note }
         return try await request("/desks/\(deskId)/bell", method: "POST",
-                                 body: body)
+                                 body: body, token: token)
+    }
+
+    /// Join the live stream — the room whoever is watching shares.
+    func joinStream(deskId: String, token: String? = nil)
+        async throws -> StreamJoin {
+        try await request("/desks/\(deskId)/join", method: "POST",
+                          token: token)
     }
 
     // MARK: Signatures (docs/signatures.md)

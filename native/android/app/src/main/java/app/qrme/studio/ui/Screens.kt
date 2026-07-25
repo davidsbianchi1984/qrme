@@ -726,7 +726,8 @@ private fun RelationshipPanel(vm: StudioViewModel) {
             status = null
             vm.call({
                 val interactor = vm.interactorId
-                    ?: ApiClient.createInteractor("You").also { vm.rememberInteractor(it) }
+                    ?: ApiClient.createInteractor("You")
+                        .also { vm.rememberInteractor(it.id, it.token) }.id
                 ApiClient.setRelationship(vm.pid!!, vm.token!!, interactor,
                     type, nickname, tone)
             }) { r ->
@@ -820,14 +821,18 @@ fun ChatScreen(vm: StudioViewModel) {
         busy = true; error = null
         vm.call({
             var interactor = vm.interactorId
+            var minted: String? = null
             if (interactor == null) {
-                interactor = ApiClient.createInteractor("You")
+                val created = ApiClient.createInteractor("You")
+                interactor = created.id
+                minted = created.token
             }
-            interactor!! to ApiClient.chat(vm.pid!!, vm.token!!, interactor, text)
+            Triple(interactor!!, minted,
+                ApiClient.chat(vm.pid!!, vm.token!!, interactor, text))
         }) { r ->
             busy = false
-            r.onSuccess { (interactor, reply) ->
-                vm.rememberInteractor(interactor)
+            r.onSuccess { (interactor, mintedToken, reply) ->
+                vm.rememberInteractor(interactor, mintedToken)
                 messages = messages + if (reply.content != null && reply.status == "approved") {
                     listOfNotNull(
                         Bubble(false, reply.content, false,
@@ -1197,7 +1202,7 @@ private fun withInteractor(vm: StudioViewModel, onError: (String) -> Unit,
                            block: (String) -> Unit) {
     vm.interactorId?.let { return block(it) }
     vm.call({ ApiClient.createInteractor("You") }) { r ->
-        r.onSuccess { vm.rememberInteractor(it); block(it) }
+        r.onSuccess { vm.rememberInteractor(it.id, it.token); block(it.id) }
             .onFailure { onError(it.message ?: "couldn't create your identity") }
     }
 }
@@ -1243,8 +1248,10 @@ private fun StrangerPanel(vm: StudioViewModel) {
             // Verify 18+: mint a fresh identity carrying the birthdate —
             // the age wall checks it server-side.
             vm.call({ ApiClient.createInteractor("You", birthdate) }) { r ->
-                r.onSuccess { vm.rememberInteractor(it); joinAs(it, minted = true) }
-                    .onFailure { error = it.message }
+                r.onSuccess {
+                    vm.rememberInteractor(it.id, it.token)
+                    joinAs(it.id, minted = true)
+                }.onFailure { error = it.message }
             }
         } else withInteractor(vm, { error = it }) { me -> joinAs(me, minted = false) }
     }
@@ -2219,7 +2226,8 @@ private fun DeskPanel(vm: StudioViewModel) {
     var open by remember { mutableStateOf(false) }
 
     if (open && deskId.isNotBlank()) {
-        DeskScreen(deskId = deskId.trim(), callerId = vm.interactorId)
+        DeskScreen(deskId = deskId.trim(), callerId = vm.interactorId,
+            viewerToken = vm.interactorToken)
         return
     }
     screenScroll {

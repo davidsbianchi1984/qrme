@@ -205,3 +205,144 @@ def test_rings_are_not_public(client):
 def test_an_unknown_desk_is_a_404_not_a_stack_trace(client):
     assert client.get("/desks/dsk_nope").status_code == 404
     assert client.post("/desks/dsk_nope/bell", json={}).status_code == 404
+
+
+# --- 18+ streams ----------------------------------------------------------
+#
+# Not a separate tier. A rated desk is the same live stream behind the same
+# verified-adult gate every other 18+ surface already uses — reusing it rather
+# than writing a second one, because a second gate is a second thing to get
+# wrong and the weaker one always wins.
+
+ADULT = "1984-06-01"
+MINOR = "2012-06-01"
+
+
+def _viewer(client, birthdate):
+    r = client.post("/interactors",
+                    json={"display_name": "Viewer", "birthdate": birthdate})
+    return {"authorization": f"Bearer {r.json()['token']}"}
+
+
+def _stream(client, **over):
+    body = {"owner_id": "perf-1", "display_name": "Sable", "trade": "performer",
+            "attestor": "perf-1", "basis": "self-attested, verified adult",
+            "rated": True, "view_style": "stage"}
+    body.update(over)
+    return client.post("/desks", json=body)
+
+
+def test_an_18_plus_stream_can_only_be_opened_by_the_person_on_it(client):
+    """The repo's hard line is that adult mode is never available for a
+    profile of another real person. A stream *is* a real person, so the same
+    line lands as: nobody else can put them on one."""
+    res = _stream(client, attestor="somebody-else")
+    assert res.status_code == 422
+    assert "only be opened by the person on it" in res.text
+
+
+def test_an_unverified_viewer_gets_an_age_wall_and_nothing_else(client):
+    created = _stream(client).json()
+    card = client.get(f"/desks/{created['desk_id']}").json()
+    assert card["age_wall"] is True
+    assert card["rated"] is True
+    # Existence acknowledged; nothing that identifies or locates them.
+    assert "display_name" not in card
+    assert "location" not in card
+    assert "feed" not in card
+    # Still never marked as AI — a real person is on the other end.
+    assert card["ai"] is False and card["human"] is True
+
+
+def test_a_minor_is_refused_exactly_as_an_anonymous_caller_is(client):
+    created = _stream(client).json()
+    headers = _viewer(client, MINOR)
+    assert client.get(f"/desks/{created['desk_id']}",
+                      headers=headers).json()["age_wall"] is True
+    assert client.get(f"/desks/{created['desk_id']}/view.webp",
+                      headers=headers).status_code == 403
+
+
+def test_a_verified_adult_sees_the_stream(client):
+    created = _stream(client).json()
+    headers = _viewer(client, ADULT)
+    card = client.get(f"/desks/{created['desk_id']}", headers=headers).json()
+    assert card["age_wall"] is False
+    assert card["display_name"] == "Sable"
+    assert card["ai"] is False
+    assert card["feed"]["watermark"] is None
+
+    view = client.get(f"/desks/{created['desk_id']}/view.webp", headers=headers)
+    assert view.status_code == 200
+    assert view.headers["content-type"] == "image/webp"
+
+
+def test_where_they_physically_are_is_never_on_a_rated_card(client):
+    """Withheld even from a verified adult. A performer's whereabouts has
+    nothing to do with watching them."""
+    created = _stream(client, location="123 Real Street").json()
+    card = client.get(f"/desks/{created['desk_id']}",
+                      headers=_viewer(client, ADULT)).json()
+    assert card["location"] is None
+
+
+def test_the_bell_on_a_rated_stream_is_not_an_anonymous_ping_channel(client):
+    """Public on an ordinary desk, gated here: handing anyone a way to buzz an
+    adult performer from anywhere is not a thing to hand out."""
+    created = _stream(client).json()
+    assert client.post(f"/desks/{created['desk_id']}/bell",
+                       json={}).status_code == 403
+    ok = client.post(f"/desks/{created['desk_id']}/bell", json={},
+                     headers=_viewer(client, ADULT))
+    assert ok.status_code == 201
+    assert "get back" in ok.json()["note"]
+
+
+def test_joining_the_stream_needs_the_same_verification(client):
+    created = _stream(client).json()
+    assert client.post(f"/desks/{created['desk_id']}/join").status_code == 403
+
+    joined = client.post(f"/desks/{created['desk_id']}/join",
+                         headers=_viewer(client, ADULT))
+    assert joined.status_code == 201
+    body = joined.json()
+    assert body["room_id"].startswith("rm_")
+    assert body["channel"] == "video"
+    assert body["ai"] is False
+    assert "away" in body["note"]
+
+
+def test_the_room_is_minted_once_and_shared(client):
+    """A stream is whoever is here, together — not a call per viewer."""
+    created = _stream(client).json()
+    a = client.post(f"/desks/{created['desk_id']}/join",
+                    headers=_viewer(client, ADULT)).json()
+    b = client.post(f"/desks/{created['desk_id']}/join",
+                    headers=_viewer(client, ADULT)).json()
+    assert a["room_id"] == b["room_id"]
+
+
+def test_the_stage_view_is_served_for_a_stage_style_desk(client):
+    created = _stream(client).json()
+    headers = _viewer(client, ADULT)
+    stage = client.get(f"/desks/{created['desk_id']}/view.webp",
+                       headers=headers).content
+
+    desk = _desk(client).json()
+    office = client.get(f"/desks/{desk['desk_id']}/view.webp").content
+    assert stage != office, "the two view styles serve the same frame"
+
+
+def test_an_unknown_view_style_is_refused(client):
+    res = _stream(client, view_style="hologram")
+    assert res.status_code == 422
+    assert "unknown view style" in res.text
+
+
+def test_an_ordinary_desk_stays_public(client):
+    """Gating the 18+ case must not quietly gate the locksmith."""
+    created = _desk(client).json()
+    assert client.get(f"/desks/{created['desk_id']}").json()["rated"] is False
+    assert client.get(f"/desks/{created['desk_id']}/view.webp").status_code == 200
+    assert client.post(f"/desks/{created['desk_id']}/bell",
+                       json={}).status_code == 201

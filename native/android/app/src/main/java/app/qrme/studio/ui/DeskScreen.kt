@@ -30,6 +30,7 @@ import coil.compose.AsyncImage
 import app.qrme.studio.ApiClient
 import app.qrme.studio.DeskCard
 import app.qrme.studio.RingReceipt
+import app.qrme.studio.StreamJoin
 import kotlinx.coroutines.launch
 
 /**
@@ -51,16 +52,18 @@ import kotlinx.coroutines.launch
  * looking at.
  */
 @Composable
-fun DeskScreen(deskId: String, callerId: String? = null) {
+fun DeskScreen(deskId: String, callerId: String? = null,
+               viewerToken: String? = null) {
     val scope = rememberCoroutineScope()
     var card by remember { mutableStateOf<DeskCard?>(null) }
     var receipt by remember { mutableStateOf<RingReceipt?>(null) }
     var note by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var ringing by remember { mutableStateOf(false) }
+    var joined by remember { mutableStateOf<StreamJoin?>(null) }
 
     suspend fun reload() {
-        runCatching { ApiClient.desk(deskId) }
+        runCatching { ApiClient.desk(deskId, viewerToken) }
             .onSuccess { card = it }
             .onFailure { error = it.message }
     }
@@ -68,21 +71,35 @@ fun DeskScreen(deskId: String, callerId: String? = null) {
 
     screenScroll {
         val c = card
+        if (c != null && c.ageWall) {
+            // Existence and nothing else: no name, no view, and no location,
+            // because where a performer physically is has nothing to do with
+            // watching them. Still never marked AI — a real person is here.
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("18+ only", color = Qrme.Txt, fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold)
+                Text(c.note ?: "", color = Qrme.T2, fontSize = 12.sp)
+                Text("A live person — not AI", color = Qrme.T3, fontSize = 11.sp)
+            }
+            return@screenScroll
+        }
         Box(
             Modifier.fillMaxWidth().aspectRatio(4f / 3f)
                 .clip(RoundedCornerShape(16.dp)).background(Qrme.Card),
         ) {
             if (c != null) {
+            if (c?.feed != null) {
                 AsyncImage(
                     model = ApiClient.base.trimEnd('/') + c.feed.url,
                     contentDescription = "The desk",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().aspectRatio(4f / 3f))
             }
+            }
             // The one label this image carries says whether it is live —
             // which is what somebody staring at an empty chair actually needs
             // to know. Never a watermark: it is a photograph of a real room.
-            if (c != null) {
+            if (c?.feed != null) {
                 Box(
                     Modifier.align(Alignment.BottomStart).padding(10.dp)
                         .clip(CircleShape)
@@ -99,7 +116,7 @@ fun DeskScreen(deskId: String, callerId: String? = null) {
         }
 
         if (c != null) {
-            if (!c.feed.live) {
+            if (c.feed != null && !c.feed.live) {
                 Text(c.feed.note, color = Qrme.T3, fontSize = 11.sp)
             }
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -122,6 +139,31 @@ fun DeskScreen(deskId: String, callerId: String? = null) {
                 c.blurb?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
             }
 
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
+                        .background(Qrme.Card)
+                        .clickable {
+                            scope.launch {
+                                runCatching {
+                                    ApiClient.joinStream(deskId, viewerToken)
+                                }.onSuccess { joined = it }
+                                    .onFailure { error = it.message }
+                            }
+                        }
+                        .padding(vertical = 14.dp),
+                    Alignment.Center,
+                ) {
+                    Text(if (joined == null) "Join the live stream" else "Joined",
+                        color = Qrme.Txt, fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+                joined?.let {
+                    Text(it.note, color = Qrme.T2, fontSize = 12.sp)
+                    Text("Room ${it.roomId}", color = Qrme.T3, fontSize = 10.sp)
+                }
+            }
+
             if (c.bellAvailable) {
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     labeledField("Anything they should know? (optional)", note,
@@ -135,7 +177,7 @@ fun DeskScreen(deskId: String, callerId: String? = null) {
                                     runCatching {
                                         ApiClient.ringBell(
                                             deskId, callerId,
-                                            note.ifBlank { null })
+                                            note.ifBlank { null }, viewerToken)
                                     }.onSuccess { receipt = it }
                                         .onFailure { error = it.message }
                                     ringing = false
@@ -162,16 +204,19 @@ fun DeskScreen(deskId: String, callerId: String? = null) {
                     color = Qrme.T2, fontSize = 12.sp)
             }
 
+            val att = c.attestation
+            if (att != null) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Attested by ${c.attestation.attestor}", color = Qrme.Txt,
+                Text("Attested by ${att.attestor}", color = Qrme.Txt,
                     fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text(c.attestation.basis, color = Qrme.T2, fontSize = 11.sp)
-                if (c.attestation.signed) {
+                Text(att.basis, color = Qrme.T2, fontSize = 11.sp)
+                if (att.signed) {
                     Text("✓ Signed", color = Qrme.Green, fontSize = 11.sp)
                 }
                 // Shipped with the claim, always: "recorded" and "proven" are
                 // different words and the difference is the whole point.
-                Text(c.attestation.note, color = Qrme.T3, fontSize = 10.sp)
+                Text(att.note, color = Qrme.T3, fontSize = 10.sp)
+            }
             }
         }
 

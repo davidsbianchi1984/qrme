@@ -61,13 +61,19 @@ data class BeaconPlaced(val id: String, val label: String, val qrSvg: String)
 data class DeskFeed(val url: String, val live: Boolean, val note: String)
 data class DeskAttestation(val attestor: String, val basis: String,
                            val signed: Boolean, val note: String)
+// `ageWall` true means an 18+ stream seen without a verified-adult token:
+// existence and nothing else, so the rest of the fields are absent.
 data class DeskCard(val deskId: String, val displayName: String,
                     val trade: String, val location: String?,
                     val blurb: String?, val presence: String,
                     val human: Boolean, val ai: Boolean,
-                    val designation: String, val attestation: DeskAttestation,
-                    val portrait: String?, val feed: DeskFeed,
-                    val bellAvailable: Boolean, val waiting: Int)
+                    val designation: String, val attestation: DeskAttestation?,
+                    val portrait: String?, val feed: DeskFeed?,
+                    val bellAvailable: Boolean, val waiting: Int,
+                    val rated: Boolean, val ageWall: Boolean, val note: String?)
+data class InteractorCreated(val id: String, val token: String?)
+data class StreamJoin(val roomId: String, val channel: String,
+                      val presence: String, val ai: Boolean, val note: String)
 data class RingReceipt(val ringId: String, val waiting: Int,
                        val presence: String, val note: String)
 
@@ -301,11 +307,18 @@ object ApiClient {
 
     // ---- chat (the core loop) ----
 
-    suspend fun createInteractor(name: String, birthdate: String? = null): String {
+    /**
+     * Mint an interactor identity. Returns the token as well as the id,
+     * because every age-gated surface checks the *token's* verified birthdate
+     * server-side — an id on its own opens nothing, which is the point.
+     */
+    suspend fun createInteractor(name: String,
+                                 birthdate: String? = null): InteractorCreated {
         val body = JSONObject().put("display_name", name)
         if (!birthdate.isNullOrBlank()) body.put("birthdate", birthdate)
         val o = JSONObject(request("/interactors", "POST", body))
-        return o.getString("id")
+        return InteractorCreated(o.getString("id"),
+            if (o.isNull("token")) null else o.optString("token"))
     }
 
     // ---- steering: the owner shapes how the profile comes across ----
@@ -611,11 +624,12 @@ object ApiClient {
      * front of an empty chair is exactly the person who has no account.
      */
     suspend fun ringBell(deskId: String, callerId: String? = null,
-                         note: String? = null): RingReceipt {
+                         note: String? = null,
+                         token: String? = null): RingReceipt {
         val body = JSONObject()
         if (callerId != null) body.put("caller_id", callerId)
         if (note != null) body.put("note", note)
-        val o = JSONObject(request("/desks/$deskId/bell", "POST", body))
+        val o = JSONObject(request("/desks/$deskId/bell", "POST", body, token))
         return RingReceipt(o.getString("ring_id"), o.optInt("waiting"),
             o.optString("presence", ""), o.optString("note", ""))
     }

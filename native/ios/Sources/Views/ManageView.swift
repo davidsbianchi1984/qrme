@@ -631,7 +631,8 @@ private struct DeskSection: View {
                 }
             }
             .navigationDestination(isPresented: $open) {
-                DeskView(deskId: deskId, callerId: state.interactorId)
+                DeskView(deskId: deskId, callerId: state.interactorId,
+                         viewerToken: state.interactorToken)
             }
         }
     }

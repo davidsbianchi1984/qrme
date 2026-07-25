@@ -38,7 +38,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   says to ring the bell, so **iOS, Android and Windows all carry the button** —
   no token, because the person in front of an empty chair is exactly the one
   without an account, and rate limited, because a bell anyone can ring from
-  anywhere is a doorbell prank waiting to happen.
+  anywhere is a doorbell prank waiting to happen. An **18+ stream** is the same
+  desk behind the deployment's existing verified-adult gate rather than a new
+  tier or a second, weaker check: unverified callers get an age wall carrying
+  existence and nothing else — no name, no view, and no location, which stays
+  withheld even past the wall — and the view, the bell and joining all take the
+  same token. Only the performer can open one, because the repo's standing rule
+  that adult mode is never available for a profile of another real person lands
+  here as *the attestor must be the owner, attesting for themselves*. The AI
+  mark is off on both sides of the wall. `POST /desks/{id}/join` returns the
+  room whoever is watching shares, minted on first arrival.
 - **The AI mark is burned into every shipped portrait.** The disclosure
   already rode alongside a portrait — `GET /profiles/{id}/avatar` returns it,
   and the beacon page and both camera overlays composite it — which covers

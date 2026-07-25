@@ -39,10 +39,17 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
         prefs.edit().putString("lang", code).apply()
     }
 
-    fun rememberInteractor(id: String, adult: Boolean = false) {
+    // The bearer token for that identity, needed by every age-gated surface.
+    var interactorToken by mutableStateOf<String?>(prefs.getString("interactor_token", null))
+        private set
+
+    fun rememberInteractor(id: String, token: String? = null,
+                           adult: Boolean = false) {
         interactorId = id
         interactorVerified = adult
+        if (token != null) interactorToken = token
         prefs.edit().putString("interactor", id)
+            .putString("interactor_token", token ?: interactorToken)
             .putBoolean("interactor_adult", adult).apply()
     }
 
@@ -66,7 +73,7 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
 
     fun signOut() {
         pid = null; token = null; displayName = ""
-        interactorId = null; interactorVerified = false
+        interactorId = null; interactorToken = null; interactorVerified = false
         prefs.edit().clear().apply()
     }
 

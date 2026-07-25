@@ -79,6 +79,37 @@ The owner sees who rang while they were away (`GET /desks/{id}/rings`, their
 token only — who called on a tradesperson is theirs, not a visitor's to browse)
 and clears each one as they answer it.
 
+## 18+ streams
+
+An adult stream is **not a separate tier**. It is the same live desk behind the
+same verified-adult gate every other 18+ surface already uses —
+`rated.viewer_is_adult`, reused rather than re-implemented, because a second
+gate is a second thing to get wrong and the weaker one always wins.
+
+What changes when `rated` is set:
+
+* **The card becomes an age wall** for anyone unverified: existence
+  acknowledged, and nothing else. No name, no trade, no view, and above all
+  **no location** — where a performer physically is has nothing to do with
+  watching them, and it stays withheld even past the wall.
+* **The view, the bell, and joining all require the same token.** The bell is
+  public on an ordinary desk, because the visitor at an empty chair is exactly
+  the person without an account. Handing anyone a way to buzz an adult
+  performer from anywhere is a different thing, so it is gated.
+* **Only they can open it.** The repo's existing hard line is that adult mode
+  is never available for a profile of *another* real person. A stream is a real
+  person by definition, so the same line lands here as: the attestor must be
+  the owner, attesting for themselves. A third party opening an 18+ stream in
+  someone else's name is the exact shape this refusal exists to prevent.
+* **Still no AI mark**, on the wall or past it. There is a person on the other
+  end, and that is true whether or not you are old enough to see them.
+
+## Joining
+
+`POST /desks/{id}/join` returns the room whoever is watching shares — a room
+rather than a call per viewer, because that is what a stream is. It is minted
+on first arrival, so a desk nobody has visited carries none.
+
 ## Endpoints
 
 ```
@@ -90,4 +121,15 @@ PUT    /desks/{id}/portrait          the owner's own photo, or clear it (token)
 POST   /desks/{id}/bell              ring it — public, rate limited
 GET    /desks/{id}/rings             who rang                   (desk token)
 POST   /desks/{id}/rings/{ring}/ack  mark one answered          (desk token)
+POST   /desks/{id}/join              join the live stream
+```
+
+For a rated desk every public surface above also requires an interactor token
+whose verified birthdate shows 18 or older:
+
+```
+GET    /desks/{id}                   → age wall without one
+GET    /desks/{id}/view.webp         → 403 without one
+POST   /desks/{id}/bell              → 403 without one
+POST   /desks/{id}/join              → 403 without one
 ```
