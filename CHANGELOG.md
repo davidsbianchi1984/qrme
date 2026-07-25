@@ -22,6 +22,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the two postures (local vs published), why TLS isn't optional, what hosting
   profiles for other people commits you to, and — stated plainly — what the
   deployment does *not* give you (no multi-tenancy, rate limiting, or backups).
+- **The Cloud Model Gateway server** (`cloudgw/`, `python -m cloudgw`) — the
+  other end of a contract that until now only had clients and fakes. Serves
+  `POST /v1/generate`, `GET /v1/model`, and the contribution intake with
+  revocation by anonymous ref. One operator-configured model (stub without a
+  key, and it says so in `/v1/model` and `/health` rather than passing itself
+  off as a hosted tier); bearer token per contributing deployment so the
+  intake records *which* one contributed; fail-closed off-machine when no
+  tokens are set. Contributions seal into PDI as an ordinary tenant — and
+  with no vault configured they are **refused**, never written somewhere
+  unencrypted, while inference keeps working. The intake screens for
+  identifying fields at any depth, product-shaped ids, and email addresses,
+  and answers 422 naming the field instead of sanitizing: a quiet strip would
+  hide the client bug that leaked it.
 - **Profile portraits** — `GET /profiles/{id}/avatar` returns the asset, the
   profile's AI watermark, and the likeness record as one shape, so 2-D, 3-D,
   VR and AR surfaces composite the badge rather than deciding whether to; a

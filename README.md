@@ -171,6 +171,12 @@ Every generated result passes the profile's moderation before it is returned.
 
 ## Cloud model — use a greater model, and contribute to it
 
+The gateway itself ships here too (`cloudgw/`, `python -m cloudgw`): it
+authenticates each contributing deployment, serves one operator-configured
+model, and seals contributions into PDI. Its intake **refuses** anything
+carrying an identifying field rather than sanitizing it — a quiet strip would
+hide the client bug that leaked it.
+
 With a [Cloud Model Gateway](docs/cloud-model.md) configured, inference
 routes to the hosted tier (the latest, most capable model — e.g.
 `claude-fable-5`) with automatic fallback to the local provider, and
