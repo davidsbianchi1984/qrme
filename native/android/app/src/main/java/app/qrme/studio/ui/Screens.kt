@@ -13,6 +13,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -1643,8 +1644,17 @@ private fun SummonPanel(vm: StudioViewModel) {
     var ref by remember { mutableStateOf("") }
     var found by remember { mutableStateOf<SummonResult?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var scanning by remember { mutableStateOf(false) }
+    val uriHandler = LocalUriHandler.current
     fun reload() { vm.call({ ApiClient.beacons(vm.pid!!) }) { r -> beacons = r.getOrDefault(emptyList()) } }
     LaunchedEffect(Unit) { reload() }
+
+    if (scanning) {
+        BeaconScannerScreen(
+            onOpen = { url -> scanning = false; runCatching { uriHandler.openUri(url) } },
+            onClose = { scanning = false })
+        return
+    }
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1680,6 +1690,13 @@ private fun SummonPanel(vm: StudioViewModel) {
                 }
             }
             lastQr?.let { Text("QR: $it", color = Qrme.T3, fontSize = 10.sp) }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Scan a beacon", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text("Point the camera at a QRME sticker and the profile appears on it — no page, no tap. A stock camera app can only open the link; this one can draw on the code.",
+                color = Qrme.T2, fontSize = 12.sp)
+            SmallAction("Open scanner") { scanning = true }
         }
 
         beacons.forEach { b ->

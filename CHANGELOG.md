@@ -6,16 +6,44 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Signatures that survive being disputed** (`qrme/signatures.py`,
+  `qrme/webauthn.py`, `POST /signatures/*`). The gesture is the same Face ID
+  prompt; what comes back is a WebAuthn assertion rather than a boolean —
+  signed by a key in the Secure Enclave that the app never sees, over a
+  challenge that **is** the SHA-256 of a canonical payload naming the document
+  hash, the stated meaning, the signer, and an expiry. Change one byte of the
+  document and verification fails. `userVerification: "required"` makes the
+  biometric mandatory rather than a presence tap, an envelope signs once,
+  and an assertion made for one document is refused for another. Proofing
+  level is recorded at enrollment and enforced per tier, so a self-asserted
+  credential cannot sign a care handoff; syncable credentials (`be`/`bs`) are
+  reported and barred from the top tier, because a key present on every device
+  in a cloud account is a weaker claim of exclusive possession. The evidence
+  package copies the public key, so revoking a passkey never retroactively
+  unmakes what it signed, and `POST /signatures/verify` checks a package with
+  no token and no lookup — a counterparty should not have to trust this
+  deployment. Every package ships its own limits attached, including that
+  WebAuthn has no trusted display. Adds `cryptography` as a runtime
+  dependency: a module that parsed assertions without verifying them would
+  produce records that only *look* like evidence.
+- **The in-camera beacon overlay on Android** (CameraX + ML Kit), matching the
+  iOS scanner: point the phone at a sticker and the profile is drawn on the
+  code in the live viewfinder, tracking it as the phone moves. ML Kit reports
+  in the analysis image's coordinate space, which is rotated and differently
+  sized from the view, so the box is mapped through the preview's
+  `FILL_CENTER` transform before anything is drawn — without that the portrait
+  lands where the sticker is not. Resolution is guarded by beacon id and an
+  in-flight flag, since the camera delivers ~30 frames a second and every one
+  sees the same sticker. The barcode model is bundled rather than downloaded
+  on demand, so the first scan works without Play Services fetching anything.
+
 ### Documentation
 
-- **[docs/signatures.md](docs/signatures.md) — signatures that survive being
-  disputed.** A specification, not an implementation. The user gesture is the
-  same Face ID prompt; what changes is that a WebAuthn/passkey assertion comes
-  back instead of a boolean, signed by a key the app never sees, over a
-  challenge that **is** the document hash — so a modified client cannot
-  manufacture one and a third party can verify it without trusting our
-  software. Covers enrollment identity-proofing (a passkey means nothing
-  without it), the evidence package, `be`/`bs` syncable-credential flags,
+- **[docs/signatures.md](docs/signatures.md) — the reasoning behind the
+  above**, and the part that is not code: why the obvious `evaluatePolicy`
+  version fails, the identity-proofing ladder, the evidence package,
   Optic ID on Vision Pro and the cross-device hybrid path for headsets that
   expose no platform authenticator, and per-product bindings for care
   handoffs, BAA execution, key release, and likeness releases. Recommends

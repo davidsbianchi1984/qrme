@@ -19,7 +19,7 @@ depends entirely on which camera is looking.
 | Scanned with | What happens | Status |
 |---|---|---|
 | The stock camera app | A URL chip. Tap it and `/b/{id}` reveals the portrait. | shipped |
-| **The QRME app** | **The portrait is drawn on the sticker in the live viewfinder.** No tap, no page. | shipped (iOS) |
+| **The QRME app** | **The portrait is drawn on the sticker in the live viewfinder.** No tap, no page. | shipped (iOS + Android) |
 | The stock camera, via an iOS App Clip | An App Clip Card — portrait, name, action — over the camera, before going anywhere | needs your Apple account |
 
 **The stock camera cannot be made to render anything.** Reading a QR and
@@ -29,11 +29,28 @@ describing one of the other two rows.
 
 ### In the QRME app
 
-`BeaconScannerView` owns the viewfinder, so it can draw on it. Vision reads
-the code, `GET /b/{id}/card` returns the little that an overlay needs, and
-the portrait is composited onto the quadrilateral Vision reported — tracking
-the sticker as the phone moves. Tapping opens the full page; not tapping
-still showed you who it is, which was the point.
+The app owns the viewfinder, so it can draw on it. `GET /b/{id}/card`
+returns the little an overlay needs, and the portrait is composited onto the
+code's reported bounds — tracking the sticker as the phone moves. Tapping
+opens the full page; not tapping still showed you who it is, which was the
+point.
+
+Two implementations, one behaviour:
+
+* **iOS** — `BeaconScannerView`, AVFoundation + Vision. Vision reports a
+  normalised box with the origin at the bottom-left; SwiftUI draws from the
+  top-left, so the box is converted before anything is placed.
+* **Android** — `BeaconScanner.kt`, CameraX + ML Kit. ML Kit reports in the
+  analysis image's own coordinate space, which is rotated relative to the
+  view and usually a different resolution, so the box is mapped through the
+  preview's `FILL_CENTER` transform. Skip either conversion and the portrait
+  lands somewhere the sticker is not — the failure looks like a tracking bug
+  and is really a coordinate-space bug.
+
+Both guard resolution by beacon id plus an in-flight flag: the camera
+delivers around thirty frames a second and every one of them sees the same
+sticker, so without the guard the overlay would re-request continuously and
+count a scan each time.
 
 The card carries the AI mark in the same payload as the portrait, so an
 overlay cannot draw the face without also having been handed the disclosure.

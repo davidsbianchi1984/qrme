@@ -57,6 +57,13 @@ data class RoomMsg(val id: String, val senderKind: String, val from: String,
 data class Beacon(val id: String, val label: String, val location: String?,
                   val scans: Int, val active: Boolean)
 data class BeaconPlaced(val id: String, val label: String, val qrSvg: String)
+// What the in-camera overlay draws. Mirrors GET /b/{id}/card, and carries the
+// AI watermark in the same payload as the face so the two cannot come apart.
+data class BeaconCard(val profileId: String, val displayName: String,
+                      val watermark: String, val initials: String,
+                      val portrait: String?, val label: String?,
+                      val sharedRoom: Boolean, val openUrl: String?,
+                      val ageWall: Boolean)
 data class SummonCard(val profileId: String, val displayName: String, val handle: String?,
                       val status: String, val note: String?)
 data class SummonResult(val type: String, val label: String?, val scans: Int?,
@@ -526,6 +533,28 @@ object ApiClient {
                 o.optString("location", null), o.optInt("scans"),
                 o.optBoolean("active"))
         }
+    }
+
+    /**
+     * The compact card behind a scanned beacon. Public — a scan carries no
+     * token, exactly like the printed sticker it came from.
+     *
+     * A rated beacon answers `age_wall` alone: no name, no portrait. The
+     * overlay renders whatever comes back, so the withholding happens at the
+     * source rather than being trusted to this client.
+     */
+    suspend fun beaconCard(bid: String): BeaconCard {
+        val o = JSONObject(request("/b/$bid/card"))
+        return BeaconCard(
+            o.optString("profile_id", bid),
+            o.optString("display_name", ""),
+            o.optString("watermark", ""),
+            o.optString("initials", ""),
+            if (o.isNull("portrait")) null else o.optString("portrait", null),
+            if (o.isNull("label")) null else o.optString("label", null),
+            !o.isNull("shared_room"),
+            if (o.isNull("open_url")) null else o.optString("open_url", null),
+            o.optBoolean("age_wall", false))
     }
 
     suspend fun pickUpBeacon(bid: String) {

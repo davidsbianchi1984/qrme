@@ -1,8 +1,9 @@
 # Signatures: the same Face ID gesture, a signature that survives dispute
 
-**Status: specification.** Nothing in this document is implemented yet. It
-describes what to build, why each part exists, and — as loudly — what it does
-not prove.
+**Status: implemented** in `qrme/signatures.py`, `qrme/webauthn.py` and
+`qrme/routers/signatures.py`, with the endpoint surface of §9 live. The
+native clients do not drive it yet. This document remains the reasoning:
+why each part exists, and — as loudly — what it does not prove.
 
 The starting instinct was right: *a real Face ID should be enough.* The user
 gesture in this design is exactly that. What changes is what comes back from
@@ -220,9 +221,17 @@ surface to check against.
 
 So, for XR:
 
-- Any signature above the lowest tier **requires the hybrid path**, with the
-  document re-rendered and confirmed on the phone. The headset is where you
-  read; the phone is where you sign.
+- On a headset with **no platform authenticator** (Quest, Android XR, anything
+  unrecognised), the high tier **requires the hybrid path**, with the document
+  re-rendered and confirmed on the phone. The headset is where you read; the
+  phone is where you sign. This costs nothing, because those devices were
+  going to need the phone anyway.
+- **Vision Pro is not in that set.** Optic ID is a platform authenticator and
+  its prompt is composited by the system, not by the app — exactly the position
+  an iPhone is in with Face ID, and we do not send iPhones to a second device.
+  The document is app-rendered in both cases, so requiring hybrid on visionOS
+  would be a real usability cost buying no actual improvement. It signs
+  on-device at every tier.
 - Record `transport` (`internal` / `hybrid`) and the platform in the evidence.
   "Signed inside a headset" is a fact a dispute should be able to see.
 - Do not accept an immersive-app screenshot as the rendering of record. The

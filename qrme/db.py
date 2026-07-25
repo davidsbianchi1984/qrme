@@ -736,6 +736,77 @@ CREATE TABLE IF NOT EXISTS robot_commands (
     result     TEXT,             -- JSON summary of what was queued/said
     created_at TEXT NOT NULL
 );
+
+-- A signing credential is a WebAuthn/passkey public key bound to an account
+-- whose identity was proofed at enrollment. The proofing level is stored
+-- here, not inferred, because it decides what this credential may sign.
+CREATE TABLE IF NOT EXISTS signing_credentials (
+    id              TEXT PRIMARY KEY,
+    account_id      TEXT NOT NULL,
+    credential_id   TEXT NOT NULL UNIQUE,   -- base64url, as the client sends it
+    public_key      TEXT NOT NULL,          -- COSE key as JSON (see webauthn.py)
+    aaguid          TEXT,                   -- which authenticator model
+    alg             INTEGER NOT NULL,
+    sign_count      INTEGER NOT NULL DEFAULT 0,
+    backup_eligible INTEGER NOT NULL DEFAULT 0,   -- may this key sync?
+    backed_up       INTEGER NOT NULL DEFAULT 0,   -- does it currently?
+    proofing_level  TEXT NOT NULL,
+    proofing_method TEXT,
+    proofing_ref    TEXT,                   -- evidence reference, never the ID image
+    proofing_attestor TEXT,
+    display_name    TEXT,                   -- the signer's name, for manifestations
+    created_at      TEXT NOT NULL,
+    revoked_at      TEXT
+);
+
+-- One row per signing request. The challenge IS the document hash, so an
+-- envelope is the binding between a person's gesture and a specific record.
+CREATE TABLE IF NOT EXISTS signature_envelopes (
+    id            TEXT PRIMARY KEY,
+    account_id    TEXT NOT NULL,
+    tier          TEXT NOT NULL,
+    meaning       TEXT NOT NULL,
+    document_sha256 TEXT NOT NULL,
+    display_text  TEXT NOT NULL,
+    display_sha256 TEXT NOT NULL,
+    payload       TEXT NOT NULL,            -- the canonical bytes that were hashed
+    challenge     TEXT NOT NULL,            -- base64url of SHA-256(payload)
+    binding_kind  TEXT,                     -- what record this signs
+    binding_ref   TEXT,
+    issued_at     TEXT NOT NULL,
+    expires_at    TEXT NOT NULL,
+    consumed_at   TEXT                      -- single use, enforced server-side
+);
+
+-- The evidence package. Written once, never regenerated: this is the
+-- artifact a dispute is fought over. The public key is COPIED here so that
+-- revoking the credential cannot take past signatures down with it.
+CREATE TABLE IF NOT EXISTS signatures (
+    id                 TEXT PRIMARY KEY,
+    envelope_id        TEXT NOT NULL,
+    account_id         TEXT NOT NULL,
+    credential_id      TEXT NOT NULL,
+    public_key         TEXT NOT NULL,
+    aaguid             TEXT,
+    alg                INTEGER NOT NULL,
+    signature          TEXT NOT NULL,       -- base64url, raw as received
+    authenticator_data TEXT NOT NULL,       -- base64url
+    client_data_json   TEXT NOT NULL,       -- base64url
+    user_verified      INTEGER NOT NULL,
+    backup_eligible    INTEGER NOT NULL,
+    backed_up          INTEGER NOT NULL,
+    sign_count         INTEGER NOT NULL,
+    sign_count_regressed INTEGER NOT NULL DEFAULT 0,
+    transport          TEXT,                -- internal | hybrid
+    platform           TEXT,                -- ios | visionos | android | quest | web
+    proofing_level     TEXT NOT NULL,
+    tier               TEXT NOT NULL,
+    signer_name        TEXT,
+    binding_kind       TEXT,
+    binding_ref        TEXT,
+    sealed_ref         TEXT,                -- PDI record, when a vault is configured
+    signed_at          TEXT NOT NULL
+);
 """
 
 _local = threading.local()
