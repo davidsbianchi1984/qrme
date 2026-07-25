@@ -39,6 +39,14 @@ QUALITY = 71
 
 FRAMES = {"DESK": "desk_view.webp", "STAGE": "stage_view.webp"}
 
+# The starter portraits, as thumbnails for the collection grid. 114px square
+# is about 2x the ~46px each one gets in a five-column grid on the phone
+# screen, so it stays crisp without carrying a megabyte into the file: the
+# whole set of 34 costs roughly 140 KB of base64.
+PORTRAIT_SRC = ROOT / "qrme" / "assets" / "portraits"
+PORTRAIT_PX = 114
+PORTRAIT_Q = 70
+
 
 def encode(path: pathlib.Path) -> str:
     im = Image.open(path).convert("RGB")
@@ -46,6 +54,34 @@ def encode(path: pathlib.Path) -> str:
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=QUALITY, optimize=True, progressive=True)
     return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
+def encode_square(path: pathlib.Path, px: int, quality: int) -> str:
+    im = Image.open(path).convert("RGB").resize((px, px), Image.LANCZOS)
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=quality, optimize=True)
+    return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
+def portrait_entries() -> list[tuple[str, str]]:
+    """Every starter portrait, in the order seed.py defines them.
+
+    Read from seed.py rather than from a directory listing so the grid is the
+    collection, in its own order, rather than whatever the filesystem hands
+    back — and so a portrait added without a starter (or the reverse) shows up
+    as a missing file here instead of a silently short grid.
+    """
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from qrme.seed import RATED, STARTERS
+
+    out = []
+    for handle, _industry, name, *_ in list(STARTERS) + list(RATED):
+        src = PORTRAIT_SRC / f"{handle}.webp"
+        if not src.is_file():
+            raise SystemExit(f"no portrait for starter {handle!r} at {src}")
+        out.append((name, encode_square(src, PORTRAIT_PX, PORTRAIT_Q)))
+    return out
 
 
 def main() -> None:
@@ -67,6 +103,21 @@ def main() -> None:
         parts.append(f"{name} = (\n{wrapped}\n)")
         parts.append("")
         print(f"{filename}: {len(b64) // 1024} KB base64")
+
+    entries = portrait_entries()
+    total = sum(len(b) for _, b in entries)
+    parts.append(f"# The starter collection: {len(entries)} portraits at "
+                 f"{PORTRAIT_PX}px ({total // 1024} KB base64 total).")
+    parts.append("# (display_name, base64 jpeg), in seed.py's order.")
+    parts.append("PORTRAITS = [")
+    for name, b64 in entries:
+        chunks = "\n".join(f'      "{c}"' for c in textwrap.wrap(b64, 96))
+        parts.append(f'    ("{name}",\n{chunks}),')
+    parts.append("]")
+    parts.append("")
+    print(f"portraits: {len(entries)} at {PORTRAIT_PX}px, "
+          f"{total // 1024} KB base64")
+
     OUT.write_text("\n".join(parts))
     print("wrote", OUT.relative_to(ROOT))
 
