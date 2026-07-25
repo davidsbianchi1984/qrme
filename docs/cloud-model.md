@@ -62,7 +62,50 @@ tenant-isolated, and auditable end to end.
 | `GET /v1/model` | `{model, tier}` — what the gateway serves |
 | `POST /v1/contributions` | Anonymized contribution payload → `202` |
 
-Authentication: `Authorization: Bearer <token>`. The gateway itself is
-operator-deployed (it is not part of these repositories); everything on the
-client side — routing, fallback, consent gating, anonymization — is
-implemented and tested here.
+| `POST /v1/contributions/revoke` | `{refs}` → how many were deleted |
+
+Authentication: `Authorization: Bearer <token>`, one per contributing
+deployment (`CLOUDGW_TOKENS=name:token,...`), so the intake records *which*
+deployment contributed rather than only that something did. With none
+configured the gateway is open to callers on this machine and closed to
+everyone else — the same fail-closed posture as PDI's admin surface, because
+an open gateway on a routable address is somebody else's model bill and an
+unattributable corpus.
+
+## Running the gateway
+
+The gateway is in this repository (`cloudgw/`):
+
+```bash
+CLOUDGW_MODEL=claude-fable-5 ANTHROPIC_API_KEY=... \
+CLOUDGW_TOKENS="acme:$(openssl rand -hex 24)" \
+CLOUDGW_PDI_URL=https://vault.example.com CLOUDGW_PDI_TOKEN=pdi_... \
+python -m cloudgw --port 8300
+```
+
+It prints what it is actually configured for at boot — an operator who thinks
+they are serving a hosted model from a stub, or collecting into a vault that
+isn't there, finds out immediately rather than from a quiet corpus later.
+
+| Variable | Effect |
+|---|---|
+| `ANTHROPIC_API_KEY` | Serves the hosted tier. Unset = a deterministic stub, which names itself a stub in `/v1/model` and `/health` so nothing can mistake it for a real model. |
+| `CLOUDGW_MODEL` | Which model to serve (default `claude-fable-5`). |
+| `CLOUDGW_TOKENS` | `name:token` pairs. Required for any caller off this machine. |
+| `CLOUDGW_PDI_URL` / `CLOUDGW_PDI_TOKEN` | The contribution vault. **Without it contributions are refused**, not written somewhere unencrypted — inference keeps working. |
+
+### The intake refuses rather than sanitizes
+
+Contributions arrive already anonymized: only the contributing deployment
+knows what its identifiers are, so only it can strip them properly. The
+gateway assumes that worked and checks anyway, because a gateway accumulates
+a corpus from deployments it does not control running versions it did not
+ship — and one client bug puts real names in the training data, discovered
+much later if at all.
+
+`cloudgw/screening.py` refuses a payload carrying an identifying field at any
+depth, a product-shaped id, or an email address, with a **422 naming the
+offending field**. Quietly sanitizing would hide the client bug that produced
+it; refusing tells that deployment's operator their build is leaking, while
+it can still be fixed. It is importable on its own, so an operator can run it
+over a corpus they already have.
