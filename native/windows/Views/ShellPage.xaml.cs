@@ -38,6 +38,8 @@ public sealed partial class ShellPage : Page
             case "gaming": ContentFrame.Navigate(typeof(GamingPage)); break;
             case "robots": ContentFrame.Navigate(typeof(RobotsPage)); break;
             case "reach": ContentFrame.Navigate(typeof(ReachPage)); break;
+            case "desk": ContentFrame.Navigate(typeof(DeskPage)); break;
+            case "signatures": ContentFrame.Navigate(typeof(SignaturesPage)); break;
             case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
         }
     }

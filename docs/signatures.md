@@ -1,9 +1,9 @@
 # Signatures: the same Face ID gesture, a signature that survives dispute
 
 **Status: implemented** in `qrme/signatures.py`, `qrme/webauthn.py` and
-`qrme/routers/signatures.py`, with the endpoint surface of §9 live. The
-native clients do not drive it yet. This document remains the reasoning:
-why each part exists, and — as loudly — what it does not prove.
+`qrme/routers/signatures.py`, with the endpoint surface of §9 live and the
+native clients driving it (§11). This document remains the reasoning: why
+each part exists, and — as loudly — what it does not prove.
 
 The starting instinct was right: *a real Face ID should be enough.* The user
 gesture in this design is exactly that. What changes is what comes back from
@@ -347,7 +347,37 @@ already make.
 - Adult-tier attestation — `standard`, and it remains an age check rather than
   an identity broadcast.
 
-## 11. What this does not prove
+## 11. The clients
+
+| Platform | Enrol | Sign | Read & verify |
+| --- | --- | --- | --- |
+| iOS / visionOS | ✅ `ASAuthorizationPlatformPublicKeyCredentialProvider` | ✅ Face ID / Touch ID / Optic ID | ✅ |
+| Android | ✅ Credential Manager | ✅ platform authenticator | ✅ |
+| Windows | — | — | ✅ |
+
+**iOS and Android use the platform's own passkey UI**, so the private key stays
+in the Secure Enclave or StrongBox and the app never handles it. Both clients
+render the document immediately before the prompt and send that exact text to
+the server, which is the §5 mitigation: the prompt cannot say what is being
+signed, so the recorded text is what a dispute reproduces.
+
+Both also need a **verified domain** before any prompt appears — associated
+domains (`webcredentials:`) on iOS, Digital Asset Links on Android. Neither can
+exist for a LAN dev server, so signing works only against a real deployment.
+That is a hosting step rather than a code one, and both screens say so on
+screen rather than failing with a system error nobody can read.
+
+**Windows reads and verifies but does not sign.** Reaching Windows Hello as a
+WebAuthn authenticator means `webauthn.dll` interop — a large block of struct
+marshalling that cannot be exercised in CI, where a compile proves almost
+nothing about whether the fields line up. A signing button that looks like it
+works and does not is worse than no button, so the desktop app carries the
+half that needs no authenticator: your enrolled credentials, a signature's
+evidence package re-verified on fetch, and a paste box for checking a package
+somebody else handed you. That last one is arguably where it belongs anyway —
+reading a counterparty's evidence is a thing people do at a keyboard.
+
+## 12. What this does not prove
 
 Written here so it is never inferred from silence:
 

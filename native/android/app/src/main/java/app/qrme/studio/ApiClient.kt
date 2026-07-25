@@ -57,6 +57,39 @@ data class RoomMsg(val id: String, val senderKind: String, val from: String,
 data class Beacon(val id: String, val label: String, val location: String?,
                   val scans: Int, val active: Boolean)
 data class BeaconPlaced(val id: String, val label: String, val qrSvg: String)
+// Live desks — a real person, so never an AI watermark.
+data class DeskFeed(val url: String, val live: Boolean, val note: String)
+data class DeskAttestation(val attestor: String, val basis: String,
+                           val signed: Boolean, val note: String)
+// `ageWall` true means an 18+ stream seen without a verified-adult token:
+// existence and nothing else, so the rest of the fields are absent.
+data class DeskCard(val deskId: String, val displayName: String,
+                    val trade: String, val location: String?,
+                    val blurb: String?, val presence: String,
+                    val human: Boolean, val ai: Boolean,
+                    val designation: String, val attestation: DeskAttestation?,
+                    val portrait: String?, val feed: DeskFeed?,
+                    val bellAvailable: Boolean, val waiting: Int,
+                    val rated: Boolean, val ageWall: Boolean, val note: String?)
+data class InteractorCreated(val id: String, val token: String?)
+data class StreamJoin(val roomId: String, val channel: String,
+                      val presence: String, val ai: Boolean, val note: String)
+data class RingReceipt(val ringId: String, val waiting: Int,
+                       val presence: String, val note: String)
+
+// Signatures (docs/signatures.md).
+data class EnrollOptions(val challenge: String, val rpId: String,
+                         val rpName: String, val userId: String,
+                         val userName: String, val displayName: String)
+data class SigningCredential(val id: String, val credentialId: String,
+                             val proofingLevel: String, val displayName: String?,
+                             val deviceBound: Boolean, val canSign: List<String>)
+data class SignatureEnvelope(val envelopeId: String, val challenge: String,
+                             val displayText: String, val meaning: String,
+                             val tier: String)
+data class SignatureReceipt(val signatureId: String, val signedAt: String,
+                            val valid: Boolean, val limits: List<String>)
+
 // What the in-camera overlay draws. Mirrors GET /b/{id}/card, and carries the
 // AI watermark in the same payload as the face so the two cannot come apart.
 data class BeaconCard(val profileId: String, val displayName: String,
@@ -274,11 +307,18 @@ object ApiClient {
 
     // ---- chat (the core loop) ----
 
-    suspend fun createInteractor(name: String, birthdate: String? = null): String {
+    /**
+     * Mint an interactor identity. Returns the token as well as the id,
+     * because every age-gated surface checks the *token's* verified birthdate
+     * server-side — an id on its own opens nothing, which is the point.
+     */
+    suspend fun createInteractor(name: String,
+                                 birthdate: String? = null): InteractorCreated {
         val body = JSONObject().put("display_name", name)
         if (!birthdate.isNullOrBlank()) body.put("birthdate", birthdate)
         val o = JSONObject(request("/interactors", "POST", body))
-        return o.getString("id")
+        return InteractorCreated(o.getString("id"),
+            if (o.isNull("token")) null else o.optString("token"))
     }
 
     // ---- steering: the owner shapes how the profile comes across ----
@@ -555,6 +595,142 @@ object ApiClient {
             !o.isNull("shared_room"),
             if (o.isNull("open_url")) null else o.optString("open_url", null),
             o.optBoolean("age_wall", false))
+    }
+
+    // ---- live desks ----
+
+    /**
+     * A desk card. Past an 18+ age wall most of the payload is absent, so
+     * every nested object is read optionally rather than demanded — the wall
+     * is a normal response, not an error.
+     */
+    suspend fun desk(id: String, token: String? = null): DeskCard {
+        val o = JSONObject(request("/desks/$id", token = token))
+        val f = o.optJSONObject("feed")
+        val a = o.optJSONObject("attestation")
+        val bell = o.optJSONObject("bell")
+        return DeskCard(
+            o.getString("desk_id"), o.optString("display_name", ""),
+            o.optString("trade", ""),
+            if (o.isNull("location")) null else o.optString("location"),
+            if (o.isNull("blurb")) null else o.optString("blurb"),
+            o.optString("presence", "away"), o.optBoolean("human"),
+            o.optBoolean("ai"), o.optString("designation", ""),
+            a?.let {
+                DeskAttestation(it.optString("attestor", ""),
+                    it.optString("basis", ""), it.optBoolean("signed"),
+                    it.optString("note", ""))
+            },
+            if (o.isNull("portrait")) null else o.optString("portrait"),
+            f?.let {
+                DeskFeed(it.getString("url"), it.optBoolean("live"),
+                    it.optString("note", ""))
+            },
+            bell?.optBoolean("available") ?: false,
+            bell?.optInt("waiting") ?: 0,
+            o.optBoolean("rated"), o.optBoolean("age_wall"),
+            if (o.isNull("note")) null else o.optString("note"))
+    }
+
+    /** Join the live stream — the room whoever is watching shares. */
+    suspend fun joinStream(deskId: String, token: String? = null): StreamJoin {
+        val o = JSONObject(request("/desks/$deskId/join", "POST", null, token))
+        return StreamJoin(o.getString("room_id"), o.optString("channel", "video"),
+            o.optString("presence", ""), o.optBoolean("ai"),
+            o.optString("note", ""))
+    }
+
+    /**
+     * Ring the bell at an unattended desk. No token: the visitor standing in
+     * front of an empty chair is exactly the person who has no account.
+     */
+    suspend fun ringBell(deskId: String, callerId: String? = null,
+                         note: String? = null,
+                         token: String? = null): RingReceipt {
+        val body = JSONObject()
+        if (callerId != null) body.put("caller_id", callerId)
+        if (note != null) body.put("note", note)
+        val o = JSONObject(request("/desks/$deskId/bell", "POST", body, token))
+        return RingReceipt(o.getString("ring_id"), o.optInt("waiting"),
+            o.optString("presence", ""), o.optString("note", ""))
+    }
+
+    // ---- signatures ----
+
+    suspend fun enrollOptions(displayName: String, token: String): EnrollOptions {
+        val o = JSONObject(request("/signatures/enroll/options", "POST",
+            JSONObject().put("display_name", displayName), token))
+        val rp = o.getJSONObject("rp")
+        val user = o.getJSONObject("user")
+        return EnrollOptions(o.getString("challenge"), rp.getString("id"),
+            rp.optString("name", "QRME"), user.getString("id"),
+            user.getString("name"), user.getString("displayName"))
+    }
+
+    suspend fun enrollCredential(credentialId: String, attestationObject: String,
+                                 clientDataJson: String, challenge: String,
+                                 proofingLevel: String, displayName: String,
+                                 token: String): SigningCredential {
+        val body = JSONObject()
+            .put("credential_id", credentialId)
+            .put("attestation_object", attestationObject)
+            .put("client_data_json", clientDataJson)
+            .put("challenge", challenge)
+            .put("proofing_level", proofingLevel)
+            .put("display_name", displayName)
+        return signingCredential(JSONObject(
+            request("/signatures/enroll", "POST", body, token)))
+    }
+
+    private fun signingCredential(o: JSONObject): SigningCredential {
+        val tiers = o.optJSONArray("can_sign")
+        return SigningCredential(
+            o.getString("id"), o.getString("credential_id"),
+            o.optString("proofing_level", ""),
+            if (o.isNull("display_name")) null else o.optString("display_name"),
+            o.optBoolean("device_bound"),
+            (0 until (tiers?.length() ?: 0)).map { tiers!!.getString(it) })
+    }
+
+    suspend fun signingCredentials(token: String): List<SigningCredential> {
+        val arr = JSONObject(request("/signatures/credentials", token = token))
+            .getJSONArray("credentials")
+        return (0 until arr.length()).map { signingCredential(arr.getJSONObject(it)) }
+    }
+
+    suspend fun requestSignature(document: String, meaning: String,
+                                 displayText: String, tier: String,
+                                 bindingKind: String?, bindingRef: String?,
+                                 token: String): SignatureEnvelope {
+        val body = JSONObject()
+            .put("document", document).put("meaning", meaning)
+            .put("display_text", displayText).put("tier", tier)
+        if (bindingKind != null) body.put("binding_kind", bindingKind)
+        if (bindingRef != null) body.put("binding_ref", bindingRef)
+        val o = JSONObject(request("/signatures/request", "POST", body, token))
+        return SignatureEnvelope(o.getString("envelope_id"),
+            o.getString("challenge"), o.getString("display_text"),
+            o.getString("meaning"), o.getString("tier"))
+    }
+
+    suspend fun submitSignature(envelopeId: String, a: Signing.Assertion,
+                                token: String): SignatureReceipt {
+        val body = JSONObject()
+            .put("envelope_id", envelopeId)
+            .put("credential_id", a.credentialId)
+            .put("signature", a.signature)
+            .put("authenticator_data", a.authenticatorData)
+            .put("client_data_json", a.clientDataJson)
+            // Android exposes a platform authenticator, so the ceremony
+            // happens on this device rather than through a second one.
+            .put("transport", "internal")
+            .put("platform", Signing.PLATFORM)
+        val o = JSONObject(request("/signatures/sign", "POST", body, token))
+        val limits = o.optJSONArray("limits")
+        return SignatureReceipt(
+            o.getString("signature_id"), o.getString("signed_at"),
+            o.getJSONObject("verification").optBoolean("valid"),
+            (0 until (limits?.length() ?: 0)).map { limits!!.getString(it) })
     }
 
     suspend fun pickUpBeacon(bid: String) {

@@ -30,7 +30,7 @@ struct ChatHubView: View {
 private func ensureInteractor(_ state: AppState) async throws -> String {
     if let id = state.interactorId { return id }
     let created = try await ApiClient.shared.createInteractor(name: "You")
-    state.rememberInteractor(created.id)
+    state.rememberInteractor(created.id, token: created.token)
     return created.id
 }
 
@@ -145,7 +145,7 @@ private struct StrangerSection: View {
                     // birthdate — the age wall checks it server-side.
                     let created = try await ApiClient.shared.createInteractor(
                         name: "You", birthdate: birthdate)
-                    state.rememberInteractor(created.id)
+                    state.rememberInteractor(created.id, token: created.token)
                     interactor = created.id
                     minted = true
                 }

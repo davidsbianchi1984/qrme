@@ -36,6 +36,32 @@ cellular from a cold start. `pyproject.toml` declares them as package data —
 without that they exist in the repo and vanish on `pip install`, which is
 invisible locally and total in a container.
 
+## The mark is in the pixels too
+
+`GET /profiles/{id}/avatar` returns the watermark with the asset, and the
+beacon page and both camera overlays composite it. That covers every surface
+QRME controls — and none of the ones it does not.
+
+`/portraits/{handle}.webp` is an ordinary file URL. It can be hotlinked,
+embedded in someone else's page, scraped, saved, or screenshotted, and a
+composited badge survives none of that. So every shipped portrait carries the
+mark **burned into the image**, top-right, drawn by
+`tools/mark_portraits.py` and pinned by a SHA-256 manifest that the test suite
+checks. A portrait quietly swapped for an unmarked one fails CI rather than
+shipping a synthetic face with nothing saying so.
+
+Top-right is deliberate: every composited badge in the product sits
+bottom-left (`landing.py`, `BeaconScannerView`, `BeaconScanner.kt`), so the two
+never collide. They are not redundant — the burned mark is the invariant "AI"
+designation on the bytes, while the composited one carries the profile's own
+designed label and is selectable, accessible text.
+
+`asset_marked` in the avatar response says which case an asset is in. QRME's
+surfaces composite regardless; the field exists so a VR nameplate, an AR
+overlay, an embed or a marketplace card can tell whether compositing is
+mandatory or merely additive. An owner-attached asset is somebody else's file
+and always reports `false` — the safe direction to be wrong in.
+
 ## The three rules
 
 **1. A starter's face is nobody's.** `qrme/seed.py` opens by promising that

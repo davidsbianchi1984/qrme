@@ -20,6 +20,64 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a shared style whose text disagrees with the assets cannot do the one job it
   exists for; the rated portrait carries its own `RATED_STYLE`, since it is
   age-walled off every surface the others appear on.
+- **Live desks** (`qrme/desks.py`, `/desks/*`, [docs/desks.md](docs/desks.md))
+  — a real person offering a service, behind the same surfaces as a synthetic
+  profile and with the one difference that matters: **a desk never carries the
+  AI watermark.** Marking a real human is not a cautious default, it is a false
+  statement about them, and the test suite pins both directions of that rule in
+  one file so neither can be relaxed quietly. Absence of a mark would be
+  ambiguous on its own, so the claim is positive — *Live person — not AI* —
+  with the attestor, the basis, and the word **recorded** rather than *proven*
+  shipped next to it; a desk cannot be opened without saying who vouches, and a
+  `high`-tier signature bound to the desk raises the claim to something a
+  counterparty can check. What a visitor looks at is a camera view of the desk
+  rather than a portrait, since we have no photograph of the person and do not
+  go looking for one; with no camera configured the card reports
+  `feed.live: false` and the clients say **SAMPLE VIEW**, because presenting a
+  still frame as live would be the same class of lie. And the sign on the chair
+  says to ring the bell, so **iOS, Android and Windows all carry the button** —
+  no token, because the person in front of an empty chair is exactly the one
+  without an account, and rate limited, because a bell anyone can ring from
+  anywhere is a doorbell prank waiting to happen. An **18+ stream** is the same
+  desk behind the deployment's existing verified-adult gate rather than a new
+  tier or a second, weaker check: unverified callers get an age wall carrying
+  existence and nothing else — no name, no view, and no location, which stays
+  withheld even past the wall — and the view, the bell and joining all take the
+  same token. Only the performer can open one, because the repo's standing rule
+  that adult mode is never available for a profile of another real person lands
+  here as *the attestor must be the owner, attesting for themselves*. The AI
+  mark is off on both sides of the wall. `POST /desks/{id}/join` returns the
+  room whoever is watching shares, minted on first arrival.
+- **The AI mark is burned into every shipped portrait.** The disclosure
+  already rode alongside a portrait — `GET /profiles/{id}/avatar` returns it,
+  and the beacon page and both camera overlays composite it — which covers
+  every surface QRME controls and none of the ones it does not.
+  `/portraits/{handle}.webp` is an ordinary file URL: hotlink it, embed it,
+  scrape it, screenshot it, and a composited badge survives none of that. The
+  mark now sits in the pixels, top-right, where every composited badge is
+  bottom-left so the two never collide. Burned offline by
+  `tools/mark_portraits.py` rather than at request time — that would put an
+  imaging library in the runtime dependencies and redraw a constant on every
+  fetch — and pinned by a SHA-256 manifest the test suite checks, so a
+  portrait swapped for an unmarked one fails CI instead of shipping quietly.
+  `asset_marked` on the avatar response tells a surface QRME does not control
+  whether compositing is mandatory; an owner-attached asset always reports
+  `false`, since nothing here can vouch for someone else's file.
+- **The native apps sign.** iOS/visionOS drive the ceremony through
+  `ASAuthorizationPlatformPublicKeyCredentialProvider` (Face ID, Touch ID, or
+  Optic ID) and Android through Credential Manager, so the private key stays in
+  the Secure Enclave or StrongBox and the app never handles it. Both render the
+  document immediately before the prompt and send that exact text to the
+  server — the mitigation for WebAuthn having no trusted display, since the
+  prompt itself can never say what is being signed. Both also need a verified
+  domain (associated domains on iOS, Digital Asset Links on Android) before any
+  prompt appears, which a LAN dev server cannot have; the screens say so rather
+  than failing with a system error nobody can read. **Windows reads and
+  verifies but does not sign**: reaching Windows Hello means `webauthn.dll`
+  struct marshalling that a compile cannot meaningfully check, and a signing
+  button that looks like it works and does not is worse than no button — so the
+  desktop app carries the half that needs no authenticator, including a paste
+  box for verifying a package a counterparty handed you.
 - **Signatures that survive being disputed** (`qrme/signatures.py`,
   `qrme/webauthn.py`, `POST /signatures/*`). The gesture is the same Face ID
   prompt; what comes back is a WebAuthn assertion rather than a boolean —
@@ -53,6 +111,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The mug says nothing, as the brief asked.** `bev_lindqvist`'s portrait had
+  the word "nothing" lettered onto it — a literal reading of "a mug that says
+  nothing at all", and the one piece of baked-in text in the collection that
+  was not deliberate. Painted out, with the mug's own shading preserved.
+- **The portraits were sliced on the wrong boundaries.** The contact sheet was
+  cut on a nominal 192px grid, but the subjects overrun their cells, so several
+  tiles carried a sliver of the neighbouring portrait — most visibly Otis's arm
+  in Bev's frame. Re-sliced on the quietest column near each seam, which is
+  where the real gutter is. `dr_priya_nair` is also re-cropped: her source is a
+  wide landscape scene, so a full-width cut padded her down to a thumbnail
+  inside her own tile.
 - **A beacon card's portrait is now an absolute URL.** `GET /b/{id}/card` was
   returning the stored asset path unchanged, which is a valid `href` only for
   a browser already on the origin — and the consumer of that field is a native

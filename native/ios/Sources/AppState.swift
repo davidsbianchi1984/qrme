@@ -12,6 +12,10 @@ final class AppState: ObservableObject {
     // is true when the identity was minted with an 18+ birthdate — the key
     // that opens the rated stranger tier.
     @Published var interactorId: String?
+    // The bearer token for that identity. Needed because every age-gated
+    // surface checks the *token's* verified birthdate server-side — an id
+    // alone opens nothing, which is the point.
+    @Published var interactorToken: String?
     @Published var interactorVerified = false
     // The profile's chosen language also drives the app chrome (tab names,
     // common actions) through L10n.
@@ -24,6 +28,7 @@ final class AppState: ObservableObject {
         token = d.string(forKey: "qrme.token")
         displayName = d.string(forKey: "qrme.name") ?? ""
         interactorId = d.string(forKey: "qrme.interactor")
+        interactorToken = d.string(forKey: "qrme.interactor.token")
         interactorVerified = d.bool(forKey: "qrme.interactor.adult")
         language = d.string(forKey: "qrme.lang") ?? "en"
     }
@@ -33,9 +38,14 @@ final class AppState: ObservableObject {
         d.set(code, forKey: "qrme.lang")
     }
 
-    func rememberInteractor(_ id: String, adult: Bool = false) {
+    func rememberInteractor(_ id: String, token: String? = nil,
+                            adult: Bool = false) {
         interactorId = id
         interactorVerified = adult
+        if let token {
+            interactorToken = token
+            d.set(token, forKey: "qrme.interactor.token")
+        }
         d.set(id, forKey: "qrme.interactor")
         d.set(adult, forKey: "qrme.interactor.adult")
     }
@@ -51,8 +61,9 @@ final class AppState: ObservableObject {
 
     func signOut() {
         pid = nil; token = nil; displayName = ""
-        interactorId = nil; interactorVerified = false
-        ["qrme.pid", "qrme.token", "qrme.name",
-         "qrme.interactor", "qrme.interactor.adult"].forEach { d.removeObject(forKey: $0) }
+        interactorId = nil; interactorToken = nil; interactorVerified = false
+        ["qrme.pid", "qrme.token", "qrme.name", "qrme.interactor",
+         "qrme.interactor.token",
+         "qrme.interactor.adult"].forEach { d.removeObject(forKey: $0) }
     }
 }

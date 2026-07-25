@@ -90,7 +90,7 @@ struct ChatView: View {
                 var interactor = state.interactorId
                 if interactor == nil {
                     let created = try await ApiClient.shared.createInteractor(name: "You")
-                    state.rememberInteractor(created.id)
+                    state.rememberInteractor(created.id, token: created.token)
                     interactor = created.id
                 }
                 let reply = try await ApiClient.shared.chat(

@@ -47,5 +47,12 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
     implementation("com.google.mlkit:barcode-scanning:17.3.0")
+    // Passkey signing (docs/signatures.md). Credential Manager is the only
+    // supported path to a platform authenticator on modern Android; the
+    // play-services-auth artifact is what backfills it below API 34.
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    // The live desk view. Compose has no async image loader of its own.
+    implementation("io.coil-kt:coil-compose:2.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }

@@ -52,9 +52,15 @@ import app.qrme.studio.SocialConn
 import app.qrme.studio.StudioViewModel
 import app.qrme.studio.SummonResult
 import app.qrme.studio.TranslateResult
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import app.qrme.studio.SignatureReceipt
+import app.qrme.studio.Signing
+import app.qrme.studio.SigningCredential
+import kotlinx.coroutines.launch
 
 @Composable
-private fun screenScroll(content: @Composable ColumnScope.() -> Unit) =
+internal fun screenScroll(content: @Composable ColumnScope.() -> Unit) =
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -77,7 +83,7 @@ private fun BrandButton(text: String, enabled: Boolean = true, busy: Boolean = f
 }
 
 @Composable
-private fun labeledField(label: String, value: String, placeholder: String, onChange: (String) -> Unit) {
+internal fun labeledField(label: String, value: String, placeholder: String, onChange: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label, color = Qrme.T2, fontSize = 12.sp)
         OutlinedTextField(
@@ -720,7 +726,8 @@ private fun RelationshipPanel(vm: StudioViewModel) {
             status = null
             vm.call({
                 val interactor = vm.interactorId
-                    ?: ApiClient.createInteractor("You").also { vm.rememberInteractor(it) }
+                    ?: ApiClient.createInteractor("You")
+                        .also { vm.rememberInteractor(it.id, it.token) }.id
                 ApiClient.setRelationship(vm.pid!!, vm.token!!, interactor,
                     type, nickname, tone)
             }) { r ->
@@ -814,14 +821,18 @@ fun ChatScreen(vm: StudioViewModel) {
         busy = true; error = null
         vm.call({
             var interactor = vm.interactorId
+            var minted: String? = null
             if (interactor == null) {
-                interactor = ApiClient.createInteractor("You")
+                val created = ApiClient.createInteractor("You")
+                interactor = created.id
+                minted = created.token
             }
-            interactor!! to ApiClient.chat(vm.pid!!, vm.token!!, interactor, text)
+            Triple(interactor!!, minted,
+                ApiClient.chat(vm.pid!!, vm.token!!, interactor, text))
         }) { r ->
             busy = false
-            r.onSuccess { (interactor, reply) ->
-                vm.rememberInteractor(interactor)
+            r.onSuccess { (interactor, mintedToken, reply) ->
+                vm.rememberInteractor(interactor, mintedToken)
                 messages = messages + if (reply.content != null && reply.status == "approved") {
                     listOfNotNull(
                         Bubble(false, reply.content, false,
@@ -1191,7 +1202,7 @@ private fun withInteractor(vm: StudioViewModel, onError: (String) -> Unit,
                            block: (String) -> Unit) {
     vm.interactorId?.let { return block(it) }
     vm.call({ ApiClient.createInteractor("You") }) { r ->
-        r.onSuccess { vm.rememberInteractor(it); block(it) }
+        r.onSuccess { vm.rememberInteractor(it.id, it.token); block(it.id) }
             .onFailure { onError(it.message ?: "couldn't create your identity") }
     }
 }
@@ -1237,8 +1248,10 @@ private fun StrangerPanel(vm: StudioViewModel) {
             // Verify 18+: mint a fresh identity carrying the birthdate —
             // the age wall checks it server-side.
             vm.call({ ApiClient.createInteractor("You", birthdate) }) { r ->
-                r.onSuccess { vm.rememberInteractor(it); joinAs(it, minted = true) }
-                    .onFailure { error = it.message }
+                r.onSuccess {
+                    vm.rememberInteractor(it.id, it.token)
+                    joinAs(it.id, minted = true)
+                }.onFailure { error = it.message }
             }
         } else withInteractor(vm, { error = it }) { me -> joinAs(me, minted = false) }
     }
@@ -1415,7 +1428,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Desk").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1428,7 +1441,9 @@ fun ManageScreen(vm: StudioViewModel) {
                 3 -> PacksPanel(vm)
                 4 -> GamingPanel(vm)
                 5 -> LicensePanel(vm)
-                else -> EarningsPanel(vm)
+                6 -> EarningsPanel(vm)
+                7 -> SignaturePanel(vm)
+                else -> DeskPanel(vm)
             }
         }
     }
@@ -2069,5 +2084,161 @@ private fun ProvenanceFooter(p: Provenance) {
             Text("licensed from $it", color = Qrme.Amber, fontSize = 10.sp)
         }
         Text(p.disclaimer, color = Qrme.T3, fontSize = 10.sp)
+    }
+}
+
+
+// ---- Signatures: a passkey assertion instead of the app's own say-so ----
+
+/**
+ * Enrol a passkey, then sign a document with it.
+ *
+ * Built around the one thing WebAuthn cannot do: it has no trusted display, so
+ * the system prompt can never say what is being signed. The document is shown
+ * here in full and the button under it is the last thing touched before the
+ * prompt, and the server stores that exact text — so a dispute reproduces the
+ * screen rather than arguing about it.
+ */
+@Composable
+private fun SignaturePanel(vm: StudioViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var credentials by remember { mutableStateOf<List<SigningCredential>>(emptyList()) }
+    var document by remember { mutableStateOf("") }
+    var meaning by remember { mutableStateOf("I attest this is accurate and complete") }
+    var receipt by remember { mutableStateOf<SignatureReceipt?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+
+    fun reload() {
+        val token = vm.token ?: return
+        vm.call({ ApiClient.signingCredentials(token) }) { r ->
+            credentials = r.getOrDefault(emptyList())
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Signing credentials", color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            if (credentials.isEmpty()) {
+                Text("None yet. A signature needs a passkey bound to this account.",
+                    color = Qrme.T2, fontSize = 12.sp)
+            }
+            credentials.forEach { c ->
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(c.displayName ?: c.credentialId, color = Qrme.Txt,
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text("verified at enrolment: ${c.proofingLevel}",
+                        color = Qrme.T2, fontSize = 11.sp)
+                    // Surfaced rather than buried: a syncable passkey lives on
+                    // every device in the user's cloud account, which is a
+                    // weaker claim that only they could have signed.
+                    Text(
+                        if (c.deviceBound) "device-bound — cannot sync"
+                        else "syncable — exists on your other devices",
+                        color = if (c.deviceBound) Qrme.Green else Qrme.Red,
+                        fontSize = 11.sp)
+                    Text("can sign: ${c.canSign.joinToString(", ")}",
+                        color = Qrme.T3, fontSize = 10.sp)
+                }
+            }
+            SmallAction("Enrol a passkey") {
+                val token = vm.token ?: return@SmallAction
+                error = null; busy = true
+                scope.launch {
+                    runCatching {
+                        val o = ApiClient.enrollOptions("QRME owner", token)
+                        val reg = Signing.register(context, o.rpId, o.rpName,
+                            o.challenge, o.userId, o.userName, o.displayName)
+                        ApiClient.enrollCredential(reg.credentialId,
+                            reg.attestationObject, reg.clientDataJson,
+                            o.challenge, "self_asserted", o.displayName, token)
+                    }.onFailure { error = it.message }
+                    busy = false
+                    reload()
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("What you are signing", color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField("Document", document, "the text being signed") { document = it }
+            labeledField("Meaning", meaning, "what your signature attests") { meaning = it }
+            Text("This exact text is hashed into the challenge and stored with "
+                + "the signature. The system prompt cannot show it — no passkey "
+                + "prompt can — so read it here.",
+                color = Qrme.T3, fontSize = 11.sp)
+            SmallAction(if (busy) "Working…" else "Sign") {
+                val token = vm.token ?: return@SmallAction
+                if (document.isBlank() || busy) return@SmallAction
+                error = null; busy = true; receipt = null
+                scope.launch {
+                    runCatching {
+                        val env = ApiClient.requestSignature(document, meaning,
+                            document, "standard", "profile", vm.pid, token)
+                        val rpId = ApiClient.base.substringAfter("://")
+                            .substringBefore("/").substringBefore(":")
+                        val a = Signing.assert(context, rpId, env.challenge)
+                        ApiClient.submitSignature(env.envelopeId, a, token)
+                    }.onSuccess { receipt = it }
+                        .onFailure { error = it.message }
+                    busy = false
+                }
+            }
+        }
+
+        receipt?.let { r ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(if (r.valid) "Verifies" else "Does not verify",
+                    color = if (r.valid) Qrme.Green else Qrme.Red,
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(r.signatureId, color = Qrme.T2, fontSize = 11.sp)
+                Text(r.signedAt, color = Qrme.T3, fontSize = 11.sp)
+                // The guarantee never travels without them.
+                r.limits.forEach {
+                    Text("• $it", color = Qrme.T3, fontSize = 10.sp)
+                }
+            }
+        }
+
+        Text("Passkeys are bound to a verified domain via Digital Asset Links, "
+            + "so signing works only against a real deployment — not a LAN dev "
+            + "server. See docs/signatures.md.",
+            color = Qrme.T3, fontSize = 11.sp)
+        error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+
+// ---- A live desk: the person behind the counter, and the bell ----
+
+/**
+ * Look up a desk by id and hand off to [DeskScreen]. A visitor normally
+ * arrives from a beacon rather than by typing an id; this is the way in until
+ * desk beacons are placed.
+ */
+@Composable
+private fun DeskPanel(vm: StudioViewModel) {
+    var deskId by remember { mutableStateOf("") }
+    var open by remember { mutableStateOf(false) }
+
+    if (open && deskId.isNotBlank()) {
+        DeskScreen(deskId = deskId.trim(), callerId = vm.interactorId,
+            viewerToken = vm.interactorToken)
+        return
+    }
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Open a desk", color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text("A desk is a real person, not a synthetic profile — so nothing "
+                + "there carries the AI mark. If they are away from the desk, "
+                + "you can ring the bell.", color = Qrme.T2, fontSize = 12.sp)
+            labeledField("Desk id", deskId, "dsk_…") { deskId = it }
+            SmallAction("Open") { if (deskId.isNotBlank()) open = true }
+        }
     }
 }

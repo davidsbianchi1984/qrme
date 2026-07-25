@@ -17,10 +17,15 @@ Three rules the rest of the module exists to enforce:
   trademarked character, uniform, or logo. A likeness release from the
   person photographed grants their face; it grants nothing about a costume
   someone else owns.
-* **The badge is not optional.** A portrait is the most-looked-at render
-  QRME produces, so :func:`render` refuses to hand one back without the
-  profile's AI watermark attached. Same invariant as every other visual and
-  textual render, applied where it is most visible.
+* **The badge is not optional, and it is in the pixels.** A portrait is the
+  most-looked-at render QRME produces, so :func:`render` refuses to hand one
+  back without the profile's AI watermark attached — and every shipped
+  portrait *also* carries the mark burned in. The composited badge covers the
+  surfaces QRME controls; the burned one covers the rest. A file served at
+  ``/portraits/{handle}.webp`` can be hotlinked, embedded, scraped, saved or
+  screenshotted, and in none of those cases does a composited badge survive.
+  Burned by ``tools/mark_portraits.py``, pinned by a checksum manifest so an
+  unmarked replacement cannot arrive quietly.
 
 The briefs lean funny on purpose. A stock headshot says "corporate mascot";
 a financial planner wearing far too much gold says "this is a character, and
@@ -71,6 +76,18 @@ def asset_path(handle: str) -> str | None:
     """The served path for a starter's portrait, or None if it has no file."""
     return (f"{ASSET_ROUTE}/{handle}.webp"
             if (portraits_dir() / f"{handle}.webp").is_file() else None)
+
+
+def asset_is_marked(asset: str | None) -> bool:
+    """Whether the image itself carries the AI mark, as opposed to needing a
+    surface to composite one.
+
+    True for the shipped collection, which is burned and checksummed. An
+    owner-attached asset is somebody else's file and nothing here can vouch
+    for its pixels — so it reports False and the surfaces keep drawing their
+    own badge over it, which is the safe direction to be wrong in.
+    """
+    return bool(asset) and asset.startswith(f"{ASSET_ROUTE}/")
 
 # handle -> the portrait, one line, played straight-faced.
 BRIEFS: dict[str, str] = {
@@ -264,9 +281,19 @@ def render(profile_id: str) -> dict:
         " FROM profiles WHERE id=?", (profile_id,)).fetchone()
     if row is None:
         return {}
+    asset = row["avatar"] or None
     return {
         "profile_id": profile_id,
-        "asset": row["avatar"] or None,
+        "asset": asset,
+        # Whether the disclosure is already in the image itself.
+        #
+        # QRME's own surfaces composite their badge either way, because theirs
+        # carries the profile's *designed* label and is real text rather than
+        # pixels. This field is for everyone else — a VR nameplate, an AR
+        # overlay, an embed, a marketplace card — to know whether compositing
+        # is mandatory or merely additive. False is the safe answer and is what
+        # an unknown asset gets.
+        "asset_marked": asset_is_marked(asset),
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # A portrait with no asset yet is still an answer: surfaces fall back
