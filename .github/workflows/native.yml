@@ -111,14 +111,22 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      # Build with Visual Studio's MSBuild rather than `dotnet build`. The
+      # Windows App SDK's MrtCore PriGen targets load a PRI packaging task
+      # (Microsoft.Build.Packaging.Pri.Tasks.dll) from
+      # Microsoft/VisualStudio/v17.0/AppxPackage — a directory that ships with
+      # Visual Studio's MSBuild and is simply absent from the standalone .NET
+      # SDK, so `dotnet build` fails with MSB4062 whichever SDK it picks.
+      # native/windows/README.md already names VS 2022 with the Windows
+      # application development workload as the requirement; this matches it.
+      - uses: microsoft/setup-msbuild@v2
+
       # Unpackaged and self-contained (see QrmeStudio.csproj), so a runtime
       # identifier is required — the Windows App SDK is copied in rather than
-      # resolved from a framework package at run time.
-      #
-      # Run from the project directory so native/windows/global.json applies:
-      # `dotnet` resolves global.json from the working directory, not from the
-      # project path, and without the pin MSBuild picks the runner's newest
-      # SDK and the App SDK's PRI task cannot be found (MSB4062).
+      # resolved from a framework package at run time. /restore because
+      # msbuild, unlike `dotnet build`, does not restore by default.
       - name: Build
         working-directory: native/windows
-        run: dotnet build QrmeStudio.csproj -c Release -p:Platform=x64 -r win-x64
+        run: >
+          msbuild QrmeStudio.csproj /restore
+          /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64
