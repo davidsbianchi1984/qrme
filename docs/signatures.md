@@ -369,7 +369,7 @@ all (§11).
 | --- | --- | --- | --- |
 | iOS / visionOS | ✅ `ASAuthorizationPlatformPublicKeyCredentialProvider` | ✅ Face ID / Touch ID / Optic ID | ✅ |
 | Android | ✅ Credential Manager | ✅ platform authenticator | ✅ |
-| Windows | — | — | ✅ |
+| Windows | ✅ WebView2 + Windows Hello | ✅ | ✅ |
 
 **iOS and Android use the platform's own passkey UI**, so the private key stays
 in the Secure Enclave or StrongBox and the app never handles it. Both clients
@@ -383,15 +383,31 @@ exist for a LAN dev server, so signing works only against a real deployment.
 That is a hosting step rather than a code one, and both screens say so on
 screen rather than failing with a system error nobody can read.
 
-**Windows reads and verifies but does not sign.** Reaching Windows Hello as a
-WebAuthn authenticator means `webauthn.dll` interop — a large block of struct
-marshalling that cannot be exercised in CI, where a compile proves almost
-nothing about whether the fields line up. A signing button that looks like it
-works and does not is worse than no button, so the desktop app carries the
-half that needs no authenticator: your enrolled credentials, a signature's
-evidence package re-verified on fetch, and a paste box for checking a package
-somebody else handed you. That last one is arguably where it belongs anyway —
-reading a counterparty's evidence is a thing people do at a keyboard.
+**Windows signs through the browser engine, not through interop.** Reaching
+Windows Hello in-process means `webauthn.dll` — several hundred lines of
+version-sensitive struct marshalling that a compile cannot meaningfully check.
+Edge already implements WebAuthn and already talks to Windows Hello, so the
+desktop app hosts a **WebView2** pointed at `GET /signatures/ceremony`, a page
+served from the deployment's own origin. The page runs
+`navigator.credentials`, posts the raw assertion back over the WebView2
+message channel, and the app makes the authenticated call. Nothing marshals a
+struct by hand, and the part most likely to be wrong is Edge's job.
+
+Two properties of that page are load-bearing:
+
+* **It is served from the relying party's origin.** WebAuthn refuses a
+  mismatched `rpId`, and an opaque origin — a `data:` URL, a local file — has
+  none to match. That is why it is a server route rather than a string
+  embedded in the C#.
+* **It never sees a token.** The page returns the assertion to its host; the
+  host authenticates. A bearer token in a query string ends up in logs and
+  browser history.
+
+The desktop app also keeps the half that needs no authenticator at all: your
+enrolled credentials, a signature's evidence package re-verified on fetch, and
+a paste box for checking a package somebody else handed you — which is
+arguably where that belongs anyway, since reading a counterparty's evidence is
+a thing people do at a keyboard.
 
 ## 12. What this does not prove
 

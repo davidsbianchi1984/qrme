@@ -276,6 +276,11 @@ def beacon_card(beacon_id: str, request: Request) -> dict:
         # a root-relative path is a valid href in a browser and a broken URL
         # everywhere else.
         "portrait": _absolute(art["asset"]),
+        # Whether the disclosure is already in the image. QRME's own overlays
+        # draw their badge either way — theirs carries the profile's designed
+        # label and is real text — but a surface QRME does not control needs to
+        # know whether compositing is mandatory or merely additive.
+        "portrait_marked": art["asset_marked"],
         "initials": landing._initials(name),
         "label": beacon["label"],
         "shared_room": beacon["room_id"],
