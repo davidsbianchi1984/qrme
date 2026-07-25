@@ -646,7 +646,10 @@ def live_overlay(x, y, w, h, comments, ticker, viewers=None):
         o.append(icon("person", acx, acy, "rgba(255,255,255,0.92)", 0.42))
         o.append(text(acx + ar + 6, cy + 15, line, 8.4,
                       f"rgba(245,242,255,{0.88 + 0.12 * (i + 1) / n:.2f})", 650))
-        cy += 26
+        # 24, not 26. The avatars made each line taller, and left alone that
+        # pushed the last line down onto the sign on the stage frame. The
+        # block still starts where it did — it just ends 4px higher.
+        cy += 24
     return "".join(o)
 
 
