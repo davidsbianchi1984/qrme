@@ -653,6 +653,32 @@ def live_overlay(x, y, w, h, comments, ticker, viewers=None):
     return "".join(o)
 
 
+def portrait_grid(x, y, w, cols, entries, cell_gap=6, uid="pg"):
+    """The starter collection, as the faces themselves.
+
+    The screen used to say "seeded with faces" and then show icon chips,
+    which is the one thing a screen about portraits must not do. Every face
+    here already carries the AI mark burned into its own pixels, so the grid
+    needs no badge of its own — the disclosure is in the image, which is the
+    whole point of having burned it in rather than drawn it at render time.
+    """
+    o = []
+    cell = (w - cell_gap * (cols - 1)) / cols
+    for i, (_name, data) in enumerate(entries):
+        cx = x + (i % cols) * (cell + cell_gap)
+        cy = y + (i // cols) * (cell + cell_gap)
+        cid = f"pc{uid}{i}"
+        o.append(f'<clipPath id="{cid}"><rect x="{cx:.1f}" y="{cy:.1f}" '
+                 f'width="{cell:.1f}" height="{cell:.1f}" rx="9"/></clipPath>')
+        o.append(f'<image x="{cx:.1f}" y="{cy:.1f}" width="{cell:.1f}" '
+                 f'height="{cell:.1f}" preserveAspectRatio="xMidYMid slice" '
+                 f'clip-path="url(#{cid})" '
+                 f'href="data:image/jpeg;base64,{data}"/>')
+        o.append(rrect(cx, cy, cell, cell, 9, "none", A(C["line"], 0.85), 1))
+    rows = -(-len(entries) // cols)
+    return "".join(o), rows * (cell + cell_gap) - cell_gap
+
+
 def render(spec):
     num = spec["num"]
     out = head(f"{num:02d}", spec["title"], spec.get("sub", ""),
@@ -663,6 +689,12 @@ def render(spec):
     # A camera frame above the cards. Runs before the hero chain because a
     # screen has either a hero or cards, never both — this is the one thing
     # that sits above whichever it is.
+    if spec.get("grid"):
+        block, gh = portrait_grid(CX, y, CW, spec.get("grid_cols", 5),
+                                  spec["grid"], uid=f"{num:02d}")
+        out.append(block)
+        y += gh + 14
+
     if spec.get("photo"):
         ph = spec.get("photo_h", 148)
         out.append(photo(CX, y, CW, ph, spec["photo"],
@@ -1896,21 +1928,18 @@ SCREENS = [
     # profiles at once, so it is also where the AI mark matters most: every
     # face here is generated, and the screen says so rather than relying on
     # the viewer to infer it from context.
-    dict(num=74, title="Starter Collection", sub="33 industries + one rated, seeded with faces",
-         accent="brand", tabs=MARKET, tab=0, cards=[
-        dict(icon="people", color="brand", k="One per industry",
-             s="healthcare · finance · tech · legal …",
-             metric="33"),
-        dict(icon="person", color="cyan", k="Dr. Amara Osei",
-             s="healthcare · listed on the marketplace", pill=("AI", "brand")),
-        dict(icon="photo", color="amber", k="The mark is in pixels",
-             s="burned in — survives a screenshot"),
-        dict(icon="lock", color="red", k="Vivienne Sable",
-             s="hidden from unverified browse",
-             pill=("18+", "crit")),
-        dict(icon="shieldok", color="green", k="Seeding is idempotent",
-             s="seeding twice never duplicates"),
-    ], button=("Browse the collection", "brand")),
+    # The faces themselves, not a description of them. Every portrait here
+    # carries the AI mark burned into its own pixels, so the grid needs no
+    # badge of its own.
+    dict(num=74, title="Starter Collection", sub="34 faces, one per industry",
+         accent="brand", tabs=MARKET, tab=0,
+         grid=frames.PORTRAITS, grid_cols=5, cards=[
+        # One card, because seven rows of faces leave ~95px above the tab bar
+        # and the grid is the screen. The AI badge on every thumbnail is the
+        # burned-in mark itself, at thumbnail size — which is the claim.
+        dict(icon="photo", color="amber", k="The mark is in the pixels",
+             s="burned in · one is rated 18+"),
+    ]),
 
     # The room a desk's viewers actually share: the bell, and the audience
     # verbs in situ rather than as a summary. Still no AI mark — there is a
