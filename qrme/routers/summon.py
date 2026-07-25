@@ -22,7 +22,7 @@ import os
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 
-from .. import db, landing, rated
+from .. import avatars, db, landing, rated
 from ..common import profile_or_404, require_owner
 from ..models import BeaconCreate, HandleSet, RatedPlacementCreate
 
@@ -218,6 +218,60 @@ def scan_beacon(beacon_id: str, request: Request) -> HTMLResponse:
 
     return HTMLResponse(landing.profile_page(
         profile, _public_base(), beacon["label"], beacon["room_id"]))
+
+
+@router.get("/b/{beacon_id}/card")
+def beacon_card(beacon_id: str, request: Request) -> dict:
+    """The smallest thing an in-camera overlay needs.
+
+    The app draws this *over the sticker in the live viewfinder* — nobody has
+    navigated anywhere, and the camera is running while it waits. So this is
+    deliberately tiny: who it is, one line of portrait, and the mark. Not the
+    full summon card, which carries chat URLs and status notes an overlay has
+    no use for.
+
+    A scan through the overlay counts the same as opening the page. It is the
+    same person finding the same sticker; the only difference is that they
+    never had to leave the camera.
+    """
+    conn = db.connect()
+    beacon = conn.execute("SELECT * FROM beacons WHERE id=?",
+                          (beacon_id,)).fetchone()
+    if beacon is None or not beacon["active"]:
+        raise HTTPException(404, "nothing answers to that code")
+
+    conn.execute("UPDATE beacons SET scans = scans + 1 WHERE id=?", (beacon_id,))
+    conn.commit()
+
+    profile = profile_or_404(beacon["profile_id"])
+    if profile["adult_mode"]:
+        rated.record_event(profile["id"], beacon["id"],
+                           rated.viewer_is_adult(request),
+                           pdi=request.app.state.pdi)
+        if not rated.viewer_is_adult(request):
+            # The overlay must be able to render the wall without ever holding
+            # the name or the portrait, so none of it is sent.
+            return {"age_wall": True, "rated": True,
+                    "note": "18+ — open in QRME with a verified adult account"}
+    if profile["status"] != "active":
+        raise HTTPException(410, "this profile no longer answers")
+
+    art = avatars.render(profile["id"])
+    name = ("anonymous persona" if profile["anonymous"]
+            else profile["display_name"])
+    return {
+        "profile_id": profile["id"],
+        "display_name": name,
+        # The mark travels with the card, so an overlay cannot draw the face
+        # without also having been handed the disclosure to draw with it.
+        "watermark": art["watermark"]["line"],
+        "portrait": art["asset"],
+        "initials": landing._initials(name),
+        "label": beacon["label"],
+        "shared_room": beacon["room_id"],
+        "open_url": f"{_public_base()}/b/{beacon_id}",
+        "age_wall": False,
+    }
 
 
 # -- the summon endpoint -----------------------------------------------------

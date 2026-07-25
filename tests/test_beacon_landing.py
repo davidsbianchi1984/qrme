@@ -228,3 +228,75 @@ def test_the_call_to_action_survives_an_honorific(client):
     r = client.get(f"/b/{_beacon(client, pid)['id']}")
     assert "Talk to Sana" in r.text
     assert "Talk to Dr." not in r.text
+
+
+# -- the in-camera card ----------------------------------------------------
+
+def test_the_card_is_small_enough_to_fetch_while_the_camera_runs(client):
+    """The overlay draws this over the sticker in a live viewfinder, so it
+    carries what a face needs and nothing else — no chat URLs, no status
+    notes, none of the full summon card."""
+    pid, token = _profile(client)
+    client.put(f"/profiles/{pid}/avatar", json={"asset": "/a/m.png"},
+               headers={"authorization": f"Bearer {token}"})
+    b = _beacon(client, pid)
+
+    card = client.get(f"/b/{b['id']}/card").json()
+    assert card["display_name"] == "Marcus Bell"
+    assert card["portrait"] == "/a/m.png"
+    assert card["initials"] == "MB"
+    assert card["age_wall"] is False
+    assert set(card) == {"profile_id", "display_name", "watermark", "portrait",
+                         "initials", "label", "shared_room", "open_url",
+                         "age_wall"}
+
+
+def test_the_mark_travels_with_the_face(client):
+    """An overlay cannot be handed a portrait without also being handed the
+    disclosure to draw beside it."""
+    pid, _ = _profile(client)
+    card = client.get(f"/b/{_beacon(client, pid)['id']}/card").json()
+    assert card["watermark"] == "✦ AI · Marcus Bell"
+
+
+def test_the_rated_card_carries_nothing_to_leak(client):
+    """The overlay must be able to render the wall without ever holding the
+    name or the portrait — so neither is sent."""
+    pid, _ = _profile(client, adult_mode=True)
+    card = client.get(f"/b/{_beacon(client, pid)['id']}/card").json()
+    assert card["age_wall"] is True
+    assert "display_name" not in card
+    assert "portrait" not in card
+    assert "Marcus Bell" not in str(card)
+
+
+def test_an_anonymous_profile_stays_anonymous_in_the_camera(client):
+    pid, _ = _profile(client, anonymous=True)
+    card = client.get(f"/b/{_beacon(client, pid)['id']}/card").json()
+    assert card["display_name"] == "anonymous persona"
+    assert "Marcus Bell" not in str(card)
+
+
+def test_a_shared_beacon_says_so_on_the_card(client):
+    """Someone about to walk into a room deserves to know before they tap."""
+    pid, _ = _profile(client)
+    b = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "back table", "mode": "room"}).json()
+    assert client.get(f"/b/{b['id']}/card").json()["shared_room"] == b["room_id"]
+
+
+def test_scanning_through_the_camera_counts(client):
+    """Same person, same sticker — the only difference is they never left the
+    camera, so it counts the same."""
+    pid, _ = _profile(client)
+    bid = _beacon(client, pid)["id"]
+    client.get(f"/b/{bid}/card")
+    client.get(f"/b/{bid}")
+    assert client.get(f"/profiles/{pid}/beacons").json()[0]["scans"] == 2
+
+
+def test_a_picked_up_beacon_has_no_card(client):
+    pid, _ = _profile(client)
+    bid = _beacon(client, pid)["id"]
+    client.delete(f"/beacons/{bid}")
+    assert client.get(f"/b/{bid}/card").status_code == 404

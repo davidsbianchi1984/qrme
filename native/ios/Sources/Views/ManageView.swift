@@ -145,10 +145,32 @@ private struct SummonSection: View {
     @State private var ref = ""
     @State private var found: SummonResult?
     @State private var error: String?
+    @State private var scanning = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
+                // The other half of placing a beacon: finding one. Opens the
+                // camera and draws the profile onto the sticker rather than
+                // sending anyone to a URL.
+                Button { scanning = true } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "viewfinder")
+                        Text("Scan a beacon").font(.subheadline.weight(.semibold))
+                    }
+                    .frame(maxWidth: .infinity).padding(12)
+                    .background(Theme.brand)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(.white)
+                }
+                .fullScreenCover(isPresented: $scanning) {
+                    ZStack(alignment: .topTrailing) {
+                        BeaconScannerView()
+                        Button("Done") { scanning = false }
+                            .padding().foregroundStyle(.white)
+                    }
+                }
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text("@handle").font(.headline).foregroundStyle(Theme.txt)
                     Text("A unique name anyone can summon the profile by.")
