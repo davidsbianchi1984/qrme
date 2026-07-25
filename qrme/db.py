@@ -784,6 +784,68 @@ CREATE TABLE IF NOT EXISTS desk_rings (
 -- already out there, and this schema is applied with CREATE TABLE IF NOT
 -- EXISTS, so widening an existing table would only take effect on a fresh
 -- one. Additive works everywhere.
+-- The audience layer: what a viewer does other than talk. Likes, comments,
+-- shares and subscriptions all point at a (kind, id) pair rather than at a
+-- profile column, because the same four verbs have to work on a synthetic
+-- profile, a live desk, a room message and a marketplace listing without four
+-- copies of each table.
+
+-- A like. UNIQUE on (target, actor) rather than a counter column: a like is a
+-- fact about one person, not a number that can be pumped by calling twice.
+CREATE TABLE IF NOT EXISTS reactions (
+    id          TEXT PRIMARY KEY,
+    target_kind TEXT NOT NULL,   -- profile | desk | message | listing
+    target_id   TEXT NOT NULL,
+    actor_id    TEXT NOT NULL,
+    created_at  TEXT NOT NULL,
+    UNIQUE (target_kind, target_id, actor_id)
+);
+
+-- A comment. Moderated on the way in exactly like a chat turn: a blocked one
+-- is kept so its author can see what happened to it, and shown to nobody else.
+CREATE TABLE IF NOT EXISTS comments (
+    id          TEXT PRIMARY KEY,
+    target_kind TEXT NOT NULL,
+    target_id   TEXT NOT NULL,
+    author_id   TEXT NOT NULL,
+    body        TEXT NOT NULL,
+    status      TEXT NOT NULL,   -- approved | blocked
+    flag_reason TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- A share. Recorded rather than merely counted, because "shared 40 times"
+-- and "shared 40 times by one account" are different facts and only one of
+-- them is worth anything.
+CREATE TABLE IF NOT EXISTS shares (
+    id          TEXT PRIMARY KEY,
+    target_kind TEXT NOT NULL,
+    target_id   TEXT NOT NULL,
+    actor_id    TEXT,            -- NULL: shared from a beacon page, no account
+    channel     TEXT NOT NULL DEFAULT 'link',
+    created_at  TEXT NOT NULL
+);
+
+-- A subscription. Two tiers on one row: `follow` is free and means "tell me
+-- when they are live", `paid` additionally credits the creator's ledger every
+-- period. Cancelling sets status and keeps the row, so a lapsed subscriber is
+-- distinguishable from someone who was never there.
+CREATE TABLE IF NOT EXISTS subscriptions (
+    id           TEXT PRIMARY KEY,
+    subject_kind TEXT NOT NULL,  -- profile | desk
+    subject_id   TEXT NOT NULL,
+    subscriber   TEXT NOT NULL,
+    tier         TEXT NOT NULL DEFAULT 'follow',  -- follow | paid
+    price        REAL NOT NULL DEFAULT 0,
+    currency     TEXT NOT NULL DEFAULT 'USD',
+    status       TEXT NOT NULL DEFAULT 'active',  -- active | cancelled
+    started_at   TEXT NOT NULL,
+    renewed_at   TEXT,
+    periods      INTEGER NOT NULL DEFAULT 0,      -- how many have been charged
+    cancelled_at TEXT,
+    UNIQUE (subject_kind, subject_id, subscriber)
+);
+
 CREATE TABLE IF NOT EXISTS desk_beacons (
     id         TEXT PRIMARY KEY,   -- dbn_… — also the QR token
     desk_id    TEXT NOT NULL REFERENCES desks(id),
