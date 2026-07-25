@@ -133,6 +133,62 @@ profile to open on. Full text in `qrme/avatars.py`; a few for the flavour:
 | Rosa Delgado (automotive) | Grease stripe across the forehead, torque wrench across both palms like a presented sword. |
 | Bev Lindqvist (HR) | A mug that says nothing at all, and the expression of someone who has heard it and is not going to react. |
 
+All 34, as shipped — the briefs above, rendered. Every one carries the AI
+mark in its own pixels, which is why they can be shown here at all:
+a page of unmarked synthetic faces is the thing this file exists to
+prevent.
+
+<table>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/dr_amara_osei.webp" width="118" alt="Dr. Amara Osei"><br><sub><b>Dr. Amara Osei</b><br>healthcare</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/marcus_bell.webp" width="118" alt="Marcus Bell"><br><sub><b>Marcus Bell</b><br>finance</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/priya_raman.webp" width="118" alt="Priya Raman"><br><sub><b>Priya Raman</b><br>technology</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/elena_vasquez.webp" width="118" alt="Elena Vasquez"><br><sub><b>Elena Vasquez</b><br>education</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/jonathan_ashe.webp" width="118" alt="Jonathan Ashe"><br><sub><b>Jonathan Ashe</b><br>legal</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/sam_whitfield.webp" width="118" alt="Sam Whitfield"><br><sub><b>Sam Whitfield</b><br>agriculture</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/ingrid_halvorsen.webp" width="118" alt="Ingrid Halvorsen"><br><sub><b>Ingrid Halvorsen</b><br>manufacturing</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/diego_fuentes.webp" width="118" alt="Diego Fuentes"><br><sub><b>Diego Fuentes</b><br>construction</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/naomi_clarke.webp" width="118" alt="Naomi Clarke"><br><sub><b>Naomi Clarke</b><br>real estate</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/tomas_rivera.webp" width="118" alt="Tomás Rivera"><br><sub><b>Tomás Rivera</b><br>energy</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/odessa_grant.webp" width="118" alt="Odessa Grant"><br><sub><b>Odessa Grant</b><br>transportation</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/ken_nakamura.webp" width="118" alt="Ken Nakamura"><br><sub><b>Ken Nakamura</b><br>retail</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/lucia_moretti.webp" width="118" alt="Lucia Moretti"><br><sub><b>Lucia Moretti</b><br>hospitality</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/ray_coleman.webp" width="118" alt="Ray Coleman"><br><sub><b>Ray Coleman</b><br>media</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/wren_okafor.webp" width="118" alt="Wren Okafor"><br><sub><b>Wren Okafor</b><br>arts design</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/coach_dana_reyes.webp" width="118" alt="Coach Dana Reyes"><br><sub><b>Coach Dana Reyes</b><br>sports fitness</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/chef_henri_laurent.webp" width="118" alt="Chef Henri Laurent"><br><sub><b>Chef Henri Laurent</b><br>culinary</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/dr_sana_iqbal.webp" width="118" alt="Dr. Sana Iqbal"><br><sub><b>Dr. Sana Iqbal</b><br>environment</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/pete_kowalski.webp" width="118" alt="Pete Kowalski"><br><sub><b>Pete Kowalski</b><br>government</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/grace_mwangi.webp" width="118" alt="Grace Mwangi"><br><sub><b>Grace Mwangi</b><br>nonprofit</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/dr_felix_baum.webp" width="118" alt="Dr. Felix Baum"><br><sub><b>Dr. Felix Baum</b><br>science</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/aisha_diallo.webp" width="118" alt="Aisha Diallo"><br><sub><b>Aisha Diallo</b><br>telecom</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/harold_jenkins.webp" width="118" alt="Harold Jenkins"><br><sub><b>Harold Jenkins</b><br>insurance</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/rosa_delgado.webp" width="118" alt="Rosa Delgado"><br><sub><b>Rosa Delgado</b><br>automotive</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/cmdr_ellen_park.webp" width="118" alt="Ellen Park"><br><sub><b>Ellen Park</b><br>aerospace</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/mimi_beaumont.webp" width="118" alt="Mimi Beaumont"><br><sub><b>Mimi Beaumont</b><br>fashion beauty</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/jack_osei_turner.webp" width="118" alt="Jack Osei-Turner"><br><sub><b>Jack Osei-Turner</b><br>marketing</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/nadia_petrova.webp" width="118" alt="Nadia Petrova"><br><sub><b>Nadia Petrova</b><br>cybersecurity</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/bev_lindqvist.webp" width="118" alt="Bev Lindqvist"><br><sub><b>Bev Lindqvist</b><br>human resources</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/otis_marsh.webp" width="118" alt="Otis Marsh"><br><sub><b>Otis Marsh</b><br>music</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/dr_lena_whitcomb.webp" width="118" alt="Dr. Lena Whitcomb"><br><sub><b>Dr. Lena Whitcomb</b><br>mental health</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/dr_marcus_adeyemi.webp" width="118" alt="Dr. Marcus Adeyemi"><br><sub><b>Dr. Marcus Adeyemi</b><br>psychiatry</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/dr_priya_nair.webp" width="118" alt="Dr. Priya Nair"><br><sub><b>Dr. Priya Nair</b><br>counseling</sub></td>
+    <td align="center" width="20%"><img src="../qrme/assets/portraits/vivienne_sable.webp" width="118" alt="Vivienne Sable"><br><sub><b>Vivienne Sable</b><br>adult · 18+</sub></td>
+  </tr>
+</table>
+
 **Three are played straight.** Dr. Lena Whitcomb, Dr. Marcus Adeyemi and
 Dr. Priya Nair — the mental-health trio JIM-mini's Guardian escalates to — get
 calm, unremarkable rooms and no gags. A joke portrait on the profile someone
