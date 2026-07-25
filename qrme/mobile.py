@@ -73,9 +73,42 @@ def lan_address() -> str:
     return "127.0.0.1"
 
 
+def public_base() -> str | None:
+    """The address this deployment answers on from outside, when it is
+    hosted rather than run on a laptop. Set ``QRME_PUBLIC_URL`` and pairing
+    advertises that instead of a LAN address — same QR, same phone flow,
+    reachable from wherever the operator has published it."""
+    url = os.environ.get("QRME_PUBLIC_URL")
+    return url.rstrip("/") if url else None
+
+
 def pairing(port: int = 8000) -> dict:
-    """Everything the phone needs: the studio URL on this network, whether
-    the studio has actually been built, and the same-network caveat."""
+    """Everything the phone needs: the studio URL, whether the studio has
+    actually been built, and the reachability caveat that applies.
+
+    Two postures, one flow: a hosted deployment advertises its public URL,
+    a laptop advertises its LAN address."""
+    hosted = public_base()
+    if hosted:
+        built = console_dir() is not None
+        how = ["Build the studio first: npm --prefix app run build",
+               "Then restart the API and re-read GET /pair."] if not built else [
+            f"Open {hosted}/app/ on the phone (or scan the QR).",
+            "Add to Home Screen — it installs and runs full-screen."]
+        return {
+            "console_url": f"{hosted}/app/",
+            "api_url": hosted,
+            "console_built": built,
+            "reachable": True,
+            "hosted": True,
+            "qr_svg": "/pair/qr.svg",
+            "how": how,
+            "note": "Published deployment — serve it over HTTPS and treat "
+                    "owner and interactor tokens as secrets. Set "
+                    "QRME_SIGNUP_KEY to keep profile creation to people you "
+                    "have given the key to.",
+        }
+
     host = lan_address()
     base = f"http://{host}:{port}"
     built = console_dir() is not None
@@ -104,6 +137,7 @@ def pairing(port: int = 8000) -> dict:
         "api_url": base,
         "console_built": built,
         "reachable": reachable,
+        "hosted": False,
         "qr_svg": "/pair/qr.svg",
         "how": how,
         "note": "Local network only — this address is not reachable from the "

@@ -6,7 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Published deployments** — `QRME_PUBLIC_URL` makes `GET /pair` advertise
+  the deployment's public address (QR included) instead of a LAN address, so
+  the phone flow works hosted or local from one code path. `QRME_SIGNUP_KEY`
+  gates profile creation behind an `x-signup-key` header so a published
+  instance stays the operator's rather than open registration; unset leaves
+  LAN use exactly as it was, and talking to a profile stays public either way.
 
 ## [0.1.4] — 2026-07-24
 

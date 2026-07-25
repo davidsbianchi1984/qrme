@@ -17,6 +17,14 @@ unrecoverable from the database — it is shown to the caller exactly once.
 Public surfaces (chatting with a profile, browsing the marketplace, summoning
 by handle/tag/beacon) require no token: talking to a synthetic profile is open
 by design, the same way scanning a QR code in the world is.
+
+Above the per-capability layer sits an optional **deployment gate**. On a
+laptop or a LAN, anyone who can reach the API can create a profile — that is
+the right default when reaching it already means being in the house. A
+deployment published to the internet is different: without a gate, whoever
+finds the URL can create profiles on it. Setting ``QRME_SIGNUP_KEY`` requires
+that key to create a profile, so a hosted instance stays the operator's and
+their colleagues', not the internet's. Unset, nothing changes.
 """
 
 from __future__ import annotations
@@ -99,3 +107,24 @@ def revoke_subject(subject_id: str) -> None:
     conn = db.connect()
     conn.execute("DELETE FROM api_tokens WHERE subject_id=?", (subject_id,))
     conn.commit()
+
+
+def require_signup_key(request: Request) -> None:
+    """Deployment-level gate for creating a profile.
+
+    Unset ``QRME_SIGNUP_KEY`` means open, which is what a laptop or LAN
+    deployment wants. When it is set — the sensible posture for anything
+    published — the caller must present it as ``x-signup-key``. This is a
+    gate on *who may create an account here*, not a replacement for the
+    per-capability tokens: everything after creation is still authorized by
+    the owner or interactor token.
+    """
+    required = os.environ.get("QRME_SIGNUP_KEY")
+    if not required:
+        return
+    presented = request.headers.get("x-signup-key", "")
+    # Constant-time compare so a wrong key can't be recovered by timing.
+    if not (presented and secrets.compare_digest(presented, required)):
+        raise HTTPException(
+            403, "this deployment requires a signup key to create a profile "
+                 "— send it as the x-signup-key header")

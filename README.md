@@ -261,8 +261,22 @@ from. The phone layout follows: the sidebar becomes a thumb-reachable bottom
 tab bar, inputs stay at 16px so iOS doesn't zoom, and the layout respects
 the notch and home indicator.
 
-The address is local-network only and deliberately not reachable from the
-internet — your profiles and their memories stay on your own network.
+### Published deployments
+
+The same code serves a laptop on Wi-Fi and an instance you host for yourself
+and your colleagues to reach from anywhere:
+
+| Variable | Effect |
+|---|---|
+| `QRME_PUBLIC_URL` | `GET /pair` advertises this address (QR included) instead of a LAN one, so the phone flow works over the internet. Serve it over HTTPS — tokens travel in headers. |
+| `QRME_SIGNUP_KEY` | Profile creation requires this key as the `x-signup-key` header, so a published instance stays yours rather than open registration. Unset = open, the right default on a LAN. |
+
+Talking to a profile stays public either way; the key gates creating an
+account on your deployment, not using one.
+
+Without `QRME_PUBLIC_URL`, the address is local-network only and deliberately
+not reachable from the internet — your profiles and their memories stay on
+your own network.
 Everything still requires the owner or interactor bearer token; a phone on
 the LAN is exactly as authorized as a laptop on the LAN. If `/pair` reports
 `reachable: false`, it could only find loopback (which on a phone means the
