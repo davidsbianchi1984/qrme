@@ -346,3 +346,30 @@ def test_an_ordinary_desk_stays_public(client):
     assert client.get(f"/desks/{created['desk_id']}/view.webp").status_code == 200
     assert client.post(f"/desks/{created['desk_id']}/bell",
                        json={}).status_code == 201
+
+
+# --- gaps the pre-release audit turned up --------------------------------
+
+def test_a_desk_can_be_pointed_at_its_own_camera(client):
+    """`feed.live` was read from a column nothing could write, so the live
+    branch was unreachable and every desk was a sample view forever."""
+    created = _desk(client).json()
+    assert created["feed"]["live"] is False
+
+    res = client.put(f"/desks/{created['desk_id']}/camera",
+                     json={"url": "https://cam.example/desk.mjpg"},
+                     headers=_token(created))
+    assert res.status_code == 200
+    assert res.json()["feed"]["live"] is True
+    assert "A live view" in res.json()["feed"]["note"]
+
+    cleared = client.put(f"/desks/{created['desk_id']}/camera", json={},
+                         headers=_token(created))
+    assert cleared.json()["feed"]["live"] is False
+
+
+def test_only_the_desk_can_turn_its_own_camera_on(client):
+    """A camera on a person is not something a platform turns on for them."""
+    created = _desk(client).json()
+    assert client.put(f"/desks/{created['desk_id']}/camera",
+                      json={"url": "https://cam.example/x"}).status_code == 401

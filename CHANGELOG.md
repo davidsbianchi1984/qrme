@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.6] — 2026-07-25
+
 ### Added
 
 - **The starter collection has faces.** All 34 portraits ship as files in
@@ -111,6 +113,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The signing flow in both mobile apps could never succeed.** iOS and
+  Android each enrol a passkey at `self_asserted` — all the screens can do —
+  and then immediately requested the `standard` tier, which needs `federated`
+  proofing or better. Every attempt died at the server with a 422. The tests
+  missed it because they all enrol at `document` level, so none of them walked
+  the sequence the clients actually perform; there are now tests that do. Both
+  apps default to `basic`, and say plainly that the higher tiers need an
+  identity check a passkey alone does not provide.
+- **A credential's proofing level could never change.** `docs/signatures.md`
+  said a user re-proofs and the new level applies from that moment forward, and
+  nothing implemented it — so every credential was stuck at whatever it
+  enrolled with, permanently. `POST /signatures/credentials/{id}/proofing`
+  records a fresh check. It applies going forward only: a signature already
+  made copied its level into the evidence at signing time, so raising the
+  credential today cannot quietly upgrade what it signed yesterday.
+- **A desk's camera could never be turned on.** `feed.live` was read from a
+  column no endpoint could write, so the live branch was unreachable and every
+  desk was a sample view for ever. `PUT /desks/{id}/camera` sets it, and only
+  the desk's own token can — a camera on a person is not something a platform
+  switches on for them.
 - **The mug says nothing, as the brief asked.** `bev_lindqvist`'s portrait had
   the word "nothing" lettered onto it — a literal reading of "a mug that says
   nothing at all", and the one piece of baked-in text in the collection that
@@ -374,7 +396,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.5...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.6...HEAD
+[0.1.6]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.6
 [0.1.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.5
 [0.1.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.4
 [0.1.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.3

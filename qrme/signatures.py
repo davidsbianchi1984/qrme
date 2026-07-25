@@ -255,6 +255,36 @@ def credentials_for(account_id: str) -> list[dict]:
     return [_credential_out(r) for r in rows]
 
 
+def reproof(row_id: str, level: str, attestor: str,
+            method: str | None = None, ref: str | None = None) -> dict | None:
+    """Raise (or lower) a credential's proofing level after enrollment.
+
+    The spec promised this and nothing implemented it, which left every
+    credential stuck at whatever it was enrolled with — and both mobile apps
+    enroll self-asserted, so nothing they created could ever sign above the
+    basic tier.
+
+    The new level applies from now on and **never retroactively**: a signature
+    already made copied its level into the evidence at signing time, so raising
+    the credential today cannot quietly upgrade what it signed yesterday.
+    """
+    rank = _level_rank(level)
+    if rank > 0 and not attestor:
+        raise SignatureError(
+            f"proofing level {level!r} requires an attestor — who checked the "
+            "identity is part of the record, not a footnote")
+    conn = db.connect()
+    if conn.execute("SELECT 1 FROM signing_credentials WHERE id=?",
+                    (row_id,)).fetchone() is None:
+        return None
+    conn.execute(
+        "UPDATE signing_credentials SET proofing_level=?, proofing_method=?,"
+        " proofing_ref=?, proofing_attestor=? WHERE id=?",
+        (level, method, ref, attestor or None, row_id))
+    conn.commit()
+    return credential(row_id)
+
+
 def revoke(row_id: str) -> dict | None:
     """Revoke a credential going forward. Past signatures stay verifiable —
     their public key was copied into the evidence at signing time."""

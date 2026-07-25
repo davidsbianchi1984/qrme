@@ -142,6 +142,23 @@ def set_portrait(desk_id: str, body: PortraitSet, request: Request) -> dict:
     return desks.set_portrait(desk_id, body.asset)
 
 
+class CameraSet(BaseModel):
+    url: str | None = Field(default=None, max_length=500)
+
+
+@router.put("/desks/{desk_id}/camera")
+def set_camera(desk_id: str, body: CameraSet, request: Request) -> dict:
+    """Point the desk at its own camera, or clear it back to the sample view.
+
+    Theirs to set: a camera on a person is not something a platform turns on
+    for them.
+    """
+    if desks.card(desk_id, viewer_adult=True) is None:
+        raise HTTPException(404, "no such desk")
+    _require_desk(desk_id, request)
+    return desks.set_camera(desk_id, body.url)
+
+
 @router.post("/desks/{desk_id}/bell", status_code=201)
 def ring_bell(desk_id: str, body: RingIn, request: Request) -> dict:
     """Ring the bell.

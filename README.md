@@ -109,11 +109,28 @@ in a request body.
   as open as scanning a QR code in the world.
 - Deleting a profile revokes its owner token.
 
+## Live desks — a real person, and no AI mark
+
+Every profile in QRME is synthetic and every render of one carries the AI
+mark. A **desk** is the opposite case: an actual human offering a service,
+and it **never** carries that mark — stamping "AI" on a real person is not a
+cautious default, it is a false statement about them. Absence alone would be
+ambiguous, so a desk makes the claim positively (*Live person — not AI*) and
+shows who attested it, on what basis, and whether they signed it.
+
+What a visitor looks at is a camera view of the desk rather than a portrait,
+and when the chair is empty there is a **bell** they can ring from the screen
+— no account needed, because the person in front of an empty chair is exactly
+the one who has none. An 18+ stream is the same desk behind the deployment's
+existing verified-adult gate. See [docs/desks.md](docs/desks.md).
+
+## Signatures that survive being disputed
+
 A bearer token authorises an action; it does not *sign* one. For records that
-get disputed later — a likeness release, a care handoff, a BAA — see
-[docs/signatures.md](docs/signatures.md): the same Face ID gesture through
-WebAuthn/passkeys, returning a cryptographic assertion bound to the enrolled
-account and to the exact document. Specified, not yet built.
+get contested later — a likeness release, a care handoff, a BAA — the same
+Face ID gesture goes through WebAuthn/passkeys and returns a cryptographic
+assertion bound to the enrolled account **and to the exact document**. See
+[docs/signatures.md](docs/signatures.md).
 
 ## Objection, takedown & lifecycle states
 
