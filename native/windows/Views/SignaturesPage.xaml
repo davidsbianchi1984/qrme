@@ -3,20 +3,37 @@
     x:Class="QrmeStudio.Views.SignaturesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     Background="{StaticResource QrmeScrBotBrush}">
 
     <ScrollViewer>
         <StackPanel MaxWidth="680" Margin="20,12" Spacing="12" Padding="4">
 
-            <!-- Stated up front rather than discovered by a failing button. -->
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="Signing happens on your phone" FontWeight="Bold" FontSize="16"
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Sign with Windows Hello" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock TextWrapping="Wrap" FontSize="12"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="This desktop app reads and verifies signatures; it does not create them. Reaching Windows Hello as a WebAuthn authenticator needs webauthn.dll interop that is not written yet, and shipping that untested would produce a button that looks like it signs and does not. Enrol and sign in the iOS or Android app; everything below reads the same records." />
+                               Text="The ceremony runs in an embedded browser rather than through webauthn.dll interop — Edge already talks to Windows Hello, and nothing here has to marshal a struct by hand. It needs the deployment served over HTTPS on its own domain: WebAuthn refuses a mismatched relying party." />
+                    <TextBox x:Name="DocumentBox" Header="What you are signing"
+                             AcceptsReturn="True" TextWrapping="Wrap" Height="90" />
+                    <TextBox x:Name="MeaningBox" Header="What your signature means"
+                             Text="I attest this is accurate and complete" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="Register this device" Click="OnEnroll"
+                                Background="{StaticResource QrmeCardBrush}"
+                                Foreground="{StaticResource QrmeTxtBrush}" />
+                        <Button x:Name="SignButton" Content="Sign" Click="OnSign"
+                                Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    </StackPanel>
+                    <TextBlock x:Name="CeremonyStatus" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <!-- Collapsed until a ceremony starts: an empty browser
+                         frame on the page would just be furniture. -->
+                    <controls:WebView2 x:Name="Ceremony" Height="420"
+                                       Visibility="Collapsed" />
                 </StackPanel>
             </Border>
 

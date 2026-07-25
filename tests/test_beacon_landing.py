@@ -250,8 +250,8 @@ def test_the_card_is_small_enough_to_fetch_while_the_camera_runs(client):
     assert card["initials"] == "MB"
     assert card["age_wall"] is False
     assert set(card) == {"profile_id", "display_name", "watermark", "portrait",
-                         "initials", "label", "shared_room", "open_url",
-                         "age_wall"}
+                         "portrait_marked", "initials", "label", "shared_room",
+                         "open_url", "age_wall"}
 
 
 def test_the_mark_travels_with_the_face(client):
@@ -303,3 +303,27 @@ def test_a_picked_up_beacon_has_no_card(client):
     bid = _beacon(client, pid)["id"]
     client.delete(f"/beacons/{bid}")
     assert client.get(f"/b/{bid}/card").status_code == 404
+
+
+def test_the_card_says_whether_the_portrait_already_carries_the_mark(client):
+    """A shipped starter's portrait has the AI mark burned into its pixels; an
+    owner-attached asset is somebody else's file and cannot be vouched for.
+    A surface QRME does not control has to be able to tell the two apart."""
+    from qrme import seed
+    seed.seed()
+    pid = client.get("/summon?ref=@otis_marsh").json()["profile"]["profile_id"]
+    b = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "the shop counter"}).json()
+    card = client.get(f"/b/{b['id']}/card").json()
+    assert card["portrait"].endswith("/portraits/otis_marsh.webp")
+    assert card["portrait_marked"] is True
+
+
+def test_an_owner_attached_portrait_is_never_claimed_to_be_marked(client):
+    pid, token = _profile(client)
+    client.put(f"/profiles/{pid}/avatar",
+               json={"asset": "https://example.test/face.png"},
+               headers={"authorization": f"Bearer {token}"})
+    b = _beacon(client, pid)
+    card = client.get(f"/b/{b['id']}/card").json()
+    assert card["portrait_marked"] is False

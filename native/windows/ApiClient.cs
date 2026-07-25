@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -456,6 +457,26 @@ public record SignaturePackage(
     [property: JsonPropertyName("signer")] SignatureSigner Signer,
     [property: JsonPropertyName("verification")] SignatureVerification Verification,
     [property: JsonPropertyName("limits")] List<string> Limits);
+
+public record EnrollRp(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name);
+
+public record EnrollUser(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("displayName")] string DisplayName);
+
+public record EnrollOptions(
+    [property: JsonPropertyName("challenge")] string Challenge,
+    [property: JsonPropertyName("rp")] EnrollRp Rp,
+    [property: JsonPropertyName("user")] EnrollUser User);
+
+public record SignatureEnvelope(
+    [property: JsonPropertyName("envelope_id")] string EnvelopeId,
+    [property: JsonPropertyName("challenge")] string Challenge,
+    [property: JsonPropertyName("display_text")] string DisplayText,
+    [property: JsonPropertyName("meaning")] string Meaning);
 
 public record SignaturePolicy(
     [property: JsonPropertyName("standard")] string Standard,
@@ -1045,6 +1066,68 @@ public sealed class ApiClient
     /// <summary>The absolute URL of the desk's camera view.</summary>
     public string DeskViewUrl(string deskId) =>
         new Uri(_http.BaseAddress!, $"/desks/{deskId}/view.webp").ToString();
+
+    // MARK: Signatures — the ceremony runs in a WebView2 (see SignaturesPage)
+
+    /// <summary>
+    /// The URL of the embeddable WebAuthn ceremony page. Served from the
+    /// deployment's own origin because WebAuthn refuses a mismatched rpId and
+    /// an opaque origin has none to match.
+    /// </summary>
+    public string CeremonyUrl(string mode, string challenge,
+                              string displayText = "", string meaning = "",
+                              string userId = "", string userName = "",
+                              string displayName = "")
+    {
+        var q = new Dictionary<string, string>
+        {
+            ["mode"] = mode, ["challenge"] = challenge,
+            ["display_text"] = displayText, ["meaning"] = meaning,
+            ["user_id"] = userId, ["user_name"] = userName,
+            ["display_name"] = displayName,
+        };
+        var query = string.Join("&", q.Where(kv => kv.Value.Length > 0)
+            .Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value)}"));
+        return new Uri(_http.BaseAddress!, $"/signatures/ceremony?{query}").ToString();
+    }
+
+    public async Task<EnrollOptions> EnrollOptions(string displayName, string token) =>
+        await Send<EnrollOptions>(Post("/signatures/enroll/options",
+            new { display_name = displayName }, token));
+
+    public async Task<SigningCredential> EnrollCredential(
+        string credentialId, string attestationObject, string clientDataJson,
+        string challenge, string displayName, string token) =>
+        await Send<SigningCredential>(Post("/signatures/enroll", new
+        {
+            credential_id = credentialId,
+            attestation_object = attestationObject,
+            client_data_json = clientDataJson,
+            challenge,
+            proofing_level = "self_asserted",
+            display_name = displayName,
+        }, token));
+
+    public async Task<SignatureEnvelope> RequestSignature(
+        string document, string meaning, string tier, string token) =>
+        await Send<SignatureEnvelope>(Post("/signatures/request", new
+        {
+            document, meaning, display_text = document, tier,
+        }, token));
+
+    public async Task<SignaturePackage> SubmitSignature(
+        string envelopeId, string credentialId, string signature,
+        string authenticatorData, string clientDataJson, string token) =>
+        await Send<SignaturePackage>(Post("/signatures/sign", new
+        {
+            envelope_id = envelopeId,
+            credential_id = credentialId,
+            signature,
+            authenticator_data = authenticatorData,
+            client_data_json = clientDataJson,
+            transport = "internal",
+            platform = "windows",
+        }, token));
 
     // MARK: Signatures — read and verify. Signing needs a platform
     // authenticator, which this app does not yet reach (see SignaturesPage).

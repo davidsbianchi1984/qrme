@@ -19,7 +19,9 @@ from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import auth, signatures
+from fastapi.responses import HTMLResponse
+
+from .. import auth, signatures, signing_page
 
 router = APIRouter()
 
@@ -99,6 +101,30 @@ def policy() -> dict:
         "standard": signatures.STANDARD,
         "limits": signatures.LIMITS,
     }
+
+
+@router.get("/signatures/ceremony", response_class=HTMLResponse)
+def ceremony(request: Request, mode: str = "sign", challenge: str = "",
+             display_text: str = "", meaning: str = "", user_id: str = "",
+             user_name: str = "", display_name: str = "") -> HTMLResponse:
+    """The WebAuthn ceremony as an embeddable page.
+
+    Served from the relying party's own origin because WebAuthn refuses a
+    mismatched `rpId` and an opaque origin has none to match — which is why
+    this is a route rather than a string inside the desktop app.
+
+    Takes **no token**: the page runs the ceremony and posts the raw assertion
+    to its host, and the host makes the authenticated call. A bearer token in
+    a query string ends up in logs and history.
+    """
+    if mode not in {"sign", "enroll"}:
+        raise HTTPException(422, "mode must be 'sign' or 'enroll'")
+    if not challenge:
+        raise HTTPException(422, "a ceremony needs the challenge to sign over")
+    return HTMLResponse(signing_page.ceremony_page(
+        mode=mode, challenge=challenge, rp_id=_rp_id(),
+        display_text=display_text, meaning=meaning, user_id=user_id,
+        user_name=user_name, display_name=display_name))
 
 
 @router.post("/signatures/enroll/options")

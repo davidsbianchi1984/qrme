@@ -6,6 +6,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Windows signs now, through the browser engine rather than interop.** The
+  blocker was `webauthn.dll`: several hundred lines of version-sensitive struct
+  marshalling that a compile cannot meaningfully check and nothing here can
+  execute. Edge already implements WebAuthn and already talks to Windows Hello,
+  so the desktop app hosts a **WebView2** pointed at a new
+  `GET /signatures/ceremony` page, served from the deployment's own origin —
+  WebAuthn refuses a mismatched relying party, and an opaque origin has none to
+  match, which is why it is a route and not a string inside the C#. The page
+  runs `navigator.credentials`, posts the raw assertion back over the WebView2
+  message channel, and the app makes the authenticated call; **the page never
+  sees a token**, because a bearer token in a query string ends up in logs and
+  history. It shows the document before the prompt for the same reason the
+  native screens do.
+- **`portrait_marked` on the beacon card.** `asset_marked` existed on the
+  avatar response and nothing consumed it. The camera overlays are the surface
+  that most needs it: a shipped starter's portrait carries the AI mark in its
+  own pixels, an owner-attached asset is somebody else's file and cannot be
+  vouched for, and a surface QRME does not control has to be able to tell those
+  apart. QRME's own overlays still draw their badge either way — theirs carries
+  the profile's designed label and is real text, not pixels.
+
 ## [0.1.6] — 2026-07-25
 
 ### Added

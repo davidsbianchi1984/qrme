@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -10,18 +11,19 @@ using Microsoft.UI.Xaml.Navigation;
 namespace QrmeStudio.Views;
 
 /// <summary>
-/// The read half of docs/signatures.md: what has been signed, whether it still
-/// verifies, and what the scheme does not claim.
+/// Signing, and the read half of docs/signatures.md.
 ///
-/// This page does not sign. A signature has to come from a platform
-/// authenticator, and reaching Windows Hello as one means webauthn.dll interop
-/// — a large block of struct marshalling that cannot be exercised here. A
-/// button that looks like it signs and does not is worse than no button, so
-/// the page says where signing happens instead of pretending to offer it.
+/// The ceremony runs in an embedded WebView2 rather than through
+/// <c>webauthn.dll</c>. That interop is several hundred lines of
+/// version-sensitive struct marshalling which a compile cannot meaningfully
+/// check; Edge already speaks WebAuthn and already talks to Windows Hello, so
+/// nothing here marshals anything by hand. The page it loads is served from
+/// the deployment's own origin — WebAuthn refuses a mismatched relying party,
+/// and an opaque origin has none to match.
 ///
-/// Verification is a different matter and belongs on a desktop: it needs no
-/// authenticator, and reading someone else's evidence package is exactly the
-/// thing a person does at a keyboard.
+/// The web page never sees a token. It posts the raw assertion back over the
+/// WebView2 message channel and this class makes the authenticated call; a
+/// bearer token in a query string ends up in logs and history.
 /// </summary>
 public sealed partial class SignaturesPage : Page
 {
@@ -33,7 +35,109 @@ public sealed partial class SignaturesPage : Page
         public string Tiers { get; init; } = "";
     }
 
+    private string _pendingEnvelope = "";
+    // Kept rather than parsed back out of the navigated URL: the enrol call
+    // has to echo the exact challenge, and re-deriving it from a query string
+    // is a decode bug waiting to happen.
+    private string _pendingChallenge = "";
+    private bool _wired;
+
     public SignaturesPage() => InitializeComponent();
+
+    /// <summary>
+    /// Start one ceremony in the embedded browser and hand the result to
+    /// <see cref="OnCeremonyMessage"/>.
+    /// </summary>
+    private async Task RunCeremony(string url)
+    {
+        await Ceremony.EnsureCoreWebView2Async();
+        if (!_wired)
+        {
+            Ceremony.CoreWebView2.WebMessageReceived += OnCeremonyMessage;
+            _wired = true;
+        }
+        Ceremony.Visibility = Visibility.Visible;
+        Ceremony.CoreWebView2.Navigate(url);
+    }
+
+    private async void OnEnroll(object sender, RoutedEventArgs e)
+    {
+        var token = AppState.Current.Token;
+        if (token is null) { Fail(new Exception("Create a profile first.")); return; }
+        try
+        {
+            var options = await ApiClient.Shared.EnrollOptions("QRME owner", token);
+            _pendingEnvelope = "";
+            _pendingChallenge = options.Challenge;
+            CeremonyStatus.Text = "Follow the Windows Hello prompt.";
+            await RunCeremony(ApiClient.Shared.CeremonyUrl(
+                "enroll", options.Challenge, userId: options.User.Id,
+                userName: options.User.Name,
+                displayName: options.User.DisplayName));
+        }
+        catch (Exception ex) { Fail(ex); }
+    }
+
+    private async void OnSign(object sender, RoutedEventArgs e)
+    {
+        var token = AppState.Current.Token;
+        if (token is null) { Fail(new Exception("Create a profile first.")); return; }
+        var document = DocumentBox.Text.Trim();
+        if (document.Length == 0) return;
+        try
+        {
+            // `basic` is what a self-asserted credential can sign, and
+            // self-asserted is all this page can enrol.
+            var env = await ApiClient.Shared.RequestSignature(
+                document, MeaningBox.Text.Trim(), "basic", token);
+            _pendingEnvelope = env.EnvelopeId;
+            CeremonyStatus.Text = "Follow the Windows Hello prompt.";
+            await RunCeremony(ApiClient.Shared.CeremonyUrl(
+                "sign", env.Challenge, displayText: env.DisplayText,
+                meaning: env.Meaning));
+        }
+        catch (Exception ex) { Fail(ex); }
+    }
+
+    private async void OnCeremonyMessage(object? sender,
+        Microsoft.Web.WebView2.Core.CoreWebView2WebMessageReceivedEventArgs args)
+    {
+        var token = AppState.Current.Token;
+        if (token is null) return;
+        try
+        {
+            using var doc = JsonDocument.Parse(args.TryGetWebMessageAsString());
+            var root = doc.RootElement;
+            if (!root.GetProperty("ok").GetBoolean())
+            {
+                Fail(new Exception(root.GetProperty("error").GetString() ?? "refused"));
+                return;
+            }
+            string S(string k) => root.GetProperty(k).GetString() ?? "";
+
+            if (root.GetProperty("mode").GetString() == "enroll")
+            {
+                var cred = await ApiClient.Shared.EnrollCredential(
+                    S("credential_id"), S("attestation_object"),
+                    S("client_data_json"), _pendingChallenge,
+                    "QRME owner", token);
+                CeremonyStatus.Text =
+                    $"Registered. This credential can sign: {string.Join(", ", cred.CanSign)}.";
+            }
+            else
+            {
+                var pkg = await ApiClient.Shared.SubmitSignature(
+                    _pendingEnvelope, S("credential_id"), S("signature"),
+                    S("authenticator_data"), S("client_data_json"), token);
+                CeremonyStatus.Text = pkg.Verification.Valid
+                    ? $"Signed — {pkg.SignatureId} verifies."
+                    : "Signed, but the package does not verify.";
+            }
+            Ceremony.Visibility = Visibility.Collapsed;
+            ErrorText.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception ex) { Fail(ex); }
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
