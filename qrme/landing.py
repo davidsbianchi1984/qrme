@@ -62,6 +62,29 @@ h1{font-size:26px;margin:20px 0 4px;animation:rise .7s .1s cubic-bezier(.2,.8,.2
  animation:rise .7s .28s cubic-bezier(.2,.8,.2,1) both}
 .foot{margin-top:18px;color:#6f6899;font-size:12px;line-height:1.6}
 .wall{font-size:52px;margin-bottom:8px}
+/* A desk is a real person, so this badge is the opposite of .mark and must
+   not be mistaken for it at a glance: green rather than neutral, top-right
+   rather than bottom-left, and it states the claim instead of a disclaimer.
+   It rides on the frame for the same reason .mark does — a screenshot of an
+   unmarked photograph would carry no claim either way. */
+.human{position:absolute;right:12px;top:12px;padding:7px 12px;
+ border-radius:999px;background:rgba(6,32,20,.86);backdrop-filter:blur(8px);
+ color:#7ce8b0;font-size:13px;font-weight:700;letter-spacing:.3px}
+.status{margin-top:14px;color:#a79fd0;font-size:14px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;
+ margin-right:7px;vertical-align:1px}
+.dot.here{background:#7ce8b0}
+.dot.away{background:#ffcc66}
+.dot.shut{background:#6f6899}
+.bell{display:block;width:100%;margin-top:18px;padding:15px;border:0;
+ border-radius:14px;font:inherit;font-weight:700;color:#0d0a20;
+ background:linear-gradient(120deg,#ffd479,#ffb347);cursor:pointer;
+ animation:rise .7s .28s cubic-bezier(.2,.8,.2,1) both}
+.bell:disabled{opacity:.6;cursor:default}
+.vouch{margin-top:16px;padding:12px 14px;border-radius:12px;
+ background:#181233;color:#a79fd0;font-size:12.5px;line-height:1.55;
+ text-align:left}
+.vouch b{color:#c9c3e8}
 @keyframes rise{from{opacity:0;transform:translateY(14px) scale(.985)}
  to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
@@ -119,6 +142,133 @@ def age_wall() -> str:
         sign in with a verified adult account to continue.</p>
       <p class="foot">QRME · synthetic profiles<br>
         The age check happens here, not at whoever placed this code.</p>""")
+
+
+def desk_age_wall() -> str:
+    """A rated desk reached by sticker.
+
+    Every sticker scan is tokenless, so this is not an edge case a verified
+    adult occasionally hits — it is what *everyone* who scans an 18+ desk's
+    printed code sees, and the only way past it is opening the desk in QRME
+    while signed in. Says nothing about who staffs it and, above all, nothing
+    about where: a performer's whereabouts on an adult listing is a safety
+    matter, and a sticker is by definition somewhere physical.
+    """
+    return _page("18+", """
+      <div class="wall">⊘</div>
+      <h1>18+ only</h1>
+      <p class="sub">This stream is age-restricted. Open it in QRME and sign
+        in with a verified adult account to continue.</p>
+      <p class="foot">QRME · live desks<br>
+        The age check happens here, not at whoever placed this code.</p>""")
+
+
+# The bell is the reason this page exists, so it has to work from a stranger's
+# camera-app browser with no account. A plain form POST would navigate away
+# from the desk and land them on JSON, so this is the one script on the page
+# that does anything. It degrades honestly: without JS the button is still
+# rendered but reports that it needs the app, rather than silently doing
+# nothing when tapped.
+_BELL_JS = """
+(function(){
+  var b=document.getElementById('bell'),s=document.getElementById('bs');
+  if(!b)return;
+  b.addEventListener('click',function(){
+    b.disabled=true;s.textContent='Ringing\\u2026';
+    fetch(%(endpoint)s,{method:'POST',headers:{'content-type':'application/json'},
+      body:'{}'}).then(function(r){return r.json().then(function(j){
+        return {ok:r.ok,j:j};});}).then(function(o){
+      if(o.ok){b.textContent='Bell rung';
+        s.textContent=o.j.note||'They will see it when they get back.';}
+      else{b.disabled=false;
+        s.textContent=(o.j&&o.j.detail)||'That did not go through.';}
+    }).catch(function(){b.disabled=false;
+      s.textContent='No connection \\u2014 try again in a moment.';});
+  });
+})();
+"""
+
+
+def desk_page(card: dict, label: str | None = None) -> str:
+    """The reveal for a desk: an empty chair, and a bell you can reach.
+
+    The inverse of :func:`profile_page` in the one respect that matters. That
+    page marks the portrait *AI* because the person in it does not exist; this
+    one states **Live person — not AI** because they do, and is careful to make
+    the two badges look nothing alike. Absence of the AI mark would not be a
+    disclosure — an unmarked card could be a synthetic profile whose badge got
+    dropped — so the claim is positive, and it carries who vouched for it.
+    """
+    desk_id = card["desk_id"]
+    name = card["display_name"]
+    presence = card["presence"]
+    view = card["feed"]["url"]
+
+    dot, said = {
+        "attended": ("here", "At the desk right now"),
+        "away": ("away", "Away from the desk"),
+        "closed": ("shut", "Closed — not taking callers"),
+    }.get(presence, ("away", "Away from the desk"))
+    if presence == "away":
+        said = "Away from the desk — ring the bell and they will see it"
+
+    waiting = card["bell"]["waiting"]
+    queued = (f" · {waiting} waiting" if waiting else "")
+
+    if card["bell"]["available"]:
+        bell = (f'<button class="bell" id="bell">🔔 Ring the bell</button>'
+                f'<p class="status" id="bs">A stranger\'s ring is limited to '
+                f'one every {desks_anon_cooldown()} seconds, so nobody can '
+                f'lean on it.</p>')
+        # Relative, not the configured public base: the sticker was scanned
+        # from whatever origin actually reached this page, which on a local
+        # deployment is a LAN address rather than the public hostname. An
+        # absolute URL here would ring a bell on a different machine, or none.
+        script = ("<script>" + _BELL_JS % {
+            "endpoint": _js(f"/desks/{desk_id}/bell")} + "</script>")
+    else:
+        bell = '<p class="status" id="bs">The bell is off while this desk is closed.</p>'
+        script = ""
+
+    att = card["attestation"]
+    signed = ("a signed attestation" if att["signed"]
+              else "recorded, not signed")
+    where = (f'<p class="sub">this code is at {html.escape(label)}</p>'
+             if label else "")
+    trade = html.escape(card["trade"])
+    blurb = (f'<p class="blurb">{html.escape(card["blurb"])}</p>'
+             if card.get("blurb") else "")
+    livenote = ("" if card["feed"]["live"] else
+                "<br>This deployment has no camera on this desk, so the "
+                "picture is a sample rather than a live view — and is not "
+                "claimed to be one.")
+
+    return _page(f"{name} · QRME", f"""
+      <div class="frame"><img src="{html.escape(view)}" alt="">
+        <div class="human">{html.escape(card["designation"])}</div></div>
+      <h1>{html.escape(name)}</h1>
+      <p class="sub">{trade}</p>
+      {where}
+      {blurb}
+      <p class="status"><span class="dot {dot}"></span>{html.escape(said)}{queued}</p>
+      {bell}
+      <div class="vouch"><b>Who says they are real:</b>
+        {html.escape(att["attestor"])} — {html.escape(att["basis"])}
+        ({signed}).<br>{html.escape(att["note"])}</div>
+      <p class="foot">QRME · live desks. No AI watermark on this page, on
+        purpose: there is an actual person behind this desk.{livenote}</p>
+      {script}""")
+
+
+def desks_anon_cooldown() -> int:
+    from . import desks
+    return desks.ANON_COOLDOWN_SECONDS
+
+
+def _js(value: str) -> str:
+    """A JS string literal safe to drop into an inline script."""
+    import json
+    return html.escape(json.dumps(value), quote=False).replace("</", "<\\/")
 
 
 def profile_page(profile: dict, base: str, label: str | None = None,

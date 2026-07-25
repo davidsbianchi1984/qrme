@@ -128,7 +128,14 @@ What a visitor looks at is a camera view of the desk rather than a portrait,
 and when the chair is empty there is a **bell** they can ring from the screen
 — no account needed, because the person in front of an empty chair is exactly
 the one who has none. An 18+ stream is the same desk behind the deployment's
-existing verified-adult gate. See [docs/desks.md](docs/desks.md).
+existing verified-adult gate.
+
+A desk can also be **left behind as a printed code**, the way a profile can —
+the sticker on the shop door, which is there precisely because nobody is behind
+it right now. Scanning it opens a page with the desk view, the positive human
+claim, who vouched for it, and a bell that works without an account. A rated
+desk's code always lands on the age wall, since a sticker scan carries no token
+that could clear it. See [docs/desks.md](docs/desks.md).
 
 ## Signatures that survive being disputed
 

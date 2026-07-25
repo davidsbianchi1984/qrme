@@ -778,6 +778,22 @@ CREATE TABLE IF NOT EXISTS desk_rings (
     acked_at  TEXT
 );
 
+-- A desk left behind as a printed code — the sticker on the shop door that
+-- says "I'm out back, ring the bell". Deliberately its own table rather than
+-- a nullable desk_id on `beacons`: that column is NOT NULL on every database
+-- already out there, and this schema is applied with CREATE TABLE IF NOT
+-- EXISTS, so widening an existing table would only take effect on a fresh
+-- one. Additive works everywhere.
+CREATE TABLE IF NOT EXISTS desk_beacons (
+    id         TEXT PRIMARY KEY,   -- dbn_… — also the QR token
+    desk_id    TEXT NOT NULL REFERENCES desks(id),
+    label      TEXT NOT NULL,      -- e.g. "on the shop door"
+    location   TEXT,               -- free-text place
+    scans      INTEGER NOT NULL DEFAULT 0,
+    active     INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+);
+
 -- A signing credential is a WebAuthn/passkey public key bound to an account
 -- whose identity was proofed at enrollment. The proofing level is stored
 -- here, not inferred, because it decides what this credential may sign.
