@@ -398,12 +398,12 @@ object ApiClient {
                                message: String, rating: Int?): String {
         val body = JSONObject().put("category", category).put("message", message)
         rating?.let { body.put("rating", it) }
-        return request("/feedback", "POST", body, token)
+        return JSONObject(request("/feedback", "POST", body, token))
             .optString("status", "received")
     }
 
     suspend fun feedback(token: String?): FeedbackState {
-        val o = request("/feedback", token = token)
+        val o = JSONObject(request("/feedback", token = token))
         val mineArr = o.optJSONArray("mine")
         val mine = (0 until (mineArr?.length() ?: 0)).map { i ->
             val f = mineArr!!.getJSONObject(i)
@@ -637,9 +637,9 @@ object ApiClient {
 
     suspend fun gameCallout(sid: String, token: String, situation: String,
                             minorPresent: Boolean): GameCalloutResult {
-        val o = request("/gaming/sessions/$sid/callout", "POST",
+        val o = JSONObject(request("/gaming/sessions/$sid/callout", "POST",
             JSONObject().put("situation", situation)
-                .put("minor_present", minorPresent), token)
+                .put("minor_present", minorPresent), token))
         return GameCalloutResult(o.optString("status", ""),
             o.optString("line", null), o.optString("flag_reason", null))
     }
