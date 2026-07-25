@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -382,6 +383,47 @@ public record Excursion(
     [property: JsonPropertyName("learned")] bool Learned);
 
 /// <summary>
+// Signatures (docs/signatures.md). Windows reads and verifies; it does not
+// sign — see SignaturesPage for why.
+
+public record SigningCredential(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("credential_id")] string CredentialId,
+    [property: JsonPropertyName("proofing_level")] string ProofingLevel,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("device_bound")] bool DeviceBound,
+    [property: JsonPropertyName("backup_eligible")] bool BackupEligible,
+    [property: JsonPropertyName("can_sign")] List<string> CanSign,
+    [property: JsonPropertyName("revoked_at")] string? RevokedAt);
+
+public record SigningCredentials(
+    [property: JsonPropertyName("credentials")] List<SigningCredential> Credentials);
+
+public record SignatureVerification(
+    [property: JsonPropertyName("valid")] bool Valid,
+    [property: JsonPropertyName("notes")] List<string> Notes);
+
+public record SignatureSigner(
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("proofing_level")] string ProofingLevel);
+
+public record SignaturePackage(
+    [property: JsonPropertyName("signature_id")] string SignatureId,
+    [property: JsonPropertyName("meaning")] string? Meaning,
+    [property: JsonPropertyName("display_text")] string? DisplayText,
+    [property: JsonPropertyName("document_sha256")] string? DocumentSha256,
+    [property: JsonPropertyName("signed_at")] string SignedAt,
+    [property: JsonPropertyName("tier")] string Tier,
+    [property: JsonPropertyName("platform")] string? Platform,
+    [property: JsonPropertyName("transport")] string? Transport,
+    [property: JsonPropertyName("signer")] SignatureSigner Signer,
+    [property: JsonPropertyName("verification")] SignatureVerification Verification,
+    [property: JsonPropertyName("limits")] List<string> Limits);
+
+public record SignaturePolicy(
+    [property: JsonPropertyName("standard")] string Standard,
+    [property: JsonPropertyName("limits")] List<string> Limits);
+
 /// Async client for the QRME backend. Windows reaches the local dev server
 /// directly on 127.0.0.1.
 /// </summary>
@@ -950,4 +992,25 @@ public sealed class ApiClient
         var res = await _http.SendAsync(req);
         res.EnsureSuccessStatusCode();
     }
+
+    // MARK: Signatures — read and verify. Signing needs a platform
+    // authenticator, which this app does not yet reach (see SignaturesPage).
+
+    public async Task<SignaturePolicy> GetSignaturePolicy() =>
+        await Send<SignaturePolicy>(new HttpRequestMessage(HttpMethod.Get, "/signatures/policy"));
+
+    public async Task<List<SigningCredential>> ListSigningCredentials(string token) =>
+        (await Send<SigningCredentials>(Get("/signatures/credentials", token))).Credentials;
+
+    public async Task<SignaturePackage> GetSignature(string id) =>
+        await Send<SignaturePackage>(new HttpRequestMessage(HttpMethod.Get, $"/signatures/{id}"));
+
+    /// <summary>
+    /// Check an evidence package handed over from outside. No token: a
+    /// counterparty must be able to verify a signature without an account
+    /// here, which is what makes it a record that stands on its own.
+    /// </summary>
+    public async Task<SignatureVerification> VerifySignature(JsonElement package) =>
+        await Send<SignatureVerification>(
+            Post("/signatures/verify", new { package }));
 }

@@ -4,7 +4,7 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn" }
+    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign" }
     @State private var tab: Tab = .general
 
     var body: some View {
@@ -23,6 +23,7 @@ struct ManageView: View {
             case .gaming: GamingSection()
             case .license: LicenseSection()
             case .earnings: EarningsSection()
+            case .signatures: SignatureSection()
             }
         }
     }
@@ -571,6 +572,31 @@ private struct LicenseSection: View {
         Task {
             try? await ApiClient.shared.revokeLicense(gid: g.id, token: token)
             await load()
+        }
+    }
+}
+
+
+// MARK: Signatures — a passkey assertion instead of the app's own say-so
+
+/// Bridges the shared app state into `SignatureView`, which needs an account
+/// token: a signature is attributed to the enrolled account, never to a value
+/// the client supplies.
+private struct SignatureSection: View {
+    @EnvironmentObject private var state: AppState
+
+    var body: some View {
+        if let pid = state.pid, let token = state.token {
+            NavigationStack { SignatureView(profileId: pid, token: token) }
+        } else {
+            VStack(spacing: 8) {
+                Text("Create a profile first").font(.subheadline.weight(.semibold))
+                Text("Signing credentials are bound to an account, so there has "
+                     + "to be one before a passkey can stand for it.")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(24)
         }
     }
 }

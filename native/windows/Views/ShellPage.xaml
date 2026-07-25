@@ -39,6 +39,9 @@
             <NavigationViewItem Content="Reach" Tag="reach">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Map" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Content="Signatures" Tag="signatures">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Permissions" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Settings" Tag="settings">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Setting" /></NavigationViewItem.Icon>
             </NavigationViewItem>

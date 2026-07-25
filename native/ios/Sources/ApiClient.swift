@@ -28,6 +28,54 @@ struct Post: Decodable {
 
 struct Health: Decodable { let status: String }
 
+// MARK: Signatures
+
+struct SignaturePolicy: Decodable {
+    let proofing_levels: [String]
+    let standard: String
+    let limits: [String]
+}
+
+struct EnrollUser: Decodable { let id: String; let name: String; let displayName: String }
+struct EnrollRp: Decodable { let id: String; let name: String }
+
+struct EnrollOptions: Decodable {
+    let challenge: String
+    let rp: EnrollRp
+    let user: EnrollUser
+}
+
+struct SigningCredential: Decodable, Identifiable {
+    let id: String
+    let credential_id: String
+    let proofing_level: String
+    let display_name: String?
+    let backup_eligible: Bool
+    let device_bound: Bool
+    let can_sign: [String]
+    let revoked_at: String?
+}
+
+struct SignatureEnvelope: Decodable {
+    let envelope_id: String
+    let challenge: String
+    let display_text: String
+    let meaning: String
+    let tier: String
+    let expires_at: String
+}
+
+struct SignatureVerification: Decodable { let valid: Bool; let notes: [String] }
+
+struct SignatureReceipt: Decodable {
+    let signature_id: String
+    let meaning: String?
+    let signed_at: String
+    let tier: String
+    let verification: SignatureVerification
+    let limits: [String]
+}
+
 struct ProviderInfo: Decodable {
     let name: String
     let label: String
@@ -934,5 +982,77 @@ actor ApiClient {
         struct Ok: Decodable {}
         let _: Ok = try await request("/excursions/\(cid)/learn",
                                       method: "POST", token: token)
+    }
+
+    // MARK: Signatures (docs/signatures.md)
+
+    func signaturePolicy() async throws -> SignaturePolicy {
+        try await request("/signatures/policy")
+    }
+
+    func enrollOptions(displayName: String,
+                       token: String) async throws -> EnrollOptions {
+        try await request("/signatures/enroll/options", method: "POST",
+                          body: ["display_name": displayName], token: token)
+    }
+
+    func enrollCredential(credentialId: String, attestationObject: String,
+                          clientDataJSON: String, challenge: String,
+                          proofingLevel: String, displayName: String,
+                          attestor: String?,
+                          token: String) async throws -> SigningCredential {
+        var body: [String: Any] = [
+            "credential_id": credentialId,
+            "attestation_object": attestationObject,
+            "client_data_json": clientDataJSON,
+            "challenge": challenge,
+            "proofing_level": proofingLevel,
+            "display_name": displayName,
+        ]
+        if let attestor { body["proofing_attestor"] = attestor }
+        return try await request("/signatures/enroll", method: "POST",
+                                 body: body, token: token)
+    }
+
+    func signingCredentials(token: String) async throws -> [SigningCredential] {
+        struct Wrapper: Decodable { let credentials: [SigningCredential] }
+        let w: Wrapper = try await request("/signatures/credentials", token: token)
+        return w.credentials
+    }
+
+    func revokeCredential(id: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/signatures/credentials/\(id)",
+                                      method: "DELETE", token: token)
+    }
+
+    func requestSignature(document: String, meaning: String, displayText: String,
+                          tier: String, bindingKind: String? = nil,
+                          bindingRef: String? = nil,
+                          token: String) async throws -> SignatureEnvelope {
+        var body: [String: Any] = [
+            "document": document, "meaning": meaning,
+            "display_text": displayText, "tier": tier,
+        ]
+        if let bindingKind { body["binding_kind"] = bindingKind }
+        if let bindingRef { body["binding_ref"] = bindingRef }
+        return try await request("/signatures/request", method: "POST",
+                                 body: body, token: token)
+    }
+
+    func submitSignature(envelopeId: String, assertion: Signing.Assertion,
+                         platform: String,
+                         token: String) async throws -> SignatureReceipt {
+        try await request("/signatures/sign", method: "POST", body: [
+            "envelope_id": envelopeId,
+            "credential_id": assertion.credentialId,
+            "signature": assertion.signature,
+            "authenticator_data": assertion.authenticatorData,
+            "client_data_json": assertion.clientDataJSON,
+            // Optic ID and Face ID are both platform authenticators, so the
+            // ceremony happens on this device rather than via a second one.
+            "transport": "internal",
+            "platform": platform,
+        ], token: token)
     }
 }

@@ -20,6 +20,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a shared style whose text disagrees with the assets cannot do the one job it
   exists for; the rated portrait carries its own `RATED_STYLE`, since it is
   age-walled off every surface the others appear on.
+- **The native apps sign.** iOS/visionOS drive the ceremony through
+  `ASAuthorizationPlatformPublicKeyCredentialProvider` (Face ID, Touch ID, or
+  Optic ID) and Android through Credential Manager, so the private key stays in
+  the Secure Enclave or StrongBox and the app never handles it. Both render the
+  document immediately before the prompt and send that exact text to the
+  server — the mitigation for WebAuthn having no trusted display, since the
+  prompt itself can never say what is being signed. Both also need a verified
+  domain (associated domains on iOS, Digital Asset Links on Android) before any
+  prompt appears, which a LAN dev server cannot have; the screens say so rather
+  than failing with a system error nobody can read. **Windows reads and
+  verifies but does not sign**: reaching Windows Hello means `webauthn.dll`
+  struct marshalling that a compile cannot meaningfully check, and a signing
+  button that looks like it works and does not is worse than no button — so the
+  desktop app carries the half that needs no authenticator, including a paste
+  box for verifying a package a counterparty handed you.
 - **Signatures that survive being disputed** (`qrme/signatures.py`,
   `qrme/webauthn.py`, `POST /signatures/*`). The gesture is the same Face ID
   prompt; what comes back is a WebAuthn assertion rather than a boolean —
@@ -53,6 +68,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The mug says nothing, as the brief asked.** `bev_lindqvist`'s portrait had
+  the word "nothing" lettered onto it — a literal reading of "a mug that says
+  nothing at all", and the one piece of baked-in text in the collection that
+  was not deliberate. Painted out, with the mug's own shading preserved.
+- **The portraits were sliced on the wrong boundaries.** The contact sheet was
+  cut on a nominal 192px grid, but the subjects overrun their cells, so several
+  tiles carried a sliver of the neighbouring portrait — most visibly Otis's arm
+  in Bev's frame. Re-sliced on the quietest column near each seam, which is
+  where the real gutter is. `dr_priya_nair` is also re-cropped: her source is a
+  wide landscape scene, so a full-width cut padded her down to a thumbnail
+  inside her own tile.
 - **A beacon card's portrait is now an absolute URL.** `GET /b/{id}/card` was
   returning the stored asset path unchanged, which is a valid `href` only for
   a browser already on the origin — and the consumer of that field is a native
