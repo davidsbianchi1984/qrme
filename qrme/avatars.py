@@ -1,0 +1,264 @@
+"""Portraits for synthetic profiles — art direction, rights, and the mark.
+
+A profile without a face is a row in a table. This module holds the visual
+identity of one: a **brief** (what the portrait shows, written to be handed
+straight to an illustrator or an image model), the **asset** once it exists,
+and the **badge** that must ride on every render of it.
+
+Three rules the rest of the module exists to enforce:
+
+* **Starter faces are nobody.** Every portrait in ``BRIEFS`` describes an
+  invented person. That is what keeps ``seed.py``'s promise — starters are
+  ``fictional`` kind, no real-person rights involved — true of the picture
+  as well as the persona. A real likeness on a profile is a different
+  animal: it needs ``kind="other_person"`` and a consent record, which
+  ``routers/profiles.py`` already enforces at 422.
+* **No borrowed costumes.** Briefs describe generic wardrobe, never a
+  trademarked character, uniform, or logo. A likeness release from the
+  person photographed grants their face; it grants nothing about a costume
+  someone else owns.
+* **The badge is not optional.** A portrait is the most-looked-at render
+  QRME produces, so :func:`render` refuses to hand one back without the
+  profile's AI watermark attached. Same invariant as every other visual and
+  textual render, applied where it is most visible.
+
+The briefs lean funny on purpose. A stock headshot says "corporate mascot";
+a financial planner wearing far too much gold says "this is a character, and
+everyone here knows it" — which is the honest note for a synthetic profile
+to open on.
+"""
+
+from __future__ import annotations
+
+from . import db, watermark
+
+# Shared direction, so 33 portraits look like one collection rather than 33
+# stock photos. Kept separate from the per-profile line below because it is
+# the part a generator should receive verbatim every time.
+STYLE = ("Waist-up character portrait, shallow depth of field, warm key light "
+         "against the QRME night-indigo palette. Photographic but a touch "
+         "heightened — a person who knows they are posing. Plain background, "
+         "no text, no logos, no trademarked costume or uniform.")
+
+# handle -> the portrait, one line, played straight-faced.
+BRIEFS: dict[str, str] = {
+    "dr_amara_osei":
+        "A physician in her fifties in a white coat, stethoscope slung on "
+        "like a scarf rather than worn, holding a comically oversized model "
+        "of a human heart under one arm the way you'd hold a football.",
+    "marcus_bell":
+        "A retired financial planner in a three-piece suit loud enough to "
+        "count as a personality, gold chains layered to the sternum, gold "
+        "grills, pinky rings — and a pocket calculator held up like a "
+        "trophy, because the money jokes are the only flashy thing about "
+        "his actual advice.",
+    "priya_raman":
+        "A software architect at a whiteboard covered in a diagram that has "
+        "clearly escaped its own scope, holding a marker in each hand and "
+        "one behind each ear.",
+    "elena_vasquez":
+        "A teacher mid-sentence with chalk dust on both sleeves, holding a "
+        "stack of books tall enough that she is peering around it.",
+    "jonathan_ashe":
+        "A lawyer in shirtsleeves and loosened tie, one hand resting on a "
+        "law library's worth of bound volumes, the other holding a single "
+        "sticky note — the part that actually mattered.",
+    "sam_whitfield":
+        "A farmer leaning on a fence in a seed-company cap, one boot up on "
+        "the rail, holding a single ear of corn like a sommelier presenting "
+        "a vintage.",
+    "ingrid_halvorsen":
+        "A manufacturing engineer in a hi-vis vest and safety glasses "
+        "pushed up on her forehead, holding a machined part up to the light "
+        "with the reverence of a jeweller.",
+    "diego_fuentes":
+        "A site foreman in a hard hat with a tape measure clipped at the "
+        "hip, arms crossed, standing beside a level that is very slightly "
+        "off — and he has noticed.",
+    "naomi_clarke":
+        "A real-estate agent in a sharp blazer holding an absurd ring of "
+        "keys with both hands, smiling the specific smile of someone about "
+        "to say the word 'cosy'.",
+    "tomas_rivera":
+        "An energy engineer in a field jacket with a hard hat under one "
+        "arm, a small wind-turbine model spinning on his palm.",
+    "odessa_grant":
+        "A logistics director in a bomber jacket holding a clipboard, "
+        "surrounded by a floating constellation of tiny shipping "
+        "containers, entirely unbothered by them.",
+    "ken_nakamura":
+        "A retail operator in a crisp apron over a button-down, holding a "
+        "barcode scanner like a duelling pistol at rest.",
+    "lucia_moretti":
+        "A hotelier in an immaculate suit holding a brass bell with one "
+        "finger poised over it, radiating the calm of someone who has "
+        "already fixed the problem you're about to describe.",
+    "ray_coleman":
+        "A broadcast veteran in headphones around the neck, leaning into a "
+        "vintage ribbon microphone, one hand raised in the universal 'we're "
+        "live' gesture.",
+    "wren_okafor":
+        "A painter in a paint-wrecked smock holding a brush in the teeth "
+        "and one in each hand, a smear of cadmium yellow across one cheek "
+        "that clearly happened hours ago and went unremarked.",
+    "coach_dana_reyes":
+        "A strength coach in a track jacket with a whistle and a stopwatch, "
+        "holding a clipboard and giving the camera a look that says one "
+        "more set.",
+    "chef_henri_laurent":
+        "A chef in whites with a towel over the shoulder, tasting spoon "
+        "raised, expression suspended between delight and profound "
+        "disappointment.",
+    "dr_sana_iqbal":
+        "An environmental scientist in field gear holding a soil core "
+        "sample in one hand and a seedling in the other, weighing them "
+        "against each other like scales.",
+    "pete_kowalski":
+        "A career civil servant in a slightly dated suit holding a single "
+        "form, radiating the serenity of a man who knows which office you "
+        "actually need.",
+    "grace_mwangi":
+        "A nonprofit director in a bright print blazer holding a "
+        "hand-lettered donation thermometer that has been amended upward "
+        "several times.",
+    "dr_felix_baum":
+        "A research scientist in a lab coat with hair defeated by static, "
+        "holding a flask of something faintly luminous at arm's length, "
+        "delighted.",
+    "aisha_diallo":
+        "A telecom network engineer in a utility vest holding a coil of "
+        "fibre optic cable that glows softly at the cut end, like a lamp "
+        "she happens to be carrying.",
+    "harold_jenkins":
+        "An insurance adjuster in a cardigan holding an umbrella indoors, "
+        "open, because you never know — expression entirely sincere.",
+    "rosa_delgado":
+        "A master mechanic in coveralls with a grease stripe across the "
+        "forehead, holding a torque wrench across both palms like a "
+        "presented sword.",
+    "cmdr_ellen_park":
+        "A retired flight commander in a flight jacket with the patches "
+        "removed, holding a helmet under one arm, looking slightly up and "
+        "past the camera out of pure habit.",
+    "mimi_beaumont":
+        "A beauty editor in immaculate everything, holding a makeup brush "
+        "like a conductor's baton mid-downbeat.",
+    "jack_osei_turner":
+        "A brand strategist in a perfectly plain black t-shirt in front of "
+        "a wall of sticky notes, holding one that just says 'WHY?'.",
+    "nadia_petrova":
+        "A security researcher in a hoodie over a collared shirt, lit by a "
+        "screen, holding a hardware key on a lanyard up between two "
+        "fingers like the only thing she trusts in the room.",
+    "bev_lindqvist":
+        "An HR director in a warm cardigan holding a mug that says nothing "
+        "at all, wearing the expression of someone who has heard it and is "
+        "not going to react to it.",
+    "otis_marsh":
+        "A session musician on a stool with a battered acoustic guitar, "
+        "capo on the wrong fret, entirely unbothered.",
+    "dr_lena_whitcomb":
+        "A clinical psychologist in a soft cardigan in an armchair, hands "
+        "loosely folded, the room deliberately unremarkable and calm.",
+    "dr_marcus_adeyemi":
+        "A psychiatrist in a quiet suit at a desk, reading glasses in hand, "
+        "warm and unhurried, no props that suggest emergency.",
+    "dr_priya_nair":
+        "A counsellor in a comfortable chair beside a window, a box of "
+        "tissues on the table placed within reach without comment.",
+    # Rated tier. The brief stays suggestive at most: the profile is age-
+    # walled at every surface, but this file ships in a public repository, and
+    # "tasteful in the source, gated in the product" is the right split.
+    "vivienne_sable":
+        "A cabaret headliner backstage in a feathered robe over stage "
+        "costume, seated at a bulb-lit mirror with a cigarette holder held "
+        "unlit, one eyebrow raised at the camera. Old-Hollywood glamour, "
+        "shoulders and above, nothing explicit.",
+}
+
+# The mental-health trio is played straight on purpose — a joke portrait on
+# the profile someone reaches in a bad hour is a joke at their expense.
+SOMBRE = {"dr_lena_whitcomb", "dr_marcus_adeyemi", "dr_priya_nair"}
+
+
+def brief(handle: str) -> dict | None:
+    """The generation-ready brief for a starter handle: shared style plus the
+    profile's own line. ``None`` for a handle with no brief."""
+    line = BRIEFS.get(handle)
+    if line is None:
+        return None
+    return {
+        "handle": handle,
+        "portrait": line,
+        "style": STYLE,
+        "prompt": f"{line} {STYLE}",
+        "tone": "sombre" if handle in SOMBRE else "humorous",
+        # Stated in the brief itself so it survives being copied out of here
+        # and pasted somewhere else, which is what briefs are for.
+        "constraints": [
+            "The subject is an invented person — not a likeness of anyone real.",
+            "No trademarked character, costume, uniform, or logo.",
+            "No text rendered in the image; the AI badge is composited by the"
+            " client from GET /profiles/{id}/avatar.",
+        ],
+    }
+
+
+def catalog() -> list[dict]:
+    """Every starter brief, for generating the collection in one pass."""
+    return [brief(handle) for handle in BRIEFS]
+
+
+def set_avatar(profile_id: str, asset: str) -> dict:
+    """Attach a rendered portrait to a profile."""
+    conn = db.connect()
+    conn.execute("UPDATE profiles SET avatar=? WHERE id=?", (asset, profile_id))
+    conn.commit()
+    return render(profile_id)
+
+
+def render(profile_id: str) -> dict:
+    """A profile's portrait *as it must be displayed*.
+
+    The badge is attached here rather than left to each surface to decide,
+    because "the client forgot" is how an unmarked synthetic face reaches a
+    viewer. 2-D, 3-D, VR and AR surfaces all read this one shape, so the
+    disclosure travels with the asset into every one of them.
+    """
+    row = db.connect().execute(
+        "SELECT avatar, kind, consent_basis, consent_attestor"
+        " FROM profiles WHERE id=?", (profile_id,)).fetchone()
+    if row is None:
+        return {}
+    return {
+        "profile_id": profile_id,
+        "asset": row["avatar"] or None,
+        "watermark": watermark.design(profile_id),
+        "likeness": likeness(profile_id),
+        # A portrait with no asset yet is still an answer: surfaces fall back
+        # to initials rather than showing an unbadged placeholder.
+        "placeholder": not row["avatar"],
+    }
+
+
+def likeness(profile_id: str) -> dict:
+    """Whose face this is, in rights terms.
+
+    A portrait of an invented person carries no likeness rights. A portrait
+    of a real person carries a grant that can be withdrawn, so the record of
+    it belongs next to the picture rather than in somebody's inbox.
+    """
+    row = db.connect().execute(
+        "SELECT kind, consent_basis, consent_attestor FROM profiles WHERE id=?",
+        (profile_id,)).fetchone()
+    if row is None or row["kind"] == "fictional":
+        return {"real_person": False,
+                "note": "invented likeness — no rights holder"}
+    return {
+        "real_person": True,
+        "basis": row["consent_basis"],
+        "attestor": row["consent_attestor"],
+        "revocable": True,
+        "note": "depicts a real person under a recorded grant; withdrawing"
+                " the grant retires the portrait with the profile",
+    }

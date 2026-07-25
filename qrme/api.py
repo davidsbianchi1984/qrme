@@ -20,10 +20,11 @@ from . import mobile, offline
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
-from .routers import (apps, assistant, community, connections, earnings,
-                      feedback, gaming, governance, intelligence, interaction,
-                      licensing, models, packs, profiles, research, robots,
-                      social, steering, summon, watch, watermarks)
+from .routers import (apps, assistant, avatars, community, connections,
+                      earnings, feedback, gaming, governance, intelligence,
+                      interaction, licensing, models, packs, profiles,
+                      research, robots, social, steering, summon, watch,
+                      watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -104,6 +105,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(earnings.router)
     app.include_router(watch.router)
     app.include_router(watermarks.router)
+    app.include_router(avatars.router)
     app.include_router(steering.router)
     app.include_router(feedback.router)
     app.include_router(gaming.router)

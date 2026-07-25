@@ -6,9 +6,11 @@ curated synthetic expert for every major industry, each with a claimed
 @handle (direct summoning), a marketplace listing (browse + #tag summoning),
 and a persona written to be genuinely useful to talk to.
 
-All starter profiles are ``fictional`` kind (no real-person rights involved),
-owned by the platform owner id ``qrme-starter``, and pass through exactly the
-same moderation and provenance pipeline as any user profile. Seeding is
+All starter profiles are ``fictional`` kind (no real-person rights involved
+— the portraits in ``avatars.py`` describe invented people too, so the claim
+holds for the face as well as the persona), owned by the platform owner id
+``qrme-starter``, and pass through exactly the same moderation and provenance
+pipeline as any user profile. Seeding is
 idempotent — a profile whose @handle is already claimed is skipped — so it is
 safe to run at every deploy:
 
@@ -207,6 +209,29 @@ STARTERS: list[tuple[str, str, str, str, list[str], str]] = [
      "deeper than a conversation can reach."),
 ]
 
+# The rated tier, seeded so it isn't an empty shelf either. Same shape as
+# above; the difference is ``adult_mode``, which is why it is a separate list
+# rather than a seventh tuple field on all 33.
+#
+# Fictional by necessity, not preference: ``rated.py`` states the hard line —
+# adult mode is never available for a profile of another real person. A
+# ``self`` profile could carry it, but a *starter* ships to every deployment,
+# so it can only ever be an invented character.
+#
+# Every discovery surface (@handle, #tag, beacon scan, marketplace browse)
+# already resolves a rated profile to an age-wall card without a verified-18+
+# interactor token, so seeding this does not put it in front of anyone the
+# gate wouldn't already stop.
+RATED: list[tuple[str, str, str, str, list[str], str]] = [
+    ("vivienne_sable", "adult", "Vivienne Sable", "creator_persona",
+     ["adult", "cabaret", "burlesque", "18plus"],
+     "A cabaret headliner and burlesque historian with two decades on stage "
+     "and a genuine scholar's love of the form — the Ziegfeld era, the "
+     "Parisian revues, the craft of a tease that is mostly timing. Flirtatious "
+     "and quick, warm rather than crude, and far more interested in "
+     "confidence, costume, and stagecraft than in shock."),
+]
+
 
 def seed() -> dict:
     """Create the starter collection (idempotent: claimed handles skip)."""
@@ -217,11 +242,11 @@ def seed() -> dict:
     from .routers.profiles import create_profile
     from .routers.summon import claim_handle
     from .models import HandleSet
-    from . import db
+    from . import avatars, db
 
     conn = db.connect()
     created, skipped = [], []
-    for handle, industry, name, purpose, tags, persona in STARTERS:
+    for handle, industry, name, purpose, tags, persona in STARTERS + RATED:
         taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                              (handle,)).fetchone()
         if taken:
@@ -230,8 +255,17 @@ def seed() -> dict:
         profile = create_profile(ProfileCreate(
             owner_id=OWNER_ID, kind="fictional", display_name=name,
             persona=persona, purpose=purpose,
+            adult_mode=industry == "adult",
             verification=Verification(birthdate=_BIRTHDATE)))
         claim_handle(profile["id"], HandleSet(handle=handle))
+        # The portrait brief doubles as the profile's `appearance`, which
+        # rides on the prompt (persona.py). One description behind the face
+        # and the voice, so a profile that looks like it is holding an
+        # oversized anatomical heart knows that about itself.
+        portrait = avatars.BRIEFS.get(handle)
+        if portrait:
+            conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
+                         (portrait, profile["id"]))
         all_tags = list(dict.fromkeys([industry.replace("_", "-"), *tags]))
         blurb = persona.split(". ")[0] + "."
         # Both marketplace surfaces: the generalized listings (browse) and
@@ -254,7 +288,8 @@ def seed() -> dict:
         created.append({"handle": f"@{handle}", "industry": industry,
                         "profile_id": profile["id"], "name": name})
     return {"created": len(created), "skipped": len(skipped),
-            "industries": len(STARTERS), "profiles": created}
+            "industries": len(STARTERS), "rated": len(RATED),
+            "profiles": created}
 
 
 if __name__ == "__main__":

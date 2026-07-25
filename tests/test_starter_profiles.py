@@ -3,7 +3,10 @@ fresh marketplace has profiles to immerse with before users publish their
 own. Each starter gets a claimed @handle, a marketplace listing, and works
 end-to-end through summoning and chat like any user profile."""
 
-from qrme.seed import STARTERS
+from qrme.seed import RATED, STARTERS
+
+# The seeded collection is the industry starters plus the rated tier.
+COLLECTION = STARTERS + RATED
 
 
 def test_starters_cover_every_industry_exactly_once():
@@ -18,7 +21,7 @@ def test_seed_populates_the_marketplace(client):
     r = client.post("/marketplace/seed")
     assert r.status_code == 201, r.text
     out = r.json()
-    assert out["created"] == len(STARTERS) and out["skipped"] == 0
+    assert out["created"] == len(COLLECTION) and out["skipped"] == 0
 
     listings = client.get("/marketplace/listings").json()
     assert len(listings) >= len(STARTERS)
@@ -36,10 +39,14 @@ def test_seed_populates_the_marketplace(client):
 def test_seed_is_idempotent(client):
     first = client.post("/marketplace/seed").json()
     second = client.post("/marketplace/seed").json()
-    assert first["created"] == len(STARTERS)
-    assert second["created"] == 0 and second["skipped"] == len(STARTERS)
+    assert first["created"] == len(COLLECTION)
+    assert second["created"] == 0 and second["skipped"] == len(COLLECTION)
     listings = client.get("/marketplace/listings").json()
-    assert len(listings) == len(STARTERS)             # no duplicates
+    # No duplicates — and one short of the collection, because browse omits
+    # the rated starter from an unverified viewer entirely. Seeding a rated
+    # profile does not put it in front of anyone the age wall wouldn't stop.
+    assert len(listings) == len(STARTERS)
+    assert not any("Vivienne Sable" in l["title"] for l in listings)
 
 
 def test_starters_are_summonable_by_handle_and_tag(client):
