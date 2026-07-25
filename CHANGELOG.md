@@ -6,6 +6,70 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.8] — 2026-07-25
+
+### Added
+
+- **Two ways into a live room, and they are not the same act.** Watching and
+  commenting is something a viewer does; appearing *on* the stream is something
+  the host lets them do. `POST /desks/{id}/join` now takes `mode`:
+  `audience` joins immediately, while `guest` **only asks** — it returns a
+  pending request rather than a room, because a join that behaved as though the
+  request had been granted would be the worst possible default.
+
+  Coming up needs an **account**, since the host is deciding about a person
+  rather than an anonymous request, and on a rated desk a **verified adult**,
+  because a guest there is someone *going live* on an 18+ stream rather than
+  merely watching one. One hand up at a time, so a host reading the queue sees
+  people instead of repeats; a decision is made once; and a guest can always
+  step back down without asking, because needing permission to *stop* being on
+  camera would be the wrong way round. The queue is owner-only — who asked to
+  appear on someone's stream is theirs to see.
+
+- **`GET /desks/{id}/overlay` — what renders over the video.** Recent comments,
+  likes, shares, gifts and whoever is currently up, defined in one place so
+  every client draws the same layer instead of each inventing its own. A live
+  stream's reactions belong on top of the picture because that is where the
+  viewer is already looking, and on a stream whose entire premise is an empty
+  chair with a bell, the reactions *are* the room. The plate behind each line is
+  transparent so the room stays visible through it; the text on it is not faded,
+  because chat you have to squint at is chat nobody reads.
+
+### Changed
+
+- **The screens show what they had been describing.** The galleries covered
+  every capability through 0.1.5 and then stopped, so live desks, desk beacons,
+  the audience layer, commerce and signatures had no screen at all. Eight new
+  mobile screens (69–76) and three desktop views (07–09) close that, and the
+  desktop sidebar gains **Desks** and **Signing**.
+
+  Three of them carry the **real camera frames** — the photographs that ship as
+  `qrme/assets/desks/*.webp`, embedded as base64 rather than linked, because an
+  SVG rendered through an `<img>` tag cannot fetch external files and a relative
+  path renders as an empty box. The signs in them are the feature: *ring bell
+  for service, away from the desk*, and *be back soon or ring bell*.
+
+- **The starter collection is visible instead of described.** All 34 portraits
+  now appear in the README, in [docs/avatars.md](docs/avatars.md) beneath the
+  briefs that specify them, and as a grid on the Starter Collection screen —
+  which previously said "seeded with faces" and drew icon chips. None of those
+  galleries carries a badge of its own: the AI mark is burned into each
+  portrait's own pixels, so it survives a screenshot, a hotlink or a crop and
+  travels into every page that shows one. That is the property that made
+  burning it in worth doing rather than drawing it at render time.
+
+### Fixed
+
+- **`[0.1.5]` and `[0.1.6]` linked to releases that do not exist.** Both
+  versions were cut — changelog, notes, version bumps — but their `app-v*` tags
+  were never pushed, so those two entries pointed at 404s. They now point at
+  their release-prep commits. Deliberately **not** fixed by backfilling the
+  tags: pushing them now would fire the installer build and publish v0.1.5 and
+  v0.1.6 releases *dated after* v0.1.7, putting superseded installers at the top
+  of the page people download from. [docs/releasing.md](docs/releasing.md)
+  records that reasoning, because an unexplained gap in a tag sequence is
+  exactly what someone later "fixes" without knowing why it was left.
+
 ## [0.1.7] — 2026-07-25
 
 ### Added
@@ -565,7 +629,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.7...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.8...HEAD
+[0.1.8]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.8
 [0.1.7]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.7
 [0.1.6]: https://github.com/davidsbianchi1984/qrme/commit/db6d7c9
 [0.1.5]: https://github.com/davidsbianchi1984/qrme/commit/13338e6
