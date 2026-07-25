@@ -1,0 +1,93 @@
+# Live desks: a real person, and the mark that must not be on them
+
+Everything else in QRME is a synthetic profile, and every render of one carries
+the AI mark. A desk is the opposite case — an actual human offering a service —
+and the important part of the design is what it refuses to do.
+
+## The mark is off, and that is not a relaxation
+
+**A desk never carries the AI watermark.** Stamping "AI" on a real person is
+not a cautious default. It is a false statement about them: it tells a visitor
+that the human they are waiting for does not exist. A mark is a claim, and a
+claim has to be true in both directions or it is worth nothing in either.
+
+`tests/test_desks.py` checks both halves in the same file, on purpose:
+
+| | AI mark |
+|---|---|
+| Synthetic profile | always, and it cannot be designed away |
+| Live desk | never, anywhere on the card or the view |
+
+An unmarked synthetic face is the failure everyone expects. Marking a real
+human is the one nobody checks for, which is exactly why it is pinned next to
+its opposite.
+
+## Absence is not the disclosure
+
+An unmarked card could equally be an AI whose badge got dropped, so a desk
+makes the claim positively — *Live person — not AI* — and shows who vouched for
+it, on what basis, and when.
+
+That claim is **recorded, not proven**. QRME stores an attestation; it does not
+independently verify a human, and saying otherwise would make this badge as
+hollow as an unmarked AI card. The card carries that sentence next to the claim
+rather than in a policy document.
+
+A desk cannot be opened without an attestor and a basis. A "not AI" badge that
+nobody stands behind is worse than no badge, because it would be believed.
+
+**Signing raises it.** An attestation bound with
+`binding_kind="desk_human_attestation"` at the `high` tier
+([docs/signatures.md](signatures.md)) turns "we wrote down who said so" into a
+signature a counterparty can verify without trusting this deployment. The card
+reports `attestation.signed` and the signature id when one exists.
+
+## What a visitor looks at
+
+Not a portrait. We have no photograph of the person and do not go looking for
+one; a desk shows a **camera view of the desk itself**. An empty chair with a
+sign on it says everything a visitor needs to know, and it depicts nobody.
+
+`GET /desks/{id}/view.webp` serves that view. When a desk has no camera
+configured, a sample frame stands in and the card reports `feed.live: false` —
+presenting a still frame as a live feed would be the same class of lie as
+marking a human as AI, so the clients label it **SAMPLE VIEW** rather than
+**● LIVE**.
+
+## The bell
+
+The sign taped to the chair says to ring the bell. A visitor looking at that
+chair through a screen cannot reach it, so the button is on the screen they are
+already looking at — in the iOS, Android and Windows apps.
+
+`POST /desks/{id}/bell` takes no token. The person standing in front of an
+empty chair is exactly the person who has no account, and demanding one at that
+moment would be demanding it at the worst possible moment.
+
+It is rate limited, because a bell anyone can ring from anywhere is a doorbell
+prank waiting to happen:
+
+* an identified caller waits **5 minutes** between rings;
+* an anonymous caller — a stranger from a beacon, with no identity to limit
+  against — is capped **per desk**, at 30 seconds.
+
+A closed desk has no bell at all, and says so rather than accepting a ring
+nobody will hear. An *attended* desk still accepts one: they are here, but
+looking elsewhere, and that is a reason to ring rather than a reason not to.
+
+The owner sees who rang while they were away (`GET /desks/{id}/rings`, their
+token only — who called on a tradesperson is theirs, not a visitor's to browse)
+and clears each one as they answer it.
+
+## Endpoints
+
+```
+POST   /desks                        open a desk (attestation required)
+GET    /desks/{id}                   the card: who, presence, human claim, bell
+GET    /desks/{id}/view.webp         the camera view — no watermark, no-store
+PUT    /desks/{id}/presence          attended | away | closed   (desk token)
+PUT    /desks/{id}/portrait          the owner's own photo, or clear it (token)
+POST   /desks/{id}/bell              ring it — public, rate limited
+GET    /desks/{id}/rings             who rang                   (desk token)
+POST   /desks/{id}/rings/{ring}/ack  mark one answered          (desk token)
+```

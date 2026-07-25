@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.DeskPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="680" Margin="20,12" Spacing="12" Padding="4">
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Look up a desk" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="DeskIdBox" Header="Desk id" PlaceholderText="dsk_…" />
+                    <Button Content="Open" Click="OnOpen"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                </StackPanel>
+            </Border>
+
+            <!-- The view of the desk. No AI watermark: it is a photograph of a
+                 real room belonging to a real person. -->
+            <Grid x:Name="ViewPanel" Visibility="Collapsed">
+                <Border CornerRadius="16" Background="{StaticResource QrmeCardBrush}">
+                    <Image x:Name="DeskImage" Stretch="UniformToFill" Height="360" />
+                </Border>
+                <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12"
+                        CornerRadius="20" Padding="10,4" Background="#99000000">
+                    <TextBlock x:Name="LiveBadge" FontSize="11" FontWeight="Bold" Foreground="White" />
+                </Border>
+            </Grid>
+
+            <Border x:Name="WhoPanel" Visibility="Collapsed"
+                    Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="NameText" FontWeight="Bold" FontSize="20"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="TradeText" FontSize="13"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <!-- The positive claim, in place of the mark a synthetic
+                         profile would carry here. -->
+                    <TextBlock x:Name="DesignationText" FontSize="12" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeGreenBrush}" />
+                    <TextBlock x:Name="PresenceText" FontSize="14"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="FeedNote" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="BellPanel" Visibility="Collapsed"
+                    Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBox x:Name="NoteBox" Header="Anything they should know? (optional)"
+                             PlaceholderText="need a key cut" />
+                    <Button x:Name="RingButton" Content="🔔  Ring the bell" Click="OnRing"
+                            HorizontalAlignment="Stretch" Padding="0,12"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <TextBlock x:Name="RingResult" FontSize="12" TextWrapping="Wrap"
+                               Visibility="Collapsed" Foreground="{StaticResource QrmeGreenBrush}" />
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="AttestPanel" Visibility="Collapsed"
+                    Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="4">
+                    <TextBlock x:Name="AttestorText" FontSize="12" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="BasisText" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="AttestNote" FontSize="10" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="ErrorText" FontSize="12" Visibility="Collapsed"
+                       TextWrapping="Wrap" Foreground="{StaticResource QrmeRedBrush}" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

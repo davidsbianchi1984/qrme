@@ -22,10 +22,10 @@ from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (apps, assistant, avatars, community, connections,
-                      earnings, feedback, gaming, governance, intelligence,
-                      interaction, licensing, models, packs, profiles,
-                      research, robots, signatures, social, steering, summon,
-                      watch, watermarks)
+                      desks, earnings, feedback, gaming, governance,
+                      intelligence, interaction, licensing, models, packs,
+                      profiles, research, robots, signatures, social, steering,
+                      summon, watch, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -113,6 +113,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(models.router)
     app.include_router(robots.router)
     app.include_router(signatures.router)
+    app.include_router(desks.router)
 
     # Optional CORS for a packaged desktop/mobile front-end that calls the API
     # from a different origin (e.g. the Electron app in app/). Off by default;

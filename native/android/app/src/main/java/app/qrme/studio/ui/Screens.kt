@@ -60,7 +60,7 @@ import app.qrme.studio.SigningCredential
 import kotlinx.coroutines.launch
 
 @Composable
-private fun screenScroll(content: @Composable ColumnScope.() -> Unit) =
+internal fun screenScroll(content: @Composable ColumnScope.() -> Unit) =
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -83,7 +83,7 @@ private fun BrandButton(text: String, enabled: Boolean = true, busy: Boolean = f
 }
 
 @Composable
-private fun labeledField(label: String, value: String, placeholder: String, onChange: (String) -> Unit) {
+internal fun labeledField(label: String, value: String, placeholder: String, onChange: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label, color = Qrme.T2, fontSize = 12.sp)
         OutlinedTextField(
@@ -1421,7 +1421,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Desk").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1435,7 +1435,8 @@ fun ManageScreen(vm: StudioViewModel) {
                 4 -> GamingPanel(vm)
                 5 -> LicensePanel(vm)
                 6 -> EarningsPanel(vm)
-                else -> SignaturePanel(vm)
+                7 -> SignaturePanel(vm)
+                else -> DeskPanel(vm)
             }
         }
     }
@@ -2201,5 +2202,35 @@ private fun SignaturePanel(vm: StudioViewModel) {
             + "server. See docs/signatures.md.",
             color = Qrme.T3, fontSize = 11.sp)
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+    }
+}
+
+
+// ---- A live desk: the person behind the counter, and the bell ----
+
+/**
+ * Look up a desk by id and hand off to [DeskScreen]. A visitor normally
+ * arrives from a beacon rather than by typing an id; this is the way in until
+ * desk beacons are placed.
+ */
+@Composable
+private fun DeskPanel(vm: StudioViewModel) {
+    var deskId by remember { mutableStateOf("") }
+    var open by remember { mutableStateOf(false) }
+
+    if (open && deskId.isNotBlank()) {
+        DeskScreen(deskId = deskId.trim(), callerId = vm.interactorId)
+        return
+    }
+    screenScroll {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Open a desk", color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text("A desk is a real person, not a synthetic profile — so nothing "
+                + "there carries the AI mark. If they are away from the desk, "
+                + "you can ring the bell.", color = Qrme.T2, fontSize = 12.sp)
+            labeledField("Desk id", deskId, "dsk_…") { deskId = it }
+            SmallAction("Open") { if (deskId.isNotBlank()) open = true }
+        }
     }
 }

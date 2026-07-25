@@ -4,7 +4,7 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign" }
+    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign", desk = "Desk" }
     @State private var tab: Tab = .general
 
     var body: some View {
@@ -24,6 +24,7 @@ struct ManageView: View {
             case .license: LicenseSection()
             case .earnings: EarningsSection()
             case .signatures: SignatureSection()
+            case .desk: DeskSection()
             }
         }
     }
@@ -597,6 +598,41 @@ private struct SignatureSection: View {
                     .multilineTextAlignment(.center)
             }
             .padding(24)
+        }
+    }
+}
+
+
+// MARK: A live desk — the person behind the counter, and the bell
+
+/// Look up a desk by id and hand off to `DeskView`. A visitor normally arrives
+/// from a beacon rather than by typing an id; this is the way in until desk
+/// beacons are placed.
+private struct DeskSection: View {
+    @EnvironmentObject private var state: AppState
+    @State private var deskId = ""
+    @State private var open = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Open a desk") {
+                    TextField("dsk_…", text: $deskId)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                    Button("Open") { open = true }
+                        .disabled(deskId.isEmpty)
+                }
+                Section {
+                    Text("A desk is a real person, not a synthetic profile — "
+                         + "so nothing here carries the AI mark. If they are "
+                         + "away from the desk, you can ring the bell.")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }
+            }
+            .navigationDestination(isPresented: $open) {
+                DeskView(deskId: deskId, callerId: state.interactorId)
+            }
         }
     }
 }

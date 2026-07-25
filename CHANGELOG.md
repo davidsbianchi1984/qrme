@@ -20,6 +20,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a shared style whose text disagrees with the assets cannot do the one job it
   exists for; the rated portrait carries its own `RATED_STYLE`, since it is
   age-walled off every surface the others appear on.
+- **Live desks** (`qrme/desks.py`, `/desks/*`, [docs/desks.md](docs/desks.md))
+  — a real person offering a service, behind the same surfaces as a synthetic
+  profile and with the one difference that matters: **a desk never carries the
+  AI watermark.** Marking a real human is not a cautious default, it is a false
+  statement about them, and the test suite pins both directions of that rule in
+  one file so neither can be relaxed quietly. Absence of a mark would be
+  ambiguous on its own, so the claim is positive — *Live person — not AI* —
+  with the attestor, the basis, and the word **recorded** rather than *proven*
+  shipped next to it; a desk cannot be opened without saying who vouches, and a
+  `high`-tier signature bound to the desk raises the claim to something a
+  counterparty can check. What a visitor looks at is a camera view of the desk
+  rather than a portrait, since we have no photograph of the person and do not
+  go looking for one; with no camera configured the card reports
+  `feed.live: false` and the clients say **SAMPLE VIEW**, because presenting a
+  still frame as live would be the same class of lie. And the sign on the chair
+  says to ring the bell, so **iOS, Android and Windows all carry the button** —
+  no token, because the person in front of an empty chair is exactly the one
+  without an account, and rate limited, because a bell anyone can ring from
+  anywhere is a doorbell prank waiting to happen.
 - **The AI mark is burned into every shipped portrait.** The disclosure
   already rode alongside a portrait — `GET /profiles/{id}/avatar` returns it,
   and the beacon page and both camera overlays composite it — which covers

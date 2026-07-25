@@ -57,6 +57,20 @@ data class RoomMsg(val id: String, val senderKind: String, val from: String,
 data class Beacon(val id: String, val label: String, val location: String?,
                   val scans: Int, val active: Boolean)
 data class BeaconPlaced(val id: String, val label: String, val qrSvg: String)
+// Live desks — a real person, so never an AI watermark.
+data class DeskFeed(val url: String, val live: Boolean, val note: String)
+data class DeskAttestation(val attestor: String, val basis: String,
+                           val signed: Boolean, val note: String)
+data class DeskCard(val deskId: String, val displayName: String,
+                    val trade: String, val location: String?,
+                    val blurb: String?, val presence: String,
+                    val human: Boolean, val ai: Boolean,
+                    val designation: String, val attestation: DeskAttestation,
+                    val portrait: String?, val feed: DeskFeed,
+                    val bellAvailable: Boolean, val waiting: Int)
+data class RingReceipt(val ringId: String, val waiting: Int,
+                       val presence: String, val note: String)
+
 // Signatures (docs/signatures.md).
 data class EnrollOptions(val challenge: String, val rpId: String,
                          val rpName: String, val userId: String,
@@ -568,6 +582,42 @@ object ApiClient {
             !o.isNull("shared_room"),
             if (o.isNull("open_url")) null else o.optString("open_url", null),
             o.optBoolean("age_wall", false))
+    }
+
+    // ---- live desks ----
+
+    suspend fun desk(id: String): DeskCard {
+        val o = JSONObject(request("/desks/$id"))
+        val f = o.getJSONObject("feed")
+        val a = o.getJSONObject("attestation")
+        val bell = o.getJSONObject("bell")
+        return DeskCard(
+            o.getString("desk_id"), o.getString("display_name"),
+            o.optString("trade", ""),
+            if (o.isNull("location")) null else o.optString("location"),
+            if (o.isNull("blurb")) null else o.optString("blurb"),
+            o.getString("presence"), o.optBoolean("human"),
+            o.optBoolean("ai"), o.optString("designation", ""),
+            DeskAttestation(a.optString("attestor", ""), a.optString("basis", ""),
+                a.optBoolean("signed"), a.optString("note", "")),
+            if (o.isNull("portrait")) null else o.optString("portrait"),
+            DeskFeed(f.getString("url"), f.optBoolean("live"),
+                f.optString("note", "")),
+            bell.optBoolean("available"), bell.optInt("waiting"))
+    }
+
+    /**
+     * Ring the bell at an unattended desk. No token: the visitor standing in
+     * front of an empty chair is exactly the person who has no account.
+     */
+    suspend fun ringBell(deskId: String, callerId: String? = null,
+                         note: String? = null): RingReceipt {
+        val body = JSONObject()
+        if (callerId != null) body.put("caller_id", callerId)
+        if (note != null) body.put("note", note)
+        val o = JSONObject(request("/desks/$deskId/bell", "POST", body))
+        return RingReceipt(o.getString("ring_id"), o.optInt("waiting"),
+            o.optString("presence", ""), o.optString("note", ""))
     }
 
     // ---- signatures ----

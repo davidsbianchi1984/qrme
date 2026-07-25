@@ -737,6 +737,40 @@ CREATE TABLE IF NOT EXISTS robot_commands (
     created_at TEXT NOT NULL
 );
 
+-- A live desk: a real person offering services, not a synthetic profile.
+-- Kept in its own table rather than as a profile flag, because everything
+-- that touches `profiles` attaches the AI watermark, and a human must never
+-- pick it up by inheriting machinery built for synthetic renders.
+CREATE TABLE IF NOT EXISTS desks (
+    id                TEXT PRIMARY KEY,
+    owner_id          TEXT NOT NULL,
+    display_name      TEXT NOT NULL,
+    trade             TEXT NOT NULL,
+    location          TEXT,
+    blurb             TEXT,
+    presence          TEXT NOT NULL DEFAULT 'away',  -- attended | away | closed
+    portrait          TEXT,            -- only ever set by the desk's owner
+    camera_url        TEXT,            -- the desk's own camera, when it has one;
+                                       -- NULL means the sample frame is served
+                                       -- and the card says live:false
+    attestor          TEXT NOT NULL,   -- who vouches a real person staffs this
+    attestation_basis TEXT NOT NULL,
+    attested_at       TEXT NOT NULL,
+    created_at        TEXT NOT NULL,
+    last_seen         TEXT NOT NULL
+);
+
+-- Ring the bell at an unattended desk. caller_id is NULL for a stranger who
+-- arrived from a beacon and has no identity to rate-limit against.
+CREATE TABLE IF NOT EXISTS desk_rings (
+    id        TEXT PRIMARY KEY,
+    desk_id   TEXT NOT NULL REFERENCES desks(id),
+    caller_id TEXT,
+    note      TEXT,
+    rung_at   TEXT NOT NULL,
+    acked_at  TEXT
+);
+
 -- A signing credential is a WebAuthn/passkey public key bound to an account
 -- whose identity was proofed at enrollment. The proofing level is stored
 -- here, not inferred, because it decides what this credential may sign.

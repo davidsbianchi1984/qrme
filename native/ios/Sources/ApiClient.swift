@@ -28,6 +28,46 @@ struct Post: Decodable {
 
 struct Health: Decodable { let status: String }
 
+// MARK: Live desks — a real person, so never an AI watermark
+
+struct DeskFeed: Decodable {
+    let url: String
+    let live: Bool
+    let note: String
+}
+
+struct DeskAttestation: Decodable {
+    let attestor: String
+    let basis: String
+    let signed: Bool
+    let note: String
+}
+
+struct DeskBell: Decodable { let available: Bool; let waiting: Int }
+
+struct DeskCard: Decodable {
+    let desk_id: String
+    let display_name: String
+    let trade: String
+    let location: String?
+    let blurb: String?
+    let presence: String
+    let human: Bool
+    let ai: Bool
+    let designation: String
+    let attestation: DeskAttestation
+    let portrait: String?
+    let feed: DeskFeed
+    let bell: DeskBell
+}
+
+struct RingReceipt: Decodable {
+    let ring_id: String
+    let waiting: Int
+    let presence: String
+    let note: String
+}
+
 // MARK: Signatures
 
 struct SignaturePolicy: Decodable {
@@ -982,6 +1022,23 @@ actor ApiClient {
         struct Ok: Decodable {}
         let _: Ok = try await request("/excursions/\(cid)/learn",
                                       method: "POST", token: token)
+    }
+
+    // MARK: Live desks
+
+    func desk(_ id: String) async throws -> DeskCard {
+        try await request("/desks/\(id)")
+    }
+
+    /// Ring the bell at an unattended desk. No token: the visitor standing in
+    /// front of an empty chair is exactly the person who has no account.
+    func ringBell(deskId: String, callerId: String? = nil,
+                  note: String? = nil) async throws -> RingReceipt {
+        var body: [String: Any] = [:]
+        if let callerId { body["caller_id"] = callerId }
+        if let note { body["note"] = note }
+        return try await request("/desks/\(deskId)/bell", method: "POST",
+                                 body: body)
     }
 
     // MARK: Signatures (docs/signatures.md)
