@@ -39,6 +39,12 @@ targets:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        # Required before AVCaptureSession may run: iOS terminates the app
+        # outright if a camera is opened without this string.
+        NSCameraUsageDescription: >-
+          QRME reads beacon QR codes so a profile can appear on the sticker
+          in front of you. Frames stay on the device; only the code's id is
+          sent.
         # Allow http://127.0.0.1:8000 in the Simulator (local dev backend).
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
