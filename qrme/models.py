@@ -254,6 +254,12 @@ class HandleSet(BaseModel):
 class BeaconCreate(BaseModel):
     label: str                         # e.g. "Rosa's garden bench"
     location: str | None = None        # free-text place description
+    # "chat" (default): each scan opens that person's own conversation.
+    # "room": every scan joins one shared room, so the people who found the
+    # same sticker are talking to the profile together — a workshop, a
+    # meeting, a class. Left running until the beacon is picked up.
+    mode: Literal["chat", "room"] = "chat"
+    topic: str | None = None           # room mode: what the gathering is about
 
 
 class EmbodimentAdd(BaseModel):

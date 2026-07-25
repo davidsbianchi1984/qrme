@@ -160,3 +160,71 @@ def test_the_page_escapes_what_the_owner_typed(client):
     assert "<script>alert(1)</script>" not in r.text
     assert "&lt;script&gt;" in r.text
     assert "<b>x</b>" not in r.text
+
+
+# -- shared mode: one sticker, one conversation ----------------------------
+
+def test_a_room_beacon_puts_everyone_in_the_same_conversation(client):
+    """A sticker at a meeting, a class, a workshop: the people who found the
+    same code should be talking to the profile together, not each in their
+    own private thread."""
+    pid, _ = _profile(client)
+    b = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "Tuesday 7pm, church basement",
+                          "mode": "room", "topic": "open share"}).json()
+    assert b["mode"] == "room"
+    assert b["room_id"]
+
+    r = client.get(f"/b/{b['id']}")
+    assert "Join the conversation" in r.text
+    assert b["room_id"] in r.text
+    assert "you may not be the only one here" in r.text
+    # Not the private 1:1 path.
+    assert "Talk to Marcus" not in r.text
+
+
+def test_the_profile_is_already_in_the_room(client):
+    """Nobody should scan a sticker and arrive somewhere empty."""
+    pid, _ = _profile(client)
+    b = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "studio wall", "mode": "room"}).json()
+    seats = db.connect().execute(
+        "SELECT kind, ref_id FROM room_participants WHERE room_id=?",
+        (b["room_id"],)).fetchall()
+    assert [(s["kind"], s["ref_id"]) for s in seats] == [("profile", pid)]
+
+
+def test_chat_stays_the_default(client):
+    """Placing a beacon without asking for a room keeps the private
+    conversation every existing beacon has."""
+    pid, _ = _profile(client)
+    b = client.post(f"/profiles/{pid}/beacons", json={"label": "bench"}).json()
+    assert b["mode"] == "chat" and b["room_id"] is None
+    assert "Talk to Marcus" in client.get(f"/b/{b['id']}").text
+
+
+def test_the_room_topic_falls_back_to_the_label(client):
+    pid, _ = _profile(client)
+    b = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "front counter", "mode": "room"}).json()
+    topic = db.connect().execute("SELECT topic FROM rooms WHERE id=?",
+                                 (b["room_id"],)).fetchone()["topic"]
+    assert topic == "front counter"
+
+
+def test_a_rated_room_beacon_still_walls(client):
+    """Shared mode does not open a side door around the age gate."""
+    pid, _ = _profile(client, adult_mode=True)
+    b = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "backstage", "mode": "room"}).json()
+    r = client.get(f"/b/{b['id']}")
+    assert "18+ only" in r.text
+    assert b["room_id"] not in r.text
+
+
+def test_the_call_to_action_survives_an_honorific(client):
+    """"Talk to Dr." is what the naive first-word split produced."""
+    pid, _ = _profile(client, display_name="Dr. Sana Iqbal")
+    r = client.get(f"/b/{_beacon(client, pid)['id']}")
+    assert "Talk to Sana" in r.text
+    assert "Talk to Dr." not in r.text

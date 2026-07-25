@@ -77,6 +77,22 @@ def _page(title: str, body: str) -> str:
         f'<body><main class="card">{body}</main></body></html>')
 
 
+# Honorifics that are not what anyone calls a person. Without this the
+# call to action on "Dr. Sana Iqbal" reads "Talk to Dr."
+_HONORIFICS = {"dr", "dr.", "mr", "mr.", "ms", "ms.", "mrs", "mrs.",
+               "prof", "prof.", "chef", "coach", "cmdr", "cmdr.", "capt",
+               "capt.", "rev", "rev.", "sgt", "sgt."}
+
+
+def first_name(display_name: str) -> str:
+    """What to call them on a button. Falls back to the whole name rather
+    than to something wrong."""
+    for part in display_name.split():
+        if part.lower().strip(".,") not in {h.strip(".") for h in _HONORIFICS}:
+            return part
+    return display_name
+
+
 def _initials(name: str) -> str:
     parts = [p for p in name.replace(".", " ").split() if p]
     return "".join(p[0] for p in parts[:2]).upper() or "?"
@@ -105,11 +121,14 @@ def age_wall() -> str:
         The age check happens here, not at whoever placed this code.</p>""")
 
 
-def profile_page(profile: dict, base: str, label: str | None = None) -> str:
+def profile_page(profile: dict, base: str, label: str | None = None,
+                 room_id: str | None = None) -> str:
     """The reveal: portrait, name, and one way in.
 
     ``base`` is the public origin, so the call to action works from a phone
-    that has never heard of this deployment.
+    that has never heard of this deployment. ``room_id`` switches the way in
+    from a private conversation to the shared room everyone scanning this
+    code joins — a class, a workshop, a meeting.
     """
     pid = profile["id"]
     art = avatars.render(pid)
@@ -131,13 +150,25 @@ def profile_page(profile: dict, base: str, label: str | None = None) -> str:
     where = (f'<p class="sub">left at {html.escape(label)}</p>'
              if label else "")
 
+    if room_id:
+        # Shared mode: everyone who scans this code lands in one conversation
+        # together, rather than each in a private thread with the profile.
+        cta = (f'<a class="cta" href="{html.escape(base)}/app/#/rooms/'
+               f'{html.escape(room_id)}">Join the conversation</a>')
+        footnote = ("Everyone who scans this code joins the same room, so "
+                    "you may not be the only one here.")
+    else:
+        cta = (f'<a class="cta" href="{html.escape(base)}/app/#/summon?'
+               f'ref={html.escape(pid)}">Talk to '
+               f'{html.escape(first_name(name))}</a>')
+        footnote = "Someone left this code here on purpose."
+
     return _page(f"{name} · QRME", f"""
       <div class="frame">{portrait}
         <div class="mark">{html.escape(watermark)}</div></div>
       <h1>{html.escape(name)}</h1>
       {where}
       {blurb_html}
-      <a class="cta" href="{html.escape(base)}/app/#/summon?ref={html.escape(pid)}">
-        Talk to {html.escape(name.split()[0])}</a>
+      {cta}
       <p class="foot">{html.escape(art["watermark"]["disclosure"])}.<br>
-        Someone left this code here on purpose.</p>""")
+        {footnote}</p>""")

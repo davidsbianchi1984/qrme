@@ -106,10 +106,24 @@ def place_beacon(profile_id: str, body: BeaconCreate) -> dict:
     profile_or_404(profile_id)
     conn = db.connect()
     beacon_id = db.new_id("bcn")
+    room_id = None
+    if body.mode == "room":
+        # One room, minted with the profile in it, that every scanner joins.
+        # The people who found the same sticker end up talking to the profile
+        # together rather than each in their own private thread.
+        room_id = db.new_id("room")
+        conn.execute(
+            "INSERT INTO rooms (id, topic, channel, status, created_at)"
+            " VALUES (?,?,'chat','active',?)",
+            (room_id, body.topic or body.label, db.utcnow()))
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?, 'profile', ?)", (room_id, profile_id))
     conn.execute(
-        "INSERT INTO beacons (id, profile_id, label, location, scans, active,"
-        " created_at) VALUES (?,?,?,?,0,1,?)",
-        (beacon_id, profile_id, body.label, body.location, db.utcnow()),
+        "INSERT INTO beacons (id, profile_id, label, location, room_id, scans, active,"
+        " created_at) VALUES (?,?,?,?,?,0,1,?)",
+        (beacon_id, profile_id, body.label, body.location, room_id,
+         db.utcnow()),
     )
     conn.commit()
     return {
@@ -119,6 +133,8 @@ def place_beacon(profile_id: str, body: BeaconCreate) -> dict:
         # printed QR encodes — sharing or printing that one is the point.
         "summon_url": f"{_public_base()}/summon?ref={beacon_id}",
         "scan_url": f"{_public_base()}/b/{beacon_id}",
+        "mode": body.mode,
+        "room_id": room_id,
         "qr_svg": f"/beacons/{beacon_id}/qr.svg",
     }
 
@@ -201,7 +217,7 @@ def scan_beacon(beacon_id: str, request: Request) -> HTMLResponse:
         return HTMLResponse(landing.gone("profile"), status_code=410)
 
     return HTMLResponse(landing.profile_page(
-        profile, _public_base(), beacon["label"]))
+        profile, _public_base(), beacon["label"], beacon["room_id"]))
 
 
 # -- the summon endpoint -----------------------------------------------------
@@ -289,6 +305,9 @@ def place_rated(profile_id: str, body: RatedPlacementCreate,
             422, "only adult-mode profiles are placed at adult venues")
     conn = db.connect()
     beacon_id = db.new_id("bcn")
+    # Rated placements stay one-to-one. A shared room behind an 18+ QR at a
+    # public venue is a different product with different moderation
+    # questions, and is not something to acquire by accident.
     label = body.label or f"{venue['name']} placement"
     conn.execute(
         "INSERT INTO beacons (id, profile_id, label, location, scans,"

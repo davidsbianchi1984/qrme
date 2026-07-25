@@ -206,6 +206,9 @@ CREATE TABLE IF NOT EXISTS beacons (
     location   TEXT,               -- free-text place
     scans      INTEGER NOT NULL DEFAULT 0,
     active     INTEGER NOT NULL DEFAULT 1,
+    room_id    TEXT REFERENCES rooms(id),  -- set = everyone who scans this
+                                           -- code joins one shared room
+                                           -- instead of a private 1:1 chat
     created_at TEXT NOT NULL
 );
 
