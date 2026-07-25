@@ -355,6 +355,107 @@ def feed(desk_id: str) -> dict:
     }
 
 
+# --- beacons: leave the desk behind ---------------------------------------
+#
+# A profile beacon and a desk beacon are the same gesture pointed at opposite
+# things. Scanning a profile beacon reveals somebody who does not exist, and
+# the page says so in the watermark. Scanning a desk beacon reveals somebody
+# who does — who is simply not at the desk this minute — and the page must not
+# say otherwise. The bell is what makes the second one worth printing: the
+# sticker is on the door precisely because nobody is behind it right now.
+#
+# The scanner is a stranger with no account, which decides two things that are
+# not details:
+#
+# * The bell they ring is an **anonymous** ring, so it takes the per-desk
+#   cooldown rather than the per-caller one. A printed code is reachable by
+#   anyone walking past, and that is the whole threat model.
+# * A rated desk shows them the age wall, always. There is no token on a
+#   sticker scan, so there is nothing that could clear it — which is the
+#   correct outcome, not a limitation to work around.
+
+def place_beacon(desk_id: str, label: str,
+                 location: str | None = None) -> dict:
+    """Print this desk onto something. Returns the token the QR encodes."""
+    row = _row(desk_id)
+    if row is None:
+        raise DeskError("no such desk")
+    if not label.strip():
+        raise DeskError(
+            "a beacon needs a label so its owner can tell their codes apart "
+            "once several are printed and stuck to different doors")
+
+    beacon_id = db.new_id("dbn")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO desk_beacons (id, desk_id, label, location, scans,"
+        " active, created_at) VALUES (?,?,?,?,0,1,?)",
+        (beacon_id, desk_id, label.strip(), location, db.utcnow()))
+    conn.commit()
+    return beacon(beacon_id)
+
+
+def beacon(beacon_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM desk_beacons WHERE id=?", (beacon_id,)).fetchone()
+    if row is None:
+        return None
+    return {
+        "id": row["id"],
+        "desk_id": row["desk_id"],
+        "label": row["label"],
+        "location": row["location"],
+        "scans": row["scans"],
+        "active": bool(row["active"]),
+        "created_at": row["created_at"],
+        "scan_url": f"/d/{row['id']}",
+        "qr_svg": f"/desk-beacons/{row['id']}/qr.svg",
+    }
+
+
+def beacons_for(desk_id: str) -> list[dict]:
+    rows = db.connect().execute(
+        "SELECT id FROM desk_beacons WHERE desk_id=?"
+        " ORDER BY created_at, rowid", (desk_id,)).fetchall()
+    return [beacon(r["id"]) for r in rows]
+
+
+def pick_up_beacon(beacon_id: str) -> dict:
+    """Peel the sticker off. The code stops resolving; the desk is untouched."""
+    conn = db.connect()
+    if not conn.execute("UPDATE desk_beacons SET active=0 WHERE id=?",
+                        (beacon_id,)).rowcount:
+        raise DeskError("no such desk beacon")
+    conn.commit()
+    return {"id": beacon_id, "active": False}
+
+
+def scan(beacon_id: str, viewer_adult: bool = False) -> dict | None:
+    """Resolve a scanned code to its desk, counting the scan.
+
+    Returns ``None`` for a code that never existed or has been picked up — the
+    caller turns that into the same "nothing here any more" page a stale
+    profile beacon gets, because a stranger holding a phone at a dead sticker
+    should not be able to tell the difference between the two.
+    """
+    row = db.connect().execute(
+        "SELECT * FROM desk_beacons WHERE id=?", (beacon_id,)).fetchone()
+    if row is None or not row["active"]:
+        return None
+    conn = db.connect()
+    conn.execute("UPDATE desk_beacons SET scans = scans + 1 WHERE id=?",
+                 (beacon_id,))
+    conn.commit()
+
+    desk = card(row["desk_id"], viewer_adult=viewer_adult)
+    if desk is None:              # desk deleted out from under a live sticker
+        return None
+    return desk | {
+        "beacon": {"id": row["id"], "label": row["label"],
+                   "location": row["location"]},
+    }
+
+
 def join(desk_id: str) -> dict:
     """Join the live stream. Mints the room on first arrival.
 

@@ -8,6 +8,52 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A live desk can be left behind as a printed code.** A profile beacon and a
+  desk beacon are the same gesture aimed at opposite things: scanning the first
+  reveals somebody who does not exist, and the page marks the portrait *AI*;
+  scanning the second reveals somebody who does, and the page must not say
+  otherwise. `POST /desks/{id}/beacons` prints one, `GET /d/{id}` is what a
+  phone's camera app opens, and `GET /d/{id}/card` is the same scan as JSON for
+  the native overlays. The sticker on the shop door is arguably the more
+  natural of the two — it is there *because* nobody is behind the desk right
+  now, which is exactly what the bell was built for, and the scan page carries
+  a working one.
+
+  The badge is inverted and deliberately unlike the AI mark at a glance —
+  **Live person — not AI**, green and top-right against the mark's neutral
+  bottom-left — because absence of the AI mark is not a disclosure on its own:
+  an unmarked card could be a synthetic profile whose badge got dropped. The
+  page states the claim positively and names who vouched for it.
+
+  Two consequences of the scanner being a stranger with no account, neither of
+  them a gap: their ring is **anonymous**, so it takes the 30-second per-desk
+  cooldown rather than the 5-minute per-caller one, because a printed code is
+  reachable by anyone walking past; and a **rated desk always shows them the
+  age wall**, since there is no token on a sticker scan that could clear it.
+  That wall withholds the name and, above all, the location — whereabouts on an
+  adult listing is a safety matter and a sticker is by definition somewhere
+  physical. Placing a beacon is owner-only, because anyone who could print a
+  code for a desk they do not hold could put a stranger's name and whereabouts
+  on a sticker and put it anywhere.
+
+  Stored in its own `desk_beacons` table rather than as a nullable `desk_id` on
+  `beacons`: that column is `NOT NULL` on every database already out there, and
+  the schema is applied with `CREATE TABLE IF NOT EXISTS`, so widening an
+  existing table would only ever take effect on a fresh one.
+
+### Changed
+
+- **The three products are now cut as one release** — documented in
+  [docs/releasing.md](docs/releasing.md), and in JIM-mini's and PDI's copies of
+  the same file. Same number, same pass, even when a repository has nothing of
+  its own to ship that round; an empty round says so in those words rather than
+  being padded. Through v0.1.5 each repository cut whenever it happened to have
+  work, so the numbers matched only by coincidence — which is how QRME reached
+  0.1.6 alone. The doc also writes down the trap that follows: tag the
+  release-prep commit rather than the tip of `main`, because work keeps landing
+  while a release is cut and anything arriving after the changelog is sectioned
+  belongs to `[Unreleased]`, not to the version being tagged.
+
 - **Windows signs now, through the browser engine rather than interop.** The
   blocker was `webauthn.dll`: several hundred lines of version-sensitive struct
   marshalling that a compile cannot meaningfully check and nothing here can

@@ -373,3 +373,163 @@ def test_only_the_desk_can_turn_its_own_camera_on(client):
     created = _desk(client).json()
     assert client.put(f"/desks/{created['desk_id']}/camera",
                       json={"url": "https://cam.example/x"}).status_code == 401
+
+
+# --- beacons: the desk as a printed code ---------------------------------
+#
+# A profile beacon and a desk beacon are the same gesture aimed at opposite
+# things, so these tests mostly check that the differences survived: no AI
+# mark, a positive human claim, a reachable bell, and an age wall that a
+# tokenless scan can never get past.
+
+def _beacon(client, created, **over):
+    body = {"label": "shop door", "location": "Mill Yard"}
+    body.update(over)
+    return client.post(f"/desks/{created['desk_id']}/beacons",
+                       json=body, headers=_token(created))
+
+
+def test_a_desk_can_be_left_behind_as_a_printed_code(client):
+    created = _desk(client).json()
+    placed = _beacon(client, created)
+    assert placed.status_code == 201
+    body = placed.json()
+    assert body["desk_id"] == created["desk_id"]
+    assert body["active"] is True and body["scans"] == 0
+    assert body["scan_url"] == f"/d/{body['id']}"
+    assert client.get(body["qr_svg"]).headers["content-type"] == "image/svg+xml"
+
+
+def test_only_the_desks_owner_can_print_it(client):
+    """Anyone who could place a beacon for a desk they do not hold could put a
+    stranger's name and whereabouts on a code and stick it anywhere."""
+    created = _desk(client).json()
+    assert client.post(f"/desks/{created['desk_id']}/beacons",
+                       json={"label": "door"}).status_code == 401
+    other = _desk(client, owner_id="o2").json()
+    assert client.post(f"/desks/{created['desk_id']}/beacons",
+                       json={"label": "door"},
+                       headers=_token(other)).status_code == 403
+
+
+def test_scanning_the_code_shows_a_person_not_an_ai(client):
+    """The whole point. The profile landing page marks the portrait AI; this
+    one must make the opposite claim, and must not look like the same badge."""
+    created = _desk(client).json()
+    placed = _beacon(client, created).json()
+
+    page = client.get(f"/d/{placed['id']}")
+    assert page.status_code == 200
+    assert 'class="mark"' not in page.text      # the AI badge, never here
+    assert 'class="human"' in page.text
+    assert desks.DESIGNATION in page.text
+    # Who vouched is on the page, not in a policy document elsewhere.
+    assert "met in person, saw the trade licence" in page.text
+
+
+def test_the_scanned_card_says_person_in_json_too(client):
+    """Native clients draw their overlay from this, not from the HTML."""
+    created = _desk(client).json()
+    placed = _beacon(client, created).json()
+
+    card = client.get(f"/d/{placed['id']}/card").json()
+    assert card["ai"] is False and card["human"] is True
+    assert card["designation"] == desks.DESIGNATION
+    assert card["beacon"]["label"] == "shop door"
+    assert card["feed"]["watermark"] is None
+
+
+def test_a_stranger_can_reach_the_bell_from_the_sticker(client):
+    """The sticker is on the door precisely because nobody is behind it."""
+    created = _desk(client).json()
+    placed = _beacon(client, created).json()
+    page = client.get(f"/d/{placed['id']}").text
+    assert 'id="bell"' in page
+    # The page must post to this desk's bell, relatively — an absolute public
+    # base would ring a bell on another host when scanned over a LAN.
+    assert f'"/desks/{created["desk_id"]}/bell"' in page
+
+    rung = client.post(f"/desks/{created['desk_id']}/bell", json={})
+    assert rung.status_code == 201
+    assert rung.json()["waiting"] == 1
+
+
+def test_a_closed_desk_offers_no_bell_on_the_page(client):
+    created = _desk(client).json()
+    client.put(f"/desks/{created['desk_id']}/presence",
+               json={"presence": "closed"}, headers=_token(created))
+    placed = _beacon(client, created).json()
+    page = client.get(f"/d/{placed['id']}").text
+    assert 'id="bell"' not in page
+    assert "bell is off" in page
+
+
+def test_scans_are_counted(client):
+    created = _desk(client).json()
+    placed = _beacon(client, created).json()
+    client.get(f"/d/{placed['id']}")
+    client.get(f"/d/{placed['id']}/card")
+
+    listed = client.get(f"/desks/{created['desk_id']}/beacons",
+                        headers=_token(created)).json()["beacons"]
+    assert listed[0]["scans"] == 2
+
+
+def test_a_picked_up_code_stops_resolving(client):
+    """A stale sticker on a wall outlives the desk it advertised."""
+    created = _desk(client).json()
+    placed = _beacon(client, created).json()
+    assert client.delete(f"/desk-beacons/{placed['id']}",
+                         headers=_token(created)).status_code == 200
+
+    page = client.get(f"/d/{placed['id']}")
+    assert page.status_code == 404
+    assert "Nothing here" in page.text
+    assert client.get(f"/d/{placed['id']}/card").status_code == 404
+
+
+def test_a_rated_desks_code_always_hits_the_age_wall(client):
+    """Every sticker scan is tokenless, so there is nothing that could clear
+    this gate — which is the correct outcome, not a limitation."""
+    created = _desk(client, owner_id="perf", attestor="perf",
+                    display_name="Vivienne Marlowe", rated=True,
+                    location="Studio 9, Kings Road").json()
+    placed = _beacon(client, created, label="stage door").json()
+
+    page = client.get(f"/d/{placed['id']}")
+    assert "18+ only" in page.text
+    assert "Vivienne" not in page.text
+    # Whereabouts on an adult listing is a safety matter, and a sticker is by
+    # definition somewhere physical.
+    assert "Kings Road" not in page.text
+
+    card = client.get(f"/d/{placed['id']}/card").json()
+    assert card["age_wall"] is True
+    assert "location" not in card and "display_name" not in card
+
+
+def test_the_bell_script_is_valid_javascript(client):
+    """The %-formatting that injects the endpoint is one stray literal % away
+    from producing a page whose only interactive element silently dies."""
+    import re
+    import shutil
+    import subprocess
+
+    created = _desk(client).json()
+    placed = _beacon(client, created).json()
+    script = re.search(r"<script>(.*?)</script>",
+                       client.get(f"/d/{placed['id']}").text, re.S).group(1)
+    node = shutil.which("node")
+    if node is None:                       # pragma: no cover - CI has node
+        import pytest
+        pytest.skip("node not available to syntax-check the bell script")
+    proc = subprocess.run([node, "--check", "-"], input=script,
+                          capture_output=True, text=True)
+    assert proc.returncode == 0, proc.stderr
+
+
+def test_a_beacon_needs_a_label_and_a_real_desk(client):
+    created = _desk(client).json()
+    assert _beacon(client, created, label="  ").status_code == 422
+    assert client.post("/desks/dsk_nope/beacons", json={"label": "x"},
+                       headers=_token(created)).status_code in (403, 404)

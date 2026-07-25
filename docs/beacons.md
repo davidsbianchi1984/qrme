@@ -11,6 +11,11 @@ it lands on the profile's page.
 `scan_url` is the one to print or share. `summon_url` is the JSON surface for
 clients that want data rather than a page.
 
+> **A live desk can be left behind the same way**, with the badge inverted —
+> *Live person — not AI* instead of the AI mark, because there is an actual
+> person behind that door. Different table, different routes (`/d/{id}`), same
+> gesture. See [desks.md](desks.md#leaving-the-desk-behind--beacons).
+
 ## What a scan actually does — three different answers
 
 Whether the portrait can appear *in the camera*, without going anywhere,

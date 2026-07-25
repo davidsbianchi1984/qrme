@@ -8,12 +8,14 @@ token, minted once at creation.
 
 from __future__ import annotations
 
+import io
+
 from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import Response
+from fastapi.responses import HTMLResponse, Response
 
-from .. import auth, desks, rated
+from .. import auth, desks, landing, rated
 
 router = APIRouter()
 
@@ -209,3 +211,88 @@ def join_stream(desk_id: str, request: Request) -> dict:
         if str(exc) == "no such desk":
             raise HTTPException(404, "no such desk") from exc
         raise _fail(exc) from exc
+
+
+# --- beacons: the desk as a printed code ----------------------------------
+
+class DeskBeaconCreate(BaseModel):
+    label: str = Field(max_length=120)
+    location: str | None = Field(default=None, max_length=120)
+
+
+@router.post("/desks/{desk_id}/beacons", status_code=201)
+def place_desk_beacon(desk_id: str, body: DeskBeaconCreate,
+                      request: Request) -> dict:
+    """Print this desk onto something — the sticker for the shop door.
+
+    Owner-only. Anyone who could place a beacon for a desk they do not hold
+    could put a stranger's face and location on a code and stick it anywhere,
+    which is a worse outcome than the feature is worth.
+    """
+    _require_desk(desk_id, request)
+    try:
+        return desks.place_beacon(desk_id, body.label, body.location)
+    except desks.DeskError as exc:
+        if str(exc) == "no such desk":
+            raise HTTPException(404, "no such desk") from exc
+        raise _fail(exc) from exc
+
+
+@router.get("/desks/{desk_id}/beacons")
+def list_desk_beacons(desk_id: str, request: Request) -> dict:
+    """Every code printed for this desk, with its scan count."""
+    _require_desk(desk_id, request)
+    return {"beacons": desks.beacons_for(desk_id)}
+
+
+@router.delete("/desk-beacons/{beacon_id}")
+def pick_up_desk_beacon(beacon_id: str, request: Request) -> dict:
+    """Peel the sticker off. The code stops resolving; the desk is untouched."""
+    existing = desks.beacon(beacon_id)
+    if existing is None:
+        raise HTTPException(404, "no such desk beacon")
+    _require_desk(existing["desk_id"], request)
+    return desks.pick_up_beacon(beacon_id)
+
+
+@router.get("/desk-beacons/{beacon_id}/qr.svg")
+def desk_beacon_qr(beacon_id: str) -> Response:
+    """The printable code. Public: it is going on a door."""
+    existing = desks.beacon(beacon_id)
+    if existing is None:
+        raise HTTPException(404, "no such desk beacon")
+    import segno
+
+    from ..routers.summon import _public_base
+
+    buf = io.BytesIO()
+    segno.make(f"{_public_base()}/d/{beacon_id}", error="m").save(
+        buf, kind="svg", scale=8, dark="#0d0a20", light=None)
+    return Response(buf.getvalue(), media_type="image/svg+xml")
+
+
+@router.get("/d/{beacon_id}", response_class=HTMLResponse)
+def scan_desk_beacon(beacon_id: str, request: Request) -> HTMLResponse:
+    """What a phone's camera app opens when someone scans the sticker.
+
+    Public and tokenless by definition. A rated desk therefore always lands on
+    the age wall here — there is no token on a sticker scan that could clear
+    it, which is the right answer rather than a gap.
+    """
+    scanned = desks.scan(beacon_id, viewer_adult=_adult(request))
+    if scanned is None:
+        return HTMLResponse(landing.gone("desk code"), status_code=404)
+    if scanned.get("age_wall"):
+        return HTMLResponse(landing.desk_age_wall(), status_code=200)
+    return HTMLResponse(landing.desk_page(
+        scanned, scanned["beacon"]["location"]))
+
+
+@router.get("/d/{beacon_id}/card")
+def scan_desk_beacon_card(beacon_id: str, request: Request) -> dict:
+    """The same scan, as JSON — what the native apps read when their camera
+    recognises the code and draws the overlay in place."""
+    scanned = desks.scan(beacon_id, viewer_adult=_adult(request))
+    if scanned is None:
+        raise HTTPException(404, "no such desk beacon")
+    return scanned

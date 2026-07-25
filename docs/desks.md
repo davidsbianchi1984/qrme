@@ -110,6 +110,46 @@ What changes when `rated` is set:
 rather than a call per viewer, because that is what a stream is. It is minted
 on first arrival, so a desk nobody has visited carries none.
 
+## Leaving the desk behind — beacons
+
+A profile can be left somewhere physical as a printed QR code
+([beacons.md](beacons.md)). A desk can too, and it is arguably the more
+natural of the two: the sticker goes on the shop door *because* nobody is
+behind it right now, which is the exact situation the bell was built for.
+
+The two are the same gesture aimed at opposite things, and the differences are
+the whole feature:
+
+| | profile beacon | desk beacon |
+|---|---|---|
+| what is revealed | somebody who does not exist | somebody who does |
+| the badge | **AI** — on the portrait, so a screenshot carries it | **Live person — not AI** — green, top-right, worded as a claim |
+| the way in | a conversation, or a shared room | the bell, and the live stream |
+| a rated one, scanned | age wall | age wall |
+
+The badge placement is deliberate: green and top-right against the AI mark's
+neutral bottom-left, so the two cannot be confused at the glance a scanner
+actually gives them. Absence of the AI mark would not be a disclosure on its
+own — an unmarked card could be a synthetic profile whose badge got dropped —
+so the desk states the claim positively and names who vouched for it, right
+there on the page.
+
+Two things follow from the scanner being a stranger with no account, and
+neither is a limitation to work around:
+
+- **Their ring is anonymous**, so it takes the per-desk cooldown (30s) rather
+  than the per-caller one (5min). A printed code is reachable by anyone walking
+  past, which is the entire threat model.
+- **A rated desk always shows them the age wall.** There is no token on a
+  sticker scan, so there is nothing that could clear it. The wall withholds the
+  name and, above all, the location: whereabouts on an adult listing is a
+  safety matter, and a sticker is by definition somewhere physical.
+
+The scan page is one self-contained document for the same reasons the profile
+one is — a camera app's in-app browser, on cellular, from cold. The bell is the
+single script on it, and it posts to a **relative** URL: an absolute public
+base would ring a bell on a different host when the code is scanned over a LAN.
+
 ## Endpoints
 
 ```
@@ -118,11 +158,23 @@ GET    /desks/{id}                   the card: who, presence, human claim, bell
 GET    /desks/{id}/view.webp         the camera view — no watermark, no-store
 PUT    /desks/{id}/presence          attended | away | closed   (desk token)
 PUT    /desks/{id}/portrait          the owner's own photo, or clear it (token)
+PUT    /desks/{id}/camera            point it at a real camera        (token)
 POST   /desks/{id}/bell              ring it — public, rate limited
 GET    /desks/{id}/rings             who rang                   (desk token)
 POST   /desks/{id}/rings/{ring}/ack  mark one answered          (desk token)
 POST   /desks/{id}/join              join the live stream
+
+POST   /desks/{id}/beacons           print the desk onto something (desk token)
+GET    /desks/{id}/beacons           every code, with its scan count  (token)
+DELETE /desk-beacons/{id}            peel the sticker off             (token)
+GET    /desk-beacons/{id}/qr.svg     the printable code — public
+GET    /d/{id}                       what a phone opens on a scan
+GET    /d/{id}/card                  the same scan, as JSON for the apps
 ```
+
+Placing a beacon is owner-only. Anyone who could print a code for a desk they
+do not hold could put a stranger's name and whereabouts on a sticker and put it
+anywhere — worse than the feature is worth.
 
 For a rated desk every public surface above also requires an interactor token
 whose verified birthdate shows 18 or older:
