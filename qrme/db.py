@@ -814,6 +814,38 @@ CREATE TABLE IF NOT EXISTS desk_guests (
 -- therefore cannot be bought. `POST /marketplace/listings` needs no token and
 -- never has, so anyone can create a listing; nobody can attach money to one
 -- without holding a token and becoming its recorded seller.
+-- Where a listing is offered. A side table for the same reason listing_offers
+-- is one — and because `listings.area` is a *subject* area (healthcare,
+-- finance, relationships), not a place. Folding geography into that column
+-- would make "near me" quietly mean "in healthcare".
+--
+-- Deliberately coarse: a named locality a seller typed, never coordinates and
+-- never anything sniffed from an address or an IP. And a rated listing can
+-- never get a row here at all (see marketplace.set_place), which makes "you
+-- cannot filter your way to where a performer physically is" structural rather
+-- than a check somebody has to remember.
+CREATE TABLE IF NOT EXISTS listing_places (
+    listing_id TEXT PRIMARY KEY REFERENCES listings(id),
+    locality   TEXT NOT NULL,   -- as typed, e.g. "Oakland, CA"
+    region     TEXT,            -- broader bucket, e.g. "California"
+    remote     INTEGER NOT NULL DEFAULT 0,  -- also served from anywhere
+    created_at TEXT NOT NULL
+);
+
+-- One interactor's saved marketplace settings: where they consider "here",
+-- how far out they want to look, and the kinds and tags they keep choosing.
+-- Typed by them — nothing here is inferred from a device.
+CREATE TABLE IF NOT EXISTS marketplace_prefs (
+    interactor_id  TEXT PRIMARY KEY REFERENCES interactors(id),
+    locality       TEXT,
+    region         TEXT,
+    scope          TEXT NOT NULL DEFAULT 'anywhere',  -- locality | region | anywhere
+    include_remote INTEGER NOT NULL DEFAULT 1,
+    kinds          TEXT NOT NULL DEFAULT '[]',
+    tags           TEXT NOT NULL DEFAULT '[]',
+    updated_at     TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS listing_offers (
     listing_id TEXT PRIMARY KEY REFERENCES listings(id),
     seller_id  TEXT NOT NULL,   -- who the sale accrues to

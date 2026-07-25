@@ -22,10 +22,12 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, engagement, llm, moderation, persona, watermark
+from .. import (auth, db, engagement, llm, marketplace, moderation, persona,
+                watermark)
 from ..common import age_of, interactor_or_404, profile_or_404, source_items
 from ..models import (
-    HandoffCreate, ListingCreate, ProviderCreate, RoomCreate, RoomMessage,
+    HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
+    ProviderCreate, RoomCreate, RoomMessage,
 )
 
 router = APIRouter()
@@ -282,6 +284,104 @@ def browse_listings(request: Request, kind: str | None = None,
                     "business": bool(row["business"]),
                     "profile_id": row["profile_id"]})
     return out
+
+
+# --------------------------------------------------------------------------- #
+# marketplace search: words, place, settings, and a hand with the words
+# --------------------------------------------------------------------------- #
+
+@router.get("/marketplace/search")
+def search_listings(request: Request, q: str | None = None,
+                    kind: str | None = None, tag: str | None = None,
+                    area: str | None = None, scope: str | None = None,
+                    locality: str | None = None, region: str | None = None,
+                    include_remote: bool | None = None,
+                    limit: int = 50) -> dict:
+    """Rank listings by words and by place.
+
+    Deterministic: two callers passing the same arguments get the same order,
+    and the response says which terms matched which fields. A signed-in
+    interactor's saved settings supply the defaults; anything passed here
+    wins over them.
+    """
+    from .. import rated
+
+    who = auth.principal(request)
+    interactor_id = who["subject_id"] if who and who["role"] == "interactor" \
+        else None
+    try:
+        return marketplace.search_with_prefs(
+            interactor_id, q, kind=kind, tag=tag, area=area, scope=scope,
+            locality=locality, region=region, include_remote=include_remote,
+            adult_viewer=rated.viewer_is_adult(request), limit=limit)
+    except marketplace.MarketError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.get("/marketplace/localities")
+def marketplace_localities() -> list[dict]:
+    """Every place a listing actually claims, with counts — so a searcher
+    picks from what exists instead of typing a spelling nothing matches."""
+    return marketplace.localities()
+
+
+@router.put("/marketplace/listings/{listing_id}/place")
+def set_listing_place(listing_id: str, body: ListingPlace) -> dict:
+    """Say where a listing is offered. Refused for a rated listing: where a
+    performer physically is has nothing to do with browsing them."""
+    try:
+        return marketplace.set_place(listing_id, body.locality, body.region,
+                                     body.remote)
+    except marketplace.MarketError as exc:
+        raise HTTPException(
+            404 if str(exc).startswith("no such") else 422, str(exc))
+
+
+@router.delete("/marketplace/listings/{listing_id}/place")
+def clear_listing_place(listing_id: str) -> dict:
+    return marketplace.clear_place(listing_id)
+
+
+@router.get("/marketplace/settings/{interactor_id}")
+def get_market_settings(interactor_id: str, request: Request) -> dict:
+    interactor_or_404(interactor_id)
+    auth.require(request, "interactor", interactor_id)
+    return marketplace.prefs(interactor_id)
+
+
+@router.put("/marketplace/settings/{interactor_id}")
+def put_market_settings(interactor_id: str, body: MarketPrefs,
+                        request: Request) -> dict:
+    """Save where "here" is and how far out to look. Typed, never sniffed —
+    location a user did not enter is location they did not agree to share."""
+    interactor_or_404(interactor_id)
+    auth.require(request, "interactor", interactor_id)
+    try:
+        return marketplace.set_prefs(
+            interactor_id, locality=body.locality, region=body.region,
+            scope=body.scope, include_remote=body.include_remote,
+            kinds=body.kinds, tags=body.tags)
+    except marketplace.MarketError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.post("/marketplace/assist")
+def assist_search(body: MarketAssist, request: Request) -> dict:
+    """Turn "I don't know what to search for" into candidate searches.
+
+    Returns **suggestions, never results**. Nothing is searched, filtered or
+    reordered on the caller's behalf — they take a suggestion to the search
+    box themselves, and get the same deterministic ranking as everyone else.
+    """
+    who = auth.principal(request)
+    interactor_id = who["subject_id"] if who and who["role"] == "interactor" \
+        else None
+    try:
+        return marketplace.assist(
+            body.need, interactor_id=interactor_id,
+            provider=llm.get_provider(cloud=request.app.state.cloud))
+    except marketplace.MarketError as exc:
+        raise HTTPException(422, str(exc))
 
 
 @router.delete("/marketplace/listings/{listing_id}", status_code=204)

@@ -272,7 +272,17 @@ def spark(x, y, w, h, pts, col):
             f'<circle cx="{endx}" cy="{endy}" r="3.2" fill="{col}"/>')
 
 
+BUTTON_KINDS = ("brand", "danger", "amber", "ghost")
+
+
 def button(x, y, w, label, kind="brand", h=42):
+    # A misspelled kind used to fall through to `ghost` silently, so a button
+    # meant to be the screen's primary action rendered as a faint outline and
+    # nothing said so. Loud instead: the generator is the only thing that can
+    # catch this, since the SVG is perfectly valid either way.
+    if kind not in BUTTON_KINDS:
+        raise ValueError(
+            f"unknown button kind {kind!r} — one of {', '.join(BUTTON_KINDS)}")
     if kind == "brand":
         fill, tcol, st = "url(#gBrand)", "#fff", None
     elif kind == "danger":
@@ -1994,6 +2004,45 @@ SCREENS = [
         dict(icon="shieldok", color="green", k="Still no AI mark",
              s="rated changes who watches, not what"),
     ]),
+
+    # Search, with the two things browse-by-exact-tag could never do: plain
+    # words, and a place. `area` on a listing is a *subject* area, so the
+    # place lives in its own table — otherwise "near me" means "in healthcare".
+    dict(num=77, title="Search & Place", sub="Plain words, and how far out",
+         accent="brand", tabs=MARKET, tab=0, cards=[
+        dict(icon="search", color="brand", k="\"help me read a lease\"",
+             s="finds legal without knowing the tag"),
+        dict(icon="compass", color="cyan", k="Oakland, CA", s="scope · locality",
+             pill=("NEAR", "good")),
+        dict(icon="net", color="green", k="Remote reaches past", s="served from anywhere"),
+        dict(icon="list", color="amber", k="3 hidden by place", s="said, not silently dropped"),
+        dict(icon="lock", color="red", k="Rated carries no place",
+             s="a filter is a way of asking"),
+    ], button=("Search", "brand")),
+
+    # The settings behind that search. Everything here was typed by the
+    # person — nothing is sniffed from a device.
+    dict(num=78, title="Marketplace Settings", sub="Where 'here' is, and how far",
+         accent="cyan", tabs=MARKET, tab=1, cards=[
+        dict(icon="compass", color="cyan", k="Locality", s="Oakland, CA — typed, not sniffed"),
+        dict(icon="grid", color="brand", k="Scope", s="locality · region · anywhere"),
+        dict(icon="net", color="green", k="Include remote", s="on"),
+        dict(icon="heart", color="amber", k="Kinds & tags", s="the ones you keep choosing"),
+        dict(icon="info", color="brand", k="Defaults, not a cage",
+             s="a typed locality wins over saved"),
+    ], button=("Save settings", "brand")),
+
+    # The assistant that helps you name what you want — and stops there.
+    dict(num=79, title="Search Assistant", sub="Words for the box, nothing more",
+         accent="green", tabs=MARKET, tab=0, cards=[
+        dict(icon="chat", color="green", k="\"I can't name it\"", s="say it in your own words"),
+        dict(icon="list", color="brand", k="lease review", s="suggestion · tap to search"),
+        dict(icon="list", color="brand", k="tenant rights", s="suggestion · tap to search"),
+        dict(icon="shieldok", color="cyan", k="Nothing searched",
+             s="suggestions only — you run it", pill=("AI", "info")),
+        dict(icon="eye", color="amber", k="Ranking is yours",
+             s="no model reorders your results"),
+    ], button=("Use a suggestion", "brand")),
 ]
 
 
