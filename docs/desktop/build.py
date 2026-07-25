@@ -39,8 +39,8 @@ IY = CONTENT_Y + PAD
 IW = CONTENT_W - 2 * PAD
 
 NAV = [("target", "Home"), ("chat", "Conversation"), ("people", "Relationships"),
-       ("lock", "Memory"), ("compass", "Marketplace"), ("doc", "Licensing"),
-       ("gear", "Control")]
+       ("lock", "Memory"), ("person", "Desks"), ("compass", "Marketplace"),
+       ("doc", "Licensing"), ("pen", "Signing"), ("gear", "Control")]
 
 
 def status_dot(x, y, label, tone):
@@ -475,6 +475,202 @@ def v_control():
     return o
 
 
+def v_desks():
+    """Live desks and the room their viewers share.
+
+    The one view in this gallery that must carry **no** AI mark anywhere: a
+    desk is an actual person, and the badge makes the positive claim instead.
+    """
+    o = []
+    lw = IW * 0.56
+    rw = IW - lw - 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Live desks", right="a person, not a profile")
+    cy = IY + 50
+    desks = [("person", "green", "Bev Okafor", "Locksmith · Mill Yard",
+              "ATTENDED", "good"),
+             ("person", "amber", "Ray Coleman", "Locksmith · the counter",
+              "AWAY", "warn"),
+             ("person", "red", "Vivienne Marlowe", "Performer · location withheld",
+              "18+", "crit")]
+    for ic, col, k, s, pl, tone in desks:
+        c = ACCENT[col]
+        o.append(rrect(IX + 24, cy, lw - 48, 66, 12, "rgba(255,255,255,0.03)",
+                       C["line"], 1))
+        o.append(f'<circle cx="{IX+56}" cy="{cy+33}" r="19" fill="{A(c,0.18)}" '
+                 f'stroke="{c}" stroke-width="1.2"/>')
+        o.append(icon(ic, IX + 56, cy + 33, c, 0.95))
+        o.append(text(IX + 88, cy + 27, k, 12.5, C["txt"], 700))
+        o.append(text(IX + 88, cy + 44, s, 10, C["t2"], 500))
+        o.append(pill(IX + lw - 40, cy + 22, pl, tone))
+        # The claim, on every desk row. Absence of the AI mark would be
+        # ambiguous on its own — an unmarked card could be a profile whose
+        # badge got dropped.
+        o.append(text(IX + lw - 40, cy + 50, "Live person — not AI", 9,
+                      C["green"], 650, "end"))
+        cy += 76
+
+    o.append(rrect(IX + 24, cy + 4, lw - 48, 74, 12, A(C["amber"], 0.08),
+                   C["amber"], 1))
+    o.append(icon("finger", IX + 54, cy + 42, C["amber"], 0.95))
+    o.append(text(IX + 84, cy + 34, "Ring the bell", 12.5, C["txt"], 700))
+    o.append(text(IX + 84, cy + 52, "no account needed · one ring per desk "
+                  "every 30s", 9.5, C["t2"], 500))
+
+    o += panel(IX + lw + 20, IY, rw, hh, "The live room", right="everyone together")
+    dx = IX + lw + 38
+    dw = rw - 36
+    ly = IY + 46
+    o.append(rrect(dx, ly, dw, 58, 11, A(C["green"], 0.08), C["green"], 1))
+    o.append(icon("eye", dx + 26, ly + 29, C["green"], 0.95))
+    o.append(text(dx + 50, ly + 25, "Bev Okafor · live", 12, C["txt"], 700))
+    o.append(text(dx + 50, ly + 42, "one room, not a call per viewer", 9.5,
+                  C["t2"], 500))
+    ly += 70
+    feed = [("chat", "brand", "“Are you open till six?”", "moderated like any turn"),
+            ("heart", "pink", "12 likes", "one per person — never a counter"),
+            ("gift", "amber", "Gift · $5 from Bea", "verified adult · capped"),
+            ("link", "cyan", "Shared to a friend", "the gate is at the destination")]
+    for ic, col, k, s in feed:
+        o.append(rrect(dx, ly, dw, 52, 11, "rgba(255,255,255,0.03)", C["line"], 1))
+        o.append(chip(dx + 12, ly + 9, ic, ACCENT[col]))
+        o.append(text(dx + 56, ly + 23, k, 11.5, C["txt"], 650))
+        o.append(text(dx + 56, ly + 39, s, 9.5, C["t2"], 500))
+        ly += 60
+    o.append(rrect(dx, ly + 4, dw, 60, 12, A(C["cyan"], 0.08), C["cyan"], 1))
+    # Deliberately "on a desk" rather than "on this view": the sidebar carries
+    # the product tagline, which is not a watermark. On a view whose subject is
+    # truthful marking, the claim has to be exactly true.
+    o.append(text(dx + 16, ly + 26, "No AI mark on a desk, ever",
+                  10.5, C["cyan"], 700))
+    o.append(text(dx + 16, ly + 45, "there is a real person on the other end",
+                  9.5, C["t2"], 500))
+    return o
+
+
+def v_audience():
+    """The audience layer and the commerce that rides on it."""
+    o = []
+    tw = (IW - 3 * 18) / 4
+    o += tile(IX, IY, tw, 100, "Likes", "248", "one per person", C["pink"], "heart")
+    o += tile(IX + (tw + 18), IY, tw, 100, "Comments", "63", "all moderated",
+              C["brandA"], "chat")
+    o += tile(IX + 2 * (tw + 18), IY, tw, 100, "Shares", "77", "gated at the far end",
+              C["cyan"], "link")
+    o += tile(IX + 3 * (tw + 18), IY, tw, 100, "Subscribers", "31",
+              "free follow · paid", C["amber"], "star2")
+
+    ty = IY + 122
+    hh = CONTENT_H - 2 * PAD - 122
+    lw = IW * 0.55
+    rw = IW - lw - 20
+
+    o += panel(IX, ty, lw, hh, "Recent activity", right="likes · comments · shares")
+    o.append(table(IX + 20, ty + 46, lw - 40,
+                   [("who", 0.28, "start"), ("what", 0.44, "start"),
+                    ("state", 0.28, "end")],
+                   [("Bea", "liked Rosa Vance", ("counted", C["green"], 600)),
+                    ("Cy", "“Lovely garden”", ("approved", C["green"], 600)),
+                    ("Ada", "shared a desk", ("no account needed", C["t2"], 500)),
+                    ("Mal", "“my ssn is …”", ("blocked", C["red"], 700)),
+                    ("Bea", "subscribed · paid", ("$5 / period", C["amber"], 700))]))
+    o.append(text(IX + 20, ty + hh - 26,
+                  "A blocked comment is kept and shown to its author with the "
+                  "reason — and to nobody else.", 9.5, C["t3"], 500))
+
+    o += panel(IX + lw + 20, ty, rw, hh, "Commerce", right="simulated")
+    dx = IX + lw + 38
+    dw = rw - 36
+    ly = ty + 46
+    rows = [("gift", "amber", "Gift · $10", "adult only · capped · final"),
+            ("building", "brand", "Pruning, properly · $12.50", "listing_sale"),
+            ("star2", "green", "Subscription · $5", "period 2 of 2")]
+    for ic, col, k, s in rows:
+        o.append(rrect(dx, ly, dw, 52, 11, "rgba(255,255,255,0.03)", C["line"], 1))
+        o.append(chip(dx + 12, ly + 9, ic, ACCENT[col]))
+        o.append(text(dx + 56, ly + 23, k, 11.5, C["txt"], 650))
+        o.append(text(dx + 56, ly + 39, s, 9.5, C["t2"], 500))
+        ly += 60
+    o.append(rrect(dx, ly + 4, dw, 78, 12, A(C["red"], 0.08), C["red"], 1))
+    o.append(text(dx + 16, ly + 26, "No real funds move", 11, C["red"], 700))
+    o.append(text(dx + 16, ly + 45, "real rows on the creator statement,", 9.5,
+                  C["t2"], 500))
+    o.append(text(dx + 16, ly + 60, "no spend caps or chargebacks — yet", 9.5,
+                  C["t2"], 500))
+    return o
+
+
+def v_signatures():
+    """Signing, which is more a desktop story than a mobile one: Windows has
+    no in-process route to Hello that a compile can check, so the ceremony
+    runs in a WebView2 on the relying party's own origin."""
+    o = []
+    lw = IW * 0.54
+    rw = IW - lw - 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "What you are signing", right="shown before the prompt")
+    o.append(rrect(IX + 24, IY + 50, lw - 48, 150, 12, "rgba(255,255,255,0.03)",
+                   C["line"], 1))
+    for i, line in enumerate([
+            "SERVICES AGREEMENT — SCHEDULE B",
+            "",
+            "The Supplier shall deliver the milestones set out in",
+            "Schedule A, and the Client shall pay within 30 days of",
+            "each acceptance certificate.",
+            "",
+            "Signed for and on behalf of the Client."]):
+        o.append(text(IX + 44, IY + 78 + i * 18, line, 10,
+                      C["txt"] if i == 0 else C["t2"], 700 if i == 0 else 500))
+    o.append(text(IX + 24, IY + 226,
+                  "The system prompt cannot say what is being signed — so this "
+                  "does, first.", 9.5, C["t3"], 500))
+
+    ly = IY + 254
+    for ic, col, k, s in [
+            ("finger", "indigo", "Windows Hello · Face ID",
+             "the passkey signs the document's own hash"),
+            ("shieldok", "green", "Verifiable without an account",
+             "the package stands on its own arithmetic"),
+            ("db", "cyan", "Sealed into the vault",
+             "chained — order rests on more than one table")]:
+        o.append(rrect(IX + 24, ly, lw - 48, 54, 11, "rgba(255,255,255,0.03)",
+                       C["line"], 1))
+        o.append(chip(IX + 36, ly + 10, ic, ACCENT[col]))
+        o.append(text(IX + 80, ly + 24, k, 11.5, C["txt"], 650))
+        o.append(text(IX + 80, ly + 40, s, 9.5, C["t2"], 500))
+        ly += 62
+
+    o += panel(IX + lw + 20, IY, rw, hh, "Proofing decides the tier",
+               right="recorded, not inferred")
+    dx = IX + lw + 38
+    dw = rw - 36
+    ty2 = IY + 46
+    o.append(table(dx, ty2, dw,
+                   [("tier", 0.34, "start"), ("needs", 0.44, "start"),
+                    ("device", 0.22, "end")],
+                   [("basic", "self-asserted", ("any", C["t2"], 500)),
+                    ("standard", "federated", ("any", C["t2"], 500)),
+                    ("high", "document + in person",
+                     ("bound", C["green"], 700))]))
+    ly = ty2 + 160
+    o.append(rrect(dx, ly, dw, 88, 12, A(C["brandA"], 0.08), C["brandA"], 1))
+    o.append(icon("finger", dx + 28, ly + 44, C["brandA"], 0.95))
+    o.append(text(dx + 54, ly + 30, "Windows signs through the browser engine",
+                  10.5, C["txt"], 700))
+    o.append(text(dx + 54, ly + 48, "a WebView2 on the relying party's own",
+                  9.5, C["t2"], 500))
+    o.append(text(dx + 54, ly + 63, "origin — the page never sees a token",
+                  9.5, C["t2"], 500))
+    o.append(rrect(dx, ly + 100, dw, 62, 12, A(C["amber"], 0.08), C["amber"], 1))
+    o.append(text(dx + 16, ly + 124, "A signature is not a notarisation", 10.5,
+                  C["amber"], 700))
+    o.append(text(dx + 16, ly + 143, "it proves the key and the document, "
+                  "not the person", 9.5, C["t2"], 500))
+    return o
+
+
 VIEWS = [
     (1, "Home", "Home", v_home),
     (2, "Conversation", "Conversation", v_conversation),
@@ -482,6 +678,9 @@ VIEWS = [
     (4, "Memory Vault", "Memory", v_memory),
     (5, "Marketplace & Licensing", "Marketplace", v_marketplace),
     (6, "Control Center", "Control", v_control),
+    (7, "Live Desks", "Desks", v_desks),
+    (8, "Audience & Commerce", "Marketplace", v_audience),
+    (9, "Signatures", "Signing", v_signatures),
 ]
 
 

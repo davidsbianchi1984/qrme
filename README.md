@@ -510,6 +510,14 @@ Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation 
     <td align="center" width="50%"><a href="docs/desktop/05-marketplace-licensing.svg"><img src="docs/desktop/05-marketplace-licensing.svg" width="460" alt="Marketplace & Licensing"></a><br><sub><b>05</b> · Marketplace & Licensing</sub></td>
     <td align="center" width="50%"><a href="docs/desktop/06-control-center.svg"><img src="docs/desktop/06-control-center.svg" width="460" alt="Control Center"></a><br><sub><b>06</b> · Control Center</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/07-live-desks.svg"><img src="docs/desktop/07-live-desks.svg" width="460" alt="Live Desks"></a><br><sub><b>07</b> · Live Desks</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/08-audience-commerce.svg"><img src="docs/desktop/08-audience-commerce.svg" width="460" alt="Audience & Commerce"></a><br><sub><b>08</b> · Audience &amp; Commerce</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
+    <td align="center" width="50%"></td>
+  </tr>
 </table>
 
 ### Mobile app
@@ -680,6 +688,32 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/68-gaming-companion.svg"><img src="docs/screens/68-gaming-companion.svg" width="210" alt="Gaming Companion"></a><br><sub><b>68</b> · Gaming Companion</sub></td>
   </tr>
 </table>
+
+**Live desks, the audience layer & commerce**
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/69-live-desks.svg"><img src="docs/screens/69-live-desks.svg" width="210" alt="Live Desks"></a><br><sub><b>69</b> · Live Desks</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/70-desk-beacons.svg"><img src="docs/screens/70-desk-beacons.svg" width="210" alt="Desk Beacons"></a><br><sub><b>70</b> · Desk Beacons</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/71-audience.svg"><img src="docs/screens/71-audience.svg" width="210" alt="Audience"></a><br><sub><b>71</b> · Audience</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/72-gifts-purchases.svg"><img src="docs/screens/72-gifts-purchases.svg" width="210" alt="Gifts &amp; Purchases"></a><br><sub><b>72</b> · Gifts &amp; Purchases</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/73-signatures.svg"><img src="docs/screens/73-signatures.svg" width="210" alt="Signatures"></a><br><sub><b>73</b> · Signatures</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/74-starter-collection.svg"><img src="docs/screens/74-starter-collection.svg" width="210" alt="Starter Collection"></a><br><sub><b>74</b> · Starter Collection</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/75-live-room.svg"><img src="docs/screens/75-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>75</b> · Live Room</sub></td>
+  </tr>
+</table>
+
+The mark runs in both directions across this set, which is the whole point of
+it. **74** is the starter collection — every face there is generated, so it
+carries the AI badge and the mark is burned into the portrait itself. **69**,
+**70** and **75** are live desks and the room their viewers share: an actual
+person is on the other end, so they carry no AI mark at all and make the
+positive claim (*Live person — not AI*) instead. Absence alone would be
+ambiguous; the claim is stated.
 
 
 ## Design assets
