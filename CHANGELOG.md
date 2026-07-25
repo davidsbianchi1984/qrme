@@ -20,6 +20,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a shared style whose text disagrees with the assets cannot do the one job it
   exists for; the rated portrait carries its own `RATED_STYLE`, since it is
   age-walled off every surface the others appear on.
+- **The AI mark is burned into every shipped portrait.** The disclosure
+  already rode alongside a portrait — `GET /profiles/{id}/avatar` returns it,
+  and the beacon page and both camera overlays composite it — which covers
+  every surface QRME controls and none of the ones it does not.
+  `/portraits/{handle}.webp` is an ordinary file URL: hotlink it, embed it,
+  scrape it, screenshot it, and a composited badge survives none of that. The
+  mark now sits in the pixels, top-right, where every composited badge is
+  bottom-left so the two never collide. Burned offline by
+  `tools/mark_portraits.py` rather than at request time — that would put an
+  imaging library in the runtime dependencies and redraw a constant on every
+  fetch — and pinned by a SHA-256 manifest the test suite checks, so a
+  portrait swapped for an unmarked one fails CI instead of shipping quietly.
+  `asset_marked` on the avatar response tells a surface QRME does not control
+  whether compositing is mandatory; an owner-attached asset always reports
+  `false`, since nothing here can vouch for someone else's file.
 - **The native apps sign.** iOS/visionOS drive the ceremony through
   `ASAuthorizationPlatformPublicKeyCredentialProvider` (Face ID, Touch ID, or
   Optic ID) and Android through Credential Manager, so the private key stays in

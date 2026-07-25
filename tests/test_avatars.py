@@ -242,3 +242,58 @@ def test_a_starters_face_belongs_to_nobody(client):
     art = client.get(f"/profiles/{pid}/avatar").json()
     assert art["likeness"]["real_person"] is False
     assert "no rights holder" in art["likeness"]["note"]
+
+
+# --- the mark is in the pixels, not only in the chrome --------------------
+
+def test_every_shipped_portrait_matches_the_checksum_manifest():
+    """The AI mark is burned into these files. A portrait swapped for an
+    unmarked one would be a synthetic face circulating with no disclosure and
+    nothing in the API would notice, so the bytes are pinned."""
+    import hashlib
+    import json
+    directory = avatars.portraits_dir()
+    manifest = json.loads((directory / "MANIFEST.json").read_text())
+    shipped = sorted(p.name for p in directory.glob("*.webp"))
+    assert sorted(manifest) == shipped, "manifest and directory disagree"
+    for name in shipped:
+        digest = hashlib.sha256((directory / name).read_bytes()).hexdigest()
+        assert manifest[name] == digest, f"{name} is not the marked file"
+
+
+def test_a_shipped_portrait_reports_that_it_is_already_marked(client):
+    """So a surface drawing its own badge can avoid stacking a second one."""
+    from qrme import seed
+    seed.seed()
+    pid = client.get("/summon?ref=@dr_amara_osei").json()["profile"]["profile_id"]
+    art = client.get(f"/profiles/{pid}/avatar").json()
+    assert art["asset_marked"] is True
+
+
+def test_an_owner_attached_asset_is_never_assumed_to_be_marked(client):
+    """Nothing here can vouch for somebody else's file, so the surfaces keep
+    drawing their own badge over it — the safe direction to be wrong in."""
+    created = client.post("/profiles", json={
+        "owner_id": "o1", "kind": "fictional", "display_name": "Marcus Bell",
+        "persona": "A planner.",
+        "verification": {"birthdate": "1980-01-01", "id_document": "passport",
+                         "liveness_check": True}}).json()
+    client.put(f"/profiles/{created['id']}/avatar",
+               json={"asset": "https://example.test/face.png"},
+               headers={"authorization": f"Bearer {created['owner_token']}"})
+    art = client.get(f"/profiles/{created['id']}/avatar").json()
+    assert art["asset"] == "https://example.test/face.png"
+    assert art["asset_marked"] is False
+
+
+def test_a_portrait_served_directly_carries_the_disclosure_in_its_bytes(client):
+    """The gap this closes: /portraits/{handle}.webp is an ordinary file URL.
+    It can be hotlinked, embedded, scraped or saved, and a composited badge
+    survives none of that."""
+    import hashlib
+    import json
+    res = client.get("/portraits/otis_marsh.webp")
+    assert res.status_code == 200
+    manifest = json.loads(
+        (avatars.portraits_dir() / "MANIFEST.json").read_text())
+    assert hashlib.sha256(res.content).hexdigest() == manifest["otis_marsh.webp"]
