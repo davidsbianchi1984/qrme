@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.1.7] — 2026-07-25
+
 ### Added
 
 - **Gifts, and buying things on the marketplace.** Round 2 of the audience
@@ -130,19 +132,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the schema is applied with `CREATE TABLE IF NOT EXISTS`, so widening an
   existing table would only ever take effect on a fresh one.
 
-### Changed
-
-- **The three products are now cut as one release** — documented in
-  [docs/releasing.md](docs/releasing.md), and in JIM-mini's and PDI's copies of
-  the same file. Same number, same pass, even when a repository has nothing of
-  its own to ship that round; an empty round says so in those words rather than
-  being padded. Through v0.1.5 each repository cut whenever it happened to have
-  work, so the numbers matched only by coincidence — which is how QRME reached
-  0.1.6 alone. The doc also writes down the trap that follows: tag the
-  release-prep commit rather than the tip of `main`, because work keeps landing
-  while a release is cut and anything arriving after the changelog is sectioned
-  belongs to `[Unreleased]`, not to the version being tagged.
-
 - **Windows signs now, through the browser engine rather than interop.** The
   blocker was `webauthn.dll`: several hundred lines of version-sensitive struct
   marshalling that a compile cannot meaningfully check and nothing here can
@@ -163,6 +152,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   vouched for, and a surface QRME does not control has to be able to tell those
   apart. QRME's own overlays still draw their badge either way — theirs carries
   the profile's designed label and is real text, not pixels.
+
+### Changed
+
+- **The three products are now cut as one release** — documented in
+  [docs/releasing.md](docs/releasing.md), and in JIM-mini's and PDI's copies of
+  the same file. Same number, same pass, even when a repository has nothing of
+  its own to ship that round; an empty round says so in those words rather than
+  being padded. Through v0.1.5 each repository cut whenever it happened to have
+  work, so the numbers matched only by coincidence — which is how QRME reached
+  0.1.6 alone. The doc also writes down the trap that follows: tag the
+  release-prep commit rather than the tip of `main`, because work keeps landing
+  while a release is cut and anything arriving after the changelog is sectioned
+  belongs to `[Unreleased]`, not to the version being tagged.
 
 ## [0.1.6] — 2026-07-25
 
@@ -563,7 +565,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.6...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.7...HEAD
+[0.1.7]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.7
 [0.1.6]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.6
 [0.1.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.5
 [0.1.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.4

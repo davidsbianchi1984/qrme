@@ -1,91 +1,94 @@
-# QRME v0.1.6 — release notes
+# QRME v0.1.7 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.1.6` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.1.7` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.1.6** — the release about telling the truth in both directions. A
-synthetic profile now carries the AI mark in its own pixels, so it survives
-being screenshotted or hotlinked; and a **live desk** — an actual person
-behind a counter — carries no mark at all, because stamping "AI" on a real
-human is a false statement about them. One of three interoperating products
-(with [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
-[pdi](https://github.com/davidsbianchi1984/pdi)).
+**QRME v0.1.7** — the release where a profile stops being only something you
+talk to. You can now like it, comment on it, share it, subscribe to it, gift
+the person behind it, and buy what they are selling — and a live desk can be
+left on a door as a printed code, the way a synthetic profile already could.
+One of three interoperating products (with
+[jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
+[pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at
+this version.
 
 ### Highlights
 
-- **Live desks, and a bell you can reach.** A real person offering a service,
-  behind the same surfaces as a synthetic profile and with the one difference
-  that matters: **a desk never carries the AI watermark.** Absence alone would
-  be ambiguous — an unmarked card could be an AI whose badge got dropped — so
-  the claim is positive (*Live person — not AI*) with the attestor, the basis,
-  and the word **recorded** rather than *proven* shipped beside it. A desk
-  cannot be opened without saying who vouches.
-- **What a visitor looks at is the desk, not a portrait.** We have no
-  photograph of the person and do not go looking for one; the surface is a
-  camera view of their own counter. An empty chair with a sign on it says
-  everything, and it depicts nobody. Without a camera configured the card
-  reports `live: false` and the apps say **SAMPLE VIEW** — a still frame
-  presented as live would be the same class of lie.
-- **The sign says ring the bell, so the button is on the screen.** iOS,
-  Android and Windows all carry it. No token: the person in front of an empty
-  chair is exactly the one without an account. Rate limited, because a bell
-  anyone can ring from anywhere is a doorbell prank waiting to happen.
-- **18+ streams** are the same desk behind the deployment's *existing*
-  verified-adult gate — not a new tier and not a second, weaker check.
-  Unverified callers get an age wall carrying existence and nothing else; the
-  location stays withheld even past it. Only the performer can open one,
-  because the standing rule that adult mode is never available for a profile of
-  another real person lands here as *the attestor must be the owner, attesting
-  for themselves*.
-- **Signatures that survive being disputed.** The same Face ID gesture through
-  WebAuthn/passkeys, returning an assertion signed in the Secure Enclave over a
-  challenge that **is** the document hash. Change one byte and it stops
-  verifying. iOS/visionOS and Android drive the ceremony; Windows reads and
-  verifies but does not sign, because reaching Windows Hello means interop a
-  compile cannot meaningfully check and a button that looks like it signs and
-  does not is worse than no button. ESIGN/UETA grade, with 21 CFR Part 11 as a
-  configuration change — HIPAA does not require Part 11, and that confusion is
-  expensive.
-- **The AI mark is in the pixels.** All 34 starter portraits carry it burned
-  in, top-right, where every composited badge sits bottom-left so the two never
-  collide. `/portraits/{handle}.webp` is an ordinary file URL — hotlink it,
-  embed it, screenshot it, and a composited badge survives none of that. Pinned
-  by a SHA-256 manifest the test suite checks, so an unmarked replacement fails
-  CI rather than shipping quietly.
-- **Beacons you can read without leaving the camera.** Point the iOS or Android
-  app at a sticker and the profile is drawn *on the code* in the live
-  viewfinder. A stock camera app can only open a URL — that is the whole API
-  surface a QR exposes to a third party — so the landing page from v0.1.5
-  remains the best possible version of that, and this is the one that doesn't
-  need it.
+- **A live desk can be left behind as a printed code.** A profile beacon and a
+  desk beacon are the same gesture aimed at opposite things: scanning the first
+  reveals somebody who does not exist and the page marks the portrait *AI*;
+  scanning the second reveals somebody who does. So the badge is inverted and
+  deliberately unlike the AI mark at a glance — **Live person — not AI**, green
+  and top-right against the mark's neutral bottom-left — because absence of the
+  AI mark is not a disclosure on its own. The sticker goes on the shop door
+  *because* nobody is behind it, so the scan page carries a working bell.
 
-### Fixed
+- **Like, comment, share, subscribe.** On a profile, a live desk, a room
+  message or a marketplace listing. A **like is a fact, not a counter** —
+  stored per person, so liking twice is still one like and no account can
+  manufacture popularity in a loop. A **comment** goes through the same
+  moderation pipeline as a chat turn, at the target's maturity setting; a
+  blocked one is kept and shown to its author with the reason, and to nobody
+  else. A **share** needs no account, because the person who scanned a sticker
+  is the one most likely to pass it on — the age gate lives at the destination,
+  not on the sharer.
 
-Three things a pre-release audit turned up, all of them features that looked
-finished and could not work:
+- **Subscriptions, free and paid.** A free `follow`, and a `paid` tier that
+  credits the creator's ledger each period alongside pack sales and licence
+  fees. Paid confirms the price explicitly, because a recurring charge nobody
+  meant to start *keeps* costing them. **Nothing bills on a timer** — periods
+  are charged by an explicit renew, so a deployment left running accrues
+  nothing unseen.
 
-- **The signing flow in both mobile apps could never succeed.** They enrol at
-  `self_asserted` and then asked for the `standard` tier, which needs better
-  proofing. Every attempt died at the server. The tests missed it because they
-  all enrol at `document` level, so none walked the sequence the clients
-  actually perform.
-- **A credential's proofing level could never change**, despite the spec
-  promising exactly that. `POST /signatures/credentials/{id}/proofing` records
-  a fresh check — going forward only, never rewriting what was already signed.
-- **A desk's camera could never be turned on.** `feed.live` read a column no
-  endpoint could write, so the live branch was unreachable.
+- **The marketplace is transactable at last.** `listings` had no price and no
+  purchase endpoint, so a product could be listed and bought by nobody. Now a
+  listing is a shop window and an **offer** is what makes it a shop: price and
+  seller live in a row only a token-holder can write, and the seller comes from
+  that token rather than a request body. A listing nobody offered cannot be
+  bought — not by a check that could be forgotten, but because there is nowhere
+  for a price to be.
+
+- **Gifts, with rules purchases do not carry.** A gift sends money to a person
+  and receives nothing, which is the shape livestream tipping keeps turning
+  into a way of taking money from people who should not be spending it. So the
+  giver must be a **verified adult** whoever they are gifting, a single gift is
+  **capped**, a rated desk runs its own 18+ gate on top, and the recipient is
+  read from the subject rather than named by the giver.
+
+- **Windows signs, through the browser engine rather than interop.** The
+  blocker was `webauthn.dll` — hundreds of lines of version-sensitive struct
+  marshalling a compile cannot check. Edge already talks to Windows Hello, so
+  the desktop app hosts a **WebView2** on a new `GET /signatures/ceremony`
+  page served from the deployment's own origin. The page never sees a token.
+
+- **The three products now cut as one release.** Same number, same pass, even
+  when a repository has nothing of its own to ship — documented in
+  [docs/releasing.md](docs/releasing.md) in all three.
+
+### Money here is simulated
+
+Subscriptions, gifts and purchases write **real rows** on the creator's
+statement and settle through the same payout sweep as pack sales and licence
+fees — but **no real funds move**, and every money-bearing response says so in
+its own body rather than leaving it to a policy page.
+
+[docs/commerce.md](docs/commerce.md) states what is *absent*: running spend
+totals, cooling-off, parental controls, a real identity check behind "verified
+adult", chargebacks, and payout compliance. If you wire a real payment
+processor to these endpoints, that list is the work remaining — not a set of
+nice-to-haves.
 
 ### Verification
 
-425 tests green. Both front-ends build clean. iOS, Android and Windows all
-compile in CI.
+486 tests green (48 new this release). Both front-ends build clean. iOS,
+Android and Windows all compile in CI.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.1.6` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.1.7` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md
