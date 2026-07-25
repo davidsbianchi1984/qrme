@@ -6,7 +6,7 @@ import { useSession } from "../store";
 // set the owner relationship, so the app can chat straight away.
 export function Onboarding() {
   const { setSession } = useSession();
-  const [name, setName] = useState("Ava");
+  const [name, setName] = useState("");
   const [persona, setPersona] = useState(
     "A warm, curious digital version of me — remembers what matters and speaks plainly.",
   );
@@ -21,7 +21,7 @@ export function Onboarding() {
       const profile = await api.createProfile({
         owner_id: "owner-desktop",
         kind: "self",
-        display_name: name.trim() || "Ava",
+        display_name: name.trim() || "AI assistant",
         persona: persona.trim(),
         verification: { birthdate },
         purpose: "companion_coach",
@@ -58,7 +58,11 @@ export function Onboarding() {
 
         <label>
           Profile name
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          {/* No pre-filled name. The profile is the user's to name, and a
+              default sitting in the box is the one most people never change —
+              which is how a sample name becomes the product's mascot. */}
+          <input value={name} placeholder="Name your assistant"
+                 onChange={(e) => setName(e.target.value)} />
         </label>
         <label>
           Persona

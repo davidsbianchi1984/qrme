@@ -793,7 +793,7 @@ def render(spec):
         out.append(orb(cx0, y + 42, 34))
         out.append(icon("person", cx0, y + 40, "rgba(255,255,255,0.92)", 1.5))
         out.append(f'<circle cx="{cx0}" cy="{y+42}" r="40" fill="none" stroke="url(#gBrand)" stroke-width="2.5"/>')
-        out.append(text(cx0, y + 98, "Ava", 21, "#fff", 750, "middle"))
+        out.append(text(cx0, y + 98, "AI assistant", 21, "#fff", 750, "middle"))
         out.append(text(cx0, y + 116, "AI Version Me", 11.5, C["t2"], 500, "middle"))
         out.append(f'<circle cx="{cx0-30}" cy="{y+130}" r="3" fill="{C["green"]}"/>')
         out.append(text(cx0 - 22, y + 134, "Online", 10.5, C["green"], 600))
@@ -815,15 +815,20 @@ def render(spec):
                 out.append(text(gx + 12, gy + 42, v, 19, col, 800))
                 out.append(text(gx + gw - 12, gy + 42, s, 9.5, C["t2"], 500, "end"))
         y += 132
-        out.append(button(CX, y, CW, "Chat with Ava", "brand", 42))
+        out.append(button(CX, y, CW, "Chat", "brand", 42))
         out.append(button(CX, y + 50, (CW - 10) / 2, "Customize", "ghost", 38))
         out.append(button(CX + (CW - 10) / 2 + 10, y + 50, (CW - 10) / 2, "View Memory", "ghost", 38))
 
     elif hero == "chat":
         out.append(f'<circle cx="{CX+13}" cy="{y+11}" r="13" fill="url(#orb)"/>')
-        out.append(text(CX + 32, y + 8, "Ava", 12, C["txt"], 650))
-        out.append(f'<circle cx="{CX+52}" cy="{y+5}" r="2.5" fill="{C["green"]}"/>')
-        out.append(text(CX + 58, y + 8, "Online", 9.5, C["green"], 600))
+        # The dot and "Online" used to sit at a fixed x that assumed a
+        # three-letter name. Measured off the label instead, so the status
+        # cannot be overwritten by a longer one.
+        _label = "AI assistant"
+        out.append(text(CX + 32, y + 8, _label, 12, C["txt"], 650))
+        _dot = CX + 32 + len(_label) * 6.4 + 10
+        out.append(f'<circle cx="{_dot}" cy="{y+5}" r="2.5" fill="{C["green"]}"/>')
+        out.append(text(_dot + 6, y + 8, "Online", 9.5, C["green"], 600))
         y += 24
         # AI bubble
         out.append(rrect(CX, y, CW - 40, 66, 14, "url(#gCard)", C["line"], 1))
@@ -833,7 +838,7 @@ def render(spec):
         y += 78
         # user bubble
         out.append(rrect(CX + 60, y, CW - 60, 40, 14, "url(#gBrand)"))
-        out.append(text(CX + CW - 14, y + 17, "Hey Ava! I've been busy,", 10.5, "#fff", 500, "end"))
+        out.append(text(CX + CW - 14, y + 17, "Hey! I've been busy,", 10.5, "#fff", 500, "end"))
         out.append(text(CX + CW - 14, y + 32, "but thinking about you.", 10.5, "#fff", 500, "end"))
         y += 52
         # context panel
@@ -1094,7 +1099,7 @@ def render(spec):
         out.append(f'<circle cx="{W/2}" cy="{qy+qs_/2}" r="18" fill="{C["scrB"]}" stroke="{C["brandA"]}" stroke-width="2"/>')
         out.append(icon("person", W / 2, qy + qs_ / 2, C["brandA"], 1.0))
         y = qy + qs_ + 18
-        out.append(text(W / 2, y, "@ava.bianchi", 14, C["brandA"], 700, "middle"))
+        out.append(text(W / 2, y, "@your.handle", 14, C["brandA"], 700, "middle"))
         out.append(text(W / 2, y + 16, "Scan to summon this profile — anywhere", 10, C["t2"], 500, "middle"))
         y += 34
         for ic, col, k, s in [("target", "brand", "@handle · #tag · beacon", "one resolver, three refs"),
@@ -1160,8 +1165,8 @@ def render(spec):
         out.append(orb(W / 2, y + 38, 30))
         out.append(icon("dove", W / 2, y + 38, "rgba(255,255,255,0.95)", 1.6))
         y += 82
-        out.append(text(W / 2, y, "Ava", 20, "#fff", 750, "middle"))
-        out.append(text(W / 2, y + 18, "@ava.bianchi · a memorial", 10.5, C["t2"], 500, "middle"))
+        out.append(text(W / 2, y, "AI assistant", 20, "#fff", 750, "middle"))
+        out.append(text(W / 2, y + 18, "@your.handle · a memorial", 10.5, C["t2"], 500, "middle"))
         y += 40
         for ic, col, k, s in [("dove", "cyan", "Graceful departure", "a farewell for every relationship"),
                               ("lock", "green", "Memory preserved", "sealed in the vault, exportable"),
@@ -1173,7 +1178,7 @@ def render(spec):
     elif hero == "moderation":
         out.append(rrect(CX, y, CW, 64, 16, "url(#gCard)", C["line"], 1))
         out.append(icon("chat", CX + 22, y + 22, C["brandA"], 0.8))
-        out.append(text(CX + 40, y + 20, "Ava wants to reply", 11, C["t2"], 600))
+        out.append(text(CX + 40, y + 20, "Your assistant wants to reply", 11, C["t2"], 600))
         out.append(pill(CX + CW - 14, y + 20, "HELD", "warn"))
         out.append(text(CX + 14, y + 44, "“Tell me about your rose garden.”", 11.5, C["txt"], 500))
         y += 76
@@ -1249,7 +1254,7 @@ def render(spec):
         out.append(text(W / 2, y, "Session ended", 16, "#fff", 750, "middle"))
         out.append(text(W / 2, y + 20, "Your vault is sealed. See you soon.", 11, C["t2"], 400, "middle"))
         y += 42
-        for ic, col, k, s in [("chat", "brand", "Talked with Ava", "12 messages this session"),
+        for ic, col, k, s in [("chat", "brand", "Conversation", "12 messages this session"),
                               ("lock", "green", "Memories saved & sealed", "AES-256-GCM, on device"),
                               ("eye", "cyan", "Nothing left your vault", "offline the whole time")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
@@ -1375,7 +1380,7 @@ def render(spec):
         out.append(pill(CX + CW - 14, y + 22, "AR HEADSET · LINKED", "info"))
         out.append(icon("headset", CX + 28, y + 24, C["cyan"], 0.9))
         y += ph + 14
-        for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Ava stands in your space"),
+        for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Stands in your room"),
                               ("speaker", "brand", "Spatial audio", "her voice comes from where she is"),
                               ("eye", "pink", "Passthrough AR or full VR", "your living room, or her world")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
@@ -1391,7 +1396,7 @@ def render(spec):
         out.append(rrect(CX + 14, y + 14, 58, 20, 10, A(C["red"], 0.9)))
         out.append(f'<circle cx="{CX+26}" cy="{y+24}" r="3.5" fill="#fff"/>')
         out.append(text(CX + 34, y + 28, "LIVE", 10.5, "#fff", 750))
-        out.append(text(CX + 14, y + vh - 26, "Ava", 13, "#fff", 700))
+        out.append(text(CX + 14, y + vh - 26, "AI assistant", 13, "#fff", 700))
         out.append(text(CX + 14, y + vh - 12, "1080p · end-to-end encrypted", 9.5, "rgba(255,255,255,0.75)"))
         # self preview tile
         out.append(rrect(CX + CW - 68, y + vh - 86, 56, 74, 12, "#0d0a24", "rgba(255,255,255,0.18)", 1))
@@ -1420,15 +1425,15 @@ def render(spec):
         out.append(f'<path d="M{W/2-11} {y+40} l7 8 14 -16" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>')
         y += 100
         out.append(text(W / 2, y, "You're all set", 18, "#fff", 750, "middle", -0.3))
-        out.append(text(W / 2, y + 21, "Ava is ready to meet the world.", 11, C["t2"], 400, "middle"))
+        out.append(text(W / 2, y + 21, "Ready to meet the world.", 11, C["t2"], 400, "middle"))
         y += 44
-        for ic, col, k, s in [("person", "brand", "Profile created", "Ava · AI version of you"),
+        for ic, col, k, s in [("person", "brand", "Profile created", "an AI version of you"),
                               ("db", "cyan", "Sources added", "1,024 memories sealed in your vault"),
                               ("sliders", "amber", "Personality set", "warm · balanced boundaries"),
                               ("mask", "pink", "Avatar ready", "2D portrait + 3D for video & VR")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
-        out.append(button(CX, y + 2, CW, "Start chatting with Ava", "brand", 44))
+        out.append(button(CX, y + 2, CW, "Start chatting", "brand", 44))
 
     elif hero == "social":
         out.append(text(CX, y, "Collect to build the profile · publish to run it.",
@@ -1649,9 +1654,9 @@ SCREENS = [
     dict(num=3, title="Build Your Profile", sub="Add memories & knowledge", hero="sources", accent="cyan", tab=0),
     dict(num=4, title="Personality", sub="Shape how your AI interacts", hero="personality", accent="brand", tab=0),
     dict(num=5, title="Profile Home", sub="Your AI, at a glance", hero="profilehome", accent="brand", tab=0),
-    dict(num=6, title="Chat with Ava", sub="Every response explained", hero="chat", accent="brand", tab=0),
+    dict(num=6, title="Chat", sub="Every response explained", hero="chat", accent="brand", tab=0),
     dict(num=7, title="Memory Vault", sub="Your AI remembers", hero="vault", accent="cyan", tabs=VAULT, tab=0, locked=True),
-    dict(num=8, title="Relationships", sub="People in Ava's life", hero="relationships", accent="amber", tabs=REL, tab=0),
+    dict(num=8, title="Relationships", sub="People it knows", hero="relationships", accent="amber", tabs=REL, tab=0),
     dict(num=9, title="Add Relationship", sub="Relationship-aware behavior", hero="addrel", accent="amber", tabs=REL, tab=0),
     dict(num=10, title="Profile Health", sub="At a glance", hero="health", accent="green", tab=2),
     dict(num=11, title="Marketplace", sub="Discover & connect", hero="marketplace", accent="amber", tabs=MARKET, tab=0),
@@ -1726,7 +1731,7 @@ SCREENS = [
     # ---- moderation, posting & the persona engine ----
     dict(num=32, title="Moderation", sub="Every reply, before it's seen", hero="moderation", accent="green", tab=0),
     dict(num=33, title="Posts", sub="Post in your AI's voice", accent="amber", tabs=MARKET, tab=3, cards=[
-        dict(icon="pen", color="amber", k="Compose a post", s="in Ava's voice, then moderated"),
+        dict(icon="pen", color="amber", k="Compose a post", s="in its own voice, moderated"),
         dict(icon="chat", color="brand", k="“Tomatoes are in — finally.”", s="posted to the feed", pill=("LIVE", "good")),
         dict(icon="shieldok", color="green", k="Public posts → strict", s="always the strict filter"),
         dict(icon="chart", color="cyan", k="12 posts · 3.4k views", s="GET /posts"),

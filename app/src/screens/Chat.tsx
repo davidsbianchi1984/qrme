@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { api } from "../api";
 import { useSession } from "../store";
 
-interface Msg { who: "you" | "ava"; text: string; note?: string }
+interface Msg { who: "you" | "assistant"; text: string; note?: string }
 
 export function Chat() {
   const { session } = useSession();
@@ -33,7 +33,7 @@ export function Chat() {
       const text = pm.status === "approved"
         ? pm.content
         : "(this reply was held by moderation)";
-      setMsgs((m) => [...m, { who: "ava", text, note }]);
+      setMsgs((m) => [...m, { who: "assistant", text, note }]);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -61,7 +61,7 @@ export function Chat() {
             {m.note && <div className="bubble-note">{m.note}</div>}
           </div>
         ))}
-        {busy && <div className="bubble ava thinking">…</div>}
+        {busy && <div className="bubble assistant thinking">…</div>}
       </div>
 
       {error && <div className="error">⚠ {error}</div>}
