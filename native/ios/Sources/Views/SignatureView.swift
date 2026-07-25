@@ -16,7 +16,10 @@ struct SignatureView: View {
     @State private var policy: SignaturePolicy?
     @State private var document = ""
     @State private var meaning = "I attest this is accurate and complete"
-    @State private var tier = "standard"
+    // `basic` is what a self-asserted credential can sign, and self-asserted
+    // is all this screen can enrol. Defaulting to `standard` shipped a happy
+    // path that always failed at the server.
+    @State private var tier = "basic"
     @State private var receipt: SignatureReceipt?
     @State private var error: String?
     @State private var busy = false
@@ -65,6 +68,11 @@ struct SignatureView: View {
                 Text("This exact text is hashed into the challenge and stored "
                      + "with the signature. The system prompt cannot show it — "
                      + "no passkey prompt can — so read it here.")
+                    .font(.caption2).foregroundStyle(.secondary)
+                Text("Standard and high need an identity check beyond a "
+                     + "passkey — that is what the tier buys. Until one is "
+                     + "recorded against your credential, only basic will "
+                     + "sign.")
                     .font(.caption2).foregroundStyle(.secondary)
                 Button("Sign with Face ID") { Task { await sign() } }
                     .disabled(busy || document.isEmpty || meaning.isEmpty)

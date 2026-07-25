@@ -523,3 +523,77 @@ def test_base64url_survives_missing_padding():
     unpadded = webauthn.b64url_encode(raw)
     assert "=" not in unpadded
     assert webauthn.b64url_decode(unpadded) == raw
+
+
+# --- the sequence the apps actually perform -------------------------------
+#
+# Every test above enrols at `document` level, which is why none of them saw
+# that both mobile clients enrol `self_asserted` and then immediately ask for
+# `standard` — a happy path that always failed at the server. These walk the
+# client's real order.
+
+def test_the_default_client_flow_enrol_then_sign_succeeds(client):
+    headers = _token(client)
+    auth, enrolled = _enroll(client, headers, level="self_asserted")
+    assert enrolled.json()["can_sign"] == ["basic"]
+
+    _, res = _sign(client, headers, auth, tier="basic")
+    assert res.status_code == 201, res.text
+    assert res.json()["verification"]["valid"] is True
+
+
+def test_a_credential_can_be_reproofed_to_reach_a_higher_tier(client):
+    """The spec promised this and nothing implemented it, which left every
+    credential stuck at whatever it enrolled with."""
+    headers = _token(client)
+    auth, enrolled = _enroll(client, headers, level="self_asserted")
+    row_id = enrolled.json()["id"]
+    assert "high" not in enrolled.json()["can_sign"]
+
+    res = client.post(f"/signatures/credentials/{row_id}/proofing", json={
+        "proofing_level": "document", "proofing_attestor": "clinic-registrar",
+        "proofing_method": "government ID + liveness"}, headers=headers)
+    assert res.status_code == 200
+    assert set(res.json()["can_sign"]) == {"basic", "standard", "high"}
+
+    _, signed = _sign(client, headers, auth, tier="high")
+    assert signed.status_code == 201
+
+
+def test_reproofing_needs_an_attestor_like_enrolment_does(client):
+    headers = _token(client)
+    _, enrolled = _enroll(client, headers, level="self_asserted")
+    res = client.post(
+        f"/signatures/credentials/{enrolled.json()['id']}/proofing",
+        json={"proofing_level": "document", "proofing_attestor": ""},
+        headers=headers)
+    assert res.status_code == 422
+    assert "attestor" in res.text
+
+
+def test_reproofing_never_rewrites_what_was_already_signed(client):
+    """The level travels into the evidence at signing time, so raising the
+    credential today cannot quietly upgrade yesterday's signature."""
+    headers = _token(client)
+    auth, enrolled = _enroll(client, headers, level="self_asserted")
+    _, first = _sign(client, headers, auth, tier="basic")
+    sig_id = first.json()["signature_id"]
+
+    client.post(f"/signatures/credentials/{enrolled.json()['id']}/proofing",
+                json={"proofing_level": "document",
+                      "proofing_attestor": "registrar"}, headers=headers)
+
+    pkg = client.get(f"/signatures/{sig_id}").json()
+    assert pkg["signer"]["proofing_level"] == "self_asserted"
+    assert pkg["tier"] == "basic"
+
+
+def test_reproofing_someone_elses_credential_is_refused(client):
+    headers = _token(client)
+    _, enrolled = _enroll(client, headers, level="self_asserted")
+    other = _token(client)
+    res = client.post(
+        f"/signatures/credentials/{enrolled.json()['id']}/proofing",
+        json={"proofing_level": "document", "proofing_attestor": "x"},
+        headers=other)
+    assert res.status_code == 403

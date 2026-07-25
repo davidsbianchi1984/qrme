@@ -151,6 +151,33 @@ def revoke_credential(row_id: str, request: Request) -> dict:
     return signatures.revoke(row_id)
 
 
+class ReproofIn(BaseModel):
+    proofing_level: str
+    proofing_attestor: str = Field(max_length=120)
+    proofing_method: str | None = Field(default=None, max_length=120)
+    proofing_ref: str | None = Field(default=None, max_length=200)
+
+
+@router.post("/signatures/credentials/{row_id}/proofing")
+def reproof(row_id: str, body: ReproofIn, request: Request) -> dict:
+    """Record a fresh identity check against an existing credential.
+
+    Enrollment fixes a level; this is how it moves. Applies going forward
+    only — signatures already made carry the level they were made at.
+    """
+    existing = signatures.credential(row_id)
+    if existing is None:
+        raise HTTPException(404, "no such credential")
+    if existing["account_id"] != _account(request):
+        raise HTTPException(403, "not your credential")
+    try:
+        return signatures.reproof(
+            row_id, body.proofing_level, body.proofing_attestor,
+            body.proofing_method, body.proofing_ref)
+    except signatures.SignatureError as exc:
+        raise _fail(exc) from exc
+
+
 @router.post("/signatures/request")
 def request_signature(body: RequestIn, request: Request) -> dict:
     """Mint an envelope whose challenge is the hash of this document."""

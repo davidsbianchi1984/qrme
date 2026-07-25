@@ -2169,7 +2169,9 @@ private fun SignaturePanel(vm: StudioViewModel) {
             labeledField("Meaning", meaning, "what your signature attests") { meaning = it }
             Text("This exact text is hashed into the challenge and stored with "
                 + "the signature. The system prompt cannot show it — no passkey "
-                + "prompt can — so read it here.",
+                + "prompt can — so read it here. Standard and high need an "
+                + "identity check beyond a passkey; until one is recorded "
+                + "against your credential, only basic will sign.",
                 color = Qrme.T3, fontSize = 11.sp)
             SmallAction(if (busy) "Working…" else "Sign") {
                 val token = vm.token ?: return@SmallAction
@@ -2178,7 +2180,11 @@ private fun SignaturePanel(vm: StudioViewModel) {
                 scope.launch {
                     runCatching {
                         val env = ApiClient.requestSignature(document, meaning,
-                            document, "standard", "profile", vm.pid, token)
+                            // `basic` is what a self-asserted credential can
+                            // sign, and self-asserted is all this panel can
+                            // enrol. Asking for `standard` shipped a happy
+                            // path that always failed at the server.
+                            document, "basic", "profile", vm.pid, token)
                         val rpId = ApiClient.base.substringAfter("://")
                             .substringBefore("/").substringBefore(":")
                         val a = Signing.assert(context, rpId, env.challenge)

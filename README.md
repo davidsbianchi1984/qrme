@@ -109,11 +109,28 @@ in a request body.
   as open as scanning a QR code in the world.
 - Deleting a profile revokes its owner token.
 
+## Live desks — a real person, and no AI mark
+
+Every profile in QRME is synthetic and every render of one carries the AI
+mark. A **desk** is the opposite case: an actual human offering a service,
+and it **never** carries that mark — stamping "AI" on a real person is not a
+cautious default, it is a false statement about them. Absence alone would be
+ambiguous, so a desk makes the claim positively (*Live person — not AI*) and
+shows who attested it, on what basis, and whether they signed it.
+
+What a visitor looks at is a camera view of the desk rather than a portrait,
+and when the chair is empty there is a **bell** they can ring from the screen
+— no account needed, because the person in front of an empty chair is exactly
+the one who has none. An 18+ stream is the same desk behind the deployment's
+existing verified-adult gate. See [docs/desks.md](docs/desks.md).
+
+## Signatures that survive being disputed
+
 A bearer token authorises an action; it does not *sign* one. For records that
-get disputed later — a likeness release, a care handoff, a BAA — see
-[docs/signatures.md](docs/signatures.md): the same Face ID gesture through
-WebAuthn/passkeys, returning a cryptographic assertion bound to the enrolled
-account and to the exact document. Specified, not yet built.
+get contested later — a likeness release, a care handoff, a BAA — the same
+Face ID gesture goes through WebAuthn/passkeys and returns a cryptographic
+assertion bound to the enrolled account **and to the exact document**. See
+[docs/signatures.md](docs/signatures.md).
 
 ## Objection, takedown & lifecycle states
 
@@ -386,6 +403,10 @@ installed).
 | `ANTHROPIC_API_KEY` | — | Enables real model replies |
 | `QRME_PDI_URL` / `QRME_PDI_TOKEN` | — | PDI tandem: seal source material in the encrypted vault |
 | `QRME_CLOUD_URL` / `QRME_CLOUD_TOKEN` | — | Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution ([docs/cloud-model.md](docs/cloud-model.md)) |
+| `QRME_RP_ID` | `qrme.app` | The WebAuthn relying party — **the deployment's own domain**. Passkeys are bound to it, so leaving the default on a real deployment makes every signature fail as "made for a different site" ([docs/signatures.md](docs/signatures.md)) |
+| `QRME_RP_ORIGINS` | any | Comma-separated allowlist of origins a signing ceremony may come from. Unset accepts any origin the relying party matches |
+| `QRME_CONSOLE_DIR` | `app/dist` | Where the built studio is served from. Set it explicitly in a container — it resolves relative to the installed package otherwise, which is not where the build lands |
+| `QRME_CORS_ORIGINS` | off | Comma-separated allowlist for a front-end on another origin; `*` for any. Off is right when the studio and API share an origin |
 
 ## Test
 

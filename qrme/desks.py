@@ -29,8 +29,6 @@ and the owner sees the ring when they get back.
 
 from __future__ import annotations
 
-import html
-import json
 from datetime import datetime, timedelta, timezone
 
 from . import auth, db
@@ -135,7 +133,7 @@ def set_presence(desk_id: str, presence: str) -> dict:
 
 def set_portrait(desk_id: str, asset: str | None) -> dict:
     """Attach a portrait the desk owner holds the rights to, or clear it back
-    to the placeholder. Never populated on their behalf."""
+    back to the desk view. Never populated on their behalf."""
     conn = db.connect()
     conn.execute("UPDATE desks SET portrait=? WHERE id=?", (asset, desk_id))
     conn.commit()
@@ -158,6 +156,19 @@ def age_wall_card(desk_id: str) -> dict:
         "note": "18+ only — open this with an interactor token whose verified "
                 "birthdate shows 18 or older",
     }
+
+
+def set_camera(desk_id: str, url: str | None) -> dict:
+    """Point this desk at its own camera, or clear it back to the sample.
+
+    Until this is set, ``feed.live`` is false and every client says SAMPLE
+    VIEW — which was true, but meant the live branch could never be reached
+    by anything, since nothing could write the column.
+    """
+    conn = db.connect()
+    conn.execute("UPDATE desks SET camera_url=? WHERE id=?", (url, desk_id))
+    conn.commit()
+    return card(desk_id, viewer_adult=True)
 
 
 def card(desk_id: str, viewer_adult: bool = False) -> dict | None:
@@ -380,9 +391,3 @@ def join(desk_id: str) -> dict:
         "note": ("They are here." if row["presence"] == "attended"
                  else "They are away — ring the bell and they will see it."),
     }
-
-
-def listing(desk_id: str) -> str:
-    """A compact JSON blob for embedding, kept parallel to the profile card so
-    a surface can render either without branching on more than ``ai``."""
-    return json.dumps(card(desk_id))
