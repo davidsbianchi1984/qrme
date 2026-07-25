@@ -157,6 +157,26 @@ on a timer**: periods are charged by an explicit renew, so a deployment left
 running accrues nothing unseen. Money here is simulated, and every subscription
 says so in its own response. See [docs/audience.md](docs/audience.md).
 
+## Gifts, and buying things on the marketplace
+
+A listing is a shop window; an **offer** is what makes it a shop. Creating a
+listing has never needed a token, so the price and the seller live in a
+separate row only a token-holder can write — and the seller comes from that
+token, never from a request body. A listing nobody has offered simply cannot be
+bought, because there is nowhere for a price to be. Buying confirms the price
+explicitly, and a receipt keeps the title it was bought under.
+
+A **gift** is not a small purchase: it sends money to a person and receives
+nothing back, which is the shape livestream tipping keeps turning into a way to
+take money from people who should not be spending it. So the giver must be a
+verified adult whoever they are gifting, a single gift is capped, a rated desk
+still runs its own age gate on top, and the recipient is read from the subject
+rather than named by the giver. Money here is **simulated** — real rows on the
+creator's statement, no real funds — and every money response says so itself.
+[docs/commerce.md](docs/commerce.md) also lists plainly what this is *not*:
+spend totals, parental controls, chargebacks and payout compliance are absent,
+and are the work remaining before real money touches these endpoints.
+
 ## Signatures that survive being disputed
 
 A bearer token authorises an action; it does not *sign* one. For records that

@@ -21,8 +21,8 @@ from . import mobile, offline
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
-from .routers import (apps, assistant, audience, avatars, community,
-                      connections,
+from .routers import (apps, assistant, audience, avatars, commerce,
+                      community, connections,
                       desks, earnings, feedback, gaming, governance,
                       intelligence, interaction, licensing, models, packs,
                       profiles, research, robots, signatures, social, steering,
@@ -117,6 +117,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(desks.router)
     # Last on purpose: these paths are generic (`/{kind}/{id}/like`), so every
     # concrete route above gets first refusal on a match.
+    app.include_router(commerce.router)
     app.include_router(audience.router)
 
     # Optional CORS for a packaged desktop/mobile front-end that calls the API

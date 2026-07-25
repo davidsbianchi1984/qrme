@@ -134,9 +134,9 @@ already uses that word for the per-relationship EMA score that conditions the
 persona prompt ([adaptation.py](../qrme/adaptation.py)). Two different numbers
 under one word would have been read as one number by whoever came next.
 
-## Not built yet
+## The commerce half
 
-**Gifting and marketplace purchase** are the commerce half of this and are a
-separate round. Note that `listings` currently has no `price` and no purchase
-endpoint at all — you can list a product on the marketplace today and nobody
-can buy it. Packs and licences have priced purchase; listings never got it.
+**Gifting and marketplace purchase** shipped in the following round — see
+[commerce.md](commerce.md). That round also closed the gap this one turned up:
+`listings` had no price and no purchase endpoint at all, so a product could be
+listed and bought by nobody.
