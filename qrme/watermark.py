@@ -40,9 +40,14 @@ def design(profile_id: str) -> dict:
     designation is invariant: whatever the custom label says, the rendered
     line always carries "AI"."""
     row = db.connect().execute(
-        "SELECT display_name, watermark_design FROM profiles WHERE id=?",
-        (profile_id,)).fetchone()
-    name = row["display_name"] if row else profile_id
+        "SELECT display_name, anonymous, watermark_design FROM profiles"
+        " WHERE id=?", (profile_id,)).fetchone()
+    # An anonymous profile's name is withheld everywhere else it could be
+    # seen (summon cards, marketplace listings). The default watermark is
+    # built from that name and rides on every render the profile produces —
+    # so without this it was the one surface that gave it away.
+    name = (("anonymous persona" if row["anonymous"] else row["display_name"])
+            if row else profile_id)
     custom = json.loads(row["watermark_design"]) if (
         row and row["watermark_design"]) else {}
     mark = custom.get("mark") or DEFAULT_MARK

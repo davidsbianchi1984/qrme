@@ -132,3 +132,32 @@ def test_creative_works_and_guidance_are_stamped(client):
     edited = client.post(f"/profiles/{pid}/assist/proofread",
                          json={"text": "i think the garden are lovely"}).json()
     assert edited["watermark"]["kind"] == "proofread"
+
+
+def test_an_anonymous_profiles_watermark_does_not_name_it(client):
+    """The anonymity toggle withholds the display name from summon cards and
+    marketplace listings. The default watermark is built from that same name
+    and rides on every render the profile produces, so it was the one surface
+    that gave it away — found by a beacon scan, where the leak would have been
+    to a stranger who scanned a sticker."""
+    body = {"owner_id": "o1", "kind": "fictional", "display_name": "Marcus Bell",
+            "persona": "A retired planner.", "anonymous": True,
+            "verification": {"birthdate": "1980-01-01",
+                             "id_document": "passport", "liveness_check": True}}
+    pid = client.post("/profiles", json=body).json()["id"]
+
+    design = client.get(f"/profiles/{pid}/watermark").json()
+    assert "Marcus Bell" not in design["line"]
+    assert design["line"] == "\u2726 AI \u00b7 anonymous persona"
+
+    # Still declares AI, which is the part that is never negotiable.
+    assert "AI" in design["line"]
+
+
+def test_a_named_profiles_watermark_still_names_it(client):
+    body = {"owner_id": "o1", "kind": "fictional", "display_name": "Ada",
+            "persona": "An engineer.",
+            "verification": {"birthdate": "1980-01-01",
+                             "id_document": "passport", "liveness_check": True}}
+    pid = client.post("/profiles", json=body).json()["id"]
+    assert client.get(f"/profiles/{pid}/watermark").json()["line"].endswith("Ada")

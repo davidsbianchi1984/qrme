@@ -51,6 +51,8 @@ def test_beacon_left_behind_and_scanned(client):
         "label": "Rosa's garden bench",
         "location": "Riverside Park, third bench past the willow"}).json()
     assert beacon["summon_url"].endswith(f"/summon?ref={beacon['id']}")
+    # The printed QR points at the human page, not this JSON surface.
+    assert beacon["scan_url"].endswith(f"/b/{beacon['id']}")
 
     # A real, printable QR code.
     qr = client.get(beacon["qr_svg"])
