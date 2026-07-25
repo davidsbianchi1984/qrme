@@ -510,6 +510,14 @@ Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation 
     <td align="center" width="50%"><a href="docs/desktop/05-marketplace-licensing.svg"><img src="docs/desktop/05-marketplace-licensing.svg" width="460" alt="Marketplace & Licensing"></a><br><sub><b>05</b> · Marketplace & Licensing</sub></td>
     <td align="center" width="50%"><a href="docs/desktop/06-control-center.svg"><img src="docs/desktop/06-control-center.svg" width="460" alt="Control Center"></a><br><sub><b>06</b> · Control Center</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/07-live-desks.svg"><img src="docs/desktop/07-live-desks.svg" width="460" alt="Live Desks"></a><br><sub><b>07</b> · Live Desks</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/08-audience-commerce.svg"><img src="docs/desktop/08-audience-commerce.svg" width="460" alt="Audience & Commerce"></a><br><sub><b>08</b> · Audience &amp; Commerce</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
+    <td align="center" width="50%"></td>
+  </tr>
 </table>
 
 ### Mobile app
