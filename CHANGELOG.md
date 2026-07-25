@@ -4,9 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.9] — 2026-07-25
 
 ### Added
+
+- **The tandem doc describes the architecture that actually exists** —
+  [docs/tandem.md](docs/tandem.md), and the same file byte-for-byte in all
+  three repositories. It had drifted in three separate ways at once.
+
+  **It was missing an arrow.** For most of this project's life one sentence
+  covered the topology: every arrow points *into* PDI. PDI's gate agent broke
+  that on purpose — it asks a QRME profile for the words it speaks at a door —
+  and the document, the ASCII diagram and the section headings all still
+  described the world before it. There is a `pdi ✕ qrme` section now, with the
+  flow, the fallbacks, and why the model is the voice and not the decider.
+
+  **Two of the three copies were stale.** JIM's and PDI's still described the
+  suite gateway's erase, export, consent and metering as `[planned]` when
+  `suite/gateway.py` had shipped them, and the docker-compose e2e harness as
+  `[planned]` when it runs in CI. A reader in those repos was told cross-app
+  deletion did not exist. The three copies are identical again.
+
+  **The numbers were wrong.** *QRME 59, JIM 49, PDI 20 tests* against actual
+  suites of 523, 293 and 177.
+
+  Also new: a **beacon family** section, because three products now put a
+  printed code on a physical thing and answer three different questions with
+  it, and the shared rules (a scan is a page not JSON; a dead code and a code
+  that never existed render identically; the page renders only what it was
+  handed) were true in three places and written down in none.
+
+- **The diagram is generated** — `tools/build_assets.py` now writes
+  `docs/diagrams/tandem-flow.svg`, and the block that draws it is identical in
+  all three repos so one picture cannot become three that disagree. It replaces
+  a hand-drawn SVG that was cream-and-serif while every other asset in every
+  repo is night-indigo, and that showed two arrows because it was drawn when
+  there were two.
+
+  The vault arrows name **what actually goes down them**. *"Medical payloads"*
+  was true and incomplete: spending events, bank transactions, messages and
+  location all ride the same wire, under the same consent gate, into the same
+  `jim/{user}/context/…` namespace. A diagram — or a doc — naming only the
+  medical half invites the reader to assume the rest is held somewhere else,
+  and it is not. All four categories a person would be startled to find there
+  now sit on the label's bold line together; putting two of them a row down in
+  a smaller font would have re-made the same mistake more quietly. The QRME
+  arrow got the same treatment, having been summarised to *"source material"*
+  while also carrying rated placement earnings and adaptation runs.
 
 - **Marketplace search: words, place, and a hand with the words** —
   `qrme/marketplace.py`, [docs/marketplace.md](docs/marketplace.md), 8 routes,
@@ -48,6 +92,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   79 Search Assistant).
 
 ### Changed
+
+- The Starter Collection row said *33 fictional profiles* while the README, the
+  avatars doc and the generated cover all said 34. Both were right —
+  `@vivienne_sable` seeds the rated tier from `RATED` rather than `STARTERS` —
+  and reading them together still looked like a contradiction. Named.
 
 - **The README cover is generated now** (`tools/build_assets.py`) rather than
   hand-built. It had been drawn before live desks, beacons, the audience layer,
