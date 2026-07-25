@@ -8,6 +8,54 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The audience layer — like, comment, share, subscribe.** What a viewer does
+  *other* than talk, on a profile, a live desk, a room message or a marketplace
+  listing. Targets are a `(kind, id)` pair rather than a column per thing,
+  because the same four verbs on four surfaces would otherwise have become four
+  near-identical tables that drifted apart within a round.
+
+  **A like is a fact, not a counter** — `reactions` is UNIQUE on
+  `(target, actor)`, so liking twice is idempotent and reports
+  `was_already_liked` instead of erroring. A plain integer column would let one
+  account manufacture popularity by calling an endpoint in a loop, which makes
+  every number on the platform meaningless rather than just that one. That is
+  also why a like needs a token: a like from nobody in particular is a number
+  anyone can produce.
+
+  **A comment is authored text, so it is filtered like authored text** — the
+  same moderation pipeline as a chat turn, at *the target's* maturity setting
+  rather than the commenter's, since a comment lands under someone else's name.
+  A blocked comment is kept, returned to its author with the reason, and shown
+  to nobody else; the endpoint answers 201 because the comment was accepted and
+  recorded, and what happened to it is in `status`. Blocked comments are not
+  counted.
+
+  **Sharing is gated at the far end, not at the sharer** — no token needed,
+  including for a rated target, because the link lands the recipient on the age
+  wall regardless of who sent it. Refusing the sharer would be gate theatre.
+  Shares record the actor when there is one: "shared 40 times" and "shared 40
+  times by one account" are different facts.
+
+  **Subscriptions are two tiers on one row** — a free `follow`, and a `paid`
+  tier that credits the creator's ledger each period alongside pack sales and
+  licence fees. Paid requires `accept_price` to match, the same explicit consent
+  priced packs use and for a sharper reason: a recurring charge a viewer did not
+  mean to start *keeps* costing them. **Nothing bills on a timer** — the first
+  period is charged on subscribe and later ones by an explicit
+  `POST /subscriptions/{id}/renew`, so a deployment left running accrues nothing
+  unseen. Cancelling keeps the row so a lapsed subscriber stays distinguishable
+  from someone who was never there, and re-subscribing reuses it. Money is
+  simulated exactly as it is elsewhere here, and every subscription response
+  says so in its own `billing` field rather than leaving it to a policy page.
+
+  A rated target keeps its gate on **every** verb, running the deployment's
+  existing verified-adult check rather than a second implementation of it. The
+  test asserts across all five surfaces in one loop, because a gate remembered
+  on four of five is exactly the kind that ships. `GET …/audience` is
+  deliberately not called `engagement`: that word already means the
+  per-relationship EMA score, and two different numbers under one word get read
+  as one.
+
 - **A live desk can be left behind as a printed code.** A profile beacon and a
   desk beacon are the same gesture aimed at opposite things: scanning the first
   reveals somebody who does not exist, and the page marks the portrait *AI*;

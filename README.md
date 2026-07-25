@@ -137,6 +137,26 @@ claim, who vouched for it, and a bell that works without an account. A rated
 desk's code always lands on the age wall, since a sticker scan carries no token
 that could clear it. See [docs/desks.md](docs/desks.md).
 
+## The audience layer — like, comment, share, subscribe
+
+What a viewer does other than talk, on a profile, a live desk, a room message
+or a marketplace listing. A **like** is stored per person rather than as a
+counter, so liking twice is still one like and nobody can manufacture
+popularity in a loop. A **comment** is authored text and goes through the same
+moderation pipeline as a chat turn, at the target's maturity setting — a
+blocked one is kept and shown to its author with the reason, and to nobody
+else. A **share** needs no account, because the person who scanned a sticker is
+the one most likely to pass it on, and the age gate lives at the destination
+rather than on the sharer.
+
+**Subscriptions** come in two tiers on one row: a free `follow`, and a `paid`
+tier that credits the creator's ledger each period alongside pack sales and
+licence fees. Paid requires the price to be confirmed explicitly, because a
+recurring charge nobody meant to start keeps costing them — and **nothing bills
+on a timer**: periods are charged by an explicit renew, so a deployment left
+running accrues nothing unseen. Money here is simulated, and every subscription
+says so in its own response. See [docs/audience.md](docs/audience.md).
+
 ## Signatures that survive being disputed
 
 A bearer token authorises an action; it does not *sign* one. For records that
