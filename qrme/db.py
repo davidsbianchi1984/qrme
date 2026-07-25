@@ -784,6 +784,58 @@ CREATE TABLE IF NOT EXISTS desk_rings (
 -- already out there, and this schema is applied with CREATE TABLE IF NOT
 -- EXISTS, so widening an existing table would only take effect on a fresh
 -- one. Additive works everywhere.
+-- Commerce: gifts, and the offer that turns a listing into something buyable.
+
+-- A listing is a shop window. An *offer* is what makes it a shop.
+--
+-- Deliberately a side table rather than columns on `listings`. Partly because
+-- this schema is applied with CREATE TABLE IF NOT EXISTS, so new columns on an
+-- existing table would only ever appear on a fresh database — but mostly
+-- because it makes the safety property structural instead of a check someone
+-- can forget: a listing with no offer row has no seller and no price, and
+-- therefore cannot be bought. `POST /marketplace/listings` needs no token and
+-- never has, so anyone can create a listing; nobody can attach money to one
+-- without holding a token and becoming its recorded seller.
+CREATE TABLE IF NOT EXISTS listing_offers (
+    listing_id TEXT PRIMARY KEY REFERENCES listings(id),
+    seller_id  TEXT NOT NULL,   -- who the sale accrues to
+    price      REAL NOT NULL,
+    currency   TEXT NOT NULL DEFAULT 'USD',
+    stock      INTEGER,         -- NULL = unlimited
+    status     TEXT NOT NULL DEFAULT 'open',   -- open | closed
+    created_at TEXT NOT NULL
+);
+
+-- One purchase. Kept even when the listing is later withdrawn, because a
+-- receipt that disappears with the shop window is not a receipt.
+CREATE TABLE IF NOT EXISTS orders (
+    id         TEXT PRIMARY KEY,
+    listing_id TEXT NOT NULL REFERENCES listings(id),
+    title      TEXT NOT NULL,   -- copied at purchase: what they actually bought
+    buyer_id   TEXT NOT NULL,
+    seller_id  TEXT NOT NULL,
+    price      REAL NOT NULL,
+    currency   TEXT NOT NULL DEFAULT 'USD',
+    ledger_ref TEXT,            -- the seller's ledger entry
+    status     TEXT NOT NULL DEFAULT 'paid',
+    created_at TEXT NOT NULL
+);
+
+-- A gift: value sent to a person with nothing delivered back. That asymmetry
+-- is why gifts carry rules purchases do not — see qrme/commerce.py.
+CREATE TABLE IF NOT EXISTS gifts (
+    id           TEXT PRIMARY KEY,
+    subject_kind TEXT NOT NULL,  -- profile | desk
+    subject_id   TEXT NOT NULL,
+    giver_id     TEXT NOT NULL,
+    beneficiary  TEXT NOT NULL,  -- whose ledger it lands on
+    amount       REAL NOT NULL,
+    currency     TEXT NOT NULL DEFAULT 'USD',
+    note         TEXT,
+    ledger_ref   TEXT,
+    created_at   TEXT NOT NULL
+);
+
 -- The audience layer: what a viewer does other than talk. Likes, comments,
 -- shares and subscriptions all point at a (kind, id) pair rather than at a
 -- profile column, because the same four verbs have to work on a synthetic

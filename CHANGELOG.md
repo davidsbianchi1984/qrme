@@ -8,6 +8,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Gifts, and buying things on the marketplace.** Round 2 of the audience
+  work, and it starts by fixing something the first round turned up: `listings`
+  had no price and no purchase endpoint at all, so a product could be listed
+  and bought by nobody. Packs and licences had priced purchase; listings never
+  got it.
+
+  **A listing is a shop window; an offer is what makes it a shop.**
+  `POST /marketplace/listings` needs no token and never has, so anyone can
+  create one naming any provider — harmless while listings were discovery-only,
+  and not harmless the moment a price could attach. So price and seller live in
+  a separate `listing_offers` row that only a token-holder can write, and the
+  seller comes from that token rather than a request body. A listing with no
+  offer cannot be bought, not by a check that could be forgotten but because
+  there is nowhere for a price to be. Buying confirms `accept_price` against
+  the offer, an order copies the title it was bought under (a receipt that
+  changes when the seller edits the listing is not a receipt), and withdrawing
+  an offer keeps both the shop window and past receipts. Buying your own
+  listing is refused — it would credit you with your own money and inflate the
+  sales count at once.
+
+  **A gift is not a small purchase.** It sends money to a person and receives
+  nothing, which is exactly the shape livestream tipping keeps turning into a
+  way to take money from people who should not be spending it. So the giver
+  must be a **verified adult** whoever they are gifting — an account with no
+  birthdate is refused, because an unverified age is not evidence of an adult —
+  a single gift is **capped**, a rated desk runs its own 18+ gate on top (the
+  two answer different questions), and the beneficiary is read from the subject
+  rather than named by the giver, since a body-supplied one would let anyone
+  route a performer's gift into their own balance. Every gift states
+  `refundable: false` at the point of giving rather than in a policy page.
+
+  Money remains **simulated**, as everywhere else here: real rows on the
+  creator's statement under `listing_sale` and `gift`, settling through the
+  same payout sweep as pack sales and licence fees, with no real funds moved —
+  and every money-bearing response says so in its own body.
+  [docs/commerce.md](docs/commerce.md) states plainly what this is *not*:
+  running spend totals, cooling-off, parental controls, a real identity check
+  behind "verified adult", chargebacks, and payout compliance are all absent.
+  That list is written down rather than omitted because a half-built safety
+  feature that looks whole is worse than an obviously missing one.
+
 - **The audience layer — like, comment, share, subscribe.** What a viewer does
   *other* than talk, on a profile, a live desk, a room message or a marketplace
   listing. Targets are a `(kind, id)` pair rather than a column per thing,
