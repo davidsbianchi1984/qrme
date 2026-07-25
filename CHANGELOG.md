@@ -14,6 +14,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   gates profile creation behind an `x-signup-key` header so a published
   instance stays the operator's rather than open registration; unset leaves
   LAN use exactly as it was, and talking to a profile stays public either way.
+- **Deployable as one container** — a two-stage `Dockerfile` builds the studio
+  and installs the API into a single image, so a hosted instance serves UI and
+  API from one origin exactly as the phone flow does. Runs as a non-root user,
+  keeps the database on a `/data` volume, honours `$PORT`, and reports health
+  at `/health`. [docs/hosting.md](docs/hosting.md) covers the operator side:
+  the two postures (local vs published), why TLS isn't optional, what hosting
+  profiles for other people commits you to, and — stated plainly — what the
+  deployment does *not* give you (no multi-tenancy, rate limiting, or backups).
 
 ## [0.1.4] — 2026-07-24
 

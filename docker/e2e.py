@@ -23,6 +23,9 @@ import urllib.request
 QRME = os.environ.get("QRME_URL", "http://qrme:8000")
 JIM = os.environ.get("JIM_URL", "http://jim:8200")
 PDI = os.environ.get("PDI_URL", "http://pdi:8100")
+# PDI admin endpoints (tenant creation) need this; the harness configures one
+# because dev-open mode is localhost-only and this runs across the network.
+PDI_ADMIN = os.environ.get("PDI_ADMIN_TOKEN", "")
 
 
 def call(base: str, method: str, path: str, body=None, token=None):
@@ -49,7 +52,8 @@ def check(label: str, cond: bool, detail="") -> None:
 
 def main() -> None:
     print("== PDI: vault stands alone ==", flush=True)
-    st, tenant = call(PDI, "POST", "/tenants", {"name": "e2e", "retention": "forever"})
+    st, tenant = call(PDI, "POST", "/tenants", {"name": "e2e", "retention": "forever"},
+                      token=PDI_ADMIN or None)
     check("create tenant", st == 201, str(st))
     tok = tenant["token"]
     st, _ = call(PDI, "PUT", "/records", {"key": "e2e/secret", "value": "hunter2"}, tok)

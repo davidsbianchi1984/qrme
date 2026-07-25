@@ -9,8 +9,10 @@
 # jim-mini / pdi). Override with QRME_CONTEXT / JIM_CONTEXT / PDI_CONTEXT for a
 # different local layout.
 #
-# NOTE: a *test* harness — PDI runs in dev-open admin mode with an ephemeral
-# master key and the stub LLM provider. Not a production topology.
+# NOTE: a *test* harness — fixed throwaway credentials and the stub LLM
+# provider. Not a production topology.
+
+x-pdi-admin: &pdi-admin "${PDI_ADMIN_TOKEN:-pdi-e2e-harness-admin-token}"
 
 services:
   pdi:
@@ -18,6 +20,10 @@ services:
       context: ${PDI_CONTEXT:-../../pdi}
     environment:
       PDI_MASTER_KEY: "${PDI_MASTER_KEY:-cGRpLWUyZS1oYXJuZXNzLXRlc3Qta2V5LTMyYnl0ZXM=}"
+      # PDI's dev-open admin mode is open only to callers on the same machine;
+      # over the compose network it fails closed, so the harness configures a
+      # token the way a real deployment does.
+      PDI_ADMIN_TOKEN: *pdi-admin
       PDI_DB: /data/pdi.db
     volumes:
       - pdi-data:/data
@@ -30,11 +36,18 @@ services:
   bootstrap:
     build:
       context: ${QRME_CONTEXT:-..}
+    # The images run as a non-root service user, and the `shared` volume is
+    # created empty and root-owned because no such directory exists in the
+    # image to inherit ownership from. Only this one-shot writes there, so it
+    # takes root rather than the production image carrying a /shared it has no
+    # use for; the env files it leaves are world-readable for qrme and jim.
+    user: "0:0"
     depends_on:
       pdi:
         condition: service_healthy
     environment:
       PDI_URL: http://pdi:8100
+      PDI_ADMIN_TOKEN: *pdi-admin
     volumes:
       - shared:/shared
       - ./:/work:ro
@@ -94,6 +107,7 @@ services:
       QRME_URL: http://qrme:8000
       JIM_URL: http://jim:8200
       PDI_URL: http://pdi:8100
+      PDI_ADMIN_TOKEN: *pdi-admin
     volumes:
       - ./:/work:ro
     command: ["python", "/work/e2e.py"]

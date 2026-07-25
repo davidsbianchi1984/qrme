@@ -274,6 +274,19 @@ and your colleagues to reach from anywhere:
 Talking to a profile stays public either way; the key gates creating an
 account on your deployment, not using one.
 
+The `Dockerfile` packages the studio and the API into one image so a hosted
+instance serves both from the same origin, exactly like the phone flow does:
+
+```bash
+docker build -t qrme .
+docker run -p 8000:8000 -v qrme-data:/data \
+  -e QRME_PUBLIC_URL=https://qrme.example.com \
+  -e QRME_SIGNUP_KEY="$(openssl rand -base64 24)" qrme
+```
+
+[docs/hosting.md](docs/hosting.md) covers the rest — TLS, what mounting
+`/data` protects, and what running profiles for other people commits you to.
+
 Without `QRME_PUBLIC_URL`, the address is local-network only and deliberately
 not reachable from the internet — your profiles and their memories stay on
 your own network.
