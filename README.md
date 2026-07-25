@@ -692,13 +692,20 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/72-gifts-purchases.svg"><img src="docs/screens/72-gifts-purchases.svg" width="210" alt="Gifts &amp; Purchases"></a><br><sub><b>72</b> · Gifts &amp; Purchases</sub></td>
     <td align="center" width="33%"><a href="docs/screens/73-signatures.svg"><img src="docs/screens/73-signatures.svg" width="210" alt="Signatures"></a><br><sub><b>73</b> · Signatures</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/74-starter-collection.svg"><img src="docs/screens/74-starter-collection.svg" width="210" alt="Starter Collection"></a><br><sub><b>74</b> · Starter Collection</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/75-live-room.svg"><img src="docs/screens/75-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>75</b> · Live Room</sub></td>
   </tr>
 </table>
 
-Screens **69** and **70** are the only two in this set that carry no AI mark,
-and that is the point: a desk is an actual person, so the badge makes the
-positive claim (*Live person — not AI*) instead of the disclosure every
-synthetic profile carries.
+The mark runs in both directions across this set, which is the whole point of
+it. **74** is the starter collection — every face there is generated, so it
+carries the AI badge and the mark is burned into the portrait itself. **69**,
+**70** and **75** are live desks and the room their viewers share: an actual
+person is on the other end, so they carry no AI mark at all and make the
+positive claim (*Live person — not AI*) instead. Absence alone would be
+ambiguous; the claim is stated.
 
 
 ## Design assets

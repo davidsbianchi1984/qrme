@@ -1771,6 +1771,44 @@ SCREENS = [
         dict(icon="lock", color="amber", k="Proofing decides the tier",
              s="self-asserted · federated · document · in person"),
     ], button=("Sign", "brand")),
+
+    # The starter collection is the one place a viewer meets many synthetic
+    # profiles at once, so it is also where the AI mark matters most: every
+    # face here is generated, and the screen says so rather than relying on
+    # the viewer to infer it from context.
+    dict(num=74, title="Starter Collection", sub="33 industries + one rated, seeded with faces",
+         accent="brand", tabs=MARKET, tab=0, cards=[
+        dict(icon="people", color="brand", k="One expert per industry",
+             s="healthcare · finance · technology · education · legal …",
+             metric="33"),
+        dict(icon="person", color="cyan", k="Dr. Amara Osei · @dr_amara_osei",
+             s="healthcare · listed on the marketplace", pill=("AI", "brand")),
+        dict(icon="photo", color="amber", k="The mark is in the pixels",
+             s="burned into the portrait — it survives a screenshot"),
+        dict(icon="lock", color="red", k="Vivienne Sable · adult",
+             s="hidden from an unverified browse entirely",
+             pill=("18+", "crit")),
+        dict(icon="shieldok", color="green", k="Seeding is idempotent",
+             s="already-seeded profiles are skipped, never duplicated"),
+    ], button=("Browse the collection", "brand")),
+
+    # The room a desk's viewers actually share: the bell, and the audience
+    # verbs in situ rather than as a summary. Still no AI mark — there is a
+    # real person on the other end of this stream.
+    dict(num=75, title="Live Room", sub="Everyone watching is here together",
+         accent="green", tab=3, cards=[
+        dict(icon="eye", color="green", k="Bev Okafor · live",
+             s="one room, not a call per viewer", pill=("LIVE", "good")),
+        dict(icon="finger", color="amber", k="🔔 Ring the bell",
+             s="they are away — one ring per desk every 30s"),
+        dict(icon="chat", color="brand", k="“Are you open till six?”",
+             s="comments moderated like any chat turn"),
+        dict(icon="heart", color="pink", k="Likes", s="one per person", metric="12"),
+        dict(icon="gift", color="amber", k="Gift · $5 from Bea",
+             s="verified adult · capped · not refundable", pill=("SENT", "good")),
+        dict(icon="shieldok", color="cyan", k="No AI mark on this stream",
+             s="there is a real person on the other end of it"),
+    ], button=("Join the stream", "green")),
 ]
 
 
