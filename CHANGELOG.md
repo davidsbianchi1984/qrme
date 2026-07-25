@@ -6,6 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Documentation
+
+- **[docs/signatures.md](docs/signatures.md) — signatures that survive being
+  disputed.** A specification, not an implementation. The user gesture is the
+  same Face ID prompt; what changes is that a WebAuthn/passkey assertion comes
+  back instead of a boolean, signed by a key the app never sees, over a
+  challenge that **is** the document hash — so a modified client cannot
+  manufacture one and a third party can verify it without trusting our
+  software. Covers enrollment identity-proofing (a passkey means nothing
+  without it), the evidence package, `be`/`bs` syncable-credential flags,
+  Optic ID on Vision Pro and the cross-device hybrid path for headsets that
+  expose no platform authenticator, and per-product bindings for care
+  handoffs, BAA execution, key release, and likeness releases. Recommends
+  **ESIGN/UETA** grade with 21 CFR Part 11 as a configuration change rather
+  than a rewrite — HIPAA does not require Part 11, and JIM's terms already
+  state the product is not a medical device. Ends with what the scheme does
+  *not* prove, including the absence of a trusted display: WebAuthn cannot
+  attest to what appeared on the screen, and the mitigation is signing on a
+  second device rather than a claim that it can.
+
 ## [0.1.5] — 2026-07-25
 
 ### Added
