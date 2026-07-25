@@ -42,11 +42,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   there were two.
 
   The vault arrows name **what actually goes down them**. *"Medical payloads"*
-  was true and incomplete: a user's spending events and bank transactions ride
-  the same wire, under the same consent gate, into the same
+  was true and incomplete: spending events, bank transactions, messages and
+  location all ride the same wire, under the same consent gate, into the same
   `jim/{user}/context/…` namespace. A diagram — or a doc — naming only the
-  medical half invites the reader to assume the financial half is held
-  somewhere else, and it is not. Both the picture and the prose enumerate now.
+  medical half invites the reader to assume the rest is held somewhere else,
+  and it is not. All four categories a person would be startled to find there
+  now sit on the label's bold line together; putting two of them a row down in
+  a smaller font would have re-made the same mistake more quietly. The QRME
+  arrow got the same treatment, having been summarised to *"source material"*
+  while also carrying rated placement earnings and adaptation runs.
 
 - **Marketplace search: words, place, and a hand with the words** —
   `qrme/marketplace.py`, [docs/marketplace.md](docs/marketplace.md), 8 routes,
