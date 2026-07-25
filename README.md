@@ -403,6 +403,10 @@ installed).
 | `ANTHROPIC_API_KEY` | — | Enables real model replies |
 | `QRME_PDI_URL` / `QRME_PDI_TOKEN` | — | PDI tandem: seal source material in the encrypted vault |
 | `QRME_CLOUD_URL` / `QRME_CLOUD_TOKEN` | — | Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution ([docs/cloud-model.md](docs/cloud-model.md)) |
+| `QRME_RP_ID` | `qrme.app` | The WebAuthn relying party — **the deployment's own domain**. Passkeys are bound to it, so leaving the default on a real deployment makes every signature fail as "made for a different site" ([docs/signatures.md](docs/signatures.md)) |
+| `QRME_RP_ORIGINS` | any | Comma-separated allowlist of origins a signing ceremony may come from. Unset accepts any origin the relying party matches |
+| `QRME_CONSOLE_DIR` | `app/dist` | Where the built studio is served from. Set it explicitly in a container — it resolves relative to the installed package otherwise, which is not where the build lands |
+| `QRME_CORS_ORIGINS` | off | Comma-separated allowlist for a front-end on another origin; `*` for any. Off is right when the studio and API share an origin |
 
 ## Test
 

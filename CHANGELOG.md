@@ -128,6 +128,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   records a fresh check. It applies going forward only: a signature already
   made copied its level into the evidence at signing time, so raising the
   credential today cannot quietly upgrade what it signed yesterday.
+- **The WebAuthn deployment variables were undocumented.** `QRME_RP_ID` and
+  `QRME_RP_ORIGINS` shipped with the signature scheme and appeared in no table
+  anywhere, so an operator had no way to learn that leaving `QRME_RP_ID` at its
+  default makes every signature on a real deployment fail as *"made for a
+  different site"* — a server-side refusal that reads like a client bug. Both
+  are in the README's environment table now, with `QRME_CONSOLE_DIR` and
+  `QRME_CORS_ORIGINS`, which were also read but never written down; and
+  `docs/signatures.md` gains the deployment section that says what the domain
+  itself has to serve.
 - **A desk's camera could never be turned on.** `feed.live` was read from a
   column no endpoint could write, so the live branch was unreachable and every
   desk was a sample view for ever. `PUT /desks/{id}/camera` sets it, and only

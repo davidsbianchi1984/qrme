@@ -347,6 +347,22 @@ already make.
 - Adult-tier attestation — `standard`, and it remains an age check rather than
   an identity broadcast.
 
+## 10a. Configuring a deployment
+
+Two environment variables decide whether any of this works, and getting them
+wrong fails in a way that reads like a client bug:
+
+| | |
+| --- | --- |
+| `QRME_RP_ID` | The relying party — **your deployment's domain**. Passkeys are bound to it. Left at the default on a real deployment, every assertion is refused with *"this assertion was made for a different site"*, and nothing in the client says why. |
+| `QRME_RP_ORIGINS` | Optional comma-separated allowlist of origins a ceremony may come from. Unset accepts any origin that matches the relying party. |
+
+The domain also has to serve the platform association files — an
+`apple-app-site-association` with a `webcredentials` entry for iOS, and
+`/.well-known/assetlinks.json` for Android. Without them the OS refuses before
+a prompt ever appears, which is why a LAN dev server cannot exercise signing at
+all (§11).
+
 ## 11. The clients
 
 | Platform | Enrol | Sign | Read & verify |
