@@ -114,7 +114,11 @@ jobs:
       # Unpackaged and self-contained (see QrmeStudio.csproj), so a runtime
       # identifier is required — the Windows App SDK is copied in rather than
       # resolved from a framework package at run time.
+      #
+      # Run from the project directory so native/windows/global.json applies:
+      # `dotnet` resolves global.json from the working directory, not from the
+      # project path, and without the pin MSBuild picks the runner's newest
+      # SDK and the App SDK's PRI task cannot be found (MSB4062).
       - name: Build
-        run: >
-          dotnet build native/windows/QrmeStudio.csproj
-          -c Release -p:Platform=x64 -r win-x64
+        working-directory: native/windows
+        run: dotnet build QrmeStudio.csproj -c Release -p:Platform=x64 -r win-x64

@@ -294,7 +294,7 @@ private struct RoomsSection: View {
     }
 
     private func reloadTranscript(_ roomId: String) async {
-        transcript = (try? await ApiClient.shared.roomTranscript(roomId)) ?? transcript
+        transcript = (try? await ApiClient.shared.roomTranscript(roomId: roomId)) ?? transcript
     }
 
     private func send(_ roomId: String) {
