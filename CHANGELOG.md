@@ -6,6 +6,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The README cover is generated now** (`tools/build_assets.py`) rather than
+  hand-built. It had been drawn before live desks, beacons, the audience layer,
+  the marketplace and the burned-in AI mark existed, and was still advertising
+  the 0.1.0 product four releases later — in amber on navy, while every screen
+  in `docs/screens/` is night-indigo with neon purple.
+
+  It now reads its palette from the same constants the screens use, so it
+  cannot drift away from what it is a picture of, and names what actually
+  shipped: 34 starter profiles, live desks, desk beacons, the audience layer,
+  the marketplace, gifts. Regenerate with `python3 tools/build_assets.py`.
+
+  The other sixteen files in `assets/design/` are **deliberately untouched** —
+  no README or doc references any of them, so they are an orphaned illustration
+  library rather than something going stale in public.
+
 ## [0.1.8] — 2026-07-25
 
 ### Added
