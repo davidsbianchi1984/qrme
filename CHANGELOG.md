@@ -52,6 +52,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   only: what protects the other participants is how wide the channel actually
   is, and a rejected preference is the lender's business.
 
+## [0.4.0] — 2026-07-26
+
+**The round where the starter profiles stopped answering from tone alone.**
+Thirty-four of them shipped with no source material at all while the packs
+that matched them sat unused in the marketplace. Plus the README finally says
+which version you are looking at.
+
+### Added
+
 - **Starters arrive knowing something** — `qrme/seed.py`, 12 tests.
   `qrme/packs.py` has always described its starter packs as *"one free Field
   Pack per industry, **matching the Starter Collection**"*. The pairing was
@@ -1143,7 +1152,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.3.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.0...HEAD
+[0.4.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.0
 [0.3.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.0
 [0.2.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.2
 [0.2.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.1
