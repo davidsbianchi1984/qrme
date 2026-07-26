@@ -274,64 +274,104 @@ one seeded by `POST /marketplace/seed`. **The AI mark is burned into each
 portrait's own pixels**, so it survives a screenshot, a hotlink, or a crop:
 these images carry their disclosure wherever they end up, including here.
 
-Shown in the **avatar bubble** the app draws around every face — rounded, over
-a soft brand glow. These are baked by `tools/bubble_portraits.py` into
-`docs/portraits/bubbles/` rather than styled here, because GitHub's markdown
-sanitiser strips the `style` attribute that would otherwise do it: on a surface
-QRME does not control, the bubble is in the pixels or it does not happen. The
-shipped `qrme/assets/portraits/` files stay square and untouched — the app
-draws its own bubble, and baking one in would nest a bubble inside a bubble.
+Each one is shown as **the card the app actually gives it** — screen 5's
+Profile Home: the avatar bubble, the role, the stat tiles, and the Chat button
+under them. The gallery used to be a portrait with a name and an industry
+captioned beneath, which is a directory listing rather than a profile, and it
+was five columns wide — about 590px of content on a phone that offers 390, so
+the fourth column was sliced mid-word and the fifth never appeared at all.
+Two columns of whole cards fit.
 
+**The tiles carry facts, not the mock's numbers.** Screen 5 reads *Memory 247 ·
+Relationships 12 · Engagement 92%*, which is fine for one illustrative mock and
+would be a fabrication repeated 34 times here: nobody has talked to these
+profiles yet. What each card reports is true of that starter — the size of the
+Field Pack grounding it, and how many skills it is tagged with.
+
+The bubble inside each card is baked by `tools/bubble_portraits.py` into
+`docs/portraits/bubbles/`, because GitHub's markdown sanitiser strips the
+`style` attribute that would otherwise round it: on a surface QRME does not
+control, the bubble is in the pixels or it does not happen. The shipped
+`qrme/assets/portraits/` files stay square and untouched — the app draws its
+own bubble, and baking one in would nest a bubble inside a bubble.
+
+Cards are generated, never hand-written: `python3 tools/starter_cards.py` then
+`python3 tools/starter_gallery.py`, both reading the starter list straight out
+of `qrme/seed.py` so the page cannot drift from what a deployment actually
+seeds.
+
+<!-- starter-gallery:begin -->
 <table>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/dr_amara_osei.webp" width="118" alt="Dr. Amara Osei"><br><sub><b>Dr. Amara Osei</b><br>healthcare</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/marcus_bell.webp" width="118" alt="Marcus Bell"><br><sub><b>Marcus Bell</b><br>finance</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/priya_raman.webp" width="118" alt="Priya Raman"><br><sub><b>Priya Raman</b><br>technology</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/elena_vasquez.webp" width="118" alt="Elena Vasquez"><br><sub><b>Elena Vasquez</b><br>education</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/jonathan_ashe.webp" width="118" alt="Jonathan Ashe"><br><sub><b>Jonathan Ashe</b><br>legal</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_amara_osei.svg" width="176" alt="Dr. Amara Osei — physician & health educator, healthcare"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/marcus_bell.svg" width="176" alt="Marcus Bell — retired fee-only financial planner, finance"></td>
   </tr>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/sam_whitfield.webp" width="118" alt="Sam Whitfield"><br><sub><b>Sam Whitfield</b><br>agriculture</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/ingrid_halvorsen.webp" width="118" alt="Ingrid Halvorsen"><br><sub><b>Ingrid Halvorsen</b><br>manufacturing</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/diego_fuentes.webp" width="118" alt="Diego Fuentes"><br><sub><b>Diego Fuentes</b><br>construction</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/naomi_clarke.webp" width="118" alt="Naomi Clarke"><br><sub><b>Naomi Clarke</b><br>real estate</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/tomas_rivera.webp" width="118" alt="Tomás Rivera"><br><sub><b>Tomás Rivera</b><br>energy</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/priya_raman.svg" width="176" alt="Priya Raman — software architect, technology"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/elena_vasquez.svg" width="176" alt="Elena Vasquez — classroom teacher & learning coach, education"></td>
   </tr>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/odessa_grant.webp" width="118" alt="Odessa Grant"><br><sub><b>Odessa Grant</b><br>transportation</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/ken_nakamura.webp" width="118" alt="Ken Nakamura"><br><sub><b>Ken Nakamura</b><br>retail</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/lucia_moretti.webp" width="118" alt="Lucia Moretti"><br><sub><b>Lucia Moretti</b><br>hospitality</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/ray_coleman.webp" width="118" alt="Ray Coleman"><br><sub><b>Ray Coleman</b><br>media</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/wren_okafor.webp" width="118" alt="Wren Okafor"><br><sub><b>Wren Okafor</b><br>arts design</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/jonathan_ashe.svg" width="176" alt="Jonathan Ashe — retired contracts attorney, legal"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/sam_whitfield.svg" width="176" alt="Sam Whitfield — row-crop & vegetable farmer, agriculture"></td>
   </tr>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/coach_dana_reyes.webp" width="118" alt="Coach Dana Reyes"><br><sub><b>Coach Dana Reyes</b><br>sports fitness</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/chef_henri_laurent.webp" width="118" alt="Chef Henri Laurent"><br><sub><b>Chef Henri Laurent</b><br>culinary</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/dr_sana_iqbal.webp" width="118" alt="Dr. Sana Iqbal"><br><sub><b>Dr. Sana Iqbal</b><br>environment</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/pete_kowalski.webp" width="118" alt="Pete Kowalski"><br><sub><b>Pete Kowalski</b><br>government</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/grace_mwangi.webp" width="118" alt="Grace Mwangi"><br><sub><b>Grace Mwangi</b><br>nonprofit</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/ingrid_halvorsen.svg" width="176" alt="Ingrid Halvorsen — plant operations engineer, manufacturing"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/diego_fuentes.svg" width="176" alt="Diego Fuentes — general contractor, construction"></td>
   </tr>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/dr_felix_baum.webp" width="118" alt="Dr. Felix Baum"><br><sub><b>Dr. Felix Baum</b><br>science</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/aisha_diallo.webp" width="118" alt="Aisha Diallo"><br><sub><b>Aisha Diallo</b><br>telecom</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/harold_jenkins.webp" width="118" alt="Harold Jenkins"><br><sub><b>Harold Jenkins</b><br>insurance</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/rosa_delgado.webp" width="118" alt="Rosa Delgado"><br><sub><b>Rosa Delgado</b><br>automotive</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/cmdr_ellen_park.webp" width="118" alt="Ellen Park"><br><sub><b>Ellen Park</b><br>aerospace</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/naomi_clarke.svg" width="176" alt="Naomi Clarke — residential broker, real estate"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/tomas_rivera.svg" width="176" alt="Tomás Rivera — power-systems engineer, energy"></td>
   </tr>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/mimi_beaumont.webp" width="118" alt="Mimi Beaumont"><br><sub><b>Mimi Beaumont</b><br>fashion beauty</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/jack_osei_turner.webp" width="118" alt="Jack Osei-Turner"><br><sub><b>Jack Osei-Turner</b><br>marketing</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/nadia_petrova.webp" width="118" alt="Nadia Petrova"><br><sub><b>Nadia Petrova</b><br>cybersecurity</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/bev_lindqvist.webp" width="118" alt="Bev Lindqvist"><br><sub><b>Bev Lindqvist</b><br>human resources</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/otis_marsh.webp" width="118" alt="Otis Marsh"><br><sub><b>Otis Marsh</b><br>music</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/odessa_grant.svg" width="176" alt="Odessa Grant — logistics director, transportation"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/ken_nakamura.svg" width="176" alt="Ken Nakamura — omnichannel merchant, retail"></td>
   </tr>
   <tr>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/dr_lena_whitcomb.webp" width="118" alt="Dr. Lena Whitcomb"><br><sub><b>Dr. Lena Whitcomb</b><br>mental health</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/dr_marcus_adeyemi.webp" width="118" alt="Dr. Marcus Adeyemi"><br><sub><b>Dr. Marcus Adeyemi</b><br>psychiatry</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/dr_priya_nair.webp" width="118" alt="Dr. Priya Nair"><br><sub><b>Dr. Priya Nair</b><br>counseling</sub></td>
-    <td align="center" width="20%"><img src="docs/portraits/bubbles/vivienne_sable.webp" width="118" alt="Vivienne Sable"><br><sub><b>Vivienne Sable</b><br>adult · 18+</sub></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/lucia_moretti.svg" width="176" alt="Lucia Moretti — hotelier, hospitality"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/ray_coleman.svg" width="176" alt="Ray Coleman — documentary producer, media"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/wren_okafor.svg" width="176" alt="Wren Okafor — designer-illustrator, arts design"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/coach_dana_reyes.svg" width="176" alt="Coach Dana Reyes — strength & conditioning coach, sports fitness"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/chef_henri_laurent.svg" width="176" alt="Chef Henri Laurent — classically trained chef, culinary"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_sana_iqbal.svg" width="176" alt="Dr. Sana Iqbal — climate scientist, environment"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/pete_kowalski.svg" width="176" alt="Pete Kowalski — retired city administrator, government"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/grace_mwangi.svg" width="176" alt="Grace Mwangi — nonprofit director, nonprofit"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_felix_baum.svg" width="176" alt="Dr. Felix Baum — research physicist, science"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/aisha_diallo.svg" width="176" alt="Aisha Diallo — network engineer, telecom"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/harold_jenkins.svg" width="176" alt="Harold Jenkins — claims adjuster & underwriter, insurance"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/rosa_delgado.svg" width="176" alt="Rosa Delgado — master mechanic, automotive"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/cmdr_ellen_park.svg" width="176" alt="Ellen Park — aerospace engineer & test pilot, aerospace"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/mimi_beaumont.svg" width="176" alt="Mimi Beaumont — stylist & atelier seamstress, fashion beauty"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/jack_osei_turner.svg" width="176" alt="Jack Osei-Turner — brand strategist, marketing"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/nadia_petrova.svg" width="176" alt="Nadia Petrova — defensive security analyst, cybersecurity"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/bev_lindqvist.svg" width="176" alt="Bev Lindqvist — HR director, human resources"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/otis_marsh.svg" width="176" alt="Otis Marsh — session musician & teacher, music"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_lena_whitcomb.svg" width="176" alt="Dr. Lena Whitcomb — clinical psychologist, mental health"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_marcus_adeyemi.svg" width="176" alt="Dr. Marcus Adeyemi — psychiatrist, psychiatry"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_priya_nair.svg" width="176" alt="Dr. Priya Nair — family & couples therapist, counseling"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/vivienne_sable.svg" width="176" alt="Vivienne Sable — cabaret headliner & burlesque historian, adult"></td>
   </tr>
 </table>
+<!-- starter-gallery:end -->
 
 ## Companion features
 
