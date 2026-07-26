@@ -1,11 +1,11 @@
-# QRME v0.4.0 — release notes
+# QRME v0.3.1 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.4.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.3.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.4.0** — the release where the starter profiles stopped answering from
+**QRME v0.3.1** — the release where the starter profiles stopped answering from
 tone alone. One of three interoperating products (with
 [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at this
@@ -76,7 +76,7 @@ topped up, each fail the test that forbids it.
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.4.0` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.3.1` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md

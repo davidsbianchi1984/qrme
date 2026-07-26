@@ -52,7 +52,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   only: what protects the other participants is how wide the channel actually
   is, and a rejected preference is the lender's business.
 
-## [0.4.0] — 2026-07-26
+## [0.3.1] — 2026-07-26
 
 **The round where the starter profiles stopped answering from tone alone.**
 Thirty-four of them shipped with no source material at all while the packs
@@ -1152,8 +1152,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.0...HEAD
-[0.4.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.0
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.3.1...HEAD
+[0.3.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.1
 [0.3.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.0
 [0.2.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.2
 [0.2.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.1
