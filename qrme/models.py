@@ -232,6 +232,12 @@ class ReferralRelease(BaseModel):
     signature_id: str
 
 
+class ReferralReply(BaseModel):
+    """The clinician's note back — what brings the profile up to speed so the
+    patient does not have to retell it."""
+    content: str
+
+
 class TriageItem(BaseModel):
     id: str
     text: str

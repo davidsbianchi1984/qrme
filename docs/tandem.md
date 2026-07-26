@@ -80,6 +80,27 @@ The package names the specialist as synthetic inside itself, because a
 clinician reading a transcript must never have to work out which voice was a
 person, and the AI mark rides on the portrait rather than the document.
 
+**The clinician writes back, once, and the profile is caught up.** Opening the
+one-time link mints a **reply token** at that same moment, so the summary link
+stays burnt while exactly one note can come back. The note is sealed in the PDI
+vault under a `qrme/{profile}/clinical/…` key — the same treatment source
+material gets, content in the vault and only a key reference held locally.
+
+The point is the handover: somebody arriving at the specialist after seeing a
+clinician should not have to retell the whole thing, and the profile should
+already know where the matter stands.
+
+It is deliberately **not a `source_items` row**, and that is the load-bearing
+decision. Source material is what a profile recalls *as its own*, and it is
+what `workflows._scoped_items` feeds to a `research` phase — so a clinical
+opinion filed there could be recited as the profile's own knowledge, or drafted
+from into a letter. Instead the note reaches the prompt in its own block that
+names the clinician and says the words are theirs: attribute them, never
+present them as your own assessment, never extend them into advice they did not
+give, and for anything they do not cover, point back. Notes are scoped to
+(profile, interactor) — it is that person's medical information and appears in
+no other conversation.
+
 **JIM matches; it never signs.** `jim/referral.py` maps a condition to an area,
 searches near a coarse self-declared locality (a town — deliberately not the
 consented live-location feed, which is a stream where a place name is wanted),

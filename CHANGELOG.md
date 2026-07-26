@@ -43,6 +43,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   specialist as synthetic inside itself: a clinician reading a transcript
   should never have to work out which voice was a person.
 
+- **The clinician writes back, and the profile is caught up** — 2 routes, 10
+  tests. Opening the one-time link mints a **reply token** at that moment, so
+  the summary link stays burnt while exactly one note can return. Open once,
+  reply once. The note is sealed in the PDI vault under
+  `qrme/{profile}/clinical/…` — the same treatment source material gets,
+  content in the vault and only a key reference held locally.
+
+  The point is the handover: somebody who has just seen a clinician should not
+  have to retell the whole thing to the specialist, and the profile should
+  already know where the matter stands.
+
+  **It is deliberately not a `source_items` row**, which is the decision the
+  rest hangs on. Source material is what a profile recalls *as its own*, and
+  it is what `workflows._scoped_items` feeds to a `research` phase — a
+  clinical opinion filed there could be recited as the profile's own knowledge,
+  or drafted from into a letter. A test asserts it reaches neither.
+
+  Instead it arrives in its own prompt block naming the clinician: *these are
+  that clinician's words, not yours* — attribute them, never present them as
+  your own assessment, never extend them into advice they did not give, and
+  for anything they do not cover, say so and point back. Notes are scoped to
+  (profile, interactor); another interactor talking to the same profile sees
+  nothing, in the prompt or through the API.
+
 ## [0.2.2] — 2026-07-26
 
 **A documentation release.** No code changed in any of the three products — no

@@ -25,10 +25,12 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import (auth, db, engagement, llm, marketplace, moderation, persona,
                 referral, watermark)
 from ..common import (age_of, interactor_or_404, profile_or_404,
-                      require_interactor, source_items)
+                      require_interactor, require_owner_or_interactor,
+                      source_items)
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
-    ProviderCreate, ReferralPrepare, ReferralRelease, RoomCreate, RoomMessage,
+    ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
+    RoomCreate, RoomMessage,
 )
 
 router = APIRouter()
@@ -589,6 +591,38 @@ def open_referral(referral_id: str, token: str) -> dict:
     except referral.ReferralError as exc:
         raise HTTPException(410 if "already opened" in str(exc) else 403,
                             str(exc))
+
+
+@router.post("/referrals/{referral_id}/reply", status_code=201)
+def reply_to_referral(referral_id: str, token: str, body: ReferralReply,
+                      request: Request) -> dict:
+    """The clinician writes back, once — so the profile is caught up and the
+    patient does not have to explain it all again.
+
+    Sealed in the PDI vault like source material, but recorded separately and
+    surfaced to the profile as *that clinician's words*: it never becomes
+    something the profile can recite as its own knowledge, and never reaches a
+    workflow's `research` phase.
+    """
+    try:
+        return referral.reply(referral_id, token, body.content,
+                              pdi=request.app.state.pdi)
+    except referral.ReferralError as exc:
+        raise HTTPException(403, str(exc))
+
+
+@router.get("/profiles/{profile_id}/clinical-notes/{interactor_id}")
+def read_clinical_notes(profile_id: str, interactor_id: str,
+                        request: Request) -> list[dict]:
+    """What a clinician wrote back on this conversation.
+
+    The pair may read it — the person it is about, and the profile's owner —
+    and nobody else: it is that person's medical information.
+    """
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    return referral.notes_for(profile_id, interactor_id,
+                              request.app.state.pdi)
 
 
 @router.get("/interactors/{interactor_id}/referrals")

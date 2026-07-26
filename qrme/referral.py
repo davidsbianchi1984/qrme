@@ -267,14 +267,95 @@ def redeem(referral_id: str, token: str, pdi=None) -> dict:
             f"this referral was already opened at {row['redeemed_at']} and "
             "a referral link works once")
 
+    # A reply token is minted *here*, at the single opening, so the clinician
+    # can write back without the summary link staying reusable. Open once,
+    # reply once — the point of the note is to catch the profile up so the
+    # patient does not have to retell everything, and a channel that needed
+    # the summary link kept alive would trade that against the guarantee the
+    # patient signed for.
+    reply_token = f"rpl_{secrets.token_urlsafe(24)}"
     conn = db.connect()
-    conn.execute("UPDATE referrals SET redeemed_at=? WHERE id=?",
-                 (db.utcnow(), referral_id))
+    conn.execute(
+        "UPDATE referrals SET redeemed_at=?, reply_token=? WHERE id=?",
+        (db.utcnow(), reply_token, referral_id))
     conn.commit()
     return {"id": referral_id, "package": json.loads(row["package"]),
             "signature_id": row["signature_id"],
+            "reply_token": reply_token,
+            "reply_note": "you may write back once, to bring the profile up to "
+                          "speed. Your words are attributed to you and are "
+                          "never spoken as the profile's own.",
             "note": "released by the patient under a verified signature; "
                     "this link has now been used and will not open again"}
+
+
+def reply(referral_id: str, token: str, content: str, pdi=None) -> dict:
+    """The clinician writes back, once.
+
+    The note is sealed in the vault the same way source material is, and
+    recorded against (profile, interactor) — never as a ``source_items`` row.
+    Source material is what the profile recalls *as its own* and what a
+    workflow's `research` phase reads; a clinician's words are somebody
+    else's, and filing them there would let a synthetic profile recite a
+    clinical opinion as its own knowledge.
+    """
+    row = get(referral_id)
+    if row is None or not row["reply_token"]:
+        raise ReferralError("no such referral, or it has not been opened yet")
+    if not secrets.compare_digest(token, row["reply_token"]):
+        raise ReferralError("that reply link is not valid")
+    if row["replied_at"]:
+        raise ReferralError("you have already written back on this referral")
+    body = (content or "").strip()
+    if not body:
+        raise ReferralError("a note needs something in it")
+
+    provider = db.connect().execute(
+        "SELECT * FROM providers WHERE id=?", (row["provider_id"],)).fetchone()
+    note_id = db.new_id("cln")
+    stored, pdi_key = body, None
+    if pdi is not None:
+        pdi_key = f"qrme/{row['profile_id']}/clinical/{note_id}"
+        pdi.put(pdi_key, json.dumps({"content": body}))
+        stored = None                       # sealed — only the key stays local
+
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO clinical_notes (id, referral_id, profile_id,"
+        " interactor_id, provider_id, provider_name, content, pdi_key,"
+        " created_at) VALUES (?,?,?,?,?,?,?,?,?)",
+        (note_id, referral_id, row["profile_id"], row["interactor_id"],
+         row["provider_id"], provider["name"] if provider else "a clinician",
+         stored, pdi_key, db.utcnow()))
+    conn.execute("UPDATE referrals SET replied_at=? WHERE id=?",
+                 (db.utcnow(), referral_id))
+    conn.commit()
+    return {"id": note_id, "referral_id": referral_id,
+            "sealed": pdi_key is not None,
+            "note": "recorded and attributed to you; the profile will treat it "
+                    "as your words, not its own"}
+
+
+def notes_for(profile_id: str, interactor_id: str, pdi=None) -> list[dict]:
+    """Clinician notes for this conversation, content resolved from the vault.
+
+    Scoped to the pair: it is that person's medical information and belongs in
+    no other conversation, including another interactor's with the same
+    profile.
+    """
+    rows = db.connect().execute(
+        "SELECT * FROM clinical_notes WHERE profile_id=? AND interactor_id=?"
+        " ORDER BY created_at, rowid", (profile_id, interactor_id)).fetchall()
+    out = []
+    for r in rows:
+        content = r["content"]
+        if r["pdi_key"] and pdi is not None:
+            raw = pdi.get(r["pdi_key"])
+            content = json.loads(raw)["content"] if raw else None
+        if content:
+            out.append({"id": r["id"], "from": r["provider_name"],
+                        "at": r["created_at"], "content": content})
+    return out
 
 
 def history(interactor_id: str) -> list[dict]:

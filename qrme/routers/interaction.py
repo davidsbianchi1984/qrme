@@ -9,7 +9,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (adaptation, auth, companion, db, engagement, llm, moderation,
-                persona, watermark)
+                persona, referral, watermark)
 from ..common import (
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -223,9 +223,13 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     ]
 
     sources = source_items(speaking_profile["id"], pdi)
+    # Anything a clinician wrote back on a referral from *this* conversation.
+    # Carried so the person does not have to retell their situation from the
+    # top; attributed in the prompt, never spoken as the profile's own.
+    notes = referral.notes_for(speaking_profile["id"], body.interactor_id, pdi)
     system = persona.build_system_prompt(
         speaking_profile, relationship if handoff is None else None,
-        engagement_state, sources=sources)
+        engagement_state, sources=sources, clinical_notes=notes)
     # Attention conditioning from the latent embedding (claims 21/22).
     attention = adaptation.attention_prompt(
         adaptation.get(profile_id, body.interactor_id))

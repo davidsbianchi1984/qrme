@@ -11,6 +11,7 @@ edited after signing, and a link opened twice.
 
 import pytest
 
+from tests.test_capabilities import pdi_pair  # noqa: F401
 from tests.test_signatures import Authenticator
 
 
@@ -298,3 +299,224 @@ def test_the_patient_can_see_what_they_released_and_whether_it_was_opened(setup)
     after = s["client"].get(f"/interactors/{iid}/referrals",
                             headers=s["me"]).json()
     assert after[0]["opened_at"] is not None
+
+
+# -- the clinician writes back ----------------------------------------------
+#
+# The reason this channel exists is that the patient should not have to retell
+# their situation from the top. The reason it is not a `source_items` row is
+# that a synthetic profile must never acquire a clinical opinion it can recite
+# as its own.
+
+def _released(s):
+    prep = _prepare(s).json()
+    rid = prep["referral_id"]
+    sig = _sign(s, prep["sign"]["challenge"], prep["sign"]["envelope_id"])
+    rel = s["client"].post(f"/referrals/{rid}/release", headers=s["me"],
+                           json={"signature_id": sig}).json()
+    return rid, rel["token"]
+
+
+def test_opening_it_yields_a_reply_token(setup):
+    """Open once, reply once — the summary link stays burnt."""
+    s = setup
+    rid, token = _released(s)
+    opened = s["client"].get(f"/referrals/{rid}?token={token}").json()
+    assert opened["reply_token"]
+    assert "never spoken as the profile's own" in opened["reply_note"]
+
+
+def test_the_note_reaches_the_profile_as_the_clinicians_words(setup):
+    s = setup
+    rid, token = _released(s)
+    reply_token = s["client"].get(
+        f"/referrals/{rid}?token={token}").json()["reply_token"]
+
+    posted = s["client"].post(
+        f"/referrals/{rid}/reply?token={reply_token}",
+        json={"content": "Reviewed. Likely costochondritis, not cardiac. "
+                         "Booked for review in two weeks."})
+    assert posted.status_code == 201
+
+    from qrme import persona, referral as ref_mod
+    notes = ref_mod.notes_for(s["profile"]["id"], s["interactor"]["id"])
+    assert notes[0]["from"] == "Riverside Cardiology"
+    assert "costochondritis" in notes[0]["content"]
+
+    # The prompt carries it attributed, and says plainly whose words they are.
+    from qrme import db
+    profile = dict(db.connect().execute(
+        "SELECT * FROM profiles WHERE id=?", (s["profile"]["id"],)).fetchone())
+    system = persona.build_system_prompt(profile, None, None,
+                                         clinical_notes=notes)
+    assert "Riverside Cardiology" in system
+    assert "costochondritis" in system
+    assert "not yours" in system
+    assert "never present this as your own assessment" in system
+    # And the reason it is carried at all.
+    assert "need not explain it again" in system
+
+
+def test_a_note_is_never_source_material(setup):
+    """Source material is what a profile recalls *as its own*, and it is what
+    a workflow's `research` phase reads. A clinical opinion in there could be
+    recited as the profile's own knowledge — and drafted from."""
+    s = setup
+    rid, token = _released(s)
+    reply_token = s["client"].get(
+        f"/referrals/{rid}?token={token}").json()["reply_token"]
+    s["client"].post(f"/referrals/{rid}/reply?token={reply_token}",
+                     json={"content": "Likely costochondritis."})
+
+    from qrme import db
+    rows = db.connect().execute(
+        "SELECT * FROM source_items WHERE profile_id=?",
+        (s["profile"]["id"],)).fetchall()
+    assert all("costochondritis" not in (r["content"] or "") for r in rows)
+
+    from qrme import workflows
+    items, ok = workflows._scoped_items(s["profile"]["id"], None, None)
+    assert ok
+    assert all("costochondritis" not in (i.get("content") or "") for i in items)
+
+
+def test_a_clinician_writes_back_once(setup):
+    s = setup
+    rid, token = _released(s)
+    reply_token = s["client"].get(
+        f"/referrals/{rid}?token={token}").json()["reply_token"]
+    first = s["client"].post(f"/referrals/{rid}/reply?token={reply_token}",
+                             json={"content": "Reviewed."})
+    assert first.status_code == 201
+    second = s["client"].post(f"/referrals/{rid}/reply?token={reply_token}",
+                              json={"content": "And another thing."})
+    assert second.status_code == 403
+    assert "already written back" in second.json()["detail"]
+
+
+def test_a_wrong_reply_link_is_refused(setup):
+    s = setup
+    rid, token = _released(s)
+    s["client"].get(f"/referrals/{rid}?token={token}")
+    r = s["client"].post(f"/referrals/{rid}/reply?token=rpl_wrong",
+                         json={"content": "hello"})
+    assert r.status_code == 403
+
+
+def test_nobody_can_write_back_before_it_is_opened(setup):
+    s = setup
+    rid, _ = _released(s)          # released, but never opened
+    r = s["client"].post(f"/referrals/{rid}/reply?token=rpl_guess",
+                         json={"content": "hello"})
+    assert r.status_code == 403
+    assert "not been opened" in r.json()["detail"]
+
+
+def test_an_empty_note_is_refused(setup):
+    s = setup
+    rid, token = _released(s)
+    reply_token = s["client"].get(
+        f"/referrals/{rid}?token={token}").json()["reply_token"]
+    r = s["client"].post(f"/referrals/{rid}/reply?token={reply_token}",
+                         json={"content": "   "})
+    assert r.status_code == 403
+
+
+def test_the_note_belongs_to_one_conversation_only(setup):
+    """It is that person's medical information. Another interactor talking to
+    the same profile must never see it."""
+    s = setup
+    rid, token = _released(s)
+    reply_token = s["client"].get(
+        f"/referrals/{rid}?token={token}").json()["reply_token"]
+    s["client"].post(f"/referrals/{rid}/reply?token={reply_token}",
+                     json={"content": "Likely costochondritis."})
+
+    other = s["client"].post("/interactors", json={
+        "display_name": "Mal", "birthdate": "1990-01-01"}).json()
+    from qrme import referral as ref_mod
+    assert ref_mod.notes_for(s["profile"]["id"], other["id"]) == []
+
+    # And they cannot read it through the API either.
+    r = s["client"].get(
+        f"/profiles/{s['profile']['id']}/clinical-notes/{s['interactor']['id']}",
+        headers={"authorization": f"Bearer {other['token']}"})
+    assert r.status_code == 403
+
+
+def test_the_patient_can_read_what_the_clinician_wrote(setup):
+    s = setup
+    rid, token = _released(s)
+    reply_token = s["client"].get(
+        f"/referrals/{rid}?token={token}").json()["reply_token"]
+    s["client"].post(f"/referrals/{rid}/reply?token={reply_token}",
+                     json={"content": "Likely costochondritis."})
+
+    out = s["client"].get(
+        f"/profiles/{s['profile']['id']}/clinical-notes/{s['interactor']['id']}",
+        headers=s["me"]).json()
+    assert out[0]["from"] == "Riverside Cardiology"
+    assert "costochondritis" in out[0]["content"]
+
+
+def test_the_note_is_sealed_in_the_pdi_vault(pdi_pair):
+    """The same treatment source material gets: the content lives in the
+    vault, QRME keeps only a key reference, and it resolves on read."""
+    client, fake = pdi_pair
+    prof = client.post("/profiles", json={
+        "owner_id": "o1", "kind": "fictional",
+        "display_name": "Dr. Amara Osei", "persona": "A physician.",
+        "verification": {"birthdate": "1980-01-01"}}).json()
+    owner = {"authorization": f"Bearer {prof['owner_token']}"}
+    it = client.post("/interactors", json={"display_name": "Dana Reyes",
+                                           "birthdate": "1990-03-02"}).json()
+    me = {"authorization": f"Bearer {it['token']}"}
+    client.post(f"/profiles/{prof['id']}/chat", headers=owner, json={
+        "interactor_id": it["id"], "message": "my chest has been tight"})
+
+    auth = Authenticator()
+    opts = client.post("/signatures/enroll/options",
+                       json={"display_name": "Dana Reyes"},
+                       headers=me).json()
+    body = auth.register(opts["challenge"])
+    body.update({"proofing_level": "document", "display_name": "Dana Reyes",
+                 "proofing_attestor": "clinic-registrar"})
+    client.post("/signatures/enroll", json=body, headers=me)
+    prov = client.post("/providers", json={"name": "Riverside Cardiology",
+                                           "area": "medical",
+                                           "location": "Leeds"}).json()
+
+    prep = client.post("/referrals/prepare", headers=me, json={
+        "interactor_id": it["id"], "profile_id": prof["id"],
+        "provider_id": prov["id"]}).json()
+    assertion = auth.assert_(prep["sign"]["challenge"])
+    sig = client.post("/signatures/sign", headers=me, json={
+        "envelope_id": prep["sign"]["envelope_id"], **assertion}).json()
+    rel = client.post(f"/referrals/{prep['referral_id']}/release", headers=me,
+                      json={"signature_id": sig["signature_id"]}).json()
+    reply_token = client.get(
+        f"/referrals/{prep['referral_id']}?token={rel['token']}"
+    ).json()["reply_token"]
+
+    posted = client.post(
+        f"/referrals/{prep['referral_id']}/reply?token={reply_token}",
+        json={"content": "Likely costochondritis, not cardiac."}).json()
+    assert posted["sealed"] is True
+
+    # In the vault, under a qrme/ key PDI attributes to QRME.
+    key = f"qrme/{prof['id']}/clinical/{posted['id']}"
+    assert "costochondritis" in fake.store[key]
+
+    # And not in QRME's own database.
+    from qrme import db as qdb
+    row = qdb.connect().execute(
+        "SELECT content, pdi_key FROM clinical_notes WHERE id=?",
+        (posted["id"],)).fetchone()
+    assert row["content"] is None
+    assert row["pdi_key"] == key
+
+    # Resolved on read, so the profile still gets caught up.
+    out = client.get(
+        f"/profiles/{prof['id']}/clinical-notes/{it['id']}",
+        headers=me).json()
+    assert "costochondritis" in out[0]["content"]

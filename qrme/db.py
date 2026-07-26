@@ -177,6 +177,33 @@ CREATE TABLE IF NOT EXISTS handoffs (
 -- would agree with itself however the row was edited afterwards. `release()`
 -- re-hashes `package` as it stands and compares *that* to the signature. The
 -- column is kept as a record of what was signed, not as the guarantee.
+-- What the clinician wrote back, so the synthetic profile is caught up without
+-- the patient retelling everything (see qrme/referral.py).
+--
+-- Sealed in the PDI vault exactly like source material — `content` is NULL when
+-- `pdi_key` is set — but deliberately **not** a `source_items` row. Source
+-- material is life material the profile recalls *as its own*, and it is what
+-- `workflows._scoped_items` feeds to a `research` phase. A clinician's note is
+-- neither: it is somebody else's words, and it reaches the prompt through its
+-- own attributed block that says so. Filing it as a source would let the
+-- profile recite a clinical opinion as its own knowledge, which is the one
+-- thing this must never do.
+--
+-- Scoped to (profile, interactor): it is that person's medical information and
+-- belongs in no other conversation.
+CREATE TABLE IF NOT EXISTS clinical_notes (
+    id            TEXT PRIMARY KEY,
+    referral_id   TEXT NOT NULL REFERENCES referrals(id),
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    provider_id   TEXT NOT NULL REFERENCES providers(id),
+    provider_name TEXT NOT NULL,   -- denormalised: the attribution must survive
+                                   -- a provider row being edited or removed
+    content       TEXT,            -- NULL when sealed in the PDI vault
+    pdi_key       TEXT,
+    created_at    TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS referrals (
     id              TEXT PRIMARY KEY,
     interactor_id   TEXT NOT NULL REFERENCES interactors(id),
@@ -188,6 +215,10 @@ CREATE TABLE IF NOT EXISTS referrals (
     signature_id    TEXT,            -- set once released
     token           TEXT,            -- one-time; NULL until released
     redeemed_at     TEXT,            -- set on the single opening
+    -- Issued *at* that opening, so the clinician can write back once without
+    -- the summary link being reusable. Open once, reply once.
+    reply_token     TEXT,
+    replied_at      TEXT,
     created_at      TEXT NOT NULL
 );
 
