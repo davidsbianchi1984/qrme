@@ -1,4 +1,10 @@
-# QRME — AI Synthetic Profile Platform (v1)
+# QRME — AI Synthetic Profile Platform
+
+**Current release: v0.3.0** ([changelog](CHANGELOG.md) ·
+[release notes](RELEASE_NOTES.md)) — one of three products
+([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
+[pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
+one number names one combination of all three.
 
 ![QRME — relationship-aware synthetic profiles](assets/design/00-cover.svg)
 
@@ -17,7 +23,36 @@ workflows, and enhance operational decision-making — running more efficiently
 and taking over mundane or outdated tasks and roles — all within the same
 secure, private network environment.
 
+## What's in the current release
+
+The tables further down describe every capability in detail. This is the short
+version of how it got here — what each release actually added, newest first.
+Full detail in [CHANGELOG.md](CHANGELOG.md).
+
+| Release | What landed |
+|---|---|
+| **0.3.0** | **The round where the tandem reaches a person.** Owner-authorized **workflow delegation** — a specialist can be handed a multi-step task rather than a single chat turn, off until an owner enables it and refused outright if `research` is delegated without a source grant. A **medical referral signed for rather than consented to**: the release is authorised by a verified WebAuthn assertion on a device-bound credential (Face ID / Touch ID / Optic ID), the challenge *is* the hash of the exact package, and the link opens **once**. The clinician then **writes back once**, and the note reaches the profile attributed to them by name rather than absorbed as the profile's own knowledge |
+| **0.2.2** | A documentation release — no code changed in any of the three products. Corrections to things that described themselves inaccurately, plus the release checklist that explains why those kept happening |
+| **0.2.1** | A profile has a **front page** — screen 80, what a visitor actually lands on from a beacon scan. A help box on every screen. Real faces instead of the hologram placeholder throughout the screens |
+| **0.2.0**–**0.1.9** | Marketplace search by words, by place, and by an assistant that only ever *suggests* — you run the search, and nothing reorders your results. Generated architecture diagram and README cover |
+| **0.1.8** | Two ways into a live room, and they are deliberately not the same act. The live-desk video overlay. The starter collection visible rather than described |
+| **0.1.7** | Gifts and marketplace purchases. The audience layer — like, comment, share, subscribe. A live desk left behind as a **printed QR code**. The point at which the three products began being cut as one release |
+| **0.1.6** | The starter collection got faces, with the **AI mark burned into every shipped portrait**. Live desks. The native apps sign, and signatures survive being disputed |
+| **0.1.5** | Published deployments, one-container deploy, the Cloud Model Gateway, and beacons that land on a page rather than on JSON. Native apps compiled in CI |
+| **0.1.4**–**0.1.2** | `python -m qrme` launcher, running it on your phone, synthetic-media watermarking on every AI render, Terms of Service, macOS notarization |
+| **0.1.1** | Native iOS / Android / Windows apps at full parity. First-run onboarding. LLM provider choice, robotic embodiment, steering, and the third-party objection & revocation flow |
+| **0.1.0** | First public release — profiles & relationships, memory & moderation, lifecycle, summoning, marketplace & licensing, assistant & perception, cloud model |
+
+**Money here is still simulated.** Subscriptions, gifts and purchases write real
+rows on the creator's statement and settle through the same payout sweep as pack
+sales and licence fees — but **no real funds move**, and every money-bearing
+response says so in its own body. [docs/commerce.md](docs/commerce.md) lists
+what is absent.
+
 ## What's in v1
+
+The PRD conformance map — every numbered feature in
+[docs/PRD.md](docs/PRD.md) and the code that implements it.
 
 | PRD feature | Implementation |
 |---|---|
