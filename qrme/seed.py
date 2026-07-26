@@ -10,9 +10,13 @@ All starter profiles are ``fictional`` kind (no real-person rights involved
 — the portraits in ``avatars.py`` describe invented people too, so the claim
 holds for the face as well as the persona), owned by the platform owner id
 ``qrme-starter``, and pass through exactly the same moderation and provenance
-pipeline as any user profile. Seeding is
-idempotent — a profile whose @handle is already claimed is skipped — so it is
-safe to run at every deploy:
+pipeline as any user profile.
+
+Seeding is idempotent — a profile whose @handle is already claimed is not
+recreated — and is also a **repair**: an existing starter missing its portrait
+or appearance gets them filled in, blank-only, so a deployment older than the
+portraits recovers its faces by running this again rather than by hand. Safe
+at every deploy:
 
     python -m qrme.seed          # or POST /marketplace/seed
 """
@@ -263,7 +267,11 @@ def _backfill(conn, profile_id: str, handle: str) -> bool:
 
 
 def seed() -> dict:
-    """Create the starter collection (idempotent: claimed handles skip)."""
+    """Create the starter collection.
+
+    Idempotent by @handle, and a repair for the ones already there: see
+    :func:`_backfill`. Returns `created`, `skipped` and `repaired`.
+    """
     import json
 
     from .models import ListingCreate, ProfileCreate, Verification

@@ -247,7 +247,12 @@ def seed_marketplace() -> dict:
     """Populate the starter collection: one synthetic expert per industry,
     each with a claimed @handle and a marketplace listing, so a fresh
     deployment has profiles to immerse with before users publish their own.
-    Idempotent — already-seeded profiles are skipped."""
+
+    Idempotent, and also a **repair**: a starter that already exists keeps its
+    profile but has a missing portrait or appearance filled in, so a deployment
+    created before the portraits shipped gets its faces back by running this
+    again. Blank-only — anything an owner set is left alone. The response
+    reports `repaired` alongside `created` and `skipped`."""
     from .. import seed
     return seed.seed()
 
