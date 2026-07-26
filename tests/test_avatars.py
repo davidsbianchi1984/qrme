@@ -205,6 +205,38 @@ def test_the_portraits_are_square_and_small_enough_to_load_on_cellular():
         assert path.stat().st_size < 120_000, f"{path.name} is heavy"
 
 
+def test_every_portrait_has_a_bubble_for_the_readme():
+    """The README embeds these directly, and GitHub strips the `style`
+    attribute that would round them — so a portrait without a baked bubble
+    renders as the hard-edged black box the shipped file actually is.
+
+    That is invisible in the repo and obvious on the project's front page, so
+    a newly added portrait must not be able to reintroduce it quietly.
+    """
+    import pathlib
+    root = pathlib.Path(__file__).resolve().parents[1]
+    bubbles = root / "docs" / "portraits" / "bubbles"
+    shipped = {p.name for p in avatars.portraits_dir().glob("*.webp")}
+    baked = {p.name for p in bubbles.glob("*.webp")}
+    missing = sorted(shipped - baked)
+    assert not missing, (
+        f"no README bubble for {', '.join(missing)} — "
+        "run `python3 tools/bubble_portraits.py`")
+
+
+def test_the_bubbles_keep_their_transparency():
+    """The bubble's corners and glow margin must be alpha, not a dark fill.
+    Baking a background in would be the black box again by another route, and
+    would read as a grey slab in GitHub's light theme."""
+    import pathlib
+    root = pathlib.Path(__file__).resolve().parents[1]
+    sample = root / "docs" / "portraits" / "bubbles" / "marcus_bell.webp"
+    raw = sample.read_bytes()
+    # VP8L / VP8X with the alpha bit is how a WebP carries transparency.
+    assert b"ALPH" in raw[:64] or b"VP8L" in raw[:64], \
+        "bubble has no alpha channel; the corners would render filled"
+
+
 def test_the_portrait_directory_is_declared_as_package_data():
     """These files live inside the package, so they vanish on `pip install`
     unless setuptools is told to carry them. That failure is invisible in the
