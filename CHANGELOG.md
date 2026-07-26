@@ -27,6 +27,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   rendered as literal `[0.2.1]` text, and `[Unreleased]` still diffed against
   `app-v0.1.8` — a three-release diff pretending to be an empty one.
 
+- **The release checklist is why that kept happening.** `docs/releasing.md`
+  step 1 said to move the `Unreleased` items and date the heading, and never
+  mentioned the link definition at the bottom of the file — so the step was
+  skipped three releases running by someone following the instructions
+  correctly. Step 2 was wrong in the same direction: it named `pyproject.toml`
+  and `app/package.json` when the version string actually lives in **five**
+  places, the two extra ones being the `FastAPI(...)` call in `qrme/api.py` and
+  the second root entry in `app/package-lock.json`. Both steps now say what
+  they meant, in all three repositories.
+
 ## [0.2.1] — 2026-07-26
 
 ### Added
