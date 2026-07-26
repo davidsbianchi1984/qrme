@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-07-26
+
+**The round where the tandem reaches a person.** A synthetic specialist could
+answer a question; now it can be handed a multi-step task, and the person it
+is talking to can be put in front of a real clinician with the release signed
+for rather than ticked.
+
 ### Added
 
 - **Owner-authorized workflow delegation** — `qrme/delegation.py`, 5 routes,
@@ -1051,7 +1058,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.2.2...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.3.0...HEAD
+[0.3.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.0
 [0.2.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.2
 [0.2.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.1
 [0.2.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.0
