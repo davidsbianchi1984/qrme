@@ -1,77 +1,57 @@
-# QRME v0.2.1 — release notes
+# QRME v0.2.2 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.2.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.2.2` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.2.1** — the release where a profile stops being a face and a sentence,
-and every screen gets something that can answer a question without pretending to
-be a person. One of three interoperating products (with
+**QRME v0.2.2** — a documentation release. **No code changed**: no new routes,
+no schema, no behaviour. Everything here corrects something that was
+*described* wrongly, which on this round turned out to be the thing costing
+real time. One of three interoperating products (with
 [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at this
 version.
 
-### Highlights
-
-- **A profile has a front page.** Skills, experience, reviews, rating, and how
-  many people have actually talked to it — in **one call**, because the caller
-  is a scan page on cellular and five round trips is how a page arrives in
-  pieces.
-
-- **A review comes from somebody who was actually there.** It checks the
-  `engagement` row for a real interaction, and `UNIQUE (profile_id, author_id)`
-  makes a second review from one account impossible **in the schema** rather
-  than in a check somebody could forget — reviews are edited, never stacked.
-  Without both, a rating is worth exactly the number of accounts somebody can
-  make. The average always reports its own `count`: one five-star review and
-  two hundred are different facts.
-
-- **Experience about a real person is a credential.** On a `fictional` profile
-  invented history is the point and the AI mark says so. On one depicting
-  somebody real, *"twenty years at Accra General"* is a claim asserted on their
-  behalf, so it is refused without the same rights basis the persona needed.
-
-- **A help box on every screen.** Every screen here can be somebody's first — a
-  beacon scan lands a stranger on a profile page — and until now the only thing
-  that could answer a question was a synthetic profile, which is the one thing
-  that should never be answering questions *about the product*.
-
-  It is structurally **not a profile**: no name, no face, no memory. On a
-  product whose subject is synthetic people who can be mistaken for real ones, a
-  help assistant with a portrait would be a thirty-fifth character rather than
-  the thing that explains the other thirty-four. *Are you real*, *pretend you
-  are*, *what do you think of me* are caught **before any model sees them** and
-  handed back to the profile on the page. It writes nothing, and it works with
-  no model at all — the written answers are the answer, not an apology.
-
-- **The screens show real faces instead of a hologram.** Profile Home, Avatar
-  Studio and Live Video drew a purple orb with a generic person glyph where the
-  face belongs. All 34 starter portraits were already in the repo and exactly
-  one screen used them.
-
-  **A rounded box rather than a circle, and not only for taste**:
-  `tools/mark_portraits.py` burns the AI mark into the pixels at the top-right,
-  so a circular clip cuts off the corner the disclosure lives in. Those screens
-  name the character and their profession; "AI assistant" stays where it
-  belongs, in chrome that genuinely cannot know who is loaded.
-
-- **Screen 80** is the front page a visitor sees, as opposed to screen 5, which
-  is the owner's view of their own profile.
-
 ### Fixed
 
-- **Re-seeding repairs a starter that predates its portrait.** The seed is
-  idempotent by @handle, and idempotent meant *do nothing* — so a deployment
-  created before the portraits shipped was stuck showing **initials** on
-  profiles whose faces ship inside the package, and running the seed again, the
-  obvious repair, did nothing at all. It backfills blanks now and reports
-  `repaired` next to `created` and `skipped`. **To fix a live deployment:**
+- **`POST /marketplace/seed` advertised the opposite of what it does.** Its
+  docstring — the text served in the OpenAPI docs, which is where somebody
+  deciding whether a call is safe to make actually reads — still said
+  *"Idempotent — already-seeded profiles are skipped"*. v0.2.1 made that only
+  half true: the endpoint now also **repairs**, filling a missing portrait or
+  appearance on a starter that already exists.
+
+  The stale sentence pointed away from the fix. Anyone looking at three
+  starters rendering as bare initials would read that line and conclude the one
+  call that repairs them could not possibly help, because skipping is precisely
+  what they do not want. The claim was wrong in **four** places — the endpoint,
+  `qrme/seed.py`'s module and `seed()` docstrings, and the README's Starter
+  Collection row — and all four now say idempotent *and* repairing, blank-only,
+  reporting `repaired` alongside `created` and `skipped`.
+
+  **To repair a live deployment, this is still the one call:**
   `POST /marketplace/seed`.
 
-- **The chat screen's online dot** sat at a fixed x that assumed a three-letter
-  name, so a longer one ran straight through it. Found by rendering the screen
-  rather than by reading the diff.
+- **Three releases of changelog links were missing.** `[0.1.9]`, `[0.2.0]` and
+  `[0.2.1]` had headings but no link definitions, so three shipped versions
+  rendered as literal `[0.2.1]` bracket text rather than linking anywhere, and
+  `[Unreleased]` still compared against `app-v0.1.8` — presenting a
+  three-release diff as though it were an empty one.
+
+- **The release checklist is why that kept happening**, and is the entry that
+  matters most here. `docs/releasing.md` step 1 said to move the `Unreleased`
+  items under the new heading and date it, and stopped — it never mentioned the
+  link definition at the bottom of the file. The step was skipped three
+  releases running by someone following the instructions correctly, and nothing
+  complains when you miss it: the heading renders fine, and the damage appears
+  hundreds of lines from where the edit was made.
+
+  Step 2 was wrong in the same direction. It named `pyproject.toml` and
+  `app/package.json` when the version string lives in **five** places — the two
+  it omitted being the `FastAPI(...)` call in `qrme/api.py` and the second root
+  entry in `app/package-lock.json`, both of which had to be rediscovered each
+  round. Both steps now say what they meant, in all three repositories.
 
 ### Money here is still simulated
 
@@ -82,13 +62,17 @@ its own body. [docs/commerce.md](docs/commerce.md) lists what is absent.
 
 ### Verification
 
-549 tests green (26 new this release). 197 routes. 169 SVGs parse, and all 160
-rendered screens carry the help affordance. Both front-ends build clean.
+549 tests green — **the same 549, passing the same way**, which is the point of
+a release that claims no functional change. 197 routes, also unchanged. Version
+strings moved in exactly five places: `pyproject.toml`, the FastAPI app,
+`app/package.json`, and the two root entries in its lockfile (dependency
+versions untouched). Every version heading in the changelog was checked against
+its link definition — 12 for 12.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.2.1` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.2.2` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md
