@@ -202,7 +202,7 @@ def lend_room_mic(room_id: str, body: RoomMicLend, request: Request) -> dict:
     require_interactor(body.interactor_id, request)
     try:
         return roommic.lend(room_id, body.interactor_id, body.device,
-                            body.mic_type)
+                            body.mic_type, body.gain)
     except roommic.RoomMicError as exc:
         raise HTTPException(403, str(exc))
 

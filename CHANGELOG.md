@@ -9,7 +9,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - **A second ear: lending the profiles a wearable microphone** —
-  `qrme/roommic.py`, 3 routes, 13 tests. In a voice or video room the
+  `qrme/roommic.py`, 3 routes, 18 tests. In a voice or video room the
   participant's own microphone is carrying their voice to the other people.
   The profiles are reading text and have no ear of their own, so anything said
   aloud but not typed is invisible to them.
@@ -34,6 +34,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   The profile's prompt states the limit rather than assuming it: *you hear
   them, not the other people in this room, who have not lent you anything and
   may not realise you could hear them.*
+
+  And a grant **runs near-field however the lender has their dial set**. How
+  wide the microphone listens is what makes "the profiles hear them, not the
+  room" true of the capture rather than true of a sentence in a note. JIM caps
+  channel 2 while a call is in progress; a room is that condition for its whole
+  duration, so there is no state in which a wider one would be honest here.
+  Capped, not rejected and not overwritten — the lender's setting is theirs and
+  applies everywhere else. The row records both what was asked for and what it
+  ran at, and the room's disclosure carries the **effective** gain only: what
+  protects the other participants is how wide the channel actually is, and a
+  rejected preference is the lender's business.
 
 - **Starters arrive knowing something** — `qrme/seed.py`, 12 tests.
   `qrme/packs.py` has always described its starter packs as *"one free Field

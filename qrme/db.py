@@ -186,6 +186,14 @@ CREATE TABLE IF NOT EXISTS room_mics (
     -- Only microphones pointed at a person qualify: a room-facing one would
     -- pick up the other participants, whose voices are not the lender's to give.
     mic_type      TEXT NOT NULL DEFAULT 'watch',
+    -- What the lender asked for, and what the grant actually runs at. In a
+    -- room these differ whenever the request was anything but near-field: a
+    -- room has other people in it by definition, so a channel wide enough to
+    -- hear them is a channel lending their voices. Both are stored because the
+    -- request is the lender's setting and `gain` is what the room was told —
+    -- reporting the request would overstate what the profiles could hear.
+    requested_gain TEXT NOT NULL DEFAULT 'near_field',
+    gain          TEXT NOT NULL DEFAULT 'near_field',
     started_at    TEXT NOT NULL,
     ended_at      TEXT
 );

@@ -227,6 +227,11 @@ class RoomMicLend(BaseModel):
                       "bone_conduction", "glasses", "collar_tag", "handheld",
                       "speakerphone", "conference", "console", "laptop",
                       "room_array", "doorbell"] = "watch"
+    # The lender's own gain setting. Accepted so one client can send it to
+    # either product, but a room grant always runs near-field — a room has
+    # other people in it, and a channel wide enough to hear them is a channel
+    # lending their voices. See qrme/roommic.py:ROOM_GAIN.
+    gain: Literal["near_field", "normal", "wide"] = "near_field"
 
 
 class ReferralPrepare(BaseModel):

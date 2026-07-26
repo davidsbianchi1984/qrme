@@ -226,6 +226,81 @@ def test_a_room_facing_microphone_cannot_be_lent_to_a_room(client):
     assert client.get(f"/rooms/{room['id']}/mic").json()["microphones_lent"] == []
 
 
+def test_a_room_grant_runs_narrow_whatever_the_lender_set(client):
+    """The gain is what makes "the profiles hear them, not the room" true of
+    the capture rather than true of a sentence in a note. JIM caps channel 2
+    while a call is in progress; a room is that condition for its whole life.
+    """
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    mal = _interactor(client, "Mal")
+    room = _room(client, p, sam, mal)
+
+    out = client.post(f"/rooms/{room['id']}/mic",
+                      json={"interactor_id": sam["id"], "gain": "wide"},
+                      headers=_as(sam["token"])).json()
+    assert out["gain"] == "near_field"
+    assert out["capped"] is True
+    assert out["requested_gain"] == "wide"
+    assert "other people in this room" in out["because"]
+    assert "still yours everywhere else" in out["because"]
+
+
+def test_a_near_field_lender_is_not_told_they_were_capped(client):
+    """Nothing was overridden, so saying so would be noise."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+    out = client.post(f"/rooms/{room['id']}/mic",
+                      json={"interactor_id": sam["id"]},
+                      headers=_as(sam["token"])).json()
+    assert out["gain"] == "near_field" and out["capped"] is False
+    assert "because" not in out
+
+
+def test_the_room_is_told_what_the_microphone_actually_hears(client):
+    """What protects the other participants is how wide the channel is, so the
+    disclosure carries it — the *effective* gain, never the request. A rejected
+    preference is the lender's business and is not true of the capture."""
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    mal = _interactor(client, "Mal")
+    room = _room(client, p, sam, mal)
+    client.post(f"/rooms/{room['id']}/mic",
+                json={"interactor_id": sam["id"], "gain": "wide"},
+                headers=_as(sam["token"]))
+
+    seen = client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(mal["token"])).json()
+    lent = seen["microphones_lent"][0]
+    assert lent["gain"] == "near_field"
+    assert "your own voice" in lent["hears"]
+    assert "requested_gain" not in lent
+    assert "narrow enough" in seen["note"] and "not the room" in seen["note"]
+
+
+def test_an_unknown_gain_is_rejected(client):
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+    r = client.post(f"/rooms/{room['id']}/mic",
+                    json={"interactor_id": sam["id"], "gain": "maximum"},
+                    headers=_as(sam["token"]))
+    assert r.status_code == 422        # rejected by the schema
+
+
+def test_the_gain_levels_match_jim(client):
+    """The two products do not import each other, the same way docs/tandem.md
+    is byte-identical in three repos rather than shared. If they drift, one of
+    them is telling a user something the other does not do."""
+    from qrme import roommic
+    assert set(roommic.GAIN_LEVELS) == {"near_field", "normal", "wide"}
+    assert roommic.GAIN_LEVELS["near_field"]["reaches_others"] is False
+    assert all(roommic.GAIN_LEVELS[g]["reaches_others"]
+               for g in ("normal", "wide"))
+    assert roommic.ROOM_GAIN == "near_field"
+
+
 def test_any_worn_microphone_can_be_lent(client):
     p = make_profile(client)
     sam = _interactor(client, "Sam")

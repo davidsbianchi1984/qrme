@@ -31,6 +31,14 @@ participant cannot consent on behalf of the people they can hear.
 room closes, so a permission cannot outlive the conversation that justified
 it and quietly apply to the next one.
 
+**And it runs near-field, whatever the lender set.** How wide the microphone
+listens is what makes "the profiles hear them, not the room" true of the
+capture rather than true of a sentence in a note. In JIM the cap applies while
+a call is in progress; a room is that condition permanently, so the grant is
+capped for its whole life. The lender's own dial is not overwritten — it is
+theirs and it comes back — but a room is the one place it cannot be honoured,
+because the people it would reach are sitting right there.
+
 Permission and state only — capture is on the device, like everywhere else.
 """
 
@@ -55,6 +63,22 @@ MIC_TYPES: dict[str, bool] = {          # name -> personal?
 }
 PERSONAL_TYPES = tuple(k for k, v in MIC_TYPES.items() if v)
 
+# How wide the lent channel listens — also kept in step with `jim/mic.py` by
+# hand. `reaches_others` is what a level is judged on: not how loud it is, but
+# whether somebody who did not agree ends up inside it.
+GAIN_LEVELS: dict[str, dict] = {
+    "near_field": {"reaches_others": False,
+                   "describes": "your own voice, close to the microphone"},
+    "normal": {"reaches_others": True,
+               "describes": "you and whatever is happening near you"},
+    "wide": {"reaches_others": True,
+             "describes": "the room, including people not talking to you"},
+}
+# What a room grant runs at, always. JIM caps channel 2 while a call is in
+# progress; a room is that condition for its whole duration, so there is no
+# state in which a wider one would be honest here.
+ROOM_GAIN = "near_field"
+
 
 class RoomMicError(ValueError):
     """A grant that must not happen. Text meant for a person."""
@@ -73,12 +97,18 @@ def _is_participant(room_id: str, interactor_id: str) -> bool:
 
 
 def lend(room_id: str, interactor_id: str, device: str,
-         mic_type: str = "watch") -> dict:
+         mic_type: str = "watch", gain: str = ROOM_GAIN) -> dict:
     """Lend this room's profiles the wearable's microphone.
 
     Refused outside a live room, from a non-participant, or in a text room —
     in a chat room nobody's microphone is occupied, so there is nothing for a
     second one to work around.
+
+    ``gain`` is accepted so a client can send the user's own setting without
+    knowing which product it is talking to, but a room grant always runs
+    near-field. It is capped rather than rejected for the same reason JIM caps
+    it mid-call: the lender's preference is not wrong, the room is simply the
+    one place it cannot be honoured.
     """
     room = _room(room_id)
     if room is None:
@@ -101,6 +131,9 @@ def lend(room_id: str, interactor_id: str, device: str,
             "room, not at you. It would pick up the people around you, and "
             "their voices are not yours to lend. A worn or clipped-on one "
             f"can: {', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)}")
+    if gain not in GAIN_LEVELS:
+        raise RoomMicError(
+            f"unknown gain {gain!r} — one of {', '.join(GAIN_LEVELS)}")
 
     conn = db.connect()
     existing = conn.execute(
@@ -109,17 +142,30 @@ def lend(room_id: str, interactor_id: str, device: str,
     if existing:
         return {**dict(existing), "already_lent": True}
 
+    # One local, used for both the row and the answer, so what is reported can
+    # never drift from what was recorded.
+    effective = ROOM_GAIN
+
     grant_id = db.new_id("rmic")
     conn.execute(
         "INSERT INTO room_mics (id, room_id, interactor_id, device,"
-        " mic_type, started_at) VALUES (?,?,?,?,?,?)",
-        (grant_id, room_id, interactor_id, device, mic_type, db.utcnow()))
+        " mic_type, requested_gain, gain, started_at) VALUES (?,?,?,?,?,?,?,?)",
+        (grant_id, room_id, interactor_id, device, mic_type, gain, effective,
+         db.utcnow()))
     conn.commit()
-    return {"id": grant_id, "room_id": room_id, "device": device,
-            "mic_type": mic_type, "lending": True,
-            "note": "the profiles in this room can hear you on your "
-                    f"{device.replace('_', ' ')}. Everyone here is shown "
-                    "that you lent it"}
+    out = {"id": grant_id, "room_id": room_id, "device": device,
+           "mic_type": mic_type, "lending": True,
+           "gain": effective, "capped": gain != effective,
+           "note": "the profiles in this room can hear you on your "
+                   f"{device.replace('_', ' ')}. Everyone here is shown "
+                   "that you lent it"}
+    if out["capped"]:
+        out["requested_gain"] = gain
+        out["because"] = (
+            "there are other people in this room, so your microphone stays "
+            "narrow however you have it set — it picks up you, not them. Your "
+            "setting is still yours everywhere else")
+    return out
 
 
 def take_back(room_id: str, interactor_id: str) -> dict:
@@ -157,15 +203,24 @@ def disclosure(room_id: str) -> dict:
     rows = db.connect().execute(
         "SELECT * FROM room_mics WHERE room_id=? AND ended_at IS NULL"
         " ORDER BY started_at, rowid", (room_id,)).fetchall()
+    # The room is shown the gain each grant *runs at*, never the one its lender
+    # asked for. What protects the other participants is how wide the channel
+    # actually is; a rejected preference is the lender's business, and putting
+    # it here would tell the room something prejudicial and untrue of the
+    # capture in the same breath.
     lent = [{"interactor_id": r["interactor_id"], "device": r["device"],
-             "mic_type": r["mic_type"], "since": r["started_at"]}
+             "mic_type": r["mic_type"], "gain": r["gain"],
+             "hears": GAIN_LEVELS[r["gain"]]["describes"],
+             "since": r["started_at"]}
             for r in rows]
     return {
         "room_id": room_id,
         "microphones_lent": lent,
+        "gain": ROOM_GAIN,
         "note": ("no one has lent the profiles a microphone" if not lent else
                  f"{len(lent)} participant(s) have lent the profiles a "
-                 "microphone; the profiles hear them, not the room"),
+                 "microphone, set narrow enough to pick up its wearer; the "
+                 "profiles hear them, not the room"),
     }
 
 
