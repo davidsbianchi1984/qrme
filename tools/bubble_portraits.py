@@ -43,9 +43,9 @@ OUT = ROOT / "docs" / "portraits" / "bubbles"
 
 # Matched to docs/screens/build.py:face() so the README and the app agree.
 RADIUS = 0.28                    # of the portrait's side
-GLOW_MARGIN = 0.18               # canvas padding, as a fraction of the side
-GLOW = (123, 92, 255)            # C["brandA"] — the neon purple
-GLOW_ALPHA = 0.5                 # face() draws url(#glow) at 0.5 in the centre
+GLOW_MARGIN = 0.22               # canvas padding, as a fraction of the side
+GLOW = (139, 106, 255)           # between C["brandA"] and C["brandB"]
+GLOW_ALPHA = 0.80                # at the box edge, falling off outward
 BORDER = (255, 255, 255, 56)     # rgba(255,255,255,0.22)
 
 
@@ -59,14 +59,19 @@ def bubble(image: Image.Image) -> Image.Image:
 
     canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
 
-    # The glow: face() lays a radial gradient circle of r*1.45 behind the box.
-    # Approximated by a blurred rounded rect, which reads the same at gallery
-    # size and does not need a gradient per file.
+    # The glow. `face()` lays a radial gradient behind the box; reproduced here
+    # as a rounded rect at full strength, blurred *narrowly* so the halo stays
+    # concentrated at the edge rather than dissipating across the margin.
+    #
+    # The first version blurred by most of the margin width, which spread the
+    # light so thin it was invisible against a dark page — a glow that only
+    # existed in the source. Rendered against the app's own background is the
+    # only way this is checkable, so it is checked that way.
     halo = Image.new("L", (side, side), 0)
     ImageDraw.Draw(halo).rounded_rectangle(
-        (pad * 0.45, pad * 0.45, side - pad * 0.45, side - pad * 0.45),
-        radius=rad + pad // 2, fill=round(255 * GLOW_ALPHA))
-    halo = halo.filter(ImageFilter.GaussianBlur(pad * 0.62))
+        (pad * 0.6, pad * 0.6, side - pad * 0.6, side - pad * 0.6),
+        radius=rad, fill=round(255 * GLOW_ALPHA))
+    halo = halo.filter(ImageFilter.GaussianBlur(pad * 0.46))
     canvas.paste(Image.new("RGBA", (side, side), GLOW + (255,)), (0, 0), halo)
 
     # The portrait, clipped to the rounded box.

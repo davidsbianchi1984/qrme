@@ -266,6 +266,67 @@ def _backfill(conn, profile_id: str, handle: str) -> bool:
     return changed
 
 
+def _ground(conn, profile_id: str, industry: str) -> int:
+    """Install this starter's industry Field Pack, if it has none yet.
+
+    ``qrme/packs.py`` says the starter packs are *"one free Field Pack per
+    industry, matching the Starter Collection"*, and the pairing was never
+    wired: all 34 starters shipped with **zero source material** while 37
+    packs sat in the marketplace. A physician persona with no medical
+    material answers from tone alone, which is the cold start those packs
+    were written to fix.
+
+    Deliberately narrow:
+
+    * **Only the starter's own industry.** Not "everything relevant" — a
+      profile that hoards material crowds out its own knowledge, because
+      ``persona.build_system_prompt`` renders ``sources[:8]``. One pack is
+      three items, which leaves the budget room to grow.
+    * **Only when the profile has nothing.** An owner who has added their own
+      material, or removed the pack on purpose, does not get it pushed back
+      on the next seed — the same blank-only rule :func:`_backfill` follows.
+    * **Free packs only**, and no ledger credit: this is a deployment
+      grounding its own starters, not a purchase. A priced pack is a decision
+      for whoever owns the profile.
+
+    Returns the number of source items added.
+    """
+    from . import db                # deferred, like seed()'s own imports
+
+    existing = conn.execute(
+        "SELECT 1 FROM source_items WHERE profile_id=? LIMIT 1",
+        (profile_id,)).fetchone()
+    if existing:
+        return 0
+    pack = conn.execute(
+        "SELECT id, price FROM knowledge_packs WHERE industry=?"
+        " AND audience='profile' AND rated=0 ORDER BY rowid LIMIT 1",
+        (industry,)).fetchone()
+    if pack is None or pack["price"]:
+        return 0
+
+    items = conn.execute(
+        "SELECT * FROM pack_items WHERE pack_id=? ORDER BY rowid",
+        (pack["id"],)).fetchall()
+    if not items:
+        return 0
+    title = conn.execute("SELECT title FROM knowledge_packs WHERE id=?",
+                         (pack["id"],)).fetchone()["title"]
+    for item in items:
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,?,?)",
+            (db.new_id("src"), profile_id, "pack",
+             f"{title} — {item['title']}", item["content"], pack["id"],
+             db.utcnow()))
+    conn.execute(
+        "INSERT INTO pack_installs (pack_id, profile_id, robot_id,"
+        " price_paid, installed_at) VALUES (?,?,'',0,?)",
+        (pack["id"], profile_id, db.utcnow()))
+    conn.commit()
+    return len(items)
+
+
 def seed() -> dict:
     """Create the starter collection.
 
@@ -282,7 +343,7 @@ def seed() -> dict:
     from . import avatars, db
 
     conn = db.connect()
-    created, skipped, repaired = [], [], []
+    created, skipped, repaired, grounded = [], [], [], []
     for handle, industry, name, purpose, tags, persona in STARTERS + RATED:
         taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                              (handle,)).fetchone()
@@ -299,6 +360,11 @@ def seed() -> dict:
             # missing, it does not restore starters to factory settings.
             if _backfill(conn, taken["profile_id"], handle):
                 repaired.append(handle)
+            # Grounding is part of the repair too: every deployment seeded
+            # before this shipped has starters with no source material at
+            # all, and they cannot be fixed by hand at 34 profiles.
+            if _ground(conn, taken["profile_id"], industry):
+                grounded.append(handle)
             continue
         profile = create_profile(ProfileCreate(
             owner_id=OWNER_ID, kind="fictional", display_name=name,
@@ -341,6 +407,8 @@ def seed() -> dict:
             provider_name=PROVIDER_NAME,
             business=True,
             profile_id=profile["id"]))
+        if _ground(conn, profile["id"], industry):
+            grounded.append(handle)
         created.append({"handle": f"@{handle}", "industry": industry,
                         "profile_id": profile["id"], "name": name})
     return {"created": len(created), "skipped": len(skipped),
@@ -349,6 +417,10 @@ def seed() -> dict:
             # "34 skipped" on a deployment that just got 34 faces back is the
             # kind of summary that hides the thing you wanted to know.
             "repaired": len(repaired), "repaired_handles": repaired,
+            # Starters that just got their industry Field Pack. Separate from
+            # `repaired` because it answers a different question: not "did the
+            # faces come back" but "do these specialists know anything".
+            "grounded": len(grounded), "grounded_handles": grounded,
             "industries": len(STARTERS), "rated": len(RATED),
             "profiles": created}
 

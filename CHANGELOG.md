@@ -6,6 +6,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Starters arrive knowing something** — `qrme/seed.py`, 12 tests.
+  `qrme/packs.py` has always described its starter packs as *"one free Field
+  Pack per industry, **matching the Starter Collection**"*. The pairing was
+  never wired. All 34 starters shipped with **zero source material** while 37
+  packs sat in the marketplace — Dr. Sana Iqbal had an environment persona and
+  no environmental knowledge, Diego Fuentes a construction persona and no
+  construction material. Every one of them answered from tone alone.
+
+  Seeding now installs each starter's own industry pack, and it is part of the
+  **repair** path, so deployments seeded before this catch up by re-running
+  rather than by hand across 34 profiles.
+
+  Deliberately narrow, and each limit is a way of not overwriting somebody's
+  decision:
+
+  - **Only the starter's own industry.** Not "everything relevant" —
+    `build_system_prompt` renders `sources[:8]`, so a profile that hoards
+    material crowds out its own knowledge. One pack is three items, which
+    leaves the budget room to grow.
+  - **Only onto a profile with nothing.** An owner who added their own
+    material, or removed the pack on purpose, is not topped up on the next
+    seed — the same blank-only rule the portrait backfill follows.
+  - **Free packs only, and no ledger credit.** A deployment grounding its own
+    starters is not a purchase; a priced pack stays a decision for whoever owns
+    the profile.
+  - **The rated starter is left alone.** There is no adult-industry Field Pack,
+    and substituting one would be putting words in the profile the age wall
+    exists to contain.
+
+### Fixed
+
+- **The README's avatar bubbles had no visible glow.** The bubble shipped in
+  0.3.0 got the rounded clip right and then blurred the halo across most of the
+  margin, which spread the light so thin it vanished against a dark page — a
+  glow that existed in the source and nowhere a reader would see it. Narrowed
+  the blur and raised the strength so the gallery matches the Profile Home
+  screen it is meant to mirror. Checked by rendering against the app's own
+  background, which is the only way this is checkable at all.
+
 ## [0.3.0] — 2026-07-26
 
 **The round where the tandem reaches a person.** A synthetic specialist could
