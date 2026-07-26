@@ -85,6 +85,64 @@ can warrant a handoff; a person starts it. JIM stores the task's *status* only
 — the drafts stay in QRME under its moderation and the user's own token, rather
 than making JIM a second store of generated health correspondence.
 
+### Reaching a real clinician
+
+The handoffs above end at a synthetic profile. `POST /handoffs` has always been
+able to package a session for a real provider — and it releases on
+`consent: true`, **a boolean the client sets**. For a health conversation
+leaving the product that is the "the app says the user agreed" problem
+`qrme/webauthn.py` opens by describing itself as the fix for, and the whole
+signing stack was already in the repo, unused by the one endpoint that shipped
+somebody's medical transcript outside.
+
+A **referral** (`qrme/referral.py`) is a handoff with three differences:
+
+* **Signed for, not consented to.** The envelope's challenge *is* the hash of
+  the exact package, and `release()` re-hashes the stored package at release
+  time — not the `document_sha256` column written beside it, which would agree
+  with itself however the row was edited afterwards. The user signs *this*
+  summary to *this* clinician; change either and the release stops as
+  arithmetic rather than as policy.
+* **Bound to one referral.** `binding_kind="referral"` means a valid assertion
+  raised for anything else is not a skeleton key.
+* **One-time.** A handoff token stays live for an ongoing relationship; a
+  referral link opens once, and a second attempt says so rather than quietly
+  working — a replayed link is something the patient should be able to find.
+
+The package names the specialist as synthetic inside itself, because a
+clinician reading a transcript must never have to work out which voice was a
+person, and the AI mark rides on the portrait rather than the document.
+
+**The clinician writes back, once, and the profile is caught up.** Opening the
+one-time link mints a **reply token** at that same moment, so the summary link
+stays burnt while exactly one note can come back. The note is sealed in the PDI
+vault under a `qrme/{profile}/clinical/…` key — the same treatment source
+material gets, content in the vault and only a key reference held locally.
+
+The point is the handover: somebody arriving at the specialist after seeing a
+clinician should not have to retell the whole thing, and the profile should
+already know where the matter stands.
+
+It is deliberately **not a `source_items` row**, and that is the load-bearing
+decision. Source material is what a profile recalls *as its own*, and it is
+what `workflows._scoped_items` feeds to a `research` phase — so a clinical
+opinion filed there could be recited as the profile's own knowledge, or drafted
+from into a letter. Instead the note reaches the prompt in its own block that
+names the clinician and says the words are theirs: attribute them, never
+present them as your own assessment, never extend them into advice they did not
+give, and for anything they do not cover, point back. Notes are scoped to
+(profile, interactor) — it is that person's medical information and appears in
+no other conversation.
+
+**JIM matches; it never signs.** `jim/referral.py` maps a condition to an area,
+searches near a coarse self-declared locality (a town — deliberately not the
+consented live-location feed, which is a stream where a place name is wanted),
+and asks QRME to prepare. The assertion is against **QRME's** relying party and
+travels from the user's device to QRME directly: a guardian product standing in
+the middle of the exchange that proves its own user was present would defeat
+the point of collecting it. JIM stores a handle and not the summary, the
+signature, or the link.
+
 ## qrme / jim-mini ✕ pdi
 
 PDI is a separate secure-hosting product: a private, encrypted data vault with

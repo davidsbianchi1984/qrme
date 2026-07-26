@@ -23,11 +23,14 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (auth, db, engagement, llm, marketplace, moderation, persona,
-                watermark)
-from ..common import age_of, interactor_or_404, profile_or_404, source_items
+                referral, watermark)
+from ..common import (age_of, interactor_or_404, profile_or_404,
+                      require_interactor, require_owner_or_interactor,
+                      source_items)
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
-    ProviderCreate, RoomCreate, RoomMessage,
+    ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
+    RoomCreate, RoomMessage,
 )
 
 router = APIRouter()
@@ -511,3 +514,120 @@ def revoke_handoff(handoff_id: str, request: Request) -> dict:
     if row["pdi_key"] and request.app.state.pdi is not None:
         request.app.state.pdi.delete(row["pdi_key"])
     return {"id": handoff_id, "revoked": True}
+
+
+# --------------------------------------------------------------------------- #
+# medical referrals — a handoff signed for, rather than consented to
+# --------------------------------------------------------------------------- #
+#
+# The handoff above releases on `consent: true`, a boolean the client sets.
+# For a health conversation leaving the product that is the "the app says the
+# user agreed" problem qrme/webauthn.py exists to solve — and the whole
+# signing stack was already here, unused by the one endpoint that needed it.
+
+def _rp_id() -> str:
+    import os
+    return os.environ.get("QRME_RP_ID", "qrme.app")
+
+
+@router.get("/referrals/match")
+def match_clinicians(area: str, location: str | None = None,
+                     limit: int = 5) -> list[dict]:
+    """Clinicians who can help, nearest first.
+
+    Expertise filters, geography ranks — never the reverse. Returns an empty
+    list rather than a near-miss: a confident wrong referral is somebody
+    phoning a clinic that cannot help them.
+    """
+    return referral.match(area, location, limit)
+
+
+@router.post("/referrals/prepare", status_code=201)
+def prepare_referral(body: ReferralPrepare, request: Request) -> dict:
+    """Assemble the summary and raise the signature that would release it.
+
+    **Nothing is released here.** The response carries the package so the user
+    can read exactly what would go, and a WebAuthn challenge whose value *is*
+    the hash of those bytes — sign it with Face ID and you have signed this
+    summary, not a checkbox.
+    """
+    interactor = interactor_or_404(body.interactor_id)
+    require_interactor(body.interactor_id, request)
+    profile = profile_or_404(body.profile_id)
+    try:
+        return referral.prepare(
+            interactor, profile, body.provider_id,
+            account_id=f"interactor:{body.interactor_id}", rp_id=_rp_id())
+    except referral.ReferralError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.post("/referrals/{referral_id}/release")
+def release_referral(referral_id: str, body: ReferralRelease,
+                     request: Request) -> dict:
+    """Mint the one-time link, if the signature really authorises this one.
+
+    Checked: that the assertion verifies, that it was raised for this
+    referral, and that it covers the bytes about to be sent — a summary edited
+    after signing cannot ride the old signature.
+    """
+    row = referral.get(referral_id)
+    if row is None:
+        raise HTTPException(404, "no such referral")
+    require_interactor(row["interactor_id"], request)
+    try:
+        return referral.release(referral_id, body.signature_id)
+    except referral.ReferralError as exc:
+        raise HTTPException(403, str(exc))
+
+
+@router.get("/referrals/{referral_id}")
+def open_referral(referral_id: str, token: str) -> dict:
+    """The clinician opens it. Once — a second attempt says so rather than
+    quietly working, because a replayed link is something the patient should
+    be able to discover."""
+    try:
+        return referral.redeem(referral_id, token)
+    except referral.ReferralError as exc:
+        raise HTTPException(410 if "already opened" in str(exc) else 403,
+                            str(exc))
+
+
+@router.post("/referrals/{referral_id}/reply", status_code=201)
+def reply_to_referral(referral_id: str, token: str, body: ReferralReply,
+                      request: Request) -> dict:
+    """The clinician writes back, once — so the profile is caught up and the
+    patient does not have to explain it all again.
+
+    Sealed in the PDI vault like source material, but recorded separately and
+    surfaced to the profile as *that clinician's words*: it never becomes
+    something the profile can recite as its own knowledge, and never reaches a
+    workflow's `research` phase.
+    """
+    try:
+        return referral.reply(referral_id, token, body.content,
+                              pdi=request.app.state.pdi)
+    except referral.ReferralError as exc:
+        raise HTTPException(403, str(exc))
+
+
+@router.get("/profiles/{profile_id}/clinical-notes/{interactor_id}")
+def read_clinical_notes(profile_id: str, interactor_id: str,
+                        request: Request) -> list[dict]:
+    """What a clinician wrote back on this conversation.
+
+    The pair may read it — the person it is about, and the profile's owner —
+    and nobody else: it is that person's medical information.
+    """
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    return referral.notes_for(profile_id, interactor_id,
+                              request.app.state.pdi)
+
+
+@router.get("/interactors/{interactor_id}/referrals")
+def my_referrals(interactor_id: str, request: Request) -> list[dict]:
+    """What this person has released, to whom, and whether it was opened."""
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    return referral.history(interactor_id)

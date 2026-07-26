@@ -85,6 +85,7 @@ def build_system_prompt(
     relationship: dict | None,
     engagement: dict | None,
     sources: list[dict] | None = None,
+    clinical_notes: list[dict] | None = None,
 ) -> str:
     parts: list[str] = []
 
@@ -121,6 +122,25 @@ def build_system_prompt(
             title = item.get("title") or item["kind"]
             lines.append(f"- [{item['kind']}] {title}: {snippet}")
         parts.append(label + ":\n" + "\n".join(lines))
+
+    if clinical_notes:
+        # Deliberately its own block, and never folded into `sources` above.
+        # Source material is what this profile recalls *as its own*; these are
+        # a named human clinician's words about the person in the conversation.
+        # The point of carrying them is that the patient should not have to
+        # retell everything — not that the profile acquires a clinical opinion.
+        lines = [f"- {n['from']} ({n['at'][:10]}): {n['content'][:400]}"
+                 for n in clinical_notes[:4]]
+        parts.append(
+            "A real clinician has written to you about this person, so you "
+            "are already up to speed and they need not explain it again:\n"
+            + "\n".join(lines)
+            + "\n\nThese are that clinician's words, not yours. Attribute "
+              "them by name whenever you draw on them (\"Dr … wrote that …\"). "
+              "You are not a clinician and must never present this as your own "
+              "assessment, extend it into advice they did not give, or answer "
+              "a new medical question by reasoning from it — for anything it "
+              "does not cover, say so and point back to them.")
 
     demographics = json.loads(profile["demographics"])
     if demographics:
