@@ -52,6 +52,43 @@ own persona conditioning, moderation, and per-user memory before JIM surfaces
 it. Without the endpoint, JIM uses its own standalone guidance — the two
 remain independent.
 
+### Reaching a real clinician
+
+The handoffs above end at a synthetic profile. `POST /handoffs` has always been
+able to package a session for a real provider — and it releases on
+`consent: true`, **a boolean the client sets**. For a health conversation
+leaving the product that is the "the app says the user agreed" problem
+`qrme/webauthn.py` opens by describing itself as the fix for, and the whole
+signing stack was already in the repo, unused by the one endpoint that shipped
+somebody's medical transcript outside.
+
+A **referral** (`qrme/referral.py`) is a handoff with three differences:
+
+* **Signed for, not consented to.** The envelope's challenge *is* the hash of
+  the exact package, and `release()` re-hashes the stored package at release
+  time — not the `document_sha256` column written beside it, which would agree
+  with itself however the row was edited afterwards. The user signs *this*
+  summary to *this* clinician; change either and the release stops as
+  arithmetic rather than as policy.
+* **Bound to one referral.** `binding_kind="referral"` means a valid assertion
+  raised for anything else is not a skeleton key.
+* **One-time.** A handoff token stays live for an ongoing relationship; a
+  referral link opens once, and a second attempt says so rather than quietly
+  working — a replayed link is something the patient should be able to find.
+
+The package names the specialist as synthetic inside itself, because a
+clinician reading a transcript must never have to work out which voice was a
+person, and the AI mark rides on the portrait rather than the document.
+
+**JIM matches; it never signs.** `jim/referral.py` maps a condition to an area,
+searches near a coarse self-declared locality (a town — deliberately not the
+consented live-location feed, which is a stream where a place name is wanted),
+and asks QRME to prepare. The assertion is against **QRME's** relying party and
+travels from the user's device to QRME directly: a guardian product standing in
+the middle of the exchange that proves its own user was present would defeat
+the point of collecting it. JIM stores a handle and not the summary, the
+signature, or the link.
+
 ## qrme / jim-mini ✕ pdi
 
 PDI is a separate secure-hosting product: a private, encrypted data vault with

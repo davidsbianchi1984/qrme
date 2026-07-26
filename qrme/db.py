@@ -166,6 +166,31 @@ CREATE TABLE IF NOT EXISTS handoffs (
     created_at    TEXT NOT NULL
 );
 
+-- Medical referrals: a handoff whose release is authorised by a verified
+-- WebAuthn assertion instead of a `consent: true` boolean (see
+-- qrme/referral.py). A separate table rather than columns on `handoffs`
+-- because the two are different promises — a handoff token stays live for an
+-- ongoing provider relationship, a referral link opens once.
+--
+-- `document_sha256` records the hash at signing time and is **not** what the
+-- release checks against — it was written in the same breath as `package` and
+-- would agree with itself however the row was edited afterwards. `release()`
+-- re-hashes `package` as it stands and compares *that* to the signature. The
+-- column is kept as a record of what was signed, not as the guarantee.
+CREATE TABLE IF NOT EXISTS referrals (
+    id              TEXT PRIMARY KEY,
+    interactor_id   TEXT NOT NULL REFERENCES interactors(id),
+    profile_id      TEXT NOT NULL REFERENCES profiles(id),
+    provider_id     TEXT NOT NULL REFERENCES providers(id),
+    package         TEXT NOT NULL,   -- JSON, exactly what was signed
+    document_sha256 TEXT NOT NULL,   -- of `package`, checked again at release
+    envelope_id     TEXT NOT NULL,   -- the signature envelope raised for this
+    signature_id    TEXT,            -- set once released
+    token           TEXT,            -- one-time; NULL until released
+    redeemed_at     TEXT,            -- set on the single opening
+    created_at      TEXT NOT NULL
+);
+
 -- Creative works a profile composes (music description, poem, note) that
 -- capture a shared moment — kept as artifacts.
 CREATE TABLE IF NOT EXISTS creative_works (

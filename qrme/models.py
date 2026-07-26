@@ -218,6 +218,20 @@ class HandoffCreate(BaseModel):
     consent: bool = False              # explicit user consent required
 
 
+class ReferralPrepare(BaseModel):
+    """Build a medical referral package and raise the signature that would
+    authorise releasing it. Nothing leaves until the assertion verifies."""
+    interactor_id: str
+    profile_id: str                    # the AI specialist session to package
+    provider_id: str
+
+
+class ReferralRelease(BaseModel):
+    # The verified signature raised for *this* referral. Deliberately not a
+    # consent boolean: see qrme/referral.py.
+    signature_id: str
+
+
 class TriageItem(BaseModel):
     id: str
     text: str

@@ -6,6 +6,43 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Medical referral, signed for rather than consented to** — `qrme/referral.py`,
+  5 routes, 14 tests. `POST /handoffs` could already package an AI specialist's
+  session for a real provider. It releases on **`consent: true`, a boolean the
+  client sets** — while `qrme/webauthn.py` opens by describing itself as *"the
+  layer that turns 'the app says the user agreed' into something a third party
+  can check"*. The whole signing stack — enrolment, proofing levels,
+  device-bound credentials, verified evidence packages — sat one import away
+  from the single endpoint that ships somebody's health conversation outside
+  the product, and a checkbox was authorising it.
+
+  A referral signs at the **`high` tier**: document proofing on a device-bound
+  credential — the platform authenticator (Face ID / Touch ID / Optic ID)
+  rather than a passkey that roams. An account without one is told so, never
+  quietly dropped to a weaker tier: that would be the checkbox again wearing a
+  signature's name.
+
+  **The signature is over the package.** The envelope's challenge *is* the hash
+  of the exact bytes, and `release()` **re-hashes the stored package** at
+  release time — deliberately not the `document_sha256` column beside it, which
+  was written in the same breath and would agree with itself however the row
+  was edited afterwards. The first draft compared those two columns and a test
+  caught it: the guarantee exists only because the check reads the real bytes.
+
+  **Bound, and one-time.** `binding_kind="referral"` stops a valid assertion
+  raised for something else being a skeleton key. The link opens once, and a
+  second attempt says so rather than quietly working — a replayed link is
+  something the patient should be able to discover.
+
+  Matching filters on **expertise** and only *ranks* on geography (a
+  cardiologist two streets away is not a substitute for a psychiatrist), and
+  returns nothing rather than a near miss, because a confident wrong referral
+  is somebody phoning a clinic that cannot help them. The package names the
+  specialist as synthetic inside itself: a clinician reading a transcript
+  should never have to work out which voice was a person.
+
 ## [0.2.2] — 2026-07-26
 
 **A documentation release.** No code changed in any of the three products — no
