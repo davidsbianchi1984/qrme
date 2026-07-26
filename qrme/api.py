@@ -32,7 +32,7 @@ from .routers import (apps, assistant, audience, avatars, commerce,
 
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
-    app = FastAPI(title="QRME", version="0.3.0")
+    app = FastAPI(title="QRME", version="0.4.0")
 
     @app.get("/terms")
     def terms() -> dict:

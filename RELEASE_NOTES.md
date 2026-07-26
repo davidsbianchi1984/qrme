@@ -1,77 +1,64 @@
-# QRME v0.3.0 — release notes
+# QRME v0.4.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.3.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.4.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.3.0** — the release where the tandem reaches a person. A synthetic
-specialist could answer a question; now it can be handed a multi-step task, and
-the person talking to it can be put in front of a real clinician with the
-release **signed for rather than ticked**. One of three interoperating products
-(with [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
+**QRME v0.4.0** — the release where the starter profiles stopped answering from
+tone alone. One of three interoperating products (with
+[jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at this
 version.
 
 ### Highlights
 
-- **A specialist can be handed a task, not just a turn.** `qrme/workflows.py`
-  has always run `research → draft → review → send → confirm` in character,
-  carrying memory forward and surviving across sessions. Every route reaching it
-  was owner-only, which blocked the case the tandem needs: JIM's Guardian
-  handing work to a specialist it is already talking to.
+**Starters arrive knowing something.** `qrme/packs.py` has always described its
+starter packs as *"one free Field Pack per industry, **matching the Starter
+Collection**"*. The pairing was never wired. All 34 starters shipped with **zero
+source material** while 37 packs sat in the marketplace — Dr. Sana Iqbal had an
+environment persona and no environmental knowledge, Diego Fuentes a construction
+persona and no construction material. Every one of them answered from tone alone,
+which is a convincing impression of expertise and not the thing itself.
 
-  Relaxing those routes would have been the wrong fix. **A workflow is not a
-  chat turn** — it runs several phases unattended and its `research` phase reads
-  the profile's vaulted source material, where a missing grant means scope
-  `["*"]`, *all of it*. So delegation is off until an owner turns it on, and
-  **delegating `research` without a grant is refused at write time**, where the
-  owner is present to read the error rather than at 3am inside somebody else's
-  workflow. An owner's own workflow has no `delegated_workflows` row, and that
-  absence is what keeps the two surfaces from ever merging.
+Seeding now installs each starter's own industry pack, and it is part of the
+**repair** path — deployments seeded before this catch up by re-running seed
+rather than by hand across 34 profiles.
 
-- **A referral to a real clinician, authorised by a signature.**
-  `POST /handoffs` could already package a session for a real provider — and it
-  released on `consent: true`, **a boolean the client sets**. Meanwhile
-  `qrme/webauthn.py` opens by describing itself as *"the layer that turns 'the
-  app says the user agreed' into something a third party can check"*, sitting
-  one import away from the single endpoint that ships somebody's health
-  conversation outside the product.
+Deliberately narrow, and each limit is a way of not overwriting somebody's
+decision:
 
-  A referral signs at the **`high` tier**: document proofing on a device-bound
-  credential — the platform authenticator (Face ID / Touch ID / Optic ID) rather
-  than a passkey that roams. The challenge **is** the hash of the exact package,
-  and release re-hashes the stored bytes rather than trusting the hash recorded
-  beside them. Bound to one referral, so an assertion raised elsewhere is not a
-  skeleton key. The link **opens once**, and a second attempt says so rather
-  than quietly working.
+- **Only the starter's own industry.** Not "everything relevant" —
+  `build_system_prompt` renders `sources[:8]`, so a profile that hoards material
+  crowds out its own knowledge. One pack is three items, which leaves the budget
+  room to grow.
+- **Only onto a profile with nothing.** An owner who added their own material, or
+  removed the pack on purpose, is not topped up on the next seed.
+- **Free packs only, and no ledger credit.** A deployment grounding its own
+  starters is not a purchase; a priced pack stays a decision for whoever owns the
+  profile.
+- **The rated starter is left alone.** There is no adult-industry Field Pack, and
+  substituting one would be putting words in the profile the age wall exists to
+  contain.
 
-- **The clinician writes back, and the profile is caught up.** Opening the link
-  mints a reply token at that same moment — open once, reply once. The note is
-  sealed in the PDI vault under `qrme/{profile}/clinical/…`, the same treatment
-  source material gets.
+### Changed
 
-  It is deliberately **not** a `source_items` row, and that is the decision the
-  rest hangs on: source material is what a profile recalls *as its own*, and it
-  is what a workflow's `research` phase reads. Instead the note arrives in its
-  own prompt block naming the clinician — *these are that clinician's words, not
-  yours* — so the person does not have to retell their situation, and the
-  profile does not acquire a clinical opinion it can improvise from.
-
-- **Matching filters on expertise and only ranks on geography.** A cardiologist
-  two streets away is not a substitute for a psychiatrist. No match returns
-  nothing rather than a near miss: a confident wrong referral is somebody
-  phoning a clinic that cannot help them.
+**The README says which version you are looking at.** The title said `(v1)` and
+the only feature section mapped the original PRD scope, so thirteen releases of
+work were described nowhere a visitor would find them. There is now a release
+table, newest first, and the PRD map keeps its place while saying what it
+actually is — a conformance map, not a history. The same section went into all
+three repositories.
 
 ### Fixed
 
-- **The starter gallery on GitHub rendered 34 black boxes.** The portraits were
-  loading fine — they are square RGB with a near-black backdrop, and the README
-  embeds them raw, while the app draws its rounded avatar bubble at render time.
-  GitHub's markdown sanitiser strips the `style` attribute that would round
-  them, so on a surface QRME does not control the bubble has to be **in the
-  pixels**. `tools/bubble_portraits.py` bakes it, on transparency so the gallery
-  sits on whatever theme the reader has.
+**The README's avatar bubbles had no visible glow.** The bubble shipped in 0.3.0
+got the rounded clip right and then blurred the halo across most of the margin,
+which spread the light so thin it vanished against a dark page — a glow that
+existed in the source and nowhere a reader would see it. Narrowed the blur and
+raised the strength so the gallery matches the Profile Home screen it is meant to
+mirror. Checked by rendering against the app's own background, which is the only
+way this is checkable at all.
 
 ### Money here is still simulated
 
@@ -82,18 +69,14 @@ its own body. [docs/commerce.md](docs/commerce.md) lists what is absent.
 
 ### Verification
 
-589 tests green (40 new this release). 209 routes. Nine safety properties are
-mutation-checked — each fails the test that forbids it: delegating research
-without a grant, a delegated caller widening its envelope, an owner's workflow
-appearing on the delegated routes, a signature raised elsewhere releasing a
-referral, trusting the stored hash instead of re-hashing, a referral link
-opening twice, dropping the clinician attribution directive, a clinician
-writing back repeatedly, and one patient's note reaching another's conversation.
+622 tests green. 211 routes. The grounding limits are mutation-checked — a
+priced pack being auto-installed, and a profile with existing material being
+topped up, each fail the test that forbids it.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.3.0` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.4.0` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md
