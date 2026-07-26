@@ -25,7 +25,8 @@ from .routers import (apps, assistant, audience, avatars, commerce,
                       community, connections,
                       desks, earnings, feedback, gaming, governance,
                       intelligence, interaction, licensing, models, packs,
-                      profiles, research, robots, signatures, social, steering,
+                      frontpage, profiles, research, robots, signatures,
+                      social, steering,
                       summon, watch, watermarks)
 
 
@@ -92,6 +93,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.state.cloud = None if offline.enabled() else cloud_client
 
     app.include_router(profiles.router)
+    app.include_router(frontpage.router)
     app.include_router(interaction.router)
     app.include_router(intelligence.router)
     app.include_router(connections.router)

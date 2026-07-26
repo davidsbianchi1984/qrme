@@ -481,6 +481,62 @@ def person_row(y, initial, col, name, rel, tone_label, tone):
     return "".join(out), y + 58
 
 
+# The character these screens depict. A screen with a real face on it should
+# carry that person's name and profession — "AI assistant" belongs in the
+# chrome that *cannot* know who is loaded, not on a page showing somebody.
+# Both come from seed.py by way of frames.PORTRAITS, so the face and the name
+# cannot drift apart.
+CHARACTER = "Marcus Bell"
+CHARACTER_ROLE = "retired fee-only financial planner"
+
+
+def _face_of(name):
+    for who, b64 in frames.PORTRAITS:
+        if who == name:
+            return b64
+    raise SystemExit(f"no portrait for {name!r} in frames.PORTRAITS")
+
+
+def _assistant_face():
+    """The character's portrait, used wherever their face appears, so the
+    screens read as one person rather than a different one per screen."""
+    return _face_of(CHARACTER)
+
+
+def face(cx, cy, size, b64, radius=None):
+    """A real portrait, centred in a rounded box.
+
+    These places used to draw :func:`orb` — a purple sphere with a generic
+    person glyph — where the *face* belongs. The pixels were already in the
+    repo: all 34 starter portraits ride in `frames.PORTRAITS`, and exactly one
+    screen used them. So the screens showed a hologram of a profile whose
+    photograph was sitting one import away.
+
+    **A rounded box rather than a circle, and that is not only taste.**
+    `tools/mark_portraits.py` burns the AI mark into the pixels at the
+    *top-right*, so a circular clip of a square portrait cuts the corner the
+    disclosure lives in. The radius here stays well inside it, so the mark
+    survives into every screen that shows a face — which is the whole reason
+    it was burned in rather than composited.
+    """
+    r = size / 2
+    rad = radius if radius is not None else size * 0.28
+    x, y = cx - r, cy - r
+    cid = f"fc{abs(hash((cx, cy, size))) % 100000}"
+    return "".join([
+        f'<circle cx="{cx}" cy="{cy}" r="{r*1.45:.1f}" fill="url(#glow)"/>',
+        f'<defs><clipPath id="{cid}">'
+        f'<rect x="{x:.1f}" y="{y:.1f}" width="{size}" height="{size}"'
+        f' rx="{rad:.1f}"/></clipPath></defs>',
+        f'<image href="data:image/jpeg;base64,{b64}" x="{x:.1f}" y="{y:.1f}"'
+        f' width="{size}" height="{size}" preserveAspectRatio="xMidYMid slice"'
+        f' clip-path="url(#{cid})"/>',
+        f'<rect x="{x:.1f}" y="{y:.1f}" width="{size}" height="{size}"'
+        f' rx="{rad:.1f}" fill="none" stroke="rgba(255,255,255,0.22)"'
+        f' stroke-width="1"/>',
+    ])
+
+
 def orb(cx, cy, r, head_profile=False):
     out = [f'<circle cx="{cx}" cy="{cy}" r="{r*1.5:.1f}" fill="url(#glow)"/>',
            f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="url(#orb)"/>',
@@ -790,11 +846,9 @@ def render(spec):
 
     elif hero == "profilehome":
         cx0 = W / 2
-        out.append(orb(cx0, y + 42, 34))
-        out.append(icon("person", cx0, y + 40, "rgba(255,255,255,0.92)", 1.5))
-        out.append(f'<circle cx="{cx0}" cy="{y+42}" r="40" fill="none" stroke="url(#gBrand)" stroke-width="2.5"/>')
-        out.append(text(cx0, y + 98, "AI assistant", 21, "#fff", 750, "middle"))
-        out.append(text(cx0, y + 116, "AI Version Me", 11.5, C["t2"], 500, "middle"))
+        out.append(face(cx0, y + 42, 84, _assistant_face()))
+        out.append(text(cx0, y + 98, CHARACTER, 21, "#fff", 750, "middle"))
+        out.append(text(cx0, y + 116, CHARACTER_ROLE, 10.5, C["t2"], 500, "middle"))
         out.append(f'<circle cx="{cx0-30}" cy="{y+130}" r="3" fill="{C["green"]}"/>')
         out.append(text(cx0 - 22, y + 134, "Online", 10.5, C["green"], 600))
         y += 150
@@ -1336,7 +1390,7 @@ def render(spec):
         gw = (CW - 12) / 2
         # 2D portrait tile
         out.append(rrect(CX, y, gw, 128, 16, "url(#gCard)", C["line"], 1))
-        out.append(orb(CX + gw / 2, y + 54, 30))
+        out.append(face(CX + gw / 2, y + 54, 64, _assistant_face()))
         out.append(icon("person", CX + gw / 2, y + 52, "rgba(255,255,255,0.92)", 1.4))
         out.append(pill(CX + gw - 12, y + 20, "2D", "brand"))
         out.append(text(CX + gw / 2, y + 104, "Portrait", 11.5, C["txt"], 650, "middle"))
@@ -1345,7 +1399,7 @@ def render(spec):
         gx = CX + gw + 12
         out.append(rrect(gx, y, gw, 128, 16, "url(#gCard)", C["line"], 1))
         out.append(ring(gx + gw / 2, y + 54, 30, 0.75, C["cyan"], 4))
-        out.append(orb(gx + gw / 2, y + 54, 24))
+        out.append(face(gx + gw / 2, y + 54, 54, _assistant_face()))
         out.append(icon("person", gx + gw / 2, y + 52, "rgba(255,255,255,0.92)", 1.2))
         out.append(pill(gx + gw - 12, y + 20, "3D", "info"))
         out.append(text(gx + gw / 2, y + 104, "Avatar", 11.5, C["txt"], 650, "middle"))
@@ -1390,13 +1444,13 @@ def render(spec):
         vh = 196
         out.append(rrect(CX, y, CW, vh, 18, "url(#orb)", C["line"], 1))
         out.append(rrect(CX, y, CW, vh, 18, "url(#glow)"))
-        out.append(orb(W / 2, y + vh / 2 - 12, 44))
+        out.append(face(W / 2, y + vh / 2 - 12, 96, _assistant_face()))
         out.append(icon("person", W / 2, y + vh / 2 - 14, "rgba(255,255,255,0.95)", 1.9))
         # LIVE badge
         out.append(rrect(CX + 14, y + 14, 58, 20, 10, A(C["red"], 0.9)))
         out.append(f'<circle cx="{CX+26}" cy="{y+24}" r="3.5" fill="#fff"/>')
         out.append(text(CX + 34, y + 28, "LIVE", 10.5, "#fff", 750))
-        out.append(text(CX + 14, y + vh - 26, "AI assistant", 13, "#fff", 700))
+        out.append(text(CX + 14, y + vh - 26, CHARACTER, 13, "#fff", 700))
         out.append(text(CX + 14, y + vh - 12, "1080p · end-to-end encrypted", 9.5, "rgba(255,255,255,0.75)"))
         # self preview tile
         out.append(rrect(CX + CW - 68, y + vh - 86, 56, 74, 12, "#0d0a24", "rgba(255,255,255,0.18)", 1))

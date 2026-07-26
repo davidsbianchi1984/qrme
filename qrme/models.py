@@ -509,3 +509,28 @@ class MarketAssist(BaseModel):
     box — never results, and nothing is filtered on the caller's behalf."""
 
     need: str
+
+
+class ExperienceEntry(BaseModel):
+    """One line of a profile's history."""
+
+    title: str
+    org: str | None = None
+    period: str | None = None
+    detail: str | None = None
+
+
+class ExperienceSet(BaseModel):
+    """The whole experience list, replaced wholesale — a CV is a statement,
+    not a set of rows to patch one at a time."""
+
+    entries: list[ExperienceEntry] = []
+
+
+class ReviewIn(BaseModel):
+    """A review by somebody who talked to the profile. One per interactor,
+    edited rather than stacked."""
+
+    interactor_id: str
+    rating: int
+    body: str | None = None

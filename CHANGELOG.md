@@ -6,6 +6,64 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A profile has a front page** — `qrme/frontpage.py`, 3 routes, 12 tests. A
+  profile had a name, a portrait and a persona; everything else a visitor might
+  want was scattered. Skills lived as flat marketplace tags, "experience"
+  existed only as prose buried in the persona, and the nearest thing to a
+  review was a thumbs up/down on the `engagement` row that nobody could read.
+  Somebody who scanned a beacon got a face, a sentence and a button.
+
+  `GET /profiles/{id}/front` assembles it in **one call** — identity, headline,
+  skills, experience, rating, reviews, and how many people have actually talked
+  to it — because the caller is a scan page on cellular and five round trips is
+  how a page arrives in pieces.
+
+  **A review comes from somebody who was actually there.** It checks the
+  `engagement` row for a real interaction, and `UNIQUE (profile_id, author_id)`
+  makes a second review from one account impossible *in the schema* rather than
+  in a check somebody could forget — reviews are edited, never stacked. Without
+  both, a rating is worth exactly the number of accounts somebody can make. The
+  average always reports its own `count`, because one five-star review and two
+  hundred are different facts.
+
+  **Experience about a real person is a credential.** On a `fictional` profile
+  invented history is the point and the AI mark says so. On a profile depicting
+  somebody real, *"twenty years at Accra General"* is a claim asserted on their
+  behalf, so it is refused without the same rights basis the persona needed.
+
+  **Nothing on the page outranks the mark.** It carries `avatars.render`'s
+  watermark like every other surface; a five-star average is a well-liked
+  synthetic profile and nothing more. Reviews are moderated on the way in, and
+  a blocked one is kept, shown to its author with the reason, invisible to
+  everyone else, and excluded from the average — the shape `qrme.audience`
+  already uses for comments.
+
+  The headline is **derived from the persona** rather than stored. A separate
+  field is a second copy that starts agreeing with the persona and stops.
+
+### Changed
+
+- **The screens show real faces instead of a hologram.** Profile Home, Avatar
+  Studio and Live Video drew `orb()` — a purple sphere with a generic person
+  glyph — where the face belongs. The pixels were already in the repo: all 34
+  starter portraits ride in `frames.PORTRAITS`, and exactly one screen used
+  them, so the gallery showed a hologram of a profile whose photograph was one
+  import away.
+
+  **A rounded box rather than a circle, and not only for taste.**
+  `tools/mark_portraits.py` burns the AI mark into the pixels at the
+  *top-right*, so a circular clip of a square portrait cuts off the corner the
+  disclosure lives in. The radius stays well inside it, so the mark survives
+  into every screen that shows a face — which is the whole reason it was burned
+  in rather than composited.
+
+  Those screens name the character and their profession (`Marcus Bell` ·
+  *retired fee-only financial planner*), both sourced from `seed.py` so the
+  face and the name cannot drift apart. "AI assistant" stays where it belongs:
+  the chrome that genuinely cannot know who is loaded.
+
 ### Fixed
 
 - **Re-seeding repairs a starter that predates its portrait.** The seed is
