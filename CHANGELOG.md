@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-07-26
+
+**A documentation release.** No code changed in any of the three products — no
+new routes, no schema, no behaviour. Every entry below corrects something that
+was *described* wrongly, which on this round turned out to be the thing costing
+real time.
+
 ### Fixed
 
 - **`POST /marketplace/seed` described itself as only skipping.** Its docstring
@@ -953,7 +960,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.2.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.2.2...HEAD
+[0.2.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.2
 [0.2.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.1
 [0.2.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.0
 [0.1.9]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.9
