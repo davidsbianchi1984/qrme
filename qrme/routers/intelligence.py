@@ -7,10 +7,14 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, db, offline, tasks, workflows
-from ..common import anonymized_exchange, profile_or_404, require_owner
+from .. import adaptation, db, delegation, offline, tasks, workflows
+from ..common import (
+    anonymized_exchange, interactor_or_404, profile_or_404,
+    require_interactor, require_owner, require_owner_or_interactor,
+)
 from ..models import (
-    GrantCreate, SpecialistSet, TaskRun, WorkflowCreate, WorkflowResume,
+    DelegatedWorkflowCreate, DelegationSet, GrantCreate, SpecialistSet, TaskRun,
+    WorkflowCreate, WorkflowResume,
 )
 
 router = APIRouter()
@@ -168,6 +172,119 @@ def cancel_workflow(profile_id: str, workflow_id: str,
     require_owner(profile_id, request)
     wf = _workflow_or_404(profile_id, workflow_id)
     return workflows.cancel(profile_id, wf)
+
+
+# -- Delegated workflows: somebody else starting one -------------------------
+#
+# The routes above are owner-only and stay that way. These are the separate
+# surface an interactor reaches — JIM's Guardian handing work to a specialist
+# it is already in conversation with. See qrme/delegation.py for why relaxing
+# the owner routes would have been the wrong fix.
+
+def _delegated_or_404(profile_id: str, workflow_id: str,
+                      request: Request) -> tuple[dict, str]:
+    """Resolve a delegated workflow and authorize the caller.
+
+    A workflow the owner started has no `delegated_workflows` row, so it 404s
+    here however the caller authenticates — the two surfaces never merge.
+    """
+    who = delegation.started_by(profile_id, workflow_id)
+    if who is None:
+        raise HTTPException(404, "no delegated workflow with that id")
+    require_owner_or_interactor(profile_id, who, request)
+    wf = workflows.get(profile_id, workflow_id)
+    if wf is None:                    # pragma: no cover - FK makes this unreachable
+        raise HTTPException(404, "workflow not found")
+    return wf, who
+
+
+@router.put("/profiles/{profile_id}/delegation")
+def set_delegation(profile_id: str, body: DelegationSet,
+                   request: Request) -> dict:
+    """Declare which workflow phases somebody else may start on this profile.
+
+    Off until this is called. A policy that delegates `research` without a
+    grant is refused here, where the owner can read the reason.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    grant_id = None
+    if body.grant_token:
+        grant = tasks._grant_for(profile_id, body.grant_token)
+        if grant is None or grant["revoked"]:
+            raise HTTPException(403, "grant revoked or unknown")
+        grant_id = grant["id"]
+    try:
+        return delegation.set_policy(profile_id, body.phases, grant_id,
+                                     body.enabled)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@router.get("/profiles/{profile_id}/delegation")
+def get_delegation(profile_id: str) -> dict:
+    """What a caller may ask this profile to do — readable without a token.
+
+    It is a capability advertisement, so a client can decide whether a handoff
+    is possible before attempting one. Reports the permitted phases and never
+    the grant behind them.
+    """
+    profile_or_404(profile_id)
+    return delegation.offer(profile_id)
+
+
+@router.post("/profiles/{profile_id}/delegated-workflows", status_code=201)
+def start_delegated_workflow(profile_id: str, body: DelegatedWorkflowCreate,
+                             request: Request) -> dict:
+    """Start a workflow on this profile as an interactor, inside the owner's
+    policy. Requires an existing conversation — delegated work is for somebody
+    already talking to the profile, not a stranger holding its id."""
+    profile_or_404(profile_id)
+    interactor_or_404(body.interactor_id)
+    require_interactor(body.interactor_id, request)
+    if not delegation.in_conversation(profile_id, body.interactor_id):
+        raise HTTPException(
+            403, "not in conversation with this profile; delegated work is "
+                 "for somebody already talking to it")
+    try:
+        return delegation.start(profile_id, body.interactor_id, body.goal,
+                                body.plan)
+    except delegation.DelegationError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@router.get("/profiles/{profile_id}/delegated-workflows/{workflow_id}")
+def get_delegated_workflow(profile_id: str, workflow_id: str,
+                           request: Request) -> dict:
+    profile_or_404(profile_id)
+    wf, who = _delegated_or_404(profile_id, workflow_id, request)
+    return {**wf, "delegated_to": who}
+
+
+@router.post("/profiles/{profile_id}/delegated-workflows/{workflow_id}/advance")
+def advance_delegated_workflow(profile_id: str, workflow_id: str,
+                               request: Request) -> dict:
+    """Run the next phase. Without this the handoff would be inert — the owner
+    would have to advance work they did not ask for."""
+    profile = profile_or_404(profile_id)
+    wf, who = _delegated_or_404(profile_id, workflow_id, request)
+    out = workflows.advance(profile, wf, pdi=request.app.state.pdi,
+                            cloud=request.app.state.cloud)
+    return {**out, "delegated_to": who}
+
+
+@router.post("/profiles/{profile_id}/delegated-workflows/{workflow_id}/resume")
+def resume_delegated_workflow(profile_id: str, workflow_id: str,
+                              body: WorkflowResume, request: Request) -> dict:
+    profile_or_404(profile_id)
+    wf, who = _delegated_or_404(profile_id, workflow_id, request)
+    try:
+        return {**workflows.resume(profile_id, wf, body.input),
+                "delegated_to": who}
+    except ValueError as e:
+        raise HTTPException(409, str(e))
 
 
 # -- Offline fine-tuning (claim 26) ------------------------------------------

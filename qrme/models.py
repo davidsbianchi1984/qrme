@@ -296,6 +296,22 @@ class WorkflowResume(BaseModel):
     input: str                         # the awaited external confirmation
 
 
+class DelegationSet(BaseModel):
+    """Owner-declared envelope for workflows somebody else may start."""
+    phases: list[str]                  # from delegation.DELEGABLE
+    # Scopes every delegated vault read. Required when `research` is in
+    # `phases` — without it that phase reads every source item on the profile.
+    grant_token: str | None = None
+    enabled: bool = True
+
+
+class DelegatedWorkflowCreate(BaseModel):
+    goal: str
+    # Omit to get the owner's whole permitted set, never the product default.
+    plan: list[str] | None = None
+    interactor_id: str
+
+
 class ObjectionOpen(BaseModel):
     profile_id: str
     objector_ref: str                  # out-of-band proof-of-identity reference

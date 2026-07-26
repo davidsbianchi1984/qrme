@@ -571,6 +571,36 @@ CREATE TABLE IF NOT EXISTS workflows (
     updated_at  TEXT NOT NULL
 );
 
+-- Owner-authorized workflow delegation: who else may start a workflow on this
+-- profile, and what they may ask for. The workflow routes are owner-only, and
+-- correctly so — a workflow reads vaulted source material unattended, which is
+-- not the same decision as allowing a chat turn. So delegation is off until an
+-- owner writes a row here.
+--
+-- `grant_id` is not optional in practice: `set_policy` refuses a policy that
+-- delegates `research` without one, because `workflows._scoped_items` reads
+-- *every* source item when the grant is absent. The column is nullable only so
+-- a policy that delegates, say, `draft` alone need not invent a grant.
+CREATE TABLE IF NOT EXISTS delegation_policies (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    phases     TEXT NOT NULL,      -- JSON list: the phases a caller may ask for
+    grant_id   TEXT,               -- scopes every delegated vault read
+    enabled    INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+-- Which workflows were started by somebody other than the owner, and by whom.
+-- A separate table rather than a column on `workflows` so an owner's own
+-- workflow has no row here at all — that absence is what keeps it unreachable
+-- from the delegated routes.
+CREATE TABLE IF NOT EXISTS delegated_workflows (
+    workflow_id   TEXT PRIMARY KEY REFERENCES workflows(id),
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    created_at    TEXT NOT NULL
+);
+
 -- Offline fine-tuning runs (claim 26): local-only adaptation passes whose
 -- artifacts are sealed (PDI vault when configured); nothing leaves the host.
 CREATE TABLE IF NOT EXISTS finetune_runs (

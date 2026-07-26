@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Owner-authorized workflow delegation** — `qrme/delegation.py`, 5 routes,
+  14 tests. `qrme/workflows.py` has always run a plan of phases in character,
+  carrying memory forward and surviving across sessions. Every route reaching
+  it was `require_owner`, which is right for the owner's console and blocked
+  the case the tandem needs: **JIM's Guardian handing work to a specialist it
+  is already talking to.**
+
+  The obvious fix — let an interactor call the workflow routes — is the wrong
+  one. **A workflow is not a chat turn.** `POST /chat` composes one reply and
+  moderates it; a workflow runs several phases unattended, and its `research`
+  phase reads the profile's vaulted source material. Worse,
+  `workflows._scoped_items` treats a missing grant as scope `["*"]` — *all of
+  it*. Letting anyone who can reach the endpoint start that is not the same
+  decision at a larger size; it is a different decision.
+
+  So delegation is **off until an owner turns it on**, and turning it on means
+  saying what may be delegated. **A grant is mandatory the moment `research`
+  is delegable** — refused at write time (422), where the owner is present to
+  read the error, rather than at 3am inside somebody else's workflow. A caller
+  may only ask for a subset of the owner's phases, and omitting the plan gets
+  the owner's set rather than `DEFAULT_PLAN`, which is every phase there is.
+
+  The two surfaces never merge: an owner's own workflow has no
+  `delegated_workflows` row, and that absence is the whole guard — it 404s on
+  the delegated routes however the caller authenticates.
+
+  `send` *is* delegable, deliberately. The phase produces the finished
+  deliverable; there is no code path from a workflow phase to an outbound
+  message.
+
 ## [0.2.2] — 2026-07-26
 
 **A documentation release.** No code changed in any of the three products — no
