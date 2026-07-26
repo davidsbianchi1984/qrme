@@ -143,6 +143,40 @@ the middle of the exchange that proves its own user was present would defeat
 the point of collecting it. JIM stores a handle and not the summary, the
 signature, or the link.
 
+### A second ear — the same wearable, two consent questions
+
+A phone has one microphone and one foreground claim on it. On a call, or while
+speaking in a live room, the agent is deaf — precisely when somebody might want
+to ask it something. A watch already on the wrist has a microphone nothing else
+is using.
+
+Both products lend it, and **what lives in the service is permission and state,
+never audio** — capture is on the device, and nothing in either module touches a
+sample. What the backend owns is whether the agent may listen right now, on what,
+and the record of when it did.
+
+The interesting part is that the same hardware raises a *different* question on
+each side.
+
+* **`jim/mic.py` — a one-to-one call.** Refuses **speakerphone** outright: on an
+  earpiece the wearable hears the wearer, on speaker it hears the other party as
+  well, and they are not a user of this product. They were never asked and
+  cannot revoke anything, so the only safe answer is not to capture. Also
+  refuses when others are in earshot, requires the primary to be genuinely
+  occupied (a second ear with no reason is just a second ear), accepts only a
+  registered **wearable** — a stationary console is a room microphone, a
+  different decision — and closes each handover out with its reason recorded.
+* **`qrme/roommic.py` — a live room.** The others *are* participants, so they
+  can be told, and telling them is the price of the feature: the disclosure is
+  readable by anyone in the room rather than by the lender alone. The grant is
+  per participant and never becomes the room's microphone, because nobody can
+  consent for the people they can hear. Refused in a text room, where no primary
+  is occupied at all. Every grant closes when the room does.
+
+The profile's prompt states the limit rather than assuming it: *you hear them,
+not the other people in this room, who have not lent you anything and may not
+realise you could hear them.*
+
 ## qrme / jim-mini ✕ pdi
 
 PDI is a separate secure-hosting product: a private, encrypted data vault with

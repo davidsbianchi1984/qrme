@@ -218,6 +218,22 @@ class HandoffCreate(BaseModel):
     consent: bool = False              # explicit user consent required
 
 
+class RoomMicLend(BaseModel):
+    """Lend a room's profiles your wearable microphone (see qrme/roommic.py).
+    Everyone in the room is shown that you did."""
+    interactor_id: str
+    device: str = "smart_watch"
+    mic_type: Literal["watch", "earbuds", "headset", "lapel", "clip_on",
+                      "bone_conduction", "glasses", "collar_tag", "handheld",
+                      "speakerphone", "conference", "console", "laptop",
+                      "room_array", "doorbell"] = "watch"
+    # The lender's own gain setting. Accepted so one client can send it to
+    # either product, but a room grant always runs near-field — a room has
+    # other people in it, and a channel wide enough to hear them is a channel
+    # lending their voices. See qrme/roommic.py:ROOM_GAIN.
+    gain: Literal["near_field", "normal", "wide"] = "near_field"
+
+
 class ReferralPrepare(BaseModel):
     """Build a medical referral package and raise the signature that would
     authorise releasing it. Nothing leaves until the assertion verifies."""

@@ -166,6 +166,38 @@ CREATE TABLE IF NOT EXISTS handoffs (
     created_at    TEXT NOT NULL
 );
 
+-- Wearable microphones lent to a room's profiles (see qrme/roommic.py). In a
+-- voice or video room the participant's own microphone is carrying their voice
+-- to the other people; a watch on the wrist has one nothing else is using.
+--
+-- Per participant, never per room: somebody can lend their own microphone, and
+-- cannot consent on behalf of the people they can hear. `disclosure()` is
+-- readable by everyone in the room rather than by the lender alone — in a room
+-- the others *can* be told, and telling them is the price of the feature.
+--
+-- Rows are closed, not deleted, and every grant is closed when the room closes,
+-- so a permission cannot outlive the conversation that justified it.
+CREATE TABLE IF NOT EXISTS room_mics (
+    id            TEXT PRIMARY KEY,
+    room_id       TEXT NOT NULL REFERENCES rooms(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    device        TEXT NOT NULL,   -- the device, e.g. smart_watch, earbuds
+    -- watch | earbuds | lapel | clip_on | … see qrme/roommic.py:MIC_TYPES.
+    -- Only microphones pointed at a person qualify: a room-facing one would
+    -- pick up the other participants, whose voices are not the lender's to give.
+    mic_type      TEXT NOT NULL DEFAULT 'watch',
+    -- What the lender asked for, and what the grant actually runs at. In a
+    -- room these differ whenever the request was anything but near-field: a
+    -- room has other people in it by definition, so a channel wide enough to
+    -- hear them is a channel lending their voices. Both are stored because the
+    -- request is the lender's setting and `gain` is what the room was told —
+    -- reporting the request would overstate what the profiles could hear.
+    requested_gain TEXT NOT NULL DEFAULT 'near_field',
+    gain          TEXT NOT NULL DEFAULT 'near_field',
+    started_at    TEXT NOT NULL,
+    ended_at      TEXT
+);
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`

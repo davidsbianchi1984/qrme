@@ -6,6 +6,91 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A second ear: lending the profiles a wearable microphone** —
+  `qrme/roommic.py`, 3 routes, 21 tests. In a voice or video room the
+  participant's own microphone is carrying their voice to the other people.
+  The profiles are reading text and have no ear of their own, so anything said
+  aloud but not typed is invisible to them.
+
+  This lends them any personal microphone already on the person — watch,
+  earbuds, lapel, clip-on, glasses. A room-facing one (speakerphone,
+  conference puck, room array) is refused, and in a room that is the sharpest
+  version of the rule: it would pick up the other participants, and their
+  voices are not the lender's to give. **Permission and state only**
+  — capture is on the device; nothing here touches a sample.
+
+  The counterpart is `jim/mic.py`, which lends the same wearable to the
+  Guardian during a call — and the same hardware raises a *different* question
+  here, because **a room has other people in it**. They are participants, so
+  they can be told, and telling them is the price of the feature: the
+  disclosure is readable by anyone in the room, not by the lender alone. The
+  grant is per participant and never becomes the room's microphone, because
+  nobody can consent for the people they can hear. Refused in a text room,
+  where no primary is occupied at all, and every grant closes when the room
+  does — a permission must not outlive the conversation that justified it.
+
+  The profile's prompt states the limit rather than assuming it: *you hear
+  them, not the other people in this room, who have not lent you anything and
+  may not realise you could hear them.*
+
+  Two bounds make that true of the capture rather than of a sentence in a note.
+  A lent channel **keys on its wearer and drops the rest** — which in a room is
+  the other participants — and it **runs near-field however the lender has
+  their dial set**. Both, not just the filter, because a filter can fail and
+  the people it would fail on did not choose to be in range. Every gain level
+  describes the lender at a distance, never a level of company; a dial whose
+  wide end meant "more voices" would be the whole objection to this feature
+  wearing a different name.
+
+  JIM caps channel 2 while a call is in progress; a room is that condition for
+  its whole duration, so there is no state in which a wider one would be honest
+  here. Capped, not rejected and not overwritten — the lender's setting is
+  theirs and applies everywhere else. The row records both what was asked for
+  and what it ran at, and the room's disclosure carries the **effective** gain
+  only: what protects the other participants is how wide the channel actually
+  is, and a rejected preference is the lender's business.
+
+- **Starters arrive knowing something** — `qrme/seed.py`, 12 tests.
+  `qrme/packs.py` has always described its starter packs as *"one free Field
+  Pack per industry, **matching the Starter Collection**"*. The pairing was
+  never wired. All 34 starters shipped with **zero source material** while 37
+  packs sat in the marketplace — Dr. Sana Iqbal had an environment persona and
+  no environmental knowledge, Diego Fuentes a construction persona and no
+  construction material. Every one of them answered from tone alone.
+
+  Seeding now installs each starter's own industry pack, and it is part of the
+  **repair** path, so deployments seeded before this catch up by re-running
+  rather than by hand across 34 profiles.
+
+  Deliberately narrow, and each limit is a way of not overwriting somebody's
+  decision:
+
+  - **Only the starter's own industry.** Not "everything relevant" —
+    `build_system_prompt` renders `sources[:8]`, so a profile that hoards
+    material crowds out its own knowledge. One pack is three items, which
+    leaves the budget room to grow.
+  - **Only onto a profile with nothing.** An owner who added their own
+    material, or removed the pack on purpose, is not topped up on the next
+    seed — the same blank-only rule the portrait backfill follows.
+  - **Free packs only, and no ledger credit.** A deployment grounding its own
+    starters is not a purchase; a priced pack stays a decision for whoever owns
+    the profile.
+  - **The rated starter is left alone.** There is no adult-industry Field Pack,
+    and substituting one would be putting words in the profile the age wall
+    exists to contain.
+
+### Fixed
+
+- **The README's avatar bubbles had no visible glow.** The bubble shipped in
+  0.3.0 got the rounded clip right and then blurred the halo across most of the
+  margin, which spread the light so thin it vanished against a dark page — a
+  glow that existed in the source and nowhere a reader would see it. Narrowed
+  the blur and raised the strength so the gallery matches the Profile Home
+  screen it is meant to mirror. Checked by rendering against the app's own
+  background, which is the only way this is checkable at all.
+
 ## [0.3.0] — 2026-07-26
 
 **The round where the tandem reaches a person.** A synthetic specialist could
