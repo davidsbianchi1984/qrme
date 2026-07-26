@@ -274,9 +274,57 @@ def test_the_room_is_told_what_the_microphone_actually_hears(client):
                       headers=_as(mal["token"])).json()
     lent = seen["microphones_lent"][0]
     assert lent["gain"] == "near_field"
-    assert "your own voice" in lent["hears"]
+    assert "close to the microphone" in lent["hears"]
     assert "requested_gain" not in lent
     assert "narrow enough" in seen["note"] and "not the room" in seen["note"]
+
+
+def test_every_level_is_the_lender_at_a_distance_never_more_people(client):
+    """A dial whose wide end means "more voices" would be the whole objection
+    to this feature, wearing a different name."""
+    from qrme import roommic
+    for spec in roommic.GAIN_LEVELS.values():
+        assert spec["describes"].startswith("you"), spec
+
+
+def test_the_lent_channel_keys_on_its_wearer(client):
+    """Focus is not a setting. In a room the chatter a wider channel would
+    pick up is the other participants, and their voices were never the
+    lender's to give."""
+    from qrme import roommic
+
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    mal = _interactor(client, "Mal")
+    room = _room(client, p, sam, mal)
+
+    out = client.post(f"/rooms/{room['id']}/mic",
+                      json={"interactor_id": sam["id"]},
+                      headers=_as(sam["token"])).json()
+    assert out["voice_focus"] is True
+    assert "keys on your voice and drops the rest" in out["note"]
+
+    seen = client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(mal["token"])).json()
+    assert seen["voice_focus"] is True
+    assert "keys on its own wearer" in seen["note"]
+    assert roommic.VOICE_FOCUS is True
+
+
+def test_focus_does_not_stand_in_for_the_cap(client):
+    """Both bounds, not just the filter — a filter can fail, and the people it
+    would fail on did not choose to be in range."""
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    mal = _interactor(client, "Mal")
+    room = _room(client, p, sam, mal)
+
+    out = client.post(f"/rooms/{room['id']}/mic",
+                      json={"interactor_id": sam["id"], "gain": "wide"},
+                      headers=_as(sam["token"])).json()
+    assert out["voice_focus"] is True     # still keyed on the lender
+    assert out["gain"] == "near_field"    # and still narrowed anyway
+    assert out["capped"] is True
 
 
 def test_an_unknown_gain_is_rejected(client):
@@ -299,6 +347,7 @@ def test_the_gain_levels_match_jim(client):
     assert all(roommic.GAIN_LEVELS[g]["reaches_others"]
                for g in ("normal", "wide"))
     assert roommic.ROOM_GAIN == "near_field"
+    assert roommic.VOICE_FOCUS is True
 
 
 def test_any_worn_microphone_can_be_lent(client):

@@ -31,13 +31,21 @@ participant cannot consent on behalf of the people they can hear.
 room closes, so a permission cannot outlive the conversation that justified
 it and quietly apply to the next one.
 
-**And it runs near-field, whatever the lender set.** How wide the microphone
-listens is what makes "the profiles hear them, not the room" true of the
-capture rather than true of a sentence in a note. In JIM the cap applies while
-a call is in progress; a room is that condition permanently, so the grant is
-capped for its whole life. The lender's own dial is not overwritten — it is
-theirs and it comes back — but a room is the one place it cannot be honoured,
-because the people it would reach are sitting right there.
+**It keys on its wearer and it runs near-field.** Two bounds, deliberately
+separate, and together they are what makes "the profiles hear them, not the
+room" true of the capture rather than true of a sentence in a note.
+
+:data:`VOICE_FOCUS` is the filter: the channel locks onto the lender and drops
+the rest, which in a room is the other participants. :data:`ROOM_GAIN` is the
+limit: the grant runs near-field however the lender has their dial set. In JIM
+that cap applies while a call is in progress; a room is that condition
+permanently, so the grant is capped for its whole life. The lender's own dial
+is not overwritten — it is theirs and it comes back — but a room is the one
+place it cannot be honoured, because the people it would reach are sitting
+right there.
+
+Both, and not just the filter, because a filter can fail and the people it
+would fail on did not choose to be in range.
 
 Permission and state only — capture is on the device, like everywhere else.
 """
@@ -64,16 +72,28 @@ MIC_TYPES: dict[str, bool] = {          # name -> personal?
 PERSONAL_TYPES = tuple(k for k, v in MIC_TYPES.items() if v)
 
 # How wide the lent channel listens — also kept in step with `jim/mic.py` by
-# hand. `reaches_others` is what a level is judged on: not how loud it is, but
-# whether somebody who did not agree ends up inside it.
+# hand. Every level is **the lender at some distance**, never a level of
+# company: there is no setting whose answer to "what does it pick up" is "more
+# people", and in a room that would be the whole objection to the feature.
+#
+# `reaches_others` does not mean the others are transcribed — VOICE_FOCUS
+# handles that — it means another voice is physically inside the pickup pattern
+# at that width. Focus is a filter and a filter can fail, so the width is kept
+# as a second bound rather than folded into the first.
 GAIN_LEVELS: dict[str, dict] = {
     "near_field": {"reaches_others": False,
-                   "describes": "your own voice, close to the microphone"},
+                   "describes": "you, speaking close to the microphone"},
     "normal": {"reaches_others": True,
-               "describes": "you and whatever is happening near you"},
+               "describes": "you, at arm's length or across a desk"},
     "wide": {"reaches_others": True,
-             "describes": "the room, including people not talking to you"},
+             "describes": "you, from anywhere in the room"},
 }
+
+# The lent channel keys on the lender's voice and drops the rest. Not a
+# setting, and in a room that matters more than anywhere else: the chatter a
+# wider channel would pick up is other participants, and their voices were
+# never the lender's to give.
+VOICE_FOCUS = True
 # What a room grant runs at, always. JIM caps channel 2 while a call is in
 # progress; a room is that condition for its whole duration, so there is no
 # state in which a wider one would be honest here.
@@ -156,9 +176,11 @@ def lend(room_id: str, interactor_id: str, device: str,
     out = {"id": grant_id, "room_id": room_id, "device": device,
            "mic_type": mic_type, "lending": True,
            "gain": effective, "capped": gain != effective,
+           "voice_focus": VOICE_FOCUS,
            "note": "the profiles in this room can hear you on your "
-                   f"{device.replace('_', ' ')}. Everyone here is shown "
-                   "that you lent it"}
+                   f"{device.replace('_', ' ')} — it keys on your voice and "
+                   "drops the rest, including the others here. Everyone in "
+                   "the room is shown that you lent it"}
     if out["capped"]:
         out["requested_gain"] = gain
         out["because"] = (
@@ -217,10 +239,12 @@ def disclosure(room_id: str) -> dict:
         "room_id": room_id,
         "microphones_lent": lent,
         "gain": ROOM_GAIN,
+        "voice_focus": VOICE_FOCUS,
         "note": ("no one has lent the profiles a microphone" if not lent else
                  f"{len(lent)} participant(s) have lent the profiles a "
-                 "microphone, set narrow enough to pick up its wearer; the "
-                 "profiles hear them, not the room"),
+                 "microphone. Each one keys on its own wearer and is set "
+                 "narrow enough to reach only them; the profiles hear them, "
+                 "not the room"),
     }
 
 

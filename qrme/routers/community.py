@@ -143,11 +143,14 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
             who = ", ".join(_display("user", i) for i in listening)
             system += (
                 f"\n\n{who} has lent you a microphone on a wearable, so you "
-                "can hear them speak as well as read what is typed. You hear "
-                "only them — not the other people in this room, who have not "
-                "lent you anything and may not realise you could hear them at "
-                "all. Never repeat or refer to anything you would only know "
-                "from someone else's voice.")
+                "can hear them speak as well as read what is typed. It keys "
+                "on its wearer and is set narrow enough to reach only them, "
+                "so you hear only them — not the other people in this room, "
+                "who have not lent you anything and may not realise you could "
+                "hear them at all. Never repeat or refer to anything you "
+                "would only know from someone else's voice, and if you seem "
+                "to have picked up background talk, treat it as noise rather "
+                "than as something said to you.")
         content = llm.get_provider(cloud=cloud).generate(system, turns)
         verdict = moderation.review(content, None, {"birthdate": None},
                                     maturity=maturity)
