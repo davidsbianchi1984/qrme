@@ -1,57 +1,77 @@
-# QRME v0.2.2 — release notes
+# QRME v0.3.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.2.2` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.3.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.2.2** — a documentation release. **No code changed**: no new routes,
-no schema, no behaviour. Everything here corrects something that was
-*described* wrongly, which on this round turned out to be the thing costing
-real time. One of three interoperating products (with
-[jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
+**QRME v0.3.0** — the release where the tandem reaches a person. A synthetic
+specialist could answer a question; now it can be handed a multi-step task, and
+the person talking to it can be put in front of a real clinician with the
+release **signed for rather than ticked**. One of three interoperating products
+(with [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at this
 version.
 
+### Highlights
+
+- **A specialist can be handed a task, not just a turn.** `qrme/workflows.py`
+  has always run `research → draft → review → send → confirm` in character,
+  carrying memory forward and surviving across sessions. Every route reaching it
+  was owner-only, which blocked the case the tandem needs: JIM's Guardian
+  handing work to a specialist it is already talking to.
+
+  Relaxing those routes would have been the wrong fix. **A workflow is not a
+  chat turn** — it runs several phases unattended and its `research` phase reads
+  the profile's vaulted source material, where a missing grant means scope
+  `["*"]`, *all of it*. So delegation is off until an owner turns it on, and
+  **delegating `research` without a grant is refused at write time**, where the
+  owner is present to read the error rather than at 3am inside somebody else's
+  workflow. An owner's own workflow has no `delegated_workflows` row, and that
+  absence is what keeps the two surfaces from ever merging.
+
+- **A referral to a real clinician, authorised by a signature.**
+  `POST /handoffs` could already package a session for a real provider — and it
+  released on `consent: true`, **a boolean the client sets**. Meanwhile
+  `qrme/webauthn.py` opens by describing itself as *"the layer that turns 'the
+  app says the user agreed' into something a third party can check"*, sitting
+  one import away from the single endpoint that ships somebody's health
+  conversation outside the product.
+
+  A referral signs at the **`high` tier**: document proofing on a device-bound
+  credential — the platform authenticator (Face ID / Touch ID / Optic ID) rather
+  than a passkey that roams. The challenge **is** the hash of the exact package,
+  and release re-hashes the stored bytes rather than trusting the hash recorded
+  beside them. Bound to one referral, so an assertion raised elsewhere is not a
+  skeleton key. The link **opens once**, and a second attempt says so rather
+  than quietly working.
+
+- **The clinician writes back, and the profile is caught up.** Opening the link
+  mints a reply token at that same moment — open once, reply once. The note is
+  sealed in the PDI vault under `qrme/{profile}/clinical/…`, the same treatment
+  source material gets.
+
+  It is deliberately **not** a `source_items` row, and that is the decision the
+  rest hangs on: source material is what a profile recalls *as its own*, and it
+  is what a workflow's `research` phase reads. Instead the note arrives in its
+  own prompt block naming the clinician — *these are that clinician's words, not
+  yours* — so the person does not have to retell their situation, and the
+  profile does not acquire a clinical opinion it can improvise from.
+
+- **Matching filters on expertise and only ranks on geography.** A cardiologist
+  two streets away is not a substitute for a psychiatrist. No match returns
+  nothing rather than a near miss: a confident wrong referral is somebody
+  phoning a clinic that cannot help them.
+
 ### Fixed
 
-- **`POST /marketplace/seed` advertised the opposite of what it does.** Its
-  docstring — the text served in the OpenAPI docs, which is where somebody
-  deciding whether a call is safe to make actually reads — still said
-  *"Idempotent — already-seeded profiles are skipped"*. v0.2.1 made that only
-  half true: the endpoint now also **repairs**, filling a missing portrait or
-  appearance on a starter that already exists.
-
-  The stale sentence pointed away from the fix. Anyone looking at three
-  starters rendering as bare initials would read that line and conclude the one
-  call that repairs them could not possibly help, because skipping is precisely
-  what they do not want. The claim was wrong in **four** places — the endpoint,
-  `qrme/seed.py`'s module and `seed()` docstrings, and the README's Starter
-  Collection row — and all four now say idempotent *and* repairing, blank-only,
-  reporting `repaired` alongside `created` and `skipped`.
-
-  **To repair a live deployment, this is still the one call:**
-  `POST /marketplace/seed`.
-
-- **Three releases of changelog links were missing.** `[0.1.9]`, `[0.2.0]` and
-  `[0.2.1]` had headings but no link definitions, so three shipped versions
-  rendered as literal `[0.2.1]` bracket text rather than linking anywhere, and
-  `[Unreleased]` still compared against `app-v0.1.8` — presenting a
-  three-release diff as though it were an empty one.
-
-- **The release checklist is why that kept happening**, and is the entry that
-  matters most here. `docs/releasing.md` step 1 said to move the `Unreleased`
-  items under the new heading and date it, and stopped — it never mentioned the
-  link definition at the bottom of the file. The step was skipped three
-  releases running by someone following the instructions correctly, and nothing
-  complains when you miss it: the heading renders fine, and the damage appears
-  hundreds of lines from where the edit was made.
-
-  Step 2 was wrong in the same direction. It named `pyproject.toml` and
-  `app/package.json` when the version string lives in **five** places — the two
-  it omitted being the `FastAPI(...)` call in `qrme/api.py` and the second root
-  entry in `app/package-lock.json`, both of which had to be rediscovered each
-  round. Both steps now say what they meant, in all three repositories.
+- **The starter gallery on GitHub rendered 34 black boxes.** The portraits were
+  loading fine — they are square RGB with a near-black backdrop, and the README
+  embeds them raw, while the app draws its rounded avatar bubble at render time.
+  GitHub's markdown sanitiser strips the `style` attribute that would round
+  them, so on a surface QRME does not control the bubble has to be **in the
+  pixels**. `tools/bubble_portraits.py` bakes it, on transparency so the gallery
+  sits on whatever theme the reader has.
 
 ### Money here is still simulated
 
@@ -62,17 +82,18 @@ its own body. [docs/commerce.md](docs/commerce.md) lists what is absent.
 
 ### Verification
 
-549 tests green — **the same 549, passing the same way**, which is the point of
-a release that claims no functional change. 197 routes, also unchanged. Version
-strings moved in exactly five places: `pyproject.toml`, the FastAPI app,
-`app/package.json`, and the two root entries in its lockfile (dependency
-versions untouched). Every version heading in the changelog was checked against
-its link definition — 12 for 12.
+589 tests green (40 new this release). 209 routes. Nine safety properties are
+mutation-checked — each fails the test that forbids it: delegating research
+without a grant, a delegated caller widening its envelope, an owner's workflow
+appearing on the delegated routes, a signature raised elsewhere releasing a
+referral, trusting the stored hash instead of re-hashing, a referral link
+opening twice, dropping the clinician attribution directive, a clinician
+writing back repeatedly, and one patient's note reaching another's conversation.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.2.2` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.3.0` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md
