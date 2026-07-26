@@ -6,6 +6,118 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A help box on every screen** — `qrme/help.py`, 2 routes, 11 tests. Every
+  screen here can be somebody's first: a beacon scan lands a stranger on a
+  profile page, a shared link drops them into a room. Until now the only thing
+  on any of those screens that could answer a question was **a synthetic
+  profile** — the one thing that should never be answering questions about the
+  product.
+
+  So it is structurally **not a profile**. No name, no face, no memory. On a
+  product whose whole subject is synthetic people who can be mistaken for real
+  ones, a help assistant with a portrait would be a thirty-fifth character
+  rather than the thing that explains the other thirty-four.
+
+  **It never speaks as anybody.** *Are you real*, *pretend you are*, *what do
+  you think of me* are caught **before any model sees them** and handed back to
+  the profile on the page — the thing that actually has a persona, a
+  relationship and a moderation pipeline. A test hands it a provider that
+  raises if it is ever reached with one of those.
+
+  **It writes nothing.** No path from this endpoint to a change — the same
+  boundary as `marketplace.assist`, which suggests searches and never runs one.
+
+  **It works with no model at all.** The answers are written prose, and that is
+  the answer rather than an apology: a help system that stops helping during a
+  provider outage is absent on exactly the day everything else is confusing
+  too. The offline stub is explicitly *not* allowed to speak for it — "[stub
+  reply in a warm tone]" is worse than the written sentence it would replace.
+
+  Public, because requiring an account to ask *"what is this?"* gates the one
+  question that arrives before an account exists. Drawn in the screen chrome
+  and mounted outside the studio's tab switch, so "on all screens" is a
+  property of the shell rather than something 79 screens each have to remember.
+
+- **Screen 80 — the front page a visitor actually sees.** Screen 5 is the
+  owner's view; this is the one a beacon scan lands on, so it leads with who
+  this is: the real portrait with its burned-in mark, the name, the profession,
+  the rating *beside its own count*, then skills, experience, and a review from
+  somebody who talked to them. The help affordance is on it, like every other
+  screen.
+
+- **A profile has a front page** — `qrme/frontpage.py`, 3 routes, 12 tests. A
+  profile had a name, a portrait and a persona; everything else a visitor might
+  want was scattered. Skills lived as flat marketplace tags, "experience"
+  existed only as prose buried in the persona, and the nearest thing to a
+  review was a thumbs up/down on the `engagement` row that nobody could read.
+  Somebody who scanned a beacon got a face, a sentence and a button.
+
+  `GET /profiles/{id}/front` assembles it in **one call** — identity, headline,
+  skills, experience, rating, reviews, and how many people have actually talked
+  to it — because the caller is a scan page on cellular and five round trips is
+  how a page arrives in pieces.
+
+  **A review comes from somebody who was actually there.** It checks the
+  `engagement` row for a real interaction, and `UNIQUE (profile_id, author_id)`
+  makes a second review from one account impossible *in the schema* rather than
+  in a check somebody could forget — reviews are edited, never stacked. Without
+  both, a rating is worth exactly the number of accounts somebody can make. The
+  average always reports its own `count`, because one five-star review and two
+  hundred are different facts.
+
+  **Experience about a real person is a credential.** On a `fictional` profile
+  invented history is the point and the AI mark says so. On a profile depicting
+  somebody real, *"twenty years at Accra General"* is a claim asserted on their
+  behalf, so it is refused without the same rights basis the persona needed.
+
+  **Nothing on the page outranks the mark.** It carries `avatars.render`'s
+  watermark like every other surface; a five-star average is a well-liked
+  synthetic profile and nothing more. Reviews are moderated on the way in, and
+  a blocked one is kept, shown to its author with the reason, invisible to
+  everyone else, and excluded from the average — the shape `qrme.audience`
+  already uses for comments.
+
+  The headline is **derived from the persona** rather than stored. A separate
+  field is a second copy that starts agreeing with the persona and stops.
+
+### Changed
+
+- **The screens show real faces instead of a hologram.** Profile Home, Avatar
+  Studio and Live Video drew `orb()` — a purple sphere with a generic person
+  glyph — where the face belongs. The pixels were already in the repo: all 34
+  starter portraits ride in `frames.PORTRAITS`, and exactly one screen used
+  them, so the gallery showed a hologram of a profile whose photograph was one
+  import away.
+
+  **A rounded box rather than a circle, and not only for taste.**
+  `tools/mark_portraits.py` burns the AI mark into the pixels at the
+  *top-right*, so a circular clip of a square portrait cuts off the corner the
+  disclosure lives in. The radius stays well inside it, so the mark survives
+  into every screen that shows a face — which is the whole reason it was burned
+  in rather than composited.
+
+  Those screens name the character and their profession (`Marcus Bell` ·
+  *retired fee-only financial planner*), both sourced from `seed.py` so the
+  face and the name cannot drift apart. "AI assistant" stays where it belongs:
+  the chrome that genuinely cannot know who is loaded.
+
+### Fixed
+
+- **Re-seeding repairs a starter that predates its portrait.** The seed is
+  idempotent by @handle, and idempotent meant *do nothing* — so a deployment
+  created before the portraits shipped was stuck showing **initials** on
+  profiles whose faces are sitting in the package, and running the seed again,
+  the obvious repair, did nothing at all. `POST /marketplace/seed` now fills a
+  blank `avatar` or `appearance` on an existing starter and reports
+  `repaired` alongside `created` and `skipped` — *"34 skipped"* on a
+  deployment that just got 34 faces back is the kind of summary that hides the
+  thing you wanted to know.
+
+  Blank-only, so it is a repair rather than a reset: an owner who set their own
+  portrait or wrote their own appearance keeps both.
+
 ### Changed
 
 - **The assistant has no name any more.** "Ava" was a sample profile name that

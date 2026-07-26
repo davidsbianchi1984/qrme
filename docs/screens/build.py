@@ -348,6 +348,28 @@ def statusbar():
     return o
 
 
+def help_button():
+    """The help affordance, on every screen.
+
+    Drawn here rather than per screen because "on all screens" is a property
+    of the chrome, not something 79 screens can each be trusted to remember —
+    and the one screen that forgets is the one somebody is stuck on.
+
+    Above the tab bar and on the trailing edge, where it is reachable by a
+    thumb and out of the way of the primary action. Deliberately unbranded and
+    faceless: on a product whose subject is synthetic people who look real, a
+    help assistant with a portrait would be a thirty-fifth character.
+    """
+    r = 17
+    cx = SX + SW - 30
+    cy = SY + SH - 84
+    return [
+        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{A(C["brandA"], 0.16)}"'
+        f' stroke="{C["brandA"]}" stroke-width="1.2"/>',
+        text(cx, cy + 5, "?", 17, C["brandA"], 800, "middle"),
+    ]
+
+
 def navbar():
     o = []
     yb = SY + SH - 6
@@ -479,6 +501,62 @@ def person_row(y, initial, col, name, rel, tone_label, tone):
     out.append(text(CX + 52, y + 37, rel, 10.5, C["t2"]))
     out.append(pill(CX + CW - 14, y + 25, tone_label, tone))
     return "".join(out), y + 58
+
+
+# The character these screens depict. A screen with a real face on it should
+# carry that person's name and profession — "AI assistant" belongs in the
+# chrome that *cannot* know who is loaded, not on a page showing somebody.
+# Both come from seed.py by way of frames.PORTRAITS, so the face and the name
+# cannot drift apart.
+CHARACTER = "Marcus Bell"
+CHARACTER_ROLE = "retired fee-only financial planner"
+
+
+def _face_of(name):
+    for who, b64 in frames.PORTRAITS:
+        if who == name:
+            return b64
+    raise SystemExit(f"no portrait for {name!r} in frames.PORTRAITS")
+
+
+def _assistant_face():
+    """The character's portrait, used wherever their face appears, so the
+    screens read as one person rather than a different one per screen."""
+    return _face_of(CHARACTER)
+
+
+def face(cx, cy, size, b64, radius=None):
+    """A real portrait, centred in a rounded box.
+
+    These places used to draw :func:`orb` — a purple sphere with a generic
+    person glyph — where the *face* belongs. The pixels were already in the
+    repo: all 34 starter portraits ride in `frames.PORTRAITS`, and exactly one
+    screen used them. So the screens showed a hologram of a profile whose
+    photograph was sitting one import away.
+
+    **A rounded box rather than a circle, and that is not only taste.**
+    `tools/mark_portraits.py` burns the AI mark into the pixels at the
+    *top-right*, so a circular clip of a square portrait cuts the corner the
+    disclosure lives in. The radius here stays well inside it, so the mark
+    survives into every screen that shows a face — which is the whole reason
+    it was burned in rather than composited.
+    """
+    r = size / 2
+    rad = radius if radius is not None else size * 0.28
+    x, y = cx - r, cy - r
+    cid = f"fc{abs(hash((cx, cy, size))) % 100000}"
+    return "".join([
+        f'<circle cx="{cx}" cy="{cy}" r="{r*1.45:.1f}" fill="url(#glow)"/>',
+        f'<defs><clipPath id="{cid}">'
+        f'<rect x="{x:.1f}" y="{y:.1f}" width="{size}" height="{size}"'
+        f' rx="{rad:.1f}"/></clipPath></defs>',
+        f'<image href="data:image/jpeg;base64,{b64}" x="{x:.1f}" y="{y:.1f}"'
+        f' width="{size}" height="{size}" preserveAspectRatio="xMidYMid slice"'
+        f' clip-path="url(#{cid})"/>',
+        f'<rect x="{x:.1f}" y="{y:.1f}" width="{size}" height="{size}"'
+        f' rx="{rad:.1f}" fill="none" stroke="rgba(255,255,255,0.22)"'
+        f' stroke-width="1"/>',
+    ])
 
 
 def orb(cx, cy, r, head_profile=False):
@@ -790,11 +868,9 @@ def render(spec):
 
     elif hero == "profilehome":
         cx0 = W / 2
-        out.append(orb(cx0, y + 42, 34))
-        out.append(icon("person", cx0, y + 40, "rgba(255,255,255,0.92)", 1.5))
-        out.append(f'<circle cx="{cx0}" cy="{y+42}" r="40" fill="none" stroke="url(#gBrand)" stroke-width="2.5"/>')
-        out.append(text(cx0, y + 98, "AI assistant", 21, "#fff", 750, "middle"))
-        out.append(text(cx0, y + 116, "AI Version Me", 11.5, C["t2"], 500, "middle"))
+        out.append(face(cx0, y + 42, 84, _assistant_face()))
+        out.append(text(cx0, y + 98, CHARACTER, 21, "#fff", 750, "middle"))
+        out.append(text(cx0, y + 116, CHARACTER_ROLE, 10.5, C["t2"], 500, "middle"))
         out.append(f'<circle cx="{cx0-30}" cy="{y+130}" r="3" fill="{C["green"]}"/>')
         out.append(text(cx0 - 22, y + 134, "Online", 10.5, C["green"], 600))
         y += 150
@@ -1336,7 +1412,7 @@ def render(spec):
         gw = (CW - 12) / 2
         # 2D portrait tile
         out.append(rrect(CX, y, gw, 128, 16, "url(#gCard)", C["line"], 1))
-        out.append(orb(CX + gw / 2, y + 54, 30))
+        out.append(face(CX + gw / 2, y + 54, 64, _assistant_face()))
         out.append(icon("person", CX + gw / 2, y + 52, "rgba(255,255,255,0.92)", 1.4))
         out.append(pill(CX + gw - 12, y + 20, "2D", "brand"))
         out.append(text(CX + gw / 2, y + 104, "Portrait", 11.5, C["txt"], 650, "middle"))
@@ -1345,7 +1421,7 @@ def render(spec):
         gx = CX + gw + 12
         out.append(rrect(gx, y, gw, 128, 16, "url(#gCard)", C["line"], 1))
         out.append(ring(gx + gw / 2, y + 54, 30, 0.75, C["cyan"], 4))
-        out.append(orb(gx + gw / 2, y + 54, 24))
+        out.append(face(gx + gw / 2, y + 54, 54, _assistant_face()))
         out.append(icon("person", gx + gw / 2, y + 52, "rgba(255,255,255,0.92)", 1.2))
         out.append(pill(gx + gw - 12, y + 20, "3D", "info"))
         out.append(text(gx + gw / 2, y + 104, "Avatar", 11.5, C["txt"], 650, "middle"))
@@ -1386,17 +1462,70 @@ def render(spec):
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
+    elif hero == "frontpage":
+        cx0 = W / 2
+        out.append(face(cx0, y + 40, 76, _assistant_face()))
+        out.append(text(cx0, y + 96, CHARACTER, 19, "#fff", 750, "middle"))
+        out.append(text(cx0, y + 113, CHARACTER_ROLE, 10.5, C["t2"], 500,
+                        "middle"))
+        # The rating, with its own count beside it: one five-star review and
+        # two hundred are different facts, and an average alone hides which.
+        out.append(stars(cx0 - 62, y + 130, 4, C["gold"], 0.7))
+        out.append(text(cx0 + 6, y + 134, "4.0 · 37 reviews", 10, C["t2"],
+                        600))
+        y += 152
+        # Skills, wrapped so a long list cannot run off the card.
+        out.append(text(CX, y, "SKILLS", 9.5, C["t3"], 700, spacing=0.8))
+        y += 12
+        sx = CX
+        for label in ("budgeting", "retirement", "fee-only", "debt"):
+            w = 14 + len(label) * 5.6
+            if sx + w > CX + CW:
+                sx, y = CX, y + 24
+            out.append(rrect(sx, y, w, 20, 10, A(C["brandA"], 0.14),
+                             C["brandA"], 1))
+            out.append(text(sx + w / 2, y + 14, label, 9.5, C["brandA"], 600,
+                            "middle"))
+            sx += w + 6
+        y += 40
+
+        # Experience, then what people who actually talked to it said. A hero
+        # screen draws its own rows — the generic card stack is an `else` to
+        # this branch, not something a hero gets as well.
+        out.append(text(CX, y, "EXPERIENCE", 9.5, C["t3"], 700, spacing=0.8))
+        y += 14
+        for title_, sub in (("Fee-only financial planner", "Bell & Co · 1994–2024"),
+                            ("Retirement counsellor", "County Credit Union · 1988–1994")):
+            out.append(rrect(CX, y, CW, 40, 12, "url(#gCard)", C["line"], 1))
+            out.append(text(CX + 12, y + 17, title_, 10.5, C["txt"], 650))
+            out.append(text(CX + 12, y + 30, sub, 9, C["t2"]))
+            y += 46
+        y += 4
+
+        out.append(text(CX, y, "REVIEWS", 9.5, C["t3"], 700, spacing=0.8))
+        out.append(text(CX + CW, y, "from people who talked to it", 8.5,
+                        C["t3"], 500, "end"))
+        y += 14
+        out.append(rrect(CX, y, CW, 46, 12, "url(#gCard)", C["line"], 1))
+        out.append(stars(CX + 12, y + 16, 5, C["gold"], 0.6))
+        out.append(text(CX + 78, y + 19, "R. Okafor", 9, C["t2"], 600))
+        out.append(text(CX + 12, y + 35, "\u201cExplained my pension plainly.\u201d",
+                        10, C["txt"], 500))
+        y += 56
+
+        out.append(button(CX, y, CW, "Talk to Marcus", "brand", 40))
+
     elif hero == "video":
         vh = 196
         out.append(rrect(CX, y, CW, vh, 18, "url(#orb)", C["line"], 1))
         out.append(rrect(CX, y, CW, vh, 18, "url(#glow)"))
-        out.append(orb(W / 2, y + vh / 2 - 12, 44))
+        out.append(face(W / 2, y + vh / 2 - 12, 96, _assistant_face()))
         out.append(icon("person", W / 2, y + vh / 2 - 14, "rgba(255,255,255,0.95)", 1.9))
         # LIVE badge
         out.append(rrect(CX + 14, y + 14, 58, 20, 10, A(C["red"], 0.9)))
         out.append(f'<circle cx="{CX+26}" cy="{y+24}" r="3.5" fill="#fff"/>')
         out.append(text(CX + 34, y + 28, "LIVE", 10.5, "#fff", 750))
-        out.append(text(CX + 14, y + vh - 26, "AI assistant", 13, "#fff", 700))
+        out.append(text(CX + 14, y + vh - 26, CHARACTER, 13, "#fff", 700))
         out.append(text(CX + 14, y + vh - 12, "1080p · end-to-end encrypted", 9.5, "rgba(255,255,255,0.75)"))
         # self preview tile
         out.append(rrect(CX + CW - 68, y + vh - 86, 56, 74, 12, "#0d0a24", "rgba(255,255,255,0.18)", 1))
@@ -1639,6 +1768,7 @@ def render(spec):
             out.append(button(CX, y, CW, spec["button"][0], spec["button"][1], 42))
 
     out += tabbar(spec.get("tabs", MAIN), spec.get("tab", 0))
+    out += help_button()
     out += navbar()
     out += close()
     return "".join(out)
@@ -2048,6 +2178,11 @@ SCREENS = [
         dict(icon="eye", color="amber", k="Ranking is yours",
              s="no model reorders your results"),
     ], button=("Use a suggestion", "brand")),
+    # What a visitor sees. The owner's view is screen 5; this is the one a
+    # beacon scan lands on, so it leads with who this is and what people who
+    # actually talked to them thought.
+    dict(num=80, title="Profile", sub="What a visitor sees first",
+         hero="frontpage", accent="brand", tab=0),
 ]
 
 

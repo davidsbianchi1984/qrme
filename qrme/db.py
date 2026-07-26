@@ -905,6 +905,43 @@ CREATE TABLE IF NOT EXISTS reactions (
 
 -- A comment. Moderated on the way in exactly like a chat turn: a blocked one
 -- is kept so its author can see what happened to it, and shown to nobody else.
+-- What a profile has done, shown on its front page. Owner-written, replaced
+-- wholesale rather than edited row by row, because a CV is a statement.
+--
+-- On a profile that depicts a REAL person this is a credential, so
+-- frontpage.set_experience refuses it without the same rights basis the
+-- persona needed. On a fictional profile the invented history is the point.
+CREATE TABLE IF NOT EXISTS profile_experience (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    position   INTEGER NOT NULL DEFAULT 0,
+    title      TEXT NOT NULL,
+    org        TEXT,
+    period     TEXT,
+    detail     TEXT,
+    created_at TEXT NOT NULL
+);
+
+-- A review, by somebody who actually talked to the profile.
+--
+-- UNIQUE (profile_id, author_id) is the load-bearing line: one review per
+-- person, edited rather than stacked, so review-bombing from a single account
+-- is impossible in the schema rather than in a check somebody could forget.
+-- A blocked review is kept and shown to its author alone, and its rating does
+-- not count toward the average.
+CREATE TABLE IF NOT EXISTS profile_reviews (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    author_id   TEXT NOT NULL REFERENCES interactors(id),
+    rating      INTEGER NOT NULL,          -- 1..5
+    body        TEXT,
+    status      TEXT NOT NULL,             -- approved | blocked
+    flag_reason TEXT,
+    created_at  TEXT NOT NULL,
+    updated_at  TEXT,
+    UNIQUE (profile_id, author_id)
+);
+
 CREATE TABLE IF NOT EXISTS comments (
     id          TEXT PRIMARY KEY,
     target_kind TEXT NOT NULL,

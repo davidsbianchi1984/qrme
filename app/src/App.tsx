@@ -6,6 +6,7 @@ import { Chat } from "./screens/Chat";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
+import { Help } from "./Help";
 
 type Tab = "home" | "chat" | "relationships" | "memory" | "settings";
 
@@ -58,6 +59,10 @@ export function App() {
         {tab === "memory" && <Memory />}
         {tab === "settings" && <Settings />}
       </main>
+
+      {/* Outside the tab switch on purpose: it is part of the shell, so every
+          screen has it without each screen having to remember. */}
+      <Help />
     </div>
   );
 }
