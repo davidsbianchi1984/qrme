@@ -23,14 +23,14 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (auth, db, engagement, llm, marketplace, moderation, persona,
-                referral, watermark)
+                referral, roommic, watermark)
 from ..common import (age_of, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomCreate, RoomMessage,
+    RoomCreate, RoomMessage, RoomMicLend,
 )
 
 router = APIRouter()
@@ -134,6 +134,20 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         system += (f"\n\nYou are in a group {room['channel']} room about: "
                    f"{room['topic']} ({_CHANNEL_NOTES[room['channel']]}). "
                    "Reply with one short, in-character turn.")
+        # A lent wearable is the only reason a profile in a voice room can
+        # hear anybody, so it is stated rather than assumed — and stated with
+        # its limits, because the temptation is to behave as though the whole
+        # room is audible when exactly one person chose to be.
+        listening = roommic.heard_by_profiles(room["id"])
+        if listening:
+            who = ", ".join(_display("user", i) for i in listening)
+            system += (
+                f"\n\n{who} has lent you a microphone on a wearable, so you "
+                "can hear them speak as well as read what is typed. You hear "
+                "only them — not the other people in this room, who have not "
+                "lent you anything and may not realise you could hear them at "
+                "all. Never repeat or refer to anything you would only know "
+                "from someone else's voice.")
         content = llm.get_provider(cloud=cloud).generate(system, turns)
         verdict = moderation.review(content, None, {"birthdate": None},
                                     maturity=maturity)
@@ -172,6 +186,45 @@ def create_room(body: RoomCreate) -> dict:
             for p in body.participants
         ],
     }
+
+
+@router.post("/rooms/{room_id}/mic", status_code=201)
+def lend_room_mic(room_id: str, body: RoomMicLend, request: Request) -> dict:
+    """Lend this room's profiles your wearable's microphone.
+
+    In a voice or video room your own microphone is carrying your voice to the
+    other people; the profiles are reading text and have no ear. This lends
+    them the watch on your wrist, for context, while the primary is busy.
+
+    Everyone in the room can see that you did — see `GET …/mic`.
+    """
+    interactor_or_404(body.interactor_id)
+    require_interactor(body.interactor_id, request)
+    try:
+        return roommic.lend(room_id, body.interactor_id, body.device)
+    except roommic.RoomMicError as exc:
+        raise HTTPException(403, str(exc))
+
+
+@router.delete("/rooms/{room_id}/mic/{interactor_id}")
+def take_back_room_mic(room_id: str, interactor_id: str,
+                       request: Request) -> dict:
+    """Take your microphone back."""
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    return roommic.take_back(room_id, interactor_id)
+
+
+@router.get("/rooms/{room_id}/mic")
+def room_mic_disclosure(room_id: str) -> dict:
+    """Who in this room has lent the profiles a microphone.
+
+    Deliberately readable by anyone in the room rather than by the lender
+    alone: the people who need to know are the other participants, and a
+    disclosure only its subject can see is not a disclosure.
+    """
+    _room_or_404(room_id)
+    return roommic.disclosure(room_id)
 
 
 @router.post("/rooms/{room_id}/messages", status_code=201)

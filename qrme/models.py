@@ -218,6 +218,13 @@ class HandoffCreate(BaseModel):
     consent: bool = False              # explicit user consent required
 
 
+class RoomMicLend(BaseModel):
+    """Lend a room's profiles your wearable microphone (see qrme/roommic.py).
+    Everyone in the room is shown that you did."""
+    interactor_id: str
+    device: str = "smart_watch"
+
+
 class ReferralPrepare(BaseModel):
     """Build a medical referral package and raise the signature that would
     authorise releasing it. Nothing leaves until the assertion verifies."""

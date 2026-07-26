@@ -8,6 +8,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A second ear: lending the profiles a wearable microphone** —
+  `qrme/roommic.py`, 3 routes, 11 tests. In a voice or video room the
+  participant's own microphone is carrying their voice to the other people.
+  The profiles are reading text and have no ear of their own, so anything said
+  aloud but not typed is invisible to them.
+
+  This lends them the watch already on the wrist. **Permission and state only**
+  — capture is on the device; nothing here touches a sample.
+
+  The counterpart is `jim/mic.py`, which lends the same wearable to the
+  Guardian during a call — and the same hardware raises a *different* question
+  here, because **a room has other people in it**. They are participants, so
+  they can be told, and telling them is the price of the feature: the
+  disclosure is readable by anyone in the room, not by the lender alone. The
+  grant is per participant and never becomes the room's microphone, because
+  nobody can consent for the people they can hear. Refused in a text room,
+  where no primary is occupied at all, and every grant closes when the room
+  does — a permission must not outlive the conversation that justified it.
+
+  The profile's prompt states the limit rather than assuming it: *you hear
+  them, not the other people in this room, who have not lent you anything and
+  may not realise you could hear them.*
+
 - **Starters arrive knowing something** — `qrme/seed.py`, 12 tests.
   `qrme/packs.py` has always described its starter packs as *"one free Field
   Pack per industry, **matching the Starter Collection**"*. The pairing was
