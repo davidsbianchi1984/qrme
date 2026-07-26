@@ -223,6 +223,10 @@ class RoomMicLend(BaseModel):
     Everyone in the room is shown that you did."""
     interactor_id: str
     device: str = "smart_watch"
+    mic_type: Literal["watch", "earbuds", "headset", "lapel", "clip_on",
+                      "bone_conduction", "glasses", "collar_tag", "handheld",
+                      "speakerphone", "conference", "console", "laptop",
+                      "room_array", "doorbell"] = "watch"
 
 
 class ReferralPrepare(BaseModel):

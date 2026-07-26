@@ -181,7 +181,11 @@ CREATE TABLE IF NOT EXISTS room_mics (
     id            TEXT PRIMARY KEY,
     room_id       TEXT NOT NULL REFERENCES rooms(id),
     interactor_id TEXT NOT NULL REFERENCES interactors(id),
-    device        TEXT NOT NULL,   -- the wearable, e.g. smart_watch
+    device        TEXT NOT NULL,   -- the device, e.g. smart_watch, earbuds
+    -- watch | earbuds | lapel | clip_on | … see qrme/roommic.py:MIC_TYPES.
+    -- Only microphones pointed at a person qualify: a room-facing one would
+    -- pick up the other participants, whose voices are not the lender's to give.
+    mic_type      TEXT NOT NULL DEFAULT 'watch',
     started_at    TEXT NOT NULL,
     ended_at      TEXT
 );

@@ -206,3 +206,33 @@ def test_a_closed_room_will_not_take_a_new_grant(client):
                     headers=_as(sam["token"]))
     assert r.status_code == 403
     assert "has closed" in r.json()["detail"]
+
+
+def test_a_room_facing_microphone_cannot_be_lent_to_a_room(client):
+    """The sharpest version of the rule: in a room, a room-facing microphone
+    would pick up the other participants — and their voices are not the
+    lender's to give."""
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    mal = _interactor(client, "Mal")
+    room = _room(client, p, sam, mal)
+
+    r = client.post(f"/rooms/{room['id']}/mic",
+                    json={"interactor_id": sam["id"], "device": "desk_puck",
+                          "mic_type": "conference"},
+                    headers=_as(sam["token"]))
+    assert r.status_code == 403
+    assert "not yours to lend" in r.json()["detail"]
+    assert client.get(f"/rooms/{room['id']}/mic").json()["microphones_lent"] == []
+
+
+def test_any_worn_microphone_can_be_lent(client):
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    room = _room(client, p, sam)
+    r = client.post(f"/rooms/{room['id']}/mic",
+                    json={"interactor_id": sam["id"], "device": "lapel_mic",
+                          "mic_type": "lapel"},
+                    headers=_as(sam["token"]))
+    assert r.status_code == 201
+    assert r.json()["mic_type"] == "lapel"

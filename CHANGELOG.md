@@ -9,12 +9,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - **A second ear: lending the profiles a wearable microphone** —
-  `qrme/roommic.py`, 3 routes, 11 tests. In a voice or video room the
+  `qrme/roommic.py`, 3 routes, 13 tests. In a voice or video room the
   participant's own microphone is carrying their voice to the other people.
   The profiles are reading text and have no ear of their own, so anything said
   aloud but not typed is invisible to them.
 
-  This lends them the watch already on the wrist. **Permission and state only**
+  This lends them any personal microphone already on the person — watch,
+  earbuds, lapel, clip-on, glasses. A room-facing one (speakerphone,
+  conference puck, room array) is refused, and in a room that is the sharpest
+  version of the rule: it would pick up the other participants, and their
+  voices are not the lender's to give. **Permission and state only**
   — capture is on the device; nothing here touches a sample.
 
   The counterpart is `jim/mic.py`, which lends the same wearable to the

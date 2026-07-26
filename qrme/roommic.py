@@ -39,6 +39,23 @@ from __future__ import annotations
 from . import db
 
 
+# What may be lent, and what may not. Kept in step with `jim/mic.py`'s
+# MIC_TYPES by hand — the two products do not import each other, the same way
+# docs/tandem.md is byte-identical in three repos rather than shared.
+#
+# The axis is who the microphone is pointed at, not how it attaches. A room
+# already has other people in it; lending one aimed at all of them would be
+# lending their voices, which is not the lender's to give.
+MIC_TYPES: dict[str, bool] = {          # name -> personal?
+    "watch": True, "earbuds": True, "headset": True, "lapel": True,
+    "clip_on": True, "bone_conduction": True, "glasses": True,
+    "collar_tag": True, "handheld": True,
+    "speakerphone": False, "conference": False, "console": False,
+    "laptop": False, "room_array": False, "doorbell": False,
+}
+PERSONAL_TYPES = tuple(k for k, v in MIC_TYPES.items() if v)
+
+
 class RoomMicError(ValueError):
     """A grant that must not happen. Text meant for a person."""
 
@@ -55,7 +72,8 @@ def _is_participant(room_id: str, interactor_id: str) -> bool:
         " AND ref_id=?", (room_id, interactor_id)).fetchone() is not None
 
 
-def lend(room_id: str, interactor_id: str, device: str) -> dict:
+def lend(room_id: str, interactor_id: str, device: str,
+         mic_type: str = "watch") -> dict:
     """Lend this room's profiles the wearable's microphone.
 
     Refused outside a live room, from a non-participant, or in a text room —
@@ -73,6 +91,16 @@ def lend(room_id: str, interactor_id: str, device: str) -> dict:
             "so the profiles can already read everything you send")
     if not _is_participant(room_id, interactor_id):
         raise RoomMicError("only a participant can lend a microphone")
+    if mic_type not in MIC_TYPES:
+        raise RoomMicError(
+            f"unknown microphone type {mic_type!r} — one of "
+            f"{', '.join(sorted(MIC_TYPES))}")
+    if not MIC_TYPES[mic_type]:
+        raise RoomMicError(
+            f"a {mic_type.replace('_', ' ')} microphone is pointed at the "
+            "room, not at you. It would pick up the people around you, and "
+            "their voices are not yours to lend. A worn or clipped-on one "
+            f"can: {', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)}")
 
     conn = db.connect()
     existing = conn.execute(
@@ -84,11 +112,11 @@ def lend(room_id: str, interactor_id: str, device: str) -> dict:
     grant_id = db.new_id("rmic")
     conn.execute(
         "INSERT INTO room_mics (id, room_id, interactor_id, device,"
-        " started_at) VALUES (?,?,?,?,?)",
-        (grant_id, room_id, interactor_id, device, db.utcnow()))
+        " mic_type, started_at) VALUES (?,?,?,?,?,?)",
+        (grant_id, room_id, interactor_id, device, mic_type, db.utcnow()))
     conn.commit()
     return {"id": grant_id, "room_id": room_id, "device": device,
-            "lending": True,
+            "mic_type": mic_type, "lending": True,
             "note": "the profiles in this room can hear you on your "
                     f"{device.replace('_', ' ')}. Everyone here is shown "
                     "that you lent it"}
@@ -130,7 +158,8 @@ def disclosure(room_id: str) -> dict:
         "SELECT * FROM room_mics WHERE room_id=? AND ended_at IS NULL"
         " ORDER BY started_at, rowid", (room_id,)).fetchall()
     lent = [{"interactor_id": r["interactor_id"], "device": r["device"],
-             "since": r["started_at"]} for r in rows]
+             "mic_type": r["mic_type"], "since": r["started_at"]}
+            for r in rows]
     return {
         "room_id": room_id,
         "microphones_lent": lent,
