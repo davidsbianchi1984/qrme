@@ -1462,6 +1462,59 @@ def render(spec):
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
+    elif hero == "frontpage":
+        cx0 = W / 2
+        out.append(face(cx0, y + 40, 76, _assistant_face()))
+        out.append(text(cx0, y + 96, CHARACTER, 19, "#fff", 750, "middle"))
+        out.append(text(cx0, y + 113, CHARACTER_ROLE, 10.5, C["t2"], 500,
+                        "middle"))
+        # The rating, with its own count beside it: one five-star review and
+        # two hundred are different facts, and an average alone hides which.
+        out.append(stars(cx0 - 62, y + 130, 4, C["gold"], 0.7))
+        out.append(text(cx0 + 6, y + 134, "4.0 · 37 reviews", 10, C["t2"],
+                        600))
+        y += 152
+        # Skills, wrapped so a long list cannot run off the card.
+        out.append(text(CX, y, "SKILLS", 9.5, C["t3"], 700, spacing=0.8))
+        y += 12
+        sx = CX
+        for label in ("budgeting", "retirement", "fee-only", "debt"):
+            w = 14 + len(label) * 5.6
+            if sx + w > CX + CW:
+                sx, y = CX, y + 24
+            out.append(rrect(sx, y, w, 20, 10, A(C["brandA"], 0.14),
+                             C["brandA"], 1))
+            out.append(text(sx + w / 2, y + 14, label, 9.5, C["brandA"], 600,
+                            "middle"))
+            sx += w + 6
+        y += 40
+
+        # Experience, then what people who actually talked to it said. A hero
+        # screen draws its own rows — the generic card stack is an `else` to
+        # this branch, not something a hero gets as well.
+        out.append(text(CX, y, "EXPERIENCE", 9.5, C["t3"], 700, spacing=0.8))
+        y += 14
+        for title_, sub in (("Fee-only financial planner", "Bell & Co · 1994–2024"),
+                            ("Retirement counsellor", "County Credit Union · 1988–1994")):
+            out.append(rrect(CX, y, CW, 40, 12, "url(#gCard)", C["line"], 1))
+            out.append(text(CX + 12, y + 17, title_, 10.5, C["txt"], 650))
+            out.append(text(CX + 12, y + 30, sub, 9, C["t2"]))
+            y += 46
+        y += 4
+
+        out.append(text(CX, y, "REVIEWS", 9.5, C["t3"], 700, spacing=0.8))
+        out.append(text(CX + CW, y, "from people who talked to it", 8.5,
+                        C["t3"], 500, "end"))
+        y += 14
+        out.append(rrect(CX, y, CW, 46, 12, "url(#gCard)", C["line"], 1))
+        out.append(stars(CX + 12, y + 16, 5, C["gold"], 0.6))
+        out.append(text(CX + 78, y + 19, "R. Okafor", 9, C["t2"], 600))
+        out.append(text(CX + 12, y + 35, "\u201cExplained my pension plainly.\u201d",
+                        10, C["txt"], 500))
+        y += 56
+
+        out.append(button(CX, y, CW, "Talk to Marcus", "brand", 40))
+
     elif hero == "video":
         vh = 196
         out.append(rrect(CX, y, CW, vh, 18, "url(#orb)", C["line"], 1))
@@ -2125,6 +2178,11 @@ SCREENS = [
         dict(icon="eye", color="amber", k="Ranking is yours",
              s="no model reorders your results"),
     ], button=("Use a suggestion", "brand")),
+    # What a visitor sees. The owner's view is screen 5; this is the one a
+    # beacon scan lands on, so it leads with who this is and what people who
+    # actually talked to them thought.
+    dict(num=80, title="Profile", sub="What a visitor sees first",
+         hero="frontpage", accent="brand", tab=0),
 ]
 
 

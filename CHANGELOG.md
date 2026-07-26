@@ -40,6 +40,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and mounted outside the studio's tab switch, so "on all screens" is a
   property of the shell rather than something 79 screens each have to remember.
 
+- **Screen 80 — the front page a visitor actually sees.** Screen 5 is the
+  owner's view; this is the one a beacon scan lands on, so it leads with who
+  this is: the real portrait with its burned-in mark, the name, the profession,
+  the rating *beside its own count*, then skills, experience, and a review from
+  somebody who talked to them. The help affordance is on it, like every other
+  screen.
+
 - **A profile has a front page** — `qrme/frontpage.py`, 3 routes, 12 tests. A
   profile had a name, a portrait and a persona; everything else a visitor might
   want was scattered. Skills lived as flat marketplace tags, "experience"
