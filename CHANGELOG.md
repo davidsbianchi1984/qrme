@@ -4,6 +4,39 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **The assistant has no name any more.** "Ava" was a sample profile name that
+  had quietly become the product's mascot: the studio's nav read *Chat with
+  Ava*, the chat bubble's CSS class was `.ava`, the screen gallery said *People
+  in Ava's life* and *Ava wants to reply*, the desktop frames said *Ava ·
+  Online*, and the demo handle was `@ava.bianchi`.
+
+  None of that is true of the product. A QRME profile is named by whoever
+  creates it, so hardcoding one name in the chrome told every user their
+  assistant was somebody else's. The chat screen was already right — it reads
+  `session.profile.display_name` — so the name only ever lived in the parts
+  that could not know it.
+
+  Everything that cannot know the name now says **AI assistant**, and the
+  message role is `assistant` rather than `ava`, which is what it always was.
+
+  **Onboarding no longer pre-fills the name.** `useState("Ava")` put a name in
+  the box, and a default in a box is the one most people never change — which
+  is exactly how a sample name becomes a mascot. It is empty now, with
+  *"Name your assistant"* as placeholder text.
+
+  Screen 6 is `06-chat.svg` rather than `06-chat-with-ava.svg`.
+
+### Fixed
+
+- **The chat screen's online dot sat at a fixed x that assumed a three-letter
+  name**, so "AI assistant" ran straight through it — found by rendering the
+  screen rather than by reading the diff. The dot and its label are measured
+  off the label now, so a longer name cannot overwrite the status.
+
 ## [0.2.0] — 2026-07-25
 
 ### Fixed

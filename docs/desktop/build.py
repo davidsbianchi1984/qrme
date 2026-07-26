@@ -97,7 +97,7 @@ def frame(title, active):
     o.append(text(CONTENT_X + PAD, WIN_Y + 33, title, 15, C["txt"], 700, spacing=-0.2))
     rx = WIN_X + WIN_W - 24 - (86 if PLATFORM_D == 'windows' else 0)
     o.append(icon("gear", rx - 10, WIN_Y + 27, C["t2"], 0.8))
-    o.append(status_dot(rx - 34, WIN_Y + 31, "Ava · Online", "on"))
+    o.append(status_dot(rx - 34, WIN_Y + 31, "AI assistant · Online", "on"))
     o.append(f'<circle cx="{rx-34-96}" cy="{WIN_Y+27}" r="13" fill="url(#orb)"/>')
     o.append(icon("person", rx - 34 - 96, WIN_Y + 27, "rgba(255,255,255,0.9)", 0.62))
     ny = CONTENT_Y + 18
@@ -209,12 +209,12 @@ def v_home():
                        [12, 18, 15, 24, 30, 27, 38, 44, 40, 52, 61, 58], C["brandA"]))
     o.append(text(IX + 20, y2 + ph - 16, "wk 1", 9, C["t3"], 500))
     o.append(text(IX + lw - 20, y2 + ph - 16, "now", 9, C["t3"], 500, "end"))
-    o += panel(IX + lw + 20, y2, rw, ph, "Ava")
+    o += panel(IX + lw + 20, y2, rw, ph, "AI assistant")
     acx = IX + lw + 20 + rw / 2
     o.append(f'<circle cx="{acx}" cy="{y2+96}" r="42" fill="url(#orb)"/>')
     o.append(icon("person", acx, y2 + 94, "rgba(255,255,255,0.92)", 1.9))
     o.append(f'<circle cx="{acx}" cy="{y2+96}" r="48" fill="none" stroke="url(#gBrand)" stroke-width="3"/>')
-    o.append(text(acx, y2 + 168, "Ava · AI Version Me", 12.5, C["txt"], 700, "middle"))
+    o.append(text(acx, y2 + 168, "AI Version of Me", 12.5, C["txt"], 700, "middle"))
     o.append(status_dot(acx + 44, y2 + 190, "Online", "on"))
     o.append(text(acx - 52, y2 + 194, "Identity 98.9%", 10, C["t2"], 600))
     y3 = y2 + ph + 22
@@ -245,7 +245,7 @@ def v_conversation():
     lw = IW * 0.62
     rw = IW - lw - 20
     hh = CONTENT_H - 2 * PAD
-    o += panel(IX, IY, lw, hh, "Chat with Ava", right="every response explained")
+    o += panel(IX, IY, lw, hh, "Chat", right="every response explained")
     cy = IY + 56
     # AI bubble
     o.append(rrect(IX + 24, cy, lw * 0.62, 62, 14, "rgba(255,255,255,0.04)", C["line"], 1))
@@ -256,7 +256,7 @@ def v_conversation():
     # user bubble (right)
     uw = lw * 0.55
     o.append(rrect(IX + lw - 24 - uw, cy, uw, 44, 14, "url(#gBrand)"))
-    o.append(text(IX + lw - 40, cy + 20, "Hey Ava! I've been busy,", 10.5, "#fff", 500, "end"))
+    o.append(text(IX + lw - 40, cy + 20, "Hey! I've been busy,", 10.5, "#fff", 500, "end"))
     o.append(text(IX + lw - 40, cy + 35, "but thinking about you.", 10.5, "#fff", 500, "end"))
     cy += 64
     o.append(rrect(IX + 24, cy, lw * 0.66, 62, 14, "rgba(255,255,255,0.04)", C["line"], 1))
@@ -296,7 +296,7 @@ def v_relationships():
     lw = IW * 0.62
     rw = IW - lw - 20
     hh = CONTENT_H - 2 * PAD
-    o += panel(IX, IY, lw, hh, "People in Ava's life", right="12 relationships")
+    o += panel(IX, IY, lw, hh, "People it knows", right="12 relationships")
     rows = [[("D", "David", C["brandA"]), "Owner", ("Direct", C["txt"], 500), "now"],
             [("S", "Sarah", C["amber"]), "Daughter", ("Supportive", C["green"], 600), "3h"],
             [("J", "John", C["cyan"]), "Friend", ("Casual", C["cyan"], 500), "1d"],

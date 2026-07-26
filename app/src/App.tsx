@@ -11,7 +11,7 @@ type Tab = "home" | "chat" | "relationships" | "memory" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
-  { id: "chat", label: "Chat with Ava", icon: "💬" },
+  { id: "chat", label: "Chat", icon: "💬" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
   { id: "settings", label: "Control", icon: "⚙" },
