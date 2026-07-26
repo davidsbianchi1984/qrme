@@ -6,6 +6,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Re-seeding repairs a starter that predates its portrait.** The seed is
+  idempotent by @handle, and idempotent meant *do nothing* — so a deployment
+  created before the portraits shipped was stuck showing **initials** on
+  profiles whose faces are sitting in the package, and running the seed again,
+  the obvious repair, did nothing at all. `POST /marketplace/seed` now fills a
+  blank `avatar` or `appearance` on an existing starter and reports
+  `repaired` alongside `created` and `skipped` — *"34 skipped"* on a
+  deployment that just got 34 faces back is the kind of summary that hides the
+  thing you wanted to know.
+
+  Blank-only, so it is a repair rather than a reset: an owner who set their own
+  portrait or wrote their own appearance keeps both.
+
 ### Changed
 
 - **The assistant has no name any more.** "Ava" was a sample profile name that

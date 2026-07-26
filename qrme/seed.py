@@ -233,6 +233,35 @@ RATED: list[tuple[str, str, str, str, list[str], str]] = [
 ]
 
 
+def _backfill(conn, profile_id: str, handle: str) -> bool:
+    """Fill in a starter's portrait and appearance if they are missing.
+
+    Returns whether anything changed. Blank-only by design: ``COALESCE`` in
+    the UPDATE means an owner who set their own face or wrote their own
+    appearance keeps it, so re-seeding is a repair rather than a reset.
+    """
+    from . import avatars           # deferred, like seed()'s own imports
+
+    row = conn.execute("SELECT avatar, appearance FROM profiles WHERE id=?",
+                       (profile_id,)).fetchone()
+    if row is None:
+        return False
+    asset = avatars.asset_path(handle)
+    portrait = avatars.BRIEFS.get(handle)
+    changed = False
+    if asset and not row["avatar"]:
+        conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
+                     (asset, profile_id))
+        changed = True
+    if portrait and not row["appearance"]:
+        conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
+                     (portrait, profile_id))
+        changed = True
+    if changed:
+        conn.commit()
+    return changed
+
+
 def seed() -> dict:
     """Create the starter collection (idempotent: claimed handles skip)."""
     import json
@@ -245,12 +274,23 @@ def seed() -> dict:
     from . import avatars, db
 
     conn = db.connect()
-    created, skipped = [], []
+    created, skipped, repaired = [], [], []
     for handle, industry, name, purpose, tags, persona in STARTERS + RATED:
         taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                              (handle,)).fetchone()
         if taken:
             skipped.append(handle)
+            # Idempotent used to mean "do nothing", which left every
+            # deployment seeded before the portraits shipped stuck with
+            # initials on a profile whose face is sitting in the package. The
+            # seed is idempotent by *handle*, so re-running it could never
+            # repair them and nothing else would.
+            #
+            # Only ever fills a blank. An owner who set their own portrait or
+            # wrote their own appearance keeps it — this backfills what was
+            # missing, it does not restore starters to factory settings.
+            if _backfill(conn, taken["profile_id"], handle):
+                repaired.append(handle)
             continue
         profile = create_profile(ProfileCreate(
             owner_id=OWNER_ID, kind="fictional", display_name=name,
@@ -296,6 +336,11 @@ def seed() -> dict:
         created.append({"handle": f"@{handle}", "industry": industry,
                         "profile_id": profile["id"], "name": name})
     return {"created": len(created), "skipped": len(skipped),
+            # Starters that already existed and were missing their portrait or
+            # appearance. Reported rather than folded into `skipped`, because
+            # "34 skipped" on a deployment that just got 34 faces back is the
+            # kind of summary that hides the thing you wanted to know.
+            "repaired": len(repaired), "repaired_handles": repaired,
             "industries": len(STARTERS), "rated": len(RATED),
             "profiles": created}
 
