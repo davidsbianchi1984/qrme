@@ -4,6 +4,29 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **`POST /marketplace/seed` described itself as only skipping.** Its docstring
+  — the text served in the OpenAPI docs, which is where anybody deciding
+  whether it is safe to call actually reads it — said *"Idempotent —
+  already-seeded profiles are skipped"*, and 0.2.1 made that only half true:
+  the endpoint now also **repairs**, filling a missing portrait or appearance
+  on a starter that already exists.
+
+  The stale sentence had a cost. Someone looking at three starters rendering as
+  bare initials would read that line and conclude the one call that fixes them
+  could not possibly help, because re-seeding skips what is already there. No
+  behaviour changes here — this corrects the description in all four places it
+  was wrong: the endpoint, `qrme/seed.py`'s module and `seed()` docstrings, and
+  the README's Starter Collection row.
+
+- **Changelog release links stopped at 0.1.8.** `[0.1.9]`, `[0.2.0]` and
+  `[0.2.1]` had headings but no link definitions, so three shipped versions
+  rendered as literal `[0.2.1]` text, and `[Unreleased]` still diffed against
+  `app-v0.1.8` — a three-release diff pretending to be an empty one.
+
 ## [0.2.1] — 2026-07-26
 
 ### Added
@@ -920,7 +943,10 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.1.8...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.2.1...HEAD
+[0.2.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.1
+[0.2.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.0
+[0.1.9]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.9
 [0.1.8]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.8
 [0.1.7]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.1.7
 [0.1.6]: https://github.com/davidsbianchi1984/qrme/commit/db6d7c9
