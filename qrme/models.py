@@ -534,3 +534,9 @@ class ReviewIn(BaseModel):
     interactor_id: str
     rating: int
     body: str | None = None
+
+
+class HelpAsk(BaseModel):
+    """A question about using QRME — not a message to a profile."""
+
+    question: str = ""

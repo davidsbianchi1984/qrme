@@ -7,8 +7,8 @@ is owner-only, and a review needs an interactor who has actually been here.
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import auth, frontpage
-from ..models import ExperienceSet, ReviewIn
+from .. import auth, frontpage, help as help_mod
+from ..models import ExperienceSet, HelpAsk, ReviewIn
 from .profiles import profile_or_404, require_owner
 
 router = APIRouter(tags=["front page"])
@@ -67,3 +67,23 @@ def leave_review(profile_id: str, body: ReviewIn, request: Request) -> dict:
                                 body.body)
     except frontpage.FrontPageError as exc:
         raise HTTPException(422, str(exc))
+
+
+@router.get("/help/topics")
+def help_topics() -> dict:
+    """What the help box can answer, so a UI can offer them rather than
+    leaving somebody staring at an empty field."""
+    return {"topics": help_mod.topics(), "disclosure": help_mod.DISCLOSURE}
+
+
+@router.post("/help")
+def ask_help(body: HelpAsk) -> dict:
+    """The help box that sits on every screen.
+
+    Public on purpose: every screen here can be somebody's first — a beacon
+    scan lands a stranger on a profile page — and requiring an account to ask
+    "what is this?" would gate the one question that arrives before one exists.
+
+    It writes nothing. There is no path from this endpoint to a change.
+    """
+    return help_mod.ask(body.question)

@@ -8,6 +8,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A help box on every screen** — `qrme/help.py`, 2 routes, 11 tests. Every
+  screen here can be somebody's first: a beacon scan lands a stranger on a
+  profile page, a shared link drops them into a room. Until now the only thing
+  on any of those screens that could answer a question was **a synthetic
+  profile** — the one thing that should never be answering questions about the
+  product.
+
+  So it is structurally **not a profile**. No name, no face, no memory. On a
+  product whose whole subject is synthetic people who can be mistaken for real
+  ones, a help assistant with a portrait would be a thirty-fifth character
+  rather than the thing that explains the other thirty-four.
+
+  **It never speaks as anybody.** *Are you real*, *pretend you are*, *what do
+  you think of me* are caught **before any model sees them** and handed back to
+  the profile on the page — the thing that actually has a persona, a
+  relationship and a moderation pipeline. A test hands it a provider that
+  raises if it is ever reached with one of those.
+
+  **It writes nothing.** No path from this endpoint to a change — the same
+  boundary as `marketplace.assist`, which suggests searches and never runs one.
+
+  **It works with no model at all.** The answers are written prose, and that is
+  the answer rather than an apology: a help system that stops helping during a
+  provider outage is absent on exactly the day everything else is confusing
+  too. The offline stub is explicitly *not* allowed to speak for it — "[stub
+  reply in a warm tone]" is worse than the written sentence it would replace.
+
+  Public, because requiring an account to ask *"what is this?"* gates the one
+  question that arrives before an account exists. Drawn in the screen chrome
+  and mounted outside the studio's tab switch, so "on all screens" is a
+  property of the shell rather than something 79 screens each have to remember.
+
 - **A profile has a front page** — `qrme/frontpage.py`, 3 routes, 12 tests. A
   profile had a name, a portrait and a persona; everything else a visitor might
   want was scattered. Skills lived as flat marketplace tags, "experience"

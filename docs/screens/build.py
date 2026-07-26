@@ -348,6 +348,28 @@ def statusbar():
     return o
 
 
+def help_button():
+    """The help affordance, on every screen.
+
+    Drawn here rather than per screen because "on all screens" is a property
+    of the chrome, not something 79 screens can each be trusted to remember —
+    and the one screen that forgets is the one somebody is stuck on.
+
+    Above the tab bar and on the trailing edge, where it is reachable by a
+    thumb and out of the way of the primary action. Deliberately unbranded and
+    faceless: on a product whose subject is synthetic people who look real, a
+    help assistant with a portrait would be a thirty-fifth character.
+    """
+    r = 17
+    cx = SX + SW - 30
+    cy = SY + SH - 84
+    return [
+        f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{A(C["brandA"], 0.16)}"'
+        f' stroke="{C["brandA"]}" stroke-width="1.2"/>',
+        text(cx, cy + 5, "?", 17, C["brandA"], 800, "middle"),
+    ]
+
+
 def navbar():
     o = []
     yb = SY + SH - 6
@@ -1693,6 +1715,7 @@ def render(spec):
             out.append(button(CX, y, CW, spec["button"][0], spec["button"][1], 42))
 
     out += tabbar(spec.get("tabs", MAIN), spec.get("tab", 0))
+    out += help_button()
     out += navbar()
     out += close()
     return "".join(out)

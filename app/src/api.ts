@@ -91,6 +91,13 @@ export const api = {
 
   offlineStatus: () => req<Record<string, unknown>>("/offline/status"),
 
+  // The help box. No token: a beacon scan lands a stranger on a page, and
+  // requiring an account to ask "what is this?" gates the one question that
+  // arrives before one exists.
+  help: (question: string) =>
+    req<{ answer: string; disclosure: string; ai: boolean; refused: boolean;
+          topics: string[] }>("/help", { method: "POST", body: { question } }),
+
   createProfile: (body: {
     owner_id: string; kind: string; display_name: string; persona: string;
     verification: { birthdate: string }; purpose?: string;
