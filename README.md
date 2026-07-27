@@ -259,7 +259,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat overlay</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -279,6 +279,27 @@ where a viewer is already looking, and on a stream whose premise is an empty
 chair with a bell, the reactions are the room. Those screens also show the two
 ways in: **come up as a guest**, which asks the host, or **just comment**,
 which is immediate.
+
+**89** is the same room with the faces drawn as circles on the glass, and with
+the five things a viewer can actually do in a row along the bottom of the
+frame. Every one of them was already a route and none of them was anywhere a
+thumb could reach, which reads exactly like a missing feature:
+
+| On screen | Route |
+| --- | --- |
+| **Ring** | `POST /desks/{desk_id}/bell` — one ring per desk per 30s |
+| **Gift** | `POST /{kind}/{subject_id}/gift` |
+| **Like** | `POST /posts/{id}/like` — the audience layer |
+| **Share** | `POST /{kind}/{id}/share` |
+| **Come up** | `POST /desks/{desk_id}/guests` — the host decides |
+
+Ringing and coming up sit in the same row as like, gift and share because from
+the viewer's side they are one gesture: a thing you do to the room you are
+watching. That the last of them needs the host to say yes is the host's
+business, not a reason to file it under a different menu. The two that carry a
+condition say so on the cards underneath, and the buttons are labelled — an
+unlabelled bell and an unlabelled arrow are the two icons nobody guesses right,
+and the cost of guessing wrong is interrupting a stranger's stream.
 
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it

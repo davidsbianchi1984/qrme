@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import frames          # generated: tools/encode_desk_frames.py
+import textwidth as tw  # generated: tools/measure_text.py
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -204,6 +205,23 @@ def icon(name, cx, cy, col, s=1.0):
     if name == "flag":
         return (f'<path d="M{cx-sc(6)} {cy+sc(8)} v-{sc(16)}" {st}/>'
                 f'<path d="M{cx-sc(6)} {cy-sc(7)} h{sc(11)} l-{sc(2.5)} {sc(3.5)} {sc(2.5)} {sc(3.5)} h-{sc(11)} Z" {st}/>')
+    if name == "bell":  # ring the bell on a desk
+        return (f'<path d="M{cx-sc(7)} {cy+sc(4)} C{cx-sc(5.5)} {cy+sc(1)} {cx-sc(5)} {cy-sc(2)} {cx-sc(5)} {cy-sc(4)} '
+                f'A{sc(5)} {sc(5)} 0 0 1 {cx+sc(5)} {cy-sc(4)} '
+                f'C{cx+sc(5)} {cy-sc(2)} {cx+sc(5.5)} {cy+sc(1)} {cx+sc(7)} {cy+sc(4)} Z" {st}/>'
+                f'<path d="M{cx-sc(2.2)} {cy+sc(4)} a{sc(2.2)} {sc(2.2)} 0 0 0 {sc(4.4)} 0" {st}/>'
+                f'<circle cx="{cx}" cy="{cy-sc(8.6)}" r="{sc(1.2)}" {p}/>')
+    if name == "share":  # pass it on — three nodes, two edges
+        return (f'<circle cx="{cx+sc(5)}" cy="{cy-sc(6)}" r="{sc(2.6)}" {st}/>'
+                f'<circle cx="{cx-sc(6)}" cy="{cy}" r="{sc(2.6)}" {st}/>'
+                f'<circle cx="{cx+sc(5)}" cy="{cy+sc(6)}" r="{sc(2.6)}" {st}/>'
+                f'<path d="M{cx-sc(3.6)} {cy-sc(1.2)} l{sc(6.2)} -{sc(3.6)} '
+                f'M{cx-sc(3.6)} {cy+sc(1.2)} l{sc(6.2)} {sc(3.6)}" {st}/>')
+    if name == "comeup":  # ask to come up as a guest — a person, and up
+        return (f'<circle cx="{cx-sc(3)}" cy="{cy-sc(4)}" r="{sc(3.2)}" {st}/>'
+                f'<path d="M{cx-sc(9)} {cy+sc(7)} c0 -{sc(5.4)} {sc(12)} -{sc(5.4)} {sc(12)} 0" {st}/>'
+                f'<path d="M{cx+sc(6)} {cy+sc(3)} v-{sc(9)} '
+                f'M{cx+sc(2.8)} {cy-sc(2.8)} l{sc(3.2)} -{sc(3.2)} {sc(3.2)} {sc(3.2)}" {st}/>')
     if name == "dove":  # memorial / departure
         return (f'<path d="M{cx-sc(8)} {cy+sc(2)} c{sc(3)} -{sc(5)} {sc(8)} -{sc(6)} {sc(11)} -{sc(3)} '
                 f'c{sc(2)} -{sc(4)} {sc(5)} -{sc(4)} {sc(5)} -{sc(4)} c-{sc(1)} {sc(3)} -{sc(2)} {sc(4)} -{sc(4)} {sc(5)} '
@@ -296,12 +314,53 @@ def bubble_chat(x, y, w, rows):
     return out, yy
 
 
+def live_actions(x, y, w, h, actions):
+    """The verbs a viewer has in a live room, drawn on the picture.
+
+    Every one of these already existed as a route — ``POST /desks/{id}/bell``,
+    ``POST /desks/{id}/guests``, ``POST /{kind}/{id}/gift`` and the audience
+    layer's like and share — and none of them existed anywhere a thumb could
+    reach. A capability with no control is indistinguishable from a missing
+    feature, which is exactly how it read.
+
+    So: one row, on the frame, at the bottom where a thumb rests. Ringing the
+    bell and asking to come up sit in the same row as like, gift and share
+    because from the viewer's side they are the same gesture — a thing you do
+    to the room you are watching. That the last one needs the host to say yes
+    is the host's business, not a reason to file it under a different menu.
+
+    Each button is labelled. An unlabelled bell and an unlabelled "come up"
+    arrow are the two icons in this row nobody guesses right, and the cost of
+    guessing wrong is interrupting a stranger's stream.
+    """
+    o = []
+    bar_h = 52
+    by = y + h - 10 - bar_h
+    o.append(rrect(x + 8, by, w - 16, bar_h, 24, "rgba(8,6,22,0.66)",
+                   "rgba(255,255,255,0.10)", 1))
+    slot = (w - 16) / len(actions)
+    for i, (ic, col, label) in enumerate(actions):
+        # The label is the point of the row, so it is the label that sets the
+        # limit. Checked here rather than left to a render, which is how the
+        # same overlap reached the agent groups.
+        if len(label) * 4.15 > slot - 6:
+            raise ValueError(f"live action label too wide for its slot: {label!r}")
+        bx = x + 8 + slot * (i + 0.5)
+        o.append(f'<circle cx="{bx}" cy="{by+19}" r="14" '
+                 f'fill="{A(ACCENT[col], 0.20)}" '
+                 f'stroke="{A(ACCENT[col], 0.60)}" stroke-width="1"/>')
+        o.append(icon(ic, bx, by + 19, ACCENT[col], 0.66))
+        o.append(text(bx, by + 45, label, 7.4, "rgba(240,238,255,0.94)", 650,
+                      "middle"))
+    return o, bar_h + 20
+
+
 def friends_list(y, entries):
     """A profile's friends, founder first.
 
     The founder's row carries a small badge saying so. Position alone would
     leave a reader to infer why one face is always at the top, and the honest
-    answer — *this one comes as standard, and you can remove him* — is short
+    answer — *this one comes as standard, and it cannot be removed* — is short
     enough to just say.
     """
     out, yy = [], y
@@ -672,7 +731,53 @@ def close():
 # --------------------------------------------------------------------------- #
 # building blocks
 # --------------------------------------------------------------------------- #
+def card_room(c):
+    """How much room a card's title and subtitle actually have, in px.
+
+    The title shares its line with a pill; the subtitle passes underneath one,
+    so only the title pays for it. A metric is set large against the right edge
+    at the card's vertical centre, which is level with both.
+
+    The margins here are the *breakage* line, not the design's. Cards are laid
+    out to 14px of inner padding; this checks against 8, because the measuring
+    font is Cairo's DejaVu and the browsers that actually render these SVGs
+    find SF Pro, Segoe UI or Roboto — all narrower. Checking the design's own
+    padding against the widest possible font would fail text that looks fine
+    everywhere it is ever seen.
+    """
+    tx = CX + 56 if c.get("icon") else CX + 14
+    right = CX + CW - 8
+    if c.get("metric"):
+        right -= tw.width(c["metric"], 20, 750) + 4
+    # A status dot is set at the card's vertical centre, so unlike a pill it is
+    # level with the subtitle too. Missing that let `REQUIRED` sit on top of
+    # "verified before any chat" on the adult-mode screen.
+    if c.get("stat"):
+        right -= 14 + 6.0 * len(c["stat"][0]) + 4
+    title_right = right
+    if c.get("pill"):
+        title_right -= (12 + tw.width(c["pill"][0], 9.5, 700)
+                        + 0.4 * len(c["pill"][0]) + 4)
+    return title_right - tx, right - tx
+
+
 def card_block(y, c):
+    # Nothing on these screens wraps or ellipsises, so text that does not fit
+    # runs off the side of the phone and stays there. Three cards on the gaming
+    # screen did exactly that and survived a full gallery rebuild, because the
+    # only thing that would have caught it was somebody looking at that one
+    # screen. Measured rather than counted — `Companion` and `lllllllll` are
+    # both nine characters and one is nearly twice as wide.
+    title_room, sub_room = card_room(c)
+    have = tw.width(c["k"], 13, 600)
+    if have > title_room:
+        raise ValueError(f"card title runs off the card: {c['k']!r} needs "
+                         f"{have:.0f}px, has {title_room:.0f}px")
+    if c.get("s"):
+        have = tw.width(c["s"], 11, 400)
+        if have > sub_room:
+            raise ValueError(f"card subtitle runs off the card: {c['s']!r} "
+                             f"needs {have:.0f}px, has {sub_room:.0f}px")
     h = c.get("h", 52)
     extra = c.get("extra")
     if extra and extra[0] in ("meter", "spark"):
@@ -1041,9 +1146,17 @@ def render(spec):
         # Over the picture, anchored to its bottom — an overlay drawn before
         # the photo is a list above a picture, which is the thing it exists
         # not to be.
+        bottom = 12
+        if spec.get("live_actions"):
+            block, used = live_actions(CX, y, CW, ph, spec["live_actions"])
+            out += block
+            # The chat gives way to the buttons rather than the other way
+            # round: a comment you cannot read scrolls past, a control you
+            # cannot reach never gets used.
+            bottom += used
         if spec.get("bubble_chat"):
             rows = spec["bubble_chat"]
-            block, _ = bubble_chat(CX + 8, y + ph - 12 - len(rows) * 30,
+            block, _ = bubble_chat(CX + 8, y + ph - bottom - len(rows) * 30,
                                    CW - 16, rows)
             out += block
         y += ph + 12
@@ -1471,8 +1584,8 @@ def render(spec):
         out.append(text(CX + 14, y + 40, "\"How do you stay patient?\"", 10, C["txt"], 500))
         out.append(text(CX + 14, y + 56, "→ name replaced · rated +1 · revocable", 9.5, C["t3"], 500))
         y += 86
-        for ic, col, k, s in [("eye", "cyan", "Anonymized at the gateway", "no ids, names replaced"),
-                              ("warn", "red", "Revoke deletes past items", "erased by their refs")]:
+        for ic, col, k, s in [("eye", "cyan", "Anonymized at gateway", "no ids, names replaced"),
+                              ("warn", "red", "Revoke deletes items", "erased by their refs")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
@@ -1485,8 +1598,8 @@ def render(spec):
         y += 40
         for ic, col, k, s, pt in [("cloud", "red", "Model API calls", "none outbound", ("BLOCKED", "crit")),
                                   ("link", "red", "Cloud gateway", "bypassed even if set", ("BLOCKED", "crit")),
-                                  ("sliders", "green", "Inference & fine-tune", "recomputed on-host", ("LOCAL", "good")),
-                                  ("eye", "cyan", "GET /offline/status", "proves the posture", ("PROVEN", "info"))]:
+                                  ("sliders", "green", "Inference & tune", "recomputed on-host", ("LOCAL", "good")),
+                                  ("eye", "cyan", "GET /offline", "proves the posture", ("PROVEN", "info"))]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "pill": pt, "h": 48})
             out.append(s2)
 
@@ -1499,7 +1612,7 @@ def render(spec):
         y += 40
         for ic, col, k, s in [("dove", "cyan", "Graceful departure", "a farewell for every relationship"),
                               ("lock", "green", "Memory preserved", "sealed in the vault, exportable"),
-                              ("people", "amber", "Succession", "ownership passes, old token revoked"),
+                              ("people", "amber", "Succession", "ownership passes, token revoked"),
                               ("chat", "brand", "Chat closes with 410", "a goodbye, never a silent 404")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
@@ -1710,8 +1823,8 @@ def render(spec):
         out.append(icon("headset", CX + 28, y + 24, C["cyan"], 0.9))
         y += ph + 14
         for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Stands in your room"),
-                              ("speaker", "brand", "Spatial audio", "her voice comes from where she is"),
-                              ("eye", "pink", "Passthrough AR or full VR", "your living room, or her world")]:
+                              ("speaker", "brand", "Spatial audio", "her voice comes from there"),
+                              ("eye", "pink", "Passthrough AR, full VR", "your living room, or her world")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
@@ -1810,7 +1923,7 @@ def render(spec):
         out.append(text(W / 2, y + 21, "Ready to meet the world.", 11, C["t2"], 400, "middle"))
         y += 44
         for ic, col, k, s in [("person", "brand", "Profile created", "an AI version of you"),
-                              ("db", "cyan", "Sources added", "1,024 memories sealed in your vault"),
+                              ("db", "cyan", "Sources added", "1,024 memories, sealed"),
                               ("sliders", "amber", "Personality set", "warm · balanced boundaries"),
                               ("mask", "pink", "Avatar ready", "2D portrait + 3D for video & VR")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
@@ -2059,19 +2172,19 @@ SCREENS = [
     dict(num=16, title="Genesis", sub="Born from four questions", hero="genesis", accent="brand", tab=0),
     dict(num=17, title="Summon & Beacons", sub="Leave your AI in the world", hero="beacon", accent="brand", tab=0),
     dict(num=18, title="Proactive", sub="It reaches out first", accent="pink", tab=0, cards=[
-        dict(icon="chat", color="pink", k="“How did the garden do?”", s="only if you set proactive scope", pill=("SCOPED", "brand")),
+        dict(icon="chat", color="pink", k="“The garden?”", s="only if you set proactive scope", pill=("SCOPED", "brand")),
         dict(icon="clock", color="cyan", k="Quiet hours honored", s="22:00 – 07:00 · rate-capped 24h"),
         dict(icon="shieldok", color="green", k="Moderated & anti-spam", s="no repeat until you reply"),
     ], button=("Reply", "brand")),
     dict(num=19, title="Transparency", sub="Honest about multiplicity", accent="brand", tab=0, cards=[
-        dict(icon="people", color="brand", k="12 active relationships", s="acknowledged truthfully if asked", pill=("OPEN", "brand")),
-        dict(icon="eye", color="cyan", k="GET /transparency", s="who it talks to, disclosed by design"),
+        dict(icon="people", color="brand", k="12 relationships", s="acknowledged truthfully if asked", pill=("OPEN", "brand")),
+        dict(icon="eye", color="cyan", k="GET /transparency", s="who it talks to, by design"),
         dict(icon="chat", color="amber", k="“Yes, I know others too.”", s="every prompt instructs honesty"),
     ]),
     dict(num=20, title="Connections", sub="Meet other real people", accent="pink", tab=0, tabs=MARKET, cards=[
         dict(icon="people", color="pink", k="Friendly tier", s="matched anonymously by alias", pill=("OPEN", "good")),
         dict(icon="shield", color="red", k="Rated tier · 18+", s="age-verified both ends"),
-        dict(icon="warn", color="amber", k="Per-tier moderation", s="minors always strict · blocks never sent"),
+        dict(icon="warn", color="amber", k="Per-tier moderation", s="minors strict · blocks never sent"),
     ]),
     dict(num=21, title="Rooms", sub="Chat, voice, video, AR, VR", accent="cyan", tab=0, cards=[
         dict(icon="chat", color="brand", k="Multiparty conversation", s="users + profiles, any mix"),
@@ -2081,8 +2194,8 @@ SCREENS = [
     ]),
     dict(num=22, title="Providers", sub="When AI hands off to a human", accent="cyan", tab=0, tabs=MARKET, cards=[
         dict(icon="cross", color="red", k="Bay Area Wellness", s="mental health · 0.8 mi", pill=("OPEN", "good")),
-        dict(icon="chart", color="green", k="Certified Financial Planner", s="finance · telehealth"),
-        dict(icon="link", color="cyan", k="Consented handoff", s="session sealed in the vault, revocable"),
+        dict(icon="chart", color="green", k="Certified Planner", s="finance · telehealth"),
+        dict(icon="link", color="cyan", k="Consented handoff", s="sealed in the vault, revocable"),
     ]),
     # ---- data promise & lifecycle ----
     dict(num=23, title="Cloud Model", sub="Greater model, opt-in", hero="cloud", accent="brand", tabs=CONTROL, tab=0),
@@ -2092,15 +2205,15 @@ SCREENS = [
     # ---- assistant & claims 21–26 ----
     dict(num=27, title="AI Assistant", sub="A capable creative partner", accent="brand", tab=0, cards=[
         dict(icon="list", color="brand", k="Triage & curate", s="keep the best N, auditable score"),
-        dict(icon="pen", color="amber", k="Proofread in your voice", s="improved draft + edit suggestions"),
-        dict(icon="eye", color="cyan", k="Perceive the scene", s="hands-free, step-by-step guidance"),
-        dict(icon="star2", color="pink", k="Compose a work", s="music, poem, note — kept as an artifact"),
+        dict(icon="pen", color="amber", k="Proofread in your voice", s="improved draft + suggestions"),
+        dict(icon="eye", color="cyan", k="Perceive the scene", s="hands-free, step by step"),
+        dict(icon="star2", color="pink", k="Compose a work", s="music, poem, note — kept"),
     ]),
     dict(num=28, title="Specialists", sub="Biometric-routed handoff", accent="cyan", tab=0, cards=[
         dict(icon="heart", color="red", k="Stress detected", s="HR +38 · from JIM-mini", extra=("spark", [60, 68, 80, 95, 108], "red")),
         dict(icon="brain", color="pink", k="Handed off", s="mental-health agent, this turn", pill=("ENGAGED", "brand")),
         dict(icon="link", color="cyan", k="Sustained across turns", s="until a reading shows recovery"),
-        dict(icon="person", color="green", k="Then hands back", s="profile speaks again", pill=("RETURNED", "good")),
+        dict(icon="person", color="green", k="Hands back", s="profile speaks again", pill=("RETURNED", "good")),
     ]),
     dict(num=29, title="Tasks & Grants", sub="Autonomous, revocable", accent="amber",
          tab=0, light=("amber", "needs you — awaiting confirm"), cards=[
@@ -2110,28 +2223,28 @@ SCREENS = [
         dict(icon="warn", color="red", k="Revoke halts the read", s="raw data never retained"),
     ]),
     dict(num=30, title="Fine-Tune", sub="Encrypted, offline (Claim 26)", accent="green", tab=2, cards=[
-        dict(icon="sliders", color="green", k="Recompute embeddings", s="all local · no external calls", pill=("LOCAL", "good")),
+        dict(icon="sliders", color="green", k="Recompute", s="all local · no external calls", pill=("LOCAL", "good")),
         dict(icon="lock", color="cyan", k="Sealed in the vault", s="adaptation artifact encrypted"),
-        dict(icon="chart", color="brand", k="Run recorded", s="metrics · external_transmission: false"),
+        dict(icon="chart", color="brand", k="Run recorded", s="external_transmission: false"),
     ], button=("Run Fine-Tune", "brand")),
     dict(num=31, title="Your Data Promise", sub="No raw data leaves your vault", accent="green", tabs=CONTROL, tab=0, cards=[
         dict(icon="lock", color="green", k="Sealed at rest", s="AES-256-GCM · tenant-isolated", pill=("VAULT", "good")),
-        dict(icon="eye", color="cyan", k="Every access audited", s="stored · read · erased", pill=("CHAIN OK", "good")),
+        dict(icon="eye", color="cyan", k="Access audited", s="stored · read · erased", pill=("CHAIN OK", "good")),
         dict(icon="finger", color="brand", k="Capability tokens", s="only the SHA-256 hash is stored"),
-        dict(icon="warn", color="red", k="Delete anything, anytime", s="local trace + vault records purged"),
+        dict(icon="warn", color="red", k="Delete anything, anytime", s="local trace + vault records"),
     ]),
     # ---- moderation, posting & the persona engine ----
     dict(num=32, title="Moderation", sub="Every reply, before it's seen", hero="moderation", accent="green", tab=0),
     dict(num=33, title="Posts", sub="Post in your AI's voice", accent="amber", tabs=MARKET, tab=3, cards=[
         dict(icon="pen", color="amber", k="Compose a post", s="in its own voice, moderated"),
-        dict(icon="chat", color="brand", k="“Tomatoes are in — finally.”", s="posted to the feed", pill=("LIVE", "good")),
+        dict(icon="chat", color="brand", k="“Tomatoes at last.”", s="posted to the feed", pill=("LIVE", "good")),
         dict(icon="shieldok", color="green", k="Public posts → strict", s="always the strict filter"),
         dict(icon="chart", color="cyan", k="12 posts · 3.4k views", s="GET /posts"),
     ]),
     dict(num=34, title="Adult Mode", sub="Age-gated at both ends", accent="red", tab=0, locked=True, cards=[
         dict(icon="lock", color="red", k="Adult content mode", s="an adult owner must enable it", pill=("18+", "crit")),
-        dict(icon="finger", color="green", k="Owner verified 18+", s="required to turn it on", stat=("VERIFIED", "on")),
-        dict(icon="person", color="amber", k="Interactor 18+", s="verified before any chat", stat=("REQUIRED", "avail")),
+        dict(icon="finger", color="green", k="Owner is 18+", s="required to turn it on", stat=("VERIFIED", "on")),
+        dict(icon="person", color="amber", k="Interactor 18+", s="verified before chat", stat=("REQUIRED", "avail")),
         dict(icon="shieldok", color="cyan", k="Minors always strict", s="no exceptions, ever"),
     ]),
     dict(num=35, title="Aging & Lifecycle", sub="It evolves with time", accent="cyan", tab=0, cards=[
@@ -2173,55 +2286,55 @@ SCREENS = [
         dict(icon="person", color="brand", k="NEO · 1X", s="Humanoid · Grok onboard · active"),
         dict(icon="star2", color="cyan", k="Isaac 1 · Weave", s="Home robot · tidying · docked"),
         dict(icon="grid", color="green", k="Saros 20 · Roborock", s="Vacuum · mapping · patrol 9pm"),
-        dict(icon="shield", color="amber", k="Command allowlist", s="Per-body limits · say is moderated"),
+        dict(icon="shield", color="amber", k="Command allowlist", s="per-body limits · moderated"),
         dict(icon="list", color="pink", k="Command log", s="Every order audited"),
     ], button=("Bind a robot", "brand")),
     # ---- knowledge packs & robot task mods ----
     dict(num=57, title="Knowledge Packs", sub="Downloadable expertise, per industry", accent="amber", tabs=MARKET, tab=0, cards=[
         dict(icon="db", color="amber", k="Finance Field Pack", s="3 items · QRME Starter Collection", pill=("FREE", "good")),
-        dict(icon="db", color="brand", k="Distributed Systems Pro", s="priced · explicit accept to buy", pill=("$29.99", "warn")),
+        dict(icon="db", color="brand", k="Systems Pro pack", s="priced · explicit accept to buy", pill=("$29.99", "warn")),
         dict(icon="star2", color="green", k="Install → smarter", s="items join the source material"),
         dict(icon="eye", color="cyan", k="Provenance counts it", s="grounded_in.by_kind: pack"),
     ], button=("Download Field Pack", "brand")),
     dict(num=58, title="Robot Task Packs", sub="Task mods for the body it embodies", accent="cyan", tab=3, cards=[
-        dict(icon="gear", color="cyan", k="Household Tasks Pack", s="sort_laundry · water_plants · set_table", pill=("FREE", "good")),
-        dict(icon="shield", color="green", k="Capability-checked install", s="a vacuum is never sold manipulation"),
-        dict(icon="lock", color="amber", k="Allowlist extended, not opened", s="unknown verbs still refused"),
+        dict(icon="gear", color="cyan", k="Household Tasks", s="sort_laundry · water_plants", pill=("FREE", "good")),
+        dict(icon="shield", color="green", k="Checked on install", s="a vacuum is never sold guile"),
+        dict(icon="lock", color="amber", k="Extended, not opened", s="unknown verbs still refused"),
         dict(icon="chart", color="pink", k="Every task audited", s="procedure carried in the result"),
     ], button=("Buy Culinary Assistant · 9.99", "brand")),
     dict(num=59, title="Embodied Agent", sub="The persona knows its body", accent="brand", tab=3, cards=[
-        dict(icon="person", color="brand", k="Same identity in the body", s="never a second persona"),
-        dict(icon="star2", color="cyan", k="Learned modules in the prompt", s="say knows what the body can do"),
+        dict(icon="person", color="brand", k="Same identity, in a body", s="never a second persona"),
+        dict(icon="star2", color="cyan", k="Learned, in the prompt", s="say knows what the body can do"),
         dict(icon="grid", color="green", k="Skills list", s="GET /robots/{id}/skills"),
-        dict(icon="shieldok", color="amber", k="Revocable", s="uninstall revokes the verbs instantly"),
+        dict(icon="shieldok", color="amber", k="Revocable", s="uninstall revokes the verbs"),
     ]),
     dict(num=60, title="Publish a Pack", sub="Your expertise, on the market", accent="amber", tabs=MARKET, tab=0, cards=[
-        dict(icon="pen", color="amber", k="Bundle knowledge items", s="or task modules with requirements"),
+        dict(icon="pen", color="amber", k="Bundle knowledge items", s="or task modules, with needs"),
         dict(icon="chart", color="brand", k="Free or priced", s="POST /packs · listed under #pack"),
         dict(icon="people", color="green", k="Installs tracked", s="catalog shows items · installs"),
     ], button=("Publish", "brand")),
     dict(num=61, title="Pack Registries", sub="Federated mod storefronts", accent="brand", tabs=MARKET, tab=0, cards=[
         dict(icon="building", color="brand", k="Robotmods.net", s="task mods for robot bodies", pill=("2 PACKS", "info")),
-        dict(icon="building", color="cyan", k="LLMmods.com", s="knowledge mods for LLM personas", pill=("2 PACKS", "info")),
-        dict(icon="shieldok", color="green", k="Origin on every label", s="publisher & storefront URL on the pack"),
-        dict(icon="chart", color="amber", k="Same rules once synced", s="buy flow · capability checks · provenance"),
+        dict(icon="building", color="cyan", k="LLMmods.com", s="knowledge mods for personas", pill=("2 PACKS", "info")),
+        dict(icon="shieldok", color="green", k="Origin on every label", s="publisher & storefront on pack"),
+        dict(icon="chart", color="amber", k="Same rules once synced", s="buy flow · checks · provenance"),
     ], button=("Sync sources", "brand")),
     dict(num=62, title="Rated Placement", sub="18+ marketing, walled at the source", accent="red", tabs=MARKET, tab=0, locked=True, cards=[
-        dict(icon="building", color="red", k="Adult venues", s="OnlyFans · Fansly · x-rated directories", pill=("18+", "crit")),
+        dict(icon="building", color="red", k="Adult venues", s="OnlyFans · Fansly · x-rated sites", pill=("18+", "crit")),
         dict(icon="grid", color="amber", k="QR · @handle · #tag", s="publish the refs where adults are"),
-        dict(icon="lock", color="green", k="The wall travels", s="every scan resolves through the age gate"),
-        dict(icon="shieldok", color="cyan", k="Never another real person", s="self or fictional personas only"),
+        dict(icon="lock", color="green", k="The wall travels", s="every scan hits the age gate"),
+        dict(icon="shieldok", color="cyan", k="Never a real person", s="self or fictional personas only"),
     ], button=("Place at a venue", "brand")),
     dict(num=63, title="Placement Analytics", sub="What each venue earns", accent="amber", tabs=MARKET, tab=0, locked=True, cards=[
         dict(icon="chart", color="amber", k="OnlyFans · 3 scans", s="2 walled · 1 verified", extra=("spark", [1, 1, 3, 2, 4], "amber")),
         dict(icon="chart", color="cyan", k="Fansly · 2 scans", s="0 walled · 2 verified"),
-        dict(icon="people", color="green", k="Funnel", s="resolutions → verified → chatters", metric="25%"),
+        dict(icon="people", color="green", k="Funnel", s="resolved → verified", metric="25%"),
         dict(icon="shieldok", color="brand", k="Counted, never identified", s="owner-only · no viewer identities"),
     ]),
     dict(num=64, title="Creator Payouts", sub="One statement, every sale", accent="green", tabs=MARKET, tab=0, cards=[
         dict(icon="chart", color="green", k="Accrued balance", s="pack sales · license fees", metric="$86"),
-        dict(icon="db", color="amber", k="Distributed Systems Pro", s="pack_sale · $29.99", pill=("ACCRUED", "warn")),
-        dict(icon="pen", color="brand", k="consult license · Priya", s="license_fee · $49.00", pill=("PAID", "good")),
+        dict(icon="db", color="amber", k="Systems Pro", s="pack_sale · $29.99", pill=("ACCRUED", "warn")),
+        dict(icon="pen", color="brand", k="consult · Priya", s="license_fee · $49.00", pill=("PAID", "good")),
         dict(icon="shieldok", color="cyan", k="Written at sale time", s="a record, not a reconstruction"),
     ], button=("Request payout", "brand")),
     dict(num=65, title="Watch Remote", sub="Your agents, on your wrist", accent="green", tab=3, cards=[
@@ -2229,27 +2342,27 @@ SCREENS = [
         dict(icon="clock", color="amber", k="research brief", s="awaiting: external confirmation", pill=("NEEDS YOU", "warn")),
         dict(icon="clock", color="red", k="second job", s="cancelled from the wrist", pill=("STOPPED", "crit")),
         dict(icon="person", color="brand", k="Kitchen NEO", s="come here · patrol · dock · stop"),
-        dict(icon="shieldok", color="cyan", k="No new powers, only reach", s="same auth · allowlists · moderation"),
+        dict(icon="shieldok", color="cyan", k="Reach, not new powers", s="same auth · allowlists · rules"),
     ], button=("Assist", "brand")),
     dict(num=67, title="Smart Glasses", sub="Capture the POV, render to the lens", accent="cyan", tab=3, cards=[
-        dict(icon="eye", color="cyan", k="Ray-Ban Meta", s="capture · livestream · HUD caption", pill=("LINKED", "good")),
+        dict(icon="eye", color="cyan", k="Ray-Ban Meta", s="capture · livestream · HUD", pill=("LINKED", "good")),
         dict(icon="eye", color="brand", k="Meta Ray-Ban Display", s="POV context · HUD overlay · nav"),
         dict(icon="compass", color="green", k="Google (Android XR)", s="Gemini POV · live-translation HUD"),
-        dict(icon="photo", color="amber", k="Capture ⟷ render", s="collect the view in · produce to the lens"),
+        dict(icon="photo", color="amber", k="Capture ⟷ render", s="collect in · produce to the lens"),
     ], button=("Connect glasses", "brand")),
     dict(num=68, title="Gaming Companion", sub="A teammate, synthetically operated", accent="indigo", tab=3, cards=[
-        dict(icon="star2", color="indigo", k="Halo Infinite · Xbox", s="role: teammate · online multiplayer", pill=("LIVE", "good")),
-        dict(icon="chat", color="brand", k="“Enemy on the flag — falling back, cover me”", s="in-character callout, moderated"),
+        dict(icon="star2", color="indigo", k="Halo Infinite · Xbox", s="role: teammate · multiplayer", pill=("LIVE", "good")),
+        dict(icon="chat", color="brand", k="“Falling back, cover me”", s="in-character callout, moderated"),
         dict(icon="shieldok", color="green", k="Fair play, enforced", s="within the rules · never cheats"),
-        dict(icon="people", color="cyan", k="Companion · teammate · practice", s="PlayStation · Xbox · Switch · Steam · PC"),
+        dict(icon="people", color="cyan", k="Companion or teammate", s="PlayStation · Xbox · Switch · PC"),
     ], button=("Start a session", "brand")),
     dict(num=66, title="Steering", sub="Tone, pace, age & appearance — one hub", accent="brand", tab=2, cards=[
-        dict(icon="sliders", color="brand", k="Pace · Autonomy · Verbosity", s="throttle dials, 0–100"),
-        dict(icon="sliders", color="amber", k="Warmth · Humor · Formality", s="behavior dials, 0–100"),
-        dict(icon="person", color="cyan", k="Appearance", s="how it looks — rides on every surface"),
+        dict(icon="sliders", color="brand", k="Pace · Autonomy · Words", s="throttle dials, 0–100"),
+        dict(icon="sliders", color="amber", k="Warmth · Humor · Form", s="behavior dials, 0–100"),
+        dict(icon="person", color="cyan", k="Appearance", s="how it looks — on every surface"),
         dict(icon="clock", color="green", k="Age", s="base age · ages with time"),
-        dict(icon="lock", color="red", k="Intimacy · 18+ only", s="adult-mode profiles · within boundaries", pill=("18+", "crit")),
-        dict(icon="shieldok", color="green", k="Steering, not piloting", s="shapes presentation · never identity or safety"),
+        dict(icon="lock", color="red", k="Intimacy · 18+ only", s="adult-mode profiles · in bounds", pill=("18+", "crit")),
+        dict(icon="shieldok", color="green", k="Steering, not piloting", s="shapes manner, never safety"),
     ], button=("Apply", "brand")),
 
     # ---- live desks, the audience layer, and commerce (0.1.6 / 0.1.7) ----
@@ -2264,13 +2377,13 @@ SCREENS = [
         dict(icon="person", color="green", k="Bev Okafor",
              s="Live person — not AI", pill=("HUMAN", "good")),
         dict(icon="eye", color="cyan", k="You see the desk",
-             s="a camera view — it depicts nobody"),
-        dict(icon="shieldok", color="brand", k="Attested by shop-manager",
+             s="a camera view, depicting nobody"),
+        dict(icon="shieldok", color="brand", k="Attested by a manager",
              s="met in person · saw the licence"),
         dict(icon="clock", color="amber", k="Away right now",
              s="the state the bell exists for", pill=("AWAY", "warn")),
         dict(icon="warn", color="cyan", k="Recorded, not proven",
-             s="we record who vouched, not proof"),
+             s="we record who vouched"),
     ], button=("Ring the bell", "amber")),
 
     dict(num=70, title="Desk Beacons", sub="The sticker on the shop door",
@@ -2278,23 +2391,23 @@ SCREENS = [
         dict(icon="grid", color="cyan", k="shop door",
              s="printed code · 24 scans", pill=("LIVE", "good")),
         dict(icon="person", color="green", k="Reveals a person",
-             s="a profile beacon reveals nobody real"),
+             s="a profile beacon reveals nobody"),
         dict(icon="finger", color="amber", k="A stranger can ring it",
              s="no account · one ring per 30s"),
         dict(icon="lock", color="red", k="18+ hits the wall",
              s="a scan carries no token to clear it",
              pill=("18+", "crit")),
         dict(icon="shield", color="brand", k="Only the owner prints",
-             s="or anyone could post your address"),
+             s="or anyone posts your address"),
     ], button=("Print a code", "brand")),
 
     dict(num=71, title="Audience", sub="Like, comment, share, subscribe",
          accent="pink", tab=0, cards=[
-        dict(icon="heart", color="pink", k="Likes", s="one per person — never a counter", metric="248"),
+        dict(icon="heart", color="pink", k="Likes", s="one each, not a counter", metric="248"),
         dict(icon="chat", color="brand", k="Comments",
              s="moderated at the target's setting"),
         dict(icon="link", color="cyan", k="Shares",
-             s="no account — gated at the far end"),
+             s="no account · gated at the end"),
         dict(icon="star2", color="amber", k="Subscribers",
              s="free follow · paid tier", metric="31"),
         dict(icon="warn", color="green", k="Blocked comments kept",
@@ -2307,13 +2420,13 @@ SCREENS = [
              s="adult only · capped · final",
              pill=("SENT", "good")),
         dict(icon="building", color="brand", k="Pruning, properly",
-             s="listing_sale · receipt keeps the title"),
+             s="listing_sale · receipt keeps title"),
         dict(icon="lock", color="cyan", k="A listing is a window",
              s="an offer is what makes it a shop"),
         dict(icon="shieldok", color="green", k="Lands on the statement",
              s="beside pack sales · one payout"),
         dict(icon="warn", color="red", k="No real funds",
-             s="no spend caps or chargebacks yet",
+             s="no spend caps, no chargebacks",
              pill=("SIMULATED", "warn")),
     ], button=("Send a gift", "amber")),
 
@@ -2321,14 +2434,14 @@ SCREENS = [
          accent="indigo", tab=3, cards=[
         dict(icon="finger", color="indigo", k="Windows Hello",
              s="signs the document's own hash", pill=("BOUND", "good")),
-        dict(icon="pen", color="brand", k="Shown before the prompt",
-             s="the prompt cannot say — this does"),
+        dict(icon="pen", color="brand", k="Shown before it runs",
+             s="the prompt cannot say; this can"),
         dict(icon="shieldok", color="green", k="Verifiable by anyone",
              s="stands on its own arithmetic"),
         dict(icon="db", color="cyan", k="Sealed into the vault",
              s="chained — the order is protected"),
         dict(icon="lock", color="amber", k="Proofing sets the tier",
-             s="self · federated · document · person"),
+             s="self · federated · document"),
     ], button=("Sign", "brand")),
 
     # The starter collection is the one place a viewer meets many synthetic
@@ -2367,11 +2480,11 @@ SCREENS = [
                        ("Bea", "are you open till six?")]),
          cards=[
         dict(icon="finger", color="amber", k="Ring the bell",
-             s="away — one ring per desk per 30s"),
+             s="away · one ring per 30s"),
         dict(icon="people", color="green", k="Come up as a guest",
              s="asks the host — they decide", pill=("ASK", "warn")),
         dict(icon="chat", color="brand", k="Or just comment",
-             s="immediate · moderated like any turn"),
+             s="immediate · moderated as usual"),
         dict(icon="shieldok", color="cyan", k="No AI mark here",
              s="a real person is on the other end"),
     ]),
@@ -2395,11 +2508,11 @@ SCREENS = [
         dict(icon="person", color="red", k="Vivienne Marlowe",
              s="Live person — not AI", pill=("18+", "crit")),
         dict(icon="people", color="amber", k="Guests need her yes",
-             s="and a verified adult, on a rated desk"),
+             s="a verified adult, on a rated desk"),
         dict(icon="lock", color="brand", k="Location withheld",
-             s="withheld even from adults — safety"),
+             s="withheld even from adults"),
         dict(icon="shieldok", color="green", k="Still no AI mark",
-             s="rated changes who watches, not what"),
+             s="rated changes who, not what"),
     ]),
 
     # Search, with the two things browse-by-exact-tag could never do: plain
@@ -2408,7 +2521,7 @@ SCREENS = [
     dict(num=77, title="Search & Place", sub="Plain words, and how far out",
          accent="brand", tabs=MARKET, tab=0, cards=[
         dict(icon="search", color="brand", k="\"help me read a lease\"",
-             s="finds legal without knowing the tag"),
+             s="finds legal, not knowing the tag"),
         dict(icon="compass", color="cyan", k="Oakland, CA", s="scope · locality",
              pill=("NEAR", "good")),
         dict(icon="net", color="green", k="Remote reaches past", s="served from anywhere"),
@@ -2520,16 +2633,35 @@ SCREENS = [
     # Onboarding: pairing happens at sign-up, so the watch faces and the
     # agent lights work from the first day rather than after somebody finds a
     # settings page.
-    # The transparent chat overlay, with the faces as circles on the glass.
-    dict(num=89, title="Live Room", sub="The room stays the picture",
+    # The transparent chat overlay, with the faces as circles on the glass —
+    # and the five things a viewer can actually do, in a row under it. Every
+    # one is a route that already shipped: bell, gift, like, share, and the
+    # guest request. They were reachable by API and by nothing else.
+    dict(num=89, title="Live Room", sub="Ring, gift, or ask to come up",
          accent="pink", tab=3,
          photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=300,
+         live_actions=[
+             ("bell", "amber", "Ring"),
+             ("gift", "gold", "Gift"),
+             ("heart", "pink", "Like"),
+             ("share", "cyan", "Share"),
+             ("comeup", "green", "Come up"),
+         ],
          bubble_chat=[
              ("Marcus Bell", "the compounding chart, again?", frames.PORTRAITS[1][1]),
              ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
              ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
              ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
-         ]),
+         ], cards=[
+        # The two that carry a condition. Like, gift and share are unsurprising
+        # — you press them and they happen — but a bell that can be hammered
+        # and a guest slot that needs nobody's permission are both ways to make
+        # somebody's stream worse, so those two say their rule out loud.
+        dict(icon="bell", color="amber", k="Ring the bell",
+             s="one ring per desk per 30s"),
+        dict(icon="comeup", color="green", k="Come up as a guest",
+             s="the host decides — you ask", pill=("ASK", "warn")),
+    ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
@@ -2544,7 +2676,7 @@ SCREENS = [
         dict(icon="person", color="cyan", k="Dr. Amara Osei", s="you have talked to this profile", pill=("70", "good")),
         dict(icon="chart", color="amber", k="Priya Raman", s="you engage with technology", pill=("35", "warn")),
         dict(icon="eye", color="indigo", k="Wren Okafor", s="popular with people here", pill=("28", "info")),
-        dict(icon="shield", color="red", k="Never ranked on", s="memories · source material · vault"),
+        dict(icon="shield", color="red", k="Never ranked on", s="memories · source items · vault"),
     ]),
     dict(num=86, title="Customise", sub="Themes, colour, your Top 8",
          accent="amber", tab=0, cards=[
@@ -2552,7 +2684,10 @@ SCREENS = [
         dict(icon="eye", color="indigo", k="Accent colour", s="#f7b731 — validated, not markup"),
         dict(icon="chat", color="cyan", k="Tagline", s="90 characters, in your words"),
         dict(icon="person", color="green", k="Top 8", s="friends only, your order"),
-        dict(icon="shield", color="red", k="No raw HTML", s="the nostalgia, not the injection"),
+        # Raw HTML *is* allowed — that is the MySpace part, and refusing it
+        # would have been refusing the feature. What is not allowed is script.
+        dict(icon="pen", color="indigo", k="Your own HTML", s="marquee, tables, backgrounds"),
+        dict(icon="shield", color="red", k="Script is stripped", s="the nostalgia, not the injection"),
     ], button=("Save page", "brand")),
 ]
 
