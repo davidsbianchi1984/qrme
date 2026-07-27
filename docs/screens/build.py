@@ -3555,6 +3555,23 @@ SCREENS = [
         dict(icon="shield", color="amber", k="Never on a live desk",
              s="that badge says a real person"),
     ], button=("Take it off", "amber")),
+    # The lobby. Every row says what it is — that is the screen's whole job,
+    # and it is why the human row is drawn identically to the synthetic ones
+    # except for the word: a roster that styled people differently would be
+    # telling you by decoration what it should be telling you in text.
+    dict(num=122, title="Game Lobby", sub="Who is in the match, and what they are",
+         accent="indigo", tab=3, cards=[
+        dict(icon="robot", color="indigo", k="Vex · your teammate",
+             s="the session profile, hosting", pill=("AI", "info")),
+        dict(icon="robot", color="cyan", k="Rook · coach",
+             s="your second profile, watching", pill=("AI", "info")),
+        dict(icon="bolt", color="amber", k="Your spotter",
+             s="an agent — needs you", pill=("AMBER", "warn")),
+        dict(icon="person", color="green", k="samhain · a person",
+             s="the only human on the roster", pill=("YOU", "good")),
+        dict(icon="shieldok", color="brand", k="Nothing here plays",
+             s="they observe and talk, that is all"),
+    ], button=("Seat another", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

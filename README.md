@@ -277,6 +277,9 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
     <td align="center" width="33%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="210" alt="Lend It Anywhere"></a><br><sub><b>120</b> · Lend It Anywhere</sub></td>
     <td align="center" width="33%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="210" alt="Wear a Character"></a><br><sub><b>121</b> · Wear a Character</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="210" alt="Game Lobby"></a><br><sub><b>122</b> · Game Lobby</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1174,6 +1177,77 @@ costume, it is a puppet, and the person whose face is underneath is the one
 whose consent counts. Removal stamps a time rather than deleting the row, so a
 viewer who saw a face and later wants to know what they were actually looking
 at has an answer.
+
+## More than one synthetic thing in a game
+
+`qrme/routers/gaming.py` seats **one** profile beside a player — a companion, a
+teammate, a practice partner. That is a conversation. `qrme/gamelobby.py` is
+the roster: several synthetic profiles *and* running agents in the same
+session, with the real players.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="200" alt="Game lobby"></a><br><sub><b>122</b> · every row says what it is</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /gaming/lobby/vocabulary` | seats, kinds, the cap, and what nothing here can do |
+| `POST /gaming/sessions/{id}/lobby` | seat a member |
+| `GET /gaming/sessions/{id}/lobby` | the roster — the people in the match |
+| `DELETE /gaming/sessions/{id}/lobby` | take one out |
+| `GET …/lobby/context` | what a synthetic member is told about its own position |
+
+  </td>
+  </tr>
+</table>
+
+**Adding a second one changes the question, and the question is fair play.** A
+companion calling shots is a teammate talking. Five of them coordinating on one
+player's behalf is indistinguishable, from the publisher's side, from a bot
+squad — and this platform's fair-play rule is already *absolute* rather than a
+toggle. So the roster carries two limits a single companion never needed.
+
+**Synthetic members are capped at four**, counting the session's own profile.
+Not for load: a lobby where the synthetic side outnumbers the humans has stopped
+being people playing with help and become an operation being run, whatever any
+single line says. The cap counts the host because counting only the table would
+let the limit sit one higher than the number the roster actually shows — the
+sort of off-by-one that turns a stated limit into a lie about itself.
+
+**Nothing here can act in a game.** Members observe and they talk. There is no
+input, no aim, no macro, no automation, no exploit — published by name in
+`gamelobby.NEVER`, and a test asserts no function in either module is named for
+any of them. *"We did not add that"* is a fact about today; the test is what
+makes it a fact about tomorrow. The difference between a coach and a cheat is
+exactly that line.
+
+**Every member says what it is** — player, profile or agent — on every read,
+never inferred from a name. It matters more here than in a chat room, because
+the other people in a match did not opt into anything. The screen draws the
+human row identically to the synthetic ones except for the word: a roster that
+styled people differently would be telling you by decoration what it should be
+telling you in text.
+
+**Agents bring their light.** An agent in a lobby is a running workflow, so it
+carries the same green/amber/red as everywhere else. A member that has stopped
+and is waiting on a person must not look, on the roster, exactly like one that
+is working.
+
+**The session's own profile is derived, not stored.** A copy of it in
+`game_lobby` would be a second place the same fact lives, and the day the two
+disagree the roster would show a session hosted by a profile the session does
+not think it has.
+
+**A minor anywhere in the lobby makes the whole lobby strict**, keyed on the
+lobby rather than on the session's owner — the person a line might land badly
+on is the one sitting in it, not the one who started it.
+
+**Two consents, and neither replaces the other.** The session owner decides who
+is in their lobby; a profile or agent must be one the same account holds,
+checked on `owner_id`. Somebody *else's* profile is a two-party question and
+this is not the module that answers it — `qrme/sharing.py` already asks both
+sides — so it is refused with a pointer rather than half-answered here.
 
 ## Friends you might know
 

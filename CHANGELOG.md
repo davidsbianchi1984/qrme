@@ -85,6 +85,37 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   evidence twice. A `self_asserted` level has no evidence to match on, and that
   limit is stated rather than papered over.
 
+- **More than one synthetic thing in a game session** — `qrme/gamelobby.py`,
+  5 routes, 19 tests, screen 122. `game_sessions` seats exactly one profile;
+  this is the roster beside the real players — other profiles, and running
+  workflows as `agent` members carrying the same green/amber/red light as
+  everywhere else.
+
+  **Adding a second one changes the question, and the question is fair play.**
+  A companion calling shots is a teammate talking; five coordinating on one
+  player's behalf is indistinguishable, from the publisher's side, from a bot
+  squad. So synthetic members are **capped at four**, counting the session's
+  own profile — a lobby where the synthetic side outnumbers the humans has
+  stopped being people playing with help. And **nothing here can act in a
+  game**: no input, aim, macro, automation or exploit, published by name in
+  `NEVER`, with a test asserting no function in either module is named for any
+  of them.
+
+  Every member says what it is on every read, never inferred from a name — it
+  matters more here than in a chat room, because the other people in a match
+  did not opt into anything. The session's own profile is derived rather than
+  stored, so a roster can never show a session hosted by a profile the session
+  does not think it has. A minor anywhere in the lobby makes the whole lobby
+  strict, keyed on the lobby rather than the owner.
+
+- **Two more beacon placements walked end to end** — a pharmacy counter and a
+  link posted to a neighbourhood site. The pharmacy is the one that carries the
+  most obligation, and the neighbourhood one exists because **the scan is the
+  only part that changes**: `scan_url` is an ordinary URL and the QR is one way
+  of typing it, so the same page, mark, age wall and picked-up sentence all
+  answer — but the camera path is gone and `label` has to mean something to a
+  reader rather than to somebody standing in front of a wall.
+
 - **Wearing a character over your own camera** — `qrme/overlays.py`, 4 routes,
   14 tests, screen 121. A mask, a creature driven by your own expressions, a
   puppet, a replaced background. Ordinary, and it lands directly on the

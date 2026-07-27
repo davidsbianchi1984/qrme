@@ -167,9 +167,69 @@ The creator gets what they came for — a code that turns a wall into a way to
 find them — and the only thing a wrong scanner reaches is a wall that names
 nobody.
 
-Both of these are also why `docs/beacons.md` keeps saying *stranger* rather
-than *user*. Everything on the far side of a printed code is somebody with no
-account, no context, and no reason to have read anything.
+#### The pharmacy counter
+
+A pharmacist places `@dr_sana_iqbal` — or their own store's profile — beside
+the consultation window, for the questions people do not want to ask out loud
+in a queue.
+
+This is the placement that carries the most obligation, and the section above
+says why in one line: *do not place a beacon somewhere its profile is not
+actually equipped for.* A code at a pharmacy will be scanned by somebody
+holding a new prescription, at the exact moment they are least able to judge
+whether the thing answering knows what it is talking about.
+
+So three things the code already does matter more here than anywhere else:
+
+- **The AI mark is burned into the portrait**, not drawn by the page. Someone
+  who screenshots an answer to show a family member carries the disclosure with
+  it — and a medication question is the kind of answer that gets screenshotted
+  and forwarded.
+- **The profile is grounded in its own industry pack**, so it is answering from
+  material rather than from tone. An ungrounded persona sounds exactly as
+  confident.
+- **The handoff to a real clinician is a referral, not a chat log.** When the
+  question stops being one a synthetic profile should answer, `qrme/referral.py`
+  packages it, the user **signs for the release with Face ID**, and the link
+  opens once. That path exists precisely so the answer to a hard question can be
+  *"take this to a person"* without the platform quietly emailing somebody's
+  symptoms around.
+
+`mode: chat`, not `room`. A queue at a pharmacy counter is the last place to
+put strangers in a shared conversation with each other.
+
+#### The one that is not a sticker at all — a neighbourhood site
+
+A locksmith posts their profile's link in a Nextdoor thread, or on the
+business's own website. No printing, no camera, no wall.
+
+Worth its own scenario because **the scan is the part that changes and nothing
+else does.** `scan_url` is an ordinary URL; the QR is only one way of typing
+it. So the same page answers, with the same AI mark, the same age wall if the
+profile is rated, and the same *picked up* sentence when the beacon is taken
+down.
+
+Two differences are real, though:
+
+- **The camera path is gone**, and with it the in-viewfinder portrait. What
+  arrives is a link in a feed, so the page has to carry its own context — which
+  it does, because it was written for a stranger who pointed a phone at a wall
+  and knows nothing.
+- **The label means something different.** `label` is free text meant to tell
+  a scanner *where they are* — "stall 3, second floor" is useless in a
+  Nextdoor post. `"the Maple Street locksmith, posted in Nextdoor"` is the
+  version that helps, and it is worth remembering that the label is shown to
+  whoever opens the link, while `location` is not.
+
+A link in a neighbourhood feed also outlives the thread it was posted in far
+longer than a sticker outlives a wall, which makes the picked-up state the one
+to get right rather than an afterthought.
+
+Both of the physical scenarios are also why `docs/beacons.md` keeps saying
+*stranger* rather than *user*. Everything on the far side of a printed code is
+somebody with no account, no context, and no reason to have read anything —
+and the neighbourhood one is the reminder that this is true of a pasted link
+too.
 
 **Placing a beacon for someone else's benefit carries obligations.** A code
 in a clinic waiting room or at a recovery meeting will be scanned by people

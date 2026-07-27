@@ -155,5 +155,9 @@ def end_session(session_id: str, request: Request) -> dict:
     conn.execute("UPDATE game_sessions SET status='ended' WHERE id=?",
                  (session_id,))
     conn.commit()
+    # The lobby empties with the session. A seat that survived the match would
+    # put a synthetic member in the next one without anybody asking for it.
+    from .. import gamelobby
     return {"session_id": session_id, "status": "ended",
-            "callouts": session["callouts"]}
+            "callouts": session["callouts"],
+            "lobby_emptied": gamelobby.close(session_id)}

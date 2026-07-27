@@ -631,6 +631,26 @@ CREATE TABLE IF NOT EXISTS game_sessions (
     created_at TEXT NOT NULL
 );
 
+-- The lobby: more than one synthetic thing in a game session. `game_sessions`
+-- seats exactly one profile; this is the roster beside the real players — other
+-- profiles, and running workflows as `agent` members.
+--
+-- `left_at` rather than a delete, because who was in a match is the record a
+-- fair-play question is answered from later, and deleting the row destroys the
+-- only evidence that the answer was fine.
+CREATE TABLE IF NOT EXISTS game_lobby (
+    id          TEXT PRIMARY KEY,
+    session_id  TEXT NOT NULL REFERENCES game_sessions(id),
+    member_kind TEXT NOT NULL,   -- player | profile | agent
+    member_id   TEXT NOT NULL,
+    role        TEXT NOT NULL,   -- see qrme/gamelobby.py:SEATS
+    callsign    TEXT,
+    joined_at   TEXT NOT NULL,
+    left_at     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_game_lobby_live
+    ON game_lobby (session_id) WHERE left_at IS NULL;
+
 -- Steering: how the owner shapes a subject's presentation (a profile or a
 -- robot) — throttle/behavior dials as JSON of dial -> 0..100; absent dials
 -- read as the 50 default. Steering, not piloting: shapes style/pace/behavior

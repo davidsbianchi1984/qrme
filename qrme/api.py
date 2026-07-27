@@ -23,7 +23,8 @@ from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (apps, assistant, audience, avatars, commerce,
                       community, connections,
-                      desks, earnings, exchange, feedback, friends, gaming, governance,
+                      desks, earnings, exchange, feedback, friends, gamelobby, gaming,
+                      governance,
                       identity, intelligence, interaction, licensing, models,
                       overlays as overlay_routes, packs, pages, placemic,
                       frontpage, profiles, research, revisions, robots,
@@ -103,6 +104,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(identity.router)
     app.include_router(placemic.router)
     app.include_router(overlay_routes.router)
+    app.include_router(gamelobby.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
     app.include_router(exchange.router)
