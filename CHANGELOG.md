@@ -107,6 +107,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   attestation, never accepted from a client, so a stream that never earned it
   cannot paste it on.
 
+- **Whose live, room or stream this is now appears on it** —
+  `identity.whose()`, 1 route, 5 tests. The simpler burned mark is justified by
+  the viewer already knowing whose account they are on, and that was asserted
+  while the top-left of a live surface carried a `LIVE` pill and nothing else,
+  and while no route returned it. The argument was resting on chrome that did
+  not exist.
+
+  One function for every surface — desk, room, party, connection, stream —
+  because "whose is this" must have one answer everywhere; a desk that names
+  its owner while a room names nobody is how a viewer learns to stop looking.
+  Drawn beside the `LIVE` pill on all nine surfaces with a picture, full screen
+  and landscape included, since full screen is where it matters most: that is
+  the state with the app's own header taken away. And returned **with** the
+  mark by `GET /desks/{id}/live-person`, so a client cannot render one without
+  having been handed the other.
+
+  An anonymous account answers with its silhouette name rather than nothing — a
+  viewer still needs to know the stream belongs to one consistent account,
+  which is a different fact from knowing which person that is. Its `@handle` is
+  withheld: this call answers *who is this*, not *where is this*, and the
+  handle would put an identifier on the one surface built to withhold one.
+
 - **Seventeen face overlays**, not one. Masks and half masks, characters,
   creatures, 2-D and 3-D avatars, helmets and visors, paint, makeup, hair,
   headwear, eyewear, prosthetics, rendered styles, and plain blur or silhouette

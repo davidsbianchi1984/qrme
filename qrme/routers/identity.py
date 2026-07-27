@@ -166,3 +166,27 @@ def roster(profile_id: str, request: Request) -> dict:
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
     return identity.roster(profile["owner_id"])
+
+
+@router.get("/places/{surface}/{surface_id}/whose")
+def whose(surface: str, surface_id: str) -> dict:
+    """Whose live, room, party or stream this is — the top-left corner.
+
+    Public, and it has to be: this is the fact a viewer needs *before* they
+    decide anything else about what they are looking at. The burned live mark
+    says a real person is behind the camera and deliberately says nothing about
+    the mask on their face, and the only reason it can afford that is this —
+    the viewer already knows whose account they are on.
+
+    An anonymous profile answers with its silhouette name rather than nothing.
+    A viewer still needs to know the stream belongs to one consistent account,
+    which is a different fact from knowing which person that is.
+    """
+    if surface not in identity.WHOSE_SURFACES:
+        raise HTTPException(
+            422, f"unknown surface {surface!r} — one of "
+                 f"{', '.join(identity.WHOSE_SURFACES)}")
+    out = identity.whose(surface, surface_id)
+    if not out:
+        raise HTTPException(404, "no such place")
+    return out

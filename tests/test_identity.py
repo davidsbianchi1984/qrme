@@ -411,3 +411,93 @@ def test_the_report_says_the_picture_is_withheld_too(client):
                      headers=auth_header(p)).json()
     assert any("silhouette" in s for s in out["withheld"])
     assert not any("picture" in s for s in out["not_withheld"])
+
+
+# -- whose surface is this ----------------------------------------------------
+
+def test_every_live_surface_can_name_its_account(client):
+    """The claim that was made before it was built.
+
+    The burned live mark says a real person is behind the camera and
+    deliberately says nothing about the mask on their face. The only reason it
+    can afford that is that the viewer already knows *whose* stream they are
+    on — and that was asserted while the top-left carried a LIVE pill and
+    nothing else, and while no API field returned it.
+    """
+    from qrme import identity
+
+    p = make_profile(client, display_name="Otis Marsh")
+    sam = client.post("/interactors", json={"display_name": "Sam",
+                                            "birthdate": "1990-01-01"}).json()
+    room = client.post("/rooms", json={
+        "topic": "the read-through", "channel": "video",
+        "participants": [{"kind": "profile", "id": p["id"]},
+                         {"kind": "user", "id": sam["id"]}]}).json()
+
+    who = client.get(f"/places/room/{room['id']}/whose").json()
+    assert who["display_name"] == "Otis Marsh"
+    assert who["account_id"] == p["id"]
+    assert who["is"] == identity.WHOSE_SURFACES["room"]
+
+
+def test_an_unknown_place_says_so_rather_than_naming_nobody(client):
+    """A caller can tell "nobody" from "not here"."""
+    assert client.get("/places/room/rm_nothing/whose").status_code == 404
+    assert client.get("/places/nowhere/x/whose").status_code == 422
+
+
+def test_an_anonymous_stream_still_names_a_consistent_account(client):
+    """A viewer needs to know the stream belongs to one account, which is a
+    different fact from knowing which person that is. Answering with nothing
+    would make an anonymous live indistinguishable from an unattributed one."""
+    p = _hidden(client, display_name="Wren Ashby")
+    who = client.get(f"/places/stream/{p['id']}/whose").json()
+    assert who["display_name"] == "anonymous persona"
+    assert who["anonymous"] is True
+    assert who["handle"] is None
+    assert "Wren" not in str(who)
+
+
+def test_an_anonymous_profiles_handle_is_not_a_name(client):
+    """The handle is still its address — people link to it — but it is not a
+    *name*, and this answers "who is this" rather than "where is this".
+    Returning it would put an identifier on the one surface built to withhold
+    one."""
+    from qrme import identity
+
+    p = _hidden(client, display_name="Wren Ashby")
+    db.connect().execute(
+        "INSERT INTO handles (handle, profile_id, created_at)"
+        " VALUES (?,?,?)", ("wren", p["id"], db.utcnow()))
+    db.connect().commit()
+    assert identity.handle_of(p["id"]) is None
+
+    named = make_profile(client, display_name="Otis Marsh")
+    db.connect().execute(
+        "INSERT INTO handles (handle, profile_id, created_at)"
+        " VALUES (?,?,?)", ("otis_marsh", named["id"], db.utcnow()))
+    db.connect().commit()
+    assert identity.handle_of(named["id"]) == "@otis_marsh"
+
+
+def test_the_live_mark_carries_whose_stream_it_is(client):
+    """The two facts ship together, so a client cannot render the mark without
+    having been handed the thing that makes it sufficient."""
+    from qrme import overlays
+
+    sam = client.post("/interactors", json={"display_name": "Sam",
+                                            "birthdate": "1990-01-01"}).json()
+    now = db.utcnow()
+    did = db.new_id("desk")
+    db.connect().execute(
+        "INSERT INTO desks (id, owner_id, display_name, trade, attestor,"
+        " attestation_basis, attested_at, created_at, last_seen)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
+        (did, sam["id"], "Sam's desk", "locksmith", "Sam", "self-attested",
+         now, now, now))
+    db.connect().commit()
+
+    mark = client.get(f"/desks/{did}/live-person").json()
+    assert mark["line"] == overlays.LIVE_MARK
+    assert mark["whose"]["display_name"] == "Sam's desk"
+    assert mark["whose"]["account_id"] == sam["id"]

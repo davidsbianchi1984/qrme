@@ -1172,7 +1172,23 @@ somebody puts a face on:
 An earlier version composed the badge with the costume — *"… · wearing The
 Wolf"* — which answered a question nobody had. **A viewer is on a named
 account's live or room.** The handle is at the top left, they chose it to get
-there, and they know whose stream this is. The open question on that page is
+there, and they know whose stream this is.
+
+That last sentence was written before it was true. The top-left of a live
+surface carried a `LIVE` pill and nothing else, and no route returned whose
+surface it was — the argument for the simpler mark was resting on chrome that
+did not exist. So `identity.whose(surface, id)` now answers it for a desk, a
+room, a party, a connection and a stream; `GET /places/{surface}/{id}/whose`
+publishes it; every screen with a picture draws it beside the `LIVE` pill; and
+`GET /desks/{id}/live-person` returns it **with** the mark, so a client cannot
+render one without having been handed the other.
+
+An anonymous account answers with its silhouette name rather than with nothing.
+A viewer still needs to know a stream belongs to one consistent account, which
+is a different fact from knowing which person that is — and an anonymous
+profile's `@handle` is withheld here, because this call answers *who is this*
+rather than *where is this*, and returning it would put an identifier on the
+one surface built to withhold one. The open question on that page is
 never *is that his real nose*; it is *is there a person here at all*, and that
 is the only thing this mark answers.
 

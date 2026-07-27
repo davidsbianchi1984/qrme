@@ -387,3 +387,114 @@ def rank_of(profile_id: str) -> int:
     from . import verification
     level = verification.status(profile_id).get("level")
     return _level_rank(level) if level else -1
+
+
+# --------------------------------------------------------------------------- #
+# Whose surface is this
+# --------------------------------------------------------------------------- #
+
+# Which surfaces can name an account, and what "whose" means on each.
+#
+# This exists because a claim was made before it was built. The burned live
+# mark — `NOT AI · REAL PERSON` — deliberately says nothing about the mask on
+# somebody's face, and the reason it can afford not to is that **the viewer
+# already knows whose stream they are on**. That was asserted while the
+# top-left of a live surface carried a LIVE pill and nothing else, so the
+# argument was resting on chrome that did not exist and an API field that was
+# never returned.
+#
+# One function rather than a rule per surface, because "whose is this" must
+# have one answer everywhere. A desk that names its owner while a room names
+# nobody is how a viewer learns to stop looking.
+WHOSE_SURFACES: dict[str, str] = {
+    "desk": "the person staffing it",
+    "room": "the profile the room was opened around",
+    "party": "the host",
+    "connection": "the other person",
+    "stream": "the account that posted it",
+}
+
+
+def handle_of(profile_id: str) -> str | None:
+    """The @handle for a profile, or None. Never for an anonymous one.
+
+    An anonymous profile's handle is still its address — people link to it —
+    but it is not a *name*, and this function answers the question "who is
+    this" rather than "where is this". Returning a handle here would put an
+    identifier on the one surface built to withhold one.
+    """
+    row = db.connect().execute(
+        "SELECT h.handle FROM handles h JOIN profiles p ON p.id = h.profile_id"
+        " WHERE h.profile_id=? AND p.anonymous = 0", (profile_id,)).fetchone()
+    return f"@{row['handle']}" if row else None
+
+
+def whose(surface: str, surface_id: str) -> dict:
+    """Whose live, room, party or stream this is — for the top-left corner.
+
+    Returns ``{}`` for a surface that does not exist, so a caller can tell
+    "nobody" from "not here". An **anonymous** profile answers with its
+    silhouette name rather than nothing: the viewer still needs to know the
+    stream belongs to one consistent account, which is a different fact from
+    knowing which person that is.
+    """
+    conn = db.connect()
+    if surface == "desk":
+        row = conn.execute(
+            "SELECT owner_id, display_name FROM desks WHERE id=?",
+            (surface_id,)).fetchone()
+        if row is None:
+            return {}
+        return {"surface": surface, "surface_id": surface_id,
+                "account_id": row["owner_id"],
+                "display_name": row["display_name"], "handle": None,
+                "is": WHOSE_SURFACES[surface]}
+    if surface in ("room", "stream"):
+        # A room is opened around a profile; a stream is posted by one.
+        pid = surface_id
+        if surface == "room":
+            row = conn.execute(
+                "SELECT ref_id FROM room_participants WHERE room_id=?"
+                " AND kind='profile' ORDER BY rowid LIMIT 1",
+                (surface_id,)).fetchone()
+            if row is None:
+                return {}
+            pid = row["ref_id"]
+        prof = conn.execute(
+            "SELECT id, display_name, anonymous FROM profiles WHERE id=?",
+            (pid,)).fetchone()
+        if prof is None:
+            return {}
+        hidden = bool(prof["anonymous"])
+        return {"surface": surface, "surface_id": surface_id,
+                "account_id": prof["id"],
+                "display_name": ("anonymous persona" if hidden
+                                 else prof["display_name"]),
+                "handle": handle_of(prof["id"]),
+                "anonymous": hidden,
+                "is": WHOSE_SURFACES[surface]}
+    if surface == "party":
+        row = conn.execute("SELECT host_id FROM watch_parties WHERE id=?",
+                           (surface_id,)).fetchone()
+        if row is None:
+            return {}
+        return {"surface": surface, "surface_id": surface_id,
+                "account_id": row["host_id"],
+                "display_name": _name_of(row["host_id"]),
+                "handle": handle_of(row["host_id"]),
+                "is": WHOSE_SURFACES[surface]}
+    return {}
+
+
+def _name_of(subject_id: str) -> str | None:
+    """A display name for an id that might be a profile or an interactor."""
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT display_name, anonymous FROM profiles WHERE id=?",
+        (subject_id,)).fetchone()
+    if row is not None:
+        return ("anonymous persona" if row["anonymous"]
+                else row["display_name"])
+    row = conn.execute("SELECT display_name FROM interactors WHERE id=?",
+                       (subject_id,)).fetchone()
+    return row["display_name"] if row else None

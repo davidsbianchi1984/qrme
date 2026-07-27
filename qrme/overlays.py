@@ -459,11 +459,21 @@ def live_person_mark(desk_id: str) -> dict:
     if row is None:
         return {}
 
+    from . import identity
+
+    # Whose stream this is, carried *with* the mark rather than left to a
+    # second call. The mark can afford to say nothing about the costume only
+    # because the viewer knows whose account they are on — so the two facts
+    # ship together, and a client cannot render one without having been handed
+    # the other.
+    who = identity.whose("desk", desk_id)
+
     return {
         "desk_id": desk_id,
         # Bound to the account that owns the stream, which is what makes this
         # unforgeable by anybody else's client.
         "owner_id": row["owner_id"],
+        "whose": who,
         # The whole mark, and it does not vary. See LIVE_MARK.
         "line": LIVE_MARK,
         "designation": desks.DESIGNATION,

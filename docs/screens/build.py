@@ -2572,6 +2572,33 @@ def render_full(spec):
     if spec.get("rated"):
         out.append(rrect(tx, sy + 20, 38, 20, 10, A(C["red"], 0.85)))
         out.append(text(tx + 19, sy + 34, "18+", 9.5, "#fff", 800, "middle"))
+        tx += 44
+
+    # Whose live this is, and it is not decoration.
+    #
+    # The `NOT AI · REAL PERSON` mark says a human is behind the camera. It
+    # deliberately says nothing about the mask over their face, and the reason
+    # it can afford not to is that the viewer already knows *whose* stream they
+    # are on. That was asserted before it was drawn — the top-left carried the
+    # LIVE pill and nothing else — so the argument was resting on chrome that
+    # did not exist.
+    #
+    # Top left, beside the LIVE pill, on every surface with a picture: a live
+    # desk, a room, a rated stream, a watch party, full screen and landscape
+    # alike. Full screen is where it matters most, because that is the state
+    # with the app's own header taken away.
+    if spec.get("whose"):
+        handle = spec["whose"]
+        hw = 26 + len(handle) * 6.0
+        out.append(rrect(tx, sy + 20, hw, 20, 10, "rgba(8,6,20,0.72)"))
+        out.append(f'<circle cx="{tx+11}" cy="{sy+30}" r="6" '
+                   f'fill="{A(C["brandA"], 0.9)}"/>')
+        out.append(f'<circle cx="{tx+11}" cy="{sy+28.2}" r="2.1" fill="#fff"/>')
+        out.append(f'<path d="M{tx+7.4} {sy+33.6} c0 -3.4 {7.2} -3.4 {7.2} 0" '
+                   f'fill="none" stroke="#fff" stroke-width="1.5" '
+                   f'stroke-linecap="round"/>')
+        out.append(text(tx + 21, sy + 34, handle, 9.5, "#fff", 700, "start"))
+        tx += hw + 6
 
     if spec.get("ar_presence"):
         out += ar_presence(sx, sy, sw, sh, spec["ar_presence"])
@@ -2943,7 +2970,7 @@ SCREENS = [
     # premise is an empty chair with a bell, the reactions are the room.
     dict(num=75, title="Live Room", sub="Two ways in — come up, or comment",
          accent="green", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=202,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh", photo_h=202,
          overlay=dict(
              viewers="14 watching",
              ticker=[("gift", "amber", "Bea · $5"),
@@ -2971,7 +2998,7 @@ SCREENS = [
     # safety matter rather than a detail.
     dict(num=76, title="Rated Stream", sub="18+, and still a real person",
          accent="red", tab=3, locked=True,
-         photo=frames.STAGE, photo_tag=("LIVE", "live"), photo_h=202,
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh", photo_h=202,
          overlay=dict(
              viewers="38 watching",
              ticker=[("gift", "amber", "Ada · $20"),
@@ -3130,7 +3157,7 @@ SCREENS = [
     # guest request. They were reachable by API and by nothing else.
     dict(num=89, title="Live Room", sub="Ring, gift, or ask to come up",
          accent="pink", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=PHOTO_FULL - 2,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh", photo_h=PHOTO_FULL - 2,
          live_bar=[
              ("comeup", "green"),
              ("bell", "amber"),
@@ -3156,7 +3183,7 @@ SCREENS = [
     # with no screenshot anywhere of a full-screen video before somebody
     # presses on it.
     dict(num=90, title="Full Screen", full=True, accent="pink",
-         photo=frames.DESK, photo_tag=("LIVE", "live"),
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh",
          live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")],
          bubble_chat=[
@@ -3170,7 +3197,7 @@ SCREENS = [
          held=[("?", None, "brandA", "Help"),
                (None, "rotate", "cyan", "Landscape"),
                (None, "shrink", "t2", "Back to app")],
-         photo=frames.DESK, photo_tag=("LIVE", "live"),
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh",
          live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")],
          bubble_chat=[
@@ -3178,7 +3205,7 @@ SCREENS = [
              ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
          ]),
     dict(num=92, title="Full Screen Landscape", full=True, landscape=True,
-         accent="pink", photo=frames.DESK, photo_tag=("LIVE", "live"),
+         accent="pink", photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh",
          # Landscape is where the room finally arrives at its own aspect
          # ratio, so nothing is dimmed over it here — this is the resting
          # state, and the same long press brings the same controls back.
@@ -3193,7 +3220,7 @@ SCREENS = [
     # because the gate belongs to the profile rather than to the app chrome —
     # taking the chrome away must not take the rating with it.
     dict(num=93, title="Rated Full Screen", full=True, rated=True,
-         accent="red", photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         accent="red", photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh",
          live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")],
          bubble_chat=[
@@ -3201,7 +3228,7 @@ SCREENS = [
              ("Cy", "gifted a rose", frames.PORTRAITS[4][1]),
          ]),
     dict(num=94, title="Rated Held", full=True, rated=True, accent="red",
-         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh",
          held=[("?", None, "brandA", "Help"),
                (None, "rotate", "cyan", "Landscape"),
                (None, "shrink", "t2", "Back to app")],
@@ -3209,7 +3236,7 @@ SCREENS = [
                    ("heart", "pink"), ("share", "cyan")]),
     dict(num=95, title="Rated Landscape", full=True, landscape=True,
          rated=True, accent="red",
-         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh",
          live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")],
          bubble_chat=[
