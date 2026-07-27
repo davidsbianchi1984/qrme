@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import json
 
-from . import db, llm, moderation, persona
+from . import agentlight, db, llm, moderation, persona
 
 # The phases a plan may use. `confirm` is the one pausing phase: it waits for
 # external input and resumes later.
@@ -74,6 +74,11 @@ def _hydrate(row) -> dict:
     wf["memory"] = json.loads(wf["memory"])
     wf["next_phase"] = (wf["plan"][wf["cursor"]]
                         if wf["cursor"] < len(wf["plan"]) else None)
+    # The status light, attached here rather than in each router. Every
+    # workflow that reaches a client passes through this function, so putting
+    # it anywhere else would mean one surface showing a light and another not —
+    # and the screens are meant to agree with each other.
+    wf["agent"] = agentlight.light(wf["status"])
     return wf
 
 

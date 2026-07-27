@@ -215,8 +215,24 @@ def v_home():
     o.append(icon("person", acx, y2 + 94, "rgba(255,255,255,0.92)", 1.9))
     o.append(f'<circle cx="{acx}" cy="{y2+96}" r="48" fill="none" stroke="url(#gBrand)" stroke-width="3"/>')
     o.append(text(acx, y2 + 168, "AI Version of Me", 12.5, C["txt"], 700, "middle"))
-    o.append(status_dot(acx + 44, y2 + 190, "Online", "on"))
-    o.append(text(acx - 52, y2 + 194, "Identity 98.9%", 10, C["t2"], 600))
+    # Left-anchored text against a right-anchored pill, rather than both
+    # measured from the centre — they were overlapping by about thirty pixels
+    # at the widths they actually render.
+    o.append(text(IX + lw + 40, y2 + 194, "Identity 98.9%", 10, C["t2"], 600))
+    o.append(status_dot(IX + lw + 20 + rw - 16, y2 + 190, "Online", "on"))
+    # The agent status lights. "Online" says the profile is reachable; these
+    # say whether its running work needs a person — a different question, and
+    # the one somebody scanning a dashboard is actually asking.
+    o.append(text(IX + lw + 40, y2 + 222, "AGENTS", 9, C["t3"], 700, "start", 0.6))
+    ay = y2 + 238
+    for label, sub, tone in (("Ship the notes", "working", "on"),
+                             ("Research brief", "needs you", "avail"),
+                             ("Second job", "stopped", "crit")):
+        col = {"on": C["green"], "avail": C["amber"], "crit": C["red"]}[tone]
+        o.append(f'<circle cx="{IX+lw+44}" cy="{ay-3}" r="3.4" fill="{col}"/>')
+        o.append(text(IX + lw + 54, ay, label, 10, C["txt"], 600))
+        o.append(text(IX + lw + 20 + rw - 16, ay, sub, 9, col, 700, "end"))
+        ay += 17
     y3 = y2 + ph + 22
     bh = CONTENT_Y + CONTENT_H - PAD - y3
     o += panel(IX, y3, lw, bh, "Recent activity", right="live")
@@ -693,9 +709,45 @@ VIEWS = [
 ]
 
 
+def agent_overlay(counts):
+    """The agent lights, pinned to every desktop view.
+
+    A watch answers this for the people who wear one. Desktop users have no
+    wrist to glance at, so the same information has to live somewhere that
+    does not depend on remembering to open a page — and amber and red are
+    precisely the states nobody thinks to go looking for.
+
+    Bottom-right, above the content and clear of the sidebar: the corner a
+    dashboard convention already reserves for status, and the one place a
+    persistent strip does not cover something a person is reading.
+    """
+    w, h = 132, 116
+    x = WIN_X + WIN_W - w - 24
+    y = WIN_Y + WIN_H - h - 24
+    o = [rrect(x, y, w, h, 15, "rgba(9,7,26,0.62)", A(C["brandA"], 0.5), 1)]
+    yy = y + 26
+    rows = (("green", "running"), ("amber", "need help"), ("red", "stopped"))
+    for (colour, word), n in zip(rows, counts):
+        col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
+        dim = n == 0
+        o.append(f'<circle cx="{x+18}" cy="{yy}" r="5.5" fill="{col}"'
+                 + (' opacity="0.28"' if dim else "") + "/>")
+        o.append(text(x + 32, yy + 5, str(n), 14,
+                      col if not dim else C["t3"], 800))
+        o.append(text(x + 46, yy + 5, word, 9.5,
+                      C["t2"] if not dim else C["t3"], 600))
+        yy += 28
+    o.append(text(x + w / 2, y + h - 12, "open \u203a", 9,
+                  C["brandA"], 700, "middle"))
+    return o
+
+
 def render(title, nav, fn):
     o = frame(title, nav)
     o += fn()
+    # On every view, not just Home: the whole point is that it is there while
+    # you are doing something else.
+    o += agent_overlay((3, 1, 1))
     o += close()
     return "".join(o)
 
