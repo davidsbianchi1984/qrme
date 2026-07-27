@@ -421,6 +421,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   is *where is my microphone live right now, all of it* — shown beside the
   room's own disclosure, because those two being the same thing is the design.
 
+- **The rest of the round reaches the watch and the desktop too** — watch faces
+  06–09, desktop views 12–14. Channel 2 got its watch face because the audit
+  caught it; the same audit run against everything built since found the same
+  hole five more times. Overlays, backgrounds, the game lobby, identity and
+  fixed screens were all phone-only, and all five answer a question you ask
+  *while you are away from the phone*.
+
+  The wrist question is one question in five shapes: **what am I currently
+  presenting as?** Face 06 is the name and picture a stranger sees right now —
+  which for an anonymous profile is the fixed `Anonymous NNNNNNNN` nobody can
+  change. Face 07 is what is over your face and behind you on camera. Face 08
+  is who is in the lobby beside you, with the seat kinds spelled out. Face 09
+  is which fixed screens are lit and what each one is showing. None of the four
+  can change anything — the wrist adds reach, not powers, and face 05 stays the
+  single deliberate exception because a lent microphone *is* the watch.
+
+  `wearables.FACES` gained all four in the same change, and the binding test
+  was tightened while it was open: it now reads an explicit `face="..."` key
+  out of the builder rather than inferring the face from a title, so a face
+  drawn under a name the regex happened not to match can no longer pass.
+
+  Desktop views 12–14 are the ones a wide window earns rather than a phone
+  screen made larger. **13 Camera & Screens** is the clearest case: overlays,
+  backgrounds and fixed displays are three modules on the phone and one
+  question at a desk — *what does everything of mine that is currently facing
+  outward look like* — so they are one view.
+
+- **The assistant delivers the walkthrough by voice or by text** —
+  `help.ask(question, mode=...)`, `POST /help` gained `mode`. The tutorial
+  already existed at `/tutorial`, which is fine if you know it is there. What
+  somebody actually does is ask the help box *"show me around"* — a phrase that
+  is not a question with an answer, and answering it with a paragraph **about**
+  tours would be the most annoying possible reply.
+
+  So the phrase table starts the tour instead, handing back the first step
+  inline. Voice is a `mode` on the existing help box rather than a second
+  endpoint: a spoken assistant and a written one answering differently is two
+  products, and the spoken one would be the one nobody re-read. The refusal
+  check still runs **first**, so asking the guide to pretend it is somebody is
+  refused rather than answered with a tour.
+
 ### Fixed
 - **The account avatar was painted over the header pill on every desktop view.**
   It sat at a hard-coded 96px from the pill's right edge while `status_dot`

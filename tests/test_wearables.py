@@ -91,8 +91,12 @@ def test_there_is_a_watch_face_for_every_permission(client):
     """A face somebody can enable and never see would be a permission granting
     nothing; a face with no permission would be one nobody chose."""
     src = pathlib.Path("docs/watch/build.py").read_text()
-    drawn = set(re.findall(r'dict\(num=\d+, title="(\w+)"', src))
-    assert {f.lower() for f in drawn} == set(wearables.FACES), (
+    # Read the permission each face declares, rather than lower-casing its
+    # title and hoping. The title is prose — "On Camera" reads better on a
+    # wrist than "Camera" — and a binding that breaks when somebody writes a
+    # two-word title is a binding people loosen instead of satisfying.
+    drawn = set(re.findall(r'face="([a-z_]+)"', src))
+    assert drawn == set(wearables.FACES), (
         f"watch faces {sorted(drawn)} vs permissions "
         f"{sorted(wearables.FACES)}")
 

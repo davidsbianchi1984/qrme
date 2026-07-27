@@ -54,6 +54,13 @@ Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation 
     <td align="center" width="50%"><a href="docs/desktop/10-community.svg"><img src="docs/desktop/10-community.svg" width="460" alt="Community"></a><br><sub><b>10</b> · Community</sub></td>
     <td align="center" width="50%"><a href="docs/desktop/11-channel-2.svg"><img src="docs/desktop/11-channel-2.svg" width="460" alt="Channel 2"></a><br><sub><b>11</b> · Channel 2 · every place at once</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/12-who-you-are.svg"><img src="docs/desktop/12-who-you-are.svg" width="460" alt="Who You Are"></a><br><sub><b>12</b> · Who you are · profiles and anonymity</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/13-camera-screens.svg"><img src="docs/desktop/13-camera-screens.svg" width="460" alt="Camera & Screens"></a><br><sub><b>13</b> · Camera &amp; screens · what others see of you</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/14-game-lobby.svg"><img src="docs/desktop/14-game-lobby.svg" width="460" alt="Game Lobby"></a><br><sub><b>14</b> · Game lobby · the roster and the rule</sub></td>
+  </tr>
 </table>
 
 ### Mobile app
@@ -900,6 +907,12 @@ earbuds or glasses — and says which faces it may show.
     <td align="center" width="25%"><a href="docs/watch/04-control.svg"><img src="docs/watch/04-control.svg" width="150" alt="Control"></a><br><sub><b>04</b> · Control</sub></td>
     <td align="center" width="25%"><a href="docs/watch/05-microphone.svg"><img src="docs/watch/05-microphone.svg" width="150" alt="Microphone"></a><br><sub><b>05</b> · Microphone</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="docs/watch/06-identity.svg"><img src="docs/watch/06-identity.svg" width="150" alt="Identity"></a><br><sub><b>06</b> · Identity</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/07-on-camera.svg"><img src="docs/watch/07-on-camera.svg" width="150" alt="On Camera"></a><br><sub><b>07</b> · On Camera</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/08-lobby.svg"><img src="docs/watch/08-lobby.svg" width="150" alt="Lobby"></a><br><sub><b>08</b> · Lobby</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/09-screens.svg"><img src="docs/watch/09-screens.svg" width="150" alt="Screens"></a><br><sub><b>09</b> · Screens</sub></td>
+  </tr>
 </table>
 
 <table>
@@ -964,6 +977,16 @@ see is a permission granting nothing.
 away cannot return by re-presenting the same name, and the owner can still see
 what was ever paired — which is the question people actually ask after losing a
 watch.
+
+**Faces 06–09 all answer the same kind of question**: *what am I currently
+presenting as, without looking at a phone.* Which profile you are posting as
+and whether it is anonymous — the one mistake here that cannot be taken back,
+and exactly the thing somebody assumes rather than checks when the answer is
+two taps into a phone. What your camera is showing, which is the one thing your
+own screen cannot show you, because the phone is in front of the lens and you
+are behind it. Who is in the game with you, as counts. And which fixed screens
+are live with you on them, because a fixture is the surface you can forget is
+on — you walked away from it.
 
 **05 Microphone is the one face that can end something**, and that is
 deliberate rather than an exception to *"the wrist adds reach, not powers"*. A

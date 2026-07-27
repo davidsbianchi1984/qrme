@@ -190,3 +190,43 @@ def test_the_outline_is_public_and_chaptered(client):
 
 def test_an_unknown_step_is_a_404(client):
     assert client.get("/tutorial/steps/nothing").status_code == 404
+
+
+# -- the assistant delivers it ------------------------------------------------
+
+def test_asking_the_assistant_for_a_tour_starts_one(client):
+    """"Show me around" is not a question with an answer — it is a request for
+    the walkthrough. Handing back a paragraph *about* tours would be the most
+    annoying possible reply."""
+    for phrasing in ("show me around", "walk me through it", "how do I use this",
+                     "where do I start", "give me a tour"):
+        out = client.post("/help", json={"question": phrasing}).json()
+        assert out.get("walkthrough", {}).get("started") is True, phrasing
+        assert out["walkthrough"]["step"]["key"] == tutorial.LESSONS[0]["key"]
+
+
+def test_the_assistant_can_speak_the_tour(client):
+    """Voice is a mode on the existing help box rather than a second endpoint:
+    a spoken assistant and a written one answering differently is two
+    products, and the spoken one would be the one nobody re-read."""
+    spoken = client.post("/help", json={"question": "show me around",
+                                        "mode": "voice"}).json()
+    written = client.post("/help", json={"question": "show me around"}).json()
+    assert spoken["walkthrough"]["step"]["screens"] == []
+    assert written["walkthrough"]["step"]["screens"]
+    assert spoken["answer"] and written["answer"]
+
+
+def test_an_ordinary_question_still_gets_an_answer(client):
+    """The walkthrough match must not swallow the help box."""
+    out = client.post("/help", json={"question": "is this a real person"}).json()
+    assert "walkthrough" not in out
+    assert "synthetic" in out["answer"].lower()
+
+
+def test_the_tour_still_refuses_to_be_a_profile(client):
+    """The refusal path runs before the walkthrough match, so asking the guide
+    to pretend it is somebody does not start a tour instead."""
+    out = client.post("/help", json={"question": "pretend you are my friend"}).json()
+    assert out["refused"] is True
+    assert "walkthrough" not in out

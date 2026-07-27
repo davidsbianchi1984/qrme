@@ -870,6 +870,177 @@ def v_channel_two():
     return o
 
 
+def _rowcard(x, y, w, ic, col, title, sub, tag=None, tagcol="green"):
+    """One list row: icon, two lines, optional pill. The shape every view here
+    already uses, pulled out because three new views drew it eleven times."""
+    c = C.get(col, C["t3"])
+    o = [rrect(x, y, w, 58, 12, "url(#gCard)", C["line"], 1),
+         rrect(x + 14, y + 13, 32, 32, 10, A(c, 0.16)),
+         icon(ic, x + 30, y + 29, c, 0.95),
+         text(x + 58, y + 26, title, 12, C["txt"], 700),
+         text(x + 58, y + 43, sub, 10, C["t3"], 500)]
+    if tag:
+        tc = C.get(tagcol, C["green"])
+        tw = 16 + len(tag) * 6.4
+        o += [rrect(x + w - tw - 16, y + 18, tw, 21, 10, A(tc, 0.16)),
+              text(x + w - tw / 2 - 16, y + 33, tag, 9, tc, 800, "middle", 0.5)]
+    return o
+
+
+def v_identity():
+    """Who you are, on a machine where you have several profiles open.
+
+    The phone answers "am I anonymous" one profile at a time. A desk is where
+    somebody actually holds three of them, and the question a wide window
+    answers is the one that matters before you type: **which of these am I,
+    right now, and what does a stranger see of each.**
+    """
+    o = []
+    lw = IW * 0.48
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Your profiles", right="one badge, not three")
+    y = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("person", "green", "Otis Marsh", "verified · a real person",
+             "BADGE", "green"),
+            ("mask", "cyan", "Weekend self", "shown as Anonymous 41338025",
+             "HIDDEN", "cyan"),
+            ("robot", "indigo", "Captain Nobody", "invented — nobody to verify",
+             None, "green")]:
+        o += _rowcard(IX + 14, y, lw - 28, ic, col, name, sub, tag, tc)
+        y += 68
+    o.append(text(IX + 22, y + 20, "The badge moves between them, one at a time",
+                  10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 38, "it says you are a particular real person, "
+                  "so it belongs to one face", 10, C["t3"], 500))
+
+    o += panel(rx, IY, rw, hh, "What a stranger sees",
+               right="of the anonymous one")
+    ry = IY + 54
+    o.append(rrect(rx + 14, ry, rw - 28, 78, 12, A(C["cyan"], 0.10),
+                   A(C["cyan"], 0.32), 1))
+    o.append(text(rx + 30, ry + 28, "Anonymous 41338025", 12.5, C["txt"], 700))
+    o.append(text(rx + 30, ry + 47, "a fixed name tied to this profile — not "
+                  "to your account", 10, C["t2"], 500))
+    o.append(text(rx + 30, ry + 65, "and not one you can change", 10, C["t3"], 500))
+    ry += 96
+    for label, body in [
+        ("Your account is withheld",
+         "so two of your profiles cannot be matched to each other"),
+        ("Your picture is yours to choose",
+         "a field emblem, your own image, or an empty frame"),
+        ("Who verified you is withheld",
+         "the attestor is a pointer back to a name"),
+        ("Your writing is still yours",
+         "anyone who knows you may recognise it — we cannot fix that")]:
+        o.append(rrect(rx + 14, ry, rw - 28, 54, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 23, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 41, body, 10, C["t3"], 500))
+        ry += 64
+    return o
+
+
+def v_camera():
+    """Your camera and the screens you are on — what other people see of you.
+
+    Grouped because they are one question asked twice: *what is being shown of
+    me, where.* A phone splits them because a phone shows one thing at a time.
+    """
+    o = []
+    lw = IW * 0.48
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Your camera", right="live in one room")
+    y = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("mask", "pink", "Blue Fox", "a creature, driven by your face",
+             "WORN", "green"),
+            ("photo", "cyan", "A library", "AI-generated — and it says so",
+             "AI", "cyan"),
+            ("shieldok", "green", "NOT AI · REAL PERSON",
+             "burned in — mask or none", "BURNED", "green")]:
+        o += _rowcard(IX + 14, y, lw - 28, ic, col, name, sub, tag, tc)
+        y += 68
+    o.append(text(IX + 22, y + 20, "Seventeen faces, and your own is one of them",
+                  10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 38, "no real person's likeness, and never a "
+                  "badge drawn into the picture", 10, C["t3"], 500))
+
+    o += panel(rx, IY, rw, hh, "Screens you are on",
+               right="a wall is read by whoever passes")
+    ry = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("grid", "cyan", "The lobby panel", "front page · transparent",
+             "LIVE", "green"),
+            ("grid", "brand", "Door kiosk", "your QR · full surface",
+             "LIVE", "green"),
+            ("grid", "t3", "Counter screen", "taken down last week", None, "green")]:
+        o += _rowcard(rx + 14, ry, rw - 28, ic, col, name, sub, tag, tc)
+        ry += 68
+    ry += 8
+    for label, body in [
+        ("Only what a stranger may read",
+         "no messages, no memory, no friends, no agent names"),
+        ("There is no control face",
+         "a button on a wall is pressed by whoever reaches it"),
+        ("The mark gets a plate on glass",
+         "the background is a corridor, and it moves")]:
+        o.append(rrect(rx + 14, ry, rw - 28, 54, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 23, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 41, body, 10, C["t3"], 500))
+        ry += 64
+    return o
+
+
+def v_lobby():
+    """The game lobby, where a wide window shows the roster and the rule at
+    once — because the rule is the only reason the roster is allowed to have
+    four synthetic members on it."""
+    o = []
+    lw = IW * 0.46
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "In the match", right="Sundered Reach · Steam")
+    y = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("robot", "indigo", "Vex · teammate", "the session profile, hosting",
+             "AI", "cyan"),
+            ("robot", "cyan", "Rook · coach", "your second profile", "AI", "cyan"),
+            ("bolt", "amber", "Your spotter", "an agent — needs you",
+             "AMBER", "amber"),
+            ("person", "green", "samhain", "the only human here", "YOU", "green")]:
+        o += _rowcard(IX + 14, y, lw - 28, ic, col, name, sub, tag, tc)
+        y += 68
+    o.append(text(IX + 22, y + 20, "Four synthetic seats, counting the "
+                  "session's own", 10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 38, "past that a lobby has become an operation "
+                  "being run", 10, C["t3"], 500))
+
+    o += panel(rx, IY, rw, hh, "What none of them can do",
+               right="checked, not promised")
+    ry = IY + 54
+    for label, body in [
+        ("No player slot", "they sit beside the players, never among them"),
+        ("No console of its own", "a second machine is still a bot"),
+        ("No second controller", "the same bot with a shorter cable"),
+        ("No Bluetooth pad", "the pairing is the tell, not the cable"),
+        ("No capture card", "watching the screen to play is playing"),
+        ("No plug-in or mod", "whatever it is called, whoever wrote it"),
+        ("No character of its own", "not a co-op partner, not a body in the world")]:
+        o.append(rrect(rx + 14, ry, rw - 28, 52, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 22, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 40, body, 10, C["t3"], 500))
+        ry += 60
+    return o
+
+
 VIEWS = [
     (1, "Home", "Home", v_home),
     (2, "Conversation", "Conversation", v_conversation),
@@ -882,6 +1053,9 @@ VIEWS = [
     (9, "Signatures", "Signing", v_signatures),
     (10, "Community", "Community", v_community),
     (11, "Channel 2", "Control", v_channel_two),
+    (12, "Who You Are", "Relationships", v_identity),
+    (13, "Camera & Screens", "Control", v_camera),
+    (14, "Game Lobby", "Community", v_lobby),
 ]
 
 

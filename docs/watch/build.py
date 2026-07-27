@@ -179,20 +179,20 @@ def big_counts(rows):
 FACES = [
     # agents — the light board, matching JIM's face 36 so one wrist shows the
     # same shape whichever product paired it.
-    dict(num=1, title="Agents", accent="green", kind="counts", rows=[
+    dict(num=1, title="Agents", face="agents", accent="green", kind="counts", rows=[
         ("green", "running", 3), ("amber", "need help", 1),
         ("red", "stopped", 1)], foot="open on your phone"),
     # activity — the community layer, as counts. Not the content: a feed on a
     # wrist is a reading surface, and reading is the thing a glance cannot do.
-    dict(num=2, title="Activity", accent="cyan", kind="counts", rows=[
+    dict(num=2, title="Activity", face="activity", accent="cyan", kind="counts", rows=[
         ("cyan", "new posts", 12), ("brand", "friend picks", 3),
         ("amber", "replies", 2)], foot="tap to open the feed"),
-    dict(num=3, title="Profile", accent="brand", kind="tiles", tiles=[
+    dict(num=3, title="Profile", face="profile", accent="brand", kind="tiles", tiles=[
         ("chat", "brand", "247", "memories"),
         ("people", "cyan", "12", "relationships"),
         ("chart", "green", "92%", "engagement"),
         ("star", "gold", "4.0", "rating")]),
-    dict(num=4, title="Control", accent="amber", kind="rows", rows=[
+    dict(num=4, title="Control", face="control", accent="amber", kind="rows", rows=[
         ("check", "green", "Approve reply", "held for you"),
         ("play", "amber", "Assist agent", "one is waiting"),
         ("stop", "red", "Halt", "stops the run")], foot="the wrist adds reach, not powers"),
@@ -204,11 +204,40 @@ FACES = [
     # somebody find a phone to stop their own device listening would be the
     # one permission on the platform you cannot revoke from the thing it runs
     # on, and "yours to end, alone and at any moment" would be false.
-    dict(num=5, title="Microphone", accent="cyan", kind="rows", rows=[
+    dict(num=5, title="Microphone", face="microphone", accent="cyan", kind="rows", rows=[
         ("mic", "cyan", "Lent to a room", "the quarterly numbers"),
         ("shield", "green", "Near-field only", "you, not the room"),
         ("stop", "red", "Take it back", "ends it here")],
         foot="everyone in the room can see it is lent"),
+    # identity — the question you want answered *before* you speak, not after.
+    # "Am I anonymous right now" is the one mistake on this platform that
+    # cannot be taken back, and it is exactly the sort of thing somebody
+    # assumes rather than checks when the answer lives two taps into a phone.
+    dict(num=6, title="Identity", face="identity", accent="brand", kind="rows", rows=[
+        ("person", "brand", "Otis Marsh", "posting as this one"),
+        ("mask", "cyan", "Weekend self", "Anonymous 41338025"),
+        ("check", "green", "Verified", "on the work profile")],
+        foot="tap to switch which one you are"),
+    # camera — what other people are seeing of you. On the wrist because your
+    # own screen is the one thing a camera overlay does not appear on: the
+    # phone is in front of the lens, and you are behind it.
+    dict(num=7, title="On Camera", face="camera", accent="pink", kind="rows", rows=[
+        ("mask", "pink", "Blue Fox", "over your face"),
+        ("photo", "cyan", "A library", "AI-generated"),
+        ("shield", "green", "NOT AI · REAL", "burned in")],
+        foot="what the room sees, not what you see"),
+    # lobby — counts and kinds, never the transcript. Same shape as the agents
+    # face: a wrist answers "who is here", a screen answers "what did they say".
+    dict(num=8, title="Lobby", face="lobby", accent="indigo", kind="counts", rows=[
+        ("green", "people", 1), ("indigo", "profiles", 2),
+        ("amber", "agents", 1)], foot="nothing here plays — they talk"),
+    # screens — where you are currently on display. A fixture is the one
+    # surface you can forget is on, because you walked away from it.
+    dict(num=9, title="Screens", face="screens", accent="cyan", kind="rows", rows=[
+        ("grid", "cyan", "The lobby panel", "front page · live"),
+        ("grid", "brand", "Door kiosk", "your QR · live"),
+        ("stop", "red", "Take one down", "ends it there")],
+        foot="a wall is read by whoever walks past"),
 ]
 
 

@@ -608,3 +608,8 @@ class HelpAsk(BaseModel):
     """A question about using QRME — not a message to a profile."""
 
     question: str = ""
+    # `voice` renders the same answer for listening rather than reading. It is
+    # a mode on the existing box rather than a second endpoint, because a
+    # spoken help assistant and a written one answering differently is two
+    # products, and the spoken one would be the one nobody re-read.
+    mode: str = "text"

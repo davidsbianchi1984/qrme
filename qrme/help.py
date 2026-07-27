@@ -139,6 +139,20 @@ TOPICS: dict[str, tuple[tuple[str, ...], str]] = {
 }
 
 
+# Asking for the tour, in the words people use. Kept beside TOPICS rather than
+# inside it because the reply is not a paragraph — it is the first step of a
+# walkthrough, and a topic that returned prose about tours would be the most
+# annoying possible answer to "show me around".
+_WALKTHROUGH: dict[str, tuple[tuple[str, ...], str]] = {
+    "walk_me_through": (
+        ("show me around", "walk me through", "give me a tour", "tutorial",
+         "guide me", "how do i use this", "where do i start", "getting started",
+         "teach me", "walkthrough", "show me how"),
+        "",
+    ),
+}
+
+
 def _model_is_real() -> bool:
     """Whether a *real* provider is configured, as opposed to the offline stub.
 
@@ -186,7 +200,7 @@ def _grounding() -> str:
     return "\n".join(f"- {answer}" for _keys, answer in TOPICS.values())
 
 
-def ask(question: str, provider=None) -> dict:
+def ask(question: str, provider=None, mode: str = "text") -> dict:
     """Answer a question about using QRME. Never writes anything.
 
     Returns ``source`` so a caller can tell a written answer from a generated
@@ -206,6 +220,27 @@ def ask(question: str, provider=None) -> dict:
     if refusal:
         return {"answer": refusal, "source": "written", "ai": False,
                 "refused": True, "disclosure": DISCLOSURE, "topics": topics()}
+
+    # "Show me around" is not a question with an answer — it is a request for
+    # the walkthrough. Matched here rather than left as a topic, because the
+    # help box is where somebody asks it and being handed a paragraph about
+    # tours instead of a tour is the wrong reply.
+    #
+    # The assistant delivers it either way: `mode="voice"` renders the same
+    # lesson for listening, so somebody driving or unable to read the screen
+    # gets the tour rather than a link to it.
+    if _match(question, _WALKTHROUGH) is not None:
+        from . import tutorial
+        first = tutorial.LESSONS[0]
+        step = tutorial.say(first, mode)
+        return {
+            "answer": step.get("speak") or f"{step['title']}. {step['what']}",
+            "source": "written", "ai": False, "refused": False,
+            "disclosure": DISCLOSURE, "topics": topics(),
+            "walkthrough": {"started": True, "step": step,
+                            "steps": len(tutorial.LESSONS),
+                            "next": "/tutorial/done"},
+        }
 
     written = _match(question, TOPICS)
 

@@ -101,6 +101,16 @@ FACES: dict[str, str] = {
     # the listening. A watch that can be lent and cannot be taken back from is
     # a watch you have to go and find a phone to switch off.
     "microphone": "whether this watch is lent to a room, and the way back",
+    # The four below are all the same kind of question: *what am I currently
+    # presenting as, without looking at a phone.* Each is a glance answer to
+    # something you would otherwise find out by being told, which is the test
+    # for a wrist — a face that needs reading belongs on a screen you hold.
+    "identity": "which of your profiles you are posting as, and whether it is "
+                "anonymous right now",
+    "camera": "what your camera is showing other people — the overlay on your "
+              "face and what is behind you",
+    "lobby": "who is in the game with you, and which of them are synthetic",
+    "screens": "which fixed screens are live with you on them",
 }
 DEFAULT_FACES = ("agents", "activity")
 
