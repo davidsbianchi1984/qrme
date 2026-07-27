@@ -30,10 +30,12 @@ icon, C, ACCENT, esc, rrect, text = pb.icon, pb.C, pb.ACCENT, pb.esc, pb.rrect, 
 A = pb.A
 
 W, H = 236, 300
-# case + screen (Apple-Watch rounded square, taller than wide)
+# Case and screen are the same rectangle: the display runs edge to edge, the
+# way a modern watch does. A separate inset screen leaves a bezel band that
+# reads as a frame drawn around a picture rather than as glass filling a case.
 CAX, CAY, CAW, CAH = 18, 20, 196, 260
-SXX, SYY, SWW, SHH = 30, 32, 172, 236
-PADX = 44          # content left inside screen
+SXX, SYY, SWW, SHH = CAX, CAY, CAW, CAH
+PADX = 38          # content left inside screen
 CW = SWW - 2 * (PADX - SXX)   # content width
 
 
@@ -64,11 +66,12 @@ def head(num, title, accent="brand"):
     # crown + side button on the right
     o.append(rrect(CAX + CAW - 2, 118, 7, 34, 3, "#333c52"))
     o.append(rrect(CAX + CAW - 1, 160, 5, 26, 2, "#2a3145"))
-    o.append(rrect(CAX, CAY, CAW, CAH, 60, "url(#gFrame)",
-                   "rgba(255,255,255,0.10)", 1))
-    o.append(rrect(SXX, SYY, SWW, SHH, 48, "url(#gScr)"))
-    o.append(text(SXX + SWW - 14, SYY + 24, "10:09", 11, ac, 700, "end"))
-    o.append(text(PADX, SYY + 24, title, 13, C["txt"], 700, spacing=-0.2))
+    # The screen is the whole face. The case survives only as the hairline
+    # around it — enough to say where the glass ends, not enough to be a bezel.
+    o.append(rrect(SXX, SYY, SWW, SHH, 60, "url(#gScr)",
+                   "rgba(255,255,255,0.13)", 1.2))
+    o.append(text(SXX + SWW - 26, SYY + 30, "10:09", 11, ac, 700, "end"))
+    o.append(text(PADX, SYY + 30, title, 13, C["txt"], 700, spacing=-0.2))
     return o
 
 
