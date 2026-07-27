@@ -46,6 +46,10 @@ class ProfileCreate(BaseModel):
     # the profile. An explicit refusal is refused.
     terms_consent: bool = True
     owner_id: str
+    # The plan this account joins on. Omitted means Basic for a new account,
+    # and *no change* for an existing member — making a second profile must not
+    # quietly move somebody off Pro. See qrme/routers/profiles.py:_enrol.
+    plan: str | None = None
     kind: ProfileKind
     display_name: str
     persona: str = Field(description="Core identity: voice, history, values.")
@@ -156,6 +160,10 @@ class GenesisAnswers(BaseModel):
 
 class GenesisCreate(BaseModel):
     owner_id: str
+    # The plan this account joins on. Omitted means Basic for a new account,
+    # and *no change* for an existing member — making a second profile must not
+    # quietly move somebody off Pro. See qrme/routers/profiles.py:_enrol.
+    plan: str | None = None
     verification: Verification
     answers: GenesisAnswers
     display_name: str | None = None    # omit to let the profile name itself

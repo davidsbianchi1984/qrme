@@ -7,7 +7,7 @@ ADULT = {"birthdate": "1984-06-01"}
 
 def _profile(client, owner="creator-1", name="Priya Raman", **extra):
     r = client.post("/profiles", json={
-        "owner_id": owner, "kind": "fictional", "display_name": name,
+        "plan": "pro", "owner_id": owner, "kind": "fictional", "display_name": name,
         "persona": "A pragmatic software architect.",
         "verification": ADULT, **extra})
     assert r.status_code == 201, r.text

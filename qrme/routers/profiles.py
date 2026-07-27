@@ -7,7 +7,7 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import auth, companion, db, identity, persona, terms
+from .. import auth, companion, db, identity, persona, terms, tiers
 from ..common import (
     age_of, profile_or_404, profile_out, require_owner, source_items,
 )
@@ -17,6 +17,18 @@ from ..models import (
 )
 
 router = APIRouter()
+
+
+def _enrol(account_id: str, plan: str | None) -> None:
+    """Put a new account on a plan; leave an existing member's alone.
+
+    Called from both creation paths. Written once rather than inline twice,
+    because "genesis quietly enrolled people on a different plan from the
+    ordinary form" is exactly the kind of divergence two copies produce.
+    """
+    if plan is None and tiers.plan_of(account_id) != "visitor":
+        return                       # already a member — do not downgrade them
+    tiers.subscribe(account_id, plan or tiers.DEFAULT_PLAN)
 
 
 # The signup key is a gate on the *HTTP* surface — who may create a profile
@@ -81,9 +93,16 @@ def create_profile(body: ProfileCreate) -> dict:
     # be a reason profile creation fails.
     from .. import friends
     friends.install_founder(profile_id)
+    # Making something is what a membership is *for*, so creating a profile is
+    # where an account joins one. Basic unless a plan is named, because the
+    # cheaper of two prices is the honest default to put somebody on when they
+    # have not chosen — and an existing member keeps the plan they have rather
+    # than being quietly downgraded by making a second profile.
+    _enrol(body.owner_id, getattr(body, "plan", None))
     token = auth.issue("owner", profile_id)
     out = {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
            "owner_token": token}
+    out["membership"] = tiers.membership(body.owner_id)
     if body.language:
         out["language"] = body.language
     return out
@@ -111,9 +130,11 @@ def genesis_profile(body: GenesisCreate) -> dict:
          body.purpose, body.maturity, db.utcnow()),
     )
     conn.commit()
+    _enrol(body.owner_id, getattr(body, "plan", None))
     token = auth.issue("owner", profile_id)
     return {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
-            "owner_token": token}
+            "owner_token": token,
+            "membership": tiers.membership(body.owner_id)}
 
 
 @router.get("/profiles/{profile_id}", response_model=ProfileOut)

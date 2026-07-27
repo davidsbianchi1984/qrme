@@ -7,6 +7,7 @@ ADULT = {"birthdate": "1984-06-01"}
 
 def _profile(client, moderation_mode="auto"):
     r = client.post("/profiles", json={
+        "plan": "pro",
         "owner_id": "owner-1", "kind": "fictional", "display_name": "Test Profile",
         "persona": "A helpful studio persona.",
         "moderation_mode": moderation_mode, "verification": ADULT})

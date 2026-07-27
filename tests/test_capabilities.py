@@ -13,9 +13,15 @@ ADULT = {"birthdate": "1984-06-01"}
 
 
 def make_profile(client, **extra):
+    # Pro, where the product's own default is Basic, and deliberately so: most
+    # tests here exercise paid capabilities — the marketplace, packs, lent
+    # skills, connectors — and an account entitled to them is what a real user
+    # of those features holds. The gate itself is tested in test_tiers.py, on
+    # accounts that are explicitly Basic or visitor. Pass plan="basic" to opt
+    # a test back down.
     body = {"owner_id": "owner-1", "kind": "self", "display_name": "Dana",
             "persona": "A retired teacher who loves gardening and dry humor.",
-            "verification": ADULT}
+            "verification": ADULT, "plan": "pro"}
     body.update(extra)
     r = client.post("/profiles", json=body)
     assert r.status_code == 201, r.text

@@ -195,6 +195,9 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                 "little box", "mini window"),
     "guide": ("the guide", "the helper", "help button", "this assistant"),
     "welcome": ("the ai mark", "the mark", "the badge", "watermark"),
+    "plans": ("price", "pricing", "cost", "how much", "plan", "plans",
+              "subscription", "subscribe", "upgrade", "basic", "pro",
+              "billing", "what do i get", "free"),
 }
 
 

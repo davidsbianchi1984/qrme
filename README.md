@@ -299,6 +299,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="210" alt="The Corner Pane"></a><br><sub><b>128</b> · The Corner Pane</sub></td>
     <td align="center" width="33%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="210" alt="Where Is It"></a><br><sub><b>129</b> · Where Is It?</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="210" alt="Choose a Plan"></a><br><sub><b>130</b> · Choose a Plan</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/131-what-pro-adds.svg"><img src="docs/screens/131-what-pro-adds.svg" width="210" alt="What Pro Adds"></a><br><sub><b>131</b> · What Pro Adds</sub></td>
+    <td align="center" width="33%"></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1555,6 +1560,67 @@ repository has already shipped a screen nothing referenced.
 
 **Progress is recorded per step rather than as a cursor**, so somebody who
 skipped ahead and came back is not told they finished things they never saw.
+
+## Membership
+
+`qrme/tiers.py`, 4 routes, 26 tests, screens **130** and **131**.
+
+Two plans and a doorway below them.
+
+| | | |
+| --- | --- | --- |
+| **Visitor** | free | read any public page — a scanned beacon needs no account |
+| **Basic** | **$20/month** | make your own profiles and your own agent |
+| **Pro** | **$130/month** | everything that leaves your account: the marketplace, connectors, skills, downloads, connections, and every modifier and builder |
+
+**Money here is simulated**, exactly as in `commerce.py` — subscribing writes a
+row and moves no real funds, and every response that names a price says so in
+its own body. A test asserts nothing in the module reaches a payment processor.
+This is the one surface where a tier system would be tempted to look like a
+working checkout, which is precisely where somebody would be misled.
+
+**Visitor is a real state, not an oversight.** QRME's whole reach story is a
+stranger scanning a printed code and landing somewhere useful. A wall asking
+them to subscribe before they could read the page would break the feature the
+beacons exist for.
+
+**Enforcement is one table and one chokepoint.** `tiers.GATED` maps a path
+pattern to the capability it needs and `tiers.gate` is installed once as an
+application-wide dependency, so **no route opts in** — a capability cannot be
+added to the product and forgotten at one of its eleven endpoints. The
+alternative was a `require_plan(...)` call at the top of every paid handler,
+which is the shape this repository has already been bitten by twice: a
+docstring claiming a check the code did not make.
+
+That table is checked against the served routes rather than proof-read, and the
+first version failed. It named `/steering`, `/governance` and `/licensing` as
+prefixes; none is a route here — steering lives at `/profiles/{id}/steering` —
+so all three were **paywalls in front of a wall**. They read as protection,
+protected nothing, and would have survived indefinitely, because nothing fails
+when a pattern matches no traffic. The table is patterns now, not prefixes,
+because most paid capabilities hang off a profile.
+
+**Browsing stays open, and that is a decision.** A Basic member may look at the
+marketplace and may not list, sell, license or buy. A paywall that hides the
+shop from the person you are trying to sell to argues against itself, and the
+catalogue is public to strangers anyway — hiding it from paying members but not
+from passers-by would be incoherent.
+
+**The refusal is structured, because 402 is already spoken here.**
+`POST /packs/{id}/install` answers 402 for *this pack costs money, confirm the
+price*. Both are genuinely payment-required, so the status is right for both —
+but a client must show *upgrade* for one and *confirm* for the other, and
+telling them apart by matching on prose breaks the first time somebody rewords
+a message. So a plan refusal carries `reason: "plan"`, what it needs, what you
+have, and the price.
+
+**A membership belongs to the account, not the profile.** Per-profile would
+mean paying twice to hold two profiles, which is exactly what `identity.py`
+exists to let people do for free. Creating a profile enrols a new account on
+Basic; an existing member keeps the plan they have, because making a second
+profile must not quietly move somebody off Pro. **Cancelling keeps the
+profiles** — a lapsed subscription is not a reason to delete somebody's work,
+and a product that deleted it is one nobody could safely try.
 
 ## The pane in the corner
 

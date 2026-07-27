@@ -14,10 +14,10 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Request, Response
 
 from . import avatars as avatar_assets
-from . import mobile, offline
+from . import mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
@@ -32,12 +32,19 @@ from .routers import (apps, assistant, audience, avatars, commerce,
                       frontpage, profiles, research, revisions, robots,
                       sharing, signatures,
                       social, steering,
-                      summon, tutorial, wall, watch, watchparty, watermarks)
+                      summon, tiers as tier_routes, tutorial, wall,
+                      watch, watchparty, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
-    app = FastAPI(title="QRME", version="0.3.3")
+    # The membership gate is an application-wide dependency rather than a call
+    # at the top of each paid handler. One table, one chokepoint: a capability
+    # cannot be added to the product and forgotten at one of its routes,
+    # because no route opts in. See qrme/tiers.py for the table and for why
+    # browsing stays open.
+    app = FastAPI(title="QRME", version="0.4.0",
+                  dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
     def terms() -> dict:
@@ -110,6 +117,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(displays.router)
     app.include_router(tutorial.router)
     app.include_router(dock.router)
+    app.include_router(tier_routes.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
     app.include_router(exchange.router)

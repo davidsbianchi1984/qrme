@@ -309,6 +309,29 @@ CREATE TABLE IF NOT EXISTS tutorial_progress (
     PRIMARY KEY (learner_id, lesson)
 );
 
+-- What an account has paid for (see qrme/tiers.py). Keyed on the *account*
+-- (`profiles.owner_id`) rather than on a profile, because a membership is
+-- something a person holds and profiles are things they make with it.
+--
+-- One live row per account, enforced by ending the previous one rather than by
+-- a unique index: the history is worth keeping — "when did this account go
+-- from basic to pro" is a question a statement has to answer — and an account
+-- on two plans at once is a question nobody should face at the moment a gate
+-- is being checked.
+--
+-- Billing is simulated, like everything else money-shaped in this repository.
+-- There is no charge here, no processor and no token: the row *is* the
+-- subscription.
+CREATE TABLE IF NOT EXISTS memberships (
+    id         TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    plan       TEXT NOT NULL,          -- basic | pro
+    started_at TEXT NOT NULL,
+    ended_at   TEXT
+);
+CREATE INDEX IF NOT EXISTS memberships_live
+    ON memberships (account_id, ended_at);
+
 -- Where the helper dock sits and what it is showing (see qrme/dock.py). One
 -- row per account, absent until somebody moves it — `dock.settings` applies
 -- the defaults, so the pane draws on first launch without this row existing

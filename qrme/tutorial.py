@@ -146,6 +146,16 @@ LESSONS: tuple[dict, ...] = (
               "A fixed screen shows less than a watch does, because a wall is "
               "read by whoever walks past.",
          screens=(126,), try_it="Place one and choose what it shows."),
+    dict(key="plans", chapter="Being yourself", title="What it costs",
+         what="Basic is $20 a month and is the entry to making things: your "
+              "own profiles and your own agent. Pro is $130 a month and adds "
+              "everything that leaves your account — the marketplace, "
+              "connectors, skills, downloads, connections, and every builder. "
+              "Reading is free and always was: a scanned beacon needs no "
+              "account at all. Billing here is simulated and no real funds "
+              "move.",
+         screens=(130, 131),
+         try_it="Open Choose a Plan and read what Basic already includes."),
     dict(key="guide", chapter="Being yourself", title="This guide",
          what="The walkthrough you are in. It has no name and no face, it "
               "works with no model configured, and it never taps anything for "

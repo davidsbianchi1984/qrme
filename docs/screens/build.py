@@ -3725,6 +3725,37 @@ SCREENS = [
         dict(icon="lock", color="amber", k="It still never taps",
              s="it tells you where to"),
     ], button=("Ask the guide", "brand")),
+    # The price list. Card five is the one that has to be there: money in this
+    # repository is simulated everywhere, and a tier screen is the one place a
+    # reader would assume otherwise.
+    dict(num=130, title="Choose a Plan", sub="Basic makes, Pro reaches out",
+         accent="brand", tab=3, cards=[
+        dict(icon="person", color="cyan", k="Basic · $20/month",
+             s="your profiles, your own agent", pill=("NOW", "info")),
+        dict(icon="bolt", color="brand", k="Pro · $130/month",
+             s="all that leaves your account"),
+        dict(icon="eye", color="green", k="Visitors read free",
+             s="a scan needs no account"),
+        dict(icon="lock", color="amber", k="Cancel, keep your work",
+             s="profiles outlive the plan"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Go Pro", "brand")),
+    # What Basic cannot reach, said plainly rather than by a greyed-out row
+    # with no explanation. The last card is the design: browsing stays open.
+    dict(num=131, title="What Pro Adds", sub="The things that leave your account",
+         accent="cyan", tab=3, cards=[
+        dict(icon="grid", color="cyan", k="The marketplace",
+             s="list, sell, license, place"),
+        dict(icon="link", color="indigo", k="Connectors and apps",
+             s="reach outside services"),
+        dict(icon="share", color="green", k="Lend and borrow skills",
+             s="plus standing connections"),
+        dict(icon="sliders", color="brand", k="Builders and modifiers",
+             s="steering, governance, more"),
+        dict(icon="search", color="amber", k="Browsing stays open",
+             s="look before you pay"),
+    ], button=("Compare plans", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
