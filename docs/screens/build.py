@@ -3550,7 +3550,7 @@ SCREENS = [
              s="your face is untouched"),
         dict(icon="eye", color="green", k="Everyone here is told",
              s="they see the name, not a face"),
-        dict(icon="cross", color="red", k="Never a real person",
+        dict(icon="warn", color="red", k="Never a real person",
              s="no likeness of anybody real"),
         dict(icon="shield", color="amber", k="Never on a live desk",
              s="that badge says a real person"),
