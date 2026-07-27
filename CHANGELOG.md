@@ -377,6 +377,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   check on the design: if that route could leak anything, the wrong thing is on
   the face list.
 
+- **A guided walkthrough of the whole app** — `qrme/tutorial.py`, 6 routes,
+  16 tests, screen 127. `help.py` answers a question somebody thought to ask;
+  this is the other half of the same surface, for somebody who does not yet
+  know what there is to ask about. Seven chapters, seventeen steps, in an order
+  that introduces nothing before it exists.
+
+  **The guide has no name and no face**, structurally rather than as a style
+  choice: a tutorial guide with a persona would be the most convincing
+  synthetic profile on this platform, met by every user in their first minute,
+  at the exact moment they have the least idea what is synthetic here.
+
+  **It never taps anything for you** — every lesson says what to tap, none of
+  them taps it, and a test asserts the module writes to nothing but the
+  learner's own progress. **It works with no model configured**, like
+  `help.TOPICS`, because a walkthrough that needs an API key is missing on a
+  self-hosted deployment.
+
+  **Voice and text are one lesson rendered twice.** Spoken, a screen number is
+  noise, so `?mode=voice` drops the numbers and keeps the sentence — two
+  hand-written versions would drift and the spoken one would be the one nobody
+  re-read.
+
+  **And it cannot quietly fall behind the app.** Each lesson names the screens
+  it covers and a test asserts every screen in the gallery is claimed by one,
+  in both directions. Add a feature, draw its screen, and the walkthrough fails
+  until somebody has said what it is for.
+
 - **Channel 2 reaches the watch and the desktop** — watch face 05, desktop view
   11. The audit before tagging found the feature had screens on the phone only,
   which is the odd one out: **the watch is the device being lent.**

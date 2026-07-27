@@ -31,7 +31,7 @@ from .routers import (apps, assistant, audience, avatars, commerce,
                       frontpage, profiles, research, revisions, robots,
                       sharing, signatures,
                       social, steering,
-                      summon, wall, watch, watchparty, watermarks)
+                      summon, tutorial, wall, watch, watchparty, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -107,6 +107,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(overlay_routes.router)
     app.include_router(gamelobby.router)
     app.include_router(displays.router)
+    app.include_router(tutorial.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
     app.include_router(exchange.router)

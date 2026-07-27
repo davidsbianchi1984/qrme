@@ -299,6 +299,16 @@ CREATE TABLE IF NOT EXISTS displays (
     removed_at TEXT
 );
 
+-- How far somebody has got through the guided walkthrough. One row per step
+-- rather than a cursor, so a learner who skipped ahead and came back is not
+-- told they have finished things they never saw.
+CREATE TABLE IF NOT EXISTS tutorial_progress (
+    learner_id TEXT NOT NULL,
+    lesson     TEXT NOT NULL,
+    done_at    TEXT NOT NULL,
+    PRIMARY KEY (learner_id, lesson)
+);
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`

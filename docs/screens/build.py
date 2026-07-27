@@ -3677,6 +3677,22 @@ SCREENS = [
         dict(icon="shieldok", color="green", k="The mark gets a plate",
              s="on glass it must stay legible"),
     ], button=("Take it down", "amber")),
+    # The guided walkthrough. The third card is the one that keeps it honest:
+    # the guide has no name and no face, which on a platform full of disclosed
+    # synthetic people is the difference between furniture and a character.
+    dict(num=127, title="Show Me Around", sub="The guide, not a profile",
+         accent="brand", tab=3, cards=[
+        dict(icon="compass", color="brand", k="Seven chapters",
+             s="sixteen steps, in order", pill=("STEP 1", "info")),
+        dict(icon="speaker", color="cyan", k="Read it or hear it",
+             s="voice drops the numbers"),
+        dict(icon="mask", color="amber", k="No name, no face",
+             s="it is furniture, not somebody"),
+        dict(icon="lock", color="green", k="It never taps for you",
+             s="it tells you what to tap"),
+        dict(icon="shieldok", color="indigo", k="Every screen covered",
+             s="a test holds it to the app"),
+    ], button=("Start the tour", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

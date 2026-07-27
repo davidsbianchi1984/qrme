@@ -287,6 +287,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
     <td align="center" width="33%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="210" alt="On a Screen"></a><br><sub><b>126</b> · On a Screen</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>127</b> · Show Me Around</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1469,6 +1470,64 @@ the same reason the beacon listing is; what a given screen is *showing* is
 public, because a fixture in a corridor cannot keep a secret from the corridor.
 That last one is also the check on the whole design: if that route could leak
 anything, the wrong thing is on the face list.
+
+## Show me around — the guided walkthrough
+
+[`qrme/help.py`](#a-help-box-on-every-screen) answers a question somebody
+thought to ask. `qrme/tutorial.py` is the other half of the same surface: a
+walkthrough for somebody who does not yet know what there is to ask about.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="200" alt="Show me around"></a><br><sub><b>127</b> · seven chapters, seventeen steps</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /tutorial` | the whole walkthrough, chaptered |
+| `GET /tutorial/steps/{key}` | one named step |
+| `GET /tutorial/for-screen/{n}` | the lesson covering a given screen |
+| `POST /tutorial/start` | begin, or begin again |
+| `GET /tutorial/progress/{id}` | where a learner is, and what is next |
+| `POST /tutorial/done` | mark a step and get the next |
+
+`?mode=voice` on any of them renders it for listening instead of reading.
+
+  </td>
+  </tr>
+</table>
+
+**The guide has no name and no face**, and that is structural rather than a
+style choice. A tutorial guide with a persona would be the most convincing
+synthetic profile on this platform — met by every user in their first minute, at
+the exact moment they have the least idea what is synthetic here. It is
+furniture, and it says so.
+
+**It never taps anything for you.** Every lesson says what to tap; none of them
+taps it. A walkthrough that placed a beacon or sent a message *"to show you
+how"* would be acting on somebody's account before they understood what the
+account was. A test asserts the module writes to nothing but the learner's own
+progress.
+
+**It works with no model configured**, like `help.TOPICS` — written prose,
+matched to screens. A walkthrough that needs an API key is one that is missing
+on a self-hosted deployment, which is a supported setup here rather than a
+degraded one. A test asserts no provider reaches it.
+
+**Voice and text are one lesson rendered twice, not two scripts.** Spoken, a
+screen number is noise — nobody listening is helped by *"screen eighty-one"* —
+so voice drops the numbers and keeps the sentence. Two hand-written versions
+would drift, and the spoken one would be the one nobody re-read.
+
+**And it cannot quietly fall behind the app.** Each lesson names the screens it
+is about, and a test asserts **every screen in the gallery is claimed by some
+lesson** — both directions, so a renumbered screen also fails. Add a feature,
+draw its screen, and the walkthrough breaks until somebody has said what it is
+for. That is the only way a guided tour of a moving product stays true, and this
+repository has already shipped a screen nothing referenced.
+
+**Progress is recorded per step rather than as a cursor**, so somebody who
+skipped ahead and came back is not told they finished things they never saw.
 
 ## Friends you might know
 
