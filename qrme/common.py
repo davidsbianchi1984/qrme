@@ -53,6 +53,49 @@ def require_owner_or_interactor(profile_id: str, interactor_id: str,
     raise HTTPException(403, "not authorized for this resource")
 
 
+def require_self(subject_id: str, request: Request) -> None:
+    """The caller must **be** this party, whatever kind of subject they are.
+
+    The two-party surfaces — an agreed exchange, a lent skill, a watch party —
+    identify who is acting by an id in the request body, and an id in a body is
+    a claim rather than a fact. Without this, `{"actor_id": "<somebody else>"}`
+    is a complete impersonation: an anonymous caller could forge *both*
+    signatures on an agreement, open its channel, and accept delivery of an
+    executable on the victim's behalf. Every consent property those modules
+    describe rests on this check existing.
+
+    Deliberately not `auth.require`, which also pins the role: a party here may
+    be a profile owner or an interactor, and which of the two they are is not
+    what is being asserted. What is being asserted is that the token belongs to
+    the person the body names.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(
+            401, "authentication required — this acts on somebody's behalf, "
+                 "so it has to know it is them")
+    if who["subject_id"] != subject_id:
+        raise HTTPException(
+            403, "that is not you — an id in a request body is a claim, and "
+                 "this one does not match the token presented")
+
+
+def require_one_of(subject_ids: list[str], request: Request) -> str:
+    """The caller must be one of these parties. Returns which one they are.
+
+    For the endpoints where either side may act — reopening an agreement,
+    closing a grant — and where the answer is also needed, so the handler does
+    not have to ask twice.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who["subject_id"] not in subject_ids:
+        raise HTTPException(
+            403, "only the people involved in this can act on it")
+    return who["subject_id"]
+
+
 def interactor_or_404(interactor_id: str) -> dict:
     row = db.connect().execute(
         "SELECT * FROM interactors WHERE id=?", (interactor_id,)

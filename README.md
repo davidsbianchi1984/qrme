@@ -269,7 +269,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/116-lend-a-skill.svg"><img src="docs/screens/116-lend-a-skill.svg" width="210" alt="Lend a Skill"></a><br><sub><b>116</b> · Lend a Skill</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/117-edit-a-message.svg"><img src="docs/screens/117-edit-a-message.svg" width="210" alt="Edit a Message"></a><br><sub><b>117</b> · Edit a Message</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -841,6 +841,8 @@ including what a camera app can and cannot actually do with a QR code.
 
 ## Editing what you already said
 
+<img src="docs/screens/117-edit-a-message.svg" width="210" align="right" alt="Edit a Message">
+
 `PATCH` and `DELETE /profiles/{id}/messages/{message_id}`. A conversation is
 not a courtroom transcript: people mistype, give the wrong year, say a thing
 badly. On this platform that matters more than usual, because what somebody
@@ -1135,6 +1137,39 @@ it mid-sentence.
 | to open | both, and only the person it was offered to may accept |
 | to close | either, alone |
 | transferred | nothing |
+
+## Who these surfaces think you are
+
+An exchange, a lent skill and a watch party all name the acting party in the
+request body — `actor_id`, `host_id`, `borrower_id`. **An id in a body is a
+claim, not a fact**, and `common.require_self` is what turns it into one: the
+token presented has to belong to the person the body names.
+
+That check was missing when those three shipped, and the gap was total. An
+anonymous caller could forge *both* signatures on somebody else's agreement,
+open its channel, and accept delivery of an executable on their behalf; accept
+and use a skill somebody lent to a third party; or seize the scrubber in a
+watch party by passing the host's id. Every consent property the three modules
+describe rested on a check that did not exist — the modules were right and the
+doors were open.
+
+| surface | who may act | who may read |
+| --- | --- | --- |
+| an exchange | the two parties, each only as themselves | the two parties — a manifest names somebody's files, their sizes and what the work is worth |
+| a lent skill | the lender offers; the borrower accepts, declines and uses; either closes | the two parties, plus the borrower's own view of the log kept about them |
+| a watch party | the host seeks and ends; a member speaks only as themselves, or as a profile they own | members only |
+
+Two details worth stating because they are easy to get subtly wrong. Bringing a
+**synthetic profile** into a room speaks in its voice, so it is its owner's call
+and nobody else's. And the surface listing was narrowed: it was meant to be
+"what the room can see about itself", but there is no room-membership check to
+hang that on, and without one it listed who was lending what to whom to anybody
+who guessed the id. It now shows the caller's own grants, and says so.
+
+`tests/test_two_party_auth.py` holds all of it. Each case is asserted twice —
+once against an anonymous caller and once against **a valid token belonging to
+the wrong person**, because a test that only tries the first passes against a
+system that accepts any logged-in user as anybody.
 
 ## Watch parties, and a profile that has not seen the video
 

@@ -190,8 +190,22 @@ def test_a_profiles_line_is_marked_as_a_profiles(client):
     assert line["synthetic"] is True
 
 
-def test_the_route_publishes_the_blindness(client):
+def test_the_route_publishes_the_blindness_to_members_only(client):
+    """Two properties in one place, because they were added at different times
+    and the second broke this test.
+
+    The context is what a synthetic profile in the room is told, and it says it
+    has not watched. It is also the room's private state, so it is readable by
+    the people in the room and nobody else — this test used to call it with no
+    token at all and pass, which is exactly the gap `require_self` closed.
+    """
     me, post = _video_post(client)
-    party = watchparty.start(post["id"], "person_1")
-    r = client.get(f"/watch-parties/{party['id']}/context").json()
-    assert r["you_have_not_seen_it"] is True
+    party = watchparty.start(post["id"], me["id"])
+
+    r = client.get(f"/watch-parties/{party['id']}/context",
+                   headers=auth_header(me))
+    assert r.status_code == 200
+    assert r.json()["you_have_not_seen_it"] is True
+
+    assert client.get(f"/watch-parties/{party['id']}/context",
+                      headers={"authorization": ""}).status_code == 401

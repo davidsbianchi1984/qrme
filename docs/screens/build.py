@@ -3450,6 +3450,22 @@ SCREENS = [
         dict(icon="cross", color="red", k="Either of you can stop it",
              s="alone, with no agreement needed"),
     ], button=("Accept the loan", "brand")),
+    # Editing what you already said. The screen exists because the feature is
+    # invisible otherwise: the interesting part is not the edit box, it is what
+    # happens to the answer that was written under the old wording.
+    dict(num=117, title="Edit a Message", sub="The correction carries forward",
+         accent="brand", tab=0, cards=[
+        dict(icon="pen", color="brand", k="“Born in 1985.”",
+             s="edited — it said 1885", pill=("EDITED", "info")),
+        dict(icon="chat", color="amber", k="Answered the old",
+             s="written before your edit", pill=("STALE", "warn")),
+        dict(icon="shieldok", color="green", k="Re-moderated on edit",
+             s="not a way past the filter"),
+        dict(icon="eye", color="cyan", k="The next turn reads 1985",
+             s="history is rebuilt every turn"),
+        dict(icon="doc", color="red", k="Retract keeps the row",
+             s="text stops counting, trail stays"),
+    ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
