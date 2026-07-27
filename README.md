@@ -255,7 +255,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="210" alt="My Page"></a><br><sub><b>85</b> · My Page</sub></td>
     <td align="center" width="33%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="210" alt="Customise"></a><br><sub><b>86</b> · Customise</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="210" alt="For You"></a><br><sub><b>87</b> · For You</sub></td>
   </tr>
 </table>
 
@@ -506,6 +506,13 @@ The PRD conformance map — every numbered feature in
   proves the posture.
 - Delete anything, anytime: erasing a profile removes every local trace and
   purges its vault records; the owner token dies with it.
+- **The For You feed does not read any of it.** A ranked feed is a new use of a
+  person's data and would have quietly made the rest of this page less true, so
+  the line is drawn narrowly: it ranks on what you did *in public* — who you are
+  friends with, which profiles you have talked to, the tags on those profiles,
+  and what has been liked. It never touches source material, memories, or
+  anything vaulted. That is asserted by a test against the ranking's own
+  queries, not merely stated here.
 
 ## Training-data licensing & derivable agents
 
@@ -643,6 +650,57 @@ account and no other way to know.
 everybody who scans the same sticker is talking to the profile together — a
 class, a workshop, a Q&A after a set. See [docs/beacons.md](docs/beacons.md),
 including what a camera app can and cannot actually do with a QR code.
+
+## The community wall, and the feed
+
+A profile publishes to its wall (`POST /profiles/{id}/wall`); other people see
+some of it in their feed (`GET /profiles/{id}/feed`). Publishing is the easy
+half. The feed is where the decisions are.
+
+**Likes, comments and shares are not new.** The audience layer already carried
+those four verbs against a `(kind, id)` pair, and `post` is now one of its
+target kinds — so a like on a post is the same row shape, and the same
+`UNIQUE (target, actor)`, as a like on a profile. No parallel tables, and none
+of the drift a second set would have grown within a round.
+
+**Every post says why it is in front of you.** Each entry carries a `reason` in
+plain words — *a friend posted this*, *you have talked to this profile*,
+*popular with people here*. A ranked feed that cannot explain itself is one
+nobody can audit, including whoever wrote it, and the explanation costs a
+string. `GET .../feed` also returns its own weights, so the ranking can be
+argued with rather than merely accepted:
+
+| signal | weight | |
+| --- | --- | --- |
+| a friend posted it | 100 | you chose to stand with them |
+| you have talked to the profile | 60 | you were actually there |
+| tags you engage with | 25 | it works in something you follow |
+| likes | 2 each, **capped at 40** | popularity contributes, it does not decide |
+| recency | up to 10 | a tiebreak, not the ranking |
+
+The cap is the interesting one. Uncapped, a single heavily-liked stranger
+outranks every friend you have — which is the failure mode people actually
+complain about, and a test pins it.
+
+<table>
+  <tr>
+    <td align="center" width="40%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="230" alt="For You"></a></td>
+    <td valign="middle">
+
+Every row on the feed screen carries its reason and its score, and the last row
+says what the ranking will never look at. That is the screen doing the same job
+as the API: a feed you cannot interrogate is one you have to take on trust.
+
+  </td>
+  </tr>
+</table>
+
+**Moderation runs on the way in and on the way out.** Every post passes the
+same filter as a chat turn; a blocked one is kept, returned to its author with
+the reason, and invisible to everyone else. On the way out, an adult profile's
+posts are walled out of an ordinary feed — a gate inherited from the *author*
+rather than judged per post, because otherwise an adult profile publishes past
+its own wall by writing something innocuous.
 
 ## The page you make yourself
 

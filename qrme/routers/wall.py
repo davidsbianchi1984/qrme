@@ -1,0 +1,66 @@
+"""The community wall and the For You feed.
+
+Mounted at ``/profiles/{id}/wall`` rather than ``/posts``: ``interaction.py``
+already owns that path for composed posts, and shadowing it made this route
+return the other one's rows — which looked like a serialisation bug rather than
+a collision.
+
+Likes, comments and shares are not here — `post` is a target kind in the
+audience layer, so `POST /posts/{id}/like` already works and is the same row
+shape as a like on a profile.
+"""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel, Field
+
+from .. import wall
+from ..common import profile_or_404, require_owner
+
+router = APIRouter()
+
+
+class PostCreate(BaseModel):
+    body: str = Field(min_length=1, max_length=wall.MAX_BODY)
+
+
+@router.post("/profiles/{profile_id}/wall", status_code=201)
+def create_post(profile_id: str, body: PostCreate, request: Request) -> dict:
+    """Publish to the wall. Moderated on the way in; a blocked post comes back
+    to its author with the reason and is invisible to everyone else."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return wall.publish(profile_id, body.body)
+    except wall.WallError as exc:
+        raise HTTPException(422, str(exc)) from None
+
+
+@router.get("/profiles/{profile_id}/wall")
+def list_posts(profile_id: str) -> dict:
+    """One profile's wall, newest first."""
+    profile_or_404(profile_id)
+    return {"profile_id": profile_id, "posts": wall.wall(profile_id)}
+
+
+@router.get("/profiles/{profile_id}/feed")
+def feed(profile_id: str, limit: int = 25, adult: bool = False) -> dict:
+    """The For You feed, most relevant first — and why each one is there.
+
+    Ranked on public actions only: friendships, engagement, marketplace tags
+    and likes. Never source material, memories, or anything vaulted. The
+    weights are returned so the ranking can be argued with rather than merely
+    accepted.
+    """
+    profile_or_404(profile_id)
+    return {
+        "profile_id": profile_id,
+        "posts": wall.for_you(profile_id, limit=limit, adult_ok=adult),
+        "ranked_on": ["friends", "profiles you have talked to",
+                      "tags you engage with", "likes", "recency"],
+        "never_ranked_on": ["source material", "memories", "vaulted data"],
+        "weights": {"friend": wall.W_FRIEND, "talked": wall.W_TALKED,
+                    "tag": wall.W_TAG, "like": wall.W_LIKES,
+                    "like_cap": wall.W_LIKES_CAP},
+    }

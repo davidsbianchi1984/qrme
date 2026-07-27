@@ -28,7 +28,8 @@ router = APIRouter()
 # Mapping here rather than exposing `/profile/{id}/like` keeps these endpoints
 # reading like the routes they sit beside instead of like a separate API.
 _KIND_BY_PATH = {"profiles": "profile", "desks": "desk",
-                 "messages": "message", "listings": "listing"}
+                 "messages": "message", "listings": "listing",
+                 "posts": "post"}
 
 
 def _kind(path_kind: str) -> str:

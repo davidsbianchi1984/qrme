@@ -45,7 +45,7 @@ from . import db, ledger, moderation
 # What can be liked, commented on or shared. Kept as a closed set so a typo
 # in a path parameter cannot silently create a fifth kind of thing that no
 # listing endpoint will ever read back.
-TARGETS = ("profile", "desk", "message", "listing")
+TARGETS = ("profile", "desk", "message", "listing", "post")
 
 # What can be subscribed to. A message and a listing cannot: subscribing means
 # "tell me when there is more from them", and neither produces more.
@@ -86,7 +86,8 @@ def target_exists(kind: str, target_id: str) -> bool:
     and the first person to notice would be whoever tried to explain a total.
     """
     table = {"profile": "profiles", "desk": "desks",
-             "message": "room_messages", "listing": "listings"}[kind]
+             "message": "room_messages", "listing": "listings",
+             "post": "posts"}[kind]
     return db.connect().execute(
         f"SELECT 1 FROM {table} WHERE id=?", (target_id,)).fetchone() is not None
 
@@ -106,6 +107,14 @@ def is_rated(kind: str, target_id: str) -> bool:
         row = db.connect().execute(
             "SELECT adult_mode FROM profiles WHERE id=?",
             (target_id,)).fetchone()
+        return bool(row and row["adult_mode"])
+    if kind == "post":
+        # A post inherits the gate from whoever wrote it. Deciding it per post
+        # would mean an adult profile could publish past its own wall by
+        # writing something innocuous.
+        row = db.connect().execute(
+            "SELECT p.adult_mode FROM posts o JOIN profiles p"
+            " ON p.id = o.profile_id WHERE o.id=?", (target_id,)).fetchone()
         return bool(row and row["adult_mode"])
     return False
 

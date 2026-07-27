@@ -701,10 +701,17 @@ CREATE TABLE IF NOT EXISTS finetune_runs (
 
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
+-- Posts a profile publishes. `surface` says where: a social platform via
+-- social.py, or 'wall' for the community wall (qrme/wall.py).
+--
+-- The wall reuses this rather than adding a second posts table. It already had
+-- a surface column, an author, content and a moderation verdict, which is the
+-- whole of what a wall post is — and likes, comments and shares are not here
+-- at all, because `post` is a target kind in the audience layer.
 CREATE TABLE IF NOT EXISTS posts (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),
-    surface      TEXT,
+    surface      TEXT,            -- external platform name, or 'wall'
     topic        TEXT,
     content      TEXT NOT NULL,
     status       TEXT NOT NULL,  -- approved | pending | rejected

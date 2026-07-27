@@ -2421,6 +2421,16 @@ SCREENS = [
                   ("Ingrid", frames.PORTRAITS[6][1])])),
     # The editor behind it. A closed set of themes, because the version of
     # this that took raw markup is why MySpace is a security lesson.
+    # The feed. Every row says why it is there, which is the part that makes a
+    # ranked feed auditable rather than merely effective.
+    dict(num=87, title="For You", sub="And why each one is here",
+         accent="cyan", tab=0, cards=[
+        dict(icon="person", color="green", k="Marcus Bell", s="a friend posted this", pill=("110", "good")),
+        dict(icon="person", color="cyan", k="Dr. Amara Osei", s="you have talked to this profile", pill=("70", "good")),
+        dict(icon="chart", color="amber", k="Priya Raman", s="you engage with technology", pill=("35", "warn")),
+        dict(icon="eye", color="indigo", k="Wren Okafor", s="popular with people here", pill=("28", "info")),
+        dict(icon="shield", color="red", k="Never ranked on", s="memories · source material · vault"),
+    ]),
     dict(num=86, title="Customise", sub="Themes, colour, your Top 8",
          accent="amber", tab=0, cards=[
         dict(icon="sparkle", color="amber", k="Theme", s="Sunset · six presets", pill=("PICKED", "good")),

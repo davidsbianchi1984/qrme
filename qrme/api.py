@@ -27,7 +27,7 @@ from .routers import (apps, assistant, audience, avatars, commerce,
                       intelligence, interaction, licensing, models, packs, pages,
                       frontpage, profiles, research, robots, signatures,
                       social, steering,
-                      summon, watch, watermarks)
+                      summon, wall, watch, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -99,6 +99,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(connections.router)
     app.include_router(friends.router)
     app.include_router(pages.router)
+    app.include_router(wall.router)
     app.include_router(social.router)
     app.include_router(apps.router)
     app.include_router(research.router)
