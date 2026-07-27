@@ -278,7 +278,7 @@ def friends_list(y, entries):
     out, yy = [], y
     for entry in entries:
         name, sub, b64, badge = entry[:4]
-        packs = entry[4] if len(entry) > 4 else 0
+        packs = entry[4] if len(entry) > 4 else []
         # The founder's row gives up its right end to the badge, so its
         # subtitle has less room than the others. Caught here rather than in a
         # render, which is how the same overlap got shipped on the agent groups.
@@ -290,17 +290,27 @@ def friends_list(y, entries):
             out.append(face(CX + 33, yy + 30, 40, b64))
         else:
             out.append(orb(CX + 33, yy + 30, 19))
-        # Knowledge packs, beside the face rather than in the subtitle: it is a
-        # property of what the profile *knows*, and it belongs next to the
-        # thing it qualifies.
-        if packs:
-            word = "PACK" if packs == 1 else "PACKS"
-            out.append(rrect(CX + 12, yy + 55, 42, 13, 6,
-                             A(C["cyan"], 0.2), C["cyan"], 0.9))
-            out.append(text(CX + 33, yy + 64, f"{packs} {word}", 6.5,
-                            C["cyan"], 800, "middle", 0.3))
+
         out.append(text(CX + 62, yy + 32, name, 13, C["txt"], 700))
-        out.append(text(CX + 62, yy + 49, sub, 9.5, C["t2"], 500))
+        out.append(text(CX + 62, yy + 47, sub, 9.5, C["t2"], 500))
+        # The packs a profile carries, named rather than counted — "4 packs"
+        # says how much it knows, the names say what about. Sits under the
+        # name because covering a face to label it is the wrong trade, and
+        # overflows to +N rather than running under the badge.
+        if packs:
+            avail = (CW - 52 - 12) - 62          # left edge to the badge
+            shown, used = [], 0.0
+            for i, nm in enumerate(packs):
+                w = len(nm) * 3.9 + (7 if shown else 0)
+                tail = 22 if i < len(packs) - 1 else 0
+                if used + w + tail > avail:
+                    break
+                shown.append(nm)
+                used += w
+            line = " · ".join(shown)
+            if len(shown) < len(packs):
+                line += f"  +{len(packs) - len(shown)}"
+            out.append(text(CX + 62, yy + 61, line, 7.5, C["cyan"], 600))
         if badge:
             col = C["gold"] if badge == "VERIFIED" else C["brandA"]
             bw = 52
@@ -2410,9 +2420,14 @@ SCREENS = [
         # unbadged one is something else.
         ("David Bianchi", "CEO/Imagineer",
          frames.FOUNDER_VERIFIED[1], "VERIFIED"),
-        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI", 4),
-        ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], "AI", 1),
-        ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], "AI", 1),
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI",
+         ["technology", "cybersecurity", "science", "telecom"]),
+        # The subtitle carries the relationship; the pack line carries what
+        # they know. Naming the industry in both just says it twice.
+        ("Marcus Bell", "mutual friend", frames.PORTRAITS[1][1], "AI",
+         ["finance"]),
+        ("Dr. Amara Osei", "mutual friend", frames.PORTRAITS[0][1], "AI",
+         ["healthcare"]),
     ]),
     # The page somebody made, in their own colours. Drawn in the page's theme
     # rather than the app's, because a homepage that looks like every other
