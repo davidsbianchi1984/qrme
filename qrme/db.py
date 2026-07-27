@@ -198,6 +198,157 @@ CREATE TABLE IF NOT EXISTS room_mics (
     ended_at      TEXT
 );
 
+-- Channel 2 everywhere else: the same lent wearable, on the surfaces that are
+-- not a room — a watch party, a live desk's stream, a one-to-one connection.
+--
+-- A separate table from `room_mics` rather than a column added to it, because
+-- this schema has no migrations: `CREATE TABLE IF NOT EXISTS` reaches a fresh
+-- database and an ALTER reaches none of the existing ones. A new table is the
+-- only shape that arrives everywhere.
+--
+-- Rooms deliberately do **not** write here. Two storage paths for one surface
+-- is how a disclosure ends up reading one table while the grant sits in the
+-- other, and a microphone that is live but undisclosed is the single worst
+-- failure this feature has. `roommic.lend_on` refuses `surface='room'` and
+-- points at the room routes.
+CREATE TABLE IF NOT EXISTS place_mics (
+    id            TEXT PRIMARY KEY,
+    surface       TEXT NOT NULL,   -- party | desk | connection
+    surface_id    TEXT NOT NULL,
+    interactor_id TEXT NOT NULL,
+    device        TEXT NOT NULL,
+    mic_type      TEXT NOT NULL DEFAULT 'watch',
+    requested_gain TEXT NOT NULL DEFAULT 'near_field',
+    gain          TEXT NOT NULL DEFAULT 'near_field',
+    started_at    TEXT NOT NULL,
+    ended_at      TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_place_mics_live
+    ON place_mics (surface, surface_id) WHERE ended_at IS NULL;
+
+-- Overlays: a character worn over a person's own camera. Permission and state
+-- only — the compositing happens on the device, like capture.
+--
+-- `removed_at` rather than a delete, so "who was wearing what, when" survives
+-- the overlay coming off: a viewer who saw a face and later wants to know what
+-- they were actually looking at has an answer.
+CREATE TABLE IF NOT EXISTS overlays (
+    id            TEXT PRIMARY KEY,
+    interactor_id TEXT NOT NULL,
+    surface       TEXT NOT NULL,   -- room | party | connection | stream | desk
+    surface_id    TEXT NOT NULL,
+    -- mask | character | creature | puppet | helmet_hud | touch_up | backdrop.
+    -- See qrme/overlays.py:KINDS — the ones that cover a face are disclosed
+    -- differently from the ones that do not, because they are different claims
+    -- about what the viewer is seeing.
+    kind          TEXT NOT NULL,
+    title         TEXT NOT NULL,   -- shown to everyone who can see the wearer
+    asset         TEXT,
+    -- Where the picture behind them came from: own | imported | generated |
+    -- blur. Only meaningful for `backdrop`. `generated` is synthetic media
+    -- even though the person in front of it is real, and the two are disclosed
+    -- separately because they are separate claims.
+    --
+    -- Added to the CREATE rather than by an ALTER because this table has never
+    -- been in a release — it was introduced earlier in this same unreleased
+    -- branch, so no deployment has it. A working copy that ran the
+    -- intermediate commit needs its dev database recreated.
+    source        TEXT,
+    worn_at       TEXT NOT NULL,
+    removed_at    TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_overlays_live
+    ON overlays (surface, surface_id) WHERE removed_at IS NULL;
+
+-- The picture an anonymous profile shows instead of a face. One row per
+-- profile, and a **separate table from `profiles.avatar`** on purpose: the two
+-- are pictures for two different states, exactly like a display name and an
+-- anonymous one. Writing this into `avatar` would mean turning anonymity off
+-- showed it instead of the face somebody actually has.
+--
+-- Either a preset emblem key (qrme/identity.py:EMBLEM_FIELDS) or an image the
+-- owner uploaded — never both, and neither is required: no row means the plain
+-- silhouette. It briefly held emblems only, on the reasoning that a closed set
+-- was the enforcement against uploading a face; that made the feature useless
+-- to somebody who wants a picture of their own workshop, and what the platform
+-- cannot check it says plainly instead of pretending to prevent.
+CREATE TABLE IF NOT EXISTS anonymous_pictures (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    emblem     TEXT,           -- a preset field emblem, or NULL
+    asset      TEXT,           -- or their own image, or NULL
+    set_at     TEXT NOT NULL
+);
+
+-- A profile on a screen that stays where it is: a wall panel, a kiosk, a pane
+-- of glass. The watch-face idea (qrme/wearables.py:FACES) for fixtures, with a
+-- shorter list of things that may be shown — a watch is read by its wearer, a
+-- wall by whoever walks past.
+--
+-- `removed_at` rather than a delete, like an unpaired wearable: a profile that
+-- was on a lobby wall for a year should still be able to say where it was.
+CREATE TABLE IF NOT EXISTS displays (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,   -- wall_panel | kiosk | counter_screen | …
+    label      TEXT NOT NULL,   -- what the owner calls it: "the lobby panel"
+    location   TEXT,
+    size       TEXT NOT NULL DEFAULT 'full',      -- badge | half | full
+    finish     TEXT NOT NULL DEFAULT 'opaque',    -- opaque | transparent
+    faces      TEXT NOT NULL DEFAULT '[]',        -- JSON list, see displays.FACES
+    placed_at  TEXT NOT NULL,
+    removed_at TEXT
+);
+
+-- How far somebody has got through the guided walkthrough. One row per step
+-- rather than a cursor, so a learner who skipped ahead and came back is not
+-- told they have finished things they never saw.
+CREATE TABLE IF NOT EXISTS tutorial_progress (
+    learner_id TEXT NOT NULL,
+    lesson     TEXT NOT NULL,
+    done_at    TEXT NOT NULL,
+    PRIMARY KEY (learner_id, lesson)
+);
+
+-- What an account has paid for (see qrme/tiers.py). Keyed on the *account*
+-- (`profiles.owner_id`) rather than on a profile, because a membership is
+-- something a person holds and profiles are things they make with it.
+--
+-- One live row per account, enforced by ending the previous one rather than by
+-- a unique index: the history is worth keeping — "when did this account go
+-- from basic to pro" is a question a statement has to answer — and an account
+-- on two plans at once is a question nobody should face at the moment a gate
+-- is being checked.
+--
+-- Billing is simulated, like everything else money-shaped in this repository.
+-- There is no charge here, no processor and no token: the row *is* the
+-- subscription.
+CREATE TABLE IF NOT EXISTS memberships (
+    id         TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    plan       TEXT NOT NULL,          -- basic | pro
+    started_at TEXT NOT NULL,
+    ended_at   TEXT
+);
+CREATE INDEX IF NOT EXISTS memberships_live
+    ON memberships (account_id, ended_at);
+
+-- Where the helper dock sits and what it is showing (see qrme/dock.py). One
+-- row per account, absent until somebody moves it — `dock.settings` applies
+-- the defaults, so the pane draws on first launch without this row existing
+-- and the defaults are written down in exactly one place.
+--
+-- Preferences only. Nothing about the dock is a capability: the pane shows and
+-- routes, and this table cannot grant it anything, because there is nothing to
+-- grant.
+CREATE TABLE IF NOT EXISTS dock_prefs (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    corner     TEXT NOT NULL DEFAULT 'bottom_right',  -- bottom_right | bottom_left
+    state      TEXT NOT NULL DEFAULT 'handle',        -- hidden | handle | open
+    face       TEXT NOT NULL DEFAULT 'helper',
+    faces      TEXT NOT NULL,                         -- JSON array
+    updated_at TEXT NOT NULL
+);
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`
@@ -579,6 +730,26 @@ CREATE TABLE IF NOT EXISTS game_sessions (
     created_at TEXT NOT NULL
 );
 
+-- The lobby: more than one synthetic thing in a game session. `game_sessions`
+-- seats exactly one profile; this is the roster beside the real players — other
+-- profiles, and running workflows as `agent` members.
+--
+-- `left_at` rather than a delete, because who was in a match is the record a
+-- fair-play question is answered from later, and deleting the row destroys the
+-- only evidence that the answer was fine.
+CREATE TABLE IF NOT EXISTS game_lobby (
+    id          TEXT PRIMARY KEY,
+    session_id  TEXT NOT NULL REFERENCES game_sessions(id),
+    member_kind TEXT NOT NULL,   -- player | profile | agent
+    member_id   TEXT NOT NULL,
+    role        TEXT NOT NULL,   -- see qrme/gamelobby.py:SEATS
+    callsign    TEXT,
+    joined_at   TEXT NOT NULL,
+    left_at     TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_game_lobby_live
+    ON game_lobby (session_id) WHERE left_at IS NULL;
+
 -- Steering: how the owner shapes a subject's presentation (a profile or a
 -- robot) — throttle/behavior dials as JSON of dial -> 0..100; absent dials
 -- read as the 50 default. Steering, not piloting: shapes style/pace/behavior
@@ -701,10 +872,211 @@ CREATE TABLE IF NOT EXISTS finetune_runs (
 
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
+-- A wearable paired over Bluetooth: a watch, a band, a ring, earbuds.
+--
+-- Distinct from `embodiments`, which is where a *profile* lives — a speaker, a
+-- hologram, a robot. This is hardware belonging to the **owner**, paired to
+-- reach their own account: the wrist is a control surface, not a place a
+-- persona is embodied. Running them together would mean pairing a watch could
+-- put somebody's synthetic profile on it.
+--
+-- Only the pairing and what it is allowed to show. No sensor stream, no
+-- capture, nothing about a microphone — a paired watch here is a screen and a
+-- set of buttons.
+CREATE TABLE IF NOT EXISTS wearables (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    name         TEXT NOT NULL,
+    kind         TEXT NOT NULL,   -- watch | band | ring | earbuds | glasses
+    transport    TEXT NOT NULL DEFAULT 'bluetooth',
+    faces        TEXT NOT NULL DEFAULT '[]',  -- JSON: which faces are enabled
+    paired_at    TEXT NOT NULL,
+    last_seen_at TEXT,
+    revoked_at   TEXT,
+    UNIQUE (profile_id, name)
+);
+
+-- What a post is promoting, when it is promoting something. A separate table
+-- because `posts` shipped before this and the schema has no migrations, so a
+-- new column would reach a fresh database and miss every existing one.
+CREATE TABLE IF NOT EXISTS post_attachments (
+    post_id    TEXT PRIMARY KEY REFERENCES posts(id),
+    listing_id TEXT NOT NULL REFERENCES listings(id),
+    created_at TEXT NOT NULL
+);
+
+-- A skill one person lends another, inside a place they are both already in.
+--
+-- `skill_ref` is a *reference* to something the lender already has — a pack id,
+-- a robot task name, a language pair. Never a copy: packs here are bought and
+-- licensed, and a lending feature that duplicated them would be a piracy tool
+-- with a consent dialog on the front. See qrme/sharing.py.
+--
+-- Two people open a grant; either one closes it. `closed_by` records which,
+-- because "I ended it" and "they ended it" are different facts to both of them.
+CREATE TABLE IF NOT EXISTS skill_grants (
+    id           TEXT PRIMARY KEY,
+    lender_id    TEXT NOT NULL,
+    borrower_id  TEXT NOT NULL,
+    surface      TEXT NOT NULL,   -- room | desk | party | connection | exchange
+    surface_id   TEXT NOT NULL,
+    skill_kind   TEXT NOT NULL,   -- pack | robot_task | profession | language | workflow
+    skill_ref    TEXT NOT NULL,
+    title        TEXT NOT NULL,
+    note         TEXT,
+    fee          REAL NOT NULL DEFAULT 0,
+    state        TEXT NOT NULL,   -- offered | active | declined | closed
+    offered_at   TEXT NOT NULL,
+    accepted_at  TEXT,
+    closed_at    TEXT,
+    closed_by    TEXT,
+    close_reason TEXT
+);
+
+-- Every invocation of a lent skill. This is the lender's log, and it is the
+-- reason a grant is worth agreeing to: you can watch it being used, and stop it
+-- mid-sentence. "Both parties choose" is a slogan without it.
+CREATE TABLE IF NOT EXISTS skill_uses (
+    id          TEXT PRIMARY KEY,
+    grant_id    TEXT NOT NULL REFERENCES skill_grants(id),
+    borrower_id TEXT NOT NULL,
+    what        TEXT,
+    used_at     TEXT NOT NULL
+);
+
+-- Two people agreeing, in writing, on work about to change hands.
+--
+-- `state` is the whole safety story: only `draft` is editable, and any edit
+-- deletes the signature rows, so a signature can never be attached to a
+-- manifest its signer did not read. See qrme/exchange.py.
+CREATE TABLE IF NOT EXISTS exchanges (
+    id         TEXT PRIMARY KEY,
+    desk_id    TEXT,                -- the desk it came out of, when it did
+    host_id    TEXT NOT NULL,
+    guest_id   TEXT NOT NULL,
+    work       TEXT NOT NULL,       -- one sentence: what is being done
+    industry   TEXT NOT NULL,
+    includes   TEXT,                -- JSON list: what is delivered at the end
+    excludes   TEXT,                -- JSON list: what is not, said out loud
+    fee        REAL NOT NULL DEFAULT 0,
+    state      TEXT NOT NULL,       -- draft|proposed|signed|delivered|closed|withdrawn
+    created_at TEXT NOT NULL
+);
+
+-- Every artifact named on a manifest, in both directions. `accepted_at` is the
+-- second consent: a signed agreement makes an item available, and this is the
+-- receiving side actually taking it.
+CREATE TABLE IF NOT EXISTS exchange_items (
+    id          TEXT PRIMARY KEY,
+    exchange_id TEXT NOT NULL REFERENCES exchanges(id),
+    direction   TEXT NOT NULL,      -- host_to_guest | guest_to_host
+    name        TEXT NOT NULL,
+    kind        TEXT NOT NULL,
+    bytes       INTEGER NOT NULL DEFAULT 0,
+    note        TEXT,
+    accepted_at TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- A signature against a *fingerprint*, never against an exchange id. That is
+-- what lets `channel()` tell a current signature from a stale one without
+-- anything having to remember to clear it.
+CREATE TABLE IF NOT EXISTS exchange_signatures (
+    exchange_id TEXT NOT NULL REFERENCES exchanges(id),
+    party_id    TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    signed_at   TEXT NOT NULL,
+    PRIMARY KEY (exchange_id, party_id)
+);
+
+-- Watching something together. The party holds a *position*, not a player:
+-- each viewer's own video still loads only when they press play, which is the
+-- promise post_videos above is built on. See qrme/watchparty.py.
+CREATE TABLE IF NOT EXISTS watch_parties (
+    id         TEXT PRIMARY KEY,
+    post_id    TEXT NOT NULL REFERENCES posts(id),
+    host_id    TEXT NOT NULL,
+    title      TEXT,
+    position_s INTEGER NOT NULL DEFAULT 0,
+    playing    INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+
+-- Who is in the room. `kind` separates a real account from a synthetic
+-- profile, because nearly every rule differs between them — and because a room
+-- where you cannot tell which of the names is a person is the room this
+-- platform exists not to build.
+CREATE TABLE IF NOT EXISTS watch_party_members (
+    id        TEXT PRIMARY KEY,
+    party_id  TEXT NOT NULL REFERENCES watch_parties(id),
+    member_id TEXT NOT NULL,
+    kind      TEXT NOT NULL,        -- person | profile
+    role      TEXT NOT NULL,        -- host | guest
+    joined_at TEXT NOT NULL,
+    left_at   TEXT,
+    UNIQUE (party_id, member_id)
+);
+
+-- The party chat, each line stamped with the position it was said at so a
+-- comment about a moment stays attached to that moment. Moderated like every
+-- other utterance; a blocked line is kept rather than dropped.
+CREATE TABLE IF NOT EXISTS watch_party_lines (
+    id          TEXT PRIMARY KEY,
+    party_id    TEXT NOT NULL REFERENCES watch_parties(id),
+    member_id   TEXT NOT NULL,
+    kind        TEXT NOT NULL,
+    body        TEXT NOT NULL,
+    position_s  INTEGER NOT NULL DEFAULT 0,
+    status      TEXT NOT NULL,
+    flag_reason TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- A video a post is pointing at, on somebody else's platform.
+--
+-- The link and the id, never the file and never a thumbnail: re-hosting
+-- somebody's video is a copyright problem and a cached thumbnail is a copy of
+-- an image nobody granted. `title` is what the poster typed, not what was
+-- scraped from the other site — which is both the honest attribution and the
+-- reason nothing here has to make a request to render.
+--
+-- Separate table for the same reason as post_attachments above: no migrations.
+CREATE TABLE IF NOT EXISTS post_videos (
+    post_id    TEXT PRIMARY KEY REFERENCES posts(id),
+    platform   TEXT NOT NULL,
+    video_id   TEXT NOT NULL,
+    url        TEXT NOT NULL,
+    title      TEXT,
+    created_at TEXT NOT NULL
+);
+
+-- Edits to a message already sent. One row per revision, so the trail is the
+-- history rather than only the latest text.
+--
+-- A separate table on purpose: this schema is CREATE TABLE IF NOT EXISTS with
+-- no migrations, so adding columns to `messages` would reach a fresh database
+-- and silently miss every existing one. Retraction needs no new column at all —
+-- it writes `retracted` into the status the history query already filters on.
+CREATE TABLE IF NOT EXISTS message_revisions (
+    id          TEXT PRIMARY KEY,
+    message_id  TEXT NOT NULL REFERENCES messages(id),
+    was         TEXT NOT NULL,        -- the text this revision replaced
+    became      TEXT,                 -- NULL when the edit was a retraction
+    reason      TEXT,                 -- moderation flag, when one applied
+    edited_at   TEXT NOT NULL
+);
+
+-- Posts a profile publishes. `surface` says where: a social platform via
+-- social.py, or 'wall' for the community wall (qrme/wall.py).
+--
+-- The wall reuses this rather than adding a second posts table. It already had
+-- a surface column, an author, content and a moderation verdict, which is the
+-- whole of what a wall post is — and likes, comments and shares are not here
+-- at all, because `post` is a target kind in the audience layer.
 CREATE TABLE IF NOT EXISTS posts (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),
-    surface      TEXT,
+    surface      TEXT,            -- external platform name, or 'wall'
     topic        TEXT,
     content      TEXT NOT NULL,
     status       TEXT NOT NULL,  -- approved | pending | rejected
@@ -1182,6 +1554,74 @@ CREATE TABLE IF NOT EXISTS signatures (
     binding_ref        TEXT,
     sealed_ref         TEXT,                -- PDI record, when a vault is configured
     signed_at          TEXT NOT NULL
+);
+
+-- The homepage a person builds for themselves, as opposed to the front page
+-- the platform assembles. Theme, colour, a tagline, a paragraph, and a Top 8.
+--
+-- Deliberately a fixed set of columns and a closed theme list rather than a
+-- blob of markup. MySpace let people paste raw HTML and CSS, which is why it
+-- was also the golden age of drive-by script injection; the nostalgia worth
+-- keeping is the feeling of a place you decorated, not the implementation.
+--
+-- `about` carries a moderation status like any other text a person writes for
+-- other people to read, and a blocked one is kept so its author can be told
+-- why rather than having it vanish.
+CREATE TABLE IF NOT EXISTS profile_pages (
+    profile_id   TEXT PRIMARY KEY REFERENCES profiles(id),
+    theme        TEXT NOT NULL DEFAULT 'midnight',
+    accent       TEXT,                       -- #rrggbb, validated
+    layout       TEXT NOT NULL DEFAULT 'classic',
+    tagline      TEXT,
+    about        TEXT,
+    about_status TEXT NOT NULL DEFAULT 'approved',  -- approved | blocked
+    about_flag   TEXT,
+    top_friends  TEXT NOT NULL DEFAULT '[]',  -- JSON, owner's order
+    html         TEXT,                       -- sanitised: see qrme/markup.py
+    html_removed TEXT NOT NULL DEFAULT '[]',  -- JSON: what the filter stripped
+    links        TEXT NOT NULL DEFAULT '[]',  -- JSON [{label, url}]
+    show_offers  INTEGER NOT NULL DEFAULT 0,  -- surface this profile's listings
+    updated_at   TEXT NOT NULL
+);
+
+-- How well a profile's identity has been established. Distinct from `kind`,
+-- which says whether there is a real person at all: this says whether anybody
+-- checked they are who they claim. The ladder is signatures.PROOFING_LEVELS,
+-- reused so the platform has one meaning for it rather than two that drift,
+-- and `attestor` is required above self_asserted for the same reason it is
+-- there — who checked belongs in the record, not in a footnote.
+CREATE TABLE IF NOT EXISTS profile_verification (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    level      TEXT NOT NULL,   -- self_asserted | federated | document | in_person
+    attestor   TEXT,            -- who checked; required above self_asserted
+    method     TEXT,
+    ref        TEXT,            -- evidence held elsewhere, never the document
+    checked_at TEXT NOT NULL
+);
+
+-- Friendships between profiles. Distinct from `relationships`, which records
+-- how one profile treats one *interactor* — the person typing at it. This is
+-- the other axis: profile ↔ profile, the social graph the community surfaces
+-- are drawn from.
+--
+-- Directed on purpose. A friends list is a claim its owner makes about who
+-- they stand with, and making it mutual would mean one profile's list could be
+-- edited by somebody else. Two rows make a mutual friendship, and `mutual` on
+-- the read side reports whether the other row exists.
+--
+-- `state` rather than DELETE, so a removal is durable. The founder row is
+-- installed on every new profile, and if it were deleted outright the next
+-- install would put it straight back — a friend you cannot get rid of, which
+-- is furniture rather than a friendship.
+CREATE TABLE IF NOT EXISTS friendships (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    friend_id    TEXT NOT NULL REFERENCES profiles(id),
+    origin       TEXT NOT NULL DEFAULT 'chosen',  -- chosen | founder
+    state        TEXT NOT NULL DEFAULT 'active',  -- active | removed
+    created_at   TEXT NOT NULL,
+    removed_at   TEXT,
+    UNIQUE (profile_id, friend_id)
 );
 """
 

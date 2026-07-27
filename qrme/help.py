@@ -139,6 +139,115 @@ TOPICS: dict[str, tuple[tuple[str, ...], str]] = {
 }
 
 
+# Asking for the tour, in the words people use. Kept beside TOPICS rather than
+# inside it because the reply is not a paragraph — it is the first step of a
+# walkthrough, and a topic that returned prose about tours would be the most
+# annoying possible answer to "show me around".
+_WALKTHROUGH: dict[str, tuple[tuple[str, ...], str]] = {
+    "walk_me_through": (
+        ("show me around", "walk me through", "give me a tour", "tutorial",
+         "guide me", "how do i use this", "where do i start", "getting started",
+         "teach me", "walkthrough", "show me how"),
+        "",
+    ),
+}
+
+
+# "Where is the thing that does X." The question the help box gets more than
+# any other and answered worst, because a paragraph *describing* a feature to
+# somebody who is asking where it lives is a correct answer to a question they
+# did not ask.
+#
+# Keyed by tutorial lesson, so the directions cannot name a screen the
+# walkthrough does not cover — `tutorial.LESSONS` already binds each lesson to
+# its screens, and a test binds every lesson to an entry here. Add a feature,
+# draw its screen, write its lesson, and the assistant can point at it or the
+# suite fails.
+#
+# The phrases are what people type, not what the feature is called. Somebody
+# looking for overlays types *change my face*; nobody types *overlays*.
+DIRECTIONS: dict[str, tuple[str, ...]] = {
+    "make_one": ("make a profile", "new profile", "create a profile",
+                 "add a profile", "genesis"),
+    "talk": ("send a message", "chat with", "talk to it", "message it"),
+    "health": ("profile health", "how is it doing", "stats", "transparency",
+               "what it knows", "sources"),
+    "control": ("control center", "moderation", "boundaries", "steering",
+                "turn it off", "settings", "switches"),
+    "market": ("marketplace", "sell", "license", "listing", "knowledge pack",
+               "buy a profile"),
+    "reach": ("handle", "claim a name", "beacon", "qr code", "sticker",
+              "get found", "share a link"),
+    "desks": ("live desk", "ring the bell", "go live", "start a stream"),
+    "social": ("friends", "my page", "the feed", "the wall", "post something"),
+    "mic": ("lend my microphone", "microphone", "let it hear me", "channel 2",
+            "mic"),
+    "fullscreen": ("full screen", "fullscreen", "landscape", "sideways",
+                   "rotate"),
+    "together": ("watch party", "watch together", "watch with"),
+    "work": ("exchange", "agreement", "sign something", "contract"),
+    "games": ("game", "games", "play", "lobby", "co-op", "multiplayer"),
+    "face": ("change my face", "face overlay", "mask", "disguise", "costume",
+             "change my background", "background", "backdrop", "blur",
+             "be anonymous", "anonymous", "hide my name"),
+    "screens": ("wall panel", "kiosk", "fixed screen", "put it on a screen",
+                "second screen", "the corner", "the pane", "the dock",
+                "little box", "mini window"),
+    "guide": ("the guide", "the helper", "help button", "this assistant"),
+    "welcome": ("the ai mark", "the mark", "the badge", "watermark"),
+    "signup": ("sign up", "signup", "get started", "make an account",
+               "join", "register", "pay", "payment", "card", "checkout"),
+    "plans": ("price", "pricing", "cost", "how much", "plan", "plans",
+              "subscription", "subscribe", "upgrade", "basic", "pro",
+              "billing", "what do i get", "free"),
+}
+
+
+def where_is(question: str) -> dict | None:
+    """Directions to the screen that does a thing, rather than a description.
+
+    The other half of the walkthrough. `show me around` starts at the
+    beginning; this answers *I know what I want, where is it* — which is the
+    same question the dock's routing table answers for the pane, read from the
+    same place so the assistant and the pane cannot disagree.
+    """
+    from . import dock, tutorial
+
+    key = None
+    hits = 0
+    q = (question or "").lower().strip()
+    if not q:
+        return None
+    import re
+
+    for lesson_key, phrases in DIRECTIONS.items():
+        n = sum(1 for p in phrases
+                if re.search(r"(?<!\w)" + re.escape(p) + r"(?!\w)", q))
+        if n > hits:
+            key, hits = lesson_key, n
+    if key is None:
+        return None
+
+    lesson = tutorial.LESSONS[tutorial._index(key)]
+    screens = list(lesson["screens"])
+
+    # If the same thing is also a face on the pane in the corner, say so — that
+    # is the whole reason the dock is discoverable at all. Somebody who never
+    # taps the helper button will never find out it opens onto anything.
+    in_dock = None
+    for face_name, route in dock.ROUTES.items():
+        if route["screen"] in screens:
+            in_dock = dock.route(face_name)
+            break
+
+    say = f"{lesson['title']}: {lesson['try_it']}"
+    if in_dock:
+        say += (f" It is also a face on the pane in the corner — tap the help "
+                f"button and choose {in_dock['title']}.")
+    return {"lesson": key, "title": lesson["title"], "screens": screens,
+            "say": say, "dock": in_dock, "walkthrough_step": f"/tutorial/steps/{key}"}
+
+
 def _model_is_real() -> bool:
     """Whether a *real* provider is configured, as opposed to the offline stub.
 
@@ -186,7 +295,7 @@ def _grounding() -> str:
     return "\n".join(f"- {answer}" for _keys, answer in TOPICS.values())
 
 
-def ask(question: str, provider=None) -> dict:
+def ask(question: str, provider=None, mode: str = "text") -> dict:
     """Answer a question about using QRME. Never writes anything.
 
     Returns ``source`` so a caller can tell a written answer from a generated
@@ -206,6 +315,38 @@ def ask(question: str, provider=None) -> dict:
     if refusal:
         return {"answer": refusal, "source": "written", "ai": False,
                 "refused": True, "disclosure": DISCLOSURE, "topics": topics()}
+
+    # "Show me around" is not a question with an answer — it is a request for
+    # the walkthrough. Matched here rather than left as a topic, because the
+    # help box is where somebody asks it and being handed a paragraph about
+    # tours instead of a tour is the wrong reply.
+    #
+    # The assistant delivers it either way: `mode="voice"` renders the same
+    # lesson for listening, so somebody driving or unable to read the screen
+    # gets the tour rather than a link to it.
+    if _match(question, _WALKTHROUGH) is not None:
+        from . import tutorial
+        first = tutorial.LESSONS[0]
+        step = tutorial.say(first, mode)
+        return {
+            "answer": step.get("speak") or f"{step['title']}. {step['what']}",
+            "source": "written", "ai": False, "refused": False,
+            "disclosure": DISCLOSURE, "topics": topics(),
+            "walkthrough": {"started": True, "step": step,
+                            "steps": len(tutorial.LESSONS),
+                            "next": "/tutorial/done"},
+        }
+
+    # "Where do I change my background." Matched before TOPICS and before any
+    # model, because both would answer it with a description of backgrounds —
+    # a correct paragraph about a thing, handed to somebody who was asking
+    # where it lives. Directions are cheap and the model cannot know the screen
+    # numbers.
+    directions = where_is(question)
+    if directions is not None:
+        return {"answer": directions["say"], "source": "written", "ai": False,
+                "refused": False, "disclosure": DISCLOSURE, "topics": topics(),
+                "directions": directions}
 
     written = _match(question, TOPICS)
 

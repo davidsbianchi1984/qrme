@@ -42,7 +42,8 @@ def test_summon_by_hashtag(client):
     assert [c["profile_id"] for c in hit["profiles"]] == [garden["id"]]
 
     anon = client.get("/summon", params={"ref": "#fiction"}).json()
-    assert anon["profiles"][0]["display_name"] == "anonymous persona"
+    from qrme import identity
+    assert anon["profiles"][0]["display_name"].startswith("Anonymous ")
 
 
 def test_beacon_left_behind_and_scanned(client):

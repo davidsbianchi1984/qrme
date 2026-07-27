@@ -148,7 +148,9 @@ def test_an_anonymous_profiles_watermark_does_not_name_it(client):
 
     design = client.get(f"/profiles/{pid}/watermark").json()
     assert "Marcus Bell" not in design["line"]
-    assert design["line"] == "\u2726 AI \u00b7 anonymous persona"
+    from qrme import identity
+    assert design["line"] == f"\u2726 AI \u00b7 {identity.anonymous_name(pid)}"
+    assert "Anonymous " in design["line"]
 
     # Still declares AI, which is the part that is never negotiable.
     assert "AI" in design["line"]

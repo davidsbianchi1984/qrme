@@ -7,7 +7,7 @@ ADULT = {"birthdate": "1984-06-01"}
 
 def _rated_profile(client, handle="velvet_ivy"):
     r = client.post("/profiles", json={
-        "owner_id": "owner-1", "kind": "fictional",
+        "plan": "pro", "owner_id": "owner-1", "kind": "fictional",
         "display_name": "Velvet Ivy", "adult_mode": True,
         "persona": "A flirtatious cabaret hostess persona for adult "
                    "audiences.", "maturity": "open",
@@ -27,7 +27,7 @@ def _interactor(client, birthdate):
 
 def test_adult_mode_never_for_another_real_person(client):
     r = client.post("/profiles", json={
-        "owner_id": "owner-1", "kind": "other_person",
+        "plan": "pro", "owner_id": "owner-1", "kind": "other_person",
         "display_name": "Someone Else", "adult_mode": True,
         "persona": "x", "verification": ADULT,
         "consent": {"basis": "subject_consent", "attestor": "owner-1"}})

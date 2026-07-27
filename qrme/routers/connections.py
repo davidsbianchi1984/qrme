@@ -149,4 +149,9 @@ def end_connection(connection_id: str, body: ConnectionMessage | None = None,
     conn.execute("UPDATE connections SET status='ended' WHERE id=?",
                  (connection_id,))
     conn.commit()
-    return {"id": connection_id, "status": "ended"}
+    # Ending the connection returns any wearable lent inside it. The
+    # permission was scoped to this conversation and must not survive it.
+    from .. import roommic
+    returned = roommic.close_place("connection", connection_id)
+    return {"id": connection_id, "status": "ended",
+            "microphones_returned": returned}

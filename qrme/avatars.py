@@ -66,10 +66,59 @@ RATED_STYLE = ("Warm practical light, full colour, old-Hollywood glamour. "
 # nothing — the same trap that made the studio 404 inside the container.
 ASSET_ROUTE = "/portraits"
 
+# Photographs, which are a different kind of thing from portraits and live
+# apart from them on purpose.
+#
+# Everything under ``/portraits`` is a synthetic face with the AI mark burned
+# into its pixels, checksummed by ``tools/mark_portraits.py``. A real
+# photograph of a real person is not that, and must not be burned with that
+# mark: the mark says *AI-generated synthetic media*, and stamping it on an
+# authentic photograph is a false statement in the opposite direction from the
+# one the mark exists to prevent.
+#
+# Keeping them in one directory would also mean an unburned file sitting in a
+# tree whose manifest check walks every file in it — so the check would either
+# fail or have to be loosened, and loosening the thing that guarantees the
+# marks are intact is not a trade worth making for a folder layout.
+PHOTO_ROUTE = "/photos"
+
+# What an anonymous profile shows before it puts anything in the bubble: an
+# empty picture frame with a plus. A third kind of asset again — not a portrait,
+# since nothing generated it and burning the AI mark into it would be a false
+# statement about a drawing of nobody; not a photograph either, since it depicts
+# no one. Interface furniture, so it lives apart from both and `asset_is_marked`
+# reports False for it like any other unburned file.
+#
+# **One picture, for the owner and for visitors alike.** There was briefly a
+# plain silhouette for strangers and this for the owner, on the reasoning that a
+# photo-and-plus reads as a control and a control offered to somebody who cannot
+# press it reports the empty bubble as a gap. The identifying work is done by
+# the name — `Anonymous 41338025` — so the picture is a placeholder rather than
+# a claim about anybody, and an empty frame is the most honest drawing of an
+# empty frame. Two defaults meant two things that could disagree about the same
+# profile, which is the shape of bug this codebase keeps finding.
+FIGURE_ROUTE = "/figures"
+ADD_PHOTO = f"{FIGURE_ROUTE}/add-photo.svg"
+
+# The old name, still pointing at the one default. Kept because `silhouette` is
+# what the *field* on a render is called, and a constant that disagreed with it
+# would be worse than a slightly dated word.
+SILHOUETTE = ADD_PHOTO
+
 
 def portraits_dir():
     from pathlib import Path
     return Path(__file__).resolve().parent / "assets" / "portraits"
+
+
+def figures_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "figures"
+
+
+def photos_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "photos"
 
 
 def asset_path(handle: str) -> str | None:
@@ -78,14 +127,23 @@ def asset_path(handle: str) -> str | None:
             if (portraits_dir() / f"{handle}.webp").is_file() else None)
 
 
+def photo_path(handle: str) -> str | None:
+    """The served path for a real photograph, or None if there is no file."""
+    return (f"{PHOTO_ROUTE}/{handle}.webp"
+            if (photos_dir() / f"{handle}.webp").is_file() else None)
+
+
 def asset_is_marked(asset: str | None) -> bool:
     """Whether the image itself carries the AI mark, as opposed to needing a
     surface to composite one.
 
-    True for the shipped collection, which is burned and checksummed. An
-    owner-attached asset is somebody else's file and nothing here can vouch
-    for its pixels — so it reports False and the surfaces keep drawing their
-    own badge over it, which is the safe direction to be wrong in.
+    True only for the burned collection. An owner-attached asset is somebody
+    else's file and nothing here can vouch for its pixels; a photograph under
+    ``/photos`` is deliberately unburned because it is not AI-generated. Both
+    report False, so the surfaces keep drawing their own badge — which is the
+    safe direction to be wrong in, and in the photograph's case is the correct
+    answer rather than a fallback: the *profile* is synthetic and must say so,
+    while the *picture* is authentic and must not claim otherwise.
     """
     return bool(asset) and asset.startswith(f"{ASSET_ROUTE}/")
 
@@ -277,14 +335,39 @@ def render(profile_id: str) -> dict:
     disclosure travels with the asset into every one of them.
     """
     row = db.connect().execute(
-        "SELECT avatar, kind, consent_basis, consent_attestor"
+        "SELECT avatar, kind, anonymous, consent_basis, consent_attestor"
         " FROM profiles WHERE id=?", (profile_id,)).fetchone()
     if row is None:
         return {}
     asset = row["avatar"] or None
+
+    # An anonymous profile gets the stand-in picture, and gets it *here*.
+    #
+    # Two things were leaking past the flag. A profile that had set a portrait
+    # of its own face went on serving that face — a picture is the strongest
+    # identifier on a page and the flag never touched it. And a profile with no
+    # portrait fell back to initials drawn from the display name, so hiding the
+    # name produced a monogram of it.
+    #
+    # Substituted in `render()` rather than at each surface for the same reason
+    # the AI badge is attached here: 2-D, 3-D, VR, AR, the beacon page and every
+    # embed read this one shape, and "the client forgot" is how a face reaches a
+    # viewer it should not have reached. A surface cannot opt out of this by
+    # not knowing about it.
+    anonymous = bool(row["anonymous"])
+    if anonymous:
+        # The plain figure, or the field emblem this profile chose. Still a
+        # closed set drawn by us either way — never their own picture, which is
+        # the thing the flag exists to withhold.
+        from . import identity
+        asset = identity.emblem_asset(profile_id)
+
     return {
         "profile_id": profile_id,
         "asset": asset,
+        # Says the picture is not this profile's own, so a surface renders it
+        # as a figure rather than captioning it as somebody's face.
+        "silhouette": anonymous,
         # Whether the disclosure is already in the image itself.
         #
         # QRME's own surfaces composite their badge either way, because theirs
@@ -297,8 +380,10 @@ def render(profile_id: str) -> dict:
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # A portrait with no asset yet is still an answer: surfaces fall back
-        # to initials rather than showing an unbadged placeholder.
-        "placeholder": not row["avatar"],
+        # to initials rather than showing an unbadged placeholder. Never true
+        # for an anonymous profile — the silhouette *is* the picture there, and
+        # falling back would put a monogram of the hidden name on the page.
+        "placeholder": not anonymous and not row["avatar"],
     }
 
 

@@ -27,6 +27,10 @@ rrect, text, pill, chip, button, ring, spark, esc, stars = (
 
 W, H = 1280, 820
 WIN_X, WIN_Y, WIN_W, WIN_H = 24, 24, 1232, 772
+
+# The helper dock's geometry, read from the module rather than copied, so the
+# mockup cannot drift from what the client is told to draw.
+from qrme.dock import BOX as DOCK                                    # noqa: E402
 TOPBAR_H = 54
 SIDE_W = 216
 CONTENT_X = WIN_X + SIDE_W
@@ -40,7 +44,8 @@ IW = CONTENT_W - 2 * PAD
 
 NAV = [("target", "Home"), ("chat", "Conversation"), ("people", "Relationships"),
        ("lock", "Memory"), ("person", "Desks"), ("compass", "Marketplace"),
-       ("doc", "Licensing"), ("pen", "Signing"), ("gear", "Control")]
+       ("doc", "Licensing"), ("pen", "Signing"), ("chart", "Community"),
+       ("gear", "Control")]
 
 
 def status_dot(x, y, label, tone):
@@ -97,9 +102,23 @@ def frame(title, active):
     o.append(text(CONTENT_X + PAD, WIN_Y + 33, title, 15, C["txt"], 700, spacing=-0.2))
     rx = WIN_X + WIN_W - 24 - (86 if PLATFORM_D == 'windows' else 0)
     o.append(icon("gear", rx - 10, WIN_Y + 27, C["t2"], 0.8))
-    o.append(status_dot(rx - 34, WIN_Y + 31, "AI assistant · Online", "on"))
-    o.append(f'<circle cx="{rx-34-96}" cy="{WIN_Y+27}" r="13" fill="url(#orb)"/>')
-    o.append(icon("person", rx - 34 - 96, WIN_Y + 27, "rgba(255,255,255,0.9)", 0.62))
+    # The account pill, and the avatar beside it — beside, not on top of.
+    #
+    # The avatar used to sit at a hard-coded 96px from the pill's right edge
+    # while `status_dot` sizes itself from its label, so at this label's length
+    # the orb landed *inside* the pill and painted out three characters of
+    # "Assistant". It read as a rendering glitch on all eleven desktop views,
+    # which is how long it survived: the header is the part of a mockup nobody
+    # looks at twice.
+    #
+    # Derived from the same expression `status_dot` uses, so a longer label
+    # moves the avatar instead of colliding with it.
+    label = "AI assistant · Online"
+    pill_w = 14 + len(label) * 6.0
+    o.append(status_dot(rx - 34, WIN_Y + 31, label, "on"))
+    ax = rx - 34 - pill_w - 21
+    o.append(f'<circle cx="{ax}" cy="{WIN_Y+27}" r="13" fill="url(#orb)"/>')
+    o.append(icon("person", ax, WIN_Y + 27, "rgba(255,255,255,0.9)", 0.62))
     ny = CONTENT_Y + 18
     for ic, lbl in NAV:
         on = (lbl == active)
@@ -626,6 +645,89 @@ def v_audience():
     return o
 
 
+def v_community():
+    """The social layer, where a wide window actually earns its keep.
+
+    On a phone the friends list, the wall and the feed are three screens you
+    move between. Here they sit beside each other, which is the one thing a
+    desktop can do that a phone cannot — and the reason the feed's *why* column
+    is worth the space: a ranked feed you can read the reasoning of, all at
+    once, is a ranked feed somebody can actually argue with.
+    """
+    import sys
+    sys.path.insert(0, os.path.join(OUT, "..", "screens"))
+    import frames
+
+    o = []
+    lw = IW * 0.42
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    # -- friends -----------------------------------------------------------
+    o += panel(IX, IY, lw, hh, "Friends", right="two come as standard")
+    fy = IY + 54
+    people = [
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER_VERIFIED[1],
+         "VERIFIED", [], 4.0),
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI",
+         ["technology", "cybersecurity", "science", "telecom"], 4.0),
+        ("Marcus Bell", "mutual friend", frames.PORTRAITS[1][1], "AI",
+         ["finance"], 5.0),
+        ("Dr. Amara Osei", "mutual friend", frames.PORTRAITS[0][1], "AI",
+         ["healthcare"], 3.0),
+    ]
+    for name, sub, b64, badge, packs, rating in people:
+        o.append(rrect(IX + 18, fy, lw - 36, 76, 12,
+                       "rgba(255,255,255,0.03)", C["line"], 1))
+        o.append(pb.face(IX + 52, fy + 38, 44, b64))
+        o.append(text(IX + 84, fy + 26, name, 12.5, C["txt"], 700))
+        o.append(text(IX + 84, fy + 42, sub, 9.5, C["t2"], 500))
+        if packs:
+            o.append(text(IX + 84, fy + 56, " · ".join(packs[:2])
+                          + (f"  +{len(packs)-2}" if len(packs) > 2 else ""),
+                          8, C["cyan"], 600))
+        o.append(stars(IX + 84, fy + 68, rating, C["gold"], 0.55))
+        o.append(text(IX + 122, fy + 71, f"{rating:.1f}", 8, C["gold"], 700))
+        col = C["gold"] if badge == "VERIFIED" else C["brandA"]
+        o.append(rrect(IX + lw - 96, fy + 28, 62, 20, 10, A(col, 0.18), col, 1))
+        o.append(text(IX + lw - 65, fy + 42, badge, 8, col, 800, "middle", 0.4))
+        fy += 84
+
+    # -- the feed, with its reasons ----------------------------------------
+    o += panel(rx, IY, rw, hh, "For You", right="and why each one is here")
+    hy = IY + 54
+    o.append(text(rx + 24, hy, "FROM", 8, C["t3"], 700, "start", 0.7))
+    o.append(text(rx + 210, hy, "WHY IT IS HERE", 8, C["t3"], 700, "start", 0.7))
+    o.append(text(rx + rw - 24, hy, "SCORE", 8, C["t3"], 700, "end", 0.7))
+    hy += 12
+    rows = [
+        ("Marcus Bell", "a friend posted this", "110", C["green"]),
+        ("Dr. Amara Osei", "you have talked to this profile", "70", C["cyan"]),
+        ("Priya Raman", "you engage with technology", "35", C["amber"]),
+        ("Wren Okafor", "popular with people here", "28", C["indigo"]),
+        ("Ken Nakamura", "new on the wall", "10", C["t3"]),
+    ]
+    for i, (who, why, score, col) in enumerate(rows):
+        y = hy + 14 + i * 46
+        o.append(rrect(rx + 18, y, rw - 36, 38, 10,
+                       "rgba(255,255,255,0.03)", C["line"], 1))
+        o.append(f'<circle cx="{rx+36}" cy="{y+19}" r="4" fill="{col}"/>')
+        o.append(text(rx + 50, y + 23, who, 11, C["txt"], 650))
+        o.append(text(rx + 192, y + 23, why, 10, C["t2"], 500))
+        o.append(text(rx + rw - 34, y + 23, score, 11, col, 800, "end"))
+
+    ny = hy + 14 + len(rows) * 46 + 12
+    o.append(rrect(rx + 18, ny, rw - 36, 58, 12, A(C["red"], 0.08),
+                   A(C["red"], 0.5), 1))
+    o.append(icon("shield", rx + 44, ny + 29, C["red"], 0.8))
+    o.append(text(rx + 64, ny + 24, "Never ranked on", 10.5, C["txt"], 700))
+    o.append(text(rx + 64, ny + 40,
+                  "source material · memories · anything vaulted", 9.5,
+                  C["t2"], 500))
+    return o
+
+
 def v_signatures():
     """Signing, which is more a desktop story than a mobile one: Windows has
     no in-process route to Hello that a compile can check, so the ceremony
@@ -696,6 +798,253 @@ def v_signatures():
     return o
 
 
+def v_channel_two():
+    """Channel 2, on the machine a desk is actually run from.
+
+    The phone screen (81) shows one room's disclosure to the person lending.
+    A desk operator has several places open at once — a room, a watch party,
+    a stream — and the question a wide window answers is the one a phone
+    cannot: **where is my microphone live right now, all of it, at once.**
+
+    So the left column is every place a grant is open, and the right is the
+    room's own disclosure — what the *other people* see, shown beside what the
+    lender sees, because those two being the same thing is the whole design.
+    """
+    o = []
+    lw = IW * 0.46
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Where it is lent", right="you can end any of these")
+    y = IY + 54
+    places = [
+        ("mic", "cyan", "The quarterly numbers", "room · voice", "LENT"),
+        ("people", "brand", "Friday watch party", "party · 4 members", "LENT"),
+        ("speaker", "green", "Your live desk", "desk · visitors present", "LENT"),
+        ("chat", "t3", "Marcus Bell", "connection · not lent", None),
+    ]
+    for ic, col, name, sub, tag in places:
+        c = C.get(col, C["t3"])
+        o.append(rrect(IX + 14, y, lw - 28, 58, 12, "url(#gCard)", C["line"], 1))
+        o.append(rrect(IX + 28, y + 13, 32, 32, 10, A(c, 0.16)))
+        o.append(icon(ic, IX + 44, y + 29, c, 0.95))
+        o.append(text(IX + 72, y + 26, name, 12, C["txt"], 700))
+        o.append(text(IX + 72, y + 43, sub, 10, C["t3"], 500))
+        if tag:
+            o.append(rrect(IX + lw - 92, y + 18, 50, 21, 10, A(C["green"], 0.16)))
+            o.append(text(IX + lw - 67, y + 33, tag, 9, C["green"], 800, "middle", 0.5))
+        else:
+            o.append(text(IX + lw - 42, y + 33, "—", 12, C["t3"], 600, "middle"))
+        y += 68
+
+    o.append(text(IX + 22, y + 22, "Near-field on every one of them, whatever "
+                  "your dial says", 10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 40, "there are other people in all four places, "
+                  "so the channel stays narrow", 10, C["t3"], 500))
+
+    # -- what the room sees ------------------------------------------------
+    o += panel(rx, IY, rw, hh, "What the room sees",
+               right="the same thing you do")
+    ry = IY + 54
+    o.append(rrect(rx + 14, ry, rw - 28, 74, 12, A(C["cyan"], 0.10),
+                   A(C["cyan"], 0.35), 1))
+    o.append(text(rx + 30, ry + 28, "Sam has lent the profiles a microphone",
+                  11.5, C["txt"], 700))
+    o.append(text(rx + 30, ry + 47, "on a smart watch · keys on their voice",
+                  10, C["t2"], 500))
+    o.append(text(rx + 30, ry + 63, "you, speaking close to the microphone",
+                  10, C["t3"], 500))
+    ry += 92
+
+    for label, body in [
+        ("Everyone here is told",
+         "a disclosure only the lender can see is not a disclosure"),
+        ("It hears them, not the room",
+         "near-field, and it keys on its wearer — both, not either"),
+        ("It ends when this does",
+         "a permission must not outlive the conversation"),
+        ("Not a room-facing mic",
+         "a conference puck would lend the voices of people who did not agree"),
+    ]:
+        o.append(rrect(rx + 14, ry, rw - 28, 56, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 24, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 42, body, 10, C["t3"], 500))
+        ry += 66
+    return o
+
+
+def _rowcard(x, y, w, ic, col, title, sub, tag=None, tagcol="green"):
+    """One list row: icon, two lines, optional pill. The shape every view here
+    already uses, pulled out because three new views drew it eleven times."""
+    c = C.get(col, C["t3"])
+    o = [rrect(x, y, w, 58, 12, "url(#gCard)", C["line"], 1),
+         rrect(x + 14, y + 13, 32, 32, 10, A(c, 0.16)),
+         icon(ic, x + 30, y + 29, c, 0.95),
+         text(x + 58, y + 26, title, 12, C["txt"], 700),
+         text(x + 58, y + 43, sub, 10, C["t3"], 500)]
+    if tag:
+        tc = C.get(tagcol, C["green"])
+        tw = 16 + len(tag) * 6.4
+        o += [rrect(x + w - tw - 16, y + 18, tw, 21, 10, A(tc, 0.16)),
+              text(x + w - tw / 2 - 16, y + 33, tag, 9, tc, 800, "middle", 0.5)]
+    return o
+
+
+def v_identity():
+    """Who you are, on a machine where you have several profiles open.
+
+    The phone answers "am I anonymous" one profile at a time. A desk is where
+    somebody actually holds three of them, and the question a wide window
+    answers is the one that matters before you type: **which of these am I,
+    right now, and what does a stranger see of each.**
+    """
+    o = []
+    lw = IW * 0.48
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Your profiles", right="one badge, not three")
+    y = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("person", "green", "Otis Marsh", "verified · a real person",
+             "BADGE", "green"),
+            ("mask", "cyan", "Weekend self", "shown as Anonymous 41338025",
+             "HIDDEN", "cyan"),
+            ("robot", "indigo", "Captain Nobody", "invented — nobody to verify",
+             None, "green")]:
+        o += _rowcard(IX + 14, y, lw - 28, ic, col, name, sub, tag, tc)
+        y += 68
+    o.append(text(IX + 22, y + 20, "The badge moves between them, one at a time",
+                  10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 38, "it says you are a particular real person, "
+                  "so it belongs to one face", 10, C["t3"], 500))
+
+    o += panel(rx, IY, rw, hh, "What a stranger sees",
+               right="of the anonymous one")
+    ry = IY + 54
+    o.append(rrect(rx + 14, ry, rw - 28, 78, 12, A(C["cyan"], 0.10),
+                   A(C["cyan"], 0.32), 1))
+    o.append(text(rx + 30, ry + 28, "Anonymous 41338025", 12.5, C["txt"], 700))
+    o.append(text(rx + 30, ry + 47, "a fixed name tied to this profile — not "
+                  "to your account", 10, C["t2"], 500))
+    o.append(text(rx + 30, ry + 65, "and not one you can change", 10, C["t3"], 500))
+    ry += 96
+    for label, body in [
+        ("Your account is withheld",
+         "so two of your profiles cannot be matched to each other"),
+        ("Your picture is yours to choose",
+         "a field emblem, your own image, or an empty frame"),
+        ("Who verified you is withheld",
+         "the attestor is a pointer back to a name"),
+        ("Your writing is still yours",
+         "anyone who knows you may recognise it — we cannot fix that")]:
+        o.append(rrect(rx + 14, ry, rw - 28, 54, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 23, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 41, body, 10, C["t3"], 500))
+        ry += 64
+    return o
+
+
+def v_camera():
+    """Your camera and the screens you are on — what other people see of you.
+
+    Grouped because they are one question asked twice: *what is being shown of
+    me, where.* A phone splits them because a phone shows one thing at a time.
+    """
+    o = []
+    lw = IW * 0.48
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Your camera", right="live in one room")
+    y = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("mask", "pink", "Blue Fox", "a creature, driven by your face",
+             "WORN", "green"),
+            ("photo", "cyan", "A library", "AI-generated — and it says so",
+             "AI", "cyan"),
+            ("shieldok", "green", "NOT AI · REAL PERSON",
+             "burned in — mask or none", "BURNED", "green")]:
+        o += _rowcard(IX + 14, y, lw - 28, ic, col, name, sub, tag, tc)
+        y += 68
+    o.append(text(IX + 22, y + 20, "Seventeen faces, and your own is one of them",
+                  10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 38, "no real person's likeness, and never a "
+                  "badge drawn into the picture", 10, C["t3"], 500))
+
+    o += panel(rx, IY, rw, hh, "Screens you are on",
+               right="a wall is read by whoever passes")
+    ry = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("grid", "cyan", "The lobby panel", "front page · transparent",
+             "LIVE", "green"),
+            ("grid", "brand", "Door kiosk", "your QR · full surface",
+             "LIVE", "green"),
+            ("grid", "t3", "Counter screen", "taken down last week", None, "green")]:
+        o += _rowcard(rx + 14, ry, rw - 28, ic, col, name, sub, tag, tc)
+        ry += 68
+    ry += 8
+    for label, body in [
+        ("Only what a stranger may read",
+         "no messages, no memory, no friends, no agent names"),
+        ("There is no control face",
+         "a button on a wall is pressed by whoever reaches it"),
+        ("The mark gets a plate on glass",
+         "the background is a corridor, and it moves")]:
+        o.append(rrect(rx + 14, ry, rw - 28, 54, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 23, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 41, body, 10, C["t3"], 500))
+        ry += 64
+    return o
+
+
+def v_lobby():
+    """The game lobby, where a wide window shows the roster and the rule at
+    once — because the rule is the only reason the roster is allowed to have
+    four synthetic members on it."""
+    o = []
+    lw = IW * 0.46
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "In the match", right="Sundered Reach · Steam")
+    y = IY + 54
+    for ic, col, name, sub, tag, tc in [
+            ("robot", "indigo", "Vex · teammate", "the session profile, hosting",
+             "AI", "cyan"),
+            ("robot", "cyan", "Rook · coach", "your second profile", "AI", "cyan"),
+            ("bolt", "amber", "Your spotter", "an agent — needs you",
+             "AMBER", "amber"),
+            ("person", "green", "samhain", "the only human here", "YOU", "green")]:
+        o += _rowcard(IX + 14, y, lw - 28, ic, col, name, sub, tag, tc)
+        y += 68
+    o.append(text(IX + 22, y + 20, "Four synthetic seats, counting the "
+                  "session's own", 10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 38, "past that a lobby has become an operation "
+                  "being run", 10, C["t3"], 500))
+
+    o += panel(rx, IY, rw, hh, "What none of them can do",
+               right="checked, not promised")
+    ry = IY + 54
+    for label, body in [
+        ("No player slot", "they sit beside the players, never among them"),
+        ("No console of its own", "a second machine is still a bot"),
+        ("No second controller", "the same bot with a shorter cable"),
+        ("No Bluetooth pad", "the pairing is the tell, not the cable"),
+        ("No capture card", "watching the screen to play is playing"),
+        ("No plug-in or mod", "whatever it is called, whoever wrote it"),
+        ("No character of its own", "not a co-op partner, not a body in the world")]:
+        o.append(rrect(rx + 14, ry, rw - 28, 52, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 22, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 40, body, 10, C["t3"], 500))
+        ry += 60
+    return o
+
+
 VIEWS = [
     (1, "Home", "Home", v_home),
     (2, "Conversation", "Conversation", v_conversation),
@@ -706,26 +1055,42 @@ VIEWS = [
     (7, "Live Desks", "Desks", v_desks),
     (8, "Audience & Commerce", "Marketplace", v_audience),
     (9, "Signatures", "Signing", v_signatures),
+    (10, "Community", "Community", v_community),
+    (11, "Channel 2", "Control", v_channel_two),
+    (12, "Who You Are", "Relationships", v_identity),
+    (13, "Camera & Screens", "Control", v_camera),
+    (14, "Game Lobby", "Community", v_lobby),
 ]
 
 
-def agent_overlay(counts):
-    """The agent lights, pinned to every desktop view.
+def helper_dock(counts):
+    """The helper dock, pinned to every desktop view, open on the agent lights.
 
-    A watch answers this for the people who wear one. Desktop users have no
-    wrist to glance at, so the same information has to live somewhere that
-    does not depend on remembering to open a page — and amber and red are
-    precisely the states nobody thinks to go looking for.
+    This corner used to hold a lights-only panel with no way to put it away.
+    It is now the dock (`qrme/dock.py`) drawn in its desktop default state, and
+    the merge is the point: two floating boxes in one corner is what you get by
+    adding the second, and the first was already three-quarters of the feature
+    - pinned, glanceable, and routing to a screen that can act.
 
-    Bottom-right, above the content and clear of the sidebar: the corner a
-    dashboard convention already reserves for status, and the one place a
-    persistent strip does not cover something a person is reading.
+    The lights panel's own reason is why `dock.DEFAULT_STATE_ON["desktop"]` is
+    `open` where the phone's is `handle`: a desktop user has no wrist to glance
+    at, and amber and red are precisely the states nobody thinks to go looking
+    for. What it gains by becoming the dock is a way to close it, the other
+    eight faces, and the helper button as its handle.
+
+    Geometry comes from `dock.BOX` rather than being restated here, so the
+    mockup cannot drift from what a client is told to draw.
     """
-    w, h = 132, 116
-    x = WIN_X + WIN_W - w - 24
-    y = WIN_Y + WIN_H - h - 24
+    w, h = DOCK["width"], DOCK["height"]
+    hr = DOCK["handle"] // 2
+    right = WIN_X + WIN_W - DOCK["inset"]
+    # The handle sits in the corner proper; the pane stacks above it.
+    hx, hy = right - hr, WIN_Y + WIN_H - DOCK["inset"] - hr
+    x, y = right - w, hy - hr - 12 - h
+
     o = [rrect(x, y, w, h, 15, "rgba(9,7,26,0.62)", A(C["brandA"], 0.5), 1)]
-    yy = y + 26
+    o.append(text(x + 14, y + 20, "Agents", 9, C["t3"], 700, spacing=0.6))
+    yy = y + 40
     rows = (("green", "running"), ("amber", "need help"), ("red", "stopped"))
     for (colour, word), n in zip(rows, counts):
         col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
@@ -736,9 +1101,19 @@ def agent_overlay(counts):
                       col if not dim else C["t3"], 800))
         o.append(text(x + 46, yy + 5, word, 9.5,
                       C["t2"] if not dim else C["t3"], 600))
-        yy += 28
-    o.append(text(x + w / 2, y + h - 12, "open \u203a", 9,
+        yy += 26
+    # Every face carries a way out of the pane: it shows and routes, and never
+    # acts. See qrme/dock.py.
+    o.append(text(x + w / 2, y + h - 10, "open Agents \u203a", 9,
                   C["brandA"], 700, "middle"))
+
+    # The handle - the helper button, and the thing that puts the pane away.
+    # One control in this corner rather than two, which is why the dock takes
+    # over the button the app already had instead of adding its own.
+    o.append(f'<circle cx="{hx}" cy="{hy}" r="{hr}" '
+             f'fill="{A(C["brandA"], 0.2)}" '
+             f'stroke="{A(C["brandA"], 0.55)}" stroke-width="1.2"/>')
+    o.append(icon("compass", hx, hy, C["brandA"], 0.82))
     return o
 
 
@@ -747,7 +1122,7 @@ def render(title, nav, fn):
     o += fn()
     # On every view, not just Home: the whole point is that it is there while
     # you are doing something else.
-    o += agent_overlay((3, 1, 1))
+    o += helper_dock((3, 1, 1))
     o += close()
     return "".join(o)
 
@@ -761,8 +1136,14 @@ def main():
         os.makedirs(outdir, exist_ok=True)
         for num, title, nav, fn in VIEWS:
             slug = title.lower().replace(" & ", "-").replace(" ", "-")
+            # Rendered before the file is opened. `open(..., "w")` truncates
+            # straight away, so the other order means a render that raises
+            # leaves a zero-byte SVG behind — a build that fails by corrupting
+            # its own output, and the empty file then breaks whatever reads it
+            # next rather than being reported.
+            svg = render(title, nav, fn)
             with open(os.path.join(outdir, f"{num:02d}-{slug}.svg"), "w") as f:
-                f.write(render(title, nav, fn))
+                f.write(svg)
             total += 1
     PLATFORM_D = "macos"
     print(f"generated {total} desktop screens ({len(VIEWS)} × 2 platforms)")

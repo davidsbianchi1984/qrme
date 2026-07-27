@@ -8,7 +8,7 @@ Guardian during a call — is that **a room has other people in it**. That is
 the whole of the design here, and the disclosure test is the one that matters.
 """
 
-from tests.test_capabilities import make_profile
+from tests.test_capabilities import auth_header, make_profile
 
 
 def _interactor(client, name="Sam"):
@@ -110,7 +110,8 @@ def test_the_disclosure_is_readable_by_the_whole_room(client):
     mal = _interactor(client, "Mal")
     room = _room(client, p, sam, mal)
 
-    before = client.get(f"/rooms/{room['id']}/mic").json()
+    before = client.get(f"/rooms/{room['id']}/mic",
+                        headers=_as(mal["token"])).json()
     assert before["microphones_lent"] == []
     assert "no one has lent" in before["note"]
 
@@ -134,7 +135,52 @@ def test_taking_it_back_removes_it_from_the_disclosure(client):
     out = client.delete(f"/rooms/{room['id']}/mic/{sam['id']}",
                         headers=_as(sam["token"])).json()
     assert out["lending"] is False
-    assert client.get(f"/rooms/{room['id']}/mic").json()["microphones_lent"] == []
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(sam["token"])).json()["microphones_lent"] == []
+
+
+def test_the_disclosure_stops_at_the_people_it_protects(client):
+    """"Anyone in the room" was the design and "anyone at all" was the code.
+
+    The route checked nothing, so it answered any caller holding a room id —
+    and a room id is not a secret. It rides in beacons and on printed QR
+    stickers, which is what they are for. That turned a privacy feature into
+    its opposite: who is wearing a live microphone, on what, and since when,
+    published to whoever scanned the sticker.
+
+    Both halves are asserted, and the second is the one that matters — a test
+    that only tried an anonymous caller would pass against a system that
+    hands a room's disclosure to any signed-in stranger.
+    """
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    outsider = _interactor(client, "Nosy")
+    room = _room(client, p, sam)
+    client.post(f"/rooms/{room['id']}/mic", json={"interactor_id": sam["id"]},
+                headers=_as(sam["token"]))
+
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers={"authorization": ""}).status_code == 401
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(outsider["token"])).status_code == 403
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(sam["token"])).status_code == 200
+
+
+def test_the_profiles_owner_can_read_the_disclosure_too(client):
+    """The profiles are the side being lent the microphone, so their owner is
+    exactly who the disclosure is addressed to — being in the room as a
+    `profile` participant has to count as being in the room."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+    client.post(f"/rooms/{room['id']}/mic", json={"interactor_id": sam["id"]},
+                headers=_as(sam["token"]))
+
+    seen = client.get(f"/rooms/{room['id']}/mic", headers=auth_header(p))
+    assert seen.status_code == 200
+    assert [m["interactor_id"]
+            for m in seen.json()["microphones_lent"]] == [sam["id"]]
 
 
 # -- what the profiles are told ----------------------------------------------
@@ -360,3 +406,85 @@ def test_any_worn_microphone_can_be_lent(client):
                     headers=_as(sam["token"]))
     assert r.status_code == 201
     assert r.json()["mic_type"] == "lapel"
+
+
+# -- the pairing registry and the lending vocabulary --------------------------
+
+def test_a_device_can_be_lent_under_the_name_it_was_paired_with(client):
+    """Two vocabularies for one collar clip, and for a while nothing joined
+    them.
+
+    `qrme/wearables.py` is where somebody registers the devices they own and
+    it calls them `lapel_mic` and `clip_on_mic`; this module is kept in step
+    with `jim/mic.py` by hand and calls them `lapel` and `clip_on`. So you
+    could pair a lapel mic and then be told `lapel_mic` was an unknown
+    microphone type when you tried to lend it — and the registry exists *for*
+    this feature, which its own comment says.
+    """
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+
+    out = client.post(f"/rooms/{room['id']}/mic",
+                      json={"interactor_id": sam["id"], "mic_type": "lapel_mic",
+                            "device": "lapel_mic"},
+                      headers=_as(sam["token"]))
+    assert out.status_code == 201, out.text
+    assert out.json()["mic_type"] == "lapel"      # stored under one name
+
+
+def test_every_microphone_bearing_paired_kind_can_be_lent(client):
+    """The join, asserted rather than hoped for. A kind somebody can pair and
+    cannot lend is a dead end they find at the moment they try to use it.
+
+    The mic-bearing kinds are written out here rather than derived from
+    `FROM_WEARABLE`, which would make this test agree with whatever that table
+    happens to say. Every kind in the registry has to appear on one side or
+    the other, so adding one to `wearables.KINDS` fails here until somebody
+    decides whether it carries a microphone — which is the moment to decide
+    it, not the moment a user tries to lend it.
+    """
+    from qrme import roommic, wearables
+
+    BEARING = {"watch", "earbuds", "headset", "lapel_mic", "clip_on_mic",
+               "glasses"}
+    SILENT = {"band", "ring", "pendant"}
+
+    unclassified = set(wearables.KINDS) - BEARING - SILENT
+    assert not unclassified, (
+        "pairable devices nobody has said carry a microphone or not: "
+        f"{sorted(unclassified)}")
+
+    for kind in BEARING:
+        landed = roommic.FROM_WEARABLE.get(kind, kind)
+        assert landed in roommic.MIC_TYPES, (
+            f"{kind!r} can be paired but has nowhere to land")
+        assert roommic.MIC_TYPES[landed] is True, (
+            f"{kind!r} is pairable as a worn device but lends as room-facing")
+
+
+def test_a_refused_pairing_kind_gets_its_reason_not_unknown(client):
+    """"Unknown microphone type" reads as a gap somebody files a bug about, or
+    works around. The reason those devices are absent is the whole argument of
+    this module, so it is what comes back."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+
+    r = client.post(f"/rooms/{room['id']}/mic",
+                    json={"interactor_id": sam["id"],
+                          "mic_type": "smart_speaker"},
+                    headers=_as(sam["token"]))
+    assert r.status_code == 403
+    detail = r.json()["detail"]
+    assert "unknown" not in detail.lower()
+    assert "not yours to lend" in detail
+
+
+def test_the_vocabulary_route_lists_what_can_and_cannot_be_lent(client):
+    out = client.get("/microphones/vocabulary").json()
+    assert "watch" in out["personal"]
+    refused = {r["kind"] for r in out["refused"]}
+    assert "speakerphone" in refused and "room_array" in refused
+    assert all(r["why"] for r in out["refused"])
+    assert out["room_gain"] == "near_field" and out["voice_focus"] is True

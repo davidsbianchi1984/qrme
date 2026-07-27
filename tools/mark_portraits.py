@@ -15,6 +15,12 @@ So the mark goes into the pixels. Run once, offline, and commit the result:
 burning at request time would mean an imaging library in the runtime
 dependencies and a redraw on every fetch, to reach a mark that never changes.
 
+**Sized for the smallest place it appears, not the biggest.** It was first
+scaled for a portrait viewed whole, where it looked right and read fine — and
+was then two or three pixels tall in a friends-list thumbnail, which is where
+most people actually meet a face. A disclosure that vanishes at the size it is
+usually seen at is not a disclosure.
+
 The mark sits **top-right**. Every composited badge in the product is
 bottom-left (`landing.py`, `BeaconScannerView`, `BeaconScanner.kt`), so the two
 never collide and a surface that draws its own live badge still shows the
@@ -46,7 +52,7 @@ def mark(image: Image.Image) -> Image.Image:
     out = image.convert("RGB")
     w, _ = out.size
     pad = round(w * 0.035)
-    size = round(w * 0.062)
+    size = round(w * 0.115)
     try:
         font = ImageFont.truetype(FONT, size)
     except OSError:                                  # pragma: no cover

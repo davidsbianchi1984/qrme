@@ -7,7 +7,7 @@ ADULT = {"birthdate": "1984-06-01"}
 
 def _profile(client, name="Rex", persona="A hype-loving co-op gamer."):
     r = client.post("/profiles", json={
-        "owner_id": "owner-1", "kind": "fictional", "display_name": name,
+        "plan": "pro", "owner_id": "owner-1", "kind": "fictional", "display_name": name,
         "persona": persona, "verification": ADULT})
     out = r.json()
     client.headers["authorization"] = f"Bearer {out['owner_token']}"

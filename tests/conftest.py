@@ -31,6 +31,10 @@ def profile_id(client):
             "display_name": "Dana",
             "persona": "A retired teacher who loves gardening and dry humor.",
             "verification": ADULT_VERIFICATION,
+            # Pro, where the product default is Basic — see the note on
+            # tests/test_capabilities.py:make_profile. The membership gate is
+            # tested on its own accounts in test_tiers.py.
+            "plan": "pro",
         },
     )
     assert response.status_code == 201, response.text

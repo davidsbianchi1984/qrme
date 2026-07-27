@@ -7,7 +7,7 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import auth, companion, db, persona, terms
+from .. import auth, companion, db, identity, persona, terms, tiers
 from ..common import (
     age_of, profile_or_404, profile_out, require_owner, source_items,
 )
@@ -17,6 +17,18 @@ from ..models import (
 )
 
 router = APIRouter()
+
+
+def _enrol(account_id: str, plan: str | None) -> None:
+    """Put a new account on a plan; leave an existing member's alone.
+
+    Called from both creation paths. Written once rather than inline twice,
+    because "genesis quietly enrolled people on a different plan from the
+    ordinary form" is exactly the kind of divergence two copies produce.
+    """
+    if plan is None and tiers.plan_of(account_id) != "visitor":
+        return                       # already a member — do not downgrade them
+    tiers.subscribe(account_id, plan or tiers.DEFAULT_PLAN)
 
 
 # The signup key is a gate on the *HTTP* surface — who may create a profile
@@ -76,9 +88,21 @@ def create_profile(body: ProfileCreate) -> dict:
             raise HTTPException(
                 422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
         i18n.set_language(profile_id, body.language)
+    # The standing first friend. Silent when there is nothing to install —
+    # an unseeded deployment has no founder, and a cosmetic default must not
+    # be a reason profile creation fails.
+    from .. import friends
+    friends.install_founder(profile_id)
+    # Making something is what a membership is *for*, so creating a profile is
+    # where an account joins one. Basic unless a plan is named, because the
+    # cheaper of two prices is the honest default to put somebody on when they
+    # have not chosen — and an existing member keeps the plan they have rather
+    # than being quietly downgraded by making a second profile.
+    _enrol(body.owner_id, getattr(body, "plan", None))
     token = auth.issue("owner", profile_id)
-    out = {**profile_out(profile_or_404(profile_id)).model_dump(),
+    out = {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
            "owner_token": token}
+    out["membership"] = tiers.membership(body.owner_id)
     if body.language:
         out["language"] = body.language
     return out
@@ -106,14 +130,24 @@ def genesis_profile(body: GenesisCreate) -> dict:
          body.purpose, body.maturity, db.utcnow()),
     )
     conn.commit()
+    _enrol(body.owner_id, getattr(body, "plan", None))
     token = auth.issue("owner", profile_id)
-    return {**profile_out(profile_or_404(profile_id)).model_dump(),
-            "owner_token": token}
+    return {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
+            "owner_token": token,
+            "membership": tiers.membership(body.owner_id)}
 
 
 @router.get("/profiles/{profile_id}", response_model=ProfileOut)
-def get_profile(profile_id: str) -> ProfileOut:
-    return profile_out(profile_or_404(profile_id))
+def get_profile(profile_id: str, request: Request) -> ProfileOut:
+    """Public, so it is redacted for everyone but the owner.
+
+    The request is here to answer one question — *is this the owner asking?* —
+    because an anonymous profile returns its real name to them and to nobody
+    else. Public and unredacted was the previous combination, and it made
+    `anonymous` a property of the four surfaces that render a profile rather
+    than of the profile itself.
+    """
+    return profile_out(profile_or_404(profile_id), request)
 
 
 # -- Embodiments: the profile in a physical body -----------------------------
@@ -235,8 +269,7 @@ def memorial_view(profile_id: str) -> dict:
         " WHERE profile_id=? AND role='profile'", (profile_id,)).fetchone()["n"]
     return {
         "profile_id": profile_id,
-        "display_name": ("anonymous persona" if profile["anonymous"]
-                         else profile["display_name"]),
+        "display_name": identity.shown_name(profile),
         "handle": f"@{handle['handle']}" if handle else None,
         "purpose": profile["purpose"],
         "status": "departed",
@@ -262,7 +295,7 @@ def update_profile(profile_id: str, body: ProfileUpdate,
              profile_id),
         )
         conn.commit()
-    return profile_out(profile_or_404(profile_id))
+    return profile_out(profile_or_404(profile_id), request)
 
 
 @router.get("/profiles/{profile_id}/export")
@@ -425,7 +458,8 @@ def browse_marketplace(tag: str | None = None) -> list[dict]:
             continue
         cards.append({
             "profile_id": row["profile_id"],
-            "display_name": ("anonymous persona" if row["anonymous"]
+            "display_name": (identity.anonymous_name(row["profile_id"])
+                             if row["anonymous"]
                              else row["display_name"]),
             "purpose": row["purpose"], "tags": tags, "blurb": row["blurb"],
         })

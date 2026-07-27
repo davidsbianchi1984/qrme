@@ -13,9 +13,15 @@ ADULT = {"birthdate": "1984-06-01"}
 
 
 def make_profile(client, **extra):
+    # Pro, where the product's own default is Basic, and deliberately so: most
+    # tests here exercise paid capabilities — the marketplace, packs, lent
+    # skills, connectors — and an account entitled to them is what a real user
+    # of those features holds. The gate itself is tested in test_tiers.py, on
+    # accounts that are explicitly Basic or visitor. Pass plan="basic" to opt
+    # a test back down.
     body = {"owner_id": "owner-1", "kind": "self", "display_name": "Dana",
             "persona": "A retired teacher who loves gardening and dry humor.",
-            "verification": ADULT}
+            "verification": ADULT, "plan": "pro"}
     body.update(extra)
     r = client.post("/profiles", json=body)
     assert r.status_code == 201, r.text
@@ -246,7 +252,11 @@ def test_marketplace_listing_and_discovery(client):
     cards = client.get("/marketplace").json()
     assert len(cards) == 2
     anon = next(c for c in cards if c["tags"] == ["fiction"])
-    assert anon["display_name"] == "anonymous persona"   # identity stays hidden
+    # Identity stays hidden, under a fixed number tied to the profile rather
+    # than one label shared by every anonymous listing — two anonymous cards in
+    # a marketplace have to be tellable apart.
+    from qrme import identity
+    assert anon["display_name"] == identity.anonymous_name(ghost["id"])
     assert "persona" not in {k for c in cards for k in c} or True
 
     family_only = client.get("/marketplace", params={"tag": "family"}).json()

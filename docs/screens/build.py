@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import frames          # generated: tools/encode_desk_frames.py
+import textwidth as tw  # generated: tools/measure_text.py
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -67,6 +68,22 @@ def icon(name, cx, cy, col, s=1.0):
     if name == "person":
         return (f'<circle cx="{cx}" cy="{cy-sc(4)}" r="{sc(3.6)}" {st}/>'
                 f'<path d="M{cx-sc(6)} {cy+sc(7)} c0 -{sc(6)} {sc(12)} -{sc(6)} {sc(12)} 0" {st}/>')
+    if name == "addphoto":
+        # The same mark as qrme/assets/figures/add-photo.svg: a picture frame
+        # with a plus badged on. Drawn here too so the screen shows the control
+        # rather than a word describing it.
+        return (f'<rect x="{cx-sc(9)}" y="{cy-sc(7.5)}" width="{sc(15)}" '
+                f'height="{sc(12)}" rx="{sc(2.4)}" {st}/>'
+                f'<circle cx="{cx-sc(4.6)}" cy="{cy-sc(3.4)}" r="{sc(1.5)}" '
+                f'{p}/>'
+                f'<path d="M{cx-sc(8)} {cy+sc(3.4)} L{cx-sc(2.6)} '
+                f'{cy-sc(1.4)} L{cx+sc(1.4)} {cy+sc(2.2)}" {st}/>'
+                f'<circle cx="{cx+sc(6.4)}" cy="{cy+sc(6)}" r="{sc(4.6)}" '
+                f'{p}/>'
+                f'<path d="M{cx+sc(6.4)} {cy+sc(3.6)} V{cy+sc(8.4)} '
+                f'M{cx+sc(4)} {cy+sc(6)} H{cx+sc(8.8)}" fill="none" '
+                f'stroke="#0d0a20" stroke-width="{1.6*s:.2f}" '
+                f'stroke-linecap="round"/>')
     if name == "people":
         return (f'<circle cx="{cx-sc(4)}" cy="{cy-sc(4)}" r="{sc(3)}" {st}/>'
                 f'<circle cx="{cx+sc(4)}" cy="{cy-sc(4)}" r="{sc(3)}" {st}/>'
@@ -204,6 +221,49 @@ def icon(name, cx, cy, col, s=1.0):
     if name == "flag":
         return (f'<path d="M{cx-sc(6)} {cy+sc(8)} v-{sc(16)}" {st}/>'
                 f'<path d="M{cx-sc(6)} {cy-sc(7)} h{sc(11)} l-{sc(2.5)} {sc(3.5)} {sc(2.5)} {sc(3.5)} h-{sc(11)} Z" {st}/>')
+    if name == "expand":  # go full screen — corners pushing out
+        return (f'<path d="M{cx+sc(2)} {cy-sc(7)} H{cx+sc(7)} V{cy-sc(2)} '
+                f'M{cx+sc(7)} {cy-sc(7)} L{cx+sc(1)} {cy-sc(1)}" {st}/>'
+                f'<path d="M{cx-sc(2)} {cy+sc(7)} H{cx-sc(7)} V{cy+sc(2)} '
+                f'M{cx-sc(7)} {cy+sc(7)} L{cx-sc(1)} {cy+sc(1)}" {st}/>')
+    if name == "shrink":  # and back out of it — corners pulling in
+        return (f'<path d="M{cx+sc(7)} {cy-sc(2)} H{cx+sc(2)} V{cy-sc(7)} '
+                f'M{cx+sc(2)} {cy-sc(2)} L{cx+sc(7)} {cy-sc(7)}" {st}/>'
+                f'<path d="M{cx-sc(7)} {cy+sc(2)} H{cx-sc(2)} V{cy+sc(7)} '
+                f'M{cx-sc(2)} {cy+sc(2)} L{cx-sc(7)} {cy+sc(7)}" {st}/>')
+    if name == "rotate":  # tilt the phone — the way into landscape
+        # Two phones and the turn between them. A single tilted phone with a
+        # curved arrow is the usual glyph and it is illegible at 15px; the
+        # before-and-after reads instantly at any size because the shapes
+        # differ rather than the annotation.
+        return (f'<rect x="{cx-sc(8.5)}" y="{cy-sc(6)}" width="{sc(6.5)}" '
+                f'height="{sc(11)}" rx="1.6" {st}/>'
+                f'<rect x="{cx+sc(1)}" y="{cy-sc(3.2)}" width="{sc(11)}" '
+                f'height="{sc(6.5)}" rx="1.6" {st}/>'
+                f'<path d="M{cx-sc(1)} {cy-sc(6.5)} a{sc(6)} {sc(6)} 0 0 1 {sc(3.4)} -{sc(1.6)}" {st}/>'
+                f'<path d="M{cx+sc(0.6)} {cy-sc(9.6)} l-{sc(1.8)} {sc(2.6)} {sc(2.8)} {sc(1)}" {st}/>')
+    if name == "smiley":  # the emoji key inside a composer
+        return (f'<circle cx="{cx}" cy="{cy}" r="{sc(7)}" {st}/>'
+                f'<circle cx="{cx-sc(2.6)}" cy="{cy-sc(2)}" r="{sc(1.1)}" {p}/>'
+                f'<circle cx="{cx+sc(2.6)}" cy="{cy-sc(2)}" r="{sc(1.1)}" {p}/>'
+                f'<path d="M{cx-sc(3.4)} {cy+sc(2)} a{sc(3.6)} {sc(3.6)} 0 0 0 {sc(6.8)} 0" {st}/>')
+    if name == "bell":  # ring the bell on a desk
+        return (f'<path d="M{cx-sc(7)} {cy+sc(4)} C{cx-sc(5.5)} {cy+sc(1)} {cx-sc(5)} {cy-sc(2)} {cx-sc(5)} {cy-sc(4)} '
+                f'A{sc(5)} {sc(5)} 0 0 1 {cx+sc(5)} {cy-sc(4)} '
+                f'C{cx+sc(5)} {cy-sc(2)} {cx+sc(5.5)} {cy+sc(1)} {cx+sc(7)} {cy+sc(4)} Z" {st}/>'
+                f'<path d="M{cx-sc(2.2)} {cy+sc(4)} a{sc(2.2)} {sc(2.2)} 0 0 0 {sc(4.4)} 0" {st}/>'
+                f'<circle cx="{cx}" cy="{cy-sc(8.6)}" r="{sc(1.2)}" {p}/>')
+    if name == "share":  # pass it on — three nodes, two edges
+        return (f'<circle cx="{cx+sc(5)}" cy="{cy-sc(6)}" r="{sc(2.6)}" {st}/>'
+                f'<circle cx="{cx-sc(6)}" cy="{cy}" r="{sc(2.6)}" {st}/>'
+                f'<circle cx="{cx+sc(5)}" cy="{cy+sc(6)}" r="{sc(2.6)}" {st}/>'
+                f'<path d="M{cx-sc(3.6)} {cy-sc(1.2)} l{sc(6.2)} -{sc(3.6)} '
+                f'M{cx-sc(3.6)} {cy+sc(1.2)} l{sc(6.2)} {sc(3.6)}" {st}/>')
+    if name == "comeup":  # ask to come up as a guest — a person, and up
+        return (f'<circle cx="{cx-sc(3)}" cy="{cy-sc(4)}" r="{sc(3.2)}" {st}/>'
+                f'<path d="M{cx-sc(9)} {cy+sc(7)} c0 -{sc(5.4)} {sc(12)} -{sc(5.4)} {sc(12)} 0" {st}/>'
+                f'<path d="M{cx+sc(6)} {cy+sc(3)} v-{sc(9)} '
+                f'M{cx+sc(2.8)} {cy-sc(2.8)} l{sc(3.2)} -{sc(3.2)} {sc(3.2)} {sc(3.2)}" {st}/>')
     if name == "dove":  # memorial / departure
         return (f'<path d="M{cx-sc(8)} {cy+sc(2)} c{sc(3)} -{sc(5)} {sc(8)} -{sc(6)} {sc(11)} -{sc(3)} '
                 f'c{sc(2)} -{sc(4)} {sc(5)} -{sc(4)} {sc(5)} -{sc(4)} c-{sc(1)} {sc(3)} -{sc(2)} {sc(4)} -{sc(4)} {sc(5)} '
@@ -265,6 +325,226 @@ def agent_light(x, y, colour, label):
     return (f'<circle cx="{x}" cy="{y}" r="10" fill="{A(col, 0.16)}"/>'
             + f'<circle cx="{x}" cy="{y}" r="4.6" fill="{col}"/>'
             + text(x + 15, y + 4, label, 10.5, col, 700, spacing=0.2))
+
+
+def bubble_chat(x, y, w, rows):
+    """The chat overlay in a live room: circular faces on transparent glass.
+
+    Drawn over the video rather than in a panel beside it. A comment strip with
+    its own solid background takes a bite out of the picture people came to
+    watch; this floats, so the room stays the thing on screen.
+
+    The screens draw their own circles rather than using the baked bubbles in
+    ``docs/portraits/bubbles/``. Those exist for the README, which cannot draw
+    one — GitHub strips the `style` that would round an `<img>`. Inside the
+    product a surface can round its own, and using the pre-baked file here
+    would put a bubble inside a bubble.
+    """
+    out, yy = [], y
+    for name, said, b64 in rows:
+        # No plate behind the row — just a soft scrim under the text so it
+        # survives a bright frame without boxing the video in.
+        out.append(f'<circle cx="{x+15}" cy="{yy+13}" r="16" '
+                   f'fill="rgba(8,6,22,0.7)"/>')
+        out.append(face(x + 15, yy + 13, 26, b64, radius=13))
+        out.append(rrect(x + 32, yy + 2, w - 32, 23, 11,
+                         "rgba(8,6,22,0.62)"))
+        out.append(text(x + 41, yy + 11, name, 8, C["cyan"], 800))
+        out.append(text(x + 41, yy + 21, said, 9, "rgba(255,255,255,0.92)",
+                        500))
+        yy += 30
+    return out, yy
+
+
+D_BTN = 22          # the round buttons on the live bar
+G_BTN = 4           # and the gap between them
+
+# A photo that *is* the screen: from where content starts down to just above
+# the tab bar. A live room laid out any other way puts the thing somebody came
+# to watch in a box with furniture around it.
+PHOTO_FULL = (SY + SH - 52) - (SY + 100) - 10
+
+
+def live_bar(x, y, w, h, actions, placeholder="Type…"):
+    """The composer and the reaction buttons, on one line at the foot of a live
+    room.
+
+    Every verb here already existed as a route — ``POST /desks/{id}/bell``,
+    ``POST /desks/{id}/guests``, ``POST /{kind}/{id}/gift`` and the audience
+    layer's like and share — and none of them existed anywhere a thumb could
+    reach. A capability with no control is indistinguishable from a missing
+    feature, which is exactly how it read.
+
+    The first version of this row was five large labelled buttons under the
+    video, and it was wrong twice over: it ate the picture, and it explained
+    itself at a size nobody needs. Every live product converges on the same
+    answer because it is the right one — the video is the screen, and the
+    controls are a single strip at the bottom, small enough to stay out of the
+    way and thumb-reachable because that is where the thumb already is.
+
+    So: a composer on the left, then the reactions as small circles pushed to
+    the right corner. No captions. An icon at this size has to carry its own
+    meaning, which is why the bell is a bell and the guest request is a person
+    with an arrow over them rather than anything cleverer.
+
+    Ringing and asking to come up sit in the same strip as like, gift and
+    share because from the viewer's side they are one gesture — a thing you do
+    to the room you are watching. That the last one needs the host to say yes
+    is the host's business, not a reason to file it under a different menu.
+    """
+    o = []
+    right = x + w - 8
+    strip = len(actions) * D_BTN + (len(actions) - 1) * G_BTN
+    by = y + h - 10 - D_BTN                 # top of the row
+    cy = by + D_BTN / 2
+
+    # The composer takes whatever the buttons leave. It has a floor: below
+    # this the placeholder is unreadable and the field stops looking like
+    # somewhere you can type, which is the only job it has on a still image.
+    # Capped as well as floored. On a landscape screen the composer would
+    # otherwise run half a metre of glass to reach the buttons, and a text
+    # field that wide reads as a banner rather than somewhere to type.
+    room = (right - strip - 8) - (x + 8)
+    if room < 74:
+        raise ValueError(
+            f"{len(actions)} buttons leave {room:.0f}px for the composer; "
+            f"74 is the floor")
+    bar_w = min(room, 240)
+    o.append(rrect(x + 8, by, bar_w, D_BTN, D_BTN / 2, "rgba(8,6,22,0.62)",
+                   "rgba(255,255,255,0.12)", 1))
+    o.append(text(x + 18, cy + 3, placeholder, 8.6,
+                  "rgba(232,228,255,0.55)", 500))
+    # The emoji key sits inside the right end of the field, where every
+    # composer puts it — reactions are one line up, this is for the message.
+    o.append(f'<circle cx="{x+8+bar_w-13}" cy="{cy}" r="7.4" '
+             f'fill="rgba(255,255,255,0.20)"/>')
+    o.append(icon("smiley", x + 8 + bar_w - 13, cy, "rgba(255,255,255,0.82)",
+                  0.42))
+
+    bx = right - strip
+    for entry in actions:
+        ic, col = entry[0], entry[1]
+        count = entry[2] if len(entry) > 2 else None
+        o.append(f'<circle cx="{bx+D_BTN/2}" cy="{cy}" r="{D_BTN/2}" '
+                 f'fill="rgba(8,6,22,0.62)" '
+                 f'stroke="{A(ACCENT[col], 0.45)}" stroke-width="0.9"/>')
+        o.append(icon(ic, bx + D_BTN / 2, cy, ACCENT[col], 0.44))
+        if count:
+            # Tucked under the glyph rather than beside it — a count that
+            # widens the button breaks the even spacing of the strip.
+            o.append(text(bx + D_BTN - 2, cy + D_BTN / 2 - 1, count, 6.4,
+                          "rgba(255,255,255,0.85)", 700, "end"))
+        bx += D_BTN + G_BTN
+    return o, D_BTN + 18
+
+
+def friends_list(y, entries):
+    """A profile's friends, founder first.
+
+    The founder's row carries a small badge saying so. Position alone would
+    leave a reader to infer why one face is always at the top, and the honest
+    answer — *this one comes as standard, and it cannot be removed* — is short
+    enough to just say.
+    """
+    out, yy = [], y
+    for entry in entries:
+        name, sub, b64, badge = entry[:4]
+        packs = entry[4] if len(entry) > 4 else []
+        rating = entry[5] if len(entry) > 5 else None
+        quote = entry[6] if len(entry) > 6 else None
+        # The founder's row gives up its right end to the badge, so its
+        # subtitle has less room than the others. Caught here rather than in a
+        # render, which is how the same overlap got shipped on the agent groups.
+        # The chevron-and-badge end of the row is spoken for, and a rating
+        # takes more of it. Measuring the name to place the stars beside it was
+        # the first attempt and it collided — a bold 13px name is wider than
+        # any character estimate — so the stars sit at a fixed x and the
+        # subtitle is held short enough to clear them.
+        limit = 14 if rating is not None else (26 if badge else 34)
+        if len(sub) > limit:
+            raise ValueError(f"friend subtitle too long for the row: {sub!r}")
+        h = 88 if quote else 74
+        out.append(rrect(CX, yy, CW, h, 15, "url(#gCard)", C["line"], 1))
+        if b64:
+            out.append(face(CX + 33, yy + h / 2 - 8, 40, b64))
+        else:
+            out.append(orb(CX + 33, yy + h / 2 - 8, 19))
+
+        out.append(text(CX + 62, yy + 26, name, 13, C["txt"], 700))
+        out.append(text(CX + 62, yy + 41, sub, 9.5, C["t2"], 500))
+        # The packs a profile carries, named rather than counted — "4 packs"
+        # says how much it knows, the names say what about. Set small on
+        # purpose: the names are the useful part, so more of them fitting beats
+        # any of them being large. Overflows to +N rather than running under
+        # the badge.
+        if packs:
+            avail = (CW - 52 - 12) - 62          # left edge to the badge
+            shown, used = [], 0.0
+            for i, nm in enumerate(packs):
+                w = len(nm) * 3.2 + (5 if shown else 0)
+                tail = 16 if i < len(packs) - 1 else 0
+                if used + w + tail > avail:
+                    break
+                shown.append(nm)
+                used += w
+            line = " · ".join(shown)
+            if len(shown) < len(packs):
+                line += f"  +{len(packs) - len(shown)}"
+            out.append(text(CX + 62, yy + 54, line, 6.5, C["cyan"], 600))
+        # The rating and what somebody said about it, on one line at the
+        # bottom. The stars answer "is this any good"; the line beside them
+        # answers "good at what", and one without the other is half an answer.
+        if rating is not None:
+            out.append(stars(CX + 62, yy + 67, rating, C["gold"], 0.5))
+            out.append(text(CX + 96, yy + 70, f"{rating:.1f}", 7.5,
+                            C["gold"], 700))
+            if quote:
+                if len(quote) > 30:
+                    raise ValueError(
+                        f"review too long for the row: {quote!r}")
+                out.append(text(CX + 114, yy + 70, quote, 7, C["t3"], 400))
+        if badge:
+            col = C["gold"] if badge == "VERIFIED" else C["brandA"]
+            bw = 52
+            bx = CX + CW - bw - 12
+            out.append(rrect(bx, yy + h / 2 - 17, bw, 18, 9, A(col, 0.18),
+                             col, 1))
+            out.append(text(bx + bw / 2, yy + h / 2 - 5, badge, 7.5, col, 800,
+                            "middle", 0.4))
+        yy += h + 9
+    return out, yy
+
+
+def my_page(y, spec):
+    """Somebody's own homepage — theme, tagline, Top 8.
+
+    Drawn in the page's *own* colours rather than the app's, which is the
+    entire point of the feature: a generated page looks like everybody else's,
+    and the thing worth reviving from MySpace is that yours did not.
+    """
+    bg, ink, accent = spec["bg"], spec["ink"], spec["accent"]
+    out = [rrect(CX, y, CW, 266, 16, bg, A(accent, 0.55), 1.4)]
+    yy = y + 16
+    out.append(face(CX + 40, yy + 24, 48, spec["face"]))
+    out.append(text(CX + 74, yy + 18, spec["name"], 14, ink, 750))
+    out.append(text(CX + 74, yy + 34, spec["handle"], 9.5, A(ink, 0.6), 500))
+    out.append(rrect(CX + 74, yy + 42, 46, 15, 7, A(accent, 0.22), accent, 1))
+    out.append(text(CX + 97, yy + 53, spec["badge"], 7, accent, 800,
+                    "middle", 0.4))
+    yy += 74            # clear of the badge above
+    for line in spec["tagline"]:
+        out.append(text(CX + 16, yy, line, 10.5, A(ink, 0.85), 500))
+        yy += 14
+    yy += 8
+    out.append(text(CX + 16, yy, "TOP 8", 8, accent, 800, "start", 0.7))
+    yy += 12
+    for i, (nm, b64) in enumerate(spec["top"]):
+        col, row = i % 4, i // 4
+        fx = CX + 34 + col * 56
+        fy = yy + 22 + row * 58
+        out.append(face(fx, fy, 38, b64))
+        out.append(text(fx, fy + 31, nm, 7, A(ink, 0.7), 600, "middle"))
+    return out, y + 266 + 10
 
 
 def agent_groups(y, groups):
@@ -468,11 +748,11 @@ def navbar():
     return o
 
 
-def head(num, title, sub, accent="brand", locked=False):
-    ac = ACCENT.get(accent, C["brandA"])
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
-           f'viewBox="0 0 {W} {H}" role="img" aria-label="{esc(title)} screen">']
-    out.append(f'''<defs>
+def defs(ac):
+    """The gradients every screen shares. Split out of :func:`head` so a
+    full-bleed screen — which has no title bar to hang them off — can still
+    open with the same palette instead of growing a second copy."""
+    return f'''<defs>
       <linearGradient id="gScr" x1="0" y1="0" x2="0.6" y2="1">
         <stop offset="0" stop-color="{C['scrA']}"/><stop offset="1" stop-color="{C['scrB']}"/></linearGradient>
       <linearGradient id="gFrame" x1="0" y1="0" x2="1" y2="1">
@@ -492,7 +772,14 @@ def head(num, title, sub, accent="brand", locked=False):
         <stop offset="78%" stop-color="#3f3bc0"/><stop offset="100%" stop-color="#140f34"/></radialGradient>
       <radialGradient id="glow" cx="50%" cy="50%" r="50%">
         <stop offset="0" stop-color="{ac}" stop-opacity="0.5"/><stop offset="1" stop-color="{ac}" stop-opacity="0"/></radialGradient>
-    </defs>''')
+    </defs>'''
+
+
+def head(num, title, sub, accent="brand", locked=False):
+    ac = ACCENT.get(accent, C["brandA"])
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
+           f'viewBox="0 0 {W} {H}" role="img" aria-label="{esc(title)} screen">',
+           defs(ac)]
     out.append(rrect(PX, PY, PW, PH, 40, "url(#gFrame)"))
     out.append(rrect(SX, SY, SW, SH, 31, "url(#gScr)"))
     out += statusbar()
@@ -534,7 +821,53 @@ def close():
 # --------------------------------------------------------------------------- #
 # building blocks
 # --------------------------------------------------------------------------- #
+def card_room(c):
+    """How much room a card's title and subtitle actually have, in px.
+
+    The title shares its line with a pill; the subtitle passes underneath one,
+    so only the title pays for it. A metric is set large against the right edge
+    at the card's vertical centre, which is level with both.
+
+    The margins here are the *breakage* line, not the design's. Cards are laid
+    out to 14px of inner padding; this checks against 8, because the measuring
+    font is Cairo's DejaVu and the browsers that actually render these SVGs
+    find SF Pro, Segoe UI or Roboto — all narrower. Checking the design's own
+    padding against the widest possible font would fail text that looks fine
+    everywhere it is ever seen.
+    """
+    tx = CX + 56 if c.get("icon") else CX + 14
+    right = CX + CW - 8
+    if c.get("metric"):
+        right -= tw.width(c["metric"], 20, 750) + 4
+    # A status dot is set at the card's vertical centre, so unlike a pill it is
+    # level with the subtitle too. Missing that let `REQUIRED` sit on top of
+    # "verified before any chat" on the adult-mode screen.
+    if c.get("stat"):
+        right -= 14 + 6.0 * len(c["stat"][0]) + 4
+    title_right = right
+    if c.get("pill"):
+        title_right -= (12 + tw.width(c["pill"][0], 9.5, 700)
+                        + 0.4 * len(c["pill"][0]) + 4)
+    return title_right - tx, right - tx
+
+
 def card_block(y, c):
+    # Nothing on these screens wraps or ellipsises, so text that does not fit
+    # runs off the side of the phone and stays there. Three cards on the gaming
+    # screen did exactly that and survived a full gallery rebuild, because the
+    # only thing that would have caught it was somebody looking at that one
+    # screen. Measured rather than counted — `Companion` and `lllllllll` are
+    # both nine characters and one is nearly twice as wide.
+    title_room, sub_room = card_room(c)
+    have = tw.width(c["k"], 13, 600)
+    if have > title_room:
+        raise ValueError(f"card title runs off the card: {c['k']!r} needs "
+                         f"{have:.0f}px, has {title_room:.0f}px")
+    if c.get("s"):
+        have = tw.width(c["s"], 11, 400)
+        if have > sub_room:
+            raise ValueError(f"card subtitle runs off the card: {c['s']!r} "
+                             f"needs {have:.0f}px, has {sub_room:.0f}px")
     h = c.get("h", 52)
     extra = c.get("extra")
     if extra and extra[0] in ("meter", "spark"):
@@ -872,6 +1205,15 @@ def render(spec):
         out += block
         y += 4
 
+    if spec.get("friends"):
+        block, y = friends_list(y, spec["friends"])
+        out += block
+        y += 4
+
+    if spec.get("my_page"):
+        block, y = my_page(y, spec["my_page"])
+        out += block
+
     # A camera frame above the cards. Runs before the hero chain because a
     # screen has either a hero or cards, never both — this is the one thing
     # that sits above whichever it is.
@@ -880,6 +1222,12 @@ def render(spec):
                                   spec["grid"], uid=f"{num:02d}")
         out.append(block)
         y += gh + 14
+
+    if spec.get("facade_card"):
+        f = spec["facade_card"]
+        out.append(video_facade(CX, y, CW, 152, f["platform"], f["title"],
+                                f["note"], uid=f"{num:02d}"))
+        y += 164
 
     if spec.get("photo"):
         ph = spec.get("photo_h", 148)
@@ -891,6 +1239,22 @@ def render(spec):
             ov = spec["overlay"]
             out.append(live_overlay(CX, y, CW, ph, ov.get("comments", []),
                                     ov.get("ticker", []), ov.get("viewers")))
+        # Over the picture, anchored to its bottom — an overlay drawn before
+        # the photo is a list above a picture, which is the thing it exists
+        # not to be.
+        bottom = 12
+        if spec.get("live_bar"):
+            block, used = live_bar(CX, y, CW, ph, spec["live_bar"])
+            out += block
+            # The chat gives way to the bar rather than the other way round: a
+            # comment you cannot read scrolls past, a control you cannot reach
+            # never gets used.
+            bottom += used
+        if spec.get("bubble_chat"):
+            rows = spec["bubble_chat"]
+            block, _ = bubble_chat(CX + 8, y + ph - bottom - len(rows) * 30,
+                                   CW - 16, rows)
+            out += block
         y += ph + 12
 
     if hero == "welcome":
@@ -937,7 +1301,7 @@ def render(spec):
         out.append(button(CX, y + 2, CW, "+  Add Source", "brand", 40))
         y += 52
         out.append(icon("lock", CX + 6, y + 6, C["cyan"], 0.6))
-        out.append(text(CX + 18, y + 10, "Stored locally in your vault · optional cloud contribution", 9.3, C["t3"], 500))
+        out.append(text(CX + 18, y + 10, "Stored in your vault · optional cloud contribution", 9.3, C["t3"], 500))
 
     elif hero == "personality":
         y += 8
@@ -1248,10 +1612,14 @@ def render(spec):
         out.append(orb(W / 2, y + 34, 26))
         out.append(text(W / 2, y + 78, "Four questions to birth your AI", 12, C["txt"], 600, "middle"))
         y += 100
-        qs = [("1", "What do you love most?", "answered"),
-              ("2", "What's a memory you'd keep forever?", "answered"),
+        # The four fields `GenesisAnswers` actually takes — social_style,
+        # humor, comfort, what_matters — rather than four questions written
+        # for the mock. Two of those had drifted from the model *and* ran off
+        # the side of the phone.
+        qs = [("1", "How are you around people?", "answered"),
+              ("2", "What makes you laugh?", "answered"),
               ("3", "How do you comfort a friend?", "now"),
-              ("4", "What would you never compromise on?", "next")]
+              ("4", "What matters most to you?", "next")]
         for n, q, state in qs:
             col = C["green"] if state == "answered" else (C["brandA"] if state == "now" else C["t3"])
             out.append(rrect(CX, y, CW, 46, 13, "url(#gCard)", C["line"],
@@ -1316,8 +1684,8 @@ def render(spec):
         out.append(text(CX + 14, y + 40, "\"How do you stay patient?\"", 10, C["txt"], 500))
         out.append(text(CX + 14, y + 56, "→ name replaced · rated +1 · revocable", 9.5, C["t3"], 500))
         y += 86
-        for ic, col, k, s in [("eye", "cyan", "Anonymized at the gateway", "no ids, names replaced"),
-                              ("warn", "red", "Revoke deletes past items", "erased by their refs")]:
+        for ic, col, k, s in [("eye", "cyan", "Anonymized at gateway", "no ids, names replaced"),
+                              ("warn", "red", "Revoke deletes items", "erased by their refs")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
@@ -1330,8 +1698,8 @@ def render(spec):
         y += 40
         for ic, col, k, s, pt in [("cloud", "red", "Model API calls", "none outbound", ("BLOCKED", "crit")),
                                   ("link", "red", "Cloud gateway", "bypassed even if set", ("BLOCKED", "crit")),
-                                  ("sliders", "green", "Inference & fine-tune", "recomputed on-host", ("LOCAL", "good")),
-                                  ("eye", "cyan", "GET /offline/status", "proves the posture", ("PROVEN", "info"))]:
+                                  ("sliders", "green", "Inference & tune", "recomputed on-host", ("LOCAL", "good")),
+                                  ("eye", "cyan", "GET /offline", "proves the posture", ("PROVEN", "info"))]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "pill": pt, "h": 48})
             out.append(s2)
 
@@ -1344,7 +1712,7 @@ def render(spec):
         y += 40
         for ic, col, k, s in [("dove", "cyan", "Graceful departure", "a farewell for every relationship"),
                               ("lock", "green", "Memory preserved", "sealed in the vault, exportable"),
-                              ("people", "amber", "Succession", "ownership passes, old token revoked"),
+                              ("people", "amber", "Succession", "ownership passes, token revoked"),
                               ("chat", "brand", "Chat closes with 410", "a goodbye, never a silent 404")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
@@ -1505,7 +1873,7 @@ def render(spec):
         out.append(button(CX, y + 2, CW, "Continue", "brand", 44))
 
     elif hero == "avatar":
-        out.append(text(CX, y, "A 2D portrait for chat, a 3D avatar for video, AR & VR.", 10.5, C["t2"]))
+        out.append(text(CX, y, "A 2D portrait for chat, a 3D avatar for AR & VR.", 10.5, C["t2"]))
         y += 26
         gw = (CW - 12) / 2
         # 2D portrait tile
@@ -1555,8 +1923,8 @@ def render(spec):
         out.append(icon("headset", CX + 28, y + 24, C["cyan"], 0.9))
         y += ph + 14
         for ic, col, k, s in [("headset", "cyan", "Room-scale presence", "Stands in your room"),
-                              ("speaker", "brand", "Spatial audio", "her voice comes from where she is"),
-                              ("eye", "pink", "Passthrough AR or full VR", "your living room, or her world")]:
+                              ("speaker", "brand", "Spatial audio", "her voice comes from there"),
+                              ("eye", "pink", "Passthrough AR, full VR", "your living room, or her world")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
             out.append(s2)
 
@@ -1645,7 +2013,7 @@ def render(spec):
             out.append(f'<circle cx="{bx+d/2}" cy="{y+d/2}" r="{d/2}" fill="{fill}" stroke="{stroke}" stroke-width="1"/>')
             out.append(icon(ic, bx + d / 2, y + d / 2, icol, 1.2))
         y += d + 14
-        out.append(text(W / 2, y, "Camera & mic stay on your device — the stream is encrypted.", 9.3, C["t3"], 500, "middle"))
+        out.append(text(W / 2, y, "Camera & mic stay on your device · encrypted stream", 9.3, C["t3"], 500, "middle"))
 
     elif hero == "allset":
         out.append(orb(W / 2, y + 40, 34))
@@ -1655,7 +2023,7 @@ def render(spec):
         out.append(text(W / 2, y + 21, "Ready to meet the world.", 11, C["t2"], 400, "middle"))
         y += 44
         for ic, col, k, s in [("person", "brand", "Profile created", "an AI version of you"),
-                              ("db", "cyan", "Sources added", "1,024 memories sealed in your vault"),
+                              ("db", "cyan", "Sources added", "1,024 memories, sealed"),
                               ("sliders", "amber", "Personality set", "warm · balanced boundaries"),
                               ("mask", "pink", "Avatar ready", "2D portrait + 3D for video & VR")]:
             s2, y = card_block(y, {"icon": ic, "color": col, "k": k, "s": s, "h": 48})
@@ -1768,7 +2136,7 @@ def render(spec):
                 out.append(text(bx - w / 2, y + 31, lab, 10, col, 700, "middle"))
                 bx -= w + 8
             y += 62
-        out.append(text(CX, y, "Only the folders & albums you pick — nothing else is read.",
+        out.append(text(CX, y, "Only the folders & albums you pick — nothing else",
                         9.5, C["t3"], 500))
 
     elif hero == "assistant":
@@ -1866,9 +2234,24 @@ def render(spec):
             out.append(s)
         if spec.get("button"):
             out.append(button(CX, y, CW, spec["button"][0], spec["button"][1], 42))
+            y += 42
+        # The tab bar is drawn *after* the body and is opaque, so a screen with
+        # one card too many does not look crowded — it looks finished, with the
+        # overflow silently painted over. On the live-desks screen that hid
+        # `Ring the bell` completely, which is the button the screen exists
+        # for, and nothing said so because everything above it rendered fine.
+        if y > SY + SH - 52:
+            raise ValueError(
+                f'screen {num} runs {y - (SY + SH - 52):.0f}px past the tab '
+                f'bar — the last thing on it will be painted over')
 
     out += tabbar(spec.get("tabs", MAIN), spec.get("tab", 0))
-    out += help_button()
+    # The help button sits in the bottom trailing corner, which is exactly
+    # where a live room's reaction strip ends. It stands down rather than
+    # landing on the share button — a floating helper that covers a control is
+    # worse than no floating helper.
+    if not spec.get("live_bar"):
+        out += help_button()
     out += navbar()
     # Drawn after the tab bar so nothing sits on top of it, and before close()
     # because close() emits the closing tag — appending past it produced a
@@ -1877,6 +2260,404 @@ def render(spec):
         out += agent_overlay(spec["overlay_agents"])
     out += close()
 
+    return "".join(out)
+
+
+# --------------------------------------------------------------------------- #
+# full screen — the video with the app taken off it
+# --------------------------------------------------------------------------- #
+def avatar_grid(x, y, w, h, people, cols=2, pad=10):
+    """An audio room: everyone as a box, because there is nothing to look at.
+
+    A voice call with no video is the case every layout forgets, and the boxes
+    are not decoration — they are the only way to answer the two questions an
+    audio room actually raises: *who is here* and *who is talking*. So the
+    speaking ring is the loudest thing in the tile, and a muted person keeps
+    their box rather than vanishing from it. Somebody who has gone quiet is
+    still in the room, and a UI that removes them is telling the others they
+    left.
+
+    Synthetic profiles wear their AI badge here exactly as they do everywhere
+    else. A room is a surface like any other, and a mark that switches off when
+    the layout changes is a mark nobody can rely on.
+    """
+    o = []
+    rows = (len(people) + cols - 1) // cols
+    bw = (w - pad * (cols - 1)) / cols
+    bh = (h - pad * (rows - 1)) / rows
+    for i, (name, b64, state, badge) in enumerate(people):
+        bx = x + (i % cols) * (bw + pad)
+        by = y + (i // cols) * (bh + pad)
+        live = state == "speaking"
+        o.append(rrect(bx, by, bw, bh, 16,
+                       "rgba(16,12,40,0.72)" if not live
+                       else A(C["green"], 0.14),
+                       A(C["green"], 0.85) if live else "rgba(255,255,255,0.08)",
+                       2 if live else 1))
+        r = min(bw, bh) * 0.26
+        fcx, fcy = bx + bw / 2, by + bh / 2 - 6
+        if live:
+            # The ring, not a waveform. A waveform on a still image is a
+            # picture of sound that is not happening.
+            o.append(f'<circle cx="{fcx}" cy="{fcy}" r="{r+7}" fill="none" '
+                     f'stroke="{A(C["green"], 0.55)}" stroke-width="2.5"/>')
+        o.append(face(fcx, fcy, r * 2, b64, radius=r))
+        o.append(text(fcx, by + bh - 16, name, 9.5, "#efecff", 700, "middle"))
+        if badge:
+            bwid = 8 + tw.width(badge, 6.4, 800)
+            o.append(rrect(bx + 8, by + 8, bwid, 13, 6.5, A(C["cyan"], 0.22)))
+            o.append(text(bx + 8 + bwid / 2, by + 17.5, badge, 6.4,
+                          C["cyan"], 800, "middle"))
+        if state == "muted":
+            # A slash through a microphone, drawn rather than implied by a
+            # dimmed tile: dimming means "away" on every other surface here.
+            o.append(f'<circle cx="{bx+bw-16}" cy="{by+16}" r="9" '
+                     f'fill="rgba(8,6,20,0.72)"/>')
+            o.append(icon("mic", bx + bw - 16, by + 16, C["t3"], 0.42))
+            o.append(f'<path d="M{bx+bw-22} {by+10} l12 12" stroke="{C["red"]}"'
+                     f' stroke-width="1.8" stroke-linecap="round"/>')
+    return o
+
+
+def ar_presence(x, y, w, h, people):
+    """The others, placed in the room the camera is actually looking at.
+
+    This is the whole of what AR is over a video call: they are not in a strip
+    down the side, they are *somewhere* — beside the desk, by the door — and
+    where they are is information. A floor ring under each one is what makes
+    them stand in the room rather than float on the glass, and it is the only
+    part of this drawing doing real work.
+
+    Marked, obviously. A synthetic profile standing in somebody's actual office
+    is the single place a missing AI badge would matter most.
+    """
+    o = []
+    for name, b64, fx, fy, scale in people:
+        cx_, cy_ = x + w * fx, y + h * fy
+        r = min(w, h) * 0.075 * scale
+        o.append(f'<ellipse cx="{cx_}" cy="{cy_+r*1.45}" rx="{r*1.15}" '
+                 f'ry="{r*0.3}" fill="{A(C["cyan"], 0.22)}"/>')
+        o.append(f'<circle cx="{cx_}" cy="{cy_+r*1.45}" rx="{r*1.15}" '
+                 f'r="{r*1.15}" fill="none" stroke="{A(C["cyan"], 0.35)}" '
+                 f'stroke-width="1" transform="matrix(1,0,0,0.26,0,'
+                 f'{cy_+r*1.45-(cy_+r*1.45)*0.26:.2f})"/>')
+        o.append(f'<circle cx="{cx_}" cy="{cy_}" r="{r+4}" fill="none" '
+                 f'stroke="{A(C["cyan"], 0.55)}" stroke-width="1.4"/>')
+        o.append(face(cx_, cy_, r * 2, b64, radius=r))
+        nw = tw.width(name, 8.4, 700) + 14
+        o.append(rrect(cx_ - nw / 2, cy_ + r + 6, nw, 16, 8,
+                       "rgba(8,6,20,0.70)"))
+        o.append(text(cx_, cy_ + r + 17, name, 8.4, "#dff3ff", 700, "middle"))
+    return o
+
+
+def space_scene(x, y, w, h, avatars, label="VR", uid="sp"):
+    """A room that is not a place: the 3-D space people meet inside.
+
+    Drawn rather than photographed, because there is no photograph of a
+    synthetic room and using one would be a picture of somewhere that does not
+    exist. A horizon, a floor receding to a vanishing point, and the people in
+    it standing at different depths — which is the whole of what 3-D buys over
+    a grid of boxes, and the reason a room like this is worth having at all.
+
+    The people are the same portraits as everywhere else, with the same AI
+    badge. A profile does not become anonymous by walking into a rendered room.
+    """
+    o = [rrect(x, y, w, h, 0, "#07051a")]
+    horizon = y + h * 0.44
+    o.append(f'<ellipse cx="{x+w/2}" cy="{horizon}" rx="{w*0.62}" '
+             f'ry="{h*0.20}" fill="url(#glow)" opacity="0.55"/>')
+    # Floor: lines to a vanishing point, and rungs spaced so they crowd toward
+    # it. Even spacing reads as a flat grid seen from above, which is the one
+    # thing this drawing must not look like.
+    vpx, vpy = x + w / 2, horizon
+    for i in range(-7, 8):
+        o.append(f'<path d="M{vpx} {vpy} L{x+w/2+i*(w/5)} {y+h}" '
+                 f'stroke="rgba(150,130,255,0.20)" stroke-width="1" '
+                 f'fill="none"/>')
+    for k in range(1, 9):
+        t = k / 9
+        yy = horizon + (y + h - horizon) * (t ** 2.1)
+        o.append(f'<path d="M{x} {yy} H{x+w}" '
+                 f'stroke="rgba(150,130,255,{0.06+0.16*t:.2f})" '
+                 f'stroke-width="1"/>')
+    # Standing presences, near ones larger and lower. Depth is carried by size
+    # and position rather than by a shadow, which at this scale is a smudge.
+    for name, b64, depth in avatars:
+        scale = 0.55 + 0.45 * depth
+        r = min(w, h) * 0.085 * (0.8 + 0.6 * depth)
+        cx_ = x + w * (0.5 + (depth - 0.5) * 0.9) if len(avatars) > 1 else x + w / 2
+        cy_ = horizon + (y + h - horizon) * (0.10 + 0.40 * depth)
+        o.append(f'<ellipse cx="{cx_}" cy="{cy_+r*1.5}" rx="{r*1.1}" '
+                 f'ry="{r*0.28}" fill="rgba(150,130,255,{0.10+0.14*depth:.2f})"/>')
+        o.append(f'<circle cx="{cx_}" cy="{cy_}" r="{r+5}" fill="none" '
+                 f'stroke="{A(C["brandA"], 0.45)}" stroke-width="1.4"/>')
+        o.append(face(cx_, cy_, r * 2, b64, radius=r))
+        o.append(text(cx_, cy_ + r + 16, name, 8.6 * (0.85 + 0.3 * scale),
+                      "#e6e1ff", 650, "middle"))
+    if label:
+        lw = 16 + tw.width(label, 9, 800)
+        o.append(rrect(x + w - lw - 22, y + 20, lw, 20, 10,
+                       A(C["brandA"], 0.30)))
+        o.append(text(x + w - lw / 2 - 22, y + 34, label, 9, "#fff", 800,
+                      "middle"))
+    return o
+
+
+def video_facade(x, y, w, h, platform, title, note, uid="vf", cyf=0.5,
+                 bottom_note=True):
+    """A video from another platform, before anybody presses play.
+
+    There is deliberately no thumbnail here, and the empty plate is the point
+    rather than a gap in the mock. A normal embed loads the other company's
+    player the moment the page renders, which tells them you looked before you
+    decided to; QRME renders the platform's name, the poster's own words and a
+    play control, all served from this side. Pressing play is when the request
+    happens — see ``qrme/embeds.py``.
+
+    Drawing a YouTube thumbnail here would have been the prettier mock and a
+    picture of the thing the code refuses to do.
+    """
+    o = [rrect(x, y, w, h, 14, "#0d0a1c", A(C["line"], 0.9), 1)]
+    cy = y + h * cyf - 8
+    o.append(f'<circle cx="{x+w/2}" cy="{cy}" r="26" '
+             f'fill="rgba(255,255,255,0.10)" '
+             f'stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>')
+    o.append(f'<path d="M{x+w/2-7} {cy-10} L{x+w/2+11} {cy} '
+             f'L{x+w/2-7} {cy+10} Z" fill="rgba(255,255,255,0.92)"/>')
+    # The platform chip, top-left, where a source belongs.
+    pw = 16 + tw.width(platform, 9, 750)
+    o.append(rrect(x + 10, y + 10, pw, 20, 10, "rgba(255,255,255,0.12)"))
+    o.append(text(x + 10 + pw / 2, y + 24, platform, 9, "#fff", 750, "middle"))
+    if title:
+        o.append(text(x + w / 2, cy + 48, title, 11, "#efecff", 650, "middle"))
+    if note and bottom_note:
+        o.append(rrect(x, y + h - 30, w, 30, 0, "rgba(6,4,16,0.72)"))
+        o.append(icon("lock", x + 18, y + h - 15, C["green"], 0.46))
+        o.append(text(x + 30, y + h - 11, note, 8.2, "#cfe8d6", 600))
+    elif note:
+        # Full screen has a strip along the bottom already, so the promise sits
+        # under the title instead of in a bar that would land on the composer.
+        o.append(icon("lock", x + w / 2 - tw.width(note, 8.6, 600) / 2 - 8,
+                      cy + 66, C["green"], 0.46))
+        o.append(text(x + w / 2 + 6, cy + 69, note, 8.6, "#cfe8d6", 600,
+                      "middle"))
+    return "".join(o)
+
+
+def held_controls(sx, sy, sw, sh, kinds, landscape=False, cyf=0.5):
+    """What a long press puts back on the picture.
+
+    The help button used to be on every screen unconditionally, on the theory
+    that "on all screens" is a property of the chrome rather than something 88
+    screens can each be trusted to remember. That theory is right everywhere
+    except here, where the chrome *is* the thing being taken away: a floating
+    helper welded to the corner of a full-screen video is a permanent smudge on
+    it, and it sits exactly where the share button now goes.
+
+    So on a live surface it comes back the way everything else does — you press
+    and hold, and the controls surface. That keeps the promise (help is never
+    more than a gesture away) without keeping the pixel.
+
+    The scrim is the honest part of the drawing. Long-press states are usually
+    illustrated as a picture with buttons floating on it, which is not what a
+    phone does — it dims what you are holding, so the controls read and so it
+    is obvious the picture is still there underneath, waiting.
+    """
+    # Dimmed hard, not tinted. The point of the state is that there is exactly
+    # one bright thing on the glass and it is the thing you can press; a light
+    # scrim leaves the picture competing with the buttons and turns a decision
+    # into a hunt. Tapping anywhere else takes the dim away again, which is why
+    # nothing else needs to be lit.
+    o = [rrect(sx, sy, sw, sh, 40, "rgba(4,3,12,0.78)")]
+    r = 19
+    # The slot is set by the widest *caption*, not the button. Spacing them on
+    # the circles put "Landscape" and "Back to app" into each other, which is
+    # the same overlap that has now been shipped three times in this file.
+    slot = max(r * 2, max(tw.width(k[3], 8.4, 650) for k in kinds)) + 14
+    total = slot * len(kinds)
+    if total > sw - 24:
+        raise ValueError(f"held controls need {total:.0f}px, screen has {sw-24:.0f}")
+    bx = sx + sw / 2 - total / 2 + slot / 2
+    cy = sy + sh * cyf - 8
+    for glyph, ic, key, label in kinds:
+        col = ACCENT.get(key) or C[key]
+        # Lit rather than outlined: a halo, a filled disc and a white glyph.
+        # Against a 78% scrim an outlined button is a dark circle with a thin
+        # edge, which is the one thing on the screen that should not read as
+        # switched off.
+        o.append(f'<circle cx="{bx}" cy="{cy}" r="{r+13}" '
+                 f'fill="{A(col, 0.16)}"/>')
+        o.append(f'<circle cx="{bx}" cy="{cy}" r="{r}" fill="{A(col, 0.92)}"/>')
+        if glyph:
+            o.append(text(bx, cy + 6, glyph, 19, "#0b0820", 800, "middle"))
+        else:
+            o.append(icon(ic, bx, cy, "#0b0820", 0.78))
+        o.append(text(bx, cy + r + 17, label, 8.6, "#fff", 700, "middle"))
+        bx += slot
+    o.append(text(sx + sw / 2, cy - r - 20, "PRESS AND HOLD", 8.6,
+                  "rgba(255,255,255,0.62)", 750, "middle", 1.4))
+    o.append(text(sx + sw / 2, cy + r + 44, "tap anywhere else to go back",
+                  8.2, "rgba(255,255,255,0.42)", 500, "middle"))
+    return o
+
+
+def render_full(spec):
+    """A live room with the application taken off it.
+
+    Portrait fills the phone's whole face — no title, no tab bar, no help
+    button — because "full screen" that stops short of the chrome is just a
+    larger box. Landscape is the same idea turned ninety degrees, which is what
+    a phone does when you tilt it and the only shape in which a room shot
+    sixteen-by-nine arrives at its own aspect ratio instead of being cropped to
+    fit a column.
+    """
+    # The picture runs to the edge of the *file*, not to the edge of a device
+    # drawn inside a margin. Two separate borders were showing up around a
+    # screen that claims to be full: the ~10px of phone body every other screen
+    # draws around its display, and the transparent margin this canvas leaves
+    # around the phone — which is invisible on a dark page and a white band on
+    # a light one. Both are gone. A screenshot of a full screen is the screen.
+    w, h = (H, W) if spec.get("landscape") else (W, H)
+    land = spec.get("landscape", False)
+    sx, sy, sw, sh = 0, 0, w, h
+    sradius = 28
+
+    ac = ACCENT.get(spec.get("accent", "brand"), C["brandA"])
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+           f'viewBox="0 0 {w} {h}" role="img" '
+           f'aria-label="{esc(spec["title"])} screen">', defs(ac)]
+    out.append(rrect(sx, sy, sw, sh, sradius, "url(#gScr)"))
+
+    if spec.get("voices"):
+        # An audio room has no picture, so the boxes *are* the screen. Inset
+        # from the edges the way a photo is not: a grid pushed into the corner
+        # radius loses its corner tiles.
+        out.append(rrect(sx, sy, sw, sh, sradius, "#0a0820"))
+        used_bar = D_BTN + 18
+        out += avatar_grid(sx + 16, sy + 46, sw - 32,
+                           sh - 46 - used_bar - 18, spec["voices"],
+                           cols=3 if land else 2)
+    elif spec.get("space"):
+        out += space_scene(sx, sy, sw, sh, spec["space"]["avatars"],
+                           label=spec["space"].get("label", "VR"),
+                           uid=f's{spec["num"]}')
+    elif spec.get("facade"):
+        # Full screen on a video nobody has pressed play on yet is an empty
+        # screen, and drawing a still from the video would be a picture of the
+        # request this design refuses to make.
+        f = spec["facade"]
+        out.append(rrect(sx, sy, sw, sh, sradius, "#08061a"))
+        out.append(video_facade(sx, sy, sw, sh, f["platform"], f["title"],
+                                f["note"], uid=f'f{spec["num"]}',
+                                cyf=0.38 if spec.get("held") else 0.46,
+                                bottom_note=False))
+    else:
+        cid = f'clipfull{spec["num"]}'
+        out.append(f'<clipPath id="{cid}"><rect x="{sx}" y="{sy}" '
+                   f'width="{sw}" height="{sh}" rx="{sradius}"/></clipPath>')
+        out.append(f'<image x="{sx}" y="{sy}" width="{sw}" height="{sh}" '
+                   f'preserveAspectRatio="xMidYMid slice" '
+                   f'clip-path="url(#{cid})" '
+                   f'href="data:image/jpeg;base64,{spec["photo"]}"/>')
+
+    # The camera cut-out is a property of the hardware, so it rotates with the
+    # phone and it keeps its platform's shape — an iOS pill on an Android
+    # frame was the tell that this renderer was ignoring PLATFORM entirely.
+    hole = "#05070d"
+    if PLATFORM == "android":
+        cxh, cyh = (sx + 13, h / 2) if land else (w / 2, sy + 13)
+        out.append(f'<circle cx="{cxh}" cy="{cyh}" r="4.5" fill="{hole}"/>')
+    elif land:
+        out.append(rrect(sx + 5, h / 2 - 30, 15, 60, 7.5, hole))
+    else:
+        out.append(rrect(w / 2 - 30, sy + 5, 60, 15, 7.5, hole))
+
+    tx = sx + (34 if land else 20)
+    if spec.get("photo_tag"):
+        label, tone = spec["photo_tag"]
+        col = {"live": C["red"], "sample": C["t2"], "rated": C["red"]}[tone]
+        tagw = 16 + len(label) * 6.2
+        out.append(rrect(tx, sy + 20, tagw, 20, 10, "rgba(8,6,20,0.72)"))
+        out.append(f'<circle cx="{tx+11}" cy="{sy+30}" r="3.4" fill="{col}"/>')
+        out.append(text(tx + 19, sy + 34, label, 9, "#fff", 750, "start", 0.4))
+        tx += tagw + 6
+    # A rated stream keeps its badge in full screen. The gate is a property of
+    # the profile, not of the chrome, so taking the chrome away must not take
+    # it with them.
+    if spec.get("rated"):
+        out.append(rrect(tx, sy + 20, 38, 20, 10, A(C["red"], 0.85)))
+        out.append(text(tx + 19, sy + 34, "18+", 9.5, "#fff", 800, "middle"))
+        tx += 44
+
+    # Whose live this is, and it is not decoration.
+    #
+    # The `NOT AI · REAL PERSON` mark says a human is behind the camera. It
+    # deliberately says nothing about the mask over their face, and the reason
+    # it can afford not to is that the viewer already knows *whose* stream they
+    # are on. That was asserted before it was drawn — the top-left carried the
+    # LIVE pill and nothing else — so the argument was resting on chrome that
+    # did not exist.
+    #
+    # Top left, beside the LIVE pill, on every surface with a picture: a live
+    # desk, a room, a rated stream, a watch party, full screen and landscape
+    # alike. Full screen is where it matters most, because that is the state
+    # with the app's own header taken away.
+    if spec.get("whose"):
+        handle = spec["whose"]
+        hw = 26 + len(handle) * 6.0
+        out.append(rrect(tx, sy + 20, hw, 20, 10, "rgba(8,6,20,0.72)"))
+        out.append(f'<circle cx="{tx+11}" cy="{sy+30}" r="6" '
+                   f'fill="{A(C["brandA"], 0.9)}"/>')
+        out.append(f'<circle cx="{tx+11}" cy="{sy+28.2}" r="2.1" fill="#fff"/>')
+        out.append(f'<path d="M{tx+7.4} {sy+33.6} c0 -3.4 {7.2} -3.4 {7.2} 0" '
+                   f'fill="none" stroke="#fff" stroke-width="1.5" '
+                   f'stroke-linecap="round"/>')
+        out.append(text(tx + 21, sy + 34, handle, 9.5, "#fff", 700, "start"))
+        tx += hw + 6
+
+    if spec.get("ar_presence"):
+        out += ar_presence(sx, sy, sw, sh, spec["ar_presence"])
+
+    bar, used = live_bar(sx, sy, sw, sh, spec["live_bar"])
+    rows = spec.get("bubble_chat", [])
+    if rows:
+        cw = (sw * 0.62) if land else (sw - 28)
+        block, _ = bubble_chat(sx + (32 if land else 14),
+                               sy + sh - 12 - used - len(rows) * 30, cw, rows)
+        out += block
+    out += bar
+
+    if spec.get("held"):
+        out += held_controls(sx, sy, sw, sh, spec["held"], landscape=land,
+                             cyf=0.68 if spec.get("facade") else 0.5)
+
+    # The system navigation, on the edge the hand is holding. Android's three
+    # marks turn with the phone the way iOS's single bar does; drawing the iOS
+    # bar on both was the other half of the same PLATFORM bug.
+    stroke = 'fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.3"'
+    if PLATFORM == "android":
+        if land:
+            ax, ay = sx + sw - 12, h / 2
+            out.append(f'<path d="M{ax-4.5} {ay-34+5} L{ax} {ay-34-5} '
+                       f'L{ax+4.5} {ay-34+5} Z" {stroke} stroke-linejoin="round"/>')
+            out.append(f'<circle cx="{ax}" cy="{ay}" r="4.6" {stroke}/>')
+            out.append(rrect(ax - 4.6, ay + 34 - 4.6, 9.2, 9.2, 1.6, "none",
+                             "rgba(255,255,255,0.5)", 1.3))
+        else:
+            ax, ay = w / 2, sy + sh - 14
+            out.append(f'<path d="M{ax-34+5} {ay-4.5} L{ax-34-5} {ay} '
+                       f'L{ax-34+5} {ay+4.5} Z" {stroke} stroke-linejoin="round"/>')
+            out.append(f'<circle cx="{ax}" cy="{ay}" r="4.6" {stroke}/>')
+            out.append(rrect(ax + 34 - 4.6, ay - 4.6, 9.2, 9.2, 1.6, "none",
+                             "rgba(255,255,255,0.5)", 1.3))
+    elif land:
+        out.append(rrect(sx + sw - 8, h / 2 - 40, 4, 80, 2,
+                         "rgba(255,255,255,0.55)"))
+    else:
+        out.append(rrect(w / 2 - 55, sy + sh - 10, 110, 4, 2,
+                         "rgba(255,255,255,0.55)"))
+    out += close()
     return "".join(out)
 
 
@@ -1904,19 +2685,19 @@ SCREENS = [
     dict(num=16, title="Genesis", sub="Born from four questions", hero="genesis", accent="brand", tab=0),
     dict(num=17, title="Summon & Beacons", sub="Leave your AI in the world", hero="beacon", accent="brand", tab=0),
     dict(num=18, title="Proactive", sub="It reaches out first", accent="pink", tab=0, cards=[
-        dict(icon="chat", color="pink", k="“How did the garden do?”", s="only if you set proactive scope", pill=("SCOPED", "brand")),
+        dict(icon="chat", color="pink", k="“The garden?”", s="only if you set proactive scope", pill=("SCOPED", "brand")),
         dict(icon="clock", color="cyan", k="Quiet hours honored", s="22:00 – 07:00 · rate-capped 24h"),
         dict(icon="shieldok", color="green", k="Moderated & anti-spam", s="no repeat until you reply"),
     ], button=("Reply", "brand")),
     dict(num=19, title="Transparency", sub="Honest about multiplicity", accent="brand", tab=0, cards=[
-        dict(icon="people", color="brand", k="12 active relationships", s="acknowledged truthfully if asked", pill=("OPEN", "brand")),
-        dict(icon="eye", color="cyan", k="GET /transparency", s="who it talks to, disclosed by design"),
+        dict(icon="people", color="brand", k="12 relationships", s="acknowledged truthfully if asked", pill=("OPEN", "brand")),
+        dict(icon="eye", color="cyan", k="GET /transparency", s="who it talks to, by design"),
         dict(icon="chat", color="amber", k="“Yes, I know others too.”", s="every prompt instructs honesty"),
     ]),
     dict(num=20, title="Connections", sub="Meet other real people", accent="pink", tab=0, tabs=MARKET, cards=[
         dict(icon="people", color="pink", k="Friendly tier", s="matched anonymously by alias", pill=("OPEN", "good")),
         dict(icon="shield", color="red", k="Rated tier · 18+", s="age-verified both ends"),
-        dict(icon="warn", color="amber", k="Per-tier moderation", s="minors always strict · blocks never sent"),
+        dict(icon="warn", color="amber", k="Per-tier moderation", s="minors strict · blocks never sent"),
     ]),
     dict(num=21, title="Rooms", sub="Chat, voice, video, AR, VR", accent="cyan", tab=0, cards=[
         dict(icon="chat", color="brand", k="Multiparty conversation", s="users + profiles, any mix"),
@@ -1926,8 +2707,8 @@ SCREENS = [
     ]),
     dict(num=22, title="Providers", sub="When AI hands off to a human", accent="cyan", tab=0, tabs=MARKET, cards=[
         dict(icon="cross", color="red", k="Bay Area Wellness", s="mental health · 0.8 mi", pill=("OPEN", "good")),
-        dict(icon="chart", color="green", k="Certified Financial Planner", s="finance · telehealth"),
-        dict(icon="link", color="cyan", k="Consented handoff", s="session sealed in the vault, revocable"),
+        dict(icon="chart", color="green", k="Certified Planner", s="finance · telehealth"),
+        dict(icon="link", color="cyan", k="Consented handoff", s="sealed in the vault, revocable"),
     ]),
     # ---- data promise & lifecycle ----
     dict(num=23, title="Cloud Model", sub="Greater model, opt-in", hero="cloud", accent="brand", tabs=CONTROL, tab=0),
@@ -1937,15 +2718,15 @@ SCREENS = [
     # ---- assistant & claims 21–26 ----
     dict(num=27, title="AI Assistant", sub="A capable creative partner", accent="brand", tab=0, cards=[
         dict(icon="list", color="brand", k="Triage & curate", s="keep the best N, auditable score"),
-        dict(icon="pen", color="amber", k="Proofread in your voice", s="improved draft + edit suggestions"),
-        dict(icon="eye", color="cyan", k="Perceive the scene", s="hands-free, step-by-step guidance"),
-        dict(icon="star2", color="pink", k="Compose a work", s="music, poem, note — kept as an artifact"),
+        dict(icon="pen", color="amber", k="Proofread in your voice", s="improved draft + suggestions"),
+        dict(icon="eye", color="cyan", k="Perceive the scene", s="hands-free, step by step"),
+        dict(icon="star2", color="pink", k="Compose a work", s="music, poem, note — kept"),
     ]),
     dict(num=28, title="Specialists", sub="Biometric-routed handoff", accent="cyan", tab=0, cards=[
         dict(icon="heart", color="red", k="Stress detected", s="HR +38 · from JIM-mini", extra=("spark", [60, 68, 80, 95, 108], "red")),
         dict(icon="brain", color="pink", k="Handed off", s="mental-health agent, this turn", pill=("ENGAGED", "brand")),
         dict(icon="link", color="cyan", k="Sustained across turns", s="until a reading shows recovery"),
-        dict(icon="person", color="green", k="Then hands back", s="profile speaks again", pill=("RETURNED", "good")),
+        dict(icon="person", color="green", k="Hands back", s="profile speaks again", pill=("RETURNED", "good")),
     ]),
     dict(num=29, title="Tasks & Grants", sub="Autonomous, revocable", accent="amber",
          tab=0, light=("amber", "needs you — awaiting confirm"), cards=[
@@ -1955,28 +2736,28 @@ SCREENS = [
         dict(icon="warn", color="red", k="Revoke halts the read", s="raw data never retained"),
     ]),
     dict(num=30, title="Fine-Tune", sub="Encrypted, offline (Claim 26)", accent="green", tab=2, cards=[
-        dict(icon="sliders", color="green", k="Recompute embeddings", s="all local · no external calls", pill=("LOCAL", "good")),
+        dict(icon="sliders", color="green", k="Recompute", s="all local · no external calls", pill=("LOCAL", "good")),
         dict(icon="lock", color="cyan", k="Sealed in the vault", s="adaptation artifact encrypted"),
-        dict(icon="chart", color="brand", k="Run recorded", s="metrics · external_transmission: false"),
+        dict(icon="chart", color="brand", k="Run recorded", s="external_transmission: false"),
     ], button=("Run Fine-Tune", "brand")),
     dict(num=31, title="Your Data Promise", sub="No raw data leaves your vault", accent="green", tabs=CONTROL, tab=0, cards=[
         dict(icon="lock", color="green", k="Sealed at rest", s="AES-256-GCM · tenant-isolated", pill=("VAULT", "good")),
-        dict(icon="eye", color="cyan", k="Every access audited", s="stored · read · erased", pill=("CHAIN OK", "good")),
+        dict(icon="eye", color="cyan", k="Access audited", s="stored · read · erased", pill=("CHAIN OK", "good")),
         dict(icon="finger", color="brand", k="Capability tokens", s="only the SHA-256 hash is stored"),
-        dict(icon="warn", color="red", k="Delete anything, anytime", s="local trace + vault records purged"),
+        dict(icon="warn", color="red", k="Delete anything, anytime", s="local trace + vault records"),
     ]),
     # ---- moderation, posting & the persona engine ----
     dict(num=32, title="Moderation", sub="Every reply, before it's seen", hero="moderation", accent="green", tab=0),
     dict(num=33, title="Posts", sub="Post in your AI's voice", accent="amber", tabs=MARKET, tab=3, cards=[
         dict(icon="pen", color="amber", k="Compose a post", s="in its own voice, moderated"),
-        dict(icon="chat", color="brand", k="“Tomatoes are in — finally.”", s="posted to the feed", pill=("LIVE", "good")),
+        dict(icon="chat", color="brand", k="“Tomatoes at last.”", s="posted to the feed", pill=("LIVE", "good")),
         dict(icon="shieldok", color="green", k="Public posts → strict", s="always the strict filter"),
         dict(icon="chart", color="cyan", k="12 posts · 3.4k views", s="GET /posts"),
     ]),
     dict(num=34, title="Adult Mode", sub="Age-gated at both ends", accent="red", tab=0, locked=True, cards=[
         dict(icon="lock", color="red", k="Adult content mode", s="an adult owner must enable it", pill=("18+", "crit")),
-        dict(icon="finger", color="green", k="Owner verified 18+", s="required to turn it on", stat=("VERIFIED", "on")),
-        dict(icon="person", color="amber", k="Interactor 18+", s="verified before any chat", stat=("REQUIRED", "avail")),
+        dict(icon="finger", color="green", k="Owner is 18+", s="required to turn it on", stat=("VERIFIED", "on")),
+        dict(icon="person", color="amber", k="Interactor 18+", s="verified before chat", stat=("REQUIRED", "avail")),
         dict(icon="shieldok", color="cyan", k="Minors always strict", s="no exceptions, ever"),
     ]),
     dict(num=35, title="Aging & Lifecycle", sub="It evolves with time", accent="cyan", tab=0, cards=[
@@ -2018,55 +2799,55 @@ SCREENS = [
         dict(icon="person", color="brand", k="NEO · 1X", s="Humanoid · Grok onboard · active"),
         dict(icon="star2", color="cyan", k="Isaac 1 · Weave", s="Home robot · tidying · docked"),
         dict(icon="grid", color="green", k="Saros 20 · Roborock", s="Vacuum · mapping · patrol 9pm"),
-        dict(icon="shield", color="amber", k="Command allowlist", s="Per-body limits · say is moderated"),
+        dict(icon="shield", color="amber", k="Command allowlist", s="per-body limits · moderated"),
         dict(icon="list", color="pink", k="Command log", s="Every order audited"),
     ], button=("Bind a robot", "brand")),
     # ---- knowledge packs & robot task mods ----
     dict(num=57, title="Knowledge Packs", sub="Downloadable expertise, per industry", accent="amber", tabs=MARKET, tab=0, cards=[
         dict(icon="db", color="amber", k="Finance Field Pack", s="3 items · QRME Starter Collection", pill=("FREE", "good")),
-        dict(icon="db", color="brand", k="Distributed Systems Pro", s="priced · explicit accept to buy", pill=("$29.99", "warn")),
+        dict(icon="db", color="brand", k="Systems Pro pack", s="priced · explicit accept to buy", pill=("$29.99", "warn")),
         dict(icon="star2", color="green", k="Install → smarter", s="items join the source material"),
         dict(icon="eye", color="cyan", k="Provenance counts it", s="grounded_in.by_kind: pack"),
     ], button=("Download Field Pack", "brand")),
     dict(num=58, title="Robot Task Packs", sub="Task mods for the body it embodies", accent="cyan", tab=3, cards=[
-        dict(icon="gear", color="cyan", k="Household Tasks Pack", s="sort_laundry · water_plants · set_table", pill=("FREE", "good")),
-        dict(icon="shield", color="green", k="Capability-checked install", s="a vacuum is never sold manipulation"),
-        dict(icon="lock", color="amber", k="Allowlist extended, not opened", s="unknown verbs still refused"),
+        dict(icon="gear", color="cyan", k="Household Tasks", s="sort_laundry · water_plants", pill=("FREE", "good")),
+        dict(icon="shield", color="green", k="Checked on install", s="a vacuum is never sold guile"),
+        dict(icon="lock", color="amber", k="Extended, not opened", s="unknown verbs still refused"),
         dict(icon="chart", color="pink", k="Every task audited", s="procedure carried in the result"),
     ], button=("Buy Culinary Assistant · 9.99", "brand")),
     dict(num=59, title="Embodied Agent", sub="The persona knows its body", accent="brand", tab=3, cards=[
-        dict(icon="person", color="brand", k="Same identity in the body", s="never a second persona"),
-        dict(icon="star2", color="cyan", k="Learned modules in the prompt", s="say knows what the body can do"),
+        dict(icon="person", color="brand", k="Same identity, in a body", s="never a second persona"),
+        dict(icon="star2", color="cyan", k="Learned, in the prompt", s="say knows what the body can do"),
         dict(icon="grid", color="green", k="Skills list", s="GET /robots/{id}/skills"),
-        dict(icon="shieldok", color="amber", k="Revocable", s="uninstall revokes the verbs instantly"),
+        dict(icon="shieldok", color="amber", k="Revocable", s="uninstall revokes the verbs"),
     ]),
     dict(num=60, title="Publish a Pack", sub="Your expertise, on the market", accent="amber", tabs=MARKET, tab=0, cards=[
-        dict(icon="pen", color="amber", k="Bundle knowledge items", s="or task modules with requirements"),
+        dict(icon="pen", color="amber", k="Bundle knowledge items", s="or task modules, with needs"),
         dict(icon="chart", color="brand", k="Free or priced", s="POST /packs · listed under #pack"),
         dict(icon="people", color="green", k="Installs tracked", s="catalog shows items · installs"),
     ], button=("Publish", "brand")),
     dict(num=61, title="Pack Registries", sub="Federated mod storefronts", accent="brand", tabs=MARKET, tab=0, cards=[
         dict(icon="building", color="brand", k="Robotmods.net", s="task mods for robot bodies", pill=("2 PACKS", "info")),
-        dict(icon="building", color="cyan", k="LLMmods.com", s="knowledge mods for LLM personas", pill=("2 PACKS", "info")),
-        dict(icon="shieldok", color="green", k="Origin on every label", s="publisher & storefront URL on the pack"),
-        dict(icon="chart", color="amber", k="Same rules once synced", s="buy flow · capability checks · provenance"),
+        dict(icon="building", color="cyan", k="LLMmods.com", s="knowledge mods for personas", pill=("2 PACKS", "info")),
+        dict(icon="shieldok", color="green", k="Origin on every label", s="publisher & storefront on pack"),
+        dict(icon="chart", color="amber", k="Same rules once synced", s="buy flow · checks · provenance"),
     ], button=("Sync sources", "brand")),
     dict(num=62, title="Rated Placement", sub="18+ marketing, walled at the source", accent="red", tabs=MARKET, tab=0, locked=True, cards=[
-        dict(icon="building", color="red", k="Adult venues", s="OnlyFans · Fansly · x-rated directories", pill=("18+", "crit")),
+        dict(icon="building", color="red", k="Adult venues", s="OnlyFans · Fansly · x-rated sites", pill=("18+", "crit")),
         dict(icon="grid", color="amber", k="QR · @handle · #tag", s="publish the refs where adults are"),
-        dict(icon="lock", color="green", k="The wall travels", s="every scan resolves through the age gate"),
-        dict(icon="shieldok", color="cyan", k="Never another real person", s="self or fictional personas only"),
+        dict(icon="lock", color="green", k="The wall travels", s="every scan hits the age gate"),
+        dict(icon="shieldok", color="cyan", k="Never a real person", s="self or fictional personas only"),
     ], button=("Place at a venue", "brand")),
     dict(num=63, title="Placement Analytics", sub="What each venue earns", accent="amber", tabs=MARKET, tab=0, locked=True, cards=[
         dict(icon="chart", color="amber", k="OnlyFans · 3 scans", s="2 walled · 1 verified", extra=("spark", [1, 1, 3, 2, 4], "amber")),
         dict(icon="chart", color="cyan", k="Fansly · 2 scans", s="0 walled · 2 verified"),
-        dict(icon="people", color="green", k="Funnel", s="resolutions → verified → chatters", metric="25%"),
+        dict(icon="people", color="green", k="Funnel", s="resolved → verified", metric="25%"),
         dict(icon="shieldok", color="brand", k="Counted, never identified", s="owner-only · no viewer identities"),
     ]),
     dict(num=64, title="Creator Payouts", sub="One statement, every sale", accent="green", tabs=MARKET, tab=0, cards=[
         dict(icon="chart", color="green", k="Accrued balance", s="pack sales · license fees", metric="$86"),
-        dict(icon="db", color="amber", k="Distributed Systems Pro", s="pack_sale · $29.99", pill=("ACCRUED", "warn")),
-        dict(icon="pen", color="brand", k="consult license · Priya", s="license_fee · $49.00", pill=("PAID", "good")),
+        dict(icon="db", color="amber", k="Systems Pro", s="pack_sale · $29.99", pill=("ACCRUED", "warn")),
+        dict(icon="pen", color="brand", k="consult · Priya", s="license_fee · $49.00", pill=("PAID", "good")),
         dict(icon="shieldok", color="cyan", k="Written at sale time", s="a record, not a reconstruction"),
     ], button=("Request payout", "brand")),
     dict(num=65, title="Watch Remote", sub="Your agents, on your wrist", accent="green", tab=3, cards=[
@@ -2074,48 +2855,52 @@ SCREENS = [
         dict(icon="clock", color="amber", k="research brief", s="awaiting: external confirmation", pill=("NEEDS YOU", "warn")),
         dict(icon="clock", color="red", k="second job", s="cancelled from the wrist", pill=("STOPPED", "crit")),
         dict(icon="person", color="brand", k="Kitchen NEO", s="come here · patrol · dock · stop"),
-        dict(icon="shieldok", color="cyan", k="No new powers, only reach", s="same auth · allowlists · moderation"),
+        dict(icon="shieldok", color="cyan", k="Reach, not new powers", s="same auth · allowlists · rules"),
     ], button=("Assist", "brand")),
     dict(num=67, title="Smart Glasses", sub="Capture the POV, render to the lens", accent="cyan", tab=3, cards=[
-        dict(icon="eye", color="cyan", k="Ray-Ban Meta", s="capture · livestream · HUD caption", pill=("LINKED", "good")),
+        dict(icon="eye", color="cyan", k="Ray-Ban Meta", s="capture · livestream · HUD", pill=("LINKED", "good")),
         dict(icon="eye", color="brand", k="Meta Ray-Ban Display", s="POV context · HUD overlay · nav"),
         dict(icon="compass", color="green", k="Google (Android XR)", s="Gemini POV · live-translation HUD"),
-        dict(icon="photo", color="amber", k="Capture ⟷ render", s="collect the view in · produce to the lens"),
+        dict(icon="photo", color="amber", k="Capture ⟷ render", s="collect in · produce to the lens"),
     ], button=("Connect glasses", "brand")),
     dict(num=68, title="Gaming Companion", sub="A teammate, synthetically operated", accent="indigo", tab=3, cards=[
-        dict(icon="star2", color="indigo", k="Halo Infinite · Xbox", s="role: teammate · online multiplayer", pill=("LIVE", "good")),
-        dict(icon="chat", color="brand", k="“Enemy on the flag — falling back, cover me”", s="in-character callout, moderated"),
+        dict(icon="star2", color="indigo", k="Halo Infinite · Xbox", s="role: teammate · multiplayer", pill=("LIVE", "good")),
+        dict(icon="chat", color="brand", k="“Falling back, cover me”", s="in-character callout, moderated"),
         dict(icon="shieldok", color="green", k="Fair play, enforced", s="within the rules · never cheats"),
-        dict(icon="people", color="cyan", k="Companion · teammate · practice", s="PlayStation · Xbox · Switch · Steam · PC"),
+        dict(icon="people", color="cyan", k="Companion or teammate", s="PlayStation · Xbox · Switch · PC"),
     ], button=("Start a session", "brand")),
     dict(num=66, title="Steering", sub="Tone, pace, age & appearance — one hub", accent="brand", tab=2, cards=[
-        dict(icon="sliders", color="brand", k="Pace · Autonomy · Verbosity", s="throttle dials, 0–100"),
-        dict(icon="sliders", color="amber", k="Warmth · Humor · Formality", s="behavior dials, 0–100"),
-        dict(icon="person", color="cyan", k="Appearance", s="how it looks — rides on every surface"),
+        dict(icon="sliders", color="brand", k="Pace · Autonomy · Words", s="throttle dials, 0–100"),
+        dict(icon="sliders", color="amber", k="Warmth · Humor · Form", s="behavior dials, 0–100"),
+        dict(icon="person", color="cyan", k="Appearance", s="how it looks — on every surface"),
         dict(icon="clock", color="green", k="Age", s="base age · ages with time"),
-        dict(icon="lock", color="red", k="Intimacy · 18+ only", s="adult-mode profiles · within boundaries", pill=("18+", "crit")),
-        dict(icon="shieldok", color="green", k="Steering, not piloting", s="shapes presentation · never identity or safety"),
+        dict(icon="lock", color="red", k="Intimacy · 18+ only", s="adult-mode profiles · in bounds", pill=("18+", "crit")),
+        dict(icon="shieldok", color="green", k="Steering, not piloting", s="shapes manner, never safety"),
     ], button=("Apply", "brand")),
 
     # ---- live desks, the audience layer, and commerce (0.1.6 / 0.1.7) ----
     # The desk screens are the only ones in this set that must NOT show the AI
     # mark: a desk is an actual person, and stamping "AI" on them would be a
     # false statement. The badge is the positive claim instead.
+    # Five cards and a button did not fit: the button — which is the whole
+    # point of the screen — was drawn *below* the tab bar, where nothing
+    # renders it and nobody could see it. The two attestation cards say one
+    # thing between them and are now one card, and the sample view is smaller,
+    # because on this screen the photo is a thumbnail of a desk nobody has
+    # claimed yet rather than the subject.
     dict(num=69, title="Live Desks", sub="A real person — never the AI mark",
          accent="green", tab=3,
-         photo=frames.DESK, photo_tag=("SAMPLE VIEW", "sample"),
+         photo=frames.DESK, photo_tag=("SAMPLE VIEW", "sample"), photo_h=110,
          photo_note="No camera yet — not claimed live",
          cards=[
         dict(icon="person", color="green", k="Bev Okafor",
              s="Live person — not AI", pill=("HUMAN", "good")),
         dict(icon="eye", color="cyan", k="You see the desk",
-             s="a camera view — it depicts nobody"),
-        dict(icon="shieldok", color="brand", k="Attested by shop-manager",
-             s="met in person · saw the licence"),
+             s="a camera view, depicting nobody"),
+        dict(icon="shieldok", color="brand", k="Attested, not proven",
+             s="a manager vouched, not verified"),
         dict(icon="clock", color="amber", k="Away right now",
              s="the state the bell exists for", pill=("AWAY", "warn")),
-        dict(icon="warn", color="cyan", k="Recorded, not proven",
-             s="we record who vouched, not proof"),
     ], button=("Ring the bell", "amber")),
 
     dict(num=70, title="Desk Beacons", sub="The sticker on the shop door",
@@ -2123,23 +2908,23 @@ SCREENS = [
         dict(icon="grid", color="cyan", k="shop door",
              s="printed code · 24 scans", pill=("LIVE", "good")),
         dict(icon="person", color="green", k="Reveals a person",
-             s="a profile beacon reveals nobody real"),
+             s="a profile beacon reveals nobody"),
         dict(icon="finger", color="amber", k="A stranger can ring it",
              s="no account · one ring per 30s"),
         dict(icon="lock", color="red", k="18+ hits the wall",
              s="a scan carries no token to clear it",
              pill=("18+", "crit")),
         dict(icon="shield", color="brand", k="Only the owner prints",
-             s="or anyone could post your address"),
+             s="or anyone posts your address"),
     ], button=("Print a code", "brand")),
 
     dict(num=71, title="Audience", sub="Like, comment, share, subscribe",
          accent="pink", tab=0, cards=[
-        dict(icon="heart", color="pink", k="Likes", s="one per person — never a counter", metric="248"),
+        dict(icon="heart", color="pink", k="Likes", s="one each, not a counter", metric="248"),
         dict(icon="chat", color="brand", k="Comments",
              s="moderated at the target's setting"),
         dict(icon="link", color="cyan", k="Shares",
-             s="no account — gated at the far end"),
+             s="no account · gated at the end"),
         dict(icon="star2", color="amber", k="Subscribers",
              s="free follow · paid tier", metric="31"),
         dict(icon="warn", color="green", k="Blocked comments kept",
@@ -2152,13 +2937,13 @@ SCREENS = [
              s="adult only · capped · final",
              pill=("SENT", "good")),
         dict(icon="building", color="brand", k="Pruning, properly",
-             s="listing_sale · receipt keeps the title"),
+             s="listing_sale · receipt keeps title"),
         dict(icon="lock", color="cyan", k="A listing is a window",
              s="an offer is what makes it a shop"),
         dict(icon="shieldok", color="green", k="Lands on the statement",
              s="beside pack sales · one payout"),
         dict(icon="warn", color="red", k="No real funds",
-             s="no spend caps or chargebacks yet",
+             s="no spend caps, no chargebacks",
              pill=("SIMULATED", "warn")),
     ], button=("Send a gift", "amber")),
 
@@ -2166,14 +2951,14 @@ SCREENS = [
          accent="indigo", tab=3, cards=[
         dict(icon="finger", color="indigo", k="Windows Hello",
              s="signs the document's own hash", pill=("BOUND", "good")),
-        dict(icon="pen", color="brand", k="Shown before the prompt",
-             s="the prompt cannot say — this does"),
+        dict(icon="pen", color="brand", k="Shown before it runs",
+             s="the prompt cannot say; this can"),
         dict(icon="shieldok", color="green", k="Verifiable by anyone",
              s="stands on its own arithmetic"),
         dict(icon="db", color="cyan", k="Sealed into the vault",
              s="chained — the order is protected"),
         dict(icon="lock", color="amber", k="Proofing sets the tier",
-             s="self · federated · document · person"),
+             s="self · federated · document"),
     ], button=("Sign", "brand")),
 
     # The starter collection is the one place a viewer meets many synthetic
@@ -2201,7 +2986,7 @@ SCREENS = [
     # premise is an empty chair with a bell, the reactions are the room.
     dict(num=75, title="Live Room", sub="Two ways in — come up, or comment",
          accent="green", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=208,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh", photo_h=202,
          overlay=dict(
              viewers="14 watching",
              ticker=[("gift", "amber", "Bea · $5"),
@@ -2212,13 +2997,15 @@ SCREENS = [
                        ("Bea", "are you open till six?")]),
          cards=[
         dict(icon="finger", color="amber", k="Ring the bell",
-             s="away — one ring per desk per 30s"),
+             s="away · one ring per 30s"),
         dict(icon="people", color="green", k="Come up as a guest",
              s="asks the host — they decide", pill=("ASK", "warn")),
         dict(icon="chat", color="brand", k="Or just comment",
-             s="immediate · moderated like any turn"),
+             s="immediate · moderated as usual"),
+        # Kept clear of the floating help button, which lands in this corner
+        # and was sitting on top of the last three words.
         dict(icon="shieldok", color="cyan", k="No AI mark here",
-             s="a real person is on the other end"),
+             s="a real person, not a render"),
     ]),
 
     # The other view style. Same mechanic, same bell, behind the deployment's
@@ -2227,7 +3014,7 @@ SCREENS = [
     # safety matter rather than a detail.
     dict(num=76, title="Rated Stream", sub="18+, and still a real person",
          accent="red", tab=3, locked=True,
-         photo=frames.STAGE, photo_tag=("LIVE", "live"), photo_h=208,
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh", photo_h=202,
          overlay=dict(
              viewers="38 watching",
              ticker=[("gift", "amber", "Ada · $20"),
@@ -2240,11 +3027,11 @@ SCREENS = [
         dict(icon="person", color="red", k="Vivienne Marlowe",
              s="Live person — not AI", pill=("18+", "crit")),
         dict(icon="people", color="amber", k="Guests need her yes",
-             s="and a verified adult, on a rated desk"),
+             s="a verified adult, on a rated desk"),
         dict(icon="lock", color="brand", k="Location withheld",
-             s="withheld even from adults — safety"),
+             s="withheld even from adults"),
         dict(icon="shieldok", color="green", k="Still no AI mark",
-             s="rated changes who watches, not what"),
+             s="rated changes who, not what"),
     ]),
 
     # Search, with the two things browse-by-exact-tag could never do: plain
@@ -2253,7 +3040,7 @@ SCREENS = [
     dict(num=77, title="Search & Place", sub="Plain words, and how far out",
          accent="brand", tabs=MARKET, tab=0, cards=[
         dict(icon="search", color="brand", k="\"help me read a lease\"",
-             s="finds legal without knowing the tag"),
+             s="finds legal, not knowing the tag"),
         dict(icon="compass", color="cyan", k="Oakland, CA", s="scope · locality",
              pill=("NEAR", "good")),
         dict(icon="net", color="green", k="Remote reaches past", s="served from anywhere"),
@@ -2290,8 +3077,23 @@ SCREENS = [
     # actually talked to them thought.
     dict(num=80, title="Profile", sub="What a visitor sees first",
          hero="frontpage", accent="brand", tab=0),
-    # 81 is deliberately skipped: it belongs to unreleased work being held,
-    # and reusing the number would collide the day that lands.
+    # Channel 2, and the disclosure is the design, so the disclosure is the
+    # screen. It shows the other participants **by name** seeing the grant —
+    # a version that showed the lender only their own row would be the exact
+    # mistake qrme/roommic.py was written to avoid.
+    dict(num=81, title="Lend a Microphone", sub="The room is told, not only you",
+         accent="cyan", tab=3, cards=[
+        dict(icon="watch", color="cyan", k="Your smart watch",
+             s="the profiles can hear you speak", pill=("LENT", "good")),
+        dict(icon="people", color="brand", k="Sam and Mal see this",
+             s="one only you can see is not one"),
+        dict(icon="shieldok", color="green", k="Near-field, always",
+             s="you, not the people beside you"),
+        dict(icon="mic", color="indigo", k="Keys on your voice",
+             s="their voices are not yours to lend"),
+        dict(icon="eye", color="amber", k="Ends with the room",
+             s="it cannot outlive the conversation"),
+    ], button=("Take it back", "amber")),
     #
     # The screen a light sends you to. Grouped, because somebody opening this
     # *because* amber appeared should not have to scan a flat list for the one
@@ -2310,25 +3112,806 @@ SCREENS = [
         dict(icon="person", color="cyan", k="Marcus Bell", s="two of three phases done"),
         dict(icon="eye", color="amber", k="The lights follow you", s="the work stays where it is"),
     ]),
+    # The friends list, with the founder standing where he always stands. The
+    # STANDARD badge is doing real work: it says the position is a default
+    # rather than a ranking, which is the honest version and also the one that
+    # makes "remove" an obvious thing to be allowed to do.
+    dict(num=84, title="Friends", sub="Who this profile stands with",
+         accent="cyan", tab=1, friends=[
+        # No handle in the subtitle: the badges already say which is which,
+        # and a suffix on a person's own name reads as a filename.
+        #
+        # Every synthetic profile carries the AI badge, not only the founder's.
+        # A badge that appears on one AI profile and not the next implies the
+        # unbadged one is something else.
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER_VERIFIED[1],
+         "VERIFIED", [], 4.0, None),
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI",
+         # No invented review on the founder's own rows: a quote is somebody
+         # else's words about a real person, and making one up is the one bit
+         # of this page that would be putting them in their mouth.
+         ["technology", "cybersecurity", "science", "telecom"], 4.0, None),
+        # The subtitle carries the relationship; the pack line carries what
+        # they know. Naming the industry in both just says it twice.
+        ("Marcus Bell", "mutual friend", frames.PORTRAITS[1][1], "AI",
+         ["finance"], 5.0, "\u201cSaved me from an annuity.\u201d"),
+        # Not every review is a good one, and a wall of five stars is the
+        # least believable thing a profile page can show.
+        ("Dr. Amara Osei", "mutual friend", frames.PORTRAITS[0][1], "AI",
+         ["healthcare"], 3.0, "\u201cDefers to a real doctor.\u201d"),
+    ]),
+    # The page somebody made, in their own colours. Drawn in the page's theme
+    # rather than the app's, because a homepage that looks like every other
+    # homepage is the thing this feature exists to stop being true.
+    dict(num=85, title="My Page", sub="The one you make yourself",
+         accent="amber", tab=0, my_page=dict(
+             bg="#1d1206", ink="#ffe9cc", accent="#d4a83a",
+             name="Marcus Bell", handle="@marcus_bell", badge="AI",
+             face=frames.PORTRAITS[1][1],
+             tagline=["Money jokes on the outside,",
+                      "honest arithmetic underneath."],
+             # Eight, because the row is labelled Top 8. Four faces under that
+             # heading reads as a bug in the page rather than a short list.
+             top=[("David", frames.FOUNDER_VERIFIED[1]),
+                  ("David AI", frames.FOUNDER[1]),
+                  ("Amara", frames.PORTRAITS[0][1]),
+                  ("Priya", frames.PORTRAITS[2][1]),
+                  ("Elena", frames.PORTRAITS[3][1]),
+                  ("Jonathan", frames.PORTRAITS[4][1]),
+                  ("Sam", frames.PORTRAITS[5][1]),
+                  ("Ingrid", frames.PORTRAITS[6][1])])),
+    # The editor behind it. A closed set of themes, because the version of
+    # this that took raw markup is why MySpace is a security lesson.
+    # The feed. Every row says why it is there, which is the part that makes a
+    # ranked feed auditable rather than merely effective.
+    # Onboarding: pairing happens at sign-up, so the watch faces and the
+    # agent lights work from the first day rather than after somebody finds a
+    # settings page.
+    # The transparent chat overlay, with the faces as circles on the glass —
+    # and the five things a viewer can actually do, in a row under it. Every
+    # one is a route that already shipped: bell, gift, like, share, and the
+    # guest request. They were reachable by API and by nothing else.
+    dict(num=89, title="Live Room", sub="Ring, gift, or ask to come up",
+         accent="pink", tab=3,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh", photo_h=PHOTO_FULL - 2,
+         live_bar=[
+             ("comeup", "green"),
+             ("bell", "amber"),
+             ("gift", "gold"),
+             ("heart", "pink"),
+             ("share", "cyan"),
+         ],
+         bubble_chat=[
+             ("Marcus Bell", "the compounding chart, again?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+             ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
+         ]),
+    # Full screen, and what a long press puts back on it. Two states of the
+    # same surface rather than two features: 89 is the room inside the app, 90
+    # is the same room with the app taken off, and 91 is 90 turned ninety
+    # degrees — which is the only shape in which a room shot sixteen-by-nine
+    # arrives at its own aspect ratio instead of cropped into a column.
+    # Three states per surface, and they are the same three every time:
+    # plain full screen, held, and turned sideways. The plain one is easy to
+    # skip when writing these — it is the state with nothing happening in it —
+    # and skipping it left the README claiming a completeness it did not have,
+    # with no screenshot anywhere of a full-screen video before somebody
+    # presses on it.
+    dict(num=90, title="Full Screen", full=True, accent="pink",
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh",
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+             ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
+         ]),
+    dict(num=91, title="Full Screen Held", full=True, accent="pink",
+         # "Full screen" is not offered among the held buttons because you are
+         # already in it — a button that does nothing but confirm where you
+         # are is worse than no button.
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh",
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+             ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
+         ]),
+    dict(num=92, title="Full Screen Landscape", full=True, landscape=True,
+         accent="pink", photo=frames.DESK, photo_tag=("LIVE", "live"), whose="@otis_marsh",
+         # Landscape is where the room finally arrives at its own aspect
+         # ratio, so nothing is dimmed over it here — this is the resting
+         # state, and the same long press brings the same controls back.
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Marcus Bell", "the compounding chart, again?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+         ]),
+    # The rated stream gets the same three. The badge survives all of them,
+    # because the gate belongs to the profile rather than to the app chrome —
+    # taking the chrome away must not take the rating with it.
+    dict(num=93, title="Rated Full Screen", full=True, rated=True,
+         accent="red", photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh",
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Ada", "is she back on at eight?", frames.PORTRAITS[6][1]),
+             ("Cy", "gifted a rose", frames.PORTRAITS[4][1]),
+         ]),
+    dict(num=94, title="Rated Held", full=True, rated=True, accent="red",
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh",
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=95, title="Rated Landscape", full=True, landscape=True,
+         rated=True, accent="red",
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), whose="@otis_marsh",
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Ada", "is she back on at eight?", frames.PORTRAITS[6][1]),
+             ("Cy", "gifted a rose", frames.PORTRAITS[4][1]),
+         ]),
+    # A room with its camera on: the other place a video and a conversation
+    # run at once. The strip carries a microphone rather than a bell — in a
+    # room you are a participant, not a visitor at somebody's desk.
+    dict(num=96, title="Room Full Screen", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("ROOM", "sample"),
+         live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Marcus Bell", "can everyone see the slide?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "yes — go on", frames.PORTRAITS[0][1]),
+         ]),
+    dict(num=97, title="Room Held", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("ROOM", "sample"),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=98, title="Room Landscape", full=True, landscape=True,
+         accent="cyan", photo=frames.DESK, photo_tag=("ROOM", "sample"),
+         live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Marcus Bell", "can everyone see the slide?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "yes — go on", frames.PORTRAITS[0][1]),
+             ("Priya Raman", "one second, joining audio", frames.PORTRAITS[2][1]),
+         ]),
+    # Somebody else's video, posted here. The empty plate is the feature: see
+    # `qrme/embeds.py` — nothing is requested from the other platform until a
+    # viewer presses play, so there is nothing to draw yet.
+    dict(num=99, title="Posted Video", sub="From another platform",
+         accent="cyan", tab=0,
+         facade_card=dict(platform="YouTube", title="the compounding talk",
+                          note="nothing loads until you press play"),
+         cards=[
+        dict(icon="link", color="cyan", k="The link, not the file",
+             s="never re-hosted, never copied"),
+        dict(icon="lock", color="green", k="No request on load",
+             s="they cannot see you looked", pill=("OFF", "good")),
+        dict(icon="photo", color="amber", k="No cached thumbnail",
+             s="its absence is the promise"),
+        dict(icon="shieldok", color="brand", k="Still a post",
+             s="moderated · like · share · rated"),
+    ]),
+    # A posted video is not a live desk. There is nobody at a desk to ring
+    # and no host to ask, so the strip is only the three verbs that mean
+    # something here — a control that cannot do anything is worse than absent.
+    dict(num=100, title="Video Full Screen", full=True, accent="cyan",
+         facade=dict(platform="YouTube", title="the compounding talk",
+                     note="nothing is requested until you press play"),
+         live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
+    dict(num=101, title="Video Held", full=True, accent="cyan",
+         facade=dict(platform="YouTube", title="the compounding talk",
+                     note="nothing is requested until you press play"),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
+    dict(num=102, title="Video Landscape", full=True, landscape=True,
+         accent="cyan",
+         facade=dict(platform="YouTube", title="the compounding talk",
+                     note="nothing is requested until you press play"),
+         live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
+    # The rooms that are not a camera pointed at a desk. A room's channel can
+    # be chat, voice, video, AR or VR (`POST /rooms`), and each of them gets
+    # the same three states — plain full screen, held, and turned sideways —
+    # because those are states of a *room*, not features of one screen.
+    #
+    # Audio first, because it is the case every layout forgets. There is
+    # nothing to look at, so the boxes are the screen.
+    dict(num=103, title="Audio Room", full=True, accent="green",
+         voices=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], "listening", None),
+             ("Priya Raman", frames.PORTRAITS[2][1], "muted", "AI"),
+             ("Elena Duarte", frames.PORTRAITS[3][1], "listening", "AI"),
+             ("Jonathan Reyes", frames.PORTRAITS[4][1], "muted", "AI"),
+         ],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
+                   ("share", "cyan")]),
+    dict(num=104, title="Audio Held", full=True, accent="green",
+         voices=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], "listening", None),
+             ("Priya Raman", frames.PORTRAITS[2][1], "muted", "AI"),
+             ("Elena Duarte", frames.PORTRAITS[3][1], "listening", "AI"),
+             ("Jonathan Reyes", frames.PORTRAITS[4][1], "muted", "AI"),
+         ],
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
+                   ("share", "cyan")]),
+    dict(num=105, title="Audio Landscape", full=True, landscape=True,
+         accent="green", voices=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], "listening", None),
+             ("Priya Raman", frames.PORTRAITS[2][1], "muted", "AI"),
+             ("Elena Duarte", frames.PORTRAITS[3][1], "listening", "AI"),
+             ("Jonathan Reyes", frames.PORTRAITS[4][1], "muted", "AI"),
+         ],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
+                   ("share", "cyan")]),
+    # AR: the room is the one you are already in, with the others placed in
+    # it. The camera frame is real and carries no AI mark; the people standing
+    # in it are synthetic and carry theirs — which is the single place a
+    # missing badge would matter most.
+    dict(num=106, title="AR Room", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("AR", "sample"),
+         ar_presence=[
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.26, 0.46, 1.0),
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.72, 0.38, 0.82),
+         ],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=107, title="AR Held", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("AR", "sample"),
+         ar_presence=[
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.26, 0.46, 1.0),
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.72, 0.38, 0.82),
+         ],
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=108, title="AR Landscape", full=True, landscape=True,
+         accent="cyan", photo=frames.DESK, photo_tag=("AR", "sample"),
+         ar_presence=[
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.20, 0.52, 1.0),
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.50, 0.40, 0.86),
+             ("Priya Raman", frames.PORTRAITS[2][1], 0.78, 0.48, 0.94),
+         ],
+         # No chat overlay here. The presence markers already name everyone in
+         # the room, and a bubble repeating "Dr. Amara Osei" under her own
+         # label is the same name twice with a collision between them.
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    # VR: a room that is not a place. Drawn rather than photographed, because
+    # there is no photograph of somewhere that does not exist, and a stock
+    # picture of a headset would be a picture of the hardware instead of the
+    # room. Depth is carried by size and position — which is the whole of what
+    # 3-D buys over a grid of boxes.
+    dict(num=109, title="VR Room", full=True, accent="brand",
+         space=dict(label="VR · 3-D", avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.22),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.55),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.86),
+         ]),
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=110, title="VR Held", full=True, accent="brand",
+         space=dict(label="VR · 3-D", avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.22),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.55),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.86),
+         ]),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=111, title="VR Landscape", full=True, landscape=True,
+         accent="brand",
+         space=dict(label="VR · 3-D", avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.18),
+             ("Priya Raman", frames.PORTRAITS[2][1], 0.42),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.64),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.88),
+         ]),
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    # The agreement window. Two people about to send each other work, and the
+    # document they both sign before anything moves — see `qrme/exchange.py`.
+    # The manifest is the screen: what crosses, which way, and how big, because
+    # "what am I about to receive" should be a list rather than an assurance.
+    dict(num=112, title="The Agreement", sub="Before anything moves",
+         accent="gold", tab=0, cards=[
+        dict(icon="doc", color="gold", k="Checkout flow",
+             s="software · agreed by both", pill=("DRAFT", "warn")),
+        dict(icon="link", color="cyan", k="spec.pdf → them",
+             s="document · 240 KB"),
+        dict(icon="bolt", color="amber", k="checkout.zip → you",
+             s="source · 1.4 MB · runs", pill=("RUNS", "crit")),
+        dict(icon="shieldok", color="green", k="Included when done",
+             s="the source · a handover call"),
+        dict(icon="cross", color="red", k="Not included",
+             s="hosting · ongoing support"),
+    ], button=("Sign — 1 of 2", "brand")),
+    # The rule the whole design turns on, given its own screen because it is
+    # the one people will not believe until they see it happen.
+    dict(num=113, title="Signatures Cleared", sub="The manifest changed",
+         accent="red", tab=0, cards=[
+        dict(icon="warn", color="red", k="An item was added",
+             s="both signatures dropped", pill=("VOID", "crit")),
+        dict(icon="person", color="amber", k="You signed", s="at 14:02 — cleared"),
+        dict(icon="person", color="amber", k="They signed", s="at 14:03 — cleared"),
+        dict(icon="lock", color="cyan", k="Nothing moved",
+             s="the channel never opened"),
+        dict(icon="doc", color="green", k="Read it again",
+             s="then both sign the new one"),
+    ], button=("Review the manifest", "brand")),
+    # Delivery: a signed agreement makes items available, it does not place
+    # them. Each one is taken separately by the side receiving it.
+    dict(num=114, title="Delivery", sub="Nothing arrives on its own",
+         accent="green", tab=0, cards=[
+        dict(icon="shieldok", color="green", k="Both signed",
+             s="channel open · 2 items", pill=("OPEN", "good")),
+        dict(icon="doc", color="cyan", k="spec.pdf", s="accepted 14:11",
+             pill=("TAKEN", "good")),
+        dict(icon="bolt", color="amber", k="checkout.zip",
+             s="source · waiting for you", pill=("ACCEPT", "warn")),
+        dict(icon="warn", color="red", k="It runs on your machine",
+             s="signing is not a code review"),
+        dict(icon="lock", color="brand", k="No device access",
+             s="the listed items, and nothing else"),
+    ], button=("Accept checkout.zip", "amber")),
+    # The watch party, in the app. A posted video, the people and the profiles
+    # in the room, and the line that keeps the embed promise.
+    dict(num=115, title="Watch Party", sub="Together, on your own play button",
+         accent="cyan", tab=0,
+         facade_card=dict(platform="YouTube", title="the compounding talk",
+                          note="the room shares a position, not a player"),
+         cards=[
+        dict(icon="people", color="cyan", k="4 people · 2 profiles",
+             s="each marked for what it is"),
+        dict(icon="finger", color="amber", k="The host holds it",
+             s="the position — everyone follows"),
+        dict(icon="shieldok", color="green", k="Profiles have not seen it",
+             s="told so, not just starved"),
+    ], button=("Join the party", "brand")),
+    # Lending a skill inside a place two people already share. The card that
+    # matters is the last one: either of them can end it, alone.
+    dict(num=116, title="Lend a Skill", sub="Both agree · either can stop",
+         accent="cyan", tab=0, cards=[
+        dict(icon="db", color="amber", k="Finance Pack",
+             s="offered into this room", pill=("OFFER", "warn")),
+        dict(icon="people", color="cyan", k="Marcus → you",
+             s="use it here, while you both want"),
+        dict(icon="lock", color="green", k="Nothing is copied",
+             s="no install, no licence, no copy"),
+        dict(icon="eye", color="brand", k="He sees every use",
+             s="which is why it is worth lending"),
+        dict(icon="cross", color="red", k="Either of you can stop it",
+             s="alone, with no agreement needed"),
+    ], button=("Accept the loan", "brand")),
+    # Editing what you already said. The screen exists because the feature is
+    # invisible otherwise: the interesting part is not the edit box, it is what
+    # happens to the answer that was written under the old wording.
+    dict(num=117, title="Edit a Message", sub="The correction carries forward",
+         accent="brand", tab=0, cards=[
+        dict(icon="pen", color="brand", k="“Born in 1985.”",
+             s="edited — it said 1885", pill=("EDITED", "info")),
+        dict(icon="chat", color="amber", k="Answered the old",
+             s="written before your edit", pill=("STALE", "warn")),
+        dict(icon="shieldok", color="green", k="Re-moderated on edit",
+             s="not a way past the filter"),
+        dict(icon="eye", color="cyan", k="The next turn reads 1985",
+             s="history is rebuilt every turn"),
+        dict(icon="doc", color="red", k="Retract keeps the row",
+             s="text stops counting, trail stays"),
+    ]),
+    # Anonymity, and the card that keeps it honest is the fourth one. A screen
+    # that listed only what is withheld would be read as a promise of
+    # untraceability, and somebody deciding whether it is safe to post would
+    # decide on the strength of it.
+    dict(num=118, title="Stay Anonymous", sub="What we withhold, and what we can't",
+         accent="cyan", tab=3, cards=[
+        dict(icon="mask", color="brand", k="Anonymous 41338025",
+             s="tied to this profile, not you"),
+        dict(icon="lock", color="pink", k="You cannot change it",
+             s="so nobody can pick a real name"),
+        dict(icon="lock", color="cyan", k="Your account is hidden",
+             s="your profiles cannot be matched"),
+        dict(icon="addphoto", color="cyan", k="Your own picture",
+             s="or a field emblem, or neither"),
+        dict(icon="warn", color="amber", k="Your writing is still yours",
+             s="people who know you may tell"),
+    ], button=("Turn it off", "amber")),
+    # Several profiles and one badge, on one screen — because the rule only
+    # makes sense next to the thing it constrains. Three rows, one verified,
+    # one anonymous, one invented, which is the whole vocabulary.
+    dict(num=119, title="Your Profiles", sub="As many as you like · one verified",
+         accent="brand", tab=3, cards=[
+        dict(icon="person", color="green", k="Work · verified",
+             s="a real person — you, checked", pill=("BADGE", "good")),
+        # You see your own name here. Everybody else gets the subtitle.
+        dict(icon="mask", color="cyan", k="Weekend self",
+             s="shown as anonymous persona", pill=("HIDDEN", "info")),
+        dict(icon="robot", color="indigo", k="Captain Nobody",
+             s="invented — nobody to verify"),
+        # Both of these said the rule instead of saying what it does for you.
+        # "One badge, not three" only counts if you count the rows above it,
+        # and "it says you are one person" parses as the badge making a claim
+        # about your personhood. "One at a time, not one forever" is the
+        # argument in `qrme/identity.py` compressed into a riddle — fine in a
+        # docstring, where the reader came looking for the reasoning; useless
+        # on a card, where they came to find a control.
+        dict(icon="shieldok", color="brand", k="Only one can be verified",
+             s="the badge means this is you"),
+        dict(icon="rotate", color="amber", k="Move it to another",
+             s="yours to move, any time"),
+    ], button=("Move the badge", "brand")),
+    # Channel 2 off the room. The last two cards are the ones that make the
+    # list a rule rather than an inventory: every place here has other people
+    # in it who can be shown the disclosure, which is the test a surface has
+    # to pass to be on the screen at all.
+    dict(num=120, title="Lend It Anywhere", sub="The same microphone, other places",
+         accent="cyan", tab=3, cards=[
+        dict(icon="people", color="brand", k="In a watch party",
+             s="the others watching hear you", pill=("LENT", "good")),
+        dict(icon="speaker", color="cyan", k="On a live desk",
+             s="your visitors, while it is open"),
+        dict(icon="chat", color="indigo", k="In a 1:1 connection",
+             s="the other person, and no one else"),
+        dict(icon="eye", color="green", k="Everyone here is told",
+             s="and can be shown the disclosure"),
+        dict(icon="shieldok", color="amber", k="Ends when it does",
+             s="it cannot outlive the place"),
+    ], button=("Take it back", "amber")),
+    # Wearing a character over your own camera. The last two cards are the
+    # feature: an overlay is synthetic media on a real face, so the screen that
+    # offers it is also the screen that says what it can never be.
+    dict(num=121, title="Wear a Character", sub="Seventeen faces, and your own",
+         accent="pink", tab=3, cards=[
+        dict(icon="mask", color="pink", k="Blue Fox",
+             s="driven by your own expressions", pill=("WORN", "good")),
+        dict(icon="photo", color="cyan", k="Your background only",
+             s="your face is untouched"),
+        dict(icon="eye", color="green", k="Everyone here is told",
+             s="they see the name, not a face"),
+        dict(icon="warn", color="red", k="Never a real person",
+             s="no likeness of anybody real"),
+        dict(icon="shieldok", color="green", k="Live person — not AI",
+             s="the badge stays, mask and all"),
+    ], button=("Take it off", "amber")),
+    # The lobby. Every row says what it is — that is the screen's whole job,
+    # and it is why the human row is drawn identically to the synthetic ones
+    # except for the word: a roster that styled people differently would be
+    # telling you by decoration what it should be telling you in text.
+    dict(num=122, title="Game Lobby", sub="Who is in the match, and what they are",
+         accent="indigo", tab=3, cards=[
+        dict(icon="robot", color="indigo", k="Vex · your teammate",
+             s="the session profile, hosting", pill=("AI", "info")),
+        dict(icon="robot", color="cyan", k="Rook · coach",
+             s="your second profile, watching", pill=("AI", "info")),
+        dict(icon="bolt", color="amber", k="Your spotter",
+             s="an agent — needs you", pill=("AMBER", "warn")),
+        dict(icon="person", color="green", k="samhain · a person",
+             s="the only human on the roster", pill=("YOU", "good")),
+        dict(icon="shieldok", color="brand", k="Nothing here plays",
+             s="they observe and talk, that is all"),
+    ], button=("Seat another", "brand")),
+    # The desk badge with a mask on it. The screen exists because the pair is
+    # the disclosure: either line alone is a different and wrong claim, so the
+    # first two cards are deliberately adjacent and equally weighted.
+    dict(num=123, title="Masked and Real", sub="One mark, whatever you wear",
+         accent="green", tab=3, cards=[
+        dict(icon="shieldok", color="green", k="NOT AI · REAL PERSON",
+             s="burned in — mask or none"),
+        dict(icon="person", color="cyan", k="@otis_marsh",
+             s="top left, where it always was"),
+        dict(icon="lock", color="indigo", k="Tied to your account",
+             s="no one else can paste it on"),
+        dict(icon="eye", color="brand", k="They know whose room",
+             s="they chose it to get here"),
+        dict(icon="mask", color="pink", k="Change your face too",
+             s="see Wear a Character"),
+    ], button=("Change the mask", "brand")),
+    # Backgrounds, and the third card is the whole reason this is not just a
+    # picker: a generated room is synthetic media even when the face is not.
+    dict(num=124, title="Your Background", sub="Yours, imported, or generated",
+         accent="cyan", tab=3, cards=[
+        dict(icon="photo", color="cyan", k="Your kitchen",
+             s="your own photo, no mark needed", pill=("ON", "good")),
+        dict(icon="link", color="indigo", k="Imported image",
+             s="you need the rights to it"),
+        dict(icon="brain", color="pink", k="A generated scene",
+             s="AI-made — and it says so", pill=("AI", "info")),
+        dict(icon="eye", color="brand", k="Blur your real room",
+             s="the room you are really in"),
+        dict(icon="mask", color="green", k="Change your face too",
+             s="see Wear a Character"),
+    ], button=("Change background", "brand")),
+    # The hardware answer to the fair-play rule, refused on its own screen
+    # because it is the workaround somebody will actually propose.
+    dict(num=125, title="Never a Player", sub="Synthetic members sit beside you",
+         accent="red", tab=3, cards=[
+        dict(icon="warn", color="red", k="Never a player slot",
+             s="not on your console either"),
+        dict(icon="cross", color="red", k="No second controller",
+             s="the same bot, shorter cable"),
+        dict(icon="cross", color="pink", k="No Bluetooth pad",
+             s="pairing one is the tell"),
+        dict(icon="cross", color="amber", k="No capture card",
+             s="watching to play is playing"),
+        dict(icon="people", color="green", k="Beside the players",
+             s="coach, spotter, archivist"),
+    ]),
+    # A profile on a fixture. The third and fourth cards are why this is not
+    # just the watch again: a wrist is read by its owner and a wall by whoever
+    # walks past, so the list of what may be shown is shorter, not longer.
+    dict(num=126, title="On a Screen", sub="A wall, a kiosk, a pane of glass",
+         accent="cyan", tab=3, cards=[
+        dict(icon="grid", color="cyan", k="The lobby panel",
+             s="wall, kiosk, counter, window", pill=("LIVE", "good")),
+        dict(icon="expand", color="brand", k="Full, half, or a strip",
+             s="and opaque or see-through"),
+        dict(icon="eye", color="amber", k="Only what strangers read",
+             s="a wall cannot tell who is there"),
+        dict(icon="warn", color="red", k="No control on a wall",
+             s="pressed by whoever reaches it"),
+        dict(icon="shieldok", color="green", k="The mark gets a plate",
+             s="on glass it must stay legible"),
+    ], button=("Take it down", "amber")),
+    # The guided walkthrough. The third card is the one that keeps it honest:
+    # the guide has no name and no face, which on a platform full of disclosed
+    # synthetic people is the difference between furniture and a character.
+    dict(num=127, title="Show Me Around", sub="The guide, not a profile",
+         accent="brand", tab=3, cards=[
+        dict(icon="compass", color="brand", k="Seven chapters",
+             s="sixteen steps, in order", pill=("STEP 1", "info")),
+        dict(icon="speaker", color="cyan", k="Read it or hear it",
+             s="voice drops the numbers"),
+        dict(icon="mask", color="amber", k="No name, no face",
+             s="it is furniture, not somebody"),
+        dict(icon="lock", color="green", k="It never taps for you",
+             s="it tells you what to tap"),
+        dict(icon="shieldok", color="indigo", k="Every screen covered",
+             s="a test holds it to the app"),
+    ], button=("Start the tour", "brand")),
+    # The pane in the corner. Card four is the one that decides the design: a
+    # dock is inside every screenshot and every screen share, so it tucks
+    # itself away on a surface that is going out, and it never carries a
+    # control that could be mis-tapped onto a live broadcast.
+    dict(num=128, title="The Corner Pane", sub="Tucks away with the helper",
+         accent="brand", tab=3, cards=[
+        dict(icon="shrink", color="brand", k="Tap to tuck it away",
+             s="the helper button is the handle"),
+        dict(icon="watch", color="cyan", k="The watch faces, here",
+             s="no watch required"),
+        dict(icon="warn", color="amber", k="It shows, it never acts",
+             s="the real screen is one tap away"),
+        dict(icon="eye", color="red", k="It is in your screenshot",
+             s="so it tucks itself on a live"),
+        dict(icon="compass", color="green", k="Every face has a way out",
+             s="it points at the screen"),
+    ], button=("Move it left", "brand")),
+    # Directions rather than a description. The second card is the whole
+    # point: somebody asking where a thing is has not asked what it is.
+    dict(num=129, title="Where Is It?", sub="Ask, and the guide points",
+         accent="cyan", tab=3, cards=[
+        dict(icon="search", color="brand", k="Change my background",
+             s="Your Background · screen 124"),
+        dict(icon="compass", color="cyan", k="It names the screen",
+             s="not a paragraph about it"),
+        dict(icon="shrink", color="indigo", k="And the corner pane",
+             s="when the face is in there too"),
+        dict(icon="speaker", color="green", k="Say it or type it",
+             s="the same answer either way"),
+        dict(icon="lock", color="amber", k="It still never taps",
+             s="it tells you where to"),
+    ], button=("Ask the guide", "brand")),
+    # The price list. Card five is the one that has to be there: money in this
+    # repository is simulated everywhere, and a tier screen is the one place a
+    # reader would assume otherwise.
+    dict(num=130, title="Choose a Plan", sub="Basic makes, Pro reaches out",
+         accent="brand", tab=3, cards=[
+        dict(icon="person", color="cyan", k="Basic · $20/month",
+             s="your profiles, your own agent", pill=("NOW", "info")),
+        dict(icon="bolt", color="brand", k="Pro · $130/month",
+             s="all that leaves your account"),
+        dict(icon="eye", color="green", k="Visitors read free",
+             s="a scan needs no account"),
+        dict(icon="lock", color="amber", k="Cancel, keep your work",
+             s="profiles outlive the plan"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Go Pro", "brand")),
+    # What Basic cannot reach, said plainly rather than by a greyed-out row
+    # with no explanation. The last card is the design: browsing stays open.
+    dict(num=131, title="What Pro Adds", sub="The things that leave your account",
+         accent="cyan", tab=3, cards=[
+        dict(icon="grid", color="cyan", k="The marketplace",
+             s="list, sell, license, place"),
+        dict(icon="link", color="indigo", k="Connectors and apps",
+             s="reach outside services"),
+        dict(icon="share", color="green", k="Lend and borrow skills",
+             s="plus standing connections"),
+        dict(icon="sliders", color="brand", k="Builders and modifiers",
+             s="steering, governance, more"),
+        dict(icon="search", color="amber", k="Browsing stays open",
+             s="look before you pay"),
+    ], button=("Compare plans", "brand")),
+    # ---- first-run: the plan step ----
+    #
+    # Distinct from 130, which is the reference price list reached from
+    # settings. This is the one in the signup flow, and the difference that
+    # matters is the third card: you can decline and keep looking, because a
+    # visitor is a real state rather than a lapsed customer.
+    dict(num=132, title="Pick a Plan", sub="Step 4 of 5",
+         accent="brand", tab=0, cards=[
+        dict(icon="person", color="cyan", k="Basic · $20/month",
+             s="make profiles and your agent"),
+        dict(icon="bolt", color="brand", k="Pro · $130/month",
+             s="all that leaves your account"),
+        dict(icon="eye", color="green", k="Not yet — just look",
+             s="you need a plan to make things"),
+        dict(icon="lock", color="amber", k="Change or cancel later",
+             s="your profiles outlive the plan"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Continue with Basic", "brand")),
+    # The payment step, marked. Drawn rather than skipped because a signup
+    # flow has one and pretending otherwise would make the mockups a worse
+    # guide than the product — but every version of this screen carries the
+    # simulation pill, because a convincing checkout is the one place in this
+    # repository somebody could reasonably be misled about money.
+    dict(num=133, title="Payment", sub="Step 5 of 5",
+         accent="cyan", tab=0, cards=[
+        dict(icon="coin", color="amber", k="Basic · $20 a month",
+             s="first charge today", pill=("SIM", "warn")),
+        dict(icon="lock", color="green", k="Card details",
+             s="nothing is sent anywhere"),
+        dict(icon="warn", color="red", k="No processor is called",
+             s="the subscription is a row"),
+        dict(icon="cal", color="cyan", k="Renews monthly",
+             s="cancel from settings"),
+        dict(icon="shieldok", color="indigo", k="Leave and keep it all",
+             s="cancelling deletes nothing"),
+    ], button=("Confirm — simulated", "brand")),
+    # Where signup lands. The fourth card is the honest half of an upsell:
+    # naming what is not included beats discovering it at a wall.
+    dict(num=134, title="You're on Basic", sub="Here is what that means",
+         accent="green", tab=0, cards=[
+        dict(icon="shieldok", color="green", k="Make what you like",
+             s="profiles, and your own agent", pill=("ON", "good")),
+        dict(icon="grid", color="amber", k="Marketplace is Pro",
+             s="you can browse it now"),
+        dict(icon="link", color="amber", k="Connectors are Pro",
+             s="so are lent skills"),
+        dict(icon="sliders", color="amber", k="Builders are Pro",
+             s="steering and governance"),
+        dict(icon="compass", color="brand", k="The guide knows the way",
+             s="ask it where anything is"),
+    ], button=("Start building", "brand")),
+    # The 402 moment, in context. This is what the structured refusal is for:
+    # a client shows a price rather than a permission error.
+    dict(num=135, title="This Needs Pro", sub="What you tapped, and why",
+         accent="amber", tab=3, cards=[
+        dict(icon="lock", color="amber", k="Listing on the market",
+             s="needs Pro · $130/month"),
+        dict(icon="person", color="cyan", k="You are on Basic",
+             s="nothing changes on its own"),
+        dict(icon="search", color="green", k="Keep browsing free",
+             s="looking was never gated"),
+        dict(icon="bolt", color="brand", k="What else Pro adds",
+             s="connectors, skills, builders"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Upgrade to Pro", "brand")),
+    dict(num=88, title="Your Devices", sub="Pair them while you sign up",
+         accent="cyan", tab=0, cards=[
+        dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
+        dict(icon="mic", color="green", k="AirPods", s="in the ears", pill=("PAIRED", "good")),
+        dict(icon="mic", color="indigo", k="Lapel mic", s="clipped to the collar"),
+        dict(icon="eye", color="amber", k="Glasses · ring · pendant", s="worn on the person"),
+        dict(icon="shield", color="red", k="Smart speakers refused", s="they hear whoever walks in"),
+    ], button=("Pair a device", "brand")),
+    dict(num=87, title="For You", sub="And why each one is here",
+         accent="cyan", tab=0, cards=[
+        dict(icon="person", color="green", k="Marcus Bell", s="a friend posted this", pill=("110", "good")),
+        dict(icon="person", color="cyan", k="Dr. Amara Osei", s="you have talked to this profile", pill=("70", "good")),
+        dict(icon="chart", color="amber", k="Priya Raman", s="you engage with technology", pill=("35", "warn")),
+        dict(icon="eye", color="indigo", k="Wren Okafor", s="popular with people here", pill=("28", "info")),
+        dict(icon="shield", color="red", k="Never ranked on", s="memories · source items · vault"),
+    ]),
+    dict(num=86, title="Customise", sub="Themes, colour, your Top 8",
+         accent="amber", tab=0, cards=[
+        dict(icon="sparkle", color="amber", k="Theme", s="Sunset · six presets", pill=("PICKED", "good")),
+        dict(icon="eye", color="indigo", k="Accent colour", s="#f7b731 — validated, not markup"),
+        dict(icon="chat", color="cyan", k="Tagline", s="90 characters, in your words"),
+        dict(icon="person", color="green", k="Top 8", s="friends only, your order"),
+        # Raw HTML *is* allowed — that is the MySpace part, and refusing it
+        # would have been refusing the feature. What is not allowed is script.
+        dict(icon="pen", color="indigo", k="Your own HTML", s="marquee, tables, backgrounds"),
+        dict(icon="shield", color="red", k="Script is stripped", s="the nostalgia, not the injection"),
+    ], button=("Save page", "brand")),
 ]
+
+
+# Characters that must not reach a filename, because the filename becomes a URL
+# in the README's <img src>. A "?" starts a query string and a "#" a fragment,
+# so `129-where-is-it?.svg` silently resolves to `129-where-is-it` and the image
+# is a broken icon. A comma survives the URL but not every shell.
+#
+# One function rather than the expression written out twice, which is how a
+# comma reached a filename once already: the copy that swept away stale files
+# and the copy that wrote new ones disagreed, so the build both created the bad
+# name and declined to clean it up.
+_UNSAFE = str.maketrans({c: None for c in "?#,:!'\"()[]{}<>|\\^`*$&+;@="})
+
+
+def slug(title: str) -> str:
+    """The filename part of a screen's title, safe to put in a URL."""
+    out = (title.lower().replace(" & ", "-").replace(" ", "-")
+                .replace("\u00e9", "e").translate(_UNSAFE))
+    while "--" in out:
+        out = out.replace("--", "-")
+    return out.strip("-")
+
+
+def filename(screen: dict) -> str:
+    """The one place a screen's file is named."""
+    return f'{screen["num"]:02d}-{slug(screen["title"])}.svg'
 
 
 def main():
     global PLATFORM
     total = 0
+    # Renaming a screen used to leave the old file behind, and a stale SVG on
+    # disk is worse than a missing one: it still renders, it is still linked,
+    # and it shows a version of the product that no longer exists. Renumbering
+    # the room screens left six of them lying there before this was noticed.
+    stale = 0
     for plat, sub in (("ios", ""), ("android", "android")):
         PLATFORM = plat
         outdir = OUT if not sub else os.path.join(OUT, sub)
         os.makedirs(outdir, exist_ok=True)
+        keep = {filename(s) for s in SCREENS}
+        for name in os.listdir(outdir):
+            if name.endswith(".svg") and name not in keep:
+                os.remove(os.path.join(outdir, name))
+                stale += 1
         for s in SCREENS:
             n = s["num"]
-            slug = s["title"].lower().replace(" & ", "-").replace(" ", "-").replace("é", "e")
-            fn = f'{n:02d}-{slug}.svg'
+            fn = filename(s)
+            draw = render_full if s.get("full") else render
+            # Rendered before the file is opened. `open(..., "w")` truncates
+            # immediately, so doing it the other way round meant a render that
+            # raised left a zero-byte SVG behind — a build that fails by
+            # corrupting its own output, and the empty file then crashed the
+            # audit rather than being reported by it.
+            svg = draw(s)
             with open(os.path.join(outdir, fn), "w") as f:
-                f.write(render(s))
+                f.write(svg)
             total += 1
     PLATFORM = "ios"
-    print(f"generated {total} screens ({total // 2} × 2 platforms)")
+    print(f"generated {total} screens ({total // 2} × 2 platforms)"
+          + (f", removed {stale} stale" if stale else ""))
     return []
 
 

@@ -46,6 +46,10 @@ class ProfileCreate(BaseModel):
     # the profile. An explicit refusal is refused.
     terms_consent: bool = True
     owner_id: str
+    # The plan this account joins on. Omitted means Basic for a new account,
+    # and *no change* for an existing member — making a second profile must not
+    # quietly move somebody off Pro. See qrme/routers/profiles.py:_enrol.
+    plan: str | None = None
     kind: ProfileKind
     display_name: str
     persona: str = Field(description="Core identity: voice, history, values.")
@@ -85,7 +89,11 @@ class ProfileUpdate(BaseModel):
 
 class ProfileOut(BaseModel):
     id: str
-    owner_id: str
+    # Null to anyone but the owner. It is an account identifier, and on this
+    # platform an account may hold several profiles — so publishing it lets a
+    # reader match two anonymous profiles to each other, and match both to the
+    # named one beside them. No visitor needs it; see `common.profile_out`.
+    owner_id: str | None
     kind: ProfileKind
     display_name: str
     persona: str
@@ -152,6 +160,10 @@ class GenesisAnswers(BaseModel):
 
 class GenesisCreate(BaseModel):
     owner_id: str
+    # The plan this account joins on. Omitted means Basic for a new account,
+    # and *no change* for an existing member — making a second profile must not
+    # quietly move somebody off Pro. See qrme/routers/profiles.py:_enrol.
+    plan: str | None = None
     verification: Verification
     answers: GenesisAnswers
     display_name: str | None = None    # omit to let the profile name itself
@@ -223,10 +235,22 @@ class RoomMicLend(BaseModel):
     Everyone in the room is shown that you did."""
     interactor_id: str
     device: str = "smart_watch"
+    # Both vocabularies, because a device may be named the way the pairing
+    # registry named it (`lapel_mic`) or the way this module and jim/mic.py do
+    # (`lapel`). `roommic.FROM_WEARABLE` translates; the schema accepts either
+    # so a client holding a paired device can send what it already has.
+    #
+    # The room-facing kinds are listed and then refused by the module rather
+    # than rejected by the schema, because a 422 from a Literal says "not a
+    # valid value" and the true answer is "that microphone would pick up the
+    # other people in the room". The reason is the feature.
     mic_type: Literal["watch", "earbuds", "headset", "lapel", "clip_on",
                       "bone_conduction", "glasses", "collar_tag", "handheld",
+                      "lapel_mic", "clip_on_mic",
                       "speakerphone", "conference", "console", "laptop",
-                      "room_array", "doorbell"] = "watch"
+                      "room_array", "doorbell",
+                      "smart_speaker", "conference_puck", "tabletop_mic",
+                      "desk_mic"] = "watch"
     # The lender's own gain setting. Accepted so one client can send it to
     # either product, but a room grant always runs near-field — a room has
     # other people in it, and a channel wide enough to hear them is a channel
@@ -592,3 +616,8 @@ class HelpAsk(BaseModel):
     """A question about using QRME — not a message to a profile."""
 
     question: str = ""
+    # `voice` renders the same answer for listening rather than reading. It is
+    # a mode on the existing box rather than a second endpoint, because a
+    # spoken help assistant and a written one answering differently is two
+    # products, and the spoken one would be the one nobody re-read.
+    mode: str = "text"

@@ -128,6 +128,13 @@ def set_presence(desk_id: str, presence: str) -> dict:
     conn.execute("UPDATE desks SET presence=?, last_seen=? WHERE id=?",
                  (presence, db.utcnow(), desk_id))
     conn.commit()
+    if presence == "closed":
+        # Any microphone lent to this desk's profiles goes back when the desk
+        # closes. Scoped to the session that justified it — a grant that
+        # survived closing would be live again the next time the desk opened,
+        # for a conversation nobody has had yet.
+        from . import roommic
+        roommic.close_place("desk", desk_id)
     return card(desk_id)
 
 

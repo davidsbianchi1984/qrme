@@ -20,9 +20,14 @@ def test_succession_transfers_control_to_the_successor(client):
     assert client.get(f"/profiles/{p['id']}/export").status_code == 401
     ok = {"authorization": f"Bearer {r['owner_token']}"}
     assert client.get(f"/profiles/{p['id']}/export", headers=ok).status_code == 200
-    # Ownership is reflected on the card, and the profile stays active.
-    card = client.get(f"/profiles/{p['id']}", headers={}).json()
+    # Ownership is reflected on the card, and the profile stays active. Read
+    # with the successor's token: `owner_id` is an account identifier, so the
+    # public view withholds it — one account may hold several profiles, and
+    # publishing it matches them to each other.
+    card = client.get(f"/profiles/{p['id']}", headers=ok).json()
     assert card["owner_id"] == "daughter-1" and card["status"] == "active"
+    assert client.get(f"/profiles/{p['id']}",
+                      headers={"authorization": ""}).json()["status"] == "active"
 
 
 def test_succession_without_successor_becomes_memorial(client):

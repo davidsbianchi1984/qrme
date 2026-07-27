@@ -19,6 +19,11 @@ from datetime import datetime, timezone
 _EMBODIMENT_FORMS = "text, voice, feed, AR/VR, a speaker, a hologram, or a robot"
 
 
+def _shown_name(profile) -> str:
+    from . import identity
+    return identity.shown_name(profile)
+
+
 def identity_signature(profile: dict) -> dict:
     """A stable fingerprint of *who the profile is* — name, core persona,
     purpose, maturity. It does not depend on the embodiment or modality an
@@ -30,8 +35,9 @@ def identity_signature(profile: dict) -> dict:
     ])
     return {
         "signature": hashlib.sha256(core.encode()).hexdigest()[:16],
-        "name": ("anonymous persona" if profile["anonymous"]
-                 else profile["display_name"]),
+        # Deferred: `identity` reaches the database and this module is imported
+        # by things that build a prompt before one exists.
+        "name": _shown_name(profile),
         "invariant_across": _EMBODIMENT_FORMS,
         "guarantee": "identity, memory, and voice stay constant across every "
                      "embodiment and modality; only the form of expression changes",

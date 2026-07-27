@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import html
 
-from . import avatars, db
+from . import avatars, db, identity
 
 # Night indigo, matching the studio and the printed QR's dark ink.
 _CSS = """
@@ -283,8 +283,7 @@ def profile_page(profile: dict, base: str, label: str | None = None,
     pid = profile["id"]
     art = avatars.render(pid)
     watermark = art["watermark"]["line"]
-    name = ("anonymous persona" if profile["anonymous"]
-            else profile["display_name"])
+    name = identity.shown_name(profile)
 
     if art["asset"]:
         portrait = f'<img src="{html.escape(art["asset"])}" alt="" >'

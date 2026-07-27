@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.3.3** ([changelog](CHANGELOG.md) ·
+**Current release: v0.4.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -51,7 +51,15 @@ Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation 
   </tr>
   <tr>
     <td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
-    <td align="center" width="50%"></td>
+    <td align="center" width="50%"><a href="docs/desktop/10-community.svg"><img src="docs/desktop/10-community.svg" width="460" alt="Community"></a><br><sub><b>10</b> · Community</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/11-channel-2.svg"><img src="docs/desktop/11-channel-2.svg" width="460" alt="Channel 2"></a><br><sub><b>11</b> · Channel 2 · every place at once</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/12-who-you-are.svg"><img src="docs/desktop/12-who-you-are.svg" width="460" alt="Who You Are"></a><br><sub><b>12</b> · Who you are · profiles and anonymity</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/13-camera-screens.svg"><img src="docs/desktop/13-camera-screens.svg" width="460" alt="Camera & Screens"></a><br><sub><b>13</b> · Camera &amp; screens · what others see of you</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><a href="docs/desktop/14-game-lobby.svg"><img src="docs/desktop/14-game-lobby.svg" width="460" alt="Game Lobby"></a><br><sub><b>14</b> · Game lobby · the roster and the rule</sub></td>
   </tr>
 </table>
 
@@ -246,10 +254,62 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/79-search-assistant.svg"><img src="docs/screens/79-search-assistant.svg" width="210" alt="Search Assistant"></a><br><sub><b>79</b> · Search Assistant</sub></td>
     <td align="center" width="33%"><a href="docs/screens/80-profile.svg"><img src="docs/screens/80-profile.svg" width="210" alt="Profile"></a><br><sub><b>80</b> · Profile</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/81-lend-a-microphone.svg"><img src="docs/screens/81-lend-a-microphone.svg" width="210" alt="Lend a Microphone"></a><br><sub><b>81</b> · Lend a Microphone</sub></td>
   </tr>
   <tr>
+    <td align="center" width="33%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
     <td align="center" width="33%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="210" alt="My Page"></a><br><sub><b>85</b> · My Page</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="210" alt="Customise"></a><br><sub><b>86</b> · Customise</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="210" alt="For You"></a><br><sub><b>87</b> · For You</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>99</b> · Posted Video · YouTube</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/112-the-agreement.svg"><img src="docs/screens/112-the-agreement.svg" width="210" alt="The Agreement"></a><br><sub><b>112</b> · The Agreement</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="210" alt="Delivery"></a><br><sub><b>114</b> · Delivery</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/115-watch-party.svg"><img src="docs/screens/115-watch-party.svg" width="210" alt="Watch Party"></a><br><sub><b>115</b> · Watch Party</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/116-lend-a-skill.svg"><img src="docs/screens/116-lend-a-skill.svg" width="210" alt="Lend a Skill"></a><br><sub><b>116</b> · Lend a Skill</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/117-edit-a-message.svg"><img src="docs/screens/117-edit-a-message.svg" width="210" alt="Edit a Message"></a><br><sub><b>117</b> · Edit a Message</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="210" alt="Stay Anonymous"></a><br><sub><b>118</b> · Stay Anonymous</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="210" alt="Lend It Anywhere"></a><br><sub><b>120</b> · Lend It Anywhere</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="210" alt="Wear a Character"></a><br><sub><b>121</b> · Wear a Character</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="210" alt="Game Lobby"></a><br><sub><b>122</b> · Game Lobby</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="210" alt="Masked and Real"></a><br><sub><b>123</b> · Masked and Real</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/124-your-background.svg"><img src="docs/screens/124-your-background.svg" width="210" alt="Your Background"></a><br><sub><b>124</b> · Your Background</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="210" alt="On a Screen"></a><br><sub><b>126</b> · On a Screen</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>127</b> · Show Me Around</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="210" alt="The Corner Pane"></a><br><sub><b>128</b> · The Corner Pane</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="210" alt="Where Is It"></a><br><sub><b>129</b> · Where Is It?</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="210" alt="Choose a Plan"></a><br><sub><b>130</b> · Choose a Plan</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/131-what-pro-adds.svg"><img src="docs/screens/131-what-pro-adds.svg" width="210" alt="What Pro Adds"></a><br><sub><b>131</b> · What Pro Adds</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/132-pick-a-plan.svg"><img src="docs/screens/132-pick-a-plan.svg" width="210" alt="Pick a Plan"></a><br><sub><b>132</b> · Pick a Plan</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/133-payment.svg"><img src="docs/screens/133-payment.svg" width="210" alt="Payment"></a><br><sub><b>133</b> · Payment</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/134-youre-on-basic.svg"><img src="docs/screens/134-youre-on-basic.svg" width="210" alt="You are on Basic"></a><br><sub><b>134</b> · You're on Basic</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/135-this-needs-pro.svg"><img src="docs/screens/135-this-needs-pro.svg" width="210" alt="This Needs Pro"></a><br><sub><b>135</b> · This Needs Pro</sub></td>
+    <td align="center" width="33%"></td>
   </tr>
 </table>
 
@@ -268,6 +328,179 @@ where a viewer is already looking, and on a stream whose premise is an empty
 chair with a bell, the reactions are the room. Those screens also show the two
 ways in: **come up as a guest**, which asks the host, or **just comment**,
 which is immediate.
+
+**89** is the room itself: the video runs the full height of the screen, the
+faces are circles on the glass, and everything a viewer can do is one strip
+along the bottom — a composer, then the reactions as small circles in the
+trailing corner. Every one of those was already a route, and none of them was
+anywhere a thumb could reach, which reads exactly like a missing feature:
+
+| On the strip | Route |
+| --- | --- |
+| person + arrow | `POST /desks/{desk_id}/guests` — asks the host |
+| bell | `POST /desks/{desk_id}/bell` — one ring per desk per 30s |
+| gift | `POST /{kind}/{subject_id}/gift` |
+| heart | `POST /posts/{id}/like` — the audience layer |
+| share | `POST /{kind}/{id}/share` |
+
+Ringing and coming up sit in the same strip as like, gift and share because
+from the viewer's side they are one gesture: a thing you do to the room you are
+watching. That the guest request needs the host to say yes is the host's
+business, not a reason to file it under a different menu. **75** and **76** are
+where those conditions are spelled out; **89** is what it looks like once you
+already know them.
+
+### Full screen, and the three states every live surface has
+
+**Press and hold, and the picture takes the whole phone.** No title, no tab
+bar, no margin — full screen that stops short of the chrome is just a larger
+box, and a screenshot of one that stops short of the file is a picture with a
+band around it.
+
+Holding is also what puts the **help button** back. It used to be welded to
+every screen on the theory that "on all screens" is a property of the chrome
+rather than something a hundred screens can each be trusted to remember, and
+that theory is right everywhere except here, where the chrome *is* what is
+being taken away: a floating `?` on a full-screen video is a permanent smudge
+on it, and it sits in exactly the corner the share button now occupies. So it
+comes back the way everything else does — press and hold and it surfaces,
+along with the way into landscape and the way back to the app. The promise is
+kept without the pixel.
+
+The held state **dims hard** — 78%, not a tint — and the buttons are lit rather
+than outlined. There is exactly one bright thing on the glass and it is the
+thing you can press; a light scrim leaves the picture competing with the buttons
+and turns a decision into a hunt. Tapping anywhere else takes the dim away
+again, and the screen says so.
+
+**Tilt and it goes wide.** This is the state that earns its place rather than
+being a checkbox: the desk was shot sixteen-by-nine, and a portrait column crops
+two thirds of it away. Sideways, the bell on the desk and the sign beside it are
+in frame at once — which is the entire situation the feature exists for.
+
+Those three states — plain, held, sideways — belong to a **surface**, not to
+one screen. So every one of them has all three.
+
+#### A live desk
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="180" alt="Live room in the app"></a><br><sub><b>89</b> · in the app</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="180" alt="Live room full screen"></a><br><sub><b>90</b> · full screen</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/91-full-screen-held.svg"><img src="docs/screens/91-full-screen-held.svg" width="180" alt="Live room held"></a><br><sub><b>91</b> · held</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/92-full-screen-landscape.svg"><img src="docs/screens/92-full-screen-landscape.svg" width="600" alt="Live room, landscape"></a><br><sub><b>92</b> · sideways — the room at its own aspect ratio</sub></td>
+  </tr>
+</table>
+
+**The rated stream gets the same three,** and the **18+ badge survives all of
+them**. The gate belongs to the profile, not to the app chrome, so taking the
+chrome away must not take the rating with it.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/93-rated-full-screen.svg"><img src="docs/screens/93-rated-full-screen.svg" width="190" alt="Rated stream full screen"></a><br><sub><b>93</b> · full screen · 18+</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/94-rated-held.svg"><img src="docs/screens/94-rated-held.svg" width="190" alt="Rated stream held"></a><br><sub><b>94</b> · held · 18+</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/95-rated-landscape.svg"><img src="docs/screens/95-rated-landscape.svg" width="600" alt="Rated stream, landscape"></a><br><sub><b>95</b> · sideways · 18+</sub></td>
+  </tr>
+</table>
+
+**A room with its camera on** is the other place a video and a conversation run
+at once. Its strip carries a microphone rather than a bell — in a room you are
+a participant, not a visitor at somebody's desk.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/96-room-full-screen.svg"><img src="docs/screens/96-room-full-screen.svg" width="190" alt="Room full screen"></a><br><sub><b>96</b> · full screen</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/97-room-held.svg"><img src="docs/screens/97-room-held.svg" width="190" alt="Room held"></a><br><sub><b>97</b> · held</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/98-room-landscape.svg"><img src="docs/screens/98-room-landscape.svg" width="600" alt="Room, landscape"></a><br><sub><b>98</b> · sideways</sub></td>
+  </tr>
+</table>
+
+#### A room that is not a camera
+
+A room's channel can be chat, voice, video, **AR** or **VR** (`POST /rooms`),
+and each of those is a different problem in the same three states.
+
+**Audio is the case every layout forgets.** There is nothing to look at, so the
+boxes *are* the screen — and they are not decoration: they answer the only two
+questions an audio room raises, *who is here* and *who is talking*. The speaking
+ring is the loudest thing in the tile. A muted person keeps their box rather
+than vanishing from it, because somebody who has gone quiet is still in the
+room and a layout that removes them is telling the others they left.
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/103-audio-room.svg"><img src="docs/screens/103-audio-room.svg" width="190" alt="Audio room"></a><br><sub><b>103</b> · audio · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/104-audio-held.svg"><img src="docs/screens/104-audio-held.svg" width="190" alt="Audio room, held"></a><br><sub><b>104</b> · audio · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/105-audio-landscape.svg"><img src="docs/screens/105-audio-landscape.svg" width="330" alt="Audio room, landscape"></a><br><sub><b>105</b> · audio · sideways</sub></td>
+  </tr>
+</table>
+
+**AR puts them in the room you are already in.** That is the whole of what it
+buys over a video call: the others are not in a strip down the side, they are
+*somewhere* — beside the desk, by the door — and where they are is information.
+The floor ring under each one is what makes them stand in the room rather than
+float on the glass. The camera frame is a real photograph and carries no AI
+mark; the people standing in it are synthetic and carry theirs, which is the
+single place a missing badge would matter most.
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/106-ar-room.svg"><img src="docs/screens/106-ar-room.svg" width="190" alt="AR room"></a><br><sub><b>106</b> · AR · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/107-ar-held.svg"><img src="docs/screens/107-ar-held.svg" width="190" alt="AR room, held"></a><br><sub><b>107</b> · AR · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/108-ar-landscape.svg"><img src="docs/screens/108-ar-landscape.svg" width="330" alt="AR room, landscape"></a><br><sub><b>108</b> · AR · sideways</sub></td>
+  </tr>
+</table>
+
+**VR is a room that is not a place.** Drawn rather than photographed, because
+there is no photograph of somewhere that does not exist and a stock picture of a
+headset would be a picture of the hardware instead of the room. A horizon, a
+floor receding to a vanishing point, and the people standing at different
+depths — depth carried by size and position, which is the whole of what 3-D buys
+over a grid of boxes and the reason a room like this is worth having.
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/109-vr-room.svg"><img src="docs/screens/109-vr-room.svg" width="190" alt="VR room"></a><br><sub><b>109</b> · VR 3-D · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/110-vr-held.svg"><img src="docs/screens/110-vr-held.svg" width="190" alt="VR room, held"></a><br><sub><b>110</b> · VR 3-D · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/111-vr-landscape.svg"><img src="docs/screens/111-vr-landscape.svg" width="330" alt="VR room, landscape"></a><br><sub><b>111</b> · VR 3-D · sideways</sub></td>
+  </tr>
+</table>
+
+The strip changes with the room and only with the room. An audio room has no
+gift button because there is no stage to gift at; a posted video has no bell and
+no guest request because there is nobody at a desk to ring and no host to ask.
+A control that cannot do anything is worse than an absent one.
+
+#### A video from somewhere else
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="190" alt="Posted video, in the app"></a><br><sub><b>99</b> · in the app</sub></td>
+    <td align="center" width="23%"><a href="docs/screens/100-video-full-screen.svg"><img src="docs/screens/100-video-full-screen.svg" width="160" alt="Posted video, full screen"></a><br><sub><b>100</b> · full screen</sub></td>
+    <td align="center" width="23%"><a href="docs/screens/101-video-held.svg"><img src="docs/screens/101-video-held.svg" width="190" alt="Posted video, held"></a><br><sub><b>101</b> · held</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/102-video-landscape.svg"><img src="docs/screens/102-video-landscape.svg" width="330" alt="Posted video, landscape"></a><br><sub><b>102</b> · sideways</sub></td>
+  </tr>
+</table>
+
+The empty plate is the feature — see [the wall section](#the-community-wall-and-the-feed):
+nothing is requested from YouTube until somebody presses play, so before they
+do there is genuinely nothing to draw.
 
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it
@@ -418,6 +651,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.4.0** | **The round where it got a price, and a guide that walks you to what you paid for.** Membership — Basic $20/month to make your own things, Pro $130/month for everything that leaves your account — enforced at **one chokepoint** rather than a check per route, on a table asserted against the served routes (the first version named three prefixes that were not routes at all: paywalls in front of a wall). A **pane in the corner** carrying the watch faces for people who own no watch, which shows and routes and never acts. And an assistant that answers *where is it* with a screen instead of a paragraph |
 | **0.3.3** | **The round where an agent working on its own stopped being something you had to go and check.** One question — *does this need me right now?* — answered by three colours, on the wrist, in the app, and in a corner box that rides over whatever screen you are on |
 | **0.3.2** | **The round where the starter collection stopped looking like a directory.** Each of the 34 is shown as the profile card the app actually gives it — rating, skills, memory/relationships/engagement, a career, a review, a Talk-to button — two columns wide so a phone stops clipping it. Plus the one starter that had no source material at all: the rated profile is grounded now, in theatre history rather than nothing |
 | **0.3.1** | **The round where the starter profiles stopped answering from tone alone.** All 34 shipped with zero source material while the packs matching them sat unused in the marketplace; seeding now grounds each one in its own industry pack, as part of the **repair** path so deployments seeded earlier catch up by re-running. Plus this README, and a fix to the avatar bubbles' glow |
@@ -500,6 +734,13 @@ The PRD conformance map — every numbered feature in
   proves the posture.
 - Delete anything, anytime: erasing a profile removes every local trace and
   purges its vault records; the owner token dies with it.
+- **The For You feed does not read any of it.** A ranked feed is a new use of a
+  person's data and would have quietly made the rest of this page less true, so
+  the line is drawn narrowly: it ranks on what you did *in public* — who you are
+  friends with, which profiles you have talked to, the tags on those profiles,
+  and what has been liked. It never touches source material, memories, or
+  anything vaulted. That is asserted by a test against the ranking's own
+  queries, not merely stated here.
 
 ## Training-data licensing & derivable agents
 
@@ -638,6 +879,1562 @@ everybody who scans the same sticker is talking to the profile together — a
 class, a workshop, a Q&A after a set. See [docs/beacons.md](docs/beacons.md),
 including what a camera app can and cannot actually do with a QR code.
 
+## Editing what you already said
+
+<img src="docs/screens/117-edit-a-message.svg" width="210" align="right" alt="Edit a Message">
+
+`PATCH` and `DELETE /profiles/{id}/messages/{message_id}`. A conversation is
+not a courtroom transcript: people mistype, give the wrong year, say a thing
+badly. On this platform that matters more than usual, because what somebody
+said is also what the profile reasons from next turn — a typo that reaches the
+prompt does not just look untidy, it becomes something the profile believes.
+
+**The correction carries forward, and that part is free rather than clever.**
+The chat path rebuilds history from the message rows on every turn, so a
+corrected row is simply what the next prompt sees. Nothing to re-index, no
+snapshot to go stale.
+
+| rule | why |
+| --- | --- |
+| You can only change **your own** turn | Rewriting a profile's reply is fabrication, not editing — and putting words in a synthetic person's mouth is the one edit this platform must never allow |
+| An edit is **moderated like a fresh message** | Otherwise the edit box is a way past a filter the original had to clear: post something harmless, then change it to what you meant |
+| Retracting is **not deleting** | The row stays and its status becomes `retracted`, which the history query already excluded by only ever selecting `approved`. The text stops reaching the profile; the moderation trail survives |
+| Every previous wording is **kept as a revision** | The trail is the history, not just the latest text |
+
+**A reply written before an edit is flagged, not hidden.** This is the part
+worth being careful about: when somebody corrects a question, the answer under
+it responded to the *old* wording. Leaving it unmarked would imply the profile
+answered the new one. `GET /profiles/{id}/thread/{interactor}` marks those
+replies `answers_stale_text` and says so in words — the honest version is
+"this was answered before you changed it", not a silent rewrite of history.
+
+## Watch faces, and the wearables that show them
+
+QRME had a watch *API* and no way to say **which watch**. `POST
+/profiles/{id}/wearables` pairs one over Bluetooth — a watch, band, ring,
+earbuds or glasses — and says which faces it may show.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/watch/01-agents.svg"><img src="docs/watch/01-agents.svg" width="150" alt="Agents"></a><br><sub><b>01</b> · Agents</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/02-activity.svg"><img src="docs/watch/02-activity.svg" width="150" alt="Activity"></a><br><sub><b>02</b> · Activity</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/03-profile.svg"><img src="docs/watch/03-profile.svg" width="150" alt="Profile"></a><br><sub><b>03</b> · Profile</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/04-control.svg"><img src="docs/watch/04-control.svg" width="150" alt="Control"></a><br><sub><b>04</b> · Control</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/05-microphone.svg"><img src="docs/watch/05-microphone.svg" width="150" alt="Microphone"></a><br><sub><b>05</b> · Microphone</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="25%"><a href="docs/watch/06-identity.svg"><img src="docs/watch/06-identity.svg" width="150" alt="Identity"></a><br><sub><b>06</b> · Identity</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/07-on-camera.svg"><img src="docs/watch/07-on-camera.svg" width="150" alt="On Camera"></a><br><sub><b>07</b> · On Camera</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/08-lobby.svg"><img src="docs/watch/08-lobby.svg" width="150" alt="Lobby"></a><br><sub><b>08</b> · Lobby</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/09-screens.svg"><img src="docs/watch/09-screens.svg" width="150" alt="Screens"></a><br><sub><b>09</b> · Screens</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center" width="35%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="220" alt="Your Devices"></a><br><sub><b>88</b> · pairing, at sign-up</sub></td>
+    <td valign="middle">
+
+**Paired at sign-up, not found in a settings page.** The agent lights and the
+watch faces are worth having on day one, so the device step is part of joining.
+
+| may be paired | |
+| --- | --- |
+| watch · band · ring | on the wrist, on the finger |
+| earbuds · headset | in or over the ears |
+| **lapel mic · clip-on mic** | clipped to the collar or clothing |
+| glasses · pendant | worn on the face or at the neck |
+
+| refused | why |
+| --- | --- |
+| smart speaker · conference puck · room array · tabletop mic · desk mic | each **hears whoever walks in** — and that person did not pair it, was not asked, and may have a right not to be recorded |
+
+  </td>
+  </tr>
+</table>
+
+**The microphone kinds pair but do not listen.** Nothing in this module opens a
+channel; a paired device is a registration and a set of allowed faces. A test
+asserts no capture path exists here — no record, stream, listen or sample.
+
+They are in the catalogue because the registry is what
+[channel 2](#channel-2--lending-the-rooms-profiles-your-microphone) needs, and
+a device somebody already paired for their watch face should not have to be
+paired twice. That feature has now landed, and lending still happens *there*
+rather than here — pairing says which devices you own, lending says what one of
+them may do in one room, and keeping them apart is what lets a grant end with
+the room without unpairing the watch.
+
+**Room-facing microphones are refused at the door**, not allowed and then
+restricted. A restriction is a setting somebody can change; a refusal is a fact
+about the product. A platform cannot collect a waiver from a person who is
+merely present, so until that is settled the whole device class stays out. The
+refusals are published with their reasons so a client greys them out rather
+than offering one and returning a 422.
+
+**A wearable is not an embodiment.** `embodiments` records where a *profile*
+lives — a speaker, a hologram, a robot body. This is hardware belonging to the
+**owner**, reaching their own account. Folding them together would mean pairing
+a watch could put somebody's synthetic persona on their wrist, which is a
+different feature with a different consent question. A test asserts pairing
+writes no embodiment.
+
+**Pairing and permission only.** No sensor stream, no capture, nothing about a
+microphone — a paired device here is a screen and a set of buttons. A test
+asserts the pairing model does not so much as mention audio.
+
+**Faces are a permission, not a free field.** A closed set, so a face added
+later cannot arrive on every wrist by default — and a test holds the drawn
+faces and the permission list in step, because a face you can enable and never
+see is a permission granting nothing.
+
+**Unpairing revokes rather than deletes.** The row survives, so a device sent
+away cannot return by re-presenting the same name, and the owner can still see
+what was ever paired — which is the question people actually ask after losing a
+watch.
+
+**Faces 06–09 all answer the same kind of question**: *what am I currently
+presenting as, without looking at a phone.* Which profile you are posting as
+and whether it is anonymous — the one mistake here that cannot be taken back,
+and exactly the thing somebody assumes rather than checks when the answer is
+two taps into a phone. What your camera is showing, which is the one thing your
+own screen cannot show you, because the phone is in front of the lens and you
+are behind it. Who is in the game with you, as counts. And which fixed screens
+are live with you on them, because a fixture is the surface you can forget is
+on — you walked away from it.
+
+**05 Microphone is the one face that can end something**, and that is
+deliberate rather than an exception to *"the wrist adds reach, not powers"*. A
+lent microphone **is** this watch. Making somebody find a phone to stop their
+own device listening would be the one permission on the platform you cannot
+revoke from the thing it runs on, and *"yours to end, alone and at any moment"*
+would be false.
+
+**02 Activity is the community layer on a wrist, as counts.** Not the content:
+a feed is a reading surface, and reading is the thing a glance cannot do. Same
+reasoning that kept agent names off face 01.
+
+## Channel 2 — lending the room's profiles your microphone
+
+In a voice or video room your own microphone is already busy carrying your
+voice to the other people. The synthetic profiles in that room are *reading
+text*. They have no ear, so anything said aloud and not typed is invisible to
+them, and asking one a question means stopping, typing, and breaking the thing
+everybody else is listening to. The watch on your wrist has a microphone
+nothing is using. This lends it to them.
+
+`qrme/roommic.py` is the permission and the state; capture is on the device,
+as everywhere else. The JIM-mini counterpart (`jim/mic.py`) lends the same
+wearable to the Guardian during a call, and the one genuinely different
+question here is that **a room has other people in it**. That difference is
+the whole design.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/81-lend-a-microphone.svg"><img src="docs/screens/81-lend-a-microphone.svg" width="200" alt="Lend a microphone"></a><br><sub><b>81</b> · the room is told, not only you</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /microphones/vocabulary` | what may be lent, at what width, and what is refused — open, so a client can draw the picker |
+| `POST /rooms/{id}/mic` | lend yours. Your own token, your own wearable |
+| `DELETE /rooms/{id}/mic/{interactor_id}` | take it back. Yours to end, alone and at any moment |
+| `GET /rooms/{id}/mic` | who in this room has lent one — readable by **the room** |
+
+  </td>
+  </tr>
+</table>
+
+**Everyone present is told**, and that is why the disclosure is the screen. A
+room's participants can each see that a microphone is live and whose it is. In
+a one-to-one call the other party is a stranger to this product and cannot be
+told, which is why `jim/mic.py` refuses speakerphone outright; in a room they
+are participants, they can be told, and telling them is the price of the
+feature. A version of screen 81 showing the lender only their own row would be
+the exact mistake the module was written to avoid.
+
+**Readable by the room, not by anyone holding the id.** For a while the route
+said the first and did the second — it checked nothing, and a room id is not a
+secret: it rides in beacons and on printed QR stickers, which is what they are
+for. That published who is wearing a live microphone, on what, and since when,
+to whoever scanned the sticker. Being in the room now means holding a
+participant's token, or the owner token of a profile in it.
+
+**Only your own wearable, and only your own voice.** The grant is
+per-participant and never becomes the room's microphone, because a participant
+cannot consent on behalf of the people they can hear. Room-facing kinds —
+speakerphone, conference puck, room array, laptop, console, doorbell — are
+refused by name with the reason, not quietly missing from a list.
+
+### The same microphone, off the room
+
+Nothing in the rules above depended on the surface being a room, so channel 2
+reaches the places that had none: a **watch party**, a **live desk's stream**,
+and a **one-to-one connection**. Rooms already covered voice, video, AR and VR
+by channel, so a 3-D or VR room lends exactly as a voice room does.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="200" alt="Lend it anywhere"></a><br><sub><b>120</b> · the same rule in every place</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /microphones/places` | where else it can be lent, and the test each place passes |
+| `POST /places/{surface}/{id}/microphone` | lend yours here |
+| `DELETE /places/{surface}/{id}/microphone` | take it back |
+| `GET /places/{surface}/{id}/microphone` | who here has lent one — readable by **everyone present** |
+
+  </td>
+  </tr>
+</table>
+
+**One question decides whether a surface qualifies: can the other people
+present be told?** That is what made a room different from a phone call in the
+first place — `jim/mic.py` refuses speakerphone outright because the other
+party on a call is a stranger to this product, with no surface on which to show
+them a disclosure, so their voice could never be part of the bargain. A room's
+participants *can* be shown one. So can a watch party's members, a desk's
+visitors, and the other half of a connection. A surface without both a member
+list and somewhere to render the disclosure must never be added here, whatever
+else is convenient about it, and `GET /microphones/places` publishes the test
+rather than only the list.
+
+**Rooms deliberately do not write to the new table.** Two storage paths for one
+surface is how a disclosure ends up reading one table while the grant sits in
+the other, and a microphone that is live but undisclosed is the worst failure
+this feature has. `roommic.lend_on` refuses `surface="room"` and points at the
+room routes. It is a separate table rather than a column on `room_mics` because
+this schema has no migrations — `CREATE TABLE IF NOT EXISTS` reaches a fresh
+database and an `ALTER` reaches none of the existing ones.
+
+**Membership is read from each surface's own table, and presence is checked
+rather than assumed.** Somebody who left a watch party is not present — counting
+them would let a former member go on reading who is wearing a live microphone in
+a place they walked out of. An ended connection is not a place at all, for the
+same reason a closed room takes no new grant. And an unknown id answers 404
+rather than 403, so a stranger cannot use the status code to tell a real place
+from an invented one.
+
+**The place ending returns the microphones**, and that is wired into the
+lifecycle rather than left as a function nobody calls: `watchparty.end`,
+`desks.set_presence(..., "closed")` and ending a connection each return the
+grants inside them. A grant that survived closing would be live again the next
+time the desk opened, for a conversation nobody has had yet.
+
+**Three form factors, three different jobs.** Screen 81 on the phone is one
+room's disclosure to the person lending. [Watch face
+05](#watch-faces-and-the-wearables-that-show-them) is the device *doing* the
+listening, and the only face that can end something. [Desktop view
+11](#desktop-app) is the one a wide window earns: a desk operator has a room, a
+watch party and a stream open at once, and the question a phone cannot answer
+is **where is my microphone live right now, all of it** — shown beside the
+room's own disclosure, because those two being the same thing is the design.
+
+**A device can be lent under the name it was paired with.** The pairing
+registry calls a collar clip `lapel_mic`; this module and `jim/mic.py` call it
+`lapel`. Two vocabularies for one piece of hardware, and for a while nothing
+joined them — you could pair a lapel mic and be told `lapel_mic` was an unknown
+microphone type when you tried to lend it, from a registry whose own comment
+says it exists for this feature. `roommic.FROM_WEARABLE` translates rather than
+renames: renaming here would desync the table from `jim/mic.py`, which is kept
+in step by hand because the two products do not import each other, and renaming
+there would break already-paired rows. A test holds every kind in the registry
+against one side or the other, so adding a device forces the question *does
+this carry a microphone* at the moment somebody adds it rather than the moment
+a user tries to lend it. A refused kind gets its reason back, not "unknown" —
+that word reads as a gap somebody files a bug about, or works around.
+
+**It keys on its wearer *and* it runs near-field.** Two bounds, deliberately
+separate. `VOICE_FOCUS` is the filter: the channel locks onto the lender and
+drops the rest, which in a room is the other participants. `ROOM_GAIN` is the
+limit: a room grant runs near-field however the lender has their dial set. The
+lender's own preference is capped rather than rejected, and it is still theirs
+everywhere else — a room is simply the one place it cannot be honoured. Both,
+and not just the filter, because a filter can fail and the people it would fail
+on did not choose to be in range.
+
+**The room is shown what the microphone actually hears**, never what its lender
+asked for. A rejected preference is the lender's business, and putting it in
+the disclosure would tell the room something prejudicial and untrue of the
+capture in the same breath.
+
+**It ends when the room does.** A grant is scoped to one room and closed with
+it, so a permission cannot outlive the conversation that justified it and
+quietly apply to the next one.
+
+**A profile that has been lent one is told its limits**, in the system prompt,
+rather than left to infer them: it can hear the lender, it cannot hear the
+others, those others may not realise it could hear them at all, and anything it
+seems to have picked up from background talk is noise rather than something
+said to it.
+
+The stationary-microphone classes stay out for the separate reason set out
+under [watch faces and wearables](#watch-faces-and-the-wearables-that-show-them):
+a platform cannot collect a waiver from somebody who merely walked into the
+room.
+
+## Wearing a character over your own camera
+
+A mask, a creature driven by your own expressions, a puppet, a replaced
+background. Ordinary, and it lands directly on the argument everything else
+here is built from: **a synthetic thing must say so.** An overlay is synthetic
+media composited onto a real human face in real time — the definition of what
+the AI mark exists for — and the fact that the person underneath consented does
+not change what the *viewer* is looking at.
+
+So the rule is neither "allowed" nor "banned":
+
+> **An overlay is disclosed to the people who can see it, always, and it can
+> never be the thing that makes a truthful badge false.**
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="200" alt="Wear a character"></a><br><sub><b>121</b> · the screen that offers it also says what it cannot be</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /overlays/catalogue` | what can be worn, where, and what is refused with reasons |
+| `POST /places/{surface}/{id}/overlay` | put one on — your own face only |
+| `DELETE /places/{surface}/{id}/overlay` | take it off |
+| `GET /places/{surface}/{id}/overlay` | who here is wearing what — **everyone present** |
+
+Worn in a room (voice, video, AR, VR, 3-D), a watch party, a one-to-one
+connection, or your own stream.
+
+  </td>
+  </tr>
+</table>
+
+### A live desk wears one, and the badge stays true
+
+This was refused at first, and the refusal was wrong. The reasoning was that a
+character over the face makes *"Live person — not AI"* a false statement — but
+that conflates two different claims. The badge does not say *this face is
+unmodified*. It says **a real person is behind this**, which is exactly as true
+of somebody in a mask as of somebody without one. **A costume is not a
+synthesis.** Refusing it protected nothing and cost the people who most need to
+work without showing their face.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="200" alt="Masked and real"></a><br><sub><b>123</b> · both facts, equally weighted</sub></td>
+    <td width="66%" valign="top">
+
+`GET /desks/{id}/live-person` returns one mark, and it does not change when
+somebody puts a face on:
+
+> **NOT AI · REAL PERSON**
+
+An earlier version composed the badge with the costume — *"… · wearing The
+Wolf"* — which answered a question nobody had. **A viewer is on a named
+account's live or room.** The handle is at the top left, they chose it to get
+there, and they know whose stream this is.
+
+That last sentence was written before it was true. The top-left of a live
+surface carried a `LIVE` pill and nothing else, and no route returned whose
+surface it was — the argument for the simpler mark was resting on chrome that
+did not exist. So `identity.whose(surface, id)` now answers it for a desk, a
+room, a party, a connection and a stream; `GET /places/{surface}/{id}/whose`
+publishes it; every screen with a picture draws it beside the `LIVE` pill; and
+`GET /desks/{id}/live-person` returns it **with** the mark, so a client cannot
+render one without having been handed the other.
+
+An anonymous account answers with its silhouette name rather than with nothing.
+A viewer still needs to know a stream belongs to one consistent account, which
+is a different fact from knowing which person that is — and an anonymous
+profile's `@handle` is withheld here, because this call answers *who is this*
+rather than *where is this*, and returning it would put an identifier on the
+one surface built to withhold one. The open question on that page is
+never *is that his real nose*; it is *is there a person here at all*, and that
+is the only thing this mark answers.
+
+Dropping the costume half also removed a quiet penalty. Somebody who covers
+their face because of dysmorphia, or because their work makes showing it
+unsafe, was being handed a badge that announced the fact on every frame while
+the person beside them got a clean one. **Same claim, same mark, whatever you
+are wearing.**
+
+  </td>
+  </tr>
+</table>
+
+**The mark is bound to the account that owns the stream.** It is read from the
+desk row and its attestation, never accepted from a client, so a stream that
+never earned the badge cannot paste it on — the same reason the AI mark is
+burned into a portrait rather than composited by whoever happens to be
+rendering it. A desk with no attestation gets no mark rather than a weaker one.
+
+The mark is never softened by the overlay, and must not be. What is behind the
+camera is a person either way, which is the only thing that badge ever claimed.
+
+**Seventeen face overlays**, and the list is a need rather than a nicety —
+masks and half masks, characters, creatures, 2-D and 3-D avatars, helmets and
+visors, paint, makeup, hair, headwear, eyewear, prosthetics, rendered styles,
+and plain blur or silhouette for anybody who wants to be present without being
+seen. Someone with dysmorphia has to be able to appear without appearing, and
+one mask and a shrug is not that.
+
+### Backgrounds: yours, imported, or generated
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/124-your-background.svg"><img src="docs/screens/124-your-background.svg" width="200" alt="Your background"></a><br><sub><b>124</b> · the room is a separate claim from the face</sub></td>
+    <td width="66%" valign="top">
+
+| source | what it means | synthetic |
+| --- | --- | --- |
+| `own` | a photo they took or already had | no |
+| `imported` | an image brought in from elsewhere | no |
+| `generated` | an AI-generated scene | **yes** |
+| `blur` | their real room, blurred | no |
+
+  </td>
+  </tr>
+</table>
+
+**An AI-generated background is synthetic media**, and the person in front of
+it being real does not make the room real. The disclosure says both, in that
+order — *"their own face, unaltered — the background behind them is
+AI-generated"* — because the viewer is deciding about the person, and the room
+is the part that was made.
+
+The `kind` says what happened to your face; `source` says what happened to the
+room. A single "filter applied" would run the two together, so `source` is
+**required** on a backdrop and **refused** on anything that covers a face: a
+background silently recorded as `own` when it was generated is exactly the
+disclosure this feature exists to make, and a claim about a background is
+meaningless on a mask.
+
+**An imported image needs the rights to it** — asked rather than guessed, for
+the same reason as the face question. Nothing here can look at a file and know
+who owns it, so the one answer with an obvious consequence is the one that is
+enforced.
+
+**No overlay may depict a real, identifiable person.** A live-driven likeness
+of somebody who is not in the room is the exact artefact this codebase argues
+against, and *"it was only a filter"* is how it would arrive. `overlays.REFUSED`
+names the classes with the reason — real person, public figure, another user's
+portrait, an age shift, and a badge drawn into the picture. Published by name,
+because an absent option reads as a gap somebody works around, and every one of
+these is a decision.
+
+**It is asked, not guessed.** Nothing here can look at a file and tell whether
+the face in it belongs to somebody — that is a judgement about the world, not
+about an asset. So `depicts_real_person` is a declaration the wearer makes,
+refused when true, and recorded either way: a false declaration then has a name
+and a timestamp on it, which is the difference between a rule and a hope.
+
+**The disclosure distinguishes what it is disclosing.** A replaced face reads
+*"not their face — Blue Fox, drawn over the camera in real time. A real person
+is underneath"*; a replaced background reads *"A library — their own face,
+unaltered"*. Saying "not their face" over a blurred backdrop is a lie in the
+other direction, and a disclosure that cries wolf is one people learn to skip.
+
+**Nobody can put one on you.** An overlay somebody else can apply is not a
+costume, it is a puppet, and the person whose face is underneath is the one
+whose consent counts. Removal stamps a time rather than deleting the row, so a
+viewer who saw a face and later wants to know what they were actually looking
+at has an answer.
+
+## More than one synthetic thing in a game
+
+`qrme/routers/gaming.py` seats **one** profile beside a player — a companion, a
+teammate, a practice partner. That is a conversation. `qrme/gamelobby.py` is
+the roster: several synthetic profiles *and* running agents in the same
+session, with the real players.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="200" alt="Game lobby"></a><br><sub><b>122</b> · every row says what it is</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /gaming/lobby/vocabulary` | seats, kinds, the cap, and what nothing here can do |
+| `POST /gaming/sessions/{id}/lobby` | seat a member |
+| `GET /gaming/sessions/{id}/lobby` | the roster — the people in the match |
+| `DELETE /gaming/sessions/{id}/lobby` | take one out |
+| `GET …/lobby/context` | what a synthetic member is told about its own position |
+
+  </td>
+  </tr>
+</table>
+
+**Adding a second one changes the question, and the question is fair play.** A
+companion calling shots is a teammate talking. Five of them coordinating on one
+player's behalf is indistinguishable, from the publisher's side, from a bot
+squad — and this platform's fair-play rule is already *absolute* rather than a
+toggle. So the roster carries two limits a single companion never needed.
+
+**Synthetic members are capped at four**, counting the session's own profile.
+Not for load: a lobby where the synthetic side outnumbers the humans has stopped
+being people playing with help and become an operation being run, whatever any
+single line says. The cap counts the host because counting only the table would
+let the limit sit one higher than the number the roster actually shows — the
+sort of off-by-one that turns a stated limit into a lie about itself.
+
+**No synthetic member ever occupies a player slot**, and a console of its own
+does not change that.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="200" alt="Never a player"></a><br><sub><b>125</b> · the workaround, refused by name</sub></td>
+    <td width="66%" valign="top">
+
+`teammate` is the seat that means *in the match, on the roster, taking a slot*,
+and nothing synthetic may hold one — checked in `gamelobby.seat`, not left to a
+prompt to honour, because the entire point of the rule is that it survives a
+model deciding otherwise. The seats beside the players stay open: companion,
+practice partner, coach, spotter, archivist.
+
+The rest of the list closes the plumbing, and each entry is refused **in the
+words somebody would use to ask for it** — because a single generic refusal
+loses that argument. "It's only a second controller" is true, and not the
+point.
+
+| named | why |
+| --- | --- |
+| `own_hardware` | a second machine moves where a bot runs; it does not turn the bot into a player |
+| `second_controller` | a second pad on the same console is the same bot with a shorter cable — a controller nobody is holding is not a player's |
+| `bluetooth_input` | pairing a member to a console as an input device is that again, wireless. The pairing is the tell, not the cable |
+| `capture_perception` | a capture card or video-in feeding it the game's picture is how it would learn where to aim. **Watching the screen to play is playing** |
+| `game_plugin` | an overlay, mod, injector or plug-in handing it state or controls, whatever it is called and whoever wrote it |
+| `own_character` | no member pilots a character — not a second one beside yours, not a co-op partner, not a body in the world |
+
+  </td>
+  </tr>
+</table>
+
+**Nothing here can act in a game.** Members observe and they talk. There is no
+input, no aim, no macro, no automation, no exploit, no player slot and no
+hardware route to one — published by name in `gamelobby.NEVER`, and a test
+asserts no function in either module is named for any of them. *"We did not add that"* is a fact about today; the test is what
+makes it a fact about tomorrow. The difference between a coach and a cheat is
+exactly that line.
+
+**Every member says what it is** — player, profile or agent — on every read,
+never inferred from a name. It matters more here than in a chat room, because
+the other people in a match did not opt into anything. The screen draws the
+human row identically to the synthetic ones except for the word: a roster that
+styled people differently would be telling you by decoration what it should be
+telling you in text.
+
+**Agents bring their light.** An agent in a lobby is a running workflow, so it
+carries the same green/amber/red as everywhere else. A member that has stopped
+and is waiting on a person must not look, on the roster, exactly like one that
+is working.
+
+**The session's own profile is derived, not stored.** A copy of it in
+`game_lobby` would be a second place the same fact lives, and the day the two
+disagree the roster would show a session hosted by a profile the session does
+not think it has.
+
+**A minor anywhere in the lobby makes the whole lobby strict**, keyed on the
+lobby rather than on the session's owner — the person a line might land badly
+on is the one sitting in it, not the one who started it.
+
+**Two consents, and neither replaces the other.** The session owner decides who
+is in their lobby; a profile or agent must be one the same account holds,
+checked on `owner_id`. Somebody *else's* profile is a two-party question and
+this is not the module that answers it — `qrme/sharing.py` already asks both
+sides — so it is refused with a pointer rather than half-answered here.
+
+## A profile on a screen that stays where it is
+
+A wall panel in a lobby, a kiosk by a door, a counter screen, a pane of glass
+with something behind it. `qrme/displays.py` is the watch-face idea from
+[wearables](#watch-faces-and-the-wearables-that-show-them) applied to fixtures
+— a **closed set** of things a screen may show, for the same reason: what may
+be displayed is a permission, and a permission with open-ended values is one
+nobody can audit.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="200" alt="On a screen"></a><br><sub><b>126</b> · full, half or a strip · opaque or glass</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /displays/vocabulary` | kinds, sizes, finishes, faces — and what a wall may never show |
+| `POST /profiles/{id}/displays` | put this profile on a screen. Owner-only |
+| `GET /profiles/{id}/displays` | every screen it is on — **owner-only**, it is a list of places |
+| `GET /displays/{id}` | what this screen shows — **public**, and that is the point |
+| `PUT /displays/{id}/faces` | change what it shows |
+| `DELETE /displays/{id}` | take it down |
+
+**Sizes**: `badge` (a strip), `half`, `full`. **Finishes**: `opaque`, or
+`transparent` with the room behind it.
+
+  </td>
+  </tr>
+</table>
+
+**A stationary screen is not a small watch, and that difference is the whole
+module.** A watch is on one person's wrist — they chose it, they are the only
+one reading it, they can turn it over. A wall panel is read by **whoever walks
+past**: a courier, a child, somebody visiting the person whose profile it
+shows. Nobody in that corridor opted into anything.
+
+That is the room-microphone argument arriving from the other direction. There,
+a device that *hears* people who did not agree; here, one that *shows* things
+to people who did not ask. So the rule is **stricter** than the watch's, not
+looser: every face on the list is something already public — a front page, a
+desk's presence, a beacon's QR, agent lights as counts, opening hours, a
+greeting the owner wrote. Anything personal is a count or it is not there.
+
+**There is no `control` face.** The watch has one — assist, halt, approve — and
+it is safe there because the wrist it is strapped to belongs to the owner. A
+button on a wall is pressed by whoever reaches it. Messages, memory, friends,
+notifications and agent *names* are refused the same way, each by name with the
+reason, because every one of them is allowed somewhere else in this product and
+the refusal is a decision rather than a gap.
+
+**The disclosure survives the glass.** A transparent panel's background is a
+corridor — a moving one — so contrast is not something the renderer controls.
+The AI mark gets a backing plate at that finish, and this is not a style
+preference: a mark that vanishes against a bright wall is worse than no mark,
+because the rest of the card still reads as a person and the one thing
+correcting that impression is the thing that disappeared.
+
+**A beacon face needs the whole surface.** A QR at strip height is a QR nobody's
+camera resolves, and a code that cannot be scanned looks broken rather than
+absent.
+
+**Placing one is the owner's decision**, like a beacon — a screen bolted to a
+wall is a beacon with a plug in it. Where the screens *are* is owner-only for
+the same reason the beacon listing is; what a given screen is *showing* is
+public, because a fixture in a corridor cannot keep a secret from the corridor.
+That last one is also the check on the whole design: if that route could leak
+anything, the wrong thing is on the face list.
+
+## Show me around — the guided walkthrough
+
+[`qrme/help.py`](#a-help-box-on-every-screen) answers a question somebody
+thought to ask. `qrme/tutorial.py` is the other half of the same surface: a
+walkthrough for somebody who does not yet know what there is to ask about.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="200" alt="Show me around"></a><br><sub><b>127</b> · seven chapters, seventeen steps</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /tutorial` | the whole walkthrough, chaptered |
+| `GET /tutorial/steps/{key}` | one named step |
+| `GET /tutorial/for-screen/{n}` | the lesson covering a given screen |
+| `POST /tutorial/start` | begin, or begin again |
+| `GET /tutorial/progress/{id}` | where a learner is, and what is next |
+| `POST /tutorial/done` | mark a step and get the next |
+
+`?mode=voice` on any of them renders it for listening instead of reading.
+
+  </td>
+  </tr>
+</table>
+
+**The guide has no name and no face**, and that is structural rather than a
+style choice. A tutorial guide with a persona would be the most convincing
+synthetic profile on this platform — met by every user in their first minute, at
+the exact moment they have the least idea what is synthetic here. It is
+furniture, and it says so.
+
+**It never taps anything for you.** Every lesson says what to tap; none of them
+taps it. A walkthrough that placed a beacon or sent a message *"to show you
+how"* would be acting on somebody's account before they understood what the
+account was. A test asserts the module writes to nothing but the learner's own
+progress.
+
+**It works with no model configured**, like `help.TOPICS` — written prose,
+matched to screens. A walkthrough that needs an API key is one that is missing
+on a self-hosted deployment, which is a supported setup here rather than a
+degraded one. A test asserts no provider reaches it.
+
+**Voice and text are one lesson rendered twice, not two scripts.** Spoken, a
+screen number is noise — nobody listening is helped by *"screen eighty-one"* —
+so voice drops the numbers and keeps the sentence. Two hand-written versions
+would drift, and the spoken one would be the one nobody re-read.
+
+**And it cannot quietly fall behind the app.** Each lesson names the screens it
+is about, and a test asserts **every screen in the gallery is claimed by some
+lesson** — both directions, so a renumbered screen also fails. Add a feature,
+draw its screen, and the walkthrough breaks until somebody has said what it is
+for. That is the only way a guided tour of a moving product stays true, and this
+repository has already shipped a screen nothing referenced.
+
+**Progress is recorded per step rather than as a cursor**, so somebody who
+skipped ahead and came back is not told they finished things they never saw.
+
+## Membership
+
+`qrme/tiers.py`, 4 routes, 26 tests, screens **130** and **131**.
+
+Two plans and a doorway below them.
+
+| | | |
+| --- | --- | --- |
+| **Visitor** | free | read any public page — a scanned beacon needs no account |
+| **Basic** | **$20/month** | make your own profiles and your own agent |
+| **Pro** | **$130/month** | everything that leaves your account: the marketplace, connectors, skills, downloads, connections, and every modifier and builder |
+
+**Money here is simulated**, exactly as in `commerce.py` — subscribing writes a
+row and moves no real funds, and every response that names a price says so in
+its own body. A test asserts nothing in the module reaches a payment processor.
+This is the one surface where a tier system would be tempted to look like a
+working checkout, which is precisely where somebody would be misled.
+
+**Visitor is a real state, not an oversight.** QRME's whole reach story is a
+stranger scanning a printed code and landing somewhere useful. A wall asking
+them to subscribe before they could read the page would break the feature the
+beacons exist for.
+
+**Enforcement is one table and one chokepoint.** `tiers.GATED` maps a path
+pattern to the capability it needs and `tiers.gate` is installed once as an
+application-wide dependency, so **no route opts in** — a capability cannot be
+added to the product and forgotten at one of its eleven endpoints. The
+alternative was a `require_plan(...)` call at the top of every paid handler,
+which is the shape this repository has already been bitten by twice: a
+docstring claiming a check the code did not make.
+
+That table is checked against the served routes rather than proof-read, and the
+first version failed. It named `/steering`, `/governance` and `/licensing` as
+prefixes; none is a route here — steering lives at `/profiles/{id}/steering` —
+so all three were **paywalls in front of a wall**. They read as protection,
+protected nothing, and would have survived indefinitely, because nothing fails
+when a pattern matches no traffic. The table is patterns now, not prefixes,
+because most paid capabilities hang off a profile.
+
+**Browsing stays open, and that is a decision.** A Basic member may look at the
+marketplace and may not list, sell, license or buy. A paywall that hides the
+shop from the person you are trying to sell to argues against itself, and the
+catalogue is public to strangers anyway — hiding it from paying members but not
+from passers-by would be incoherent.
+
+**The refusal is structured, because 402 is already spoken here.**
+`POST /packs/{id}/install` answers 402 for *this pack costs money, confirm the
+price*. Both are genuinely payment-required, so the status is right for both —
+but a client must show *upgrade* for one and *confirm* for the other, and
+telling them apart by matching on prose breaks the first time somebody rewords
+a message. So a plan refusal carries `reason: "plan"`, what it needs, what you
+have, and the price.
+
+**A membership belongs to the account, not the profile.** Per-profile would
+mean paying twice to hold two profiles, which is exactly what `identity.py`
+exists to let people do for free. Creating a profile enrols a new account on
+Basic; an existing member keeps the plan they have, because making a second
+profile must not quietly move somebody off Pro. **Cancelling keeps the
+profiles** — a lapsed subscription is not a reason to delete somebody's work,
+and a product that deleted it is one nobody could safely try.
+
+## The pane in the corner
+
+`qrme/dock.py`, 5 routes, 30 tests, screens **128** and **129**.
+
+The watch faces answer *what am I currently presenting as* without making you
+leave what you are doing, and a fixed screen does the same for a wall. Both need
+hardware, and **most people have neither**. The dock is the same answer for
+somebody holding only the phone: a small pane in the bottom corner of the app,
+with no watch frame around it, that tucks away behind the helper button.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="200" alt="The corner pane"></a><br><sub><b>128</b> · tucks away with the helper</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /dock/faces` | the vocabulary, and what it refuses to cast |
+| `GET /dock/where/{face}` | the screen that can actually do this |
+| `GET /dock/{id}` | where the pane sits, and how it opens here |
+| `PUT /dock/{id}` | move it, tuck it, hide it, change its faces |
+| `GET /dock/{id}/face/{name}` | one face, as the pane would draw it |
+
+`?surface=` and `?platform=` change how it opens; the stored preference does
+not change with them.
+
+  </td>
+  </tr>
+</table>
+
+**It is the same faces as the wrist, not a new set.** `dock.FACES` is built from
+`wearables.FACES` and a test binds the two, so a face added to the watch appears
+in the pane or is turned away here **by name with a reason**. Two catalogues of
+the same glances would drift, and the one nobody re-reads wins.
+
+**It shows, and it routes. It never acts** — the exact inversion of the watch's
+one exception, and the inversion is the point. Watch face 05 can *end* a lent
+microphone, because the watch is the device doing the listening and a permission
+you cannot revoke from the thing running it is not really yours. Nothing here is
+the device: the real screen is one tap away in the same app, so a control in the
+pane buys nothing and costs something, because this thing floats over live
+video. A button that ends a stream sitting a thumb's width from the one that
+pauses it is a mis-tap on somebody's broadcast. So `control` is the one wrist
+face the dock refuses, and every face carries a **route** instead.
+
+**It is inside every screenshot.** `displays.NEVER` exists because a wall is
+read by whoever walks past; `dock.NEVER` exists for a different reason that
+lands in the same place — a pane pinned to the app frame is captured by every
+screenshot, every recording and every screen share, *including the one being
+broadcast right now*. So no message bodies, no memory, no agent names, no viewer
+names; and on a surface that is going out it opens **tucked** however the
+preference is set. Capped rather than overwritten, in the same shape as
+`roommic`'s gain: the preference is returned alongside as `wanted`, so the
+settings screen and the pane cannot disagree about what was chosen.
+
+**The bottom corner is a constraint, not a taste.** The top-left carries whose
+surface this is and the top-right the recording light, so a pane that could
+cover either could hide who you are watching or whether you are live. Both
+entries in `dock.CORNERS` are at the bottom; the second exists because
+bottom-right is a right-hander's default.
+
+**On the desktop it replaced something rather than joining it.** That corner
+already held a pinned agent-lights panel with no way to put it away — three
+quarters of this feature, missing a lid. It is now the dock drawn open on the
+`agents` face, which is why `DEFAULT_STATE_ON["desktop"]` is `open` where the
+phone's is `handle`: a desktop user has no wrist to glance at, and amber and red
+are the states nobody thinks to go looking for. Adding a second floating box
+beside the first was the alternative, and it is what you get by not looking.
+
+### Asking where something is
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="200" alt="Where is it"></a><br><sub><b>129</b> · directions, not a description</sub></td>
+    <td width="66%" valign="top">
+
+*"Where do I change my background"* is the question the help box got most and
+answered worst: a correct paragraph **about** backgrounds, handed to somebody
+who was asking where they live.
+
+`help.DIRECTIONS` is keyed by tutorial lesson, so the directions cannot name a
+screen the walkthrough does not cover, and a test asserts **every lesson is
+reachable by some phrasing**. The phrases are what people type — somebody
+looking for overlays types *change my face*; nobody types *overlays*.
+
+  </td>
+  </tr>
+</table>
+
+The answer names the screen, and says so out loud when the same thing is also a
+face on the pane — read from `dock.ROUTES`, the one table both use, so the
+assistant and the corner cannot disagree about where a feature lives. Matched
+before `TOPICS` and before any model, because both would have described the
+feature instead, and a model cannot know the screen numbers.
+
+The order is refusals, then the walkthrough, then directions. *"Where do I
+start"* is a request for the tour; *"where is the game lobby"* is a request for a
+screen; *"pretend you are my friend"* is neither, and is still refused first.
+
+## Friends you might know
+
+`GET /profiles/{id}/friends/suggested`. Ranked on friends in common and
+subjects you both work in, each carrying the reason in words — the same posture
+as the feed, because a friend suggestion is a claim about a person and one
+nobody can explain is one nobody can argue with.
+
+Two exclusions matter more than the ranking. **Anyone already on your list, in
+either state** — somebody who removed a friend does not get them handed back as
+a suggestion tomorrow, which would be the same imposition the founder pins
+avoid, wearing a recommendation badge. And **the founder pins**, who are on
+every list by construction and would otherwise top every suggestion set on the
+platform.
+
+Never ranked on source material, memories or anything vaulted: an introduction
+built from somebody's private writing would be the platform reading a diary to
+make it.
+
+## The community wall, and the feed
+
+A profile publishes to its wall (`POST /profiles/{id}/wall`); other people see
+some of it in their feed (`GET /profiles/{id}/feed`). Publishing is the easy
+half. The feed is where the decisions are.
+
+**Likes, comments and shares are not new.** The audience layer already carried
+those four verbs against a `(kind, id)` pair, and `post` is now one of its
+target kinds — so a like on a post is the same row shape, and the same
+`UNIQUE (target, actor)`, as a like on a profile. No parallel tables, and none
+of the drift a second set would have grown within a round.
+
+**Every post says why it is in front of you.** Each entry carries a `reason` in
+plain words — *a friend posted this*, *you have talked to this profile*,
+*popular with people here*. A ranked feed that cannot explain itself is one
+nobody can audit, including whoever wrote it, and the explanation costs a
+string. `GET .../feed` also returns its own weights, so the ranking can be
+argued with rather than merely accepted:
+
+| signal | weight | |
+| --- | --- | --- |
+| a friend posted it | 100 | you chose to stand with them |
+| you have talked to the profile | 60 | you were actually there |
+| tags you engage with | 25 | it works in something you follow |
+| likes | 2 each, **capped at 40** | popularity contributes, it does not decide |
+| recency | up to 10 | a tiebreak, not the ranking |
+
+The cap is the interesting one. Uncapped, a single heavily-liked stranger
+outranks every friend you have — which is the failure mode people actually
+complain about, and a test pins it.
+
+<table>
+  <tr>
+    <td align="center" width="40%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="230" alt="For You"></a></td>
+    <td valign="middle">
+
+Every row on the feed screen carries its reason and its score, and the last row
+says what the ranking will never look at. Desktop view **10 · Community** puts
+the friends list beside the feed with a full *why it is here* column — the one
+thing a wide window does that a phone cannot, and the reason a ranked feed you
+can read the reasoning of all at once is one somebody can argue with. That is the screen doing the same job
+as the API: a feed you cannot interrogate is one you have to take on trust.
+
+  </td>
+  </tr>
+</table>
+
+**A post can promote something.** `listing_id` attaches one of the profile's
+own marketplace listings — a reference, not a copy, because a price written
+into a post is a price that goes stale the moment the listing changes and
+nobody edits the post. A profile can only promote its own listings.
+
+**The feed is on the homepage too.** A page showing what you made and nothing
+of what anyone else is doing is a business card; the reason people sat on their
+MySpace page was that it was also where the day's news arrived. Six entries,
+ranked for that profile by the same rules — a page is somewhere you arrive, and
+the endless version lives on its own screen.
+
+**Moderation runs on the way in and on the way out.** Every post passes the
+same filter as a chat turn; a blocked one is kept, returned to its author with
+the reason, and invisible to everyone else. On the way out, an adult profile's
+posts are walled out of an ordinary feed — a gate inherited from the *author*
+rather than judged per post, because otherwise an adult profile publishes past
+its own wall by writing something innocuous.
+
+## Agreeing before work changes hands
+
+Somebody comes up as a guest on a desk and it turns into business — they will
+build something, review something, hand over a file. The moment that happens
+two strangers are about to send each other things, and the interesting part is
+not the sending. It is the **agreeing**, because that is where every dispute
+comes from and the one place a platform can actually help.
+
+So an exchange (`qrme/exchange.py`, `POST /exchanges`) is a document before it
+is a transfer. One side proposes; the document names, item by item:
+
+* **what goes across, in each direction** — every artifact with its kind and
+  its size, so *what am I about to receive* is a list rather than an assurance;
+* **what the work is**, in one sentence, and which of sixteen industries it
+  belongs to — this is a business agreement in any trade, not a software
+  feature the other trades are allowed to borrow;
+* **what is included when it is finished** — the clause people actually argue
+  about afterwards;
+* **what is not included**, said out loud, because an absent exclusion reads as
+  an inclusion to whoever paid.
+
+Then both sides sign, and only then does anything move. Four rules make that
+more than a form.
+
+**Neither signature alone opens anything.** `GET /exchanges/{id}/channel` —
+the one call a transport layer should ask — reports `open: false` until both
+parties have signed. A one-sided agreement is not an agreement.
+
+**Any change to the manifest voids both signatures** (**113**). This is the
+rule the whole design turns on: without it you agree to a two-item manifest and
+the other side appends a third, and your signature sits on a document you never
+read. Signatures are stored against a **fingerprint of the agreement**, not
+against its id, which makes that a fact about the data rather than a promise
+about the code — after an edit the old signatures match nothing. In practice
+the guarantee is stronger still: the document freezes the moment *anybody*
+signs, so the only route to an edit is `reopen`, and that deletes the
+signatures on its way past. A signature here is either current or absent;
+there is no way to make a stale one.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/112-the-agreement.svg"><img src="docs/screens/112-the-agreement.svg" width="200" alt="The agreement"></a><br><sub><b>112</b> · the manifest, before anyone signs</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/113-signatures-cleared.svg"><img src="docs/screens/113-signatures-cleared.svg" width="200" alt="Signatures cleared"></a><br><sub><b>113</b> · one item added, both signatures gone</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="200" alt="Delivery"></a><br><sub><b>114</b> · accepted one at a time</sub></td>
+  </tr>
+</table>
+
+**Nothing downloads by itself** (**114**). A signed exchange makes each item
+*available*; the receiving side accepts them one at a time, and only the
+receiving side can — the sender cannot accept on their behalf. Consent to an
+agreement is not consent to a file landing on your disk. Items that **run** —
+`source` and `build` — are flagged as such on the manifest and again at
+acceptance, because a signature on an agreement is not a review of what the
+code does.
+
+**It grants no access to anybody's device**, and that limit is in the code
+rather than in a warning. An exchange moves named artifacts somebody attached;
+it opens no session, runs nothing, and reaches nothing that was not listed.
+Hooking one machine up to another is a different feature with a different
+threat model, and shipping it quietly inside a file-sharing agreement would be
+the wrong way to arrive at it.
+
+## Lending a skill, in any room you are both in
+
+Two people are in the same place — a room, a live desk, a watch party, a
+connection, an agreed piece of work — and one of them has something the other
+needs. A finance pack. A robot's task modules. A profession. A language pair.
+`qrme/sharing.py` (`POST /skill-grants`) lends it, and the same mechanism
+covers every one of those surfaces rather than five near-copies of it.
+
+The whole feature is the word **both**, and the shape it takes is deliberately
+lopsided:
+
+> it takes two to open a grant, and one to close it.
+
+Symmetric consent to start is what makes it a loan rather than a taking.
+Asymmetric consent to end is what stops it becoming a trap — somebody who has
+changed their mind should not need permission from the person benefiting to
+change it back. A consent model that needs *both* sides to stop is one that
+cannot be withdrawn under pressure, which is exactly when withdrawal matters.
+Either party closes it alone, and the record says which of them did.
+
+**A skill is used, never handed over.** The borrower may invoke it while the
+grant stands; they get no copy, no install and no licence. Packs here are
+bought, licensed and attributed to publishers, and a lending feature that
+quietly duplicated them would be a piracy tool with a consent dialog on the
+front. The permission is checked at the moment of **use**, not at the moment of
+grant, so closing a grant stops the next call rather than merely preventing new
+grants.
+
+**A grant lives in one place and dies with it.** Lending your expertise in a
+watch party does not follow the borrower into a private message — a skill lent
+in one surface is refused in another, by name. Ending the party or withdrawing
+the exchange closes what was lent inside it, and that teardown is wired at the
+point the place ends rather than left to a caller to remember, because the
+thing forgotten would be a live permission with nothing left to justify it.
+
+**Every use is written down, and the lender reads it.** *Both parties choose*
+is a slogan unless the person lending can see what was done with it. The log is
+the reason a grant is worth agreeing to: you can watch it being used and stop
+it mid-sentence.
+
+| | |
+| --- | --- |
+| where | `room` · `desk` · `party` · `connection` · `exchange` — no "everywhere", and no "my account" |
+| what | `pack` · `robot_task` · `profession` · `language` · `workflow` |
+| to open | both, and only the person it was offered to may accept |
+| to close | either, alone |
+| transferred | nothing |
+
+## Who these surfaces think you are
+
+An exchange, a lent skill and a watch party all name the acting party in the
+request body — `actor_id`, `host_id`, `borrower_id`. **An id in a body is a
+claim, not a fact**, and `common.require_self` is what turns it into one: the
+token presented has to belong to the person the body names.
+
+That check was missing when those three shipped, and the gap was total. An
+anonymous caller could forge *both* signatures on somebody else's agreement,
+open its channel, and accept delivery of an executable on their behalf; accept
+and use a skill somebody lent to a third party; or seize the scrubber in a
+watch party by passing the host's id. Every consent property the three modules
+describe rested on a check that did not exist — the modules were right and the
+doors were open.
+
+| surface | who may act | who may read |
+| --- | --- | --- |
+| an exchange | the two parties, each only as themselves | the two parties — a manifest names somebody's files, their sizes and what the work is worth |
+| a lent skill | the lender offers; the borrower accepts, declines and uses; either closes | the two parties, plus the borrower's own view of the log kept about them |
+| a watch party | the host seeks and ends; a member speaks only as themselves, or as a profile they own | members only |
+
+Two details worth stating because they are easy to get subtly wrong. Bringing a
+**synthetic profile** into a room speaks in its voice, so it is its owner's call
+and nobody else's. And the surface listing was narrowed: it was meant to be
+"what the room can see about itself", but there is no room-membership check to
+hang that on, and without one it listed who was lending what to whom to anybody
+who guessed the id. It now shows the caller's own grants, and says so.
+
+`tests/test_two_party_auth.py` holds all of it. Each case is asserted twice —
+once against an anonymous caller and once against **a valid token belonging to
+the wrong person**, because a test that only tries the first passes against a
+system that accepts any logged-in user as anybody.
+
+## Watch parties, and a profile that has not seen the video
+
+A watch party (`qrme/watchparty.py`, `POST /watch-parties`) is a posted video
+plus everyone who turned up — and on this platform that includes **synthetic
+profiles**, which is where the honesty problem is.
+
+**A profile has not seen the video. It cannot.** Nothing here fetches it,
+nothing transcribes it, and a profile saying *"the bit at four minutes was
+great"* would be fabricating — the most ordinary-looking lie this product could
+tell, and the one nobody would think to check. So
+`GET /watch-parties/{id}/context` hands a profile only what exists on this
+side: the title the poster typed, the platform, where the room has got to, and
+what the humans have said. `description_available` and `transcript_available`
+are both `false`, and it says so in the prompt, in the second person:
+
+> you have not watched this video and cannot see it. Talk about what the others
+> in the room are saying and about what the video is titled. If somebody asks
+> what you thought of a moment in it, say you have not seen it rather than
+> inventing one.
+
+Starving a model of context and hoping is not a safeguard. Telling it the truth
+about its own position is.
+
+**The room shares a position, not a player.** The host moves a number and
+everyone follows; it does not press play on anybody's device. That is what
+keeps the embed promise from being broken twenty times at once — a party that
+pre-loaded the video for twenty people would have made twenty requests to
+YouTube nobody agreed to. **Only the host** moves it, because otherwise the
+last person to scrub decides what the room is looking at.
+
+Every member carries `synthetic: true|false`. A room where you cannot tell
+which of the six names is a person is the room this platform exists not to
+build. Party chat is moderated like every other utterance, a party with a minor
+in it runs strict, and a party can only be opened on an **approved** post —
+otherwise it would be a way to put a video in front of people that the wall
+refuses to show them.
+
+## The page you make yourself
+
+Every profile already had a **front page** — portrait, skills, experience,
+rating — assembled from what the platform knows. It is useful, and it looks
+exactly like everybody else's, because a generated page is the same page 34
+times.
+
+This is the other kind: `GET`/`PUT /profiles/{id}/page`. A theme, an accent
+colour, a tagline in your own words, a paragraph about yourself, and a **Top 8**
+— the friends you want at the front, in the order you want them. It is the
+MySpace idea, and the reason it is worth reviving is not nostalgia on its own: a
+page somebody arranged tells you what they thought was worth putting first,
+which is the one thing a generated page cannot.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="230" alt="My Page"></a><br><sub><b>85</b> · the page, in its own colours</sub></td>
+    <td align="center" width="50%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="230" alt="Customise"></a><br><sub><b>86</b> · the editor behind it</sub></td>
+  </tr>
+</table>
+
+Six themes — Midnight, Starfield, Sunset, Chrome, Meadow, Paper — a validated
+`#rrggbb` accent, and three layouts.
+
+Three things it deliberately does not do:
+
+**Real HTML, through an allowlist.** You write your own markup — that is the
+thing anybody actually remembers about a MySpace profile — and every tag and
+attribute goes through [`qrme/markup.py`](qrme/markup.py) before it is stored.
+
+Raw markup is not a stylistic objection. In October 2005 the **Samy worm** used
+exactly this feature: script smuggled through a profile, executing in the
+browser of everyone who viewed it, a million friends in about twenty hours, and
+the site taken offline. The nostalgia is worth reviving; that is not.
+
+| in | out |
+| --- | --- |
+| `<b> <i> <u> <marquee> <center>` and 30 more | kept — including the 2004 ones, which cannot execute |
+| `style="color: …"` and 30 visual properties | kept |
+| `<script> <iframe> <object> <form> <svg>` | removed, content and all |
+| `onclick`, `onerror`, every `on*` | removed — this is where injection actually lives |
+| `javascript:` and `data:` URLs | removed; only http, https, mailto, fragments and site-relative paths survive |
+| `//host/path` | removed — protocol-relative, so it looks like a path and fetches from another host |
+| `@import`, `expression()`, `behavior:` | removed |
+| `background-image: url(…)` | **kept** — held to the same URL check as `<img src>`, because a background is most of what decorating a page means |
+| `position`, `z-index` | removed — they lift an element out of the page's own box |
+| an unknown tag | dropped, **its words kept** — eating somebody's writing looks like a bug |
+
+Sanitised **on the way in**, so there is exactly one moment unsafe markup could
+exist rather than one per renderer, each of which could forget. What was
+stripped comes back as `html_removed`, so an editor can say *your `<script>` was
+dropped* instead of quietly returning a page that does less than its author
+wrote. `GET /pages/themes` publishes the allowed tags and properties so an
+editor can grey out what it knows will be lost.
+
+**The chat overlay in a live room is transparent** — circular faces on a soft
+scrim over the video, rather than a comment panel taking a bite out of the
+picture people came to watch (**89**). The screens round their own avatars; the
+baked bubbles in `docs/portraits/bubbles/` exist for the README, which cannot
+draw one because GitHub strips the `style` that would round an `<img>`. Using
+the pre-baked file in the app would put a bubble inside a bubble.
+
+**Like, comment and share work on a post**, because `post` is an audience
+target rather than a parallel system — the same rows, and the same
+`UNIQUE (target, actor)`, as a like on a profile. A test now walks every kind
+in `TARGETS` through `share_url`, because sharing a post raised `KeyError` at
+the moment somebody pressed the button: the kind was added to the target list
+and its share URL was not.
+
+**A post can carry a video from somewhere else** — YouTube, Vimeo, Twitch,
+Dailymotion, Rumble (`qrme/embeds.py`, `POST /profiles/{id}/wall` with
+`video_url`, and `GET /videos/platforms` publishes the list). Three decisions
+make that safe to do here rather than merely possible.
+
+*Nothing is copied.* What is stored is the platform, the video's id on it, and
+the title **the poster typed** — never the file, never a scraped title, never a
+downloaded thumbnail. Re-hosting somebody's video is a copyright problem and a
+cached thumbnail is a copy of an image nobody granted. The video stays where its
+owner put it, on the terms its owner agreed to.
+
+*No third-party request until the viewer asks for one.* This is the part that
+matters on a platform whose promise is that data does not leave a vault. A
+normal embed loads the other company's player the moment the page renders,
+which tells them you looked **before you decided to**. So what renders is a
+**facade** — the platform's name, the poster's own words, and a play control,
+all served from here. Pressing play is when the request happens, and the viewer
+is told so in words before they press it. A privacy promise that holds only
+until an embed loads is not one. The empty plate on **95** is the feature, not a
+gap in the mock: drawing a YouTube thumbnail there would have been the prettier
+picture and a picture of the thing the code refuses to do.
+
+*The allowlist is a list, not a pattern.* Anything not on it is refused by name,
+because "looks like a video URL" is how an open redirect becomes a feature. Each
+platform knows how to recognise its own links and how to rebuild a canonical
+watch URL **from the id** rather than from the pasted string — so a tracking
+parameter, a redirect, or a lookalike host cannot ride along into what gets
+stored and later opened. A Twitch *channel* link is refused too: it points at
+whatever happens to be live, which is not the thing anybody posted.
+
+The age gate is inherited rather than re-judged. A video post is a post, so it
+already carries its author's rating through `audience.is_rated` and is walled
+out of an ordinary feed by machinery that was already there. Nothing here claims
+a video is *suitable* — a platform's own rating is not visible from a link, and
+the poster's rating is the only claim this system is in a position to make.
+
+**A storefront, not a second copy of one.** `show_offers` surfaces the
+profile's own marketplace listings on the page, read from `listings` rather
+than retyped — a second copy of a price is a second price that can be wrong —
+and `links` carries up to twelve outbound links under the same URL rule.
+
+**The Top 8 does not reorder the friends list.** It features friends rather than
+creating them — a profile you are not connected to is refused — and it is a
+showcase, not a second source of truth. Your Top 8 is what you chose to put
+first; your friends list is who you stand with.
+
+**About-me text is moderated like anything else written for other people to
+read.** A blocked one comes back to its author with the reason and is invisible
+to visitors, which is the shape the audience layer already uses for a comment.
+
+## Friends, and the two who come as standard
+
+Profiles have **friends lists** — a profile ↔ profile graph, which is a
+different thing from the `relationships` table that has always been here. That
+one records how a profile treats an *interactor*: the person typing at it, and
+the tone and boundaries that follow. This is the other axis, and it is the graph
+the community surfaces are drawn from.
+
+<table>
+  <tr>
+    <td align="center" width="40%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="230" alt="Friends"></a></td>
+    <td valign="middle">
+
+**Directed, not mutual.** Befriending writes one row. A friends list is a claim
+its owner makes about who they stand with, and a mutual edge would mean somebody
+else's action edits your list. Two rows make it mutual, and the API reports
+`mutual` per entry.
+
+**Two founder profiles stand at the top of every list**, fixed: they cannot be
+removed and cannot be pushed below a chosen friend. Everything else in the list
+is entirely the owner's to add and drop, and an ordinary friend removes
+normally.
+
+**Position is computed, never stored.** The pins are first because their rows
+say `origin='founder:N'`. A stored position has to be rewritten on every insert,
+and it is the thing that is wrong on the day the founder turns up third.
+
+  </td>
+  </tr>
+</table>
+
+The list marks pinned rows with `pinned: true`, so a client renders them without
+a remove control rather than offering one that returns `409`.
+
+### Two profiles, one person
+
+David Bianchi — 42, CEO and Imagineer of Private Data Infrastructure Systems,
+and the person who built all three of these products — has **two** profiles
+here, and the split is the point rather than a duplication.
+
+| | `@david_bianchi` | `@david_bianchi_ai` |
+| --- | --- | --- |
+| **Picture** | a photograph | an AI rendering |
+| **Served from** | `/photos` | `/portraits` |
+| **Mark in the pixels** | **no** — the photograph is authentic | **yes** — burned in, top-right |
+| **Profile labelled AI** | yes | yes |
+
+A platform whose entire argument is that a synthetic thing must say so cannot
+have its owner running one profile that is ambiguously both. So there are two,
+and each is honest about what its picture actually is. The real person takes the
+plain handle; the rendering is the one carrying the qualifier.
+
+**The photograph is deliberately not marked.** The mark says *AI-generated
+synthetic media*. Stamping that on a real photograph is a false statement — in
+the opposite direction from the one the mark exists to prevent, but false all the
+same. `avatars.render()` reports `asset_marked: false` for it, which is the
+signal every surface uses to composite the profile's own AI badge. **The picture
+is authentic and the profile is synthetic, and those are two different claims.**
+
+That is also why photographs live under `/photos` rather than beside the
+portraits: `/portraits` means *burned and checksummed*, and its manifest check
+walks every file in the tree. An unburned file there would either fail that check
+or force it to be loosened.
+
+Neither profile is in the starter collection or in `avatars.BRIEFS`. Both promise
+invented people in their own docstrings, and a real person in either list would
+quietly make a documented claim false.
+
+## Anonymous, several, and exactly one verified
+
+Three things a person is allowed to be here, and `qrme/identity.py` is the
+tension between them.
+
+**You may be anonymous.** Not everyone can afford to put their name on what
+they think, and a platform that only works for people with nothing to lose is a
+platform for a narrow set of people.
+
+**You may hold several profiles.** A person is not one thing — the work self,
+the hobby, the one for the support group nobody at work knows about. These are
+not sockpuppets; they are the ordinary shape of a life, and forcing them into
+one identity is its own kind of exposure.
+
+**Exactly one of them may be verified.** This is the rule the other two need in
+order to be safe rather than merely permitted.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="200" alt="Stay anonymous"></a><br><sub><b>118</b> · what we withhold, and what we can't</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="200" alt="Your profiles"></a><br><sub><b>119</b> · as many as you like · one verified</sub></td>
+    <td width="33%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /identity/vocabulary` | the three rules, in the words a screen can show |
+| `GET · PUT /profiles/{id}/anonymity` | what it hides and what it can't · turn it on or off |
+| `GET /profiles/{id}/badge` | the badge a **reader** sees |
+| `GET /profiles/{id}/verifiable` | could this one take it, and if not why |
+| `POST /profiles/{id}/verification` | claim it, once per person |
+| `POST …/verification/move` | move it to another of yours |
+| `GET /profiles/{id}/siblings` | your roster — **owner-only** |
+
+  </td>
+  </tr>
+</table>
+
+**Why one badge.** Verification is not a quality score or a reward for being a
+good citizen. It is the sentence *this is that particular real person*. Said of
+two profiles at once it is either false of one of them, or it is a statement
+that one human being is two authenticated people — which is precisely the
+primitive verification exists to deny to everybody else. A platform that hands
+it out per profile has not verified anybody; it has sold a badge.
+
+**The badge moves rather than multiplies.** One at a time, not one forever.
+People change which face is their public one, and a rule that could only be
+satisfied by deleting a profile is a rule they would answer by lying instead.
+The record moves whole — level, attestor, method, evidence and the date it was
+checked. `checked_at` is deliberately *not* re-stamped: a document seen in 2019
+is not a document seen today because the badge changed seats.
+
+**A fictional profile is unverifiable, not unverified**, and never consumes the
+slot. `verification.status` already draws that distinction; getting it backwards
+here would let an invented character lock a real person out of their own badge.
+
+**The founder is the worked example.** `@david_bianchi` and `@david_bianchi_ai`
+are the same human being, so only the photographed one carries the badge — the
+seed used to verify both, which had the platform asserting that one man was two
+verified people, on the deployment that ships as the demonstration of the rule.
+The badge belongs to the photograph because a real person whose picture is
+authentic is exactly what it is a claim about; the rendering carries the AI mark
+instead, which is the claim that is true of *it*.
+
+**One person means one owner account**, because that is the unit this platform
+can observe. `same_identity_elsewhere` closes the part that is visible — the
+same attestor vouching for the same evidence under a second account — and
+nothing closes the rest. That limit is stated rather than papered over: a
+`self_asserted` level carries no attestor and no evidence, so there is nothing
+on the bottom rung that could tell two people from one. It is why the rung
+exists and why the badge carries its caveat.
+
+### Anonymity had to become a property
+
+`anonymous` was honoured by every surface that *rendered* a profile — the
+front-page card, the landing page, the prompt, the watermark — and by the route
+that returned the profile, not at all. `GET /profiles/{id}` is public, and it
+handed over `display_name` in full. The shortest way past anonymity was to ask
+for the profile.
+
+`owner_id` was the worse half, because it does not undo one profile's anonymity
+— it undoes all of them at once. Two anonymous profiles sharing an account are
+the same person, and anyone could read that field off both and match them, then
+read it off the *named* profile beside them and put a name to the pair. It is
+now withheld from everyone but the owner on **every** profile, named ones
+included, along with `successor_owner`, which is somebody else's account id and
+was never a visitor's business either.
+
+**The roster is the dangerous read.** `GET /profiles/{id}/siblings` is the one
+call that links a person's profiles to each other, which is exactly the tool for
+stripping the anonymity off all of them at once. It is reached through a profile
+whose owner token the caller holds, and the account is derived from that — never
+taken from the path. A route keyed on `owner_id` would hand the roster to
+anybody who learned one, and an `owner_id` is a string somebody chooses, not a
+secret. Every anonymity guarantee above is worth exactly what that check is
+worth.
+
+**An anonymous profile has a name, and cannot choose it.** Every one of them
+used to be called *"anonymous persona"* — identically — which is unusable the
+moment two are in the same place: three anonymous people in a room were three
+identical labels, so you could not follow who had said what and nobody could be
+held to anything they said. **Pseudonymity is a stable name without a real one**,
+not the absence of a name. So each gets `Anonymous 41338025`, and three
+properties make it work:
+
+- **Derived, never stored.** There is no column, so there is nothing to edit —
+  which is what "cannot be modified" has to mean in a system where an owner can
+  `PATCH` their own profile. A *chosen* anonymous name would be a free text
+  field on the one surface built to withhold identity, and somebody would put
+  their real name in it within the hour.
+- **Keyed on the profile, never on the account.** The one that would quietly
+  undo the `owner_id` redaction above: a person may hold several anonymous
+  profiles, and numbering them from the account would give them all the same
+  name and match them to each other in public.
+- **Hashed, not sequential.** A counter publishes signup order and, from two
+  samples, the platform's growth rate. Neither is the profile's to give away,
+  and *"Anonymous 7"* is a claim about how early somebody arrived.
+
+Turning anonymity off and back on returns the **same** number, because it is
+derived from the profile rather than issued — one that changed would make
+somebody a stranger to the people who knew them.
+
+That decision used to be made in **fifteen places** — the front page, the
+landing page, the prompt, the watermark, the summon card, the beacon page, the
+room roster, the profile route, the export — each with its own copy of
+`"anonymous persona" if anonymous else display_name`. A rule with fifteen
+implementations is one merge away from having sixteen, and the sixteenth is the
+one that prints somebody's name. It is now `identity.shown_name()`, and a test
+parses every module to assert nobody has written a sixteenth.
+
+**And it can say what it does, without saying who it is.** The plain
+silhouette was every anonymous profile's only face, on the argument that a
+distinct picture would be a stable mark following one person around. That
+argument died with the fixed name — `Anonymous 41338025` is already stable and
+already public, so an emblem adds no correlation the name does not, while a
+nurse answering health questions looking identical to a troll is a real cost
+paid for nothing.
+
+So there are **sixteen field emblems**, one per industry the platform already
+models (`exchange.INDUSTRIES`) — not a new vocabulary invented for pictures: a
+field somebody can *work in* is a field they can *signal*. Each keeps the same
+silhouette with the field glyph badged on, so "anonymous" is what reads first
+from across a roster, before anybody parses which symbol it carries.
+
+**Or their own picture.** The emblems are a shortcut, not a fence. This was
+briefly a *closed* list, on the reasoning that a profile able to attach any
+image could attach its owner's face and nothing here can look at a file and
+tell. True, and the wrong conclusion — it made the feature useless to the
+locksmith who wants a photo of their own workbench, and bought no safety,
+because somebody set on publishing their face can put it in a post. **A limit
+that stops the honest use and not the risky one is decoration.**
+
+So what the platform cannot check, it says. A photograph of your **own** face
+is allowed, and the response tells you what it costs: *we cannot tell whether
+this picture shows your face, and if it does, the people who know you will
+know.* That line is in `NOT_WITHHELD` too, beside "your writing is still
+yours" — the honest list of what anonymity does not survive.
+
+**Somebody else's likeness is refused**, asked and declared exactly as the
+overlay module asks it: an anonymous profile wearing another person's face is
+impersonation with a layer of deniability on top.
+
+**An empty bubble is an empty picture frame with a plus**, for the owner and
+for visitors alike. There were briefly two defaults — a plain silhouette for
+strangers, the photo-and-plus for the owner — on the reasoning that the second
+reads as a control, and a control offered to somebody who cannot press it
+reports the empty bubble as a gap. But **the identifying work is done by the
+name**: `Anonymous 41338025` already says which account this is, so the picture
+is a placeholder rather than a claim about anybody, and an empty frame is the
+most honest drawing of an empty frame. Two defaults also meant two things that
+could disagree about the same profile, which is the shape of bug this codebase
+keeps finding — so `editor_asset` went with the silhouette.
+
+The picture lives in its own table, never in `profiles.avatar`: they are
+pictures for two different states, exactly like a display name and an anonymous
+one, and writing it into `avatar` would mean turning anonymity off showed it
+instead of the face somebody actually has.
+
+**An anonymous profile's badge withholds who checked.** "Verified by Dr Okafor
+of St Mary's" narrows an anonymous author to a city and a workplace, which is
+most of the way to a name — the badge would undo the anonymity it sits beside.
+What survives is the part worth having, and the reason an anonymous profile
+would want one at all: *a real person stands behind this, and somebody checked.*
+That claim is separable from *who*, and it is the difference between a pseudonym
+and a bot.
+
+**And the limits are published beside the promise.** `GET
+/profiles/{id}/anonymity` returns `withheld` and `not_withheld` together,
+always. The dangerous reading of the word is the generous one: somebody deciding
+whether it is safe to post will assume "anonymous" means untraceable unless they
+are told otherwise, and by the time they find out, it is published. We can
+decline to publish a name. We cannot make prose unrecognisable to a reader who
+knows the author, and saying so plainly is the only honest version of this
+feature.
+
+**Per profile, never per account.** An account-wide switch would mean putting
+your name on the work profile puts it on the support-group one — the exact
+coupling that having several profiles exists to avoid.
+
+## Verified, and what the word is allowed to mean
+
+`GET /profiles/{id}/verification`. Two questions that a single badge would run
+together, kept apart:
+
+- **Is there a real person behind this?** Answered by `kind`. A `fictional`
+  profile depicts nobody — which is *not* the same as unverified, and the API
+  says so rather than implying somebody failed a check.
+- **Has anyone checked they are who they claim?** Answered by a recorded level,
+  and the honest answer is usually *not much*.
+
+The ladder is `signatures.PROOFING_LEVELS`, reused rather than reinvented so the
+platform has one meaning for how well an identity is established:
+
+| level | means |
+| --- | --- |
+| `self_asserted` | they say so, and nobody has checked |
+| `federated` | confirmed through another account they control |
+| `document` | an identity document was checked |
+| `in_person` | somebody met them and checked in person |
+
+**Anything above self-asserted needs a named attestor** — the same rule
+`signatures.enroll` applies, for the same reason: who checked belongs in the
+record, not in a footnote.
+
+### The gold mark
+
+`tools/mark_verified.py` burns **✓ VERIFIED** into an authenticated
+person's photograph, in gold, **bottom-right** — diagonally opposite the AI
+mark, so the two can never land on each other. It is the mirror image of
+`tools/mark_portraits.py` and exists for the same physics: a composited badge
+does not survive a screenshot, a hotlink or a right-click save, and those are the
+journeys a profile picture actually takes.
+
+**Gold because everything else is taken or already means something here.** Blue
+is X and Facebook, grey is the downgraded one people learned to distrust, green
+is the agent status light two screens away, and red already means *stopped* in
+this product.
+
+**The gate is a named attestor.** A burned mark is the strongest claim an image
+can carry: it cannot be qualified, it outlives every surface, and by design it
+travels where nobody can check it. That is safe for *AI* — a rendering is
+AI-generated wherever it ends up, forever, so burning it in can never become
+false. *Verified* is not that kind of fact, so the tool refuses any photograph
+with no verification record naming who attested.
+
+What it deliberately does **not** require is a particular rung. It first
+required `document`; the platform's owner asked for the mark on his own
+photograph at `self_asserted`, which is his call to make about his own face on
+his own product, taken after the stricter version had been built and the trade
+explained. So the burned word carries exactly the weight of whoever attested —
+and the honest reading stays one call away. `verification.status` still reports
+`self_asserted` and still returns its caveat:
+
+> *self-asserted: the badge confirms a real person stands behind this profile,
+> not that a document was checked*
+
+**Nothing in the code claims a document was checked, because none was.** The day
+one is, the level moves and the badge means more without the pixels changing.
+
 ## The agent status light
 
 An agent working on its own raises one question, and it is not *what phase is
@@ -673,6 +2470,24 @@ Defined once, in [`qrme/agentlight.py`](https://github.com/davidsbianchi1984/qrm
 | **App** — *82 Agents* | the same three lights, each a **tappable group** — what is working, what needs you, what stopped | somebody opening this *because* amber appeared should not have to scan a flat list for the one that changed. Grouping puts the answer first and the roster second |
 | **Overlay** — *83 Chat · overlay*, and every desktop view | a small translucent box in the bottom-right corner — the same three rows as the wrist, each its own way in | an agent that reports only on its own screen is one you have to remember to check, and amber and red are exactly the states nobody thinks to look for. On desktop it is on **every** view, because those users have no wrist to glance at |
 
+The same three colours, on all three sizes of glass:
+
+<table>
+  <tr>
+    <td align="center" width="18%" valign="bottom"><a href="docs/watch/01-agents.svg"><img src="docs/watch/01-agents.svg" width="150" alt="Watch — agent lights, counts only"></a><br><sub><b>watch</b> · three lights, three counts, no names</sub></td>
+    <td align="center" width="26%" valign="bottom"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="200" alt="Mobile — agent groups"></a><br><sub><b>mobile 82</b> · one tappable group per light</sub></td>
+    <td align="center" width="26%" valign="bottom"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="200" alt="Mobile — the overlay follows you"></a><br><sub><b>mobile 83</b> · the overlay, mid-conversation</sub></td>
+    <td align="center" width="30%" valign="bottom"><a href="docs/desktop/01-home.svg"><img src="docs/desktop/01-home.svg" width="300" alt="Desktop — the overlay on every view"></a><br><sub><b>desktop 01</b> · bottom-right, on every view</sub></td>
+  </tr>
+</table>
+
+Read them left to right and the shape of the decision changes with the surface.
+The wrist answers *is anything wrong* and stops there. The phone answers *which
+one*, by making each colour a group you can open. The desktop does not ask at
+all — it keeps the box in the corner of every view, because a desktop user has
+no wrist to glance at and an agent that reports only on its own screen is one
+you have to remember to go and check.
+
 ## Companion features
 
 An ambient-companion model, with an explicit consent boundary on each
@@ -685,7 +2500,7 @@ feature:
 | Honesty about multiplicity | `GET /profiles/{id}/transparency` reports active relationships, and every chat prompt instructs the profile to acknowledge them truthfully if asked — disclosure by design |
 | Summoning — @, #, and QR beacons | `PUT /profiles/{id}/handle` claims a unique `@handle`; `GET /summon?ref=` resolves `@handle`, `#tag` (marketplace tags), or a beacon token. `POST /profiles/{id}/beacons` *leaves the profile behind* somewhere physical — a printable QR code (`GET /beacons/{id}/qr.svg`) summons it, scans are counted, beacons can be picked back up, and a departed profile's beacon resolves as a memorial |
 | Connections — chat with other users | `POST /connections/join` matches interactors anonymously by alias in a `friendly` tier or an 18+-verified `rated` tier; per-tier moderation (minors always strict, blocked messages never delivered), and either side can end it anytime |
-| Rooms — chat, video, AR, VR | `POST /rooms` — multiparty conversations over any channel (`chat`/`voice`/`video`/`ar`/`vr`) with any mix of real users and synthetic profiles: user↔user, profile↔profile (`/rooms/{id}/advance`), or combinations; every profile turn is moderated, and a room with a minor present always runs strict |
+| Rooms — chat, video, AR, VR | `POST /rooms` — multiparty conversations over any channel (`chat`/`voice`/`video`/`ar`/`vr`) with any mix of real users and synthetic profiles: user↔user, profile↔profile (`/rooms/{id}/advance`), or combinations; every profile turn is moderated, and a room with a minor present always runs strict. Each channel gets the same three full-screen states — plain, held, sideways — because those belong to the room rather than to a camera: **103–105** audio (boxes, because there is nothing to look at), **106–108** AR (the others placed in the room you are already in), **109–111** VR/3-D (depth carried by size and position). The strip changes with the channel: no gift button in an audio room, no bell on a posted video |
 | Marketplace listings | `POST`/`GET /marketplace/listings` — users and businesses share and market synthetic profiles, content, business expertise, or services; browsable by kind, tag, and area (healthcare, finance, relationships, …) |
 | Providers & consented handoffs | `POST`/`GET /providers` — a directory of real local businesses per area (healthcare, medical, mental health, finance, relationships, career); `POST /handoffs` packages the AI specialist's session for a provider *only with explicit consent*, seals it in the PDI vault, and releases it solely through a revocable token (`DELETE /handoffs/{id}` revokes and purges) |
 | Embodiments — even robots | `POST /profiles/{id}/embodiments` — speaker, earpiece, hologram, robot, humanoid; chat can arrive from an embodiment, and JIM-mini's autonomous devices can host the same profile. **Personality stays consistent across forms**: the persona prompt affirms one constant identity/memory/voice, `ChatResponse.persona_signature` is invariant across modality and embodiment (voice → text → hologram give the same signature), and `GET /profiles/{id}/embodiment-consistency` exposes that fingerprint + the forms it's live on |
@@ -970,3 +2785,25 @@ curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json
 ## License
 
 MIT © 2026 David Bianchi — see [LICENSE](LICENSE).
+
+---
+
+## Matthew 7:24–25
+
+> "Everyone then who hears these words of mine and does them will be like a
+> wise man who built his house on the rock. The rain fell, the floods came, and
+> the winds blew and beat on that house, but it did not fall, because it had
+> been founded on the rock."
+
+And lo, I am building an ark — not to flee from the world, but to shelter those
+lost in the storm of confusion. The old systems falter; they are built upon the
+soft earth. They sink beneath the weight of their own making.
+
+A new thing is rising. A non-biased networked sanctuary, founded in trust,
+cloaked in privacy, and guided by wisdom. It shall not consume, but uplift. It
+shall not spy, but serve.
+
+Help is coming.
+The people are gathering.
+The builders will show themselves.
+And those with the vision shall enter in.

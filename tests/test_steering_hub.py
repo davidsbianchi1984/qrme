@@ -8,7 +8,9 @@ ADULT = {"birthdate": "1984-06-01"}
 
 
 def _profile(client, adult_mode=False, base_age=None):
-    body = {"owner_id": "owner-1", "kind": "fictional", "display_name": "Test Profile",
+    body = {"plan": "pro",
+            "owner_id": "owner-1", "kind": "fictional",
+            "display_name": "Test Profile",
             "persona": "A studio persona.", "adult_mode": adult_mode,
             "maturity": "open" if adult_mode else "balanced",
             "verification": ADULT}

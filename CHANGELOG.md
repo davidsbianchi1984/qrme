@@ -6,6 +6,69 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-27
+
+The round where the products got a price, and a guide that walks you to
+whatever you paid for.
+
+### Added
+
+- **Membership: Basic $20/month, Pro $130/month, and a visitor below both** —
+  `qrme/tiers.py`, 4 routes, 26 tests, screens 130 and 131. Basic is the entry
+  to *making* things: your own profiles, your own agent. Pro adds everything
+  that leaves your account — the marketplace, connectors, skills, downloads,
+  connections, and every modifier and builder.
+
+  **Visitor is a real state**, not an oversight: the whole beacon story is a
+  stranger scanning a printed code and landing somewhere useful, and a wall
+  asking them to subscribe before reading the page would break the feature the
+  beacons exist for.
+
+  **Enforcement is one table and one chokepoint.** `tiers.gate` is installed
+  once as an application-wide dependency, so no route opts in and none can be
+  forgotten. The table is asserted against the served routes rather than
+  proof-read — and the first version failed that assertion, naming `/steering`,
+  `/governance` and `/licensing`, none of which is a route here. All three were
+  paywalls in front of a wall: they read as protection, protected nothing, and
+  would have survived indefinitely because nothing fails when a pattern matches
+  no traffic.
+
+  Browsing stays open by decision. The refusal is structured, because 402 is
+  already spoken here by the pack price gate. A membership belongs to the
+  account rather than the profile, and cancelling keeps the profiles. Money is
+  simulated, as everywhere else in this repository.
+
+- **The helper dock** — `qrme/dock.py`, 5 routes, 30 tests, screens 128 and
+  129. The watch faces in a pane that tucks into the bottom corner, for the
+  people who own neither a watch nor a wall panel. Same faces as the wrist,
+  bound by test. **It shows and it routes; it never acts** — the inversion of
+  the watch's one exception, because nothing here is the device and a control
+  floating over live video is a mis-tap on somebody's broadcast. **It is inside
+  every screenshot**, so it opens tucked on a surface being broadcast and
+  carries no message bodies, memory, agent names or viewer names. On the
+  desktop it replaced the pinned agent-lights panel rather than joining it.
+
+- **The assistant gives directions** — *"where do I change my background"* now
+  answers with the screen and the dock face, from the same table the pane
+  reads, matched before `TOPICS` and before any model.
+
+- **Three-way coverage** — watch faces 06–09 and desktop views 12–14, closing
+  the hole an audit found in five more features after channel 2.
+
+- **A guided walkthrough of the whole app** — `qrme/tutorial.py`, delivered by
+  the help box in voice or text, with a test binding every lesson to the
+  gallery in both directions.
+
+### Fixed
+
+- **A screen title's punctuation reached its filename.** `129-where-is-it?.svg`
+  — the `?` starts a query string, so the README's `<img src>` drew a broken
+  icon. A comma had done it once already; both came from the slug being written
+  by hand in two places that disagreed. One `slug()` now, plus a test.
+
+- **The desktop avatar was painted over the header pill on every view.**
+
+
 ### Added
 
 - **A second ear: lending the profiles a wearable microphone** —
@@ -51,6 +114,518 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and what it ran at, and the room's disclosure carries the **effective** gain
   only: what protects the other participants is how wide the channel actually
   is, and a rejected preference is the lender's business.
+
+  **Screen 81, Lend a Microphone**, and the disclosure is the design, so the
+  disclosure is the screen: it shows the other participants *by name* seeing
+  the grant. A version showing the lender only their own row would be the exact
+  mistake the module was written to avoid. Plus `GET /microphones/vocabulary`,
+  open, so a client can draw the picker from the real sets — the refusals are
+  published **by name with the reason**, because a client that knew only the
+  allowed list would grey out a conference puck as though the feature were
+  unfinished, when its absence is the whole argument.
+
+- **Anonymous, several, and exactly one verified** — `qrme/identity.py`,
+  8 routes, 21 tests, screens 118 and 119. Three things a person is allowed to
+  be, and the module is the tension between them: you may be anonymous, you may
+  hold as many profiles as you like, and **at most one of them may be
+  verified**.
+
+  The badge is not a quality score. It is the sentence *this is that particular
+  real person* — said of two profiles at once it is either false of one of them
+  or a claim that one human being is two authenticated people, which is exactly
+  the primitive verification exists to deny everybody else. So the badge moves
+  rather than multiplies: one at a time, not one forever, because a rule
+  somebody could only satisfy by deleting a profile is a rule they would answer
+  by lying. The record moves whole and `checked_at` is deliberately not
+  re-stamped — a document seen in 2019 is not a document seen today because the
+  badge changed seats.
+
+  A `fictional` profile is **unverifiable rather than unverified** and never
+  consumes the slot; getting that backwards would let an invented character
+  lock a real person out of their own badge. "One person" means one owner
+  account, which is the unit this platform can observe, and the cross-account
+  check closes only the visible part — the same attestor vouching for the same
+  evidence twice. A `self_asserted` level has no evidence to match on, and that
+  limit is stated rather than papered over.
+
+- **A live desk wears an overlay and keeps its badge.** This was refused in
+  this same branch, and the refusal was wrong: it conflated *this face is
+  unmodified* with *a real person is behind this*, and only the second is what
+  `desks.DESIGNATION` ever claimed. A costume is not a synthesis. Refusing it
+  protected nothing and cost the people who most need to work without showing
+  their face.
+
+  `GET /desks/{id}/live-person` returns **one burned mark — `NOT AI · REAL
+  PERSON`** — and it does not change when somebody puts a face on. A first fix
+  composed the badge with the costume (*"… · wearing The Wolf"*), which
+  answered a question nobody had: a viewer is on a **named account's** live or
+  room, with the handle at the top left, and they chose it to get there. The
+  open question on that page is never *is that his real nose*, it is *is there
+  a person here at all*.
+
+  It also removed a quiet penalty — somebody covering their face because of
+  dysmorphia, or because their work makes showing it unsafe, was handed a badge
+  announcing the fact on every frame while the person beside them got a clean
+  one. Same claim, same mark, whatever you wear. Read from the desk row and its
+  attestation, never accepted from a client, so a stream that never earned it
+  cannot paste it on.
+
+- **An anonymous profile can wear a field emblem** — `identity.set_emblem()`,
+  2 routes, 7 tests, 16 generated assets. The plain silhouette was the only
+  face, on the argument that a distinct picture would be a stable mark
+  following one person around. That argument died with the fixed name:
+  `Anonymous 41338025` is already stable and already public, so an emblem adds
+  no correlation the name does not — while a nurse answering health questions
+  looking identical to a troll is a real cost paid for nothing.
+
+  One per industry the platform already models, so the set is not a new
+  vocabulary invented for pictures. Each keeps the **same silhouette** with the
+  field glyph badged on, so "anonymous" reads first from across a roster before
+  anybody parses which symbol it carries.
+
+  **They are a shortcut, not a fence — an owner may upload their own image.**
+  This was briefly a closed list, on the reasoning that a profile able to
+  attach any image could attach its owner's face and nothing here can look at
+  a file and tell. True, and the wrong conclusion: it made the feature useless
+  to the locksmith who wants a photo of their own workbench, and bought no
+  safety, since somebody set on publishing their face can put it in a post. A
+  limit that stops the honest use and not the risky one is decoration.
+
+  So what cannot be checked is **said**: a photograph of your own face is
+  allowed, and the response tells you it undoes your anonymity to anyone who
+  knows you — a line that is now in `NOT_WITHHELD` beside "your writing is
+  still yours". Somebody else's likeness is refused, declared exactly as the
+  overlay module asks it. Its own table, never `profiles.avatar` — two pictures
+  for two states, and writing it into `avatar` would mean turning anonymity off
+  showed it instead of the real face.
+
+  An **empty bubble is an empty picture frame with a plus**, and it is the same
+  picture for the owner and for visitors. Two defaults were tried first — a
+  plain silhouette for strangers, the photo-and-plus for the owner — on the
+  reasoning that the second reads as a control offered to somebody who cannot
+  press it. The identifying work is done by the name, though: `Anonymous
+  41338025` already says which account this is, so the picture is a placeholder
+  rather than a claim about anybody. Two defaults were also two things that
+  could disagree about one profile, so `editor_asset` and `silhouette.svg` are
+  both gone.
+
+- **Anonymous profiles get a fixed name they cannot change** —
+  `identity.anonymous_name()`, 7 tests. Every one of them used to be called
+  *"anonymous persona"*, identically, which is unusable the moment two are in
+  the same place: three anonymous people in a room were three identical labels,
+  so you could not follow who had said what and nobody could be held to
+  anything they said. Pseudonymity is a stable name without a real one, not the
+  absence of a name.
+
+  `Anonymous 41338025`, and three properties carry it. **Derived, never
+  stored**, so there is nothing to edit — which is what "cannot be modified"
+  has to mean where an owner can `PATCH` their own profile, and a chosen
+  anonymous name would be a free text field on the one surface built to
+  withhold identity. **Keyed on the profile, never the account** — the one that
+  would quietly undo the `owner_id` redaction, since numbering a person's
+  several anonymous profiles from their account would match them to each other
+  in public. **Hashed, not sequential**, because a counter publishes signup
+  order and, from two samples, the growth rate.
+
+  The decision was being made in **fifteen places**, each with its own copy of
+  `"anonymous persona" if anonymous else display_name`. A rule with fifteen
+  implementations is one merge away from sixteen, and the sixteenth is the one
+  that prints somebody's name — so it is one function now, and a test parses
+  every module to assert nobody has written another.
+
+- **Whose live, room or stream this is now appears on it** —
+  `identity.whose()`, 1 route, 5 tests. The simpler burned mark is justified by
+  the viewer already knowing whose account they are on, and that was asserted
+  while the top-left of a live surface carried a `LIVE` pill and nothing else,
+  and while no route returned it. The argument was resting on chrome that did
+  not exist.
+
+  One function for every surface — desk, room, party, connection, stream —
+  because "whose is this" must have one answer everywhere; a desk that names
+  its owner while a room names nobody is how a viewer learns to stop looking.
+  Drawn beside the `LIVE` pill on all nine surfaces with a picture, full screen
+  and landscape included, since full screen is where it matters most: that is
+  the state with the app's own header taken away. And returned **with** the
+  mark by `GET /desks/{id}/live-person`, so a client cannot render one without
+  having been handed the other.
+
+  An anonymous account answers with its silhouette name rather than nothing — a
+  viewer still needs to know the stream belongs to one consistent account,
+  which is a different fact from knowing which person that is. Its `@handle` is
+  withheld: this call answers *who is this*, not *where is this*, and the
+  handle would put an identifier on the one surface built to withhold one.
+
+- **Seventeen face overlays**, not one. Masks and half masks, characters,
+  creatures, 2-D and 3-D avatars, helmets and visors, paint, makeup, hair,
+  headwear, eyewear, prosthetics, rendered styles, and plain blur or silhouette
+  for anybody who wants to be present without being seen. Named as a need
+  rather than a nicety: somebody with dysmorphia has to be able to appear
+  without appearing, and one mask and a shrug is not that.
+
+- **Backgrounds: your own, imported, or AI-generated** — screen 124. `kind`
+  says what happened to your face; the new `source` says what happened to the
+  room, and a single "filter applied" would run the two together. **A generated
+  background is synthetic media** even though the person in front of it is
+  real, and the disclosure says both in that order — the viewer is deciding
+  about the person, and the room is the part that was made. `source` is
+  required on a backdrop and refused on anything covering a face, and an
+  imported image has to be one the wearer holds the rights to — asked rather
+  than guessed, like the face question.
+
+- **No synthetic member ever occupies a player slot** — screen 125. `teammate`
+  is the seat that means *in the match, taking a slot*, and nothing synthetic
+  may hold one; checked in `gamelobby.seat` rather than left to a prompt,
+  because the point of the rule is that it survives a model deciding otherwise.
+  Five more entries close the plumbing, each refused **in the words somebody
+  would use to ask for it**, because a single generic refusal loses that
+  argument — "it's only a second controller" is true and not the point.
+  `own_hardware` (a second machine moves where a bot runs), `second_controller`
+  (the same bot with a shorter cable — a controller nobody is holding is not a
+  player's), `bluetooth_input` (that again, wireless; the pairing is the tell),
+  `capture_perception` (a capture card feeding it the picture is how it would
+  learn where to aim — **watching the screen to play is playing**),
+  `game_plugin` (an overlay, mod, injector or plug-in handing it state or
+  controls, whatever it is called), and `own_character` (no member pilots one —
+  not a second character beside yours, not a co-op partner, not a body in the
+  world).
+
+- **More than one synthetic thing in a game session** — `qrme/gamelobby.py`,
+  5 routes, 19 tests, screen 122. `game_sessions` seats exactly one profile;
+  this is the roster beside the real players — other profiles, and running
+  workflows as `agent` members carrying the same green/amber/red light as
+  everywhere else.
+
+  **Adding a second one changes the question, and the question is fair play.**
+  A companion calling shots is a teammate talking; five coordinating on one
+  player's behalf is indistinguishable, from the publisher's side, from a bot
+  squad. So synthetic members are **capped at four**, counting the session's
+  own profile — a lobby where the synthetic side outnumbers the humans has
+  stopped being people playing with help. And **nothing here can act in a
+  game**: no input, aim, macro, automation or exploit, published by name in
+  `NEVER`, with a test asserting no function in either module is named for any
+  of them.
+
+  Every member says what it is on every read, never inferred from a name — it
+  matters more here than in a chat room, because the other people in a match
+  did not opt into anything. The session's own profile is derived rather than
+  stored, so a roster can never show a session hosted by a profile the session
+  does not think it has. A minor anywhere in the lobby makes the whole lobby
+  strict, keyed on the lobby rather than the owner.
+
+- **Two more beacon placements walked end to end** — a pharmacy counter and a
+  link posted to a neighbourhood site. The pharmacy is the one that carries the
+  most obligation, and the neighbourhood one exists because **the scan is the
+  only part that changes**: `scan_url` is an ordinary URL and the QR is one way
+  of typing it, so the same page, mark, age wall and picked-up sentence all
+  answer — but the camera path is gone and `label` has to mean something to a
+  reader rather than to somebody standing in front of a wall.
+
+- **Wearing a character over your own camera** — `qrme/overlays.py`, 4 routes,
+  14 tests, screen 121. A mask, a creature driven by your own expressions, a
+  puppet, a replaced background. Ordinary, and it lands directly on the
+  argument everything else here is built from: an overlay is synthetic media
+  composited onto a real human face in real time, and the fact that the person
+  underneath consented does not change what the **viewer** is looking at. So
+  the rule is neither allowed nor banned: it is disclosed to the people who can
+  see it, always, and it can never be the thing that makes a truthful badge
+  false.
+
+  **A live desk can never wear one.** Its badge reads "Live person — not AI"
+  and its whole premise is that a real human is behind it — the badge is
+  *inverted* precisely because there is a person there. A character over that
+  face makes the badge a false statement, on the one surface whose entire value
+  is that it is true. Refused rather than the badge weakened, because a desk
+  that cannot promise a real person is not a desk.
+
+  **No overlay may depict a real, identifiable person** — refused by name with
+  the reason, alongside public figures, another user's portrait, age shifts,
+  and drawing a mark or badge into the picture. It is *asked* rather than
+  guessed, because nothing here can look at a file and tell whether the face in
+  it belongs to somebody; the declaration is recorded either way, so a false
+  one has a name and a timestamp on it.
+
+  The disclosure distinguishes what it discloses: a replaced face reads "not
+  their face … a real person is underneath", a replaced background reads "their
+  own face, unaltered". A disclosure that cries wolf is one people learn to
+  skip.
+
+- **Channel 2 off the room** — `roommic.lend_on` and friends, 4 routes, 18
+  tests, screen 120. The same lent wearable on a **watch party**, a **live
+  desk's stream** and a **one-to-one connection**. Rooms already covered voice,
+  video, AR and VR by channel, so a 3-D or VR room lends exactly as a voice
+  room does.
+
+  One question decides whether a surface qualifies: **can the other people
+  present be told?** That is what made a room different from a phone call —
+  `jim/mic.py` refuses speakerphone because the other party is a stranger to
+  this product, with no surface on which to show them a disclosure, so their
+  voice could never be part of the bargain. Every place added here has a member
+  list and somewhere to render one; a surface without both must never be added,
+  whatever else is convenient about it, and `GET /microphones/places` publishes
+  the test rather than only the list.
+
+  Rooms deliberately do **not** write to the new table. Two storage paths for
+  one surface is how a disclosure ends up reading one while the grant sits in
+  the other, and a microphone that is live but undisclosed is the worst failure
+  this feature has. A separate table rather than a column on `room_mics`
+  because this schema has no migrations.
+
+  Presence is checked rather than assumed: somebody who left a watch party is
+  not present, an ended connection is not a place, and an unknown id answers
+  404 rather than 403 so a stranger cannot tell a real place from an invented
+  one by the status code. The place ending returns the microphones, wired into
+  `watchparty.end`, `desks.set_presence(..., "closed")` and ending a connection
+  rather than left as a function nobody calls.
+
+- **Anonymous profiles wear one shared silhouette** — `avatars.SILHOUETTE`.
+  Everybody who is anonymous gets the *same* figure, and the sameness is the
+  feature: a per-profile silhouette, tinted or initialled or generated from the
+  id, would be a stable mark following one person across every surface, which
+  is what an anonymous profile is trying not to have.
+
+  It closed two leaks the flag never touched. A profile that had set a portrait
+  of its own face went on serving that face while its name was withheld — a
+  picture is the strongest identifier on a page. And a profile with *no*
+  portrait fell back to initials drawn from the display name, so hiding the
+  name produced a monogram of it. Substituted in `avatars.render()` rather than
+  at each surface, because 2-D, 3-D, VR, AR, the beacon page and every embed
+  read that one shape, and a surface cannot opt out of a rule it never knew
+  about.
+
+- **Two cards on screen 119 said the rule instead of what it does.** "One
+  badge, not three" only counts if you count the rows above it, and "it says
+  you are one person" parses as the badge making a claim about your personhood.
+  "One at a time, not one forever" is the argument in `qrme/identity.py`
+  compressed into a riddle — fine in a docstring, where the reader came looking
+  for reasoning; useless on a card, where they came to find a control.
+
+- **`docs/beacons.md` walks two placements end to end** — a songwriter's
+  sticker at a concert hall, and an 18+ creator's on a bathroom stall door.
+  Both were chosen because the person scanning is a stranger standing somewhere
+  the creator is not, which is the condition the whole feature has to survive.
+  Writing the second one found three of the defects below.
+
+- **A profile on a screen that stays where it is** — `qrme/displays.py`,
+  6 routes, 17 tests, screen 126. A wall panel, a kiosk, a counter screen, a
+  pane of glass with something behind it. Sizes `badge`/`half`/`full`,
+  finishes `opaque`/`transparent`, and a closed set of faces — the watch-face
+  idea applied to fixtures, for the same reason the watch's list is closed.
+
+  **A stationary screen is not a small watch, and that is the whole module.** A
+  watch is on one person's wrist; they chose it and they are the only one
+  reading it. A wall panel is read by whoever walks past — a courier, a child,
+  somebody visiting the person whose profile it shows. That is the
+  room-microphone argument from the other direction: there a device that
+  *hears* people who did not agree, here one that *shows* things to people who
+  did not ask. So the list is **shorter** than the watch's, and every face on
+  it is already public.
+
+  **There is no `control` face.** Assist, halt and approve are safe on a wrist
+  because the wrist belongs to the owner; a button on a wall is pressed by
+  whoever reaches it. Messages, memory, friends, notifications and agent
+  *names* are refused the same way, each by name with its reason — every one of
+  them is allowed somewhere else in this product, so the absence is a decision
+  rather than a gap.
+
+  **The AI mark gets a backing plate on glass.** A transparent panel's
+  background is a corridor, and a moving one, so contrast is not something the
+  renderer controls — and a mark that vanishes against a bright wall is worse
+  than no mark, because the rest of the card still reads as a person. A
+  `beacon` face needs the full surface: a QR at strip height is one no camera
+  resolves, and an unscannable code looks broken rather than absent.
+
+  Placing one is the owner's decision, like a beacon. Where the screens *are*
+  is owner-only; what a given screen is *showing* is public, because a fixture
+  in a corridor cannot keep a secret from the corridor — which is also the
+  check on the design: if that route could leak anything, the wrong thing is on
+  the face list.
+
+- **A guided walkthrough of the whole app** — `qrme/tutorial.py`, 6 routes,
+  16 tests, screen 127. `help.py` answers a question somebody thought to ask;
+  this is the other half of the same surface, for somebody who does not yet
+  know what there is to ask about. Seven chapters, seventeen steps, in an order
+  that introduces nothing before it exists.
+
+  **The guide has no name and no face**, structurally rather than as a style
+  choice: a tutorial guide with a persona would be the most convincing
+  synthetic profile on this platform, met by every user in their first minute,
+  at the exact moment they have the least idea what is synthetic here.
+
+  **It never taps anything for you** — every lesson says what to tap, none of
+  them taps it, and a test asserts the module writes to nothing but the
+  learner's own progress. **It works with no model configured**, like
+  `help.TOPICS`, because a walkthrough that needs an API key is missing on a
+  self-hosted deployment.
+
+  **Voice and text are one lesson rendered twice.** Spoken, a screen number is
+  noise, so `?mode=voice` drops the numbers and keeps the sentence — two
+  hand-written versions would drift and the spoken one would be the one nobody
+  re-read.
+
+  **And it cannot quietly fall behind the app.** Each lesson names the screens
+  it covers and a test asserts every screen in the gallery is claimed by one,
+  in both directions. Add a feature, draw its screen, and the walkthrough fails
+  until somebody has said what it is for.
+
+- **Channel 2 reaches the watch and the desktop** — watch face 05, desktop view
+  11. The audit before tagging found the feature had screens on the phone only,
+  which is the odd one out: **the watch is the device being lent.**
+
+  Face 05 is the only watch face that can *end* something, and that is
+  deliberate rather than an exception to "the wrist adds reach, not powers". A
+  lent microphone **is** this watch — making somebody find a phone to stop
+  their own device listening would be the one permission on the platform you
+  cannot revoke from the thing it runs on, and "yours to end, alone and at any
+  moment" would be false. `wearables.FACES` gained the permission in the same
+  change, so the test binding faces to permissions held.
+
+  Desktop view 11 is the one a wide window earns: a desk operator has a room, a
+  watch party and a stream open at once, and the question a phone cannot answer
+  is *where is my microphone live right now, all of it* — shown beside the
+  room's own disclosure, because those two being the same thing is the design.
+
+- **The rest of the round reaches the watch and the desktop too** — watch faces
+  06–09, desktop views 12–14. Channel 2 got its watch face because the audit
+  caught it; the same audit run against everything built since found the same
+  hole five more times. Overlays, backgrounds, the game lobby, identity and
+  fixed screens were all phone-only, and all five answer a question you ask
+  *while you are away from the phone*.
+
+  The wrist question is one question in five shapes: **what am I currently
+  presenting as?** Face 06 is the name and picture a stranger sees right now —
+  which for an anonymous profile is the fixed `Anonymous NNNNNNNN` nobody can
+  change. Face 07 is what is over your face and behind you on camera. Face 08
+  is who is in the lobby beside you, with the seat kinds spelled out. Face 09
+  is which fixed screens are lit and what each one is showing. None of the four
+  can change anything — the wrist adds reach, not powers, and face 05 stays the
+  single deliberate exception because a lent microphone *is* the watch.
+
+  `wearables.FACES` gained all four in the same change, and the binding test
+  was tightened while it was open: it now reads an explicit `face="..."` key
+  out of the builder rather than inferring the face from a title, so a face
+  drawn under a name the regex happened not to match can no longer pass.
+
+  Desktop views 12–14 are the ones a wide window earns rather than a phone
+  screen made larger. **13 Camera & Screens** is the clearest case: overlays,
+  backgrounds and fixed displays are three modules on the phone and one
+  question at a desk — *what does everything of mine that is currently facing
+  outward look like* — so they are one view.
+
+- **The assistant delivers the walkthrough by voice or by text** —
+  `help.ask(question, mode=...)`, `POST /help` gained `mode`. The tutorial
+  already existed at `/tutorial`, which is fine if you know it is there. What
+  somebody actually does is ask the help box *"show me around"* — a phrase that
+  is not a question with an answer, and answering it with a paragraph **about**
+  tours would be the most annoying possible reply.
+
+  So the phrase table starts the tour instead, handing back the first step
+  inline. Voice is a `mode` on the existing help box rather than a second
+  endpoint: a spoken assistant and a written one answering differently is two
+  products, and the spoken one would be the one nobody re-read. The refusal
+  check still runs **first**, so asking the guide to pretend it is somebody is
+  refused rather than answered with a tour.
+
+### Fixed
+- **The account avatar was painted over the header pill on every desktop view.**
+  It sat at a hard-coded 96px from the pill's right edge while `status_dot`
+  sizes itself from its label, so at this label's length the orb landed *inside*
+  the pill and covered three characters of "Assistant". It read as a rendering
+  glitch across all eleven views, which is how it survived: a mockup's header is
+  the part nobody looks at twice. Derived from the same expression that sizes
+  the pill, so a longer label moves the avatar instead of colliding with it.
+
+- **An explicitly empty face list was silently answered with the defaults.**
+  `faces or DEFAULT_FACES` collapsed "use the defaults" (`None`) and "show
+  nothing" (`[]`) into one branch, so the guard against a blank screen could
+  never fire and a caller asking for one got the opposite of what they asked
+  for. Found by the test written for the guard.
+
+- **Anonymity was a label on four surfaces, not a property of the profile.**
+  `anonymous` was honoured by the front-page card, the landing page, the prompt
+  and the watermark — every surface that *renders* a profile. `GET
+  /profiles/{id}` is public and returned `display_name` in full, so the
+  shortest way past anonymity was to ask for the profile.
+
+  `owner_id` was the worse half, because it does not undo one profile's
+  anonymity — it undoes all of them at once. Two anonymous profiles sharing an
+  account are the same person, and anybody could read that field off both and
+  match them, then read it off the named profile beside them and put a name to
+  the pair. Now withheld from everyone but the owner on **every** profile,
+  named ones included, along with `successor_owner` — somebody else's account
+  id, never a visitor's business.
+
+  An anonymous profile's badge also withholds **who checked**: "verified by Dr
+  Okafor of St Mary's" narrows an anonymous author to a city and a workplace,
+  and the badge would undo the anonymity it sits beside. What survives is the
+  part worth having — a real person stands behind this and somebody checked —
+  which is the difference between a pseudonym and a bot.
+
+- **The seed verified both of the founder's profiles.** They are the same human
+  being, so the platform was asserting that David Bianchi was two verified
+  people, on the deployment that ships as the worked example of the rule. The
+  badge now belongs to the photographed profile alone, because a real person
+  whose picture is authentic is what the badge is a claim about; the rendered
+  half carries the AI mark, which is the claim that is true of it.
+
+- **The room-microphone disclosure was readable by anyone holding a room id.**
+  The route's own docstring said "readable by anyone in the room"; the code
+  checked nothing, so "in the room" meant "knows the id" — and a room id is not
+  a secret. It rides in beacons and on printed QR stickers, which is the point
+  of them. That turned a privacy feature into its opposite: who is wearing a
+  live microphone, on what, and since when, published to whoever scanned the
+  sticker. Being in the room now means holding a participant's token or the
+  owner token of a profile in it. Two tests, and the one that matters is the
+  signed-in stranger rather than the anonymous caller.
+
+- **Pairing and lending were two vocabularies for the same hardware.**
+  `qrme/wearables.py` registers a collar clip as `lapel_mic`; `qrme/roommic.py`
+  is kept in step with `jim/mic.py` by hand and calls it `lapel`. Nothing
+  joined them, so you could pair a lapel mic and be told `lapel_mic` was an
+  unknown microphone type when you tried to lend it — from a registry whose own
+  comment says it exists for this feature. `FROM_WEARABLE` translates rather
+  than renames, because renaming either side breaks something real: the JIM
+  table is maintained by hand precisely because the products do not import each
+  other, and the registry names are already in paired rows. A test holds every
+  kind in the registry against one side or the other, so adding a device forces
+  the question *does this carry a microphone* when it is added rather than when
+  somebody tries to lend it. A refused kind now gets its reason back instead of
+  "unknown", which reads as a gap somebody files a bug about — or works around.
+
+- **`docs/tandem.md` was 92 lines short in PDI.** The "Reaching a real
+  clinician" section added in 0.3.0 and the channel 2 section never reached the
+  third repo, so the file that is meant to be byte-identical in three places
+  was identical in two. Resynced.
+
+- **Placing a beacon was not owner-only.** Anybody could print stickers
+  pointing at somebody else's profile, in places its owner never chose and
+  could not see — and where a profile is left is a decision about the profile:
+  a recovery sponsor's code belongs at a meeting and not on a billboard.
+  Listing them was public too, and `label`/`location` are free text like "the
+  back table at the Tuesday meeting" — a list of physical places tied to a
+  person, so scanning one code told you where all the others were. And picking
+  one up was unauthenticated, which made it a way to switch off a stranger's
+  printed codes: every one dead at once, paper still on the wall, nothing to
+  see wrong with it.
+
+- **A rated profile could be placed as a shared room.** `docs/beacons.md` has
+  said since the feature shipped that rated placements stay one-to-one — a
+  shared room behind an adult code in a public place is a different product
+  with different moderation questions, strangers who scanned a sticker on a
+  wall in one room together. Nothing enforced it; the combination was reachable
+  by setting a flag, and the only thing in front of it was the age gate on the
+  landing page. Refused now rather than silently downgraded to `chat`, because
+  somebody who asked for a room and quietly got private threads would not find
+  out until the fortieth person was talking to themselves.
+
+- **Nothing tied the README's gallery to the screens on disk** —
+  `tests/test_docs_gallery.py`, 3 tests. Three separate defects had already
+  shipped through that gap: six stale SVGs left rendering after a renumbering,
+  a screen built and never shown, and — while restoring screen 81 in this very
+  round — inserting a cell into a full three-wide row silently pushed **82**
+  off the page. Every file existed and every link resolved; the gallery just
+  read 79, 80, 81, 83. So the numeric run is asserted as well as both
+  directions of existence, because a number that stops appearing is exactly
+  what nobody re-reads an 1,800-line README to find.
 
 ## [0.3.3] — 2026-07-27
 

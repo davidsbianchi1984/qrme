@@ -14,25 +14,37 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI, Request, Response
+from fastapi import Depends, FastAPI, Request, Response
 
 from . import avatars as avatar_assets
-from . import mobile, offline
+from . import mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (apps, assistant, audience, avatars, commerce,
                       community, connections,
-                      desks, earnings, feedback, gaming, governance,
-                      intelligence, interaction, licensing, models, packs,
-                      frontpage, profiles, research, robots, signatures,
+                      desks, displays, dock, earnings, exchange, feedback,
+                      friends,
+                      gamelobby, gaming,
+                      governance,
+                      identity, intelligence, interaction, licensing, models,
+                      overlays as overlay_routes, packs, pages, placemic,
+                      frontpage, profiles, research, revisions, robots,
+                      sharing, signatures,
                       social, steering,
-                      summon, watch, watermarks)
+                      summon, tiers as tier_routes, tutorial, wall,
+                      watch, watchparty, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
-    app = FastAPI(title="QRME", version="0.3.3")
+    # The membership gate is an application-wide dependency rather than a call
+    # at the top of each paid handler. One table, one chokepoint: a capability
+    # cannot be added to the product and forgotten at one of its routes,
+    # because no route opts in. See qrme/tiers.py for the table and for why
+    # browsing stays open.
+    app = FastAPI(title="QRME", version="0.4.0",
+                  dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
     def terms() -> dict:
@@ -97,6 +109,21 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(interaction.router)
     app.include_router(intelligence.router)
     app.include_router(connections.router)
+    app.include_router(friends.router)
+    app.include_router(identity.router)
+    app.include_router(placemic.router)
+    app.include_router(overlay_routes.router)
+    app.include_router(gamelobby.router)
+    app.include_router(displays.router)
+    app.include_router(tutorial.router)
+    app.include_router(dock.router)
+    app.include_router(tier_routes.router)
+    app.include_router(pages.router)
+    app.include_router(wall.router)
+    app.include_router(exchange.router)
+    app.include_router(watchparty.router)
+    app.include_router(sharing.router)
+    app.include_router(revisions.router)
     app.include_router(social.router)
     app.include_router(apps.router)
     app.include_router(research.router)
@@ -143,6 +170,21 @@ def create_app(pdi_client: PDIClient | None = None,
         app.mount(avatar_assets.ASSET_ROUTE,
                   StaticFiles(directory=str(_portraits)),
                   name="portraits")
+    # Real photographs, served apart from the burned synthetic faces — see
+    # avatars.PHOTO_ROUTE for why they are not the same kind of asset.
+    _photos = avatar_assets.photos_dir()
+    if _photos.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.PHOTO_ROUTE,
+                  StaticFiles(directory=str(_photos)), name="photos")
+    # The anonymous silhouette — neither a burned portrait nor a photograph,
+    # so a third mount rather than a file smuggled into either tree. See
+    # avatars.FIGURE_ROUTE.
+    _figures = avatar_assets.figures_dir()
+    if _figures.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.FIGURE_ROUTE,
+                  StaticFiles(directory=str(_figures)), name="figures")
 
     # The studio itself, served from this API so a phone loads the UI and
     # calls the API on one origin (no CORS, nothing to configure). Mounted

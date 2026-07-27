@@ -53,6 +53,49 @@ def require_owner_or_interactor(profile_id: str, interactor_id: str,
     raise HTTPException(403, "not authorized for this resource")
 
 
+def require_self(subject_id: str, request: Request) -> None:
+    """The caller must **be** this party, whatever kind of subject they are.
+
+    The two-party surfaces — an agreed exchange, a lent skill, a watch party —
+    identify who is acting by an id in the request body, and an id in a body is
+    a claim rather than a fact. Without this, `{"actor_id": "<somebody else>"}`
+    is a complete impersonation: an anonymous caller could forge *both*
+    signatures on an agreement, open its channel, and accept delivery of an
+    executable on the victim's behalf. Every consent property those modules
+    describe rests on this check existing.
+
+    Deliberately not `auth.require`, which also pins the role: a party here may
+    be a profile owner or an interactor, and which of the two they are is not
+    what is being asserted. What is being asserted is that the token belongs to
+    the person the body names.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(
+            401, "authentication required — this acts on somebody's behalf, "
+                 "so it has to know it is them")
+    if who["subject_id"] != subject_id:
+        raise HTTPException(
+            403, "that is not you — an id in a request body is a claim, and "
+                 "this one does not match the token presented")
+
+
+def require_one_of(subject_ids: list[str], request: Request) -> str:
+    """The caller must be one of these parties. Returns which one they are.
+
+    For the endpoints where either side may act — reopening an agreement,
+    closing a grant — and where the answer is also needed, so the handler does
+    not have to ask twice.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who["subject_id"] not in subject_ids:
+        raise HTTPException(
+            403, "only the people involved in this can act on it")
+    return who["subject_id"]
+
+
 def interactor_or_404(interactor_id: str) -> dict:
     row = db.connect().execute(
         "SELECT * FROM interactors WHERE id=?", (interactor_id,)
@@ -178,12 +221,47 @@ def relationship(profile_id: str, interactor_id: str) -> dict | None:
     return dict(row) if row else None
 
 
-def profile_out(row: dict) -> ProfileOut:
+def profile_out(row: dict, request: Request | None = None, *,
+                owner: bool = False) -> ProfileOut:
+    """One profile, redacted for whoever is asking.
+
+    `GET /profiles/{id}` is public, and for a long time this function handed
+    every caller the raw row — including `display_name` and `owner_id` on a
+    profile flagged `anonymous`. The flag was real everywhere it was
+    *rendered*: the front-page card, the landing page, the prompt and the
+    watermark all substituted "anonymous persona". The route that returns the
+    profile itself did not, so anonymity was a property of four presentation
+    surfaces rather than of the profile, and the shortest way past it was to
+    ask for the profile.
+
+    `owner_id` is the worse of the two, because it does not just undo one
+    profile's anonymity — it undoes all of them at once. Two anonymous
+    profiles sharing an owner are the same person, and anybody could read that
+    field off both and match them. The same field on a *named* profile then
+    names the anonymous ones beside it. Withheld from everyone but the owner
+    for that reason, along with `successor_owner`, which is somebody else's
+    account id and was never a visitor's business either.
+
+    The owner still sees their own profile whole: they are the one person for
+    whom none of this is a disclosure.
+
+    ``owner=True`` says so directly, for the one case a token cannot: the
+    response to profile *creation*, which carries the owner token it is being
+    authorized by. The incoming request there holds the signup key, so asking
+    it who is calling would redact the creator's own new profile from them.
+    """
+    from . import auth, identity
+
+    who = auth.principal(request) if request is not None else None
+    is_owner = owner or who == {"role": "owner", "subject_id": row["id"]}
+    hidden = bool(row["anonymous"]) and not is_owner
+
     return ProfileOut(
         id=row["id"],
-        owner_id=row["owner_id"],
+        owner_id=row["owner_id"] if is_owner else None,
         kind=row["kind"],
-        display_name=row["display_name"],
+        display_name=(identity.anonymous_name(row["id"]) if hidden
+                      else row["display_name"]),
         persona=row["persona"],
         demographics=json.loads(row["demographics"]),
         sources=json.loads(row["sources"]),
@@ -194,7 +272,7 @@ def profile_out(row: dict) -> ProfileOut:
         aging_enabled=bool(row["aging_enabled"]),
         base_age=row["base_age"],
         effective_age=persona.effective_age(row),
-        successor_owner=row["successor_owner"],
+        successor_owner=row["successor_owner"] if is_owner else None,
         purpose=row["purpose"],
         maturity=row["maturity"],
         cloud_contribution=bool(row["cloud_contribution"]),

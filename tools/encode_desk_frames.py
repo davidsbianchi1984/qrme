@@ -118,6 +118,31 @@ def main() -> None:
     print(f"portraits: {len(entries)} at {PORTRAIT_PX}px, "
           f"{total // 1024} KB base64")
 
+    # The founder, kept out of PORTRAITS on purpose. That list documents itself
+    # as the starter collection, and every starter is an invented person; this
+    # one is a real person, so folding him in would make the comment above it
+    # false. The friends screens want his face, so it gets its own name.
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from qrme.seed import (FOUNDER_HANDLE, FOUNDER_NAME, VERIFIED_HANDLE,
+                           VERIFIED_NAME)
+    PHOTO_SRC = ROOT / "qrme" / "assets" / "photos"
+    for const, handle, name, src_dir, note in (
+            ("FOUNDER", FOUNDER_HANDLE, FOUNDER_NAME, PORTRAIT_SRC,
+             "the AI rendering, marked in its own pixels"),
+            ("FOUNDER_VERIFIED", VERIFIED_HANDLE, VERIFIED_NAME, PHOTO_SRC,
+             "the photograph — authentic, so deliberately unmarked")):
+        fsrc = src_dir / f"{handle}.webp"
+        if not fsrc.is_file():
+            raise SystemExit(f"no founder image at {fsrc}")
+        fb64 = encode_square(fsrc, PORTRAIT_PX, PORTRAIT_Q)
+        fchunks = "\n".join(f'    "{c}"' for c in textwrap.wrap(fb64, 96))
+        parts.append(f"# The founder, {note}. Kept out of the starter")
+        parts.append("# collection above, which is invented people only.")
+        parts.append(f'{const} = ("{name}",\n{fchunks})')
+        parts.append("")
+        print(f"{const}: {len(fb64) // 1024} KB base64")
+
     OUT.write_text("\n".join(parts))
     print("wrote", OUT.relative_to(ROOT))
 

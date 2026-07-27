@@ -85,5 +85,10 @@ def ask_help(body: HelpAsk) -> dict:
     "what is this?" would gate the one question that arrives before one exists.
 
     It writes nothing. There is no path from this endpoint to a change.
+
+    Asking it to *show you around* starts the guided walkthrough here rather
+    than handing back a paragraph about tours — and `mode="voice"` renders
+    that first step for listening, so somebody who cannot read the screen gets
+    the tour itself rather than a link to it.
     """
-    return help_mod.ask(body.question)
+    return help_mod.ask(body.question, mode=body.mode)

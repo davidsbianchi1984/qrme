@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Add a picture">
+  <!-- The empty bubble, as its owner sees it: a photo with a plus.
+       Deliberately **not** what a visitor gets. A stranger looking at an
+       anonymous profile that has set no picture sees the plain silhouette —
+       showing them an "add a picture" control would be offering them a button
+       that is not theirs to press, and would report the absence as a gap in
+       somebody's profile rather than as the default it is.
+       Same figure family as silhouette.svg and the emblems, so the four read
+       as one set. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A2550"/>
+      <stop offset="1" stop-color="#1B1838"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#bg)"/>
+  <rect x="46" y="56" width="108" height="84" rx="12" fill="none"
+        stroke="#8078D8" stroke-width="7"/>
+  <circle cx="76" cy="84" r="9" fill="#8078D8"/>
+  <path d="M56 130 L88 98 L112 122 L126 110 L144 128 V130 Z" fill="#8078D8"/>
+  <circle cx="150" cy="150" r="34" fill="#6C63C4" stroke="#1B1838"
+          stroke-width="6"/>
+  <path d="M150 136 V164 M136 150 H164" stroke="#fff" stroke-width="7"
+        stroke-linecap="round"/>
+</svg>

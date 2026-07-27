@@ -46,7 +46,8 @@ def design(profile_id: str) -> dict:
     # seen (summon cards, marketplace listings). The default watermark is
     # built from that name and rides on every render the profile produces —
     # so without this it was the one surface that gave it away.
-    name = (("anonymous persona" if row["anonymous"] else row["display_name"])
+    from . import identity
+    name = (identity.shown_name(row, profile_id)
             if row else profile_id)
     custom = json.loads(row["watermark_design"]) if (
         row and row["watermark_design"]) else {}

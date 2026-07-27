@@ -71,6 +71,30 @@ MIC_TYPES: dict[str, bool] = {          # name -> personal?
 }
 PERSONAL_TYPES = tuple(k for k, v in MIC_TYPES.items() if v)
 
+# The same hardware, under the name the *pairing* registry gives it.
+#
+# `qrme/wearables.py` is where a person registers the devices they own, and it
+# calls them `lapel_mic` and `clip_on_mic`; this module is kept in step with
+# `jim/mic.py` by hand, and that one calls them `lapel` and `clip_on`. Two
+# vocabularies for one collar clip, and for a while nothing joined them: you
+# could pair a lapel mic and then be told `lapel_mic` was an unknown
+# microphone type when you tried to lend it. The registry existed *for* this
+# feature — `wearables.KINDS` says so in its own comment — and the feature
+# arrived speaking a different language.
+#
+# Translated rather than renamed. Renaming here would desync the table from
+# `jim/mic.py`, which is maintained by hand precisely because the two products
+# do not import each other; renaming there would break paired rows. A test
+# asserts every microphone-bearing kind in the registry has a landing place.
+FROM_WEARABLE: dict[str, str] = {
+    "watch": "watch",
+    "earbuds": "earbuds",
+    "headset": "headset",
+    "lapel_mic": "lapel",
+    "clip_on_mic": "clip_on",
+    "glasses": "glasses",
+}
+
 # How wide the lent channel listens — also kept in step with `jim/mic.py` by
 # hand. Every level is **the lender at some distance**, never a level of
 # company: there is no setting whose answer to "what does it pick up" is "more
@@ -141,7 +165,24 @@ def lend(room_id: str, interactor_id: str, device: str,
             "so the profiles can already read everything you send")
     if not _is_participant(room_id, interactor_id):
         raise RoomMicError("only a participant can lend a microphone")
+    # A device may arrive under the name it was paired with. See FROM_WEARABLE:
+    # the registry and this table are two vocabularies for one collar clip, and
+    # the person lending it should not have to know which module they are
+    # talking to.
+    mic_type = FROM_WEARABLE.get(mic_type, mic_type)
     if mic_type not in MIC_TYPES:
+        # A kind the pairing registry refuses outright gets the refusal it
+        # earned, not "unknown". They are the room-facing devices, and the
+        # reason they are absent is a decision — "unknown" reads as a gap
+        # somebody will file a bug about, or worse, work around.
+        from . import wearables
+        if mic_type in wearables.REFUSED:
+            raise RoomMicError(
+                f"a {mic_type.replace('_', ' ')} is "
+                f"{wearables.REFUSED[mic_type]}: it would pick up the people "
+                "around you, and their voices are not yours to lend. A worn "
+                "or clipped-on one can: "
+                f"{', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)}")
         raise RoomMicError(
             f"unknown microphone type {mic_type!r} — one of "
             f"{', '.join(sorted(MIC_TYPES))}")
@@ -253,3 +294,160 @@ def heard_by_profiles(room_id: str) -> list[str]:
     return [r["interactor_id"] for r in db.connect().execute(
         "SELECT interactor_id FROM room_mics WHERE room_id=?"
         " AND ended_at IS NULL", (room_id,)).fetchall()]
+
+
+# --------------------------------------------------------------------------- #
+# Channel 2 on the surfaces that are not a room
+# --------------------------------------------------------------------------- #
+
+# Where else a wearable can be lent, and — the only question that decides it —
+# **can the other people present be told?**
+#
+# That is the whole rule, and it is what made a room different from a phone
+# call in the first place. `jim/mic.py` refuses speakerphone outright because
+# the other party on a call is a stranger to this product: there is no surface
+# on which to show them a disclosure, so their voice cannot be part of the
+# bargain. A room's participants *can* be shown one, so a worn microphone is
+# allowed there and telling them is the price.
+#
+# Every surface below passes that test — each has a member list and a place to
+# render the disclosure to it. A surface that does not have both must not be
+# added here, whatever else is convenient about it.
+PLACES: dict[str, str] = {
+    "party": "a watch party — the other members are listed and can be shown",
+    "desk": "a live desk's stream — its visitors are present and can be shown",
+    "connection": "a one-to-one connection — the other person is a user here",
+}
+
+
+def _place(surface: str) -> None:
+    if surface == "room":
+        raise RoomMicError(
+            "a room lends through its own routes — POST /rooms/{id}/mic. Two "
+            "storage paths for one surface is how a live microphone ends up "
+            "undisclosed")
+    if surface not in PLACES:
+        raise RoomMicError(
+            f"unknown surface {surface!r} — one of {', '.join(PLACES)}")
+
+
+def lend_on(surface: str, surface_id: str, interactor_id: str, device: str,
+            mic_type: str = "watch", gain: str = ROOM_GAIN) -> dict:
+    """Lend the profiles here your wearable's microphone.
+
+    The room rules apply unchanged, because the reasons for them do not depend
+    on the surface being a room: only a worn microphone (a room-facing one
+    lends the voices of people who did not agree), always near-field (there are
+    other people present, by definition of every surface in :data:`PLACES`),
+    keyed on its wearer, disclosed to everyone present, and ended with the
+    place.
+    """
+    _place(surface)
+    mic_type = FROM_WEARABLE.get(mic_type, mic_type)
+    if mic_type not in MIC_TYPES:
+        from . import wearables
+        if mic_type in wearables.REFUSED:
+            raise RoomMicError(
+                f"a {mic_type.replace('_', ' ')} is "
+                f"{wearables.REFUSED[mic_type]}: it would pick up the people "
+                "around you, and their voices are not yours to lend")
+        raise RoomMicError(f"unknown microphone type {mic_type!r}")
+    if not MIC_TYPES[mic_type]:
+        raise RoomMicError(
+            f"a {mic_type.replace('_', ' ')} microphone is pointed at the "
+            "room, not at you. It would pick up the people around you, and "
+            "their voices are not yours to lend")
+    if gain not in GAIN_LEVELS:
+        raise RoomMicError(f"unknown gain {gain!r}")
+
+    conn = db.connect()
+    existing = conn.execute(
+        "SELECT * FROM place_mics WHERE surface=? AND surface_id=?"
+        " AND interactor_id=? AND ended_at IS NULL",
+        (surface, surface_id, interactor_id)).fetchone()
+    if existing:
+        return {**dict(existing), "already_lent": True}
+
+    effective = ROOM_GAIN
+    grant_id = db.new_id("pmic")
+    conn.execute(
+        "INSERT INTO place_mics (id, surface, surface_id, interactor_id,"
+        " device, mic_type, requested_gain, gain, started_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
+        (grant_id, surface, surface_id, interactor_id, device, mic_type,
+         gain, effective, db.utcnow()))
+    conn.commit()
+    out = {"id": grant_id, "surface": surface, "surface_id": surface_id,
+           "device": device, "mic_type": mic_type, "lending": True,
+           "gain": effective, "capped": gain != effective,
+           "voice_focus": VOICE_FOCUS,
+           "note": f"the profiles here can hear you on your "
+                   f"{device.replace('_', ' ')} — it keys on your voice and "
+                   "drops the rest. Everyone here is shown that you lent it"}
+    if out["capped"]:
+        out["requested_gain"] = gain
+        out["because"] = (
+            "there are other people here, so your microphone stays narrow "
+            "however you have it set. Your setting is still yours elsewhere")
+    return out
+
+
+def take_back_on(surface: str, surface_id: str, interactor_id: str) -> dict:
+    """Yours to end, alone and at any moment."""
+    _place(surface)
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT id FROM place_mics WHERE surface=? AND surface_id=?"
+        " AND interactor_id=? AND ended_at IS NULL",
+        (surface, surface_id, interactor_id)).fetchone()
+    if row is None:
+        return {"lending": False, "note": "you were not lending one"}
+    conn.execute("UPDATE place_mics SET ended_at=? WHERE id=?",
+                 (db.utcnow(), row["id"]))
+    conn.commit()
+    return {"lending": False, "id": row["id"]}
+
+
+def close_place(surface: str, surface_id: str) -> int:
+    """End every grant here. Called when the party ends, the desk closes or
+    the connection drops — a permission must not outlive the thing that
+    justified it and quietly apply to the next one."""
+    conn = db.connect()
+    rows = conn.execute(
+        "SELECT id FROM place_mics WHERE surface=? AND surface_id=?"
+        " AND ended_at IS NULL", (surface, surface_id)).fetchall()
+    conn.execute(
+        "UPDATE place_mics SET ended_at=? WHERE surface=? AND surface_id=?"
+        " AND ended_at IS NULL", (db.utcnow(), surface, surface_id))
+    conn.commit()
+    return len(rows)
+
+
+def disclosure_on(surface: str, surface_id: str) -> dict:
+    """Who here has lent one — readable by everyone present, by design."""
+    _place(surface)
+    rows = db.connect().execute(
+        "SELECT * FROM place_mics WHERE surface=? AND surface_id=?"
+        " AND ended_at IS NULL ORDER BY started_at, rowid",
+        (surface, surface_id)).fetchall()
+    # The effective gain, never the requested one — same reason as a room's.
+    lent = [{"interactor_id": r["interactor_id"], "device": r["device"],
+             "mic_type": r["mic_type"], "gain": r["gain"],
+             "hears": GAIN_LEVELS[r["gain"]]["describes"],
+             "since": r["started_at"]} for r in rows]
+    return {
+        "surface": surface, "surface_id": surface_id,
+        "microphones_lent": lent,
+        "gain": ROOM_GAIN, "voice_focus": VOICE_FOCUS,
+        "note": ("no one has lent the profiles a microphone" if not lent else
+                 f"{len(lent)} person(s) have lent the profiles a microphone. "
+                 "Each keys on its own wearer and is set narrow enough to "
+                 "reach only them"),
+    }
+
+
+def heard_by_profiles_on(surface: str, surface_id: str) -> list[str]:
+    """Interactor ids whose voice the profiles here currently receive."""
+    return [r["interactor_id"] for r in db.connect().execute(
+        "SELECT interactor_id FROM place_mics WHERE surface=? AND surface_id=?"
+        " AND ended_at IS NULL", (surface, surface_id)).fetchall()]
