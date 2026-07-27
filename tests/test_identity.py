@@ -325,3 +325,89 @@ def test_the_vocabulary_states_all_three_rules(client):
     assert "as many profiles" in joined
     assert "at most one" in joined
     assert "moves" in joined
+
+
+# -- the silhouette -----------------------------------------------------------
+
+def test_an_anonymous_profile_gets_the_silhouette_not_its_own_face(client):
+    """A picture is the strongest identifier on a page, and the flag never
+    touched it. A profile that had set a portrait of its own face went on
+    serving that face while its name was being withheld."""
+    from qrme import avatars
+
+    p = _hidden(client, display_name="Wren Ashby")
+    db.connect().execute("UPDATE profiles SET avatar=? WHERE id=?",
+                         ("/photos/wren.webp", p["id"]))
+    db.connect().commit()
+
+    art = avatars.render(p["id"])
+    assert art["asset"] == avatars.SILHOUETTE
+    assert art["silhouette"] is True
+    assert "wren" not in art["asset"].lower()
+
+
+def test_everybody_anonymous_gets_the_same_one(client):
+    """Sameness is the feature. A per-profile silhouette — tinted, initialled,
+    or generated from the id — would be a stable mark following one person
+    across every surface, which is what an anonymous profile is trying not to
+    have. Two of them must be indistinguishable at a glance, whether or not
+    they are the same person."""
+    from qrme import avatars
+
+    a = _hidden(client, owner_id="owner-sil-1", display_name="One")
+    b = _hidden(client, owner_id="owner-sil-2", display_name="Two")
+    c3 = _hidden(client, owner_id="owner-sil-1", display_name="Three")
+
+    faces = {avatars.render(p["id"])["asset"] for p in (a, b, c3)}
+    assert len(faces) == 1
+
+
+def test_a_hidden_profile_never_falls_back_to_initials(client):
+    """The other leak, and the sneakier one: no portrait meant initials drawn
+    from the display name, so hiding the name produced a monogram of it."""
+    from qrme import avatars
+
+    p = _hidden(client, display_name="Wren Ashby")
+    art = avatars.render(p["id"])
+    assert art["placeholder"] is False
+    assert art["asset"] == avatars.SILHOUETTE
+
+
+def test_a_named_profile_keeps_its_own_face(client):
+    """The substitution is anonymity's, not a general downgrade."""
+    from qrme import avatars
+
+    p = make_profile(client, display_name="Public Pat")
+    db.connect().execute("UPDATE profiles SET avatar=? WHERE id=?",
+                         ("/photos/pat.webp", p["id"]))
+    db.connect().commit()
+    art = avatars.render(p["id"])
+    assert art["asset"] == "/photos/pat.webp"
+    assert art["silhouette"] is False
+
+
+def test_the_silhouette_is_not_burned_with_the_ai_mark(client):
+    """It depicts nobody and nothing generated it, so stamping *AI-generated
+    synthetic media* on it would be a false statement in the same direction
+    the founder's photograph avoids — and it is not a photograph either. A
+    third kind of asset, and `asset_is_marked` says so."""
+    from qrme import avatars
+    assert avatars.asset_is_marked(avatars.SILHOUETTE) is False
+
+
+def test_the_silhouette_file_ships_with_the_package(client):
+    """A route serving a file that is not installed is a broken image on every
+    anonymous profile."""
+    from qrme import avatars
+    assert (avatars.figures_dir() / "silhouette.svg").is_file()
+
+
+def test_the_report_says_the_picture_is_withheld_too(client):
+    """It used to list the picture under what anonymity does *not* cover,
+    which stopped being true the moment the silhouette landed. A limits list
+    that is out of date is worse than none — people plan around it."""
+    p = _hidden(client)
+    out = client.get(f"/profiles/{p['id']}/anonymity",
+                     headers=auth_header(p)).json()
+    assert any("silhouette" in s for s in out["withheld"])
+    assert not any("picture" in s for s in out["not_withheld"])

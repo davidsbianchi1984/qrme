@@ -109,11 +109,34 @@ def claim_handle(profile_id: str, body: HandleSet) -> dict:
 # -- beacons: leave a profile behind -----------------------------------------
 
 @router.post("/profiles/{profile_id}/beacons", status_code=201)
-def place_beacon(profile_id: str, body: BeaconCreate) -> dict:
-    profile_or_404(profile_id)
+def place_beacon(profile_id: str, body: BeaconCreate,
+                 request: Request) -> dict:
+    """Leave this profile somewhere. Owner only.
+
+    It was anybody's, which meant a stranger could print stickers pointing at
+    somebody else's profile, in places its owner never chose and cannot see.
+    Where a profile is left is a decision about the profile — a recovery
+    sponsor's code belongs at a meeting and not on a billboard — and the owner
+    is the only person entitled to make it.
+    """
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
     conn = db.connect()
     beacon_id = db.new_id("bcn")
     room_id = None
+    if body.mode == "room" and profile["adult_mode"]:
+        # Documented since the feature shipped and never enforced: "rated
+        # placements stay one-to-one". A shared room behind an adult QR at a
+        # public venue is a different product with different moderation
+        # questions — strangers who scanned a sticker on a wall, in one room
+        # together, with rated material between them — and it was reachable by
+        # setting a flag. Refused rather than silently downgraded to `chat`,
+        # because somebody who asked for a room and got a private thread would
+        # not find out until the fortieth person was talking to themselves.
+        raise HTTPException(
+            422, "a rated profile is placed one-to-one. A shared room behind "
+                 "an adult code in a public place is a different product with "
+                 "different moderation questions, not a flag on this one")
     if body.mode == "room":
         # One room, minted with the profile in it, that every scanner joins.
         # The people who found the same sticker end up talking to the profile
@@ -147,8 +170,16 @@ def place_beacon(profile_id: str, body: BeaconCreate) -> dict:
 
 
 @router.get("/profiles/{profile_id}/beacons")
-def list_beacons(profile_id: str) -> list[dict]:
+def list_beacons(profile_id: str, request: Request) -> list[dict]:
+    """Every place this profile has been left. Owner only.
+
+    The rows carry `label` and `location` — free text like "Rosa's garden
+    bench" or "the back table at the Tuesday meeting". That is a list of
+    physical places associated with a person, and it was readable by anybody
+    with the profile id. Scanning one code told you where all the others were.
+    """
     profile_or_404(profile_id)
+    require_owner(profile_id, request)
     rows = db.connect().execute(
         "SELECT * FROM beacons WHERE profile_id=? ORDER BY created_at, rowid",
         (profile_id,)).fetchall()
@@ -156,12 +187,20 @@ def list_beacons(profile_id: str) -> list[dict]:
 
 
 @router.delete("/beacons/{beacon_id}")
-def pick_up_beacon(beacon_id: str) -> dict:
-    """Pick a beacon back up: the placed QR stops summoning."""
+def pick_up_beacon(beacon_id: str, request: Request) -> dict:
+    """Pick a beacon back up: the placed QR stops summoning. Owner only.
+
+    Unauthenticated, this was a way to switch off somebody else's printed
+    stickers — every code they had put up going dead at once, with the paper
+    still on the wall and nothing to see wrong with it.
+    """
     conn = db.connect()
-    if not conn.execute("UPDATE beacons SET active=0 WHERE id=?",
-                        (beacon_id,)).rowcount:
+    row = conn.execute("SELECT profile_id FROM beacons WHERE id=?",
+                       (beacon_id,)).fetchone()
+    if row is None:
         raise HTTPException(404, "beacon not found")
+    require_owner(row["profile_id"], request)
+    conn.execute("UPDATE beacons SET active=0 WHERE id=?", (beacon_id,))
     conn.commit()
     return {"id": beacon_id, "active": False}
 

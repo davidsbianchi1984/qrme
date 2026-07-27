@@ -85,6 +85,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   evidence twice. A `self_asserted` level has no evidence to match on, and that
   limit is stated rather than papered over.
 
+- **Anonymous profiles wear one shared silhouette** — `avatars.SILHOUETTE`.
+  Everybody who is anonymous gets the *same* figure, and the sameness is the
+  feature: a per-profile silhouette, tinted or initialled or generated from the
+  id, would be a stable mark following one person across every surface, which
+  is what an anonymous profile is trying not to have.
+
+  It closed two leaks the flag never touched. A profile that had set a portrait
+  of its own face went on serving that face while its name was withheld — a
+  picture is the strongest identifier on a page. And a profile with *no*
+  portrait fell back to initials drawn from the display name, so hiding the
+  name produced a monogram of it. Substituted in `avatars.render()` rather than
+  at each surface, because 2-D, 3-D, VR, AR, the beacon page and every embed
+  read that one shape, and a surface cannot opt out of a rule it never knew
+  about.
+
+- **Two cards on screen 119 said the rule instead of what it does.** "One
+  badge, not three" only counts if you count the rows above it, and "it says
+  you are one person" parses as the badge making a claim about your personhood.
+  "One at a time, not one forever" is the argument in `qrme/identity.py`
+  compressed into a riddle — fine in a docstring, where the reader came looking
+  for reasoning; useless on a card, where they came to find a control.
+
+- **`docs/beacons.md` walks two placements end to end** — a songwriter's
+  sticker at a concert hall, and an 18+ creator's on a bathroom stall door.
+  Both were chosen because the person scanning is a stranger standing somewhere
+  the creator is not, which is the condition the whole feature has to survive.
+  Writing the second one found three of the defects below.
+
 ### Fixed
 
 - **Anonymity was a label on four surfaces, not a property of the profile.**
@@ -142,6 +170,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   clinician" section added in 0.3.0 and the channel 2 section never reached the
   third repo, so the file that is meant to be byte-identical in three places
   was identical in two. Resynced.
+
+- **Placing a beacon was not owner-only.** Anybody could print stickers
+  pointing at somebody else's profile, in places its owner never chose and
+  could not see — and where a profile is left is a decision about the profile:
+  a recovery sponsor's code belongs at a meeting and not on a billboard.
+  Listing them was public too, and `label`/`location` are free text like "the
+  back table at the Tuesday meeting" — a list of physical places tied to a
+  person, so scanning one code told you where all the others were. And picking
+  one up was unauthenticated, which made it a way to switch off a stranger's
+  printed codes: every one dead at once, paper still on the wall, nothing to
+  see wrong with it.
+
+- **A rated profile could be placed as a shared room.** `docs/beacons.md` has
+  said since the feature shipped that rated placements stay one-to-one — a
+  shared room behind an adult code in a public place is a different product
+  with different moderation questions, strangers who scanned a sticker on a
+  wall in one room together. Nothing enforced it; the combination was reachable
+  by setting a flag, and the only thing in front of it was the age gate on the
+  landing page. Refused now rather than silently downgraded to `chat`, because
+  somebody who asked for a room and quietly got private threads would not find
+  out until the fortieth person was talking to themselves.
 
 - **Nothing tied the README's gallery to the screens on disk** —
   `tests/test_docs_gallery.py`, 3 tests. Three separate defects had already

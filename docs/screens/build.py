@@ -3510,10 +3510,17 @@ SCREENS = [
              s="shown as anonymous persona", pill=("HIDDEN", "info")),
         dict(icon="robot", color="indigo", k="Captain Nobody",
              s="invented — nobody to verify"),
-        dict(icon="shieldok", color="brand", k="One badge, not three",
-             s="it says you are one person"),
-        dict(icon="rotate", color="amber", k="Move it whenever",
-             s="one at a time, not one forever"),
+        # Both of these said the rule instead of saying what it does for you.
+        # "One badge, not three" only counts if you count the rows above it,
+        # and "it says you are one person" parses as the badge making a claim
+        # about your personhood. "One at a time, not one forever" is the
+        # argument in `qrme/identity.py` compressed into a riddle — fine in a
+        # docstring, where the reader came looking for the reasoning; useless
+        # on a card, where they came to find a control.
+        dict(icon="shieldok", color="brand", k="Only one can be verified",
+             s="the badge means this is you"),
+        dict(icon="rotate", color="amber", k="Move it to another",
+             s="yours to move, any time"),
     ], button=("Move the badge", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[

@@ -82,10 +82,30 @@ ASSET_ROUTE = "/portraits"
 # marks are intact is not a trade worth making for a folder layout.
 PHOTO_ROUTE = "/photos"
 
+# The one face every anonymous profile wears, and a third kind of asset again.
+#
+# Not a portrait: nothing generated it, so burning the AI mark into it would be
+# a false statement about a drawing of nobody. Not a photograph either: it
+# depicts no one. It is interface furniture, so it lives apart from both and
+# `asset_is_marked` reports False for it like any other unburned file.
+#
+# **Identical for everybody, on purpose.** A per-profile silhouette — tinted,
+# initialled, or generated from the profile id — would be a stable mark that
+# follows one person across every surface they appear on, which is precisely
+# what an anonymous profile is trying not to have. Two anonymous profiles have
+# to be indistinguishable at a glance, whether or not they are the same person.
+FIGURE_ROUTE = "/figures"
+SILHOUETTE = f"{FIGURE_ROUTE}/silhouette.svg"
+
 
 def portraits_dir():
     from pathlib import Path
     return Path(__file__).resolve().parent / "assets" / "portraits"
+
+
+def figures_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "figures"
 
 
 def photos_dir():
@@ -307,14 +327,35 @@ def render(profile_id: str) -> dict:
     disclosure travels with the asset into every one of them.
     """
     row = db.connect().execute(
-        "SELECT avatar, kind, consent_basis, consent_attestor"
+        "SELECT avatar, kind, anonymous, consent_basis, consent_attestor"
         " FROM profiles WHERE id=?", (profile_id,)).fetchone()
     if row is None:
         return {}
     asset = row["avatar"] or None
+
+    # An anonymous profile gets the silhouette, and gets it *here*.
+    #
+    # Two things were leaking past the flag. A profile that had set a portrait
+    # of its own face went on serving that face — a picture is the strongest
+    # identifier on a page and the flag never touched it. And a profile with no
+    # portrait fell back to initials drawn from the display name, so hiding the
+    # name produced a monogram of it.
+    #
+    # Substituted in `render()` rather than at each surface for the same reason
+    # the AI badge is attached here: 2-D, 3-D, VR, AR, the beacon page and every
+    # embed read this one shape, and "the client forgot" is how a face reaches a
+    # viewer it should not have reached. A surface cannot opt out of this by
+    # not knowing about it.
+    anonymous = bool(row["anonymous"])
+    if anonymous:
+        asset = SILHOUETTE
+
     return {
         "profile_id": profile_id,
         "asset": asset,
+        # Says the picture is not this profile's own, so a surface renders it
+        # as a figure rather than captioning it as somebody's face.
+        "silhouette": anonymous,
         # Whether the disclosure is already in the image itself.
         #
         # QRME's own surfaces composite their badge either way, because theirs
@@ -327,8 +368,10 @@ def render(profile_id: str) -> dict:
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # A portrait with no asset yet is still an answer: surfaces fall back
-        # to initials rather than showing an unbadged placeholder.
-        "placeholder": not row["avatar"],
+        # to initials rather than showing an unbadged placeholder. Never true
+        # for an anonymous profile — the silhouette *is* the picture there, and
+        # falling back would put a monogram of the hidden name on the page.
+        "placeholder": not anonymous and not row["avatar"],
     }
 
 

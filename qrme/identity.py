@@ -77,6 +77,8 @@ REAL_PERSON_KINDS = ("self", "other_person")
 # deciding what to post deserves the limits in the same breath as the promise.
 WITHHELD = (
     "your display name — surfaces show 'anonymous persona' instead",
+    "your picture — you get the same silhouette as everybody else who is "
+    "anonymous, so it identifies nobody and matches no one",
     "your owner account, so two of your profiles cannot be matched to "
     "each other by whoever is reading them",
     "who verified you, if anyone did — the attestor is a pointer back to you",
@@ -86,7 +88,6 @@ WITHHELD = (
 NOT_WITHHELD = (
     "what you write — prose is recognisable to anyone who knows you",
     "your handle, which is how people link to you at all",
-    "your picture, if you set one",
     "who your friends are, and what you post, like and share",
     "anything you say in a room, to the people in that room",
 )

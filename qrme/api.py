@@ -160,6 +160,14 @@ def create_app(pdi_client: PDIClient | None = None,
         from fastapi.staticfiles import StaticFiles
         app.mount(avatar_assets.PHOTO_ROUTE,
                   StaticFiles(directory=str(_photos)), name="photos")
+    # The anonymous silhouette — neither a burned portrait nor a photograph,
+    # so a third mount rather than a file smuggled into either tree. See
+    # avatars.FIGURE_ROUTE.
+    _figures = avatar_assets.figures_dir()
+    if _figures.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.FIGURE_ROUTE,
+                  StaticFiles(directory=str(_figures)), name="figures")
 
     # The studio itself, served from this API so a phone loads the UI and
     # calls the API on one origin (no CORS, nothing to configure). Mounted

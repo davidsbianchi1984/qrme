@@ -17,12 +17,28 @@ def _profile(client, **over):
                              "id_document": "passport", "liveness_check": True}}
     body.update(over)
     created = client.post("/profiles", json=body).json()
+    # Hold the owner capability, so the owner-only calls below (placing a
+    # beacon, listing them, picking one up) authorize. Safe for the scan tests
+    # that assert what a *stranger* sees: `rated.viewer_is_adult` requires an
+    # **interactor** token, so an owner token still meets the age wall — which
+    # is the correct answer anyway, since an owner is not a verified adult
+    # viewer by virtue of owning something.
+    client.headers["authorization"] = f"Bearer {created['owner_token']}"
     return created["id"], created["owner_token"]
 
 
-def _beacon(client, pid, label="stall 3, second floor"):
-    return client.post(f"/profiles/{pid}/beacons",
-                       json={"label": label, "location": "cafe"}).json()
+def _beacon(client, pid, label="stall 3, second floor", token=None, **extra):
+    """Place a beacon as its owner.
+
+    Placing one is owner-only: where a profile is left is a decision about the
+    profile, and it used to be anybody's. `_profile` leaves the owner token on
+    the client, so these calls authorize without passing one — `token` is for
+    the tests that juggle two owners.
+    """
+    body = {"label": label, "location": "cafe", **extra}
+    headers = {"authorization": f"Bearer {token}"} if token else None
+    return client.post(f"/profiles/{pid}/beacons", json=body,
+                       headers=headers).json()
 
 
 def test_the_printed_qr_points_at_the_page_not_the_json(client):
@@ -168,10 +184,9 @@ def test_a_room_beacon_puts_everyone_in_the_same_conversation(client):
     """A sticker at a meeting, a class, a workshop: the people who found the
     same code should be talking to the profile together, not each in their
     own private thread."""
-    pid, _ = _profile(client)
-    b = client.post(f"/profiles/{pid}/beacons",
-                    json={"label": "Tuesday 7pm, church basement",
-                          "mode": "room", "topic": "open share"}).json()
+    pid, token = _profile(client)
+    b = _beacon(client, pid, label="Tuesday 7pm, church basement", token=token,
+                mode="room", topic="open share")
     assert b["mode"] == "room"
     assert b["room_id"]
 
@@ -185,9 +200,8 @@ def test_a_room_beacon_puts_everyone_in_the_same_conversation(client):
 
 def test_the_profile_is_already_in_the_room(client):
     """Nobody should scan a sticker and arrive somewhere empty."""
-    pid, _ = _profile(client)
-    b = client.post(f"/profiles/{pid}/beacons",
-                    json={"label": "studio wall", "mode": "room"}).json()
+    pid, token = _profile(client)
+    b = _beacon(client, pid, label="studio wall", token=token, mode="room")
     seats = db.connect().execute(
         "SELECT kind, ref_id FROM room_participants WHERE room_id=?",
         (b["room_id"],)).fetchall()
@@ -197,29 +211,89 @@ def test_the_profile_is_already_in_the_room(client):
 def test_chat_stays_the_default(client):
     """Placing a beacon without asking for a room keeps the private
     conversation every existing beacon has."""
-    pid, _ = _profile(client)
-    b = client.post(f"/profiles/{pid}/beacons", json={"label": "bench"}).json()
+    pid, token = _profile(client)
+    b = _beacon(client, pid, label="bench", token=token)
     assert b["mode"] == "chat" and b["room_id"] is None
     assert "Talk to Marcus" in client.get(f"/b/{b['id']}").text
 
 
 def test_the_room_topic_falls_back_to_the_label(client):
-    pid, _ = _profile(client)
-    b = client.post(f"/profiles/{pid}/beacons",
-                    json={"label": "front counter", "mode": "room"}).json()
+    pid, token = _profile(client)
+    b = _beacon(client, pid, label="front counter", token=token, mode="room")
     topic = db.connect().execute("SELECT topic FROM rooms WHERE id=?",
                                  (b["room_id"],)).fetchone()["topic"]
     assert topic == "front counter"
 
 
-def test_a_rated_room_beacon_still_walls(client):
-    """Shared mode does not open a side door around the age gate."""
-    pid, _ = _profile(client, adult_mode=True)
-    b = client.post(f"/profiles/{pid}/beacons",
-                    json={"label": "backstage", "mode": "room"}).json()
-    r = client.get(f"/b/{b['id']}")
-    assert "18+ only" in r.text
-    assert b["room_id"] not in r.text
+def test_a_rated_beacon_cannot_be_a_shared_room_at_all(client):
+    """This used to be allowed and then walled, and the wall was doing work it
+    should never have been asked to do.
+
+    `docs/beacons.md` has said since the feature shipped that rated placements
+    stay one-to-one — a shared room behind an adult code in a public place is
+    a different product with different moderation questions: strangers who
+    scanned a sticker on a wall, in one room together, with rated material
+    between them. Nothing enforced it, so the combination was reachable by
+    setting a flag, and the only thing standing in front of it was an age gate
+    on the landing page.
+
+    Refused rather than quietly downgraded to `chat`: somebody who asked for a
+    room and silently got private threads would not find out until the
+    fortieth person was talking to themselves.
+    """
+    pid, token = _profile(client, adult_mode=True)
+    r = client.post(f"/profiles/{pid}/beacons",
+                    json={"label": "backstage", "mode": "room"},
+                    headers={"authorization": f"Bearer {token}"})
+    assert r.status_code == 422
+    assert "one-to-one" in r.json()["detail"]
+
+    # And the ordinary rated placement still walls, as it always did.
+    b = _beacon(client, pid, label="backstage", token=token)
+    assert "18+ only" in client.get(f"/b/{b['id']}").text
+
+
+def test_only_the_owner_decides_where_a_profile_is_left(client):
+    """It was anybody's. A stranger could print stickers pointing at somebody
+    else's profile, in places its owner never chose and could not see — and
+    where a profile is left is a decision about the profile. A recovery
+    sponsor's code belongs at a meeting and not on a billboard."""
+    pid, _ = _profile(client)
+    r = client.post(f"/profiles/{pid}/beacons", json={"label": "anywhere"},
+                    headers={"authorization": ""})
+    assert r.status_code == 401
+
+    other, other_token = _profile(client, owner_id="o2",
+                                  display_name="Someone Else")
+    r = client.post(f"/profiles/{pid}/beacons", json={"label": "anywhere"},
+                    headers={"authorization": f"Bearer {other_token}"})
+    assert r.status_code == 403
+
+
+def test_where_a_profile_has_been_left_is_not_public(client):
+    """`label` and `location` are free text like "the back table at the
+    Tuesday meeting" — a list of physical places associated with a person,
+    readable by anybody holding the profile id. Scanning one code told you
+    where all the others were."""
+    pid, _ = _profile(client)
+    _beacon(client, pid, label="the back table, Tuesday meeting")
+    assert client.get(f"/profiles/{pid}/beacons",
+                      headers={"authorization": ""}).status_code == 401
+    mine = client.get(f"/profiles/{pid}/beacons")
+    assert mine.status_code == 200
+    assert mine.json()[0]["label"] == "the back table, Tuesday meeting"
+
+
+def test_a_stranger_cannot_switch_off_your_stickers(client):
+    """Unauthenticated, picking one up was a way to kill somebody else's
+    printed codes — every one going dead at once, with the paper still on the
+    wall and nothing to see wrong with it."""
+    pid, _ = _profile(client)
+    bid = _beacon(client, pid)["id"]
+    assert client.delete(f"/beacons/{bid}",
+                         headers={"authorization": ""}).status_code == 401
+    assert client.get(f"/b/{bid}").status_code == 200      # still live
+    assert client.delete(f"/beacons/{bid}").status_code == 200
 
 
 def test_the_call_to_action_survives_an_honorific(client):
@@ -312,8 +386,11 @@ def test_the_card_says_whether_the_portrait_already_carries_the_mark(client):
     from qrme import seed
     seed.seed()
     pid = client.get("/summon?ref=@otis_marsh").json()["profile"]["profile_id"]
-    b = client.post(f"/profiles/{pid}/beacons",
-                    json={"label": "the shop counter"}).json()
+    # A seeded starter's owner token is never handed out, so mint one — this
+    # test is about what the card reports, not about who may place a beacon.
+    from qrme import auth
+    b = _beacon(client, pid, label="the shop counter",
+                token=auth.issue("owner", pid))
     card = client.get(f"/b/{b['id']}/card").json()
     assert card["portrait"].endswith("/portraits/otis_marsh.webp")
     assert card["portrait_marked"] is True

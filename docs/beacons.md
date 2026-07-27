@@ -99,6 +99,78 @@ that a profile is most useful exactly where its subject already comes up:
 Any profile can be placed anywhere; nothing in the code ties an industry to a
 location. The table is a suggestion about where a profile earns its keep.
 
+### Two placements, end to end
+
+The table above is a list. These are the two that show what the feature
+actually has to survive, because in both of them the person scanning is a
+stranger standing somewhere the creator is not.
+
+#### The songwriter at the concert hall
+
+Otis has a set on Friday. He prints a sticker and puts it on the merch table
+and inside the stairwell to the balcony, where people queue.
+
+```bash
+curl -X POST $QRME/profiles/$OTIS/beacons \
+  -d '{"label":"merch table, Friday","mode":"room","topic":"after the set"}'
+```
+
+`mode: room` is the whole choice here. A **chat** beacon gives every scanner
+their own private conversation, which for a Q&A after a set is forty people
+each asking the same question into forty separate rooms. A **room** beacon
+mints one shared room with the profile already in it, so everyone who scans
+the same sticker is in the same conversation — they can see each other's
+questions, and the answers land once.
+
+The room page says *"you may not be the only one here"* before anybody types.
+A stranger who scanned a sticker on a wall has no way of knowing which of the
+two they walked into, and a shared room is a different thing to enter than a
+private chat.
+
+What the scanner gets, without an account and without knowing what QRME is:
+the portrait with **the AI mark burned into the pixels**, so a screenshot of
+it still carries the disclosure; the profile's page; and the room. When Otis
+peels the sticker off on Saturday, the beacon reports itself picked up rather
+than 404ing — stickers outlive the things behind them, and a code someone
+scans next month should say so in a sentence instead of looking broken.
+
+#### The 18+ creator, and a sticker in a bathroom stall
+
+The interesting case, because it is the one where the ordinary path and the
+dangerous path are the same path. A creator with a rated (18+) profile puts a
+QR sticker on the inside of a stall door in a men's room. It will be scanned
+by strangers, some of them not adults, and neither the creator nor QRME is
+standing there to check.
+
+The design answer is that **the sticker cannot carry anything to leak.**
+
+- **The beacon card contains neither the name nor the portrait.** For a rated
+  placement the payload is `age_wall: true` and nothing else — so the camera
+  overlay can draw the wall having never held a face, a handle, or a blurb.
+  There is no rated content on the sticker for a wrong scan to reveal, because
+  the sticker was never given any.
+- **The age wall is the ordinary path, not the failure path.** A stranger who
+  scanned a sticker has no token, so the age check can *never* pass on a first
+  scan. That is not an edge case to handle — it is what every public rated
+  beacon does every time, and the wall is built as the normal first screen
+  rather than as an error.
+- **The wall says the check happens at QRME**, not at whoever put the sticker
+  up. A stranger has no reason to trust a code on a door, and telling them
+  where verification actually occurs is the difference between a gate and a
+  phishing page shaped like one.
+- **Rated placements stay one-to-one.** `mode: room` is refused for them. A
+  shared room behind an adult QR at a public venue is a different product with
+  different moderation questions, and not something anybody should acquire by
+  accident because a flag defaulted.
+
+The creator gets what they came for — a code that turns a wall into a way to
+find them — and the only thing a wrong scanner reaches is a wall that names
+nobody.
+
+Both of these are also why `docs/beacons.md` keeps saying *stranger* rather
+than *user*. Everything on the far side of a printed code is somebody with no
+account, no context, and no reason to have read anything.
+
 **Placing a beacon for someone else's benefit carries obligations.** A code
 in a clinic waiting room or at a recovery meeting will be scanned by people
 in a bad hour. The mental-health profiles keep crisis escalation local and
