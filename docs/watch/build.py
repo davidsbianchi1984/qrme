@@ -48,7 +48,12 @@ def head(num, title, accent="brand"):
          f'viewBox="0 0 {W} {H}" role="img" aria-label="{esc(title)} watch screen">']
     o.append(f'''<defs>
       <linearGradient id="gScr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{C['scrA']}"/><stop offset="1" stop-color="{C['scrB']}"/></linearGradient>
-      <linearGradient id="gFrame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{C['frameA']}"/><stop offset="1" stop-color="{C['frameB']}"/></linearGradient>
+      <!-- The case gets its own gradient rather than the phone's. QRME's
+           frameA (#2a2352) is *lighter* than the screen, which on a phone
+           reads as the metal band catching the light and on a watch reads as
+           a purple glow behind the whole device. A case is darker than the
+           display it surrounds. -->
+      <linearGradient id="gFrame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#141029"/><stop offset="1" stop-color="#07050f"/></linearGradient>
       <linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{C['card']}"/><stop offset="1" stop-color="{C['card2']}"/></linearGradient>
       <linearGradient id="gBrand" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{C['brandA']}"/><stop offset="1" stop-color="{C['brandB']}"/></linearGradient>
       <linearGradient id="mV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="{C['brandA']}"/><stop offset="1" stop-color="{C['brandB']}"/></linearGradient>
@@ -59,7 +64,8 @@ def head(num, title, accent="brand"):
     # crown + side button on the right
     o.append(rrect(CAX + CAW - 2, 118, 7, 34, 3, "#333c52"))
     o.append(rrect(CAX + CAW - 1, 160, 5, 26, 2, "#2a3145"))
-    o.append(rrect(CAX, CAY, CAW, CAH, 60, "url(#gFrame)"))
+    o.append(rrect(CAX, CAY, CAW, CAH, 60, "url(#gFrame)",
+                   "rgba(255,255,255,0.10)", 1))
     o.append(rrect(SXX, SYY, SWW, SHH, 48, "url(#gScr)"))
     o.append(text(SXX + SWW - 14, SYY + 24, "10:09", 11, ac, 700, "end"))
     o.append(text(PADX, SYY + 24, title, 13, C["txt"], 700, spacing=-0.2))
