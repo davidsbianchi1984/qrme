@@ -1,62 +1,79 @@
-# QRME v0.3.2 — release notes
+# QRME v0.3.3 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.3.2` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.3.3` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.3.2** — the release where the starter collection stopped looking like
-a directory. One of three interoperating products (with
+**QRME v0.3.3** — the release where an agent working on its own stopped being
+something you had to go and check. One of three interoperating products (with
 [jim-mini](https://github.com/davidsbianchi1984/jim-mini) and
 [pdi](https://github.com/davidsbianchi1984/pdi)), all three cut together at this
 version.
 
-### The starter gallery shows each profile's own front page
+### One question, answered everywhere
 
-It used to be a portrait with a name and an industry captioned under it. That is
-a directory listing, not a profile — screen 80 gives a starter an avatar bubble,
-a role, **the rating people who talked to it left**, skill chips, Memory /
-Relationships / Engagement, a career, a review, and a **Talk to** button. The
-page was showing two of those.
+An agent off doing work raises one question, and it is not *what phase is it
+in*. It is **does this need me right now?** Three colours answer it:
 
-It was also **five columns wide** — roughly 590px of content on a phone that
-offers 390 — so on mobile the fourth column was sliced mid-word and the fifth
-never appeared. Every starter past the third was unreachable to anybody reading
-on a phone, which is most people. Two columns of whole cards fit, checked by
-rendering the real markup at 390px rather than by arithmetic.
+| | | |
+| --- | --- | --- |
+| 🟢 **green** | working · done | in progress, or finished. Nothing wanted from you |
+| 🟡 **amber** | needs you | it has stopped and is waiting on a person |
+| 🔴 **red** | stopped | it hit an error or was cancelled, and will not continue |
 
-Generated from `qrme/seed.py`, not hand-written: the old gallery was a second
-copy of the starter list maintained by hand and could drift from it silently.
-Adding a starter without a role line is now a build error rather than a blank
-cell, and both tools have a `--check` mode.
+The word rides with the colour, because green alone cannot separate an agent
+that is still going from one that has finished — and those call for opposite
+reactions.
 
-Careers and reviews are written, like the personas themselves — these are
-invented experts, so a CV is characterisation of the kind the bio already is,
-and each is drawn from that starter's own bio so the two cannot contradict each
-other. The rating and the three tiles are the app's own sample values, identical
-on every card: a freshly seeded starter has zero of each, so 34 cards reading
-*4.0 · 37 reviews* is self-evidently a template, and the README says so.
+### Derived, never stored
 
-### Fixed
+There is no `light` column and nothing sets one. It is computed in the single
+function every workflow read passes through, so a row cannot be persisted with
+a light that disagrees with its own status. A second field naming the same fact
+is a second field that can disagree with the first, and the one a screen reads
+would be the one nobody remembers to update. A test asserts the column does not
+exist.
 
-**The rated starter was the only profile with no source material at all.** 0.3.1
-grounded every starter in its industry's Field Pack and left Vivienne Sable out,
-under a rule that ran two things together: the age wall governs *who may talk to
-her*, and was never a reason for her to know less about her own subject.
+An unrecognised status **raises rather than defaulting**. A default would paint
+an unknown state green, and green is the colour that means *ignore me* — the
+one failure this must not have.
 
-The **Cabaret & Burlesque Field Pack** is theatre history and stagecraft — the
-Ziegfeld era, the Parisian revues, and why a tease is a rhythm problem. Free and
-unrated like the other 33, so it reaches her through the existing path with no
-change to `_ground()`. Seeding now reports `grounded: 34`, where it reported 33.
+### Three surfaces, doing three different jobs
 
-Deliberately **not** the same thing as the $6.99 age-gated *After Dark Companion
-Pack*, which is conversational craft sold to owners of any adult-mode persona
-and never auto-installed. A test pins both so they cannot be merged by accident.
+**The watch** shows three lights and three counts and **no agent names**.
+Naming them was the first cut and was wrong: a name is something you read, and
+reading is the thing a glance cannot do. Which agent went amber is a question
+for the app, where there is room to answer it.
 
-**A test was asserting the gap into place.**
-`test_starter_packs_cover_every_industry` compared the pack list against
-`STARTERS` and not `STARTERS + RATED`, so the check that existed to catch a
-missing pack would have gone on passing forever with her ungrounded.
+**Screen 82** folds every agent into one tappable group per light. Somebody
+opening it *because* amber appeared should not have to scan a flat list for the
+one that changed.
+
+**The overlay** rides over an ordinary screen, and over **every** desktop view.
+This is the piece that makes the rest useful: an agent that reports only on its
+own screen is one you have to remember to go and check, and amber and red are
+exactly the states nobody thinks to look for. Desktop users have no wrist to
+glance at, which is why it is on every view rather than one.
+
+It is shaped like the watch face rather than as a bar across the screen — a
+small translucent box in the bottom-right, three stacked rows, each its own tap
+target. A bar reads as chrome and cuts the content in half; a corner box reads
+as something floating above the work, which is what it is.
+
+### The README leads with the screens now
+
+Everything you can look at is above everything you have to read, and the
+run / config material is gathered under one **Reference** heading at the bottom
+— so a command spotted in a screenshot has one place to go and look it up.
+Those tables are set smaller, because they are for looking things up in rather
+than reading through.
+
+### Also in this release
+
+- A group subtitle that ran under the chevron is fixed, and the builder now
+  length-guards them — the bug was visible in a render and invisible in the
+  source, which is how it survived being written.
 
 ### Money here is still simulated
 
@@ -67,14 +84,13 @@ its own body. [docs/commerce.md](docs/commerce.md) lists what is absent.
 
 ### Verification
 
-624 tests green (2 new). 211 routes. Both generators idempotent under `--check`.
-All 34 cards clear their content by exactly 16px, checked across every file
-rather than eyeballed on one.
+633 tests green (9 new). 212 routes. Both starter generators idempotent under
+`--check`.
 
 ### Install
 
 Download the installer for your OS from the assets below (built by the
-`desktop-release` workflow from the `app-v0.3.2` tag), run `python -m qrme`
+`desktop-release` workflow from the `app-v0.3.3` tag), run `python -m qrme`
 and pick your device, or open it on your phone — see the README.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md
