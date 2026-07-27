@@ -280,6 +280,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="210" alt="Game Lobby"></a><br><sub><b>122</b> · Game Lobby</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="210" alt="Masked and Real"></a><br><sub><b>123</b> · Masked and Real</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/124-your-background.svg"><img src="docs/screens/124-your-background.svg" width="210" alt="Your Background"></a><br><sub><b>124</b> · Your Background</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1144,13 +1149,83 @@ connection, or your own stream.
   </tr>
 </table>
 
-**A live desk can never wear one**, and this is the sharp case. A desk's badge
-reads *"Live person — not AI"* and its whole premise is that a real human is
-behind it — the badge is **inverted** precisely because there is a person
-there. Put a character over that face and the badge becomes a false statement,
-made by the platform, on the one surface whose entire value is that the
-statement is true. The overlay is refused rather than the badge weakened,
-because a desk that cannot promise a real person is not a desk.
+### A live desk wears one, and the badge stays true
+
+This was refused at first, and the refusal was wrong. The reasoning was that a
+character over the face makes *"Live person — not AI"* a false statement — but
+that conflates two different claims. The badge does not say *this face is
+unmodified*. It says **a real person is behind this**, which is exactly as true
+of somebody in a mask as of somebody without one. **A costume is not a
+synthesis.** Refusing it protected nothing and cost the people who most need to
+work without showing their face.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="200" alt="Masked and real"></a><br><sub><b>123</b> · both facts, equally weighted</sub></td>
+    <td width="66%" valign="top">
+
+`GET /desks/{id}/live-person` returns the pair, and the pair **is** the
+disclosure:
+
+> **Live person — not AI · wearing The Wolf**
+> *a real person is behind this stream and they are wearing something over
+> their face. The costume is not AI, and neither is the person under it.*
+
+Either half alone is a different and wrong claim. "Real person" over a mask
+invites the reading that the mask is their face; "wearing an overlay" without
+it invites the reading that the whole picture is generated — the opposite
+error, and the one this platform exists to prevent. So neither half is
+available on its own.
+
+  </td>
+  </tr>
+</table>
+
+**The mark is bound to the account that owns the stream.** It is read from the
+desk row and its attestation, never accepted from a client, so a stream that
+never earned the badge cannot paste it on — the same reason the AI mark is
+burned into a portrait rather than composited by whoever happens to be
+rendering it. A desk with no attestation gets no mark rather than a weaker one.
+
+The *not AI* half is never softened by the overlay, and must not be. What is
+behind the camera is a person either way, which is the only thing that badge
+ever claimed.
+
+### Backgrounds: yours, imported, or generated
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/124-your-background.svg"><img src="docs/screens/124-your-background.svg" width="200" alt="Your background"></a><br><sub><b>124</b> · the room is a separate claim from the face</sub></td>
+    <td width="66%" valign="top">
+
+| source | what it means | synthetic |
+| --- | --- | --- |
+| `own` | a photo they took or already had | no |
+| `imported` | an image brought in from elsewhere | no |
+| `generated` | an AI-generated scene | **yes** |
+| `blur` | their real room, blurred | no |
+
+  </td>
+  </tr>
+</table>
+
+**An AI-generated background is synthetic media**, and the person in front of
+it being real does not make the room real. The disclosure says both, in that
+order — *"their own face, unaltered — the background behind them is
+AI-generated"* — because the viewer is deciding about the person, and the room
+is the part that was made.
+
+The `kind` says what happened to your face; `source` says what happened to the
+room. A single "filter applied" would run the two together, so `source` is
+**required** on a backdrop and **refused** on anything that covers a face: a
+background silently recorded as `own` when it was generated is exactly the
+disclosure this feature exists to make, and a claim about a background is
+meaningless on a mask.
+
+**An imported image needs the rights to it** — asked rather than guessed, for
+the same reason as the face question. Nothing here can look at a file and know
+who owns it, so the one answer with an obvious consequence is the one that is
+enforced.
 
 **No overlay may depict a real, identifiable person.** A live-driven likeness
 of somebody who is not in the room is the exact artefact this codebase argues
@@ -1215,10 +1290,33 @@ single line says. The cap counts the host because counting only the table would
 let the limit sit one higher than the number the roster actually shows — the
 sort of off-by-one that turns a stated limit into a lie about itself.
 
+**No synthetic member ever occupies a player slot**, and a console of its own
+does not change that.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="200" alt="Never a player"></a><br><sub><b>125</b> · the workaround, refused by name</sub></td>
+    <td width="66%" valign="top">
+
+`teammate` is the seat that means *in the match, on the roster, taking a slot*,
+and nothing synthetic may hold one — checked in `gamelobby.seat`, not left to a
+prompt to honour, because the entire point of the rule is that it survives a
+model deciding otherwise. The seats beside the players stay open: companion,
+practice partner, coach, spotter, archivist.
+
+And `own_hardware` closes the obvious way round *"no automation"*, which is to
+stop calling it automation: **a second machine moves where a bot runs, it does
+not turn the bot into a player.** No console, PC, handheld or separate instance
+makes a synthetic member eligible for a two-, three- or any-player game.
+
+  </td>
+  </tr>
+</table>
+
 **Nothing here can act in a game.** Members observe and they talk. There is no
-input, no aim, no macro, no automation, no exploit — published by name in
-`gamelobby.NEVER`, and a test asserts no function in either module is named for
-any of them. *"We did not add that"* is a fact about today; the test is what
+input, no aim, no macro, no automation, no exploit, no player slot and no
+hardware route to one — published by name in `gamelobby.NEVER`, and a test
+asserts no function in either module is named for any of them. *"We did not add that"* is a fact about today; the test is what
 makes it a fact about tomorrow. The difference between a coach and a cheat is
 exactly that line.
 

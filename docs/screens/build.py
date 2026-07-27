@@ -3552,8 +3552,8 @@ SCREENS = [
              s="they see the name, not a face"),
         dict(icon="warn", color="red", k="Never a real person",
              s="no likeness of anybody real"),
-        dict(icon="shield", color="amber", k="Never on a live desk",
-             s="that badge says a real person"),
+        dict(icon="shieldok", color="green", k="Live person — not AI",
+             s="the badge stays, mask and all"),
     ], button=("Take it off", "amber")),
     # The lobby. Every row says what it is — that is the screen's whole job,
     # and it is why the human row is drawn identically to the synthetic ones
@@ -3572,6 +3572,52 @@ SCREENS = [
         dict(icon="shieldok", color="brand", k="Nothing here plays",
              s="they observe and talk, that is all"),
     ], button=("Seat another", "brand")),
+    # The desk badge with a mask on it. The screen exists because the pair is
+    # the disclosure: either line alone is a different and wrong claim, so the
+    # first two cards are deliberately adjacent and equally weighted.
+    dict(num=123, title="Masked and Real", sub="A live desk keeps its badge",
+         accent="green", tab=3, cards=[
+        dict(icon="shieldok", color="green", k="Live person, not AI",
+             s="a costume is not a synthesis", pill=("REAL", "good")),
+        dict(icon="mask", color="pink", k="Wearing The Wolf",
+             s="and the viewer is told both", pill=("WORN", "info")),
+        dict(icon="lock", color="cyan", k="Tied to your account",
+             s="no one else can paste it on"),
+        dict(icon="eye", color="brand", k="Shown on the stream",
+             s="not buried in a settings page"),
+        dict(icon="person", color="amber", k="Still a person behind it",
+             s="that is all the badge ever said"),
+    ], button=("Change the mask", "brand")),
+    # Backgrounds, and the third card is the whole reason this is not just a
+    # picker: a generated room is synthetic media even when the face is not.
+    dict(num=124, title="Your Background", sub="Yours, imported, or generated",
+         accent="cyan", tab=3, cards=[
+        dict(icon="photo", color="cyan", k="Your kitchen",
+             s="your own photo, no mark needed", pill=("ON", "good")),
+        dict(icon="link", color="indigo", k="Imported image",
+             s="you need the rights to it"),
+        dict(icon="brain", color="pink", k="A generated scene",
+             s="AI-made — and it says so", pill=("AI", "info")),
+        dict(icon="eye", color="brand", k="Blur your real room",
+             s="the room you are really in"),
+        dict(icon="person", color="green", k="Your face is untouched",
+             s="only what is behind you changed"),
+    ], button=("Change background", "brand")),
+    # The hardware answer to the fair-play rule, refused on its own screen
+    # because it is the workaround somebody will actually propose.
+    dict(num=125, title="Never a Player", sub="Synthetic members sit beside you",
+         accent="red", tab=3, cards=[
+        dict(icon="warn", color="red", k="Never a player slot",
+             s="they never take a slot"),
+        dict(icon="cross", color="red", k="Not from its own console",
+             s="a second machine is still a bot"),
+        dict(icon="people", color="green", k="Beside the players",
+             s="coach, spotter, archivist"),
+        dict(icon="chat", color="cyan", k="They observe and talk",
+             s="that is the whole capability"),
+        dict(icon="shieldok", color="brand", k="Checked, not promised",
+             s="the code refuses, not the prompt"),
+    ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

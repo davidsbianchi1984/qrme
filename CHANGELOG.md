@@ -85,6 +85,42 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   evidence twice. A `self_asserted` level has no evidence to match on, and that
   limit is stated rather than papered over.
 
+- **A live desk wears an overlay and keeps its badge.** This was refused in
+  this same branch, and the refusal was wrong: it conflated *this face is
+  unmodified* with *a real person is behind this*, and only the second is what
+  `desks.DESIGNATION` ever claimed. A costume is not a synthesis. Refusing it
+  protected nothing and cost the people who most need to work without showing
+  their face.
+
+  `GET /desks/{id}/live-person` returns the pair, and the pair **is** the
+  disclosure — *"Live person — not AI · wearing The Wolf"*. Either half alone
+  is a different and wrong claim: "real person" over a mask invites the reading
+  that the mask is their face; "wearing an overlay" without it invites the
+  reading that the whole picture is generated, which is the opposite error and
+  the one this platform exists to prevent. So neither is available on its own.
+  The mark is read from the desk row and its attestation, never accepted from a
+  client, so a stream that never earned it cannot paste it on.
+
+- **Backgrounds: your own, imported, or AI-generated** — screen 124. `kind`
+  says what happened to your face; the new `source` says what happened to the
+  room, and a single "filter applied" would run the two together. **A generated
+  background is synthetic media** even though the person in front of it is
+  real, and the disclosure says both in that order — the viewer is deciding
+  about the person, and the room is the part that was made. `source` is
+  required on a backdrop and refused on anything covering a face, and an
+  imported image has to be one the wearer holds the rights to — asked rather
+  than guessed, like the face question.
+
+- **No synthetic member ever occupies a player slot** — screen 125. `teammate`
+  is the seat that means *in the match, taking a slot*, and nothing synthetic
+  may hold one; checked in `gamelobby.seat` rather than left to a prompt,
+  because the point of the rule is that it survives a model deciding otherwise.
+  `own_hardware` closes the obvious way round *"no automation"*, which is to
+  stop calling it automation: **a second machine moves where a bot runs, it
+  does not turn the bot into a player.** No console, PC, handheld or separate
+  instance makes a synthetic member eligible for a two-, three- or any-player
+  game.
+
 - **More than one synthetic thing in a game session** — `qrme/gamelobby.py`,
   5 routes, 19 tests, screen 122. `game_sessions` seats exactly one profile;
   this is the roster beside the real players — other profiles, and running

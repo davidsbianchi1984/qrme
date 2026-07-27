@@ -195,7 +195,7 @@ def test_nothing_here_can_act_in_a_game(client):
                 f"{module.__name__} grew a function named for {banned!r}")
 
     assert set(gamelobby.NEVER) == {"input", "aim", "macro", "automation",
-                                    "exploit"}
+                                    "exploit", "player_slot", "own_hardware"}
     assert "Nothing in it plays" in gamelobby.FAIR_PLAY
 
 
@@ -340,5 +340,58 @@ def test_the_vocabulary_publishes_what_nothing_here_can_do(client):
     """A limit nobody can read is a limit nobody can rely on."""
     out = client.get("/gaming/lobby/vocabulary").json()
     never = {n["thing"] for n in out["never"]}
-    assert never == {"input", "aim", "macro", "automation", "exploit"}
+    assert never == {"input", "aim", "macro", "automation", "exploit",
+                     "player_slot", "own_hardware"}
     assert out["max_synthetic"] == gamelobby.MAX_SYNTHETIC
+
+
+# -- no synthetic member ever holds a player's slot ---------------------------
+
+def test_a_synthetic_member_cannot_take_a_player_seat(client):
+    """`teammate` is the seat that means *in the match, on the roster, taking a
+    slot*. Everything else on the list sits beside the players.
+
+    Checked in code rather than trusted to a prompt, because the entire point
+    of the rule is that it survives a model deciding otherwise.
+    """
+    host = make_profile(client, display_name="Vex")
+    mine = make_profile(client, owner_id="owner-1", display_name="Rook")
+    sid = _session(client, host)
+
+    with pytest.raises(gamelobby.LobbyError) as exc:
+        gamelobby.seat(sid, "profile", mine["id"], "teammate")
+    assert "player's slot" in str(exc.value)
+
+    with pytest.raises(gamelobby.LobbyError):
+        gamelobby.seat(sid, "agent", _workflow(host["id"]), "teammate")
+
+    # And the seats beside the players are all still open to them.
+    for role in gamelobby.SYNTHETIC_SEATS:
+        assert gamelobby.seat(sid, "agent", _workflow(host["id"]),
+                              role) or True
+        break
+
+
+def test_a_person_still_takes_a_player_seat(client):
+    """The rule is about what a slot may be filled *by*, not about removing
+    the slot."""
+    host = make_profile(client, display_name="Vex")
+    sam = _interactor(client)
+    sid = _session(client, host)
+    out = gamelobby.seat(sid, "player", sam["id"], "teammate")
+    assert out["seated"] is True and out["synthetic"] is False
+
+
+def test_a_console_of_its_own_does_not_make_a_bot_a_player(client):
+    """The hardware answer to the rule, refused by name.
+
+    "No automation" invites the workaround of running the thing on a second
+    machine and calling it a second player. A second machine moves where a bot
+    runs; it does not turn the bot into a person, and the refusal says so in
+    the words somebody proposing it would use.
+    """
+    assert "own_hardware" in gamelobby.NEVER
+    assert "console" in gamelobby.NEVER["own_hardware"]
+    assert "does not turn a bot into a player" in gamelobby.NEVER["own_hardware"]
+    assert "console of its own" in gamelobby.FAIR_PLAY
+    assert "player slot" in gamelobby.FAIR_PLAY

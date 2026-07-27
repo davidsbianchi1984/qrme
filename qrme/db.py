@@ -235,7 +235,7 @@ CREATE INDEX IF NOT EXISTS idx_place_mics_live
 CREATE TABLE IF NOT EXISTS overlays (
     id            TEXT PRIMARY KEY,
     interactor_id TEXT NOT NULL,
-    surface       TEXT NOT NULL,   -- room | party | connection | stream
+    surface       TEXT NOT NULL,   -- room | party | connection | stream | desk
     surface_id    TEXT NOT NULL,
     -- mask | character | creature | puppet | helmet_hud | touch_up | backdrop.
     -- See qrme/overlays.py:KINDS — the ones that cover a face are disclosed
@@ -244,6 +244,16 @@ CREATE TABLE IF NOT EXISTS overlays (
     kind          TEXT NOT NULL,
     title         TEXT NOT NULL,   -- shown to everyone who can see the wearer
     asset         TEXT,
+    -- Where the picture behind them came from: own | imported | generated |
+    -- blur. Only meaningful for `backdrop`. `generated` is synthetic media
+    -- even though the person in front of it is real, and the two are disclosed
+    -- separately because they are separate claims.
+    --
+    -- Added to the CREATE rather than by an ALTER because this table has never
+    -- been in a release — it was introduced earlier in this same unreleased
+    -- branch, so no deployment has it. A working copy that ran the
+    -- intermediate commit needs its dev database recreated.
+    source        TEXT,
     worn_at       TEXT NOT NULL,
     removed_at    TEXT
 );

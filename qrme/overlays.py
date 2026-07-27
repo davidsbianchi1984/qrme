@@ -25,13 +25,26 @@ a refusal. A live-driven likeness of somebody who is not in the room is the
 exact artefact this whole codebase argues against, and "it was only a filter"
 is how it would arrive. :data:`REFUSED` names the classes with the reason.
 
-**A live desk cannot wear one at all.** This is the sharp case. A desk's badge
-reads *"Live person — not AI"* (``desks.DESIGNATION``) and its whole premise is
-that a real human is behind it — the badge is inverted precisely because there
-is a person there. Put a character over that face and the badge becomes a false
-statement, made by the platform, on the one surface whose entire value is that
-the statement is true. The overlay is refused rather than the badge weakened,
-because a desk that cannot promise a real person is not a desk.
+**A live desk may wear one, and the badge stays true.** This was refused at
+first, on the reasoning that a character over the face makes ``desks.DESIGNATION``
+— *"Live person — not AI"* — a false statement. That conflated two different
+claims. The badge does not say *this face is unmodified*; it says **a real
+person is behind this**, which is exactly as true of somebody in a mask as of
+somebody without one. A costume is not a synthesis. Refusing it protected
+nothing and cost the one group who most need to work without showing their
+face.
+
+So the desk keeps its badge and the overlay rides beside it, and the pair is
+the disclosure: :func:`live_person_mark` states both facts at once — *a real
+person, and they are wearing something.* Neither half is any use alone. "Real
+person" over a mask invites the reading that the mask is their face; "wearing
+an overlay" without the first invites the reading that the whole thing is
+generated.
+
+**The mark is bound to the account that owns the stream.** It is issued
+against the desk, not asserted by the client, so it cannot be pasted onto a
+stream that never earned it — the same reason the AI mark is burned into a
+portrait rather than composited by whoever renders it.
 
 Rendering is on the device, like capture. What lives here is which overlay a
 person is wearing where, what it is allowed to be, and what every viewer must
@@ -91,15 +104,31 @@ SURFACES: dict[str, str] = {
     "party": "a watch party",
     "connection": "a one-to-one connection",
     "stream": "your own posted video or live session",
+    "desk": "a live desk's stream — the badge stays, see live_person_mark",
 }
 
-# The one surface that may never wear one, and why. Kept as data rather than an
-# `if` so the refusal can be published with its reason.
-FORBIDDEN_SURFACES: dict[str, str] = {
-    "desk": "a live desk's badge reads 'Live person — not AI' and its whole "
-            "premise is that a real human is behind it. A character over that "
-            "face makes the badge a false statement, on the one surface whose "
-            "value is that it is true",
+# Nowhere is forbidden any more. Kept as an empty mapping rather than deleted
+# because the refusal machinery is the right shape and the next surface that
+# genuinely cannot carry a disclosure should land here rather than in an `if`.
+FORBIDDEN_SURFACES: dict[str, str] = {}
+
+# Where the picture behind you came from. The kind says what happened to your
+# face; this says what happened to the room, and they are separate claims that
+# a single "filter applied" would run together.
+#
+# `generated` is the one that matters. An AI-generated background **is**
+# synthetic media, and the fact that the person in front of it is real does not
+# make the room real. Both get said, in that order, because the person is the
+# thing a viewer is deciding about.
+BACKDROP_SOURCES: dict[str, dict] = {
+    "own": {"synthetic": False,
+            "means": "a photo they took or already had"},
+    "imported": {"synthetic": False,
+                 "means": "an image they brought in from somewhere else"},
+    "generated": {"synthetic": True,
+                  "means": "an AI-generated scene"},
+    "blur": {"synthetic": False,
+             "means": "their real room, blurred"},
 }
 
 MAX_PER_SURFACE = 1
@@ -114,14 +143,18 @@ def catalogue() -> dict:
     return {
         "kinds": [{"kind": k, **v} for k, v in KINDS.items()],
         "surfaces": [{"surface": k, "means": v} for k, v in SURFACES.items()],
+        "backgrounds": [{"source": k, **v}
+                        for k, v in BACKDROP_SOURCES.items()],
         "never": [{"surface": k, "why": v}
                   for k, v in FORBIDDEN_SURFACES.items()],
         "refused": [{"kind": k, "why": v} for k, v in REFUSED.items()],
         "rules": [
             "everyone who can see you is told you are wearing one",
             "it can never depict a real, identifiable person",
-            "it can never be a live desk — that badge says a real person",
+            "a live desk keeps its 'real person' badge and shows both facts",
             "it cannot draw a mark or badge into the picture",
+            "an AI-generated background says so, even though you are real",
+            "an imported image needs the rights to use it",
             "you take it off yourself, and it comes off when you leave",
         ],
     }
@@ -142,7 +175,8 @@ def _check(surface: str, kind: str) -> None:
 
 def wear(interactor_id: str, surface: str, surface_id: str, kind: str,
          title: str, asset: str | None = None,
-         depicts_real_person: bool = False) -> dict:
+         depicts_real_person: bool = False, source: str | None = None,
+         holds_rights: bool = True) -> dict:
     """Put an overlay on, here.
 
     ``depicts_real_person`` is asked rather than guessed. Nothing in this
@@ -155,6 +189,32 @@ def wear(interactor_id: str, surface: str, surface_id: str, kind: str,
     _check(surface, kind)
     if depicts_real_person:
         raise OverlayError(REFUSED["real_person"])
+
+    # Where the picture behind them came from. Required for a backdrop and
+    # meaningless on a mask, so it is validated rather than defaulted — a
+    # background silently recorded as `own` when it was generated is exactly
+    # the disclosure this feature exists to make.
+    if kind == "backdrop":
+        if source is None:
+            raise OverlayError(
+                "say where the background came from — one of "
+                f"{', '.join(BACKDROP_SOURCES)}. A generated scene and a photo "
+                "of your own kitchen are different claims")
+        if source not in BACKDROP_SOURCES:
+            raise OverlayError(
+                f"unknown background source {source!r} — one of "
+                f"{', '.join(BACKDROP_SOURCES)}")
+        if source == "imported" and not holds_rights:
+            # Asked, not guessed: nothing here can look at an image and know
+            # who owns it. Declaring you do not is the one answer that has an
+            # obvious consequence, so it is the one that is enforced.
+            raise OverlayError(
+                "an imported image needs the rights to use it. Bring one you "
+                "hold, generate one, or use your own room")
+    elif source is not None:
+        raise OverlayError(
+            f"{kind!r} does not have a background — `source` describes the "
+            "picture behind you, and this one is on your face")
     title = (title or "").strip()
     if not title:
         raise OverlayError(
@@ -168,9 +228,9 @@ def wear(interactor_id: str, surface: str, surface_id: str, kind: str,
     overlay_id = db.new_id("ovl")
     conn.execute(
         "INSERT INTO overlays (id, interactor_id, surface, surface_id, kind,"
-        " title, asset, worn_at) VALUES (?,?,?,?,?,?,?,?)",
+        " title, asset, source, worn_at) VALUES (?,?,?,?,?,?,?,?,?)",
         (overlay_id, interactor_id, surface, surface_id, kind, title, asset,
-         db.utcnow()))
+         source, db.utcnow()))
     conn.commit()
     return {**worn_one(overlay_id), "wearing": True}
 
@@ -204,18 +264,31 @@ def close_place(surface: str, surface_id: str) -> int:
     return n
 
 
-def _disclosure(kind: str, title: str) -> str:
+def _disclosure(kind: str, title: str, source: str | None = None) -> str:
     """The line a viewer is shown, in words rather than a flag.
 
-    A face-covering overlay and a background replacement are not the same
-    claim, so they do not get the same sentence. Saying "filter applied" over
-    a replaced face understates it; saying "this is not their face" over a
-    blurred background is a lie in the other direction, and a disclosure that
-    cries wolf is one people learn to skip.
+    Three different claims, and they get three different sentences. Saying
+    "filter applied" over a replaced face understates it; saying "this is not
+    their face" over a blurred background is a lie in the other direction; and
+    an **AI-generated background** is synthetic media that the other two
+    sentences would say nothing about at all. A disclosure that cries wolf is
+    one people learn to skip, and one that stays quiet where it matters is
+    worse than none.
+
+    The order is deliberate on the generated case: the person comes first,
+    because the viewer is deciding about the person. The room comes second,
+    because it is the part that was made.
     """
     if KINDS[kind]["covers_face"]:
         return (f"not their face — {title}, drawn over the camera in real "
                 "time. A real person is underneath")
+    if kind == "backdrop" and source and BACKDROP_SOURCES[source]["synthetic"]:
+        return (f"their own face, unaltered — the background behind them is "
+                f"AI-generated ({title})")
+    if kind == "backdrop" and source == "blur":
+        return "their own face, unaltered — their real room, blurred"
+    if kind == "backdrop":
+        return f"their own face, unaltered — the background is {title}"
     return f"{title} — their own face, unaltered"
 
 
@@ -237,10 +310,18 @@ def _read(row) -> dict:
         "title": row["title"],
         "asset": row["asset"],
         "covers_face": KINDS[row["kind"]]["covers_face"],
+        "source": row["source"],
+        # Whether anything in this picture was generated. False for a mask,
+        # which is a costume rather than a synthesis; True for an AI-made
+        # background, whose subject is a real person in a room that is not.
+        "background_generated": bool(
+            row["source"] and BACKDROP_SOURCES.get(row["source"], {})
+            .get("synthetic")),
         # The disclosure travels with the thing being rendered rather than
         # sitting in a settings screen the viewer never opens — the same reason
         # `avatars.render` attaches the AI mark to the portrait.
-        "disclosure": _disclosure(row["kind"], row["title"]),
+        "disclosure": _disclosure(row["kind"], row["title"],
+                                  row["source"]),
         "since": row["worn_at"],
     }
 
@@ -274,3 +355,81 @@ def wearing(interactor_id: str, surface: str, surface_id: str) -> dict | None:
         " AND surface_id=? AND removed_at IS NULL",
         (interactor_id, surface, surface_id)).fetchone()
     return _read(row) if row else None
+
+
+def wearing_on_desk(desk_id: str) -> dict | None:
+    """The overlay live on this desk, whoever put it there.
+
+    A desk has one stream, so it has at most one face on it. Keyed on the desk
+    rather than on a person because the viewer's question is about the picture
+    in front of them, not about which account is driving it.
+    """
+    row = db.connect().execute(
+        "SELECT * FROM overlays WHERE surface='desk' AND surface_id=?"
+        " AND removed_at IS NULL ORDER BY worn_at DESC, rowid DESC LIMIT 1",
+        (desk_id,)).fetchone()
+    return _read(row) if row else None
+
+
+def live_person_mark(desk_id: str) -> dict:
+    """The badge a live desk carries while somebody on it wears an overlay:
+    **a real person, and they are wearing something.**
+
+    Both halves, always, because neither is any use alone. *"Live person — not
+    AI"* over a mask invites the reading that the mask is their face. *"Wearing
+    an overlay"* without it invites the reading that the whole picture is
+    generated — the opposite error, and the one this platform exists to
+    prevent. The pair is the disclosure; either half alone is a different and
+    wrong claim.
+
+    **Issued against the desk, never asserted by the client.** The mark is read
+    from the desk row and its attestation, so a stream that never earned it
+    cannot paste it on — the same reason the AI mark is burned into a portrait
+    rather than composited by whoever happens to be rendering it. A desk with
+    no attestation gets no mark rather than a weaker one.
+
+    The *not AI* half is not softened by the overlay and must not be. A costume
+    is not a synthesis: what is behind the camera is a person either way, which
+    is the only thing that badge ever claimed.
+    """
+    from . import desks
+
+    row = db.connect().execute(
+        "SELECT owner_id, attestor, attestation_basis, attested_at"
+        "  FROM desks WHERE id=?", (desk_id,)).fetchone()
+    if row is None:
+        return {}
+
+    over = wearing_on_desk(desk_id)
+    mark = {
+        "desk_id": desk_id,
+        # Bound to the account that owns the stream, which is what makes this
+        # unforgeable by anybody else's client.
+        "owner_id": row["owner_id"],
+        "designation": desks.DESIGNATION,
+        "real_person": True,
+        "attestor": row["attestor"],
+        "attestation_basis": row["attestation_basis"],
+        "attested_at": row["attested_at"],
+        "note": desks.ATTESTATION_NOTE,
+        "wearing_overlay": over is not None,
+    }
+    if over is None:
+        mark["line"] = desks.DESIGNATION
+        mark["means"] = "a real person is behind this stream"
+        return mark
+
+    mark["overlay"] = {"kind": over["kind"], "title": over["title"],
+                       "covers_face": over["covers_face"]}
+    if over["covers_face"]:
+        mark["line"] = f"{desks.DESIGNATION} · wearing {over['title']}"
+        mark["means"] = (
+            "a real person is behind this stream and they are wearing "
+            "something over their face. The costume is not AI, and neither "
+            "is the person under it")
+    else:
+        mark["line"] = f"{desks.DESIGNATION} · {over['title']}"
+        mark["means"] = (
+            "a real person, and what has changed is behind them rather than "
+            "on them")
+    return mark

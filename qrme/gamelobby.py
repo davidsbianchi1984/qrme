@@ -82,14 +82,33 @@ NEVER: dict[str, str] = {
     "macro": "no recorded or generated sequence is played back",
     "automation": "no member takes a turn, a shot or an action",
     "exploit": "nothing here knows or offers a bug, glitch or cheat",
+    # The two that close the hardware answer to the rule above. Everything
+    # before this line is about what a member *does*; these are about what a
+    # member *is allowed to be* in a match, and they exist because the obvious
+    # way round "no automation" is to stop calling it automation.
+    "player_slot": "no synthetic member occupies a player slot in a two-, "
+                   "three- or any-player game — they are beside the players, "
+                   "never among them",
+    "own_hardware": "and not from a console, PC, handheld or instance of its "
+                    "own either. A second machine does not turn a bot into a "
+                    "player; it just moves where the bot is running",
 }
 
 FAIR_PLAY = (
     "Everything in this lobby observes and talks. Nothing in it plays. No "
     "member sends an input to the game, corrects anybody's aim, or takes an "
     "action on a player's behalf — that is the line between a coach and a "
-    "cheat, and it is a property of the code rather than a setting."
+    "cheat, and it is a property of the code rather than a setting. No "
+    "synthetic member occupies a player slot in a multiplayer game, and "
+    "giving one a console of its own does not change that: a second machine "
+    "moves where a bot runs, it does not make the bot a player."
 )
+
+# The seats a synthetic member may hold. A `player` seat is a person's, and
+# nothing else may take one — which is the rule above expressed as data rather
+# than left to a prompt to honour.
+SYNTHETIC_SEATS = ("companion", "practice_partner", "coach", "spotter",
+                   "archivist")
 
 
 class LobbyError(ValueError):
@@ -121,6 +140,16 @@ def seat(session_id: str, member_kind: str, member_id: str,
             f"unknown member kind {member_kind!r} — one of {', '.join(KINDS)}")
     if role not in SEATS:
         raise LobbyError(f"unknown seat {role!r} — one of {', '.join(SEATS)}")
+
+    # A `teammate` seat is a player's seat: it is the one that means *in the
+    # match, on the roster, taking a slot*. Nothing synthetic may hold one, and
+    # that is checked here rather than trusted to a prompt, because the whole
+    # point of the rule is that it survives a model deciding otherwise.
+    if member_kind in SYNTHETIC_KINDS and role not in SYNTHETIC_SEATS:
+        raise LobbyError(
+            f"a {KINDS[member_kind].split(' —')[0]} cannot take the {role!r} "
+            f"seat — that is a player's slot. It can sit beside the players "
+            f"as {', '.join(SYNTHETIC_SEATS)}, never among them")
 
     conn = db.connect()
     if member_kind == "profile":

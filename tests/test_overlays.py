@@ -6,8 +6,14 @@ a synthetic thing must say so. An overlay is synthetic media composited onto a
 real human face in real time, and the fact that the person underneath agreed
 does not change what the *viewer* is looking at.
 
-So the tests that matter are not about the catalogue. They are the three
-refusals, and the live desk is the sharpest of them.
+So the tests that matter are not about the catalogue. They are the refusals,
+and the disclosures that have to distinguish three different claims: a face
+replaced, a face untouched, and a real face in a room that was generated.
+
+The live desk is the case that changed. It was refused outright at first, on
+reasoning that turned out to conflate *this face is unmodified* with *a real
+person is behind this*. Only the second is what the badge ever claimed, and a
+costume does not make it false.
 """
 
 import pytest
@@ -77,7 +83,7 @@ def test_a_background_is_not_disclosed_as_a_replaced_face(client):
     rid = _room(client, p, sam)
     out = client.post(f"/places/room/{rid}/overlay",
                       json={"interactor_id": sam["id"], "kind": "backdrop",
-                            "title": "A library"},
+                            "title": "A library", "source": "own"},
                       headers=_as(sam["token"])).json()
     assert out["covers_face"] is False
     assert "their own face, unaltered" in out["disclosure"]
@@ -86,30 +92,88 @@ def test_a_background_is_not_disclosed_as_a_replaced_face(client):
 
 # -- the three refusals -------------------------------------------------------
 
-def test_a_live_desk_can_never_wear_one(client):
-    """The sharp case.
+def _desk(client, owner):
+    now = db.utcnow()
+    did = db.new_id("desk")
+    db.connect().execute(
+        "INSERT INTO desks (id, owner_id, display_name, trade, attestor,"
+        " attestation_basis, attested_at, created_at, last_seen)"
+        " VALUES (?,?,?,?,?,?,?,?,?)",
+        (did, owner["id"], "Sam's desk", "locksmith", "Sam",
+         "self-attested", now, now, now))
+    db.connect().commit()
+    return did
 
-    A desk's badge reads "Live person — not AI" and its whole premise is that
-    a real human is behind it — the badge is *inverted* precisely because
-    there is a person there. Put a character over that face and the badge
-    becomes a false statement, made by the platform, on the one surface whose
-    entire value is that the statement is true. The overlay is refused rather
-    than the badge weakened, because a desk that cannot promise a real person
-    is not a desk.
+
+def test_a_live_desk_wears_one_and_keeps_its_badge(client):
+    """This was refused at first, and the refusal was wrong.
+
+    The reasoning was that a character over the face makes "Live person — not
+    AI" a false statement. That conflated two claims. The badge does not say
+    *this face is unmodified*; it says **a real person is behind this**, which
+    is exactly as true of somebody in a mask. A costume is not a synthesis, and
+    refusing it protected nothing while costing the people who most need to
+    work without showing their face.
     """
     from qrme import desks
     assert desks.DESIGNATION == "Live person — not AI"
 
-    with pytest.raises(overlays.OverlayError) as exc:
-        overlays.wear("usr_1", "desk", "dsk_1", "mask", "Anything")
-    assert "Live person — not AI" in str(exc.value)
-
     sam = _interactor(client)
-    r = client.post("/places/desk/dsk_1/overlay",
+    did = _desk(client, sam)
+    r = client.post(f"/places/desk/{did}/overlay",
                     json={"interactor_id": sam["id"], "kind": "mask",
-                          "title": "Anything"}, headers=_as(sam["token"]))
-    assert r.status_code == 422
-    assert "false statement" in r.json()["detail"]
+                          "title": "The Wolf"}, headers=_as(sam["token"]))
+    assert r.status_code == 201, r.text
+
+    mark = client.get(f"/desks/{did}/live-person").json()
+    assert mark["real_person"] is True
+    assert mark["designation"] == desks.DESIGNATION
+    assert mark["wearing_overlay"] is True
+    assert "The Wolf" in mark["line"]
+    assert "not AI" in mark["line"]
+
+
+def test_the_badge_states_both_facts_or_neither(client):
+    """Either half alone is a different and wrong claim. "Real person" over a
+    mask invites the reading that the mask is their face; "wearing an overlay"
+    without it invites the reading that the whole picture is generated — the
+    opposite error, and the one this platform exists to prevent."""
+    sam = _interactor(client)
+    did = _desk(client, sam)
+
+    bare = client.get(f"/desks/{did}/live-person").json()
+    assert bare["wearing_overlay"] is False
+    assert bare["line"] == "Live person — not AI"
+
+    client.post(f"/places/desk/{did}/overlay",
+                json={"interactor_id": sam["id"], "kind": "character",
+                      "title": "Corvid"}, headers=_as(sam["token"]))
+    both = client.get(f"/desks/{did}/live-person").json()
+    assert "not AI" in both["line"] and "Corvid" in both["line"]
+    assert "neither is the person under it" in both["means"]
+
+
+def test_the_mark_is_bound_to_the_account_that_owns_the_stream(client):
+    """Issued against the desk, never asserted by a client — the same reason
+    the AI mark is burned into a portrait rather than composited by whoever
+    happens to be rendering it. A stream that never earned it cannot paste it
+    on."""
+    sam = _interactor(client)
+    did = _desk(client, sam)
+    mark = client.get(f"/desks/{did}/live-person").json()
+    assert mark["owner_id"] == sam["id"]
+    assert mark["attestor"] == "Sam"
+    assert client.get("/desks/dsk_nothing/live-person").status_code == 404
+
+
+def test_only_the_desks_owner_puts_a_face_on_its_stream(client):
+    sam = _interactor(client)
+    other = _interactor(client, "Nosy")
+    did = _desk(client, sam)
+    r = client.post(f"/places/desk/{did}/overlay",
+                    json={"interactor_id": other["id"], "kind": "mask",
+                          "title": "Anything"}, headers=_as(other["token"]))
+    assert r.status_code == 403
 
 
 def test_no_overlay_may_depict_a_real_person(client):
@@ -136,7 +200,10 @@ def test_the_refused_classes_are_named_with_their_reasons(client):
     for expected in ("real_person", "public_figure", "another_user",
                      "age_shift", "badge_mimic"):
         assert expected in refused and refused[expected]
-    assert out["never"][0]["surface"] == "desk"
+    # Nowhere is forbidden any more — the desk came off this list, and the
+    # machinery stays for the next surface that genuinely cannot disclose.
+    assert out["never"] == []
+    assert "desk" in {s["surface"] for s in out["surfaces"]}
 
 
 def test_an_age_shifting_overlay_is_refused_by_name(client):
@@ -251,3 +318,85 @@ def test_the_record_survives_the_overlay_coming_off(client):
                                (out["id"],)).fetchone()
     assert row is not None and row["removed_at"] is not None
     assert row["title"] == "Was here"
+
+
+# -- backgrounds --------------------------------------------------------------
+
+def test_a_generated_background_says_so_even_though_you_are_real(client):
+    """An AI-generated background **is** synthetic media, and the person in
+    front of it being real does not make the room real. The order is
+    deliberate: the person first, because that is what a viewer is deciding
+    about; the room second, because that is the part that was made."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    rid = _room(client, p, sam)
+    out = client.post(f"/places/room/{rid}/overlay",
+                      json={"interactor_id": sam["id"], "kind": "backdrop",
+                            "title": "a quiet library", "source": "generated"},
+                      headers=_as(sam["token"])).json()
+    assert out["background_generated"] is True
+    assert "their own face, unaltered" in out["disclosure"]
+    assert "AI-generated" in out["disclosure"]
+
+
+def test_your_own_photo_is_not_called_generated(client):
+    """A disclosure that cries wolf is one people learn to skip."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    rid = _room(client, p, sam)
+    out = client.post(f"/places/room/{rid}/overlay",
+                      json={"interactor_id": sam["id"], "kind": "backdrop",
+                            "title": "my kitchen", "source": "own"},
+                      headers=_as(sam["token"])).json()
+    assert out["background_generated"] is False
+    assert "AI-generated" not in out["disclosure"]
+
+
+def test_a_background_must_say_where_it_came_from(client):
+    """Silently recording a generated scene as somebody's own room is exactly
+    the disclosure this feature exists to make."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    rid = _room(client, p, sam)
+    r = client.post(f"/places/room/{rid}/overlay",
+                    json={"interactor_id": sam["id"], "kind": "backdrop",
+                          "title": "somewhere"}, headers=_as(sam["token"]))
+    assert r.status_code == 422
+    assert "where the background came from" in r.json()["detail"]
+
+
+def test_an_imported_image_needs_the_rights_to_it(client):
+    """Asked, not guessed — nothing here can look at an image and know who
+    owns it, so the one answer with an obvious consequence is the one that is
+    enforced."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    rid = _room(client, p, sam)
+    r = client.post(f"/places/room/{rid}/overlay",
+                    json={"interactor_id": sam["id"], "kind": "backdrop",
+                          "title": "a film still", "source": "imported",
+                          "holds_rights": False}, headers=_as(sam["token"]))
+    assert r.status_code == 422
+    assert "rights" in r.json()["detail"]
+
+
+def test_a_mask_has_no_background_to_describe(client):
+    """`source` says what happened to the room. A face-covering overlay does
+    not have one, and accepting the field there would record a claim about
+    something that is not in the picture."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    rid = _room(client, p, sam)
+    r = client.post(f"/places/room/{rid}/overlay",
+                    json={"interactor_id": sam["id"], "kind": "mask",
+                          "title": "Blue Fox", "source": "generated"},
+                    headers=_as(sam["token"]))
+    assert r.status_code == 422
+    assert "does not have a background" in r.json()["detail"]
+
+
+def test_the_catalogue_lists_where_a_background_can_come_from(client):
+    out = client.get("/overlays/catalogue").json()
+    sources = {b["source"]: b["synthetic"] for b in out["backgrounds"]}
+    assert sources == {"own": False, "imported": False,
+                       "generated": True, "blur": False}
