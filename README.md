@@ -295,6 +295,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
     <td align="center" width="33%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="210" alt="On a Screen"></a><br><sub><b>126</b> · On a Screen</sub></td>
     <td align="center" width="33%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>127</b> · Show Me Around</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="210" alt="The Corner Pane"></a><br><sub><b>128</b> · The Corner Pane</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="210" alt="Where Is It"></a><br><sub><b>129</b> · Where Is It?</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1551,6 +1555,105 @@ repository has already shipped a screen nothing referenced.
 
 **Progress is recorded per step rather than as a cursor**, so somebody who
 skipped ahead and came back is not told they finished things they never saw.
+
+## The pane in the corner
+
+`qrme/dock.py`, 5 routes, 30 tests, screens **128** and **129**.
+
+The watch faces answer *what am I currently presenting as* without making you
+leave what you are doing, and a fixed screen does the same for a wall. Both need
+hardware, and **most people have neither**. The dock is the same answer for
+somebody holding only the phone: a small pane in the bottom corner of the app,
+with no watch frame around it, that tucks away behind the helper button.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="200" alt="The corner pane"></a><br><sub><b>128</b> · tucks away with the helper</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /dock/faces` | the vocabulary, and what it refuses to cast |
+| `GET /dock/where/{face}` | the screen that can actually do this |
+| `GET /dock/{id}` | where the pane sits, and how it opens here |
+| `PUT /dock/{id}` | move it, tuck it, hide it, change its faces |
+| `GET /dock/{id}/face/{name}` | one face, as the pane would draw it |
+
+`?surface=` and `?platform=` change how it opens; the stored preference does
+not change with them.
+
+  </td>
+  </tr>
+</table>
+
+**It is the same faces as the wrist, not a new set.** `dock.FACES` is built from
+`wearables.FACES` and a test binds the two, so a face added to the watch appears
+in the pane or is turned away here **by name with a reason**. Two catalogues of
+the same glances would drift, and the one nobody re-reads wins.
+
+**It shows, and it routes. It never acts** — the exact inversion of the watch's
+one exception, and the inversion is the point. Watch face 05 can *end* a lent
+microphone, because the watch is the device doing the listening and a permission
+you cannot revoke from the thing running it is not really yours. Nothing here is
+the device: the real screen is one tap away in the same app, so a control in the
+pane buys nothing and costs something, because this thing floats over live
+video. A button that ends a stream sitting a thumb's width from the one that
+pauses it is a mis-tap on somebody's broadcast. So `control` is the one wrist
+face the dock refuses, and every face carries a **route** instead.
+
+**It is inside every screenshot.** `displays.NEVER` exists because a wall is
+read by whoever walks past; `dock.NEVER` exists for a different reason that
+lands in the same place — a pane pinned to the app frame is captured by every
+screenshot, every recording and every screen share, *including the one being
+broadcast right now*. So no message bodies, no memory, no agent names, no viewer
+names; and on a surface that is going out it opens **tucked** however the
+preference is set. Capped rather than overwritten, in the same shape as
+`roommic`'s gain: the preference is returned alongside as `wanted`, so the
+settings screen and the pane cannot disagree about what was chosen.
+
+**The bottom corner is a constraint, not a taste.** The top-left carries whose
+surface this is and the top-right the recording light, so a pane that could
+cover either could hide who you are watching or whether you are live. Both
+entries in `dock.CORNERS` are at the bottom; the second exists because
+bottom-right is a right-hander's default.
+
+**On the desktop it replaced something rather than joining it.** That corner
+already held a pinned agent-lights panel with no way to put it away — three
+quarters of this feature, missing a lid. It is now the dock drawn open on the
+`agents` face, which is why `DEFAULT_STATE_ON["desktop"]` is `open` where the
+phone's is `handle`: a desktop user has no wrist to glance at, and amber and red
+are the states nobody thinks to go looking for. Adding a second floating box
+beside the first was the alternative, and it is what you get by not looking.
+
+### Asking where something is
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="200" alt="Where is it"></a><br><sub><b>129</b> · directions, not a description</sub></td>
+    <td width="66%" valign="top">
+
+*"Where do I change my background"* is the question the help box got most and
+answered worst: a correct paragraph **about** backgrounds, handed to somebody
+who was asking where they live.
+
+`help.DIRECTIONS` is keyed by tutorial lesson, so the directions cannot name a
+screen the walkthrough does not cover, and a test asserts **every lesson is
+reachable by some phrasing**. The phrases are what people type — somebody
+looking for overlays types *change my face*; nobody types *overlays*.
+
+  </td>
+  </tr>
+</table>
+
+The answer names the screen, and says so out loud when the same thing is also a
+face on the pane — read from `dock.ROUTES`, the one table both use, so the
+assistant and the corner cannot disagree about where a feature lives. Matched
+before `TOPICS` and before any model, because both would have described the
+feature instead, and a model cannot know the screen numbers.
+
+The order is refusals, then the walkthrough, then directions. *"Where do I
+start"* is a request for the tour; *"where is the game lobby"* is a request for a
+screen; *"pretend you are my friend"* is neither, and is still refused first.
 
 ## Friends you might know
 

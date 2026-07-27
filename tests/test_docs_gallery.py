@@ -68,6 +68,24 @@ def test_every_screen_is_shown_somewhere():
                          + "\n  ".join(unshown))
 
 
+def test_no_screen_is_named_something_a_url_cannot_carry():
+    """A screen filename becomes a URL in the README's `<img src>`.
+
+    "Where Is It?" produced `129-where-is-it?.svg`, where the `?` starts a
+    query string: the browser asks for `129-where-is-it` and draws a broken
+    icon. A comma had already reached a filename the same way. Both came from
+    the title being slugged by hand in two places that disagreed, so the
+    builder now has one `slug()` and this is the assertion that it is used.
+
+    Checked against the files rather than the builder, because the failure is
+    a file on disk that the README cannot address.
+    """
+    bad = sorted(f for f in _on_disk()
+                 if not re.fullmatch(r"[0-9a-z][0-9a-z\-.]*\.svg", f))
+    assert not bad, ("screen files whose names are unsafe in a URL:\n  "
+                     + "\n  ".join(bad))
+
+
 def test_the_gallery_runs_in_order_and_skips_nothing():
     """The check the other two cannot make.
 

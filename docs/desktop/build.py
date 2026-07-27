@@ -27,6 +27,10 @@ rrect, text, pill, chip, button, ring, spark, esc, stars = (
 
 W, H = 1280, 820
 WIN_X, WIN_Y, WIN_W, WIN_H = 24, 24, 1232, 772
+
+# The helper dock's geometry, read from the module rather than copied, so the
+# mockup cannot drift from what the client is told to draw.
+from qrme.dock import BOX as DOCK                                    # noqa: E402
 TOPBAR_H = 54
 SIDE_W = 216
 CONTENT_X = WIN_X + SIDE_W
@@ -1059,23 +1063,34 @@ VIEWS = [
 ]
 
 
-def agent_overlay(counts):
-    """The agent lights, pinned to every desktop view.
+def helper_dock(counts):
+    """The helper dock, pinned to every desktop view, open on the agent lights.
 
-    A watch answers this for the people who wear one. Desktop users have no
-    wrist to glance at, so the same information has to live somewhere that
-    does not depend on remembering to open a page — and amber and red are
-    precisely the states nobody thinks to go looking for.
+    This corner used to hold a lights-only panel with no way to put it away.
+    It is now the dock (`qrme/dock.py`) drawn in its desktop default state, and
+    the merge is the point: two floating boxes in one corner is what you get by
+    adding the second, and the first was already three-quarters of the feature
+    - pinned, glanceable, and routing to a screen that can act.
 
-    Bottom-right, above the content and clear of the sidebar: the corner a
-    dashboard convention already reserves for status, and the one place a
-    persistent strip does not cover something a person is reading.
+    The lights panel's own reason is why `dock.DEFAULT_STATE_ON["desktop"]` is
+    `open` where the phone's is `handle`: a desktop user has no wrist to glance
+    at, and amber and red are precisely the states nobody thinks to go looking
+    for. What it gains by becoming the dock is a way to close it, the other
+    eight faces, and the helper button as its handle.
+
+    Geometry comes from `dock.BOX` rather than being restated here, so the
+    mockup cannot drift from what a client is told to draw.
     """
-    w, h = 132, 116
-    x = WIN_X + WIN_W - w - 24
-    y = WIN_Y + WIN_H - h - 24
+    w, h = DOCK["width"], DOCK["height"]
+    hr = DOCK["handle"] // 2
+    right = WIN_X + WIN_W - DOCK["inset"]
+    # The handle sits in the corner proper; the pane stacks above it.
+    hx, hy = right - hr, WIN_Y + WIN_H - DOCK["inset"] - hr
+    x, y = right - w, hy - hr - 12 - h
+
     o = [rrect(x, y, w, h, 15, "rgba(9,7,26,0.62)", A(C["brandA"], 0.5), 1)]
-    yy = y + 26
+    o.append(text(x + 14, y + 20, "Agents", 9, C["t3"], 700, spacing=0.6))
+    yy = y + 40
     rows = (("green", "running"), ("amber", "need help"), ("red", "stopped"))
     for (colour, word), n in zip(rows, counts):
         col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
@@ -1086,9 +1101,19 @@ def agent_overlay(counts):
                       col if not dim else C["t3"], 800))
         o.append(text(x + 46, yy + 5, word, 9.5,
                       C["t2"] if not dim else C["t3"], 600))
-        yy += 28
-    o.append(text(x + w / 2, y + h - 12, "open \u203a", 9,
+        yy += 26
+    # Every face carries a way out of the pane: it shows and routes, and never
+    # acts. See qrme/dock.py.
+    o.append(text(x + w / 2, y + h - 10, "open Agents \u203a", 9,
                   C["brandA"], 700, "middle"))
+
+    # The handle - the helper button, and the thing that puts the pane away.
+    # One control in this corner rather than two, which is why the dock takes
+    # over the button the app already had instead of adding its own.
+    o.append(f'<circle cx="{hx}" cy="{hy}" r="{hr}" '
+             f'fill="{A(C["brandA"], 0.2)}" '
+             f'stroke="{A(C["brandA"], 0.55)}" stroke-width="1.2"/>')
+    o.append(icon("compass", hx, hy, C["brandA"], 0.82))
     return o
 
 
@@ -1097,7 +1122,7 @@ def render(title, nav, fn):
     o += fn()
     # On every view, not just Home: the whole point is that it is there while
     # you are doing something else.
-    o += agent_overlay((3, 1, 1))
+    o += helper_dock((3, 1, 1))
     o += close()
     return "".join(o)
 

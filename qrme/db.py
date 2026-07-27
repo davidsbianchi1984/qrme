@@ -309,6 +309,23 @@ CREATE TABLE IF NOT EXISTS tutorial_progress (
     PRIMARY KEY (learner_id, lesson)
 );
 
+-- Where the helper dock sits and what it is showing (see qrme/dock.py). One
+-- row per account, absent until somebody moves it — `dock.settings` applies
+-- the defaults, so the pane draws on first launch without this row existing
+-- and the defaults are written down in exactly one place.
+--
+-- Preferences only. Nothing about the dock is a capability: the pane shows and
+-- routes, and this table cannot grant it anything, because there is nothing to
+-- grant.
+CREATE TABLE IF NOT EXISTS dock_prefs (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    corner     TEXT NOT NULL DEFAULT 'bottom_right',  -- bottom_right | bottom_left
+    state      TEXT NOT NULL DEFAULT 'handle',        -- hidden | handle | open
+    face       TEXT NOT NULL DEFAULT 'helper',
+    faces      TEXT NOT NULL,                         -- JSON array
+    updated_at TEXT NOT NULL
+);
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`

@@ -3693,6 +3693,38 @@ SCREENS = [
         dict(icon="shieldok", color="indigo", k="Every screen covered",
              s="a test holds it to the app"),
     ], button=("Start the tour", "brand")),
+    # The pane in the corner. Card four is the one that decides the design: a
+    # dock is inside every screenshot and every screen share, so it tucks
+    # itself away on a surface that is going out, and it never carries a
+    # control that could be mis-tapped onto a live broadcast.
+    dict(num=128, title="The Corner Pane", sub="Tucks away with the helper",
+         accent="brand", tab=3, cards=[
+        dict(icon="shrink", color="brand", k="Tap to tuck it away",
+             s="the helper button is the handle"),
+        dict(icon="watch", color="cyan", k="The watch faces, here",
+             s="no watch required"),
+        dict(icon="warn", color="amber", k="It shows, it never acts",
+             s="the real screen is one tap away"),
+        dict(icon="eye", color="red", k="It is in your screenshot",
+             s="so it tucks itself on a live"),
+        dict(icon="compass", color="green", k="Every face has a way out",
+             s="it points at the screen"),
+    ], button=("Move it left", "brand")),
+    # Directions rather than a description. The second card is the whole
+    # point: somebody asking where a thing is has not asked what it is.
+    dict(num=129, title="Where Is It?", sub="Ask, and the guide points",
+         accent="cyan", tab=3, cards=[
+        dict(icon="search", color="brand", k="Change my background",
+             s="Your Background · screen 124"),
+        dict(icon="compass", color="cyan", k="It names the screen",
+             s="not a paragraph about it"),
+        dict(icon="shrink", color="indigo", k="And the corner pane",
+             s="when the face is in there too"),
+        dict(icon="speaker", color="green", k="Say it or type it",
+             s="the same answer either way"),
+        dict(icon="lock", color="amber", k="It still never taps",
+             s="it tells you where to"),
+    ], button=("Ask the guide", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
@@ -3723,6 +3755,32 @@ SCREENS = [
 ]
 
 
+# Characters that must not reach a filename, because the filename becomes a URL
+# in the README's <img src>. A "?" starts a query string and a "#" a fragment,
+# so `129-where-is-it?.svg` silently resolves to `129-where-is-it` and the image
+# is a broken icon. A comma survives the URL but not every shell.
+#
+# One function rather than the expression written out twice, which is how a
+# comma reached a filename once already: the copy that swept away stale files
+# and the copy that wrote new ones disagreed, so the build both created the bad
+# name and declined to clean it up.
+_UNSAFE = str.maketrans({c: None for c in "?#,:!'\"()[]{}<>|\\^`*$&+;@="})
+
+
+def slug(title: str) -> str:
+    """The filename part of a screen's title, safe to put in a URL."""
+    out = (title.lower().replace(" & ", "-").replace(" ", "-")
+                .replace("\u00e9", "e").translate(_UNSAFE))
+    while "--" in out:
+        out = out.replace("--", "-")
+    return out.strip("-")
+
+
+def filename(screen: dict) -> str:
+    """The one place a screen's file is named."""
+    return f'{screen["num"]:02d}-{slug(screen["title"])}.svg'
+
+
 def main():
     global PLATFORM
     total = 0
@@ -3735,17 +3793,14 @@ def main():
         PLATFORM = plat
         outdir = OUT if not sub else os.path.join(OUT, sub)
         os.makedirs(outdir, exist_ok=True)
-        keep = {f'{s["num"]:02d}-'
-                + s["title"].lower().replace(" & ", "-").replace(" ", "-")
-                            .replace("é", "e") + ".svg" for s in SCREENS}
+        keep = {filename(s) for s in SCREENS}
         for name in os.listdir(outdir):
             if name.endswith(".svg") and name not in keep:
                 os.remove(os.path.join(outdir, name))
                 stale += 1
         for s in SCREENS:
             n = s["num"]
-            slug = s["title"].lower().replace(" & ", "-").replace(" ", "-").replace("é", "e")
-            fn = f'{n:02d}-{slug}.svg'
+            fn = filename(s)
             draw = render_full if s.get("full") else render
             # Rendered before the file is opened. `open(..., "w")` truncates
             # immediately, so doing it the other way round meant a render that

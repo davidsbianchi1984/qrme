@@ -149,9 +149,13 @@ LESSONS: tuple[dict, ...] = (
     dict(key="guide", chapter="Being yourself", title="This guide",
          what="The walkthrough you are in. It has no name and no face, it "
               "works with no model configured, and it never taps anything for "
-              "you — it says what to tap. Ask it anything from the help button "
-              "on any screen.",
-         screens=(127,), try_it="Open the help button on the screen you are on."),
+              "you — it says what to tap. The helper button in the corner is "
+              "also the handle for a small pane that shows the watch faces "
+              "without a watch, and if you already know what you want, ask "
+              "where it is and the guide names the screen instead of "
+              "describing the feature.",
+         screens=(127, 128, 129),
+         try_it="Ask it where to change your background."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))
