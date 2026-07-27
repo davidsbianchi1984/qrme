@@ -1164,18 +1164,23 @@ work without showing their face.
     <td align="center" width="34%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="200" alt="Masked and real"></a><br><sub><b>123</b> · both facts, equally weighted</sub></td>
     <td width="66%" valign="top">
 
-`GET /desks/{id}/live-person` returns the pair, and the pair **is** the
-disclosure:
+`GET /desks/{id}/live-person` returns one mark, and it does not change when
+somebody puts a face on:
 
-> **Live person — not AI · wearing The Wolf**
-> *a real person is behind this stream and they are wearing something over
-> their face. The costume is not AI, and neither is the person under it.*
+> **NOT AI · REAL PERSON**
 
-Either half alone is a different and wrong claim. "Real person" over a mask
-invites the reading that the mask is their face; "wearing an overlay" without
-it invites the reading that the whole picture is generated — the opposite
-error, and the one this platform exists to prevent. So neither half is
-available on its own.
+An earlier version composed the badge with the costume — *"… · wearing The
+Wolf"* — which answered a question nobody had. **A viewer is on a named
+account's live or room.** The handle is at the top left, they chose it to get
+there, and they know whose stream this is. The open question on that page is
+never *is that his real nose*; it is *is there a person here at all*, and that
+is the only thing this mark answers.
+
+Dropping the costume half also removed a quiet penalty. Somebody who covers
+their face because of dysmorphia, or because their work makes showing it
+unsafe, was being handed a badge that announced the fact on every frame while
+the person beside them got a clean one. **Same claim, same mark, whatever you
+are wearing.**
 
   </td>
   </tr>
@@ -1187,9 +1192,15 @@ never earned the badge cannot paste it on — the same reason the AI mark is
 burned into a portrait rather than composited by whoever happens to be
 rendering it. A desk with no attestation gets no mark rather than a weaker one.
 
-The *not AI* half is never softened by the overlay, and must not be. What is
-behind the camera is a person either way, which is the only thing that badge
-ever claimed.
+The mark is never softened by the overlay, and must not be. What is behind the
+camera is a person either way, which is the only thing that badge ever claimed.
+
+**Seventeen face overlays**, and the list is a need rather than a nicety —
+masks and half masks, characters, creatures, 2-D and 3-D avatars, helmets and
+visors, paint, makeup, hair, headwear, eyewear, prosthetics, rendered styles,
+and plain blur or silhouette for anybody who wants to be present without being
+seen. Someone with dysmorphia has to be able to appear without appearing, and
+one mask and a shrug is not that.
 
 ### Backgrounds: yours, imported, or generated
 
@@ -1304,10 +1315,19 @@ prompt to honour, because the entire point of the rule is that it survives a
 model deciding otherwise. The seats beside the players stay open: companion,
 practice partner, coach, spotter, archivist.
 
-And `own_hardware` closes the obvious way round *"no automation"*, which is to
-stop calling it automation: **a second machine moves where a bot runs, it does
-not turn the bot into a player.** No console, PC, handheld or separate instance
-makes a synthetic member eligible for a two-, three- or any-player game.
+The rest of the list closes the plumbing, and each entry is refused **in the
+words somebody would use to ask for it** — because a single generic refusal
+loses that argument. "It's only a second controller" is true, and not the
+point.
+
+| named | why |
+| --- | --- |
+| `own_hardware` | a second machine moves where a bot runs; it does not turn the bot into a player |
+| `second_controller` | a second pad on the same console is the same bot with a shorter cable — a controller nobody is holding is not a player's |
+| `bluetooth_input` | pairing a member to a console as an input device is that again, wireless. The pairing is the tell, not the cable |
+| `capture_perception` | a capture card or video-in feeding it the game's picture is how it would learn where to aim. **Watching the screen to play is playing** |
+| `game_plugin` | an overlay, mod, injector or plug-in handing it state or controls, whatever it is called and whoever wrote it |
+| `own_character` | no member pilots a character — not a second one beside yours, not a co-op partner, not a body in the world |
 
   </td>
   </tr>

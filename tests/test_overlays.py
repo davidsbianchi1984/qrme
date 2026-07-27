@@ -106,18 +106,13 @@ def _desk(client, owner):
 
 
 def test_a_live_desk_wears_one_and_keeps_its_badge(client):
-    """This was refused at first, and the refusal was wrong.
+    """The refusal here was wrong twice over.
 
-    The reasoning was that a character over the face makes "Live person — not
-    AI" a false statement. That conflated two claims. The badge does not say
-    *this face is unmodified*; it says **a real person is behind this**, which
-    is exactly as true of somebody in a mask. A costume is not a synthesis, and
-    refusing it protected nothing while costing the people who most need to
-    work without showing their face.
+    First it conflated *this face is unmodified* with *a real person is behind
+    this* — only the second is what the badge ever claimed, and a costume is
+    not a synthesis. Then the fix over-corrected, composing the badge with the
+    costume, which answered a question nobody had.
     """
-    from qrme import desks
-    assert desks.DESIGNATION == "Live person — not AI"
-
     sam = _interactor(client)
     did = _desk(client, sam)
     r = client.post(f"/places/desk/{did}/overlay",
@@ -127,30 +122,51 @@ def test_a_live_desk_wears_one_and_keeps_its_badge(client):
 
     mark = client.get(f"/desks/{did}/live-person").json()
     assert mark["real_person"] is True
-    assert mark["designation"] == desks.DESIGNATION
-    assert mark["wearing_overlay"] is True
-    assert "The Wolf" in mark["line"]
-    assert "not AI" in mark["line"]
+    assert mark["line"] == overlays.LIVE_MARK
+    assert mark["burned"] is True
 
 
-def test_the_badge_states_both_facts_or_neither(client):
-    """Either half alone is a different and wrong claim. "Real person" over a
-    mask invites the reading that the mask is their face; "wearing an overlay"
-    without it invites the reading that the whole picture is generated — the
-    opposite error, and the one this platform exists to prevent."""
+def test_the_mark_never_mentions_the_costume(client):
+    """A viewer is on a **named account's** live or room — the handle is at the
+    top left and they chose it to get there. The open question on that page is
+    never *is that his real nose*, it is *is there a person here at all*, and
+    that is the only thing this mark answers.
+
+    It also removes a quiet penalty: somebody covering their face because of
+    dysmorphia, or because their work makes showing it unsafe, was being handed
+    a badge that announced the fact on every frame while the person beside them
+    got a clean one.
+    """
     sam = _interactor(client)
     did = _desk(client, sam)
 
-    bare = client.get(f"/desks/{did}/live-person").json()
-    assert bare["wearing_overlay"] is False
-    assert bare["line"] == "Live person — not AI"
-
+    bare = client.get(f"/desks/{did}/live-person").json()["line"]
     client.post(f"/places/desk/{did}/overlay",
                 json={"interactor_id": sam["id"], "kind": "character",
                       "title": "Corvid"}, headers=_as(sam["token"]))
-    both = client.get(f"/desks/{did}/live-person").json()
-    assert "not AI" in both["line"] and "Corvid" in both["line"]
-    assert "neither is the person under it" in both["means"]
+    masked = client.get(f"/desks/{did}/live-person").json()
+
+    assert masked["line"] == bare == overlays.LIVE_MARK
+    assert "Corvid" not in str(masked)
+    assert "NOT AI" in masked["line"] and "REAL PERSON" in masked["line"]
+
+
+def test_the_whole_facial_catalogue_is_available(client):
+    """Named as a need rather than a nicety: somebody with dysmorphia has to be
+    able to appear without appearing. One mask and a shrug is not that."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    rid = _room(client, p, sam)
+
+    assert len(overlays.FACE_KINDS) >= 15
+    for kind in ("obscured", "silhouette", "avatar_2d", "avatar_3d",
+                 "stylised", "prosthetic", "half_mask"):
+        assert kind in overlays.FACE_KINDS
+        r = client.post(f"/places/room/{rid}/overlay",
+                        json={"interactor_id": sam["id"], "kind": kind,
+                              "title": kind.replace("_", " ")},
+                        headers=_as(sam["token"]))
+        assert r.status_code == 201, f"{kind}: {r.text}"
 
 
 def test_the_mark_is_bound_to_the_account_that_owns_the_stream(client):

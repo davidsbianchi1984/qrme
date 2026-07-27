@@ -92,14 +92,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   protected nothing and cost the people who most need to work without showing
   their face.
 
-  `GET /desks/{id}/live-person` returns the pair, and the pair **is** the
-  disclosure — *"Live person — not AI · wearing The Wolf"*. Either half alone
-  is a different and wrong claim: "real person" over a mask invites the reading
-  that the mask is their face; "wearing an overlay" without it invites the
-  reading that the whole picture is generated, which is the opposite error and
-  the one this platform exists to prevent. So neither is available on its own.
-  The mark is read from the desk row and its attestation, never accepted from a
-  client, so a stream that never earned it cannot paste it on.
+  `GET /desks/{id}/live-person` returns **one burned mark — `NOT AI · REAL
+  PERSON`** — and it does not change when somebody puts a face on. A first fix
+  composed the badge with the costume (*"… · wearing The Wolf"*), which
+  answered a question nobody had: a viewer is on a **named account's** live or
+  room, with the handle at the top left, and they chose it to get there. The
+  open question on that page is never *is that his real nose*, it is *is there
+  a person here at all*.
+
+  It also removed a quiet penalty — somebody covering their face because of
+  dysmorphia, or because their work makes showing it unsafe, was handed a badge
+  announcing the fact on every frame while the person beside them got a clean
+  one. Same claim, same mark, whatever you wear. Read from the desk row and its
+  attestation, never accepted from a client, so a stream that never earned it
+  cannot paste it on.
+
+- **Seventeen face overlays**, not one. Masks and half masks, characters,
+  creatures, 2-D and 3-D avatars, helmets and visors, paint, makeup, hair,
+  headwear, eyewear, prosthetics, rendered styles, and plain blur or silhouette
+  for anybody who wants to be present without being seen. Named as a need
+  rather than a nicety: somebody with dysmorphia has to be able to appear
+  without appearing, and one mask and a shrug is not that.
 
 - **Backgrounds: your own, imported, or AI-generated** — screen 124. `kind`
   says what happened to your face; the new `source` says what happened to the
@@ -115,11 +128,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   is the seat that means *in the match, taking a slot*, and nothing synthetic
   may hold one; checked in `gamelobby.seat` rather than left to a prompt,
   because the point of the rule is that it survives a model deciding otherwise.
-  `own_hardware` closes the obvious way round *"no automation"*, which is to
-  stop calling it automation: **a second machine moves where a bot runs, it
-  does not turn the bot into a player.** No console, PC, handheld or separate
-  instance makes a synthetic member eligible for a two-, three- or any-player
-  game.
+  Five more entries close the plumbing, each refused **in the words somebody
+  would use to ask for it**, because a single generic refusal loses that
+  argument — "it's only a second controller" is true and not the point.
+  `own_hardware` (a second machine moves where a bot runs), `second_controller`
+  (the same bot with a shorter cable — a controller nobody is holding is not a
+  player's), `bluetooth_input` (that again, wireless; the pairing is the tell),
+  `capture_perception` (a capture card feeding it the picture is how it would
+  learn where to aim — **watching the screen to play is playing**),
+  `game_plugin` (an overlay, mod, injector or plug-in handing it state or
+  controls, whatever it is called), and `own_character` (no member pilots one —
+  not a second character beside yours, not a co-op partner, not a body in the
+  world).
 
 - **More than one synthetic thing in a game session** — `qrme/gamelobby.py`,
   5 routes, 19 tests, screen 122. `game_sessions` seats exactly one profile;

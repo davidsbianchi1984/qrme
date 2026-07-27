@@ -34,12 +34,17 @@ somebody without one. A costume is not a synthesis. Refusing it protected
 nothing and cost the one group who most need to work without showing their
 face.
 
-So the desk keeps its badge and the overlay rides beside it, and the pair is
-the disclosure: :func:`live_person_mark` states both facts at once — *a real
-person, and they are wearing something.* Neither half is any use alone. "Real
-person" over a mask invites the reading that the mask is their face; "wearing
-an overlay" without the first invites the reading that the whole thing is
-generated.
+So the desk keeps its badge, and the badge does not mention the costume.
+:func:`live_person_mark` returns :data:`LIVE_MARK` — *NOT AI · REAL PERSON* —
+whatever is on the wearer's face. A viewer is on a **named account's** live or
+room, with the handle at the top left; they chose it to get there and they know
+whose stream it is. The open question on that page is never *is that his real
+nose*, it is *is there a person here at all*.
+
+That also removes a quiet penalty. Somebody who covers their face because of
+dysmorphia, or because their work makes showing it unsafe, was being handed a
+badge that announced the fact on every frame while the person beside them got a
+clean one. Same claim, same mark, whatever you are wearing.
 
 **The mark is bound to the account that owns the stream.** It is issued
 against the desk, not asserted by the client, so it cannot be pasted onto a
@@ -62,21 +67,52 @@ from . import db
 # leave it alone. They are disclosed differently below because they are
 # different claims about what the viewer is seeing.
 KINDS: dict[str, dict] = {
+    # -- worn over the face ---------------------------------------------------
     "mask": {"covers_face": True,
              "means": "a mask or helmet drawn over your face"},
+    "half_mask": {"covers_face": True,
+                  "means": "a domino or half mask — your eyes and mouth show"},
     "character": {"covers_face": True,
                   "means": "an invented character replacing your face"},
     "creature": {"covers_face": True,
                  "means": "an animal or creature, driven by your expressions"},
     "puppet": {"covers_face": True,
                "means": "an avatar you drive — it moves when you move"},
+    "avatar_2d": {"covers_face": True,
+                  "means": "a drawn 2-D face that follows yours"},
+    "avatar_3d": {"covers_face": True,
+                  "means": "a modelled 3-D head that follows yours"},
     "helmet_hud": {"covers_face": True,
                    "means": "a visor or helmet with a readout over it"},
+    "paint": {"covers_face": True,
+              "means": "face paint, markings or tattoos over your features"},
+    "makeup": {"covers_face": True,
+               "means": "stage makeup — your face, styled"},
+    "hair": {"covers_face": True,
+             "means": "hair, a wig or a beard drawn on"},
+    "headwear": {"covers_face": True,
+                 "means": "a hat, hood, veil or headdress"},
+    "eyewear": {"covers_face": True,
+                "means": "glasses, goggles or a visor over your eyes"},
+    "prosthetic": {"covers_face": True,
+                   "means": "sculpted features — a nose, a brow, a jaw"},
+    "stylised": {"covers_face": True,
+                 "means": "a rendered style over your own face — ink, cel, "
+                          "clay, pixel"},
+    "obscured": {"covers_face": True,
+                 "means": "your face blurred, pixelated or blacked out"},
+    "silhouette": {"covers_face": True,
+                   "means": "you as an outline, lit from behind"},
+
+    # -- your own face, left alone --------------------------------------------
     "touch_up": {"covers_face": False,
                  "means": "lighting and smoothing — still your face"},
     "backdrop": {"covers_face": False,
                  "means": "a replaced background — your face is untouched"},
 }
+
+# The face-covering ones, derived rather than listed twice.
+FACE_KINDS = tuple(k for k, v in KINDS.items() if v["covers_face"])
 
 # What no overlay may be, with the reason each is refused. Published by name
 # rather than left out of the catalogue: an absence reads as a gap somebody
@@ -130,6 +166,29 @@ BACKDROP_SOURCES: dict[str, dict] = {
     "blur": {"synthetic": False,
              "means": "their real room, blurred"},
 }
+
+# The burned mark a live stream carries, and it does not change when somebody
+# puts a face on.
+#
+# An earlier version composed the badge with the costume — *"Live person — not
+# AI · wearing The Wolf"* — on the reasoning that a viewer needs to know the
+# face is not the face. They do not, and saying it was answering a question
+# nobody had: **a viewer is on a named account's live or room.** The handle is
+# at the top left, they arrived by choosing it, and they know whose stream this
+# is. The open question on that page is never *is that his real nose*, it is
+# *is there a person here at all* — and that is the only thing this mark
+# answers.
+#
+# Dropping the costume half also removes a quiet penalty. Somebody who covers
+# their face because of dysmorphia, or because their work makes showing it
+# unsafe, was being given a badge that announced the fact on every frame while
+# the person beside them got a clean one. Same claim, same mark, whatever is on
+# your face.
+#
+# Burned rather than composited, for the reason every mark in this codebase is:
+# a badge drawn by the client survives neither a screenshot nor a re-host, and
+# those are the journeys a stream frame actually takes.
+LIVE_MARK = "NOT AI · REAL PERSON"
 
 MAX_PER_SURFACE = 1
 
@@ -400,36 +459,19 @@ def live_person_mark(desk_id: str) -> dict:
     if row is None:
         return {}
 
-    over = wearing_on_desk(desk_id)
-    mark = {
+    return {
         "desk_id": desk_id,
         # Bound to the account that owns the stream, which is what makes this
         # unforgeable by anybody else's client.
         "owner_id": row["owner_id"],
+        # The whole mark, and it does not vary. See LIVE_MARK.
+        "line": LIVE_MARK,
         "designation": desks.DESIGNATION,
         "real_person": True,
+        "burned": True,
         "attestor": row["attestor"],
         "attestation_basis": row["attestation_basis"],
         "attested_at": row["attested_at"],
         "note": desks.ATTESTATION_NOTE,
-        "wearing_overlay": over is not None,
+        "means": "a real person is behind this stream",
     }
-    if over is None:
-        mark["line"] = desks.DESIGNATION
-        mark["means"] = "a real person is behind this stream"
-        return mark
-
-    mark["overlay"] = {"kind": over["kind"], "title": over["title"],
-                       "covers_face": over["covers_face"]}
-    if over["covers_face"]:
-        mark["line"] = f"{desks.DESIGNATION} · wearing {over['title']}"
-        mark["means"] = (
-            "a real person is behind this stream and they are wearing "
-            "something over their face. The costume is not AI, and neither "
-            "is the person under it")
-    else:
-        mark["line"] = f"{desks.DESIGNATION} · {over['title']}"
-        mark["means"] = (
-            "a real person, and what has changed is behind them rather than "
-            "on them")
-    return mark

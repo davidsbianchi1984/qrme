@@ -92,6 +92,29 @@ NEVER: dict[str, str] = {
     "own_hardware": "and not from a console, PC, handheld or instance of its "
                     "own either. A second machine does not turn a bot into a "
                     "player; it just moves where the bot is running",
+    # The rest of the plumbing, named individually. Every one of these is the
+    # same act — a synthetic thing driving a character — and each arrives
+    # wearing a different word, so refusing the act generically is not enough.
+    # Somebody proposing one of these will say "it is only a controller", "it
+    # is only a capture card", "it is only a plug-in", and the refusal has to
+    # meet them in that vocabulary.
+    "second_controller": "a second pad, stick or wheel on the same console is "
+                         "the same bot with a shorter cable — one player, one "
+                         "controller, and a controller nobody is holding is "
+                         "not a player's",
+    "bluetooth_input": "pairing a synthetic member to a console as an input "
+                       "device is the second controller again, wireless. The "
+                       "pairing is the tell, not the cable",
+    "capture_perception": "a capture card or video-in feeding the game's "
+                          "picture to a member is how it would learn where to "
+                          "aim. Watching the screen to play is playing",
+    "game_plugin": "an overlay, mod, injector or plug-in that hands a member "
+                   "the game's state or its controls, whatever it is called "
+                   "and whoever wrote it",
+    "own_character": "no member pilots a character. Not a second character "
+                     "beside the player's, not a co-op partner, not a body "
+                     "in the world — the player's character is the only one "
+                     "this platform's account is behind",
 }
 
 FAIR_PLAY = (
@@ -99,9 +122,12 @@ FAIR_PLAY = (
     "member sends an input to the game, corrects anybody's aim, or takes an "
     "action on a player's behalf — that is the line between a coach and a "
     "cheat, and it is a property of the code rather than a setting. No "
-    "synthetic member occupies a player slot in a multiplayer game, and "
-    "giving one a console of its own does not change that: a second machine "
-    "moves where a bot runs, it does not make the bot a player."
+    "synthetic member occupies a player slot in a multiplayer game, and no "
+    "amount of hardware changes that: not a console of its own, not a second "
+    "controller on yours, not a Bluetooth pad paired to it, not a capture "
+    "card feeding it the picture, not a plug-in handing it the controls. "
+    "Every one of those is the same bot with different plumbing, and none of "
+    "them pilots a character beside you."
 )
 
 # The seats a synthetic member may hold. A `player` seat is a person's, and

@@ -194,8 +194,10 @@ def test_nothing_here_can_act_in_a_game(client):
             assert not any(banned in n for n in names), (
                 f"{module.__name__} grew a function named for {banned!r}")
 
-    assert set(gamelobby.NEVER) == {"input", "aim", "macro", "automation",
-                                    "exploit", "player_slot", "own_hardware"}
+    assert set(gamelobby.NEVER) == {
+        "input", "aim", "macro", "automation", "exploit",
+        "player_slot", "own_hardware", "second_controller", "bluetooth_input",
+        "capture_perception", "game_plugin", "own_character"}
     assert "Nothing in it plays" in gamelobby.FAIR_PLAY
 
 
@@ -340,8 +342,8 @@ def test_the_vocabulary_publishes_what_nothing_here_can_do(client):
     """A limit nobody can read is a limit nobody can rely on."""
     out = client.get("/gaming/lobby/vocabulary").json()
     never = {n["thing"] for n in out["never"]}
-    assert never == {"input", "aim", "macro", "automation", "exploit",
-                     "player_slot", "own_hardware"}
+    assert never == set(gamelobby.NEVER)
+    assert all(n["means"] for n in out["never"])
     assert out["max_synthetic"] == gamelobby.MAX_SYNTHETIC
 
 
@@ -380,6 +382,29 @@ def test_a_person_still_takes_a_player_seat(client):
     sid = _session(client, host)
     out = gamelobby.seat(sid, "player", sam["id"], "teammate")
     assert out["seated"] is True and out["synthetic"] is False
+
+
+def test_every_way_of_plugging_a_bot_in_is_refused_by_its_own_name(client):
+    """The act is one act — a synthetic thing driving a character — and it
+    arrives wearing a different word every time.
+
+    Somebody proposing it says "it is only a second controller", "it is only a
+    capture card", "it is only a plug-in". A single generic refusal loses that
+    argument, because each of those is true and none of them is the point. So
+    each is refused in the vocabulary somebody would use to ask for it.
+    """
+    n = gamelobby.NEVER
+    assert "shorter cable" in n["second_controller"]
+    assert "wireless" in n["bluetooth_input"]
+    assert "Watching the screen to play is playing" in n["capture_perception"]
+    assert "whoever wrote it" in n["game_plugin"]
+    assert "no member pilots a character" in n["own_character"]
+
+    play = gamelobby.FAIR_PLAY
+    for plumbing in ("console of its own", "second controller", "Bluetooth",
+                     "capture card", "plug-in"):
+        assert plumbing in play, plumbing
+    assert "same bot with different plumbing" in play
 
 
 def test_a_console_of_its_own_does_not_make_a_bot_a_player(client):

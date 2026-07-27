@@ -3542,7 +3542,7 @@ SCREENS = [
     # Wearing a character over your own camera. The last two cards are the
     # feature: an overlay is synthetic media on a real face, so the screen that
     # offers it is also the screen that says what it can never be.
-    dict(num=121, title="Wear a Character", sub="Your camera, someone else's face",
+    dict(num=121, title="Wear a Character", sub="Seventeen faces, and your own",
          accent="pink", tab=3, cards=[
         dict(icon="mask", color="pink", k="Blue Fox",
              s="driven by your own expressions", pill=("WORN", "good")),
@@ -3575,18 +3575,18 @@ SCREENS = [
     # The desk badge with a mask on it. The screen exists because the pair is
     # the disclosure: either line alone is a different and wrong claim, so the
     # first two cards are deliberately adjacent and equally weighted.
-    dict(num=123, title="Masked and Real", sub="A live desk keeps its badge",
+    dict(num=123, title="Masked and Real", sub="One mark, whatever you wear",
          accent="green", tab=3, cards=[
-        dict(icon="shieldok", color="green", k="Live person, not AI",
-             s="a costume is not a synthesis", pill=("REAL", "good")),
-        dict(icon="mask", color="pink", k="Wearing The Wolf",
-             s="and the viewer is told both", pill=("WORN", "info")),
-        dict(icon="lock", color="cyan", k="Tied to your account",
+        dict(icon="shieldok", color="green", k="NOT AI · REAL PERSON",
+             s="burned in — mask or none"),
+        dict(icon="person", color="cyan", k="@otis_marsh",
+             s="top left, where it always was"),
+        dict(icon="lock", color="indigo", k="Tied to your account",
              s="no one else can paste it on"),
-        dict(icon="eye", color="brand", k="Shown on the stream",
-             s="not buried in a settings page"),
-        dict(icon="person", color="amber", k="Still a person behind it",
-             s="that is all the badge ever said"),
+        dict(icon="eye", color="brand", k="They know whose room",
+             s="they chose it to get here"),
+        dict(icon="mask", color="pink", k="Change your face too",
+             s="see Wear a Character"),
     ], button=("Change the mask", "brand")),
     # Backgrounds, and the third card is the whole reason this is not just a
     # picker: a generated room is synthetic media even when the face is not.
@@ -3600,23 +3600,23 @@ SCREENS = [
              s="AI-made — and it says so", pill=("AI", "info")),
         dict(icon="eye", color="brand", k="Blur your real room",
              s="the room you are really in"),
-        dict(icon="person", color="green", k="Your face is untouched",
-             s="only what is behind you changed"),
+        dict(icon="mask", color="green", k="Change your face too",
+             s="see Wear a Character"),
     ], button=("Change background", "brand")),
     # The hardware answer to the fair-play rule, refused on its own screen
     # because it is the workaround somebody will actually propose.
     dict(num=125, title="Never a Player", sub="Synthetic members sit beside you",
          accent="red", tab=3, cards=[
         dict(icon="warn", color="red", k="Never a player slot",
-             s="they never take a slot"),
-        dict(icon="cross", color="red", k="Not from its own console",
-             s="a second machine is still a bot"),
+             s="not on your console either"),
+        dict(icon="cross", color="red", k="No second controller",
+             s="the same bot, shorter cable"),
+        dict(icon="cross", color="pink", k="No Bluetooth pad",
+             s="pairing one is the tell"),
+        dict(icon="cross", color="amber", k="No capture card",
+             s="watching to play is playing"),
         dict(icon="people", color="green", k="Beside the players",
              s="coach, spotter, archivist"),
-        dict(icon="chat", color="cyan", k="They observe and talk",
-             s="that is the whole capability"),
-        dict(icon="shieldok", color="brand", k="Checked, not promised",
-             s="the code refuses, not the prompt"),
     ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
