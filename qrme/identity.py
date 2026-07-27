@@ -78,8 +78,8 @@ REAL_PERSON_KINDS = ("self", "other_person")
 WITHHELD = (
     "your display name — surfaces show a fixed 'Anonymous 00000000' tied to "
     "this profile, which you cannot change and which says nothing about you",
-    "your picture — unless you replace it. The bubble starts as a silhouette "
-    "and you may put a field emblem or your own image in it",
+    "your picture — unless you replace it. The bubble starts empty and you "
+    "may put a field emblem or your own image in it",
     "your owner account, so two of your profiles cannot be matched to "
     "each other by whoever is reading them",
     "who verified you, if anyone did — the attestor is a pointer back to you",
@@ -641,8 +641,8 @@ def emblem_of(profile_id: str) -> str | None:
 def emblem_asset(profile_id: str) -> str:
     """The picture an anonymous profile shows.
 
-    Their own upload, or a preset emblem, or the plain silhouette — in that
-    order, because the most specific choice somebody made is the one to honour.
+    Their own upload, or a preset emblem, or the empty frame — in that order,
+    because the most specific choice somebody made is the one to honour.
     """
     from . import avatars
     chosen = picture_of(profile_id)
@@ -650,7 +650,7 @@ def emblem_asset(profile_id: str) -> str:
         return chosen["asset"]
     if chosen["emblem"]:
         return f"{avatars.FIGURE_ROUTE}/emblem-{chosen['emblem']}.svg"
-    return avatars.SILHOUETTE
+    return avatars.ADD_PHOTO
 
 
 def set_picture(profile_id: str, emblem: str | None = None,
@@ -658,7 +658,7 @@ def set_picture(profile_id: str, emblem: str | None = None,
                 depicts_someone_else: bool = False) -> dict:
     """Put something in the bubble: a preset emblem, or an image of your own.
 
-    Both empty clears it back to the plain silhouette. Both set is refused —
+    Both empty clears it back to the empty frame. Both set is refused —
     two pictures for one bubble has no answer, and picking one silently would
     make the other setting look broken.
 
@@ -711,12 +711,6 @@ def set_picture(profile_id: str, emblem: str | None = None,
         "profile_id": profile_id,
         "emblem": emblem,
         "asset": emblem_asset(profile_id),
-        # What the *owner's* editor should draw in the bubble. The photo-plus
-        # while it is empty, because an empty bubble is an invitation to them
-        # and a default to everybody else — `avatars.render` keeps returning
-        # the plain silhouette to visitors either way.
-        "editor_asset": (avatars.ADD_PHOTO if emblem is None and asset is None
-                         else emblem_asset(profile_id)),
         "own_image": asset is not None,
         "shown": bool(profile["anonymous"]),
         "note": ("in the bubble now" if profile["anonymous"] else

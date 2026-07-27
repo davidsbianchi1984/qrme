@@ -214,10 +214,9 @@ def emblems() -> dict:
     from .. import avatars
 
     return {"emblems": identity.emblems(),
-            "plain": "the silhouette everybody starts with",
-            # The control an owner taps on an empty bubble. Not what a visitor
-            # sees — they get the silhouette, because an "add a picture" button
-            # on somebody else's profile is a button that is not theirs.
+            # The empty bubble everybody starts with, and what an owner taps
+            # to fill it. One picture rather than two: the name does the
+            # identifying, so this is a placeholder rather than a claim.
             "add_picture": avatars.ADD_PHOTO,
             "own_image": "you can upload your own instead — these are a "
                          "shortcut, not the only option",

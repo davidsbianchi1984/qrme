@@ -342,7 +342,7 @@ def test_an_anonymous_profile_gets_the_silhouette_not_its_own_face(client):
     db.connect().commit()
 
     art = avatars.render(p["id"])
-    assert art["asset"] == avatars.SILHOUETTE
+    assert art["asset"] == avatars.ADD_PHOTO
     assert art["silhouette"] is True
     assert "wren" not in art["asset"].lower()
 
@@ -360,7 +360,7 @@ def test_everybody_anonymous_gets_the_same_one(client):
     c3 = _hidden(client, owner_id="owner-sil-1", display_name="Three")
 
     faces = {avatars.render(p["id"])["asset"] for p in (a, b, c3)}
-    assert len(faces) == 1
+    assert len(faces) == 1 and faces == {avatars.ADD_PHOTO}
 
 
 def test_a_hidden_profile_never_falls_back_to_initials(client):
@@ -371,7 +371,7 @@ def test_a_hidden_profile_never_falls_back_to_initials(client):
     p = _hidden(client, display_name="Wren Ashby")
     art = avatars.render(p["id"])
     assert art["placeholder"] is False
-    assert art["asset"] == avatars.SILHOUETTE
+    assert art["asset"] == avatars.ADD_PHOTO
 
 
 def test_a_named_profile_keeps_its_own_face(client):
@@ -396,11 +396,12 @@ def test_the_silhouette_is_not_burned_with_the_ai_mark(client):
     assert avatars.asset_is_marked(avatars.SILHOUETTE) is False
 
 
-def test_the_silhouette_file_ships_with_the_package(client):
+def test_the_default_picture_ships_with_the_package(client):
     """A route serving a file that is not installed is a broken image on every
     anonymous profile."""
     from qrme import avatars
-    assert (avatars.figures_dir() / "silhouette.svg").is_file()
+    name = avatars.ADD_PHOTO.rsplit("/", 1)[-1]
+    assert (avatars.figures_dir() / name).is_file()
 
 
 def test_the_report_says_the_picture_is_withheld_too(client):
@@ -410,8 +411,10 @@ def test_the_report_says_the_picture_is_withheld_too(client):
     p = _hidden(client)
     out = client.get(f"/profiles/{p['id']}/anonymity",
                      headers=auth_header(p)).json()
-    assert any("silhouette" in s for s in out["withheld"])
-    assert not any("picture" in s for s in out["not_withheld"])
+    assert any("your picture" in s for s in out["withheld"])
+    # …and the half that says what it cannot do, now that an upload is allowed.
+    assert any("photograph you put in the bubble" in s
+               for s in out["not_withheld"])
 
 
 # -- whose surface is this ----------------------------------------------------
@@ -640,7 +643,7 @@ def test_an_anonymous_profile_can_say_what_field_it_works_in(client):
     from qrme import avatars
 
     p = _hidden(client, display_name="Wren Ashby")
-    assert avatars.render(p["id"])["asset"] == avatars.SILHOUETTE
+    assert avatars.render(p["id"])["asset"] == avatars.ADD_PHOTO
 
     r = client.put(f"/profiles/{p['id']}/emblem",
                    json={"emblem": "healthcare"}, headers=auth_header(p))
@@ -764,7 +767,7 @@ def test_clearing_it_returns_the_plain_figure(client):
                headers=auth_header(p))
     client.put(f"/profiles/{p['id']}/emblem", json={},
                headers=auth_header(p))
-    assert avatars.render(p["id"])["asset"] == avatars.SILHOUETTE
+    assert avatars.render(p["id"])["asset"] == avatars.ADD_PHOTO
 
 
 def test_only_the_owner_chooses_it(client):
@@ -778,40 +781,40 @@ def test_only_the_owner_chooses_it(client):
                       headers=_anon(client)).status_code == 401
 
 
-def test_an_empty_bubble_offers_its_owner_a_photo_and_a_plus(client):
-    """The control, in the bubble, for the person who can use it."""
+def test_an_empty_bubble_is_an_empty_frame_for_everybody(client):
+    """One default picture, not two.
+
+    There was briefly a plain silhouette for strangers and a photo-and-plus for
+    the owner, on the reasoning that the second reads as a control and a
+    control offered to somebody who cannot press it reports the empty bubble as
+    a gap. The identifying work is done by the name — `Anonymous 41338025` — so
+    the picture is a placeholder rather than a claim about anybody, and two
+    defaults meant two things that could disagree about the same profile.
+    """
     from qrme import avatars
 
     p = _hidden(client)
-    out = client.put(f"/profiles/{p['id']}/emblem", json={},
-                     headers=auth_header(p)).json()
-    assert out["editor_asset"] == avatars.ADD_PHOTO
-
-    catalogue = client.get("/identity/emblems").json()
-    assert catalogue["add_picture"] == avatars.ADD_PHOTO
+    assert avatars.render(p["id"])["asset"] == avatars.ADD_PHOTO
+    assert client.get("/identity/emblems").json()["add_picture"] == \
+        avatars.ADD_PHOTO
     assert (avatars.figures_dir() / "add-photo.svg").is_file()
 
 
-def test_a_visitor_never_sees_the_add_button(client):
-    """Showing a stranger "add a picture" on somebody else's profile offers a
-    button that is not theirs to press, and reports the absence as a gap in
-    the profile rather than as the default it is."""
-    from qrme import avatars
-
+def test_there_is_no_second_field_naming_the_same_picture(client):
+    """`editor_asset` existed only to differ from `asset`, and once they agree
+    it is a second field that can disagree — the shape of bug this codebase
+    keeps finding."""
     p = _hidden(client)
-    art = avatars.render(p["id"])
-    assert art["asset"] == avatars.SILHOUETTE
-    assert art["asset"] != avatars.ADD_PHOTO
-
-    seen = client.get(f"/profiles/{p['id']}", headers=_anon(client)).json()
-    assert "add-photo" not in str(seen)
+    out = client.put(f"/profiles/{p['id']}/emblem", json={},
+                     headers=auth_header(p)).json()
+    assert "editor_asset" not in out
 
 
-def test_the_add_button_gives_way_once_something_is_in_it(client):
+def test_the_empty_frame_gives_way_once_something_is_in_it(client):
     from qrme import avatars
 
     p = _hidden(client)
     out = client.put(f"/profiles/{p['id']}/emblem", json={"emblem": "trades"},
                      headers=auth_header(p)).json()
-    assert out["editor_asset"].endswith("emblem-trades.svg")
-    assert out["editor_asset"] != avatars.ADD_PHOTO
+    assert out["asset"].endswith("emblem-trades.svg")
+    assert avatars.render(p["id"])["asset"] != avatars.ADD_PHOTO

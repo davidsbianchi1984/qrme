@@ -82,30 +82,28 @@ ASSET_ROUTE = "/portraits"
 # marks are intact is not a trade worth making for a folder layout.
 PHOTO_ROUTE = "/photos"
 
-# The one face every anonymous profile wears, and a third kind of asset again.
+# What an anonymous profile shows before it puts anything in the bubble: an
+# empty picture frame with a plus. A third kind of asset again — not a portrait,
+# since nothing generated it and burning the AI mark into it would be a false
+# statement about a drawing of nobody; not a photograph either, since it depicts
+# no one. Interface furniture, so it lives apart from both and `asset_is_marked`
+# reports False for it like any other unburned file.
 #
-# Not a portrait: nothing generated it, so burning the AI mark into it would be
-# a false statement about a drawing of nobody. Not a photograph either: it
-# depicts no one. It is interface furniture, so it lives apart from both and
-# `asset_is_marked` reports False for it like any other unburned file.
-#
-# **Identical for everybody, on purpose.** A per-profile silhouette — tinted,
-# initialled, or generated from the profile id — would be a stable mark that
-# follows one person across every surface they appear on, which is precisely
-# what an anonymous profile is trying not to have. Two anonymous profiles have
-# to be indistinguishable at a glance, whether or not they are the same person.
+# **One picture, for the owner and for visitors alike.** There was briefly a
+# plain silhouette for strangers and this for the owner, on the reasoning that a
+# photo-and-plus reads as a control and a control offered to somebody who cannot
+# press it reports the empty bubble as a gap. The identifying work is done by
+# the name — `Anonymous 41338025` — so the picture is a placeholder rather than
+# a claim about anybody, and an empty frame is the most honest drawing of an
+# empty frame. Two defaults meant two things that could disagree about the same
+# profile, which is the shape of bug this codebase keeps finding.
 FIGURE_ROUTE = "/figures"
-SILHOUETTE = f"{FIGURE_ROUTE}/silhouette.svg"
-
-# The empty bubble as its **owner** sees it: a photo with a plus, inviting them
-# to put something in it.
-#
-# Deliberately not what `render()` returns. A visitor looking at an anonymous
-# profile that has set no picture gets the plain silhouette, because showing
-# them this would be offering a button that is not theirs to press — and would
-# report the absence as a gap in somebody's profile rather than as the default
-# it is. This is a control, and controls belong to the person who can use them.
 ADD_PHOTO = f"{FIGURE_ROUTE}/add-photo.svg"
+
+# The old name, still pointing at the one default. Kept because `silhouette` is
+# what the *field* on a render is called, and a constant that disagreed with it
+# would be worse than a slightly dated word.
+SILHOUETTE = ADD_PHOTO
 
 
 def portraits_dir():
@@ -343,7 +341,7 @@ def render(profile_id: str) -> dict:
         return {}
     asset = row["avatar"] or None
 
-    # An anonymous profile gets the silhouette, and gets it *here*.
+    # An anonymous profile gets the stand-in picture, and gets it *here*.
     #
     # Two things were leaking past the flag. A profile that had set a portrait
     # of its own face went on serving that face — a picture is the strongest
