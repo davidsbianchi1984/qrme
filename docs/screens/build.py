@@ -3756,6 +3756,73 @@ SCREENS = [
         dict(icon="search", color="amber", k="Browsing stays open",
              s="look before you pay"),
     ], button=("Compare plans", "brand")),
+    # ---- first-run: the plan step ----
+    #
+    # Distinct from 130, which is the reference price list reached from
+    # settings. This is the one in the signup flow, and the difference that
+    # matters is the third card: you can decline and keep looking, because a
+    # visitor is a real state rather than a lapsed customer.
+    dict(num=132, title="Pick a Plan", sub="Step 4 of 5",
+         accent="brand", tab=0, cards=[
+        dict(icon="person", color="cyan", k="Basic · $20/month",
+             s="make profiles and your agent"),
+        dict(icon="bolt", color="brand", k="Pro · $130/month",
+             s="all that leaves your account"),
+        dict(icon="eye", color="green", k="Not yet — just look",
+             s="you need a plan to make things"),
+        dict(icon="lock", color="amber", k="Change or cancel later",
+             s="your profiles outlive the plan"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Continue with Basic", "brand")),
+    # The payment step, marked. Drawn rather than skipped because a signup
+    # flow has one and pretending otherwise would make the mockups a worse
+    # guide than the product — but every version of this screen carries the
+    # simulation pill, because a convincing checkout is the one place in this
+    # repository somebody could reasonably be misled about money.
+    dict(num=133, title="Payment", sub="Step 5 of 5",
+         accent="cyan", tab=0, cards=[
+        dict(icon="coin", color="amber", k="Basic · $20 a month",
+             s="first charge today", pill=("SIM", "warn")),
+        dict(icon="lock", color="green", k="Card details",
+             s="nothing is sent anywhere"),
+        dict(icon="warn", color="red", k="No processor is called",
+             s="the subscription is a row"),
+        dict(icon="cal", color="cyan", k="Renews monthly",
+             s="cancel from settings"),
+        dict(icon="shieldok", color="indigo", k="Leave and keep it all",
+             s="cancelling deletes nothing"),
+    ], button=("Confirm — simulated", "brand")),
+    # Where signup lands. The fourth card is the honest half of an upsell:
+    # naming what is not included beats discovering it at a wall.
+    dict(num=134, title="You're on Basic", sub="Here is what that means",
+         accent="green", tab=0, cards=[
+        dict(icon="shieldok", color="green", k="Make what you like",
+             s="profiles, and your own agent", pill=("ON", "good")),
+        dict(icon="grid", color="amber", k="Marketplace is Pro",
+             s="you can browse it now"),
+        dict(icon="link", color="amber", k="Connectors are Pro",
+             s="so are lent skills"),
+        dict(icon="sliders", color="amber", k="Builders are Pro",
+             s="steering and governance"),
+        dict(icon="compass", color="brand", k="The guide knows the way",
+             s="ask it where anything is"),
+    ], button=("Start building", "brand")),
+    # The 402 moment, in context. This is what the structured refusal is for:
+    # a client shows a price rather than a permission error.
+    dict(num=135, title="This Needs Pro", sub="What you tapped, and why",
+         accent="amber", tab=3, cards=[
+        dict(icon="lock", color="amber", k="Listing on the market",
+             s="needs Pro · $130/month"),
+        dict(icon="person", color="cyan", k="You are on Basic",
+             s="nothing changes on its own"),
+        dict(icon="search", color="green", k="Keep browsing free",
+             s="looking was never gated"),
+        dict(icon="bolt", color="brand", k="What else Pro adds",
+             s="connectors, skills, builders"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Upgrade to Pro", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

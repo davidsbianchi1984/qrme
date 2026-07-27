@@ -303,7 +303,12 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/131-what-pro-adds.svg"><img src="docs/screens/131-what-pro-adds.svg" width="210" alt="What Pro Adds"></a><br><sub><b>131</b> · What Pro Adds</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/132-pick-a-plan.svg"><img src="docs/screens/132-pick-a-plan.svg" width="210" alt="Pick a Plan"></a><br><sub><b>132</b> · Pick a Plan</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/133-payment.svg"><img src="docs/screens/133-payment.svg" width="210" alt="Payment"></a><br><sub><b>133</b> · Payment</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/134-youre-on-basic.svg"><img src="docs/screens/134-youre-on-basic.svg" width="210" alt="You are on Basic"></a><br><sub><b>134</b> · You're on Basic</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/135-this-needs-pro.svg"><img src="docs/screens/135-this-needs-pro.svg" width="210" alt="This Needs Pro"></a><br><sub><b>135</b> · This Needs Pro</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>

@@ -62,6 +62,15 @@ LESSONS: tuple[dict, ...] = (
               "Every one is marked as AI, and the mark is burned into the "
               "portrait's pixels so it survives a screenshot.",
          screens=(1, 2, 19), try_it="Look at the mark on any portrait here."),
+    dict(key="signup", chapter="Getting started", title="Signing up",
+         what="Log in, verify you are a real person once, choose what the app "
+              "may reach, pick a plan and pay. You can decline the plan and "
+              "keep looking — a visitor reads any public page, and only "
+              "*making* something needs Basic. If you later tap something "
+              "your plan does not include, the app says which plan it needs "
+              "and what it costs rather than refusing you flatly.",
+         screens=(132, 133, 134, 135),
+         try_it="Open Pick a Plan and read the third option."),
     dict(key="make_one", chapter="Getting started", title="Making a profile",
          what="You describe who it is and it answers in character from the "
               "first message. Genesis builds one from four questions if you "
