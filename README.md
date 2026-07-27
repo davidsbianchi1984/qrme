@@ -275,9 +275,10 @@ portrait's own pixels**, so it survives a screenshot, a hotlink, or a crop:
 these images carry their disclosure wherever they end up, including here.
 
 Each one is shown as **the card the app actually gives it** — screen 80, the
-profile front page a visitor lands on: the avatar bubble, the role, the rating
-people who talked to it left, the skill chips, and Memory / Relationships /
-Engagement under them. The gallery used to be a portrait with a name and an industry
+profile front page a visitor lands on, carried all the way through: the avatar
+bubble, the role, the rating people who talked to it left, the skill chips,
+Memory / Relationships / Engagement, then the career and a review, then **Talk
+to …**. The gallery used to be a portrait with a name and an industry
 captioned beneath, which is a directory listing rather than a profile, and it
 was five columns wide — about 590px of content on a phone that offers 390, so
 the fourth column was sliced mid-word and the fifth never appeared at all.
