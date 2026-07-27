@@ -342,7 +342,48 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the creator is not, which is the condition the whole feature has to survive.
   Writing the second one found three of the defects below.
 
+- **A profile on a screen that stays where it is** — `qrme/displays.py`,
+  6 routes, 17 tests, screen 126. A wall panel, a kiosk, a counter screen, a
+  pane of glass with something behind it. Sizes `badge`/`half`/`full`,
+  finishes `opaque`/`transparent`, and a closed set of faces — the watch-face
+  idea applied to fixtures, for the same reason the watch's list is closed.
+
+  **A stationary screen is not a small watch, and that is the whole module.** A
+  watch is on one person's wrist; they chose it and they are the only one
+  reading it. A wall panel is read by whoever walks past — a courier, a child,
+  somebody visiting the person whose profile it shows. That is the
+  room-microphone argument from the other direction: there a device that
+  *hears* people who did not agree, here one that *shows* things to people who
+  did not ask. So the list is **shorter** than the watch's, and every face on
+  it is already public.
+
+  **There is no `control` face.** Assist, halt and approve are safe on a wrist
+  because the wrist belongs to the owner; a button on a wall is pressed by
+  whoever reaches it. Messages, memory, friends, notifications and agent
+  *names* are refused the same way, each by name with its reason — every one of
+  them is allowed somewhere else in this product, so the absence is a decision
+  rather than a gap.
+
+  **The AI mark gets a backing plate on glass.** A transparent panel's
+  background is a corridor, and a moving one, so contrast is not something the
+  renderer controls — and a mark that vanishes against a bright wall is worse
+  than no mark, because the rest of the card still reads as a person. A
+  `beacon` face needs the full surface: a QR at strip height is one no camera
+  resolves, and an unscannable code looks broken rather than absent.
+
+  Placing one is the owner's decision, like a beacon. Where the screens *are*
+  is owner-only; what a given screen is *showing* is public, because a fixture
+  in a corridor cannot keep a secret from the corridor — which is also the
+  check on the design: if that route could leak anything, the wrong thing is on
+  the face list.
+
 ### Fixed
+
+- **An explicitly empty face list was silently answered with the defaults.**
+  `faces or DEFAULT_FACES` collapsed "use the defaults" (`None`) and "show
+  nothing" (`[]`) into one branch, so the guard against a blank screen could
+  never fire and a caller asking for one got the opposite of what they asked
+  for. Found by the test written for the guard.
 
 - **Anonymity was a label on four surfaces, not a property of the profile.**
   `anonymous` was honoured by the front-page card, the landing page, the prompt

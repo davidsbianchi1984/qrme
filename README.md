@@ -285,6 +285,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="210" alt="On a Screen"></a><br><sub><b>126</b> · On a Screen</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1382,6 +1383,74 @@ is in their lobby; a profile or agent must be one the same account holds,
 checked on `owner_id`. Somebody *else's* profile is a two-party question and
 this is not the module that answers it — `qrme/sharing.py` already asks both
 sides — so it is refused with a pointer rather than half-answered here.
+
+## A profile on a screen that stays where it is
+
+A wall panel in a lobby, a kiosk by a door, a counter screen, a pane of glass
+with something behind it. `qrme/displays.py` is the watch-face idea from
+[wearables](#watch-faces-and-the-wearables-that-show-them) applied to fixtures
+— a **closed set** of things a screen may show, for the same reason: what may
+be displayed is a permission, and a permission with open-ended values is one
+nobody can audit.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="200" alt="On a screen"></a><br><sub><b>126</b> · full, half or a strip · opaque or glass</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /displays/vocabulary` | kinds, sizes, finishes, faces — and what a wall may never show |
+| `POST /profiles/{id}/displays` | put this profile on a screen. Owner-only |
+| `GET /profiles/{id}/displays` | every screen it is on — **owner-only**, it is a list of places |
+| `GET /displays/{id}` | what this screen shows — **public**, and that is the point |
+| `PUT /displays/{id}/faces` | change what it shows |
+| `DELETE /displays/{id}` | take it down |
+
+**Sizes**: `badge` (a strip), `half`, `full`. **Finishes**: `opaque`, or
+`transparent` with the room behind it.
+
+  </td>
+  </tr>
+</table>
+
+**A stationary screen is not a small watch, and that difference is the whole
+module.** A watch is on one person's wrist — they chose it, they are the only
+one reading it, they can turn it over. A wall panel is read by **whoever walks
+past**: a courier, a child, somebody visiting the person whose profile it
+shows. Nobody in that corridor opted into anything.
+
+That is the room-microphone argument arriving from the other direction. There,
+a device that *hears* people who did not agree; here, one that *shows* things
+to people who did not ask. So the rule is **stricter** than the watch's, not
+looser: every face on the list is something already public — a front page, a
+desk's presence, a beacon's QR, agent lights as counts, opening hours, a
+greeting the owner wrote. Anything personal is a count or it is not there.
+
+**There is no `control` face.** The watch has one — assist, halt, approve — and
+it is safe there because the wrist it is strapped to belongs to the owner. A
+button on a wall is pressed by whoever reaches it. Messages, memory, friends,
+notifications and agent *names* are refused the same way, each by name with the
+reason, because every one of them is allowed somewhere else in this product and
+the refusal is a decision rather than a gap.
+
+**The disclosure survives the glass.** A transparent panel's background is a
+corridor — a moving one — so contrast is not something the renderer controls.
+The AI mark gets a backing plate at that finish, and this is not a style
+preference: a mark that vanishes against a bright wall is worse than no mark,
+because the rest of the card still reads as a person and the one thing
+correcting that impression is the thing that disappeared.
+
+**A beacon face needs the whole surface.** A QR at strip height is a QR nobody's
+camera resolves, and a code that cannot be scanned looks broken rather than
+absent.
+
+**Placing one is the owner's decision**, like a beacon — a screen bolted to a
+wall is a beacon with a plug in it. Where the screens *are* is owner-only for
+the same reason the beacon listing is; what a given screen is *showing* is
+public, because a fixture in a corridor cannot keep a secret from the corridor.
+That last one is also the check on the whole design: if that route could leak
+anything, the wrong thing is on the face list.
 
 ## Friends you might know
 

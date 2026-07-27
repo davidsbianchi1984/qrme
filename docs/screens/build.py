@@ -3661,6 +3661,22 @@ SCREENS = [
         dict(icon="people", color="green", k="Beside the players",
              s="coach, spotter, archivist"),
     ]),
+    # A profile on a fixture. The third and fourth cards are why this is not
+    # just the watch again: a wrist is read by its owner and a wall by whoever
+    # walks past, so the list of what may be shown is shorter, not longer.
+    dict(num=126, title="On a Screen", sub="A wall, a kiosk, a pane of glass",
+         accent="cyan", tab=3, cards=[
+        dict(icon="grid", color="cyan", k="The lobby panel",
+             s="wall, kiosk, counter, window", pill=("LIVE", "good")),
+        dict(icon="expand", color="brand", k="Full, half, or a strip",
+             s="and opaque or see-through"),
+        dict(icon="eye", color="amber", k="Only what strangers read",
+             s="a wall cannot tell who is there"),
+        dict(icon="warn", color="red", k="No control on a wall",
+             s="pressed by whoever reaches it"),
+        dict(icon="shieldok", color="green", k="The mark gets a plate",
+             s="on glass it must stay legible"),
+    ], button=("Take it down", "amber")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

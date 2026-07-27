@@ -279,6 +279,26 @@ CREATE TABLE IF NOT EXISTS anonymous_pictures (
     set_at     TEXT NOT NULL
 );
 
+-- A profile on a screen that stays where it is: a wall panel, a kiosk, a pane
+-- of glass. The watch-face idea (qrme/wearables.py:FACES) for fixtures, with a
+-- shorter list of things that may be shown — a watch is read by its wearer, a
+-- wall by whoever walks past.
+--
+-- `removed_at` rather than a delete, like an unpaired wearable: a profile that
+-- was on a lobby wall for a year should still be able to say where it was.
+CREATE TABLE IF NOT EXISTS displays (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,   -- wall_panel | kiosk | counter_screen | …
+    label      TEXT NOT NULL,   -- what the owner calls it: "the lobby panel"
+    location   TEXT,
+    size       TEXT NOT NULL DEFAULT 'full',      -- badge | half | full
+    finish     TEXT NOT NULL DEFAULT 'opaque',    -- opaque | transparent
+    faces      TEXT NOT NULL DEFAULT '[]',        -- JSON list, see displays.FACES
+    placed_at  TEXT NOT NULL,
+    removed_at TEXT
+);
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`
