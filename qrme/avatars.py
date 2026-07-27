@@ -348,7 +348,11 @@ def render(profile_id: str) -> dict:
     # not knowing about it.
     anonymous = bool(row["anonymous"])
     if anonymous:
-        asset = SILHOUETTE
+        # The plain figure, or the field emblem this profile chose. Still a
+        # closed set drawn by us either way — never their own picture, which is
+        # the thing the flag exists to withhold.
+        from . import identity
+        asset = identity.emblem_asset(profile_id)
 
     return {
         "profile_id": profile_id,

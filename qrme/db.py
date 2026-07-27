@@ -260,6 +260,22 @@ CREATE TABLE IF NOT EXISTS overlays (
 CREATE INDEX IF NOT EXISTS idx_overlays_live
     ON overlays (surface, surface_id) WHERE removed_at IS NULL;
 
+-- The emblem an anonymous profile wears instead of a face. One row per
+-- profile, and a **separate table from `profiles.avatar`** on purpose: the two
+-- are pictures for two different states, exactly like a display name and an
+-- anonymous one. Writing the emblem into `avatar` would mean turning anonymity
+-- off showed the emblem instead of the face somebody actually has.
+--
+-- The value is a key from qrme/identity.py:EMBLEMS, never a URL or an upload —
+-- a closed set is the enforcement. An anonymous profile that could attach an
+-- arbitrary image could attach its owner's face, or somebody else's, and no
+-- check on this side can look at a file and tell.
+CREATE TABLE IF NOT EXISTS anonymous_emblems (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    emblem     TEXT NOT NULL,
+    set_at     TEXT NOT NULL
+);
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`

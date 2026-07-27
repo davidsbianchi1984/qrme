@@ -30,6 +30,14 @@ class AnonymousIn(BaseModel):
     anonymous: bool
 
 
+class EmblemIn(BaseModel):
+    # A key from the closed list, or null for the plain silhouette. Never a
+    # URL and never an upload: a picture nobody vetted is a picture that could
+    # be its owner's face, or somebody else's, and nothing on this side can
+    # look at a file and tell which.
+    emblem: str | None = None
+
+
 class VerifyIn(BaseModel):
     level: str
     attestor: str | None = None
@@ -190,3 +198,32 @@ def whose(surface: str, surface_id: str) -> dict:
     if not out:
         raise HTTPException(404, "no such place")
     return out
+
+
+@router.get("/identity/emblems")
+def emblems() -> dict:
+    """The pictures an anonymous profile may wear. Open — it is a catalogue.
+
+    One per industry the platform already models, so the set is not a new
+    vocabulary invented for pictures: a field somebody can work in is a field
+    they can signal.
+    """
+    return {"emblems": identity.emblems(),
+            "plain": "the silhouette everybody starts with",
+            "note": "a closed list rather than an upload — a picture nobody "
+                    "vetted is a picture that could be somebody's face"}
+
+
+@router.put("/profiles/{profile_id}/emblem")
+def set_emblem(profile_id: str, body: EmblemIn, request: Request) -> dict:
+    """Choose the field emblem this profile wears while anonymous.
+
+    Owner-only, and saveable even when anonymity is off — it simply does not
+    show until it is on, the same way a display name waits behind the flag.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return identity.set_emblem(profile_id, body.emblem)
+    except identity.IdentityError as exc:
+        raise HTTPException(422, str(exc)) from None

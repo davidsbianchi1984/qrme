@@ -626,3 +626,100 @@ def test_one_place_decides_what_a_profile_is_called(client):
                 offenders.append(f"{path.name}:{node.lineno}")
     assert not offenders, ("the anonymous name is being decided outside "
                            f"identity.shown_name: {offenders}")
+
+
+# -- the emblem an anonymous profile wears ------------------------------------
+
+def test_an_anonymous_profile_can_say_what_field_it_works_in(client):
+    """The plain silhouette was the only face, on the argument that a distinct
+    picture would be a stable mark following one person around. That argument
+    died with the fixed name: `Anonymous 41338025` is already stable and
+    already public, so an emblem adds no correlation the name does not — while
+    a nurse answering health questions looking identical to a troll is a real
+    cost paid for nothing."""
+    from qrme import avatars
+
+    p = _hidden(client, display_name="Wren Ashby")
+    assert avatars.render(p["id"])["asset"] == avatars.SILHOUETTE
+
+    r = client.put(f"/profiles/{p['id']}/emblem",
+                   json={"emblem": "healthcare"}, headers=auth_header(p))
+    assert r.status_code == 200, r.text
+    assert avatars.render(p["id"])["asset"].endswith("emblem-healthcare.svg")
+    assert avatars.render(p["id"])["silhouette"] is True
+
+
+def test_the_emblem_is_a_closed_list_not_an_upload(client):
+    """The enforcement. An anonymous profile that could attach an arbitrary
+    image could attach its owner's face, or somebody else's, and nothing on
+    this side can look at a file and tell which. Choosing from a list makes
+    that impossible rather than merely against the rules."""
+    p = _hidden(client)
+    for attempt in ("https://example.test/me.jpg", "/photos/wren.webp",
+                    "my_face"):
+        r = client.put(f"/profiles/{p['id']}/emblem",
+                       json={"emblem": attempt}, headers=auth_header(p))
+        assert r.status_code == 422, attempt
+        assert "closed list" in r.json()["detail"]
+
+
+def test_the_emblem_set_mirrors_the_industries(client):
+    """Not a new vocabulary invented for pictures — the same list the
+    marketplace, the knowledge packs and the work agreements already use. A
+    field that can be worked in is a field that can be signalled."""
+    from qrme import exchange
+
+    assert set(identity.EMBLEM_FIELDS) == set(exchange.INDUSTRIES)
+    listed = {e["emblem"] for e in client.get("/identity/emblems").json()["emblems"]}
+    assert listed == set(exchange.INDUSTRIES)
+
+
+def test_every_emblem_ships_as_a_file(client):
+    """A catalogue entry with no drawing behind it is a broken image on
+    somebody's profile."""
+    from qrme import avatars
+
+    for e in identity.emblems():
+        name = e["asset"].rsplit("/", 1)[-1]
+        assert (avatars.figures_dir() / name).is_file(), name
+
+
+def test_an_emblem_never_replaces_the_real_face(client):
+    """Two pictures for two states, like a display name and an anonymous one.
+    Writing the emblem into `avatar` would mean turning anonymity off showed
+    the emblem instead of the face somebody actually has."""
+    from qrme import avatars
+
+    p = _hidden(client, display_name="Wren Ashby")
+    db.connect().execute("UPDATE profiles SET avatar=? WHERE id=?",
+                         ("/photos/wren.webp", p["id"]))
+    db.connect().commit()
+    client.put(f"/profiles/{p['id']}/emblem", json={"emblem": "trades"},
+               headers=auth_header(p))
+    assert avatars.render(p["id"])["asset"].endswith("emblem-trades.svg")
+
+    client.put(f"/profiles/{p['id']}/anonymity", json={"anonymous": False},
+               headers=auth_header(p))
+    assert avatars.render(p["id"])["asset"] == "/photos/wren.webp"
+
+
+def test_clearing_it_returns_the_plain_figure(client):
+    from qrme import avatars
+
+    p = _hidden(client)
+    client.put(f"/profiles/{p['id']}/emblem", json={"emblem": "legal"},
+               headers=auth_header(p))
+    client.put(f"/profiles/{p['id']}/emblem", json={"emblem": None},
+               headers=auth_header(p))
+    assert avatars.render(p["id"])["asset"] == avatars.SILHOUETTE
+
+
+def test_only_the_owner_chooses_it(client):
+    a = _hidden(client, owner_id="o-a", display_name="Mine")
+    b = make_profile(client, owner_id="o-b", display_name="Theirs")
+    assert client.put(f"/profiles/{a['id']}/emblem",
+                      json={"emblem": "legal"},
+                      headers=auth_header(b)).status_code == 403
+    assert client.put(f"/profiles/{a['id']}/emblem",
+                      json={"emblem": "legal"},
+                      headers=_anon(client)).status_code == 401

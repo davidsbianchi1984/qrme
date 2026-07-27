@@ -1962,6 +1962,29 @@ implementations is one merge away from having sixteen, and the sixteenth is the
 one that prints somebody's name. It is now `identity.shown_name()`, and a test
 parses every module to assert nobody has written a sixteenth.
 
+**And it can say what it does, without saying who it is.** The plain
+silhouette was every anonymous profile's only face, on the argument that a
+distinct picture would be a stable mark following one person around. That
+argument died with the fixed name — `Anonymous 41338025` is already stable and
+already public, so an emblem adds no correlation the name does not, while a
+nurse answering health questions looking identical to a troll is a real cost
+paid for nothing.
+
+So there are **sixteen field emblems**, one per industry the platform already
+models (`exchange.INDUSTRIES`) — not a new vocabulary invented for pictures: a
+field somebody can *work in* is a field they can *signal*. Each keeps the same
+silhouette with the field glyph badged on, so "anonymous" is what reads first
+from across a roster, before anybody parses which symbol it carries.
+
+**A closed list is the enforcement, not a rule.** An anonymous profile that
+could attach an arbitrary image could attach its owner's face, or somebody
+else's, and nothing on this side can look at a file and tell which — so it
+chooses from a list rather than uploading, which makes that impossible instead
+of merely forbidden. The emblem lives in its own table, never in
+`profiles.avatar`: they are pictures for two different states, exactly like a
+display name and an anonymous one, and writing it into `avatar` would mean
+turning anonymity off showed the emblem instead of the face somebody has.
+
 **An anonymous profile's badge withholds who checked.** "Verified by Dr Okafor
 of St Mary's" narrows an anonymous author to a city and a workplace, which is
 most of the way to a name — the badge would undo the anonymity it sits beside.

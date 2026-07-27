@@ -78,8 +78,8 @@ REAL_PERSON_KINDS = ("self", "other_person")
 WITHHELD = (
     "your display name — surfaces show a fixed 'Anonymous 00000000' tied to "
     "this profile, which you cannot change and which says nothing about you",
-    "your picture — you get the same silhouette as everybody else who is "
-    "anonymous, so it identifies nobody and matches no one",
+    "your picture — a silhouette, or a field emblem you pick from a fixed "
+    "list. Never a photograph, so it cannot be your face or anybody's",
     "your owner account, so two of your profiles cannot be matched to "
     "each other by whoever is reading them",
     "who verified you, if anyone did — the attestor is a pointer back to you",
@@ -584,3 +584,87 @@ def shown_name(profile, profile_id: str | None = None) -> str:
             "shown_name needs the profile id to build an anonymous name — "
             "pass profile_id when the row does not carry one")
     return anonymous_name(profile_id)
+
+
+# --------------------------------------------------------------------------- #
+# The emblem an anonymous profile wears
+# --------------------------------------------------------------------------- #
+
+# One per industry the platform already models. Not a new vocabulary invented
+# for pictures — the same list the marketplace, the knowledge packs and the
+# work agreements use, so a field that can be *worked in* is a field that can
+# be *signalled*.
+#
+# The plain silhouette was every anonymous profile's only face, on the argument
+# that a distinct picture would be a stable mark following one person around.
+# That argument died with the fixed name: `Anonymous 41338025` is already
+# stable and already public, so an emblem adds no correlation the name does not
+# provide — while a nurse answering health questions looking identical to a
+# troll is a real cost paid for nothing.
+#
+# **A closed set is the enforcement.** An anonymous profile that could attach an
+# arbitrary image could attach its owner's face, or somebody else's, and nothing
+# on this side can look at a file and tell which. Choosing from a list makes
+# that impossible rather than merely against the rules.
+EMBLEM_FIELDS: tuple[str, ...] = (
+    "software", "design", "writing", "audio", "video", "photography",
+    "engineering", "trades", "finance", "legal", "healthcare", "education",
+    "marketing", "research", "manufacturing", "other",
+)
+
+
+def emblems() -> list[dict]:
+    """The pictures an anonymous profile may choose from."""
+    from . import avatars
+    return [{"emblem": key, "asset": f"{avatars.FIGURE_ROUTE}/emblem-{key}.svg",
+             "means": f"works in {key}"} for key in EMBLEM_FIELDS]
+
+
+def emblem_of(profile_id: str) -> str | None:
+    """The emblem key this profile has chosen, or None for the plain figure."""
+    row = db.connect().execute(
+        "SELECT emblem FROM anonymous_emblems WHERE profile_id=?",
+        (profile_id,)).fetchone()
+    return row["emblem"] if row else None
+
+
+def emblem_asset(profile_id: str) -> str:
+    """The picture an anonymous profile shows — its emblem, or the plain one."""
+    from . import avatars
+    key = emblem_of(profile_id)
+    return (f"{avatars.FIGURE_ROUTE}/emblem-{key}.svg" if key
+            else avatars.SILHOUETTE)
+
+
+def set_emblem(profile_id: str, emblem: str | None) -> dict:
+    """Choose a field emblem, or clear it back to the plain silhouette.
+
+    Stored rather than derived, unlike the name — because unlike the name this
+    *is* a choice, and the whole point is that somebody working anonymously can
+    say which field they work in.
+    """
+    profile = _profile(profile_id)
+    if emblem is not None and emblem not in EMBLEM_FIELDS:
+        raise IdentityError(
+            f"unknown emblem {emblem!r} — one of {', '.join(EMBLEM_FIELDS)}. "
+            "It is a closed list rather than an upload: a picture nobody "
+            "vetted is a picture that could be somebody's face")
+    conn = db.connect()
+    if emblem is None:
+        conn.execute("DELETE FROM anonymous_emblems WHERE profile_id=?",
+                     (profile_id,))
+    else:
+        conn.execute(
+            "INSERT INTO anonymous_emblems (profile_id, emblem, set_at)"
+            " VALUES (?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
+            " emblem=excluded.emblem, set_at=excluded.set_at",
+            (profile_id, emblem, db.utcnow()))
+    conn.commit()
+    return {
+        "profile_id": profile_id,
+        "emblem": emblem,
+        "asset": emblem_asset(profile_id),
+        "shown": bool(profile["anonymous"]),
+        "note": ("worn now" if profile["anonymous"] else
+                 "saved — it appears when this profile is anonymous"),
+    }

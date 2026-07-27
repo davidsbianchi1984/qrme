@@ -107,6 +107,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   attestation, never accepted from a client, so a stream that never earned it
   cannot paste it on.
 
+- **An anonymous profile can wear a field emblem** — `identity.set_emblem()`,
+  2 routes, 7 tests, 16 generated assets. The plain silhouette was the only
+  face, on the argument that a distinct picture would be a stable mark
+  following one person around. That argument died with the fixed name:
+  `Anonymous 41338025` is already stable and already public, so an emblem adds
+  no correlation the name does not — while a nurse answering health questions
+  looking identical to a troll is a real cost paid for nothing.
+
+  One per industry the platform already models, so the set is not a new
+  vocabulary invented for pictures. Each keeps the **same silhouette** with the
+  field glyph badged on, so "anonymous" reads first from across a roster before
+  anybody parses which symbol it carries.
+
+  **A closed list is the enforcement rather than a rule.** A profile that could
+  attach an arbitrary image could attach its owner's face, or somebody else's,
+  and nothing here can look at a file and tell which. Its own table, never
+  `profiles.avatar` — two pictures for two states, and writing it into `avatar`
+  would mean turning anonymity off showed the emblem instead of the real face.
+
 - **Anonymous profiles get a fixed name they cannot change** —
   `identity.anonymous_name()`, 7 tests. Every one of them used to be called
   *"anonymous persona"*, identically, which is unusable the moment two are in
