@@ -912,11 +912,16 @@ watch faces are worth having on day one, so the device step is part of joining.
 </table>
 
 **The microphone kinds pair but do not listen.** Nothing in this module opens a
-channel; a paired device is a registration and a set of allowed faces. They are
-in the catalogue because the registry is what a later feature will need, and a
-device somebody already paired for their watch face should not have to be
-paired twice. A test asserts no capture path exists here — no record, stream,
-listen or sample.
+channel; a paired device is a registration and a set of allowed faces. A test
+asserts no capture path exists here — no record, stream, listen or sample.
+
+They are in the catalogue because the registry is what
+[channel 2](#channel-2--lending-the-rooms-profiles-your-microphone) needs, and
+a device somebody already paired for their watch face should not have to be
+paired twice. That feature has now landed, and lending still happens *there*
+rather than here — pairing says which devices you own, lending says what one of
+them may do in one room, and keeping them apart is what lets a grant end with
+the room without unpairing the watch.
 
 **Room-facing microphones are refused at the door**, not allowed and then
 restricted. A restriction is a setting somebody can change; a refusal is a fact

@@ -39,8 +39,21 @@ from . import db
 # What may be paired. Personal devices, worn by the person pairing them.
 #
 # The microphone-bearing kinds are here because the pairing registry is what
-# a later feature will need — not because anything listens yet. Nothing in
-# this module opens a channel, and the held work stays held.
+# `qrme/roommic.py` needs — not because anything listens *here*. Nothing in
+# this module opens a channel; a paired device is a registration and a set of
+# allowed faces, and a test asserts no capture path exists.
+#
+# That feature has since landed, and the split is deliberate rather than
+# historical: pairing says which devices somebody owns, lending says what one
+# of them may do inside one room. Keeping them apart is what lets a grant end
+# with the room without unpairing the watch.
+#
+# The names here and the ones in `roommic.MIC_TYPES` differ — `lapel_mic`
+# against `lapel` — because that table is kept in step with `jim/mic.py` by
+# hand, the two products not importing each other. `roommic.FROM_WEARABLE`
+# translates, and a test holds every kind below against one side or the other,
+# so adding a device forces the question *does this carry a microphone* here
+# rather than when somebody tries to lend it.
 KINDS: dict[str, str] = {
     "watch": "on the wrist",
     "band": "on the wrist",
