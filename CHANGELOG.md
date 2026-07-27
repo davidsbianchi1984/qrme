@@ -52,6 +52,66 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   only: what protects the other participants is how wide the channel actually
   is, and a rejected preference is the lender's business.
 
+## [0.3.2] — 2026-07-27
+
+**The round where the starter collection stopped looking like a directory.**
+Each of the 34 is now shown as the profile card the app actually gives it, and
+the one starter with no source material finally has some.
+
+### Changed
+
+- **The starter gallery shows each profile's own front page** —
+  `tools/starter_cards.py`, `tools/starter_gallery.py`. It used to be a
+  portrait with a name and an industry captioned under it, which is a directory
+  listing rather than a profile: screen 80 gives a starter an avatar bubble, a
+  role, the rating people who talked to it left, skill chips, Memory /
+  Relationships / Engagement, a career, a review, and a **Talk to** button. The
+  page was showing two of those.
+
+  It was also **five columns wide** — roughly 590px of content on a phone that
+  offers 390, so on mobile the fourth column was sliced mid-word and the fifth
+  never appeared at all. Every starter past the third was unreachable to
+  anybody reading on a phone. Two columns of whole cards fit, checked by
+  rendering the real markup at 390px rather than by arithmetic.
+
+  Generated from `qrme/seed.py` rather than hand-written, because the old
+  gallery was a second copy of the starter list maintained by hand and could
+  drift from it silently. Adding a starter without a role line is now a build
+  error instead of a blank cell, and both tools have a `--check` mode.
+
+  Careers and reviews are written, like the personas: these are invented
+  experts, so a CV is characterisation of the kind the bio already is, and each
+  is drawn from that starter's own bio so the two cannot contradict each other.
+  The rating and the three tiles are the app's own sample values, identical on
+  every card — a freshly seeded starter has zero of each, so 34 cards reading
+  *4.0 · 37 reviews* is self-evidently a template, and the README says so.
+
+### Fixed
+
+- **The rated starter was the only profile with no source material at all.**
+  0.3.1 grounded every starter in its industry's Field Pack and left Vivienne
+  Sable out, because the rule read *"there is no adult-industry Field Pack, and
+  inventing a substitute would be putting words in a profile the age wall
+  exists to contain"* — which ran two things together. The wall governs **who
+  may talk to her**; it was never a reason for her to know less about her own
+  subject.
+
+  The **Cabaret & Burlesque Field Pack** is theatre history and stagecraft: the
+  Ziegfeld era, the Parisian revues, and why a tease is a rhythm problem. Free
+  and unrated like the other 33, so it reaches her through the existing path
+  with no change to `_ground()` — she was already in the same seed loop with
+  nothing to match. Seeding now reports `grounded: 34`, where it reported 33.
+
+  Deliberately **not** the same thing as `RATED_PACK`, which is the $6.99
+  age-gated *After Dark Companion Pack* sold to owners of any adult-mode
+  persona and never auto-installed. A test pins both so the two cannot be
+  merged by accident.
+
+- **`test_starter_packs_cover_every_industry` compared the pack list against
+  `STARTERS` and not `STARTERS + RATED`** — so the test that existed to catch a
+  missing pack had been asserting the gap into place, and would have gone on
+  passing forever with her ungrounded.
+
 ## [0.3.1] — 2026-07-26
 
 **The round where the starter profiles stopped answering from tone alone.**
@@ -1152,7 +1212,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.3.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.3.2...HEAD
+[0.3.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.2
 [0.3.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.1
 [0.3.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.0
 [0.2.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.2.2
