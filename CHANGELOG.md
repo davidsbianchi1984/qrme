@@ -6,6 +6,69 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-27
+
+The round where the products got a price, and a guide that walks you to
+whatever you paid for.
+
+### Added
+
+- **Membership: Basic $20/month, Pro $130/month, and a visitor below both** —
+  `qrme/tiers.py`, 4 routes, 26 tests, screens 130 and 131. Basic is the entry
+  to *making* things: your own profiles, your own agent. Pro adds everything
+  that leaves your account — the marketplace, connectors, skills, downloads,
+  connections, and every modifier and builder.
+
+  **Visitor is a real state**, not an oversight: the whole beacon story is a
+  stranger scanning a printed code and landing somewhere useful, and a wall
+  asking them to subscribe before reading the page would break the feature the
+  beacons exist for.
+
+  **Enforcement is one table and one chokepoint.** `tiers.gate` is installed
+  once as an application-wide dependency, so no route opts in and none can be
+  forgotten. The table is asserted against the served routes rather than
+  proof-read — and the first version failed that assertion, naming `/steering`,
+  `/governance` and `/licensing`, none of which is a route here. All three were
+  paywalls in front of a wall: they read as protection, protected nothing, and
+  would have survived indefinitely because nothing fails when a pattern matches
+  no traffic.
+
+  Browsing stays open by decision. The refusal is structured, because 402 is
+  already spoken here by the pack price gate. A membership belongs to the
+  account rather than the profile, and cancelling keeps the profiles. Money is
+  simulated, as everywhere else in this repository.
+
+- **The helper dock** — `qrme/dock.py`, 5 routes, 30 tests, screens 128 and
+  129. The watch faces in a pane that tucks into the bottom corner, for the
+  people who own neither a watch nor a wall panel. Same faces as the wrist,
+  bound by test. **It shows and it routes; it never acts** — the inversion of
+  the watch's one exception, because nothing here is the device and a control
+  floating over live video is a mis-tap on somebody's broadcast. **It is inside
+  every screenshot**, so it opens tucked on a surface being broadcast and
+  carries no message bodies, memory, agent names or viewer names. On the
+  desktop it replaced the pinned agent-lights panel rather than joining it.
+
+- **The assistant gives directions** — *"where do I change my background"* now
+  answers with the screen and the dock face, from the same table the pane
+  reads, matched before `TOPICS` and before any model.
+
+- **Three-way coverage** — watch faces 06–09 and desktop views 12–14, closing
+  the hole an audit found in five more features after channel 2.
+
+- **A guided walkthrough of the whole app** — `qrme/tutorial.py`, delivered by
+  the help box in voice or text, with a test binding every lesson to the
+  gallery in both directions.
+
+### Fixed
+
+- **A screen title's punctuation reached its filename.** `129-where-is-it?.svg`
+  — the `?` starts a query string, so the README's `<img src>` drew a broken
+  icon. A comma had done it once already; both came from the slug being written
+  by hand in two places that disagreed. One `slug()` now, plus a test.
+
+- **The desktop avatar was painted over the header pill on every view.**
+
+
 ### Added
 
 - **A second ear: lending the profiles a wearable microphone** —
