@@ -31,11 +31,14 @@ class AnonymousIn(BaseModel):
 
 
 class EmblemIn(BaseModel):
-    # A key from the closed list, or null for the plain silhouette. Never a
-    # URL and never an upload: a picture nobody vetted is a picture that could
-    # be its owner's face, or somebody else's, and nothing on this side can
-    # look at a file and tell which.
+    # A preset field emblem, or your own image, or neither for the plain
+    # silhouette. Not both — two pictures for one bubble has no answer.
     emblem: str | None = None
+    asset: str | None = None
+    # Asked and refused, exactly as the overlay module asks it: nothing here
+    # can look at an image and know whose face it is, and an anonymous profile
+    # wearing somebody else's is impersonation with deniability on top.
+    depicts_someone_else: bool = False
 
 
 class VerifyIn(BaseModel):
@@ -210,20 +213,30 @@ def emblems() -> dict:
     """
     return {"emblems": identity.emblems(),
             "plain": "the silhouette everybody starts with",
-            "note": "a closed list rather than an upload — a picture nobody "
-                    "vetted is a picture that could be somebody's face"}
+            "own_image": "you can upload your own instead — these are a "
+                         "shortcut, not the only option",
+            "note": "a photograph of your own face is allowed and undoes your "
+                    "anonymity to anyone who knows you. Somebody else's "
+                    "likeness is refused"}
 
 
 @router.put("/profiles/{profile_id}/emblem")
 def set_emblem(profile_id: str, body: EmblemIn, request: Request) -> dict:
-    """Choose the field emblem this profile wears while anonymous.
+    """What goes in the bubble while this profile is anonymous.
 
-    Owner-only, and saveable even when anonymity is off — it simply does not
-    show until it is on, the same way a display name waits behind the flag.
+    A preset field emblem, or an image of the owner's own. Owner-only, and
+    saveable even when anonymity is off — it simply does not show until it is
+    on, the same way a display name waits behind the flag.
+
+    A photograph of the owner's *own* face is allowed. It defeats their
+    anonymity and they may have reasons; the response says so plainly rather
+    than the platform overruling a choice it cannot evaluate. Somebody else's
+    likeness is refused.
     """
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     try:
-        return identity.set_emblem(profile_id, body.emblem)
+        return identity.set_picture(profile_id, body.emblem, body.asset,
+                                    body.depicts_someone_else)
     except identity.IdentityError as exc:
         raise HTTPException(422, str(exc)) from None

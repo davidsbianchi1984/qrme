@@ -1976,14 +1976,28 @@ field somebody can *work in* is a field they can *signal*. Each keeps the same
 silhouette with the field glyph badged on, so "anonymous" is what reads first
 from across a roster, before anybody parses which symbol it carries.
 
-**A closed list is the enforcement, not a rule.** An anonymous profile that
-could attach an arbitrary image could attach its owner's face, or somebody
-else's, and nothing on this side can look at a file and tell which — so it
-chooses from a list rather than uploading, which makes that impossible instead
-of merely forbidden. The emblem lives in its own table, never in
-`profiles.avatar`: they are pictures for two different states, exactly like a
-display name and an anonymous one, and writing it into `avatar` would mean
-turning anonymity off showed the emblem instead of the face somebody has.
+**Or their own picture.** The emblems are a shortcut, not a fence. This was
+briefly a *closed* list, on the reasoning that a profile able to attach any
+image could attach its owner's face and nothing here can look at a file and
+tell. True, and the wrong conclusion — it made the feature useless to the
+locksmith who wants a photo of their own workbench, and bought no safety,
+because somebody set on publishing their face can put it in a post. **A limit
+that stops the honest use and not the risky one is decoration.**
+
+So what the platform cannot check, it says. A photograph of your **own** face
+is allowed, and the response tells you what it costs: *we cannot tell whether
+this picture shows your face, and if it does, the people who know you will
+know.* That line is in `NOT_WITHHELD` too, beside "your writing is still
+yours" — the honest list of what anonymity does not survive.
+
+**Somebody else's likeness is refused**, asked and declared exactly as the
+overlay module asks it: an anonymous profile wearing another person's face is
+impersonation with a layer of deniability on top.
+
+The picture lives in its own table, never in `profiles.avatar`: they are
+pictures for two different states, exactly like a display name and an anonymous
+one, and writing it into `avatar` would mean turning anonymity off showed it
+instead of the face somebody actually has.
 
 **An anonymous profile's badge withholds who checked.** "Verified by Dr Okafor
 of St Mary's" narrows an anonymous author to a city and a workplace, which is

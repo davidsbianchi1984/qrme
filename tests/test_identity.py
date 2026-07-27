@@ -649,18 +649,71 @@ def test_an_anonymous_profile_can_say_what_field_it_works_in(client):
     assert avatars.render(p["id"])["silhouette"] is True
 
 
-def test_the_emblem_is_a_closed_list_not_an_upload(client):
-    """The enforcement. An anonymous profile that could attach an arbitrary
-    image could attach its owner's face, or somebody else's, and nothing on
-    this side can look at a file and tell which. Choosing from a list makes
-    that impossible rather than merely against the rules."""
+def test_you_can_put_your_own_photo_in_the_bubble(client):
+    """The presets are a shortcut, not a fence.
+
+    This was briefly a closed list, on the reasoning that a profile able to
+    attach any image could attach its owner's face. True, and the wrong
+    conclusion: it made the feature useless to the locksmith who wants a
+    picture of their own workbench, and bought no safety, because somebody
+    determined to publish their face can put it in a post. A limit that stops
+    the honest use and not the risky one is decoration.
+    """
+    from qrme import avatars
+
+    p = _hidden(client, display_name="Wren Ashby")
+    r = client.put(f"/profiles/{p['id']}/emblem",
+                   json={"asset": "/photos/my-workbench.webp"},
+                   headers=auth_header(p))
+    assert r.status_code == 200, r.text
+    assert r.json()["own_image"] is True
+    assert avatars.render(p["id"])["asset"] == "/photos/my-workbench.webp"
+
+
+def test_uploading_one_says_what_it_costs(client):
+    """The platform cannot tell whether a picture shows somebody's face, so it
+    says so rather than pretending to prevent it."""
     p = _hidden(client)
-    for attempt in ("https://example.test/me.jpg", "/photos/wren.webp",
-                    "my_face"):
-        r = client.put(f"/profiles/{p['id']}/emblem",
-                       json={"emblem": attempt}, headers=auth_header(p))
-        assert r.status_code == 422, attempt
-        assert "closed list" in r.json()["detail"]
+    out = client.put(f"/profiles/{p['id']}/emblem",
+                     json={"asset": "/photos/me.webp"},
+                     headers=auth_header(p)).json()
+    assert "cannot tell whether this picture shows your face" in out["remember"]
+
+    report = client.get(f"/profiles/{p['id']}/anonymity",
+                        headers=auth_header(p)).json()
+    assert any("photograph you put in the bubble" in s
+               for s in report["not_withheld"])
+
+
+def test_somebody_elses_likeness_is_still_refused(client):
+    """Asked and refused exactly as the overlay module asks it — an anonymous
+    profile wearing another person's face is impersonation with a layer of
+    deniability on top."""
+    p = _hidden(client)
+    r = client.put(f"/profiles/{p['id']}/emblem",
+                   json={"asset": "/photos/somebody.webp",
+                         "depicts_someone_else": True},
+                   headers=auth_header(p))
+    assert r.status_code == 422
+    assert "impersonation" in r.json()["detail"]
+
+
+def test_a_preset_and_an_upload_cannot_both_be_set(client):
+    """Two pictures for one bubble has no answer, and picking one silently
+    would make the other setting look broken."""
+    p = _hidden(client)
+    r = client.put(f"/profiles/{p['id']}/emblem",
+                   json={"emblem": "trades", "asset": "/photos/x.webp"},
+                   headers=auth_header(p))
+    assert r.status_code == 422
+    assert "not both" in r.json()["detail"]
+
+
+def test_an_unknown_preset_is_still_refused(client):
+    p = _hidden(client)
+    r = client.put(f"/profiles/{p['id']}/emblem",
+                   json={"emblem": "not_a_field"}, headers=auth_header(p))
+    assert r.status_code == 422
 
 
 def test_the_emblem_set_mirrors_the_industries(client):
@@ -709,7 +762,7 @@ def test_clearing_it_returns_the_plain_figure(client):
     p = _hidden(client)
     client.put(f"/profiles/{p['id']}/emblem", json={"emblem": "legal"},
                headers=auth_header(p))
-    client.put(f"/profiles/{p['id']}/emblem", json={"emblem": None},
+    client.put(f"/profiles/{p['id']}/emblem", json={},
                headers=auth_header(p))
     assert avatars.render(p["id"])["asset"] == avatars.SILHOUETTE
 

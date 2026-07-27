@@ -78,8 +78,8 @@ REAL_PERSON_KINDS = ("self", "other_person")
 WITHHELD = (
     "your display name — surfaces show a fixed 'Anonymous 00000000' tied to "
     "this profile, which you cannot change and which says nothing about you",
-    "your picture — a silhouette, or a field emblem you pick from a fixed "
-    "list. Never a photograph, so it cannot be your face or anybody's",
+    "your picture — unless you replace it. The bubble starts as a silhouette "
+    "and you may put a field emblem or your own image in it",
     "your owner account, so two of your profiles cannot be matched to "
     "each other by whoever is reading them",
     "who verified you, if anyone did — the attestor is a pointer back to you",
@@ -88,6 +88,8 @@ WITHHELD = (
 )
 NOT_WITHHELD = (
     "what you write — prose is recognisable to anyone who knows you",
+    "a photograph you put in the bubble yourself — we cannot tell whether it "
+    "shows your face, and if it does, the people who know you will know",
     "your handle, which is how people link to you at all",
     "who your friends are, and what you post, like and share",
     "anything you say in a room, to the people in that room",
@@ -590,22 +592,22 @@ def shown_name(profile, profile_id: str | None = None) -> str:
 # The emblem an anonymous profile wears
 # --------------------------------------------------------------------------- #
 
-# One per industry the platform already models. Not a new vocabulary invented
-# for pictures — the same list the marketplace, the knowledge packs and the
-# work agreements use, so a field that can be *worked in* is a field that can
-# be *signalled*.
+# Presets, one per industry the platform already models. Not a new vocabulary
+# invented for pictures — the same list the marketplace, the knowledge packs
+# and the work agreements use, so a field that can be *worked in* is a field
+# that can be *signalled*.
 #
-# The plain silhouette was every anonymous profile's only face, on the argument
-# that a distinct picture would be a stable mark following one person around.
-# That argument died with the fixed name: `Anonymous 41338025` is already
-# stable and already public, so an emblem adds no correlation the name does not
-# provide — while a nurse answering health questions looking identical to a
-# troll is a real cost paid for nothing.
+# They are a shortcut, not a fence. This was briefly a **closed** set, on the
+# reasoning that a profile able to attach any image could attach its owner's
+# face and nothing here can look at a file and tell. True, and the wrong
+# conclusion: it made the feature useless to the locksmith who wants a picture
+# of their own workbench, and it bought no safety, because somebody determined
+# to publish their face can put it in a post. A limit that stops the honest use
+# and not the risky one is decoration.
 #
-# **A closed set is the enforcement.** An anonymous profile that could attach an
-# arbitrary image could attach its owner's face, or somebody else's, and nothing
-# on this side can look at a file and tell which. Choosing from a list makes
-# that impossible rather than merely against the rules.
+# So an owner may upload their own image, and what the platform cannot check it
+# **says** rather than pretends to prevent — see NOT_WITHHELD, which now names
+# a recognisable photograph of yourself as the thing anonymity cannot survive.
 EMBLEM_FIELDS: tuple[str, ...] = (
     "software", "design", "writing", "audio", "video", "photography",
     "engineering", "trades", "finance", "legal", "healthcare", "education",
@@ -620,51 +622,108 @@ def emblems() -> list[dict]:
              "means": f"works in {key}"} for key in EMBLEM_FIELDS]
 
 
-def emblem_of(profile_id: str) -> str | None:
-    """The emblem key this profile has chosen, or None for the plain figure."""
+def picture_of(profile_id: str) -> dict:
+    """What this profile has put in the bubble: a preset, an upload, or
+    neither."""
     row = db.connect().execute(
-        "SELECT emblem FROM anonymous_emblems WHERE profile_id=?",
+        "SELECT emblem, asset FROM anonymous_pictures WHERE profile_id=?",
         (profile_id,)).fetchone()
-    return row["emblem"] if row else None
+    if row is None:
+        return {"emblem": None, "asset": None}
+    return {"emblem": row["emblem"], "asset": row["asset"]}
+
+
+def emblem_of(profile_id: str) -> str | None:
+    """The preset emblem key, if that is what they chose."""
+    return picture_of(profile_id)["emblem"]
 
 
 def emblem_asset(profile_id: str) -> str:
-    """The picture an anonymous profile shows — its emblem, or the plain one."""
+    """The picture an anonymous profile shows.
+
+    Their own upload, or a preset emblem, or the plain silhouette — in that
+    order, because the most specific choice somebody made is the one to honour.
+    """
     from . import avatars
-    key = emblem_of(profile_id)
-    return (f"{avatars.FIGURE_ROUTE}/emblem-{key}.svg" if key
-            else avatars.SILHOUETTE)
+    chosen = picture_of(profile_id)
+    if chosen["asset"]:
+        return chosen["asset"]
+    if chosen["emblem"]:
+        return f"{avatars.FIGURE_ROUTE}/emblem-{chosen['emblem']}.svg"
+    return avatars.SILHOUETTE
 
 
-def set_emblem(profile_id: str, emblem: str | None) -> dict:
-    """Choose a field emblem, or clear it back to the plain silhouette.
+def set_picture(profile_id: str, emblem: str | None = None,
+                asset: str | None = None,
+                depicts_someone_else: bool = False) -> dict:
+    """Put something in the bubble: a preset emblem, or an image of your own.
 
-    Stored rather than derived, unlike the name — because unlike the name this
-    *is* a choice, and the whole point is that somebody working anonymously can
-    say which field they work in.
+    Both empty clears it back to the plain silhouette. Both set is refused —
+    two pictures for one bubble has no answer, and picking one silently would
+    make the other setting look broken.
+
+    ``depicts_someone_else`` is asked and refused for the same reason the
+    overlay module asks it: an anonymous profile wearing another person's face
+    is impersonation with a layer of deniability on top, and nothing here can
+    look at an image and know whose face it is. Declared, refused when true,
+    and recorded either way — which is what puts a name and a timestamp on a
+    false declaration.
+
+    What is deliberately **not** refused is a photograph of the owner's own
+    face. It defeats their anonymity, and they may have reasons; the platform
+    says so plainly in :func:`anonymity` rather than overruling a choice it
+    cannot evaluate. A limit that stops the honest use and not the risky one is
+    decoration.
     """
     profile = _profile(profile_id)
+    if emblem is not None and asset is not None:
+        raise IdentityError(
+            "choose one — a preset emblem or your own image, not both")
     if emblem is not None and emblem not in EMBLEM_FIELDS:
         raise IdentityError(
-            f"unknown emblem {emblem!r} — one of {', '.join(EMBLEM_FIELDS)}. "
-            "It is a closed list rather than an upload: a picture nobody "
-            "vetted is a picture that could be somebody's face")
+            f"unknown emblem {emblem!r} — one of {', '.join(EMBLEM_FIELDS)}")
+    if asset is not None:
+        if depicts_someone_else:
+            raise IdentityError(
+                "that is somebody else's likeness. An anonymous profile "
+                "wearing another person's face is impersonation with a layer "
+                "of deniability on top")
+        asset = asset.strip()
+        if not asset:
+            raise IdentityError("an empty image is not a picture")
+
     conn = db.connect()
-    if emblem is None:
-        conn.execute("DELETE FROM anonymous_emblems WHERE profile_id=?",
+    if emblem is None and asset is None:
+        conn.execute("DELETE FROM anonymous_pictures WHERE profile_id=?",
                      (profile_id,))
     else:
         conn.execute(
-            "INSERT INTO anonymous_emblems (profile_id, emblem, set_at)"
-            " VALUES (?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
-            " emblem=excluded.emblem, set_at=excluded.set_at",
-            (profile_id, emblem, db.utcnow()))
+            "INSERT INTO anonymous_pictures (profile_id, emblem, asset, set_at)"
+            " VALUES (?,?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
+            " emblem=excluded.emblem, asset=excluded.asset,"
+            " set_at=excluded.set_at",
+            (profile_id, emblem, asset, db.utcnow()))
     conn.commit()
-    return {
+
+    out = {
         "profile_id": profile_id,
         "emblem": emblem,
         "asset": emblem_asset(profile_id),
+        "own_image": asset is not None,
         "shown": bool(profile["anonymous"]),
-        "note": ("worn now" if profile["anonymous"] else
+        "note": ("in the bubble now" if profile["anonymous"] else
                  "saved — it appears when this profile is anonymous"),
     }
+    if asset is not None:
+        out["remember"] = (
+            "we do not publish your name, and we cannot tell whether this "
+            "picture shows your face. If it does, the people who know you will "
+            "know it is you — that is the one part of anonymity a photograph "
+            "undoes on its own")
+    return out
+
+
+# The old name, kept because it reads better at the call site for the common
+# case and because renaming a function is not worth breaking a caller over.
+def set_emblem(profile_id: str, emblem: str | None) -> dict:
+    return set_picture(profile_id, emblem=emblem)

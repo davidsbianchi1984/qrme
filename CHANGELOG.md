@@ -120,11 +120,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   field glyph badged on, so "anonymous" reads first from across a roster before
   anybody parses which symbol it carries.
 
-  **A closed list is the enforcement rather than a rule.** A profile that could
-  attach an arbitrary image could attach its owner's face, or somebody else's,
-  and nothing here can look at a file and tell which. Its own table, never
-  `profiles.avatar` — two pictures for two states, and writing it into `avatar`
-  would mean turning anonymity off showed the emblem instead of the real face.
+  **They are a shortcut, not a fence — an owner may upload their own image.**
+  This was briefly a closed list, on the reasoning that a profile able to
+  attach any image could attach its owner's face and nothing here can look at
+  a file and tell. True, and the wrong conclusion: it made the feature useless
+  to the locksmith who wants a photo of their own workbench, and bought no
+  safety, since somebody set on publishing their face can put it in a post. A
+  limit that stops the honest use and not the risky one is decoration.
+
+  So what cannot be checked is **said**: a photograph of your own face is
+  allowed, and the response tells you it undoes your anonymity to anyone who
+  knows you — a line that is now in `NOT_WITHHELD` beside "your writing is
+  still yours". Somebody else's likeness is refused, declared exactly as the
+  overlay module asks it. Its own table, never `profiles.avatar` — two pictures
+  for two states, and writing it into `avatar` would mean turning anonymity off
+  showed it instead of the real face.
 
 - **Anonymous profiles get a fixed name they cannot change** —
   `identity.anonymous_name()`, 7 tests. Every one of them used to be called
