@@ -72,7 +72,7 @@ def mark(image: Image.Image) -> Image.Image:
     out = image.convert("RGB")
     w, h = out.size
     pad = round(w * 0.035)
-    size = round(w * 0.052)
+    size = round(w * 0.085)
     try:
         font = ImageFont.truetype(FONT, size)
     except OSError:                                  # pragma: no cover

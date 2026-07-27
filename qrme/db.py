@@ -701,6 +701,22 @@ CREATE TABLE IF NOT EXISTS finetune_runs (
 
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
+-- Edits to a message already sent. One row per revision, so the trail is the
+-- history rather than only the latest text.
+--
+-- A separate table on purpose: this schema is CREATE TABLE IF NOT EXISTS with
+-- no migrations, so adding columns to `messages` would reach a fresh database
+-- and silently miss every existing one. Retraction needs no new column at all —
+-- it writes `retracted` into the status the history query already filters on.
+CREATE TABLE IF NOT EXISTS message_revisions (
+    id          TEXT PRIMARY KEY,
+    message_id  TEXT NOT NULL REFERENCES messages(id),
+    was         TEXT NOT NULL,        -- the text this revision replaced
+    became      TEXT,                 -- NULL when the edit was a retraction
+    reason      TEXT,                 -- moderation flag, when one applied
+    edited_at   TEXT NOT NULL
+);
+
 -- Posts a profile publishes. `surface` says where: a social platform via
 -- social.py, or 'wall' for the community wall (qrme/wall.py).
 --

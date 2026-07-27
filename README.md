@@ -651,6 +651,33 @@ everybody who scans the same sticker is talking to the profile together — a
 class, a workshop, a Q&A after a set. See [docs/beacons.md](docs/beacons.md),
 including what a camera app can and cannot actually do with a QR code.
 
+## Editing what you already said
+
+`PATCH` and `DELETE /profiles/{id}/messages/{message_id}`. A conversation is
+not a courtroom transcript: people mistype, give the wrong year, say a thing
+badly. On this platform that matters more than usual, because what somebody
+said is also what the profile reasons from next turn — a typo that reaches the
+prompt does not just look untidy, it becomes something the profile believes.
+
+**The correction carries forward, and that part is free rather than clever.**
+The chat path rebuilds history from the message rows on every turn, so a
+corrected row is simply what the next prompt sees. Nothing to re-index, no
+snapshot to go stale.
+
+| rule | why |
+| --- | --- |
+| You can only change **your own** turn | Rewriting a profile's reply is fabrication, not editing — and putting words in a synthetic person's mouth is the one edit this platform must never allow |
+| An edit is **moderated like a fresh message** | Otherwise the edit box is a way past a filter the original had to clear: post something harmless, then change it to what you meant |
+| Retracting is **not deleting** | The row stays and its status becomes `retracted`, which the history query already excluded by only ever selecting `approved`. The text stops reaching the profile; the moderation trail survives |
+| Every previous wording is **kept as a revision** | The trail is the history, not just the latest text |
+
+**A reply written before an edit is flagged, not hidden.** This is the part
+worth being careful about: when somebody corrects a question, the answer under
+it responded to the *old* wording. Leaving it unmarked would imply the profile
+answered the new one. `GET /profiles/{id}/thread/{interactor}` marks those
+replies `answers_stale_text` and says so in words — the honest version is
+"this was answered before you changed it", not a silent rewrite of history.
+
 ## The community wall, and the feed
 
 A profile publishes to its wall (`POST /profiles/{id}/wall`); other people see
