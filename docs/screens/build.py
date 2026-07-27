@@ -3435,6 +3435,21 @@ SCREENS = [
         dict(icon="shieldok", color="green", k="Profiles have not seen it",
              s="told so, not just starved"),
     ], button=("Join the party", "brand")),
+    # Lending a skill inside a place two people already share. The card that
+    # matters is the last one: either of them can end it, alone.
+    dict(num=116, title="Lend a Skill", sub="Both agree · either can stop",
+         accent="cyan", tab=0, cards=[
+        dict(icon="db", color="amber", k="Finance Pack",
+             s="offered into this room", pill=("OFFER", "warn")),
+        dict(icon="people", color="cyan", k="Marcus → you",
+             s="use it here, while you both want"),
+        dict(icon="lock", color="green", k="Nothing is copied",
+             s="no install, no licence, no copy"),
+        dict(icon="eye", color="brand", k="He sees every use",
+             s="which is why it is worth lending"),
+        dict(icon="cross", color="red", k="Either of you can stop it",
+             s="alone, with no agreement needed"),
+    ], button=("Accept the loan", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
@@ -3489,8 +3504,14 @@ def main():
             slug = s["title"].lower().replace(" & ", "-").replace(" ", "-").replace("é", "e")
             fn = f'{n:02d}-{slug}.svg'
             draw = render_full if s.get("full") else render
+            # Rendered before the file is opened. `open(..., "w")` truncates
+            # immediately, so doing it the other way round meant a render that
+            # raised left a zero-byte SVG behind — a build that fails by
+            # corrupting its own output, and the empty file then crashed the
+            # audit rather than being reported by it.
+            svg = draw(s)
             with open(os.path.join(outdir, fn), "w") as f:
-                f.write(draw(s))
+                f.write(svg)
             total += 1
     PLATFORM = "ios"
     print(f"generated {total} screens ({total // 2} × 2 platforms)"

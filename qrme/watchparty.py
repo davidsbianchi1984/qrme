@@ -42,7 +42,7 @@ runs strict, the same rule rooms already use.
 
 from __future__ import annotations
 
-from . import db, embeds, moderation
+from . import db, embeds, moderation, sharing
 
 MAX_PARTY = 50
 MAX_LINE = 600
@@ -135,6 +135,27 @@ def leave(party_id: str, who_id: str) -> dict:
         " member_id=?", (db.utcnow(), party_id, who_id))
     db.connect().commit()
     return get(party_id)
+
+
+def end(party_id: str, host_id: str) -> dict:
+    """Close the party, and with it anything lent inside it.
+
+    The teardown is here rather than left to whoever closes the room, because
+    "remember to revoke the grants" is the kind of instruction one caller
+    eventually forgets — and the thing forgotten is a permission still standing
+    after the place that justified it is gone.
+    """
+    row = _party(party_id)
+    if row is None:
+        raise PartyError("no such watch party")
+    if row["host_id"] != host_id:
+        raise PartyError("only the host ends the party")
+    conn = db.connect()
+    conn.execute("UPDATE watch_party_members SET left_at=? WHERE party_id=?"
+                 " AND left_at IS NULL", (db.utcnow(), party_id))
+    conn.commit()
+    return {"party_id": party_id, "ended": True,
+            "grants_closed": sharing.close_surface("party", party_id)}
 
 
 def members(party_id: str) -> list[dict]:

@@ -51,7 +51,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from . import db
+from . import db, sharing
 
 MAX_ITEMS = 40
 MAX_TEXT = 400
@@ -371,6 +371,10 @@ def withdraw(exchange_id: str, actor_id: str) -> dict:
     db.connect().execute("UPDATE exchanges SET state='withdrawn' WHERE id=?",
                          (exchange_id,))
     db.connect().commit()
+    # Anything lent for this piece of work goes with it. Walking away from the
+    # agreement and leaving the other side still holding your skill would be
+    # the half-withdrawal nobody means.
+    sharing.close_surface("exchange", exchange_id)
     return get(exchange_id)
 
 

@@ -734,6 +734,45 @@ CREATE TABLE IF NOT EXISTS post_attachments (
     created_at TEXT NOT NULL
 );
 
+-- A skill one person lends another, inside a place they are both already in.
+--
+-- `skill_ref` is a *reference* to something the lender already has — a pack id,
+-- a robot task name, a language pair. Never a copy: packs here are bought and
+-- licensed, and a lending feature that duplicated them would be a piracy tool
+-- with a consent dialog on the front. See qrme/sharing.py.
+--
+-- Two people open a grant; either one closes it. `closed_by` records which,
+-- because "I ended it" and "they ended it" are different facts to both of them.
+CREATE TABLE IF NOT EXISTS skill_grants (
+    id           TEXT PRIMARY KEY,
+    lender_id    TEXT NOT NULL,
+    borrower_id  TEXT NOT NULL,
+    surface      TEXT NOT NULL,   -- room | desk | party | connection | exchange
+    surface_id   TEXT NOT NULL,
+    skill_kind   TEXT NOT NULL,   -- pack | robot_task | profession | language | workflow
+    skill_ref    TEXT NOT NULL,
+    title        TEXT NOT NULL,
+    note         TEXT,
+    fee          REAL NOT NULL DEFAULT 0,
+    state        TEXT NOT NULL,   -- offered | active | declined | closed
+    offered_at   TEXT NOT NULL,
+    accepted_at  TEXT,
+    closed_at    TEXT,
+    closed_by    TEXT,
+    close_reason TEXT
+);
+
+-- Every invocation of a lent skill. This is the lender's log, and it is the
+-- reason a grant is worth agreeing to: you can watch it being used, and stop it
+-- mid-sentence. "Both parties choose" is a slogan without it.
+CREATE TABLE IF NOT EXISTS skill_uses (
+    id          TEXT PRIMARY KEY,
+    grant_id    TEXT NOT NULL REFERENCES skill_grants(id),
+    borrower_id TEXT NOT NULL,
+    what        TEXT,
+    used_at     TEXT NOT NULL
+);
+
 -- Two people agreeing, in writing, on work about to change hands.
 --
 -- `state` is the whole safety story: only `draft` is editable, and any edit

@@ -267,6 +267,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="210" alt="Delivery"></a><br><sub><b>114</b> · Delivery</sub></td>
     <td align="center" width="33%"><a href="docs/screens/115-watch-party.svg"><img src="docs/screens/115-watch-party.svg" width="210" alt="Watch Party"></a><br><sub><b>115</b> · Watch Party</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/116-lend-a-skill.svg"><img src="docs/screens/116-lend-a-skill.svg" width="210" alt="Lend a Skill"></a><br><sub><b>116</b> · Lend a Skill</sub></td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -1082,6 +1087,54 @@ it opens no session, runs nothing, and reaches nothing that was not listed.
 Hooking one machine up to another is a different feature with a different
 threat model, and shipping it quietly inside a file-sharing agreement would be
 the wrong way to arrive at it.
+
+## Lending a skill, in any room you are both in
+
+Two people are in the same place — a room, a live desk, a watch party, a
+connection, an agreed piece of work — and one of them has something the other
+needs. A finance pack. A robot's task modules. A profession. A language pair.
+`qrme/sharing.py` (`POST /skill-grants`) lends it, and the same mechanism
+covers every one of those surfaces rather than five near-copies of it.
+
+The whole feature is the word **both**, and the shape it takes is deliberately
+lopsided:
+
+> it takes two to open a grant, and one to close it.
+
+Symmetric consent to start is what makes it a loan rather than a taking.
+Asymmetric consent to end is what stops it becoming a trap — somebody who has
+changed their mind should not need permission from the person benefiting to
+change it back. A consent model that needs *both* sides to stop is one that
+cannot be withdrawn under pressure, which is exactly when withdrawal matters.
+Either party closes it alone, and the record says which of them did.
+
+**A skill is used, never handed over.** The borrower may invoke it while the
+grant stands; they get no copy, no install and no licence. Packs here are
+bought, licensed and attributed to publishers, and a lending feature that
+quietly duplicated them would be a piracy tool with a consent dialog on the
+front. The permission is checked at the moment of **use**, not at the moment of
+grant, so closing a grant stops the next call rather than merely preventing new
+grants.
+
+**A grant lives in one place and dies with it.** Lending your expertise in a
+watch party does not follow the borrower into a private message — a skill lent
+in one surface is refused in another, by name. Ending the party or withdrawing
+the exchange closes what was lent inside it, and that teardown is wired at the
+point the place ends rather than left to a caller to remember, because the
+thing forgotten would be a live permission with nothing left to justify it.
+
+**Every use is written down, and the lender reads it.** *Both parties choose*
+is a slogan unless the person lending can see what was done with it. The log is
+the reason a grant is worth agreeing to: you can watch it being used and stop
+it mid-sentence.
+
+| | |
+| --- | --- |
+| where | `room` · `desk` · `party` · `connection` · `exchange` — no "everywhere", and no "my account" |
+| what | `pack` · `robot_task` · `profession` · `language` · `workflow` |
+| to open | both, and only the person it was offered to may accept |
+| to close | either, alone |
+| transferred | nothing |
 
 ## Watch parties, and a profile that has not seen the video
 

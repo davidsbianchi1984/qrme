@@ -115,6 +115,17 @@ def chat(party_id: str, limit: int = 100) -> dict:
     return {"party_id": party_id, "lines": watchparty.chat(party_id, limit)}
 
 
+@router.post("/watch-parties/{party_id}/end")
+def end(party_id: str, body: SeekIn | None = None,
+        host_id: str = "") -> dict:
+    """Close the party, and with it anything lent inside it."""
+    who = host_id or (body.host_id if body else "")
+    try:
+        return watchparty.end(party_id, who)
+    except watchparty.PartyError as exc:
+        raise _fail(exc) from None
+
+
 @router.get("/watch-parties/{party_id}/context")
 def context(party_id: str) -> dict:
     """Everything a synthetic profile in this party is allowed to know.

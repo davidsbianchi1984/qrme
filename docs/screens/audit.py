@@ -54,7 +54,10 @@ def bounds(path: str, kind: str) -> tuple[float, float]:
     correct layout as broken.
     """
     src = open(path).read()
-    canvas = float(re.search(r'width="(\d+)"', src).group(1))
+    m = re.search(r'width="(\d+)"', src)
+    if m is None:
+        raise SystemExit(f"{path} is not a drawing — {len(src)} bytes")
+    canvas = float(m.group(1))
     if kind == "watch":
         return WATCH
     if kind == "desktop":
