@@ -2399,7 +2399,7 @@ FOUNDER = ("David Bianchi",
 
 # The founder, the photograph — authentic, so deliberately unmarked. Kept out of the starter
 # collection above, which is invented people only.
-FOUNDER_LIVE = ("David Bianchi",
+FOUNDER_VERIFIED = ("David Bianchi",
     "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEEx"
     "NDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7"
     "Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAByAHIDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABAUAAgMGAQf/xAA3EAACAQMC"

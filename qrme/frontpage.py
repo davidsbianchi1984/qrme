@@ -34,7 +34,7 @@ all. A profile with glowing reviews is a well-liked synthetic profile.
 
 from __future__ import annotations
 
-from . import avatars, db, moderation
+from . import avatars, db, moderation, verification
 
 MIN_RATING, MAX_RATING = 1, 5
 
@@ -252,6 +252,12 @@ def front_page(profile_id: str, viewer_id: str | None = None) -> dict | None:
         # Never optional and never last. Every other field on this page is
         # about how good the profile is; this one is about what it is.
         "ai_disclosure": art.get("watermark", {}).get("line"),
+        # Whether anybody checked the identity behind this profile, and how
+        # hard they looked. Carried as the whole record rather than a boolean,
+        # because "verified" on its own is a word and the level is the fact —
+        # a surface that shows the badge without the level is showing a
+        # credential the platform minted for itself.
+        "verification": verification.status(profile_id),
         "skills": skills,
         "experience": experience(profile_id),
         "rating": rating(profile_id),

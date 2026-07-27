@@ -276,11 +276,11 @@ def friends_list(y, entries):
     enough to just say.
     """
     out, yy = [], y
-    for name, sub, b64, founder in entries:
+    for name, sub, b64, badge in entries:
         # The founder's row gives up its right end to the badge, so its
         # subtitle has less room than the others. Caught here rather than in a
         # render, which is how the same overlap got shipped on the agent groups.
-        if len(sub) > (26 if founder else 34):
+        if len(sub) > (26 if badge else 34):
             raise ValueError(f"friend subtitle too long for the row: {sub!r}")
         h = 62
         out.append(rrect(CX, yy, CW, h, 15, "url(#gCard)", C["line"], 1))
@@ -290,13 +290,13 @@ def friends_list(y, entries):
             out.append(orb(CX + 33, yy + 31, 19))
         out.append(text(CX + 62, yy + 26, name, 13, C["txt"], 700))
         out.append(text(CX + 62, yy + 43, sub, 9.5, C["t2"], 500))
-        if founder:
+        if badge:
+            col = C["green"] if badge == "VERIFIED" else C["brandA"]
             bw = 52
             bx = CX + CW - bw - 12
-            out.append(rrect(bx, yy + 20, bw, 18, 9, A(C["brandA"], 0.18),
-                             C["brandA"], 1))
-            out.append(text(bx + bw / 2, yy + 32, "STANDARD", 7.5,
-                            C["brandA"], 800, "middle", 0.4))
+            out.append(rrect(bx, yy + 20, bw, 18, 9, A(col, 0.18), col, 1))
+            out.append(text(bx + bw / 2, yy + 32, badge, 7.5, col, 800,
+                            "middle", 0.4))
         yy += h + 9
     return out, yy
 
@@ -2355,10 +2355,11 @@ SCREENS = [
     # makes "remove" an obvious thing to be allowed to do.
     dict(num=84, title="Friends", sub="Who this profile stands with",
          accent="cyan", tab=1, friends=[
-        ("David Bianchi", "@david_bianchi_live", frames.FOUNDER_LIVE[1], True),
-        ("David Bianchi", "@david_bianchi", frames.FOUNDER[1], True),
-        ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], False),
-        ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], False),
+        ("David Bianchi", "@david_bianchi_verified",
+         frames.FOUNDER_VERIFIED[1], "VERIFIED"),
+        ("David Bianchi", "@david_bianchi", frames.FOUNDER[1], "AI"),
+        ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], None),
+        ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], None),
     ]),
 ]
 

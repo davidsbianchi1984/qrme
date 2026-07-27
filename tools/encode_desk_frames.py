@@ -124,13 +124,13 @@ def main() -> None:
     # false. The friends screens want his face, so it gets its own name.
     import sys
     sys.path.insert(0, str(ROOT))
-    from qrme.seed import (FOUNDER_HANDLE, FOUNDER_NAME, LIVE_HANDLE,
-                           LIVE_NAME)
+    from qrme.seed import (FOUNDER_HANDLE, FOUNDER_NAME, VERIFIED_HANDLE,
+                           VERIFIED_NAME)
     PHOTO_SRC = ROOT / "qrme" / "assets" / "photos"
     for const, handle, name, src_dir, note in (
             ("FOUNDER", FOUNDER_HANDLE, FOUNDER_NAME, PORTRAIT_SRC,
              "the AI rendering, marked in its own pixels"),
-            ("FOUNDER_LIVE", LIVE_HANDLE, LIVE_NAME, PHOTO_SRC,
+            ("FOUNDER_VERIFIED", VERIFIED_HANDLE, VERIFIED_NAME, PHOTO_SRC,
              "the photograph — authentic, so deliberately unmarked")):
         fsrc = src_dir / f"{handle}.webp"
         if not fsrc.is_file():

@@ -14,10 +14,23 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import friends
+from .. import friends, verification
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
+
+
+@router.get("/profiles/{profile_id}/verification")
+def get_verification(profile_id: str) -> dict:
+    """Whether anybody checked the identity behind this profile, and how hard.
+
+    Public, for the same reason the watermark endpoint is: a claim a stranger
+    can see is a claim a stranger should be able to check. Always returns the
+    level and what it means alongside the badge — "verified" on its own is a
+    word, and the level is the fact.
+    """
+    profile_or_404(profile_id)
+    return verification.status(profile_id)
 
 
 class FriendAdd(BaseModel):

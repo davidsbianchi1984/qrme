@@ -22,7 +22,7 @@ def _seeded(client):
     """Seed the collection, and hand back both founder profile ids in pinned
     order: the photographed one, then the rendered one."""
     out = seed.seed()
-    return [out["founder_live"], out["founder"]]
+    return [out["founder_verified"], out["founder"]]
 
 
 # -- the founder comes standard ---------------------------------------------
@@ -277,7 +277,7 @@ def test_the_photograph_is_not_marked_ai_but_the_profile_still_is(client):
     """
     live, rendered = _seeded(client)
     avatar = client.get(f"/profiles/{live}/avatar").json()
-    assert avatar["asset"] == f"/photos/{seed.LIVE_HANDLE}.webp"
+    assert avatar["asset"] == f"/photos/{seed.VERIFIED_HANDLE}.webp"
     assert avatar["asset_marked"] is False
     assert avatar["watermark"]                      # the profile is still labelled
     assert avatar["likeness"]["real_person"] is True
@@ -323,4 +323,117 @@ def test_the_founder_handles_agree_with_the_seed(client):
     """Two modules name the same person twice over. If they drift, every new
     profile gets a short list and nothing else complains."""
     assert set(friends.FOUNDER_HANDLES) == {seed.FOUNDER_HANDLE,
-                                            seed.LIVE_HANDLE}
+                                            seed.VERIFIED_HANDLE}
+
+
+# -- verified means something, or it means nothing ---------------------------
+
+def test_the_verified_profile_carries_a_level_not_just_a_word(client):
+    """A badge with nothing behind it is a credential the platform minted for
+    itself. The level and its plain-English meaning travel with the word, so no
+    surface can show one without the other."""
+    from qrme import verification
+    verified, rendered = _seeded(client)
+    v = client.get(f"/profiles/{verified}/verification").json()
+    assert v["verified"] is True
+    assert v["real_person"] is True
+    assert v["level"] in verification.PROOFING_LEVELS
+    assert v["means"] == verification.MEANING[v["level"]]
+    assert v["attestor"]
+
+
+def test_self_asserted_says_so_in_the_badge(client):
+    """It is the bottom rung, and nobody has checked a document. Saying that
+    beside the word is the difference between a badge and a claim."""
+    verified, rendered = _seeded(client)
+    v = client.get(f"/profiles/{verified}/verification").json()
+    assert v["level"] == "self_asserted"
+    assert v["rank"] == 0
+    assert "not that a document was checked" in v["caveat"]
+
+
+def test_a_level_above_self_asserted_needs_a_named_attestor(client):
+    """The same rule `signatures.enroll` applies, for the same reason: who
+    checked belongs in the record, not in a footnote."""
+    from qrme import verification
+    verified, _ = _seeded(client)
+    with pytest.raises(verification.VerificationError) as exc:
+        verification.verify(verified, "document")
+    assert "requires an attestor" in str(exc.value)
+
+    ok = verification.verify(verified, "document", attestor="A notary",
+                             method="passport")
+    assert ok["rank"] == 2 and ok["caveat"] is None
+
+
+def test_an_invented_profile_has_nobody_to_verify(client):
+    """`fictional` is not unverified — it is a different answer. Reporting it
+    as 'not verified' would imply somebody failed a check."""
+    from qrme import db, verification
+    _seeded(client)
+    starter = db.connect().execute(
+        "SELECT profile_id FROM handles WHERE handle='marcus_bell'").fetchone()
+    v = verification.status(starter["profile_id"])
+    assert v["verified"] is False and v["real_person"] is False
+    assert "nobody to verify" in v["note"]
+
+
+def test_an_unchecked_real_person_is_not_reported_as_verified(client):
+    """The default for a real-person profile is no badge at all."""
+    from qrme import verification
+    _seeded(client)
+    mine = make_profile(client, display_name="Nobody Checked")
+    v = verification.status(mine["id"])
+    assert v["verified"] is False and v["real_person"] is True
+
+
+def test_the_friends_list_carries_the_verification_record(client):
+    """A friends list is exactly where somebody decides whether a face is a
+    real person, so the level rides with the row."""
+    verified, rendered = _seeded(client)
+    profile = make_profile(client, display_name="Reader")
+    entries = client.get(f"/profiles/{profile['id']}/friends").json()["friends"]
+    assert entries[0]["verification"]["verified"] is True
+    assert entries[0]["verification"]["level"] == "self_asserted"
+
+
+# -- the founder actually knows things ---------------------------------------
+
+def test_both_founder_profiles_carry_the_domain_knowledge(client):
+    """The platform reasoning was there from the start; the man's own subject
+    was not, which left the profile every account meets first unable to answer
+    the thing it is most likely to be asked about."""
+    from qrme import db
+    for pid in _seeded(client):
+        titles = [r["title"] for r in db.connect().execute(
+            "SELECT title FROM source_items WHERE profile_id=?",
+            (pid,)).fetchall()]
+        assert any("Private Data Infrastructure" in t for t in titles)
+        assert any("Envelope encryption" in t for t in titles)
+        assert len(titles) == len(seed.FOUNDER_SOURCES)
+
+
+def test_both_founder_profiles_carry_skills_and_a_cv(client):
+    """Experience on a real person is a credential, which is why
+    `set_experience` refuses it without a rights basis — so the basis has to be
+    recorded before the CV, and a missing one would fail here rather than
+    silently leave the page empty."""
+    from qrme import frontpage
+    for pid in _seeded(client):
+        page = frontpage.front_page(pid)
+        assert page["skills"] == seed.FOUNDER_SKILLS
+        assert [e["title"] for e in page["experience"]] == [
+            e["title"] for e in seed.FOUNDER_EXPERIENCE]
+        assert page["verification"]["verified"] is True
+
+
+def test_the_cv_needs_the_rights_basis_that_was_recorded(client):
+    """Mutation guard in test form: strip the basis and the CV becomes
+    impossible to set, which is the rule doing its job."""
+    from qrme import db, frontpage
+    verified, _ = _seeded(client)
+    db.connect().execute(
+        "UPDATE profiles SET consent_basis=NULL WHERE id=?", (verified,))
+    db.connect().commit()
+    with pytest.raises(frontpage.FrontPageError):
+        frontpage.set_experience(verified, list(seed.FOUNDER_EXPERIENCE))

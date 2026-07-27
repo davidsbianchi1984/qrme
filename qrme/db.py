@@ -1184,6 +1184,21 @@ CREATE TABLE IF NOT EXISTS signatures (
     signed_at          TEXT NOT NULL
 );
 
+-- How well a profile's identity has been established. Distinct from `kind`,
+-- which says whether there is a real person at all: this says whether anybody
+-- checked they are who they claim. The ladder is signatures.PROOFING_LEVELS,
+-- reused so the platform has one meaning for it rather than two that drift,
+-- and `attestor` is required above self_asserted for the same reason it is
+-- there — who checked belongs in the record, not in a footnote.
+CREATE TABLE IF NOT EXISTS profile_verification (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    level      TEXT NOT NULL,   -- self_asserted | federated | document | in_person
+    attestor   TEXT,            -- who checked; required above self_asserted
+    method     TEXT,
+    ref        TEXT,            -- evidence held elsewhere, never the document
+    checked_at TEXT NOT NULL
+);
+
 -- Friendships between profiles. Distinct from `relationships`, which records
 -- how one profile treats one *interactor* — the person typing at it. This is
 -- the other axis: profile ↔ profile, the social graph the community surfaces

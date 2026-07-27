@@ -35,7 +35,7 @@ Three decisions worth keeping in view:
 
 from __future__ import annotations
 
-from . import db
+from . import db, verification
 
 # The founder's two profiles, in the order they stand. One constant, because
 # "who is pinned" is a product decision and should be greppable rather than
@@ -45,7 +45,7 @@ from . import db
 # rendered likeness is marked AI in its own pixels, the photograph is not, and
 # a platform whose whole argument is that synthetic things must say so cannot
 # have its owner running a single profile that is ambiguously both.
-FOUNDER_HANDLES: tuple[str, ...] = ("david_bianchi_live", "david_bianchi")
+FOUNDER_HANDLES: tuple[str, ...] = ("david_bianchi_verified", "david_bianchi")
 
 # Kept as a name because the rest of the module and its tests read better for
 # it, and because a single-founder deployment is still a coherent thing.
@@ -233,6 +233,11 @@ def friends_of(profile_id: str) -> list[dict]:
             # Said out loud so a client renders the row without a remove
             # control, rather than offering one that will 409.
             "pinned": founder,
+            # The identity badge, as the whole record. A friends list is
+            # exactly where somebody decides whether a face is a real person,
+            # so the level travels with the word rather than being a second
+            # call the surface might not make.
+            "verification": verification.status(r["friend_id"]),
             "since": r["created_at"],
             "mutual": _is_mutual(profile_id, r["friend_id"]),
         })
