@@ -1285,7 +1285,7 @@ def render(spec):
         out.append(button(CX, y + 2, CW, "+  Add Source", "brand", 40))
         y += 52
         out.append(icon("lock", CX + 6, y + 6, C["cyan"], 0.6))
-        out.append(text(CX + 18, y + 10, "Stored locally in your vault · optional cloud contribution", 9.3, C["t3"], 500))
+        out.append(text(CX + 18, y + 10, "Stored in your vault · optional cloud contribution", 9.3, C["t3"], 500))
 
     elif hero == "personality":
         y += 8
@@ -1596,10 +1596,14 @@ def render(spec):
         out.append(orb(W / 2, y + 34, 26))
         out.append(text(W / 2, y + 78, "Four questions to birth your AI", 12, C["txt"], 600, "middle"))
         y += 100
-        qs = [("1", "What do you love most?", "answered"),
-              ("2", "What's a memory you'd keep forever?", "answered"),
+        # The four fields `GenesisAnswers` actually takes — social_style,
+        # humor, comfort, what_matters — rather than four questions written
+        # for the mock. Two of those had drifted from the model *and* ran off
+        # the side of the phone.
+        qs = [("1", "How are you around people?", "answered"),
+              ("2", "What makes you laugh?", "answered"),
               ("3", "How do you comfort a friend?", "now"),
-              ("4", "What would you never compromise on?", "next")]
+              ("4", "What matters most to you?", "next")]
         for n, q, state in qs:
             col = C["green"] if state == "answered" else (C["brandA"] if state == "now" else C["t3"])
             out.append(rrect(CX, y, CW, 46, 13, "url(#gCard)", C["line"],
@@ -1853,7 +1857,7 @@ def render(spec):
         out.append(button(CX, y + 2, CW, "Continue", "brand", 44))
 
     elif hero == "avatar":
-        out.append(text(CX, y, "A 2D portrait for chat, a 3D avatar for video, AR & VR.", 10.5, C["t2"]))
+        out.append(text(CX, y, "A 2D portrait for chat, a 3D avatar for AR & VR.", 10.5, C["t2"]))
         y += 26
         gw = (CW - 12) / 2
         # 2D portrait tile
@@ -1993,7 +1997,7 @@ def render(spec):
             out.append(f'<circle cx="{bx+d/2}" cy="{y+d/2}" r="{d/2}" fill="{fill}" stroke="{stroke}" stroke-width="1"/>')
             out.append(icon(ic, bx + d / 2, y + d / 2, icol, 1.2))
         y += d + 14
-        out.append(text(W / 2, y, "Camera & mic stay on your device — the stream is encrypted.", 9.3, C["t3"], 500, "middle"))
+        out.append(text(W / 2, y, "Camera & mic stay on your device · encrypted stream", 9.3, C["t3"], 500, "middle"))
 
     elif hero == "allset":
         out.append(orb(W / 2, y + 40, 34))
@@ -2116,7 +2120,7 @@ def render(spec):
                 out.append(text(bx - w / 2, y + 31, lab, 10, col, 700, "middle"))
                 bx -= w + 8
             y += 62
-        out.append(text(CX, y, "Only the folders & albums you pick — nothing else is read.",
+        out.append(text(CX, y, "Only the folders & albums you pick — nothing else",
                         9.5, C["t3"], 500))
 
     elif hero == "assistant":
@@ -2214,6 +2218,16 @@ def render(spec):
             out.append(s)
         if spec.get("button"):
             out.append(button(CX, y, CW, spec["button"][0], spec["button"][1], 42))
+            y += 42
+        # The tab bar is drawn *after* the body and is opaque, so a screen with
+        # one card too many does not look crowded — it looks finished, with the
+        # overflow silently painted over. On the live-desks screen that hid
+        # `Ring the bell` completely, which is the button the screen exists
+        # for, and nothing said so because everything above it rendered fine.
+        if y > SY + SH - 52:
+            raise ValueError(
+                f'screen {num} runs {y - (SY + SH - 52):.0f}px past the tab '
+                f'bar — the last thing on it will be painted over')
 
     out += tabbar(spec.get("tabs", MAIN), spec.get("tab", 0))
     # The help button sits in the bottom trailing corner, which is exactly
@@ -2825,21 +2839,25 @@ SCREENS = [
     # The desk screens are the only ones in this set that must NOT show the AI
     # mark: a desk is an actual person, and stamping "AI" on them would be a
     # false statement. The badge is the positive claim instead.
+    # Five cards and a button did not fit: the button — which is the whole
+    # point of the screen — was drawn *below* the tab bar, where nothing
+    # renders it and nobody could see it. The two attestation cards say one
+    # thing between them and are now one card, and the sample view is smaller,
+    # because on this screen the photo is a thumbnail of a desk nobody has
+    # claimed yet rather than the subject.
     dict(num=69, title="Live Desks", sub="A real person — never the AI mark",
          accent="green", tab=3,
-         photo=frames.DESK, photo_tag=("SAMPLE VIEW", "sample"),
+         photo=frames.DESK, photo_tag=("SAMPLE VIEW", "sample"), photo_h=110,
          photo_note="No camera yet — not claimed live",
          cards=[
         dict(icon="person", color="green", k="Bev Okafor",
              s="Live person — not AI", pill=("HUMAN", "good")),
         dict(icon="eye", color="cyan", k="You see the desk",
              s="a camera view, depicting nobody"),
-        dict(icon="shieldok", color="brand", k="Attested by a manager",
-             s="met in person · saw the licence"),
+        dict(icon="shieldok", color="brand", k="Attested, not proven",
+             s="a manager vouched, not verified"),
         dict(icon="clock", color="amber", k="Away right now",
              s="the state the bell exists for", pill=("AWAY", "warn")),
-        dict(icon="warn", color="cyan", k="Recorded, not proven",
-             s="we record who vouched"),
     ], button=("Ring the bell", "amber")),
 
     dict(num=70, title="Desk Beacons", sub="The sticker on the shop door",
@@ -2925,7 +2943,7 @@ SCREENS = [
     # premise is an empty chair with a bell, the reactions are the room.
     dict(num=75, title="Live Room", sub="Two ways in — come up, or comment",
          accent="green", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=208,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=202,
          overlay=dict(
              viewers="14 watching",
              ticker=[("gift", "amber", "Bea · $5"),
@@ -2941,8 +2959,10 @@ SCREENS = [
              s="asks the host — they decide", pill=("ASK", "warn")),
         dict(icon="chat", color="brand", k="Or just comment",
              s="immediate · moderated as usual"),
+        # Kept clear of the floating help button, which lands in this corner
+        # and was sitting on top of the last three words.
         dict(icon="shieldok", color="cyan", k="No AI mark here",
-             s="a real person is on the other end"),
+             s="a real person, not a render"),
     ]),
 
     # The other view style. Same mechanic, same bell, behind the deployment's
@@ -2951,7 +2971,7 @@ SCREENS = [
     # safety matter rather than a detail.
     dict(num=76, title="Rated Stream", sub="18+, and still a real person",
          accent="red", tab=3, locked=True,
-         photo=frames.STAGE, photo_tag=("LIVE", "live"), photo_h=208,
+         photo=frames.STAGE, photo_tag=("LIVE", "live"), photo_h=202,
          overlay=dict(
              viewers="38 watching",
              ticker=[("gift", "amber", "Ada · $20"),
@@ -3095,7 +3115,7 @@ SCREENS = [
     # guest request. They were reachable by API and by nothing else.
     dict(num=89, title="Live Room", sub="Ring, gift, or ask to come up",
          accent="pink", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=PHOTO_FULL,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=PHOTO_FULL - 2,
          live_bar=[
              ("comeup", "green"),
              ("bell", "amber"),
