@@ -271,6 +271,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/116-lend-a-skill.svg"><img src="docs/screens/116-lend-a-skill.svg" width="210" alt="Lend a Skill"></a><br><sub><b>116</b> · Lend a Skill</sub></td>
     <td align="center" width="33%"><a href="docs/screens/117-edit-a-message.svg"><img src="docs/screens/117-edit-a-message.svg" width="210" alt="Edit a Message"></a><br><sub><b>117</b> · Edit a Message</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="210" alt="Stay Anonymous"></a><br><sub><b>118</b> · Stay Anonymous</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1476,6 +1480,123 @@ or force it to be loosened.
 Neither profile is in the starter collection or in `avatars.BRIEFS`. Both promise
 invented people in their own docstrings, and a real person in either list would
 quietly make a documented claim false.
+
+## Anonymous, several, and exactly one verified
+
+Three things a person is allowed to be here, and `qrme/identity.py` is the
+tension between them.
+
+**You may be anonymous.** Not everyone can afford to put their name on what
+they think, and a platform that only works for people with nothing to lose is a
+platform for a narrow set of people.
+
+**You may hold several profiles.** A person is not one thing — the work self,
+the hobby, the one for the support group nobody at work knows about. These are
+not sockpuppets; they are the ordinary shape of a life, and forcing them into
+one identity is its own kind of exposure.
+
+**Exactly one of them may be verified.** This is the rule the other two need in
+order to be safe rather than merely permitted.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="200" alt="Stay anonymous"></a><br><sub><b>118</b> · what we withhold, and what we can't</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="200" alt="Your profiles"></a><br><sub><b>119</b> · as many as you like · one verified</sub></td>
+    <td width="33%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /identity/vocabulary` | the three rules, in the words a screen can show |
+| `GET · PUT /profiles/{id}/anonymity` | what it hides and what it can't · turn it on or off |
+| `GET /profiles/{id}/badge` | the badge a **reader** sees |
+| `GET /profiles/{id}/verifiable` | could this one take it, and if not why |
+| `POST /profiles/{id}/verification` | claim it, once per person |
+| `POST …/verification/move` | move it to another of yours |
+| `GET /profiles/{id}/siblings` | your roster — **owner-only** |
+
+  </td>
+  </tr>
+</table>
+
+**Why one badge.** Verification is not a quality score or a reward for being a
+good citizen. It is the sentence *this is that particular real person*. Said of
+two profiles at once it is either false of one of them, or it is a statement
+that one human being is two authenticated people — which is precisely the
+primitive verification exists to deny to everybody else. A platform that hands
+it out per profile has not verified anybody; it has sold a badge.
+
+**The badge moves rather than multiplies.** One at a time, not one forever.
+People change which face is their public one, and a rule that could only be
+satisfied by deleting a profile is a rule they would answer by lying instead.
+The record moves whole — level, attestor, method, evidence and the date it was
+checked. `checked_at` is deliberately *not* re-stamped: a document seen in 2019
+is not a document seen today because the badge changed seats.
+
+**A fictional profile is unverifiable, not unverified**, and never consumes the
+slot. `verification.status` already draws that distinction; getting it backwards
+here would let an invented character lock a real person out of their own badge.
+
+**The founder is the worked example.** `@david_bianchi` and `@david_bianchi_ai`
+are the same human being, so only the photographed one carries the badge — the
+seed used to verify both, which had the platform asserting that one man was two
+verified people, on the deployment that ships as the demonstration of the rule.
+The badge belongs to the photograph because a real person whose picture is
+authentic is exactly what it is a claim about; the rendering carries the AI mark
+instead, which is the claim that is true of *it*.
+
+**One person means one owner account**, because that is the unit this platform
+can observe. `same_identity_elsewhere` closes the part that is visible — the
+same attestor vouching for the same evidence under a second account — and
+nothing closes the rest. That limit is stated rather than papered over: a
+`self_asserted` level carries no attestor and no evidence, so there is nothing
+on the bottom rung that could tell two people from one. It is why the rung
+exists and why the badge carries its caveat.
+
+### Anonymity had to become a property
+
+`anonymous` was honoured by every surface that *rendered* a profile — the
+front-page card, the landing page, the prompt, the watermark — and by the route
+that returned the profile, not at all. `GET /profiles/{id}` is public, and it
+handed over `display_name` in full. The shortest way past anonymity was to ask
+for the profile.
+
+`owner_id` was the worse half, because it does not undo one profile's anonymity
+— it undoes all of them at once. Two anonymous profiles sharing an account are
+the same person, and anyone could read that field off both and match them, then
+read it off the *named* profile beside them and put a name to the pair. It is
+now withheld from everyone but the owner on **every** profile, named ones
+included, along with `successor_owner`, which is somebody else's account id and
+was never a visitor's business either.
+
+**The roster is the dangerous read.** `GET /profiles/{id}/siblings` is the one
+call that links a person's profiles to each other, which is exactly the tool for
+stripping the anonymity off all of them at once. It is reached through a profile
+whose owner token the caller holds, and the account is derived from that — never
+taken from the path. A route keyed on `owner_id` would hand the roster to
+anybody who learned one, and an `owner_id` is a string somebody chooses, not a
+secret. Every anonymity guarantee above is worth exactly what that check is
+worth.
+
+**An anonymous profile's badge withholds who checked.** "Verified by Dr Okafor
+of St Mary's" narrows an anonymous author to a city and a workplace, which is
+most of the way to a name — the badge would undo the anonymity it sits beside.
+What survives is the part worth having, and the reason an anonymous profile
+would want one at all: *a real person stands behind this, and somebody checked.*
+That claim is separable from *who*, and it is the difference between a pseudonym
+and a bot.
+
+**And the limits are published beside the promise.** `GET
+/profiles/{id}/anonymity` returns `withheld` and `not_withheld` together,
+always. The dangerous reading of the word is the generous one: somebody deciding
+whether it is safe to post will assume "anonymous" means untraceable unless they
+are told otherwise, and by the time they find out, it is published. We can
+decline to publish a name. We cannot make prose unrecognisable to a reader who
+knows the author, and saying so plainly is the only honest version of this
+feature.
+
+**Per profile, never per account.** An account-wide switch would mean putting
+your name on the work profile puts it on the support-group one — the exact
+coupling that having several profiles exists to avoid.
 
 ## Verified, and what the word is allowed to mean
 

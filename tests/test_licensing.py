@@ -50,8 +50,15 @@ def test_acquire_and_derive_a_specialist_agent(client):
 
     # The derived agent is a real, buyer-owned profile with provenance, and it
     # chats in-character.
-    child = client.get(f"/profiles/{derived['derived_profile_id']}").json()
+    # Read as the buyer: `owner_id` is an account identifier and the public
+    # view withholds it, because one account may hold several profiles and
+    # publishing it matches them to each other.
+    mine = {"authorization": f"Bearer {derived['owner_token']}"}
+    child = client.get(f"/profiles/{derived['derived_profile_id']}",
+                       headers=mine).json()
     assert child["licensed_from"] == p["id"] and child["owner_id"] == buyer_id
+    assert client.get(f"/profiles/{derived['derived_profile_id']}",
+                      headers={"authorization": ""}).json()["owner_id"] is None
     user = client.post("/interactors", json={"display_name": "U"}).json()["id"]
     reply = client.post(f"/profiles/{child['id']}/chat",
                         json={"interactor_id": user, "message": "help me"})

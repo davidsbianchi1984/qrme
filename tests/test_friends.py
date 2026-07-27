@@ -446,7 +446,30 @@ def test_both_founder_profiles_carry_skills_and_a_cv(client):
         assert page["skills"] == seed.FOUNDER_SKILLS
         assert [e["title"] for e in page["experience"]] == [
             e["title"] for e in seed.FOUNDER_EXPERIENCE]
-        assert page["verification"]["verified"] is True
+
+
+def test_only_the_photographed_founder_profile_is_verified(client):
+    """One person, one badge — and the founder is the case that shows why.
+
+    Both profiles are the same human being, so this used to have the platform
+    asserting that David Bianchi was two verified people, on the deployment
+    that ships as the worked example of the rule. The badge belongs to the
+    photographed half, because a real person whose picture is authentic is
+    exactly what the badge is a claim about; the rendered half carries the AI
+    mark instead, which is the claim that is true of it.
+    """
+    from qrme import db, identity, verification
+    live, rendered = _seeded(client)
+
+    assert verification.status(live)["verified"] is True
+    assert verification.status(rendered)["verified"] is False
+
+    owner = db.connect().execute("SELECT owner_id FROM profiles WHERE id=?",
+                                 (live,)).fetchone()["owner_id"]
+    assert identity.verified_profile(owner) == live
+
+    # And the rendered half cannot take a second one while the first stands.
+    assert identity.can_verify(rendered)["can_verify"] is False
 
 
 def test_the_cv_needs_the_rights_basis_that_was_recorded(client):

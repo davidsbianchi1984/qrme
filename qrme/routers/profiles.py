@@ -82,7 +82,7 @@ def create_profile(body: ProfileCreate) -> dict:
     from .. import friends
     friends.install_founder(profile_id)
     token = auth.issue("owner", profile_id)
-    out = {**profile_out(profile_or_404(profile_id)).model_dump(),
+    out = {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
            "owner_token": token}
     if body.language:
         out["language"] = body.language
@@ -112,13 +112,21 @@ def genesis_profile(body: GenesisCreate) -> dict:
     )
     conn.commit()
     token = auth.issue("owner", profile_id)
-    return {**profile_out(profile_or_404(profile_id)).model_dump(),
+    return {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
             "owner_token": token}
 
 
 @router.get("/profiles/{profile_id}", response_model=ProfileOut)
-def get_profile(profile_id: str) -> ProfileOut:
-    return profile_out(profile_or_404(profile_id))
+def get_profile(profile_id: str, request: Request) -> ProfileOut:
+    """Public, so it is redacted for everyone but the owner.
+
+    The request is here to answer one question — *is this the owner asking?* —
+    because an anonymous profile returns its real name to them and to nobody
+    else. Public and unredacted was the previous combination, and it made
+    `anonymous` a property of the four surfaces that render a profile rather
+    than of the profile itself.
+    """
+    return profile_out(profile_or_404(profile_id), request)
 
 
 # -- Embodiments: the profile in a physical body -----------------------------
@@ -267,7 +275,7 @@ def update_profile(profile_id: str, body: ProfileUpdate,
              profile_id),
         )
         conn.commit()
-    return profile_out(profile_or_404(profile_id))
+    return profile_out(profile_or_404(profile_id), request)
 
 
 @router.get("/profiles/{profile_id}/export")

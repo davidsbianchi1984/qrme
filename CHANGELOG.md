@@ -61,7 +61,58 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   allowed list would grey out a conference puck as though the feature were
   unfinished, when its absence is the whole argument.
 
+- **Anonymous, several, and exactly one verified** — `qrme/identity.py`,
+  8 routes, 21 tests, screens 118 and 119. Three things a person is allowed to
+  be, and the module is the tension between them: you may be anonymous, you may
+  hold as many profiles as you like, and **at most one of them may be
+  verified**.
+
+  The badge is not a quality score. It is the sentence *this is that particular
+  real person* — said of two profiles at once it is either false of one of them
+  or a claim that one human being is two authenticated people, which is exactly
+  the primitive verification exists to deny everybody else. So the badge moves
+  rather than multiplies: one at a time, not one forever, because a rule
+  somebody could only satisfy by deleting a profile is a rule they would answer
+  by lying. The record moves whole and `checked_at` is deliberately not
+  re-stamped — a document seen in 2019 is not a document seen today because the
+  badge changed seats.
+
+  A `fictional` profile is **unverifiable rather than unverified** and never
+  consumes the slot; getting that backwards would let an invented character
+  lock a real person out of their own badge. "One person" means one owner
+  account, which is the unit this platform can observe, and the cross-account
+  check closes only the visible part — the same attestor vouching for the same
+  evidence twice. A `self_asserted` level has no evidence to match on, and that
+  limit is stated rather than papered over.
+
 ### Fixed
+
+- **Anonymity was a label on four surfaces, not a property of the profile.**
+  `anonymous` was honoured by the front-page card, the landing page, the prompt
+  and the watermark — every surface that *renders* a profile. `GET
+  /profiles/{id}` is public and returned `display_name` in full, so the
+  shortest way past anonymity was to ask for the profile.
+
+  `owner_id` was the worse half, because it does not undo one profile's
+  anonymity — it undoes all of them at once. Two anonymous profiles sharing an
+  account are the same person, and anybody could read that field off both and
+  match them, then read it off the named profile beside them and put a name to
+  the pair. Now withheld from everyone but the owner on **every** profile,
+  named ones included, along with `successor_owner` — somebody else's account
+  id, never a visitor's business.
+
+  An anonymous profile's badge also withholds **who checked**: "verified by Dr
+  Okafor of St Mary's" narrows an anonymous author to a city and a workplace,
+  and the badge would undo the anonymity it sits beside. What survives is the
+  part worth having — a real person stands behind this and somebody checked —
+  which is the difference between a pseudonym and a bot.
+
+- **The seed verified both of the founder's profiles.** They are the same human
+  being, so the platform was asserting that David Bianchi was two verified
+  people, on the deployment that ships as the worked example of the rule. The
+  badge now belongs to the photographed profile alone, because a real person
+  whose picture is authentic is what the badge is a claim about; the rendered
+  half carries the AI mark, which is the claim that is true of it.
 
 - **The room-microphone disclosure was readable by anyone holding a room id.**
   The route's own docstring said "readable by anyone in the room"; the code

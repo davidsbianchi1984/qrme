@@ -221,12 +221,46 @@ def relationship(profile_id: str, interactor_id: str) -> dict | None:
     return dict(row) if row else None
 
 
-def profile_out(row: dict) -> ProfileOut:
+def profile_out(row: dict, request: Request | None = None, *,
+                owner: bool = False) -> ProfileOut:
+    """One profile, redacted for whoever is asking.
+
+    `GET /profiles/{id}` is public, and for a long time this function handed
+    every caller the raw row — including `display_name` and `owner_id` on a
+    profile flagged `anonymous`. The flag was real everywhere it was
+    *rendered*: the front-page card, the landing page, the prompt and the
+    watermark all substituted "anonymous persona". The route that returns the
+    profile itself did not, so anonymity was a property of four presentation
+    surfaces rather than of the profile, and the shortest way past it was to
+    ask for the profile.
+
+    `owner_id` is the worse of the two, because it does not just undo one
+    profile's anonymity — it undoes all of them at once. Two anonymous
+    profiles sharing an owner are the same person, and anybody could read that
+    field off both and match them. The same field on a *named* profile then
+    names the anonymous ones beside it. Withheld from everyone but the owner
+    for that reason, along with `successor_owner`, which is somebody else's
+    account id and was never a visitor's business either.
+
+    The owner still sees their own profile whole: they are the one person for
+    whom none of this is a disclosure.
+
+    ``owner=True`` says so directly, for the one case a token cannot: the
+    response to profile *creation*, which carries the owner token it is being
+    authorized by. The incoming request there holds the signup key, so asking
+    it who is calling would redact the creator's own new profile from them.
+    """
+    from . import auth
+
+    who = auth.principal(request) if request is not None else None
+    is_owner = owner or who == {"role": "owner", "subject_id": row["id"]}
+    hidden = bool(row["anonymous"]) and not is_owner
+
     return ProfileOut(
         id=row["id"],
-        owner_id=row["owner_id"],
+        owner_id=row["owner_id"] if is_owner else None,
         kind=row["kind"],
-        display_name=row["display_name"],
+        display_name=("anonymous persona" if hidden else row["display_name"]),
         persona=row["persona"],
         demographics=json.loads(row["demographics"]),
         sources=json.loads(row["sources"]),
@@ -237,7 +271,7 @@ def profile_out(row: dict) -> ProfileOut:
         aging_enabled=bool(row["aging_enabled"]),
         base_age=row["base_age"],
         effective_age=persona.effective_age(row),
-        successor_owner=row["successor_owner"],
+        successor_owner=row["successor_owner"] if is_owner else None,
         purpose=row["purpose"],
         maturity=row["maturity"],
         cloud_contribution=bool(row["cloud_contribution"]),

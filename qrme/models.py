@@ -85,7 +85,11 @@ class ProfileUpdate(BaseModel):
 
 class ProfileOut(BaseModel):
     id: str
-    owner_id: str
+    # Null to anyone but the owner. It is an account identifier, and on this
+    # platform an account may hold several profiles — so publishing it lets a
+    # reader match two anonymous profiles to each other, and match both to the
+    # named one beside them. No visitor needs it; see `common.profile_out`.
+    owner_id: str | None
     kind: ProfileKind
     display_name: str
     persona: str

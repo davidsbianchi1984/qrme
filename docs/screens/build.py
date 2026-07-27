@@ -3481,6 +3481,40 @@ SCREENS = [
         dict(icon="doc", color="red", k="Retract keeps the row",
              s="text stops counting, trail stays"),
     ]),
+    # Anonymity, and the card that keeps it honest is the fourth one. A screen
+    # that listed only what is withheld would be read as a promise of
+    # untraceability, and somebody deciding whether it is safe to post would
+    # decide on the strength of it.
+    dict(num=118, title="Stay Anonymous", sub="What we withhold, and what we can't",
+         accent="cyan", tab=3, cards=[
+        dict(icon="mask", color="brand", k="Your name is hidden",
+             s="it is not published anywhere", pill=("ON", "good")),
+        dict(icon="lock", color="cyan", k="Your account is hidden",
+             s="your profiles cannot be matched"),
+        dict(icon="shieldok", color="green", k="Verified, without a name",
+             s="a real person, not a bot"),
+        dict(icon="warn", color="amber", k="Your writing is still yours",
+             s="people who know you may tell"),
+        dict(icon="pen", color="indigo", k="Per profile, not account",
+             s="this one only, never the rest"),
+    ], button=("Turn it off", "amber")),
+    # Several profiles and one badge, on one screen — because the rule only
+    # makes sense next to the thing it constrains. Three rows, one verified,
+    # one anonymous, one invented, which is the whole vocabulary.
+    dict(num=119, title="Your Profiles", sub="As many as you like · one verified",
+         accent="brand", tab=3, cards=[
+        dict(icon="person", color="green", k="Work · verified",
+             s="a real person — you, checked", pill=("BADGE", "good")),
+        # You see your own name here. Everybody else gets the subtitle.
+        dict(icon="mask", color="cyan", k="Weekend self",
+             s="shown as anonymous persona", pill=("HIDDEN", "info")),
+        dict(icon="robot", color="indigo", k="Captain Nobody",
+             s="invented — nobody to verify"),
+        dict(icon="shieldok", color="brand", k="One badge, not three",
+             s="it says you are one person"),
+        dict(icon="rotate", color="amber", k="Move it whenever",
+             s="one at a time, not one forever"),
+    ], button=("Move the badge", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

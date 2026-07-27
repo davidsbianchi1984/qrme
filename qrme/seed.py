@@ -484,10 +484,22 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     # answer until somebody checks a document, and `verification.status`
     # carries that caveat alongside the word so no surface can show one
     # without the other.
-    from . import verification
-    verification.verify(
-        profile["id"], "self_asserted", attestor=attestor,
-        method="platform owner, self-attested")
+    #
+    # **The photographed profile only**, and this used to verify both. One
+    # person, one badge — and this is the case that shows why the rule is not
+    # bureaucratic: the founder's two profiles are the same human being, so a
+    # badge on each would have the platform asserting that David Bianchi is
+    # two verified people, on the deployment that ships as the example of how
+    # the rule works. It belongs to the photographed half because that is what
+    # the badge is a claim about: a real person, whose picture is authentic.
+    # The rendered half carries the AI mark instead, which is the claim that
+    # is true of *it*. `tools/mark_verified.py` burns the gold mark into a
+    # photograph for exactly the same reason.
+    if handle == VERIFIED_HANDLE:
+        from . import verification
+        verification.verify(
+            profile["id"], "self_asserted", attestor=attestor,
+            method="platform owner, self-attested")
 
     # The rendered half carries the industry libraries — see FOUNDER_AI_PACKS.
     if handle == FOUNDER_HANDLE:
