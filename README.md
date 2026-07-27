@@ -410,6 +410,14 @@ one failure this must not have.
 
 Defined once, in [`qrme/agentlight.py`](https://github.com/davidsbianchi1984/qrme/blob/main/qrme/agentlight.py), for all three products.
 
+**Where you actually see it.** Three surfaces, doing three different jobs.
+
+| Surface | What it shows | Why that shape |
+| --- | --- | --- |
+| **Watch** — *36 Agents* (JIM) | three lights and three counts, and **no agent names** | a wrist is glanced at, not read. Naming the agents was the first cut and was wrong: a name is something you read, and reading is the thing a glance cannot do. Which agent went amber is a question for the app, where there is room to answer it |
+| **App** — *82 Agents* | the same three lights, each a **tappable group** — what is working, what needs you, what stopped | somebody opening this *because* amber appeared should not have to scan a flat list for the one that changed. Grouping puts the answer first and the roster second |
+| **Overlay** — *83 Chat · overlay*, and every desktop view | a pinned strip with the three counts and a way in | an agent that reports only on its own screen is one you have to remember to check, and amber and red are exactly the states nobody thinks to look for. On desktop it is on **every** view, because those users have no wrist to glance at |
+
 ## Companion features
 
 An ambient-companion model, with an explicit consent boundary on each
@@ -890,6 +898,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/79-search-assistant.svg"><img src="docs/screens/79-search-assistant.svg" width="210" alt="Search Assistant"></a><br><sub><b>79</b> · Search Assistant</sub></td>
     <td align="center" width="33%"><a href="docs/screens/80-profile.svg"><img src="docs/screens/80-profile.svg" width="210" alt="Profile"></a><br><sub><b>80</b> · Profile</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
   </tr>
 </table>
 

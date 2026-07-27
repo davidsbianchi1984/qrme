@@ -267,6 +267,56 @@ def agent_light(x, y, colour, label):
             + text(x + 15, y + 4, label, 10.5, col, 700, spacing=0.2))
 
 
+def agent_groups(y, groups):
+    """Three tappable groups, one per light. The whole agent list, folded.
+
+    A flat list of every running agent is the wrong shape for the screen
+    somebody opens *because* a light went amber: it makes them scan for the
+    one that changed. Grouping by light puts the answer first and the roster
+    second, and it means the amber group is the one your thumb lands on.
+    """
+    out, yy = [], y
+    for colour, label, n, sub in groups:
+        col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
+        h = 66
+        out.append(rrect(CX, yy, CW, h, 16, "url(#gCard)", C["line"], 1))
+        out.append(f'<circle cx="{CX+34}" cy="{yy+33}" r="17" fill="{A(col, 0.18)}"/>')
+        out.append(f'<circle cx="{CX+34}" cy="{yy+33}" r="8" fill="{col}"/>')
+        out.append(text(CX + 62, yy + 28, f"{n} {label}", 14.5, C["txt"], 700))
+        out.append(text(CX + 62, yy + 46, sub, 10, C["t2"], 500))
+        # The chevron is the whole affordance: these rows go somewhere.
+        out.append(f'<path d="M{CX+CW-30} {yy+26} l8 7 -8 7" fill="none" '
+                   f'stroke="{C["t3"]}" stroke-width="2" stroke-linecap="round"/>')
+        yy += h + 10
+    return out, yy
+
+
+def agent_overlay(y, counts):
+    """The lights, floating over whatever screen you are actually on.
+
+    This is the piece that makes the rest useful. An agent that only reports
+    on its own screen is one you have to remember to go and check, and the
+    states worth knowing about — amber and red — are exactly the ones nobody
+    thinks to look for. It rides above the tab bar so it is never the thing
+    you tap by accident, and each light is its own target.
+    """
+    out = []
+    w, h = CW, 46
+    out.append(rrect(CX, y, w, h, 15, "url(#gCard)", C["brandA"], 1.4))
+    out.append(text(CX + 16, y + 28, "AGENTS", 9, C["t3"], 700, "start", 0.7))
+    x = CX + 74
+    for colour, n in zip(("green", "amber", "red"), counts):
+        col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
+        dim = n == 0
+        out.append(f'<circle cx="{x}" cy="{y+23}" r="6" fill="{col}"'
+                   + (' opacity="0.25"' if dim else "") + "/>")
+        out.append(text(x + 12, y + 28, str(n), 14,
+                        col if not dim else C["t3"], 800))
+        x += 46
+    out.append(text(CX + w - 16, y + 28, "open ›", 10.5, C["brandA"], 700, "end"))
+    return out
+
+
 def meter(x, y, w, pct, grad):
     return (rrect(x, y, w, 7, 4, "#0d0a24", C["line"], 1)
             + rrect(x, y, max(6, w * pct), 7, 4, f"url(#{grad})"))
@@ -796,6 +846,11 @@ def render(spec):
         colour, label = spec["light"]
         out.append(agent_light(CX + 8, y - 6, colour, label))
         y += 22
+
+    if spec.get("groups"):
+        block, y = agent_groups(y, spec["groups"])
+        out += block
+        y += 4
 
     # A camera frame above the cards. Runs before the hero chain because a
     # screen has either a hero or cards, never both — this is the one thing
@@ -1784,7 +1839,9 @@ def render(spec):
             y += 46
 
     else:  # generic stacked cards
-        for c in spec["cards"]:
+        # `.get` rather than `[...]`: a screen whose body is agent groups has
+        # no cards at all, and used to die here rather than render.
+        for c in spec.get("cards", []):
             s, y = card_block(y, c)
             out.append(s)
         if spec.get("button"):
@@ -1793,7 +1850,13 @@ def render(spec):
     out += tabbar(spec.get("tabs", MAIN), spec.get("tab", 0))
     out += help_button()
     out += navbar()
+    # Drawn after the tab bar so nothing sits on top of it, and before close()
+    # because close() emits the closing tag — appending past it produced a
+    # valid-looking file that no renderer would parse.
+    if spec.get("overlay_agents"):
+        out += agent_overlay(SY + SH - 52 - 58, spec["overlay_agents"])
     out += close()
+
     return "".join(out)
 
 
@@ -2207,6 +2270,26 @@ SCREENS = [
     # actually talked to them thought.
     dict(num=80, title="Profile", sub="What a visitor sees first",
          hero="frontpage", accent="brand", tab=0),
+    # 81 is deliberately skipped: it belongs to unreleased work being held,
+    # and reusing the number would collide the day that lands.
+    #
+    # The screen a light sends you to. Grouped, because somebody opening this
+    # *because* amber appeared should not have to scan a flat list for the one
+    # that changed.
+    dict(num=82, title="Agents", sub="What they need, at a glance",
+         accent="green", tab=0, groups=[
+        ("green", "working", 3, "drafting · researching · sending"),
+        ("amber", "need you", 1, "waiting on a confirm before it goes"),
+        ("red", "stopped", 1, "one cancelled from the wrist"),
+    ]),
+    # The overlay, over an ordinary screen. This is the point of the feature:
+    # amber and red are exactly the states nobody thinks to go and check.
+    dict(num=83, title="Chat", sub="Agents keep running behind you",
+         accent="brand", tab=0, overlay_agents=(3, 1, 1), cards=[
+        dict(icon="chat", color="brand", k="You", s="how did the letter turn out?"),
+        dict(icon="person", color="cyan", k="Marcus Bell", s="two of three phases done"),
+        dict(icon="eye", color="amber", k="The bar follows you", s="the work stays where it is"),
+    ]),
 ]
 
 
