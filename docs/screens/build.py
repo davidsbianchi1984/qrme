@@ -277,6 +277,11 @@ def agent_groups(y, groups):
     """
     out, yy = [], y
     for colour, label, n, sub in groups:
+        # The chevron owns the right edge of the row. A sub that runs under it
+        # reads as a rendering fault, so it is caught here rather than in a
+        # screenshot somebody sends back weeks later.
+        if len(sub) > 30:
+            raise ValueError(f"agent group sub runs under the chevron: {sub!r}")
         col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
         h = 66
         out.append(rrect(CX, yy, CW, h, 16, "url(#gCard)", C["line"], 1))
@@ -2278,8 +2283,8 @@ SCREENS = [
     # that changed.
     dict(num=82, title="Agents", sub="What they need, at a glance",
          accent="green", tab=0, groups=[
-        ("green", "working", 3, "drafting · researching · sending"),
-        ("amber", "need you", 1, "waiting on a confirm before it goes"),
+        ("green", "working", 3, "drafting · researching"),
+        ("amber", "need you", 1, "waiting on your confirm"),
         ("red", "stopped", 1, "one cancelled from the wrist"),
     ]),
     # The overlay, over an ordinary screen. This is the point of the feature:
