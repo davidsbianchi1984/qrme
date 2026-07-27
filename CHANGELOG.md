@@ -107,6 +107,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   attestation, never accepted from a client, so a stream that never earned it
   cannot paste it on.
 
+- **Anonymous profiles get a fixed name they cannot change** —
+  `identity.anonymous_name()`, 7 tests. Every one of them used to be called
+  *"anonymous persona"*, identically, which is unusable the moment two are in
+  the same place: three anonymous people in a room were three identical labels,
+  so you could not follow who had said what and nobody could be held to
+  anything they said. Pseudonymity is a stable name without a real one, not the
+  absence of a name.
+
+  `Anonymous 41338025`, and three properties carry it. **Derived, never
+  stored**, so there is nothing to edit — which is what "cannot be modified"
+  has to mean where an owner can `PATCH` their own profile, and a chosen
+  anonymous name would be a free text field on the one surface built to
+  withhold identity. **Keyed on the profile, never the account** — the one that
+  would quietly undo the `owner_id` redaction, since numbering a person's
+  several anonymous profiles from their account would match them to each other
+  in public. **Hashed, not sequential**, because a counter publishes signup
+  order and, from two samples, the growth rate.
+
+  The decision was being made in **fifteen places**, each with its own copy of
+  `"anonymous persona" if anonymous else display_name`. A rule with fifteen
+  implementations is one merge away from sixteen, and the sixteenth is the one
+  that prints somebody's name — so it is one function now, and a test parses
+  every module to assert nobody has written another.
+
 - **Whose live, room or stream this is now appears on it** —
   `identity.whose()`, 1 route, 5 tests. The simpler burned mark is justified by
   the viewer already knowing whose account they are on, and that was asserted

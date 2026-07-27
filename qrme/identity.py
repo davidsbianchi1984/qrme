@@ -76,7 +76,8 @@ REAL_PERSON_KINDS = ("self", "other_person")
 # implied: the dangerous reading of the word is the generous one, and somebody
 # deciding what to post deserves the limits in the same breath as the promise.
 WITHHELD = (
-    "your display name — surfaces show 'anonymous persona' instead",
+    "your display name — surfaces show a fixed 'Anonymous 00000000' tied to "
+    "this profile, which you cannot change and which says nothing about you",
     "your picture — you get the same silhouette as everybody else who is "
     "anonymous, so it identifies nobody and matches no one",
     "your owner account, so two of your profiles cannot be matched to "
@@ -266,7 +267,7 @@ def roster(owner_id: str) -> dict:
             # surface where that is the point, and it is why nobody else may
             # read it.
             "display_name": r["display_name"],
-            "shown_as": ("anonymous persona" if r["anonymous"]
+            "shown_as": (anonymous_name(r["id"]) if r["anonymous"]
                          else r["display_name"]),
             "anonymous": bool(r["anonymous"]),
             "verified": r["id"] == held,
@@ -304,7 +305,8 @@ def anonymity(profile_id: str) -> dict:
     return {
         "profile_id": profile_id,
         "anonymous": on,
-        "shown_as": "anonymous persona" if on else profile["display_name"],
+        "shown_as": (anonymous_name(profile_id) if on
+                     else profile["display_name"]),
         "withheld": list(WITHHELD) if on else [],
         "not_withheld": list(NOT_WITHHELD),
         "reversible": True,
@@ -468,7 +470,7 @@ def whose(surface: str, surface_id: str) -> dict:
         hidden = bool(prof["anonymous"])
         return {"surface": surface, "surface_id": surface_id,
                 "account_id": prof["id"],
-                "display_name": ("anonymous persona" if hidden
+                "display_name": (anonymous_name(prof["id"]) if hidden
                                  else prof["display_name"]),
                 "handle": handle_of(prof["id"]),
                 "anonymous": hidden,
@@ -493,8 +495,92 @@ def _name_of(subject_id: str) -> str | None:
         "SELECT display_name, anonymous FROM profiles WHERE id=?",
         (subject_id,)).fetchone()
     if row is not None:
-        return ("anonymous persona" if row["anonymous"]
+        return (anonymous_name(subject_id) if row["anonymous"]
                 else row["display_name"])
     row = conn.execute("SELECT display_name FROM interactors WHERE id=?",
                        (subject_id,)).fetchone()
     return row["display_name"] if row else None
+
+# --------------------------------------------------------------------------- #
+# What an anonymous profile is called
+# --------------------------------------------------------------------------- #
+
+# The width of the number. Wide enough that two anonymous profiles colliding is
+# rare, and a collision is a cosmetic clash rather than a leak — two people
+# called Anonymous 41338025 is confusing, not revealing.
+_ANON_DIGITS = 8
+
+ANON_PREFIX = "Anonymous"
+
+
+def anonymous_name(profile_id: str) -> str:
+    """The name an anonymous profile is shown under, e.g. ``Anonymous 41338025``.
+
+    Every anonymous profile used to be called *"anonymous persona"* — all of
+    them, identically. That is unusable the moment more than one is in the same
+    place: three anonymous people in a room were three identical labels, so you
+    could not follow who had said what, and nobody could be held to anything
+    they said. **Pseudonymity is a stable name without a real one**, not the
+    absence of a name.
+
+    Three properties, and each is load-bearing:
+
+    **Derived, never stored.** There is no column, so there is nothing to edit —
+    which is what "cannot be modified" means in a system where an owner can
+    PATCH their own profile. A chosen anonymous name would be a free text field
+    on the one surface built to withhold identity, and somebody would put their
+    real name in it within the hour.
+
+    **Keyed on the profile, never on the owner.** This is the one that would
+    quietly undo `profile_out`'s redaction if it were got wrong. A person may
+    hold several anonymous profiles; numbering them from the account would give
+    them all the same name and match them to each other in public — exactly the
+    correlation withholding `owner_id` exists to prevent.
+
+    **Hashed, not sequential.** A counter would publish signup order and, from
+    two samples, the platform's growth rate. Neither is the profile's to give
+    away, and "Anonymous 7" is a claim about how early somebody arrived.
+    """
+    import hashlib
+
+    digest = hashlib.sha256(f"anon:{profile_id}".encode()).digest()
+    number = int.from_bytes(digest[:8], "big") % (10 ** _ANON_DIGITS)
+    return f"{ANON_PREFIX} {number:0{_ANON_DIGITS}d}"
+
+
+def shown_name(profile, profile_id: str | None = None) -> str:
+    """What to call this profile on any surface, anonymity applied.
+
+    The single place that decision is made. It was made in **fifteen** — the
+    front page, the landing page, the prompt, the watermark, the summon card,
+    the beacon page, the room roster, the profile route, the export — each with
+    its own copy of ``"anonymous persona" if anonymous else display_name``. A
+    rule with fifteen implementations is a rule that is one merge away from
+    having sixteen, and the sixteenth is the one that prints somebody's name.
+
+    Accepts a row or an id, because half the callers already have the row and
+    fetching it again would be the cost that pushes the next person back to
+    writing the conditional inline.
+    """
+    if isinstance(profile, str):
+        profile_id = profile
+        profile = db.connect().execute(
+            "SELECT id, display_name, anonymous FROM profiles WHERE id=?",
+            (profile,)).fetchone()
+        if profile is None:
+            return ""
+    if not profile["anonymous"]:
+        return profile["display_name"]
+    # `profile_id` is accepted because several callers hold a row selected for
+    # something else — the watermark reads three columns and `id` is not one of
+    # them. Asking each to re-query would be the friction that sends the next
+    # person back to writing the conditional inline, which is how there came to
+    # be fifteen of them.
+    if profile_id is None:
+        keys = profile.keys() if hasattr(profile, "keys") else profile
+        profile_id = profile["id"] if "id" in keys else None
+    if profile_id is None:
+        raise ValueError(
+            "shown_name needs the profile id to build an anonymous name — "
+            "pass profile_id when the row does not carry one")
+    return anonymous_name(profile_id)

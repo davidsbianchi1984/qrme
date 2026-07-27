@@ -250,7 +250,7 @@ def profile_out(row: dict, request: Request | None = None, *,
     authorized by. The incoming request there holds the signup key, so asking
     it who is calling would redact the creator's own new profile from them.
     """
-    from . import auth
+    from . import auth, identity
 
     who = auth.principal(request) if request is not None else None
     is_owner = owner or who == {"role": "owner", "subject_id": row["id"]}
@@ -260,7 +260,8 @@ def profile_out(row: dict, request: Request | None = None, *,
         id=row["id"],
         owner_id=row["owner_id"] if is_owner else None,
         kind=row["kind"],
-        display_name=("anonymous persona" if hidden else row["display_name"]),
+        display_name=(identity.anonymous_name(row["id"]) if hidden
+                      else row["display_name"]),
         persona=row["persona"],
         demographics=json.loads(row["demographics"]),
         sources=json.loads(row["sources"]),

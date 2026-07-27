@@ -3514,16 +3514,16 @@ SCREENS = [
     # decide on the strength of it.
     dict(num=118, title="Stay Anonymous", sub="What we withhold, and what we can't",
          accent="cyan", tab=3, cards=[
-        dict(icon="mask", color="brand", k="Your name is hidden",
-             s="it is not published anywhere", pill=("ON", "good")),
+        dict(icon="mask", color="brand", k="Anonymous 41338025",
+             s="tied to this profile, not you"),
+        dict(icon="lock", color="pink", k="You cannot change it",
+             s="so nobody can pick a real name"),
         dict(icon="lock", color="cyan", k="Your account is hidden",
              s="your profiles cannot be matched"),
         dict(icon="shieldok", color="green", k="Verified, without a name",
              s="a real person, not a bot"),
         dict(icon="warn", color="amber", k="Your writing is still yours",
              s="people who know you may tell"),
-        dict(icon="pen", color="indigo", k="Per profile, not account",
-             s="this one only, never the rest"),
     ], button=("Turn it off", "amber")),
     # Several profiles and one badge, on one screen — because the rule only
     # makes sense next to the thing it constrains. Three rows, one verified,

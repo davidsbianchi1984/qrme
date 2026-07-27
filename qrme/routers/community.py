@@ -22,8 +22,8 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (auth, db, engagement, llm, marketplace, moderation, persona,
-                referral, roommic, watermark)
+from .. import (auth, db, engagement, identity, llm, marketplace, moderation,
+                persona, referral, roommic, watermark)
 from ..common import (age_of, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
@@ -105,8 +105,7 @@ def _room_maturity(participants: list[dict]) -> str:
 def _display(kind: str, ref_id: str) -> str:
     if kind == "profile":
         profile = profile_or_404(ref_id)
-        return ("anonymous persona" if profile["anonymous"]
-                else profile["display_name"])
+        return identity.shown_name(profile)
     return interactor_or_404(ref_id)["display_name"]
 
 

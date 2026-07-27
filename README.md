@@ -1929,6 +1929,39 @@ anybody who learned one, and an `owner_id` is a string somebody chooses, not a
 secret. Every anonymity guarantee above is worth exactly what that check is
 worth.
 
+**An anonymous profile has a name, and cannot choose it.** Every one of them
+used to be called *"anonymous persona"* — identically — which is unusable the
+moment two are in the same place: three anonymous people in a room were three
+identical labels, so you could not follow who had said what and nobody could be
+held to anything they said. **Pseudonymity is a stable name without a real one**,
+not the absence of a name. So each gets `Anonymous 41338025`, and three
+properties make it work:
+
+- **Derived, never stored.** There is no column, so there is nothing to edit —
+  which is what "cannot be modified" has to mean in a system where an owner can
+  `PATCH` their own profile. A *chosen* anonymous name would be a free text
+  field on the one surface built to withhold identity, and somebody would put
+  their real name in it within the hour.
+- **Keyed on the profile, never on the account.** The one that would quietly
+  undo the `owner_id` redaction above: a person may hold several anonymous
+  profiles, and numbering them from the account would give them all the same
+  name and match them to each other in public.
+- **Hashed, not sequential.** A counter publishes signup order and, from two
+  samples, the platform's growth rate. Neither is the profile's to give away,
+  and *"Anonymous 7"* is a claim about how early somebody arrived.
+
+Turning anonymity off and back on returns the **same** number, because it is
+derived from the profile rather than issued — one that changed would make
+somebody a stranger to the people who knew them.
+
+That decision used to be made in **fifteen places** — the front page, the
+landing page, the prompt, the watermark, the summon card, the beacon page, the
+room roster, the profile route, the export — each with its own copy of
+`"anonymous persona" if anonymous else display_name`. A rule with fifteen
+implementations is one merge away from having sixteen, and the sixteenth is the
+one that prints somebody's name. It is now `identity.shown_name()`, and a test
+parses every module to assert nobody has written a sixteenth.
+
 **An anonymous profile's badge withholds who checked.** "Verified by Dr Okafor
 of St Mary's" narrows an anonymous author to a city and a workplace, which is
 most of the way to a name — the badge would undo the anonymity it sits beside.

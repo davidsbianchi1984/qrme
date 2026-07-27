@@ -39,7 +39,8 @@ def test_an_anonymous_profile_does_not_return_its_name(client):
     """
     p = _hidden(client, display_name="Wren Ashby")
     seen = client.get(f"/profiles/{p['id']}", headers=_anon(client)).json()
-    assert seen["display_name"] == "anonymous persona"
+    assert seen["display_name"] == identity.anonymous_name(p["id"])
+    assert seen["display_name"].startswith("Anonymous ")
     assert "Wren Ashby" not in str(seen)
 
 
@@ -452,7 +453,7 @@ def test_an_anonymous_stream_still_names_a_consistent_account(client):
     would make an anonymous live indistinguishable from an unattributed one."""
     p = _hidden(client, display_name="Wren Ashby")
     who = client.get(f"/places/stream/{p['id']}/whose").json()
-    assert who["display_name"] == "anonymous persona"
+    assert who["display_name"] == identity.anonymous_name(p["id"])
     assert who["anonymous"] is True
     assert who["handle"] is None
     assert "Wren" not in str(who)
@@ -501,3 +502,127 @@ def test_the_live_mark_carries_whose_stream_it_is(client):
     assert mark["line"] == overlays.LIVE_MARK
     assert mark["whose"]["display_name"] == "Sam's desk"
     assert mark["whose"]["account_id"] == sam["id"]
+
+
+# -- the name an anonymous profile is given -----------------------------------
+
+def test_an_anonymous_profile_gets_a_number_it_can_be_followed_by(client):
+    """Every anonymous profile used to be called "anonymous persona" —
+    identically. That is unusable the moment more than one is in the same
+    place: three anonymous people in a room were three identical labels, so
+    you could not follow who had said what, and nobody could be held to
+    anything they said. Pseudonymity is a stable name without a real one, not
+    the absence of a name."""
+    p = _hidden(client, display_name="Wren Ashby")
+    name = identity.shown_name(p["id"])
+    assert name.startswith("Anonymous ")
+    assert name.split()[1].isdigit() and len(name.split()[1]) == 8
+    assert identity.shown_name(p["id"]) == name        # stable across reads
+
+
+def test_two_anonymous_profiles_are_told_apart(client):
+    """The reason the number exists."""
+    a = _hidden(client, owner_id="o-a", display_name="One")
+    b = _hidden(client, owner_id="o-b", display_name="Two")
+    assert identity.shown_name(a["id"]) != identity.shown_name(b["id"])
+
+
+def test_the_number_is_keyed_on_the_profile_never_the_account(client):
+    """The one that would quietly undo `profile_out`'s redaction.
+
+    A person may hold several anonymous profiles. Numbering them from the
+    account would give them all the same name and match them to each other in
+    public — exactly the correlation withholding `owner_id` exists to prevent.
+    """
+    a = _hidden(client, owner_id="same-owner", display_name="Work")
+    b = _hidden(client, owner_id="same-owner", display_name="Not work")
+    assert identity.shown_name(a["id"]) != identity.shown_name(b["id"])
+
+    seen_a = client.get(f"/profiles/{a['id']}", headers=_anon(client)).json()
+    seen_b = client.get(f"/profiles/{b['id']}", headers=_anon(client)).json()
+    assert seen_a["display_name"] != seen_b["display_name"]
+    assert seen_a["owner_id"] is None and seen_b["owner_id"] is None
+
+
+def test_the_name_cannot_be_modified(client):
+    """"Cannot be modified" has to mean something in a system where an owner
+    can PATCH their own profile. It is derived, so there is nothing to edit —
+    a chosen anonymous name would be a free text field on the one surface
+    built to withhold identity, and somebody would put their real name in it
+    within the hour."""
+    p = _hidden(client, display_name="Wren Ashby")
+    before = identity.shown_name(p["id"])
+
+    client.patch(f"/profiles/{p['id']}", json={"display_name": "Anonymous 1"},
+                 headers=auth_header(p))
+    assert identity.shown_name(p["id"]) == before
+    seen = client.get(f"/profiles/{p['id']}", headers=_anon(client)).json()
+    assert seen["display_name"] == before
+
+    # And no column holds it, so there is nothing for an update to reach.
+    cols = {r[1] for r in db.connect().execute("PRAGMA table_info(profiles)")}
+    assert "anonymous_name" not in cols and "anon_number" not in cols
+
+
+def test_the_number_is_not_a_signup_counter(client):
+    """A sequence would publish signup order and, from two samples, the
+    platform's growth rate. Neither is the profile's to give away, and
+    "Anonymous 7" is a claim about how early somebody arrived."""
+    made = [_hidden(client, owner_id=f"o{i}", display_name=f"P{i}")
+            for i in range(5)]
+    numbers = [int(identity.shown_name(p["id"]).split()[1]) for p in made]
+    assert numbers != sorted(numbers) or max(numbers) > 1000
+
+
+def test_turning_anonymity_off_and_on_returns_the_same_number(client):
+    """Derived from the profile, so it survives the switch. A number that
+    changed would make somebody a stranger to the people who knew them."""
+    p = _hidden(client, display_name="Wren Ashby")
+    was = identity.shown_name(p["id"])
+
+    client.put(f"/profiles/{p['id']}/anonymity", json={"anonymous": False},
+               headers=auth_header(p))
+    assert identity.shown_name(p["id"]) == "Wren Ashby"
+
+    client.put(f"/profiles/{p['id']}/anonymity", json={"anonymous": True},
+               headers=auth_header(p))
+    assert identity.shown_name(p["id"]) == was
+
+
+def test_one_place_decides_what_a_profile_is_called(client):
+    """It was decided in fifteen — the front page, the landing page, the
+    prompt, the watermark, the summon card, the beacon page, the room roster,
+    the profile route, the export. A rule with fifteen implementations is one
+    merge away from having sixteen, and the sixteenth is the one that prints
+    somebody's name."""
+    import ast
+    import pathlib
+
+    # Parsed rather than grepped: the phrase still appears in prose explaining
+    # why it went away, and a check that cannot tell a docstring from a value
+    # is one somebody silences instead of satisfying. Docstrings are the first
+    # statement of a module, class or function, so they are skipped by
+    # position; every other string constant is a value being returned.
+    root = pathlib.Path(__file__).resolve().parent.parent / "qrme"
+    offenders = []
+    for path in root.rglob("*.py"):
+        if path.name == "identity.py":
+            continue
+        tree = ast.parse(path.read_text())
+        docstrings = set()
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef,
+                                 ast.AsyncFunctionDef)):
+                body = getattr(node, "body", [])
+                if (body and isinstance(body[0], ast.Expr)
+                        and isinstance(body[0].value, ast.Constant)
+                        and isinstance(body[0].value.value, str)):
+                    docstrings.add(id(body[0].value))
+        for node in ast.walk(tree):
+            if (isinstance(node, ast.Constant)
+                    and isinstance(node.value, str)
+                    and "anonymous persona" in node.value
+                    and id(node) not in docstrings):
+                offenders.append(f"{path.name}:{node.lineno}")
+    assert not offenders, ("the anonymous name is being decided outside "
+                           f"identity.shown_name: {offenders}")

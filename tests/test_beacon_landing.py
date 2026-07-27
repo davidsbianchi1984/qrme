@@ -166,7 +166,8 @@ def test_an_anonymous_profile_stays_anonymous_on_a_sticker(client):
     pid, _ = _profile(client, anonymous=True)
     r = client.get(f"/b/{_beacon(client, pid)['id']}")
     assert "Marcus Bell" not in r.text
-    assert "anonymous persona" in r.text
+    from qrme import identity
+    assert identity.anonymous_name(pid) in r.text
 
 
 def test_the_page_escapes_what_the_owner_typed(client):
@@ -350,7 +351,8 @@ def test_the_rated_card_carries_nothing_to_leak(client):
 def test_an_anonymous_profile_stays_anonymous_in_the_camera(client):
     pid, _ = _profile(client, anonymous=True)
     card = client.get(f"/b/{_beacon(client, pid)['id']}/card").json()
-    assert card["display_name"] == "anonymous persona"
+    from qrme import identity
+    assert card["display_name"] == identity.anonymous_name(pid)
     assert "Marcus Bell" not in str(card)
 
 

@@ -22,7 +22,7 @@ import os
 from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse
 
-from .. import avatars, db, landing, rated
+from .. import avatars, db, identity, landing, rated
 from ..common import profile_or_404, require_owner
 from ..models import BeaconCreate, HandleSet, RatedPlacementCreate
 
@@ -56,8 +56,7 @@ def _card(profile: dict, handle: str | None = None) -> dict:
     reachable = profile["status"] == "active"
     return {
         "profile_id": profile["id"],
-        "display_name": ("anonymous persona" if profile["anonymous"]
-                         else profile["display_name"]),
+        "display_name": identity.shown_name(profile),
         "handle": f"@{handle}" if handle else _handle_of(profile["id"]),
         "purpose": profile["purpose"],
         "status": profile["status"],
@@ -303,7 +302,7 @@ def beacon_card(beacon_id: str, request: Request) -> dict:
         raise HTTPException(410, "this profile no longer answers")
 
     art = avatars.render(profile["id"])
-    name = ("anonymous persona" if profile["anonymous"]
+    name = (identity.anonymous_name(profile["id"]) if profile["anonymous"]
             else profile["display_name"])
     return {
         "profile_id": profile["id"],

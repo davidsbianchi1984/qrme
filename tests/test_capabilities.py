@@ -246,7 +246,11 @@ def test_marketplace_listing_and_discovery(client):
     cards = client.get("/marketplace").json()
     assert len(cards) == 2
     anon = next(c for c in cards if c["tags"] == ["fiction"])
-    assert anon["display_name"] == "anonymous persona"   # identity stays hidden
+    # Identity stays hidden, under a fixed number tied to the profile rather
+    # than one label shared by every anonymous listing — two anonymous cards in
+    # a marketplace have to be tellable apart.
+    from qrme import identity
+    assert anon["display_name"] == identity.anonymous_name(ghost["id"])
     assert "persona" not in {k for c in cards for k in c} or True
 
     family_only = client.get("/marketplace", params={"tag": "family"}).json()

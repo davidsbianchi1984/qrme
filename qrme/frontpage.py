@@ -34,7 +34,7 @@ all. A profile with glowing reviews is a well-liked synthetic profile.
 
 from __future__ import annotations
 
-from . import avatars, db, moderation, verification
+from . import avatars, db, identity, moderation, verification
 
 MIN_RATING, MAX_RATING = 1, 5
 
@@ -244,8 +244,7 @@ def front_page(profile_id: str, viewer_id: str | None = None) -> dict | None:
     art = avatars.render(profile_id)
     return {
         "profile_id": profile_id,
-        "display_name": ("anonymous persona" if profile["anonymous"]
-                         else profile["display_name"]),
+        "display_name": identity.shown_name(profile),
         "handle": f"@{handle['handle']}" if handle else None,
         "headline": headline(profile),
         "portrait": art.get("asset"),

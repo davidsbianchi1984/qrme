@@ -7,7 +7,7 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import auth, companion, db, persona, terms
+from .. import auth, companion, db, identity, persona, terms
 from ..common import (
     age_of, profile_or_404, profile_out, require_owner, source_items,
 )
@@ -248,8 +248,7 @@ def memorial_view(profile_id: str) -> dict:
         " WHERE profile_id=? AND role='profile'", (profile_id,)).fetchone()["n"]
     return {
         "profile_id": profile_id,
-        "display_name": ("anonymous persona" if profile["anonymous"]
-                         else profile["display_name"]),
+        "display_name": identity.shown_name(profile),
         "handle": f"@{handle['handle']}" if handle else None,
         "purpose": profile["purpose"],
         "status": "departed",
@@ -438,7 +437,8 @@ def browse_marketplace(tag: str | None = None) -> list[dict]:
             continue
         cards.append({
             "profile_id": row["profile_id"],
-            "display_name": ("anonymous persona" if row["anonymous"]
+            "display_name": (identity.anonymous_name(row["profile_id"])
+                             if row["anonymous"]
                              else row["display_name"]),
             "purpose": row["purpose"], "tags": tags, "blurb": row["blurb"],
         })
