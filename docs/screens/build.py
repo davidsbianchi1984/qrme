@@ -205,6 +205,27 @@ def icon(name, cx, cy, col, s=1.0):
     if name == "flag":
         return (f'<path d="M{cx-sc(6)} {cy+sc(8)} v-{sc(16)}" {st}/>'
                 f'<path d="M{cx-sc(6)} {cy-sc(7)} h{sc(11)} l-{sc(2.5)} {sc(3.5)} {sc(2.5)} {sc(3.5)} h-{sc(11)} Z" {st}/>')
+    if name == "expand":  # go full screen — corners pushing out
+        return (f'<path d="M{cx+sc(2)} {cy-sc(7)} H{cx+sc(7)} V{cy-sc(2)} '
+                f'M{cx+sc(7)} {cy-sc(7)} L{cx+sc(1)} {cy-sc(1)}" {st}/>'
+                f'<path d="M{cx-sc(2)} {cy+sc(7)} H{cx-sc(7)} V{cy+sc(2)} '
+                f'M{cx-sc(7)} {cy+sc(7)} L{cx-sc(1)} {cy+sc(1)}" {st}/>')
+    if name == "shrink":  # and back out of it — corners pulling in
+        return (f'<path d="M{cx+sc(7)} {cy-sc(2)} H{cx+sc(2)} V{cy-sc(7)} '
+                f'M{cx+sc(2)} {cy-sc(2)} L{cx+sc(7)} {cy-sc(7)}" {st}/>'
+                f'<path d="M{cx-sc(7)} {cy+sc(2)} H{cx-sc(2)} V{cy+sc(7)} '
+                f'M{cx-sc(2)} {cy+sc(2)} L{cx-sc(7)} {cy+sc(7)}" {st}/>')
+    if name == "rotate":  # tilt the phone — the way into landscape
+        # Two phones and the turn between them. A single tilted phone with a
+        # curved arrow is the usual glyph and it is illegible at 15px; the
+        # before-and-after reads instantly at any size because the shapes
+        # differ rather than the annotation.
+        return (f'<rect x="{cx-sc(8.5)}" y="{cy-sc(6)}" width="{sc(6.5)}" '
+                f'height="{sc(11)}" rx="1.6" {st}/>'
+                f'<rect x="{cx+sc(1)}" y="{cy-sc(3.2)}" width="{sc(11)}" '
+                f'height="{sc(6.5)}" rx="1.6" {st}/>'
+                f'<path d="M{cx-sc(1)} {cy-sc(6.5)} a{sc(6)} {sc(6)} 0 0 1 {sc(3.4)} -{sc(1.6)}" {st}/>'
+                f'<path d="M{cx+sc(0.6)} {cy-sc(9.6)} l-{sc(1.8)} {sc(2.6)} {sc(2.8)} {sc(1)}" {st}/>')
     if name == "smiley":  # the emoji key inside a composer
         return (f'<circle cx="{cx}" cy="{cy}" r="{sc(7)}" {st}/>'
                 f'<circle cx="{cx-sc(2.6)}" cy="{cy-sc(2)}" r="{sc(1.1)}" {p}/>'
@@ -364,11 +385,15 @@ def live_bar(x, y, w, h, actions, placeholder="Type…"):
     # The composer takes whatever the buttons leave. It has a floor: below
     # this the placeholder is unreadable and the field stops looking like
     # somewhere you can type, which is the only job it has on a still image.
-    bar_w = (right - strip - 8) - (x + 8)
-    if bar_w < 74:
+    # Capped as well as floored. On a landscape screen the composer would
+    # otherwise run half a metre of glass to reach the buttons, and a text
+    # field that wide reads as a banner rather than somewhere to type.
+    room = (right - strip - 8) - (x + 8)
+    if room < 74:
         raise ValueError(
-            f"{len(actions)} buttons leave {bar_w:.0f}px for the composer; "
+            f"{len(actions)} buttons leave {room:.0f}px for the composer; "
             f"74 is the floor")
+    bar_w = min(room, 240)
     o.append(rrect(x + 8, by, bar_w, D_BTN, D_BTN / 2, "rgba(8,6,22,0.62)",
                    "rgba(255,255,255,0.12)", 1))
     o.append(text(x + 18, cy + 3, placeholder, 8.6,
@@ -707,11 +732,11 @@ def navbar():
     return o
 
 
-def head(num, title, sub, accent="brand", locked=False):
-    ac = ACCENT.get(accent, C["brandA"])
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
-           f'viewBox="0 0 {W} {H}" role="img" aria-label="{esc(title)} screen">']
-    out.append(f'''<defs>
+def defs(ac):
+    """The gradients every screen shares. Split out of :func:`head` so a
+    full-bleed screen — which has no title bar to hang them off — can still
+    open with the same palette instead of growing a second copy."""
+    return f'''<defs>
       <linearGradient id="gScr" x1="0" y1="0" x2="0.6" y2="1">
         <stop offset="0" stop-color="{C['scrA']}"/><stop offset="1" stop-color="{C['scrB']}"/></linearGradient>
       <linearGradient id="gFrame" x1="0" y1="0" x2="1" y2="1">
@@ -731,7 +756,14 @@ def head(num, title, sub, accent="brand", locked=False):
         <stop offset="78%" stop-color="#3f3bc0"/><stop offset="100%" stop-color="#140f34"/></radialGradient>
       <radialGradient id="glow" cx="50%" cy="50%" r="50%">
         <stop offset="0" stop-color="{ac}" stop-opacity="0.5"/><stop offset="1" stop-color="{ac}" stop-opacity="0"/></radialGradient>
-    </defs>''')
+    </defs>'''
+
+
+def head(num, title, sub, accent="brand", locked=False):
+    ac = ACCENT.get(accent, C["brandA"])
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
+           f'viewBox="0 0 {W} {H}" role="img" aria-label="{esc(title)} screen">',
+           defs(ac)]
     out.append(rrect(PX, PY, PW, PH, 40, "url(#gFrame)"))
     out.append(rrect(SX, SY, SW, SH, 31, "url(#gScr)"))
     out += statusbar()
@@ -2196,6 +2228,155 @@ def render(spec):
 
 
 # --------------------------------------------------------------------------- #
+# full screen — the video with the app taken off it
+# --------------------------------------------------------------------------- #
+def held_controls(sx, sy, sw, sh, kinds, landscape=False):
+    """What a long press puts back on the picture.
+
+    The help button used to be on every screen unconditionally, on the theory
+    that "on all screens" is a property of the chrome rather than something 88
+    screens can each be trusted to remember. That theory is right everywhere
+    except here, where the chrome *is* the thing being taken away: a floating
+    helper welded to the corner of a full-screen video is a permanent smudge on
+    it, and it sits exactly where the share button now goes.
+
+    So on a live surface it comes back the way everything else does — you press
+    and hold, and the controls surface. That keeps the promise (help is never
+    more than a gesture away) without keeping the pixel.
+
+    The scrim is the honest part of the drawing. Long-press states are usually
+    illustrated as a picture with buttons floating on it, which is not what a
+    phone does — it dims what you are holding, so the controls read and so it
+    is obvious the picture is still there underneath, waiting.
+    """
+    o = [rrect(sx, sy, sw, sh, 28 if landscape else 31, "rgba(6,4,16,0.42)")]
+    r = 19
+    # The slot is set by the widest *caption*, not the button. Spacing them on
+    # the circles put "Landscape" and "Back to app" into each other, which is
+    # the same overlap that has now been shipped three times in this file.
+    slot = max(r * 2, max(tw.width(k[3], 8.4, 650) for k in kinds)) + 14
+    total = slot * len(kinds)
+    if total > sw - 24:
+        raise ValueError(f"held controls need {total:.0f}px, screen has {sw-24:.0f}")
+    bx = sx + sw / 2 - total / 2 + slot / 2
+    cy = sy + sh / 2 - 8
+    for glyph, ic, key, label in kinds:
+        col = ACCENT.get(key) or C[key]
+        o.append(f'<circle cx="{bx}" cy="{cy}" r="{r}" fill="{A(col, 0.18)}" '
+                 f'stroke="{col}" stroke-width="1.2"/>')
+        if glyph:
+            o.append(text(bx, cy + 6, glyph, 19, col, 800, "middle"))
+        else:
+            o.append(icon(ic, bx, cy, col, 0.78))
+        o.append(text(bx, cy + r + 15, label, 8.4, "rgba(240,238,255,0.92)",
+                      650, "middle"))
+        bx += slot
+    o.append(text(sx + sw / 2, cy - r - 16, "PRESS AND HOLD", 8.6,
+                  "rgba(255,255,255,0.55)", 750, "middle", 1.4))
+    return o
+
+
+def render_full(spec):
+    """A live room with the application taken off it.
+
+    Portrait fills the phone's whole face — no title, no tab bar, no help
+    button — because "full screen" that stops short of the chrome is just a
+    larger box. Landscape is the same idea turned ninety degrees, which is what
+    a phone does when you tilt it and the only shape in which a room shot
+    sixteen-by-nine arrives at its own aspect ratio instead of being cropped to
+    fit a column.
+    """
+    land = spec.get("landscape", False)
+    if land:
+        w, h = H, W
+        px, py, pw, ph = PY, PX, H - 2 * PY, W - 2 * PX
+        sx, sy, sw, sh = SY, SX, H - 2 * SY, W - 2 * SX
+        radius, sradius = 40, 28
+    else:
+        w, h = W, H
+        px, py, pw, ph = PX, PY, PW, PH
+        sx, sy, sw, sh = SX, SY, SW, SH
+        radius, sradius = 40, 31
+
+    ac = ACCENT.get(spec.get("accent", "brand"), C["brandA"])
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+           f'viewBox="0 0 {w} {h}" role="img" '
+           f'aria-label="{esc(spec["title"])} screen">', defs(ac)]
+    out.append(rrect(px, py, pw, ph, radius, "url(#gFrame)"))
+    out.append(rrect(sx, sy, sw, sh, sradius, "url(#gScr)"))
+
+    # The picture *is* the screen, corner radius and all — clipped to the
+    # display rather than laid inside it with a margin, which is the whole
+    # difference between full screen and a big photo.
+    cid = f'clipfull{spec["num"]}'
+    out.append(f'<clipPath id="{cid}"><rect x="{sx}" y="{sy}" width="{sw}" '
+               f'height="{sh}" rx="{sradius}"/></clipPath>')
+    out.append(f'<image x="{sx}" y="{sy}" width="{sw}" height="{sh}" '
+               f'preserveAspectRatio="xMidYMid slice" clip-path="url(#{cid})" '
+               f'href="data:image/jpeg;base64,{spec["photo"]}"/>')
+
+    # The camera cut-out is a property of the hardware, so it rotates with the
+    # phone and it keeps its platform's shape — an iOS pill on an Android
+    # frame was the tell that this renderer was ignoring PLATFORM entirely.
+    hole = "#05070d"
+    if PLATFORM == "android":
+        cxh, cyh = (sx + 13, h / 2) if land else (w / 2, sy + 13)
+        out.append(f'<circle cx="{cxh}" cy="{cyh}" r="4.5" fill="{hole}"/>')
+    elif land:
+        out.append(rrect(sx + 5, h / 2 - 30, 15, 60, 7.5, hole))
+    else:
+        out.append(rrect(w / 2 - 30, sy + 5, 60, 15, 7.5, hole))
+
+    label, tone = spec.get("photo_tag", ("LIVE", "live"))
+    col = {"live": C["red"], "sample": C["t2"]}[tone]
+    tagw = 16 + len(label) * 6.2
+    tx = sx + (32 if land else 14)
+    out.append(rrect(tx, sy + 14, tagw, 20, 10, "rgba(8,6,20,0.72)"))
+    out.append(f'<circle cx="{tx+11}" cy="{sy+24}" r="3.4" fill="{col}"/>')
+    out.append(text(tx + 19, sy + 28, label, 9, "#fff", 750, "start", 0.4))
+
+    bar, used = live_bar(sx, sy, sw, sh, spec["live_bar"])
+    rows = spec.get("bubble_chat", [])
+    if rows:
+        cw = (sw * 0.62) if land else (sw - 28)
+        block, _ = bubble_chat(sx + (32 if land else 14),
+                               sy + sh - 12 - used - len(rows) * 30, cw, rows)
+        out += block
+    out += bar
+
+    if spec.get("held"):
+        out += held_controls(sx, sy, sw, sh, spec["held"], landscape=land)
+
+    # The system navigation, on the edge the hand is holding. Android's three
+    # marks turn with the phone the way iOS's single bar does; drawing the iOS
+    # bar on both was the other half of the same PLATFORM bug.
+    stroke = 'fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.3"'
+    if PLATFORM == "android":
+        if land:
+            ax, ay = sx + sw - 12, h / 2
+            out.append(f'<path d="M{ax-4.5} {ay-34+5} L{ax} {ay-34-5} '
+                       f'L{ax+4.5} {ay-34+5} Z" {stroke} stroke-linejoin="round"/>')
+            out.append(f'<circle cx="{ax}" cy="{ay}" r="4.6" {stroke}/>')
+            out.append(rrect(ax - 4.6, ay + 34 - 4.6, 9.2, 9.2, 1.6, "none",
+                             "rgba(255,255,255,0.5)", 1.3))
+        else:
+            ax, ay = w / 2, sy + sh - 14
+            out.append(f'<path d="M{ax-34+5} {ay-4.5} L{ax-34-5} {ay} '
+                       f'L{ax-34+5} {ay+4.5} Z" {stroke} stroke-linejoin="round"/>')
+            out.append(f'<circle cx="{ax}" cy="{ay}" r="4.6" {stroke}/>')
+            out.append(rrect(ax + 34 - 4.6, ay - 4.6, 9.2, 9.2, 1.6, "none",
+                             "rgba(255,255,255,0.5)", 1.3))
+    elif land:
+        out.append(rrect(sx + sw - 8, h / 2 - 40, 4, 80, 2,
+                         "rgba(255,255,255,0.55)"))
+    else:
+        out.append(rrect(w / 2 - 55, sy + sh - 10, 110, 4, 2,
+                         "rgba(255,255,255,0.55)"))
+    out += close()
+    return "".join(out)
+
+
+# --------------------------------------------------------------------------- #
 # screen definitions — a screen for every capability
 # --------------------------------------------------------------------------- #
 SCREENS = [
@@ -2700,6 +2881,37 @@ SCREENS = [
              ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
              ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
          ]),
+    # Full screen, and what a long press puts back on it. Two states of the
+    # same surface rather than two features: 89 is the room inside the app, 90
+    # is the same room with the app taken off, and 91 is 90 turned ninety
+    # degrees — which is the only shape in which a room shot sixteen-by-nine
+    # arrives at its own aspect ratio instead of cropped into a column.
+    dict(num=90, title="Full Screen", full=True, accent="pink",
+         # The help button is the reason this state exists. "Full screen" is
+         # not offered here because you are already in it — a button that does
+         # nothing but confirm where you are is worse than no button.
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         photo=frames.DESK, photo_tag=("LIVE", "live"),
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+             ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
+         ]),
+    dict(num=91, title="Full Screen Landscape", full=True, landscape=True,
+         accent="pink", photo=frames.DESK, photo_tag=("LIVE", "live"),
+         # Landscape is where the room finally arrives at its own aspect
+         # ratio, so nothing is dimmed over it here — this is the resting
+         # state, and the same long press brings the same controls back.
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Marcus Bell", "the compounding chart, again?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+         ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
@@ -2741,8 +2953,9 @@ def main():
             n = s["num"]
             slug = s["title"].lower().replace(" & ", "-").replace(" ", "-").replace("é", "e")
             fn = f'{n:02d}-{slug}.svg'
+            draw = render_full if s.get("full") else render
             with open(os.path.join(outdir, fn), "w") as f:
-                f.write(render(s))
+                f.write(draw(s))
             total += 1
     PLATFORM = "ios"
     print(f"generated {total} screens ({total // 2} × 2 platforms)")

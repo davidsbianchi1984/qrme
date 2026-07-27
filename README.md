@@ -260,7 +260,13 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
     <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="210" alt="Full Screen — long press"></a><br><sub><b>90</b> · Full Screen · long press</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/91-full-screen-landscape.svg"><img src="docs/screens/91-full-screen-landscape.svg" width="660" alt="Full Screen Landscape"></a><br><sub><b>91</b> · Full Screen · landscape — tilt the phone and the room arrives at its own aspect ratio</sub></td>
   </tr>
 </table>
 
@@ -299,9 +305,31 @@ from the viewer's side they are one gesture: a thing you do to the room you are
 watching. That the guest request needs the host to say yes is the host's
 business, not a reason to file it under a different menu. **75** and **76** are
 where those conditions are spelled out; **89** is what it looks like once you
-already know them. The help button stands down on this screen — it lives in the
-same corner the share button now occupies, and a floating helper that covers a
-control is worse than no floating helper.
+already know them.
+
+**Press and hold, and the picture takes the whole phone** (**90**). No title,
+no tab bar, nothing but the room and the strip — full screen that stops short
+of the chrome is just a larger box. Holding is also what puts the **help
+button** back. It used to be welded to every screen on the theory that "on all
+screens" is a property of the chrome rather than something 90 screens can each
+be trusted to remember, and that theory is right everywhere except here, where
+the chrome *is* the thing being taken away: a floating `?` on a full-screen
+video is a permanent smudge on it, and it sits in exactly the corner the share
+button now occupies. So it comes back the way everything else does — you press
+and hold and it surfaces, along with the way into landscape and the way back to
+the app. The promise is kept without the pixel.
+
+The held state dims what you are holding rather than floating buttons over a
+bright picture, because that is what a phone actually does and because the dim
+is what says the room is still there underneath, waiting.
+
+**Tilt the phone and it goes wide** (**91**). This is the one that earns its
+place rather than being a checkbox: the desk was shot sixteen-by-nine, and in a
+portrait column two thirds of it is cropped away. Turned sideways it arrives at
+its own aspect ratio — the bell on the desk and the sign beside it are both in
+frame at once, which is the entire situation the feature exists for. The chat
+takes the left third and the strip runs along the bottom, with the composer
+capped rather than stretched across half a metre of glass.
 
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it
