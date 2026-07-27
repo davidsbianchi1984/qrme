@@ -66,10 +66,31 @@ RATED_STYLE = ("Warm practical light, full colour, old-Hollywood glamour. "
 # nothing — the same trap that made the studio 404 inside the container.
 ASSET_ROUTE = "/portraits"
 
+# Photographs, which are a different kind of thing from portraits and live
+# apart from them on purpose.
+#
+# Everything under ``/portraits`` is a synthetic face with the AI mark burned
+# into its pixels, checksummed by ``tools/mark_portraits.py``. A real
+# photograph of a real person is not that, and must not be burned with that
+# mark: the mark says *AI-generated synthetic media*, and stamping it on an
+# authentic photograph is a false statement in the opposite direction from the
+# one the mark exists to prevent.
+#
+# Keeping them in one directory would also mean an unburned file sitting in a
+# tree whose manifest check walks every file in it — so the check would either
+# fail or have to be loosened, and loosening the thing that guarantees the
+# marks are intact is not a trade worth making for a folder layout.
+PHOTO_ROUTE = "/photos"
+
 
 def portraits_dir():
     from pathlib import Path
     return Path(__file__).resolve().parent / "assets" / "portraits"
+
+
+def photos_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "photos"
 
 
 def asset_path(handle: str) -> str | None:
@@ -78,14 +99,23 @@ def asset_path(handle: str) -> str | None:
             if (portraits_dir() / f"{handle}.webp").is_file() else None)
 
 
+def photo_path(handle: str) -> str | None:
+    """The served path for a real photograph, or None if there is no file."""
+    return (f"{PHOTO_ROUTE}/{handle}.webp"
+            if (photos_dir() / f"{handle}.webp").is_file() else None)
+
+
 def asset_is_marked(asset: str | None) -> bool:
     """Whether the image itself carries the AI mark, as opposed to needing a
     surface to composite one.
 
-    True for the shipped collection, which is burned and checksummed. An
-    owner-attached asset is somebody else's file and nothing here can vouch
-    for its pixels — so it reports False and the surfaces keep drawing their
-    own badge over it, which is the safe direction to be wrong in.
+    True only for the burned collection. An owner-attached asset is somebody
+    else's file and nothing here can vouch for its pixels; a photograph under
+    ``/photos`` is deliberately unburned because it is not AI-generated. Both
+    report False, so the surfaces keep drawing their own badge — which is the
+    safe direction to be wrong in, and in the photograph's case is the correct
+    answer rather than a fallback: the *profile* is synthetic and must say so,
+    while the *picture* is authentic and must not claim otherwise.
     """
     return bool(asset) and asset.startswith(f"{ASSET_ROUTE}/")
 

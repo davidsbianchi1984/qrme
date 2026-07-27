@@ -1,9 +1,11 @@
 """Friends lists between profiles, and the founder who comes as standard.
 
-The tests that matter here are the ones that stop the default from becoming an
-imposition. A friend installed on every new profile is a fine welcome; a friend
-who cannot be removed, or who quietly reappears after being removed, is
-furniture wearing a person's face. Both of those are pinned below.
+The founder's two profiles are **fixed** on every list — pinned, unremovable,
+and in a set order. That is a product decision by the platform's owner, taken
+after the removable version had been built, so the tests here pin the decision
+rather than argue with it: the pins hold, an ordinary friend is still freely
+removable, and the list says which rows are which so a client does not offer a
+control that will fail.
 
 The other half is keeping this apart from `relationships`, which is a different
 table answering a different question. A bug that read one as the other would
@@ -17,30 +19,33 @@ from tests.test_capabilities import auth_header, make_profile
 
 
 def _seeded(client):
-    """Seed the collection, and hand back the founder's profile id."""
+    """Seed the collection, and hand back both founder profile ids in pinned
+    order: the photographed one, then the rendered one."""
     out = seed.seed()
-    return out["founder"]
+    return [out["founder_live"], out["founder"]]
 
 
 # -- the founder comes standard ---------------------------------------------
 
-def test_a_new_profile_gets_the_founder_at_position_one(client):
-    founder = _seeded(client)
+def test_a_new_profile_gets_both_founders_at_the_top(client):
+    """Two profiles of the same man — the photograph and the AI rendering —
+    in that fixed order."""
+    live, rendered = _seeded(client)
     profile = make_profile(client, display_name="Newcomer")
 
     listed = client.get(f"/profiles/{profile['id']}/friends").json()
-    assert listed["count"] == 1
-    first = listed["friends"][0]
-    assert first["position"] == 1
-    assert first["profile_id"] == founder
-    assert first["founder"] is True
-    assert first["handle"] == friends.FOUNDER_HANDLE
+    assert listed["count"] == 2
+    assert [f["profile_id"] for f in listed["friends"]] == [live, rendered]
+    assert [f["position"] for f in listed["friends"]] == [1, 2]
+    assert all(f["founder"] and f["pinned"] for f in listed["friends"])
+    assert [f["handle"] for f in listed["friends"]] == list(
+        friends.FOUNDER_HANDLES)
 
 
 def test_the_founder_stays_first_however_many_friends_arrive(client):
     """Position is computed from `origin`, not stored. A stored column would be
     the thing that is wrong on the day the founder turns up third."""
-    founder = _seeded(client)
+    live, rendered = _seeded(client)
     profile = make_profile(client, display_name="Popular")
     others = [make_profile(client, display_name=f"Friend {i}")
               for i in range(3)]
@@ -51,10 +56,10 @@ def test_the_founder_stays_first_however_many_friends_arrive(client):
         assert r.status_code == 200, r.text
 
     listed = client.get(f"/profiles/{profile['id']}/friends").json()
-    assert listed["count"] == 4
-    assert listed["friends"][0]["profile_id"] == founder
-    assert [f["founder"] for f in listed["friends"]] == [True, False, False,
-                                                         False]
+    assert listed["count"] == 5
+    assert [f["profile_id"] for f in listed["friends"]][:2] == [live, rendered]
+    assert [f["founder"] for f in listed["friends"]] == [
+        True, True, False, False, False]
 
 
 def test_the_founder_is_first_even_when_he_arrives_last(client):
@@ -69,81 +74,104 @@ def test_the_founder_is_first_even_when_he_arrives_last(client):
                 headers=auth_header(a))
     assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 1
 
-    founder = _seeded(client)          # the founder appears only now
+    live, rendered = _seeded(client)   # the founders appear only now
 
     listed = client.get(f"/profiles/{a['id']}/friends").json()
-    assert listed["count"] == 2
-    assert listed["friends"][0]["profile_id"] == founder
+    assert listed["count"] == 3
+    assert [f["profile_id"] for f in listed["friends"]] == [live, rendered,
+                                                            b["id"]]
     assert listed["friends"][0]["position"] == 1
-    assert listed["friends"][1]["profile_id"] == b["id"]
 
 
-def test_the_backfill_does_not_undo_a_removal(client):
-    """A repair that reverses somebody's decision is not a repair."""
-    founder = _seeded(client)
+def test_the_backfill_restores_a_pin_that_was_cleared(client):
+    """Unlike an ordinary un-friending, `removed` is not a state the pins are
+    allowed to stay in — so a row cleared before they became fixed is repaired
+    rather than respected."""
+    live, rendered = _seeded(client)
     a = make_profile(client, display_name="Decided")
-    client.delete(f"/profiles/{a['id']}/friends/{founder}",
-                  headers=auth_header(a))
+    db.connect().execute(
+        "UPDATE friendships SET state='removed' WHERE profile_id=? AND"
+        " friend_id=?", (a["id"], live))
+    db.connect().commit()
+    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 1
 
-    assert friends.backfill_founder() == []
-    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 0
+    assert a["id"] in friends.backfill_founder()
+    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 2
 
 
-def test_the_founders_own_profile_does_not_befriend_itself(client):
-    founder = _seeded(client)
-    listed = client.get(f"/profiles/{founder}/friends").json()
-    assert listed["count"] == 0
+def test_a_founder_profile_does_not_befriend_itself(client):
+    """Each carries the other, but neither carries itself."""
+    live, rendered = _seeded(client)
+    for me, other in ((live, rendered), (rendered, live)):
+        listed = client.get(f"/profiles/{me}/friends").json()
+        assert [f["profile_id"] for f in listed["friends"]] == [other]
 
 
 def test_install_is_silent_when_there_is_no_founder(client):
     """An unseeded deployment has none. Creating a profile must still work —
     a cosmetic default is not a reason for profile creation to fail."""
-    assert friends.founder_id() is None
+    assert friends.founder_ids() == []
     profile = make_profile(client, display_name="Early")
     assert client.get(f"/profiles/{profile['id']}/friends").json()["count"] == 0
 
 
 # -- and can be shown the door ----------------------------------------------
 
-def test_the_founder_can_be_removed(client):
-    founder = _seeded(client)
+def test_the_founder_pins_cannot_be_removed(client):
+    """Fixed by product decision — the platform's owner asked for exactly this,
+    after the removable version had been built and shown. Enforced in
+    `unfriend`, the one function every removal path goes through, so a future
+    caller cannot route around it by not knowing about it."""
+    founders = _seeded(client)
     profile = make_profile(client, display_name="Independent")
 
-    r = client.delete(f"/profiles/{profile['id']}/friends/{founder}",
-                      headers=auth_header(profile))
-    assert r.status_code == 200, r.text
-    assert r.json() == {"profile_id": profile["id"], "friend_id": founder,
-                        "removed": True, "was_founder": True}
-    assert client.get(f"/profiles/{profile['id']}/friends").json()["count"] == 0
+    for fid in founders:
+        r = client.delete(f"/profiles/{profile['id']}/friends/{fid}",
+                          headers=auth_header(profile))
+        assert r.status_code == 409, r.text
+        assert "cannot be removed" in r.json()["detail"]
+    assert client.get(f"/profiles/{profile['id']}/friends").json()["count"] == 2
 
 
-def test_removing_the_founder_sticks(client):
-    """The install runs on profile creation. If removal deleted the row, the
-    next install would put him straight back — which is the difference between
-    a default and something you cannot get rid of."""
-    founder = _seeded(client)
-    profile = make_profile(client, display_name="Firm")
-    client.delete(f"/profiles/{profile['id']}/friends/{founder}",
-                  headers=auth_header(profile))
+def test_the_list_says_which_rows_are_pinned(client):
+    """So a client renders those rows without a remove control, rather than
+    offering one that 409s."""
+    _seeded(client)
+    profile = make_profile(client, display_name="Reader")
+    other = make_profile(client, display_name="Chosen")
+    client.post(f"/profiles/{profile['id']}/friends",
+                json={"friend_id": other["id"]}, headers=auth_header(profile))
 
-    again = friends.install_founder(profile["id"])
-    assert again["installed"] is False
-    assert again["reason"] == "already removed"
-    assert client.get(f"/profiles/{profile['id']}/friends").json()["count"] == 0
+    entries = client.get(f"/profiles/{profile['id']}/friends").json()["friends"]
+    assert [f["pinned"] for f in entries] == [True, True, False]
 
 
-def test_a_removed_founder_can_be_invited_back(client):
-    founder = _seeded(client)
-    profile = make_profile(client, display_name="Forgiving")
-    client.delete(f"/profiles/{profile['id']}/friends/{founder}",
-                  headers=auth_header(profile))
+def test_an_ordinary_friend_is_still_removable(client):
+    """The pin is the exception, not the new rule."""
+    _seeded(client)
+    a = make_profile(client, display_name="Ada")
+    b = make_profile(client, display_name="Bo")
+    client.post(f"/profiles/{a['id']}/friends", json={"friend_id": b["id"]},
+                headers=auth_header(a))
+    r = client.delete(f"/profiles/{a['id']}/friends/{b['id']}",
+                      headers=auth_header(a))
+    assert r.status_code == 200 and r.json()["removed"] is True
+    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 2
 
-    r = client.post(f"/profiles/{profile['id']}/friends",
-                    json={"friend_id": founder}, headers=auth_header(profile))
-    assert r.status_code == 200, r.text
-    assert r.json()["revived"] is True
-    back = client.get(f"/profiles/{profile['id']}/friends").json()
-    assert back["friends"][0]["founder"] is True
+
+def test_removing_an_ordinary_friend_sticks(client):
+    """The tombstone machinery still earns its keep: the founder install runs
+    on profile creation, and a deleted row would be recreated."""
+    _seeded(client)
+    a = make_profile(client, display_name="Firm")
+    b = make_profile(client, display_name="Gone")
+    client.post(f"/profiles/{a['id']}/friends", json={"friend_id": b["id"]},
+                headers=auth_header(a))
+    client.delete(f"/profiles/{a['id']}/friends/{b['id']}",
+                  headers=auth_header(a))
+    friends.install_founder(a["id"])
+    listed = client.get(f"/profiles/{a['id']}/friends").json()
+    assert b["id"] not in [f["profile_id"] for f in listed["friends"]]
 
 
 # -- the ordinary verbs ------------------------------------------------------
@@ -213,7 +241,7 @@ def test_only_the_owner_edits_the_list(client):
 def test_friendships_and_relationships_are_separate_tables(client):
     """`relationships` records how a profile treats an *interactor*. Reading
     one as the other would look like working code."""
-    founder = _seeded(client)
+    _seeded(client)
     profile = make_profile(client, display_name="Distinct")
     conn = db.connect()
     assert conn.execute(
@@ -221,51 +249,78 @@ def test_friendships_and_relationships_are_separate_tables(client):
         (profile["id"],)).fetchone()["n"] == 0
     assert conn.execute(
         "SELECT COUNT(*) AS n FROM friendships WHERE profile_id=?",
-        (profile["id"],)).fetchone()["n"] == 1
+        (profile["id"],)).fetchone()["n"] == 2
 
 
 # -- the founder profile itself ---------------------------------------------
 
-def test_the_founder_is_a_real_person_with_a_marked_portrait(client):
-    """He is `self` kind, not `fictional`, so the likeness record says a real
-    person is depicted and the grant is revocable. And the portrait carries the
-    AI mark in its own pixels, because it is an AI rendering of a real face —
-    which is the exact case the mark exists for."""
-    founder = _seeded(client)
-    avatar = client.get(f"/profiles/{founder}/avatar").json()
-    assert avatar["asset"] == f"/portraits/{friends.FOUNDER_HANDLE}.webp"
+def test_the_rendered_founder_carries_the_mark_in_its_pixels(client):
+    """An AI rendering of a real face is exactly the case the burned mark
+    exists for, so it gets the same treatment as the other 34 rather than a
+    gentler one."""
+    live, rendered = _seeded(client)
+    avatar = client.get(f"/profiles/{rendered}/avatar").json()
+    assert avatar["asset"] == f"/portraits/{seed.FOUNDER_HANDLE}.webp"
     assert avatar["asset_marked"] is True
     assert avatar["likeness"]["real_person"] is True
     assert avatar["likeness"]["revocable"] is True
 
 
-def test_the_founder_is_not_in_the_fictional_starter_collection(client):
+def test_the_photograph_is_not_marked_ai_but_the_profile_still_is(client):
+    """Two different claims, and they must not be run together.
+
+    The picture is authentic, so burning *AI-generated synthetic media* into it
+    would be a false statement in the opposite direction from the one the mark
+    exists to prevent. The profile is synthetic, so it still carries the
+    watermark — `asset_marked: False` is the signal every surface uses to
+    composite it.
+    """
+    live, rendered = _seeded(client)
+    avatar = client.get(f"/profiles/{live}/avatar").json()
+    assert avatar["asset"] == f"/photos/{seed.LIVE_HANDLE}.webp"
+    assert avatar["asset_marked"] is False
+    assert avatar["watermark"]                      # the profile is still labelled
+    assert avatar["likeness"]["real_person"] is True
+
+
+def test_no_photograph_is_ever_reported_as_carrying_the_mark(client):
+    """The guard, stated once. If a photograph were served from the burned
+    tree, `asset_is_marked` would say True and every surface would skip its
+    badge — leaving an unlabelled synthetic profile behind a real face."""
+    from qrme import avatars
+    assert avatars.asset_is_marked("/photos/anything.webp") is False
+    assert avatars.asset_is_marked(None) is False
+    for path in avatars.photos_dir().glob("*.webp"):
+        assert avatars.asset_is_marked(f"/photos/{path.name}") is False
+
+
+def test_both_founder_profiles_are_grounded(client):
+    """0.3.1 established that a profile with no source material answers from
+    tone alone. The two profiles every new account meets first must not
+    reintroduce it."""
+    for pid in _seeded(client):
+        rows = db.connect().execute(
+            "SELECT title FROM source_items WHERE profile_id=?",
+            (pid,)).fetchall()
+        assert len(rows) == len(seed.FOUNDER_SOURCES)
+        assert db.connect().execute(
+            "SELECT COUNT(*) AS n FROM source_items WHERE profile_id=? AND"
+            " pack_id IS NOT NULL", (pid,)).fetchone()["n"] == 0
+
+
+def test_neither_founder_is_in_the_fictional_starter_collection(client):
     """`seed.py`'s docstring promises every starter is fictional, and
     `avatars.BRIEFS` promises every brief describes an invented person. A real
     person in either list would quietly make a documented claim false."""
     from qrme import avatars
     handles = [h for h, *_ in seed.STARTERS + seed.RATED]
-    assert friends.FOUNDER_HANDLE not in handles
-    assert friends.FOUNDER_HANDLE not in avatars.BRIEFS
+    for handle in friends.FOUNDER_HANDLES:
+        assert handle not in handles
+        assert handle not in avatars.BRIEFS
 
 
-def test_the_founder_is_grounded_like_everybody_else(client):
-    """0.3.1 established that a profile with no source material answers from
-    tone alone, and fixed it for all 34 starters. The profile every new account
-    meets first must not reintroduce it."""
-    founder = _seeded(client)
-    rows = db.connect().execute(
-        "SELECT title FROM source_items WHERE profile_id=?",
-        (founder,)).fetchall()
-    assert len(rows) == len(seed.FOUNDER_SOURCES)
-    # Written material, not a Field Pack — the packs are paired one-per-industry
-    # with the Starter Collection and a founder pack would break that pairing.
-    assert db.connect().execute(
-        "SELECT COUNT(*) AS n FROM source_items WHERE profile_id=? AND"
-        " pack_id IS NOT NULL", (founder,)).fetchone()["n"] == 0
-
-
-def test_the_founder_handle_agrees_with_the_seed(client):
-    """Two modules name the same person. If they drift, every new profile gets
-    an empty list and nothing else complains."""
-    assert friends.FOUNDER_HANDLE == seed.FOUNDER_HANDLE
+def test_the_founder_handles_agree_with_the_seed(client):
+    """Two modules name the same person twice over. If they drift, every new
+    profile gets a short list and nothing else complains."""
+    assert set(friends.FOUNDER_HANDLES) == {seed.FOUNDER_HANDLE,
+                                            seed.LIVE_HANDLE}

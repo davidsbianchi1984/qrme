@@ -144,6 +144,13 @@ def create_app(pdi_client: PDIClient | None = None,
         app.mount(avatar_assets.ASSET_ROUTE,
                   StaticFiles(directory=str(_portraits)),
                   name="portraits")
+    # Real photographs, served apart from the burned synthetic faces — see
+    # avatars.PHOTO_ROUTE for why they are not the same kind of asset.
+    _photos = avatar_assets.photos_dir()
+    if _photos.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.PHOTO_ROUTE,
+                  StaticFiles(directory=str(_photos)), name="photos")
 
     # The studio itself, served from this API so a phone loads the UI and
     # calls the API on one origin (no CORS, nothing to configure). Mounted

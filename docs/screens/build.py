@@ -2355,10 +2355,10 @@ SCREENS = [
     # makes "remove" an obvious thing to be allowed to do.
     dict(num=84, title="Friends", sub="Who this profile stands with",
          accent="cyan", tab=1, friends=[
-        ("David Bianchi", "comes with every profile", frames.FOUNDER[1], True),
+        ("David Bianchi", "@david_bianchi_live", frames.FOUNDER_LIVE[1], True),
+        ("David Bianchi", "@david_bianchi", frames.FOUNDER[1], True),
         ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], False),
         ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], False),
-        ("Priya Raman", "technology", frames.PORTRAITS[2][1], False),
     ]),
 ]
 

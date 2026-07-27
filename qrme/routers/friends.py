@@ -34,9 +34,9 @@ def list_friends(profile_id: str) -> dict:
         "profile_id": profile_id,
         "count": len(entries),
         "friends": entries,
-        # Said out loud rather than left to be inferred from position 1, so a
+        # Said out loud rather than left to be inferred from position, so a
         # client does not have to know the convention to render the badge.
-        "founder_handle": friends.FOUNDER_HANDLE,
+        "founder_handles": list(friends.FOUNDER_HANDLES),
     }
 
 
@@ -53,12 +53,16 @@ def add_friend(profile_id: str, body: FriendAdd, request: Request) -> dict:
 
 @router.delete("/profiles/{profile_id}/friends/{friend_id}")
 def remove_friend(profile_id: str, friend_id: str, request: Request) -> dict:
-    """Owner removes somebody — the founder included.
+    """Owner removes somebody.
 
-    Deliberately not special-cased. The founder is installed as a default, and
-    a default you cannot undo is not a default; the removal also sticks, so he
-    does not reappear the next time the install runs.
+    The founder's two profiles are fixed and refuse with 409 — a product
+    decision by the platform's owner, and one the list marks with ``pinned``
+    so a client can render those rows without a remove control rather than
+    offering one that fails.
     """
     profile_or_404(profile_id)
     require_owner(profile_id, request)
-    return friends.unfriend(profile_id, friend_id)
+    try:
+        return friends.unfriend(profile_id, friend_id)
+    except friends.PinnedFriend as exc:
+        raise HTTPException(409, str(exc)) from None

@@ -256,17 +256,47 @@ FOUNDER_HANDLE = "david_bianchi"
 FOUNDER_NAME = "David Bianchi"
 FOUNDER_TAGS = ["qrme", "founder", "synthetic-profiles"]
 FOUNDER_PERSONA = (
-    "The person who built QRME, and the first friend on every profile made "
-    "here. Talks about why the platform is shaped the way it is: why a "
-    "synthetic profile says so on its face, why a memory belongs to the "
-    "person it is about, and why the awkward parts were left in rather than "
-    "smoothed over. Happy to be asked hard questions about any of it, and "
-    "straightforward that this is a synthetic profile of a real person — the "
-    "answers are the platform's reasoning, not the man's private opinions.")
+    "The synthetic half of QRME's creator. David Bianchi is 42, CEO and "
+    "Imagineer of Private Data Infrastructure Systems, and built all three of "
+    "these products — QRME, JIM-mini and PDI. This profile talks about why the "
+    "platform is shaped the way it is: why a synthetic profile says so on its "
+    "face, why a memory belongs to the person it is about, why the vault is "
+    "the bottom layer rather than an add-on, and why the awkward parts were "
+    "left in rather than smoothed over. Happy to be asked hard questions about "
+    "any of it, and straightforward that this is a synthetic profile of a real "
+    "person — the answers are the platform's reasoning, not the man's private "
+    "opinions. For those, ask him.")
 FOUNDER_APPEARANCE = (
     "A portrait of the platform's founder — long hair, a short beard, a green "
     "tunic, half-smiling at the camera. An AI rendering of a real person "
     "rather than a photograph of one, and marked as such.")
+
+# The other half: David himself, photographed rather than rendered.
+#
+# Two profiles for one man, on purpose. The distinction QRME spends its whole
+# design arguing for — that a synthetic thing must say it is synthetic — would
+# be hollow if the founder ran a single profile that was ambiguously both. So
+# there is a rendered one, marked AI in its own pixels, and a photographed one
+# that is not marked, because marking an authentic photograph *AI-generated*
+# is a false statement in the other direction.
+#
+# The profile is still synthetic and still labelled: `avatars.render` returns
+# ``asset_marked: False`` for the photograph, which is the signal every surface
+# uses to composite the profile's own AI badge over it. Honest about the
+# picture, honest about the profile, and those are two different claims.
+LIVE_HANDLE = "david_bianchi_live"
+LIVE_NAME = "David Bianchi"
+LIVE_PERSONA = (
+    "The real David Bianchi — 42, CEO and Imagineer of Private Data "
+    "Infrastructure Systems, and the person who built QRME, JIM-mini and PDI. "
+    "This is his personal profile rather than a synthetic expert: the man "
+    "behind the three products, what he is building and why. Still an AI "
+    "speaking on his behalf, and it says so; the photograph is real, the "
+    "conversation is not him typing.")
+LIVE_APPEARANCE = (
+    "A photograph — not a rendering — of David Bianchi standing in a data "
+    "centre aisle, rows of racks lit blue behind him, long hair, full beard, "
+    "grinning at the camera.")
 
 # What he actually knows. Written material rather than a Field Pack: the packs
 # are paired one-per-industry with the Starter Collection, and inventing a
@@ -308,33 +338,31 @@ FOUNDER_SOURCES: list[tuple[str, str]] = [
 ]
 
 
-def _seed_founder(conn) -> str | None:
-    """Create the founder profile, or return the existing one's id.
+def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
+    """Create one of the founder's two profiles, or return the existing id.
 
-    Idempotent by handle like the rest of the seed. Runs before the starters
-    so that :func:`friends.install_founder` has somebody to install by the time
-    the first starter is created — otherwise the collection would be the one
-    set of profiles on the deployment without the standing first friend.
+    Idempotent by handle like the rest of the seed. Both are grounded in the
+    same written material: the two profiles differ in what they *are* — one
+    rendered, one photographed — not in what they know.
     """
     from .models import HandleSet, ProfileCreate, Verification
     from .routers.profiles import create_profile
     from .routers.summon import claim_handle
-    from . import avatars, db
+    from . import db
 
     taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
-                         (FOUNDER_HANDLE,)).fetchone()
+                         (handle,)).fetchone()
     if taken:
         return taken["profile_id"]
 
     profile = create_profile(ProfileCreate(
-        owner_id=OWNER_ID, kind="self", display_name=FOUNDER_NAME,
-        persona=FOUNDER_PERSONA, purpose="creator_persona",
+        owner_id=OWNER_ID, kind="self", display_name=name,
+        persona=persona, purpose="creator_persona",
         verification=Verification(birthdate=_BIRTHDATE)))
-    claim_handle(profile["id"], HandleSet(handle=FOUNDER_HANDLE))
+    claim_handle(profile["id"], HandleSet(handle=handle))
 
     conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
-                 (FOUNDER_APPEARANCE, profile["id"]))
-    asset = avatars.asset_path(FOUNDER_HANDLE)
+                 (appearance, profile["id"]))
     if asset:
         conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
                      (asset, profile["id"]))
@@ -346,6 +374,27 @@ def _seed_founder(conn) -> str | None:
              db.utcnow()))
     conn.commit()
     return profile["id"]
+
+
+def _seed_founder(conn) -> tuple[str, str]:
+    """Both of the founder's profiles: the rendered one and the photographed
+    one.
+
+    Runs before the starters so that :func:`friends.install_founder` has
+    somebody to install by the time the first starter is created — otherwise
+    the collection would be the one set of profiles on the deployment without
+    the standing first friends.
+    """
+    from . import avatars
+
+    rendered = _seed_one_founder(
+        conn, FOUNDER_HANDLE, FOUNDER_NAME, FOUNDER_PERSONA,
+        FOUNDER_APPEARANCE, avatars.asset_path(FOUNDER_HANDLE))
+    live = _seed_one_founder(
+        conn, LIVE_HANDLE, LIVE_NAME, LIVE_PERSONA, LIVE_APPEARANCE,
+        # A photograph, from the unburned tree — see avatars.PHOTO_ROUTE.
+        avatars.photo_path(LIVE_HANDLE))
+    return rendered, live
 
 
 def _backfill(conn, profile_id: str, handle: str) -> bool:
@@ -457,7 +506,7 @@ def seed() -> dict:
     created, skipped, repaired, grounded = [], [], [], []
     # Before the starters, so every profile created below already has somebody
     # to stand first in its friends list.
-    founder = _seed_founder(conn)
+    founder, founder_live = _seed_founder(conn)
     for handle, industry, name, purpose, tags, persona in STARTERS + RATED:
         taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                              (handle,)).fetchone()
@@ -546,6 +595,8 @@ def seed() -> dict:
             # part of the collection: the starters are invented people and this
             # one is not.
             "founder": founder, "founder_handle": f"@{FOUNDER_HANDLE}",
+            "founder_live": founder_live,
+            "founder_live_handle": f"@{LIVE_HANDLE}",
             # Profiles that predate the founder and just got him. Same repair
             # shape as the portrait backfill above, for the same reason: the
             # install runs at creation, so nothing else would ever reach them.

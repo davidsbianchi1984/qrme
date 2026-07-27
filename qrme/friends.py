@@ -15,35 +15,49 @@ Three decisions worth keeping in view:
   mutual, and :func:`friends_of` reports ``mutual`` per entry so a surface can
   show the difference without inventing it.
 
-* **The founder comes standard, and can be shown the door.** Every new profile
-  is created with the founder's profile pinned at position one. This is the
-  MySpace pattern and it is doing the same job: a brand-new account with an
-  empty friends list looks broken, and the platform's owner standing there is
-  both a welcome and a face to put to the thing. But it is a real row, it
-  counts, and it can be removed — a friend you cannot remove is furniture.
+* **The founder comes standard, and stays.** Every new profile is created with
+  both of the founder's profiles pinned at the top of its list — the rendered
+  one and the photographed one, which are two different profiles of the same
+  man. This is the MySpace pattern: a brand-new account with an empty friends
+  list looks broken, and the platform's owner standing there is both a welcome
+  and a face to put to the thing.
 
-* **Removal is durable.** Removing sets ``state='removed'`` rather than
-  deleting, because the founder install runs on profile creation and a deleted
-  row would simply be recreated. Somebody who removed the founder once should
-  not find him back tomorrow; that is the difference between a default and an
-  imposition.
+  These two are **fixed**. They cannot be removed and cannot be reordered
+  below a chosen friend — a product decision by the platform's owner, made
+  explicitly and after the removable version had been built. Everything else in
+  the list is entirely the owner's to add and drop.
+
+* **Removal is durable for everyone it applies to.** Removing sets
+  ``state='removed'`` rather than deleting, because the founder install runs on
+  profile creation and a deleted row would simply be recreated. That machinery
+  stays: it is what makes an ordinary un-friending stick.
 """
 
 from __future__ import annotations
 
 from . import db
 
-# The founder profile's handle. One constant, because "who is pinned" is a
-# product decision and should be greppable rather than spelled out at each
-# call site.
-FOUNDER_HANDLE = "david_bianchi"
+# The founder's two profiles, in the order they stand. One constant, because
+# "who is pinned" is a product decision and should be greppable rather than
+# spelled out at each call site.
+#
+# Two profiles for one person is the point rather than an accident: the
+# rendered likeness is marked AI in its own pixels, the photograph is not, and
+# a platform whose whole argument is that synthetic things must say so cannot
+# have its owner running a single profile that is ambiguously both.
+FOUNDER_HANDLES: tuple[str, ...] = ("david_bianchi_live", "david_bianchi")
 
-# Where the founder sits, and why the rest of the list cannot reach it.
-FOUNDER_POSITION = 1
+# Kept as a name because the rest of the module and its tests read better for
+# it, and because a single-founder deployment is still a coherent thing.
+FOUNDER_HANDLE = FOUNDER_HANDLES[0]
 
 
 class FriendError(ValueError):
     """A friendship that cannot exist — unknown profile, or a self-edge."""
+
+
+class PinnedFriend(FriendError):
+    """A pinned founder row cannot be removed."""
 
 
 def _profile_exists(profile_id: str) -> bool:
@@ -51,48 +65,70 @@ def _profile_exists(profile_id: str) -> bool:
         "SELECT 1 FROM profiles WHERE id=?", (profile_id,)).fetchone() is not None
 
 
-def founder_id() -> str | None:
-    """The founder profile's id, or ``None`` on a deployment without one.
+def founder_ids() -> list[str]:
+    """The founder profiles' ids, in pinned order.
 
-    Looked up by handle rather than pinned to a fixed id, because the id is
-    minted at seed time and differs per deployment. ``None`` is a normal
-    answer: an unseeded database has no founder, and installing one is not
-    something profile creation should be inventing on the fly.
+    Looked up by handle rather than pinned to fixed ids, because ids are minted
+    at seed time and differ per deployment. An empty list is a normal answer:
+    an unseeded database has no founder, and installing one is not something
+    profile creation should be inventing on the fly.
     """
-    row = db.connect().execute(
-        "SELECT profile_id FROM handles WHERE handle=?",
-        (FOUNDER_HANDLE,)).fetchone()
-    return row["profile_id"] if row else None
+    out = []
+    conn = db.connect()
+    for handle in FOUNDER_HANDLES:
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (handle,)).fetchone()
+        if row:
+            out.append(row["profile_id"])
+    return out
+
+
+def founder_id() -> str | None:
+    """The first founder profile's id, or ``None``."""
+    ids = founder_ids()
+    return ids[0] if ids else None
+
+
+def is_pinned(profile_id: str, friend_id: str) -> bool:
+    """Whether this row is one of the fixed founder pins."""
+    return friend_id in founder_ids() and profile_id != friend_id
 
 
 def install_founder(profile_id: str) -> dict:
-    """Give a newly created profile its standing first friend.
+    """Give a newly created profile its standing friends.
 
-    Idempotent, and deliberately silent when there is nothing to do: no
-    founder on this deployment, the profile *is* the founder, or the row
-    already exists in either state. Creation calls this on every profile, so
-    raising here would turn a cosmetic default into a reason profile creation
-    fails.
+    Idempotent, and deliberately silent when there is nothing to do: no founder
+    on this deployment, or the profile *is* one of them. Creation calls this on
+    every profile, so raising here would turn a default into a reason profile
+    creation fails.
+
+    Unlike an ordinary friendship, a pin that was somehow cleared is restored —
+    these two are fixed, so "already removed" is not a state they are allowed
+    to stay in.
     """
-    fid = founder_id()
-    if fid is None or fid == profile_id:
+    ids = [fid for fid in founder_ids() if fid != profile_id]
+    if not ids:
         return {"installed": False, "reason": "no founder to install"}
 
     conn = db.connect()
-    existing = conn.execute(
-        "SELECT state FROM friendships WHERE profile_id=? AND friend_id=?",
-        (profile_id, fid)).fetchone()
-    if existing is not None:
-        # Includes the removed case, which is the point: somebody who removed
-        # the founder does not get him back the next time this runs.
-        return {"installed": False, "reason": f"already {existing['state']}"}
-
-    conn.execute(
-        "INSERT INTO friendships (id, profile_id, friend_id, origin, state,"
-        " created_at) VALUES (?,?,?,?,?,?)",
-        (db.new_id("frn"), profile_id, fid, "founder", "active", db.utcnow()))
+    installed = []
+    for order, fid in enumerate(ids):
+        existing = conn.execute(
+            "SELECT id, state FROM friendships WHERE profile_id=? AND"
+            " friend_id=?", (profile_id, fid)).fetchone()
+        if existing is None:
+            conn.execute(
+                "INSERT INTO friendships (id, profile_id, friend_id, origin,"
+                " state, created_at) VALUES (?,?,?,?,?,?)",
+                (db.new_id("frn"), profile_id, fid, f"founder:{order}",
+                 "active", db.utcnow()))
+            installed.append(fid)
+        elif existing["state"] != "active":
+            conn.execute("UPDATE friendships SET state='active',"
+                         " removed_at=NULL WHERE id=?", (existing["id"],))
+            installed.append(fid)
     conn.commit()
-    return {"installed": True, "friend_id": fid}
+    return {"installed": bool(installed), "friend_ids": installed}
 
 
 def befriend(profile_id: str, friend_id: str) -> dict:
@@ -133,12 +169,19 @@ def befriend(profile_id: str, friend_id: str) -> dict:
 
 
 def unfriend(profile_id: str, friend_id: str) -> dict:
-    """Remove a friend, founder included.
+    """Remove a friend.
 
-    Marks the row removed rather than deleting it — see the module note. The
-    founder is not special-cased here on purpose: the whole point of him being
-    a real row is that the ordinary verb works on him.
+    Marks the row removed rather than deleting it — see the module note.
+
+    The founder pins are refused. That is a product decision by the platform's
+    owner rather than a technical constraint, and it is enforced here, in the
+    one function every removal path goes through, so a future caller cannot
+    route around it by not knowing about it.
     """
+    if is_pinned(profile_id, friend_id):
+        raise PinnedFriend(
+            "the founder is a fixed friend on every profile and cannot be "
+            "removed")
     conn = db.connect()
     row = conn.execute(
         "SELECT id, state, origin FROM friendships WHERE profile_id=? AND"
@@ -149,17 +192,21 @@ def unfriend(profile_id: str, friend_id: str) -> dict:
     conn.execute("UPDATE friendships SET state='removed', removed_at=? WHERE"
                  " id=?", (db.utcnow(), row["id"]))
     conn.commit()
-    return {"profile_id": profile_id, "friend_id": friend_id, "removed": True,
-            "was_founder": row["origin"] == "founder"}
+    return {"profile_id": profile_id, "friend_id": friend_id, "removed": True}
 
 
 def friends_of(profile_id: str) -> list[dict]:
-    """The list, founder first, then everyone else oldest-first.
+    """The list: the founder pins in their fixed order, then everyone else
+    oldest-first.
 
     The ordering is computed here rather than stored, so it cannot drift out of
     step with what ``origin`` says. A stored position column would have to be
     rewritten on every insert and would be the thing that is wrong when the
     founder turns up third.
+
+    ``origin`` is ``founder:0``, ``founder:1``, … for the pins, so their order
+    among themselves is fixed too and does not depend on which row happened to
+    be written first.
     """
     rows = db.connect().execute(
         "SELECT f.friend_id, f.origin, f.created_at, p.display_name, p.avatar,"
@@ -168,11 +215,13 @@ def friends_of(profile_id: str) -> list[dict]:
         "  JOIN profiles p ON p.id = f.friend_id"
         "  LEFT JOIN handles h ON h.profile_id = f.friend_id"
         " WHERE f.profile_id=? AND f.state='active'"
-        " ORDER BY (f.origin='founder') DESC, f.created_at ASC",
+        " ORDER BY (f.origin LIKE 'founder:%') DESC, f.origin ASC,"
+        "          f.created_at ASC",
         (profile_id,)).fetchall()
 
     out = []
     for i, r in enumerate(rows, start=1):
+        founder = r["origin"].startswith("founder")
         out.append({
             "position": i,
             "profile_id": r["friend_id"],
@@ -180,7 +229,10 @@ def friends_of(profile_id: str) -> list[dict]:
             "handle": r["handle"],
             "avatar": r["avatar"],
             "kind": r["kind"],
-            "founder": r["origin"] == "founder",
+            "founder": founder,
+            # Said out loud so a client renders the row without a remove
+            # control, rather than offering one that will 409.
+            "pinned": founder,
             "since": r["created_at"],
             "mutual": _is_mutual(profile_id, r["friend_id"]),
         })
@@ -194,25 +246,22 @@ def _is_mutual(profile_id: str, friend_id: str) -> bool:
 
 
 def backfill_founder() -> list[str]:
-    """Install the founder on profiles that predate him.
+    """Install the founder pins on profiles that predate them.
 
     :func:`install_founder` runs at profile creation, which does nothing for a
     deployment that was already running before the founder was seeded — those
-    profiles would be the only ones on the platform without the standing first
-    friend, and nothing else would ever notice. The seed is the repair, exactly
-    as it is for the starters' portraits.
+    profiles would be the only ones on the platform without the standing
+    friends, and nothing else would ever notice. The seed is the repair,
+    exactly as it is for the starters' portraits.
 
-    Skips anybody who has removed him, because a repair that undoes a person's
-    decision is not a repair.
+    Also repairs a pin that was cleared before the pins became fixed: unlike an
+    ordinary un-friending, "removed" is not a state these two are allowed to
+    stay in.
     """
-    fid = founder_id()
-    if fid is None:
+    ids = founder_ids()
+    if not ids:
         return []
-    rows = db.connect().execute(
-        "SELECT p.id FROM profiles p"
-        "  LEFT JOIN friendships f"
-        "         ON f.profile_id = p.id AND f.friend_id = ?"
-        " WHERE p.id != ? AND f.id IS NULL", (fid, fid)).fetchall()
+    rows = db.connect().execute("SELECT id FROM profiles").fetchall()
     return [r["id"] for r in rows if install_founder(r["id"])["installed"]]
 
 

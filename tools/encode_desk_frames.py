@@ -124,17 +124,24 @@ def main() -> None:
     # false. The friends screens want his face, so it gets its own name.
     import sys
     sys.path.insert(0, str(ROOT))
-    from qrme.seed import FOUNDER_HANDLE, FOUNDER_NAME
-    fsrc = PORTRAIT_SRC / f"{FOUNDER_HANDLE}.webp"
-    if not fsrc.is_file():
-        raise SystemExit(f"no founder portrait at {fsrc}")
-    fb64 = encode_square(fsrc, PORTRAIT_PX, PORTRAIT_Q)
-    fchunks = "\n".join(f'    "{c}"' for c in textwrap.wrap(fb64, 96))
-    parts.append("# The founder — a real person, so deliberately not in the")
-    parts.append("# starter collection above. (display_name, base64 jpeg).")
-    parts.append(f'FOUNDER = ("{FOUNDER_NAME}",\n{fchunks})')
-    parts.append("")
-    print(f"founder portrait: {len(fb64) // 1024} KB base64")
+    from qrme.seed import (FOUNDER_HANDLE, FOUNDER_NAME, LIVE_HANDLE,
+                           LIVE_NAME)
+    PHOTO_SRC = ROOT / "qrme" / "assets" / "photos"
+    for const, handle, name, src_dir, note in (
+            ("FOUNDER", FOUNDER_HANDLE, FOUNDER_NAME, PORTRAIT_SRC,
+             "the AI rendering, marked in its own pixels"),
+            ("FOUNDER_LIVE", LIVE_HANDLE, LIVE_NAME, PHOTO_SRC,
+             "the photograph — authentic, so deliberately unmarked")):
+        fsrc = src_dir / f"{handle}.webp"
+        if not fsrc.is_file():
+            raise SystemExit(f"no founder image at {fsrc}")
+        fb64 = encode_square(fsrc, PORTRAIT_PX, PORTRAIT_Q)
+        fchunks = "\n".join(f'    "{c}"' for c in textwrap.wrap(fb64, 96))
+        parts.append(f"# The founder, {note}. Kept out of the starter")
+        parts.append("# collection above, which is invented people only.")
+        parts.append(f'{const} = ("{name}",\n{fchunks})')
+        parts.append("")
+        print(f"{const}: {len(fb64) // 1024} KB base64")
 
     OUT.write_text("\n".join(parts))
     print("wrote", OUT.relative_to(ROOT))
