@@ -76,6 +76,11 @@ def create_profile(body: ProfileCreate) -> dict:
             raise HTTPException(
                 422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
         i18n.set_language(profile_id, body.language)
+    # The standing first friend. Silent when there is nothing to install —
+    # an unseeded deployment has no founder, and a cosmetic default must not
+    # be a reason profile creation fails.
+    from .. import friends
+    friends.install_founder(profile_id)
     token = auth.issue("owner", profile_id)
     out = {**profile_out(profile_or_404(profile_id)).model_dump(),
            "owner_token": token}

@@ -1183,6 +1183,31 @@ CREATE TABLE IF NOT EXISTS signatures (
     sealed_ref         TEXT,                -- PDI record, when a vault is configured
     signed_at          TEXT NOT NULL
 );
+
+-- Friendships between profiles. Distinct from `relationships`, which records
+-- how one profile treats one *interactor* — the person typing at it. This is
+-- the other axis: profile ↔ profile, the social graph the community surfaces
+-- are drawn from.
+--
+-- Directed on purpose. A friends list is a claim its owner makes about who
+-- they stand with, and making it mutual would mean one profile's list could be
+-- edited by somebody else. Two rows make a mutual friendship, and `mutual` on
+-- the read side reports whether the other row exists.
+--
+-- `state` rather than DELETE, so a removal is durable. The founder row is
+-- installed on every new profile, and if it were deleted outright the next
+-- install would put it straight back — a friend you cannot get rid of, which
+-- is furniture rather than a friendship.
+CREATE TABLE IF NOT EXISTS friendships (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    friend_id    TEXT NOT NULL REFERENCES profiles(id),
+    origin       TEXT NOT NULL DEFAULT 'chosen',  -- chosen | founder
+    state        TEXT NOT NULL DEFAULT 'active',  -- active | removed
+    created_at   TEXT NOT NULL,
+    removed_at   TEXT,
+    UNIQUE (profile_id, friend_id)
+);
 """
 
 _local = threading.local()

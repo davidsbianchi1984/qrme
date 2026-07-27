@@ -118,6 +118,24 @@ def main() -> None:
     print(f"portraits: {len(entries)} at {PORTRAIT_PX}px, "
           f"{total // 1024} KB base64")
 
+    # The founder, kept out of PORTRAITS on purpose. That list documents itself
+    # as the starter collection, and every starter is an invented person; this
+    # one is a real person, so folding him in would make the comment above it
+    # false. The friends screens want his face, so it gets its own name.
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from qrme.seed import FOUNDER_HANDLE, FOUNDER_NAME
+    fsrc = PORTRAIT_SRC / f"{FOUNDER_HANDLE}.webp"
+    if not fsrc.is_file():
+        raise SystemExit(f"no founder portrait at {fsrc}")
+    fb64 = encode_square(fsrc, PORTRAIT_PX, PORTRAIT_Q)
+    fchunks = "\n".join(f'    "{c}"' for c in textwrap.wrap(fb64, 96))
+    parts.append("# The founder — a real person, so deliberately not in the")
+    parts.append("# starter collection above. (display_name, base64 jpeg).")
+    parts.append(f'FOUNDER = ("{FOUNDER_NAME}",\n{fchunks})')
+    parts.append("")
+    print(f"founder portrait: {len(fb64) // 1024} KB base64")
+
     OUT.write_text("\n".join(parts))
     print("wrote", OUT.relative_to(ROOT))
 

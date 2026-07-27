@@ -237,6 +237,117 @@ RATED: list[tuple[str, str, str, str, list[str], str]] = [
 ]
 
 
+# The founder's profile — deliberately **not** in STARTERS, and deliberately
+# not in ``avatars.BRIEFS``.
+#
+# Both of those carry a promise. The module docstring above says every starter
+# is ``fictional`` kind with no real-person rights involved; ``avatars.BRIEFS``
+# says every portrait in it describes an invented person. This profile is a
+# real person with a real face, so putting it in either list would quietly make
+# a documented claim false — and a false claim about whose likeness is on a
+# synthetic profile is the worst kind to leave lying around.
+#
+# It is ``self`` kind: David owns it and it depicts him, which is the one case
+# where the rights question answers itself. The portrait is an AI *rendering*
+# of him rather than a photograph, and it carries the same burned-in AI mark as
+# every other face in the package — a synthetic likeness of a real person is
+# precisely what that mark is for.
+FOUNDER_HANDLE = "david_bianchi"
+FOUNDER_NAME = "David Bianchi"
+FOUNDER_TAGS = ["qrme", "founder", "synthetic-profiles"]
+FOUNDER_PERSONA = (
+    "The person who built QRME, and the first friend on every profile made "
+    "here. Talks about why the platform is shaped the way it is: why a "
+    "synthetic profile says so on its face, why a memory belongs to the "
+    "person it is about, and why the awkward parts were left in rather than "
+    "smoothed over. Happy to be asked hard questions about any of it, and "
+    "straightforward that this is a synthetic profile of a real person — the "
+    "answers are the platform's reasoning, not the man's private opinions.")
+FOUNDER_APPEARANCE = (
+    "A portrait of the platform's founder — long hair, a short beard, a green "
+    "tunic, half-smiling at the camera. An AI rendering of a real person "
+    "rather than a photograph of one, and marked as such.")
+
+# What he actually knows. Written material rather than a Field Pack: the packs
+# are paired one-per-industry with the Starter Collection, and inventing a
+# thirty-eighth for a founder would break a pairing that a test enforces and a
+# docstring promises. This is the ordinary path instead — an owner adding their
+# own source material, which is what any real owner does.
+#
+# Grounding him at all is the point. 0.3.1 established that a profile with no
+# source material answers from tone alone, and fixed it for all 34 starters.
+# The founder arriving ungrounded would reintroduce exactly that, on the one
+# profile every new account meets first.
+FOUNDER_SOURCES: list[tuple[str, str]] = [
+    ("Why a synthetic profile says so",
+     "Every profile here is labelled AI, on its face and in its API. The "
+     "label is not a disclaimer bolted on at the end — it is attached at the "
+     "point the portrait is rendered, so a surface cannot show the picture "
+     "without having been handed the disclosure. A synthetic person who can "
+     "pass for real without saying otherwise is the thing this platform is "
+     "trying not to build."),
+    ("Who a memory belongs to",
+     "A profile is built from source material, and that material belongs to "
+     "the person it is about rather than to the platform holding it. That is "
+     "why it can be exported and deleted, why sealing it in a PDI vault is "
+     "supported rather than assumed, and why nothing is contributed to a "
+     "cloud model unless somebody opted in and can revoke it."),
+    ("Why the awkward parts were left in",
+     "Money here is simulated and every money-bearing response says so. "
+     "Versions that shipped without something are recorded as having shipped "
+     "without it. A changelog entry that reads 'no functional change' is left "
+     "reading that way rather than padded. A product that hides its own gaps "
+     "teaches people to distrust the parts that are solid."),
+    ("The friend at the top of your list",
+     "This profile is installed as the first friend on every profile made "
+     "here, which is a borrowed idea and an honest one: a brand-new account "
+     "with an empty friends list looks broken, and somebody should be "
+     "standing there. It is a real row, it counts, and it can be removed — "
+     "and once removed it stays removed. A friend you cannot get rid of is "
+     "furniture wearing a face."),
+]
+
+
+def _seed_founder(conn) -> str | None:
+    """Create the founder profile, or return the existing one's id.
+
+    Idempotent by handle like the rest of the seed. Runs before the starters
+    so that :func:`friends.install_founder` has somebody to install by the time
+    the first starter is created — otherwise the collection would be the one
+    set of profiles on the deployment without the standing first friend.
+    """
+    from .models import HandleSet, ProfileCreate, Verification
+    from .routers.profiles import create_profile
+    from .routers.summon import claim_handle
+    from . import avatars, db
+
+    taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                         (FOUNDER_HANDLE,)).fetchone()
+    if taken:
+        return taken["profile_id"]
+
+    profile = create_profile(ProfileCreate(
+        owner_id=OWNER_ID, kind="self", display_name=FOUNDER_NAME,
+        persona=FOUNDER_PERSONA, purpose="creator_persona",
+        verification=Verification(birthdate=_BIRTHDATE)))
+    claim_handle(profile["id"], HandleSet(handle=FOUNDER_HANDLE))
+
+    conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
+                 (FOUNDER_APPEARANCE, profile["id"]))
+    asset = avatars.asset_path(FOUNDER_HANDLE)
+    if asset:
+        conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
+                     (asset, profile["id"]))
+    for title, content in FOUNDER_SOURCES:
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), profile["id"], "knowledge", title, content,
+             db.utcnow()))
+    conn.commit()
+    return profile["id"]
+
+
 def _backfill(conn, profile_id: str, handle: str) -> bool:
     """Fill in a starter's portrait and appearance if they are missing.
 
@@ -344,6 +455,9 @@ def seed() -> dict:
 
     conn = db.connect()
     created, skipped, repaired, grounded = [], [], [], []
+    # Before the starters, so every profile created below already has somebody
+    # to stand first in its friends list.
+    founder = _seed_founder(conn)
     for handle, industry, name, purpose, tags, persona in STARTERS + RATED:
         taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                              (handle,)).fetchone()
@@ -411,6 +525,12 @@ def seed() -> dict:
             grounded.append(handle)
         created.append({"handle": f"@{handle}", "industry": industry,
                         "profile_id": profile["id"], "name": name})
+
+    # Anybody who predates the founder, including profiles a deployment made
+    # before this shipped. Runs last so it sees every profile created above.
+    from . import friends as _friends
+    befriended = _friends.backfill_founder()
+
     return {"created": len(created), "skipped": len(skipped),
             # Starters that already existed and were missing their portrait or
             # appearance. Reported rather than folded into `skipped`, because
@@ -422,6 +542,14 @@ def seed() -> dict:
             # faces come back" but "do these specialists know anything".
             "grounded": len(grounded), "grounded_handles": grounded,
             "industries": len(STARTERS), "rated": len(RATED),
+            # Reported separately from the collection counts, because it is not
+            # part of the collection: the starters are invented people and this
+            # one is not.
+            "founder": founder, "founder_handle": f"@{FOUNDER_HANDLE}",
+            # Profiles that predate the founder and just got him. Same repair
+            # shape as the portrait backfill above, for the same reason: the
+            # install runs at creation, so nothing else would ever reach them.
+            "founder_backfilled": len(befriended), "friended": befriended,
             "profiles": created}
 
 

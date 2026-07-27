@@ -267,6 +267,40 @@ def agent_light(x, y, colour, label):
             + text(x + 15, y + 4, label, 10.5, col, 700, spacing=0.2))
 
 
+def friends_list(y, entries):
+    """A profile's friends, founder first.
+
+    The founder's row carries a small badge saying so. Position alone would
+    leave a reader to infer why one face is always at the top, and the honest
+    answer — *this one comes as standard, and you can remove him* — is short
+    enough to just say.
+    """
+    out, yy = [], y
+    for name, sub, b64, founder in entries:
+        # The founder's row gives up its right end to the badge, so its
+        # subtitle has less room than the others. Caught here rather than in a
+        # render, which is how the same overlap got shipped on the agent groups.
+        if len(sub) > (26 if founder else 34):
+            raise ValueError(f"friend subtitle too long for the row: {sub!r}")
+        h = 62
+        out.append(rrect(CX, yy, CW, h, 15, "url(#gCard)", C["line"], 1))
+        if b64:
+            out.append(face(CX + 33, yy + 31, 40, b64))
+        else:
+            out.append(orb(CX + 33, yy + 31, 19))
+        out.append(text(CX + 62, yy + 26, name, 13, C["txt"], 700))
+        out.append(text(CX + 62, yy + 43, sub, 9.5, C["t2"], 500))
+        if founder:
+            bw = 52
+            bx = CX + CW - bw - 12
+            out.append(rrect(bx, yy + 20, bw, 18, 9, A(C["brandA"], 0.18),
+                             C["brandA"], 1))
+            out.append(text(bx + bw / 2, yy + 32, "STANDARD", 7.5,
+                            C["brandA"], 800, "middle", 0.4))
+        yy += h + 9
+    return out, yy
+
+
 def agent_groups(y, groups):
     """Three tappable groups, one per light. The whole agent list, folded.
 
@@ -869,6 +903,11 @@ def render(spec):
 
     if spec.get("groups"):
         block, y = agent_groups(y, spec["groups"])
+        out += block
+        y += 4
+
+    if spec.get("friends"):
+        block, y = friends_list(y, spec["friends"])
         out += block
         y += 4
 
@@ -2309,6 +2348,17 @@ SCREENS = [
         dict(icon="chat", color="brand", k="You", s="how did the letter turn out?"),
         dict(icon="person", color="cyan", k="Marcus Bell", s="two of three phases done"),
         dict(icon="eye", color="amber", k="The lights follow you", s="the work stays where it is"),
+    ]),
+    # The friends list, with the founder standing where he always stands. The
+    # STANDARD badge is doing real work: it says the position is a default
+    # rather than a ranking, which is the honest version and also the one that
+    # makes "remove" an obvious thing to be allowed to do.
+    dict(num=84, title="Friends", sub="Who this profile stands with",
+         accent="cyan", tab=1, friends=[
+        ("David Bianchi", "comes with every profile", frames.FOUNDER[1], True),
+        ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], False),
+        ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], False),
+        ("Priya Raman", "technology", frames.PORTRAITS[2][1], False),
     ]),
 ]
 
