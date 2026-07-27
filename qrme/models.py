@@ -227,10 +227,22 @@ class RoomMicLend(BaseModel):
     Everyone in the room is shown that you did."""
     interactor_id: str
     device: str = "smart_watch"
+    # Both vocabularies, because a device may be named the way the pairing
+    # registry named it (`lapel_mic`) or the way this module and jim/mic.py do
+    # (`lapel`). `roommic.FROM_WEARABLE` translates; the schema accepts either
+    # so a client holding a paired device can send what it already has.
+    #
+    # The room-facing kinds are listed and then refused by the module rather
+    # than rejected by the schema, because a 422 from a Literal says "not a
+    # valid value" and the true answer is "that microphone would pick up the
+    # other people in the room". The reason is the feature.
     mic_type: Literal["watch", "earbuds", "headset", "lapel", "clip_on",
                       "bone_conduction", "glasses", "collar_tag", "handheld",
+                      "lapel_mic", "clip_on_mic",
                       "speakerphone", "conference", "console", "laptop",
-                      "room_array", "doorbell"] = "watch"
+                      "room_array", "doorbell",
+                      "smart_speaker", "conference_puck", "tabletop_mic",
+                      "desk_mic"] = "watch"
     # The lender's own gain setting. Accepted so one client can send it to
     # either product, but a room grant always runs near-field — a room has
     # other people in it, and a channel wide enough to hear them is a channel

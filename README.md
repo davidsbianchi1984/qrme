@@ -1002,6 +1002,20 @@ cannot consent on behalf of the people they can hear. Room-facing kinds —
 speakerphone, conference puck, room array, laptop, console, doorbell — are
 refused by name with the reason, not quietly missing from a list.
 
+**A device can be lent under the name it was paired with.** The pairing
+registry calls a collar clip `lapel_mic`; this module and `jim/mic.py` call it
+`lapel`. Two vocabularies for one piece of hardware, and for a while nothing
+joined them — you could pair a lapel mic and be told `lapel_mic` was an unknown
+microphone type when you tried to lend it, from a registry whose own comment
+says it exists for this feature. `roommic.FROM_WEARABLE` translates rather than
+renames: renaming here would desync the table from `jim/mic.py`, which is kept
+in step by hand because the two products do not import each other, and renaming
+there would break already-paired rows. A test holds every kind in the registry
+against one side or the other, so adding a device forces the question *does
+this carry a microphone* at the moment somebody adds it rather than the moment
+a user tries to lend it. A refused kind gets its reason back, not "unknown" —
+that word reads as a gap somebody files a bug about, or works around.
+
 **It keys on its wearer *and* it runs near-field.** Two bounds, deliberately
 separate. `VOICE_FOCUS` is the filter: the channel locks onto the lender and
 drops the rest, which in a room is the other participants. `ROOM_GAIN` is the

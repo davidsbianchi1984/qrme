@@ -124,6 +124,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   owner token of a profile in it. Two tests, and the one that matters is the
   signed-in stranger rather than the anonymous caller.
 
+- **Pairing and lending were two vocabularies for the same hardware.**
+  `qrme/wearables.py` registers a collar clip as `lapel_mic`; `qrme/roommic.py`
+  is kept in step with `jim/mic.py` by hand and calls it `lapel`. Nothing
+  joined them, so you could pair a lapel mic and be told `lapel_mic` was an
+  unknown microphone type when you tried to lend it — from a registry whose own
+  comment says it exists for this feature. `FROM_WEARABLE` translates rather
+  than renames, because renaming either side breaks something real: the JIM
+  table is maintained by hand precisely because the products do not import each
+  other, and the registry names are already in paired rows. A test holds every
+  kind in the registry against one side or the other, so adding a device forces
+  the question *does this carry a microphone* when it is added rather than when
+  somebody tries to lend it. A refused kind now gets its reason back instead of
+  "unknown", which reads as a gap somebody files a bug about — or works around.
+
+- **`docs/tandem.md` was 92 lines short in PDI.** The "Reaching a real
+  clinician" section added in 0.3.0 and the channel 2 section never reached the
+  third repo, so the file that is meant to be byte-identical in three places
+  was identical in two. Resynced.
+
 - **Nothing tied the README's gallery to the screens on disk** —
   `tests/test_docs_gallery.py`, 3 tests. Three separate defects had already
   shipped through that gap: six stale SVGs left rendering after a renumbering,

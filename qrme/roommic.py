@@ -71,6 +71,30 @@ MIC_TYPES: dict[str, bool] = {          # name -> personal?
 }
 PERSONAL_TYPES = tuple(k for k, v in MIC_TYPES.items() if v)
 
+# The same hardware, under the name the *pairing* registry gives it.
+#
+# `qrme/wearables.py` is where a person registers the devices they own, and it
+# calls them `lapel_mic` and `clip_on_mic`; this module is kept in step with
+# `jim/mic.py` by hand, and that one calls them `lapel` and `clip_on`. Two
+# vocabularies for one collar clip, and for a while nothing joined them: you
+# could pair a lapel mic and then be told `lapel_mic` was an unknown
+# microphone type when you tried to lend it. The registry existed *for* this
+# feature — `wearables.KINDS` says so in its own comment — and the feature
+# arrived speaking a different language.
+#
+# Translated rather than renamed. Renaming here would desync the table from
+# `jim/mic.py`, which is maintained by hand precisely because the two products
+# do not import each other; renaming there would break paired rows. A test
+# asserts every microphone-bearing kind in the registry has a landing place.
+FROM_WEARABLE: dict[str, str] = {
+    "watch": "watch",
+    "earbuds": "earbuds",
+    "headset": "headset",
+    "lapel_mic": "lapel",
+    "clip_on_mic": "clip_on",
+    "glasses": "glasses",
+}
+
 # How wide the lent channel listens — also kept in step with `jim/mic.py` by
 # hand. Every level is **the lender at some distance**, never a level of
 # company: there is no setting whose answer to "what does it pick up" is "more
@@ -141,7 +165,24 @@ def lend(room_id: str, interactor_id: str, device: str,
             "so the profiles can already read everything you send")
     if not _is_participant(room_id, interactor_id):
         raise RoomMicError("only a participant can lend a microphone")
+    # A device may arrive under the name it was paired with. See FROM_WEARABLE:
+    # the registry and this table are two vocabularies for one collar clip, and
+    # the person lending it should not have to know which module they are
+    # talking to.
+    mic_type = FROM_WEARABLE.get(mic_type, mic_type)
     if mic_type not in MIC_TYPES:
+        # A kind the pairing registry refuses outright gets the refusal it
+        # earned, not "unknown". They are the room-facing devices, and the
+        # reason they are absent is a decision — "unknown" reads as a gap
+        # somebody will file a bug about, or worse, work around.
+        from . import wearables
+        if mic_type in wearables.REFUSED:
+            raise RoomMicError(
+                f"a {mic_type.replace('_', ' ')} is "
+                f"{wearables.REFUSED[mic_type]}: it would pick up the people "
+                "around you, and their voices are not yours to lend. A worn "
+                "or clipped-on one can: "
+                f"{', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)}")
         raise RoomMicError(
             f"unknown microphone type {mic_type!r} — one of "
             f"{', '.join(sorted(MIC_TYPES))}")

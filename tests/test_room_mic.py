@@ -406,3 +406,85 @@ def test_any_worn_microphone_can_be_lent(client):
                     headers=_as(sam["token"]))
     assert r.status_code == 201
     assert r.json()["mic_type"] == "lapel"
+
+
+# -- the pairing registry and the lending vocabulary --------------------------
+
+def test_a_device_can_be_lent_under_the_name_it_was_paired_with(client):
+    """Two vocabularies for one collar clip, and for a while nothing joined
+    them.
+
+    `qrme/wearables.py` is where somebody registers the devices they own and
+    it calls them `lapel_mic` and `clip_on_mic`; this module is kept in step
+    with `jim/mic.py` by hand and calls them `lapel` and `clip_on`. So you
+    could pair a lapel mic and then be told `lapel_mic` was an unknown
+    microphone type when you tried to lend it — and the registry exists *for*
+    this feature, which its own comment says.
+    """
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+
+    out = client.post(f"/rooms/{room['id']}/mic",
+                      json={"interactor_id": sam["id"], "mic_type": "lapel_mic",
+                            "device": "lapel_mic"},
+                      headers=_as(sam["token"]))
+    assert out.status_code == 201, out.text
+    assert out.json()["mic_type"] == "lapel"      # stored under one name
+
+
+def test_every_microphone_bearing_paired_kind_can_be_lent(client):
+    """The join, asserted rather than hoped for. A kind somebody can pair and
+    cannot lend is a dead end they find at the moment they try to use it.
+
+    The mic-bearing kinds are written out here rather than derived from
+    `FROM_WEARABLE`, which would make this test agree with whatever that table
+    happens to say. Every kind in the registry has to appear on one side or
+    the other, so adding one to `wearables.KINDS` fails here until somebody
+    decides whether it carries a microphone — which is the moment to decide
+    it, not the moment a user tries to lend it.
+    """
+    from qrme import roommic, wearables
+
+    BEARING = {"watch", "earbuds", "headset", "lapel_mic", "clip_on_mic",
+               "glasses"}
+    SILENT = {"band", "ring", "pendant"}
+
+    unclassified = set(wearables.KINDS) - BEARING - SILENT
+    assert not unclassified, (
+        "pairable devices nobody has said carry a microphone or not: "
+        f"{sorted(unclassified)}")
+
+    for kind in BEARING:
+        landed = roommic.FROM_WEARABLE.get(kind, kind)
+        assert landed in roommic.MIC_TYPES, (
+            f"{kind!r} can be paired but has nowhere to land")
+        assert roommic.MIC_TYPES[landed] is True, (
+            f"{kind!r} is pairable as a worn device but lends as room-facing")
+
+
+def test_a_refused_pairing_kind_gets_its_reason_not_unknown(client):
+    """"Unknown microphone type" reads as a gap somebody files a bug about, or
+    works around. The reason those devices are absent is the whole argument of
+    this module, so it is what comes back."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+
+    r = client.post(f"/rooms/{room['id']}/mic",
+                    json={"interactor_id": sam["id"],
+                          "mic_type": "smart_speaker"},
+                    headers=_as(sam["token"]))
+    assert r.status_code == 403
+    detail = r.json()["detail"]
+    assert "unknown" not in detail.lower()
+    assert "not yours to lend" in detail
+
+
+def test_the_vocabulary_route_lists_what_can_and_cannot_be_lent(client):
+    out = client.get("/microphones/vocabulary").json()
+    assert "watch" in out["personal"]
+    refused = {r["kind"] for r in out["refused"]}
+    assert "speakerphone" in refused and "room_array" in refused
+    assert all(r["why"] for r in out["refused"])
+    assert out["room_gain"] == "near_field" and out["voice_focus"] is True
