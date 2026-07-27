@@ -26,13 +26,27 @@ class PageEdit(BaseModel):
     top_friends: list[str] | None = Field(
         None, description=f"Up to {pages.TOP_FRIENDS} friend profile ids, in "
                           "the order they should appear.")
+    html: str | None = Field(
+        None, max_length=pages.MAX_HTML,
+        description="Your own markup. Sanitised through an allowlist before "
+                    "storage; what was stripped comes back in html_removed.")
+    links: list[dict] | None = Field(
+        None, description="[{label, url}] — http, https or mailto.")
+    show_offers: bool | None = Field(
+        None, description="Surface this profile's marketplace listings on the "
+                          "page.")
 
 
 @router.get("/pages/themes")
 def list_themes() -> dict:
     """The theme presets. A closed set on purpose — see `qrme/pages.py`."""
+    from .. import markup
     return {"themes": pages.theme_catalog(), "layouts": list(pages.LAYOUTS),
-            "top_friends": pages.TOP_FRIENDS}
+            "top_friends": pages.TOP_FRIENDS,
+            # Published so an editor can grey out what it knows will be
+            # stripped, rather than letting somebody write it and lose it.
+            "html_tags": sorted(markup.ALLOWED_TAGS),
+            "css_properties": sorted(markup.ALLOWED_CSS)}
 
 
 @router.get("/profiles/{profile_id}/page")
@@ -52,6 +66,7 @@ def edit_page(profile_id: str, body: PageEdit, request: Request) -> dict:
         return pages.set_page(
             profile_id, theme=body.theme, accent=body.accent,
             layout=body.layout, tagline=body.tagline, about=body.about,
-            top_friends=body.top_friends)
+            top_friends=body.top_friends, html=body.html, links=body.links,
+            show_offers=body.show_offers)
     except pages.PageError as exc:
         raise HTTPException(422, str(exc)) from None

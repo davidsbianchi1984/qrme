@@ -14,13 +14,14 @@ was worth putting first.
 
 Three things this deliberately does not do.
 
-**No raw HTML or CSS.** MySpace let people paste arbitrary markup into their
-profile, and the result was the golden age of drive-by script injection — a
-page could rewrite the page around it, phish the viewer, or redirect them
-somewhere else entirely. The nostalgia worth keeping is the *feeling* of a
-place you decorated; the implementation worth keeping is none of it. Themes are
-a closed set and the colour is validated, so a page can be personal without
-being a script host.
+**Real HTML, through an allowlist.** People can write their own markup — that
+is the thing anybody actually remembers about a MySpace profile — and every tag
+and attribute goes through :mod:`qrme.markup` first. Raw markup is how the Samy
+worm took MySpace down in 2005: script smuggled through a profile, running in
+the browser of everyone who looked at it. The nostalgia is worth keeping; that
+is not. What the filter strips is reported back, so the editor can say *your
+<script> was dropped* rather than silently handing back a page that does less
+than its author wrote.
 
 **The Top 8 does not reorder the friends list.** The founder pins are fixed
 there, and this is a showcase rather than a second source of truth for the same
@@ -38,7 +39,7 @@ from __future__ import annotations
 import json
 import re
 
-from . import db, friends, moderation
+from . import db, friends, markup, moderation
 
 # The presets, named for what they feel like rather than what they contain.
 # A closed set, because "pick a theme" is a decision a person can make in two
@@ -64,6 +65,8 @@ DEFAULT_LAYOUT = "classic"
 
 MAX_TAGLINE = 90
 MAX_ABOUT = 1200
+MAX_HTML = 20000
+MAX_LINKS = 12
 TOP_FRIENDS = 8              # the number is the joke, and it is a good number
 
 _HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -83,10 +86,36 @@ def theme_catalog() -> list[dict]:
     return [{"id": k, **v} for k, v in THEMES.items()]
 
 
+def _check_links(links: list[dict]) -> list[dict]:
+    """Outbound links from a page — a storefront needs somewhere to point.
+
+    Same URL rule the markup filter applies, for the same reason: an unknown
+    scheme is not a harmless one.
+    """
+    if len(links) > MAX_LINKS:
+        raise PageError(f"a page carries at most {MAX_LINKS} links")
+    out = []
+    for link in links:
+        label = (link.get("label") or "").strip()
+        url = (link.get("url") or "").strip()
+        if not label or not url:
+            raise PageError("a link needs a label and a url")
+        if len(label) > 60:
+            raise PageError("a link label is at most 60 characters")
+        if not markup._safe_url(url):
+            raise PageError(
+                f"{url!r} is not a link a page may carry — http, https and "
+                f"mailto only")
+        out.append({"label": label, "url": url})
+    return out
+
+
 def set_page(profile_id: str, *, theme: str | None = None,
              accent: str | None = None, layout: str | None = None,
              tagline: str | None = None, about: str | None = None,
              top_friends: list[str] | None = None,
+             html: str | None = None, links: list[dict] | None = None,
+             show_offers: bool | None = None,
              author: dict | None = None) -> dict:
     """Update the parts of the page the owner controls.
 
@@ -117,20 +146,37 @@ def set_page(profile_id: str, *, theme: str | None = None,
     if top_friends is not None:
         top_friends = _check_top(profile_id, top_friends)
 
+    html_removed = None
+    if html is not None:
+        if len(html) > MAX_HTML:
+            raise PageError(f"page markup is at most {MAX_HTML} characters")
+        # Stored already-safe. Sanitising on the way in rather than on the way
+        # out means there is exactly one moment where unsafe markup could
+        # exist, and it is before anything is written — rather than one per
+        # renderer, each of which could forget.
+        html, removed = markup.sanitise(html)
+        html_removed = json.dumps(removed)
+
+    if links is not None:
+        links = _check_links(links)
+
     current = _row(profile_id)
     now = db.utcnow()
     if current is None:
         db.connect().execute(
             "INSERT INTO profile_pages (profile_id, theme, accent, layout,"
-            " tagline, about, about_status, about_flag, top_friends,"
-            " updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            " tagline, about, about_status, about_flag, top_friends, html,"
+            " html_removed, links, show_offers, updated_at)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (profile_id, theme or DEFAULT_THEME, accent,
              layout or DEFAULT_LAYOUT, tagline, about, status, flag,
-             json.dumps(top_friends or []), now))
+             json.dumps(top_friends or []), html, html_removed or "[]",
+             json.dumps(links or []), int(bool(show_offers)), now))
     else:
         db.connect().execute(
             "UPDATE profile_pages SET theme=?, accent=?, layout=?, tagline=?,"
-            " about=?, about_status=?, about_flag=?, top_friends=?,"
+            " about=?, about_status=?, about_flag=?, top_friends=?, html=?,"
+            " html_removed=?, links=?, show_offers=?,"
             " updated_at=? WHERE profile_id=?",
             (theme if theme is not None else current["theme"],
              accent if accent is not None else current["accent"],
@@ -141,6 +187,12 @@ def set_page(profile_id: str, *, theme: str | None = None,
              flag if about is not None else current["about_flag"],
              json.dumps(top_friends) if top_friends is not None
              else current["top_friends"],
+             html if html is not None else current["html"],
+             html_removed if html_removed is not None
+             else current["html_removed"],
+             json.dumps(links) if links is not None else current["links"],
+             int(bool(show_offers)) if show_offers is not None
+             else current["show_offers"],
              now, profile_id))
     db.connect().commit()
     return page(profile_id, owner=True)
@@ -193,6 +245,19 @@ def page(profile_id: str, owner: bool = False) -> dict:
         # out rather than 404 the page it sits on.
         top = [by_id[fid] for fid in wanted if fid in by_id]
 
+    # The storefront half: what this profile is offering, straight from the
+    # marketplace rather than retyped onto the page. A second copy of a price
+    # is a second price that can be wrong.
+    offers = []
+    if row and row["show_offers"]:
+        offers = [
+            {"id": r["id"], "kind": r["kind"], "title": r["title"],
+             "blurb": r["blurb"], "area": r["area"]}
+            for r in db.connect().execute(
+                "SELECT id, kind, title, blurb, area FROM listings"
+                " WHERE profile_id=? ORDER BY created_at DESC LIMIT 8",
+                (profile_id,)).fetchall()]
+
     return {
         "profile_id": profile_id,
         "theme": {"id": theme_id, **theme},
@@ -202,6 +267,13 @@ def page(profile_id: str, owner: bool = False) -> dict:
         "about": about,
         "about_blocked": blocked,
         "top_friends": top,
+        # Already sanitised in storage — a renderer never sees raw markup, so
+        # no renderer can forget to clean it.
+        "html": (row["html"] if row else None),
+        "html_removed": (json.loads(row["html_removed"]) if row else []),
+        "links": (json.loads(row["links"]) if row else []),
+        "offers": offers,
+        "show_offers": bool(row["show_offers"]) if row else False,
         "customised": row is not None,
         "updated_at": (row["updated_at"] if row else None),
     }

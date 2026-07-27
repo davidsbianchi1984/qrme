@@ -758,12 +758,36 @@ Six themes — Midnight, Starfield, Sunset, Chrome, Meadow, Paper — a validate
 
 Three things it deliberately does not do:
 
-**No raw HTML or CSS.** MySpace let people paste arbitrary markup into a
-profile, which is why it was also the golden age of drive-by script injection: a
-page could rewrite the page around it, phish the viewer, or send them somewhere
-else. The nostalgia worth keeping is the *feeling* of a place you decorated. The
-implementation worth keeping is none of it. Themes are a closed set, the colour
-is validated, and a test asserts there is no field that stores markup as markup.
+**Real HTML, through an allowlist.** You write your own markup — that is the
+thing anybody actually remembers about a MySpace profile — and every tag and
+attribute goes through [`qrme/markup.py`](qrme/markup.py) before it is stored.
+
+Raw markup is not a stylistic objection. In October 2005 the **Samy worm** used
+exactly this feature: script smuggled through a profile, executing in the
+browser of everyone who viewed it, a million friends in about twenty hours, and
+the site taken offline. The nostalgia is worth reviving; that is not.
+
+| in | out |
+| --- | --- |
+| `<b> <i> <u> <marquee> <center>` and 30 more | kept — including the 2004 ones, which cannot execute |
+| `style="color: …"` and 30 visual properties | kept |
+| `<script> <iframe> <object> <form> <svg>` | removed, content and all |
+| `onclick`, `onerror`, every `on*` | removed — this is where injection actually lives |
+| `javascript:` and `data:` URLs | removed; only http, https, mailto and fragments survive |
+| `@import`, `expression()`, `behavior:`, `url()` in CSS | removed — CSS can exfiltrate and hijack layout |
+| an unknown tag | dropped, **its words kept** — eating somebody's writing looks like a bug |
+
+Sanitised **on the way in**, so there is exactly one moment unsafe markup could
+exist rather than one per renderer, each of which could forget. What was
+stripped comes back as `html_removed`, so an editor can say *your `<script>` was
+dropped* instead of quietly returning a page that does less than its author
+wrote. `GET /pages/themes` publishes the allowed tags and properties so an
+editor can grey out what it knows will be lost.
+
+**A storefront, not a second copy of one.** `show_offers` surfaces the
+profile's own marketplace listings on the page, read from `listings` rather
+than retyped — a second copy of a price is a second price that can be wrong —
+and `links` carries up to twelve outbound links under the same URL rule.
 
 **The Top 8 does not reorder the friends list.** It features friends rather than
 creating them — a profile you are not connected to is refused — and it is a

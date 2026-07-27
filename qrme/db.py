@@ -1228,6 +1228,10 @@ CREATE TABLE IF NOT EXISTS profile_pages (
     about_status TEXT NOT NULL DEFAULT 'approved',  -- approved | blocked
     about_flag   TEXT,
     top_friends  TEXT NOT NULL DEFAULT '[]',  -- JSON, owner's order
+    html         TEXT,                       -- sanitised: see qrme/markup.py
+    html_removed TEXT NOT NULL DEFAULT '[]',  -- JSON: what the filter stripped
+    links        TEXT NOT NULL DEFAULT '[]',  -- JSON [{label, url}]
+    show_offers  INTEGER NOT NULL DEFAULT 0,  -- surface this profile's listings
     updated_at   TEXT NOT NULL
 );
 

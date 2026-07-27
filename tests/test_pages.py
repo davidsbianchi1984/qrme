@@ -187,21 +187,74 @@ def test_a_tagline_has_a_length(client):
     assert r.status_code == 422
 
 
-def test_no_page_field_stores_markup_as_markup(client):
-    """There is no field that takes HTML, and this is the test that says so.
-    If somebody adds one, this fails and they have to argue with the module
-    docstring rather than with nobody."""
+def test_markup_is_stored_only_ever_sanitised(client):
+    """This test used to assert no field stored markup at all. That changed on
+    purpose — people can write real HTML now — so it asserts the invariant that
+    replaced it: whatever reaches the column has already been through the
+    allowlist, and no renderer is trusted to clean anything.
+    """
+    from qrme import db
     me = make_profile(client, display_name="Injector")
-    payload = "<script>alert(1)</script>"
+    payload = ('<p onclick="alert(1)">hi</p><script>steal()</script>'
+               '<a href="javascript:alert(1)">x</a>')
     client.put(f"/profiles/{me['id']}/page",
-               json={"tagline": payload, "about": payload},
+               json={"html": payload, "tagline": payload[:80]},
                headers=auth_header(me))
     row = db.connect().execute(
         "SELECT * FROM profile_pages WHERE profile_id=?",
         (me["id"],)).fetchone()
-    # Stored verbatim as *text* — never interpreted, and the columns are a
-    # fixed set rather than a markup blob. The guarantee is that no rendering
-    # path treats any of them as markup.
-    assert set(row.keys()) == {
-        "profile_id", "theme", "accent", "layout", "tagline", "about",
-        "about_status", "about_flag", "top_friends", "updated_at"}
+
+    stored = (row["html"] or "").lower()
+    for banned in ("<script", "onclick", "javascript:"):
+        assert banned not in stored
+
+    # The tagline is not markup and is never rendered as any: it is plain text
+    # wherever it appears, so it is stored verbatim and escaped at draw time.
+    assert row["tagline"] == payload[:80]
+
+
+# -- the storefront ----------------------------------------------------------
+
+def test_a_page_can_carry_links(client):
+    me = make_profile(client, display_name="Trader")
+    r = client.put(f"/profiles/{me['id']}/page",
+                   json={"links": [{"label": "Book a session",
+                                    "url": "https://example.com/book"}]},
+                   headers=auth_header(me))
+    assert r.status_code == 200, r.text
+    assert r.json()["links"][0]["label"] == "Book a session"
+
+
+def test_a_link_cannot_be_a_script_url(client):
+    """The same URL rule the markup filter applies, for the same reason: an
+    unknown scheme is not a harmless one."""
+    me = make_profile(client, display_name="Trader")
+    r = client.put(f"/profiles/{me['id']}/page",
+                   json={"links": [{"label": "click",
+                                    "url": "javascript:alert(1)"}]},
+                   headers=auth_header(me))
+    assert r.status_code == 422
+
+
+def test_offers_come_from_the_marketplace_rather_than_being_retyped(client):
+    """A second copy of a price is a second price that can be wrong."""
+    from qrme import db
+    seed.seed()
+    marcus = db.connect().execute(
+        "SELECT profile_id FROM handles WHERE handle='marcus_bell'"
+    ).fetchone()["profile_id"]
+
+    off = pages.page(marcus)["offers"]
+    assert off == []                       # nothing surfaced until asked for
+
+    pages.set_page(marcus, show_offers=True)
+    listed = pages.page(marcus)["offers"]
+    assert listed and "Marcus Bell" in listed[0]["title"]
+    rows = db.connect().execute(
+        "SELECT title FROM listings WHERE profile_id=?", (marcus,)).fetchall()
+    assert listed[0]["title"] in [r["title"] for r in rows]
+
+
+def test_offers_are_off_until_the_owner_turns_them_on(client):
+    me = make_profile(client, display_name="Quiet")
+    assert client.get(f"/profiles/{me['id']}/page").json()["show_offers"] is False
