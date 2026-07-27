@@ -274,19 +274,21 @@ one seeded by `POST /marketplace/seed`. **The AI mark is burned into each
 portrait's own pixels**, so it survives a screenshot, a hotlink, or a crop:
 these images carry their disclosure wherever they end up, including here.
 
-Each one is shown as **the card the app actually gives it** — screen 5's
-Profile Home: the avatar bubble, the role, the stat tiles, and the Chat button
-under them. The gallery used to be a portrait with a name and an industry
+Each one is shown as **the card the app actually gives it** — screen 80, the
+profile front page a visitor lands on: the avatar bubble, the role, the rating
+people who talked to it left, the skill chips, and Memory / Relationships /
+Engagement under them. The gallery used to be a portrait with a name and an industry
 captioned beneath, which is a directory listing rather than a profile, and it
 was five columns wide — about 590px of content on a phone that offers 390, so
 the fourth column was sliced mid-word and the fifth never appeared at all.
 Two columns of whole cards fit.
 
-**The tiles carry facts, not the mock's numbers.** Screen 5 reads *Memory 247 ·
-Relationships 12 · Engagement 92%*, which is fine for one illustrative mock and
-would be a fabrication repeated 34 times here: nobody has talked to these
-profiles yet. What each card reports is true of that starter — the size of the
-Field Pack grounding it, and how many skills it is tagged with.
+**The figures are sample values, identical on every card.** A freshly seeded
+starter has no reviews, no relationships and no engagement, because nobody has
+talked to it yet — those are the app's own mock numbers, repeated unchanged so
+that thirty-four cards reading *4.0 · 37 reviews* are self-evidently a template
+rather than a measurement. The name, role, portrait, industry and skills are
+real, read straight out of `qrme/seed.py`.
 
 The bubble inside each card is baked by `tools/bubble_portraits.py` into
 `docs/portraits/bubbles/`, because GitHub's markdown sanitiser strips the

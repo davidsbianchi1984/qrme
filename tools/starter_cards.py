@@ -6,14 +6,19 @@ bubble, a role, stat tiles and a **Chat** button, and the page was showing a
 thinner thing than the app does. These cards are that screen, one per starter,
 sized for a gallery cell.
 
-**The stat tiles carry real facts, not the screen's demo numbers.** Screen 5
-reads *Memory 247 · Relationships 12 · Engagement 92%*, which is fine for one
-illustrative mock and wrong here: stamping invented engagement figures onto 34
-public cards would be publishing data about profiles nobody has talked to yet.
-What each card shows instead is true of that starter — the size of the Field
-Pack it is grounded in, and how many skills it is tagged with. The rated
-starter has no Field Pack (there is no adult-industry pack, deliberately), so
-its tiles say so rather than showing a zero that looks like a failure.
+The card follows **screen 80**, the profile front page a visitor lands on: the
+bubble, the name, the role, the rating other people gave it, the skill chips,
+and the call to action — plus screen 5's Memory, Relationships and Engagement
+tiles beneath them.
+
+**The figures are the product's own sample values, and they are identical on
+every card.** A freshly seeded starter has nothing: no reviews, no
+relationships, no messages, no engagement, because nobody has talked to it yet.
+Reporting those zeros would render 34 dead cards; inventing a different number
+per profile would be fabricating activity. The compromise is the app's existing
+mock figures, repeated unchanged — thirty-four cards all reading *4.0 · 37
+reviews* is self-evidently a template rather than a measurement, and the README
+says so in a line under the gallery.
 
 SVG rather than PNG, with the portrait embedded as base64: the text stays crisp
 at any display width and selectable in the file, and GitHub renders these the
@@ -87,20 +92,54 @@ def wrap(text: str, limit: int) -> list[str]:
     return list(best)
 
 
-def tiles(handle: str, industry: str, tags: list[str]) -> list[tuple]:
-    """(label, value, unit, colour) — every one of them true of this starter."""
-    if handle == "vivienne_sable":       # rated tier: no pack exists to install
-        return [("Field Pack", "None", "rated tier", C["amber"]),
-                ("Skills", str(len(tags)), "tagged", C["brandA"])]
-    return [("Field Pack", "3", "items", C["brandA"]),
-            ("Skills", str(len(tags)), "tagged", C["amber"])]
+# The app's own sample figures (screens 5 and 80), used verbatim and identically
+# on every card. See the module docstring for why these are not per-profile.
+SAMPLE = {"rating": 4.0, "reviews": 37, "memory": "247", "relationships": "12",
+          "engagement": "92%"}
+
+
+def tiles() -> list[tuple]:
+    """(label, value, unit, colour) — the three the profile screen leads with."""
+    return [("Memory", SAMPLE["memory"], "entries", C["brandA"]),
+            ("Relationships", SAMPLE["relationships"], "connections", C["amber"]),
+            ("Engagement", SAMPLE["engagement"], "High", C["green"])]
+
+
+def stars(x: float, y: float, rating: float) -> str:
+    """Five glyphs, filled to the rating. Drawn rather than typed so the
+    half-filled case cannot render as a missing-glyph box on a phone."""
+    out = []
+    for i in range(5):
+        cx, filled = x + i * 15, i < int(round(rating))
+        pts = []
+        for k in range(10):
+            r = 6.2 if k % 2 == 0 else 2.7
+            import math
+            a = -math.pi / 2 + k * math.pi / 5
+            pts.append(f"{cx + r * math.cos(a):.1f},{y + r * math.sin(a):.1f}")
+        out.append(f'<polygon points="{" ".join(pts)}" '
+                   f'fill="{C["gold"] if filled else "none"}" '
+                   f'stroke="{C["gold"]}" stroke-width="1" opacity="'
+                   f'{1 if filled else 0.45}"/>')
+    return "".join(out)
 
 
 def card(handle: str, industry: str, display: str, tags: list[str]) -> str:
     role = ROLES[handle].replace("&amp;", "&")
     png = base64.b64encode((BUBBLES / f"{handle}.webp").read_bytes()).decode()
     role_lines = wrap(role, 30)
-    H = 430 + 16 * (len(role_lines) - 1)
+    chips = [t for t in tags if t != industry.replace("_", "-")][:3]
+
+    # Height is derived, not guessed. The first cut used a constant plus a
+    # nudge per role line and left every card with a strip of dead space under
+    # the button — and would have clipped the moment a chip row wrapped.
+    chip_rows, row_w = 1, 0.0
+    for label in chips:
+        w = 16 + len(label) * 6.4
+        if row_w + w > W - PAD * 2:
+            chip_rows, row_w = chip_rows + 1, 0.0
+        row_w += w + 6
+    H = int(398 + 16 * len(role_lines) + 26 * (chip_rows - 1) + PAD)
 
     o: list[str] = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
@@ -138,40 +177,63 @@ def card(handle: str, industry: str, display: str, tags: list[str]) -> str:
                  f'{esc(line)}</text>')
         ry += 16
 
-    o.append(f'<circle cx="{cx-34}" cy="{ry+2}" r="3.5" fill="{C["green"]}"/>')
-    o.append(f'<text x="{cx-25}" y="{ry+6}" font-family="{FONT}" '
-             f'font-size="12" font-weight="600" fill="{C["green"]}">'
-             f'{esc(industry.replace("_", " "))}</text>')
+    # Rating other people gave it — screen 80 leads with this, above the
+    # skills, because "what did people who talked to it think" outranks any
+    # claim the profile makes about itself.
+    ry += 6
+    o.append(stars(cx - 70, ry, SAMPLE["rating"]))
+    o.append(f'<text x="{cx+14}" y="{ry+5}" font-family="{FONT}" '
+             f'font-size="13" font-weight="700" fill="{C["txt"]}">'
+             f'{SAMPLE["rating"]:.1f} · {SAMPLE["reviews"]} reviews</text>')
+    ry += 26
 
-    ty = ry + 24
-    tw = (W - PAD * 2 - 10) / 2
-    for i, (label, value, unit, col) in enumerate(tiles(handle, industry, tags)):
-        tx = PAD + i * (tw + 10)
-        o.append(f'<rect x="{tx}" y="{ty}" width="{tw}" height="62" rx="14" '
-                 f'fill="url(#tile)" stroke="{C["line"]}"/>')
-        o.append(f'<text x="{tx+12}" y="{ty+22}" font-family="{FONT}" '
-                 f'font-size="11" fill="{C["t2"]}">{esc(label)}</text>')
-        o.append(f'<text x="{tx+12}" y="{ty+48}" font-family="{FONT}" '
-                 f'font-size="20" font-weight="800" fill="{col}">{esc(value)}</text>')
-        o.append(f'<text x="{tx+tw-10}" y="{ty+48}" text-anchor="end" '
-                 f'font-family="{FONT}" font-size="10" fill="{C["t2"]}">'
+    o.append(f'<text x="{PAD}" y="{ry}" font-family="{FONT}" font-size="10" '
+             f'font-weight="700" letter-spacing="0.8" fill="{C["t3"]}">'
+             f'SKILLS</text>')
+    ry += 14
+    sx = PAD
+    for label in chips:
+        w = 16 + len(label) * 6.4
+        if sx + w > W - PAD:
+            sx, ry = PAD, ry + 26
+        o.append(f'<rect x="{sx}" y="{ry}" width="{w:.1f}" height="22" rx="11" '
+                 f'fill="{S.A(C["brandA"], 0.14)}" stroke="{C["brandA"]}"/>')
+        o.append(f'<text x="{sx + w/2:.1f}" y="{ry+15}" text-anchor="middle" '
+                 f'font-family="{FONT}" font-size="10.5" font-weight="600" '
+                 f'fill="{C["brandA"]}">{esc(label)}</text>')
+        sx += w + 6
+    ry += 34
+
+    # Memory · Relationships · Engagement, the three the profile screen puts
+    # under the fold. Three across rather than two-up, so the card stays short
+    # enough that two fit a phone row.
+    tw = (W - PAD * 2 - 12) / 3
+    for i, (label, value, unit, col) in enumerate(tiles()):
+        tx = PAD + i * (tw + 6)
+        o.append(f'<rect x="{tx:.1f}" y="{ry}" width="{tw:.1f}" height="58" '
+                 f'rx="13" fill="url(#tile)" stroke="{C["line"]}"/>')
+        o.append(f'<text x="{tx + tw/2:.1f}" y="{ry+17}" text-anchor="middle" '
+                 f'font-family="{FONT}" font-size="9" fill="{C["t2"]}">'
+                 f'{esc(label)}</text>')
+        o.append(f'<text x="{tx + tw/2:.1f}" y="{ry+38}" text-anchor="middle" '
+                 f'font-family="{FONT}" font-size="17" font-weight="800" '
+                 f'fill="{col}">{esc(value)}</text>')
+        o.append(f'<text x="{tx + tw/2:.1f}" y="{ry+50}" text-anchor="middle" '
+                 f'font-family="{FONT}" font-size="8.5" fill="{C["t2"]}">'
                  f'{esc(unit)}</text>')
+    by = ry + 72
 
-    by = ty + 78
+    # How the button addresses them. A plain given name for most; an honorific
+    # plus surname for the ones who carry one, because "Talk to Osei" reads as
+    # a stranger being curt and "Talk to Dr. Osei" reads as the product.
+    parts = display.split()
+    first = (f"{parts[0]} {parts[-1]}"
+             if parts[0] in ("Dr.", "Chef", "Coach") else parts[0])
     o.append(f'<rect x="{PAD}" y="{by}" width="{W-PAD*2}" height="44" rx="14" '
              f'fill="url(#brand)"/>')
     o.append(f'<text x="{cx}" y="{by+28}" text-anchor="middle" '
-             f'font-family="{FONT}" font-size="16" font-weight="700" '
-             f'fill="#fff">Chat</text>')
-
-    gw = (W - PAD * 2 - 10) / 2
-    for i, label in enumerate(("Customize", "View Memory")):
-        gx = PAD + i * (gw + 10)
-        o.append(f'<rect x="{gx}" y="{by+52}" width="{gw}" height="38" rx="12" '
-                 f'fill="none" stroke="{C["line"]}"/>')
-        o.append(f'<text x="{gx+gw/2}" y="{by+76}" text-anchor="middle" '
-                 f'font-family="{FONT}" font-size="12.5" font-weight="600" '
-                 f'fill="{C["t2"]}">{label}</text>')
+             f'font-family="{FONT}" font-size="15" font-weight="700" '
+             f'fill="#fff">Talk to {esc(first)}</text>')
 
     o.append("</svg>")
     return "\n".join(o)
