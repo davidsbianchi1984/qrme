@@ -136,6 +136,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   for two states, and writing it into `avatar` would mean turning anonymity off
   showed it instead of the real face.
 
+  An **empty bubble shows its owner a photo with a plus** — the control, in the
+  place it acts on. Not to visitors: they keep the plain silhouette, because an
+  "add a picture" button on somebody else's profile is a button that is not
+  theirs to press, and would report the absence as a gap rather than the
+  default it is. `avatars.render()` is unchanged and the affordance rides on
+  `editor_asset`, which only the owner's own response carries.
+
 - **Anonymous profiles get a fixed name they cannot change** —
   `identity.anonymous_name()`, 7 tests. Every one of them used to be called
   *"anonymous persona"*, identically, which is unusable the moment two are in

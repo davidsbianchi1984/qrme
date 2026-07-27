@@ -211,8 +211,14 @@ def emblems() -> dict:
     vocabulary invented for pictures: a field somebody can work in is a field
     they can signal.
     """
+    from .. import avatars
+
     return {"emblems": identity.emblems(),
             "plain": "the silhouette everybody starts with",
+            # The control an owner taps on an empty bubble. Not what a visitor
+            # sees — they get the silhouette, because an "add a picture" button
+            # on somebody else's profile is a button that is not theirs.
+            "add_picture": avatars.ADD_PHOTO,
             "own_image": "you can upload your own instead — these are a "
                          "shortcut, not the only option",
             "note": "a photograph of your own face is allowed and undoes your "

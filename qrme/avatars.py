@@ -97,6 +97,16 @@ PHOTO_ROUTE = "/photos"
 FIGURE_ROUTE = "/figures"
 SILHOUETTE = f"{FIGURE_ROUTE}/silhouette.svg"
 
+# The empty bubble as its **owner** sees it: a photo with a plus, inviting them
+# to put something in it.
+#
+# Deliberately not what `render()` returns. A visitor looking at an anonymous
+# profile that has set no picture gets the plain silhouette, because showing
+# them this would be offering a button that is not theirs to press — and would
+# report the absence as a gap in somebody's profile rather than as the default
+# it is. This is a control, and controls belong to the person who can use them.
+ADD_PHOTO = f"{FIGURE_ROUTE}/add-photo.svg"
+
 
 def portraits_dir():
     from pathlib import Path

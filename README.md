@@ -1994,6 +1994,15 @@ yours" — the honest list of what anonymity does not survive.
 overlay module asks it: an anonymous profile wearing another person's face is
 impersonation with a layer of deniability on top.
 
+**An empty bubble shows its owner a photo with a plus**, because an empty
+bubble is an invitation to them and a default to everybody else. A visitor
+looking at an anonymous profile that has set nothing still gets the plain
+silhouette — offering a stranger an "add a picture" control would be a button
+that is not theirs to press, and would report the absence as a gap in
+somebody's profile rather than as the way it ships. So `avatars.render()` keeps
+returning the silhouette and the affordance rides on `editor_asset`, which only
+the owner's own response carries.
+
 The picture lives in its own table, never in `profiles.avatar`: they are
 pictures for two different states, exactly like a display name and an anonymous
 one, and writing it into `avatar` would mean turning anonymity off showed it

@@ -776,3 +776,42 @@ def test_only_the_owner_chooses_it(client):
     assert client.put(f"/profiles/{a['id']}/emblem",
                       json={"emblem": "legal"},
                       headers=_anon(client)).status_code == 401
+
+
+def test_an_empty_bubble_offers_its_owner_a_photo_and_a_plus(client):
+    """The control, in the bubble, for the person who can use it."""
+    from qrme import avatars
+
+    p = _hidden(client)
+    out = client.put(f"/profiles/{p['id']}/emblem", json={},
+                     headers=auth_header(p)).json()
+    assert out["editor_asset"] == avatars.ADD_PHOTO
+
+    catalogue = client.get("/identity/emblems").json()
+    assert catalogue["add_picture"] == avatars.ADD_PHOTO
+    assert (avatars.figures_dir() / "add-photo.svg").is_file()
+
+
+def test_a_visitor_never_sees_the_add_button(client):
+    """Showing a stranger "add a picture" on somebody else's profile offers a
+    button that is not theirs to press, and reports the absence as a gap in
+    the profile rather than as the default it is."""
+    from qrme import avatars
+
+    p = _hidden(client)
+    art = avatars.render(p["id"])
+    assert art["asset"] == avatars.SILHOUETTE
+    assert art["asset"] != avatars.ADD_PHOTO
+
+    seen = client.get(f"/profiles/{p['id']}", headers=_anon(client)).json()
+    assert "add-photo" not in str(seen)
+
+
+def test_the_add_button_gives_way_once_something_is_in_it(client):
+    from qrme import avatars
+
+    p = _hidden(client)
+    out = client.put(f"/profiles/{p['id']}/emblem", json={"emblem": "trades"},
+                     headers=auth_header(p)).json()
+    assert out["editor_asset"].endswith("emblem-trades.svg")
+    assert out["editor_asset"] != avatars.ADD_PHOTO

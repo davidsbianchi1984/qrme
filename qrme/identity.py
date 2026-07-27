@@ -616,7 +616,7 @@ EMBLEM_FIELDS: tuple[str, ...] = (
 
 
 def emblems() -> list[dict]:
-    """The pictures an anonymous profile may choose from."""
+    """The preset pictures an anonymous profile may choose from."""
     from . import avatars
     return [{"emblem": key, "asset": f"{avatars.FIGURE_ROUTE}/emblem-{key}.svg",
              "means": f"works in {key}"} for key in EMBLEM_FIELDS]
@@ -705,10 +705,18 @@ def set_picture(profile_id: str, emblem: str | None = None,
             (profile_id, emblem, asset, db.utcnow()))
     conn.commit()
 
+    from . import avatars
+
     out = {
         "profile_id": profile_id,
         "emblem": emblem,
         "asset": emblem_asset(profile_id),
+        # What the *owner's* editor should draw in the bubble. The photo-plus
+        # while it is empty, because an empty bubble is an invitation to them
+        # and a default to everybody else — `avatars.render` keeps returning
+        # the plain silhouette to visitors either way.
+        "editor_asset": (avatars.ADD_PHOTO if emblem is None and asset is None
+                         else emblem_asset(profile_id)),
         "own_image": asset is not None,
         "shown": bool(profile["anonymous"]),
         "note": ("in the bubble now" if profile["anonymous"] else

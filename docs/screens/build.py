@@ -68,6 +68,22 @@ def icon(name, cx, cy, col, s=1.0):
     if name == "person":
         return (f'<circle cx="{cx}" cy="{cy-sc(4)}" r="{sc(3.6)}" {st}/>'
                 f'<path d="M{cx-sc(6)} {cy+sc(7)} c0 -{sc(6)} {sc(12)} -{sc(6)} {sc(12)} 0" {st}/>')
+    if name == "addphoto":
+        # The same mark as qrme/assets/figures/add-photo.svg: a picture frame
+        # with a plus badged on. Drawn here too so the screen shows the control
+        # rather than a word describing it.
+        return (f'<rect x="{cx-sc(9)}" y="{cy-sc(7.5)}" width="{sc(15)}" '
+                f'height="{sc(12)}" rx="{sc(2.4)}" {st}/>'
+                f'<circle cx="{cx-sc(4.6)}" cy="{cy-sc(3.4)}" r="{sc(1.5)}" '
+                f'{p}/>'
+                f'<path d="M{cx-sc(8)} {cy+sc(3.4)} L{cx-sc(2.6)} '
+                f'{cy-sc(1.4)} L{cx+sc(1.4)} {cy+sc(2.2)}" {st}/>'
+                f'<circle cx="{cx+sc(6.4)}" cy="{cy+sc(6)}" r="{sc(4.6)}" '
+                f'{p}/>'
+                f'<path d="M{cx+sc(6.4)} {cy+sc(3.6)} V{cy+sc(8.4)} '
+                f'M{cx+sc(4)} {cy+sc(6)} H{cx+sc(8.8)}" fill="none" '
+                f'stroke="#0d0a20" stroke-width="{1.6*s:.2f}" '
+                f'stroke-linecap="round"/>')
     if name == "people":
         return (f'<circle cx="{cx-sc(4)}" cy="{cy-sc(4)}" r="{sc(3)}" {st}/>'
                 f'<circle cx="{cx+sc(4)}" cy="{cy-sc(4)}" r="{sc(3)}" {st}/>'
@@ -3520,7 +3536,7 @@ SCREENS = [
              s="so nobody can pick a real name"),
         dict(icon="lock", color="cyan", k="Your account is hidden",
              s="your profiles cannot be matched"),
-        dict(icon="photo", color="cyan", k="Your own picture",
+        dict(icon="addphoto", color="cyan", k="Your own picture",
              s="or a field emblem, or neither"),
         dict(icon="warn", color="amber", k="Your writing is still yours",
              s="people who know you may tell"),
