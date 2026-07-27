@@ -46,11 +46,11 @@ def set_watermark_design(profile_id: str, body: WatermarkDesignSet,
     return watermark.set_design(profile_id, body.mark, body.label)
 
 
-@router.get("/watermarks/{watermark_id}")
-def watermark_credential(watermark_id: str) -> dict:
-    """Resolve a synthetic-media credential: which profile produced the
-    media, what kind it is, when it was issued, and the content hash."""
-    result = watermark.verify(watermark_id)
+@router.post("/watermarks/verify")
+def watermark_check(body: WatermarkVerify) -> dict:
+    """Verify content against its credential: valid + whether the presented
+    content still matches the hash issued at creation."""
+    result = watermark.verify(body.watermark_id, body.content)
     if result is None:
         raise HTTPException(
             404, "no such watermark — this content was not credentialed by "
@@ -58,11 +58,21 @@ def watermark_credential(watermark_id: str) -> dict:
     return result
 
 
-@router.post("/watermarks/verify")
-def watermark_check(body: WatermarkVerify) -> dict:
-    """Verify content against its credential: valid + whether the presented
-    content still matches the hash issued at creation."""
-    result = watermark.verify(body.watermark_id, body.content)
+# Registered *after* every literal `/watermarks/...` route, and it has to stay
+# that way. Starlette matches in registration order, so a variable segment
+# placed first answers the literal paths too, and the literal handler is never
+# reached — silently, with no error and nothing in the logs.
+#
+# It does not fix everything: `GET /watermarks/verify` still lands here, because
+# there is no GET route at that path and `verify` is a legal watermark id. A 404
+# is the right answer to "fetch the watermark called verify". What the ordering
+# buys is that adding one later works rather than being quietly unreachable.
+# `tests/test_routing.py` asserts the property for every route in the app.
+@router.get("/watermarks/{watermark_id}")
+def watermark_credential(watermark_id: str) -> dict:
+    """Resolve a synthetic-media credential: which profile produced the
+    media, what kind it is, when it was issued, and the content hash."""
+    result = watermark.verify(watermark_id)
     if result is None:
         raise HTTPException(
             404, "no such watermark — this content was not credentialed by "

@@ -846,8 +846,14 @@ def main():
         os.makedirs(outdir, exist_ok=True)
         for num, title, nav, fn in VIEWS:
             slug = title.lower().replace(" & ", "-").replace(" ", "-")
+            # Rendered before the file is opened. `open(..., "w")` truncates
+            # straight away, so the other order means a render that raises
+            # leaves a zero-byte SVG behind — a build that fails by corrupting
+            # its own output, and the empty file then breaks whatever reads it
+            # next rather than being reported.
+            svg = render(title, nav, fn)
             with open(os.path.join(outdir, f"{num:02d}-{slug}.svg"), "w") as f:
-                f.write(render(title, nav, fn))
+                f.write(svg)
             total += 1
     PLATFORM_D = "macos"
     print(f"generated {total} desktop screens ({len(VIEWS)} × 2 platforms)")

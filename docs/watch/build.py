@@ -227,8 +227,12 @@ def main():
     for spec in FACES:
         slug = re.sub(r"[^a-z0-9]+", "-", spec["title"].lower()).strip("-")
         path = os.path.join(OUT, f"{spec['num']:02d}-{slug}.svg")
+        # Rendered first — see the note in docs/screens/build.py. Opening for
+        # write truncates before the render runs, so a failure here would leave
+        # an empty face behind rather than the previous good one.
+        svg = render(spec)
         with open(path, "w") as fh:
-            fh.write(render(spec))
+            fh.write(svg)
     print(f"generated {len(FACES)} watch faces")
 
 

@@ -350,15 +350,21 @@ ASSETS = {"00-cover.svg": cover}
 
 def main() -> None:
     os.makedirs(OUT, exist_ok=True)
+    # Every asset is built before its file is opened. `open(..., "w")`
+    # truncates immediately, so generating into an already-opened handle means
+    # a generator that raises replaces a good asset with an empty one — the
+    # build damages what it was meant to refresh.
     for name, fn in ASSETS.items():
         path = os.path.join(OUT, name)
+        body = fn()
         with open(path, "w") as f:
-            f.write(fn())
+            f.write(body)
         print(f"wrote assets/design/{name}")
     os.makedirs(DIAG_OUT, exist_ok=True)
     for name, fn in DIAGRAMS.items():
+        body = fn()
         with open(os.path.join(DIAG_OUT, name), "w") as f:
-            f.write(fn())
+            f.write(body)
         print(f"wrote docs/diagrams/{name}")
 
 
