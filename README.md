@@ -257,6 +257,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="210" alt="Customise"></a><br><sub><b>86</b> · Customise</sub></td>
     <td align="center" width="33%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="210" alt="For You"></a><br><sub><b>87</b> · For You</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat overlay</sub></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -892,6 +897,13 @@ stripped comes back as `html_removed`, so an editor can say *your `<script>` was
 dropped* instead of quietly returning a page that does less than its author
 wrote. `GET /pages/themes` publishes the allowed tags and properties so an
 editor can grey out what it knows will be lost.
+
+**The chat overlay in a live room is transparent** — circular faces on a soft
+scrim over the video, rather than a comment panel taking a bite out of the
+picture people came to watch (**89**). The screens round their own avatars; the
+baked bubbles in `docs/portraits/bubbles/` exist for the README, which cannot
+draw one because GitHub strips the `style` that would round an `<img>`. Using
+the pre-baked file in the app would put a bubble inside a bubble.
 
 **Like, comment and share work on a post**, because `post` is an audience
 target rather than a parallel system — the same rows, and the same

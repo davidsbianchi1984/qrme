@@ -267,6 +267,35 @@ def agent_light(x, y, colour, label):
             + text(x + 15, y + 4, label, 10.5, col, 700, spacing=0.2))
 
 
+def bubble_chat(x, y, w, rows):
+    """The chat overlay in a live room: circular faces on transparent glass.
+
+    Drawn over the video rather than in a panel beside it. A comment strip with
+    its own solid background takes a bite out of the picture people came to
+    watch; this floats, so the room stays the thing on screen.
+
+    The screens draw their own circles rather than using the baked bubbles in
+    ``docs/portraits/bubbles/``. Those exist for the README, which cannot draw
+    one — GitHub strips the `style` that would round an `<img>`. Inside the
+    product a surface can round its own, and using the pre-baked file here
+    would put a bubble inside a bubble.
+    """
+    out, yy = [], y
+    for name, said, b64 in rows:
+        # No plate behind the row — just a soft scrim under the text so it
+        # survives a bright frame without boxing the video in.
+        out.append(f'<circle cx="{x+15}" cy="{yy+13}" r="16" '
+                   f'fill="rgba(8,6,22,0.7)"/>')
+        out.append(face(x + 15, yy + 13, 26, b64, radius=13))
+        out.append(rrect(x + 32, yy + 2, w - 32, 23, 11,
+                         "rgba(8,6,22,0.62)"))
+        out.append(text(x + 41, yy + 11, name, 8, C["cyan"], 800))
+        out.append(text(x + 41, yy + 21, said, 9, "rgba(255,255,255,0.92)",
+                        500))
+        yy += 30
+    return out, yy
+
+
 def friends_list(y, entries):
     """A profile's friends, founder first.
 
@@ -1009,6 +1038,14 @@ def render(spec):
             ov = spec["overlay"]
             out.append(live_overlay(CX, y, CW, ph, ov.get("comments", []),
                                     ov.get("ticker", []), ov.get("viewers")))
+        # Over the picture, anchored to its bottom — an overlay drawn before
+        # the photo is a list above a picture, which is the thing it exists
+        # not to be.
+        if spec.get("bubble_chat"):
+            rows = spec["bubble_chat"]
+            block, _ = bubble_chat(CX + 8, y + ph - 12 - len(rows) * 30,
+                                   CW - 16, rows)
+            out += block
         y += ph + 12
 
     if hero == "welcome":
@@ -2483,6 +2520,16 @@ SCREENS = [
     # Onboarding: pairing happens at sign-up, so the watch faces and the
     # agent lights work from the first day rather than after somebody finds a
     # settings page.
+    # The transparent chat overlay, with the faces as circles on the glass.
+    dict(num=89, title="Live Room", sub="The room stays the picture",
+         accent="pink", tab=3,
+         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=300,
+         bubble_chat=[
+             ("Marcus Bell", "the compounding chart, again?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+             ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
+         ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
