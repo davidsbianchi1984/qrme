@@ -279,30 +279,39 @@ def friends_list(y, entries):
     for entry in entries:
         name, sub, b64, badge = entry[:4]
         packs = entry[4] if len(entry) > 4 else []
+        rating = entry[5] if len(entry) > 5 else None
+        quote = entry[6] if len(entry) > 6 else None
         # The founder's row gives up its right end to the badge, so its
         # subtitle has less room than the others. Caught here rather than in a
         # render, which is how the same overlap got shipped on the agent groups.
-        if len(sub) > (26 if badge else 34):
+        # The chevron-and-badge end of the row is spoken for, and a rating
+        # takes more of it. Measuring the name to place the stars beside it was
+        # the first attempt and it collided — a bold 13px name is wider than
+        # any character estimate — so the stars sit at a fixed x and the
+        # subtitle is held short enough to clear them.
+        limit = 14 if rating is not None else (26 if badge else 34)
+        if len(sub) > limit:
             raise ValueError(f"friend subtitle too long for the row: {sub!r}")
-        h = 74
+        h = 88 if quote else 74
         out.append(rrect(CX, yy, CW, h, 15, "url(#gCard)", C["line"], 1))
         if b64:
-            out.append(face(CX + 33, yy + 30, 40, b64))
+            out.append(face(CX + 33, yy + h / 2 - 8, 40, b64))
         else:
-            out.append(orb(CX + 33, yy + 30, 19))
+            out.append(orb(CX + 33, yy + h / 2 - 8, 19))
 
-        out.append(text(CX + 62, yy + 32, name, 13, C["txt"], 700))
-        out.append(text(CX + 62, yy + 47, sub, 9.5, C["t2"], 500))
+        out.append(text(CX + 62, yy + 26, name, 13, C["txt"], 700))
+        out.append(text(CX + 62, yy + 41, sub, 9.5, C["t2"], 500))
         # The packs a profile carries, named rather than counted — "4 packs"
-        # says how much it knows, the names say what about. Sits under the
-        # name because covering a face to label it is the wrong trade, and
-        # overflows to +N rather than running under the badge.
+        # says how much it knows, the names say what about. Set small on
+        # purpose: the names are the useful part, so more of them fitting beats
+        # any of them being large. Overflows to +N rather than running under
+        # the badge.
         if packs:
             avail = (CW - 52 - 12) - 62          # left edge to the badge
             shown, used = [], 0.0
             for i, nm in enumerate(packs):
-                w = len(nm) * 3.9 + (7 if shown else 0)
-                tail = 22 if i < len(packs) - 1 else 0
+                w = len(nm) * 3.2 + (5 if shown else 0)
+                tail = 16 if i < len(packs) - 1 else 0
                 if used + w + tail > avail:
                     break
                 shown.append(nm)
@@ -310,13 +319,26 @@ def friends_list(y, entries):
             line = " · ".join(shown)
             if len(shown) < len(packs):
                 line += f"  +{len(packs) - len(shown)}"
-            out.append(text(CX + 62, yy + 61, line, 7.5, C["cyan"], 600))
+            out.append(text(CX + 62, yy + 54, line, 6.5, C["cyan"], 600))
+        # The rating and what somebody said about it, on one line at the
+        # bottom. The stars answer "is this any good"; the line beside them
+        # answers "good at what", and one without the other is half an answer.
+        if rating is not None:
+            out.append(stars(CX + 62, yy + 67, rating, C["gold"], 0.5))
+            out.append(text(CX + 96, yy + 70, f"{rating:.1f}", 7.5,
+                            C["gold"], 700))
+            if quote:
+                if len(quote) > 30:
+                    raise ValueError(
+                        f"review too long for the row: {quote!r}")
+                out.append(text(CX + 114, yy + 70, quote, 7, C["t3"], 400))
         if badge:
             col = C["gold"] if badge == "VERIFIED" else C["brandA"]
             bw = 52
             bx = CX + CW - bw - 12
-            out.append(rrect(bx, yy + 28, bw, 18, 9, A(col, 0.18), col, 1))
-            out.append(text(bx + bw / 2, yy + 40, badge, 7.5, col, 800,
+            out.append(rrect(bx, yy + h / 2 - 17, bw, 18, 9, A(col, 0.18),
+                             col, 1))
+            out.append(text(bx + bw / 2, yy + h / 2 - 5, badge, 7.5, col, 800,
                             "middle", 0.4))
         yy += h + 9
     return out, yy
@@ -2418,16 +2440,21 @@ SCREENS = [
         # Every synthetic profile carries the AI badge, not only the founder's.
         # A badge that appears on one AI profile and not the next implies the
         # unbadged one is something else.
-        ("David Bianchi", "CEO/Imagineer",
-         frames.FOUNDER_VERIFIED[1], "VERIFIED"),
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER_VERIFIED[1],
+         "VERIFIED", [], 4.0, None),
         ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI",
-         ["technology", "cybersecurity", "science", "telecom"]),
+         # No invented review on the founder's own rows: a quote is somebody
+         # else's words about a real person, and making one up is the one bit
+         # of this page that would be putting them in their mouth.
+         ["technology", "cybersecurity", "science", "telecom"], 4.0, None),
         # The subtitle carries the relationship; the pack line carries what
         # they know. Naming the industry in both just says it twice.
         ("Marcus Bell", "mutual friend", frames.PORTRAITS[1][1], "AI",
-         ["finance"]),
+         ["finance"], 5.0, "\u201cSaved me from an annuity.\u201d"),
+        # Not every review is a good one, and a wall of five stars is the
+        # least believable thing a profile page can show.
         ("Dr. Amara Osei", "mutual friend", frames.PORTRAITS[0][1], "AI",
-         ["healthcare"]),
+         ["healthcare"], 3.0, "\u201cDefers to a real doctor.\u201d"),
     ]),
     # The page somebody made, in their own colours. Drawn in the page's theme
     # rather than the app's, because a homepage that looks like every other
