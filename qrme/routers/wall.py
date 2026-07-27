@@ -15,7 +15,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import wall
+from .. import embeds, wall
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -23,18 +23,44 @@ router = APIRouter()
 
 class PostCreate(BaseModel):
     body: str = Field(min_length=1, max_length=wall.MAX_BODY)
+    video_url: str | None = None
+    video_title: str = ""
 
 
 @router.post("/profiles/{profile_id}/wall", status_code=201)
 def create_post(profile_id: str, body: PostCreate, request: Request) -> dict:
     """Publish to the wall. Moderated on the way in; a blocked post comes back
-    to its author with the reason and is invisible to everyone else."""
+    to its author with the reason and is invisible to everyone else.
+
+    ``video_url`` attaches a video from another platform. The link is stored,
+    never the file, and what renders is a facade — no request reaches the other
+    platform until a viewer presses play.
+    """
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     try:
-        return wall.publish(profile_id, body.body)
-    except wall.WallError as exc:
+        return wall.publish(profile_id, body.body, video_url=body.video_url,
+                            video_title=body.video_title)
+    except (wall.WallError, embeds.EmbedError) as exc:
         raise HTTPException(422, str(exc)) from None
+
+
+@router.get("/videos/platforms")
+def platforms() -> dict:
+    """Where a video may be posted from, and what is promised about it.
+
+    Published rather than kept internal so a client can offer the list up front
+    instead of letting somebody paste a link and find out it was refused.
+    """
+    return {
+        "platforms": [{"key": k, "name": v["name"], "hosts": list(v["hosts"])}
+                      for k, v in embeds.PLATFORMS.items()],
+        "stored": ["the platform", "the video id", "the title you type"],
+        "never_stored": ["the video file", "a scraped title",
+                         "a cached thumbnail"],
+        "loads_on_press": True,
+        "note": embeds.LEAVING.format(name="the platform"),
+    }
 
 
 @router.get("/profiles/{profile_id}/wall")

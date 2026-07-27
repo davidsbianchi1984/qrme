@@ -37,7 +37,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from . import audience, db, moderation
+from . import audience, db, embeds, moderation
 
 MAX_BODY = 2000
 
@@ -65,7 +65,8 @@ class WallError(ValueError):
 
 
 def publish(profile_id: str, body: str, author: dict | None = None,
-            listing_id: str | None = None) -> dict:
+            listing_id: str | None = None, video_url: str | None = None,
+            video_title: str = "") -> dict:
     """Write a post to the wall. Moderated on the way in.
 
     A blocked post is kept and returned to its author with the reason, and is
@@ -101,6 +102,11 @@ def publish(profile_id: str, body: str, author: dict | None = None,
             raise WallError(
                 "a post can only promote its own profile's listing")
 
+    # Checked before the post is written, not after. Attaching afterwards would
+    # leave a bad link as an orphan post somebody has to go and delete.
+    if video_url is not None:
+        embeds.parse(video_url)
+
     post_id = db.new_id("pst")
     db.connect().execute(
         "INSERT INTO posts (id, profile_id, surface, topic, content, status,"
@@ -112,8 +118,10 @@ def publish(profile_id: str, body: str, author: dict | None = None,
             "INSERT INTO post_attachments (post_id, listing_id, created_at)"
             " VALUES (?,?,?)", (post_id, listing_id, db.utcnow()))
     db.connect().commit()
+    video = embeds.attach(post_id, video_url, video_title) \
+        if video_url is not None else None
     return {"id": post_id, "profile_id": profile_id, "body": body,
-            "listing_id": listing_id,
+            "listing_id": listing_id, "video": video,
             "status": status,
             "blocked_reason": None if verdict.approved else verdict.reason}
 
@@ -221,6 +229,7 @@ def for_you(viewer_profile_id: str, limit: int = 25,
             "body": r["body"], "created_at": r["created_at"],
             "likes": likes,
             "promoting": _attachment(r["id"]),
+            "video": embeds.facade(r["id"]),
             "score": round(score, 1),
             # Never empty. A feed that cannot say why something is in front of
             # you is one nobody can audit, including its author.
@@ -258,7 +267,8 @@ def wall(profile_id: str, limit: int = 50, owner: bool = False) -> list[dict]:
         entry = {"id": r["id"], "profile_id": r["profile_id"],
                  "body": r["content"], "created_at": r["created_at"],
                  "likes": r["likes"] or 0, "status": r["status"],
-                 "promoting": _attachment(r["id"])}
+                 "promoting": _attachment(r["id"]),
+                 "video": embeds.facade(r["id"])}
         if owner and r["status"] == "blocked":
             entry["blocked_reason"] = r["flag_reason"]
         out.append(entry)

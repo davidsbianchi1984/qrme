@@ -1207,6 +1207,12 @@ def render(spec):
         out.append(block)
         y += gh + 14
 
+    if spec.get("facade_card"):
+        f = spec["facade_card"]
+        out.append(video_facade(CX, y, CW, 152, f["platform"], f["title"],
+                                f["note"], uid=f"{num:02d}"))
+        y += 164
+
     if spec.get("photo"):
         ph = spec.get("photo_h", 148)
         out.append(photo(CX, y, CW, ph, spec["photo"],
@@ -2230,7 +2236,48 @@ def render(spec):
 # --------------------------------------------------------------------------- #
 # full screen — the video with the app taken off it
 # --------------------------------------------------------------------------- #
-def held_controls(sx, sy, sw, sh, kinds, landscape=False):
+def video_facade(x, y, w, h, platform, title, note, uid="vf", cyf=0.5,
+                 bottom_note=True):
+    """A video from another platform, before anybody presses play.
+
+    There is deliberately no thumbnail here, and the empty plate is the point
+    rather than a gap in the mock. A normal embed loads the other company's
+    player the moment the page renders, which tells them you looked before you
+    decided to; QRME renders the platform's name, the poster's own words and a
+    play control, all served from this side. Pressing play is when the request
+    happens — see ``qrme/embeds.py``.
+
+    Drawing a YouTube thumbnail here would have been the prettier mock and a
+    picture of the thing the code refuses to do.
+    """
+    o = [rrect(x, y, w, h, 14, "#0d0a1c", A(C["line"], 0.9), 1)]
+    cy = y + h * cyf - 8
+    o.append(f'<circle cx="{x+w/2}" cy="{cy}" r="26" '
+             f'fill="rgba(255,255,255,0.10)" '
+             f'stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/>')
+    o.append(f'<path d="M{x+w/2-7} {cy-10} L{x+w/2+11} {cy} '
+             f'L{x+w/2-7} {cy+10} Z" fill="rgba(255,255,255,0.92)"/>')
+    # The platform chip, top-left, where a source belongs.
+    pw = 16 + tw.width(platform, 9, 750)
+    o.append(rrect(x + 10, y + 10, pw, 20, 10, "rgba(255,255,255,0.12)"))
+    o.append(text(x + 10 + pw / 2, y + 24, platform, 9, "#fff", 750, "middle"))
+    if title:
+        o.append(text(x + w / 2, cy + 48, title, 11, "#efecff", 650, "middle"))
+    if note and bottom_note:
+        o.append(rrect(x, y + h - 30, w, 30, 0, "rgba(6,4,16,0.72)"))
+        o.append(icon("lock", x + 18, y + h - 15, C["green"], 0.46))
+        o.append(text(x + 30, y + h - 11, note, 8.2, "#cfe8d6", 600))
+    elif note:
+        # Full screen has a strip along the bottom already, so the promise sits
+        # under the title instead of in a bar that would land on the composer.
+        o.append(icon("lock", x + w / 2 - tw.width(note, 8.6, 600) / 2 - 8,
+                      cy + 66, C["green"], 0.46))
+        o.append(text(x + w / 2 + 6, cy + 69, note, 8.6, "#cfe8d6", 600,
+                      "middle"))
+    return "".join(o)
+
+
+def held_controls(sx, sy, sw, sh, kinds, landscape=False, cyf=0.5):
     """What a long press puts back on the picture.
 
     The help button used to be on every screen unconditionally, on the theory
@@ -2249,7 +2296,12 @@ def held_controls(sx, sy, sw, sh, kinds, landscape=False):
     phone does — it dims what you are holding, so the controls read and so it
     is obvious the picture is still there underneath, waiting.
     """
-    o = [rrect(sx, sy, sw, sh, 28 if landscape else 31, "rgba(6,4,16,0.42)")]
+    # Dimmed hard, not tinted. The point of the state is that there is exactly
+    # one bright thing on the glass and it is the thing you can press; a light
+    # scrim leaves the picture competing with the buttons and turns a decision
+    # into a hunt. Tapping anywhere else takes the dim away again, which is why
+    # nothing else needs to be lit.
+    o = [rrect(sx, sy, sw, sh, 40, "rgba(4,3,12,0.78)")]
     r = 19
     # The slot is set by the widest *caption*, not the button. Spacing them on
     # the circles put "Landscape" and "Back to app" into each other, which is
@@ -2259,20 +2311,26 @@ def held_controls(sx, sy, sw, sh, kinds, landscape=False):
     if total > sw - 24:
         raise ValueError(f"held controls need {total:.0f}px, screen has {sw-24:.0f}")
     bx = sx + sw / 2 - total / 2 + slot / 2
-    cy = sy + sh / 2 - 8
+    cy = sy + sh * cyf - 8
     for glyph, ic, key, label in kinds:
         col = ACCENT.get(key) or C[key]
-        o.append(f'<circle cx="{bx}" cy="{cy}" r="{r}" fill="{A(col, 0.18)}" '
-                 f'stroke="{col}" stroke-width="1.2"/>')
+        # Lit rather than outlined: a halo, a filled disc and a white glyph.
+        # Against a 78% scrim an outlined button is a dark circle with a thin
+        # edge, which is the one thing on the screen that should not read as
+        # switched off.
+        o.append(f'<circle cx="{bx}" cy="{cy}" r="{r+13}" '
+                 f'fill="{A(col, 0.16)}"/>')
+        o.append(f'<circle cx="{bx}" cy="{cy}" r="{r}" fill="{A(col, 0.92)}"/>')
         if glyph:
-            o.append(text(bx, cy + 6, glyph, 19, col, 800, "middle"))
+            o.append(text(bx, cy + 6, glyph, 19, "#0b0820", 800, "middle"))
         else:
-            o.append(icon(ic, bx, cy, col, 0.78))
-        o.append(text(bx, cy + r + 15, label, 8.4, "rgba(240,238,255,0.92)",
-                      650, "middle"))
+            o.append(icon(ic, bx, cy, "#0b0820", 0.78))
+        o.append(text(bx, cy + r + 17, label, 8.6, "#fff", 700, "middle"))
         bx += slot
-    o.append(text(sx + sw / 2, cy - r - 16, "PRESS AND HOLD", 8.6,
-                  "rgba(255,255,255,0.55)", 750, "middle", 1.4))
+    o.append(text(sx + sw / 2, cy - r - 20, "PRESS AND HOLD", 8.6,
+                  "rgba(255,255,255,0.62)", 750, "middle", 1.4))
+    o.append(text(sx + sw / 2, cy + r + 44, "tap anywhere else to go back",
+                  8.2, "rgba(255,255,255,0.42)", 500, "middle"))
     return o
 
 
@@ -2290,30 +2348,46 @@ def render_full(spec):
     if land:
         w, h = H, W
         px, py, pw, ph = PY, PX, H - 2 * PY, W - 2 * PX
-        sx, sy, sw, sh = SY, SX, H - 2 * SY, W - 2 * SX
-        radius, sradius = 40, 28
     else:
         w, h = W, H
         px, py, pw, ph = PX, PY, PW, PH
-        sx, sy, sw, sh = SX, SY, SW, SH
-        radius, sradius = 40, 31
+    # The picture runs to the edge of the device, not to the edge of an inset
+    # display. Every other screen here draws a body and then a screen inside
+    # it with ~10px of bezel between, and on a full-screen shot that bezel
+    # reads as an unexplained border around the video — which is exactly what
+    # it was called out as. A modern phone's display *is* the face, so on this
+    # renderer the two rectangles are the same rectangle.
+    sx, sy, sw, sh = px, py, pw, ph
+    sradius = 40
 
     ac = ACCENT.get(spec.get("accent", "brand"), C["brandA"])
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
            f'viewBox="0 0 {w} {h}" role="img" '
            f'aria-label="{esc(spec["title"])} screen">', defs(ac)]
-    out.append(rrect(px, py, pw, ph, radius, "url(#gFrame)"))
     out.append(rrect(sx, sy, sw, sh, sradius, "url(#gScr)"))
 
-    # The picture *is* the screen, corner radius and all — clipped to the
-    # display rather than laid inside it with a margin, which is the whole
-    # difference between full screen and a big photo.
-    cid = f'clipfull{spec["num"]}'
-    out.append(f'<clipPath id="{cid}"><rect x="{sx}" y="{sy}" width="{sw}" '
-               f'height="{sh}" rx="{sradius}"/></clipPath>')
-    out.append(f'<image x="{sx}" y="{sy}" width="{sw}" height="{sh}" '
-               f'preserveAspectRatio="xMidYMid slice" clip-path="url(#{cid})" '
-               f'href="data:image/jpeg;base64,{spec["photo"]}"/>')
+    if spec.get("facade"):
+        # Full screen on a video nobody has pressed play on yet is an empty
+        # screen, and drawing a still from the video would be a picture of the
+        # request this design refuses to make.
+        f = spec["facade"]
+        out.append(rrect(sx, sy, sw, sh, sradius, "#08061a"))
+        out.append(video_facade(sx, sy, sw, sh, f["platform"], f["title"],
+                                f["note"], uid=f'f{spec["num"]}',
+                                cyf=0.38 if spec.get("held") else 0.46,
+                                bottom_note=False))
+    else:
+        cid = f'clipfull{spec["num"]}'
+        out.append(f'<clipPath id="{cid}"><rect x="{sx}" y="{sy}" '
+                   f'width="{sw}" height="{sh}" rx="{sradius}"/></clipPath>')
+        out.append(f'<image x="{sx}" y="{sy}" width="{sw}" height="{sh}" '
+                   f'preserveAspectRatio="xMidYMid slice" '
+                   f'clip-path="url(#{cid})" '
+                   f'href="data:image/jpeg;base64,{spec["photo"]}"/>')
+    # A hairline where the glass meets the air, so the device still reads as a
+    # device rather than as a rounded photograph.
+    out.append(rrect(sx, sy, sw, sh, sradius, "none",
+                     "rgba(255,255,255,0.10)", 1.2))
 
     # The camera cut-out is a property of the hardware, so it rotates with the
     # phone and it keeps its platform's shape — an iOS pill on an Android
@@ -2327,13 +2401,21 @@ def render_full(spec):
     else:
         out.append(rrect(w / 2 - 30, sy + 5, 60, 15, 7.5, hole))
 
-    label, tone = spec.get("photo_tag", ("LIVE", "live"))
-    col = {"live": C["red"], "sample": C["t2"]}[tone]
-    tagw = 16 + len(label) * 6.2
     tx = sx + (32 if land else 14)
-    out.append(rrect(tx, sy + 14, tagw, 20, 10, "rgba(8,6,20,0.72)"))
-    out.append(f'<circle cx="{tx+11}" cy="{sy+24}" r="3.4" fill="{col}"/>')
-    out.append(text(tx + 19, sy + 28, label, 9, "#fff", 750, "start", 0.4))
+    if spec.get("photo_tag"):
+        label, tone = spec["photo_tag"]
+        col = {"live": C["red"], "sample": C["t2"], "rated": C["red"]}[tone]
+        tagw = 16 + len(label) * 6.2
+        out.append(rrect(tx, sy + 14, tagw, 20, 10, "rgba(8,6,20,0.72)"))
+        out.append(f'<circle cx="{tx+11}" cy="{sy+24}" r="3.4" fill="{col}"/>')
+        out.append(text(tx + 19, sy + 28, label, 9, "#fff", 750, "start", 0.4))
+        tx += tagw + 6
+    # A rated stream keeps its badge in full screen. The gate is a property of
+    # the profile, not of the chrome, so taking the chrome away must not take
+    # it with them.
+    if spec.get("rated"):
+        out.append(rrect(tx, sy + 14, 38, 20, 10, A(C["red"], 0.85)))
+        out.append(text(tx + 19, sy + 28, "18+", 9.5, "#fff", 800, "middle"))
 
     bar, used = live_bar(sx, sy, sw, sh, spec["live_bar"])
     rows = spec.get("bubble_chat", [])
@@ -2345,7 +2427,8 @@ def render_full(spec):
     out += bar
 
     if spec.get("held"):
-        out += held_controls(sx, sy, sw, sh, spec["held"], landscape=land)
+        out += held_controls(sx, sy, sw, sh, spec["held"], landscape=land,
+                             cyf=0.68 if spec.get("facade") else 0.5)
 
     # The system navigation, on the edge the hand is holding. Android's three
     # marks turn with the phone the way iOS's single bar does; drawing the iOS
@@ -2912,6 +2995,67 @@ SCREENS = [
              ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
              ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
          ]),
+    # The rated stream gets the same two states. The badge survives full
+    # screen, because the gate belongs to the profile rather than to the app
+    # chrome — taking the chrome away must not take the rating with it.
+    dict(num=92, title="Rated Full Screen", full=True, landscape=True,
+         rated=True, accent="red",
+         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Ada", "is she back on at eight?", frames.PORTRAITS[6][1]),
+             ("Cy", "gifted a rose", frames.PORTRAITS[4][1]),
+         ]),
+    dict(num=93, title="Rated Held", full=True, rated=True, accent="red",
+         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    # A room, which is the other place a video and a conversation run at once.
+    dict(num=94, title="Room Full Screen", full=True, landscape=True,
+         accent="cyan", photo=frames.DESK, photo_tag=("ROOM", "sample"),
+         live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Marcus Bell", "can everyone see the slide?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "yes — go on", frames.PORTRAITS[0][1]),
+             ("Priya Raman", "one second, joining audio", frames.PORTRAITS[2][1]),
+         ]),
+    # Somebody else's video, posted here. The empty plate is the feature: see
+    # `qrme/embeds.py` — nothing is requested from the other platform until a
+    # viewer presses play, so there is nothing to draw yet.
+    dict(num=95, title="Posted Video", sub="From another platform",
+         accent="cyan", tab=0,
+         facade_card=dict(platform="YouTube", title="the compounding talk",
+                          note="nothing loads until you press play"),
+         cards=[
+        dict(icon="link", color="cyan", k="The link, not the file",
+             s="never re-hosted, never copied"),
+        dict(icon="lock", color="green", k="No request on load",
+             s="they cannot see you looked", pill=("OFF", "good")),
+        dict(icon="photo", color="amber", k="No cached thumbnail",
+             s="its absence is the promise"),
+        dict(icon="shieldok", color="brand", k="Still a post",
+             s="moderated · like · share · rated"),
+    ]),
+    # A posted video is not a live desk. There is nobody at a desk to ring
+    # and no host to ask, so the strip is only the three verbs that mean
+    # something here — a control that cannot do anything is worse than absent.
+    dict(num=96, title="Video Held", full=True, accent="cyan",
+         facade=dict(platform="YouTube", title="the compounding talk",
+                     note="nothing is requested until you press play"),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
+    dict(num=97, title="Video Landscape", full=True, landscape=True,
+         accent="cyan",
+         facade=dict(platform="YouTube", title="the compounding talk",
+                     note="nothing is requested until you press play"),
+         live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

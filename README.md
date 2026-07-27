@@ -262,11 +262,29 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
     <td align="center" width="33%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="210" alt="Full Screen — long press"></a><br><sub><b>90</b> · Full Screen · long press</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/93-rated-held.svg"><img src="docs/screens/93-rated-held.svg" width="210" alt="Rated stream — long press"></a><br><sub><b>93</b> · Rated · long press · 18+</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/95-posted-video.svg"><img src="docs/screens/95-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>95</b> · Posted Video · YouTube</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/96-video-held.svg"><img src="docs/screens/96-video-held.svg" width="210" alt="Posted Video — long press"></a><br><sub><b>96</b> · Video · long press</sub></td>
+  </tr>
 </table>
+
+Turned sideways, each of them fills the glass. The landscape frames are the
+same four surfaces — a live desk, a rated stream, a room, and a video somebody
+posted from another platform — with the app taken off:
 
 <table>
   <tr>
-    <td align="center"><a href="docs/screens/91-full-screen-landscape.svg"><img src="docs/screens/91-full-screen-landscape.svg" width="660" alt="Full Screen Landscape"></a><br><sub><b>91</b> · Full Screen · landscape — tilt the phone and the room arrives at its own aspect ratio</sub></td>
+    <td align="center"><a href="docs/screens/91-full-screen-landscape.svg"><img src="docs/screens/91-full-screen-landscape.svg" width="620" alt="Live Room — landscape"></a><br><sub><b>91</b> · Live Room · the room at its own aspect ratio</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screens/92-rated-full-screen.svg"><img src="docs/screens/92-rated-full-screen.svg" width="620" alt="Rated stream — landscape"></a><br><sub><b>92</b> · Rated Stream · the 18+ badge survives full screen</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screens/94-room-full-screen.svg"><img src="docs/screens/94-room-full-screen.svg" width="620" alt="Room — landscape"></a><br><sub><b>94</b> · Room · a chat session, video and all</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screens/97-video-landscape.svg"><img src="docs/screens/97-video-landscape.svg" width="620" alt="Posted video — landscape"></a><br><sub><b>97</b> · Posted Video · still nothing requested from YouTube</sub></td>
   </tr>
 </table>
 
@@ -319,9 +337,18 @@ button now occupies. So it comes back the way everything else does — you press
 and hold and it surfaces, along with the way into landscape and the way back to
 the app. The promise is kept without the pixel.
 
-The held state dims what you are holding rather than floating buttons over a
-bright picture, because that is what a phone actually does and because the dim
-is what says the room is still there underneath, waiting.
+The held state **dims hard** — 78%, not a tint — so there is exactly one bright
+thing on the glass and it is the thing you can press. A light scrim leaves the
+picture competing with the buttons and turns a decision into a hunt. Tapping
+anywhere else takes the dim away again, which is why nothing else needs to be
+lit and why the screen says so.
+
+**The same two states apply to every live surface**, because they are states of
+a video rather than a feature of one screen: the rated stream (**92**, **93**),
+a room's chat session (**94**), and a video posted from somewhere else
+(**96**, **97**). On a rated stream the **18+ badge survives full screen** —
+the gate belongs to the profile, not to the app chrome, so taking the chrome
+away must not take the rating with it.
 
 **Tilt the phone and it goes wide** (**91**). This is the one that earns its
 place rather than being a checkbox: the desk was shot sixteen-by-nine, and in a
@@ -963,6 +990,42 @@ in `TARGETS` through `share_url`, because sharing a post raised `KeyError` at
 the moment somebody pressed the button: the kind was added to the target list
 and its share URL was not.
 
+**A post can carry a video from somewhere else** — YouTube, Vimeo, Twitch,
+Dailymotion, Rumble (`qrme/embeds.py`, `POST /profiles/{id}/wall` with
+`video_url`, and `GET /videos/platforms` publishes the list). Three decisions
+make that safe to do here rather than merely possible.
+
+*Nothing is copied.* What is stored is the platform, the video's id on it, and
+the title **the poster typed** — never the file, never a scraped title, never a
+downloaded thumbnail. Re-hosting somebody's video is a copyright problem and a
+cached thumbnail is a copy of an image nobody granted. The video stays where its
+owner put it, on the terms its owner agreed to.
+
+*No third-party request until the viewer asks for one.* This is the part that
+matters on a platform whose promise is that data does not leave a vault. A
+normal embed loads the other company's player the moment the page renders,
+which tells them you looked **before you decided to**. So what renders is a
+**facade** — the platform's name, the poster's own words, and a play control,
+all served from here. Pressing play is when the request happens, and the viewer
+is told so in words before they press it. A privacy promise that holds only
+until an embed loads is not one. The empty plate on **95** is the feature, not a
+gap in the mock: drawing a YouTube thumbnail there would have been the prettier
+picture and a picture of the thing the code refuses to do.
+
+*The allowlist is a list, not a pattern.* Anything not on it is refused by name,
+because "looks like a video URL" is how an open redirect becomes a feature. Each
+platform knows how to recognise its own links and how to rebuild a canonical
+watch URL **from the id** rather than from the pasted string — so a tracking
+parameter, a redirect, or a lookalike host cannot ride along into what gets
+stored and later opened. A Twitch *channel* link is refused too: it points at
+whatever happens to be live, which is not the thing anybody posted.
+
+The age gate is inherited rather than re-judged. A video post is a post, so it
+already carries its author's rating through `audience.is_rated` and is walled
+out of an ordinary feed by machinery that was already there. Nothing here claims
+a video is *suitable* — a platform's own rating is not visible from a link, and
+the poster's rating is the only claim this system is in a position to make.
+
 **A storefront, not a second copy of one.** `show_offers` surfaces the
 profile's own marketplace listings on the page, read from `listings` rather
 than retyped — a second copy of a price is a second price that can be wrong —
@@ -1139,6 +1202,24 @@ Defined once, in [`qrme/agentlight.py`](https://github.com/davidsbianchi1984/qrm
 | **Watch** — *36 Agents* (JIM) | three lights and three counts, and **no agent names** | a wrist is glanced at, not read. Naming the agents was the first cut and was wrong: a name is something you read, and reading is the thing a glance cannot do. Which agent went amber is a question for the app, where there is room to answer it |
 | **App** — *82 Agents* | the same three lights, each a **tappable group** — what is working, what needs you, what stopped | somebody opening this *because* amber appeared should not have to scan a flat list for the one that changed. Grouping puts the answer first and the roster second |
 | **Overlay** — *83 Chat · overlay*, and every desktop view | a small translucent box in the bottom-right corner — the same three rows as the wrist, each its own way in | an agent that reports only on its own screen is one you have to remember to check, and amber and red are exactly the states nobody thinks to look for. On desktop it is on **every** view, because those users have no wrist to glance at |
+
+The same three colours, on all three sizes of glass:
+
+<table>
+  <tr>
+    <td align="center" width="18%" valign="bottom"><a href="docs/watch/01-agents.svg"><img src="docs/watch/01-agents.svg" width="150" alt="Watch — agent lights, counts only"></a><br><sub><b>watch</b> · three lights, three counts, no names</sub></td>
+    <td align="center" width="26%" valign="bottom"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="200" alt="Mobile — agent groups"></a><br><sub><b>mobile 82</b> · one tappable group per light</sub></td>
+    <td align="center" width="26%" valign="bottom"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="200" alt="Mobile — the overlay follows you"></a><br><sub><b>mobile 83</b> · the overlay, mid-conversation</sub></td>
+    <td align="center" width="30%" valign="bottom"><a href="docs/desktop/01-home.svg"><img src="docs/desktop/01-home.svg" width="300" alt="Desktop — the overlay on every view"></a><br><sub><b>desktop 01</b> · bottom-right, on every view</sub></td>
+  </tr>
+</table>
+
+Read them left to right and the shape of the decision changes with the surface.
+The wrist answers *is anything wrong* and stops there. The phone answers *which
+one*, by making each colour a group you can open. The desktop does not ask at
+all — it keeps the box in the corner of every view, because a desktop user has
+no wrist to glance at and an agent that reports only on its own screen is one
+you have to remember to go and check.
 
 ## Companion features
 

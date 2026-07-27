@@ -734,6 +734,24 @@ CREATE TABLE IF NOT EXISTS post_attachments (
     created_at TEXT NOT NULL
 );
 
+-- A video a post is pointing at, on somebody else's platform.
+--
+-- The link and the id, never the file and never a thumbnail: re-hosting
+-- somebody's video is a copyright problem and a cached thumbnail is a copy of
+-- an image nobody granted. `title` is what the poster typed, not what was
+-- scraped from the other site — which is both the honest attribution and the
+-- reason nothing here has to make a request to render.
+--
+-- Separate table for the same reason as post_attachments above: no migrations.
+CREATE TABLE IF NOT EXISTS post_videos (
+    post_id    TEXT PRIMARY KEY REFERENCES posts(id),
+    platform   TEXT NOT NULL,
+    video_id   TEXT NOT NULL,
+    url        TEXT NOT NULL,
+    title      TEXT,
+    created_at TEXT NOT NULL
+);
+
 -- Edits to a message already sent. One row per revision, so the trail is the
 -- history rather than only the latest text.
 --
