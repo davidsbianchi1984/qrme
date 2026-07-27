@@ -25,7 +25,7 @@ from .routers import (apps, assistant, audience, avatars, commerce,
                       community, connections,
                       desks, earnings, exchange, feedback, friends, gaming, governance,
                       identity, intelligence, interaction, licensing, models,
-                      packs, pages, placemic,
+                      overlays as overlay_routes, packs, pages, placemic,
                       frontpage, profiles, research, revisions, robots,
                       sharing, signatures,
                       social, steering,
@@ -102,6 +102,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(friends.router)
     app.include_router(identity.router)
     app.include_router(placemic.router)
+    app.include_router(overlay_routes.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
     app.include_router(exchange.router)

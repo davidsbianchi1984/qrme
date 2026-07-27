@@ -276,6 +276,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="210" alt="Stay Anonymous"></a><br><sub><b>118</b> · Stay Anonymous</sub></td>
     <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
     <td align="center" width="33%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="210" alt="Lend It Anywhere"></a><br><sub><b>120</b> · Lend It Anywhere</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="210" alt="Wear a Character"></a><br><sub><b>121</b> · Wear a Character</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1106,6 +1107,73 @@ The stationary-microphone classes stay out for the separate reason set out
 under [watch faces and wearables](#watch-faces-and-the-wearables-that-show-them):
 a platform cannot collect a waiver from somebody who merely walked into the
 room.
+
+## Wearing a character over your own camera
+
+A mask, a creature driven by your own expressions, a puppet, a replaced
+background. Ordinary, and it lands directly on the argument everything else
+here is built from: **a synthetic thing must say so.** An overlay is synthetic
+media composited onto a real human face in real time — the definition of what
+the AI mark exists for — and the fact that the person underneath consented does
+not change what the *viewer* is looking at.
+
+So the rule is neither "allowed" nor "banned":
+
+> **An overlay is disclosed to the people who can see it, always, and it can
+> never be the thing that makes a truthful badge false.**
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="200" alt="Wear a character"></a><br><sub><b>121</b> · the screen that offers it also says what it cannot be</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /overlays/catalogue` | what can be worn, where, and what is refused with reasons |
+| `POST /places/{surface}/{id}/overlay` | put one on — your own face only |
+| `DELETE /places/{surface}/{id}/overlay` | take it off |
+| `GET /places/{surface}/{id}/overlay` | who here is wearing what — **everyone present** |
+
+Worn in a room (voice, video, AR, VR, 3-D), a watch party, a one-to-one
+connection, or your own stream.
+
+  </td>
+  </tr>
+</table>
+
+**A live desk can never wear one**, and this is the sharp case. A desk's badge
+reads *"Live person — not AI"* and its whole premise is that a real human is
+behind it — the badge is **inverted** precisely because there is a person
+there. Put a character over that face and the badge becomes a false statement,
+made by the platform, on the one surface whose entire value is that the
+statement is true. The overlay is refused rather than the badge weakened,
+because a desk that cannot promise a real person is not a desk.
+
+**No overlay may depict a real, identifiable person.** A live-driven likeness
+of somebody who is not in the room is the exact artefact this codebase argues
+against, and *"it was only a filter"* is how it would arrive. `overlays.REFUSED`
+names the classes with the reason — real person, public figure, another user's
+portrait, an age shift, and a badge drawn into the picture. Published by name,
+because an absent option reads as a gap somebody works around, and every one of
+these is a decision.
+
+**It is asked, not guessed.** Nothing here can look at a file and tell whether
+the face in it belongs to somebody — that is a judgement about the world, not
+about an asset. So `depicts_real_person` is a declaration the wearer makes,
+refused when true, and recorded either way: a false declaration then has a name
+and a timestamp on it, which is the difference between a rule and a hope.
+
+**The disclosure distinguishes what it is disclosing.** A replaced face reads
+*"not their face — Blue Fox, drawn over the camera in real time. A real person
+is underneath"*; a replaced background reads *"A library — their own face,
+unaltered"*. Saying "not their face" over a blurred backdrop is a lie in the
+other direction, and a disclosure that cries wolf is one people learn to skip.
+
+**Nobody can put one on you.** An overlay somebody else can apply is not a
+costume, it is a puppet, and the person whose face is underneath is the one
+whose consent counts. Removal stamps a time rather than deleting the row, so a
+viewer who saw a face and later wants to know what they were actually looking
+at has an answer.
 
 ## Friends you might know
 

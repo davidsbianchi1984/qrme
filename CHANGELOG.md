@@ -85,6 +85,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   evidence twice. A `self_asserted` level has no evidence to match on, and that
   limit is stated rather than papered over.
 
+- **Wearing a character over your own camera** — `qrme/overlays.py`, 4 routes,
+  14 tests, screen 121. A mask, a creature driven by your own expressions, a
+  puppet, a replaced background. Ordinary, and it lands directly on the
+  argument everything else here is built from: an overlay is synthetic media
+  composited onto a real human face in real time, and the fact that the person
+  underneath consented does not change what the **viewer** is looking at. So
+  the rule is neither allowed nor banned: it is disclosed to the people who can
+  see it, always, and it can never be the thing that makes a truthful badge
+  false.
+
+  **A live desk can never wear one.** Its badge reads "Live person — not AI"
+  and its whole premise is that a real human is behind it — the badge is
+  *inverted* precisely because there is a person there. A character over that
+  face makes the badge a false statement, on the one surface whose entire value
+  is that it is true. Refused rather than the badge weakened, because a desk
+  that cannot promise a real person is not a desk.
+
+  **No overlay may depict a real, identifiable person** — refused by name with
+  the reason, alongside public figures, another user's portrait, age shifts,
+  and drawing a mark or badge into the picture. It is *asked* rather than
+  guessed, because nothing here can look at a file and tell whether the face in
+  it belongs to somebody; the declaration is recorded either way, so a false
+  one has a name and a timestamp on it.
+
+  The disclosure distinguishes what it discloses: a replaced face reads "not
+  their face … a real person is underneath", a replaced background reads "their
+  own face, unaltered". A disclosure that cries wolf is one people learn to
+  skip.
+
 - **Channel 2 off the room** — `roommic.lend_on` and friends, 4 routes, 18
   tests, screen 120. The same lent wearable on a **watch party**, a **live
   desk's stream** and a **one-to-one connection**. Rooms already covered voice,

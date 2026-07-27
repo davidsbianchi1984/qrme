@@ -226,6 +226,30 @@ CREATE TABLE IF NOT EXISTS place_mics (
 CREATE INDEX IF NOT EXISTS idx_place_mics_live
     ON place_mics (surface, surface_id) WHERE ended_at IS NULL;
 
+-- Overlays: a character worn over a person's own camera. Permission and state
+-- only — the compositing happens on the device, like capture.
+--
+-- `removed_at` rather than a delete, so "who was wearing what, when" survives
+-- the overlay coming off: a viewer who saw a face and later wants to know what
+-- they were actually looking at has an answer.
+CREATE TABLE IF NOT EXISTS overlays (
+    id            TEXT PRIMARY KEY,
+    interactor_id TEXT NOT NULL,
+    surface       TEXT NOT NULL,   -- room | party | connection | stream
+    surface_id    TEXT NOT NULL,
+    -- mask | character | creature | puppet | helmet_hud | touch_up | backdrop.
+    -- See qrme/overlays.py:KINDS — the ones that cover a face are disclosed
+    -- differently from the ones that do not, because they are different claims
+    -- about what the viewer is seeing.
+    kind          TEXT NOT NULL,
+    title         TEXT NOT NULL,   -- shown to everyone who can see the wearer
+    asset         TEXT,
+    worn_at       TEXT NOT NULL,
+    removed_at    TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_overlays_live
+    ON overlays (surface, surface_id) WHERE removed_at IS NULL;
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`

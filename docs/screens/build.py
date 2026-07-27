@@ -3539,6 +3539,22 @@ SCREENS = [
         dict(icon="shieldok", color="amber", k="Ends when it does",
              s="it cannot outlive the place"),
     ], button=("Take it back", "amber")),
+    # Wearing a character over your own camera. The last two cards are the
+    # feature: an overlay is synthetic media on a real face, so the screen that
+    # offers it is also the screen that says what it can never be.
+    dict(num=121, title="Wear a Character", sub="Your camera, someone else's face",
+         accent="pink", tab=3, cards=[
+        dict(icon="mask", color="pink", k="Blue Fox",
+             s="driven by your own expressions", pill=("WORN", "good")),
+        dict(icon="photo", color="cyan", k="Your background only",
+             s="your face is untouched"),
+        dict(icon="eye", color="green", k="Everyone here is told",
+             s="they see the name, not a face"),
+        dict(icon="cross", color="red", k="Never a real person",
+             s="no likeness of anybody real"),
+        dict(icon="shield", color="amber", k="Never on a live desk",
+             s="that badge says a real person"),
+    ], button=("Take it off", "amber")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
