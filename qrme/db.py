@@ -198,6 +198,34 @@ CREATE TABLE IF NOT EXISTS room_mics (
     ended_at      TEXT
 );
 
+-- Channel 2 everywhere else: the same lent wearable, on the surfaces that are
+-- not a room — a watch party, a live desk's stream, a one-to-one connection.
+--
+-- A separate table from `room_mics` rather than a column added to it, because
+-- this schema has no migrations: `CREATE TABLE IF NOT EXISTS` reaches a fresh
+-- database and an ALTER reaches none of the existing ones. A new table is the
+-- only shape that arrives everywhere.
+--
+-- Rooms deliberately do **not** write here. Two storage paths for one surface
+-- is how a disclosure ends up reading one table while the grant sits in the
+-- other, and a microphone that is live but undisclosed is the single worst
+-- failure this feature has. `roommic.lend_on` refuses `surface='room'` and
+-- points at the room routes.
+CREATE TABLE IF NOT EXISTS place_mics (
+    id            TEXT PRIMARY KEY,
+    surface       TEXT NOT NULL,   -- party | desk | connection
+    surface_id    TEXT NOT NULL,
+    interactor_id TEXT NOT NULL,
+    device        TEXT NOT NULL,
+    mic_type      TEXT NOT NULL DEFAULT 'watch',
+    requested_gain TEXT NOT NULL DEFAULT 'near_field',
+    gain          TEXT NOT NULL DEFAULT 'near_field',
+    started_at    TEXT NOT NULL,
+    ended_at      TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_place_mics_live
+    ON place_mics (surface, surface_id) WHERE ended_at IS NULL;
+
 -- Medical referrals: a handoff whose release is authorised by a verified
 -- WebAuthn assertion instead of a `consent: true` boolean (see
 -- qrme/referral.py). A separate table rather than columns on `handoffs`

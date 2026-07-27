@@ -85,6 +85,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   evidence twice. A `self_asserted` level has no evidence to match on, and that
   limit is stated rather than papered over.
 
+- **Channel 2 off the room** — `roommic.lend_on` and friends, 4 routes, 18
+  tests, screen 120. The same lent wearable on a **watch party**, a **live
+  desk's stream** and a **one-to-one connection**. Rooms already covered voice,
+  video, AR and VR by channel, so a 3-D or VR room lends exactly as a voice
+  room does.
+
+  One question decides whether a surface qualifies: **can the other people
+  present be told?** That is what made a room different from a phone call —
+  `jim/mic.py` refuses speakerphone because the other party is a stranger to
+  this product, with no surface on which to show them a disclosure, so their
+  voice could never be part of the bargain. Every place added here has a member
+  list and somewhere to render one; a surface without both must never be added,
+  whatever else is convenient about it, and `GET /microphones/places` publishes
+  the test rather than only the list.
+
+  Rooms deliberately do **not** write to the new table. Two storage paths for
+  one surface is how a disclosure ends up reading one while the grant sits in
+  the other, and a microphone that is live but undisclosed is the worst failure
+  this feature has. A separate table rather than a column on `room_mics`
+  because this schema has no migrations.
+
+  Presence is checked rather than assumed: somebody who left a watch party is
+  not present, an ended connection is not a place, and an unknown id answers
+  404 rather than 403 so a stranger cannot tell a real place from an invented
+  one by the status code. The place ending returns the microphones, wired into
+  `watchparty.end`, `desks.set_presence(..., "closed")` and ending a connection
+  rather than left as a function nobody calls.
+
 - **Anonymous profiles wear one shared silhouette** — `avatars.SILHOUETTE`.
   Everybody who is anonymous gets the *same* figure, and the sameness is the
   feature: a per-profile silhouette, tinted or initialled or generated from the

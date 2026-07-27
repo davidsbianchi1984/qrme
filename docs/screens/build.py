@@ -3522,6 +3522,23 @@ SCREENS = [
         dict(icon="rotate", color="amber", k="Move it to another",
              s="yours to move, any time"),
     ], button=("Move the badge", "brand")),
+    # Channel 2 off the room. The last two cards are the ones that make the
+    # list a rule rather than an inventory: every place here has other people
+    # in it who can be shown the disclosure, which is the test a surface has
+    # to pass to be on the screen at all.
+    dict(num=120, title="Lend It Anywhere", sub="The same microphone, other places",
+         accent="cyan", tab=3, cards=[
+        dict(icon="people", color="brand", k="In a watch party",
+             s="the others watching hear you", pill=("LENT", "good")),
+        dict(icon="speaker", color="cyan", k="On a live desk",
+             s="your visitors, while it is open"),
+        dict(icon="chat", color="indigo", k="In a 1:1 connection",
+             s="the other person, and no one else"),
+        dict(icon="eye", color="green", k="Everyone here is told",
+             s="and can be shown the disclosure"),
+        dict(icon="shieldok", color="amber", k="Ends when it does",
+             s="it cannot outlive the place"),
+    ], button=("Take it back", "amber")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

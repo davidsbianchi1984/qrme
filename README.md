@@ -275,6 +275,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="210" alt="Stay Anonymous"></a><br><sub><b>118</b> · Stay Anonymous</sub></td>
     <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="210" alt="Lend It Anywhere"></a><br><sub><b>120</b> · Lend It Anywhere</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1006,6 +1007,62 @@ per-participant and never becomes the room's microphone, because a participant
 cannot consent on behalf of the people they can hear. Room-facing kinds —
 speakerphone, conference puck, room array, laptop, console, doorbell — are
 refused by name with the reason, not quietly missing from a list.
+
+### The same microphone, off the room
+
+Nothing in the rules above depended on the surface being a room, so channel 2
+reaches the places that had none: a **watch party**, a **live desk's stream**,
+and a **one-to-one connection**. Rooms already covered voice, video, AR and VR
+by channel, so a 3-D or VR room lends exactly as a voice room does.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="200" alt="Lend it anywhere"></a><br><sub><b>120</b> · the same rule in every place</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /microphones/places` | where else it can be lent, and the test each place passes |
+| `POST /places/{surface}/{id}/microphone` | lend yours here |
+| `DELETE /places/{surface}/{id}/microphone` | take it back |
+| `GET /places/{surface}/{id}/microphone` | who here has lent one — readable by **everyone present** |
+
+  </td>
+  </tr>
+</table>
+
+**One question decides whether a surface qualifies: can the other people
+present be told?** That is what made a room different from a phone call in the
+first place — `jim/mic.py` refuses speakerphone outright because the other
+party on a call is a stranger to this product, with no surface on which to show
+them a disclosure, so their voice could never be part of the bargain. A room's
+participants *can* be shown one. So can a watch party's members, a desk's
+visitors, and the other half of a connection. A surface without both a member
+list and somewhere to render the disclosure must never be added here, whatever
+else is convenient about it, and `GET /microphones/places` publishes the test
+rather than only the list.
+
+**Rooms deliberately do not write to the new table.** Two storage paths for one
+surface is how a disclosure ends up reading one table while the grant sits in
+the other, and a microphone that is live but undisclosed is the worst failure
+this feature has. `roommic.lend_on` refuses `surface="room"` and points at the
+room routes. It is a separate table rather than a column on `room_mics` because
+this schema has no migrations — `CREATE TABLE IF NOT EXISTS` reaches a fresh
+database and an `ALTER` reaches none of the existing ones.
+
+**Membership is read from each surface's own table, and presence is checked
+rather than assumed.** Somebody who left a watch party is not present — counting
+them would let a former member go on reading who is wearing a live microphone in
+a place they walked out of. An ended connection is not a place at all, for the
+same reason a closed room takes no new grant. And an unknown id answers 404
+rather than 403, so a stranger cannot use the status code to tell a real place
+from an invented one.
+
+**The place ending returns the microphones**, and that is wired into the
+lifecycle rather than left as a function nobody calls: `watchparty.end`,
+`desks.set_presence(..., "closed")` and ending a connection each return the
+grants inside them. A grant that survived closing would be live again the next
+time the desk opened, for a conversation nobody has had yet.
 
 **A device can be lent under the name it was paired with.** The pairing
 registry calls a collar clip `lapel_mic`; this module and `jim/mic.py` call it

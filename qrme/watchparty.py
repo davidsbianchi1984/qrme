@@ -154,8 +154,13 @@ def end(party_id: str, host_id: str) -> dict:
     conn.execute("UPDATE watch_party_members SET left_at=? WHERE party_id=?"
                  " AND left_at IS NULL", (db.utcnow(), party_id))
     conn.commit()
+    from . import roommic
     return {"party_id": party_id, "ended": True,
-            "grants_closed": sharing.close_surface("party", party_id)}
+            "grants_closed": sharing.close_surface("party", party_id),
+            # A lent microphone is scoped to this party and dies with it. A
+            # permission that outlives the thing which justified it is one
+            # that quietly applies to the next thing.
+            "microphones_returned": roommic.close_place("party", party_id)}
 
 
 def members(party_id: str) -> list[dict]:
