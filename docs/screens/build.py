@@ -205,6 +205,11 @@ def icon(name, cx, cy, col, s=1.0):
     if name == "flag":
         return (f'<path d="M{cx-sc(6)} {cy+sc(8)} v-{sc(16)}" {st}/>'
                 f'<path d="M{cx-sc(6)} {cy-sc(7)} h{sc(11)} l-{sc(2.5)} {sc(3.5)} {sc(2.5)} {sc(3.5)} h-{sc(11)} Z" {st}/>')
+    if name == "smiley":  # the emoji key inside a composer
+        return (f'<circle cx="{cx}" cy="{cy}" r="{sc(7)}" {st}/>'
+                f'<circle cx="{cx-sc(2.6)}" cy="{cy-sc(2)}" r="{sc(1.1)}" {p}/>'
+                f'<circle cx="{cx+sc(2.6)}" cy="{cy-sc(2)}" r="{sc(1.1)}" {p}/>'
+                f'<path d="M{cx-sc(3.4)} {cy+sc(2)} a{sc(3.6)} {sc(3.6)} 0 0 0 {sc(6.8)} 0" {st}/>')
     if name == "bell":  # ring the bell on a desk
         return (f'<path d="M{cx-sc(7)} {cy+sc(4)} C{cx-sc(5.5)} {cy+sc(1)} {cx-sc(5)} {cy-sc(2)} {cx-sc(5)} {cy-sc(4)} '
                 f'A{sc(5)} {sc(5)} 0 0 1 {cx+sc(5)} {cy-sc(4)} '
@@ -314,45 +319,82 @@ def bubble_chat(x, y, w, rows):
     return out, yy
 
 
-def live_actions(x, y, w, h, actions):
-    """The verbs a viewer has in a live room, drawn on the picture.
+D_BTN = 22          # the round buttons on the live bar
+G_BTN = 4           # and the gap between them
 
-    Every one of these already existed as a route — ``POST /desks/{id}/bell``,
+# A photo that *is* the screen: from where content starts down to just above
+# the tab bar. A live room laid out any other way puts the thing somebody came
+# to watch in a box with furniture around it.
+PHOTO_FULL = (SY + SH - 52) - (SY + 100) - 10
+
+
+def live_bar(x, y, w, h, actions, placeholder="Type…"):
+    """The composer and the reaction buttons, on one line at the foot of a live
+    room.
+
+    Every verb here already existed as a route — ``POST /desks/{id}/bell``,
     ``POST /desks/{id}/guests``, ``POST /{kind}/{id}/gift`` and the audience
     layer's like and share — and none of them existed anywhere a thumb could
     reach. A capability with no control is indistinguishable from a missing
     feature, which is exactly how it read.
 
-    So: one row, on the frame, at the bottom where a thumb rests. Ringing the
-    bell and asking to come up sit in the same row as like, gift and share
-    because from the viewer's side they are the same gesture — a thing you do
+    The first version of this row was five large labelled buttons under the
+    video, and it was wrong twice over: it ate the picture, and it explained
+    itself at a size nobody needs. Every live product converges on the same
+    answer because it is the right one — the video is the screen, and the
+    controls are a single strip at the bottom, small enough to stay out of the
+    way and thumb-reachable because that is where the thumb already is.
+
+    So: a composer on the left, then the reactions as small circles pushed to
+    the right corner. No captions. An icon at this size has to carry its own
+    meaning, which is why the bell is a bell and the guest request is a person
+    with an arrow over them rather than anything cleverer.
+
+    Ringing and asking to come up sit in the same strip as like, gift and
+    share because from the viewer's side they are one gesture — a thing you do
     to the room you are watching. That the last one needs the host to say yes
     is the host's business, not a reason to file it under a different menu.
-
-    Each button is labelled. An unlabelled bell and an unlabelled "come up"
-    arrow are the two icons in this row nobody guesses right, and the cost of
-    guessing wrong is interrupting a stranger's stream.
     """
     o = []
-    bar_h = 52
-    by = y + h - 10 - bar_h
-    o.append(rrect(x + 8, by, w - 16, bar_h, 24, "rgba(8,6,22,0.66)",
-                   "rgba(255,255,255,0.10)", 1))
-    slot = (w - 16) / len(actions)
-    for i, (ic, col, label) in enumerate(actions):
-        # The label is the point of the row, so it is the label that sets the
-        # limit. Checked here rather than left to a render, which is how the
-        # same overlap reached the agent groups.
-        if len(label) * 4.15 > slot - 6:
-            raise ValueError(f"live action label too wide for its slot: {label!r}")
-        bx = x + 8 + slot * (i + 0.5)
-        o.append(f'<circle cx="{bx}" cy="{by+19}" r="14" '
-                 f'fill="{A(ACCENT[col], 0.20)}" '
-                 f'stroke="{A(ACCENT[col], 0.60)}" stroke-width="1"/>')
-        o.append(icon(ic, bx, by + 19, ACCENT[col], 0.66))
-        o.append(text(bx, by + 45, label, 7.4, "rgba(240,238,255,0.94)", 650,
-                      "middle"))
-    return o, bar_h + 20
+    right = x + w - 8
+    strip = len(actions) * D_BTN + (len(actions) - 1) * G_BTN
+    by = y + h - 10 - D_BTN                 # top of the row
+    cy = by + D_BTN / 2
+
+    # The composer takes whatever the buttons leave. It has a floor: below
+    # this the placeholder is unreadable and the field stops looking like
+    # somewhere you can type, which is the only job it has on a still image.
+    bar_w = (right - strip - 8) - (x + 8)
+    if bar_w < 74:
+        raise ValueError(
+            f"{len(actions)} buttons leave {bar_w:.0f}px for the composer; "
+            f"74 is the floor")
+    o.append(rrect(x + 8, by, bar_w, D_BTN, D_BTN / 2, "rgba(8,6,22,0.62)",
+                   "rgba(255,255,255,0.12)", 1))
+    o.append(text(x + 18, cy + 3, placeholder, 8.6,
+                  "rgba(232,228,255,0.55)", 500))
+    # The emoji key sits inside the right end of the field, where every
+    # composer puts it — reactions are one line up, this is for the message.
+    o.append(f'<circle cx="{x+8+bar_w-13}" cy="{cy}" r="7.4" '
+             f'fill="rgba(255,255,255,0.20)"/>')
+    o.append(icon("smiley", x + 8 + bar_w - 13, cy, "rgba(255,255,255,0.82)",
+                  0.42))
+
+    bx = right - strip
+    for entry in actions:
+        ic, col = entry[0], entry[1]
+        count = entry[2] if len(entry) > 2 else None
+        o.append(f'<circle cx="{bx+D_BTN/2}" cy="{cy}" r="{D_BTN/2}" '
+                 f'fill="rgba(8,6,22,0.62)" '
+                 f'stroke="{A(ACCENT[col], 0.45)}" stroke-width="0.9"/>')
+        o.append(icon(ic, bx + D_BTN / 2, cy, ACCENT[col], 0.44))
+        if count:
+            # Tucked under the glyph rather than beside it — a count that
+            # widens the button breaks the even spacing of the strip.
+            o.append(text(bx + D_BTN - 2, cy + D_BTN / 2 - 1, count, 6.4,
+                          "rgba(255,255,255,0.85)", 700, "end"))
+        bx += D_BTN + G_BTN
+    return o, D_BTN + 18
 
 
 def friends_list(y, entries):
@@ -1147,12 +1189,12 @@ def render(spec):
         # the photo is a list above a picture, which is the thing it exists
         # not to be.
         bottom = 12
-        if spec.get("live_actions"):
-            block, used = live_actions(CX, y, CW, ph, spec["live_actions"])
+        if spec.get("live_bar"):
+            block, used = live_bar(CX, y, CW, ph, spec["live_bar"])
             out += block
-            # The chat gives way to the buttons rather than the other way
-            # round: a comment you cannot read scrolls past, a control you
-            # cannot reach never gets used.
+            # The chat gives way to the bar rather than the other way round: a
+            # comment you cannot read scrolls past, a control you cannot reach
+            # never gets used.
             bottom += used
         if spec.get("bubble_chat"):
             rows = spec["bubble_chat"]
@@ -2136,7 +2178,12 @@ def render(spec):
             out.append(button(CX, y, CW, spec["button"][0], spec["button"][1], 42))
 
     out += tabbar(spec.get("tabs", MAIN), spec.get("tab", 0))
-    out += help_button()
+    # The help button sits in the bottom trailing corner, which is exactly
+    # where a live room's reaction strip ends. It stands down rather than
+    # landing on the share button — a floating helper that covers a control is
+    # worse than no floating helper.
+    if not spec.get("live_bar"):
+        out += help_button()
     out += navbar()
     # Drawn after the tab bar so nothing sits on top of it, and before close()
     # because close() emits the closing tag — appending past it produced a
@@ -2639,29 +2686,20 @@ SCREENS = [
     # guest request. They were reachable by API and by nothing else.
     dict(num=89, title="Live Room", sub="Ring, gift, or ask to come up",
          accent="pink", tab=3,
-         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=300,
-         live_actions=[
-             ("bell", "amber", "Ring"),
-             ("gift", "gold", "Gift"),
-             ("heart", "pink", "Like"),
-             ("share", "cyan", "Share"),
-             ("comeup", "green", "Come up"),
+         photo=frames.DESK, photo_tag=("LIVE", "live"), photo_h=PHOTO_FULL,
+         live_bar=[
+             ("comeup", "green"),
+             ("bell", "amber"),
+             ("gift", "gold"),
+             ("heart", "pink"),
+             ("share", "cyan"),
          ],
          bubble_chat=[
              ("Marcus Bell", "the compounding chart, again?", frames.PORTRAITS[1][1]),
              ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
              ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
              ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
-         ], cards=[
-        # The two that carry a condition. Like, gift and share are unsurprising
-        # — you press them and they happen — but a bell that can be hammered
-        # and a guest slot that needs nobody's permission are both ways to make
-        # somebody's stream worse, so those two say their rule out loud.
-        dict(icon="bell", color="amber", k="Ring the bell",
-             s="one ring per desk per 30s"),
-        dict(icon="comeup", color="green", k="Come up as a guest",
-             s="the host decides — you ask", pill=("ASK", "warn")),
-    ]),
+         ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

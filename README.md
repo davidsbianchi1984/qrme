@@ -280,26 +280,28 @@ chair with a bell, the reactions are the room. Those screens also show the two
 ways in: **come up as a guest**, which asks the host, or **just comment**,
 which is immediate.
 
-**89** is the same room with the faces drawn as circles on the glass, and with
-the five things a viewer can actually do in a row along the bottom of the
-frame. Every one of them was already a route and none of them was anywhere a
-thumb could reach, which reads exactly like a missing feature:
+**89** is the room itself: the video runs the full height of the screen, the
+faces are circles on the glass, and everything a viewer can do is one strip
+along the bottom — a composer, then the reactions as small circles in the
+trailing corner. Every one of those was already a route, and none of them was
+anywhere a thumb could reach, which reads exactly like a missing feature:
 
-| On screen | Route |
+| On the strip | Route |
 | --- | --- |
-| **Ring** | `POST /desks/{desk_id}/bell` — one ring per desk per 30s |
-| **Gift** | `POST /{kind}/{subject_id}/gift` |
-| **Like** | `POST /posts/{id}/like` — the audience layer |
-| **Share** | `POST /{kind}/{id}/share` |
-| **Come up** | `POST /desks/{desk_id}/guests` — the host decides |
+| person + arrow | `POST /desks/{desk_id}/guests` — asks the host |
+| bell | `POST /desks/{desk_id}/bell` — one ring per desk per 30s |
+| gift | `POST /{kind}/{subject_id}/gift` |
+| heart | `POST /posts/{id}/like` — the audience layer |
+| share | `POST /{kind}/{id}/share` |
 
-Ringing and coming up sit in the same row as like, gift and share because from
-the viewer's side they are one gesture: a thing you do to the room you are
-watching. That the last of them needs the host to say yes is the host's
-business, not a reason to file it under a different menu. The two that carry a
-condition say so on the cards underneath, and the buttons are labelled — an
-unlabelled bell and an unlabelled arrow are the two icons nobody guesses right,
-and the cost of guessing wrong is interrupting a stranger's stream.
+Ringing and coming up sit in the same strip as like, gift and share because
+from the viewer's side they are one gesture: a thing you do to the room you are
+watching. That the guest request needs the host to say yes is the host's
+business, not a reason to file it under a different menu. **75** and **76** are
+where those conditions are spelled out; **89** is what it looks like once you
+already know them. The help button stands down on this screen — it lives in the
+same corner the share button now occupies, and a floating helper that covers a
+control is worse than no floating helper.
 
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it
