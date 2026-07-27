@@ -403,6 +403,16 @@ FOUNDER_SKILLS = ["private-data-infrastructure", "encryption", "ai-agents",
 FOUNDER_CONSENT = ("self — the subject is the account owner",
                    "David Bianchi")
 
+# Knowledge packs installed on the **AI** profile only.
+#
+# The two halves are the same man and know the same things about the platform,
+# but they are not the same kind of thing to talk to. The photographed profile
+# is him; loading it with four industry libraries would be claiming he has them
+# memorised. The rendered one is openly a synthetic expert, and a synthetic
+# expert is exactly what a knowledge pack is for — so the asymmetry is the
+# honest way round rather than an oversight.
+FOUNDER_AI_PACKS = ["technology", "cybersecurity", "science", "telecom"]
+
 
 def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     """Create one of the founder's two profiles, or return the existing id.
@@ -419,6 +429,13 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                          (handle,)).fetchone()
     if taken:
+        # Repair, not recreate — the same shape as the portrait backfill. A
+        # deployment seeded before the packs were published has an AI half with
+        # no libraries, and re-running the seed is the only thing that reaches
+        # it.
+        if handle == FOUNDER_HANDLE:
+            for industry in FOUNDER_AI_PACKS:
+                _ground(conn, taken["profile_id"], industry, force=True)
         return taken["profile_id"]
 
     profile = create_profile(ProfileCreate(
@@ -471,6 +488,11 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     verification.verify(
         profile["id"], "self_asserted", attestor=attestor,
         method="platform owner, self-attested")
+
+    # The rendered half carries the industry libraries — see FOUNDER_AI_PACKS.
+    if handle == FOUNDER_HANDLE:
+        for industry in FOUNDER_AI_PACKS:
+            _ground(conn, profile["id"], industry, force=True)
     return profile["id"]
 
 
@@ -524,7 +546,8 @@ def _backfill(conn, profile_id: str, handle: str) -> bool:
     return changed
 
 
-def _ground(conn, profile_id: str, industry: str) -> int:
+def _ground(conn, profile_id: str, industry: str,
+            force: bool = False) -> int:
     """Install this starter's industry Field Pack, if it has none yet.
 
     ``qrme/packs.py`` says the starter packs are *"one free Field Pack per
@@ -543,6 +566,10 @@ def _ground(conn, profile_id: str, industry: str) -> int:
     * **Only when the profile has nothing.** An owner who has added their own
       material, or removed the pack on purpose, does not get it pushed back
       on the next seed — the same blank-only rule :func:`_backfill` follows.
+      ``force=True`` is the one exception: the founder's AI profile is meant to
+      carry several libraries *on top of* its written material, so the
+      blank-only rule would stop it after the first. It still skips a pack
+      already installed, so re-seeding stays idempotent.
     * **Free packs only**, and no ledger credit: this is a deployment
       grounding its own starters, not a purchase. A priced pack is a decision
       for whoever owns the profile.
@@ -551,11 +578,12 @@ def _ground(conn, profile_id: str, industry: str) -> int:
     """
     from . import db                # deferred, like seed()'s own imports
 
-    existing = conn.execute(
-        "SELECT 1 FROM source_items WHERE profile_id=? LIMIT 1",
-        (profile_id,)).fetchone()
-    if existing:
-        return 0
+    if not force:
+        existing = conn.execute(
+            "SELECT 1 FROM source_items WHERE profile_id=? LIMIT 1",
+            (profile_id,)).fetchone()
+        if existing:
+            return 0
     pack = conn.execute(
         "SELECT id, price FROM knowledge_packs WHERE industry=?"
         " AND audience='profile' AND rated=0 ORDER BY rowid LIMIT 1",
@@ -563,6 +591,11 @@ def _ground(conn, profile_id: str, industry: str) -> int:
     if pack is None or pack["price"]:
         return 0
 
+    # Idempotent even under force: a pack already installed is not installed
+    # twice, so re-seeding does not multiply the library.
+    if conn.execute("SELECT 1 FROM pack_installs WHERE pack_id=? AND"
+                    " profile_id=?", (pack["id"], profile_id)).fetchone():
+        return 0
     items = conn.execute(
         "SELECT * FROM pack_items WHERE pack_id=? ORDER BY rowid",
         (pack["id"],)).fetchall()

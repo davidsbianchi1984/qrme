@@ -406,11 +406,33 @@ def test_both_founder_profiles_carry_the_domain_knowledge(client):
     from qrme import db
     for pid in _seeded(client):
         titles = [r["title"] for r in db.connect().execute(
-            "SELECT title FROM source_items WHERE profile_id=?",
-            (pid,)).fetchall()]
+            "SELECT title FROM source_items WHERE profile_id=? AND"
+            " pack_id IS NULL", (pid,)).fetchall()]
         assert any("Private Data Infrastructure" in t for t in titles)
         assert any("Envelope encryption" in t for t in titles)
         assert len(titles) == len(seed.FOUNDER_SOURCES)
+
+
+def test_only_the_ai_half_carries_the_knowledge_packs(client):
+    """The asymmetry is the honest way round. The photographed profile is the
+    man; loading it with four industry libraries would be claiming he has them
+    memorised. The rendered one is openly a synthetic expert, which is what a
+    pack is for.
+
+    Packs arrive on the seed re-run once the library is published — the same
+    repair path the portraits and the starters' grounding take."""
+    from qrme import db
+    verified, rendered = _seeded(client)
+    client.post("/packs/seed")
+    seed.seed()
+
+    def packs_on(pid):
+        return db.connect().execute(
+            "SELECT COUNT(*) AS n FROM pack_installs WHERE profile_id=?",
+            (pid,)).fetchone()["n"]
+
+    assert packs_on(rendered) == len(seed.FOUNDER_AI_PACKS)
+    assert packs_on(verified) == 0
 
 
 def test_both_founder_profiles_carry_skills_and_a_cv(client):

@@ -276,26 +276,37 @@ def friends_list(y, entries):
     enough to just say.
     """
     out, yy = [], y
-    for name, sub, b64, badge in entries:
+    for entry in entries:
+        name, sub, b64, badge = entry[:4]
+        packs = entry[4] if len(entry) > 4 else 0
         # The founder's row gives up its right end to the badge, so its
         # subtitle has less room than the others. Caught here rather than in a
         # render, which is how the same overlap got shipped on the agent groups.
         if len(sub) > (26 if badge else 34):
             raise ValueError(f"friend subtitle too long for the row: {sub!r}")
-        h = 62
+        h = 74
         out.append(rrect(CX, yy, CW, h, 15, "url(#gCard)", C["line"], 1))
         if b64:
-            out.append(face(CX + 33, yy + 31, 40, b64))
+            out.append(face(CX + 33, yy + 30, 40, b64))
         else:
-            out.append(orb(CX + 33, yy + 31, 19))
-        out.append(text(CX + 62, yy + 26, name, 13, C["txt"], 700))
-        out.append(text(CX + 62, yy + 43, sub, 9.5, C["t2"], 500))
+            out.append(orb(CX + 33, yy + 30, 19))
+        # Knowledge packs, beside the face rather than in the subtitle: it is a
+        # property of what the profile *knows*, and it belongs next to the
+        # thing it qualifies.
+        if packs:
+            word = "PACK" if packs == 1 else "PACKS"
+            out.append(rrect(CX + 12, yy + 55, 42, 13, 6,
+                             A(C["cyan"], 0.2), C["cyan"], 0.9))
+            out.append(text(CX + 33, yy + 64, f"{packs} {word}", 6.5,
+                            C["cyan"], 800, "middle", 0.3))
+        out.append(text(CX + 62, yy + 32, name, 13, C["txt"], 700))
+        out.append(text(CX + 62, yy + 49, sub, 9.5, C["t2"], 500))
         if badge:
             col = C["gold"] if badge == "VERIFIED" else C["brandA"]
             bw = 52
             bx = CX + CW - bw - 12
-            out.append(rrect(bx, yy + 20, bw, 18, 9, A(col, 0.18), col, 1))
-            out.append(text(bx + bw / 2, yy + 32, badge, 7.5, col, 800,
+            out.append(rrect(bx, yy + 28, bw, 18, 9, A(col, 0.18), col, 1))
+            out.append(text(bx + bw / 2, yy + 40, badge, 7.5, col, 800,
                             "middle", 0.4))
         yy += h + 9
     return out, yy
@@ -2393,11 +2404,15 @@ SCREENS = [
          accent="cyan", tab=1, friends=[
         # No handle in the subtitle: the badges already say which is which,
         # and a suffix on a person's own name reads as a filename.
-        ("David Bianchi", "CEO · PDI Systems",
+        #
+        # Every synthetic profile carries the AI badge, not only the founder's.
+        # A badge that appears on one AI profile and not the next implies the
+        # unbadged one is something else.
+        ("David Bianchi", "CEO/Imagineer",
          frames.FOUNDER_VERIFIED[1], "VERIFIED"),
-        ("David Bianchi", "CEO · PDI Systems", frames.FOUNDER[1], "AI"),
-        ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], None),
-        ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], None),
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI", 4),
+        ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], "AI", 1),
+        ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], "AI", 1),
     ]),
     # The page somebody made, in their own colours. Drawn in the page's theme
     # rather than the app's, because a homepage that looks like every other
