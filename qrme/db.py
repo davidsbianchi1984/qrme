@@ -734,6 +734,94 @@ CREATE TABLE IF NOT EXISTS post_attachments (
     created_at TEXT NOT NULL
 );
 
+-- Two people agreeing, in writing, on work about to change hands.
+--
+-- `state` is the whole safety story: only `draft` is editable, and any edit
+-- deletes the signature rows, so a signature can never be attached to a
+-- manifest its signer did not read. See qrme/exchange.py.
+CREATE TABLE IF NOT EXISTS exchanges (
+    id         TEXT PRIMARY KEY,
+    desk_id    TEXT,                -- the desk it came out of, when it did
+    host_id    TEXT NOT NULL,
+    guest_id   TEXT NOT NULL,
+    work       TEXT NOT NULL,       -- one sentence: what is being done
+    industry   TEXT NOT NULL,
+    includes   TEXT,                -- JSON list: what is delivered at the end
+    excludes   TEXT,                -- JSON list: what is not, said out loud
+    fee        REAL NOT NULL DEFAULT 0,
+    state      TEXT NOT NULL,       -- draft|proposed|signed|delivered|closed|withdrawn
+    created_at TEXT NOT NULL
+);
+
+-- Every artifact named on a manifest, in both directions. `accepted_at` is the
+-- second consent: a signed agreement makes an item available, and this is the
+-- receiving side actually taking it.
+CREATE TABLE IF NOT EXISTS exchange_items (
+    id          TEXT PRIMARY KEY,
+    exchange_id TEXT NOT NULL REFERENCES exchanges(id),
+    direction   TEXT NOT NULL,      -- host_to_guest | guest_to_host
+    name        TEXT NOT NULL,
+    kind        TEXT NOT NULL,
+    bytes       INTEGER NOT NULL DEFAULT 0,
+    note        TEXT,
+    accepted_at TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- A signature against a *fingerprint*, never against an exchange id. That is
+-- what lets `channel()` tell a current signature from a stale one without
+-- anything having to remember to clear it.
+CREATE TABLE IF NOT EXISTS exchange_signatures (
+    exchange_id TEXT NOT NULL REFERENCES exchanges(id),
+    party_id    TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    signed_at   TEXT NOT NULL,
+    PRIMARY KEY (exchange_id, party_id)
+);
+
+-- Watching something together. The party holds a *position*, not a player:
+-- each viewer's own video still loads only when they press play, which is the
+-- promise post_videos above is built on. See qrme/watchparty.py.
+CREATE TABLE IF NOT EXISTS watch_parties (
+    id         TEXT PRIMARY KEY,
+    post_id    TEXT NOT NULL REFERENCES posts(id),
+    host_id    TEXT NOT NULL,
+    title      TEXT,
+    position_s INTEGER NOT NULL DEFAULT 0,
+    playing    INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL
+);
+
+-- Who is in the room. `kind` separates a real account from a synthetic
+-- profile, because nearly every rule differs between them — and because a room
+-- where you cannot tell which of the names is a person is the room this
+-- platform exists not to build.
+CREATE TABLE IF NOT EXISTS watch_party_members (
+    id        TEXT PRIMARY KEY,
+    party_id  TEXT NOT NULL REFERENCES watch_parties(id),
+    member_id TEXT NOT NULL,
+    kind      TEXT NOT NULL,        -- person | profile
+    role      TEXT NOT NULL,        -- host | guest
+    joined_at TEXT NOT NULL,
+    left_at   TEXT,
+    UNIQUE (party_id, member_id)
+);
+
+-- The party chat, each line stamped with the position it was said at so a
+-- comment about a moment stays attached to that moment. Moderated like every
+-- other utterance; a blocked line is kept rather than dropped.
+CREATE TABLE IF NOT EXISTS watch_party_lines (
+    id          TEXT PRIMARY KEY,
+    party_id    TEXT NOT NULL REFERENCES watch_parties(id),
+    member_id   TEXT NOT NULL,
+    kind        TEXT NOT NULL,
+    body        TEXT NOT NULL,
+    position_s  INTEGER NOT NULL DEFAULT 0,
+    status      TEXT NOT NULL,
+    flag_reason TEXT,
+    created_at  TEXT NOT NULL
+);
+
 -- A video a post is pointing at, on somebody else's platform.
 --
 -- The link and the id, never the file and never a thumbnail: re-hosting

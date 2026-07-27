@@ -23,12 +23,12 @@ from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (apps, assistant, audience, avatars, commerce,
                       community, connections,
-                      desks, earnings, feedback, friends, gaming, governance,
+                      desks, earnings, exchange, feedback, friends, gaming, governance,
                       intelligence, interaction, licensing, models, packs, pages,
                       frontpage, profiles, research, revisions, robots,
                       signatures,
                       social, steering,
-                      summon, wall, watch, watermarks)
+                      summon, wall, watch, watchparty, watermarks)
 
 
 def create_app(pdi_client: PDIClient | None = None,
@@ -101,6 +101,8 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(friends.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
+    app.include_router(exchange.router)
+    app.include_router(watchparty.router)
     app.include_router(revisions.router)
     app.include_router(social.router)
     app.include_router(apps.router)

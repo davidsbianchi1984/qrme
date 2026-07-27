@@ -3376,6 +3376,65 @@ SCREENS = [
          ]),
          live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
+    # The agreement window. Two people about to send each other work, and the
+    # document they both sign before anything moves — see `qrme/exchange.py`.
+    # The manifest is the screen: what crosses, which way, and how big, because
+    # "what am I about to receive" should be a list rather than an assurance.
+    dict(num=112, title="The Agreement", sub="Before anything moves",
+         accent="gold", tab=0, cards=[
+        dict(icon="doc", color="gold", k="Checkout flow",
+             s="software · agreed by both", pill=("DRAFT", "warn")),
+        dict(icon="link", color="cyan", k="spec.pdf → them",
+             s="document · 240 KB"),
+        dict(icon="bolt", color="amber", k="checkout.zip → you",
+             s="source · 1.4 MB · runs", pill=("RUNS", "crit")),
+        dict(icon="shieldok", color="green", k="Included when done",
+             s="the source · a handover call"),
+        dict(icon="cross", color="red", k="Not included",
+             s="hosting · ongoing support"),
+    ], button=("Sign — 1 of 2", "brand")),
+    # The rule the whole design turns on, given its own screen because it is
+    # the one people will not believe until they see it happen.
+    dict(num=113, title="Signatures Cleared", sub="The manifest changed",
+         accent="red", tab=0, cards=[
+        dict(icon="warn", color="red", k="An item was added",
+             s="both signatures dropped", pill=("VOID", "crit")),
+        dict(icon="person", color="amber", k="You signed", s="at 14:02 — cleared"),
+        dict(icon="person", color="amber", k="They signed", s="at 14:03 — cleared"),
+        dict(icon="lock", color="cyan", k="Nothing moved",
+             s="the channel never opened"),
+        dict(icon="doc", color="green", k="Read it again",
+             s="then both sign the new one"),
+    ], button=("Review the manifest", "brand")),
+    # Delivery: a signed agreement makes items available, it does not place
+    # them. Each one is taken separately by the side receiving it.
+    dict(num=114, title="Delivery", sub="Nothing arrives on its own",
+         accent="green", tab=0, cards=[
+        dict(icon="shieldok", color="green", k="Both signed",
+             s="channel open · 2 items", pill=("OPEN", "good")),
+        dict(icon="doc", color="cyan", k="spec.pdf", s="accepted 14:11",
+             pill=("TAKEN", "good")),
+        dict(icon="bolt", color="amber", k="checkout.zip",
+             s="source · waiting for you", pill=("ACCEPT", "warn")),
+        dict(icon="warn", color="red", k="It runs on your machine",
+             s="signing is not a code review"),
+        dict(icon="lock", color="brand", k="No device access",
+             s="the listed items, and nothing else"),
+    ], button=("Accept checkout.zip", "amber")),
+    # The watch party, in the app. A posted video, the people and the profiles
+    # in the room, and the line that keeps the embed promise.
+    dict(num=115, title="Watch Party", sub="Together, on your own play button",
+         accent="cyan", tab=0,
+         facade_card=dict(platform="YouTube", title="the compounding talk",
+                          note="the room shares a position, not a player"),
+         cards=[
+        dict(icon="people", color="cyan", k="4 people · 2 profiles",
+             s="each marked for what it is"),
+        dict(icon="finger", color="amber", k="The host holds it",
+             s="the position — everyone follows"),
+        dict(icon="shieldok", color="green", k="Profiles have not seen it",
+             s="told so, not just starved"),
+    ], button=("Join the party", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

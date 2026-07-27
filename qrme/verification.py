@@ -86,6 +86,29 @@ def status(profile_id: str) -> dict:
         "  FROM profiles p"
         "  LEFT JOIN profile_verification v ON v.profile_id = p.id"
         " WHERE p.id=?", (profile_id,)).fetchone()
+    return _read(row)
+
+
+def statuses(profile_ids: list[str]) -> dict[str, dict]:
+    """The same badge for many profiles, in one query.
+
+    A friends list needs one of these per row, and fetching them one at a time
+    made a list of fifty into fifty round trips. The formatting stays in
+    :func:`_read` so both paths cannot drift apart — which is the usual cost of
+    adding a batch version beside a single one.
+    """
+    if not profile_ids:
+        return {}
+    marks = ",".join("?" * len(profile_ids))
+    rows = db.connect().execute(
+        "SELECT p.id, p.kind, v.level, v.attestor, v.method, v.checked_at"
+        "  FROM profiles p"
+        "  LEFT JOIN profile_verification v ON v.profile_id = p.id"
+        f" WHERE p.id IN ({marks})", list(profile_ids)).fetchall()
+    return {r["id"]: _read(r) for r in rows}
+
+
+def _read(row) -> dict:
     if row is None:
         return {}
     if row["kind"] == "fictional":

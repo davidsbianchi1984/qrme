@@ -262,6 +262,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
     <td align="center" width="33%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>99</b> · Posted Video · YouTube</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/112-the-agreement.svg"><img src="docs/screens/112-the-agreement.svg" width="210" alt="The Agreement"></a><br><sub><b>112</b> · The Agreement</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="210" alt="Delivery"></a><br><sub><b>114</b> · Delivery</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/115-watch-party.svg"><img src="docs/screens/115-watch-party.svg" width="210" alt="Watch Party"></a><br><sub><b>115</b> · Watch Party</sub></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -1015,6 +1020,105 @@ the reason, and invisible to everyone else. On the way out, an adult profile's
 posts are walled out of an ordinary feed — a gate inherited from the *author*
 rather than judged per post, because otherwise an adult profile publishes past
 its own wall by writing something innocuous.
+
+## Agreeing before work changes hands
+
+Somebody comes up as a guest on a desk and it turns into business — they will
+build something, review something, hand over a file. The moment that happens
+two strangers are about to send each other things, and the interesting part is
+not the sending. It is the **agreeing**, because that is where every dispute
+comes from and the one place a platform can actually help.
+
+So an exchange (`qrme/exchange.py`, `POST /exchanges`) is a document before it
+is a transfer. One side proposes; the document names, item by item:
+
+* **what goes across, in each direction** — every artifact with its kind and
+  its size, so *what am I about to receive* is a list rather than an assurance;
+* **what the work is**, in one sentence, and which of sixteen industries it
+  belongs to — this is a business agreement in any trade, not a software
+  feature the other trades are allowed to borrow;
+* **what is included when it is finished** — the clause people actually argue
+  about afterwards;
+* **what is not included**, said out loud, because an absent exclusion reads as
+  an inclusion to whoever paid.
+
+Then both sides sign, and only then does anything move. Four rules make that
+more than a form.
+
+**Neither signature alone opens anything.** `GET /exchanges/{id}/channel` —
+the one call a transport layer should ask — reports `open: false` until both
+parties have signed. A one-sided agreement is not an agreement.
+
+**Any change to the manifest voids both signatures** (**113**). This is the
+rule the whole design turns on: without it you agree to a two-item manifest and
+the other side appends a third, and your signature sits on a document you never
+read. Signatures are stored against a **fingerprint of the agreement**, not
+against its id, which makes that a fact about the data rather than a promise
+about the code — after an edit the old signatures match nothing. In practice
+the guarantee is stronger still: the document freezes the moment *anybody*
+signs, so the only route to an edit is `reopen`, and that deletes the
+signatures on its way past. A signature here is either current or absent;
+there is no way to make a stale one.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/112-the-agreement.svg"><img src="docs/screens/112-the-agreement.svg" width="200" alt="The agreement"></a><br><sub><b>112</b> · the manifest, before anyone signs</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/113-signatures-cleared.svg"><img src="docs/screens/113-signatures-cleared.svg" width="200" alt="Signatures cleared"></a><br><sub><b>113</b> · one item added, both signatures gone</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="200" alt="Delivery"></a><br><sub><b>114</b> · accepted one at a time</sub></td>
+  </tr>
+</table>
+
+**Nothing downloads by itself** (**114**). A signed exchange makes each item
+*available*; the receiving side accepts them one at a time, and only the
+receiving side can — the sender cannot accept on their behalf. Consent to an
+agreement is not consent to a file landing on your disk. Items that **run** —
+`source` and `build` — are flagged as such on the manifest and again at
+acceptance, because a signature on an agreement is not a review of what the
+code does.
+
+**It grants no access to anybody's device**, and that limit is in the code
+rather than in a warning. An exchange moves named artifacts somebody attached;
+it opens no session, runs nothing, and reaches nothing that was not listed.
+Hooking one machine up to another is a different feature with a different
+threat model, and shipping it quietly inside a file-sharing agreement would be
+the wrong way to arrive at it.
+
+## Watch parties, and a profile that has not seen the video
+
+A watch party (`qrme/watchparty.py`, `POST /watch-parties`) is a posted video
+plus everyone who turned up — and on this platform that includes **synthetic
+profiles**, which is where the honesty problem is.
+
+**A profile has not seen the video. It cannot.** Nothing here fetches it,
+nothing transcribes it, and a profile saying *"the bit at four minutes was
+great"* would be fabricating — the most ordinary-looking lie this product could
+tell, and the one nobody would think to check. So
+`GET /watch-parties/{id}/context` hands a profile only what exists on this
+side: the title the poster typed, the platform, where the room has got to, and
+what the humans have said. `description_available` and `transcript_available`
+are both `false`, and it says so in the prompt, in the second person:
+
+> you have not watched this video and cannot see it. Talk about what the others
+> in the room are saying and about what the video is titled. If somebody asks
+> what you thought of a moment in it, say you have not seen it rather than
+> inventing one.
+
+Starving a model of context and hoping is not a safeguard. Telling it the truth
+about its own position is.
+
+**The room shares a position, not a player.** The host moves a number and
+everyone follows; it does not press play on anybody's device. That is what
+keeps the embed promise from being broken twenty times at once — a party that
+pre-loaded the video for twenty people would have made twenty requests to
+YouTube nobody agreed to. **Only the host** moves it, because otherwise the
+last person to scrub decides what the room is looking at.
+
+Every member carries `synthetic: true|false`. A room where you cannot tell
+which of the six names is a person is the room this platform exists not to
+build. Party chat is moderated like every other utterance, a party with a minor
+in it runs strict, and a party can only be opened on an **approved** post —
+otherwise it would be a way to put a video in front of people that the wall
+refuses to show them.
 
 ## The page you make yourself
 

@@ -219,6 +219,14 @@ def friends_of(profile_id: str) -> list[dict]:
         "          f.created_at ASC",
         (profile_id,)).fetchall()
 
+    # Both of the per-row lookups below are answered up front. Reading a
+    # verification record and a reciprocal friendship one row at a time made a
+    # list of fifty friends into a hundred and one queries, all of which fit in
+    # two.
+    ids = [r["friend_id"] for r in rows]
+    badges = verification.statuses(ids)
+    mutual = _mutual_with(profile_id, ids)
+
     out = []
     for i, r in enumerate(rows, start=1):
         founder = r["origin"].startswith("founder")
@@ -237,9 +245,9 @@ def friends_of(profile_id: str) -> list[dict]:
             # exactly where somebody decides whether a face is a real person,
             # so the level travels with the word rather than being a second
             # call the surface might not make.
-            "verification": verification.status(r["friend_id"]),
+            "verification": badges.get(r["friend_id"], {}),
             "since": r["created_at"],
-            "mutual": _is_mutual(profile_id, r["friend_id"]),
+            "mutual": r["friend_id"] in mutual,
         })
     return out
 
@@ -248,6 +256,17 @@ def _is_mutual(profile_id: str, friend_id: str) -> bool:
     return db.connect().execute(
         "SELECT 1 FROM friendships WHERE profile_id=? AND friend_id=? AND"
         " state='active'", (friend_id, profile_id)).fetchone() is not None
+
+
+def _mutual_with(profile_id: str, friend_ids: list[str]) -> set[str]:
+    """Which of these list `profile_id` back, in one query."""
+    if not friend_ids:
+        return set()
+    marks = ",".join("?" * len(friend_ids))
+    return {r["profile_id"] for r in db.connect().execute(
+        f"SELECT profile_id FROM friendships WHERE friend_id=? AND"
+        f" state='active' AND profile_id IN ({marks})",
+        [profile_id] + list(friend_ids)).fetchall()}
 
 
 def backfill_founder() -> list[str]:

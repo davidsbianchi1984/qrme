@@ -157,16 +157,22 @@ def _signals(viewer_profile_id: str) -> tuple[set[str], set[str], set[str]]:
         "   SELECT interactor_id FROM engagement WHERE profile_id=?)",
         (viewer_profile_id,)).fetchall()}
 
+    # One query for every tag, rather than one query per friend. Somebody with
+    # five hundred friends was making five hundred round trips to build a
+    # single feed, and the cost was invisible until the list got long.
     import json
     tags: set[str] = set()
-    for pid in friends_of | talked:
-        row = conn.execute("SELECT tags FROM marketplace WHERE profile_id=?",
-                           (pid,)).fetchone()
-        if row and row["tags"]:
-            try:
-                tags.update(json.loads(row["tags"]))
-            except ValueError:
-                pass
+    known = list(friends_of | talked)
+    if known:
+        marks = ",".join("?" * len(known))
+        for row in conn.execute(
+                f"SELECT tags FROM marketplace WHERE profile_id IN ({marks})",
+                known).fetchall():
+            if row["tags"]:
+                try:
+                    tags.update(json.loads(row["tags"]))
+                except ValueError:
+                    pass
     return friends_of, talked, tags
 
 
@@ -228,8 +234,6 @@ def for_you(viewer_profile_id: str, limit: int = 25,
             "display_name": r["display_name"], "avatar": r["avatar"],
             "body": r["body"], "created_at": r["created_at"],
             "likes": likes,
-            "promoting": _attachment(r["id"]),
-            "video": embeds.facade(r["id"]),
             "score": round(score, 1),
             # Never empty. A feed that cannot say why something is in front of
             # you is one nobody can audit, including its author.
@@ -237,7 +241,40 @@ def for_you(viewer_profile_id: str, limit: int = 25,
         })
 
     out.sort(key=lambda p: (-p["score"], p["created_at"]), reverse=False)
-    return out[:limit]
+    # Rank first, cut to the limit, *then* go and fetch what hangs off the
+    # survivors. Doing it inside the loop above read a listing and a video for
+    # every one of up to five hundred candidates in order to show twenty-five
+    # of them — 584 queries to build one feed, and the cost grew with how much
+    # had been posted rather than with how much is shown.
+    return _hydrate(out[:limit])
+
+
+def _hydrate(entries: list[dict]) -> list[dict]:
+    """Attach listings and videos to a page of entries, in two queries.
+
+    Batched rather than per row: one round trip for the listings, one for the
+    videos, regardless of how many entries there are. A loop of single-row
+    lookups is the same work spread over a hundred round trips, and it is
+    invisible until the wall is big enough to matter.
+    """
+    if not entries:
+        return entries
+    ids = [e["id"] for e in entries]
+    marks = ",".join("?" * len(ids))
+    conn = db.connect()
+    listings = {r["post_id"]: {k: r[k] for k in
+                               ("id", "kind", "title", "blurb", "area")}
+                for r in conn.execute(
+                    "SELECT a.post_id, l.id, l.kind, l.title, l.blurb, l.area"
+                    "  FROM post_attachments a JOIN listings l"
+                    "    ON l.id = a.listing_id"
+                    f" WHERE a.post_id IN ({marks})", ids).fetchall()}
+    videos = {r["post_id"]: embeds.row_facade(r) for r in conn.execute(
+        f"SELECT * FROM post_videos WHERE post_id IN ({marks})", ids).fetchall()}
+    for e in entries:
+        e["promoting"] = listings.get(e["id"])
+        e["video"] = videos.get(e["id"])
+    return entries
 
 
 def _attachment(post_id: str) -> dict | None:
@@ -266,10 +303,8 @@ def wall(profile_id: str, limit: int = 50, owner: bool = False) -> list[dict]:
             continue
         entry = {"id": r["id"], "profile_id": r["profile_id"],
                  "body": r["content"], "created_at": r["created_at"],
-                 "likes": r["likes"] or 0, "status": r["status"],
-                 "promoting": _attachment(r["id"]),
-                 "video": embeds.facade(r["id"])}
+                 "likes": r["likes"] or 0, "status": r["status"]}
         if owner and r["status"] == "blocked":
             entry["blocked_reason"] = r["flag_reason"]
         out.append(entry)
-    return out
+    return _hydrate(out)

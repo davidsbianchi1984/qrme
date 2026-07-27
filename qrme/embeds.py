@@ -204,6 +204,17 @@ def facade(post_id: str) -> dict | None:
     """
     row = db.connect().execute(
         "SELECT * FROM post_videos WHERE post_id=?", (post_id,)).fetchone()
+    return row_facade(row)
+
+
+def row_facade(row) -> dict | None:
+    """The same thing, from a row somebody else already fetched.
+
+    Split out so a page of posts can be hydrated in one query instead of one
+    per post — see :func:`qrme.wall._hydrate`. The formatting lives here rather
+    than being duplicated at the call site, so there is still exactly one place
+    that decides what a facade contains.
+    """
     if row is None:
         return None
     spec = PLATFORMS[row["platform"]]
