@@ -91,7 +91,7 @@ The PRD conformance map — every numbered feature in
 | Rated Placement (18+) | Adult-mode profiles marketed where adult audiences are (`qrme/rated.py`): `GET /venues` lists venues willing to host rated profiles/beacons (OnlyFans, Fansly, x-rated directories — structural catalog); `POST /profiles/{id}/placements` mints a printable QR beacon + the @handle/#tag refs to publish there. **The age wall travels with the profile, not the venue**: @handle and beacon scans resolve to a wall card, #tag browse and marketplace listings omit rated profiles entirely, unless the viewer presents a verified-18+ interactor token — and adult mode is *never* available for a profile of another real person (self or fictional only). Native apps intentionally carry no rated surfaces (no in-app 18+ identity verification) |
 | Pack Registries | Federated mod storefronts (`qrme/pack_sources.py`): **Robotmods.net** (task mods for robot bodies) and **LLMmods.com** (knowledge mods for LLM personas). `GET /packs/registries` lists them with sync state; `POST /packs/registries/{key}/sync` imports a registry's catalog idempotently as ordinary packs with `origin`/`origin_url` on the label and a marketplace listing under the registry tag. Once synced, nothing is special-cased: same buy/download flow, same capability checks for robot mods, same provenance and uninstall |
 | Robot Task Packs | Knowledge packs with `audience: robot` carry **task modules** for the body a profile embodies: each item is a new commandable verb with the capabilities it requires and the procedure the embodied agent follows. Install targets a bound robot (`robot_id`) and is **capability-checked against the robotics catalog** — a vacuum is never sold a manipulation task; installed tasks extend that robot's command allowlist (still owner-commanded, still audited in `robot_commands`, procedure carried in the result), `GET /robots/{id}/skills` lists them, uninstall revokes them immediately, and the embodied persona's `say` prompt knows what its body has learned. Starters: Household / Care / Sentry Patrol free, Culinary Assistant priced |
-| Starter Collection | `POST /marketplace/seed` (or `python -m qrme.seed`) populates one curated synthetic expert per industry — 33 fictional profiles, plus `@vivienne_sable` on the rated tier for 34 in all, each with a claimed `@handle` and a marketplace listing — so a fresh deployment has profiles to immerse with before users publish their own. Includes a mental-health trio (`@dr_lena_whitcomb`, `@dr_marcus_adeyemi`, `@dr_priya_nair`) matching JIM-mini's starter specialists for its tandem hookup. **Each starter is grounded in its own industry's free Field Pack** — run `POST /packs/seed` first and every non-rated starter installs the pack matching its industry, so a finance persona answers with finance material rather than from tone alone. Idempotent, and a repair: re-running fills in a missing portrait, appearance, or grounding on a starter that already exists (blank-only, so anything an owner set is kept, and a pack an owner removed stays removed), which is how a deployment older than any of those catches up. The response reports `grounded` alongside `created`, `skipped` and `repaired`. Same moderation and provenance pipeline as any user profile |
+| Starter Collection | `POST /marketplace/seed` (or `python -m qrme.seed`) populates one curated synthetic expert per industry — 33 fictional profiles, plus `@vivienne_sable` on the rated tier for 34 in all, each with a claimed `@handle` and a marketplace listing — so a fresh deployment has profiles to immerse with before users publish their own. Includes a mental-health trio (`@dr_lena_whitcomb`, `@dr_marcus_adeyemi`, `@dr_priya_nair`) matching JIM-mini's starter specialists for its tandem hookup. **Each starter is grounded in its own industry's free Field Pack** — run `POST /packs/seed` first and every starter installs the pack matching its industry, so a finance persona answers with finance material rather than from tone alone. That includes the rated one: the age wall governs *who may talk to her*, which was never a reason for her to know less about her own subject, and her Cabaret & Burlesque Field Pack is theatre history and stagecraft. It is a different thing from the priced, age-gated After Dark Companion Pack, which is conversational craft sold to owners of any adult-mode persona and is never auto-installed. Idempotent, and a repair: re-running fills in a missing portrait, appearance, or grounding on a starter that already exists (blank-only, so anything an owner set is kept, and a pack an owner removed stays removed), which is how a deployment older than any of those catches up. The response reports `grounded` alongside `created`, `skipped` and `repaired`. Same moderation and provenance pipeline as any user profile |
 | You own it / total control | `PATCH /profiles/{id}` (edit anytime), `GET /profiles/{id}/export` (full data export), `DELETE /profiles/{id}` (erases everything, including vaulted records) |
 | Encrypted at rest (PDI tandem) | With `QRME_PDI_URL` + `QRME_PDI_TOKEN` (or an injected client), source-material content is sealed in PDI's AES-256-GCM vault (`qrme/pdi_client.py`); QRME keeps only key references, resolves them on read, and purges the vault on delete |
 
@@ -274,19 +274,28 @@ one seeded by `POST /marketplace/seed`. **The AI mark is burned into each
 portrait's own pixels**, so it survives a screenshot, a hotlink, or a crop:
 these images carry their disclosure wherever they end up, including here.
 
-Each one is shown as **the card the app actually gives it** — screen 5's
-Profile Home: the avatar bubble, the role, the stat tiles, and the Chat button
-under them. The gallery used to be a portrait with a name and an industry
+Each one is shown as **the card the app actually gives it** — screen 80, the
+profile front page a visitor lands on, carried all the way through: the avatar
+bubble, the role, the rating people who talked to it left, the skill chips,
+Memory / Relationships / Engagement, then the career and a review, then **Talk
+to …**. The gallery used to be a portrait with a name and an industry
 captioned beneath, which is a directory listing rather than a profile, and it
 was five columns wide — about 590px of content on a phone that offers 390, so
 the fourth column was sliced mid-word and the fifth never appeared at all.
 Two columns of whole cards fit.
 
-**The tiles carry facts, not the mock's numbers.** Screen 5 reads *Memory 247 ·
-Relationships 12 · Engagement 92%*, which is fine for one illustrative mock and
-would be a fabrication repeated 34 times here: nobody has talked to these
-profiles yet. What each card reports is true of that starter — the size of the
-Field Pack grounding it, and how many skills it is tagged with.
+**The careers and reviews are written, like the personas themselves.** These
+are invented experts — that is the first line of this section — so a CV and a
+notice from a satisfied reader are characterisation, the same kind of thing the
+bio already is. Each one is drawn from that starter's own bio so the two cannot
+contradict each other.
+
+**The figures are sample values, identical on every card.** A freshly seeded
+starter has no reviews, no relationships and no engagement, because nobody has
+talked to it yet — those are the app's own mock numbers, repeated unchanged so
+that thirty-four cards reading *4.0 · 37 reviews* are self-evidently a template
+rather than a measurement. The name, role, portrait, industry and skills are
+read straight out of `qrme/seed.py`.
 
 The bubble inside each card is baked by `tools/bubble_portraits.py` into
 `docs/portraits/bubbles/`, because GitHub's markdown sanitiser strips the

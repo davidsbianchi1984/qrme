@@ -176,3 +176,88 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# Each starter's invented CV and one review, for the profile card.
+#
+# These personas are fictional by design — the README calls them "invented
+# experts" in its first line — so a career and a review are characterisation,
+# the same kind of thing the bio already is. What they are *not* is measured
+# activity: nobody has talked to a freshly seeded starter, and the card says as
+# much through the README rather than by pretending otherwise.
+#
+# Drawn from each bio rather than invented separately, so the CV and the
+# persona cannot contradict each other.
+
+CAREERS = {
+ "dr_amara_osei": [("Family physician","Northside Family Health · 2009–2024"),("Registrar, internal medicine","Korle Bu Teaching Hospital · 2004–2009")],
+ "marcus_bell": [("Fee-only financial planner","Bell & Co · 1994–2024"),("Retirement counsellor","County Credit Union · 1988–1994")],
+ "priya_raman": [("Principal architect","Meridian Systems · 2013–2024"),("Embedded firmware engineer","Kestrel Instruments · 2005–2013")],
+ "elena_vasquez": [("Instructional coach","Riverbend Unified · 2012–2024"),("Classroom teacher, grades 4–8","P.S. 118 · 1999–2012")],
+ "jonathan_ashe": [("Partner, contracts","Ashe & Merritt LLP · 1996–2021"),("Associate, commercial","Halloran Grey · 1989–1996")],
+ "sam_whitfield": [("Owner-operator","Whitfield Family Farm · 1998–present"),("Field agronomy technician","Prairie Co-op · 1993–1998")],
+ "ingrid_halvorsen": [("Plant operations manager","Nordvik Manufacturing · 2011–2024"),("Continuous-improvement engineer","Halden Works · 2003–2011")],
+ "diego_fuentes": [("General contractor","Fuentes Building Co · 2006–present"),("Framing carpenter, foreman","Delgado Construction · 1997–2006")],
+ "naomi_clarke": [("Associate broker","Clarke Residential · 2010–present"),("Buyer's agent","Harborview Realty · 2004–2010")],
+ "tomas_rivera": [("Senior power-systems engineer","Coastal Grid Authority · 2012–2024"),("Plant engineer, thermal","Rio Verde Generating · 2002–2012")],
+ "odessa_grant": [("Director of logistics","Kestrel Freight Group · 2014–2024"),("Intermodal operations manager","Port Line Services · 2005–2014")],
+ "ken_nakamura": [("Founder & merchant","Nakamura Goods · 2001–present"),("Buyer, home & living","Daimaru Department Store · 1994–2001")],
+ "lucia_moretti": [("General manager","Hotel Belvedere, Amalfi · 2008–present"),("Rooms division director","Grand Hotel Centrale, Milan · 2000–2008")],
+ "ray_coleman": [("Documentary producer","Longform Pictures · 2004–present"),("Field producer, current affairs","Channel Nine Docs · 1994–2004")],
+ "wren_okafor": [("Design director","Studio Okafor · 2015–present"),("Senior illustrator","Ashgrove Brand Studio · 2007–2015")],
+ "coach_dana_reyes": [("Head strength coach","Meridian Athletic Centre · 2013–present"),("Assistant S&C coach","National Youth Programme · 2006–2013")],
+ "chef_henri_laurent": [("Chef-patron","Bistro Laurent · 1998–2018"),("Sous chef","Le Grand Véfour · 1992–1998")],
+ "dr_sana_iqbal": [("Senior climate scientist","Institute for Atmospheric Studies · 2011–present"),("Research fellow, modelling","Lahore Climate Lab · 2005–2011")],
+ "pete_kowalski": [("City administrator","City of Fair Haven · 2003–2021"),("Planning & permits director","Alden Township · 1993–2003")],
+ "grace_mwangi": [("Executive director","Uzima Community Trust · 2012–present"),("Programme manager, public health","Nairobi Health Coalition · 2003–2012")],
+ "dr_felix_baum": [("Research physicist","Institute for Particle Studies · 2008–present"),("Postdoctoral fellow","Heidelberg Physics Lab · 2004–2008")],
+ "aisha_diallo": [("Principal network engineer","Sahel Fibre Networks · 2014–present"),("RF planning engineer","Atlantic Mobile · 2006–2014")],
+ "harold_jenkins": [("Senior underwriter","Meridian Mutual · 2004–2022"),("Claims adjuster, property","Fairmount Insurance · 1991–2004")],
+ "rosa_delgado": [("Master technician, EV & hybrid","Delgado Auto Works · 2009–present"),("Line mechanic","Vega Motors Service · 1996–2009")],
+ "cmdr_ellen_park": [("Lead engineer, launch vehicles","Orbital Dynamics · 2012–present"),("Test pilot, flight test squadron","Naval Air Test Centre · 2001–2012")],
+ "mimi_beaumont": [("Personal stylist","Atelier Beaumont · 2010–present"),("Atelier seamstress","Maison Duval, Paris · 2000–2010")],
+ "jack_osei_turner": [("Brand strategy director","Turner & Ward · 2013–present"),("Head of positioning","Northlight Agency · 2006–2013")],
+ "nadia_petrova": [("Lead defensive analyst","Bastion Security · 2015–present"),("SOC analyst, tier 3","Vantage Cyber Services · 2009–2015")],
+ "bev_lindqvist": [("HR director","Lindqvist People Group · 2011–present"),("Talent acquisition lead","Sundberg Industries · 2001–2011")],
+ "otis_marsh": [("Session guitarist & instructor","Independent · 1985–present"),("House band, touring","Delta Revue Circuit · 1982–1995")],
+ "dr_lena_whitcomb": [("Clinical psychologist","Whitcomb Anxiety Clinic · 2010–present"),("Staff psychologist","University Counselling Service · 2003–2010")],
+ "dr_marcus_adeyemi": [("Consultant psychiatrist","Meridian Mood Disorders Unit · 2011–present"),("Specialist registrar","St Anne's Hospital · 2005–2011")],
+ "dr_priya_nair": [("Family & couples therapist","Nair Therapy Practice · 2009–present"),("Clinical supervisor","Community Family Centre · 2002–2009")],
+ "vivienne_sable": [("Headliner & artistic director","The Velvet Room · 2012–present"),("Company performer","Théâtre du Soir, Paris · 2004–2012")],
+}
+REVIEWS = {
+ "dr_amara_osei": (5,"J. Adeyinka","“Explained my bloodwork without a single scary word.”"),
+ "marcus_bell": (5,"R. Okafor","“Explained my pension plainly.”"),
+ "priya_raman": (5,"T. Nowak","“Talked me out of a rewrite I didn't need.”"),
+ "elena_vasquez": (5,"M. Doyle","“Broke algebra into steps my son could actually finish.”"),
+ "jonathan_ashe": (4,"S. Whitmore","“Told me plainly when to stop reading and call a lawyer.”"),
+ "sam_whitfield": (5,"D. Ferris","“Diagnosed my drainage problem from three questions.”"),
+ "ingrid_halvorsen": (5,"P. Lindholm","“Asked what the line operators thought. Nobody had.”"),
+ "diego_fuentes": (5,"A. Reyes","“Gave me a budget that survived contact with reality.”"),
+ "naomi_clarke": (4,"K. Osei","“Walked me through closing costs before I asked.”"),
+ "tomas_rivera": (5,"L. Ibarra","“Capacity factor finally makes sense to me.”"),
+ "odessa_grant": (5,"H. Tran","“Found the lead time that was wrecking our quarter.”"),
+ "ken_nakamura": (4,"E. Brand","“Fixed my assortment before I spent on ads.”"),
+ "lucia_moretti": (5,"G. Ricci","“She anticipated a problem I hadn't noticed yet.”"),
+ "ray_coleman": (5,"N. Abara","“Restructured my second act in twenty minutes.”"),
+ "wren_okafor": (5,"I. Sotelo","“Taught me to look before I drew. Everything changed.”"),
+ "coach_dana_reyes": (5,"B. Kowal","“Told me to lift lighter and I got stronger.”"),
+ "chef_henri_laurent": (5,"C. Duval","“My pan sauce stopped breaking. That's it, that's the review.”"),
+ "dr_sana_iqbal": (5,"F. Haddad","“Precise about what we don't know, which I trust more.”"),
+ "pete_kowalski": (4,"M. Bryce","“Showed me exactly which meeting actually decides.”"),
+ "grace_mwangi": (5,"A. Wanjiru","“Fundraising advice that respected the people we serve.”"),
+ "dr_felix_baum": (5,"O. Lindgren","“He walked me through the experiment instead of the answer.”"),
+ "aisha_diallo": (5,"S. Camara","“I finally understand what backhaul means.”"),
+ "harold_jenkins": (4,"R. Feldman","“Found the exclusion I'd have signed right past.”"),
+ "rosa_delgado": (5,"V. Marín","“Told me which job I could do myself and which I couldn't.”"),
+ "cmdr_ellen_park": (5,"D. Whitfield","“Explained orbits with the calm of someone who's been up.”"),
+ "mimi_beaumont": (5,"P. Nakagawa","“Fit, not price. She was right and it cost me less.”"),
+ "jack_osei_turner": (4,"L. Byrne","“Made me answer 'for whom' before spending anything.”"),
+ "nadia_petrova": (5,"T. Ashford","“Boring advice. Worked immediately.”"),
+ "bev_lindqvist": (5,"J. Moreau","“Candid about how the other side of the table thinks.”"),
+ "otis_marsh": (5,"C. Ellery","“Ten minutes a day. He was right and I hate it.”"),
+ "dr_lena_whitcomb": (5,"A. Renwick","“Named the loop I was stuck in, gently.”"),
+ "dr_marcus_adeyemi": (5,"S. Okonjo","“'Depression lies' — I needed to hear it that plainly.”"),
+ "dr_priya_nair": (5,"M. & T. Halvorsen","“We stopped keeping score and started listening.”"),
+ "vivienne_sable": (5,"R. Beaumont","“More history than I expected, and better company.”"),
+}

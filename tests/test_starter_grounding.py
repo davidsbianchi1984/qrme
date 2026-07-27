@@ -33,7 +33,7 @@ def _profile(name):
 
 def test_every_starter_gets_its_own_industry_pack(client):
     out = _seeded(client)
-    assert out["grounded"] == 33          # all but the rated one; see below
+    assert out["grounded"] == 34          # every starter, the rated one included
 
     rows = db.connect().execute(
         "SELECT p.id, p.display_name, COUNT(s.id) n FROM profiles p"
@@ -80,13 +80,43 @@ def test_one_pack_leaves_room_in_the_prompt_budget(client):
     assert len(_sources(marcus["id"])) <= 4
 
 
-def test_the_rated_starter_is_left_alone(client):
-    """There is no adult-industry Field Pack, and inventing a substitute would
-    be putting words in a profile the age wall exists to contain."""
+def test_the_rated_starter_is_grounded_like_every_other(client):
+    """She used to be the only starter with no source material at all.
+
+    The old rule read "there is no adult-industry Field Pack, and inventing a
+    substitute would be putting words in a profile the age wall exists to
+    contain" — which ran two things together. The wall gates *who may talk to
+    her*; it was never a reason for her to know less about her own subject.
+    The Cabaret & Burlesque Field Pack is theatre history and stagecraft, free
+    and unrated like the other thirty-three, and it reaches her through exactly
+    the same path.
+    """
     _seeded(client)
     vivienne = _profile("Vivienne Sable")
-    assert vivienne["adult_mode"] == 1
-    assert list(_sources(vivienne["id"])) == []
+    assert vivienne["adult_mode"] == 1          # still age-walled
+    titles = [s["title"] for s in _sources(vivienne["id"])]
+    assert len(titles) == 3
+    assert all(t.startswith("Cabaret & Burlesque Field Pack") for t in titles)
+
+
+def test_her_pack_is_history_and_craft_not_content(client):
+    """The wall is on the conversation, not on the reading list. If this pack
+    ever drifts toward explicit material it stops being grounding and becomes
+    the thing the wall exists for."""
+    _seeded(client)
+    rows = _sources(_profile("Vivienne Sable")["id"])
+    body = " ".join(f'{s["title"]} {s["content"]}' for s in rows)
+    assert "Ziegfeld" in body and "Folies" in body and "timing" in body.lower()
+
+
+def test_the_two_adult_packs_are_not_the_same_pack(client):
+    """One grounds her for free; the other is $6.99 commerce for any adult-mode
+    persona. Conflating them is how a duplicate gets shipped."""
+    from qrme.packs import RATED_PACK, STARTER_PACKS
+    assert STARTER_PACKS["adult"][0] == "Cabaret & Burlesque Field Pack"
+    assert RATED_PACK[1] == "After Dark Companion Pack"
+    assert RATED_PACK[0] == "after_dark"        # a different industry key
+    assert RATED_PACK[2] > 0                    # and priced, so never auto-installed
 
 
 # -- not pushing material onto somebody's decision ---------------------------
@@ -164,7 +194,7 @@ def test_a_deployment_seeded_before_this_gets_grounded_on_rerun(client):
     client.post("/packs/seed")
     out = client.post("/marketplace/seed").json()
     assert out["created"] == 0                # nothing new
-    assert out["grounded"] == 33              # but everything grounded
+    assert out["grounded"] == 34              # but everything grounded
     assert len(_sources(marcus["id"])) == 3
 
 
@@ -202,4 +232,4 @@ def test_a_priced_pack_is_never_auto_installed(client):
     assert list(_sources(marcus["id"])) == []
     assert "marcus_bell" not in out["grounded_handles"]
     # Everyone whose pack is still free is unaffected.
-    assert out["grounded"] == 32
+    assert out["grounded"] == 33

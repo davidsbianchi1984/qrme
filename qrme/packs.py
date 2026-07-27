@@ -356,6 +356,41 @@ STARTER_PACKS: dict[str, tuple[str, list[tuple[str, str]]]] = {
          "relationships: if conflict ever turns unsafe or hopeless, reach "
          "988 or local support first."),
     ]),
+    # The rated starter's grounding pack, and **not** the same thing as
+    # RATED_PACK further down. Two adult-adjacent packs exist because they do
+    # two different jobs:
+    #
+    #   this one           free, rated=0, industry "adult" — what Vivienne
+    #                      Sable actually knows: theatre history and stagecraft.
+    #                      Seeded onto her like every other starter's pack.
+    #   After Dark (below) $6.99, rated=1, industry "after_dark" — consent-
+    #                      forward conversational craft, sold to owners of any
+    #                      adult-mode persona, never auto-installed.
+    #
+    # Naming them apart matters: a reader who finds one should not think they
+    # have found the other. Vivienne was the only starter in the collection
+    # left answering from tone alone, because the age wall on *who may talk to
+    # her* had been quietly read as a reason for her to know less about her own
+    # subject. It was never that.
+    "adult": ("Cabaret & Burlesque Field Pack", [
+        ("The Ziegfeld era", "American revue between 1907 and 1931 built the "
+         "vocabulary still in use — the staircase entrance, the showgirl "
+         "parade, the tableau. Ziegfeld's innovation was scale and costume "
+         "budget rather than explicitness; the Follies sat closer to a fashion "
+         "house than to a burlesque hall, which is why the form outlasted the "
+         "respectability campaigns that closed its rivals."),
+        ("The Parisian revues", "The Folies Bergère and the Moulin Rouge "
+         "developed a different line: the comic sketch, the chanteuse, the "
+         "finale as spectacle. Josephine Baker's 1925 Revue Nègre is the "
+         "hinge — a performer whose command of a room made her the act rather "
+         "than the set behind her."),
+        ("Timing is the craft", "A tease is a rhythm problem. The reveal is "
+         "the least interesting beat; the anticipation before it and the "
+         "recovery after are where a performer either holds a room or loses "
+         "it. Practitioners describe it as closer to stand-up than to dance — "
+         "the same reliance on the pause, and the same failure mode when the "
+         "pause is rushed."),
+    ]),
 }
 
 

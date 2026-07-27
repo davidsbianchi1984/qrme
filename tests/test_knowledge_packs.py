@@ -8,8 +8,11 @@ TRIO = {"mental_health", "psychiatry", "counseling"}
 
 
 def test_starter_packs_cover_every_industry():
-    from qrme.seed import STARTERS
-    industries = {industry for _, industry, *_ in STARTERS}
+    from qrme.seed import RATED, STARTERS
+    # RATED is in here too: the rated starter is a starter, and leaving her out
+    # is exactly how she ended up the only profile in the collection with no
+    # source material at all.
+    industries = {industry for _, industry, *_ in STARTERS + RATED}
     assert set(STARTER_PACKS) == industries       # one pack per industry
     for title, items in STARTER_PACKS.values():
         assert len(items) >= 3
