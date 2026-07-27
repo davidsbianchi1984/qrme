@@ -246,9 +246,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/79-search-assistant.svg"><img src="docs/screens/79-search-assistant.svg" width="210" alt="Search Assistant"></a><br><sub><b>79</b> · Search Assistant</sub></td>
     <td align="center" width="33%"><a href="docs/screens/80-profile.svg"><img src="docs/screens/80-profile.svg" width="210" alt="Profile"></a><br><sub><b>80</b> · Profile</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/81-lend-a-microphone.svg"><img src="docs/screens/81-lend-a-microphone.svg" width="210" alt="Lend a Microphone"></a><br><sub><b>81</b> · Lend a Microphone</sub></td>
   </tr>
   <tr>
+    <td align="center" width="33%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
     <td align="center" width="33%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
     <td align="center" width="33%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
   </tr>
@@ -944,6 +945,87 @@ watch.
 **02 Activity is the community layer on a wrist, as counts.** Not the content:
 a feed is a reading surface, and reading is the thing a glance cannot do. Same
 reasoning that kept agent names off face 01.
+
+## Channel 2 — lending the room's profiles your microphone
+
+In a voice or video room your own microphone is already busy carrying your
+voice to the other people. The synthetic profiles in that room are *reading
+text*. They have no ear, so anything said aloud and not typed is invisible to
+them, and asking one a question means stopping, typing, and breaking the thing
+everybody else is listening to. The watch on your wrist has a microphone
+nothing is using. This lends it to them.
+
+`qrme/roommic.py` is the permission and the state; capture is on the device,
+as everywhere else. The JIM-mini counterpart (`jim/mic.py`) lends the same
+wearable to the Guardian during a call, and the one genuinely different
+question here is that **a room has other people in it**. That difference is
+the whole design.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/81-lend-a-microphone.svg"><img src="docs/screens/81-lend-a-microphone.svg" width="200" alt="Lend a microphone"></a><br><sub><b>81</b> · the room is told, not only you</sub></td>
+    <td width="66%" valign="top">
+
+| route | does |
+| --- | --- |
+| `GET /microphones/vocabulary` | what may be lent, at what width, and what is refused — open, so a client can draw the picker |
+| `POST /rooms/{id}/mic` | lend yours. Your own token, your own wearable |
+| `DELETE /rooms/{id}/mic/{interactor_id}` | take it back. Yours to end, alone and at any moment |
+| `GET /rooms/{id}/mic` | who in this room has lent one — readable by **the room** |
+
+  </td>
+  </tr>
+</table>
+
+**Everyone present is told**, and that is why the disclosure is the screen. A
+room's participants can each see that a microphone is live and whose it is. In
+a one-to-one call the other party is a stranger to this product and cannot be
+told, which is why `jim/mic.py` refuses speakerphone outright; in a room they
+are participants, they can be told, and telling them is the price of the
+feature. A version of screen 81 showing the lender only their own row would be
+the exact mistake the module was written to avoid.
+
+**Readable by the room, not by anyone holding the id.** For a while the route
+said the first and did the second — it checked nothing, and a room id is not a
+secret: it rides in beacons and on printed QR stickers, which is what they are
+for. That published who is wearing a live microphone, on what, and since when,
+to whoever scanned the sticker. Being in the room now means holding a
+participant's token, or the owner token of a profile in it.
+
+**Only your own wearable, and only your own voice.** The grant is
+per-participant and never becomes the room's microphone, because a participant
+cannot consent on behalf of the people they can hear. Room-facing kinds —
+speakerphone, conference puck, room array, laptop, console, doorbell — are
+refused by name with the reason, not quietly missing from a list.
+
+**It keys on its wearer *and* it runs near-field.** Two bounds, deliberately
+separate. `VOICE_FOCUS` is the filter: the channel locks onto the lender and
+drops the rest, which in a room is the other participants. `ROOM_GAIN` is the
+limit: a room grant runs near-field however the lender has their dial set. The
+lender's own preference is capped rather than rejected, and it is still theirs
+everywhere else — a room is simply the one place it cannot be honoured. Both,
+and not just the filter, because a filter can fail and the people it would fail
+on did not choose to be in range.
+
+**The room is shown what the microphone actually hears**, never what its lender
+asked for. A rejected preference is the lender's business, and putting it in
+the disclosure would tell the room something prejudicial and untrue of the
+capture in the same breath.
+
+**It ends when the room does.** A grant is scoped to one room and closed with
+it, so a permission cannot outlive the conversation that justified it and
+quietly apply to the next one.
+
+**A profile that has been lent one is told its limits**, in the system prompt,
+rather than left to infer them: it can hear the lender, it cannot hear the
+others, those others may not realise it could hear them at all, and anything it
+seems to have picked up from background talk is noise rather than something
+said to it.
+
+The stationary-microphone classes stay out for the separate reason set out
+under [watch faces and wearables](#watch-faces-and-the-wearables-that-show-them):
+a platform cannot collect a waiver from somebody who merely walked into the
+room.
 
 ## Friends you might know
 

@@ -63,6 +63,33 @@ def _participants(room_id: str) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def _require_in_room(room_id: str, request: Request) -> str:
+    """The caller must be one of this room's participants. Returns who.
+
+    Two ways to be in a room, because a room holds two kinds of participant.
+    A person is in it if they hold the token of a `user` participant. A
+    profile's owner is in it if they hold the owner token of a `profile`
+    participant — the profiles are the side being lent the microphone, so
+    their owner is exactly who the disclosure is addressed to.
+
+    Nobody else, and an unidentified caller least of all: a room id travels on
+    beacons and printed stickers, so "knows the id" cannot stand in for "is
+    here".
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required — this room's "
+                                 "disclosure is for the people in it")
+    for p in _participants(room_id):
+        if p["kind"] == "user" and who == {"role": "interactor",
+                                           "subject_id": p["ref_id"]}:
+            return p["ref_id"]
+        if p["kind"] == "profile" and who == {"role": "owner",
+                                              "subject_id": p["ref_id"]}:
+            return p["ref_id"]
+    raise HTTPException(403, "you are not in this room")
+
+
 def _room_maturity(participants: list[dict]) -> str:
     """A room with a minor present always runs strict."""
     for p in participants:
@@ -191,6 +218,43 @@ def create_room(body: RoomCreate) -> dict:
     }
 
 
+@router.get("/microphones/vocabulary")
+def microphone_vocabulary() -> dict:
+    """What may be lent, at what width, and what is refused.
+
+    Open, because it describes the feature rather than anybody's room — a
+    client needs it to draw the picker before there is a grant to be party to.
+
+    The refusals are listed **by name, with the reason**. A client that only
+    knew the allowed list would grey out a conference puck as though the app
+    had not got round to it yet, and the reason it is missing is the entire
+    argument of `qrme/roommic.py`: that microphone is pointed at the other
+    people in the room, and their voices were never the lender's to give.
+    """
+    return {
+        "personal": list(roommic.PERSONAL_TYPES),
+        "refused": [
+            {"kind": k,
+             "why": "it is pointed at the room, not at you — it would pick up "
+                    "the people around you, and their voices are not yours "
+                    "to lend"}
+            for k, personal in roommic.MIC_TYPES.items() if not personal],
+        "gain_levels": [
+            {"level": k, "describes": v["describes"],
+             "reaches_others": v["reaches_others"]}
+            for k, v in roommic.GAIN_LEVELS.items()],
+        "room_gain": roommic.ROOM_GAIN,
+        "voice_focus": roommic.VOICE_FOCUS,
+        "rules": [
+            "only a worn or clipped-on microphone, and only your own",
+            "a room grant runs near-field whatever your dial says",
+            "the channel keys on your voice and drops the rest",
+            "everyone in the room is shown that you lent it, and what it hears",
+            "it ends when the room does",
+        ],
+    }
+
+
 @router.post("/rooms/{room_id}/mic", status_code=201)
 def lend_room_mic(room_id: str, body: RoomMicLend, request: Request) -> dict:
     """Lend this room's profiles your wearable's microphone.
@@ -220,14 +284,23 @@ def take_back_room_mic(room_id: str, interactor_id: str,
 
 
 @router.get("/rooms/{room_id}/mic")
-def room_mic_disclosure(room_id: str) -> dict:
+def room_mic_disclosure(room_id: str, request: Request) -> dict:
     """Who in this room has lent the profiles a microphone.
 
-    Deliberately readable by anyone in the room rather than by the lender
+    Deliberately readable by anyone **in the room** rather than by the lender
     alone: the people who need to know are the other participants, and a
     disclosure only its subject can see is not a disclosure.
+
+    "In the room" is the whole of it, though, and for a while this route only
+    said so. It checked nothing, so it answered anybody holding a room id —
+    and a room id is not a secret: it rides in beacons and on printed QR
+    stickers, which is the point of them. That made a privacy feature into the
+    opposite one, publishing who is wearing a live microphone, on what, and
+    since when, to whoever scanned the sticker. Widening a disclosure past the
+    people it protects is not a smaller version of the same idea.
     """
     _room_or_404(room_id)
+    _require_in_room(room_id, request)
     return roommic.disclosure(room_id)
 
 

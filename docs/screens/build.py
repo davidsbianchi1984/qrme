@@ -3034,8 +3034,23 @@ SCREENS = [
     # actually talked to them thought.
     dict(num=80, title="Profile", sub="What a visitor sees first",
          hero="frontpage", accent="brand", tab=0),
-    # 81 is deliberately skipped: it belongs to unreleased work being held,
-    # and reusing the number would collide the day that lands.
+    # Channel 2, and the disclosure is the design, so the disclosure is the
+    # screen. It shows the other participants **by name** seeing the grant —
+    # a version that showed the lender only their own row would be the exact
+    # mistake qrme/roommic.py was written to avoid.
+    dict(num=81, title="Lend a Microphone", sub="The room is told, not only you",
+         accent="cyan", tab=3, cards=[
+        dict(icon="watch", color="cyan", k="Your smart watch",
+             s="the profiles can hear you speak", pill=("LENT", "good")),
+        dict(icon="people", color="brand", k="Sam and Mal see this",
+             s="one only you can see is not one"),
+        dict(icon="shieldok", color="green", k="Near-field, always",
+             s="you, not the people beside you"),
+        dict(icon="mic", color="indigo", k="Keys on your voice",
+             s="their voices are not yours to lend"),
+        dict(icon="eye", color="amber", k="Ends with the room",
+             s="it cannot outlive the conversation"),
+    ], button=("Take it back", "amber")),
     #
     # The screen a light sends you to. Grouped, because somebody opening this
     # *because* amber appeared should not have to scan a flat list for the one

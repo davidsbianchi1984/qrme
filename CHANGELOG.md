@@ -52,6 +52,37 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   only: what protects the other participants is how wide the channel actually
   is, and a rejected preference is the lender's business.
 
+  **Screen 81, Lend a Microphone**, and the disclosure is the design, so the
+  disclosure is the screen: it shows the other participants *by name* seeing
+  the grant. A version showing the lender only their own row would be the exact
+  mistake the module was written to avoid. Plus `GET /microphones/vocabulary`,
+  open, so a client can draw the picker from the real sets — the refusals are
+  published **by name with the reason**, because a client that knew only the
+  allowed list would grey out a conference puck as though the feature were
+  unfinished, when its absence is the whole argument.
+
+### Fixed
+
+- **The room-microphone disclosure was readable by anyone holding a room id.**
+  The route's own docstring said "readable by anyone in the room"; the code
+  checked nothing, so "in the room" meant "knows the id" — and a room id is not
+  a secret. It rides in beacons and on printed QR stickers, which is the point
+  of them. That turned a privacy feature into its opposite: who is wearing a
+  live microphone, on what, and since when, published to whoever scanned the
+  sticker. Being in the room now means holding a participant's token or the
+  owner token of a profile in it. Two tests, and the one that matters is the
+  signed-in stranger rather than the anonymous caller.
+
+- **Nothing tied the README's gallery to the screens on disk** —
+  `tests/test_docs_gallery.py`, 3 tests. Three separate defects had already
+  shipped through that gap: six stale SVGs left rendering after a renumbering,
+  a screen built and never shown, and — while restoring screen 81 in this very
+  round — inserting a cell into a full three-wide row silently pushed **82**
+  off the page. Every file existed and every link resolved; the gallery just
+  read 79, 80, 81, 83. So the numeric run is asserted as well as both
+  directions of existence, because a number that stops appearing is exactly
+  what nobody re-reads an 1,800-line README to find.
+
 ## [0.3.3] — 2026-07-27
 
 **The round where an agent working on its own stopped being something you had

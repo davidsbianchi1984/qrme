@@ -8,7 +8,7 @@ Guardian during a call — is that **a room has other people in it**. That is
 the whole of the design here, and the disclosure test is the one that matters.
 """
 
-from tests.test_capabilities import make_profile
+from tests.test_capabilities import auth_header, make_profile
 
 
 def _interactor(client, name="Sam"):
@@ -110,7 +110,8 @@ def test_the_disclosure_is_readable_by_the_whole_room(client):
     mal = _interactor(client, "Mal")
     room = _room(client, p, sam, mal)
 
-    before = client.get(f"/rooms/{room['id']}/mic").json()
+    before = client.get(f"/rooms/{room['id']}/mic",
+                        headers=_as(mal["token"])).json()
     assert before["microphones_lent"] == []
     assert "no one has lent" in before["note"]
 
@@ -134,7 +135,52 @@ def test_taking_it_back_removes_it_from_the_disclosure(client):
     out = client.delete(f"/rooms/{room['id']}/mic/{sam['id']}",
                         headers=_as(sam["token"])).json()
     assert out["lending"] is False
-    assert client.get(f"/rooms/{room['id']}/mic").json()["microphones_lent"] == []
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(sam["token"])).json()["microphones_lent"] == []
+
+
+def test_the_disclosure_stops_at_the_people_it_protects(client):
+    """"Anyone in the room" was the design and "anyone at all" was the code.
+
+    The route checked nothing, so it answered any caller holding a room id —
+    and a room id is not a secret. It rides in beacons and on printed QR
+    stickers, which is what they are for. That turned a privacy feature into
+    its opposite: who is wearing a live microphone, on what, and since when,
+    published to whoever scanned the sticker.
+
+    Both halves are asserted, and the second is the one that matters — a test
+    that only tried an anonymous caller would pass against a system that
+    hands a room's disclosure to any signed-in stranger.
+    """
+    p = make_profile(client)
+    sam = _interactor(client, "Sam")
+    outsider = _interactor(client, "Nosy")
+    room = _room(client, p, sam)
+    client.post(f"/rooms/{room['id']}/mic", json={"interactor_id": sam["id"]},
+                headers=_as(sam["token"]))
+
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers={"authorization": ""}).status_code == 401
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(outsider["token"])).status_code == 403
+    assert client.get(f"/rooms/{room['id']}/mic",
+                      headers=_as(sam["token"])).status_code == 200
+
+
+def test_the_profiles_owner_can_read_the_disclosure_too(client):
+    """The profiles are the side being lent the microphone, so their owner is
+    exactly who the disclosure is addressed to — being in the room as a
+    `profile` participant has to count as being in the room."""
+    p = make_profile(client)
+    sam = _interactor(client)
+    room = _room(client, p, sam)
+    client.post(f"/rooms/{room['id']}/mic", json={"interactor_id": sam["id"]},
+                headers=_as(sam["token"]))
+
+    seen = client.get(f"/rooms/{room['id']}/mic", headers=auth_header(p))
+    assert seen.status_code == 200
+    assert [m["interactor_id"]
+            for m in seen.json()["microphones_lent"]] == [sam["id"]]
 
 
 # -- what the profiles are told ----------------------------------------------
