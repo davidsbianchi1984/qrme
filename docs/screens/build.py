@@ -252,6 +252,21 @@ def pill(x, y, label, tone):
             + text(x - w / 2, y + 1, label, 9.5, col, 700, "middle", 0.4))
 
 
+def agent_light(x, y, colour, label):
+    """The agent status light — green working, amber needs you, red stopped.
+
+    A dot with a soft halo and a word. The word is not decoration: a colour
+    alone cannot say whether a green agent is mid-task or finished, and on a
+    small screen the word is doing most of the reading anyway. Mapped from the
+    workflow status by `qrme/agentlight.py`, which is the only place the
+    meaning lives.
+    """
+    col = {"green": C["green"], "amber": C["amber"], "red": C["red"]}[colour]
+    return (f'<circle cx="{x}" cy="{y}" r="10" fill="{A(col, 0.16)}"/>'
+            + f'<circle cx="{x}" cy="{y}" r="4.6" fill="{col}"/>'
+            + text(x + 15, y + 4, label, 10.5, col, 700, spacing=0.2))
+
+
 def meter(x, y, w, pct, grad):
     return (rrect(x, y, w, 7, 4, "#0d0a24", C["line"], 1)
             + rrect(x, y, max(6, w * pct), 7, 4, f"url(#{grad})"))
@@ -773,6 +788,14 @@ def render(spec):
                spec.get("accent", "brand"), spec.get("locked", False))
     y = SY + 100
     hero = spec.get("hero")
+
+    # An agent's status light, when the screen is showing one at work. Sits
+    # directly under the subtitle, above everything else, because "does this
+    # need me" is the first question and should not be somewhere you scroll to.
+    if spec.get("light"):
+        colour, label = spec["light"]
+        out.append(agent_light(CX + 8, y - 6, colour, label))
+        y += 22
 
     # A camera frame above the cards. Runs before the hero chain because a
     # screen has either a hero or cards, never both — this is the one thing
@@ -1841,11 +1864,12 @@ SCREENS = [
         dict(icon="link", color="cyan", k="Sustained across turns", s="until a reading shows recovery"),
         dict(icon="person", color="green", k="Then hands back", s="profile speaks again", pill=("RETURNED", "good")),
     ]),
-    dict(num=29, title="Tasks & Grants", sub="Autonomous, revocable", accent="amber", tab=0, cards=[
-        dict(icon="gift", color="amber", k="Scoped grant issued", s="a revocable vault token", pill=("SCOPED", "brand")),
+    dict(num=29, title="Tasks & Grants", sub="Autonomous, revocable", accent="amber",
+         tab=0, light=("amber", "needs you — awaiting confirm"), cards=[
+        dict(icon="gift", color="amber", k="Grant issued", s="a revocable vault token", pill=("SCOPED", "brand")),
         dict(icon="list", color="brand", k="research → draft → send", s="one phase at a time"),
         dict(icon="clock", color="cyan", k="Pauses at confirm", s="resumes in a later session"),
-        dict(icon="warn", color="red", k="Revoke halts the next read", s="raw data never retained"),
+        dict(icon="warn", color="red", k="Revoke halts the read", s="raw data never retained"),
     ]),
     dict(num=30, title="Fine-Tune", sub="Encrypted, offline (Claim 26)", accent="green", tab=2, cards=[
         dict(icon="sliders", color="green", k="Recompute embeddings", s="all local · no external calls", pill=("LOCAL", "good")),
@@ -1963,10 +1987,10 @@ SCREENS = [
         dict(icon="shieldok", color="cyan", k="Written at sale time", s="a record, not a reconstruction"),
     ], button=("Request payout", "brand")),
     dict(num=65, title="Watch Remote", sub="Your agents, on your wrist", accent="green", tab=3, cards=[
-        dict(icon="clock", color="green", k="ship the notes · working", s="phase: draft", pill=("GREEN", "good")),
-        dict(icon="clock", color="amber", k="research brief · assist", s="awaiting: external confirmation", pill=("ORANGE", "warn")),
-        dict(icon="clock", color="red", k="second job · stopped", s="cancelled from the wrist", pill=("RED", "crit")),
-        dict(icon="person", color="brand", k="Kitchen NEO", s="quick ring: come here · patrol · dock · stop"),
+        dict(icon="clock", color="green", k="ship the notes", s="phase: draft", pill=("WORKING", "good")),
+        dict(icon="clock", color="amber", k="research brief", s="awaiting: external confirmation", pill=("NEEDS YOU", "warn")),
+        dict(icon="clock", color="red", k="second job", s="cancelled from the wrist", pill=("STOPPED", "crit")),
+        dict(icon="person", color="brand", k="Kitchen NEO", s="come here · patrol · dock · stop"),
         dict(icon="shieldok", color="cyan", k="No new powers, only reach", s="same auth · allowlists · moderation"),
     ], button=("Assist", "brand")),
     dict(num=67, title="Smart Glasses", sub="Capture the POV, render to the lens", accent="cyan", tab=3, cards=[

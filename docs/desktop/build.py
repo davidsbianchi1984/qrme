@@ -215,8 +215,24 @@ def v_home():
     o.append(icon("person", acx, y2 + 94, "rgba(255,255,255,0.92)", 1.9))
     o.append(f'<circle cx="{acx}" cy="{y2+96}" r="48" fill="none" stroke="url(#gBrand)" stroke-width="3"/>')
     o.append(text(acx, y2 + 168, "AI Version of Me", 12.5, C["txt"], 700, "middle"))
-    o.append(status_dot(acx + 44, y2 + 190, "Online", "on"))
-    o.append(text(acx - 52, y2 + 194, "Identity 98.9%", 10, C["t2"], 600))
+    # Left-anchored text against a right-anchored pill, rather than both
+    # measured from the centre — they were overlapping by about thirty pixels
+    # at the widths they actually render.
+    o.append(text(IX + lw + 40, y2 + 194, "Identity 98.9%", 10, C["t2"], 600))
+    o.append(status_dot(IX + lw + 20 + rw - 16, y2 + 190, "Online", "on"))
+    # The agent status lights. "Online" says the profile is reachable; these
+    # say whether its running work needs a person — a different question, and
+    # the one somebody scanning a dashboard is actually asking.
+    o.append(text(IX + lw + 40, y2 + 222, "AGENTS", 9, C["t3"], 700, "start", 0.6))
+    ay = y2 + 238
+    for label, sub, tone in (("Ship the notes", "working", "on"),
+                             ("Research brief", "needs you", "avail"),
+                             ("Second job", "stopped", "crit")):
+        col = {"on": C["green"], "avail": C["amber"], "crit": C["red"]}[tone]
+        o.append(f'<circle cx="{IX+lw+44}" cy="{ay-3}" r="3.4" fill="{col}"/>')
+        o.append(text(IX + lw + 54, ay, label, 10, C["txt"], 600))
+        o.append(text(IX + lw + 20 + rw - 16, ay, sub, 9, col, 700, "end"))
+        ay += 17
     y3 = y2 + ph + 22
     bh = CONTENT_Y + CONTENT_H - PAD - y3
     o += panel(IX, y3, lw, bh, "Recent activity", right="live")

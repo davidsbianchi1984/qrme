@@ -7,7 +7,8 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import adaptation, db, delegation, offline, tasks, workflows
+from .. import (adaptation, agentlight, db, delegation, offline, tasks,
+                workflows)
 from ..common import (
     anonymized_exchange, interactor_or_404, profile_or_404,
     require_interactor, require_owner, require_owner_or_interactor,
@@ -18,6 +19,19 @@ from ..models import (
 )
 
 router = APIRouter()
+
+
+@router.get("/agent/lights")
+def agent_lights() -> dict:
+    """What the three status lights mean, and which states drive each.
+
+    Published so a client renders the same key the screens do. The legend is
+    built from the mapping rather than written out beside it — a legend that
+    is maintained separately eventually describes a mapping the code does not
+    have, and it is the legend people trust.
+    """
+    return {"order": list(agentlight.ORDER), "legend": agentlight.legend(),
+            "question": "does this agent need me right now?"}
 
 
 # -- Latent persona embeddings (claims 21/22) --------------------------------
