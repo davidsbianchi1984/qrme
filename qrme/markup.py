@@ -23,9 +23,12 @@ What that means concretely:
 * **URLs must be http, https, mailto, or a fragment.** ``javascript:`` and
   ``data:`` are both script vectors — the second is the one people forget.
 * **No ``<style>`` blocks and no ``@import``**, but ``style=""`` survives on a
-  short list of visual properties. CSS can exfiltrate (background-image
-  pointing at somebody's logger) and can hijack a page's whole layout, so
-  colour, spacing, borders and fonts are in and positioning is out.
+  short list of visual properties — including ``background-image``, because a
+  background is most of what decorating a page means. A ``url()`` inside CSS is
+  held to the same scheme check as ``<img src>``; banning one while allowing
+  the other was inconsistent, since both fetch from wherever they point.
+  Positioning stays out: colour, spacing, borders and fonts cannot lift an
+  element out of the page's own box, and ``position`` can.
 * **Frames, objects, embeds, forms and scripts are gone entirely.** A form on
   somebody's profile page is a credential-phishing surface with a friendly
   face on it.
@@ -77,12 +80,18 @@ ALLOWED_CSS = {
 
 SAFE_SCHEMES = ("http://", "https://", "mailto:", "#", "/")
 
-_URL_IN_CSS = re.compile(r"url\s*\(", re.I)
+_CSS_URL = re.compile(r"url\s*\(\s*([^)]+?)\s*\)", re.I)
 _CSS_BAD = re.compile(r"(expression|javascript:|@import|behavior|binding)", re.I)
 
 
 def _safe_url(value: str) -> bool:
     v = value.strip().lower().replace("\t", "").replace("\n", "")
+    # `//host/path` is protocol-relative: it looks like a site-relative path
+    # and fetches from another host entirely. The leading "/" in SAFE_SCHEMES
+    # is for real site-relative paths, and this is the one case where those two
+    # are told apart.
+    if v.startswith("//"):
+        return False
     if v.startswith(SAFE_SCHEMES):
         return True
     # Anything else — javascript:, data:, vbscript:, or a scheme nobody has
@@ -102,10 +111,14 @@ def _clean_style(value: str) -> str:
         prop, val = prop.strip().lower(), val.strip()
         if prop not in ALLOWED_CSS or not val:
             continue
-        # url() in CSS fetches from wherever it points, which turns a page view
-        # into a request somebody else can log. Images go through <img>, where
-        # the src is checked.
-        if _URL_IN_CSS.search(val):
+        # url() gets the same treatment <img src> gets, rather than being
+        # banned outright. Blocking it while allowing <img> was inconsistent —
+        # both fetch from wherever they point — and it cost the one thing a
+        # decorated page is actually for: a background image. So the URL inside
+        # is extracted and checked against the same scheme list, and anything
+        # that is not plainly http, https or a site-relative path is dropped.
+        urls = _CSS_URL.findall(val)
+        if urls and not all(_safe_url(u.strip("\"'")) for u in urls):
             continue
         out.append(f"{prop}: {val}")
     return "; ".join(out)

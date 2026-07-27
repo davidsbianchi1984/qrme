@@ -132,3 +132,35 @@ def test_the_editor_is_told_which_tags_it_may_use(client):
     r = client.get("/pages/themes").json()
     assert "marquee" in r["html_tags"] and "script" not in r["html_tags"]
     assert "color" in r["css_properties"] and "position" not in r["css_properties"]
+
+
+# -- decorating a page, which is the point -----------------------------------
+
+def test_a_background_image_survives(client):
+    """The single most MySpace thing there is. Blocking url() in CSS while
+    allowing <img src> was inconsistent — both fetch from wherever they point —
+    and it cost the one thing a decorated page is actually for."""
+    out = clean('<div style="background-image:url(https://cdn.example/skulls.png)">rain</div>')
+    assert "background-image" in out and "skulls.png" in out
+
+
+def test_a_site_relative_background_survives(client):
+    assert "/my/tile.png" in clean('<div style="background:url(/my/tile.png)">x</div>')
+
+
+@pytest.mark.parametrize("url", [
+    "javascript:alert(1)", "data:text/html,<script>alert(1)</script>",
+    "//logger.example/track.gif",
+])
+def test_an_unsafe_css_url_takes_the_declaration_with_it(url):
+    out = clean(f'<div style="background:url({url})">x</div>')
+    assert "background" not in out
+
+
+def test_protocol_relative_urls_are_not_site_relative(client):
+    """`//host/path` looks like a path and fetches from another host. The
+    leading "/" allowance is for real site-relative paths, and this is the one
+    case where the two have to be told apart."""
+    assert markup._safe_url("//evil.example/x") is False
+    assert markup._safe_url("/my/page") is True
+    assert 'href' not in clean('<a href="//evil.example">x</a>')

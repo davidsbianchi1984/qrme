@@ -879,8 +879,11 @@ the site taken offline. The nostalgia is worth reviving; that is not.
 | `style="color: …"` and 30 visual properties | kept |
 | `<script> <iframe> <object> <form> <svg>` | removed, content and all |
 | `onclick`, `onerror`, every `on*` | removed — this is where injection actually lives |
-| `javascript:` and `data:` URLs | removed; only http, https, mailto and fragments survive |
-| `@import`, `expression()`, `behavior:`, `url()` in CSS | removed — CSS can exfiltrate and hijack layout |
+| `javascript:` and `data:` URLs | removed; only http, https, mailto, fragments and site-relative paths survive |
+| `//host/path` | removed — protocol-relative, so it looks like a path and fetches from another host |
+| `@import`, `expression()`, `behavior:` | removed |
+| `background-image: url(…)` | **kept** — held to the same URL check as `<img src>`, because a background is most of what decorating a page means |
+| `position`, `z-index` | removed — they lift an element out of the page's own box |
 | an unknown tag | dropped, **its words kept** — eating somebody's writing looks like a bug |
 
 Sanitised **on the way in**, so there is exactly one moment unsafe markup could
@@ -889,6 +892,13 @@ stripped comes back as `html_removed`, so an editor can say *your `<script>` was
 dropped* instead of quietly returning a page that does less than its author
 wrote. `GET /pages/themes` publishes the allowed tags and properties so an
 editor can grey out what it knows will be lost.
+
+**Like, comment and share work on a post**, because `post` is an audience
+target rather than a parallel system — the same rows, and the same
+`UNIQUE (target, actor)`, as a like on a profile. A test now walks every kind
+in `TARGETS` through `share_url`, because sharing a post raised `KeyError` at
+the moment somebody pressed the button: the kind was added to the target list
+and its share URL was not.
 
 **A storefront, not a second copy of one.** `show_offers` surfaces the
 profile's own marketplace listings on the page, read from `listings` rather

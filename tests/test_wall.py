@@ -193,3 +193,36 @@ def test_an_adult_profiles_post_is_walled_out_of_an_ordinary_feed(client):
     assert [p["id"] for p in wall.for_you(me)] == []
     assert post["id"] in [p["id"] for p in wall.for_you(me, adult_ok=True)]
     assert audience.is_rated("post", post["id"]) is True
+
+
+# -- the three verbs, on a post ---------------------------------------------
+
+def test_like_comment_and_share_all_work_on_a_post(client):
+    """The whole reason `post` became an audience target rather than growing
+    its own tables. Sharing was the one that did not: `share_url` had no
+    pattern for a post and raised KeyError at the moment somebody shared it."""
+    me = make_profile(client, display_name="Author")
+    them = make_profile(client, display_name="Reader")
+    post = client.post(f"/profiles/{me['id']}/wall", json={"body": "Look."},
+                       headers=auth_header(me)).json()
+
+    assert client.post(f"/posts/{post['id']}/like",
+                       json={"actor_id": them["id"]}).status_code == 201
+    assert client.post(f"/posts/{post['id']}/comments",
+                       json={"actor_id": them["id"],
+                             "body": "Nice one."}).status_code == 201
+    r = client.post(f"/posts/{post['id']}/share",
+                    json={"actor_id": them["id"], "channel": "link"})
+    assert r.status_code == 201, r.text
+    assert r.json()["url"] == f"/posts/{post['id']}"
+
+    counts = client.get(f"/posts/{post['id']}/audience").json()
+    assert counts["likes"] == 1 and counts["comments"] == 1
+    assert counts["shares"] == 1
+
+
+def test_every_target_kind_can_be_shared(client):
+    """The guard for the bug above: a kind in TARGETS with no share URL is a
+    KeyError waiting for the first person to press share."""
+    for kind in audience.TARGETS:
+        assert audience.share_url(kind, "x_1")

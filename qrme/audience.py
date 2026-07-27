@@ -288,11 +288,15 @@ def share(kind: str, target_id: str, actor_id: str | None = None,
 def share_url(kind: str, target_id: str) -> str:
     """Where a share points. Relative — the caller makes it absolute against
     whatever origin it is serving from."""
+    # Every kind in TARGETS needs an entry. A missing one is a KeyError at the
+    # moment somebody shares, which is the worst place to find out — so the
+    # lookup is checked against TARGETS by a test rather than by hoping.
     return {
         "profile": f"/summon?ref={target_id}",
         "desk": f"/desks/{target_id}",
         "listing": f"/marketplace/listings?id={target_id}",
         "message": f"/rooms/messages/{target_id}",
+        "post": f"/posts/{target_id}",
     }[kind]
 
 
