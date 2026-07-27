@@ -95,6 +95,12 @@ FACES: dict[str, str] = {
     "activity": "how many new posts, friends and replies are waiting",
     "profile": "the profile's own headline figures",
     "control": "assist, halt, approve — the remote",
+    # Channel 2, on the device it is running on. The whole feature is lending
+    # the microphone on this wrist, and the grant is "yours to end, alone and
+    # at any moment" — so the most obvious place to end it is the thing doing
+    # the listening. A watch that can be lent and cannot be taken back from is
+    # a watch you have to go and find a phone to switch off.
+    "microphone": "whether this watch is lent to a room, and the way back",
 }
 DEFAULT_FACES = ("agents", "activity")
 

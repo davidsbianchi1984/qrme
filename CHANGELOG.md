@@ -377,7 +377,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   check on the design: if that route could leak anything, the wrong thing is on
   the face list.
 
+- **Channel 2 reaches the watch and the desktop** — watch face 05, desktop view
+  11. The audit before tagging found the feature had screens on the phone only,
+  which is the odd one out: **the watch is the device being lent.**
+
+  Face 05 is the only watch face that can *end* something, and that is
+  deliberate rather than an exception to "the wrist adds reach, not powers". A
+  lent microphone **is** this watch — making somebody find a phone to stop
+  their own device listening would be the one permission on the platform you
+  cannot revoke from the thing it runs on, and "yours to end, alone and at any
+  moment" would be false. `wearables.FACES` gained the permission in the same
+  change, so the test binding faces to permissions held.
+
+  Desktop view 11 is the one a wide window earns: a desk operator has a room, a
+  watch party and a stream open at once, and the question a phone cannot answer
+  is *where is my microphone live right now, all of it* — shown beside the
+  room's own disclosure, because those two being the same thing is the design.
+
 ### Fixed
+- **The account avatar was painted over the header pill on every desktop view.**
+  It sat at a hard-coded 96px from the pill's right edge while `status_dot`
+  sizes itself from its label, so at this label's length the orb landed *inside*
+  the pill and covered three characters of "Assistant". It read as a rendering
+  glitch across all eleven views, which is how it survived: a mockup's header is
+  the part nobody looks at twice. Derived from the same expression that sizes
+  the pill, so a longer label moves the avatar instead of colliding with it.
 
 - **An explicitly empty face list was silently answered with the defaults.**
   `faces or DEFAULT_FACES` collapsed "use the defaults" (`None`) and "show

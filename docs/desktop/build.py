@@ -98,9 +98,23 @@ def frame(title, active):
     o.append(text(CONTENT_X + PAD, WIN_Y + 33, title, 15, C["txt"], 700, spacing=-0.2))
     rx = WIN_X + WIN_W - 24 - (86 if PLATFORM_D == 'windows' else 0)
     o.append(icon("gear", rx - 10, WIN_Y + 27, C["t2"], 0.8))
-    o.append(status_dot(rx - 34, WIN_Y + 31, "AI assistant · Online", "on"))
-    o.append(f'<circle cx="{rx-34-96}" cy="{WIN_Y+27}" r="13" fill="url(#orb)"/>')
-    o.append(icon("person", rx - 34 - 96, WIN_Y + 27, "rgba(255,255,255,0.9)", 0.62))
+    # The account pill, and the avatar beside it — beside, not on top of.
+    #
+    # The avatar used to sit at a hard-coded 96px from the pill's right edge
+    # while `status_dot` sizes itself from its label, so at this label's length
+    # the orb landed *inside* the pill and painted out three characters of
+    # "Assistant". It read as a rendering glitch on all eleven desktop views,
+    # which is how long it survived: the header is the part of a mockup nobody
+    # looks at twice.
+    #
+    # Derived from the same expression `status_dot` uses, so a longer label
+    # moves the avatar instead of colliding with it.
+    label = "AI assistant · Online"
+    pill_w = 14 + len(label) * 6.0
+    o.append(status_dot(rx - 34, WIN_Y + 31, label, "on"))
+    ax = rx - 34 - pill_w - 21
+    o.append(f'<circle cx="{ax}" cy="{WIN_Y+27}" r="13" fill="url(#orb)"/>')
+    o.append(icon("person", ax, WIN_Y + 27, "rgba(255,255,255,0.9)", 0.62))
     ny = CONTENT_Y + 18
     for ic, lbl in NAV:
         on = (lbl == active)
@@ -780,6 +794,82 @@ def v_signatures():
     return o
 
 
+def v_channel_two():
+    """Channel 2, on the machine a desk is actually run from.
+
+    The phone screen (81) shows one room's disclosure to the person lending.
+    A desk operator has several places open at once — a room, a watch party,
+    a stream — and the question a wide window answers is the one a phone
+    cannot: **where is my microphone live right now, all of it, at once.**
+
+    So the left column is every place a grant is open, and the right is the
+    room's own disclosure — what the *other people* see, shown beside what the
+    lender sees, because those two being the same thing is the whole design.
+    """
+    o = []
+    lw = IW * 0.46
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    o += panel(IX, IY, lw, hh, "Where it is lent", right="you can end any of these")
+    y = IY + 54
+    places = [
+        ("mic", "cyan", "The quarterly numbers", "room · voice", "LENT"),
+        ("people", "brand", "Friday watch party", "party · 4 members", "LENT"),
+        ("speaker", "green", "Your live desk", "desk · visitors present", "LENT"),
+        ("chat", "t3", "Marcus Bell", "connection · not lent", None),
+    ]
+    for ic, col, name, sub, tag in places:
+        c = C.get(col, C["t3"])
+        o.append(rrect(IX + 14, y, lw - 28, 58, 12, "url(#gCard)", C["line"], 1))
+        o.append(rrect(IX + 28, y + 13, 32, 32, 10, A(c, 0.16)))
+        o.append(icon(ic, IX + 44, y + 29, c, 0.95))
+        o.append(text(IX + 72, y + 26, name, 12, C["txt"], 700))
+        o.append(text(IX + 72, y + 43, sub, 10, C["t3"], 500))
+        if tag:
+            o.append(rrect(IX + lw - 92, y + 18, 50, 21, 10, A(C["green"], 0.16)))
+            o.append(text(IX + lw - 67, y + 33, tag, 9, C["green"], 800, "middle", 0.5))
+        else:
+            o.append(text(IX + lw - 42, y + 33, "—", 12, C["t3"], 600, "middle"))
+        y += 68
+
+    o.append(text(IX + 22, y + 22, "Near-field on every one of them, whatever "
+                  "your dial says", 10.5, C["t2"], 600))
+    o.append(text(IX + 22, y + 40, "there are other people in all four places, "
+                  "so the channel stays narrow", 10, C["t3"], 500))
+
+    # -- what the room sees ------------------------------------------------
+    o += panel(rx, IY, rw, hh, "What the room sees",
+               right="the same thing you do")
+    ry = IY + 54
+    o.append(rrect(rx + 14, ry, rw - 28, 74, 12, A(C["cyan"], 0.10),
+                   A(C["cyan"], 0.35), 1))
+    o.append(text(rx + 30, ry + 28, "Sam has lent the profiles a microphone",
+                  11.5, C["txt"], 700))
+    o.append(text(rx + 30, ry + 47, "on a smart watch · keys on their voice",
+                  10, C["t2"], 500))
+    o.append(text(rx + 30, ry + 63, "you, speaking close to the microphone",
+                  10, C["t3"], 500))
+    ry += 92
+
+    for label, body in [
+        ("Everyone here is told",
+         "a disclosure only the lender can see is not a disclosure"),
+        ("It hears them, not the room",
+         "near-field, and it keys on its wearer — both, not either"),
+        ("It ends when this does",
+         "a permission must not outlive the conversation"),
+        ("Not a room-facing mic",
+         "a conference puck would lend the voices of people who did not agree"),
+    ]:
+        o.append(rrect(rx + 14, ry, rw - 28, 56, 12, "url(#gCard)", C["line"], 1))
+        o.append(text(rx + 30, ry + 24, label, 11.5, C["txt"], 700))
+        o.append(text(rx + 30, ry + 42, body, 10, C["t3"], 500))
+        ry += 66
+    return o
+
+
 VIEWS = [
     (1, "Home", "Home", v_home),
     (2, "Conversation", "Conversation", v_conversation),
@@ -791,6 +881,7 @@ VIEWS = [
     (8, "Audience & Commerce", "Marketplace", v_audience),
     (9, "Signatures", "Signing", v_signatures),
     (10, "Community", "Community", v_community),
+    (11, "Channel 2", "Control", v_channel_two),
 ]
 
 

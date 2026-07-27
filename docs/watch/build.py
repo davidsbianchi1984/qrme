@@ -196,6 +196,19 @@ FACES = [
         ("check", "green", "Approve reply", "held for you"),
         ("play", "amber", "Assist agent", "one is waiting"),
         ("stop", "red", "Halt", "stops the run")], foot="the wrist adds reach, not powers"),
+    # microphone — channel 2, on the device that is doing the listening.
+    #
+    # The other four faces report; this one is the only place the wrist can
+    # end something, and that is deliberate rather than an exception to "the
+    # wrist adds reach, not powers". A lent microphone is this watch. Making
+    # somebody find a phone to stop their own device listening would be the
+    # one permission on the platform you cannot revoke from the thing it runs
+    # on, and "yours to end, alone and at any moment" would be false.
+    dict(num=5, title="Microphone", accent="cyan", kind="rows", rows=[
+        ("mic", "cyan", "Lent to a room", "the quarterly numbers"),
+        ("shield", "green", "Near-field only", "you, not the room"),
+        ("stop", "red", "Take it back", "ends it here")],
+        foot="everyone in the room can see it is lent"),
 ]
 
 

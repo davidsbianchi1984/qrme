@@ -52,6 +52,7 @@ Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation 
   <tr>
     <td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
     <td align="center" width="50%"><a href="docs/desktop/10-community.svg"><img src="docs/desktop/10-community.svg" width="460" alt="Community"></a><br><sub><b>10</b> · Community</sub></td>
+    <td align="center" width="50%"><a href="docs/desktop/11-channel-2.svg"><img src="docs/desktop/11-channel-2.svg" width="460" alt="Channel 2"></a><br><sub><b>11</b> · Channel 2 · every place at once</sub></td>
   </tr>
 </table>
 
@@ -896,6 +897,7 @@ earbuds or glasses — and says which faces it may show.
     <td align="center" width="25%"><a href="docs/watch/02-activity.svg"><img src="docs/watch/02-activity.svg" width="150" alt="Activity"></a><br><sub><b>02</b> · Activity</sub></td>
     <td align="center" width="25%"><a href="docs/watch/03-profile.svg"><img src="docs/watch/03-profile.svg" width="150" alt="Profile"></a><br><sub><b>03</b> · Profile</sub></td>
     <td align="center" width="25%"><a href="docs/watch/04-control.svg"><img src="docs/watch/04-control.svg" width="150" alt="Control"></a><br><sub><b>04</b> · Control</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/05-microphone.svg"><img src="docs/watch/05-microphone.svg" width="150" alt="Microphone"></a><br><sub><b>05</b> · Microphone</sub></td>
   </tr>
 </table>
 
@@ -961,6 +963,13 @@ see is a permission granting nothing.
 away cannot return by re-presenting the same name, and the owner can still see
 what was ever paired — which is the question people actually ask after losing a
 watch.
+
+**05 Microphone is the one face that can end something**, and that is
+deliberate rather than an exception to *"the wrist adds reach, not powers"*. A
+lent microphone **is** this watch. Making somebody find a phone to stop their
+own device listening would be the one permission on the platform you cannot
+revoke from the thing it runs on, and *"yours to end, alone and at any moment"*
+would be false.
 
 **02 Activity is the community layer on a wrist, as counts.** Not the content:
 a feed is a reading surface, and reading is the thing a glance cannot do. Same
@@ -1073,6 +1082,15 @@ lifecycle rather than left as a function nobody calls: `watchparty.end`,
 `desks.set_presence(..., "closed")` and ending a connection each return the
 grants inside them. A grant that survived closing would be live again the next
 time the desk opened, for a conversation nobody has had yet.
+
+**Three form factors, three different jobs.** Screen 81 on the phone is one
+room's disclosure to the person lending. [Watch face
+05](#watch-faces-and-the-wearables-that-show-them) is the device *doing* the
+listening, and the only face that can end something. [Desktop view
+11](#desktop-app) is the one a wide window earns: a desk operator has a room, a
+watch party and a stream open at once, and the question a phone cannot answer
+is **where is my microphone live right now, all of it** — shown beside the
+room's own disclosure, because those two being the same thing is the design.
 
 **A device can be lent under the name it was paired with.** The pairing
 registry calls a collar clip `lapel_mic`; this module and `jim/mic.py` call it
