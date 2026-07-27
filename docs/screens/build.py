@@ -2236,6 +2236,144 @@ def render(spec):
 # --------------------------------------------------------------------------- #
 # full screen — the video with the app taken off it
 # --------------------------------------------------------------------------- #
+def avatar_grid(x, y, w, h, people, cols=2, pad=10):
+    """An audio room: everyone as a box, because there is nothing to look at.
+
+    A voice call with no video is the case every layout forgets, and the boxes
+    are not decoration — they are the only way to answer the two questions an
+    audio room actually raises: *who is here* and *who is talking*. So the
+    speaking ring is the loudest thing in the tile, and a muted person keeps
+    their box rather than vanishing from it. Somebody who has gone quiet is
+    still in the room, and a UI that removes them is telling the others they
+    left.
+
+    Synthetic profiles wear their AI badge here exactly as they do everywhere
+    else. A room is a surface like any other, and a mark that switches off when
+    the layout changes is a mark nobody can rely on.
+    """
+    o = []
+    rows = (len(people) + cols - 1) // cols
+    bw = (w - pad * (cols - 1)) / cols
+    bh = (h - pad * (rows - 1)) / rows
+    for i, (name, b64, state, badge) in enumerate(people):
+        bx = x + (i % cols) * (bw + pad)
+        by = y + (i // cols) * (bh + pad)
+        live = state == "speaking"
+        o.append(rrect(bx, by, bw, bh, 16,
+                       "rgba(16,12,40,0.72)" if not live
+                       else A(C["green"], 0.14),
+                       A(C["green"], 0.85) if live else "rgba(255,255,255,0.08)",
+                       2 if live else 1))
+        r = min(bw, bh) * 0.26
+        fcx, fcy = bx + bw / 2, by + bh / 2 - 6
+        if live:
+            # The ring, not a waveform. A waveform on a still image is a
+            # picture of sound that is not happening.
+            o.append(f'<circle cx="{fcx}" cy="{fcy}" r="{r+7}" fill="none" '
+                     f'stroke="{A(C["green"], 0.55)}" stroke-width="2.5"/>')
+        o.append(face(fcx, fcy, r * 2, b64, radius=r))
+        o.append(text(fcx, by + bh - 16, name, 9.5, "#efecff", 700, "middle"))
+        if badge:
+            bwid = 8 + tw.width(badge, 6.4, 800)
+            o.append(rrect(bx + 8, by + 8, bwid, 13, 6.5, A(C["cyan"], 0.22)))
+            o.append(text(bx + 8 + bwid / 2, by + 17.5, badge, 6.4,
+                          C["cyan"], 800, "middle"))
+        if state == "muted":
+            # A slash through a microphone, drawn rather than implied by a
+            # dimmed tile: dimming means "away" on every other surface here.
+            o.append(f'<circle cx="{bx+bw-16}" cy="{by+16}" r="9" '
+                     f'fill="rgba(8,6,20,0.72)"/>')
+            o.append(icon("mic", bx + bw - 16, by + 16, C["t3"], 0.42))
+            o.append(f'<path d="M{bx+bw-22} {by+10} l12 12" stroke="{C["red"]}"'
+                     f' stroke-width="1.8" stroke-linecap="round"/>')
+    return o
+
+
+def ar_presence(x, y, w, h, people):
+    """The others, placed in the room the camera is actually looking at.
+
+    This is the whole of what AR is over a video call: they are not in a strip
+    down the side, they are *somewhere* — beside the desk, by the door — and
+    where they are is information. A floor ring under each one is what makes
+    them stand in the room rather than float on the glass, and it is the only
+    part of this drawing doing real work.
+
+    Marked, obviously. A synthetic profile standing in somebody's actual office
+    is the single place a missing AI badge would matter most.
+    """
+    o = []
+    for name, b64, fx, fy, scale in people:
+        cx_, cy_ = x + w * fx, y + h * fy
+        r = min(w, h) * 0.075 * scale
+        o.append(f'<ellipse cx="{cx_}" cy="{cy_+r*1.45}" rx="{r*1.15}" '
+                 f'ry="{r*0.3}" fill="{A(C["cyan"], 0.22)}"/>')
+        o.append(f'<circle cx="{cx_}" cy="{cy_+r*1.45}" rx="{r*1.15}" '
+                 f'r="{r*1.15}" fill="none" stroke="{A(C["cyan"], 0.35)}" '
+                 f'stroke-width="1" transform="matrix(1,0,0,0.26,0,'
+                 f'{cy_+r*1.45-(cy_+r*1.45)*0.26:.2f})"/>')
+        o.append(f'<circle cx="{cx_}" cy="{cy_}" r="{r+4}" fill="none" '
+                 f'stroke="{A(C["cyan"], 0.55)}" stroke-width="1.4"/>')
+        o.append(face(cx_, cy_, r * 2, b64, radius=r))
+        nw = tw.width(name, 8.4, 700) + 14
+        o.append(rrect(cx_ - nw / 2, cy_ + r + 6, nw, 16, 8,
+                       "rgba(8,6,20,0.70)"))
+        o.append(text(cx_, cy_ + r + 17, name, 8.4, "#dff3ff", 700, "middle"))
+    return o
+
+
+def space_scene(x, y, w, h, avatars, label="VR", uid="sp"):
+    """A room that is not a place: the 3-D space people meet inside.
+
+    Drawn rather than photographed, because there is no photograph of a
+    synthetic room and using one would be a picture of somewhere that does not
+    exist. A horizon, a floor receding to a vanishing point, and the people in
+    it standing at different depths — which is the whole of what 3-D buys over
+    a grid of boxes, and the reason a room like this is worth having at all.
+
+    The people are the same portraits as everywhere else, with the same AI
+    badge. A profile does not become anonymous by walking into a rendered room.
+    """
+    o = [rrect(x, y, w, h, 0, "#07051a")]
+    horizon = y + h * 0.44
+    o.append(f'<ellipse cx="{x+w/2}" cy="{horizon}" rx="{w*0.62}" '
+             f'ry="{h*0.20}" fill="url(#glow)" opacity="0.55"/>')
+    # Floor: lines to a vanishing point, and rungs spaced so they crowd toward
+    # it. Even spacing reads as a flat grid seen from above, which is the one
+    # thing this drawing must not look like.
+    vpx, vpy = x + w / 2, horizon
+    for i in range(-7, 8):
+        o.append(f'<path d="M{vpx} {vpy} L{x+w/2+i*(w/5)} {y+h}" '
+                 f'stroke="rgba(150,130,255,0.20)" stroke-width="1" '
+                 f'fill="none"/>')
+    for k in range(1, 9):
+        t = k / 9
+        yy = horizon + (y + h - horizon) * (t ** 2.1)
+        o.append(f'<path d="M{x} {yy} H{x+w}" '
+                 f'stroke="rgba(150,130,255,{0.06+0.16*t:.2f})" '
+                 f'stroke-width="1"/>')
+    # Standing presences, near ones larger and lower. Depth is carried by size
+    # and position rather than by a shadow, which at this scale is a smudge.
+    for name, b64, depth in avatars:
+        scale = 0.55 + 0.45 * depth
+        r = min(w, h) * 0.085 * (0.8 + 0.6 * depth)
+        cx_ = x + w * (0.5 + (depth - 0.5) * 0.9) if len(avatars) > 1 else x + w / 2
+        cy_ = horizon + (y + h - horizon) * (0.10 + 0.40 * depth)
+        o.append(f'<ellipse cx="{cx_}" cy="{cy_+r*1.5}" rx="{r*1.1}" '
+                 f'ry="{r*0.28}" fill="rgba(150,130,255,{0.10+0.14*depth:.2f})"/>')
+        o.append(f'<circle cx="{cx_}" cy="{cy_}" r="{r+5}" fill="none" '
+                 f'stroke="{A(C["brandA"], 0.45)}" stroke-width="1.4"/>')
+        o.append(face(cx_, cy_, r * 2, b64, radius=r))
+        o.append(text(cx_, cy_ + r + 16, name, 8.6 * (0.85 + 0.3 * scale),
+                      "#e6e1ff", 650, "middle"))
+    if label:
+        lw = 16 + tw.width(label, 9, 800)
+        o.append(rrect(x + w - lw - 22, y + 20, lw, 20, 10,
+                       A(C["brandA"], 0.30)))
+        o.append(text(x + w - lw / 2 - 22, y + 34, label, 9, "#fff", 800,
+                      "middle"))
+    return o
+
+
 def video_facade(x, y, w, h, platform, title, note, uid="vf", cyf=0.5,
                  bottom_note=True):
     """A video from another platform, before anybody presses play.
@@ -2344,21 +2482,16 @@ def render_full(spec):
     sixteen-by-nine arrives at its own aspect ratio instead of being cropped to
     fit a column.
     """
+    # The picture runs to the edge of the *file*, not to the edge of a device
+    # drawn inside a margin. Two separate borders were showing up around a
+    # screen that claims to be full: the ~10px of phone body every other screen
+    # draws around its display, and the transparent margin this canvas leaves
+    # around the phone — which is invisible on a dark page and a white band on
+    # a light one. Both are gone. A screenshot of a full screen is the screen.
+    w, h = (H, W) if spec.get("landscape") else (W, H)
     land = spec.get("landscape", False)
-    if land:
-        w, h = H, W
-        px, py, pw, ph = PY, PX, H - 2 * PY, W - 2 * PX
-    else:
-        w, h = W, H
-        px, py, pw, ph = PX, PY, PW, PH
-    # The picture runs to the edge of the device, not to the edge of an inset
-    # display. Every other screen here draws a body and then a screen inside
-    # it with ~10px of bezel between, and on a full-screen shot that bezel
-    # reads as an unexplained border around the video — which is exactly what
-    # it was called out as. A modern phone's display *is* the face, so on this
-    # renderer the two rectangles are the same rectangle.
-    sx, sy, sw, sh = px, py, pw, ph
-    sradius = 40
+    sx, sy, sw, sh = 0, 0, w, h
+    sradius = 28
 
     ac = ACCENT.get(spec.get("accent", "brand"), C["brandA"])
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
@@ -2366,7 +2499,20 @@ def render_full(spec):
            f'aria-label="{esc(spec["title"])} screen">', defs(ac)]
     out.append(rrect(sx, sy, sw, sh, sradius, "url(#gScr)"))
 
-    if spec.get("facade"):
+    if spec.get("voices"):
+        # An audio room has no picture, so the boxes *are* the screen. Inset
+        # from the edges the way a photo is not: a grid pushed into the corner
+        # radius loses its corner tiles.
+        out.append(rrect(sx, sy, sw, sh, sradius, "#0a0820"))
+        used_bar = D_BTN + 18
+        out += avatar_grid(sx + 16, sy + 46, sw - 32,
+                           sh - 46 - used_bar - 18, spec["voices"],
+                           cols=3 if land else 2)
+    elif spec.get("space"):
+        out += space_scene(sx, sy, sw, sh, spec["space"]["avatars"],
+                           label=spec["space"].get("label", "VR"),
+                           uid=f's{spec["num"]}')
+    elif spec.get("facade"):
         # Full screen on a video nobody has pressed play on yet is an empty
         # screen, and drawing a still from the video would be a picture of the
         # request this design refuses to make.
@@ -2384,10 +2530,6 @@ def render_full(spec):
                    f'preserveAspectRatio="xMidYMid slice" '
                    f'clip-path="url(#{cid})" '
                    f'href="data:image/jpeg;base64,{spec["photo"]}"/>')
-    # A hairline where the glass meets the air, so the device still reads as a
-    # device rather than as a rounded photograph.
-    out.append(rrect(sx, sy, sw, sh, sradius, "none",
-                     "rgba(255,255,255,0.10)", 1.2))
 
     # The camera cut-out is a property of the hardware, so it rotates with the
     # phone and it keeps its platform's shape — an iOS pill on an Android
@@ -2401,21 +2543,24 @@ def render_full(spec):
     else:
         out.append(rrect(w / 2 - 30, sy + 5, 60, 15, 7.5, hole))
 
-    tx = sx + (32 if land else 14)
+    tx = sx + (34 if land else 20)
     if spec.get("photo_tag"):
         label, tone = spec["photo_tag"]
         col = {"live": C["red"], "sample": C["t2"], "rated": C["red"]}[tone]
         tagw = 16 + len(label) * 6.2
-        out.append(rrect(tx, sy + 14, tagw, 20, 10, "rgba(8,6,20,0.72)"))
-        out.append(f'<circle cx="{tx+11}" cy="{sy+24}" r="3.4" fill="{col}"/>')
-        out.append(text(tx + 19, sy + 28, label, 9, "#fff", 750, "start", 0.4))
+        out.append(rrect(tx, sy + 20, tagw, 20, 10, "rgba(8,6,20,0.72)"))
+        out.append(f'<circle cx="{tx+11}" cy="{sy+30}" r="3.4" fill="{col}"/>')
+        out.append(text(tx + 19, sy + 34, label, 9, "#fff", 750, "start", 0.4))
         tx += tagw + 6
     # A rated stream keeps its badge in full screen. The gate is a property of
     # the profile, not of the chrome, so taking the chrome away must not take
     # it with them.
     if spec.get("rated"):
-        out.append(rrect(tx, sy + 14, 38, 20, 10, A(C["red"], 0.85)))
-        out.append(text(tx + 19, sy + 28, "18+", 9.5, "#fff", 800, "middle"))
+        out.append(rrect(tx, sy + 20, 38, 20, 10, A(C["red"], 0.85)))
+        out.append(text(tx + 19, sy + 34, "18+", 9.5, "#fff", 800, "middle"))
+
+    if spec.get("ar_presence"):
+        out += ar_presence(sx, sy, sw, sh, spec["ar_presence"])
 
     bar, used = live_bar(sx, sy, sw, sh, spec["live_bar"])
     rows = spec.get("bubble_chat", [])
@@ -3056,6 +3201,118 @@ SCREENS = [
          facade=dict(platform="YouTube", title="the compounding talk",
                      note="nothing is requested until you press play"),
          live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
+    # The rooms that are not a camera pointed at a desk. A room's channel can
+    # be chat, voice, video, AR or VR (`POST /rooms`), and each of them gets
+    # the same three states — plain full screen, held, and turned sideways —
+    # because those are states of a *room*, not features of one screen.
+    #
+    # Audio first, because it is the case every layout forgets. There is
+    # nothing to look at, so the boxes are the screen.
+    dict(num=98, title="Audio Room", full=True, accent="green",
+         voices=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], "listening", None),
+             ("Priya Raman", frames.PORTRAITS[2][1], "muted", "AI"),
+             ("Elena Duarte", frames.PORTRAITS[3][1], "listening", "AI"),
+             ("Jonathan Reyes", frames.PORTRAITS[4][1], "muted", "AI"),
+         ],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
+                   ("share", "cyan")]),
+    dict(num=99, title="Audio Held", full=True, accent="green",
+         voices=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], "listening", None),
+             ("Priya Raman", frames.PORTRAITS[2][1], "muted", "AI"),
+             ("Elena Duarte", frames.PORTRAITS[3][1], "listening", "AI"),
+             ("Jonathan Reyes", frames.PORTRAITS[4][1], "muted", "AI"),
+         ],
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
+                   ("share", "cyan")]),
+    dict(num=100, title="Audio Landscape", full=True, landscape=True,
+         accent="green", voices=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], "listening", None),
+             ("Priya Raman", frames.PORTRAITS[2][1], "muted", "AI"),
+             ("Elena Duarte", frames.PORTRAITS[3][1], "listening", "AI"),
+             ("Jonathan Reyes", frames.PORTRAITS[4][1], "muted", "AI"),
+         ],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
+                   ("share", "cyan")]),
+    # AR: the room is the one you are already in, with the others placed in
+    # it. The camera frame is real and carries no AI mark; the people standing
+    # in it are synthetic and carry theirs — which is the single place a
+    # missing badge would matter most.
+    dict(num=101, title="AR Room", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("AR", "sample"),
+         ar_presence=[
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.26, 0.46, 1.0),
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.72, 0.38, 0.82),
+         ],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=102, title="AR Held", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("AR", "sample"),
+         ar_presence=[
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.26, 0.46, 1.0),
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.72, 0.38, 0.82),
+         ],
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=103, title="AR Landscape", full=True, landscape=True,
+         accent="cyan", photo=frames.DESK, photo_tag=("AR", "sample"),
+         ar_presence=[
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.20, 0.52, 1.0),
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.50, 0.40, 0.86),
+             ("Priya Raman", frames.PORTRAITS[2][1], 0.78, 0.48, 0.94),
+         ],
+         # No chat overlay here. The presence markers already name everyone in
+         # the room, and a bubble repeating "Dr. Amara Osei" under her own
+         # label is the same name twice with a collision between them.
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    # VR: a room that is not a place. Drawn rather than photographed, because
+    # there is no photograph of somewhere that does not exist, and a stock
+    # picture of a headset would be a picture of the hardware instead of the
+    # room. Depth is carried by size and position — which is the whole of what
+    # 3-D buys over a grid of boxes.
+    dict(num=104, title="VR Room", full=True, accent="brand",
+         space=dict(label="VR · 3-D", avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.22),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.55),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.86),
+         ]),
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=105, title="VR Held", full=True, accent="brand",
+         space=dict(label="VR · 3-D", avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.22),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.55),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.86),
+         ]),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=106, title="VR Landscape", full=True, landscape=True,
+         accent="brand",
+         space=dict(label="VR · 3-D", avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.18),
+             ("Priya Raman", frames.PORTRAITS[2][1], 0.42),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.64),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.88),
+         ]),
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
@@ -3089,10 +3346,22 @@ SCREENS = [
 def main():
     global PLATFORM
     total = 0
+    # Renaming a screen used to leave the old file behind, and a stale SVG on
+    # disk is worse than a missing one: it still renders, it is still linked,
+    # and it shows a version of the product that no longer exists. Renumbering
+    # the room screens left six of them lying there before this was noticed.
+    stale = 0
     for plat, sub in (("ios", ""), ("android", "android")):
         PLATFORM = plat
         outdir = OUT if not sub else os.path.join(OUT, sub)
         os.makedirs(outdir, exist_ok=True)
+        keep = {f'{s["num"]:02d}-'
+                + s["title"].lower().replace(" & ", "-").replace(" ", "-")
+                            .replace("é", "e") + ".svg" for s in SCREENS}
+        for name in os.listdir(outdir):
+            if name.endswith(".svg") and name not in keep:
+                os.remove(os.path.join(outdir, name))
+                stale += 1
         for s in SCREENS:
             n = s["num"]
             slug = s["title"].lower().replace(" & ", "-").replace(" ", "-").replace("é", "e")
@@ -3102,7 +3371,8 @@ def main():
                 f.write(draw(s))
             total += 1
     PLATFORM = "ios"
-    print(f"generated {total} screens ({total // 2} × 2 platforms)")
+    print(f"generated {total} screens ({total // 2} × 2 platforms)"
+          + (f", removed {stale} stale" if stale else ""))
     return []
 
 

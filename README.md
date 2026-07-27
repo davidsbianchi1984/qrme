@@ -260,31 +260,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
     <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="210" alt="Full Screen — long press"></a><br><sub><b>90</b> · Full Screen · long press</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/93-rated-held.svg"><img src="docs/screens/93-rated-held.svg" width="210" alt="Rated stream — long press"></a><br><sub><b>93</b> · Rated · long press · 18+</sub></td>
     <td align="center" width="33%"><a href="docs/screens/95-posted-video.svg"><img src="docs/screens/95-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>95</b> · Posted Video · YouTube</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/96-video-held.svg"><img src="docs/screens/96-video-held.svg" width="210" alt="Posted Video — long press"></a><br><sub><b>96</b> · Video · long press</sub></td>
-  </tr>
-</table>
-
-Turned sideways, each of them fills the glass. The landscape frames are the
-same four surfaces — a live desk, a rated stream, a room, and a video somebody
-posted from another platform — with the app taken off:
-
-<table>
-  <tr>
-    <td align="center"><a href="docs/screens/91-full-screen-landscape.svg"><img src="docs/screens/91-full-screen-landscape.svg" width="620" alt="Live Room — landscape"></a><br><sub><b>91</b> · Live Room · the room at its own aspect ratio</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="docs/screens/92-rated-full-screen.svg"><img src="docs/screens/92-rated-full-screen.svg" width="620" alt="Rated stream — landscape"></a><br><sub><b>92</b> · Rated Stream · the 18+ badge survives full screen</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="docs/screens/94-room-full-screen.svg"><img src="docs/screens/94-room-full-screen.svg" width="620" alt="Room — landscape"></a><br><sub><b>94</b> · Room · a chat session, video and all</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="docs/screens/97-video-landscape.svg"><img src="docs/screens/97-video-landscape.svg" width="620" alt="Posted video — landscape"></a><br><sub><b>97</b> · Posted Video · still nothing requested from YouTube</sub></td>
   </tr>
 </table>
 
@@ -325,38 +301,132 @@ business, not a reason to file it under a different menu. **75** and **76** are
 where those conditions are spelled out; **89** is what it looks like once you
 already know them.
 
-**Press and hold, and the picture takes the whole phone** (**90**). No title,
-no tab bar, nothing but the room and the strip — full screen that stops short
-of the chrome is just a larger box. Holding is also what puts the **help
-button** back. It used to be welded to every screen on the theory that "on all
-screens" is a property of the chrome rather than something 90 screens can each
-be trusted to remember, and that theory is right everywhere except here, where
-the chrome *is* the thing being taken away: a floating `?` on a full-screen
-video is a permanent smudge on it, and it sits in exactly the corner the share
-button now occupies. So it comes back the way everything else does — you press
-and hold and it surfaces, along with the way into landscape and the way back to
-the app. The promise is kept without the pixel.
+### Full screen, and the three states every live surface has
 
-The held state **dims hard** — 78%, not a tint — so there is exactly one bright
-thing on the glass and it is the thing you can press. A light scrim leaves the
-picture competing with the buttons and turns a decision into a hunt. Tapping
-anywhere else takes the dim away again, which is why nothing else needs to be
-lit and why the screen says so.
+**Press and hold, and the picture takes the whole phone.** No title, no tab
+bar, no margin — full screen that stops short of the chrome is just a larger
+box, and a screenshot of one that stops short of the file is a picture with a
+band around it.
 
-**The same two states apply to every live surface**, because they are states of
-a video rather than a feature of one screen: the rated stream (**92**, **93**),
-a room's chat session (**94**), and a video posted from somewhere else
-(**96**, **97**). On a rated stream the **18+ badge survives full screen** —
-the gate belongs to the profile, not to the app chrome, so taking the chrome
-away must not take the rating with it.
+Holding is also what puts the **help button** back. It used to be welded to
+every screen on the theory that "on all screens" is a property of the chrome
+rather than something a hundred screens can each be trusted to remember, and
+that theory is right everywhere except here, where the chrome *is* what is
+being taken away: a floating `?` on a full-screen video is a permanent smudge
+on it, and it sits in exactly the corner the share button now occupies. So it
+comes back the way everything else does — press and hold and it surfaces,
+along with the way into landscape and the way back to the app. The promise is
+kept without the pixel.
 
-**Tilt the phone and it goes wide** (**91**). This is the one that earns its
-place rather than being a checkbox: the desk was shot sixteen-by-nine, and in a
-portrait column two thirds of it is cropped away. Turned sideways it arrives at
-its own aspect ratio — the bell on the desk and the sign beside it are both in
-frame at once, which is the entire situation the feature exists for. The chat
-takes the left third and the strip runs along the bottom, with the composer
-capped rather than stretched across half a metre of glass.
+The held state **dims hard** — 78%, not a tint — and the buttons are lit rather
+than outlined. There is exactly one bright thing on the glass and it is the
+thing you can press; a light scrim leaves the picture competing with the buttons
+and turns a decision into a hunt. Tapping anywhere else takes the dim away
+again, and the screen says so.
+
+**Tilt and it goes wide.** This is the state that earns its place rather than
+being a checkbox: the desk was shot sixteen-by-nine, and a portrait column crops
+two thirds of it away. Sideways, the bell on the desk and the sign beside it are
+in frame at once — which is the entire situation the feature exists for.
+
+Those three states — plain, held, sideways — belong to a **surface**, not to
+one screen. So every one of them has all three.
+
+#### A live desk
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="200" alt="Live room, in the app"></a><br><sub><b>89</b> · in the app</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="200" alt="Live room, held"></a><br><sub><b>90</b> · held</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/93-rated-held.svg"><img src="docs/screens/93-rated-held.svg" width="200" alt="Rated stream, held"></a><br><sub><b>93</b> · rated · held · 18+</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/91-full-screen-landscape.svg"><img src="docs/screens/91-full-screen-landscape.svg" width="600" alt="Live room, landscape"></a><br><sub><b>91</b> · the room at its own aspect ratio</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screens/92-rated-full-screen.svg"><img src="docs/screens/92-rated-full-screen.svg" width="600" alt="Rated stream, landscape"></a><br><sub><b>92</b> · rated — the 18+ badge survives full screen</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/screens/94-room-full-screen.svg"><img src="docs/screens/94-room-full-screen.svg" width="600" alt="Room, landscape"></a><br><sub><b>94</b> · a room's video session</sub></td>
+  </tr>
+</table>
+
+On a rated stream the **18+ badge survives full screen**. The gate belongs to
+the profile, not to the app chrome, so taking the chrome away must not take the
+rating with it.
+
+#### A room that is not a camera
+
+A room's channel can be chat, voice, video, **AR** or **VR** (`POST /rooms`),
+and each of those is a different problem in the same three states.
+
+**Audio is the case every layout forgets.** There is nothing to look at, so the
+boxes *are* the screen — and they are not decoration: they answer the only two
+questions an audio room raises, *who is here* and *who is talking*. The speaking
+ring is the loudest thing in the tile. A muted person keeps their box rather
+than vanishing from it, because somebody who has gone quiet is still in the
+room and a layout that removes them is telling the others they left.
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/98-audio-room.svg"><img src="docs/screens/98-audio-room.svg" width="190" alt="Audio room"></a><br><sub><b>98</b> · audio · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/99-audio-held.svg"><img src="docs/screens/99-audio-held.svg" width="190" alt="Audio room, held"></a><br><sub><b>99</b> · audio · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/100-audio-landscape.svg"><img src="docs/screens/100-audio-landscape.svg" width="330" alt="Audio room, landscape"></a><br><sub><b>100</b> · audio · sideways</sub></td>
+  </tr>
+</table>
+
+**AR puts them in the room you are already in.** That is the whole of what it
+buys over a video call: the others are not in a strip down the side, they are
+*somewhere* — beside the desk, by the door — and where they are is information.
+The floor ring under each one is what makes them stand in the room rather than
+float on the glass. The camera frame is a real photograph and carries no AI
+mark; the people standing in it are synthetic and carry theirs, which is the
+single place a missing badge would matter most.
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/101-ar-room.svg"><img src="docs/screens/101-ar-room.svg" width="190" alt="AR room"></a><br><sub><b>101</b> · AR · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/102-ar-held.svg"><img src="docs/screens/102-ar-held.svg" width="190" alt="AR room, held"></a><br><sub><b>102</b> · AR · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/103-ar-landscape.svg"><img src="docs/screens/103-ar-landscape.svg" width="330" alt="AR room, landscape"></a><br><sub><b>103</b> · AR · sideways</sub></td>
+  </tr>
+</table>
+
+**VR is a room that is not a place.** Drawn rather than photographed, because
+there is no photograph of somewhere that does not exist and a stock picture of a
+headset would be a picture of the hardware instead of the room. A horizon, a
+floor receding to a vanishing point, and the people standing at different
+depths — depth carried by size and position, which is the whole of what 3-D buys
+over a grid of boxes and the reason a room like this is worth having.
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/104-vr-room.svg"><img src="docs/screens/104-vr-room.svg" width="190" alt="VR room"></a><br><sub><b>104</b> · VR 3-D · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/105-vr-held.svg"><img src="docs/screens/105-vr-held.svg" width="190" alt="VR room, held"></a><br><sub><b>105</b> · VR 3-D · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/106-vr-landscape.svg"><img src="docs/screens/106-vr-landscape.svg" width="330" alt="VR room, landscape"></a><br><sub><b>106</b> · VR 3-D · sideways</sub></td>
+  </tr>
+</table>
+
+The strip changes with the room and only with the room. An audio room has no
+gift button because there is no stage to gift at; a posted video has no bell and
+no guest request because there is nobody at a desk to ring and no host to ask.
+A control that cannot do anything is worse than an absent one.
+
+#### A video from somewhere else
+
+<table>
+  <tr>
+    <td align="center" width="30%"><a href="docs/screens/95-posted-video.svg"><img src="docs/screens/95-posted-video.svg" width="190" alt="Posted video, in the app"></a><br><sub><b>95</b> · in the app</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/96-video-held.svg"><img src="docs/screens/96-video-held.svg" width="190" alt="Posted video, held"></a><br><sub><b>96</b> · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/97-video-landscape.svg"><img src="docs/screens/97-video-landscape.svg" width="330" alt="Posted video, landscape"></a><br><sub><b>97</b> · sideways</sub></td>
+  </tr>
+</table>
+
+The empty plate is the feature — see [the wall section](#the-community-wall-and-the-feed):
+nothing is requested from YouTube until somebody presses play, so before they
+do there is genuinely nothing to draw.
 
 The mark runs in both directions across this set, which is the whole point of
 it. **74** is the starter collection — every face there is generated, so it
@@ -1233,7 +1303,7 @@ feature:
 | Honesty about multiplicity | `GET /profiles/{id}/transparency` reports active relationships, and every chat prompt instructs the profile to acknowledge them truthfully if asked — disclosure by design |
 | Summoning — @, #, and QR beacons | `PUT /profiles/{id}/handle` claims a unique `@handle`; `GET /summon?ref=` resolves `@handle`, `#tag` (marketplace tags), or a beacon token. `POST /profiles/{id}/beacons` *leaves the profile behind* somewhere physical — a printable QR code (`GET /beacons/{id}/qr.svg`) summons it, scans are counted, beacons can be picked back up, and a departed profile's beacon resolves as a memorial |
 | Connections — chat with other users | `POST /connections/join` matches interactors anonymously by alias in a `friendly` tier or an 18+-verified `rated` tier; per-tier moderation (minors always strict, blocked messages never delivered), and either side can end it anytime |
-| Rooms — chat, video, AR, VR | `POST /rooms` — multiparty conversations over any channel (`chat`/`voice`/`video`/`ar`/`vr`) with any mix of real users and synthetic profiles: user↔user, profile↔profile (`/rooms/{id}/advance`), or combinations; every profile turn is moderated, and a room with a minor present always runs strict |
+| Rooms — chat, video, AR, VR | `POST /rooms` — multiparty conversations over any channel (`chat`/`voice`/`video`/`ar`/`vr`) with any mix of real users and synthetic profiles: user↔user, profile↔profile (`/rooms/{id}/advance`), or combinations; every profile turn is moderated, and a room with a minor present always runs strict. Each channel gets the same three full-screen states — plain, held, sideways — because those belong to the room rather than to a camera: **98–100** audio (boxes, because there is nothing to look at), **101–103** AR (the others placed in the room you are already in), **104–106** VR/3-D (depth carried by size and position). The strip changes with the channel: no gift button in an audio room, no bell on a posted video |
 | Marketplace listings | `POST`/`GET /marketplace/listings` — users and businesses share and market synthetic profiles, content, business expertise, or services; browsable by kind, tag, and area (healthcare, finance, relationships, …) |
 | Providers & consented handoffs | `POST`/`GET /providers` — a directory of real local businesses per area (healthcare, medical, mental health, finance, relationships, career); `POST /handoffs` packages the AI specialist's session for a provider *only with explicit consent*, seals it in the PDI vault, and releases it solely through a revocable token (`DELETE /handoffs/{id}` revokes and purges) |
 | Embodiments — even robots | `POST /profiles/{id}/embodiments` — speaker, earpiece, hologram, robot, humanoid; chat can arrive from an embodiment, and JIM-mini's autonomous devices can host the same profile. **Personality stays consistent across forms**: the persona prompt affirms one constant identity/memory/voice, `ChatResponse.persona_signature` is invariant across modality and embodiment (voice → text → hologram give the same signature), and `GET /profiles/{id}/embodiment-consistency` exposes that fingerprint + the forms it's live on |
