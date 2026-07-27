@@ -3114,10 +3114,24 @@ SCREENS = [
     # is the same room with the app taken off, and 91 is 90 turned ninety
     # degrees — which is the only shape in which a room shot sixteen-by-nine
     # arrives at its own aspect ratio instead of cropped into a column.
+    # Three states per surface, and they are the same three every time:
+    # plain full screen, held, and turned sideways. The plain one is easy to
+    # skip when writing these — it is the state with nothing happening in it —
+    # and skipping it left the README claiming a completeness it did not have,
+    # with no screenshot anywhere of a full-screen video before somebody
+    # presses on it.
     dict(num=90, title="Full Screen", full=True, accent="pink",
-         # The help button is the reason this state exists. "Full screen" is
-         # not offered here because you are already in it — a button that does
-         # nothing but confirm where you are is worse than no button.
+         photo=frames.DESK, photo_tag=("LIVE", "live"),
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
+             ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
+         ]),
+    dict(num=91, title="Full Screen Held", full=True, accent="pink",
+         # "Full screen" is not offered among the held buttons because you are
+         # already in it — a button that does nothing but confirm where you
+         # are is worse than no button.
          held=[("?", None, "brandA", "Help"),
                (None, "rotate", "cyan", "Landscape"),
                (None, "shrink", "t2", "Back to app")],
@@ -3128,7 +3142,7 @@ SCREENS = [
              ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
              ("Priya Raman", "shipping the fix now", frames.PORTRAITS[2][1]),
          ]),
-    dict(num=91, title="Full Screen Landscape", full=True, landscape=True,
+    dict(num=92, title="Full Screen Landscape", full=True, landscape=True,
          accent="pink", photo=frames.DESK, photo_tag=("LIVE", "live"),
          # Landscape is where the room finally arrives at its own aspect
          # ratio, so nothing is dimmed over it here — this is the resting
@@ -3140,10 +3154,25 @@ SCREENS = [
              ("Dr. Amara Osei", "he loves that chart", frames.PORTRAITS[0][1]),
              ("David Bianchi", "it is a good chart", frames.FOUNDER_VERIFIED[1]),
          ]),
-    # The rated stream gets the same two states. The badge survives full
-    # screen, because the gate belongs to the profile rather than to the app
-    # chrome — taking the chrome away must not take the rating with it.
-    dict(num=92, title="Rated Full Screen", full=True, landscape=True,
+    # The rated stream gets the same three. The badge survives all of them,
+    # because the gate belongs to the profile rather than to the app chrome —
+    # taking the chrome away must not take the rating with it.
+    dict(num=93, title="Rated Full Screen", full=True, rated=True,
+         accent="red", photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Ada", "is she back on at eight?", frames.PORTRAITS[6][1]),
+             ("Cy", "gifted a rose", frames.PORTRAITS[4][1]),
+         ]),
+    dict(num=94, title="Rated Held", full=True, rated=True, accent="red",
+         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=95, title="Rated Landscape", full=True, landscape=True,
          rated=True, accent="red",
          photo=frames.STAGE, photo_tag=("LIVE", "live"),
          live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
@@ -3152,15 +3181,25 @@ SCREENS = [
              ("Ada", "is she back on at eight?", frames.PORTRAITS[6][1]),
              ("Cy", "gifted a rose", frames.PORTRAITS[4][1]),
          ]),
-    dict(num=93, title="Rated Held", full=True, rated=True, accent="red",
-         photo=frames.STAGE, photo_tag=("LIVE", "live"),
+    # A room with its camera on: the other place a video and a conversation
+    # run at once. The strip carries a microphone rather than a bell — in a
+    # room you are a participant, not a visitor at somebody's desk.
+    dict(num=96, title="Room Full Screen", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("ROOM", "sample"),
+         live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")],
+         bubble_chat=[
+             ("Marcus Bell", "can everyone see the slide?", frames.PORTRAITS[1][1]),
+             ("Dr. Amara Osei", "yes — go on", frames.PORTRAITS[0][1]),
+         ]),
+    dict(num=97, title="Room Held", full=True, accent="cyan",
+         photo=frames.DESK, photo_tag=("ROOM", "sample"),
          held=[("?", None, "brandA", "Help"),
                (None, "rotate", "cyan", "Landscape"),
                (None, "shrink", "t2", "Back to app")],
-         live_bar=[("comeup", "green"), ("bell", "amber"), ("gift", "gold"),
+         live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
-    # A room, which is the other place a video and a conversation run at once.
-    dict(num=94, title="Room Full Screen", full=True, landscape=True,
+    dict(num=98, title="Room Landscape", full=True, landscape=True,
          accent="cyan", photo=frames.DESK, photo_tag=("ROOM", "sample"),
          live_bar=[("comeup", "green"), ("mic", "amber"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")],
@@ -3172,7 +3211,7 @@ SCREENS = [
     # Somebody else's video, posted here. The empty plate is the feature: see
     # `qrme/embeds.py` — nothing is requested from the other platform until a
     # viewer presses play, so there is nothing to draw yet.
-    dict(num=95, title="Posted Video", sub="From another platform",
+    dict(num=99, title="Posted Video", sub="From another platform",
          accent="cyan", tab=0,
          facade_card=dict(platform="YouTube", title="the compounding talk",
                           note="nothing loads until you press play"),
@@ -3189,14 +3228,18 @@ SCREENS = [
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
     # something here — a control that cannot do anything is worse than absent.
-    dict(num=96, title="Video Held", full=True, accent="cyan",
+    dict(num=100, title="Video Full Screen", full=True, accent="cyan",
+         facade=dict(platform="YouTube", title="the compounding talk",
+                     note="nothing is requested until you press play"),
+         live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
+    dict(num=101, title="Video Held", full=True, accent="cyan",
          facade=dict(platform="YouTube", title="the compounding talk",
                      note="nothing is requested until you press play"),
          held=[("?", None, "brandA", "Help"),
                (None, "rotate", "cyan", "Landscape"),
                (None, "shrink", "t2", "Back to app")],
          live_bar=[("heart", "pink"), ("chat", "brand"), ("share", "cyan")]),
-    dict(num=97, title="Video Landscape", full=True, landscape=True,
+    dict(num=102, title="Video Landscape", full=True, landscape=True,
          accent="cyan",
          facade=dict(platform="YouTube", title="the compounding talk",
                      note="nothing is requested until you press play"),
@@ -3208,7 +3251,7 @@ SCREENS = [
     #
     # Audio first, because it is the case every layout forgets. There is
     # nothing to look at, so the boxes are the screen.
-    dict(num=98, title="Audio Room", full=True, accent="green",
+    dict(num=103, title="Audio Room", full=True, accent="green",
          voices=[
              ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
              ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
@@ -3219,7 +3262,7 @@ SCREENS = [
          ],
          live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
                    ("share", "cyan")]),
-    dict(num=99, title="Audio Held", full=True, accent="green",
+    dict(num=104, title="Audio Held", full=True, accent="green",
          voices=[
              ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
              ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
@@ -3233,7 +3276,7 @@ SCREENS = [
                (None, "shrink", "t2", "Back to app")],
          live_bar=[("mic", "amber"), ("comeup", "green"), ("heart", "pink"),
                    ("share", "cyan")]),
-    dict(num=100, title="Audio Landscape", full=True, landscape=True,
+    dict(num=105, title="Audio Landscape", full=True, landscape=True,
          accent="green", voices=[
              ("Marcus Bell", frames.PORTRAITS[1][1], "speaking", "AI"),
              ("Dr. Amara Osei", frames.PORTRAITS[0][1], "listening", "AI"),
@@ -3248,7 +3291,7 @@ SCREENS = [
     # it. The camera frame is real and carries no AI mark; the people standing
     # in it are synthetic and carry theirs — which is the single place a
     # missing badge would matter most.
-    dict(num=101, title="AR Room", full=True, accent="cyan",
+    dict(num=106, title="AR Room", full=True, accent="cyan",
          photo=frames.DESK, photo_tag=("AR", "sample"),
          ar_presence=[
              ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.26, 0.46, 1.0),
@@ -3256,7 +3299,7 @@ SCREENS = [
          ],
          live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
-    dict(num=102, title="AR Held", full=True, accent="cyan",
+    dict(num=107, title="AR Held", full=True, accent="cyan",
          photo=frames.DESK, photo_tag=("AR", "sample"),
          ar_presence=[
              ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.26, 0.46, 1.0),
@@ -3267,7 +3310,7 @@ SCREENS = [
                (None, "shrink", "t2", "Back to app")],
          live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
-    dict(num=103, title="AR Landscape", full=True, landscape=True,
+    dict(num=108, title="AR Landscape", full=True, landscape=True,
          accent="cyan", photo=frames.DESK, photo_tag=("AR", "sample"),
          ar_presence=[
              ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.20, 0.52, 1.0),
@@ -3284,7 +3327,7 @@ SCREENS = [
     # picture of a headset would be a picture of the hardware instead of the
     # room. Depth is carried by size and position — which is the whole of what
     # 3-D buys over a grid of boxes.
-    dict(num=104, title="VR Room", full=True, accent="brand",
+    dict(num=109, title="VR Room", full=True, accent="brand",
          space=dict(label="VR · 3-D", avatars=[
              ("Marcus Bell", frames.PORTRAITS[1][1], 0.22),
              ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.55),
@@ -3292,7 +3335,7 @@ SCREENS = [
          ]),
          live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
-    dict(num=105, title="VR Held", full=True, accent="brand",
+    dict(num=110, title="VR Held", full=True, accent="brand",
          space=dict(label="VR · 3-D", avatars=[
              ("Marcus Bell", frames.PORTRAITS[1][1], 0.22),
              ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.55),
@@ -3303,7 +3346,7 @@ SCREENS = [
                (None, "shrink", "t2", "Back to app")],
          live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
-    dict(num=106, title="VR Landscape", full=True, landscape=True,
+    dict(num=111, title="VR Landscape", full=True, landscape=True,
          accent="brand",
          space=dict(label="VR · 3-D", avatars=[
              ("Marcus Bell", frames.PORTRAITS[1][1], 0.18),

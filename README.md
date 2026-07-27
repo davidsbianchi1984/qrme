@@ -260,7 +260,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
     <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/95-posted-video.svg"><img src="docs/screens/95-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>95</b> · Posted Video · YouTube</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>99</b> · Posted Video · YouTube</sub></td>
   </tr>
 </table>
 
@@ -336,27 +336,51 @@ one screen. So every one of them has all three.
 
 <table>
   <tr>
-    <td align="center" width="34%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="200" alt="Live room, in the app"></a><br><sub><b>89</b> · in the app</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="200" alt="Live room, held"></a><br><sub><b>90</b> · held</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/93-rated-held.svg"><img src="docs/screens/93-rated-held.svg" width="200" alt="Rated stream, held"></a><br><sub><b>93</b> · rated · held · 18+</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="180" alt="Live room in the app"></a><br><sub><b>89</b> · in the app</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="180" alt="Live room full screen"></a><br><sub><b>90</b> · full screen</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/91-full-screen-held.svg"><img src="docs/screens/91-full-screen-held.svg" width="180" alt="Live room held"></a><br><sub><b>91</b> · held</sub></td>
   </tr>
 </table>
 
 <table>
   <tr>
-    <td align="center"><a href="docs/screens/91-full-screen-landscape.svg"><img src="docs/screens/91-full-screen-landscape.svg" width="600" alt="Live room, landscape"></a><br><sub><b>91</b> · the room at its own aspect ratio</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="docs/screens/92-rated-full-screen.svg"><img src="docs/screens/92-rated-full-screen.svg" width="600" alt="Rated stream, landscape"></a><br><sub><b>92</b> · rated — the 18+ badge survives full screen</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="docs/screens/94-room-full-screen.svg"><img src="docs/screens/94-room-full-screen.svg" width="600" alt="Room, landscape"></a><br><sub><b>94</b> · a room's video session</sub></td>
+    <td align="center"><a href="docs/screens/92-full-screen-landscape.svg"><img src="docs/screens/92-full-screen-landscape.svg" width="600" alt="Live room, landscape"></a><br><sub><b>92</b> · sideways — the room at its own aspect ratio</sub></td>
   </tr>
 </table>
 
-On a rated stream the **18+ badge survives full screen**. The gate belongs to
-the profile, not to the app chrome, so taking the chrome away must not take the
-rating with it.
+**The rated stream gets the same three,** and the **18+ badge survives all of
+them**. The gate belongs to the profile, not to the app chrome, so taking the
+chrome away must not take the rating with it.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/93-rated-full-screen.svg"><img src="docs/screens/93-rated-full-screen.svg" width="190" alt="Rated stream full screen"></a><br><sub><b>93</b> · full screen · 18+</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/94-rated-held.svg"><img src="docs/screens/94-rated-held.svg" width="190" alt="Rated stream held"></a><br><sub><b>94</b> · held · 18+</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/95-rated-landscape.svg"><img src="docs/screens/95-rated-landscape.svg" width="600" alt="Rated stream, landscape"></a><br><sub><b>95</b> · sideways · 18+</sub></td>
+  </tr>
+</table>
+
+**A room with its camera on** is the other place a video and a conversation run
+at once. Its strip carries a microphone rather than a bell — in a room you are
+a participant, not a visitor at somebody's desk.
+
+<table>
+  <tr>
+    <td align="center" width="34%"><a href="docs/screens/96-room-full-screen.svg"><img src="docs/screens/96-room-full-screen.svg" width="190" alt="Room full screen"></a><br><sub><b>96</b> · full screen</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/97-room-held.svg"><img src="docs/screens/97-room-held.svg" width="190" alt="Room held"></a><br><sub><b>97</b> · held</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><a href="docs/screens/98-room-landscape.svg"><img src="docs/screens/98-room-landscape.svg" width="600" alt="Room, landscape"></a><br><sub><b>98</b> · sideways</sub></td>
+  </tr>
+</table>
 
 #### A room that is not a camera
 
@@ -372,9 +396,9 @@ room and a layout that removes them is telling the others they left.
 
 <table>
   <tr>
-    <td align="center" width="30%"><a href="docs/screens/98-audio-room.svg"><img src="docs/screens/98-audio-room.svg" width="190" alt="Audio room"></a><br><sub><b>98</b> · audio · full screen</sub></td>
-    <td align="center" width="30%"><a href="docs/screens/99-audio-held.svg"><img src="docs/screens/99-audio-held.svg" width="190" alt="Audio room, held"></a><br><sub><b>99</b> · audio · held</sub></td>
-    <td align="center" width="40%"><a href="docs/screens/100-audio-landscape.svg"><img src="docs/screens/100-audio-landscape.svg" width="330" alt="Audio room, landscape"></a><br><sub><b>100</b> · audio · sideways</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/103-audio-room.svg"><img src="docs/screens/103-audio-room.svg" width="190" alt="Audio room"></a><br><sub><b>103</b> · audio · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/104-audio-held.svg"><img src="docs/screens/104-audio-held.svg" width="190" alt="Audio room, held"></a><br><sub><b>104</b> · audio · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/105-audio-landscape.svg"><img src="docs/screens/105-audio-landscape.svg" width="330" alt="Audio room, landscape"></a><br><sub><b>105</b> · audio · sideways</sub></td>
   </tr>
 </table>
 
@@ -388,9 +412,9 @@ single place a missing badge would matter most.
 
 <table>
   <tr>
-    <td align="center" width="30%"><a href="docs/screens/101-ar-room.svg"><img src="docs/screens/101-ar-room.svg" width="190" alt="AR room"></a><br><sub><b>101</b> · AR · full screen</sub></td>
-    <td align="center" width="30%"><a href="docs/screens/102-ar-held.svg"><img src="docs/screens/102-ar-held.svg" width="190" alt="AR room, held"></a><br><sub><b>102</b> · AR · held</sub></td>
-    <td align="center" width="40%"><a href="docs/screens/103-ar-landscape.svg"><img src="docs/screens/103-ar-landscape.svg" width="330" alt="AR room, landscape"></a><br><sub><b>103</b> · AR · sideways</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/106-ar-room.svg"><img src="docs/screens/106-ar-room.svg" width="190" alt="AR room"></a><br><sub><b>106</b> · AR · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/107-ar-held.svg"><img src="docs/screens/107-ar-held.svg" width="190" alt="AR room, held"></a><br><sub><b>107</b> · AR · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/108-ar-landscape.svg"><img src="docs/screens/108-ar-landscape.svg" width="330" alt="AR room, landscape"></a><br><sub><b>108</b> · AR · sideways</sub></td>
   </tr>
 </table>
 
@@ -403,9 +427,9 @@ over a grid of boxes and the reason a room like this is worth having.
 
 <table>
   <tr>
-    <td align="center" width="30%"><a href="docs/screens/104-vr-room.svg"><img src="docs/screens/104-vr-room.svg" width="190" alt="VR room"></a><br><sub><b>104</b> · VR 3-D · full screen</sub></td>
-    <td align="center" width="30%"><a href="docs/screens/105-vr-held.svg"><img src="docs/screens/105-vr-held.svg" width="190" alt="VR room, held"></a><br><sub><b>105</b> · VR 3-D · held</sub></td>
-    <td align="center" width="40%"><a href="docs/screens/106-vr-landscape.svg"><img src="docs/screens/106-vr-landscape.svg" width="330" alt="VR room, landscape"></a><br><sub><b>106</b> · VR 3-D · sideways</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/109-vr-room.svg"><img src="docs/screens/109-vr-room.svg" width="190" alt="VR room"></a><br><sub><b>109</b> · VR 3-D · full screen</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/110-vr-held.svg"><img src="docs/screens/110-vr-held.svg" width="190" alt="VR room, held"></a><br><sub><b>110</b> · VR 3-D · held</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/111-vr-landscape.svg"><img src="docs/screens/111-vr-landscape.svg" width="330" alt="VR room, landscape"></a><br><sub><b>111</b> · VR 3-D · sideways</sub></td>
   </tr>
 </table>
 
@@ -418,9 +442,10 @@ A control that cannot do anything is worse than an absent one.
 
 <table>
   <tr>
-    <td align="center" width="30%"><a href="docs/screens/95-posted-video.svg"><img src="docs/screens/95-posted-video.svg" width="190" alt="Posted video, in the app"></a><br><sub><b>95</b> · in the app</sub></td>
-    <td align="center" width="30%"><a href="docs/screens/96-video-held.svg"><img src="docs/screens/96-video-held.svg" width="190" alt="Posted video, held"></a><br><sub><b>96</b> · held</sub></td>
-    <td align="center" width="40%"><a href="docs/screens/97-video-landscape.svg"><img src="docs/screens/97-video-landscape.svg" width="330" alt="Posted video, landscape"></a><br><sub><b>97</b> · sideways</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="190" alt="Posted video, in the app"></a><br><sub><b>99</b> · in the app</sub></td>
+    <td align="center" width="23%"><a href="docs/screens/100-video-full-screen.svg"><img src="docs/screens/100-video-full-screen.svg" width="160" alt="Posted video, full screen"></a><br><sub><b>100</b> · full screen</sub></td>
+    <td align="center" width="23%"><a href="docs/screens/101-video-held.svg"><img src="docs/screens/101-video-held.svg" width="190" alt="Posted video, held"></a><br><sub><b>101</b> · held</sub></td>
+    <td align="center" width="30%"><a href="docs/screens/102-video-landscape.svg"><img src="docs/screens/102-video-landscape.svg" width="330" alt="Posted video, landscape"></a><br><sub><b>102</b> · sideways</sub></td>
   </tr>
 </table>
 
@@ -1303,7 +1328,7 @@ feature:
 | Honesty about multiplicity | `GET /profiles/{id}/transparency` reports active relationships, and every chat prompt instructs the profile to acknowledge them truthfully if asked — disclosure by design |
 | Summoning — @, #, and QR beacons | `PUT /profiles/{id}/handle` claims a unique `@handle`; `GET /summon?ref=` resolves `@handle`, `#tag` (marketplace tags), or a beacon token. `POST /profiles/{id}/beacons` *leaves the profile behind* somewhere physical — a printable QR code (`GET /beacons/{id}/qr.svg`) summons it, scans are counted, beacons can be picked back up, and a departed profile's beacon resolves as a memorial |
 | Connections — chat with other users | `POST /connections/join` matches interactors anonymously by alias in a `friendly` tier or an 18+-verified `rated` tier; per-tier moderation (minors always strict, blocked messages never delivered), and either side can end it anytime |
-| Rooms — chat, video, AR, VR | `POST /rooms` — multiparty conversations over any channel (`chat`/`voice`/`video`/`ar`/`vr`) with any mix of real users and synthetic profiles: user↔user, profile↔profile (`/rooms/{id}/advance`), or combinations; every profile turn is moderated, and a room with a minor present always runs strict. Each channel gets the same three full-screen states — plain, held, sideways — because those belong to the room rather than to a camera: **98–100** audio (boxes, because there is nothing to look at), **101–103** AR (the others placed in the room you are already in), **104–106** VR/3-D (depth carried by size and position). The strip changes with the channel: no gift button in an audio room, no bell on a posted video |
+| Rooms — chat, video, AR, VR | `POST /rooms` — multiparty conversations over any channel (`chat`/`voice`/`video`/`ar`/`vr`) with any mix of real users and synthetic profiles: user↔user, profile↔profile (`/rooms/{id}/advance`), or combinations; every profile turn is moderated, and a room with a minor present always runs strict. Each channel gets the same three full-screen states — plain, held, sideways — because those belong to the room rather than to a camera: **103–105** audio (boxes, because there is nothing to look at), **106–108** AR (the others placed in the room you are already in), **109–111** VR/3-D (depth carried by size and position). The strip changes with the channel: no gift button in an audio room, no bell on a posted video |
 | Marketplace listings | `POST`/`GET /marketplace/listings` — users and businesses share and market synthetic profiles, content, business expertise, or services; browsable by kind, tag, and area (healthcare, finance, relationships, …) |
 | Providers & consented handoffs | `POST`/`GET /providers` — a directory of real local businesses per area (healthcare, medical, mental health, finance, relationships, career); `POST /handoffs` packages the AI specialist's session for a provider *only with explicit consent*, seals it in the PDI vault, and releases it solely through a revocable token (`DELETE /handoffs/{id}` revokes and purges) |
 | Embodiments — even robots | `POST /profiles/{id}/embodiments` — speaker, earpiece, hologram, robot, humanoid; chat can arrive from an embodiment, and JIM-mini's autonomous devices can host the same profile. **Personality stays consistent across forms**: the persona prompt affirms one constant identity/memory/voice, `ChatResponse.persona_signature` is invariant across modality and embodiment (voice → text → hologram give the same signature), and `GET /profiles/{id}/embodiment-consistency` exposes that fingerprint + the forms it's live on |
