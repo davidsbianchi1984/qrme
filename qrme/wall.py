@@ -64,7 +64,8 @@ class WallError(ValueError):
     """A post that cannot stand."""
 
 
-def publish(profile_id: str, body: str, author: dict | None = None) -> dict:
+def publish(profile_id: str, body: str, author: dict | None = None,
+            listing_id: str | None = None) -> dict:
     """Write a post to the wall. Moderated on the way in.
 
     A blocked post is kept and returned to its author with the reason, and is
@@ -87,14 +88,32 @@ def publish(profile_id: str, body: str, author: dict | None = None) -> dict:
         maturity="adult" if row["adult_mode"] else "general")
     status = "approved" if verdict.approved else "blocked"
 
+    # What the post is promoting, if anything. A reference to a listing rather
+    # than a copy of one: a price written into a post is a price that goes
+    # stale the moment the listing changes, and nobody edits the post.
+    if listing_id is not None:
+        listed = db.connect().execute(
+            "SELECT profile_id FROM listings WHERE id=?",
+            (listing_id,)).fetchone()
+        if listed is None:
+            raise WallError("no such listing")
+        if listed["profile_id"] != profile_id:
+            raise WallError(
+                "a post can only promote its own profile's listing")
+
     post_id = db.new_id("pst")
     db.connect().execute(
         "INSERT INTO posts (id, profile_id, surface, topic, content, status,"
         " flag_reason, created_at) VALUES (?,?,?,NULL,?,?,?,?)",
         (post_id, profile_id, SURFACE, body, status,
          None if verdict.approved else verdict.reason, db.utcnow()))
+    if listing_id is not None:
+        db.connect().execute(
+            "INSERT INTO post_attachments (post_id, listing_id, created_at)"
+            " VALUES (?,?,?)", (post_id, listing_id, db.utcnow()))
     db.connect().commit()
     return {"id": post_id, "profile_id": profile_id, "body": body,
+            "listing_id": listing_id,
             "status": status,
             "blocked_reason": None if verdict.approved else verdict.reason}
 
@@ -201,6 +220,7 @@ def for_you(viewer_profile_id: str, limit: int = 25,
             "display_name": r["display_name"], "avatar": r["avatar"],
             "body": r["body"], "created_at": r["created_at"],
             "likes": likes,
+            "promoting": _attachment(r["id"]),
             "score": round(score, 1),
             # Never empty. A feed that cannot say why something is in front of
             # you is one nobody can audit, including its author.
@@ -209,6 +229,15 @@ def for_you(viewer_profile_id: str, limit: int = 25,
 
     out.sort(key=lambda p: (-p["score"], p["created_at"]), reverse=False)
     return out[:limit]
+
+
+def _attachment(post_id: str) -> dict | None:
+    """The listing a post is promoting, read live rather than copied."""
+    row = db.connect().execute(
+        "SELECT l.id, l.kind, l.title, l.blurb, l.area FROM post_attachments a"
+        "  JOIN listings l ON l.id = a.listing_id WHERE a.post_id=?",
+        (post_id,)).fetchone()
+    return dict(row) if row else None
 
 
 def wall(profile_id: str, limit: int = 50, owner: bool = False) -> list[dict]:
@@ -228,7 +257,8 @@ def wall(profile_id: str, limit: int = 50, owner: bool = False) -> list[dict]:
             continue
         entry = {"id": r["id"], "profile_id": r["profile_id"],
                  "body": r["content"], "created_at": r["created_at"],
-                 "likes": r["likes"] or 0, "status": r["status"]}
+                 "likes": r["likes"] or 0, "status": r["status"],
+                 "promoting": _attachment(r["id"])}
         if owner and r["status"] == "blocked":
             entry["blocked_reason"] = r["flag_reason"]
         out.append(entry)

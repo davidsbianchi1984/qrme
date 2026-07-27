@@ -67,6 +67,9 @@ MAX_TAGLINE = 90
 MAX_ABOUT = 1200
 MAX_HTML = 20000
 MAX_LINKS = 12
+# How much of the feed a homepage carries. Short on purpose: a page is
+# somewhere you arrive, and the endless version lives on its own screen.
+FEED_ON_PAGE = 6
 TOP_FRIENDS = 8              # the number is the joke, and it is a good number
 
 _HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -218,7 +221,7 @@ def _check_top(profile_id: str, ids: list[str]) -> list[str]:
     return list(ids)
 
 
-def page(profile_id: str, owner: bool = False) -> dict:
+def page(profile_id: str, owner: bool = False, feed: bool = True) -> dict:
     """The page as it should be rendered.
 
     ``owner=True`` includes a blocked about-text and why, so its author can
@@ -244,6 +247,18 @@ def page(profile_id: str, owner: bool = False) -> dict:
         # longer a friend — a Top 8 pointing at a removed friend should thin
         # out rather than 404 the page it sits on.
         top = [by_id[fid] for fid in wanted if fid in by_id]
+
+    # The feed, on the page rather than only on its own screen. A homepage
+    # that shows what you made and nothing of what anyone else is doing is a
+    # business card; the reason people sat on their MySpace page was that it
+    # was also where the day's news arrived. Ranked for this profile by the
+    # same rules as the standalone feed — public actions only — and capped
+    # short, because a page is a place you arrive rather than a place you
+    # scroll forever.
+    timeline = []
+    if feed:
+        from . import wall
+        timeline = wall.for_you(profile_id, limit=FEED_ON_PAGE)
 
     # The storefront half: what this profile is offering, straight from the
     # marketplace rather than retyped onto the page. A second copy of a price
@@ -273,6 +288,7 @@ def page(profile_id: str, owner: bool = False) -> dict:
         "html_removed": (json.loads(row["html_removed"]) if row else []),
         "links": (json.loads(row["links"]) if row else []),
         "offers": offers,
+        "feed": timeline,
         "show_offers": bool(row["show_offers"]) if row else False,
         "customised": row is not None,
         "updated_at": (row["updated_at"] if row else None),

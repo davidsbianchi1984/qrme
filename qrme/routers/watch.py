@@ -15,17 +15,67 @@ new powers, only reach.
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, robotics, steering, workflows
+from .. import db, robotics, steering, wearables, workflows
 from ..common import profile_or_404, require_owner
 from .interaction import approve_message, reject_message
 from .robots import RobotCommand, command_robot
 
 router = APIRouter()
+
+
+class WearablePair(BaseModel):
+    name: str = Field(min_length=1, max_length=60,
+                      description="What you will recognise it by.")
+    kind: str = Field(description="watch | band | ring | earbuds | glasses")
+    faces: list[str] | None = Field(
+        None, description="Which faces this device may show. Defaults to "
+                          "agents + activity.")
+
+
+@router.get("/profiles/{profile_id}/wearables")
+def list_wearables(profile_id: str, request: Request,
+                   include_revoked: bool = False) -> dict:
+    """Devices paired to this account, and which faces each may show."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return {"profile_id": profile_id,
+            "wearables": wearables.paired(profile_id, include_revoked),
+            "faces": wearables.FACES, "kinds": list(wearables.KINDS)}
+
+
+@router.post("/profiles/{profile_id}/wearables", status_code=201)
+def pair_wearable(profile_id: str, body: WearablePair,
+                  request: Request) -> dict:
+    """Pair a watch or wearable over Bluetooth.
+
+    Pairing and permission only — no sensor stream, no capture, nothing about
+    a microphone. A paired device here is a screen and a set of buttons.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return wearables.pair(profile_id, body.name, body.kind, body.faces)
+    except wearables.WearableError as exc:
+        raise HTTPException(422, str(exc)) from None
+
+
+@router.delete("/profiles/{profile_id}/wearables/{name}")
+def unpair_wearable(profile_id: str, name: str, request: Request) -> dict:
+    """Unpair. The record survives so a device sent away cannot come back by
+    re-presenting the same name, and so the owner can see what was ever
+    paired — the question people actually ask after losing a watch."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return wearables.unpair(profile_id, name)
+    except wearables.WearableError as exc:
+        raise HTTPException(404, str(exc)) from None
+
 
 # agent status -> watch light
 LIGHTS = {"running": "green", "awaiting_input": "orange",

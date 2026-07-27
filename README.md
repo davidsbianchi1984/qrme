@@ -678,6 +678,64 @@ answered the new one. `GET /profiles/{id}/thread/{interactor}` marks those
 replies `answers_stale_text` and says so in words — the honest version is
 "this was answered before you changed it", not a silent rewrite of history.
 
+## Watch faces, and the wearables that show them
+
+QRME had a watch *API* and no way to say **which watch**. `POST
+/profiles/{id}/wearables` pairs one over Bluetooth — a watch, band, ring,
+earbuds or glasses — and says which faces it may show.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/watch/01-agents.svg"><img src="docs/watch/01-agents.svg" width="150" alt="Agents"></a><br><sub><b>01</b> · Agents</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/02-activity.svg"><img src="docs/watch/02-activity.svg" width="150" alt="Activity"></a><br><sub><b>02</b> · Activity</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/03-profile.svg"><img src="docs/watch/03-profile.svg" width="150" alt="Profile"></a><br><sub><b>03</b> · Profile</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/04-control.svg"><img src="docs/watch/04-control.svg" width="150" alt="Control"></a><br><sub><b>04</b> · Control</sub></td>
+  </tr>
+</table>
+
+**A wearable is not an embodiment.** `embodiments` records where a *profile*
+lives — a speaker, a hologram, a robot body. This is hardware belonging to the
+**owner**, reaching their own account. Folding them together would mean pairing
+a watch could put somebody's synthetic persona on their wrist, which is a
+different feature with a different consent question. A test asserts pairing
+writes no embodiment.
+
+**Pairing and permission only.** No sensor stream, no capture, nothing about a
+microphone — a paired device here is a screen and a set of buttons. A test
+asserts the pairing model does not so much as mention audio.
+
+**Faces are a permission, not a free field.** A closed set, so a face added
+later cannot arrive on every wrist by default — and a test holds the drawn
+faces and the permission list in step, because a face you can enable and never
+see is a permission granting nothing.
+
+**Unpairing revokes rather than deletes.** The row survives, so a device sent
+away cannot return by re-presenting the same name, and the owner can still see
+what was ever paired — which is the question people actually ask after losing a
+watch.
+
+**02 Activity is the community layer on a wrist, as counts.** Not the content:
+a feed is a reading surface, and reading is the thing a glance cannot do. Same
+reasoning that kept agent names off face 01.
+
+## Friends you might know
+
+`GET /profiles/{id}/friends/suggested`. Ranked on friends in common and
+subjects you both work in, each carrying the reason in words — the same posture
+as the feed, because a friend suggestion is a claim about a person and one
+nobody can explain is one nobody can argue with.
+
+Two exclusions matter more than the ranking. **Anyone already on your list, in
+either state** — somebody who removed a friend does not get them handed back as
+a suggestion tomorrow, which would be the same imposition the founder pins
+avoid, wearing a recommendation badge. And **the founder pins**, who are on
+every list by construction and would otherwise top every suggestion set on the
+platform.
+
+Never ranked on source material, memories or anything vaulted: an introduction
+built from somebody's private writing would be the platform reading a diary to
+make it.
+
 ## The community wall, and the feed
 
 A profile publishes to its wall (`POST /profiles/{id}/wall`); other people see
@@ -724,6 +782,17 @@ as the API: a feed you cannot interrogate is one you have to take on trust.
   </td>
   </tr>
 </table>
+
+**A post can promote something.** `listing_id` attaches one of the profile's
+own marketplace listings — a reference, not a copy, because a price written
+into a post is a price that goes stale the moment the listing changes and
+nobody edits the post. A profile can only promote its own listings.
+
+**The feed is on the homepage too.** A page showing what you made and nothing
+of what anyone else is doing is a business card; the reason people sat on their
+MySpace page was that it was also where the day's news arrived. Six entries,
+ranked for that profile by the same rules — a page is somewhere you arrive, and
+the endless version lives on its own screen.
 
 **Moderation runs on the way in and on the way out.** Every post passes the
 same filter as a chat turn; a blocked one is kept, returned to its author with

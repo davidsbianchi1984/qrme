@@ -274,3 +274,110 @@ def count(profile_id: str) -> int:
     return db.connect().execute(
         "SELECT COUNT(*) AS n FROM friendships WHERE profile_id=? AND"
         " state='active'", (profile_id,)).fetchone()["n"]
+
+
+# -- who you might know ------------------------------------------------------
+
+# What a suggestion is worth, and why. Same posture as the feed's weights:
+# small readable integers, because a recommendation nobody can explain is one
+# nobody can argue with — and a friend suggestion is a claim about a person.
+S_MUTUAL = 40           # per friend in common, capped below
+S_MUTUAL_CAP = 120
+S_TAG = 20              # per shared subject
+S_TAG_CAP = 60
+S_FRIEND_OF_PIN = 5     # the founder is everybody's friend, so this is faint
+
+
+def suggestions(profile_id: str, limit: int = 10) -> list[dict]:
+    """Profiles this one might want to know, most likely first, and why.
+
+    Ranked on the same public signals the feed uses — the friend graph and the
+    subjects a profile works in. Never source material, never memories: a
+    friend suggestion built from somebody's private writing would be the
+    platform reading a diary to make an introduction.
+
+    Two exclusions that matter more than the ranking:
+
+    * **Anyone already on the list**, in either state. Somebody who removed a
+      friend should not be handed them back as a suggestion the next day —
+      that is the same imposition the founder pins were careful to avoid,
+      wearing a recommendation badge.
+    * **The founder pins**, which are already on every list by construction and
+      would otherwise top every suggestion set on the platform.
+    """
+    import json
+
+    conn = db.connect()
+    mine = {f["profile_id"] for f in friends_of(profile_id)}
+    # Every row, not only the active ones: a removal is a decision.
+    known = {r["friend_id"] for r in conn.execute(
+        "SELECT friend_id FROM friendships WHERE profile_id=?",
+        (profile_id,)).fetchall()}
+    excluded = known | {profile_id} | set(founder_ids())
+
+    my_tags: set[str] = set()
+    row = conn.execute("SELECT tags FROM marketplace WHERE profile_id=?",
+                       (profile_id,)).fetchone()
+    if row and row["tags"]:
+        try:
+            my_tags = set(json.loads(row["tags"]))
+        except ValueError:
+            my_tags = set()
+
+    # Friends of friends, with how many paths lead to each.
+    mutual_counts: dict[str, int] = {}
+    for friend in mine:
+        for r in conn.execute(
+                "SELECT friend_id FROM friendships WHERE profile_id=? AND"
+                " state='active'", (friend,)).fetchall():
+            fid = r["friend_id"]
+            if fid not in excluded:
+                mutual_counts[fid] = mutual_counts.get(fid, 0) + 1
+
+    candidates = dict.fromkeys(mutual_counts)
+    if my_tags:
+        for r in conn.execute("SELECT profile_id, tags FROM marketplace"
+                              ).fetchall():
+            if r["profile_id"] in excluded:
+                continue
+            try:
+                if my_tags & set(json.loads(r["tags"] or "[]")):
+                    candidates.setdefault(r["profile_id"])
+            except ValueError:
+                pass
+
+    out = []
+    for pid in candidates:
+        info = conn.execute(
+            "SELECT p.display_name, p.avatar, p.kind, m.tags, h.handle"
+            "  FROM profiles p"
+            "  LEFT JOIN marketplace m ON m.profile_id = p.id"
+            "  LEFT JOIN handles h ON h.profile_id = p.id"
+            " WHERE p.id=?", (pid,)).fetchone()
+        if info is None:
+            continue
+        score, reason = 0, None
+        n = mutual_counts.get(pid, 0)
+        if n:
+            score += min(n * S_MUTUAL, S_MUTUAL_CAP)
+            reason = (f"{n} friend{'s' if n > 1 else ''} in common")
+        shared: set[str] = set()
+        try:
+            shared = my_tags & set(json.loads(info["tags"] or "[]"))
+        except ValueError:
+            pass
+        if shared:
+            score += min(len(shared) * S_TAG, S_TAG_CAP)
+            if reason is None:
+                reason = f"also works in {sorted(shared)[0]}"
+        if score == 0:
+            continue
+        out.append({
+            "profile_id": pid, "display_name": info["display_name"],
+            "handle": info["handle"], "avatar": info["avatar"],
+            "kind": info["kind"], "score": score,
+            "mutual_friends": n, "shared_subjects": sorted(shared),
+            "reason": reason,
+        })
+    out.sort(key=lambda s: (-s["score"], s["display_name"]))
+    return out[:limit]

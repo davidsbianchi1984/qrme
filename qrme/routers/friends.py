@@ -53,6 +53,24 @@ def list_friends(profile_id: str) -> dict:
     }
 
 
+@router.get("/profiles/{profile_id}/friends/suggested")
+def suggested(profile_id: str, limit: int = 10) -> dict:
+    """People this profile might want to know, and why each one.
+
+    Ranked on the friend graph and shared subjects — the same public signals
+    the feed uses. Never source material or memories: an introduction built
+    from somebody's private writing would be the platform reading a diary to
+    make it.
+    """
+    profile_or_404(profile_id)
+    return {"profile_id": profile_id,
+            "suggested": friends.suggestions(profile_id, limit=limit),
+            "ranked_on": ["friends in common", "subjects you both work in"],
+            "never_ranked_on": ["source material", "memories", "vaulted data"],
+            "excluded": "anyone already on your list, in either state — a "
+                        "friend you removed is not a suggestion"}
+
+
 @router.post("/profiles/{profile_id}/friends")
 def add_friend(profile_id: str, body: FriendAdd, request: Request) -> dict:
     """Owner adds somebody to the list."""

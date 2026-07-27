@@ -701,6 +701,39 @@ CREATE TABLE IF NOT EXISTS finetune_runs (
 
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
+-- A wearable paired over Bluetooth: a watch, a band, a ring, earbuds.
+--
+-- Distinct from `embodiments`, which is where a *profile* lives — a speaker, a
+-- hologram, a robot. This is hardware belonging to the **owner**, paired to
+-- reach their own account: the wrist is a control surface, not a place a
+-- persona is embodied. Running them together would mean pairing a watch could
+-- put somebody's synthetic profile on it.
+--
+-- Only the pairing and what it is allowed to show. No sensor stream, no
+-- capture, nothing about a microphone — a paired watch here is a screen and a
+-- set of buttons.
+CREATE TABLE IF NOT EXISTS wearables (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    name         TEXT NOT NULL,
+    kind         TEXT NOT NULL,   -- watch | band | ring | earbuds | glasses
+    transport    TEXT NOT NULL DEFAULT 'bluetooth',
+    faces        TEXT NOT NULL DEFAULT '[]',  -- JSON: which faces are enabled
+    paired_at    TEXT NOT NULL,
+    last_seen_at TEXT,
+    revoked_at   TEXT,
+    UNIQUE (profile_id, name)
+);
+
+-- What a post is promoting, when it is promoting something. A separate table
+-- because `posts` shipped before this and the schema has no migrations, so a
+-- new column would reach a fresh database and miss every existing one.
+CREATE TABLE IF NOT EXISTS post_attachments (
+    post_id    TEXT PRIMARY KEY REFERENCES posts(id),
+    listing_id TEXT NOT NULL REFERENCES listings(id),
+    created_at TEXT NOT NULL
+);
+
 -- Edits to a message already sent. One row per revision, so the trail is the
 -- history rather than only the latest text.
 --
