@@ -2,7 +2,7 @@
 
 The counterpart to ``tools/mark_portraits.py``, and the mirror image of what it
 says. That one burns *AI* into a synthetic face so a picture circulating
-outside QRME still says what it is. This burns *VERIFIED REAL* into an
+outside QRME still says what it is. This burns *VERIFIED* into an
 authentic photograph, for the same reason and with the same physics: a
 composited badge does not survive a screenshot, a hotlink, or a right-click
 save, and those are the journeys a profile picture actually takes.
@@ -12,26 +12,30 @@ downgraded one everybody learned to distrust, green reads as the agent status
 light two screens away, and red already means *stopped* in this product. Gold
 is unclaimed in this space and reads as a distinction rather than a warning.
 
-**It is gated, and the gate is the whole point.**
+**It is gated, and the gate is a named attestor.**
 
 A burned mark is the strongest claim an image can carry: it cannot be
 qualified, it outlives every surface, and by design it travels to places where
 nobody can check it. That is safe for *AI* — an AI rendering is AI-generated
 wherever it ends up, forever, so burning it in can never become false.
 
-*Verified real* is not that kind of fact. At ``self_asserted`` the only thing
-established is that somebody typed their own name, and a gold checkmark on that
-photograph would be a credential the platform minted for itself — which is the
-exact failure the AI mark exists to prevent, pointed the other way.
+*Verified* is not that kind of fact, so the gate is that somebody is **on the
+record** as having attested to the identity. :func:`qrme.verification.verify`
+stores who, by what method, and at what level, and this refuses to burn a photo
+with no such record.
 
-So this refuses to burn anything below ``document``. Somebody has to have
-checked an identity document, and a named attestor has to be on the record for
-it. When that happens, run this. Until it does, the surfaces composite the
-badge live from ``verification.status`` where the level rides along with it and
-the caveat can be read.
+What the gate deliberately does **not** require is a particular rung. It first
+required ``document``, and the platform's owner asked for the mark on his own
+photograph at ``self_asserted`` — a decision he is entitled to make about his
+own face on his own product, taken after the stricter version had been built
+and the trade explained. So the burned word carries exactly the weight of
+whoever attested, and the honest reading lives one call away:
+``verification.status`` still reports ``self_asserted`` and still returns its
+caveat. **Nothing in the code claims a document was checked, because none was.**
 
+    python3 tools/mark_verified.py --preview
     python3 tools/mark_verified.py --preview        # render, do not install
-    python3 tools/mark_verified.py <handle>         # burn, once authenticated
+    python3 tools/mark_verified.py <handle>         # burn, once attested
 """
 
 from __future__ import annotations
@@ -45,25 +49,25 @@ ROOT = Path(__file__).resolve().parent.parent
 PHOTOS = ROOT / "qrme" / "assets" / "photos"
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
-LABEL = "VERIFIED REAL"
+LABEL = "VERIFIED"
 
 # The one colour left. See the module note for why each of the others is out.
 GOLD = (212, 168, 58)
 GOLD_LIGHT = (247, 216, 122)
 
-# The rung this mark requires. Below it the claim is not established enough to
-# burn into pixels that will outlive every place they can be checked.
-REQUIRED_LEVEL = "document"
+# What the mark requires: a verification record with a named attestor. Not a
+# particular rung — see the module note for whose decision that was and why the
+# API still reports the real level either way.
+REQUIRE_ATTESTOR = True
 
 
 def mark(image: Image.Image) -> Image.Image:
     """Draw the gold mark into a copy of ``image``.
 
-    Bottom-left. ``mark_portraits`` puts the AI mark top-right and every
-    composited badge in the product is bottom-left; this is neither, so it can
-    never land on top of the other one — a photograph should never carry both,
-    but a layout that makes the collision impossible is better than a rule
-    saying it must not happen.
+    Bottom-right. ``mark_portraits`` puts the AI mark top-right, diagonally
+    opposite, so the two can never land on each other — a photograph should
+    never carry both, but a layout that makes the collision impossible beats a
+    rule saying it must not happen.
     """
     out = image.convert("RGB")
     w, h = out.size
@@ -79,8 +83,8 @@ def mark(image: Image.Image) -> Image.Image:
     text_w = draw.textlength(LABEL, font=font)
     box_h = round(size * 1.75)
     box_w = round(text_w + size * 2.6)
-    x0, y1 = pad, h - pad
-    x1, y0 = x0 + box_w, y1 - box_h
+    x1, y1 = w - pad, h - pad
+    x0, y0 = x1 - box_w, y1 - box_h
 
     draw.rounded_rectangle((x0, y0, x1, y1), radius=box_h // 2,
                            fill=(24, 18, 4, 214), outline=GOLD, width=2)
@@ -102,15 +106,15 @@ def mark(image: Image.Image) -> Image.Image:
     return out
 
 
-def _level_of(handle: str) -> str | None:
-    """The recorded proofing level for the profile owning ``handle``."""
+def _record_of(handle: str) -> dict:
+    """The verification record for the profile owning ``handle``."""
     sys.path.insert(0, str(ROOT))
     from qrme import db, verification
     row = db.connect().execute(
         "SELECT profile_id FROM handles WHERE handle=?", (handle,)).fetchone()
     if row is None:
-        return None
-    return verification.status(row["profile_id"]).get("level")
+        return {}
+    return verification.status(row["profile_id"])
 
 
 def main(argv: list[str]) -> int:
@@ -130,19 +134,17 @@ def main(argv: list[str]) -> int:
         print(__doc__.strip().splitlines()[-1], file=sys.stderr)
         return 2
 
-    from qrme.signatures import PROOFING_LEVELS
-    need = PROOFING_LEVELS.index(REQUIRED_LEVEL)
     for handle in handles:
         path = PHOTOS / f"{handle}.webp"
         if not path.is_file():
             print(f"no photograph at {path}", file=sys.stderr)
             return 1
-        level = _level_of(handle)
-        if level is None or PROOFING_LEVELS.index(level) < need:
-            print(f"refusing to burn {handle}: proofing level is "
-                  f"{level or 'unrecorded'}, and this mark requires "
-                  f"{REQUIRED_LEVEL} or better. A gold checkmark cannot be "
-                  f"qualified once it is in the pixels.", file=sys.stderr)
+        record = _record_of(handle)
+        if not record.get("verified") or not record.get("attestor"):
+            print(f"refusing to burn {handle}: no verification record with a "
+                  f"named attestor. A gold checkmark cannot be qualified once "
+                  f"it is in the pixels, so somebody has to be on the record "
+                  f"for it.", file=sys.stderr)
             return 1
         with Image.open(path) as im:
             mark(im).save(path, "WEBP", quality=90, method=6)

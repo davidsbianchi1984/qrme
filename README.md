@@ -781,8 +781,9 @@ record, not in a footnote.
 
 ### The gold mark
 
-`tools/mark_verified.py` burns **✓ VERIFIED REAL** into an authenticated
-person's photograph, in gold, bottom-left. It is the mirror image of
+`tools/mark_verified.py` burns **✓ VERIFIED** into an authenticated
+person's photograph, in gold, **bottom-right** — diagonally opposite the AI
+mark, so the two can never land on each other. It is the mirror image of
 `tools/mark_portraits.py` and exists for the same physics: a composited badge
 does not survive a screenshot, a hotlink or a right-click save, and those are the
 journeys a profile picture actually takes.
@@ -792,23 +793,26 @@ is X and Facebook, grey is the downgraded one people learned to distrust, green
 is the agent status light two screens away, and red already means *stopped* in
 this product.
 
-**It refuses to burn below `document`.** A burned mark is the strongest claim an
-image can carry: it cannot be qualified, it outlives every surface, and by design
-it travels where nobody can check it. That is safe for *AI* — an AI rendering is
+**The gate is a named attestor.** A burned mark is the strongest claim an image
+can carry: it cannot be qualified, it outlives every surface, and by design it
+travels where nobody can check it. That is safe for *AI* — a rendering is
 AI-generated wherever it ends up, forever, so burning it in can never become
-false. *Verified real* is not that kind of fact. At `self_asserted` the only
-thing established is that somebody typed their own name, and a gold checkmark on
-that photograph would be a credential the platform minted for itself — the exact
-failure the AI mark exists to prevent, pointed the other way.
+false. *Verified* is not that kind of fact, so the tool refuses any photograph
+with no verification record naming who attested.
 
-Until a document is checked and an attestor named, the badge is composited live
-from `verification.status`, where the level rides with it:
+What it deliberately does **not** require is a particular rung. It first
+required `document`; the platform's owner asked for the mark on his own
+photograph at `self_asserted`, which is his call to make about his own face on
+his own product, taken after the stricter version had been built and the trade
+explained. So the burned word carries exactly the weight of whoever attested —
+and the honest reading stays one call away. `verification.status` still reports
+`self_asserted` and still returns its caveat:
 
 > *self-asserted: the badge confirms a real person stands behind this profile,
 > not that a document was checked*
 
-The founder's profiles read `self_asserted` today. The day a document is checked,
-one call moves the level and the burn becomes available.
+**Nothing in the code claims a document was checked, because none was.** The day
+one is, the level moves and the badge means more without the pixels changing.
 
 ## The agent status light
 

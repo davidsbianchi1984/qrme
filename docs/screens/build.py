@@ -309,7 +309,7 @@ def my_page(y, spec):
     and the thing worth reviving from MySpace is that yours did not.
     """
     bg, ink, accent = spec["bg"], spec["ink"], spec["accent"]
-    out = [rrect(CX, y, CW, 206, 16, bg, A(accent, 0.55), 1.4)]
+    out = [rrect(CX, y, CW, 266, 16, bg, A(accent, 0.55), 1.4)]
     yy = y + 16
     out.append(face(CX + 40, yy + 24, 48, spec["face"]))
     out.append(text(CX + 74, yy + 18, spec["name"], 14, ink, 750))
@@ -327,10 +327,10 @@ def my_page(y, spec):
     for i, (nm, b64) in enumerate(spec["top"]):
         col, row = i % 4, i // 4
         fx = CX + 34 + col * 56
-        fy = yy + 22 + row * 52
+        fy = yy + 22 + row * 58
         out.append(face(fx, fy, 38, b64))
         out.append(text(fx, fy + 31, nm, 7, A(ink, 0.7), 600, "middle"))
-    return out, y + 206 + 10
+    return out, y + 266 + 10
 
 
 def agent_groups(y, groups):
@@ -2391,9 +2391,11 @@ SCREENS = [
     # makes "remove" an obvious thing to be allowed to do.
     dict(num=84, title="Friends", sub="Who this profile stands with",
          accent="cyan", tab=1, friends=[
-        ("David Bianchi", "@david_bianchi",
+        # No handle in the subtitle: the badges already say which is which,
+        # and a suffix on a person's own name reads as a filename.
+        ("David Bianchi", "CEO · PDI Systems",
          frames.FOUNDER_VERIFIED[1], "VERIFIED"),
-        ("David Bianchi", "@david_bianchi_ai", frames.FOUNDER[1], "AI"),
+        ("David Bianchi", "CEO · PDI Systems", frames.FOUNDER[1], "AI"),
         ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], None),
         ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], None),
     ]),
@@ -2402,15 +2404,21 @@ SCREENS = [
     # homepage is the thing this feature exists to stop being true.
     dict(num=85, title="My Page", sub="The one you make yourself",
          accent="amber", tab=0, my_page=dict(
-             bg="#2a0f1e", ink="#ffe8d6", accent="#f7b731",
+             bg="#1d1206", ink="#ffe9cc", accent="#d4a83a",
              name="Marcus Bell", handle="@marcus_bell", badge="AI",
              face=frames.PORTRAITS[1][1],
              tagline=["Money jokes on the outside,",
                       "honest arithmetic underneath."],
+             # Eight, because the row is labelled Top 8. Four faces under that
+             # heading reads as a bug in the page rather than a short list.
              top=[("David", frames.FOUNDER_VERIFIED[1]),
                   ("David AI", frames.FOUNDER[1]),
                   ("Amara", frames.PORTRAITS[0][1]),
-                  ("Priya", frames.PORTRAITS[2][1])])),
+                  ("Priya", frames.PORTRAITS[2][1]),
+                  ("Elena", frames.PORTRAITS[3][1]),
+                  ("Jonathan", frames.PORTRAITS[4][1]),
+                  ("Sam", frames.PORTRAITS[5][1]),
+                  ("Ingrid", frames.PORTRAITS[6][1])])),
     # The editor behind it. A closed set of themes, because the version of
     # this that took raw markup is why MySpace is a security lesson.
     dict(num=86, title="Customise", sub="Themes, colour, your Top 8",
