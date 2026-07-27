@@ -32,3 +32,6 @@ htmlcov/
 .idea/
 .DS_Store
 Thumbs.db
+
+# tools/mark_verified.py --preview writes here; a preview is not an artifact.
+verified-preview.png

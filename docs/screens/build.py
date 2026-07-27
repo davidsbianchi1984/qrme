@@ -291,7 +291,7 @@ def friends_list(y, entries):
         out.append(text(CX + 62, yy + 26, name, 13, C["txt"], 700))
         out.append(text(CX + 62, yy + 43, sub, 9.5, C["t2"], 500))
         if badge:
-            col = C["green"] if badge == "VERIFIED" else C["brandA"]
+            col = C["gold"] if badge == "VERIFIED" else C["brandA"]
             bw = 52
             bx = CX + CW - bw - 12
             out.append(rrect(bx, yy + 20, bw, 18, 9, A(col, 0.18), col, 1))
@@ -299,6 +299,38 @@ def friends_list(y, entries):
                             "middle", 0.4))
         yy += h + 9
     return out, yy
+
+
+def my_page(y, spec):
+    """Somebody's own homepage — theme, tagline, Top 8.
+
+    Drawn in the page's *own* colours rather than the app's, which is the
+    entire point of the feature: a generated page looks like everybody else's,
+    and the thing worth reviving from MySpace is that yours did not.
+    """
+    bg, ink, accent = spec["bg"], spec["ink"], spec["accent"]
+    out = [rrect(CX, y, CW, 206, 16, bg, A(accent, 0.55), 1.4)]
+    yy = y + 16
+    out.append(face(CX + 40, yy + 24, 48, spec["face"]))
+    out.append(text(CX + 74, yy + 18, spec["name"], 14, ink, 750))
+    out.append(text(CX + 74, yy + 34, spec["handle"], 9.5, A(ink, 0.6), 500))
+    out.append(rrect(CX + 74, yy + 42, 46, 15, 7, A(accent, 0.22), accent, 1))
+    out.append(text(CX + 97, yy + 53, spec["badge"], 7, accent, 800,
+                    "middle", 0.4))
+    yy += 74            # clear of the badge above
+    for line in spec["tagline"]:
+        out.append(text(CX + 16, yy, line, 10.5, A(ink, 0.85), 500))
+        yy += 14
+    yy += 8
+    out.append(text(CX + 16, yy, "TOP 8", 8, accent, 800, "start", 0.7))
+    yy += 12
+    for i, (nm, b64) in enumerate(spec["top"]):
+        col, row = i % 4, i // 4
+        fx = CX + 34 + col * 56
+        fy = yy + 22 + row * 52
+        out.append(face(fx, fy, 38, b64))
+        out.append(text(fx, fy + 31, nm, 7, A(ink, 0.7), 600, "middle"))
+    return out, y + 206 + 10
 
 
 def agent_groups(y, groups):
@@ -910,6 +942,10 @@ def render(spec):
         block, y = friends_list(y, spec["friends"])
         out += block
         y += 4
+
+    if spec.get("my_page"):
+        block, y = my_page(y, spec["my_page"])
+        out += block
 
     # A camera frame above the cards. Runs before the hero chain because a
     # screen has either a hero or cards, never both — this is the one thing
@@ -2355,12 +2391,36 @@ SCREENS = [
     # makes "remove" an obvious thing to be allowed to do.
     dict(num=84, title="Friends", sub="Who this profile stands with",
          accent="cyan", tab=1, friends=[
-        ("David Bianchi", "@david_bianchi_verified",
+        ("David Bianchi", "@david_bianchi",
          frames.FOUNDER_VERIFIED[1], "VERIFIED"),
-        ("David Bianchi", "@david_bianchi", frames.FOUNDER[1], "AI"),
+        ("David Bianchi", "@david_bianchi_ai", frames.FOUNDER[1], "AI"),
         ("Marcus Bell", "finance · mutual", frames.PORTRAITS[1][1], None),
         ("Dr. Amara Osei", "healthcare · mutual", frames.PORTRAITS[0][1], None),
     ]),
+    # The page somebody made, in their own colours. Drawn in the page's theme
+    # rather than the app's, because a homepage that looks like every other
+    # homepage is the thing this feature exists to stop being true.
+    dict(num=85, title="My Page", sub="The one you make yourself",
+         accent="amber", tab=0, my_page=dict(
+             bg="#2a0f1e", ink="#ffe8d6", accent="#f7b731",
+             name="Marcus Bell", handle="@marcus_bell", badge="AI",
+             face=frames.PORTRAITS[1][1],
+             tagline=["Money jokes on the outside,",
+                      "honest arithmetic underneath."],
+             top=[("David", frames.FOUNDER_VERIFIED[1]),
+                  ("David AI", frames.FOUNDER[1]),
+                  ("Amara", frames.PORTRAITS[0][1]),
+                  ("Priya", frames.PORTRAITS[2][1])])),
+    # The editor behind it. A closed set of themes, because the version of
+    # this that took raw markup is why MySpace is a security lesson.
+    dict(num=86, title="Customise", sub="Themes, colour, your Top 8",
+         accent="amber", tab=0, cards=[
+        dict(icon="sparkle", color="amber", k="Theme", s="Sunset · six presets", pill=("PICKED", "good")),
+        dict(icon="eye", color="indigo", k="Accent colour", s="#f7b731 — validated, not markup"),
+        dict(icon="chat", color="cyan", k="Tagline", s="90 characters, in your words"),
+        dict(icon="person", color="green", k="Top 8", s="friends only, your order"),
+        dict(icon="shield", color="red", k="No raw HTML", s="the nostalgia, not the injection"),
+    ], button=("Save page", "brand")),
 ]
 
 

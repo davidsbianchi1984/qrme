@@ -252,7 +252,7 @@ RATED: list[tuple[str, str, str, str, list[str], str]] = [
 # of him rather than a photograph, and it carries the same burned-in AI mark as
 # every other face in the package — a synthetic likeness of a real person is
 # precisely what that mark is for.
-FOUNDER_HANDLE = "david_bianchi"
+FOUNDER_HANDLE = "david_bianchi_ai"
 FOUNDER_NAME = "David Bianchi"
 FOUNDER_TAGS = ["qrme", "founder", "synthetic-profiles"]
 FOUNDER_PERSONA = (
@@ -284,7 +284,7 @@ FOUNDER_APPEARANCE = (
 # ``asset_marked: False`` for the photograph, which is the signal every surface
 # uses to composite the profile's own AI badge over it. Honest about the
 # picture, honest about the profile, and those are two different claims.
-VERIFIED_HANDLE = "david_bianchi_verified"
+VERIFIED_HANDLE = "david_bianchi"
 VERIFIED_NAME = "David Bianchi"
 VERIFIED_PERSONA = (
     "The real David Bianchi — 42, CEO and Imagineer of Private Data "

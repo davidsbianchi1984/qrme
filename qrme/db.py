@@ -1184,6 +1184,30 @@ CREATE TABLE IF NOT EXISTS signatures (
     signed_at          TEXT NOT NULL
 );
 
+-- The homepage a person builds for themselves, as opposed to the front page
+-- the platform assembles. Theme, colour, a tagline, a paragraph, and a Top 8.
+--
+-- Deliberately a fixed set of columns and a closed theme list rather than a
+-- blob of markup. MySpace let people paste raw HTML and CSS, which is why it
+-- was also the golden age of drive-by script injection; the nostalgia worth
+-- keeping is the feeling of a place you decorated, not the implementation.
+--
+-- `about` carries a moderation status like any other text a person writes for
+-- other people to read, and a blocked one is kept so its author can be told
+-- why rather than having it vanish.
+CREATE TABLE IF NOT EXISTS profile_pages (
+    profile_id   TEXT PRIMARY KEY REFERENCES profiles(id),
+    theme        TEXT NOT NULL DEFAULT 'midnight',
+    accent       TEXT,                       -- #rrggbb, validated
+    layout       TEXT NOT NULL DEFAULT 'classic',
+    tagline      TEXT,
+    about        TEXT,
+    about_status TEXT NOT NULL DEFAULT 'approved',  -- approved | blocked
+    about_flag   TEXT,
+    top_friends  TEXT NOT NULL DEFAULT '[]',  -- JSON, owner's order
+    updated_at   TEXT NOT NULL
+);
+
 -- How well a profile's identity has been established. Distinct from `kind`,
 -- which says whether there is a real person at all: this says whether anybody
 -- checked they are who they claim. The ladder is signatures.PROOFING_LEVELS,

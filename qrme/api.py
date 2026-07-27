@@ -24,7 +24,7 @@ from .pdi_client import PDIClient
 from .routers import (apps, assistant, audience, avatars, commerce,
                       community, connections,
                       desks, earnings, feedback, friends, gaming, governance,
-                      intelligence, interaction, licensing, models, packs,
+                      intelligence, interaction, licensing, models, packs, pages,
                       frontpage, profiles, research, robots, signatures,
                       social, steering,
                       summon, watch, watermarks)
@@ -98,6 +98,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(intelligence.router)
     app.include_router(connections.router)
     app.include_router(friends.router)
+    app.include_router(pages.router)
     app.include_router(social.router)
     app.include_router(apps.router)
     app.include_router(research.router)

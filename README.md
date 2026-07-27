@@ -250,6 +250,12 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="210" alt="My Page"></a><br><sub><b>85</b> · My Page</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="210" alt="Customise"></a><br><sub><b>86</b> · Customise</sub></td>
+    <td align="center" width="33%"></td>
   </tr>
 </table>
 
@@ -637,6 +643,172 @@ account and no other way to know.
 everybody who scans the same sticker is talking to the profile together — a
 class, a workshop, a Q&A after a set. See [docs/beacons.md](docs/beacons.md),
 including what a camera app can and cannot actually do with a QR code.
+
+## The page you make yourself
+
+Every profile already had a **front page** — portrait, skills, experience,
+rating — assembled from what the platform knows. It is useful, and it looks
+exactly like everybody else's, because a generated page is the same page 34
+times.
+
+This is the other kind: `GET`/`PUT /profiles/{id}/page`. A theme, an accent
+colour, a tagline in your own words, a paragraph about yourself, and a **Top 8**
+— the friends you want at the front, in the order you want them. It is the
+MySpace idea, and the reason it is worth reviving is not nostalgia on its own: a
+page somebody arranged tells you what they thought was worth putting first,
+which is the one thing a generated page cannot.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="230" alt="My Page"></a><br><sub><b>85</b> · the page, in its own colours</sub></td>
+    <td align="center" width="50%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="230" alt="Customise"></a><br><sub><b>86</b> · the editor behind it</sub></td>
+  </tr>
+</table>
+
+Six themes — Midnight, Starfield, Sunset, Chrome, Meadow, Paper — a validated
+`#rrggbb` accent, and three layouts.
+
+Three things it deliberately does not do:
+
+**No raw HTML or CSS.** MySpace let people paste arbitrary markup into a
+profile, which is why it was also the golden age of drive-by script injection: a
+page could rewrite the page around it, phish the viewer, or send them somewhere
+else. The nostalgia worth keeping is the *feeling* of a place you decorated. The
+implementation worth keeping is none of it. Themes are a closed set, the colour
+is validated, and a test asserts there is no field that stores markup as markup.
+
+**The Top 8 does not reorder the friends list.** It features friends rather than
+creating them — a profile you are not connected to is refused — and it is a
+showcase, not a second source of truth. Your Top 8 is what you chose to put
+first; your friends list is who you stand with.
+
+**About-me text is moderated like anything else written for other people to
+read.** A blocked one comes back to its author with the reason and is invisible
+to visitors, which is the shape the audience layer already uses for a comment.
+
+## Friends, and the two who come as standard
+
+Profiles have **friends lists** — a profile ↔ profile graph, which is a
+different thing from the `relationships` table that has always been here. That
+one records how a profile treats an *interactor*: the person typing at it, and
+the tone and boundaries that follow. This is the other axis, and it is the graph
+the community surfaces are drawn from.
+
+<table>
+  <tr>
+    <td align="center" width="40%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="230" alt="Friends"></a></td>
+    <td valign="middle">
+
+**Directed, not mutual.** Befriending writes one row. A friends list is a claim
+its owner makes about who they stand with, and a mutual edge would mean somebody
+else's action edits your list. Two rows make it mutual, and the API reports
+`mutual` per entry.
+
+**Two founder profiles stand at the top of every list**, fixed: they cannot be
+removed and cannot be pushed below a chosen friend. Everything else in the list
+is entirely the owner's to add and drop, and an ordinary friend removes
+normally.
+
+**Position is computed, never stored.** The pins are first because their rows
+say `origin='founder:N'`. A stored position has to be rewritten on every insert,
+and it is the thing that is wrong on the day the founder turns up third.
+
+  </td>
+  </tr>
+</table>
+
+The list marks pinned rows with `pinned: true`, so a client renders them without
+a remove control rather than offering one that returns `409`.
+
+### Two profiles, one person
+
+David Bianchi — 42, CEO and Imagineer of Private Data Infrastructure Systems,
+and the person who built all three of these products — has **two** profiles
+here, and the split is the point rather than a duplication.
+
+| | `@david_bianchi` | `@david_bianchi_ai` |
+| --- | --- | --- |
+| **Picture** | a photograph | an AI rendering |
+| **Served from** | `/photos` | `/portraits` |
+| **Mark in the pixels** | **no** — the photograph is authentic | **yes** — burned in, top-right |
+| **Profile labelled AI** | yes | yes |
+
+A platform whose entire argument is that a synthetic thing must say so cannot
+have its owner running one profile that is ambiguously both. So there are two,
+and each is honest about what its picture actually is. The real person takes the
+plain handle; the rendering is the one carrying the qualifier.
+
+**The photograph is deliberately not marked.** The mark says *AI-generated
+synthetic media*. Stamping that on a real photograph is a false statement — in
+the opposite direction from the one the mark exists to prevent, but false all the
+same. `avatars.render()` reports `asset_marked: false` for it, which is the
+signal every surface uses to composite the profile's own AI badge. **The picture
+is authentic and the profile is synthetic, and those are two different claims.**
+
+That is also why photographs live under `/photos` rather than beside the
+portraits: `/portraits` means *burned and checksummed*, and its manifest check
+walks every file in the tree. An unburned file there would either fail that check
+or force it to be loosened.
+
+Neither profile is in the starter collection or in `avatars.BRIEFS`. Both promise
+invented people in their own docstrings, and a real person in either list would
+quietly make a documented claim false.
+
+## Verified, and what the word is allowed to mean
+
+`GET /profiles/{id}/verification`. Two questions that a single badge would run
+together, kept apart:
+
+- **Is there a real person behind this?** Answered by `kind`. A `fictional`
+  profile depicts nobody — which is *not* the same as unverified, and the API
+  says so rather than implying somebody failed a check.
+- **Has anyone checked they are who they claim?** Answered by a recorded level,
+  and the honest answer is usually *not much*.
+
+The ladder is `signatures.PROOFING_LEVELS`, reused rather than reinvented so the
+platform has one meaning for how well an identity is established:
+
+| level | means |
+| --- | --- |
+| `self_asserted` | they say so, and nobody has checked |
+| `federated` | confirmed through another account they control |
+| `document` | an identity document was checked |
+| `in_person` | somebody met them and checked in person |
+
+**Anything above self-asserted needs a named attestor** — the same rule
+`signatures.enroll` applies, for the same reason: who checked belongs in the
+record, not in a footnote.
+
+### The gold mark
+
+`tools/mark_verified.py` burns **✓ VERIFIED REAL** into an authenticated
+person's photograph, in gold, bottom-left. It is the mirror image of
+`tools/mark_portraits.py` and exists for the same physics: a composited badge
+does not survive a screenshot, a hotlink or a right-click save, and those are the
+journeys a profile picture actually takes.
+
+**Gold because everything else is taken or already means something here.** Blue
+is X and Facebook, grey is the downgraded one people learned to distrust, green
+is the agent status light two screens away, and red already means *stopped* in
+this product.
+
+**It refuses to burn below `document`.** A burned mark is the strongest claim an
+image can carry: it cannot be qualified, it outlives every surface, and by design
+it travels where nobody can check it. That is safe for *AI* — an AI rendering is
+AI-generated wherever it ends up, forever, so burning it in can never become
+false. *Verified real* is not that kind of fact. At `self_asserted` the only
+thing established is that somebody typed their own name, and a gold checkmark on
+that photograph would be a credential the platform minted for itself — the exact
+failure the AI mark exists to prevent, pointed the other way.
+
+Until a document is checked and an attestor named, the badge is composited live
+from `verification.status`, where the level rides with it:
+
+> *self-asserted: the badge confirms a real person stands behind this profile,
+> not that a document was checked*
+
+The founder's profiles read `self_asserted` today. The day a document is checked,
+one call moves the level and the burn becomes available.
 
 ## The agent status light
 

@@ -45,7 +45,7 @@ from . import db, verification
 # rendered likeness is marked AI in its own pixels, the photograph is not, and
 # a platform whose whole argument is that synthetic things must say so cannot
 # have its owner running a single profile that is ambiguously both.
-FOUNDER_HANDLES: tuple[str, ...] = ("david_bianchi_verified", "david_bianchi")
+FOUNDER_HANDLES: tuple[str, ...] = ("david_bianchi", "david_bianchi_ai")
 
 # Kept as a name because the rest of the module and its tests read better for
 # it, and because a single-founder deployment is still a coherent thing.
