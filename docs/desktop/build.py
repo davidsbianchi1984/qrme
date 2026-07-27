@@ -40,7 +40,8 @@ IW = CONTENT_W - 2 * PAD
 
 NAV = [("target", "Home"), ("chat", "Conversation"), ("people", "Relationships"),
        ("lock", "Memory"), ("person", "Desks"), ("compass", "Marketplace"),
-       ("doc", "Licensing"), ("pen", "Signing"), ("gear", "Control")]
+       ("doc", "Licensing"), ("pen", "Signing"), ("chart", "Community"),
+       ("gear", "Control")]
 
 
 def status_dot(x, y, label, tone):
@@ -626,6 +627,89 @@ def v_audience():
     return o
 
 
+def v_community():
+    """The social layer, where a wide window actually earns its keep.
+
+    On a phone the friends list, the wall and the feed are three screens you
+    move between. Here they sit beside each other, which is the one thing a
+    desktop can do that a phone cannot — and the reason the feed's *why* column
+    is worth the space: a ranked feed you can read the reasoning of, all at
+    once, is a ranked feed somebody can actually argue with.
+    """
+    import sys
+    sys.path.insert(0, os.path.join(OUT, "..", "screens"))
+    import frames
+
+    o = []
+    lw = IW * 0.42
+    rw = IW - lw - 20
+    rx = IX + lw + 20
+    hh = CONTENT_H - 2 * PAD
+
+    # -- friends -----------------------------------------------------------
+    o += panel(IX, IY, lw, hh, "Friends", right="two come as standard")
+    fy = IY + 54
+    people = [
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER_VERIFIED[1],
+         "VERIFIED", [], 4.0),
+        ("David Bianchi", "CEO/Imagineer", frames.FOUNDER[1], "AI",
+         ["technology", "cybersecurity", "science", "telecom"], 4.0),
+        ("Marcus Bell", "mutual friend", frames.PORTRAITS[1][1], "AI",
+         ["finance"], 5.0),
+        ("Dr. Amara Osei", "mutual friend", frames.PORTRAITS[0][1], "AI",
+         ["healthcare"], 3.0),
+    ]
+    for name, sub, b64, badge, packs, rating in people:
+        o.append(rrect(IX + 18, fy, lw - 36, 76, 12,
+                       "rgba(255,255,255,0.03)", C["line"], 1))
+        o.append(pb.face(IX + 52, fy + 38, 44, b64))
+        o.append(text(IX + 84, fy + 26, name, 12.5, C["txt"], 700))
+        o.append(text(IX + 84, fy + 42, sub, 9.5, C["t2"], 500))
+        if packs:
+            o.append(text(IX + 84, fy + 56, " · ".join(packs[:2])
+                          + (f"  +{len(packs)-2}" if len(packs) > 2 else ""),
+                          8, C["cyan"], 600))
+        o.append(stars(IX + 84, fy + 68, rating, C["gold"], 0.55))
+        o.append(text(IX + 122, fy + 71, f"{rating:.1f}", 8, C["gold"], 700))
+        col = C["gold"] if badge == "VERIFIED" else C["brandA"]
+        o.append(rrect(IX + lw - 96, fy + 28, 62, 20, 10, A(col, 0.18), col, 1))
+        o.append(text(IX + lw - 65, fy + 42, badge, 8, col, 800, "middle", 0.4))
+        fy += 84
+
+    # -- the feed, with its reasons ----------------------------------------
+    o += panel(rx, IY, rw, hh, "For You", right="and why each one is here")
+    hy = IY + 54
+    o.append(text(rx + 24, hy, "FROM", 8, C["t3"], 700, "start", 0.7))
+    o.append(text(rx + 210, hy, "WHY IT IS HERE", 8, C["t3"], 700, "start", 0.7))
+    o.append(text(rx + rw - 24, hy, "SCORE", 8, C["t3"], 700, "end", 0.7))
+    hy += 12
+    rows = [
+        ("Marcus Bell", "a friend posted this", "110", C["green"]),
+        ("Dr. Amara Osei", "you have talked to this profile", "70", C["cyan"]),
+        ("Priya Raman", "you engage with technology", "35", C["amber"]),
+        ("Wren Okafor", "popular with people here", "28", C["indigo"]),
+        ("Ken Nakamura", "new on the wall", "10", C["t3"]),
+    ]
+    for i, (who, why, score, col) in enumerate(rows):
+        y = hy + 14 + i * 46
+        o.append(rrect(rx + 18, y, rw - 36, 38, 10,
+                       "rgba(255,255,255,0.03)", C["line"], 1))
+        o.append(f'<circle cx="{rx+36}" cy="{y+19}" r="4" fill="{col}"/>')
+        o.append(text(rx + 50, y + 23, who, 11, C["txt"], 650))
+        o.append(text(rx + 192, y + 23, why, 10, C["t2"], 500))
+        o.append(text(rx + rw - 34, y + 23, score, 11, col, 800, "end"))
+
+    ny = hy + 14 + len(rows) * 46 + 12
+    o.append(rrect(rx + 18, ny, rw - 36, 58, 12, A(C["red"], 0.08),
+                   A(C["red"], 0.5), 1))
+    o.append(icon("shield", rx + 44, ny + 29, C["red"], 0.8))
+    o.append(text(rx + 64, ny + 24, "Never ranked on", 10.5, C["txt"], 700))
+    o.append(text(rx + 64, ny + 40,
+                  "source material · memories · anything vaulted", 9.5,
+                  C["t2"], 500))
+    return o
+
+
 def v_signatures():
     """Signing, which is more a desktop story than a mobile one: Windows has
     no in-process route to Hello that a compile can check, so the ceremony
@@ -706,6 +790,7 @@ VIEWS = [
     (7, "Live Desks", "Desks", v_desks),
     (8, "Audience & Commerce", "Marketplace", v_audience),
     (9, "Signatures", "Signing", v_signatures),
+    (10, "Community", "Community", v_community),
 ]
 
 

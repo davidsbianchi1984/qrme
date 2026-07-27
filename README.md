@@ -51,7 +51,7 @@ Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation 
   </tr>
   <tr>
     <td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
-    <td align="center" width="50%"></td>
+    <td align="center" width="50%"><a href="docs/desktop/10-community.svg"><img src="docs/desktop/10-community.svg" width="460" alt="Community"></a><br><sub><b>10</b> · Community</sub></td>
   </tr>
 </table>
 
@@ -715,7 +715,10 @@ complain about, and a test pins it.
     <td valign="middle">
 
 Every row on the feed screen carries its reason and its score, and the last row
-says what the ranking will never look at. That is the screen doing the same job
+says what the ranking will never look at. Desktop view **10 · Community** puts
+the friends list beside the feed with a full *why it is here* column — the one
+thing a wide window does that a phone cannot, and the reason a ranked feed you
+can read the reasoning of all at once is one somebody can argue with. That is the screen doing the same job
 as the API: a feed you cannot interrogate is one you have to take on trust.
 
   </td>
