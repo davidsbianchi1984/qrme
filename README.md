@@ -693,6 +693,43 @@ earbuds or glasses — and says which faces it may show.
   </tr>
 </table>
 
+<table>
+  <tr>
+    <td align="center" width="35%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="220" alt="Your Devices"></a><br><sub><b>88</b> · pairing, at sign-up</sub></td>
+    <td valign="middle">
+
+**Paired at sign-up, not found in a settings page.** The agent lights and the
+watch faces are worth having on day one, so the device step is part of joining.
+
+| may be paired | |
+| --- | --- |
+| watch · band · ring | on the wrist, on the finger |
+| earbuds · headset | in or over the ears |
+| **lapel mic · clip-on mic** | clipped to the collar or clothing |
+| glasses · pendant | worn on the face or at the neck |
+
+| refused | why |
+| --- | --- |
+| smart speaker · conference puck · room array · tabletop mic · desk mic | each **hears whoever walks in** — and that person did not pair it, was not asked, and may have a right not to be recorded |
+
+  </td>
+  </tr>
+</table>
+
+**The microphone kinds pair but do not listen.** Nothing in this module opens a
+channel; a paired device is a registration and a set of allowed faces. They are
+in the catalogue because the registry is what a later feature will need, and a
+device somebody already paired for their watch face should not have to be
+paired twice. A test asserts no capture path exists here — no record, stream,
+listen or sample.
+
+**Room-facing microphones are refused at the door**, not allowed and then
+restricted. A restriction is a setting somebody can change; a refusal is a fact
+about the product. A platform cannot collect a waiver from a person who is
+merely present, so until that is settled the whole device class stays out. The
+refusals are published with their reasons so a client greys them out rather
+than offering one and returning a 422.
+
 **A wearable is not an embodiment.** `embodiments` records where a *profile*
 lives — a speaker, a hologram, a robot body. This is hardware belonging to the
 **owner**, reaching their own account. Folding them together would mean pairing

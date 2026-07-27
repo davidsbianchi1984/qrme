@@ -10,10 +10,19 @@ to the **owner** and reaches their own account. Folding them together would
 mean pairing a watch could put somebody's synthetic persona on their wrist,
 which is a different feature with a different consent question.
 
-**Pairing and permission only.** There is no sensor stream here, no capture,
-and nothing about a microphone. A paired watch in this module is a screen and a
-set of buttons; anything that listens is a separate decision that has not been
-made here.
+**Pairing and permission only.** Nothing here opens a channel. A paired device
+is a registration and a set of allowed faces; whether anything ever listens
+through one is a separate decision, held elsewhere and not made here. The
+microphone-bearing kinds are listed because the registry is what that later
+feature will need — a device somebody already paired for their watch face
+should not have to be paired twice.
+
+**Room-facing microphones are refused at the door.** A smart speaker, a
+conference puck, a tabletop array: each hears whoever walks in, and that person
+did not pair it, was not asked, and in most places has a right not to be
+recorded. A platform cannot collect a waiver from somebody who is merely
+present. Refused rather than allowed-and-restricted, because a restriction is a
+setting somebody can change and a refusal is a fact about the product.
 
 **Unpairing is a revocation, not a delete.** The row stays with `revoked_at`
 set, so a device that has been sent away cannot quietly come back by
@@ -27,7 +36,43 @@ import json
 
 from . import db
 
-KINDS = ("watch", "band", "ring", "earbuds", "glasses")
+# What may be paired. Personal devices, worn by the person pairing them.
+#
+# The microphone-bearing kinds are here because the pairing registry is what
+# a later feature will need — not because anything listens yet. Nothing in
+# this module opens a channel, and the held work stays held.
+KINDS: dict[str, str] = {
+    "watch": "on the wrist",
+    "band": "on the wrist",
+    "ring": "on the finger",
+    "earbuds": "in the ears",
+    "headset": "over the ears",
+    "lapel_mic": "clipped to the collar",
+    "clip_on_mic": "clipped to clothing",
+    "glasses": "worn on the face",
+    "pendant": "worn at the neck",
+}
+
+# What may **not** be paired, and why, in the words the refusal returns.
+#
+# A room-facing microphone hears whoever walks in. They did not pair it, were
+# not asked, and in most places have a right not to be recorded — and a
+# platform cannot collect a waiver from somebody who is simply present. Until
+# that is worked out with counsel, the device class is refused at the door
+# rather than allowed and then restricted, because a restriction is a setting
+# and a refusal is a fact.
+REFUSED: dict[str, str] = {
+    "smart_speaker": "a room-facing microphone",
+    "conference_puck": "a room-facing microphone",
+    "room_array": "a room-facing microphone",
+    "tabletop_mic": "a room-facing microphone",
+    "desk_mic": "a room-facing microphone",
+}
+REFUSAL = (
+    "{kind} is {what}: it hears whoever walks into the room, and they did "
+    "not pair it, were not asked, and may have a right not to be recorded. "
+    "Only devices worn by the person pairing them can be attached."
+)
 
 # The faces a wrist can be given, and what each is for. A closed set, because
 # "which faces" is a permission and a permission with open-ended values is one
@@ -40,7 +85,10 @@ FACES: dict[str, str] = {
 }
 DEFAULT_FACES = ("agents", "activity")
 
-MAX_WEARABLES = 8
+# Comfortably above the number of kinds, so somebody can own one of each and
+# still add a second watch. A limit below the catalogue would be a rule that
+# contradicts the menu it is printed next to.
+MAX_WEARABLES = 12
 
 
 class WearableError(ValueError):
@@ -61,6 +109,8 @@ def pair(profile_id: str, name: str, kind: str,
         raise WearableError("a device needs a name you will recognise")
     if len(name) > 60:
         raise WearableError("a device name is at most 60 characters")
+    if kind in REFUSED:
+        raise WearableError(REFUSAL.format(kind=kind, what=REFUSED[kind]))
     if kind not in KINDS:
         raise WearableError(
             f"unknown wearable {kind!r}; expected one of {', '.join(KINDS)}")

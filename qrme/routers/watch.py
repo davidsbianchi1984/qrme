@@ -31,7 +31,7 @@ router = APIRouter()
 class WearablePair(BaseModel):
     name: str = Field(min_length=1, max_length=60,
                       description="What you will recognise it by.")
-    kind: str = Field(description="watch | band | ring | earbuds | glasses")
+    kind: str = Field(description="See GET .../wearables for the list.")
     faces: list[str] | None = Field(
         None, description="Which faces this device may show. Defaults to "
                           "agents + activity.")
@@ -45,7 +45,12 @@ def list_wearables(profile_id: str, request: Request,
     require_owner(profile_id, request)
     return {"profile_id": profile_id,
             "wearables": wearables.paired(profile_id, include_revoked),
-            "faces": wearables.FACES, "kinds": list(wearables.KINDS)}
+            "faces": wearables.FACES,
+            "kinds": wearables.KINDS,
+            # Said out loud, so a client can grey these out with the reason
+            # rather than offering them and returning a 422.
+            "refused": {k: wearables.REFUSAL.format(kind=k, what=v)
+                        for k, v in wearables.REFUSED.items()}}
 
 
 @router.post("/profiles/{profile_id}/wearables", status_code=201)

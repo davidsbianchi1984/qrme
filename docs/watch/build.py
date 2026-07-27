@@ -161,7 +161,7 @@ def big_counts(rows):
                       c if not dim else C["t3"], 800))
         # Offset by the number's own width: "12" is wider than "3", and a
         # fixed label position crowds the two-digit case.
-        o.append(text(PADX + 40 + len(str(n)) * 14, y + 7, label, 10.5,
+        o.append(text(PADX + 46 + len(str(n)) * 14, y + 7, label, 10.5,
                       C["t2"] if not dim else C["t3"], 600))
         y += 46
     return o

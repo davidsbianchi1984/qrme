@@ -2480,6 +2480,17 @@ SCREENS = [
     # this that took raw markup is why MySpace is a security lesson.
     # The feed. Every row says why it is there, which is the part that makes a
     # ranked feed auditable rather than merely effective.
+    # Onboarding: pairing happens at sign-up, so the watch faces and the
+    # agent lights work from the first day rather than after somebody finds a
+    # settings page.
+    dict(num=88, title="Your Devices", sub="Pair them while you sign up",
+         accent="cyan", tab=0, cards=[
+        dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),
+        dict(icon="mic", color="green", k="AirPods", s="in the ears", pill=("PAIRED", "good")),
+        dict(icon="mic", color="indigo", k="Lapel mic", s="clipped to the collar"),
+        dict(icon="eye", color="amber", k="Glasses · ring · pendant", s="worn on the person"),
+        dict(icon="shield", color="red", k="Smart speakers refused", s="they hear whoever walks in"),
+    ], button=("Pair a device", "brand")),
     dict(num=87, title="For You", sub="And why each one is here",
          accent="cyan", tab=0, cards=[
         dict(icon="person", color="green", k="Marcus Bell", s="a friend posted this", pill=("110", "good")),
