@@ -283,12 +283,18 @@ was five columns wide — about 590px of content on a phone that offers 390, so
 the fourth column was sliced mid-word and the fifth never appeared at all.
 Two columns of whole cards fit.
 
+**The careers and reviews are written, like the personas themselves.** These
+are invented experts — that is the first line of this section — so a CV and a
+notice from a satisfied reader are characterisation, the same kind of thing the
+bio already is. Each one is drawn from that starter's own bio so the two cannot
+contradict each other.
+
 **The figures are sample values, identical on every card.** A freshly seeded
 starter has no reviews, no relationships and no engagement, because nobody has
 talked to it yet — those are the app's own mock numbers, repeated unchanged so
 that thirty-four cards reading *4.0 · 37 reviews* are self-evidently a template
 rather than a measurement. The name, role, portrait, industry and skills are
-real, read straight out of `qrme/seed.py`.
+read straight out of `qrme/seed.py`.
 
 The bubble inside each card is baked by `tools/bubble_portraits.py` into
 `docs/portraits/bubbles/`, because GitHub's markdown sanitiser strips the

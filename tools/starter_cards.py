@@ -40,7 +40,7 @@ BUBBLES = ROOT / "docs" / "portraits" / "bubbles"
 OUT = ROOT / "docs" / "portraits" / "cards"
 
 sys.path.insert(0, str(ROOT / "tools"))
-from starter_gallery import ROLES, starters  # noqa: E402
+from starter_gallery import CAREERS, REVIEWS, ROLES, starters  # noqa: E402
 
 
 def _screens():
@@ -139,7 +139,9 @@ def card(handle: str, industry: str, display: str, tags: list[str]) -> str:
         if row_w + w > W - PAD * 2:
             chip_rows, row_w = chip_rows + 1, 0.0
         row_w += w + 6
-    H = int(398 + 16 * len(role_lines) + 26 * (chip_rows - 1) + PAD)
+    quote_lines = wrap(REVIEWS[handle][2], 44)
+    H = int(574 + 16 * len(role_lines) + 26 * (chip_rows - 1)
+            + 14 * len(quote_lines) + PAD)
 
     o: list[str] = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
@@ -221,7 +223,51 @@ def card(handle: str, industry: str, display: str, tags: list[str]) -> str:
         o.append(f'<text x="{tx + tw/2:.1f}" y="{ry+50}" text-anchor="middle" '
                  f'font-family="{FONT}" font-size="8.5" fill="{C["t2"]}">'
                  f'{esc(unit)}</text>')
-    by = ry + 72
+    ry += 72
+
+    # Experience, then a review. Screen 80's order, and the order matters:
+    # what the profile did comes before what somebody thought of it, because
+    # the second only means something once you know the first.
+    o.append(f'<text x="{PAD}" y="{ry}" font-family="{FONT}" font-size="10" '
+             f'font-weight="700" letter-spacing="0.8" fill="{C["t3"]}">'
+             f'EXPERIENCE</text>')
+    ry += 12
+    for title_, org in CAREERS[handle]:
+        o.append(f'<rect x="{PAD}" y="{ry}" width="{W-PAD*2}" height="40" '
+                 f'rx="12" fill="url(#tile)" stroke="{C["line"]}"/>')
+        o.append(f'<text x="{PAD+12}" y="{ry+17}" font-family="{FONT}" '
+                 f'font-size="11.5" font-weight="650" fill="{C["txt"]}">'
+                 f'{esc(title_)}</text>')
+        o.append(f'<text x="{PAD+12}" y="{ry+31}" font-family="{FONT}" '
+                 f'font-size="9.5" fill="{C["t2"]}">{esc(org)}</text>')
+        ry += 46
+
+    stars_n, who, quote = REVIEWS[handle]
+    # The experience boxes leave a 6px gap and this label's cap-height eats 8,
+    # so without the nudge REVIEWS sits inside the box above it.
+    ry += 12
+    o.append(f'<text x="{PAD}" y="{ry}" font-family="{FONT}" font-size="10" '
+             f'font-weight="700" letter-spacing="0.8" fill="{C["t3"]}">'
+             f'REVIEWS</text>')
+    o.append(f'<text x="{W-PAD}" y="{ry}" text-anchor="end" '
+             f'font-family="{FONT}" font-size="8.5" fill="{C["t3"]}">'
+             f'from people who talked to it</text>')
+    ry += 12
+    qlines = quote_lines
+    rh = 34 + 14 * len(qlines)
+    o.append(f'<rect x="{PAD}" y="{ry}" width="{W-PAD*2}" height="{rh}" '
+             f'rx="12" fill="url(#tile)" stroke="{C["line"]}"/>')
+    o.append(stars(PAD + 14, ry + 16, stars_n))
+    o.append(f'<text x="{PAD+92}" y="{ry+20}" font-family="{FONT}" '
+             f'font-size="9.5" font-weight="600" fill="{C["t2"]}">'
+             f'{esc(who)}</text>')
+    qy = ry + 36
+    for line in qlines:
+        o.append(f'<text x="{PAD+14}" y="{qy}" font-family="{FONT}" '
+                 f'font-size="10.5" fill="{C["txt"]}">{esc(line)}</text>')
+        qy += 14
+    by = ry + rh + 14
+
 
     # How the button addresses them. A plain given name for most; an honorific
     # plus surname for the ones who carry one, because "Talk to Osei" reads as
