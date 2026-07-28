@@ -77,9 +77,15 @@ async function req<T>(
     );
   }
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  // A body is not guaranteed to be JSON — a crashed server answers plain
+  // text ("Internal Server Error"), and surfacing a JSON.parse exception
+  // instead of those words is how one error hides another.
+  let data: unknown = null;
+  try { data = text ? JSON.parse(text) : null; }
+  catch { data = null; }
   if (!res.ok) {
-    const detail = (data && (data.detail || data.message)) || res.statusText;
+    const body = data as { detail?: unknown; message?: unknown } | null;
+    const detail = (body && (body.detail || body.message)) || text.trim() || res.statusText;
     throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
   }
   return data as T;
