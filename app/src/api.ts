@@ -34,7 +34,11 @@ export function setLlmKey(key: string) {
 // account is what owns — its id is the owner_id profiles are created under.
 export const accountApi = {
   signup: (body: { email: string; password: string; display_name?: string }) =>
-    req<{ account_id: string; email: string; verified: boolean; code_delivery: string }>(
+    req<{ account_id: string; email: string; verified: boolean; code_delivery?: string;
+          verification: "local" | "email";
+          // Present when verification is "local" (no mail transport — the
+          // machine owner is trusted and the account activates directly).
+          display_name?: string; account_token?: string }>(
       "/signup", { method: "POST", body }),
   verifyEmail: (body: { email: string; code: string }) =>
     req<{ account_id: string; email: string; display_name?: string; account_token: string }>(

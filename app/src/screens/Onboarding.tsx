@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { accountApi, api } from "../api";
 import { useSession } from "../store";
 
@@ -59,9 +59,60 @@ function AccountGate() {
   const finishSession = (a: { account_id: string; account_token: string; email: string }) =>
     setSession({ accountId: a.account_id, accountToken: a.account_token, accountEmail: a.email });
 
+  const isDesktop = Boolean((window as unknown as { qrmeDesktop?: unknown }).qrmeDesktop);
   const whereIsTheCode = delivery === "console"
-    ? <> — this deployment has no mail service configured, so the code was <b>printed in the terminal running the backend</b></>
+    ? (isDesktop
+        ? <> — this deployment has no mail service configured, so the code was <b>written to the app's backend log</b> (button below opens it)</>
+        : <> — this deployment has no mail service configured, so the code was <b>printed in the terminal running the backend</b></>)
     : null;
+
+  // On the code screen, the person may verify by clicking the emailed link
+  // in their browser instead of typing the code. The app holds the email and
+  // password, so it notices on its own: poll sign-in until the address is
+  // proven, then continue without another keystroke.
+  useEffect(() => {
+    if (mode !== "code" || !password) return;
+    const timer = setInterval(async () => {
+      try {
+        const a = await accountApi.signin({ email: email.trim(), password });
+        finishSession(a);
+      } catch { /* not verified yet — keep waiting */ }
+    }, 3000);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, email, password]);
+
+  const signup = async () => {
+    setBusy(true); setError(null); setNotice(null);
+    try {
+      const r = await accountApi.signup({ email: email.trim(), password, display_name: name.trim() || undefined });
+      if (r.verification === "local" && r.account_token) {
+        // No mail transport on this deployment (the desktop install): the
+        // machine owner is trusted, the account is already active.
+        finishSession({ account_id: r.account_id, account_token: r.account_token, email: r.email });
+        return;
+      }
+      setDelivery(r.code_delivery || null); setMode("code");
+    } catch (e) {
+      const msg = (e as Error).message;
+      if (msg.includes("already pending")) {
+        // A signup that crashed mid-flight leaves a pending account. Never
+        // strand the person on the form for that — go to the code screen
+        // and issue a fresh code.
+        setMode("code");
+        try {
+          const r = await accountApi.resendCode(email.trim());
+          setDelivery(r.code_delivery);
+          setNotice("This address already had a signup in progress — we've sent a fresh code.");
+        } catch (e2) { setError((e2 as Error).message); }
+      } else if (msg.includes("already exists")) {
+        setMode("signin");
+        setNotice("This address already has an account — sign in (or use Forgot password).");
+      } else {
+        setError(msg);
+      }
+    } finally { setBusy(false); }
+  };
 
   return (
     <>
@@ -87,8 +138,9 @@ function AccountGate() {
 
       {mode === "code" && (<>
         <p className="muted">
-          We sent a 6-digit code to <b>{email}</b>{whereIsTheCode}.
-          Enter it to prove the address is yours; sign-in works only after that.
+          We emailed a verification link to <b>{email}</b>{whereIsTheCode}.
+          <b> Click the link and this screen continues on its own.</b> Prefer
+          typing? Enter the 6-digit code from the same email instead.
         </p>
         <label>Verification code
           <input value={code} inputMode="numeric" placeholder="123456" onChange={(e) => setCode(e.target.value)} />
@@ -126,9 +178,7 @@ function AccountGate() {
       {mode === "signup" && (
         <button className="primary"
                 disabled={busy || !email.trim() || !password || !passwordsMatch}
-                onClick={() => run(
-                  () => accountApi.signup({ email: email.trim(), password, display_name: name.trim() || undefined }),
-                  (r) => { setDelivery(r.code_delivery); setMode("code"); })}>
+                onClick={signup}>
           {busy ? "Creating…" : "Create account"}
         </button>
       )}

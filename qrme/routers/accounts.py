@@ -9,6 +9,7 @@ profile keeps its own owner capability token exactly as before. See
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
 from .. import accounts, auth
@@ -67,6 +68,30 @@ def verify_email(body: VerifyEmail) -> dict:
         return accounts.verify(body.email, body.code)
     except accounts.AccountError as exc:
         raise HTTPException(exc.status, exc.detail)
+
+
+@router.get("/verify-email/click", response_class=HTMLResponse)
+def verify_email_click(token: str = "") -> HTMLResponse:
+    """The emailed link lands here, in a browser. The app finishes on its
+    own: it holds the email and password, so it signs in the moment the
+    address is proven."""
+    page = ("<html><body style='font-family:sans-serif;background:#0d0a20;"
+            "color:#e6edf3;display:grid;place-items:center;height:95vh'>"
+            "<div style='text-align:center'><h1>{title}</h1><p>{body}</p>"
+            "</div></body></html>")
+    try:
+        result = accounts.verify_link(token)
+    except accounts.AccountError as exc:
+        return HTMLResponse(page.format(
+            title="That link didn't work", body=exc.detail), 403)
+    if result["already"]:
+        return HTMLResponse(page.format(
+            title="Already verified",
+            body="This address was verified earlier — just sign in."))
+    return HTMLResponse(page.format(
+        title="✓ Verified",
+        body="Your account is active. Go back to QRME — it will continue "
+             "on its own."))
 
 
 @router.post("/verify-email/resend")
