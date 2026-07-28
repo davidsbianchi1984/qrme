@@ -1723,7 +1723,7 @@ and a product that deleted it is one nobody could safely try.
 
 ## Where your data lives
 
-`qrme/storage.py`, 23 tests, screens **138**, **139** and **140**.
+`qrme/storage.py`, 38 tests, screens **138**, **139** and **140**.
 
 There are two postures, and the difference between them is the whole of what
 Basic buys.
@@ -1840,7 +1840,7 @@ would be selling absolution rather than encryption.
 
 ## The pane in the corner
 
-`qrme/dock.py`, 5 routes, 30 tests, screens **128** and **129**.
+`qrme/dock.py`, 5 routes, 34 tests, screens **128** and **129**.
 
 The watch faces answer *what am I currently presenting as* without making you
 leave what you are doing, and a fixed screen does the same for a wall. Both need

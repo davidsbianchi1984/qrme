@@ -1,3 +1,4 @@
+import pathlib
 """The README's gallery and the drawings on disk, held in step.
 
 Every defect this file exists to catch has already happened at least once in
@@ -106,3 +107,37 @@ def test_the_gallery_runs_in_order_and_skips_nothing():
     assert sorted(numbers) == expected, (
         "the gallery skips: "
         + ", ".join(str(n) for n in expected if n not in numbers))
+
+
+# -- the README's own arithmetic -----------------------------------------------
+
+def test_every_test_count_the_readme_claims_is_true():
+    """The README says "`module.py`, N tests" in a dozen places, and five of
+    them were wrong when this was written — `storage.py` claimed 23 with 38,
+    `dock.py` claimed 30 with 34, and JIM-mini's three were all short.
+
+    A number in prose is a duplicate of something the repository already
+    knows, and duplicates drift the moment somebody adds a test. Nothing fails
+    when a file grows a function, so nothing did — for several releases, in a
+    document whose whole pitch is that its claims are checked.
+
+    The counting is deliberately the dumb kind: `def test_` at column zero, in
+    every file matching the module's name. A cleverer measure would be a
+    second thing to keep in step.
+    """
+    import re
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    readme = (root / "README.md").read_text()
+    claims = re.findall(
+        r"`((?:qrme|jim)/[\w/]+\.py)`[^\n]{0,40}?(\d+) tests", readme)
+    assert claims, "no test-count claims found — has the README format changed?"
+    for module, claimed in claims:
+        stem = pathlib.Path(module).stem
+        files = sorted(root.rglob(f"test_{stem}*.py"))
+        assert files, f"README cites {module} but no test_{stem}*.py exists"
+        actual = sum(len(re.findall(r"^def test_", f.read_text(), re.M))
+                     for f in files)
+        assert actual == int(claimed), (
+            f"README says {module} has {claimed} tests; "
+            f"{', '.join(f.name for f in files)} hold {actual}")

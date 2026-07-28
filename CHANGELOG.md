@@ -18,6 +18,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The README's own arithmetic was wrong.** `qrme/storage.py` claimed 23
+  tests against 38, `qrme/dock.py` claimed 30 against 34. A number in prose is
+  a duplicate of something the repository already knows, and nothing fails when
+  a file grows a test — so nothing did, in a document whose whole pitch is that
+  its claims are checked. A guard now verifies every "`module.py`, N tests"
+  claim against the files.
+
 - **Stale copy behind a growing list.** `SENSITIVE` gained `clinical_note`
   and four pieces of user-facing copy went on saying **two things are
   refused**: screen 138's card, screen 140's subtitle, the walkthrough lesson
