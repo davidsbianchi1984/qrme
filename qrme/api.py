@@ -17,7 +17,7 @@ import os
 from fastapi import Depends, FastAPI, Request, Response
 
 from . import avatars as avatar_assets
-from . import mobile, offline, tiers
+from . import llm, mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
@@ -162,6 +162,18 @@ def create_app(pdi_client: PDIClient | None = None,
         app.add_middleware(
             CORSMiddleware, allow_origins=allow, allow_credentials=False,
             allow_methods=["*"], allow_headers=["*"])
+
+    # Bring-your-own model key: ``x-llm-api-key`` rides the request into a
+    # context variable the provider layer reads — the caller's generations run
+    # on their credential, which is never persisted and never logged. Requests
+    # without one use the deployment's env key (the operator lending theirs).
+    @app.middleware("http")
+    async def _llm_request_key(request: Request, call_next):
+        token = llm.set_request_key(request.headers.get("x-llm-api-key"))
+        try:
+            return await call_next(request)
+        finally:
+            llm.reset_request_key(token)
 
     # The starter portraits. Mounted unconditionally: unlike the studio, these
     # ship inside the package, so if the directory is missing something is

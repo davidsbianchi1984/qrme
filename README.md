@@ -2850,6 +2850,10 @@ of the screens above and want to know what it does, this is where to find it.
 - **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-5`
   with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.
+  **Bring your own key:** send `x-llm-api-key` on any request (the console's
+  Control Center stores it device-side) and that request's generations run
+  on your credential — never persisted, never logged; the deployment's env
+  key (an operator lending theirs out) answers requests that bring none.
 - **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
   packs, starter content, seeding) with routes in `qrme/routers/packs.py`;
   `qrme/seed.py` (starter profile collection); `qrme/robotics.py` (robot
@@ -2888,6 +2892,13 @@ one command each, so you pick per device: **phone** (this section),
 **packaged installer** (`.dmg`/`.exe`/`.AppImage` from the releases page —
 no toolchain needed), or **headless API** (`python -m qrme serve`). Same
 backend, same data, same token checks in every form.
+
+The packaged installer is **double-click-and-done**: it ships the whole
+Python backend as a frozen binary (`packaging/backend_entry.py`, built by
+PyInstaller in the release workflow) and the app spawns it at launch when no
+backend is already answering — no Python install, no terminal, data under
+the app's own user-data directory, and the spawned backend dies with the
+window. A backend you already run yourself is left alone.
 
 `python -m qrme phone` builds the studio if it's missing (first run installs the
 npm dependencies too), prints the phone URL **with a QR code right in the

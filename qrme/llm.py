@@ -31,9 +31,33 @@ import logging
 import os
 import urllib.error
 import urllib.request
+from contextvars import ContextVar
 from typing import Protocol
 
 logger = logging.getLogger("qrme.llm")
+
+# Bring-your-own key: a caller may send ``x-llm-api-key`` and the request's
+# generations run on *their* credential instead of the deployment's. The key
+# lives in a request-scoped context variable set by API middleware — it is
+# never persisted, never logged, and gone when the request ends. The
+# deployment's own env key (the operator lending theirs out) stays the
+# fallback for requests that bring none.
+_REQUEST_KEY: ContextVar[str | None] = ContextVar("qrme_llm_request_key",
+                                                  default=None)
+
+
+def set_request_key(key: str | None):
+    """Install a caller-supplied API key for the current request; returns the
+    reset token. Middleware owns the set/reset pairing."""
+    return _REQUEST_KEY.set(key or None)
+
+
+def reset_request_key(token) -> None:
+    _REQUEST_KEY.reset(token)
+
+
+def request_key() -> str | None:
+    return _REQUEST_KEY.get()
 
 MODEL = os.environ.get("QRME_MODEL", "claude-opus-5")
 
@@ -58,10 +82,11 @@ class Provider(Protocol):
 class AnthropicProvider:
     """Claude via the official Anthropic SDK."""
 
-    def __init__(self) -> None:
+    def __init__(self, api_key: str | None = None) -> None:
         import anthropic
 
-        self._client = anthropic.Anthropic()
+        self._client = (anthropic.Anthropic(api_key=api_key) if api_key
+                        else anthropic.Anthropic())
 
     def generate(self, system: str, messages: list[dict]) -> str:
         response = self._client.messages.create(
@@ -275,7 +300,9 @@ def default_name() -> str:
     env = os.environ.get("QRME_LLM")
     if env in _REGISTRY and is_configured(env):
         return env
-    if is_configured("anthropic"):
+    # A caller who typed a key in wants a real model, not the stub — and the
+    # product's default model is Claude.
+    if is_configured("anthropic") or request_key():
         return "anthropic"
     return "stub"
 
@@ -287,7 +314,10 @@ def resolve_choice(choice: str | None) -> str:
     is unknown or unconfigured is logged and falls back to the default, so a
     stored preference can never wedge generation."""
     if choice and choice != "auto":
-        if choice in _REGISTRY and is_configured(choice):
+        if choice in _REGISTRY and (is_configured(choice) or request_key()):
+            # A caller-supplied key IS the configuration for their explicit
+            # choice — the deployment needing no credential of its own is the
+            # whole point of bring-your-own.
             return choice
         logger.warning("requested provider %r is not available; using default",
                        choice)
@@ -301,14 +331,17 @@ def _build(name: str) -> Provider:
     stub = StubProvider()
     if name == "stub":
         return stub
+    # The request's own key outranks the deployment's env key: somebody who
+    # typed their credential in expects their requests billed to it.
+    key = request_key() or _env_value(name)
     try:
         if spec["kind"] == "anthropic":
-            primary: Provider = AnthropicProvider()
+            primary: Provider = AnthropicProvider(api_key=request_key())
         elif spec["kind"] == "openai":
             primary = OpenAICompatibleProvider(
-                name, spec["base"], _env_value(name) or "", spec["model"])
+                name, spec["base"], key or "", spec["model"])
         elif spec["kind"] == "gemini":
-            primary = GeminiProvider(_env_value(name) or "", spec["model"])
+            primary = GeminiProvider(key or "", spec["model"])
         else:  # unknown kind — safety net
             return stub
     except Exception as exc:  # noqa: BLE001 — e.g. missing SDK

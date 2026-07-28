@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { api, getBase, setBase, type PairInfo } from "../api";
+import { api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo } from "../api";
 import { useSession } from "../store";
 
 export function Settings() {
   const { session, signOut } = useSession();
   const [base, setBaseInput] = useState(getBase());
+  const [llmKey, setLlmKeyInput] = useState(getLlmKey());
+  const [keySaved, setKeySaved] = useState(false);
   const [offline, setOffline] = useState<Record<string, unknown> | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +39,24 @@ export function Settings() {
         </label>
         <button className="primary" onClick={save}>{saved ? "Saved ✓" : "Save"}</button>
         {error && <div className="error">⚠ {error}</div>}
+      </div>
+
+      <div className="card">
+        <h3>Your model API key</h3>
+        <p className="muted small">
+          Paste your own key (Anthropic <code>sk-ant-…</code>, or OpenAI / xAI /
+          Gemini for those providers) and your profiles' replies run on your
+          credential. It stays on this device and rides only your own requests —
+          the server never stores it. Leave it empty to use whatever key the
+          deployment lends.
+        </p>
+        <label>API key
+          <input type="password" value={llmKey} placeholder="sk-…"
+                 onChange={(e) => setLlmKeyInput(e.target.value)} />
+        </label>
+        <button className="primary" onClick={() => {
+          setLlmKey(llmKey); setKeySaved(true); setTimeout(() => setKeySaved(false), 1500);
+        }}>{keySaved ? "Saved ✓" : llmKey.trim() ? "Save key" : "Clear key"}</button>
       </div>
 
       <div className="card">

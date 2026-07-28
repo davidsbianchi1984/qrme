@@ -21,12 +21,23 @@ export function setBase(url: string) {
   localStorage.setItem("qrme.base", url.replace(/\/+$/, ""));
 }
 
+// Bring-your-own model key: stored on this device only, sent per-request as
+// x-llm-api-key so generations run on the user's own credential. The backend
+// never persists it; without one, the deployment's key (if any) answers.
+export function getLlmKey(): string { return localStorage.getItem("qrme.llmKey") || ""; }
+export function setLlmKey(key: string) {
+  if (key.trim()) localStorage.setItem("qrme.llmKey", key.trim());
+  else localStorage.removeItem("qrme.llmKey");
+}
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (opts.token) headers["authorization"] = `Bearer ${opts.token}`;
+  const llmKey = getLlmKey();
+  if (llmKey) headers["x-llm-api-key"] = llmKey;
   let res: Response;
   try {
     res = await fetch(getBase() + path, {
