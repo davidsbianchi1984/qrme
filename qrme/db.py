@@ -309,6 +309,41 @@ CREATE TABLE IF NOT EXISTS tutorial_progress (
     PRIMARY KEY (learner_id, lesson)
 );
 
+-- Channel 3: a live view through somebody's camera (see qrme/viewfinder.py).
+--
+-- Permission and state only. No frame, no still, no thumbnail — the video
+-- never touches this database and there is deliberately no column it could
+-- land in. A session is a record that somebody agreed to point a camera at
+-- something for a while.
+--
+-- `subject` is what the camera is pointed at, and it is the column everything
+-- else reads from: who may watch is decided by what is in shot rather than by
+-- who is asking. `bystanders` holds what the holder declared about the room,
+-- which is not something this software can observe for itself.
+--
+-- `state` rather than DELETE so a finished session is auditable — "was a
+-- camera live in that room, and who was watching" is exactly the question
+-- asked afterwards.
+CREATE TABLE IF NOT EXISTS camera_sessions (
+    id          TEXT PRIMARY KEY,
+    holder_id   TEXT NOT NULL,
+    surface     TEXT NOT NULL,          -- room | connection | desk | exchange
+    surface_id  TEXT NOT NULL,
+    subject     TEXT NOT NULL,          -- object | place | document | person
+    viewer_kind TEXT NOT NULL,          -- person | profile
+    viewer_id   TEXT NOT NULL,
+    minutes     INTEGER NOT NULL,
+    recording   INTEGER NOT NULL DEFAULT 0,
+    bystanders  TEXT,
+    note        TEXT,
+    state       TEXT NOT NULL DEFAULT 'live',   -- live | ended | expired
+    opened_at   TEXT NOT NULL,
+    ended_at    TEXT,
+    ended_by    TEXT
+);
+CREATE INDEX IF NOT EXISTS camera_sessions_place
+    ON camera_sessions (surface, surface_id, state);
+
 -- What an account has paid for (see qrme/tiers.py). Keyed on the *account*
 -- (`profiles.owner_id`) rather than on a profile, because a membership is
 -- something a person holds and profiles are things they make with it.

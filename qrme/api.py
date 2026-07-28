@@ -32,7 +32,8 @@ from .routers import (apps, assistant, audience, avatars, commerce,
                       frontpage, profiles, research, revisions, robots,
                       sharing, signatures,
                       social, steering,
-                      summon, tiers as tier_routes, tutorial, wall,
+                      summon, tiers as tier_routes, tutorial,
+                      viewfinder as viewfinder_routes, wall,
                       watch, watchparty, watermarks)
 
 
@@ -118,6 +119,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(tutorial.router)
     app.include_router(dock.router)
     app.include_router(tier_routes.router)
+    app.include_router(viewfinder_routes.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
     app.include_router(exchange.router)

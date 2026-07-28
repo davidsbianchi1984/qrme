@@ -33,7 +33,7 @@ def _listing(client, **over):
 
 def _rated_listing(client):
     r = client.post("/profiles", json={
-        "owner_id": "owner-1", "kind": "fictional", "display_name": "Velvet Ivy",
+        "plan": "pro", "owner_id": "owner-1", "kind": "fictional", "display_name": "Velvet Ivy",
         "adult_mode": True, "maturity": "open",
         "persona": "A cabaret hostess persona for adult audiences.",
         "verification": ADULT})

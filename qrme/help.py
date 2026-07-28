@@ -190,6 +190,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "face": ("change my face", "face overlay", "mask", "disguise", "costume",
              "change my background", "background", "backdrop", "blur",
              "be anonymous", "anonymous", "hide my name"),
+    "camera": ("share my camera", "show them", "channel 3", "live camera",
+               "point my camera", "let them see", "show you the problem"),
     "screens": ("wall panel", "kiosk", "fixed screen", "put it on a screen",
                 "second screen", "the corner", "the pane", "the dock",
                 "little box", "mini window"),
@@ -199,7 +201,13 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                "join", "register", "pay", "payment", "card", "checkout"),
     "plans": ("price", "pricing", "cost", "how much", "plan", "plans",
               "subscription", "subscribe", "upgrade", "basic", "pro",
-              "billing", "what do i get", "free"),
+              "billing", "what do i get"),
+    # "free" moved off `plans` and onto this lesson. Somebody typing it is
+    # almost never asking what a tier costs — they are asking what the free
+    # one gives up, and that question has its own screens.
+    "storage": ("free", "is my data private", "private", "privacy",
+                "encrypted", "encryption", "the vault", "vault",
+                "who can read", "where is my data", "in the clear"),
 }
 
 

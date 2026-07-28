@@ -60,7 +60,7 @@ def test_adult_mode_gates_minor_interactors(client):
     profile = client.post(
         "/profiles",
         json={
-            "owner_id": "owner-1",
+            "plan": "pro", "owner_id": "owner-1",
             "kind": "self",
             "display_name": "Adult Persona",
             "persona": "x",

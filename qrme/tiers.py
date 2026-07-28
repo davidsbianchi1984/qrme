@@ -1,11 +1,20 @@
 """Membership: what an account has paid for, and what that entitles it to.
 
-Two plans and a doorway. **Basic** ($20/month) is the entry point to *making*
-anything: your own profiles, and your own agent. **Pro** ($130/month) adds the
-things that reach outside your own account — the marketplace, connectors,
-lent skills, downloads, standing connections, and every modifier and builder
-for the agent. Below both is **visitor**, which is not a plan and costs
-nothing: somebody who scanned a beacon and landed on a page.
+Three plans and a doorway. **Free** ($0) is the whole app with your data in
+the clear. **Basic** ($20/month) is the same app in the encrypted vault —
+twenty dollars buys *privacy*, not capability, and that is the product
+decision `qrme/storage.py` encodes. **Pro** ($130/month) adds the things that
+reach outside your own account: the marketplace, connectors, lent skills,
+downloads, standing connections, and every modifier and builder. Below all
+three is **visitor**, which is not a plan and costs nothing: somebody who
+scanned a beacon and landed on a page.
+
+Free and Basic reaching the same capabilities is deliberate. A free tier
+crippled into uselessness teaches nobody anything about the product; a free
+tier that is honestly *not private* teaches somebody exactly what they are
+choosing between — and :data:`storage.FREE_DISCLOSURE` rides on every surface
+that stores something, so the choice is legible at the moment it matters
+rather than in a Terms of Service.
 
 Visitor is a real state rather than an oversight. QRME's whole reach story is a
 stranger scanning a printed code and arriving somewhere useful — a wall that
@@ -58,11 +67,20 @@ PLANS: dict[str, dict] = {
         "title": "Visitor",
         "means": "read any public page. Scanning a beacon needs no account.",
     },
+    "free": {
+        "price_usd": 0,
+        "period": None,
+        "title": "Free",
+        "means": "the same app as Basic, with your data in the clear. No "
+                 "vault, nothing encrypted under a key you hold, and the "
+                 "people running this deployment can read it.",
+    },
     "basic": {
         "price_usd": 20,
         "period": "month",
         "title": "Basic",
-        "means": "make your own profiles and your own agent.",
+        "means": "the same features as Free, in the encrypted vault. Twenty "
+                 "dollars buys privacy, not capability.",
     },
     "pro": {
         "price_usd": 130,
@@ -73,19 +91,29 @@ PLANS: dict[str, dict] = {
                  "builder for your agent.",
     },
 }
-ORDER = ("visitor", "basic", "pro")
-DEFAULT_PLAN = "basic"          # what creating a profile enrols you on
+ORDER = ("visitor", "free", "basic", "pro")
+# What creating a profile enrols a new account on.
+#
+# Free rather than Basic, and the change is deliberate: putting somebody on a
+# paid plan they did not ask for is the wrong default even when the price is
+# fair, and `storage.FREE_DISCLOSURE` means the cheaper default is also the
+# honest one — they are told plainly what they got.
+DEFAULT_PLAN = "free"
 
 # Every capability, the plan it starts at, and the sentence a refusal returns.
 # The refusal names the plan, because "upgrade to continue" with no price is
 # the pattern people have learned to distrust.
 CAPABILITIES: dict[str, dict] = {
+    # Free and Basic reach exactly the same capabilities. That is the product
+    # decision: twenty dollars buys privacy rather than features, and a free
+    # tier crippled into uselessness teaches nobody anything about the
+    # product. See qrme/storage.py.
     "profiles": {
-        "from": "basic",
+        "from": "free",
         "is": "create and run your own synthetic profiles",
     },
     "own_agent": {
-        "from": "basic",
+        "from": "free",
         "is": "your own personal agent",
     },
     "builders": {
@@ -189,6 +217,20 @@ def plan_of(account_id: str) -> str:
         "SELECT plan FROM memberships WHERE account_id=? AND ended_at IS NULL",
         (account_id,)).fetchone()
     return row["plan"] if row else "visitor"
+
+
+def plan_of_profile(profile_id: str) -> str:
+    """The plan governing a profile's stored work — its owner's.
+
+    A membership belongs to the person, not the profile (`account_of` explains
+    why at length), so anything asking "may this profile's work be sealed" has
+    to resolve through `profiles.owner_id` first. Asking `plan_of(profile_id)`
+    would find no membership under a profile id, return "visitor", and quietly
+    treat every paying member's profile as an open-cloud account.
+    """
+    row = db.connect().execute(
+        "SELECT owner_id FROM profiles WHERE id=?", (profile_id,)).fetchone()
+    return plan_of(row["owner_id"]) if row else "visitor"
 
 
 def entitles(plan: str, capability: str) -> bool:
@@ -348,9 +390,12 @@ def cancel(account_id: str) -> dict:
 
 
 def membership(account_id: str) -> dict:
+    from . import storage
+
     plan = plan_of(account_id)
     spec = PLANS[plan]
     return {
+        "storage": storage.describe(plan),
         "account_id": account_id,
         "plan": plan,
         "title": spec["title"],
@@ -364,11 +409,15 @@ def membership(account_id: str) -> dict:
 
 def catalogue() -> dict:
     """The pricing page, generated from the same table the gate reads."""
+    from . import storage
+
     return {
         "plans": [
             {"plan": p, **PLANS[p], "includes": includes(p),
-             "locked": [c for c in CAPABILITIES if not entitles(p, c)]}
+             "locked": [c for c in CAPABILITIES if not entitles(p, c)],
+             "storage": storage.describe(p)}
             for p in ORDER],
+        "the_difference": storage.vocabulary()["the_difference"],
         "capabilities": CAPABILITIES,
         "billing": "simulated — no real funds move; the subscription is a row",
     }

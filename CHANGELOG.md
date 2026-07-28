@@ -6,6 +6,113 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Platform custody, and a vault gate that asks about the plan** —
+  `storage.CUSTODY`, `storage.vault_for`, `tiers.plan_of_profile`. The free
+  plan is the familiar hosted-assistant arrangement: QRME holds the work and
+  the person has access to it, over ordinary HTTPS, never through a vault.
+  Named as **custody rather than ownership**, deliberately — a product decides
+  who holds and operates a record, and does not get to decide away somebody's
+  statutory rights over their own personal data.
+
+### Fixed
+
+- **The README's own arithmetic was wrong.** `qrme/storage.py` claimed 23
+  tests against 38, `qrme/dock.py` claimed 30 against 34. A number in prose is
+  a duplicate of something the repository already knows, and nothing fails when
+  a file grows a test — so nothing did, in a document whose whole pitch is that
+  its claims are checked. A guard now verifies every "`module.py`, N tests"
+  claim against the files.
+
+- **Stale copy behind a growing list.** `SENSITIVE` gained `clinical_note`
+  and four pieces of user-facing copy went on saying **two things are
+  refused**: screen 138's card, screen 140's subtitle, the walkthrough lesson
+  and a README heading. Screen 140 also never drew the third refusal at all. A
+  number written into prose is a duplicate of a list and drifts silently —
+  nothing fails when a dict grows an entry. The copy no longer counts in prose,
+  screen 140 names all three, and two guards hold it: one rejecting a hardcoded
+  count that disagrees with `len(SENSITIVE)`, one asserting the screen names
+  every kind on the list.
+
+- **`docs/tandem.md` described sealing as unconditional.** It was written when
+  a paid plan was the only kind. Now says which plans reach PDI at all —
+  byte-identical in all three repositories, as that file always is.
+
+- **A free account's work was being sealed into the vault.** Every seal point
+  read `if pdi is not None` — whether the *deployment* has a vault, not
+  whether the *account* is on a plan that uses one. On a PDI-backed
+  deployment that put a free account's work in a vault it was not paying for
+  and could not hold a key to. `storage.vault_for(plan, pdi)` is now the one
+  place the question is asked. Guarded by counting vault writes rather than
+  by reading call sites.
+
+  Reads and deletions deliberately keep the real vault: a plan-gated vault on
+  a read strands a downgraded account's history behind a billing change, and
+  on a delete it leaves records nobody can reach and calls that erasure.
+  Signing keeps it too — a signer is frequently an interactor with no
+  membership, and gating `signatures._seal` by their plan would quietly stop
+  writing the custody chain a referral depends on.
+
+- **A clinician's note about a real person could land in the open store.**
+  The referral flow writes through `referral.reply` rather than `add_source`,
+  so the third-party-source rule — which is the same rule — never saw it.
+  `clinical_note` joins `SENSITIVE`, refused at `POST /referrals/prepare`
+  before any clinician is contacted, because refusing when the note comes back
+  would strand a real person who has already been written to.
+
+- **A refusal test that proved nothing.** `test_the_refusal_lands_before_any_clinician_is_contacted`
+  passed with the guard removed, because it used a nonexistent provider and
+  failed at "no such clinician" either way. A refusal test has to be reached
+  by a request that would otherwise succeed; it now builds the whole flow.
+
+- **A free plan, with nothing private about it** — `qrme/storage.py`, 23 tests,
+  screens 138, 139 and 140. Two storage postures: **open cloud** (Free — the
+  platform's own database, in the clear) and **encrypted vault** (Basic and
+  Pro — sealed in PDI under a key you can hold, with a tamper-evident chain).
+  `DEFAULT_PLAN` is now `free`, and the ladder runs visitor → free → basic →
+  pro.
+
+  **Free and Basic reach identical capabilities** — `includes("free") ==
+  includes("basic")`, asserted by test. What $20 buys is privacy, not a
+  feature. A free tier crippled into uselessness teaches nobody anything about
+  the product; a free tier that is honestly *not private* teaches somebody
+  exactly what they are choosing between.
+
+  **The disclosure is structural.** `storage.describe()` rides on `GET /plans`,
+  `GET /memberships/{id}` and the body returned when a profile is created, and
+  `not_private` is a field rather than a footnote. The open posture names its
+  readers — *you, anyone you share with, the people who operate this
+  deployment, anyone with lawful access to it* — because "industry-standard
+  security" is what a product says when it does not want to finish the
+  sentence.
+
+  **Two payloads are refused rather than quietly exposed**, and the test for
+  the list is not *would the account holder mind* but **whose exposure is it**:
+  source material about somebody else, and anything behind the age gate. Both
+  are cases where the person harmed is frequently not the person who clicked.
+
+### Fixed
+
+- **A signing credential was on the sensitive list and should never have
+  been.** It reads like the most sensitive thing in the product and is not a
+  storage-at-rest risk at all — WebAuthn keeps the private key on the device,
+  so an open store has nothing to expose. Gating it also broke signing
+  outright: a signer is frequently an interactor with no membership, so
+  `plan_of` returned "visitor", the posture came back open, and every
+  enrolment was refused. The reasoning is recorded in the module so it cannot
+  be re-added by intuition.
+
+- **A hard line was being answered with a price.** A rated profile *of another
+  real person* is refused at any amount, and the storage-posture check ran
+  first — so the response was 402, telling somebody the line is a price. It is
+  not. The check now runs after the hard line, and
+  `test_a_hard_line_is_never_answered_with_a_price` holds the order.
+
+- **The rated-content check ran before enrolment**, so a brand-new account was
+  still "visitor" at that line and every rated profile was refused. It now
+  reads the plan being asked for, falling back to `DEFAULT_PLAN`.
+
 ## [0.4.0] — 2026-07-27
 
 The round where the products got a price, and a guide that walks you to

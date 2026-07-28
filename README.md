@@ -309,6 +309,16 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/134-youre-on-basic.svg"><img src="docs/screens/134-youre-on-basic.svg" width="210" alt="You are on Basic"></a><br><sub><b>134</b> · You're on Basic</sub></td>
     <td align="center" width="33%"><a href="docs/screens/135-this-needs-pro.svg"><img src="docs/screens/135-this-needs-pro.svg" width="210" alt="This Needs Pro"></a><br><sub><b>135</b> · This Needs Pro</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/136-show-them.svg"><img src="docs/screens/136-show-them.svg" width="210" alt="Show Them"></a><br><sub><b>136</b> · Show Them</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/137-whats-in-shot.svg"><img src="docs/screens/137-whats-in-shot.svg" width="210" alt="Whats In Shot"></a><br><sub><b>137</b> · What's In Shot</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/138-youre-on-free.svg"><img src="docs/screens/138-youre-on-free.svg" width="210" alt="You are on Free"></a><br><sub><b>138</b> · You're on Free</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/139-where-it-lives.svg"><img src="docs/screens/139-where-it-lives.svg" width="210" alt="Where It Lives"></a><br><sub><b>139</b> · Where It Lives</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/140-not-on-free.svg"><img src="docs/screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
+    <td align="center" width="33%"></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1567,17 +1577,100 @@ repository has already shipped a screen nothing referenced.
 **Progress is recorded per step rather than as a cursor**, so somebody who
 skipped ahead and came back is not told they finished things they never saw.
 
+## Channel 3 — sharing your camera
+
+`qrme/viewfinder.py`, 7 routes, 28 tests, screens **136** and **137**.
+
+Channel 2 lent the profiles an ear. This lends an eye: a live view through the
+camera in your hand, for the enormous class of problems where **describing the
+thing is the hard part and showing it is trivial**. A mechanic looking at your
+engine bay. A plumber watching you point at the joint. An electrician reading
+the plate on a consumer unit. A vet watching a dog walk.
+
+JIM-mini's `capture.py` is the still, sealed, asynchronous version of the same
+idea, and the difference is the whole module. **A photograph is one framed
+moment somebody chose. A live camera is whatever happens to be behind it** —
+the rest of the room, the post on the table, the child in the doorway. Somebody
+who agreed to *"show you the leak"* did not agree to any of that.
+
+### What is in shot decides the rules, not who is watching
+
+This is the inversion the module is built on. The obvious approach gates on the
+viewer — *is it a person or a profile* — and it gets both important cases
+wrong. A profile that can see an engine bay is genuinely useful and the stakes
+are a car. A real stranger watching a live view of somebody's body is not made
+safe by being human.
+
+| in shot | a person may watch | a synthetic profile may watch |
+| --- | --- | --- |
+| **object** — engine, boiler, board, leak | ✅ | ✅ |
+| **document** — paper, a plate, a meter | ✅ | ✅ |
+| **place** — a room, a site, a yard | ✅ | ✅ |
+| **person** — a body, an injury, how somebody moves | ✅ | ❌ |
+
+The refusal is published by name with its reason, and it points somewhere
+useful: a profile watching a body in real time would be making judgements about
+it with no examination, no accountability and nobody to answer for being wrong
+— and unlike a still, there is no moment somebody chose to send. JIM-mini
+reaches the same conclusion from the other direction, where a photograph of a
+rash is never handed to an agent.
+
+### The viewer never controls the camera
+
+No remote zoom, no focus, no lens switch, no torch, no capture trigger. **The
+person holding the phone points it**, and `viewfinder.NEVER` says so out loud —
+a remote party who can operate the camera on somebody's device has something
+categorically different from a view, and it is the thing people are actually
+afraid of when they decline. A test reads the router and asserts no route looks
+like camera control, because the easy way to add a zoom button is a new
+endpoint rather than a new argument.
+
+Also never: any other camera on the device, coordinates, a session that starts
+without the holder starting it in the moment, and any state where it is running
+and not visible on the holder's own screen.
+
+### Ephemeral, capped, and yours to end
+
+It records nothing unless somebody says so. Fifteen minutes by default, **45 as
+the ceiling** — long enough to look at an engine properly, short enough that a
+forgotten session is measured in minutes rather than a working day. Two to open
+and one to close, the shape `sharing.py` uses for a lent skill: symmetric
+consent to start makes it a loan, asymmetric consent to end stops it being a
+trap. And it dies with the surface, because nobody remembers a permission
+granted inside a conversation that finished.
+
+The disclosure is a first-class read rather than something a client assembles,
+and it is **not** open to anybody holding the surface id — a room id rides on
+printed beacon stickers, and *"who has a camera live in there, and is it
+recording"* is exactly what a stranger who scanned one must not be able to ask.
+That mistake shipped once in `roommic`.
+
+### Bystanders are the unsolved part, and it says so
+
+Nothing here can tell whether somebody walked into frame. A "bystander
+detection" toggle would be **worse than the gap**, because it would be relied
+on. So the honest version is a note addressed to the only party who can
+actually see the room: *we cannot tell whether somebody has walked into shot,
+or blur them if they have; you can look at the room before you start, and stop
+the moment it stops being about the thing.*
+
 ## Membership
 
 `qrme/tiers.py`, 4 routes, 26 tests, screens **130** and **131**.
 
-Two plans and a doorway below them.
+Three plans and a doorway below them.
 
 | | | |
 | --- | --- | --- |
 | **Visitor** | free | read any public page — a scanned beacon needs no account |
-| **Basic** | **$20/month** | make your own profiles and your own agent |
+| **Free** | **$0** | make your own profiles and your own agent, stored in the clear |
+| **Basic** | **$20/month** | the same, sealed in the vault under a key you can hold |
 | **Pro** | **$130/month** | everything that leaves your account: the marketplace, connectors, skills, downloads, connections, and every modifier and builder |
+
+**Free and Basic reach identical capabilities, and that is deliberate** —
+`includes("free") == includes("basic")`, asserted by test. What $20 buys is
+`qrme/storage.py`'s vault posture, not a feature. See *[Where your data
+lives](#where-your-data-lives)* below.
 
 **Money here is simulated**, exactly as in `commerce.py` — subscribing writes a
 row and moves no real funds, and every response that names a price says so in
@@ -1628,9 +1721,126 @@ profile must not quietly move somebody off Pro. **Cancelling keeps the
 profiles** — a lapsed subscription is not a reason to delete somebody's work,
 and a product that deleted it is one nobody could safely try.
 
+## Where your data lives
+
+`qrme/storage.py`, 38 tests, screens **138**, **139** and **140**.
+
+There are two postures, and the difference between them is the whole of what
+Basic buys.
+
+| | | |
+| --- | --- | --- |
+| **Open cloud** | Free | the platform's own database, in the clear. The operator can read it, a backup contains it, a subpoena reaches it |
+| **Encrypted vault** | Basic, Pro | sealed in PDI before it lands, under a key you can hold yourself, with a tamper-evident chain over every access |
+
+**Free and paid differ in where your data lives, not in what you can do.** A
+free tier crippled into uselessness teaches nobody anything about the product;
+a free tier that is honestly *not private* teaches somebody exactly what they
+are choosing between.
+
+### Who holds it
+
+The other half of the same question, and the one the free plan is really
+about. `storage.CUSTODY` names two arrangements:
+
+| | | |
+| --- | --- | --- |
+| **Platform custody** | Free | QRME holds your work and you have access to it — the familiar hosted-assistant arrangement. It reaches us over ordinary HTTPS, sits in our own database, and never goes through a vault |
+| **Your custody** | Basic, Pro | sealed in PDI before it lands, under a key you can hold. We operate the service; we do not hold the contents |
+
+**Custody, not ownership, and the word is deliberate.** A product gets to
+decide who *holds and operates* a record. It does not get to decide away
+somebody's statutory rights over their own personal data — access,
+rectification, erasure and portability survive whatever a plan says, in every
+jurisdiction that has them. A tier table claiming "the platform owns your
+data" would be claiming something no court would honour, and this repository
+does not put claims in tables it cannot keep. `test_custody_is_never_described_as_ownership`
+checks the values a user is actually shown.
+
+**The vault gate asks about the plan, not the deployment — and it did not
+used to.** Every seal point read `if pdi is not None`, which is whether the
+*operator* configured a vault. So a free account on a PDI-backed deployment
+had its work sealed into a vault it was not paying for and could not hold a
+key to. `storage.vault_for(plan, pdi)` is now the one place that question is
+asked, and `test_a_free_account_puts_nothing_in_the_vault` counts writes
+rather than reading call sites — because reading call sites is how twenty of
+them stayed wrong.
+
+**Writes only. Reads and deletions keep the real vault, always.** Somebody
+who was on Basic for a year and moved to Free still has a year of sealed
+records: they have to be able to read them back, and erasure has to be able to
+purge them. A plan-gated vault on a read strands somebody's history behind a
+billing change; on a delete it leaves records nobody can reach and calls that
+erasure. Both are worse than the bug the gate fixes, and both are asserted.
+
+**Signing deliberately keeps the real vault whatever the plan**, because a
+signer is frequently an *interactor* with no membership at all — gating
+`signatures._seal` by their plan returns None and the custody chain a referral
+depends on quietly stops being written. That is the same trap that put
+`signature` on the sensitive list in the first draft, and it is recorded in
+the module so the loop is not closed the tidy-looking way.
+
+**So the disclosure is structural.** `storage.describe()` is carried on every
+surface that names a plan — `GET /plans`, `GET /memberships/{id}`, and the body
+returned when a profile is created — and `not_private` is a **field**, not a
+footnote. A privacy claim that lives in a Terms of Service and not in the
+response body is a claim nobody reads at the moment it matters. And the open
+posture names its readers rather than gesturing at them: *you, anyone you share
+with, the people who operate this deployment, anyone with lawful access to it.*
+"Industry-standard security" is what a product says when it does not want to
+finish the sentence.
+
+**Some payloads are refused rather than quietly exposed**, and the test for
+the list is not *would the account holder mind* — it is **whose exposure is
+it**:
+
+- **source material about somebody else.** They did not pick this plan.
+- **anything behind the age gate.** Rated content needs the vault.
+- **a clinician's written opinion about a real person.** The patient did not
+  pick this plan either — and this one reached the open store because the
+  referral flow writes through `referral.reply` rather than `add_source`, so
+  the third-party rule above, which is the same rule, never saw it. Refused at
+  `POST /referrals/prepare`, **before any clinician is contacted**: refusing
+  when the note comes back would strand a real person who has already been
+  written to, mid-flow, holding words they cannot file.
+
+Both are payloads where the person harmed is frequently not the person who
+clicked. Letting free store anything and warning loudly sounds more respectful
+of the user's autonomy and is not, for exactly that reason.
+
+The list is short on purpose and holds only what *this* repository can refuse —
+`test_every_sensitive_kind_is_enforced_somewhere` fails if a kind is named
+here that nothing outside `storage.py` actually checks. The first draft named
+`body_image` and `medical`, which are JIM-mini's payloads and unreachable from
+here, and a `signature`, which is **not a storage-at-rest risk at all**:
+WebAuthn keeps the private key on the device, so there is nothing for an open
+store to expose. Gating it also broke signing outright, because a signer is
+frequently an interactor with no membership — `plan_of` returned "visitor", the
+posture came back open, and every enrolment was refused. A sensitive list
+assembled from which words sound alarming is how that happens.
+
+**A hard line is never answered with a price.** A rated profile *of another
+real person* is refused at any amount, and the first version checked the
+storage posture first — so the response was **402**, telling somebody the line
+is a price. It is not. The check now runs after the hard line, and
+`test_a_hard_line_is_never_answered_with_a_price` holds the order.
+
+**A downgrade never unseals anything.** Moving from Basic to Free leaves
+everything already sealed exactly where it is; only new content goes to the
+open store. A billing event that silently declassified a year of somebody's
+records would be the worst thing this module could do, so `downgrade_effect`
+exists to *state* the rule rather than to perform it — a test asserts it
+contains no write at all.
+
+**And an upgrade does not un-expose anything.** Content written in the clear
+was in the clear. Sealing it afterwards protects it from here on and changes
+nothing about the backups, logs and copies that already exist, and
+`upgrade_effect` says so in those words. A product that implied otherwise
+would be selling absolution rather than encryption.
+
 ## The pane in the corner
 
-`qrme/dock.py`, 5 routes, 30 tests, screens **128** and **129**.
+`qrme/dock.py`, 5 routes, 34 tests, screens **128** and **129**.
 
 The watch faces answer *what am I currently presenting as* without making you
 leave what you are doing, and a fixed screen does the same for a wall. Both need

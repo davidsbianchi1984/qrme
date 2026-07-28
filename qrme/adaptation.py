@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 
-from . import db
+from . import db, storage, tiers
 
 _ALPHA = 0.3          # EMA step for per-interaction updates
 
@@ -152,6 +152,7 @@ def finetune(profile_id: str, pdi=None) -> dict:
 
     run_id = db.new_id("ftr")
     vault_key = None
+    pdi = storage.vault_for(tiers.plan_of_profile(profile_id), pdi)
     if pdi is not None and artifact:
         vault_key = f"qrme/{profile_id}/adaptation/{run_id}"
         pdi.put(vault_key, json.dumps(artifact))

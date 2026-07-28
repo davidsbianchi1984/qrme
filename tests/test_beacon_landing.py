@@ -11,7 +11,8 @@ from qrme import db
 
 
 def _profile(client, **over):
-    body = {"owner_id": "o1", "kind": "fictional", "display_name": "Marcus Bell",
+    body = {"plan": "pro",
+            "owner_id": "o1", "kind": "fictional", "display_name": "Marcus Bell",
             "persona": "A retired fee-only financial planner.",
             "verification": {"birthdate": "1980-01-01",
                              "id_document": "passport", "liveness_check": True}}

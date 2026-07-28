@@ -19,7 +19,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from . import db, llm, moderation, persona, watermark
+from . import db, llm, moderation, persona, storage, tiers, watermark
 
 SELF_NAMES = ("Sage", "Iris", "Wren", "Nova", "Juno", "Arlo", "Mira", "Rae")
 
@@ -104,6 +104,9 @@ def sunset(profile: dict, pdi=None, cloud=None) -> dict:
     conn.commit()
 
     archive_key = None
+    # The plan, not the deployment: a free account's archive stays in the
+    # open store with the rest of its work. See `qrme/storage.py`.
+    pdi = storage.vault_for(tiers.plan_of_profile(profile["id"]), pdi)
     if pdi is not None:
         archive_key = f"qrme/{profile['id']}/archive/sunset"
         pdi.put(archive_key, json.dumps({
