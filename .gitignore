@@ -35,3 +35,8 @@ Thumbs.db
 
 # tools/mark_verified.py --preview writes here; a preview is not an artifact.
 verified-preview.png
+
+# PyInstaller writes the generated build spec into the working directory when
+# the backend is frozen locally; the release workflow regenerates it from
+# flags, so it is a build artifact rather than source.
+*.spec
