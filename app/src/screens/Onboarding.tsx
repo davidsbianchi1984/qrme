@@ -10,7 +10,9 @@ export function Onboarding() {
   const [persona, setPersona] = useState(
     "A warm, curious digital version of me — remembers what matters and speaks plainly.",
   );
-  const [birthdate, setBirthdate] = useState("1990-06-01");
+  // Empty, not a sample date: this field is age verification, and a
+  // pre-filled birthdate is a wrong answer already submitted.
+  const [birthdate, setBirthdate] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +85,7 @@ export function Onboarding() {
 
         {error && <div className="error">⚠ {error}</div>}
 
-        <button className="primary" disabled={busy} onClick={create}>
+        <button className="primary" disabled={busy || !birthdate} onClick={create}>
           {busy ? "Creating…" : "Create My Profile"}
         </button>
         <p className="hint">
