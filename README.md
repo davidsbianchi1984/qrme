@@ -2846,7 +2846,7 @@ of the screens above and want to know what it does, this is where to find it.
 - **Storage**: SQLite (`qrme/db.py`), path via `QRME_DB` (default `qrme.db`).
 - **Persona conditioning**: `qrme/persona.py` builds the system prompt from
   profile identity + relationship + engagement + aging.
-- **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-4-8`
+- **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-5`
   with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.
 - **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
@@ -2956,7 +2956,7 @@ phone itself): set `QRME_LAN_HOST` to this machine's address and restart.
 <tr><td valign="top"><sub><code>QRME_DB</code></sub></td><td valign="top"><sub><code>qrme.db</code></sub></td><td valign="top"><sub>SQLite database path</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_LLM</code></sub></td><td valign="top"><sub>auto</sub></td><td valign="top"><sub><code>stub</code> forces the offline deterministic provider; <code>anthropic</code> forces the SDK</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_OFFLINE</code></sub></td><td valign="top"><sub>off</sub></td><td valign="top"><sub><code>1</code>/<code>true</code> runs <b>fully offline</b>: local inference only (Anthropic SDK and cloud gateway bypassed even if configured), cloud never attached, embeddings/fine-tuning recomputed on-host. <code>GET /offline/status</code> reports the posture</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_MODEL</code></sub></td><td valign="top"><sub><code>claude-opus-4-8</code></sub></td><td valign="top"><sub>Model used for profile replies</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_MODEL</code></sub></td><td valign="top"><sub><code>claude-opus-5</code></sub></td><td valign="top"><sub>Model used for profile replies</sub></td></tr>
 <tr><td valign="top"><sub><code>ANTHROPIC_API_KEY</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Enables real model replies</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_PDI_URL</code> / <code>QRME_PDI_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>PDI tandem: seal source material in the encrypted vault</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_CLOUD_URL</code> / <code>QRME_CLOUD_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution (<a href="docs/cloud-model.md">docs/cloud-model.md</a>)</sub></td></tr>
