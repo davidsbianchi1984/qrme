@@ -103,6 +103,19 @@ SENSITIVE: dict[str, str] = {
     "third_party_source": "source material about a person who is not you — "
                           "they did not pick this plan",
     "rated_content": "content behind the age gate",
+    # A real clinician's written opinion about a real person, arriving through
+    # `qrme/referral.py`. It reached the open store because the referral flow
+    # writes through `referral.reply` rather than `add_source`, so the
+    # third-party rule above — which is the same rule — never saw it. The
+    # patient is frequently not the account holder, which is the whole test.
+    #
+    # Refused at *preparation*, before any clinician is contacted, rather than
+    # at the reply. Refusing when the note arrives would strand a real person
+    # who has already been written to, mid-flow, holding words they cannot
+    # file. Same reasoning as JIM-mini refusing a child at enrolment rather
+    # than at the first journal entry.
+    "clinical_note": "a clinician's written opinion about a real person — "
+                     "the patient did not pick this plan",
 }
 
 # Deliberately *not* here, and worth recording because the first version got it
@@ -119,11 +132,65 @@ SENSITIVE: dict[str, str] = {
 # happens.
 
 FREE_DISCLOSURE = (
-    "This account is on the free plan. Your data is stored in the clear — no "
-    "vault, no encryption you hold the key to, and the people who run this "
-    "deployment can read it. That is what free means here, and it is the only "
-    "difference from Basic: the features are the same."
+    "This account is on the free plan. QRME holds your work and you have "
+    "access to it — it reaches us over ordinary HTTPS, sits in our own "
+    "database in the clear, and never goes through a vault. No encryption you "
+    "hold the key to, no record of who read what, and the people who run this "
+    "deployment can read all of it. That is what free means here, and it is "
+    "the only difference from Basic: the features are the same."
 )
+
+
+# Who holds the record — a separate question from whether it is encrypted, and
+# the one the free plan is really about.
+#
+# On an open-cloud plan the arrangement is the familiar hosted-assistant one:
+# **QRME holds the data and the person has access to it.** It reaches the
+# platform over ordinary HTTPS, lands in the platform's own database, and stays
+# there. The account can read it back for as long as the account exists. It is
+# not sealed under a key they hold, there is no chain proving what was read,
+# and no vault is involved at any point.
+#
+# "Custody", not "ownership", and the word is chosen carefully. A product gets
+# to decide who *holds and operates* a record. It does not get to decide away
+# somebody's statutory rights over their own personal data — access,
+# rectification, erasure and portability survive whatever a plan says, in
+# every jurisdiction that has them. Writing an ownership claim into a tier
+# table would claim what the law does not grant, and this repository does not
+# put claims in tables it cannot keep.
+CUSTODY: dict[str, dict] = {
+    "platform": {
+        "held_by": "QRME",
+        "means": "we host your work and you have access to it, the way a "
+                 "hosted assistant works. It is ours to operate; it is not "
+                 "sealed to you.",
+        "transport": "ordinary HTTPS to this platform's API",
+        "user_holds_a_key": False,
+        "returning_access": True,
+        "goes_through_a_vault": False,
+        "access_record": "none is kept — there is no audit chain on this plan",
+        "erasure": "ask and we delete it. Best effort, and no proof is issued "
+                   "— backups and logs roll off on their own schedule.",
+    },
+    "user": {
+        "held_by": "you",
+        "means": "sealed in PDI before it lands, under a key you can hold "
+                 "yourself. We operate the service; we do not hold the "
+                 "contents.",
+        "transport": "sealed to the PDI vault, which may be your own device",
+        "user_holds_a_key": True,
+        "returning_access": True,
+        "goes_through_a_vault": True,
+        "access_record": "every store, read and erase lands in a "
+                         "tamper-evident chain you can verify",
+        "erasure": "real and provable — the vault record is purged and the "
+                   "chain shows it happened",
+    },
+}
+
+# Posture -> custody. They move together by construction rather than as two
+# tables somebody has to keep in step.
+CUSTODY_OF: dict[str, str] = {"open_cloud": "platform", "vault": "user"}
 
 
 class StorageError(ValueError):
@@ -133,6 +200,41 @@ class StorageError(ValueError):
 def posture_of(plan: str) -> str:
     """The one place this question is answered."""
     return BY_PLAN.get(plan, "open_cloud")
+
+
+def custody_of(plan: str) -> str:
+    """Who holds this account's work."""
+    return CUSTODY_OF[posture_of(plan)]
+
+
+def vault_for(plan: str, pdi):
+    """The vault this account's **writes** go to, or None.
+
+    The one place the question is asked, and it asks about the *plan* rather
+    than the deployment. Every seal point here used to read
+    `if pdi is not None`, which is whether the operator configured a vault —
+    so a free account on a PDI-backed deployment had its work sealed into a
+    vault it was not paying for and could not hold a key to. Free is platform
+    custody over plain HTTPS; that gate was asking the wrong question.
+
+    **Writes only. Reads and deletions keep the real vault, always.** Somebody
+    who was on Basic for a year and moved to Free still has a year of sealed
+    records: they have to be able to read them back, and erasure has to be
+    able to purge them. A plan-gated vault on a read strands somebody's
+    history behind a billing change; on a delete it leaves records nobody can
+    reach and calls that erasure.
+
+    **Not used for signing.** `signatures._seal` keeps the real vault whatever
+    the plan, because a signer is frequently an *interactor* with no
+    membership at all — `plan_of` returns "visitor", this would return None,
+    and the custody chain a referral depends on would quietly stop being
+    written. That is the same trap that put `signature` on SENSITIVE in the
+    first draft of this module, and it is recorded here so the next person
+    does not close the loop the tidy-looking way.
+    """
+    if pdi is None:
+        return None
+    return pdi if is_private(plan) else None
 
 
 def is_private(plan: str) -> bool:
@@ -160,6 +262,8 @@ def describe(plan: str) -> dict:
         "you_hold_a_key": spec["you_hold_a_key"],
         "disclosure": FREE_DISCLOSURE if not spec["private"] else None,
         "refused_here": sorted(SENSITIVE) if not spec["private"] else [],
+        # Who holds it, which is the question the free plan is really about.
+        "custody": {"who": custody_of(plan), **CUSTODY[custody_of(plan)]},
     }
 
 
@@ -236,8 +340,10 @@ def vocabulary() -> dict:
     return {
         "postures": POSTURES,
         "by_plan": BY_PLAN,
+        "custody": CUSTODY,
+        "custody_of": CUSTODY_OF,
         "sensitive": SENSITIVE,
         "free_disclosure": FREE_DISCLOSURE,
         "the_difference": "Free and Basic run the same app. The difference is "
-                          "where your data lives.",
+                          "where your data lives, and who holds it.",
     }

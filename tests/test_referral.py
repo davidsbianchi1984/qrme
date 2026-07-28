@@ -19,7 +19,7 @@ from tests.test_signatures import Authenticator
 def setup(client):
     """A profile, an interactor with a signing credential, and a session."""
     prof = client.post("/profiles", json={
-        "owner_id": "o1", "kind": "fictional",
+        "owner_id": "o1", "kind": "fictional", "plan": "basic",
         "display_name": "Dr. Amara Osei", "persona": "A physician.",
         "verification": {"birthdate": "1980-01-01"}}).json()
     owner = {"authorization": f"Bearer {prof['owner_token']}"}
@@ -116,7 +116,7 @@ def test_prepare_shows_the_package_and_releases_nothing(setup):
 
 def test_a_referral_with_nothing_to_refer_is_refused(client):
     prof = client.post("/profiles", json={
-        "owner_id": "o1", "kind": "fictional", "display_name": "Dr. Osei",
+        "owner_id": "o1", "kind": "fictional", "plan": "basic", "display_name": "Dr. Osei",
         "persona": "A physician.",
         "verification": {"birthdate": "1980-01-01"}}).json()
     it = client.post("/interactors", json={"display_name": "Dana",
@@ -135,7 +135,7 @@ def test_an_account_with_no_high_tier_credential_is_told_why(client):
     """Silently dropping to a weaker tier would be the checkbox again wearing
     a signature's name."""
     prof = client.post("/profiles", json={
-        "owner_id": "o1", "kind": "fictional", "display_name": "Dr. Osei",
+        "owner_id": "o1", "kind": "fictional", "plan": "basic", "display_name": "Dr. Osei",
         "persona": "A physician.",
         "verification": {"birthdate": "1980-01-01"}}).json()
     owner = {"authorization": f"Bearer {prof['owner_token']}"}
@@ -464,7 +464,7 @@ def test_the_note_is_sealed_in_the_pdi_vault(pdi_pair):
     vault, QRME keeps only a key reference, and it resolves on read."""
     client, fake = pdi_pair
     prof = client.post("/profiles", json={
-        "owner_id": "o1", "kind": "fictional",
+        "owner_id": "o1", "kind": "fictional", "plan": "basic",
         "display_name": "Dr. Amara Osei", "persona": "A physician.",
         "verification": {"birthdate": "1980-01-01"}}).json()
     owner = {"authorization": f"Bearer {prof['owner_token']}"}

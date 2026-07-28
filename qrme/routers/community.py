@@ -23,7 +23,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (auth, db, engagement, identity, llm, marketplace, moderation,
-                persona, referral, roommic, watermark)
+                persona, referral, roommic, storage, tiers, watermark)
 from ..common import (age_of, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
@@ -683,6 +683,15 @@ def prepare_referral(body: ReferralPrepare, request: Request) -> dict:
     interactor = interactor_or_404(body.interactor_id)
     require_interactor(body.interactor_id, request)
     profile = profile_or_404(body.profile_id)
+    # Refused here, before any clinician is contacted, rather than when the
+    # note comes back. A clinician's written opinion about a real person does
+    # not go in the open store, and refusing at the reply would strand a real
+    # person who has already been written to, mid-flow, holding words they
+    # cannot file. See `storage.SENSITIVE["clinical_note"]`.
+    try:
+        storage.require(tiers.plan_of_profile(profile["id"]), "clinical_note")
+    except storage.StorageError as exc:
+        raise HTTPException(402, str(exc)) from None
     try:
         return referral.prepare(
             interactor, profile, body.provider_id,

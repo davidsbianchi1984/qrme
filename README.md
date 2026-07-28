@@ -1738,6 +1738,48 @@ free tier crippled into uselessness teaches nobody anything about the product;
 a free tier that is honestly *not private* teaches somebody exactly what they
 are choosing between.
 
+### Who holds it
+
+The other half of the same question, and the one the free plan is really
+about. `storage.CUSTODY` names two arrangements:
+
+| | | |
+| --- | --- | --- |
+| **Platform custody** | Free | QRME holds your work and you have access to it — the familiar hosted-assistant arrangement. It reaches us over ordinary HTTPS, sits in our own database, and never goes through a vault |
+| **Your custody** | Basic, Pro | sealed in PDI before it lands, under a key you can hold. We operate the service; we do not hold the contents |
+
+**Custody, not ownership, and the word is deliberate.** A product gets to
+decide who *holds and operates* a record. It does not get to decide away
+somebody's statutory rights over their own personal data — access,
+rectification, erasure and portability survive whatever a plan says, in every
+jurisdiction that has them. A tier table claiming "the platform owns your
+data" would be claiming something no court would honour, and this repository
+does not put claims in tables it cannot keep. `test_custody_is_never_described_as_ownership`
+checks the values a user is actually shown.
+
+**The vault gate asks about the plan, not the deployment — and it did not
+used to.** Every seal point read `if pdi is not None`, which is whether the
+*operator* configured a vault. So a free account on a PDI-backed deployment
+had its work sealed into a vault it was not paying for and could not hold a
+key to. `storage.vault_for(plan, pdi)` is now the one place that question is
+asked, and `test_a_free_account_puts_nothing_in_the_vault` counts writes
+rather than reading call sites — because reading call sites is how twenty of
+them stayed wrong.
+
+**Writes only. Reads and deletions keep the real vault, always.** Somebody
+who was on Basic for a year and moved to Free still has a year of sealed
+records: they have to be able to read them back, and erasure has to be able to
+purge them. A plan-gated vault on a read strands somebody's history behind a
+billing change; on a delete it leaves records nobody can reach and calls that
+erasure. Both are worse than the bug the gate fixes, and both are asserted.
+
+**Signing deliberately keeps the real vault whatever the plan**, because a
+signer is frequently an *interactor* with no membership at all — gating
+`signatures._seal` by their plan returns None and the custody chain a referral
+depends on quietly stops being written. That is the same trap that put
+`signature` on the sensitive list in the first draft, and it is recorded in
+the module so the loop is not closed the tidy-looking way.
+
 **So the disclosure is structural.** `storage.describe()` is carried on every
 surface that names a plan — `GET /plans`, `GET /memberships/{id}`, and the body
 returned when a profile is created — and `not_private` is a **field**, not a
@@ -1753,6 +1795,13 @@ list is not *would the account holder mind* — it is **whose exposure is it**:
 
 - **source material about somebody else.** They did not pick this plan.
 - **anything behind the age gate.** Rated content needs the vault.
+- **a clinician's written opinion about a real person.** The patient did not
+  pick this plan either — and this one reached the open store because the
+  referral flow writes through `referral.reply` rather than `add_source`, so
+  the third-party rule above, which is the same rule, never saw it. Refused at
+  `POST /referrals/prepare`, **before any clinician is contacted**: refusing
+  when the note comes back would strand a real person who has already been
+  written to, mid-flow, holding words they cannot file.
 
 Both are payloads where the person harmed is frequently not the person who
 clicked. Letting free store anything and warning loudly sounds more respectful

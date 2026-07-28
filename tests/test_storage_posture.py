@@ -255,3 +255,178 @@ def test_free_is_still_refused_the_paid_capabilities(client):
                     headers=auth_header(me))
     assert r.status_code == 402
     assert r.json()["detail"]["needs"] == "pro"
+
+
+# -- platform custody: free never reaches the vault ----------------------------
+
+class CountingVault:
+    """A vault that records every write, so a test can assert there were none."""
+
+    def __init__(self):
+        self.store: dict[str, str] = {}
+        self.writes: list[str] = []
+
+    def put(self, key, value):
+        self.writes.append(key)
+        self.store[key] = value
+
+    def get(self, key):
+        return self.store.get(key)
+
+    def delete(self, key):
+        return self.store.pop(key, None) is not None
+
+
+def test_the_vault_gate_asks_about_the_plan_not_the_deployment(client):
+    """The bug this round is about. Every seal point read `if pdi is not None`
+    — whether the *deployment* has a vault, not whether the *account* is on a
+    plan that uses one."""
+    fake = CountingVault()
+    assert storage.vault_for("basic", fake) is fake
+    assert storage.vault_for("pro", fake) is fake
+    assert storage.vault_for("free", fake) is None
+    assert storage.vault_for("visitor", fake) is None
+    assert storage.vault_for("basic", None) is None
+
+
+def test_a_profiles_plan_resolves_through_to_its_owner(client):
+    """A membership belongs to the person, not the profile. Asking
+    `plan_of(profile_id)` finds no membership, returns "visitor", and quietly
+    treats every paying member's profile as an open-cloud account."""
+    me = make_profile(client, plan="basic", owner_id="acct-c1")
+    assert tiers.plan_of(me["id"]) == "visitor"
+    assert tiers.plan_of_profile(me["id"]) == "basic"
+    assert tiers.plan_of_profile("prf_nonexistent") == "visitor"
+
+
+def test_free_is_platform_custody_and_paid_is_the_users(client):
+    assert storage.custody_of("free") == "platform"
+    assert storage.custody_of("basic") == "user"
+    platform = storage.CUSTODY["platform"]
+    assert platform["goes_through_a_vault"] is False
+    assert platform["user_holds_a_key"] is False
+    assert platform["returning_access"] is True
+    assert "HTTPS" in platform["transport"]
+
+
+def test_the_membership_says_who_holds_it(client):
+    me = make_profile(client, plan="free", owner_id="acct-c2")
+    out = client.get("/memberships/acct-c2", headers=auth_header(me)).json()
+    assert out["storage"]["custody"]["who"] == "platform"
+    assert out["storage"]["custody"]["held_by"] == "QRME"
+    assert out["storage"]["custody"]["goes_through_a_vault"] is False
+
+
+def test_custody_is_never_described_as_ownership(client):
+    """A product decides who *holds* a record. It does not get to decide away
+    somebody's statutory rights over their own personal data.
+
+    Checked against the **values a user is shown**, not the module source — the
+    JIM-mini version of this test first swept the source and failed on the
+    comment explaining why ownership is the wrong word, which is the fourth
+    time a substring guard in these repositories has tripped on its own
+    explanation.
+    """
+    shown = " ".join(
+        str(v) for spec in storage.CUSTODY.values() for v in spec.values()
+    ).lower()
+    for phrase in ("we own your", "the platform owns", "you do not own",
+                   "owns your data", "our property"):
+        assert phrase not in shown, (
+            f"{phrase!r} is an ownership claim, not a custody one")
+    assert "host your work" in shown and "access to it" in shown
+    assert "statutory rights" in inspect.getsource(storage)
+
+
+# -- a clinician's note about a real person ------------------------------------
+
+def _referral_setup(client, plan, owner_id):
+    """A real profile, a real interactor with a real conversation, and a real
+    provider — so that removing the guard lets the referral actually succeed.
+
+    The first version passed `provider_id="prv_any"`, and a mutation check
+    showed it failed at "no such clinician" with the guard removed: a green
+    tick that proved nothing. A refusal test has to be reached *by a request
+    that would otherwise work.*
+    """
+    prof = make_profile(client, plan=plan, owner_id=owner_id)
+    owner = auth_header(prof)
+    it = client.post("/interactors", json={"display_name": "Dana"}).json()
+    me = {"authorization": f"Bearer {it['token']}"}
+    client.post(f"/profiles/{prof['id']}/chat", headers=owner, json={
+        "interactor_id": it["id"], "message": "my chest has been tight"})
+    # A referral signs at the `high` tier, so the interactor needs a
+    # device-bound, document-proofed credential before prepare will run.
+    from tests.test_signatures import Authenticator
+
+    a = Authenticator()
+    opts = client.post("/signatures/enroll/options",
+                       json={"display_name": "Dana"}, headers=me).json()
+    body = a.register(opts["challenge"])
+    body.update({"proofing_level": "document", "display_name": "Dana",
+                 "proofing_attestor": "clinic-registrar"})
+    client.post("/signatures/enroll", json=body, headers=me)
+    prov = client.post("/providers", json={
+        "name": "Riverside Cardiology", "area": "medical",
+        "location": "Leeds", "contact": "0113 000 0000"}).json()
+    return prof, it, me, prov
+
+
+def test_a_referral_cannot_be_prepared_on_an_open_plan(client):
+    """A clinician's written opinion about a real person reached the open
+    store because the referral flow writes through `referral.reply` rather
+    than `add_source`, so the third-party rule — which is the same rule —
+    never saw it. The patient is frequently not the account holder."""
+    prof, it, me, prov = _referral_setup(client, "free", "acct-c3")
+    out = client.post("/referrals/prepare", headers=me, json={
+        "interactor_id": it["id"], "profile_id": prof["id"],
+        "provider_id": prov["id"]})
+    assert out.status_code == 402, out.text
+    assert "did not pick this plan" in out.json()["detail"]
+
+
+def test_the_refusal_lands_before_any_clinician_is_contacted(client):
+    """Refusing when the note comes back would strand a real person who has
+    already been written to, mid-flow, holding words they cannot file."""
+    from qrme import db as qdb
+
+    prof, it, me, prov = _referral_setup(client, "free", "acct-c4")
+    client.post("/referrals/prepare", headers=me, json={
+        "interactor_id": it["id"], "profile_id": prof["id"],
+        "provider_id": prov["id"]})
+    n = qdb.connect().execute(
+        "SELECT COUNT(*) AS n FROM referrals").fetchone()["n"]
+    assert n == 0, "a referral row was created before the refusal"
+
+
+def test_the_same_referral_prepares_normally_on_a_paid_plan(client):
+    """The other half. Without it the two tests above pass if referrals broke
+    entirely, which is a different bug wearing the same green tick."""
+    prof, it, me, prov = _referral_setup(client, "basic", "acct-c5")
+    out = client.post("/referrals/prepare", headers=me, json={
+        "interactor_id": it["id"], "profile_id": prof["id"],
+        "provider_id": prov["id"]})
+    assert out.status_code in (200, 201), out.text
+
+
+def test_every_sensitive_kind_is_still_enforced_somewhere(client):
+    """Re-asserted after adding `clinical_note`, because the whole value of
+    that list is that nothing sits on it unenforced."""
+    root = pathlib.Path(__file__).resolve().parent.parent / "qrme"
+    body = "\n".join(p.read_text() for p in root.rglob("*.py")
+                     if p.name != "storage.py")
+    for kind in storage.SENSITIVE:
+        assert f'"{kind}"' in body, (
+            f"{kind!r} is listed as too sensitive for the open store and "
+            "nothing outside storage.py refuses it")
+
+
+def test_signing_deliberately_keeps_the_real_vault(client):
+    """The trap this module already fell into once, recorded so the loop is
+    not closed the tidy-looking way. A signer is frequently an interactor with
+    no membership: gating `_seal` by their plan returns None, and the custody
+    chain a referral depends on quietly stops being written."""
+    src = inspect.getsource(storage.vault_for)
+    assert "signatures._seal" in src
+    assert "vault_for" not in inspect.getsource(
+        __import__("qrme.signatures", fromlist=["_seal"])._seal)

@@ -219,6 +219,20 @@ def plan_of(account_id: str) -> str:
     return row["plan"] if row else "visitor"
 
 
+def plan_of_profile(profile_id: str) -> str:
+    """The plan governing a profile's stored work — its owner's.
+
+    A membership belongs to the person, not the profile (`account_of` explains
+    why at length), so anything asking "may this profile's work be sealed" has
+    to resolve through `profiles.owner_id` first. Asking `plan_of(profile_id)`
+    would find no membership under a profile id, return "visitor", and quietly
+    treat every paying member's profile as an open-cloud account.
+    """
+    row = db.connect().execute(
+        "SELECT owner_id FROM profiles WHERE id=?", (profile_id,)).fetchone()
+    return plan_of(row["owner_id"]) if row else "visitor"
+
+
 def entitles(plan: str, capability: str) -> bool:
     """Whether a plan reaches a capability. Pure — no database, so the pricing
     page and the gate cannot disagree about what a plan includes."""

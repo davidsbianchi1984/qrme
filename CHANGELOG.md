@@ -8,6 +8,43 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Platform custody, and a vault gate that asks about the plan** —
+  `storage.CUSTODY`, `storage.vault_for`, `tiers.plan_of_profile`. The free
+  plan is the familiar hosted-assistant arrangement: QRME holds the work and
+  the person has access to it, over ordinary HTTPS, never through a vault.
+  Named as **custody rather than ownership**, deliberately — a product decides
+  who holds and operates a record, and does not get to decide away somebody's
+  statutory rights over their own personal data.
+
+### Fixed
+
+- **A free account's work was being sealed into the vault.** Every seal point
+  read `if pdi is not None` — whether the *deployment* has a vault, not
+  whether the *account* is on a plan that uses one. On a PDI-backed
+  deployment that put a free account's work in a vault it was not paying for
+  and could not hold a key to. `storage.vault_for(plan, pdi)` is now the one
+  place the question is asked. Guarded by counting vault writes rather than
+  by reading call sites.
+
+  Reads and deletions deliberately keep the real vault: a plan-gated vault on
+  a read strands a downgraded account's history behind a billing change, and
+  on a delete it leaves records nobody can reach and calls that erasure.
+  Signing keeps it too — a signer is frequently an interactor with no
+  membership, and gating `signatures._seal` by their plan would quietly stop
+  writing the custody chain a referral depends on.
+
+- **A clinician's note about a real person could land in the open store.**
+  The referral flow writes through `referral.reply` rather than `add_source`,
+  so the third-party-source rule — which is the same rule — never saw it.
+  `clinical_note` joins `SENSITIVE`, refused at `POST /referrals/prepare`
+  before any clinician is contacted, because refusing when the note comes back
+  would strand a real person who has already been written to.
+
+- **A refusal test that proved nothing.** `test_the_refusal_lands_before_any_clinician_is_contacted`
+  passed with the guard removed, because it used a nonexistent provider and
+  failed at "no such clinician" either way. A refusal test has to be reached
+  by a request that would otherwise succeed; it now builds the whole flow.
+
 - **A free plan, with nothing private about it** — `qrme/storage.py`, 23 tests,
   screens 138, 139 and 140. Two storage postures: **open cloud** (Free — the
   platform's own database, in the clear) and **encrypted vault** (Basic and
