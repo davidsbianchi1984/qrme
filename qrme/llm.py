@@ -35,7 +35,7 @@ from typing import Protocol
 
 logger = logging.getLogger("qrme.llm")
 
-MODEL = os.environ.get("QRME_MODEL", "claude-opus-4-8")
+MODEL = os.environ.get("QRME_MODEL", "claude-opus-5")
 
 # Per-provider default models are overridable by env so an operator can pin a
 # specific version without a code change.

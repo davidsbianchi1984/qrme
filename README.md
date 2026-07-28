@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.4.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.4.2** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -661,6 +661,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.4.2** | **The round where the installer you download actually gets you running.** A first-run bug report from a real Windows install drove all of it: the desktop installers stop being labelled 0.3.3 (and a widened guard now holds all five version strings together — pyproject had sat at 0.4.0 and the lockfile roots at 0.3.3, each a number nothing failed on), `python -m qrme serve` now answers the packaged console by default instead of dying cross-origin as *"Failed to fetch"*, the console's errors name the URL and the command instead of the raw fetch error, the age field stops pre-filling a birthdate, and the Anthropic provider defaults to `claude-opus-5` |
 | **0.4.1** | **The round where free got honest, and the claims got checked.** A free plan that reaches everything Basic reaches — $20 buys privacy, not features — stored under **platform custody**: QRME holds it, you have access, no vault at any point, and every surface that names a plan says so. The vault gate now asks about the *plan* rather than the deployment (a free account's work was being sealed into a vault it could not hold a key to), a clinician's note about a real person joined the refusals, and channel 3 points your camera at a thing so somebody else can see it — never at a person for a synthetic profile. Plus the guards that keep the README's own arithmetic true |
 | **0.4.0** | **The round where it got a price, and a guide that walks you to what you paid for.** Membership — Basic $20/month to make your own things, Pro $130/month for everything that leaves your account — enforced at **one chokepoint** rather than a check per route, on a table asserted against the served routes (the first version named three prefixes that were not routes at all: paywalls in front of a wall). A **pane in the corner** carrying the watch faces for people who own no watch, which shows and routes and never acts. And an assistant that answers *where is it* with a screen instead of a paragraph |
 | **0.3.3** | **The round where an agent working on its own stopped being something you had to go and check.** One question — *does this need me right now?* — answered by three colours, on the wrist, in the app, and in a corner box that rides over whatever screen you are on |
@@ -2846,7 +2847,7 @@ of the screens above and want to know what it does, this is where to find it.
 - **Storage**: SQLite (`qrme/db.py`), path via `QRME_DB` (default `qrme.db`).
 - **Persona conditioning**: `qrme/persona.py` builds the system prompt from
   profile identity + relationship + engagement + aging.
-- **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-4-8`
+- **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-5`
   with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.
 - **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
@@ -2956,7 +2957,7 @@ phone itself): set `QRME_LAN_HOST` to this machine's address and restart.
 <tr><td valign="top"><sub><code>QRME_DB</code></sub></td><td valign="top"><sub><code>qrme.db</code></sub></td><td valign="top"><sub>SQLite database path</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_LLM</code></sub></td><td valign="top"><sub>auto</sub></td><td valign="top"><sub><code>stub</code> forces the offline deterministic provider; <code>anthropic</code> forces the SDK</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_OFFLINE</code></sub></td><td valign="top"><sub>off</sub></td><td valign="top"><sub><code>1</code>/<code>true</code> runs <b>fully offline</b>: local inference only (Anthropic SDK and cloud gateway bypassed even if configured), cloud never attached, embeddings/fine-tuning recomputed on-host. <code>GET /offline/status</code> reports the posture</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_MODEL</code></sub></td><td valign="top"><sub><code>claude-opus-4-8</code></sub></td><td valign="top"><sub>Model used for profile replies</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_MODEL</code></sub></td><td valign="top"><sub><code>claude-opus-5</code></sub></td><td valign="top"><sub>Model used for profile replies</sub></td></tr>
 <tr><td valign="top"><sub><code>ANTHROPIC_API_KEY</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Enables real model replies</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_PDI_URL</code> / <code>QRME_PDI_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>PDI tandem: seal source material in the encrypted vault</sub></td></tr>
 <tr><td valign="top"><sub><code>QRME_CLOUD_URL</code> / <code>QRME_CLOUD_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution (<a href="docs/cloud-model.md">docs/cloud-model.md</a>)</sub></td></tr>
