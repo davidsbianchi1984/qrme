@@ -80,35 +80,17 @@ def main() -> int:
             return 1
         print("ok: /health")
 
-        status, body = call("POST", "/signup", {
+        # This deployment has no mail transport, so signup activates the
+        # account directly — the packaged desktop experience.
+        status, acct = call("POST", "/signup", {
             "email": "smoke@example.test", "password": "a-real-passphrase",
             "display_name": "Smoke Test"})
-        if status != 201:
-            print(f"FAIL: /signup -> {status}: {body}")
+        if status != 201 or acct.get("verification") != "local" \
+                or not acct.get("account_token"):
+            print(f"FAIL: /signup -> {status}: {acct}")
             print(log_path.read_text(errors="replace")[-2000:])
             return 1
-        print(f"ok: /signup (code delivery: {body.get('code_delivery')})")
-
-        code = None
-        for _ in range(10):
-            m = re.search(r"code is: (\d{6})",
-                          log_path.read_text(errors="replace"))
-            if m:
-                code = m.group(1)
-                break
-            time.sleep(1)
-        if not code:
-            print("FAIL: verification code never appeared in the console log")
-            print(log_path.read_text(errors="replace")[-2000:])
-            return 1
-        print("ok: code printed to console transport")
-
-        status, acct = call("POST", "/verify-email",
-                            {"email": "smoke@example.test", "code": code})
-        if status != 200 or not acct.get("account_token"):
-            print(f"FAIL: /verify-email -> {status}: {acct}")
-            return 1
-        print("ok: /verify-email minted an account session")
+        print("ok: /signup activated directly (no mail transport)")
 
         status, profile = call("POST", "/profiles", {
             "owner_id": acct["account_id"], "kind": "self",
