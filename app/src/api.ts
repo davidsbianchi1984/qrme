@@ -39,7 +39,7 @@ async function req<T>(
     // user nothing. Name the actual problem: no QRME backend answering.
     throw new Error(
       `Can't reach the QRME backend at ${getBase()}. ` +
-      `Start it with "python -m qrme", or set the backend URL in Settings.`,
+      `Start it with "python -m qrme serve", or set the backend URL in Settings.`,
     );
   }
   const text = await res.text();
