@@ -220,6 +220,32 @@ def test_without_a_mail_transport_signup_activates_directly(client, monkeypatch)
         "password": "hunter2-hunter2"}).status_code == 200
 
 
+def test_a_stranded_pending_account_is_finished_on_a_no_mail_machine(
+        client, monkeypatch):
+    """A pending half-account (older builds crashed mid-signup) on a machine
+    with no mail transport can never be verified by email. Retrying signup
+    finishes it on the spot, under the newly-typed password — the machine
+    owner is the only person here."""
+    _capture_mail(monkeypatch)
+    _signup(client)
+    monkeypatch.setattr(mailer, "configured_transport", lambda: "console")
+    r = client.post("/signup", json={
+        "email": "dana@example.test", "password": "a-different-passphrase",
+        "display_name": "Dana"})
+    assert r.status_code == 201, r.text
+    assert r.json()["verification"] == "local"
+    assert r.json()["account_token"]
+    assert client.post("/signin", json={
+        "email": "dana@example.test",
+        "password": "a-different-passphrase"}).status_code == 200
+    # A VERIFIED account is never overwritten this way, even without mail.
+    r = client.post("/signup", json={
+        "email": "dana@example.test", "password": "attacker-tries-this",
+        "display_name": "Mallory"})
+    assert r.status_code == 409
+    assert "sign in" in r.json()["detail"]
+
+
 def test_console_mail_survives_a_cp1252_stdout(capsys, monkeypatch):
     """The frozen Windows backend's stdout is cp1252. The first shipped
     banner used box-drawing characters that encoding cannot represent, so
