@@ -3869,7 +3869,7 @@ SCREENS = [
              s="profiles, and your own agent", pill=("ON", "good")),
         dict(icon="lock", color="cyan", k="$20 buys privacy",
              s="not one extra feature"),
-        dict(icon="warn", color="amber", k="Two things we refuse",
+        dict(icon="warn", color="amber", k="Some things we refuse",
              s="see what free will not hold"),
         dict(icon="info", color="indigo", k="Billing is simulated",
              s="no real funds move", pill=("SIM", "warn")),
@@ -3877,14 +3877,14 @@ SCREENS = [
     # The two postures side by side. The last two cards are the ones a pricing
     # page normally leaves out, and leaving them out is how a product ends up
     # selling absolution rather than encryption.
-    dict(num=139, title="Where It Lives", sub="Open cloud, or sealed vault",
+    dict(num=139, title="Where It Lives", sub="Who holds it, and how",
          accent="cyan", tab=3, cards=[
-        dict(icon="grid", color="amber", k="Free · open cloud",
-             s="the platform's own database"),
+        dict(icon="grid", color="amber", k="Free · we hold it",
+             s="we host it, you have access"),
         dict(icon="eye", color="red", k="Operators can read it",
              s="so can a lawful request"),
-        dict(icon="lock", color="green", k="Basic · sealed vault",
-             s="under a key you can hold"),
+        dict(icon="lock", color="green", k="Basic · you hold it",
+             s="sealed to you, not to us"),
         dict(icon="shieldok", color="cyan", k="Upgrading seals ahead",
              s="it cannot un-expose the past"),
         dict(icon="shield", color="indigo", k="A lapse unseals nothing",
@@ -3892,18 +3892,18 @@ SCREENS = [
     ], button=("Move to Basic", "brand")),
     # What the open store will not hold, and the test for the list: whose
     # exposure is it. Both entries are somebody who never chose the plan.
-    dict(num=140, title="Not On Free", sub="Two things we will not leave open",
+    dict(num=140, title="Not On Free", sub="What we will not leave open",
          accent="red", tab=3, cards=[
         dict(icon="person", color="red", k="Somebody else's letters",
              s="they did not pick this plan"),
+        dict(icon="doc", color="red", k="A clinician's note",
+             s="the patient did not pick it"),
         dict(icon="eye", color="amber", k="Behind the age gate",
              s="rated work needs the vault"),
         dict(icon="shieldok", color="green", k="Your own work is fine",
              s="your notes, your call"),
         dict(icon="lock", color="cyan", k="Basic · $20 a month",
              s="the vault is free to host"),
-        dict(icon="info", color="indigo", k="Billing is simulated",
-             s="no real funds move", pill=("SIM", "warn")),
     ], button=("Seal it for $20", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[

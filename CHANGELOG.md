@@ -18,6 +18,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Stale copy behind a growing list.** `SENSITIVE` gained `clinical_note`
+  and four pieces of user-facing copy went on saying **two things are
+  refused**: screen 138's card, screen 140's subtitle, the walkthrough lesson
+  and a README heading. Screen 140 also never drew the third refusal at all. A
+  number written into prose is a duplicate of a list and drifts silently —
+  nothing fails when a dict grows an entry. The copy no longer counts in prose,
+  screen 140 names all three, and two guards hold it: one rejecting a hardcoded
+  count that disagrees with `len(SENSITIVE)`, one asserting the screen names
+  every kind on the list.
+
+- **`docs/tandem.md` described sealing as unconditional.** It was written when
+  a paid plan was the only kind. Now says which plans reach PDI at all —
+  byte-identical in all three repositories, as that file always is.
+
 - **A free account's work was being sealed into the vault.** Every seal point
   read `if pdi is not None` — whether the *deployment* has a vault, not
   whether the *account* is on a plan that uses one. On a PDI-backed

@@ -1790,8 +1790,9 @@ with, the people who operate this deployment, anyone with lawful access to it.*
 "Industry-standard security" is what a product says when it does not want to
 finish the sentence.
 
-**Two things are refused rather than quietly exposed**, and the test for the
-list is not *would the account holder mind* — it is **whose exposure is it**:
+**Some payloads are refused rather than quietly exposed**, and the test for
+the list is not *would the account holder mind* — it is **whose exposure is
+it**:
 
 - **source material about somebody else.** They did not pick this plan.
 - **anything behind the age gate.** Rated content needs the vault.

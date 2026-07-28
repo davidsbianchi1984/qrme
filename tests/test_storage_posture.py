@@ -430,3 +430,123 @@ def test_signing_deliberately_keeps_the_real_vault(client):
     assert "signatures._seal" in src
     assert "vault_for" not in inspect.getsource(
         __import__("qrme.signatures", fromlist=["_seal"])._seal)
+
+
+# -- the copy cannot go stale behind the list ----------------------------------
+
+_COUNT_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+                "six": 6, "seven": 7, "eight": 8}
+
+
+def test_no_copy_hardcodes_a_stale_count_of_refusals(client):
+    """The gap this test exists for actually shipped.
+
+    `SENSITIVE` gained `clinical_note` and four pieces of user-facing copy went
+    on saying **two**: screen 138's card, screen 140's subtitle, the
+    walkthrough lesson, and a README heading. A number written into prose is a
+    duplicate of a list, and duplicates drift silently — nothing fails when a
+    dict grows an entry.
+
+    So no copy near a refusal may name a count that disagrees with the list.
+    The honest fix is usually to stop counting in prose at all, which is what
+    the copy does now.
+    """
+    import re
+
+    n = len(storage.SENSITIVE)
+    sources = {
+        "qrme/tutorial.py": pathlib.Path("qrme/tutorial.py"),
+        "docs/screens/build.py": pathlib.Path("docs/screens/build.py"),
+        "README.md": pathlib.Path("README.md"),
+    }
+    root = pathlib.Path(__file__).resolve().parent.parent
+    pattern = re.compile(
+        # No em dash and a short window: the first version reached across
+        # "all three products — never stored, so it cannot disagree", which is
+        # a sentence about the agent light. A guard with a false positive gets
+        # loosened until it catches nothing.
+        r"\b(one|two|three|four|five|six|seven|eight)\b[^.\n\u2014]{0,25}?"
+        r"(we refuse|are refused|refused rather|never stored|"
+        r"will not leave open|not be stored)",
+        re.IGNORECASE)
+    for label, rel in sources.items():
+        text = (root / rel).read_text()
+        for m in pattern.finditer(text):
+            said = _COUNT_WORDS[m.group(1).lower()]
+            assert said == n, (
+                f"{label} says {m.group(1)!r} where SENSITIVE holds {n}: "
+                f"{m.group(0)!r}")
+
+
+def test_the_refusal_screen_names_every_kind_on_the_list(client):
+    """A screen that lists the refusals and misses one is the same drift in
+    the other direction — the list grew and the drawing did not."""
+    build = (pathlib.Path(__file__).resolve().parent.parent
+             / "docs" / "screens" / "build.py").read_text()
+    start = build.index('num=140')
+    screen = build[start:build.index("], button=", start)].lower()
+    for kind, hint in [("third_party_source", "letters"),
+                       ("clinical_note", "clinician"),
+                       ("rated_content", "age gate")]:
+        assert kind in storage.SENSITIVE
+        assert hint in screen, (
+            f"screen 140 does not name {kind!r} (looked for {hint!r})")
+
+
+def test_a_free_account_puts_nothing_in_the_vault(client, monkeypatch):
+    """The end-to-end half of the vault gate, which JIM-mini had and this
+    repository did not.
+
+    A unit test of `vault_for` proves the function; it does not prove that
+    every seal point calls it. Counting writes across a real exercise is what
+    catches the site somebody adds next month and wires straight to
+    `app.state.pdi`.
+    """
+    from qrme import adaptation, companion
+
+    vault = CountingVault()
+    me = make_profile(client, plan="free", owner_id="acct-c6")
+    companion.sunset(dict(id=me["id"], display_name="X", owner_id="acct-c6"),
+                     pdi=vault)
+    adaptation.finetune(me["id"], pdi=vault)
+    assert vault.writes == [], (
+        "a free profile reached the vault at: " + ", ".join(vault.writes))
+
+
+def test_the_same_work_on_a_paid_plan_does_reach_the_vault(client):
+    """Otherwise the test above passes if sealing broke outright, which is a
+    different bug wearing the same green tick."""
+    from qrme import adaptation, companion
+
+    vault = CountingVault()
+    me = make_profile(client, plan="pro", owner_id="acct-c7")
+    companion.sunset(dict(id=me["id"], display_name="X", owner_id="acct-c7"),
+                     pdi=vault)
+    assert vault.writes, "nothing sealed on a vault plan"
+    assert all(k.startswith(f"qrme/{me['id']}/") for k in vault.writes)
+
+
+def test_the_two_ungated_seal_points_are_unreachable_on_an_open_plan(client):
+    """`rated.py` and `referral.py` still read `if pdi is not None` rather
+    than asking the plan, and that is deliberate — both sit behind an earlier
+    refusal that an open plan cannot get past, so a second gate would be dead
+    code pretending to be defence.
+
+    It is only safe while the earlier refusal holds, which is exactly the kind
+    of thing that breaks silently when somebody moves a check. So the chain is
+    asserted rather than trusted: on a free plan, neither door opens.
+    """
+    # rated events need a rated profile, and a rated profile needs a vault plan
+    r = client.post("/profiles", json={
+        "plan": "free", "owner_id": "acct-c8", "kind": "fictional",
+        "display_name": "Velvet", "persona": "A cabaret singer.",
+        "adult_mode": True, "maturity": "open",
+        "verification": {"birthdate": "1984-06-01"}})
+    assert r.status_code == 402, "a rated profile opened on an open plan"
+
+    # clinical notes need a referral, and a referral needs a vault plan
+    prof, it, me, prov = _referral_setup(client, "free", "acct-c9")
+    out = client.post("/referrals/prepare", headers=me, json={
+        "interactor_id": it["id"], "profile_id": prof["id"],
+        "provider_id": prov["id"]})
+    assert out.status_code == 402, "a referral opened on an open plan"

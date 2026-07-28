@@ -180,17 +180,20 @@ LESSONS: tuple[dict, ...] = (
          try_it="Open Choose a Plan and read what Free already includes."),
     dict(key="storage", chapter="Being yourself",
          title="Where your data lives",
-         what="On the free plan nothing is private. What you make sits in "
-              "this platform's own database in the clear, where the people "
-              "who run it can read it and a lawful request reaches it. Basic "
-              "seals it in the vault under a key you can hold, and that is "
-              "the only thing the $20 buys — the features are identical. Two "
-              "things are never stored in the clear whatever you have chosen: "
-              "source material about somebody who is not you, and anything "
-              "behind the age gate, because in both the person exposed did "
-              "not pick the plan. Moving up seals what you write from then on "
-              "and cannot un-expose what was already open; moving down never "
-              "unseals anything already in the vault.",
+         what="On the free plan nothing is private, and we hold it. What you "
+              "make reaches us over an ordinary connection, sits in this "
+              "platform's own database in the clear, and never goes through a "
+              "vault — the people who run it can read it and a lawful request "
+              "reaches it. You have access to it for as long as you have an "
+              "account. Basic seals the same work under a key you can hold, "
+              "and that is the only thing the $20 buys: the features are "
+              "identical. A few things are never left open whatever you have "
+              "chosen — source material about somebody who is not you, a "
+              "clinician's note about a real person, and anything behind the "
+              "age gate — because in each the person exposed did not pick the "
+              "plan. Moving up seals what you write from then on and cannot "
+              "un-expose what was already open; moving down never unseals "
+              "anything already in the vault.",
          screens=(138, 139, 140),
          try_it="Open Where It Lives and read who can read a free account."),
     dict(key="guide", chapter="Being yourself", title="This guide",
