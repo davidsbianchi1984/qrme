@@ -309,6 +309,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/134-youre-on-basic.svg"><img src="docs/screens/134-youre-on-basic.svg" width="210" alt="You are on Basic"></a><br><sub><b>134</b> · You're on Basic</sub></td>
     <td align="center" width="33%"><a href="docs/screens/135-this-needs-pro.svg"><img src="docs/screens/135-this-needs-pro.svg" width="210" alt="This Needs Pro"></a><br><sub><b>135</b> · This Needs Pro</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/136-show-them.svg"><img src="docs/screens/136-show-them.svg" width="210" alt="Show Them"></a><br><sub><b>136</b> · Show Them</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/137-whats-in-shot.svg"><img src="docs/screens/137-whats-in-shot.svg" width="210" alt="Whats In Shot"></a><br><sub><b>137</b> · What's In Shot</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1566,6 +1570,83 @@ repository has already shipped a screen nothing referenced.
 
 **Progress is recorded per step rather than as a cursor**, so somebody who
 skipped ahead and came back is not told they finished things they never saw.
+
+## Channel 3 — sharing your camera
+
+`qrme/viewfinder.py`, 7 routes, 28 tests, screens **136** and **137**.
+
+Channel 2 lent the profiles an ear. This lends an eye: a live view through the
+camera in your hand, for the enormous class of problems where **describing the
+thing is the hard part and showing it is trivial**. A mechanic looking at your
+engine bay. A plumber watching you point at the joint. An electrician reading
+the plate on a consumer unit. A vet watching a dog walk.
+
+JIM-mini's `capture.py` is the still, sealed, asynchronous version of the same
+idea, and the difference is the whole module. **A photograph is one framed
+moment somebody chose. A live camera is whatever happens to be behind it** —
+the rest of the room, the post on the table, the child in the doorway. Somebody
+who agreed to *"show you the leak"* did not agree to any of that.
+
+### What is in shot decides the rules, not who is watching
+
+This is the inversion the module is built on. The obvious approach gates on the
+viewer — *is it a person or a profile* — and it gets both important cases
+wrong. A profile that can see an engine bay is genuinely useful and the stakes
+are a car. A real stranger watching a live view of somebody's body is not made
+safe by being human.
+
+| in shot | a person may watch | a synthetic profile may watch |
+| --- | --- | --- |
+| **object** — engine, boiler, board, leak | ✅ | ✅ |
+| **document** — paper, a plate, a meter | ✅ | ✅ |
+| **place** — a room, a site, a yard | ✅ | ✅ |
+| **person** — a body, an injury, how somebody moves | ✅ | ❌ |
+
+The refusal is published by name with its reason, and it points somewhere
+useful: a profile watching a body in real time would be making judgements about
+it with no examination, no accountability and nobody to answer for being wrong
+— and unlike a still, there is no moment somebody chose to send. JIM-mini
+reaches the same conclusion from the other direction, where a photograph of a
+rash is never handed to an agent.
+
+### The viewer never controls the camera
+
+No remote zoom, no focus, no lens switch, no torch, no capture trigger. **The
+person holding the phone points it**, and `viewfinder.NEVER` says so out loud —
+a remote party who can operate the camera on somebody's device has something
+categorically different from a view, and it is the thing people are actually
+afraid of when they decline. A test reads the router and asserts no route looks
+like camera control, because the easy way to add a zoom button is a new
+endpoint rather than a new argument.
+
+Also never: any other camera on the device, coordinates, a session that starts
+without the holder starting it in the moment, and any state where it is running
+and not visible on the holder's own screen.
+
+### Ephemeral, capped, and yours to end
+
+It records nothing unless somebody says so. Fifteen minutes by default, **45 as
+the ceiling** — long enough to look at an engine properly, short enough that a
+forgotten session is measured in minutes rather than a working day. Two to open
+and one to close, the shape `sharing.py` uses for a lent skill: symmetric
+consent to start makes it a loan, asymmetric consent to end stops it being a
+trap. And it dies with the surface, because nobody remembers a permission
+granted inside a conversation that finished.
+
+The disclosure is a first-class read rather than something a client assembles,
+and it is **not** open to anybody holding the surface id — a room id rides on
+printed beacon stickers, and *"who has a camera live in there, and is it
+recording"* is exactly what a stranger who scanned one must not be able to ask.
+That mistake shipped once in `roommic`.
+
+### Bystanders are the unsolved part, and it says so
+
+Nothing here can tell whether somebody walked into frame. A "bystander
+detection" toggle would be **worse than the gap**, because it would be relied
+on. So the honest version is a note addressed to the only party who can
+actually see the room: *we cannot tell whether somebody has walked into shot,
+or blur them if they have; you can look at the room before you start, and stop
+the moment it stops being about the thing.*
 
 ## Membership
 

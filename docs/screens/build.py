@@ -3823,6 +3823,36 @@ SCREENS = [
         dict(icon="info", color="indigo", k="Billing is simulated",
              s="no real funds move", pill=("SIM", "warn")),
     ], button=("Upgrade to Pro", "brand")),
+    # Channel 3. Card one is the whole pitch — describing a knocking engine is
+    # the hard part; pointing at it is trivial.
+    dict(num=136, title="Show Them", sub="Channel 3 · point, don't describe",
+         accent="cyan", tab=3, cards=[
+        dict(icon="eye", color="cyan", k="Point at the engine",
+             s="a mechanic watches, live"),
+        dict(icon="clock", color="brand", k="Runs for 15 minutes",
+             s="45 is the ceiling"),
+        dict(icon="finger", color="green", k="You point it, always",
+             s="no zoom, no torch, no shutter"),
+        dict(icon="eye", color="amber", k="Nothing is kept",
+             s="recording is a separate yes"),
+        dict(icon="warn", color="red", k="Ends with the room",
+             s="or the moment you say stop"),
+    ], button=("Start sharing", "brand")),
+    # The rule that decides everything. Card two is the inversion: the subject
+    # governs, not the audience.
+    dict(num=137, title="What's In Shot", sub="The subject sets the rules",
+         accent="brand", tab=3, cards=[
+        dict(icon="gear", color="green", k="A thing · anyone",
+             s="engine, boiler, board, leak"),
+        dict(icon="doc", color="cyan", k="A document · anyone",
+             s="it carries names and numbers"),
+        dict(icon="grid", color="amber", k="A place · anyone",
+             s="whoever is there is in shot"),
+        dict(icon="person", color="red", k="A body · a person only",
+             s="never a synthetic profile"),
+        dict(icon="warn", color="indigo", k="We cannot see the room",
+             s="look before you start"),
+    ]),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

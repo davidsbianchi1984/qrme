@@ -190,6 +190,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "face": ("change my face", "face overlay", "mask", "disguise", "costume",
              "change my background", "background", "backdrop", "blur",
              "be anonymous", "anonymous", "hide my name"),
+    "camera": ("share my camera", "show them", "channel 3", "live camera",
+               "point my camera", "let them see", "show you the problem"),
     "screens": ("wall panel", "kiosk", "fixed screen", "put it on a screen",
                 "second screen", "the corner", "the pane", "the dock",
                 "little box", "mini window"),

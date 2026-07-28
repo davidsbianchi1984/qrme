@@ -121,6 +121,18 @@ LESSONS: tuple[dict, ...] = (
               "the room does.",
          screens=(81, 120),
          try_it="Lend it, then look at what the room sees."),
+    dict(key="camera", chapter="People", title="Sharing your camera",
+         what="Channel 2 lent the profiles an ear; this lends an eye. Point "
+              "your camera at the thing and somebody watches live — a "
+              "mechanic looking at your engine, a plumber watching you point "
+              "at the joint. What the camera is pointed at decides who may "
+              "watch: a thing, a document or a place is open to anyone, and a "
+              "body goes to a real person rather than a synthetic profile. "
+              "You point it — no viewer can zoom, focus, use the torch or "
+              "take a shot. It records nothing unless you say so, and it ends "
+              "when you say stop or when the room does.",
+         screens=(136, 137),
+         try_it="Open What's In Shot and read the last card."),
     dict(key="fullscreen", chapter="Watching", title="Full screen and sideways",
          what="Any live surface fills the phone. A long press dims everything "
               "but the controls and brings the help button back; turning the "
