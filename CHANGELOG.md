@@ -6,15 +6,50 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.2] — 2026-07-28
+
+### Changed
+
+- **The Anthropic provider defaults to `claude-opus-5`.** The default model
+  string in `qrme/llm.py` (and the README rows quoting it) still named the
+  previous Opus generation. `QRME_MODEL` still overrides, and every other
+  provider default is untouched. Verified against the live API: with
+  `QRME_LLM=anthropic` every chat produces a real round-trip to
+  api.anthropic.com, and the per-profile switchboard
+  (`PUT /profiles/{id}/model`) stores and honors provider choices.
+
+- **`python -m qrme serve` answers the packaged console by default.** The
+  installer ships only the console; the API it calls is started by hand — and
+  a loopback `serve` never set `QRME_CORS_ORIGINS`, so every console request
+  died as *"Failed to fetch"* against a backend that was running fine,
+  including for a user following the app's own recovery instructions. A
+  loopback serve now defaults CORS open (the posture the in-app hint has
+  always instructed), announced on stdout, with `--no-cors` to keep it
+  closed — and never when binding beyond loopback or when an explicit
+  allowlist is set. Owner and interactor endpoints still require their
+  bearer tokens. Four tests, mutation-checked.
+
 ### Fixed
 
 - **The desktop installers were labelled 0.3.3.** `app/package.json` carries
   its own version and no cut ever bumped it, so the 0.4.0 and 0.4.1 releases
   both attached installers stamped with the stale number — built from the
   right tag, named for the wrong release, and invisible to the auto-updater,
-  which compares package versions and saw nothing newer. Now 0.4.1, with a
+  which compares package versions and saw nothing newer. Bumped, with a
   test asserting it always matches the API version, because a duplicated
-  number with nothing to fail is how the last three of these happened.
+  number with nothing to fail is how the last three of these happened. This
+  release is the first whose installers come out named for it.
+
+- **The desktop onboarding pre-filled a birthdate.** The age-verification
+  field shipped with a sample date sitting in it — a wrong answer already
+  submitted. It starts empty now, and Create My Profile waits for a real one.
+  (The name field was already deliberately empty here; JIM Guardian's screen
+  broke that rule and was fixed in the same pass.)
+
+- **A network-level fetch failure surfaced as "Failed to fetch".** The
+  console's error now names the backend URL it could not reach and the
+  command that starts one — `python -m qrme serve`, which the old hint got
+  wrong too: bare `python -m qrme` only prints the launcher menu.
 
 ## [0.4.1] — 2026-07-28
 
@@ -1956,7 +1991,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.2...HEAD
+[0.4.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.2
 [0.4.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.1
 [0.4.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.0
 [0.3.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.3.3
