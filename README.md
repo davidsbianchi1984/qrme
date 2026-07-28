@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.4.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.4.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -661,6 +661,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.4.3** | **The round where the app got a front door and a key of your own.** Email + password accounts with the address proven by a 6-digit emailed code before sign-in works — the account owns the profiles, resets revoke every session, and neither login nor reset can be used to fish for who has an account. Bring-your-own model key: paste your credential in the Control Center and your requests run on it, never stored server-side, with the deployment's key as the lent fallback. And the installer finally runs itself: the whole Python backend ships frozen inside it and the app spawns it at launch — double-click-and-done |
 | **0.4.2** | **The round where the installer you download actually gets you running.** A first-run bug report from a real Windows install drove all of it: the desktop installers stop being labelled 0.3.3 (and a widened guard now holds all five version strings together — pyproject had sat at 0.4.0 and the lockfile roots at 0.3.3, each a number nothing failed on), `python -m qrme serve` now answers the packaged console by default instead of dying cross-origin as *"Failed to fetch"*, the console's errors name the URL and the command instead of the raw fetch error, the age field stops pre-filling a birthdate, and the Anthropic provider defaults to `claude-opus-5` |
 | **0.4.1** | **The round where free got honest, and the claims got checked.** A free plan that reaches everything Basic reaches — $20 buys privacy, not features — stored under **platform custody**: QRME holds it, you have access, no vault at any point, and every surface that names a plan says so. The vault gate now asks about the *plan* rather than the deployment (a free account's work was being sealed into a vault it could not hold a key to), a clinician's note about a real person joined the refusals, and channel 3 points your camera at a thing so somebody else can see it — never at a person for a synthetic profile. Plus the guards that keep the README's own arithmetic true |
 | **0.4.0** | **The round where it got a price, and a guide that walks you to what you paid for.** Membership — Basic $20/month to make your own things, Pro $130/month for everything that leaves your account — enforced at **one chokepoint** rather than a check per route, on a table asserted against the served routes (the first version named three prefixes that were not routes at all: paywalls in front of a wall). A **pane in the corner** carrying the watch faces for people who own no watch, which shows and routes and never acts. And an assistant that answers *where is it* with a screen instead of a paragraph |
@@ -777,8 +778,22 @@ in a request body.
 
 | Token | Minted by | Grants |
 |---|---|---|
+| **account** | `POST /verify-email` and `POST /signin` return `account_token` | Proves "I am this account" to a console. The account is what *owns* — its id is the `owner_id` profiles are created under and the `account_id` memberships bill to — but it carries none of a profile's owner powers by itself |
 | **owner** | `POST /profiles` and `POST /profiles/genesis` return `owner_token` **once** | Full control of that profile: edit, sources, surfaces, specialists, grants/tasks, fine-tune, moderation queue, stats, export, erasure, departure, and the assistant/perception endpoints |
 | **interactor** | `POST /interactors` returns `token` | Reading one's own conversation memory (`GET /profiles/{id}/memory/{interactor}`) |
+
+**Accounts** (`qrme/accounts.py`): `POST /signup` (email + password) creates
+an account that **cannot sign in yet** — a 6-digit code goes to the address
+(SMTP when `QRME_SMTP_HOST` is configured, printed to the server terminal
+otherwise), and only `POST /verify-email` proves the inbox and mints the
+first token. `POST /signin` refuses unverified addresses and answers
+unknown-address and wrong-password identically;
+`POST /verify-email/resend` retires the old code;
+`POST /password/reset/request` + `POST /password/reset` change a forgotten
+password by the same emailed-code proof and revoke every account session
+(per-profile owner tokens are separate capabilities and survive). Passwords
+are PBKDF2-hashed with per-account salts; codes are hashed at rest,
+single-use, and expire in 15 minutes.
 
 - Send it as `Authorization: Bearer <token>`. A missing/invalid token on a
   gated endpoint is **401**; a valid token for the wrong resource is **403**.
@@ -2850,6 +2865,10 @@ of the screens above and want to know what it does, this is where to find it.
 - **LLM**: official Anthropic SDK (`qrme/llm.py`), model `claude-opus-5`
   with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.
+  **Bring your own key:** send `x-llm-api-key` on any request (the console's
+  Control Center stores it device-side) and that request's generations run
+  on your credential — never persisted, never logged; the deployment's env
+  key (an operator lending theirs out) answers requests that bring none.
 - **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
   packs, starter content, seeding) with routes in `qrme/routers/packs.py`;
   `qrme/seed.py` (starter profile collection); `qrme/robotics.py` (robot
@@ -2888,6 +2907,13 @@ one command each, so you pick per device: **phone** (this section),
 **packaged installer** (`.dmg`/`.exe`/`.AppImage` from the releases page —
 no toolchain needed), or **headless API** (`python -m qrme serve`). Same
 backend, same data, same token checks in every form.
+
+The packaged installer is **double-click-and-done**: it ships the whole
+Python backend as a frozen binary (`packaging/backend_entry.py`, built by
+PyInstaller in the release workflow) and the app spawns it at launch when no
+backend is already answering — no Python install, no terminal, data under
+the app's own user-data directory, and the spawned backend dies with the
+window. A backend you already run yourself is left alone.
 
 `python -m qrme phone` builds the studio if it's missing (first run installs the
 npm dependencies too), prints the phone URL **with a QR code right in the

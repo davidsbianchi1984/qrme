@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import type { Profile } from "./api";
 
 export interface Session {
+  accountId?: string;
+  accountToken?: string;
+  accountEmail?: string;
   profileId?: string;
   ownerToken?: string;
   interactorId?: string;

@@ -1,0 +1,169 @@
+"""Email + password accounts: the address is verified before sign-in works.
+
+QRME's shape: the account is what owns — its id is the ``owner_id`` profiles
+are created under — while each profile keeps its own owner capability token.
+Codes are hashed at rest, single-use, expiring; unknown-address and
+wrong-password answers are indistinguishable; a signup code cannot reset a
+password.
+"""
+
+from __future__ import annotations
+
+from qrme import accounts, db, mailer
+
+
+def _capture_mail(monkeypatch):
+    sent: list[dict] = []
+
+    def fake_deliver(to, subject, body):
+        sent.append({"to": to, "subject": subject, "body": body})
+        return "console"
+
+    monkeypatch.setattr(mailer, "deliver", fake_deliver)
+    return sent
+
+
+def _code_from(message: dict) -> str:
+    for line in message["body"].splitlines():
+        if "code is:" in line:
+            return line.rsplit(":", 1)[1].strip()
+    raise AssertionError(f"no code in {message['body']!r}")
+
+
+def _signup(client, email="dana@example.test", password="hunter2-hunter2"):
+    return client.post("/signup", json={
+        "email": email, "password": password, "display_name": "Dana"})
+
+
+def _verified(client, sent):
+    _signup(client)
+    r = client.post("/verify-email", json={
+        "email": "dana@example.test", "code": _code_from(sent[0])})
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
+def test_signup_sends_a_code_and_cannot_sign_in_yet(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    r = _signup(client)
+    assert r.status_code == 201, r.text
+    body = r.json()
+    assert body["verified"] is False and body["code_delivery"] == "console"
+    assert "account_token" not in body and "code" not in body
+    assert len(sent) == 1 and sent[0]["to"] == "dana@example.test"
+    assert client.post("/signin", json={
+        "email": "dana@example.test",
+        "password": "hunter2-hunter2"}).status_code == 403
+
+
+def test_the_code_mints_the_first_session_and_the_account_owns_profiles(
+        client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    acct = _verified(client, sent)
+    assert acct["account_token"]
+    # The account id is the owner_id a profile is created under; the profile
+    # still mints its own owner token exactly as before.
+    r = client.post("/profiles", json={
+        "owner_id": acct["account_id"], "kind": "fictional",
+        "display_name": "Marisol", "persona": "A warm chef.",
+        "verification": {"birthdate": "1970-05-14"}, "terms_consent": True,
+    })
+    assert r.status_code == 201, r.text
+    assert r.json()["owner_id"] == acct["account_id"]
+    assert r.json()["owner_token"]
+
+
+def test_a_wrong_code_verifies_nothing(client, monkeypatch):
+    _capture_mail(monkeypatch)
+    _signup(client)
+    assert client.post("/verify-email", json={
+        "email": "dana@example.test", "code": "000000"}).status_code == 403
+
+
+def test_a_code_is_single_use(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    _signup(client)
+    code = _code_from(sent[0])
+    assert client.post("/verify-email", json={
+        "email": "dana@example.test", "code": code}).status_code == 200
+    assert client.post("/verify-email", json={
+        "email": "dana@example.test", "code": code}).status_code == 409
+
+
+def test_resend_retires_the_previous_code(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    _signup(client)
+    old = _code_from(sent[0])
+    assert client.post("/verify-email/resend",
+                       json={"email": "dana@example.test"}).status_code == 200
+    assert client.post("/verify-email", json={
+        "email": "dana@example.test", "code": old}).status_code == 403
+    assert client.post("/verify-email", json={
+        "email": "dana@example.test", "code": _code_from(sent[1])}
+    ).status_code == 200
+
+
+def test_wrong_password_and_unknown_address_answer_identically(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    _verified(client, sent)
+    wrong = client.post("/signin", json={
+        "email": "dana@example.test", "password": "not-the-password"})
+    unknown = client.post("/signin", json={
+        "email": "nobody@example.test", "password": "whatever-here"})
+    assert wrong.status_code == unknown.status_code == 403
+    assert wrong.json()["detail"] == unknown.json()["detail"]
+
+
+def test_forgot_password_resets_via_emailed_code(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    _verified(client, sent)
+    assert client.post("/password/reset/request", json={
+        "email": "dana@example.test"}).status_code == 200
+    assert "reset code is:" in sent[-1]["body"]
+    r = client.post("/password/reset", json={
+        "email": "dana@example.test", "code": _code_from(sent[-1]),
+        "new_password": "a-brand-new-passphrase"})
+    assert r.status_code == 200, r.text
+    assert client.post("/signin", json={
+        "email": "dana@example.test",
+        "password": "hunter2-hunter2"}).status_code == 403
+    assert client.post("/signin", json={
+        "email": "dana@example.test",
+        "password": "a-brand-new-passphrase"}).status_code == 200
+
+
+def test_a_verify_code_cannot_reset_a_password(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    _signup(client)
+    signup_code = _code_from(sent[0])
+    client.post("/verify-email", json={
+        "email": "dana@example.test", "code": signup_code})
+    assert client.post("/password/reset", json={
+        "email": "dana@example.test", "code": signup_code,
+        "new_password": "a-brand-new-passphrase"}).status_code == 403
+
+
+def test_neither_oracle_endpoint_reveals_who_has_an_account(client, monkeypatch):
+    _capture_mail(monkeypatch)
+    for path in ("/verify-email/resend", "/password/reset/request"):
+        r = client.post(path, json={"email": "nobody@example.test"})
+        assert r.status_code == 200
+        assert r.json()["code_delivery"] == "none"
+
+
+def test_passwords_and_codes_are_never_stored_in_the_clear(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    _signup(client)
+    code = _code_from(sent[0])
+    row = db.connect().execute(
+        "SELECT * FROM accounts WHERE email='dana@example.test'").fetchone()
+    assert "hunter2-hunter2" not in (row["password_hash"] + row["salt"])
+    stored = db.connect().execute(
+        "SELECT code_hash FROM email_codes").fetchall()
+    assert all(code != r["code_hash"] for r in stored)
+
+
+def test_a_short_password_is_refused_before_any_email_is_sent(client, monkeypatch):
+    sent = _capture_mail(monkeypatch)
+    assert _signup(client, password="short").status_code == 422
+    assert sent == []

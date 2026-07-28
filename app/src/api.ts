@@ -21,12 +21,46 @@ export function setBase(url: string) {
   localStorage.setItem("qrme.base", url.replace(/\/+$/, ""));
 }
 
+// Bring-your-own model key: stored on this device only, sent per-request as
+// x-llm-api-key so generations run on the user's own credential. The backend
+// never persists it; without one, the deployment's key (if any) answers.
+export function getLlmKey(): string { return localStorage.getItem("qrme.llmKey") || ""; }
+export function setLlmKey(key: string) {
+  if (key.trim()) localStorage.setItem("qrme.llmKey", key.trim());
+  else localStorage.removeItem("qrme.llmKey");
+}
+
+// Accounts: the email is verified (emailed code) before sign-in works. The
+// account is what owns — its id is the owner_id profiles are created under.
+export const accountApi = {
+  signup: (body: { email: string; password: string; display_name?: string }) =>
+    req<{ account_id: string; email: string; verified: boolean; code_delivery: string }>(
+      "/signup", { method: "POST", body }),
+  verifyEmail: (body: { email: string; code: string }) =>
+    req<{ account_id: string; email: string; display_name?: string; account_token: string }>(
+      "/verify-email", { method: "POST", body }),
+  resendCode: (email: string) =>
+    req<{ email: string; code_delivery: string }>(
+      "/verify-email/resend", { method: "POST", body: { email } }),
+  signin: (body: { email: string; password: string }) =>
+    req<{ account_id: string; email: string; display_name?: string; account_token: string }>(
+      "/signin", { method: "POST", body }),
+  requestReset: (email: string) =>
+    req<{ email: string; code_delivery: string }>(
+      "/password/reset/request", { method: "POST", body: { email } }),
+  resetPassword: (body: { email: string; code: string; new_password: string }) =>
+    req<{ email: string; reset: boolean }>(
+      "/password/reset", { method: "POST", body }),
+};
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (opts.token) headers["authorization"] = `Bearer ${opts.token}`;
+  const llmKey = getLlmKey();
+  if (llmKey) headers["x-llm-api-key"] = llmKey;
   let res: Response;
   try {
     res = await fetch(getBase() + path, {
