@@ -7,7 +7,7 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import auth, companion, db, identity, persona, terms, tiers
+from .. import auth, companion, db, identity, persona, storage, terms, tiers
 from ..common import (
     age_of, profile_or_404, profile_out, require_owner, source_items,
 )
@@ -50,9 +50,31 @@ def create_profile(body: ProfileCreate) -> dict:
     if body.adult_mode and body.kind == "other_person":
         # Hard line: never a rated persona of another real person — only
         # the verified adult owner themself, or a fictional character.
+        #
+        # **Checked before the storage question, and the order is the point.**
+        # The first version asked "can your plan hold rated content" first, so
+        # this request came back 402 *pay $20* when the true answer is 403
+        # *never, at any price*. A payment response in front of a hard line
+        # tells somebody the line is a price, which is the one impression this
+        # particular refusal must never give. The suite caught it in
+        # `test_a_real_likeness_can_never_be_rated`.
         raise HTTPException(
             403, "adult mode is never available for a profile of another "
                  "real person")
+    if body.adult_mode:
+        # A rated profile's content is not something to hold in the clear.
+        #
+        # Checked against the plan this request lands on rather than the one
+        # the account holds *now*: creation is also enrolment, so a brand-new
+        # account is still "visitor" at this line, and reading the current plan
+        # refused every rated profile ever created.
+        landing = getattr(body, "plan", None) or tiers.plan_of(body.owner_id)
+        if landing == "visitor":
+            landing = tiers.DEFAULT_PLAN
+        try:
+            storage.require(landing, "rated_content")
+        except storage.StorageError as exc:
+            raise HTTPException(402, str(exc)) from None
     if body.kind == "other_person" and body.consent is None:
         raise HTTPException(
             422, "profiles of another real person require a consent/rights record")
@@ -94,10 +116,11 @@ def create_profile(body: ProfileCreate) -> dict:
     from .. import friends
     friends.install_founder(profile_id)
     # Making something is what a membership is *for*, so creating a profile is
-    # where an account joins one. Basic unless a plan is named, because the
-    # cheaper of two prices is the honest default to put somebody on when they
-    # have not chosen — and an existing member keeps the plan they have rather
-    # than being quietly downgraded by making a second profile.
+    # where an account joins one. Free unless a plan is named: putting somebody
+    # on a paid plan they did not ask for is the wrong default even at a fair
+    # price, and the free tier is honest about what it is rather than quiet.
+    # An existing member keeps the plan they have rather than being downgraded
+    # by making a second profile.
     _enrol(body.owner_id, getattr(body, "plan", None))
     token = auth.issue("owner", profile_id)
     out = {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
@@ -360,8 +383,17 @@ def delete_profile(profile_id: str, request: Request) -> dict:
 
 @router.post("/profiles/{profile_id}/sources", status_code=201)
 def add_source(profile_id: str, body: SourceAdd, request: Request) -> dict:
-    profile_or_404(profile_id)
+    row = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    # Source material about somebody who is not the account holder does not go
+    # into the open store. The person exposed did not choose the plan — see
+    # qrme/storage.py:SENSITIVE.
+    if row["kind"] == "other_person":
+        try:
+            storage.require(tiers.plan_of(row["owner_id"]),
+                            "third_party_source")
+        except storage.StorageError as exc:
+            raise HTTPException(402, str(exc)) from None
     pdi = request.app.state.pdi
     conn = db.connect()
     item_id = db.new_id("src")

@@ -3728,16 +3728,16 @@ SCREENS = [
     # The price list. Card five is the one that has to be there: money in this
     # repository is simulated everywhere, and a tier screen is the one place a
     # reader would assume otherwise.
-    dict(num=130, title="Choose a Plan", sub="Basic makes, Pro reaches out",
+    dict(num=130, title="Choose a Plan", sub="Free builds too — $20 seals it",
          accent="brand", tab=3, cards=[
-        dict(icon="person", color="cyan", k="Basic · $20/month",
-             s="your profiles, your own agent", pill=("NOW", "info")),
+        dict(icon="eye", color="amber", k="Free · $0",
+             s="the same app, in the clear", pill=("NOW", "info")),
+        dict(icon="lock", color="cyan", k="Basic · $20/month",
+             s="the same app, sealed in a vault"),
         dict(icon="bolt", color="brand", k="Pro · $130/month",
              s="all that leaves your account"),
-        dict(icon="eye", color="green", k="Visitors read free",
-             s="a scan needs no account"),
-        dict(icon="lock", color="amber", k="Cancel, keep your work",
-             s="profiles outlive the plan"),
+        dict(icon="person", color="green", k="Free does all Basic does",
+             s="$20 buys privacy, not features"),
         dict(icon="info", color="indigo", k="Billing is simulated",
              s="no real funds move", pill=("SIM", "warn")),
     ], button=("Go Pro", "brand")),
@@ -3764,17 +3764,17 @@ SCREENS = [
     # visitor is a real state rather than a lapsed customer.
     dict(num=132, title="Pick a Plan", sub="Step 4 of 5",
          accent="brand", tab=0, cards=[
-        dict(icon="person", color="cyan", k="Basic · $20/month",
-             s="make profiles and your agent"),
+        dict(icon="eye", color="amber", k="Free · $0",
+             s="make things — stored in the clear"),
+        dict(icon="lock", color="cyan", k="Basic · $20/month",
+             s="the same, sealed in a vault"),
         dict(icon="bolt", color="brand", k="Pro · $130/month",
              s="all that leaves your account"),
-        dict(icon="eye", color="green", k="Not yet — just look",
-             s="you need a plan to make things"),
-        dict(icon="lock", color="amber", k="Change or cancel later",
+        dict(icon="shieldok", color="green", k="Change or cancel later",
              s="your profiles outlive the plan"),
         dict(icon="info", color="indigo", k="Billing is simulated",
              s="no real funds move", pill=("SIM", "warn")),
-    ], button=("Continue with Basic", "brand")),
+    ], button=("Start free", "brand")),
     # The payment step, marked. Drawn rather than skipped because a signup
     # flow has one and pretending otherwise would make the mockups a worse
     # guide than the product — but every version of this screen carries the
@@ -3799,6 +3799,8 @@ SCREENS = [
          accent="green", tab=0, cards=[
         dict(icon="shieldok", color="green", k="Make what you like",
              s="profiles, and your own agent", pill=("ON", "good")),
+        dict(icon="lock", color="cyan", k="Sealed in the vault",
+             s="that is what the $20 bought"),
         dict(icon="grid", color="amber", k="Marketplace is Pro",
              s="you can browse it now"),
         dict(icon="link", color="amber", k="Connectors are Pro",
@@ -3853,6 +3855,56 @@ SCREENS = [
         dict(icon="warn", color="indigo", k="We cannot see the room",
              s="look before you start"),
     ]),
+    # ---- the free plan ----
+    #
+    # Where signup lands now. The order of the cards is the argument: what is
+    # *not* private is said before anything about what the plan can do,
+    # because a disclosure that arrives after the pitch is a disclosure nobody
+    # reads at the moment it matters.
+    dict(num=138, title="You're on Free", sub="The same app, in the clear",
+         accent="amber", tab=0, cards=[
+        dict(icon="eye", color="red", k="Not private",
+             s="no vault, no key, no audit trail", pill=("OPEN", "warn")),
+        dict(icon="person", color="green", k="All that Basic does",
+             s="profiles, and your own agent", pill=("ON", "good")),
+        dict(icon="lock", color="cyan", k="$20 buys privacy",
+             s="not one extra feature"),
+        dict(icon="warn", color="amber", k="Two things we refuse",
+             s="see what free will not hold"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Seal it for $20", "brand")),
+    # The two postures side by side. The last two cards are the ones a pricing
+    # page normally leaves out, and leaving them out is how a product ends up
+    # selling absolution rather than encryption.
+    dict(num=139, title="Where It Lives", sub="Open cloud, or sealed vault",
+         accent="cyan", tab=3, cards=[
+        dict(icon="grid", color="amber", k="Free · open cloud",
+             s="the platform's own database"),
+        dict(icon="eye", color="red", k="Operators can read it",
+             s="so can a lawful request"),
+        dict(icon="lock", color="green", k="Basic · sealed vault",
+             s="under a key you can hold"),
+        dict(icon="shieldok", color="cyan", k="Upgrading seals ahead",
+             s="it cannot un-expose the past"),
+        dict(icon="shield", color="indigo", k="A lapse unseals nothing",
+             s="a lapse is not a disclosure"),
+    ], button=("Move to Basic", "brand")),
+    # What the open store will not hold, and the test for the list: whose
+    # exposure is it. Both entries are somebody who never chose the plan.
+    dict(num=140, title="Not On Free", sub="Two things we will not leave open",
+         accent="red", tab=3, cards=[
+        dict(icon="person", color="red", k="Somebody else's letters",
+             s="they did not pick this plan"),
+        dict(icon="eye", color="amber", k="Behind the age gate",
+             s="rated work needs the vault"),
+        dict(icon="shieldok", color="green", k="Your own work is fine",
+             s="your notes, your call"),
+        dict(icon="lock", color="cyan", k="Basic · $20 a month",
+             s="the vault is free to host"),
+        dict(icon="info", color="indigo", k="Billing is simulated",
+             s="no real funds move", pill=("SIM", "warn")),
+    ], button=("Seal it for $20", "brand")),
     dict(num=88, title="Your Devices", sub="Pair them while you sign up",
          accent="cyan", tab=0, cards=[
         dict(icon="watch", color="cyan", k="Apple Watch", s="on the wrist · agents, activity", pill=("PAIRED", "good")),

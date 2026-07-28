@@ -676,6 +676,12 @@ def seed() -> dict:
             owner_id=OWNER_ID, kind="fictional", display_name=name,
             persona=persona, purpose=purpose,
             adult_mode=industry == "adult",
+            # The starter collection is the deployment's own, and one of the
+            # 34 is rated — which `storage.SENSITIVE` will not hold in the
+            # open store. Named here rather than left to the default for the
+            # same reason `/packs/seed` sits in `tiers.OPEN`: seeding is the
+            # operator stocking the shelf, not a user picking a plan.
+            plan="pro",
             verification=Verification(birthdate=_BIRTHDATE)))
         claim_handle(profile["id"], HandleSet(handle=handle))
         # The portrait brief doubles as the profile's `appearance`, which

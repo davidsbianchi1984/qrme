@@ -6,6 +6,55 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A free plan, with nothing private about it** — `qrme/storage.py`, 23 tests,
+  screens 138, 139 and 140. Two storage postures: **open cloud** (Free — the
+  platform's own database, in the clear) and **encrypted vault** (Basic and
+  Pro — sealed in PDI under a key you can hold, with a tamper-evident chain).
+  `DEFAULT_PLAN` is now `free`, and the ladder runs visitor → free → basic →
+  pro.
+
+  **Free and Basic reach identical capabilities** — `includes("free") ==
+  includes("basic")`, asserted by test. What $20 buys is privacy, not a
+  feature. A free tier crippled into uselessness teaches nobody anything about
+  the product; a free tier that is honestly *not private* teaches somebody
+  exactly what they are choosing between.
+
+  **The disclosure is structural.** `storage.describe()` rides on `GET /plans`,
+  `GET /memberships/{id}` and the body returned when a profile is created, and
+  `not_private` is a field rather than a footnote. The open posture names its
+  readers — *you, anyone you share with, the people who operate this
+  deployment, anyone with lawful access to it* — because "industry-standard
+  security" is what a product says when it does not want to finish the
+  sentence.
+
+  **Two payloads are refused rather than quietly exposed**, and the test for
+  the list is not *would the account holder mind* but **whose exposure is it**:
+  source material about somebody else, and anything behind the age gate. Both
+  are cases where the person harmed is frequently not the person who clicked.
+
+### Fixed
+
+- **A signing credential was on the sensitive list and should never have
+  been.** It reads like the most sensitive thing in the product and is not a
+  storage-at-rest risk at all — WebAuthn keeps the private key on the device,
+  so an open store has nothing to expose. Gating it also broke signing
+  outright: a signer is frequently an interactor with no membership, so
+  `plan_of` returned "visitor", the posture came back open, and every
+  enrolment was refused. The reasoning is recorded in the module so it cannot
+  be re-added by intuition.
+
+- **A hard line was being answered with a price.** A rated profile *of another
+  real person* is refused at any amount, and the storage-posture check ran
+  first — so the response was 402, telling somebody the line is a price. It is
+  not. The check now runs after the hard line, and
+  `test_a_hard_line_is_never_answered_with_a_price` holds the order.
+
+- **The rated-content check ran before enrolment**, so a brand-new account was
+  still "visitor" at that line and every rated profile was refused. It now
+  reads the plan being asked for, falling back to `DEFAULT_PLAN`.
+
 ## [0.4.0] — 2026-07-27
 
 The round where the products got a price, and a guide that walks you to

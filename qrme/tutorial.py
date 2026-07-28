@@ -65,12 +65,12 @@ LESSONS: tuple[dict, ...] = (
     dict(key="signup", chapter="Getting started", title="Signing up",
          what="Log in, verify you are a real person once, choose what the app "
               "may reach, pick a plan and pay. You can decline the plan and "
-              "keep looking — a visitor reads any public page, and only "
-              "*making* something needs Basic. If you later tap something "
-              "your plan does not include, the app says which plan it needs "
-              "and what it costs rather than refusing you flatly.",
-         screens=(132, 133, 134, 135),
-         try_it="Open Pick a Plan and read the third option."),
+              "keep looking — a visitor reads any public page — and the free "
+              "plan makes things too. If you later tap something your plan "
+              "does not include, the app says which plan it needs and what it "
+              "costs rather than refusing you flatly.",
+         screens=(132, 133, 134, 135, 138),
+         try_it="Open Pick a Plan and read the first option."),
     dict(key="make_one", chapter="Getting started", title="Making a profile",
          what="You describe who it is and it answers in character from the "
               "first message. Genesis builds one from four questions if you "
@@ -168,15 +168,31 @@ LESSONS: tuple[dict, ...] = (
               "read by whoever walks past.",
          screens=(126,), try_it="Place one and choose what it shows."),
     dict(key="plans", chapter="Being yourself", title="What it costs",
-         what="Basic is $20 a month and is the entry to making things: your "
-              "own profiles and your own agent. Pro is $130 a month and adds "
-              "everything that leaves your account — the marketplace, "
-              "connectors, skills, downloads, connections, and every builder. "
-              "Reading is free and always was: a scanned beacon needs no "
-              "account at all. Billing here is simulated and no real funds "
-              "move.",
+         what="Free makes things: your own profiles and your own agent, with "
+              "everything stored in the clear. Basic is $20 a month and is "
+              "the same app with all of it sealed in the vault. Pro is $130 a "
+              "month and adds everything that leaves your account — the "
+              "marketplace, connectors, skills, downloads, connections, and "
+              "every builder. Reading is free and always was: a scanned "
+              "beacon needs no account at all. Billing here is simulated and "
+              "no real funds move.",
          screens=(130, 131),
-         try_it="Open Choose a Plan and read what Basic already includes."),
+         try_it="Open Choose a Plan and read what Free already includes."),
+    dict(key="storage", chapter="Being yourself",
+         title="Where your data lives",
+         what="On the free plan nothing is private. What you make sits in "
+              "this platform's own database in the clear, where the people "
+              "who run it can read it and a lawful request reaches it. Basic "
+              "seals it in the vault under a key you can hold, and that is "
+              "the only thing the $20 buys — the features are identical. Two "
+              "things are never stored in the clear whatever you have chosen: "
+              "source material about somebody who is not you, and anything "
+              "behind the age gate, because in both the person exposed did "
+              "not pick the plan. Moving up seals what you write from then on "
+              "and cannot un-expose what was already open; moving down never "
+              "unseals anything already in the vault.",
+         screens=(138, 139, 140),
+         try_it="Open Where It Lives and read who can read a free account."),
     dict(key="guide", chapter="Being yourself", title="This guide",
          what="The walkthrough you are in. It has no name and no face, it "
               "works with no model configured, and it never taps anything for "

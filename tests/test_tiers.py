@@ -190,12 +190,18 @@ def test_making_a_second_profile_does_not_downgrade_you(client):
     assert tiers.plan_of("acct-2") == "pro"
 
 
-def test_creating_a_profile_enrols_a_new_account_on_basic(client):
+def test_creating_a_profile_enrols_a_new_account_on_free(client):
     """Making something is what a membership is for, so creation is where an
-    account joins one. The cheaper price is the honest default for somebody
-    who has not chosen."""
+    account joins one — and the default is Free.
+
+    Putting somebody on a paid plan they did not ask for is the wrong default
+    even at a fair price. Free is honest about what it is rather than quiet,
+    which is what makes it safe to land people on.
+    """
     me = make_profile(client, plan=None, owner_id="acct-3")
-    assert me["membership"]["plan"] == tiers.DEFAULT_PLAN == "basic"
+    assert me["membership"]["plan"] == tiers.DEFAULT_PLAN == "free"
+    assert me["membership"]["storage"]["private"] is False
+    assert "in the clear" in me["membership"]["storage"]["disclosure"]
 
 
 def test_genesis_enrols_on_the_same_terms_as_the_form(client):
@@ -209,7 +215,7 @@ def test_genesis_enrols_on_the_same_terms_as_the_form(client):
                     "what_matters": "ferns, honesty, the garden",
                     "comfort": "sits with you and says little"}})
     assert r.status_code == 201, r.text
-    assert r.json()["membership"]["plan"] == "basic"
+    assert r.json()["membership"]["plan"] == "free"
 
 
 def test_an_interactor_is_not_an_account(client):

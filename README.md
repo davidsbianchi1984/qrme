@@ -313,6 +313,12 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/137-whats-in-shot.svg"><img src="docs/screens/137-whats-in-shot.svg" width="210" alt="Whats In Shot"></a><br><sub><b>137</b> · What's In Shot</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/138-youre-on-free.svg"><img src="docs/screens/138-youre-on-free.svg" width="210" alt="You are on Free"></a><br><sub><b>138</b> · You're on Free</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/139-where-it-lives.svg"><img src="docs/screens/139-where-it-lives.svg" width="210" alt="Where It Lives"></a><br><sub><b>139</b> · Where It Lives</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/140-not-on-free.svg"><img src="docs/screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
+    <td align="center" width="33%"></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -1652,13 +1658,19 @@ the moment it stops being about the thing.*
 
 `qrme/tiers.py`, 4 routes, 26 tests, screens **130** and **131**.
 
-Two plans and a doorway below them.
+Three plans and a doorway below them.
 
 | | | |
 | --- | --- | --- |
 | **Visitor** | free | read any public page — a scanned beacon needs no account |
-| **Basic** | **$20/month** | make your own profiles and your own agent |
+| **Free** | **$0** | make your own profiles and your own agent, stored in the clear |
+| **Basic** | **$20/month** | the same, sealed in the vault under a key you can hold |
 | **Pro** | **$130/month** | everything that leaves your account: the marketplace, connectors, skills, downloads, connections, and every modifier and builder |
+
+**Free and Basic reach identical capabilities, and that is deliberate** —
+`includes("free") == includes("basic")`, asserted by test. What $20 buys is
+`qrme/storage.py`'s vault posture, not a feature. See *[Where your data
+lives](#where-your-data-lives)* below.
 
 **Money here is simulated**, exactly as in `commerce.py` — subscribing writes a
 row and moves no real funds, and every response that names a price says so in
@@ -1708,6 +1720,73 @@ Basic; an existing member keeps the plan they have, because making a second
 profile must not quietly move somebody off Pro. **Cancelling keeps the
 profiles** — a lapsed subscription is not a reason to delete somebody's work,
 and a product that deleted it is one nobody could safely try.
+
+## Where your data lives
+
+`qrme/storage.py`, 23 tests, screens **138**, **139** and **140**.
+
+There are two postures, and the difference between them is the whole of what
+Basic buys.
+
+| | | |
+| --- | --- | --- |
+| **Open cloud** | Free | the platform's own database, in the clear. The operator can read it, a backup contains it, a subpoena reaches it |
+| **Encrypted vault** | Basic, Pro | sealed in PDI before it lands, under a key you can hold yourself, with a tamper-evident chain over every access |
+
+**Free and paid differ in where your data lives, not in what you can do.** A
+free tier crippled into uselessness teaches nobody anything about the product;
+a free tier that is honestly *not private* teaches somebody exactly what they
+are choosing between.
+
+**So the disclosure is structural.** `storage.describe()` is carried on every
+surface that names a plan — `GET /plans`, `GET /memberships/{id}`, and the body
+returned when a profile is created — and `not_private` is a **field**, not a
+footnote. A privacy claim that lives in a Terms of Service and not in the
+response body is a claim nobody reads at the moment it matters. And the open
+posture names its readers rather than gesturing at them: *you, anyone you share
+with, the people who operate this deployment, anyone with lawful access to it.*
+"Industry-standard security" is what a product says when it does not want to
+finish the sentence.
+
+**Two things are refused rather than quietly exposed**, and the test for the
+list is not *would the account holder mind* — it is **whose exposure is it**:
+
+- **source material about somebody else.** They did not pick this plan.
+- **anything behind the age gate.** Rated content needs the vault.
+
+Both are payloads where the person harmed is frequently not the person who
+clicked. Letting free store anything and warning loudly sounds more respectful
+of the user's autonomy and is not, for exactly that reason.
+
+The list is short on purpose and holds only what *this* repository can refuse —
+`test_every_sensitive_kind_is_enforced_somewhere` fails if a kind is named
+here that nothing outside `storage.py` actually checks. The first draft named
+`body_image` and `medical`, which are JIM-mini's payloads and unreachable from
+here, and a `signature`, which is **not a storage-at-rest risk at all**:
+WebAuthn keeps the private key on the device, so there is nothing for an open
+store to expose. Gating it also broke signing outright, because a signer is
+frequently an interactor with no membership — `plan_of` returned "visitor", the
+posture came back open, and every enrolment was refused. A sensitive list
+assembled from which words sound alarming is how that happens.
+
+**A hard line is never answered with a price.** A rated profile *of another
+real person* is refused at any amount, and the first version checked the
+storage posture first — so the response was **402**, telling somebody the line
+is a price. It is not. The check now runs after the hard line, and
+`test_a_hard_line_is_never_answered_with_a_price` holds the order.
+
+**A downgrade never unseals anything.** Moving from Basic to Free leaves
+everything already sealed exactly where it is; only new content goes to the
+open store. A billing event that silently declassified a year of somebody's
+records would be the worst thing this module could do, so `downgrade_effect`
+exists to *state* the rule rather than to perform it — a test asserts it
+contains no write at all.
+
+**And an upgrade does not un-expose anything.** Content written in the clear
+was in the clear. Sealing it afterwards protects it from here on and changes
+nothing about the backups, logs and copies that already exist, and
+`upgrade_effect` says so in those words. A product that implied otherwise
+would be selling absolution rather than encryption.
 
 ## The pane in the corner
 
