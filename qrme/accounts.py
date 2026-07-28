@@ -139,15 +139,35 @@ def signup(email: str, password: str, display_name: str | None = None) -> dict:
         raise AccountError(422, "password must be at least 8 characters")
     conn = db.connect()
     existing = conn.execute(
-        "SELECT verified_at FROM accounts WHERE email=?", (email,)
+        "SELECT * FROM accounts WHERE email=?", (email,)
     ).fetchone()
     if existing:
+        if existing["verified_at"]:
+            raise AccountError(
+                409, "an account already exists for this address — sign in "
+                     "instead")
+        if mailer.configured_transport() == "console":
+            # A pending half-account (a crashed or abandoned earlier signup)
+            # on a machine with no mail transport: nothing can ever verify
+            # it, and the machine owner is the only person here. Finish it
+            # now, under the credentials just typed — the earlier attempt's
+            # password may be lost to the crash that stranded it.
+            salt = secrets.token_hex(16)
+            conn.execute(
+                "UPDATE accounts SET password_hash=?, salt=?,"
+                " display_name=? WHERE id=?",
+                (_hash_password(password, salt), salt,
+                 (display_name or "").strip() or existing["display_name"],
+                 existing["id"]),
+            )
+            conn.commit()
+            result = _activate(email, existing["id"])
+            result["verified"] = True
+            result["verification"] = "local"
+            return result
         raise AccountError(
-            409,
-            "an account already exists for this address — sign in instead"
-            if existing["verified_at"]
-            else "an account is already pending for this address — verify the "
-                 "emailed code, or resend it")
+            409, "an account is already pending for this address — verify "
+                 "the emailed code, or resend it")
     salt = secrets.token_hex(16)
     account_id = db.new_id("acc")
     conn.execute(
