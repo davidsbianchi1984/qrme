@@ -777,8 +777,22 @@ in a request body.
 
 | Token | Minted by | Grants |
 |---|---|---|
+| **account** | `POST /verify-email` and `POST /signin` return `account_token` | Proves "I am this account" to a console. The account is what *owns* — its id is the `owner_id` profiles are created under and the `account_id` memberships bill to — but it carries none of a profile's owner powers by itself |
 | **owner** | `POST /profiles` and `POST /profiles/genesis` return `owner_token` **once** | Full control of that profile: edit, sources, surfaces, specialists, grants/tasks, fine-tune, moderation queue, stats, export, erasure, departure, and the assistant/perception endpoints |
 | **interactor** | `POST /interactors` returns `token` | Reading one's own conversation memory (`GET /profiles/{id}/memory/{interactor}`) |
+
+**Accounts** (`qrme/accounts.py`): `POST /signup` (email + password) creates
+an account that **cannot sign in yet** — a 6-digit code goes to the address
+(SMTP when `QRME_SMTP_HOST` is configured, printed to the server terminal
+otherwise), and only `POST /verify-email` proves the inbox and mints the
+first token. `POST /signin` refuses unverified addresses and answers
+unknown-address and wrong-password identically;
+`POST /verify-email/resend` retires the old code;
+`POST /password/reset/request` + `POST /password/reset` change a forgotten
+password by the same emailed-code proof and revoke every account session
+(per-profile owner tokens are separate capabilities and survive). Passwords
+are PBKDF2-hashed with per-account salts; codes are hashed at rest,
+single-use, and expire in 15 minutes.
 
 - Send it as `Authorization: Bearer <token>`. A missing/invalid token on a
   gated endpoint is **401**; a valid token for the wrong resource is **403**.

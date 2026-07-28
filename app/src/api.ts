@@ -30,6 +30,29 @@ export function setLlmKey(key: string) {
   else localStorage.removeItem("qrme.llmKey");
 }
 
+// Accounts: the email is verified (emailed code) before sign-in works. The
+// account is what owns — its id is the owner_id profiles are created under.
+export const accountApi = {
+  signup: (body: { email: string; password: string; display_name?: string }) =>
+    req<{ account_id: string; email: string; verified: boolean; code_delivery: string }>(
+      "/signup", { method: "POST", body }),
+  verifyEmail: (body: { email: string; code: string }) =>
+    req<{ account_id: string; email: string; display_name?: string; account_token: string }>(
+      "/verify-email", { method: "POST", body }),
+  resendCode: (email: string) =>
+    req<{ email: string; code_delivery: string }>(
+      "/verify-email/resend", { method: "POST", body: { email } }),
+  signin: (body: { email: string; password: string }) =>
+    req<{ account_id: string; email: string; display_name?: string; account_token: string }>(
+      "/signin", { method: "POST", body }),
+  requestReset: (email: string) =>
+    req<{ email: string; code_delivery: string }>(
+      "/password/reset/request", { method: "POST", body: { email } }),
+  resetPassword: (body: { email: string; code: string; new_password: string }) =>
+    req<{ email: string; reset: boolean }>(
+      "/password/reset", { method: "POST", body }),
+};
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},

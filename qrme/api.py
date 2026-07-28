@@ -21,7 +21,8 @@ from . import llm, mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
-from .routers import (apps, assistant, audience, avatars, commerce,
+from .routers import (accounts as account_routes,
+                      apps, assistant, audience, avatars, commerce,
                       community, connections,
                       desks, displays, dock, earnings, exchange, feedback,
                       friends,
@@ -141,6 +142,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(avatars.router)
     app.include_router(steering.router)
     app.include_router(feedback.router)
+    app.include_router(account_routes.router)
     app.include_router(gaming.router)
     app.include_router(models.router)
     app.include_router(robots.router)
