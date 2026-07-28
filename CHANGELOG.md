@@ -6,6 +6,44 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.3] — 2026-07-28
+
+### Added
+
+- **Accounts: email + password, the address verified before sign-in works**
+  (`qrme/accounts.py`, `qrme/mailer.py`, `qrme/routers/accounts.py`). The
+  account is what *owns* — its id is the `owner_id` profiles are created
+  under and the `account_id` memberships bill to — while every profile keeps
+  its own owner capability token exactly as before. `POST /signup` creates
+  an account that cannot sign in yet; a 6-digit code goes to the address
+  (SMTP when `QRME_SMTP_HOST` is configured, printed to the server terminal
+  otherwise) and only `POST /verify-email` proves the inbox and mints the
+  first account token. `POST /signin` refuses unverified addresses and
+  answers unknown-address and wrong-password identically;
+  `POST /password/reset/request` + `POST /password/reset` change a forgotten
+  password by the same emailed-code proof and revoke every account session.
+  Passwords are PBKDF2 with per-account salts; codes hashed at rest,
+  single-use, 15-minute expiry. The console onboarding is now the
+  conventional two-stage flow: account gate (tabs, show/hide password
+  toggles, a re-enter field checked live, Forgot password) then profile
+  creation under the signed-in account.
+
+- **Bring your own model key.** `x-llm-api-key` rides any request into a
+  request-scoped context variable the provider layer reads — that request's
+  generations run on the caller's credential, never persisted, never
+  logged, gone when the request ends. An explicit provider choice plus a
+  caller key counts as configured; a key on auto defaults to Claude rather
+  than the stub; the deployment's env key remains the fallback (an operator
+  lending theirs out). The Control Center stores the key device-side only.
+
+- **The installer runs itself.** `packaging/backend_entry.py` freezes the
+  whole backend with PyInstaller (CORS on, loopback only, data under the
+  app's user-data directory); the release workflow builds it per-OS and
+  ships it inside the installer; Electron probes `/health`, spawns the
+  bundled backend when nothing answers, waits for it, and kills it on
+  quit — double-click-and-done, no Python on the machine. A backend the
+  user already runs is left alone.
+
 ## [0.4.2] — 2026-07-28
 
 ### Changed
@@ -1991,7 +2029,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.2...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.3...HEAD
+[0.4.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.3
 [0.4.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.2
 [0.4.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.1
 [0.4.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.0
