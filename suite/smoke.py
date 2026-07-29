@@ -113,6 +113,11 @@ def run(workdir: str | None = None) -> dict:
         assert r.status_code == 201, f"enroll: {r.text}"
         user = r.json()
         jim.headers["authorization"] = f"Bearer {user['user_token']}"
+        # The vault is plan-gated, not deployment-gated (jim/storage.py):
+        # a visitor's writes stay out of the vault by design, so the sealed
+        # exchange below needs the user on a private plan.
+        r = jim.post(f"/memberships/{user['id']}", json={"plan": "basic"})
+        assert r.status_code == 200, f"membership: {r.text}"
         r = jim.post(f"/monitor/{user['id']}",
                      json={"note": "I lost my job and can't pay rent"})
         assert r.status_code == 200, f"monitor: {r.text}"

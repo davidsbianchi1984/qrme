@@ -2850,7 +2850,9 @@ uvicorn suite.gateway:app    # /qrme/… /jim/… /pdi/… on one origin
 
 On top of the mounted apps it adds a thin, **stateless** cross-cutting layer
 (it fans out over the per-product tokens the caller already holds and stores no
-credential of its own):
+*user* credential of its own — the one credential it does hold is the suite's
+vault-tenant token, a deployment credential it mints itself so QRME's seals
+keep working in suite mode):
 
 | Endpoint | What |
 |---|---|
@@ -2860,6 +2862,8 @@ credential of its own):
 | `POST /suite/export` | Data portability — one bundle with the identity's data from every product |
 | `PUT /suite/consent` · `POST /suite/consent/read` | Centralized consent, sealed in the PDI vault and enforced across products |
 | `POST /suite/usage` | Usage metering hooks for a suite-wide subscription |
+| `POST /suite/ecosystem` | One call after sign-on: the demo org seeded in QRME, JIM's care team linked to its first desk |
+| `POST /suite/operations` | The caller's coordinations as the vault recorded them — provenance, scoped by owner |
 
 See [docs/tandem.md](docs/tandem.md) for the full cross-product architecture.
 

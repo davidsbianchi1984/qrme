@@ -22,6 +22,10 @@ and adds a thin cross-cutting suite layer over the three:
                               enforced across products
     POST /suite/consent/read  read the authoritative consent document back
     POST /suite/usage         usage metering hooks for a suite-wide subscription
+    POST /suite/ecosystem     one call after sign-on: demo org seeded in QRME,
+                              JIM's care team linked to its first desk
+    POST /suite/operations    the caller's coordinations as the vault recorded
+                              them — the provenance view, scoped by owner
 
 These fan out over the per-product tokens the caller already holds, so the
 gateway stays stateless and stores no credential of its own.
@@ -44,6 +48,13 @@ from pydantic import BaseModel
 # Each product is its own FastAPI app; the same instance is both mounted (for
 # the launcher's per-product calls) and used in-process by /suite/session.
 _MOUNTS: dict[str, FastAPI] = {}
+
+# The suite's vault tenant for QRME's seals — a deployment credential (like a
+# standalone QRME's QRME_PDI_TOKEN), not a user credential, so holding it does
+# not break the gateway's no-user-credentials rule. Minted idempotently by
+# name at startup; the token never leaves this process.
+VAULT_TENANT = "suite:qrme-vault"
+_VAULT: dict = {}          # {"tenant_id": ..., "token": ...} when wired
 
 
 def _load(prefix: str, module: str) -> None:
@@ -112,7 +123,44 @@ def create_gateway() -> FastAPI:
         except Exception:  # noqa: BLE001 — wiring is a bonus, never a blocker
             pass
 
-    gw = FastAPI(title="Suite Gateway", version="0.1.6")
+    # Same posture for QRME's vault. In suite mode the mounted QRME would
+    # otherwise run with app.state.pdi = None, so coordinations would quietly
+    # stop sealing the moment the three products share one origin — the vault
+    # posture must not be a casualty of the deployment shape. The gateway
+    # finds (or mints once, by name) a dedicated vault tenant and injects
+    # QRME's own PDIClient over the in-process bridge. A deployment that
+    # already configured QRME_PDI_URL keeps its wiring; this only fills the
+    # gap. When PDI runs with a PDI_ADMIN_TOKEN the mint is refused and the
+    # suite comes up unwired — the operator configures QRME_PDI_TOKEN
+    # explicitly, as they would standalone.
+    _VAULT.clear()
+    if ("qrme" in _MOUNTS and "pdi" in _MOUNTS
+            and _MOUNTS["qrme"].state.pdi is None):
+        try:
+            from starlette.testclient import TestClient as _ASGIBridge
+
+            from qrme.pdi_client import PDIClient as _QrmePDIClient
+            bridge = _ASGIBridge(_MOUNTS["pdi"])
+            tenant_id = next(
+                (t["tenant_id"]
+                 for t in bridge.get("/retention").json()["record_retention"]
+                 if t["name"] == VAULT_TENANT), None)
+            if tenant_id is None:
+                minted = bridge.post("/tenants", json={
+                    "name": VAULT_TENANT, "retention": "forever"}).json()
+                tenant_id, token = minted["id"], minted["token"]
+            else:
+                # The plaintext token from the original mint is gone (PDI
+                # keeps only its hash) — issue a fresh scoped one.
+                token = bridge.post(f"/tenants/{tenant_id}/tokens",
+                                    json={"role": "write"}).json()["token"]
+            _MOUNTS["qrme"].state.pdi = _QrmePDIClient(
+                token=token, client=bridge)
+            _VAULT.update({"tenant_id": tenant_id, "token": token})
+        except Exception:  # noqa: BLE001 — wiring is a bonus, never a blocker
+            pass
+
+    gw = FastAPI(title="Suite Gateway", version="0.1.7")
 
     origins = os.environ.get("SUITE_CORS_ORIGINS", "*")
     from fastapi.middleware.cors import CORSMiddleware
@@ -134,7 +182,17 @@ def create_gateway() -> FastAPI:
             except Exception:  # noqa: BLE001
                 live = False
             products[name] = {"mounted": True, "live": live, "base": f"/{name}"}
-        return {"origin": "one", "products": products}
+
+        def _wired(name: str, attr: str) -> bool:
+            mounted = _MOUNTS.get(name)
+            return bool(mounted is not None
+                        and getattr(mounted.state, attr, None) is not None)
+        return {"origin": "one", "products": products,
+                # Which in-process tandems the gateway wired: JIM's QRME
+                # client, and QRME's PDI vault. False means that joint runs
+                # degraded (no care team / no sealing), not that it's down.
+                "tandems": {"jim_qrme": _wired("jim", "qrme"),
+                            "qrme_pdi": _wired("qrme", "pdi")}}
 
     @gw.post("/suite/session", status_code=201)
     async def suite_session(body: SuiteEnroll) -> dict:
@@ -219,6 +277,44 @@ def create_gateway() -> FastAPI:
                 "care_team": link_r.json(),
                 "note": "the Guardian now takes stacked concerns to this "
                         "team; coordinate by hand from JIM's Care Team tab"}
+
+    @gw.post("/suite/operations")
+    async def suite_operations(body: SuiteHandles) -> dict:
+        """The caller's coordinations as the vault recorded them — the
+        provenance view across the joint. The caller's own QRME owner token
+        authenticates (listing their organizations proves it); the gateway
+        collects their coordination ids and returns only the vault journal
+        entries that are theirs. The vault tenant's token never leaves this
+        process, and nobody reads another identity's operations — in suite
+        mode every identity's seals share one tenant, so the per-tenant
+        isolation PDI provides standalone has to be re-drawn here, by owner."""
+        if "qrme" not in _MOUNTS:
+            raise HTTPException(503, "qrme is not mounted")
+        if not body.qrme or not body.qrme.get("owner_token"):
+            raise HTTPException(422, "hand back the qrme slice of "
+                                     "/suite/session's products map")
+        if not _VAULT:
+            return {"entries": [], "note": "the qrme-pdi tandem is not "
+                    "wired, so nothing seals; see /suite/health tandems"}
+        token = body.qrme["owner_token"]
+        orgs_r = await _call(_MOUNTS["qrme"], "GET", "/organizations",
+                             headers=_bearer(token))
+        if orgs_r.status_code >= 400:
+            raise HTTPException(403, "QRME did not recognize that owner token")
+        mine: set[str] = set()
+        for org in orgs_r.json():
+            c_r = await _call(_MOUNTS["qrme"], "GET",
+                              f"/organizations/{org['id']}/coordinations",
+                              headers=_bearer(token))
+            if c_r.status_code < 400:
+                mine.update(c["id"] for c in c_r.json())
+        j_r = await _call(_MOUNTS["pdi"], "GET", "/operations",
+                          headers=_bearer(_VAULT["token"]))
+        journal = j_r.json().get("entries", []) if j_r.status_code < 400 else []
+        return {"entries": [e for e in journal
+                            if e["key"].rsplit("/", 1)[-1] in mine],
+                "note": "your coordinations as the vault recorded them; "
+                        "every read of this journal is on PDI's audit chain"}
 
     @gw.post("/suite/erase")
     async def suite_erase(body: SuiteHandles) -> dict:
