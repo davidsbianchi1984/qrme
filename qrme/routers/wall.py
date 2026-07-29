@@ -15,7 +15,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import embeds, wall
+from .. import embeds, media as media_mod, wall
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -25,6 +25,7 @@ class PostCreate(BaseModel):
     body: str = Field(min_length=1, max_length=wall.MAX_BODY)
     video_url: str | None = None
     video_title: str = ""
+    media_ids: list[str] = Field(default_factory=list, max_length=8)
 
 
 @router.post("/profiles/{profile_id}/wall", status_code=201)
@@ -40,9 +41,36 @@ def create_post(profile_id: str, body: PostCreate, request: Request) -> dict:
     require_owner(profile_id, request)
     try:
         return wall.publish(profile_id, body.body, video_url=body.video_url,
-                            video_title=body.video_title)
+                            video_title=body.video_title,
+                            media_ids=body.media_ids)
     except (wall.WallError, embeds.EmbedError) as exc:
         raise HTTPException(422, str(exc)) from None
+    except media_mod.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from None
+
+
+@router.post("/profiles/{profile_id}/media", status_code=201)
+async def upload_media(profile_id: str, request: Request) -> dict:
+    """One photo or video, raw in the request body — the user's own pixels.
+
+    Raw rather than multipart on purpose: the console sends the file bytes
+    directly, nothing new to depend on, and the kind is read from the bytes
+    either way (media.py's whitelist). Authentic media is never AI-marked.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    data = await request.body()
+    try:
+        return media_mod.save(profile_id, data)
+    except media_mod.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from None
+
+
+@router.get("/media/limits")
+def media_limits() -> dict:
+    """Caps and accepted types, published so a client can say so before an
+    upload fails rather than after."""
+    return media_mod.limits()
 
 
 @router.get("/videos/platforms")

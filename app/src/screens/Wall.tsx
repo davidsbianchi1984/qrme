@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, getBase, type WallComment, type WallPost } from "../api";
+import { api, getBase, type MediaUpload, type WallComment, type WallPost } from "../api";
 import { useSession } from "../store";
 
 // The community wall — the For You feed, in the console at last. The
@@ -19,6 +19,8 @@ export function Wall() {
   const [body, setBody] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [videoTitle, setVideoTitle] = useState("");
+  const [uploads, setUploads] = useState<MediaUpload[]>([]);
+  const [uploading, setUploading] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null);   // post id
   const [liked, setLiked] = useState<Set<string>>(new Set());
   const [openComments, setOpenComments] = useState<string | null>(null);
@@ -51,16 +53,29 @@ export function Wall() {
         body: body.trim(),
         video_url: videoUrl.trim() || undefined,
         video_title: videoTitle.trim() || undefined,
+        media_ids: uploads.map((u) => u.id),
       }, session.ownerToken);
       if (post.status === "blocked") {
         setError(`Moderation held this post: ${post.blocked_reason}`);
       } else {
-        setBody(""); setVideoUrl(""); setVideoTitle("");
+        setBody(""); setVideoUrl(""); setVideoTitle(""); setUploads([]);
         setNote("Posted to your wall.");
         load();
       }
     } catch (e) { setError((e as Error).message); }
     finally { setBusy(false); }
+  }
+
+  async function pickFiles(files: FileList | null) {
+    if (!files || !session.profileId || !session.ownerToken) return;
+    setUploading(true); setError(null);
+    try {
+      for (const file of Array.from(files)) {
+        const up = await api.uploadMedia(session.profileId, file, session.ownerToken);
+        setUploads((cur) => [...cur, up]);
+      }
+    } catch (e) { setError((e as Error).message); }
+    finally { setUploading(false); }
   }
 
   async function toggleLike(p: WallPost) {
@@ -118,6 +133,14 @@ export function Wall() {
         </div>
       </div>
       <p className="wp-body">{p.body}</p>
+
+      {(p.media || []).length > 0 && (
+        <div className="wp-media">
+          {(p.media || []).map((m) => m.kind === "image"
+            ? <img key={m.id} src={getBase() + m.url} alt="" />
+            : <video key={m.id} src={getBase() + m.url} controls />)}
+        </div>
+      )}
 
       {p.video && (
         <div className="wp-video">
@@ -186,14 +209,27 @@ export function Wall() {
                    onChange={(e) => setVideoTitle(e.target.value)} />
           </label>
         </div>
+        <label>Attach your own photos or videos
+          <input type="file" multiple accept="image/*,video/*"
+                 onChange={(e) => { pickFiles(e.target.files); e.target.value = ""; }} />
+        </label>
+        {uploads.length > 0 && (
+          <div className="wp-uploads">
+            {uploads.map((u) => u.kind === "image"
+              ? <img key={u.id} src={getBase() + u.url} alt="" />
+              : <video key={u.id} src={getBase() + u.url} />)}
+            <button onClick={() => setUploads([])}>clear</button>
+          </div>
+        )}
         {platforms && (
           <p className="muted small">
             Links from {platforms} render right here — nothing loads from
-            their side until someone presses play.
+            their side until someone presses play. Your own photos and
+            footage upload as-is, never AI-marked.
           </p>
         )}
-        <button className="primary" disabled={busy || !body.trim()}
-                onClick={publish}>Post</button>
+        <button className="primary" disabled={busy || uploading || !body.trim()}
+                onClick={publish}>{uploading ? "Uploading…" : "Post"}</button>
       </div>
 
       {posts.length === 0 && (

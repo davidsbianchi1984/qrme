@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { accountApi, api } from "../api";
 import { useSession } from "../store";
+import { oauthApi } from "../api";
 
 type Mode = "signup" | "code" | "signin" | "reset";
 
@@ -42,6 +43,34 @@ function AccountGate() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [oauthDoors, setOauthDoors] = useState<
+    { provider: string; name: string; configured: boolean; setup?: string }[]>([]);
+  const [oauthWaiting, setOauthWaiting] = useState(false);
+
+  useEffect(() => {
+    oauthApi.providers().then((r) => setOauthDoors(r.providers)).catch(() => {});
+  }, []);
+
+  async function signInWith(provider: string) {
+    setError(null); setNotice(null); setOauthWaiting(true);
+    try {
+      const started = await oauthApi.start(provider);
+      window.open(started.url, "_blank");
+      setNotice("Finish signing in with the browser window that just opened…");
+      // Poll the one-time claim until the callback lands or two minutes pass.
+      const until = Date.now() + 120000;
+      while (Date.now() < until) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const got = await oauthApi.claim(started.state).catch(() => null);
+        if (got === null) { setError("Sign-in was not completed — try again."); break; }
+        if (got.ready && got.account_token) {
+          finishSession({ account_id: got.account_id!, account_token: got.account_token, email: got.email! });
+          return;
+        }
+      }
+    } catch (e) { setError((e as Error).message); }
+    finally { setOauthWaiting(false); }
+  }
 
   function switchMode(m: Mode) {
     setMode(m); setError(null); setNotice(null); setCode("");
@@ -122,6 +151,24 @@ function AccountGate() {
                   onClick={() => switchMode("signup")}>Create account</button>
           <button className={mode === "signin" ? "tab active" : "tab"}
                   onClick={() => switchMode("signin")}>Sign in</button>
+        </div>
+      )}
+
+      {(mode === "signup" || mode === "signin") && oauthDoors.length > 0 && (
+        <div className="oauth-doors">
+          {oauthDoors.map((d) => (
+            <button key={d.provider} disabled={!d.configured || oauthWaiting}
+                    title={d.configured ? undefined : d.setup}
+                    onClick={() => signInWith(d.provider)}>
+              {d.provider === "google" ? "🟢" : ""} Sign in with {d.name}
+              {!d.configured && <span className="muted small"> · not configured here</span>}
+            </button>
+          ))}
+          <p className="field-hint">
+            A configured provider opens your browser and vouches for your
+            email — no code to type. Grey means this deployment hasn't
+            registered an OAuth client yet (hover for what to set).
+          </p>
         </div>
       )}
 

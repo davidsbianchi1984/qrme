@@ -1221,6 +1221,35 @@ CREATE TABLE IF NOT EXISTS post_videos (
     created_at TEXT NOT NULL
 );
 
+-- One row per attempted "Sign in with ..." (qrme/oauth.py). result holds the
+-- finished session until the console claims it, exactly once.
+CREATE TABLE IF NOT EXISTS oauth_states (
+    state        TEXT PRIMARY KEY,
+    provider     TEXT NOT NULL,
+    redirect_uri TEXT NOT NULL,
+    result       TEXT,
+    claimed_at   TEXT,
+    created_at   TEXT NOT NULL
+);
+
+-- The user's own uploads (qrme/media.py): photos and footage stored on this
+-- deployment and served at /media. kind is decided from the file's bytes.
+CREATE TABLE IF NOT EXISTS media (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,      -- image | video
+    filename   TEXT NOT NULL,
+    bytes      INTEGER NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS post_media (
+    post_id    TEXT NOT NULL REFERENCES posts(id),
+    media_id   TEXT NOT NULL REFERENCES media(id),
+    created_at TEXT NOT NULL,
+    PRIMARY KEY (post_id, media_id)
+);
+
 -- Edits to a message already sent. One row per revision, so the trail is the
 -- history rather than only the latest text.
 --

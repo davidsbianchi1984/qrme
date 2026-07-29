@@ -387,3 +387,14 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .wp-actions button { font-size: 12.5px; padding: 8px 12px !important; }
 .wp-comments { margin-top: 10px; border-top: 1px solid var(--line);
   padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.wp-media { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.wp-media img, .wp-media video { max-width: 100%; border-radius: 12px;
+  border: 1px solid var(--line); max-height: 340px; }
+.wp-uploads { display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 10px; }
+.wp-uploads img, .wp-uploads video { height: 64px; border-radius: 8px;
+  border: 1px solid var(--line); }
+.oauth-doors { display: flex; flex-direction: column; gap: 8px; margin: 0 0 14px; }
+.oauth-doors button { background: rgba(255,255,255,0.05); color: var(--txt);
+  border: 1px solid var(--line); border-radius: 12px; padding: 11px; font-weight: 600; }
+.oauth-doors button:disabled { opacity: 0.55; cursor: default; }
