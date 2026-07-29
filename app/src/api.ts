@@ -40,6 +40,13 @@ export function getBase(): string {
 export function setBase(url: string) {
   localStorage.setItem("qrme.base", url.replace(/\/+$/, ""));
 }
+export function clearBase() { localStorage.removeItem("qrme.base"); }
+
+// The console's own version, injected at build time (vite.config.ts) and
+// compared against /health's — see VersionGuard.tsx.
+declare const __APP_VERSION__: string;
+export const CONSOLE_VERSION: string =
+  typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "dev";
 
 // Bring-your-own model key: stored on this device only, sent per-request as
 // x-llm-api-key so generations run on the user's own credential. The backend
@@ -245,6 +252,8 @@ export interface WatchFace {
 
 export const api = {
   health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
+
+  healthInfo: () => req<{ status?: string; version?: string }>("/health"),
 
   // How to open this studio on a phone: its URL on the local network.
   pair: () => req<PairInfo>("/pair"),
