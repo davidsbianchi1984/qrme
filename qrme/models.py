@@ -7,7 +7,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-ProfileKind = Literal["self", "other_person", "fictional"]
+ProfileKind = Literal["self", "other_person", "fictional", "hybrid"]
 InteractionScope = Literal["reactive", "proactive"]
 ModerationMode = Literal["auto", "manual"]
 RelationshipType = Literal[
@@ -142,6 +142,10 @@ class ChatRequest(BaseModel):
     # Real-time biometric monitoring context (claim 23): e.g. stress_level
     # (0..1), heart_rate, condition — typically supplied by JIM-mini.
     biometrics: dict | None = None
+    # Environmental context (spec clause 1): where the person is and what's
+    # around them — location, conditions, local_time, activity. The reply
+    # adapts to it; the raw payload is stored beside the biometric context.
+    environment: dict | None = None
 
 
 class SpecialistSet(BaseModel):
@@ -332,6 +336,42 @@ class EmbodimentAdd(BaseModel):
 class MarketplaceList(BaseModel):
     tags: list[str] = Field(default_factory=list)
     blurb: str | None = None
+
+
+class CompositeSource(BaseModel):
+    """One constituent of a hybrid profile (spec [0038])."""
+
+    profile_id: str
+    weight: float = Field(default=1.0, gt=0)   # relative; normalized on create
+    aspect: str | None = None          # e.g. "leadership", "storytelling"
+
+
+class CompositeCreate(BaseModel):
+    """A hybrid profile: 'a combination of aspects or characteristics of
+    several people, such as a combination of several past presidents or
+    business leaders, a combination of trusted relatives such as grandparents
+    who are gone' (spec [0038])."""
+
+    terms_consent: bool = True
+    owner_id: str
+    plan: str | None = None
+    display_name: str
+    sources: list[CompositeSource] = Field(min_length=2)
+    verification: Verification
+    anonymous: bool = False
+    purpose: Purpose | None = None
+    maturity: Maturity = "balanced"
+    language: str | None = None
+
+
+class SimulationRun(BaseModel):
+    """Ask a profile to simulate the represented person's actions, workflow,
+    and decision-making in a scenario (spec clause 1) — predictive modeling
+    from retained memory (clause 5). Owner-only; never distributed."""
+
+    scenario: str
+    horizon: Literal["immediate", "short_term", "long_term"] = "short_term"
+    interactor_id: str | None = None   # condition on this relationship's history
 
 
 class GrantCreate(BaseModel):
@@ -543,6 +583,9 @@ class ChatResponse(BaseModel):
     # continuity when a relationship moves from voice → text → hologram.
     persona_signature: str | None = None
     embodiment: str | None = None      # the embodiment this turn came through
+    # Echo of the environmental context the reply adapted to (spec clause 1);
+    # None when the request carried none.
+    environment: dict | None = None
 
 
 class Feedback(BaseModel):

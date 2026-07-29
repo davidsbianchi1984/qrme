@@ -618,6 +618,46 @@ CREATE TABLE IF NOT EXISTS biometric_context (
     created_at    TEXT NOT NULL
 );
 
+-- Environmental context received during interactions (spec clause 1: the
+-- profile "dynamically adapts to environmental data, such as location,
+-- conditions, and user behavior, enabling contextual relevance").
+CREATE TABLE IF NOT EXISTS environment_context (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    data          TEXT NOT NULL,   -- JSON: location, conditions, local_time, activity
+    created_at    TEXT NOT NULL
+);
+
+-- Hybrid profiles (spec [0038]): a profile representing "a combination of
+-- aspects or characteristics of several people". One row per constituent;
+-- the composite profile itself is an ordinary profiles row with kind=hybrid.
+CREATE TABLE IF NOT EXISTS composite_sources (
+    profile_id        TEXT NOT NULL REFERENCES profiles(id),
+    source_profile_id TEXT NOT NULL REFERENCES profiles(id),
+    weight            REAL NOT NULL,   -- normalized share of the blend, 0..1
+    aspect            TEXT,            -- which side of them is borrowed
+    created_at        TEXT NOT NULL,
+    PRIMARY KEY (profile_id, source_profile_id)
+);
+
+-- Real-time simulation runs (spec clause 1: "real-time simulations of the
+-- first person's actions, workflows, and decision-making processes for
+-- predictive modeling and operational insights"; clause 5: retained memory
+-- "utilized for predictive modeling"). Owner-only, never distributed.
+CREATE TABLE IF NOT EXISTS simulations (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT,             -- optional: whose relationship conditions it
+    scenario      TEXT NOT NULL,
+    horizon       TEXT NOT NULL,    -- immediate | short_term | long_term
+    narrative     TEXT NOT NULL,    -- the in-persona prediction
+    basis         TEXT NOT NULL,    -- JSON: what evidence conditioned the run
+    confidence    REAL NOT NULL,    -- 0..1, from evidence volume, not model mood
+    watermark_id  TEXT,             -- synthetic-media credential
+    created_at    TEXT NOT NULL
+);
+
 -- Revocable access grants (claim 25): scoped tokens a profile uses to read
 -- vaulted data during a task, without retaining the raw data.
 CREATE TABLE IF NOT EXISTS grants (

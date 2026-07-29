@@ -179,6 +179,18 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         )
         conn.commit()
 
+    # Environmental context (spec clause 1): stored beside the biometric
+    # context, and rendered into the prompt so the reply adapts to where the
+    # person is and what's around them.
+    if body.environment:
+        conn.execute(
+            "INSERT INTO environment_context (id, profile_id, interactor_id,"
+            " data, created_at) VALUES (?,?,?,?,?)",
+            (db.new_id("env"), profile_id, body.interactor_id,
+             json.dumps(body.environment), db.utcnow()),
+        )
+        conn.commit()
+
     active = get_active_handoff(profile_id, body.interactor_id)
     domain = biometric_domain(body.biometrics) if body.biometrics else None
     if domain:
@@ -239,6 +251,12 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += ("\n\nCurrent situation from real-time monitoring: "
                    + json.dumps(body.biometrics, sort_keys=True)
                    + ". Respond with appropriate care.")
+    if body.environment:
+        system += ("\n\nThe person's current environment: "
+                   + json.dumps(body.environment, sort_keys=True)
+                   + ". Let your reply be contextually relevant to where "
+                     "they are and what surrounds them — naturally, without "
+                     "reciting this data back.")
     others = companion.other_relationships(profile_id, body.interactor_id)
     if others:
         system += (f"\n\nHonesty about multiplicity: you also hold {others} "
@@ -299,6 +317,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         # embodiment — the same signature over voice, text, and a hologram.
         persona_signature=persona.identity_signature(profile)["signature"],
         embodiment=embodiment_name,
+        environment=body.environment,
     )
 
 

@@ -7,15 +7,15 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (adaptation, agentlight, db, delegation, offline, tasks,
-                workflows)
+from .. import (adaptation, agentlight, db, delegation, offline, simulation,
+                tasks, workflows)
 from ..common import (
     anonymized_exchange, interactor_or_404, profile_or_404,
     require_interactor, require_owner, require_owner_or_interactor,
 )
 from ..models import (
-    DelegatedWorkflowCreate, DelegationSet, GrantCreate, SpecialistSet, TaskRun,
-    WorkflowCreate, WorkflowResume,
+    DelegatedWorkflowCreate, DelegationSet, GrantCreate, SimulationRun,
+    SpecialistSet, TaskRun, WorkflowCreate, WorkflowResume,
 )
 
 router = APIRouter()
@@ -299,6 +299,29 @@ def resume_delegated_workflow(profile_id: str, workflow_id: str,
                 "delegated_to": who}
     except ValueError as e:
         raise HTTPException(409, str(e))
+
+
+# -- Real-time simulation / predictive modeling (spec clauses 1 & 5) ---------
+
+@router.post("/profiles/{profile_id}/simulate", status_code=201)
+def simulate(profile_id: str, body: SimulationRun, request: Request) -> dict:
+    """Run a real-time simulation of the represented person's actions,
+    workflow, and decision-making in a scenario. Owner-only operational
+    insight; the narrative is watermarked synthetic and never distributed."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    if body.interactor_id:
+        interactor_or_404(body.interactor_id)
+    return simulation.run(profile, body.scenario, body.horizon,
+                          body.interactor_id, pdi=request.app.state.pdi,
+                          cloud=request.app.state.cloud)
+
+
+@router.get("/profiles/{profile_id}/simulations")
+def list_simulations(profile_id: str, request: Request) -> list[dict]:
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return simulation.list_runs(profile_id)
 
 
 # -- Offline fine-tuning (claim 26) ------------------------------------------

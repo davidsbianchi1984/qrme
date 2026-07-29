@@ -102,6 +102,17 @@ def build_system_prompt(
     )
     parts.append(f"Core identity (never alter this):\n{profile['persona']}")
 
+    # A hybrid profile (spec [0038]) carries its blend openly: who it is a
+    # composite of, in what shares, and the rule that it never claims to be
+    # any single constituent.
+    kind = (profile.get("kind") if isinstance(profile, dict)
+            else profile["kind"])
+    if kind == "hybrid":
+        from . import composite
+        blend = composite.prompt_block(profile["id"], bool(profile["anonymous"]))
+        if blend:
+            parts.append(blend)
+
     # The persona speaks its owner-set language everywhere: every surface
     # that builds a system prompt through here inherits the directive.
     from . import i18n

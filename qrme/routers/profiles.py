@@ -7,13 +7,15 @@ import json
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import auth, companion, db, identity, persona, storage, terms, tiers
+from .. import (auth, companion, composite, db, identity, persona, storage,
+                terms, tiers)
 from ..common import (
     age_of, profile_or_404, profile_out, require_owner, source_items,
 )
 from ..models import (
-    EmbodimentAdd, GenesisCreate, MarketplaceList, ProfileCreate, ProfileOut,
-    ProfileUpdate, SourceAdd, SucceedRequest, SurfacesSet,
+    CompositeCreate, EmbodimentAdd, GenesisCreate, MarketplaceList,
+    ProfileCreate, ProfileOut, ProfileUpdate, SourceAdd, SucceedRequest,
+    SurfacesSet,
 )
 
 router = APIRouter()
@@ -42,6 +44,12 @@ def create_profile(body: ProfileCreate) -> dict:
         raise HTTPException(
             403, "acceptance of the Terms of Service is required to create "
                  "a profile (GET /terms)")
+    if body.kind == "hybrid":
+        # A hybrid is born from its constituents, not typed free-hand — the
+        # composite route validates every source and records the blend.
+        raise HTTPException(
+            422, "hybrid profiles are created via POST /profiles/composite, "
+                 "from at least two source profiles")
     owner_age = age_of(body.verification.birthdate)
     if owner_age < 18 and not body.verification.guardian_consent:
         raise HTTPException(403, "owners under 18 require parent/guardian consent")
@@ -129,6 +137,74 @@ def create_profile(body: ProfileCreate) -> dict:
     if body.language:
         out["language"] = body.language
     return out
+
+
+@router.post("/profiles/composite", status_code=201,
+             dependencies=[Depends(auth.require_signup_key)])
+def create_composite(body: CompositeCreate) -> dict:
+    """A hybrid profile blended from several existing ones (spec [0038]).
+
+    Sources must be the caller's own profiles or marketplace-listed; departed
+    profiles are allowed (blending grandparents who are gone is the spec's own
+    example), rated ones never. The blend is recorded per-constituent and
+    published at GET /profiles/{id}/composition.
+    """
+    if not body.terms_consent:
+        raise HTTPException(
+            403, "acceptance of the Terms of Service is required to create "
+                 "a profile (GET /terms)")
+    owner_age = age_of(body.verification.birthdate)
+    if owner_age < 18 and not body.verification.guardian_consent:
+        raise HTTPException(403, "owners under 18 require parent/guardian consent")
+    try:
+        resolved = composite.resolve_sources(body)
+    except composite.CompositeError as e:
+        raise HTTPException(403, str(e))
+    persona_text, demographics = composite.blend_persona(resolved)
+
+    profile_id = db.new_id("prf")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO profiles (id, owner_id, kind, display_name, persona,"
+        " demographics, sources, anonymous, adult_mode, interaction_scope,"
+        " moderation_mode, aging_enabled, base_age, purpose, maturity,"
+        " cloud_contribution, terms_version, terms_accepted_at, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,0,'reactive','auto',0,NULL,?,?,0,?,?,?)",
+        (profile_id, body.owner_id, "hybrid", body.display_name, persona_text,
+         json.dumps(demographics), json.dumps([]), int(body.anonymous),
+         body.purpose, body.maturity, terms.TERMS_VERSION, db.utcnow(),
+         db.utcnow()),
+    )
+    conn.commit()
+    composite.record(profile_id, resolved)
+    if body.language:
+        from .. import i18n
+        if body.language not in i18n.SUPPORTED:
+            raise HTTPException(
+                422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
+        i18n.set_language(profile_id, body.language)
+    from .. import friends
+    friends.install_founder(profile_id)
+    _enrol(body.owner_id, body.plan)
+    token = auth.issue("owner", profile_id)
+    out = {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),
+           "owner_token": token,
+           "composition": composite.composition(profile_id)}
+    out["membership"] = tiers.membership(body.owner_id)
+    return out
+
+
+@router.get("/profiles/{profile_id}/composition")
+def get_composition(profile_id: str) -> dict:
+    """What a hybrid is blended from — readable by anyone, the same open
+    stance as /transparency: the blend is the profile's provenance."""
+    profile = profile_or_404(profile_id)
+    if profile["kind"] != "hybrid":
+        raise HTTPException(404, "this profile is not a hybrid")
+    return {"profile_id": profile_id,
+            "sources": composite.composition(profile_id),
+            "policy": "a hybrid acknowledges openly that it is a blend and "
+                      "never claims to be any single constituent"}
 
 
 @router.post("/profiles/genesis", status_code=201)
