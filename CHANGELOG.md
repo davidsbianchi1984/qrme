@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.15.0] — 2026-07-29
+
 **The temperament dials — the field's list, verbatim.** Steering gains
 a fourth dial group: mood, outlook, maturity, agreeableness,
 confidence, curiosity — each 0–100, defaulting to silence, rendered
@@ -2396,7 +2398,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.5...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.15.0...HEAD
+[0.15.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.15.0
 [0.14.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.5
 [0.14.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.4
 [0.14.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.3
