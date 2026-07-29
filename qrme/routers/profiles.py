@@ -559,17 +559,34 @@ def browse_marketplace(tag: str | None = None) -> list[dict]:
         " p.anonymous FROM marketplace m JOIN profiles p ON p.id=m.profile_id"
         " WHERE p.status='active'"        # restricted/terminated stay hidden
         " ORDER BY m.listed_at DESC").fetchall()
+    from .. import avatars as avatar_mod
     cards = []
     for row in rows:
         tags = json.loads(row["tags"])
         if tag and tag not in tags:
             continue
+        # The portrait rides the card, and so does its provenance — a face on
+        # a discovery card must say which kind of face it is. avatars.render()
+        # already substitutes the silhouette for anonymous profiles, so no
+        # hidden face can leak onto the marketplace through this field.
+        av = avatar_mod.render(row["profile_id"])
+        asset = av.get("asset")
+        avatar_kind = None
+        if asset:
+            avatar_kind = ("real_photo"
+                           if asset.startswith(avatar_mod.PHOTO_ROUTE)
+                           else "ai")
         cards.append({
             "profile_id": row["profile_id"],
             "display_name": (identity.anonymous_name(row["profile_id"])
                              if row["anonymous"]
                              else row["display_name"]),
             "purpose": row["purpose"], "tags": tags, "blurb": row["blurb"],
+            "avatar": asset,
+            # "ai" (a generated portrait — the badge is mandatory) or
+            # "real_photo" (an authentic photograph of a real person whose
+            # likeness is on record) or None (no picture; initials).
+            "avatar_kind": avatar_kind,
         })
     return cards
 

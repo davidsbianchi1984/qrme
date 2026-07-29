@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api, getBase } from "../api";
 import { useSession } from "../store";
 
 // For You + the marketplace + the starter collection, one discovery surface.
@@ -78,6 +78,20 @@ export function Discover() {
       <div className="discover-grid">
         {cards.map((c) => (
           <div key={c.profile_id} className="card discover-card">
+            <div className="dc-face">
+              {c.avatar ? (
+                <img className="dc-avatar" src={getBase() + c.avatar}
+                     alt={c.display_name} />
+              ) : (
+                <span className="dc-avatar dc-initials">
+                  {c.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
+                </span>
+              )}
+              {c.avatar_kind === "ai" && <span className="dc-badge ai">AI</span>}
+              {c.avatar_kind === "real_photo" && (
+                <span className="dc-badge real">✓ real photo</span>
+              )}
+            </div>
             <b>{c.display_name}</b>
             {c.blurb && <p className="muted small">{c.blurb}</p>}
             <div className="tag-row">

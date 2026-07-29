@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Field feedback, applied.** Discovery cards now carry the portrait —
+and say which kind of face it is: an **AI** badge on generated
+portraits, **✓ real photo** only on an authentic photograph under
+/photos (`/marketplace` gains `avatar` + `avatar_kind`; anonymous
+profiles keep their silhouette). The Friends header drops the
+"founder stands first" line. Room kinds read plainly: Text, Voice
+chat only, Video, AR, VR. The Blend screen now explains itself —
+blending creates a brand-new openly-hybrid profile; it is not a
+follow, and the sources are untouched. And the Memory Vault gains
+**Erase all** beside the per-conversation erase.
+
 **Two versions answering is no longer a mystery.** Field report: a
 fresh console over a stale backend answers "Not Found" on every newer
 screen while looking otherwise alive — the shell refuses to adopt a

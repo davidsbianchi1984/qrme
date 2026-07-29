@@ -346,7 +346,8 @@ export const api = {
       { method: "POST", body: { friend_id: friendId }, token }),
   marketplace: (tag?: string) =>
     req<{ profile_id: string; display_name: string; purpose?: string;
-          blurb?: string; tags: string[] }[]>(
+          blurb?: string; tags: string[]; avatar?: string | null;
+          avatar_kind?: "ai" | "real_photo" | null }[]>(
       `/marketplace${tag ? `?tag=${encodeURIComponent(tag)}` : ""}`),
   marketplaceListings: () =>
     req<{ listings?: unknown[] } | unknown[]>(`/marketplace/listings`),
