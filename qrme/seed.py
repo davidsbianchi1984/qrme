@@ -432,7 +432,10 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
         # Repair, not recreate — the same shape as the portrait backfill. A
         # deployment seeded before the packs were published has an AI half with
         # no libraries, and re-running the seed is the only thing that reaches
-        # it.
+        # it. The face gets the same treatment: this early return used to skip
+        # the avatar entirely, so the two profiles the user actually recognizes
+        # were the two the portrait repair could never reach.
+        _backfill_founder(conn, taken["profile_id"], handle)
         if handle == FOUNDER_HANDLE:
             for industry in FOUNDER_AI_PACKS:
                 _ground(conn, taken["profile_id"], industry, force=True)
@@ -556,6 +559,65 @@ def _backfill(conn, profile_id: str, handle: str) -> bool:
     if changed:
         conn.commit()
     return changed
+
+
+def _backfill_founder(conn, profile_id: str, handle: str) -> bool:
+    """The founder's half of :func:`_backfill`, blank-only like it.
+
+    His two profiles are not starters — the rendered half's face lives in the
+    portrait tree, the photographed half's in the photo tree — so the starter
+    backfill never sees them, and until this existed nothing else did either.
+    """
+    from . import avatars
+
+    asset = (avatars.asset_path(handle) if handle == FOUNDER_HANDLE
+             else avatars.photo_path(handle))
+    appearance = (FOUNDER_APPEARANCE if handle == FOUNDER_HANDLE
+                  else VERIFIED_APPEARANCE)
+    row = conn.execute("SELECT avatar, appearance FROM profiles WHERE id=?",
+                       (profile_id,)).fetchone()
+    if row is None:
+        return False
+    changed = False
+    if asset and not row["avatar"]:
+        conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
+                     (asset, profile_id))
+        changed = True
+    if appearance and not row["appearance"]:
+        conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
+                     (appearance, profile_id))
+        changed = True
+    if changed:
+        conn.commit()
+    return changed
+
+
+def repair() -> dict:
+    """Blank-only portrait repair for profiles that already exist. Never
+    creates one — a deployment that chose not to install the starters stays
+    without them.
+
+    :func:`seed` repairs too, but only when somebody presses the seed button,
+    and the field showed nobody knows the button is a repair: a deployment
+    upgraded past the portraits sat on initials for weeks with 34 faces in
+    the package. So ``api.create_app`` calls this at startup, and the faces
+    come back on the first launch after the upgrade.
+    """
+    from . import db
+
+    conn = db.connect()
+    repaired: list[str] = []
+    for handle, *_ in STARTERS + RATED:
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (handle,)).fetchone()
+        if row and _backfill(conn, row["profile_id"], handle):
+            repaired.append(handle)
+    for handle in (FOUNDER_HANDLE, VERIFIED_HANDLE):
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (handle,)).fetchone()
+        if row and _backfill_founder(conn, row["profile_id"], handle):
+            repaired.append(handle)
+    return {"repaired": len(repaired), "repaired_handles": repaired}
 
 
 def _ground(conn, profile_id: str, industry: str,

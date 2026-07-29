@@ -218,6 +218,18 @@ def create_app(pdi_client: PDIClient | None = None,
         app.mount("/app", StaticFiles(directory=str(_console), html=True),
                   name="console")
 
+    # Heal what an upgrade left blank. Deployments seeded before the
+    # portraits shipped sat on initials with 34 faces in the package, because
+    # the repair lived behind a seed button nobody knows is a repair.
+    # Blank-only and existing-profiles-only (see seed.repair), and a failed
+    # repair must not keep the API from answering — the faces can wait,
+    # the vault check-ins cannot.
+    from . import seed as seed_mod
+    try:
+        seed_mod.repair()
+    except Exception:
+        pass
+
     return app
 
 

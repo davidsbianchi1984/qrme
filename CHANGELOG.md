@@ -6,6 +6,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The faces come back on their own, and the phone layout stops fighting
+your thumbs.** Field round. Deployments seeded before the portraits
+shipped sat on initials with 34 faces in the package, because the repair
+lived behind a seed button nobody knows is a repair — the API now runs a
+blank-only portrait repair at startup (`seed.repair()`), including the
+founder's two profiles, which the starter backfill never reached. On a
+phone, the twelve tab labels forced the whole app wider than the screen
+(the right half of every form hung off the viewport — tapping the Rooms
+topic box opened the Kind dropdown instead), and the agent-lights window
+and help button sat on top of the tab bar: the bar now scrolls, forms
+stack one column, and the corner widgets ride above the tabs. Opening a
+room without a profile picked now says what it needs instead of failing
+with a validation dump.
+
 ## [0.15.0] — 2026-07-29
 
 **The temperament dials — the field's list, verbatim.** Steering gains

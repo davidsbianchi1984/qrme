@@ -193,6 +193,24 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
   /* Inputs at 16px so iOS doesn't zoom the viewport when they focus. */
   input, textarea, select { font-size: 16px; }
   button { min-height: 44px; }
+
+  /* One column on a phone. Two side-by-side fields overflow the viewport,
+     and the one that ran off the right edge crowded its neighbour — tapping
+     the Rooms topic box opened the Kind dropdown instead, which from the
+     user's chair is "it wouldn't let me type a topic". */
+  .row { grid-template-columns: 1fr; }
+
+  /* Twelve tab labels cannot all shrink to fit one phone row: their
+     min-content widths forced the whole app to ~576px, so every screen
+     overflowed sideways and the right half of each form hung off the
+     viewport. The bar scrolls instead — every door stays reachable with a
+     swipe, and the page itself stops being wider than the phone. */
+  nav { overflow-x: auto; justify-content: flex-start; min-width: 0; }
+  .nav-item { flex: 0 0 auto; min-width: 64px; }
+  /* min-width:auto is the default for grid and flex children, which lets
+     the widest descendant re-inflate the column the nav just stopped
+     inflating — zero it, or the fix above changes nothing. */
+  .sidebar, .content { min-width: 0; }
 }
 
 /* The help box — on every screen, and deliberately plain. A help assistant
@@ -319,3 +337,27 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   font-weight: 800; padding: 2px 6px; border-radius: 8px; letter-spacing: .3px; }
 .dc-badge.ai { background: rgba(123,92,255,0.9); color: #fff; }
 .dc-badge.real { background: rgba(67,224,138,0.9); color: #06281a; }
+
+/* ---- Corner widgets on a phone ------------------------------------------
+   Last in the file on purpose: these override .help-fab/.watch-lights/.wl-dot,
+   whose base rules sit above, and the cascade gives the later rule the win.
+   At desktop sizes 22px of bottom margin clears nothing important; on a
+   phone it parked the agent lights on top of Home and Chat and the help fab
+   on top of Campaigns — unpressable tabs, reported as broken screens. The
+   widgets ride above the tab bar instead, and the lights shrink a notch:
+   still a watch face, just a smaller wrist. */
+@media (max-width: 760px) {
+  .help-fab, .help-panel {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  .watch-lights {
+    left: 12px; bottom: calc(76px + env(safe-area-inset-bottom));
+    width: 132px; height: 132px; padding: 12px; gap: 4px;
+  }
+  .watch-lights .wl-row { width: 96px; }
+  .watch-lights .wl-count { font-size: 13px; }
+  .watch-lights .wl-label, .watch-lights .wl-name { font-size: 10px; }
+  .wl-dot {
+    left: 12px; bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+}
