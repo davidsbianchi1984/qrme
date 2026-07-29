@@ -4,7 +4,7 @@ version = "0.6.1"
 description = "AI synthetic profiles — relationship-aware, remembered, yours"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Proprietary - All Rights Reserved (see LICENSE)" }
+license = { text = "MIT" }
 authors = [{ name = "David Bianchi" }]
 keywords = ["ai", "synthetic-profiles", "llm", "relationships", "moderation"]
 classifiers = [
