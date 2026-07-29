@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.13.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.13.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -671,6 +671,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.13.1** | **Demo, docs and hardening** — the one-press demo org, the tandem contract and disclosures caught up, and caps on the new surface |
 | **0.13.0** | **The ecosystem round** — crowdfunding with proceeds routed by the user (screen 145, Campaigns tab), organizations whose department agents coordinate on one goal (screen 146, Org tab), and a console chrome that follows the profile's language |
 | **0.12.0** | **The specification, mined** — hybrid profiles blended from several people, real-time simulation with confidence earned from evidence, and replies that adapt to where you are; Blend and What If tabs plus the 📍 toggle in Chat |
 | **0.11.1** | **Cut with the siblings** — no functional change; PDI's desktop app finally carries its own vault |
