@@ -67,6 +67,11 @@ _OPENAI_MODEL = os.environ.get("QRME_OPENAI_MODEL", "gpt-4o")
 _GROK_MODEL = os.environ.get("QRME_GROK_MODEL", "grok-2-latest")
 _PPLX_MODEL = os.environ.get("QRME_PERPLEXITY_MODEL", "sonar")
 _GEMINI_MODEL = os.environ.get("QRME_GEMINI_MODEL", "gemini-2.0-flash")
+# The local model: whatever the user pulled into Ollama. deepseek-r1:1.5b
+# is small enough for most machines; QRME_OLLAMA_MODEL overrides.
+_OLLAMA_MODEL = os.environ.get("QRME_OLLAMA_MODEL", "deepseek-r1:1.5b")
+_OLLAMA_BASE = os.environ.get("QRME_OLLAMA_URL",
+                              "http://127.0.0.1:11434") + "/v1"
 
 _TIMEOUT = int(os.environ.get("QRME_LLM_TIMEOUT", "30"))
 
@@ -251,6 +256,17 @@ _REGISTRY: dict[str, dict] = {
         "env": ["GEMINI_API_KEY", "GOOGLE_API_KEY"],
         "model": _GEMINI_MODEL,
     },
+    # A real offline model: Ollama (ollama.com) runs models like
+    # deepseek-r1:1.5b on the user's own machine — free, no key, nothing
+    # leaves the host. The daemon running IS the configuration.
+    "ollama": {
+        "label": "Local (Ollama)",
+        "kind": "openai",
+        "network": False,
+        "env": [],
+        "base": _OLLAMA_BASE,
+        "model": _OLLAMA_MODEL,
+    },
 }
 
 #: Valid values for a stored preference: any registry name, or ``auto`` (let
@@ -266,6 +282,28 @@ def _env_value(name: str) -> str | None:
     return None
 
 
+_OLLAMA_PROBE: dict = {"at": 0.0, "alive": False}
+
+
+def _ollama_alive() -> bool:
+    """Is a local Ollama daemon answering? Probed (there is no key to
+    check), cached briefly so the settings screen doesn't knock on the
+    port for every tile."""
+    import time
+    if time.monotonic() - _OLLAMA_PROBE["at"] < 10:
+        return _OLLAMA_PROBE["alive"]
+    alive = False
+    try:
+        req = urllib.request.Request(
+            _OLLAMA_BASE.rsplit("/v1", 1)[0] + "/api/version")
+        with urllib.request.urlopen(req, timeout=0.5) as r:
+            alive = r.status == 200
+    except Exception:  # noqa: BLE001 — not running is the common case
+        alive = False
+    _OLLAMA_PROBE.update(at=time.monotonic(), alive=alive)
+    return alive
+
+
 def is_configured(name: str) -> bool:
     """True when a provider can actually be used in this environment. The stub
     is always available; ``anthropic`` also counts as configured when
@@ -274,6 +312,8 @@ def is_configured(name: str) -> bool:
         return True
     if name == "anthropic" and os.environ.get("QRME_LLM") == "anthropic":
         return True
+    if name == "ollama":
+        return _ollama_alive()
     if name not in _REGISTRY:
         return False
     return _env_value(name) is not None
@@ -304,6 +344,10 @@ def default_name() -> str:
     # product's default model is Claude.
     if is_configured("anthropic") or request_key():
         return "anthropic"
+    # No key anywhere, but a local model is running: a real answer beats a
+    # canned one, and it never leaves the machine.
+    if is_configured("ollama"):
+        return "ollama"
     return "stub"
 
 
@@ -369,6 +413,10 @@ def get_provider(cloud=None, choice: str | None = None) -> Provider:
     """
     from . import offline
     if offline.enabled():
+        # Offline is absolute for the network — but Ollama IS offline: it
+        # answers on loopback and nothing leaves the machine.
+        if is_configured("ollama"):
+            return _build("ollama")
         return StubProvider()
 
     explicit = bool(choice) and choice != "auto"
