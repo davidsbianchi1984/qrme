@@ -6,12 +6,14 @@ import { Chat } from "./screens/Chat";
 import { Discover } from "./screens/Discover";
 import { Friends } from "./screens/Friends";
 import { Rooms } from "./screens/Rooms";
+import { Blend } from "./screens/Blend";
+import { Simulate } from "./screens/Simulate";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
 import { Help } from "./Help";
 
-type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "relationships" | "memory" | "settings";
+type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "blend" | "simulate" | "relationships" | "memory" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -19,6 +21,8 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "discover", label: "Discover", icon: "🛍" },
   { id: "friends", label: "Friends", icon: "👥" },
   { id: "rooms", label: "Rooms", icon: "🎧" },
+  { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻" },
+  { id: "simulate", label: "What If", icon: "🔮" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
   { id: "settings", label: "Control", icon: "⚙" },
@@ -64,6 +68,8 @@ export function App() {
         {tab === "discover" && <Discover />}
         {tab === "friends" && <Friends />}
         {tab === "rooms" && <Rooms />}
+        {tab === "blend" && <Blend />}
+        {tab === "simulate" && <Simulate />}
         {tab === "relationships" && <Relationships />}
         {tab === "memory" && <Memory />}
         {tab === "settings" && <Settings />}

@@ -3314,6 +3314,40 @@ SCREENS = [
         dict(icon="warn", color="amber", k="Honest when degraded",
              s="amber notice on a fallback reply"),
     ]),
+    # ---- the specification, mined: hybrids, simulation, environment ----
+    dict(num=142, title="Blend a Profile", sub="Several people, one persona",
+         accent="brand", tab=0, cards=[
+        dict(icon="people", color="brand", k="Grandma Rose",
+             s="her storytelling", metric="75%"),
+        dict(icon="person", color="cyan", k="Grandpa Joe",
+             s="his patience", metric="25%"),
+        dict(icon="eye", color="green", k="Says it's a blend",
+             s="it never claims to be one of them", pill=("HONEST", "good")),
+        dict(icon="warn", color="red", k="Rated never blends",
+             s="and strangers need a listing"),
+    ], button=("Blend", "brand")),
+    dict(num=143, title="What Would They Do", sub="A prediction, not their word",
+         accent="violet", tab=2, cards=[
+        dict(icon="brain", color="pink", k="The likely decision",
+             s="in character, with their reasons"),
+        dict(icon="list", color="brand", k="The workflow",
+             s="the steps they would take"),
+        dict(icon="chart", color="cyan", k="Confidence",
+             s="earned, not claimed", metric="0.62"),
+        dict(icon="shieldok", color="green", k="Marked as AI",
+             s="owner-only · never distributed", pill=("PRIVATE", "good")),
+    ], button=("Run Simulation", "brand")),
+    dict(num=144, title="Where You Are", sub="Replies that fit the moment",
+         accent="cyan", tab=0, cards=[
+        dict(icon="compass", color="cyan", k="A trailhead, in the rain",
+             s="location · conditions · time"),
+        dict(icon="chat", color="brand", k="The reply meets you",
+             s="woven in, never recited back"),
+        dict(icon="heart", color="red", k="Beside the biometrics",
+             s="handled as honestly as claim 23"),
+        dict(icon="lock", color="green", k="Kept in your vault",
+             s="environment_context, erasable"),
+    ]),
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
     # something here — a control that cannot do anything is worse than absent.
