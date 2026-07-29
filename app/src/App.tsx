@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { api } from "./api";
+import { t } from "./l10n";
 import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
 import { Home } from "./screens/Home";
@@ -35,6 +37,15 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
 export function App() {
   const { session, signOut } = useSession();
   const [tab, setTab] = useState<Tab>("home");
+  // The chrome follows the profile's language (server-side setting; the
+  // content always did — this closes the frame around it).
+  const [lang, setLang] = useState<string>("en");
+  useEffect(() => {
+    if (!session.profileId) return;
+    api.getLanguage(session.profileId)
+      .then((r) => setLang(r.language || "en"))
+      .catch(() => setLang("en"));
+  }, [session.profileId]);
 
   // No profile yet → onboarding owns the whole window.
   if (!session.profileId) return <Onboarding />;
@@ -57,12 +68,12 @@ export function App() {
               onClick={() => setTab(n.id)}
             >
               <span className="nav-icon">{n.icon}</span>
-              {n.label}
+              {t(`nav.${n.id}`, lang)}
             </button>
           ))}
         </nav>
         <button className="signout" onClick={signOut}>
-          Sign out
+          {t("signout", lang)}
         </button>
       </aside>
 
