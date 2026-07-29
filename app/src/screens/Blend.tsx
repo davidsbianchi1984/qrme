@@ -79,17 +79,29 @@ export function Blend() {
     <div className="screen">
       <header className="screen-head">
         <h2>Blend a Profile</h2>
-        <span className="muted small">several people, one persona — and it says so openly</span>
+        <span className="muted small">make a new profile from several people — not a follow; the sources are untouched</span>
       </header>
 
       {!made && (
         <>
           <div className="card">
-            <h3>Who goes into the blend</h3>
+            <h3>What blending is</h3>
+            <p className="muted small">
+              Blending <b>creates a brand-new profile</b> whose persona mixes
+              two or more existing ones, in the shares you choose — both
+              grandparents at once, a mentor's judgment with a friend's humor.
+              It is not following or friending: the sources are untouched, and
+              the result is a new synthetic person that says openly who it is
+              a blend of.
+            </p>
+          </div>
+          <div className="card">
+            <h3>Who can go into the blend</h3>
             <p className="muted small">
               Your own profiles and anything listed on the marketplace. Rated
               profiles never blend; a profile that has departed still can —
-              that is what this is for.
+              a blend is one way the people who loved them keep a piece of
+              how they were.
             </p>
             {candidates.length === 0 && (
               <p className="muted center">Nothing to blend yet — install the starter collection in Discover.</p>

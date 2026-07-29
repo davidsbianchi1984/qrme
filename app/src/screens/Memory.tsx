@@ -28,6 +28,19 @@ export function Memory() {
     } catch (e) { setError((e as Error).message); }
   }
 
+  async function eraseAll() {
+    if (!session.profileId || !session.ownerToken || convos.length === 0) return;
+    if (!confirm(`Erase all ${convos.length} remembered conversation(s)? ` +
+                 "This cannot be undone.")) return;
+    try {
+      for (const c of convos) {
+        await api.clearMemory(session.profileId, c.interactor_id, session.ownerToken);
+      }
+      setOpen(null); setEntries([]);
+      load();
+    } catch (e) { setError((e as Error).message); }
+  }
+
   async function erase(interactorId: string, name: string) {
     if (!session.profileId || !session.ownerToken) return;
     if (!confirm(`Erase the conversation with ${name}? This cannot be undone.`)) return;
@@ -48,6 +61,11 @@ export function Memory() {
       {error && <div className="error">⚠ {error}</div>}
 
       <div className="card">
+        {convos.length > 0 && (
+          <div className="actions" style={{ justifyContent: "flex-end", marginBottom: 8 }}>
+            <button className="danger" onClick={eraseAll}>Erase all</button>
+          </div>
+        )}
         {convos.length === 0 && <p className="muted center">No memories yet — have a chat first.</p>}
         {convos.map((c) => (
           <div key={c.interactor_id} className="convo-row">

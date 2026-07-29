@@ -33,7 +33,13 @@ export function Settings() {
       </header>
 
       <div className="card">
-        <h3>API connection</h3>
+        <h3>API connection — where this app's own server lives</h3>
+        <p className="muted small">
+          This is the <b>address of the QRME backend</b> this console talks
+          to (the desktop app starts its own; a phone points here over
+          Wi-Fi). It is an address, not a secret — and it is <b>not</b> the
+          model API key below: the two are different things.
+        </p>
         <label>
           Backend base URL
           <input value={base} onChange={(e) => setBaseInput(e.target.value)} />
@@ -47,13 +53,15 @@ export function Settings() {
       <MailPanel />
 
       <div className="card">
-        <h3>Your model API key</h3>
+        <h3>Your model API key — who pays for the AI's words</h3>
         <p className="muted small">
-          Paste your own key (Anthropic <code>sk-ant-…</code>, or OpenAI / xAI /
-          Gemini for those providers) and your profiles' replies run on your
-          credential. It stays on this device and rides only your own requests —
-          the server never stores it. Leave it empty to use whatever key the
-          deployment lends.
+          Different from the connection above: that was <b>where</b> this app's
+          server lives; this is <b>whose credential the AI generation runs
+          on</b>. Paste your own key (Anthropic <code>sk-ant-…</code>, or
+          OpenAI / xAI / Gemini for those providers) and your profiles'
+          replies run on your credential. It is a secret: it stays on this
+          device and rides only your own requests — the server never stores
+          it. Leave it empty to use whatever key the deployment lends.
         </p>
         <label>API key
           <input type="password" value={llmKey} placeholder="sk-…"

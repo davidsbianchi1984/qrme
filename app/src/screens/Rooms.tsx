@@ -8,9 +8,9 @@ import { useSession } from "../store";
 // its badge; stepping inside one takes a headset or a phone, and the card
 // says so instead of pretending.
 const CHANNELS = [
-  { id: "chat", label: "2D · text" },
-  { id: "voice", label: "2D · audio" },
-  { id: "video", label: "2D · video" },
+  { id: "chat", label: "Text" },
+  { id: "voice", label: "Voice chat only" },
+  { id: "video", label: "Video" },
   { id: "ar", label: "AR" },
   { id: "vr", label: "VR" },
 ];

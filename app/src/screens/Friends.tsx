@@ -39,12 +39,11 @@ export function Friends() {
     <div className="screen">
       <header className="screen-head">
         <h2>Friends</h2>
-        <span className="muted small">the founder stands first, on every list</span>
       </header>
 
       <div className="card">
         {(data?.friends || []).length === 0 && (
-          <p className="muted center">Loading, or no friends yet — the founder appears the moment the starter collection is installed (Discover).</p>
+          <p className="muted center">Loading, or no friends yet — add friends from Discover.</p>
         )}
         {(data?.friends || []).map((f, i) => {
           const isFounder = f.pinned || (f.handle != null && founderHandles.has(f.handle));

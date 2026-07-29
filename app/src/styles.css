@@ -134,7 +134,10 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 .bubble.you { align-self: flex-end; background: linear-gradient(90deg, var(--brand), var(--brand2)); color: #fff; }
 .bubble.thinking { color: var(--t2); }
 .bubble-note { margin-top: 6px; font-size: 11px; color: var(--amber); }
-.composer { display: flex; gap: 10px; margin-top: 12px; }
+/* The send button must clear the help fab (fixed bottom-right, 46px +
+   22px inset): the composer stops short of that corner instead of hiding
+   its most important button under the "?" bubble. */
+.composer { display: flex; gap: 10px; margin-top: 12px; padding-right: 76px; }
 .composer input { margin-top: 0; }
 
 /* ---- memory ---- */
@@ -305,3 +308,14 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .vg-hint { color: #ffb3c0; }
 .vg-close { margin-left: auto; background: none; border: 0; color: #ffb3c0;
   font-size: 18px; line-height: 1; cursor: pointer; }
+
+/* Discovery cards: the face, and which kind of face it is. */
+.dc-face { position: relative; width: 64px; height: 64px; margin-bottom: 8px; }
+.dc-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #0d0a24; border: 1px solid var(--line); }
+.dc-initials { font-weight: 800; font-size: 20px; color: var(--muted); }
+.dc-badge { position: absolute; bottom: -4px; right: -6px; font-size: 9px;
+  font-weight: 800; padding: 2px 6px; border-radius: 8px; letter-spacing: .3px; }
+.dc-badge.ai { background: rgba(123,92,255,0.9); color: #fff; }
+.dc-badge.real { background: rgba(67,224,138,0.9); color: #06281a; }
