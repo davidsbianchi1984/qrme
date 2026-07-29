@@ -345,6 +345,10 @@ export const api = {
     req<{ id: string; display_name: string; trade: string; location?: string;
           blurb?: string; presence: string; rated: number }[]>(`/desks`),
 
+  // The profile's language: the console chrome follows it (l10n.ts).
+  getLanguage: (profileId: string) =>
+    req<{ language: string }>(`/profiles/${profileId}/language`),
+
   // Crowdfunding with proceeds routed where the user said (spec [0020]).
   getProceeds: (profileId: string) =>
     req<{ proceeds_to: DesigneeOut[] }>(`/profiles/${profileId}/proceeds`),
