@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The temperament dials — the field's list, verbatim.** Steering gains
+a fourth dial group: mood, outlook, maturity, agreeableness,
+confidence, curiosity — each 0–100, defaulting to silence, rendered
+into the persona prompt exactly like the existing dials and picked up
+by every surface that reads the dial catalog. Together with language,
+the aging lifecycle, and the freeform persona (the deliberate home of
+culture and background), the video's "modify your profile's
+characteristics" list is now covered dial for dial.
+
 ## [0.14.5] — 2026-07-29
 
 **No functional changes here**: cut with the siblings. JIM-mini

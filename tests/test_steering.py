@@ -108,3 +108,20 @@ def test_steering_is_owner_only(client, profile_id):
                    json={"values": {"pace": 90}},
                    headers={"authorization": ""})
     assert r.status_code in (401, 403)
+
+
+def test_the_temperament_group_is_the_fields_list_verbatim(client):
+    """Mood, outlook, maturity, agreeableness, confidence, curiosity —
+    the six dials the field named, in one group, rendered into the persona
+    prompt like every other dial."""
+    from qrme import steering
+    temperament = [n for n, (g, *_rest) in steering.DIALS.items()
+                   if g == "temperament"]
+    assert temperament == ["mood", "outlook", "maturity", "agreeableness",
+                           "confidence", "curiosity"]
+    steering.set_dials("prf_temper", {"mood": 90, "confidence": 10}, False)
+    text = steering.directive("prf_temper", False)
+    assert "bright and upbeat" in text
+    assert "tentative, hedges" in text
+    # Near-default dials say nothing — curiosity at 50 leaves no line.
+    assert "inquisitive" not in text
