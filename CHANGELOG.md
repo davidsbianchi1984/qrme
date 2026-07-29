@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.0] — 2026-07-29
+
+**The front page and the wrist.** Home gains a "New in this release"
+card naming Blend, What If, Campaigns and Org; the wearables vocabulary
+gains proceeds and coordination faces (counts only, never the thing
+itself), drawn as watch faces 10 and 11 and routed from the pane.
+
 ## [0.13.1] — 2026-07-29
 
 **The train after the cut.** The demo org (one press, a staffed
@@ -2295,7 +2302,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.13.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.0...HEAD
+[0.14.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.0
 [0.13.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.1
 [0.13.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.0
 [0.12.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.12.0
