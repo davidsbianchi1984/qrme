@@ -167,6 +167,58 @@ def test_usage_meters_span_the_suite(gateway):
     assert m["pdi"]["sealed_records"] >= 0
 
 
+def test_suite_mode_keeps_the_vault_posture(gateway):
+    """In suite mode QRME must not quietly lose its PDI tandem: the gateway
+    wires a dedicated vault tenant, coordinations seal, and the provenance
+    view shows each owner exactly their own operations — never anyone
+    else's, even though every identity's seals share the suite tenant."""
+    h = gateway.get("/suite/health").json()
+    assert h["tandems"] == {"jim_qrme": True, "qrme_pdi": True}
+
+    session = gateway.post("/suite/session", json={
+        "display_name": "Dana", "birthdate": "1954-06-01"}).json()
+    p = session["products"]
+    gateway.post("/suite/ecosystem", json={"qrme": p["qrme"], "jim": p["jim"]})
+    plan = gateway.post(
+        f"/jim/users/{p['jim']['user_id']}/care-team/coordinate",
+        json={"goal": "plan a gentle first week"},
+        headers={"authorization": f"Bearer {p['jim']['user_token']}"})
+    assert plan.status_code == 201, plan.text
+    # The headline: the joint plan is sealed, not silently unsealed.
+    assert plan.json()["sealed_in_qrme_vault"] is True
+
+    # The provenance view returns the owner's entry, read from the vault.
+    ops = gateway.post("/suite/operations", json={"qrme": p["qrme"]})
+    assert ops.status_code == 200, ops.text
+    entries = ops.json()["entries"]
+    assert len(entries) == 1
+    assert entries[0]["goal"] == "plan a gentle first week"
+    assert entries[0]["key"].startswith("qrme/coordination/")
+
+    # Another identity sees none of it; a bad token sees nothing at all.
+    other = gateway.post("/suite/session", json={
+        "display_name": "Noa", "birthdate": "1990-02-02"}).json()
+    ops2 = gateway.post("/suite/operations",
+                        json={"qrme": other["products"]["qrme"]})
+    assert ops2.json()["entries"] == []
+    forged = dict(p["qrme"], owner_token="own_forged")
+    assert gateway.post("/suite/operations",
+                        json={"qrme": forged}).status_code == 403
+
+
+def test_the_vault_tenant_is_minted_once(gateway):
+    from fastapi.testclient import TestClient as _TC
+
+    from suite.gateway import VAULT_TENANT, create_gateway
+    # A second gateway over the same databases (a restart) reuses the tenant
+    # instead of minting a sibling.
+    with _TC(create_gateway()) as second:
+        assert second.get("/suite/health").json()["tandems"]["qrme_pdi"]
+        names = [t["name"] for t in second.get("/pdi/retention").json()
+                 ["record_retention"]]
+        assert names.count(VAULT_TENANT) == 1
+
+
 def test_the_suite_wires_its_own_tandem_and_bootstraps_the_ecosystem(gateway):
     """One call after sign-on: the demo org seeded in QRME, JIM's care team
     linked to its first desk — through the in-process tandem the gateway

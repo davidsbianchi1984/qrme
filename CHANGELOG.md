@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The vault posture survives suite mode.** The gateway now wires QRME's
+PDI tandem too: a dedicated vault tenant (`suite:qrme-vault`), found or
+minted once by name, injected as QRME's own PDIClient over the
+in-process bridge — so coordinations seal in suite mode instead of
+quietly not. `GET /suite/health` reports both tandems, and
+`POST /suite/operations` is the provenance view: the caller's
+coordinations as the vault recorded them, authenticated with their own
+QRME owner token and scoped by owner, because in suite mode every
+identity's seals share the one tenant.
+
+Fixed: `python -m suite.smoke` had been failing since the vault gate
+moved from deployment to plan — its user enrolled as a visitor, whose
+writes rightly stay out of the vault. The smoke now puts its user on a
+private plan before asserting the exchange sealed. (CI's qrme-only
+checkout skips the smoke, which is how it slipped.)
+
 ## [0.14.1] — 2026-07-29
 
 **The suite wires its own tandem.** In suite mode the gateway bridges
