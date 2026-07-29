@@ -97,6 +97,21 @@ def create_gateway() -> FastAPI:
     _load("jim", "jim.api")
     _load("pdi", "pdi.api")
 
+    # In suite mode the tandem is this process: JIM's QRME client bridges to
+    # the mounted QRME app over an in-process ASGI transport, so the care
+    # team (jim/careteam.py) and the specialist handoffs work with no second
+    # server and no JIM_QRME_URL. Skipped when either side is missing —
+    # a partial suite still comes up.
+    if "qrme" in _MOUNTS and "jim" in _MOUNTS:
+        try:
+            from starlette.testclient import TestClient as _ASGIBridge
+
+            from jim.qrme_client import QRMEClient as _JimQRMEClient
+            _MOUNTS["jim"].state.qrme = _JimQRMEClient(
+                client=_ASGIBridge(_MOUNTS["qrme"]))
+        except Exception:  # noqa: BLE001 — wiring is a bonus, never a blocker
+            pass
+
     gw = FastAPI(title="Suite Gateway", version="0.1.6")
 
     origins = os.environ.get("SUITE_CORS_ORIGINS", "*")
@@ -173,6 +188,37 @@ def create_gateway() -> FastAPI:
     # right to be forgotten, data portability, and consent — must span them
     # too. These fan out over the per-product tokens the caller already holds;
     # the gateway stays stateless and never stores a credential of its own.
+
+    @gw.post("/suite/ecosystem", status_code=201)
+    async def suite_ecosystem(body: SuiteHandles) -> dict:
+        """One call, a working ecosystem: seed the identity's demo org in
+        QRME (idempotent) and link JIM's care team to its first desk. The
+        caller hands back the tokens /suite/session returned — the gateway
+        stays stateless and stores no credential of its own."""
+        if "qrme" not in _MOUNTS or "jim" not in _MOUNTS:
+            raise HTTPException(503, "the ecosystem needs qrme and jim mounted")
+        if not body.qrme or not body.jim:
+            raise HTTPException(422, "hand back the qrme and jim slices of "
+                                     "/suite/session's products map")
+        org_r = await _call(_MOUNTS["qrme"], "POST", "/organizations/demo",
+                            headers=_bearer(body.qrme.get("owner_token")))
+        if org_r.status_code >= 400:
+            raise HTTPException(502, f"demo org failed: {org_r.text}")
+        org = org_r.json()
+        desk = org["departments"][0]
+        link_r = await _call(
+            _MOUNTS["jim"], "PUT",
+            f"/users/{body.jim['user_id']}/care-team",
+            json={"org_id": org["id"], "department_id": desk["id"],
+                  "owner_token": body.qrme["owner_token"]},
+            headers=_bearer(body.jim.get("user_token")))
+        if link_r.status_code >= 400:
+            raise HTTPException(502, f"care-team link failed: {link_r.text}")
+        return {"org": {"id": org["id"], "name": org["name"],
+                        "departments": org["departments"]},
+                "care_team": link_r.json(),
+                "note": "the Guardian now takes stacked concerns to this "
+                        "team; coordinate by hand from JIM's Care Team tab"}
 
     @gw.post("/suite/erase")
     async def suite_erase(body: SuiteHandles) -> dict:

@@ -165,3 +165,30 @@ def test_usage_meters_span_the_suite(gateway):
     m = r.json()["products"]
     assert "qrme" in m and "jim" in m
     assert m["pdi"]["sealed_records"] >= 0
+
+
+def test_the_suite_wires_its_own_tandem_and_bootstraps_the_ecosystem(gateway):
+    """One call after sign-on: the demo org seeded in QRME, JIM's care team
+    linked to its first desk — through the in-process tandem the gateway
+    wires itself, with no second server and no credential stored."""
+    session = gateway.post("/suite/session", json={
+        "display_name": "Dana", "birthdate": "1954-06-01"}).json()
+    r = gateway.post("/suite/ecosystem", json={
+        "qrme": session["products"]["qrme"],
+        "jim": session["products"]["jim"]})
+    assert r.status_code == 201, r.text
+    out = r.json()
+    assert out["org"]["name"] == "The Demo Workshop"
+    assert len(out["org"]["departments"]) == 2
+    assert out["care_team"]["linked"] is True
+    assert "owner_token" not in out["care_team"]     # never echoed
+
+    # The link is real: a manual coordination runs through the wired tandem
+    # and the joint plan lands back in JIM.
+    jim = session["products"]["jim"]
+    plan = gateway.post(
+        f"/jim/users/{jim['user_id']}/care-team/coordinate",
+        json={"goal": "plan a gentle first week"},
+        headers={"authorization": f"Bearer {jim['user_token']}"})
+    assert plan.status_code == 201, plan.text
+    assert plan.json()["plan"]
