@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-07-29
+
+**There are no functional changes to QRME in this release**: the three
+products are cut as one release, and the version moves so one number keeps
+naming one combination of all three. In JIM-mini, the Apple Watch found
+its way in — an iPhone Shortcuts automation drips Health readings at a
+tokened URL, and the Health app's export seeds the baseline from history
+in one upload.
+
 ## [0.5.0] — 2026-07-29
 
 ### Added
@@ -2136,7 +2145,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.5.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.6.0...HEAD
+[0.6.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.6.0
 [0.5.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.5.0
 [0.4.8]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.8
 [0.4.7]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.7
