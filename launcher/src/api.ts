@@ -21,6 +21,9 @@ async function req<T>(path: string, opts: { method?: string; body?: unknown } = 
 export interface Health {
   origin: string;
   products: Record<string, { mounted: boolean; live: boolean; base: string }>;
+  // Which in-process tandems the gateway wired. False = that joint runs
+  // degraded (no care team / no sealing), not that a product is down.
+  tandems?: { jim_qrme: boolean; qrme_pdi: boolean };
 }
 export interface Session {
   identity: string;
@@ -31,8 +34,23 @@ export interface Session {
   };
 }
 
+export interface Ecosystem {
+  org: { id: string; name: string; departments: { id: string; name: string; role: string }[] };
+  care_team: { linked: boolean };
+  note: string;
+}
+export interface OperationEntry {
+  key: string; updated_at: string; org: string | null; goal: string | null;
+  plan: string | null; departments: (string | null)[];
+}
+
 export const api = {
   health: () => req<Health>("/suite/health"),
   session: (display_name: string, birthdate: string) =>
     req<Session>("/suite/session", { method: "POST", body: { display_name, birthdate } }),
+  ecosystem: (s: Session) =>
+    req<Ecosystem>("/suite/ecosystem", { method: "POST", body: { qrme: s.products.qrme, jim: s.products.jim } }),
+  operations: (s: Session) =>
+    req<{ entries: OperationEntry[]; note: string }>(
+      "/suite/operations", { method: "POST", body: { qrme: s.products.qrme } }),
 };

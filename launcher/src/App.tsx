@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, getBase, setBase, type Health } from "./api";
+import { api, getBase, setBase, type Ecosystem, type Health, type OperationEntry } from "./api";
 import { useSession } from "./store";
 
 const PRODUCTS = [
@@ -16,6 +16,8 @@ export function App() {
   const [base, setBaseInput] = useState(getBase());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [eco, setEco] = useState<Ecosystem | null>(null);
+  const [ops, setOps] = useState<OperationEntry[] | null>(null);
 
   useEffect(() => {
     api.health().then(setHealth).catch(() => setHealth(null));
@@ -30,6 +32,32 @@ export function App() {
 
   const provisioned = (k: string) =>
     session?.products?.[k as keyof typeof session.products];
+
+  async function buildEcosystem() {
+    if (!session) return;
+    setBusy(true); setError(null);
+    try {
+      setEco(await api.ecosystem(session));
+      setOps((await api.operations(session)).entries);
+    } catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  async function refreshOps() {
+    if (!session) return;
+    setBusy(true); setError(null);
+    try { setOps((await api.operations(session)).entries); }
+    catch (e) { setError((e as Error).message); } finally { setBusy(false); }
+  }
+
+  // The two joints the gateway wires in-process. False is "degraded", not
+  // "down": the products still answer, but the care team / vault sealing
+  // that ride the joint are off.
+  const JOINTS = [
+    { key: "jim_qrme" as const, name: "Care-team tandem",
+      tag: "JIM reaches QRME's organizations" },
+    { key: "qrme_pdi" as const, name: "Vault sealing",
+      tag: "QRME's coordinations seal into PDI" },
+  ];
 
   return (
     <div className="wrap">
@@ -83,7 +111,60 @@ export function App() {
               );
             })}
           </div>
-          <button className="signout" onClick={() => setSession(null)}>Sign out of the suite</button>
+          <div className="joints">
+            {JOINTS.map((j) => {
+              const wired = health?.tandems?.[j.key];
+              return (
+                <div className="joint" key={j.key}>
+                  <span className="pdot" style={{ background: wired ? "#43e08a" : "#ffb84d" }} />
+                  <div>
+                    <div className="jname">{j.name}</div>
+                    <div className="jtag">{wired ? j.tag : "not wired — runs degraded"}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="eco">
+            {!eco ? (
+              <>
+                <p className="muted">
+                  One press seeds your demo organization in QRME and links JIM's
+                  care team to its first desk — a working ecosystem on your own
+                  account. Pressing it again finds the same one.
+                </p>
+                <button className="primary" disabled={busy} onClick={buildEcosystem}>
+                  {busy ? "Building…" : "Build my ecosystem"}
+                </button>
+              </>
+            ) : (
+              <div className="ecodone">
+                <b>{eco.org.name}</b> — {eco.org.departments.map((d) => d.name).join(" · ")}
+                <span className="jtag"> · care team {eco.care_team.linked ? "linked ✓" : "not linked"}</span>
+              </div>
+            )}
+            {error && <div className="error">⚠ {error}</div>}
+          </div>
+
+          {ops !== null && (
+            <div className="opsbox">
+              <div className="opshead">
+                <span>Operations — your coordinations as the vault recorded them</span>
+                <button className="signout" disabled={busy} onClick={refreshOps}>Refresh</button>
+              </div>
+              {ops.length === 0 ? (
+                <div className="jtag">Nothing sealed yet — coordinate from JIM's Care Team tab and it lands here.</div>
+              ) : ops.map((o) => (
+                <div className="oprow" key={o.key}>
+                  <div className="opgoal">{o.goal || "(no goal recorded)"}</div>
+                  <div className="jtag">{o.key} · {o.departments.filter(Boolean).join(", ")}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button className="signout" onClick={() => { setSession(null); setEco(null); setOps(null); }}>Sign out of the suite</button>
         </div>
       )}
     </div>

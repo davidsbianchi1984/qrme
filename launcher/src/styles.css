@@ -50,3 +50,24 @@ label { display: block; font-size: 12px; color: var(--t2); margin-bottom: 14px; 
   padding: 8px 14px; font-size: 13px; font-weight: 600; }
 .signout { margin-top: 24px; background: rgba(255,255,255,0.05); color: var(--t2);
   border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; font-size: 13px; }
+
+.joints { display: flex; gap: 16px; margin-top: 16px; }
+.joint { flex: 1; display: flex; align-items: center; gap: 10px;
+  background: linear-gradient(160deg, var(--card), var(--card2)); border: 1px solid var(--line);
+  border-radius: 12px; padding: 12px 14px; }
+.jname { font-size: 13px; font-weight: 700; }
+.jtag { font-size: 11px; color: var(--t3); }
+
+.eco { margin-top: 18px; background: linear-gradient(160deg, var(--card), var(--card2));
+  border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+.eco p { margin: 0 0 12px; font-size: 13px; }
+.eco .primary { width: auto; padding: 11px 18px; }
+.ecodone { font-size: 13px; }
+
+.opsbox { margin-top: 16px; background: linear-gradient(160deg, var(--card), var(--card2));
+  border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+.opshead { display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; color: var(--t2); margin-bottom: 10px; }
+.opshead .signout { margin-top: 0; padding: 6px 12px; font-size: 12px; }
+.oprow { border-top: 1px solid var(--line); padding: 10px 0 8px; }
+.opgoal { font-size: 13px; margin-bottom: 2px; }
