@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-from .. import accounts, auth
+from .. import accounts, auth, mailer
 
 router = APIRouter()
 
@@ -35,6 +35,20 @@ class VerifyEmail(BaseModel):
 
 class ResendCode(BaseModel):
     email: str
+
+
+class MailSettings(BaseModel):
+    """Where this deployment sends mail through (qrme/mailer.py)."""
+    host: str
+    port: int = 587
+    username: str | None = None
+    password: str | None = None
+    sender: str | None = None
+    public_url: str | None = None    # what verification links point at
+
+
+class MailTest(BaseModel):
+    to: str
 
 
 class ResetRequest(BaseModel):
@@ -136,3 +150,52 @@ def reset_password(body: ResetPassword) -> dict:
                                        body.new_password)
     except accounts.AccountError as exc:
         raise HTTPException(exc.status, exc.detail)
+
+
+# ---- where this deployment sends mail through ---------------------------
+
+@router.get("/settings/mail")
+def get_mail_settings() -> dict:
+    """The mail configuration, never its password. Until a host is set, no
+    verification email can be sent to anybody — which is why local signup
+    does not wait for one."""
+    return mailer.describe_settings()
+
+
+@router.put("/settings/mail",
+            dependencies=[Depends(auth.require_signup_key)])
+def put_mail_settings(body: MailSettings) -> dict:
+    """Point this deployment at a mail server, from the app itself.
+    Environment variables still win when set."""
+    try:
+        return mailer.save_settings(
+            host=body.host, port=body.port, username=body.username or "",
+            password=body.password or "", sender=body.sender or "",
+            public_url=body.public_url or "")
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.delete("/settings/mail",
+               dependencies=[Depends(auth.require_signup_key)])
+def delete_mail_settings() -> dict:
+    """Forget the mail server; delivery falls back to the console."""
+    return mailer.clear_settings()
+
+
+@router.post("/settings/mail/test",
+             dependencies=[Depends(auth.require_signup_key)])
+def test_mail_settings(body: MailTest) -> dict:
+    """Send a real message now, and say plainly what the server said. A
+    settings screen that saves without ever proving it can deliver is how an
+    app ends up insisting it emailed somebody."""
+    if mailer.configured_transport() != "smtp":
+        raise HTTPException(422, "no mail server is configured — save one first")
+    try:
+        mailer.deliver(
+            body.to, "QRME test message",
+            "This is a test from QRME.\n\nIf you are reading it in your "
+            "inbox, verification emails will reach your users too.")
+    except Exception as exc:  # noqa: BLE001 — smtplib raises many kinds
+        raise HTTPException(502, f"the mail server refused it: {exc}")
+    return {"sent": True, "to": body.to}
