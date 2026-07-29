@@ -1,7 +1,7 @@
 {
   "name": "qrme-desktop",
   "productName": "QRME",
-  "version": "0.14.3",
+  "version": "0.14.4",
   "description": "QRME desktop app — a runnable React front-end wired to the QRME API, packaged with Electron.",
   "author": "David Bianchi",
   "repository": "https://github.com/davidsbianchi1984/qrme",
