@@ -1,18 +1,23 @@
-# QRME v0.14.1 — release notes
+# QRME v0.14.2 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.14.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.14.2` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.14.1** — the suite wires its own tandem.
+**QRME v0.14.2** — the vault posture survives suite mode.
 
-In suite mode the gateway bridges JIM's QRME client to the mounted QRME
-app in-process, so the care team and specialist handoffs work with no
-second server and no configuration. `POST /suite/ecosystem` takes the
-tokens `/suite/session` returned and builds the working ecosystem in one
-call — demo org seeded, care team linked — with the gateway storing no
-credential of its own.
+In suite mode the mounted QRME used to run with no PDI tandem, so
+coordinations quietly stopped sealing. The gateway now finds (or mints
+once, by name) a dedicated vault tenant — `suite:qrme-vault` — and
+injects QRME's own PDIClient over the in-process bridge.
+`GET /suite/health` reports both tandems, and `POST /suite/operations`
+is the provenance view: your coordinations as the vault recorded them,
+authenticated with your own owner token and scoped by owner. The
+launcher shows the two joints as lights, builds the ecosystem in one
+press, and lists your operations. The tandem contract (docs/tandem.md)
+documents suite mode, and `python -m suite.smoke` is repaired (its user
+now joins a private plan before asserting the exchange sealed).
 
 ### Verification
 

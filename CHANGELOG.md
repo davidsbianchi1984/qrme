@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.2] — 2026-07-29
+
 **The launcher shows the joints.** The suite dashboard now renders the
 two tandems the gateway wires (care team, vault sealing) as lights —
 amber is degraded, not down — plus a one-press "Build my ecosystem"
@@ -2340,7 +2342,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.2...HEAD
+[0.14.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.2
 [0.14.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.1
 [0.14.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.0
 [0.13.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.1
