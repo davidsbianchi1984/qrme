@@ -398,3 +398,8 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .oauth-doors button { background: rgba(255,255,255,0.05); color: var(--txt);
   border: 1px solid var(--line); border-radius: 12px; padding: 11px; font-weight: 600; }
 .oauth-doors button:disabled { opacity: 0.55; cursor: default; }
+.wp-file { display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+  border-radius: 10px; padding: 8px 12px; font-size: 13px;
+  color: var(--txt); text-decoration: none; }
+.wp-body a { color: var(--brand2); word-break: break-all; }

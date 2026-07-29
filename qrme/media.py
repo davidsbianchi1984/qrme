@@ -6,10 +6,16 @@ and served from this deployment. Three rules:
 
 * **A whitelist read from the bytes, not the filename.** The kind is decided
   by magic numbers — a renamed executable is refused no matter what its
-  extension claims. Images: JPEG, PNG, WebP, GIF. Video: MP4, WebM.
-* **Caps stated up front.** 8 MB for a picture, 60 MB for a video — a wall
-  is a feed, not a locker. The limits ride ``GET /media/limits`` so a client
-  can say so before the upload fails instead of after.
+  extension claims. Images: JPEG, PNG, WebP, GIF. Video: MP4, WebM. Files:
+  PDF, the zip-family office documents (docx/xlsx/pptx/zip — PK magic, with
+  the extension taken from a whitelist rather than trusted), and plain text
+  (txt/csv/md). Nothing that a browser executes: no HTML, no SVG, no
+  scripts — a text file that *contains* markup is stored and served as
+  ``text/plain``, where markup is just characters.
+* **Caps stated up front.** 8 MB for a picture, 60 MB for a video, 20 MB
+  for a file — a wall is a feed, not a locker. The limits ride
+  ``GET /media/limits`` so a client can say so before the upload fails
+  instead of after.
 * **Never the AI mark.** These are the user's own photographs and footage.
   Burning the synthetic-media mark into an authentic picture is a false
   statement in exactly the direction the mark exists to prevent — the same
@@ -32,6 +38,15 @@ ROUTE = "/media"
 # kind -> (max bytes, {extension: magic check})
 IMAGE_MAX = 8 * 1024 * 1024
 VIDEO_MAX = 60 * 1024 * 1024
+FILE_MAX = 20 * 1024 * 1024
+
+_MAX = {"image": IMAGE_MAX, "video": VIDEO_MAX, "file": FILE_MAX}
+
+# Extensions a PK-magic (zip family) or text upload may keep. The magic
+# proves the container; the whitelisted extension only picks which safe
+# label it is served under — anything else becomes .zip or .txt.
+_PK_EXTS = {".docx", ".xlsx", ".pptx", ".zip"}
+_TEXT_EXTS = {".txt", ".csv", ".md"}
 
 _SNIFF = [
     # (kind, extension, test on the leading bytes)
@@ -63,6 +78,9 @@ def limits() -> dict:
         "image": {"max_bytes": IMAGE_MAX,
                   "types": ["JPEG", "PNG", "GIF", "WebP"]},
         "video": {"max_bytes": VIDEO_MAX, "types": ["MP4", "WebM"]},
+        "file": {"max_bytes": FILE_MAX,
+                 "types": ["PDF", "DOCX", "XLSX", "PPTX", "ZIP",
+                           "TXT", "CSV", "MD"]},
         "detected_from": "the file's own bytes, never its name",
         "ai_marked": False,
         "note": "your own photos and footage — authentic media is never "
@@ -70,23 +88,45 @@ def limits() -> dict:
     }
 
 
-def _sniff(data: bytes) -> tuple[str, str]:
+def _named_ext(name: str | None) -> str:
+    if not name or "." not in name:
+        return ""
+    return "." + name.rsplit(".", 1)[1].lower()
+
+
+def _sniff(data: bytes, name: str | None = None) -> tuple[str, str]:
     for kind, ext, test in _SNIFF:
         try:
             if test(data):
                 return kind, ext
         except IndexError:                              # pragma: no cover
             continue
-    raise MediaError(422, "unrecognized file — JPEG, PNG, GIF, WebP, MP4 "
-                          "or WebM, detected from the bytes themselves")
+    # Documents. The magic proves the container; the extension only picks
+    # which safe label it is served under — never trusted beyond the list.
+    if data[:4] == b"%PDF":
+        return "file", ".pdf"
+    if data[:4] == b"PK\x03\x04":
+        ext = _named_ext(name)
+        return "file", ext if ext in _PK_EXTS else ".zip"
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise MediaError(
+            422, "unrecognized file — pictures (JPEG, PNG, GIF, WebP), "
+                 "video (MP4, WebM) or documents (PDF, docx/xlsx/pptx/zip, "
+                 "plain text), detected from the bytes themselves") from None
+    # Plain text serves as text/plain, where any markup is just characters —
+    # which is why .html and .svg are deliberately not in the list.
+    ext = _named_ext(name)
+    return "file", ext if ext in _TEXT_EXTS else ".txt"
 
 
-def save(profile_id: str, data: bytes) -> dict:
+def save(profile_id: str, data: bytes, name: str | None = None) -> dict:
     """Store one upload for this profile and return its serving facts."""
     if not data:
         raise MediaError(422, "the upload arrived empty")
-    kind, ext = _sniff(data)
-    cap = IMAGE_MAX if kind == "image" else VIDEO_MAX
+    kind, ext = _sniff(data, name)
+    cap = _MAX[kind]
     if len(data) > cap:
         raise MediaError(413, f"{kind} uploads top out at "
                               f"{cap // (1024 * 1024)} MB")
@@ -95,14 +135,18 @@ def save(profile_id: str, data: bytes) -> dict:
     directory.mkdir(parents=True, exist_ok=True)
     filename = f"{media_id}{ext}"
     (directory / filename).write_bytes(data)
+    # The display name is the uploader's own, kept for the card and nothing
+    # else — the file on disk is named by its id and whitelisted extension.
+    display = (name or "").strip()[:120] or None
     conn = db.connect()
     conn.execute(
-        "INSERT INTO media (id, profile_id, kind, filename, bytes,"
-        " created_at) VALUES (?,?,?,?,?,?)",
-        (media_id, profile_id, kind, filename, len(data), db.utcnow()))
+        "INSERT INTO media (id, profile_id, kind, filename, name, bytes,"
+        " created_at) VALUES (?,?,?,?,?,?,?)",
+        (media_id, profile_id, kind, filename, display, len(data),
+         db.utcnow()))
     conn.commit()
     return {"id": media_id, "kind": kind, "url": f"{ROUTE}/{filename}",
-            "bytes": len(data), "ai_marked": False}
+            "name": display, "bytes": len(data), "ai_marked": False}
 
 
 def check_owned(profile_id: str, media_ids: list[str]) -> None:
@@ -136,7 +180,8 @@ def attach(post_id: str, profile_id: str, media_ids: list[str]) -> list[dict]:
 
 def row_facade(row) -> dict:
     return {"id": row["id"], "kind": row["kind"],
-            "url": f"{ROUTE}/{row['filename']}", "ai_marked": False}
+            "url": f"{ROUTE}/{row['filename']}",
+            "name": row["name"], "ai_marked": False}
 
 
 def for_posts(post_ids: list[str]) -> dict[str, list[dict]]:

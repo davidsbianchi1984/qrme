@@ -56,6 +56,55 @@ def test_the_bytes_decide_the_kind_and_the_caps_hold(client):
     assert lim["ai_marked"] is False
 
 
+def test_documents_ride_too_and_keep_only_whitelisted_labels(client):
+    me = make_profile(client, display_name="Poster")
+    pdf = client.post(f"/profiles/{me['id']}/media?filename=notes.pdf",
+                      content=b"%PDF-1.4 tiny", headers=auth_header(me)).json()
+    assert pdf["kind"] == "file" and pdf["url"].endswith(".pdf")
+    assert pdf["name"] == "notes.pdf"
+
+    # PK magic keeps a whitelisted extension; anything fancier becomes .zip.
+    docx = client.post(f"/profiles/{me['id']}/media?filename=cv.docx",
+                       content=b"PK\x03\x04rest", headers=auth_header(me)).json()
+    assert docx["url"].endswith(".docx")
+    weird = client.post(f"/profiles/{me['id']}/media?filename=cv.exe",
+                        content=b"PK\x03\x04rest", headers=auth_header(me)).json()
+    assert weird["url"].endswith(".zip")
+    # Text keeps txt/csv/md only — .html and .svg would execute, so a text
+    # file claiming them serves as .txt, where markup is just characters.
+    html = client.post(f"/profiles/{me['id']}/media?filename=page.html",
+                       content=b"<script>alert(1)</script>",
+                       headers=auth_header(me)).json()
+    assert html["url"].endswith(".txt")
+
+    r = client.post(f"/profiles/{me['id']}/wall",
+                    json={"body": "my cv attached",
+                          "media_ids": [pdf["id"]]}, headers=auth_header(me))
+    assert r.status_code == 201
+    posts = client.get(f"/profiles/{me['id']}/wall").json()["posts"]
+    assert posts[0]["media"][0]["name"] == "notes.pdf"
+
+
+def test_a_link_in_the_text_renders_as_the_video(client):
+    """The field ask, verbatim: dropping a link in the text renders the
+    video, not just the text — whitelisted platforms only."""
+    me = make_profile(client, display_name="Poster")
+    r = client.post(f"/profiles/{me['id']}/wall",
+                    json={"body": "watch this "
+                          "https://www.youtube.com/watch?v=dQw4w9WgXcQ !"},
+                    headers=auth_header(me))
+    assert r.status_code == 201
+    video = r.json()["video"]
+    assert video and video["platform"] == "youtube"
+    assert video["video_id"] == "dQw4w9WgXcQ"
+
+    # An unknown platform's link stays what it was: text in the body.
+    r = client.post(f"/profiles/{me['id']}/wall",
+                    json={"body": "see https://example.com/watch?v=nope"},
+                    headers=auth_header(me))
+    assert r.status_code == 201 and r.json()["video"] is None
+
+
 def test_a_post_cannot_borrow_somebody_elses_upload(client):
     a = make_profile(client, display_name="Ada")
     b = make_profile(client, display_name="Bo")

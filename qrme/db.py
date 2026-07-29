@@ -1237,8 +1237,9 @@ CREATE TABLE IF NOT EXISTS oauth_states (
 CREATE TABLE IF NOT EXISTS media (
     id         TEXT PRIMARY KEY,
     profile_id TEXT NOT NULL REFERENCES profiles(id),
-    kind       TEXT NOT NULL,      -- image | video
-    filename   TEXT NOT NULL,
+    kind       TEXT NOT NULL,      -- image | video | file
+    filename   TEXT NOT NULL,      -- on disk: {id}{whitelisted ext}
+    name       TEXT,               -- the uploader's own display name
     bytes      INTEGER NOT NULL,
     created_at TEXT NOT NULL
 );

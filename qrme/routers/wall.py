@@ -50,18 +50,21 @@ def create_post(profile_id: str, body: PostCreate, request: Request) -> dict:
 
 
 @router.post("/profiles/{profile_id}/media", status_code=201)
-async def upload_media(profile_id: str, request: Request) -> dict:
-    """One photo or video, raw in the request body — the user's own pixels.
+async def upload_media(profile_id: str, request: Request,
+                       filename: str = "") -> dict:
+    """One photo, video or document, raw in the request body.
 
     Raw rather than multipart on purpose: the console sends the file bytes
     directly, nothing new to depend on, and the kind is read from the bytes
-    either way (media.py's whitelist). Authentic media is never AI-marked.
+    either way (media.py's whitelist). ``filename`` is a display hint — it
+    never chooses the kind, and only a whitelisted extension survives it.
+    Authentic media is never AI-marked.
     """
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     data = await request.body()
     try:
-        return media_mod.save(profile_id, data)
+        return media_mod.save(profile_id, data, name=filename or None)
     except media_mod.MediaError as exc:
         raise HTTPException(exc.status, exc.message) from None
 

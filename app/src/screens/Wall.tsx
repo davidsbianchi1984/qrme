@@ -132,13 +132,23 @@ export function Wall() {
       {p.reason && <div className="wp-reason">{p.reason}</div>}
         </div>
       </div>
-      <p className="wp-body">{p.body}</p>
+      <p className="wp-body">
+        {p.body.split(/(https?:\/\/\S+)/g).map((part, i) =>
+          part.startsWith("http")
+            ? <a key={i} href={part} target="_blank" rel="noreferrer">{part}</a>
+            : part)}
+      </p>
 
       {(p.media || []).length > 0 && (
         <div className="wp-media">
           {(p.media || []).map((m) => m.kind === "image"
             ? <img key={m.id} src={getBase() + m.url} alt="" />
-            : <video key={m.id} src={getBase() + m.url} controls />)}
+            : m.kind === "video"
+              ? <video key={m.id} src={getBase() + m.url} controls />
+              : <a key={m.id} className="wp-file" href={getBase() + m.url}
+                   target="_blank" rel="noreferrer" download={m.name || undefined}>
+                  📄 {m.name || "attached file"}
+                </a>)}
         </div>
       )}
 
@@ -209,15 +219,18 @@ export function Wall() {
                    onChange={(e) => setVideoTitle(e.target.value)} />
           </label>
         </div>
-        <label>Attach your own photos or videos
-          <input type="file" multiple accept="image/*,video/*"
+        <label>Attach your own photos, videos or files
+          <input type="file" multiple
+                 accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt,.csv,.md"
                  onChange={(e) => { pickFiles(e.target.files); e.target.value = ""; }} />
         </label>
         {uploads.length > 0 && (
           <div className="wp-uploads">
             {uploads.map((u) => u.kind === "image"
               ? <img key={u.id} src={getBase() + u.url} alt="" />
-              : <video key={u.id} src={getBase() + u.url} />)}
+              : u.kind === "video"
+                ? <video key={u.id} src={getBase() + u.url} />
+                : <span key={u.id} className="wp-file">📄 {u.name || "file"}</span>)}
             <button onClick={() => setUploads([])}>clear</button>
           </div>
         )}

@@ -166,7 +166,8 @@ export interface VideoFacade {
   loads_on_press: boolean; note: string;
 }
 export interface MediaUpload {
-  id: string; kind: "image" | "video"; url: string; ai_marked: false;
+  id: string; kind: "image" | "video" | "file"; url: string;
+  name?: string | null; ai_marked: false;
 }
 export interface WallPost {
   id: string; profile_id: string; display_name?: string;
@@ -388,8 +389,10 @@ export const api = {
     req<WallPost>(`/profiles/${profileId}/wall`,
       { method: "POST", body, token }),
   uploadMedia: async (profileId: string, file: File, token: string) => {
-    // Raw bytes, not multipart — the backend reads the kind from the bytes.
-    const res = await fetch(getBase() + `/profiles/${profileId}/media`, {
+    // Raw bytes, not multipart — the backend reads the kind from the bytes;
+    // the filename is a display hint only.
+    const res = await fetch(getBase() +
+      `/profiles/${profileId}/media?filename=${encodeURIComponent(file.name)}`, {
       method: "POST", body: file,
       headers: { authorization: `Bearer ${token}` },
     });

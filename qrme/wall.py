@@ -102,6 +102,21 @@ def publish(profile_id: str, body: str, author: dict | None = None,
             raise WallError(
                 "a post can only promote its own profile's listing")
 
+    # A link dropped straight into the text renders too: with no explicit
+    # video, the first whitelisted URL in the body becomes the post's video —
+    # a pasted YouTube link should play, not sit there as characters. Links
+    # from platforms the whitelist doesn't know stay what they were: text.
+    if video_url is None:
+        for token in body.split():
+            if not token.startswith(("http://", "https://")):
+                continue
+            try:
+                embeds.parse(token)
+            except embeds.EmbedError:
+                continue
+            video_url = token
+            break
+
     # Checked before the post is written, not after. Attaching afterwards would
     # leave a bad link as an orphan post somebody has to go and delete.
     if video_url is not None:
