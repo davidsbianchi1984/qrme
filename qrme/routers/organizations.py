@@ -55,6 +55,14 @@ def list_organizations(request: Request) -> list[dict]:
     return organization.list_for(_caller_owner_id(request))
 
 
+@router.post("/organizations/demo", status_code=201)
+def seed_demo_organization(request: Request) -> dict:
+    """One press, a staffed organization on the caller's own account —
+    two enterprise agents with a little knowledge each, granted and
+    desked, ready to coordinate."""
+    return organization.seed_demo(_caller_owner_id(request))
+
+
 @router.get("/organizations/{org_id}")
 def get_organization(org_id: str, request: Request) -> dict:
     _org_or_404(org_id, request)

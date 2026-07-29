@@ -96,6 +96,22 @@ def test_the_org_is_invisible_to_another_account(client, profile_id):
     assert r.status_code == 403
 
 
+def test_the_demo_org_is_born_ready_to_coordinate(client, profile_id):
+    r = client.post("/organizations/demo")
+    assert r.status_code == 201, r.text
+    org = r.json()
+    assert org["name"] == "The Demo Workshop"
+    assert len(org["departments"]) == 2
+    assert all(d["scoped"] for d in org["departments"])
+    lead = org["departments"][0]["id"]
+    ran = client.post(f"/organizations/{org['id']}/coordinate", json={
+        "goal": "plan the pew job", "from_department": lead})
+    assert ran.status_code == 201, ran.text
+    reads = {c["department"]: c["items_read"]
+             for c in ran.json()["contributions"]}
+    assert all(n >= 1 for n in reads.values())   # both agents pulled notes
+
+
 def test_coordination_needs_two_departments(client, profile_id):
     org = _org(client)
     view = _dept(client, org["id"], "Workshop", "builds", profile_id)

@@ -88,6 +88,17 @@ export function Org() {
                               onChange={(e) => setOrgName(e.target.value)} /></label>
             <button className="primary" disabled={busy || !orgName.trim()} onClick={createOrg}>Found</button>
           </div>
+          <p className="muted small">
+            Or meet it working: one press builds a demo team on your own
+            account — two agents with a little knowledge each, granted and
+            desked, ready to coordinate.
+          </p>
+          <button disabled={busy} onClick={async () => {
+            setBusy(true); setError(null);
+            try { await api.seedDemoOrg(token!); load(); }
+            catch (e) { setError((e as Error).message); }
+            finally { setBusy(false); }
+          }}>Found a demo org</button>
         </div>
       )}
 
