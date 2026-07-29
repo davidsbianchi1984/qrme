@@ -20,6 +20,16 @@ stack one column, and the corner widgets ride above the tabs. Opening a
 room without a profile picked now says what it needs instead of failing
 with a validation dump.
 
+**The Wall reaches the console.** The community layer — the For You
+feed with its stated reasons, posts, likes, comments, shares, and
+shared-video links — has lived in the backend since the community
+round, but the desktop console never got the door, which read in the
+field as the features not existing. New Wall tab: a composer that takes
+a video link (YouTube, Vimeo, Twitch — the whitelist is shown up
+front), and video cards that honor the facade contract — drawn from
+stored fields only, nothing loads from the other platform until the
+viewer presses play.
+
 ## [0.15.0] — 2026-07-29
 
 **The temperament dials — the field's list, verbatim.** Steering gains

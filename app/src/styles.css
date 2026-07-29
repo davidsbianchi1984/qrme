@@ -361,3 +361,29 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
     left: 12px; bottom: calc(76px + env(safe-area-inset-bottom));
   }
 }
+
+/* ---- the Wall (For You feed) --------------------------------------------
+   The video card is a facade until pressed: drawn entirely from stored
+   fields, no request to the other platform — pressing play swaps in the
+   platform's own player, and the card has already said so. */
+.wall-post { margin-top: 14px; }
+.wp-head { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.wp-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+  background: #0d0a24; border: 1px solid var(--line); flex: none;
+  display: inline-flex; align-items: center; justify-content: center; }
+.wp-initials { font-weight: 800; font-size: 14px; color: var(--muted, #9a93c6); }
+.wp-reason { font-size: 11px; color: var(--t3); }
+.wp-body { margin: 4px 0 10px; line-height: 1.5; }
+.wp-video iframe { width: 100%; aspect-ratio: 16 / 9; border: 0;
+  border-radius: 12px; background: #000; }
+.wp-facade { display: flex; gap: 12px; align-items: center; width: 100%;
+  text-align: left; background: #0d0a24; border: 1px solid var(--line);
+  border-radius: 12px; padding: 14px; }
+.wp-play { width: 44px; height: 44px; border-radius: 50%; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(123,92,255,0.2); border: 1px solid var(--brand);
+  color: var(--brand2); font-size: 16px; }
+.wp-actions { display: flex; gap: 8px; margin-top: 10px; }
+.wp-actions button { font-size: 12.5px; padding: 8px 12px !important; }
+.wp-comments { margin-top: 10px; border-top: 1px solid var(--line);
+  padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
