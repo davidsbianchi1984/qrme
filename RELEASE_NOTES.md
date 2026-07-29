@@ -1,18 +1,18 @@
-# QRME v0.14.0 — release notes
+# QRME v0.14.1 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.14.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.14.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.14.0** — the front page and the wrist.
+**QRME v0.14.1** — the suite wires its own tandem.
 
-- Home gains a "New in this release" card naming Blend, What If,
-  Campaigns and Org — the doors existed, the front page never said so.
-- Two new wrist faces with the standing rule (a count-shaped answer to
-  "is anything waiting on me", never the thing itself): **Proceeds** —
-  campaigns and donors, never a donor's name — and **Coordination** —
-  desks and plans waiting, never the plan. Watch faces 10 and 11.
+In suite mode the gateway bridges JIM's QRME client to the mounted QRME
+app in-process, so the care team and specialist handoffs work with no
+second server and no configuration. `POST /suite/ecosystem` takes the
+tokens `/suite/session` returned and builds the working ecosystem in one
+call — demo org seeded, care team linked — with the gateway storing no
+credential of its own.
 
 ### Verification
 

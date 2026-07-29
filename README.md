@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.14.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.14.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -671,6 +671,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.14.1** | **The suite wires its own tandem** — in-process tandem bridging and the one-call ecosystem bootstrap (`POST /suite/ecosystem`) |
 | **0.14.0** | **The front page and the wrist** — Home names the new doors; watch faces 10-11 glance proceeds and coordination, counts only |
 | **0.13.1** | **Demo, docs and hardening** — the one-press demo org, the tandem contract and disclosures caught up, and caps on the new surface |
 | **0.13.0** | **The ecosystem round** — crowdfunding with proceeds routed by the user (screen 145, Campaigns tab), organizations whose department agents coordinate on one goal (screen 146, Org tab), and a console chrome that follows the profile's language |

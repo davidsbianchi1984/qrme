@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.1] — 2026-07-29
+
+**The suite wires its own tandem.** In suite mode the gateway bridges
+JIM's QRME client to the mounted QRME app in-process — the care team
+and specialist handoffs work with no second server — and
+`POST /suite/ecosystem` builds the working ecosystem in one stateless
+call: demo org seeded, care team linked.
+
 ## [0.14.0] — 2026-07-29
 
 **The front page and the wrist.** Home gains a "New in this release"
@@ -2302,7 +2310,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.1...HEAD
+[0.14.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.1
 [0.14.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.0
 [0.13.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.1
 [0.13.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.0
