@@ -618,6 +618,102 @@ CREATE TABLE IF NOT EXISTS biometric_context (
     created_at    TEXT NOT NULL
 );
 
+-- The operational ecosystem (PDI proposal: "role-specific AI agents ...
+-- collaborate across departments, pulling relevant data, offering smart
+-- suggestions, and coordinating efforts"). An organization belongs to an
+-- account; its departments each bind one enterprise agent with a scoped,
+-- revocable vault grant for its data pulls.
+CREATE TABLE IF NOT EXISTS organizations (
+    id         TEXT PRIMARY KEY,
+    owner_id   TEXT NOT NULL,
+    name       TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+    id         TEXT PRIMARY KEY,
+    org_id     TEXT NOT NULL REFERENCES organizations(id),
+    name       TEXT NOT NULL,      -- e.g. Finance, Dispatch
+    role       TEXT NOT NULL,      -- what its agent does for the team
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    grant_id   TEXT,               -- revocable scope for this agent's reads
+    created_at TEXT NOT NULL,
+    UNIQUE (org_id, name)
+);
+
+-- One coordination: a goal taken across departments, each agent contributing
+-- from its own scoped material, the initiating agent composing the joint
+-- plan. Sealed into the PDI vault when the tandem is configured.
+CREATE TABLE IF NOT EXISTS coordinations (
+    id           TEXT PRIMARY KEY,
+    org_id       TEXT NOT NULL REFERENCES organizations(id),
+    goal         TEXT NOT NULL,
+    initiated_by TEXT NOT NULL REFERENCES departments(id),
+    plan         TEXT,
+    status       TEXT NOT NULL,    -- completed | failed
+    watermark_id TEXT,
+    pdi_key      TEXT,             -- vault key of the sealed record
+    created_at   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS coordination_contributions (
+    coordination_id TEXT NOT NULL REFERENCES coordinations(id),
+    department_id   TEXT NOT NULL REFERENCES departments(id),
+    content         TEXT NOT NULL, -- that agent's suggestion, in persona
+    items_read      INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (coordination_id, department_id)
+);
+
+-- Where the proceeds go (spec [0020], example two: "supply crowdfunding for
+-- any loved ones left behind or organizations for donations, wherever the
+-- proceeds might go up to the user"). Owner-token gated: sunset leaves the
+-- living owner the pen; verified owner death (/succeed) revokes it and
+-- hands a fresh one to the person they chose.
+CREATE TABLE IF NOT EXISTS proceeds_designations (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    name       TEXT NOT NULL,
+    kind       TEXT NOT NULL,      -- loved_one | organization
+    account_id TEXT,               -- platform account, when the designee has one
+    share      INTEGER NOT NULL,   -- percent; a profile's rows sum to 100
+    created_at TEXT NOT NULL
+);
+
+-- Crowdfunding campaigns on a profile ([0020] example two). A campaign may
+-- not exist before the profile says where its money goes.
+CREATE TABLE IF NOT EXISTS campaigns (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    title      TEXT NOT NULL,
+    cause      TEXT,
+    goal       REAL NOT NULL,
+    status     TEXT NOT NULL DEFAULT 'open',   -- open | closed
+    created_at TEXT NOT NULL,
+    closed_at  TEXT
+);
+
+CREATE TABLE IF NOT EXISTS campaign_donations (
+    id           TEXT PRIMARY KEY,
+    campaign_id  TEXT NOT NULL REFERENCES campaigns(id),
+    giver_id     TEXT,             -- interactor; NULL is an anonymous gift
+    on_behalf_of TEXT,             -- a company backing the campaign, by name
+    amount       REAL NOT NULL,
+    currency     TEXT NOT NULL DEFAULT 'USD',
+    note         TEXT,
+    created_at   TEXT NOT NULL
+);
+
+-- How one donation split across the designees, with the ledger entry each
+-- share landed on — the auditable line from a donor's gift to a loved one's
+-- statement.
+CREATE TABLE IF NOT EXISTS campaign_splits (
+    donation_id    TEXT NOT NULL REFERENCES campaign_donations(id),
+    designation_id TEXT NOT NULL REFERENCES proceeds_designations(id),
+    amount         REAL NOT NULL,
+    ledger_ref     TEXT,
+    PRIMARY KEY (donation_id, designation_id)
+);
+
 -- Environmental context received during interactions (spec clause 1: the
 -- profile "dynamically adapts to environmental data, such as location,
 -- conditions, and user behavior, enabling contextual relevance").

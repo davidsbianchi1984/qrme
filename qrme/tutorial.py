@@ -174,6 +174,24 @@ LESSONS: tuple[dict, ...] = (
               "coach. Nothing in the lobby ever plays: no input, no second "
               "controller, no console of its own.",
          screens=(122, 125), try_it="Open a lobby and read what it cannot do."),
+    dict(key="proceeds", chapter="Working", title="Where the money goes",
+         what="A profile can raise money — for the person behind it, or for "
+              "the loved ones and organizations they named. You route the "
+              "proceeds in advance, in shares that must add to one hundred; "
+              "every donation splits at the door onto the ledger, the donor "
+              "always sees the names, and when the owner is gone the pen "
+              "passes to the successor they chose.",
+         screens=(145,),
+         try_it="Name a loved one and a share, then open a campaign."),
+    dict(key="ecosystem", chapter="Working", title="Departments that coordinate",
+         what="An organization gives each department its own role agent — "
+              "your profiles, staffed to desks. Ask them to coordinate on a "
+              "goal and each pulls from its own scoped material, offers its "
+              "part, and the lead agent composes the joint plan. Revoke a "
+              "department's grant and its pulls stop instantly; with the PDI "
+              "tandem on, every plan is sealed into your vault.",
+         screens=(146,),
+         try_it="Staff two departments and give them one goal."),
     dict(key="predict", chapter="Working", title="What they would do",
          what="Ask a profile to model the likely decision and the steps the "
               "person would take in a scenario you describe. The answer is a "

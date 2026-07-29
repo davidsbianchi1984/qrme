@@ -179,6 +179,40 @@ export interface CompositionRow {
   weight: number;
   aspect?: string | null;
 }
+export interface OrgOut {
+  id: string;
+  name: string;
+  departments: { id: string; name: string; role: string;
+                 profile_id: string; agent: string; scoped: boolean }[];
+}
+export interface CoordinationOut {
+  id: string;
+  goal: string;
+  plan?: string | null;
+  status: string;
+  sealed?: boolean;
+  initiated_by?: string;
+  contributions?: { department: string; content: string; items_read: number }[];
+  departments?: { name: string; items_read: number }[];
+}
+export interface DesigneeOut {
+  id: string;
+  name: string;
+  kind: string;
+  share: number;
+  has_account: boolean;
+}
+export interface CampaignOut {
+  id: string;
+  profile_id: string;
+  title: string;
+  cause?: string | null;
+  goal: number;
+  raised: number;
+  donors: number;
+  status: string;
+  proceeds_to: DesigneeOut[];
+}
 export interface SimulationOut {
   id: string;
   scenario: string;
@@ -310,6 +344,48 @@ export const api = {
   listDesks: () =>
     req<{ id: string; display_name: string; trade: string; location?: string;
           blurb?: string; presence: string; rated: number }[]>(`/desks`),
+
+  // Crowdfunding with proceeds routed where the user said (spec [0020]).
+  getProceeds: (profileId: string) =>
+    req<{ proceeds_to: DesigneeOut[] }>(`/profiles/${profileId}/proceeds`),
+  setProceeds: (profileId: string, designees: {
+    name: string; kind: "loved_one" | "organization"; share: number;
+    account_id?: string;
+  }[], token: string) =>
+    req<{ proceeds_to: DesigneeOut[] }>(`/profiles/${profileId}/proceeds`,
+      { method: "PUT", body: { designees }, token }),
+  listCampaigns: (profileId: string) =>
+    req<CampaignOut[]>(`/profiles/${profileId}/campaigns`),
+  createCampaign: (profileId: string, body: {
+    title: string; goal: number; cause?: string;
+  }, token: string) =>
+    req<CampaignOut>(`/profiles/${profileId}/campaigns`,
+      { method: "POST", body, token }),
+  donate: (campaignId: string, body: {
+    amount: number; giver_id?: string; note?: string; on_behalf_of?: string;
+  }) =>
+    req<{ split: { name: string; amount: number }[]; note_to_giver: string }>(
+      `/campaigns/${campaignId}/donate`, { method: "POST", body }),
+  closeCampaign: (campaignId: string, token: string) =>
+    req<CampaignOut>(`/campaigns/${campaignId}/close`,
+      { method: "POST", token }),
+
+  // The operational ecosystem: departments staffed by role agents.
+  listOrgs: (token: string) =>
+    req<OrgOut[]>("/organizations", { token }),
+  createOrg: (name: string, token: string) =>
+    req<OrgOut>("/organizations", { method: "POST", body: { name }, token }),
+  addDepartment: (orgId: string, body: {
+    name: string; role: string; profile_id: string; grant_token?: string;
+  }, token: string) =>
+    req<OrgOut>(`/organizations/${orgId}/departments`,
+      { method: "POST", body, token }),
+  coordinate: (orgId: string, body: { goal: string; from_department: string },
+               token: string) =>
+    req<CoordinationOut>(`/organizations/${orgId}/coordinate`,
+      { method: "POST", body, token }),
+  listCoordinations: (orgId: string, token: string) =>
+    req<CoordinationOut[]>(`/organizations/${orgId}/coordinations`, { token }),
 
   memory: (profileId: string, interactorId: string, token: string) =>
     req<{ history: MemoryEntry[] } | MemoryEntry[]>(

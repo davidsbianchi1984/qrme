@@ -374,6 +374,48 @@ class SimulationRun(BaseModel):
     interactor_id: str | None = None   # condition on this relationship's history
 
 
+class OrganizationCreate(BaseModel):
+    name: str
+
+
+class DepartmentAdd(BaseModel):
+    name: str                          # e.g. Finance
+    role: str                          # what its agent does for the team
+    profile_id: str                    # the role-specific agent
+    grant_token: str | None = None     # revocable scope for its data pulls
+
+
+class CoordinateRequest(BaseModel):
+    goal: str
+    from_department: str               # department id that leads the plan
+
+
+class Designee(BaseModel):
+    """One recipient of a profile's proceeds (spec [0020] example two)."""
+
+    name: str
+    kind: Literal["loved_one", "organization"]
+    share: int                         # percent; a designation sums to 100
+    account_id: str | None = None      # platform account, when they have one
+
+
+class ProceedsSet(BaseModel):
+    designees: list[Designee] = Field(min_length=1)
+
+
+class CampaignCreate(BaseModel):
+    title: str
+    goal: float
+    cause: str | None = None
+
+
+class DonationCreate(BaseModel):
+    amount: float
+    giver_id: str | None = None        # interactor; omitted = anonymous
+    note: str | None = None
+    on_behalf_of: str | None = None    # a company backing the campaign
+
+
 class GrantCreate(BaseModel):
     scope: list[str] | None = None     # source-item ids; None = all sources
 
