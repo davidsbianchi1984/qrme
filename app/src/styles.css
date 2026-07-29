@@ -246,3 +246,23 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* An honest amber: the reply arrived, but not from who the user picked.
    Distinct from .error (red) — nothing failed to deliver; it degraded. */
 .degraded { background: rgba(255,184,60,0.10); color: #ffb83c; border: 1px solid rgba(255,184,60,0.5); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 10px 0; }
+
+/* Discover / Friends / Rooms / Memory vault rows */
+.discover-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.discover-card p { margin: 6px 0; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+.tag { font-size: 10.5px; padding: 3px 9px; border-radius: 8px; background: rgba(255,255,255,0.07); color: var(--t2); }
+.tag.live { background: rgba(67,224,138,0.15); color: #43e08a; }
+.tag.rated { background: rgba(255,77,94,0.15); color: var(--red); }
+.tag.founder-tag { background: rgba(126,231,135,0.15); color: #7ee787; }
+.friend-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.friend-row:first-child { border-top: none; }
+.friend-row.founder { background: rgba(126,231,135,0.05); border-radius: 8px; padding-left: 8px; }
+.friend-rank { width: 22px; color: var(--t3); font-size: 12px; }
+.friend-row button { margin-left: auto; font-size: 12px; padding: 5px 12px; }
+.room-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+.room-row:first-child { border-top: none; }
+.convo-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.convo-row:first-child { border-top: none; }
+.convo-row .actions { display: flex; gap: 6px; }
+.convo-row button { font-size: 12px; padding: 5px 12px; }

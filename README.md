@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.10.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.11.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -661,6 +661,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.11.0** | **The console catches up with its backend** — Discover (marketplace + one-press starter collection), Friends (founder pinned first, visibly), Rooms (2D/AR/VR + live desks), a memory vault that names names and erases one conversation at a time, and a chat fallback that stopped performing a character |
 | **0.10.0** | **A real offline model** — install Ollama, pull deepseek-r1:1.5b, and QRME finds it on its own: a Local tile, no key, nothing leaves the machine |
 | **0.9.1** | **Cut with the siblings** — no functional change |
 | **0.9.0** | **Cut with the siblings** — no functional change; in JIM-mini the medicine cabinet arrived |

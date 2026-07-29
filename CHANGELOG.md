@@ -6,6 +6,43 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.11.0] — 2026-07-29
+
+### Added
+
+- **The console catches up with its backend.** Friends, the marketplace,
+  the starter collection, the rooms and the live desks all existed as API
+  surfaces; the desktop console finally shows the doors:
+  - **Discover** — the marketplace cards, tag search, and one press to
+    install the 33-profile starter collection (idempotent server-side);
+    every card is a real profile with an *Add friend* button.
+  - **Friends** — the list with the founder pinned first (David Bianchi
+    and his synthetic profile at positions one and two, by design —
+    `qrme/friends.py` has always enforced it; now it is visible), plus
+    suggestions.
+  - **Rooms** — list and open rooms across every channel (2D text, 2D
+    audio, 2D video, **AR**, **VR**) and see the live desks with their
+    presence. AR/VR rooms carry an honest badge: join from a headset or
+    phone; the desktop shows the room. New `GET /rooms` and `GET /desks`
+    list routes back it.
+- **The memory vault names names** (`GET /profiles/{id}/memories`,
+  owner-only): one row per remembered conversation — *Dana with June
+  Bianchi, 12 turns, last Tuesday* — never "profile" and "interactor",
+  and each row individually erasable from the screen.
+
+### Fixed
+
+- **Chat's fallback stopped performing a character.** "[stub reply in a
+  warm tone to: hi]" was a stage direction leaking into the play. The
+  fallback now quotes what it heard plainly, says no model answered, and
+  names both doors out (a provider key, or Ollama). The quoted echo stays
+  on purpose — moderation must see user-influenced text ride into the
+  reply, end to end.
+
+### Changed
+
+- Version aligned to 0.11.0 — cut together with jim-mini and pdi.
+
 ## [0.10.0] — 2026-07-29
 
 ### Added
@@ -2204,7 +2241,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.10.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.11.0...HEAD
+[0.11.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.11.0
 [0.10.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.10.0
 [0.9.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.9.1
 [0.9.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.9.0

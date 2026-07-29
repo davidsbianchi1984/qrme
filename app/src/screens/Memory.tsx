@@ -2,63 +2,82 @@ import { useEffect, useState } from "react";
 import { api, type MemoryEntry } from "../api";
 import { useSession } from "../store";
 
+// The vault, with real names: one row per remembered conversation — the
+// profile's name and the person's name, never "profile" and "interactor" —
+// and each row individually erasable. Ids are plumbing; names are memory.
 export function Memory() {
   const { session } = useSession();
+  const [convos, setConvos] = useState<Awaited<ReturnType<typeof api.memories>>>([]);
+  const [open, setOpen] = useState<string | null>(null);   // interactor_id
   const [entries, setEntries] = useState<MemoryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
-    if (!session.profileId || !session.interactorId || !session.ownerToken) return;
-    try {
-      const data = await api.memory(
-        session.profileId,
-        session.interactorId,
-        session.ownerToken,
-      );
-      const list = Array.isArray(data) ? data : data.history || [];
-      setEntries(list);
-    } catch (e) {
-      setError((e as Error).message);
-    }
+  function load() {
+    if (!session.profileId || !session.ownerToken) return;
+    api.memories(session.profileId, session.ownerToken)
+      .then(setConvos).catch((e) => setError((e as Error).message));
   }
-  useEffect(() => {
-    load();
-  }, [session.profileId]);
+  useEffect(load, [session.profileId]);
 
-  async function clear() {
-    if (!session.profileId || !session.interactorId || !session.ownerToken) return;
-    if (!confirm("Erase this conversation's memory? This cannot be undone.")) return;
+  async function view(interactorId: string) {
+    if (!session.profileId || !session.ownerToken) return;
+    setOpen(interactorId); setEntries([]);
     try {
-      await api.clearMemory(session.profileId, session.interactorId, session.ownerToken);
-      setEntries([]);
-    } catch (e) {
-      setError((e as Error).message);
-    }
+      const data = await api.memory(session.profileId, interactorId, session.ownerToken);
+      setEntries(Array.isArray(data) ? data : data.history || []);
+    } catch (e) { setError((e as Error).message); }
+  }
+
+  async function erase(interactorId: string, name: string) {
+    if (!session.profileId || !session.ownerToken) return;
+    if (!confirm(`Erase the conversation with ${name}? This cannot be undone.`)) return;
+    try {
+      await api.clearMemory(session.profileId, interactorId, session.ownerToken);
+      if (open === interactorId) { setOpen(null); setEntries([]); }
+      load();
+    } catch (e) { setError((e as Error).message); }
   }
 
   return (
     <div className="screen">
       <header className="screen-head">
         <h2>Memory Vault 🔒</h2>
-        <span className="muted small">AES-256-GCM · stored in your vault</span>
+        <span className="muted small">AES-256-GCM · one row per conversation · erase by name</span>
       </header>
 
       {error && <div className="error">⚠ {error}</div>}
 
-      <div className="memory-list">
-        {entries.length === 0 && <div className="muted center">No memories yet — have a chat first.</div>}
-        {entries.map((e, i) => (
-          <div className={"mem " + e.role} key={i}>
-            <span className="mem-role">{e.role}</span>
-            <span className="mem-text">{e.content}</span>
+      <div className="card">
+        {convos.length === 0 && <p className="muted center">No memories yet — have a chat first.</p>}
+        {convos.map((c) => (
+          <div key={c.interactor_id} className="convo-row">
+            <div className="convo-names">
+              <b>{c.profile_name}</b>
+              <span className="muted small"> with </span>
+              <b>{c.interactor_name}</b>
+              <span className="muted small"> · {c.turns} turns · last {new Date(c.last_at).toLocaleDateString()}</span>
+            </div>
+            <div className="actions">
+              <button onClick={() => view(c.interactor_id)}>
+                {open === c.interactor_id ? "Viewing" : "View"}
+              </button>
+              <button className="danger" onClick={() => erase(c.interactor_id, c.interactor_name)}>
+                Erase this one
+              </button>
+            </div>
           </div>
         ))}
       </div>
 
-      {entries.length > 0 && (
-        <div className="actions">
-          <button onClick={load}>Refresh</button>
-          <button className="danger" onClick={clear}>Delete this memory</button>
+      {open && (
+        <div className="memory-list">
+          {entries.length === 0 && <div className="muted center">Loading…</div>}
+          {entries.map((e, i) => (
+            <div className={"mem " + e.role} key={i}>
+              <span className="mem-role">{e.role}</span>
+              <span className="mem-text">{e.content}</span>
+            </div>
+          ))}
         </div>
       )}
     </div>

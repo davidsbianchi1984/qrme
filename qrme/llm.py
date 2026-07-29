@@ -173,15 +173,29 @@ class StubProvider:
     """
 
     def generate(self, system: str, messages: list[dict]) -> str:
+        # The stub still honors the prompt contract (nickname and tone are
+        # read out of the system prompt, so relationship-aware behavior
+        # stays observable end to end) — but it no longer performs a
+        # character. "[stub reply in a warm tone to: hi]" in a chat bubble
+        # is a stage direction leaking into the play; the only honest stub
+        # reply is an explanation of itself and the two doors out.
         last_user = next(
             (m["content"] for m in reversed(messages) if m["role"] == "user"), ""
         )
         nickname = _extract(system, "Address them as: ")
         tone = _extract(system, "Tone: ") or "warm"
-        greeting = f"{nickname}, " if nickname else ""
+        greeting = f"{nickname} — " if nickname else ""
+        # The echo stays (moderation must be able to see user-influenced
+        # text ride into the reply, end to end) but as a plain quotation,
+        # not a stage direction: no brackets, no "stub reply in a warm
+        # tone" leaking into a chat bubble.
         return (
-            f"{greeting}thanks for telling me about that. "
-            f"[stub reply in a {tone} tone to: {last_user[:120]}]"
+            f"{greeting}I heard you: \u201c{last_user[:80]}\u201d. I can't "
+            "answer as this profile yet — no model answered this request. "
+            "Your message is saved. To bring this profile to life, add a "
+            "provider key in Settings → Model, or install Ollama "
+            "(ollama.com) and pull a model like deepseek-r1:1.5b — free, "
+            f"offline, found automatically. (tone: {tone})"
         )
 
 
