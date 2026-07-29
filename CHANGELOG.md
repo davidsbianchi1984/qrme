@@ -6,6 +6,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.14.5] — 2026-07-29
+
+**No functional changes here**: cut with the siblings. JIM-mini
+gained the fall path through the watch drip, the crash watch on its
+native shells, and the docs web for the field round.
+
 ## [0.14.4] — 2026-07-29
 
 **Field feedback, applied.** Discovery cards now carry the portrait —
@@ -2381,7 +2387,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.4...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.14.5...HEAD
+[0.14.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.5
 [0.14.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.4
 [0.14.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.3
 [0.14.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.2
