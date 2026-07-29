@@ -16,6 +16,7 @@ import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
 import { Help } from "./Help";
+import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
 type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "settings";
@@ -49,10 +50,13 @@ export function App() {
   }, [session.profileId]);
 
   // No profile yet → onboarding owns the whole window.
-  if (!session.profileId) return <Onboarding />;
+  // The guard wraps onboarding too: a mismatched backend at sign-up is
+  // the same trap, one screen earlier.
+  if (!session.profileId) return <><VersionGuard /><Onboarding /></>;
 
   return (
     <div className="app">
+      <VersionGuard />
       <aside className="sidebar">
         <div className="brand">
           <span className="orb" />
