@@ -34,6 +34,12 @@ class OrganizationError(ValueError):
     """Refusal with a reason a person can read."""
 
 
+# A coordination is one model call per department plus the composition pass,
+# so the department count is the request's cost multiplier. Twelve desks is a
+# large real team; a hundred is a bill wearing an org chart.
+MAX_DEPARTMENTS = 12
+
+
 def create(owner_id: str, name: str) -> dict:
     if not name.strip():
         raise OrganizationError("an organization needs a name")
@@ -88,6 +94,14 @@ def add_department(org: dict, name: str, role: str, profile: dict,
             raise OrganizationError("grant revoked or unknown")
         grant_id = grant["id"]
     conn = db.connect()
+    staffed = conn.execute(
+        "SELECT COUNT(*) FROM departments WHERE org_id=?",
+        (org["id"],)).fetchone()[0]
+    if staffed >= MAX_DEPARTMENTS:
+        raise OrganizationError(
+            f"an organization holds at most {MAX_DEPARTMENTS} departments — "
+            "a coordination is one model call per desk, and the cap is what "
+            "keeps one press from becoming a bill")
     dept_id = db.new_id("dep")
     try:
         conn.execute(
@@ -250,6 +264,14 @@ def seed_demo(owner_id: str) -> dict:
     from . import auth, tasks as tasks_mod, terms
 
     conn = db.connect()
+    # Idempotent: pressing the button twice must not mint a second team.
+    existing = conn.execute(
+        "SELECT id FROM organizations WHERE owner_id=? AND name=?",
+        (owner_id, "The Demo Workshop")).fetchone()
+    if existing:
+        out = view(existing["id"])
+        out["note"] = "your demo team already exists — here it is again"
+        return out
     agents = []
     for name, persona_text, role, know in (
         ("Workshop Agent",
