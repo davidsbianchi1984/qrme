@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.5.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.6.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -661,6 +661,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.6.0** | **Cut with the siblings** — no functional change; in JIM-mini the Apple Watch found its way in (Shortcuts drip + Health-export baseline seed) |
 | **0.5.0** | **The round where the model switchboard got a face.** Claude, ChatGPT, Grok, Perplexity, Gemini and the offline stub as tiles you click in the Control Center, each saying whether it is configured here — the per-profile choice has been in the API since 0.4.3 and nowhere in the app |
 | **0.4.8** | **The round where the app can actually send email.** Point it at a mail server from Settings — host, username, app password, link address — see which source is in force, and send a real test message that reports what the server said. Configuring one turns local signup back into genuine email verification, clickable link and all; without one, the app says so plainly instead of waiting on a letter it cannot post |
 | **0.4.7** | **The round where an upgrade actually replaced the old app.** A leftover backend from an earlier install held the port and served its old API to every new console — so three upgrades in a row met the first version's signup. `/health` reports the version, the shell adopts a backend only when it is its own (else it takes a free port and tells the window), and quitting kills the whole process tree |
