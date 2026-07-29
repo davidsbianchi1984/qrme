@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.1] — 2026-07-29
+
+### Fixed
+
+- **Settings says plainly when the built-in helper is what will answer**
+  (Settings → *Which model answers*). The silent case was the bad one:
+  *Automatic* quietly resolving to the offline stub under a screen full of
+  provider logos. An amber notice now names the fallback and what to do
+  about it; picking a provider with no key warns the same way. (In
+  JIM-mini, the same round also fixed the coach performing distress it
+  never detected — see its changelog.)
+
 ## [0.6.0] — 2026-07-29
 
 **There are no functional changes to QRME in this release**: the three
@@ -2145,7 +2157,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.6.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.6.1...HEAD
+[0.6.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.6.1
 [0.6.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.6.0
 [0.5.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.5.0
 [0.4.8]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.8
