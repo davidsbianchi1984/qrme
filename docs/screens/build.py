@@ -3303,6 +3303,17 @@ SCREENS = [
         dict(icon="shieldok", color="brand", k="Still a post",
              s="moderated · like · share · rated"),
     ]),
+    dict(num=141, title="Which Model Answers", sub="Pick it by its own logo",
+         accent="violet", tab=4, cards=[
+        dict(icon="bolt", color="brand", k="Claude",
+             s="speaking for this profile", pill=("ACTIVE", "brand")),
+        dict(icon="chat", color="green", k="Five providers, one tap",
+             s="GPT, Grok, Perplexity, Gemini"),
+        dict(icon="shield", color="cyan", k="Your own key",
+             s="on this device, rides your calls"),
+        dict(icon="warn", color="amber", k="Honest when degraded",
+             s="amber notice on a fallback reply"),
+    ]),
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
     # something here — a control that cannot do anything is worse than absent.

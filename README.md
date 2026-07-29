@@ -318,7 +318,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/140-not-on-free.svg"><img src="docs/screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/141-which-model-answers.svg"><img src="docs/screens/141-which-model-answers.svg" width="210" alt="Which Model Answers"></a><br><sub><b>141</b> · Which Model Answers</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
