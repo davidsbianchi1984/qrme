@@ -1,14 +1,19 @@
-# QRME v0.14.5 — release notes
+# QRME v0.15.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.14.5` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.15.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.14.5** — **no functional change in this release**: cut with
-the siblings. JIM-mini gained the fall path through the watch drip,
-the crash watch on all three native shells, and the docs web for the
-field round.
+**QRME v0.15.0** — the temperament dials, the field's list verbatim.
+
+Steering gains a fourth dial group: mood, outlook, maturity,
+agreeableness, confidence, curiosity — each 0–100, defaulting to
+silence, rendered into the persona prompt exactly like the existing
+dials and picked up by every surface that reads the dial catalog.
+Together with language, the aging lifecycle, and the freeform persona,
+the video's "modify your profile's characteristics" list is covered
+dial for dial. Cut alongside JIM-mini's guided wellness round.
 
 ### Verification
 
