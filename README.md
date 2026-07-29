@@ -983,6 +983,12 @@ earbuds or glasses — and says which faces it may show.
     <td align="center" width="25%"><a href="docs/watch/08-lobby.svg"><img src="docs/watch/08-lobby.svg" width="150" alt="Lobby"></a><br><sub><b>08</b> · Lobby</sub></td>
     <td align="center" width="25%"><a href="docs/watch/09-screens.svg"><img src="docs/watch/09-screens.svg" width="150" alt="Screens"></a><br><sub><b>09</b> · Screens</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="docs/watch/10-proceeds.svg"><img src="docs/watch/10-proceeds.svg" width="150" alt="Proceeds"></a><br><sub><b>10</b> · Proceeds</sub></td>
+    <td align="center" width="25%"><a href="docs/watch/11-coordination.svg"><img src="docs/watch/11-coordination.svg" width="150" alt="Coordination"></a><br><sub><b>11</b> · Coordination</sub></td>
+    <td align="center" width="25%"></td>
+    <td align="center" width="25%"></td>
+  </tr>
 </table>
 
 <table>

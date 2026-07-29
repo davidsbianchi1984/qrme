@@ -238,6 +238,14 @@ FACES = [
         ("grid", "brand", "Door kiosk", "your QR · live"),
         ("stop", "red", "Take one down", "ends it there")],
         foot="a wall is read by whoever walks past"),
+    dict(num=10, title="Proceeds", face="proceeds", accent="amber", kind="counts", rows=[
+        ("amber", "open campaigns", 1), ("green", "donors today", 4),
+        ("brand", "goal reached", 0)],
+        foot="progress, never a donor's name"),
+    dict(num=11, title="Coordination", face="coordination", accent="green", kind="counts", rows=[
+        ("green", "desks staffed", 2), ("amber", "plans waiting", 1),
+        ("cyan", "sealed to vault", 3)],
+        foot="the plan itself is not a glance"),
 ]
 
 
