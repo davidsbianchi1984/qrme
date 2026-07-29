@@ -134,7 +134,10 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 .bubble.you { align-self: flex-end; background: linear-gradient(90deg, var(--brand), var(--brand2)); color: #fff; }
 .bubble.thinking { color: var(--t2); }
 .bubble-note { margin-top: 6px; font-size: 11px; color: var(--amber); }
-.composer { display: flex; gap: 10px; margin-top: 12px; }
+/* The send button must clear the help fab (fixed bottom-right, 46px +
+   22px inset): the composer stops short of that corner instead of hiding
+   its most important button under the "?" bubble. */
+.composer { display: flex; gap: 10px; margin-top: 12px; padding-right: 76px; }
 .composer input { margin-top: 0; }
 
 /* ---- memory ---- */
