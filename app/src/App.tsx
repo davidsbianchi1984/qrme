@@ -3,16 +3,22 @@ import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
 import { Home } from "./screens/Home";
 import { Chat } from "./screens/Chat";
+import { Discover } from "./screens/Discover";
+import { Friends } from "./screens/Friends";
+import { Rooms } from "./screens/Rooms";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
 import { Help } from "./Help";
 
-type Tab = "home" | "chat" | "relationships" | "memory" | "settings";
+type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "relationships" | "memory" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
   { id: "chat", label: "Chat", icon: "💬" },
+  { id: "discover", label: "Discover", icon: "🛍" },
+  { id: "friends", label: "Friends", icon: "👥" },
+  { id: "rooms", label: "Rooms", icon: "🎧" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
   { id: "settings", label: "Control", icon: "⚙" },
@@ -55,6 +61,9 @@ export function App() {
       <main className="content">
         {tab === "home" && <Home go={setTab} />}
         {tab === "chat" && <Chat />}
+        {tab === "discover" && <Discover />}
+        {tab === "friends" && <Friends />}
+        {tab === "rooms" && <Rooms />}
         {tab === "relationships" && <Relationships />}
         {tab === "memory" && <Memory />}
         {tab === "settings" && <Settings />}

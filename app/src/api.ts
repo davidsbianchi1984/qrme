@@ -224,6 +224,47 @@ export const api = {
     req<{ active_relationships: number; relationships?: unknown[] }>(
       `/profiles/${id}/transparency`),
 
+  // The vault's table of contents, with real names — one row per remembered
+  // conversation, so the owner chooses what to erase by name, not by id.
+  memories: (profileId: string, token: string) =>
+    req<{ interactor_id: string; interactor_name: string; profile_name: string;
+          turns: number; last_at: string }[]>(
+      `/profiles/${profileId}/memories`, { token }),
+
+  // The surfaces the console finally shows: friends (founder first), the
+  // marketplace, the starter collection, and the rooms.
+  friends: (profileId: string) =>
+    req<{ friends: { profile_id: string; display_name: string; pinned?: boolean;
+                     handle?: string | null }[]; founder_handles: string[] }>(
+      `/profiles/${profileId}/friends`),
+  suggestedFriends: (profileId: string) =>
+    req<{ suggestions: { profile_id: string; display_name: string }[] } |
+        { profile_id: string; display_name: string }[]>(
+      `/profiles/${profileId}/friends/suggested`),
+  addFriend: (profileId: string, friendId: string, token: string) =>
+    req<unknown>(`/profiles/${profileId}/friends`,
+      { method: "POST", body: { friend_id: friendId }, token }),
+  marketplace: (tag?: string) =>
+    req<{ profile_id: string; display_name: string; purpose?: string;
+          blurb?: string; tags: string[] }[]>(
+      `/marketplace${tag ? `?tag=${encodeURIComponent(tag)}` : ""}`),
+  marketplaceListings: () =>
+    req<{ listings?: unknown[] } | unknown[]>(`/marketplace/listings`),
+  seedStarters: () =>
+    req<{ created: string[]; skipped: string[]; repaired?: string[] }>(
+      `/marketplace/seed`, { method: "POST" }),
+  listRooms: () =>
+    req<{ id: string; topic?: string | null; channel: string;
+          participants: number; created_at: string }[]>(`/rooms`),
+  createRoom: (body: { topic?: string; channel: string;
+                       participants: { kind: string; id: string }[] }) =>
+    req<{ id: string }>(`/rooms`, { method: "POST", body }),
+  roomMessages: (roomId: string) =>
+    req<unknown[]>(`/rooms/${roomId}/messages`),
+  listDesks: () =>
+    req<{ id: string; display_name: string; trade: string; location?: string;
+          blurb?: string; presence: string; rated: number }[]>(`/desks`),
+
   memory: (profileId: string, interactorId: string, token: string) =>
     req<{ history: MemoryEntry[] } | MemoryEntry[]>(
       `/profiles/${profileId}/memory/${interactorId}`, { token }),

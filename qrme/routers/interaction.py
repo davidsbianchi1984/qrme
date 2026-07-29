@@ -487,6 +487,31 @@ def get_engagement(profile_id: str, interactor_id: str) -> EngagementOut:
 
 # -- Persistent memory management (PRD 6.4) ----------------------------------
 
+@router.get("/profiles/{profile_id}/memories")
+def list_memories(profile_id: str, request: Request) -> list[dict]:
+    """The vault's table of contents, with real names: one row per
+    conversation this profile remembers — who it was with (the person's
+    display name, not an id), how many turns, and when it last moved.
+    Owner-only: the whole point of the list is choosing what to erase."""
+    profile = profile_or_404(profile_id)
+    auth.require(request, "owner", profile_id)
+    conn = db.connect()
+    rows = conn.execute(
+        "SELECT m.interactor_id, COUNT(*) AS turns,"
+        " MAX(m.created_at) AS last_at, i.display_name"
+        " FROM messages m LEFT JOIN interactors i ON i.id = m.interactor_id"
+        " WHERE m.profile_id=? GROUP BY m.interactor_id"
+        " ORDER BY last_at DESC",
+        (profile_id,)).fetchall()
+    return [{
+        "interactor_id": r["interactor_id"],
+        "interactor_name": r["display_name"] or "someone unnamed",
+        "profile_name": profile["display_name"],
+        "turns": r["turns"],
+        "last_at": r["last_at"],
+    } for r in rows]
+
+
 @router.get("/profiles/{profile_id}/memory/{interactor_id}")
 def view_memory(profile_id: str, interactor_id: str,
                 request: Request) -> list[MessageOut]:

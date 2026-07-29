@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, Response
 
-from .. import auth, desks, landing, rated
+from .. import db, auth, desks, landing, rated
 
 router = APIRouter()
 
@@ -87,6 +87,20 @@ def open_desk(body: DeskCreate) -> dict:
             view_style=body.view_style)
     except desks.DeskError as exc:
         raise _fail(exc) from exc
+
+
+@router.get("/desks")
+def list_desks() -> list[dict]:
+    """Every open desk with its presence, so the console can show who is
+    live right now. Rated desks are listed (badge and all) — the adult
+    gate stands where it always stood: on the card, the view, the bell
+    and joining, not on knowing the desk exists."""
+    rows = db.connect().execute(
+        "SELECT id, display_name, trade, location, blurb, presence, rated,"
+        " view_style FROM desks WHERE presence != 'closed'"
+        " ORDER BY CASE presence WHEN 'attended' THEN 0 ELSE 1 END,"
+        " display_name").fetchall()
+    return [dict(r) for r in rows]
 
 
 @router.get("/desks/{desk_id}")

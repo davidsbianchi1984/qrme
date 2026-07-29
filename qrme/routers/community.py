@@ -254,6 +254,21 @@ def microphone_vocabulary() -> dict:
     }
 
 
+@router.get("/rooms")
+def list_rooms() -> list[dict]:
+    """Every active room, with its channel — chat, voice, video, AR or VR —
+    so a console can show the doors instead of asking for an id."""
+    conn = db.connect()
+    rows = conn.execute(
+        "SELECT r.*, COUNT(p.room_id) AS heads FROM rooms r"
+        " LEFT JOIN room_participants p ON p.room_id = r.id"
+        " WHERE r.status='active' GROUP BY r.id ORDER BY r.created_at DESC"
+    ).fetchall()
+    return [{"id": r["id"], "topic": r["topic"], "channel": r["channel"],
+             "participants": r["heads"], "created_at": r["created_at"]}
+            for r in rows]
+
+
 @router.post("/rooms/{room_id}/mic", status_code=201)
 def lend_room_mic(room_id: str, body: RoomMicLend, request: Request) -> dict:
     """Lend this room's profiles your wearable's microphone.
