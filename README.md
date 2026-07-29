@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.9.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.9.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -661,6 +661,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.9.1** | **Cut with the siblings** — no functional change |
 | **0.9.0** | **Cut with the siblings** — no functional change; in JIM-mini the medicine cabinet arrived |
 | **0.8.0** | **Continuity, joined up** — cut with the siblings: JIM-mini's silence vigil and PDI's bequests now attest QRME's existing succession/memorial flow with one shared reference |
 | **0.7.0** | **The last version anyone fetches by hand** — the desktop app checks GitHub Releases on launch; Windows/Linux download the update and offer one restart, macOS is shown the download |
