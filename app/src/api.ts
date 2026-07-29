@@ -379,6 +379,9 @@ export const api = {
     req<OrgOut[]>("/organizations", { token }),
   createOrg: (name: string, token: string) =>
     req<OrgOut>("/organizations", { method: "POST", body: { name }, token }),
+  seedDemoOrg: (token: string) =>
+    req<OrgOut & { note?: string }>("/organizations/demo",
+      { method: "POST", token }),
   addDepartment: (orgId: string, body: {
     name: string; role: string; profile_id: string; grant_token?: string;
   }, token: string) =>

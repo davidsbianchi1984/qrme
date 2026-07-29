@@ -237,6 +237,67 @@ def coordinations_for(org_id: str) -> list[dict]:
     return out
 
 
+def seed_demo(owner_id: str) -> dict:
+    """One press, a staffed organization — so the first meeting with the
+    ecosystem is a working team, not an empty form.
+
+    Everything created belongs to the caller's own account: two fresh
+    enterprise agents with a little knowledge each and an all-scope grant,
+    staffed to two desks. Nothing here touches the starter collection —
+    those profiles belong to the platform, and a department may only be
+    staffed by a profile its org's owner holds.
+    """
+    from . import auth, tasks as tasks_mod, terms
+
+    conn = db.connect()
+    agents = []
+    for name, persona_text, role, know in (
+        ("Workshop Agent",
+         "A steady, practical foreman who knows the shop floor.",
+         "runs the workshop",
+         "Bench 2 is free Tuesdays; oak stock is low; the pew job needs "
+         "two weekends."),
+        ("Finance Agent",
+         "A precise, kind bookkeeper who keeps everything square.",
+         "keeps the books",
+         "Materials budget this month: $1,400 committed, $600 free; "
+         "invoices go out Fridays."),
+    ):
+        profile_id = db.new_id("prf")
+        conn.execute(
+            "INSERT INTO profiles (id, owner_id, kind, display_name, persona,"
+            " demographics, sources, anonymous, adult_mode, interaction_scope,"
+            " moderation_mode, aging_enabled, base_age, purpose, maturity,"
+            " cloud_contribution, terms_version, terms_accepted_at, created_at)"
+            " VALUES (?,?,?,?,?,'{}','[]',0,0,'reactive','auto',0,NULL,"
+            " 'enterprise_agent','balanced',0,?,?,?)",
+            (profile_id, owner_id, "fictional", name, persona_text,
+             terms.TERMS_VERSION, db.utcnow(), db.utcnow()))
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), profile_id, "knowledge", f"{name} notes",
+             know, db.utcnow()))
+        conn.commit()
+        grant = tasks_mod.create_grant(profile_id, None)
+        agents.append((profile_id, name, role, grant))
+
+    org = create(owner_id, "The Demo Workshop")
+    org_row = get(org["id"])
+    for profile_id, name, role, grant in agents:
+        profile = dict(conn.execute("SELECT * FROM profiles WHERE id=?",
+                                    (profile_id,)).fetchone())
+        add_department(org_row, name.replace(" Agent", ""), role, profile,
+                       grant["token"])
+    out = view(org["id"])
+    out["note"] = ("a working demo team on your own account — coordinate a "
+                   "goal, then revoke a grant and watch that desk's pulls "
+                   "stop")
+    out["owner_tokens"] = {name: auth.issue("owner", pid)
+                          for pid, name, _, _ in agents}
+    return out
+
+
 def list_for(owner_id: str) -> list[dict]:
     rows = db.connect().execute(
         "SELECT id FROM organizations WHERE owner_id=?"
