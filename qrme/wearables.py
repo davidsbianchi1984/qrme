@@ -111,6 +111,14 @@ FACES: dict[str, str] = {
               "face and what is behind you",
     "lobby": "who is in the game with you, and which of them are synthetic",
     "screens": "which fixed screens are live with you on them",
+    # The ecosystem round's two glances, same test as the four above: a
+    # count-shaped answer to "is anything waiting on me", never the thing
+    # itself. A campaign's progress is its own public card; a joint plan's
+    # text is not a glance.
+    "proceeds": "how your open campaigns are doing — donors and progress, "
+                "never a donor's name",
+    "coordination": "whether the departments have finished a joint plan — "
+                    "never the plan",
 }
 DEFAULT_FACES = ("agents", "activity")
 

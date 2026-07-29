@@ -3370,6 +3370,7 @@ SCREENS = [
         dict(icon="warn", color="red", k="Revoke, pulls stop",
              s="the grant dies, the org stands"),
     ], button=("Coordinate", "brand")),
+    # (Watch faces 10 and 11 mirror these two — docs/watch/build.py.)
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
     # something here — a control that cannot do anything is worse than absent.

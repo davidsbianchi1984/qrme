@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { api, type Stats } from "../api";
 import { useSession } from "../store";
 
-export function Home({ go }: { go: (t: "chat" | "relationships" | "memory") => void }) {
+export function Home({ go }: {
+  go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
+        | "campaigns" | "org") => void;
+}) {
   const { session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +72,18 @@ export function Home({ go }: { go: (t: "chat" | "relationships" | "memory") => v
         <button className="primary" onClick={() => go("chat")}>Chat with {p?.display_name}</button>
         <button onClick={() => go("relationships")}>Relationships</button>
         <button onClick={() => go("memory")}>Memory Vault</button>
+      </div>
+
+      {/* The doors this release opened — the front page names them, or
+          testers never find them. */}
+      <div className="card">
+        <h3>New in this release</h3>
+        <div className="actions">
+          <button onClick={() => go("blend")}>🫱🏽‍🫲🏻 Blend a profile</button>
+          <button onClick={() => go("simulate")}>🔮 What would they do</button>
+          <button onClick={() => go("campaigns")}>🎗 Where the money goes</button>
+          <button onClick={() => go("org")}>🏛 Departments that coordinate</button>
+        </div>
       </div>
     </div>
   );

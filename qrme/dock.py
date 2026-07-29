@@ -181,6 +181,9 @@ ROUTES: dict[str, dict] = {
     "camera": {"screen": 121, "path": "/camera", "title": "Wear a Character"},
     "lobby": {"screen": 122, "path": "/lobby", "title": "Game Lobby"},
     "screens": {"screen": 126, "path": "/screens", "title": "On a Screen"},
+    "proceeds": {"screen": 145, "path": "/campaigns",
+                 "title": "Where the Money Goes"},
+    "coordination": {"screen": 146, "path": "/org", "title": "The Ecosystem"},
 }
 
 # The catalogue, built from the wrist rather than restated beside it. Two
