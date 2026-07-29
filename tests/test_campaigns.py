@@ -125,6 +125,20 @@ def test_rated_profiles_get_no_campaign(client):
     assert "rated" in refused.json()["detail"]
 
 
+def test_the_tokenless_door_has_a_daily_count(client, profile_id, monkeypatch):
+    from qrme import campaigns as campaigns_mod
+    monkeypatch.setattr(campaigns_mod, "DONATIONS_PER_DAY", 3)
+    _designate(client, profile_id)
+    campaign = _campaign(client, profile_id)
+    for _ in range(3):
+        assert client.post(f"/campaigns/{campaign['id']}/donate",
+                           json={"amount": 1.0}).status_code == 201
+    fourth = client.post(f"/campaigns/{campaign['id']}/donate",
+                         json={"amount": 1.0})
+    assert fourth.status_code == 422
+    assert "tomorrow" in fourth.json()["detail"]
+
+
 def test_the_cap_and_the_close(client, profile_id):
     _designate(client, profile_id)
     campaign = _campaign(client, profile_id)

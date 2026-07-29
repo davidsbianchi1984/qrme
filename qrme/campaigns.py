@@ -32,6 +32,12 @@ from . import db, ledger
 
 DONATION_MAX = 500.0     # same stance as commerce.GIFT_MAX: one tap, capped
 
+# The donate route is deliberately tokenless (generosity is not gated behind
+# signup), which makes it the platform's one anonymous write. A daily
+# per-campaign count keeps that door from becoming a ledger-spam hose while
+# staying far above any real campaign's daily traffic.
+DONATIONS_PER_DAY = 1000
+
 
 class CampaignError(ValueError):
     """Refusal with a reason a person can read."""
@@ -152,6 +158,15 @@ def donate(campaign_id: str, giver_id: str | None, amount: float,
             "account")
 
     conn = db.connect()
+    today = db.utcnow()[:10]
+    given_today = conn.execute(
+        "SELECT COUNT(*) FROM campaign_donations WHERE campaign_id=?"
+        " AND created_at >= ?", (campaign_id, today)).fetchone()[0]
+    if given_today >= DONATIONS_PER_DAY:
+        raise CampaignError(
+            "this campaign has reached today's donation count — the "
+            "tokenless door is rate-limited so it can never become a "
+            "ledger-spam hose; give again tomorrow")
     rows = [dict(r) for r in conn.execute(
         "SELECT * FROM proceeds_designations WHERE profile_id=?"
         " ORDER BY share DESC, name", (campaign["profile_id"],)).fetchall()]

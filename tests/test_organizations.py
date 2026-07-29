@@ -112,6 +112,27 @@ def test_the_demo_org_is_born_ready_to_coordinate(client, profile_id):
     assert all(n >= 1 for n in reads.values())   # both agents pulled notes
 
 
+def test_the_demo_button_is_idempotent(client, profile_id):
+    first = client.post("/organizations/demo").json()
+    again = client.post("/organizations/demo").json()
+    assert again["id"] == first["id"]
+    assert "already exists" in again["note"]
+    assert len(client.get("/organizations").json()) == 1
+
+
+def test_an_org_holds_at_most_twelve_departments(client, profile_id):
+    from qrme import organization
+    org = _org(client)
+    for i in range(organization.MAX_DEPARTMENTS):
+        p = _profile(client, f"A{i}", "agent")
+        _dept(client, org["id"], f"Desk {i}", "works", p["id"])
+    one_more = _profile(client, "A12", "agent")
+    r = client.post(f"/organizations/{org['id']}/departments", json={
+        "name": "Desk 12", "role": "works", "profile_id": one_more["id"]})
+    assert r.status_code == 422
+    assert "at most" in r.json()["detail"]
+
+
 def test_coordination_needs_two_departments(client, profile_id):
     org = _org(client)
     view = _dept(client, org["id"], "Workshop", "builds", profile_id)
