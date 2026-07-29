@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The launcher shows the joints.** The suite dashboard now renders the
+two tandems the gateway wires (care team, vault sealing) as lights —
+amber is degraded, not down — plus a one-press "Build my ecosystem"
+(`POST /suite/ecosystem`) and the owner-scoped operations list
+(`POST /suite/operations`), so the vault's record of your coordinations
+is one press away from sign-on.
+
 **Docs: suite mode enters the tandem contract.** `docs/tandem.md`
 (byte-identical across the three repos) now describes how the suite
 gateway wires both tandem joints itself — JIM's QRME client and QRME's

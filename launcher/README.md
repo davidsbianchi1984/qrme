@@ -36,6 +36,14 @@ its console. To open the product consoles too, run each repo's `app/` (they
 each read a configurable base URL — point them at the gateway prefix, e.g.
 `http://127.0.0.1:8000/qrme`).
 
+Below the product cards the dashboard shows the two **joints** the gateway
+wires in-process (the care-team tandem and vault sealing, from
+`/suite/health`'s `tandems` — amber means degraded, not down), a one-press
+**Build my ecosystem** (`POST /suite/ecosystem`: demo org seeded in QRME,
+JIM's care team linked to its first desk, idempotent), and the
+**operations** list (`POST /suite/operations`): your coordinations as the
+vault recorded them, scoped to your own owner token.
+
 ## 3. Installers
 
 Built in CI on per-OS runners the same way as the product apps — see the
