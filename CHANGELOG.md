@@ -6,6 +6,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The faces come back on their own, and the phone layout stops fighting
+your thumbs.** Field round. Deployments seeded before the portraits
+shipped sat on initials with 34 faces in the package, because the repair
+lived behind a seed button nobody knows is a repair — the API now runs a
+blank-only portrait repair at startup (`seed.repair()`), including the
+founder's two profiles, which the starter backfill never reached. On a
+phone, the twelve tab labels forced the whole app wider than the screen
+(the right half of every form hung off the viewport — tapping the Rooms
+topic box opened the Kind dropdown instead), and the agent-lights window
+and help button sat on top of the tab bar: the bar now scrolls, forms
+stack one column, and the corner widgets ride above the tabs. Opening a
+room without a profile picked now says what it needs instead of failing
+with a validation dump.
+
+**The Wall reaches the console.** The community layer — the For You
+feed with its stated reasons, posts, likes, comments, shares, and
+shared-video links — has lived in the backend since the community
+round, but the desktop console never got the door, which read in the
+field as the features not existing. New Wall tab: a composer that takes
+a video link (YouTube, Vimeo, Twitch — the whitelist is shown up
+front), and video cards that honor the facade contract — drawn from
+stored fields only, nothing loads from the other platform until the
+viewer presses play.
+
 ## [0.15.0] — 2026-07-29
 
 **The temperament dials — the field's list, verbatim.** Steering gains
@@ -2400,7 +2424,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
 
 [Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.15.0...HEAD
 [0.15.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.15.0
-[0.14.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.5
+[0.14.5]: https://github.com/davidsbianchi1984/qrme/commit/7928b5a77c95617970acb5cc656038d2973c4fd7
 [0.14.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.4
 [0.14.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.3
 [0.14.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.2

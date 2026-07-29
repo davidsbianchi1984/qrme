@@ -23,6 +23,10 @@ const CHROME: Table = {
     pt: "Descobrir", it: "Scopri", ja: "発見", zh: "发现", hi: "खोजें",
     ar: "استكشف",
   },
+  "nav.wall": {
+    en: "Wall", es: "Muro", fr: "Mur", de: "Pinnwand", pt: "Mural",
+    it: "Bacheca", ja: "ウォール", zh: "动态墙", hi: "वॉल", ar: "الحائط",
+  },
   "nav.friends": {
     en: "Friends", es: "Amigos", fr: "Amis", de: "Freunde", pt: "Amigos",
     it: "Amici", ja: "友達", zh: "好友", hi: "मित्र", ar: "الأصدقاء",

@@ -147,6 +147,21 @@ async function req<T>(
 }
 
 // ---- types (only the fields the app reads) ----
+export interface VideoFacade {
+  platform: string; platform_name: string; video_id: string; url: string;
+  embed_url: string; title: string; thumbnail: null;
+  loads_on_press: boolean; note: string;
+}
+export interface WallPost {
+  id: string; profile_id: string; display_name?: string;
+  avatar?: string | null; body: string; created_at?: string;
+  likes?: number; reason?: string; video?: VideoFacade | null;
+  status?: string; blocked_reason?: string | null;
+}
+export interface WallComment {
+  id: string; body: string; author_id?: string; status?: string;
+  created_at?: string;
+}
 export interface Profile {
   id: string;
   display_name: string;
@@ -344,6 +359,30 @@ export const api = {
   addFriend: (profileId: string, friendId: string, token: string) =>
     req<unknown>(`/profiles/${profileId}/friends`,
       { method: "POST", body: { friend_id: friendId }, token }),
+  feed: (profileId: string, adult = false) =>
+    req<{ posts: WallPost[]; ranked_on: string[] }>(
+      `/profiles/${profileId}/feed${adult ? "?adult=true" : ""}`),
+  myWall: (profileId: string) =>
+    req<{ posts: WallPost[] }>(`/profiles/${profileId}/wall`),
+  publishPost: (profileId: string,
+                body: { body: string; video_url?: string; video_title?: string },
+                token: string) =>
+    req<WallPost>(`/profiles/${profileId}/wall`,
+      { method: "POST", body, token }),
+  videoPlatforms: () =>
+    req<{ platforms: { key: string; name: string; hosts: string[] }[];
+          note: string }>(`/videos/platforms`),
+  likePost: (postId: string, token: string) =>
+    req<{ likes?: number }>(`/post/${postId}/like`, { method: "POST", token }),
+  unlikePost: (postId: string, token: string) =>
+    req<{ likes?: number }>(`/post/${postId}/like`, { method: "DELETE", token }),
+  postComments: (postId: string) =>
+    req<{ comments: WallComment[] } | WallComment[]>(`/post/${postId}/comments`),
+  addComment: (postId: string, body: string, token: string) =>
+    req<WallComment>(`/post/${postId}/comments`,
+      { method: "POST", body: { body }, token }),
+  sharePost: (postId: string, token: string) =>
+    req<unknown>(`/post/${postId}/share`, { method: "POST", token }),
   marketplace: (tag?: string) =>
     req<{ profile_id: string; display_name: string; purpose?: string;
           blurb?: string; tags: string[]; avatar?: string | null;

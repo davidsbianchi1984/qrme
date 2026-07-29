@@ -6,6 +6,7 @@ import { Onboarding } from "./screens/Onboarding";
 import { Home } from "./screens/Home";
 import { Chat } from "./screens/Chat";
 import { Discover } from "./screens/Discover";
+import { Wall } from "./screens/Wall";
 import { Friends } from "./screens/Friends";
 import { Rooms } from "./screens/Rooms";
 import { Blend } from "./screens/Blend";
@@ -19,12 +20,13 @@ import { Help } from "./Help";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "settings";
+type Tab = "home" | "chat" | "discover" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
   { id: "chat", label: "Chat", icon: "💬" },
   { id: "discover", label: "Discover", icon: "🛍" },
+  { id: "wall", label: "Wall", icon: "🧱" },
   { id: "friends", label: "Friends", icon: "👥" },
   { id: "rooms", label: "Rooms", icon: "🎧" },
   { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻" },
@@ -86,6 +88,7 @@ export function App() {
         {tab === "home" && <Home go={setTab} />}
         {tab === "chat" && <Chat />}
         {tab === "discover" && <Discover />}
+        {tab === "wall" && <Wall />}
         {tab === "friends" && <Friends />}
         {tab === "rooms" && <Rooms />}
         {tab === "blend" && <Blend />}

@@ -31,7 +31,10 @@ export function Rooms() {
   useEffect(load, []);
 
   async function create() {
-    if (!session.interactorId) { setError("Sign in first."); return; }
+    if (!session.interactorId || !session.profileId) {
+      setError("Sign in and pick a profile first — the room opens with the two of you inside.");
+      return;
+    }
     setBusy(true); setError(null);
     try {
       // A room of one isn't a room: the backend requires two participants,
