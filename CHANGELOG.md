@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.13.1] — 2026-07-29
+
+**The train after the cut.** The demo org (one press, a staffed
+team on your own account, idempotent), the docs round (tandem contract
+and invention disclosure caught up with the ecosystem), and hardening:
+twelve departments at most (a coordination is one model call per desk),
+a per-campaign daily donation count on the tokenless door, and caps
+proven by tests.
+
 ## [0.13.0] — 2026-07-29
 
 **The ecosystem round.** Crowdfunding with proceeds routed where the
@@ -2286,7 +2295,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.13.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.13.1...HEAD
+[0.13.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.1
 [0.13.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.0
 [0.12.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.12.0
 [0.11.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.11.1
