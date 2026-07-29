@@ -319,6 +319,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/140-not-on-free.svg"><img src="docs/screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
     <td align="center" width="33%"><a href="docs/screens/141-which-model-answers.svg"><img src="docs/screens/141-which-model-answers.svg" width="210" alt="Which Model Answers"></a><br><sub><b>141</b> · Which Model Answers</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/142-blend-a-profile.svg"><img src="docs/screens/142-blend-a-profile.svg" width="210" alt="Blend a Profile"></a><br><sub><b>142</b> · Blend a Profile</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/143-what-would-they-do.svg"><img src="docs/screens/143-what-would-they-do.svg" width="210" alt="What Would They Do"></a><br><sub><b>143</b> · What Would They Do</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/144-where-you-are.svg"><img src="docs/screens/144-where-you-are.svg" width="210" alt="Where You Are"></a><br><sub><b>144</b> · Where You Are</sub></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>

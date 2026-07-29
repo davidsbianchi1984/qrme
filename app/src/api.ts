@@ -171,6 +171,23 @@ export interface ChatReply {
   profile_message: ChatMessage;
   handoff?: { state: string; specialist?: string } | null;
   persona_signature?: string;
+  environment?: Record<string, string> | null;
+}
+export interface CompositionRow {
+  source_profile_id: string;
+  display_name: string;
+  weight: number;
+  aspect?: string | null;
+}
+export interface SimulationOut {
+  id: string;
+  scenario: string;
+  horizon: string;
+  narrative: string;
+  confidence: number;
+  basis: { source_items: number; remembered_turns: number; note?: string };
+  disclaimer?: string;
+  created_at?: string;
 }
 export interface Interactor { id: string; display_name: string; token: string }
 export interface MemoryEntry { role: string; content: string; at?: string }
@@ -217,8 +234,37 @@ export const api = {
     method: "PUT", body, token,
   }),
 
-  chat: (profileId: string, body: { interactor_id: string; message: string }) =>
+  chat: (profileId: string, body: {
+    interactor_id: string; message: string;
+    // Environmental context (spec clause 1): the reply adapts to where the
+    // person actually is. Optional; echoed back on the response.
+    environment?: { location?: string; conditions?: string;
+                    local_time?: string; activity?: string };
+  }) =>
     req<ChatReply>(`/profiles/${profileId}/chat`, { method: "POST", body }),
+
+  // Hybrid profiles (spec [0038]): several people blended into one persona.
+  createComposite: (body: {
+    owner_id: string; display_name: string;
+    verification: { birthdate: string };
+    sources: { profile_id: string; weight?: number; aspect?: string }[];
+    purpose?: string;
+  }) =>
+    req<Profile & { owner_token: string; composition: CompositionRow[] }>(
+      "/profiles/composite", { method: "POST", body }),
+  composition: (profileId: string) =>
+    req<{ profile_id: string; sources: CompositionRow[]; policy: string }>(
+      `/profiles/${profileId}/composition`),
+
+  // Real-time simulation (spec clauses 1 & 5): predictive modeling, owner-only.
+  simulate: (profileId: string, body: {
+    scenario: string; horizon?: "immediate" | "short_term" | "long_term";
+    interactor_id?: string;
+  }, token: string) =>
+    req<SimulationOut>(`/profiles/${profileId}/simulate`,
+      { method: "POST", body, token }),
+  simulations: (profileId: string, token: string) =>
+    req<SimulationOut[]>(`/profiles/${profileId}/simulations`, { token }),
 
   transparency: (id: string) =>
     req<{ active_relationships: number; relationships?: unknown[] }>(

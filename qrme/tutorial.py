@@ -77,11 +77,21 @@ LESSONS: tuple[dict, ...] = (
               "would rather be asked than write.",
          screens=(3, 4, 5, 16),
          try_it="Create one, or open Genesis and answer the four."),
+    dict(key="blend", chapter="Getting started", title="Blending a profile",
+         what="A hybrid blends several people into one persona — both "
+              "grandparents at once, in the shares you choose, each lending "
+              "the side of them you name. It says openly that it is a blend "
+              "and never claims to be any single one of them. Rated profiles "
+              "never blend, and a stranger's profile needs a public listing.",
+         screens=(142,), try_it="Pick two profiles and press Blend."),
     dict(key="talk", chapter="Getting started", title="Talking to it",
          what="Every reply is explained: what it drew on, and why. A profile "
               "remembers you specifically, and treats you according to the "
-              "relationship you have with it.",
-         screens=(6, 7, 8, 9), try_it="Send one message and open the why."),
+              "relationship you have with it. Tell it where you are — a "
+              "trailhead in the rain, a kitchen at seven — and the reply "
+              "meets you there instead of nowhere.",
+         screens=(6, 7, 8, 9, 144),
+         try_it="Send one message and open the why."),
     dict(key="health", chapter="Getting started", title="How it is doing",
          what="Profile health, stats, and the transparency page — what it "
               "knows, where that came from, and what it is allowed to do.",
@@ -164,6 +174,14 @@ LESSONS: tuple[dict, ...] = (
               "coach. Nothing in the lobby ever plays: no input, no second "
               "controller, no console of its own.",
          screens=(122, 125), try_it="Open a lobby and read what it cannot do."),
+    dict(key="predict", chapter="Working", title="What they would do",
+         what="Ask a profile to model the likely decision and the steps the "
+              "person would take in a scenario you describe. The answer is a "
+              "watermarked prediction, never their word, and its confidence "
+              "is earned from real material — sources and remembered "
+              "conversations — not from how sure the model sounds.",
+         screens=(143,),
+         try_it="Give it a scenario and read where the confidence came from."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "
