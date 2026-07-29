@@ -16,6 +16,7 @@ import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
 import { Help } from "./Help";
+import { WatchLights } from "./WatchLights";
 
 type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "settings";
 
@@ -95,6 +96,9 @@ export function App() {
       {/* Outside the tab switch on purpose: it is part of the shell, so every
           screen has it without each screen having to remember. */}
       <Help />
+      {/* Same reason: the agent task lights are on every screen, watch-sized,
+          minimizable to a dot when they're in the way. */}
+      <WatchLights />
     </div>
   );
 }

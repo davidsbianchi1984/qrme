@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Every README ends on the rock.** The Matthew 7:24-25 passage that
+closes the root README now closes every README in the repo (app,
+native shells, and the rest), byte-identical, at the very end — and a
+binding test enforces the standing rule so the next README added
+cannot forget it.
+
+**The lights are always on.** The packaged console gains a round,
+watch-face-sized window pinned bottom-left on every screen — the
+wrist's exact glanceable payload (three lights, three counts, the
+approval line), polling `GET /profiles/{id}/watch`, with a minimize
+control that folds it to a dot in the worst light's colour when it is
+in the way. The choice sticks.
+
 ## [0.14.2] — 2026-07-29
 
 **The launcher shows the joints.** The suite dashboard now renders the
