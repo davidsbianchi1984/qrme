@@ -3348,6 +3348,17 @@ SCREENS = [
         dict(icon="lock", color="green", k="Kept in your vault",
              s="environment_context, erasable"),
     ]),
+    dict(num=145, title="Where the Money Goes", sub="Crowdfunding, routed by you",
+         accent="amber", tabs=LICENSE, tab=2, cards=[
+        dict(icon="people", color="brand", k="June — 60%",
+             s="loved one · her own statement"),
+        dict(icon="gift", color="amber", k="Trail Fund — 40%",
+             s="organization · accrues till claimed"),
+        dict(icon="coin", color="green", k="Split, audited",
+             s="every share lands on the ledger", pill=("LEDGER", "good")),
+        dict(icon="dove", color="pink", k="Outlives departure",
+             s="succession hands the pen onward"),
+    ], button=("Donate", "brand")),
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
     # something here — a control that cannot do anything is worse than absent.
