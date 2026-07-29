@@ -2414,7 +2414,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
 
 [Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.15.0...HEAD
 [0.15.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.15.0
-[0.14.5]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.5
+[0.14.5]: https://github.com/davidsbianchi1984/qrme/commit/7928b5a77c95617970acb5cc656038d2973c4fd7
 [0.14.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.4
 [0.14.3]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.3
 [0.14.2]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.2
