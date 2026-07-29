@@ -6,6 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.13.0] — 2026-07-29
+
+**The ecosystem round.** Crowdfunding with proceeds routed where the
+user said (spec [0020] ex. two): designations that must sum to 100,
+campaigns gated on them, donations split at the door onto the ledger,
+succession moving the pen. The operational ecosystem (PDI proposal):
+organizations, department agents on revocable grants, cross-department
+coordination sealed into the vault. And the console chrome now follows
+the profile's language (app/src/l10n.ts). Screens 145-146, Campaigns
+and Org tabs. Proved end-to-end against live JIM and PDI processes:
+the care team coordinated from JIM, the plan journaled in PDI, the
+donation split exactly on the ledger.
+
 ## [0.12.0] — 2026-07-29
 
 **The specification, mined.** The filed patent spec of App.
@@ -2273,7 +2286,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.12.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.13.0...HEAD
+[0.13.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.13.0
 [0.12.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.12.0
 [0.11.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.11.1
 [0.11.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.11.0
