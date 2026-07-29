@@ -3359,6 +3359,17 @@ SCREENS = [
         dict(icon="dove", color="pink", k="Outlives departure",
              s="succession hands the pen onward"),
     ], button=("Donate", "brand")),
+    dict(num=146, title="The Ecosystem", sub="Departments that coordinate",
+         accent="cyan", tab=3, cards=[
+        dict(icon="building", color="brand", k="Bianchi & Sons",
+             s="one org · role agents per desk"),
+        dict(icon="people", color="cyan", k="Workshop · Finance",
+             s="each pulls its own material"),
+        dict(icon="link", color="green", k="One joint plan",
+             s="composed by the lead agent", pill=("SEALED", "good")),
+        dict(icon="warn", color="red", k="Revoke, pulls stop",
+             s="the grant dies, the org stands"),
+    ], button=("Coordinate", "brand")),
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
     # something here — a control that cannot do anything is worse than absent.

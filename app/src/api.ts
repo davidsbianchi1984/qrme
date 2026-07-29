@@ -179,6 +179,22 @@ export interface CompositionRow {
   weight: number;
   aspect?: string | null;
 }
+export interface OrgOut {
+  id: string;
+  name: string;
+  departments: { id: string; name: string; role: string;
+                 profile_id: string; agent: string; scoped: boolean }[];
+}
+export interface CoordinationOut {
+  id: string;
+  goal: string;
+  plan?: string | null;
+  status: string;
+  sealed?: boolean;
+  initiated_by?: string;
+  contributions?: { department: string; content: string; items_read: number }[];
+  departments?: { name: string; items_read: number }[];
+}
 export interface DesigneeOut {
   id: string;
   name: string;
@@ -353,6 +369,23 @@ export const api = {
   closeCampaign: (campaignId: string, token: string) =>
     req<CampaignOut>(`/campaigns/${campaignId}/close`,
       { method: "POST", token }),
+
+  // The operational ecosystem: departments staffed by role agents.
+  listOrgs: (token: string) =>
+    req<OrgOut[]>("/organizations", { token }),
+  createOrg: (name: string, token: string) =>
+    req<OrgOut>("/organizations", { method: "POST", body: { name }, token }),
+  addDepartment: (orgId: string, body: {
+    name: string; role: string; profile_id: string; grant_token?: string;
+  }, token: string) =>
+    req<OrgOut>(`/organizations/${orgId}/departments`,
+      { method: "POST", body, token }),
+  coordinate: (orgId: string, body: { goal: string; from_department: string },
+               token: string) =>
+    req<CoordinationOut>(`/organizations/${orgId}/coordinate`,
+      { method: "POST", body, token }),
+  listCoordinations: (orgId: string, token: string) =>
+    req<CoordinationOut[]>(`/organizations/${orgId}/coordinations`, { token }),
 
   memory: (profileId: string, interactorId: string, token: string) =>
     req<{ history: MemoryEntry[] } | MemoryEntry[]>(

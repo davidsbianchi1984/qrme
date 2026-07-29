@@ -9,12 +9,13 @@ import { Rooms } from "./screens/Rooms";
 import { Blend } from "./screens/Blend";
 import { Simulate } from "./screens/Simulate";
 import { Campaigns } from "./screens/Campaigns";
+import { Org } from "./screens/Org";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
 import { Help } from "./Help";
 
-type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "relationships" | "memory" | "settings";
+type Tab = "home" | "chat" | "discover" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -25,6 +26,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻" },
   { id: "simulate", label: "What If", icon: "🔮" },
   { id: "campaigns", label: "Campaigns", icon: "🎗" },
+  { id: "org", label: "Org", icon: "🏛" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
   { id: "settings", label: "Control", icon: "⚙" },
@@ -73,6 +75,7 @@ export function App() {
         {tab === "blend" && <Blend />}
         {tab === "simulate" && <Simulate />}
         {tab === "campaigns" && <Campaigns />}
+        {tab === "org" && <Org />}
         {tab === "relationships" && <Relationships />}
         {tab === "memory" && <Memory />}
         {tab === "settings" && <Settings />}

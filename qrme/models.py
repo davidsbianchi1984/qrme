@@ -374,6 +374,22 @@ class SimulationRun(BaseModel):
     interactor_id: str | None = None   # condition on this relationship's history
 
 
+class OrganizationCreate(BaseModel):
+    name: str
+
+
+class DepartmentAdd(BaseModel):
+    name: str                          # e.g. Finance
+    role: str                          # what its agent does for the team
+    profile_id: str                    # the role-specific agent
+    grant_token: str | None = None     # revocable scope for its data pulls
+
+
+class CoordinateRequest(BaseModel):
+    goal: str
+    from_department: str               # department id that leads the plan
+
+
 class Designee(BaseModel):
     """One recipient of a profile's proceeds (spec [0020] example two)."""
 

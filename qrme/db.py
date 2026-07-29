@@ -618,6 +618,52 @@ CREATE TABLE IF NOT EXISTS biometric_context (
     created_at    TEXT NOT NULL
 );
 
+-- The operational ecosystem (PDI proposal: "role-specific AI agents ...
+-- collaborate across departments, pulling relevant data, offering smart
+-- suggestions, and coordinating efforts"). An organization belongs to an
+-- account; its departments each bind one enterprise agent with a scoped,
+-- revocable vault grant for its data pulls.
+CREATE TABLE IF NOT EXISTS organizations (
+    id         TEXT PRIMARY KEY,
+    owner_id   TEXT NOT NULL,
+    name       TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+    id         TEXT PRIMARY KEY,
+    org_id     TEXT NOT NULL REFERENCES organizations(id),
+    name       TEXT NOT NULL,      -- e.g. Finance, Dispatch
+    role       TEXT NOT NULL,      -- what its agent does for the team
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    grant_id   TEXT,               -- revocable scope for this agent's reads
+    created_at TEXT NOT NULL,
+    UNIQUE (org_id, name)
+);
+
+-- One coordination: a goal taken across departments, each agent contributing
+-- from its own scoped material, the initiating agent composing the joint
+-- plan. Sealed into the PDI vault when the tandem is configured.
+CREATE TABLE IF NOT EXISTS coordinations (
+    id           TEXT PRIMARY KEY,
+    org_id       TEXT NOT NULL REFERENCES organizations(id),
+    goal         TEXT NOT NULL,
+    initiated_by TEXT NOT NULL REFERENCES departments(id),
+    plan         TEXT,
+    status       TEXT NOT NULL,    -- completed | failed
+    watermark_id TEXT,
+    pdi_key      TEXT,             -- vault key of the sealed record
+    created_at   TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS coordination_contributions (
+    coordination_id TEXT NOT NULL REFERENCES coordinations(id),
+    department_id   TEXT NOT NULL REFERENCES departments(id),
+    content         TEXT NOT NULL, -- that agent's suggestion, in persona
+    items_read      INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (coordination_id, department_id)
+);
+
 -- Where the proceeds go (spec [0020], example two: "supply crowdfunding for
 -- any loved ones left behind or organizations for donations, wherever the
 -- proceeds might go up to the user"). Owner-token gated: sunset leaves the

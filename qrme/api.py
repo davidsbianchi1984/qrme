@@ -29,6 +29,7 @@ from .routers import (accounts as account_routes,
                       gamelobby, gaming,
                       governance,
                       identity, intelligence, interaction, licensing, models,
+                      organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
                       frontpage, profiles, research, revisions, robots,
                       sharing, signatures,
@@ -142,6 +143,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(licensing.router)
     app.include_router(packs.router)
     app.include_router(earnings.router)
+    app.include_router(organization_routes.router)
     app.include_router(watch.router)
     app.include_router(watermarks.router)
     app.include_router(avatars.router)
