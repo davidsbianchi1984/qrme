@@ -6,6 +6,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.12.0] — 2026-07-29
+
+**The specification, mined.** The filed patent spec of App.
+19/056,418 was read end to end and everything it describes that
+the apps did not yet do was built in — backend and console.
+
+### Added
+
+- **Hybrid profiles** (spec [0038]) — `POST /profiles/composite` blends two
+  or more source profiles into one `kind=hybrid` persona with normalized
+  shares and borrowed aspects; the blend is public at
+  `GET /profiles/{id}/composition`, departed profiles may be blended (the
+  spec's "grandparents who are gone"), rated ones never, and the persona
+  says openly that it is a blend. Console: the **Blend** tab; screen 142.
+- **Real-time simulation** (spec clauses 1 & 5) — `POST /profiles/{id}/simulate`
+  predicts the represented person's likely decision, workflow and rationale
+  over a chosen horizon, with confidence **earned from evidence volume**
+  (sources, remembered turns, embedding), watermarked synthetic, owner-only,
+  never distributed. Console: the **What If** tab; screen 143.
+- **Environmental adaptation** (spec clause 1) — `ChatRequest.environment`
+  (location, conditions, local time, activity) rides beside the claim-23
+  biometrics: stored, woven into the reply, echoed back. Console: the 📍
+  toggle in Chat; screen 144.
+- Tutorial lessons `blend` and `predict`, helper directions for all three,
+  and screens 142-144 drawn for both platforms.
+
 ## [0.11.1] — 2026-07-29
 
 **No functional changes here**: cut with the siblings. In PDI, the
@@ -2247,7 +2273,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.11.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.12.0...HEAD
+[0.12.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.12.0
 [0.11.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.11.1
 [0.11.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.11.0
 [0.10.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.10.0
