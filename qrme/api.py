@@ -45,7 +45,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.4.6",
+    app = FastAPI(title="QRME", version="0.4.7",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -62,7 +62,12 @@ def create_app(pdi_client: PDIClient | None = None,
         """Service liveness, sibling-style: which tandems are configured.
         (JIM-mini and PDI always had one; QRME's front-ends probed
         /openapi.json instead — now they don't have to.)"""
-        return {"status": "ok",
+        # The version is here so a desktop shell can tell whether the backend
+        # answering the port is its own. A stale backend from an older
+        # install answers /health perfectly well and then serves an older
+        # API — which is how a user who installed three upgrades kept
+        # meeting the first version's signup.
+        return {"status": "ok", "version": app.version,
                 "pdi": app.state.pdi is not None,
                 "cloud": app.state.cloud is not None,
                 "offline": offline.enabled(),
