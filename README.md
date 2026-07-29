@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.14.4** ([changelog](CHANGELOG.md) ·
+**Current release: v0.14.5** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -671,6 +671,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.14.5** | **Cut with the siblings** — JIM's fall path, native crash watch, and docs web |
 | **0.14.4** | **The console names a version mismatch** — plus faces on the discovery cards (AI / real-photo badges), plain room labels, Blend explained, Erase all, and the settings that say which secret is which |
 | **0.14.3** | **The lights are always on** — a watch-sized, minimizable agent-lights window in the studio, and the Matthew 7:24–25 passage closes every README, test-enforced |
 | **0.14.2** | **The vault posture survives suite mode** — the gateway wires QRME's PDI tandem (`suite:qrme-vault`), owner-scoped operations provenance (`POST /suite/operations`), and the launcher shows the joints |
