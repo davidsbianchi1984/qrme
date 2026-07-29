@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo } from "../api";
+import { ProviderTiles } from "../ProviderTiles";
 import { useSession } from "../store";
 
 export function Settings() {
@@ -40,6 +41,8 @@ export function Settings() {
         <button className="primary" onClick={save}>{saved ? "Saved ✓" : "Save"}</button>
         {error && <div className="error">⚠ {error}</div>}
       </div>
+
+      <ModelPanel />
 
       <MailPanel />
 
@@ -171,6 +174,54 @@ function MailPanel() {
         </button>
       </>)}
       {note && <div className="muted small">{note}</div>}
+      {error && <div className="error">⚠ {error}</div>}
+    </div>
+  );
+}
+
+
+// Which model answers for this profile — click a tile. The switchboard has
+// always been in the backend; a person should not have to know a PUT exists.
+function ModelPanel() {
+  const { session } = useSession();
+  const [providers, setProviders] = useState<Awaited<ReturnType<typeof accountApi.listModels>>["providers"]>([]);
+  const [chosen, setChosen] = useState("auto");
+  const [effective, setEffective] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function load() {
+    accountApi.listModels().then((m) => setProviders(m.providers)).catch(() => setProviders([]));
+    if (session.profileId) {
+      accountApi.getProfileModel(session.profileId)
+        .then((c) => { setChosen(c.provider); setEffective(c.effective); })
+        .catch(() => undefined);
+    }
+  }
+  useEffect(load, [session.profileId]);
+
+  async function pick(name: string) {
+    if (!session.profileId || !session.ownerToken) return;
+    setBusy(true); setError(null);
+    try {
+      const r = await accountApi.setProfileModel(session.profileId, name, session.ownerToken);
+      setChosen(r.provider); setEffective(r.effective);
+    } catch (e) { setError((e as Error).message); }
+    finally { setBusy(false); }
+  }
+
+  return (
+    <div className="card">
+      <h3>Which model answers</h3>
+      <p className="muted small">
+        Your profile's replies can run on any of these. Pick one and every
+        reply uses it; <b>Automatic</b> uses whichever is configured.
+        {effective && chosen !== effective && (
+          <> Right now it resolves to <b>{effective}</b> — the one you picked
+          has no key on this deployment yet.</>)}
+      </p>
+      <ProviderTiles providers={providers} chosen={chosen}
+                     effective={effective} onPick={pick} busy={busy} />
       {error && <div className="error">⚠ {error}</div>}
     </div>
   );

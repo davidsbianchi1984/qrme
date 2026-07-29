@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-07-29
+
+### Added
+
+- **A picker for which model answers** (`app/src/ProviderTiles.tsx`). The
+  per-profile switchboard has been in the backend since 0.4.3 and nowhere in
+  the app: Claude, ChatGPT, Grok, Perplexity, Gemini and the offline stub are
+  now tiles you click, each marked in its own colour, each saying whether it
+  is configured here and what it resolves to if not. The marks are drawn in
+  the app rather than fetched — an installer that reaches out to six vendors'
+  CDNs is one that leaks which product you opened.
+
 ## [0.4.8] — 2026-07-28
 
 ### Added
@@ -2124,7 +2136,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.4.8...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.5.0...HEAD
+[0.5.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.5.0
 [0.4.8]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.8
 [0.4.7]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.7
 [0.4.6]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.4.6

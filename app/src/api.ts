@@ -69,6 +69,16 @@ export const accountApi = {
   signin: (body: { email: string; password: string }) =>
     req<{ account_id: string; email: string; display_name?: string; account_token: string }>(
       "/signin", { method: "POST", body }),
+  // Which model answers, as a picker rather than a config file.
+  listModels: () =>
+    req<{ providers: { name: string; label: string; configured: boolean;
+                       model: string; network: boolean }[]; default: string }>("/models"),
+  getProfileModel: (pid: string) =>
+    req<{ provider: string; effective: string }>(`/profiles/${pid}/model`),
+  setProfileModel: (pid: string, provider: string, token: string) =>
+    req<{ provider: string; effective: string }>(
+      `/profiles/${pid}/model`, { method: "PUT", body: { provider }, token }),
+
   // Mail settings: what makes verification emails real instead of a line in
   // a log file. The password goes up; it never comes back down.
   getMailSettings: () =>
