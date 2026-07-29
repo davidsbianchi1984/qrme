@@ -1,42 +1,32 @@
-# QRME v0.7.0 — release notes
+# QRME v0.8.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.7.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.8.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.7.0** — the last version anyone fetches by hand. One of three
-interoperating products, all three cut together at this version.
+**QRME v0.8.0** — the continuity round, cut together with the siblings.
+No new routes here: QRME's part of the story was already built —
+reviewer-gated ownership succession (a profile passes to its named
+successor when its owner cannot authorize the handoff themselves) and the
+memorial sunset (a profile with no successor freezes rather than
+orphans).
 
-### The app keeps itself current
+### What joined up
 
-On launch, the desktop app asks GitHub Releases whether a newer version
-exists.
-
-- **Windows and Linux** download it quietly in the background and then
-  ask once: *Restart now, or later?* One click and the new version is
-  running; your data stays exactly where it was.
-- **macOS** cannot swap an unsigned app under itself, so it does the next
-  honest thing: tells you a new version exists and opens the download
-  page.
-
-Every failure path is silent by design — no network, no release, no
-metadata means the app simply opens as normal. An update check must never
-stand between you and the app.
-
-Because the updater ships *inside* this version, 0.7.0 is the last one
-that has to be downloaded by hand: install it once and every release
-after this arrives on its own.
+One attested absence now carries through all three products: JIM-mini's
+new **vigil** (the alarm that fires when a person's signals stop) produces
+an event id that serves as the succession `verification_ref` here, and as
+the activation reference for PDI's new **bequests** (vault scopes that
+unlock to a named person only at attestation).
 
 ### Verification
 
-1188 tests green. Console build clean; all three desktop shells
-syntax-checked, and the release workflow already publishes the update
-metadata (`latest*.yml` + blockmaps) the updater feeds on.
+1188 tests green, unchanged in behaviour.
 
 ### Install
 
-Download the installer for your OS from the assets below and
-double-click — for the last time.
+If you have 0.7.0, this arrives on its own — one restart when prompted.
+Otherwise, download the installer for your OS from the assets below.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md

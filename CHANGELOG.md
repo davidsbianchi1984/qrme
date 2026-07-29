@@ -6,6 +6,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-07-29
+
+**No new routes in QRME this release** — the round's new ground lives in
+the siblings (JIM-mini's silence vigil, PDI's bequests), and QRME's part
+was already built: reviewer-gated ownership succession and memorial
+sunset. What changed here is the join: a JIM vigil event id now serves as
+the succession `verification_ref`, so one attested absence carries
+through all three products. Documented in docs/invention-disclosure.md.
+
 ## [0.7.0] — 2026-07-29
 
 ### Added
@@ -2170,7 +2179,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.7.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.8.0...HEAD
+[0.8.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.8.0
 [0.7.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.7.0
 [0.6.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.6.1
 [0.6.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.6.0
