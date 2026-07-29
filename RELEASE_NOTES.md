@@ -1,35 +1,42 @@
-# QRME v0.6.1 — release notes
+# QRME v0.7.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.6.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.7.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.6.1** — a small honesty fix in Settings, cut together with the
-siblings at this version.
+**QRME v0.7.0** — the last version anyone fetches by hand. One of three
+interoperating products, all three cut together at this version.
 
-### Model honesty in Settings
+### The app keeps itself current
 
-**Settings → Which model answers** now says plainly — in amber — when
-replies would come from the built-in offline helper (no working key on the
-deployment), or when the provider you picked has no key and another will
-answer. The silent case was the bad one: *Automatic* quietly resolving to
-the stub under a screen full of provider logos.
+On launch, the desktop app asks GitHub Releases whether a newer version
+exists.
 
-### What changed in the siblings
+- **Windows and Linux** download it quietly in the background and then
+  ask once: *Restart now, or later?* One click and the new version is
+  running; your data stays exactly where it was.
+- **macOS** cannot swap an unsigned app under itself, so it does the next
+  honest thing: tells you a new version exists and opens the download
+  page.
 
-JIM-mini's Apple Watch bridge: an iPhone Shortcuts automation drips Health
-readings at a per-user tokened URL (deposit-only — the reply never carries
-guidance), and uploading the Health app's export.zip seeds the baseline
-from months of history in one step — no events written, drift bands armed
-the same day.
+Every failure path is silent by design — no network, no release, no
+metadata means the app simply opens as normal. An update check must never
+stand between you and the app.
+
+Because the updater ships *inside* this version, 0.7.0 is the last one
+that has to be downloaded by hand: install it once and every release
+after this arrives on its own.
 
 ### Verification
 
-1188 tests green, unchanged in behaviour — which is the point.
+1188 tests green. Console build clean; all three desktop shells
+syntax-checked, and the release workflow already publishes the update
+metadata (`latest*.yml` + blockmaps) the updater feeds on.
 
 ### Install
 
-Download the installer for your OS from the assets below and double-click.
+Download the installer for your OS from the assets below and
+double-click — for the last time.
 
 **Full changelog:** https://github.com/davidsbianchi1984/qrme/blob/main/CHANGELOG.md

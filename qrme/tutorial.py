@@ -92,6 +92,15 @@ LESSONS: tuple[dict, ...] = (
               "any of it off. Nothing here runs without an owner enabling it.",
          screens=(14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40),
          try_it="Open the Control Center and turn one dial."),
+    dict(key="model", chapter="You are in control", title="Who is answering",
+         what="Every profile's replies come from a model you can see and "
+              "change — a tile per provider with its own glyph, one click "
+              "to swap, Automatic for whichever is configured. Your own "
+              "key stays on this device and rides only your requests, and "
+              "an amber notice says plainly when the built-in offline "
+              "helper is what will answer instead of a real model.",
+         screens=(141,),
+         try_it="Open Which Model Answers and read which tile is active."),
     dict(key="market", chapter="Out in the world", title="The marketplace",
          what="Share or license a profile, sell a knowledge pack, take a "
               "placement. Money here is simulated and every response says so.",

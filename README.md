@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.6.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.7.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -661,6 +661,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.7.0** | **The last version anyone fetches by hand** — the desktop app checks GitHub Releases on launch; Windows/Linux download the update and offer one restart, macOS is shown the download |
 | **0.6.1** | **Model honesty in Settings** — an amber notice when replies would come from the built-in offline helper (or a keyless pick), instead of silence under a screen of logos |
 | **0.6.0** | **Cut with the siblings** — no functional change; in JIM-mini the Apple Watch found its way in (Shortcuts drip + Health-export baseline seed) |
 | **0.5.0** | **The round where the model switchboard got a face.** Claude, ChatGPT, Grok, Perplexity, Gemini and the offline stub as tiles you click in the Control Center, each saying whether it is configured here — the per-profile choice has been in the API since 0.4.3 and nowhere in the app |
