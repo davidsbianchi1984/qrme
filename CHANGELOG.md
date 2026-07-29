@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-07-29
+
+### Added
+
+- **A real offline model** (`qrme/llm.py`; the *Local (Ollama)* tile).
+  Install Ollama (ollama.com), pull a model like `deepseek-r1:1.5b`, and
+  QRME finds the daemon on its own — the tile lights up configured, no
+  key, nothing leaves the machine. Automatic prefers it over the stub
+  when no cloud key exists, and offline mode uses it too.
+  `QRME_OLLAMA_MODEL` / `QRME_OLLAMA_URL` override the defaults.
+
 ## [0.9.1] — 2026-07-29
 
 **There are no functional changes to QRME in this release**: cut with the
@@ -2193,7 +2204,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.9.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.10.0...HEAD
+[0.10.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.10.0
 [0.9.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.9.1
 [0.9.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.9.0
 [0.8.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.8.0
