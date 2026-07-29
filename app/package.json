@@ -1,8 +1,8 @@
 {
   "name": "qrme-desktop",
   "productName": "QRME",
-  "version": "0.6.1",
-  "description": "QRME desktop app \u2014 a runnable React front-end wired to the QRME API, packaged with Electron.",
+  "version": "0.7.0",
+  "description": "QRME desktop app — a runnable React front-end wired to the QRME API, packaged with Electron.",
   "author": "David Bianchi",
   "repository": "https://github.com/davidsbianchi1984/qrme",
   "private": true,
@@ -17,6 +17,7 @@
     "dist": "npm run build && electron-builder"
   },
   "dependencies": {
+    "electron-updater": "^6.8.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -35,7 +36,13 @@
   "build": {
     "appId": "app.qrme.desktop",
     "productName": "QRME",
-    "publish": null,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "davidsbianchi1984",
+        "repo": "qrme"
+      }
+    ],
     "directories": {
       "output": "release"
     },
