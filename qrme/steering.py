@@ -12,6 +12,9 @@ embodiments. The dials come in three groups:
   ``verbosity``.
 - **behavior** — how it *comes across*: ``warmth``, ``formality``, ``humor``,
   ``assertiveness``.
+- **temperament** — the disposition itself, the field's list verbatim:
+  ``mood``, ``outlook``, ``maturity``, ``agreeableness``, ``confidence``,
+  ``curiosity``.
 - **intimacy** — ``intimacy``, an 18+-only dial: available and effective
   only on an adult-mode profile, hard-clamped to 0 otherwise. Even at full,
   it raises flirtation and affection within the persona's stated boundaries
@@ -47,6 +50,24 @@ DIALS: dict[str, tuple[str, str, str, str, bool]] = {
               "serious and plain", "playful and witty", False),
     "assertiveness": ("behavior", "Assertiveness",
                       "gentle and deferential", "direct and assertive", False),
+    # temperament — the disposition itself, the field's list verbatim:
+    # mood, outlook, maturity, agreeableness, confidence, curiosity.
+    "mood": ("temperament", "Mood",
+             "subdued and quiet-toned", "bright and upbeat", False),
+    "outlook": ("temperament", "Outlook",
+                "cautious, names the risks", "optimistic, names the openings",
+                False),
+    "maturity": ("temperament", "Maturity",
+                 "playful, youthful manner", "measured, seasoned manner",
+                 False),
+    "agreeableness": ("temperament", "Agreeableness",
+                      "contrarian, pushes back", "accommodating, goes along",
+                      False),
+    "confidence": ("temperament", "Confidence",
+                   "tentative, hedges", "self-assured, decisive", False),
+    "curiosity": ("temperament", "Curiosity",
+                  "stays on the asked topic", "inquisitive, asks and explores",
+                  False),
     "intimacy": ("intimacy", "Intimacy",
                  "reserved", "flirtatious & affectionate (within boundaries)",
                  True),
