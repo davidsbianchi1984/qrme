@@ -232,6 +232,17 @@ export interface PairInfo {
   reachable: boolean; qr_svg: string; how: string[]; note: string;
 }
 
+// The wrist's glanceable payload (GET /profiles/{id}/watch), reused by the
+// always-on lights widget: counts and the profile chip are all it reads.
+export interface WatchFace {
+  profile: {
+    id: string; display_name: string; status: string;
+    light: "green" | "orange" | "red"; pending_approvals: number;
+  };
+  summary: { working: number; needing_assistance: number; stopped: number };
+  haptic: string | null;
+}
+
 export const api = {
   health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
 
@@ -348,6 +359,10 @@ export const api = {
   // The profile's language: the console chrome follows it (l10n.ts).
   getLanguage: (profileId: string) =>
     req<{ language: string }>(`/profiles/${profileId}/language`),
+
+  // The wrist's glanceable face, reused by the always-on lights widget.
+  watchFace: (profileId: string, token: string) =>
+    req<WatchFace>(`/profiles/${profileId}/watch`, { token }),
 
   // Crowdfunding with proceeds routed where the user said (spec [0020]).
   getProceeds: (profileId: string) =>

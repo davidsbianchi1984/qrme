@@ -266,3 +266,27 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .convo-row:first-child { border-top: none; }
 .convo-row .actions { display: flex; gap: 6px; }
 .convo-row button { font-size: 12px; padding: 5px 12px; }
+
+/* The agent task lights — a watch-face-sized round window, always on
+   screen (bottom-left; Help owns bottom-right). Ring color = worst light.
+   Minimizes to a dot in that color when it's in the way. */
+.watch-lights { position: fixed; left: 22px; bottom: 22px; width: 176px;
+  height: 176px; border-radius: 50%; border: 3px solid var(--line);
+  background: radial-gradient(120% 120% at 50% 20%, #1a1440 0%, #0d0a24 70%);
+  box-shadow: 0 16px 40px rgba(0,0,0,.55);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 6px; padding: 18px; z-index: 40; }
+.wl-head { display: flex; align-items: center; gap: 6px; max-width: 130px; }
+.wl-name { font-size: 11px; font-weight: 700; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wl-min { background: none; border: 0; color: var(--muted); font-size: 16px;
+  line-height: 1; cursor: pointer; padding: 0 2px; }
+.wl-row { display: flex; align-items: center; gap: 8px; width: 116px; }
+.wl-light { width: 12px; height: 12px; border-radius: 50%; flex: none;
+  box-shadow: 0 0 8px currentColor; }
+.wl-count { font-size: 15px; font-weight: 800; width: 20px; text-align: right; }
+.wl-label { font-size: 11px; color: var(--muted); }
+.wl-foot { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.wl-dot { position: fixed; left: 22px; bottom: 22px; width: 46px; height: 46px;
+  border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,.45); z-index: 40; }
