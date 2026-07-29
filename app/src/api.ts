@@ -59,6 +59,19 @@ export function setLlmKey(key: string) {
 
 // Accounts: the email is verified (emailed code) before sign-in works. The
 // account is what owns — its id is the owner_id profiles are created under.
+export const oauthApi = {
+  providers: () =>
+    req<{ providers: { provider: string; name: string; configured: boolean;
+                       setup?: string }[] }>(`/auth/oauth/providers`),
+  start: (provider: string) =>
+    req<{ url: string; state: string }>(
+      `/auth/oauth/${provider}/start`, { method: "POST", body: {} }),
+  claim: (state: string) =>
+    req<{ ready: boolean; account_id?: string; email?: string;
+          account_token?: string }>(
+      `/auth/oauth/claim?state=${encodeURIComponent(state)}`),
+};
+
 export const accountApi = {
   signup: (body: { email: string; password: string; display_name?: string }) =>
     req<{ account_id: string; email: string; verified: boolean; code_delivery?: string;
@@ -152,10 +165,15 @@ export interface VideoFacade {
   embed_url: string; title: string; thumbnail: null;
   loads_on_press: boolean; note: string;
 }
+export interface MediaUpload {
+  id: string; kind: "image" | "video" | "file"; url: string;
+  name?: string | null; ai_marked: false;
+}
 export interface WallPost {
   id: string; profile_id: string; display_name?: string;
   avatar?: string | null; body: string; created_at?: string;
   likes?: number; reason?: string; video?: VideoFacade | null;
+  media?: MediaUpload[];
   status?: string; blocked_reason?: string | null;
 }
 export interface WallComment {
@@ -365,10 +383,26 @@ export const api = {
   myWall: (profileId: string) =>
     req<{ posts: WallPost[] }>(`/profiles/${profileId}/wall`),
   publishPost: (profileId: string,
-                body: { body: string; video_url?: string; video_title?: string },
+                body: { body: string; video_url?: string; video_title?: string;
+                        media_ids?: string[] },
                 token: string) =>
     req<WallPost>(`/profiles/${profileId}/wall`,
       { method: "POST", body, token }),
+  uploadMedia: async (profileId: string, file: File, token: string) => {
+    // Raw bytes, not multipart — the backend reads the kind from the bytes;
+    // the filename is a display hint only.
+    const res = await fetch(getBase() +
+      `/profiles/${profileId}/media?filename=${encodeURIComponent(file.name)}`, {
+      method: "POST", body: file,
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((data as { detail?: string }).detail || `upload failed (${res.status})`);
+    return data as MediaUpload;
+  },
+  mediaLimits: () =>
+    req<{ image: { max_bytes: number }; video: { max_bytes: number } }>(
+      `/media/limits`),
   videoPlatforms: () =>
     req<{ platforms: { key: string; name: string; hosts: string[] }[];
           note: string }>(`/videos/platforms`),

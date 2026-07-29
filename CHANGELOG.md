@@ -6,6 +6,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Your own pixels on the wall, and two new front doors.** Wall posts now
+carry uploads — photos, videos and files, stored on the deployment and
+served from it, kind decided by the file's bytes (JPEG, PNG, GIF, WebP;
+MP4, WebM; PDF, docx/xlsx/pptx/zip, plain text — never anything a
+browser executes), caps published at `GET /media/limits`, and never the
+AI mark: authentic media stays authentic. A video link dropped straight
+into the post text renders as the player, not as characters — the same
+whitelist, the same nothing-loads-until-play facade — and other links
+become links. And the account
+gateway grows **Sign in with Google / Apple** — configuration decides
+whether the buttons are live (`QRME_GOOGLE_CLIENT_ID` and friends), an
+unconfigured door is grey with its setup note, the provider's word
+verifies the inbox so the emailed-code dance is skipped, and a
+passwordless account fails closed on any typed password.
+
 **The faces come back on their own, and the phone layout stops fighting
 your thumbs.** Field round. Deployments seeded before the portraits
 shipped sat on initials with 34 faces in the package, because the repair

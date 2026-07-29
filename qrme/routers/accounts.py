@@ -199,3 +199,68 @@ def test_mail_settings(body: MailTest) -> dict:
     except Exception as exc:  # noqa: BLE001 — smtplib raises many kinds
         raise HTTPException(502, f"the mail server refused it: {exc}")
     return {"sent": True, "to": body.to}
+
+
+# -- Sign in with Google / Apple ---------------------------------------------
+# qrme/oauth.py holds the flow; these routes are its doors. Configuration,
+# not code, decides whether a provider is live on this deployment.
+
+from fastapi import Request as _Request
+
+from .. import oauth as oauth_mod
+
+
+class OAuthStart(BaseModel):
+    redirect_uri: str | None = None
+
+
+@router.get("/auth/oauth/providers")
+def oauth_providers() -> dict:
+    """Which sign-in doors are live here, and how to open the rest."""
+    return oauth_mod.providers()
+
+
+@router.post("/auth/oauth/{provider}/start")
+def oauth_start(provider: str, body: OAuthStart,
+                request: _Request) -> dict:
+    """Mint a state and the provider's authorize URL. The default return
+    address is this API's own callback — right for the desktop app, where
+    the backend answers on loopback."""
+    redirect = body.redirect_uri or str(
+        request.url_for("oauth_callback", provider=provider))
+    try:
+        return oauth_mod.start(provider, redirect)
+    except oauth_mod.OAuthError as exc:
+        raise HTTPException(exc.status, exc.message) from None
+
+
+@router.get("/auth/oauth/{provider}/callback", response_class=HTMLResponse)
+def oauth_callback(provider: str, code: str = "", state: str = "",
+                   error: str = "") -> HTMLResponse:
+    """Where the provider sends the browser back. Finishes the exchange and
+    tells the person to return to the app — the app itself claims the
+    session at /auth/oauth/claim."""
+    if error or not code:
+        return HTMLResponse(
+            f"<h2>Sign-in was not completed</h2>"
+            f"<p>{error or 'no code came back'} — you can close this window "
+            "and try again.</p>",
+            status_code=400)
+    try:
+        done = oauth_mod.callback(provider, code, state)
+    except oauth_mod.OAuthError as exc:
+        return HTMLResponse(f"<h2>Sign-in failed</h2><p>{exc.message}</p>",
+                            status_code=exc.status)
+    return HTMLResponse(
+        f"<h2>Signed in as {done['email']}</h2>"
+        "<p>You can close this window and return to the app.</p>")
+
+
+@router.get("/auth/oauth/claim")
+def oauth_claim(state: str) -> dict:
+    """One-time pickup of a completed sign-in. The console polls this after
+    opening the browser; the first successful claim spends the state."""
+    try:
+        return oauth_mod.claim(state)
+    except oauth_mod.OAuthError as exc:
+        raise HTTPException(exc.status, exc.message) from None

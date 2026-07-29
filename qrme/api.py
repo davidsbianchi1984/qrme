@@ -209,6 +209,16 @@ def create_app(pdi_client: PDIClient | None = None,
         app.mount(avatar_assets.FIGURE_ROUTE,
                   StaticFiles(directory=str(_figures)), name="figures")
 
+    # User uploads (qrme/media.py): the wall's photos and footage, served
+    # read-only from the deployment's own media directory. Created up front
+    # because StaticFiles refuses to mount a directory that is not there yet.
+    from . import media as media_mod
+    _media = media_mod.media_dir()
+    _media.mkdir(parents=True, exist_ok=True)
+    from fastapi.staticfiles import StaticFiles as _StaticFiles
+    app.mount(media_mod.ROUTE, _StaticFiles(directory=str(_media)),
+              name="media")
+
     # The studio itself, served from this API so a phone loads the UI and
     # calls the API on one origin (no CORS, nothing to configure). Mounted
     # last so it can never shadow an API route; absent until app/ is built.

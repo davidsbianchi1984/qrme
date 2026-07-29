@@ -66,7 +66,7 @@ class WallError(ValueError):
 
 def publish(profile_id: str, body: str, author: dict | None = None,
             listing_id: str | None = None, video_url: str | None = None,
-            video_title: str = "") -> dict:
+            video_title: str = "", media_ids: list[str] | None = None) -> dict:
     """Write a post to the wall. Moderated on the way in.
 
     A blocked post is kept and returned to its author with the reason, and is
@@ -102,10 +102,28 @@ def publish(profile_id: str, body: str, author: dict | None = None,
             raise WallError(
                 "a post can only promote its own profile's listing")
 
+    # A link dropped straight into the text renders too: with no explicit
+    # video, the first whitelisted URL in the body becomes the post's video —
+    # a pasted YouTube link should play, not sit there as characters. Links
+    # from platforms the whitelist doesn't know stay what they were: text.
+    if video_url is None:
+        for token in body.split():
+            if not token.startswith(("http://", "https://")):
+                continue
+            try:
+                embeds.parse(token)
+            except embeds.EmbedError:
+                continue
+            video_url = token
+            break
+
     # Checked before the post is written, not after. Attaching afterwards would
     # leave a bad link as an orphan post somebody has to go and delete.
     if video_url is not None:
         embeds.parse(video_url)
+    from . import media as media_mod
+    if media_ids:
+        media_mod.check_owned(profile_id, media_ids)
 
     post_id = db.new_id("pst")
     db.connect().execute(
@@ -120,8 +138,11 @@ def publish(profile_id: str, body: str, author: dict | None = None,
     db.connect().commit()
     video = embeds.attach(post_id, video_url, video_title) \
         if video_url is not None else None
+    # Ownership was checked above, before the insert; this just records it.
+    attached = media_mod.attach(post_id, profile_id, media_ids) \
+        if media_ids else []
     return {"id": post_id, "profile_id": profile_id, "body": body,
-            "listing_id": listing_id, "video": video,
+            "listing_id": listing_id, "video": video, "media": attached,
             "status": status,
             "blocked_reason": None if verdict.approved else verdict.reason}
 
@@ -271,9 +292,12 @@ def _hydrate(entries: list[dict]) -> list[dict]:
                     f" WHERE a.post_id IN ({marks})", ids).fetchall()}
     videos = {r["post_id"]: embeds.row_facade(r) for r in conn.execute(
         f"SELECT * FROM post_videos WHERE post_id IN ({marks})", ids).fetchall()}
+    from . import media as media_mod
+    uploads = media_mod.for_posts(ids)
     for e in entries:
         e["promoting"] = listings.get(e["id"])
         e["video"] = videos.get(e["id"])
+        e["media"] = uploads.get(e["id"], [])
     return entries
 
 
