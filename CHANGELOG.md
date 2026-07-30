@@ -150,12 +150,6 @@ backend" when a stored address is the culprit.
 
 ## [0.14.3] — 2026-07-29
 
-**Every README ends on the rock.** The Matthew 7:24-25 passage that
-closes the root README now closes every README in the repo (app,
-native shells, and the rest), byte-identical, at the very end — and a
-binding test enforces the standing rule so the next README added
-cannot forget it.
-
 **The lights are always on.** The packaged console gains a round,
 watch-face-sized window pinned bottom-left on every screen — the
 wrist's exact glanceable payload (three lights, three counts, the

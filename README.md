@@ -676,7 +676,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 | **0.15.0** | **The temperament dials** — mood, outlook, maturity, agreeableness, confidence, curiosity join the steering catalog |
 | **0.14.5** | **Cut with the siblings** — JIM's fall path, native crash watch, and docs web |
 | **0.14.4** | **The console names a version mismatch** — plus faces on the discovery cards (AI / real-photo badges), plain room labels, Blend explained, Erase all, and the settings that say which secret is which |
-| **0.14.3** | **The lights are always on** — a watch-sized, minimizable agent-lights window in the studio, and the Matthew 7:24–25 passage closes every README, test-enforced |
+| **0.14.3** | **The lights are always on** — a watch-sized, minimizable agent-lights window in the studio |
 | **0.14.2** | **The vault posture survives suite mode** — the gateway wires QRME's PDI tandem (`suite:qrme-vault`), owner-scoped operations provenance (`POST /suite/operations`), and the launcher shows the joints |
 | **0.14.1** | **The suite wires its own tandem** — in-process tandem bridging and the one-call ecosystem bootstrap (`POST /suite/ecosystem`) |
 | **0.14.0** | **The front page and the wrist** — Home names the new doors; watch faces 10-11 glance proceeds and coordination, counts only |
