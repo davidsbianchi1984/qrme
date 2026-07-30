@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.15.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.16.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -672,6 +672,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.16.0** | **Your own pixels, two new front doors, two new model doors** — wall uploads and pasted-link players, Google/Apple sign-in, DeepSeek and your own algorithm, and the role rides the turn |
 | **0.15.0** | **The temperament dials** — mood, outlook, maturity, agreeableness, confidence, curiosity join the steering catalog |
 | **0.14.5** | **Cut with the siblings** — JIM's fall path, native crash watch, and docs web |
 | **0.14.4** | **The console names a version mismatch** — plus faces on the discovery cards (AI / real-photo badges), plain room labels, Blend explained, Erase all, and the settings that say which secret is which |

@@ -1,19 +1,24 @@
-# QRME v0.15.0 — release notes
+# QRME v0.16.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.15.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.16.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.15.0** — the temperament dials, the field's list verbatim.
+**QRME v0.16.0** — the wall grows hands, and the menu grows doors.
 
-Steering gains a fourth dial group: mood, outlook, maturity,
-agreeableness, confidence, curiosity — each 0–100, defaulting to
-silence, rendered into the persona prompt exactly like the existing
-dials and picked up by every surface that reads the dial catalog.
-Together with language, the aging lifecycle, and the freeform persona,
-the video's "modify your profile's characteristics" list is covered
-dial for dial. Cut alongside JIM-mini's guided wellness round.
+Wall posts carry uploads: photos, videos and files, kind decided by the
+file's bytes, caps published, never the AI mark — authentic media stays
+authentic. A video link dropped into the post text renders as the
+player, on the same nothing-loads-until-play facade. The account gateway
+grows **Sign in with Google / Apple**, live only where configured. The
+model menu grows **DeepSeek** and **your own algorithm** — any endpoint
+speaking the OpenAI dialect, dark until its URL is set. And spec clauses
+2 and 12 land: a chat turn can ask the profile to work as an advisor,
+collaborator or operator, or let it read the prompt itself.
+
+Deployments seeded before the portraits shipped now repair themselves at
+startup, and the phone layout stops fighting your thumbs.
 
 ### Verification
 

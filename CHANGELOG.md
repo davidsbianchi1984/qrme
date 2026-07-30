@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.16.0] — 2026-07-30
+
 **Your own pixels on the wall, and two new front doors.** Wall posts now
 carry uploads — photos, videos and files, stored on the deployment and
 served from it, kind decided by the file's bytes (JPEG, PNG, GIF, WebP;
@@ -2456,7 +2458,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.15.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.16.0...HEAD
+[0.16.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.16.0
 [0.15.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.15.0
 [0.14.5]: https://github.com/davidsbianchi1984/qrme/commit/7928b5a77c95617970acb5cc656038d2973c4fd7
 [0.14.4]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.14.4
