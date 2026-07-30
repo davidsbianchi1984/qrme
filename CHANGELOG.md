@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The last two console-only features reach the native shells.** Voice
+enrollment went native in 0.17.0 and the other two features that had
+gained console doors did not — so iOS, Android and Windows could neither
+ask *who wrote this* nor choose how the profile should work a turn. Both
+now do.
+
+**Who wrote this?** joins Manage → General on all three
+(`POST /watermarks/recover`). It shows the counts — matched passages out
+of stored, and the similarity — rather than a bare yes, and below the
+0.25 threshold it names nobody at all, because ordinary phrases travel
+between unrelated texts.
+
+**The role picker** joins the chat composer on all three (spec clauses
+2/12), with "read my prompt" as the default, and the reply reports which
+role applied and whether it was declared or inferred — so an inference is
+never presented as an instruction.
+
+With this, every feature that has a door in the web console has one in the
+native shells too. That parity was the thing two earlier rounds each
+claimed and neither finished.
+
 ## [0.17.0] — 2026-07-30
 
 **Voice enrollment reaches the device that has the microphone.** The

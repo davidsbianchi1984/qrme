@@ -52,6 +52,7 @@ import app.qrme.studio.SocialConn
 import app.qrme.studio.StudioViewModel
 import app.qrme.studio.SummonResult
 import app.qrme.studio.TranslateResult
+import app.qrme.studio.WatermarkRecovery
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import app.qrme.studio.SignatureReceipt
@@ -563,6 +564,8 @@ fun SettingsScreen(vm: StudioViewModel) {
             }
         }
 
+        WhoWroteThisCard(vm)
+
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Objections", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             if (objections.isEmpty()) {
@@ -812,6 +815,9 @@ fun ChatScreen(vm: StudioViewModel) {
     var draft by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    // Spec clauses 2/12. Empty means "read my prompt and decide", which is what
+    // the backend does on its own — and the reply says which way it went.
+    var role by remember { mutableStateOf("") }
 
     fun send() {
         val text = draft
@@ -828,7 +834,8 @@ fun ChatScreen(vm: StudioViewModel) {
                 minted = created.token
             }
             Triple(interactor!!, minted,
-                ApiClient.chat(vm.pid!!, vm.token!!, interactor, text))
+                ApiClient.chat(vm.pid!!, vm.token!!, interactor, text,
+                    role.ifBlank { null }))
         }) { r ->
             busy = false
             r.onSuccess { (interactor, mintedToken, reply) ->
@@ -837,6 +844,10 @@ fun ChatScreen(vm: StudioViewModel) {
                     listOfNotNull(
                         Bubble(false, reply.content, false,
                                mark = reply.watermarkLine ?: "\u2726 AI"),
+                        reply.role?.let { r0 ->
+                            Bubble(false, "◈ worked as $r0" +
+                                (reply.roleHow?.let { " ($it)" } ?: ""), true)
+                        },
                         reply.provenance?.let { prov ->
                             Bubble(false, "ⓘ ${prov.generatedBy} · persona + " +
                                 "${prov.sourceItems} source item(s) · moderated: " +
@@ -877,6 +888,23 @@ fun ChatScreen(vm: StudioViewModel) {
                 }
             }
             error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        }
+        // Spec clauses 2/12 — advisor counsels, collaborator co-creates,
+        // operator executes. "Read my prompt" is the honest default: the
+        // profile infers from the wording and the reply says which.
+        Row(Modifier.padding(horizontal = 20.dp).padding(bottom = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf("" to "Read my prompt", "advisor" to "Advisor",
+                   "collaborator" to "Collaborator", "operator" to "Operator")
+                .forEach { (value, label) ->
+                    Box(Modifier.clip(RoundedCornerShape(50))
+                            .background(if (role == value) Qrme.BrandA else Qrme.Card)
+                            .clickable { role = value }
+                            .padding(horizontal = 10.dp, vertical = 6.dp)) {
+                        Text(label, fontSize = 11.sp,
+                            color = if (role == value) Color.White else Qrme.T2)
+                    }
+                }
         }
         Row(Modifier.padding(horizontal = 20.dp).padding(bottom = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -2270,6 +2298,65 @@ private fun DeskPanel(vm: StudioViewModel) {
                 + "you can ring the bell.", color = Qrme.T2, fontSize = 12.sp)
             labeledField("Desk id", deskId, "dsk_…") { deskId = it }
             SmallAction("Open") { if (deskId.isNotBlank()) open = true }
+        }
+    }
+}
+
+// ---- Who wrote this? The other direction of the watermark ----
+
+/**
+ * Paste any passage and it names the profile that produced it, from the text
+ * alone.
+ *
+ * `/watermarks/verify` needs a credential id up front and fails on one edited
+ * character. This asks "whose work is this" with no id and keeps answering after
+ * the text has been rewritten — so the counts are shown rather than a bare yes,
+ * and below the threshold it deliberately names nobody, because ordinary phrases
+ * travel between unrelated texts and a coincidence must not read as an
+ * accusation.
+ */
+@Composable
+private fun WhoWroteThisCard(vm: StudioViewModel) {
+    var text by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf<WatermarkRecovery?>(null) }
+    var busy by remember { mutableStateOf(false) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Who wrote this?", color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text("Paste any passage. If a profile here produced it, this names it — " +
+             "even if the wording has since been changed.",
+            color = Qrme.T2, fontSize = 12.sp)
+        labeledField("", text, "Paste a passage…") { text = it }
+        SmallAction(if (busy) "Checking…" else "Check this text",
+            enabled = !busy && text.isNotBlank()) {
+            busy = true
+            vm.call({ ApiClient.recoverWatermark(text) }) { r ->
+                busy = false
+                result = r.getOrNull()
+            }
+        }
+        result?.let { r ->
+            if (r.recovered && r.profileId != null) {
+                Text(if (r.verbatim) "Written by ${r.profileId}, unaltered."
+                     else "Written by ${r.profileId} — altered since.",
+                    color = if (r.verbatim) Qrme.Green else Qrme.Amber,
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("${r.matchedWindows} of ${r.storedWindows} passages matched · " +
+                     "similarity ${r.similarity}", color = Qrme.T2, fontSize = 12.sp)
+                r.markLine?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
+                r.disclosure?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
+            } else {
+                // Not "no" — the reason, so a coincidence is not read either way.
+                Text(r.reason ?: "No profile here produced this text.",
+                    color = Qrme.T2, fontSize = 12.sp)
+                if (r.bestSimilarity != null && r.threshold != null) {
+                    Text("closest overlap ${r.bestSimilarity}, below the " +
+                         "${r.threshold} threshold for naming anyone",
+                        color = Qrme.T3, fontSize = 10.sp)
+                }
+            }
+            r.method?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
         }
     }
 }

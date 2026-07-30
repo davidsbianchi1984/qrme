@@ -38,6 +38,11 @@
         <StackPanel Grid.Row="2" Spacing="8">
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
+            <!-- Spec clauses 2/12 — advisor counsels, collaborator co-creates,
+                 operator executes. "Read my prompt" is the honest default: the
+                 profile infers from the wording and the reply says which. -->
+            <ComboBox x:Name="RoleBox" Header="How should they work this turn?"
+                      HorizontalAlignment="Stretch" SelectedIndex="0" />
             <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

@@ -126,6 +126,7 @@ struct SettingsView: View {
                 SteeringCard()
 
                 WatermarkCard()
+                WhoWroteThisCard()
 
                 RelationshipCard()
 
@@ -267,6 +268,81 @@ struct WatermarkCard: View {
             id: pid, token: token, mark: nil, label: nil) {
             line = d.line; custom = d.custom
             mark = ""; label = ""; saved = false
+        }
+    }
+}
+
+/// The other direction of the watermark: paste any text and it names the
+/// profile that produced it, from the text alone.
+///
+/// `/watermarks/verify` needs a credential id up front and fails on one edited
+/// character. This asks "whose work is this" with no id, and keeps answering
+/// after the text has been rewritten — so the counts are shown rather than a
+/// bare yes, and below the threshold it deliberately names nobody.
+struct WhoWroteThisCard: View {
+    @State private var text = ""
+    @State private var result: WatermarkRecovery?
+    @State private var busy = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Who wrote this?").font(.headline).foregroundStyle(Theme.txt)
+            Text("Paste any passage. If a profile here produced it, this names "
+                 + "it — even if the wording has since been changed.")
+                .font(.footnote).foregroundStyle(Theme.t2)
+            TextField("Paste a passage…", text: $text, axis: .vertical)
+                .lineLimit(3...6)
+                .font(.subheadline).foregroundStyle(Theme.txt)
+                .padding(10).background(Theme.scrBot)
+                .clipShape(RoundedRectangle(cornerRadius: 11))
+            Button(busy ? "Checking…" : "Check this text") { check() }
+                .font(.caption.bold()).foregroundStyle(.white)
+                .padding(.horizontal, 12).padding(.vertical, 9)
+                .background(Theme.brandA).clipShape(Capsule())
+                .disabled(busy || text.trimmingCharacters(in: .whitespaces).isEmpty)
+
+            if let r = result {
+                if r.recovered, let pid = r.profile_id {
+                    Text(r.state == "unaltered"
+                         ? "Written by \(pid), unaltered."
+                         : "Written by \(pid) — altered since.")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(r.verbatim == true ? Theme.green : Theme.amber)
+                    if let matched = r.matched_windows, let stored = r.stored_windows {
+                        Text("\(matched) of \(stored) passages matched"
+                             + (r.similarity.map { " · similarity \($0)" } ?? ""))
+                            .font(.caption).monospacedDigit().foregroundStyle(Theme.t2)
+                    }
+                    if let mark = r.display?.line {
+                        Text(mark).font(.caption2).foregroundStyle(Theme.t3)
+                    }
+                    if let d = r.disclosure {
+                        Text(d).font(.caption2).foregroundStyle(Theme.t3)
+                    }
+                } else {
+                    // Not "no" — the reason, because a coincidence must not
+                    // read as an accusation either way.
+                    Text(r.reason ?? "No profile here produced this text.")
+                        .font(.caption).foregroundStyle(Theme.t2)
+                    if let best = r.best_similarity, let threshold = r.threshold {
+                        Text("closest overlap \(best), below the \(threshold) "
+                             + "threshold for naming anyone")
+                            .font(.caption2).foregroundStyle(Theme.t3)
+                    }
+                }
+                if let method = r.method {
+                    Text(method).font(.caption2).foregroundStyle(Theme.t3)
+                }
+            }
+        }
+        .card()
+    }
+
+    private func check() {
+        busy = true
+        Task {
+            result = try? await ApiClient.shared.recoverWatermark(content: text)
+            busy = false
         }
     }
 }

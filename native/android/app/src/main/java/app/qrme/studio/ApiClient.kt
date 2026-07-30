@@ -21,7 +21,18 @@ data class Robot(val id: String, val model: String, val name: String, val status
 data class CommandResult(val command: String, val status: String, val spoken: String?)
 data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
 data class ChatMessage(val content: String?, val status: String, val flagReason: String?,
-                       val provenance: Provenance? = null, val watermarkLine: String? = null)
+                       val provenance: Provenance? = null, val watermarkLine: String? = null,
+                       // Spec clauses 2/12: which way the profile worked, and
+                       // whether the owner declared it or the wording implied it.
+                       val role: String? = null, val roleHow: String? = null)
+/** Extract and reconstruct: whose work is this, from the text alone. */
+data class WatermarkRecovery(val recovered: Boolean, val reason: String?,
+                             val profileId: String?, val verbatim: Boolean,
+                             val similarity: Double, val matchedWindows: Int,
+                             val storedWindows: Int, val state: String?,
+                             val bestSimilarity: Double?, val threshold: Double?,
+                             val markLine: String?, val disclosure: String?,
+                             val method: String?)
 data class Provenance(val generatedBy: String, val sourceItems: Int,
                       val licensedFrom: String?, val moderationStatus: String,
                       val disclaimer: String)
@@ -420,17 +431,47 @@ object ApiClient {
         return o.optString("relationship_type", type)
     }
 
+    /**
+     * `role` is optional on purpose: left null the profile reads the wording and
+     * decides for itself, and the reply reports which way it went.
+     */
     suspend fun chat(id: String, token: String, interactorId: String,
-                     message: String): ChatMessage {
-        val reply = JSONObject(request("/profiles/$id/chat", "POST",
-            JSONObject().put("interactor_id", interactorId).put("message", message),
-            token))
+                     message: String, role: String? = null): ChatMessage {
+        val body = JSONObject().put("interactor_id", interactorId)
+            .put("message", message)
+        if (!role.isNullOrBlank()) body.put("role", role)
+        val reply = JSONObject(request("/profiles/$id/chat", "POST", body, token))
         val o = reply.getJSONObject("profile_message")
+        val rc = reply.optJSONObject("role_context")
         return ChatMessage(
             if (o.isNull("content")) null else o.optString("content", null),
             o.optString("status", ""), o.optString("flag_reason", null),
             provenanceOf(reply.optJSONObject("provenance")),
-            watermarkLineOf(o.optJSONObject("watermark")))
+            watermarkLineOf(o.optJSONObject("watermark")),
+            rc?.optString("role"), rc?.optString("how"))
+    }
+
+    /**
+     * Whose work is this, from the text alone — no credential id, and it keeps
+     * answering after the text has been edited. Public: a counterparty must be
+     * able to ask without an account here.
+     */
+    suspend fun recoverWatermark(content: String): WatermarkRecovery {
+        val o = JSONObject(request("/watermarks/recover", "POST",
+            JSONObject().put("content", content)))
+        val display = o.optJSONObject("display")
+        return WatermarkRecovery(
+            o.optBoolean("recovered"),
+            if (o.isNull("reason")) null else o.optString("reason"),
+            if (o.isNull("profile_id")) null else o.optString("profile_id"),
+            o.optBoolean("verbatim"), o.optDouble("similarity", 0.0),
+            o.optInt("matched_windows"), o.optInt("stored_windows"),
+            if (o.isNull("state")) null else o.optString("state"),
+            if (o.isNull("best_similarity")) null else o.optDouble("best_similarity"),
+            if (o.isNull("threshold")) null else o.optDouble("threshold"),
+            if (display == null || display.isNull("line")) null else display.optString("line"),
+            if (o.isNull("disclosure")) null else o.optString("disclosure"),
+            if (o.isNull("method")) null else o.optString("method"))
     }
 
     // ---- language (the profile speaks it everywhere) ----

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 
 namespace QrmeStudio.Views;
@@ -355,4 +356,57 @@ public sealed partial class SettingsPage : Page
         ErrorText.Text = message;
         ErrorText.Visibility = Visibility.Visible;
     }
+
+    // MARK: Who wrote this? — extract and reconstruct
+
+    /// <summary>
+    /// Never a bare yes: the counts travel with the claim so it can be checked,
+    /// and below the threshold nobody is named at all — ordinary phrases travel
+    /// between unrelated texts, and a coincidence must not read as an accusation.
+    /// </summary>
+    private async void OnRecover(object sender, RoutedEventArgs e)
+    {
+        var text = RecoverBox.Text;
+        if (string.IsNullOrWhiteSpace(text)) return;
+        RecoverButton.IsEnabled = false;
+        try
+        {
+            var r = await ApiClient.Shared.RecoverWatermark(text);
+            if (r.Recovered && r.ProfileId is { } pid)
+            {
+                RecoverVerdict.Text = r.Verbatim
+                    ? $"Written by {pid}, unaltered."
+                    : $"Written by {pid} — altered since.";
+                RecoverVerdict.Foreground = new SolidColorBrush(r.Verbatim
+                    ? Microsoft.UI.Colors.MediumSpringGreen
+                    : Microsoft.UI.Colors.Orange);
+                RecoverCounts.Text =
+                    $"{r.MatchedWindows} of {r.StoredWindows} passages matched · "
+                  + $"similarity {r.Similarity}";
+                RecoverDetail.Text = string.Join("  ", new[]
+                {
+                    r.Display?.Line, r.Disclosure, r.Method,
+                }.Where(x => !string.IsNullOrEmpty(x)));
+            }
+            else
+            {
+                RecoverVerdict.Text = r.Reason ?? "No profile here produced this text.";
+                RecoverVerdict.Foreground = new SolidColorBrush(
+                    Microsoft.UI.Colors.Gray);
+                RecoverCounts.Text = r.BestSimilarity is { } best && r.Threshold is { } th
+                    ? $"closest overlap {best}, below the {th} threshold for naming anyone"
+                    : "";
+                RecoverDetail.Text = r.Method ?? "";
+            }
+            RecoverVerdict.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            RecoverVerdict.Text = ex.Message;
+            RecoverVerdict.Foreground = new SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
+            RecoverVerdict.Visibility = Visibility.Visible;
+        }
+        finally { RecoverButton.IsEnabled = true; }
+    }
+
 }
