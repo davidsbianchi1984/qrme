@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.18.0] — 2026-07-30
+
 **Two versions of features finally get drawn, taught and findable.**
 Everything shipped in 0.16.0 and 0.17.0 had code, a console door and a
 native door — and no screen, no lesson, and no way for the in-app helper
