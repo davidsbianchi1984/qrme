@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Two versions of features finally get drawn, taught and findable.**
+Everything shipped in 0.16.0 and 0.17.0 had code, a console door and a
+native door — and no screen, no lesson, and no way for the in-app helper
+to point at it. The convention this project has followed since the
+walkthrough existed is screen SVG + gallery row + lesson + help
+destination per feature, and it had quietly stopped being followed.
+
+Three screens join the gallery: **147 Your Own Voice** (FIG. 800's order,
+permission first), **148 Who Wrote This?** (the counts, and the threshold
+below which nobody is named), and **149 How Should They Work?** (advisor,
+collaborator, operator, or let it infer). Each gets a lesson in its own
+chapter — voice and provenance under "You are in control", the role under
+"Working" — and each is reachable by asking the helper in the words
+somebody would actually use ("clone my voice", "who wrote this", "just do
+it").
+
 **The last two console-only features reach the native shells.** Voice
 enrollment went native in 0.17.0 and the other two features that had
 gained console doors did not — so iOS, Android and Windows could neither

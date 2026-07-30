@@ -224,6 +224,17 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "storage": ("free", "is my data private", "private", "privacy",
                 "encrypted", "encryption", "the vault", "vault",
                 "who can read", "where is my data", "in the clear"),
+    "voice": ("my voice", "clone my voice", "voice clone", "voiceprint",
+              "sound like me", "speak in my voice", "enroll my voice",
+              "record my voice", "voice"),
+    # Kept off `welcome`, which explains what the AI mark *is*. Somebody
+    # typing these wants the other direction — a passage in hand and no idea
+    # whose it is — and that has its own screen.
+    "whowrote": ("who wrote this", "who made this", "did you write this",
+                 "whose work is this", "check this text", "was this ai",
+                 "is this mine", "prove i wrote it", "trace this"),
+    "role": ("advisor", "collaborator", "operator", "how should it work",
+             "just do it", "give me advice", "work with me", "role"),
 }
 
 
