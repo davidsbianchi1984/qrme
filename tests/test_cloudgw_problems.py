@@ -233,6 +233,47 @@ def test_a_corrupt_counter_file_does_not_take_the_gateway_down(tmp_path):
     assert problems.Aggregate(path).rows() == []
 
 
+def test_a_file_that_parses_but_is_not_counters_is_ignored(tmp_path):
+    """The case the test above missed, found by tripping over it.
+
+    Unparseable JSON was handled from the start. *Parseable* JSON of the wrong
+    shape was not — and it is the likelier accident: a half-written file that
+    happens to close its braces, an older format, or `CLOUDGW_PROBLEMS_PATH`
+    pointed at a file that was already there. The aggregate adopted whatever
+    it found, and `GET /v1/problems` then died with a 500 sorting values that
+    had no `count`.
+
+    Which is how it was found: a scratch file of unrelated JSON got reused as
+    a counter path while driving the client, and the read blew up. A test
+    written from imagination would have reached for `"{ this is not json"`
+    again and stayed green.
+    """
+    path = tmp_path / "problems.json"
+    path.write_text(json.dumps({
+        "title": "some other tool's file",
+        "body": "prose, not a counter",
+    }), "utf-8")
+    agg = problems.Aggregate(path)
+    assert agg.rows() == []
+
+    # And it still works afterwards rather than being poisoned by the file.
+    agg.add(problems.screen(report()))
+    assert agg.rows()[0]["count"] == 3
+
+
+def test_a_partly_valid_counter_file_keeps_the_valid_rows(tmp_path):
+    """Salvage rather than discard. A single malformed row should not throw
+    away months of real counts sitting beside it in the same file."""
+    good = {"source": "qrme", "app_version": "0.18.0", "platform": "Win32",
+            "op": "GET /health", "status": 500, "count": 9,
+            "first_day": "2026-07-01", "last_day": "2026-07-30"}
+    path = tmp_path / "problems.json"
+    path.write_text(json.dumps({"good": good, "bad": "not a row",
+                                "alsobad": {"op": "GET /x"}}), "utf-8")
+    rows = problems.Aggregate(path).rows()
+    assert len(rows) == 1 and rows[0]["count"] == 9
+
+
 # ── the preflight ────────────────────────────────────────────────────────────
 
 def test_a_browser_preflight_from_a_desktop_console_succeeds(client):

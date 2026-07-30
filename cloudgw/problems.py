@@ -182,15 +182,33 @@ class Aggregate:
     careful and mean nothing.
     """
 
+    #: What a persisted row has to look like to be loaded back.
+    _ROW_KEYS = {"source", "app_version", "platform", "op", "status", "count",
+                 "first_day", "last_day"}
+
     def __init__(self, path: Path | None = None) -> None:
         self.path = path
         self._lock = threading.Lock()
         self._rows: dict[str, dict] = {}
         if path and path.exists():
             try:
-                self._rows = json.loads(path.read_text("utf-8"))
+                loaded = json.loads(path.read_text("utf-8"))
             except (OSError, ValueError):
-                self._rows = {}
+                loaded = {}
+            # Every value checked, not just that the file parsed. Unparseable
+            # JSON was already handled; *parseable* JSON of the wrong shape was
+            # not, and it is the likelier accident — a half-written file that
+            # happens to close its braces, an older format, or an operator
+            # pointing CLOUDGW_PROBLEMS_PATH at a file that was already there.
+            # The old code adopted whatever it found, and `GET /v1/problems`
+            # then died sorting rows that had no count. Found by doing exactly
+            # that by accident; kept out by construction now.
+            if isinstance(loaded, dict):
+                self._rows = {
+                    k: v for k, v in loaded.items()
+                    if isinstance(v, dict) and self._ROW_KEYS <= set(v)
+                    and isinstance(v.get("count"), int)
+                }
 
     def describe(self) -> dict:
         return {"configured": self.path is not None,

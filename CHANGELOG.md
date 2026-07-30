@@ -52,6 +52,17 @@ that a particular install sent anything. Reading that aggregate needs a
 narrower permission than writing to it, because the posting token ships inside
 every installer and is public the moment somebody unzips one.
 
+**Nothing goes before you have been asked.** Sending is opt-*out*, which only
+means something if the opting-out can happen before the first report rather
+than being discovered afterwards in a settings panel nobody opened. So the
+sender refuses until a first-run notice has been answered — and that notice
+shows the actual payload rather than describing it, from the same function
+that posts it, so it cannot go stale while still looking honest. Both answers
+are offered, the answer is remembered, and the switch on the Settings card is
+that same answer, changeable whenever. It only appears where a build has a
+collector at all: interrupting somebody to explain a thing that cannot happen
+teaches them these notices are noise.
+
 Thirty-nine tests hold the shape in place — that `recordProblem` has no
 parameter a message could arrive through, that the stored record has no field
 one could sit in, that the wire shape and the gateway's whitelist still agree,
@@ -72,6 +83,18 @@ newlines were not allowed. Harmless in itself — one invisible character — bu
 validator that is wrong about its own rule is not one to keep trusting. All of
 them now end `\Z`, with a test for the case, because the next person writing a
 pattern here will reach for `$` too.
+
+One more bug, and this one came from being careless rather than clever. While
+driving the client against a live gateway, a scratch file of unrelated JSON
+got reused as the counter path. The aggregate loaded it — it parsed, after all
+— and `GET /v1/problems` then died with a 500 sorting values that had no
+count. Unparseable JSON had been handled from the start; *parseable* JSON of
+the wrong shape had not, which is the likelier accident: a half-written file
+that happens to close its braces, an older format, an operator pointing
+`CLOUDGW_PROBLEMS_PATH` at something already there. Rows are now checked
+individually on load, so a bad one is dropped and the good ones beside it
+survive. A test written from imagination would have reached for
+`"{ this is not json"` again and stayed green.
 
 And the one that would have made all of the above pointless: the gateway had
 **no CORS at all**. The sender posts JSON with an `authorization` header, which
