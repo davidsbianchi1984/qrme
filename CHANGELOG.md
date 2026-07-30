@@ -45,6 +45,15 @@ front), and video cards that honor the facade contract — drawn from
 stored fields only, nothing loads from the other platform until the
 viewer presses play.
 
+**Two more doors on the model menu: DeepSeek, and your own algorithm.**
+DeepSeek joins the provider registry as a first-class tile
+(`QRME_DEEPSEEK_API_KEY` or `DEEPSEEK_API_KEY`), and the plug the founder
+asked for exists too: a **custom** provider pointing at any endpoint
+speaking the OpenAI dialect (`QRME_CUSTOM_LLM_URL` + `QRME_CUSTOM_LLM_KEY`,
+optional model and label overrides). The custom tile stays dark until its
+URL is set — a key alone points at nothing — and both fall back like every
+other unconfigured provider.
+
 ## [0.15.0] — 2026-07-29
 
 **The temperament dials — the field's list, verbatim.** Steering gains
