@@ -6,6 +6,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The watermark learns to survive being edited.** The field drawing asks
+for a direction the credential could not go: message + sequence +
+security key → watermark → **attack** → extract → reconstruct. Until now
+`/watermarks/verify` could only confirm that a piece of content matched a
+credential id you already had, and one changed character made it fail
+while saying nothing about who wrote the text. `POST
+/watermarks/recover` answers the other question — *whose work is this?* —
+from the text alone, and keeps answering after the text has been
+rewritten. Every stamped text now also deposits an inverted index of
+**keyed five-word windows**, HMAC'd with the deployment's watermark key
+(`QRME_WATERMARK_KEY`); recovery hashes a candidate the same way and asks
+which stamp shares the most windows. A paraphrase that keeps most of its
+sentences still resolves to its author, with the score stating how much
+drifted: `matched_windows` out of `stored_windows`, a similarity, and
+`unaltered` or `altered but traceable`. Below a 0.25 threshold it names
+nobody, because ordinary phrases travel between unrelated texts and a
+coincidence must not read as an accusation. Two properties make it a
+watermark rather than a fingerprint: without the key nobody can compute
+matching windows, so a credential cannot be forged onto text QRME never
+wrote — and the stored rows are keyed hashes, so a provenance index can
+never be read back as the writing it came from.
+
 **Voice cloning, in the order FIG. 800 draws it.** The figure is a
 permission gate first and a recorder second — 802 asks, 804 initializes,
 808 collects, 810 analyzes the characteristics, 812 records the voice —
