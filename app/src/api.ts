@@ -1,4 +1,5 @@
 // Thin typed client for the QRME FastAPI backend.
+import { recordProblem } from "./errors";
 // Base URL is configurable (Settings).
 //
 // Default base: when the studio is served *by* the API (the phone case —
@@ -137,6 +138,10 @@ async function req<T>(
       body: opts.body ? JSON.stringify(opts.body) : undefined,
     });
   } catch {
+    // Never reached a server. Recorded as status 0, which is a different
+    // failure from anything the backend answered and worth telling apart.
+    recordProblem(opts.method || "GET", path, 0);
+
     // A network-level failure surfaces as "Failed to fetch", which tells the
     // user nothing. Name the actual problem: no QRME backend answering.
     throw new Error(
@@ -152,6 +157,9 @@ async function req<T>(
   try { data = text ? JSON.parse(text) : null; }
   catch { data = null; }
   if (!res.ok) {
+    // The status and the operation, never the detail below: that string
+    // carries whatever the user typed.
+    recordProblem(opts.method || "GET", path, res.status);
     const body = data as { detail?: unknown; message?: unknown } | null;
     const detail = (body && (body.detail || body.message)) || text.trim() || res.statusText;
     throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo,
          type WatermarkRecovery } from "../api";
+import { Problems } from "../Problems";
 import { ProviderTiles } from "../ProviderTiles";
 import { useSession } from "../store";
 
@@ -144,6 +145,7 @@ export function Settings() {
         <div className="muted small">Profile: {session.profileId}</div>
         <button className="danger" onClick={signOut}>Sign out &amp; end session</button>
       </div>
+      <Problems />
     </div>
   );
 }
