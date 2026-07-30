@@ -18,6 +18,9 @@ struct ChatView: View {
     @State private var draft = ""
     @State private var busy = false
     @State private var error: String?
+    // Spec clauses 2/12. Empty means "read my prompt and decide", which is what
+    // the backend does on its own — and the reply says which way it went.
+    @State private var role = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -58,6 +61,18 @@ struct ChatView: View {
                 }
             }
 
+            // Spec clauses 2/12 — advisor counsels, collaborator co-creates,
+            // operator executes. "Read my prompt" is the honest default: the
+            // profile infers from the wording and the reply says which.
+            Picker("", selection: $role) {
+                Text("Read my prompt").tag("")
+                Text("Advisor").tag("advisor")
+                Text("Collaborator").tag("collaborator")
+                Text("Operator").tag("operator")
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, 20).padding(.bottom, 6)
+
             HStack(spacing: 10) {
                 TextField("Say something…", text: $draft)
                     .foregroundStyle(Theme.txt)
@@ -94,12 +109,19 @@ struct ChatView: View {
                     interactor = created.id
                 }
                 let reply = try await ApiClient.shared.chat(
-                    id: pid, token: token, interactorId: interactor!, message: text)
+                    id: pid, token: token, interactorId: interactor!,
+                    message: text, role: role.isEmpty ? nil : role)
                 let p = reply.profile_message
                 if let content = p.content, p.status == "approved" {
                     messages.append(Bubble(
                         mine: false, text: content, pending: false,
                         mark: p.watermark?.display?.line ?? "✦ AI"))
+                    if let rc = reply.role_context {
+                        messages.append(Bubble(
+                            mine: false,
+                            text: "◈ worked as \(rc.role) (\(rc.how))",
+                            pending: true))
+                    }
                     if let prov = reply.provenance {
                         messages.append(Bubble(
                             mine: false,

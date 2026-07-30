@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -12,7 +13,27 @@ public sealed partial class ChatPage : Page
 
     private readonly ObservableCollection<BubbleRow> _messages = new();
 
-    public ChatPage() => InitializeComponent();
+    // Index 0 is the empty default: "let it read my prompt".
+    private static readonly (string Value, string Label)[] Roles =
+    {
+        ("", "Read my prompt"),
+        ("advisor", "Advisor — weigh it and recommend"),
+        ("collaborator", "Collaborator — work it with me"),
+        ("operator", "Operator — just do it"),
+    };
+
+    public ChatPage()
+    {
+        InitializeComponent();
+        RoleBox.ItemsSource = Roles.Select(r => r.Label).ToList();
+        RoleBox.SelectedIndex = 0;
+    }
+
+    private string? SelectedRole()
+    {
+        var i = RoleBox.SelectedIndex;
+        return i > 0 && i < Roles.Length ? Roles[i].Value : null;
+    }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -39,7 +60,8 @@ public sealed partial class ChatPage : Page
                 s.RememberInteractor(created.Id);
             }
             var reply = await ApiClient.Shared.Chat(s.Pid!, s.Token!,
-                                                    s.InteractorId!, text);
+                                                    s.InteractorId!, text,
+                                                    SelectedRole());
             var p = reply.ProfileMessage;
             _messages.Add(new BubbleRow(
                 p.Content is { } c && p.Status == "approved"
@@ -51,6 +73,10 @@ public sealed partial class ChatPage : Page
                 // The watermark rides on every AI render, always visible.
                 _messages.Add(new BubbleRow(
                     p.Watermark?.Display?.Line ?? "✦ AI",
+                    HorizontalAlignment.Left));
+            if (p.Status == "approved" && reply.RoleContext is { } rc)
+                _messages.Add(new BubbleRow(
+                    $"◈ worked as {rc.Role} ({rc.How})",
                     HorizontalAlignment.Left));
             if (p.Status == "approved" && reply.Provenance is { } prov)
                 _messages.Add(new BubbleRow(

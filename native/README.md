@@ -49,6 +49,23 @@ They persist the returned `owner_token` so the app resumes signed-in, and share
 one dark-OLED palette so all three feel like one product. See each folder's
 README for the exact build/run commands.
 
+### Two more doors the console had first
+
+**Who wrote this?** sits in Manage → General (`POST /watermarks/recover`). Paste
+any passage and it names the profile that produced it, from the text alone.
+`/watermarks/verify` needs a credential id up front and fails on one edited
+character; this needs neither, and keeps answering after the writing has been
+rewritten. The screen shows the counts — how many keyed passages matched out of
+how many were stored, and the similarity — rather than a bare yes, and below the
+0.25 threshold it deliberately names **nobody**, because ordinary phrases travel
+between unrelated texts and a coincidence must not read as an accusation.
+
+**The role picker** rides the chat composer (spec clauses 2/12): advisor
+counsels, collaborator co-creates, operator executes. "Read my prompt" is the
+default and the honest one — the profile infers from the wording — and the reply
+reports which role applied *and whether it was declared or inferred*, so an
+inference is never mistaken for an instruction.
+
 ### Voice — enrolled where the microphone is
 
 The **Voice** screen walks the filing's FIG. 800 in the order the drawing

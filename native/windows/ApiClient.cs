@@ -238,7 +238,32 @@ public record ChatMessage(
 
 public record ChatReply(
     [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage,
-    [property: JsonPropertyName("provenance")] ContentProvenance? Provenance);
+    [property: JsonPropertyName("provenance")] ContentProvenance? Provenance,
+    [property: JsonPropertyName("role_context")] RoleContext? RoleContext);
+
+/// Spec clauses 2/12 — which way the profile worked this turn, and whether the
+/// owner declared it or the wording implied it. Reported so an inference is
+/// never mistaken for an instruction.
+public record RoleContext(
+    [property: JsonPropertyName("role")] string Role,
+    [property: JsonPropertyName("how")] string How);
+
+/// Extract and reconstruct: whose work is this, from the text alone. Never a
+/// bare yes — the counts travel with the claim so it can be checked.
+public record WatermarkRecovery(
+    [property: JsonPropertyName("recovered")] bool Recovered,
+    [property: JsonPropertyName("reason")] string? Reason,
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("verbatim")] bool Verbatim,
+    [property: JsonPropertyName("similarity")] double Similarity,
+    [property: JsonPropertyName("matched_windows")] int MatchedWindows,
+    [property: JsonPropertyName("stored_windows")] int StoredWindows,
+    [property: JsonPropertyName("state")] string? State,
+    [property: JsonPropertyName("best_similarity")] double? BestSimilarity,
+    [property: JsonPropertyName("threshold")] double? Threshold,
+    [property: JsonPropertyName("display")] WatermarkDesign? Display,
+    [property: JsonPropertyName("disclosure")] string? Disclosure,
+    [property: JsonPropertyName("method")] string? Method);
 
 public record SocialConn(
     [property: JsonPropertyName("id")] string Id,
@@ -780,10 +805,25 @@ public sealed class ApiClient
         return Send<RelationshipState>(req);
     }
 
+    /// <summary>
+    /// `role` is optional on purpose: left empty the profile reads the wording
+    /// and decides for itself, and the reply reports which way it went.
+    /// </summary>
     public Task<ChatReply> Chat(string id, string token, string interactorId,
-                                string message) =>
+                                string message, string? role = null) =>
         Send<ChatReply>(Post($"/profiles/{id}/chat",
-            new { interactor_id = interactorId, message }, token));
+            string.IsNullOrWhiteSpace(role)
+                ? new { interactor_id = interactorId, message }
+                : (object)new { interactor_id = interactorId, message, role },
+            token));
+
+    /// <summary>
+    /// Whose work is this, from the text alone — no credential id, and it keeps
+    /// answering after the text has been edited. No token: a counterparty must
+    /// be able to ask without an account here.
+    /// </summary>
+    public Task<WatermarkRecovery> RecoverWatermark(string content) =>
+        Send<WatermarkRecovery>(Post("/watermarks/recover", new { content }));
 
     // -- community: stranger connections & multiparty rooms --
 

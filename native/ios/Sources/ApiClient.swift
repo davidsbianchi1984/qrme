@@ -340,6 +340,37 @@ struct ChatReply: Decodable {
     let interactor_message: ChatMessage
     let profile_message: ChatMessage
     let provenance: ContentProvenance?
+    /// Spec clauses 2/12 — which way the profile worked this turn, and whether
+    /// the owner declared it or the wording implied it.
+    let role_context: RoleContext?
+}
+
+struct RoleContext: Decodable {
+    let role: String
+    /// "declared" or "inferred": the reply says which, so an inference is never
+    /// mistaken for an instruction.
+    let how: String
+}
+
+// MARK: Extract and reconstruct — whose work is this, from the text alone
+
+struct WatermarkRecovery: Decodable {
+    let recovered: Bool
+    let reason: String?
+    let profile_id: String?
+    let watermark_id: String?
+    let verbatim: Bool?
+    let similarity: Double?
+    let matched_windows: Int?
+    let stored_windows: Int?
+    let examined_windows: Int?
+    /// "unaltered" or "altered but traceable" — never a bare yes.
+    let state: String?
+    let best_similarity: Double?
+    let threshold: Double?
+    let disclosure: String?
+    let display: WatermarkDesign?
+    let method: String?
 }
 
 struct LanguageInfo: Decodable { let code: String; let label: String }
@@ -857,11 +888,23 @@ actor ApiClient {
                                  method: "PUT", body: body, token: token)
     }
 
+    /// `role` is optional on purpose: left nil the profile reads the wording and
+    /// decides for itself, and the reply reports which way it went.
     func chat(id: String, token: String, interactorId: String,
-              message: String) async throws -> ChatReply {
-        try await request("/profiles/\(id)/chat", method: "POST",
-                          body: ["interactor_id": interactorId,
-                                 "message": message], token: token)
+              message: String, role: String? = nil) async throws -> ChatReply {
+        var body: [String: Any] = ["interactor_id": interactorId,
+                                   "message": message]
+        if let role, !role.isEmpty { body["role"] = role }
+        return try await request("/profiles/\(id)/chat", method: "POST",
+                                 body: body, token: token)
+    }
+
+    /// Whose work is this, from the text alone — no credential id, and it keeps
+    /// answering after the text has been edited. Public: a counterparty must be
+    /// able to ask without an account here.
+    func recoverWatermark(content: String) async throws -> WatermarkRecovery {
+        try await request("/watermarks/recover", method: "POST",
+                          body: ["content": content])
     }
 
     // MARK: Community — stranger connections & multiparty rooms

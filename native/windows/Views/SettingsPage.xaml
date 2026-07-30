@@ -169,6 +169,30 @@
 
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
+
+            <!-- The other direction of the watermark: whose work is this, from
+                 the text alone. /watermarks/verify needs an id up front and
+                 fails on one edited character; this needs neither. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Who wrote this?" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}"
+                               Text="Paste any passage. If a profile here produced it, this names it — even if the wording has since been changed." />
+                    <TextBox x:Name="RecoverBox" AcceptsReturn="True" TextWrapping="Wrap"
+                             Height="90" PlaceholderText="Paste a passage…" />
+                    <Button x:Name="RecoverButton" Content="Check this text" Click="OnRecover"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <TextBlock x:Name="RecoverVerdict" FontSize="14" FontWeight="Bold"
+                               TextWrapping="Wrap" Visibility="Collapsed" />
+                    <TextBlock x:Name="RecoverCounts" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="RecoverDetail" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>
