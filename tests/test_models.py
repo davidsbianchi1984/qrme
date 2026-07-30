@@ -58,3 +58,24 @@ def test_chat_still_works_with_a_chosen_provider(client, profile_id, interactor_
     )
     assert r.status_code == 200, r.text
     assert r.json()["profile_message"]["content"]
+
+
+def test_deepseek_and_the_founders_own_algorithm_are_on_the_menu(client):
+    """The field ask: "implement deepseek for the time being until I can
+    upload my algorithm … or any others on the market … to where they can
+    pick and choose". Both new doors show on the menu."""
+    by_name = {p["name"]: p for p in client.get("/models").json()["providers"]}
+    assert by_name["deepseek"]["label"] == "DeepSeek"
+    assert by_name["custom"]["label"] == "Your own algorithm"
+
+
+def test_custom_provider_stays_dark_until_its_url_is_set(monkeypatch):
+    """A key alone points at nothing: the plug-in-your-algorithm tile only
+    lights once QRME_CUSTOM_LLM_URL names the endpoint."""
+    from qrme import llm
+    monkeypatch.setenv("QRME_CUSTOM_LLM_KEY", "sk-somekey")
+    monkeypatch.setitem(llm._REGISTRY["custom"], "base", "")
+    assert llm.is_configured("custom") is False
+    monkeypatch.setitem(llm._REGISTRY["custom"], "base",
+                        "http://127.0.0.1:9999/v1")
+    assert llm.is_configured("custom") is True

@@ -45,6 +45,25 @@ front), and video cards that honor the facade contract — drawn from
 stored fields only, nothing loads from the other platform until the
 viewer presses play.
 
+**Two more doors on the model menu: DeepSeek, and your own algorithm.**
+DeepSeek joins the provider registry as a first-class tile
+(`QRME_DEEPSEEK_API_KEY` or `DEEPSEEK_API_KEY`), and the plug the founder
+asked for exists too: a **custom** provider pointing at any endpoint
+speaking the OpenAI dialect (`QRME_CUSTOM_LLM_URL` + `QRME_CUSTOM_LLM_KEY`,
+optional model and label overrides). The custom tile stays dark until its
+URL is set — a key alone points at nothing — and both fall back like every
+other unconfigured provider.
+
+**Advisor, collaborator, operator — the role rides the turn.** Spec
+clauses 2 and 12, made real: a chat turn can declare how the profile
+should function (`role: "advisor" | "collaborator" | "operator"`), or
+leave it unset and the profile reads the prompt itself — a transparent
+keyword reading, never a hidden model call, silent on a tie. The reply's
+`role_context` says which of the two happened (`declared` / `inferred`),
+and the frames shape *how* the profile works — counsel with a clear
+recommendation, co-creation with a next step, precise execution — never
+*who* it is: persona, relationship, memory and moderation apply unchanged.
+
 ## [0.15.0] — 2026-07-29
 
 **The temperament dials — the field's list, verbatim.** Steering gains

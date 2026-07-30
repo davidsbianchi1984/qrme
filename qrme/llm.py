@@ -67,6 +67,14 @@ _OPENAI_MODEL = os.environ.get("QRME_OPENAI_MODEL", "gpt-4o")
 _GROK_MODEL = os.environ.get("QRME_GROK_MODEL", "grok-2-latest")
 _PPLX_MODEL = os.environ.get("QRME_PERPLEXITY_MODEL", "sonar")
 _GEMINI_MODEL = os.environ.get("QRME_GEMINI_MODEL", "gemini-2.0-flash")
+_DEEPSEEK_MODEL = os.environ.get("QRME_DEEPSEEK_MODEL", "deepseek-chat")
+# The founder's own algorithm, or anything speaking the OpenAI dialect:
+# point QRME_CUSTOM_LLM_URL at it and it becomes a first-class provider
+# tile — configuration, so the day the algorithm exists no release is
+# needed.
+_CUSTOM_BASE = os.environ.get("QRME_CUSTOM_LLM_URL", "")
+_CUSTOM_MODEL = os.environ.get("QRME_CUSTOM_LLM_MODEL", "default")
+_CUSTOM_LABEL = os.environ.get("QRME_CUSTOM_LLM_LABEL", "Your own algorithm")
 # The local model: whatever the user pulled into Ollama. deepseek-r1:1.5b
 # is small enough for most machines; QRME_OLLAMA_MODEL overrides.
 _OLLAMA_MODEL = os.environ.get("QRME_OLLAMA_MODEL", "deepseek-r1:1.5b")
@@ -270,6 +278,25 @@ _REGISTRY: dict[str, dict] = {
         "env": ["GEMINI_API_KEY", "GOOGLE_API_KEY"],
         "model": _GEMINI_MODEL,
     },
+    "deepseek": {
+        "label": "DeepSeek",
+        "kind": "openai",
+        "network": True,
+        "env": ["QRME_DEEPSEEK_API_KEY", "DEEPSEEK_API_KEY"],
+        "base": "https://api.deepseek.com/v1",
+        "model": _DEEPSEEK_MODEL,
+    },
+    # See _CUSTOM_BASE above: any OpenAI-dialect endpoint, the founder's
+    # own algorithm first among them. Configured once the URL is set.
+    "custom": {
+        "label": _CUSTOM_LABEL,
+        "kind": "openai",
+        "network": True,
+        "env": ["QRME_CUSTOM_LLM_KEY"],
+        "base": _CUSTOM_BASE,
+        "model": _CUSTOM_MODEL,
+        "needs_base": True,
+    },
     # A real offline model: Ollama (ollama.com) runs models like
     # deepseek-r1:1.5b on the user's own machine — free, no key, nothing
     # leaves the host. The daemon running IS the configuration.
@@ -329,6 +356,11 @@ def is_configured(name: str) -> bool:
     if name == "ollama":
         return _ollama_alive()
     if name not in _REGISTRY:
+        return False
+    # A provider whose whole point is a user-supplied endpoint (the
+    # founder's own algorithm) is configured only once the URL is set —
+    # a key alone points at nothing.
+    if _REGISTRY[name].get("needs_base") and not _REGISTRY[name].get("base"):
         return False
     return _env_value(name) is not None
 

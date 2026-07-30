@@ -9,7 +9,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (adaptation, auth, companion, db, engagement, llm, moderation,
-                persona, referral, watermark)
+                persona, referral, roles, watermark)
 from ..common import (
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -257,6 +257,12 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                    + ". Let your reply be contextually relevant to where "
                      "they are and what surrounds them — naturally, without "
                      "reciting this data back.")
+    # Role-specific context (spec clauses 2/12): declared on the turn, or
+    # read from the prompt itself. Shapes how the profile works this turn —
+    # persona, relationship, memory and moderation apply unchanged.
+    role_context = roles.resolve(body.role, body.message)
+    if role_context:
+        system += "\n\n" + roles.frame(role_context["role"])
     others = companion.other_relationships(profile_id, body.interactor_id)
     if others:
         system += (f"\n\nHonesty about multiplicity: you also hold {others} "
@@ -318,6 +324,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         persona_signature=persona.identity_signature(profile)["signature"],
         embodiment=embodiment_name,
         environment=body.environment,
+        role_context=role_context,
     )
 
 
