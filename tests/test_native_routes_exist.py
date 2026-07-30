@@ -17,25 +17,32 @@ import re
 from qrme.api import app
 
 from . import clientpaths
-from .clientpaths import NATIVE, paths
+from .clientpaths import NATIVE, VERBS, calls, paths
 
 # The clients keep their paths in one file per platform, but the scan covers
 # every source under `native/` so an inline call in a view is caught too.
 _MIN_PATHS = 40
 
 
-def test_every_native_path_reaches_a_route():
-    """One assertion per platform would hide which platform drifted.
+def test_every_native_call_reaches_a_route():
+    """Method and path together, for every request the three shells make.
 
-    Reported together instead, because a path added to two shells and mistyped
-    in the third is the likely shape of this failure and the diff should say so.
+    Each language says the verb its own way — Swift labels it (`method: "PUT"`),
+    Kotlin passes it positionally, C# encodes it in the helper's name
+    (`Post(...)`) or in an `HttpMethod` constant — so the check reads it rather
+    than assuming GET. Checking the path alone would accept a shell sending POST
+    where only GET is mounted, and a 405 is the same dead button as a 404.
+
+    One assertion per platform would hide which platform drifted, so all three
+    are reported together: a path added to two shells and mistyped in the third
+    is the likely shape of this failure, and the message should say which.
     """
     missing: list[str] = []
     for lang in NATIVE:
-        for line in clientpaths.unresolved(app, lang):
+        for line in clientpaths.refused(app, lang):
             missing.append(f"[{lang.name}] {line}")
     assert not missing, (
-        "the native shells build these paths and no route accepts them:\n  "
+        "the native shells make these requests and no route accepts them:\n  "
         + "\n  ".join(missing)
     )
 
@@ -55,6 +62,28 @@ def test_each_shell_is_actually_being_scanned():
         f"{_MIN_PATHS} per shell) — the literal or interpolation pattern for "
         f"that language has probably stopped matching. All counts: {counted}"
     )
+
+
+def test_each_shell_reports_more_than_one_verb():
+    """The verb readers differ per language, so each needs its own liveness check.
+
+    Swift labels the method, Kotlin passes it positionally, C# encodes it in the
+    helper's name. If one of those readers stops matching, every call from that
+    shell silently becomes a GET — and since most routes do serve a GET, the
+    suite would stay green while checking almost nothing. A shell that reaches
+    dozens of routes and reports a single verb is that failure, not a client
+    that happens to only read.
+    """
+    for lang in NATIVE:
+        made = calls(lang)
+        assert made, f"{lang.name}: no calls extracted at all"
+        verbs = {method for method, _ in made}
+        assert verbs <= set(VERBS), f"{lang.name}: unexpected verbs {verbs}"
+        assert len(verbs) > 1, (
+            f"{lang.name} reports only {verbs} across {len(made)} calls — its "
+            "verb reader has probably stopped matching, which would turn every "
+            "call into an unchecked GET"
+        )
 
 
 def test_no_shell_uses_a_singular_mapped_segment():
