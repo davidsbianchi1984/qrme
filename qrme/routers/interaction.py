@@ -9,7 +9,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (adaptation, auth, companion, db, engagement, llm, moderation,
-                persona, referral, roles, watermark)
+                persona, referral, roles, voiceprint, watermark)
 from ..common import (
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -21,6 +21,7 @@ from ..common import (
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
     InteractorCreate, MessageOut, QuietHoursSet, RelationshipSet,
+    VoiceConsent, VoiceSample, VoiceSay,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -602,3 +603,75 @@ def approve_message(message_id: str, request: Request) -> dict:
 @router.post("/moderation/{message_id}/reject")
 def reject_message(message_id: str, request: Request) -> dict:
     return _resolve_message(message_id, "rejected", request)
+
+
+# -- Voice cloning, gated as FIG. 800 draws it (qrme/voiceprint.py) -----------
+
+@router.put("/profiles/{profile_id}/voiceprint/consent")
+def grant_voice_consent(profile_id: str, body: VoiceConsent,
+                        request: Request) -> dict:
+    """Step 802: the permission, before anything is collected. Owner-only,
+    and it requires attesting the voice is your own."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return voiceprint.consent(profile_id, own_voice=body.own_voice,
+                                  sources=body.sources, note=body.note)
+    except voiceprint.VoiceError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.get("/profiles/{profile_id}/voiceprint")
+def voiceprint_status(profile_id: str, request: Request) -> dict:
+    """Consent, enrollment and the print — what this profile's voice is."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return voiceprint.status(profile_id)
+
+
+@router.post("/profiles/{profile_id}/voiceprint/samples", status_code=201)
+def collect_voice_sample(profile_id: str, body: VoiceSample,
+                         request: Request) -> dict:
+    """Steps 806–810: a sample from a call or a recording, and what the
+    material now amounts to. Refused without consent covering that source."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return voiceprint.collect(
+            profile_id, source=body.source, seconds=body.seconds,
+            turns=body.turns, transcript_chars=body.transcript_chars,
+            reference=body.reference)
+    except voiceprint.VoiceError as exc:
+        raise HTTPException(403 if "consent" in str(exc) else 422, str(exc))
+
+
+@router.post("/profiles/{profile_id}/voiceprint", status_code=201)
+def build_voiceprint(profile_id: str, request: Request) -> dict:
+    """Step 812: mint the print, once enough of the person is in it."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return voiceprint.build(profile_id)
+    except voiceprint.VoiceError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.post("/profiles/{profile_id}/voiceprint/speak")
+def speak_in_voice(profile_id: str, body: VoiceSay, request: Request) -> dict:
+    """Say something in the enrolled voice — never without the watermark
+    credential and the spoken disclosure riding along."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return voiceprint.speak(profile_id, body.text)
+    except voiceprint.VoiceError as exc:
+        raise HTTPException(422, str(exc))
+
+
+@router.delete("/profiles/{profile_id}/voiceprint")
+def revoke_voiceprint(profile_id: str, request: Request) -> dict:
+    """Withdraw: the samples are deleted, the print retires, and the record
+    of the withdrawal stays."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return voiceprint.revoke(profile_id)

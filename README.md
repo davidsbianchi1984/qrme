@@ -804,6 +804,11 @@ the terms allow — **derive their own specialist agent** from it, with provenan
 | `POST /profiles/{id}/license/acquire` | buyer (interactor token) | Acquire a license → a revocable `lic_…` token |
 | `POST /profiles/{id}/license/{grant}/derive` | buyer | Derive a **new buyer-owned specialist agent** seeded from the source persona; requires `allow_derivatives`, a valid grant, and a verified-adult buyer. Records `licensed_from` provenance and returns the new profile's `owner_token` |
 | `GET /profiles/{id}/licenses` | owner | Who holds a license, and what they derived |
+| `PUT /profiles/{id}/voiceprint/consent` | owner | **Voice cloning, gated as the filing's FIG. 800 draws it** (`qrme/voiceprint.py`): the permission comes *first*, and `own_voice` is an attestation, not decoration — QRME refuses to learn a voice on somebody else's behalf. Consent is scoped to named sources (`call` \| `voice_note` \| `direct`) |
+| `POST /profiles/{id}/voiceprint/samples` | owner | A gathered sample (steps 806–808). **Metadata only** — duration, turns, transcript size, and a `reference` naming where the audio itself lives, so a voice corpus never accumulates in the profile database. 403 without consent covering that source |
+| `POST /profiles/{id}/voiceprint` | owner | Mint the print (step 812) — refused until the enrollment is real: ≥3 samples and ≥120s. Step 810's analysis is arithmetic anyone can check (samples, seconds, mean turn length, sources), never an opaque score, so a thin enrollment is *called* thin instead of labelled ready |
+| `POST /profiles/{id}/voiceprint/speak` | owner | Speak in the enrolled voice — and never without the **watermark credential** and the spoken disclosure ("this voice is synthesized … not a recording of them speaking these words"). A cloned voice that doesn't say it is one is the thing this codebase refuses to build |
+| `DELETE /profiles/{id}/voiceprint` | owner | Withdraw: the samples are **deleted**, the print retires, and the withdrawal itself stays on record — a tombstone rather than a pretence that nothing happened |
 | `DELETE /licenses/{grant}` | source owner | Revoke a license (blocks further derivation) |
 
 `consult` licenses forbid derivation; `finetune`/`clone` permit it. `GET /profiles/{id}` reports `licensed_from` on a derived agent.
