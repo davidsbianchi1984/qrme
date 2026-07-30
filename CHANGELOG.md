@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.17.0] — 2026-07-30
+
 **Voice enrollment reaches the device that has the microphone.** The
 Voice screen shipped in the web console — which is the one surface where
 the owner cannot actually record anything, so it asks them to *type* how
