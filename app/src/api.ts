@@ -440,17 +440,20 @@ export const api = {
   videoPlatforms: () =>
     req<{ platforms: { key: string; name: string; hosts: string[] }[];
           note: string }>(`/videos/platforms`),
+  // `/posts/…`, plural. The audience routes take the *path* segment and map it
+  // to a kind (`posts` → `post`), so the singular these used to send reached
+  // no route at all and every like, comment and share came back 404.
   likePost: (postId: string, token: string) =>
-    req<{ likes?: number }>(`/post/${postId}/like`, { method: "POST", token }),
+    req<{ likes?: number }>(`/posts/${postId}/like`, { method: "POST", token }),
   unlikePost: (postId: string, token: string) =>
-    req<{ likes?: number }>(`/post/${postId}/like`, { method: "DELETE", token }),
+    req<{ likes?: number }>(`/posts/${postId}/like`, { method: "DELETE", token }),
   postComments: (postId: string) =>
-    req<{ comments: WallComment[] } | WallComment[]>(`/post/${postId}/comments`),
+    req<{ comments: WallComment[] } | WallComment[]>(`/posts/${postId}/comments`),
   addComment: (postId: string, body: string, token: string) =>
-    req<WallComment>(`/post/${postId}/comments`,
+    req<WallComment>(`/posts/${postId}/comments`,
       { method: "POST", body: { body }, token }),
   sharePost: (postId: string, token: string) =>
-    req<unknown>(`/post/${postId}/share`, { method: "POST", token }),
+    req<unknown>(`/posts/${postId}/share`, { method: "POST", token }),
   marketplace: (tag?: string) =>
     req<{ profile_id: string; display_name: string; purpose?: string;
           blurb?: string; tags: string[]; avatar?: string | null;
