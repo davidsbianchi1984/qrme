@@ -233,6 +233,17 @@ LESSONS: tuple[dict, ...] = (
               "instruction.",
          screens=(149,),
          try_it="Send the same request as an advisor, then as an operator."),
+    dict(key="problems", chapter="Working", title="What went wrong",
+         what="When a request fails, the app writes down the operation and "
+              "the status code — POST /profiles/{id}/chat, 500 — and nothing "
+              "else. Not the error message, because those messages quote what "
+              "you typed; not the path as it was called, because that names "
+              "you. You read the message when it happens: it is yours. The "
+              "log keeps the shape of the bug and none of the instance. "
+              "Before a single report is sent, the app asks, and shows you "
+              "the exact thing it would send.",
+         screens=(150, 151),
+         try_it="Open Control and press 'Show me exactly what would be shared'."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "

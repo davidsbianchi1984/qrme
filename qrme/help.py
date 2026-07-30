@@ -235,6 +235,11 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                  "is this mine", "prove i wrote it", "trace this"),
     "role": ("advisor", "collaborator", "operator", "how should it work",
              "just do it", "give me advice", "work with me", "role"),
+    # The words somebody uses when something has just broken, plus the ones
+    # they use when they have noticed the reporting and want it to stop.
+    "problems": ("what went wrong", "error", "errors", "it failed",
+                 "something broke", "bug", "report a bug", "crash",
+                 "stop sending", "stop reporting", "opt out", "diagnostics"),
 }
 
 
