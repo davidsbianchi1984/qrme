@@ -88,3 +88,33 @@ def test_an_existing_email_account_is_the_same_account(client, monkeypatch):
     r = client.post("/signin", json={"email": "same@example.com",
                                      "password": "longenough8"})
     assert r.status_code == 200
+
+
+def test_apple_asks_for_form_post_and_the_door_accepts_it(client, monkeypatch):
+    """Apple's rule, not our preference: requesting any scope forces
+    response_mode=form_post, so the browser returns as a POST. Sending
+    response_mode=query with a scope is rejected by Apple outright — which
+    would have surfaced as "sign-in is broken" on the very first attempt with
+    a freshly registered client."""
+    from qrme import oauth
+    monkeypatch.setenv("QRME_APPLE_CLIENT_ID", "com.example.qrme")
+    monkeypatch.setenv("QRME_APPLE_CLIENT_SECRET", "secret-jwt")
+    started = oauth.start("apple", "http://127.0.0.1:8000/auth/oauth/apple/callback")
+    assert "response_mode=form_post" in started["url"]
+    assert "scope=email" in started["url"]
+
+    r = client.post("/auth/oauth/apple/callback",
+                    content="error=user_cancelled_authorize",
+                    headers={"content-type": "application/x-www-form-urlencoded"})
+    assert r.status_code == 400
+    assert "user_cancelled_authorize" in r.text
+
+
+def test_google_still_comes_back_on_the_query_string(client, monkeypatch):
+    from qrme import oauth
+    monkeypatch.setenv("QRME_GOOGLE_CLIENT_ID", "gid")
+    monkeypatch.setenv("QRME_GOOGLE_CLIENT_SECRET", "gsecret")
+    started = oauth.start("google", "http://127.0.0.1:8000/auth/oauth/google/callback")
+    assert "response_mode" not in started["url"]
+    r = client.get("/auth/oauth/google/callback", params={"error": "access_denied"})
+    assert r.status_code == 400 and "access_denied" in r.text
