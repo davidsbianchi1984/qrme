@@ -61,8 +61,9 @@ tenant-isolated, and auditable end to end.
 | `POST /v1/generate` | `{system, messages}` → `{content, model}` — inference on the hosted tier |
 | `GET /v1/model` | `{model, tier}` — what the gateway serves |
 | `POST /v1/contributions` | Anonymized contribution payload → `202` |
-
 | `POST /v1/contributions/revoke` | `{refs}` → how many were deleted |
+| `POST /v1/problems` | Content-free error report from a console → `202` |
+| `GET /v1/problems` | The error aggregate, worst first |
 
 Authentication: `Authorization: Bearer <token>`, one per contributing
 deployment (`CLOUDGW_TOKENS=name:token,...`), so the intake records *which*
@@ -71,6 +72,14 @@ configured the gateway is open to callers on this machine and closed to
 everyone else — the same fail-closed posture as PDI's admin surface, because
 an open gateway on a routable address is somebody else's model bill and an
 unattributable corpus.
+
+`GET /v1/problems` is the one endpoint with a *narrower* gate than the bearer
+token, and the reason is worth stating: the token that posts error reports is
+compiled into every installer, so it is public the moment somebody unzips one.
+Writing is safe to hand out because a wrong write costs a wrong counter.
+Reading is a live map of what fails on every build, so it stays with the caller
+names in `CLOUDGW_PROBLEM_READERS` — unset meaning the local developer and
+nobody else.
 
 ## Running the gateway
 
@@ -93,6 +102,8 @@ isn't there, finds out immediately rather than from a quiet corpus later.
 | `CLOUDGW_MODEL` | Which model to serve (default `claude-fable-5`). |
 | `CLOUDGW_TOKENS` | `name:token` pairs. Required for any caller off this machine. |
 | `CLOUDGW_PDI_URL` / `CLOUDGW_PDI_TOKEN` | The contribution vault. **Without it contributions are refused**, not written somewhere unencrypted — inference keeps working. |
+| `CLOUDGW_PROBLEMS_PATH` | Where error counters are kept. Unset = counted in memory and gone when the process is. |
+| `CLOUDGW_PROBLEM_READERS` | Caller names allowed to `GET /v1/problems`. Unset = the local developer only. |
 
 ### The intake refuses rather than sanitizes
 
@@ -109,3 +120,77 @@ offending field**. Quietly sanitizing would hide the client bug that produced
 it; refusing tells that deployment's operator their build is leaking, while
 it can still be fixed. It is importable on its own, so an operator can run it
 over a corpus they already have.
+
+## Error reports
+
+The consoles record every failed request — the operation and the status, never
+the message and never the path as it was actually called.
+`POST /profiles/{id}/chat → 500` identifies a bug, where
+`POST /profiles/prf_0de08e794ed0/chat` identifies a person.
+Only the first is written down, and the redaction happens before the
+row is stored, so the buffer never holds a value that would have to be scrubbed
+later.
+
+The backends put user input straight into their error messages — a device name,
+a body site, a language code. Those are good messages for the person reading
+them and the wrong thing to keep, so they are shown and not recorded.
+
+A build sends only if it was built with an address:
+
+```bash
+PROBLEM_COLLECTOR=https://gw.example.com PROBLEM_TOKEN=… npm run build
+```
+
+Unset, and the installer has nowhere to send. That is a stronger default than a
+flag — there is no address for a later mistake to switch on. When an address is
+set, the console posts once at launch, alongside the update check, and swallows
+every failure; a diagnostic that can delay a launch has stopped being worth
+having. The Settings card shows the exact payload before it goes, from the same
+function that builds it, and turns sending off for anyone who would rather it
+did not happen.
+
+Counts go as **deltas**. Each row remembers how much of itself has been
+reported, so reopening the app twenty times does not turn one broken screen into
+twenty. A failed send moves nothing, and the next launch tries again.
+
+| Recorded | Never recorded |
+|---|---|
+| operation (`POST /profiles/{id}/chat`) | the error message |
+| status (`0` = never reached a server) | ids, tokens, key names |
+| count, date (day only) | request or response bodies |
+| product, app version, platform | any time finer than a day |
+
+### Cross-origin, on purpose
+
+The gateway answers preflights from any origin with credentials off. That is
+not a weakening: an Electron renderer's origin is `null` (it loads the console
+from `file://`) and a dev console's is whatever port Vite picked, so there is
+no allowlist that could be written and stay true. Without it the browser's
+preflight gets a 405, every report fails, and the sender swallows failures —
+the feature would be dead in the field with nothing to show for it.
+
+What CORS protects is *ambient* authority: a hostile page using a cookie the
+browser attaches for you. There is none here. Every endpoint needs a bearer
+presented explicitly, and credentials stay off so it keeps working that way.
+
+### This intake refuses too, and harder
+
+`cloudgw/problems.py` accepts exactly five top-level keys and exactly five per
+problem, and **422s on anything else** — an extra field, a path with an
+unredacted id still in it, a `platform` string long enough to hide a sentence,
+a `day` with a time of day in it.
+
+It could redact that path itself; the pattern is right there. It does not,
+because then a build whose redaction had broken would keep working and nobody
+would learn that every report from those users had been arriving with a profile
+id in it. Refusing is also cheaper here than next door: a rejected error report
+costs one lost diagnostic, where a rejected contribution costs somebody their
+donated work.
+
+What survives is less than what arrives. Reports are not stored as reports —
+they fold into counters keyed by product, version, platform, operation and
+status. Locale is validated and then dropped, and nothing records that a
+particular install sent anything, or when beyond the day. That is why these
+counters sit in a plain file while contributions are sealed in PDI: the
+contributions are people's own words, and these have no owner to protect.
+Encrypting them would look careful and mean nothing.

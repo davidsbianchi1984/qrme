@@ -4,6 +4,8 @@
     GET  /v1/model                 what this gateway serves
     POST /v1/contributions         anonymized contribution intake  → 202
     POST /v1/contributions/revoke  delete previously contributed items
+    POST /v1/problems              content-free error reports       → 202
+    GET  /v1/problems              what is breaking, worst first
 
 Authentication is a bearer token per contributing deployment
 (``CLOUDGW_TOKENS``). It fails closed the same way PDI's admin surface does:
@@ -18,8 +20,9 @@ import os
 import secrets
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 
-from . import model, screening, store
+from . import model, problems, screening, store
 
 # Starlette's in-process sentinel names no socket, so no network peer can
 # present it.
@@ -36,6 +39,17 @@ def _tokens() -> dict[str, str]:
             name, _, token = pair.partition(":")
             out[token.strip()] = name.strip()
     return out
+
+
+def _readers() -> set[str]:
+    """Caller names allowed to read the error aggregate.
+
+    Unset means the local developer and nobody else — the same fail-closed
+    default as the token check above, and for the same reason: an operator who
+    has not decided yet should get "no", not "everyone".
+    """
+    raw = os.environ.get("CLOUDGW_PROBLEM_READERS", "").strip()
+    return {n.strip() for n in raw.split(",") if n.strip()} or {"local-dev"}
 
 
 def _caller(request: Request, authorization: str = Header(default="")) -> str:
@@ -60,16 +74,39 @@ def _caller(request: Request, authorization: str = Header(default="")) -> str:
     raise HTTPException(403, "invalid gateway token")
 
 
-def create_app(provider=None, vault=None) -> FastAPI:
+def create_app(provider=None, vault=None, aggregate=None) -> FastAPI:
     app = FastAPI(title="Cloud Model Gateway", version="0.1.0")
+
+    # Cross-origin, from any origin, without credentials.
+    #
+    # Not laziness, and not a weakening: the callers are desktop consoles. An
+    # Electron renderer's origin is `null` (it loads from file://) and a dev
+    # console's is whatever port Vite picked, so there is no allowlist that
+    # could be written and stay true. Without this the browser's preflight
+    # gets a 405 and every report fails — silently, since the sender swallows
+    # failures, which is the worst way for a feature to be dead.
+    #
+    # What CORS actually protects is *ambient* authority: a hostile page using
+    # a session cookie the browser attaches for you. There is none here. Every
+    # endpoint needs a bearer token presented explicitly, and
+    # `allow_credentials=False` keeps it that way — a page that already has
+    # the token could call this from a server anyway, and one that does not
+    # gains nothing.
+    app.add_middleware(
+        CORSMiddleware, allow_origins=["*"], allow_credentials=False,
+        allow_methods=["GET", "POST", "OPTIONS"], allow_headers=["*"])
+
     app.state.provider = provider or model.provider_from_env()
     app.state.vault = vault if vault is not None else store.vault_from_env()
+    app.state.problems = (aggregate if aggregate is not None
+                          else problems.aggregate_from_env())
 
     @app.get("/health")
     def health() -> dict:
         return {"status": "ok",
                 "model": app.state.provider.name,
-                "intake": app.state.vault.describe()}
+                "intake": app.state.vault.describe(),
+                "problems": app.state.problems.describe()}
 
     @app.get("/v1/model")
     def model_info(_: str = Depends(_caller)) -> dict:
@@ -117,6 +154,44 @@ def create_app(provider=None, vault=None) -> FastAPI:
         refs = (await request.json()).get("refs") or []
         deleted = app.state.vault.delete(refs)
         return {"requested": len(refs), "deleted": deleted}
+
+    @app.post("/v1/problems", status_code=202)
+    async def report_problems(request: Request,
+                              caller: str = Depends(_caller)) -> dict:
+        """What broke, from consoles that have a collector configured.
+
+        Accepted or refused whole. A partial accept would leave the sender
+        believing its redaction is fine while the gateway silently binned the
+        half that proved otherwise — see `problems.py` for why that matters
+        more here than anywhere else on this gateway.
+        """
+        try:
+            payload = problems.screen(await request.json())
+        except problems.Rejected as exc:
+            raise HTTPException(422, str(exc)) from exc
+        folded = app.state.problems.add(payload)
+        return {"accepted": True, "problems": len(payload["problems"]),
+                "failures": folded}
+
+    @app.get("/v1/problems")
+    def list_problems(caller: str = Depends(_caller)) -> dict:
+        """The aggregate, worst first — for whoever is fixing the bugs.
+
+        Behind a *narrower* gate than the intake, which is the whole reason
+        this is not one permission. The token that posts reports is compiled
+        into every installer, so it is public the moment the first user
+        downloads one; treating "may report" and "may read the report" as the
+        same right would publish a live map of every route that fails on every
+        version to anyone who unzips an app.
+
+        Writing is safe to hand out because a wrong write costs a wrong
+        counter. Reading is not, so it stays with named callers.
+        """
+        if caller not in _readers():
+            raise HTTPException(
+                403, "this token may post error reports but not read them; "
+                     "add its name to CLOUDGW_PROBLEM_READERS to change that")
+        return {"rows": app.state.problems.rows()}
 
     return app
 
