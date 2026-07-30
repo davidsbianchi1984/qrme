@@ -146,6 +146,11 @@ class ChatRequest(BaseModel):
     # around them — location, conditions, local_time, activity. The reply
     # adapts to it; the raw payload is stored beside the biometric context.
     environment: dict | None = None
+    # Role-specific context (spec clauses 2/12): how the profile should
+    # function this turn — an advisor counsels, a collaborator co-creates,
+    # an operator executes. Unset = the profile reads the prompt itself
+    # (transparent keyword inference), or simply stays itself.
+    role: Literal["advisor", "collaborator", "operator"] | None = None
 
 
 class SpecialistSet(BaseModel):
@@ -628,6 +633,10 @@ class ChatResponse(BaseModel):
     # Echo of the environmental context the reply adapted to (spec clause 1);
     # None when the request carried none.
     environment: dict | None = None
+    # The role the profile worked in this turn (spec clauses 2/12):
+    # {"role": "advisor"|"collaborator"|"operator", "how": "declared"|
+    # "inferred"}. None = a plain turn, the profile as itself.
+    role_context: dict | None = None
 
 
 class Feedback(BaseModel):
