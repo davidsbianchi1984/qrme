@@ -45,6 +45,13 @@ targets:
           QRME reads beacon QR codes so a profile can appear on the sticker
           in front of you. Frames stay on the device; only the code's id is
           sent.
+        # Required before AVAudioRecorder may run, for the same reason: iOS
+        # kills the app if the mic opens without it. Voice enrollment records
+        # to this app's container and sends only the measurements.
+        NSMicrophoneUsageDescription: >-
+          QRME records a sample of your own voice so your profile can speak in
+          it, with your permission. The recording stays on this device; only
+          how long it ran and how many turns it held are sent.
         # Allow http://127.0.0.1:8000 in the Simulator (local dev backend).
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true

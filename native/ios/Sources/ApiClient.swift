@@ -234,6 +234,60 @@ struct PayoutReceipt: Decodable {
     let entries: Int
 }
 
+// MARK: Voiceprint (FIG. 800)
+
+struct VoiceConsentState: Decodable {
+    let granted: Bool
+    let sources: [String]?
+    let granted_at: String?
+    let note: String?
+}
+
+struct VoiceThreshold: Decodable {
+    let samples: Int
+    let seconds: Double
+}
+
+/// What the enrolled material actually amounts to. Everything here is a count
+/// off the samples — there is no opaque quality score to hide behind.
+struct VoiceEnrollment: Decodable {
+    let samples: Int
+    let seconds: Double
+    let turns: Int
+    let mean_turn_seconds: Double?
+    let ready: Bool
+    let needs: [String]
+    let threshold: VoiceThreshold
+    let method: String
+}
+
+struct VoiceprintRecord: Decodable {
+    let id: String
+    let built_at: String?
+    let retired_at: String?
+    let active: Bool
+}
+
+struct VoiceprintStatus: Decodable {
+    let consent: VoiceConsentState
+    let enrollment: VoiceEnrollment?
+    let voiceprint: VoiceprintRecord?
+    let disclosure: String
+}
+
+struct VoiceRevocation: Decodable {
+    let revoked: Bool
+    let samples_deleted: Int
+    let note: String
+}
+
+struct VoiceSpoken: Decodable {
+    let voiceprint_id: String
+    let basis: String
+    let disclosure: String
+    let revocable: Bool
+}
+
 struct RelationshipState: Decodable {
     let relationship_type: String
     let nickname: String?
@@ -1132,5 +1186,51 @@ actor ApiClient {
             "transport": "internal",
             "platform": platform,
         ], token: token)
+    }
+
+    // MARK: Voiceprint — FIG. 800, in the order the drawing gates it
+
+    func voiceprint(id: String, token: String) async throws -> VoiceprintStatus {
+        try await request("/profiles/\(id)/voiceprint", token: token)
+    }
+
+    /// Step 802. `ownVoice` is an attestation, not a checkbox: the backend
+    /// refuses the grant without it, so there is no path here to anyone else.
+    func grantVoiceConsent(id: String, token: String, sources: [String],
+                           note: String? = nil) async throws -> VoiceprintStatus {
+        var body: [String: Any] = ["own_voice": true, "sources": sources]
+        if let note { body["note"] = note }
+        return try await request("/profiles/\(id)/voiceprint/consent",
+                                 method: "PUT", body: body, token: token)
+    }
+
+    /// Steps 806–808. Only the measurements travel — seconds, turns, where it
+    /// came from. The audio itself is never posted or stored.
+    func addVoiceSample(id: String, token: String, source: String,
+                        seconds: Double, turns: Int,
+                        reference: String? = nil) async throws -> VoiceEnrollment {
+        var body: [String: Any] = ["source": source, "seconds": seconds,
+                                   "turns": turns]
+        // Names the recording without carrying it: the audio stays on device.
+        if let reference { body["reference"] = reference }
+        return try await request("/profiles/\(id)/voiceprint/samples",
+                                 method: "POST", body: body, token: token)
+    }
+
+    func buildVoiceprint(id: String, token: String) async throws -> VoiceprintStatus {
+        try await request("/profiles/\(id)/voiceprint", method: "POST", token: token)
+    }
+
+    func speakInVoice(id: String, token: String,
+                      text: String) async throws -> VoiceSpoken {
+        try await request("/profiles/\(id)/voiceprint/speak", method: "POST",
+                          body: ["text": text], token: token)
+    }
+
+    /// Withdrawal. The samples are deleted and the print retires; the record
+    /// of the withdrawal itself stays, which is why this reports counts.
+    func revokeVoiceprint(id: String, token: String) async throws -> VoiceRevocation {
+        try await request("/profiles/\(id)/voiceprint", method: "DELETE",
+                          token: token)
     }
 }
