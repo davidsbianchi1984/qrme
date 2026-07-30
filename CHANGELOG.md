@@ -29,6 +29,26 @@ count stretches of speech between silences; Windows does not meter its
 input and so reports one turn per recording rather than inventing a count
 from the duration.
 
+**Fixed — every like, comment and share on the community wall returned
+404, and always had.** The audience routes dispatch on a leading `{kind}`
+and map the *plural* path segment to a singular kind (`posts` → `post`);
+`app/src/api.ts` was asking for the singular. So `/post/{id}/like`,
+`/post/{id}/comments` and `/post/{id}/share` reached the generic route and
+were then refused by the kind lookup. Liking a post, unliking it, reading
+its comments, writing one, sharing it — none of it worked in any release
+that shipped the buttons.
+
+Nothing caught it, and the reason is worth keeping: the backend tests
+exercised the plural and passed, and the console compiled because a
+template literal is only a string. Neither half was wrong on its own. So
+the fix ships with `tests/test_console_routes_exist.py`, which checks them
+against each other — every path the console builds must resolve, no
+singular of a mapped segment may appear in `api.ts`, and the singular's
+404 is observed against a live request so the rule is not merely a
+spelling convention. A route-table comparison alone would *not* have
+caught this: `/post/x/like` matches `/{kind}/{target_id}/like` perfectly
+well at the routing layer, because the refusal happens after dispatch.
+
 **Fixed** — the Windows navigation pane displayed the literal strings
 `tab.desk` and `tab.signatures`. Chrome localization falls back to the
 key when a key is missing, and those two were never added when the
