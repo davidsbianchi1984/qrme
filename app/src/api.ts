@@ -314,6 +314,52 @@ export interface WatermarkRecovery {
   display?: { mark: string; label: string } | null;
 }
 
+/** A revocable scope token. Phases that read the profile's own material need
+ *  one; the backend refuses `research` without it. */
+export type Grant = {
+  id: string;
+  token: string;
+  scope: string[];
+  revoked: boolean;
+};
+
+/** Which phases the owner has authorised the profile to run unattended. */
+export type Delegation = {
+  delegation: {
+    phases?: string[];
+    enabled?: boolean;
+    grant_id?: string | null;
+    [key: string]: unknown;
+  } | null;
+  phases: string[];
+};
+
+/** A run in progress. `awaiting` is what it is stopped on and waiting for a
+ *  person to supply; `next_phase` is what it would do if advanced. */
+export type Workflow = {
+  id: string;
+  profile_id: string;
+  goal: string;
+  plan: string[];
+  status: string;
+  cursor: number;
+  next_phase?: string | null;
+  awaiting?: string | null;
+  agent?: string | null;
+  grant_id?: string | null;
+  memory?: unknown;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TaskRunResult = {
+  id: string;
+  status: string;
+  output?: string;
+  steps?: unknown[];
+  watermark?: unknown;
+};
+
 export const api = {
   health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
 
@@ -555,4 +601,72 @@ export const api = {
   // Who wrote this? — from the text alone, surviving edits.
   recoverWatermark: (content: string) =>
     req<WatermarkRecovery>("/watermarks/recover", { method: "POST", body: { content } }),
+  // ---------------------------------------------------------------------
+  // What this profile may do on the owner's behalf, and what it has done.
+  // The whole chain — mint a grant, authorise phases, run and steer a
+  // workflow — existed in the backend with no caller anywhere.
+  // ---------------------------------------------------------------------
+
+  // A grant is the revocable scope a phase reads through. Minting one is the
+  // first step of delegation, not a separate feature.
+  createGrant: (profileId: string, scope: string[], token: string) =>
+    req<Grant>(`/profiles/${profileId}/grants`,
+      { method: "POST", body: { scope }, token }),
+  revokeGrant: (grantId: string, token: string) =>
+    req<{ revoked: boolean }>(`/grants/${grantId}`,
+      { method: "DELETE", token }),
+
+  delegation: (profileId: string) =>
+    req<Delegation>(`/profiles/${profileId}/delegation`),
+  setDelegation: (profileId: string, body: { phases: string[];
+    grant_token?: string; enabled?: boolean }, token: string) =>
+    req<Delegation>(`/profiles/${profileId}/delegation`,
+      { method: "PUT", body, token }),
+
+  workflows: (profileId: string, token: string) =>
+    req<Workflow[]>(`/profiles/${profileId}/workflows`, { token }),
+  workflow: (profileId: string, workflowId: string, token: string) =>
+    req<Workflow>(`/profiles/${profileId}/workflows/${workflowId}`, { token }),
+  createWorkflow: (profileId: string, body: { goal: string; plan?: string[];
+    grant_token?: string }, token: string) =>
+    req<Workflow>(`/profiles/${profileId}/workflows`,
+      { method: "POST", body, token }),
+  advanceWorkflow: (profileId: string, workflowId: string, token: string) =>
+    req<Workflow>(`/profiles/${profileId}/workflows/${workflowId}/advance`,
+      { method: "POST", token }),
+  resumeWorkflow: (profileId: string, workflowId: string, input: string,
+    token: string) =>
+    req<Workflow>(`/profiles/${profileId}/workflows/${workflowId}/resume`,
+      { method: "POST", body: { input }, token }),
+  cancelWorkflow: (profileId: string, workflowId: string, token: string) =>
+    req<Workflow>(`/profiles/${profileId}/workflows/${workflowId}/cancel`,
+      { method: "POST", token }),
+
+  // The same machinery run by somebody who is not the owner, under the
+  // policy the owner set. Kept separate on purpose: these are the runs a
+  // person other than the owner started.
+  startDelegatedWorkflow: (profileId: string, body: { goal: string;
+    interactor_id: string; plan?: string[] }, token: string) =>
+    req<Workflow>(`/profiles/${profileId}/delegated-workflows`,
+      { method: "POST", body, token }),
+  delegatedWorkflow: (profileId: string, workflowId: string, token: string) =>
+    req<Workflow>(
+      `/profiles/${profileId}/delegated-workflows/${workflowId}`, { token }),
+  advanceDelegatedWorkflow: (profileId: string, workflowId: string,
+    token: string) =>
+    req<Workflow>(
+      `/profiles/${profileId}/delegated-workflows/${workflowId}/advance`,
+      { method: "POST", token }),
+  resumeDelegatedWorkflow: (profileId: string, workflowId: string,
+    input: string, token: string) =>
+    req<Workflow>(
+      `/profiles/${profileId}/delegated-workflows/${workflowId}/resume`,
+      { method: "POST", body: { input }, token }),
+
+  tasks: (profileId: string, token: string) =>
+    req<TaskRunResult[]>(`/profiles/${profileId}/tasks`, { token }),
+  runTask: (profileId: string, body: { kind?: string; topic: string;
+    grant_token: string }, token: string) =>
+    req<TaskRunResult>(`/profiles/${profileId}/tasks`,
+      { method: "POST", body, token }),
 };
