@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**252 of QRME's 409 routes cannot be reached from any client.** The route
+guards ask whether every call reaches a route. This asks the inverse — whether
+every route is reachable from a door a user can open — and it is the quieter of
+the two failures by far. A client calling a route that does not exist produces a
+404 somebody eventually reports. A route no client calls produces nothing at
+all: the code is present, its tests pass, the changelog says it shipped, and the
+capability is simply unreachable.
+
+Spot-checked rather than asserted. The console reads `/profiles/{id}/friends`
+and shows the list, but `DELETE /profiles/{id}/friends/{fid}` is called by
+nothing — you can gain a friend and never remove one. `/displays`, `/comments`,
+`/agent/lights` and two hundred and fifty others are in the same position.
+
+The count is recorded in `tests/doorless_routes.txt`, and the list is a backlog
+rather than an approval. It cannot grow: a new route with no door fails the
+test, so the gap stops widening on the day it appears. And it must shrink
+deliberately: building a door also fails the test, telling you to strike the
+line, because a backlog that quietly re-fills is how this got to 252.
+
+**A correction to this cycle's earlier entry.** The first version of this audit
+reported *zero* doorless routes and passed. That was wrong, and wrong in the
+most dangerous way — vacuously. `app.routes` is not the flat list it appears to
+be: FastAPI wraps each `include_router` in an `_IncludedRouter` that carries no
+`path` or `methods` of its own, so walking the top level saw **8 routes out of
+409**. Enumeration now recurses through those wrappers. Route *matching* was
+never affected — the wrapper implements `matches` and delegates — so the guards
+built in the last two rounds were sound; only counting was broken.
+
+The guard-on-guard is what caught it, by asserting the route table is not
+implausibly small. That test was written in the same round it went on to
+falsify, which is the argument for writing them.
+
 **Every option the backend offers, it now has to accept.** A catalog endpoint
 is a menu — the console and the three shells render it directly, so whatever it
 lists is what a user can pick. If the endpoint that *consumes* the choice
