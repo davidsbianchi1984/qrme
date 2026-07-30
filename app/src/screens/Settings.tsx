@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo } from "../api";
+import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo,
+         type WatermarkRecovery } from "../api";
 import { ProviderTiles } from "../ProviderTiles";
 import { useSession } from "../store";
 
@@ -9,6 +10,10 @@ export function Settings() {
   const [llmKey, setLlmKeyInput] = useState(getLlmKey());
   const [keySaved, setKeySaved] = useState(false);
   const [offline, setOffline] = useState<Record<string, unknown> | null>(null);
+  // "Who wrote this?" — the recoverable half of the watermark.
+  const [checkText, setCheckText] = useState("");
+  const [checked, setChecked] = useState<WatermarkRecovery | null>(null);
+  const [checking, setChecking] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pair, setPair] = useState<PairInfo | null>(null);
@@ -79,6 +84,46 @@ export function Settings() {
         ) : (
           <div className="muted">Not reachable — is the backend running?</div>
         )}
+      </div>
+
+      {/* The recoverable watermark: paste text, learn whether one of this
+          deployment's profiles wrote it — and it survives editing. */}
+      <div className="card">
+        <h3>Who wrote this? — check any text</h3>
+        <p className="muted small">
+          Paste writing you think came from a profile here. It answers from the
+          text alone, with no credential id, and still answers when the text
+          has been edited.
+        </p>
+        <textarea rows={4} value={checkText} placeholder="Paste the text…"
+                  onChange={(e) => setCheckText(e.target.value)} />
+        <button disabled={checking || !checkText.trim()}
+                onClick={async () => {
+                  setChecking(true);
+                  try { setChecked(await api.recoverWatermark(checkText)); }
+                  catch { setChecked(null); }
+                  finally { setChecking(false); }
+                }}>{checking ? "Checking…" : "Check it"}</button>
+        {checked && (checked.recovered ? (
+          <div className="guidance">
+            <div className="guidance-src">
+              {checked.display?.mark} produced by {checked.profile_id} · {checked.state}
+            </div>
+            <p>
+              {checked.matched_windows} of {checked.stored_windows} passages
+              match ({Math.round((checked.similarity || 0) * 100)}% similar).
+              {checked.verbatim
+                ? " The text is exactly what was stamped."
+                : " The text has been altered since it was written."}
+            </p>
+            <div className="muted small">{checked.method}</div>
+          </div>
+        ) : (
+          <div className="guidance">
+            <p>No profile here wrote this.</p>
+            <div className="muted small">{checked.reason}</div>
+          </div>
+        ))}
       </div>
 
       {pair && (

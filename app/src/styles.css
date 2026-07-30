@@ -403,3 +403,9 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   border-radius: 10px; padding: 8px 12px; font-size: 13px;
   color: var(--txt); text-decoration: none; }
 .wp-body a { color: var(--brand2); word-break: break-all; }
+
+/* Spec clauses 2/12: the role a profile works in for one turn. Sits with
+   the composer because it is a property of the message, not the profile. */
+.role-pick { display: flex; align-items: center; gap: 8px; padding: 4px 0;
+             font-size: 13px; color: var(--muted, #8a94ad); }
+.role-pick select { flex: 0 1 auto; min-width: 200px; }

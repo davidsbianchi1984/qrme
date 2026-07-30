@@ -212,6 +212,9 @@ export interface ChatReply {
   handoff?: { state: string; specialist?: string } | null;
   persona_signature?: string;
   environment?: Record<string, string> | null;
+  // Spec clauses 2/12: which role the profile worked in, and whether the
+  // interactor declared it or the profile read it from the prompt.
+  role_context?: { role: string; how: "declared" | "inferred" } | null;
 }
 export interface CompositionRow {
   source_profile_id: string;
@@ -283,6 +286,34 @@ export interface WatchFace {
   haptic: string | null;
 }
 
+// FIG. 800's voiceprint (qrme/voiceprint.py) — permission, enrollment,
+// characteristics, print.
+export interface VoiceEnrollment {
+  samples: number; seconds: number; turns: number;
+  mean_turn_seconds: number | null; mean_chars_per_turn: number | null;
+  by_source: Record<string, number>;
+  ready: boolean; needs: string[];
+  threshold: { samples: number; seconds: number };
+  method: string;
+}
+export interface VoiceprintStatus {
+  consent: { granted: boolean; own_voice?: boolean; sources?: string[];
+             granted_at?: string; note?: string };
+  enrollment: VoiceEnrollment | null;
+  voiceprint: { id: string; built_at: string; retired_at: string | null;
+                active: boolean } | null;
+  disclosure: string;
+}
+// Extract-and-reconstruct: who produced this text, from the text alone.
+export interface WatermarkRecovery {
+  recovered: boolean; reason?: string;
+  profile_id?: string; watermark_id?: string; kind?: string;
+  verbatim?: boolean; similarity?: number; best_similarity?: number;
+  matched_windows?: number; stored_windows?: number; examined_windows?: number;
+  state?: string; disclosure?: string; method?: string;
+  display?: { mark: string; label: string } | null;
+}
+
 export const api = {
   health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
 
@@ -327,6 +358,9 @@ export const api = {
     // person actually is. Optional; echoed back on the response.
     environment?: { location?: string; conditions?: string;
                     local_time?: string; activity?: string };
+    // Role-specific context (spec clauses 2/12): advisor | collaborator |
+    // operator. Omitted, the profile reads the prompt itself.
+    role?: string;
   }) =>
     req<ChatReply>(`/profiles/${profileId}/chat`, { method: "POST", body }),
 
@@ -500,4 +534,22 @@ export const api = {
     req<unknown>(`/profiles/${profileId}/memory/${interactorId}`, {
       method: "DELETE", token,
     }),
+  // The voiceprint, in FIG. 800's order (qrme/voiceprint.py).
+  voiceprint: (pid: string) =>
+    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`),
+  grantVoiceConsent: (pid: string, body: { own_voice: boolean; sources?: string[]; note?: string }) =>
+    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint/consent`, { method: "PUT", body }),
+  addVoiceSample: (pid: string, body: { source: string; seconds: number; turns?: number }) =>
+    req<{ id: string } & VoiceEnrollment>(`/profiles/${pid}/voiceprint/samples`, { method: "POST", body }),
+  buildVoiceprint: (pid: string) =>
+    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`, { method: "POST", body: {} }),
+  speakInVoice: (pid: string, text: string) =>
+    req<{ basis: string; disclosure: string; watermark: { watermark_id: string } }>(
+      `/profiles/${pid}/voiceprint/speak`, { method: "POST", body: { text } }),
+  revokeVoiceprint: (pid: string) =>
+    req<{ revoked: boolean; samples_deleted: number }>(
+      `/profiles/${pid}/voiceprint`, { method: "DELETE" }),
+  // Who wrote this? — from the text alone, surviving edits.
+  recoverWatermark: (content: string) =>
+    req<WatermarkRecovery>("/watermarks/recover", { method: "POST", body: { content } }),
 };
