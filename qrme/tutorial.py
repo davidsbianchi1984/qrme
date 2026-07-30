@@ -111,6 +111,29 @@ LESSONS: tuple[dict, ...] = (
               "helper is what will answer instead of a real model.",
          screens=(141,),
          try_it="Open Which Model Answers and read which tile is active."),
+    dict(key="voice", chapter="You are in control", title="Your own voice",
+         what="A profile can speak in your voice, and the permission comes "
+              "first — before anything is recorded. Saying it is your own "
+              "voice is an attestation, not a checkbox: there is no path here "
+              "for anybody else's. What you enroll is counted rather than "
+              "scored, so a thin enrollment is called thin instead of being "
+              "labelled ready, and anything spoken in that voice carries the "
+              "watermark and says out loud that it is synthesized. Withdrawing "
+              "deletes the samples and silences the voice; the withdrawal "
+              "itself stays on record.",
+         screens=(147,),
+         try_it="Open Voice and read step 1 before granting anything."),
+    dict(key="whowrote", chapter="You are in control",
+         title="Finding out who wrote something",
+         what="Paste any passage and QRME names the profile that produced it, "
+              "from the text alone — no credential id, and it keeps answering "
+              "after the wording has been changed. It never answers with a "
+              "bare yes: you see how many passages matched out of how many "
+              "were stored. Below a threshold it names nobody at all, because "
+              "ordinary phrases travel between unrelated texts and a "
+              "coincidence must not read as an accusation.",
+         screens=(148,),
+         try_it="Paste something one of your profiles wrote, then change a word and try again."),
     dict(key="market", chapter="Out in the world", title="The marketplace",
          what="Share or license a profile, sell a knowledge pack, take a "
               "placement. Money here is simulated and every response says so.",
@@ -200,6 +223,16 @@ LESSONS: tuple[dict, ...] = (
               "conversations — not from how sure the model sounds.",
          screens=(143,),
          try_it="Give it a scenario and read where the confidence came from."),
+    dict(key="role", chapter="Working", title="Advisor, collaborator, operator",
+         what="You can say how a profile should work a turn: an advisor weighs "
+              "it and recommends, a collaborator works the thing with you, an "
+              "operator just does it. Leaving it alone is the honest default — "
+              "the profile reads your wording and decides — and the reply "
+              "tells you which way it went and whether you asked or it "
+              "inferred, so an inference is never handed back as an "
+              "instruction.",
+         screens=(149,),
+         try_it="Send the same request as an advisor, then as an operator."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "

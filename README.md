@@ -329,6 +329,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/146-the-ecosystem.svg"><img src="docs/screens/146-the-ecosystem.svg" width="210" alt="The Ecosystem"></a><br><sub><b>146</b> · The Ecosystem</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/147-your-own-voice.svg"><img src="docs/screens/147-your-own-voice.svg" width="210" alt="Your Own Voice"></a><br><sub><b>147</b> · Your Own Voice</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/148-who-wrote-this.svg"><img src="docs/screens/148-who-wrote-this.svg" width="210" alt="Who Wrote This?"></a><br><sub><b>148</b> · Who Wrote This?</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/149-how-should-they-work.svg"><img src="docs/screens/149-how-should-they-work.svg" width="210" alt="How Should They Work?"></a><br><sub><b>149</b> · How Should They Work?</sub></td>
     <td align="center" width="33%"></td>
     <td align="center" width="33%"></td>
   </tr>

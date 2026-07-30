@@ -3370,6 +3370,41 @@ SCREENS = [
         dict(icon="warn", color="red", k="Revoke, pulls stop",
              s="the grant dies, the org stands"),
     ], button=("Coordinate", "brand")),
+    # ---- 0.16.0 / 0.17.0: voice cloning, provenance in reverse, the role ----
+    dict(num=147, title="Your Own Voice", sub="Permission first, in FIG. 800's order",
+         accent="brand", tabs=CONTROL, tab=2, cards=[
+        dict(icon="lock", color="brand", k="My own voice",
+             s="an attestation, not a checkbox", pill=("STEP 802", "good")),
+        dict(icon="mic", color="cyan", k="3 samples, 128s",
+             s="counted, not scored"),
+        dict(icon="speaker", color="green", k="Speaks marked",
+             s="and says it is synthesized"),
+        dict(icon="warn", color="red", k="Withdraw, gone",
+             s="the print retires, on record"),
+    ], button=("Record a sample", "brand")),
+    dict(num=148, title="Who Wrote This?", sub="Named from the text alone",
+         accent="cyan", tabs=CONTROL, tab=2, cards=[
+        dict(icon="search", color="cyan", k="No id needed",
+             s="paste the passage, that is all"),
+        dict(icon="pen", color="brand", k="Survives edits",
+             s="keyed windows, by overlap"),
+        dict(icon="chart", color="green", k="14 of 19 match",
+             s="the count rides the claim"),
+        dict(icon="shieldok", color="amber", k="Under 0.25, none",
+             s="a coincidence is not proof"),
+    ], button=("Check this text", "brand")),
+    dict(num=149, title="How Should They Work?", sub="Advisor · collaborator · operator",
+         accent="amber", tab=1, cards=[
+        dict(icon="brain", color="brand", k="Advisor",
+             s="weighs it and recommends"),
+        dict(icon="people", color="cyan", k="Collaborator",
+             s="works the thing with you"),
+        dict(icon="bolt", color="amber", k="Operator",
+             s="just does it"),
+        dict(icon="info", color="green", k="Or infer it",
+             s="the reply says which",
+             pill=("INFERRED", "good")),
+    ], button=("Send", "brand")),
     # (Watch faces 10 and 11 mirror these two — docs/watch/build.py.)
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
