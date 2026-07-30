@@ -424,6 +424,171 @@ export type Order = {
   ledger_entry: string; created_at: string; payment: string;
 };
 
+// ---------------------------------------------------------------------
+// Three two-party surfaces: an agreed exchange, a lent skill, a watch
+// party. Every shape below was read off a running server. Four would have
+// been wrong from the route signatures alone, and they are the four a
+// screen would have crashed on:
+//
+//   * POST /exchanges/{id}/items returns the whole *exchange*, not the
+//     item it created — so the new item's id has to be read out of the
+//     returned manifest;
+//   * the same is true of POST /watch-parties/{id}/members;
+//   * `channel` has two different shapes depending on `open`, which is why
+//     ExchangeChannel is a union rather than one type with optionals;
+//   * POST /watch-parties/{id}/end returns a little summary of what it
+//     shut down, and nothing else that looks like a party.
+// ---------------------------------------------------------------------
+
+export type ExchangeItem = {
+  id: string; direction: "host_to_guest" | "guest_to_host";
+  name: string; kind: string; bytes: number; note: string | null;
+  accepted_at: string | null;
+  /** The server's own judgement, not a filename guess. */
+  runs: boolean;
+};
+
+export type Exchange = {
+  id: string; desk_id: string | null;
+  host_id: string; guest_id: string;
+  work: string; industry: string;
+  includes: string[]; excludes: string[];
+  fee: number; fee_note: string;
+  state: "draft" | "proposed" | "signed" | "delivered" | "closed" | "withdrawn";
+  created_at: string;
+  items: ExchangeItem[];
+  /** Names only — the screen lists these before anybody signs. */
+  runs_on_your_machine: string[];
+  runs_warning: string | null;
+  /** What the signatures are actually against. Changes when the manifest does. */
+  fingerprint: string;
+  /** `matches_current` is the server's own answer to "does this signature
+   *  still apply", computed by comparing the stored fingerprint against the
+   *  live one. It is not `fingerprint` — that field was written here from the
+   *  route signature and does not exist on the wire.
+   *
+   *  In every state reachable today it is `true`: the manifest cannot be
+   *  edited except from `draft`, and `reopen` deletes the signatures on the
+   *  way. So it is the backend checking its own invariant rather than
+   *  assuming it, and the screen shows it for the same reason — a signature
+   *  that had gone stale would be exactly the thing worth seeing. */
+  signatures: { party_id: string; signed_at: string;
+                matches_current: boolean }[];
+  unsigned: string[];
+  channel: ExchangeChannel;
+  grants: string; does_not_grant: string;
+};
+
+/** Two shapes, not one. A closed channel says why; an open one says what. */
+export type ExchangeChannel =
+  | { open: false; reason: string; unsigned: string[] }
+  | { open: true; items: ExchangeItem[]; fingerprint: string;
+      auto_download: boolean; note: string };
+
+export type ExchangeVocabulary = {
+  industries: string[];
+  kinds: { key: string; means: string; runs: boolean }[];
+  states: string[];
+  directions: string[];
+  max_items: number;
+  /** The backend's own five sentences. Shown, not paraphrased. */
+  rules: string[];
+};
+
+export type SkillGrant = {
+  id: string; lender_id: string; borrower_id: string;
+  surface: string; surface_id: string;
+  /** The server's plain-English gloss of `surface`. */
+  where: string;
+  skill_kind: string; skill_ref: string;
+  /** Likewise for `skill_kind`. */
+  means: string;
+  title: string; note: string;
+  fee: number; fee_note: string;
+  state: "offered" | "active" | "declined" | "closed";
+  active: boolean;
+  offered_at: string; accepted_at: string | null;
+  closed_at: string | null; closed_by: string | null;
+  close_reason: string | null;
+  used_count: number;
+  recent_uses: SkillGrantUse[];
+  /** Both are constants the server states about itself. The screen quotes them. */
+  transfers_anything: boolean; either_can_end_it: boolean;
+};
+
+export type SkillGrantUse = { what: string; used_at: string; borrower_id: string };
+
+/** What `use` returns — a receipt, not the grant. */
+export type SkillGrantReceipt = {
+  grant_id: string; skill_kind: string; skill_ref: string; title: string;
+  surface: string; surface_id: string;
+  copied: boolean; note: string; used: string;
+};
+
+export type SkillGrantVocabulary = {
+  surfaces: { key: string; means: string }[];
+  skill_kinds: { key: string; means: string }[];
+  states: string[];
+  terms: string[];
+};
+
+export type PartyVideo = {
+  platform: string; platform_name: string; video_id: string;
+  url: string; embed_url: string; title: string;
+  thumbnail: string | null; loads_on_press: boolean; note: string;
+};
+
+export type PartyMember = {
+  member_id: string; kind: "person" | "profile"; role: string;
+  display_name: string | null; avatar: string | null;
+  /** Travels with every member, so a room can always say who is not a person. */
+  synthetic: boolean;
+  joined_at: string;
+};
+
+export type WatchParty = {
+  id: string; post_id: string; host_id: string; title: string | null;
+  video: PartyVideo;
+  position_s: number; playing: boolean;
+  members: PartyMember[];
+  people: number; profiles: number;
+  created_at: string;
+  loads_on_press: boolean;
+  /** "the room shares a position, not a player" — the server's sentence. */
+  note: string;
+};
+
+export type PartyLine = {
+  id: string; member_id: string; display_name: string | null;
+  kind: string; synthetic: boolean;
+  body: string; position_s: number | null; created_at: string;
+};
+
+/** What POST /chat returns: the line, plus a moderation verdict on it. */
+export type PostedLine = {
+  id: string; party_id: string; member_id: string; body: string;
+  status: string; blocked_reason: string | null;
+};
+
+/** Everything a synthetic profile in the party is allowed to know. The
+ *  absences are the point, so they are typed rather than left out. */
+export type PartyContext = {
+  watching: { title: string; platform: string;
+              description_available: boolean;
+              transcript_available: boolean };
+  position_s: number; playing: boolean;
+  recent: { who: string; said: string; at: number | null }[];
+  you_have_not_seen_it: boolean;
+  /** The literal text that goes into the prompt. Shown so a person can read
+   *  what their profile was told, rather than trusting that it was told it. */
+  instruction: string;
+};
+
+export type PartyEnded = {
+  party_id: string; ended: boolean;
+  grants_closed: number; microphones_returned: number;
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -942,4 +1107,171 @@ export const api = {
     req<Order>(`/marketplace/listings/${listingId}/purchase`,
       { method: "POST", body: { accept_price: acceptPrice }, token }),
   sales: (token: string) => req<{ sales: Order[] }>("/marketplace/sales", { token }),
+
+  // ---------------------------------------------------------------------
+  // The agreement two people sign before work changes hands.
+  //
+  // Every one of these needs the acting party's own token, and that is not
+  // ceremony: the router rejects an `actor_id` that does not match the
+  // caller, because without that check an anonymous stranger could forge
+  // both signatures and accept delivery of an executable on somebody's
+  // behalf. The bindings therefore take the token explicitly rather than
+  // leaning on an ambient one — a caller that has to pass it cannot
+  // accidentally act as the wrong person.
+  // ---------------------------------------------------------------------
+
+  exchangeVocabulary: () => req<ExchangeVocabulary>("/exchanges/vocabulary"),
+
+  myExchanges: (partyId: string, token: string) =>
+    req<{ party_id: string; exchanges: Exchange[] }>(
+      `/parties/${partyId}/exchanges`, { token }),
+
+  exchange: (exchangeId: string, token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}`, { token }),
+
+  proposeExchange: (body: {
+    host_id: string; guest_id: string; work: string; industry: string;
+    includes?: string[]; excludes?: string[]; fee?: number; desk_id?: string;
+  }, token: string) =>
+    req<Exchange>("/exchanges", { method: "POST", body, token }),
+
+  // Returns the whole exchange, not the item — read the new item off
+  // `.items`. Adding one also drops a signed exchange back to draft, which
+  // is why the screen re-renders the whole manifest from this reply rather
+  // than appending a row to what it already had.
+  addExchangeItem: (exchangeId: string, body: {
+    direction: string; name: string; kind: string; bytes?: number; note?: string;
+  }, token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}/items`,
+      { method: "POST", body, token }),
+
+  removeExchangeItem: (exchangeId: string, itemId: string, token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}/items/${itemId}`,
+      { method: "DELETE", token }),
+
+  signExchange: (exchangeId: string, actorId: string, token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}/sign`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  reopenExchange: (exchangeId: string, actorId: string, token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}/reopen`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  // The one call a transport makes. Kept separate from `exchange()` even
+  // though the manifest embeds it, because "may anything move" is the
+  // question worth asking on its own.
+  exchangeChannel: (exchangeId: string, token: string) =>
+    req<ExchangeChannel>(`/exchanges/${exchangeId}/channel`, { token }),
+
+  // One item at a time, by the side receiving it. The server refuses a
+  // sender accepting their own item, which is what keeps a signature on an
+  // agreement from being a signature on a download.
+  acceptExchangeItem: (exchangeId: string, itemId: string, actorId: string,
+                       token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}/items/${itemId}/accept`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  withdrawExchange: (exchangeId: string, actorId: string, token: string) =>
+    req<Exchange>(`/exchanges/${exchangeId}/withdraw`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  // ---------------------------------------------------------------------
+  // Lending a skill inside a place two people already share.
+  //
+  // The asymmetry is the feature and the screen shows it: two people to
+  // open a grant, either one alone to close it.
+  // ---------------------------------------------------------------------
+
+  skillGrantVocabulary: () => req<SkillGrantVocabulary>("/skill-grants/vocabulary"),
+
+  skillGrant: (grantId: string, token: string) =>
+    req<SkillGrant>(`/skill-grants/${grantId}`, { token }),
+
+  offerSkill: (body: {
+    lender_id: string; borrower_id: string; surface: string;
+    surface_id: string; skill_kind: string; skill_ref: string;
+    title: string; note?: string; fee?: number;
+  }, token: string) =>
+    req<SkillGrant>("/skill-grants", { method: "POST", body, token }),
+
+  acceptSkillGrant: (grantId: string, actorId: string, token: string) =>
+    req<SkillGrant>(`/skill-grants/${grantId}/accept`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  declineSkillGrant: (grantId: string, actorId: string, token: string) =>
+    req<SkillGrant>(`/skill-grants/${grantId}/decline`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  closeSkillGrant: (grantId: string, actorId: string, reason: string,
+               token: string) =>
+    req<SkillGrant>(`/skill-grants/${grantId}/close`,
+      { method: "POST", body: { actor_id: actorId, reason }, token }),
+
+  // Returns a receipt, not the grant: what was used, where, and the
+  // server's own line that nothing was installed. Checked at use rather
+  // than at grant time, so closing a grant stops the very next call.
+  useSkill: (grantId: string, borrowerId: string, what: string,
+             token: string) =>
+    req<SkillGrantReceipt>(`/skill-grants/${grantId}/use`,
+      { method: "POST", body: { borrower_id: borrowerId, what }, token }),
+
+  skillGrantUses: (grantId: string, token: string) =>
+    req<{ grant_id: string; uses: SkillGrantUse[] }>(
+      `/skill-grants/${grantId}/uses`, { token }),
+
+  // ---------------------------------------------------------------------
+  // Watching a posted video together, with synthetic profiles in the room.
+  // ---------------------------------------------------------------------
+
+  watchParty: (partyId: string, token: string) =>
+    req<WatchParty>(`/watch-parties/${partyId}`, { token }),
+
+  startWatchParty: (body: { post_id: string; host_id: string; title?: string },
+                    token: string) =>
+    req<WatchParty>("/watch-parties", { method: "POST", body, token }),
+
+  // Returns the whole party. `kind: "profile"` needs that profile's own
+  // owner token — bringing a synthetic profile into a room speaks in its
+  // voice, so it is its owner's call and nobody else's.
+  joinWatchParty: (partyId: string,
+                   body: { member_id: string; kind?: string; role?: string },
+                   token: string) =>
+    req<WatchParty>(`/watch-parties/${partyId}/members`,
+      { method: "POST", body, token }),
+
+  leaveWatchParty: (partyId: string, memberId: string, token: string) =>
+    req<WatchParty>(`/watch-parties/${partyId}/members/${memberId}`,
+      { method: "DELETE", token }),
+
+  // Moves the room's number. It presses play on nobody's device — which is
+  // what keeps the embed promise from being broken twenty times at once.
+  seekWatchParty: (partyId: string,
+                   body: { host_id: string; position_s: number; playing?: boolean },
+                   token: string) =>
+    req<WatchParty>(`/watch-parties/${partyId}/seek`,
+      { method: "POST", body, token }),
+
+  // The reply carries a moderation `status`, so a line can come back
+  // blocked. The screen shows that rather than optimistically appending.
+  sayInWatchParty: (partyId: string,
+                    body: { member_id: string; body: string;
+                            at_position_s?: number },
+                    token: string) =>
+    req<PostedLine>(`/watch-parties/${partyId}/chat`,
+      { method: "POST", body, token }),
+
+  watchPartyChat: (partyId: string, token: string) =>
+    req<{ party_id: string; lines: PartyLine[] }>(
+      `/watch-parties/${partyId}/chat`, { token }),
+
+  // What a synthetic profile in this party is allowed to know — and, more
+  // to the point, what it is not. Worth a door of its own: a person can
+  // read the exact instruction their profile was given about the video it
+  // has not seen, instead of taking on trust that it was given one.
+  watchPartyContext: (partyId: string, token: string) =>
+    req<PartyContext>(`/watch-parties/${partyId}/context`, { token }),
+
+  endWatchParty: (partyId: string, hostId: string, token: string) =>
+    req<PartyEnded>(`/watch-parties/${partyId}/end`,
+      { method: "POST", body: { host_id: hostId, position_s: 0 }, token }),
 };

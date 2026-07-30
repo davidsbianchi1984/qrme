@@ -1,6 +1,5 @@
 DELETE /comments/{comment_id}
 DELETE /displays/{display_id}
-DELETE /exchanges/{exchange_id}/items/{item_id}
 DELETE /gaming/sessions/{session_id}/lobby
 DELETE /handoffs/{handoff_id}
 DELETE /memberships/{account_id}
@@ -14,7 +13,6 @@ DELETE /profiles/{profile_id}/messages/{message_id}
 DELETE /profiles/{profile_id}/wearables/{name}
 DELETE /robots/{robot_id}
 DELETE /rooms/{room_id}/mic/{interactor_id}
-DELETE /watch-parties/{party_id}/members/{member_id}
 DELETE /{kind}/{subject_id}/subscribe
 GET /agent/lights
 GET /auth/oauth/{provider}/callback
@@ -37,9 +35,6 @@ GET /dock/faces
 GET /dock/where/{face}
 GET /dock/{profile_id}
 GET /dock/{profile_id}/face/{name}
-GET /exchanges/vocabulary
-GET /exchanges/{exchange_id}
-GET /exchanges/{exchange_id}/channel
 GET /excursions/{cid}
 GET /gaming/lobby/vocabulary
 GET /gaming/sessions/{session_id}/lobby
@@ -58,7 +53,6 @@ GET /orders
 GET /organizations/{org_id}
 GET /overlays/catalogue
 GET /pages/themes
-GET /parties/{party_id}/exchanges
 GET /people/{person_id}/skill-grants
 GET /places/{surface}/{surface_id}/microphone
 GET /places/{surface}/{surface_id}/overlay
@@ -102,9 +96,6 @@ GET /robots/{robot_id}/steering
 GET /rooms/{room_id}/mic
 GET /signatures/ceremony
 GET /signatures/{sig_id}/certificate
-GET /skill-grants/vocabulary
-GET /skill-grants/{grant_id}
-GET /skill-grants/{grant_id}/uses
 GET /social/{cid}/beacon
 GET /social/{cid}/qr.svg
 GET /subscriptions
@@ -114,9 +105,6 @@ GET /tutorial/for-screen/{number}
 GET /tutorial/progress/{learner_id}
 GET /tutorial/steps/{key}
 GET /venues
-GET /watch-parties/{party_id}
-GET /watch-parties/{party_id}/chat
-GET /watch-parties/{party_id}/context
 GET /watermarks/{watermark_id}
 GET /{kind}/{subject_id}/gifts
 GET /{kind}/{subject_id}/subscribers
@@ -126,12 +114,6 @@ PATCH /profiles/{profile_id}/messages/{message_id}
 POST /auth/oauth/{provider}/callback
 POST /camera/sessions
 POST /camera/sessions/{session_id}/close
-POST /exchanges
-POST /exchanges/{exchange_id}/items
-POST /exchanges/{exchange_id}/items/{item_id}/accept
-POST /exchanges/{exchange_id}/reopen
-POST /exchanges/{exchange_id}/sign
-POST /exchanges/{exchange_id}/withdraw
 POST /gaming/sessions/{session_id}/lobby
 POST /handoffs
 POST /memberships/{account_id}
@@ -175,19 +157,9 @@ POST /referrals/{referral_id}/release
 POST /referrals/{referral_id}/reply
 POST /rooms/{room_id}/mic
 POST /signatures/credentials/{row_id}/proofing
-POST /skill-grants
-POST /skill-grants/{grant_id}/accept
-POST /skill-grants/{grant_id}/close
-POST /skill-grants/{grant_id}/decline
-POST /skill-grants/{grant_id}/use
 POST /subscriptions/{sub_id}/renew
 POST /tutorial/done
 POST /tutorial/start
-POST /watch-parties
-POST /watch-parties/{party_id}/chat
-POST /watch-parties/{party_id}/end
-POST /watch-parties/{party_id}/members
-POST /watch-parties/{party_id}/seek
 POST /watermarks/verify
 POST /{kind}/{subject_id}/gift
 POST /{kind}/{subject_id}/subscribe

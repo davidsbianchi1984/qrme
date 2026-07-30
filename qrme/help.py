@@ -242,6 +242,16 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "problems": ("what went wrong", "error", "errors", "it failed",
                  "something broke", "bug", "report a bug", "crash",
                  "stop sending", "stop reporting", "opt out", "diagnostics"),
+    # People arrive at an exchange from the money side ("contract", "invoice")
+    # or the file side ("send me the files"), and the point of the feature is
+    # that those are the same screen. Both sets of words go here.
+    "exchanges": ("exchange", "agreement", "contract", "sign", "signature",
+                  "send me the files", "hand over", "deliverables",
+                  "what is included", "scope", "invoice", "manifest"),
+    "grants": ("lend", "borrow", "lent", "share a skill", "let them use",
+               "grant", "loan", "use my", "revoke", "stop letting them"),
+    "party": ("watch together", "watch party", "watch with", "same video",
+              "sync video", "viewing party", "watch a video together"),
 }
 
 

@@ -255,6 +255,47 @@ LESSONS: tuple[dict, ...] = (
               "the exact thing it would send.",
          screens=(150, 151),
          try_it="Open Control and press 'Show me exactly what would be shared'."),
+    dict(key="exchanges", chapter="Working", title="Agreeing before it moves",
+         what="Somebody comes up as a guest and it turns into business. An "
+              "exchange is a document before it is a transfer: it lists what "
+              "goes across in each direction, item by item, what the work is, "
+              "what is included when it is finished, and what is not. Then "
+              "both of you sign, and only then can anything move. Change one "
+              "item afterwards and both signatures are cleared — you will "
+              "watch it drop back to a draft — because otherwise you agreed "
+              "to a two-item list and the other side appended to it. Nothing "
+              "downloads on its own either: the receiving side accepts each "
+              "item separately, and anything that runs on your machine says "
+              "so before you sign. This moves the things that are listed. It "
+              "opens no session on anybody's device.",
+         screens=(153,),
+         try_it="Propose one, list a file, sign — then add another file and "
+                "watch both signatures disappear."),
+    dict(key="grants", chapter="Working", title="Lending what you can do",
+         what="Not a file, not a licence — a skill of yours made usable by "
+              "somebody else, inside one place you both share, for as long as "
+              "either of you wants it there. It takes two of you to open one "
+              "and only one of you to close it, which is the point: somebody "
+              "who has changed their mind should not need the agreement of "
+              "the person benefiting. Nothing is installed on their account, "
+              "and every use is written down where both of you can read it — "
+              "not just the lender, because a log only one side can see is "
+              "not a record, it is a watch.",
+         screens=(154,),
+         try_it="Lend something into a room, then end it and try to use it."),
+    dict(key="party", chapter="Working", title="Watching together",
+         what="A posted video, a position everybody shares, and whoever you "
+              "bring — including your own profiles, which are marked as "
+              "synthetic to everyone in the room. The host moves the "
+              "position, and moving it moves a number: nobody's player starts "
+              "on their device but their own. The part worth looking at is "
+              "what a profile in the room actually knows. It gets the title, "
+              "the platform, the position and the recent chat — and it has "
+              "not seen the video. You can read the exact instruction it was "
+              "given about that, which tells it to say so rather than invent "
+              "an opinion about footage nobody showed it.",
+         screens=(155,),
+         try_it="Open a party and read 'What a profile in here knows'."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "

@@ -23,6 +23,11 @@ htmlcov/
 
 # Local databases & secrets — never commit runtime data
 *.db
+# SQLite's write-ahead sidecars. `*.db` alone does not cover them, so running
+# the backend once leaves two untracked files sitting in `git status` for
+# everybody — and untracked noise is how a real file gets missed in the scroll.
+*.db-shm
+*.db-wal
 *.sqlite3
 .env
 .env.*

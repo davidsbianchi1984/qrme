@@ -71,6 +71,49 @@ const CHROME: Table = {
     pt: "Controle", it: "Controllo", ja: "コントロール", zh: "控制",
     hi: "नियंत्रण", ar: "التحكم",
   },
+  // The four below were missing, and a missing key here does not fall back
+  // to the English label sitting right next to it in NAV — `t()` returns the
+  // key itself, so the sidebar has been reading "nav.market", "nav.delegate",
+  // "nav.desk" and "nav.voice" in every language including English. The
+  // fallback chain was written to never show a blank and it never did; it
+  // showed an identifier instead, which is worse, because a blank looks
+  // broken and an identifier looks like a label somebody chose.
+  //
+  // `test_nav_labels_are_localised` fails now if a tab arrives without one.
+  "nav.market": {
+    en: "Marketplace", es: "Mercado", fr: "Place de marché", de: "Marktplatz",
+    pt: "Mercado", it: "Mercato", ja: "マーケット", zh: "市场",
+    hi: "बाज़ार", ar: "السوق",
+  },
+  "nav.delegate": {
+    en: "Delegation", es: "Delegación", fr: "Délégation", de: "Delegation",
+    pt: "Delegação", it: "Delega", ja: "委任", zh: "委托",
+    hi: "प्रत्यायोजन", ar: "التفويض",
+  },
+  "nav.desk": {
+    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Tresen", pt: "Balcão",
+    it: "Banco", ja: "デスク", zh: "服务台", hi: "डेस्क", ar: "المكتب",
+  },
+  "nav.voice": {
+    en: "Voice", es: "Voz", fr: "Voix", de: "Stimme", pt: "Voz",
+    it: "Voce", ja: "音声", zh: "语音", hi: "आवाज़", ar: "الصوت",
+  },
+  "nav.exchanges": {
+    en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
+    pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",
+    ar: "التبادلات",
+  },
+  "nav.grants": {
+    en: "Lent skills", es: "Aptitudes prestadas", fr: "Compétences prêtées",
+    de: "Geliehene Fähigkeiten", pt: "Aptidões emprestadas",
+    it: "Abilità prestate", ja: "貸した技能", zh: "借出的技能",
+    hi: "उधार दिए कौशल", ar: "المهارات المُعارة",
+  },
+  "nav.party": {
+    en: "Watch together", es: "Ver juntos", fr: "Regarder ensemble",
+    de: "Zusammen ansehen", pt: "Assistir juntos", it: "Guardare insieme",
+    ja: "一緒に見る", zh: "一起观看", hi: "साथ देखें", ar: "المشاهدة معًا",
+  },
   "signout": {
     en: "Sign out", es: "Cerrar sesión", fr: "Se déconnecter", de: "Abmelden",
     pt: "Sair", it: "Esci", ja: "サインアウト", zh: "退出登录",

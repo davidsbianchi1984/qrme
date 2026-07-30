@@ -338,6 +338,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/151-before-anything-is-sent.svg"><img src="docs/screens/151-before-anything-is-sent.svg" width="210" alt="Before Anything Is Sent"></a><br><sub><b>151</b> · Before Anything Is Sent</sub></td>
     <td align="center" width="33%"><a href="docs/screens/152-marketplace.svg"><img src="docs/screens/152-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/153-exchanges.svg"><img src="docs/screens/153-exchanges.svg" width="210" alt="Exchanges"></a><br><sub><b>153</b> · Exchanges</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/154-lent-skills.svg"><img src="docs/screens/154-lent-skills.svg" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/155-watch-together.svg"><img src="docs/screens/155-watch-together.svg" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -2156,6 +2161,12 @@ Hooking one machine up to another is a different feature with a different
 threat model, and shipping it quietly inside a file-sharing agreement would be
 the wrong way to arrive at it.
 
+The console reaches all of it (**153**): propose, list what crosses, sign,
+and accept item by item. The screen re-renders the whole agreement from every
+reply rather than patching what is already on it, so an edit that clears the
+signatures is something you watch happen rather than something you are told
+about afterwards.
+
 ## Lending a skill, in any room you are both in
 
 Two people are in the same place — a room, a live desk, a watch party, a
@@ -2203,6 +2214,12 @@ it mid-sentence.
 | to open | both, and only the person it was offered to may accept |
 | to close | either, alone |
 | transferred | nothing |
+
+The console door (**154**) is arranged around the asymmetry. The button that
+ends a grant is never disabled by which side you are on, because the moment
+withdrawal matters is exactly the moment the other party would not agree to it.
+The use log is shown to both of you: a record only one side can read is not a
+record.
 
 ## Who these surfaces think you are
 
@@ -2273,6 +2290,11 @@ build. Party chat is moderated like every other utterance, a party with a minor
 in it runs strict, and a party can only be opened on an **approved** post —
 otherwise it would be a way to put a video in front of people that the wall
 refuses to show them.
+
+The console shows that instruction verbatim (**155**), in a panel of its own.
+A person whose profile is sitting in a room discussing a film can read exactly
+what it was told about not having seen it, rather than trusting that it was
+told anything.
 
 ## The page you make yourself
 

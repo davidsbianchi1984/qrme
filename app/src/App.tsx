@@ -9,6 +9,9 @@ import { Delegate } from "./screens/Delegate";
 import { Desk } from "./screens/Desk";
 import { Discover } from "./screens/Discover";
 import { Market } from "./screens/Market";
+import { Exchanges } from "./screens/Exchanges";
+import { Grants } from "./screens/Grants";
+import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
 import { Wall } from "./screens/Wall";
 import { Friends } from "./screens/Friends";
@@ -25,7 +28,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -43,6 +46,9 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "memory", label: "Memory Vault", icon: "🔒" },
   { id: "delegate", label: "Delegation", icon: "🤝" },
   { id: "desk", label: "Desk", icon: "🛎" },
+  { id: "exchanges", label: "Exchanges", icon: "📝" },
+  { id: "grants", label: "Lent skills", icon: "🪄" },
+  { id: "party", label: "Watch together", icon: "🍿" },
   { id: "voice", label: "Voice", icon: "🎙" },
   { id: "settings", label: "Control", icon: "⚙" },
 ];
@@ -110,6 +116,9 @@ export function App() {
         {tab === "memory" && <Memory />}
         {tab === "delegate" && <Delegate />}
         {tab === "desk" && <Desk />}
+        {tab === "exchanges" && <Exchanges />}
+        {tab === "grants" && <Grants />}
+        {tab === "party" && <WatchParty />}
         {tab === "voice" && <Voice />}
         {tab === "settings" && <Settings />}
       </main>
