@@ -3448,6 +3448,55 @@ SCREENS = [
         dict(icon="coin", color="green", k="Money is simulated",
              s="and the screen says so"),
     ], button=("Buy at the shown price", "brand")),
+    # 153, 154 and 155 are the three two-party surfaces. Each drawing leads
+    # with the rule that makes the feature more than a form, because that rule
+    # is the thing a screenshot has to carry — the mechanics are obvious and
+    # the constraint is not.
+    #
+    # 153: any change to the manifest voids both signatures. Drawn as a state,
+    # not a warning, because it is something that happens to you rather than
+    # something you are told about.
+    dict(num=153, title="Exchanges", sub="Agreed before anything moves",
+         accent="brand", tab=2, cards=[
+        dict(icon="doc", color="brand", k="What crosses",
+             s="each item, kind and size"),
+        dict(icon="pen", color="amber", k="Edit voids both",
+             s="it is meant to be annoying",
+             pill=("DRAFT", "warn")),
+        dict(icon="warn", color="red", k="ordering-page.zip",
+             s="runs on your machine"),
+        dict(icon="lock", color="green", k="Nothing self-downloads",
+             s="you accept one at a time"),
+    ], button=("Sign this exact manifest", "brand")),
+    # 154: the asymmetry. Two to open, one to close — so the close control is
+    # drawn as available, not greyed behind the other party's agreement.
+    dict(num=154, title="Lent Skills", sub="Used, never copied",
+         accent="cyan", tab=2, cards=[
+        dict(icon="gift", color="cyan", k="Two to open it",
+             s="offered until they accept"),
+        dict(icon="cross", color="amber", k="Either can end it",
+             s="alone, without agreement",
+             pill=("OPEN", "good")),
+        dict(icon="compass", color="brand", k="In one place only",
+             s="and it ends when that does"),
+        dict(icon="list", color="green", k="Every use logged",
+             s="both of you can read it"),
+    ], button=("End it", "brand")),
+    # 155: the party. The card that matters is the last one — a profile in the
+    # room has not seen the video, and the screen shows the instruction it was
+    # given rather than asserting that it was given one.
+    dict(num=155, title="Watch Together", sub="A shared position, not a player",
+         accent="amber", tab=2, cards=[
+        dict(icon="people", color="brand", k="Who is here",
+             s="people and your profiles"),
+        dict(icon="mask", color="cyan", k="Marked synthetic",
+             s="on every member, always",
+             pill=("2", "info")),
+        dict(icon="clock", color="amber", k="Host moves it",
+             s="nobody's player is started"),
+        dict(icon="eye", color="green", k="It has not seen it",
+             s="and is told to say so"),
+    ], button=("Say something", "brand")),
     # (Watch faces 10 and 11 mirror these two — docs/watch/build.py.)
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
