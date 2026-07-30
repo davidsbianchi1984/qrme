@@ -1,34 +1,66 @@
-# QRME v0.18.0 — release notes
+# QRME v0.19.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.18.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.19.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.18.0** — the shells catch up, and so do the drawings.
+**QRME v0.19.0** — the app can tell you what broke, without telling you
+anything about anybody.
 
-The two features that had gained console doors but no native ones now
-have them. **Who wrote this?** reaches Manage on iOS, Android and
-Windows — paste a passage and it names the profile that produced it, from
-the text alone, showing matched passages out of stored rather than a bare
-yes, and naming nobody at all below the 0.25 threshold. **The role
-picker** reaches the chat composer on all three, defaulting to "read my
-prompt" and reporting back which role applied *and whether it was
-declared or inferred*, so an inference is never handed back as an
-instruction.
+Every failed request in the console is now recorded and, where a build has
+somewhere to send, reported. What gets kept is the *operation* and the
+status code: `POST /profiles/{id}/chat → 500` identifies a bug, where
+`POST /profiles/prf_0de08e794ed0/chat` identifies a person. Only the first
+is written down, and the redaction happens before the row is stored, so
+there is no moment at which the buffer holds something that would later
+have to be scrubbed.
 
-That completes something two earlier rounds each claimed and neither
-finished: every feature with a door in the web console now has one in the
-native shells.
+The obvious version of this would have quietly undone what every other
+screen promises. These backends put user input straight into their error
+messages — *no device called 'Pixel Buds' on this account*, *unknown site
+'knee'*. Good messages for the person reading them, and the wrong thing to
+keep. So the message is shown to you, who own it, and is **never written
+to the log**.
 
-**And the drawings caught up.** Voice cloning, the recoverable watermark
-and the role all shipped with no screen, no lesson, and no way for the
-in-app helper to point at them — for two whole versions. Three screens
-join the gallery (**147 Your Own Voice**, **148 Who Wrote This?**, **149
-How Should They Work?**), each with a lesson in its proper chapter, each
-reachable by asking the helper in the words somebody would actually type:
-"clone my voice", "who wrote this", "just do it".
+**Nothing goes before you have been asked.** Sending is opt-out, which
+only means something if the opting-out can happen before the first report
+rather than being discovered afterwards in a panel nobody opened. A
+first-run notice holds everything until it is answered — and it shows the
+actual payload rather than describing it, from the same function that
+sends it, so it cannot go stale while still reading honestly. The switch
+on the Control card is that same answer, changeable whenever.
 
-**Fixed** — `SmallAction` on Android took no `enabled` parameter, so a
-busy or empty action looked live and merely ignored taps. It takes one
-now, and the label dims with it.
+Counts are sent as **deltas**: each row remembers how much of itself has
+been reported, so reopening the app twenty times does not turn one broken
+screen into twenty. A failed send moves nothing, and the next launch
+retries.
+
+**The gateway refuses rather than redacts.** `cloudgw` gains
+`POST /v1/problems`, which accepts exactly five top-level keys and five
+per problem and rejects anything else — an unknown field, a `platform`
+string long enough to hide a sentence, a `day` carrying a time of day, a
+path with an unredacted id still in it. It could redact that path itself;
+doing so would let a build whose redaction had broken keep working while
+nobody learned that every report from those users had been arriving with a
+profile id in it.
+
+What survives is less than what arrives. Reports are not stored as
+reports — they fold into counters keyed by product, version, platform,
+operation and status. Locale is validated and then dropped, and nothing
+records that a particular install sent anything, or when beyond the day.
+
+**Off by default, by absence rather than by flag.** The collector address
+is compiled in at build time and unset, so an installer built without one
+has nowhere to send and no code path that could acquire one. There is no
+address for a later mistake to switch on.
+
+**Fixed** — four bugs found by running the thing rather than reasoning
+about it. The gateway had no CORS at all, so every browser preflight would
+have been refused and every report would have failed silently. Its
+validators were anchored with `$`, which in Python also matches before a
+trailing newline, so `Win32\n` passed a check whose error message promised
+newlines were not allowed. A counter file that was valid JSON of the wrong
+shape was adopted wholesale and took the read endpoint down with it. And
+the test guarding the payload shape ran only in this repository — the one
+where a leak would have mattered least.
