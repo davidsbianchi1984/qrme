@@ -8,6 +8,7 @@ import { Chat } from "./screens/Chat";
 import { Delegate } from "./screens/Delegate";
 import { Desk } from "./screens/Desk";
 import { Discover } from "./screens/Discover";
+import { Market } from "./screens/Market";
 import { Voice } from "./screens/Voice";
 import { Wall } from "./screens/Wall";
 import { Friends } from "./screens/Friends";
@@ -24,12 +25,13 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
   { id: "chat", label: "Chat", icon: "💬" },
   { id: "discover", label: "Discover", icon: "🛍" },
+  { id: "market", label: "Marketplace", icon: "🏷" },
   { id: "wall", label: "Wall", icon: "🧱" },
   { id: "friends", label: "Friends", icon: "👥" },
   { id: "rooms", label: "Rooms", icon: "🎧" },
@@ -96,6 +98,7 @@ export function App() {
         {tab === "home" && <Home go={setTab} />}
         {tab === "chat" && <Chat />}
         {tab === "discover" && <Discover />}
+        {tab === "market" && <Market />}
         {tab === "wall" && <Wall />}
         {tab === "friends" && <Friends />}
         {tab === "rooms" && <Rooms />}

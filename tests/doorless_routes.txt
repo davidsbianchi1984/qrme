@@ -3,8 +3,6 @@ DELETE /displays/{display_id}
 DELETE /exchanges/{exchange_id}/items/{item_id}
 DELETE /gaming/sessions/{session_id}/lobby
 DELETE /handoffs/{handoff_id}
-DELETE /marketplace/listings/{listing_id}/offer
-DELETE /marketplace/listings/{listing_id}/place
 DELETE /memberships/{account_id}
 DELETE /placements/{placement_id}
 DELETE /places/{surface}/{surface_id}/microphone
@@ -51,12 +49,6 @@ GET /help/topics
 GET /identity/emblems
 GET /identity/vocabulary
 GET /interactors/{interactor_id}/referrals
-GET /marketplace
-GET /marketplace/listings/{listing_id}/offer
-GET /marketplace/localities
-GET /marketplace/sales
-GET /marketplace/search
-GET /marketplace/settings/{interactor_id}
 GET /memberships/{account_id}
 GET /microphones/places
 GET /microphones/vocabulary
@@ -142,8 +134,6 @@ POST /exchanges/{exchange_id}/sign
 POST /exchanges/{exchange_id}/withdraw
 POST /gaming/sessions/{session_id}/lobby
 POST /handoffs
-POST /marketplace/assist
-POST /marketplace/listings/{listing_id}/purchase
 POST /memberships/{account_id}
 POST /moderation/{message_id}/approve
 POST /moderation/{message_id}/reject
@@ -204,9 +194,6 @@ POST /{kind}/{subject_id}/subscribe
 PUT /displays/{display_id}/faces
 PUT /dock/{profile_id}
 PUT /interactors/{interactor_id}/quiet-hours
-PUT /marketplace/listings/{listing_id}/offer
-PUT /marketplace/listings/{listing_id}/place
-PUT /marketplace/settings/{interactor_id}
 PUT /profiles/{profile_id}/anonymity
 PUT /profiles/{profile_id}/avatar
 PUT /profiles/{profile_id}/emblem
