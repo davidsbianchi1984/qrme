@@ -3405,6 +3405,33 @@ SCREENS = [
              s="the reply says which",
              pill=("INFERRED", "good")),
     ], button=("Send", "brand")),
+    # 150 and 151 are the error report and the notice that precedes it. The
+    # card shows an operation and a status and nothing else, because that is
+    # all the log holds — drawing a message here would depict a product that
+    # does not exist.
+    dict(num=150, title="What Went Wrong", sub="The operation, not the instance",
+         accent="cyan", tab=15, cards=[
+        dict(icon="warn", color="amber", k="POST /profiles/{id}/chat",
+             s="500 · twice · 30 Jul"),
+        dict(icon="link", color="cyan", k="GET /profiles/{id}/feed",
+             s="no answer · once · 30 Jul"),
+        dict(icon="eye", color="brand", k="No message kept",
+             s="it quotes what you typed"),
+        dict(icon="shieldok", color="green", k="Sent at launch",
+             s="only what you see here",
+             pill=("ON", "good")),
+    ], button=("Show me exactly what is sent", "brand")),
+    dict(num=151, title="Before Anything Is Sent", sub="Asked once, answerable forever",
+         accent="green", tab=15, cards=[
+        dict(icon="info", color="cyan", k="When it fails",
+             s="we would like to know"),
+        dict(icon="lock", color="green", k="Never the message",
+             s="never who you are"),
+        dict(icon="doc", color="brand", k="See the payload",
+             s="the same object we post"),
+        dict(icon="gear", color="amber", k="Change it later",
+             s="the switch is in Control"),
+    ], button=("That's fine", "brand")),
     # (Watch faces 10 and 11 mirror these two — docs/watch/build.py.)
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
