@@ -1192,13 +1192,19 @@ private fun AppsPanel(vm: StudioViewModel) {
 }
 
 @Composable
-private fun SmallAction(text: String, onClick: () -> Unit) {
+private fun SmallAction(text: String, enabled: Boolean = true,
+                        onClick: () -> Unit) {
+    // `enabled` defaults true so the existing call sites are untouched. Both
+    // backgrounds are Colors here (unlike JIM's, where the brand is a Brush),
+    // so one ternary is enough rather than layering two background() calls.
     Box(
-        Modifier.clip(RoundedCornerShape(50)).background(Qrme.BrandA)
-            .clickable { onClick() }
+        Modifier.clip(RoundedCornerShape(50))
+            .background(if (enabled) Qrme.BrandA else Qrme.Card)
+            .clickable(enabled = enabled) { onClick() }
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        Text(text, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+        Text(text, color = if (enabled) Color.White else Qrme.T3,
+            fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
 }
 
