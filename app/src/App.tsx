@@ -20,6 +20,7 @@ import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
 import { Help } from "./Help";
+import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
@@ -91,6 +92,7 @@ export function App() {
       </aside>
 
       <main className="content">
+        <ProblemNotice />
         {tab === "home" && <Home go={setTab} />}
         {tab === "chat" && <Chat />}
         {tab === "discover" && <Discover />}
