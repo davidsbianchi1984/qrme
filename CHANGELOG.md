@@ -6,8 +6,40 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-**The guard written to catch the Wall bug had a hole in it, and six client
-surfaces had no guard at all.** 0.17.0 fixed a 404 under every like, comment
+**The guard now checks the verb, not just the address.** Matching a path while
+ignoring the method accepts a client that sends POST where only GET is mounted.
+The answer is a 405 rather than a 404, and from the user's side that is the same
+dead button — so the check was proving less than it appeared to. It now requires
+a full router match, method included, and reads the verb the way each language
+actually writes it: labelled in TypeScript and Swift (`method: "PUT"`),
+positional in Kotlin, encoded in the helper's own name in C# (`Post(...)`,
+`HttpMethod.Get`).
+
+Scoping the check to the enclosing *call* rather than to loose path-shaped
+strings is what made that possible, and it fixed the boundary in both
+directions. Double-quoted paths — the ones written without interpolation — had
+been skipped entirely on a guard that claimed to cover the console, leaving a
+third of its call sites unchecked; 42 paths became 74 verb-and-path pairs. In
+the other direction, `"/app"` stopped being counted as a request: it appears in
+`defaultBase()`, where the console asks whether `window.location.pathname`
+starts with it to work out where it is being served. Only something that knows
+what encloses a literal can tell a request from a question about the page.
+
+Each language's verb reader gets its own liveness test, because they are
+separate code and they fail quietly. If one stops matching, every call from that
+surface silently becomes a GET — and since most routes do serve a GET, the suite
+would stay green while checking almost nothing. A surface reaching dozens of
+routes and reporting a single verb is that failure, so it is now an assertion.
+
+No new field bug came out of this either: all 340 verb-and-path pairs across the
+four surfaces are accepted. Method-awareness was verified by injecting the
+mistake it exists to catch — a console POST turned PUT, an iOS call stripped of
+its `method:` label so it fell back to GET — and watching the check name the
+verb the route actually accepts.
+
+Earlier in this cycle, the same guard gained the coverage it was missing
+altogether: **it had a hole in it, and six client surfaces had no guard at
+all.** 0.17.0 fixed a 404 under every like, comment
 and share, and added a test so it could not come back. That test cut a path
 at its first interpolation whenever a query followed — correct for
 `?tag=${tag}`, wrong for `/profiles/${id}/media?filename=${…}`, which it

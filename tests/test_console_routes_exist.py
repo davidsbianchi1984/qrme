@@ -28,21 +28,30 @@ API_TS = clientpaths.REPO / "app" / "src" / "api.ts"
 _COMMENTS = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
 
 
-def test_every_console_path_reaches_a_route():
-    """A guard against a path no route accepts at all.
+def test_every_console_call_reaches_a_route():
+    """Method and path together, for every `req(...)` the console makes.
 
-    Worth knowing its limit: this would *not* have caught the Wall bug. The
-    singular `/post/x/like` matches the generic `/{kind}/{target_id}/like`
-    pattern perfectly well at the routing layer, and the 404 is raised inside
-    the handler when the segment fails the kind lookup. Routing-level checks
-    cannot see refusals that happen after dispatch — which is why the two tests
-    below assert the segment itself, and send the request.
+    Checking the path alone accepts a client sending POST where only GET is
+    mounted. That is a 405, and from the user's side it is the same dead button
+    as a 404 — so the assertion is a FULL router match, not a partial one.
+
+    Scoping to enclosing calls is what makes that possible, and it also fixes a
+    false positive: `"/app"` is a path-shaped literal in `defaultBase()`, where
+    the console asks whether `window.location.pathname` starts with it. That is
+    a question about where the page is served, not a request.
+
+    Worth knowing the limit that remains: this would *not* have caught the Wall
+    bug. The singular `/post/x/like` matches the generic
+    `/{kind}/{target_id}/like` route perfectly well, and the 404 is raised
+    inside the handler when the segment fails the kind lookup. Routing-level
+    checks cannot see refusals that happen after dispatch — which is why the
+    tests below assert the segment itself, and send the request.
     """
-    missing = clientpaths.unresolved(app, CONSOLE)
-    assert not missing, (
-        "the console builds these paths and no route accepts them:\n  "
-        + "\n  ".join(missing)
-        + "\n(a 404 the user meets as a button that does nothing)"
+    bad = clientpaths.refused(app, CONSOLE)
+    assert not bad, (
+        "the console makes these requests and no route accepts them:\n  "
+        + "\n  ".join(bad)
+        + "\n(a 404 or 405 the user meets as a button that does nothing)"
     )
 
 
@@ -80,6 +89,30 @@ def test_an_interpolated_query_does_not_truncate_the_path():
     for path in ("/profiles/x/feed", "/profiles/x/media"):
         assert path in found, f"{path} is still not reaching the guard"
         assert resolves(app, path), f"{path} reaches no route"
+
+
+def test_the_check_is_really_method_aware():
+    """Pinned against the live app, so it cannot quietly relax to path-only.
+
+    The earlier version of this guard accepted a partial router match — path
+    right, method ignored. That passes a client sending PUT where only POST is
+    mounted, which answers 405 and looks to the user exactly like the 404 the
+    guard exists to prevent. Asserting a real verb difference on a real route is
+    what keeps the distinction alive; asserting it on a fixture would not.
+    """
+    assert clientpaths.accepts(app, "POST", "/interactors")
+    assert not clientpaths.accepts(app, "PUT", "/interactors")
+    assert clientpaths.methods_for(app, "/interactors") == ["POST"]
+
+    # And every call the console makes is recorded with a verb, not a bare path.
+    made = clientpaths.calls(CONSOLE)
+    assert made, "no console calls were extracted at all"
+    verbs = {method for method, _ in made}
+    assert verbs <= set(clientpaths.VERBS), f"unexpected verbs: {verbs}"
+    assert {"GET", "POST"} <= verbs, (
+        f"the console surely does more than {verbs} — the verb reader has "
+        "probably stopped matching"
+    )
 
 
 def test_the_wall_buttons_use_the_mapped_segment():

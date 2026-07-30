@@ -172,7 +172,12 @@ dead like, comment and share buttons in every release that had them, fixed in
 
 [`tests/test_native_routes_exist.py`](../tests/test_native_routes_exist.py)
 extracts every API path literal from `native/` — around 220 of them, in Swift,
-Kotlin and C# — and asks the real router about each one. It also bans the
+Kotlin and C# — with the HTTP method each one is sent with, and asks the real
+router whether that *pair* is accepted. Method matters as much as address: a
+shell sending POST where only GET is mounted gets a 405, which is the same dead
+button as a 404. Each language states its verb differently — Swift labels it,
+Kotlin passes it positionally, C# encodes it in the helper's name — so the check
+reads all three rather than assuming GET. It also bans the
 singular of every segment the audience routes map (`/post/` where only
 `/posts/` is reachable), so a fix made on the web cannot be quietly undone on a
 phone.
