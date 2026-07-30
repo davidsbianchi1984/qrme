@@ -6,6 +6,70 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**252 of QRME's 409 routes cannot be reached from any client.** The route
+guards ask whether every call reaches a route. This asks the inverse — whether
+every route is reachable from a door a user can open — and it is the quieter of
+the two failures by far. A client calling a route that does not exist produces a
+404 somebody eventually reports. A route no client calls produces nothing at
+all: the code is present, its tests pass, the changelog says it shipped, and the
+capability is simply unreachable.
+
+Spot-checked rather than asserted. The console reads `/profiles/{id}/friends`
+and shows the list, but `DELETE /profiles/{id}/friends/{fid}` is called by
+nothing — you can gain a friend and never remove one. `/displays`, `/comments`,
+`/agent/lights` and two hundred and fifty others are in the same position.
+
+The count is recorded in `tests/doorless_routes.txt`, and the list is a backlog
+rather than an approval. It cannot grow: a new route with no door fails the
+test, so the gap stops widening on the day it appears. And it must shrink
+deliberately: building a door also fails the test, telling you to strike the
+line, because a backlog that quietly re-fills is how this got to 252.
+
+**A correction to this cycle's earlier entry.** The first version of this audit
+reported *zero* doorless routes and passed. That was wrong, and wrong in the
+most dangerous way — vacuously. `app.routes` is not the flat list it appears to
+be: FastAPI wraps each `include_router` in an `_IncludedRouter` that carries no
+`path` or `methods` of its own, so walking the top level saw **8 routes out of
+409**. Enumeration now recurses through those wrappers. Route *matching* was
+never affected — the wrapper implements `matches` and delegates — so the guards
+built in the last two rounds were sound; only counting was broken.
+
+The guard-on-guard is what caught it, by asserting the route table is not
+implausibly small. That test was written in the same round it went on to
+falsify, which is the argument for writing them.
+
+**Every option the backend offers, it now has to accept.** A catalog endpoint
+is a menu — the console and the three shells render it directly, so whatever it
+lists is what a user can pick. If the endpoint that *consumes* the choice
+refuses one of those values, the user gets an error for doing exactly what they
+were offered.
+
+That is the Wall bug's shape a third time, and the one both route guards said
+plainly they could not see: the request routes perfectly and the refusal happens
+inside the handler, after dispatch. This check stops reading source and sends
+the request. Eight of them, covering languages in both delivery modes, the same
+languages as translation targets, the steering dials the server describes, the
+providers on the model menu, the robots in the catalog, the connectors, and the
+pack registries.
+
+Two decisions worth stating. A 409 is not counted as a refusal — it means the
+server understood the value and objected to the *state* (already bound, already
+connected), which is a different thing from not recognising it. And an empty
+catalog fails rather than passes, because a menu with nothing on it would
+otherwise be a test that checks nothing and reports success.
+
+**No field bug came out of this.** All 49 fixed-set refusals in the backend were
+enumerated, every catalog was probed, and every advertised value is accepted.
+The check was verified by making `/languages` offer Arabic while the writer
+refused it, and watching both language tests fail.
+
+One approach was tried and abandoned rather than shipped: matching client string
+literals to backend vocabularies by field name. `role="dialog"`, `target="_blank"`
+and `platform="xbox"` are ARIA and UI attributes, not API fields, and `kind`
+alone means five different things across five modules. Nearly every hit was a
+false positive, and a guard that cries wolf is worse than no guard — so it is
+not in this release.
+
 **The guard now checks the verb, not just the address.** Matching a path while
 ignoring the method accepts a client that sends POST where only GET is mounted.
 The answer is a 405 rather than a 404, and from the user's side that is the same
