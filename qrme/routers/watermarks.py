@@ -20,6 +20,12 @@ class WatermarkVerify(BaseModel):
     content: str | None = None         # present it to check for tampering
 
 
+class WatermarkRecover(BaseModel):
+    """Text on its own, with no credential id — who wrote it?"""
+
+    content: str
+
+
 class WatermarkDesignSet(BaseModel):
     """The owner's custom display watermark. Empty fields fall back to the
     defaults; clearing both resets to the default design. The AI designation
@@ -56,6 +62,20 @@ def watermark_check(body: WatermarkVerify) -> dict:
             404, "no such watermark — this content was not credentialed by "
                  "this QRME deployment")
     return result
+
+
+@router.post("/watermarks/recover")
+def watermark_recover(body: WatermarkRecover) -> dict:
+    """The other direction: who produced this text, from the text alone.
+
+    `/watermarks/verify` answers "does this content match *this* credential",
+    which needs the id up front and fails on a single edited character. This
+    answers "whose work is this", with no id, and keeps answering after the
+    text has been edited — the field drawing's extract-and-reconstruct step.
+    Never a bare yes: the reply carries the matched-window counts and the
+    similarity so the claim can be checked.
+    """
+    return watermark.recover(body.content)
 
 
 # Registered *after* every literal `/watermarks/...` route, and it has to stay

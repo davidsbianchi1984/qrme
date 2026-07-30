@@ -1329,6 +1329,32 @@ CREATE TABLE IF NOT EXISTS voiceprints (
 -- modalities). The server-side half of the watermark:
 -- holders of content verify against it, and content that merely *claims* a
 -- watermark fails the lookup.
+-- The recoverable half of the watermark (qrme/watermark.py).
+--
+-- The credential above is an exact-hash check: it proves a *known* watermark
+-- id matches a piece of content, and one edited character makes it fail
+-- without saying who wrote the text. The field drawing asks for the other
+-- direction — extract the mark from the text itself, with the key, and
+-- reconstruct the message even after the text has been attacked.
+--
+-- So each stamped text also deposits an inverted index of **keyed shingle
+-- hashes**: overlapping five-word windows of the normalized text, each
+-- HMAC'd with the deployment's watermark key. Recovery hashes a candidate
+-- the same way and asks which stamp shares the most windows — so a
+-- paraphrase that keeps most of the sentences still resolves to its author,
+-- and the score says how much drifted.
+--
+-- Two properties worth naming: the rows are keyed hashes, so the index is
+-- not reversible back into the original text; and without the key an
+-- attacker cannot compute matching windows, so a credential cannot be forged
+-- or transplanted onto other content.
+CREATE TABLE IF NOT EXISTS watermark_shingles (
+    watermark_id TEXT NOT NULL REFERENCES media_watermarks(id),
+    shingle      TEXT NOT NULL,
+    PRIMARY KEY (watermark_id, shingle)
+);
+CREATE INDEX IF NOT EXISTS idx_wmk_shingle ON watermark_shingles(shingle);
+
 CREATE TABLE IF NOT EXISTS media_watermarks (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),
