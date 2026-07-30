@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.17.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.18.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -677,6 +677,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.18.0** | **Parity, and the drawings to prove it** — voice, provenance lookup and the role picker reach iOS/Android/Windows, and every one of them is finally drawn, taught and findable |
 | **0.17.0** | **Voice reaches the microphone, and the Wall's buttons work again** — voice enrollment on iOS/Android/Windows, three features given doors, the recoverable watermark, and a 404 fixed under every like, comment and share |
 | **0.16.0** | **Your own pixels, two new front doors, two new model doors** — wall uploads and pasted-link players, Google/Apple sign-in, DeepSeek and your own algorithm, and the role rides the turn |
 | **0.15.0** | **The temperament dials** — mood, outlook, maturity, agreeableness, confidence, curiosity join the steering catalog |
