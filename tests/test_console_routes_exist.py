@@ -11,59 +11,21 @@ console compiled because a template literal is only a string, and the button
 looked fine until somebody pressed it. That is the gap this closes: the two
 halves are checked against each other rather than each against itself.
 
-Matching goes through Starlette's own router rather than string comparison,
-because several routes are generic in their first segment — a shape test would
-either miss those or invent shapes the app does not have.
+Extraction and matching live in :mod:`tests.clientpaths`, shared with the
+native-shell guard — the same question in four languages.
 """
 
 from __future__ import annotations
 
 import re
-from pathlib import Path
-
-from starlette.routing import Match
 
 from qrme.api import app
 
-API_TS = Path(__file__).resolve().parent.parent / "app" / "src" / "api.ts"
+from . import clientpaths
+from .clientpaths import CONSOLE, normalise, paths, resolves
 
-_INTERP = re.compile(r"\$\{[^{}]*\}")
+API_TS = clientpaths.REPO / "app" / "src" / "api.ts"
 _COMMENTS = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
-# After interpolation a real path holds only URL-safe characters. Prose that
-# happens to sit in backticks does not, which is the cheap way to tell them
-# apart when a stray one survives comment-stripping.
-_URLSAFE = re.compile(r"^[A-Za-z0-9/_.~%:@!$&'()*+,;=-]*$")
-
-
-def _console_paths() -> set[str]:
-    """Concrete paths the console builds, with interpolations filled in.
-
-    A real value rather than a placeholder, so the result is a path the router
-    can actually be asked about. Comments are stripped first: they are not code,
-    and a backticked path inside one is documentation, not a call.
-    """
-    text = _COMMENTS.sub("", API_TS.read_text(encoding="utf-8"))
-    found: set[str] = set()
-    for raw in re.findall(r"`(/[^`]*)`", text):
-        # An interpolated query suffix (the `?tag=…` idiom) is not part of the
-        # path; cut it before filling parameters in.
-        head, sep, tail = raw.partition("${")
-        path = head if sep and "?" in tail else raw
-        path = _INTERP.sub("x", path).split("?", 1)[0].rstrip("/")
-        if path.startswith("/") and _URLSAFE.match(path):
-            found.add(path or "/")
-    return found
-
-
-def _resolves(path: str) -> bool:
-    """True when some route accepts this path, by method or not."""
-    scope = {"type": "http", "method": "GET", "path": path,
-             "root_path": "", "headers": []}
-    for route in app.routes:
-        match, _ = route.matches(scope)
-        if match in (Match.FULL, Match.PARTIAL):
-            return True
-    return False
 
 
 def test_every_console_path_reaches_a_route():
@@ -76,12 +38,48 @@ def test_every_console_path_reaches_a_route():
     cannot see refusals that happen after dispatch — which is why the two tests
     below assert the segment itself, and send the request.
     """
-    missing = sorted(p for p in _console_paths() if not _resolves(p))
+    missing = clientpaths.unresolved(app, CONSOLE)
     assert not missing, (
         "the console builds these paths and no route accepts them:\n  "
         + "\n  ".join(missing)
         + "\n(a 404 the user meets as a button that does nothing)"
     )
+
+
+def test_an_interpolated_query_does_not_truncate_the_path():
+    """The guard's own blind spot, pinned so it cannot come back.
+
+    This test used to cut a literal at its first interpolation whenever a query
+    followed, on the theory that the query was interpolated. That is true of
+    `?tag=${tag}`, where the path ends before the `?` anyway — and false of
+    `/profiles/${id}/media?filename=${…}`, where cutting there leaves
+    `/profiles`. A prefix that resolves is worse than one that does not: the
+    check passes and the tail it was meant to verify is never looked at. Both
+    of QRME's such paths — the adult feed and the 0.16.0 media upload — were
+    being checked as bare `/profiles`.
+
+    So the fixture is the real shape rather than a toy: whatever else changes,
+    a path must survive an interpolation that precedes its query.
+    """
+    assert normalise("/profiles/${id}/media?filename=${f}", CONSOLE) == (
+        "/profiles/x/media"
+    )
+    assert normalise("/meds/${uid}/adherence?days=${d}", CONSOLE) == (
+        "/meds/x/adherence"
+    )
+    # The optional-parameter idiom is the one interpolation that *is* the query.
+    assert normalise('/profiles/${id}/feed${adult ? "?adult=true" : ""}',
+                     CONSOLE) == "/profiles/x/feed"
+    # And a plain interpolated query still ends where it always did.
+    assert normalise("/marketplace/listings?tag=${tag}", CONSOLE) == (
+        "/marketplace/listings"
+    )
+
+    # The two that were being skipped are now really in the set, and resolve.
+    found = paths(CONSOLE)
+    for path in ("/profiles/x/feed", "/profiles/x/media"):
+        assert path in found, f"{path} is still not reaching the guard"
+        assert resolves(app, path), f"{path} reaches no route"
 
 
 def test_the_wall_buttons_use_the_mapped_segment():

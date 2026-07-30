@@ -6,6 +6,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**The guard written to catch the Wall bug had a hole in it, and six client
+surfaces had no guard at all.** 0.17.0 fixed a 404 under every like, comment
+and share, and added a test so it could not come back. That test cut a path
+at its first interpolation whenever a query followed — correct for
+`?tag=${tag}`, wrong for `/profiles/${id}/media?filename=${…}`, which it
+checked as bare `/profiles`. A prefix that resolves is worse than one that
+does not: the check passes and the tail it exists to verify is never looked
+at. Two of QRME's console paths were being skipped that way, including the
+media upload added in 0.16.0. Interpolations are now filled in before the
+query is cut, with the optional-parameter idiom (`${adult ? "?adult=true" :
+""}`) recognised as the one interpolation that really is a query.
+
+The same check now covers the **iOS, Android and Windows shells**, which had
+none. `native.yml` proves they compile; a path is a string in all three
+languages, so `"/post/\(id)/like"` compiles, ships, and 404s in the field —
+the Wall bug exactly. Around 220 path literals across the three shells had
+never been compared with the route table. They are now, and the singular
+mapped segments are banned in the native sources too, so the bug cannot
+reappear on a phone after being fixed on the web.
+
+Extraction is shared by both guards and byte-identical in all three repos,
+since the question does not differ by product. Two tests guard the guard: one
+pins the truncation bug against the live paths that were being skipped, and
+one fails if a language's pattern stops matching — a scan that silently finds
+nothing reads exactly like a scan that finds nothing wrong.
+
+No new field bug came out of this. Every path all four surfaces build
+resolves, and each check was verified by injecting the bug it claims to catch
+and watching it fail.
+
 ## [0.18.0] — 2026-07-30
 
 **Two versions of features finally get drawn, taught and findable.**
