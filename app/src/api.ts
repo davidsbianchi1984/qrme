@@ -360,6 +360,89 @@ export type TaskRunResult = {
   watermark?: unknown;
 };
 
+/** A staffed desk. `desk_id` and `desk_token`, not `id`/`owner_token` — the
+ *  desk is its own thing, not a profile with a different name. */
+export type Desk = {
+  desk_id: string;
+  desk_token?: string;
+  display_name: string;
+  trade: string;
+  presence: string;
+  location?: string | null;
+  blurb?: string | null;
+  portrait?: string | null;
+  rated: boolean;
+  designation?: string | null;
+  attestation?: unknown;
+  human?: unknown;
+  ai?: unknown;
+  age_wall?: unknown;
+  bell?: unknown;
+  feed?: unknown;
+  join?: unknown;
+  room_id?: string | null;
+  last_seen?: string | null;
+};
+
+export type DeskRing = {
+  id?: string;
+  caller_id?: string | null;
+  note?: string | null;
+  acked?: boolean;
+  at?: string;
+  [key: string]: unknown;
+};
+
+export type DeskGuest = {
+  id?: string;
+  display_name?: string | null;
+  note?: string | null;
+  state?: string;
+  [key: string]: unknown;
+};
+
+/** What a viewer sees layered over the stream. `style` is the desk's own
+ *  view style, so the overlay matches the room rather than guessing. */
+export type DeskOverlay = {
+  style: string;
+  on_stream: unknown[];
+  waiting: unknown[];
+  likes: number;
+  comments: number;
+  shares: number;
+  gifts: unknown[];
+  gift_total: number;
+};
+
+/** The attestation behind "a real person staffs this desk" — who says so, on
+ *  what basis, and whether the claim has been burned. */
+export type LivePerson = {
+  desk_id: string;
+  real_person: boolean;
+  whose?: string | null;
+  owner_id?: string | null;
+  designation?: string | null;
+  attestor?: string | null;
+  attestation_basis?: string | null;
+  attested_at?: string | null;
+  means?: string | null;
+  line?: string | null;
+  note?: string | null;
+  burned?: boolean;
+};
+
+export type DeskBeacon = {
+  id: string;
+  desk_id: string;
+  label: string;
+  location?: string | null;
+  active: boolean;
+  scans: number;
+  scan_url: string;
+  qr_svg: string;
+  created_at: string;
+};
+
 export const api = {
   health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
 
@@ -669,4 +752,67 @@ export const api = {
     grant_token: string }, token: string) =>
     req<TaskRunResult>(`/profiles/${profileId}/tasks`,
       { method: "POST", body, token }),
+  // ---------------------------------------------------------------------
+  // Desks: a staffed counter somebody can walk up to. Opening one, saying
+  // whether anybody is there, answering the bell, and letting a visitor come
+  // up on stream all existed in the backend with no caller.
+  // ---------------------------------------------------------------------
+
+  openDesk: (body: { owner_id: string; display_name: string; trade: string;
+    attestor: string; basis: string; location?: string; blurb?: string;
+    rated?: boolean; view_style?: string }) =>
+    req<Desk>("/desks", { method: "POST", body }),
+
+  // Presence is the whole point of a desk: whether a person is actually
+  // there. `closed` is not `away` — one says come back later, the other says
+  // the counter is shut.
+  setDeskPresence: (deskId: string, presence: string, token: string) =>
+    req<Desk>(`/desks/${deskId}/presence`,
+      { method: "PUT", body: { presence }, token }),
+  setDeskPortrait: (deskId: string, asset: string | null, token: string) =>
+    req<Desk>(`/desks/${deskId}/portrait`,
+      { method: "PUT", body: { asset }, token }),
+  setDeskCamera: (deskId: string, url: string | null, token: string) =>
+    req<Desk>(`/desks/${deskId}/camera`,
+      { method: "PUT", body: { url }, token }),
+
+  // The bell, and the queue of people who rang it.
+  deskRings: (deskId: string, token: string, pending = false) =>
+    req<{ rings: DeskRing[] }>(`/desks/${deskId}/rings`
+      + (pending ? "?pending=true" : ""), { token }),
+  ackRing: (deskId: string, ringId: string, token: string) =>
+    req<DeskRing>(`/desks/${deskId}/rings/${ringId}/ack`,
+      { method: "POST", token }),
+
+  // Asking to come up, and the desk deciding. `guests/me` is the visitor's
+  // own way back down, which is theirs to press rather than the desk's.
+  deskGuests: (deskId: string, token: string, pending = false) =>
+    req<{ guests: DeskGuest[]; on_stream: unknown[] }>(
+      `/desks/${deskId}/guests` + (pending ? "?pending=true" : ""), { token }),
+  askToComeUp: (deskId: string, body: { display_name?: string; note?: string },
+    token: string) =>
+    req<DeskGuest>(`/desks/${deskId}/guests`, { method: "POST", body, token }),
+  acceptGuest: (deskId: string, reqId: string, token: string) =>
+    req<DeskGuest>(`/desks/${deskId}/guests/${reqId}/accept`,
+      { method: "POST", token }),
+  declineGuest: (deskId: string, reqId: string, token: string) =>
+    req<DeskGuest>(`/desks/${deskId}/guests/${reqId}/decline`,
+      { method: "POST", token }),
+  stepDown: (deskId: string, token: string) =>
+    req<{ stepped_down: boolean }>(`/desks/${deskId}/guests/me`,
+      { method: "DELETE", token }),
+
+  deskOverlay: (deskId: string, token: string) =>
+    req<DeskOverlay>(`/desks/${deskId}/overlay`, { token }),
+  deskLivePerson: (deskId: string) =>
+    req<LivePerson>(`/desks/${deskId}/live-person`),
+
+  deskBeacons: (deskId: string, token: string) =>
+    req<{ beacons: DeskBeacon[] }>(`/desks/${deskId}/beacons`, { token }),
+  placeDeskBeacon: (deskId: string, body: { label: string; location?: string },
+    token: string) =>
+    req<DeskBeacon>(`/desks/${deskId}/beacons`, { method: "POST", body, token }),
+  pickUpDeskBeacon: (beaconId: string, token: string) =>
+    req<{ picked_up: boolean }>(`/desk-beacons/${beaconId}`,
+      { method: "DELETE", token }),
 };

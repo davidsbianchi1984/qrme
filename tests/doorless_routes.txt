@@ -1,6 +1,4 @@
 DELETE /comments/{comment_id}
-DELETE /desk-beacons/{beacon_id}
-DELETE /desks/{desk_id}/guests/me
 DELETE /displays/{display_id}
 DELETE /exchanges/{exchange_id}/items/{item_id}
 DELETE /gaming/sessions/{session_id}/lobby
@@ -35,13 +33,6 @@ GET /campaigns/{campaign_id}
 GET /cloud/status
 GET /d/{beacon_id}
 GET /d/{beacon_id}/card
-GET /desk-beacons/{beacon_id}/qr.svg
-GET /desks/{desk_id}/beacons
-GET /desks/{desk_id}/guests
-GET /desks/{desk_id}/live-person
-GET /desks/{desk_id}/overlay
-GET /desks/{desk_id}/rings
-GET /desks/{desk_id}/view.webp
 GET /displays/vocabulary
 GET /displays/{display_id}
 GET /dock/faces
@@ -143,12 +134,6 @@ PATCH /profiles/{profile_id}/messages/{message_id}
 POST /auth/oauth/{provider}/callback
 POST /camera/sessions
 POST /camera/sessions/{session_id}/close
-POST /desks
-POST /desks/{desk_id}/beacons
-POST /desks/{desk_id}/guests
-POST /desks/{desk_id}/guests/{req_id}/accept
-POST /desks/{desk_id}/guests/{req_id}/decline
-POST /desks/{desk_id}/rings/{ring_id}/ack
 POST /exchanges
 POST /exchanges/{exchange_id}/items
 POST /exchanges/{exchange_id}/items/{item_id}/accept
@@ -216,9 +201,6 @@ POST /watch-parties/{party_id}/seek
 POST /watermarks/verify
 POST /{kind}/{subject_id}/gift
 POST /{kind}/{subject_id}/subscribe
-PUT /desks/{desk_id}/camera
-PUT /desks/{desk_id}/portrait
-PUT /desks/{desk_id}/presence
 PUT /displays/{display_id}/faces
 PUT /dock/{profile_id}
 PUT /interactors/{interactor_id}/quiet-hours

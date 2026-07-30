@@ -6,6 +6,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**A desk you can actually staff.** The desk is the one surface in QRME whose
+promise is a *person* — a real tradesperson, attested by somebody, reachable
+now — and none of it was reachable from a client. You could not open a desk,
+say whether anybody was behind it, answer the bell, or let a visitor come up.
+
+The new **Desk** screen covers the counter end to end: opening one with the
+attestation it rests on, setting presence, answering rings, accepting or
+declining the people asking to come up, the stream overlay, and beacons — the
+desk as a sticker somebody scans in the street.
+
+Four things are stated the way the backend states them rather than the way a
+console would guess. **A desk is not a profile**: the API answers `desk_id` and
+`desk_token`, and holding a desk token is what makes you the desk rather than a
+visitor to it — so the token lives in the screen rather than the shared session,
+because signing in as an owner does not make you the counter. **Away and closed
+are different promises**: one says come back, the other says the counter is
+shut, and the desk gets to make either. **The attestation is shown to its own
+keeper**, `burned` included, because a withdrawn claim is not something to
+learn about from a visitor. And **picking up a beacon retires it** — the sticker
+on the wall stops working, which is the point of picking it up.
+
+The desk's view (`view.webp`) and a beacon's QR are now excluded as
+browser-facing in `NOT_A_CLIENT_CALL`, alongside the pair and medical-ID codes:
+they are rendered in an `<img src>`, not fetched by the API client, and counting
+them as doorless would have meant building a door that cannot exist.
+
+Eighteen routes came off the doorless list, 236 → 218.
+
+
 **A profile that can act for you, and finally a way to say how far.** The
 whole authorisation chain existed in the backend with no caller anywhere: mint
 a revocable grant, authorise which phases may run unattended, start a workflow,
