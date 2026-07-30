@@ -44,6 +44,7 @@ Voice           147
 Campaigns       unaudited
 Delegate        unaudited
 Discover        unaudited
+Market          152
 Onboarding      unaudited
 Org             unaudited
 Simulate        unaudited

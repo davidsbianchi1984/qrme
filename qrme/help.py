@@ -237,6 +237,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
              "just do it", "give me advice", "work with me", "role"),
     # The words somebody uses when something has just broken, plus the ones
     # they use when they have noticed the reporting and want it to stop.
+    "market": ("marketplace", "buy", "sell", "shop", "price", "for sale",
+               "find a plumber", "hire", "listing", "search for someone"),
     "problems": ("what went wrong", "error", "errors", "it failed",
                  "something broke", "bug", "report a bug", "crash",
                  "stop sending", "stop reporting", "opt out", "diagnostics"),

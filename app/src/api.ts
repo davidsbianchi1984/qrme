@@ -370,6 +370,60 @@ export type TaskRunResult = {
 
 /** A staffed desk. `desk_id` and `desk_token`, not `id`/`owner_token` — the
  *  desk is its own thing, not a profile with a different name. */
+// The marketplace. Every field below was read off a running server, not off
+// a route signature — see the note on the bindings for the two that would
+// have been wrong from reading alone.
+export type MarketProfile = {
+  profile_id: string; display_name: string; purpose: string;
+  tags: string[]; blurb: string; avatar?: string; avatar_kind?: string;
+};
+
+export type Listing = {
+  id: string; kind: string; title: string; blurb: string; tags: string[];
+  area?: string; provider_name?: string; business?: boolean;
+  profile_id?: string;
+};
+
+export type MarketSearch = {
+  query: string; terms: string[]; scope: string;
+  locality: string | null; region: string | null;
+  results: Listing[]; total: number; hidden_by_place: number;
+  /** The backend's own sentence about how it ranked. Shown, not paraphrased. */
+  ranking: string;
+};
+
+export type MarketAssist = {
+  need: string; suggestions: string[]; source: string; ai: boolean;
+  /** False, always, so far — and the screen says so. */
+  applied: boolean; note: string;
+};
+
+export type Locality = { locality: string; region: string | null; listings: number };
+
+export type Place = {
+  listing_id: string; locality: string; region: string | null; remote: boolean;
+};
+
+export type MarketPrefs = {
+  interactor_id: string; locality: string | null; region: string | null;
+  scope: string; include_remote: boolean; kinds: string[]; tags: string[];
+  updated_at: string | null;
+};
+
+export type Offer = {
+  listing_id: string; seller_id: string; price: number; currency: string;
+  stock: number | null; status: string; created_at: string; sold: number;
+  /** The backend states the money is simulated. So does the screen. */
+  payment: string;
+};
+
+export type Order = {
+  id: string; listing_id: string; title: string;
+  buyer_id: string; seller_id: string;
+  price: number; currency: string; status: string;
+  ledger_entry: string; created_at: string; payment: string;
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -596,8 +650,9 @@ export const api = {
           blurb?: string; tags: string[]; avatar?: string | null;
           avatar_kind?: "ai" | "real_photo" | null }[]>(
       `/marketplace${tag ? `?tag=${encodeURIComponent(tag)}` : ""}`),
-  marketplaceListings: () =>
-    req<{ listings?: unknown[] } | unknown[]>(`/marketplace/listings`),
+  // Typed off a running server rather than left as `unknown[]`: it answers a
+  // bare array of listings, which the marketplace screen renders directly.
+  marketplaceListings: () => req<Listing[]>(`/marketplace/listings`),
   seedStarters: () =>
     req<{ created: string[]; skipped: string[]; repaired?: string[] }>(
       `/marketplace/seed`, { method: "POST" }),
@@ -823,4 +878,68 @@ export const api = {
   pickUpDeskBeacon: (beaconId: string, token: string) =>
     req<{ picked_up: boolean }>(`/desk-beacons/${beaconId}`,
       { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // The marketplace. A whole commercial surface — browsing, searching,
+  // placing a listing in a town, pricing it, buying it, and the seller's
+  // own statement — existed in the backend with no caller at all.
+  //
+  // Every shape below was read off a running server rather than off the
+  // route signatures. Two would have been wrong from reading alone: the
+  // offer takes `price`, not `price_cents`, and `settings/{id}` wants an
+  // *interactor* id, not a profile's.
+  // ---------------------------------------------------------------------
+
+  // Deterministic on purpose: the backend states, in the response, that no
+  // model reorders the results. The screen quotes that rather than paraphrasing it.
+  marketSearch: (q: string, interactorId?: string) =>
+    req<MarketSearch>("/marketplace/search?q=" + encodeURIComponent(q)
+      + (interactorId ? `&interactor_id=${interactorId}` : "")),
+
+  // Suggestions for the search box, and nothing else. The reply says so
+  // itself — `applied: false` — and the screen shows that, because a
+  // suggestion that had quietly filtered would be a different product.
+  marketAssist: (need: string) =>
+    req<MarketAssist>("/marketplace/assist", { method: "POST", body: { need } }),
+
+  marketLocalities: () => req<Locality[]>("/marketplace/localities"),
+
+  // Where a listing is, if anywhere. Placement is what makes "near me" mean
+  // something; without it a listing is everywhere and therefore nowhere.
+  placeListing: (listingId: string,
+                 body: { locality: string; region?: string; remote?: boolean }) =>
+    req<Place>(`/marketplace/listings/${listingId}/place`,
+      { method: "PUT", body }),
+  unplaceListing: (listingId: string) =>
+    req<{ listing_id: string; place: null }>(
+      `/marketplace/listings/${listingId}/place`, { method: "DELETE" }),
+
+  // What this buyer wants shown: their town, how far out to look, and
+  // whether remote counts. Their own setting, behind their own token.
+  marketSettings: (interactorId: string, token: string) =>
+    req<MarketPrefs>(`/marketplace/settings/${interactorId}`, { token }),
+  setMarketSettings: (interactorId: string, body: Partial<MarketPrefs>,
+                      token: string) =>
+    req<MarketPrefs>(`/marketplace/settings/${interactorId}`,
+      { method: "PUT", body, token }),
+
+  // Pricing establishes the seller — the listing endpoint never needed a
+  // token, so the seller is whoever puts the price on, where money starts.
+  offer: (listingId: string) =>
+    req<Offer>(`/marketplace/listings/${listingId}/offer`),
+  setOffer: (listingId: string,
+             body: { price: number; currency?: string; stock?: number },
+             token: string) =>
+    req<Offer>(`/marketplace/listings/${listingId}/offer`,
+      { method: "PUT", body, token }),
+  withdrawOffer: (listingId: string, token: string) =>
+    req<Offer>(`/marketplace/listings/${listingId}/offer`,
+      { method: "DELETE", token }),
+
+  // `accept_price` confirms *the* price rather than setting one: a mismatch
+  // is refused with the real figure, so a stale screen cannot undercharge.
+  purchase: (listingId: string, acceptPrice: number, token: string) =>
+    req<Order>(`/marketplace/listings/${listingId}/purchase`,
+      { method: "POST", body: { accept_price: acceptPrice }, token }),
+  sales: (token: string) => req<{ sales: Order[] }>("/marketplace/sales", { token }),
 };

@@ -233,6 +233,17 @@ LESSONS: tuple[dict, ...] = (
               "instruction.",
          screens=(149,),
          try_it="Send the same request as an advisor, then as an operator."),
+    dict(key="market", chapter="Working", title="The marketplace",
+         what="Search for what you need, put a price on what you offer, and "
+              "buy at the price shown. Two things worth knowing: the results "
+              "are ranked deterministically — title, tags, provider, blurb, in "
+              "that order, and no model reorders them — and the 'suggest "
+              "words' button only fills your search box, never filters behind "
+              "it. Where you are looking is yours: it narrows what you see and "
+              "is not passed to a seller. The money is simulated, and every "
+              "price and receipt says so.",
+         screens=(152,),
+         try_it="Search for something, then press Price on a listing."),
     dict(key="problems", chapter="Working", title="What went wrong",
          what="When a request fails, the app writes down the operation and "
               "the status code — POST /profiles/{id}/chat, 500 — and nothing "

@@ -3432,6 +3432,22 @@ SCREENS = [
         dict(icon="gear", color="amber", k="Change it later",
              s="the switch is in Control"),
     ], button=("That's fine", "brand")),
+    # 152 is the marketplace. The ranking line is the card that matters: the
+    # backend states in its own reply that nothing reorders the results, and
+    # the screen quotes it rather than paraphrasing, because a marketplace
+    # that quietly ranked by anything else would be a different product.
+    dict(num=152, title="Marketplace", sub="Find it, price it, buy it",
+         accent="green", tab=2, cards=[
+        dict(icon="search", color="cyan", k="Search or ask",
+             s="suggestions, never filters"),
+        dict(icon="list", color="brand", k="No reordering",
+             s="title, tags, provider, blurb",
+             pill=("FIXED", "good")),
+        dict(icon="compass", color="amber", k="Where you look",
+             s="yours; sellers are not told"),
+        dict(icon="coin", color="green", k="Money is simulated",
+             s="and the screen says so"),
+    ], button=("Buy at the shown price", "brand")),
     # (Watch faces 10 and 11 mirror these two — docs/watch/build.py.)
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean
