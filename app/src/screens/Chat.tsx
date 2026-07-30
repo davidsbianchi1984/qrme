@@ -16,6 +16,9 @@ export function Chat() {
   const [location, setLocation] = useState("");
   const [conditions, setConditions] = useState("");
   const [activity, setActivity] = useState("");
+  // Spec clauses 2/12: how the profile should work this turn. Empty means
+  // "read my prompt and decide", which is what the backend does on its own.
+  const [role, setRole] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
 
   async function send() {
@@ -39,15 +42,22 @@ export function Chat() {
         interactor_id: session.interactorId,
         message,
         environment,
+        // Spec clauses 2/12: ask the profile to work as an advisor,
+        // collaborator or operator. Left on "read the prompt" the profile
+        // decides for itself and the reply says which it chose.
+        role: role || undefined,
       });
       const pm = reply.profile_message;
+      const rc = reply.role_context;
       const note = reply.handoff?.state
         ? `specialist handoff: ${reply.handoff.state}`
         : pm.status !== "approved"
           ? `${pm.status} by moderation${pm.flag_reason ? ` — ${pm.flag_reason}` : ""}`
-          : reply.environment
-            ? "adapted to where you are"
-            : undefined;
+          : rc
+            ? `worked as ${rc.role} (${rc.how})`
+            : reply.environment
+              ? "adapted to where you are"
+              : undefined;
       const text = pm.status === "approved"
         ? pm.content
         : "(this reply was held by moderation)";
@@ -83,6 +93,18 @@ export function Chat() {
       </div>
 
       {error && <div className="error">⚠ {error}</div>}
+
+      {/* Spec clauses 2/12 — advisor counsels, collaborator co-creates,
+          operator executes. "Let it read my prompt" is the honest default:
+          the profile infers from the wording and the reply says which. */}
+      <label className="role-pick">How should they work this turn?
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="">Let it read my prompt</option>
+          <option value="advisor">Advisor — weigh it and recommend</option>
+          <option value="collaborator">Collaborator — work it with me</option>
+          <option value="operator">Operator — just do it</option>
+        </select>
+      </label>
 
       {whereOpen && (
         <div className="row" style={{ padding: "4px 0" }}>

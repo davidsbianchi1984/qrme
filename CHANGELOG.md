@@ -6,6 +6,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Three features come out from behind the API.** An audit for what had
+been skipped found the same failure this project keeps relearning: a
+door nobody can open reads in the field as the feature not existing.
+Voice cloning, the recoverable watermark and the advisor/collaborator/
+operator role all shipped as routes with no way to reach them.
+
+The console gains a **Voice** tab that walks FIG. 800's order rather
+than offering one "clone me" button: the permission first (with the
+attestation that it is your own voice), then enrollment showing the
+readiness numbers so a thin enrollment looks thin, then the print, then
+speaking — with the withdrawal that deletes the samples on the same
+screen. The composer gains a **role picker** — advisor, collaborator,
+operator, or "let it read my prompt", which is the honest default — and
+the reply now reports which role applied and whether it was declared or
+inferred. And Control gains **"Who wrote this?"**: paste any text and it
+names the profile that produced it, from the text alone, saying how many
+passages matched and whether the writing has been altered since.
+
 **The watermark learns to survive being edited.** The field drawing asks
 for a direction the credential could not go: message + sequence +
 security key → watermark → **attack** → extract → reconstruct. Until now
