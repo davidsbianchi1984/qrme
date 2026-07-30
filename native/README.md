@@ -161,6 +161,27 @@ a typo and nothing else; a missing symbol or a changed SwiftUI signature
 would have shipped and been found by the first person to open Xcode. Treat a
 green run as the first real evidence, not a long-standing guarantee.
 
+## Do the paths resolve?
+
+Compiling is not the same as working, and for these clients the gap has a
+specific shape: a path is a string in all three languages, so
+`"/post/\(id)/like"` compiles perfectly, ships, and 404s in the field. That is
+not hypothetical — it is precisely the bug that left QRME's community wall with
+dead like, comment and share buttons in every release that had them, fixed in
+0.17.0.
+
+[`tests/test_native_routes_exist.py`](../tests/test_native_routes_exist.py)
+extracts every API path literal from `native/` — around 220 of them, in Swift,
+Kotlin and C# — and asks the real router about each one. It also bans the
+singular of every segment the audience routes map (`/post/` where only
+`/posts/` is reachable), so a fix made on the web cannot be quietly undone on a
+phone.
+
+Two limits worth stating. Routing-level matching cannot see a refusal that
+happens *after* dispatch, which is why the singular segments are banned by name
+rather than left to the resolver. And a path assembled from pieces at runtime,
+rather than written as one literal, is invisible to any static scan.
+
 ---
 
 ## Matthew 7:24–25
