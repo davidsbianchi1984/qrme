@@ -1286,6 +1286,43 @@ CREATE TABLE IF NOT EXISTS posts (
     created_at   TEXT NOT NULL
 );
 
+-- Voice cloning, gated the way FIG. 800 draws it (qrme/voiceprint.py).
+--
+-- The consent row is the gate: nothing is collected without it, `own_voice`
+-- is the attestation that the voice belongs to the person consenting, and
+-- `revoked_at` both stops future collection and marks the withdrawal, which
+-- deletes the samples and retires the print. Samples are metadata only — the
+-- audio lives wherever the deployment's media policy puts it (`reference`),
+-- so a voice corpus never accumulates inside the profile database.
+CREATE TABLE IF NOT EXISTS voice_consents (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    own_voice  INTEGER NOT NULL DEFAULT 0,
+    sources    TEXT NOT NULL DEFAULT '[]',   -- JSON: call | voice_note | direct
+    note       TEXT,
+    granted_at TEXT NOT NULL,
+    revoked_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS voice_samples (
+    id               TEXT PRIMARY KEY,
+    profile_id       TEXT NOT NULL REFERENCES profiles(id),
+    source           TEXT NOT NULL,
+    seconds          REAL NOT NULL,
+    turns            INTEGER NOT NULL DEFAULT 1,
+    transcript_chars INTEGER NOT NULL DEFAULT 0,
+    reference        TEXT,                   -- where the audio itself lives
+    created_at       TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS voiceprints (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    id         TEXT NOT NULL,
+    samples    INTEGER NOT NULL,
+    seconds    REAL NOT NULL,
+    built_at   TEXT NOT NULL,
+    retired_at TEXT                          -- set on revocation; a tombstone
+);
+
 -- Synthetic-media credentials: one row per stamped piece of generated
 -- content — every AI render, textual or visual (chat turns, posts, room
 -- turns, game/robot lines, creative works, task outputs, non-text

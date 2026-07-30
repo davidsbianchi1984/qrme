@@ -153,6 +153,33 @@ class ChatRequest(BaseModel):
     role: Literal["advisor", "collaborator", "operator"] | None = None
 
 
+class VoiceConsent(BaseModel):
+    """FIG. 800 step 802 — the permission, before any collection.
+
+    ``own_voice`` is an attestation: QRME will not learn a voice on somebody
+    else's behalf, so without it enrollment is refused (qrme/voiceprint.py).
+    """
+
+    own_voice: bool
+    sources: list[Literal["call", "voice_note", "direct"]] | None = None
+    note: str | None = None
+
+
+class VoiceSample(BaseModel):
+    """Steps 806-808 — a gathered sample, as metadata. The audio itself lives
+    wherever the deployment's media policy puts it (``reference``)."""
+
+    source: Literal["call", "voice_note", "direct"] = "voice_note"
+    seconds: float
+    turns: int = 1
+    transcript_chars: int = 0
+    reference: str | None = None
+
+
+class VoiceSay(BaseModel):
+    text: str
+
+
 class SpecialistSet(BaseModel):
     domain: str                        # mental_health | medical | finance | …
     specialist_profile_id: str

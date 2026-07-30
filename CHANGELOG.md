@@ -6,6 +6,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Voice cloning, in the order FIG. 800 draws it.** The figure is a
+permission gate first and a recorder second — 802 asks, 804 initializes,
+808 collects, 810 analyzes the characteristics, 812 records the voice —
+and `qrme/voiceprint.py` keeps that order load-bearing. Consent comes
+first and `own_voice` is an attestation: QRME will not learn a voice on
+somebody else's behalf, and consent is scoped to the sources it named
+(a call, a voice note, a direct recording), so a sample from an
+uncovered source is refused with the reason. Samples are **metadata
+only** — seconds, turns, transcript size, and a reference naming where
+the audio lives — so a voice corpus never accumulates inside the profile
+database. Step 810's analysis is arithmetic anyone can check rather than
+an opaque score, with a stated floor (three samples, two minutes) so a
+thin enrollment is called thin instead of labelled ready. Synthesized
+speech leaves carrying the watermark credential **and** a spoken
+disclosure, because a cloned voice that does not say it is one is the
+thing this codebase exists to refuse. And withdrawal means it: the
+samples are deleted, the print retires, and the withdrawal stays on
+record.
+
 ## [0.16.0] — 2026-07-30
 
 **Your own pixels on the wall, and two new front doors.** Wall posts now
