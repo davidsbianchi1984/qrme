@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Every option the backend offers, it now has to accept.** A catalog endpoint
+is a menu — the console and the three shells render it directly, so whatever it
+lists is what a user can pick. If the endpoint that *consumes* the choice
+refuses one of those values, the user gets an error for doing exactly what they
+were offered.
+
+That is the Wall bug's shape a third time, and the one both route guards said
+plainly they could not see: the request routes perfectly and the refusal happens
+inside the handler, after dispatch. This check stops reading source and sends
+the request. Eight of them, covering languages in both delivery modes, the same
+languages as translation targets, the steering dials the server describes, the
+providers on the model menu, the robots in the catalog, the connectors, and the
+pack registries.
+
+Two decisions worth stating. A 409 is not counted as a refusal — it means the
+server understood the value and objected to the *state* (already bound, already
+connected), which is a different thing from not recognising it. And an empty
+catalog fails rather than passes, because a menu with nothing on it would
+otherwise be a test that checks nothing and reports success.
+
+**No field bug came out of this.** All 49 fixed-set refusals in the backend were
+enumerated, every catalog was probed, and every advertised value is accepted.
+The check was verified by making `/languages` offer Arabic while the writer
+refused it, and watching both language tests fail.
+
+One approach was tried and abandoned rather than shipped: matching client string
+literals to backend vocabularies by field name. `role="dialog"`, `target="_blank"`
+and `platform="xbox"` are ARIA and UI attributes, not API fields, and `kind`
+alone means five different things across five modules. Nearly every hit was a
+false positive, and a guard that cries wolf is worse than no guard — so it is
+not in this release.
+
 **The guard now checks the verb, not just the address.** Matching a path while
 ignoring the method accepts a client that sends POST where only GET is mounted.
 The answer is a 405 rather than a 404, and from the user's side that is the same
