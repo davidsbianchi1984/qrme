@@ -28,6 +28,14 @@ def main(argv: list[str] | None = None) -> int:
     intake = "PDI vault" if vault.configured else (
         "none — contributions will be refused")
     print(f"intake: {intake}")
+    from . import problems
+    where = problems.aggregate_from_env().describe()
+    print(f"errors: {'counters at ' + os.environ['CLOUDGW_PROBLEMS_PATH'] if where['configured'] else 'in memory only — set CLOUDGW_PROBLEMS_PATH, or a redeploy loses them'}")
+    readers = os.environ.get("CLOUDGW_PROBLEM_READERS", "").strip()
+    if not readers:
+        print("        no CLOUDGW_PROBLEM_READERS — nobody but a local "
+              "developer can read the aggregate back")
+
     if not os.environ.get("CLOUDGW_TOKENS"):
         print("auth:   no CLOUDGW_TOKENS — open to callers on this machine "
               "only, closed to everyone else")

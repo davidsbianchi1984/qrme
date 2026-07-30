@@ -75,7 +75,11 @@ def _caller(request: Request, authorization: str = Header(default="")) -> str:
 
 
 def create_app(provider=None, vault=None, aggregate=None) -> FastAPI:
-    app = FastAPI(title="Cloud Model Gateway", version="0.1.0")
+    # Not the product version: this is the gateway's own contract, and it is
+    # what /health reports to every caller. 0.2.0 is where POST and GET
+    # /v1/problems arrived — a contract that grew under a frozen version
+    # number is a lie the caller has no way to detect.
+    app = FastAPI(title="Cloud Model Gateway", version="0.2.0")
 
     # Cross-origin, from any origin, without credentials.
     #
