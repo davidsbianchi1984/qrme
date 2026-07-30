@@ -9,7 +9,8 @@ one number names one combination of all three.
 ![QRME — relationship-aware synthetic profiles](assets/design/00-cover.svg)
 
 > **Patent pending** — *Synthetic User Profile Management System*
-> (U.S. Patent Application No. 19/056,418, Attorney Docket 526.P002).
+> (U.S. Patent Application No. 19/056,418, Attorney Docket 526.P002;
+> **published as US 2025/0265659 A1 on August 21, 2025**).
 
 QRME lets a user create, customize, and interact with AI-driven synthetic
 profiles — versions of themselves, another person (with consent/rights
