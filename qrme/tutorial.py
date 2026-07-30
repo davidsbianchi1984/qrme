@@ -296,6 +296,23 @@ LESSONS: tuple[dict, ...] = (
               "an opinion about footage nobody showed it.",
          screens=(155,),
          try_it="Open a party and read 'What a profile in here knows'."),
+    dict(key="identity", chapter="Being yourself", title="Who this profile is",
+         what="You may hold as many profiles as you like, and any of them may "
+              "be anonymous. At most one may be verified — because the badge "
+              "says you are a particular real person, and said of two profiles "
+              "at once it is either false of one or a claim that you are two "
+              "people. So the badge moves rather than multiplying: put it on "
+              "whichever profile should carry it, and move it later. An "
+              "invented person is unverifiable rather than unverified, which "
+              "is not the same thing and never uses up your one. Anonymity is "
+              "a promise about what this platform publishes, not a promise "
+              "that nobody can recognise your writing — the screen lists what "
+              "is not hidden beside what is, at the same size. And there are "
+              "two ways to end a profile: retire it, and what it meant to the "
+              "people who knew it stays readable; or delete it, which gives "
+              "you a receipt itemising every kind of record it erased.",
+         screens=(156,),
+         try_it="Open Identity and look at the 'not withheld' column."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "

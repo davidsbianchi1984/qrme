@@ -3497,6 +3497,23 @@ SCREENS = [
         dict(icon="eye", color="green", k="It has not seen it",
              s="and is told to say so"),
     ], button=("Say something", "brand")),
+    # 156 is identity. The badge is drawn as a thing that *sits somewhere* —
+    # one profile of several — rather than a checkbox each profile has and
+    # most fail. And the anonymity card names what is NOT hidden, because a
+    # screen showing only the withheld half would be promising something the
+    # product does not do.
+    dict(num=156, title="Who This Is", sub="One badge, and it moves",
+         accent="brand", tab=15, cards=[
+        dict(icon="person", color="brand", k="Four profiles",
+             s="any of them anonymous"),
+        dict(icon="shieldok", color="green", k="One verified",
+             s="the badge moves, not renews",
+             pill=("HERE", "good")),
+        dict(icon="mask", color="cyan", k="Your writing is not",
+             s="hidden — only what we publish"),
+        dict(icon="warn", color="amber", k="Delete itemises",
+             s="one count per record kind"),
+    ], button=("Move the badge here", "brand")),
     # (Watch faces 10 and 11 mirror these two — docs/watch/build.py.)
     # A posted video is not a live desk. There is nobody at a desk to ring
     # and no host to ask, so the strip is only the three verbs that mean

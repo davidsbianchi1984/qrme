@@ -54,10 +54,26 @@ def vocabulary() -> dict:
 
     Open: it describes the feature, not anybody's account.
     """
+    from .. import verification
+
     return {
         "withheld_when_anonymous": list(identity.WITHHELD),
         "never_withheld": list(identity.NOT_WITHHELD),
         "real_person_kinds": list(identity.REAL_PERSON_KINDS),
+        # The proofing levels, which this route existed to publish and did not.
+        #
+        # A vocabulary route is how a client learns the closed sets it must
+        # offer, and this one described every rule about verification while
+        # omitting the four words the claim itself has to be made in. There
+        # was no way to build a level picker from the API — you had to read
+        # `qrme/verification.py`. The rungs are ordered weakest-first, because
+        # a screen showing them unordered would imply they are alternatives
+        # rather than a ladder.
+        "proofing_levels": [
+            {"level": level, "means": verification.MEANING[level],
+             "needs_attestor": i > 0}
+            for i, level in enumerate(verification.PROOFING_LEVELS)
+        ],
         "rules": [
             "you may hold as many profiles as you like",
             "any of them may be anonymous, one at a time and independently",
@@ -137,13 +153,28 @@ def claim(profile_id: str, body: VerifyIn, request: Request) -> dict:
     that reaches past this one gets the second badge the rule exists to
     prevent.
     """
+    from .. import verification
+
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     try:
         return identity.verify(profile_id, body.level, attestor=body.attestor,
                                method=body.method, ref=body.ref)
     except identity.IdentityError as exc:
+        # The one-badge rule refusing: your other profile already holds it.
         raise HTTPException(409, str(exc)) from None
+    except verification.VerificationError as exc:
+        # The claim itself is malformed — an unknown level, or a level above
+        # `self_asserted` with nobody named as having checked.
+        #
+        # This was uncaught, and only `identity.IdentityError` was. The two
+        # errors come from adjacent modules and only one was in the `except`,
+        # so an unknown level became a **500 with an empty body** — while the
+        # exception it swallowed carried the exact sentence the caller needed
+        # ("expected one of self_asserted, federated, document, in_person").
+        # A good message thrown away by the wrong handler is worse than no
+        # message: the work of explaining was done and then discarded.
+        raise HTTPException(422, str(exc)) from None
 
 
 @router.post("/profiles/{profile_id}/verification/move")

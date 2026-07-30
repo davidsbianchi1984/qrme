@@ -245,6 +245,13 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     # People arrive at an exchange from the money side ("contract", "invoice")
     # or the file side ("send me the files"), and the point of the feature is
     # that those are the same screen. Both sets of words go here.
+    # Two very different arrivals at one screen: somebody wanting the blue
+    # tick, and somebody wanting out. Both belong here.
+    "identity": ("verify", "verified", "badge", "blue tick", "prove it is me",
+                 "anonymous", "hide my name", "who checked", "my profiles",
+                 "rename", "delete my profile", "delete this profile",
+                 "close my account", "export", "retire", "sunset", "memorial",
+                 "avatar", "emblem", "picture", "portrait"),
     "exchanges": ("exchange", "agreement", "contract", "sign", "signature",
                   "send me the files", "hand over", "deliverables",
                   "what is included", "scope", "invoice", "manifest"),
