@@ -6,6 +6,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**Voice enrollment reaches the device that has the microphone.** The
+Voice screen shipped in the web console — which is the one surface where
+the owner cannot actually record anything, so it asks them to *type* how
+many seconds of speech they gathered. iOS, Android and Windows each gain
+a **Voice** screen (`native/ios/Sources/Views/VoiceView.swift`,
+`native/android/…/ui/VoiceScreen.kt`, `native/windows/Views/VoicePage.xaml`)
+walking the same FIG. 800 order — permission, collection, the
+characteristics, the print — but recording the sample and measuring it
+instead of asking.
+
+The privacy property survives the change, and survives it structurally
+rather than by promise: the recording is written to the app's own
+container (`temporaryDirectory`, `cacheDir`,
+`LocalApplicationData\QrmeStudio\voice`) and only the *measurement*
+crosses the wire, with `reference` naming the file. No audio is uploaded,
+so no voice corpus can accumulate server-side. Turn counting is honest
+about its method per platform: iOS and Android read the level meter and
+count stretches of speech between silences; Windows does not meter its
+input and so reports one turn per recording rather than inventing a count
+from the duration.
+
+**Fixed** — the Windows navigation pane displayed the literal strings
+`tab.desk` and `tab.signatures`. Chrome localization falls back to the
+key when a key is missing, and those two were never added when the
+screens were; all three (with `tab.voice`) are now in `L10n.cs` in every
+supported language.
+
 **Three features come out from behind the API.** An audit for what had
 been skipped found the same failure this project keeps relearning: a
 door nobody can open reads in the field as the feature not existing.

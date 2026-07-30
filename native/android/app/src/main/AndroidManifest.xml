@@ -6,6 +6,11 @@
          and discarded; nothing is recorded or uploaded. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <!-- Enrolling the owner's own voice. The recording is written to this
+         app's private cache and never uploaded; only how long it ran and how
+         many turns it held are sent. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:allowBackup="true"

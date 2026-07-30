@@ -1428,7 +1428,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Desk").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1443,6 +1443,7 @@ fun ManageScreen(vm: StudioViewModel) {
                 5 -> LicensePanel(vm)
                 6 -> EarningsPanel(vm)
                 7 -> SignaturePanel(vm)
+                8 -> VoicePanel(vm)
                 else -> DeskPanel(vm)
             }
         }
@@ -2216,6 +2217,30 @@ private fun SignaturePanel(vm: StudioViewModel) {
             color = Qrme.T3, fontSize = 11.sp)
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
+}
+
+
+// ---- Voice: the owner's own voice, enrolled from the device with the mic ----
+
+/**
+ * Gate [VoiceScreen] on there being a profile to own the voiceprint. Only the
+ * owner may enroll one, so an ownerless shell has nothing to show here.
+ */
+@Composable
+private fun VoicePanel(vm: StudioViewModel) {
+    if (vm.pid == null || vm.token == null) {
+        screenScroll {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("Create a profile first", color = Qrme.Txt, fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold)
+                Text("A voiceprint belongs to a profile and only its owner may "
+                    + "enroll one, so there has to be one to own it.",
+                    color = Qrme.T2, fontSize = 12.sp)
+            }
+        }
+        return
+    }
+    VoiceScreen(vm)
 }
 
 

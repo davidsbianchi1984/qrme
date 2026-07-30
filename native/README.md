@@ -37,7 +37,8 @@ federated registries — Robotmods.net and LLMmods.com — with one-tap sync
 via `/packs/registries` + `/packs/registries/{key}/sync`), and **License**
 (offer terms
 `/profiles/{id}/license`, grants `/profiles/{id}/licenses`, revoke
-`/licenses/{gid}`)
+`/licenses/{gid}`), and **Voice** — the owner's own voice, enrolled from the
+device that actually has a microphone in it (below)
 
 On the phone form factors, Social, Apps, and Robots share one **Connect** tab
 (segmented on iOS, a `TabRow` on Android) so the bottom bar stays at five
@@ -47,6 +48,35 @@ separate items.
 They persist the returned `owner_token` so the app resumes signed-in, and share
 one dark-OLED palette so all three feel like one product. See each folder's
 README for the exact build/run commands.
+
+### Voice — enrolled where the microphone is
+
+The **Voice** screen walks the filing's FIG. 800 in the order the drawing
+gates it, one card per step: the permission (802), then collection (806/808),
+then what the material amounts to (810), then the print (812) and what
+speaking with it always carries. The backend is
+[`qrme/voiceprint.py`](../qrme/voiceprint.py) — same six routes on all three
+platforms.
+
+These shells differ from the web console in one way that matters. The console
+asks the owner to *type* how many seconds of speech they gathered; a phone or
+a desktop has the microphone right there, so these screens **record the
+sample and measure it**. What crosses the wire is still only the measurement:
+the recording is written to the app's own container — `temporaryDirectory` on
+iOS, `cacheDir` on Android, `LocalApplicationData\QrmeStudio\voice` on
+Windows — and the profile database is told the file's *name* via `reference`,
+never its bytes. A voice corpus never accumulates server-side, which is a
+property of where the audio is written rather than a promise about it.
+
+Turn counting differs by platform, and the screens say which they did. iOS and
+Android read the platform's level meter (`AVAudioRecorder.averagePower`,
+`MediaRecorder.maxAmplitude`) and count stretches of speech between silences.
+Windows does not meter its input, so it reports **one turn per recording**
+rather than deriving a count from the duration — a number the app could not
+stand behind is worse than a coarse one it can. Permission strings ride along:
+`NSMicrophoneUsageDescription` (iOS), `RECORD_AUDIO` (Android), and on Windows
+the system privacy setting, whose refusal is reported as the setting to change
+rather than as a failure.
 
 Two cross-cutting guarantees ride on every generated surface:
 

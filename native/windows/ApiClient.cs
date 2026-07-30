@@ -67,6 +67,48 @@ public record LanguageInfo(
     [property: JsonPropertyName("code")] string Code,
     [property: JsonPropertyName("label")] string Label);
 
+// MARK: Voiceprint (FIG. 800)
+
+public record VoiceConsentState(
+    [property: JsonPropertyName("granted")] bool Granted,
+    [property: JsonPropertyName("sources")] string[]? Sources,
+    [property: JsonPropertyName("granted_at")] string? GrantedAt);
+
+public record VoiceThreshold(
+    [property: JsonPropertyName("samples")] int Samples,
+    [property: JsonPropertyName("seconds")] double Seconds);
+
+// Every field here is a count off the enrolled samples — there is no opaque
+// quality score, so a thin enrollment reads as thin.
+public record VoiceEnrollment(
+    [property: JsonPropertyName("samples")] int Samples,
+    [property: JsonPropertyName("seconds")] double Seconds,
+    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("mean_turn_seconds")] double? MeanTurnSeconds,
+    [property: JsonPropertyName("ready")] bool Ready,
+    [property: JsonPropertyName("needs")] string[] Needs,
+    [property: JsonPropertyName("threshold")] VoiceThreshold Threshold,
+    [property: JsonPropertyName("method")] string Method);
+
+public record VoiceprintRecord(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("built_at")] string? BuiltAt,
+    [property: JsonPropertyName("active")] bool Active);
+
+public record VoiceprintStatus(
+    [property: JsonPropertyName("consent")] VoiceConsentState Consent,
+    [property: JsonPropertyName("enrollment")] VoiceEnrollment? Enrollment,
+    [property: JsonPropertyName("voiceprint")] VoiceprintRecord? Voiceprint,
+    [property: JsonPropertyName("disclosure")] string Disclosure);
+
+public record VoiceSpoken(
+    [property: JsonPropertyName("basis")] string Basis,
+    [property: JsonPropertyName("disclosure")] string Disclosure);
+
+public record VoiceRevocation(
+    [property: JsonPropertyName("samples_deleted")] int SamplesDeleted,
+    [property: JsonPropertyName("note")] string Note);
+
 public record LanguagesList(
     [property: JsonPropertyName("languages")] LanguageInfo[] Languages,
     [property: JsonPropertyName("default")] string Default);
@@ -1149,4 +1191,44 @@ public sealed class ApiClient
     public async Task<SignatureVerification> VerifySignature(JsonElement package) =>
         await Send<SignatureVerification>(
             Post("/signatures/verify", new { package }));
+
+    // MARK: Voiceprint — FIG. 800, in the order the drawing gates it
+
+    public Task<VoiceprintStatus> Voiceprint(string id, string token) =>
+        Send<VoiceprintStatus>(Get($"/profiles/{id}/voiceprint", token));
+
+    /// <summary>
+    /// Step 802. own_voice is fixed true because the backend refuses the grant
+    /// without it — there is deliberately no path to enrolling somebody else's
+    /// voice, so there is nothing here for a caller to toggle.
+    /// </summary>
+    public Task<VoiceprintStatus> GrantVoiceConsent(string id, string token,
+                                                    string[] sources) =>
+        Send<VoiceprintStatus>(Put($"/profiles/{id}/voiceprint/consent",
+            new { own_voice = true, sources }, token));
+
+    /// <summary>
+    /// Steps 806–808. Only the measurements travel: how long the recording ran
+    /// and how many spoken turns it held. The audio stays on this machine.
+    /// </summary>
+    public Task<VoiceEnrollment> AddVoiceSample(string id, string token, string source,
+                                                double seconds, int turns,
+                                                string? reference = null) =>
+        Send<VoiceEnrollment>(Post($"/profiles/{id}/voiceprint/samples",
+            new { source, seconds, turns, reference }, token));
+
+    public Task<VoiceprintStatus> BuildVoiceprint(string id, string token) =>
+        Send<VoiceprintStatus>(Post($"/profiles/{id}/voiceprint", new { }, token));
+
+    public Task<VoiceSpoken> SpeakInVoice(string id, string token, string text) =>
+        Send<VoiceSpoken>(Post($"/profiles/{id}/voiceprint/speak", new { text }, token));
+
+    /// <summary>Withdrawal: the samples go, the print retires, the withdrawal
+    /// itself stays — which is why this reports counts.</summary>
+    public Task<VoiceRevocation> RevokeVoiceprint(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"/profiles/{id}/voiceprint");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<VoiceRevocation>(req);
+    }
 }

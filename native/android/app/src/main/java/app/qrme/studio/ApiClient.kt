@@ -39,6 +39,19 @@ data class EarningsStatement(val entries: List<LedgerEntry>, val accrued: Double
                              val paid: Double, val lifetime: Double,
                              val byKind: Map<String, Double>, val currency: String)
 data class PayoutReceipt(val payoutId: String, val total: Double, val entries: Int)
+data class VoiceConsentState(val granted: Boolean, val sources: List<String>,
+                            val grantedAt: String?)
+data class VoiceEnrollment(val samples: Int, val seconds: Double, val turns: Int,
+                           val meanTurnSeconds: Double?, val ready: Boolean,
+                           val needs: List<String>, val wantSamples: Int,
+                           val wantSeconds: Double, val method: String)
+data class VoiceprintRecord(val id: String, val builtAt: String?, val active: Boolean)
+data class VoiceprintStatus(val consent: VoiceConsentState,
+                            val enrollment: VoiceEnrollment?,
+                            val voiceprint: VoiceprintRecord?,
+                            val disclosure: String)
+data class VoiceSpoken(val basis: String, val disclosure: String)
+data class VoiceRevocation(val samplesDeleted: Int, val note: String)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
@@ -981,5 +994,81 @@ object ApiClient {
             JSONObject().put("capability", capability), token))
         return InvokeResult(o.optString("capability", ""), o.optString("status", ""),
             o.optString("result", ""))
+    }
+
+    // ---- voiceprint: FIG. 800, in the order the drawing gates it ----
+
+    private fun voiceprintStatusOf(o: JSONObject): VoiceprintStatus {
+        val c = o.getJSONObject("consent")
+        val srcArr = c.optJSONArray("sources")
+        val consent = VoiceConsentState(
+            c.optBoolean("granted"),
+            (0 until (srcArr?.length() ?: 0)).map { srcArr!!.getString(it) },
+            if (c.isNull("granted_at")) null else c.optString("granted_at"))
+
+        val enrollment = o.optJSONObject("enrollment")?.let { e ->
+            val needs = e.optJSONArray("needs")
+            val th = e.getJSONObject("threshold")
+            VoiceEnrollment(
+                e.optInt("samples"), e.optDouble("seconds"), e.optInt("turns"),
+                if (e.isNull("mean_turn_seconds")) null
+                else e.optDouble("mean_turn_seconds"),
+                e.optBoolean("ready"),
+                (0 until (needs?.length() ?: 0)).map { needs!!.getString(it) },
+                th.optInt("samples"), th.optDouble("seconds"),
+                e.optString("method", ""))
+        }
+
+        val print = o.optJSONObject("voiceprint")?.let { p ->
+            VoiceprintRecord(p.getString("id"),
+                if (p.isNull("built_at")) null else p.optString("built_at"),
+                p.optBoolean("active"))
+        }
+        return VoiceprintStatus(consent, enrollment, print,
+            o.optString("disclosure", ""))
+    }
+
+    suspend fun voiceprint(id: String, token: String): VoiceprintStatus =
+        voiceprintStatusOf(JSONObject(request("/profiles/$id/voiceprint", token = token)))
+
+    /**
+     * Step 802. `ownVoice` is fixed true here because the backend refuses the
+     * grant without it — there is deliberately no path to enrolling somebody
+     * else's voice, so there is nothing for a caller to toggle.
+     */
+    suspend fun grantVoiceConsent(id: String, token: String,
+                                  sources: List<String>): VoiceprintStatus {
+        val arr = JSONArray(); sources.forEach { arr.put(it) }
+        val body = JSONObject().put("own_voice", true).put("sources", arr)
+        return voiceprintStatusOf(JSONObject(
+            request("/profiles/$id/voiceprint/consent", "PUT", body, token)))
+    }
+
+    /**
+     * Steps 806–808. Only the measurements travel: how long the recording ran
+     * and how many spoken turns it held. The audio stays on the device.
+     */
+    suspend fun addVoiceSample(id: String, token: String, source: String,
+                               seconds: Double, turns: Int, reference: String? = null) {
+        val body = JSONObject().put("source", source).put("seconds", seconds)
+            .put("turns", turns)
+        if (reference != null) body.put("reference", reference)
+        request("/profiles/$id/voiceprint/samples", "POST", body, token)
+    }
+
+    suspend fun buildVoiceprint(id: String, token: String): VoiceprintStatus =
+        voiceprintStatusOf(JSONObject(
+            request("/profiles/$id/voiceprint", "POST", null, token)))
+
+    suspend fun speakInVoice(id: String, token: String, text: String): VoiceSpoken {
+        val o = JSONObject(request("/profiles/$id/voiceprint/speak", "POST",
+            JSONObject().put("text", text), token))
+        return VoiceSpoken(o.optString("basis", ""), o.optString("disclosure", ""))
+    }
+
+    /** Withdrawal: the samples go, the print retires, the withdrawal stays. */
+    suspend fun revokeVoiceprint(id: String, token: String): VoiceRevocation {
+        val o = JSONObject(request("/profiles/$id/voiceprint", "DELETE", null, token))
+        return VoiceRevocation(o.optInt("samples_deleted"), o.optString("note", ""))
     }
 }

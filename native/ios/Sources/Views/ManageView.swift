@@ -4,7 +4,7 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign", desk = "Desk" }
+    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign", voice = "Voice", desk = "Desk" }
     @State private var tab: Tab = .general
 
     var body: some View {
@@ -24,6 +24,7 @@ struct ManageView: View {
             case .license: LicenseSection()
             case .earnings: EarningsSection()
             case .signatures: SignatureSection()
+            case .voice: VoiceSection()
             case .desk: DeskSection()
             }
         }
@@ -594,6 +595,28 @@ private struct SignatureSection: View {
                 Text("Create a profile first").font(.subheadline.weight(.semibold))
                 Text("Signing credentials are bound to an account, so there has "
                      + "to be one before a passkey can stand for it.")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(24)
+        }
+    }
+}
+
+
+// MARK: Voice — the owner's own voice, enrolled from the device that has the mic
+
+private struct VoiceSection: View {
+    @EnvironmentObject private var state: AppState
+
+    var body: some View {
+        if let pid = state.pid, let token = state.token {
+            VoiceView(profileId: pid, token: token)
+        } else {
+            VStack(spacing: 8) {
+                Text("Create a profile first").font(.subheadline.weight(.semibold))
+                Text("A voiceprint belongs to a profile and only its owner may "
+                     + "enroll one, so there has to be one to own it.")
                     .font(.caption).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
