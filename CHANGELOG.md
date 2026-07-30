@@ -6,6 +6,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**A profile that can act for you, and finally a way to say how far.** The
+whole authorisation chain existed in the backend with no caller anywhere: mint
+a revocable grant, authorise which phases may run unattended, start a workflow,
+advance it, answer it when it stops, cancel it. Shipping the acting half
+without the governing half is the wrong half to ship, and it is the half that
+shipped.
+
+The new **Delegation** screen is ordered the way the decision is. Grants first,
+because a phase reads the profile's own material *through* one and it can be
+withdrawn mid-run — the work stops seeing what the grant covered from that
+moment rather than at the end. The policy second, because it is a choice about
+scope rather than about work. The runs last, because they are what the first
+two make possible.
+
+Three things are the server's judgement rendered rather than the console's
+invention. The delegable phases come from `GET /profiles/{id}/delegation`
+instead of a list retyped in the client. **`research` cannot be delegated
+without a grant** — the backend refuses it, because "without one the phase
+reads every source item on the profile" — so the console sends the grant it
+holds and lets the refusal reach anyone who has not minted one, message
+intact, rather than pre-empting it with a guess. And a run that has stopped
+shows **what it is waiting for**, because `awaiting` is the entire point of the
+pause: the profile stopped because it needs a person, and it says what for.
+
+Sixteen routes came off the doorless list, 252 → 236 — QRME's first pass, and
+the largest backlog of the three.
+
+
 **252 of QRME's 409 routes cannot be reached from any client.** The route
 guards ask whether every call reaches a route. This asks the inverse — whether
 every route is reachable from a door a user can open — and it is the quieter of

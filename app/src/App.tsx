@@ -5,6 +5,7 @@ import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
 import { Home } from "./screens/Home";
 import { Chat } from "./screens/Chat";
+import { Delegate } from "./screens/Delegate";
 import { Discover } from "./screens/Discover";
 import { Voice } from "./screens/Voice";
 import { Wall } from "./screens/Wall";
@@ -21,7 +22,7 @@ import { Help } from "./Help";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "settings";
+type Tab = "home" | "chat" | "discover" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -36,6 +37,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "org", label: "Org", icon: "🏛" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
+  { id: "delegate", label: "Delegation", icon: "🤝" },
   { id: "voice", label: "Voice", icon: "🎙" },
   { id: "settings", label: "Control", icon: "⚙" },
 ];
@@ -99,6 +101,7 @@ export function App() {
         {tab === "org" && <Org />}
         {tab === "relationships" && <Relationships />}
         {tab === "memory" && <Memory />}
+        {tab === "delegate" && <Delegate />}
         {tab === "voice" && <Voice />}
         {tab === "settings" && <Settings />}
       </main>
