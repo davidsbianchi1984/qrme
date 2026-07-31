@@ -290,7 +290,9 @@ private struct SummonSection: View {
         error = nil
         Task {
             do {
-                let r = try await ApiClient.shared.claimHandle(id: pid, handle: handle)
+                let r = try await ApiClient.shared.claimHandle(
+                    id: pid, handle: handle,
+                    token: state.token ?? "")
                 claimed = r.handle
                 handle = ""
             } catch { self.error = error.localizedDescription }

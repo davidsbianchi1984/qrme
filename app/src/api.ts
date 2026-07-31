@@ -2578,6 +2578,43 @@ export type Reattested = {
   note: string;
 };
 
+/** Languages a profile can speak. The persona generates *natively* in the
+ *  chosen one on every surface — chat, posts, rooms, robot speech — rather
+ *  than writing English and translating it afterwards. */
+export type LanguageCatalogue = {
+  languages: { code: string; label: string }[];
+  default: string;
+};
+
+/** `mode` is `pre` (already in that language everywhere) or `on_demand`
+ *  (translated when asked). Not a display setting: it changes what the model
+ *  is asked to produce. */
+export type LanguagePref = {
+  profile_id: string;
+  language: string;
+  label: string;
+  mode: string;
+};
+
+/** `engine: "none"` is the honest answer, not a failure — the offline stub
+ *  says it cannot translate rather than handing back the input as though it
+ *  had. `note` carries the reason. */
+export type Translated = {
+  text: string;
+  translation: string;
+  language: string;
+  engine: string;
+  note?: string;
+};
+
+/** The name a profile answers to. Claiming replaces whatever it had, which
+ *  is why this is owner-only: the old handle stops resolving. */
+export type HandleClaimed = {
+  profile_id: string;
+  handle: string;
+  summon: string;
+};
+
 export type SocialConnection = {
   id: string;
   profile_id: string;
@@ -4248,6 +4285,42 @@ export const api = {
   // move they have — resolving is the reviewer's, deliberately, so an owner
   // cannot adjudicate an objection against their own profile.
   // ---------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------
+  // The words it uses, and the name it answers to.
+  //
+  // `languages` is a static registry and public. The rest are the owner's.
+  //
+  // `claimHandle` in particular: it took **no credential at all**, and the
+  // damage was not that a stranger could give a profile a second name — it is
+  // that claiming one deletes whatever the profile had. So `@rosa` stopped
+  // resolving, `@notrosa` resolved to Rosa, and every printed reference and
+  // shared link that named her went dead at once. The three beacon routes
+  // just below it in the same file were given this check in an earlier pass;
+  // this one was missed.
+  // ---------------------------------------------------------------------
+
+  languages: () => req<LanguageCatalogue>("/languages"),
+  profileLanguage: (profileId: string) =>
+    req<LanguagePref>(`/profiles/${profileId}/language`),
+  setProfileLanguage: (profileId: string,
+                       body: { language: string; mode: string },
+                       token: string) =>
+    req<LanguagePref>(`/profiles/${profileId}/language`,
+      { method: "PUT", body, token }),
+  // Anything the owner ran across — an interactor's message, a room turn, a
+  // listing — into the profile's language, using the profile's own model.
+  translate: (profileId: string, text: string, to: string | undefined,
+              token: string) =>
+    req<Translated>(`/profiles/${profileId}/translate`,
+      { method: "POST", body: { text, ...(to ? { to } : {}) }, token }),
+  claimHandle: (profileId: string, handle: string, token: string) =>
+    req<HandleClaimed>(`/profiles/${profileId}/handle`,
+      { method: "PUT", body: { handle }, token }),
+  composePost: (profileId: string,
+                body: { topic: string; surface?: string }, token: string) =>
+    req<ProfilePost & { content: string | null }>(
+      `/profiles/${profileId}/compose`, { method: "POST", body, token }),
 
   watermarkDesign: (profileId: string) =>
     req<WatermarkDesign>(`/profiles/${profileId}/watermark`),

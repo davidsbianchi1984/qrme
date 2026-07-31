@@ -991,12 +991,15 @@ public sealed class ApiClient
 
     // -- Reach: summon (@handle + beacons), marketplace, licensing --
 
-    public Task<HandleClaim> ClaimHandle(string id, string handle)
+    // The owner's token. Without it a stranger could replace the name a
+    // profile answers to, and the old one stopped resolving.
+    public Task<HandleClaim> ClaimHandle(string id, string handle, string token)
     {
         var req = new HttpRequestMessage(HttpMethod.Put, $"/profiles/{id}/handle")
         {
             Content = JsonContent.Create(new { handle }),
         };
+        req.Headers.Add("authorization", $"Bearer {token}");
         return Send<HandleClaim>(req);
     }
 

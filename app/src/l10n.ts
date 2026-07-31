@@ -216,6 +216,12 @@ const CHROME: Table = {
     ja: "表示マーク", zh: "标识", hi: "चिह्न",
     ar: "العلامة",
   },
+  "nav.inwords": {
+    en: "In its words", es: "En sus palabras", fr: "Dans ses mots",
+    de: "In seinen Worten", pt: "Nas suas palavras",
+    it: "Con parole sue", ja: "その言葉で", zh: "用它的话",
+    hi: "अपने शब्दों में", ar: "بكلماته",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

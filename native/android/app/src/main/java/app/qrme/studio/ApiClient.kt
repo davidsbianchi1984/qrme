@@ -633,9 +633,11 @@ object ApiClient {
 
     // ---- Reach: summon (@handle + beacons), marketplace, licensing ----
 
-    suspend fun claimHandle(id: String, handle: String): String {
+    // The owner's token. Without it a stranger could replace the name a
+    // profile answers to, and the old one stopped resolving.
+    suspend fun claimHandle(id: String, handle: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/handle", "PUT",
-            JSONObject().put("handle", handle)))
+            JSONObject().put("handle", handle), token))
         return o.getString("handle")
     }
 

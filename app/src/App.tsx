@@ -31,6 +31,7 @@ import { Signing } from "./screens/Signing";
 import { Visiting } from "./screens/Visiting";
 import { Stranger } from "./screens/Stranger";
 import { TheMark } from "./screens/TheMark";
+import { InWords } from "./screens/InWords";
 import { Named } from "./screens/Named";
 import { Passing } from "./screens/Passing";
 import { Reaching } from "./screens/Reaching";
@@ -52,7 +53,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -93,6 +94,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "visiting", label: "Visiting", icon: "🔔" },
   { id: "stranger", label: "Strangers", icon: "🎭" },
   { id: "themark", label: "The mark", icon: "✦" },
+  { id: "inwords", label: "In its words", icon: "🗣" },
   { id: "named", label: "One thing, named", icon: "🔎" },
   { id: "passing", label: "Beginning and passing on", icon: "🕊" },
   { id: "robots", label: "Bodies", icon: "🤖" },
@@ -190,6 +192,7 @@ export function App() {
         {tab === "visiting" && <Visiting />}
         {tab === "stranger" && <Stranger />}
         {tab === "themark" && <TheMark />}
+        {tab === "inwords" && <InWords />}
         {tab === "named" && <Named onPlans={toPlans} />}
         {tab === "passing" && <Passing onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}

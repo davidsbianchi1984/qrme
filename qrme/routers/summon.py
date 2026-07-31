@@ -86,8 +86,14 @@ def _handle_of(profile_id: str) -> str | None:
 
 # -- @handles ----------------------------------------------------------------
 
-@router.put("/profiles/{profile_id}/handle")
 def claim_handle(profile_id: str, body: HandleSet) -> dict:
+    """Give this profile the name it answers to.
+
+    Split from the route below so the seeders can call it. They are minting
+    a profile and naming it in the same breath, on this deployment's own
+    behalf, and there is no owner to be yet — the token does not exist until
+    the profile does.
+    """
     profile_or_404(profile_id)
     handle = body.handle.lstrip("@").lower()
     conn = db.connect()
@@ -103,6 +109,28 @@ def claim_handle(profile_id: str, body: HandleSet) -> dict:
     conn.commit()
     return {"profile_id": profile_id, "handle": f"@{handle}",
             "summon": f"/summon?ref=@{handle}"}
+
+
+@router.put("/profiles/{profile_id}/handle")
+def put_handle(profile_id: str, body: HandleSet, request: Request) -> dict:
+    """Claim the name this profile answers to. Owner only.
+
+    It took no credential at all, and the damage was not that somebody could
+    give a profile a second name — it is the `DELETE` above. A stranger could
+    replace the handle a profile had published, so `@rosa` stopped resolving
+    and `@notrosa` resolved to Rosa. Every printed reference, shared link and
+    beacon that pointed at her by name went dead at once, and the name she now
+    answered to was chosen by whoever did it.
+
+    The three routes immediately below this one were given exactly this check
+    in an earlier pass, and `place_beacon` states the reason in words that fit
+    here without changing: *it was anybody's, which meant a stranger could
+    print stickers pointing at somebody else's profile.* This route was
+    missed.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return claim_handle(profile_id, body)
 
 
 # -- beacons: leave a profile behind -----------------------------------------

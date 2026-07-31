@@ -6,6 +6,40 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Anybody could take away the name a profile answers to
+
+`PUT /profiles/{id}/handle` took **no credential of any kind** — no `request`
+parameter, no `require_owner`, nothing. And the damage is not that a stranger
+could give a profile a second name to be found by. Claiming a handle runs
+
+```sql
+DELETE FROM handles WHERE profile_id=?
+```
+
+first, because that is how *changing* your handle works. So anybody could take
+`@rosa` away from Rosa: the handle she had published stopped resolving, the one
+the stranger chose resolved to her profile instead, and every printed
+reference, shared link and beacon that named her went dead at once — with the
+name she now answered to picked by whoever did it.
+
+The three beacon routes sitting **immediately below this one in the same file**
+were given exactly this check in an earlier pass, and `place_beacon` states the
+reason in words that fit here without changing a syllable: *it was anybody's,
+which meant a stranger could print stickers pointing at somebody else's
+profile, in places its owner never chose and cannot see.* That pass hardened
+placing, listing and picking up, and walked past the handle route above them.
+
+iOS, Android and Windows all claimed handles with no credential, and all three
+now send the owner's token.
+
+**Screen 182** is the door the round built: which language a profile speaks —
+not a display setting, since the persona *writes* in it natively on every
+surface rather than translating afterwards — translating something it ran
+across, claiming the handle, and composing a post.
+
+Console-doorless routes **23 → 18**.
+
+
 ### A post the filter refused was published by the route that lists what was published
 
 Public posts run through the **strict** moderation filter, because a public

@@ -3523,6 +3523,22 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 182: the words and the name. First card is the defect — claiming a
+    # handle deletes whatever the profile had, and the route asked for
+    # nothing — and the second is the thing people mistake for a display
+    # toggle.
+    dict(num=182, title="In Its Own Words", sub="The name is not anybody's",
+         accent="pink", tab=29, cards=[
+        dict(icon="mask", color="red", k="Yours to change",
+             s="claiming replaces the old",
+             pill=("401", "warn")),
+        dict(icon="brain", color="pink", k="Written, not turned",
+             s="it composes in that tongue"),
+        dict(icon="pen", color="green", k="Says when it cannot",
+             s="rather than echo it back"),
+        dict(icon="shield", color="amber", k="Strict on the way out",
+             s="a post faces everybody"),
+    ], button=("Claim it", "brand")),
     # 181: the mark, what was published, and who is contesting it. First
     # card is the defect — a held post handed out by the route that lists
     # what was published — and the second is the rule that cannot be typed

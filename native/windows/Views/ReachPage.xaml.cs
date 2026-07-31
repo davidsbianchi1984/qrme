@@ -312,7 +312,8 @@ public sealed partial class ReachPage : Page
         SummonError.Visibility = Visibility.Collapsed;
         try
         {
-            var r = await ApiClient.Shared.ClaimHandle(s.Pid!, handle);
+            var r = await ApiClient.Shared.ClaimHandle(s.Pid!, handle,
+                s.Token ?? "");
             ClaimedText.Text = $"claimed {r.Handle}";
             ClaimedText.Visibility = Visibility.Visible;
             HandleBox.Text = "";

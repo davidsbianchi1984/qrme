@@ -1718,7 +1718,8 @@ private fun SummonPanel(vm: StudioViewModel) {
             SmallAction("Claim") {
                 if (handle.isNotBlank()) {
                     error = null
-                    vm.call({ ApiClient.claimHandle(vm.pid!!, handle) }) { r ->
+                    vm.call({ ApiClient.claimHandle(vm.pid!!, handle,
+                        vm.token.orEmpty()) }) { r ->
                         r.onSuccess { claimed = it; handle = "" }
                             .onFailure { error = it.message }
                     }

@@ -378,7 +378,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/180-two-strangers.svg"><img src="docs/screens/180-two-strangers.svg" width="210" alt="Two Strangers"></a><br><sub><b>180</b> · Two Strangers</sub></td>
     <td align="center" width="33%"><a href="docs/screens/181-the-mark-and-the-held.svg"><img src="docs/screens/181-the-mark-and-the-held.svg" width="210" alt="The Mark, And The Held"></a><br><sub><b>181</b> · The Mark, And The Held</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/182-in-its-own-words.svg"><img src="docs/screens/182-in-its-own-words.svg" width="210" alt="In Its Own Words"></a><br><sub><b>182</b> · In Its Own Words</sub></td>
   </tr>
 </table>
 

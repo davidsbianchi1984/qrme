@@ -994,9 +994,12 @@ actor ApiClient {
 
     // MARK: Reach — summon (@handle + beacons), marketplace, licensing
 
-    func claimHandle(id: String, handle: String) async throws -> HandleClaim {
+    // The owner's token. Without it a stranger could replace the name a
+    // profile answers to, and the old one stopped resolving.
+    func claimHandle(id: String, handle: String,
+                     token: String) async throws -> HandleClaim {
         try await request("/profiles/\(id)/handle", method: "PUT",
-                          body: ["handle": handle])
+                          body: ["handle": handle], token: token)
     }
 
     func placeBeacon(id: String, label: String,

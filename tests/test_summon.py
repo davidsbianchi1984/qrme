@@ -1,6 +1,8 @@
 """Summoning: @handles, #tags, and QR beacons for leaving profiles behind."""
 
-from tests.test_capabilities import make_interactor, make_profile, pdi_pair  # noqa: F401
+from tests.test_capabilities import (  # noqa: F401
+    auth_header, make_interactor, make_profile, pdi_pair,
+)
 
 
 def test_claim_and_summon_by_handle(client):
@@ -20,9 +22,17 @@ def test_claim_and_summon_by_handle(client):
     taken = client.put(f"/profiles/{other['id']}/handle",
                        json={"handle": "dana_g"})
     assert taken.status_code == 409
-    # But re-claiming your own handle is fine.
-    assert client.put(f"/profiles/{p['id']}/handle",
+    # But re-claiming your own handle is fine — as its owner. The header has
+    # to be named: `make_profile` leaves the *most recent* profile's token as
+    # the client default, so this line would otherwise be Echo asking to
+    # rename Dana, which is exactly what the route now refuses.
+    assert client.put(f"/profiles/{p['id']}/handle", headers=auth_header(p),
                       json={"handle": "dana_g"}).status_code == 200
+    # And a caller with no credential at all cannot rename anybody.
+    saved = client.headers.pop("authorization")
+    assert client.put(f"/profiles/{p['id']}/handle",
+                      json={"handle": "someoneelse"}).status_code == 401
+    client.headers["authorization"] = saved
 
     assert client.get("/summon",
                       params={"ref": "@nobody"}).status_code == 404

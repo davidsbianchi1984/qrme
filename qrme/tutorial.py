@@ -164,6 +164,28 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="inwords", chapter="Out in the world",
+         title="In its own words",
+         what="Four things about how a profile presents itself in language. "
+              "Which one it speaks — and that is not a display setting: the "
+              "persona *writes* in that language on every surface it appears, "
+              "chat, posts, rooms, a robot speaking aloud, rather than "
+              "writing English and translating afterwards. A translator for "
+              "anything you ran across, using this profile's own model, which "
+              "says plainly when it cannot rather than handing your text back "
+              "as though it had done the work. Composing a post, which always "
+              "runs the strict filter because a public post faces the widest "
+              "audience there is. And the **@handle** — the name it answers "
+              "to. Claiming one replaces whatever the profile had, because "
+              "that is how changing it works, and that route asked for no "
+              "credential at all: anybody could take `@rosa` away from Rosa, "
+              "leaving the name she had printed and shared resolving to "
+              "nothing and the new one, chosen by a stranger, pointing at "
+              "her. The three routes underneath it were given that check "
+              "already; this one had been walked past.",
+         screens=(182,),
+         try_it="Set the language to one you read, then compose a post and "
+                "see which language it comes back in."),
     dict(key="themark", chapter="Out in the world",
          title="The mark, and the held",
          what="Three things about the same question — *is it clear what this "

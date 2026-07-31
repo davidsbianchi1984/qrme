@@ -1,5 +1,4 @@
 GET /feedback
-GET /languages
 GET /packs/registries
 GET /packs/{pack_id}
 GET /profiles/{profile_id}/apps
@@ -12,12 +11,8 @@ POST /gaming/sessions/{session_id}/callout
 POST /gaming/sessions/{session_id}/end
 POST /packs/registries/{key}/sync
 POST /profiles/{profile_id}/apps
-POST /profiles/{profile_id}/compose
 POST /profiles/{profile_id}/excursions
 POST /profiles/{profile_id}/gaming/sessions
-POST /profiles/{profile_id}/translate
 POST /social/{cid}/collect
 POST /social/{cid}/publish
-PUT /profiles/{profile_id}/handle
-PUT /profiles/{profile_id}/language
 PUT /profiles/{profile_id}/steering/hub
