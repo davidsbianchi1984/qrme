@@ -20,6 +20,14 @@ data class RobotSpec(val model: String, val label: String, val maker: String, va
 data class Robot(val id: String, val model: String, val name: String, val status: String?, val commands: List<String>)
 data class CommandResult(val command: String, val status: String, val spoken: String?)
 data class Objection(val id: String, val status: String, val reason: String?, val reattested: Int)
+
+/** What comes back from raising one. `profileStatus` is the part that matters
+ *  to the person raising it: the profile is restricted straight away, pending
+ *  review, rather than after somebody gets round to it. */
+data class ObjectionOpened(
+    val id: String, val status: String,
+    val profileStatus: String, val note: String,
+)
 data class ChatMessage(val content: String?, val status: String, val flagReason: String?,
                        val provenance: Provenance? = null, val watermarkLine: String? = null,
                        // Spec clauses 2/12: which way the profile worked, and
@@ -338,6 +346,27 @@ object ApiClient {
 
     suspend fun attest(id: String, objectionId: String, token: String) {
         request("/profiles/$id/objections/$objectionId/attest", "POST", null, token)
+    }
+
+    /**
+     * Raise an objection against a profile. Takes **no credential**, and that
+     * is the point: `open_objection` says so itself — *the objecting party
+     * need not own an account*. This route belongs to somebody who has found
+     * a synthetic profile of themselves, has no QRME account, and so has no
+     * console. A phone is the surface they have; until 0.23.0 it was the
+     * surface that could not do this.
+     *
+     * The shell already carried the other half — listing objections against
+     * your own profile and attesting to them. That is the owner's side.
+     */
+    suspend fun openObjection(profileId: String, objectorRef: String,
+                              reason: String): ObjectionOpened {
+        val body = JSONObject().put("profile_id", profileId)
+            .put("objector_ref", objectorRef).put("reason", reason)
+        val o = JSONObject(request("/objections", "POST", body, null))
+        return ObjectionOpened(
+            o.getString("id"), o.optString("status", ""),
+            o.optString("profile_status", ""), o.optString("note", ""))
     }
 
     // ---- chat (the core loop) ----

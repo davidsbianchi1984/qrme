@@ -193,6 +193,35 @@
                                Foreground="{StaticResource QrmeT3Brush}" />
                 </StackPanel>
             </Border>
+
+            <!-- Raising an objection: the half of governance that belongs to
+                 the person who is *not* the profile's owner. This shell
+                 carried the owner's half (list objections against your own
+                 profile, attest to them) and nothing for the person on the
+                 other side. `open_objection` takes no credential and says why
+                 in its own docstring: the objecting party need not own an
+                 account — so they have no console either. Placed beside "Who
+                 wrote this?" because it is the same person one step on. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Object to a profile" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}"
+                               Text="If a synthetic profile here is of you and you did not agree to it, say so. You do not need an account, and you do not need to be signed in." />
+                    <TextBox x:Name="ObjectProfileBox" PlaceholderText="Profile id" />
+                    <TextBox x:Name="ObjectContactBox" PlaceholderText="How to reach you" />
+                    <TextBox x:Name="ObjectReasonBox" AcceptsReturn="True" TextWrapping="Wrap"
+                             Height="70" PlaceholderText="What is wrong" />
+                    <Button x:Name="ObjectButton" Content="Raise an objection" Click="OnRaiseObjection"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <TextBlock x:Name="ObjectVerdict" FontSize="13" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="ObjectNote" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

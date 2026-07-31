@@ -175,6 +175,16 @@ public record Objection(
     [property: JsonPropertyName("reason")] string? Reason,
     [property: JsonPropertyName("reattested")] int Reattested);
 
+/// <summary>What comes back from raising an objection. <c>ProfileStatus</c> is
+/// the part that matters to the person raising it: the profile is restricted
+/// straight away, pending review, not after somebody gets round to it.</summary>
+public record ObjectionOpened(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("profile_status")] string? ProfileStatus,
+    [property: JsonPropertyName("note")] string? Note);
+
 public record InteractorCreated(
     [property: JsonPropertyName("id")] string Id,
     // The server has always returned this; the shell simply never kept it, so
@@ -753,6 +763,24 @@ public sealed class ApiClient
             token));
 
     // -- objections (governance) --
+
+    /// <summary>Raise an objection against a profile. Takes <b>no
+    /// credential</b>, and that is the point: <c>open_objection</c> says so in
+    /// its own docstring — <i>the objecting party need not own an account</i>.
+    ///
+    /// <para>This route belongs to somebody who has found a synthetic profile
+    /// of themselves, has no QRME account, and therefore has no console. Until
+    /// 0.23.0 every shell carried the owner's half of governance — listing
+    /// objections against your own profile, attesting to them — and none
+    /// carried this one.</para></summary>
+    public Task<ObjectionOpened> OpenObjection(
+        string profileId, string objectorRef, string reason) =>
+        Send<ObjectionOpened>(Post("/objections", new
+        {
+            profile_id = profileId,
+            objector_ref = objectorRef,
+            reason,
+        }, null));
 
     public Task<Objection[]> Objections(string id, string token)
     {

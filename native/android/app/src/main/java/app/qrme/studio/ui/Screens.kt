@@ -565,6 +565,7 @@ fun SettingsScreen(vm: StudioViewModel) {
         }
 
         WhoWroteThisCard(vm)
+        ObjectToAProfileCard(vm)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("Objections", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -2369,5 +2370,60 @@ private fun WhoWroteThisCard(vm: StudioViewModel) {
             }
             r.method?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
         }
+    }
+}
+
+/**
+ * Raising an objection — the half of governance that belongs to the person who
+ * is *not* the profile's owner.
+ *
+ * This shell already carried the owner's half: list the objections against
+ * your own profile, and attest to them. It carried nothing for the person on
+ * the other side, and `open_objection` is explicit about who they are — *the
+ * objecting party need not own an account*.
+ *
+ * Somebody who finds a synthetic profile of themselves has, by construction,
+ * no QRME account and therefore no console. A phone is the surface they have.
+ * Placed beside "Who wrote this?" because it is the same person one step on:
+ * they have identified the profile, and now they want it stopped.
+ */
+@Composable
+private fun ObjectToAProfileCard(vm: StudioViewModel) {
+    var profileId by remember { mutableStateOf("") }
+    var contact by remember { mutableStateOf("") }
+    var reason by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf<ObjectionOpened?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("Object to a profile", color = Q.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text("If a synthetic profile here is of you and you did not agree to " +
+             "it, say so. You do not need an account, and you do not need to " +
+             "be signed in.", color = Q.T2, fontSize = 12.sp)
+        OutlinedTextField(value = profileId, onValueChange = { profileId = it },
+            label = { Text("Profile id") })
+        OutlinedTextField(value = contact, onValueChange = { contact = it },
+            label = { Text("How to reach you") })
+        OutlinedTextField(value = reason, onValueChange = { reason = it },
+            label = { Text("What is wrong") })
+        Button(onClick = {
+            vm.call({ ApiClient.openObjection(profileId.trim(), contact.trim(),
+                reason) }) { result = it; error = null }
+        }, enabled = profileId.isNotBlank() && reason.isNotBlank(),
+            colors = ButtonDefaults.buttonColors(containerColor = Q.BrandA)) {
+            Text("Raise an objection")
+        }
+        result?.let { r ->
+            // Restricted immediately, pending review. That is the part the
+            // person raising it needs told: the remedy is now, not after
+            // somebody gets round to it.
+            Text("Raised. The profile is ${r.profileStatus} pending review.",
+                color = Q.Green, fontSize = 12.sp)
+            if (r.note.isNotBlank()) {
+                Text(r.note, color = Q.T2, fontSize = 11.sp)
+            }
+        }
+        error?.let { Text(it, color = Q.Red, fontSize = 12.sp) }
     }
 }

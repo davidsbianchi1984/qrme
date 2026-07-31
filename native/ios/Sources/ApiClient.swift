@@ -177,6 +177,17 @@ struct Objection: Decodable {
     let reattested: Int
 }
 
+/// What comes back from raising an objection. `profile_status` is the part
+/// that matters to the person raising it: the profile is restricted straight
+/// away, pending review, rather than after somebody gets round to it.
+struct ObjectionOpened: Decodable {
+    let id: String
+    let profile_id: String
+    let status: String
+    let profile_status: String?
+    let note: String?
+}
+
 struct InteractorCreated: Decodable { let id: String; let token: String? }
 
 struct SteeringDial: Decodable, Identifiable {
@@ -840,6 +851,23 @@ actor ApiClient {
     }
 
     // MARK: Objections (governance)
+
+    /// Raise an objection against a profile. Takes **no credential**, and
+    /// that is the whole point: `open_objection` says so in its own docstring
+    /// — *the objecting party need not own an account*. The person this route
+    /// is for has found a synthetic profile of themselves, has no QRME
+    /// account, and therefore has no console. A phone is the surface they
+    /// have, and until 0.23.0 it was the surface that could not do this.
+    ///
+    /// The shell already carried the other half — listing objections against
+    /// your own profile, and attesting to them. That is the owner's side.
+    func openObjection(profileId: String, objectorRef: String,
+                       reason: String) async throws -> ObjectionOpened {
+        try await request("/objections", method: "POST",
+                          body: ["profile_id": profileId,
+                                 "objector_ref": objectorRef,
+                                 "reason": reason])
+    }
 
     func objections(id: String, token: String) async throws -> [Objection] {
         try await request("/profiles/\(id)/objections", token: token)

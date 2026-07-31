@@ -357,6 +357,40 @@ public sealed partial class SettingsPage : Page
         ErrorText.Visibility = Visibility.Visible;
     }
 
+    // MARK: Object to a profile — the public's half of governance
+    //
+    // `open_objection` takes no credential, and says why: the objecting party
+    // need not own an account. Somebody who has found a synthetic profile of
+    // themselves therefore has no console either, and this shell carried only
+    // the owner's side of the same feature until 0.23.0.
+
+    private async void OnRaiseObjection(object sender, RoutedEventArgs e)
+    {
+        var pid = ObjectProfileBox.Text?.Trim() ?? "";
+        var why = ObjectReasonBox.Text?.Trim() ?? "";
+        if (pid.Length == 0 || why.Length == 0)
+        {
+            ObjectVerdict.Text = "A profile id and a reason are both needed.";
+            return;
+        }
+        try
+        {
+            var r = await ApiClient.Shared.OpenObjection(
+                pid, ObjectContactBox.Text?.Trim() ?? "", why);
+            // Restricted immediately, pending review — the part the person
+            // raising it needs told, because the remedy is now rather than
+            // after somebody gets round to it.
+            ObjectVerdict.Text =
+                $"Raised. The profile is {r.ProfileStatus ?? "restricted"} pending review.";
+            ObjectNote.Text = r.Note ?? "";
+        }
+        catch (System.Exception ex)
+        {
+            ObjectVerdict.Text = ex.Message;
+            ObjectNote.Text = "";
+        }
+    }
+
     // MARK: Who wrote this? — extract and reconstruct
 
     /// <summary>

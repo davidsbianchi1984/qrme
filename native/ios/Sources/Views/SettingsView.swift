@@ -127,6 +127,7 @@ struct SettingsView: View {
 
                 WatermarkCard()
                 WhoWroteThisCard()
+                ObjectToAProfileCard()
 
                 RelationshipCard()
 
@@ -344,5 +345,78 @@ struct WhoWroteThisCard: View {
             result = try? await ApiClient.shared.recoverWatermark(content: text)
             busy = false
         }
+    }
+}
+
+/// Raising an objection — the half of governance that belongs to the person
+/// who is *not* the profile's owner.
+///
+/// This shell already carried the owner's half: list the objections against
+/// your own profile, and attest to them. It carried nothing for the person on
+/// the other side of that, and `open_objection` is explicit about who they
+/// are — *the objecting party need not own an account*.
+///
+/// Somebody who finds a synthetic profile of themselves has, by construction,
+/// no QRME account and therefore no console. A phone is the surface they have.
+/// It is placed beside "Who wrote this?" because it is the same person at the
+/// next step: they have identified the profile, and now they want it stopped.
+struct ObjectToAProfileCard: View {
+    @State private var profileId = ""
+    @State private var contact = ""
+    @State private var reason = ""
+    @State private var result: ObjectionOpened?
+    @State private var busy = false
+    @State private var error: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Object to a profile").font(.headline).foregroundStyle(Theme.txt)
+            Text("If a synthetic profile here is of you and you did not agree "
+                 + "to it, say so. You do not need an account, and you do not "
+                 + "need to be signed in.")
+                .font(.footnote).foregroundStyle(Theme.t2)
+
+            TextField("Profile id", text: $profileId)
+                .textFieldStyle(.roundedBorder).autocapitalization(.none)
+            TextField("How to reach you", text: $contact)
+                .textFieldStyle(.roundedBorder).autocapitalization(.none)
+            TextField("What is wrong", text: $reason, axis: .vertical)
+                .textFieldStyle(.roundedBorder).lineLimit(2...4)
+
+            Button {
+                Task {
+                    busy = true; error = nil
+                    do {
+                        result = try await Api.shared.openObjection(
+                            profileId: profileId.trimmingCharacters(in: .whitespaces),
+                            objectorRef: contact.trimmingCharacters(in: .whitespaces),
+                            reason: reason)
+                    } catch { self.error = error.localizedDescription }
+                    busy = false
+                }
+            } label: {
+                Text("Raise an objection").frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent).tint(Theme.brandA)
+            .disabled(busy || profileId.trimmingCharacters(in: .whitespaces).isEmpty
+                      || reason.trimmingCharacters(in: .whitespaces).isEmpty)
+
+            if let r = result {
+                // The profile is restricted immediately, pending review. That
+                // is the part the person raising it needs told — the remedy is
+                // now, not after somebody gets round to it.
+                Text("Raised. The profile is \(r.profile_status ?? "restricted") "
+                     + "pending review.")
+                    .font(.footnote).foregroundStyle(Theme.green)
+                if let n = r.note {
+                    Text(n).font(.caption2).foregroundStyle(Theme.t2)
+                }
+            }
+            if let e = error {
+                Text(e).font(.footnote).foregroundStyle(Theme.red)
+            }
+        }
+        .padding(14)
+        .background(Theme.card).clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
