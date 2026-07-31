@@ -55,6 +55,7 @@ Contest         159
 Guide           160
 Plans           130,131
 Robots          163
+Workshop        164
 Placements      162
 Onboarding      unaudited
 Org             unaudited

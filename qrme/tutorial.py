@@ -324,6 +324,18 @@ LESSONS: tuple[dict, ...] = (
               "an opinion about footage nobody showed it.",
          screens=(155,),
          try_it="Open a party and read 'What a profile in here knows'."),
+    dict(key="workshop", chapter="Working", title="What it is made of",
+         what="The material a profile is built from and the manner it comes "
+              "across in. Source material — writing, conversations, life "
+              "events — is what the persona is grounded on, and on a free "
+              "account you can read it back on this screen because it is "
+              "sitting in the clear. The dials shape manner and never "
+              "permissions. A domain can be handed to a specialist profile "
+              "that knows more. And the fine-tune recomputes the profile's "
+              "own model from history it already has, on this machine, with "
+              "nothing transmitted anywhere — the answer says so itself.",
+         screens=(164,),
+         try_it="Add a piece of writing, then move the warmth dial."),
     dict(key="bodies", chapter="Working", title="A body to speak through",
          what="Bind a robot and the profile speaks through it — the same "
               "personality, the same memory, the same voice, in a different "

@@ -356,6 +356,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/162-where-it-is-marketed.svg"><img src="docs/screens/162-where-it-is-marketed.svg" width="210" alt="Where It Is Marketed"></a><br><sub><b>162</b> · Where It Is Marketed</sub></td>
     <td align="center" width="33%"><a href="docs/screens/163-a-body-to-speak-through.svg"><img src="docs/screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/164-what-it-is-made-of.svg"><img src="docs/screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
   </tr>
 </table>
 
@@ -1761,6 +1762,62 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 164 — what a profile is made of
+
+Source material, the dials, a CV, the specialists it hands work to, the bodies
+it speaks through, and the local fine-tune that folds all of it back in. Twelve
+routes and not one caller in the console: the profile could be created and
+talked to, and everything that made it *this* profile rather than a default one
+was unreachable.
+
+Two of these writes were **silently permissive**, and it is the same shape
+twice — a Pydantic model where every field has a default, so a body it does not
+understand is accepted, discarded, and answered `200`:
+
+| route | takes | the guess |
+|---|---|---|
+| `PUT .../steering` | `values` | `dials` — what the *read* calls its catalogue |
+| `PUT .../experience` | `period` | `years` — what anybody writing a CV form reaches for |
+
+Neither produced an error. The row saved with no dates, the dials did not move,
+and both requests looked exactly like successes — same status, same shape,
+plausible body. Nothing in the response distinguished *I applied your change*
+from *I ignored it*, so a client that fired and moved on would never find out.
+
+Both models are strict now, so a wrong key gets a 422 naming the field. But the
+strictness is the fix, not the guard: the guard is the thing that would have
+caught it in the first place, which is **writing and reading back**. That is
+what `test_a_write_that_answers_200_did_something.py` does, and its name is the
+rule — *a request model with defaults for every field can never fail on a body
+it does not understand, so where that model is the target of an owner's edit,
+"accepted" and "applied" have to be checked separately.*
+
+Making the models strict then broke a test that had been green for years, and
+the way it broke is the sharpest part of this. `test_the_menu_matches_the_kitchen`
+has a case named *every dial the server describes can be set* — written for
+exactly this failure, and sending `{"dials": {…}}`. It passed on every dial
+while setting none of them, because the server accepted the body and ignored
+it. **The guard was green for the same reason the bug was invisible.** It no
+longer trusts the status: it moves each dial off its current value and asks the
+server what it holds.
+
+Building the screen produced a third one of the same family. The picker for
+what a profile speaks through offered `screen`, `wearable` and `vehicle`; the
+enum is `speaker, earpiece, hologram, robot, humanoid, other`. Each wrong option
+sat in the dropdown looking exactly like a right one and would have 422'd on
+submit. A test now reads the `Literal` off the model and checks the console's
+option list against it.
+
+Three things the screen renders rather than summarises: a source's content when
+it is there, because *there* means readable — by this platform, by whoever
+operates it, and by a lawful request, and a tick saying "stored" would hide
+which side of the custody line the account is on; the fine-tune's answer, which
+is mostly claims about what did *not* happen (`external_transmission: false`,
+`computed: "locally…"`); and the identity signature, which is the one thing on
+this screen a stranger can verify — `GET .../embodiment-consistency` needs no
+account, so somebody who met the profile through a speaker can check it against
+the one they met in a room.
 
 ### Screens 162 and 163 — bodies, and where a rated profile is marketed
 

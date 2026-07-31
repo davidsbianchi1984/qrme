@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 ProfileKind = Literal["self", "other_person", "fictional", "hybrid"]
 InteractionScope = Literal["reactive", "proactive"]
@@ -709,7 +709,15 @@ class MarketAssist(BaseModel):
 
 
 class ExperienceEntry(BaseModel):
-    """One line of a profile's history."""
+    """One line of a profile's history.
+
+    Strict, for the reason `SteeringSet` is: `period` is the field, and
+    `years` is what anybody writing a CV form reaches for first. An unknown
+    key was accepted and dropped, so the row saved with no dates and the
+    request answered 200. Refusing by name is the smaller surprise.
+    """
+
+    model_config = ConfigDict(extra="forbid")
 
     title: str
     org: str | None = None

@@ -82,13 +82,40 @@ def test_every_dial_the_server_describes_can_be_set(client, profile_id):
     """The steering screen renders whatever this endpoint returns.
 
     A dial described but not settable is a slider that throws when moved.
+
+    This test used to send ``{"dials": {...}}`` and pass on every dial —
+    because the request model took ``values`` and had a default, so a body it
+    did not understand was accepted, discarded, and answered 200. It asserted
+    that every dial was settable while setting none of them: green for the
+    same reason the bug was invisible.
+
+    So it no longer trusts the status. It moves each dial off its current
+    value and asks the server what it holds, which is the only check that can
+    tell "applied" from "accepted".
     """
     described = [d["name"] for d in
                  client.get(f"/profiles/{profile_id}/steering").json()["dials"]]
-    _check(
-        "steering dial", described,
-        lambda name: client.put(f"/profiles/{profile_id}/steering",
-                                json={"dials": {name: 50}}),
+    assert described, "the catalog offered no dials, so nothing was checked"
+
+    unmoved = []
+    for name in described:
+        before = client.get(f"/profiles/{profile_id}/steering"
+                            ).json()["values"].get(name, 50)
+        target = 20 if before != 20 else 70
+        response = client.put(f"/profiles/{profile_id}/steering",
+                              json={"values": {name: target}})
+        if not _accepted(response):
+            unmoved.append(f"{name!r} -> {response.status_code} "
+                           f"{response.text[:120]}")
+            continue
+        after = client.get(f"/profiles/{profile_id}/steering"
+                           ).json()["values"].get(name)
+        if after != target:
+            unmoved.append(f"{name!r} -> 200, and stayed at {after}")
+    assert not unmoved, (
+        "steering dial: the backend describes these and then does not move "
+        "them:\n  " + "\n  ".join(unmoved)
+        + "\n(a slider the user dragged, and a value the server kept)"
     )
 
 

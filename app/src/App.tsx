@@ -18,6 +18,7 @@ import { Guide } from "./screens/Guide";
 import { Placements } from "./screens/Placements";
 import { Plans } from "./screens/Plans";
 import { Robots } from "./screens/Robots";
+import { Workshop } from "./screens/Workshop";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -36,7 +37,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -63,6 +64,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "grants", label: "Lent skills", icon: "🪄" },
   { id: "party", label: "Watch together", icon: "🍿" },
   { id: "voice", label: "Voice", icon: "🎙" },
+  { id: "workshop", label: "What it is made of", icon: "🧩" },
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
   { id: "plans", label: "Plans", icon: "🎟" },
@@ -144,6 +146,7 @@ export function App() {
         {tab === "grants" && <Grants onPlans={toPlans} />}
         {tab === "party" && <WatchParty onPlans={toPlans} />}
         {tab === "voice" && <Voice onPlans={toPlans} />}
+        {tab === "workshop" && <Workshop onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}

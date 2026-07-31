@@ -418,6 +418,121 @@ export type PlacementAnalytics = {
 
 export type PlacementCustody = Record<string, unknown>;
 
+// ---------------------------------------------------------------------
+// The owner's workshop.
+// ---------------------------------------------------------------------
+
+/** A profile's dials. Same catalogue as a robot's, plus one difference the
+ *  read carries and the robot's does not: `adult_mode`, which is what
+ *  decides whether the intimacy dial exists at all. */
+export type ProfileSteering = {
+  subject: string; subject_id: string;
+  dials: SteeringDial[];
+  values: Record<string, number>;
+  adult_mode: boolean;
+};
+
+/** The write answers without the catalogue, and without a body's derived
+ *  `behavior_profile` — a fourth shape across the two steering surfaces. */
+export type ProfileSteeringSet = {
+  subject: string; subject_id: string;
+  values: Record<string, number>;
+  adult_mode: boolean;
+};
+
+export type SourceItem = {
+  id: string; profile_id: string;
+  kind: string;
+  title: string | null;
+  /** Null once a vault holds it — the content left and only the reference
+   *  stayed. Present and readable means it is sitting in the clear, which
+   *  is the free tier's posture and worth showing rather than implying. */
+  content: string | null;
+  pdi_key: string | null;
+  pack_id: string | null;
+  created_at: string;
+};
+
+export type SourceAdded = {
+  id: string; kind: string;
+  title: string | null;
+  /** The same fact as `pdi_key`, said from the other end. */
+  vaulted: boolean;
+};
+
+/** What comes back: the domain and an id, with no name. Showing who the
+ *  specialist *is* means fetching that profile — the join is the console's
+ *  job, not the route's. */
+export type Specialist = {
+  domain: string;
+  specialist_profile_id: string;
+};
+
+export type SpecialistSet = Specialist & { profile_id: string };
+
+/** `period`, not `years`. Sending the latter used to save a row with no
+ *  dates and answer 200; the model is strict now. */
+export type ExperienceEntry = {
+  id?: string;
+  title: string;
+  org?: string | null;
+  period?: string | null;
+  detail?: string | null;
+};
+
+/** A local fine-tune. Every field after the counts is a claim about what
+ *  did *not* happen, which is the reason this feature reads the way it
+ *  does — rendered rather than summarised. */
+export type FinetuneRun = {
+  id: string;
+  interactors: number;
+  messages_processed: number;
+  engagement_avg: number | null;
+  external_transmission: boolean;
+  computed: string;
+  offline_mode: boolean;
+  sealed_in_vault: boolean;
+  vault_key: string | null;
+};
+
+export type Embodiment = {
+  name: string; kind: string;
+  /** False for a speaker or a screen that only relays. The distinction
+   *  matters: one of them can hold a conversation and one cannot. */
+  has_llm: boolean;
+};
+
+/** The public verification surface. Anybody who meets this profile in any
+ *  form can fetch this and check the signature is the same one. */
+export type EmbodimentConsistency = {
+  profile_id: string;
+  signature: string;
+  name: string;
+  invariant_across: string;
+  guarantee: string;
+  embodiments: Embodiment[];
+  surfaces: string[];
+};
+
+export type Perception = {
+  id: string;
+  recognized: Record<string, string[]>;
+  recognized_count: number;
+  goal: string | null;
+  guidance: string;
+  /** Every piece of generated guidance is marked, with a path to check it
+   *  against. Drawn beside the words rather than under a disclosure link. */
+  watermark: {
+    watermark_id: string; kind: string; profile_id: string;
+    content_sha256: string; issued_at: string; disclosure: string;
+    display: { mark: string; label: string; line: string;
+               custom: boolean; always_displayed: boolean;
+               disclosure: string };
+    verify: string;
+  };
+  status: string;
+};
+
 export type PlacementRemoved = {
   placement_id: string;
   removed: boolean;
@@ -2526,4 +2641,78 @@ export const api = {
   removePlacement: (placementId: string, token: string) =>
     req<PlacementRemoved>(`/placements/${placementId}`,
       { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // What a profile is made of, and how the owner shapes it.
+  //
+  // Source material, the dials, a CV, the specialists it hands work to, the
+  // bodies it speaks through, and the local fine-tune that folds all of it
+  // back in. Twelve routes, none of them with a caller in the console.
+  //
+  // Two of these writes were **silently permissive** until this round:
+  // `PUT .../steering` takes `values` and `PUT .../experience` takes
+  // `period`, and a body keyed anything else was accepted, discarded, and
+  // answered 200. `dials` and `years` are the obvious guesses — the first
+  // is what the steering *read* calls its catalogue, the second is what
+  // anybody writing a CV form reaches for. Both models are now strict, so
+  // the next wrong guess gets a 422 naming the field.
+  // ---------------------------------------------------------------------
+
+  profileSteering: (profileId: string, token: string) =>
+    req<ProfileSteering>(`/profiles/${profileId}/steering`, { token }),
+  setProfileSteering: (profileId: string, values: Record<string, number>,
+                       token: string) =>
+    req<ProfileSteeringSet>(`/profiles/${profileId}/steering`,
+      { method: "PUT", body: { values }, token }),
+
+  sources: (profileId: string, token: string) =>
+    req<SourceItem[]>(`/profiles/${profileId}/sources`, { token }),
+  addSource: (profileId: string,
+              body: { kind: string; title?: string; content?: string },
+              token: string) =>
+    req<SourceAdded>(`/profiles/${profileId}/sources`,
+      { method: "POST", body, token }),
+
+  // Plural route, singular body: one `{domain, specialist_profile_id}` pair
+  // per call, replacing whatever held that domain. Reading the route name
+  // as "set the list" sends an array and gets a 422 for two missing fields.
+  specialists: (profileId: string, token: string) =>
+    req<Specialist[]>(`/profiles/${profileId}/specialists`, { token }),
+  attachSpecialist: (profileId: string, domain: string,
+                     specialistProfileId: string, token: string) =>
+    req<SpecialistSet>(`/profiles/${profileId}/specialists`,
+      { method: "PUT", token,
+        body: { domain, specialist_profile_id: specialistProfileId } }),
+
+  // Replaced wholesale — a CV is a statement, not rows to patch.
+  setExperience: (profileId: string, entries: ExperienceEntry[],
+                  token: string) =>
+    req<{ profile_id: string; experience: ExperienceEntry[] }>(
+      `/profiles/${profileId}/experience`,
+      { method: "PUT", body: { entries }, token }),
+
+  // No body. The answer's own fields are the interesting part: nothing was
+  // transmitted, it was computed on this host, and whether it was sealed.
+  finetune: (profileId: string, token: string) =>
+    req<FinetuneRun>(`/profiles/${profileId}/finetune`,
+      { method: "POST", body: {}, token }),
+
+  embodiments: (profileId: string, token: string) =>
+    req<Embodiment[]>(`/profiles/${profileId}/embodiments`, { token }),
+  addEmbodiment: (profileId: string,
+                  body: { name: string; kind: string; has_llm: boolean },
+                  token: string) =>
+    req<Embodiment & { profile_id: string }>(
+      `/profiles/${profileId}/embodiments`, { method: "POST", body, token }),
+  // **Public**, and deliberately so: anybody who meets this profile through
+  // any form can check it is the same personality. No token.
+  embodimentConsistency: (profileId: string) =>
+    req<EmbodimentConsistency>(`/profiles/${profileId}/embodiment-consistency`),
+
+  perceive: (profileId: string,
+             body: { objects?: string[]; people?: string[];
+                     gestures?: string[]; place?: string; goal?: string },
+             token: string) =>
+    req<Perception>(`/profiles/${profileId}/perceive`,
+      { method: "POST", body, token }),
 };

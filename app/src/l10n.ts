@@ -128,6 +128,13 @@ const CHROME: Table = {
     ja: "案内して", zh: "带我熟悉", hi: "मुझे दिखाएँ",
     ar: "جولة تعريفية",
   },
+  "nav.workshop": {
+    en: "What it is made of", es: "De qué está hecho",
+    fr: "Ce qui le compose", de: "Woraus es besteht",
+    pt: "Do que é feito", it: "Di cosa è fatto",
+    ja: "何でできているか", zh: "由什么构成", hi: "किससे बना है",
+    ar: "مِمَّ يتكوّن",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from .. import db, persona, steering
 from ..common import profile_or_404, require_owner
@@ -22,6 +22,18 @@ router = APIRouter()
 
 
 class SteeringSet(BaseModel):
+    """Strict on purpose.
+
+    `values` defaults to `{}`, so before this a body keyed anything else —
+    `dials`, say, which is what the *read* calls the catalogue and therefore
+    the obvious guess — was accepted, ignored, and answered 200 with nothing
+    changed. No error, no log line, and the only way to find out was to write
+    and read back. A 422 naming the field is worth more than a success that
+    did nothing.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
     values: dict[str, int] = Field(default_factory=dict)
 
 

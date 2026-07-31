@@ -3515,6 +3515,22 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 164: the workshop. The first card is the material and the sentence
+    # that follows from it — material in the clear is readable, and the
+    # screen shows the words rather than a tick. The last card is the pair
+    # of writes that used to accept a wrong key and answer 200.
+    dict(num=164, title="What It Is Made Of", sub="Material, manner, and who it asks",
+         accent="green", tab=15, cards=[
+        dict(icon="doc", color="green", k="What it knows",
+             s="shown, because it is readable",
+             pill=("OPEN", "warn")),
+        dict(icon="sliders", color="brand", k="How it comes across",
+             s="manner, never permissions"),
+        dict(icon="people", color="cyan", k="Who it hands work to",
+             s="a domain, and who knows more"),
+        dict(icon="shieldok", color="amber", k="A wrong key now refuses",
+             s="it used to answer 200"),
+    ], button=("Fold it back in", "brand")),
     # 163: a body. The middle two cards are the pair that is easy to get
     # wrong from the route names alone — what the body accepts is one list,
     # what it was told is another — and the last is the limit that matters
