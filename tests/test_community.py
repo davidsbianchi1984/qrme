@@ -3,7 +3,8 @@ providers, and consented session handoffs."""
 
 import json
 
-from tests.test_capabilities import make_interactor, make_profile, pdi_pair  # noqa: F401
+from tests.test_capabilities import (as_interactor, make_interactor,  # noqa: F401
+                                     make_profile, pdi_pair)
 
 
 def test_mixed_room_users_and_profiles(client):
@@ -18,7 +19,8 @@ def test_mixed_room_users_and_profiles(client):
                          {"kind": "profile", "id": echo["id"]}]}).json()
     assert len(room["participants"]) == 3
 
-    r = client.post(f"/rooms/{room['id']}/messages", json={
+    mine = as_interactor(user)
+    r = client.post(f"/rooms/{room['id']}/messages", headers=mine, json={
         "sender_id": user, "message": "do machines remember, or just store?"})
     assert r.status_code == 201
     body = r.json()
@@ -26,12 +28,20 @@ def test_mixed_room_users_and_profiles(client):
     assert len(body["replies"]) == 2                 # both profiles answered
     assert all(reply["status"] == "approved" for reply in body["replies"])
 
-    transcript = client.get(f"/rooms/{room['id']}/messages").json()
+    transcript = client.get(f"/rooms/{room['id']}/messages",
+                            headers=mine).json()
     assert [m["sender_kind"] for m in transcript] == ["user", "profile", "profile"]
-    # Only participants may speak.
+    # Only participants may speak — and it is the *token* that says who is
+    # asking. Sending a participant's id from outside used to be enough.
     outsider = make_interactor(client, "Nosy")
-    assert client.post(f"/rooms/{room['id']}/messages", json={
-        "sender_id": outsider, "message": "hi"}).status_code == 403
+    assert client.post(f"/rooms/{room['id']}/messages",
+                       headers=as_interactor(outsider),
+                       json={"sender_id": outsider,
+                             "message": "hi"}).status_code == 403
+    assert client.post(f"/rooms/{room['id']}/messages",
+                       headers=as_interactor(outsider),
+                       json={"sender_id": user,
+                             "message": "hi"}).status_code == 403
 
 
 def test_profile_to_profile_room_advance(client):
@@ -42,11 +52,16 @@ def test_profile_to_profile_room_advance(client):
         "topic": "gardens", "channel": "voice",
         "participants": [{"kind": "profile", "id": dana["id"]},
                          {"kind": "profile", "id": echo["id"]}]}).json()
+    # A profile-only room has no user participant to press the button, so
+    # the advance and the read both go out as a profile's owner — which is
+    # exactly the case `_require_in_room` accepts an owner token for.
+    head = {"authorization": f"Bearer {dana['owner_token']}"}
     for _ in range(2):
-        r = client.post(f"/rooms/{room['id']}/advance")
+        r = client.post(f"/rooms/{room['id']}/advance", headers=head)
         assert r.status_code == 201
         assert len(r.json()["replies"]) == 2
-    transcript = client.get(f"/rooms/{room['id']}/messages").json()
+    transcript = client.get(f"/rooms/{room['id']}/messages",
+                            headers=head).json()
     assert len(transcript) == 4
     assert {m["from"] for m in transcript} == {"Dana", "Echo"}
 
@@ -71,8 +86,10 @@ def test_room_with_minor_runs_strict(client):
         "topic": "homework", "channel": "chat",
         "participants": [{"kind": "user", "id": minor},
                          {"kind": "profile", "id": dana["id"]}]}).json()
-    r = client.post(f"/rooms/{room['id']}/messages", json={
-        "sender_id": minor, "message": "someone sent me something nsfw"}).json()
+    r = client.post(f"/rooms/{room['id']}/messages",
+                    headers=as_interactor(minor),
+                    json={"sender_id": minor,
+                          "message": "someone sent me something nsfw"}).json()
     assert r["message"]["status"] == "blocked"       # strict, minor present
     assert r["replies"] == []                        # blocked input → no turns
 
