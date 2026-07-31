@@ -3515,6 +3515,22 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 165: what it can do for you. The last card is the pair of answers a
+    # provenance check gives, which can disagree — a real credential and
+    # altered content — and reporting only the first would be the one
+    # failure a mark must not have.
+    dict(num=165, title="What It Can Do For You", sub="And the mark on what it makes",
+         accent="brand", tab=15, cards=[
+        dict(icon="list", color="brand", k="Sort a pile",
+             s="with the reason each survived",
+             pill=("RANKED", "info")),
+        dict(icon="pen", color="cyan", k="Fix a draft",
+             s="the rewrite and the reasons"),
+        dict(icon="watch", color="green", k="Only what you wear",
+             s="a room mic is refused, with why"),
+        dict(icon="shieldok", color="amber", k="Two questions, not one",
+             s="issued here, and unaltered"),
+    ], button=("Check this mark", "brand")),
     # 164: the workshop. The first card is the material and the sentence
     # that follows from it — material in the clear is readable, and the
     # screen shows the words rather than a tick. The last card is the pair

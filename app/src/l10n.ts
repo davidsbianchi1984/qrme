@@ -135,6 +135,13 @@ const CHROME: Table = {
     ja: "何でできているか", zh: "由什么构成", hi: "किससे बना है",
     ar: "مِمَّ يتكوّن",
   },
+  "nav.assist": {
+    en: "What it can do for you", es: "Qué puede hacer por ti",
+    fr: "Ce qu'il peut faire pour vous", de: "Was es für dich tun kann",
+    pt: "O que pode fazer por si", it: "Cosa può fare per te",
+    ja: "できること", zh: "它能为你做什么", hi: "यह आपके लिए क्या कर सकता है",
+    ar: "ما يمكنه فعله لك",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

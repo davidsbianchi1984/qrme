@@ -357,6 +357,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/162-where-it-is-marketed.svg"><img src="docs/screens/162-where-it-is-marketed.svg" width="210" alt="Where It Is Marketed"></a><br><sub><b>162</b> · Where It Is Marketed</sub></td>
     <td align="center" width="33%"><a href="docs/screens/163-a-body-to-speak-through.svg"><img src="docs/screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
     <td align="center" width="33%"><a href="docs/screens/164-what-it-is-made-of.svg"><img src="docs/screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/165-what-it-can-do-for-you.svg"><img src="docs/screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
   </tr>
 </table>
 
@@ -1762,6 +1763,40 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 165 — what it can do for you, and the mark on what it makes
+
+Triage, proofreading, composing something to keep, the wearables the watch
+faces run on, the reviews from people who actually talked to it, correcting
+your own turn, and the check on any mark. Fifteen routes.
+
+**Checking a mark asks two questions, and they can disagree.** `valid` says the
+credential was issued by this deployment; `content_match` says this is the
+content it was issued for. A genuine credential whose content has since been
+altered comes back `valid: true, content_match: false` with a sentence saying
+so. A screen reporting `valid` alone would call something genuine at the exact
+moment the server said it had been changed — the one failure a provenance check
+must not have, because it is worse than having no check. The screen asks both,
+always, and draws the mismatch loudest.
+
+Two arguments are rendered verbatim rather than summarised. **A room-facing
+microphone is refused with a paragraph**: a smart speaker *hears whoever walks
+into the room, and they did not pair it, were not asked, and may have a right
+not to be recorded*. "Unsupported device" would be the console throwing away
+somebody's reasoning. And **triage returns the reason each item survived**, with
+its score — a pile sorted by a number nobody can see is a pile somebody has to
+re-check by hand, which is the work triage was supposed to do.
+
+`answers_stale_text` is drawn too: a reply written before the message above it
+was edited says so, rather than the conversation quietly rewriting itself.
+
+Two smaller things the round turned up. `include_revoked` was never bound, so
+the promise in `wearables.py` — *unpairing is a revocation, not a delete, the
+row stays* — was invisible in the console; a kept promise nobody can see may as
+well not have been kept. And **the route audit could not see `fetch`**: `req()`
+serialises JSON, so a raw-bytes upload has to call `fetch` directly, and
+`POST /profiles/{id}/media` had a working door while still counting as
+doorless. `clientpaths.py` now recognises both call forms.
 
 ### Screen 164 — what a profile is made of
 

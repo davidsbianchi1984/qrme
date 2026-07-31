@@ -324,6 +324,21 @@ LESSONS: tuple[dict, ...] = (
               "an opinion about footage nobody showed it.",
          screens=(155,),
          try_it="Open a party and read 'What a profile in here knows'."),
+    dict(key="assist", chapter="Working", title="What it can do for you",
+         what="Hand it a pile and it keeps the best few — and tells you why "
+              "each one survived, with the score, because a ranking nobody "
+              "can argue with is one you have to check by hand anyway. It "
+              "will fix a draft and say what it changed, and compose "
+              "something worth keeping. Everything it generates carries a "
+              "mark, and checking one asks two separate questions: was this "
+              "credential issued here, and is this the content it was issued "
+              "for. They can disagree, and when they do the answer says so. "
+              "Wearables are what the watch faces run on, and only something "
+              "you wear can be paired — a room-facing microphone is refused "
+              "with the reason, which is that whoever walks into the room "
+              "did not agree to anything.",
+         screens=(165,),
+         try_it="Compose a note, then check its mark against the words."),
     dict(key="workshop", chapter="Working", title="What it is made of",
          what="The material a profile is built from and the manner it comes "
               "across in. Source material — writing, conversations, life "

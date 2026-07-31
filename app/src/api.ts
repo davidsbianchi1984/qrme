@@ -533,6 +533,142 @@ export type Perception = {
   status: string;
 };
 
+// ---------------------------------------------------------------------
+// The profile working for its owner.
+// ---------------------------------------------------------------------
+
+/** Triage answers with the *reason* each item survived, and the score it
+ *  scored. The ranking is deliberately transparent — a pile sorted by a
+ *  number nobody can see is a pile somebody has to re-check by hand. */
+export type TriageResult = {
+  reviewed: number;
+  kept: { id: string; reason: string; preview: string }[];
+  discarded_ids: string[];
+  criteria: string | null;
+};
+
+export type MarkDisplay = {
+  mark: string; label: string; line: string;
+  custom: boolean; always_displayed: boolean; disclosure: string;
+};
+
+export type Mark = {
+  watermark_id: string; kind: string; profile_id: string;
+  content_sha256: string; issued_at: string; disclosure: string;
+  display: MarkDisplay;
+  verify: string;
+};
+
+export type Proofread = {
+  original: string;
+  edited: string;
+  watermark: Mark;
+  /** Concrete and mechanical — "add end punctuation" — beside the rewrite
+   *  rather than instead of it. */
+  suggestions: string[];
+  status: string;
+};
+
+export type CreativeWork = {
+  id: string; kind: string; moment: string; content: string;
+  watermark: Partial<Mark> & { watermark_id: string; display: MarkDisplay };
+  /** Present on the list, absent on the create. */
+  profile_id?: string;
+  created_at?: string;
+};
+
+export type Wearable = {
+  id: string; name: string; kind: string;
+  transport: string;
+  faces: string[];
+  paired_at: string;
+  /** Set once unpaired. The row survives — a device that was on somebody's
+   *  wrist is a fact about the past, not a row to delete. */
+  revoked_at: string | null;
+  paired: boolean;
+};
+
+export type WearableView = {
+  profile_id: string;
+  wearables: Wearable[];
+  /** What each watch face shows, in the backend's words. */
+  faces: Record<string, string>;
+  kinds: Record<string, string>;
+  /** Room-facing microphones, each with the paragraph saying why it cannot
+   *  be paired. Rendered verbatim: the argument is that the people who walk
+   *  into the room did not agree to anything. */
+  refused: Record<string, string>;
+};
+
+export type Review = {
+  id: string; rating: number;
+  body: string | null;
+  author_id: string;
+  created_at: string;
+  edited: boolean;
+};
+
+export type ReviewsView = {
+  profile_id: string;
+  /** `average` and `distribution` are absent until somebody has reviewed —
+   *  the empty case carries a `note` instead, and the screen shows it. */
+  rating: {
+    average: number | null; count: number;
+    note?: string;
+    distribution?: Record<string, number>;
+  };
+  reviews: Review[];
+};
+
+export type ThreadMessage = {
+  id: string; role: string; content: string; status: string;
+  created_at: string;
+  edited: boolean;
+  edit_count: number;
+  /** The interesting one: a reply written before the message above it was
+   *  changed. Marked rather than hidden, because a conversation that
+   *  silently rewrote itself would be worse than one that admits the
+   *  answer is to an older question. */
+  answers_stale_text: boolean;
+};
+
+export type ThreadView = {
+  profile_id: string; interactor_id: string;
+  messages: ThreadMessage[];
+};
+
+export type MessageRevision = Record<string, unknown>;
+
+export type UploadedMedia = {
+  id: string; kind: string; url: string;
+  name: string | null;
+  bytes: number;
+  /** False for a photograph somebody took. Authentic media is never
+   *  AI-marked, which is the whole point of the mark meaning something. */
+  ai_marked: boolean;
+};
+
+/** What the credential says about itself. */
+export type WatermarkRecord = {
+  watermark_id: string;
+  valid: boolean;
+  kind: string; profile_id: string;
+  content_sha256: string; issued_at: string; disclosure: string;
+  display: MarkDisplay;
+};
+
+/** And what it says about a piece of content you hand it.
+ *
+ *  `valid` and `content_match` answer different questions and **can
+ *  disagree**: a real credential whose content has since been altered comes
+ *  back `valid: true, content_match: false`, with `note` saying so. A screen
+ *  reporting `valid` alone would tell somebody the thing in front of them is
+ *  genuine at the exact moment the server said it had been changed. */
+export type WatermarkVerdict = WatermarkRecord & {
+  content_match: boolean;
+  note?: string;
+};
+
 export type PlacementRemoved = {
   placement_id: string;
   removed: boolean;
@@ -2715,4 +2851,108 @@ export const api = {
              token: string) =>
     req<Perception>(`/profiles/${profileId}/perceive`,
       { method: "POST", body, token }),
+
+  // ---------------------------------------------------------------------
+  // The profile working for its owner, and what it leaves behind.
+  //
+  // Triage, proofreading, composing something to keep, the wearables the
+  // watch faces run on, the reviews people who actually talked to it left,
+  // and the mark every generated thing carries.
+  // ---------------------------------------------------------------------
+
+  triage: (profileId: string,
+           body: { items: { id: string; text: string }[]; keep: number;
+                   criteria?: string }, token: string) =>
+    req<TriageResult>(`/profiles/${profileId}/assist/triage`,
+      { method: "POST", body, token }),
+  proofread: (profileId: string, text: string, token: string) =>
+    req<Proofread>(`/profiles/${profileId}/assist/proofread`,
+      { method: "POST", body: { text }, token }),
+  compose: (profileId: string, body: { kind: string; moment: string },
+            token: string) =>
+    req<CreativeWork>(`/profiles/${profileId}/assist/compose`,
+      { method: "POST", body, token }),
+  works: (profileId: string, token: string) =>
+    req<CreativeWork[]>(`/profiles/${profileId}/assist/works`, { token }),
+
+  // `include_revoked` exists because unpairing is a revocation and not a
+  // delete — the row stays, with the date. Without asking for them the
+  // console can never show that, and a promise nobody can see is a promise
+  // that may as well not have been kept.
+  wearables: (profileId: string, token: string, includeRevoked = false) =>
+    req<WearableView>(
+      `/profiles/${profileId}/wearables`
+      + (includeRevoked ? "?include_revoked=true" : ""), { token }),
+  pairWearable: (profileId: string,
+                 body: { name: string; kind: string; faces?: string[] },
+                 token: string) =>
+    req<Wearable>(`/profiles/${profileId}/wearables`,
+      { method: "POST", body, token }),
+  // Keyed by **name**, not id — the id is in the row and the route is not.
+  unpairWearable: (profileId: string, name: string, token: string) =>
+    req<Wearable>(
+      `/profiles/${profileId}/wearables/${encodeURIComponent(name)}`,
+      { method: "DELETE", token }),
+
+  reviews: (profileId: string) =>
+    req<ReviewsView>(`/profiles/${profileId}/reviews`),
+  leaveReview: (profileId: string,
+                body: { interactor_id: string; rating: number; body?: string },
+                token: string) =>
+    req<Review>(`/profiles/${profileId}/reviews`,
+      { method: "POST", body, token }),
+
+  thread: (profileId: string, interactorId: string, token: string) =>
+    req<ThreadView>(`/profiles/${profileId}/thread/${interactorId}`, { token }),
+  editMessage: (profileId: string, messageId: string, interactorId: string,
+                content: string, token: string) =>
+    req<MessageRevision>(`/profiles/${profileId}/messages/${messageId}`,
+      { method: "PATCH", body: { interactor_id: interactorId, content },
+        token }),
+  // A DELETE **with a body** — the route needs to know who is retracting.
+  // Worth stating: plenty of HTTP clients drop a body on DELETE, and this
+  // one 422s without it rather than guessing.
+  retractMessage: (profileId: string, messageId: string, interactorId: string,
+                   token: string) =>
+    req<MessageRevision>(`/profiles/${profileId}/messages/${messageId}`,
+      { method: "DELETE", body: { interactor_id: interactorId }, token }),
+
+  // ---------------------------------------------------------------------
+  // The mark.
+  //
+  // `valid` and `content_match` are **different questions** and can
+  // disagree: a genuine credential whose content has since been altered
+  // answers `valid: true, content_match: false`. A screen that reported
+  // `valid` alone would say the opposite of the truth about the thing in
+  // front of somebody.
+  // ---------------------------------------------------------------------
+
+  watermark: (watermarkId: string) =>
+    req<WatermarkRecord>(`/watermarks/${watermarkId}`),
+  verifyWatermark: (watermarkId: string, content: string) =>
+    req<WatermarkVerdict>("/watermarks/verify",
+      { method: "POST", body: { watermark_id: watermarkId, content } }),
 };
+
+/** Raw bytes, not JSON and not multipart — the route reads the request body
+ *  and works the kind out from the bytes. `filename` is a display hint that
+ *  never chooses the kind, so it rides as a query parameter. Written by hand
+ *  rather than through `req()` because `req()` serialises JSON. */
+export async function uploadMedia(profileId: string, file: File,
+                                  token: string): Promise<UploadedMedia> {
+  const q = file.name ? `?filename=${encodeURIComponent(file.name)}` : "";
+  const res = await fetch(`${getBase()}/profiles/${profileId}/media${q}`, {
+    method: "POST",
+    headers: { "content-type": "application/octet-stream",
+               authorization: `Bearer ${token}` },
+    body: file,
+  });
+  const text = await res.text();
+  let data: unknown = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!res.ok) {
+    const body = data as { detail?: unknown } | null;
+    throw new RequestError(res.status, (body && body.detail) ?? text);
+  }
+  return data as UploadedMedia;
+}

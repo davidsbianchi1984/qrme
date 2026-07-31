@@ -91,6 +91,14 @@ CONSOLE = Language(
     re.compile(r"\$\{[^{}]*\}"),
     re.compile(_TS_TEMPLATE + r"|\"(/[^\"\n]*)\""),
     (CallForm(re.compile(r"\breq\s*(?:<.*?>)?\s*\(", re.S),
+              verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),
+     # `req()` serialises JSON, so anything that cannot — a raw-bytes upload
+     # — reaches for `fetch` directly. Without this form the audit is blind
+     # to exactly those calls: `POST /profiles/{id}/media` had a working
+     # door and still counted as doorless, which is the guard failing in the
+     # direction that produces busywork rather than the one that hides a
+     # dead button, but failing either way.
+     CallForm(re.compile(r"\bfetch\s*\("),
               verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),),
 )
 # Swift's `\(…)` may hold one level of nested parentheses — `\(f(x))` — which is

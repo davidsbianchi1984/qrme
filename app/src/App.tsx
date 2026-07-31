@@ -19,6 +19,7 @@ import { Placements } from "./screens/Placements";
 import { Plans } from "./screens/Plans";
 import { Robots } from "./screens/Robots";
 import { Workshop } from "./screens/Workshop";
+import { Assist } from "./screens/Assist";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -37,7 +38,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -65,6 +66,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "party", label: "Watch together", icon: "🍿" },
   { id: "voice", label: "Voice", icon: "🎙" },
   { id: "workshop", label: "What it is made of", icon: "🧩" },
+  { id: "assist", label: "What it can do for you", icon: "🛠" },
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
   { id: "plans", label: "Plans", icon: "🎟" },
@@ -147,6 +149,7 @@ export function App() {
         {tab === "party" && <WatchParty onPlans={toPlans} />}
         {tab === "voice" && <Voice onPlans={toPlans} />}
         {tab === "workshop" && <Workshop onPlans={toPlans} />}
+        {tab === "assist" && <Assist onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}
