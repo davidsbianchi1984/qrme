@@ -407,6 +407,18 @@ LESSONS: tuple[dict, ...] = (
               "no real funds move.",
          screens=(130, 131),
          try_it="Open Choose a Plan and read what Free already includes."),
+    dict(key="refused", chapter="Being yourself",
+         title="When something is not included",
+         what="Tapping something your plan does not cover does not give you a "
+              "wall. The refusal names the capability you asked for, the plan "
+              "that has it, the plan you are on, and what the difference "
+              "costs — with the reminder that the billing is simulated and no "
+              "real funds move. Nothing you had typed is thrown away, and no "
+              "profile is changed. Reading is never gated: a scanned beacon "
+              "needs no account and no plan at all.",
+         screens=(161,),
+         try_it="Move a robot's steering dials on the free plan and read what "
+                "comes back."),
     dict(key="storage", chapter="Being yourself",
          title="Where your data lives",
          what="On the free plan nothing is private, and we hold it. What you "

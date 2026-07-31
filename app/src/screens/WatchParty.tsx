@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type PartyContext, type PartyLine,
          type WatchParty as Party } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -25,7 +26,11 @@ import { useSession } from "../store";
  * what keeps the embed promise from being broken twenty times at once. The
  * screen says so in the server's own words rather than ours.
  */
-export function WatchParty() {
+export function WatchParty({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
@@ -38,10 +43,10 @@ export function WatchParty() {
   const [title, setTitle] = useState("");
   const [say, setSay] = useState("");
   const [bring, setBring] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
 
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   const landed = (p: Party, said?: string) => {
     setParty(p); setError(null); if (said) setNote(said);
@@ -91,7 +96,7 @@ export function WatchParty() {
         your own profiles.
       </p>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">

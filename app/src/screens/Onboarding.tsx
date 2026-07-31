@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { accountApi, api } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 import { oauthApi } from "../api";
 
@@ -41,7 +42,7 @@ function AccountGate() {
   const [code, setCode] = useState("");
   const [delivery, setDelivery] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [oauthDoors, setOauthDoors] = useState<
     { provider: string; name: string; configured: boolean; setup?: string }[]>([]);
@@ -68,7 +69,7 @@ function AccountGate() {
           return;
         }
       }
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setOauthWaiting(false); }
   }
 
@@ -80,7 +81,7 @@ function AccountGate() {
   async function run<T>(fn: () => Promise<T>, then: (r: T) => void) {
     setBusy(true); setError(null); setNotice(null);
     try { then(await fn()); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -133,12 +134,12 @@ function AccountGate() {
           const r = await accountApi.resendCode(email.trim());
           setDelivery(r.code_delivery);
           setNotice("This address already had a signup in progress — we've sent a fresh code.");
-        } catch (e2) { setError((e2 as Error).message); }
+        } catch (e2) { setError(e2); }
       } else if (msg.includes("already exists")) {
         setMode("signin");
         setNotice("This address already has an account — sign in (or use Forgot password).");
       } else {
-        setError(msg);
+        setError(e);
       }
     } finally { setBusy(false); }
   };
@@ -219,7 +220,7 @@ function AccountGate() {
         )}
       </>)}
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} variant="inline" />
       {notice && <div className="muted small">{notice}</div>}
 
       {mode === "signup" && (
@@ -279,7 +280,7 @@ function ProfileCreate() {
   // pre-filled birthdate is a wrong answer already submitted.
   const [birthdate, setBirthdate] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   async function create() {
     setBusy(true);
@@ -307,7 +308,7 @@ function ProfileCreate() {
         interactorToken: me.token,
       });
     } catch (e) {
-      setError((e as Error).message);
+      setError(e);
     } finally {
       setBusy(false);
     }
@@ -334,7 +335,7 @@ function ProfileCreate() {
                onChange={(e) => setBirthdate(e.target.value)} />
       </label>
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} variant="inline" />
 
       <button className="primary" disabled={busy || !birthdate} onClick={create}>
         {busy ? "Creating…" : "Create My Profile"}

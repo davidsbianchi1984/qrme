@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, getBase, type MediaUpload, type WallComment, type WallPost } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // The community wall — the For You feed, in the console at last. The
@@ -11,7 +12,11 @@ import { useSession } from "../store";
 // drawn from stored fields only, and no request reaches the other
 // platform until the viewer presses play — at which point the embed
 // iframe loads and the card says whose player it is.
-export function Wall() {
+export function Wall({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [posts, setPosts] = useState<WallPost[]>([]);
   const [mine, setMine] = useState<WallPost[]>([]);
@@ -28,12 +33,12 @@ export function Wall() {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     if (!session.profileId) return;
     api.feed(session.profileId).then((r) => setPosts(r.posts))
-      .catch((e) => setError((e as Error).message));
+      .catch((e) => setError(e));
     // The For You feed deliberately excludes your own posts, so without
     // this section a solo owner posts into apparent silence.
     api.myWall(session.profileId).then((r) => setMine(r.posts)).catch(() => {});
@@ -62,7 +67,7 @@ export function Wall() {
         setNote("Posted to your wall.");
         load();
       }
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -74,7 +79,7 @@ export function Wall() {
         const up = await api.uploadMedia(session.profileId, file, session.ownerToken);
         setUploads((cur) => [...cur, up]);
       }
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setUploading(false); }
   }
 
@@ -91,7 +96,7 @@ export function Wall() {
       });
       setPosts((cur) => cur.map((x) => x.id === p.id
         ? { ...x, likes: (x.likes || 0) + (isLiked ? -1 : 1) } : x));
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
   }
 
   async function showComments(postId: string) {
@@ -100,7 +105,7 @@ export function Wall() {
     try {
       const r = await api.postComments(postId);
       setComments(Array.isArray(r) ? r : r.comments || []);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
   }
 
   async function sendComment(postId: string) {
@@ -110,13 +115,13 @@ export function Wall() {
       setDraft("");
       const r = await api.postComments(postId);
       setComments(Array.isArray(r) ? r : r.comments || []);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
   }
 
   async function share(postId: string) {
     if (!session.ownerToken) return;
     try { await api.sharePost(postId, session.ownerToken); setNote("Shared."); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
   }
 
   const renderPost = (p: WallPost) => (
@@ -263,7 +268,7 @@ export function Wall() {
       {posts.map(renderPost)}
 
       {note && <div className="muted small">{note}</div>}
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

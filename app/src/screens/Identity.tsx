@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type Anonymity, type Avatar, type AvatarBrief, type Deleted,
          type Emblem, type IdentityVocabulary, type Memorial, type Sibling,
          type Sunset, type Verifiable, type Verification } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -30,7 +31,11 @@ import { useSession } from "../store";
  * - the itemised deletion receipt, one count per table. "Deleted" is a claim;
  *   twenty-five numbers are evidence.
  */
-export function Identity() {
+export function Identity({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
@@ -46,7 +51,7 @@ export function Identity() {
   const [memorial, setMemorial] = useState<Memorial | null>(null);
   const [gone, setGone] = useState<Deleted | null>(null);
   const [ended, setEnded] = useState<Sunset | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
 
   const [level, setLevel] = useState("self_asserted");
@@ -55,7 +60,7 @@ export function Identity() {
   const [name, setName] = useState("");
   const [confirmEnd, setConfirmEnd] = useState<"" | "sunset" | "delete">("");
 
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
     api.identityVocabulary().then((v) => {
@@ -99,7 +104,7 @@ export function Identity() {
     <div className="screen">
       <h2>Who this profile is</h2>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (

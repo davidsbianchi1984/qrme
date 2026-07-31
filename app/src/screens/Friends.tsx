@@ -1,20 +1,25 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // The friends list, founder first — the backend pins David Bianchi and his
 // synthetic profile at positions one and two on every list, by design; the
 // console finally shows it.
-export function Friends() {
+export function Friends({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [data, setData] = useState<Awaited<ReturnType<typeof api.friends>> | null>(null);
   const [suggested, setSuggested] = useState<{ profile_id: string; display_name: string }[]>([]);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     if (!session.profileId) return;
-    api.friends(session.profileId).then(setData).catch((e) => setError((e as Error).message));
+    api.friends(session.profileId).then(setData).catch((e) => setError(e));
     api.suggestedFriends(session.profileId).then((s) => {
       const list = Array.isArray(s) ? s : (s.suggestions || []);
       setSuggested(list as { profile_id: string; display_name: string }[]);
@@ -29,7 +34,7 @@ export function Friends() {
     try {
       await api.addFriend(session.profileId!, profileId, session.ownerToken!);
       load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -70,7 +75,7 @@ export function Friends() {
         </div>
       )}
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

@@ -351,6 +351,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/159-contest-a-profile.svg"><img src="docs/screens/159-contest-a-profile.svg" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
     <td align="center" width="33%"><a href="docs/screens/160-show-me-around.svg"><img src="docs/screens/160-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/161-not-on-this-plan.svg"><img src="docs/screens/161-not-on-this-plan.svg" width="210" alt="Not On This Plan"></a><br><sub><b>161</b> · Not On This Plan</sub></td>
   </tr>
 </table>
 
@@ -1700,6 +1701,71 @@ a lookup by screen number for *what am I looking at*. It also draws the dock
 catalogue including what the dock **refuses** — `control` is not a face, because
 assist, halt and approve are actions and the pane does not act. A catalogue
 showing only what is available would hide the more interesting decision.
+
+### A refusal is a thing with a shape
+
+**161** is not a tab. It is the card that appears inside whichever screen was
+refused, and it is drawn because of what building the doors kept turning up.
+
+Several gates here answer with an *object* rather than a sentence. The plan gate
+is the clearest: it names the capability that was wanted, the plan that has it,
+the plan you are on, the price, the period, a human sentence, and the fact that
+the billing is simulated. Somebody wrote that deliberately — it is strictly more
+work than returning a string, and the only reason to do it is so a screen can
+draw a real answer instead of a wall.
+
+The console then flattened it. `req()` did `JSON.stringify(detail)` and threw
+the result as an error message, so every screen that catches an error and shows
+`.message` — which is all of them — showed the user the raw object. Nothing
+failed: the request was right, the refusal was right, and it was destroyed on
+delivery. The typecheck had nothing to say about it, because a string is a
+string.
+
+`RequestError` now carries `status` and the untouched `detail`, `planGate()`
+reads the structure back out, and `Refusal.tsx` decides how to draw it. The
+price and the words *simulated — no real funds move* are rendered on the same
+line, because a screen quoting $130 a month without them would be making a
+claim this product spends effort avoiding everywhere else.
+
+Every screen then threw the same structure away one layer up —
+`setError((e as Error).message)`, in all of them — so fixing the transport
+alone changed nothing anybody could see. They now hold the error and hand it
+to `Refusal`, which keeps each screen's existing look for an ordinary failure
+and draws a gate as a card with a button.
+
+### Screens 130 and 131 — the plan the refusal names
+
+Drawing the refusal properly found the next thing. There was no plans surface:
+`GET /plans` and the three `/memberships` routes had no caller either, so the
+console could refuse you for not having Pro and had no way to sell you Pro.
+That is worse than a flat no — an offer naming a plan in a product with no way
+to join one advertises something that appears not to exist.
+
+`Plans.tsx` is that door, and `onPlans` is threaded from the shell into every
+screen that can be refused, so the button on the card goes somewhere. Two
+things the screen shows rather than smooths over:
+
+- **`visitor` and `free` are different plans that both cost nothing.** A
+  visitor has no account and can read a public page; free has an account whose
+  work sits in this platform's database in the clear. A picker written from the
+  price alone collapses them into one $0 row and hides the whole difference.
+- **`the_difference` is rendered verbatim** above the cards — *free and Basic
+  run the same app; the difference is where your data lives, and who holds it*
+  — because a grid of ticks invites the opposite conclusion, that $20 buys
+  features. It buys custody.
+
+The price list needs no account, which is `tiers.py`'s decision and not the
+console's: *a paywall nobody can read the terms of before signing in is one
+people bounce off*. Everything above the membership card renders signed out.
+
+Adding the tab also turned up something only clicking finds: the always-on
+agent-lights widget is fixed to the bottom-left corner, **on top of the
+sidebar**, and the sidebar had grown long enough that its last three tabs were
+underneath it — a click landed on the lights. That is the same fault the phone
+layout was fixed for in an earlier round, when the widget covered Home and Chat
+and the tabs were reported as broken screens; the desktop half simply had not
+grown into it yet. The column now reserves the widget's footprint, and a test
+asserts the arithmetic rather than the number.
 
 ## Channel 3 — sharing your camera
 

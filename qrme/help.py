@@ -218,6 +218,12 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "plans": ("price", "pricing", "cost", "how much", "plan", "plans",
               "subscription", "subscribe", "upgrade", "basic", "pro",
               "billing", "what do i get"),
+    # Kept off `plans`, which answers "what does it cost". Somebody typing
+    # these has already been stopped by something and wants to know what the
+    # stop means — a different question with its own screen.
+    "refused": ("why can't i", "why cant i", "not included", "not available",
+                "locked", "refused", "greyed out", "grayed out",
+                "needs pro", "needs basic", "not on my plan"),
     # "free" moved off `plans` and onto this lesson. Somebody typing it is
     # almost never asking what a tier costs — they are asking what the free
     # one gives up, and that question has its own screens.

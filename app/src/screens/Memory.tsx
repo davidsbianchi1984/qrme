@@ -1,21 +1,26 @@
 import { useEffect, useState } from "react";
 import { api, type MemoryEntry } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // The vault, with real names: one row per remembered conversation — the
 // profile's name and the person's name, never "profile" and "interactor" —
 // and each row individually erasable. Ids are plumbing; names are memory.
-export function Memory() {
+export function Memory({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [convos, setConvos] = useState<Awaited<ReturnType<typeof api.memories>>>([]);
   const [open, setOpen] = useState<string | null>(null);   // interactor_id
   const [entries, setEntries] = useState<MemoryEntry[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     if (!session.profileId || !session.ownerToken) return;
     api.memories(session.profileId, session.ownerToken)
-      .then(setConvos).catch((e) => setError((e as Error).message));
+      .then(setConvos).catch((e) => setError(e));
   }
   useEffect(load, [session.profileId]);
 
@@ -25,7 +30,7 @@ export function Memory() {
     try {
       const data = await api.memory(session.profileId, interactorId, session.ownerToken);
       setEntries(Array.isArray(data) ? data : data.history || []);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
   }
 
   async function eraseAll() {
@@ -38,7 +43,7 @@ export function Memory() {
       }
       setOpen(null); setEntries([]);
       load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
   }
 
   async function erase(interactorId: string, name: string) {
@@ -48,7 +53,7 @@ export function Memory() {
       await api.clearMemory(session.profileId, interactorId, session.ownerToken);
       if (open === interactorId) { setOpen(null); setEntries([]); }
       load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
   }
 
   return (
@@ -58,7 +63,7 @@ export function Memory() {
         <span className="muted small">AES-256-GCM · one row per conversation · erase by name</span>
       </header>
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
 
       <div className="card">
         {convos.length > 0 && (

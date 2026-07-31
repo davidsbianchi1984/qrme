@@ -128,6 +128,11 @@ const CHROME: Table = {
     ja: "案内して", zh: "带我熟悉", hi: "मुझे दिखाएँ",
     ar: "جولة تعريفية",
   },
+  "nav.plans": {
+    en: "Plans", es: "Planes", fr: "Formules", de: "Tarife",
+    pt: "Planos", it: "Piani", ja: "プラン", zh: "方案",
+    hi: "योजनाएँ", ar: "الخطط",
+  },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
     pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",

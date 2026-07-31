@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type Display, type DisplayCatalog, type Front,
          type PageCatalog, type ProfilePage } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -29,7 +30,11 @@ import { useSession } from "../store";
  * with its reason. Those sentences are the product's posture argued carefully
  * once, and a paraphrase would be a worse version of it.
  */
-export function Presence() {
+export function Presence({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
@@ -40,7 +45,7 @@ export function Presence() {
   const [cat, setCat] = useState<DisplayCatalog | null>(null);
   const [mine, setMine] = useState<Display[]>([]);
   const [surfaces, setSurfaces] = useState<string[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
 
   const [theme, setTheme] = useState("midnight");
@@ -55,7 +60,7 @@ export function Presence() {
   const [size, setSize] = useState("full");
   const [finish, setFinish] = useState("opaque");
 
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
     api.pageCatalog().then((c) => {
@@ -115,7 +120,7 @@ export function Presence() {
     <div className="screen">
       <h2>Where this is seen</h2>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {front && (

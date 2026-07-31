@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type Exchange, type ExchangeVocabulary } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -27,7 +28,11 @@ import { useSession } from "../store";
  *   reaches nothing unlisted. People asked to sign something want to know what
  *   they are *not* signing, and the backend answers that in its own words.
  */
-export function Exchanges() {
+export function Exchanges({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
@@ -35,7 +40,7 @@ export function Exchanges() {
   const [vocab, setVocab] = useState<ExchangeVocabulary | null>(null);
   const [mine, setMine] = useState<Exchange[]>([]);
   const [open, setOpen] = useState<Exchange | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
 
   // A new proposal.
@@ -49,7 +54,7 @@ export function Exchanges() {
   const [itemKind, setItemKind] = useState("document");
   const [direction, setDirection] = useState("host_to_guest");
 
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => { api.exchangeVocabulary().then(setVocab).catch(fail); }, []);
 
@@ -112,7 +117,7 @@ export function Exchanges() {
         and only then does anything move.
       </p>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (

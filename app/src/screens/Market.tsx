@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type Listing, type Locality, type MarketPrefs, type MarketSearch,
          type Offer, type Order } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -21,7 +22,11 @@ import { useSession } from "../store";
  *   simulated. Money that looks real and is not is the one thing here it
  *   would be worst to be vague about.
  */
-export function Market() {
+export function Market({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
@@ -35,9 +40,9 @@ export function Market() {
   const [offers, setOffers] = useState<Record<string, Offer | null>>({});
   const [sales, setSales] = useState<Order[]>([]);
   const [note, setNote] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
     api.marketplaceListings().then(setListings).catch(fail);
@@ -96,7 +101,7 @@ export function Market() {
     <div className="screen">
       <h2>Marketplace</h2>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">

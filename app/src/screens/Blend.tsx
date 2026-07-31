@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // Hybrid profiles (spec [0038]): several people blended into one persona —
@@ -14,7 +15,11 @@ interface Pick {
   aspect: string;
 }
 
-export function Blend() {
+export function Blend({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session, setSession } = useSession();
   const [candidates, setCandidates] = useState<{ profile_id: string; display_name: string }[]>([]);
   const [picks, setPicks] = useState<Pick[]>([]);
@@ -22,7 +27,7 @@ export function Blend() {
   const [birthdate, setBirthdate] = useState("");
   const [made, setMade] = useState<Awaited<ReturnType<typeof api.createComposite>> | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
     api.marketplace().then((cards) => {
@@ -31,7 +36,7 @@ export function Blend() {
         : [];
       const seen = new Set(own.map((o) => o.profile_id));
       setCandidates([...own, ...cards.filter((c) => !seen.has(c.profile_id))]);
-    }).catch((e) => setError((e as Error).message));
+    }).catch((e) => setError(e));
   }, [session.profileId, session.profile]);
 
   function toggle(c: { profile_id: string; display_name: string }) {
@@ -66,7 +71,7 @@ export function Blend() {
         })),
       });
       setMade(out);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -170,7 +175,7 @@ export function Blend() {
         </div>
       )}
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

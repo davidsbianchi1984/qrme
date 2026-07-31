@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, CoordinationOut, OrgOut } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // The operational ecosystem (PDI proposal): departments staffed by your own
@@ -8,7 +9,11 @@ import { useSession } from "../store";
 // are the profiles this account holds plus the marketplace is NOT offered:
 // a department staffed by a stranger's agent would read your material on
 // somebody else's model choices, and the backend refuses it anyway.
-export function Org() {
+export function Org({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [orgs, setOrgs] = useState<OrgOut[]>([]);
   const [orgName, setOrgName] = useState("");
@@ -20,7 +25,7 @@ export function Org() {
   const [latest, setLatest] = useState<CoordinationOut | null>(null);
   const [history, setHistory] = useState<CoordinationOut[]>([]);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   const token = session.ownerToken;
   const org = orgs[0];   // one org per account covers the console's needs
@@ -34,7 +39,7 @@ export function Org() {
         api.listCoordinations(o[0].id, token)
           .then(setHistory).catch(() => setHistory([]));
       }
-    }).catch((e) => setError((e as Error).message));
+    }).catch((e) => setError(e));
   }
   useEffect(load, [token]);
 
@@ -45,7 +50,7 @@ export function Org() {
   async function createOrg() {
     setBusy(true); setError(null);
     try { await api.createOrg(orgName.trim(), token!); setOrgName(""); load(); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -58,7 +63,7 @@ export function Org() {
         profile_id: deptProfile.trim() || session.profileId!,
       }, token!);
       setDeptName(""); setDeptRole(""); setDeptProfile(""); load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -69,7 +74,7 @@ export function Org() {
       const out = await api.coordinate(org.id,
         { goal: goal.trim(), from_department: lead }, token!);
       setLatest(out); setGoal(""); load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -96,7 +101,7 @@ export function Org() {
           <button disabled={busy} onClick={async () => {
             setBusy(true); setError(null);
             try { await api.seedDemoOrg(token!); load(); }
-            catch (e) { setError((e as Error).message); }
+            catch (e) { setError(e); }
             finally { setBusy(false); }
           }}>Found a demo org</button>
         </div>
@@ -176,7 +181,7 @@ export function Org() {
         </>
       )}
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

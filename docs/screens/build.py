@@ -3515,6 +3515,24 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 161: a refusal, drawn. This is not a tab — it is the card that appears
+    # inside whichever screen was refused. It is drawn because the backend
+    # builds this refusal as an object for a screen to read, and for a while
+    # the console flattened it into text; a picture of what the object is for
+    # is the clearest way to keep it from happening again. The price and the
+    # simulated-billing note sit on the same card on purpose.
+    dict(num=161, title="Not On This Plan", sub="What was wanted, and what it costs",
+         accent="amber", tab=15, cards=[
+        dict(icon="lock", color="amber", k="Named, not barred",
+             s="the refusal says which capability",
+             pill=("PRO", "warn")),
+        dict(icon="coin", color="brand", k="$130 a month",
+             s="simulated — no real funds move"),
+        dict(icon="person", color="cyan", k="You are on free",
+             s="so you can see the distance"),
+        dict(icon="doc", color="green", k="Nothing is lost",
+             s="what you typed is still there"),
+    ], button=("See the plans", "brand")),
     dict(num=160, title="Show Me Around", sub="The tour, and the pane",
          accent="cyan", tab=15, cards=[
         dict(icon="compass", color="cyan", k="Written steps",

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type DockFace, type DockFaces, type DockSettings,
          type HelpTopics, type Lesson, type Progress,
          type Walkthrough } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -9,9 +10,9 @@ import { useSession } from "../store";
  * helper lives in.
  *
  * This is the set of doorless routes it is least comfortable to have found.
- * The product has a **thirty-eight-lesson written walkthrough** that works with
- * no model configured, names the screens each step is about, and is held to the
- * gallery by a test — add a feature, draw its screen, and the suite fails until
+ * The product has a **written walkthrough** that works with no model
+ * configured, names the screens each step is about, and is held to the gallery
+ * by a test — add a feature, draw its screen, and the suite fails until
  * somebody has written what it is for. All of that machinery, and no way for
  * anybody to take it.
  *
@@ -30,7 +31,11 @@ import { useSession } from "../store";
  *   a pane floating over the thing those buttons would stop. A catalogue that
  *   showed only what is available would hide the more interesting decision.
  */
-export function Guide() {
+export function Guide({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
@@ -46,9 +51,9 @@ export function Guide() {
   const [face, setFace] = useState<DockFace | null>(null);
 
   const [screen, setScreen] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
     api.walkthrough().then(setWalk).catch(fail);
@@ -70,7 +75,7 @@ export function Guide() {
     <div className="screen">
       <h2>Show me around</h2>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {walk && (

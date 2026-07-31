@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   api, type Delegation, type Grant, type TaskRunResult, type Workflow,
 } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // What the profile may do on the owner's behalf, and what it has done.
@@ -16,7 +17,11 @@ import { useSession } from "../store";
 // because a phase reads through one; the policy second because it is a choice
 // about scope, not about work; the runs last, because they are what the first
 // two make possible.
-export function Delegate() {
+export function Delegate({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const pid = session.profileId;
   const token = session.ownerToken;
@@ -29,7 +34,7 @@ export function Delegate() {
   const [reply, setReply] = useState<Record<string, string>>({});
   const [topic, setTopic] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [said, setSaid] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -43,7 +48,7 @@ export function Delegate() {
   async function run(action: () => Promise<unknown>, ok?: string) {
     setBusy(true); setError(null); setSaid(null);
     try { await action(); if (ok) setSaid(ok); load(); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -78,7 +83,7 @@ export function Delegate() {
   return (
     <section className="screen">
       <h2>Delegation &amp; work</h2>
-      {error && <p className="error">{error}</p>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
       {said && <p className="muted">{said}</p>}
 
       <h3>The grant it reads through</h3>

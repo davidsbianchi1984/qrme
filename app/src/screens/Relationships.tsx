@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
-export function Relationships() {
+export function Relationships({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [count, setCount] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [name, setName] = useState("");
   const [type, setType] = useState("friend");
   const [tone, setTone] = useState("warm");
@@ -17,7 +22,7 @@ export function Relationships() {
       const t = await api.transparency(session.profileId);
       setCount(t.active_relationships);
     } catch (e) {
-      setError((e as Error).message);
+      setError(e);
     }
   }
   useEffect(() => {
@@ -37,7 +42,7 @@ export function Relationships() {
       setName("");
       await load();
     } catch (e) {
-      setError((e as Error).message);
+      setError(e);
     } finally {
       setBusy(false);
     }
@@ -58,7 +63,7 @@ export function Relationships() {
         </div>
       </div>
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
 
       <div className="card">
         <h3>Add a relationship</h3>

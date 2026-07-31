@@ -3,6 +3,7 @@ import { api, type Bystanders, type CameraDisclosure, type CameraSession,
          type CameraVocabulary, type MicPlaces, type MicVocabulary,
          type MicsHere, type OverlayCatalogue, type OverlaysHere,
          type WhosePlace } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -35,7 +36,11 @@ import { useSession } from "../store";
  *   anything about who walked into shot, because it cannot see the room, and
  *   saying so is more honest than a reassurance it could not keep.
  */
-export function Live() {
+export function Live({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
@@ -68,9 +73,9 @@ export function Live() {
   const [overlayKind, setOverlayKind] = useState("mask");
   const [overlayTitle, setOverlayTitle] = useState("");
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
     api.cameraVocabulary().then((v) => {
@@ -122,7 +127,7 @@ export function Live() {
         yourself and the people around you, they are told.
       </p>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">

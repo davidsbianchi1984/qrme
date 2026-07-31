@@ -1,7 +1,6 @@
 DELETE /comments/{comment_id}
 DELETE /gaming/sessions/{session_id}/lobby
 DELETE /handoffs/{handoff_id}
-DELETE /memberships/{account_id}
 DELETE /placements/{placement_id}
 DELETE /profiles/{profile_id}/friends/{friend_id}
 DELETE /profiles/{profile_id}/marketplace
@@ -23,11 +22,9 @@ GET /gaming/sessions/{session_id}/lobby
 GET /gaming/sessions/{session_id}/lobby/context
 GET /handoffs/{handoff_id}
 GET /interactors/{interactor_id}/referrals
-GET /memberships/{account_id}
 GET /orders
 GET /organizations/{org_id}
 GET /people/{person_id}/skill-grants
-GET /plans
 GET /profiles/{profile_id}/assist/works
 GET /profiles/{profile_id}/clinical-notes/{interactor_id}
 GET /profiles/{profile_id}/cloud-contribution
@@ -65,7 +62,6 @@ PATCH /profiles/{profile_id}/messages/{message_id}
 POST /auth/oauth/{provider}/callback
 POST /gaming/sessions/{session_id}/lobby
 POST /handoffs
-POST /memberships/{account_id}
 POST /packs
 POST /packs/seed
 POST /profiles/genesis

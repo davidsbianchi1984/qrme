@@ -15,6 +15,7 @@ import { Presence } from "./screens/Presence";
 import { Live } from "./screens/Live";
 import { Contest } from "./screens/Contest";
 import { Guide } from "./screens/Guide";
+import { Plans } from "./screens/Plans";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -33,7 +34,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -60,12 +61,16 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "grants", label: "Lent skills", icon: "🪄" },
   { id: "party", label: "Watch together", icon: "🍿" },
   { id: "voice", label: "Voice", icon: "🎙" },
+  { id: "plans", label: "Plans", icon: "🎟" },
   { id: "settings", label: "Control", icon: "⚙" },
 ];
 
 export function App() {
   const { session, signOut } = useSession();
   const [tab, setTab] = useState<Tab>("home");
+  // Threaded into every screen that can be refused. A plan gate
+  // names a plan, so the refusal has to be able to reach one.
+  const toPlans = () => setTab("plans");
   // The chrome follows the profile's language (server-side setting; the
   // content always did — this closes the frame around it).
   const [lang, setLang] = useState<string>("en");
@@ -112,30 +117,31 @@ export function App() {
       <main className="content">
         <ProblemNotice />
         {tab === "home" && <Home go={setTab} />}
-        {tab === "chat" && <Chat />}
-        {tab === "discover" && <Discover />}
-        {tab === "market" && <Market />}
-        {tab === "wall" && <Wall />}
-        {tab === "friends" && <Friends />}
-        {tab === "rooms" && <Rooms />}
-        {tab === "blend" && <Blend />}
-        {tab === "simulate" && <Simulate />}
-        {tab === "campaigns" && <Campaigns />}
-        {tab === "org" && <Org />}
-        {tab === "relationships" && <Relationships />}
-        {tab === "memory" && <Memory />}
-        {tab === "delegate" && <Delegate />}
-        {tab === "desk" && <Desk />}
-        {tab === "identity" && <Identity />}
-        {tab === "presence" && <Presence />}
-        {tab === "live" && <Live />}
-        {tab === "contest" && <Contest />}
-        {tab === "guide" && <Guide />}
-        {tab === "exchanges" && <Exchanges />}
-        {tab === "grants" && <Grants />}
-        {tab === "party" && <WatchParty />}
-        {tab === "voice" && <Voice />}
-        {tab === "settings" && <Settings />}
+        {tab === "chat" && <Chat onPlans={toPlans} />}
+        {tab === "discover" && <Discover onPlans={toPlans} />}
+        {tab === "market" && <Market onPlans={toPlans} />}
+        {tab === "wall" && <Wall onPlans={toPlans} />}
+        {tab === "friends" && <Friends onPlans={toPlans} />}
+        {tab === "rooms" && <Rooms onPlans={toPlans} />}
+        {tab === "blend" && <Blend onPlans={toPlans} />}
+        {tab === "simulate" && <Simulate onPlans={toPlans} />}
+        {tab === "campaigns" && <Campaigns onPlans={toPlans} />}
+        {tab === "org" && <Org onPlans={toPlans} />}
+        {tab === "relationships" && <Relationships onPlans={toPlans} />}
+        {tab === "memory" && <Memory onPlans={toPlans} />}
+        {tab === "delegate" && <Delegate onPlans={toPlans} />}
+        {tab === "desk" && <Desk onPlans={toPlans} />}
+        {tab === "identity" && <Identity onPlans={toPlans} />}
+        {tab === "presence" && <Presence onPlans={toPlans} />}
+        {tab === "live" && <Live onPlans={toPlans} />}
+        {tab === "contest" && <Contest onPlans={toPlans} />}
+        {tab === "guide" && <Guide onPlans={toPlans} />}
+        {tab === "exchanges" && <Exchanges onPlans={toPlans} />}
+        {tab === "grants" && <Grants onPlans={toPlans} />}
+        {tab === "party" && <WatchParty onPlans={toPlans} />}
+        {tab === "voice" && <Voice onPlans={toPlans} />}
+        {tab === "plans" && <Plans />}
+        {tab === "settings" && <Settings onPlans={toPlans} />}
       </main>
 
       {/* Outside the tab switch on purpose: it is part of the shell, so every

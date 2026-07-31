@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // The doors: rooms (chat / voice / video / AR / VR) and live desks. The
@@ -15,17 +16,21 @@ const CHANNELS = [
   { id: "vr", label: "VR" },
 ];
 
-export function Rooms() {
+export function Rooms({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [rooms, setRooms] = useState<Awaited<ReturnType<typeof api.listRooms>>>([]);
   const [desks, setDesks] = useState<Awaited<ReturnType<typeof api.listDesks>>>([]);
   const [topic, setTopic] = useState("");
   const [channel, setChannel] = useState("voice");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
-    api.listRooms().then(setRooms).catch((e) => setError((e as Error).message));
+    api.listRooms().then(setRooms).catch((e) => setError(e));
     api.listDesks().then(setDesks).catch(() => setDesks([]));
   }
   useEffect(load, []);
@@ -47,7 +52,7 @@ export function Rooms() {
         ],
       });
       setTopic(""); load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -103,7 +108,7 @@ export function Rooms() {
         ))}
       </div>
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

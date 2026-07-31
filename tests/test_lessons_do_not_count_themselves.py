@@ -92,10 +92,18 @@ def test_the_prose_around_the_tutorial_does_not_count_it_either():
     into either drifts on exactly the same trigger, and is further from the
     thing that would remind somebody.
     """
-    for rel in ("qrme/help.py", "qrme/tutorial.py", "README.md"):
-        text = (REPO / rel).read_text(encoding="utf-8").lower()
+    files = [REPO / "qrme/help.py", REPO / "qrme/tutorial.py",
+             REPO / "README.md", REPO / "app/src/api.ts"]
+    # And the console's own prose. Guide.tsx opened with the count in its
+    # first paragraph, which is where somebody explaining the walkthrough
+    # naturally reaches for it — so naming files one at a time here would be
+    # the same losing game the guard was written to stop.
+    files += sorted((REPO / "app" / "src").rglob("*.tsx"))
+    for path in files:
+        rel = path.relative_to(REPO)
+        text = path.read_text(encoding="utf-8").lower()
         for word in _WORD_NUMBERS:
             for noun in ("step", "lesson"):
-                hit = re.search(rf"{word}[\w-]*\s+(?:written\s+)?{noun}s?\b",
+                hit = re.search(rf"{word}[\w-]*[\s-]+(?:written\s+)?{noun}s?\b",
                                 text)
                 assert not hit, f"{rel} counts the lessons: {hit.group(0)!r}"

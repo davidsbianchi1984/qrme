@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import { api, type Stats } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 export function Home({ go }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
-        | "campaigns" | "org") => void;
+        | "campaigns" | "org" | "plans") => void;
 }) {
   const { session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
     if (!session.profileId || !session.ownerToken) return;
     api
       .stats(session.profileId, session.ownerToken)
       .then(setStats)
-      .catch((e) => setError((e as Error).message));
+      .catch(setError);
   }, [session.profileId, session.ownerToken]);
 
   const p = session.profile;
@@ -51,7 +52,7 @@ export function Home({ go }: {
         </div>
       </div>
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={() => go("plans")} variant="inline" />
 
       <div className="tiles">
         {tiles.map((t) => (

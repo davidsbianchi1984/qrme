@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type VoiceprintStatus } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -11,10 +12,14 @@ import { useSession } from "../store";
  * because it is the first thing that has to be true, and the readiness
  * numbers are shown because a thin enrollment should look thin.
  */
-export function Voice() {
+export function Voice({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [state, setState] = useState<VoiceprintStatus | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const [seconds, setSeconds] = useState(45);
   const [source, setSource] = useState<"call" | "voice_note" | "direct">("voice_note");
@@ -26,7 +31,7 @@ export function Voice() {
   async function load() {
     if (!pid) return;
     try { setState(await api.voiceprint(pid)); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
   }
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [pid]);
 
@@ -34,7 +39,7 @@ export function Voice() {
     if (!pid) return;
     setBusy(true); setError(null);
     try { await fn(); await load(); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -49,7 +54,7 @@ export function Voice() {
         <span className="muted small">your own voice, with your permission</span>
       </header>
 
-      {error && <div className="card"><div className="error">⚠ {error}</div></div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
 
       {/* Step 802 — the permission, before anything is collected. */}
       <div className="card">

@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo,
          type WatermarkRecovery } from "../api";
+import { Refusal } from "../Refusal";
 import { Problems } from "../Problems";
 import { ProviderTiles } from "../ProviderTiles";
 import { useSession } from "../store";
 
-export function Settings() {
+export function Settings({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session, signOut } = useSession();
   const [base, setBaseInput] = useState(getBase());
   const [llmKey, setLlmKeyInput] = useState(getLlmKey());
@@ -16,7 +21,7 @@ export function Settings() {
   const [checked, setChecked] = useState<WatermarkRecovery | null>(null);
   const [checking, setChecking] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [pair, setPair] = useState<PairInfo | null>(null);
 
   useEffect(() => {
@@ -28,7 +33,7 @@ export function Settings() {
     setBase(base);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
-    api.offlineStatus().then(setOffline).catch((e) => setError((e as Error).message));
+    api.offlineStatus().then(setOffline).catch((e) => setError(e));
   }
 
   return (
@@ -51,12 +56,12 @@ export function Settings() {
           <input value={base} onChange={(e) => setBaseInput(e.target.value)} />
         </label>
         <button className="primary" onClick={save}>{saved ? "Saved ✓" : "Save"}</button>
-        {error && <div className="error">⚠ {error}</div>}
+        <Refusal error={error} onPlans={onPlans} variant="inline" />
       </div>
 
-      <ModelPanel />
+      <ModelPanel onPlans={onPlans} />
 
-      <MailPanel />
+      <MailPanel onPlans={onPlans} />
 
       <div className="card">
         <h3>Your model API key — who pays for the AI's words</h3>
@@ -155,7 +160,7 @@ export function Settings() {
 // the environment), no verification email can reach anybody — the message
 // goes to the server's log instead, which is why local signup does not wait
 // for one. Fill this in and the emails become real.
-function MailPanel() {
+function MailPanel({ onPlans }: { onPlans: () => void }) {
   const [cfg, setCfg] = useState<Awaited<ReturnType<typeof accountApi.getMailSettings>> | null>(null);
   const [host, setHost] = useState("");
   const [port, setPort] = useState(587);
@@ -166,7 +171,7 @@ function MailPanel() {
   const [testTo, setTestTo] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     accountApi.getMailSettings().then((c) => {
@@ -181,7 +186,7 @@ function MailPanel() {
   async function run(fn: () => Promise<unknown>, ok: string) {
     setBusy(true); setError(null); setNote(null);
     try { await fn(); setNote(ok); load(); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -229,7 +234,7 @@ function MailPanel() {
         </button>
       </>)}
       {note && <div className="muted small">{note}</div>}
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }
@@ -237,13 +242,13 @@ function MailPanel() {
 
 // Which model answers for this profile — click a tile. The switchboard has
 // always been in the backend; a person should not have to know a PUT exists.
-function ModelPanel() {
+function ModelPanel({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
   const [providers, setProviders] = useState<Awaited<ReturnType<typeof accountApi.listModels>>["providers"]>([]);
   const [chosen, setChosen] = useState("auto");
   const [effective, setEffective] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     accountApi.listModels().then((m) => setProviders(m.providers)).catch(() => setProviders([]));
@@ -261,7 +266,7 @@ function ModelPanel() {
     try {
       const r = await accountApi.setProfileModel(session.profileId, name, session.ownerToken);
       setChosen(r.provider); setEffective(r.effective);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -289,7 +294,7 @@ function ModelPanel() {
           has no key on this deployment yet.
         </div>
       )}
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

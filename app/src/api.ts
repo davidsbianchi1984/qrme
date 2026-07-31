@@ -185,6 +185,79 @@ export type PlanGate = {
   billing: string;
 };
 
+// ---------------------------------------------------------------------
+// What the gate is gating.
+//
+// Driven, not read off the route signatures. Two things were only
+// visible from the running server: `period` is null on the unpaid tiers
+// rather than absent or "month", and `visitor` and `free` are separate
+// plans that both cost nothing — the first is somebody with no account
+// reading a public page, the second is somebody with an account whose
+// work sits in the clear. A picker that collapsed them would be offering
+// a downgrade nobody asked for.
+// ---------------------------------------------------------------------
+
+/** Where an account's work actually lives on this plan. The sentences are
+ *  the backend's and are rendered verbatim: `disclosure` is a paragraph
+ *  somebody argued carefully about what free means here, and a paraphrase
+ *  would be a weaker version of it. Null once there is a vault, because
+ *  there is then nothing to disclose. */
+export type StoragePosture = {
+  plan: string;
+  posture: string;
+  private: boolean; not_private: boolean;
+  title: string; means: string;
+  who_can_read: string[];
+  encrypted_at_rest: boolean;
+  audit_chain: boolean;
+  you_hold_a_key: boolean;
+  disclosure: string | null;
+  /** What this posture will not hold at all, whatever the plan. Each is a
+   *  case where the person exposed did not pick the plan. */
+  refused_here: string[];
+  custody: {
+    who: string; held_by: string; means: string;
+    transport: string;
+    user_holds_a_key: boolean;
+    returning_access: boolean;
+    goes_through_a_vault: boolean;
+    access_record: string;
+    erasure: string;
+  };
+};
+
+export type PlanEntry = {
+  plan: string;
+  title: string;
+  price_usd: number;
+  /** Null on visitor and free — they are not billed, rather than billed
+   *  monthly at zero. */
+  period: string | null;
+  means: string;
+  includes: string[];
+  locked: string[];
+  storage: StoragePosture;
+};
+
+export type PlanCatalogue = {
+  plans: PlanEntry[];
+  /** Keyed by the same capability name the plan gate refuses with, so a
+   *  refusal naming `builders` can be explained without the console
+   *  writing its own glossary. */
+  capabilities: Record<string, { from: string; is: string }>;
+  the_difference: string;
+  billing: string;
+};
+
+export type Membership = {
+  account_id: string;
+  plan: string; title: string;
+  price_usd: number; period: string | null;
+  includes: string[]; locked: string[];
+  billing: string;
+  storage: StoragePosture;
+};
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},
@@ -1044,7 +1117,7 @@ export type HeldMessage = {
 // The walkthrough is written prose that works with no model configured,
 // it names the screens each step is about, and a test asserts every screen
 // in the gallery is claimed by some lesson — so it cannot quietly fall
-// behind the app. Thirty-eight lessons, and no way to take any of them.
+// behind the app. All of it, and no way for anybody to take it.
 // ---------------------------------------------------------------------
 
 export type Lesson = {
@@ -2126,9 +2199,9 @@ export const api = {
   //
   // Twelve routes with no caller, and this is the set it is least
   // comfortable to have found: the walkthrough that teaches somebody where
-  // everything in the product lives had no way to be taken. Thirty-eight
-  // written lessons, a test asserting every screen in the gallery is
-  // claimed by one of them, and no door.
+  // everything in the product lives had no way to be taken. A written
+  // lesson for every screen, a test asserting every drawing in the gallery
+  // is claimed by one of them, and no door.
   //
   // The console already had `api.help(question)` — the box you type a
   // question into. What was missing is the other half, for the person who
@@ -2169,4 +2242,32 @@ export const api = {
       { method: "PUT", body, token }),
   dockFace: (profileId: string, name: string, token: string) =>
     req<DockFace>(`/dock/${profileId}/face/${name}`, { token }),
+
+  // ---------------------------------------------------------------------
+  // Plans and membership.
+  //
+  // Found by following the refusal. `Refusal.tsx` draws a plan gate as an
+  // upsell — the capability, the plan that has it, the price — and then
+  // had nowhere to send anybody, because the four routes behind the price
+  // it was quoting had no caller either. A refusal that names a plan in a
+  // product with no way to join one is worse than a flat no.
+  //
+  // `GET /plans` is public on purpose (`tiers.py`: "a paywall nobody can
+  // read the terms of before signing in is one people bounce off"), and it
+  // is generated from the same table the gate reads, so the page and the
+  // refusal cannot disagree.
+  // ---------------------------------------------------------------------
+
+  plans: () => req<PlanCatalogue>("/plans"),
+  membership: (accountId: string, token: string) =>
+    req<Membership>(`/memberships/${accountId}`, { token }),
+  subscribe: (accountId: string, plan: string, token: string) =>
+    req<Membership>(`/memberships/${accountId}`,
+      { method: "POST", body: { plan }, token }),
+  // Ends the subscription; the account keeps its profiles. Named for what
+  // it does rather than `delete`, because "cancel my plan" and "delete my
+  // work" are the two things a person must never confuse here.
+  cancelMembership: (accountId: string, token: string) =>
+    req<Membership>(`/memberships/${accountId}`,
+      { method: "DELETE", token }),
 };

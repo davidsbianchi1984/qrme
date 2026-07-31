@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type HeldMessage, type ObjectionAudit, type ObjectionOpened,
          type ObjectionStatus } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -32,7 +33,11 @@ import { useSession } from "../store";
  * still the timeline but nothing is hash-chained, and a screen that showed the
  * events without that caveat would be overstating what it has.
  */
-export function Contest() {
+export function Contest({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
@@ -47,9 +52,9 @@ export function Contest() {
   const [audit, setAudit] = useState<ObjectionAudit | null>(null);
 
   const [queue, setQueue] = useState<HeldMessage[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   function loadQueue() {
     if (!me || !token) return;
@@ -87,7 +92,7 @@ export function Contest() {
         for, this is how you say so.
       </p>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">

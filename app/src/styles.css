@@ -36,7 +36,16 @@ code, .mono { font-family: ui-monospace, Menlo, monospace; }
 .sidebar {
   background: linear-gradient(180deg, #1b1445, #100b2c);
   border-right: 1px solid var(--line);
-  padding: 20px 14px; display: flex; flex-direction: column;
+  /* The bottom padding is the agent-lights widget's footprint: it is fixed at
+     `left: 22px; bottom: 22px` and 176px across, so it sits *on* this column.
+     The same fault was found and fixed for phones (see the 760px block near
+     the end of this file) where it covered Home and Chat and the tabs read as
+     broken. On desktop the sidebar simply had not grown long enough to reach
+     it yet; by the time it held two dozen tabs, the last three were under the
+     widget and a click landed on the lights. Reserving the space is the fix
+     that survives the next tab being added. */
+  padding: 20px 14px 214px; display: flex; flex-direction: column;
+  overflow-y: auto;
 }
 .brand { display: flex; gap: 10px; align-items: center; margin-bottom: 22px; padding: 0 6px; }
 .brand-name { font-weight: 800; letter-spacing: 0.5px; }

@@ -3,6 +3,7 @@ import {
   api, type Desk as DeskRow, type DeskBeacon, type DeskGuest,
   type DeskOverlay, type DeskRing, type LivePerson,
 } from "../api";
+import { Refusal } from "../Refusal";
 
 // A staffed counter somebody can walk up to.
 //
@@ -18,7 +19,11 @@ import {
 // state rather than the shared session for that reason — signing in as an
 // owner does not make you the desk, and conflating the two would let one
 // person's session speak for a counter they do not staff.
-export function Desk() {
+export function Desk({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const [deskId, setDeskId] = useState("");
   const [deskToken, setDeskToken] = useState("");
   const [desk, setDesk] = useState<DeskRow | null>(null);
@@ -34,7 +39,7 @@ export function Desk() {
   });
   const [label, setLabel] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [said, setSaid] = useState<string | null>(null);
 
   const load = useCallback(() => {
@@ -53,7 +58,7 @@ export function Desk() {
   async function run(action: () => Promise<unknown>, ok?: string) {
     setBusy(true); setError(null); setSaid(null);
     try { await action(); if (ok) setSaid(ok); load(); }
-    catch (e) { setError((e as Error).message); }
+    catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -62,7 +67,7 @@ export function Desk() {
   return (
     <section className="screen">
       <h2>Desk</h2>
-      {error && <p className="error">{error}</p>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
       {said && <p className="muted">{said}</p>}
 
       {!staffing && (

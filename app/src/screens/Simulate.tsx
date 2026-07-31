@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, SimulationOut } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // Real-time simulation (spec clauses 1 & 5): ask the profile what the person
@@ -14,14 +15,18 @@ const HORIZONS = [
   { id: "long_term", label: "over months or years" },
 ] as const;
 
-export function Simulate() {
+export function Simulate({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [scenario, setScenario] = useState("");
   const [horizon, setHorizon] = useState<(typeof HORIZONS)[number]["id"]>("short_term");
   const [runs, setRuns] = useState<SimulationOut[]>([]);
   const [latest, setLatest] = useState<SimulationOut | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     if (!session.profileId || !session.ownerToken) return;
@@ -46,7 +51,7 @@ export function Simulate() {
       setLatest(out);
       setScenario("");
       load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -102,7 +107,7 @@ export function Simulate() {
         </div>
       )}
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

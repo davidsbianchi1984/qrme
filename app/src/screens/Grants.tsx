@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type SkillGrant, type SkillGrantUse,
          type SkillGrantVocabulary } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
@@ -21,7 +22,11 @@ import { useSession } from "../store";
  * `surface` and `skill_kind` keys, so the screen shows those rather than
  * inventing labels that could drift from the vocabulary.
  */
-export function Grants() {
+export function Grants({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
@@ -30,7 +35,7 @@ export function Grants() {
   const [grant, setGrant] = useState<SkillGrant | null>(null);
   const [uses, setUses] = useState<SkillGrantUse[]>([]);
   const [lookup, setLookup] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
 
   const [borrower, setBorrower] = useState("");
@@ -42,7 +47,7 @@ export function Grants() {
   const [what, setWhat] = useState("");
   const [reason, setReason] = useState("");
 
-  const fail = (e: unknown) => setError((e as Error).message);
+  const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
     api.skillGrantVocabulary().then((v) => {
@@ -98,7 +103,7 @@ export function Grants() {
         long as you both want it there.
       </p>
 
-      {error && <div className="card error">{error}</div>}
+      <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (

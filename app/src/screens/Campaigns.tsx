@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, CampaignOut, DesigneeOut } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // Crowdfunding with proceeds routed where the user said (spec [0020],
@@ -12,7 +13,11 @@ interface DesigneeDraft {
   share: number;
 }
 
-export function Campaigns() {
+export function Campaigns({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [proceeds, setProceeds] = useState<DesigneeOut[]>([]);
   const [drafts, setDrafts] = useState<DesigneeDraft[]>([
@@ -26,7 +31,7 @@ export function Campaigns() {
   const [give, setGive] = useState<Record<string, string>>({});
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load() {
     if (!session.profileId) return;
@@ -55,7 +60,7 @@ export function Campaigns() {
       );
       setProceeds(saved.proceeds_to);
       setEditing(false);
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -67,7 +72,7 @@ export function Campaigns() {
         cause: cause.trim() || undefined,
       }, session.ownerToken!);
       setTitle(""); setCause(""); load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -80,7 +85,7 @@ export function Campaigns() {
       });
       setNote("Split: " + out.split.map((s) => `${s.name} $${s.amount.toFixed(2)}`).join(" · "));
       load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -167,7 +172,7 @@ export function Campaigns() {
                                   onChange={(e) => setGive((g) => ({ ...g, [c.id]: e.target.value }))} /></label>
               <button className="primary" disabled={busy} onClick={() => donate(c.id)}>Donate</button>
               <button disabled={busy}
-                      onClick={() => api.closeCampaign(c.id, session.ownerToken!).then(load).catch((e) => setError((e as Error).message))}>
+                      onClick={() => api.closeCampaign(c.id, session.ownerToken!).then(load).catch((e) => setError(e))}>
                 Close
               </button>
             </div>
@@ -176,7 +181,7 @@ export function Campaigns() {
       ))}
 
       {note && <div className="muted small">{note}</div>}
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

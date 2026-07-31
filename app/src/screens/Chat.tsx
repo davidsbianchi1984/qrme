@@ -1,15 +1,20 @@
 import { useRef, useState } from "react";
 import { api } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 interface Msg { who: "you" | "assistant"; text: string; note?: string }
 
-export function Chat() {
+export function Chat({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   // Where you are (spec clause 1): optional context the reply adapts to.
   // Off until opened, empty until filled — nothing is inferred or collected.
   const [whereOpen, setWhereOpen] = useState(false);
@@ -63,7 +68,7 @@ export function Chat() {
         : "(this reply was held by moderation)";
       setMsgs((m) => [...m, { who: "assistant", text, note }]);
     } catch (e) {
-      setError((e as Error).message);
+      setError(e);
     } finally {
       setBusy(false);
       requestAnimationFrame(() =>
@@ -92,7 +97,7 @@ export function Chat() {
         {busy && <div className="bubble assistant thinking">…</div>}
       </div>
 
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
 
       {/* Spec clauses 2/12 — advisor counsels, collaborator co-creates,
           operator executes. "Let it read my prompt" is the honest default:

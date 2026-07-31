@@ -1,21 +1,26 @@
 import { useEffect, useState } from "react";
 import { api, getBase } from "../api";
+import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 // For You + the marketplace + the starter collection, one discovery surface.
 // Everything here was already in the backend; the console just never showed
 // the doors. The starter collection installs on demand (idempotent server
 // side), and every card is a real profile you can befriend.
-export function Discover() {
+export function Discover({ onPlans }: {
+  /** Where a plan refusal sends somebody. Threaded in from the shell
+   *  rather than looked up here, so the tab id stays in one place. */
+  onPlans: () => void;
+}) {
   const { session } = useSession();
   const [cards, setCards] = useState<Awaited<ReturnType<typeof api.marketplace>>>([]);
   const [tag, setTag] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   function load(t?: string) {
-    api.marketplace(t || undefined).then(setCards).catch((e) => setError((e as Error).message));
+    api.marketplace(t || undefined).then(setCards).catch((e) => setError(e));
   }
   useEffect(() => load(), []);
 
@@ -25,7 +30,7 @@ export function Discover() {
       const r = await api.seedStarters();
       setNote(`Starter collection ready — ${r.created.length} new, ${r.skipped.length} already here.`);
       load();
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -35,7 +40,7 @@ export function Discover() {
     try {
       await api.addFriend(session.profileId, profileId, session.ownerToken);
       setNote("Added to your friends.");
-    } catch (e) { setError((e as Error).message); }
+    } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
@@ -104,7 +109,7 @@ export function Discover() {
       </div>
 
       {note && <div className="muted small">{note}</div>}
-      {error && <div className="error">⚠ {error}</div>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }
