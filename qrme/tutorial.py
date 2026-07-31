@@ -164,6 +164,28 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="handing", chapter="Out in the world",
+         title="Work handed over",
+         what="Delegation had an owner's half and no other half. You could "
+              "mint a grant, choose which phases may run unattended and "
+              "publish the policy — and nobody could take it up from here, "
+              "because the four calls for the person on the *other* end of "
+              "the conversation had no screen. That is what this adds: "
+              "somebody already talking to a profile hands it a job rather "
+              "than one more chat turn, and watches it run. Nothing behind "
+              "it was wrong, which is worth saying plainly. The offer is "
+              "public and tells you which phases are allowed and nothing "
+              "else — which source items the owner scoped is the owner's "
+              "business, not yours. Delegating `research` is refused unless "
+              "a grant scopes it, because without one the phase reads every "
+              "source item on the profile. You have to be in conversation "
+              "with it first: delegated work is not for a stranger holding "
+              "a profile id. And once it is running, the two people who may "
+              "read it are you and the owner — for different reasons, and "
+              "nobody else at all.",
+         screens=(177,),
+         try_it="Chat to a profile that accepts delegated work, then hand it "
+                "a goal and advance it a phase at a time."),
     dict(key="inside", chapter="Out in the world",
          title="Inside a room",
          what="Rooms could be opened and not entered: the console listed "

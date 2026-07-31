@@ -370,6 +370,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/175-inside-a-room.svg"><img src="docs/screens/175-inside-a-room.svg" width="210" alt="Inside A Room"></a><br><sub><b>175</b> · Inside A Room</sub></td>
     <td align="center" width="33%"><a href="docs/screens/176-a-body-and-what-it-learns.svg"><img src="docs/screens/176-a-body-and-what-it-learns.svg" width="210" alt="A Body, And What It Learns"></a><br><sub><b>176</b> · A Body, And What It Learns</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/177-work-handed-over.svg"><img src="docs/screens/177-work-handed-over.svg" width="210" alt="Work Handed Over"></a><br><sub><b>177</b> · Work Handed Over</sub></td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs

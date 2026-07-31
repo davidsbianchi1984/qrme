@@ -1,17 +1,12 @@
-api.advanceDelegatedWorkflow
 api.askToComeUp
 api.badge
 api.cameraSession
 api.composition
-api.delegatedWorkflow
 api.display
 api.exchange
 api.getProfile
-api.health
 api.mediaLimits
-api.resumeDelegatedWorkflow
 api.setAvatar
-api.startDelegatedWorkflow
 api.stats
 api.watermark
 api.workflow

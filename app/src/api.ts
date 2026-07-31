@@ -2305,7 +2305,12 @@ export type SocialBeacon = {
 };
 
 export const api = {
-  health: () => req<{ status?: string }>("/health").then(() => true).catch(() => false),
+  // `health` used to sit here: the same route, the body thrown away, a
+  // boolean returned. Nothing called it — `healthInfo` below returns the
+  // version the guard actually needs — and a binding that discards the
+  // answer is worse than none, because the next person to want a health
+  // check would have found it and lost the version with it. Deleted
+  // rather than wired: not every unused binding wants a screen.
 
   healthInfo: () => req<{ status?: string; version?: string }>("/health"),
 

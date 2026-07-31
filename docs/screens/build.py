@@ -3523,6 +3523,22 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 177: the other end of a delegation policy. The round with no defect in
+    # it, so no card carries a fix — the first is the rule that makes the
+    # feature what it is, and the third is the thing the offer deliberately
+    # will not tell you.
+    dict(num=177, title="Work Handed Over", sub="To somebody else's profile",
+         accent="indigo", tab=24, cards=[
+        dict(icon="link", color="indigo", k="Talk to it first",
+             s="not a stranger with an id",
+             pill=("403", "warn")),
+        dict(icon="finger", color="brand", k="Hand it a job",
+             s="not one more chat turn"),
+        dict(icon="lock", color="amber", k="Scope stays theirs",
+             s="you are told which phases"),
+        dict(icon="eye", color="green", k="Both may watch it",
+             s="the owner, and you"),
+    ], button=("Hand it over", "brand")),
     dict(num=176, title="A Body, And What It Learns", sub="Listed, and not yet buyable",
          accent="silver", tab=23, cards=[
         dict(icon="clock", color="silver", k="Shown, not sold",

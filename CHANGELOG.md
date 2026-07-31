@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### A policy you could publish and nobody could take up
+
+`Delegate` built the owner's half of delegation — mint a revocable grant, say
+which phases may run unattended, start and advance and cancel a workflow. All
+of it about *my profile working for me*. But delegation is not for that. It
+exists for the person on the **other** end of a conversation: somebody already
+talking to a profile hands it a job, inside the limits its owner set. That half
+had four bindings in `api.ts` and no screen calling any of them, so the policy
+was publishable and unusable from the console that published it.
+
+Driven end to end against a running backend, **every rule was already right** —
+the offer is public and lists phases only, never the grant id, because which
+source items the owner scoped is the owner's business; enabling `research` is
+refused without a grant, and the refusal names what it protects rather than the
+rule it enforces; starting one requires an existing conversation; reading or
+advancing one is `403` to an outsider, `401` to nobody at all, and `200` to the
+delegate *and* the owner, who are entitled to it for different reasons.
+
+That is worth recording plainly. This is the first round in a while with no
+defect in it, and the failure it did find is the one the door audit exists to
+name: a feature finished and unreachable. `tests/test_the_other_end_of_the_policy.py`
+pins the shape so it stays that way, and **screen 174's** second half now calls
+all four bindings with the interactor's own token.
+
+- **`api.health` deleted rather than doored.** It hit the same route as
+  `healthInfo`, threw the body away and returned a boolean. Nothing called it,
+  and a binding that discards the answer is worse than none — the next person
+  wanting a health check would have found it and lost the version with it. Not
+  every unused binding wants a screen; the backlog shrinks both ways.
+
+Unused bindings: **17 → 12**.
+
 ### A room id was the only thing a room asked for
 
 `Rooms` could open one and not enter it: the console had no way to read a

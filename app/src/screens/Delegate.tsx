@@ -17,6 +17,18 @@ import { useSession } from "../store";
 // because a phase reads through one; the policy second because it is a choice
 // about scope, not about work; the runs last, because they are what the first
 // two make possible.
+//
+// Then the other side of the same policy. Everything above is the owner's
+// half — what my profile may do for me. Delegation exists for the person on
+// the *other* end of a conversation: somebody already talking to a profile
+// hands it a job, inside the limits its owner set. That half had four
+// bindings and no screen, so an owner could publish a policy and nobody
+// could take it up from here.
+//
+// Two refusals worth keeping visible, because both are the feature working:
+// starting one needs an existing conversation — delegated work is not for a
+// stranger holding a profile id — and a phase that would read every source
+// item on the profile is refused unless the owner scoped a grant for it.
 export function Delegate({ onPlans }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
@@ -36,6 +48,16 @@ export function Delegate({ onPlans }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [said, setSaid] = useState<string | null>(null);
+
+  // The delegate's half. `interactorToken` rather than `ownerToken`: here
+  // you are the person asking somebody else's profile to do something.
+  const me = session.interactorId || "";
+  const mine = session.interactorToken || "";
+  const [theirs, setTheirs] = useState("");
+  const [offer, setOffer] = useState<Delegation | null>(null);
+  const [handedGoal, setHandedGoal] = useState("");
+  const [handed, setHanded] = useState<Workflow | null>(null);
+  const [answer, setAnswer] = useState("");
 
   const load = useCallback(() => {
     if (!pid || !token) return;
@@ -240,6 +262,118 @@ export function Delegate({ onPlans }: {
           {t.output && <p>{t.output}</p>}
         </div>
       ))}
+
+      <h3>Work you handed to somebody else's profile</h3>
+      <p className="muted small">
+        The other side of the same policy. Everything above is what your own
+        profile may do for you; this is you asking somebody else's to do
+        something, inside the limits its owner published.
+      </p>
+      <div className="card">
+        <div className="row">
+          <input value={theirs} onChange={(e) => setTheirs(e.target.value)}
+                 placeholder="their profile id" style={{ flex: 1 }} />
+          <button disabled={busy || !theirs.trim()}
+                  onClick={() => {
+                    setError(null);
+                    api.delegation(theirs.trim()).then(setOffer)
+                      .catch((e) => { setOffer(null); setError(e); });
+                  }}>
+            What will it take on?
+          </button>
+        </div>
+        {offer && (
+          <p className="small">
+            {offer.delegation
+              ? `Accepts delegated work: ${offer.phases.join(", ")}`
+              : "Does not accept delegated work."}
+            {" "}
+            <span className="muted small">
+              {/* The offer deliberately omits the grant id — which source
+                  items the owner scoped is the owner's business, and the
+                  caller only needs the shape of the request that will be
+                  accepted. */}
+              Which sources its owner scoped is not shown, and is not yours
+              to know.
+            </span>
+          </p>
+        )}
+        <div className="row">
+          <input value={handedGoal}
+                 onChange={(e) => setHandedGoal(e.target.value)}
+                 placeholder="what you want done" style={{ flex: 1 }} />
+          <button disabled={busy || !mine || !theirs.trim()
+                            || !handedGoal.trim()}
+                  onClick={async () => {
+                    setError(null); setSaid(null); setBusy(true);
+                    try {
+                      setHanded(await api.startDelegatedWorkflow(
+                        theirs.trim(),
+                        { interactor_id: me, goal: handedGoal.trim() },
+                        mine));
+                      setHandedGoal("");
+                    } catch (e) { setError(e); } finally { setBusy(false); }
+                  }}>
+            Hand it over
+          </button>
+        </div>
+        <p className="muted small">
+          You have to be talking to it already — delegated work is for
+          somebody in a conversation, not a stranger holding a profile id, and
+          starting one cold is refused by name.
+        </p>
+        {handed && (
+          <>
+            <p className="small">
+              <code>{handed.id}</code> — {handed.status}
+              {handed.next_phase ? ` · next: ${handed.next_phase}` : ""}
+              {handed.awaiting ? ` · waiting on you: ${handed.awaiting}` : ""}
+            </p>
+            <div className="row">
+              <button disabled={busy}
+                      onClick={async () => {
+                        setError(null); setBusy(true);
+                        try {
+                          setHanded(await api.advanceDelegatedWorkflow(
+                            theirs.trim(), handed.id, mine));
+                        } catch (e) { setError(e); }
+                        finally { setBusy(false); }
+                      }}>
+                Run the next phase
+              </button>
+              <button disabled={busy}
+                      onClick={async () => {
+                        setError(null); setBusy(true);
+                        try {
+                          setHanded(await api.delegatedWorkflow(
+                            theirs.trim(), handed.id, mine));
+                        } catch (e) { setError(e); }
+                        finally { setBusy(false); }
+                      }}>
+                Refresh
+              </button>
+            </div>
+            <div className="row">
+              <input value={answer}
+                     onChange={(e) => setAnswer(e.target.value)}
+                     placeholder="answer it, if it stopped to ask"
+                     style={{ flex: 1 }} />
+              <button disabled={busy || !answer.trim()}
+                      onClick={async () => {
+                        setError(null); setBusy(true);
+                        try {
+                          setHanded(await api.resumeDelegatedWorkflow(
+                            theirs.trim(), handed.id, answer.trim(), mine));
+                          setAnswer("");
+                        } catch (e) { setError(e); }
+                        finally { setBusy(false); }
+                      }}>
+                Answer and continue
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </section>
   );
 }
