@@ -1654,6 +1654,29 @@ CREATE TABLE IF NOT EXISTS listing_offers (
     created_at TEXT NOT NULL
 );
 
+-- Who made a listing, when anybody did.
+--
+-- A side table for the same reason listing_offers is one, and nullable in
+-- effect: `POST /marketplace/listings` still needs no token, so an
+-- unauthenticated create simply writes no row here. What it fixes is the
+-- other end. `DELETE /marketplace/listings/{id}` asked for no credential at
+-- all, so a stranger could remove a listing that had a recorded seller, an
+-- open offer and paid orders against it — while `DELETE
+-- /marketplace/listings/{id}/offer`, which destroys strictly less, answered
+-- the same stranger "not your offer". The guard was on the smaller door.
+--
+-- So a listing is claimed by whoever staked something on it: the creator
+-- recorded here, the seller on its offer, or the owner of the profile it
+-- advertises. A listing with none of those — made by nobody, priced by
+-- nobody, advertising nobody — has no claimant, and anyone may clear it
+-- away. That is the honest reading of an endpoint that needs no token: if it
+-- costs nothing to make, it costs nothing to remove.
+CREATE TABLE IF NOT EXISTS listing_claims (
+    listing_id  TEXT PRIMARY KEY REFERENCES listings(id),
+    claimant_id TEXT NOT NULL,   -- the subject_id of whoever created it
+    created_at  TEXT NOT NULL
+);
+
 -- One purchase. Kept even when the listing is later withdrawn, because a
 -- receipt that disappears with the shop window is not a receipt.
 CREATE TABLE IF NOT EXISTS orders (

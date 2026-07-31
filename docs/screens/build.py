@@ -3519,6 +3519,21 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 174: the seller's side. The first card is the defect the screen was
+    # built to make visible — two currencies that had been added together —
+    # and the last is the door that asked for no credential at all.
+    dict(num=174, title="What You Are Owed", sub="One currency at a time",
+         accent="gold", tab=21, cards=[
+        dict(icon="coin", color="gold", k="Not added together",
+             s="a total across two is not one",
+             pill=("2", "warn")),
+        dict(icon="pen", color="brand", k="Post what it costs",
+             s="and stop offering it later"),
+        dict(icon="eye", color="green", k="Who holds one",
+             s="and what they made from it"),
+        dict(icon="lock", color="amber", k="Only a claimant",
+             s="may take a listing down"),
+    ], button=("Request a payout", "brand")),
     # 173: beginning and passing on. The card that matters is the second —
     # the one route an owner token cannot open, because the signal it
     # answers is that the owner cannot act.

@@ -2087,6 +2087,68 @@ export type DerivedAgent = {
   owner_token: string;
 };
 
+/** The offer an owner has posted — what their profile is licensed for and
+ *  at what price. 404 when there is none, which is a real answer and not an
+ *  error: most profiles are not for sale. */
+export type LicenseOfferView = {
+  profile_id: string;
+  kind: string;
+  price: number;
+  currency: string;
+  terms: string | null;
+  allow_derivatives: boolean;
+};
+
+/** One licence somebody holds on this profile. The owner's view of the sale,
+ *  which is a different list from the grants a buyer holds. */
+export type LicenseHolder = {
+  id: string;
+  buyer_id: string;
+  kind: string;
+  derived_profile_id: string | null;
+  revoked: boolean;
+  created_at: string;
+};
+
+export type LedgerEntry = {
+  id: string; beneficiary: string; kind: string; ref: string;
+  memo: string | null; amount: number; currency: string;
+  status: string;            // accrued | paid
+  payout_id: string | null;
+  created_at: string;
+};
+
+export type MoneyTotals = {
+  accrued: number; paid: number; lifetime: number;
+  by_kind: Record<string, number>;
+};
+
+/** The creator statement.
+ *
+ *  `totals` is **one currency's** figures — the settlement currency named in
+ *  `currency` — and `by_currency` holds every currency including that one.
+ *  They were a single set of numbers summed across currencies until this
+ *  round: ¥100 and $100 came back as `accrued: 200` under whichever currency
+ *  had sold most recently. `mixed` is the flag a screen needs before it draws
+ *  a figure, because a headline that silently omits a second balance is only
+ *  honest if it says so. */
+export type EarningsStatement = {
+  owner_id: string;
+  entries: LedgerEntry[];
+  totals: MoneyTotals & { mixed: boolean };
+  by_currency: Record<string, MoneyTotals>;
+  currencies: string[];
+  currency: string;
+};
+
+/** One payout, of one currency. `remaining` names the currencies still
+ *  holding a balance, so "you have been paid" and "you have been paid some
+ *  of it" are distinguishable without a second request. */
+export type PayoutReceipt = {
+  payout_id: string; owner_id: string; total: number; currency: string;
+  entries: number; at: string; remaining: string[]; note: string;
+};
+
 /** How this profile and one person are going.
  *
  *  Deliberately narrower than what a rating hands back: `last_seen` and
@@ -3733,6 +3795,70 @@ export const api = {
   deriveAgent: (profileId: string, grantId: string, token: string) =>
     req<DerivedAgent>(`/profiles/${profileId}/license/${grantId}/derive`,
       { method: "POST", token }),
+
+  // ---------------------------------------------------------------------
+  // The other side of the counter.
+  //
+  // Everything above is what a buyer does. The console could buy a licence
+  // and derive an agent from it, and could not post an offer, see who had
+  // bought one, revoke one, read a penny of what any of it earned, or ask
+  // to be paid. Nine routes, all of them owner-side, all of them reachable
+  // from the iOS, Android and Windows shells — which is how the route audit
+  // came back clean: it asked whether *some* client had a door, and a phone
+  // counts. The console is the surface with the screens; a capability only
+  // the phone can reach is not a capability a desktop owner has.
+  //
+  // Read `mixed` before drawing a total. See EarningsStatement.
+  // ---------------------------------------------------------------------
+
+  licenseOffer: (profileId: string) =>
+    req<LicenseOfferView>(`/profiles/${profileId}/license`),
+  setLicenseOffer: (profileId: string,
+                    body: { kind: string; price: number; currency?: string;
+                            terms?: string; allow_derivatives?: boolean },
+                    token: string) =>
+    req<LicenseOfferView>(`/profiles/${profileId}/license`,
+      { method: "PUT", body, token }),
+  withdrawLicenseOffer: (profileId: string, token: string) =>
+    req<void>(`/profiles/${profileId}/license`,
+      { method: "DELETE", token }),
+  licenseHolders: (profileId: string, token: string) =>
+    req<LicenseHolder[]>(`/profiles/${profileId}/licenses`, { token }),
+  // The grant id, not the profile's. Revoking stops a buyer deriving from
+  // it; it does not unmake an agent already derived, and it does not undo
+  // the fee — the statement keeps the entry, which is what a revoked sale
+  // looks like in an honest ledger.
+  revokeLicense: (grantId: string, token: string) =>
+    req<{ grant_id: string; revoked: boolean }>(`/licenses/${grantId}`,
+      { method: "DELETE", token }),
+
+  earnings: (profileId: string, token: string) =>
+    req<EarningsStatement>(`/profiles/${profileId}/earnings`, { token }),
+  // One currency per sweep, because a transfer is a movement of money and
+  // there is no money that is partly yen. Omitting it means the settlement
+  // currency — the figure the statement puts at the top.
+  requestPayout: (profileId: string, token: string, currency?: string) =>
+    req<PayoutReceipt>(
+      `/profiles/${profileId}/earnings/payout${
+        currency ? `?currency=${encodeURIComponent(currency)}` : ""}`,
+      { method: "POST", token }),
+
+  // A listing still needs no token to create — that has always been the
+  // design, and the seller is established when a price is attached. What it
+  // now does is *record* an authenticated creator as the listing's claimant,
+  // which is what makes it theirs to move or take down. Removal used to ask
+  // for nothing at all.
+  createListing: (body: { kind: string; title: string; blurb?: string;
+                          tags?: string[]; area?: string;
+                          provider_name: string; business?: boolean;
+                          profile_id?: string },
+                  token: string) =>
+    req<{ id: string; kind: string; title: string;
+          claimed_by: string | null }>(`/marketplace/listings`,
+      { method: "POST", body, token }),
+  removeListing: (listingId: string, token: string) =>
+    req<void>(`/marketplace/listings/${listingId}`,
+      { method: "DELETE", token }),
 
   // ---------------------------------------------------------------------
   // Taking something back, and the three different answers to "there was

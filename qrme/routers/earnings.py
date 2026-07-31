@@ -31,13 +31,29 @@ def earnings(profile_id: str, request: Request) -> dict:
 
 
 @router.post("/profiles/{profile_id}/earnings/payout", status_code=201)
-def request_payout(profile_id: str, request: Request) -> dict:
-    """Sweep the accrued balance into a payout (simulated transfer). 409
-    when nothing is accrued — a payout of nothing is not a payout."""
-    receipt = ledger.payout(_owner_of(profile_id, request))
-    if receipt is None:
-        raise HTTPException(409, "nothing accrued — the balance is zero")
-    return receipt
+def request_payout(profile_id: str, request: Request,
+                   currency: str | None = None) -> dict:
+    """Sweep one currency's accrued balance into a payout (simulated
+    transfer). 409 when nothing is accrued — a payout of nothing is not a
+    payout.
+
+    ``currency`` is optional and defaults to the account's settlement
+    currency, which is what an empty request has always meant. It exists
+    because an account earning in more than one currency has more than one
+    balance, and the sweep used to add them together and call the sum a
+    transfer.
+    """
+    owner = _owner_of(profile_id, request)
+    receipt = ledger.payout(owner, currency)
+    if receipt is not None:
+        return receipt
+    held = [c for c, t in ledger.statement(owner)["by_currency"].items()
+            if t["accrued"] > 0]
+    if currency and held:
+        raise HTTPException(
+            409, f"nothing accrued in {currency} — this account holds a "
+                 f"balance in {', '.join(sorted(held))}")
+    raise HTTPException(409, "nothing accrued — the balance is zero")
 
 
 # -- Crowdfunding: proceeds where the user said (spec [0020] ex. two) --------

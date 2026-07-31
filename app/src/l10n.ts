@@ -179,6 +179,13 @@ const CHROME: Table = {
     ja: "外へ出るもの", zh: "哪些内容外流", hi: "क्या बाहर जाता है",
     ar: "ما الذي يخرج",
   },
+  "nav.selling": {
+    en: "What you are owed", es: "Lo que se te debe",
+    fr: "Ce qui vous est dû", de: "Was Ihnen zusteht",
+    pt: "O que lhe é devido", it: "Quanto ti spetta",
+    ja: "受け取るべきもの", zh: "该付给你的",
+    hi: "जो आपको मिलना है", ar: "ما هو مستحق لك",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

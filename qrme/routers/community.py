@@ -369,8 +369,70 @@ def room_transcript(room_id: str) -> list[dict]:
 # marketplace listings
 # --------------------------------------------------------------------------- #
 
-@router.post("/marketplace/listings", status_code=201)
-def create_listing(body: ListingCreate) -> dict:
+def _claimants(listing_id: str) -> set[str]:
+    """Everyone with a stake in this listing, and therefore a say in whether
+    it stays up.
+
+    Three sources, any of which is enough:
+
+    * whoever created it, when they were signed in at the time;
+    * the seller recorded on its offer — the account a purchase pays;
+    * the owner of the profile it advertises, for a ``profile`` listing.
+
+    An empty set is a real answer, not a missing one: a listing made by an
+    anonymous caller, never priced, advertising nobody. Nothing is staked on
+    it and nobody is wronged by its removal.
+    """
+    conn = db.connect()
+    out: set[str] = set()
+    row = conn.execute("SELECT claimant_id FROM listing_claims WHERE"
+                       " listing_id=?", (listing_id,)).fetchone()
+    if row:
+        out.add(row["claimant_id"])
+    offer = conn.execute("SELECT seller_id FROM listing_offers WHERE"
+                         " listing_id=?", (listing_id,)).fetchone()
+    if offer:
+        out.add(offer["seller_id"])
+    listing = conn.execute("SELECT profile_id FROM listings WHERE id=?",
+                           (listing_id,)).fetchone()
+    if listing and listing["profile_id"]:
+        prof = conn.execute("SELECT owner_id FROM profiles WHERE id=?",
+                            (listing["profile_id"],)).fetchone()
+        if prof:
+            out.add(prof["owner_id"])
+            out.add(listing["profile_id"])
+    return out
+
+
+def _may_alter(listing_id: str, request: Request) -> None:
+    """403 unless the caller is one of the listing's claimants.
+
+    The identity compared is the token's subject — an interactor id for a
+    person, a profile id for an owner token — against the set above, which
+    holds both kinds for that reason. An owner token also matches its
+    profile's ``owner_id``, so any of an account's profiles can act for a
+    listing the account put up.
+    """
+    claimants = _claimants(listing_id)
+    if not claimants:
+        return
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who["subject_id"] not in claimants:
+        raise HTTPException(403, "not your listing")
+
+
+def create_listing(body: ListingCreate, claimant: str | None = None) -> dict:
+    """Put something in the window.
+
+    Called by the route below and directly by the seeders, which have no
+    request to read a token from. ``claimant`` is therefore a plain argument
+    rather than something dug out of a ``Request``: a seeded listing has no
+    claimant and is not supposed to — the starter collection belongs to the
+    deployment, and a listing nobody staked anything on is one anybody may
+    clear away.
+    """
     if body.kind == "profile":
         if not body.profile_id:
             raise HTTPException(422, "profile listings require profile_id")
@@ -385,8 +447,24 @@ def create_listing(body: ListingCreate) -> dict:
          body.area, body.provider_name, int(body.business), body.profile_id,
          db.utcnow()),
     )
+    if claimant is not None:
+        conn.execute(
+            "INSERT OR IGNORE INTO listing_claims (listing_id, claimant_id,"
+            " created_at) VALUES (?,?,?)",
+            (listing_id, claimant, db.utcnow()))
     conn.commit()
-    return {"id": listing_id, "kind": body.kind, "title": body.title}
+    return {"id": listing_id, "kind": body.kind, "title": body.title,
+            "claimed_by": claimant}
+
+
+@router.post("/marketplace/listings", status_code=201)
+def post_listing(body: ListingCreate, request: Request) -> dict:
+    """Still needs no token — that is the design and it has not changed — but
+    a caller who *has* one is recorded as the listing's claimant, which is
+    what makes it theirs to move or take down.
+    """
+    who = auth.principal(request)
+    return create_listing(body, who["subject_id"] if who else None)
 
 
 @router.post("/marketplace/seed", status_code=201)
@@ -478,9 +556,16 @@ def marketplace_localities() -> list[dict]:
 
 
 @router.put("/marketplace/listings/{listing_id}/place")
-def set_listing_place(listing_id: str, body: ListingPlace) -> dict:
+def set_listing_place(listing_id: str, body: ListingPlace,
+                      request: Request) -> dict:
     """Say where a listing is offered. Refused for a rated listing: where a
-    performer physically is has nothing to do with browsing them."""
+    performer physically is has nothing to do with browsing them.
+
+    Claimant-gated for the same reason removal is. Moving somebody's listing
+    to another city is a quieter version of taking it down — it stops being
+    found by the people it was put up for, and nothing about it looks wrong.
+    """
+    _may_alter(listing_id, request)
     try:
         return marketplace.set_place(listing_id, body.locality, body.region,
                                      body.remote)
@@ -490,7 +575,8 @@ def set_listing_place(listing_id: str, body: ListingPlace) -> dict:
 
 
 @router.delete("/marketplace/listings/{listing_id}/place")
-def clear_listing_place(listing_id: str) -> dict:
+def clear_listing_place(listing_id: str, request: Request) -> dict:
+    _may_alter(listing_id, request)
     return marketplace.clear_place(listing_id)
 
 
@@ -537,11 +623,24 @@ def assist_search(body: MarketAssist, request: Request) -> dict:
 
 
 @router.delete("/marketplace/listings/{listing_id}", status_code=204)
-def remove_listing(listing_id: str) -> None:
+def remove_listing(listing_id: str, request: Request) -> None:
+    """Take it out of the window. Only a claimant may.
+
+    This used to ask for nothing at all, which made it the widest door in the
+    marketplace: a stranger could remove a listing that had a seller, an open
+    offer and paid orders against it, and the same stranger asking to withdraw
+    the *offer* on that listing was told "not your offer". The offer, the
+    orders and the seller's ledger all survived — the shop window was simply
+    gone, and the title was free for somebody else to put up.
+    """
     conn = db.connect()
-    if not conn.execute("DELETE FROM listings WHERE id=?",
-                        (listing_id,)).rowcount:
+    if conn.execute("SELECT 1 FROM listings WHERE id=?",
+                    (listing_id,)).fetchone() is None:
         raise HTTPException(404, "listing not found")
+    _may_alter(listing_id, request)
+    conn.execute("DELETE FROM listing_claims WHERE listing_id=?",
+                 (listing_id,))
+    conn.execute("DELETE FROM listings WHERE id=?", (listing_id,))
     conn.commit()
 
 

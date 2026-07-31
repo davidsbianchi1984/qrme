@@ -493,11 +493,21 @@ def doorless(app, surfaces=None) -> list[str]:
     Know what "door" means here, because the word is doing less work than it
     looks like. This counts *call sites*, so a binding added to `api.ts` and
     wired to no screen counts as a door and takes its route off the list — the
-    capability is still unreachable, and the number says otherwise. The rule
-    that follows is a discipline rather than something the test can enforce:
-    add the binding in the same change as the screen that calls it. A round
+    capability is still unreachable, and the number says otherwise. A round
     that adds thirty bindings and five screens will report thirty doors and
     have built five.
+
+    That paragraph used to end "a discipline rather than something the test
+    can enforce", and it was wrong. `test_a_binding_is_not_a_door.py` enforces
+    it in about twenty lines, and found twenty-five bindings that nothing
+    called. *The test cannot check this* is a claim worth testing.
+
+    ``surfaces`` is the other half of the same caution. It defaults to the
+    union of all four clients, which answers *some client can reach this* — a
+    weaker question than *this client can*, and the difference is a route only
+    the phone calls. Pass a single language to ask the narrower one:
+    `test_the_console_is_a_client_too.py` does, and the union read zero while
+    the console alone could not reach sixty-four routes.
     """
     langs = surfaces if surfaces is not None else (CONSOLE, *NATIVE)
     made: set[tuple[str, str]] = set()

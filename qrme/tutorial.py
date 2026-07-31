@@ -164,6 +164,27 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="selling", chapter="Out in the world",
+         title="What you are owed",
+         what="The other side of the counter. Everything about licensing "
+              "until now was the buyer's half — acquire one, derive an "
+              "agent from it — and the seller's half had no screen at all "
+              "here: you could be bought from without being able to post "
+              "the offer, see who held a licence, revoke one, read what any "
+              "of it earned, or ask to be paid. All nine of those work on "
+              "the phone, which is why the route audit called them doored. "
+              "The statement keeps totals per currency and never adds "
+              "across them: a hundred yen and a hundred dollars used to "
+              "come back as two hundred, labelled with whichever sale was "
+              "newest. A payout settles one currency, and says what is "
+              "left. Revoking a licence stops the buyer deriving from it — "
+              "it does not unmake an agent they already derived, and it "
+              "does not take the fee off your statement, because a sale "
+              "that happened stays on the record. And a listing can now "
+              "only be taken down by somebody with a stake in it.",
+         screens=(174,),
+         try_it="Post a consult offer, then look at what the statement says "
+                "before anybody has bought one."),
     dict(key="passing", chapter="Out in the world",
          title="Beginning, and passing on",
          what="A profile is born from four questions, and if you leave the "

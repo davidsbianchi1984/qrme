@@ -4,6 +4,64 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+**The union hid a surface.** The doorless backlog reached zero in 0.20.0, and
+it was measuring the wrong thing. `clientpaths.doorless` unions the console
+with the iOS, Android and Windows shells, so a route only the phone calls
+counts as doored — the number went to zero while a desktop owner could not
+reach **64 routes**. The guard was answering *some client can reach this*,
+which was true, in place of *this client can reach this*, which was not.
+
+That is the same shape as every defect this audit has produced: a checker
+answering a question slightly to the left of the one that matters, and
+passing.
+
+### Added
+
+- **`test_the_console_is_a_client_too.py`** — the console's own backlog, in
+  `console_doorless.txt`, checked in both directions and ratcheted so it
+  cannot grow past where it started. The union guard stays; a route no client
+  anywhere calls is still worse. A phone-only capability is a legitimate
+  design choice, which is what the snapshot is for: deferring one takes a
+  deliberate edit and shows up in a diff.
+- **`test_a_binding_is_not_a_door.py`** — a function in `api.ts` that no
+  screen calls is not a door, and `doorless` counts it as one. The docstring
+  on `doorless` had said this was "a discipline rather than something the
+  test can enforce"; it turned out to be enforceable in about twenty lines,
+  and found **25 bindings nothing calls**. *The test cannot check this* is a
+  claim worth testing.
+- **Screen 174, "What you are owed"** — the seller's side of the counter,
+  which the console did not have. An owner could be bought from and could not
+  post a licence offer, see who held one, revoke it, read what any of it
+  earned, or ask to be paid. Nine routes, all owner-side, all present on the
+  phone's Earn tab.
+
+### Fixed
+
+- **A statement added two currencies together.** A creator pricing one profile
+  in dollars and another in yen got back `accrued: 200` for ¥100 and $100,
+  labelled with whichever sale was newest — and all three native shells render
+  that figure with a currency symbol in front of it. Totals are now kept per
+  currency (`by_currency`, `currencies`, and a `mixed` flag on the headline),
+  the settlement currency is chosen deterministically rather than by recency,
+  and a payout settles **one** currency and reports what is `remaining`. An
+  account with one currency reads exactly as it did.
+- **Anyone could delete anyone's marketplace listing.** `DELETE
+  /marketplace/listings/{id}` asked for no credential, while `DELETE
+  /marketplace/listings/{id}/offer` — which destroys strictly less — answered
+  the same stranger "not your offer". A listing is now claimed by whoever
+  staked something on it: the creator recorded in `listing_claims`, the seller
+  on its offer, or the owner of the profile it advertises. Creating one still
+  needs no token, and a listing with no claimant at all is still anybody's to
+  clear away. The place routes are gated the same way, because moving somebody
+  else's listing to another city is a quieter version of taking it down.
+- **`clientpaths.py` was not byte-identical across the three repositories**,
+  though it says it is. JIM and PDI never received the `fetch`, `window.open`,
+  `<img src>` and `<a href>` call forms from the previous round, so their
+  backlogs counted doors that existed. Restored, and JIM's backlog dropped
+  73 → 69 as a result.
+
 ## [0.20.0] — 2026-07-31
 
 **The doorless backlog reached zero.** It began at 116 routes the backend
