@@ -150,7 +150,8 @@ private struct StrangerSection: View {
                     minted = true
                 }
                 let r = try await ApiClient.shared.joinQueue(
-                    interactorId: interactor, alias: alias, tier: tier)
+                    interactorId: interactor, alias: alias, tier: tier,
+                    token: state.interactorToken ?? "")
                 if minted {
                     // The server admitted this identity to the rated queue,
                     // so its verification stands — remember that.
@@ -172,7 +173,8 @@ private struct StrangerSection: View {
         Task {
             guard let interactor = state.interactorId else { return }
             messages = (try? await ApiClient.shared.connectionMessages(
-                cid: cid, interactorId: interactor)) ?? messages
+                cid: cid, interactorId: interactor,
+                token: state.interactorToken ?? "")) ?? messages
         }
     }
 
@@ -184,7 +186,8 @@ private struct StrangerSection: View {
             do {
                 let interactor = try await ensureInteractor(state)
                 _ = try await ApiClient.shared.sendConnectionMessage(
-                    cid: cid, interactorId: interactor, message: text)
+                    cid: cid, interactorId: interactor, message: text,
+                    token: state.interactorToken ?? "")
                 refresh(cid)
             } catch { self.error = error.localizedDescription }
         }
@@ -193,7 +196,9 @@ private struct StrangerSection: View {
     private func end(_ cid: String) {
         Task {
             guard let interactor = state.interactorId else { return }
-            try? await ApiClient.shared.endConnection(cid: cid, interactorId: interactor)
+            try? await ApiClient.shared.endConnection(
+                cid: cid, interactorId: interactor,
+                token: state.interactorToken ?? "")
             connectionId = nil; matchedWith = nil; messages = []; waiting = false
         }
     }

@@ -1,4 +1,3 @@
-GET /connections/{connection_id}/messages
 GET /feedback
 GET /languages
 GET /packs/registries
@@ -10,10 +9,6 @@ GET /profiles/{profile_id}/objections
 GET /profiles/{profile_id}/posts
 GET /profiles/{profile_id}/steering/hub
 GET /profiles/{profile_id}/watermark
-GET /summon
-POST /connections/join
-POST /connections/{connection_id}/end
-POST /connections/{connection_id}/messages
 POST /excursions/{cid}/learn
 POST /feedback
 POST /gaming/sessions/{session_id}/callout

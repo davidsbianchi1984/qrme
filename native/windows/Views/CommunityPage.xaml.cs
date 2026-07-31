@@ -82,7 +82,8 @@ public sealed partial class CommunityPage : Page
                 minted = true;
             }
             else me = await EnsureInteractor();
-            var r = await ApiClient.Shared.JoinQueue(me, AliasBox.Text.Trim(), Tier);
+            var r = await ApiClient.Shared.JoinQueue(me, AliasBox.Text.Trim(), Tier,
+                AppState.Current.InteractorToken ?? "");
             // A rated admit proves the 18+ verification stands — remember it.
             if (minted) s.RememberInteractor(me, adult: true);
             if (r.Status == "matched" && r.ConnectionId is not null)
@@ -107,7 +108,8 @@ public sealed partial class CommunityPage : Page
         var s = AppState.Current;
         try
         {
-            var msgs = await ApiClient.Shared.ConnectionMessages(_connectionId, s.InteractorId!);
+            var msgs = await ApiClient.Shared.ConnectionMessages(_connectionId,
+                s.InteractorId!, s.InteractorToken ?? "");
             StrangerList.ItemsSource = msgs.Select(m => new MsgVm
             {
                 From = m.From,
@@ -130,7 +132,8 @@ public sealed partial class CommunityPage : Page
         try
         {
             var me = await EnsureInteractor();
-            await ApiClient.Shared.SendConnectionMessage(_connectionId, me, text);
+            await ApiClient.Shared.SendConnectionMessage(_connectionId, me, text,
+                AppState.Current.InteractorToken ?? "");
             await RefreshStranger();
         }
         catch (Exception ex) { ShowStrangerError(ex.Message); }
@@ -141,7 +144,9 @@ public sealed partial class CommunityPage : Page
         if (_connectionId is null) return;
         try
         {
-            await ApiClient.Shared.EndConnection(_connectionId, AppState.Current.InteractorId!);
+            await ApiClient.Shared.EndConnection(_connectionId,
+                AppState.Current.InteractorId!,
+                AppState.Current.InteractorToken ?? "");
         }
         catch (Exception ex) { ShowStrangerError(ex.Message); }
         _connectionId = null;

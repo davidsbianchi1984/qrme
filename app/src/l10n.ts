@@ -204,6 +204,12 @@ const CHROME: Table = {
     ja: "訪ねる", zh: "上门", hi: "मिलने जाना",
     ar: "زيارة",
   },
+  "nav.stranger": {
+    en: "Strangers", es: "Desconocidos", fr: "Inconnus",
+    de: "Fremde", pt: "Desconhecidos", it: "Sconosciuti",
+    ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी",
+    ar: "الغرباء",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

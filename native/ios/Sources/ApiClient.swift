@@ -926,28 +926,39 @@ actor ApiClient {
 
     // MARK: Community — stranger connections & multiparty rooms
 
+    // Each of these carries the interactor's own token. The id says whose
+    // turn it is; the token says who is asking, and only the second is
+    // believed — otherwise two public ids were enough to speak as either
+    // party, read the pair's whole conversation, and end it.
     func joinQueue(interactorId: String, alias: String?,
-                   tier: String = "friendly") async throws -> ConnJoin {
+                   tier: String = "friendly",
+                   token: String) async throws -> ConnJoin {
         var body: [String: Any] = ["interactor_id": interactorId, "tier": tier]
         if let alias, !alias.isEmpty { body["alias"] = alias }
-        return try await request("/connections/join", method: "POST", body: body)
+        return try await request("/connections/join", method: "POST",
+                                 body: body, token: token)
     }
 
-    func connectionMessages(cid: String, interactorId: String) async throws -> [ConnMsg] {
+    func connectionMessages(cid: String, interactorId: String,
+                            token: String) async throws -> [ConnMsg] {
         try await request("/connections/\(cid)/messages",
-                          query: ["interactor_id": interactorId])
+                          query: ["interactor_id": interactorId], token: token)
     }
 
     func sendConnectionMessage(cid: String, interactorId: String,
-                               message: String) async throws -> ConnMsgResult {
+                               message: String,
+                               token: String) async throws -> ConnMsgResult {
         try await request("/connections/\(cid)/messages", method: "POST",
-                          body: ["interactor_id": interactorId, "message": message])
+                          body: ["interactor_id": interactorId, "message": message],
+                          token: token)
     }
 
-    func endConnection(cid: String, interactorId: String) async throws {
+    func endConnection(cid: String, interactorId: String,
+                       token: String) async throws {
         struct Ok: Decodable {}
         let _: Ok = try await request("/connections/\(cid)/end", method: "POST",
-                                      query: ["interactor_id": interactorId])
+                                      query: ["interactor_id": interactorId],
+                                      token: token)
     }
 
     func createRoom(topic: String, profileId: String,

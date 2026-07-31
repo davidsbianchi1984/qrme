@@ -1255,13 +1255,13 @@ private fun StrangerPanel(vm: StudioViewModel) {
 
     fun refresh(cid: String) {
         val me = vm.interactorId ?: return
-        vm.call({ ApiClient.connectionMessages(cid, me) }) { r ->
+        vm.call({ ApiClient.connectionMessages(cid, me, vm.interactorToken.orEmpty()) }) { r ->
             r.onSuccess { messages = it }
         }
     }
 
     fun joinAs(me: String, minted: Boolean) {
-        vm.call({ ApiClient.joinQueue(me, alias, tier) }) { r ->
+        vm.call({ ApiClient.joinQueue(me, alias, tier, vm.interactorToken.orEmpty()) }) { r ->
             r.onSuccess {
                 // The server admitted this identity to the queue — a rated
                 // admit proves the 18+ verification stands.
@@ -1324,7 +1324,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                         fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     TextButton(onClick = {
                         vm.interactorId?.let { me ->
-                            vm.call({ ApiClient.endConnection(cid, me) }) {
+                            vm.call({ ApiClient.endConnection(cid, me, vm.interactorToken.orEmpty()) }) {
                                 connectionId = null; matchedWith = null
                                 messages = emptyList(); waiting = false
                             }
@@ -1351,7 +1351,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                         if (text.isNotBlank()) {
                             draft = ""; error = null
                             withInteractor(vm, { error = it }) { me ->
-                                vm.call({ ApiClient.sendConnectionMessage(cid, me, text) }) { r ->
+                                vm.call({ ApiClient.sendConnectionMessage(cid, me, text, vm.interactorToken.orEmpty()) }) { r ->
                                     r.onFailure { error = it.message }
                                     refresh(cid)
                                 }

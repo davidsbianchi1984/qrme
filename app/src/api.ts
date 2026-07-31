@@ -2472,6 +2472,59 @@ export type DeskScanCard = {
  *  runs the profile out; they are separate rows so an import can never post.
  *  `beacon` is null on a `collect` row, which is how a screen knows not to
  *  offer a QR that would be refused. */
+/** Resolving a reference somebody arrived with: `@handle`, `#tag`, or a
+ *  beacon id off a printed sticker. A rated profile answers through the age
+ *  wall on the direct refs and is omitted entirely from `#tag` browse. */
+export type SummonCard = {
+  profile_id: string;
+  display_name: string;
+  handle: string | null;
+  purpose: string;
+  status: string;
+  rated: boolean;
+  chat: string;
+  note: string | null;
+};
+
+export type Summoned = {
+  type: "handle" | "tag" | "beacon";
+  ref: string;
+  profile?: SummonCard;
+  profiles?: SummonCard[];
+  label?: string;
+  location?: string | null;
+  scans?: number;
+};
+
+/** Anonymous matchmaking between two people — no profile involved. Either
+ *  you are matched at once, or you wait. `matched_with` is the other side's
+ *  chosen alias and never their name or id: anonymity is the feature. */
+export type ConnJoined = {
+  status: "matched" | "waiting";
+  connection_id?: string;
+  tier: string;
+  matched_with?: string;
+};
+
+/** `from` is `"you"` or the other side's alias — never an id.
+ *
+ *  A `blocked` message is returned only to the person who sent it, so they
+ *  can see what was held back. That rule is only worth anything now that the
+ *  route knows who is asking; it used to take the id on trust. */
+export type ConnMessage = {
+  id: string;
+  from: string;
+  content: string;
+  status: string;
+  created_at: string;
+};
+
+export type ConnSent = {
+  id: string;
+  status: string;
+  flag_reason: string | null;
+};
+
 export type SocialConnection = {
   id: string;
   profile_id: string;
@@ -4101,6 +4154,49 @@ export const api = {
   // destinations, which is worth saying on the screen rather than leaving
   // somebody to scan it and find out.
   // ---------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------
+  // Arriving, and talking to a stranger.
+  //
+  // `summon` is public and has to be: it is what a scanned sticker or a
+  // shared @handle resolves through, and the person following one has no
+  // account. A rated profile answers it through the age wall.
+  //
+  // The connection routes are the opposite — every one of them carries the
+  // interactor's own token. They took none at all until this round: the
+  // `interactor_id` in the body was read as *who is asking*, when all it ever
+  // said was *whose turn this is meant to be*. Two public ids were enough to
+  // speak as either party, read the pair's whole conversation including the
+  // blocked messages kept back for their sender, and end it — and `end` did
+  // not even need that, because its check was skipped entirely when no id was
+  // supplied.
+  //
+  // The ids still ride in the body and the query string: three shipped native
+  // clients send them, and a 422 on upgrade is a worse answer than not
+  // believing them. They are ignored.
+  // ---------------------------------------------------------------------
+
+  summon: (ref: string) =>
+    req<Summoned>(`/summon?ref=${encodeURIComponent(ref)}`),
+  joinQueue: (body: { interactor_id: string; tier: string; alias?: string },
+              token: string) =>
+    req<ConnJoined>("/connections/join", { method: "POST", body, token }),
+  connectionMessages: (connectionId: string, interactorId: string,
+                       token: string) =>
+    req<ConnMessage[]>(
+      `/connections/${connectionId}/messages`
+      + `?interactor_id=${encodeURIComponent(interactorId)}`, { token }),
+  sendToConnection: (connectionId: string,
+                     body: { interactor_id: string; message: string },
+                     token: string) =>
+    req<ConnSent>(`/connections/${connectionId}/messages`,
+      { method: "POST", body, token }),
+  // Either side may end it — either side, not anybody.
+  endConnection: (connectionId: string, interactorId: string, token: string) =>
+    req<{ id: string; status: string; microphones_returned: number }>(
+      `/connections/${connectionId}/end`
+      + `?interactor_id=${encodeURIComponent(interactorId)}`,
+      { method: "POST", token }),
 
   socialConnections: (profileId: string, token: string) =>
     req<SocialConnection[]>(`/profiles/${profileId}/social`, { token }),

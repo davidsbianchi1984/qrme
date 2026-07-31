@@ -164,6 +164,30 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="stranger", chapter="Out in the world",
+         title="Two strangers",
+         what="Two things you do before you have anything of your own here. "
+              "Following a reference — an `@handle`, a `#tag`, or the id off "
+              "a printed sticker — needs no account, because the person "
+              "following one does not have one yet. And talking to a "
+              "stranger: no profile involved at all, two people, each seeing "
+              "only the name the other chose. The second of those had no way "
+              "in from this console and, it turned out, **no lock on the door "
+              "either**. Every one of its routes read the person's id out of "
+              "the request and checked only that the id named somebody in the "
+              "conversation — never that the caller *was* them, and never "
+              "asking for a credential at all. Two public ids let anybody "
+              "join the queue as you, be matched with a stranger under your "
+              "name, speak as you, read your whole conversation including the "
+              "messages held back for your eyes only, and end it. Ending was "
+              "worse still: the check was skipped entirely when no id was "
+              "given, so a bare request with nothing in it closed somebody "
+              "else's conversation and handed back any microphone lent inside "
+              "it. An id is a claim. Your token is the answer, and the same "
+              "rule already guarded rooms.",
+         screens=(180,),
+         try_it="Follow an @handle, then join the friendly queue and see what "
+                "the other person is called."),
     dict(key="visiting", chapter="Out in the world",
          title="Ringing the bell",
          what="`Desk` is the side you run a desk from — open one, say whether "

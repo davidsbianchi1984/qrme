@@ -559,17 +559,23 @@ object ApiClient {
 
     // ---- Community: stranger connections & multiparty rooms ----
 
+    // Every call below carries the interactor's own token. The id in the body
+    // says whose turn it is; the token says who is asking, and the server now
+    // believes the second one only.
     suspend fun joinQueue(interactorId: String, alias: String?,
-                          tier: String = "friendly"): ConnJoin {
+                          tier: String = "friendly",
+                          token: String): ConnJoin {
         val body = JSONObject().put("interactor_id", interactorId).put("tier", tier)
         if (!alias.isNullOrBlank()) body.put("alias", alias)
-        val o = JSONObject(request("/connections/join", "POST", body))
+        val o = JSONObject(request("/connections/join", "POST", body, token))
         return ConnJoin(o.getString("status"), o.optString("connection_id", null),
             o.optString("matched_with", null))
     }
 
-    suspend fun connectionMessages(cid: String, interactorId: String): List<ConnMsg> {
-        val arr = JSONArray(request("/connections/$cid/messages?interactor_id=$interactorId"))
+    suspend fun connectionMessages(cid: String, interactorId: String,
+                                   token: String): List<ConnMsg> {
+        val arr = JSONArray(request("/connections/$cid/messages?interactor_id=$interactorId",
+            token = token))
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             ConnMsg(o.getString("id"), o.optString("from", ""), o.optString("content", ""),
@@ -577,13 +583,16 @@ object ApiClient {
         }
     }
 
-    suspend fun sendConnectionMessage(cid: String, interactorId: String, message: String) {
+    suspend fun sendConnectionMessage(cid: String, interactorId: String,
+                                      message: String, token: String) {
         request("/connections/$cid/messages", "POST",
-            JSONObject().put("interactor_id", interactorId).put("message", message))
+            JSONObject().put("interactor_id", interactorId).put("message", message),
+            token)
     }
 
-    suspend fun endConnection(cid: String, interactorId: String) {
-        request("/connections/$cid/end?interactor_id=$interactorId", "POST")
+    suspend fun endConnection(cid: String, interactorId: String, token: String) {
+        request("/connections/$cid/end?interactor_id=$interactorId", "POST",
+            token = token)
     }
 
     private fun roomMsgOf(o: JSONObject) = RoomMsg(

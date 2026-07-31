@@ -6,6 +6,48 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### An id was read as a credential, in the one feature built on consent
+
+`/connections` is anonymous matchmaking between two people with no profile
+involved: each sees the alias the other chose, never a name or an id.
+Anonymity is the whole feature. It had no door in this console, and building
+one — **screen 180** — found that it had no *authentication* either. Not weak
+authentication: none.
+
+Every route read `interactor_id` out of the request body or query string and
+checked only that it named one of the two participants. Nothing checked that
+the caller **was** that person, and no route asked for a token at all. Two
+public ids were enough to:
+
+- **join the queue as somebody else**, and be matched with a stranger under
+  their name — and on the `rated` tier, borrow a verified adult's id straight
+  past the age check, which is the one gate this feature cannot afford to lose;
+- **send messages as either party**, stored under their id and shown to the
+  other person as theirs;
+- **read the pair's entire conversation as either party**, including the
+  `blocked` messages the route deliberately withholds for their sender's eyes
+  alone — a rule worth nothing while anyone may claim to be the sender;
+- **end it.**
+
+Ending was the worst, because it did not even need the ids. The check read
+`if ender: _participant(connection, ender)` over an *optional* body and an
+*optional* query parameter, so supplying neither skipped it entirely: a bare
+`POST` with no id and no credential ended a stranger's conversation, and
+returned any wearable microphone lent inside it.
+
+This is the room defect from earlier in this same release, in the one feature
+whose premise is consent — and `community._require_in_room` had already
+settled the argument in the same words. An id is a claim; the token is the
+answer.
+
+The ids still ride in the body and the query string and are ignored: three
+shipped native clients send them, and a 422 on upgrade is a worse answer than
+not believing them. **iOS, Android and Windows all now carry the interactor's
+token** on all four calls.
+
+Console-doorless routes **33 → 28**.
+
+
 ### A refused request left a room behind
 
 `Desk` is the host's console — open a desk, set your presence, point the

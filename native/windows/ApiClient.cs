@@ -856,28 +856,35 @@ public sealed class ApiClient
 
     // -- community: stranger connections & multiparty rooms --
 
+    // The interactor's token rides on every one of these. The id says whose
+    // turn it is; the token says who is asking. Without it, two public ids
+    // were enough to speak as either party, read the pair's conversation and
+    // end it.
     public Task<ConnJoin> JoinQueue(string interactorId, string alias,
-                                    string tier = "friendly") =>
+                                    string tier, string token) =>
         Send<ConnJoin>(Post("/connections/join",
             alias is { Length: > 0 }
                 ? new { interactor_id = interactorId, tier, alias }
-                : (object)new { interactor_id = interactorId, tier }));
+                : (object)new { interactor_id = interactorId, tier }, token));
 
-    public Task<ConnMsg[]> ConnectionMessages(string cid, string interactorId) =>
-        Send<ConnMsg[]>(new HttpRequestMessage(
-            HttpMethod.Get, $"/connections/{cid}/messages?interactor_id={interactorId}"));
+    public Task<ConnMsg[]> ConnectionMessages(string cid, string interactorId,
+                                              string token) =>
+        Send<ConnMsg[]>(Get(
+            $"/connections/{cid}/messages?interactor_id={interactorId}", token));
 
-    public async Task SendConnectionMessage(string cid, string interactorId, string message)
+    public async Task SendConnectionMessage(string cid, string interactorId,
+                                            string message, string token)
     {
         var req = Post($"/connections/{cid}/messages",
-            new { interactor_id = interactorId, message });
+            new { interactor_id = interactorId, message }, token);
         var res = await _http.SendAsync(req);
         res.EnsureSuccessStatusCode();
     }
 
-    public async Task EndConnection(string cid, string interactorId)
+    public async Task EndConnection(string cid, string interactorId, string token)
     {
-        var req = Post($"/connections/{cid}/end?interactor_id={interactorId}", new { });
+        var req = Post($"/connections/{cid}/end?interactor_id={interactorId}",
+                       new { }, token);
         var res = await _http.SendAsync(req);
         res.EnsureSuccessStatusCode();
     }

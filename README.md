@@ -375,6 +375,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/178-signed-and-checked.svg"><img src="docs/screens/178-signed-and-checked.svg" width="210" alt="Signed, And Checked"></a><br><sub><b>178</b> · Signed, And Checked</sub></td>
     <td align="center" width="33%"><a href="docs/screens/179-ringing-the-bell.svg"><img src="docs/screens/179-ringing-the-bell.svg" width="210" alt="Ringing The Bell"></a><br><sub><b>179</b> · Ringing The Bell</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/180-two-strangers.svg"><img src="docs/screens/180-two-strangers.svg" width="210" alt="Two Strangers"></a><br><sub><b>180</b> · Two Strangers</sub></td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs

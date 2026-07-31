@@ -3523,6 +3523,21 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 180: talking to a stranger. First card is the defect and it is the
+    # whole round — the routes took no credential at all — and the last is
+    # the one that needed none: a scan is somebody with no account.
+    dict(num=180, title="Two Strangers", sub="An id is not a credential",
+         accent="indigo", tab=27, cards=[
+        dict(icon="mask", color="red", k="Not who you name",
+             s="the token says who asks",
+             pill=("401", "warn")),
+        dict(icon="eye", color="indigo", k="An alias, and no more",
+             s="never a name, never an id"),
+        dict(icon="shield", color="amber", k="Held back stays back",
+             s="only the sender sees it"),
+        dict(icon="link", color="green", k="A scan needs nothing",
+             s="they have no account yet"),
+    ], button=("Find somebody", "brand")),
     # 179: the visitor's side of a desk. First card is the defect — a 401
     # that still left a room behind it — and the third is the sentence the
     # whole desk feature rests on, inverted from the mark.
