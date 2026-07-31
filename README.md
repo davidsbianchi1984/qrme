@@ -346,6 +346,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
     <td align="center" width="33%"><a href="docs/screens/157-where-it-is-seen.svg"><img src="docs/screens/157-where-it-is-seen.svg" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/158-what-is-live.svg"><img src="docs/screens/158-what-is-live.svg" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
   </tr>
 </table>
 
@@ -1742,6 +1743,21 @@ on. So the honest version is a note addressed to the only party who can
 actually see the room: *we cannot tell whether somebody has walked into shot,
 or blur them if they have; you can look at the room before you start, and stop
 the moment it stops being about the thing.*
+
+All three of these — the camera, the lent microphone, the worn overlay — now
+share one console door (**158**), because they share one rule: whatever you put
+between yourself and the people around you, they are told. The screen renders
+the `never` list, the bystander note's *"we cannot see the room"*, and the
+refusal when a profile is asked to watch a body, all verbatim. Each is an
+argument already made carefully here, and a paraphrase would be a worse version
+of it.
+
+Building that door found something worth writing down: **the camera and the
+microphone accept different sets of surfaces.** A watch party takes a lent
+microphone and refuses a shared camera; a room takes a camera and lends
+microphones through its own route. Two vocabularies that look interchangeable
+and are not — a single picker built from either one refuses half its own
+options, which is what the first version of the screen did.
 
 ## Membership
 

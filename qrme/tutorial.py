@@ -330,6 +330,24 @@ LESSONS: tuple[dict, ...] = (
               "of your screens is not: that is a list of physical places.",
          screens=(157,),
          try_it="Open Where It Is Seen and read what a fixed screen never shows."),
+    dict(key="live", chapter="Being yourself", title="What is live in a place",
+         what="A camera you are sharing, a microphone you have lent, a face "
+              "drawn over your camera — three things that look separate and "
+              "follow one rule: whatever you put between yourself and the "
+              "people around you, they are told. Somebody watching your "
+              "camera cannot zoom it, cannot take a photograph from their "
+              "side, cannot reach any other camera, and gets no location; a "
+              "session cannot start without you starting it, and there is no "
+              "state where it is running and hidden from your own screen. A "
+              "microphone must be one you wear and stays narrow enough to "
+              "reach only you — a speakerphone is refused because the voices "
+              "around you are not yours to lend. And an overlay always says a "
+              "real person is underneath. The one thing we will not promise "
+              "is who walked into shot behind you: we cannot see the room, "
+              "and a reassurance about something we cannot observe would be "
+              "worth nothing.",
+         screens=(158,),
+         try_it="Open What Is Live and read what a viewer can never do."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "

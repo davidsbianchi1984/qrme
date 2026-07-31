@@ -109,6 +109,12 @@ const CHROME: Table = {
     ja: "表示される場所", zh: "展示位置", hi: "कहाँ दिखता है",
     ar: "أين يُعرض",
   },
+  "nav.live": {
+    en: "What is live", es: "Qué está activo", fr: "Ce qui est en direct",
+    de: "Was gerade läuft", pt: "O que está ativo", it: "Cosa è attivo",
+    ja: "起動中のもの", zh: "正在进行", hi: "क्या चालू है",
+    ar: "ما هو نشط",
+  },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
     pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",

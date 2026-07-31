@@ -789,6 +789,129 @@ export type Display = {
   placed_at: string;
 };
 
+// ---------------------------------------------------------------------
+// What is live in a shared place: a camera running, a lent microphone, a
+// face drawn over one.
+//
+// One posture runs through all three, and the screen is built on it —
+// whatever you put between yourself and the people around you, they are
+// told. Every type below therefore carries the backend's own sentences
+// rather than a flag the console would have to caption itself.
+// ---------------------------------------------------------------------
+
+/** The six things a viewer can never do. Rendered verbatim: this is the
+ *  product's promise about a live camera, argued once, carefully. */
+export type CameraNever = {
+  camera_control: string; capture_trigger: string; other_cameras: string;
+  location: string; background_start: string; silent_run: string;
+};
+
+/** Who is in shot, and whose problem that is. `why_it_is_yours` is the
+ *  honest part: the platform cannot see the room, so it declines to promise
+ *  anything about who walked into it. */
+export type Bystanders = {
+  subject: string; risk: string;
+  we_cannot: string; you_can: string; why_it_is_yours: string;
+};
+
+export type CameraVocabulary = {
+  subjects: Record<string, { means: string; bystander_risk: string }>;
+  /** `may_watch[subject][viewer_kind]`. The one `false` is a profile
+   *  watching a person, and `refusals.profile_on_person` says why at
+   *  length. */
+  may_watch: Record<string, Record<string, boolean>>;
+  viewers: string[];
+  surfaces: Record<string, string>;
+  never: CameraNever;
+  max_minutes: number; default_minutes: number;
+  records_by_default: boolean;
+  refusals: Record<string, string>;
+  bystanders: Bystanders;
+};
+
+export type CameraSession = {
+  id: string; holder_id: string;
+  surface: string; surface_id: string;
+  subject: string; subject_means: string;
+  viewer_kind: string; viewer_id: string;
+  minutes: number; recording: boolean;
+  bystanders: string | null; note: string | null;
+  state: string; live: boolean;
+  opened_at: string; ended_at: string | null; ended_by: string | null;
+  never: CameraNever;
+  bystanders_note: Bystanders;
+};
+
+/** What the people in a place are told about cameras in it. */
+export type CameraDisclosure = {
+  surface: string; surface_id: string;
+  live: unknown[]; any_live: boolean; any_recording: boolean;
+  note: string;
+};
+
+export type MicVocabulary = {
+  personal: string[];
+  /** Room-pointed devices, each with the same reason: "it is pointed at the
+   *  room, not at you — it would pick up the people around you, and their
+   *  voices are not yours to lend." */
+  refused: { kind: string; why: string }[];
+  gain_levels: { level: string; describes: string; reaches_others: boolean }[];
+  room_gain: string; voice_focus: boolean; rules: string[];
+};
+
+export type MicPlaces = {
+  /** Which surfaces can take a lent microphone, and why each qualifies. */
+  places: { surface: string; why: string }[];
+  /** Rooms are excluded here and lend through their own route — the reply
+   *  says so, and the refusal on a wrong surface repeats it. */
+  room: string; test: string; rules: string[];
+};
+
+export type LentMic = {
+  id: string; room_id?: string;
+  device: string; mic_type: string;
+  lending: boolean; gain: string; capped: boolean; voice_focus: boolean;
+  /** Ends with "Everyone in the room is shown that you lent it." */
+  note: string;
+};
+
+export type MicsHere = {
+  room_id?: string; surface?: string; surface_id?: string;
+  microphones_lent: { interactor_id: string; device: string;
+                      mic_type: string; gain: string; hears: string;
+                      since: string }[];
+  gain: string; voice_focus: boolean; note: string;
+};
+
+export type OverlayCatalogue = {
+  kinds: { kind: string; covers_face: boolean; means: string }[];
+};
+
+export type Overlay = {
+  id: string; interactor_id: string;
+  surface: string; surface_id: string;
+  kind: string; title: string; asset: string | null;
+  covers_face: boolean; source: string | null;
+  background_generated: boolean;
+  /** "not their face — Fox, drawn over the camera in real time. A real
+   *  person is underneath." The sentence other people in the place see. */
+  disclosure: string;
+  since: string; wearing?: boolean;
+};
+
+export type OverlaysHere = {
+  surface: string; surface_id: string;
+  overlays: Overlay[];
+  /** "…every one of them is named as wearing it." */
+  note: string;
+};
+
+/** Whose place this is. Small, and the point is `is` — "the host". */
+export type WhosePlace = {
+  surface: string; surface_id: string; account_id: string;
+  display_name: string | null; handle: string | null; is: string;
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -1651,4 +1774,94 @@ export const api = {
     req<{ profile_id: string; surfaces: string[] }>(
       `/profiles/${profileId}/surfaces`,
       { method: "PUT", body: { surfaces }, token }),
+
+  // ---------------------------------------------------------------------
+  // What is live in a shared place.
+  //
+  // Twenty routes with no caller: a camera being shared, a microphone lent
+  // to the profiles in a room, a face drawn over a camera. Three features
+  // with one posture — whatever you put between yourself and the people
+  // around you, they are told — and none of them reachable.
+  // ---------------------------------------------------------------------
+
+  cameraVocabulary: () => req<CameraVocabulary>("/camera/vocabulary"),
+
+  // Per subject kind, because the honest answer differs: a boiler has no
+  // face, a room full of people does.
+  bystanders: (subject: string) =>
+    req<Bystanders>(`/camera/bystanders/${subject}`),
+
+  // 422 with a paragraph when a profile is asked to watch a person. The
+  // screen shows that paragraph rather than "not allowed" — it is the
+  // reasoning, and it is the part worth reading.
+  openCamera: (body: {
+    holder_id: string; viewer_id: string; viewer_kind: string;
+    subject: string; surface: string; surface_id: string; minutes?: number;
+  }, token: string) =>
+    req<CameraSession>("/camera/sessions", { method: "POST", body, token }),
+
+  cameraSession: (sessionId: string, token: string) =>
+    req<CameraSession>(`/camera/sessions/${sessionId}`, { token }),
+
+  // Returns a bare array. The holder's own list, and the reason it exists
+  // is `never.silent_run`: there is no state where a session is on and not
+  // visible to the person holding the phone.
+  liveCameras: (holderId: string, token: string) =>
+    req<CameraSession[]>(`/camera/live/${holderId}`, { token }),
+
+  closeCamera: (sessionId: string, actorId: string, token: string) =>
+    req<CameraSession>(`/camera/sessions/${sessionId}/close`,
+      { method: "POST", body: { actor_id: actorId }, token }),
+
+  // What the people in a place are told. The other half of the promise —
+  // a session the room cannot see would make the rest of it decoration.
+  cameraDisclosure: (surface: string, surfaceId: string, token: string) =>
+    req<CameraDisclosure>(`/camera/disclosure/${surface}/${surfaceId}`,
+      { token }),
+
+  micVocabulary: () => req<MicVocabulary>("/microphones/vocabulary"),
+
+  // Which surfaces can take one, and why each qualifies: the other people
+  // present must have a member list and somewhere to be shown the
+  // disclosure. Rooms are excluded and lend through their own route.
+  micPlaces: () => req<MicPlaces>("/microphones/places"),
+
+  lendMicHere: (surface: string, surfaceId: string,
+                interactorId: string, token: string) =>
+    req<LentMic>(`/places/${surface}/${surfaceId}/microphone`,
+      { method: "POST", body: { interactor_id: interactorId }, token }),
+  micsHere: (surface: string, surfaceId: string, token: string) =>
+    req<MicsHere>(`/places/${surface}/${surfaceId}/microphone`, { token }),
+  takeBackMicHere: (surface: string, surfaceId: string,
+                    interactorId: string, token: string) =>
+    req<{ lending: boolean; id: string }>(
+      `/places/${surface}/${surfaceId}/microphone`,
+      { method: "DELETE", body: { interactor_id: interactorId }, token }),
+
+  lendMicInRoom: (roomId: string, interactorId: string, token: string) =>
+    req<LentMic>(`/rooms/${roomId}/mic`,
+      { method: "POST", body: { interactor_id: interactorId }, token }),
+  micsInRoom: (roomId: string, token: string) =>
+    req<MicsHere>(`/rooms/${roomId}/mic`, { token }),
+  takeBackMicInRoom: (roomId: string, interactorId: string, token: string) =>
+    req<{ lending: boolean; id: string }>(
+      `/rooms/${roomId}/mic/${interactorId}`, { method: "DELETE", token }),
+
+  overlayCatalogue: () => req<OverlayCatalogue>("/overlays/catalogue"),
+
+  wearOverlay: (surface: string, surfaceId: string, body: {
+    interactor_id: string; kind: string; title: string;
+  }, token: string) =>
+    req<Overlay>(`/places/${surface}/${surfaceId}/overlay`,
+      { method: "POST", body, token }),
+  overlaysHere: (surface: string, surfaceId: string, token: string) =>
+    req<OverlaysHere>(`/places/${surface}/${surfaceId}/overlay`, { token }),
+  takeOffOverlay: (surface: string, surfaceId: string,
+                   interactorId: string, token: string) =>
+    req<{ wearing: boolean; id: string }>(
+      `/places/${surface}/${surfaceId}/overlay`,
+      { method: "DELETE", body: { interactor_id: interactorId }, token }),
+
+  whosePlace: (surface: string, surfaceId: string, token: string) =>
+    req<WhosePlace>(`/places/${surface}/${surfaceId}/whose`, { token }),
 };

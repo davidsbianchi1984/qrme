@@ -253,6 +253,12 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                  "html", "tagline", "front page", "what people see",
                  "wall panel", "kiosk", "screen", "display", "shop window",
                  "put it on a screen", "surfaces"),
+    # Somebody worried about being watched, and somebody trying to share a
+    # camera, arrive with very different words at the same screen.
+    "live": ("camera", "share my camera", "show them", "video call",
+             "is anyone watching", "recording", "who can see", "bystander",
+             "microphone", "lend my mic", "they can hear", "mute",
+             "mask", "overlay", "hide my face", "filter"),
     "identity": ("verify", "verified", "badge", "blue tick", "prove it is me",
                  "anonymous", "hide my name", "who checked", "my profiles",
                  "rename", "delete my profile", "delete this profile",

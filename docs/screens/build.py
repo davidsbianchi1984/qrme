@@ -3506,6 +3506,21 @@ SCREENS = [
     # what a fixed screen may never show. A wall panel is read by people who
     # did not choose to look at it, and the refusal names its reason rather
     # than a rule number.
+    # 158: what is live. Every card is something the people around you are
+    # told — which is the one rule holding the camera, the microphone and the
+    # overlay together.
+    dict(num=158, title="What Is Live", sub="And what the room is told",
+         accent="amber", tab=15, cards=[
+        dict(icon="eye", color="amber", k="Your camera is on",
+             s="and your screen shows it",
+             pill=("LIVE", "warn")),
+        dict(icon="lock", color="brand", k="They cannot zoom",
+             s="the holder points the phone"),
+        dict(icon="mic", color="cyan", k="Only what you wear",
+             s="near-field, never the room"),
+        dict(icon="mask", color="green", k="A person underneath",
+             s="every wearer is named"),
+    ], button=("Stop sharing", "brand")),
     dict(num=157, title="Where It Is Seen", sub="Your page, and other people's walls",
          accent="cyan", tab=15, cards=[
         dict(icon="pen", color="brand", k="The page you make",
