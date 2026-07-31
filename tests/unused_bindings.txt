@@ -8,14 +8,10 @@ api.display
 api.exchange
 api.getProfile
 api.health
-api.lendMicInRoom
 api.mediaLimits
-api.micsInRoom
 api.resumeDelegatedWorkflow
-api.roomMessages
 api.setAvatar
 api.startDelegatedWorkflow
 api.stats
-api.takeBackMicInRoom
 api.watermark
 api.workflow

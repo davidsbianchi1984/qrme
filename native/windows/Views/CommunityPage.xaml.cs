@@ -57,7 +57,7 @@ public sealed partial class CommunityPage : Page
         var s = AppState.Current;
         if (!string.IsNullOrEmpty(s.InteractorId)) return s.InteractorId!;
         var created = await ApiClient.Shared.CreateInteractor("You");
-        s.RememberInteractor(created.Id);
+        s.RememberInteractor(created.Id, token: created.Token);
         return created.Id;
     }
 
@@ -77,7 +77,7 @@ public sealed partial class CommunityPage : Page
                 // the age wall checks it server-side.
                 var created = await ApiClient.Shared.CreateInteractor(
                     "You", BirthdateBox.Text.Trim());
-                s.RememberInteractor(created.Id);
+                s.RememberInteractor(created.Id, token: created.Token);
                 me = created.Id;
                 minted = true;
             }
@@ -178,7 +178,8 @@ public sealed partial class CommunityPage : Page
         if (_roomId is null) return;
         try
         {
-            var msgs = await ApiClient.Shared.RoomTranscript(_roomId);
+            var msgs = await ApiClient.Shared.RoomTranscript(
+                _roomId, AppState.Current.InteractorToken ?? "");
             RoomList.ItemsSource = msgs.Select(m => new RoomMsgVm
             {
                 From = m.From,
@@ -198,7 +199,8 @@ public sealed partial class CommunityPage : Page
         try
         {
             var me = await EnsureInteractor();
-            await ApiClient.Shared.RoomMessage(_roomId, me, text);
+            await ApiClient.Shared.RoomMessage(
+                _roomId, me, text, AppState.Current.InteractorToken ?? "");
             await ReloadRoom();
         }
         catch (Exception ex) { ShowRoomError(ex.Message); }
@@ -210,7 +212,8 @@ public sealed partial class CommunityPage : Page
         RoomError.Visibility = Visibility.Collapsed;
         try
         {
-            await ApiClient.Shared.RoomAdvance(_roomId);
+            await ApiClient.Shared.RoomAdvance(
+                _roomId, AppState.Current.InteractorToken ?? "");
             await ReloadRoom();
         }
         catch (Exception ex) { ShowRoomError(ex.Message); }

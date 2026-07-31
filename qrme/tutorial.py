@@ -164,6 +164,28 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="inside", chapter="Out in the world",
+         title="Inside a room",
+         what="Rooms could be opened and not entered: the console listed "
+              "what was live and had no way to read a word of it, say "
+              "anything, let the profiles take a turn, or lend them a "
+              "microphone. Building the way in found two things worth more "
+              "than the screen. The speaker was read from the request body, "
+              "and checked only against the list of participants — not "
+              "against who was asking — so anybody holding a room id could "
+              "put words in a named person's mouth and have every profile "
+              "answer as though she had said them. And the transcript asked "
+              "for no credential at all, so the whole conversation was "
+              "readable by anyone who knew the id. A room id is not a "
+              "secret; it rides in beacons and on printed stickers, which is "
+              "the point of them — and that sentence was already written "
+              "down two routes away, guarding the smaller fact of who lent a "
+              "microphone. Everything a profile says in a room is "
+              "watermarked as it is said, and a room with anyone under 18 in "
+              "it runs strict for everybody.",
+         screens=(175,),
+         try_it="Open a room from Rooms, then take its id next door and go "
+                "in."),
     dict(key="selling", chapter="Out in the world",
          title="What you are owed",
          what="The other side of the counter. Everything about licensing "

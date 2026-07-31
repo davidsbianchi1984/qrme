@@ -600,17 +600,25 @@ object ApiClient {
         return RoomCreated(o.getString("id"), o.optString("topic", ""), o.optString("channel", ""))
     }
 
-    suspend fun roomMessage(roomId: String, senderId: String, message: String) {
+    // All three carry the interactor token now. The room routes used to take
+    // none: the speaker was read out of `sender_id` in the body, so anybody
+    // with a room id could post as a named participant, and the transcript
+    // was readable by anybody at all. `sender_id` is still sent because the
+    // server still accepts the field; it is ignored there, and the token is
+    // what says who is speaking.
+    suspend fun roomMessage(roomId: String, senderId: String, message: String,
+                            token: String) {
         request("/rooms/$roomId/messages", "POST",
-            JSONObject().put("sender_id", senderId).put("message", message))
+            JSONObject().put("sender_id", senderId).put("message", message),
+            token)
     }
 
-    suspend fun roomAdvance(roomId: String) {
-        request("/rooms/$roomId/advance", "POST")
+    suspend fun roomAdvance(roomId: String, token: String) {
+        request("/rooms/$roomId/advance", "POST", null, token)
     }
 
-    suspend fun roomTranscript(roomId: String): List<RoomMsg> {
-        val arr = JSONArray(request("/rooms/$roomId/messages"))
+    suspend fun roomTranscript(roomId: String, token: String): List<RoomMsg> {
+        val arr = JSONArray(request("/rooms/$roomId/messages", token = token))
         return (0 until arr.length()).map { roomMsgOf(arr.getJSONObject(it)) }
     }
 

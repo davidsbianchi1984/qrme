@@ -367,6 +367,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/172-one-thing-named.svg"><img src="docs/screens/172-one-thing-named.svg" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
     <td align="center" width="33%"><a href="docs/screens/173-beginning-and-passing-on.svg"><img src="docs/screens/173-beginning-and-passing-on.svg" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
     <td align="center" width="33%"><a href="docs/screens/174-what-you-are-owed.svg"><img src="docs/screens/174-what-you-are-owed.svg" width="210" alt="What You Are Owed"></a><br><sub><b>174</b> · What You Are Owed</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/175-inside-a-room.svg"><img src="docs/screens/175-inside-a-room.svg" width="210" alt="Inside A Room"></a><br><sub><b>175</b> · Inside A Room</sub></td>
   </tr>
 </table>
 

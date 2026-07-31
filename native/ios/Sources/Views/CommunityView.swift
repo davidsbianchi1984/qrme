@@ -294,7 +294,9 @@ private struct RoomsSection: View {
     }
 
     private func reloadTranscript(_ roomId: String) async {
-        transcript = (try? await ApiClient.shared.roomTranscript(roomId: roomId)) ?? transcript
+        guard let token = state.interactorToken else { return }
+        transcript = (try? await ApiClient.shared.roomTranscript(
+            roomId: roomId, token: token)) ?? transcript
     }
 
     private func send(_ roomId: String) {
@@ -305,7 +307,8 @@ private struct RoomsSection: View {
             do {
                 let interactor = try await ensureInteractor(state)
                 _ = try await ApiClient.shared.roomMessage(
-                    roomId: roomId, senderId: interactor, message: text)
+                    roomId: roomId, senderId: interactor, message: text,
+                    token: state.interactorToken ?? "")
                 await reloadTranscript(roomId)
             } catch { self.error = error.localizedDescription }
             busy = false
@@ -316,7 +319,8 @@ private struct RoomsSection: View {
         busy = true; error = nil
         Task {
             do {
-                _ = try await ApiClient.shared.roomAdvance(roomId: roomId)
+                _ = try await ApiClient.shared.roomAdvance(
+                    roomId: roomId, token: state.interactorToken ?? "")
                 await reloadTranscript(roomId)
             } catch { self.error = error.localizedDescription }
             busy = false

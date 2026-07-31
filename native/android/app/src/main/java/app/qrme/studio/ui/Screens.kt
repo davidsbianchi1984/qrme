@@ -1378,7 +1378,8 @@ private fun RoomsPanel(vm: StudioViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload(roomId: String) {
-        vm.call({ ApiClient.roomTranscript(roomId) }) { r ->
+        val tok = vm.interactorToken ?: return
+        vm.call({ ApiClient.roomTranscript(roomId, tok) }) { r ->
             r.onSuccess { transcript = it }
         }
     }
@@ -1429,7 +1430,9 @@ private fun RoomsPanel(vm: StudioViewModel) {
                         if (text.isNotBlank() && !busy) {
                             draft = ""; busy = true; error = null
                             withInteractor(vm, { error = it; busy = false }) { me ->
-                                vm.call({ ApiClient.roomMessage(current.id, me, text) }) { r ->
+                                vm.call({ ApiClient.roomMessage(
+                                    current.id, me, text,
+                                    vm.interactorToken ?: "") }) { r ->
                                     busy = false
                                     r.onFailure { error = it.message }
                                     reload(current.id)
@@ -1440,7 +1443,8 @@ private fun RoomsPanel(vm: StudioViewModel) {
                     SmallAction("Let them talk") {
                         if (!busy) {
                             busy = true; error = null
-                            vm.call({ ApiClient.roomAdvance(current.id) }) { r ->
+                            vm.call({ ApiClient.roomAdvance(
+                                current.id, vm.interactorToken ?: "") }) { r ->
                                 busy = false
                                 r.onFailure { error = it.message }
                                 reload(current.id)

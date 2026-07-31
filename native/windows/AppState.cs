@@ -19,6 +19,10 @@ public sealed class AppState
     // InteractorVerified is true when the identity was minted with an 18+
     // birthdate — the key that opens the rated stranger tier.
     public string? InteractorId { get; set; }
+    // Kept from the mint response. Without it this shell could hold an
+    // identity and never act as it — which is why the room routes had to be
+    // callable with no credential for the Community page to work at all.
+    public string? InteractorToken { get; set; }
     public bool InteractorVerified { get; set; }
     // The profile's chosen language also drives the app chrome via L10n.
     public string Language { get; set; } = "en";
@@ -29,10 +33,12 @@ public sealed class AppState
         Save();
     }
 
-    public void RememberInteractor(string id, bool adult = false)
+    public void RememberInteractor(string id, bool adult = false,
+                                   string? token = null)
     {
         InteractorId = id;
         InteractorVerified = adult;
+        if (token is { Length: > 0 }) InteractorToken = token;
         Save();
     }
 
@@ -51,6 +57,7 @@ public sealed class AppState
     public void SignOut()
     {
         Pid = null; Token = null; DisplayName = ""; InteractorId = null;
+        InteractorToken = null;
         InteractorVerified = false;
         try { File.Delete(PathOnDisk); } catch { /* ignore */ }
     }

@@ -1672,6 +1672,17 @@ export type LentMic = {
   note: string;
 };
 
+/** One turn in a room. A profile's turn always carries a watermark; a
+ *  person's never does, which is the difference the screen renders. */
+export type RoomMsg = {
+  id: string;
+  sender_kind: string;          // user | profile
+  from: string;
+  content: string | null;
+  watermark: { display?: { line?: string } } | null;
+  created_at?: string;
+};
+
 export type MicsHere = {
   room_id?: string; surface?: string; surface_id?: string;
   microphones_lent: { interactor_id: string; device: string;
@@ -2414,8 +2425,21 @@ export const api = {
   createRoom: (body: { topic?: string; channel: string;
                        participants: { kind: string; id: string }[] }) =>
     req<{ id: string }>(`/rooms`, { method: "POST", body }),
-  roomMessages: (roomId: string) =>
-    req<unknown[]>(`/rooms/${roomId}/messages`),
+  // Inside a room: read it, speak in it, let the profiles take a turn. All
+  // three carry the interactor token, and the speaker is read from it rather
+  // than from `sender_id` in the body — which is what let anybody holding a
+  // room id post under a named participant's name. The transcript took no
+  // token at all, so a room id, which rides on printed stickers, was enough
+  // to read everything said in it.
+  roomMessages: (roomId: string, token: string) =>
+    req<RoomMsg[]>(`/rooms/${roomId}/messages`, { token }),
+  sayInRoom: (roomId: string, interactorId: string, message: string,
+              token: string) =>
+    req<{ message: RoomMsg; replies: RoomMsg[] }>(`/rooms/${roomId}/messages`,
+      { method: "POST", body: { sender_id: interactorId, message }, token }),
+  advanceRoom: (roomId: string, token: string) =>
+    req<{ replies: RoomMsg[] }>(`/rooms/${roomId}/advance`,
+      { method: "POST", token }),
   listDesks: () =>
     req<{ id: string; display_name: string; trade: string; location?: string;
           blurb?: string; presence: string; rated: number }[]>(`/desks`),

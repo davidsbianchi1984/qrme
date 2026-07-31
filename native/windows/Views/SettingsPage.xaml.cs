@@ -225,7 +225,7 @@ public sealed partial class SettingsPage : Page
             if (s.InteractorId is null)
             {
                 var created = await ApiClient.Shared.CreateInteractor("You");
-                s.RememberInteractor(created.Id);
+                s.RememberInteractor(created.Id, token: created.Token);
             }
             var type = RelationshipTypes[Math.Max(0, RelTypeBox.SelectedIndex)];
             var r = await ApiClient.Shared.SetRelationship(

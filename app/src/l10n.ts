@@ -186,6 +186,12 @@ const CHROME: Table = {
     ja: "受け取るべきもの", zh: "该付给你的",
     hi: "जो आपको मिलना है", ar: "ما هو مستحق لك",
   },
+  "nav.inside": {
+    en: "Inside a room", es: "Dentro de una sala", fr: "Dans un salon",
+    de: "Im Raum", pt: "Dentro de uma sala", it: "Dentro una stanza",
+    ja: "ルームの中", zh: "在房间里", hi: "कमरे के भीतर",
+    ar: "داخل الغرفة",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

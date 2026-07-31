@@ -959,18 +959,26 @@ actor ApiClient {
         ])
     }
 
-    func roomMessage(roomId: String, senderId: String,
-                     message: String) async throws -> RoomPost {
+    // All three carry the interactor token now. The room routes used to take
+    // none: the speaker was read out of `sender_id` in the body, so anybody
+    // with a room id could post as a named participant, and the transcript
+    // was readable by anybody at all. `sender_id` is still sent because the
+    // server still accepts the field; it is ignored there, and the token is
+    // what says who is speaking.
+    func roomMessage(roomId: String, senderId: String, message: String,
+                     token: String) async throws -> RoomPost {
         try await request("/rooms/\(roomId)/messages", method: "POST",
-                          body: ["sender_id": senderId, "message": message])
+                          body: ["sender_id": senderId, "message": message],
+                          token: token)
     }
 
-    func roomAdvance(roomId: String) async throws -> RoomAdvance {
-        try await request("/rooms/\(roomId)/advance", method: "POST")
+    func roomAdvance(roomId: String, token: String) async throws -> RoomAdvance {
+        try await request("/rooms/\(roomId)/advance", method: "POST",
+                          token: token)
     }
 
-    func roomTranscript(roomId: String) async throws -> [RoomMsg] {
-        try await request("/rooms/\(roomId)/messages")
+    func roomTranscript(roomId: String, token: String) async throws -> [RoomMsg] {
+        try await request("/rooms/\(roomId)/messages", token: token)
     }
 
     // MARK: Reach — summon (@handle + beacons), marketplace, licensing

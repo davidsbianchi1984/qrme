@@ -40,8 +40,6 @@ POST /profiles/{profile_id}/excursions
 POST /profiles/{profile_id}/gaming/sessions
 POST /profiles/{profile_id}/objections/{objection_id}/attest
 POST /profiles/{profile_id}/translate
-POST /rooms/{room_id}/advance
-POST /rooms/{room_id}/messages
 POST /signatures/enroll
 POST /signatures/enroll/options
 POST /signatures/request

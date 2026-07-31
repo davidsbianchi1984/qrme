@@ -318,18 +318,48 @@ def room_mic_disclosure(room_id: str, request: Request) -> dict:
     return roommic.disclosure(room_id)
 
 
+def _require_user_in_room(room_id: str, request: Request) -> str:
+    """The caller, as a **user** participant of this room. Returns their id.
+
+    A room turn is spoken by a person, so an owner token — which
+    :func:`_require_in_room` accepts, because a profile's owner is entitled to
+    the disclosure — is not enough to speak here.
+    """
+    who = _require_in_room(room_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == who
+               for p in _participants(room_id)):
+        raise HTTPException(
+            403, "a room turn is spoken by a person, so this needs the token "
+                 "of a user participant rather than a profile's owner token")
+    return who
+
+
 @router.post("/rooms/{room_id}/messages", status_code=201)
 def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
-    """A user participant speaks; every profile participant answers."""
+    """A user participant speaks; every profile participant answers.
+
+    **The speaker is the token, never the body.** This used to read
+    ``body.sender_id`` and check only that the id named a participant — not
+    that the *caller* was that participant. So anybody holding a room id could
+    put words in a named person's mouth: the message stored under their name,
+    the transcript showing `from: Ada`, and every profile in the room
+    answering it as though she had spoken.
+
+    A room id is not a secret. It rides in beacons and on printed QR stickers,
+    which is the point of them — the argument is already written out in
+    :func:`room_mic_disclosure`, where it was applied to who may *read* who
+    lent a microphone and not to who may speak.
+
+    ``sender_id`` stays on the model because three shipped native clients send
+    it, and is ignored. Reading it would be the defect.
+    """
     room = _room_or_404(room_id)
+    speaker = _require_user_in_room(room_id, request)
     participants = _participants(room_id)
-    if not any(p["kind"] == "user" and p["ref_id"] == body.sender_id
-               for p in participants):
-        raise HTTPException(403, "sender is not a user participant of this room")
     maturity = _room_maturity(participants)
     verdict = moderation.review(body.message, None, {"birthdate": None},
                                 maturity=maturity)
-    sent = _store_room_message(room_id, "user", body.sender_id, body.message,
+    sent = _store_room_message(room_id, "user", speaker, body.message,
                                verdict.approved, verdict.reason)
     replies = []
     if verdict.approved:
@@ -341,8 +371,16 @@ def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
 
 @router.post("/rooms/{room_id}/advance", status_code=201)
 def room_advance(room_id: str, request: Request) -> dict:
-    """Profiles take a turn unprompted — profile↔profile rooms run on this."""
+    """Profiles take a turn unprompted — profile↔profile rooms run on this.
+
+    Anyone in the room may advance it, including a profile's owner: a
+    profile↔profile room has no user participant to press the button, and its
+    owners are exactly who it is for. What it is not open to is a stranger
+    holding the room id, who could otherwise run a room forward indefinitely
+    against somebody else's model key.
+    """
     room = _room_or_404(room_id)
+    _require_in_room(room_id, request)
     participants = _participants(room_id)
     if not any(p["kind"] == "profile" for p in participants):
         raise HTTPException(422, "no synthetic profiles in this room")
@@ -352,8 +390,19 @@ def room_advance(room_id: str, request: Request) -> dict:
 
 
 @router.get("/rooms/{room_id}/messages")
-def room_transcript(room_id: str) -> list[dict]:
+def room_transcript(room_id: str, request: Request) -> list[dict]:
+    """What has been said in this room, to the people in it.
+
+    It took no token at all, so the whole transcript — what a named person
+    typed, and what every profile answered — was readable by anybody who knew
+    the room id. The same room id that rides on a printed sticker.
+
+    The reasoning is the one already written down for the microphone
+    disclosure two routes up, which is the *narrower* fact: who is wearing a
+    live microphone was held to a standard the conversation itself was not.
+    """
     _room_or_404(room_id)
+    _require_in_room(room_id, request)
     rows = db.connect().execute(
         "SELECT * FROM room_messages WHERE room_id=? AND status='approved'"
         " ORDER BY created_at, rowid", (room_id,)).fetchall()

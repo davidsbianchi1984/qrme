@@ -176,7 +176,11 @@ public record Objection(
     [property: JsonPropertyName("reattested")] int Reattested);
 
 public record InteractorCreated(
-    [property: JsonPropertyName("id")] string Id);
+    [property: JsonPropertyName("id")] string Id,
+    // The server has always returned this; the shell simply never kept it, so
+    // no route could be called as this person. The room routes are the first
+    // that require it.
+    [property: JsonPropertyName("token")] string? Token = null);
 
 public record SteeringDial(
     [property: JsonPropertyName("name")] string Name,
@@ -890,22 +894,30 @@ public sealed class ApiClient
             },
         }));
 
-    public async Task RoomMessage(string roomId, string senderId, string message)
+    // All three carry the interactor token now. The room routes used to take
+    // none: the speaker was read out of `sender_id` in the body, so anybody
+    // with a room id could post as a named participant, and the transcript
+    // was readable by anybody at all. `sender_id` is still sent because the
+    // server still accepts the field; it is ignored there, and the token is
+    // what says who is speaking.
+    public async Task RoomMessage(string roomId, string senderId, string message,
+                                  string token)
     {
-        var req = Post($"/rooms/{roomId}/messages", new { sender_id = senderId, message });
+        var req = Post($"/rooms/{roomId}/messages",
+                       new { sender_id = senderId, message }, token);
         var res = await _http.SendAsync(req);
         res.EnsureSuccessStatusCode();
     }
 
-    public async Task RoomAdvance(string roomId)
+    public async Task RoomAdvance(string roomId, string token)
     {
-        var req = Post($"/rooms/{roomId}/advance", new { });
+        var req = Post($"/rooms/{roomId}/advance", new { }, token);
         var res = await _http.SendAsync(req);
         res.EnsureSuccessStatusCode();
     }
 
-    public Task<RoomMsg[]> RoomTranscript(string roomId) =>
-        Send<RoomMsg[]>(new HttpRequestMessage(HttpMethod.Get, $"/rooms/{roomId}/messages"));
+    public Task<RoomMsg[]> RoomTranscript(string roomId, string token) =>
+        Send<RoomMsg[]>(Get($"/rooms/{roomId}/messages", token));
 
     // -- Connect: social platforms & the connected-apps catalog --
 

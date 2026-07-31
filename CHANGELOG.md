@@ -4,6 +4,46 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### A room id was the only thing a room asked for
+
+`Rooms` could open one and not enter it: the console had no way to read a
+transcript, say anything, let the profiles take a turn, or lend them a
+microphone. Six routes, four behind `api.ts` bindings that no screen called.
+Building the way in — **screen 175, "Inside a room"** — found two defects
+worth more than the screen.
+
+- **Anybody could speak as anybody.** `POST /rooms/{id}/messages` read the
+  speaker from `sender_id` **in the body** and checked only that the id named
+  a participant, never that the caller *was* that person. A stranger's token
+  plus a named participant's id gave a `201`, a message stored under her name,
+  a transcript reading `from: Ada`, and every profile in the room answering as
+  though she had spoken.
+- **The transcript asked for nothing at all.** Not a wrong token — no token.
+  The whole conversation was readable by anyone holding the room id.
+- **`POST /rooms/{id}/advance` asked for nothing either**, so a stranger could
+  run somebody else's room forward indefinitely against their model key.
+
+A room id is not a secret; it rides in beacons and on printed QR stickers,
+which is the point of them. That sentence was **already written down two
+routes away**, on `GET /rooms/{id}/mic`, guarding the narrower fact of who is
+wearing a live microphone. All three now go through the same
+`_require_in_room`.
+
+`sender_id` stays on the request model and is ignored — three shipped native
+clients send it, and a 422 on upgrade is a worse answer than not believing it.
+
+### The native shells learned to send a credential
+
+Gating the routes broke iOS, Android and Windows, none of which sent a token
+on any room route. All three now do. **Windows had no interactor token at
+all** — `AppState` kept the id and threw the token away, so the shell could
+hold an identity and never act as it, which is part of why these routes had to
+be open for its Community page to work.
+
+Unused `api.ts` bindings **21 → 17**; console backlog **55 → 53**.
+
 ## [0.20.1] — 2026-07-31
 
 Two rounds, and the second was found by the first. The audit round below built

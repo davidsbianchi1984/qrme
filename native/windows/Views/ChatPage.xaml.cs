@@ -57,7 +57,7 @@ public sealed partial class ChatPage : Page
             if (string.IsNullOrEmpty(s.InteractorId))
             {
                 var created = await ApiClient.Shared.CreateInteractor("You");
-                s.RememberInteractor(created.Id);
+                s.RememberInteractor(created.Id, token: created.Token);
             }
             var reply = await ApiClient.Shared.Chat(s.Pid!, s.Token!,
                                                     s.InteractorId!, text,

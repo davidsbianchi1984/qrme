@@ -3519,6 +3519,21 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 175: inside a room. The first card is the defect that mattered most —
+    # the speaker was read out of the body, so a room id was enough to talk
+    # as somebody else — and the last is the microphone's whole point.
+    dict(num=175, title="Inside A Room", sub="Knowing the id is not being here",
+         accent="cyan", tab=22, cards=[
+        dict(icon="mask", color="red", k="Not who you say",
+             s="the token names the speaker",
+             pill=("403", "warn")),
+        dict(icon="eye", color="cyan", k="Read by the room",
+             s="an id rides on a sticker"),
+        dict(icon="brain", color="green", k="Every turn is marked",
+             s="synthetic, as it is said"),
+        dict(icon="bell", color="amber", k="A lent ear is shown",
+             s="to everyone here, always"),
+    ], button=("Say it", "brand")),
     # 174: the seller's side. The first card is the defect the screen was
     # built to make visible — two currencies that had been added together —
     # and the last is the door that asked for no credential at all.
