@@ -87,14 +87,45 @@ def require(request: Request, role: str, subject_id: str) -> None:
         raise HTTPException(403, "not authorized for this resource")
 
 
+# Starlette's in-process sentinel names no socket, so no network peer can
+# present it. Same set the cloud gateway uses, for the same reason.
+_LOCAL_CALLERS = frozenset({"127.0.0.1", "::1", "localhost", "testclient"})
+
+
 def require_reviewer(request: Request) -> None:
-    """Guard the objection-review path. A dedicated reviewer role sits outside
-    profile ownership (an owner must not adjudicate an objection against their
-    own profile); it is held via ``QRME_ADMIN_TOKEN``. Unset = development mode
-    (open, for local use only), matching PDI's admin convention."""
+    """Guard the objection-review path.
+
+    A dedicated reviewer role sits outside profile ownership — an owner must
+    not adjudicate an objection against their own profile — and is held via
+    ``QRME_ADMIN_TOKEN``.
+
+    **Unset is development mode, and development mode now means localhost.**
+    It previously meant *everybody*: with no token configured this returned
+    unconditionally, for any caller from any address. The docstring said "for
+    local use only" and nothing enforced the local part, which is the same
+    shape of defect as a validator whose message promises more than its
+    pattern checks.
+
+    What sits behind this gate is why it is worth the four lines. Upholding an
+    objection **terminates a profile and erases its content**; succession
+    **hands a profile to a different owner**. On a deployment where somebody
+    forgot the variable — the exact deployment least likely to notice — those
+    were reachable by an anonymous caller on the internet.
+
+    So it fails closed the way ``cloudgw`` already did, which the old
+    docstring claimed to match and did not: a local caller still gets the open
+    development path, and a remote one gets a 503 naming the variable to set.
+    An operator who has not decided yet should get "no", not "everyone".
+    """
     required = os.environ.get("QRME_ADMIN_TOKEN")
     if not required:
-        return
+        host = request.client.host if request.client else ""
+        if host in _LOCAL_CALLERS:
+            return
+        raise HTTPException(
+            503, "this deployment is reachable beyond localhost but has no "
+                 "QRME_ADMIN_TOKEN configured — objection review and "
+                 "succession stay closed until it is")
     token = bearer(request)
     if not token:
         raise HTTPException(401, "reviewer token required")
