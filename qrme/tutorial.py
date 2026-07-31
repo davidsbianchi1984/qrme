@@ -164,6 +164,25 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="passing", chapter="Out in the world",
+         title="Beginning, and passing on",
+         what="A profile is born from four questions, and if you leave the "
+              "name blank it chooses its own from the answers. At the other "
+              "end is the one route in this product an owner token cannot "
+              "open: succession answers a signal that the owner has died or "
+              "cannot act, so requiring their authorisation would require "
+              "the one thing known to be unavailable. A reviewer holds it "
+              "instead, against a verification reference kept out of band. "
+              "With somebody named, control passes and a fresh owner token "
+              "is minted; with nobody, the profile sunsets to memorial — "
+              "frozen rather than orphaned. A contested identity cannot be "
+              "handed on at all. In between: what a profile can be taught, "
+              "published under your own token so the money follows it, and "
+              "the single press from a wrist that goes down the same paths "
+              "the full apps use.",
+         screens=(173,),
+         try_it="Create one with the name left blank, and see what it calls "
+                "itself."),
     dict(key="named", chapter="Out in the world",
          title="One thing, named",
          what="Six reads that each answer about one particular thing, and "

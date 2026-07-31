@@ -365,6 +365,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/170-reaching-out-and-what-stops-it.svg"><img src="docs/screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
     <td align="center" width="33%"><a href="docs/screens/171-what-leaves-and-on-what-terms.svg"><img src="docs/screens/171-what-leaves-and-on-what-terms.svg" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
     <td align="center" width="33%"><a href="docs/screens/172-one-thing-named.svg"><img src="docs/screens/172-one-thing-named.svg" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/173-beginning-and-passing-on.svg"><img src="docs/screens/173-beginning-and-passing-on.svg" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
   </tr>
 </table>
 
@@ -1770,6 +1771,71 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 173 — beginning, and passing on
+
+The last five routes, and the backlog reaches **zero**.
+
+**An owner token cannot be the gate on succession.** The signal that route
+answers is that the owner has died or cannot act, so requiring their
+authorisation would be requiring the one thing known to be unavailable. A
+reviewer holds it — outside profile ownership, against a `verification_ref`
+kept out of band: a death certificate, a power of attorney. With somebody
+named, control passes and a fresh owner token is minted. With nobody, the
+profile sunsets to memorial: **frozen rather than orphaned**, because a profile
+whose owner has died and which nobody can reach is worse than one that has
+plainly stopped.
+
+A contested identity cannot be handed on. An open objection blocks succession
+with a 409 — inheriting a profile somebody is disputing would settle the
+dispute by transfer rather than by resolving it.
+
+At the other end, **genesis** is a profile born from four questions, and it may
+choose its own name from the answers. That is not decoration: a persona
+assembled from what somebody said about themselves should not then be handed a
+label by a form field.
+
+#### A route that asked for nothing at all
+
+`POST /packs` took no token. Anybody could publish a pack to the marketplace,
+name any string as the `publisher`, and name **any account** in
+`publisher_owner_id` as the one sales accrue to. The argument against that was
+already written down one module over, about gifts — *a body-supplied
+beneficiary would let anyone direct a gift meant for a performer into their own
+balance* — and this route was making the opposite choice. The account is now
+read from the caller's own token, and the body's is ignored.
+
+And the wrist: one press goes down the same paths the full apps use — same
+auth, same allowlists, same moderation. A shortcut that skipped any of those
+would be a second, weaker way in, which is exactly what a wrist should not be.
+
+---
+
+## The doorless backlog reached zero
+
+It began at **116** and was worked down a block at a time. `doorless_routes.txt`
+is now empty, and `test_every_route_has_a_door.py` has a new assertion saying
+so directly — separate from the record comparison, so the message is plain when
+it goes: *the number is no longer zero*, rather than *strike this line*.
+Deferring a route legitimately means editing that test as well as the file,
+which is the right amount of friction for a decision that used to be made by
+accident.
+
+The guard-on-guard changed with it. It used to assert the snapshot was
+non-empty, which no longer means anything, so the liveness check moved to where
+the meaning lives: **the console must still be producing call sites.** If the
+extractor broke entirely, every route would read as doorless — loudly. If it
+were quietly narrowed to a handful of forms, that count is what would notice.
+
+What the whole exercise actually produced was not doors. It was defects, and
+almost none of them were visible to the typecheck: a swallowed refusal; two
+silently-permissive writes; a test that had been green for years for the same
+reason a bug was invisible; a picker offering options the server refuses; four
+route-audit blind spots; two surfaces that took no token at all; a licence sold
+to somebody who could not use it; a link that resolved against the wrong
+origin; an honesty note served to nobody. **Building the door kept finding
+something wrong with the room behind it** — which is the argument for the whole
+method, made once, at length, by doing it 116 times.
 
 ### Screen 172 — one thing, named
 

@@ -1,7 +1,0 @@
-GET /auth/oauth/{provider}/callback
-POST /auth/oauth/{provider}/callback
-POST /packs
-POST /packs/seed
-POST /profiles/genesis
-POST /profiles/{profile_id}/succeed
-POST /profiles/{profile_id}/watch/act

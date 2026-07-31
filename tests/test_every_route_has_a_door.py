@@ -8,18 +8,27 @@ exist produces a 404 somebody eventually reports. A route no client asks for
 produces nothing at all: the code is present, its tests pass, the changelog says
 it shipped — and the capability is simply unreachable.
 
-QRME has a long backlog of these, so the current state is recorded in
-`doorless_routes.txt` rather than asserted to be empty. The list is a backlog,
-not an approval. Two things follow from that, and both are the point:
+`doorless_routes.txt` records the current state rather than the test asserting
+a number, and it is **now empty**. It began at 116 and was worked down a block
+at a time; the file staying empty is the whole point of keeping it.
 
-* **It cannot grow.** A new route with no door fails this test, so the gap stops
-  widening on the day it is noticed rather than the day someone goes looking.
+Two things follow, and both still hold:
+
+* **It cannot grow silently.** A new route with no door fails this test, so the
+  gap stops widening on the day it is noticed rather than the day somebody goes
+  looking. Adding a line to the file is allowed — a backlog is not an approval,
+  and there are legitimate reasons to defer — but it takes a deliberate edit
+  and shows up in a diff.
 * **It must shrink deliberately.** Building a door makes the test fail too,
   telling you to strike the line. A backlog that quietly re-fills is how the
   first five came to be there.
 
-Browser-facing paths — a QR image used as an `<img src>`, a landing page reached
-by scanning — are excluded in `clientpaths.NOT_A_CLIENT_CALL`, not listed here.
+Paths nothing in this product should ever call — a link in an email, a
+provider's redirect back — are excluded in `clientpaths.NOT_A_CLIENT_CALL`,
+not listed here. That list is for paths no client *should* build, never for
+paths the extractor cannot see: three entries were once exempted because an
+`<img src>` was invisible to it, and one of the three turned out to have no
+door at all.
 """
 
 from __future__ import annotations
@@ -67,8 +76,8 @@ def test_the_doorless_backlog_matches_the_record():
 def test_the_audit_is_actually_looking_at_something():
     """A guard on the guard.
 
-    An empty route table would make the comparison meaningless, and an empty
-    snapshot would hide that the backlog exists at all.
+    An empty route table would make the comparison meaningless, and so would a
+    client whose calls stopped being extracted.
 
     It counts through `all_routes`, not `app.routes`, and the difference is the
     reason this test exists. FastAPI hides routes inside `_IncludedRouter`
@@ -76,8 +85,34 @@ def test_the_audit_is_actually_looking_at_something():
     QRME's 409. The first version of this audit reported zero doorless routes on
     that basis and passed — which is exactly the vacuous green a guard on the
     guard is for.
+
+    The snapshot used to be asserted non-empty for the same reason. It is empty
+    now, on purpose, so the liveness check moved to where the meaning actually
+    lives: **the console must still be producing calls.** If the extractor
+    broke, `calls()` would collapse and every route would read as doorless —
+    loudly, in the test above. If instead it were quietly narrowed to a handful
+    of forms, the count here is what would notice.
     """
     routed = clientpaths.all_routes(app)
     assert len(routed) > 50, (
         f"only {len(routed)} routes found — the app did not build properly")
-    assert _recorded(), f"{SNAPSHOT.name} is empty; the audit records nothing"
+    made = clientpaths.calls(clientpaths.CONSOLE)
+    assert len(made) > 200, (
+        f"only {len(made)} console call sites extracted — the audit is "
+        "reading almost nothing, so an empty backlog means nothing either")
+
+
+def test_the_backlog_is_empty():
+    """It reached zero, and that is a thing worth failing over.
+
+    Separate from the record comparison above so the message is plain when it
+    goes. That one says *strike this line*; this one says *the number is no
+    longer zero*, which is the sentence somebody adding a route wants to read.
+
+    Legitimately deferring a route means editing this test as well as the file
+    — which is the right amount of friction for a decision that used to be
+    made by accident.
+    """
+    assert clientpaths.doorless(app) == [], (
+        "the doorless backlog is no longer empty:\n    "
+        + "\n    ".join(clientpaths.doorless(app)))

@@ -3519,6 +3519,21 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 173: beginning and passing on. The card that matters is the second —
+    # the one route an owner token cannot open, because the signal it
+    # answers is that the owner cannot act.
+    dict(num=173, title="Beginning, And Passing On", sub="The owner cannot authorise this",
+         accent="silver", tab=20, cards=[
+        dict(icon="dove", color="silver", k="A reviewer, not you",
+             s="the owner may be gone",
+             pill=("403", "warn")),
+        dict(icon="lock", color="amber", k="Frozen, not orphaned",
+             s="when nobody was named"),
+        dict(icon="pen", color="green", k="It names itself",
+             s="from what you said of them"),
+        dict(icon="coin", color="brand", k="Sales follow the token",
+             s="never a name in the body"),
+    ], button=("Pass it on", "brand")),
     # 172: one named thing. The inversion is the point — the campaign is
     # the most public read in the product, and that is what makes it honest.
     dict(num=172, title="One Thing, Named", sub="Six reads, six answers",

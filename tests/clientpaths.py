@@ -427,6 +427,17 @@ NOT_A_CLIENT_CALL = (
     "/terms",
     "/verify-email/click",
     "/medical-id/{token}/qr.svg",
+    # Where Google and Apple send the browser back. The console starts the
+    # flow at `/auth/oauth/{provider}/start` and claims the session at
+    # `/auth/oauth/claim`; the address in between is built by the **API**
+    # (`request.url_for`) and handed to the provider, so no client of this
+    # product ever constructs it — and none should, because a redirect_uri a
+    # client could choose is a redirect_uri an attacker could choose.
+    #
+    # Two of them because Apple requires `response_mode=form_post` whenever
+    # a scope is requested, so its half of the door arrives as a POST with
+    # the code in a urlencoded body.
+    "/auth/oauth/{provider}/callback",
 )
 
 

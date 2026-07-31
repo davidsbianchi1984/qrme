@@ -17,10 +17,13 @@ def _profile(client, owner="creator-1", name="Priya Raman", **extra):
 
 def test_pack_sale_accrues_to_the_publisher(client):
     seller_pid, seller_tok = _profile(client)
+    # The seller's own token. The account sales accrue to is read from it and
+    # not from the body — a `publisher_owner_id` in the request used to be
+    # taken at its word, by a route that asked for no token at all.
+    client.headers["authorization"] = seller_tok
     pub = client.post("/packs", json={
         "industry": "technology", "title": "Distributed Systems Pro Pack",
         "price": 29.99, "publisher": "Priya Raman Consulting",
-        "publisher_owner_id": "creator-1",
         "items": [{"title": "Idempotency keys", "content": "Do it once."}]})
     pack_id = pub.json()["id"]
 
@@ -41,6 +44,7 @@ def test_pack_sale_accrues_to_the_publisher(client):
     assert s["totals"]["accrued"] == 29.99 and s["totals"]["paid"] == 0
 
     # Free downloads are never money events.
+    client.headers["authorization"] = seller_tok
     free = client.post("/packs", json={
         "industry": "technology", "title": "Free Notes", "price": 0,
         "publisher_owner_id": "creator-1",

@@ -1948,6 +1948,34 @@ export type DeskBeacon = {
   created_at: string;
 };
 
+/** What succession did. Either control passed to a named person, or the
+ *  profile sunset to memorial — frozen rather than orphaned. */
+export type Succession = {
+  profile_id: string;
+  status: string;
+  successor_owner?: string | null;
+  /** Minted only where there is somebody to hand it to, and shown once. */
+  owner_token?: string | null;
+  note?: string;
+};
+
+export type PackSummary = {
+  id: string; industry: string; audience: string; title: string;
+  blurb: string | null; publisher: string; price: number; currency: string;
+  free: boolean; origin: string; origin_url: string | null; rated: boolean;
+  items: number; installs: number;
+};
+
+/** Seeding is idempotent, and says so by counting both sides. A press that
+ *  reported only `created` would look like it had done nothing the second
+ *  time instead of like there was nothing left to do. */
+export type PackSeed = {
+  created: number;
+  skipped: number;
+  industries: number;
+  packs: unknown[];
+};
+
 /** The three lights, and which statuses drive each.
  *
  *  Built from the mapping rather than written beside it — the backend says
@@ -3769,6 +3797,56 @@ export const api = {
   grantsInPlace: (surface: string, surfaceId: string, token: string) =>
     req<PlaceGrants>(`/surfaces/${surface}/${surfaceId}/skill-grants`,
       { token }),
+
+  // ---------------------------------------------------------------------
+  // A beginning, an ending, what it is taught, and a press from the wrist.
+  //
+  // The one worth reading twice is succession. **The owner token cannot be
+  // the gate**, because the signal it responds to is that the owner has died
+  // or cannot act — so it is held by a reviewer, outside profile ownership,
+  // against an out-of-band `verification_ref`. With a named successor,
+  // control passes and a fresh owner token is minted; with none, the profile
+  // sunsets to memorial: frozen rather than orphaned.
+  //
+  // Publishing a pack now needs an owner token too, and the account sales
+  // accrue to is read from it rather than from the body. It used to take
+  // neither — anybody could publish under any publisher name and name any
+  // account as the one the money went to.
+  // ---------------------------------------------------------------------
+
+  genesis: (body: {
+    owner_id: string;
+    verification: { birthdate: string; guardian_consent?: boolean };
+    answers: { social_style: string; humor: string; what_matters: string;
+               comfort: string };
+    display_name?: string;
+    purpose?: string;
+    plan?: string;
+  }) => req<Profile>("/profiles/genesis", { method: "POST", body }),
+
+  // A reviewer's token, never the owner's.
+  succeed: (profileId: string, verificationRef: string, token: string) =>
+    req<Succession>(`/profiles/${profileId}/succeed`,
+      { method: "POST", body: { verification_ref: verificationRef }, token }),
+
+  publishPack: (body: {
+    industry: string; title: string; blurb?: string; price?: number;
+    currency?: string; publisher?: string; rated?: boolean;
+    audience?: "profile" | "robot";
+    items: { title: string; content: string; task?: string }[];
+  }, token: string) =>
+    req<PackSummary>("/packs", { method: "POST", body, token }),
+  seedPacks: () => req<PackSeed>("/packs/seed", { method: "POST" }),
+
+  // One press from the wrist, down the same paths the full apps use — same
+  // auth, same allowlists, same moderation. A shortcut that skipped any of
+  // those would be a second, weaker way in.
+  watchAct: (profileId: string,
+             body: { target: "workflow" | "robot" | "approval"; id: string;
+                     action: string; input?: string },
+             token: string) =>
+    req<Record<string, unknown>>(`/profiles/${profileId}/watch/act`,
+      { method: "POST", body, token }),
 };
 
 /** Open the WebAuthn ceremony.

@@ -13,7 +13,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, ledger, robotics
+from .. import auth, db, ledger, robotics
 from ..common import profile_or_404, require_owner
 from ..models import PackInstall, PackPublish
 
@@ -109,10 +109,36 @@ def pack_detail(pack_id: str, request: Request) -> dict:
     return {**_summary(pack), "item_titles": titles}
 
 
+def _publisher_account(request: Request) -> str:
+    """Whose account a pack's sales accrue to: the caller's, never the body's.
+
+    `commerce.beneficiary_of` already argues this next door — *a body-supplied
+    beneficiary would let anyone direct a gift meant for a performer into
+    their own balance* — and this route was making the opposite choice with no
+    token at all. Anybody could publish a priced pack, name any string as the
+    `publisher`, and name any account as the one the money accrues to.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who.get("role") != "owner":
+        raise HTTPException(403, "publishing needs an owner token")
+    row = db.connect().execute("SELECT owner_id FROM profiles WHERE id=?",
+                               (who["subject_id"],)).fetchone()
+    if row is None:
+        raise HTTPException(403, "publishing needs an owner token")
+    return row["owner_id"]
+
+
 @router.post("/packs", status_code=201)
-def publish_pack(body: PackPublish) -> dict:
+def publish_pack(body: PackPublish, request: Request) -> dict:
     """Publish a pack to the marketplace. Priced packs are bought; price 0
-    is a free download."""
+    is a free download.
+
+    The account sales accrue to is read from the caller. A `publisher_owner_id`
+    in the body is ignored — see :func:`_publisher_account`.
+    """
+    publisher_owner_id = _publisher_account(request)
     if not body.items:
         raise HTTPException(422, "a pack needs at least one knowledge item")
     if body.price < 0:
@@ -128,7 +154,7 @@ def publish_pack(body: PackPublish) -> dict:
         " VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         (pack_id, body.industry, body.audience, body.title, body.blurb,
          body.publisher, body.price, body.currency, int(body.rated),
-         body.publisher_owner_id, db.utcnow()))
+         publisher_owner_id, db.utcnow()))
     for item in body.items:
         conn.execute(
             "INSERT INTO pack_items (id, pack_id, title, content, task,"

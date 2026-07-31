@@ -186,6 +186,13 @@ const CHROME: Table = {
     ja: "名指しでひとつ", zh: "指名一件事", hi: "एक चीज़, नाम से",
     ar: "شيء واحد، بالاسم",
   },
+  "nav.passing": {
+    en: "Beginning and passing on", es: "Comienzo y sucesión",
+    fr: "Naissance et transmission", de: "Anfang und Übergabe",
+    pt: "Início e sucessão", it: "Inizio e successione",
+    ja: "はじまりと引き継ぎ", zh: "开始与传承",
+    hi: "आरंभ और उत्तराधिकार", ar: "البداية والانتقال",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",
