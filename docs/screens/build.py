@@ -3519,6 +3519,20 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 172: one named thing. The inversion is the point — the campaign is
+    # the most public read in the product, and that is what makes it honest.
+    dict(num=172, title="One Thing, Named", sub="Six reads, six answers",
+         accent="gold", tab=19, cards=[
+        dict(icon="eye", color="gold", k="A campaign: open",
+             s="so its split can be seen",
+             pill=("OPEN", "info")),
+        dict(icon="coin", color="amber", k="Say where it goes",
+             s="before asking anyone for it"),
+        dict(icon="mask", color="green", k="What was taken out",
+             s="counted, before it left"),
+        dict(icon="lock", color="brand", k="Yours, not the room's",
+             s="and the note says which"),
+    ], button=("Look it up", "brand")),
     # 171: what leaves. Two different kinds of leaving, and the two facts
     # that shaped the screen: the preview is a dry run, and the adult bar
     # moved from delivery to the till.

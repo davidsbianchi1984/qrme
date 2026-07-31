@@ -179,6 +179,13 @@ const CHROME: Table = {
     ja: "外へ出るもの", zh: "哪些内容外流", hi: "क्या बाहर जाता है",
     ar: "ما الذي يخرج",
   },
+  "nav.named": {
+    en: "One thing, named", es: "Una cosa, con nombre",
+    fr: "Une chose, nommée", de: "Eine Sache, benannt",
+    pt: "Uma coisa, nomeada", it: "Una cosa, per nome",
+    ja: "名指しでひとつ", zh: "指名一件事", hi: "एक चीज़, नाम से",
+    ar: "شيء واحد، بالاسم",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

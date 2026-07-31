@@ -1,10 +1,4 @@
-GET /agent/lights
 GET /auth/oauth/{provider}/callback
-GET /campaigns/{campaign_id}
-GET /excursions/{cid}
-GET /organizations/{org_id}
-GET /people/{person_id}/skill-grants
-GET /surfaces/{surface}/{surface_id}/skill-grants
 POST /auth/oauth/{provider}/callback
 POST /packs
 POST /packs/seed

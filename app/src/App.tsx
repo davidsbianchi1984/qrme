@@ -25,6 +25,7 @@ import { Lobby } from "./screens/Lobby";
 import { Audience } from "./screens/Audience";
 import { Beacons } from "./screens/Beacons";
 import { Leaving } from "./screens/Leaving";
+import { Named } from "./screens/Named";
 import { Reaching } from "./screens/Reaching";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
@@ -44,7 +45,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "named" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -79,6 +80,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "beacons", label: "Where people find you", icon: "🔳" },
   { id: "reaching", label: "Reaching out", icon: "🌙" },
   { id: "leaving", label: "What leaves", icon: "📤" },
+  { id: "named", label: "One thing, named", icon: "🔎" },
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
   { id: "plans", label: "Plans", icon: "🎟" },
@@ -168,6 +170,7 @@ export function App() {
         {tab === "beacons" && <Beacons onPlans={toPlans} />}
         {tab === "reaching" && <Reaching onPlans={toPlans} />}
         {tab === "leaving" && <Leaving onPlans={toPlans} />}
+        {tab === "named" && <Named onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}

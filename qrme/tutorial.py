@@ -164,6 +164,23 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="named", chapter="Out in the world",
+         title="One thing, named",
+         what="Six reads that each answer about one particular thing, and "
+              "six different answers to who is allowed to ask. The light "
+              "legend takes no id at all. A campaign is readable by "
+              "anybody — the most public read in the product, and that is "
+              "what makes it honest, because it carries who the money goes "
+              "to and the person about to give some is the one entitled to "
+              "see it. For the same reason a campaign cannot exist before "
+              "the designation does. An excursion is the owner's alone, "
+              "since it holds the brief that was sanitised before it went "
+              "and the count of what was taken out. And a place's lent "
+              "skills are filtered to your own, with a note saying so: a "
+              "short list there means your grants, not no grants.",
+         screens=(172,),
+         try_it="Read a campaign with no token at all, and find who the "
+                "money goes to written on the same card."),
     dict(key="leaving", chapter="Out in the world",
          title="What leaves, and on what terms",
          what="Two different kinds of leaving, and conflating them is how "

@@ -364,6 +364,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/169-where-people-find-you.svg"><img src="docs/screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
     <td align="center" width="33%"><a href="docs/screens/170-reaching-out-and-what-stops-it.svg"><img src="docs/screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
     <td align="center" width="33%"><a href="docs/screens/171-what-leaves-and-on-what-terms.svg"><img src="docs/screens/171-what-leaves-and-on-what-terms.svg" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/172-one-thing-named.svg"><img src="docs/screens/172-one-thing-named.svg" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
   </tr>
 </table>
 
@@ -1769,6 +1770,49 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 172 — one thing, named
+
+Six routes that each answer about one particular thing, and six different
+answers to **who may ask**:
+
+| | who may ask |
+|---|---|
+| the light legend | anybody; it takes no id at all |
+| a campaign | **anybody**, deliberately |
+| an organization | signed in |
+| an excursion | the profile's owner |
+| somebody's lent skills | themselves |
+| a place's lent skills | you, filtered to your own |
+
+**The campaign is the inversion, and it is the point.** It is the most public
+read in this product, and that is exactly what makes it honest: it carries
+`proceeds_to`, so somebody about to give money sees who receives it on the
+same card, before they give it. A fundraising page that hid its split would be
+the ordinary kind of dishonest. In the same spirit a campaign cannot exist
+before the designation does — creating one first is refused with *say where
+the money goes first: designate loved ones or organizations before asking
+anyone for it.*
+
+Two reads are narrower than their names suggest, and both say so rather than
+letting a screen misread them. An **excursion** carries the brief that was
+sanitised before it left and the count of what was stripped out of it; those
+two numbers are the whole basis on which the feature asks to be trusted, so
+the screen shows them together — *nothing left this machine* and *three
+private terms stripped before it went* are very different reassurances and
+either alone is misleading.
+
+A **place's** lent skills are filtered to the caller's own, with a `note`
+saying a room-wide view needs a membership check that does not exist yet. The
+console renders that note verbatim, because a short list there means *your*
+grants, not *no* grants — reading it the other way turns an access limit into
+an empty room.
+
+The light legend is built from the mapping rather than written beside it, and
+the backend says why: *a legend that is maintained separately eventually
+describes a mapping the code does not have, and it is the legend people
+trust.* So the statuses driving each light come back with it, and the screen
+shows them.
 
 ### Taking it back — three answers to "there was nothing there"
 

@@ -1056,6 +1056,10 @@ export interface CampaignOut {
   donors: number;
   status: string;
   proceeds_to: DesigneeOut[];
+  /** The sentence that travels with every figure in this repository. A
+   *  fundraising page is the last place it should be dropped. */
+  payment?: string;
+  created_at?: string;
 }
 export interface SimulationOut {
   id: string;
@@ -1942,6 +1946,50 @@ export type DeskBeacon = {
    *  scan surfaces, fetching this does **not** count as a scan. */
   qr_svg: string;
   created_at: string;
+};
+
+/** The three lights, and which statuses drive each.
+ *
+ *  Built from the mapping rather than written beside it — the backend says
+ *  why: a legend maintained separately eventually describes a mapping the
+ *  code does not have, and it is the legend people trust. */
+export type LightLegend = {
+  order: string[];
+  legend: { light: string; labels: string[]; statuses: string[] }[];
+  question: string;
+};
+
+/** One trip out to look something up.
+ *
+ *  `redactions` is the count of private terms stripped from the brief before
+ *  it went, and `left_host` says whether anything actually left this machine
+ *  at all. Both are the point: a research feature that could not tell you
+ *  either would be asking for trust it had not earned. */
+export type Excursion = {
+  id: string;
+  profile_id: string;
+  topic: string;
+  brief: string;
+  redactions: number;
+  left_host: boolean;
+  findings: string | null;
+  learned: boolean;
+};
+
+export type PersonGrants = {
+  lending?: unknown[];
+  borrowing?: unknown[];
+  [key: string]: unknown;
+};
+
+export type PlaceGrants = {
+  surface: string;
+  surface_id: string;
+  grants: unknown[];
+  /** Rendered verbatim. It says the list is yours alone and why a room-wide
+   *  view does not exist yet, which is the sort of thing a screen quietly
+   *  presenting a short list would otherwise misrepresent as "nothing here". */
+  note: string;
 };
 
 /** What unfriending answers.
@@ -3687,6 +3735,40 @@ export const api = {
   unlistFromMarketplace: (profileId: string, token: string) =>
     req<void>(`/profiles/${profileId}/marketplace`,
       { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // One named thing, and who may ask about it.
+  //
+  // Six reads, six different answers, each for a reason worth stating:
+  //
+  //   the light legend   anybody, and it takes no id at all
+  //   a campaign         **anybody** — deliberately the most public read in
+  //                      the product, because it carries `proceeds_to` and
+  //                      the person about to give money is the one entitled
+  //                      to see where it goes
+  //   an organization    signed in
+  //   an excursion       the profile's owner only — it holds the brief that
+  //                      was sanitised before it left, and the count of
+  //                      what was taken out
+  //   somebody's grants  themselves only
+  //   a place's grants   filtered to your own, because there is no
+  //                      room-membership check to hang "what the room can
+  //                      see" on, and without one it listed who is lending
+  //                      what to whom to anybody who guessed the id
+  // ---------------------------------------------------------------------
+
+  agentLights: () => req<LightLegend>("/agent/lights"),
+  campaign: (campaignId: string) =>
+    req<CampaignOut>(`/campaigns/${campaignId}`),
+  organization: (orgId: string, token: string) =>
+    req<OrgOut>(`/organizations/${orgId}`, { token }),
+  excursion: (cid: string, token: string) =>
+    req<Excursion>(`/excursions/${cid}`, { token }),
+  grantsForPerson: (personId: string, token: string) =>
+    req<PersonGrants>(`/people/${personId}/skill-grants`, { token }),
+  grantsInPlace: (surface: string, surfaceId: string, token: string) =>
+    req<PlaceGrants>(`/surfaces/${surface}/${surfaceId}/skill-grants`,
+      { token }),
 };
 
 /** Open the WebAuthn ceremony.
