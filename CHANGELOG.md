@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### A post the filter refused was published by the route that lists what was published
+
+Public posts run through the **strict** moderation filter, because a public
+post faces the widest audience there is. When it holds one — or when the owner
+has set the profile to approve its own posts by hand — `compose_post` stores it
+`pending` and is deliberate about what it hands back:
+
+```python
+"content": content if status == "approved" else None
+```
+
+`content: None`, **to the owner who just asked for it**.
+
+Fourteen lines further down, `list_posts` returned `{**dict(r)}` — every column
+of every row, whatever its status — to anybody, with no token at all. So the
+hold was enforced against the author and against nobody else: a post the strict
+filter refused was readable in full by a stranger, from the route whose entire
+job is to list what a profile has *published*, carrying `flag_reason` with it —
+the sentence naming the rule the text broke.
+
+An approved post is public. A held one is a queue, and now only its owner sees
+it. **Screen 181** shows the two apart.
+
+The same screen opens two surfaces that were already right and are now pinned:
+the **designation cannot be designed away** (ask for the label "Rosa" and the
+line comes back "✦ AI · Rosa"), and an owner **cannot resolve an objection
+against their own profile** — re-attesting the basis is the only move they
+have, because an owner who could dismiss it would be deciding their own case.
+
+Console-doorless routes **28 → 23**.
+
+
 ### An id was read as a credential, in the one feature built on consent
 
 `/connections` is anonymous matchmaking between two people with no profile

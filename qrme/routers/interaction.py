@@ -376,14 +376,33 @@ def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dic
 
 
 @router.get("/profiles/{profile_id}/posts")
-def list_posts(profile_id: str) -> list[dict]:
+def list_posts(profile_id: str, request: Request) -> list[dict]:
+    """What this profile has published.
+
+    Public, because a published post is public — but *published* is the word
+    doing the work. `compose_post` fourteen lines up withholds the text of a
+    post that is `pending`, returning `content: None` even to the owner who
+    asked for it, because the strict filter held it or because the owner set
+    this profile to approve its own posts by hand.
+
+    This route used to return every column of every row to anyone with no
+    token at all. So the hold was enforced against the author and nobody else:
+    a post the moderation filter refused was published in full by the route
+    that lists what was published, together with `flag_reason` — the sentence
+    saying which rule it broke.
+
+    Approved posts are public. Everything else is the owner's queue, and only
+    the owner sees it.
+    """
     profile_or_404(profile_id)
+    mine = auth.principal(request) == {"role": "owner",
+                                       "subject_id": profile_id}
     rows = db.connect().execute(
         "SELECT * FROM posts WHERE profile_id=? ORDER BY created_at, rowid",
         (profile_id,)).fetchall()
     # Every rendered post carries its credential and the profile's mark.
     return [{**dict(r), "watermark": watermark.brief(r["watermark_id"])}
-            for r in rows]
+            for r in rows if mine or r["status"] == "approved"]
 
 
 # -- Companion features: proactive check-ins and transparency ----------------

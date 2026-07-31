@@ -3523,6 +3523,22 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 181: the mark, what was published, and who is contesting it. First
+    # card is the defect — a held post handed out by the route that lists
+    # what was published — and the second is the rule that cannot be typed
+    # around.
+    dict(num=181, title="The Mark, And The Held", sub="Published is not written",
+         accent="amber", tab=28, cards=[
+        dict(icon="lock", color="red", k="Held is not out",
+             s="a queue, not a publication",
+             pill=("0", "warn")),
+        dict(icon="pen", color="amber", k="AI stays in front",
+             s="design the rest of it"),
+        dict(icon="eye", color="green", k="The mark travels",
+             s="on every render, always"),
+        dict(icon="shield", color="silver", k="Not your own case",
+             s="re-attest, and wait"),
+    ], button=("Set the mark", "brand")),
     # 180: talking to a stranger. First card is the defect and it is the
     # whole round — the routes took no credential at all — and the last is
     # the one that needed none: a scan is somebody with no account.

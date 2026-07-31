@@ -164,6 +164,29 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="themark", chapter="Out in the world",
+         title="The mark, and the held",
+         what="Three things about the same question — *is it clear what this "
+              "is, and who says otherwise*. You design the mark your "
+              "profile's work carries: pick the glyph and what to call it, "
+              "and whatever you type, the line comes back with **AI ·** in "
+              "front of it. The designation is not a field you can empty. "
+              "Next to it is what the profile has published, and separately "
+              "what is being held: a post the strict filter stopped, or one "
+              "waiting because you set this profile to approve its own posts "
+              "by hand. A held post is a queue and not a publication, and "
+              "only you see it — the route that lists what a profile "
+              "published used to hand those out in full to anybody who "
+              "asked, text and the reason they were held, with no credential "
+              "at all. And last, anybody objecting that this profile should "
+              "not exist. Opening one restricts the profile immediately. You "
+              "can re-attest the basis you claim the right on and that is "
+              "all you can do — resolving it belongs to a reviewer, because "
+              "an owner who could dismiss an objection against their own "
+              "profile would be deciding their own case.",
+         screens=(181,),
+         try_it="Set a label without the word AI in it, and read the line "
+                "that comes back."),
     dict(key="stranger", chapter="Out in the world",
          title="Two strangers",
          what="Two things you do before you have anything of your own here. "

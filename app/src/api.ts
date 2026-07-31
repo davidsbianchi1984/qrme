@@ -2525,6 +2525,59 @@ export type ConnSent = {
   flag_reason: string | null;
 };
 
+/** The mark a profile's generated work carries.
+ *
+ *  `label` comes back with `AI ·` in front of whatever the owner typed, and
+ *  that is the point: the designation cannot be designed away. Ask for
+ *  "Rosa" and the line is "✦ AI · Rosa". */
+export type WatermarkDesign = {
+  mark: string;
+  label: string;
+  line: string;
+  /** Whether the owner has set one, or this is the default. */
+  custom: boolean;
+  always_displayed: boolean;
+  disclosure: string;
+};
+
+/** One composed post. `content` is present only when the post is approved —
+ *  or when the caller is the owner reading their own hold queue. */
+export type ProfilePost = {
+  id: string;
+  profile_id: string;
+  surface: string | null;
+  topic: string;
+  content: string;
+  status: string;
+  /** Why it was held. Never public: it names the rule the text broke. */
+  flag_reason: string | null;
+  watermark_id: string;
+  created_at: string;
+  watermark: { watermark_id: string; kind: string; disclosure: string };
+};
+
+/** Somebody contesting that this profile should exist. Opening one restricts
+ *  the profile immediately and pending review — `prior_status` is what it
+ *  goes back to if the objection is dismissed. */
+export type ObjectionRow = {
+  id: string;
+  profile_id: string;
+  /** An out-of-band proof-of-identity reference, not the objector's name. */
+  objector_ref: string;
+  reason: string | null;
+  status: string;
+  reattested: number;
+  prior_status: string;
+  created_at: string;
+  resolved_at: string | null;
+};
+
+export type Reattested = {
+  id: string;
+  reattested: boolean;
+  note: string;
+};
+
 export type SocialConnection = {
   id: string;
   profile_id: string;
@@ -4175,6 +4228,45 @@ export const api = {
   // clients send them, and a 422 on upgrade is a worse answer than not
   // believing them. They are ignored.
   // ---------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------
+  // The mark, and contesting it.
+  //
+  // `watermarkDesign` is public because every render of this profile's work
+  // carries the line, so anyone looking at one can check what it should say.
+  // Setting it is the owner's, and whatever they set, the answer comes back
+  // with the AI designation in front — it is not a field they can empty.
+  //
+  // `profilePosts` is public too, and *published* is the word doing the work
+  // there: a post the strict filter held, or one the owner set to approve by
+  // hand, is the owner's queue and not a publication. It used to return every
+  // row to anybody, `flag_reason` included.
+  //
+  // The objection routes are the owner's side of somebody contesting that
+  // their profile should exist at all. Opening one is public and elsewhere;
+  // these two are what the owner does about it, and re-attesting is the only
+  // move they have — resolving is the reviewer's, deliberately, so an owner
+  // cannot adjudicate an objection against their own profile.
+  // ---------------------------------------------------------------------
+
+  watermarkDesign: (profileId: string) =>
+    req<WatermarkDesign>(`/profiles/${profileId}/watermark`),
+  setWatermarkDesign: (profileId: string,
+                       body: { mark?: string; label?: string },
+                       token: string) =>
+    req<WatermarkDesign>(`/profiles/${profileId}/watermark`,
+      { method: "PUT", body, token }),
+  // With the owner's token this includes the hold queue; without it, only
+  // what is actually published.
+  profilePosts: (profileId: string, token?: string) =>
+    req<ProfilePost[]>(`/profiles/${profileId}/posts`,
+      token ? { token } : {}),
+  profileObjections: (profileId: string, token: string) =>
+    req<ObjectionRow[]>(`/profiles/${profileId}/objections`, { token }),
+  reattestBasis: (profileId: string, objectionId: string, token: string) =>
+    req<Reattested>(
+      `/profiles/${profileId}/objections/${objectionId}/attest`,
+      { method: "POST", token }),
 
   summon: (ref: string) =>
     req<Summoned>(`/summon?ref=${encodeURIComponent(ref)}`),

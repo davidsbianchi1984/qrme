@@ -210,6 +210,12 @@ const CHROME: Table = {
     ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी",
     ar: "الغرباء",
   },
+  "nav.themark": {
+    en: "The mark", es: "La marca", fr: "La marque",
+    de: "Die Kennzeichnung", pt: "A marca", it: "Il marchio",
+    ja: "表示マーク", zh: "标识", hi: "चिह्न",
+    ar: "العلامة",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

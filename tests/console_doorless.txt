@@ -5,10 +5,7 @@ GET /packs/{pack_id}
 GET /profiles/{profile_id}/apps
 GET /profiles/{profile_id}/excursions
 GET /profiles/{profile_id}/gaming/sessions
-GET /profiles/{profile_id}/objections
-GET /profiles/{profile_id}/posts
 GET /profiles/{profile_id}/steering/hub
-GET /profiles/{profile_id}/watermark
 POST /excursions/{cid}/learn
 POST /feedback
 POST /gaming/sessions/{session_id}/callout
@@ -18,11 +15,9 @@ POST /profiles/{profile_id}/apps
 POST /profiles/{profile_id}/compose
 POST /profiles/{profile_id}/excursions
 POST /profiles/{profile_id}/gaming/sessions
-POST /profiles/{profile_id}/objections/{objection_id}/attest
 POST /profiles/{profile_id}/translate
 POST /social/{cid}/collect
 POST /social/{cid}/publish
 PUT /profiles/{profile_id}/handle
 PUT /profiles/{profile_id}/language
 PUT /profiles/{profile_id}/steering/hub
-PUT /profiles/{profile_id}/watermark
