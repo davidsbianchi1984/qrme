@@ -234,7 +234,7 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                 "revoke", "delete what left", "shared model", "licence",
                 "license", "acquire a licence", "derive an agent", "clone it",
                 "consult"),
-    "robots": ("what bodies can i buy", "robot models", "which robot",
+    "bodies": ("what bodies can i buy", "robot models", "which robot",
                "humanoid", "is optimus supported", "when does it ship",
                "why can't i bind that", "not yet buyable", "announced",
                "teach my robot", "task pack", "fit a skill", "robot skills",
