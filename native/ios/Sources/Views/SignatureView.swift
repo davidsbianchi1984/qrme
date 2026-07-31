@@ -13,6 +13,7 @@ struct SignatureView: View {
     let token: String
 
     @State private var credentials: [SigningCredential] = []
+    @State private var revoking: String?
     @State private var policy: SignaturePolicy?
     @State private var document = ""
     @State private var meaning = "I attest this is accurate and complete"
@@ -50,6 +51,19 @@ struct SignatureView: View {
                             .foregroundStyle(c.device_bound ? .green : .orange)
                         Text("can sign: \(c.can_sign.joined(separator: ", "))")
                             .font(.caption2).foregroundStyle(.secondary)
+
+                        // The screen enrolled these and could not take one
+                        // away. A signing credential signs documents as you,
+                        // and the moment you most need this button is the
+                        // moment the device holding that credential is not in
+                        // your hand — so it belongs on the phone you still
+                        // have, beside the credential it revokes.
+                        Button(role: .destructive) {
+                            revoking = c.credential_id
+                        } label: {
+                            Text("Revoke this credential").font(.caption)
+                        }
+                        .disabled(busy)
                     }
                 }
                 Button("Enrol a passkey") { Task { await enrol() } }
@@ -111,6 +125,19 @@ struct SignatureView: View {
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
+        .confirmationDialog("Revoke this credential?",
+                           isPresented: .constant(revoking != nil),
+                           titleVisibility: .visible) {
+            Button("Revoke", role: .destructive) {
+                if let id = revoking { Task { await revoke(id) } }
+                revoking = nil
+            }
+            Button("Keep it", role: .cancel) { revoking = nil }
+        } message: {
+            Text("Signatures already made stay valid and stay in the audit "
+                 + "trail. This stops the credential being used again — which "
+                 + "is what you want if the device holding it is gone.")
+        }
         .navigationTitle("Signatures")
         .task { await load() }
     }
@@ -123,6 +150,17 @@ struct SignatureView: View {
         }
         policy = try? await ApiClient.shared.signaturePolicy()
         credentials = (try? await ApiClient.shared.signingCredentials(token: token)) ?? []
+    }
+
+    private func revoke(_ credentialId: String) async {
+        busy = true; error = nil
+        defer { busy = false }
+        do {
+            try await ApiClient.shared.revokeCredential(id: credentialId,
+                                                        token: token)
+            credentials = (try? await ApiClient.shared.signingCredentials(
+                token: token)) ?? []
+        } catch { self.error = error.localizedDescription }
     }
 
     private func enrol() async {
