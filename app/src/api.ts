@@ -122,6 +122,69 @@ export const accountApi = {
       "/password/reset", { method: "POST", body }),
 };
 
+/** A refusal the backend structured on purpose.
+ *
+ *  Several gates here answer with an *object* rather than a sentence — the
+ *  plan gate is the clearest: `{reason, capability, needs, have, price_usd,
+ *  period, message, billing}`. That shape exists so a screen can say "this
+ *  needs Pro, $130 a month, and the billing is simulated" with a button, and
+ *  it was being flattened with `JSON.stringify` and thrown as the message. The
+ *  user saw the raw object.
+ *
+ *  Worth naming as a shape rather than fixing in one place: the backend did
+ *  the work of making a refusal actionable, and the transport threw the
+ *  structure away at the last step. Every screen that catches an error and
+ *  renders `.message` — which is all of them — showed a blob.
+ *
+ *  So `message` is now the human sentence the object already carried, and the
+ *  structure rides along on `detail` for anything that wants to render it
+ *  properly. Existing `catch (e) { (e as Error).message }` keeps working and
+ *  simply gets better. */
+export class RequestError extends Error {
+  readonly status: number;
+  readonly detail: unknown;
+
+  constructor(status: number, detail: unknown) {
+    super(RequestError.sentence(detail));
+    this.name = "RequestError";
+    this.status = status;
+    this.detail = detail;
+  }
+
+  /** The most human thing in the payload. A structured refusal that carries
+   *  its own `message` is quoted; anything else falls back to the JSON, which
+   *  is at least honest about being unhandled. */
+  private static sentence(detail: unknown): string {
+    if (typeof detail === "string") return detail;
+    if (detail && typeof detail === "object") {
+      const m = (detail as { message?: unknown }).message;
+      if (typeof m === "string" && m) return m;
+    }
+    return JSON.stringify(detail);
+  }
+}
+
+/** The plan gate, when that is what refused. Null for anything else, so a
+ *  screen can render the upsell properly and otherwise show the sentence. */
+export function planGate(err: unknown): PlanGate | null {
+  const d = err instanceof RequestError ? err.detail : null;
+  if (!d || typeof d !== "object") return null;
+  const g = d as Partial<PlanGate>;
+  return g.reason === "plan" && typeof g.needs === "string"
+    ? (g as PlanGate) : null;
+}
+
+export type PlanGate = {
+  reason: "plan";
+  capability: string;
+  needs: string; have: string;
+  price_usd: number; period: string;
+  message: string;
+  /** "simulated — no real funds move". Carried on the refusal itself, so an
+   *  upsell cannot show a price without it. */
+  billing: string;
+};
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},
@@ -161,8 +224,9 @@ async function req<T>(
     // carries whatever the user typed.
     recordProblem(opts.method || "GET", path, res.status);
     const body = data as { detail?: unknown; message?: unknown } | null;
-    const detail = (body && (body.detail || body.message)) || text.trim() || res.statusText;
-    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+    const detail = (body && (body.detail ?? body.message)) ?? text.trim()
+      ?? res.statusText;
+    throw new RequestError(res.status, detail);
   }
   return data as T;
 }
