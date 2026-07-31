@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { t as tr, visitorLang } from "../l10n";
 import { api, type EmbodimentConsistency, type ObjectionOpened,
          type ObjectionStatus, type WatermarkRecovery } from "../api";
 
@@ -50,6 +51,11 @@ import { api, type EmbodimentConsistency, type ObjectionOpened,
  * no router; the hash is read once at mount, which is enough for a link and
  * is not pretending to be more.
  */
+/** The visitor's language, resolved once. There is no profile to watch for
+ *  changes on — that is the whole point of this screen. */
+const LANG = visitorLang();
+const L = (key: string) => tr(key, LANG);
+
 export function Public({ start, onBack }: {
   start: Pane;
   onBack: () => void;
@@ -62,24 +68,24 @@ export function Public({ start, onBack }: {
         <span className="orb" />
         <div>
           <div className="brand-name">QRME</div>
-          <div className="brand-sub">Without an account</div>
+          <div className="brand-sub">{L("pub.sub")}</div>
         </div>
-        <button className="linkish" onClick={onBack}>Back to sign in</button>
+        <button className="linkish" onClick={onBack}>{L("pub.back")}</button>
       </header>
 
       {/* `.tabs`, not `.row` — the tab styling is scoped under it. */}
       <div className="tabs">
         <button className={pane === "object" ? "tab active" : "tab"}
                 onClick={() => setPane("object")}>
-          Object to a profile
+          {L("pub.tab.object")}
         </button>
         <button className={pane === "mark" ? "tab active" : "tab"}
                 onClick={() => setPane("mark")}>
-          Is this genuine?
+          {L("pub.tab.mark")}
         </button>
         <button className={pane === "same" ? "tab active" : "tab"}
                 onClick={() => setPane("same")}>
-          Is this the same one?
+          {L("pub.tab.same")}
         </button>
       </div>
 
@@ -88,9 +94,8 @@ export function Public({ start, onBack }: {
       {pane === "same" && <SamePane />}
 
       <p className="muted small">
-        Nothing on this page reads or needs a token. If you do have a profile,
-        signing in gets you the same forms with your own case history beside
-        them.
+        {L("pub.notoken")} If you do have a profile, signing in gets you the
+        same forms with your own case history beside them.
       </p>
     </div>
   );
@@ -138,7 +143,7 @@ function ObjectPane() {
   return (
     <>
       <div className="card">
-        <h3>A profile depicts me</h3>
+        <h3>{L("pub.object.title")}</h3>
         <p className="muted small">
           You do not need an account, and this page is the proof of it rather
           than a promise about it. Opening an objection restricts the profile
@@ -147,15 +152,15 @@ function ObjectPane() {
         </p>
         <div className="row">
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
-                 placeholder="the profile's id" style={{ flex: 1 }} />
+                 placeholder={L("pub.object.profileId")} style={{ flex: 1 }} />
           <input value={ref} onChange={(e) => setRef(e.target.value)}
-                 placeholder="your proof reference" />
+                 placeholder={L("pub.object.ref")} />
         </div>
         <div className="row">
           <input value={reason} onChange={(e) => setReason(e.target.value)}
-                 placeholder="why — in your own words" style={{ flex: 1 }} />
+                 placeholder={L("pub.object.reason")} style={{ flex: 1 }} />
           <button disabled={busy || !profileId.trim() || !ref.trim()}
-                  onClick={open}>Open it</button>
+                  onClick={open}>{L("pub.object.open")}</button>
         </div>
         <p className="muted small">
           The proof reference points at an identity check held outside this
@@ -181,11 +186,11 @@ function ObjectPane() {
       )}
 
       <div className="card">
-        <h3>Check a case</h3>
+        <h3>{L("pub.check.title")}</h3>
         <div className="row">
           <input value={lookup} onChange={(e) => setLookup(e.target.value)}
-                 placeholder="objection id" style={{ flex: 1 }} />
-          <button disabled={busy || !lookup.trim()} onClick={check}>Check</button>
+                 placeholder={L("pub.check.id")} style={{ flex: 1 }} />
+          <button disabled={busy || !lookup.trim()} onClick={check}>{L("pub.check.go")}</button>
         </div>
         {status && (
           <p className="small">
@@ -229,7 +234,7 @@ function SamePane() {
   return (
     <>
       <div className="card">
-        <h3>I met one of these somewhere else</h3>
+        <h3>{L("pub.same.title")}</h3>
         <p className="muted small">
           A profile keeps one identity signature across every form it takes —
           a chat window, a voice on a speaker, a body in a room. Put the id in
@@ -239,7 +244,7 @@ function SamePane() {
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
                  placeholder="the profile's id" style={{ flex: 1 }} />
           <button disabled={busy || !profileId.trim()} onClick={check}>
-            Look it up
+            {L("pub.same.go")}
           </button>
         </div>
       </div>
@@ -285,7 +290,7 @@ function MarkPane() {
   return (
     <>
       <div className="card">
-        <h3>Somebody sent me this</h3>
+        <h3>{L("pub.mark.title")}</h3>
         <p className="muted small">
           Paste it. This asks whose work it is with no credential id, and keeps
           answering after the text has been reworded — which is the state text
@@ -294,9 +299,9 @@ function MarkPane() {
           and lives inside an account.
         </p>
         <textarea value={content} onChange={(e) => setContent(e.target.value)}
-                  rows={6} placeholder="paste the text" />
+                  rows={6} placeholder={L("pub.mark.paste")} />
         <button disabled={busy || !content.trim()} onClick={ask}>
-          Ask who wrote it
+          {L("pub.mark.ask")}
         </button>
       </div>
 
@@ -324,7 +329,7 @@ function MarkPane() {
             </>
           ) : (
             <>
-              <h3>Not recognised</h3>
+              <h3>{L("pub.mark.unknown")}</h3>
               <p className="small">{found.reason}</p>
               <p className="muted small">
                 This says nothing about whether a person wrote it. It says no

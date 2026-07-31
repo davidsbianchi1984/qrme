@@ -279,10 +279,208 @@ const CHROME: Table = {
     pt: "Sair", it: "Esci", ja: "サインアウト", zh: "退出登录",
     hi: "साइन आउट", ar: "تسجيل الخروج",
   },
+
+  // ---- the surface for people with no profile (screens/Public.tsx) ----
+  //
+  // Everything above is chrome for somebody signed in, and takes its
+  // language from their profile. These take it from `visitorLang` below,
+  // because the reader of this screen is by construction the one person in
+  // the product who has no profile to take a setting from.
+  "pub.sub": {
+    en: "Without an account", es: "Sin cuenta", fr: "Sans compte",
+    de: "Ohne Konto", pt: "Sem conta", it: "Senza account",
+    ja: "アカウントなしで", zh: "无需账户", hi: "बिना खाते के",
+    ar: "بدون حساب",
+  },
+  "pub.back": {
+    en: "Back to sign in", es: "Volver a iniciar sesión",
+    fr: "Retour à la connexion", de: "Zurück zur Anmeldung",
+    pt: "Voltar a iniciar sessão", it: "Torna all'accesso",
+    ja: "サインインに戻る", zh: "返回登录", hi: "साइन इन पर लौटें",
+    ar: "العودة لتسجيل الدخول",
+  },
+  "pub.tab.object": {
+    en: "Object to a profile", es: "Objetar a un perfil",
+    fr: "Contester un profil", de: "Einem Profil widersprechen",
+    pt: "Contestar um perfil", it: "Contestare un profilo",
+    ja: "プロフィールに異議を申し立てる", zh: "对某个资料提出异议",
+    hi: "किसी प्रोफ़ाइल पर आपत्ति", ar: "الاعتراض على ملف",
+  },
+  "pub.tab.mark": {
+    en: "Is this genuine?", es: "¿Esto es auténtico?",
+    fr: "Est-ce authentique ?", de: "Ist das echt?",
+    pt: "Isto é genuíno?", it: "È autentico?", ja: "これは本物ですか？",
+    zh: "这是真的吗？", hi: "क्या यह असली है?", ar: "هل هذا أصلي؟",
+  },
+  "pub.tab.same": {
+    en: "Is this the same one?", es: "¿Es el mismo?",
+    fr: "Est-ce le même ?", de: "Ist das dasselbe?",
+    pt: "É o mesmo?", it: "È lo stesso?", ja: "これは同じものですか？",
+    zh: "这是同一个吗？", hi: "क्या यह वही है?", ar: "هل هذا هو نفسه؟",
+  },
+  "pub.object.title": {
+    en: "A profile depicts me", es: "Un perfil me representa",
+    fr: "Un profil me représente", de: "Ein Profil stellt mich dar",
+    pt: "Um perfil representa-me", it: "Un profilo mi rappresenta",
+    ja: "私を模したプロフィールがあります", zh: "有一个资料在描绘我",
+    hi: "एक प्रोफ़ाइल मुझे दर्शाती है", ar: "هناك ملف يصوّرني",
+  },
+  "pub.object.profileId": {
+    en: "the profile's id", es: "el id del perfil",
+    fr: "l'identifiant du profil", de: "die ID des Profils",
+    pt: "o id do perfil", it: "l'id del profilo", ja: "プロフィールのID",
+    zh: "该资料的 id", hi: "प्रोफ़ाइल की आईडी", ar: "معرّف الملف",
+  },
+  "pub.object.ref": {
+    en: "your proof reference", es: "su referencia de prueba",
+    fr: "votre référence de preuve", de: "Ihr Nachweis-Aktenzeichen",
+    pt: "a sua referência de prova", it: "il tuo riferimento di prova",
+    ja: "本人確認の参照番号", zh: "你的证明编号",
+    hi: "आपका प्रमाण संदर्भ", ar: "مرجع إثباتك",
+  },
+  "pub.object.reason": {
+    en: "why — in your own words", es: "por qué — con sus palabras",
+    fr: "pourquoi — avec vos mots", de: "warum — in Ihren eigenen Worten",
+    pt: "porquê — nas suas palavras", it: "perché — con parole tue",
+    ja: "理由 — ご自身の言葉で", zh: "原因 — 用你自己的话",
+    hi: "क्यों — अपने शब्दों में", ar: "لماذا — بكلماتك",
+  },
+  "pub.object.open": {
+    en: "Open it", es: "Abrirla", fr: "L'ouvrir", de: "Einreichen",
+    pt: "Abrir", it: "Aprila", ja: "申し立てる", zh: "提出",
+    hi: "दर्ज करें", ar: "افتحه",
+  },
+  "pub.check.title": {
+    en: "Check a case", es: "Consultar un caso", fr: "Suivre un dossier",
+    de: "Einen Fall prüfen", pt: "Consultar um caso",
+    it: "Controlla un caso", ja: "申し立てを確認する", zh: "查询案件",
+    hi: "मामला देखें", ar: "تحقّق من قضية",
+  },
+  "pub.check.id": {
+    en: "objection id", es: "id de la objeción", fr: "identifiant du dossier",
+    de: "ID des Widerspruchs", pt: "id da contestação",
+    it: "id della contestazione", ja: "申し立てID", zh: "异议 id",
+    hi: "आपत्ति आईडी", ar: "معرّف الاعتراض",
+  },
+  "pub.check.go": {
+    en: "Check", es: "Consultar", fr: "Vérifier", de: "Prüfen",
+    pt: "Consultar", it: "Controlla", ja: "確認", zh: "查询",
+    hi: "जाँचें", ar: "تحقّق",
+  },
+  "pub.mark.title": {
+    en: "Somebody sent me this", es: "Alguien me envió esto",
+    fr: "Quelqu'un m'a envoyé ceci", de: "Jemand hat mir das geschickt",
+    pt: "Alguém enviou-me isto", it: "Qualcuno mi ha mandato questo",
+    ja: "これを送られてきました", zh: "有人给我发了这个",
+    hi: "किसी ने मुझे यह भेजा", ar: "أرسل لي أحدهم هذا",
+  },
+  "pub.mark.paste": {
+    en: "paste the text", es: "pegue el texto", fr: "collez le texte",
+    de: "Text einfügen", pt: "cole o texto", it: "incolla il testo",
+    ja: "テキストを貼り付けてください", zh: "粘贴文本",
+    hi: "पाठ चिपकाएँ", ar: "الصق النص",
+  },
+  "pub.mark.ask": {
+    en: "Ask who wrote it", es: "Preguntar quién lo escribió",
+    fr: "Demander qui l'a écrit", de: "Fragen, wer es geschrieben hat",
+    pt: "Perguntar quem o escreveu", it: "Chiedi chi l'ha scritto",
+    ja: "誰が書いたか調べる", zh: "查询是谁写的",
+    hi: "पूछें किसने लिखा", ar: "اسأل من كتبه",
+  },
+  "pub.mark.unknown": {
+    en: "Not recognised", es: "No reconocido", fr: "Non reconnu",
+    de: "Nicht erkannt", pt: "Não reconhecido", it: "Non riconosciuto",
+    ja: "該当なし", zh: "未识别", hi: "पहचाना नहीं गया",
+    ar: "غير معروف",
+  },
+  "pub.same.title": {
+    en: "I met one of these somewhere else",
+    es: "Me encontré con uno de estos en otro sitio",
+    fr: "J'en ai rencontré un ailleurs",
+    de: "Ich bin so einem anderswo begegnet",
+    pt: "Encontrei um destes noutro lugar",
+    it: "Ne ho incontrato uno altrove",
+    ja: "別の場所で会ったことがあります",
+    zh: "我在别处遇到过其中一个",
+    hi: "मैं इनमें से एक से कहीं और मिला था",
+    ar: "قابلت واحدًا من هؤلاء في مكان آخر",
+  },
+  "pub.same.go": {
+    en: "Look it up", es: "Buscarlo", fr: "Rechercher", de: "Nachschlagen",
+    pt: "Procurar", it: "Cerca", ja: "調べる", zh: "查询",
+    hi: "देखें", ar: "ابحث عنه",
+  },
+  "pub.notoken": {
+    en: "Nothing on this page reads or needs a token.",
+    es: "Nada en esta página lee ni necesita una credencial.",
+    fr: "Rien sur cette page ne lit ni ne requiert d'identifiant.",
+    de: "Nichts auf dieser Seite liest oder braucht ein Token.",
+    pt: "Nada nesta página lê ou precisa de uma credencial.",
+    it: "Nulla in questa pagina legge o richiede una credenziale.",
+    ja: "このページは資格情報を読み取らず、必要ともしません。",
+    zh: "本页面既不读取也不需要任何凭据。",
+    hi: "इस पृष्ठ पर कुछ भी टोकन नहीं पढ़ता और न ही चाहिए।",
+    ar: "لا شيء في هذه الصفحة يقرأ رمزًا أو يحتاج إليه.",
+  },
+  "pub.invite": {
+    en: "Here about a profile, not for one?",
+    es: "¿Viene por un perfil, no a crear uno?",
+    fr: "Ici à propos d'un profil, pas pour en créer un ?",
+    de: "Wegen eines Profils hier, nicht für eines?",
+    pt: "Está aqui por causa de um perfil, não para criar um?",
+    it: "Sei qui per un profilo, non per crearne uno?",
+    ja: "プロフィールを作りに来たのではなく、あるプロフィールの件でしょうか？",
+    zh: "你是为某个资料而来，而不是来创建一个？",
+    hi: "किसी प्रोफ़ाइल के बारे में आए हैं, बनाने नहीं?",
+    ar: "أتيت بشأن ملف، لا لإنشاء واحد؟",
+  },
+  "pub.invite.none": {
+    en: "Neither needs an account.",
+    es: "Ninguna de las dos necesita cuenta.",
+    fr: "Aucun des deux ne nécessite de compte.",
+    de: "Für beides ist kein Konto nötig.",
+    pt: "Nenhuma das duas precisa de conta.",
+    it: "Nessuna delle due richiede un account.",
+    ja: "どちらもアカウントは不要です。",
+    zh: "两者都不需要账户。",
+    hi: "दोनों के लिए खाता ज़रूरी नहीं।",
+    ar: "لا يحتاج أيٌّ منهما إلى حساب.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {
   const row = CHROME[key];
   if (!row) return key;
   return row[(lang as Lang) || "en"] || row.en || key;
+}
+
+const SUPPORTED: Lang[] =
+  ["en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar"];
+
+/**
+ * The language of somebody who has no profile to take one from.
+ *
+ * Everything above this line is keyed on the profile's setting — the header
+ * comment says so, and it is right for the console. It is useless for the
+ * one surface in this app built for people who do not have a profile: the
+ * person contesting a synthetic profile of themselves, the person asking
+ * whether what they were sent was written by a human, the person checking
+ * they met the same profile twice.
+ *
+ * Their browser has been saying which language they read on every request
+ * and in `navigator.languages` on every render. Nothing looked, so the page
+ * built for the person with no account was also the page with no language.
+ *
+ * Region is dropped (`es-419` and `es-ES` are both `es`) and anything
+ * unrecognised falls back to English rather than guessing.
+ */
+export function visitorLang(
+  preferred: readonly string[] =
+    typeof navigator === "undefined" ? [] : navigator.languages ?? [],
+): Lang {
+  for (const tag of preferred) {
+    const base = tag.split("-")[0].toLowerCase() as Lang;
+    if (SUPPORTED.includes(base)) return base;
+  }
+  return "en";
 }

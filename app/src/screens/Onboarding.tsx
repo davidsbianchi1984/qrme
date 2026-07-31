@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { accountApi, api } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
+import { t as tr, visitorLang } from "../l10n";
 import { oauthApi } from "../api";
 
 type Mode = "signup" | "code" | "signin" | "reset";
@@ -373,15 +374,15 @@ export function Onboarding({ onPublic }: {
             reachable only after signing up, which is the one thing neither
             person should have to do. */}
         <div className="public-links">
-          <p className="muted small">Here about a profile, not for one?</p>
+          <p className="muted small">{tr("pub.invite", visitorLang())}</p>
           <button className="linkish" onClick={() => onPublic("object")}>
-            A profile depicts me
+            {tr("pub.object.title", visitorLang())}
           </button>
           <button className="linkish" onClick={() => onPublic("mark")}>
-            Is this genuine?
+            {tr("pub.tab.mark", visitorLang())}
           </button>
           <p className="muted small">
-            Neither needs an account.
+            {tr("pub.invite.none", visitorLang())}
           </p>
         </div>
       </div>
