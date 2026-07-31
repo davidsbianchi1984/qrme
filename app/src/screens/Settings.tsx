@@ -137,7 +137,11 @@ export function Settings({ onPlans }: {
           <h3>Open on your phone</h3>
           <p className="muted small">{pair.note}</p>
           <div className="pair">
-            <img className="pair-qr" src={getBase() + pair.qr_svg} alt="QR code for the studio URL on this network" />
+            {/* The literal rather than `pair.qr_svg`, which says the same
+                thing: a path built from a response field is invisible to the
+                route audit, and this door counted as missing for as long as
+                it was written that way. */}
+            <img className="pair-qr" src={getBase() + "/pair/qr.svg"} alt="QR code for the studio URL on this network" />
             <div>
               <div className="mono pair-url">{pair.console_url}</div>
               <ol className="pair-steps">{pair.how.map((s) => <li key={s}>{s}</li>)}</ol>

@@ -23,6 +23,7 @@ import { Assist } from "./screens/Assist";
 import { Referrals } from "./screens/Referrals";
 import { Lobby } from "./screens/Lobby";
 import { Audience } from "./screens/Audience";
+import { Beacons } from "./screens/Beacons";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -41,7 +42,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -73,6 +74,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "referrals", label: "Somebody qualified", icon: "🩺" },
   { id: "lobby", label: "In the game", icon: "🎮" },
   { id: "audience", label: "Who follows", icon: "💛" },
+  { id: "beacons", label: "Where people find you", icon: "🔳" },
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
   { id: "plans", label: "Plans", icon: "🎟" },
@@ -159,6 +161,7 @@ export function App() {
         {tab === "referrals" && <Referrals onPlans={toPlans} />}
         {tab === "lobby" && <Lobby onPlans={toPlans} />}
         {tab === "audience" && <Audience onPlans={toPlans} />}
+        {tab === "beacons" && <Beacons onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}

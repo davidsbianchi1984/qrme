@@ -191,14 +191,22 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
                 {!r.active && " · taken down"}
               </div>
             </div>
+            {/* Free to fetch: asking for the picture is not a scan, unlike
+                following the link beside it. */}
+            <img src={getBase() + `/beacons/${r.beacon_id}/qr.svg`}
+                 width={56} height={56} alt="this beacon's QR code" />
             {/* The list response carries no urls, so this is derived — and
                 deliberately labelled "on this deployment", because the
                 published link uses the configured public host and this one
                 uses whatever API the console is pointed at. They are the
                 same route on different hosts, and quietly calling this one
-                "the link" would hand somebody the wrong address to print. */}
-            <a href={`${getBase()}/b/${r.beacon_id}`} target="_blank"
-               rel="noreferrer">open here</a>
+                "the link" would hand somebody the wrong address to print.
+                Written as `getBase() + literal` rather than one template:
+                a template opening with `${...}` is a string the route audit
+                cannot resolve to a path, and this door counted as missing
+                for as long as it was written that way. */}
+            <a href={getBase() + `/b/${r.beacon_id}`} target="_blank"
+               rel="noreferrer">open here (counts as a scan)</a>
             <button onClick={() => remove(r.id)}>Take down</button>
           </div>
         ))}

@@ -361,6 +361,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/166-somebody-qualified.svg"><img src="docs/screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
     <td align="center" width="33%"><a href="docs/screens/167-in-the-game-with-you.svg"><img src="docs/screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
     <td align="center" width="33%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/169-where-people-find-you.svg"><img src="docs/screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
   </tr>
 </table>
 
@@ -1766,6 +1767,66 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 169 — where people find you
+
+Six routes: the two scan surfaces, the two QR images, and the platform beacon
+that is neither.
+
+**Two codes that look identical and go opposite ways.** A placed beacon brings
+a stranger *here* — the profile answers them on QRME. A platform beacon sends
+them *away*, to an Instagram or Mastodon account that already exists; only
+where there is no handle to build a link from does it fall back to a QRME
+summon page. The pictures are indistinguishable, so the screen says which is
+which. Scanning one to find out is not a reasonable way to learn it.
+
+**Looking at a code is free; opening it is not.** Every scan surface
+increments the count — the page, its JSON twin, and the older `/summon?ref=`
+— because the server cannot tell an owner checking their own sticker from a
+stranger who found it. Only the QR image itself is free. A `?preview=1` would
+fix the inconvenience and ruin the number: the count is the only evidence a
+sticker on a wall is working at all. So the console renders pictures freely,
+never opens a scan page on its own, and labels every scan link with what it
+costs.
+
+A connection has a direction and the two never share a row: `collect` pulls an
+account's content in, `publish` runs the profile out, so a read-only import can
+never also post. Only `publish` has a beacon, and the list says so by giving
+`beacon: null` — the button is absent rather than present and refused.
+
+#### The audit was blind to the two requests with no function call in them
+
+An `<img src>` is a fetch. An `<a href>` is a fetch. Neither passes through
+`req()` on the way, and the route extractor could see neither — so
+`/b/{id}` and `/beacons/{id}/qr.svg` sat on the doorless backlog while
+Placements had been rendering both since it was written. That is the same
+false-positive failure the nested-template bug produced a few rounds ago,
+arriving from a different direction: a guard that invents work fails more
+quietly than one that misses some.
+
+Worse, the exemption list had absorbed three of them. `/pair/qr.svg`,
+`/desks/{id}/view.webp` and `/desk-beacons/{id}/qr.svg` were all marked
+*"rendered in an `<img src>`, not fetched by the API client"* — an exemption
+made out of a blind spot, which is exactly the shape that stops anybody
+asking. One of the three turned out to have **no door at all**: a desk's view
+frame was never rendered anywhere in the console, so the honesty note attached
+to it — *a sample view; this deployment has no camera on this desk, so the
+frame is not live and is not claimed to be* — was being served to nobody.
+
+The rule the list now holds to: exempt a path because nothing should ever call
+it, never because the audit cannot see the call. Two entries survive — a terms
+page and the click target of a verification email, both places somebody is
+*sent* to from outside.
+
+#### And a link that went nowhere
+
+A desk beacon returned a **relative** `scan_url` while the profile beacon next
+door returned an absolute one. The desk screen rendered it as a link, which
+resolved against the *console's* own origin — so it went nowhere in every
+build where the console is not served by the API, which is every packaged
+build. The QR image had been encoding the absolute URL all along; the JSON
+description of that same code disagreed with it. Both shapes are now asserted
+side by side, which is the only reason they cannot drift apart again quietly.
 
 ### Screen 168 — who follows, and what they pay
 

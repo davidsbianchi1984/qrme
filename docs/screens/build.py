@@ -3519,6 +3519,21 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 169: the codes. Two pictures that look identical and go opposite ways,
+    # and the fact that made the whole screen: there is no way to check a
+    # code without adding to the number you are checking.
+    dict(num=169, title="Where People Find You", sub="Two codes, opposite directions",
+         accent="cyan", tab=16, cards=[
+        dict(icon="qr", color="cyan", k="A placed code",
+             s="brings them here to you"),
+        dict(icon="link", color="amber", k="A platform code",
+             s="sends them somewhere else"),
+        dict(icon="eye", color="green", k="Looking is free",
+             s="opening it counts as a scan",
+             pill=("COUNTS", "warn")),
+        dict(icon="shield", color="brand", k="Collect never posts",
+             s="two rows, never one"),
+    ], button=("Show its code", "brand")),
     dict(num=168, title="Who Follows, And What They Pay", sub="Nothing bills on a timer",
          accent="amber", tab=15, cards=[
         dict(icon="coin", color="amber", k="A period is a press",

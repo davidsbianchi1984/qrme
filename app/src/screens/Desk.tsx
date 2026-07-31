@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  api, type Desk as DeskRow, type DeskBeacon, type DeskGuest,
-  type DeskOverlay, type DeskRing, type LivePerson,
+  api, getBase, type Desk as DeskRow, type DeskBeacon, type DeskGuest,
+  type DeskOverlay, type DeskRing, type DeskScanCard, type LivePerson,
 } from "../api";
 import { Refusal } from "../Refusal";
 
@@ -32,6 +32,7 @@ export function Desk({ onPlans }: {
   const [overlay, setOverlay] = useState<DeskOverlay | null>(null);
   const [who, setWho] = useState<LivePerson | null>(null);
   const [beacons, setBeacons] = useState<DeskBeacon[]>([]);
+  const [card, setCard] = useState<DeskScanCard | null>(null);
 
   const [form, setForm] = useState({
     owner_id: "", display_name: "", trade: "", attestor: "", basis: "",
@@ -158,6 +159,20 @@ export function Desk({ onPlans }: {
                 {who.burned ? " · CLAIM BURNED" : ""}
               </p>
             )}
+            {/* The frame a visitor is shown. It was never rendered anywhere
+                in this console — the whole point of the `feed` block is a
+                picture that carries its own honesty note, and the note was
+                being served to nobody. `live` is false on a deployment with
+                no camera, and the server says so in words rather than
+                letting a sample frame pass for a live one. */}
+            <img src={getBase() + `/desks/${deskId}/view.webp`}
+                 width={240} alt="the view from this desk" />
+            {desk.feed && (
+              <p className="muted small">
+                {desk.feed.live ? "Live." : "Not live."} {desk.feed.note}
+                {desk.feed.watermark && ` · watermark: ${desk.feed.watermark}`}
+              </p>
+            )}
           </div>
 
           <h3>Is anybody there?</h3>
@@ -275,7 +290,30 @@ export function Desk({ onPlans }: {
                 <span className="muted">{b.scans} scan{b.scans === 1 ? "" : "s"}</span>
                 {!b.active && <span className="muted">retired</span>}
               </div>
-              <a href={b.scan_url} target="_blank" rel="noreferrer">{b.scan_url}</a>
+              {/* The picture to print. Fetching it is free; following the
+                  link below it is not — the server counts that as a scan,
+                  because it cannot tell the owner from a stranger. */}
+              <img src={getBase() + `/desk-beacons/${b.id}/qr.svg`}
+                   width={120} height={120} alt="this desk code's QR" />
+              {/* Derived rather than taken from `b.scan_url`, which says the
+                  same thing: the literal is what the route audit can read.
+                  `scan_url` itself was a bare path until this link went to
+                  use it and resolved against the console's own origin — it
+                  is absolute now, and describes the address the printed code
+                  actually carries rather than this deployment's. */}
+              <a href={getBase() + `/d/${b.id}`} target="_blank"
+                 rel="noreferrer">open it here (counts as a scan)</a>
+              <span className="muted small">Printed: {b.scan_url}</span>
+              {/* What a native app receives when its camera recognises this
+                  code — the same scan as the page, shaped for drawing an
+                  overlay in place. Offered because seeing it is the only way
+                  to check what a scanner will actually be told. It counts as
+                  a scan for the same reason the page does. */}
+              <button disabled={busy}
+                onClick={() => run(async () =>
+                  setCard(await api.deskScanCard(b.id)))}>
+                What a scanner sees
+              </button>
               {b.active && (
                 <button disabled={busy}
                   onClick={() => run(() =>
@@ -297,6 +335,33 @@ export function Desk({ onPlans }: {
               Place a beacon
             </button>
           </div>
+
+          {card && (
+            <div className="card">
+              <h4>What a scanner sees</h4>
+              <p className="small">
+                {card.display_name} — {card.trade}
+                {card.location && ` · ${card.location}`}
+                <br />
+                {/* The line that makes the whole desk feature honest, and
+                    the one a scanner is shown first. */}
+                <strong>{card.designation}</strong> · {card.presence}
+              </p>
+              {card.age_wall && (
+                <p className="muted small">
+                  This desk is rated, so a scan lands on the age wall. A
+                  sticker carries no token that could clear it — that is the
+                  right answer rather than a gap.
+                </p>
+              )}
+              <p className="muted small">
+                Attested by {card.attestation.attestor}:{" "}
+                {card.attestation.basis}. {card.attestation.note}
+              </p>
+              <p className="muted small">{card.feed.note}</p>
+              <p className="muted small">That read counted as a scan.</p>
+            </div>
+          )}
         </>
       )}
     </section>

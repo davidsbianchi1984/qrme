@@ -160,6 +160,13 @@ const CHROME: Table = {
     ja: "フォロワー", zh: "谁在关注", hi: "कौन फ़ॉलो करता है",
     ar: "من يتابع",
   },
+  "nav.beacons": {
+    en: "Where people find you", es: "Dónde te encuentran",
+    fr: "Où l'on vous trouve", de: "Wo man dich findet",
+    pt: "Onde te encontram", it: "Dove ti trovano",
+    ja: "見つけられる場所", zh: "别人从哪里找到你",
+    hi: "लोग आपको कहाँ पाते हैं", ar: "أين يجدونك",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

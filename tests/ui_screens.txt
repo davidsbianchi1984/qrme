@@ -60,6 +60,7 @@ Assist          165
 Referrals       166
 Lobby           167
 Audience        168
+Beacons         169
 Placements      162
 Onboarding      unaudited
 Org             unaudited

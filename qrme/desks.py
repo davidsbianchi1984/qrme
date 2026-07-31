@@ -29,9 +29,21 @@ and the owner sees the ring when they get back.
 
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
 
 from . import auth, db
+
+
+def _public_base() -> str:
+    """Where this deployment is reachable from outside.
+
+    Same environment variable the summon beacons read, deliberately: a desk
+    code and a profile code are printed by the same person onto the same wall,
+    and two sources of truth for "where is this deployment" is how one of them
+    ends up pointing at localhost on a sticker.
+    """
+    return os.environ.get("QRME_PUBLIC_URL", "https://qrme.app").rstrip("/")
 
 # attended: the person is here now. away: signed on, not at the desk — the
 # state the bell exists for. closed: not taking callers at all.
@@ -415,7 +427,17 @@ def beacon(beacon_id: str) -> dict | None:
         "scans": row["scans"],
         "active": bool(row["active"]),
         "created_at": row["created_at"],
-        "scan_url": f"/d/{row['id']}",
+        # Absolute, because `scan_url` is a description of what the printed QR
+        # encodes — and the QR encodes an absolute URL, because a code on a
+        # shop door has no origin to be relative to. Returning a bare path
+        # here made the two disagree, and a console rendering it as a link
+        # resolved it against its *own* origin: the desk screen's "open the
+        # scan page" link went nowhere every time the console was served from
+        # anywhere but the API, which is every packaged build. The summon
+        # beacon next door has always returned this absolute.
+        "scan_url": f"{_public_base()}/d/{row['id']}",
+        # Still a path: this one is fetched as an `<img src>` against the API
+        # the client is already talking to, not printed on anything.
         "qr_svg": f"/desk-beacons/{row['id']}/qr.svg",
     }
 

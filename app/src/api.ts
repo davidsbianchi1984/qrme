@@ -1843,6 +1843,17 @@ export type DockFace = {
   never: string[];
 };
 
+/** The frame a visitor sees, and the sentence that keeps it honest.
+ *  `live` is false wherever no camera is attached, and `note` says so in
+ *  words — a sample view is never allowed to pass for a live one. */
+export type DeskFeed = {
+  url: string;
+  live: boolean;
+  note: string;
+  ai: boolean;
+  watermark: string | null;
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -1859,7 +1870,10 @@ export type Desk = {
   ai?: unknown;
   age_wall?: unknown;
   bell?: unknown;
-  feed?: unknown;
+  /** Typed rather than `unknown` because the console renders it: the note is
+   *  the whole reason the block exists, and a picture served without it
+   *  reads as a live camera on a deployment that has none. */
+  feed?: DeskFeed;
   join?: unknown;
   room_id?: string | null;
   last_seen?: string | null;
@@ -1919,9 +1933,67 @@ export type DeskBeacon = {
   location?: string | null;
   active: boolean;
   scans: number;
+  /** Absolute. It describes what the printed code encodes, and a code on a
+   *  shop door has no origin to be relative to. It was a bare path until the
+   *  beacons screen went to link it and found the link resolving against the
+   *  console's own origin. */
   scan_url: string;
+  /** A path on this API — `<img src>` it against `getBase()`. Unlike the
+   *  scan surfaces, fetching this does **not** count as a scan. */
   qr_svg: string;
   created_at: string;
+};
+
+/** What a scanning app receives, as opposed to the page a browser gets.
+ *  The same scan either way — including the count, which goes up for both. */
+export type DeskScanCard = {
+  desk_id: string;
+  display_name: string;
+  trade: string;
+  location: string | null;
+  presence: string;
+  /** "Live person — not AI", or its opposite. The first thing a scanner is
+   *  told, and the sentence the whole desk feature rests on. */
+  designation: string;
+  human: boolean;
+  ai: boolean;
+  age_wall: boolean;
+  rated: boolean;
+  attestation: {
+    attestor: string; basis: string; attested_at: string;
+    signed: boolean; signature_id: string | null; note: string;
+  };
+  feed: DeskFeed;
+  beacon: { id: string; label: string; location: string | null };
+};
+
+/** One direction of one platform. `collect` pulls content in, `publish`
+ *  runs the profile out; they are separate rows so an import can never post.
+ *  `beacon` is null on a `collect` row, which is how a screen knows not to
+ *  offer a QR that would be refused. */
+export type SocialConnection = {
+  id: string;
+  profile_id: string;
+  platform: string;
+  direction: string;
+  handle: string | null;
+  scope: string[];
+  status: string;
+  collected: number;
+  published: number;
+  beacon: string | null;
+};
+
+export type SocialBeacon = {
+  connection: string;
+  platform: string;
+  handle: string | null;
+  /** Where the code actually sends somebody: the account's page on the
+   *  platform, or — with no handle to build one from — a QRME summon link.
+   *  Worth showing, because the two are very different destinations and the
+   *  picture looks identical. */
+  presence_url: string;
+  qr_svg: string;
 };
 
 export const api = {
@@ -2294,6 +2366,11 @@ export const api = {
   placeDeskBeacon: (deskId: string, body: { label: string; location?: string },
     token: string) =>
     req<DeskBeacon>(`/desks/${deskId}/beacons`, { method: "POST", body, token }),
+  // No token: a scan is a stranger with a camera, and this is that same
+  // scan shaped for an app rather than a browser. It increments the count
+  // like any other — there is no read of a beacon that doesn't.
+  deskScanCard: (beaconId: string) =>
+    req<DeskScanCard>(`/d/${beaconId}/card`),
   pickUpDeskBeacon: (beaconId: string, token: string) =>
     req<{ picked_up: boolean }>(`/desk-beacons/${beaconId}`,
       { method: "DELETE", token }),
@@ -3337,6 +3414,40 @@ export const api = {
   // `sales(token)` next door reads the seller's side of the same ledger;
   // this is the buyer's. Two names because they are two questions.
   myOrders: (token: string) => req<{ orders: Order[] }>("/orders", { token }),
+
+  // ---------------------------------------------------------------------
+  // Where people find you: a platform connection, and the code that points
+  // at it.
+  //
+  // A connection has a **direction**, and the two never overlap: `collect`
+  // pulls an account's content in to grow the profile, `publish` runs the
+  // profile out on the platform. Separate rows on purpose, so a read-only
+  // import can never also post. Only a `publish` connection has a beacon —
+  // asking a `collect` one for its QR is a 409, and the list says which is
+  // which by giving `beacon: null`, so a screen never has to find out by
+  // being refused.
+  //
+  // The QR here points at the **platform**, not at QRME: `presence_url` is
+  // the account's own page. Only when there is no handle does it fall back
+  // to a QRME summon link. That is the opposite of a placed beacon, whose
+  // code always lands on QRME — the same picture, two different
+  // destinations, which is worth saying on the screen rather than leaving
+  // somebody to scan it and find out.
+  // ---------------------------------------------------------------------
+
+  socialConnections: (profileId: string, token: string) =>
+    req<SocialConnection[]>(`/profiles/${profileId}/social`, { token }),
+  connectSocial: (profileId: string,
+                  body: { platform: string; direction: string;
+                          handle?: string; scope?: string[] },
+                  token: string) =>
+    req<SocialConnection>(`/profiles/${profileId}/social`,
+      { method: "POST", body, token }),
+  disconnectSocial: (cid: string, token: string) =>
+    req<{ disconnected: boolean }>(`/social/${cid}`,
+      { method: "DELETE", token }),
+  socialBeacon: (cid: string) =>
+    req<SocialBeacon>(`/social/${cid}/beacon`),
 };
 
 /** Open the WebAuthn ceremony.

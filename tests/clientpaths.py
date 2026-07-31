@@ -60,6 +60,10 @@ class CallForm:
     verb: str | None = None
     verb_in_body: re.Pattern[str] | None = None
     default: str = "GET"
+    #: The bracket pair enclosing the call's arguments. Parentheses for every
+    #: function call, braces for a JSX attribute — `src={…}` is a request the
+    #: browser makes with no function anywhere in it.
+    delims: str = "()"
 
 
 @dataclass(frozen=True)
@@ -104,7 +108,19 @@ CONSOLE = Language(
      # ceremony has to be one: it is served from the relying party's own
      # origin because an opaque origin has no `rpId` to match. The audit
      # counted it doorless in every client that opens it.
-     CallForm(re.compile(r"\bwindow\.open\s*\("), verb="GET"),),
+     CallForm(re.compile(r"\bwindow\.open\s*\("), verb="GET"),
+     # The two requests with no function call in them at all. A QR code is an
+     # `<img src>` and a scanned page is an `<a href>`; the browser fetches
+     # both, and neither passes through `req()` or `fetch()` on the way. The
+     # audit could not see either, which is why `/beacons/{id}/qr.svg` and
+     # `/b/{id}` sat on the doorless backlog while Placements had been
+     # rendering both since it was written — the same false-positive failure
+     # the nested-template bug produced, from a different direction.
+     #
+     # Braces rather than parentheses: a JSX attribute is not a call, and
+     # scanning it for `(` finds the wrong span or none.
+     CallForm(re.compile(r"\bsrc=\{"), verb="GET", delims="{}"),
+     CallForm(re.compile(r"\bhref=\{"), verb="GET", delims="{}"),),
 )
 # Swift's `\(…)` may hold one level of nested parentheses — `\(f(x))` — which is
 # as deep as these clients go.
@@ -276,14 +292,18 @@ def _usable(path: str) -> bool:
     return (path != "/" and path.startswith("/") and bool(_URLSAFE.match(path)))
 
 
-def _call_body(text: str, open_paren: int) -> str:
-    """The text between a call's parentheses, respecting nesting and strings.
+def _call_body(text: str, opener: int, delims: str = "()") -> str:
+    """The text between a call's brackets, respecting nesting and strings.
 
     Scanning forward to some delimiter instead is what made the first version of
     this wrong: it let a *neighbouring* call's `method:` be read as this call's,
     because the neighbour wrote its path in a form the scan skipped over.
+
+    `delims` is the bracket pair, because not every request is a function call:
+    a JSX `src={…}` fetches a URL with no callee at all.
     """
-    depth, i, n, quote = 0, open_paren, len(text), None
+    lo, hi = delims
+    depth, i, n, quote = 0, opener, len(text), None
     while i < n:
         c = text[i]
         if quote:
@@ -294,12 +314,12 @@ def _call_body(text: str, open_paren: int) -> str:
                 quote = None
         elif c in "\"'`":
             quote = c
-        elif c == "(":
+        elif c == lo:
             depth += 1
-        elif c == ")":
+        elif c == hi:
             depth -= 1
             if depth == 0:
-                return text[open_paren + 1:i]
+                return text[opener + 1:i]
         i += 1
     return ""
 
@@ -320,7 +340,7 @@ def calls(lang: Language) -> dict[tuple[str, str], tuple[str, str]]:
         text = _COMMENTS.sub("", f.read_text(encoding="utf-8"))
         for form in lang.calls:
             for m in form.opener.finditer(text):
-                body = _call_body(text, m.end() - 1)
+                body = _call_body(text, m.end() - 1, form.delims)
                 if not body:
                     continue
                 lit = lang.literal.search(body)
@@ -386,19 +406,27 @@ def refused(app, lang: Language) -> list[str]:
     return out
 
 
-# Paths served for a browser or a camera rather than for an API client: a QR
-# image used as an `<img src>`, a landing page reached by scanning or by
-# following a link, a form post a provider redirects into. No client builds
-# these, and none should.
+# Paths nothing in this product ever asks for: a page somebody is *sent* to
+# from outside — a link in an email, a provider's redirect back. No client
+# builds these, and none should.
+#
+# This list used to be longer, and the extra entries were a different thing
+# wearing the same coat. `/pair/qr.svg`, `/desks/{id}/view.webp` and
+# `/desk-beacons/{id}/qr.svg` were all exempted as "rendered in an `<img
+# src>`, not fetched by the API client" — but an `<img src>` *is* a fetch,
+# and a door. They were on this list because the extractor could not see
+# them, which made an exemption out of a blind spot: the guard stopped
+# asking, and one of the three turned out to have no door at all. A desk's
+# view frame was never rendered anywhere in the console, and the honesty
+# note attached to it — *not live, and not claimed to be* — was therefore
+# being shown to nobody.
+#
+# So the rule this list now holds to: exempt a path because nothing should
+# ever call it, never because the audit cannot see the call.
 NOT_A_CLIENT_CALL = (
     "/terms",
-    "/pair/qr.svg",
     "/verify-email/click",
     "/medical-id/{token}/qr.svg",
-    # Rendered in an `<img src>`, not fetched by the API client. A desk's
-    # view and a desk beacon's QR are pictures the browser asks for directly.
-    "/desks/{desk_id}/view.webp",
-    "/desk-beacons/{beacon_id}/qr.svg",
 )
 
 

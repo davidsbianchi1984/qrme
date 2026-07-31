@@ -164,6 +164,22 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="beacons", chapter="Out in the world",
+         title="Where people find you",
+         what="Two kinds of QR code, and they look identical. A placed "
+              "beacon brings a stranger *here* — the profile answers them "
+              "on QRME. A platform beacon sends them *away*, to an account "
+              "that already exists; only with no handle to build a link "
+              "from does it fall back to a QRME page. Connecting a platform "
+              "has a direction, and the two never share a row: collect "
+              "pulls that account's content in, publish runs the profile "
+              "out, so a read-only import can never also post. And asking "
+              "for a code's picture is free, but opening the page it points "
+              "to counts as a scan — there is no preview that does not, "
+              "because the server cannot tell you from a stranger.",
+         screens=(169,),
+         try_it="Connect a platform to publish, show its code, and read "
+                "where scanning it would actually send somebody."),
     dict(key="audience", chapter="Out in the world",
          title="Who follows, and what they pay",
          what="Following is free; paying is a separate tier and there is no "

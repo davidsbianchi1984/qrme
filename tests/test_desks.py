@@ -396,7 +396,15 @@ def test_a_desk_can_be_left_behind_as_a_printed_code(client):
     body = placed.json()
     assert body["desk_id"] == created["desk_id"]
     assert body["active"] is True and body["scans"] == 0
-    assert body["scan_url"] == f"/d/{body['id']}"
+    # Absolute, and it was not always. `scan_url` describes what the printed
+    # code encodes — and the code encodes an absolute URL, because a sticker
+    # on a shop door has no origin to be relative to. A bare path here made
+    # the two disagree, and a console rendering it as a link resolved it
+    # against its own origin, which is not the API's in any packaged build.
+    assert body["scan_url"].startswith("http")
+    assert body["scan_url"].endswith(f"/d/{body['id']}")
+    # Still a path: fetched against the API this client is already talking
+    # to, rather than printed on anything.
     assert client.get(body["qr_svg"]).headers["content-type"] == "image/svg+xml"
 
 
