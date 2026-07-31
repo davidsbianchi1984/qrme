@@ -258,6 +258,176 @@ export type Membership = {
   storage: StoragePosture;
 };
 
+// ---------------------------------------------------------------------
+// Robot bodies.
+// ---------------------------------------------------------------------
+
+export type RobotModel = {
+  model: string; label: string; maker: string; kind: string;
+  capabilities: string[];
+  llm_capable: boolean;
+};
+
+/** What binding a body answers with. Note it is **not** what the list
+ *  returns — the two shapes differ, and the extra fields here are the ones
+ *  worth showing once, at the moment of binding. */
+export type BoundRobot = {
+  id: string; profile_id: string;
+  model: string; label: string; maker: string; kind: string;
+  name: string;
+  llm_provider: string;
+  /** What this *model* of body accepts. Not a history, and not what it has
+   *  learned — see the block above `robotCatalogue`. */
+  commands: string[];
+  /** The claim the whole embodiment rests on: the same personality, the
+   *  same memory, the same voice, whatever it is speaking through. */
+  identity: {
+    signature: string; name: string;
+    invariant_across: string; guarantee: string;
+  };
+  note: string;
+};
+
+/** The list shape. Carries `status` and `created_at`, which the bind
+ *  response does not, and drops the catalogue detail, which it does. */
+export type RobotRow = {
+  id: string; profile_id: string;
+  model: string; name: string;
+  llm_provider: string;
+  status: string;
+  created_at: string;
+  commands: string[];
+};
+
+/** A task module installed from a pack. `procedure` is rendered verbatim:
+ *  every one of them names what the body will *not* do — "reminders only:
+ *  never dispense", "companionship, not care" — and that is the sentence
+ *  somebody pointing a robot at a relative needs to read. */
+export type RobotSkill = {
+  task: string; title: string; procedure: string;
+  pack_id: string; pack_title: string;
+};
+
+export type RobotCommandResult = {
+  robot_id: string; command: string;
+  status: string; action: string;
+  arg: string | null;
+  said?: string;
+};
+
+export type RobotCommandEntry = {
+  id: string; robot_id: string;
+  command: string; arg: string | null;
+  result: Record<string, unknown>;
+  created_at: string;
+};
+
+export type SteeringDial = {
+  name: string; group: string; label: string;
+  low: string; high: string;
+  default: number; min: number; max: number;
+  adult_only: boolean;
+};
+
+export type RobotSteering = {
+  subject: string; subject_id: string;
+  dials: SteeringDial[];
+  values: Record<string, number>;
+  /** What the dials actually do to a body, derived rather than stored:
+   *  pace becomes motion_eagerness, autonomy becomes initiative,
+   *  assertiveness becomes firmness. Showing it is the difference between
+   *  a slider and an explanation. */
+  behavior_profile: Record<string, number>;
+};
+
+/** The PUT answers without `dials` — values and the derived profile only. */
+export type RobotSteeringSet = {
+  subject: string; subject_id: string;
+  values: Record<string, number>;
+  behavior_profile: Record<string, number>;
+};
+
+// ---------------------------------------------------------------------
+// Rated placement: marketing an adult-mode profile at an adult venue.
+// ---------------------------------------------------------------------
+
+export type Venue = {
+  key: string; name: string;
+  url: string | null;
+  kind: string;
+  /** `profile`, `beacon`, or both — what this venue will actually carry. */
+  hosts: string[];
+  blurb: string;
+  age_wall: boolean;
+  /** Rendered verbatim on the screen. The same sentence on every venue,
+   *  and the point of the feature: the wall does not move to the venue. */
+  note: string;
+};
+
+export type PlacementMade = {
+  placement_id: string;
+  venue: { key: string; name: string; url: string | null; hosts: string[] };
+  beacon_id: string;
+  /** The JSON surface existing clients read. */
+  summon_url: string;
+  /** What the printed QR encodes and where a phone camera lands. This is
+   *  the one to publish; they are easy to mix up. */
+  scan_url: string;
+  /** A path on this API, not the markup — `<img src>` it. */
+  qr_svg: string;
+  /** Null until the profile has claimed one. */
+  handle: string | null;
+  rated: boolean;
+  note: string;
+};
+
+/** The list shape, which carries the counts and **not** the urls or the QR
+ *  path. Those are derivable from `beacon_id`, and a screen that assumed
+ *  the create shape came back here would render blanks. */
+export type PlacementRow = {
+  id: string; venue: string; venue_name: string;
+  beacon_id: string;
+  label: string;
+  created_at: string;
+  scans: number;
+  active: boolean;
+};
+
+export type PlacementAnalytics = {
+  profile_id: string;
+  venues: {
+    placement_id: string; venue: string; venue_name: string;
+    label: string; active: boolean;
+    scans: number;
+    /** The split that matters: `walled` reached the age wall, `verified`
+     *  got through it. */
+    walled: number; verified: number;
+    by_day: { day: string; scans: number }[];
+  }[];
+  /** Scans that arrived at the profile without going through a placement. */
+  direct: { walled: number; verified: number };
+  funnel: {
+    resolutions: number; verified_views: number; unique_chatters: number;
+    verified_rate: number;
+    /** **Null**, not zero, when nothing has got through the wall yet —
+     *  there is no rate to state. A screen calling `.toFixed()` on it
+     *  without checking prints nonsense. */
+    chat_rate: number | null;
+  };
+};
+
+export type PlacementCustody = Record<string, unknown>;
+
+export type PlacementRemoved = {
+  placement_id: string;
+  removed: boolean;
+  beacon_id: string;
+  /** False afterwards: the beacon is deactivated, not deleted, so a QR
+   *  already printed at the venue stops resolving rather than pointing
+   *  somewhere new. */
+  beacon_active: boolean;
+};
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},
@@ -2269,5 +2439,91 @@ export const api = {
   // work" are the two things a person must never confuse here.
   cancelMembership: (accountId: string, token: string) =>
     req<Membership>(`/memberships/${accountId}`,
+      { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // A body to speak through.
+  //
+  // The native shells already drive the catalogue, the binding and the
+  // command button; the web console never had any of it, so the three
+  // routes that say what a body has *become* — its steering, what it has
+  // learned, and what it has been told to do — had no caller anywhere.
+  //
+  // Read the three list-shaped things carefully, because two of them are
+  // named almost identically and mean different things:
+  //
+  //   robot.commands            what this model of body accepts at all
+  //   GET /robots/{id}/commands the audit log of what it was told to do
+  //   GET /robots/{id}/skills   installed task modules, which *extend* the
+  //                             allowlist above with new verbs
+  //
+  // A screen built from the route names alone would show the log where the
+  // buttons belong.
+  // ---------------------------------------------------------------------
+
+  robotCatalogue: () => req<{ robots: RobotModel[] }>("/robotics/catalog"),
+  robots: (profileId: string, token: string) =>
+    req<RobotRow[]>(`/profiles/${profileId}/robots`, { token }),
+  bindRobot: (profileId: string, body: { name: string; model: string },
+              token: string) =>
+    req<BoundRobot>(`/profiles/${profileId}/robots`,
+      { method: "POST", body, token }),
+  // Unbinds the body from the profile. The name follows the response —
+  // `{id, unbound: true}` — rather than the HTTP verb, because "delete my
+  // robot" and "stop this profile speaking through it" are different
+  // enough to be worth not confusing on a button.
+  unbindRobot: (robotId: string, token: string) =>
+    req<{ id: string; unbound: boolean }>(`/robots/${robotId}`,
+      { method: "DELETE", token }),
+
+  commandRobot: (robotId: string, body: { command: string; arg?: string },
+                 token: string) =>
+    req<RobotCommandResult>(`/robots/${robotId}/command`,
+      { method: "POST", body, token }),
+  robotCommandLog: (robotId: string, token: string) =>
+    req<RobotCommandEntry[]>(`/robots/${robotId}/commands`, { token }),
+  robotSkills: (robotId: string, token: string) =>
+    req<RobotSkill[]>(`/robots/${robotId}/skills`, { token }),
+
+  robotSteering: (robotId: string, token: string) =>
+    req<RobotSteering>(`/robots/${robotId}/steering`, { token }),
+  // `values`, not `dials` — driven, and worth saying: the request model
+  // takes `values` with a default of `{}`, so a body keyed `dials` is
+  // accepted, ignored, and answered 200 with nothing changed. There is no
+  // error to notice.
+  setRobotSteering: (robotId: string, values: Record<string, number>,
+                     token: string) =>
+    req<RobotSteeringSet>(`/robots/${robotId}/steering`,
+      { method: "PUT", body: { values }, token }),
+
+  // ---------------------------------------------------------------------
+  // Where a rated profile is marketed.
+  //
+  // The venue catalogue is public and structural; the age wall never moves
+  // to the venue. Every entry carries that sentence and the screen renders
+  // it verbatim, because it is the whole argument for the feature existing:
+  // a rated profile can be advertised anywhere and still only resolves
+  // through QRME's own 18+ wall.
+  // ---------------------------------------------------------------------
+
+  venues: () => req<Venue[]>("/venues"),
+  placements: (profileId: string, token: string) =>
+    req<PlacementRow[]>(`/profiles/${profileId}/placements`, { token }),
+  placeAtVenue: (profileId: string, body: { venue: string; label?: string },
+                 token: string) =>
+    req<PlacementMade>(`/profiles/${profileId}/placements`,
+      { method: "POST", body, token }),
+  placementAnalytics: (profileId: string, token: string) =>
+    req<PlacementAnalytics>(`/profiles/${profileId}/placements/analytics`,
+      { token }),
+  // 409s with an operator sentence when the deployment has no vault. That
+  // is a posture to report, not a failure to apologise for.
+  placementCustody: (profileId: string, token: string) =>
+    req<PlacementCustody>(`/profiles/${profileId}/placements/custody`,
+      { token }),
+  // Deactivates the beacon rather than deleting it: a QR already printed
+  // at a venue stops resolving, and the response says so.
+  removePlacement: (placementId: string, token: string) =>
+    req<PlacementRemoved>(`/placements/${placementId}`,
       { method: "DELETE", token }),
 };

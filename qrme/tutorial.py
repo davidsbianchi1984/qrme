@@ -164,6 +164,19 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="placement", chapter="Out in the world",
+         title="Marketing a rated profile",
+         what="An adult-mode profile can be advertised at an adult venue — a "
+              "creator platform, a directory — as a link or a printed code. "
+              "The venue never becomes the gate: every summon of a rated "
+              "profile resolves through QRME's own 18+ age wall, wherever the "
+              "code or the handle was found. Taking a placement down "
+              "deactivates the code rather than repointing it, so anything "
+              "already printed stops working instead of leading somewhere "
+              "new. You are shown counts and rates; nobody who scans is ever "
+              "identified.",
+         screens=(162,),
+         try_it="Open Where it is marketed and read the venue note."),
     dict(key="social", chapter="People", title="Friends, pages and the feed",
          what="A friends list, a page you build yourself in real HTML, and a "
               "feed that tells you why each thing is in front of you.",
@@ -311,6 +324,19 @@ LESSONS: tuple[dict, ...] = (
               "an opinion about footage nobody showed it.",
          screens=(155,),
          try_it="Open a party and read 'What a profile in here knows'."),
+    dict(key="bodies", chapter="Working", title="A body to speak through",
+         what="Bind a robot and the profile speaks through it — the same "
+              "personality, the same memory, the same voice, in a different "
+              "form. Three lists here look alike and are not: what the body "
+              "accepts, what it has been told to do, and what it has learned "
+              "from an installed task pack. Each learned task carries the "
+              "sentence naming what it will refuse — reminders only and never "
+              "dispensing, company on a walk and never physical support — and "
+              "that limit is the part worth reading before you point one at "
+              "somebody. Steering shapes how it comes across and never what "
+              "it may be told to do.",
+         screens=(163,),
+         try_it="Bind a body, then tell it to tidy."),
     dict(key="identity", chapter="Being yourself", title="Who this profile is",
          what="You may hold as many profiles as you like, and any of them may "
               "be anonymous. At most one may be verified — because the badge "

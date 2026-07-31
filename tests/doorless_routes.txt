@@ -1,12 +1,10 @@
 DELETE /comments/{comment_id}
 DELETE /gaming/sessions/{session_id}/lobby
 DELETE /handoffs/{handoff_id}
-DELETE /placements/{placement_id}
 DELETE /profiles/{profile_id}/friends/{friend_id}
 DELETE /profiles/{profile_id}/marketplace
 DELETE /profiles/{profile_id}/messages/{message_id}
 DELETE /profiles/{profile_id}/wearables/{name}
-DELETE /robots/{robot_id}
 DELETE /{kind}/{subject_id}/subscribe
 GET /agent/lights
 GET /auth/oauth/{provider}/callback
@@ -32,9 +30,6 @@ GET /profiles/{profile_id}/embedding/{interactor_id}
 GET /profiles/{profile_id}/embodiment-consistency
 GET /profiles/{profile_id}/embodiments
 GET /profiles/{profile_id}/engagement/{interactor_id}
-GET /profiles/{profile_id}/placements
-GET /profiles/{profile_id}/placements/analytics
-GET /profiles/{profile_id}/placements/custody
 GET /profiles/{profile_id}/reviews
 GET /profiles/{profile_id}/sources
 GET /profiles/{profile_id}/specialists
@@ -44,16 +39,12 @@ GET /profiles/{profile_id}/wearables
 GET /providers
 GET /referrals/match
 GET /referrals/{referral_id}
-GET /robots/{robot_id}/commands
-GET /robots/{robot_id}/skills
-GET /robots/{robot_id}/steering
 GET /signatures/ceremony
 GET /signatures/{sig_id}/certificate
 GET /social/{cid}/beacon
 GET /social/{cid}/qr.svg
 GET /subscriptions
 GET /surfaces/{surface}/{surface_id}/skill-grants
-GET /venues
 GET /watermarks/{watermark_id}
 GET /{kind}/{subject_id}/gifts
 GET /{kind}/{subject_id}/subscribers
@@ -77,7 +68,6 @@ POST /profiles/{profile_id}/license/{grant_id}/derive
 POST /profiles/{profile_id}/marketplace
 POST /profiles/{profile_id}/media
 POST /profiles/{profile_id}/perceive
-POST /profiles/{profile_id}/placements
 POST /profiles/{profile_id}/proactive/{interactor_id}
 POST /profiles/{profile_id}/reviews
 POST /profiles/{profile_id}/sources
@@ -97,4 +87,3 @@ PUT /interactors/{interactor_id}/quiet-hours
 PUT /profiles/{profile_id}/experience
 PUT /profiles/{profile_id}/specialists
 PUT /profiles/{profile_id}/steering
-PUT /robots/{robot_id}/steering

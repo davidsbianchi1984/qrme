@@ -218,6 +218,12 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "plans": ("price", "pricing", "cost", "how much", "plan", "plans",
               "subscription", "subscribe", "upgrade", "basic", "pro",
               "billing", "what do i get"),
+    "bodies": ("robot", "robots", "a body", "humanoid", "android",
+               "my robot", "bind a robot", "embodiment", "speak through",
+               "task pack", "robot skills"),
+    "placement": ("adult venue", "onlyfans", "fansly", "rated placement",
+                  "place my profile", "market my profile", "18+ venue",
+                  "adult marketing", "where is it advertised"),
     # Kept off `plans`, which answers "what does it cost". Somebody typing
     # these has already been stopped by something and wants to know what the
     # stop means — a different question with its own screen.

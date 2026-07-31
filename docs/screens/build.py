@@ -3515,6 +3515,38 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 163: a body. The middle two cards are the pair that is easy to get
+    # wrong from the route names alone — what the body accepts is one list,
+    # what it was told is another — and the last is the limit that matters
+    # to whoever is standing next to it.
+    dict(num=163, title="A Body To Speak Through", sub="Same person, new form",
+         accent="cyan", tab=15, cards=[
+        dict(icon="robot", color="cyan", k="The same person",
+             s="identity holds across bodies",
+             pill=("BOUND", "good")),
+        dict(icon="finger", color="brand", k="What it accepts",
+             s="this model, plus what it learned"),
+        dict(icon="list", color="amber", k="Everything it was told",
+             s="a body keeps a record"),
+        dict(icon="shield", color="green", k="Steering is manner",
+             s="never what it may be told"),
+    ], button=("Tell it to tidy", "brand")),
+    # 162: rated placement. Every card is a place the age wall does *not*
+    # move to, which is the only reason the feature is defensible. The
+    # third card is the one people get wrong: taking a placement down kills
+    # the code already printed at the venue rather than repointing it.
+    dict(num=162, title="Where It Is Marketed", sub="The wall does not travel",
+         accent="red", tab=15, cards=[
+        dict(icon="lock", color="red", k="Wherever found",
+             s="the 18+ wall still resolves here",
+             pill=("18+", "crit")),
+        dict(icon="grid", color="cyan", k="A link or a printed code",
+             s="the venue carries one or both"),
+        dict(icon="rotate", color="amber", k="Take it down and it dies",
+             s="the printed code stops resolving"),
+        dict(icon="chart", color="green", k="Counts, never people",
+             s="who scanned is never recorded"),
+    ], button=("Place it", "brand")),
     # 161: a refusal, drawn. This is not a tab — it is the card that appears
     # inside whichever screen was refused. It is drawn because the backend
     # builds this refusal as an object for a screen to read, and for a while

@@ -128,6 +128,18 @@ const CHROME: Table = {
     ja: "案内して", zh: "带我熟悉", hi: "मुझे दिखाएँ",
     ar: "جولة تعريفية",
   },
+  "nav.robots": {
+    en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
+    pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",
+    hi: "देह", ar: "الأجساد",
+  },
+  "nav.placements": {
+    en: "Where it is marketed", es: "Dónde se anuncia",
+    fr: "Où c'est diffusé", de: "Wo es beworben wird",
+    pt: "Onde é divulgado", it: "Dove è promosso",
+    ja: "掲載先", zh: "投放位置", hi: "कहाँ प्रचारित",
+    ar: "أين يُعرض",
+  },
   "nav.plans": {
     en: "Plans", es: "Planes", fr: "Formules", de: "Tarife",
     pt: "Planos", it: "Piani", ja: "プラン", zh: "方案",

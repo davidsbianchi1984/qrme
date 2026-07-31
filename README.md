@@ -353,6 +353,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/160-show-me-around.svg"><img src="docs/screens/160-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
     <td align="center" width="33%"><a href="docs/screens/161-not-on-this-plan.svg"><img src="docs/screens/161-not-on-this-plan.svg" width="210" alt="Not On This Plan"></a><br><sub><b>161</b> · Not On This Plan</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/162-where-it-is-marketed.svg"><img src="docs/screens/162-where-it-is-marketed.svg" width="210" alt="Where It Is Marketed"></a><br><sub><b>162</b> · Where It Is Marketed</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/163-a-body-to-speak-through.svg"><img src="docs/screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -1757,6 +1761,57 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screens 162 and 163 — bodies, and where a rated profile is marketed
+
+The last two doorless blocks, and both had a trap that a route signature hides.
+
+**163, bodies.** The native shells already drove the catalogue, the binding and
+a command button, so the routes describing what a body has *become* had no
+caller anywhere. Three list-shaped things here have almost the same name and
+mean different things:
+
+| | is |
+|---|---|
+| `robot.commands` | what this model of body accepts at all — the buttons |
+| `GET /robots/{id}/commands` | the audit log of what it was told to do |
+| `GET /robots/{id}/skills` | task modules from a pack, which **extend** the first list |
+
+A screen built from the route names puts the log where the buttons belong, and
+it typechecks. Each installed skill's `procedure` is rendered verbatim, because
+every one of them names what the body will *not* do — *reminders only: never
+dispense*, *companionship, not care, and never a substitute for human contact*
+— and that limit is the sentence somebody pointing a robot at a relative needs
+to read. `behavior_profile` is drawn beside the dials: pace becomes motion
+eagerness, autonomy becomes initiative, assertiveness becomes firmness. It is
+the difference between a slider and an explanation.
+
+The steering write takes **`values`**, not `dials` — and the request model
+defaults to `{}`, so a body keyed anything else is accepted, ignored, and
+answered `200` with nothing changed. There is no error to notice. The only way
+to find it is to write and read back, which is what the test does.
+
+**162, rated placement.** An adult-mode profile can be advertised at an adult
+venue — a creator platform, a directory — as a link or a printable code. The
+feature is only defensible because of one sentence the backend puts on every
+venue, rendered verbatim and never paraphrased: *every summon of a rated
+profile resolves through QRME's 18+ age wall, regardless of where the QR or
+handle was found*. The wall does not travel. Summarising that to "18+" drops
+the load-bearing half.
+
+Three more things that were only visible by driving it:
+
+- `scan_url` and `summon_url` are **not** interchangeable — the first is where
+  a phone camera lands and what the code encodes, the second is the JSON
+  surface for clients. Publishing the wrong one hands somebody a page of JSON,
+  so the screen labels both;
+- `funnel.chat_rate` is **null, not zero**, until something has got through the
+  wall. `(null).toFixed()` is `"0"` in JavaScript rather than an error, so a
+  screen that did not check would publish a conversion rate nobody measured;
+- taking a placement down **deactivates the beacon rather than deleting it**,
+  so a code already printed at a venue stops resolving instead of being
+  reissued to point somewhere new. That is the safety property, and the screen
+  says it as it happens.
 
 Adding the tab also turned up something only clicking finds: the always-on
 agent-lights widget is fixed to the bottom-left corner, **on top of the
