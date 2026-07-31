@@ -324,6 +324,22 @@ LESSONS: tuple[dict, ...] = (
               "an opinion about footage nobody showed it.",
          screens=(155,),
          try_it="Open a party and read 'What a profile in here knows'."),
+    dict(key="lobby", chapter="Working", title="Who is in the game with you",
+         what="A profile can sit in a lobby beside you as a companion, a "
+              "coach or a spotter. Everything in that lobby observes and "
+              "talks; nothing in it plays — no key, stick or click is ever "
+              "sent to a game, nothing corrects anybody's aim, and no "
+              "synthetic member takes a player slot. More hardware does not "
+              "change it: a console of its own, a second controller on yours, "
+              "a pad paired over Bluetooth and a capture card are all the "
+              "same bot with different plumbing. The roster says which "
+              "members are synthetic, because everyone in a match is owed "
+              "that. And you can read the instruction a synthetic member is "
+              "given, which tells it that some of the others are synthetic "
+              "too — a lobby that reads as friends when it is one player and "
+              "several generated voices is exactly what this prevents.",
+         screens=(167,),
+         try_it="Open a lobby and read what nothing in it will do."),
     dict(key="referral", chapter="Working",
          title="Handing it to somebody qualified",
          what="A profile is not a clinician, and the summary it assembles "

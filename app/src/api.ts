@@ -790,6 +790,75 @@ export type Certificate = {
   standard: string;
 };
 
+// ---------------------------------------------------------------------
+// The lobby.
+// ---------------------------------------------------------------------
+
+export type LobbyVocabulary = {
+  kinds: { kind: string; is: string }[];
+  seats: { role: string; does: string }[];
+  max_synthetic: number;
+  /** Twelve entries, each closing a route somebody would otherwise argue
+   *  for — its own console, a second controller, a Bluetooth pad, a
+   *  capture card. Rendered verbatim: every one is a decision with a
+   *  reason, and "no cheating" is not the same statement. */
+  never: { thing: string; means: string }[];
+  fair_play: string;
+  rules: string[];
+};
+
+export type Seat = {
+  seat_id: string | null;
+  member_kind: string;
+  member_id: string;
+  role: string;
+  does: string;
+  callsign: string | null;
+  synthetic: boolean;
+  is: string;
+  host?: boolean;
+  since: string;
+  seated?: boolean;
+};
+
+export type Lobby = {
+  session_id: string; game: string; platform: string;
+  members: Seat[];
+  people: number; profiles: number; agents: number;
+  synthetic_seats_left: number;
+  maturity: string;
+  fair_play: string;
+};
+
+/** What a synthetic member is told about its own position. The instruction
+ *  says openly that some of the others are synthetic too — a model that
+ *  believes every callsign is a person will address them as people. */
+export type LobbyContext = {
+  game: string;
+  members: { callsign: string | null; role: string; synthetic: boolean }[];
+  people: number;
+  synthetic_here: number;
+  maturity: string;
+  instruction: string;
+};
+
+export type HandoffPackage = {
+  user: string;
+  provider_area: string;
+  sessions: number | null;
+  specialist?: string;
+  specialist_purpose?: string;
+  recent_exchange?: { role: string; content: string }[];
+};
+
+export type HandoffMade = {
+  id: string; provider: string; area: string;
+  token: string;
+  /** True where a vault holds the package. False means it is sitting in
+   *  this deployment's database until somebody revokes it. */
+  sealed: boolean;
+};
+
 export type PlacementRemoved = {
   placement_id: string;
   removed: boolean;
@@ -3119,6 +3188,57 @@ export const api = {
       { method: "POST", body, token }),
   certificate: (signatureId: string) =>
     req<Certificate>(`/signatures/${signatureId}/certificate`),
+
+  // ---------------------------------------------------------------------
+  // A lobby, and the handoff.
+  //
+  // The lobby's whole design is in one sentence it publishes: *everything
+  // in this lobby observes and talks; nothing in it plays*. The `never`
+  // list spells that out twelve ways, each one closing a route somebody
+  // would otherwise argue for — a console of its own, a second controller,
+  // a Bluetooth pad, a capture card. The console renders those rather than
+  // paraphrasing, because each is an argument somebody made.
+  //
+  // The handoff is the *lighter* sibling of a referral: consented rather
+  // than signed, revocable rather than one-time, and purged on revoke. Two
+  // ways to hand a conversation on, and the difference is the point.
+  // ---------------------------------------------------------------------
+
+  lobbyVocabulary: () => req<LobbyVocabulary>("/gaming/lobby/vocabulary"),
+  lobby: (sessionId: string, token: string) =>
+    req<Lobby>(`/gaming/sessions/${sessionId}/lobby`, { token }),
+  // `member_kind`, not `kind`. A player seats only themselves — an id in a
+  // body is a claim, and the route checks it against the token.
+  takeSeat: (sessionId: string,
+             body: { member_kind: string; member_id: string; role: string;
+                     callsign?: string }, token: string) =>
+    req<Seat>(`/gaming/sessions/${sessionId}/lobby`,
+      { method: "POST", body, token }),
+  // A DELETE with a body, like retracting a message: the route has to know
+  // which member is leaving.
+  leaveLobby: (sessionId: string, memberId: string, token: string) =>
+    req<{ id: string; seated: boolean }>(
+      `/gaming/sessions/${sessionId}/lobby`,
+      { method: "DELETE", body: { member_id: memberId }, token }),
+  // What a synthetic member is *told* about its own position — including
+  // that some of the others are synthetic too. Shown to the owner because
+  // a lobby that reads as five friends when it is one player and four
+  // generated voices is the impression this product must not create.
+  lobbyContext: (sessionId: string, token: string) =>
+    req<LobbyContext>(`/gaming/sessions/${sessionId}/lobby/context`,
+      { token }),
+
+  handoff: (body: { interactor_id: string; provider_id: string;
+                    profile_id?: string; consent: boolean }, token: string) =>
+    req<HandoffMade>("/handoffs", { method: "POST", body, token }),
+  openHandoff: (handoffId: string, token: string) =>
+    req<{ id: string; package: HandoffPackage | null }>(
+      `/handoffs/${handoffId}?token=${encodeURIComponent(token)}`),
+  // Revoking purges the package, not just the access. The response says
+  // `revoked`, and a later read 403s.
+  revokeHandoff: (handoffId: string, token: string) =>
+    req<{ id: string; revoked: boolean }>(`/handoffs/${handoffId}`,
+      { method: "DELETE", token }),
 };
 
 /** Open the WebAuthn ceremony.

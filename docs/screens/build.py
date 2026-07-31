@@ -3515,6 +3515,22 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 167: the lobby. The whole design is one sentence, and the cards are
+    # the three ways somebody would try to get around it — a machine of its
+    # own, a second pad, a capture card — plus the instruction the synthetic
+    # member is actually given, which is the only checkable part.
+    dict(num=167, title="In The Game With You", sub="Observes and talks; never plays",
+         accent="green", tab=15, cards=[
+        dict(icon="people", color="green", k="Who is synthetic",
+             s="said per member, not in a note",
+             pill=("OPEN", "good")),
+        dict(icon="finger", color="red", k="No input, ever",
+             s="not one key, stick or click"),
+        dict(icon="shield", color="amber", k="Not with more hardware",
+             s="a second pad is the same bot"),
+        dict(icon="doc", color="cyan", k="What it is told",
+             s="that the others are synthetic too"),
+    ], button=("Open the lobby", "brand")),
     # 166: the referral. Every card is a place where the design chose the
     # more awkward option — a separate read-it-first step, a signature over
     # the bytes rather than a tick, a link that dies on first use, and the

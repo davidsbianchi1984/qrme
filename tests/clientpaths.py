@@ -179,7 +179,7 @@ def normalise(raw: str, lang: Language) -> str:
 
 
 def _spans(raw: str, lang: Language) -> list[tuple[int, int]]:
-    """Every interpolation in `raw`, as (start, end) — nesting included.
+    r"""Every interpolation in `raw`, as (start, end) — nesting included.
 
     The language patterns match one flat interpolation each, which is right
     until somebody nests one. `${tag ? `?tag=${enc(tag)}` : ""}` has an inner

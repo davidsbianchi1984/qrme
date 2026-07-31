@@ -149,6 +149,11 @@ const CHROME: Table = {
     ja: "専門家へ", zh: "转给专业人士", hi: "योग्य व्यक्ति",
     ar: "شخص مؤهل",
   },
+  "nav.lobby": {
+    en: "In the game", es: "En la partida", fr: "Dans la partie",
+    de: "Im Spiel", pt: "Na partida", it: "In partita",
+    ja: "ゲーム中", zh: "对局中", hi: "खेल में", ar: "في اللعبة",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

@@ -359,6 +359,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/164-what-it-is-made-of.svg"><img src="docs/screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
     <td align="center" width="33%"><a href="docs/screens/165-what-it-can-do-for-you.svg"><img src="docs/screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
     <td align="center" width="33%"><a href="docs/screens/166-somebody-qualified.svg"><img src="docs/screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/167-in-the-game-with-you.svg"><img src="docs/screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
   </tr>
 </table>
 
@@ -1764,6 +1765,45 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 167 — who is in the game with you
+
+Eight routes: the gaming lobby, and the handoff.
+
+The lobby's entire design is one sentence it publishes about itself —
+**everything in this lobby observes and talks; nothing in it plays** — and the
+`never` list spells that out twelve ways. The obvious entries are the dull
+ones. The interesting four close routes somebody would otherwise argue for:
+
+- **its own hardware** — *a second machine does not turn a bot into a player;
+  it just moves where the bot is running*;
+- **a second controller** — *the same bot with a shorter cable, and a
+  controller nobody is holding is not a player's*;
+- **a Bluetooth pad** paired to it as an input device;
+- **a capture card** feeding it the picture.
+
+The console renders all twelve verbatim. "No cheating" is not the same
+statement, and shortening an argument to a slogan is how the argument gets
+lost.
+
+The uncomfortable card is the one showing **what a synthetic member is told**.
+The instruction says openly that some of the others in the lobby are synthetic
+too — because a model that believes every callsign is a person addresses them
+as people, and a lobby that reads as five friends when it is one player and
+four generated voices is exactly the impression this product exists to
+prevent. It is shown to the owner because that is the only way to check it.
+
+The handoff turns out to be the **lighter sibling of the referral above**, and
+the pair is worth seeing together:
+
+| | referral | handoff |
+|---|---|---|
+| authorised by | a device signature over the bytes | explicit consent |
+| lifetime | one open, ever | until revoked |
+| on revoke | — | the package is *purged*, not hidden |
+
+Neither substitutes for the other, and a product offering only the heavier one
+would push people to skip it.
 
 ### Screen 166 — handing it to somebody qualified
 
