@@ -41,6 +41,8 @@ export function Market({ onPlans }: {
   const [sales, setSales] = useState<Order[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const [tags, setTags] = useState("");
+  const [blurb, setBlurb] = useState("");
 
   const fail = (e: unknown) => setError(e);
 
@@ -203,6 +205,52 @@ export function Market({ onPlans }: {
             </p>
           </>
         )}
+      </div>
+
+      <div className="card">
+        <h3>Put this profile in the directory</h3>
+        <p className="muted small">
+          Different from a listing: a listing sells one thing, this puts the
+          profile itself where people browsing can find it. Tags are how they
+          find it, and the card shows display information only — never
+          anything from inside the persona.
+        </p>
+        <div className="row">
+          <input value={tags} onChange={(e) => setTags(e.target.value)}
+                 placeholder="tags, comma separated" style={{ flex: 1 }} />
+          <input value={blurb} onChange={(e) => setBlurb(e.target.value)}
+                 placeholder="a line about it" style={{ flex: 1 }} />
+          <button disabled={!session.profileId || !session.ownerToken}
+                  onClick={async () => {
+                    setError(null); setNote(null);
+                    try {
+                      await api.listOnMarketplace(session.profileId!, {
+                        tags: tags.split(",").map((t) => t.trim())
+                                  .filter(Boolean),
+                        blurb: blurb.trim() || undefined },
+                        session.ownerToken!);
+                      setNote("Listed.");
+                    } catch (e) { fail(e); }
+                  }}>List it</button>
+          {/* Unlisting a profile that is not listed is a 404, so the
+              refusal carries the fact rather than the button pretending it
+              worked. The friends delete next door answers 200 for the same
+              situation, which is why that one reads a flag instead. */}
+          <button className="chip"
+                  disabled={!session.profileId || !session.ownerToken}
+                  onClick={async () => {
+                    setError(null); setNote(null);
+                    try {
+                      await api.unlistFromMarketplace(session.profileId!,
+                                                      session.ownerToken!);
+                      setNote("Taken out of the directory.");
+                    } catch (e) { fail(e); }
+                  }}>take it out</button>
+        </div>
+        <p className="muted small">
+          Listing again replaces the tags and the line rather than adding a
+          second row — one profile is in the directory once.
+        </p>
       </div>
 
       <div className="card">

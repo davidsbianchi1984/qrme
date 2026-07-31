@@ -1,6 +1,3 @@
-DELETE /comments/{comment_id}
-DELETE /profiles/{profile_id}/friends/{friend_id}
-DELETE /profiles/{profile_id}/marketplace
 GET /agent/lights
 GET /auth/oauth/{provider}/callback
 GET /campaigns/{campaign_id}
@@ -12,6 +9,5 @@ POST /auth/oauth/{provider}/callback
 POST /packs
 POST /packs/seed
 POST /profiles/genesis
-POST /profiles/{profile_id}/marketplace
 POST /profiles/{profile_id}/succeed
 POST /profiles/{profile_id}/watch/act

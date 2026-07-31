@@ -1944,6 +1944,20 @@ export type DeskBeacon = {
   created_at: string;
 };
 
+/** What unfriending answers.
+ *
+ *  A 200 here does **not** mean a row went away: removing somebody who was
+ *  never a friend succeeds with `removed: false` and a reason. Unlike the
+ *  comment and listing deletes next door, which 404. A screen reporting
+ *  success from the status code alone tells somebody it removed a friendship
+ *  that never existed. */
+export type FriendRemoval = {
+  profile_id: string;
+  friend_id: string;
+  removed: boolean;
+  reason?: string;
+};
+
 export type CloudStatus = {
   cloud: boolean;
   model: unknown;
@@ -3643,6 +3657,36 @@ export const api = {
   deriveAgent: (profileId: string, grantId: string, token: string) =>
     req<DerivedAgent>(`/profiles/${profileId}/license/${grantId}/derive`,
       { method: "POST", token }),
+
+  // ---------------------------------------------------------------------
+  // Taking something back, and the three different answers to "there was
+  // nothing there".
+  //
+  //   comment    404 "no such comment"     — and 403 if it is not yours
+  //   listing    404 "profile is not listed"
+  //   friend     **200**, `removed: false`, `reason: "not a friend"`
+  //
+  // The third is the one that bites. A caller reading only the status code
+  // reports "Removed." for a row that was never there, so `removeFriend`
+  // hands back the flag and the screen reads it. The founder's two profiles
+  // are pinned and answer 409 instead — the list marks them, so the control
+  // is not offered rather than offered and refused.
+  // ---------------------------------------------------------------------
+
+  removeFriend: (profileId: string, friendId: string, token: string) =>
+    req<FriendRemoval>(`/profiles/${profileId}/friends/${friendId}`,
+      { method: "DELETE", token }),
+  deleteComment: (commentId: string, token: string) =>
+    req<{ id: string; deleted: boolean }>(`/comments/${commentId}`,
+      { method: "DELETE", token }),
+  listOnMarketplace: (profileId: string,
+                      body: { tags: string[]; blurb?: string },
+                      token: string) =>
+    req<{ profile_id: string; listed: boolean; tags: string[] }>(
+      `/profiles/${profileId}/marketplace`, { method: "POST", body, token }),
+  unlistFromMarketplace: (profileId: string, token: string) =>
+    req<void>(`/profiles/${profileId}/marketplace`,
+      { method: "DELETE", token }),
 };
 
 /** Open the WebAuthn ceremony.

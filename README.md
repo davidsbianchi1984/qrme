@@ -1770,6 +1770,41 @@ The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
 
+### Taking it back — three answers to "there was nothing there"
+
+Four routes, and **no new screen**. A take-it-back control belongs beside the
+thing it takes back; a fourth screen collecting all the deletes would be a
+place nobody would look. So unfriending went onto Friends, withdrawing a
+comment onto Wall, and listing a profile in the directory onto Market.
+
+Building them side by side surfaced a disagreement none of the three routes
+knows it is in:
+
+| | nothing to remove | somebody else's |
+|---|---|---|
+| a comment | **404** `no such comment` | **403** `not your comment` |
+| a directory listing | **404** `profile is not listed` | 403 |
+| a friend | **200**, `removed: false` | — (owner-only) |
+
+The third is the one that bites. A caller reading only the status code reports
+*Removed.* for a row that was never there — so the friends screen reads the
+flag and says *"Nothing to remove — not a friend."* The other two let the
+refusal carry the fact.
+
+None of this is a bug in any one route; it is three reasonable local choices
+that stop agreeing the moment a screen has to speak for all of them. Recorded
+rather than unified, because changing a delete's status code changes it for
+every client already written against it — and a test now asserts all three
+together, so a future round that does unify them changes it on purpose.
+
+Two controls are absent rather than present-and-refused. The founder's two
+profiles are pinned and answer 409; the list marks them with `pinned`, which
+the backend's own docstring says exists *so a client can render those rows
+without a remove control*. And *withdraw* appears only on your own comments —
+the profile being commented on is not the comment's author, and removing
+criticism from your own page is a different power from withdrawing your own
+words. This route grants only the second.
+
 ### Screen 171 — what leaves, and on what terms
 
 Five routes: the gateway's status, the contribution view and its revoke, and

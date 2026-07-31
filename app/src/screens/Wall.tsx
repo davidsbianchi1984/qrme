@@ -118,6 +118,19 @@ export function Wall({ onPlans }: {
     } catch (e) { setError(e); }
   }
 
+  // Withdrawing your own. The route refuses somebody else's with a 403 and
+  // a missing one with a 404, which is worth knowing beside the friends
+  // delete next door — that one answers 200 and reports failure in a flag.
+  async function withdrawComment(commentId: string, postId: string) {
+    if (!session.ownerToken) return;
+    try {
+      await api.deleteComment(commentId, session.ownerToken);
+      const r = await api.postComments(postId);
+      setComments(Array.isArray(r) ? r : r.comments || []);
+      setNote("Withdrawn.");
+    } catch (e) { setError(e); }
+  }
+
   async function share(postId: string) {
     if (!session.ownerToken) return;
     try { await api.sharePost(postId, session.ownerToken); setNote("Shared."); }
@@ -188,7 +201,17 @@ export function Wall({ onPlans }: {
         <div className="wp-comments">
       {comments.length === 0 && <p className="muted small">No comments yet.</p>}
       {comments.map((c) => (
-        <div key={c.id} className="muted small">• {c.body}</div>
+        <div key={c.id} className="muted small">
+          • {c.body}
+          {/* Only on your own. Somebody else's is a 403 by name, and a
+              button that always 403s is worse than no button. */}
+          {c.author_id && c.author_id === session.profileId && (
+            <button className="chip"
+                    onClick={() => withdrawComment(c.id, p.id)}>
+              withdraw
+            </button>
+          )}
+        </div>
       ))}
       <div className="voice-row">
         <input value={draft} placeholder="say something kind"

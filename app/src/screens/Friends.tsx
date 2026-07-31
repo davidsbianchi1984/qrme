@@ -16,6 +16,7 @@ export function Friends({ onPlans }: {
   const [suggested, setSuggested] = useState<{ profile_id: string; display_name: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [note, setNote] = useState<string | null>(null);
 
   function load() {
     if (!session.profileId) return;
@@ -30,9 +31,25 @@ export function Friends({ onPlans }: {
   if (!session.profileId) return <div className="screen"><p className="muted center">Sign in first.</p></div>;
 
   async function add(profileId: string) {
-    setBusy(true); setError(null);
+    setBusy(true); setError(null); setNote(null);
     try {
       await api.addFriend(session.profileId!, profileId, session.ownerToken!);
+      load();
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  // Unfriending answers 200 even when there was nothing to remove — unlike
+  // the comment and listing deletes, which 404. So the flag is what says
+  // whether anything happened; reporting success from the status code alone
+  // would tell somebody a friendship they never had has ended.
+  async function remove(profileId: string, name: string) {
+    setBusy(true); setError(null); setNote(null);
+    try {
+      const r = await api.removeFriend(session.profileId!, profileId,
+                                       session.ownerToken!);
+      setNote(r.removed ? `${name} removed.`
+                        : `Nothing to remove — ${r.reason || "not a friend"}.`);
       load();
     } catch (e) { setError(e); }
     finally { setBusy(false); }
@@ -58,6 +75,15 @@ export function Friends({ onPlans }: {
               <b>{f.display_name}</b>
               {isFounder && <span className="tag founder-tag">founder</span>}
               {f.handle && <span className="muted small">@{f.handle}</span>}
+              {/* Not offered on the founder's two rows. They are pinned by
+                  the platform and answer 409, and the list marks them — so
+                  the control is absent rather than present and refused. */}
+              {!isFounder && (
+                <button className="chip" disabled={busy}
+                        onClick={() => remove(f.profile_id, f.display_name)}>
+                  remove
+                </button>
+              )}
             </div>
           );
         })}
@@ -75,6 +101,7 @@ export function Friends({ onPlans }: {
         </div>
       )}
 
+      {note && <p className="muted small">{note}</p>}
       <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
