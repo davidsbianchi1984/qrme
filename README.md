@@ -350,6 +350,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/159-contest-a-profile.svg"><img src="docs/screens/159-contest-a-profile.svg" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/160-show-me-around.svg"><img src="docs/screens/160-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
   </tr>
 </table>
 
@@ -1687,6 +1688,18 @@ repository has already shipped a screen nothing referenced.
 
 **Progress is recorded per step rather than as a cursor**, so somebody who
 skipped ahead and came back is not told they finished things they never saw.
+
+Until now none of this was reachable. The walkthrough existed, worked with no
+model, kept itself honest against the gallery — and there was no way to take
+it. The console had the help *box* (type a question, get an answer) and not the
+tour, which is the half for somebody who does not yet know what to ask, and
+therefore the half that matters on a first minute.
+
+**160** is its door: where you are in the tour, every step in every chapter, and
+a lookup by screen number for *what am I looking at*. It also draws the dock
+catalogue including what the dock **refuses** — `control` is not a face, because
+assist, halt and approve are actions and the pane does not act. A catalogue
+showing only what is available would hide the more interesting decision.
 
 ## Channel 3 — sharing your camera
 

@@ -122,6 +122,12 @@ const CHROME: Table = {
     ja: "プロフィールの異議", zh: "申诉档案", hi: "प्रोफ़ाइल पर आपत्ति",
     ar: "الاعتراض على ملف",
   },
+  "nav.guide": {
+    en: "Show me around", es: "Guíame", fr: "Faire le tour",
+    de: "Rundgang", pt: "Mostrar tudo", it: "Fammi da guida",
+    ja: "案内して", zh: "带我熟悉", hi: "मुझे दिखाएँ",
+    ar: "جولة تعريفية",
+  },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
     pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",

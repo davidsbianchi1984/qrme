@@ -3512,6 +3512,21 @@ SCREENS = [
     # 159: contesting a profile. The first card is the whole asymmetry —
     # restricted at once, before review — and the second is the bargain that
     # makes it fair, that a dismissal puts it back.
+    # 160: the guide's own door. The last card is the one that says what
+    # kind of thing the guide is — no name, no face — which on a platform of
+    # synthetic people is the whole reason it looks like furniture.
+    dict(num=160, title="Show Me Around", sub="The tour, and the pane",
+         accent="cyan", tab=15, cards=[
+        dict(icon="compass", color="cyan", k="Written steps",
+             s="the same tour every time",
+             pill=("STEP 1", "info")),
+        dict(icon="doc", color="brand", k="What am I looking at",
+             s="every screen has a lesson"),
+        dict(icon="grid", color="amber", k="The pane that follows",
+             s="it shows, it never acts"),
+        dict(icon="mask", color="green", k="No name, no face",
+             s="so it is furniture, not a 35th"),
+    ], button=("Start the tour", "brand")),
     dict(num=159, title="Contest A Profile", sub="Restricted before review",
          accent="red", tab=15, cards=[
         dict(icon="flag", color="red", k="Restricted at once",

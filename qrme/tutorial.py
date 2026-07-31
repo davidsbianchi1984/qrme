@@ -56,6 +56,21 @@ GUIDE = ("This is QRME's own guide — not a profile, and not a person. It has "
 # are a profile before you have a room, and in a room before you lend it a
 # microphone.
 LESSONS: tuple[dict, ...] = (
+    dict(key="guide", chapter="Getting started", title="This guide",
+         what="You are reading it. The walkthrough is a fixed set of written "
+              "steps, not something a model makes up as it goes — so it says "
+              "the same thing every time and it still works on a deployment "
+              "with no model configured at all. Every screen in the app is "
+              "explained by one of these steps, and a test keeps that true: "
+              "add a feature, draw its screen, and the suite fails until "
+              "somebody has written what it is for. If you are looking at a "
+              "screen and do not know what it is, you can look it up by "
+              "number. The guide has no name and no face, and that is "
+              "deliberate — on a platform where everything that looks like "
+              "somebody is marked as AI, a guide with a persona would be the "
+              "first thing you met that was not.",
+         screens=(160,),
+         try_it="Press Start the tour, or look up the screen you were just on."),
     dict(key="welcome", chapter="Getting started", title="What QRME is",
          what="QRME makes AI synthetic profiles — characters with a persona, a "
               "memory, and a relationship with each person who talks to them. "

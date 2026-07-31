@@ -14,6 +14,7 @@ import { Identity } from "./screens/Identity";
 import { Presence } from "./screens/Presence";
 import { Live } from "./screens/Live";
 import { Contest } from "./screens/Contest";
+import { Guide } from "./screens/Guide";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -32,10 +33,11 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
+  { id: "guide", label: "Show me around", icon: "🧭" },
   { id: "chat", label: "Chat", icon: "💬" },
   { id: "discover", label: "Discover", icon: "🛍" },
   { id: "market", label: "Marketplace", icon: "🏷" },
@@ -128,6 +130,7 @@ export function App() {
         {tab === "presence" && <Presence />}
         {tab === "live" && <Live />}
         {tab === "contest" && <Contest />}
+        {tab === "guide" && <Guide />}
         {tab === "exchanges" && <Exchanges />}
         {tab === "grants" && <Grants />}
         {tab === "party" && <WatchParty />}

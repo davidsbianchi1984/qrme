@@ -973,6 +973,83 @@ export type HeldMessage = {
   created_at: string;
 };
 
+// ---------------------------------------------------------------------
+// The guide itself: the walkthrough, the help index, and the pane the
+// helper lives in.
+//
+// The walkthrough is written prose that works with no model configured,
+// it names the screens each step is about, and a test asserts every screen
+// in the gallery is claimed by some lesson — so it cannot quietly fall
+// behind the app. Thirty-eight lessons, and no way to take any of them.
+// ---------------------------------------------------------------------
+
+export type Lesson = {
+  key: string; chapter: string; title: string;
+  what: string; try_it: string;
+  mode: string;
+  /** The binding to the gallery. `/tutorial/for-screen/{n}` is the same
+   *  relation read the other way. */
+  screens: number[];
+};
+
+export type Walkthrough = {
+  /** Why the guide has no name and no face — shown, because on a platform
+   *  of synthetic people a guide with a persona would be the first thing
+   *  you met that was not marked. */
+  guide: string;
+  chapters: { chapter: string; steps: Lesson[] }[];
+};
+
+export type Progress = {
+  learner_id: string; guide: string;
+  /** Where they are now. Null once finished. */
+  step: Lesson | null;
+  done: number; total: number; finished: boolean;
+  note: string;
+};
+
+export type HelpTopics = { topics: string[]; disclosure: string };
+
+export type DockFaces = {
+  faces: Record<string, string>;
+  /** What the dock will not carry, with the reason. `control` is refused
+   *  because assist/halt/approve are *actions* and the dock does not act —
+   *  it floats over the thing those buttons would stop. */
+  refused: Record<string, string>;
+  corners: Record<string, string>;
+  states: Record<string, string>;
+};
+
+export type DockRoute = {
+  face: string; screen: number; path: string; title: string;
+  opens_dock_face: string;
+};
+
+export type DockSettings = {
+  profile_id: string; corner: string; state: string;
+  face: string; faces: string[];
+  platform: string;
+  /** False until the owner has chosen — so a screen can tell a default
+   *  from a decision. */
+  set: boolean;
+  surface: string | null;
+  wanted: string;
+  /** Capped rather than overridden on a surface being transmitted. `why`
+   *  carries the reason when it is. */
+  tucked: boolean; why: string | null;
+};
+
+export type DockFace = {
+  face: string; shows: string;
+  profile_id: string; surface: string | null; surface_id: string | null;
+  route: DockRoute;
+  /** Always false. The dock shows and never acts. */
+  acts: boolean;
+  box: { width: number; height: number; handle: number; inset: number };
+  /** The keys of what may never appear in the pane. */
+  never: string[];
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -1979,4 +2056,53 @@ export const api = {
   rejectMessage: (messageId: string, token: string) =>
     req<{ id: string; status: string }>(`/moderation/${messageId}/reject`,
       { method: "POST", body: {}, token }),
+
+  // ---------------------------------------------------------------------
+  // The guide itself.
+  //
+  // Twelve routes with no caller, and this is the set it is least
+  // comfortable to have found: the walkthrough that teaches somebody where
+  // everything in the product lives had no way to be taken. Thirty-eight
+  // written lessons, a test asserting every screen in the gallery is
+  // claimed by one of them, and no door.
+  //
+  // The console already had `api.help(question)` — the box you type a
+  // question into. What was missing is the other half, for the person who
+  // does not yet know what to ask.
+  // ---------------------------------------------------------------------
+
+  walkthrough: () => req<Walkthrough>("/tutorial"),
+  lesson: (key: string) => req<Lesson>(`/tutorial/steps/${key}`),
+
+  // The gallery relation, read from the screen end: what explains this
+  // drawing. It is what makes a "what am I looking at" button possible.
+  lessonForScreen: (screen: number) =>
+    req<Lesson>(`/tutorial/for-screen/${screen}`),
+
+  // `lesson`, not `key` — the field is named for what it holds rather than
+  // for its role in the record, and reading the route signature would have
+  // got this wrong.
+  startWalkthrough: (learnerId: string, lesson: string) =>
+    req<Progress>("/tutorial/start",
+      { method: "POST", body: { learner_id: learnerId, lesson } }),
+  finishLesson: (learnerId: string, lesson: string) =>
+    req<Progress>("/tutorial/done",
+      { method: "POST", body: { learner_id: learnerId, lesson } }),
+  progress: (learnerId: string) =>
+    req<Progress>(`/tutorial/progress/${learnerId}`),
+
+  // What the help box can answer without a model. Worth showing rather
+  // than leaving people to guess at a blank input.
+  helpTopics: () => req<HelpTopics>("/help/topics"),
+
+  dockFaces: () => req<DockFaces>("/dock/faces"),
+  dockRoute: (face: string) => req<DockRoute>(`/dock/where/${face}`),
+  dockSettings: (profileId: string, token: string) =>
+    req<DockSettings>(`/dock/${profileId}`, { token }),
+  setDock: (profileId: string, body: { corner?: string; state?: string;
+                                       face?: string }, token: string) =>
+    req<DockSettings>(`/dock/${profileId}`,
+      { method: "PUT", body, token }),
+  dockFace: (profileId: string, name: string, token: string) =>
+    req<DockFace>(`/dock/${profileId}/face/${name}`, { token }),
 };

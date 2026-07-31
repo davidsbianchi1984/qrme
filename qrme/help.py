@@ -266,6 +266,13 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                 "objection", "i did not agree", "without my permission",
                 "my late", "estate", "withdraw consent", "revoke",
                 "moderation queue", "approve", "waiting for approval"),
+    # "Where is the tour" is a different question from "show me around",
+    # which _WALKTHROUGH already answers by starting one. These are the words
+    # for the screen that lists it, and for the dock's own settings.
+    "guide": ("the guide", "the tour", "lessons", "what am i looking at",
+              "what is this screen", "explain this screen", "help topics",
+              "what can you answer", "the dock", "the pane", "the bubble",
+              "move the dock", "hide the dock", "corner"),
     "identity": ("verify", "verified", "badge", "blue tick", "prove it is me",
                  "anonymous", "hide my name", "who checked", "my profiles",
                  "rename", "delete my profile", "delete this profile",

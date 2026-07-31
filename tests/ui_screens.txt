@@ -52,6 +52,7 @@ Identity        156
 Presence        157
 Live            158
 Contest         159
+Guide           160
 Onboarding      unaudited
 Org             unaudited
 Simulate        unaudited
