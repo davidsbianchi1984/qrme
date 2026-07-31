@@ -222,6 +222,11 @@ const CHROME: Table = {
     it: "Con parole sue", ja: "その言葉で", zh: "用它的话",
     hi: "अपने शब्दों में", ar: "بكلماته",
   },
+  "nav.remainder": {
+    en: "Everything else", es: "Todo lo demás", fr: "Le reste",
+    de: "Alles Übrige", pt: "Tudo o resto", it: "Tutto il resto",
+    ja: "そのほか", zh: "其他", hi: "बाकी सब", ar: "كل ما تبقى",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

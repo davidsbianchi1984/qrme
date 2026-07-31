@@ -3523,6 +3523,21 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 183: the tail of the audit, and the route that mattered in it — the
+    # one place a profile's words actually leave, going out unmarked while
+    # the in-app equivalent was stamped every time.
+    dict(num=183, title="Everything Else", sub="The last of the doorless",
+         accent="green", tab=30, cards=[
+        dict(icon="pen", color="red", k="Marked going out",
+             s="it left unmarked before",
+             pill=("0", "warn")),
+        dict(icon="shield", color="amber", k="Strict past the door",
+             s="not the profile's own dial"),
+        dict(icon="eye", color="green", k="What asking cost",
+             s="stripped, and whether it left"),
+        dict(icon="link", color="cyan", k="One id, one answer",
+             s="nine reads, one control"),
+    ], button=("Look it up", "brand")),
     # 182: the words and the name. First card is the defect — claiming a
     # handle deletes whatever the profile had, and the route asked for
     # nothing — and the second is the thing people mistake for a display

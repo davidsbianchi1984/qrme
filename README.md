@@ -380,6 +380,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/181-the-mark-and-the-held.svg"><img src="docs/screens/181-the-mark-and-the-held.svg" width="210" alt="The Mark, And The Held"></a><br><sub><b>181</b> · The Mark, And The Held</sub></td>
     <td align="center" width="33%"><a href="docs/screens/182-in-its-own-words.svg"><img src="docs/screens/182-in-its-own-words.svg" width="210" alt="In Its Own Words"></a><br><sub><b>182</b> · In Its Own Words</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/183-everything-else.svg"><img src="docs/screens/183-everything-else.svg" width="210" alt="Everything Else"></a><br><sub><b>183</b> · Everything Else</sub></td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs

@@ -24,7 +24,7 @@ import os
 
 from fastapi import APIRouter, HTTPException, Request, Response
 
-from .. import catalog, db, moderation
+from .. import catalog, db, moderation, watermark
 from ..common import profile_or_404, require_owner, source_items
 from ..models import SocialCollect, SocialConnect, SocialPublish
 
@@ -194,18 +194,32 @@ def publish(cid: str, body: SocialPublish, request: Request) -> dict:
         raise HTTPException(409, "this connection is for collecting, not publishing")
     if row["status"] != "active":
         raise HTTPException(409, "connection has been revoked")
-    profile = profile_or_404(row["profile_id"])
+    profile_or_404(row["profile_id"])
+    # Strict, not the profile's own maturity. `compose_post` states the rule
+    # for an in-app post — *public posts face the widest audience: always the
+    # strict filter* — and this is that same act aimed somewhere wider still:
+    # a platform QRME does not run, in front of an audience it cannot see.
+    # Reading `profile["maturity"]` here meant a profile set to `open` ran the
+    # open filter on the way *out of the building*, while the same profile
+    # posting in-app ran strict.
     verdict = moderation.review(body.content, None, {"birthdate": None},
-                                profile["maturity"])
+                                maturity="strict")
     status = "approved" if verdict.approved else "rejected"
     conn = db.connect()
     post_id = db.new_id("post")
     surface = f"social:{row['platform']}"
+    # Stamped, like every other public post. `compose_post` says why in one
+    # sentence — *a public post is synthetic media leaving the platform: it
+    # carries a verifiable synthetic-media credential from the moment it
+    # exists* — and this route is the literal case that sentence describes.
+    # It stored `watermark_id` as NULL, so the only posts going out with no
+    # credential were the ones actually leaving.
+    credential = watermark.stamp(row["profile_id"], "post", body.content)
     conn.execute(
         "INSERT INTO posts (id, profile_id, surface, topic, content, status,"
-        " flag_reason, created_at) VALUES (?,?,?,?,?,?,?,?)",
+        " flag_reason, watermark_id, created_at) VALUES (?,?,?,?,?,?,?,?,?)",
         (post_id, row["profile_id"], surface, body.topic, body.content, status,
-         verdict.reason, db.utcnow()),
+         verdict.reason, credential["watermark_id"], db.utcnow()),
     )
     if verdict.approved:
         conn.execute("UPDATE social_connections SET published = published + 1 WHERE id=?",
@@ -218,6 +232,9 @@ def publish(cid: str, body: SocialPublish, request: Request) -> dict:
         "status": status,
         "flag_reason": verdict.reason,
         "content": body.content if verdict.approved else None,
+        # Handed back so whatever posts this to the platform can carry the
+        # disclosure with it rather than having to look it up afterwards.
+        "watermark": credential,
     }
 
 

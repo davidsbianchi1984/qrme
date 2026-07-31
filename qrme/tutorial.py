@@ -164,6 +164,31 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="remainder", chapter="Out in the world",
+         title="Everything else",
+         what="The tail of the audit, on one screen, because that is honestly "
+              "what it is: six small features that each had a couple of "
+              "routes and no way in. Feedback on the app — your own words "
+              "come back to you and to nobody else, and all anyone else ever "
+              "sees is the count. Where mods come from, and syncing one in. "
+              "Apps this profile is connected to. Going out to look "
+              "something up, where the answer tells you how much was "
+              "stripped from the question first and whether it left this "
+              "machine at all — that is the part worth reading, not the "
+              "findings. Every steering dial in one place. Playing alongside "
+              "somebody in a game. And publishing to a platform we do not "
+              "run, which is the one place a profile's words genuinely "
+              "leave. That route stored its post with **no mark on it** "
+              "while the same profile posting in-app was stamped every time, "
+              "and it used the profile's own filter where posting in-app "
+              "always uses the strictest one. Both now match: strict on the "
+              "way out, and a credential that travels with it. There is also "
+              "a lookup box — nine kinds of record had a call written for "
+              "them and no screen calling it, and they were all the same "
+              "question about different ids, so they are one control.",
+         screens=(183,),
+         try_it="Send a piece of feedback, then look up your own profile id "
+                "in the box at the bottom."),
     dict(key="inwords", chapter="Out in the world",
          title="In its own words",
          what="Four things about how a profile presents itself in language. "

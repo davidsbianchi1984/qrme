@@ -6,6 +6,55 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### The only post that actually leaves was the one going out unmarked
+
+`POST /social/{cid}/publish` writes a profile's words to a platform QRME does
+not run. It is the single route in this product where synthetic media genuinely
+**leaves the building** — and it stored that post with `watermark_id` NULL,
+while `compose_post`, the in-app equivalent, stamped a credential every time.
+
+`compose_post` even says why, in a sentence that describes the *other* route
+more exactly than the one it is written above: *a public post is synthetic
+media leaving the platform: it carries a verifiable synthetic-media credential
+from the moment it exists.* So the only posts going out unmarked were the ones
+actually going out.
+
+The same function ran `profile["maturity"]` as its moderation filter, where
+`compose_post` forces `strict` with the note *public posts face the widest
+audience: always the strict filter*. A profile set to `open` was therefore held
+to the loosest rule on the way to an audience QRME cannot see, and the
+strictest one when posting where it can. Both now match the in-app path, and
+`publish` hands the credential back so whatever posts it onward carries the
+disclosure rather than looking it up.
+
+### The audit reaches zero
+
+**Screen 183** doors the last eighteen routes — feedback, mod registries,
+connected apps, excursions, the steering hub, playing alongside somebody, and
+both directions of a social connection — and wires the eleven remaining
+`api.ts` bindings that nothing called. Nine of those were the same question
+about different ids, so they are one lookup control rather than nine buttons
+nobody would find.
+
+| | at the start of this release | now |
+|---|---|---|
+| Console-doorless routes | 64 | **0** |
+| `api.ts` bindings nothing calls | 25 | **0** |
+
+Both record files are now **empty rather than short**, and the tests that read
+them assert emptiness.
+
+`test_the_union_is_still_wider_than_the_console` had to change with it. It
+asserted the union backlog was *strictly* smaller than the console's, on the
+reasoning that if the two ever agreed the likelier cause was a broken native
+extractor than a console that had caught up. That was sound while catching up
+was hypothetical. It now asserts the invariant that survives — the union can
+never exceed the console's, since the console is one of its own surfaces — and
+the liveness check it was doubling for lives in
+`test_each_native_shell_is_still_being_read`, which counts call sites per shell
+and would actually notice.
+
+
 ### Anybody could take away the name a profile answers to
 
 `PUT /profiles/{id}/handle` took **no credential of any kind** — no `request`

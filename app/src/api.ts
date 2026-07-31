@@ -2615,6 +2615,90 @@ export type HandleClaimed = {
   summon: string;
 };
 
+/** Feedback on the app itself. `mine` is only ever the caller's own words;
+ *  `tally` is the public count by category, which is the most a submission
+ *  ever contributes to anybody else's view. */
+export type FeedbackBoard = {
+  mine: { id: string; category: string; message: string; rating: number | null;
+          status: string; created_at: string }[];
+  tally: Record<string, number>;
+  total: number;
+  categories: string[];
+};
+
+/** A third-party catalogue of task or knowledge mods. `audience` says which
+ *  kind of thing it stocks — a robot body or a profile. */
+export type RegistrySynced = {
+  registry: string; name: string; url: string;
+  created: number; skipped: number;
+  packs: { pack_id: string; title: string; price: number }[];
+};
+
+export type PackDetail = {
+  id: string; industry: string; audience: string; title: string;
+  blurb: string; publisher: string; price: number; currency: string;
+  free: boolean; origin: string; origin_url: string; rated: boolean;
+  items: number; installs: number; item_titles: string[];
+};
+
+export type PackRegistry = {
+  key: string; name: string; url: string; audience: string;
+  tagline: string; available: number; synced: number;
+};
+
+/** An app this profile is connected to. `directions` is what the connection
+ *  is *for*: `collect` reads into the profile, `act` lets it do something. */
+export type AppConnector = {
+  id: string; profile_id: string; provider: string; app: string;
+  label: string; capabilities: string[]; directions: string[];
+  status: string; collected: number; actions: number;
+};
+
+export type ExcursionLearned = {
+  source_id: string; already_learned: boolean; note: string;
+};
+
+/** The whole steering surface for a profile: the dials on offer, the values
+ *  set, and the age/appearance sections that ride on the persona prompt.
+ *  `adult_only` dials are reported rather than hidden, so the refusal on a
+ *  profile that is not rated has something to point at. */
+export type SteeringHub = {
+  subject_id: string;
+  adult_mode: boolean;
+  dials: SteeringDial[];
+  values?: Record<string, number>;
+  age?: Record<string, unknown>;
+  appearance?: Record<string, unknown>;
+};
+
+export type GameSession = {
+  id: string; profile_id: string; platform: string; platform_label: string;
+  game: string; role: string; mode: string; status: string; note?: string;
+};
+
+export type GameCallout = {
+  session_id: string; role: string; status: string; line: string;
+};
+
+export type GameEnded = {
+  session_id: string; status: string; callouts: number;
+  lobby_emptied: number;
+};
+
+/** What `publish` hands back. `watermark` is new: this route stored a post
+ *  with no credential at all, which meant the only synthetic media going out
+ *  unmarked was the media actually leaving the platform. */
+export type SocialPublished = {
+  post_id: string; platform: string; surface: string; status: string;
+  flag_reason: string | null; content: string | null;
+  watermark: { watermark_id: string; kind: string; disclosure: string };
+};
+
+export type SocialCollected = {
+  connection: string; platform: string; ingested: number;
+  total_sources: number; note: string;
+};
+
 export type SocialConnection = {
   id: string;
   profile_id: string;
@@ -4299,6 +4383,91 @@ export const api = {
   // just below it in the same file were given this check in an earlier pass;
   // this one was missed.
   // ---------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------
+  // The last of the backlog: feedback, mod registries, connected apps,
+  // excursions, the steering hub, playing alongside somebody, and the two
+  // halves of a social connection.
+  //
+  // `publish` is the one worth reading twice. It writes a post to a platform
+  // QRME does not run, and it used to store that post with **no watermark
+  // id** while the in-app `compose` stamped one — so the only synthetic media
+  // leaving the building was the media with no credential on it. It also ran
+  // the profile's own maturity filter where `compose` forces `strict`, so a
+  // profile set to `open` was held to the loosest rule on the way out.
+  // ---------------------------------------------------------------------
+
+  feedback: (token?: string) =>
+    req<FeedbackBoard>("/feedback", token ? { token } : {}),
+  sendFeedback: (body: { category: string; message: string; rating?: number },
+                 token?: string) =>
+    req<{ id: string; category: string; status: string; note: string }>(
+      "/feedback", { method: "POST", body, ...(token ? { token } : {}) }),
+
+  packRegistries: (token: string) =>
+    req<PackRegistry[]>("/packs/registries", { token }),
+  // `created` and `skipped`, not a single count: syncing is idempotent, and
+  // the difference between "two new" and "two already had" is the whole
+  // reason to press it twice.
+  syncRegistry: (key: string, token: string) =>
+    req<RegistrySynced>(`/packs/registries/${key}/sync`,
+      { method: "POST", token }),
+  // The shop window: metadata plus item *titles*. The contents are the
+  // product and arrive by installing. A rated pack needs an age-verified
+  // caller even for the window.
+  pack: (packId: string, token?: string) =>
+    req<PackDetail>(`/packs/${packId}`, token ? { token } : {}),
+
+  profileApps: (profileId: string, token: string) =>
+    req<AppConnector[]>(`/profiles/${profileId}/apps`, { token }),
+  connectApp: (profileId: string,
+               body: { provider: string; app: string;
+                       capabilities?: string[] }, token: string) =>
+    req<AppConnector>(`/profiles/${profileId}/apps`,
+      { method: "POST", body, token }),
+
+  excursions: (profileId: string, token: string) =>
+    req<Excursion[]>(`/profiles/${profileId}/excursions`, { token }),
+  // `redactions` and `left_host` on the answer are the point of the feature:
+  // what was stripped before the question went out, and whether it went out.
+  startExcursion: (profileId: string,
+                   body: { topic: string; question: string;
+                           private?: string[] }, token: string) =>
+    req<Excursion>(`/profiles/${profileId}/excursions`,
+      { method: "POST", body, token }),
+  learnFromExcursion: (excursionId: string, token: string) =>
+    req<ExcursionLearned>(`/excursions/${excursionId}/learn`,
+      { method: "POST", token }),
+
+  steeringHub: (profileId: string, token: string) =>
+    req<SteeringHub>(`/profiles/${profileId}/steering/hub`, { token }),
+  setSteeringHub: (profileId: string, body: Record<string, unknown>,
+                   token: string) =>
+    req<SteeringHub>(`/profiles/${profileId}/steering/hub`,
+      { method: "PUT", body, token }),
+
+  gameSessions: (profileId: string, token: string) =>
+    req<GameSession[]>(`/profiles/${profileId}/gaming/sessions`, { token }),
+  startGameSession: (profileId: string,
+                     body: { platform: string; game: string; role?: string;
+                             mode?: string }, token: string) =>
+    req<GameSession>(`/profiles/${profileId}/gaming/sessions`,
+      { method: "POST", body, token }),
+  gameCallout: (sessionId: string, situation: string, token: string) =>
+    req<GameCallout>(`/gaming/sessions/${sessionId}/callout`,
+      { method: "POST", body: { situation }, token }),
+  endGameSession: (sessionId: string, token: string) =>
+    req<GameEnded>(`/gaming/sessions/${sessionId}/end`,
+      { method: "POST", token }),
+
+  collectSocial: (cid: string, items: { title?: string; content: string }[],
+                  token: string) =>
+    req<SocialCollected>(`/social/${cid}/collect`,
+      { method: "POST", body: { items }, token }),
+  publishSocial: (cid: string, body: { topic: string; content: string },
+                  token: string) =>
+    req<SocialPublished>(`/social/${cid}/publish`,
+      { method: "POST", body, token }),
 
   languages: () => req<LanguageCatalogue>("/languages"),
   profileLanguage: (profileId: string) =>
