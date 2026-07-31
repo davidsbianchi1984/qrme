@@ -167,6 +167,12 @@ const CHROME: Table = {
     ja: "見つけられる場所", zh: "别人从哪里找到你",
     hi: "लोग आपको कहाँ पाते हैं", ar: "أين يجدونك",
   },
+  "nav.reaching": {
+    en: "Reaching out", es: "Contactar", fr: "Prendre contact",
+    de: "Sich melden", pt: "Entrar em contacto", it: "Farsi vivo",
+    ja: "こちらから連絡", zh: "主动联系", hi: "पहल करना",
+    ar: "المبادرة بالتواصل",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

@@ -1944,6 +1944,62 @@ export type DeskBeacon = {
   created_at: string;
 };
 
+/** How this profile and one person are going.
+ *
+ *  Deliberately narrower than what a rating hands back: `last_seen` and
+ *  `contributed` come out of the write and are **not** in the read. The two
+ *  answer different questions and a screen that assumed they matched would
+ *  render blanks. */
+export type Engagement = {
+  profile_id: string;
+  interactor_id: string;
+  score: number;
+  interactions: number;
+  sessions: number;
+  feedback_pos: number;
+  feedback_neg: number;
+};
+
+/** What a rating answers with — the engagement record plus the two fields
+ *  only the write knows. `contributed` is the honest one: it says whether
+ *  this thumbs-up actually sent an anonymised exchange to the cloud, which
+ *  happens only on `up`, only with the profile opted in, and only where a
+ *  gateway is configured. */
+export type FeedbackResult = Engagement & {
+  last_seen: string | null;
+  contributed: boolean;
+};
+
+/** The latent picture of one relationship. Owner-only: it is a model of a
+ *  named person, and the six dimensions are what the profile behaves from. */
+export type PersonaEmbedding = {
+  profile_id: string;
+  interactor_id: string;
+  vector: Record<string, number>;
+  version: number;
+  updated_at: string;
+};
+
+/** An unprompted message that got past all three gates, with the reason the
+ *  profile gave itself for sending it. */
+export type ProactiveOutreach = {
+  reason: string;
+  message: {
+    id: string; role: string; content: string; status: string;
+    flag_reason: string | null; created_at: string;
+    watermark?: unknown;
+  };
+};
+
+/** The window during which no profile may reach out unprompted. Hours in
+ *  UTC, 0–23; null on both means no window at all. Set by the person, and
+ *  refused to their profile's owner. */
+export type QuietHours = {
+  id: string;
+  quiet_start: number | null;
+  quiet_end: number | null;
+};
+
 /** What a scanning app receives, as opposed to the page a browser gets.
  *  The same scan either way — including the count, which goes up for both. */
 export type DeskScanCard = {
@@ -3448,6 +3504,54 @@ export const api = {
       { method: "DELETE", token }),
   socialBeacon: (cid: string) =>
     req<SocialBeacon>(`/social/${cid}/beacon`),
+
+  // ---------------------------------------------------------------------
+  // One person, and what reaching out to them costs.
+  //
+  // Three separate gates stand between a profile and an unprompted message,
+  // and they refuse in three different words because they are three
+  // different facts:
+  //
+  //   403  the owner never turned proactive outreach on at all
+  //   429  "awaiting a reply" — it already reached out and heard nothing
+  //   429  "rate cap" — it reached out recently and may not again yet
+  //   429  "quiet hours" — the recipient's window, set by the recipient
+  //
+  // The last one is the one worth knowing: **the owner cannot set it.**
+  // Sending it with an owner token is a 403. The person being reached out
+  // to holds their own window, which is the only arrangement in which it
+  // means anything.
+  //
+  // Two surfaces here took no token at all until this round. Both do now:
+  // a rating is gated on the rater's own token, because a rating in
+  // somebody else's name is a lie about what they thought *and* the trigger
+  // for contributing their exchange to the cloud; and the engagement record
+  // is gated on the owner or that person, because it is a record of how
+  // often somebody talks to a profile.
+  // ---------------------------------------------------------------------
+
+  engagement: (profileId: string, interactorId: string, token: string) =>
+    req<Engagement>(`/profiles/${profileId}/engagement/${interactorId}`,
+      { token }),
+  // The rater's token, not the owner's.
+  rateExchange: (profileId: string, interactorId: string,
+                 rating: "up" | "down", token: string) =>
+    req<FeedbackResult>(
+      `/profiles/${profileId}/interactions/${interactorId}/feedback`,
+      { method: "POST", body: { rating }, token }),
+  personaEmbedding: (profileId: string, interactorId: string, token: string) =>
+    req<PersonaEmbedding>(`/profiles/${profileId}/embedding/${interactorId}`,
+      { token }),
+  reachOut: (profileId: string, interactorId: string, token: string) =>
+    req<ProactiveOutreach>(`/profiles/${profileId}/proactive/${interactorId}`,
+      { method: "POST", token }),
+  // The recipient's own token. An owner sending this is refused, and that
+  // refusal is the feature.
+  setQuietHours: (interactorId: string,
+                  body: { quiet_start: number | null;
+                          quiet_end: number | null }, token: string) =>
+    req<QuietHours>(`/interactors/${interactorId}/quiet-hours`,
+      { method: "PUT", body, token }),
 };
 
 /** Open the WebAuthn ceremony.

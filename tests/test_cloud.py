@@ -7,7 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from qrme import db
-from tests.test_capabilities import _Resp, make_interactor, make_profile
+from tests.test_capabilities import (_Resp, as_interactor, make_interactor,
+                                     make_profile)
 
 
 class FakeCloudHttp:
@@ -100,7 +101,7 @@ def test_contribution_requires_opt_in_and_is_anonymized(cloud_pair):
 
     up = client.post(
         f"/profiles/{consenting['id']}/interactions/{user}/feedback",
-        json={"rating": "up"}).json()
+        json={"rating": "up"}, headers=as_interactor(user)).json()
     assert up["contributed"] is True
     payload = fake.contributions[0]
     blob = json.dumps(payload)
@@ -113,7 +114,7 @@ def test_contribution_requires_opt_in_and_is_anonymized(cloud_pair):
     # No consent → nothing leaves, even on a thumbs-up.
     quiet = client.post(
         f"/profiles/{private['id']}/interactions/{user}/feedback",
-        json={"rating": "up"}).json()
+        json={"rating": "up"}, headers=as_interactor(user)).json()
     assert quiet["contributed"] is False
     assert len(fake.contributions) == 1
 
@@ -122,7 +123,7 @@ def test_contribution_requires_opt_in_and_is_anonymized(cloud_pair):
                 json={"interactor_id": user, "message": "hm"})
     down = client.post(
         f"/profiles/{consenting['id']}/interactions/{user}/feedback",
-        json={"rating": "down"}).json()
+        json={"rating": "down"}, headers=as_interactor(user)).json()
     assert down["contributed"] is False
     assert len(fake.contributions) == 1
 

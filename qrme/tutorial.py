@@ -164,6 +164,24 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="reaching", chapter="Out in the world",
+         title="Reaching out, and what stops it",
+         what="A profile may message somebody first only if its owner "
+              "switched that on — and even then four separate refusals "
+              "stand in the way, in four different sentences, because they "
+              "are four different facts. It is reactive-only. It already "
+              "reached out and heard nothing, and will not send twice into "
+              "silence. It reached out recently and the rate cap holds. Or "
+              "the person's quiet hours are in effect — and that last one "
+              "is not the owner's to lift. Quiet hours belong to the person "
+              "they protect, and an owner sending them is refused, because "
+              "a boundary your correspondent can move is not a boundary. "
+              "Alongside them: the engagement record, readable by those two "
+              "and nobody else, and the latent picture the profile actually "
+              "behaves from, shown so it can be argued with.",
+         screens=(170,),
+         try_it="Reach out twice in a row and read the second refusal — it "
+                "is a different sentence from the first."),
     dict(key="beacons", chapter="Out in the world",
          title="Where people find you",
          what="Two kinds of QR code, and they look identical. A placed "

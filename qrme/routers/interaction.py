@@ -468,8 +468,23 @@ def transparency(profile_id: str) -> dict:
 @router.post("/profiles/{profile_id}/interactions/{interactor_id}/feedback")
 def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
                   request: Request) -> dict:
+    """A rating, from the person who is rating.
+
+    Gated on that person's own token, and not on the owner's. Two reasons,
+    and the second is the serious one:
+
+    * a rating in somebody else's name is a lie about what they thought, and
+      it moves the engagement score the profile then *behaves* from;
+    * an `up` rating is the trigger for cloud contribution below. Open, this
+      route let anybody with two ids push a stranger's exchange to the
+      gateway — an unauthenticated caller causing somebody else's
+      conversation to leave the deployment.
+
+    It answered 200 to a caller holding no token at all.
+    """
     profile = profile_or_404(profile_id)
     interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
     result = engagement.record_feedback(profile_id, interactor_id, body.rating)
 
     # Opt-in cloud contribution: positively-rated exchanges, anonymized,
@@ -505,7 +520,21 @@ def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
 
 @router.get("/profiles/{profile_id}/engagement/{interactor_id}",
             response_model=EngagementOut)
-def get_engagement(profile_id: str, interactor_id: str) -> EngagementOut:
+def get_engagement(profile_id: str, interactor_id: str,
+                   request: Request) -> EngagementOut:
+    """How this profile and this person are going. Two parties, both entitled.
+
+    The owner, because it is their profile's relationship; the person, because
+    it is a record of them. Nobody else — this is how often somebody talks to
+    a profile, how many sessions they have had and whether they liked it, and
+    it was readable by anyone holding two ids and no token.
+
+    The rule is already written down one route over: the list of a profile's
+    beacons is owner-gated because *that is a list of physical places
+    associated with a person*. This is the same argument about a different
+    column.
+    """
+    require_owner_or_interactor(profile_id, interactor_id, request)
     state = engagement.get(profile_id, interactor_id)
     if state is None:
         raise HTTPException(404, "no engagement recorded")

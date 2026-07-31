@@ -362,6 +362,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/167-in-the-game-with-you.svg"><img src="docs/screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
     <td align="center" width="33%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
     <td align="center" width="33%"><a href="docs/screens/169-where-people-find-you.svg"><img src="docs/screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/170-reaching-out-and-what-stops-it.svg"><img src="docs/screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
   </tr>
 </table>
 
@@ -1767,6 +1768,65 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 170 — reaching out, and what stops it
+
+Five routes: the outreach itself, the quiet-hours window, the engagement
+record, a rating, and the latent picture of one relationship.
+
+**Four refusals, and only two of them are the owner's to lift.** A profile may
+message somebody unprompted only if its owner switched that on, and even then
+three more gates stand in the way. They answer in four different sentences,
+and the difference is the whole point — a screen that collapsed them into
+"can't right now" would be discarding the only thing the owner can act on:
+
+| | who lifts it | how |
+|---|---|---|
+| reactive-only (403) | the owner | turn outreach on |
+| awaiting a reply (429) | the recipient | reply once |
+| rate cap (429) | time | wait out the interval |
+| quiet hours (429) | **the recipient** | change their own window |
+
+**Quiet hours are not the owner's to set.** Sending them with an owner token
+is a 403, and that refusal is the feature rather than a gap in it: a window
+your correspondent can move is not a boundary. The console shows the control
+to whoever holds the person's own token and explains the refusal to everybody
+else, because an owner who does not know why it is missing will look for a
+bug.
+
+The window is half-open — from the first hour up to but not including the
+second — so a start equal to its end covers **nothing**. Somebody setting 9 to
+9 to mean *all day* gets no protection at all. That is recorded as it is and
+warned about on the screen rather than corrected: changing the arithmetic
+would silently redefine every window already stored, which is a worse answer
+than saying it plainly.
+
+#### Two surfaces that took no token at all
+
+Both found by building the screen. Neither was visible to the typecheck, and
+neither was caught by the suite — the tests sent no token because they did not
+have to.
+
+- **The engagement record was readable by anybody.** How often a named person
+  talks to a profile, across how many sessions, and whether they liked it,
+  answered 200 to a caller holding nothing. The rule was already written down
+  one route over: a profile's beacon list is owner-gated because *that is a
+  list of physical places associated with a person*. This is the same argument
+  about a different column. It is now the owner's and that person's, and
+  nobody else's.
+- **A rating could be cast in somebody else's name** — and that is worse than
+  it first sounds, because an `up` rating is the trigger for contributing the
+  exchange to the shared cloud model. Open, this let an unauthenticated caller
+  cause a stranger's conversation to leave the deployment: the one failure
+  this repository's whole cloud posture exists to prevent, reachable with two
+  ids and no token. A rating now needs the rater's own token, and the owner is
+  refused it too — a rating in somebody's name is a lie about what they
+  thought, and the score is what the profile then behaves from.
+
+The embedding stays owner-only, and unlike the engagement record the person
+themselves does not get it either: it is not a record of what they did, it is
+what the profile inferred. It is rendered rather than described, because a
+number nobody can see is a number nobody can argue with.
 
 ### Screen 169 — where people find you
 

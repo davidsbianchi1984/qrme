@@ -6,7 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from qrme import db
-from tests.test_capabilities import make_profile
+from tests.test_capabilities import as_interactor, make_profile
 from tests.test_cloud import FakeCloudHttp
 
 
@@ -61,7 +61,7 @@ def test_offline_contribution_is_inert(offline_client):
                 json={"interactor_id": user, "message": "hi"})
     fb = client.post(
         f"/profiles/{p['id']}/interactions/{user}/feedback",
-        json={"rating": "up"}).json()
+        json={"rating": "up"}, headers=as_interactor(user)).json()
     # No cloud attached → nothing is ever contributed.
     assert fb["contributed"] is False
 

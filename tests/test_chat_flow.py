@@ -37,21 +37,26 @@ def test_memory_persists_and_can_be_cleared(client, profile_id, interactor_id):
     assert client.get(f"/profiles/{profile_id}/memory/{interactor_id}").json() == []
 
 
-def test_engagement_tracks_messages_and_feedback(client, profile_id, interactor_id):
+def test_engagement_tracks_messages_and_feedback(client, profile_id, interactor_id,
+                                                 interactor_head):
+    """Both halves carry Sam's own token now. They did not, and did not have
+    to: the rating and the record were open to anybody holding two ids."""
     client.post(
         f"/profiles/{profile_id}/chat",
         json={"interactor_id": interactor_id, "message": "Hello there"},
     )
     before = client.get(
-        f"/profiles/{profile_id}/engagement/{interactor_id}"
+        f"/profiles/{profile_id}/engagement/{interactor_id}",
+        headers=interactor_head,
     ).json()
     assert before["interactions"] == 1
 
     client.post(
         f"/profiles/{profile_id}/interactions/{interactor_id}/feedback",
-        json={"rating": "up"},
+        json={"rating": "up"}, headers=interactor_head,
     )
-    after = client.get(f"/profiles/{profile_id}/engagement/{interactor_id}").json()
+    after = client.get(f"/profiles/{profile_id}/engagement/{interactor_id}",
+                       headers=interactor_head).json()
     assert after["feedback_pos"] == 1
     assert after["score"] > before["score"]
 

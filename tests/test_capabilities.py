@@ -48,6 +48,18 @@ def make_interactor(client, name="Maya", birthdate="1996-04-01"):
         "display_name": name, "birthdate": birthdate}).json()["id"]
 
 
+def as_interactor(interactor_id: str) -> dict:
+    """That person's own token, as a header.
+
+    `make_interactor` returns only the id, which was enough for as long as
+    the surfaces about a person took no token — their rating and their
+    engagement record both did not. Tests that touch either need this.
+    """
+    from qrme import auth
+
+    return {"authorization": f"Bearer {auth.issue('interactor', interactor_id)}"}
+
+
 def test_profile_purposes_stored_and_reported(client):
     p = make_profile(client, purpose="legacy_memorial")
     assert p["purpose"] == "legacy_memorial"

@@ -3519,6 +3519,21 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 170: reaching out. The four refusals, and the point that only two of
+    # them belong to the owner. The quiet-hours card is the one that took a
+    # decision — it is the recipient's, and the owner is refused it.
+    dict(num=170, title="Reaching Out, And What Stops It", sub="Four refusals, two of them yours",
+         accent="indigo", tab=17, cards=[
+        dict(icon="clock", color="indigo", k="Quiet hours",
+             s="theirs to set, not yours",
+             pill=("403", "warn")),
+        dict(icon="bell", color="amber", k="Awaiting a reply",
+             s="never twice into silence"),
+        dict(icon="finger", color="cyan", k="A rating is theirs",
+             s="and it can send an exchange"),
+        dict(icon="brain", color="green", k="What it learned",
+             s="shown, so it can be argued with"),
+    ], button=("Reach out now", "brand")),
     # 169: the codes. Two pictures that look identical and go opposite ways,
     # and the fact that made the whole screen: there is no way to check a
     # code without adding to the number you are checking.

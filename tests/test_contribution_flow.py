@@ -2,7 +2,8 @@
 be contributed, see everything that has left, and revoke — which stops future
 contributions AND deletes past ones at the gateway by their anonymous refs."""
 
-from tests.test_capabilities import make_interactor, make_profile
+from tests.test_capabilities import (as_interactor, make_interactor,
+                                     make_profile)
 from tests.test_cloud import cloud_pair  # noqa: F401
 
 
@@ -11,7 +12,7 @@ def _chat_and_uprate(client, p, user):
                 json={"interactor_id": user, "message": "tell me a story"})
     return client.post(
         f"/profiles/{p['id']}/interactions/{user}/feedback",
-        json={"rating": "up"}).json()
+        json={"rating": "up"}, headers=as_interactor(user)).json()
 
 
 def test_preview_shows_exactly_what_would_leave(cloud_pair):

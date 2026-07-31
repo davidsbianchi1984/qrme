@@ -52,3 +52,19 @@ def interactor_id(client):
     )
     assert response.status_code == 201, response.text
     return response.json()["id"]
+
+
+@pytest.fixture()
+def interactor_head(client, interactor_id):
+    """Sam's own token, as a header.
+
+    Separate from `interactor_id` so a test has to reach for it deliberately.
+    Several surfaces about a person — their rating, their engagement record —
+    were readable and writable with no token at all, and the tests did not
+    notice because they had none to send.
+    """
+    row = client.get(f"/interactors/{interactor_id}")
+    if row.status_code == 200 and row.json().get("token"):
+        return {"authorization": f"Bearer {row.json()['token']}"}
+    from qrme import auth
+    return {"authorization": f"Bearer {auth.issue('interactor', interactor_id)}"}
