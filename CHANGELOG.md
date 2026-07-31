@@ -4,10 +4,16 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.20.1] — 2026-07-31
 
-**A sale credited to a key nothing reads.** Paying down the first of the 25
-unused `api.ts` bindings found it. `PUT /marketplace/listings/{id}/offer`
+Two rounds, and the second was found by the first. The audit round below built
+a guard that names every `api.ts` binding no screen calls; paying down the
+first of them turned up a marketplace sale that was credited to a key nothing
+reads.
+
+### A sale credited to a key nothing reads
+
+Paying down the first of the 25 unused `api.ts` bindings found it. `PUT /marketplace/listings/{id}/offer`
 recorded the seller as the token's subject — and an **owner token's subject is
 a profile, not an account**, while `GET /profiles/{id}/earnings` resolves the
 profile to its `owner_id` before querying the ledger.
@@ -42,8 +48,10 @@ other half of the money.
   bindings: **25 → 21**.
 
 
-**The union hid a surface.** The doorless backlog reached zero in 0.20.0, and
-it was measuring the wrong thing. `clientpaths.doorless` unions the console
+### The union hid a surface
+
+The doorless backlog reached zero in 0.20.0, and it was measuring the wrong
+thing. `clientpaths.doorless` unions the console
 with the iOS, Android and Windows shells, so a route only the phone calls
 counts as doored — the number went to zero while a desktop owner could not
 reach **64 routes**. The guard was answering *some client can reach this*,

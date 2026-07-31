@@ -1,87 +1,108 @@
-# QRME v0.20.0 — release notes
+# QRME v0.20.1 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.20.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.20.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.20.0 — the doorless backlog reached zero.**
+**QRME v0.20.1 — the guard was measuring the wrong thing, and the money knew.**
 
-It began at **116** routes the backend served that no client could reach. This
-release closes the last **42**, each with a door in the console, carried by six
-new screens (**168–173**).
+Two rounds, and the second was found by the first.
 
-A route with no door is the quieter of the two integration failures. A client
-asking for a route that does not exist produces a 404 somebody eventually
-reports. A route no client asks for produces nothing at all: the code is
-present, its tests pass, the changelog says it shipped, and the capability is
-simply unreachable.
+## The union hid a surface
 
-## What the exercise actually produced
+0.20.0 reported a doorless backlog of **zero**. It was true of the wrong
+question. `clientpaths.doorless` unions the console with the iOS, Android and
+Windows shells, so a route only the phone calls counts as doored — and the
+number went to zero while a desktop owner could not reach **64 routes**. The
+guard was answering *some client can reach this*, which was true, in place of
+*this client can reach this*, which was not.
 
-Not doors — **defects**. Almost none were visible to the typecheck.
+That is the shape of every defect this audit has produced: a checker answering
+a question slightly to the left of the one that matters, and passing.
 
-**Three routes took no token at all.**
+**Two new guards, in all three repositories:**
 
-- `POST /packs` let anybody publish to the marketplace, name any string as the
-  publisher, and name *any account* as the one sales accrue to.
-- `POST /profiles/{id}/interactions/{id}/feedback` let anybody rate in somebody
-  else's name — and since an `up` rating is the trigger for cloud contribution,
-  an unauthenticated caller could push a stranger's conversation out of the
-  deployment.
-- `GET /profiles/{id}/engagement/{id}` exposed how often a named person talks
-  to a profile, across how many sessions, and whether they liked it.
+- `test_the_console_is_a_client_too.py` — the console's own backlog, checked in
+  both directions and ratcheted so it cannot grow past where it started. The
+  union guard stays; a route no client anywhere calls is still worse. A
+  phone-only capability is a legitimate design choice, which is what the
+  snapshot is for: deferring one takes a deliberate edit and shows in a diff.
+- `test_a_binding_is_not_a_door.py` — a function in `api.ts` that no screen
+  calls is not a door, and `doorless` counted it as one. The docstring on
+  `doorless` had said this was *"a discipline rather than something the test
+  can enforce"*. It is enforceable in about twenty lines, and found **25
+  bindings nothing calls**. *The test cannot check this* is a claim worth
+  testing.
 
-In each case the argument against it was **already written down elsewhere in
-this repository** — `commerce.beneficiary_of` on gifts, the beacon list on
-physical places. Three routes had quietly gone the other way.
+## Screen 174 — "What you are owed"
 
-**A licence was sold to somebody who could not use it.** A licence permitting
-derivatives went to a buyer under 18: `201`, `can_derive: true`, fee credited
-to the seller at sale time — then a `403` on the only thing the licence exists
-for. The adult check now runs at acquire, where the money moves.
+Nine of the sixty-four were the whole seller's side of the product. An owner
+could be bought from and could not post a licence offer, see who held one,
+revoke it, read a penny of what it earned, or ask to be paid — all present on
+the phone's Earn tab, all absent from the desk.
 
-**A link resolved against the wrong origin.** Desk beacons returned a relative
-`scan_url` while the profile beacons next door returned an absolute one, so the
-console's scan link resolved against the console's own origin — dead in every
-packaged build.
+Building the screen found three defects.
 
-**An honesty note was served to nobody.** A desk's view frame, and the sentence
-it carries — *this deployment has no camera on this desk, so the frame is not
-live and is not claimed to be* — was never rendered anywhere in the console.
+**A statement added two currencies together.** ¥100 and $100 came back as
+`accrued: 200`, labelled with whichever sale was newest, and all three native
+shells render that figure with a currency symbol in front of it. Nothing was
+wrong with the entries; each carried its own currency the whole time. The
+arithmetic over them was wrong, in the one place where a wrong number looks
+exactly like a right one. Totals are per currency now (`by_currency`,
+`currencies`, and a `mixed` flag on the headline), the settlement currency is
+chosen deterministically rather than by recency, and a payout settles **one**
+currency and reports what is `remaining`. A single-currency account reads
+exactly as it did.
 
-## The audit could not see two kinds of request
+**Anyone could delete anyone's listing.** `DELETE /marketplace/listings/{id}`
+asked for no credential, while `DELETE …/offer` — which destroys strictly less
+— answered the same stranger *"not your offer"*. Driven against a running
+backend: a stranger removed a listing that had a recorded seller, an open offer
+and a paid order against it. The offer and the orders survived orphaned and the
+title was free for somebody else to put up. A listing is now claimed by whoever
+staked something on it — the creator recorded in `listing_claims`, the seller
+on its offer, or the owner of the profile it advertises. Creating one still
+needs no token, and a listing with no claimant at all is still anybody's to
+clear away, which is the honest reading of an endpoint that needs none.
 
-An `<img src>` is a fetch. An `<a href>` is a fetch. Neither passes through the
-API client, and the extractor could see neither — so two routes sat on the
-backlog while the placements screen had been rendering both since it was
-written.
+**A sale credited to a key nothing reads.** This one came out of paying down
+the first of the 25 unused bindings. `PUT /marketplace/listings/{id}/offer`
+recorded the seller as the token's subject — and an **owner token's subject is
+a profile, not an account**, while `GET /profiles/{id}/earnings` resolves the
+profile to its `owner_id` before querying the ledger. So a seller who priced a
+listing while signed in as their profile's owner got `200` on the offer, `201`
+on the purchase with a real `ledger_entry` and the sentence *the sale is
+recorded on the seller's statement* — and an empty statement. The money was
+written under a key nothing queries, and every response along the way said it
+had gone through.
 
-Worse, **the exemption list had absorbed three of them**, each marked "rendered
-in an `<img src>`, not fetched by the API client" — an exemption made out of a
-blind spot, which is the shape that stops anybody asking. One of the three had
-no door at all. The list now holds to one rule: **exempt a path because nothing
-should ever call it, never because the audit cannot see the call.**
+It survived because nobody could do it: `api.setOffer` existed and no screen
+called it, and the phone prices listings as an *interactor*, whose subject id
+already is the account. `commerce.beneficiary_of` has resolved a profile to its
+owner for gifts since gifts existed — the same rule, never applied to the other
+half of the money. `_earner()` is that rule on the other half, across pricing,
+withdrawing and `GET /marketplace/sales`.
 
-## Recorded rather than corrected
+## Also
 
-Five findings are pinned as observed behaviour instead of changed, because each
-is a decision to make deliberately rather than while building a screen:
+- **`clientpaths.py` was not byte-identical across the three repositories**,
+  though it says it is. JIM-mini and PDI never received the `fetch`,
+  `window.open`, `<img src>` and `<a href>` call forms from 0.20.0, so their
+  backlogs counted doors that already existed. Restored; JIM's dropped 73 → 69.
+- **The pairing QR is built from a literal** in JIM-mini and PDI rather than
+  from a path arriving in a response body — a real door no static check could
+  see, which had got itself exempted as *not a client call*. That is an
+  exemption made out of a blind spot, and the last one of those turned out to
+  have no door at all.
 
-- a **gift** reads its beneficiary from the subject; a **subscription** takes
-  one from the request body;
-- the contribution **preview is computed whether or not you are opted in**, so
-  the console changes the heading rather than the content;
-- the quiet-hours window is half-open, so **9-to-9 covers nothing** — changing
-  the arithmetic would silently redefine every window already stored;
-- three deletes give three different answers to *there was nothing there*;
-- `deleted_at_gateway` is true *vacuously* when nothing ever left.
+## Where the numbers stand
 
-## The guard, now that the backlog is empty
+| | QRME | JIM-mini | PDI |
+|---|---|---|---|
+| union backlog | 0 | 69 | 58 |
+| console backlog | 55 | 109 | 84 |
+| unused bindings | 21 | 4 | 3 |
 
-A new assertion says so directly, separate from the record comparison so the
-message is plain when it goes: *the number is no longer zero*. Its
-guard-on-guard moved too — asserting the snapshot was non-empty no longer means
-anything, so the liveness check now sits on the console's extracted call sites.
-
-Seven new test files, 154 tests, 23 injection-verified. **Suite: 1807 passing.**
+The console backlogs are new, ratcheted, and now visible. That is the point of
+them.
