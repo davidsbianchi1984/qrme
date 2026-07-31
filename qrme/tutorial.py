@@ -180,8 +180,13 @@ LESSONS: tuple[dict, ...] = (
               "left. Revoking a licence stops the buyer deriving from it — "
               "it does not unmake an agent they already derived, and it "
               "does not take the fee off your statement, because a sale "
-              "that happened stays on the record. And a listing can now "
-              "only be taken down by somebody with a stake in it.",
+              "that happened stays on the record. A listing can now "
+              "only be taken down — or moved — by somebody with a stake "
+              "in it. And putting a price on one credits your "
+              "**account**, not the profile you happen to be signed in as: "
+              "before this screen existed the sale went through, the "
+              "receipt said it was on your statement, and the statement "
+              "was empty.",
          screens=(174,),
          try_it="Post a consult offer, then look at what the statement says "
                 "before anybody has bought one."),

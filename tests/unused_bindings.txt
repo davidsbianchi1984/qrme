@@ -11,15 +11,11 @@ api.health
 api.lendMicInRoom
 api.mediaLimits
 api.micsInRoom
-api.placeListing
 api.resumeDelegatedWorkflow
 api.roomMessages
 api.setAvatar
-api.setOffer
 api.startDelegatedWorkflow
 api.stats
 api.takeBackMicInRoom
-api.unplaceListing
 api.watermark
-api.withdrawOffer
 api.workflow

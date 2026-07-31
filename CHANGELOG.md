@@ -6,6 +6,42 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+**A sale credited to a key nothing reads.** Paying down the first of the 25
+unused `api.ts` bindings found it. `PUT /marketplace/listings/{id}/offer`
+recorded the seller as the token's subject — and an **owner token's subject is
+a profile, not an account**, while `GET /profiles/{id}/earnings` resolves the
+profile to its `owner_id` before querying the ledger.
+
+So a seller who priced a listing while signed in as their profile's owner got
+`200` on the offer, `201` on the buyer's purchase with a real `ledger_entry`
+and the sentence *the sale is recorded on the seller's statement* — and an
+empty statement. The money was written under a key nothing queries, and every
+response along the way said it had gone through.
+
+It survived because nobody could do it: `api.setOffer` existed and no screen
+called it, and the phone prices listings as an *interactor*, whose subject id
+already is the account. `commerce.beneficiary_of` has resolved a profile to
+its owner for gifts since gifts existed — the same rule, never applied to the
+other half of the money.
+
+### Fixed
+
+- `_earner()` resolves an owner token to its account for **every** seller-side
+  route: pricing, withdrawing, and `GET /marketplace/sales`. Moving what is
+  stored had to move what is compared, or a seller locks themselves out of
+  their own offer.
+- `api.placeListing` and `api.unplaceListing` took no token, which was
+  harmless only while nothing called them — those routes gained claimant
+  gating this round, so a tokenless call would now be a 401.
+
+### Added
+
+- **"What you are owed" gains the price and the place.** `setOffer`,
+  `withdrawOffer`, `placeListing`, `unplaceListing` — four of the 25 unused
+  bindings, wired to the screen that should have carried them. Unused
+  bindings: **25 → 21**.
+
+
 **The union hid a surface.** The doorless backlog reached zero in 0.20.0, and
 it was measuring the wrong thing. `clientpaths.doorless` unions the console
 with the iOS, Android and Windows shells, so a route only the phone calls

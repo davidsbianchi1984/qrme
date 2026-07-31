@@ -2663,13 +2663,20 @@ export const api = {
 
   // Where a listing is, if anywhere. Placement is what makes "near me" mean
   // something; without it a listing is everywhere and therefore nowhere.
+  // Both take a token now. These routes stopped being open when listings
+  // gained claimants: moving somebody's listing to another city is a quieter
+  // version of taking it down, so it is gated the same way. The bindings had
+  // no token parameter at all, which was harmless only because no screen
+  // called them — a tokenless call would now be a 401 the moment one did.
   placeListing: (listingId: string,
-                 body: { locality: string; region?: string; remote?: boolean }) =>
+                 body: { locality: string; region?: string; remote?: boolean },
+                 token: string) =>
     req<Place>(`/marketplace/listings/${listingId}/place`,
-      { method: "PUT", body }),
-  unplaceListing: (listingId: string) =>
+      { method: "PUT", body, token }),
+  unplaceListing: (listingId: string, token: string) =>
     req<{ listing_id: string; place: null }>(
-      `/marketplace/listings/${listingId}/place`, { method: "DELETE" }),
+      `/marketplace/listings/${listingId}/place`,
+      { method: "DELETE", token }),
 
   // What this buyer wants shown: their town, how far out to look, and
   // whether remote counts. Their own setting, behind their own token.

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type EarningsStatement, type LicenseHolder,
-         type LicenseOfferView, type PayoutReceipt } from "../api";
+         type LicenseOfferView, type Offer, type PayoutReceipt } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -57,6 +57,12 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
   const [listingTitle, setListingTitle] = useState("");
   const [listingBlurb, setListingBlurb] = useState("");
   const [listingId, setListingId] = useState("");
+  const [askPrice, setAskPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [locality, setLocality] = useState("");
+  const [region, setRegion] = useState("");
+  const [remote, setRemote] = useState(false);
+  const [offerOn, setOfferOn] = useState<Offer | null>(null);
 
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -293,12 +299,93 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
           </button>
         </div>
         <p className="muted small">
-          Only a claimant may take a listing down: whoever made it, the seller
-          on its offer, or the owner of the profile it advertises. It used to
-          take no credential at all, so anyone could remove anyone's — while
-          the same stranger asking to withdraw the <em>offer</em> on it was
-          told it was not theirs.
+          Only a claimant may take a listing down or move it: whoever made it,
+          the seller on its offer, or the owner of the profile it advertises.
+          It used to take no credential at all, so anyone could remove
+          anyone's — while the same stranger asking to withdraw the{" "}
+          <em>offer</em> on it was told it was not theirs.
         </p>
+      </div>
+
+      <div className="card">
+        <h3>A price on it</h3>
+        <p className="muted small">
+          A listing is a shop window; an offer is what makes it a shop. The
+          sale accrues to <strong>your account</strong>, not to the profile you
+          happen to be signed in as — a distinction that cost real money before
+          this screen existed: the sale went through, the receipt said it was on
+          your statement, and the statement was empty.
+        </p>
+        <div className="row">
+          <input value={askPrice} onChange={(e) => setAskPrice(e.target.value)}
+                 placeholder="price" style={{ width: "7rem" }} />
+          <input value={stock} onChange={(e) => setStock(e.target.value)}
+                 placeholder="stock (blank = unlimited)" style={{ flex: 1 }} />
+        </div>
+        <div className="row">
+          <button disabled={busy || !token || !listingId.trim()
+                            || !askPrice.trim()}
+                  onClick={act(async () => setOfferOn(
+                    await api.setOffer(listingId.trim(), {
+                      price: Number(askPrice), currency,
+                      stock: stock.trim() ? Number(stock) : undefined,
+                    }, token)), "Priced.")}>
+            Put a price on it
+          </button>
+          <button disabled={busy || !token || !listingId.trim()}
+                  onClick={act(async () => {
+                    await api.withdrawOffer(listingId.trim(), token);
+                    setOfferOn(null);
+                  }, "Stopped selling it. The window stays; receipts stay.")}>
+            Stop selling it
+          </button>
+        </div>
+        {offerOn && (
+          <p className="small">
+            {money(offerOn.price, offerOn.currency)} · {offerOn.status} ·{" "}
+            sold {offerOn.sold}
+            {offerOn.stock !== null && ` · ${offerOn.stock} left`}
+          </p>
+        )}
+      </div>
+
+      <div className="card">
+        <h3>Where it is offered</h3>
+        <p className="muted small">
+          A named locality you type, never coordinates and never anything read
+          off an address or an IP. A rated listing is refused a location
+          outright: where a performer physically is has nothing to do with
+          browsing them.
+        </p>
+        <div className="row">
+          <input value={locality} onChange={(e) => setLocality(e.target.value)}
+                 placeholder="locality, e.g. Oakland, CA" style={{ flex: 1 }} />
+          <input value={region} onChange={(e) => setRegion(e.target.value)}
+                 placeholder="region" style={{ width: "9rem" }} />
+          <label className="small">
+            <input type="checkbox" checked={remote}
+                   onChange={(e) => setRemote(e.target.checked)} />
+            {" "}also served from anywhere
+          </label>
+        </div>
+        <div className="row">
+          <button disabled={busy || !token || !listingId.trim()
+                            || !locality.trim()}
+                  onClick={act(async () => {
+                    await api.placeListing(listingId.trim(), {
+                      locality: locality.trim(),
+                      region: region.trim() || undefined, remote,
+                    }, token);
+                  }, "Placed.")}>
+            Say where it is
+          </button>
+          <button disabled={busy || !token || !listingId.trim()}
+                  onClick={act(async () => {
+                    await api.unplaceListing(listingId.trim(), token);
+                  }, "Cleared — it is offered anywhere again.")}>
+            Clear the place
+          </button>
+        </div>
       </div>
     </div>
   );

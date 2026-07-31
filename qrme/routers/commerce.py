@@ -33,6 +33,39 @@ def _actor(request: Request) -> str:
     return who["subject_id"]
 
 
+def _earner(request: Request) -> str:
+    """The **account** this caller's money lands in.
+
+    An owner token's subject is a *profile*, not an account, and the ledger is
+    keyed by ``owner_id``. Attributing a sale to the token's subject therefore
+    wrote the credit under a profile id, and `GET /profiles/{id}/earnings`
+    — which resolves the profile to its ``owner_id`` before querying — could
+    not see it. A seller who priced a listing while signed in as their
+    profile's owner made the sale, got a 201 saying *the sale is recorded on
+    the seller's statement*, and had an empty statement. The money sat in the
+    ledger under a key nothing reads.
+
+    Nobody noticed because the console had no way to price a listing: the
+    binding existed in `api.ts` and no screen called it. It went unnoticed on
+    the phone too, where the Market tab prices listings as an *interactor*,
+    whose subject id already is the account.
+
+    `commerce.beneficiary_of` has resolved a profile to its owner for gifts
+    since gifts existed. This is the same rule, applied to the other half of
+    the money.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who["role"] != "owner":
+        return who["subject_id"]
+    row = db.connect().execute("SELECT owner_id FROM profiles WHERE id=?",
+                               (who["subject_id"],)).fetchone()
+    if row is None:
+        raise HTTPException(403, "this token names no profile")
+    return row["owner_id"]
+
+
 def _fail(exc: commerce.CommerceError):
     if str(exc).startswith("no such "):
         return HTTPException(404, str(exc))
@@ -96,7 +129,7 @@ def put_offer(listing_id: str, body: OfferIn, request: Request) -> dict:
     starts, rather than back there where it did not exist.
     """
     try:
-        return commerce.offer(listing_id, _actor(request), body.price,
+        return commerce.offer(listing_id, _earner(request), body.price,
                               body.currency, body.stock)
     except commerce.CommerceError as exc:
         raise _fail(exc) from exc
@@ -117,7 +150,7 @@ def delete_offer(listing_id: str, request: Request) -> dict:
     """Stop selling. The listing stays as a shop window; past orders stay as
     receipts."""
     try:
-        return commerce.withdraw(listing_id, _actor(request))
+        return commerce.withdraw(listing_id, _earner(request))
     except commerce.CommerceError as exc:
         raise _fail(exc) from exc
 
@@ -152,7 +185,7 @@ def my_orders(request: Request) -> dict:
 @router.get("/marketplace/sales")
 def my_sales(request: Request) -> dict:
     """What you sold."""
-    return {"sales": commerce.orders_for_seller(_actor(request))}
+    return {"sales": commerce.orders_for_seller(_earner(request))}
 
 
 # --- gifting --------------------------------------------------------------
