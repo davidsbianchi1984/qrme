@@ -324,6 +324,22 @@ LESSONS: tuple[dict, ...] = (
               "an opinion about footage nobody showed it.",
          screens=(155,),
          try_it="Open a party and read 'What a profile in here knows'."),
+    dict(key="referral", chapter="Working",
+         title="Handing it to somebody qualified",
+         what="A profile is not a clinician, and the summary it assembles "
+              "says so before anything else. If you have been talking to one "
+              "about a symptom, you can hand that conversation to somebody "
+              "who is qualified — once. Preparing it releases nothing: you "
+              "read exactly what would go, and the signature you then give "
+              "with your device is over those precise words, because the "
+              "thing you sign is their hash. A summary changed afterwards "
+              "cannot ride the old signature. The link the clinician gets "
+              "opens once and says when it was used if anybody tries again, "
+              "and they may write back one time — their words, attributed to "
+              "them, never recited by the profile as its own.",
+         screens=(166,),
+         try_it="Search for an area of care and read the package it "
+                "assembles before you sign anything."),
     dict(key="assist", chapter="Working", title="What it can do for you",
          what="Hand it a pile and it keeps the best few — and tells you why "
               "each one survived, with the score, because a ranking nobody "

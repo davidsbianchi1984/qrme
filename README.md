@@ -358,6 +358,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/163-a-body-to-speak-through.svg"><img src="docs/screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
     <td align="center" width="33%"><a href="docs/screens/164-what-it-is-made-of.svg"><img src="docs/screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
     <td align="center" width="33%"><a href="docs/screens/165-what-it-can-do-for-you.svg"><img src="docs/screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/166-somebody-qualified.svg"><img src="docs/screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
   </tr>
 </table>
 
@@ -1763,6 +1764,48 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 166 — handing it to somebody qualified
+
+A profile is not a clinician, and the package it assembles says so before it
+says anything else. Twelve routes: the clinician directory, the referral
+lifecycle, and the signature behind it.
+
+Every part is built to be awkward where the easy version would be wrong.
+**Prepare releases nothing** — you read exactly what would go, and the
+challenge it raises **is the hash of those bytes**, so signing it signs this
+summary rather than a checkbox, and a summary edited afterwards cannot ride the
+old signature. **The link works once**, and a second attempt says *when* the
+first happened rather than quietly working, because a replayed link is
+something the patient should be able to discover. The clinician may write back
+one time, and their words stay theirs — the profile never recites them as its
+own knowledge.
+
+Three pairs here are one wrong variable from a bug that looks like success, and
+each is labelled on the screen rather than left to the reader:
+
+| | |
+|---|---|
+| the **referral token** | opens it |
+| the **reply token** | answers it, and does not exist until it has been opened |
+| `envelope_id` | is what gets signed |
+| `signature_id` | is what release checks |
+| **proofing level** | how the identity was checked |
+| `can_sign` | what that actually permits — and a referral is `high` |
+
+The screen shows `can_sign` rather than the tier table, because that is the
+fact somebody needs when the button is greyed out. Matching is expertise-first
+by design: *a cardiologist two streets away is not a substitute for a
+psychiatrist*, so area filters and location only ranks, and no match is an
+empty list rather than a near-miss.
+
+**The route audit gained a second blind spot fix.** The WebAuthn ceremony is a
+*page the browser navigates to* — it has to be, because WebAuthn refuses a
+mismatched `rpId` and an opaque origin has none to match — so no client
+"requests" it and every client that opens it counted as doorless.
+`clientpaths.py` now recognises `window.open` as the GET it is. The URL has to
+be built as `getBase() + \`/signatures/ceremony…\`` for the extractor to
+resolve it, which is worth knowing before the next one.
 
 ### Screen 165 — what it can do for you, and the mark on what it makes
 

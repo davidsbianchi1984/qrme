@@ -3515,6 +3515,22 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 166: the referral. Every card is a place where the design chose the
+    # more awkward option — a separate read-it-first step, a signature over
+    # the bytes rather than a tick, a link that dies on first use, and the
+    # sentence that the thing you were talking to is not a clinician.
+    dict(num=166, title="Somebody Qualified", sub="Once, and only with your signature",
+         accent="red", tab=15, cards=[
+        dict(icon="warn", color="red", k="Not a clinician",
+             s="and the summary says so first",
+             pill=("AI", "crit")),
+        dict(icon="doc", color="cyan", k="Read it, then sign",
+             s="nothing has gone anywhere yet"),
+        dict(icon="finger", color="brand", k="Over these exact words",
+             s="the challenge is their hash"),
+        dict(icon="lock", color="amber", k="The link works once",
+             s="a second try says when"),
+    ], button=("Sign it with your device", "brand")),
     # 165: what it can do for you. The last card is the pair of answers a
     # provenance check gives, which can disagree — a real credential and
     # altered content — and reporting only the first would be the one

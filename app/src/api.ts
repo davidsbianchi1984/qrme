@@ -669,6 +669,127 @@ export type WatermarkVerdict = WatermarkRecord & {
   note?: string;
 };
 
+// ---------------------------------------------------------------------
+// Referrals.
+// ---------------------------------------------------------------------
+
+export type Provider = {
+  id: string; name: string; area: string;
+  location: string | null; contact: string | null;
+  business: boolean;
+  created_at?: string;
+};
+
+/** A match. `match` says in words how it matched rather than scoring it —
+ *  a number would imply a precision the data does not have, and expertise
+ *  filters while geography only ranks. A cardiologist two streets away is
+ *  not a substitute for a psychiatrist. */
+export type Clinician = Provider & {
+  in_your_area: boolean;
+  match: string;
+};
+
+export type ReferralPackage = {
+  user: string; clinician: string; area: string;
+  /** Rendered verbatim, and the most important line in the package: the
+   *  thing that had the conversation is an AI profile, not a clinician,
+   *  and nothing in it is a diagnosis. */
+  specialist: { name: string; synthetic: boolean; note: string };
+  recent_exchange: { role: string; content: string }[];
+};
+
+export type ReferralPrepared = {
+  referral_id: string;
+  clinician: string; area: string;
+  /** What would go. Shown before anything is signed — the point of a
+   *  separate prepare step is that somebody reads this first. */
+  package: ReferralPackage;
+  display_text: string;
+  sign: {
+    envelope_id: string;
+    challenge: string;
+    payload: Record<string, unknown>;
+    display_text: string;
+  };
+};
+
+export type ReferralReleased = {
+  id: string;
+  /** Opens it, once. Not the same string as the reply token, which does
+   *  not exist yet. */
+  token: string;
+  one_time: boolean;
+  signature_id: string;
+  signed_by: { account_id: string; name: string; proofing_level: string };
+  meaning: string;
+};
+
+export type ReferralOpened = {
+  id: string;
+  package: ReferralPackage;
+  signature_id: string;
+  /** Arrives only here, when the link is spent. The clinician answers with
+   *  this, not with the token they opened it with. */
+  reply_token: string;
+  reply_note: string;
+  note: string;
+};
+
+export type ReferralReplied = {
+  id: string; referral_id: string;
+  sealed: boolean;
+  note: string;
+};
+
+export type ReferralHistory = {
+  id: string; provider_id: string;
+  released: boolean;
+  opened_at: string | null;
+  signature_id: string | null;
+  created_at: string;
+};
+
+export type ClinicalNote = {
+  id: string;
+  from: string;
+  at: string;
+  content: string;
+};
+
+export type SigningCredential = {
+  id: string; account_id: string;
+  credential_id: string; aaguid: string; alg: number;
+  proofing_level: string;
+  proofing_method: string | null;
+  proofing_attestor: string | null;
+  display_name: string;
+  backup_eligible: boolean; backed_up: boolean;
+  /** False for a passkey that syncs between devices, which is why it
+   *  cannot reach the high tier — the tier wants a key that stayed put. */
+  device_bound: boolean;
+  created_at: string;
+  revoked_at: string | null;
+  /** The visible consequence of the proofing level, and what the screen
+   *  shows instead of explaining the tiers. */
+  can_sign: string[];
+};
+
+export type Certificate = {
+  signature_id: string;
+  printed_name: string;
+  signed_at: string;
+  meaning: string;
+  document_sha256: string;
+  /** The bytes the signer actually read, kept beside the hash of them —
+   *  a signature over a document nobody saw is a signature over nothing. */
+  what_was_shown: string;
+  identity_verified_as: string;
+  tier: string;
+  valid: boolean;
+  verify_at: string;
+  standard: string;
+};
+
 export type PlacementRemoved = {
   placement_id: string;
   removed: boolean;
@@ -2932,7 +3053,94 @@ export const api = {
   verifyWatermark: (watermarkId: string, content: string) =>
     req<WatermarkVerdict>("/watermarks/verify",
       { method: "POST", body: { watermark_id: watermarkId, content } }),
+
+  // ---------------------------------------------------------------------
+  // Handing a conversation to a clinician.
+  //
+  // Nothing is released until a signature covers the exact bytes. `prepare`
+  // assembles the summary and raises a challenge whose value *is* the hash
+  // of those bytes — so signing it signs this summary rather than a
+  // checkbox, and a summary edited afterwards cannot ride the old
+  // signature.
+  //
+  // Three pairs are easy to confuse and are named apart here:
+  //
+  //   the referral token  opens it, once
+  //   the reply token     answers it, and arrives only when it is opened
+  //   the signature id    is what release checks, not the envelope id
+  // ---------------------------------------------------------------------
+
+  clinicians: (area: string, location?: string) =>
+    req<Clinician[]>(`/referrals/match?area=${encodeURIComponent(area)}`
+      + (location ? `&location=${encodeURIComponent(location)}` : "")),
+  providers: () => req<Provider[]>("/providers"),
+  addProvider: (body: { name: string; area: string; location?: string;
+                        contact?: string; business?: boolean }) =>
+    req<{ id: string; name: string; area: string }>("/providers",
+      { method: "POST", body }),
+
+  prepareReferral: (body: { interactor_id: string; profile_id: string;
+                            provider_id: string }, token: string) =>
+    req<ReferralPrepared>("/referrals/prepare",
+      { method: "POST", body, token }),
+  releaseReferral: (referralId: string, signatureId: string, token: string) =>
+    req<ReferralReleased>(`/referrals/${referralId}/release`,
+      { method: "POST", body: { signature_id: signatureId }, token }),
+  // The clinician's side. No account — the link is the credential, and it
+  // works once.
+  openReferral: (referralId: string, token: string) =>
+    req<ReferralOpened>(
+      `/referrals/${referralId}?token=${encodeURIComponent(token)}`),
+  replyToReferral: (referralId: string, replyToken: string, content: string) =>
+    req<ReferralReplied>(
+      `/referrals/${referralId}/reply?token=${encodeURIComponent(replyToken)}`,
+      { method: "POST", body: { content } }),
+  myReferrals: (interactorId: string, token: string) =>
+    req<ReferralHistory[]>(`/interactors/${interactorId}/referrals`, { token }),
+  clinicalNotes: (profileId: string, interactorId: string, token: string) =>
+    req<ClinicalNote[]>(
+      `/profiles/${profileId}/clinical-notes/${interactorId}`, { token }),
+
+  // ---------------------------------------------------------------------
+  // The signature behind it.
+  // ---------------------------------------------------------------------
+
+  signingCredentials: (token: string) =>
+    req<{ credentials: SigningCredential[] }>("/signatures/credentials",
+      { token }),
+  // Enrolment fixes a proofing level; this is how it moves. `can_sign` on
+  // the answer is the visible consequence — a self-asserted credential
+  // signs `basic` only, and a document check opens `high`.
+  reproof: (rowId: string,
+            body: { proofing_level: string; proofing_attestor: string;
+                    proofing_method?: string; proofing_ref?: string },
+            token: string) =>
+    req<SigningCredential>(`/signatures/credentials/${rowId}/proofing`,
+      { method: "POST", body, token }),
+  certificate: (signatureId: string) =>
+    req<Certificate>(`/signatures/${signatureId}/certificate`),
 };
+
+/** Open the WebAuthn ceremony.
+ *
+ *  A page rather than a request, and it has to be: WebAuthn refuses a
+ *  mismatched `rpId`, and an opaque origin has none to match — so the
+ *  ceremony is served from the relying party's own origin and the browser
+ *  navigates to it. It takes no token on purpose; a bearer token in a query
+ *  string ends up in logs and history. */
+export function openCeremony(params: {
+  mode: "sign" | "enroll"; challenge: string;
+  display_text?: string; meaning?: string;
+  user_id?: string; user_name?: string; display_name?: string;
+}): Window | null {
+  const q = new URLSearchParams(
+    Object.entries(params).filter(([, v]) => v) as [string, string][]);
+  // The path is its own literal so the route audit can see it — a template
+  // that opens with `${...}` is a string the extractor cannot resolve to a
+  // path, and this door would go on counting as missing.
+  return window.open(getBase() + `/signatures/ceremony?${q}`,
+                     "qrme-ceremony", "width=460,height=620");
+}
 
 /** Raw bytes, not JSON and not multipart — the route reads the request body
  *  and works the kind out from the bytes. `filename` is a display hint that

@@ -99,7 +99,12 @@ CONSOLE = Language(
      # direction that produces busywork rather than the one that hides a
      # dead button, but failing either way.
      CallForm(re.compile(r"\bfetch\s*\("),
-              verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),),
+              verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),
+     # A page the browser navigates to is still a door, and the WebAuthn
+     # ceremony has to be one: it is served from the relying party's own
+     # origin because an opaque origin has no `rpId` to match. The audit
+     # counted it doorless in every client that opens it.
+     CallForm(re.compile(r"\bwindow\.open\s*\("), verb="GET"),),
 )
 # Swift's `\(…)` may hold one level of nested parentheses — `\(f(x))` — which is
 # as deep as these clients go.

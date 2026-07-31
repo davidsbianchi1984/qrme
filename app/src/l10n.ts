@@ -142,6 +142,13 @@ const CHROME: Table = {
     ja: "できること", zh: "它能为你做什么", hi: "यह आपके लिए क्या कर सकता है",
     ar: "ما يمكنه فعله لك",
   },
+  "nav.referrals": {
+    en: "Somebody qualified", es: "Alguien cualificado",
+    fr: "Quelqu'un de qualifié", de: "Jemand mit Qualifikation",
+    pt: "Alguém qualificado", it: "Qualcuno di qualificato",
+    ja: "専門家へ", zh: "转给专业人士", hi: "योग्य व्यक्ति",
+    ar: "شخص مؤهل",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",
