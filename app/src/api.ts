@@ -589,6 +589,124 @@ export type PartyEnded = {
   grants_closed: number; microphones_returned: number;
 };
 
+// ---------------------------------------------------------------------
+// Who a profile is, who may know, and how it ends.
+//
+// Three of the shapes below are unions rather than one type with optional
+// fields, and that is not tidiness — each pair is a genuinely different
+// answer, and flattening them would let a screen read a field that is only
+// meaningful in the other case.
+// ---------------------------------------------------------------------
+
+/** Whether somebody checked, and how well. Two answers, not one shape.
+ *
+ *  The unverified reply says *why* — an invented person is **unverifiable**
+ *  rather than unverified, and the note distinguishes those, because "nobody
+ *  checked" said of a fictional character is a category error rather than a
+ *  gap.
+ *
+ *  The verified reply is also what `GET /badge` returns to the public, with
+ *  one difference: on an anonymous profile the attestor is dropped and
+ *  `attestor_withheld` appears. "Checked by Dr Okafor of St Mary's" narrows an
+ *  anonymous author to a city and a workplace. */
+export type Verification =
+  | { verified: false; real_person: boolean; note: string }
+  | { verified: true; real_person: boolean; level: string; rank: number;
+      means: string; method: string | null; checked_at: string;
+      caveat: string | null;
+      /** Present to the owner and on a named profile. */
+      attestor?: string;
+      /** Present instead, on an anonymous profile, to the public. */
+      attestor_withheld?: boolean; note?: string };
+
+/** Whether this profile *could* take the badge. Two answers again: the
+ *  blocked one names the sibling that holds it and whether it can be moved,
+ *  and the plain one has no `held_by` to read. */
+export type Verifiable =
+  | { can_verify: true; reason: string }
+  | { can_verify: false; reason: string; held_by?: string; movable?: boolean };
+
+export type BadgeMoved = {
+  moved: boolean; from: string; verified_profile: string;
+  checked_at: string;
+  /** "the check itself did not change — only which of your profiles carries
+   *  it". The distinction the whole feature turns on. */
+  note: string;
+};
+
+export type Anonymity = {
+  profile_id: string; anonymous: boolean;
+  /** The fixed `Anonymous 00000000` when on, the real name when off. */
+  shown_as: string;
+  withheld: string[];
+  /** The half that matters more. Shown with equal weight on the screen. */
+  not_withheld: string[];
+  reversible: boolean;
+  note: string;
+  /** Only on a change: what the switch does and does not do retroactively. */
+  note_on_change?: string;
+};
+
+export type IdentityVocabulary = {
+  withheld_when_anonymous: string[];
+  never_withheld: string[];
+  real_person_kinds: string[];
+  /** Weakest first — a ladder, not a menu of alternatives. */
+  proofing_levels: { level: string; means: string; needs_attestor: boolean }[];
+  rules: string[];
+};
+
+export type Sibling = {
+  profile_id: string; kind: string; display_name: string;
+  shown_as: string; anonymous: boolean;
+  verified: boolean;
+  /** False for an invented person — which is why the roster can say
+   *  "unverifiable" rather than leaving a blank that reads as "not yet". */
+  can_be_verified: boolean;
+  level: string | null; status: string; created_at: string;
+};
+
+export type Emblem = { emblem: string; asset: string; means: string };
+
+export type EmblemSet = {
+  profile_id: string; emblem: string; asset: string;
+  own_image: boolean; shown: boolean; note: string;
+};
+
+export type Avatar = {
+  profile_id: string; asset: string | null; silhouette: boolean;
+  asset_marked: boolean;
+  /** Always displayed, by the product's own rule. */
+  watermark: { mark: string; label: string; line: string; custom: boolean;
+               always_displayed: boolean; disclosure: string };
+  likeness: { real_person: boolean; note: string;
+              basis?: string | null; attestor?: string | null;
+              revocable?: boolean };
+  placeholder: boolean;
+};
+
+export type AvatarBrief = {
+  handle: string; portrait: string; style: string; prompt?: string;
+};
+
+/** What sunsetting did. `archive_key` is non-null only where a vault holds it. */
+export type Sunset = {
+  status: string; farewells: number; memory: string;
+  archive_key: string | null;
+};
+
+export type Memorial = {
+  profile_id: string; display_name: string; handle: string | null;
+  purpose: string; status: string;
+  memorial_anchors: unknown[]; relationships_touched: number; note: string;
+};
+
+/** The itemised receipt for a deletion — one count per table it emptied.
+ *  Typed as an open record because the table list is the backend's business
+ *  and will grow; the screen renders whatever came back rather than a fixed
+ *  list that would silently stop mentioning a new one. */
+export type Deleted = { deleted: Record<string, number> };
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -1274,4 +1392,110 @@ export const api = {
   endWatchParty: (partyId: string, hostId: string, token: string) =>
     req<PartyEnded>(`/watch-parties/${partyId}/end`,
       { method: "POST", body: { host_id: hostId, position_s: 0 }, token }),
+
+  // ---------------------------------------------------------------------
+  // Who a profile is, who may know, and how it ends.
+  //
+  // Nineteen routes with no caller — including `DELETE /profiles/{id}`, so
+  // the console could make a profile and never remove one.
+  //
+  // Two routes are deliberately still without a door and stay in the
+  // doorless backlog rather than getting a button that lies:
+  //
+  //   * `POST /profiles/{id}/succeed` requires a *reviewer* token, not the
+  //     owner's, and on purpose — succession runs when the owner cannot
+  //     authorise anything. A button on the owner's own screen would 403
+  //     every time it was pressed;
+  //   * `POST /profiles/genesis` is a second creation path (a profile born
+  //     from a short interview, which names itself). It belongs in
+  //     onboarding, next to the first one, not on a screen about a profile
+  //     that already exists.
+  // ---------------------------------------------------------------------
+
+  identityVocabulary: () => req<IdentityVocabulary>("/identity/vocabulary"),
+
+  // The roster: every profile this account holds, which one carries the
+  // badge, and which of them could. Owner-only — it is the linkage between
+  // somebody's separate personas, which is the thing anonymity protects.
+  siblings: (profileId: string, token: string) =>
+    req<{ owner_id: string; profiles: Sibling[] }>(
+      `/profiles/${profileId}/siblings`, { token }),
+
+  verification: (profileId: string, token: string) =>
+    req<Verification>(`/profiles/${profileId}/verification`, { token }),
+
+  // Public, and not the same call: on an anonymous profile this drops the
+  // attestor. What survives is the part worth having — a real person stands
+  // behind this and somebody checked.
+  badge: (profileId: string) =>
+    req<Verification>(`/profiles/${profileId}/badge`),
+
+  verifiable: (profileId: string, token: string) =>
+    req<Verifiable>(`/profiles/${profileId}/verifiable`, { token }),
+
+  // 422 when the claim is malformed, 409 when the one-badge rule refuses.
+  // Both carry a sentence worth showing; the screen shows whichever arrives
+  // rather than replacing it with one of its own.
+  claimVerification: (profileId: string, body: {
+    level: string; attestor?: string; method?: string; ref?: string;
+  }, token: string) =>
+    req<Verification>(`/profiles/${profileId}/verification`,
+      { method: "POST", body, token }),
+
+  // Moving is the whole design: at most one of your profiles may be
+  // verified, and which one is a decision you can revisit. The check itself
+  // is not redone — only where it points.
+  moveBadge: (toProfileId: string, token: string) =>
+    req<BadgeMoved>(`/profiles/${toProfileId}/verification/move`,
+      { method: "POST", body: {}, token }),
+
+  anonymity: (profileId: string, token: string) =>
+    req<Anonymity>(`/profiles/${profileId}/anonymity`, { token }),
+  setAnonymity: (profileId: string, anonymous: boolean, token: string) =>
+    req<Anonymity>(`/profiles/${profileId}/anonymity`,
+      { method: "PUT", body: { anonymous }, token }),
+
+  emblems: () => req<{ emblems: Emblem[] }>("/identity/emblems"),
+  setEmblem: (profileId: string, emblem: string, token: string) =>
+    req<EmblemSet>(`/profiles/${profileId}/emblem`,
+      { method: "PUT", body: { emblem }, token }),
+
+  // The bubble, and everything the product says about it: the watermark that
+  // is always displayed, and whether a real person's likeness stands behind
+  // it under a grant that can be withdrawn.
+  avatar: (profileId: string, token: string) =>
+    req<Avatar>(`/profiles/${profileId}/avatar`, { token }),
+  // Takes `asset`, not a brief — the brief is the prompt you would hand a
+  // generator, and generating is not this endpoint's job.
+  setAvatar: (profileId: string, asset: string, token: string) =>
+    req<Avatar>(`/profiles/${profileId}/avatar`,
+      { method: "PUT", body: { asset }, token }),
+
+  avatarBriefs: () =>
+    req<{ style: string; briefs: AvatarBrief[] }>("/avatars/briefs"),
+  avatarBrief: (handle: string) =>
+    req<AvatarBrief>(`/avatars/briefs/${handle}`),
+
+  editProfile: (profileId: string, body: Record<string, unknown>,
+                token: string) =>
+    req<Profile>(`/profiles/${profileId}`, { method: "PATCH", body, token }),
+
+  // Everything held about this profile, as rows. The point of a door for it
+  // is that leaving before you can take your things is not leaving.
+  exportProfile: (profileId: string, token: string) =>
+    req<Record<string, unknown>>(`/profiles/${profileId}/export`, { token }),
+
+  // Retire it rather than erase it: the profile departs, and what it meant
+  // to the people who knew it stays readable.
+  sunsetProfile: (profileId: string, token: string) =>
+    req<Sunset>(`/profiles/${profileId}/sunset`,
+      { method: "POST", body: {}, token }),
+  memorial: (profileId: string) =>
+    req<Memorial>(`/profiles/${profileId}/memorial`),
+
+  // The other ending. Returns a count per table it emptied — twenty-five of
+  // them — which the screen shows rather than summarising, because "deleted"
+  // is a claim and an itemised receipt is evidence.
+  deleteProfile: (profileId: string, token: string) =>
+    req<Deleted>(`/profiles/${profileId}`, { method: "DELETE", token }),
 };

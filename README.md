@@ -343,6 +343,9 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/154-lent-skills.svg"><img src="docs/screens/154-lent-skills.svg" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
     <td align="center" width="33%"><a href="docs/screens/155-watch-together.svg"><img src="docs/screens/155-watch-together.svg" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -2680,6 +2683,19 @@ feature.
 **Per profile, never per account.** An account-wide switch would mean putting
 your name on the work profile puts it on the support-group one — the exact
 coupling that having several profiles exists to avoid.
+
+The console reaches all of it (**156**). The roster comes first, with the badge
+drawn as a thing that *sits on one profile and can move* rather than a checkbox
+each profile has and most fail — and an invented person reads as
+**unverifiable** rather than as an empty box, because those are different
+answers. The anonymity card puts `not_withheld` beside `withheld` at the same
+size: a screen that showed only the hidden half would be selling the promise
+this feature deliberately does not make.
+
+Two of its endings sit on the same screen for the same reason. Retiring leaves
+what the profile meant to the people who knew it; deleting returns an itemised
+receipt — a count per kind of record, twenty-five of them — because *deleted* is
+a claim and the numbers are evidence.
 
 ## Verified, and what the word is allowed to mean
 

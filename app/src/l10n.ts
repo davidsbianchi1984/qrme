@@ -98,6 +98,11 @@ const CHROME: Table = {
     en: "Voice", es: "Voz", fr: "Voix", de: "Stimme", pt: "Voz",
     it: "Voce", ja: "音声", zh: "语音", hi: "आवाज़", ar: "الصوت",
   },
+  "nav.identity": {
+    en: "Identity", es: "Identidad", fr: "Identité", de: "Identität",
+    pt: "Identidade", it: "Identità", ja: "本人確認", zh: "身份",
+    hi: "पहचान", ar: "الهوية",
+  },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
     pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",
