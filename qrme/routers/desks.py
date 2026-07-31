@@ -237,18 +237,31 @@ def join_stream(desk_id: str, request: Request,
     """
     _gate_rated(desk_id, request)
     mode = (body.mode if body else "audience")
-    try:
-        joined = desks.join(desk_id, mode=mode)
-    except desks.DeskError as exc:
-        if str(exc) == "no such desk":
-            raise HTTPException(404, "no such desk") from exc
-        raise _fail(exc) from exc
+
+    # Asked and answered *before* anything is written. `join` mints the
+    # stream's room on first arrival — a real row, committed — and this check
+    # used to come after it, so an anonymous guest request was refused with a
+    # 401 and left a room behind it anyway. A caller we are about to turn away
+    # should not be able to change what is stored here on the way out.
+    #
+    # `ask_to_come_up`, the next route down, already had the order right: gate,
+    # then identify, then write. This is the same three steps in the same
+    # feature, and now in the same order.
+    who = None
     if mode == "guest":
         who = auth.principal(request)
         if who is None:
             raise HTTPException(
                 401, "coming up on stream needs an account — the host is "
                      "deciding about a person, not an anonymous request")
+
+    try:
+        joined = desks.join(desk_id, mode=mode)
+    except desks.DeskError as exc:
+        if str(exc) == "no such desk":
+            raise HTTPException(404, "no such desk") from exc
+        raise _fail(exc) from exc
+    if who is not None:
         try:
             joined["guest_request"] = desks.request_guest(
                 desk_id, who["subject_id"])

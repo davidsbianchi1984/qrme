@@ -28,6 +28,7 @@ import { Leaving } from "./screens/Leaving";
 import { Selling } from "./screens/Selling";
 import { Inside } from "./screens/Inside";
 import { Signing } from "./screens/Signing";
+import { Visiting } from "./screens/Visiting";
 import { Named } from "./screens/Named";
 import { Passing } from "./screens/Passing";
 import { Reaching } from "./screens/Reaching";
@@ -49,7 +50,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -87,6 +88,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "selling", label: "What you are owed", icon: "💰" },
   { id: "inside", label: "Inside a room", icon: "🚪" },
   { id: "signing", label: "Signing", icon: "🖋" },
+  { id: "visiting", label: "Visiting", icon: "🔔" },
   { id: "named", label: "One thing, named", icon: "🔎" },
   { id: "passing", label: "Beginning and passing on", icon: "🕊" },
   { id: "robots", label: "Bodies", icon: "🤖" },
@@ -181,6 +183,7 @@ export function App() {
         {tab === "selling" && <Selling onPlans={toPlans} />}
         {tab === "inside" && <Inside onPlans={toPlans} />}
         {tab === "signing" && <Signing />}
+        {tab === "visiting" && <Visiting />}
         {tab === "named" && <Named onPlans={toPlans} />}
         {tab === "passing" && <Passing onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}

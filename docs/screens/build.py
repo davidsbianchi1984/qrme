@@ -3523,6 +3523,21 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 179: the visitor's side of a desk. First card is the defect — a 401
+    # that still left a room behind it — and the third is the sentence the
+    # whole desk feature rests on, inverted from the mark.
+    dict(num=179, title="Ringing The Bell", sub="The other side of the counter",
+         accent="cyan", tab=26, cards=[
+        dict(icon="lock", color="red", k="No trace, if refused",
+             s="a refusal writes nothing",
+             pill=("401", "warn")),
+        dict(icon="bell", color="cyan", k="Ring without an account",
+             s="the visitor has none yet"),
+        dict(icon="eye", color="green", k="Live person, not AI",
+             s="the mark, the other way up"),
+        dict(icon="finger", color="amber", k="Ask, do not enter",
+             s="coming up is the host's call"),
+    ], button=("Ring the bell", "brand")),
     # 178: signing. The first card is the defect — a package missing a field
     # came back saying the signature was invalid, which is the worst thing
     # this endpoint can say and it was not true — and the third is the reason

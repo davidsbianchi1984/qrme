@@ -164,6 +164,31 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="visiting", chapter="Out in the world",
+         title="Ringing the bell",
+         what="`Desk` is the side you run a desk from — open one, say whether "
+              "you are there, point the camera, answer the bell, bring "
+              "somebody up. Every route it uses is yours alone. There was no "
+              "*visitor's* side at all, and the visitor is who the whole "
+              "thing is for: somebody standing in front of an empty chair "
+              "with a sign on it saying to ring. Now you can look at the "
+              "card, ring, watch the stream, and put a hand up to come on it. "
+              "The card and the bell ask for nothing, because the person at "
+              "an empty chair is exactly the one who has no account yet — an "
+              "18+ stream is the one exception. Coming up **on** the stream "
+              "is the host's call, so that asks rather than does, and it "
+              "needs an account: they are deciding about a person. That "
+              "refusal used to mint the stream's room first and check who was "
+              "asking afterwards, so a request we turned away left a room "
+              "behind it. Nothing is written now until you are somebody. The "
+              "same screen leaves this profile somewhere — a printed code on "
+              "a bench or at a meeting — and only its owner may place one, "
+              "see the list, or pick one back up: where a profile is left is "
+              "a decision about the profile, and the list is a record of "
+              "places a person goes.",
+         screens=(179,),
+         try_it="Look at a desk by its id, ring the bell, then place a code "
+                "of your own and scan it."),
     dict(key="signing", chapter="Out in the world",
          title="Signed, and checked",
          what="Signing had seven routes and no way in from here. You could "

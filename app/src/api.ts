@@ -2016,22 +2016,138 @@ export type DeskRing = {
   [key: string]: unknown;
 };
 
-export type DeskGuest = {
-  id?: string;
-  display_name?: string | null;
-  note?: string | null;
-  state?: string;
-  [key: string]: unknown;
+/** What a visitor sees standing in front of somebody's desk.
+ *
+ *  `designation` is the sentence the whole feature rests on — *Live person —
+ *  not AI* — and it is the inversion of the mark every synthetic profile
+ *  carries. `attestation.signed` is the honest qualifier: recorded is not
+ *  proven, and the screen has to say which this is. */
+export type DeskCard = {
+  desk_id: string;
+  display_name: string;
+  trade: string;
+  location: string | null;
+  blurb: string | null;
+  rated: boolean;
+  age_wall: boolean;
+  presence: string;
+  last_seen: string | null;
+  human: boolean;
+  ai: boolean;
+  designation: string;
+  attestation: {
+    attestor: string; basis: string; attested_at: string;
+    signed: boolean; signature_id: string | null; note: string;
+  };
+  portrait: string | null;
+  feed: { url: string; live: boolean; note: string;
+          watermark: string | null; ai: boolean };
 };
 
-/** What a viewer sees layered over the stream. `style` is the desk's own
- *  view style, so the overlay matches the room rather than guessing. */
+export type BellRung = {
+  ring_id: string;
+  desk_id: string;
+  /** How many are already waiting — including this one. */
+  waiting: number;
+  presence: string;
+  note: string;
+};
+
+/** Both join modes land in the same room; `on_stream` is the difference, and
+ *  it is reported rather than inferred so a client draws the right thing
+ *  instead of guessing from the absence of something. */
+export type DeskJoined = {
+  desk_id: string;
+  room_id: string;
+  channel: string;
+  presence: string;
+  rated: boolean;
+  /** Always false. There is a real person on the other end of this stream. */
+  ai: boolean;
+  mode: string;
+  on_stream: boolean;
+  overlay: DeskOverlay;
+  note: string;
+  /** Present only for `mode: "guest"`, and only once the request is made. */
+  guest_request?: DeskGuest;
+};
+
+/** A profile left somewhere — a QR sticker on a bench, at a meeting, on a
+ *  counter. `mode: "room"` mints one shared room every scanner joins, so the
+ *  people who found the same sticker talk to the profile together. */
+export type ProfileBeacon = {
+  id: string;
+  label: string;
+  location: string | null;
+  summon_url: string;
+  /** What the printed QR actually encodes — this is the one to print. */
+  scan_url: string;
+  mode: string;
+  room_id: string | null;
+  qr_svg: string;
+};
+
+export type PlacedBeacon = {
+  id: string; profile_id: string; label: string; location: string | null;
+  scans: number; active: boolean; room_id: string | null; created_at: string;
+};
+
+/** The smallest thing an in-camera overlay needs: who it is, one line of
+ *  portrait, and the mark. The mark travels *with* the card so an overlay
+ *  cannot draw the face without also holding the disclosure to draw with it. */
+export type BeaconScanCard = {
+  profile_id?: string;
+  display_name?: string;
+  watermark?: string;
+  portrait?: string | null;
+  /** Whether the disclosure is already burned into the image. A surface QRME
+   *  does not control needs to know if compositing is mandatory. */
+  portrait_marked?: boolean;
+  initials?: string;
+  label?: string;
+  shared_room?: string | null;
+  open_url?: string;
+  age_wall: boolean;
+  rated?: boolean;
+  note?: string;
+};
+
+/** A raised hand. The field is `status`, not `state` — the index signature
+ *  below meant the wrong name typechecked and read `undefined` forever. */
+export type DeskGuest = {
+  id: string;
+  desk_id: string;
+  guest_id: string;
+  display_name: string | null;
+  note: string | null;
+  status: string;
+  requested_at: string;
+  decided_at: string | null;
+  on_stream: boolean;
+};
+
+/** What a viewer sees layered over the stream.
+ *
+ *  Three of these were written from the route's name rather than from its
+ *  answer, and `Desk` rendered all three wrong. `style` is a layout object,
+ *  not a word, so *laid out as a ${style}* printed `[object Object]`.
+ *  `comments` and `waiting` were **exactly swapped**: `waiting.length` on a
+ *  number printed `undefined waiting`, and `{comments}` on an array of
+ *  objects renders as nothing while empty and throws the moment somebody
+ *  comments on the stream.
+ *
+ *  Driven against a running desk, which is the rule the marketplace block
+ *  further down states for itself and this one skipped. */
 export type DeskOverlay = {
-  style: string;
+  /** Semi-transparent by design: the picture stays readable underneath, which
+   *  is the whole reason these sit over the video rather than beside it. */
+  style: { opacity: number; over_video: boolean; anchor: string };
   on_stream: unknown[];
-  waiting: unknown[];
+  /** A count of raised hands, not the hands. */
+  waiting: number;
   likes: number;
-  comments: number;
+  /** The last six approved room messages, oldest first. */
+  comments: { who: string; said: string }[];
   shares: number;
   gifts: unknown[];
   gift_total: number;
@@ -2759,6 +2875,33 @@ export const api = {
     req<{ stepped_down: boolean }>(`/desks/${deskId}/guests/me`,
       { method: "DELETE", token }),
 
+  // ---------------------------------------------------------------------
+  // The other side of a desk.
+  //
+  // Everything above is the host's: open one, set your presence, read who
+  // rang, accept a guest. None of it is the visitor's, and the visitor is the
+  // person the feature is *for* — somebody standing in front of an empty
+  // chair with a sign on it saying to ring the bell.
+  //
+  // Two of these take no token and it is deliberate both times. The card is
+  // public because a desk is a shopfront. The bell is public because the
+  // visitor at an empty chair is exactly the person who has no account yet —
+  // an 18+ stream is the one exception, since an anonymous ping channel to an
+  // adult performer is not something to hand out.
+  // ---------------------------------------------------------------------
+
+  visitDesk: (deskId: string) => req<DeskCard>(`/desks/${deskId}`),
+  ringBell: (deskId: string, body: { caller_id?: string; note?: string }) =>
+    req<BellRung>(`/desks/${deskId}/bell`, { method: "POST", body }),
+  // `guest` needs an account and this binding does not carry one, because a
+  // guest request is `askToComeUp` below — the route answers 401 to an
+  // anonymous `mode: "guest"` rather than quietly seating them in the
+  // audience, which is the honest refusal.
+  joinDesk: (deskId: string, mode: "audience" | "guest" = "audience",
+             token?: string) =>
+    req<DeskJoined>(`/desks/${deskId}/join`,
+      { method: "POST", body: { mode }, ...(token ? { token } : {}) }),
+
   deskOverlay: (deskId: string, token: string) =>
     req<DeskOverlay>(`/desks/${deskId}/overlay`, { token }),
   deskLivePerson: (deskId: string) =>
@@ -2777,6 +2920,44 @@ export const api = {
   pickUpDeskBeacon: (beaconId: string, token: string) =>
     req<{ picked_up: boolean }>(`/desk-beacons/${beaconId}`,
       { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // Leaving a *profile* somewhere. A different family from the desk beacons
+  // above, and easy to confuse with them: `/desk-beacons/…` points at a live
+  // person, `/beacons/…` points at a profile. Both print as a QR sticker.
+  //
+  // All three owner routes are owner-only, and each of those checks was put
+  // there because the route had shipped without it: placing was anybody's,
+  // so a stranger could print stickers pointing at somebody else's profile;
+  // the list carries `label` and `location` as free text — "the back table at
+  // the Tuesday meeting" — which is a list of physical places a person
+  // frequents, and it was readable from the profile id alone; and picking one
+  // up was a way to switch off somebody else's printed stickers, with the
+  // paper still on the wall and nothing to see wrong with it.
+  // ---------------------------------------------------------------------
+
+  profileBeacons: (profileId: string, token: string) =>
+    req<PlacedBeacon[]>(`/profiles/${profileId}/beacons`, { token }),
+  // `mode: "room"` is refused outright on a rated profile rather than
+  // downgraded — somebody who asked for a shared room and silently got
+  // private threads would not find out until the fortieth scanner was
+  // talking to themselves.
+  placeBeacon: (profileId: string,
+                body: { label: string; location?: string; mode?: string;
+                        topic?: string }, token: string) =>
+    req<ProfileBeacon>(`/profiles/${profileId}/beacons`,
+      { method: "POST", body, token }),
+  // Deactivated, not deleted: the printed paper still exists, so the code has
+  // to keep answering — with nothing.
+  pickUpBeacon: (beaconId: string, token: string) =>
+    req<{ id: string; active: boolean }>(`/beacons/${beaconId}`,
+      { method: "DELETE", token }),
+  // No token: this is a stranger with a camera pointed at a sticker, which is
+  // the whole point of leaving one. On a rated profile it returns the age
+  // wall and *nothing else* — not the name, not the portrait — so an overlay
+  // can draw the refusal without ever having held what it refuses.
+  beaconCard: (beaconId: string) =>
+    req<BeaconScanCard>(`/b/${beaconId}/card`),
 
   // ---------------------------------------------------------------------
   // The marketplace. A whole commercial surface — browsing, searching,

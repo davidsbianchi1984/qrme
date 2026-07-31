@@ -1,4 +1,3 @@
-api.askToComeUp
 api.badge
 api.cameraSession
 api.composition

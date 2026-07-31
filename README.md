@@ -373,7 +373,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/177-work-handed-over.svg"><img src="docs/screens/177-work-handed-over.svg" width="210" alt="Work Handed Over"></a><br><sub><b>177</b> · Work Handed Over</sub></td>
     <td align="center" width="33%"><a href="docs/screens/178-signed-and-checked.svg"><img src="docs/screens/178-signed-and-checked.svg" width="210" alt="Signed, And Checked"></a><br><sub><b>178</b> · Signed, And Checked</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/179-ringing-the-bell.svg"><img src="docs/screens/179-ringing-the-bell.svg" width="210" alt="Ringing The Bell"></a><br><sub><b>179</b> · Ringing The Bell</sub></td>
   </tr>
 </table>
 

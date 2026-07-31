@@ -6,6 +6,48 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### A refused request left a room behind
+
+`Desk` is the host's console — open a desk, set your presence, point the
+camera, read who rang, bring a guest up — and every route it calls is
+owner-only. There was no **visitor's** side at all, and the visitor is the
+person the feature is for: somebody standing in front of an empty chair with a
+sign on it saying to ring the bell. Seven routes, plus `askToComeUp`, which had
+sat in `api.ts` for months with no screen calling it. **Screen 179** is that
+side, together with leaving a profile somewhere.
+
+Building it found three defects, and the third was found by the compiler after
+the first two were fixed.
+
+- **A `401` that wrote anyway.** Joining as a `guest` needs an account — the
+  host is deciding about a person, not an anonymous request — and the route
+  said so. It also called `desks.join` *first*, which mints the stream's room
+  on first arrival (a real row, committed), and asked who was calling
+  afterwards. So a request we were turning away left a room behind it.
+  `ask_to_come_up`, **the very next route in the same file**, already had the
+  order right: gate, identify, then write.
+
+- **Two fields exactly swapped, and a third stringified.** `DeskOverlay` was
+  written from the route's name rather than its answer. `waiting` is a *count*
+  and was typed as a list, so `waiting.length` printed **“undefined waiting”**.
+  `comments` is a *list* and was typed as a count, so `{overlay.comments}`
+  rendered nothing while empty and would have thrown *Objects are not valid as
+  a React child* the moment anybody spoke on the stream. And `style` is a
+  layout object, so *laid out as a `${style}`* printed `[object Object]`.
+  `api.ts` states the rule for itself twenty lines below, over the marketplace
+  block: *every shape below was read off a running server rather than off the
+  route signatures.*
+
+- **A field that was never on the wire.** With the types corrected, the
+  compiler found `DeskGuest.state` — the real field is `status`, and an index
+  signature had made the wrong name typecheck and read `undefined` forever. The
+  status label never rendered, and the guard
+  `g.state !== "accepted" && g.state !== "declined"` was **always true**: the
+  host was offered *Let them up* for people already up, and *Not now* for
+  people already turned away.
+
+Console-doorless routes **40 → 33**; unused bindings **12 → 11**.
+
 ## [0.21.0] — 2026-07-31
 
 Four door-audit rounds run back to back. Each built a console door for a

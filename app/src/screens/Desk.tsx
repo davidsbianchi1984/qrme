@@ -216,10 +216,14 @@ export function Desk({ onPlans }: {
             <div key={String(g.id ?? i)} className="card">
               <div className="row">
                 <strong>{String(g.display_name ?? "someone")}</strong>
-                {g.state && <span className="muted">{String(g.state)}</span>}
+                {/* `status`, not `state`. The old name was never on the wire,
+                    so this label never appeared and the guard below was
+                    always true — the buttons offered to accept people who had
+                    already been accepted, and to decline the declined. */}
+                {g.status && <span className="muted">{g.status}</span>}
               </div>
               {g.note && <p className="muted">{String(g.note)}</p>}
-              {g.id && g.state !== "accepted" && g.state !== "declined" && (
+              {g.id && g.status !== "accepted" && g.status !== "declined" && (
                 <div className="row">
                   <button disabled={busy}
                     onClick={() => run(() =>
@@ -242,13 +246,23 @@ export function Desk({ onPlans }: {
             <>
               <h3>On the stream</h3>
               <p className="muted">
-                {overlay.on_stream.length} up, {overlay.waiting.length} waiting ·
-                {" "}{overlay.likes} likes · {overlay.comments} comments ·
+                {overlay.on_stream.length} up, {overlay.waiting} waiting ·
+                {" "}{overlay.likes} likes · {overlay.comments.length} comments ·
                 {" "}{overlay.shares} shares
                 {overlay.gift_total > 0
                   ? ` · ${overlay.gift_total} in gifts` : ""}
-                {" "}· laid out as a {overlay.style}
+                {" "}· drawn over the picture at{" "}
+                {Math.round(overlay.style.opacity * 100)}%,{" "}
+                {overlay.style.anchor.replace("-", " ")}
               </p>
+              {/* The comments themselves, which the count was standing in
+                  for. Rendering the array directly is what would have thrown
+                  the moment anybody said anything. */}
+              {overlay.comments.map((c, i) => (
+                <p key={i} className="small">
+                  <strong>{c.who}</strong> {c.said}
+                </p>
+              ))}
               <button disabled={busy}
                 onClick={() => run(() => api.stepDown(deskId, deskToken),
                   "Stepped down.")}>

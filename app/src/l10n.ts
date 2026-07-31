@@ -198,6 +198,12 @@ const CHROME: Table = {
     ja: "署名", zh: "签名", hi: "हस्ताक्षर",
     ar: "التوقيع",
   },
+  "nav.visiting": {
+    en: "Visiting", es: "De visita", fr: "En visite",
+    de: "Zu Besuch", pt: "Em visita", it: "In visita",
+    ja: "訪ねる", zh: "上门", hi: "मिलने जाना",
+    ar: "زيارة",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",
