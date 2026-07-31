@@ -32,16 +32,27 @@ def _listing(client, **over):
 
 
 def _rated_listing(client):
+    """A rated profile and the listing that advertises it, plus the owner's
+    header.
+
+    The header is returned because a `profile` listing has a claimant — the
+    owner of the profile it advertises — and the place routes are gated on
+    that. An anonymous `PUT …/place` now answers 401 before the structural
+    422 below, which is the right order: whether this listing may carry a
+    location is nobody's business until they are entitled to ask.
+    """
     r = client.post("/profiles", json={
         "plan": "pro", "owner_id": "owner-1", "kind": "fictional", "display_name": "Velvet Ivy",
         "adult_mode": True, "maturity": "open",
         "persona": "A cabaret hostess persona for adult audiences.",
         "verification": ADULT})
     assert r.status_code == 201, r.text
-    pid = r.json()["id"]
-    return pid, _listing(client, kind="profile", profile_id=pid,
-                         title="Velvet Ivy — cabaret", tags=["cabaret"],
-                         area="entertainment", provider_name="Velvet")
+    body = r.json()
+    head = {"authorization": f"Bearer {body['owner_token']}"}
+    return body["id"], _listing(client, kind="profile", profile_id=body["id"],
+                                title="Velvet Ivy — cabaret", tags=["cabaret"],
+                                area="entertainment",
+                                provider_name="Velvet"), head
 
 
 def _interactor(client, name="Sam"):
@@ -176,18 +187,34 @@ def test_clearing_a_place_returns_the_listing_to_anywhere(client):
 
 def test_a_rated_listing_cannot_carry_a_location(client):
     """Where a performer physically is has nothing to do with browsing them,
-    and a place filter is a way of asking. Refused, not silently ignored."""
-    _pid, lid = _rated_listing(client)
-    r = client.put(f"/marketplace/listings/{lid}/place",
+    and a place filter is a way of asking. Refused, not silently ignored.
+
+    Asked as the owner, who is the only caller entitled to try. The refusal is
+    structural — `marketplace.set_place` will not write the row — so it holds
+    for the one person who could otherwise set it, which is the version of
+    this claim that matters.
+    """
+    _pid, lid, head = _rated_listing(client)
+    r = client.put(f"/marketplace/listings/{lid}/place", headers=head,
                    json={"locality": "Oakland, CA"})
     assert r.status_code == 422
     assert "physically is" in r.text
 
 
+def test_a_stranger_is_refused_before_being_told_that(client):
+    """The order of the two refusals. Whether a listing may carry a location
+    says something about the listing; an anonymous caller does not get to
+    learn it by asking.
+    """
+    _pid, lid, _head = _rated_listing(client)
+    assert client.put(f"/marketplace/listings/{lid}/place",
+                      json={"locality": "Oakland, CA"}).status_code == 401
+
+
 def test_no_place_filter_can_surface_a_rated_listing(client):
     """Structural rather than checked: the refusal above means no row exists,
     so there is nothing for a place filter to match — even for an adult."""
-    _pid, _lid = _rated_listing(client)
+    _pid, _lid, _own = _rated_listing(client)
     _hdr = _interactor(client, "Adult")[1]
     r = client.post("/interactors", json={"display_name": "Adult",
                                           "birthdate": "1984-06-01"})
@@ -202,7 +229,7 @@ def test_no_place_filter_can_surface_a_rated_listing(client):
 
 def test_a_rated_listing_still_never_surfaces_unverified(client):
     """The pre-existing rule, unchanged by any of this."""
-    _pid, _lid = _rated_listing(client)
+    _pid, _lid, _own = _rated_listing(client)
     body = client.get("/marketplace/search", params={"q": "cabaret"}).json()
     assert body["results"] == []
 
