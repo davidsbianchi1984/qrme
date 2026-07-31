@@ -90,15 +90,23 @@ def test_revoked_license_cannot_derive(client):
     assert r.status_code == 403
 
 
-def test_minor_buyer_cannot_derive(client):
+def test_a_minor_is_refused_at_the_till_not_at_delivery(client):
+    """The bar moved earlier, and that is the point.
+
+    This used to buy the licence: 201, `can_derive: true`, the fee credited
+    to the seller at sale time — and only then a 403 on the one thing the
+    licence exists for. Somebody had been paid for something the server would
+    not let them hand over.
+    """
     p = make_profile(client)
     as_owner(client, p)
     client.put(f"/profiles/{p['id']}/license", json={"kind": "clone"})
     minor_id, hdr = _buyer(client, birthdate="2015-01-01")
-    g = client.post(f"/profiles/{p['id']}/license/acquire", headers=hdr).json()
-    r = client.post(f"/profiles/{p['id']}/license/{g['grant_id']}/derive",
-                    headers=hdr)
-    assert r.status_code == 403
+    bought = client.post(f"/profiles/{p['id']}/license/acquire", headers=hdr)
+    assert bought.status_code == 403, (
+        "a licence that permits deriving was sold to a minor who cannot use "
+        "it, and the fee moved")
+    assert "verified-18+" in bought.json()["detail"]
 
 
 def test_acquire_requires_a_buyer_token(client):

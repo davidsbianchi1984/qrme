@@ -3519,6 +3519,21 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 171: what leaves. Two different kinds of leaving, and the two facts
+    # that shaped the screen: the preview is a dry run, and the adult bar
+    # moved from delivery to the till.
+    dict(num=171, title="What Leaves, And On What Terms", sub="Two kinds of leaving",
+         accent="cyan", tab=18, cards=[
+        dict(icon="eye", color="cyan", k="A dry run",
+             s="what would leave, not what is",
+             pill=("SIM", "warn")),
+        dict(icon="mask", color="green", k="Names taken out",
+             s="and a ref to delete it by"),
+        dict(icon="coin", color="amber", k="Refused at the till",
+             s="never after the fee moved"),
+        dict(icon="rotate", color="brand", k="Take it back",
+             s="stops, and asks for deletion"),
+    ], button=("Stop, and take it back", "brand")),
     # 170: reaching out. The four refusals, and the point that only two of
     # them belong to the owner. The quiet-hours card is the one that took a
     # decision — it is the recipient's, and the owner is refused it.

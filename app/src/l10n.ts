@@ -173,6 +173,12 @@ const CHROME: Table = {
     ja: "こちらから連絡", zh: "主动联系", hi: "पहल करना",
     ar: "المبادرة بالتواصل",
   },
+  "nav.leaving": {
+    en: "What leaves", es: "Qué sale", fr: "Ce qui sort",
+    de: "Was hinausgeht", pt: "O que sai", it: "Cosa esce",
+    ja: "外へ出るもの", zh: "哪些内容外流", hi: "क्या बाहर जाता है",
+    ar: "ما الذي يخرج",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",

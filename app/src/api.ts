@@ -1944,6 +1944,59 @@ export type DeskBeacon = {
   created_at: string;
 };
 
+export type CloudStatus = {
+  cloud: boolean;
+  model: unknown;
+  fallback: string;
+  contribution: string;
+};
+
+/** The contribution loop, as the owner can see it.
+ *
+ *  `preview_next` is a **dry run** and is computed whether or not
+ *  `opted_in` is true — it is what would leave, not what is leaving. A
+ *  screen that renders it under one heading regardless tells an opted-out
+ *  owner their next conversation is on its way out. */
+export type ContributionView = {
+  opted_in: boolean;
+  policy: string;
+  preview_next: {
+    source: string; kind: string; quality: string; purpose: string;
+    exchange: { role: string; content: string }[];
+  } | null;
+  contributed: {
+    ref: string; at: string; revoked: boolean;
+    payload: Record<string, unknown>;
+  }[];
+};
+
+export type RevokeResult = {
+  opted_in: boolean;
+  revoked: number;
+  /** True vacuously when `revoked` is 0 — nothing ever left, so nothing
+   *  needed deleting. Not the same claim as "the gateway confirmed", and a
+   *  tick shown for both would be the wrong reassurance. */
+  deleted_at_gateway: boolean;
+  note: string;
+};
+
+export type LicenseGrant = {
+  grant_id: string;
+  profile_id: string;
+  kind: string;
+  token: string;
+  terms: string | null;
+  can_derive: boolean;
+};
+
+export type DerivedAgent = {
+  derived_profile_id: string;
+  owner_id: string;
+  licensed_from: string;
+  kind: string;
+  owner_token: string;
+};
+
 /** How this profile and one person are going.
  *
  *  Deliberately narrower than what a rating hands back: `last_seen` and
@@ -3552,6 +3605,44 @@ export const api = {
                           quiet_end: number | null }, token: string) =>
     req<QuietHours>(`/interactors/${interactorId}/quiet-hours`,
       { method: "PUT", body, token }),
+
+  // ---------------------------------------------------------------------
+  // What leaves this deployment, and on what terms.
+  //
+  // Two different kinds of leaving, and the difference is worth keeping
+  // straight. A **contribution** sends an anonymised exchange to the shared
+  // model: no ids, the persona name replaced, and a random ref so the item
+  // can be deleted at the gateway without identifying anybody. A **licence**
+  // sends the profile itself — somebody else acquires the right to consult
+  // it, or to derive a whole new agent seeded from its persona.
+  //
+  // The contribution view is a **dry run**: `preview_next` is computed
+  // whether or not the profile is opted in, so it says what *would* leave
+  // rather than what is about to. Rendering it without that distinction
+  // tells an opted-out owner their next conversation is going out.
+  // ---------------------------------------------------------------------
+
+  cloudStatus: () => req<CloudStatus>("/cloud/status"),
+  contributionView: (profileId: string, token: string) =>
+    req<ContributionView>(`/profiles/${profileId}/cloud-contribution`,
+      { token }),
+  // Stops future contributions *and* asks the gateway to delete past ones by
+  // their refs. `deleted_at_gateway` is true vacuously when nothing ever
+  // left, which is worth saying apart from "the gateway confirmed".
+  revokeContributions: (profileId: string, token: string) =>
+    req<RevokeResult>(`/profiles/${profileId}/cloud-contribution/revoke`,
+      { method: "POST", token }),
+
+  // The buyer's token, not the owner's. A licence permitting derivatives is
+  // refused to a buyer under 18 **here**, at the till — the fee moves at
+  // sale time, so refusing at delivery would leave somebody paid for
+  // something the server will not hand over.
+  acquireLicense: (profileId: string, token: string) =>
+    req<LicenseGrant>(`/profiles/${profileId}/license/acquire`,
+      { method: "POST", token }),
+  deriveAgent: (profileId: string, grantId: string, token: string) =>
+    req<DerivedAgent>(`/profiles/${profileId}/license/${grantId}/derive`,
+      { method: "POST", token }),
 };
 
 /** Open the WebAuthn ceremony.

@@ -164,6 +164,24 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="leaving", chapter="Out in the world",
+         title="What leaves, and on what terms",
+         what="Two different kinds of leaving, and conflating them is how "
+              "somebody agrees to the wrong one. A contribution sends one "
+              "anonymised exchange to the shared model — no ids, the "
+              "persona name replaced, and a random ref so the item can be "
+              "deleted at the gateway later without identifying anybody. A "
+              "licence sends the profile itself: the right to consult it, "
+              "or where the offer allows, to derive a new agent seeded from "
+              "its persona and owned by the buyer. The contribution preview "
+              "is a dry run — it says what would leave, not what is about "
+              "to, and it is computed whether or not you are opted in. And "
+              "a licence that permits deriving is refused to a buyer under "
+              "18 at the till rather than at delivery, because the fee "
+              "moves when the licence is sold.",
+         screens=(171,),
+         try_it="Read the preview while opted out, then notice the heading "
+                "changes rather than the content."),
     dict(key="reaching", chapter="Out in the world",
          title="Reaching out, and what stops it",
          what="A profile may message somebody first only if its owner "

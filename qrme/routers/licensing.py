@@ -128,6 +128,20 @@ def acquire_license(profile_id: str, request: Request) -> dict:
     offer = _offer(profile_id)
     if offer is None:
         raise HTTPException(404, "this profile is not offered for license")
+    if offer["allow_derivatives"] and (
+            not buyer["birthdate"]
+            or age_of(date.fromisoformat(buyer["birthdate"])) < 18):
+        # The same bar `derive` applies, applied at the till instead.
+        #
+        # Without this a minor could buy a clone licence, be told
+        # `can_derive: true`, have the fee credited to the seller at sale
+        # time — and then be refused the only thing the licence is for. The
+        # money moves here; refusing at delivery leaves somebody paid for
+        # something they may not hand over.
+        raise HTTPException(
+            403, "a licence that permits deriving an agent requires a "
+                 "verified-18+ buyer — the same bar deriving one does, "
+                 "applied before the fee rather than after")
     conn = db.connect()
     grant_id = db.new_id("lic")
     token = f"lic_{secrets.token_urlsafe(24)}"

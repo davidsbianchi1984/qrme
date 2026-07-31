@@ -363,6 +363,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
     <td align="center" width="33%"><a href="docs/screens/169-where-people-find-you.svg"><img src="docs/screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
     <td align="center" width="33%"><a href="docs/screens/170-reaching-out-and-what-stops-it.svg"><img src="docs/screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/171-what-leaves-and-on-what-terms.svg"><img src="docs/screens/171-what-leaves-and-on-what-terms.svg" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
   </tr>
 </table>
 
@@ -1768,6 +1769,43 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 171 — what leaves, and on what terms
+
+Five routes: the gateway's status, the contribution view and its revoke, and
+the two halves of licensing a profile out.
+
+**Two different kinds of leaving**, kept apart because conflating them is how
+somebody agrees to the wrong one. A *contribution* sends one anonymised
+exchange to the shared model — no ids, the persona name replaced, and a random
+ref so the item can be deleted at the gateway later without identifying
+anybody. A *licence* sends the profile itself: the right to consult it, or
+where the offer allows, to derive a whole new agent seeded from its persona
+and owned by the buyer.
+
+**The preview is a dry run, and the heading has to say so.** `preview_next` is
+computed whether or not the profile is opted in, which is useful — it answers
+*what would this cost me* before you commit — but a console rendering it under
+one heading either way tells an opted-out owner their next conversation is on
+its way out. The heading changes with `opted_in`; the content does not.
+
+Revoking does two things and reports them apart: it stops future
+contributions, and it asks the gateway to delete past ones by their refs.
+`deleted_at_gateway` comes back true **vacuously** when nothing ever left, so
+the console reads the count beside it — a tick shown for both cases would be
+the wrong reassurance.
+
+#### A licence sold to somebody who could not use it
+
+A licence permitting derivatives used to sell to anybody. A fourteen-year-old
+could buy one: **201**, `can_derive: true`, and the fee credited to the seller
+at sale time — then a **403** on the only thing the licence exists for.
+Somebody had been paid for a thing the server would not hand over.
+
+The adult check now runs at **acquire**, where the money moves, rather than at
+derive. A consult licence still sells to anybody, deliberately: it buys time
+with a profile and creates no new owner, so tightening that would be a
+different decision than the one this fixes.
 
 ### Screen 170 — reaching out, and what stops it
 
