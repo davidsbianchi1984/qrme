@@ -1,122 +1,101 @@
-# QRME v0.21.0 — release notes
+# QRME v0.22.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.21.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.22.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.21.0 — four doors, and three defects behind them.**
+**QRME v0.22.0 — the audit reaches zero, and finds five more defects on the way.**
 
-Four rounds run back to back. Each one built a console door for a backend
-feature that had none. In three of the four, building the door found a defect
-in the thing it was a door to — and in every one of those, the argument
-against the defect was **already written down somewhere else in the same
-repository**.
+Five rounds. Each built a console door for a backend feature that had none,
+and in **every one of them** building the door found a defect in the thing it
+was a door to. In every one of those, the argument against the defect was
+already written down somewhere else in the same repository — usually a few
+lines away, occasionally in the docstring directly above.
 
-## A room id was the only thing a room asked for
-
-`Rooms` could open a room and not enter it. Building the way in — **screen
-175** — found two defects worth more than the screen.
-
-- **Anybody could speak as anybody.** `POST /rooms/{id}/messages` read the
-  speaker from `sender_id` *in the request body* and checked only that the id
-  named a participant, never that the caller *was* that person. A stranger's
-  token plus a named participant's id gave a `201`, a message stored under her
-  name, and every profile in the room answering as though she had spoken.
-- **The transcript asked for nothing at all** — not a wrong token, no token.
-  And neither did `advance`, so a stranger could run somebody else's room
-  forward indefinitely against their model key.
-
-A room id is not a secret; it rides in beacons and on printed QR stickers,
-which is the point of them. That sentence was already written **two routes
-away**, on `GET /rooms/{id}/mic`, guarding the narrower fact of who is wearing
-a live microphone. All three now go through the same membership check.
-
-`sender_id` stays on the request model and is ignored — three shipped native
-clients send it, and a 422 on upgrade is a worse answer than not believing it.
-
-## The body market, and what you bolt onto a body
-
-Choosing a body is shopping, and the catalogue listed nine models. It now
-lists **36 from 25 makers** across humanoids, home robots, quadrupeds and
-announced platforms, with a review date the suite refuses to let go stale.
-
-Announced bodies are listed **on purpose** — an owner shopping should see what
-is coming — and binding one is refused with a `409` that says so, rather than
-a `404` that would lie about a machine its maker has publicly shown.
-
-Alongside it, the **connections bracket**: task packs and connectors. Each
-installed pack becomes a commandable verb for exactly one body, capability
-checked at install and audited like every built-in command. A vacuum is still
-never taught `fetch`.
-
-## A policy you could publish and nobody could take up
-
-`Delegate` built the owner's half of delegation — mint a grant, choose which
-phases run unattended, start and advance and cancel. But delegation exists for
-the person on the **other** end of a conversation, and that half had four
-bindings and no screen calling any of them. The policy was publishable and
-unusable from the console that published it.
-
-Driven end to end, **every rule was already right**: the offer is public and
-lists phases only, never the grant id, because which source items the owner
-scoped is the owner's business; `research` is refused without a grant, and the
-refusal names what it protects rather than the rule it enforces; starting one
-requires an existing conversation; and reading one is `403` to an outsider,
-`401` to nobody at all, and `200` to the delegate *and* the owner, who are
-entitled to it for different reasons.
-
-The first round in a while with no defect in it, recorded plainly as such. The
-failure it *did* find is exactly the one the door audit exists to name: a
-feature finished and unreachable.
-
-## A missing field was reported as a broken signature
-
-Seven signature routes had no console door: enrol a credential, revoke one,
-read the policy, mint an envelope, sign it, and check a package handed over
-from outside. `Referrals` had already written the gap down as a sentence —
-*“None enrolled. The ceremony can enrol one.”* — under a heading with no
-button behind it. The ceremony page existed and posts the raw assertion back
-to its host; nothing in the console was listening, so the message went
-nowhere.
-
-Building the listener found the defect, in the one place this feature cannot
-afford one.
-
-`verify_package` runs eight checks in order. **Any** exception anywhere in that
-sequence ran `checks["signature"] = False` and appended `str(exc)`. So a
-package missing `display_text` — trimmed in transit, or a summary forwarded in
-place of the package — came back saying **the signature is invalid**, when the
-ECDSA verification several lines earlier had passed. That is the strongest and
-most damaging thing this endpoint can say, it was false, and the reason offered
-was `'display_text'`: a Python `KeyError` repr sitting beside two notes written
-as full sentences. A counterparty reading it would conclude they had been
-handed a forgery.
-
-The argument was already in the same feature. The router says of its own
-refusals: *the message is the reason, because a signature that is turned away
-without one is impossible to fix from the outside.* A counterparty is exactly
-the outside.
-
-Two rules now hold. A check that already **passed** is never retroactively
-failed by a later one breaking — only the check that actually broke is
-reported broken. And a check that never **ran** is not a pass: all eight are
-named, `valid` is false whenever any is absent, and the notes say which and
-why in sentences. The screen draws unrun as unrun, because a fixed backend
-behind a screen that drew absent as a tick would put the same lie back on the
-glass.
-
-## Where the numbers landed
-
-| | before | after |
+| | at the start of this release | now |
 |---|---|---|
-| Console-doorless routes | 64 | 40 |
-| `api.ts` bindings nothing calls | 25 | 12 |
-| Screen-manifest `unaudited` seeds | 8 | 7 |
+| Console-doorless routes | 64 | **0** |
+| `api.ts` bindings nothing calls | 25 | **0** |
 
-New screens **174–178**. Full suite: **1926 passing**.
+Both record files are now **empty rather than short**, and the tests that read
+them assert emptiness.
+
+## The only post that actually leaves was the one going out unmarked
+
+`POST /social/{cid}/publish` writes a profile's words to a platform QRME does
+not run. It is the single route in this product where synthetic media
+genuinely **leaves the building** — and it stored that post with
+`watermark_id` NULL, while `compose_post`, the in-app equivalent, stamped a
+credential every time.
+
+`compose_post` even says why, in a sentence that describes the *other* route
+more exactly than the one it is written above: *a public post is synthetic
+media leaving the platform: it carries a verifiable synthetic-media credential
+from the moment it exists.* So the only posts going out unmarked were the ones
+actually going out.
+
+The same function ran the profile's own `maturity` as its moderation filter,
+where `compose_post` forces `strict` with the note *public posts face the
+widest audience: always the strict filter*. A profile set to `open` was held to
+the loosest rule on the way to an audience QRME cannot see, and the strictest
+one when posting where it can.
+
+## Anybody could take away the name a profile answers to
+
+`PUT /profiles/{id}/handle` took **no credential of any kind**. The damage is
+not that a stranger could give a profile a second name — claiming a handle
+deletes the existing one first, because that is how *changing* your handle
+works. So anybody could take `@rosa` away from Rosa: every printed reference,
+shared link and beacon naming her went dead at once, and the name she now
+answered to was picked by whoever did it.
+
+The three beacon routes **immediately below this one in the same file** were
+given exactly this check in an earlier pass, and `place_beacon` states the
+reason in words that fit here without changing a syllable.
+
+## A post the filter refused was published by the route that lists what was published
+
+`compose_post` stores a held post `pending` and returns `content: None` **to
+the owner who just asked for it**. Fourteen lines further down, `list_posts`
+returned every column of every row, whatever its status, to anybody, with no
+token. The hold was enforced against the author and against nobody else — and
+`flag_reason` went with it, naming the rule the text broke.
+
+## An id was read as a credential, in the feature built on consent
+
+`/connections` had no authentication at all. Speak as anybody, read anybody's
+conversation, and end one with no id and no token.
+
+## A guest joining a stream minted the room before the 401
+
+The anonymous path created the desk's room and *then* refused the caller.
+
+## Two guards that could only pass while the problem existed
+
+`test_the_union_is_still_wider_than_the_console` asserted the union backlog was
+*strictly* smaller than the console's, reasoning that if the two ever agreed
+the likelier cause was a broken native extractor than a console that had caught
+up. Sound while catching up was hypothetical. It now asserts the invariant that
+survives — the union can never exceed the console's, since the console is one of
+its own surfaces — and the liveness check it was doubling for moved to
+`test_each_native_shell_is_still_being_read`, which counts call sites per shell
+and would actually notice.
+
+## Also in this release
+
+**Six new console screens** (178–183): signing a document, the visitor's side
+of a desk, meeting a stranger, the mark on a post, what a profile says and in
+which language, and the remainder — the last eighteen routes, wired as one
+lookup control rather than nine buttons nobody would find.
+
+The iOS, Android and Windows shells carry the same credentials the console
+now does, on connections and on claiming a handle.
+
+**Suite: 2027 passing.**
 
 ---
 
-Installers for macOS, Windows and Linux are attached below once the release
-build finishes.
+Cut in step with [JIM-mini](https://github.com/davidsbianchi1984/jim-mini) and
+[PDI](https://github.com/davidsbianchi1984/pdi), both also at v0.22.0, both of
+which reached zero on the same audit in this release.
