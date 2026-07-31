@@ -859,6 +859,51 @@ export type HandoffMade = {
   sealed: boolean;
 };
 
+// ---------------------------------------------------------------------
+// The audience.
+// ---------------------------------------------------------------------
+
+export type Subscription = {
+  id: string;
+  subject_kind: string; subject_id: string;
+  subscriber: string;
+  /** `follow` or `paid` — there is no middle tier, and a name that is not
+   *  one of those is refused with both spelled out. */
+  tier: string;
+  price: number; currency: string;
+  status: string;
+  started_at: string; renewed_at: string;
+  /** Counts up only when somebody presses renew. Nothing here bills on a
+   *  timer, so a deployment left running charges nobody. */
+  periods: number;
+  /** Set on cancel; the row survives, so a lapsed-then-returned subscriber
+   *  keeps one history rather than accumulating rows. */
+  cancelled_at: string | null;
+  billing: string;
+  charged?: { period: number; amount: number; ledger_entry: string };
+};
+
+export type Gift = {
+  id?: string;
+  amount: number; currency: string;
+  note?: string | null;
+  created_at?: string;
+};
+
+export type GiftsView = {
+  gifts: Gift[];
+  total: number;
+  /** Published so a screen can say the limit before somebody hits it. */
+  cap_per_gift: number;
+};
+
+export type AudienceView = {
+  likes: number; comments: number; shares: number;
+  subscribers: number;
+  you_liked: boolean;
+  your_subscription: Subscription | null;
+};
+
 export type PlacementRemoved = {
   placement_id: string;
   removed: boolean;
@@ -3239,6 +3284,59 @@ export const api = {
   revokeHandoff: (handoffId: string, token: string) =>
     req<{ id: string; revoked: boolean }>(`/handoffs/${handoffId}`,
       { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // An audience, and what it pays.
+  //
+  // Two tiers only — `follow` (free) and `paid` — and paid asks for two
+  // things a careless client would skip: `accept_price` matching the price
+  // exactly, and a `beneficiary`. **Nothing renews on a timer.** A period
+  // is charged when somebody presses renew, which is why the console has a
+  // button for it rather than a schedule: a deployment left running does
+  // not accrue charges nobody authorised and nobody saw.
+  //
+  // Worth knowing, because the two differ: a **gift** reads its
+  // beneficiary from the subject (`commerce.beneficiary_of`, so a giver
+  // cannot redirect money meant for a performer), while a **subscription**
+  // takes one from the body. The console sends the profile's own account
+  // and says so.
+  // ---------------------------------------------------------------------
+
+  subscriptions: (token: string) =>
+    req<{ subscriptions: Subscription[] }>("/subscriptions", { token }),
+  // Named apart from `subscribe`, which joins a **plan**. Following a
+  // creator and paying for the product are different things, and one verb
+  // for both is how somebody ends up cancelling the wrong one.
+  follow: (kind: string, subjectId: string,
+           body: { tier: string; price?: number; accept_price?: number;
+                   beneficiary?: string }, token: string) =>
+    req<Subscription>(`/${kind}/${subjectId}/subscribe`,
+      { method: "POST", body, token }),
+  unfollow: (kind: string, subjectId: string, token: string) =>
+    req<Subscription>(`/${kind}/${subjectId}/subscribe`,
+      { method: "DELETE", body: {}, token }),
+  // Explicit, and the only way a period is ever charged.
+  renewSubscription: (subId: string, beneficiary: string, token: string) =>
+    req<Subscription>(`/subscriptions/${subId}/renew`,
+      { method: "POST", body: { beneficiary }, token }),
+  subscribers: (kind: string, subjectId: string, token: string) =>
+    req<{ subscribers: Subscription[] }>(`/${kind}/${subjectId}/subscribers`,
+      { token }),
+
+  gifts: (kind: string, subjectId: string, token: string) =>
+    req<GiftsView>(`/${kind}/${subjectId}/gifts`, { token }),
+  // No beneficiary field: it is read from the subject, so a giver cannot
+  // point somebody else's gift at their own balance.
+  sendGift: (kind: string, subjectId: string,
+             body: { amount: number; note?: string }, token: string) =>
+    req<Gift>(`/${kind}/${subjectId}/gift`,
+      { method: "POST", body, token }),
+
+  audience: (kind: string, targetId: string, token?: string) =>
+    req<AudienceView>(`/${kind}/${targetId}/audience`, { token }),
+  // `sales(token)` next door reads the seller's side of the same ledger;
+  // this is the buyer's. Two names because they are two questions.
+  myOrders: (token: string) => req<{ orders: Order[] }>("/orders", { token }),
 };
 
 /** Open the WebAuthn ceremony.

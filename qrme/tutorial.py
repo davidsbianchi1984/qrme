@@ -164,6 +164,20 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="audience", chapter="Out in the world",
+         title="Who follows, and what they pay",
+         what="Following is free; paying is a separate tier and there is no "
+              "middle one. Nothing renews on a timer — a period is charged "
+              "when somebody presses the button, so a count of periods is a "
+              "count of deliberate acts and a deployment left running "
+              "charges nobody. Agreeing to a price means sending the same "
+              "number back, so what you agreed to is what is charged. "
+              "Gifting needs a verified birthdate, and the cap is published "
+              "before you can hit it. Money here is simulated and every "
+              "response says so.",
+         screens=(168,),
+         try_it="Follow a profile for free, then read what a paid period "
+                "would actually charge."),
     dict(key="placement", chapter="Out in the world",
          title="Marketing a rated profile",
          what="An adult-mode profile can be advertised at an adult venue — a "

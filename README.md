@@ -360,6 +360,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/165-what-it-can-do-for-you.svg"><img src="docs/screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
     <td align="center" width="33%"><a href="docs/screens/166-somebody-qualified.svg"><img src="docs/screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
     <td align="center" width="33%"><a href="docs/screens/167-in-the-game-with-you.svg"><img src="docs/screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
   </tr>
 </table>
 
@@ -1765,6 +1766,34 @@ things the screen shows rather than smooths over:
 The price list needs no account, which is `tiers.py`'s decision and not the
 console's: *a paywall nobody can read the terms of before signing in is one
 people bounce off*. Everything above the membership card renders signed out.
+
+### Screen 168 — who follows, and what they pay
+
+Nine routes: subscriptions, gifts, the audience counters and the buyer's side
+of the ledger.
+
+**Nothing renews on a timer.** A period is charged when somebody presses
+renew — so `periods` is a count of deliberate acts, and the screen says that
+rather than showing it as a duration. `audience.py` gives the reason: a
+deployment left running does not accrue charges nobody authorised and nobody
+saw. Paid also asks for an `accept_price` that matches the price *exactly*,
+which is not a flag but a check that the number somebody agreed to is the
+number being charged.
+
+One asymmetry worth knowing, because the two routes look alike:
+
+- a **gift** reads its beneficiary from the subject — `commerce.beneficiary_of`
+  says why, that *a body-supplied beneficiary would let anyone direct a gift
+  meant for a performer into their own balance*;
+- a **subscription** takes a beneficiary from the request body.
+
+The console sends the profile's own account and shows which account the money
+is credited to, because that is the part somebody paying is entitled to see.
+It is a question worth settling rather than something I changed unilaterally.
+
+Gifting refuses without a verified birthdate — *an unverified age is not
+evidence of an adult* — and `cap_per_gift` is published so the limit can be
+stated before somebody runs into it.
 
 ### Screen 167 — who is in the game with you
 

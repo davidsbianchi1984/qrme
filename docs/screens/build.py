@@ -3515,6 +3515,22 @@ SCREENS = [
     # 160: the guide's own door. The last card is the one that says what
     # kind of thing the guide is — no name, no face — which on a platform of
     # synthetic people is the whole reason it looks like furniture.
+    # 168: the audience. The first card is the one that took a decision —
+    # nothing renews on a timer, so a period is a deliberate act and the
+    # count is a count of them. The last is the asymmetry between how a
+    # gift and a subscription decide who gets credited.
+    dict(num=168, title="Who Follows, And What They Pay", sub="Nothing bills on a timer",
+         accent="amber", tab=15, cards=[
+        dict(icon="coin", color="amber", k="A period is a press",
+             s="never a schedule, ever",
+             pill=("SIM", "warn")),
+        dict(icon="finger", color="cyan", k="The price you agreed",
+             s="sent back to confirm it"),
+        dict(icon="person", color="green", k="Verified age to gift",
+             s="unverified is not evidence"),
+        dict(icon="shield", color="brand", k="Who gets credited",
+             s="read from the profile, not you"),
+    ], button=("Charge another period", "brand")),
     # 167: the lobby. The whole design is one sentence, and the cards are
     # the three ways somebody would try to get around it — a machine of its
     # own, a second pad, a capture card — plus the instruction the synthetic

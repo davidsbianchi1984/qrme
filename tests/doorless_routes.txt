@@ -1,7 +1,6 @@
 DELETE /comments/{comment_id}
 DELETE /profiles/{profile_id}/friends/{friend_id}
 DELETE /profiles/{profile_id}/marketplace
-DELETE /{kind}/{subject_id}/subscribe
 GET /agent/lights
 GET /auth/oauth/{provider}/callback
 GET /b/{beacon_id}
@@ -11,7 +10,6 @@ GET /cloud/status
 GET /d/{beacon_id}
 GET /d/{beacon_id}/card
 GET /excursions/{cid}
-GET /orders
 GET /organizations/{org_id}
 GET /people/{person_id}/skill-grants
 GET /profiles/{profile_id}/cloud-contribution
@@ -19,11 +17,7 @@ GET /profiles/{profile_id}/embedding/{interactor_id}
 GET /profiles/{profile_id}/engagement/{interactor_id}
 GET /social/{cid}/beacon
 GET /social/{cid}/qr.svg
-GET /subscriptions
 GET /surfaces/{surface}/{surface_id}/skill-grants
-GET /{kind}/{subject_id}/gifts
-GET /{kind}/{subject_id}/subscribers
-GET /{kind}/{target_id}/audience
 POST /auth/oauth/{provider}/callback
 POST /packs
 POST /packs/seed
@@ -36,7 +30,4 @@ POST /profiles/{profile_id}/marketplace
 POST /profiles/{profile_id}/proactive/{interactor_id}
 POST /profiles/{profile_id}/succeed
 POST /profiles/{profile_id}/watch/act
-POST /subscriptions/{sub_id}/renew
-POST /{kind}/{subject_id}/gift
-POST /{kind}/{subject_id}/subscribe
 PUT /interactors/{interactor_id}/quiet-hours

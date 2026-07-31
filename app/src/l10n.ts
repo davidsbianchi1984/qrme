@@ -154,6 +154,12 @@ const CHROME: Table = {
     de: "Im Spiel", pt: "Na partida", it: "In partita",
     ja: "ゲーム中", zh: "对局中", hi: "खेल में", ar: "في اللعبة",
   },
+  "nav.audience": {
+    en: "Who follows", es: "Quién sigue", fr: "Qui suit",
+    de: "Wer folgt", pt: "Quem segue", it: "Chi segue",
+    ja: "フォロワー", zh: "谁在关注", hi: "कौन फ़ॉलो करता है",
+    ar: "من يتابع",
+  },
   "nav.robots": {
     en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
     pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",
