@@ -413,6 +413,18 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                 "objection", "i did not agree", "without my permission",
                 "my late", "estate", "withdraw consent", "revoke",
                 "moderation queue", "approve", "waiting for approval"),
+    # The words of somebody who has no profile and is asking anyway. Kept
+    # distinct from "contest" above, which is an owner's vocabulary for their
+    # own held messages as much as an objector's — these are the phrases that
+    # say *I am not one of your users* out loud, and they should land on the
+    # surface that needs no sign-in rather than on a tab behind one.
+    "withoutanaccount": ("i do not have an account", "i don't have an account",
+                         "no account", "without an account",
+                         "without signing up", "do i need an account",
+                         "must i sign up", "not a user",
+                         "who wrote this", "who made this", "is this real",
+                         "is this genuine", "did a person write this",
+                         "is this ai", "same one i met", "met it before"),
     # "Where is the tour" is a different question from "show me around",
     # which _WALKTHROUGH already answers by starting one. These are the words
     # for the screen that lists it, and for the dock's own settings.

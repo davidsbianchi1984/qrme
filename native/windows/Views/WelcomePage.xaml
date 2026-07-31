@@ -53,6 +53,22 @@
                 </Button.Background>
             </Button>
 
+            <!-- The other reason somebody opens this app: they have found a
+                 synthetic profile of themselves, or were sent something and
+                 want to know whether a person wrote it. Both routes are
+                 public on the backend and both sat behind this gate. -->
+            <StackPanel Spacing="4" HorizontalAlignment="Center">
+                <TextBlock Text="Here about a profile, not for one?"
+                           Foreground="{StaticResource QrmeT2Brush}" FontSize="12"
+                           HorizontalAlignment="Center" />
+                <Button Content="A profile depicts me · Is this genuine?"
+                        HorizontalAlignment="Center" Background="Transparent"
+                        Foreground="{StaticResource QrmeBrandABrush}" Click="OnPublicDoor" />
+                <TextBlock Text="Neither needs an account."
+                           Foreground="{StaticResource QrmeT3Brush}" FontSize="11"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
             <TextBlock Text="Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app"
                        FontFamily="Consolas" FontSize="11" Foreground="{StaticResource QrmeT2Brush}"
                        HorizontalAlignment="Center" />

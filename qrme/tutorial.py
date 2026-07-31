@@ -189,6 +189,30 @@ LESSONS: tuple[dict, ...] = (
          screens=(183,),
          try_it="Send a piece of feedback, then look up your own profile id "
                 "in the box at the bottom."),
+    # "Out in the world" rather than "You are in control": the chapters are
+    # named for the reader, and this is the one lesson about a surface that is
+    # not for them. It belongs beside beacons and desks — the places a profile
+    # meets somebody who never signed up for anything.
+    dict(key="withoutanaccount", chapter="Out in the world",
+         title="Without an account",
+         what="The one surface here that is not for you. Three of QRME's "
+              "routes are public deliberately, and the backend says so in its "
+              "own words — objecting to a profile *\"need not own an "
+              "account\"*, and the identity signature is readable by "
+              "*\"anyone meeting the profile through any form\"*. Every "
+              "client called them from behind the sign-in screen, so the "
+              "person each was written for could not reach it: somebody who "
+              "has found a synthetic profile of themselves, and somebody sent "
+              "a message who wants to know whether a person wrote it. Neither "
+              "has an account, and asking them to make one with the platform "
+              "they are asking about is the wrong answer. The link is on the "
+              "sign-in page now, on every client, and `#object` in the URL "
+              "opens the form directly — so a takedown notice can point at "
+              "it. Nothing on it sends a credential. The half that quotes an "
+              "objector's reason stays where the credential is.",
+         screens=(184,),
+         try_it="Sign out and open the link under the sign-in form. Every "
+                "control on that page works with no profile at all."),
     dict(key="inwords", chapter="Out in the world",
          title="In its own words",
          what="Four things about how a profile presents itself in language. "

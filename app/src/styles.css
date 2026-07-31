@@ -430,3 +430,24 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .role-pick { display: flex; align-items: center; gap: 8px; padding: 4px 0;
              font-size: 13px; color: var(--muted, #8a94ad); }
 .role-pick select { flex: 0 1 auto; min-width: 200px; }
+
+/* ---- the doors that open without an account ----
+   Deliberately the onboarding frame rather than the app frame: there is no
+   sidebar here because there is no profile, and a stranger objecting to a
+   profile of themselves should not be looking at a console they cannot use. */
+.public-entry {
+  width: 560px; margin: 24px auto; padding: 0 24px 40px;
+}
+.public-head {
+  display: flex; align-items: center; gap: 10px; padding: 18px 0 14px;
+}
+.public-head .brand-name { font-weight: 700; }
+.public-head .brand-sub { font-size: 11px; color: var(--t3); }
+.public-head .linkish { margin-left: auto; margin-top: 0; }
+.public-entry textarea {
+  width: 100%; box-sizing: border-box; margin: 8px 0;
+  background: var(--card2); color: var(--txt);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px;
+}
+.public-links { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.public-links button.linkish { display: block; margin: 6px auto 0; }

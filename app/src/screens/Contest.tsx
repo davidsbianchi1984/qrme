@@ -97,11 +97,16 @@ export function Contest({ onPlans }: {
 
       <div className="card">
         <h3>Open an objection</h3>
-        {/* Public on purpose. Said out loud, because somebody who has just
-            found a profile of themselves will assume they have to sign up. */}
+        {/* Public on purpose. This sentence used to read "You do not need an
+            account" — on a tab nobody without one could open, which made it
+            a promise the app broke in the act of making it. The form is now
+            also on the sign-in page, where the person it describes can
+            actually reach it, and the copy points there instead of asserting
+            something this surface cannot deliver. */}
         <p className="muted small">
-          You do not need an account. Objecting to a profile should not require
-          joining the platform that is hosting it.
+          Objecting to a profile does not require joining the platform hosting
+          it: the same form is on the sign-in page, open to anybody. You are
+          seeing it here because you are signed in.
         </p>
         <div className="row">
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}

@@ -38,6 +38,7 @@ import app.qrme.studio.LicenseGrant
 import app.qrme.studio.LicenseOffer
 import app.qrme.studio.Listing
 import app.qrme.studio.Objection
+import app.qrme.studio.ObjectionOpened
 import app.qrme.studio.Pack
 import app.qrme.studio.PackRegistry
 import app.qrme.studio.Post
@@ -104,6 +105,11 @@ internal fun labeledField(label: String, value: String, placeholder: String, onC
 
 @Composable
 fun WelcomeScreen(vm: StudioViewModel) {
+    // Not everybody who opens this app wants a profile. Some are here
+    // *because* of one — see WithoutAnAccountScreen below.
+    var publicDoor by remember { mutableStateOf(false) }
+    if (publicDoor) { WithoutAnAccountScreen(vm) { publicDoor = false }; return }
+
     var name by remember { mutableStateOf("") }
     var languages by remember { mutableStateOf<List<LanguageInfo>>(emptyList()) }
     var language by remember { mutableStateOf("en") }
@@ -176,7 +182,158 @@ fun WelcomeScreen(vm: StudioViewModel) {
                  "AI-generated synthetic content, never professional advice; you assume the " +
                  "risks of AI interactions. Full terms: GET /terms · docs/terms.md",
                 color = Qrme.T3, fontSize = 9.sp)
+            // The other reason somebody opens this app: they have found a
+            // synthetic profile of themselves, or were sent something and
+            // want to know whether a person wrote it. Both routes are public
+            // on the backend and both sat behind the sign-in gate.
+            Text("Here about a profile, not for one?", color = Qrme.T2, fontSize = 13.sp)
+            TextButton(onClick = { publicDoor = true }) {
+                Text("A profile depicts me · Is this genuine?",
+                    color = Qrme.BrandA, fontSize = 13.sp)
+            }
+            Text("Neither needs an account.", color = Qrme.T3, fontSize = 11.sp)
+
             Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app",
+                color = Qrme.T3, fontSize = 10.sp)
+        }
+    }
+}
+
+// ---- Without an account ----
+
+/**
+ * The two things this app lets a stranger do, on the one screen a stranger
+ * can reach.
+ *
+ * `MainActivity` renders `WelcomeScreen` unless `vm.isSignedIn`, so
+ * `openObjection` — wired into the settings screen one release ago precisely
+ * because a phone is the surface an objector reaches for — sat inside a
+ * signed-in tab, past a profile the objector does not have.
+ *
+ * `ApiClient.recoverWatermark` says it in its own comment: *"Public: a
+ * counterparty must be able to ask without an account here."* It was written
+ * beside a call site that required one.
+ *
+ * Nothing here passes a token, and nothing here is the owner's half: listing
+ * objections against your own profile and attesting to them stays where the
+ * credential is.
+ */
+@Composable
+fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
+    var pane by remember { mutableIntStateOf(0) }
+    var profileId by remember { mutableStateOf("") }
+    var objectorRef by remember { mutableStateOf("") }
+    var reason by remember { mutableStateOf("") }
+    var opened by remember { mutableStateOf<ObjectionOpened?>(null) }
+    var content by remember { mutableStateOf("") }
+    var found by remember { mutableStateOf<WatermarkRecovery?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    Box(Modifier.fillMaxSize().background(Qrme.Bg)) {
+        screenScroll {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Without an account", color = Qrme.Txt, fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold)
+                TextButton(onClick = onBack) {
+                    Text("Back", color = Qrme.BrandA, fontSize = 13.sp) }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("A profile depicts me", "Is this genuine?")
+                    .forEachIndexed { i, label ->
+                        FilterChip(
+                            selected = pane == i, onClick = { pane = i },
+                            label = { Text(label, fontSize = 12.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = Qrme.BrandA,
+                                selectedLabelColor = Color.White, labelColor = Qrme.T2,
+                            ),
+                        )
+                    }
+            }
+
+            if (pane == 0) {
+                Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Opening an objection restricts the profile straight away — " +
+                         "public surfaces off, no new interactors — before anybody " +
+                         "reviews it. A dismissal puts it back to exactly what it was.",
+                        color = Qrme.T2, fontSize = 12.sp)
+                    labeledField("The profile's id", profileId, "prf_…") { profileId = it }
+                    labeledField("Your proof reference", objectorRef, "an id check held elsewhere") { objectorRef = it }
+                    labeledField("Why — in your own words", reason, "") { reason = it }
+                    Text("The proof reference points at an identity check held outside " +
+                         "this system. It is not a login, and it is what lets you " +
+                         "object without one.", color = Qrme.T3, fontSize = 11.sp)
+                    BrandButton("Open it",
+                        enabled = profileId.isNotBlank() && objectorRef.isNotBlank(),
+                        busy = busy) {
+                        busy = true; error = null
+                        vm.call({ ApiClient.openObjection(profileId.trim(),
+                                                          objectorRef.trim(), reason) }) { r ->
+                            busy = false
+                            r.onSuccess { opened = it }.onFailure { error = it.message }
+                        }
+                    }
+                }
+                opened?.let { o ->
+                    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text("Opened — ${o.id}", color = Qrme.Txt, fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold)
+                        Text(o.note, color = Qrme.T2, fontSize = 12.sp)
+                        Text("The profile is ${o.profileStatus} from this moment.",
+                            color = Qrme.T2, fontSize = 12.sp)
+                        Text("Write the id down. It is how you follow this case " +
+                             "without an account — there is no inbox here to come " +
+                             "back to.", color = Qrme.T3, fontSize = 11.sp)
+                    }
+                }
+            } else {
+                Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("Paste it. This asks whose work it is with no credential id, " +
+                         "and keeps answering after the text has been reworded — which " +
+                         "is the state text usually arrives in.",
+                        color = Qrme.T2, fontSize = 12.sp)
+                    labeledField("Paste the text", content, "") { content = it }
+                    BrandButton("Ask who wrote it", enabled = content.isNotBlank(),
+                                busy = busy) {
+                        busy = true; error = null; found = null
+                        vm.call({ ApiClient.recoverWatermark(content) }) { r ->
+                            busy = false
+                            r.onSuccess { found = it }.onFailure { error = it.message }
+                        }
+                    }
+                }
+                found?.let { f ->
+                    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        if (f.recovered) {
+                            Text(f.state ?: "recovered", color = Qrme.Txt,
+                                fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                            Text("Produced by a QRME synthetic profile.",
+                                color = Qrme.T2, fontSize = 12.sp)
+                            Text("${f.matchedWindows} of ${f.storedWindows} stored " +
+                                 "windows matched.", color = Qrme.T3, fontSize = 11.sp)
+                            if (!f.verbatim) {
+                                Text("The wording has changed since it was stamped. " +
+                                     "That does not make it less traceable — it is " +
+                                     "what the score is measuring.",
+                                    color = Qrme.T3, fontSize = 11.sp)
+                            }
+                        } else {
+                            Text("Not recognised", color = Qrme.Txt, fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold)
+                            f.reason?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+                            Text("This says nothing about whether a person wrote it. " +
+                                 "It says no profile on this deployment has stamped " +
+                                 "work sharing enough wording with it.",
+                                color = Qrme.T3, fontSize = 11.sp)
+                        }
+                    }
+                }
+            }
+
+            error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+            Text("Nothing on this screen sends a credential. You do not need a profile " +
+                 "to use it, and making one is not the price of objecting to one.",
                 color = Qrme.T3, fontSize = 10.sp)
         }
     }

@@ -3,6 +3,7 @@ import { api } from "./api";
 import { t } from "./l10n";
 import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
+import { Public, type Pane as PublicPane } from "./screens/Public";
 import { Home } from "./screens/Home";
 import { Chat } from "./screens/Chat";
 import { Delegate } from "./screens/Delegate";
@@ -108,6 +109,10 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
 export function App() {
   const { session, signOut } = useSession();
   const [tab, setTab] = useState<Tab>("home");
+  // The two doors that open before a profile exists. Null is the sign-in
+  // screen; the state lives here rather than inside Onboarding so the hash
+  // link and the in-page link land in the same place.
+  const [publicDoor, setPublicDoor] = useState<PublicPane | null>(null);
   // Threaded into every screen that can be refused. A plan gate
   // names a plan, so the refusal has to be able to reach one.
   const toPlans = () => setTab("plans");
@@ -121,10 +126,35 @@ export function App() {
       .catch(() => setLang("en"));
   }, [session.profileId]);
 
-  // No profile yet → onboarding owns the whole window.
-  // The guard wraps onboarding too: a mismatched backend at sign-up is
-  // the same trap, one screen earlier.
-  if (!session.profileId) return <><VersionGuard /><Onboarding /></>;
+  // No profile yet → onboarding owns the whole window, *except* for the two
+  // things QRME's backend deliberately lets a stranger do.
+  //
+  // `open_objection` says it in its own docstring — "public: the objecting
+  // party need not own an account" — and Contest.tsx said it in the copy a
+  // person reads. Both were true of the route and false of the app: this
+  // early return handed the entire window to sign-up, so the one surface a
+  // person with no account could reach was the one asking them to make one.
+  // The person that route exists for is by construction the person without
+  // an account: they have found a synthetic profile of themselves.
+  //
+  // Read once at mount rather than routed, so a link in a takedown notice or
+  // a moderation reply can point at the form instead of the sign-up page.
+  if (!session.profileId) {
+    const door = publicDoor
+      ?? (window.location.hash === "#object" ? "object"
+        : window.location.hash === "#mark" ? "mark" : null);
+    return (
+      <>
+        <VersionGuard />
+        {door
+          ? <Public start={door} onBack={() => {
+              setPublicDoor(null);
+              if (window.location.hash) window.location.hash = "";
+            }} />
+          : <Onboarding onPublic={setPublicDoor} />}
+      </>
+    );
+  }
 
   return (
     <div className="app">

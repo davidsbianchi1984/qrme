@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.WithoutAnAccountPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <ScrollViewer>
+        <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
+            <Grid>
+                <TextBlock Text="Without an account" FontSize="22" FontWeight="Bold"
+                           Foreground="{StaticResource QrmeTxtBrush}" />
+                <Button Content="Back" HorizontalAlignment="Right" Click="OnBack"
+                        Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+            </Grid>
+            <TextBlock Text="Two things this app lets a stranger do. Both routes are public on the backend and both used to sit behind the sign-in gate — which asked the person objecting to a profile to make one first."
+                       Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
+
+            <!-- Objecting -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="A profile depicts me" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="Opening an objection restricts the profile straight away — public surfaces off, no new interactors — before anybody reviews it. A dismissal puts it back to exactly what it was."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <TextBox x:Name="ProfileBox" Header="The profile's id" PlaceholderText="prf_…" />
+                    <TextBox x:Name="RefBox" Header="Your proof reference"
+                             PlaceholderText="an identity check held elsewhere" />
+                    <TextBox x:Name="ReasonBox" Header="Why — in your own words"
+                             AcceptsReturn="True" Height="70" TextWrapping="Wrap" />
+                    <TextBlock Text="The proof reference points at an identity check held outside this system. It is not a login, and it is what lets you object without one."
+                               Foreground="{StaticResource QrmeT3Brush}" FontSize="11" TextWrapping="Wrap" />
+                    <Button x:Name="ObjectButton" Content="Open it" HorizontalAlignment="Stretch"
+                            Height="42" Foreground="White" Click="OnObject">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource QrmeBrandA}" Offset="0" />
+                                <GradientStop Color="#FF3AA0FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="OpenedCard" Background="{StaticResource QrmeCardBrush}"
+                    BorderBrush="{StaticResource QrmeLineBrush}" BorderThickness="1"
+                    CornerRadius="16" Padding="16" Visibility="Collapsed">
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="OpenedTitle" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="OpenedNote" Foreground="{StaticResource QrmeT2Brush}"
+                               FontSize="12" TextWrapping="Wrap" />
+                    <TextBlock Text="Write the id down. It is how you follow this case without an account — there is no inbox here to come back to."
+                               Foreground="{StaticResource QrmeT3Brush}" FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <!-- The mark -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Somebody sent me this" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock Text="Paste it. This asks whose work it is with no credential id, and keeps answering after the text has been reworded — which is the state text usually arrives in."
+                               Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
+                    <TextBox x:Name="ContentBox" AcceptsReturn="True" Height="110"
+                             TextWrapping="Wrap" PlaceholderText="paste the text" />
+                    <Button x:Name="RecoverButton" Content="Ask who wrote it"
+                            HorizontalAlignment="Stretch" Height="42" Foreground="White"
+                            Click="OnRecover">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource QrmeBrandA}" Offset="0" />
+                                <GradientStop Color="#FF3AA0FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="FoundCard" Background="{StaticResource QrmeCardBrush}"
+                    BorderBrush="{StaticResource QrmeLineBrush}" BorderThickness="1"
+                    CornerRadius="16" Padding="16" Visibility="Collapsed">
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="FoundTitle" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="FoundBody" Foreground="{StaticResource QrmeT2Brush}"
+                               FontSize="12" TextWrapping="Wrap" />
+                    <TextBlock x:Name="FoundDetail" Foreground="{StaticResource QrmeT3Brush}"
+                               FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
+                       TextWrapping="Wrap" Visibility="Collapsed" />
+
+            <TextBlock Text="Nothing on this page sends a credential. You do not need a profile to use it, and making one is not the price of objecting to one."
+                       Foreground="{StaticResource QrmeT3Brush}" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

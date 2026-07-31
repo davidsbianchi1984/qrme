@@ -348,7 +348,11 @@ function ProfileCreate() {
   );
 }
 
-export function Onboarding() {
+export function Onboarding({ onPublic }: {
+  /** The two doors that open without an account. Passed in rather than
+   *  routed here, so the link and the `#object` hash land in one place. */
+  onPublic: (door: "object" | "mark") => void;
+}) {
   const { session } = useSession();
   const accountReady = Boolean(session.accountToken);
   return (
@@ -361,6 +365,25 @@ export function Onboarding() {
           It runs against your local QRME API — your data stays in your vault.
         </p>
         {accountReady ? <ProfileCreate /> : <AccountGate />}
+
+        {/* Not everybody arriving here wants a profile. Some are here
+            *because* of one — somebody who has found a synthetic profile of
+            themselves, or who was sent something and wants to know whether a
+            person wrote it. Both routes are public on the backend and were
+            reachable only after signing up, which is the one thing neither
+            person should have to do. */}
+        <div className="public-links">
+          <p className="muted small">Here about a profile, not for one?</p>
+          <button className="linkish" onClick={() => onPublic("object")}>
+            A profile depicts me
+          </button>
+          <button className="linkish" onClick={() => onPublic("mark")}>
+            Is this genuine?
+          </button>
+          <p className="muted small">
+            Neither needs an account.
+          </p>
+        </div>
       </div>
     </div>
   );

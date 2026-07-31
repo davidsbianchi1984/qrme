@@ -74,6 +74,7 @@ Passing         173
 Selling         174
 Inside          175
 Placements      162
+Public          184
 Onboarding      unaudited
 Org             unaudited
 Simulate        unaudited

@@ -51,6 +51,9 @@ public sealed partial class WelcomePage : Page
         }
     }
 
+    private void OnPublicDoor(object sender, RoutedEventArgs e) =>
+        Frame.Navigate(typeof(WithoutAnAccountPage));
+
     private void ShowError(string message)
     {
         ErrorText.Text = message;

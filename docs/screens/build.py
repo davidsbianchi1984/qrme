@@ -3523,6 +3523,23 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 184: the console before there is a profile. The first card is the
+    # defect and it is the whole round — three routes the backend made
+    # public on purpose, reachable only after signing up to the platform the
+    # person is asking about. It sits on tab 0 with Welcome because it is
+    # beside Welcome in the flow, not behind the nav: there is no nav yet.
+    dict(num=184, title="Without An Account", sub="Public means before sign-in",
+         accent="green", tab=0, cards=[
+        dict(icon="flag", color="red", k="Object, no account",
+             s="the route always allowed it",
+             pill=("3", "warn")),
+        dict(icon="search", color="cyan", k="Whose work is this",
+             s="from the text, after editing"),
+        dict(icon="shieldok", color="green", k="Is it the same one",
+             s="one signature, every form"),
+        dict(icon="lock", color="silver", k="Nothing reads a token",
+             s="the audit trail stays gated"),
+    ], button=("Open it", "brand")),
     # 183: the tail of the audit, and the route that mattered in it — the
     # one place a profile's words actually leave, going out unmarked while
     # the in-app equivalent was stamped every time.

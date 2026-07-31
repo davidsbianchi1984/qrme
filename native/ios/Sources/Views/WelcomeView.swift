@@ -11,6 +11,9 @@ struct WelcomeView: View {
     @State private var birthdate = Date(timeIntervalSince1970: 441_763_200) // 1984-01-01
     @State private var busy = false
     @State private var error: String?
+    /// Not everybody who opens this app wants a profile. Some are here
+    /// *because* of one.
+    @State private var publicDoor = false
 
     private let kinds = ["self", "other_person", "fictional"]
 
@@ -76,10 +79,28 @@ struct WelcomeView: View {
                 Text("By creating a profile you agree to the Terms of Service — profiles are AI-generated synthetic content, never professional advice; you assume the risks of AI interactions. Full terms: GET /terms · docs/terms.md")
                     .font(.caption2).foregroundStyle(Theme.t3)
 
+                // The other reason somebody opens this app: they have found a
+                // synthetic profile of themselves, or they were sent
+                // something and want to know whether a person wrote it. Both
+                // routes are public on the backend and both were reachable
+                // only from inside a signed-in tab bar — which asked the
+                // person objecting to a profile to make one first.
+                VStack(spacing: 6) {
+                    Text("Here about a profile, not for one?")
+                        .font(.footnote).foregroundStyle(Theme.t2)
+                    Button("A profile depicts me · Is this genuine?") {
+                        publicDoor = true
+                    }
+                    .font(.footnote.bold()).foregroundStyle(Theme.brandA)
+                    Text("Neither needs an account.")
+                        .font(.caption2).foregroundStyle(Theme.t3)
+                }.padding(.top, 4)
+
                 Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app")
                     .font(.system(size: 10, design: .monospaced)).foregroundStyle(Theme.t3)
             }.padding(20)
         }
+        .sheet(isPresented: $publicDoor) { WithoutAnAccountView() }
         .task {
             languages = (try? await ApiClient.shared.languages())?.languages ?? []
         }

@@ -124,11 +124,15 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
             {same.invariant_across}.
           </p>
           {/* Said because it is unusual and load-bearing: this one route
-              needs no account, so somebody who has just met the profile on
-              a speaker can check it against the one they met in a room. */}
+              needs no credential, so somebody who has just met the profile on
+              a speaker can check it against the one they met in a room. That
+              was true of the route and false of the app until the sign-in
+              page grew a lookup for it — the person this sentence describes
+              is not you, and was reading nothing. */}
           <p className="muted small">
             This check is public — anybody who meets {same.name} in any form
-            can read it without an account.
+            can look up this signature from the sign-in page, with no profile
+            of their own.
           </p>
           {same.surfaces.length > 0 && (
             <p className="muted small">
