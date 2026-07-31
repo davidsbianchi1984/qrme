@@ -912,6 +912,67 @@ export type WhosePlace = {
   display_name: string | null; handle: string | null; is: string;
 };
 
+// ---------------------------------------------------------------------
+// Contesting a profile that depicts you, and holding what one says.
+//
+// The most consequential surface in the product, and it had no door. A
+// real person or their estate can object; opening one restricts the
+// profile *immediately*, before any review, and the two consent-basis
+// shortcuts terminate it outright.
+// ---------------------------------------------------------------------
+
+/** What opening an objection did. `prior_status` is the promise that a
+ *  dismissal is reversible: the profile goes back to whatever it was,
+ *  active or a departed memorial. */
+export type ObjectionOpened = {
+  id: string; profile_id: string;
+  status: string;
+  /** `restricted`, immediately — public surfaces off, no new interactors. */
+  profile_status: string;
+  prior_status: string;
+  note: string;
+};
+
+/** The public status check, for the objecting party — who may have no
+ *  account at all. `objector_ref` comes back so they can confirm it is
+ *  their case without having to be logged in as anybody. */
+export type ObjectionStatus = {
+  id: string; profile_id: string; status: string;
+  reattested: boolean; objector_ref: string;
+};
+
+export type ObjectionEvent = {
+  id: string; event: string; actor: string;
+  detail: Record<string, unknown>;
+  /** Whether this event was sealed into the PDI vault. PDI hash-chains
+   *  every write, so a sealed copy is independently tamper-evident. */
+  sealed: boolean; pdi_key: string | null;
+  at: string;
+};
+
+export type ObjectionAudit = {
+  objection_id: string; profile_id: string; status: string;
+  /** False when no vault is configured — and the screen says so, because
+   *  "tamper-evident" is a claim that depends on it. */
+  vault_backed: boolean;
+  events: ObjectionEvent[];
+};
+
+/** What any of resolve / withdraw / revoke returns. */
+export type ObjectionOutcome = {
+  id: string; status: string; profile_status: string;
+};
+
+export type HeldMessage = {
+  id: string; profile_id: string; interactor_id: string;
+  role: string; content: string;
+  status: string;
+  /** Why it is waiting — "owner approval required", or a moderation flag. */
+  flag_reason: string | null;
+  watermark_id: string | null;
+  created_at: string;
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -1864,4 +1925,58 @@ export const api = {
 
   whosePlace: (surface: string, surfaceId: string, token: string) =>
     req<WhosePlace>(`/places/${surface}/${surfaceId}/whose`, { token }),
+
+  // ---------------------------------------------------------------------
+  // Contesting a profile, and holding what one says.
+  //
+  // Nine routes with no caller, including the takedown path for a product
+  // whose whole subject is synthetic people who can be mistaken for real
+  // ones. A person depicted by a profile had no way to say so from here.
+  // ---------------------------------------------------------------------
+
+  // Public, and deliberately so: the objecting party need not own an
+  // account. Somebody who has just found a profile of themselves should
+  // not have to sign up to the thing depicting them in order to object.
+  //
+  // `objector_ref` is an out-of-band proof-of-identity reference, not a
+  // login — the identity check happens elsewhere and this points at it.
+  openObjection: (body: {
+    profile_id: string; objector_ref: string; reason?: string;
+  }) => req<ObjectionOpened>("/objections", { method: "POST", body }),
+
+  objection: (objectionId: string) =>
+    req<ObjectionStatus>(`/objections/${objectionId}`),
+
+  // Owner- or reviewer-gated, because it quotes the objector's reason.
+  objectionAudit: (objectionId: string, token: string) =>
+    req<ObjectionAudit>(`/objections/${objectionId}/audit`, { token }),
+
+  // Reviewer-gated. `uphold` terminates the profile and erases its
+  // content; `dismiss` restores whatever it was before.
+  resolveObjection: (objectionId: string, outcome: "uphold" | "dismiss",
+                     token: string) =>
+    req<ObjectionOutcome>(`/objections/${objectionId}/resolve`,
+      { method: "POST", body: { outcome }, token }),
+
+  // The two shortcuts that bypass review entirely, because the standing
+  // party's rights override preservation. Both terminate immediately, even
+  // mid-review, and each applies to exactly one consent basis — the
+  // refusal names the profile's actual basis when it does not match.
+  withdrawConsent: (objectionId: string) =>
+    req<ObjectionOutcome>(`/objections/${objectionId}/withdraw`,
+      { method: "POST", body: {} }),
+  revokeAuthorization: (objectionId: string) =>
+    req<ObjectionOutcome>(`/objections/${objectionId}/revoke`,
+      { method: "POST", body: {} }),
+
+  // The owner's own queue: what this profile said that is waiting on them.
+  // A bare array, not a wrapper.
+  moderationQueue: (profileId: string, token: string) =>
+    req<HeldMessage[]>(`/profiles/${profileId}/moderation/queue`, { token }),
+  approveMessage: (messageId: string, token: string) =>
+    req<{ id: string; status: string }>(`/moderation/${messageId}/approve`,
+      { method: "POST", body: {}, token }),
+  rejectMessage: (messageId: string, token: string) =>
+    req<{ id: string; status: string }>(`/moderation/${messageId}/reject`,
+      { method: "POST", body: {}, token }),
 };

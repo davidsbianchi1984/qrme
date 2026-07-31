@@ -259,6 +259,13 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
              "is anyone watching", "recording", "who can see", "bystander",
              "microphone", "lend my mic", "they can hear", "mute",
              "mask", "overlay", "hide my face", "filter"),
+    # The words somebody uses when they have just found a profile of
+    # themselves, and the words an owner uses about their own held messages.
+    "contest": ("that is me", "this is me", "profile of me", "impersonating",
+                "take it down", "takedown", "remove this profile", "object",
+                "objection", "i did not agree", "without my permission",
+                "my late", "estate", "withdraw consent", "revoke",
+                "moderation queue", "approve", "waiting for approval"),
     "identity": ("verify", "verified", "badge", "blue tick", "prove it is me",
                  "anonymous", "hide my name", "who checked", "my profiles",
                  "rename", "delete my profile", "delete this profile",

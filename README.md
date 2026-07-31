@@ -348,6 +348,9 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/157-where-it-is-seen.svg"><img src="docs/screens/157-where-it-is-seen.svg" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
     <td align="center" width="33%"><a href="docs/screens/158-what-is-live.svg"><img src="docs/screens/158-what-is-live.svg" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/159-contest-a-profile.svg"><img src="docs/screens/159-contest-a-profile.svg" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -952,6 +955,24 @@ A real person (or their estate) can contest a profile that represents them —
 | `POST /objections/{obj}/withdraw` | subject | A `subject_consent` subject withdraws consent — forces **termination**, honored even mid-review |
 
 Profile lifecycle: **active** → `restricted` (objection pending) → `terminated` (erased) or back to active; and **active** → `departed` (memorial, via `/sunset`). `GET /profiles/{id}` reports the current `status`.
+
+The console reaches it (**159**), and the form works with **no token**, which
+is the point rather than an oversight: somebody who has just found a profile of
+themselves should not have to join the platform hosting it in order to object.
+What they give instead is the proof reference, which points at an identity
+check held elsewhere.
+
+The screen puts the two halves of the bargain side by side, because either one
+alone would be unfair. Opening restricts the profile **immediately, before
+anybody reviews it** — waiting out a review while the thing you are contesting
+keeps meeting people is not a protection. And `prior_status` sits right beside
+it, because that restriction is only defensible if a dismissal puts the profile
+back to exactly what it was.
+
+The audit panel states `vault_backed` in words. *Tamper-evident* is a claim
+that depends on a PDI vault being configured; where none is, the timeline is
+still the timeline and nothing is hash-chained, and showing the events without
+that caveat would overstate what the deployment actually has.
 
 ## Beacons — leaving a profile somewhere
 

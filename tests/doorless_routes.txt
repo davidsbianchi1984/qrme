@@ -29,8 +29,6 @@ GET /handoffs/{handoff_id}
 GET /help/topics
 GET /interactors/{interactor_id}/referrals
 GET /memberships/{account_id}
-GET /objections/{objection_id}
-GET /objections/{objection_id}/audit
 GET /orders
 GET /organizations/{org_id}
 GET /people/{person_id}/skill-grants
@@ -42,7 +40,6 @@ GET /profiles/{profile_id}/embedding/{interactor_id}
 GET /profiles/{profile_id}/embodiment-consistency
 GET /profiles/{profile_id}/embodiments
 GET /profiles/{profile_id}/engagement/{interactor_id}
-GET /profiles/{profile_id}/moderation/queue
 GET /profiles/{profile_id}/placements
 GET /profiles/{profile_id}/placements/analytics
 GET /profiles/{profile_id}/placements/custody
@@ -78,12 +75,6 @@ POST /auth/oauth/{provider}/callback
 POST /gaming/sessions/{session_id}/lobby
 POST /handoffs
 POST /memberships/{account_id}
-POST /moderation/{message_id}/approve
-POST /moderation/{message_id}/reject
-POST /objections
-POST /objections/{objection_id}/resolve
-POST /objections/{objection_id}/revoke
-POST /objections/{objection_id}/withdraw
 POST /packs
 POST /packs/seed
 POST /profiles/genesis

@@ -3509,6 +3509,21 @@ SCREENS = [
     # 158: what is live. Every card is something the people around you are
     # told — which is the one rule holding the camera, the microphone and the
     # overlay together.
+    # 159: contesting a profile. The first card is the whole asymmetry —
+    # restricted at once, before review — and the second is the bargain that
+    # makes it fair, that a dismissal puts it back.
+    dict(num=159, title="Contest A Profile", sub="Restricted before review",
+         accent="red", tab=15, cards=[
+        dict(icon="flag", color="red", k="Restricted at once",
+             s="before anyone reviews it",
+             pill=("HELD", "crit")),
+        dict(icon="rotate", color="green", k="Dismissal restores it",
+             s="back to exactly what it was"),
+        dict(icon="person", color="cyan", k="No account needed",
+             s="a proof reference, not a login"),
+        dict(icon="lock", color="brand", k="Every step recorded",
+             s="sealed where a vault exists"),
+    ], button=("Withdraw my consent", "brand")),
     dict(num=158, title="What Is Live", sub="And what the room is told",
          accent="amber", tab=15, cards=[
         dict(icon="eye", color="amber", k="Your camera is on",

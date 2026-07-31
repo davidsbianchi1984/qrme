@@ -13,6 +13,7 @@ import { Exchanges } from "./screens/Exchanges";
 import { Identity } from "./screens/Identity";
 import { Presence } from "./screens/Presence";
 import { Live } from "./screens/Live";
+import { Contest } from "./screens/Contest";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -31,7 +32,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -52,6 +53,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "identity", label: "Identity", icon: "🪪" },
   { id: "presence", label: "Where it is seen", icon: "🖼" },
   { id: "live", label: "What is live", icon: "🎥" },
+  { id: "contest", label: "Contest a profile", icon: "⚖" },
   { id: "exchanges", label: "Exchanges", icon: "📝" },
   { id: "grants", label: "Lent skills", icon: "🪄" },
   { id: "party", label: "Watch together", icon: "🍿" },
@@ -125,6 +127,7 @@ export function App() {
         {tab === "identity" && <Identity />}
         {tab === "presence" && <Presence />}
         {tab === "live" && <Live />}
+        {tab === "contest" && <Contest />}
         {tab === "exchanges" && <Exchanges />}
         {tab === "grants" && <Grants />}
         {tab === "party" && <WatchParty />}

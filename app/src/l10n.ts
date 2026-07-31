@@ -115,6 +115,13 @@ const CHROME: Table = {
     ja: "起動中のもの", zh: "正在进行", hi: "क्या चालू है",
     ar: "ما هو نشط",
   },
+  "nav.contest": {
+    en: "Contest a profile", es: "Impugnar un perfil",
+    fr: "Contester un profil", de: "Profil anfechten",
+    pt: "Contestar um perfil", it: "Contestare un profilo",
+    ja: "プロフィールの異議", zh: "申诉档案", hi: "प्रोफ़ाइल पर आपत्ति",
+    ar: "الاعتراض على ملف",
+  },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
     pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",

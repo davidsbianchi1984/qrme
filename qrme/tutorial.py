@@ -348,6 +348,27 @@ LESSONS: tuple[dict, ...] = (
               "worth nothing.",
          screens=(158,),
          try_it="Open What Is Live and read what a viewer can never do."),
+    dict(key="contest", chapter="Being yourself",
+         title="If a profile here is of you",
+         what="A real person — or the estate of one — can contest a profile "
+              "that represents them, and you do not need an account here to "
+              "do it: objecting to a profile should not require joining the "
+              "platform hosting it. What you give instead is a proof "
+              "reference pointing at an identity check held elsewhere. "
+              "Opening an objection restricts the profile immediately, "
+              "before anybody reviews it — public surfaces off, no new "
+              "people — because waiting out a review while the thing you are "
+              "contesting keeps meeting people is not a protection. The "
+              "other half of that bargain is that it is reversible: a "
+              "dismissal puts the profile back to exactly what it was. Two "
+              "shortcuts skip review entirely — the subject can withdraw "
+              "consent, an estate can revoke authorization — and both end "
+              "the profile at once. Every step is written down, and where a "
+              "vault is configured it is sealed into one that hash-chains "
+              "its writes.",
+         screens=(159,),
+         try_it="Open Contest A Profile and read what happens the moment an "
+                "objection is opened."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "
