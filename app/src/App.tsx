@@ -11,6 +11,7 @@ import { Discover } from "./screens/Discover";
 import { Market } from "./screens/Market";
 import { Exchanges } from "./screens/Exchanges";
 import { Identity } from "./screens/Identity";
+import { Presence } from "./screens/Presence";
 import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
@@ -29,7 +30,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -48,6 +49,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "delegate", label: "Delegation", icon: "🤝" },
   { id: "desk", label: "Desk", icon: "🛎" },
   { id: "identity", label: "Identity", icon: "🪪" },
+  { id: "presence", label: "Where it is seen", icon: "🖼" },
   { id: "exchanges", label: "Exchanges", icon: "📝" },
   { id: "grants", label: "Lent skills", icon: "🪄" },
   { id: "party", label: "Watch together", icon: "🍿" },
@@ -119,6 +121,7 @@ export function App() {
         {tab === "delegate" && <Delegate />}
         {tab === "desk" && <Desk />}
         {tab === "identity" && <Identity />}
+        {tab === "presence" && <Presence />}
         {tab === "exchanges" && <Exchanges />}
         {tab === "grants" && <Grants />}
         {tab === "party" && <WatchParty />}

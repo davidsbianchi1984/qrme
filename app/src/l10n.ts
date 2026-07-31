@@ -103,6 +103,12 @@ const CHROME: Table = {
     pt: "Identidade", it: "Identità", ja: "本人確認", zh: "身份",
     hi: "पहचान", ar: "الهوية",
   },
+  "nav.presence": {
+    en: "Where it is seen", es: "Dónde se ve", fr: "Où on le voit",
+    de: "Wo es zu sehen ist", pt: "Onde aparece", it: "Dove si vede",
+    ja: "表示される場所", zh: "展示位置", hi: "कहाँ दिखता है",
+    ar: "أين يُعرض",
+  },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
     pt: "Trocas", it: "Scambi", ja: "取り決め", zh: "交换", hi: "विनिमय",

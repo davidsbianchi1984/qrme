@@ -707,6 +707,88 @@ export type Memorial = {
  *  list that would silently stop mentioning a new one. */
 export type Deleted = { deleted: Record<string, number> };
 
+// ---------------------------------------------------------------------
+// How a profile presents itself, everywhere it is seen: the page it builds,
+// the front page a stranger lands on, the physical screens it is shown on,
+// and which surfaces it is allowed on at all.
+// ---------------------------------------------------------------------
+
+export type Theme = {
+  id: string; label: string; bg: string; ink: string; note: string;
+};
+
+export type PageCatalog = {
+  themes: Theme[]; layouts: string[]; top_friends: number;
+  /** Published so an editor can grey out what it knows will be stripped
+   *  rather than letting somebody write it and lose it — the backend says so
+   *  in its own comment. Nothing was reading them until now. */
+  html_tags: string[]; css_properties: string[];
+};
+
+export type PageLink = { label: string; url: string };
+
+export type ProfilePage = {
+  profile_id: string;
+  theme: Theme;
+  accent: string | null; layout: string;
+  tagline: string | null;
+  about: string | null;
+  /** Set when moderation held the about text, with the reason, so it can be
+   *  fixed rather than silently dropped. Owner's view only. */
+  about_blocked: string | null;
+  top_friends: unknown[];
+  html: string | null;
+  /** Tag names the sanitiser removed. The edit still succeeds — so without
+   *  showing this, somebody's `<script>` vanishes and the page just quietly
+   *  does less than they wrote. */
+  html_removed: string[];
+  links: PageLink[];
+  offers: unknown[];
+  feed: unknown[];
+};
+
+/** What a stranger lands on. Public, and the AI disclosure is part of it
+ *  rather than chrome around it. */
+export type Front = {
+  profile_id: string; display_name: string; handle: string | null;
+  headline: string | null; portrait: string | null;
+  ai_disclosure: string;
+  verification: Verification;
+  skills: unknown[]; experience: unknown[];
+  rating: { average: number | null; count: number; note?: string };
+  reviews: unknown[];
+  talked_with: number; interactions: number; adult: boolean;
+};
+
+export type DisplayCatalog = {
+  /** `passers_by` is the field that matters: a corridor panel and a screen on
+   *  your own desk are not the same risk, and the vocabulary says which is
+   *  which rather than leaving a client to guess from the name. */
+  kinds: { kind: string; passers_by: boolean; means: string }[];
+  sizes: { size: string; means: string }[];
+  finishes: { finish: string; means: string }[];
+  faces: { face: string; private: boolean; shows: string }[];
+  default_faces: string[];
+  /** What a fixed screen may never show, each with the reason. Shown on the
+   *  screen verbatim — these are the sentences that explain the product's
+   *  posture, and a paraphrase would be a worse version of an argument
+   *  somebody already made carefully. */
+  never: { thing: string; why: string }[];
+};
+
+export type Display = {
+  id: string; profile_id: string;
+  kind: string; label: string; location: string | null;
+  size: string; finish: string;
+  faces: string[];
+  passers_by: boolean;
+  /** False after it is taken down — retired, not erased. */
+  live: boolean;
+  mark: { backing_plate: boolean; why: string; min_contrast: number;
+          note: string };
+  placed_at: string;
+};
+
 export type Desk = {
   desk_id: string;
   desk_token?: string;
@@ -1498,4 +1580,75 @@ export const api = {
   // is a claim and an itemised receipt is evidence.
   deleteProfile: (profileId: string, token: string) =>
     req<Deleted>(`/profiles/${profileId}`, { method: "DELETE", token }),
+
+  // ---------------------------------------------------------------------
+  // How a profile presents itself, everywhere it is seen.
+  //
+  // Twelve routes with no caller. `/pages/themes` is the one that stings:
+  // it publishes the allowed HTML tags and CSS properties specifically so
+  // an editor can grey out what would be stripped — the backend says so in
+  // its own comment — and nothing was reading them.
+  // ---------------------------------------------------------------------
+
+  pageCatalog: () => req<PageCatalog>("/pages/themes"),
+
+  // Public: the page as a visitor sees it.
+  page: (profileId: string) =>
+    req<ProfilePage>(`/profiles/${profileId}/page`),
+
+  // The owner's view comes back from the edit, and it carries two things
+  // the visitor's does not: `about_blocked` with moderation's reason, and
+  // `html_removed`. The edit succeeds either way, so a screen that ignored
+  // those would let somebody's markup disappear without a word.
+  setPage: (profileId: string, body: {
+    theme?: string; accent?: string | null; layout?: string;
+    tagline?: string | null; about?: string | null;
+    top_friends?: string[]; html?: string | null;
+    links?: PageLink[]; show_offers?: boolean;
+  }, token: string) =>
+    req<ProfilePage>(`/profiles/${profileId}/page`,
+      { method: "PUT", body, token }),
+
+  front: (profileId: string) => req<Front>(`/profiles/${profileId}/front`),
+
+  displayCatalog: () => req<DisplayCatalog>("/displays/vocabulary"),
+
+  // Placing one is owner-only, for the same reason placing a beacon is:
+  // where a profile is shown is a decision about the profile, and a screen
+  // bolted to a wall is a beacon with a plug in it.
+  placeDisplay: (profileId: string, body: {
+    kind: string; label: string; location?: string | null;
+    size?: string; finish?: string; faces?: string[];
+  }, token: string) =>
+    req<Display>(`/profiles/${profileId}/displays`,
+      { method: "POST", body, token }),
+
+  // Owner-only, and the asymmetry with `display()` below is deliberate: the
+  // list of somebody's screens is a list of physical places.
+  myDisplays: (profileId: string, token: string) =>
+    req<{ profile_id: string; displays: Display[] }>(
+      `/profiles/${profileId}/displays`, { token }),
+
+  // Public on purpose rather than by oversight — a fixture in a corridor
+  // displays to whoever walks past, so what it shows cannot be a secret
+  // from them.
+  display: (displayId: string) => req<Display>(`/displays/${displayId}`),
+
+  // 422 naming the reason, not the rule: "a conversation on a wall is a
+  // conversation with an audience the other person did not agree to".
+  setDisplayFaces: (displayId: string, faces: string[], token: string) =>
+    req<Display>(`/displays/${displayId}/faces`,
+      { method: "PUT", body: { faces }, token }),
+
+  // Returns the display with `live: false` — taken down, not erased.
+  removeDisplay: (displayId: string, token: string) =>
+    req<Display>(`/displays/${displayId}`, { method: "DELETE", token }),
+
+  surfaces: (profileId: string) =>
+    req<{ profile_id: string; surfaces: string[] }>(
+      `/profiles/${profileId}/surfaces`),
+  setSurfaces: (profileId: string, surfaces: string[], token: string) =>
+    req<{ profile_id: string; surfaces: string[] }>(
+      `/profiles/${profileId}/surfaces`,
+      { method: "PUT", body: { surfaces }, token }),
 };

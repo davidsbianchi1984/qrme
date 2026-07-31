@@ -345,6 +345,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   </tr>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/157-where-it-is-seen.svg"><img src="docs/screens/157-where-it-is-seen.svg" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
   </tr>
 </table>
 
@@ -1601,6 +1602,12 @@ public, because a fixture in a corridor cannot keep a secret from the corridor.
 That last one is also the check on the whole design: if that route could leak
 anything, the wrong thing is on the face list.
 
+The console reaches it (**157**), and draws the asymmetry rather than leaving
+both halves looking like ordinary rows: what a given screen is showing sits in
+public, and the list of an owner's screens does not. The `never` list is
+rendered verbatim, each entry with its reason — those sentences are the
+argument made once, carefully, and a paraphrase would be a worse version of it.
+
 ## Show me around — the guided walkthrough
 
 [`qrme/help.py`](#a-help-box-on-every-screen) answers a question somebody
@@ -2417,6 +2424,13 @@ first; your friends list is who you stand with.
 **About-me text is moderated like anything else written for other people to
 read.** A blocked one comes back to its author with the reason and is invisible
 to visitors, which is the shape the audience layer already uses for a comment.
+
+The editor (**157**) lists the surviving tags *before* you write, which is what
+`/pages/themes` published them for — the backend's own comment says "so an
+editor can grey out what it knows will be stripped, rather than letting
+somebody write it and lose it", and until now nothing read them. It also shows
+`html_removed` after a save, because the save succeeds either way: without it,
+a `<script>` disappears and the page simply does less than its author wrote.
 
 ## Friends, and the two who come as standard
 

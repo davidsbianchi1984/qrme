@@ -1,5 +1,4 @@
 DELETE /comments/{comment_id}
-DELETE /displays/{display_id}
 DELETE /gaming/sessions/{session_id}/lobby
 DELETE /handoffs/{handoff_id}
 DELETE /memberships/{account_id}
@@ -26,8 +25,6 @@ GET /campaigns/{campaign_id}
 GET /cloud/status
 GET /d/{beacon_id}
 GET /d/{beacon_id}/card
-GET /displays/vocabulary
-GET /displays/{display_id}
 GET /dock/faces
 GET /dock/where/{face}
 GET /dock/{profile_id}
@@ -47,7 +44,6 @@ GET /objections/{objection_id}/audit
 GET /orders
 GET /organizations/{org_id}
 GET /overlays/catalogue
-GET /pages/themes
 GET /people/{person_id}/skill-grants
 GET /places/{surface}/{surface_id}/microphone
 GET /places/{surface}/{surface_id}/overlay
@@ -56,14 +52,11 @@ GET /plans
 GET /profiles/{profile_id}/assist/works
 GET /profiles/{profile_id}/clinical-notes/{interactor_id}
 GET /profiles/{profile_id}/cloud-contribution
-GET /profiles/{profile_id}/displays
 GET /profiles/{profile_id}/embedding/{interactor_id}
 GET /profiles/{profile_id}/embodiment-consistency
 GET /profiles/{profile_id}/embodiments
 GET /profiles/{profile_id}/engagement/{interactor_id}
-GET /profiles/{profile_id}/front
 GET /profiles/{profile_id}/moderation/queue
-GET /profiles/{profile_id}/page
 GET /profiles/{profile_id}/placements
 GET /profiles/{profile_id}/placements/analytics
 GET /profiles/{profile_id}/placements/custody
@@ -71,7 +64,6 @@ GET /profiles/{profile_id}/reviews
 GET /profiles/{profile_id}/sources
 GET /profiles/{profile_id}/specialists
 GET /profiles/{profile_id}/steering
-GET /profiles/{profile_id}/surfaces
 GET /profiles/{profile_id}/thread/{interactor_id}
 GET /profiles/{profile_id}/wearables
 GET /providers
@@ -118,7 +110,6 @@ POST /profiles/{profile_id}/assist/compose
 POST /profiles/{profile_id}/assist/proofread
 POST /profiles/{profile_id}/assist/triage
 POST /profiles/{profile_id}/cloud-contribution/revoke
-POST /profiles/{profile_id}/displays
 POST /profiles/{profile_id}/embodiments
 POST /profiles/{profile_id}/finetune
 POST /profiles/{profile_id}/interactions/{interactor_id}/feedback
@@ -146,12 +137,9 @@ POST /tutorial/start
 POST /watermarks/verify
 POST /{kind}/{subject_id}/gift
 POST /{kind}/{subject_id}/subscribe
-PUT /displays/{display_id}/faces
 PUT /dock/{profile_id}
 PUT /interactors/{interactor_id}/quiet-hours
 PUT /profiles/{profile_id}/experience
-PUT /profiles/{profile_id}/page
 PUT /profiles/{profile_id}/specialists
 PUT /profiles/{profile_id}/steering
-PUT /profiles/{profile_id}/surfaces
 PUT /robots/{robot_id}/steering

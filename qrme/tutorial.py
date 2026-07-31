@@ -313,6 +313,23 @@ LESSONS: tuple[dict, ...] = (
               "you a receipt itemising every kind of record it erased.",
          screens=(156,),
          try_it="Open Identity and look at the 'not withheld' column."),
+    dict(key="presence", chapter="Being yourself",
+         title="Where it is seen",
+         what="Three different audiences, and they are not the same. Your own "
+              "page is the one you build — pick a theme, write a tagline, and "
+              "put your own HTML in it, though only some of it survives: the "
+              "editor lists the tags that do, up front, because the save "
+              "succeeds either way and markup that vanished silently is "
+              "markup you never knew you lost. Your front page is what a "
+              "stranger lands on from a scan or a link, with the AI mark on "
+              "it. And a fixed screen — a wall panel, a kiosk, a shop window "
+              "— is read by people who did not choose to look at it, which is "
+              "why it can never show messages, memory, friends or agent "
+              "names, and why each refusal tells you the reason rather than "
+              "the rule. What any one screen is showing is public. The list "
+              "of your screens is not: that is a list of physical places.",
+         screens=(157,),
+         try_it="Open Where It Is Seen and read what a fixed screen never shows."),
     dict(key="face", chapter="Being yourself", title="Your face, or not",
          what="Wear a character over your camera, change what is behind you, "
               "or stay anonymous under a fixed name nobody can change. A "

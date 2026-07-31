@@ -3502,6 +3502,22 @@ SCREENS = [
     # most fail. And the anonymity card names what is NOT hidden, because a
     # screen showing only the withheld half would be promising something the
     # product does not do.
+    # 157: presentation. The card that carries the screen is the third one —
+    # what a fixed screen may never show. A wall panel is read by people who
+    # did not choose to look at it, and the refusal names its reason rather
+    # than a rule number.
+    dict(num=157, title="Where It Is Seen", sub="Your page, and other people's walls",
+         accent="cyan", tab=15, cards=[
+        dict(icon="pen", color="brand", k="The page you make",
+             s="your own HTML, mostly"),
+        dict(icon="grid", color="cyan", k="Lobby panel",
+             s="read by passers-by",
+             pill=("LIVE", "good")),
+        dict(icon="lock", color="amber", k="Never messages",
+             s="an audience they never chose"),
+        dict(icon="eye", color="green", k="What it shows is public",
+             s="the list of screens is not"),
+    ], button=("Place it on a screen", "brand")),
     dict(num=156, title="Who This Is", sub="One badge, and it moves",
          accent="brand", tab=15, cards=[
         dict(icon="person", color="brand", k="Four profiles",

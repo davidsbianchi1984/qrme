@@ -247,6 +247,12 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     # that those are the same screen. Both sets of words go here.
     # Two very different arrivals at one screen: somebody wanting the blue
     # tick, and somebody wanting out. Both belong here.
+    # People arrive here from three directions — decorating a page, putting
+    # a profile on a physical screen, and asking what a wall can show.
+    "presence": ("my page", "customise", "customize", "theme", "layout",
+                 "html", "tagline", "front page", "what people see",
+                 "wall panel", "kiosk", "screen", "display", "shop window",
+                 "put it on a screen", "surfaces"),
     "identity": ("verify", "verified", "badge", "blue tick", "prove it is me",
                  "anonymous", "hide my name", "who checked", "my profiles",
                  "rename", "delete my profile", "delete this profile",
