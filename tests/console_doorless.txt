@@ -1,14 +1,10 @@
 DELETE /beacons/{beacon_id}
-DELETE /profiles/{profile_id}/packs/{pack_id}
-DELETE /robots/{robot_id}/packs/{pack_id}
 DELETE /signatures/credentials/{row_id}
 GET /b/{beacon_id}/card
 GET /connections/{connection_id}/messages
-GET /connectors/catalog
 GET /desks/{desk_id}
 GET /feedback
 GET /languages
-GET /packs
 GET /packs/registries
 GET /packs/{pack_id}
 GET /profiles/{profile_id}/apps
@@ -16,7 +12,6 @@ GET /profiles/{profile_id}/beacons
 GET /profiles/{profile_id}/excursions
 GET /profiles/{profile_id}/gaming/sessions
 GET /profiles/{profile_id}/objections
-GET /profiles/{profile_id}/packs
 GET /profiles/{profile_id}/posts
 GET /profiles/{profile_id}/steering/hub
 GET /profiles/{profile_id}/watermark
@@ -32,7 +27,6 @@ POST /feedback
 POST /gaming/sessions/{session_id}/callout
 POST /gaming/sessions/{session_id}/end
 POST /packs/registries/{key}/sync
-POST /packs/{pack_id}/install
 POST /profiles/{profile_id}/apps
 POST /profiles/{profile_id}/beacons
 POST /profiles/{profile_id}/compose

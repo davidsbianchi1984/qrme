@@ -3519,6 +3519,22 @@ SCREENS = [
     # nothing renews on a timer, so a period is a deliberate act and the
     # count is a count of them. The last is the asymmetry between how a
     # gift and a subscription decide who gets credited.
+    # 176: the body market and what you bolt onto one. The first card is
+    # the decision — announced bodies are listed and refused — and the last
+    # is the check that stops a pack being fitted to a machine that cannot
+    # physically do it.
+    dict(num=176, title="A Body, And What It Learns", sub="Listed, and not yet buyable",
+         accent="silver", tab=23, cards=[
+        dict(icon="clock", color="silver", k="Shown, not sold",
+             s="listed so you see it coming",
+             pill=("409", "warn")),
+        dict(icon="coin", color="brand", k="On sale now",
+             s="or an order book is open"),
+        dict(icon="brain", color="green", k="Taught a verb",
+             s="each task becomes a command"),
+        dict(icon="shield", color="amber", k="Only what it can do",
+             s="a vacuum is never taught fetch"),
+    ], button=("Fit it", "brand")),
     # 175: inside a room. The first card is the defect that mattered most —
     # the speaker was read out of the body, so a room id was enough to talk
     # as somebody else — and the last is the microphone's whole point.

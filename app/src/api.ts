@@ -262,10 +262,17 @@ export type Membership = {
 // Robot bodies.
 // ---------------------------------------------------------------------
 
+/** One body on the market. `availability` is the whole reason this
+ *  catalogue is worth reading: it lists machines nobody can buy yet, and
+ *  `bindable` says which of them a profile can actually be attached to —
+ *  binding an `announced` one is a 409 that names the status rather than a
+ *  404, because the machine is real and its maker has shown it. */
 export type RobotModel = {
   model: string; label: string; maker: string; kind: string;
   capabilities: string[];
   llm_capable: boolean;
+  availability: string;      // shipping | preorder | announced
+  bindable: boolean;
 };
 
 /** What binding a body answers with. Note it is **not** what the list
@@ -1681,6 +1688,35 @@ export type RoomMsg = {
   content: string | null;
   watermark: { display?: { line?: string } } | null;
   created_at?: string;
+};
+
+export type RobotCatalogue = {
+  robots: RobotModel[];
+  by_maker: Record<string, RobotModel[]>;
+  by_kind: Record<string, RobotModel[]>;
+  by_availability: Record<string, RobotModel[]>;
+  commands: Record<string, string[]>;
+  reviewed: string;
+  buyable: string[];
+  note: string;
+};
+
+export type ConnectorCatalogue = {
+  providers: { provider: string; label: string;
+               apps: { app: string; label: string; capabilities: string[];
+                       directions: string[] }[] }[];
+  app_count: number; provider_count: number;
+};
+
+export type PackRow = {
+  id: string; industry: string; audience: string; title: string;
+  publisher: string; price?: number; rated?: boolean;
+};
+
+export type InstalledPack = {
+  id: string; industry: string; audience: string; title: string;
+  publisher: string; robot_id: string | null;
+  price_paid: number | null; installed_at: string;
 };
 
 export type MicsHere = {
@@ -3316,7 +3352,34 @@ export const api = {
   // buttons belong.
   // ---------------------------------------------------------------------
 
-  robotCatalogue: () => req<{ robots: RobotModel[] }>("/robotics/catalog"),
+  // The whole market, including what nobody can buy yet. `announced` rows
+  // are listed so an owner can see a body coming and are refused at bind
+  // with a 409 that names the status — a 404 would be a lie about a machine
+  // its maker has publicly shown.
+  robotCatalogue: () => req<RobotCatalogue>("/robotics/catalog"),
+
+  // The connections bracket: what a body is taught, and what it is plugged
+  // into. A task pack installed on a robot turns each of its tasks into a
+  // commandable verb, capability-checked against the catalogue — a vacuum
+  // cannot be taught to fetch. The connected-apps catalogue is the other
+  // half: the services an agent can collect from, act on, or produce into.
+  connectorCatalogue: () => req<ConnectorCatalogue>("/connectors/catalog"),
+  packs: (audience?: string) =>
+    req<PackRow[]>(`/packs${audience ? `?audience=${audience}` : ""}`),
+  installedPacks: (profileId: string, token: string) =>
+    req<InstalledPack[]>(`/profiles/${profileId}/packs`, { token }),
+  installPack: (packId: string,
+                body: { profile_id: string; robot_id?: string;
+                        accept_price?: boolean },
+                token: string) =>
+    req<{ pack_id: string; installed: boolean; tasks?: string[] }>(
+      `/packs/${packId}/install`, { method: "POST", body, token }),
+  uninstallPack: (profileId: string, packId: string, token: string) =>
+    req<{ removed: number }>(`/profiles/${profileId}/packs/${packId}`,
+      { method: "DELETE", token }),
+  uninstallRobotPack: (robotId: string, packId: string, token: string) =>
+    req<{ removed: number }>(`/robots/${robotId}/packs/${packId}`,
+      { method: "DELETE", token }),
   robots: (profileId: string, token: string) =>
     req<RobotRow[]>(`/profiles/${profileId}/robots`, { token }),
   bindRobot: (profileId: string, body: { name: string; model: string },

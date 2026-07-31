@@ -164,6 +164,29 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="bodies", chapter="Out in the world",
+         title="A body, and what it learns",
+         what="Choosing a body is shopping, so the catalogue covers the "
+              "market rather than the shelf: humanoids, home robots, "
+              "quadrupeds and vacuums from every maker shipping one, plus "
+              "the ones announced and not yet buyable. Each row says which "
+              "it is. An announced body is listed **and refused** — binding "
+              "one answers 409 naming its status, because saying \"unknown "
+              "model\" about a machine its maker has stood on a stage with "
+              "would be false, and every command to a body nobody has would "
+              "go nowhere. The list is a dated snapshot, and a test fails "
+              "when the date goes stale, because `announced` is a claim "
+              "about the future and it ages. Then the connections bracket: "
+              "a **task pack** teaches a body verbs, each one checked "
+              "against what that model can physically do — a vacuum is "
+              "never taught to fetch, and the refusal names the missing "
+              "capability instead of accepting the install and failing "
+              "later. A **connector** is a service its agents can collect "
+              "from, act on, or produce into. A pack is fitted to a "
+              "particular machine, not to the profile, which is the "
+              "distinction that decides where it lands.",
+         screens=(176,),
+         try_it="Open the full list and find something you cannot buy yet."),
     dict(key="inside", chapter="Out in the world",
          title="Inside a room",
          what="Rooms could be opened and not entered: the console listed "

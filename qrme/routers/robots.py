@@ -70,6 +70,15 @@ def bind_robot(profile_id: str, body: RobotBind, request: Request) -> dict:
     spec = robotics.get(body.model)
     if spec is None:
         raise HTTPException(404, f"unknown robot model '{body.model}'")
+    if not spec["bindable"]:
+        # Named rather than 404'd. The catalogue lists announced platforms on
+        # purpose — an owner shopping for a body should see what is coming —
+        # and "unknown model" would be a lie about a machine its maker has
+        # publicly shown. Every command to a body nobody has would go nowhere.
+        raise HTTPException(
+            409, f"{spec['label']} is {spec['availability']}, not shipping — "
+                 "it is in the catalogue so you can see it coming, and there "
+                 "is no body to bind a profile to yet")
 
     # Which LLM rides along: an explicit choice, else the profile's own
     # preference. Only validated (and stored) for llm-capable platforms.

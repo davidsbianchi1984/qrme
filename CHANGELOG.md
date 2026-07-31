@@ -34,6 +34,37 @@ wearing a live microphone. All three now go through the same
 `sender_id` stays on the request model and is ignored — three shipped native
 clients send it, and a 422 on upgrade is a worse answer than not believing it.
 
+### The body market, and what you bolt onto a body
+
+Choosing a body is shopping, and the catalogue listed nine models. It now
+lists **36 from 25 makers** across humanoids, home robots, quadrupeds and
+vacuums — including the ones nobody can buy yet, because *what exists* is the
+question an owner is actually asking.
+
+- Every row carries `availability`: `shipping`, `preorder` or `announced`.
+- **An announced body is listed and refused.** Binding one answers `409`
+  naming its status, not `404` — saying *unknown robot model* about a machine
+  its maker has publicly shown would be false, and every command to a body
+  nobody has would go nowhere. Listing it and refusing it are two halves of
+  the same honesty.
+- `catalog()` groups by maker, kind **and** availability, because three
+  clients would otherwise group three ways.
+- `REVIEWED` dates the snapshot and `test_the_body_market.py` fails when it
+  falls a year behind the newest release. `announced` is a claim about the
+  future; a stale one reads as current, which is the same failure as an
+  exemption list nobody looks at.
+- `quadruped` is a new kind, with its own command allowlist.
+
+**The connections bracket** — screen 176 — is the other half: what a body is
+taught and what it is plugged into. A **task pack** turns each of its tasks
+into a commandable verb, capability-checked against the catalogue so a vacuum
+is never taught to fetch; a **connector** is a service the profile's agents
+can collect from, act on or produce into. A pack is fitted to a particular
+machine rather than to the profile, which is the distinction that decides
+where it lands.
+
+Console backlog **53 → 47**.
+
 ### The native shells learned to send a credential
 
 Gating the routes broke iOS, Android and Windows, none of which sent a token

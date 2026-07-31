@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { api, type BoundRobot, type RobotCommandEntry, type RobotModel,
-         type RobotRow, type RobotSkill, type RobotSteering } from "../api";
+import { api, type BoundRobot, type ConnectorCatalogue, type InstalledPack,
+         type PackRow, type RobotCatalogue, type RobotCommandEntry,
+         type RobotModel, type RobotRow, type RobotSkill,
+         type RobotSteering } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -45,6 +47,11 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
   const token = session.ownerToken || "";
 
   const [catalogue, setCatalogue] = useState<RobotModel[]>([]);
+  const [market, setMarket] = useState<RobotCatalogue | null>(null);
+  const [shelf, setShelf] = useState<PackRow[]>([]);
+  const [fitted, setFitted] = useState<InstalledPack[]>([]);
+  const [connectors, setConnectors] = useState<ConnectorCatalogue | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const [rows, setRows] = useState<RobotRow[]>([]);
   const [bound, setBound] = useState<BoundRobot | null>(null);
 
@@ -61,13 +68,30 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
   const [note, setNote] = useState<string | null>(null);
   const fail = (e: unknown) => setError(e);
 
+  /** Run something, say what happened, and reload what it changed. The same
+   *  shape the other screens use — kept here rather than shared because the
+   *  reload each screen needs is the part that differs. */
+  const act = (fn: () => Promise<unknown>, said?: string) => async () => {
+    setError(null); setNote(null);
+    try { await fn(); if (said) setNote(said); loadRobots(); }
+    catch (e) { fail(e); }
+  };
+
   useEffect(() => {
-    api.robotCatalogue().then((r) => setCatalogue(r.robots)).catch(fail);
+    api.robotCatalogue().then((r) => {
+      setCatalogue(r.robots); setMarket(r);
+    }).catch(fail);
+    // Robot task packs specifically: a profile knowledge pack teaches a
+    // persona, a robot pack teaches a body a verb, and fitting the wrong
+    // kind is refused with a capability error rather than silently ignored.
+    api.packs("robot").then(setShelf).catch(() => setShelf([]));
+    api.connectorCatalogue().then(setConnectors).catch(() => setConnectors(null));
   }, []);
 
   function loadRobots() {
-    if (!me || !token) { setRows([]); return; }
+    if (!me || !token) { setRows([]); setFitted([]); return; }
     api.robots(me, token).then(setRows).catch(() => setRows([]));
+    api.installedPacks(me, token).then(setFitted).catch(() => setFitted([]));
   }
   useEffect(loadRobots, [me, token]);
 
@@ -135,11 +159,27 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
                  placeholder="what you call it" style={{ flex: 1 }} />
           <select value={model} onChange={(e) => setModel(e.target.value)}>
             <option value="">pick a model</option>
-            {catalogue.map((m) => (
-              <option key={m.model} value={m.model}>
-                {m.label} · {m.maker}
-              </option>
-            ))}
+            {/* Grouped by whether you can actually get one. The announced
+                group is listed on purpose and is not selectable — binding
+                one answers 409 naming the status, and an option that only
+                ever produces a refusal is worse than a disabled one. */}
+            {["shipping", "preorder", "announced"].map((state) => {
+              const group = catalogue.filter((m) => m.availability === state);
+              if (group.length === 0) return null;
+              return (
+                <optgroup key={state} label={
+                  state === "shipping" ? "On sale now"
+                  : state === "preorder" ? "Open for pre-order"
+                  : "Announced — not yet buyable"}>
+                  {group.map((m) => (
+                    <option key={m.model} value={m.model}
+                            disabled={!m.bindable}>
+                      {m.label} · {m.maker}
+                    </option>
+                  ))}
+                </optgroup>
+              );
+            })}
           </select>
           <button disabled={!me || !token || !name.trim() || !model}
                   onClick={bind}>Bind</button>
@@ -167,6 +207,125 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
           <p className="muted small">{bound.note}</p>
         </div>
       )}
+
+      <div className="card">
+        <h3>The market</h3>
+        {market && (
+          <p className="muted small">
+            {market.robots.length} bodies from{" "}
+            {Object.keys(market.by_maker).length} makers. {market.note}{" "}
+            Checked against what the makers were saying on{" "}
+            <strong>{market.reviewed}</strong>.
+          </p>
+        )}
+        <div className="row">
+          <button onClick={() => setShowAll((v) => !v)}>
+            {showAll ? "Hide the full list" : "Show the full list"}
+          </button>
+        </div>
+        {showAll && market && Object.entries(market.by_kind).map(([kind, list]) => (
+          <div key={kind}>
+            <h4>{kind.replace(/_/g, " ")}</h4>
+            {list.map((m) => (
+              <p className="small" key={m.model}>
+                <strong>{m.label}</strong> · {m.maker} ·{" "}
+                <em>{m.availability}</em>
+                {!m.bindable && " — cannot be bound yet"}
+                <br />
+                <span className="muted small">
+                  {m.capabilities.join(", ")}
+                  {!m.llm_capable && " · cannot speak in character"}
+                </span>
+              </p>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <h3>Connections — skills and components</h3>
+        <p className="muted small">
+          Two different things a body is given. A <strong>task pack</strong>
+          {" "}teaches it verbs: each task in the pack becomes commandable,
+          checked against what that model of body can physically do — a
+          vacuum cannot be taught to fetch, and the refusal says which
+          capability is missing rather than accepting the install and failing
+          later. A <strong>connector</strong> is a service the profile's
+          agents can collect from, act on, or produce into.
+        </p>
+
+        <h4>Skills you can fit</h4>
+        {shelf.length === 0 && (
+          <p className="muted small">No robot task packs published yet.</p>
+        )}
+        {shelf.map((k) => (
+          <p className="small" key={k.id}>
+            <strong>{k.title}</strong> · {k.industry} · {k.publisher}
+            {k.price ? ` · ${k.price}` : " · free"}
+            {" "}
+            <button disabled={!me || !token || !open}
+                    onClick={act(async () => {
+                      await api.installPack(k.id, {
+                        profile_id: me, robot_id: open,
+                        accept_price: Boolean(k.price),
+                      }, token);
+                      if (open) {
+                        api.robotSkills(open, token).then(setSkills)
+                          .catch(() => undefined);
+                      }
+                    }, "Fitted.")}>
+              Fit to the open body
+            </button>
+          </p>
+        ))}
+        {!open && (
+          <p className="muted small">
+            Open a bound body below first — a task pack is fitted to a
+            particular machine, not to the profile.
+          </p>
+        )}
+
+        <h4>What is fitted</h4>
+        {fitted.length === 0 && (
+          <p className="muted small">Nothing installed.</p>
+        )}
+        {fitted.map((k) => (
+          <p className="small" key={`${k.id}-${k.robot_id ?? "profile"}`}>
+            <strong>{k.title}</strong> ·{" "}
+            {k.robot_id ? `on body ${k.robot_id}` : "on the profile itself"} ·
+            {" "}{k.installed_at}
+            {" "}
+            <button disabled={!token}
+                    onClick={act(async () => {
+                      if (k.robot_id) {
+                        await api.uninstallRobotPack(k.robot_id, k.id, token);
+                      } else {
+                        await api.uninstallPack(me, k.id, token);
+                      }
+                      if (open) {
+                        api.robotSkills(open, token).then(setSkills)
+                          .catch(() => undefined);
+                      }
+                    }, "Removed. Its tasks stop being commandable now.")}>
+              Remove
+            </button>
+          </p>
+        ))}
+
+        <h4>Components it can reach</h4>
+        {connectors && (
+          <p className="muted small">
+            {connectors.app_count} apps across {connectors.provider_count}{" "}
+            providers.
+          </p>
+        )}
+        {connectors?.providers.map((prov) => (
+          <p className="small" key={prov.provider}>
+            <strong>{prov.label}</strong>:{" "}
+            {prov.apps.map((a) => a.label).join(", ")}
+          </p>
+        ))}
+      </div>
 
       <div className="card">
         <h3>Bound bodies</h3>
