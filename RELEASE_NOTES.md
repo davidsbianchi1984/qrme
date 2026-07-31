@@ -1,108 +1,122 @@
-# QRME v0.20.1 — release notes
+# QRME v0.21.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.20.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.21.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.20.1 — the guard was measuring the wrong thing, and the money knew.**
+**QRME v0.21.0 — four doors, and three defects behind them.**
 
-Two rounds, and the second was found by the first.
+Four rounds run back to back. Each one built a console door for a backend
+feature that had none. In three of the four, building the door found a defect
+in the thing it was a door to — and in every one of those, the argument
+against the defect was **already written down somewhere else in the same
+repository**.
 
-## The union hid a surface
+## A room id was the only thing a room asked for
 
-0.20.0 reported a doorless backlog of **zero**. It was true of the wrong
-question. `clientpaths.doorless` unions the console with the iOS, Android and
-Windows shells, so a route only the phone calls counts as doored — and the
-number went to zero while a desktop owner could not reach **64 routes**. The
-guard was answering *some client can reach this*, which was true, in place of
-*this client can reach this*, which was not.
+`Rooms` could open a room and not enter it. Building the way in — **screen
+175** — found two defects worth more than the screen.
 
-That is the shape of every defect this audit has produced: a checker answering
-a question slightly to the left of the one that matters, and passing.
+- **Anybody could speak as anybody.** `POST /rooms/{id}/messages` read the
+  speaker from `sender_id` *in the request body* and checked only that the id
+  named a participant, never that the caller *was* that person. A stranger's
+  token plus a named participant's id gave a `201`, a message stored under her
+  name, and every profile in the room answering as though she had spoken.
+- **The transcript asked for nothing at all** — not a wrong token, no token.
+  And neither did `advance`, so a stranger could run somebody else's room
+  forward indefinitely against their model key.
 
-**Two new guards, in all three repositories:**
+A room id is not a secret; it rides in beacons and on printed QR stickers,
+which is the point of them. That sentence was already written **two routes
+away**, on `GET /rooms/{id}/mic`, guarding the narrower fact of who is wearing
+a live microphone. All three now go through the same membership check.
 
-- `test_the_console_is_a_client_too.py` — the console's own backlog, checked in
-  both directions and ratcheted so it cannot grow past where it started. The
-  union guard stays; a route no client anywhere calls is still worse. A
-  phone-only capability is a legitimate design choice, which is what the
-  snapshot is for: deferring one takes a deliberate edit and shows in a diff.
-- `test_a_binding_is_not_a_door.py` — a function in `api.ts` that no screen
-  calls is not a door, and `doorless` counted it as one. The docstring on
-  `doorless` had said this was *"a discipline rather than something the test
-  can enforce"*. It is enforceable in about twenty lines, and found **25
-  bindings nothing calls**. *The test cannot check this* is a claim worth
-  testing.
+`sender_id` stays on the request model and is ignored — three shipped native
+clients send it, and a 422 on upgrade is a worse answer than not believing it.
 
-## Screen 174 — "What you are owed"
+## The body market, and what you bolt onto a body
 
-Nine of the sixty-four were the whole seller's side of the product. An owner
-could be bought from and could not post a licence offer, see who held one,
-revoke it, read a penny of what it earned, or ask to be paid — all present on
-the phone's Earn tab, all absent from the desk.
+Choosing a body is shopping, and the catalogue listed nine models. It now
+lists **36 from 25 makers** across humanoids, home robots, quadrupeds and
+announced platforms, with a review date the suite refuses to let go stale.
 
-Building the screen found three defects.
+Announced bodies are listed **on purpose** — an owner shopping should see what
+is coming — and binding one is refused with a `409` that says so, rather than
+a `404` that would lie about a machine its maker has publicly shown.
 
-**A statement added two currencies together.** ¥100 and $100 came back as
-`accrued: 200`, labelled with whichever sale was newest, and all three native
-shells render that figure with a currency symbol in front of it. Nothing was
-wrong with the entries; each carried its own currency the whole time. The
-arithmetic over them was wrong, in the one place where a wrong number looks
-exactly like a right one. Totals are per currency now (`by_currency`,
-`currencies`, and a `mixed` flag on the headline), the settlement currency is
-chosen deterministically rather than by recency, and a payout settles **one**
-currency and reports what is `remaining`. A single-currency account reads
-exactly as it did.
+Alongside it, the **connections bracket**: task packs and connectors. Each
+installed pack becomes a commandable verb for exactly one body, capability
+checked at install and audited like every built-in command. A vacuum is still
+never taught `fetch`.
 
-**Anyone could delete anyone's listing.** `DELETE /marketplace/listings/{id}`
-asked for no credential, while `DELETE …/offer` — which destroys strictly less
-— answered the same stranger *"not your offer"*. Driven against a running
-backend: a stranger removed a listing that had a recorded seller, an open offer
-and a paid order against it. The offer and the orders survived orphaned and the
-title was free for somebody else to put up. A listing is now claimed by whoever
-staked something on it — the creator recorded in `listing_claims`, the seller
-on its offer, or the owner of the profile it advertises. Creating one still
-needs no token, and a listing with no claimant at all is still anybody's to
-clear away, which is the honest reading of an endpoint that needs none.
+## A policy you could publish and nobody could take up
 
-**A sale credited to a key nothing reads.** This one came out of paying down
-the first of the 25 unused bindings. `PUT /marketplace/listings/{id}/offer`
-recorded the seller as the token's subject — and an **owner token's subject is
-a profile, not an account**, while `GET /profiles/{id}/earnings` resolves the
-profile to its `owner_id` before querying the ledger. So a seller who priced a
-listing while signed in as their profile's owner got `200` on the offer, `201`
-on the purchase with a real `ledger_entry` and the sentence *the sale is
-recorded on the seller's statement* — and an empty statement. The money was
-written under a key nothing queries, and every response along the way said it
-had gone through.
+`Delegate` built the owner's half of delegation — mint a grant, choose which
+phases run unattended, start and advance and cancel. But delegation exists for
+the person on the **other** end of a conversation, and that half had four
+bindings and no screen calling any of them. The policy was publishable and
+unusable from the console that published it.
 
-It survived because nobody could do it: `api.setOffer` existed and no screen
-called it, and the phone prices listings as an *interactor*, whose subject id
-already is the account. `commerce.beneficiary_of` has resolved a profile to its
-owner for gifts since gifts existed — the same rule, never applied to the other
-half of the money. `_earner()` is that rule on the other half, across pricing,
-withdrawing and `GET /marketplace/sales`.
+Driven end to end, **every rule was already right**: the offer is public and
+lists phases only, never the grant id, because which source items the owner
+scoped is the owner's business; `research` is refused without a grant, and the
+refusal names what it protects rather than the rule it enforces; starting one
+requires an existing conversation; and reading one is `403` to an outsider,
+`401` to nobody at all, and `200` to the delegate *and* the owner, who are
+entitled to it for different reasons.
 
-## Also
+The first round in a while with no defect in it, recorded plainly as such. The
+failure it *did* find is exactly the one the door audit exists to name: a
+feature finished and unreachable.
 
-- **`clientpaths.py` was not byte-identical across the three repositories**,
-  though it says it is. JIM-mini and PDI never received the `fetch`,
-  `window.open`, `<img src>` and `<a href>` call forms from 0.20.0, so their
-  backlogs counted doors that already existed. Restored; JIM's dropped 73 → 69.
-- **The pairing QR is built from a literal** in JIM-mini and PDI rather than
-  from a path arriving in a response body — a real door no static check could
-  see, which had got itself exempted as *not a client call*. That is an
-  exemption made out of a blind spot, and the last one of those turned out to
-  have no door at all.
+## A missing field was reported as a broken signature
 
-## Where the numbers stand
+Seven signature routes had no console door: enrol a credential, revoke one,
+read the policy, mint an envelope, sign it, and check a package handed over
+from outside. `Referrals` had already written the gap down as a sentence —
+*“None enrolled. The ceremony can enrol one.”* — under a heading with no
+button behind it. The ceremony page existed and posts the raw assertion back
+to its host; nothing in the console was listening, so the message went
+nowhere.
 
-| | QRME | JIM-mini | PDI |
-|---|---|---|---|
-| union backlog | 0 | 69 | 58 |
-| console backlog | 55 | 109 | 84 |
-| unused bindings | 21 | 4 | 3 |
+Building the listener found the defect, in the one place this feature cannot
+afford one.
 
-The console backlogs are new, ratcheted, and now visible. That is the point of
-them.
+`verify_package` runs eight checks in order. **Any** exception anywhere in that
+sequence ran `checks["signature"] = False` and appended `str(exc)`. So a
+package missing `display_text` — trimmed in transit, or a summary forwarded in
+place of the package — came back saying **the signature is invalid**, when the
+ECDSA verification several lines earlier had passed. That is the strongest and
+most damaging thing this endpoint can say, it was false, and the reason offered
+was `'display_text'`: a Python `KeyError` repr sitting beside two notes written
+as full sentences. A counterparty reading it would conclude they had been
+handed a forgery.
+
+The argument was already in the same feature. The router says of its own
+refusals: *the message is the reason, because a signature that is turned away
+without one is impossible to fix from the outside.* A counterparty is exactly
+the outside.
+
+Two rules now hold. A check that already **passed** is never retroactively
+failed by a later one breaking — only the check that actually broke is
+reported broken. And a check that never **ran** is not a pass: all eight are
+named, `valid` is false whenever any is absent, and the notes say which and
+why in sentences. The screen draws unrun as unrun, because a fixed backend
+behind a screen that drew absent as a tick would put the same lie back on the
+glass.
+
+## Where the numbers landed
+
+| | before | after |
+|---|---|---|
+| Console-doorless routes | 64 | 40 |
+| `api.ts` bindings nothing calls | 25 | 12 |
+| Screen-manifest `unaudited` seeds | 8 | 7 |
+
+New screens **174–178**. Full suite: **1926 passing**.
+
+---
+
+Installers for macOS, Windows and Linux are attached below once the release
+build finishes.

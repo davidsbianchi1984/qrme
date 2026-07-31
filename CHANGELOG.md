@@ -6,6 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.21.0] — 2026-07-31
+
+Four door-audit rounds run back to back. Each built a console door for a
+backend feature that had none, and in three of the four, building the door
+found a defect in the thing it was a door to — with the argument against
+the defect already written down elsewhere in the same repository.
+
 ### A missing field was reported as a broken signature
 
 Seven signature routes had no console door: enrol a credential, revoke one,
