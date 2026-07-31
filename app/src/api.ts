@@ -781,6 +781,83 @@ export type SigningCredential = {
   can_sign: string[];
 };
 
+/** What each tier demands, and — the part that matters — what the scheme
+ *  does **not** prove. `limits` is prose written to be shown, not summarised:
+ *  every line is a claim somebody might otherwise make about a signature and
+ *  be wrong. The screen renders them verbatim for that reason. */
+export type SigningPolicy = {
+  tiers: Record<string, { min_proofing: string; device_bound: boolean;
+                          hybrid_required_in_xr: boolean;
+                          trusted_timestamp: boolean }>;
+  proofing_levels: string[];
+  xr_platform_authenticators: string[];
+  xr_hybrid_required: string[];
+  standard: string;
+  limits: string[];
+};
+
+/** Straight out of `navigator.credentials.create()`'s vocabulary — the
+ *  ceremony page consumes it as-is, which is why the field names are
+ *  WebAuthn's camelCase rather than this API's snake_case. */
+export type EnrollOptions = {
+  challenge: string;
+  rp: { id: string; name: string };
+  user: { id: string; name: string; displayName: string };
+  pubKeyCredParams: { type: string; alg: number }[];
+  timeout: number;
+  authenticatorSelection: { userVerification: string; residentKey: string };
+  attestation: string;
+  extensions: Record<string, unknown>;
+};
+
+/** The envelope. `challenge` **is** the hash of `payload`, and `payload`
+ *  carries the document's hash — so signing the challenge signs this
+ *  document and no other. `allowed_credentials` is why an envelope minted
+ *  by one account cannot be signed by another's key. */
+export type SignatureEnvelope = {
+  envelope_id: string;
+  challenge: string;
+  payload: Record<string, unknown>;
+  display_text: string;
+  display_sha256: string;
+  document_sha256: string;
+  meaning: string;
+  tier: string;
+  expires_at: string;
+  allowed_credentials: string[];
+  user_verification: string;
+};
+
+export type SignatureResult = {
+  signature_id: string;
+  envelope_id: string;
+  signer: { account_id: string; name: string; proofing_level: string };
+  meaning: string;
+  document_sha256: string;
+  display_text: string;
+  display_sha256: string;
+  tier: string;
+  user_verified: boolean;
+};
+
+/** `checks` is the whole answer and `valid` is only its conjunction, so the
+ *  screen shows the checks rather than a green tick.
+ *
+ *  A check that is **absent** did not run. That distinction is load-bearing:
+ *  a package missing a field used to come back `signature: false`, which
+ *  said the cryptography was broken when it had verified perfectly well.
+ *  Absent now means absent, `valid` is false whenever anything is missing,
+ *  and `notes` says which. */
+export type VerifyVerdict = {
+  valid: boolean;
+  checks: Partial<Record<
+    "signature" | "challenge_matches" | "ceremony_is_signing"
+    | "challenge_binds_payload" | "payload_binds_document"
+    | "payload_binds_display" | "display_text_matches" | "user_verified",
+    boolean>>;
+  notes: string[];
+};
+
 export type Certificate = {
   signature_id: string;
   printed_name: string;
@@ -3659,6 +3736,55 @@ export const api = {
   signingCredentials: (token: string) =>
     req<{ credentials: SigningCredential[] }>("/signatures/credentials",
       { token }),
+
+  // The console could *list* credentials and reproof them, and could do
+  // nothing else — not enrol one, not revoke one, not read the rules, not
+  // mint an envelope, not sign it, not check a package somebody handed over.
+  // `Referrals` said so out loud and had no button behind the sentence:
+  // "None enrolled. The ceremony can enrol one."
+  //
+  // Two of these take no token on purpose, and the reason is different each
+  // time. `signingPolicy` is public because a counterparty deciding whether
+  // to accept a signature must be able to read the rules without an account
+  // here. `verifyPackage` is public because the whole claim of the scheme is
+  // that the evidence stands on its own arithmetic — a verification that
+  // needed our blessing would be us vouching, which is the opposite.
+  signingPolicy: () => req<SigningPolicy>("/signatures/policy"),
+  enrollOptions: (displayName: string, token: string) =>
+    req<EnrollOptions>("/signatures/enroll/options",
+      { method: "POST", body: { display_name: displayName }, token }),
+  // `challenge` is echoed back from the options above rather than re-derived:
+  // the server is checking that this registration answers the challenge it
+  // just issued, which is what stops one being replayed.
+  enrollCredential: (body: { credential_id: string;
+                             attestation_object: string;
+                             client_data_json: string; challenge: string;
+                             proofing_level?: string; display_name?: string;
+                             proofing_method?: string; proofing_ref?: string;
+                             proofing_attestor?: string }, token: string) =>
+    req<SigningCredential>("/signatures/enroll",
+      { method: "POST", body, token }),
+  // Going forward only. Signatures already made stay verifiable, because
+  // their public key lives in the evidence rather than in this table — which
+  // is also why revoking cannot be used to disown something already signed.
+  revokeCredential: (rowId: string, token: string) =>
+    req<SigningCredential>(`/signatures/credentials/${rowId}`,
+      { method: "DELETE", token }),
+  requestSignature: (body: { document: string; meaning: string;
+                             display_text: string; tier?: string;
+                             binding_kind?: string; binding_ref?: string },
+                     token: string) =>
+    req<SignatureEnvelope>("/signatures/request",
+      { method: "POST", body, token }),
+  signEnvelope: (body: { envelope_id: string; credential_id: string;
+                         signature: string; authenticator_data: string;
+                         client_data_json: string; transport?: string;
+                         platform?: string }, token: string) =>
+    req<SignatureResult>("/signatures/sign",
+      { method: "POST", body, token }),
+  verifyPackage: (pkg: Record<string, unknown>) =>
+    req<VerifyVerdict>("/signatures/verify",
+      { method: "POST", body: { package: pkg } }),
   // Enrolment fixes a proofing level; this is how it moves. `can_sign` on
   // the answer is the visible consequence — a self-asserted credential
   // signs `basic` only, and a document check opens `high`.

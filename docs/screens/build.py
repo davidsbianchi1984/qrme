@@ -3523,6 +3523,22 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 178: signing. The first card is the defect — a package missing a field
+    # came back saying the signature was invalid, which is the worst thing
+    # this endpoint can say and it was not true — and the third is the reason
+    # the ceremony is a window rather than a request.
+    dict(num=178, title="Signed, And Checked", sub="A missing field is not a forgery",
+         accent="gold", tab=25, cards=[
+        dict(icon="shield", color="red", k="Unrun is not failed",
+             s="nor is it a pass",
+             pill=("8", "warn")),
+        dict(icon="pen", color="gold", k="Over these bytes",
+             s="the challenge is the document"),
+        dict(icon="finger", color="brand", k="Its own window",
+             s="a token in a URL lands in logs"),
+        dict(icon="eye", color="green", k="Checks on its own",
+             s="the maths, not our word"),
+    ], button=("Open the ceremony", "brand")),
     # 177: the other end of a delegation policy. The round with no defect in
     # it, so no card carries a fix — the first is the rule that makes the
     # feature what it is, and the third is the thing the offer deliberately

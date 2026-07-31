@@ -164,6 +164,33 @@ LESSONS: tuple[dict, ...] = (
               "the mark inverted, because there is somebody there.",
          screens=(61, 62, 63, 64, 65, 66, 67, 68, 69, 70),
          try_it="Open a live desk and ring the bell."),
+    dict(key="signing", chapter="Out in the world",
+         title="Signed, and checked",
+         what="Signing had seven routes and no way in from here. You could "
+              "see the credentials on your account and could not enrol one, "
+              "revoke one, read the rules a counterparty is asked to accept, "
+              "put a signature on anything, or check a package somebody "
+              "handed you — while the screen next door said *none enrolled, "
+              "the ceremony can enrol one* under a heading with no button. "
+              "The ceremony window already existed and already worked; "
+              "nothing here was listening for what it sent back. A signature "
+              "is a device credential used with your face or fingerprint "
+              "over one exact document: the challenge **is** the hash of "
+              "those bytes, so editing the text afterwards leaves the old "
+              "signature covering the old text and nothing else. The window "
+              "opens on the API's own address rather than inside the app, "
+              "because the credential refuses to work anywhere else — and it "
+              "carries no token, because a token in a web address ends up in "
+              "logs. Checking somebody else's package asks nothing of us at "
+              "all: it carries its own key and its own hashes. And it now "
+              "answers honestly when it cannot finish. A package with a "
+              "field missing used to come back saying *the signature is "
+              "invalid* — the most serious thing it can say, about "
+              "cryptography that had verified perfectly well. A check that "
+              "did not run is shown as one that did not run.",
+         screens=(178,),
+         try_it="Enrol a credential, sign a line of text, then paste the "
+                "package into the checker and read the eight checks."),
     dict(key="handing", chapter="Out in the world",
          title="Work handed over",
          what="Delegation had an owner's half and no other half. You could "

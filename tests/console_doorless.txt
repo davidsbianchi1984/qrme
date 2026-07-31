@@ -1,5 +1,4 @@
 DELETE /beacons/{beacon_id}
-DELETE /signatures/credentials/{row_id}
 GET /b/{beacon_id}/card
 GET /connections/{connection_id}/messages
 GET /desks/{desk_id}
@@ -15,7 +14,6 @@ GET /profiles/{profile_id}/objections
 GET /profiles/{profile_id}/posts
 GET /profiles/{profile_id}/steering/hub
 GET /profiles/{profile_id}/watermark
-GET /signatures/policy
 GET /summon
 POST /connections/join
 POST /connections/{connection_id}/end
@@ -34,11 +32,6 @@ POST /profiles/{profile_id}/excursions
 POST /profiles/{profile_id}/gaming/sessions
 POST /profiles/{profile_id}/objections/{objection_id}/attest
 POST /profiles/{profile_id}/translate
-POST /signatures/enroll
-POST /signatures/enroll/options
-POST /signatures/request
-POST /signatures/sign
-POST /signatures/verify
 POST /social/{cid}/collect
 POST /social/{cid}/publish
 PUT /profiles/{profile_id}/handle

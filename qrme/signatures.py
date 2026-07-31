@@ -558,11 +558,48 @@ def package(sig_id: str) -> dict | None:
     return out
 
 
+# Every check a complete verification performs, in the order it performs
+# them. Named as a list rather than left implicit because a package that
+# stops halfway leaves the rest *unrun*, and an unrun check is not a passed
+# one — `all()` over the checks that happened to execute would call a
+# half-read package valid.
+VERIFICATION_CHECKS = (
+    "signature", "challenge_matches", "ceremony_is_signing",
+    "challenge_binds_payload", "payload_binds_document",
+    "payload_binds_display", "display_text_matches", "user_verified",
+)
+
+
+def _unreadable(exc: Exception) -> str:
+    """Why the package could not be read, as a sentence.
+
+    The two notes below this function are sentences a counterparty can act
+    on, and the router says the same thing about its refusals: *the message
+    is the reason, because a signature that is turned away without one is
+    impossible to fix from the outside*. `str(KeyError("assertion"))` is
+    `"'assertion'"`, which is a Python repr wearing the same field.
+    """
+    if isinstance(exc, KeyError):
+        field = exc.args[0] if exc.args else "?"
+        return (f"this package has no `{field}` field, so there is nothing "
+                "here to check against — it may have been trimmed in transit, "
+                "or be a summary of a package rather than the package")
+    return (f"part of this package could not be read ({type(exc).__name__}), "
+            f"so the check it belongs to did not run: {exc}")
+
+
 def verify_package(pkg: dict) -> dict:
     """Re-verify an evidence package from its own contents.
 
     Takes no database lookups on purpose: this is the function a counterparty
     runs, and it must work on a package handed to them as JSON.
+
+    A failure part-way through says so as a failure *of that check*. It used
+    to force ``signature: false``, which for a package whose signature had
+    already verified was the most consequential thing this function can say
+    and false: a missing `display_text` reported the cryptography as broken
+    and named the field in a bare repr. Nothing about the signature changes
+    because a later field is absent.
     """
     checks: dict[str, bool] = {}
     notes: list[str] = []
@@ -598,8 +635,19 @@ def verify_package(pkg: dict) -> dict:
             sha256_hex(pkg["display_text"] or "") == pkg["display_sha256"])
         checks["user_verified"] = bool(pkg.get("user_verified"))
     except Exception as exc:
-        checks["signature"] = False
-        notes.append(str(exc))
+        # Only the signature check itself may be *failed* here. If it already
+        # ran and passed, it stays passed — the thing that broke is whatever
+        # came after, and that is reported as unrun rather than as a forged
+        # signature.
+        checks.setdefault("signature", False)
+        notes.append(_unreadable(exc))
+
+    unrun = [c for c in VERIFICATION_CHECKS if c not in checks]
+    if unrun:
+        notes.append(
+            "this package was not checked all the way through — "
+            + ", ".join(unrun)
+            + " did not run, so it cannot be called valid on what did")
 
     if pkg.get("sign_count_regressed"):
         notes.append("the authenticator's signature counter did not advance — "
@@ -608,7 +656,8 @@ def verify_package(pkg: dict) -> dict:
     if pkg.get("credential", {}).get("backup_eligible"):
         notes.append("this credential is syncable, so it may exist on more "
                      "than one device in the signer's cloud account")
-    return {"valid": all(checks.values()), "checks": checks, "notes": notes}
+    return {"valid": not unrun and all(checks.values()),
+            "checks": checks, "notes": notes}
 
 
 def certificate(sig_id: str) -> dict | None:

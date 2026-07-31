@@ -192,6 +192,12 @@ const CHROME: Table = {
     ja: "ルームの中", zh: "在房间里", hi: "कमरे के भीतर",
     ar: "داخل الغرفة",
   },
+  "nav.signing": {
+    en: "Signing", es: "Firmar", fr: "Signature",
+    de: "Signieren", pt: "Assinatura", it: "Firma",
+    ja: "署名", zh: "签名", hi: "हस्ताक्षर",
+    ar: "التوقيع",
+  },
   "nav.named": {
     en: "One thing, named", es: "Una cosa, con nombre",
     fr: "Une chose, nommée", de: "Eine Sache, benannt",

@@ -6,6 +6,46 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### A missing field was reported as a broken signature
+
+Seven signature routes had no console door: enrol a credential, revoke one,
+read the policy, mint an envelope, sign it, and check a package handed over
+from outside. The console could *list* credentials and reproof one and could
+do nothing else — `Referrals` had already written the gap down as a sentence,
+**“None enrolled. The ceremony can enrol one.”**, under a heading with no
+button behind it. The ceremony page existed, `openCeremony` existed, and it
+posts the raw assertion back to its host by `postMessage`. Nothing in the
+console was listening, so the message went nowhere. **Screen 178** is that
+listener and the two calls on the far side of it.
+
+Building it found the defect, in the one place this feature cannot afford one.
+
+- **`verify_package` blamed the cryptography for a missing field.** It runs
+  eight checks in order, and *any* exception anywhere in that sequence ran
+  `checks["signature"] = False` and appended `str(exc)`. So a package missing
+  `display_text` — trimmed in transit, or a summary forwarded in place of the
+  package — came back saying **the signature is invalid**, when the ECDSA
+  verification several lines earlier had passed. That is the strongest and
+  most damaging thing this endpoint can say, it was false, and the reason
+  offered was `'display_text'`: a Python `KeyError` repr sitting beside two
+  notes written as full sentences. A counterparty reading it would conclude
+  they had been handed a forgery.
+
+  The argument was **already written down in the same feature**. The router
+  says of its own refusals: *the message is the reason, because a signature
+  that is turned away without one is impossible to fix from the outside.* A
+  counterparty is exactly the outside.
+
+Two rules now hold. A check that already passed is never retroactively failed
+by a later one breaking — only the check that actually broke is reported
+broken. And a check that never *ran* is not a pass: `VERIFICATION_CHECKS`
+names all eight, `valid` is false whenever any is absent, and the notes say
+which and why in sentences. The screen renders unrun as unrun rather than as
+a tick, because a fixed backend behind a screen that drew absent as passing
+would put the same lie back on the glass.
+
+Console-doorless routes: **47 → 40**.
+
 ### A policy you could publish and nobody could take up
 
 `Delegate` built the owner's half of delegation — mint a revocable grant, say
