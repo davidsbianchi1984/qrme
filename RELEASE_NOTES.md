@@ -1,42 +1,87 @@
-# QRME v0.19.1 — release notes
+# QRME v0.20.0 — release notes
 
 *Ready-to-paste body for the GitHub Release created when you push the
-`app-v0.19.1` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
+`app-v0.20.0` tag. Kept in sync with [CHANGELOG.md](CHANGELOG.md).*
 
 ---
 
-**QRME v0.19.1** — a feature can no longer ship with nothing drawn.
+**QRME v0.20.0 — the doorless backlog reached zero.**
 
-The gallery tests all check screens against the README: a reference with no
-file, a file with no reference, a gap in the numbering. Every one of them
-starts from the screens. **None asked the opposite question — does this surface
-have a screen at all?** So a feature could ship undrawn, untaught and
-unreachable from the in-app helper, and the suite stayed green.
+It began at **116** routes the backend served that no client could reach. This
+release closes the last **42**, each with a door in the console, carried by six
+new screens (**168–173**).
 
-That had happened three times, most recently to 0.19.0's own error-reporting
-card and its first-run notice, which went out undrawn while the release notes
-described them at length. It is the same shape of flaw found twice before here:
-a guard that only walks the relation in the direction where the answers already
-exist.
+A route with no door is the quieter of the two integration failures. A client
+asking for a route that does not exist produces a 404 somebody eventually
+reports. A route no client asks for produces nothing at all: the code is
+present, its tests pass, the changelog says it shipped, and the capability is
+simply unreachable.
 
-`ui_screens.txt` is the missing direction. Every console surface carries a
-screen number, `undrawn`, or `unaudited`, so a surface nobody has classified
-fails in the round that introduces it. The mapping is declared rather than
-guessed — matching component names to screen titles resolved only a fraction of
-them, because titles are written for the person using the app and component
-names for the person editing it.
+## What the exercise actually produced
 
-Both backlogs are ratcheted against a ceiling each repository declares for
-itself, and a ceiling left high after the backlog falls fails too: a ratchet
-that stops ratcheting re-opens the ground it gained. Five failures were injected
-to prove it bites, including the one that matters — silencing the check by
-writing `undrawn` fails the ratchet.
+Not doors — **defects**. Almost none were visible to the typecheck.
 
-**And the two surfaces it caught are drawn.** Screens **150 What Went Wrong** and **151 Before Anything Is Sent** join the gallery, each
-with a lesson and with phrasings that reach it in the words somebody actually
-types when something has broken: "it failed", "something broke", "stop
-sending", "opt out". The card draws an operation and a status and nothing else,
-because that is all the log holds.
+**Three routes took no token at all.**
 
-**No application behaviour changes in this release** — screens, gallery,
-lessons, helper phrasings, and the guard that will keep them honest.
+- `POST /packs` let anybody publish to the marketplace, name any string as the
+  publisher, and name *any account* as the one sales accrue to.
+- `POST /profiles/{id}/interactions/{id}/feedback` let anybody rate in somebody
+  else's name — and since an `up` rating is the trigger for cloud contribution,
+  an unauthenticated caller could push a stranger's conversation out of the
+  deployment.
+- `GET /profiles/{id}/engagement/{id}` exposed how often a named person talks
+  to a profile, across how many sessions, and whether they liked it.
+
+In each case the argument against it was **already written down elsewhere in
+this repository** — `commerce.beneficiary_of` on gifts, the beacon list on
+physical places. Three routes had quietly gone the other way.
+
+**A licence was sold to somebody who could not use it.** A licence permitting
+derivatives went to a buyer under 18: `201`, `can_derive: true`, fee credited
+to the seller at sale time — then a `403` on the only thing the licence exists
+for. The adult check now runs at acquire, where the money moves.
+
+**A link resolved against the wrong origin.** Desk beacons returned a relative
+`scan_url` while the profile beacons next door returned an absolute one, so the
+console's scan link resolved against the console's own origin — dead in every
+packaged build.
+
+**An honesty note was served to nobody.** A desk's view frame, and the sentence
+it carries — *this deployment has no camera on this desk, so the frame is not
+live and is not claimed to be* — was never rendered anywhere in the console.
+
+## The audit could not see two kinds of request
+
+An `<img src>` is a fetch. An `<a href>` is a fetch. Neither passes through the
+API client, and the extractor could see neither — so two routes sat on the
+backlog while the placements screen had been rendering both since it was
+written.
+
+Worse, **the exemption list had absorbed three of them**, each marked "rendered
+in an `<img src>`, not fetched by the API client" — an exemption made out of a
+blind spot, which is the shape that stops anybody asking. One of the three had
+no door at all. The list now holds to one rule: **exempt a path because nothing
+should ever call it, never because the audit cannot see the call.**
+
+## Recorded rather than corrected
+
+Five findings are pinned as observed behaviour instead of changed, because each
+is a decision to make deliberately rather than while building a screen:
+
+- a **gift** reads its beneficiary from the subject; a **subscription** takes
+  one from the request body;
+- the contribution **preview is computed whether or not you are opted in**, so
+  the console changes the heading rather than the content;
+- the quiet-hours window is half-open, so **9-to-9 covers nothing** — changing
+  the arithmetic would silently redefine every window already stored;
+- three deletes give three different answers to *there was nothing there*;
+- `deleted_at_gateway` is true *vacuously* when nothing ever left.
+
+## The guard, now that the backlog is empty
+
+A new assertion says so directly, separate from the record comparison so the
+message is plain when it goes: *the number is no longer zero*. Its
+guard-on-guard moved too — asserting the snapshot was non-empty no longer means
+anything, so the liveness check now sits on the console's extracted call sites.
+
+Seven new test files, 154 tests, 23 injection-verified. **Suite: 1807 passing.**

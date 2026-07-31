@@ -4,6 +4,102 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] — 2026-07-31
+
+**The doorless backlog reached zero.** It began at 116 routes the backend
+served that no client could reach, and this release closes the last 42. Every
+one got a door in the console; six new screens (**168–173**) carry them.
+
+A route with no door is the quieter of the two integration failures. A client
+asking for a route that does not exist produces a 404 somebody eventually
+reports; a route no client asks for produces nothing at all — the code is
+present, its tests pass, the changelog says it shipped, and the capability is
+simply unreachable.
+
+**What the exercise produced was not doors. It was defects**, and almost none
+of them were visible to the typecheck:
+
+- **Three routes took no token at all.** `POST /packs` let anybody publish to
+  the marketplace, name any string as the publisher, and name *any account* as
+  the one sales accrue to. `POST /profiles/{id}/interactions/{id}/feedback` let
+  anybody rate in somebody else's name — and since an `up` rating is the
+  trigger for cloud contribution, an unauthenticated caller could push a
+  stranger's conversation out of the deployment. `GET
+  /profiles/{id}/engagement/{id}` exposed how often a named person talks to a
+  profile, across how many sessions, and whether they liked it. In each case
+  the argument against it was **already written down elsewhere in this
+  repository** — `commerce.beneficiary_of` on gifts, the beacon list on
+  physical places — and these three quietly went the other way.
+- **A licence was sold to somebody who could not use it.** A licence permitting
+  derivatives went to a buyer under 18: 201, `can_derive: true`, and the fee
+  credited to the seller at sale time — then a 403 on the only thing the
+  licence exists for. The adult check now runs at acquire, where the money
+  moves, rather than at delivery.
+- **A link that resolved against the wrong origin.** Desk beacons returned a
+  relative `scan_url` while the profile beacons next door returned an absolute
+  one, so the console's scan link resolved against the console's own origin —
+  dead in every build where the console is not served by the API, which is
+  every packaged build.
+- **An honesty note served to nobody.** A desk's view frame — the picture
+  carrying *a sample view; this deployment has no camera on this desk, so the
+  frame is not live and is not claimed to be* — was never rendered anywhere in
+  the console.
+
+### The audit could not see two kinds of request
+
+An `<img src>` is a fetch. An `<a href>` is a fetch. Neither passes through the
+API client on the way, and the route extractor could see neither — so
+`/b/{id}` and `/beacons/{id}/qr.svg` sat on the backlog while the placements
+screen had been rendering both since it was written. That is the
+false-positive failure the nested-template bug produced in 0.19.1, arriving
+from a different direction: a guard that invents work fails more quietly than
+one that misses some, because a miss is found by the bug it let through while
+an invention is found only by somebody going to do the work and finding it
+done.
+
+Worse, **the exemption list had absorbed three of them**, each marked "rendered
+in an `<img src>`, not fetched by the API client" — an exemption made out of a
+blind spot, which is exactly the shape that stops anybody asking. One of the
+three turned out to have no door at all. The list now holds to one rule:
+exempt a path because nothing should ever call it, never because the audit
+cannot see the call. Four entries survive, including the OAuth callbacks, whose
+address is built by the API and handed to the provider — a `redirect_uri` a
+client could choose is one an attacker could choose.
+
+### Recorded rather than corrected
+
+Five findings are pinned as observed behaviour instead of changed, because each
+is a decision to make deliberately rather than while building a screen, and a
+test asserting they already agree would hide the question:
+
+- a **gift** reads its beneficiary from the subject while a **subscription**
+  takes one from the request body;
+- the contribution **preview is computed whether or not you are opted in**, so
+  the console changes the heading rather than the content;
+- the quiet-hours window is half-open, so a start equal to its end covers
+  **nothing** — 9-to-9, read as *all day*, protects nobody. Changing the
+  arithmetic would silently redefine every window already stored;
+- three deletes give three different answers to *there was nothing there*: a
+  missing comment 404s, an unlisted profile 404s, and unfriending a stranger
+  answers **200** with `removed: false`;
+- `deleted_at_gateway` is true *vacuously* when nothing ever left.
+
+### The guard, now that the backlog is empty
+
+`doorless_routes.txt` is empty and a new assertion says so directly, separate
+from the record comparison so the message is plain when it goes: *the number is
+no longer zero*, rather than *strike this line*. Deferring a route legitimately
+means editing that test as well as the file, which is the right amount of
+friction for a decision that used to be made by accident.
+
+Its guard-on-guard changed with it. Asserting the snapshot was non-empty no
+longer means anything, so the liveness check moved to where the meaning lives:
+**the console must still be producing call sites.** If the extractor broke
+entirely every route would read as doorless, loudly; if it were quietly
+narrowed to a handful of forms, that count is what would notice.
+
+Seven new test files, 154 tests, 23 injection-verified. Suite: **1807 passing**.
+
 ## [0.19.1] — 2026-07-30
 
 **A feature can no longer ship with nothing drawn.** The gallery tests all
