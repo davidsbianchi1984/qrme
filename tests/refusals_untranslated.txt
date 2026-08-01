@@ -48,14 +48,30 @@
 # something a future round can produce by accident. See
 # `test_a_refusal_whose_english_is_not_a_constant`.
 #
-# **The plan gate.** `tiers.gate` raises a dict whose `message` comes from
-# `tiers.refusal()` — a template with four slots, two of which are themselves
-# English prose (`CAPABILITIES[c]["is"]`, a plan title). The handler already
-# translates that `message` when the table has it; the table does not, and
-# will not until the slots do. Translating the frame alone would produce a
-# sentence half in each language, at the one moment in this product that
-# stands between somebody and a decision to pay. That is precisely what this
-# file exists to prevent, so it is written down rather than half-done.
+# **The plan gate — closed.** This file carried it as an exception for four
+# releases: a template whose slots were English prose, where translating the
+# frame alone would have produced a sentence half in each language at the one
+# moment in this product that stands between somebody and a decision to pay.
+#
+#     asked     can the frame be translated
+#     mattered  can the slots be
+#
+# They can. Eight capability descriptions and one billing period are a closed
+# set this product authors, so they are `i18n.Term`s with translations rather
+# than strangers — and `Term` is exempt from the whitespace rule for exactly
+# that reason: the rule catches prose *nobody wrote a translation for*, and an
+# unmapped `Term` still keeps the whole sentence English.
+#
+# The plan titles are the one part deliberately left alone. `Basic` and `Pro`
+# are what the product is called on the pricing page, in the console's tabs and
+# on a receipt, and somebody comparing a refusal against a price list needs the
+# same word in both places.
+#
+# See `test_a_refusal_whose_english_is_not_a_constant`, which asserts the
+# sentence arrives whole in each of the nine, and
+# `test_gates_answer_in_a_shape_a_screen_can_use`, which drives it through a
+# real request because every unit test of it passed while the handler's dict
+# branch was dropping the template on the floor.
 #
 # ## The rule for what is not translated on purpose
 #

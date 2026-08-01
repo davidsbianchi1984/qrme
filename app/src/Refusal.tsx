@@ -1,4 +1,5 @@
 import { planGate } from "./api";
+import { t as tr, visitorLang } from "./l10n";
 
 /**
  * A refusal, rendered as what it is.
@@ -26,10 +27,6 @@ import { planGate } from "./api";
  * offer rather than a complaint, and a line of red text is not a shape you
  * can put a button in.
  */
-/** Plan names arrive as the identifiers the gate refuses with — `free`, `pro`
- *  — and read as typos in the middle of a sentence. */
-const title = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 export function Refusal({ error, onPlans, variant = "card" }: {
   error: unknown;
   /** Where "see the plans" goes. Omitted where a screen has nowhere to send
@@ -48,16 +45,35 @@ export function Refusal({ error, onPlans, variant = "card" }: {
       : <div className="card error"><p className="small">{text}</p></div>;
   }
 
+  // The muted line under the message used to repeat, in English, what the
+  // message says: the plan you are on, the plan you need, the price, the
+  // period, and that billing is simulated. It was written when `message` was
+  // English too, so the repetition cost nothing.
+  //
+  // Now that the server composes that sentence in the reader's language, the
+  // repetition is the only English left on this card — a translated paragraph
+  // in an English frame, on the one screen that stands between somebody and a
+  // decision to pay.
+  //
+  //     asked     is the refusal translated
+  //     mattered  is what surrounds it
+  //
+  // So the duplicate goes. The price and the simulated-billing disclosure are
+  // adjacent inside `message` — which is the invariant this component was
+  // built to keep — and they are adjacent there in every language.
+  //
+  // The heading keeps `needs` and `capability` because both are identifiers
+  // the API refuses with, the same string in every language, and the button
+  // is console chrome and lives in `l10n.ts` with the rest of it.
   return (
     <div className="card error">
       <h4>{gate.needs.toUpperCase()} — {gate.capability}</h4>
       <p className="small">{gate.message}</p>
-      <p className="muted small">
-        You are on <strong>{title(gate.have)}</strong>.{" "}
-        {title(gate.needs)} is ${gate.price_usd} a {gate.period} —{" "}
-        {gate.billing}.
-      </p>
-      {onPlans && <button onClick={onPlans}>See the plans</button>}
+      {onPlans && (
+        <button onClick={onPlans}>
+          {tr("refusal.see_plans", visitorLang())}
+        </button>
+      )}
     </div>
   );
 }

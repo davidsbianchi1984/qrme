@@ -468,11 +468,32 @@ class Templated(str):
     translatable: bool
 
     def __new__(cls, template: str, **slots):
-        text = template.format(**slots)
+        # `Opening` applies here too, not only at translation. This value *is*
+        # the English sentence — the one an English reader gets and the one
+        # every driven test reads — so a capitalisation that only happened on
+        # the translated path would leave English the odd one out.
+        english = {k: _open(v) if isinstance(v, Opening) else v
+                   for k, v in slots.items()}
+        text = template.format(**english)
         self = super().__new__(cls, text)
         self.template = template
         self.slots = slots
-        self.translatable = all(_is_token(v) for v in slots.values())
+        # A `Term` is exempt from the whitespace rule, and that is the point of
+        # it. The rule exists to catch prose *this product did not author* — a
+        # library's exception, a hardware availability string — which cannot be
+        # translated because nobody wrote a translation for it. A `Term` is
+        # drawn from a closed set this product does author, so its whitespace
+        # is not a warning sign: `create and run your own synthetic profiles`
+        # is a phrase with a translation, and refusing it for having spaces
+        # would keep the plan gate English for exactly the wrong reason.
+        #
+        #     asked     does this slot contain whitespace
+        #     mattered  is this slot something we have a translation for
+        #
+        # Safe by construction either way: an unmapped `Term` keeps the whole
+        # refusal English in `localize_detail`, the same as a prose slot.
+        self.translatable = all(isinstance(v, Term) or _is_token(v)
+                                for v in slots.values())
         return self
 
 
@@ -502,6 +523,24 @@ class Term(str):
     Translated at render, not at raise: the reader's language is not known at
     the raise site, which is the reason the handler does this work at all.
     """
+
+
+class Opening(Term):
+    """A `Term` that begins its sentence, and so is capitalised.
+
+    After translation, never before. The vocabulary holds one form of each
+    phrase — `create and run your own synthetic profiles` — and each language
+    raises its own first letter from that; a capitalised table would need a
+    second copy of every entry, free to drift from the first.
+
+    `str.capitalize()` is wrong here: it lower-cases everything after the first
+    character, which would turn German's `im Marktplatz einstellen` into
+    something with its nouns flattened. Only the first character moves.
+    """
+
+
+def _open(text: str) -> str:
+    return text[:1].upper() + text[1:]
 
 
 def term(word: str, language: str) -> str:
@@ -593,8 +632,14 @@ def localize_detail(detail, language: str):
         if any(str(v) not in _VOCABULARY for v in vocabulary):
             return str(detail)
         frame = tr_refusal(detail.template, language)
-        filling = {k: term(v, language) if isinstance(v, Term) else v
-                   for k, v in detail.slots.items()}
+        filling = {}
+        for key, value in detail.slots.items():
+            if isinstance(value, Opening):
+                filling[key] = _open(term(value, language))
+            elif isinstance(value, Term):
+                filling[key] = term(value, language)
+            else:
+                filling[key] = value
         try:
             return frame.format(**filling)
         except (KeyError, IndexError, ValueError):
@@ -605,7 +650,12 @@ def localize_detail(detail, language: str):
     if isinstance(detail, str):
         return tr_refusal(detail, language)
     if isinstance(detail, dict) and isinstance(detail.get("message"), str):
-        return {**detail, "message": tr_refusal(detail["message"], language)}
+        # `localize_detail` and not `tr_refusal`: a `Templated` *is* a `str`,
+        # so `tr_refusal` would look up the finished English sentence, find
+        # nothing, and hand back the English — losing the template it is
+        # carrying. The plan gate's message is exactly that shape.
+        return {**detail,
+                "message": localize_detail(detail["message"], language)}
     return detail
 
 
@@ -664,12 +714,57 @@ MESSAGE_ALREADY = "message is already {status}"
 PROFILE_ALREADY = "profile is already {status}"
 NOT_A_MEMORIAL = "this profile is {status}, not a memorial"
 
+#: The refusal `refusals_untranslated.txt` named for four releases as the one
+#: thing it would not half-do. Its slots are prose — a capability description
+#: and a billing period — so translating the frame alone would have produced a
+#: sentence half in each language at the one moment in this product that stands
+#: between somebody and a decision to pay. Both slots are `Term`s now, drawn
+#: from the vocabulary below, so the whole sentence arrives in one language or
+#: none of it does.
+#:
+#: The plan titles are deliberately *not* slots to translate. `Basic` and `Pro`
+#: are what the product is called on the pricing page, in the console's tabs
+#: and on a receipt; a person comparing a refusal against a price list needs
+#: the same word in both places. They ride in as tokens.
+PLAN_GATE = ("{capability} needs {needs} (${price}/{period}). "
+             "This account is on {have}. Billing here is simulated — "
+             "subscribing records a row and moves no real funds.")
+
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
 TEMPLATES = (MUST_BE_ONE_OF, UNKNOWN_SURFACE, OBJECTION_ALREADY,
-             MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL)
+             MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL, PLAN_GATE)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
+    PLAN_GATE: {
+        'es': '{capability} requiere {needs} (${price}/{period}). Esta cuenta '
+              'está en {have}. La facturación aquí es simulada: suscribirse '
+              'registra una fila y no mueve fondos reales.',
+        'fr': '{capability} nécessite {needs} ({price} $/{period}). Ce compte '
+              'est en {have}. La facturation est simulée ici : souscrire '
+              'enregistre une ligne et ne déplace aucun fonds réel.',
+        'de': '{capability} erfordert {needs} ({price} $/{period}). Dieses '
+              'Konto ist auf {have}. Die Abrechnung ist hier simuliert — ein '
+              'Abo legt eine Zeile an und bewegt kein echtes Geld.',
+        'pt': '{capability} requer {needs} (${price}/{period}). Esta conta '
+              'está no {have}. A cobrança aqui é simulada: assinar registra '
+              'uma linha e não movimenta fundos reais.',
+        'it': '{capability} richiede {needs} ({price} $/{period}). Questo '
+              'account è su {have}. La fatturazione qui è simulata: '
+              'abbonarsi registra una riga e non muove fondi reali.',
+        'ja': '{capability}には{needs}が必要です（${price}／{period}）。'
+              'このアカウントは{have}です。ここでの課金はシミュレーションです — '
+              '購読しても記録が残るだけで、実際の資金は動きません。',
+        'zh': '{capability}需要 {needs}（${price}/{period}）。'
+              '此账户当前为 {have}。此处的计费为模拟 — 订阅只会记录一行，'
+              '不会转移真实资金。',
+        'hi': '{capability} के लिए {needs} चाहिए (${price}/{period})। '
+              'यह खाता {have} पर है। यहाँ बिलिंग नकली है — सदस्यता लेने पर '
+              'केवल एक पंक्ति दर्ज होती है, असली पैसा नहीं जाता।',
+        'ar': '{capability} يتطلب {needs} (${price}/{period}). هذا الحساب على '
+              '{have}. الفوترة هنا محاكاة — الاشتراك يسجل صفًا ولا ينقل '
+              'أموالًا حقيقية.',
+    },
     MUST_BE_ONE_OF: {
         'es': '{field} debe ser uno de {choices}',
         'fr': '{field} doit être l\'un de {choices}',
@@ -742,6 +837,108 @@ _TEMPLATES: dict[str, dict[str, str]] = {
 #: sentence a person reads. They stay keys on the wire — the console branches
 #: on `status` — so this is only ever applied by `term()` at the last step.
 _VOCABULARY: dict[str, dict[str, str]] = {
+    # The billing period, and the eight capability descriptions the plan gate
+    # names. Longer than the state words above, and belonging here for the same
+    # reason: they are a closed set this product authors, so there is a
+    # translation for each and no guessing involved. `_SLOT_TOKEN` would refuse
+    # them for having spaces, which is why `Term` is exempt from it.
+    'month': {'es': 'mes', 'fr': 'mois', 'de': 'Monat', 'pt': 'mês',
+              'it': 'mese', 'ja': '月', 'zh': '月', 'hi': 'माह',
+              'ar': 'شهر'},
+    'create and run your own synthetic profiles': {
+        'es': 'crear y ejecutar tus propios perfiles sintéticos',
+        'fr': 'créer et faire tourner vos propres profils synthétiques',
+        'de': 'eigene synthetische Profile erstellen und betreiben',
+        'pt': 'criar e executar os seus próprios perfis sintéticos',
+        'it': 'creare e gestire i tuoi profili sintetici',
+        'ja': '自分の合成プロフィールを作成して動かすこと',
+        'zh': '创建并运行你自己的合成档案',
+        'hi': 'अपनी स्वयं की सिंथेटिक प्रोफ़ाइल बनाना और चलाना',
+        'ar': 'إنشاء ملفاتك الاصطناعية وتشغيلها'},
+    'your own personal agent': {
+        'es': 'tu propio agente personal',
+        'fr': 'votre propre agent personnel',
+        'de': 'Ihr eigener persönlicher Agent',
+        'pt': 'o seu próprio agente pessoal',
+        'it': 'il tuo agente personale',
+        'ja': '自分専用のエージェント',
+        'zh': '你自己的个人代理',
+        'hi': 'आपका अपना निजी एजेंट',
+        'ar': 'وكيلك الشخصي الخاص'},
+    'every modifier and builder for your agent — steering, adaptation, '
+    'governance and delegation': {
+        'es': 'todos los modificadores y constructores de tu agente: '
+              'dirección, adaptación, gobernanza y delegación',
+        'fr': 'tous les modificateurs et constructeurs de votre agent : '
+              'pilotage, adaptation, gouvernance et délégation',
+        'de': 'alle Modifikatoren und Baukästen für Ihren Agenten — Steuerung, '
+              'Anpassung, Governance und Delegation',
+        'pt': 'todos os modificadores e construtores do seu agente: direção, '
+              'adaptação, governança e delegação',
+        'it': 'tutti i modificatori e i costruttori del tuo agente: '
+              'orientamento, adattamento, governance e delega',
+        'ja': 'エージェントのすべての調整項目とビルダー — ステアリング、適応、'
+              'ガバナンス、委任',
+        'zh': '代理的全部调节项与构建器 — 引导、适应、治理与委派',
+        'hi': 'आपके एजेंट के सभी संशोधक और बिल्डर — स्टीयरिंग, अनुकूलन, '
+              'शासन और प्रत्यायोजन',
+        'ar': 'كل أدوات التعديل والبناء لوكيلك — التوجيه والتكيّف والحوكمة '
+              'والتفويض'},
+    'list, sell, license, place and buy on the marketplace': {
+        'es': 'publicar, vender, licenciar, colocar y comprar en el mercado',
+        'fr': 'lister, vendre, licencier, placer et acheter sur la place '
+              'de marché',
+        'de': 'im Marktplatz einstellen, verkaufen, lizenzieren, platzieren '
+              'und kaufen',
+        'pt': 'listar, vender, licenciar, colocar e comprar no mercado',
+        'it': 'pubblicare, vendere, concedere in licenza, collocare e '
+              'acquistare sul marketplace',
+        'ja': 'マーケットプレイスでの出品・販売・ライセンス・配置・購入',
+        'zh': '在市场中上架、出售、授权、投放与购买',
+        'hi': 'मार्केटप्लेस पर सूचीबद्ध करना, बेचना, लाइसेंस देना, रखना और खरीदना',
+        'ar': 'العرض والبيع والترخيص والوضع والشراء في السوق'},
+    'install knowledge packs and downloads': {
+        'es': 'instalar paquetes de conocimiento y descargas',
+        'fr': 'installer des packs de connaissances et des téléchargements',
+        'de': 'Wissenspakete und Downloads installieren',
+        'pt': 'instalar pacotes de conhecimento e transferências',
+        'it': 'installare pacchetti di conoscenza e download',
+        'ja': 'ナレッジパックとダウンロードのインストール',
+        'zh': '安装知识包与下载内容',
+        'hi': 'नॉलेज पैक और डाउनलोड इंस्टॉल करना',
+        'ar': 'تثبيت حزم المعرفة والتنزيلات'},
+    'connect outside apps and services to a profile': {
+        'es': 'conectar aplicaciones y servicios externos a un perfil',
+        'fr': 'connecter des applications et services externes à un profil',
+        'de': 'externe Apps und Dienste mit einem Profil verbinden',
+        'pt': 'ligar aplicações e serviços externos a um perfil',
+        'it': 'collegare app e servizi esterni a un profilo',
+        'ja': '外部のアプリやサービスをプロフィールに接続すること',
+        'zh': '将外部应用与服务连接到档案',
+        'hi': 'बाहरी ऐप्स और सेवाओं को प्रोफ़ाइल से जोड़ना',
+        'ar': 'ربط التطبيقات والخدمات الخارجية بملف'},
+    'lend a skill to another profile, or borrow one': {
+        'es': 'prestar una habilidad a otro perfil, o tomar una prestada',
+        'fr': "prêter une compétence à un autre profil, ou en emprunter une",
+        'de': 'eine Fähigkeit an ein anderes Profil verleihen oder eine leihen',
+        'pt': 'emprestar uma competência a outro perfil, ou pedir uma '
+              'emprestada',
+        'it': "prestare un'abilità a un altro profilo, o prenderne una in "
+              'prestito',
+        'ja': '他のプロフィールにスキルを貸す、または借りること',
+        'zh': '把技能借给其他档案，或借用一项',
+        'hi': 'किसी अन्य प्रोफ़ाइल को कौशल उधार देना, या एक उधार लेना',
+        'ar': 'إعارة مهارة لملف آخر أو استعارة واحدة'},
+    'standing connections to other accounts': {
+        'es': 'conexiones permanentes con otras cuentas',
+        'fr': 'connexions permanentes avec d\'autres comptes',
+        'de': 'dauerhafte Verbindungen zu anderen Konten',
+        'pt': 'ligações permanentes a outras contas',
+        'it': 'connessioni permanenti ad altri account',
+        'ja': '他のアカウントとの継続的な接続',
+        'zh': '与其他账户的长期连接',
+        'hi': 'अन्य खातों से स्थायी संबंध',
+        'ar': 'اتصالات دائمة بحسابات أخرى'},
     'open': {'es': 'abierta', 'fr': 'ouverte', 'de': 'offen', 'pt': 'aberta',
              'it': 'aperta', 'ja': '未処理', 'zh': '待处理', 'hi': 'खुली',
              'ar': 'مفتوح'},

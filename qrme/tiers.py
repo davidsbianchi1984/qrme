@@ -252,15 +252,43 @@ def may(account_id: str, capability: str) -> bool:
     return entitles(plan_of(account_id), capability)
 
 
-def refusal(plan: str, capability: str) -> str:
-    """Why this was refused, and what would fix it, with the price named."""
+def refusal(plan: str, capability: str):
+    """Why this was refused, and what would fix it, with the price named.
+
+    `tests/refusals_untranslated.txt` named this for four releases as the one
+    sentence it would not half-do: an f-string whose slots are a capability
+    description and a billing period, both English prose, so translating the
+    frame alone would have produced a sentence half in each language at the one
+    moment in this product that stands between somebody and a decision to pay.
+
+        asked     can the frame be translated
+        mattered  can the slots be
+
+    Both are `i18n.Term` now — drawn from a closed set this product authors, so
+    each has a translation and none of it is guessed. An unmapped one keeps the
+    whole sentence English rather than mixing, which is the same guarantee the
+    mechanism gives a prose slot.
+
+    The plan titles stay untranslated on purpose. `Basic` and `Pro` are what
+    the product is called on the pricing page, in the console's tabs and on a
+    receipt, and somebody comparing this refusal against a price list needs the
+    same word in both places.
+
+    Returns a `Templated`, which is a `str` — every caller that treated this as
+    a sentence still does, including `TierError` below.
+    """
+    from . import i18n
     need = CAPABILITIES[capability]["from"]
     spec = PLANS[need]
-    return (f"{CAPABILITIES[capability]['is'].capitalize()} needs "
-            f"{spec['title']} (${spec['price_usd']}/{spec['period']}). "
-            f"This account is on {PLANS[plan]['title']}. "
-            "Billing here is simulated — subscribing records a row and moves "
-            "no real funds.")
+    described = CAPABILITIES[capability]["is"]
+    return i18n.fill(
+        i18n.PLAN_GATE,
+        # Capitalised at the seam rather than in the table, so the vocabulary
+        # holds one form of each phrase and every language capitalises the way
+        # it capitalises.
+        capability=i18n.Opening(described),
+        needs=spec["title"], price=spec["price_usd"],
+        period=i18n.Term(spec["period"]), have=PLANS[plan]["title"])
 
 
 def require(account_id: str, capability: str) -> None:

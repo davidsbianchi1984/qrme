@@ -12,6 +12,16 @@ export type Lang =
 type Table = Record<string, Partial<Record<Lang, string>>>;
 
 const CHROME: Table = {
+  // The plan gate's card. The sentence inside it comes translated from the
+  // server (`qrme/tiers.py:refusal`); these are the console's own chrome
+  // around it, and they are here rather than inline for the reason every
+  // other console string is.
+  "refusal.see_plans": {
+    en: "See the plans", es: "Ver los planes", fr: "Voir les formules",
+    de: "Die Tarife ansehen", pt: "Ver os planos", it: "Vedi i piani",
+    ja: "プランを見る", zh: "查看方案", hi: "योजनाएँ देखें",
+    ar: "عرض الخطط",
+  },
   "nav.home": {
     en: "Home", es: "Inicio", fr: "Accueil", de: "Start", pt: "Início",
     it: "Home", ja: "ホーム", zh: "主页", hi: "होम", ar: "الرئيسية",

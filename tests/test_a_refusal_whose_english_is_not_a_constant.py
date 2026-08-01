@@ -319,3 +319,138 @@ def test_the_english_default_is_untouched(client):
                      choices=", ".join(i18n.MODES))
     assert i18n.localize_detail(said, i18n.DEFAULT) == said
     assert i18n.localize_detail(said, "en") == "mode must be one of pre, on_demand"
+
+
+# --- the plan gate, which this file named as the thing it would not do ------
+#
+# `refusals_untranslated.txt` carried this exception for four releases:
+#
+#     Translating the frame alone would produce a sentence half in each
+#     language, at the one moment in this product that stands between somebody
+#     and a decision to pay. That is precisely what this file exists to
+#     prevent, so it is written down rather than half-done.
+#
+# The slots were the obstacle, not the frame: a capability description and a
+# billing period, both English prose that `_SLOT_TOKEN` rejects for having
+# spaces in it.
+#
+#     asked     can the frame be translated
+#     mattered  can the slots be
+#
+# They can, because this product authors them. Eight capability descriptions
+# and one period word are a closed set, so they are `Term`s drawn from the
+# vocabulary — and `Term` is exempt from the whitespace rule for exactly that
+# reason. The rule catches prose *nobody wrote a translation for*; a `Term` has
+# one or the whole sentence stays English.
+
+def test_the_plan_gate_arrives_whole_in_one_language():
+    """The sentence this file was named after, in each language.
+
+    Whole is the assertion that matters. A half-translated version of this is
+    worse than the English one it replaced, and it is the failure mode the
+    record spent four releases refusing to ship.
+    """
+    from qrme import tiers
+    said = tiers.refusal("free", "marketplace")
+    english = str(said)
+    for language in ("pt", "es", "de", "fr", "it", "ja", "zh", "hi", "ar"):
+        out = i18n.localize_detail(said, language)
+        assert out != english, f"the plan gate is still English for {language}"
+        # No English fragment of the frame or the slots survives.
+        for fragment in ("needs", "This account is on", "Billing here",
+                         "list, sell, license", "month"):
+            assert fragment not in out, (
+                f"{language} kept the English fragment {fragment!r}, so the "
+                f"sentence is half in each language:\n{out}")
+
+
+def test_the_plan_titles_stay_as_they_are_printed_everywhere_else():
+    """`Basic` and `Pro` are what the product is called.
+
+    On the pricing page, in the console's tabs, on a receipt. Somebody
+    comparing this refusal against a price list needs the same word in both
+    places, so the titles ride in as tokens and are the one part of this
+    sentence deliberately not translated.
+    """
+    from qrme import tiers
+    for language in ("pt", "ja", "ar"):
+        out = i18n.localize_detail(tiers.refusal("free", "marketplace"),
+                                   language)
+        assert "Pro" in out and "Free" in out, (
+            f"a plan title was translated in {language}: {out}")
+
+
+def test_every_capability_the_gate_names_has_a_translation():
+    """The vocabulary against the table it is drawn from.
+
+    A capability added to `tiers.CAPABILITIES` without a translation keeps the
+    whole refusal English — safe, but silently. This is the difference between
+    a gap that degrades and a gap somebody knows about.
+    """
+    from qrme import tiers
+    missing = sorted(spec["is"] for spec in tiers.CAPABILITIES.values()
+                     if spec["is"] not in i18n._VOCABULARY)
+    assert not missing, (
+        f"{len(missing)} capability description(s) have no translation, so "
+        "the plan gate stays English when they are refused:\n    "
+        + "\n    ".join(missing))
+
+
+def test_every_refusable_plan_has_a_billing_period():
+    """The latent `$0/None` in the sentence, held where it cannot bite.
+
+    `refusal()` quotes `(${price}/{period})`, and the two capabilities that
+    start at `free` have no period — `$0/None`. Unreachable today: the default
+    plan *is* free, so `entitles(free, ...)` is true for both and the gate can
+    never refuse them. This asserts that it stays unreachable, rather than
+    building a second sentence for a case nobody can receive.
+    """
+    from qrme import tiers
+    reachable = [name for name, spec in tiers.CAPABILITIES.items()
+                 if not tiers.entitles(tiers.DEFAULT_PLAN, name)]
+    unpriced = [name for name in reachable
+                if tiers.PLANS[tiers.CAPABILITIES[name]["from"]]["period"] is None]
+    assert not unpriced, (
+        f"{unpriced} can be refused and its plan has no billing period, so the "
+        "refusal would read '$0/None'. Give the plan a period, or give the "
+        "refusal a second template for free capabilities.")
+
+
+def test_a_term_is_exempt_from_the_whitespace_rule_and_a_stranger_is_not():
+    """The distinction the whole mechanism turns on.
+
+    Whitespace is a proxy for *prose nobody wrote a translation for*. A `Term`
+    is prose this product authored and translated, so the proxy does not apply
+    to it — and applying it anyway is what would have kept the plan gate
+    English for the wrong reason.
+    """
+    authored = i18n.fill(i18n.MUST_BE_ONE_OF, field="x",
+                         choices=i18n.Term("create and run your own "
+                                           "synthetic profiles"))
+    assert authored.translatable
+
+    stranger = i18n.fill(i18n.MUST_BE_ONE_OF, field="x",
+                         choices="the mail server refused the connection")
+    assert not stranger.translatable
+
+    unmapped = i18n.fill(i18n.MUST_BE_ONE_OF, field="x",
+                         choices=i18n.Term("a phrase nobody translated"))
+    assert unmapped.translatable, "a Term is exempt from the whitespace rule"
+    assert i18n.localize_detail(unmapped, "pt") == str(unmapped), (
+        "an unmapped Term reached a translated frame — the exemption has to be "
+        "paid for by the vocabulary check, or it is just a hole")
+
+
+def test_the_opening_word_is_capitalised_after_translation_not_before():
+    """One form of each phrase in the vocabulary, each language raising its own
+    first letter from it — and `str.capitalize()` would flatten the rest."""
+    from qrme import tiers
+    german = i18n.localize_detail(tiers.refusal("free", "marketplace"), "de")
+    assert german[0].isupper(), german[:40]
+    # German capitalises its nouns; `capitalize()` would have lower-cased them.
+    assert "Marktplatz" in german, (
+        f"the rest of the phrase was lower-cased along with the first "
+        f"letter:\n{german}")
+    assert str(tiers.refusal("free", "marketplace")).startswith("List, sell"), (
+        "the English sentence lost its capital — `Opening` has to apply when "
+        "the Templated builds its own text, not only when it is translated")
