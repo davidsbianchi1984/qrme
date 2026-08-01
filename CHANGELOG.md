@@ -6,6 +6,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### The deploy that lived in a chat log
+
+`docs/cloudgw-deploy.md` — the gateway from a bare host to installers that
+actually report, with the two build-time variables that are the point of the
+exercise.
+
+It says in its first line what has and has not been proven. The routes, the
+refusals, the token scopes and the fail-closed defaults were all driven
+against a running instance; **the image build was not**, because the sandbox
+it was verified in has no Docker daemon. A runbook that does not distinguish
+those two is a runbook that will be trusted in the wrong place.
+
+It also states what the box does not buy: counters cannot reproduce a bug, and
+they cannot reach installers already in the field, because the address is
+compiled in.
+
+
 ### A translated string nobody reads
 
 Two keys shipped in 0.27.0 were in the table and wired to nothing — caught by
