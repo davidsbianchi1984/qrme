@@ -59,6 +59,16 @@ class CallForm:
     opener: re.Pattern[str]
     verb: str | None = None
     verb_in_body: re.Pattern[str] | None = None
+    #: How far past the end of the call to keep looking for the verb.
+    #:
+    #: Zero for every helper that names its method inside its own arguments.
+    #: Kotlin's direct-connection idiom does not: the URL is built in one call
+    #: and the verb set in the `.apply { }` block that follows, so a search
+    #: bounded by the call's own parentheses finds nothing and the default
+    #: stands. That default was "GET", and PDI submits an intake with it —
+    #: reported as a GET against a POST-only route, a phantom mismatch created
+    #: by looking in the wrong place and calling the silence an answer.
+    verb_after: int = 0
     default: str = "GET"
     #: The bracket pair enclosing the call's arguments. Parentheses for every
     #: function call, braces for a JSX attribute — `src={…}` is a request the
@@ -94,7 +104,26 @@ CONSOLE = Language(
     "console", REPO / "app" / "src", (".ts", ".tsx"),
     re.compile(r"\$\{[^{}]*\}"),
     re.compile(_TS_TEMPLATE + r"|\"(/[^\"\n]*)\""),
-    (CallForm(re.compile(r"\breq\s*(?:<.*?>)?\s*\(", re.S),
+    # `req` and its sibling `reqText`, matched as one form. The sibling
+    # exists because `req` parses the body as JSON and falls back to `null`
+    # on anything it cannot — right for a crashed server answering plain
+    # text, wrong for a route whose job is to return a page. Three of them
+    # do: the scan page at `/c/{bid}` is HTML and two `qr.svg` routes are
+    # SVG.
+    #
+    # Adding the helper made those three doors **invisible to this audit**,
+    # which reported them as newly doorless while the console had just
+    # gained working buttons for all three. That is the third time an
+    # extractor has produced a false positive here — after the nested
+    # template and the `<img src>` — and it is the same lesson each time:
+    # the audit reads one shape of call, so a new shape of call reads as no
+    # call.
+    #
+    # The alternation is spelled out rather than written `req\w*`, which
+    # would also swallow `api.requestReset(` — harmless today, because that
+    # call holds no path literal to find, and exactly the kind of accidental
+    # match that turns into a phantom door the first time one does.
+    (CallForm(re.compile(r"\breq(?:Text)?\s*(?:<.*?>)?\s*\(", re.S),
               verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),
      # `req()` serialises JSON, so anything that cannot — a raw-bytes upload
      # — reaches for `fetch` directly. Without this form the audit is blind
@@ -137,10 +166,40 @@ IOS = Language(
 ANDROID = Language(
     "android", REPO / "native" / "android", (".kt",),
     re.compile(r"\$\{[^{}]*\}|\$[A-Za-z_][A-Za-z0-9_]*"),
-    re.compile(r'"(/[^"\n]*)"'),
+    # Two literal shapes. The shared `request()` helper is handed a bare
+    # path — `"/users/$uid/meds"` — but a route answering a JSON **array**
+    # cannot use that helper, because it returns a JSONObject. Those open the
+    # connection directly and build the whole URL in the literal:
+    # `URL("$base/baseline/$uid")`. That form starts with `$`, not `/`, so
+    # the original pattern could not see it.
+    #
+    # `GET /baseline/{user_id}` proves the cost: the Android shell has had a
+    # working door for it since the baseline round, and this audit counted it
+    # doorless the entire time. A false positive produces busywork rather than
+    # a dead button, but it is still the guard being wrong.
+    re.compile(r'"\$base(/[^"\n]*)"|"(/[^"\n]*)"'),
     (CallForm(re.compile(r"\brequest\s*\("),
               verb_in_body=re.compile(
-                  r'"/[^"\n]*"\s*,\s*"(GET|POST|PUT|PATCH|DELETE)"')),),
+                  r'"/[^"\n]*"\s*,\s*"(GET|POST|PUT|PATCH|DELETE)"')),
+     # The direct-connection form above. This used to be declared `verb="GET"`
+     # with the reasoning "it exists because the response is an array, and
+     # every array route in this shell is a GET" — true of the shell it was
+     # written in, and carried into the other two products when the rule was
+     # shared. PDI opens a direct connection to POST an intake submission, and
+     # the ported assumption reported it as a GET against a POST-only route:
+     # a phantom mismatch produced by a rule that travelled without its
+     # premise.
+     #
+     #     asked     what does this call shape mean in the shell it was written for
+     #     mattered  what does this call shape mean here
+     #
+     # So the verb is read. `conn.requestMethod = "POST"` sits a line or two
+     # below the URL, inside the same call scope. Absent, it stays GET —
+     # which is what HttpURLConnection itself defaults to, so the fallback is
+     # the platform's answer rather than a guess.
+     CallForm(re.compile(r"\bURL\s*\("), verb_after=400,
+              verb_in_body=re.compile(
+                  r'requestMethod\s*=\s*"(GET|POST|PUT|PATCH|DELETE)"')),),
 )
 # C# names the verb in the helper. `Send<Post>(Post(...))` is not ambiguous
 # here: the model type is followed by `>`, never by `(`.
@@ -352,7 +411,9 @@ def calls(lang: Language) -> dict[tuple[str, str], tuple[str, str]]:
                     continue
                 verb = form.verb
                 if verb is None and form.verb_in_body is not None:
-                    hit = form.verb_in_body.search(body)
+                    look = body if not form.verb_after else (
+                        body + text[m.end():m.end() + form.verb_after])
+                    hit = form.verb_in_body.search(look)
                     verb = hit.group(1).upper() if hit else form.default
                 found.setdefault((verb or form.default, path),
                                  (str(f.relative_to(REPO)), raw))
