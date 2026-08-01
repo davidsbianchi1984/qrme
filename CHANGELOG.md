@@ -4,6 +4,103 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.23.0] — 2026-08-01
+
+Ten rounds, and one question asked in three products: **can the person this
+was built for actually reach it?** Every finding below is a route the backend
+deliberately made public, or a capability a screen deliberately offered, that
+the client then put behind something its intended user does not have.
+
+### A public route behind a private door
+
+`governance.open_objection` says what it is in its own first line — *"public:
+the objecting party need not own an account"* — and `Contest.tsx` said it in
+the copy a person reads: *"You do not need an account. Objecting to a profile
+should not require joining the platform that is hosting it."*
+
+That sentence was printed on a tab nobody without an account could open.
+`App.tsx` returned `<Onboarding />` for the entire window while
+`session.profileId` was unset, so all forty-six tabs sat behind a sign-up, and
+the three native shells did the same. The person the route exists for is by
+construction the one who cannot reach it: they have found a synthetic profile
+of themselves, they have no QRME account, and the product's answer was that
+they should make one with the platform depicting them first.
+
+A **Without an account** surface now opens before the gate on all four
+clients, carrying the objection form, the objection-status lookup, and the
+mark check. The console answers `#object` and `#mark` in the URL, so a takedown
+notice or a moderation reply can point at the form rather than at a sign-up
+page. Nothing on it sends a credential; the audit trail, which quotes the
+objector's reason, stays gated where it was.
+
+The guard's own last check found a third route nobody had looked for.
+`embodiment-consistency` is public in its own words — *"anyone meeting the
+profile through any form can verify it is the same personality"* — and the only
+screen calling it was the owner's Workshop, which printed that sentence in a
+card only the owner can see. It is now the public surface's third pane.
+
+### A binding is not a door — for the native shells too
+
+`test_a_binding_is_not_a_door.py` existed because `clientpaths.doorless` counts
+call sites: a function written in `api.ts` and wired to no screen takes its
+route off the backlog whether or not anything calls it. It checked one client
+of four. `ApiClient.swift`, `ApiClient.kt` and `ApiClient.cs` are files of the
+same kind with the same property, and nothing had ever looked at them.
+
+Eight unused bindings, three of them a capability with no door — and all three
+the same shape, a shell carrying the act that **creates** a standing power and
+not the act that **ends** it. `SignatureView` listed signing credentials and
+could not revoke one; a credential that signs documents as you, on a device you
+may no longer hold. Both are wired, with confirmations that say what the act
+does and does not undo.
+
+### The stranger's language
+
+Every localization path in this product takes a profile id, which is exactly
+what the reader of the public surface does not have. `navigator.languages` is
+the only signal those visitors carry and nothing read it, so the screen built
+for people with no account was also the screen with no language.
+
+`visitorLang()` negotiates it — region dropped, anything unrecognised falling
+back to English rather than guessing — and the action-carrying strings are
+translated across all ten languages. The longer explanatory paragraphs are not,
+yet: they are listed in `tests/public_untranslated.txt`, checked in both
+directions and ratcheted, so what is left in English is a decision on the
+record rather than an oversight.
+
+### The audit's recurring shape, named
+
+Seven times now a checker has answered a question slightly to the left of the
+one that matters, and passed:
+
+| asked | mattered |
+|---|---|
+| some client reaches this route | *this* client reaches it |
+| the console reaches it | a phone reaches it |
+| a binding exists | a screen calls it |
+| the same, three surfaces over | |
+| the name appears in the file | it was not the declaration itself |
+| a shell calls the public route | somebody without an account can |
+| the console reaches the recipient's route | the recipient can |
+
+Every one was true. None was the question. Three of the seven were mistakes in
+guards written to catch the previous one.
+
+### Fixed
+
+- `SignatureView` on iOS can revoke a signing credential it enrolled.
+- The console's `Contest` and `Workshop` copy now points at the surface that
+  keeps its promise instead of asserting something its own surface cannot
+  deliver.
+- Screen 184 joins the gallery with a lesson and dock keywords for somebody
+  who types *"I don't have an account"*.
+
+### Known gap
+
+The six releases from 0.19.0 to 0.22.0 had shipped without rows in the README
+release table. They are written in now, from the CHANGELOG sections that
+already described them.
+
 ## [0.22.0] — 2026-07-31
 
 ### The only post that actually leaves was the one going out unmarked
