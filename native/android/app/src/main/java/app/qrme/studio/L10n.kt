@@ -1,5 +1,7 @@
 package app.qrme.studio
 
+import android.content.res.Resources
+
 /**
  * App-chrome localization: tab names, screen titles, and the most common
  * actions, in every language the backend supports. Content (chat, guidance,
@@ -9,6 +11,30 @@ package app.qrme.studio
 object L10n {
     fun t(key: String, lang: String): String =
         table[key]?.let { it[lang] ?: it["en"] } ?: key
+
+    val supported = listOf("en", "es", "fr", "de", "pt", "it", "ja", "zh",
+                           "hi", "ar")
+
+    /**
+     * The language of somebody who has no profile to take one from.
+     *
+     * `AppState.language` comes from the profile's stored setting and is
+     * "en" until one exists — right for the tab bar, useless for the
+     * without-an-account screen, which exists for a person who has no
+     * profile and is not going to make one. Their phone has been carrying
+     * the answer in the system configuration all along.
+     *
+     * Region dropped; anything this app does not carry falls back to English
+     * rather than guessing.
+     */
+    fun deviceLanguage(): String {
+        val locales = Resources.getSystem().configuration.locales
+        for (i in 0 until locales.size()) {
+            val base = locales[i].language.lowercase()
+            if (supported.contains(base)) return base
+        }
+        return "en"
+    }
 
     private val table: Map<String, Map<String, String>> = mapOf(
         "tab.overview" to mapOf(

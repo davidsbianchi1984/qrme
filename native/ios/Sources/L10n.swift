@@ -9,6 +9,29 @@ enum L10n {
         table[key]?[lang] ?? table[key]?["en"] ?? key
     }
 
+    /// The language of somebody who has no profile to take one from.
+    ///
+    /// `AppState.language` is read from the profile's stored setting and
+    /// defaults to `"en"` until one exists — which is right for the tab bar
+    /// and useless for `WithoutAnAccountView`, the one screen in this app
+    /// built for a person who has no profile and is not going to make one.
+    /// Before this existed there was no language to pass there even if
+    /// something had asked: the objector's phone had been carrying the answer
+    /// in `Locale.preferredLanguages` the whole time and nothing read it.
+    ///
+    /// Region dropped (`es-419` and `es-ES` are both `es`); anything the app
+    /// does not carry falls back to English rather than guessing.
+    static var deviceLanguage: String {
+        for tag in Locale.preferredLanguages {
+            let base = String(tag.split(separator: "-")[0]).lowercased()
+            if supported.contains(base) { return base }
+        }
+        return "en"
+    }
+
+    static let supported = ["en", "es", "fr", "de", "pt", "it", "ja", "zh",
+                            "hi", "ar"]
+
     private static let table: [String: [String: String]] = [
         "tab.overview": ["en": "Overview", "es": "Resumen", "fr": "Aperçu",
                          "de": "Übersicht", "pt": "Visão geral", "it": "Panoramica",

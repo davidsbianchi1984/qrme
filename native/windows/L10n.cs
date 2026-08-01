@@ -10,6 +10,33 @@ namespace QrmeStudio;
 /// </summary>
 public static class L10n
 {
+    /// <summary>
+    /// The language of somebody who has no profile to take one from.
+    ///
+    /// <para><c>AppState.Language</c> is the profile's stored setting and is
+    /// "en" until one exists — right for the shell, useless for
+    /// WithoutAnAccountPage, which is there for a person who has no profile
+    /// and is not going to make one. Windows has been carrying the answer in
+    /// CurrentUICulture the whole time.</para>
+    ///
+    /// <para>Region dropped; anything this app does not carry falls back to
+    /// English rather than guessing.</para>
+    /// </summary>
+    public static readonly string[] Supported =
+        { "en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar" };
+
+    public static string DeviceLanguage()
+    {
+        var culture = System.Globalization.CultureInfo.CurrentUICulture;
+        while (culture != null && !string.IsNullOrEmpty(culture.Name))
+        {
+            var code = culture.TwoLetterISOLanguageName.ToLowerInvariant();
+            if (System.Array.IndexOf(Supported, code) >= 0) return code;
+            culture = culture.Parent;
+        }
+        return "en";
+    }
+
     public static string T(string key)
     {
         var lang = AppState.Current.Language;
