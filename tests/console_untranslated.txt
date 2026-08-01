@@ -1,0 +1,1616 @@
+# English on QRME's gated console. Checked by
+# test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
+# and ratcheted.
+#
+# The sidebar has forty-six labels and every one of them is translated into
+# ten languages. There are forty-six screens behind those labels, and every
+# string on all of them is English.
+#
+# `l10n.ts` says so in its own first line — "chrome localization for the
+# desktop console" — and three rounds of language audit read that sentence as
+# a scope rather than as a finding. Each round widened correctly inside it:
+# Public.tsx, then Onboarding.tsx, then the native shells. None of them asked
+# what was on the other side of the forty-six translated words.
+#
+#     asked     is the chrome localized
+#     mattered  is anything behind the chrome localized
+#
+# This is worse than a console that is uniformly English, which is why it is
+# recorded separately from public_untranslated.txt rather than folded in. A
+# console with no translations tells a Spanish reader the truth on the first
+# screen. This one puts "Mercado", "Amigos" and "Ajustes" in the sidebar —
+# the app answering in their language — and then hands them 1576 English
+# strings the moment they click. The promise is made by the only part that
+# was kept.
+#
+# Not translated in this round, and the reason is the same one that has held
+# for every ratchet in this repo: 1576 strings is not one round, and a
+# half-translated console is harder to use than an English one, because a
+# reader can no longer tell which screens they are able to read. The keys and
+# the `fill` machinery already exist; what does not exist is the decision
+# about order, and that decision belongs to somebody who knows which screens
+# matter to which market.
+#
+# The gated reader is a different argument from the accountless one, too.
+# They have a profile, the profile has a language, and the server already
+# honours it on every answer it writes — which is precisely what makes the
+# English here conspicuous: the model replies in Portuguese inside a frame
+# that cannot.
+#
+# ceiling: 1576
+Assist: .
+Assist: :
+Assist: A review comes from somebody who actually talked to it — one per person, edited rather than stacked.
+Assist: Add a photo or a document
+Assist: Cancel
+Assist: Check a mark
+Assist: Check it
+Assist: Compose
+Assist: Fix a draft
+Assist: Leave a review
+Assist: Make something to keep
+Assist: Nothing kept yet.
+Assist: Nothing paired.
+Assist: One item per line. You get back the best few
+Assist: Pair
+Assist: Proofread
+Assist: Save
+Assist: Set aside:
+Assist: Something you said
+Assist: Sort a pile
+Assist: Sort a pile, fix a draft, make something worth keeping — and every generated thing carries a mark you can check.
+Assist: Sort it
+Assist: The kind is read from the bytes rather than the file name, and nothing you took yourself is AI-marked.
+Assist: This is the content the credential was issued for.
+Assist: Two questions, and they are not the same one: was this credential issued here, and is this the content it was issued for.
+Assist: What it can do for you
+Assist: What it is worn on
+Assist: What people said
+Assist: What will not be paired
+Assist: You can correct or retract your own turn. The correction carries forward: the next reply reasons from what you meant.
+Assist: a watermark id
+Assist: bytes ·
+Assist: check this mark
+Assist: correct it
+Assist: for a
+Assist: from
+Assist: include ones you have unpaired — the row stays, with the date
+Assist: kept.
+Assist: looked at,
+Assist: one candidate per line
+Assist: open
+Assist: over
+Assist: paste something you wrote
+Assist: review
+Assist: take it back
+Assist: the content to check against it
+Assist: the moment to capture
+Assist: unpair
+Assist: what best means to you
+Assist: what you call it
+Assist: what you thought
+Assist: with the reason each one survived
+Assist: ·
+Assist: · edited
+Assist: · showing
+Assist: · unpaired
+Assist: —
+Assist: — issued
+Assist: — the ranking is meant to be arguable.
+Assist: ↑ written before the message above it was changed, so it answers the older wording.
+Audience: .
+Audience: . A gift reads who to credit from the profile itself; a subscription is told, so this screen shows you which account it named.
+Audience: Credited to
+Audience: Follow
+Audience: Follow somebody
+Audience: Gifts
+Audience: Nobody yet.
+Audience: Nothing yet.
+Audience: Send a gift
+Audience: The buyer's side of the ledger. The seller's side is on the marketplace screen — two questions, so two lists.
+Audience: This profile's audience
+Audience: Up to
+Audience: What you follow
+Audience: What you have bought
+Audience: Who follows this profile
+Audience: Who is following, and what they pay
+Audience: a note with it
+Audience: a profile id (blank means your own)
+Audience: charge another period
+Audience: charged, each one because somebody pressed a button.
+Audience: comments ·
+Audience: each — published so the limit can be said before somebody runs into it. Gifting needs a verified birthdate on the giver's account: an unverified age is not evidence of an adult.
+Audience: follow — free
+Audience: following ·
+Audience: likes ·
+Audience: paid
+Audience: period
+Audience: received across
+Audience: shares
+Audience: stop following
+Audience: ·
+Audience: —
+Beacons: ; a platform beacon sends them to an account somewhere else.
+Beacons: A QR image is free to ask for — fetching the picture is not a scan. Opening the page it points to
+Beacons: Collect
+Beacons: Connect
+Beacons: Connect a platform
+Beacons: Connected
+Beacons: Nothing yet.
+Beacons: Placements
+Beacons: Publish
+Beacons: Scanning it opens
+Beacons: So no screen here opens a scan page on its own. The links on
+Beacons: The code for
+Beacons: This code carries people
+Beacons: Two directions, never the same row.
+Beacons: Two kinds of code, and they look the same. A placed beacon brings somebody
+Beacons: What a scan costs to check
+Beacons: Where people find you
+Beacons: Without a handle the beacon has no account page to point at, so it falls back to a QRME summon link — still a working code, but it brings people here rather than to the platform.
+Beacons: and on a desk are deliberate presses, and following one adds to the number you were checking. The desk code also has a JSON twin — the same scan shaped for a native app drawing the overlay in place rather than for a browser — and it counts the same.
+Beacons: away
+Beacons: collect — pull it in
+Beacons: collected ·
+Beacons: disconnect
+Beacons: from QRME. A placed beacon does the opposite. Same picture, opposite destination.
+Beacons: here
+Beacons: is
+Beacons: one, and every scan surface counts it, because the server cannot tell an owner checking their own sticker from a stranger who found it. There is no preview that doesn't count.
+Beacons: publish — run it out there
+Beacons: published
+Beacons: pulls that account's content in to grow this profile.
+Beacons: runs the profile out on the platform. Kept apart so a read-only import can never also post.
+Beacons: show its code
+Beacons: the QR code for this platform presence
+Beacons: the handle, without the @
+Beacons: ·
+Beacons: —
+Blend: %
+Blend: A hybrid profile. It will say openly that it is a blend and never claim to be any single one of its constituents.
+Blend: Blend a Profile
+Blend: Blend another
+Blend: Blending
+Blend: Name
+Blend: Nothing to blend yet — install the starter collection in Discover.
+Blend: The blend
+Blend: Use this profile now
+Blend: What blending is
+Blend: Who can go into the blend
+Blend: Your birthdate
+Blend: Your own profiles and anything listed on the marketplace. Rated profiles never blend; a profile that has departed still can — a blend is one way the people who loved them keep a piece of how they were.
+Blend: creates a brand-new profile
+Blend: e.g. The Grandfolks
+Blend: e.g. storytelling
+Blend: make a new profile from several people — not a follow; the sources are untouched
+Blend: share
+Blend: their
+Blend: their…
+Blend: whose persona mixes two or more existing ones, in the shares you choose — both grandparents at once, a mentor's judgment with a friend's humor. It is not following or friending: the sources are untouched, and the result is a new synthetic person that says openly who it is a blend of.
+Campaigns: $
+Campaigns: %
+Campaigns: % of 100
+Campaigns: + Add
+Campaigns: Cause
+Campaigns: Close
+Campaigns: Donate
+Campaigns: Edit designation
+Campaigns: Give $
+Campaigns: Goal $
+Campaigns: Keep the garden going
+Campaigns: Kind
+Campaigns: Name
+Campaigns: Nobody designated yet — a campaign cannot exist until you say where its money goes.
+Campaigns: Open
+Campaigns: Open a campaign
+Campaigns: Proceeds go to
+Campaigns: Save
+Campaigns: Share %
+Campaigns: Sign in first.
+Campaigns: Title
+Campaigns: Where the Money Goes
+Campaigns: closed
+Campaigns: crowdfunding, routed by you — donors always see the names
+Campaigns: donor
+Campaigns: goes to:
+Campaigns: loved one
+Campaigns: of $
+Campaigns: organization
+Campaigns: what it's for
+Campaigns: ·
+Chat: .
+Chat: Advisor — weigh it and recommend
+Chat: Chat with
+Chat: Collaborator — work it with me
+Chat: Conditions
+Chat: Doing
+Chat: How should they work this turn?
+Chat: Let it read my prompt
+Chat: Operator — just do it
+Chat: Say hello to
+Chat: Send
+Chat: Tell it where you are — the reply meets you there
+Chat: Type a message…
+Chat: Where
+Chat: a trailhead, the kitchen
+Chat: every response is persona- &amp; relationship-conditioned
+Chat: hiking, cooking
+Chat: raining, quiet
+Chat: …
+Chat: 📍
+Contest: , and if the objection is dismissed it goes back to exactly that.
+Contest: Adjudicate
+Contest: Approve
+Contest: Check
+Contest: Check a case
+Contest: Contesting a profile
+Contest: Dismiss
+Contest: End it now
+Contest: I am the subject — withdraw my consent
+Contest: I speak for the estate — revoke
+Contest: If a profile here represents you, or somebody whose estate you speak for, this is how you say so.
+Contest: Nothing held.
+Contest: Objecting to a profile does not require joining the platform hosting it: the same form is on the sign-in page, open to anybody. You are seeing it here because you are signed in.
+Contest: Open an objection
+Contest: Open it
+Contest: Opened —
+Contest: Reject
+Contest: Reviewer only — an owner must not decide an objection against their own profile. Upholding terminates the profile and erases its content; dismissing restores what it was.
+Contest: The profile is
+Contest: The proof reference points at an identity check held outside this system — it is not a login, and it is what lets you object without one.
+Contest: Two shortcuts skip review entirely, because a standing party's rights outweigh preserving the profile. Both terminate it immediately, even mid-review. Each applies to one rights basis only — if it is not the one this profile was made under, the refusal says which one it is.
+Contest: Uphold
+Contest: Waiting on you
+Contest: What has happened to this case
+Contest: What this profile said, held for your approval before anybody sees it. Only appears when the profile is set to manual moderation.
+Contest: Your reference:
+Contest: by
+Contest: from this moment — before anybody reviews it. It was
+Contest: objection id
+Contest: sealed
+Contest: the profile's id
+Contest: why — in your own words
+Contest: your proof reference
+Contest: ·
+Contest: · profile
+Contest: —
+Delegate: A grant is a revocable scope. It is what a phase reads the profile's own material through, and it can be withdrawn mid-run — the work stops seeing what the grant covered from that moment, not at the end.
+Delegate: A single piece of work rather than a run with phases. It needs a grant, because it composes from the profile's own sources.
+Delegate: Advance
+Delegate: Answer &amp; continue
+Delegate: Answer and continue
+Delegate: Cancel
+Delegate: Compose from my sources
+Delegate: Delegation &amp; work
+Delegate: Hand it over
+Delegate: Mint a grant first.
+Delegate: Mint a grant over my sources
+Delegate: Nothing has been run yet.
+Delegate: One-off tasks
+Delegate: Refresh
+Delegate: Revoke
+Delegate: Run the next phase
+Delegate: Runs
+Delegate: Sign in as the owner to set delegation.
+Delegate: Start
+Delegate: The grant it reads through
+Delegate: The other side of the same policy. Everything above is what your own profile may do for you; this is you asking somebody else's to do something, inside the limits its owner published.
+Delegate: Topic
+Delegate: Turn delegation
+Delegate: Waiting on you:
+Delegate: What it may do unattended
+Delegate: What should it work on?
+Delegate: What will it take on?
+Delegate: Which sources its owner scoped is not shown, and is not yours to know.
+Delegate: Work you handed to somebody else's profile
+Delegate: You have to be talking to it already — delegated work is for somebody in a conversation, not a stranger holding a profile id, and starting one cold is refused by name.
+Delegate: Your answer
+Delegate: answer it, if it stopped to ask
+Delegate: next:
+Delegate: revoked
+Delegate: their profile id
+Delegate: what you want done
+Delegate: —
+Desk: %,
+Desk: .
+Desk: :
+Desk: A desk claims a person is behind it, so it is opened with who attests that and on what basis — a guild, a licence number. The claim is shown to every visitor and can be burned, which is why it is asked for at the start rather than added later.
+Desk: Answer
+Desk: Attested by
+Desk: Away
+Desk: Beacons
+Desk: Clear camera
+Desk: Desk
+Desk: Desk id
+Desk: Desk token
+Desk: Is anybody there?
+Desk: Label (Shop window)
+Desk: Let them up
+Desk: Look and camera
+Desk: Name shown on the desk
+Desk: Nobody has rung.
+Desk: Nobody waiting.
+Desk: Not now
+Desk: On the stream
+Desk: On what basis
+Desk: Open a desk
+Desk: Open the desk
+Desk: Or take up a desk you already have
+Desk: Pick it up
+Desk: Place a beacon
+Desk: Portrait asset
+Desk: Printed:
+Desk: Set portrait
+Desk: Step down from the stream
+Desk: Take it up
+Desk: That read counted as a scan.
+Desk: The bell
+Desk: The desk as a sticker: somebody scans it in the street and reaches this counter. Picking one up retires it — the sticker on the wall stops working, which is the point.
+Desk: The one thing a visitor most wants to know.
+Desk: This desk is rated, so a scan lands on the age wall. A sticker carries no token that could clear it — that is the right answer rather than a gap.
+Desk: Trade
+Desk: What a scanner sees
+Desk: Where (optional)
+Desk: Who attests it
+Desk: Who wants to come up
+Desk: Your owner id
+Desk: answered
+Desk: closed
+Desk: comments ·
+Desk: likes ·
+Desk: open it here (counts as a scan)
+Desk: rated
+Desk: retired
+Desk: says come back;
+Desk: says the counter is shut. They are different promises and the desk gets to make either.
+Desk: scan
+Desk: shares
+Desk: the view from this desk
+Desk: this desk code's QR
+Desk: up,
+Desk: waiting ·
+Desk: ·
+Desk: · drawn over the picture at
+Desk: —
+Discover: AI
+Discover: Add friend
+Discover: Discover
+Discover: Filter by tag
+Discover: Nothing listed yet
+Discover: Search
+Discover: The starter collection is 33 profiles across trades and interests, each carrying its industry's knowledge pack — one press to install, then talk to any of them.
+Discover: e.g. music, carpentry
+Discover: the marketplace · every card is a real profile
+Discover: ✓ real photo
+Exchanges: .
+Exchanges: . It does not grant
+Exchanges: A document before it is a transfer. Both sides sign the same manifest, and only then does anything move.
+Exchanges: Accept
+Exchanges: Add
+Exchanges: Against fingerprint
+Exchanges: Ask again
+Exchanges: Can anything move?
+Exchanges: Exchanges
+Exchanges: How this works
+Exchanges: Included:
+Exchanges: No —
+Exchanges: Not included:
+Exchanges: Nothing listed yet.
+Exchanges: Nothing yet.
+Exchanges: Open
+Exchanges: Propose
+Exchanges: Propose one
+Exchanges: Remove
+Exchanges: Reopen to edit
+Exchanges: Sign
+Exchanges: Signatures
+Exchanges: The manifest
+Exchanges: This grants
+Exchanges: Unsigned:
+Exchanges: Waiting on:
+Exchanges: Withdraw
+Exchanges: Yes —
+Exchanges: Yours
+Exchanges: available.
+Exchanges: bytes
+Exchanges: fee
+Exchanges: guest → host
+Exchanges: host → guest
+Exchanges: item
+Exchanges: runs
+Exchanges: signed
+Exchanges: still to sign
+Exchanges: the other party's id
+Exchanges: what crosses
+Exchanges: what the work is, in one sentence
+Exchanges: ·
+Exchanges: · accepted
+Exchanges: · fee
+Exchanges: —
+Exchanges: — against an older manifest, not this one
+Exchanges: — change the manifest and this changes, so the old signatures match nothing.
+Exchanges: …
+Friends: @
+Friends: Add
+Friends: Friends
+Friends: Loading, or no friends yet — add friends from Discover.
+Friends: Sign in first.
+Friends: Suggested
+Friends: founder
+Friends: remove
+Grants: (
+Grants: ) ·
+Grants: :
+Grants: Accept
+Grants: Act on it
+Grants: Closed by
+Grants: Decline
+Grants: End it
+Grants: Every use
+Grants: Every use is written down and the lender can see it. So can you — that is the list below.
+Grants: In
+Grants: Lend something
+Grants: Lent skills
+Grants: Not used yet.
+Grants: Offer
+Grants: Open
+Grants: Open one
+Grants: Something you can do, made usable by somebody else, in one place, for as long as you both want it there.
+Grants: The terms
+Grants: Use
+Grants: Use it
+Grants: grant id
+Grants: time
+Grants: what for
+Grants: what to call it
+Grants: which one
+Grants: which skill
+Grants: who may use it
+Grants: why (optional)
+Grants: · by
+Grants: · used
+Grants: —
+Guide: .
+Guide: All of it
+Guide: Done — next
+Guide: Every screen in the gallery is explained by one of the lessons, and a test keeps that true — so a drawing can always be looked up.
+Guide: Look it up
+Guide: Never carries:
+Guide: Read
+Guide: Show me around
+Guide: Start again
+Guide: The pane that follows you
+Guide: Try it:
+Guide: What am I looking at?
+Guide: What the help box can answer
+Guide: Where does it go?
+Guide: Where you are
+Guide: Written answers, matched by keyword. They work whether or not a model is reachable — a help system that stops helping when a provider is down is absent on the day everything else is confusing too.
+Guide: Yours
+Guide: a screen number
+Guide: screen
+Guide: ·
+Guide: · screen
+Guide: · showing
+Guide: · tucked here:
+Guide: — refused.
+Home: AI Version —
+Home: Chat with
+Home: Home
+Home: Memory Vault
+Home: New in this release
+Home: Persona
+Home: Relationships
+Home: ● Online
+Home: 🎗 Where the money goes
+Home: 🏛 Departments that coordinate
+Home: 🔮 What would they do
+Home: 🫱🏽‍🫲🏻 Blend a profile
+Identity: (
+Identity: )
+Identity: , rank
+Identity: .
+Identity: :
+Identity: A brief is the description you would hand a generator. Nothing here draws it for you — picking one sets the asset, and the portrait itself is yours to make.
+Identity: Anonymity
+Identity: Checked by
+Identity: Delete
+Identity: Ending it
+Identity: Erased, not retired. Nothing stays, and there is no memorial.
+Identity: Everything held about this profile, as rows. Leaving before you can take your things is not leaving.
+Identity: Export
+Identity: Memorial
+Identity: Move it to this profile
+Identity: Move the badge here
+Identity: Not withheld
+Identity: Nothing yet.
+Identity: Only you can see this list — it is the link between your separate personas, which is the thing anonymity is protecting.
+Identity: Or a portrait
+Identity: Record
+Identity: Rename
+Identity: Retire
+Identity: Reversible, from now on.
+Identity: Save
+Identity: Show the prompt
+Identity: Showing
+Identity: Shown as
+Identity: Take it with you
+Identity: The bubble
+Identity: The profile departs. What it meant to the people who knew it stays readable, and so does the export.
+Identity: The rules
+Identity: Two different endings, and the difference is what happens to the people who knew it.
+Identity: Verification
+Identity: What was erased
+Identity: Who checked is withheld — it would point back to a name this profile does not publish.
+Identity: Who this profile is
+Identity: Withheld
+Identity: Yes, delete it
+Identity: Yes, retire it
+Identity: Your profiles
+Identity: a new display name
+Identity: anonymous
+Identity: farewell
+Identity: how
+Identity: other kinds of record had nothing to erase.
+Identity: relationship
+Identity: this one
+Identity: touched
+Identity: verified (
+Identity: ·
+Identity: · memory
+Identity: · not verified
+Identity: · unverifiable — an invented person
+Identity: —
+InWords: ,
+InWords: .
+InWords: . The text is not returned here, deliberately, and it is not public either. It is waiting in the mark screen's queue.
+InWords: A public post faces the widest audience there is, so it always runs the strict filter — and it carries a synthetic-media credential from the moment it exists.
+InWords: An interactor's message, a room turn, a listing. Done with this profile's own model, into its language unless you name another.
+InWords: Anybody can now reach it at
+InWords: Choose a profile first.
+InWords: Claim it
+InWords: Claiming a handle
+InWords: Compose
+InWords: Currently
+InWords: Held —
+InWords: In its own words
+InWords: Not a display setting. The persona writes in this language natively on every surface it appears — chat, posts, rooms, a robot speaking aloud — rather than writing English and translating afterwards.
+InWords: Published.
+InWords: Say something publicly
+InWords: Set it
+InWords: The name it answers to
+InWords: Translate
+InWords: Translate something it ran across
+InWords: What it speaks
+InWords: everywhere, already
+InWords: into
+InWords: into its own language
+InWords: paste the text
+InWords: replaces
+InWords: rosa
+InWords: what it should post about
+InWords: whatever this profile had — the old one stops resolving, and anything printed or shared that named it stops working. That is why only its owner may do this, and why the route asking for nothing was worth more than a second name.
+InWords: when asked for
+InWords: which surface (optional)
+Inside: :
+Inside: Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.
+Inside: Go in
+Inside: In a voice room your own microphone carries your voice to the other people; the profiles are reading text and have no ear. Lending yours gives them one — keyed to your voice and set narrow enough to reach only you, not the room. Everybody here is shown that you lent it, which is the whole point: a microphone the others cannot see is what this is built not to be.
+Inside: Inside a room
+Inside: Lend them my microphone
+Inside: Let them talk
+Inside: Microphones
+Inside: Nothing yet.
+Inside: Read it, say something, let the profiles take a turn. You have to be in the room — knowing its id is not the same as being here, and the id travels on stickers.
+Inside: Say it
+Inside: Sign in as a person first — a room turn is spoken by somebody, so a profile's owner token is refused here by name.
+Inside: Take my microphone back
+Inside: What has been said
+Inside: Which room
+Inside: room id, from Rooms
+Inside: say something
+Inside: ·
+Inside: · since
+Leaving: , yours, licensed from
+Leaving: .
+Leaving: :
+Leaving: A dry run — nothing has been sent to produce this.
+Leaving: Acquire a licence
+Leaving: Buying one needs your token as a person, not as a profile's owner. A licence permitting derivatives is refused to a buyer under 18 at the till rather than at delivery — the fee moves when the licence is sold.
+Leaving: Consult only — this licence does not permit deriving an agent, and the button is absent rather than present and refused.
+Leaving: Contributing
+Leaving: Derive an agent from it
+Leaving: Falls back to
+Leaving: Keep the licence token:
+Leaving: Keep this owner token — it is shown once:
+Leaving: Licensing a profile
+Leaving: New profile
+Leaving: Note the persona name is already replaced. That is what the gateway would receive, not a summary of it.
+Leaving: Nothing, ever.
+Leaving: One agent per licence. Deriving again from the same grant is a 409, because a licence was sold for one.
+Leaving: Stop, and take back what has left
+Leaving: The other kind of leaving. A
+Leaving: The shared model
+Leaving: This profile is
+Leaving: Two different kinds of leaving. One sends an exchange with the names taken out; the other sends the profile itself.
+Leaving: What has actually left
+Leaving: What leaves, and on what terms
+Leaving: consult
+Leaving: licence buys time with the profile; a licence that permits derivatives lets you build a new agent seeded from its persona, owned by you and marked with where it came from.
+Leaving: the profile to license
+Leaving: ·
+Leaving: —
+Live: 's —
+Live: .
+Live: . Up to
+Live: A camera, a microphone, a face over a camera. Whatever you put between yourself and the people around you, they are told.
+Live: Lend a microphone
+Live: Lend mine
+Live: Look
+Live: Look at a place
+Live: Refused —
+Live: Share your camera
+Live: Something is recording.
+Live: Start sharing
+Live: Stop
+Live: Take it back
+Live: Take it off
+Live: This is
+Live: We cannot
+Live: Wear it
+Live: Wear something over your face
+Live: What is live here
+Live: Who else is in shot
+Live: Worn or clipped on only:
+Live: You can
+Live: Your camera is on
+Live: by default.
+Live: call it something
+Live: in
+Live: its id
+Live: min ·
+Live: minutes,
+Live: which place
+Live: who watches
+Live: ·
+Live: · since
+Live: —
+Live: — hears
+Lobby: ,
+Lobby: .
+Lobby: . Their link:
+Lobby: :
+Lobby: A lobby
+Lobby: A real person seats only themselves — an id in a request body is a claim, and the route checks it against the token. Somebody else's profile is a two-party agreement and lives in the lent- skills routes, which ask both sides.
+Lobby: And, below, how a conversation gets handed to somebody local.
+Lobby: Hand it over
+Lobby: Handing it to somebody local
+Lobby: I agree to send this
+Lobby: Open it
+Lobby: Seat
+Lobby: Seat somebody
+Lobby: See what they will see
+Lobby: Shown to you because it is the only way to check it. It says openly that some of the others here are synthetic too — a model that believes every callsign is a person will talk to them as people, and a lobby that reads as friends when it is one player and several generated voices is the impression this product exists to prevent.
+Lobby: Take it back
+Lobby: The lighter of the two ways to pass a conversation on. A referral is signed with your device and opens once; this one is consented and revocable — and revoking purges the package rather than hiding it.
+Lobby: The line
+Lobby: The package
+Lobby: The rules of the room
+Lobby: To
+Lobby: What a synthetic member is told
+Lobby: What nothing here will do
+Lobby: Who is in the game with you
+Lobby: a gaming session id
+Lobby: callsign
+Lobby: here
+Lobby: left. Everyone in a match is owed the knowledge of who is synthetic in it, so this list says so per member rather than in a footnote.
+Lobby: on
+Lobby: pick somebody
+Lobby: synthetic
+Lobby: synthetic · maturity
+Lobby: take this seat back
+Lobby: the member's id
+Lobby: ·
+Lobby: —
+Market: Buy
+Market: Different from a listing: a listing sells one thing, this puts the profile itself where people browsing can find it. Tags are how they find it, and the card shows display information only — never anything from inside the persona.
+Market: Find something
+Market: List it
+Market: Listing again replaces the tags and the line rather than adding a second row — one profile is in the directory once.
+Market: Marketplace
+Market: Nothing here.
+Market: Nothing is placed yet. A listing with no place is everywhere, which is the same as nowhere when somebody is looking for help nearby.
+Market: Price
+Market: Put this profile in the directory
+Market: Save
+Market: Search
+Market: Sign in to set this.
+Market: Suggest words
+Market: Towns with listings
+Market: What you have sold
+Market: Where you are looking
+Market: Yours alone, behind your own token. It narrows what you see and nothing else — it does not tell a seller where you are.
+Market: a line about it
+Market: a plumber, a therapist, a tutor…
+Market: anywhere
+Market: for “
+Market: hidden by where you are looking
+Market: left
+Market: listing
+Market: remote counts
+Market: result
+Market: tags, comma separated
+Market: take it out
+Market: this region
+Market: this town
+Market: town
+Market: ·
+Market: —
+Market: ”, scope
+Memory: AES-256-GCM · one row per conversation · erase by name
+Memory: Erase all
+Memory: Erase this one
+Memory: Loading…
+Memory: Memory Vault 🔒
+Memory: No memories yet — have a chat first.
+Memory: turns · last
+Memory: with
+Memory: ·
+Named: % ·
+Named: A campaign
+Named: A trip out to look something up. The owner's only, because it holds the brief that was sanitised before it went and the count of what was taken out of it.
+Named: An excursion
+Named: An organization
+Named: Look
+Named: Look it up
+Named: No departments yet.
+Named: No id, no token. It is the key the screens render, so anything that draws a light can ask what one means.
+Named: None of yours here.
+Named: One thing, named
+Named: Show mine
+Named: Six reads, six different answers to who is allowed to ask.
+Named: The most public read here, on purpose. It carries who the money goes to, and the person about to give some is the one entitled to see that — a fundraising page that hid its split would be the ordinary kind of dishonest. A campaign cannot even be created before the designation exists.
+Named: What the lights mean
+Named: What you are lending and borrowing
+Named: Where the money goes
+Named: Yours only. The route says so in its own words — it acts on somebody's behalf, so it has to know it is them.
+Named: a campaign id
+Named: an excursion id
+Named: an organization id
+Named: from
+Named: from:
+Named: of
+Named: the place's id
+Named: ·
+Named: · no account yet
+Named: —
+Named: …and in one place
+Org: (this profile)
+Org: Agent profile id
+Org: Coordinate
+Org: Department
+Org: Finance
+Org: Found
+Org: Found a demo org
+Org: Found an organization
+Org: Goal
+Org: Lead
+Org: Name
+Org: No departments yet — staff the first desk below.
+Org: Or meet it working: one press builds a demo team on your own account — two agents with a little knowledge each, granted and desked, ready to coordinate.
+Org: Past coordinations
+Org: Role
+Org: Sign in first.
+Org: Staff
+Org: The Ecosystem
+Org: The joint plan
+Org: departments that coordinate — your agents, your material, one joint plan
+Org: e.g. Bianchi & Sons
+Org: item(s) pulled
+Org: keeps the books
+Org: quote and schedule the restoration
+Org: scoped
+Org: sealed
+Org: sealed to vault
+Org: · agent:
+Passing: A contested identity cannot be handed on: an open objection blocks this with a 409. Inheriting a profile somebody is disputing would settle the dispute by transfer rather than by resolving it.
+Passing: A pack needs at least one item, a price cannot be negative, and every item in a robot pack needs a task — the command verb. Three refusals, each naming what is missing.
+Passing: An owner under 18 needs a parent or guardian's consent, and the refusal says so rather than failing generically.
+Passing: Beginning, and passing on
+Passing: Born from four questions
+Passing: Bring it into being
+Passing: Down the same paths the full apps use — same auth, same allowlists, same moderation. A shortcut that skipped any of those would be a second, weaker way in, which is exactly what a wrist should not be.
+Passing: How a profile starts, what it is taught, who holds it after, and the one press from a wrist.
+Passing: Leave the name blank and it picks its own from the answers. That is not decoration: a persona assembled from what somebody said about themselves should not then be handed a label by a form field.
+Passing: Nobody was named, so it sunsets to memorial: frozen rather than orphaned. A profile whose owner has died and which nobody can reach is worse than one that has plainly stopped.
+Passing: Now
+Passing: One press from the wrist
+Passing: Pass it on
+Passing: Passing it on
+Passing: Press it
+Passing: Publish it
+Passing: Publishing needs your owner token, and the account sales accrue to is read from it — not from the request. Naming somebody else's account in a body is how money ends up somewhere it was not earned.
+Passing: The one route in this product an
+Passing: Their owner token, shown once:
+Passing: What it can be taught
+Passing: a name, or blank to let it choose
+Passing: advance / assist / cancel
+Passing: already there, across
+Passing: assist
+Passing: created,
+Passing: industries. Pressing again is safe.
+Passing: industry
+Passing: its id
+Passing: needs input — the paused phase asked for something, and sending nothing would advance past the question rather than answer it.
+Passing: one item's title
+Passing: owner token cannot open
+Passing: reviewer token
+Passing: seed the starter packs
+Passing: the pack's title
+Passing: the profile
+Passing: verification reference
+Passing: what it asked for
+Passing: what it teaches
+Passing: your birthdate, YYYY-MM-DD
+Passing: ·
+Passing: · published by
+Passing: —
+Passing: — because the signal it answers is that the owner has died or cannot act, and requiring their authorisation would be requiring the one thing known to be unavailable. A reviewer holds it, against a verification reference kept out of band: a death certificate, a power of attorney.
+Passing: — held by
+Placements: % get through the wall.
+Placements: .
+Placements: Also reachable as
+Placements: An adult-mode profile can be advertised at an adult venue, as a link or a printable code.
+Placements: Arrivals that did not come through a placement:
+Placements: Carries:
+Placements: Counts and rates only. Nobody who scans is identified, here or anywhere else.
+Placements: Everything else
+Placements: Keep this. The list below can reopen the beacon on whatever API this console is pointed at, but only this card knows the address the code was minted with.
+Placements: Only an adult-mode profile can be placed at an adult venue, and the refusal says so rather than hiding the button.
+Placements: Place
+Placements: Place this profile
+Placements: Placed at
+Placements: Print or share:
+Placements: Publish this
+Placements: Rated resolutions are sealed in the vault — so the record of who was age-checked is not this platform's to read.
+Placements: Reported as:
+Placements: Take down
+Placements: That is the one a phone camera lands on and the one the code encodes.
+Placements: The funnel
+Placements: This deployment has no vault, so nothing here is sealed. Rated resolutions are counted in the ordinary database.
+Placements: This profile has not claimed a handle, so the code and the link are the only ways in.
+Placements: Venues
+Placements: What each venue brings
+Placements: What is kept, and where
+Placements: Where it is marketed
+Placements: got through it
+Placements: is the machine-readable surface for clients, not a link to give anybody.
+Placements: open here (counts as a scan)
+Placements: people who talked
+Placements: pick a venue
+Placements: reached the age wall ·
+Placements: resolution
+Placements: resolutions →
+Placements: scan
+Placements: the beacon's QR code
+Placements: this beacon's QR code
+Placements: verified views →
+Placements: verified.
+Placements: walled,
+Placements: what to call it (optional)
+Placements: ·
+Placements: —
+Plans: .
+Plans: . Readable by
+Plans: End my subscription
+Plans: Erasure:
+Plans: Includes:
+Plans: Never held here whatever the plan:
+Plans: Not on this plan:
+Plans: Plans
+Plans: Reading a membership needs an owner token for a profile on this account. Sign in as an owner to see or change the plan.
+Plans: This account
+Plans: You are reading the price list without signing in, which is on purpose — nothing above this needs an account.
+Plans: your plan
+Plans: —
+Plans: — in each of those the person exposed did not pick the plan.
+Presence: . Anything else is removed on save, and the save still succeeds — so the list is here rather than in a message afterwards.
+Presence: About text held:
+Presence: Currently:
+Presence: Last save removed:
+Presence: None placed.
+Presence: Only you can see this list — it is a list of physical places. What any one screen is
+Presence: Place
+Presence: Put it on a screen
+Presence: Save
+Presence: Screens it is on
+Presence: Surfaces it appears on
+Presence: Take down
+Presence: The page you make yourself
+Presence: These survive:
+Presence: What a fixed screen never shows
+Presence: What a stranger lands on
+Presence: Where this is seen
+Presence: a tagline
+Presence: about
+Presence: from
+Presence: is public, because a fixture in a corridor displays to whoever walks past.
+Presence: passers-by
+Presence: review
+Presence: showing
+Presence: taken down
+Presence: talked with it
+Presence: what to call it
+Presence: where it is
+Presence: your own HTML
+Presence: ·
+Presence: · @
+Presence: · showing
+Presence: —
+Reaching: , moved
+Reaching: , which covers nothing rather than everything — the window runs from the first up to but not including the second. To be quiet all day, end one hour before you start.
+Reaching: .
+Reaching: A latent picture of one relationship, and what the profile actually behaves from. Owner-only, and shown rather than described: a number nobody can see is a number nobody can argue with.
+Reaching: Awaiting a reply
+Reaching: Four different refusals, and only two of them are yours to lift.
+Reaching: Gated on the rater's own token. A rating in somebody else's name is a lie about what they thought, and a thumbs-up is also the trigger for contributing that exchange to the shared model — so it is not a button anybody else gets to press for you.
+Reaching: Hours are UTC, 0 to 23. Both empty means no window.
+Reaching: How are we going
+Reaching: Its own reason for sending:
+Reaching: Last seen
+Reaching: Quiet hours
+Reaching: Rate an exchange
+Reaching: Rate cap
+Reaching: Reach out now
+Reaching: Reaching out first
+Reaching: Reaching out, and what stops it
+Reaching: Reactive-only
+Reaching: Readable by you and by them, and by nobody else. It is a record of how often somebody talks to this profile, which is a fact about them as much as about it.
+Reaching: Set my quiet hours
+Reaching: Show it
+Reaching: Somebody in particular
+Reaching: The window during which nothing may reach out unprompted. Set by the person it protects — sending this with an owner token is refused, and that refusal is the point. A boundary your correspondent can move is not one.
+Reaching: This is your own control, not one you hold over anybody else — so it needs your token as a person rather than as a profile's owner. Sign in as yourself to set it.
+Reaching: Those are the
+Reaching: Three gates, and they refuse in three different sentences because they are three different facts.
+Reaching: Version
+Reaching: What it has learned about them
+Reaching: a person's id
+Reaching: across
+Reaching: clear
+Reaching: down
+Reaching: exchange
+Reaching: from
+Reaching: is not yours at all.
+Reaching: means it already reached out and heard nothing — it will not send twice into silence.
+Reaching: means it reached out recently. And
+Reaching: means you never switched outreach on.
+Reaching: quiet hours
+Reaching: same hour
+Reaching: session
+Reaching: until
+Reaching: up ·
+Reaching: ·
+Reaching: · score
+Reaching: —
+Referrals: (
+Referrals: ).
+Referrals: , identity checked as
+Referrals: -tier signature. What a credential can sign follows from how your identity was checked, and from whether the key stayed on one device.
+Referrals: :
+Referrals: A profile is not a clinician. This is how a conversation with one reaches somebody who is — once, and only under your signature.
+Referrals: A referral is a
+Referrals: Add
+Referrals: Can sign:
+Referrals: Document
+Referrals: Expertise filters and geography ranks, never the other way round — a cardiologist two streets away is not a substitute for a psychiatrist. An empty list is an answer.
+Referrals: Find
+Referrals: Handing it to somebody qualified
+Referrals: If you are the clinician
+Referrals: It opens once. A second attempt fails with the time of the first, rather than quietly working — a replayed link is something you should be able to find out about.
+Referrals: No account needed — the link is the credential, and it works once.
+Referrals: Nobody listed for that yet — which is said plainly rather than offering a near-miss.
+Referrals: None enrolled. The ceremony can enrol one.
+Referrals: Nothing has gone anywhere yet. This is what would.
+Referrals: Open it
+Referrals: Prepare
+Referrals: Read this before you sign
+Referrals: Record a check
+Referrals: Release it
+Referrals: Send it
+Referrals: Sign it with your device
+Referrals: The certificate
+Referrals: The directory —
+Referrals: The link for the clinician
+Referrals: The signature is over these exact words — the challenge is their hash — so a summary changed afterwards cannot ride it.
+Referrals: The summary
+Referrals: Their words, attributed to them. The profile never recites this as its own knowledge.
+Referrals: What the clinician wrote back
+Referrals: What was on the screen
+Referrals: What you have released
+Referrals: Who can help
+Referrals: Write back, once
+Referrals: Your signing credentials
+Referrals: area of expertise
+Referrals: certificate
+Referrals: high
+Referrals: how to reach them
+Referrals: listed
+Referrals: matched on
+Referrals: name
+Referrals: referral id
+Referrals: signed
+Referrals: the signature id the ceremony gave back
+Referrals: the token from the link
+Referrals: what you need, e.g. physiotherapy
+Referrals: what you want the patient to know
+Referrals: where
+Referrals: where you are
+Referrals: who checked it
+Referrals: ·
+Referrals: · syncs between devices
+Referrals: —
+Referrals: — checked as
+Referrals: …
+Relationships: 's life
+Relationships: Active relationships
+Relationships: Add a relationship
+Relationships: Name
+Relationships: Relationships
+Relationships: Tone
+Relationships: Type
+Relationships: acknowledges them truthfully if asked — disclosure by design
+Relationships: e.g. Sarah
+Relationships: people in
+Remainder: (
+Remainder: ) —
+Remainder: Apps it is connected to
+Remainder: Ask it
+Remainder: Connect Google Calendar
+Remainder: Credential
+Remainder: End
+Remainder: Every dial in one place
+Remainder: Everything else
+Remainder: Fetch it
+Remainder: Fold it in
+Remainder: Go and look
+Remainder: Going out to look something up
+Remainder: Its portrait
+Remainder: Look something up by its id
+Remainder: Nine of these reads had a binding written for them and no screen calling it. They are not nine features — they are one question asked about nine kinds of record, so this is one control rather than nine buttons nobody would find.
+Remainder: None yet.
+Remainder: Or read from one
+Remainder: Playing alongside somebody
+Remainder: Publish it
+Remainder: Publishing to a platform we do not run
+Remainder: Read it in
+Remainder: Send it
+Remainder: Set it
+Remainder: Start a session
+Remainder: Sync
+Remainder: Tell us about the app
+Remainder: The companion plays within the game's rules. Fair play is enforced rather than promised.
+Remainder: The mark is burned into the pixels rather than drawn over them, so it survives a screenshot or a crop.
+Remainder: The other direction on the same connection: what the account already published becomes source material this profile is built from.
+Remainder: The question is stripped before it leaves. The answer says how much was taken out and whether it left this machine at all — which is the part worth reading, not the findings.
+Remainder: Third-party catalogues. `audience` says what each one stocks — task mods for a robot body, or knowledge mods for a profile.
+Remainder: This is the one place a profile's words genuinely leave. It runs the strict filter — not the profile's own setting — and it stamps a synthetic-media credential, because content going somewhere we cannot see is the case the mark exists for. It used to do neither.
+Remainder: Where mods come from
+Remainder: Your own submissions come back to you and to nobody else. All anyone else ever sees is the count by category.
+Remainder: a post to read in
+Remainder: a publish connection id
+Remainder: an asset path
+Remainder: available,
+Remainder: dials
+Remainder: for a
+Remainder: in total across everybody.
+Remainder: installs
+Remainder: items ·
+Remainder: on
+Remainder: steam, xbox, playstation…
+Remainder: synced
+Remainder: the id
+Remainder: topic
+Remainder: what to find out
+Remainder: what to post
+Remainder: what would make this better
+Remainder: which game
+Remainder: ·
+Remainder: —
+Remainder: …
+Robots: .
+Robots: :
+Robots: A profile can speak through a robot. The personality, the memory and the voice are the same ones — only the form of expression changes.
+Robots: Bind
+Robots: Bind a body
+Robots: Bodies
+Robots: Bound bodies
+Robots: Checked against what the makers were saying on
+Robots: Components it can reach
+Robots: Connections — skills and components
+Robots: Everything it has been told
+Robots: Fit to the open body
+Robots: How it comes across
+Robots: Invariant across
+Robots: No robot task packs published yet.
+Robots: No task modules installed. A robot pack adds verbs to the list above, checked against what this body can physically do.
+Robots: Nothing installed.
+Robots: Nothing yet.
+Robots: Open
+Robots: Open a bound body below first — a task pack is fitted to a particular machine, not to the profile.
+Robots: Owner-only, and kept for the obvious reason: a body in somebody's home should not be able to be sent anywhere with no record.
+Robots: Remove
+Robots: Say it
+Robots: Skills you can fit
+Robots: Steering shapes manner, not permissions. It never touches identity, boundaries, age-gating or what the body may be told to do.
+Robots: Tell it to do something
+Robots: The market
+Robots: Two different things a body is given. A
+Robots: Unbind
+Robots: What is fitted
+Robots: What it has learned
+Robots: What that becomes in a body
+Robots: What this body accepts. Not everything a robot can be told — what
+Robots: apps across
+Robots: bodies from
+Robots: connector
+Robots: from
+Robots: is a service the profile's agents can collect from, act on, or produce into.
+Robots: is permitted, plus any task modules it has learned.
+Robots: makers.
+Robots: pick a model
+Robots: providers.
+Robots: say something about…
+Robots: task pack
+Robots: teaches it verbs: each task in the pack becomes commandable, checked against what that model of body can physically do — a vacuum cannot be taught to fetch, and the refusal says which capability is missing rather than accepting the install and failing later. A
+Robots: this model
+Robots: what you call it
+Robots: ·
+Robots: · bound
+Robots: —
+Robots: →
+Rooms: 18+
+Rooms: 2D, AR and VR sessions · live desks
+Rooms: Kind
+Rooms: Live desks
+Rooms: Live now
+Rooms: No rooms open — start one above.
+Rooms: Nobody is at a desk right now.
+Rooms: Open
+Rooms: Open a room
+Rooms: Rooms
+Rooms: Topic
+Rooms: inside
+Rooms: what it's about
+Rooms: — join from a headset or phone; this desktop shows the room
+Selling: , and the two are not added together — a total across currencies is not a number.
+Selling: , not to the profile you happen to be signed in as — a distinction that cost real money before this screen existed: the sale went through, the receipt said it was on your statement, and the statement was empty.
+Selling: A licence that permits derivatives can only be sold to a verified-18+ buyer. The check runs at the till, where the fee moves, rather than at delivery.
+Selling: A listing in the window
+Selling: A listing is a shop window; an offer is what makes it a shop. The sale accrues to
+Selling: A named locality you type, never coordinates and never anything read off an address or an IP. A rated listing is refused a location outright: where a performer physically is has nothing to do with browsing them.
+Selling: A price on it
+Selling: Accrued
+Selling: Clear the place
+Selling: Creating one needs no account — that is the design, and the seller is established when a price is attached. Signed in, the listing is recorded as yours, which is what lets you take it down again.
+Selling: Earnings
+Selling: No sales yet.
+Selling: Nobody yet.
+Selling: Not offered for licence. That is the ordinary state of a profile, not an error.
+Selling: Nothing to show — sign in as the profile's owner.
+Selling: Only a claimant may take a listing down or move it: whoever made it, the seller on its offer, or the owner of the profile it advertises. It used to take no credential at all, so anyone could remove anyone's — while the same stranger asking to withdraw the
+Selling: Pay out
+Selling: Post this offer
+Selling: Put a price on it
+Selling: Put it in the window
+Selling: Request a payout
+Selling: Revoke
+Selling: Revoking stops the buyer deriving from that licence. It does not unmake an agent already derived from it, and it does not take the fee off your statement — a sale that happened stays on the record.
+Selling: Say where it is
+Selling: Stop offering it
+Selling: Stop selling it
+Selling: Take it down
+Selling: The seller's side. What your profile is offered for, who holds a licence on it, what that has earned, and asking to be paid.
+Selling: Those are your
+Selling: USD
+Selling: What you are owed
+Selling: Where it is offered
+Selling: Who holds a licence
+Selling: Your offer
+Selling: across
+Selling: also served from anywhere
+Selling: blurb
+Selling: clone
+Selling: consult
+Selling: entries —
+Selling: figures. This account also earns in
+Selling: finetune
+Selling: listing id
+Selling: locality, e.g. Oakland, CA
+Selling: offer
+Selling: on it was told it was not theirs.
+Selling: price
+Selling: region
+Selling: sold
+Selling: stock (blank = unlimited)
+Selling: terms
+Selling: title
+Selling: your account
+Selling: ·
+Selling: · lifetime
+Selling: · paid
+Selling: — accrued
+Settings: % similar).
+Settings: (saved — type to replace)
+Settings: , or OpenAI / xAI / Gemini for those providers) and your profiles' replies run on your credential. It is a secret: it stays on this device and rides only your own requests — the server never stores it. Leave it empty to use whatever key the deployment lends.
+Settings: . New accounts must verify by email.
+Settings: . Paste your own key (Anthropic
+Settings: ; paste that here, not your normal password.
+Settings: API connection — where this app's own server lives
+Settings: API key
+Settings: App password
+Settings: Automatic
+Settings: Backend base URL
+Settings: Clear
+Settings: Control Center
+Settings: Different from the connection above: that was
+Settings: Email delivery
+Settings: From address
+Settings: Link address
+Settings: Mail goes out through
+Settings: Mail server
+Settings: No mail server configured, so
+Settings: No profile here wrote this.
+Settings: Not reachable — is the backend running?
+Settings: Offline status
+Settings: Open on your phone
+Settings: Password
+Settings: Paste the text…
+Settings: Paste writing you think came from a profile here. It answers from the text alone, with no credential id, and still answers when the text has been edited.
+Settings: Port
+Settings: Profile:
+Settings: QR code for the studio URL on this network
+Settings: Send a test message to
+Settings: Session
+Settings: Sign out &amp; end session
+Settings: This is the
+Settings: Username
+Settings: Which model answers
+Settings: Who wrote this? — check any text
+Settings: Your model API key — who pays for the AI's words
+Settings: Your profile's replies can run on any of these. Pick one and every reply uses it;
+Settings: address of the QRME backend
+Settings: app password
+Settings: built-in offline helper
+Settings: http://127.0.0.1:8000
+Settings: not
+Settings: nothing can be emailed
+Settings: of
+Settings: passages match (
+Settings: produced by
+Settings: sk-ant-…
+Settings: sk-…
+Settings: smtp.gmail.com
+Settings: the model API key below: the two are different things.
+Settings: this app's server lives; this is
+Settings: this console talks to (the desktop app starts its own; a phone points here over Wi-Fi). It is an address, not a secret — and it is
+Settings: uses whichever is configured.
+Settings: where
+Settings: whose credential the AI generation runs on
+Settings: you are in control
+Settings: you@example.com
+Settings: you@gmail.com
+Settings: ·
+Settings: — no online model has a working key on this deployment. Pick a provider above and add its key.
+Settings: — the one you picked has no key on this deployment yet.
+Settings: — verification messages are written to this app's log and signup on this machine simply goes straight in. Point it at a mail account below to send real verification links. For Gmail, turn on 2-Step Verification and create an
+Settings: — what verification links point at
+Settings: ⚠ Right now it resolves to
+Settings: ⚠ Right now replies come from the
+Signing: , good until
+Signing: , proofed
+Signing: . Finish in the ceremony window.
+Signing: . Over “
+Signing: A signature here is a device credential used with user verification over one exact document. What that does and does not prove is written below, in the words a counterparty will read.
+Signing: Check a package somebody handed you
+Signing: Check it
+Signing: Enrol a credential
+Signing: Envelope
+Signing: How your identity was checked
+Signing: Mint an envelope and sign it
+Signing: Nothing enrolled yet.
+Signing: Open the ceremony
+Signing: Revoke
+Signing: Sign a document
+Signing: Signature
+Signing: Signed as
+Signing: Signing
+Signing: Signing is done as an account, not as a profile page. Sign in as an owner to enrol a credential.
+Signing: The ceremony opens in its own window, on the API's own origin — WebAuthn refuses a credential whose relying party does not match, and this app's origin is not one it can match. That window carries no token; it hands the registration back here, and this screen makes the call.
+Signing: The challenge
+Signing: This asks nothing of us. The package carries its own public key and its own hashes, and the arithmetic either holds or it does not — a check that needed our blessing would be us vouching, which is the opposite of what the evidence is for.
+Signing: This fixes what the credential may sign. A self-asserted one signs the basic tier only; the high tier wants a document check
+Signing: Waiting for the ceremony window.
+Signing: What this account can sign with
+Signing: What this does not prove
+Signing: a key that stayed on one device.
+Signing: and
+Signing: is
+Signing: paste the evidence package (JSON)
+Signing: the exact text being signed
+Signing: the hash of this document, so the signature covers these bytes and no others. Edit the text afterwards and the old signature will not carry — which is the point of it.
+Signing: tier.
+Signing: what signing it means
+Signing: what to call this device
+Signing: what you will be shown when you sign
+Signing: who checked it (required above self-asserted)
+Signing: · did not run, so it is not a pass
+Signing: · revoked
+Signing: · syncs between devices
+Signing: —
+Signing: — checked as
+Signing: ”, meaning “
+Signing: ”.
+Simulate: Horizon
+Simulate: Past runs
+Simulate: Prediction
+Simulate: Run a simulation of
+Simulate: Scenario
+Simulate: Simulations are owner-only — sign in with a profile you own.
+Simulate: What Would They Do
+Simulate: a watermarked prediction — never the person's actual word
+Simulate: e.g. the town council proposes paving over the garden
+Stranger: #tag
+Stranger: , a
+Stranger: , or the id off a printed sticker. Public, because somebody following one has no account yet — which is the whole point of leaving one somewhere.
+Stranger: . That is the name they chose, and all either of you gets.
+Stranger: 18+
+Stranger: @handle
+Stranger: @rosa, #locksmith, or a beacon id
+Stranger: An
+Stranger: Arriving, and strangers
+Stranger: Either side may end it, and ending returns any microphone lent inside — the permission was scoped to this conversation and does not survive it.
+Stranger: End it
+Stranger: Follow a reference
+Stranger: Follow it
+Stranger: Left at
+Stranger: No profile in this one — two people, each seeing only the alias the other chose. Everything here goes out under your own credential: the id in the request says whose turn it is, and the token says who is asking, which is the part that used to be missing.
+Stranger: Nothing answers to that.
+Stranger: Refresh
+Stranger: Send
+Stranger: Talk to a stranger
+Stranger: Talking to
+Stranger: The 18+ queue needs a verified adult on
+Stranger: Waiting for somebody else on the
+Stranger: You need an interactor of your own before you can queue.
+Stranger: both
+Stranger: friendly
+Stranger: queue.
+Stranger: say something
+Stranger: sides before either is admitted to it.
+Stranger: what to be called (defaults to Stranger)
+Stranger: · held back — only you can see this
+TheMark: AI ·
+TheMark: Choose a profile first.
+TheMark: Held back
+TheMark: None.
+TheMark: Nothing waiting.
+TheMark: Nothing yet.
+TheMark: Objections to this profile
+TheMark: Only you see this. A held post is not a published one, and the route that lists what this profile published used to hand these out in full — text and the reason they were held — to anybody who asked, with no credential at all.
+TheMark: Published
+TheMark: Re-attest the basis
+TheMark: Re-attesting is all you can do here, deliberately. You cannot resolve an objection against your own profile — that is a reviewer's call, because an owner who could dismiss it would be deciding their own case.
+TheMark: Reference
+TheMark: Refresh
+TheMark: Reset to the default
+TheMark: Set it
+TheMark: Somebody claiming this profile should not exist — a likeness used without consent, an estate objecting. Opening one restricts the profile straight away, pending review.
+TheMark: The mark
+TheMark: The mark, and what is said about it
+TheMark: What every render says
+TheMark: Whatever you put here, the line comes back with
+TheMark: in front of it. The designation is not a field you can empty — a label without it is rendered with it anyway.
+TheMark: the glyph (✦)
+TheMark: what to call it
+TheMark: ·
+TheMark: · opened
+Visiting: .
+Visiting: 18+ — sign in with a verified adult account to see any of it.
+Visiting: : “
+Visiting: A printed code on a bench, at a meeting, on a counter. Where a profile is left is a decision about the profile — a recovery sponsor's code belongs at a meeting and not on a billboard — so only its owner may place one, list them, or pick one back up.
+Visiting: Ask to come up
+Visiting: Attested by
+Visiting: Coming up
+Visiting: In room
+Visiting: Leave this profile somewhere
+Visiting: Look
+Visiting: Never marked as AI: there is a real person on the other end.
+Visiting: Nothing else came back: not the name, not the portrait. The wall is drawn without ever holding what it refuses.
+Visiting: One room means the people who found the same sticker end up talking to it together. A rated profile is placed one-to-one and asking for a room is refused rather than quietly downgraded.
+Visiting: Pick it up
+Visiting: Place it
+Visiting: Print
+Visiting: Put a hand up
+Visiting: Ring the bell
+Visiting: Ring, or come in
+Visiting: Scan it
+Visiting: Stand in front of a desk
+Visiting: The card is public — a desk is a shopfront. So is the bell: the visitor at an empty chair is exactly the person who has no account yet. An 18+ stream is the one exception, because an anonymous ping channel to an adult performer is not something to hand out.
+Visiting: The overlay draws this over the sticker in the live viewfinder — nobody has navigated anywhere and the camera is still running. The mark travels
+Visiting: Two halves of the same idea: standing in front of somebody else's desk, and leaving your own profile somewhere for a stranger to find.
+Visiting: Visiting, and being found
+Visiting: Watch the stream
+Visiting: What a stranger sees when they scan it
+Visiting: Where it is already
+Visiting: You are not signed in as a visitor, so this would be refused.
+Visiting: a beacon id
+Visiting: a desk id, or scan the code on the counter
+Visiting: a private thread each
+Visiting: anything you want them to see (optional)
+Visiting: comments over the picture.
+Visiting: likes,
+Visiting: on
+Visiting: one room everybody joins
+Visiting: the card, so a surface cannot draw the face without also having been handed the disclosure to draw with it.
+Visiting: the stream is the host's call, so this asks rather than does — and it needs an account, because the host is deciding about a person rather than an anonymous request. Nothing is minted until you are somebody.
+Visiting: what to call it
+Visiting: where it is going
+Visiting: why you would like to come up
+Visiting: with
+Visiting: ·
+Visiting: · picked up
+Visiting: —
+Visiting: — that is what the QR encodes.
+Visiting: ”.
+Voice: .
+Voice: 1 · Permission
+Voice: 2 · Enrollment
+Voice: 3 · The voice
+Voice: A call
+Voice: A direct recording
+Voice: A previous voiceprint was retired when consent was withdrawn. That record stays.
+Voice: A voice note
+Voice: Add this sample
+Voice: Anything spoken in this voice carries a watermark and says it is synthesized.
+Voice: Build my voiceprint
+Voice: Built
+Voice: Granted for:
+Voice: Nothing is recorded until you say so. QRME will only learn
+Voice: Only your own voice — the permission is an attestation, not a checkbox.
+Voice: Say something in it
+Voice: Seconds of speech
+Voice: Speak
+Voice: Still wants:
+Voice: This is my own voice — allow enrollment
+Voice: Voice
+Voice: What always holds
+Voice: Where from
+Voice: Withdraw consent — delete the samples, retire the voice
+Voice: Withdrawing deletes the samples and silences the voice; the withdrawal stays on record.
+Voice: s
+Voice: sample(s) ·
+Voice: samples and
+Voice: your own voice
+Voice: your own voice, with your permission
+Voice: ·
+Voice: — there is no path here for anybody else's.
+Wall: Attach your own photos, videos or files
+Wall: For you
+Wall: Its title, in your words
+Wall: Links from
+Wall: No comments yet.
+Wall: Nothing in the feed yet — friends' posts, profiles you talk to, and tags you engage with land here.
+Wall: Post
+Wall: Say something
+Wall: Send
+Wall: Share a video (optional)
+Wall: Wall
+Wall: Your wall
+Wall: clear
+Wall: paste a link
+Wall: render right here — nothing loads from their side until someone presses play. Your own photos and footage upload as-is, never AI-marked.
+Wall: say something kind
+Wall: the For You feed · every card says why it's here
+Wall: what you're sharing
+Wall: what's on your wall
+Wall: withdraw
+Wall: ·
+Wall: •
+Wall: ↗ share
+Wall: ▶
+Wall: 💬 comments
+Wall: 📄
+WatchParty: (at
+WatchParty: +15s
+WatchParty: ,
+WatchParty: A posted video, a shared position, and whoever you bring — including your own profiles.
+WatchParty: At
+WatchParty: Bring a profile
+WatchParty: Bringing a profile in speaks in its voice, so it needs that profile's own owner token — not yours as a person.
+WatchParty: Description:
+WatchParty: End the party
+WatchParty: Everything a synthetic profile in this party is given — and the absences are the point, so they are listed too.
+WatchParty: It can see
+WatchParty: Join
+WatchParty: Nothing said yet.
+WatchParty: Open
+WatchParty: Say it
+WatchParty: Start
+WatchParty: Start or join
+WatchParty: The room
+WatchParty: The room's position
+WatchParty: This moves a number. It does not press play on anybody's device — each person's own player still starts when they start it.
+WatchParty: Title:
+WatchParty: Transcript:
+WatchParty: Watch together
+WatchParty: What a profile in here knows
+WatchParty: Who is here
+WatchParty: a profile id of yours
+WatchParty: and the position (
+WatchParty: call it something
+WatchParty: on
+WatchParty: party id
+WatchParty: post id (a post with a video)
+WatchParty: profile
+WatchParty: recent line
+WatchParty: s ·
+WatchParty: s)
+WatchParty: s).
+WatchParty: say something
+WatchParty: synthetic
+WatchParty: ·
+WatchParty: −15s
+Workshop: .
+Workshop: :
+Workshop: A domain, and the profile that knows more about it. A question in that domain goes there instead of being guessed at here.
+Workshop: A speaker, an earpiece, a hologram, a robot. The distinction that matters is whether the form can hold a conversation or only relay one.
+Workshop: Add
+Workshop: Add a line
+Workshop: Add it
+Workshop: Also present on:
+Workshop: Ask
+Workshop: Attach
+Workshop: Computed
+Workshop: Fold it back in
+Workshop: How it comes across
+Workshop: Manner, not permissions. Steering never touches identity, boundaries, age-gating, or what the profile may be asked to do.
+Workshop: Name what is in front of you and what you are trying to do, and the profile talks you through it hands-free.
+Workshop: Nothing added yet.
+Workshop: Nothing handed on.
+Workshop: Recognised
+Workshop: Recompute the profile's own model from the history it already has. No body to send, and nothing to configure.
+Workshop: Replaced whole rather than edited row by row — a history is a statement, not a set of fields.
+Workshop: Run it
+Workshop: Sealed in the vault. Only the reference is held here.
+Workshop: Show it something
+Workshop: Signature
+Workshop: Source material: the writing, conversations and life events the persona is built on.
+Workshop: Stored in the clear on this deployment — that is what you are looking at.
+Workshop: The material a profile is built from, the manner it comes across in, and everything it can hand on to somebody who knows more.
+Workshop: The same personality, wherever it is met
+Workshop: This check is public — anybody who meets
+Workshop: This is not an adult-mode profile, so the intimacy dial does not exist here at all.
+Workshop: What it has done
+Workshop: What it is made of
+Workshop: What it knows
+Workshop: What it speaks through
+Workshop: Who it hands work to
+Workshop: a domain, e.g. plumbing
+Workshop: across
+Workshop: can hold a conversation
+Workshop: in any form can look up this signature from the sign-in page, with no profile of their own.
+Workshop: message
+Workshop: period, e.g. 2011–2019
+Workshop: the material itself
+Workshop: the specialist's profile id
+Workshop: title
+Workshop: what it can see, comma separated
+Workshop: what it is
+Workshop: what you are trying to do
+Workshop: what you call it
+Workshop: where
+Workshop: ·
+Workshop: · invariant across
+Workshop: —
+Workshop: →
