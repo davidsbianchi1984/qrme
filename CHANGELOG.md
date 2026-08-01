@@ -4,6 +4,87 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.1] — 2026-08-01
+
+### The refusal that handed the body back
+
+The round in 0.30.0 put every refusal this product *writes* into the reader's
+language, through one handler no raise site opts into. It missed every refusal
+this product *returns*.
+
+    asked     is every refusal this product writes translated
+    mattered  is every refusal this product returns
+
+`RequestValidationError` is not an `HTTPException`. FastAPI raises it before
+routing finishes and renders it with its own handler, so a 422 — the refusal a
+person meets most often, because it is what a mistyped form produces — went out
+past a handler written to catch everything.
+
+**The larger half is what it carried.** Pydantic's error rows hold an `input`
+key with the value that failed, and for a missing field that value is the
+entire submitted body. Driven against the siblings: JIM returned a journal
+entry about chest pain, PDI a record value in plaintext on the one path in an
+encrypted vault that never touches the encryption layer.
+
+Every other part of this ecosystem's error design refuses to carry content.
+`errors.ts` and the nine `Problems` modules record a method, a redacted path
+and a status, and have no parameter a message could arrive through. `cloudgw`
+refuses a report whole if it finds prose in it rather than sanitising it. The
+one place content left the process was the framework's default renderer,
+because nobody had looked at it as ours.
+
+    asked     does this product record anything private
+    mattered  does this product return anything private
+
+**What this is not:** disclosure between people. A 422 goes back to whoever
+sent the request, so what came back was the sender's own body, and no stored
+record was exposed. **What it is:** content on an error path, travelling
+through whatever sits between the app and the person — a proxy's access log, a
+HAR export on a support ticket. A posture with one documented exception is a
+preference.
+
+`type`, `loc` and `msg` are returned; `input` and `ctx` are not, built as an
+allowlist so the response cannot grow a leak by somebody else's release.
+`value_error` and `assertion_error` messages are replaced outright: a validator
+that quotes the value it rejected is the same leak wearing a different key.
+
+On `extra_forbidden` the key is echoed only when it is *shaped* like a field
+name. The first version replaced it always, and
+`test_a_write_that_answers_200_did_something` failed by name — two routes there
+used to accept `dials` for `values` and `years` for `period`, discard them and
+answer 200, and a round was spent making them strict so the caller is told
+which key was wrong.
+
+    asked     can a key carry content
+    mattered  does this key look like content
+
+The guard does not check for the `input` key — that would test the name of the
+leak rather than the leak. It posts a canary at every body-taking route from
+`all_routes` and fails if it appears anywhere in the response; before the fix
+it named **124 routes**. A second check asserts how many of those reached
+validation at all, because a sweep of two hundred routes that all 404 first is
+a spotless report about nothing.
+
+
+### The synthetic self enters the tandem contract
+
+`docs/tandem.md` gains the boundary before the code that will obey it.
+
+Everything the contract described linked JIM to *somebody else's* profile, and
+the JIM user reached QRME as an **interactor** — a stranger. `ProfileKind` is
+`self | other_person | fictional | hybrid` and a `self` profile speaks *as* the
+person; JIM had no column, module or route that knew it existed, and QRME held
+nothing pointing back.
+
+    asked     does JIM reference synthetic profiles
+    mattered  does JIM reference this person's own
+
+An owner token, not an interactor token. The link refused unless QRME reports
+`kind == "self"`. JIM → QRME is an enumerated allowlist, consented per
+category, empty by default, with the composer building the brief *from* the
+allowlist rather than filtering a payload down to it — and no free text from
+the user crossing at all. Byte-identical in all three repositories.
+
 ## [0.30.0] — 2026-08-01
 
 ### Forty-six translated labels, forty-six English screens
