@@ -4,6 +4,66 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.4] — 2026-08-01
+
+### A refusal whose English is not a constant
+
+`refusals_untranslated.txt` has carried the same paragraph for three releases:
+f-string refusals, named as uncovered and deliberately not counted in the
+backlog, because
+
+    f"language must be one of {', '.join(SUPPORTED)}"
+
+cannot be looked up by its English source — at the moment it is raised there is
+no English source, only a result.
+
+    asked     is the refusal a constant we can translate
+    mattered  is every part of it something we can translate
+
+`i18n.Templated` is a `str` whose value is the finished English sentence,
+carrying the template and its slots so `localize_detail` can refill the frame
+in the reader's language. Nothing that already treats a detail as text changed
+— the default English path, JSON encoding, and every driven test asserting on a
+refusal message all work exactly as before.
+
+**The slot is the whole design.** A translated frame around an English slot is
+*worse* than an English sentence: it reads as a bug, in front of somebody who
+is already being told no. That is precisely why this record refuses to ship a
+translated plan gate, and doing it here by accident would have been the same
+mistake with a mechanism to spread it. So whitespace means prose, and a slot
+that fails the test keeps the whole refusal English — the state it was already
+in, now chosen rather than stumbled into.
+
+The known limit is stated rather than hidden: a **single** English word has no
+whitespace either, and is indistinguishable from an identifier.
+
+QRME interpolates closed sets — an objection's `open | upheld | dismissed` —
+so it carries a `Term` marker and a translated vocabulary, resolved at *render*
+rather than at raise, because the reader's language is not known where the
+refusal is raised. An unmapped word keeps the refusal English too, which makes
+coverage structural instead of a list somebody has to remember to update.
+
+**18 of 49 sites converted**; the record now names the reason per site rather
+than "f-string". Seven of the remaining 31 carry prose this product does not
+author — a mail server's exception, a moderation verdict, a hardware
+availability string — and no mechanism changes that.
+
+**Two of my own checks asked the wrong question and were caught by their own
+subjects.** The slot pattern was first written as a character allowlist, which
+quietly meant ASCII: Devanagari writes its vowels as combining marks, which are
+not `\w`, so every Hindi word in the vocabulary failed a rule written to catch
+English sentences. And the vocabulary check asked whether each translation was
+a single token, failing on `वापस ली गई` and `تم التسليم` — correct translations
+that happen to be two words.
+
+    asked     is this translation a single token
+    mattered  is this translation not still English
+
+Six injections, each caught by the right test — including the `Templated`
+branch placed below the plain-string branch, which would have looked up the
+finished sentence, found nothing, and returned English indistinguishably from a
+sentence nobody has translated yet.
+
 ## [0.30.3] — 2026-08-01
 
 ### The refusal that arrived as a list
