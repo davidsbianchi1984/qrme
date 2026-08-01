@@ -145,10 +145,7 @@ function ObjectPane() {
       <div className="card">
         <h3>{L("pub.object.title")}</h3>
         <p className="muted small">
-          You do not need an account, and this page is the proof of it rather
-          than a promise about it. Opening an objection restricts the profile
-          straight away — public surfaces off, no new interactors — before
-          anybody reviews it.
+          {L("pub.object.restricts")}
         </p>
         <div className="row">
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
@@ -163,9 +160,7 @@ function ObjectPane() {
                   onClick={open}>{L("pub.object.open")}</button>
         </div>
         <p className="muted small">
-          The proof reference points at an identity check held outside this
-          system — it is not a login, and it is what lets you object without
-          one.
+          {L("pub.object.ref.note")}
         </p>
       </div>
 
@@ -179,8 +174,7 @@ function ObjectPane() {
             objection is dismissed it goes back to exactly that.
           </p>
           <p className="muted small">
-            Write the id down. It is how you check this case later without an
-            account — there is no inbox here to come back to.
+            {L("pub.object.writeitdown")}
           </p>
         </div>
       )}
@@ -236,9 +230,7 @@ function SamePane() {
       <div className="card">
         <h3>{L("pub.same.title")}</h3>
         <p className="muted small">
-          A profile keeps one identity signature across every form it takes —
-          a chat window, a voice on a speaker, a body in a room. Put the id in
-          and compare it with the one you were given elsewhere.
+          {L("pub.same.explain")}
         </p>
         <div className="row">
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
@@ -320,9 +312,7 @@ function MarkPane() {
               </p>
               {found.verbatim === false && (
                 <p className="small">
-                  The wording has changed since it was stamped. That does not
-                  make it less traceable — it is what the score above is
-                  measuring.
+                  {L("pub.mark.altered")}
                 </p>
               )}
               <p className="muted small">{found.disclosure}</p>

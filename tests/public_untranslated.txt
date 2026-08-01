@@ -1,24 +1,29 @@
 # English left on the public screen — the surface for people with no
 # profile. Checked by test_the_stranger_has_a_language_too.py, both
-# directions, and ratcheted: a line may leave, none may be added without
-# raising the ceiling deliberately.
+# directions, and ratcheted.
 #
-# The action-carrying strings — headings, tabs, placeholders, buttons — are
-# translated across all ten languages in l10n.ts. These are the longer
-# explanatory paragraphs. `l10n.ts`'s table is Partial<Record<Lang, string>>
-# with per-key English fallback, so partial coverage is a supported state
-# there rather than a lie. Partial coverage nobody wrote down is how the
-# console came to promise a language it did not serve in the first place,
-# which is what this file exists to prevent happening twice.
+# Every line below is a **sentence fragment**, and that is the point. The
+# public screen interpolates values mid-sentence — the profile's status, the
+# window counts, the profile id — so what a naive extractor pulls out is
+# "from this moment. It was" and ", and if the objection is dismissed it goes
+# back to exactly that."
 #
-# ceiling: 10
+# Those are not translatable units. Handing them to a translation table one
+# at a time produces word-order nonsense in every language that does not
+# happen to share English's, because the interpolated value belongs somewhere
+# else in the sentence. Translating them *as listed* would be worse than
+# leaving them in English: it would look done and read broken.
+#
+# Fixing them properly means restructuring the JSX so each sentence is one
+# template with its values named — which is a change to the screen, not to a
+# string table, and is its own round.
+#
+# The five whole sentences that were here have been translated into all ten
+# languages and are gone from this list.
+#
+# ceiling: 5
 , and if the objection is dismissed it goes back to exactly that.
-A profile keeps one identity signature across every form it takes — a chat window, a voice on a speaker, a body in a room. Put the id in and compare it with the one you were given elsewhere.
 Produced by a QRME synthetic profile —
-The proof reference points at an identity check held outside this system — it is not a login, and it is what lets you object without one.
-The wording has changed since it was stamped. That does not make it less traceable — it is what the score above is measuring.
 This says nothing about whether a person wrote it. It says no profile
-Write the id down. It is how you check this case later without an account — there is no inbox here to come back to.
-You do not need an account, and this page is the proof of it rather than a promise about it. Opening an objection restricts the profile straight away — public surfaces off, no new interactors — before anybody reviews it.
 from this moment. It was
 has stamped work that shares enough wording with it.
