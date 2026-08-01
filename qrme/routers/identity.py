@@ -20,7 +20,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
-from .. import identity
+from .. import i18n, identity
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -226,8 +226,8 @@ def whose(surface: str, surface_id: str) -> dict:
     """
     if surface not in identity.WHOSE_SURFACES:
         raise HTTPException(
-            422, f"unknown surface {surface!r} — one of "
-                 f"{', '.join(identity.WHOSE_SURFACES)}")
+            422, i18n.fill(i18n.UNKNOWN_SURFACE, surface=surface,
+                           choices=", ".join(identity.WHOSE_SURFACES)))
     out = identity.whose(surface, surface_id)
     if not out:
         raise HTTPException(404, "no such place")

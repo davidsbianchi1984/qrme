@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import auth, db
+from .. import auth, db, i18n
 from ..models import FeedbackSubmit
 
 router = APIRouter()
@@ -31,7 +31,8 @@ def submit_feedback(body: FeedbackSubmit, request: Request) -> dict:
     """Send feedback on how to improve the app."""
     if body.category not in CATEGORIES:
         raise HTTPException(
-            422, f"category must be one of {', '.join(CATEGORIES)}")
+            422, i18n.fill(i18n.MUST_BE_ONE_OF, field="category",
+                                 choices=", ".join(CATEGORIES)))
     message = body.message.strip()
     if not message:
         raise HTTPException(422, "a message is required")

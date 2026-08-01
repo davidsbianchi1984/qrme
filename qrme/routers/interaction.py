@@ -8,8 +8,8 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (adaptation, auth, companion, db, engagement, llm, moderation,
-                persona, referral, roles, voiceprint, watermark)
+from .. import (adaptation, auth, companion, db, engagement, i18n, llm,
+                moderation, persona, referral, roles, voiceprint, watermark)
 from ..common import (
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -637,7 +637,8 @@ def _resolve_message(message_id: str, status: str, request: Request) -> dict:
         raise HTTPException(404, "message not found")
     require_owner(row["profile_id"], request)   # only the owner moderates
     if row["status"] != "pending":
-        raise HTTPException(409, f"message is already {row['status']}")
+        raise HTTPException(409, i18n.fill(
+            i18n.MESSAGE_ALREADY, status=i18n.Term(row["status"])))
     conn.execute("UPDATE messages SET status=? WHERE id=?", (status, message_id))
     conn.commit()
     return {"id": message_id, "status": status}

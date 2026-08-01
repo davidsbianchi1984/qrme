@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import catalog, db, llm, moderation, persona, watermark
+from .. import catalog, db, i18n, llm, moderation, persona, watermark
 from ..common import (content_provenance, profile_or_404, require_owner,
                       source_items)
 from ..models import GameSessionCreate, GameCallout
@@ -67,9 +67,11 @@ def start_session(profile_id: str, body: GameSessionCreate,
     require_owner(profile_id, request)
     platform = _platform_or_422(body.platform)
     if body.role not in ROLES:
-        raise HTTPException(422, f"role must be one of {', '.join(ROLES)}")
+        raise HTTPException(422, i18n.fill(i18n.MUST_BE_ONE_OF, field="role",
+                                 choices=", ".join(ROLES)))
     if body.mode not in MODES:
-        raise HTTPException(422, f"mode must be one of {', '.join(MODES)}")
+        raise HTTPException(422, i18n.fill(i18n.MUST_BE_ONE_OF, field="mode",
+                                 choices=", ".join(MODES)))
     conn = db.connect()
     sid = db.new_id("gms")
     conn.execute(

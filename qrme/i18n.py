@@ -403,6 +403,119 @@ def localize_public(obj, language: str):
 # to every owner who had asked their persona to stay in character.
 
 
+#: What a slot may hold and still be dropped into a translated frame.
+#:
+#: The rule is whitespace. A token — `en`, `openai`, `prf_9f2`, `@ada`,
+#: `/profiles`, `12.00` — has none. English prose has spaces in it, and so does
+#: every other language's. The one allowed exception is a comma-separated list
+#: of tokens, because half the refusals this exists for are "must be one of".
+#:
+#: Deliberately conservative in one direction only: it refuses some slots that
+#: would have been safe (a product name like `Unitree G1`) and never accepts
+#: one that is not. A refused slot costs an English sentence, which is the
+#: state everything was already in. An accepted prose slot costs a sentence
+#: half in one language and half in another, in front of somebody who is
+#: already being told no.
+#:
+#: Whitespace, not an allowlist of characters. The first version of this listed
+#: the characters a token may contain, which quietly meant *ASCII*: Devanagari
+#: writes its vowels as combining marks, which are not `\w`, so every Hindi
+#: word in the vocabulary below failed a rule written to catch English
+#: sentences. Caught by `test_no_vocabulary_word_is_itself_prose`, which was
+#: asking the question the docstring already claimed this asked.
+_SLOT_TOKEN = re.compile(r"^\S*$")
+
+
+def _is_token(value) -> bool:
+    return all(_SLOT_TOKEN.match(part.strip())
+               for part in str(value).split(","))
+
+
+class Templated(str):
+    """A refusal whose English text is not a constant, carried so it can be.
+
+    `f"language must be one of {', '.join(SUPPORTED)}"` cannot be keyed on its
+    English source, because at the moment it is raised there is no English
+    source — only a result. `tests/refusals_untranslated.txt` named 49 of these
+    and counted none of them, and the same held in the sibling products.
+
+        asked     is the refusal a constant we can translate
+        mattered  is every part of it something we can translate
+
+    This is a `str`, and its value is the finished English sentence. Everything
+    that already treats a detail as text keeps working unchanged — the default
+    path, JSON encoding, every driven test asserting on a message. What it adds
+    is a memory of how it was built, so `localize_detail` can look up the
+    *template* and refill it in the reader's language.
+
+    ## The slot is the whole problem
+
+    A translated frame around an English slot is worse than an English
+    sentence: it reads as a mistake, and it is the failure this repository
+    already refuses to ship for the plan gate, whose message interpolates a
+    capability description and a plan title. So a slot that does not look like
+    a token (see `_SLOT_TOKEN`) sets `translatable = False` and the whole
+    sentence stays English — the state it was in before, chosen rather than
+    stumbled into. Nothing raises: a refusal path is the last place to add a
+    way to fail.
+
+    For a closed set of product words — an objection's `status`, say — pass the
+    slot through `term()` first, and the slot arrives already translated.
+    """
+
+    template: str
+    slots: dict
+    translatable: bool
+
+    def __new__(cls, template: str, **slots):
+        text = template.format(**slots)
+        self = super().__new__(cls, text)
+        self.template = template
+        self.slots = slots
+        self.translatable = all(_is_token(v) for v in slots.values())
+        return self
+
+
+def fill(template: str, **slots) -> Templated:
+    """`raise HTTPException(422, i18n.fill(TEMPLATE, choices=...))`.
+
+    A function rather than the class directly, so a raise site reads as a
+    sentence being built and not as an object being constructed.
+    """
+    return Templated(template, **slots)
+
+
+class Term(str):
+    """A slot drawn from the product's own closed vocabulary.
+
+    `f"objection is already {obj['status']}"` has a slot holding `open`,
+    `upheld` or `dismissed` — the API's words, which a client branches on. They
+    stay those words on the wire. But inside a sentence a person reads, an
+    English key in a Portuguese frame is the mixed sentence this whole
+    mechanism exists to prevent, and `_SLOT_TOKEN` cannot catch it: `upheld` is
+    one word with no whitespace, indistinguishable from an identifier.
+
+    So the author marks it, and the marking is what makes it translatable:
+
+        i18n.fill(i18n.OBJECTION_ALREADY, status=i18n.Term(obj["status"]))
+
+    Translated at render, not at raise: the reader's language is not known at
+    the raise site, which is the reason the handler does this work at all.
+    """
+
+
+def term(word: str, language: str) -> str:
+    """One vocabulary word in the reader's language.
+
+    Unknown words come back unchanged, which is a visible gap rather than a
+    confident error — and `test_every_state_a_refusal_can_name_has_a_word`
+    fails on any this product can actually reach.
+    """
+    if language == DEFAULT:
+        return word
+    return _VOCABULARY.get(word, {}).get(language, word)
+
+
 def tr_refusal(text: str, language: str) -> str:
     """Translate one of the sentences this product refuses with.
 
@@ -413,7 +526,8 @@ def tr_refusal(text: str, language: str) -> str:
     """
     if language == DEFAULT:
         return text
-    return (_REFUSALS.get(text) or _VALIDATION.get(text)
+    return (_REFUSALS.get(text) or _TEMPLATES.get(text)
+            or _VALIDATION.get(text)
             or _PUBLIC.get(text, {})).get(language, text)
 
 
@@ -434,6 +548,33 @@ def localize_detail(detail, language: str):
     """
     if language == DEFAULT:
         return detail
+    # Before the plain-string branch: a Templated *is* a str, and its value is
+    # the finished English sentence, which is not a key in any table. Looking
+    # it up would find nothing and return the English — silently, and
+    # indistinguishably from a sentence nobody has translated yet.
+    if isinstance(detail, Templated):
+        if not detail.translatable:
+            return str(detail)
+        # A vocabulary word with no translation would land in the frame as an
+        # English key — the mixed sentence `Term` exists to prevent, arriving
+        # through the mechanism built to prevent it. Structural rather than
+        # enumerated: a status added to a table three modules away cannot be
+        # relied upon to reach a list here, so an unknown word keeps the whole
+        # refusal English instead of being caught by a test that has to be
+        # remembered.
+        vocabulary = [v for v in detail.slots.values() if isinstance(v, Term)]
+        if any(str(v) not in _VOCABULARY for v in vocabulary):
+            return str(detail)
+        frame = tr_refusal(detail.template, language)
+        filling = {k: term(v, language) if isinstance(v, Term) else v
+                   for k, v in detail.slots.items()}
+        try:
+            return frame.format(**filling)
+        except (KeyError, IndexError, ValueError):
+            # A translation whose braces do not match the template's. The
+            # English sentence is correct and complete; a half-formatted one
+            # in the reader's language is not.
+            return str(detail)
     if isinstance(detail, str):
         return tr_refusal(detail, language)
     if isinstance(detail, dict) and isinstance(detail.get("message"), str):
@@ -464,6 +605,159 @@ def refusal_language(request) -> str:
 #: What is here is what every route can raise: the shared owner and interactor
 #: checks in `common.py`, and the credential checks in `auth.py`. What is not
 #: here is recorded in `tests/refusals_untranslated.txt` and ratcheted.
+# --- templates: the refusals whose English is not a constant ----------------
+#
+# Named constants rather than literals at the raise site, so this file is the
+# whole list of them and `test_a_refusal_template_is_translated_or_written_down`
+# can enumerate it. A raise site reads:
+#
+#     raise HTTPException(422, i18n.fill(
+#         i18n.MUST_BE_ONE_OF, field="language",
+#         choices=", ".join(i18n.SUPPORTED)))
+#
+# Every slot in every template below holds a token — a field name, a joined
+# list of machine values, a status word that has already been through `term`.
+# See `Templated` for why that is the whole design constraint.
+
+#: Six routes said this about six different fields. One sentence, one
+#: translation, `field` as a slot: the field name is the API's own and is the
+#: same string in every language.
+MUST_BE_ONE_OF = "{field} must be one of {choices}"
+
+#: `identity` and `overlays` both name a surface that does not exist.
+UNKNOWN_SURFACE = "unknown surface {surface} — one of {choices}"
+
+#: The four governance routes, plus the two elsewhere. Separate templates
+#: rather than one with a `{subject}` slot, and deliberately: "objection",
+#: "message" and "profile" are single English words, and a single English word
+#: is exactly what `_SLOT_TOKEN` cannot tell apart from an identifier. Naming
+#: the subject inside the template puts it where it can be translated.
+OBJECTION_ALREADY = "objection is already {status}"
+MESSAGE_ALREADY = "message is already {status}"
+PROFILE_ALREADY = "profile is already {status}"
+NOT_A_MEMORIAL = "this profile is {status}, not a memorial"
+
+#: Every template this module offers. Derived from the table below rather than
+#: repeated, so a template with no translations is impossible by construction.
+TEMPLATES = (MUST_BE_ONE_OF, UNKNOWN_SURFACE, OBJECTION_ALREADY,
+             MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL)
+
+_TEMPLATES: dict[str, dict[str, str]] = {
+    MUST_BE_ONE_OF: {
+        'es': '{field} debe ser uno de {choices}',
+        'fr': '{field} doit être l\'un de {choices}',
+        'de': '{field} muss eines von {choices} sein',
+        'pt': '{field} deve ser um de {choices}',
+        'it': '{field} deve essere uno tra {choices}',
+        'ja': '{field} は次のいずれかにしてください: {choices}',
+        'zh': '{field} 必须是以下之一：{choices}',
+        'hi': '{field} इनमें से एक होना चाहिए: {choices}',
+        'ar': '{field} يجب أن يكون أحد التالي: {choices}',
+    },
+    UNKNOWN_SURFACE: {
+        'es': 'superficie desconocida {surface} — una de {choices}',
+        'fr': 'surface inconnue {surface} — l\'une de {choices}',
+        'de': 'unbekannte Oberfläche {surface} — eine von {choices}',
+        'pt': 'superfície desconhecida {surface} — uma de {choices}',
+        'it': 'superficie sconosciuta {surface} — una tra {choices}',
+        'ja': '不明なサーフェス {surface} — 次のいずれかです: {choices}',
+        'zh': '未知的呈现面 {surface} — 应为以下之一：{choices}',
+        'hi': 'अज्ञात सतह {surface} — इनमें से एक: {choices}',
+        'ar': 'سطح غير معروف {surface} — أحد التالي: {choices}',
+    },
+    OBJECTION_ALREADY: {
+        'es': 'la objeción ya está {status}',
+        'fr': 'l\'objection est déjà {status}',
+        'de': 'der Einspruch ist bereits {status}',
+        'pt': 'a objeção já está {status}',
+        'it': 'l\'obiezione è già {status}',
+        'ja': 'この異議はすでに{status}です',
+        'zh': '该异议已经{status}',
+        'hi': 'यह आपत्ति पहले ही {status} है',
+        'ar': 'هذا الاعتراض {status} بالفعل',
+    },
+    MESSAGE_ALREADY: {
+        'es': 'el mensaje ya está {status}',
+        'fr': 'le message est déjà {status}',
+        'de': 'die Nachricht ist bereits {status}',
+        'pt': 'a mensagem já está {status}',
+        'it': 'il messaggio è già {status}',
+        'ja': 'このメッセージはすでに{status}です',
+        'zh': '该消息已经{status}',
+        'hi': 'यह संदेश पहले ही {status} है',
+        'ar': 'هذه الرسالة {status} بالفعل',
+    },
+    PROFILE_ALREADY: {
+        'es': 'el perfil ya está {status}',
+        'fr': 'le profil est déjà {status}',
+        'de': 'das Profil ist bereits {status}',
+        'pt': 'o perfil já está {status}',
+        'it': 'il profilo è già {status}',
+        'ja': 'このプロフィールはすでに{status}です',
+        'zh': '该档案已经{status}',
+        'hi': 'यह प्रोफ़ाइल पहले ही {status} है',
+        'ar': 'هذا الملف {status} بالفعل',
+    },
+    NOT_A_MEMORIAL: {
+        'es': 'este perfil está {status}, no es un memorial',
+        'fr': 'ce profil est {status}, ce n\'est pas un mémorial',
+        'de': 'dieses Profil ist {status} und kein Gedenkprofil',
+        'pt': 'este perfil está {status}, não é um memorial',
+        'it': 'questo profilo è {status}, non è un memoriale',
+        'ja': 'このプロフィールは{status}であり、追悼プロフィールではありません',
+        'zh': '该档案为{status}，不是纪念档案',
+        'hi': 'यह प्रोफ़ाइल {status} है, स्मारक नहीं',
+        'ar': 'هذا الملف {status}، وليس ملفًا تذكاريًا',
+    },
+}
+
+#: The product's own closed-set words, for the moment one lands inside a
+#: sentence a person reads. They stay keys on the wire — the console branches
+#: on `status` — so this is only ever applied by `term()` at the last step.
+_VOCABULARY: dict[str, dict[str, str]] = {
+    'open': {'es': 'abierta', 'fr': 'ouverte', 'de': 'offen', 'pt': 'aberta',
+             'it': 'aperta', 'ja': '未処理', 'zh': '待处理', 'hi': 'खुली',
+             'ar': 'مفتوح'},
+    'upheld': {'es': 'aceptada', 'fr': 'acceptée', 'de': 'stattgegeben',
+               'pt': 'aceita', 'it': 'accolta', 'ja': '認容済み',
+               'zh': '支持', 'hi': 'स्वीकृत', 'ar': 'مقبول'},
+    'dismissed': {'es': 'rechazada', 'fr': 'rejetée', 'de': 'abgewiesen',
+                  'pt': 'rejeitada', 'it': 'respinta', 'ja': '却下済み',
+                  'zh': '驳回', 'hi': 'खारिज', 'ar': 'مرفوض'},
+    'withdrawn': {'es': 'retirada', 'fr': 'retirée', 'de': 'zurückgezogen',
+                  'pt': 'retirada', 'it': 'ritirata', 'ja': '取り下げ済み',
+                  'zh': '撤回', 'hi': 'वापस ली गई', 'ar': 'مسحوب'},
+    'delivered': {'es': 'entregado', 'fr': 'livré', 'de': 'zugestellt',
+                  'pt': 'entregue', 'it': 'consegnato', 'ja': '配信済み',
+                  'zh': '送达', 'hi': 'वितरित', 'ar': 'تم التسليم'},
+    'blocked': {'es': 'bloqueado', 'fr': 'bloqué', 'de': 'blockiert',
+                'pt': 'bloqueado', 'it': 'bloccato', 'ja': 'ブロック済み',
+                'zh': '拦截', 'hi': 'अवरुद्ध', 'ar': 'محظور'},
+    'active': {'es': 'activo', 'fr': 'actif', 'de': 'aktiv', 'pt': 'ativo',
+               'it': 'attivo', 'ja': '有効', 'zh': '启用中', 'hi': 'सक्रिय',
+               'ar': 'نشط'},
+    'memorial': {'es': 'memorial', 'fr': 'mémorial', 'de': 'Gedenkprofil',
+                 'pt': 'memorial', 'it': 'memoriale', 'ja': '追悼',
+                 'zh': '纪念', 'hi': 'स्मारक', 'ar': 'تذكاري'},
+    'departed': {'es': 'retirado', 'fr': 'retiré', 'de': 'ausgeschieden',
+                 'pt': 'retirado', 'it': 'ritirato', 'ja': '退出済み',
+                 'zh': '离开', 'hi': 'निवृत्त', 'ar': 'منسحب'},
+    'revoked': {'es': 'revocada', 'fr': 'révoquée', 'de': 'widerrufen',
+                'pt': 'revogada', 'it': 'revocata', 'ja': '取消済み',
+                'zh': '撤销', 'hi': 'निरस्त', 'ar': 'ملغى'},
+    'restricted': {'es': 'restringido', 'fr': 'restreint',
+                   'de': 'eingeschränkt', 'pt': 'restrito',
+                   'it': 'limitato', 'ja': '制限中', 'zh': '受限',
+                   'hi': 'प्रतिबंधित', 'ar': 'مقيد'},
+    'terminated': {'es': 'cerrado', 'fr': 'clôturé', 'de': 'beendet',
+                   'pt': 'encerrado', 'it': 'chiuso', 'ja': '終了済み',
+                   'zh': '终止', 'hi': 'समाप्त', 'ar': 'منهى'},
+    'suspended': {'es': 'suspendido', 'fr': 'suspendu', 'de': 'gesperrt',
+                  'pt': 'suspenso', 'it': 'sospeso', 'ja': '停止中',
+                  'zh': '暂停', 'hi': 'निलंबित', 'ar': 'موقوف'},
+}
+
+
 _REFUSALS: dict[str, dict[str, str]] = {
     'authentication required': {
         'es': 'se requiere autenticación',

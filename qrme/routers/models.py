@@ -69,10 +69,12 @@ def set_profile_language(profile_id: str, body: LanguageChoice,
     require_owner(profile_id, request)
     if body.language not in i18n.SUPPORTED:
         raise HTTPException(
-            422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
+            422, i18n.fill(i18n.MUST_BE_ONE_OF, field="language",
+                                 choices=", ".join(i18n.SUPPORTED)))
     if body.mode not in i18n.MODES:
         raise HTTPException(
-            422, f"mode must be one of {', '.join(i18n.MODES)}")
+            422, i18n.fill(i18n.MUST_BE_ONE_OF, field="mode",
+                                 choices=", ".join(i18n.MODES)))
     i18n.set_language(profile_id, body.language, body.mode)
     logger.info("owner set profile %s language=%s mode=%s",
                 profile_id, body.language, body.mode)
@@ -123,7 +125,8 @@ def set_profile_model(profile_id: str, body: ModelChoice, request: Request) -> d
     require_owner(profile_id, request)
     if body.provider not in llm.CHOICES:
         raise HTTPException(
-            422, f"provider must be one of {', '.join(llm.CHOICES)}")
+            422, i18n.fill(i18n.MUST_BE_ONE_OF, field="provider",
+                                 choices=", ".join(llm.CHOICES)))
     try:
         llm.set_choice(profile_id, body.provider)
     except ValueError as exc:  # defensive: CHOICES already validated above

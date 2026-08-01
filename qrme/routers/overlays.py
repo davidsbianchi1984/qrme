@@ -17,7 +17,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import db, overlays
+from .. import db, i18n, overlays
 from ..auth import principal
 from ..common import require_self
 from .placemic import _members
@@ -55,8 +55,8 @@ def _here(surface: str, surface_id: str) -> list[str]:
 def _present(surface: str, surface_id: str, request: Request) -> str:
     if surface not in overlays.SURFACES:
         raise HTTPException(
-            422, f"unknown surface {surface!r} — one of "
-                 f"{', '.join(overlays.SURFACES)}")
+            422, i18n.fill(i18n.UNKNOWN_SURFACE, surface=surface,
+                           choices=", ".join(overlays.SURFACES)))
     here = _here(surface, surface_id)
     if not here:
         raise HTTPException(404, "no such place")

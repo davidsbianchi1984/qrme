@@ -225,7 +225,8 @@ def reattest_basis(profile_id: str, objection_id: str,
     if obj["profile_id"] != profile_id:
         raise HTTPException(404, "objection not found for this profile")
     if obj["status"] != "open":
-        raise HTTPException(409, f"objection is already {obj['status']}")
+        raise HTTPException(409, i18n.fill(
+            i18n.OBJECTION_ALREADY, status=i18n.Term(obj["status"])))
     conn = db.connect()
     conn.execute("UPDATE objections SET reattested=1 WHERE id=?",
                  (objection_id,))
@@ -245,7 +246,8 @@ def resolve_objection(objection_id: str, body: ObjectionResolve,
     auth.require_reviewer(request)
     obj = _objection_or_404(objection_id)
     if obj["status"] != "open":
-        raise HTTPException(409, f"objection is already {obj['status']}")
+        raise HTTPException(409, i18n.fill(
+            i18n.OBJECTION_ALREADY, status=i18n.Term(obj["status"])))
     if body.outcome not in ("uphold", "dismiss"):
         raise HTTPException(422, "outcome must be 'uphold' or 'dismiss'")
     conn = db.connect()
@@ -288,7 +290,8 @@ def revoke_authorization(objection_id: str, request: Request) -> dict:
     — it must go through the review path."""
     obj = _objection_or_404(objection_id)
     if obj["status"] != "open":
-        raise HTTPException(409, f"objection is already {obj['status']}")
+        raise HTTPException(409, i18n.fill(
+            i18n.OBJECTION_ALREADY, status=i18n.Term(obj["status"])))
     profile = profile_or_404(obj["profile_id"])
     basis = profile["consent_basis"]
     if basis not in _REVOCABLE:
@@ -306,7 +309,8 @@ def _force_terminate(objection_id: str, request: Request, *, basis: str,
     termination."""
     obj = _objection_or_404(objection_id)
     if obj["status"] != "open":
-        raise HTTPException(409, f"objection is already {obj['status']}")
+        raise HTTPException(409, i18n.fill(
+            i18n.OBJECTION_ALREADY, status=i18n.Term(obj["status"])))
     profile = profile_or_404(obj["profile_id"])
     if profile["consent_basis"] != basis:
         raise HTTPException(

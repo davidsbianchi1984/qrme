@@ -118,7 +118,8 @@ def create_profile(body: ProfileCreate) -> dict:
         from .. import i18n
         if body.language not in i18n.SUPPORTED:
             raise HTTPException(
-                422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
+                422, i18n.fill(i18n.MUST_BE_ONE_OF, field="language",
+                               choices=", ".join(i18n.SUPPORTED)))
         i18n.set_language(profile_id, body.language)
     # The standing first friend. Silent when there is nothing to install —
     # an unseeded deployment has no founder, and a cosmetic default must not
@@ -183,7 +184,8 @@ def create_composite(body: CompositeCreate) -> dict:
         from .. import i18n
         if body.language not in i18n.SUPPORTED:
             raise HTTPException(
-                422, f"language must be one of {', '.join(i18n.SUPPORTED)}")
+                422, i18n.fill(i18n.MUST_BE_ONE_OF, field="language",
+                               choices=", ".join(i18n.SUPPORTED)))
         i18n.set_language(profile_id, body.language)
     from .. import friends
     friends.install_founder(profile_id)
@@ -330,7 +332,8 @@ def succeed_profile(profile_id: str, body: SucceedRequest,
     profile = profile_or_404(profile_id)
     auth.require_reviewer(request)
     if profile["status"] in ("departed", "terminated"):
-        raise HTTPException(409, f"profile is already {profile['status']}")
+        raise HTTPException(409, i18n.fill(
+            i18n.PROFILE_ALREADY, status=i18n.Term(profile["status"])))
     # A contested identity cannot be handed to a new owner until the objection
     # is resolved (governance.py owns the objection lifecycle).
     contested = db.connect().execute(
@@ -367,7 +370,8 @@ def memorial_view(profile_id: str) -> dict:
     profile = profile_or_404(profile_id)
     if profile["status"] != "departed":
         raise HTTPException(
-            409, f"this profile is {profile['status']}, not a memorial")
+            409, i18n.fill(i18n.NOT_A_MEMORIAL,
+                           status=i18n.Term(profile["status"])))
     conn = db.connect()
     beacons = [{"label": r["label"], "location": r["location"],
                 "scans": r["scans"]}

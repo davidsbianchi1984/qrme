@@ -29,7 +29,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
-from .. import db, llm, moderation, persona, robotics, watermark
+from .. import db, i18n, llm, moderation, persona, robotics, watermark
 from ..common import profile_or_404, require_owner, source_items
 
 router = APIRouter()
@@ -87,7 +87,8 @@ def bind_robot(profile_id: str, body: RobotBind, request: Request) -> dict:
         provider = body.llm_provider or llm.get_choice(profile_id)
         if provider not in llm.CHOICES:
             raise HTTPException(
-                422, f"llm_provider must be one of {', '.join(llm.CHOICES)}")
+                422, i18n.fill(i18n.MUST_BE_ONE_OF, field="llm_provider",
+                                 choices=", ".join(llm.CHOICES)))
     elif body.llm_provider:
         raise HTTPException(
             422, f"{spec['label']} cannot run an onboard LLM")
