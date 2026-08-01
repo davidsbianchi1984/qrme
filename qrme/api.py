@@ -16,6 +16,8 @@ import os
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.exception_handlers import http_exception_handler
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 from . import avatars as avatar_assets
 from . import i18n, llm, mobile, offline, tiers
@@ -195,6 +197,21 @@ def create_app(pdi_client: PDIClient | None = None,
                 i18n.localize_detail(refusal.detail, language),
                 headers=refusal.headers)
         return await http_exception_handler(request, refusal)
+
+    # The refusal FastAPI renders itself, which is the one a person meets most
+    # often: a mistyped form is a 422. `RequestValidationError` is not an
+    # `HTTPException`, so it went out past the handler above — in English, and
+    # carrying pydantic's `input` key, which on a missing field is the entire
+    # submitted body handed straight back to the caller. See `qrme/i18n.py`;
+    # the sibling products returned a journal entry and a plaintext vault
+    # value the same way.
+    @app.exception_handler(RequestValidationError)
+    async def _rejected_input_stays_with_its_sender(
+            request: Request, invalid: RequestValidationError):
+        return JSONResponse(
+            status_code=422,
+            content={"detail": i18n.validation_detail(
+                invalid.errors(), i18n.refusal_language(request))})
 
     # Bring-your-own model key: ``x-llm-api-key`` rides the request into a
     # context variable the provider layer reads — the caller's generations run
