@@ -11,7 +11,7 @@ from fastapi import (APIRouter, Depends, Header, HTTPException,
 from .. import (auth, companion, composite, db, i18n, identity, persona,
                 storage, terms, tiers)
 from ..common import (
-    age_of, profile_or_404, profile_out, refusals_in, require_owner,
+    age_of, profile_or_404, profile_out, require_owner,
     source_items,
 )
 from ..models import (
@@ -283,8 +283,7 @@ def embodiment_consistency(
     about who is asking.
     """
     language = i18n.negotiate(accept_language)
-    with refusals_in(language):
-        profile = profile_or_404(profile_id)
+    profile = profile_or_404(profile_id)
     sig = persona.identity_signature(profile)
     forms = [{**dict(r), "has_llm": bool(r["has_llm"])} for r in
              db.connect().execute(

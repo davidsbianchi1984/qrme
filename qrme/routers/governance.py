@@ -43,7 +43,7 @@ import logging
 from fastapi import APIRouter, Header, HTTPException, Request
 
 from .. import auth, db, i18n
-from ..common import profile_or_404, refusals_in, require_owner
+from ..common import profile_or_404, require_owner
 from ..models import ObjectionOpen, ObjectionResolve
 
 router = APIRouter()
@@ -136,8 +136,7 @@ def open_objection(body: ObjectionOpen, request: Request,
     Suspends the profile pending review — including a departed memorial, which
     an estate may contest. A terminated profile is already gone."""
     language = i18n.negotiate(accept_language)
-    with refusals_in(language):
-        profile = profile_or_404(body.profile_id)
+    profile = profile_or_404(body.profile_id)
     if profile["status"] == "terminated":
         raise HTTPException(409, i18n.tr_public(
             "profile is terminated; there is nothing left to object to",
@@ -171,8 +170,7 @@ def get_objection(objection_id: str,
     """Public status check for the objecting party (their proof reference is
     returned so they can confirm it's their case)."""
     language = i18n.negotiate(accept_language)
-    with refusals_in(language):
-        obj = _objection_or_404(objection_id)
+    obj = _objection_or_404(objection_id)
     return i18n.localize_public(
         {"id": obj["id"], "profile_id": obj["profile_id"],
          "status": obj["status"], "reattested": bool(obj["reattested"]),

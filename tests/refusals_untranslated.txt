@@ -1,0 +1,191 @@
+# English refusals — the sentences this product says when it says no.
+# Checked by test_the_platform_refuses_in_one_language.py, both directions,
+# and ratcheted.
+#
+# qrme/i18n.py opens with "the persona speaks it everywhere". It does. The
+# platform did not: every 4xx an owner received was English, on an account
+# where they had chosen Portuguese, where the model answered them in
+# Portuguese, and where the console's sidebar was in Portuguese too.
+#
+#     asked     did the caller state a language
+#     mattered  did the profile
+#
+# One handler now translates every refusal into the reader's own language, and
+# the eleven sentences any route can raise — the shared owner and interactor
+# checks, the credential checks — are translated. These 142 are not, and pass
+# through as English, which is a visible gap rather than a confident error.
+#
+# ## What this file does not cover
+#
+# **49 f-string refusals.** Sentences built with interpolation —
+# `f"language must be one of {', '.join(SUPPORTED)}"` and its kind — cannot be
+# keyed on their English source, because their English source is not a
+# constant. Translating them needs a template with named slots, which is the
+# machinery `l10n.ts` already has as `fill` and this module does not. They are
+# named here rather than counted in, so 142 cannot be read as the whole
+# number.
+#
+# **The plan gate.** `tiers.gate` raises a dict whose `message` comes from
+# `tiers.refusal()` — a template with four slots, two of which are themselves
+# English prose (`CAPABILITIES[c]["is"]`, a plan title). The handler already
+# translates that `message` when the table has it; the table does not, and
+# will not until the slots do. Translating the frame alone would produce a
+# sentence half in each language, at the one moment in this product that
+# stands between somebody and a decision to pay. That is precisely what this
+# file exists to prevent, so it is written down rather than half-done.
+#
+# ## The rule for what is not translated on purpose
+#
+# One sentence here stays English by decision, not by backlog:
+#
+#     this deployment is reachable beyond localhost but has no
+#     QRME_ADMIN_TOKEN configured — objection review and succession stay
+#     closed until it is
+#
+# The person who can act on it is the operator reading a log, the fix is the
+# name of an environment variable, and no reader of a translated version could
+# do anything a reader of this one could not.
+#
+# ceiling: 142
+18+ only — present an interactor token whose verified birthdate shows 18 or older
+a buyer acts with an interactor token
+a ceremony needs the challenge to sign over
+a connection is between two people, so this needs the token of one of them rather than a profile's owner token
+a handoff requires the user's explicit consent
+a licence that permits deriving an agent requires a verified-18+ buyer — the same bar deriving one does, applied before the fee rather than after
+a message is required
+a pack needs at least one knowledge item
+a rated profile is placed one-to-one. A shared room behind an adult code in a public place is a different product with different moderation questions, not a flag on this one
+a room turn is spoken by a person, so this needs the token of a user participant rather than a profile's owner token
+acceptance of the Terms of Service is required to create a profile (GET /terms)
+acquiring a license on a rated profile requires a verified-18+ buyer
+adult mode is never available for a profile of another real person
+adult mode requires a verified adult owner
+an agent has already been derived here
+an owner token is required
+app connector not found
+approval actions: approve, reject
+assist needs input — what the paused phase asked for
+authentication required — this is for the people who are here
+authentication required — this room's disclosure is for the people in it
+base_age cannot be negative
+beacon not found
+beacons are for publish connections
+campaign not found
+coming up on stream needs an account — the host is deciding about a person, not an anonymous request
+connection has been revoked
+connection not found
+connector has been revoked
+deriving an agent requires a verified-adult buyer
+every item in a robot pack needs a task (the command verb)
+excursion not found
+game session not found
+gifting is 18+
+gifting requires a verified birthdate on your account — an unverified age is not evidence of an adult
+gifts come from a person, so this needs an interactor token
+grant not found
+grant revoked or unknown
+handoff not found
+hybrid profiles are created via POST /profiles/composite, from at least two source profiles
+kind must be consult, finetune, or clone
+license not found
+listing not found
+message not found
+mode must be 'sign' or 'enroll'
+no PDI vault configured (set QRME_PDI_URL / QRME_PDI_TOKEN)
+no delegated workflow with that id
+no embedding yet — interact first
+no engagement recorded
+no lesson covers that screen
+no mail server is configured — save one first
+no such agent
+no such credential
+no such desk
+no such desk beacon
+no such listing
+no such place
+no such profile
+no such referral
+no such ring
+no such signature
+no such watermark — this content was not credentialed by this QRME deployment
+no synthetic profiles in this room
+no view available for this desk
+not a participant in this connection
+not authorized for this account
+not in conversation with this profile; delegated work is for somebody already talking to it
+not this organization's owner
+not your credential
+not your envelope
+not your listing
+not yours to remove
+nothing accrued — the balance is zero
+nothing answers to that code
+nothing answers to that reference
+objection not found for this profile
+only a profile's owner can bring it into a room
+only adult-mode profiles are placed at adult venues
+organization not found
+outcome must be 'uphold' or 'dismiss'
+owners under 18 require parent/guardian consent
+pack already installed on this profile
+pack already installed on this robot
+pack not found
+pack not installed on this profile
+pack not installed on this robot
+placement not found
+price cannot be negative
+profile has already departed
+profile has an open objection; resolve it before succession
+profile is not listed
+profile knowledge packs install onto the profile — omit robot_id
+profile listings require profile_id
+profiles of another real person require a consent/rights record
+provider not found
+publishing needs an owner token
+rated packs install only onto adult-mode profiles
+rating must be 1–5
+renewing charges a period, so it needs the beneficiary the money accrues to
+robot not found
+robot not found on this profile
+robot packs install onto a bound robot — pass robot_id
+room not found
+say requires an arg (what to speak about)
+social connection not found
+that is not yours to remove
+that is not yours to say
+that profile is not yours. Bringing somebody else's into your session is a two-party agreement — see the skill-grant routes, which already ask both sides
+the rated tier requires verified 18+ participants
+this beacon has been picked up
+this connection has ended
+this connection is for collecting, not publishing
+this connection is for publishing, not collecting
+this deployment is reachable beyond localhost but has no QRME_ADMIN_TOKEN configured — objection review and succession stay closed until it is
+this excursion has no findings to learn
+this game session has ended
+this license belongs to another buyer
+this license does not permit deriving an agent (consult only)
+this license has been revoked
+this listing is not for sale
+this pack is age-restricted (18+); present a verified-18+ interactor token or an adult-mode owner token
+this profile has been terminated
+this profile has departed
+this profile has departed; its memory remains viewable
+this profile is age-gated; verified 18+ required
+this profile is not a hybrid
+this profile is not offered for license
+this profile is reactive-only; its owner has not enabled proactive outreach
+this profile is restricted pending an objection review; it is not accepting new interactors
+this profile no longer answers
+this profile's license is age-restricted (18+); present a verified-18+ interactor token
+this token names no profile
+token does not resolve to a profile
+token invalid or revoked
+unknown registry
+unknown venue
+workflow actions: advance, assist, cancel
+workflow not found
+you are not here
+you are not in this lobby
+you are not in this room
+you are not in this watch party

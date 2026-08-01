@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import json
 from datetime import date, datetime, timedelta, timezone
 
@@ -19,28 +18,26 @@ def age_of(birthdate: date) -> int:
     )
 
 
-@contextlib.contextmanager
-def refusals_in(language: str):
-    """Re-raise whatever refuses inside, with its sentence translated.
-
-    For the four routes whose caller has no account. `profile_or_404` and its
-    siblings are shared with every owner route and say "profile not found" in
-    English, which is right there — the owner picked that language — and wrong
-    on the accountless screen, where the reader's browser said otherwise and
-    nothing looked.
-
-    Narrow on purpose: only the public routes wrap themselves in this, so an
-    owner's refusal is untouched and no existing caller changes. Anything the
-    table does not have falls through as English rather than being guessed at.
-    """
-    from . import i18n
-    try:
-        yield
-    except HTTPException as refusal:
-        raise HTTPException(
-            refusal.status_code,
-            i18n.tr_public(str(refusal.detail), language),
-            headers=refusal.headers) from None
+# `refusals_in` stood here for five releases: a context manager the four
+# accountless routes wrapped themselves in, translating whatever refused
+# inside. Its docstring said why the owner routes were left out —
+#
+#     `profile_or_404` and its siblings are shared with every owner route and
+#     say "profile not found" in English, which is right there — the owner
+#     picked that language
+#
+# — and the owner had not picked that language. They had picked one; it was in
+# `language_prefs`; the persona had been speaking it for eleven releases.
+#
+#     asked     did the caller state a language
+#     mattered  did the profile
+#
+# `create_app`'s exception handler now translates every refusal in the product
+# for whoever is reading it, so this helper's whole job is done in one place
+# that no route has to opt into. Keeping it as well would have left two paths
+# translating one sentence, free to drift, with nothing to say which reader got
+# which — the same argument `i18n.tr_refusal` makes for consulting one table
+# rather than two.
 
 
 def profile_or_404(profile_id: str) -> dict:

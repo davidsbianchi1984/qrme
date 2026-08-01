@@ -348,3 +348,246 @@ def localize_public(obj, language: str):
     if isinstance(obj, str):
         return tr_public(obj, language)
     return obj
+
+
+# --------------------------------------------------------------------------- #
+# The product's own refusals
+# --------------------------------------------------------------------------- #
+#
+# The first line of this module says the persona speaks the owner's language
+# everywhere. It does — `directive` rides on the system prompt, so every
+# generation site inherits it. The *platform* spoke English: every 4xx an owner
+# received, on an account where they had chosen Portuguese, where the model
+# answered them in Portuguese, and where the console's sidebar was in
+# Portuguese too.
+#
+# `common.refusals_in` was added for the four accountless routes and its
+# docstring said why the owner routes were left out:
+#
+#     `profile_or_404` and its siblings are shared with every owner route and
+#     say "profile not found" in English, which is right there — the owner
+#     picked that language
+#
+# The owner did not pick that language. They picked one, it is in
+# `language_prefs`, and English is what they get when they picked English. The
+# justification for the scope was the defect.
+#
+#     asked     did the caller state a language
+#     mattered  did the profile
+#
+# ## Whose language
+#
+# Not the profile named in the path. `GET /profiles/{id}/consistency` is a
+# public route: the reader is a stranger asking about somebody else's profile,
+# and answering them in *that owner's* language would be a new wrong answer
+# dressed as a fix. Not `Accept-Language` either — a console owner's browser
+# sends `en-US` whatever they set in the app, which would have made the whole
+# thing a no-op that passed its own tests.
+#
+#     asked     whose language is stored here
+#     mattered  who is reading this sentence
+#
+# The credential names the reader. An owner token means the profile's own
+# setting; anything else — an interactor, a reviewer, no token at all — means
+# the header, which is all such a reader carries.
+#
+# ## Which of the two stored values
+#
+# `get_language`, not `effective_language`. The latter returns English whenever
+# the mode is `on_demand`, and that mode is a statement about the *persona's*
+# voice — "keep speaking as you were, I will translate what I choose". It says
+# nothing about what the owner reads. Reusing it here would have looked right,
+# passed a test written with a `pre`-mode profile, and served English refusals
+# to every owner who had asked their persona to stay in character.
+
+
+def tr_refusal(text: str, language: str) -> str:
+    """Translate one of the sentences this product refuses with.
+
+    `_PUBLIC` is consulted too, and deliberately: "profile not found" is
+    raised by `profile_or_404`, which the accountless routes and every owner
+    route share. Two tables would be two translations of one sentence, free to
+    drift, with nothing to say which reader got which.
+    """
+    if language == DEFAULT:
+        return text
+    return (_REFUSALS.get(text) or _PUBLIC.get(text, {})).get(language, text)
+
+
+def localize_detail(detail, language: str):
+    """An HTTPException detail, translated in whichever shape it arrives.
+
+    Details are usually a sentence. `tiers.gate` raises a **dict** — reason,
+    capability, price, and a `message` a person reads — because a client has
+    to tell an upgrade apart from a purchase without matching on prose. A
+    handler that translated only `str` would have left the plan gate in
+    English: the one refusal in this product that stands between somebody and
+    a decision to pay, untouched, while everything around it changed language.
+
+    Only `message` is translated. `reason`, `capability`, `needs` and `have`
+    are the API's vocabulary — the console branches on them — and the same
+    rule holds here as for `_PUBLIC`: what a person reads is translated, what
+    a client compares is not.
+    """
+    if language == DEFAULT:
+        return detail
+    if isinstance(detail, str):
+        return tr_refusal(detail, language)
+    if isinstance(detail, dict) and isinstance(detail.get("message"), str):
+        return {**detail, "message": tr_refusal(detail["message"], language)}
+    return detail
+
+
+def refusal_language(request) -> str:
+    """The language the person receiving this refusal reads.
+
+    Never raises and never touches the response path's own error handling: a
+    diagnostic that can fail is worse than one that is in the wrong language.
+    """
+    from . import auth
+    try:
+        who = auth.principal(request)
+        if who and who.get("role") == "owner":
+            return get_language(who["subject_id"])
+    except Exception:
+        pass
+    return negotiate(request.headers.get("accept-language"))
+
+
+#: Sentences the product refuses with, keyed on the English source the way
+#: `_PUBLIC` is — so editing the English falls back loudly to the new English
+#: rather than quietly serving the old sentence in nine languages.
+#:
+#: What is here is what every route can raise: the shared owner and interactor
+#: checks in `common.py`, and the credential checks in `auth.py`. What is not
+#: here is recorded in `tests/refusals_untranslated.txt` and ratcheted.
+_REFUSALS: dict[str, dict[str, str]] = {
+    'authentication required': {
+        'es': 'se requiere autenticación',
+        'fr': 'authentification requise',
+        'de': 'Authentifizierung erforderlich',
+        'pt': 'autenticação necessária',
+        'it': 'autenticazione richiesta',
+        'ja': '認証が必要です',
+        'zh': '需要身份验证',
+        'hi': 'प्रमाणीकरण आवश्यक है',
+        'ar': 'المصادقة مطلوبة',
+    },
+    'not authorized for this resource': {
+        'es': 'sin autorización para este recurso',
+        'fr': 'non autorisé pour cette ressource',
+        'de': 'keine Berechtigung für diese Ressource',
+        'pt': 'sem autorização para este recurso',
+        'it': 'non autorizzato per questa risorsa',
+        'ja': 'このリソースへの権限がありません',
+        'zh': '无权访问此资源',
+        'hi': 'इस संसाधन के लिए अधिकार नहीं है',
+        'ar': 'غير مخوَّل للوصول إلى هذا المورد',
+    },
+    "authentication required — this acts on somebody's behalf, so it has to "
+    "know it is them": {
+        'es': 'se requiere autenticación — esto actúa en nombre de alguien, '
+              'así que tiene que saber que es esa persona',
+        'fr': "authentification requise — ceci agit au nom de quelqu'un, il "
+              "faut donc savoir que c'est bien cette personne",
+        'de': 'Authentifizierung erforderlich — dies handelt im Namen einer '
+              'Person, also muss feststehen, dass sie es ist',
+        'pt': 'autenticação necessária — isto age em nome de alguém, por isso '
+              'tem de saber que é essa pessoa',
+        'it': 'autenticazione richiesta — questo agisce per conto di '
+              'qualcuno, quindi deve sapere che è davvero lui',
+        'ja': '認証が必要です — これは誰かの代理として行う操作なので、本人で'
+              'あることを確かめる必要があります',
+        'zh': '需要身份验证 — 此操作代表他人执行，因此必须确认是本人',
+        'hi': 'प्रमाणीकरण आवश्यक है — यह किसी की ओर से किया जाने वाला कार्य है, '
+              'इसलिए यह जानना ज़रूरी है कि वह वही व्यक्ति है',
+        'ar': 'المصادقة مطلوبة — هذا الإجراء يتم نيابةً عن شخص، لذا يجب '
+              'التأكد من أنه هو',
+    },
+    'that is not you — an id in a request body is a claim, and this one does '
+    'not match the token presented': {
+        'es': 'esa no es tu identidad — un id en el cuerpo de una petición es '
+              'una afirmación, y este no coincide con el token presentado',
+        'fr': "ce n'est pas vous — un identifiant dans le corps d'une requête "
+              "est une affirmation, et celui-ci ne correspond pas au jeton "
+              "présenté",
+        'de': 'das sind nicht Sie — eine ID im Anfragetext ist eine '
+              'Behauptung, und diese passt nicht zum vorgelegten Token',
+        'pt': 'essa não é a sua identidade — um id no corpo de um pedido é '
+              'uma afirmação, e este não corresponde ao token apresentado',
+        'it': "quella non è la tua identità — un id nel corpo di una "
+              "richiesta è un'affermazione, e questo non corrisponde al token "
+              "presentato",
+        'ja': 'それはあなたではありません — リクエスト本文の id は主張にすぎず、'
+              '提示されたトークンと一致しません',
+        'zh': '那不是你 — 请求体中的 id 只是一种声称，而它与所出示的令牌不符',
+        'hi': 'वह आप नहीं हैं — अनुरोध के मुख्य भाग में दिया गया id एक दावा है, '
+              'और यह प्रस्तुत टोकन से मेल नहीं खाता',
+        'ar': 'هذا لست أنت — المعرِّف في جسم الطلب مجرد ادعاء، وهو لا يطابق '
+              'الرمز المقدَّم',
+    },
+    'only the people involved in this can act on it': {
+        'es': 'solo las personas implicadas en esto pueden actuar sobre ello',
+        'fr': 'seules les personnes concernées peuvent agir ici',
+        'de': 'nur die daran beteiligten Personen können hier handeln',
+        'pt': 'só as pessoas envolvidas nisto podem agir sobre isto',
+        'it': 'solo le persone coinvolte possono agire su questo',
+        'ja': 'これに関わっている人だけが操作できます',
+        'zh': '只有参与此事的人才能对其进行操作',
+        'hi': 'इसमें शामिल लोग ही इस पर कार्रवाई कर सकते हैं',
+        'ar': 'لا يمكن التصرف في هذا إلا للأشخاص المعنيين به',
+    },
+    'interactor not found': {
+        'es': 'interlocutor no encontrado',
+        'fr': 'interlocuteur introuvable',
+        'de': 'Interaktionspartner nicht gefunden',
+        'pt': 'interlocutor não encontrado',
+        'it': 'interlocutore non trovato',
+        'ja': '対話相手が見つかりません',
+        'zh': '未找到互动者',
+        'hi': 'संवादकर्ता नहीं मिला',
+        'ar': 'لم يتم العثور على المتفاعل',
+    },
+    'reviewer token required': {
+        'es': 'se requiere un token de revisor',
+        'fr': "jeton d'examinateur requis",
+        'de': 'Prüfer-Token erforderlich',
+        'pt': 'é necessário um token de revisor',
+        'it': 'è richiesto un token di revisore',
+        'ja': '審査者トークンが必要です',
+        'zh': '需要审核员令牌',
+        'hi': 'समीक्षक टोकन आवश्यक है',
+        'ar': 'رمز المراجع مطلوب',
+    },
+    'invalid reviewer token': {
+        'es': 'token de revisor no válido',
+        'fr': "jeton d'examinateur invalide",
+        'de': 'ungültiges Prüfer-Token',
+        'pt': 'token de revisor inválido',
+        'it': 'token di revisore non valido',
+        'ja': '審査者トークンが無効です',
+        'zh': '审核员令牌无效',
+        'hi': 'समीक्षक टोकन अमान्य है',
+        'ar': 'رمز المراجع غير صالح',
+    },
+    'this deployment requires a signup key to create a profile — send it as '
+    'the x-signup-key header': {
+        'es': 'esta instalación requiere una clave de registro para crear un '
+              'perfil — envíala en la cabecera x-signup-key',
+        'fr': "cette installation exige une clé d'inscription pour créer un "
+              "profil — envoyez-la dans l'en-tête x-signup-key",
+        'de': 'diese Installation verlangt einen Registrierungsschlüssel, um '
+              'ein Profil anzulegen — senden Sie ihn im Header x-signup-key',
+        'pt': 'esta instalação exige uma chave de registo para criar um '
+              'perfil — envie-a no cabeçalho x-signup-key',
+        'it': 'questa installazione richiede una chiave di registrazione per '
+              "creare un profilo — inviala nell'intestazione x-signup-key",
+        'ja': 'この配備でプロフィールを作成するには登録キーが必要です — '
+              'x-signup-key ヘッダーで送ってください',
+        'zh': '此部署需要注册密钥才能创建档案 — 请在 x-signup-key 请求头中发送',
+        'hi': 'इस परिनियोजन में प्रोफ़ाइल बनाने के लिए साइनअप कुंजी चाहिए — इसे '
+              'x-signup-key हेडर में भेजें',
+        'ar': 'يتطلب هذا النشر مفتاح تسجيل لإنشاء ملف تعريف — أرسله في ترويسة '
+              'x-signup-key',
+    },
+}

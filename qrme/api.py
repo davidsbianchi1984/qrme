@@ -14,10 +14,11 @@ from __future__ import annotations
 
 import os
 
-from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi.exception_handlers import http_exception_handler
 
 from . import avatars as avatar_assets
-from . import llm, mobile, offline, tiers
+from . import i18n, llm, mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
@@ -171,6 +172,29 @@ def create_app(pdi_client: PDIClient | None = None,
         app.add_middleware(
             CORSMiddleware, allow_origins=allow, allow_credentials=False,
             allow_methods=["*"], allow_headers=["*"])
+
+    # Every refusal, in the language of whoever is reading it.
+    #
+    # One handler rather than a call at the top of each route, for the reason
+    # the membership gate is one dependency: a sentence cannot be added to the
+    # product and forgotten at one of its raise sites, because no raise site
+    # opts in. `qrme/i18n.py` carries the whole argument — whose language it
+    # is, why the credential answers that and neither the path nor the browser
+    # header does, and why `get_language` rather than `effective_language`.
+    #
+    # Untranslated sentences pass through as English, which is a visible gap
+    # rather than a confident error, and is recorded in
+    # `tests/refusals_untranslated.txt` rather than left to be noticed.
+    @app.exception_handler(HTTPException)
+    async def _refusal_in_the_readers_language(
+            request: Request, refusal: HTTPException):
+        language = i18n.refusal_language(request)
+        if language != i18n.DEFAULT:
+            refusal = HTTPException(
+                refusal.status_code,
+                i18n.localize_detail(refusal.detail, language),
+                headers=refusal.headers)
+        return await http_exception_handler(request, refusal)
 
     # Bring-your-own model key: ``x-llm-api-key`` rides the request into a
     # context variable the provider layer reads — the caller's generations run
