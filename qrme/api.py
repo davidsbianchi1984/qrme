@@ -205,13 +205,28 @@ def create_app(pdi_client: PDIClient | None = None,
     # submitted body handed straight back to the caller. See `qrme/i18n.py`;
     # the sibling products returned a journal entry and a plaintext vault
     # value the same way.
+    # `message` rides alongside because `detail` is a list, and a list is not
+    # something any of this product's nine clients could show a person. The
+    # consoles printed it as JSON, the Android shells did the same by
+    # coercion, and the iOS and Windows shells asked for a string, got an
+    # array, and fell back to "HTTP 422".
+    #
+    #     asked     is the refusal translated
+    #     mattered  is the refusal a sentence
+    #
+    # `detail` keeps its shape: it is the FastAPI contract, it is what the
+    # driven tests read, and a machine reading this API has every right to the
+    # rows. The sentence carries nothing the rows do not — see
+    # `qrme/i18n.py:validation_message`.
     @app.exception_handler(RequestValidationError)
     async def _rejected_input_stays_with_its_sender(
             request: Request, invalid: RequestValidationError):
+        language = i18n.refusal_language(request)
+        rows = i18n.validation_detail(invalid.errors(), language)
         return JSONResponse(
             status_code=422,
-            content={"detail": i18n.validation_detail(
-                invalid.errors(), i18n.refusal_language(request))})
+            content={"detail": rows,
+                     "message": i18n.validation_message(rows, language)})
 
     # Bring-your-own model key: ``x-llm-api-key`` rides the request into a
     # context variable the provider layer reads — the caller's generations run

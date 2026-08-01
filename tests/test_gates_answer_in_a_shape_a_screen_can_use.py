@@ -122,7 +122,16 @@ def test_the_console_reads_the_structure_rather_than_stringifying_it():
     assert not throw, (
         "req() is stringifying the structured detail again — the object the "
         "backend built for a screen would be shown to the user raw")
-    assert "new RequestError(res.status, detail)" in api
+    # The structure rides out on the typed error. Matched as a prefix rather
+    # than as the whole call: this pinned the exact two-argument spelling, and
+    # broke when a third argument was added to carry the 422's sentence beside
+    # the rows — a change that keeps `detail` exactly where this cares about
+    # it. What matters is that the structure is still handed over unflattened.
+    #
+    #     asked     is the call spelled this exact way
+    #     mattered  does the structure still ride out on it
+    assert re.search(r"new RequestError\(res\.status, detail\b", api), (
+        "req() no longer hands the structured detail to RequestError")
 
     refusal = (REPO / "app/src/Refusal.tsx").read_text(encoding="utf-8")
     # The price and the disclosure are rendered together, not separately.

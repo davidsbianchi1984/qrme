@@ -139,22 +139,41 @@ export const accountApi = {
  *  So `message` is now the human sentence the object already carried, and the
  *  structure rides along on `detail` for anything that wants to render it
  *  properly. Existing `catch (e) { (e as Error).message }` keeps working and
- *  simply gets better. */
+ *  simply gets better.
+ *
+ *  ## The shape that walked past all of it
+ *
+ *  A 422 answers with a *list*, not an object: pydantic's rows, one per field.
+ *  `sentence` below handled a string and an object carrying `message`, and a
+ *  list is an object with no `message`, so it fell through to the
+ *  `JSON.stringify` written for the unhandled case — and a mistyped form
+ *  showed `[{"type":"missing","loc":["body","display_name"],...}]`.
+ *
+ *      asked     does a structured refusal reach the reader as a sentence
+ *      mattered  does every structured refusal
+ *
+ *  The backend composes that sentence now (`qrme/i18n.py:validation_message`),
+ *  in the reader's language, and `req` passes it in beside the rows. */
 export class RequestError extends Error {
   readonly status: number;
   readonly detail: unknown;
 
-  constructor(status: number, detail: unknown) {
-    super(RequestError.sentence(detail));
+  constructor(status: number, detail: unknown, message?: unknown) {
+    super(RequestError.sentence(detail, message));
     this.name = "RequestError";
     this.status = status;
     this.detail = detail;
   }
 
-  /** The most human thing in the payload. A structured refusal that carries
-   *  its own `message` is quoted; anything else falls back to the JSON, which
-   *  is at least honest about being unhandled. */
-  private static sentence(detail: unknown): string {
+  /** The most human thing in the payload. A sentence the body carried
+   *  alongside the structure wins; then a structured refusal quoting its own
+   *  `message`; and only then the JSON, which is at least honest about being
+   *  unhandled.
+   *
+   *  `message` is checked first and not last because the case it exists for —
+   *  the 422 list — reaches the fallback otherwise, which is how it got out. */
+  private static sentence(detail: unknown, message?: unknown): string {
+    if (typeof message === "string" && message) return message;
     if (typeof detail === "string") return detail;
     if (detail && typeof detail === "object") {
       const m = (detail as { message?: unknown }).message;
@@ -1039,7 +1058,10 @@ async function req<T>(
     const body = data as { detail?: unknown; message?: unknown } | null;
     const detail = (body && (body.detail ?? body.message)) ?? text.trim()
       ?? res.statusText;
-    throw new RequestError(res.status, detail);
+    // The sentence rides beside the structure rather than replacing it: a
+    // screen that renders the plan gate's buttons still gets `detail`, and a
+    // screen that only shows `e.message` stops showing a serialised list.
+    throw new RequestError(res.status, detail, body?.message);
   }
   return data as T;
 }
@@ -2846,7 +2868,13 @@ export const api = {
       headers: { authorization: `Bearer ${token}` },
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error((data as { detail?: string }).detail || `upload failed (${res.status})`);
+    // `detail` here can be the 422 list, which stringifies to "[object
+    // Object]" through Error. The sentence beside it is what a person reads.
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status, body.detail ?? `upload failed (${res.status})`,
+                             body.message);
+    }
     return data as MediaUpload;
   },
   mediaLimits: () =>
@@ -4863,8 +4891,9 @@ export async function uploadMedia(profileId: string, file: File,
   let data: unknown = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
   if (!res.ok) {
-    const body = data as { detail?: unknown } | null;
-    throw new RequestError(res.status, (body && body.detail) ?? text);
+    const body = data as { detail?: unknown; message?: unknown } | null;
+    throw new RequestError(res.status, (body && body.detail) ?? text,
+                           body?.message);
   }
   return data as UploadedMedia;
 }
