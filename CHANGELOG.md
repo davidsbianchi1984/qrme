@@ -4,6 +4,43 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.2] — 2026-08-01
+
+### The synthetic self enters the tandem contract
+
+`docs/tandem.md` gains the boundary before the code that obeys it, and this
+release carries the amendment that names the one exception to it. The
+implementation is JIM-mini's; the contract is shared, byte-identical in all
+three repositories, and it is QRME's `self` profile the whole section is about.
+
+Everything the contract described linked JIM to *somebody else's* profile, and
+the JIM user reached QRME as an **interactor** — a stranger. `ProfileKind` is
+`self | other_person | fictional | hybrid` and a `self` profile speaks *as* the
+person; JIM had no column, module or route that knew it existed, and QRME held
+nothing pointing back.
+
+    asked     does JIM reference synthetic profiles
+    mattered  does JIM reference this person's own
+
+An owner token, not an interactor token. The link refused unless QRME reports
+`kind == "self"` — a `fictional` profile briefed with somebody's medication
+schedule is a different product with the same code. JIM → QRME is an enumerated
+allowlist, consented per category, empty by default, with the composer building
+the brief *from* the allowlist rather than filtering a payload down to it.
+
+**The amendment.** Journal entries, check-in notes and transcripts never cross
+under any consent. The one category made of the person's own words is
+**medication**, and it is named in the contract rather than hidden in an
+implementation: `meds.py` invites their wording, so names are free text by
+design, and *"the pill for my HIV"* is a diagnosis typed into a field asking
+for a drug. Consenting to that category is consenting to a self-profile that
+can be asked about those strings by anyone it talks to — which is why the
+preview shows the strings and not a count of them.
+
+The brief arrives through QRME's own owner-gated
+`POST /profiles/{id}/sources`, so it lands where the persona is grounded and is
+sealed into PDI when a vault is configured.
+
 ## [0.30.1] — 2026-08-01
 
 ### The refusal that handed the body back
