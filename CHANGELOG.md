@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### A translated string nobody reads
+
+Two keys shipped in 0.27.0 were in the table and wired to nothing — caught by
+hand last release. `test_no_key_is_translated_into_ten_languages_and_used_
+nowhere` now catches the class, here and in JIM, where eight more turned up.
+
+    asked     is every key in the table complete
+    mattered  does every key in the table reach a screen
+
+Every completeness check in both repositories asks whether a key *has* its ten
+languages. None asked whether anything looks it up, so a translated string can
+sit beside the English it was supposed to replace with nothing to say which
+one a reader gets.
+
+The first version of the check read literal keys only and reported all
+fifty-three `nav.*` keys as dead. Every one is live — `App.tsx` builds them,
+`` t(`nav.${n.id}`, lang) `` — so a guard against dead translations would have
+had somebody delete the working ones. It now understands a built key's literal
+head.
+
+
 ### The pre-session backlog reaches its floor
 
 37 → 20 → **4**, and the four are a product name, a full stop, an example
