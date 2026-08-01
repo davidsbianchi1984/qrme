@@ -302,20 +302,60 @@ def test_the_promise_and_the_door_are_on_the_same_surface():
     can be looking at it. The sentence was true of the route and false of the
     page it was printed on, and a sentence like that is worse than silence: it
     tells the person who most needs the door that the door is already open.
+    **Claim *and* call, not claim alone.** The first version of this check
+    flagged any gated surface making the claim at all. It passed here only
+    because the copy on `Contest` and `Workshop` was rewritten in the same
+    round — and ported to JIM-mini unchanged it fired on three screens that
+    are all correct, where a beacon *owner* is told what their beacon does for
+    a stranger. Describing an accountless door elsewhere is exactly what that
+    owner needs to read. Being one and saying otherwise is the defect.
     """
     pre = _pre_session_components()
-    claims = []
+    bindings = tuple(PUBLIC_PATHS.values())
+    broken = []
     for path in sorted(SRC.rglob("*.tsx")):
-        text = path.read_text(encoding="utf-8")
+        if path.stem in pre:
+            continue                      # a stranger can be looking at it
         # Prose, not comments — a doc comment explaining the history is
-        # exactly the kind of match that made the sixth false positive.
-        prose = re.sub(r"/\*.*?\*/|//[^\n]*", "", text, flags=re.S)
-        if re.search(r"do not need an account|need no account|without an account",
-                     prose, re.I):
-            claims.append(path.stem)
+        # exactly the kind of match that made the sixth false positive, and
+        # `Contest.tsx` carries several.
+        prose = re.sub(r"/\*.*?\*/|//[^\n]*|\{/\*.*?\*/\}", "",
+                       path.read_text(encoding="utf-8"), flags=re.S)
+        if not re.search(
+                r"do not need an account|need no account|without an account",
+                prose, re.I):
+            continue
+        carries = [b for b in bindings if re.search(rf"\b{b}\s*\(", prose)]
+        if carries:
+            broken.append(f"{path.stem}: claims no account is needed and "
+                          f"calls {', '.join(carries)}")
 
-    stranded = sorted(c for c in claims if c not in pre)
-    assert not stranded, (
-        "these surfaces tell the reader they do not need an account, and are "
-        f"reachable only after signing up: {stranded}\n  Either move the door "
-        "to a surface a stranger can reach, or stop making the promise.")
+    assert not broken, (
+        "these surfaces promise that no account is needed and carry the very "
+        "thing they are promising about, behind the sign-up gate:\n    "
+        + "\n    ".join(broken)
+        + "\n  Move the door to a surface a stranger can reach, or stop making "
+          "the promise on this one. A screen that merely *describes* an "
+          "accountless door elsewhere is fine and is deliberately not flagged.")
+
+
+def test_the_exemption_for_the_public_surface_is_live():
+    """A positive control.
+
+    `Public.tsx` both makes the claim and carries every binding it is about —
+    which is the pattern above, and correct there, because a stranger can be
+    looking at it. If it ever stops being pre-session, the check above goes
+    quiet at exactly the moment it should shout.
+    """
+    pre = _pre_session_components()
+    assert "Public" in pre, (
+        "Public.tsx is no longer rendered before the session gate — the "
+        "surface built for people with no account now needs one")
+    prose = re.sub(r"/\*.*?\*/|//[^\n]*|\{/\*.*?\*/\}", "",
+                   (SRC / "screens" / "Public.tsx").read_text(encoding="utf-8"),
+                   flags=re.S)
+    assert re.search(r"do not need an account", prose, re.I), (
+        "Public.tsx no longer makes the claim, so this control proves nothing")
+    assert re.search(r"\bopenObjection\s*\(", prose), (
+        "Public.tsx no longer carries the objection form — the claim and the "
+        "door have come apart on the one surface where they belong together")
