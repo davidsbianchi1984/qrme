@@ -93,8 +93,8 @@ function AccountGate() {
   const isDesktop = Boolean((window as unknown as { qrmeDesktop?: unknown }).qrmeDesktop);
   const whereIsTheCode = delivery === "console"
     ? (isDesktop
-        ? <> — this deployment has no mail service configured, so the code was <b>written to the app's backend log</b> (button below opens it)</>
-        : <> — this deployment has no mail service configured, so the code was <b>printed in the terminal running the backend</b></>)
+        ? <> {tr("onb.nomail", visitorLang())} <b>{tr("onb.nomail.log", visitorLang())}</b> {tr("onb.nomail.open", visitorLang())}</>
+        : <> {tr("onb.nomail", visitorLang())} <b>{tr("onb.nomail.terminal", visitorLang())}</b></>)
     : null;
 
   // On the code screen, the person may verify by clicking the emailed link
@@ -163,13 +163,11 @@ function AccountGate() {
                     title={d.configured ? undefined : d.setup}
                     onClick={() => signInWith(d.provider)}>
               {d.provider === "google" ? "🟢" : ""} {tr("onb.signin.with", visitorLang())} {d.name}
-              {!d.configured && <span className="muted small"> · not configured here</span>}
+              {!d.configured && <span className="muted small"> {tr("onb.oauth.absent", visitorLang())}</span>}
             </button>
           ))}
           <p className="field-hint">
-            A configured provider opens your browser and vouches for your
-            email — no code to type. Grey means this deployment hasn't
-            registered an OAuth client yet (hover for what to set).
+            {tr("onb.oauth.note", visitorLang())}
           </p>
         </div>
       )}
@@ -181,15 +179,14 @@ function AccountGate() {
         <p className="field-hint">{tr("onb.password.min", visitorLang())}</p>
         <PasswordField label={tr("onb.password.again", visitorLang())} value={confirm} placeholder={tr("onb.password.same", visitorLang())} onChange={setConfirm} />
         {confirm && !passwordsMatch && (
-          <div className="error">⚠ The passwords don't match yet.</div>
+          <div className="error">{tr("onb.password.mismatch", visitorLang())}</div>
         )}
       </>)}
 
       {mode === "code" && (<>
         <p className="muted">
-          We emailed a verification link to <b>{email}</b>{whereIsTheCode}.
-          <b> Click the link and this screen continues on its own.</b> Prefer
-          typing? Enter the 6-digit code from the same email instead.
+          {tr("onb.verify.sent", visitorLang())} <b>{email}</b>{whereIsTheCode}.
+          <b> {tr("onb.verify.click", visitorLang())}</b> {tr("onb.verify.type", visitorLang())}
         </p>
         <label>{tr("onb.code", visitorLang())}
           <input value={code} inputMode="numeric" placeholder="123456" onChange={(e) => setCode(e.target.value)} />
@@ -202,7 +199,7 @@ function AccountGate() {
       </>)}
 
       {mode === "reset" && (<>
-        <p className="muted">Enter your account's email; we'll send a 6-digit reset code{whereIsTheCode}.</p>
+        <p className="muted">{tr("onb.reset.hint", visitorLang())}{whereIsTheCode}.</p>
         <label>{tr("onb.email", visitorLang())}<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
         <div className="actions" style={{ justifyContent: "center" }}>
           <button disabled={busy || !email.trim()}
@@ -217,7 +214,7 @@ function AccountGate() {
         <PasswordField label={tr("onb.password.new", visitorLang())} value={password} placeholder={tr("onb.password.min", visitorLang())} onChange={setPassword} />
         <PasswordField label={tr("onb.password.new.again", visitorLang())} value={confirm} placeholder={tr("onb.password.same", visitorLang())} onChange={setConfirm} />
         {confirm && !passwordsMatch && (
-          <div className="error">⚠ The passwords don't match yet.</div>
+          <div className="error">{tr("onb.password.mismatch", visitorLang())}</div>
         )}
       </>)}
 
@@ -331,7 +328,7 @@ function ProfileCreate() {
                   onChange={(e) => setPersona(e.target.value)} />
       </label>
       <label>
-        Owner birthdate (age verification)
+        {tr("onb.birthdate", visitorLang())}
         <input type="date" value={birthdate}
                onChange={(e) => setBirthdate(e.target.value)} />
       </label>
@@ -342,8 +339,7 @@ function ProfileCreate() {
         {busy ? "Creating…" : "Create My Profile"}
       </button>
       <p className="hint">
-        Signed in as <code>{session.accountEmail}</code> — your profile is
-        created under this account.
+        {tr("onb.signedin", visitorLang())} <code>{session.accountEmail}</code> {tr("onb.undercount", visitorLang())}
       </p>
     </>
   );
@@ -360,10 +356,9 @@ export function Onboarding({ onPublic }: {
     <div className="onboarding">
       <div className="onboard-card">
         <div className="orb big" />
-        <h1>Your identity. Your AI.</h1>
+        <h1>{tr("onb.tagline", visitorLang())}</h1>
         <p className="muted">
-          Create a synthetic profile that thinks, remembers, and evolves with you.
-          It runs against your local QRME API — your data stays in your vault.
+          {tr("onb.pitch", visitorLang())}
         </p>
         {accountReady ? <ProfileCreate /> : <AccountGate />}
 

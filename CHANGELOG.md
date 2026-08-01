@@ -4,6 +4,27 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### The pre-session backlog reaches its floor
+
+37 → 20 → **4**, and the four are a product name, a full stop, an example
+address and an example verification code — strings that are the same in every
+language. `public_untranslated.txt` now says so in its header: this is a
+floor, not a backlog.
+
+Two keys added last release were in the table and wired to nothing — the
+tagline and the password-mismatch warning. They had been translated into ten
+languages and no screen looked them up, so the strings stayed English while
+the table said otherwise. The round that localized the form localized most of
+the form and stopped, which is the same shape as the round two releases ago
+that localized the door and stopped at the sign on it.
+
+Fourteen more keys and the wiring for all of them, including the two dead
+ones. Four strings were missed on the first pass because JSX had wrapped them
+across source lines — a substitution matching a single line finds nothing and
+reports success.
+
 ## [0.28.0] — 2026-08-01
 
 Aligned with JIM-mini 0.28.0. The three products carry one version, so a
