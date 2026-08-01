@@ -53,6 +53,22 @@ SRC = REPO / "app" / "src"
 PUBLIC = SRC / "screens" / "Public.tsx"
 SNAPSHOT = Path(__file__).resolve().parent / "public_untranslated.txt"
 
+#: **Both** screens `App.tsx` can render before a profile exists.
+#:
+#: This file measured `Public.tsx` alone for three rounds, which is how
+#: `Onboarding.tsx` — the screen every single person meets first, before any
+#: account exists anywhere — kept forty-seven English strings while this test
+#: reported the pre-session surface clean. It is not an oversight in the copy:
+#: that file already calls `visitorLang()`, three times, on the links pointing
+#: *at* the accountless screen. The round that localized the door localized
+#: the sign to the door and stopped.
+#:
+#: The audit's shape, on this file's own scope:
+#:
+#:     asked     is the accountless screen localized
+#:     mattered  is the pre-session surface localized
+PRE_SESSION = ("screens/Public.tsx", "screens/Onboarding.tsx")
+
 #: Every language the console offers. Read from l10n.ts rather than repeated,
 #: so adding a tenth language cannot leave this list behind.
 def _languages() -> list[str]:
@@ -119,13 +135,17 @@ def _prose() -> list[str]:
     and the attributes a person reads. There is no pattern left to be wrong.
     """
     proc = subprocess.run(
-        ["node", "scripts/jsx-text.mjs", "src/screens/Public.tsx"],
+        ["node", "scripts/jsx-text.mjs"] + [f"src/{p}" for p in PRE_SESSION],
         cwd=REPO / "app", capture_output=True, text=True)
     assert proc.returncode == 0, (
         "the JSX text extractor failed, so this check would report a "
         f"comfortable zero:\n{proc.stderr}")
-    texts = json.loads(proc.stdout)["src/screens/Public.tsx"]
-    return sorted(set(texts))
+    found = json.loads(proc.stdout)
+    out = []
+    for screen in PRE_SESSION:
+        name = screen.split("/")[-1].removesuffix(".tsx")
+        out += [f"{name}: {text}" for text in found[f"src/{screen}"]]
+    return sorted(set(out))
 
 
 def _recorded() -> set[str]:
@@ -143,8 +163,8 @@ def test_the_english_that_is_left_is_written_down():
     problems = []
     if appeared:
         problems.append(
-            f"{len(appeared)} English string(s) on the public screen that "
-            "nobody has decided about:\n    "
+            f"{len(appeared)} English string(s) on the pre-session surface "
+            "that nobody has decided about:\n    "
             + "\n    ".join(s[:90] for s in appeared)
             + "\n  Translate it, or add it here — but adding is ratcheted.")
     if resolved:

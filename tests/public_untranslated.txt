@@ -1,23 +1,67 @@
-# English left on the public screen — the surface for people with no
-# profile. Checked by test_the_stranger_has_a_language_too.py, both
-# directions, and ratcheted.
+# English left on the surface a person meets before any account exists.
+# Checked by test_the_stranger_has_a_language_too.py, both directions, and
+# ratcheted.
 #
-# This list used to hold five sentence fragments and describe them as the
-# hard remainder. They were not the remainder. They were what a regex over
-# the source happened to be able to see.
+# This file measured `Public.tsx` alone for three rounds. That screen is now
+# down to its brand name — but it is one of *two* screens `App.tsx` renders
+# before a profile exists, and the other is the one everybody meets first.
 #
-# `scripts/jsx-text.mjs` asks TypeScript's own parser instead, and the real
-# figure was twenty-five: an entire explanatory paragraph in the mark pane,
-# a whole sentence about signing in, the signature line, "Also present on:",
-# "Forms:", the window-match line, and the produced-by line — none of which
-# the old pattern could reach, because every one of them wraps an
-# interpolated value and the pattern excluded braces outright.
+# `Onboarding.tsx` calls `visitorLang()` three times, all on the links
+# pointing at the accountless screen. The round that localized the door
+# localized the sign to the door and stopped, and this guard reported the
+# pre-session surface clean because it was only ever looking at one half.
 #
-# All twenty-four of those are now translated into all ten languages, as
-# whole sentences with their values named (`{now}`, `{stored}`) and put back
-# by `fill` — so each language decides where its own grammar wants them.
+#     asked     is the accountless screen localized
+#     mattered  is the pre-session surface localized
 #
-# What is left is the brand.
+# So: sign up, sign in, "at least 8 characters", "the passwords don't match
+# yet", the whole email-verification and password-reset flow — English, on the
+# first screen anybody in the world sees, in an app whose console speaks ten
+# languages the moment you are through it.
 #
-# ceiling: 1
-QRME
+# Not translated in this round on purpose. Forty-odd strings is its own round
+# and a half-translated sign-up form is worse than an English one: it reads as
+# broken software at the exact moment somebody is deciding whether to trust
+# the thing with their email. The keys already exist in `l10n.ts` for the
+# accountless screen and the same `fill` template machinery applies.
+#
+# `Public: QRME` is the brand and stays.
+#
+# ceiling: 37
+Onboarding: (button below opens it)
+Onboarding: .
+Onboarding: 123456
+Onboarding: A configured provider opens your browser and vouches for your email — no code to type. Grey means this deployment hasn't registered an OAuth client yet (hover for what to set).
+Onboarding: At least 8 characters
+Onboarding: At least 8 characters.
+Onboarding: Back to sign in
+Onboarding: Click the link and this screen continues on its own.
+Onboarding: Create a synthetic profile that thinks, remembers, and evolves with you. It runs against your local QRME API — your data stays in your vault.
+Onboarding: Create account
+Onboarding: Email
+Onboarding: Enter your account's email; we'll send a 6-digit reset code
+Onboarding: Forgot password?
+Onboarding: Name your assistant
+Onboarding: Owner birthdate (age verification)
+Onboarding: Persona
+Onboarding: Prefer typing? Enter the 6-digit code from the same email instead.
+Onboarding: Profile name
+Onboarding: Resend code
+Onboarding: Reset code
+Onboarding: Same password again
+Onboarding: Send reset code
+Onboarding: Sign in
+Onboarding: Sign in with
+Onboarding: Signed in as
+Onboarding: Verification code
+Onboarding: We emailed a verification link to
+Onboarding: Your identity. Your AI.
+Onboarding: Your name
+Onboarding: printed in the terminal running the backend
+Onboarding: written to the app's backend log
+Onboarding: you@example.com
+Onboarding: · not configured here
+Onboarding: — this deployment has no mail service configured, so the code was
+Onboarding: — your profile is created under this account.
+Onboarding: ⚠ The passwords don't match yet.
+Public: QRME
