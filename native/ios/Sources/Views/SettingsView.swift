@@ -128,6 +128,7 @@ struct SettingsView: View {
                 WatermarkCard()
                 WhoWroteThisCard()
                 ObjectToAProfileCard()
+                ProblemReportingCard()
 
                 RelationshipCard()
 
