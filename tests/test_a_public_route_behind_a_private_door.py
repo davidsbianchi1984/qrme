@@ -295,6 +295,108 @@ def test_each_shell_names_its_public_door():
         + "\n    ".join(broken))
 
 
+# --- what a screen says, as opposed to what its file contains ---------------
+#
+# The round after this file was written moved five of `Public.tsx`'s English
+# paragraphs into `l10n.ts` so a visitor reading Hindi gets Hindi. The claim
+# this file is about — *you do not need an account* — went with them, and the
+# positive control below failed, correctly, saying the claim was gone.
+#
+# It was not gone. It had moved one indirection away, and a check that reads
+# `.tsx` files for a sentence had stopped being able to see it. That is this
+# audit's recurring shape for the ninth time, and the first time it arrived
+# through a change that was itself an improvement:
+#
+#     the sentence is in the file   (not: the screen puts it on a person's
+#                                    screen)
+#
+# The rule below matters more than the control here. A gated screen that
+# claims no account is needed via `{L("some.key")}` would have walked straight
+# past it — the defect this whole file exists to catch, wearing localization
+# as a disguise. So both now read what a screen *shows*, which is its own
+# literal text plus the English of every key it looks up.
+
+
+def _english() -> dict[str, str]:
+    """The English column of the console's chrome table.
+
+    English specifically, not the visitor's language: this file is checking
+    what the product promises, and the promise is authored in English and
+    translated from it. A check that read the Hindi column would be asking
+    whether the translator kept a phrase, which is a different question and
+    not one a regex should be asked.
+    """
+    text = (SRC / "l10n.ts").read_text(encoding="utf-8")
+    table: dict[str, str] = {}
+    for key, row in re.findall(r'^  "([\w.]+)":\s*\{(.*?)^  \},',
+                               text, re.S | re.M):
+        found = re.search(r'\ben:\s*"((?:[^"\\]|\\.)*)"', row)
+        if found:
+            table[key] = found.group(1)
+    return table
+
+
+def _code(path: Path) -> str:
+    """Source with comments stripped.
+
+    A doc comment quoting the copy is exactly the match that produced the
+    sixth false positive in this audit, and `Contest.tsx` and `Public.tsx`
+    both carry several paragraphs of history.
+    """
+    return re.sub(r"/\*.*?\*/|//[^\n]*|\{/\*.*?\*/\}", "",
+                  path.read_text(encoding="utf-8"), flags=re.S)
+
+
+#: How the three components that localize spell the lookup: `t("k", lang)`
+#: directly in `App.tsx`, and `L("k")` over an aliased `tr` in the two
+#: pre-session screens.
+_LOOKUP = re.compile(r'\b(?:t|tr|L)\(\s*"([\w.]+)"')
+
+
+def _shown_text(path: Path) -> str:
+    """Everything this component can put in front of a person, in English.
+
+    Its own literal text and the English of every key it looks up, joined.
+    Deliberately not the code: bindings are searched in `_code` instead, so a
+    translated string can never be mistaken for a call site.
+    """
+    code = _code(path)
+    table = _english()
+    return "\n".join([code] + [table[k] for k in _LOOKUP.findall(code)
+                               if k in table])
+
+
+def test_every_key_a_screen_looks_up_exists_in_the_table():
+    """A guard on the resolution above, and a real check besides.
+
+    `t` returns the key itself when it misses, so a typo ships as the literal
+    string `pub.object.restricts` on the page — visible to a person, invisible
+    to a build. It would also make `_shown_text` quietly resolve to nothing,
+    which is the failure mode this audit keeps finding: a check that stops
+    being able to see, and passes.
+    """
+    table = _english()
+    # Not a magic floor — the file's own count. This catches the parser
+    # drifting off the table's formatting *and* an entry with no English
+    # column, which `t` renders as the bare key for every language that has
+    # no row of its own.
+    declared = set(re.findall(r'^  "([\w.]+)":\s*\{$',
+                              (SRC / "l10n.ts").read_text(encoding="utf-8"),
+                              re.M))
+    assert declared, "no entries found in l10n.ts at all — has it moved?"
+    assert declared == set(table), (
+        "these l10n.ts entries did not resolve to an English string, so they "
+        "ship as their own raw key and every claim below reads past them:\n"
+        "    " + "\n    ".join(sorted(declared - set(table))))
+    missing = []
+    for path in sorted(SRC.rglob("*.tsx")):
+        missing += [f"{path.stem}: {k}" for k in _LOOKUP.findall(_code(path))
+                    if k not in table]
+    assert not missing, (
+        "these screens look up keys that are not in l10n.ts, so the raw key "
+        "is what a person reads:\n    " + "\n    ".join(sorted(set(missing))))
+
+
 def test_the_promise_and_the_door_are_on_the_same_surface():
     """The specific thing that made this worth a round.
 
@@ -316,16 +418,11 @@ def test_the_promise_and_the_door_are_on_the_same_surface():
     for path in sorted(SRC.rglob("*.tsx")):
         if path.stem in pre:
             continue                      # a stranger can be looking at it
-        # Prose, not comments — a doc comment explaining the history is
-        # exactly the kind of match that made the sixth false positive, and
-        # `Contest.tsx` carries several.
-        prose = re.sub(r"/\*.*?\*/|//[^\n]*|\{/\*.*?\*/\}", "",
-                       path.read_text(encoding="utf-8"), flags=re.S)
         if not re.search(
                 r"do not need an account|need no account|without an account",
-                prose, re.I):
+                _shown_text(path), re.I):
             continue
-        carries = [b for b in bindings if re.search(rf"\b{b}\s*\(", prose)]
+        carries = [b for b in bindings if re.search(rf"\b{b}\s*\(", _code(path))]
         if carries:
             broken.append(f"{path.stem}: claims no account is needed and "
                           f"calls {', '.join(carries)}")
@@ -346,16 +443,22 @@ def test_the_exemption_for_the_public_surface_is_live():
     which is the pattern above, and correct there, because a stranger can be
     looking at it. If it ever stops being pre-session, the check above goes
     quiet at exactly the moment it should shout.
+
+    This control has already earned its place once. The round that localized
+    the public screen moved the claim into `l10n.ts`, and this test failed
+    saying the claim was gone — which was true of the file and false of the
+    page. The rule above was reading the same way, so it would have stopped
+    seeing any claim made through a lookup, silently, and passed. The fix was
+    to teach both what a screen *shows*; the control is what forced it.
     """
+    public = SRC / "screens" / "Public.tsx"
     pre = _pre_session_components()
     assert "Public" in pre, (
         "Public.tsx is no longer rendered before the session gate — the "
         "surface built for people with no account now needs one")
-    prose = re.sub(r"/\*.*?\*/|//[^\n]*|\{/\*.*?\*/\}", "",
-                   (SRC / "screens" / "Public.tsx").read_text(encoding="utf-8"),
-                   flags=re.S)
-    assert re.search(r"do not need an account", prose, re.I), (
-        "Public.tsx no longer makes the claim, so this control proves nothing")
-    assert re.search(r"\bopenObjection\s*\(", prose), (
+    assert re.search(r"do not need an account", _shown_text(public), re.I), (
+        "Public.tsx no longer makes the claim — in its own text or through "
+        "any key it looks up — so this control proves nothing")
+    assert re.search(r"\bopenObjection\s*\(", _code(public)), (
         "Public.tsx no longer carries the objection form — the claim and the "
         "door have come apart on the one surface where they belong together")
