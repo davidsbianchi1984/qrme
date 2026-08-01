@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 from datetime import date, datetime, timedelta, timezone
 
@@ -16,6 +17,30 @@ def age_of(birthdate: date) -> int:
     return today.year - birthdate.year - (
         (today.month, today.day) < (birthdate.month, birthdate.day)
     )
+
+
+@contextlib.contextmanager
+def refusals_in(language: str):
+    """Re-raise whatever refuses inside, with its sentence translated.
+
+    For the four routes whose caller has no account. `profile_or_404` and its
+    siblings are shared with every owner route and say "profile not found" in
+    English, which is right there — the owner picked that language — and wrong
+    on the accountless screen, where the reader's browser said otherwise and
+    nothing looked.
+
+    Narrow on purpose: only the public routes wrap themselves in this, so an
+    owner's refusal is untouched and no existing caller changes. Anything the
+    table does not have falls through as English rather than being guessed at.
+    """
+    from . import i18n
+    try:
+        yield
+    except HTTPException as refusal:
+        raise HTTPException(
+            refusal.status_code,
+            i18n.tr_public(str(refusal.detail), language),
+            headers=refusal.headers) from None
 
 
 def profile_or_404(profile_id: str) -> dict:

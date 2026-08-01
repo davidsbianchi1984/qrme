@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 
-from .. import watermark
+from .. import i18n, watermark
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -65,7 +65,8 @@ def watermark_check(body: WatermarkVerify) -> dict:
 
 
 @router.post("/watermarks/recover")
-def watermark_recover(body: WatermarkRecover) -> dict:
+def watermark_recover(body: WatermarkRecover,
+                      accept_language: str = Header(default="")) -> dict:
     """The other direction: who produced this text, from the text alone.
 
     `/watermarks/verify` answers "does this content match *this* credential",
@@ -74,8 +75,16 @@ def watermark_recover(body: WatermarkRecover) -> dict:
     text has been edited — the field drawing's extract-and-reconstruct step.
     Never a bare yes: the reply carries the matched-window counts and the
     similarity so the claim can be checked.
+
+    **In the asker's language.** This route's caller has no account by
+    construction — somebody holding a screenshot, asking whether a person
+    wrote it. The screen around them has been in ten languages since the
+    round that read `navigator.languages`; the sentence answering their
+    question was still in English. `localize_public` swaps exactly the
+    sentences this product wrote and leaves ids, names and numbers alone.
     """
-    return watermark.recover(body.content)
+    language = i18n.negotiate(accept_language)
+    return i18n.localize_public(watermark.recover(body.content), language)
 
 
 # Registered *after* every literal `/watermarks/...` route, and it has to stay

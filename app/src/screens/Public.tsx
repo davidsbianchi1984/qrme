@@ -168,9 +168,14 @@ function ObjectPane() {
           <h3>{fill(L("pub.object.opened"), { id: opened.id })}</h3>
           <p className="small">{opened.note}</p>
           <p className="small">
+            {/* The state words come back in the API's own vocabulary, on
+                purpose — `Contest.tsx` branches on `status === "open"`, and a
+                translated value there would hide the card that ends a case.
+                Translating for display is this screen's job, not the
+                route's. */}
             {fill(L("pub.object.opened.status"), {
-              now: <strong>{opened.profile_status}</strong>,
-              before: <strong>{opened.prior_status}</strong>,
+              now: <strong>{L(`pub.state.${opened.profile_status}`)}</strong>,
+              before: <strong>{L(`pub.state.${opened.prior_status}`)}</strong>,
             })}
           </p>
           <p className="muted small">
@@ -188,7 +193,7 @@ function ObjectPane() {
         </div>
         {status && (
           <p className="small">
-            <strong>{status.status}</strong>
+            <strong>{L(`pub.state.${status.status}`)}</strong>
             {status.objector_ref && <>{" "}
               {fill(L("pub.check.against"), { ref: status.objector_ref })}</>}
             {/* The reference is echoed back so somebody can confirm the case

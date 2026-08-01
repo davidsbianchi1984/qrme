@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import (APIRouter, Depends, Header, HTTPException,
+                     Request)
 
-from .. import (auth, companion, composite, db, identity, persona, storage,
-                terms, tiers)
+from .. import (auth, companion, composite, db, i18n, identity, persona,
+                storage, terms, tiers)
 from ..common import (
-    age_of, profile_or_404, profile_out, require_owner, source_items,
+    age_of, profile_or_404, profile_out, refusals_in, require_owner,
+    source_items,
 )
 from ..models import (
     CompositeCreate, EmbodimentAdd, GenesisCreate, MarketplaceList,
@@ -267,11 +269,22 @@ def add_embodiment(profile_id: str, body: EmbodimentAdd, request: Request) -> di
 
 
 @router.get("/profiles/{profile_id}/embodiment-consistency")
-def embodiment_consistency(profile_id: str) -> dict:
+def embodiment_consistency(
+    profile_id: str,
+    accept_language: str = Header(default=""),
+) -> dict:
     """The profile's invariant identity signature and the embodiments it stays
     consistent across. Public: anyone meeting the profile through any form can
-    verify it is the same personality."""
-    profile = profile_or_404(profile_id)
+    verify it is the same personality.
+
+    That person met the profile on a speaker or in a room and has no account,
+    so the language comes from their own header rather than from the
+    profile's setting — which is the *subject's* preference and says nothing
+    about who is asking.
+    """
+    language = i18n.negotiate(accept_language)
+    with refusals_in(language):
+        profile = profile_or_404(profile_id)
     sig = persona.identity_signature(profile)
     forms = [{**dict(r), "has_llm": bool(r["has_llm"])} for r in
              db.connect().execute(
@@ -280,8 +293,9 @@ def embodiment_consistency(profile_id: str) -> dict:
     surfaces = [r["surface"] for r in db.connect().execute(
         "SELECT surface FROM surfaces WHERE profile_id=?",
         (profile_id,)).fetchall()]
-    return {"profile_id": profile_id, **sig,
-            "embodiments": forms, "surfaces": surfaces}
+    answer = {"profile_id": profile_id, **sig,
+              "embodiments": forms, "surfaces": surfaces}
+    return i18n.localize_public(answer, language)
 
 
 @router.get("/profiles/{profile_id}/embodiments")

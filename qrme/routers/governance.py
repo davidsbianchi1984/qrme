@@ -40,10 +40,10 @@ from __future__ import annotations
 import json
 import logging
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Header, HTTPException, Request
 
-from .. import auth, db
-from ..common import profile_or_404, require_owner
+from .. import auth, db, i18n
+from ..common import profile_or_404, refusals_in, require_owner
 from ..models import ObjectionOpen, ObjectionResolve
 
 router = APIRouter()
@@ -130,14 +130,18 @@ def has_open_objection(profile_id: str) -> bool:
 
 
 @router.post("/objections", status_code=201)
-def open_objection(body: ObjectionOpen, request: Request) -> dict:
+def open_objection(body: ObjectionOpen, request: Request,
+                   accept_language: str = Header(default="")) -> dict:
     """Open an objection (public: the objecting party need not own an account).
     Suspends the profile pending review — including a departed memorial, which
     an estate may contest. A terminated profile is already gone."""
-    profile = profile_or_404(body.profile_id)
+    language = i18n.negotiate(accept_language)
+    with refusals_in(language):
+        profile = profile_or_404(body.profile_id)
     if profile["status"] == "terminated":
-        raise HTTPException(
-            409, "profile is terminated; there is nothing left to object to")
+        raise HTTPException(409, i18n.tr_public(
+            "profile is terminated; there is nothing left to object to",
+            language))
     conn = db.connect()
     objection_id = db.new_id("obj")
     prior_status = profile["status"]        # active or departed (memorial)
@@ -152,21 +156,28 @@ def open_objection(body: ObjectionOpen, request: Request) -> dict:
     conn.commit()
     _audit(request, objection_id, body.profile_id, "opened", "objector",
            {"reason": body.reason, "prior_status": prior_status})
-    return {"id": objection_id, "profile_id": body.profile_id,
-            "status": "open", "profile_status": "restricted",
-            "prior_status": prior_status,
-            "note": "profile restricted pending review; the owner must "
-                    "re-attest their rights basis"}
+    return i18n.localize_public(
+        {"id": objection_id, "profile_id": body.profile_id,
+         "status": "open", "profile_status": "restricted",
+         "prior_status": prior_status,
+         "note": "profile restricted pending review; the owner must "
+                 "re-attest their rights basis"},
+        language)
 
 
 @router.get("/objections/{objection_id}")
-def get_objection(objection_id: str) -> dict:
+def get_objection(objection_id: str,
+                  accept_language: str = Header(default="")) -> dict:
     """Public status check for the objecting party (their proof reference is
     returned so they can confirm it's their case)."""
-    obj = _objection_or_404(objection_id)
-    return {"id": obj["id"], "profile_id": obj["profile_id"],
-            "status": obj["status"], "reattested": bool(obj["reattested"]),
-            "objector_ref": obj["objector_ref"]}
+    language = i18n.negotiate(accept_language)
+    with refusals_in(language):
+        obj = _objection_or_404(objection_id)
+    return i18n.localize_public(
+        {"id": obj["id"], "profile_id": obj["profile_id"],
+         "status": obj["status"], "reattested": bool(obj["reattested"]),
+         "objector_ref": obj["objector_ref"]},
+        language)
 
 
 @router.get("/objections/{objection_id}/audit")
