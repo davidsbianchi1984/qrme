@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### The screen everybody meets first
+
+`public_untranslated.txt` recorded thirty-seven English strings on the
+pre-session surface, thirty-six of them on `Onboarding.tsx` — the screen every
+single person meets before any account exists anywhere. Two releases localized
+the accountless *door* and the routes behind it; the sign-up form itself was
+still English in ten languages' worth of browsers.
+
+Twenty-two keys, hand-translated across all ten: the tagline, both mode
+buttons, every field label and placeholder, the verification and reset codes,
+the password rules and the mismatch warning, the profile name and persona. The
+backlog is **37 → 20**, and what is left is explanatory prose rather than
+anything with an action attached.
+
+The completeness guard only looked at keys prefixed `pub.`, so twenty-two
+`onb.` keys would have been invisible to it — a check reporting a complete
+table while no longer reading all of it.
+
+    asked     are the `pub.` keys complete
+    mattered  are the keys a pre-session screen looks up complete
+
 ### Kotlin's other interpolation
 
 `_spans` routes every `${`-carrying pattern to a brace counter, which is right

@@ -82,7 +82,7 @@ def _keys_with_gaps() -> dict[str, list[str]]:
     text = (SRC / "l10n.ts").read_text(encoding="utf-8")
     langs = _languages()
     gaps: dict[str, list[str]] = {}
-    for match in re.finditer(r'"(pub\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
+    for match in re.finditer(r'"((?:pub|onb)\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
         key, block = match.group(1), match.group(2)
         present = set(re.findall(r"(\w+):", block))
         missing = [code for code in langs if code not in present]
@@ -92,7 +92,16 @@ def _keys_with_gaps() -> dict[str, list[str]]:
 
 
 def test_the_public_keys_are_translated_everywhere():
-    """No partial rows. A `pub.` key exists because a stranger reads it."""
+    """No partial rows. These keys exist because a stranger reads them.
+
+    Both prefixes. `pub.` was the only one when this was written, and adding
+    `onb.` for the pre-session screen would have created twenty-two keys this
+    check could not see — the completeness guard passing on a table it was no
+    longer reading all of.
+
+        asked     are the `pub.` keys complete
+        mattered  are the keys a pre-session screen looks up complete
+    """
     gaps = _keys_with_gaps()
     assert not gaps, (
         "these public strings are missing languages:\n    "
@@ -104,7 +113,7 @@ def test_the_public_keys_are_translated_everywhere():
 
 def test_there_are_public_keys_at_all():
     """A guard on the guard: an empty prefix search reports a perfect zero."""
-    keys = re.findall(r'"(pub\.[\w.]+)":',
+    keys = re.findall(r'"((?:pub|onb)\.[\w.]+)":',
                       (SRC / "l10n.ts").read_text(encoding="utf-8"))
     assert len(keys) > 15, (
         f"only {len(keys)} public keys found — the pattern has stopped "
@@ -216,7 +225,7 @@ def test_every_hole_survives_every_translation():
     text = (SRC / "l10n.ts").read_text(encoding="utf-8")
     langs = _languages()
     broken = []
-    for match in re.finditer(r'"(pub\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
+    for match in re.finditer(r'"((?:pub|onb)\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
         key, block = match.group(1), match.group(2)
         rows = dict(re.findall(r'(\w+): "((?:[^"\\]|\\.)*)"', block))
         if "en" not in rows:
@@ -284,7 +293,7 @@ def test_the_l10n_json_is_still_parseable_as_a_table():
     """Cheap structural check: every `pub.` row is a flat object of
     language -> string, so a stray nesting cannot silently swallow a key."""
     text = (SRC / "l10n.ts").read_text(encoding="utf-8")
-    for match in re.finditer(r'"(pub\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
+    for match in re.finditer(r'"((?:pub|onb)\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
         # `{now}`, `{id}` and friends are named holes for `fill`, not
         # structure. Taking them out first keeps this check about nesting;
         # leaving them in made it fail on every template the moment

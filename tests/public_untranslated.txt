@@ -27,36 +27,19 @@
 #
 # `Public: QRME` is the brand and stays.
 #
-# ceiling: 37
+# ceiling: 20
 Onboarding: (button below opens it)
 Onboarding: .
 Onboarding: 123456
 Onboarding: A configured provider opens your browser and vouches for your email — no code to type. Grey means this deployment hasn't registered an OAuth client yet (hover for what to set).
-Onboarding: At least 8 characters
-Onboarding: At least 8 characters.
-Onboarding: Back to sign in
 Onboarding: Click the link and this screen continues on its own.
 Onboarding: Create a synthetic profile that thinks, remembers, and evolves with you. It runs against your local QRME API — your data stays in your vault.
-Onboarding: Create account
-Onboarding: Email
 Onboarding: Enter your account's email; we'll send a 6-digit reset code
-Onboarding: Forgot password?
-Onboarding: Name your assistant
 Onboarding: Owner birthdate (age verification)
-Onboarding: Persona
 Onboarding: Prefer typing? Enter the 6-digit code from the same email instead.
-Onboarding: Profile name
-Onboarding: Resend code
-Onboarding: Reset code
-Onboarding: Same password again
-Onboarding: Send reset code
-Onboarding: Sign in
-Onboarding: Sign in with
 Onboarding: Signed in as
-Onboarding: Verification code
 Onboarding: We emailed a verification link to
 Onboarding: Your identity. Your AI.
-Onboarding: Your name
 Onboarding: printed in the terminal running the backend
 Onboarding: written to the app's backend log
 Onboarding: you@example.com

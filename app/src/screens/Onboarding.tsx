@@ -150,9 +150,9 @@ function AccountGate() {
       {(mode === "signup" || mode === "signin") && (
         <div className="tabs">
           <button className={mode === "signup" ? "tab active" : "tab"}
-                  onClick={() => switchMode("signup")}>Create account</button>
+                  onClick={() => switchMode("signup")}>{tr("onb.create", visitorLang())}</button>
           <button className={mode === "signin" ? "tab active" : "tab"}
-                  onClick={() => switchMode("signin")}>Sign in</button>
+                  onClick={() => switchMode("signin")}>{tr("onb.signin", visitorLang())}</button>
         </div>
       )}
 
@@ -162,7 +162,7 @@ function AccountGate() {
             <button key={d.provider} disabled={!d.configured || oauthWaiting}
                     title={d.configured ? undefined : d.setup}
                     onClick={() => signInWith(d.provider)}>
-              {d.provider === "google" ? "🟢" : ""} Sign in with {d.name}
+              {d.provider === "google" ? "🟢" : ""} {tr("onb.signin.with", visitorLang())} {d.name}
               {!d.configured && <span className="muted small"> · not configured here</span>}
             </button>
           ))}
@@ -175,11 +175,11 @@ function AccountGate() {
       )}
 
       {mode === "signup" && (<>
-        <label>Your name<input value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} /></label>
-        <label>Email<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
-        <PasswordField label="Password" value={password} placeholder="At least 8 characters" onChange={setPassword} />
-        <p className="field-hint">At least 8 characters.</p>
-        <PasswordField label="Re-enter password" value={confirm} placeholder="Same password again" onChange={setConfirm} />
+        <label>{tr("onb.yourname", visitorLang())}<input value={name} placeholder={tr("onb.yourname", visitorLang())} onChange={(e) => setName(e.target.value)} /></label>
+        <label>{tr("onb.email", visitorLang())}<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
+        <PasswordField label={tr("onb.password", visitorLang())} value={password} placeholder={tr("onb.password.min", visitorLang())} onChange={setPassword} />
+        <p className="field-hint">{tr("onb.password.min", visitorLang())}</p>
+        <PasswordField label={tr("onb.password.again", visitorLang())} value={confirm} placeholder={tr("onb.password.same", visitorLang())} onChange={setConfirm} />
         {confirm && !passwordsMatch && (
           <div className="error">⚠ The passwords don't match yet.</div>
         )}
@@ -191,31 +191,31 @@ function AccountGate() {
           <b> Click the link and this screen continues on its own.</b> Prefer
           typing? Enter the 6-digit code from the same email instead.
         </p>
-        <label>Verification code
+        <label>{tr("onb.code", visitorLang())}
           <input value={code} inputMode="numeric" placeholder="123456" onChange={(e) => setCode(e.target.value)} />
         </label>
       </>)}
 
       {mode === "signin" && (<>
-        <label>Email<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
+        <label>{tr("onb.email", visitorLang())}<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
         <PasswordField label="Password" value={password} onChange={setPassword} />
       </>)}
 
       {mode === "reset" && (<>
         <p className="muted">Enter your account's email; we'll send a 6-digit reset code{whereIsTheCode}.</p>
-        <label>Email<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
+        <label>{tr("onb.email", visitorLang())}<input type="email" value={email} placeholder="you@example.com" onChange={(e) => setEmail(e.target.value)} /></label>
         <div className="actions" style={{ justifyContent: "center" }}>
           <button disabled={busy || !email.trim()}
                   onClick={() => run(() => accountApi.requestReset(email.trim()),
                     (r) => { setDelivery(r.code_delivery); setNotice("If that address has an account, a reset code is on its way."); })}>
-            Send reset code
+            {tr("onb.reset.send", visitorLang())}
           </button>
         </div>
-        <label>Reset code
+        <label>{tr("onb.reset.code", visitorLang())}
           <input value={code} inputMode="numeric" placeholder="123456" onChange={(e) => setCode(e.target.value)} />
         </label>
-        <PasswordField label="New password" value={password} placeholder="At least 8 characters" onChange={setPassword} />
-        <PasswordField label="Re-enter new password" value={confirm} placeholder="Same password again" onChange={setConfirm} />
+        <PasswordField label={tr("onb.password.new", visitorLang())} value={password} placeholder={tr("onb.password.min", visitorLang())} onChange={setPassword} />
+        <PasswordField label={tr("onb.password.new.again", visitorLang())} value={confirm} placeholder={tr("onb.password.same", visitorLang())} onChange={setConfirm} />
         {confirm && !passwordsMatch && (
           <div className="error">⚠ The passwords don't match yet.</div>
         )}
@@ -228,7 +228,7 @@ function AccountGate() {
         <button className="primary"
                 disabled={busy || !email.trim() || !password || !passwordsMatch}
                 onClick={signup}>
-          {busy ? "Creating…" : "Create account"}
+          {busy ? "Creating…" : tr("onb.create", visitorLang())}
         </button>
       )}
       {mode === "code" && (<>
@@ -241,7 +241,7 @@ function AccountGate() {
         <button className="linkish" disabled={busy}
                 onClick={() => run(() => accountApi.resendCode(email.trim()),
                   (r) => { setDelivery(r.code_delivery); setNotice("A new code is on its way — the old one no longer works."); })}>
-          Resend code
+          {tr("onb.code.resend", visitorLang())}
         </button>
       </>)}
       {mode === "signin" && (<>
@@ -249,9 +249,9 @@ function AccountGate() {
                 onClick={() => run(
                   () => accountApi.signin({ email: email.trim(), password }),
                   finishSession)}>
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? "Signing in…" : tr("onb.signin", visitorLang())}
         </button>
-        <button className="linkish" onClick={() => switchMode("reset")}>Forgot password?</button>
+        <button className="linkish" onClick={() => switchMode("reset")}>{tr("onb.forgot", visitorLang())}</button>
       </>)}
       {mode === "reset" && (<>
         <button className="primary"
@@ -262,7 +262,7 @@ function AccountGate() {
                   () => { switchMode("signin"); setNotice("Password changed — sign in with the new one."); })}>
           {busy ? "Resetting…" : "Set new password"}
         </button>
-        <button className="linkish" onClick={() => switchMode("signin")}>Back to sign in</button>
+        <button className="linkish" onClick={() => switchMode("signin")}>{tr("onb.back", visitorLang())}</button>
       </>)}
     </>
   );
@@ -318,15 +318,15 @@ function ProfileCreate() {
   return (
     <>
       <label>
-        Profile name
+        {tr("onb.profile.name", visitorLang())}
         {/* No pre-filled name. The profile is the user's to name, and a
             default sitting in the box is the one most people never change —
             which is how a sample name becomes the product's mascot. */}
-        <input value={name} placeholder="Name your assistant"
+        <input value={name} placeholder={tr("onb.profile.placeholder", visitorLang())}
                onChange={(e) => setName(e.target.value)} />
       </label>
       <label>
-        Persona
+        {tr("onb.persona", visitorLang())}
         <textarea rows={3} value={persona}
                   onChange={(e) => setPersona(e.target.value)} />
       </label>
