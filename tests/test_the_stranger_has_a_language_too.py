@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -95,25 +96,36 @@ def test_there_are_public_keys_at_all():
 
 
 def _prose() -> list[str]:
-    """User-visible English left in Public.tsx.
+    """User-visible English left in Public.tsx, from the JSX grammar itself.
 
-    JSX text nodes only. The first version of this matched anything between
-    `>` and `<` and reported `useState<Row | null>(null)` as prose — TypeScript
-    generics look exactly like tags to a regex. Lines carrying code
-    punctuation are dropped, which is crude and is why the result is
-    snapshotted rather than trusted as a count.
+    The three versions of this before now were all regexes over the source,
+    and each one hid real text:
+
+    * `>([^<>{}]+)<` skipped **any** chunk containing an interpolation, so
+      `Also present on: {surfaces}.` was invisible and the strings it did
+      report were the brace-free scraps of sentences it could not cross.
+    * TypeScript generics look exactly like tags — `useState<Row | null>`
+      opens one — so the check grew a rule dropping lines with `=`, `;`,
+      `()` or `=>` in them.
+    * That rule then swallowed `MarkPane`'s entire explanatory paragraph,
+      because a paragraph next to an `onChange={(e) => …}` lands in the same
+      bleeding region as the handler.
+
+    Twenty-five strings were on that screen. The guard reported five. Each
+    fix was the audit's recurring shape again: asking what the source *looks*
+    like when what matters is what the screen *says*.
+
+    `scripts/jsx-text.mjs` asks TypeScript's own parser for `JsxText` nodes
+    and the attributes a person reads. There is no pattern left to be wrong.
     """
-    text = PUBLIC.read_text(encoding="utf-8")
-    text = re.sub(r"/\*.*?\*/|//[^\n]*", "", text, flags=re.S)   # no comments
-    out = []
-    for chunk in re.findall(r">([^<>{}]+)<", text):
-        line = re.sub(r"\s+", " ", chunk).strip()
-        if len(line.split()) < 4:
-            continue
-        if any(mark in line for mark in ("=", ";", "()", "=>", "const ")):
-            continue
-        out.append(line)
-    return sorted(set(out))
+    proc = subprocess.run(
+        ["node", "scripts/jsx-text.mjs", "src/screens/Public.tsx"],
+        cwd=REPO / "app", capture_output=True, text=True)
+    assert proc.returncode == 0, (
+        "the JSX text extractor failed, so this check would report a "
+        f"comfortable zero:\n{proc.stderr}")
+    texts = json.loads(proc.stdout)["src/screens/Public.tsx"]
+    return sorted(set(texts))
 
 
 def _recorded() -> set[str]:
@@ -140,6 +152,69 @@ def test_the_english_that_is_left_is_written_down():
             f"{len(resolved)} recorded string(s) are gone — strike them from "
             f"{SNAPSHOT.name}:\n    " + "\n    ".join(s[:90] for s in resolved))
     assert not problems, "\n\n".join(problems)
+
+
+def test_the_extractor_can_still_see():
+    """A guard on the guard, against a fixture rather than a screen.
+
+    Everything above trusts a subprocess. If node disappears, the script is
+    renamed, or the parser stops recognising `JsxText`, `_prose()` returns an
+    empty list and every check here reports a spotless screen. The quietest
+    failures in this audit were all a pattern that stopped matching.
+
+    The first version of this pointed at `Onboarding.tsx` and asserted the
+    result was non-empty. Injecting the exact break it was written for —
+    dropping every `JsxText` node — did **not** fail it, because the
+    attribute strings kept the list non-empty. A guard that survives the
+    thing it guards against is the shape this audit is named for, so it now
+    runs against a fixture whose whole answer is known and asserted.
+    """
+    proc = subprocess.run(
+        ["node", "scripts/jsx-text.mjs", "scripts/jsx-text.fixture.tsx"],
+        cwd=REPO / "app", capture_output=True, text=True)
+    assert proc.returncode == 0, f"the extractor will not run:\n{proc.stderr}"
+    found = json.loads(proc.stdout)["scripts/jsx-text.fixture.tsx"]
+    assert found == [
+        "A heading",
+        "A paragraph that runs across several lines of source and is "
+        "nonetheless one sentence to whoever reads it.",
+        "Wrapped around",
+        "an interpolated value.",
+        "a placeholder",
+        "a title",
+        "an aria label",
+        "A button",
+    ], (
+        "the extractor no longer reads the fixture the way it is documented "
+        f"to, so a clean result for Public.tsx means nothing:\n{found}")
+
+
+def test_every_hole_survives_every_translation():
+    """`fill` substitutes by name. A translation that drops `{now}` drops the
+    profile's status out of the sentence, silently, in that language only —
+    and the English row would still look right to anybody checking."""
+    text = (SRC / "l10n.ts").read_text(encoding="utf-8")
+    langs = _languages()
+    broken = []
+    for match in re.finditer(r'"(pub\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
+        key, block = match.group(1), match.group(2)
+        rows = dict(re.findall(r'(\w+): "((?:[^"\\]|\\.)*)"', block))
+        if "en" not in rows:
+            continue
+        holes = set(re.findall(r"\{(\w+)\}", rows["en"]))
+        for code in langs:
+            if code not in rows:
+                continue
+            got = set(re.findall(r"\{(\w+)\}", rows[code]))
+            if got != holes:
+                broken.append(
+                    f"{key}/{code}: has {sorted(got) or 'none'}, "
+                    f"English has {sorted(holes) or 'none'}")
+    assert not broken, (
+        "these translations do not carry the same named values as their "
+        "English:\n    " + "\n    ".join(broken)
+        + "\n  A missing name renders as the literal `{name}` on screen; an "
+          "extra one renders as itself and says nothing.")
 
 
 def test_the_backlog_only_shrinks():
@@ -190,6 +265,10 @@ def test_the_l10n_json_is_still_parseable_as_a_table():
     language -> string, so a stray nesting cannot silently swallow a key."""
     text = (SRC / "l10n.ts").read_text(encoding="utf-8")
     for match in re.finditer(r'"(pub\.[\w.]+)":\s*\{(.*?)\n  \},', text, re.S):
-        block = match.group(2)
+        # `{now}`, `{id}` and friends are named holes for `fill`, not
+        # structure. Taking them out first keeps this check about nesting;
+        # leaving them in made it fail on every template the moment
+        # interpolated sentences became translatable units.
+        block = re.sub(r"\{\w+\}", "", match.group(2))
         assert "{" not in block, f"{match.group(1)} has a nested object"
         assert json.dumps(match.group(1))  # name is a plain string key

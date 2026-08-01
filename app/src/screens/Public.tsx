@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { t as tr, visitorLang } from "../l10n";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { api, type EmbodimentConsistency, type ObjectionOpened,
          type ObjectionStatus, type WatermarkRecovery } from "../api";
 
@@ -94,8 +94,7 @@ export function Public({ start, onBack }: {
       {pane === "same" && <SamePane />}
 
       <p className="muted small">
-        {L("pub.notoken")} If you do have a profile, signing in gets you the
-        same forms with your own case history beside them.
+        {L("pub.notoken")} {L("pub.notoken.signedin")}
       </p>
     </div>
   );
@@ -166,12 +165,13 @@ function ObjectPane() {
 
       {opened && (
         <div className="card">
-          <h3>Opened — {opened.id}</h3>
+          <h3>{fill(L("pub.object.opened"), { id: opened.id })}</h3>
           <p className="small">{opened.note}</p>
           <p className="small">
-            The profile is <strong>{opened.profile_status}</strong> from this
-            moment. It was <strong>{opened.prior_status}</strong>, and if the
-            objection is dismissed it goes back to exactly that.
+            {fill(L("pub.object.opened.status"), {
+              now: <strong>{opened.profile_status}</strong>,
+              before: <strong>{opened.prior_status}</strong>,
+            })}
           </p>
           <p className="muted small">
             {L("pub.object.writeitdown")}
@@ -189,8 +189,8 @@ function ObjectPane() {
         {status && (
           <p className="small">
             <strong>{status.status}</strong>
-            {status.objector_ref && <> · opened against{" "}
-              {status.objector_ref}</>}
+            {status.objector_ref && <>{" "}
+              {fill(L("pub.check.against"), { ref: status.objector_ref })}</>}
             {/* The reference is echoed back so somebody can confirm the case
                 is theirs. The reason is not: it is quoted in the audit trail,
                 which stays gated. */}
@@ -234,7 +234,7 @@ function SamePane() {
         </p>
         <div className="row">
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
-                 placeholder="the profile's id" style={{ flex: 1 }} />
+                 placeholder={L("pub.object.profileId")} style={{ flex: 1 }} />
           <button disabled={busy || !profileId.trim()} onClick={check}>
             {L("pub.same.go")}
           </button>
@@ -246,15 +246,21 @@ function SamePane() {
           <h3>{same.name}</h3>
           <p className="small">{same.guarantee}</p>
           <p className="muted small">
-            Signature <code>{same.signature}</code> · invariant across{" "}
-            {same.invariant_across}.
+            {fill(L("pub.same.signature"), {
+              sig: <code>{same.signature}</code>,
+              across: same.invariant_across,
+            })}
           </p>
           {same.surfaces.length > 0 && (
-            <p className="muted small">Also present on: {same.surfaces.join(", ")}.</p>
+            <p className="muted small">
+              {fill(L("pub.same.alsoon"),
+                    { surfaces: same.surfaces.join(", ") })}
+            </p>
           )}
           {same.embodiments.length > 0 && (
             <p className="muted small">
-              Forms: {same.embodiments.map((e) => e.name).join(", ")}.
+              {fill(L("pub.same.forms"),
+                    { forms: same.embodiments.map((e) => e.name).join(", ") })}
             </p>
           )}
         </div>
@@ -283,13 +289,7 @@ function MarkPane() {
     <>
       <div className="card">
         <h3>{L("pub.mark.title")}</h3>
-        <p className="muted small">
-          Paste it. This asks whose work it is with no credential id, and keeps
-          answering after the text has been reworded — which is the state text
-          usually arrives in. It is the right question for a stranger holding a
-          screenshot; checking a credential you already hold is a different one
-          and lives inside an account.
-        </p>
+        <p className="muted small">{L("pub.mark.explain")}</p>
         <textarea value={content} onChange={(e) => setContent(e.target.value)}
                   rows={6} placeholder={L("pub.mark.paste")} />
         <button disabled={busy || !content.trim()} onClick={ask}>
@@ -303,12 +303,17 @@ function MarkPane() {
             <>
               <h3>{found.display?.mark} {found.display?.label}</h3>
               <p className="small">
-                Produced by a QRME synthetic profile — <strong>{found.state}</strong>.
+                {fill(L("pub.mark.producedby"),
+                      { state: <strong>{found.state}</strong> })}
               </p>
               <p className="muted small">
-                {found.matched_windows} of {found.stored_windows} stored
-                windows matched, out of {found.examined_windows} examined
-                (similarity {found.similarity}). {found.method}
+                {fill(L("pub.mark.windows"), {
+                  matched: found.matched_windows,
+                  stored: found.stored_windows,
+                  examined: found.examined_windows,
+                  similarity: found.similarity,
+                })}{" "}
+                {found.method}
               </p>
               {found.verbatim === false && (
                 <p className="small">
@@ -322,9 +327,8 @@ function MarkPane() {
               <h3>{L("pub.mark.unknown")}</h3>
               <p className="small">{found.reason}</p>
               <p className="muted small">
-                This says nothing about whether a person wrote it. It says no
-                profile <em>on this deployment</em> has stamped work that shares
-                enough wording with it.
+                {fill(L("pub.mark.unknown.explain"),
+                      { here: <em>{L("pub.mark.here")}</em> })}
               </p>
             </>
           )}

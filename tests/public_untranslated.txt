@@ -2,28 +2,22 @@
 # profile. Checked by test_the_stranger_has_a_language_too.py, both
 # directions, and ratcheted.
 #
-# Every line below is a **sentence fragment**, and that is the point. The
-# public screen interpolates values mid-sentence — the profile's status, the
-# window counts, the profile id — so what a naive extractor pulls out is
-# "from this moment. It was" and ", and if the objection is dismissed it goes
-# back to exactly that."
+# This list used to hold five sentence fragments and describe them as the
+# hard remainder. They were not the remainder. They were what a regex over
+# the source happened to be able to see.
 #
-# Those are not translatable units. Handing them to a translation table one
-# at a time produces word-order nonsense in every language that does not
-# happen to share English's, because the interpolated value belongs somewhere
-# else in the sentence. Translating them *as listed* would be worse than
-# leaving them in English: it would look done and read broken.
+# `scripts/jsx-text.mjs` asks TypeScript's own parser instead, and the real
+# figure was twenty-five: an entire explanatory paragraph in the mark pane,
+# a whole sentence about signing in, the signature line, "Also present on:",
+# "Forms:", the window-match line, and the produced-by line — none of which
+# the old pattern could reach, because every one of them wraps an
+# interpolated value and the pattern excluded braces outright.
 #
-# Fixing them properly means restructuring the JSX so each sentence is one
-# template with its values named — which is a change to the screen, not to a
-# string table, and is its own round.
+# All twenty-four of those are now translated into all ten languages, as
+# whole sentences with their values named (`{now}`, `{stored}`) and put back
+# by `fill` — so each language decides where its own grammar wants them.
 #
-# The five whole sentences that were here have been translated into all ten
-# languages and are gone from this list.
+# What is left is the brand.
 #
-# ceiling: 5
-, and if the objection is dismissed it goes back to exactly that.
-Produced by a QRME synthetic profile —
-This says nothing about whether a person wrote it. It says no profile
-from this moment. It was
-has stamped work that shares enough wording with it.
+# ceiling: 1
+QRME

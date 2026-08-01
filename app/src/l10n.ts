@@ -4,6 +4,8 @@
 // server-side — this closes the console's frame around it. Keys fall back
 // to English so a missing translation shows words, never a blank.
 
+import { createElement, Fragment, type ReactNode } from "react";
+
 export type Lang =
   | "en" | "es" | "fr" | "de" | "pt" | "it" | "ja" | "zh" | "hi" | "ar";
 
@@ -506,12 +508,197 @@ const CHROME: Table = {
     hi: "दोनों के लिए खाता ज़रूरी नहीं।",
     ar: "لا يحتاج أيٌّ منهما إلى حساب.",
   },
+  "pub.notoken.signedin": {
+    en: "If you do have a profile, signing in gets you the same forms with your own case history beside them.",
+    es: "Si sí tiene un perfil, iniciar sesión le da los mismos formularios con su propio historial de casos al lado.",
+    fr: "Si vous avez un profil, vous connecter vous donne les mêmes formulaires avec l'historique de vos dossiers à côté.",
+    de: "Wenn Sie doch ein Profil haben, bekommen Sie nach der Anmeldung dieselben Formulare mit Ihrem eigenen Fallverlauf daneben.",
+    pt: "Se você tiver um perfil, entrar dá acesso aos mesmos formulários com o seu próprio histórico de casos ao lado.",
+    it: "Se hai un profilo, accedendo trovi gli stessi moduli con accanto lo storico dei tuoi casi.",
+    ja: "プロフィールをお持ちの場合は、サインインすると同じフォームがご自身の申立て履歴とともに表示されます。",
+    zh: "如果你确实有资料，登录后可看到同样的表单，旁边还会列出你自己的案件记录。",
+    hi: "यदि आपके पास प्रोफ़ाइल है, तो साइन इन करने पर वही फ़ॉर्म आपके अपने केस इतिहास के साथ मिलते हैं।",
+    ar: "إن كان لديك ملف بالفعل، فتسجيل الدخول يمنحك النماذج نفسها مع سجل قضاياك بجانبها.",
+  },
+  "pub.object.opened": {
+    en: "Opened — {id}",
+    es: "Abierta — {id}",
+    fr: "Ouverte — {id}",
+    de: "Eröffnet — {id}",
+    pt: "Aberta — {id}",
+    it: "Aperta — {id}",
+    ja: "受付済み — {id}",
+    zh: "已提出 — {id}",
+    hi: "दर्ज — {id}",
+    ar: "فُتح — {id}",
+  },
+  "pub.object.opened.status": {
+    en: "The profile is {now} from this moment. It was {before}, and if the objection is dismissed it goes back to exactly that.",
+    es: "El perfil queda {now} desde este momento. Era {before}, y si la objeción se desestima vuelve exactamente a eso.",
+    fr: "Le profil est {now} à partir de maintenant. Il était {before}, et si la contestation est rejetée il y revient exactement.",
+    de: "Das Profil ist ab sofort {now}. Es war {before}, und wenn der Widerspruch abgewiesen wird, kehrt es genau dorthin zurück.",
+    pt: "O perfil fica {now} a partir deste momento. Era {before}, e se a contestação for rejeitada volta exatamente a isso.",
+    it: "Il profilo è {now} da questo momento. Era {before}, e se la contestazione viene respinta torna esattamente a quello.",
+    ja: "プロフィールはこの時点から {now} になります。それまでは {before} でした。異議が棄却されれば、そのままの状態に戻ります。",
+    zh: "该资料从此刻起为 {now}。此前是 {before}；若异议被驳回，将完全恢复原状。",
+    hi: "इस क्षण से प्रोफ़ाइल {now} है। यह {before} थी, और यदि आपत्ति खारिज होती है तो वह ठीक वैसी ही हो जाएगी।",
+    ar: "الملف {now} اعتبارًا من هذه اللحظة. كان {before}، وإذا رُفض الاعتراض عاد إلى ذلك تمامًا.",
+  },
+  "pub.check.against": {
+    en: "· opened against {ref}",
+    es: "· abierta con la referencia {ref}",
+    fr: "· ouverte au nom de {ref}",
+    de: "· eröffnet unter {ref}",
+    pt: "· aberta com a referência {ref}",
+    it: "· aperta con il riferimento {ref}",
+    ja: "· 申立て参照 {ref}",
+    zh: "· 以 {ref} 提出",
+    hi: "· {ref} के संदर्भ से दर्ज",
+    ar: "· فُتح باسم {ref}",
+  },
+  "pub.same.signature": {
+    en: "Signature {sig} · invariant across {across}.",
+    es: "Firma {sig} · invariable en {across}.",
+    fr: "Signature {sig} · invariante sur {across}.",
+    de: "Signatur {sig} · unverändert über {across}.",
+    pt: "Assinatura {sig} · invariável em {across}.",
+    it: "Firma {sig} · invariante su {across}.",
+    ja: "署名 {sig} · {across} を通じて不変。",
+    zh: "签名 {sig} · 在 {across} 之间保持不变。",
+    hi: "हस्ताक्षर {sig} · {across} में अपरिवर्तित।",
+    ar: "التوقيع {sig} · ثابت عبر {across}.",
+  },
+  "pub.same.alsoon": {
+    en: "Also present on: {surfaces}.",
+    es: "También presente en: {surfaces}.",
+    fr: "Également présent sur : {surfaces}.",
+    de: "Auch vorhanden auf: {surfaces}.",
+    pt: "Também presente em: {surfaces}.",
+    it: "Presente anche su: {surfaces}.",
+    ja: "他にも次の場所にあります: {surfaces}。",
+    zh: "同时出现在：{surfaces}。",
+    hi: "यहाँ भी मौजूद: {surfaces}।",
+    ar: "موجود أيضًا على: {surfaces}.",
+  },
+  "pub.same.forms": {
+    en: "Forms: {forms}.",
+    es: "Formas: {forms}.",
+    fr: "Formes : {forms}.",
+    de: "Formen: {forms}.",
+    pt: "Formas: {forms}.",
+    it: "Forme: {forms}.",
+    ja: "形態: {forms}。",
+    zh: "形态：{forms}。",
+    hi: "रूप: {forms}।",
+    ar: "الأشكال: {forms}.",
+  },
+  "pub.mark.explain": {
+    en: "Paste it. This asks whose work it is with no credential id, and keeps answering after the text has been reworded — which is the state text usually arrives in. It is the right question for a stranger holding a screenshot; checking a credential you already hold is a different one and lives inside an account.",
+    es: "Péguelo. Esto pregunta de quién es el trabajo sin ningún identificador de credencial, y sigue respondiendo después de que el texto haya sido reescrito, que es el estado en el que suele llegar. Es la pregunta correcta para un desconocido con una captura de pantalla; comprobar una credencial que ya tiene es otra distinta y vive dentro de una cuenta.",
+    fr: "Collez-le. Ceci demande à qui appartient le contenu sans aucun identifiant de justificatif, et répond encore après reformulation du texte — l'état dans lequel il arrive le plus souvent. C'est la bonne question pour un inconnu tenant une capture d'écran ; vérifier un justificatif que vous détenez déjà en est une autre, et elle vit dans un compte.",
+    de: "Fügen Sie ihn ein. Das fragt, wessen Werk es ist, ohne jede Credential-ID, und antwortet auch noch, nachdem der Text umformuliert wurde — der Zustand, in dem Text meist ankommt. Es ist die richtige Frage für eine fremde Person mit einem Screenshot; ein Nachweis, den Sie bereits halten, ist eine andere Frage und lebt in einem Konto.",
+    pt: "Cole-o. Isto pergunta de quem é o trabalho sem qualquer identificador de credencial, e continua respondendo depois de o texto ter sido reescrito — o estado em que o texto costuma chegar. É a pergunta certa para um desconhecido com uma captura de tela; verificar uma credencial que você já possui é outra e vive dentro de uma conta.",
+    it: "Incollalo. Questo chiede di chi è il lavoro senza alcun identificativo di credenziale, e continua a rispondere dopo che il testo è stato riformulato — lo stato in cui il testo di solito arriva. È la domanda giusta per uno sconosciuto con uno screenshot; verificare una credenziale che già possiedi è un'altra cosa e vive dentro un account.",
+    ja: "貼り付けてください。これは資格情報の ID なしに、それが誰の作かを尋ねます。文章が書き換えられた後でも答え続けます — 実際に届く文章はたいていその状態です。スクリーンショットを手にした見知らぬ人にとって正しい問いです。すでに持っている資格情報を確認するのは別の問いで、それはアカウントの中にあります。",
+    zh: "粘贴进来。这会在不需要任何凭据 ID 的情况下询问它出自谁手，并且在文本被改写之后仍能作答 — 而文本通常正是以这种状态出现的。对于手持截图的陌生人，这是正确的问题；核验你已经持有的凭据是另一个问题，它属于账户内部。",
+    hi: "इसे चिपकाएँ। यह बिना किसी क्रेडेंशियल आईडी के पूछता है कि यह किसका काम है, और पाठ के शब्द बदल दिए जाने के बाद भी उत्तर देता रहता है — पाठ आम तौर पर इसी हालत में पहुँचता है। स्क्रीनशॉट थामे किसी अजनबी के लिए यही सही सवाल है; जो क्रेडेंशियल आपके पास पहले से है उसे जाँचना अलग सवाल है और वह खाते के भीतर रहता है।",
+    ar: "الصقه هنا. هذا يسأل عن صاحب العمل دون أي معرّف اعتماد، ويظل يجيب بعد إعادة صياغة النص — وهي الحالة التي يصل بها النص عادةً. إنه السؤال الصحيح لغريب يحمل لقطة شاشة؛ أما التحقق من اعتماد تملكه بالفعل فسؤال آخر يعيش داخل حساب.",
+  },
+  "pub.mark.producedby": {
+    en: "Produced by a QRME synthetic profile — {state}.",
+    es: "Producido por un perfil sintético de QRME — {state}.",
+    fr: "Produit par un profil synthétique QRME — {state}.",
+    de: "Erzeugt von einem synthetischen QRME-Profil — {state}.",
+    pt: "Produzido por um perfil sintético do QRME — {state}.",
+    it: "Prodotto da un profilo sintetico QRME — {state}.",
+    ja: "QRME の合成プロフィールによる生成物 — {state}。",
+    zh: "由 QRME 合成资料生成 — {state}。",
+    hi: "QRME की सिंथेटिक प्रोफ़ाइल द्वारा निर्मित — {state}।",
+    ar: "من إنتاج ملف اصطناعي في QRME — {state}.",
+  },
+  "pub.mark.windows": {
+    en: "{matched} of {stored} stored windows matched, out of {examined} examined (similarity {similarity}).",
+    es: "Coincidieron {matched} de {stored} ventanas almacenadas, de {examined} examinadas (similitud {similarity}).",
+    fr: "{matched} fenêtres enregistrées sur {stored} correspondent, sur {examined} examinées (similarité {similarity}).",
+    de: "{matched} von {stored} gespeicherten Fenstern stimmten überein, bei {examined} geprüften (Ähnlichkeit {similarity}).",
+    pt: "Coincidiram {matched} de {stored} janelas armazenadas, entre {examined} examinadas (similaridade {similarity}).",
+    it: "Hanno corrisposto {matched} finestre su {stored} memorizzate, su {examined} esaminate (somiglianza {similarity}).",
+    ja: "保存済み {stored} 個のウィンドウのうち {matched} 個が一致しました（検査対象 {examined} 個、類似度 {similarity}）。",
+    zh: "在 {examined} 个受检窗口中，已存储的 {stored} 个窗口有 {matched} 个匹配（相似度 {similarity}）。",
+    hi: "संग्रहीत {stored} विंडो में से {matched} मेल खाईं, कुल {examined} जाँची गईं (समानता {similarity})।",
+    ar: "تطابقت {matched} من أصل {stored} نافذة مخزّنة، من بين {examined} جرى فحصها (التشابه {similarity}).",
+  },
+  "pub.mark.here": {
+    en: "on this deployment",
+    es: "en esta instalación",
+    fr: "sur ce déploiement",
+    de: "auf dieser Installation",
+    pt: "nesta instalação",
+    it: "su questa installazione",
+    ja: "この環境で",
+    zh: "在本部署中",
+    hi: "इस परिनियोजन पर",
+    ar: "في هذا التنصيب",
+  },
+  "pub.mark.unknown.explain": {
+    en: "This says nothing about whether a person wrote it. It says no profile {here} has stamped work that shares enough wording with it.",
+    es: "Esto no dice nada sobre si lo escribió una persona. Dice que ningún perfil {here} ha firmado un trabajo que comparta suficiente redacción con él.",
+    fr: "Cela ne dit rien sur le fait qu'une personne l'ait écrit. Cela dit qu'aucun profil {here} n'a signé un contenu partageant assez de formulations avec lui.",
+    de: "Das sagt nichts darüber, ob ein Mensch es geschrieben hat. Es sagt, dass kein Profil {here} eine Arbeit gestempelt hat, die genug Wortlaut mit ihr teilt.",
+    pt: "Isto não diz nada sobre se uma pessoa o escreveu. Diz que nenhum perfil {here} carimbou um trabalho que partilhe redação suficiente com ele.",
+    it: "Questo non dice nulla sul fatto che l'abbia scritto una persona. Dice che nessun profilo {here} ha timbrato un lavoro che condivida abbastanza formulazioni con esso.",
+    ja: "これは人が書いたかどうかについては何も述べていません。{here}、これと十分に語句を共有する作品に印を付けたプロフィールが存在しない、という意味です。",
+    zh: "这并不说明它是否由人所写。它说明的是：{here}没有任何资料曾为与之用词足够相近的作品加过标记。",
+    hi: "इससे यह पता नहीं चलता कि इसे किसी व्यक्ति ने लिखा या नहीं। इसका अर्थ है कि {here} किसी प्रोफ़ाइल ने ऐसा काम मुहरबंद नहीं किया जिसकी शब्दावली इससे पर्याप्त मेल खाती हो।",
+    ar: "هذا لا يقول شيئًا عمّا إذا كان قد كتبه إنسان. إنه يقول إنه ما من ملف {here} ختم عملًا يشترك معه في ما يكفي من الصياغة.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {
   const row = CHROME[key];
   if (!row) return key;
   return row[(lang as Lang) || "en"] || row.en || key;
+}
+
+
+/**
+ * A translated sentence with its values put back in.
+ *
+ * The alternative — and what `Public.tsx` did until this round — is to break
+ * the sentence at every interpolation and let JSX stitch the pieces:
+ *
+ *     The profile is <strong>{status}</strong> from this moment. It was …
+ *
+ * Which is three English fragments, and fragments cannot be translated. Word
+ * order around an inserted value is not English's in most of the ten
+ * languages here; handing a translator "from this moment. It was" produces
+ * something that looks done and reads broken. Worse, the guard that watches
+ * for untranslated copy could only see the brace-free scraps, so the parts it
+ * reported were the parts that mattered least.
+ *
+ * So the table holds the whole sentence with its holes named — `{now}`,
+ * `{before}` — and each language puts the holes wherever its grammar wants
+ * them. An unknown name renders as itself rather than vanishing: a visible
+ * `{typo}` on screen is a bug report, an empty space is a mystery.
+ */
+export function fill(
+  template: string,
+  values: Readonly<Record<string, ReactNode>>,
+): ReactNode[] {
+  const out: ReactNode[] = [];
+  const hole = /\{(\w+)\}/g;
+  let last = 0;
+  let match: RegExpExecArray | null;
+  while ((match = hole.exec(template)) !== null) {
+    if (match.index > last) out.push(template.slice(last, match.index));
+    const value = match[1] in values ? values[match[1]] : match[0];
+    // Keyed, because React warns about array children without one and a
+    // console full of warnings is how a real one gets missed.
+    out.push(createElement(Fragment, { key: out.length }, value));
+    last = match.index + match[0].length;
+  }
+  if (last < template.length) out.push(template.slice(last));
+  return out;
 }
 
 const SUPPORTED: Lang[] =
