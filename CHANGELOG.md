@@ -4,6 +4,63 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+Two outstanding console tasks — Google/Apple credentials and the Windows Hello
+field test — written down field by field. Writing them down found a defect in
+each.
+
+### A relying party id is a domain, and `127.0.0.1` is not one
+
+`docs/signatures.md` is careful that the ceremony must run on the relying
+party's own origin, and every client obeys it: the Windows shell embeds a
+WebView2 pointed at `/signatures/ceremony`, the console opens the same page.
+Both fetch it from `http://127.0.0.1:8000` — the default base address — and
+`QRME_RP_ID` defaults to `qrme.app`.
+
+Neither can host a ceremony. `rp.id` must be a **domain**, so an IP-address
+origin has none it could use; and `qrme.app` is not a suffix of a loopback
+host either. The Register and Sign buttons had never worked from a default
+install and could not, and the browser's refusal arrives inside an embedded
+WebView as a DOMException that reads like a declined credential rather than a
+wrong address.
+
+    asked     does the ceremony run on the relying party's own origin
+    mattered  can that origin be a relying party at all
+
+Both clients now rewrite a loopback IP to `localhost` — a domain, the same
+backend, a secure context without a certificate — and the ceremony route
+refuses a pairing that cannot work with a **page** naming the variable to
+change, because a JSON error inside a WebView is a blank panel.
+
+### The Apple client secret expires and nothing says so
+
+`QRME_APPLE_CLIENT_SECRET` is not a string you copy once. It is an ES256 JWT
+minted from a `.p8`, capped by Apple at six months, with no renewal notice
+and no degraded mode — on the day it lapses every token exchange answers
+`invalid_client`. `providers()` reports the door open the entire time,
+because it asks whether the variable is *set*.
+
+`scripts/mint_apple_secret.py` mints it and reads its expiry without needing
+the key, exiting non-zero inside the last thirty days so a health check can
+act. Two things it gets right that are easy to get wrong: JWS wants a raw
+64-byte `r || s` signature where `cryptography` returns DER, and a lifetime
+past Apple's ceiling is refused at minting rather than at the exchange. The
+test verifies the signature with the public key instead of measuring it.
+
+### Added
+
+- `docs/sign-in.md` — every field of the Google Web-application client and
+  the Apple Services ID, with the return addresses, the scopes that keep it
+  out of verification review, and why a Desktop-app client cannot be used.
+- `docs/windows-hello-field-test.md` — the checklist, including what the test
+  cannot prove: Windows verifies rather than signs, the ceremony runs through
+  Edge's WebAuthn, and `basic` is the only tier a self-asserted credential
+  reaches.
+- `scripts/mint_apple_secret.py`, with `mint` and `check`.
+- `*.p8` in `.gitignore`, and a test that fails if one lands in the tree
+  anyway.
+
 ## [0.24.0] — 2026-08-01
 
 Nine rounds, one question: **when a stranger does reach the thing built for

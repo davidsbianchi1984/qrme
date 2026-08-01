@@ -45,3 +45,9 @@ verified-preview.png
 # the backend is frozen locally; the release workflow regenerates it from
 # flags, so it is a build artifact rather than source.
 *.spec
+
+# Apple's Sign in with Apple key. Downloadable exactly once, which is the
+# pressure that puts it somewhere convenient — and this repo is public.
+# scripts/mint_apple_secret.py reads it from a path outside the tree; a test
+# fails if one lands inside anyway.
+*.p8

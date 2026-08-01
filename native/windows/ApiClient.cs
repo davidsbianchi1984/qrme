@@ -1230,6 +1230,13 @@ public sealed class ApiClient
     /// The URL of the embeddable WebAuthn ceremony page. Served from the
     /// deployment's own origin because WebAuthn refuses a mismatched rpId and
     /// an opaque origin has none to match.
+    ///
+    /// The host is rewritten from a loopback IP to <c>localhost</c>. That is
+    /// not cosmetic: a relying party id must be a <em>domain</em>, and
+    /// <c>127.0.0.1</c> is not one, so every ceremony fetched from the
+    /// default base address was refused by the browser before Windows Hello
+    /// was ever reached. <c>localhost</c> is a domain, resolves to the same
+    /// backend, and counts as a secure context without a certificate.
     /// </summary>
     public string CeremonyUrl(string mode, string challenge,
                               string displayText = "", string meaning = "",
@@ -1245,7 +1252,9 @@ public sealed class ApiClient
         };
         var query = string.Join("&", q.Where(kv => kv.Value.Length > 0)
             .Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value)}"));
-        return new Uri(_http.BaseAddress!, $"/signatures/ceremony?{query}").ToString();
+        var origin = new UriBuilder(_http.BaseAddress!);
+        if (origin.Host is "127.0.0.1" or "::1" or "[::1]") origin.Host = "localhost";
+        return new Uri(origin.Uri, $"/signatures/ceremony?{query}").ToString();
     }
 
     public async Task<EnrollOptions> EnrollOptions(string displayName, string token) =>

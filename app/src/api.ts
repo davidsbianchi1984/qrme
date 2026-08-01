@@ -4828,8 +4828,22 @@ export function openCeremony(params: {
   // The path is its own literal so the route audit can see it — a template
   // that opens with `${...}` is a string the extractor cannot resolve to a
   // path, and this door would go on counting as missing.
-  return window.open(getBase() + `/signatures/ceremony?${q}`,
+  return window.open(ceremonyOrigin() + `/signatures/ceremony?${q}`,
                      "qrme-ceremony", "width=460,height=620");
+}
+
+/** The base, with a loopback IP swapped for `localhost`.
+ *
+ *  A relying party id must be a **domain**, and `127.0.0.1` is not one — so
+ *  a ceremony served from the desktop app's default base was refused by the
+ *  browser before any authenticator was reached, with a message that reads
+ *  like the credential failed rather than the address. `localhost` is a
+ *  domain, reaches the same backend, and is a secure context without a
+ *  certificate. Only the ceremony window needs this; every other call is
+ *  plain HTTP and does not care. */
+export function ceremonyOrigin(base: string = getBase()): string {
+  return base.replace(/^(https?:\/\/)(127\.0\.0\.1|\[::1\])(?=[:/]|$)/,
+                      "$1localhost");
 }
 
 /** Raw bytes, not JSON and not multipart — the route reads the request body

@@ -13,6 +13,8 @@ record that stands on its own.
 
 from __future__ import annotations
 
+import html
+import ipaddress
 import os
 
 from pydantic import BaseModel, Field
@@ -36,6 +38,48 @@ def _rp_id() -> str:
 def _allowed_origins() -> list[str] | None:
     raw = os.environ.get("QRME_RP_ORIGINS", "").strip()
     return [o.strip() for o in raw.split(",") if o.strip()] or None
+
+
+def rp_id_problem(host: str, rp_id: str) -> str | None:
+    """Why this page's origin cannot run a ceremony for ``rp_id`` — or None.
+
+    The browser makes exactly this check and refuses in one line inside a
+    promise rejection, which the operator sees as "refused" in an embedded
+    WebView with nothing to act on. Making it here means the answer arrives
+    as a page that names the setting to change.
+
+    Two rules, both from the WebAuthn spec:
+
+    * **An IP-address origin has no relying party id at all.** ``rp.id`` must
+      be a *domain*, and ``127.0.0.1`` is not one. Every client in this repo
+      reaches the backend on ``http://127.0.0.1:8000`` by default, so the
+      ceremony page's default origin is one WebAuthn cannot use. ``localhost``
+      is a domain, is a secure context, and needs no certificate — which is
+      what makes a loopback field test possible at all.
+    * **``rp.id`` must equal the origin's host or be a suffix of it.** The
+      default ``qrme.app`` is neither, from a loopback origin.
+    """
+    if not host:
+        return ("this page was fetched without a Host header, so there is no "
+                "origin for a credential to be bound to")
+    try:
+        ipaddress.ip_address(host.strip("[]"))
+    except ValueError:
+        pass
+    else:
+        return (f"WebAuthn cannot run on an IP-address origin ({host}). A "
+                "relying party id must be a domain name. Reach this page on "
+                "http://localhost:<port> instead — localhost is a domain, is "
+                "treated as a secure context, and needs no certificate — and "
+                "set QRME_RP_ID=localhost.")
+    if host != rp_id and not host.endswith(f".{rp_id}"):
+        return (f"this page was served from {host}, but QRME_RP_ID is "
+                f"{rp_id!r}. A credential is bound to its relying party id, "
+                f"and {rp_id!r} is neither {host} nor a parent of it, so the "
+                "browser refuses before the Hello prompt appears. Set "
+                f"QRME_RP_ID={host} for this deployment, or serve the console "
+                f"from {rp_id}.")
+    return None
 
 
 def _account(request: Request) -> str:
@@ -121,6 +165,18 @@ def ceremony(request: Request, mode: str = "sign", challenge: str = "",
         raise HTTPException(422, "mode must be 'sign' or 'enroll'")
     if not challenge:
         raise HTTPException(422, "a ceremony needs the challenge to sign over")
+    # HTML rather than the JSON an HTTPException would give: this page is
+    # rendered inside an embedded WebView with no developer console, so a
+    # refusal nobody can read is the same as no refusal at all.
+    trouble = rp_id_problem(request.url.hostname or "", _rp_id())
+    if trouble:
+        return HTMLResponse(
+            '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+            "<title>This origin cannot sign</title></head><body>"
+            "<h1>This origin cannot sign</h1>"
+            f"<p>{html.escape(trouble)}</p>"
+            "<p>See <code>docs/windows-hello-field-test.md</code>.</p>"
+            "</body></html>", status_code=421)
     return HTMLResponse(signing_page.ceremony_page(
         mode=mode, challenge=challenge, rp_id=_rp_id(),
         display_text=display_text, meaning=meaning, user_id=user_id,

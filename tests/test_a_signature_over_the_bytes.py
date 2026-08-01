@@ -289,19 +289,29 @@ def test_the_certificate_keeps_the_words_that_were_shown(client):
     assert "ESIGN" in cert["standard"]
 
 
+#: TestClient's default Host is `testserver`, and the default QRME_RP_ID is
+#: `qrme.app` — a pairing the ceremony route now refuses, because a credential
+#: cannot be bound to a relying party id the origin does not match. Asking for
+#: the page as the relying party's own domain is what these two tests meant
+#: all along; see `test_the_ceremony_has_nowhere_to_stand.py`.
+AS_THE_RP = {"host": "qrme.app"}
+
+
 def test_the_ceremony_page_refuses_without_a_challenge(client):
     """It is a page, not a request, and the one thing it cannot do without
     is the thing being signed over."""
-    assert client.get("/signatures/ceremony").status_code == 422
-    assert client.get(
-        "/signatures/ceremony?mode=sign&challenge=abc").status_code == 200
+    assert client.get("/signatures/ceremony",
+                      headers=AS_THE_RP).status_code == 422
+    assert client.get("/signatures/ceremony?mode=sign&challenge=abc",
+                      headers=AS_THE_RP).status_code == 200
 
 
 def test_the_ceremony_page_takes_no_token(client):
     """A bearer token in a query string ends up in logs and history. The
     page runs the ceremony and posts the raw assertion to its host, and the
     host makes the authenticated call."""
-    r = client.get("/signatures/ceremony?mode=sign&challenge=abc")
+    r = client.get("/signatures/ceremony?mode=sign&challenge=abc",
+                   headers=AS_THE_RP)
     assert r.status_code == 200
     assert "authorization" not in r.text.lower() or "Bearer" not in r.text
 
@@ -339,12 +349,17 @@ def test_the_ceremony_url_is_visible_to_the_route_audit():
     """A page the browser navigates to is still a door.
 
     The literal has to start with `/` for the extractor to resolve it, so
-    `getBase() + \\`/signatures/ceremony…\\`` rather than a template opening
+    `<origin> + \\`/signatures/ceremony…\\`` rather than a template opening
     with an interpolation — otherwise this door goes on counting as missing
     while working perfectly.
+
+    The origin is `ceremonyOrigin()` and not `getBase()`: a relying party id
+    must be a domain, and the desktop base is `http://127.0.0.1:8000`. See
+    `test_the_ceremony_has_nowhere_to_stand.py`. What this test cares about
+    is unchanged — the path is still its own literal.
     """
     api = _src("app/src/api.ts")
-    assert 'getBase() + `/signatures/ceremony?' in api
+    assert 'ceremonyOrigin() + `/signatures/ceremony?' in api
 
 
 def test_the_screen_shows_what_a_credential_can_sign():
