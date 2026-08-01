@@ -187,16 +187,47 @@ def create_app(pdi_client: PDIClient | None = None,
     # Untranslated sentences pass through as English, which is a visible gap
     # rather than a confident error, and is recorded in
     # `tests/refusals_untranslated.txt` rather than left to be noticed.
+    # ## One place the sentence is, whatever shape the structure has
+    #
+    # `detail` is a string for most refusals, a **dict** for the plan gate, and
+    # a **list** for a 422. The last round gave the 422 a top-level `message`
+    # and taught every client to read it — and left the plan gate's `message`
+    # nested inside its dict, where it had always been.
+    #
+    #     asked     does the sentence ride beside the structure
+    #     mattered  does every structured refusal put it in the same place
+    #
+    # So on iOS, Android and Windows the plan gate rendered as `HTTP 402`: no
+    # price, no plan name, no reason, on the one refusal in this product that
+    # stands between somebody and a decision to pay. iOS and Windows had always
+    # done that. Android had been showing the dict's raw JSON — ugly, but it
+    # contained the price — and reading the top-level key first is what
+    # regressed it to the status code.
+    #
+    # The fix is not a third special case. Every refusal now carries a
+    # top-level `message` holding the sentence a person reads, whichever shape
+    # `detail` is, so a client never has to know the shape and a structured
+    # refusal added later cannot repeat this. `detail` is untouched: it is the
+    # FastAPI contract, the console reads the dict to build the upgrade card
+    # with its price and button, and the driven tests read it.
     @app.exception_handler(HTTPException)
     async def _refusal_in_the_readers_language(
             request: Request, refusal: HTTPException):
         language = i18n.refusal_language(request)
+        detail = refusal.detail
         if language != i18n.DEFAULT:
-            refusal = HTTPException(
-                refusal.status_code,
-                i18n.localize_detail(refusal.detail, language),
-                headers=refusal.headers)
-        return await http_exception_handler(request, refusal)
+            detail = i18n.localize_detail(detail, language)
+        said = i18n.sentence_of(detail)
+        if said is None:
+            # Nothing a person could read — a bare status, or a structure with
+            # no message in it. Answered exactly as before rather than given an
+            # invented sentence.
+            return await http_exception_handler(
+                request, HTTPException(refusal.status_code, detail,
+                                       headers=refusal.headers))
+        return JSONResponse(status_code=refusal.status_code,
+                            content={"detail": detail, "message": said},
+                            headers=refusal.headers)
 
     # The refusal FastAPI renders itself, which is the one a person meets most
     # often: a mistyped form is a 422. `RequestValidationError` is not an

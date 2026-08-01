@@ -531,6 +531,33 @@ def tr_refusal(text: str, language: str) -> str:
             or _PUBLIC.get(text, {})).get(language, text)
 
 
+def sentence_of(detail) -> str | None:
+    """The part of a refusal a person is meant to read, whatever shape it has.
+
+    `detail` is a string for most refusals, a dict for the plan gate, and a
+    list of rows for a 422. Three shapes, and every client had to know which
+    one it was looking at — which is why the plan gate reached three of the
+    four as `HTTP 402`.
+
+        asked     does the sentence ride beside the structure
+        mattered  does every structured refusal put it in the same place
+
+    Returns `None` when there is nothing readable rather than inventing
+    something: a bare status is more honest than a sentence this module made
+    up. `api.py` answers exactly as it used to in that case.
+
+    The 422's list is deliberately not handled here. Its sentence needs the
+    reader's language and the field-name rules, which is `validation_message`'s
+    job, and its handler passes the result in directly.
+    """
+    if isinstance(detail, str):
+        return detail or None
+    if isinstance(detail, dict):
+        said = detail.get("message")
+        return said if isinstance(said, str) and said else None
+    return None
+
+
 def localize_detail(detail, language: str):
     """An HTTPException detail, translated in whichever shape it arrives.
 

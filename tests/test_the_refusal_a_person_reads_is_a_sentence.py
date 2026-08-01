@@ -333,3 +333,161 @@ def test_the_client_list_is_the_whole_set():
     shells = {p.name for p in (REPO / "native").iterdir() if p.is_dir()}
     assert shells == set(SHELLS), (
         f"native/ holds {sorted(shells)}; SHELLS above covers {sorted(SHELLS)}")
+
+
+# --- every shape, not just the one that was broken last time ----------------
+#
+# The round above gave the 422 a top-level `message` and taught all four
+# clients to read it. `detail` has three shapes in this product — a string for
+# most refusals, a **dict** for the plan gate, a **list** for a 422 — and only
+# the list was fixed. The plan gate's `message` stayed nested inside its dict,
+# where it had always been.
+#
+#     asked     does the sentence ride beside the structure
+#     mattered  does every structured refusal put it in the same place
+#
+# So the plan gate reached iOS, Android and Windows as `HTTP 402`: no price, no
+# plan name, no reason, on the one refusal in this product that stands between
+# somebody and a decision to pay. iOS and Windows had always done that. Android
+# had been coercing the dict through `toString()` and showing its raw JSON —
+# ugly, but it contained the price — and teaching it to read the top-level key
+# first is what regressed it to the status code.
+#
+# The checks below are per *shape* rather than per route, because that is the
+# axis the defect lives on and the axis nothing was testing.
+
+def _probe_app():
+    """An app with one route per detail shape.
+
+    Driven through the real handler rather than by calling `sentence_of`:
+    being right about the shapes and never being reached is exactly what
+    happened to the 422 handler when its branch sat below the string branch.
+    """
+    from fastapi import HTTPException as _HTTPException
+
+    from qrme import tiers
+    app = create_app()
+
+    @app.get("/_shape/string")
+    def _string():
+        raise _HTTPException(403, "you are not the owner of this profile")
+
+    @app.get("/_shape/dict")
+    def _dict():
+        raise _HTTPException(402, {
+            "reason": "plan", "capability": "marketplace",
+            "needs": "pro", "have": "free",
+            "price_usd": tiers.PLANS["pro"]["price_usd"],
+            "period": tiers.PLANS["pro"]["period"],
+            "message": tiers.refusal("free", "marketplace"),
+            "billing": "simulated — no real funds move"})
+
+    @app.get("/_shape/bare")
+    def _bare():
+        raise _HTTPException(404)
+
+    return TestClient(app)
+
+
+@pytest.mark.parametrize("shape,path", [
+    ("string", "/_shape/string"),
+    ("dict (the plan gate)", "/_shape/dict"),
+])
+def test_every_refusal_shape_carries_a_top_level_sentence(shape, path):
+    """The defect, per shape. A client should never have to know which one it
+    is looking at to find the sentence."""
+    body = _probe_app().get(path).json()
+    said = body.get("message")
+    assert isinstance(said, str) and said.strip(), (
+        f"a {shape} refusal carries no top-level `message`, so the three "
+        f"shells fall back to the status code: {body}")
+    assert not said.lstrip().startswith(("{", "[")), (
+        f"the sentence is a serialised structure: {said[:120]}")
+
+
+def test_the_422_shape_is_covered_by_the_same_rule(client):
+    """The list, checked here too rather than only above, so all three shapes
+    are asserted in one place and adding a fourth has an obvious home."""
+    body = client.post("/profiles", json={"kind": "self"}).json()
+    assert isinstance(body.get("message"), str) and body["message"].strip()
+
+
+def test_the_plan_gate_keeps_the_structure_the_console_renders():
+    """The sentence rides *beside* the structure, never instead of it.
+
+    `planGate()` and `Refusal.tsx` read `reason`, `needs`, `price_usd`,
+    `period` and `billing` to draw the upgrade card with its price and button.
+    A fix that flattened the refusal to a sentence would have replaced that
+    card with a line of text.
+    """
+    body = _probe_app().get("/_shape/dict").json()
+    detail = body["detail"]
+    assert isinstance(detail, dict)
+    for key in ("reason", "capability", "needs", "have", "price_usd",
+                "period", "billing"):
+        assert key in detail, f"the console's upgrade card lost {key}"
+    assert detail["reason"] == "plan"
+
+
+def test_a_refusal_with_nothing_readable_is_not_given_an_invented_sentence():
+    """`HTTPException(404)` has no message of its own.
+
+    Answered exactly as before rather than handed a sentence this codebase made
+    up — a fabricated explanation is worse than a bare status, and it would be
+    indistinguishable from a real one.
+    """
+    body = _probe_app().get("/_shape/bare").json()
+    assert "message" not in body or body.get("message"), (
+        "a refusal with nothing to say grew an empty `message`, which a client "
+        "would render as a blank line where an explanation belongs")
+
+
+@pytest.mark.parametrize("language", ["pt", "ja"])
+def test_the_lifted_sentence_is_the_translated_one(language):
+    """Order inside the handler, and a test that can actually fail on it.
+
+    The first version of this compared the top-level sentence with the nested
+    one on the plan gate — and could not fail, because the plan gate's message
+    is deliberately untranslated (`refusals_untranslated.txt` says why), so
+    both sides were the same English string no matter which order the handler
+    used. An injection that lifted the sentence *before* localizing passed.
+
+        asked     do the two copies agree
+        mattered  is the lifted one the translated one
+
+    So this drives a structured refusal whose message is in `_REFUSALS`, where
+    lifting before localizing produces a visible difference.
+    """
+    from fastapi import HTTPException as _HTTPException
+    english = "authentication required"
+    assert english in i18n._REFUSALS, (
+        "the sentence this test relies on is no longer translated — pick "
+        "another from i18n._REFUSALS, or this check goes vacuous again")
+
+    app = create_app()
+
+    @app.get("/_shape/translated_dict")
+    def _translated():
+        raise _HTTPException(401, {"reason": "auth", "message": english})
+
+    body = TestClient(app).get(
+        "/_shape/translated_dict",
+        headers={"accept-language": language}).json()
+    expected = i18n.tr_refusal(english, language)
+    assert expected != english, f"no {language} translation to distinguish"
+    assert body["message"] == expected, (
+        f"the top-level sentence is {body['message']!r}, not the {language} "
+        "one — it was lifted off the detail before the detail was localized")
+    assert body["detail"]["message"] == expected
+
+
+def test_sentence_of_reads_each_shape_and_invents_nothing():
+    """The unit behind it, including the case that must return nothing."""
+    assert i18n.sentence_of("plain") == "plain"
+    assert i18n.sentence_of({"message": "structured", "needs": "pro"}) == "structured"
+    assert i18n.sentence_of({"needs": "pro"}) is None
+    assert i18n.sentence_of(None) is None
+    assert i18n.sentence_of("") is None
+    assert i18n.sentence_of([{"msg": "row"}]) is None, (
+        "the 422 list is validation_message's job — it needs the reader's "
+        "language and the field-name rules this function does not have")
