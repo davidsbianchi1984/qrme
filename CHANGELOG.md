@@ -4,6 +4,70 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.3] — 2026-08-01
+
+### The refusal that arrived as a list
+
+0.30.1 put the 422 into the reader's language — the refusal a mistyped form
+produces, and the one a person meets most often. Nothing looked at what a
+client does with the result.
+
+`detail` on a 422 is a *list* of pydantic rows, and every client family
+rendered it by a path written for a string. The console called
+`JSON.stringify` on it, so the note under a form read
+`[{"type":"missing","loc":["body","display_name"],"msg":"Field required"}]`.
+Android's `JSONObject.optString` coerces a `JSONArray` through `toString()`,
+producing the same. iOS asked for `as? String`, got `nil`, and fell back to
+`HTTP 422`; Windows called `GetString()` on an array, which throws, was
+caught, and did the same.
+
+    asked     is the refusal translated
+    mattered  is the refusal a sentence
+
+The `msg` translated last release was correct, arrived, and was read by
+nobody: it sat inside a JSON blob or was discarded for a status code. Two of
+the four families showed the person **less** than before their language was
+ever considered.
+
+**The fix.** `i18n.validation_message` composes one sentence from the rows, in
+the reader's language, and rides beside `detail` rather than replacing it —
+`detail` is the FastAPI contract, what a machine reading this API has a right
+to, and what the driven tests read. Every client decode now reads the sentence
+first. The field name stays the API's own (`display_name`), joined with an em
+dash rather than declined into the sentence, so nothing comes out half in one
+language and half in another. Mapping those names to the labels a form
+actually shows needs a per-client table that does not exist, and is recorded as
+the remaining gap rather than guessed at.
+
+**The guard took three attempts, and the first two are why the third is worth
+having.** Asking whether a client's source mentions `message` passed on all
+four clients while all four were broken — it is a field on a model, a
+parameter name on an exception class, and a word in the comment directly above
+the bug. Anchoring on the throw and asking whether the surrounding lines read
+it caught the three shells and still passed on a broken console, because the
+fallback chain has always read the sentence key as an *alternative to*
+`detail`.
+
+    asked     does the decode mention the sentence
+    mattered  does the decode pass the sentence on
+
+Seven injections, each caught by the right test with the right message.
+
+**The shape that walked past a fix it already had.** QRME's console met this
+exact problem in an earlier round and solved it — for the plan gate, whose
+refusal is an *object* carrying its own `message`. A list is an object with no
+`message`, so the 422 fell through to the `JSON.stringify` written for the
+unhandled case.
+
+    asked     does a structured refusal reach the reader as a sentence
+    mattered  does every structured refusal
+
+`test_gates_answer_in_a_shape_a_screen_can_use` pinned the exact two-argument
+spelling of that call and fired when a third argument was added to carry the
+sentence. Loosened to a prefix match, which is what it meant — the structure
+still rides out unflattened — and re-injected to confirm it still catches the
+regression it was written for.
+
 ## [0.30.2] — 2026-08-01
 
 ### The synthetic self enters the tandem contract
