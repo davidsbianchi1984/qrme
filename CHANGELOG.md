@@ -4,6 +4,77 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.0] — 2026-08-01
+
+### Forty-six translated labels, forty-six English screens
+
+QRME's sidebar answers in the reader's language: forty-six `nav.*` keys, ten
+languages each, built by ``t(`nav.${n.id}`, lang)``. Behind those forty-six
+labels are forty-six screens, and every string on all of them is English —
+**1576 of them**, now recorded in `tests/console_untranslated.txt` and
+ratcheted.
+
+    asked     is the chrome localized
+    mattered  is anything behind the chrome localized
+
+`l10n.ts` declares its own scope in its first line — "chrome localization for
+the desktop console" — and three rounds of language audit read that sentence as
+a boundary rather than as the thing to question. Each widened correctly inside
+it: `Public.tsx`, then `Onboarding.tsx`, then the native shells. Each ended
+green.
+
+This is worse than a console with no translations at all, which is why it is
+recorded separately rather than folded in. A uniformly English console tells a
+Spanish reader the truth on the first screen. This one puts *Mercado*, *Amigos*
+and *Ajustes* in the sidebar and hands them English the moment they click —
+and the backend already answers in the profile's language, so the model replies
+in Portuguese inside a frame that cannot.
+
+The structural half is `test_the_two_records_partition_the_console`. Both
+language records now derive their screen sets from `screens/` and must together
+cover it exactly: none in both, none in neither. A screen added to this console
+lands in a count whether or not anybody remembers these files exist.
+
+
+### The persona speaks it everywhere; the platform spoke English
+
+`qrme/i18n.py` opens with "the persona speaks it everywhere", and it does — the
+directive rides on the system prompt, so every generation site inherits it. The
+product's own sentences were another matter. An owner who set Portuguese got a
+Portuguese sidebar, Portuguese answers from the model, and English on all 153
+of its refusals.
+
+`common.refusals_in` was added in 0.24.0 for the four accountless routes, and
+its docstring wrote down why the owner routes were left out:
+
+> `profile_or_404` and its siblings are shared with every owner route and say
+> "profile not found" in English, which is right there — the owner picked that
+> language
+
+The owner did not pick that language. They picked one, it is in
+`language_prefs`, and English is what they get when they picked English. The
+justification for the scope **was** the defect.
+
+    asked     did the caller state a language
+    mattered  did the profile
+
+One exception handler on the app, for the reason the membership gate is one
+dependency: a sentence cannot be added to the product and forgotten at a raise
+site, because no raise site opts in. `refusals_in` is gone — two paths
+translating one sentence are free to drift.
+
+Two ways this could have been wrong and still passed, both now driven.
+**Whose language:** reading the `profile_id` in the path answers a stranger in
+the language of the person they are asking *about*; reading `Accept-Language`
+takes `en-US` from a console owner's browser whatever they set in the app. The
+credential names the reader. **Which stored value:** `effective_language`
+returns English whenever the mode is `on_demand` — a statement about the
+persona's voice, not about what the owner reads.
+
+Eleven sentences translated into all nine; **142** recorded in
+`tests/refusals_untranslated.txt` and ratcheted, with the 49 f-string refusals
+and the plan gate named in the header as classes the file does not cover.
+
 ## [0.29.0] — 2026-08-01
 
 ### The deploy that lived in a chat log
