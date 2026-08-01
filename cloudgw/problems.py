@@ -45,6 +45,23 @@ PROBLEM_FIELDS = {"op", "status", "count", "day", "fingerprint"}
 SOURCES = {"qrme", "jim-mini", "pdi"}
 
 MAX_PROBLEMS = 50          # the console's own LIMIT; a larger batch is a bug
+
+#: How many distinct (source, version, platform, op, status) rows to keep.
+#:
+#: The aggregate had no ceiling. `op` is bounded by the route tables, but
+#: `app_version` is any short string a caller sends, so the key space grows
+#: with every release forever — and with every *claimed* release, from anyone
+#: holding a posting token. A collector that fills its own disk stops
+#: answering `/health`, and takes the model routes down with it.
+#:
+#:     asked     is each report small and well-formed
+#:     mattered  is the thing they accumulate into bounded
+#:
+#: Evicting rather than refusing is right for this data specifically: the
+#: counters are advisory, and refusing new reports to protect old ones would
+#: preserve exactly the rows least worth keeping. What must not happen is
+#: evicting *quietly*, so the count is reported.
+MAX_KEYS = 5000
 MAX_SHORT = 64             # version, platform, language
 
 # Every pattern here ends `\Z`, never `$`. Python's `$` also matches *before* a
@@ -190,6 +207,10 @@ class Aggregate:
         self.path = path
         self._lock = threading.Lock()
         self._rows: dict[str, dict] = {}
+        #: How many rows this process has dropped to stay under MAX_KEYS.
+        #: Reported rather than kept quiet: a number that silently stops
+        #: growing looks exactly like a product that stopped failing.
+        self._evicted = 0
         if path and path.exists():
             try:
                 loaded = json.loads(path.read_text("utf-8"))
@@ -213,6 +234,8 @@ class Aggregate:
     def describe(self) -> dict:
         return {"configured": self.path is not None,
                 "keys": len(self._rows),
+                "capacity": MAX_KEYS,
+                "evicted": self._evicted,
                 "note": None if self.path else
                         "no CLOUDGW_PROBLEMS_PATH set — reports are validated "
                         "and counted in memory only, and go when this process "
@@ -240,8 +263,29 @@ class Aggregate:
                 row["first_day"] = min(row["first_day"], problem["day"])
                 row["last_day"] = max(row["last_day"], problem["day"])
                 folded += problem["count"]
+            self._evict()
             self._flush()
         return folded
+
+    def _evict(self) -> None:
+        """Hold the row count at :data:`MAX_KEYS`, oldest first.
+
+        Ordered by `last_day` and then by `count` ascending, so what goes is
+        what has not been seen recently and was rare when it was. A row that
+        is still happening survives a row that stopped, which is the ordering
+        the person reading this file wants — they are looking for what to fix
+        now, not what was once briefly wrong.
+
+        Called with the lock held.
+        """
+        excess = len(self._rows) - MAX_KEYS
+        if excess <= 0:
+            return
+        doomed = sorted(self._rows.items(),
+                        key=lambda kv: (kv[1]["last_day"], kv[1]["count"]))
+        for key, _ in doomed[:excess]:
+            del self._rows[key]
+        self._evicted += excess
 
     def rows(self) -> list[dict]:
         """Worst first — the point of collecting this is to know what to fix."""

@@ -4,6 +4,50 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Kotlin's other interpolation
+
+`_spans` routes every `${`-carrying pattern to a brace counter, which is right
+for the nested-template problem it was written for and blind to the *other*
+form the same language uses. Kotlin interpolates `${expr}` **and** a bare
+`$ident`, and only the first was ever substituted — so `"/users/$uid/meds"`
+normalised to itself.
+
+    asked     does this language interpolate with braces
+    mattered  what are all the ways this language interpolates
+
+It never produced a wrong verdict, which is why it lasted: Starlette's path
+parameter matches any segment, so `$uid` resolved against `{uid}` by accident.
+But the optional-parameter cut looks for a quoted `?` *inside an interpolation
+span*, and a span never found cannot be looked inside — a Kotlin call written
+with the `$flag` idiom would have carried its query into the path. The
+divergence recorded last release is now closed rather than recorded.
+
+### The collector fills its own disk
+
+`cloudgw/problems.py` is careful about each report — fifty problems at most,
+short strings bounded, a day and not a timestamp, four classes of leak refused
+outright. Every one of those is a check on the message.
+
+Nothing checked the accumulation. `Aggregate._rows` is a plain dict keyed on
+`(source, app_version, platform, op, status)`, and `app_version` is any short
+string the caller sends, so the key space grew with every release forever —
+and with every *claimed* release, from anyone holding a posting token.
+
+    asked     is each report small and well-formed
+    mattered  is the thing they accumulate into bounded
+
+A collector that fills its own disk stops answering `/health`, which is the
+one route an orchestrator uses to decide whether to restart it; on a gateway
+that also serves the greater model, the diagnostic becomes the outage.
+
+Evicting rather than refusing, because the counters are advisory and refusing
+new reports to protect old ones preserves exactly the rows least worth
+keeping. Ordered by `last_day` then `count`, so a failure still happening
+outlives one that stopped. The dropped count is reported: a number that
+silently stops growing looks exactly like a product that stopped failing.
+
 ## [0.26.0] — 2026-08-01
 
 ### Three copies of one guard, three different blind spots
