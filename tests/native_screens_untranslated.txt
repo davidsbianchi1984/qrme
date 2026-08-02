@@ -1,0 +1,32 @@
+# English strings on the screens behind a translated tab bar, per shell.
+# Checked by test_the_tabs_are_translated_and_the_screens_are_not.py, and
+# ratcheted in both directions: the count may not rise, and the record may not
+# sit more than 20 above the real number.
+#
+# This is a measurement, not a claim. The console guard in the QRME repo
+# (test_the_nav_is_translated_and_nothing_behind_it_is.py) found forty-six
+# translated sidebar labels in front of 1577 English screens and made the same
+# choice: record it honestly rather than pretend.
+#
+#     asked     is the chrome localized
+#     mattered  is anything behind the chrome localized
+#
+# These are the worst three of the nine. This product's shells localize their
+# tab bars and almost nothing else — the Windows shell answered in the reader's
+# language exactly twice, in the nav loop and on one button, before this round
+# measured it.
+#
+# The sibling product carved its alarm surface out of these numbers this round,
+# by name rather than by count, because a count cannot tell you *which* string
+# a person could not read. Nothing has been carved out here yet. The obvious
+# candidate is the objection and audit surface — the screens where somebody
+# contests what a synthetic profile said about them — for the same reason:
+# those are decisions, not descriptions.
+#
+# The Windows count is the largest because that shell puts its wording in XAML
+# attributes, which cannot be re-read when the language changes. Localizing a
+# Windows string means moving it to the code-behind first.
+
+ios: 289
+android: 205
+windows: 326

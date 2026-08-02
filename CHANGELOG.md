@@ -4,6 +4,66 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.8] — 2026-08-02
+
+### The console guard, asked of the phones
+
+`test_the_nav_is_translated_and_nothing_behind_it_is.py` has been in this repo
+since the console rounds. It found forty-six translated sidebar labels in front
+of 1577 English screens, and said why that is worse than shipping no
+translations at all:
+
+> A uniformly English console tells a Spanish reader the truth on the first
+> screen they see. This one puts *Mercado*, *Amigos* and *Ajustes* in the
+> sidebar — the app apparently answering in their language — and then hands
+> them English the moment they click.
+
+It checks `app/src`. This product also ships three native shells, all three
+with a translated tab bar, and nobody had ever counted what is behind them.
+
+| product | iOS | Android | Windows |
+|---|---|---|---|
+| **QRME** | **2.4%** | **3.8%** | **0.6%** |
+| JIM-mini | 13.0% | 14.2% | 9.7% |
+| PDI | 8.9% | 10.2% | 3.5% |
+
+    asked     is the console's nav-vs-behind gap measured
+    mattered  is the phones' too
+
+These are the worst three of the nine. Last release recorded that this
+product's Windows shell answers in the reader's language exactly twice — the
+nav loop and one button — and left it standing rather than fixing it under
+cover of a round about something else. This is that round: 289 iOS, 205
+Android and 326 Windows strings, measured and ratcheted in
+`native_screens_untranslated.txt`.
+
+The ratchet runs both ways. The count may not rise, and the record may not sit
+more than twenty above the real number — a ceiling nobody is near is a ceiling
+somebody can drift back up into without it ever firing.
+
+### Nothing is carved out here yet, and the record says which surface should be
+
+The sibling product took its **alarm surface** off these numbers this release —
+fourteen strings on all three of its shells, by name rather than by count,
+chosen because that is where English is a hazard rather than a discourtesy.
+
+This repo has no equivalent subset yet. The record names the candidate rather
+than leaving the absence implicit: the **objection and audit** screens, where
+somebody contests what a synthetic profile said about them. Those are
+decisions, not descriptions, which is the same test the sibling applied.
+
+### Every slot is now checked to survive its translation
+
+A row whose English says `{name} was contacted` and whose German forgot the
+hole renders a sentence with the person's name missing from the middle of it.
+Nothing else would notice: the string is present, the language is right, and
+the sentence is wrong.
+
+Where a shell's table holds no slotted row — which is all three here today —
+the check **skips loudly** rather than passing on an empty set. A check over
+nothing is the failure mode this whole audit is named after, and a skip says so
+in the run output where a green dot would not.
+
 ## [0.30.7] — 2026-08-02
 
 ### A guard ported before this repo needed it
