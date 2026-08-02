@@ -61,6 +61,61 @@ def require_interactor(interactor_id: str, request: Request) -> None:
     auth.require(request, "interactor", interactor_id)
 
 
+#: A profile that has departed or been terminated produces no new words at
+#: all. Kept as one map rather than a chain of `if`s at each site, because the
+#: whole finding was that each site decided separately and most did not decide.
+_SILENT = {
+    "departed": "this profile has departed; its memory remains viewable",
+    "terminated": "this profile has been terminated",
+}
+
+#: A contested profile does not publish while the objection is open. Distinct
+#: from the sentence `chat` raises — that one is about *new interactors*, and
+#: it is right for a conversation and wrong for a public post. Answering the
+#: narrower question is how the wider one went unasked.
+RESTRICTED_WHILE_CONTESTED = (
+    "this profile is restricted pending an objection review; it is not "
+    "publishing new work while the objection is open")
+
+
+def require_may_speak(profile: dict) -> None:
+    """The profile is not departed and not terminated.
+
+    `chat` had these two branches inline and correct; nothing else had them at
+    all. They live here now so the two cannot drift apart, and so a route that
+    forgets is a route that never called this.
+    """
+    said = _SILENT.get(profile.get("status"))
+    if said:
+        raise HTTPException(410, said)
+
+
+def require_may_publish(profile: dict) -> None:
+    """The profile may produce new content for somebody else to read.
+
+    `require_may_speak`, plus the contested case.
+
+    ## The finding this exists for
+
+    Nine routes make a profile produce new words. Two checked its status:
+    `chat` and `proactive_checkin` — the two whose subject is the person on the
+    *other* side. `compose`, which writes a public post and publishes it, did
+    not. So a profile that had **departed** — a memorial, "frozen rather than
+    orphaned" in succession's own words — went on writing and publishing, and a
+    profile **restricted pending an objection review** went on publishing in
+    the voice of the person contesting it, throughout the review.
+
+        asked     can somebody still talk to a departed profile
+        mattered  can a departed profile still be made to speak
+
+    `chat` answered 410 for the dead while `compose` answered 201. Nobody could
+    talk to them; they could still talk to everybody.
+    """
+    require_may_speak(profile)
+    if profile.get("status") == "restricted":
+        raise HTTPException(403, RESTRICTED_WHILE_CONTESTED)
+
+
 def require_owner_or_interactor(profile_id: str, interactor_id: str,
                                 request: Request) -> None:
     """Gate a shared per-interactor surface (a conversation's memory): either

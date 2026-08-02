@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import (adaptation, auth, companion, db, engagement, i18n, llm,
                 moderation, persona, referral, roles, voiceprint, watermark)
-from ..common import (
+from ..common import (require_may_publish, 
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
     interactor_or_404, message_out, proactive_gate, profile_or_404,
@@ -335,6 +335,9 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
 def compose_post(profile_id: str, body: ComposeRequest, request: Request) -> dict:
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    # A public post is the widest thing this profile does. A memorial does not
+    # write one, and neither does a profile whose subject is contesting it.
+    require_may_publish(profile)
     sources = source_items(profile_id, request.app.state.pdi)
     system = persona.build_system_prompt(profile, None, None, sources=sources)
     system += (f"\n\nCompose one short public post"

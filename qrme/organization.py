@@ -166,9 +166,22 @@ def coordinate(org: dict, goal: str, from_department_id: str,
             "before asking them to coordinate")
 
     contributions = []
+    # Departments whose agent profile has departed, been terminated, or is
+    # contested do not contribute — and are named rather than dropped.
+    #
+    # Skipping quietly would be the same defect one layer along: a joint plan
+    # that reads as the whole organization's while a department's dead agent
+    # is simply missing from it. `silenced` rides back in the result so the
+    # reader can see who did not speak and why.
+    silenced = []
     for dept in departments:
         profile = dict(conn.execute("SELECT * FROM profiles WHERE id=?",
                                     (dept["profile_id"],)).fetchone())
+        if profile["status"] != "active":
+            silenced.append({"department_id": dept["id"],
+                             "department": dept["name"],
+                             "profile_status": profile["status"]})
+            continue
         items = _scoped_items(dept, pdi)
         system = persona.build_system_prompt(profile, None, None,
                                              sources=items)
@@ -186,6 +199,14 @@ def coordinate(org: dict, goal: str, from_department_id: str,
 
     lead_profile = dict(conn.execute("SELECT * FROM profiles WHERE id=?",
                                      (initiator["profile_id"],)).fetchone())
+    if lead_profile["status"] != "active":
+        raise OrganizationError(
+            "the initiating department's agent is "
+            f"{lead_profile['status']} and cannot compose a joint plan")
+    if not contributions:
+        raise OrganizationError(
+            "no department has an agent able to contribute — every one of "
+            "them has departed, been terminated, or is under objection")
     system = persona.build_system_prompt(lead_profile, None, None)
     system += (f"\n\nYou initiated a coordination across {org['name']} on: "
                f"{goal}. Each department has contributed:\n"
@@ -222,7 +243,8 @@ def coordinate(org: dict, goal: str, from_department_id: str,
     return {
         "id": coordination_id, "org_id": org["id"], "goal": goal,
         "initiated_by": initiator["name"], "plan": plan,
-        "contributions": contributions, "status": "completed",
+        "contributions": contributions, "silenced": silenced,
+        "status": "completed",
         "watermark": credential,
         "sealed": pdi_key is not None, "pdi_key": pdi_key,
     }

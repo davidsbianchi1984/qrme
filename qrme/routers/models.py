@@ -20,7 +20,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
 from .. import i18n, llm
-from ..common import profile_or_404, require_owner
+from ..common import require_may_publish, profile_or_404, require_owner
 
 router = APIRouter()
 logger = logging.getLogger("qrme.models")
@@ -89,7 +89,7 @@ def translate_text(profile_id: str, body: TranslateRequest,
     a room turn, a listing — into the profile's language (or an explicit
     target), using the profile's own model. The offline stub says it cannot
     translate rather than pretending."""
-    profile_or_404(profile_id)
+    require_may_publish(profile_or_404(profile_id))
     require_owner(profile_id, request)
     try:
         return i18n.translate(profile_id, body.text, body.to,

@@ -4,6 +4,82 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.4] — 2026-08-02
+
+### A memorial that kept posting
+
+`POST /profiles/{id}/chat` has refused a departed profile for releases:
+
+```python
+if profile["status"] == "departed":
+    raise HTTPException(410, "this profile has departed; its memory remains viewable")
+```
+
+`POST /profiles/{id}/compose` — which writes a public post in that profile's
+voice and publishes it where anyone can read it — had no such check. Driven
+against a profile that had been sunset:
+
+    chat      410
+    compose   201   ← and the post is publicly readable
+
+`succeed_profile`'s own docstring calls that state **"frozen rather than
+orphaned"**. It was not frozen. Nobody could talk to the dead; the dead could
+still talk to everybody.
+
+    asked     can somebody still talk to a departed profile
+    mattered  can a departed profile still be made to speak
+
+### The same hole, one status over
+
+`open_objection` says it **"suspends the profile pending review"**, and the
+sentence a restricted profile raises says it *"is not accepting new
+interactors"*. Both true, and both about who may **start a conversation**. A
+profile restricted pending an objection review — one whose subject is
+contesting that it should exist at all — went on composing and publishing in
+that person's voice throughout the review, which is the harm the objection was
+raised to stop.
+
+### The count
+
+**Nine route handlers make a profile produce new words. Two checked its
+status** — `chat` and `proactive_checkin`, the two whose subject is the person
+on the *other* side. The seven that did not included the one that publishes.
+
+The two gates that existed were the two whose docstrings were about a reader.
+Nobody had asked the question the other way round.
+
+### What was built
+
+One gate, `common.require_may_publish`, that every generating route passes
+through, with `chat` keeping its own extra nuance (a restricted profile may
+still answer somebody it already knows). Departed and terminated answer 410;
+restricted answers 403 with a new sentence — translated into the nine
+languages rather than added to a backlog that stands at one by decision.
+
+An organization is gated one level in, at `organization.coordinate`, because
+it speaks as *each department's* agent and the route knows only the org.
+Departments whose agent has departed, been terminated or is contested are
+skipped **and named** in a new `silenced` field: dropping them quietly would be
+this same defect one layer along, a joint plan reading as the whole
+organization's while a dead agent is simply missing from it.
+
+### The guard, and two things it did not catch at first
+
+A structural check requires every route reaching a generator to gate. Two of
+its own drafts were wrong in the shape this round is about:
+
+* It credited a handler with its own status logic by searching the **module**
+  rather than the handler, so every route in a file counted as gated if any one
+  of them mentioned the status.
+* The exemption for `organizations.coordinate` asserted that `coordinate`
+  contains a status check *somewhere*. Deleting the per-department gate left
+  the **initiating** department's check behind, and the injection passed.
+
+      asked     does coordinate check a status somewhere
+      mattered  does the loop check every department's agent
+
+  It is scoped to the `for dept in departments` loop now.
+
 ## [0.40.3] — 2026-08-02
 
 ### The provenance named the model that was asked, not the one that answered

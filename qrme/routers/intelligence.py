@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import (adaptation, agentlight, db, delegation, offline, simulation,
                 tasks, workflows)
-from ..common import (
+from ..common import (require_may_publish, 
     anonymized_exchange, interactor_or_404, profile_or_404,
     require_interactor, require_owner, require_owner_or_interactor,
 )
@@ -102,6 +102,7 @@ def revoke_grant(grant_id: str, request: Request) -> dict:
 def run_task(profile_id: str, body: TaskRun, request: Request) -> dict:
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    require_may_publish(profile)
     result = tasks.run(profile, body.kind, body.topic, body.grant_token,
                        pdi=request.app.state.pdi,
                        cloud=request.app.state.cloud)
@@ -310,6 +311,7 @@ def simulate(profile_id: str, body: SimulationRun, request: Request) -> dict:
     insight; the narrative is watermarked synthetic and never distributed."""
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    require_may_publish(profile)
     if body.interactor_id:
         interactor_or_404(body.interactor_id)
     return simulation.run(profile, body.scenario, body.horizon,

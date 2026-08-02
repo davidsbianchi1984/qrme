@@ -19,7 +19,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import catalog, db, i18n, llm, moderation, persona, watermark
-from ..common import (content_provenance, profile_or_404, require_owner,
+from ..common import (require_may_publish, content_provenance, profile_or_404, require_owner,
                       source_items)
 from ..models import GameSessionCreate, GameCallout
 
@@ -109,6 +109,8 @@ def callout(session_id: str, body: GameCallout, request: Request) -> dict:
         raise HTTPException(409, "this game session has ended")
     profile = profile_or_404(session["profile_id"])
     require_owner(session["profile_id"], request)
+    # Team comms is a public surface — the docstring above says so.
+    require_may_publish(profile)
 
     sources = source_items(session["profile_id"], request.app.state.pdi)
     system = persona.build_system_prompt(profile, None, None, sources=sources)

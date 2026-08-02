@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'this profile is restricted pending an objection review; it is not publishing new work while the objection is open': {
+        'es': 'este perfil está restringido a la espera de la revisión de una objeción; no publica trabajo nuevo mientras la objeción esté abierta',
+        'fr': "ce profil est restreint dans l'attente de l'examen d'une objection ; il ne publie pas de nouveau travail tant que l'objection est ouverte",
+        'de': 'dieses Profil ist bis zur Einspruchsprüfung eingeschränkt; es veröffentlicht keine neuen Arbeiten, solange der Einspruch offen ist',
+        'pt': 'este perfil está restrito enquanto aguarda a revisão de uma objeção; não publica trabalho novo enquanto a objeção estiver aberta',
+        'it': "questo profilo è limitato in attesa della revisione di un'obiezione; non pubblica nuovi lavori finché l'obiezione resta aperta",
+        'ja': 'このプロフィールは異議の審査を待って制限中です。異議が open のあいだ、新しい作品は公開しません',
+        'zh': '此资料因异议待审而受限；在异议未结之前不会发布新作品',
+        'hi': 'यह प्रोफ़ाइल आपत्ति समीक्षा तक प्रतिबंधित है; जब तक आपत्ति खुली है, यह नया कार्य प्रकाशित नहीं करती',
+        'ar': 'هذا الملف مقيَّد بانتظار مراجعة اعتراض؛ ولا ينشر أعمالًا جديدة ما دام الاعتراض قائمًا',
+    },
     # --- 0.40.2: the 142 recorded in tests/refusals_untranslated.txt -------
     #
     # Every one of these was a sentence the product said when it said no, in
