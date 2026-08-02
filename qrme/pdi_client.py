@@ -34,8 +34,18 @@ class _UrllibClient:
         h = {"content-type": "application/json"}
         if headers:
             h.update(headers)
+        url = self._base + path
+        # Before the `try`, deliberately: the clause below turns an HTTPError
+        # into a response, and a refusal that got swallowed into a 4xx would
+        # look like the vault answering rather than like nothing being sent.
+        #
+        # `offline.py` calls this "the on-prem PDI vault". That was a sentence
+        # about how somebody would deploy it, not a property of this code —
+        # QRME_PDI_URL can point anywhere.
+        from . import offline
+        offline.allow(url, "the PDI vault")
         req = urllib.request.Request(
-            self._base + path, data=data, method=method, headers=h)
+            url, data=data, method=method, headers=h)
         try:
             with urllib.request.urlopen(req) as r:
                 return _Response(r.status, r.read())

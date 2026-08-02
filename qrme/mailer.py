@@ -136,6 +136,15 @@ def deliver(to: str, subject: str, body: str) -> str:
         msg = EmailMessage()
         msg["From"], msg["To"], msg["Subject"] = sender, to, subject
         msg.set_content(body)
+        # Offline mode said "nothing leaves the host" and never looked here.
+        # A verification code is a small thing to send; the address it is sent
+        # *to* is a person's email handed to a third-party mail server, on a
+        # deployment configured to keep everything on the machine.
+        #
+        #     asked     is inference offline
+        #     mattered  is everything that can leave
+        from . import offline
+        offline.allow_host(settings["host"], "sending mail")
         with smtplib.SMTP(settings["host"], int(settings["port"]),
                           timeout=30) as smtp:
             smtp.starttls()

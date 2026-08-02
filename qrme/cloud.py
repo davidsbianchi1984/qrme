@@ -43,6 +43,16 @@ class _UrllibClient:
         h = {"content-type": "application/json"}
         if headers:
             h.update(headers)
+        # Offline mode gated this by never *attaching* the client —
+        # `api.py` does `app.state.cloud = None if offline.enabled()`. That is
+        # a gate on the wiring, not on the way out: anything that builds a
+        # client directly, as the tests and the suite gateway do, walks past
+        # it.
+        #
+        #     asked     is the cloud client attached
+        #     mattered  can the cloud be reached
+        from . import offline
+        offline.allow(self._base + path, "the cloud gateway")
         req = urllib.request.Request(
             self._base + path, data=data, method=method, headers=h)
         try:

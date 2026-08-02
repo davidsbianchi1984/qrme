@@ -98,6 +98,17 @@ class AnthropicProvider:
     def __init__(self, api_key: str | None = None) -> None:
         import anthropic
 
+        # Gated here and not only in `provider_for_profile`. Offline mode
+        # bypassed this by never *choosing* it — a gate on the factory, which
+        # anything constructing a provider directly walks past.
+        #
+        #     asked     does offline mode pick a local provider
+        #     mattered  can a remote one still be built and used
+        from . import offline
+        if offline.enabled():
+            raise offline.LeftTheHost(
+                "offline mode is on, so the Anthropic API cannot be reached. "
+                "Nothing leaves this machine while QRME_OFFLINE is set.")
         self._client = (anthropic.Anthropic(api_key=api_key) if api_key
                         else anthropic.Anthropic())
 
@@ -335,8 +346,14 @@ def _ollama_alive() -> bool:
         return _OLLAMA_PROBE["alive"]
     alive = False
     try:
-        req = urllib.request.Request(
-            _OLLAMA_BASE.rsplit("/v1", 1)[0] + "/api/version")
+        probe = _OLLAMA_BASE.rsplit("/v1", 1)[0] + "/api/version"
+        # "Ollama IS offline: it answers on loopback" was true of the default
+        # and never checked — QRME_OLLAMA_URL can name any host. Offline mode
+        # allows a local daemon and refuses a remote one, which is what that
+        # sentence always meant.
+        from . import offline
+        offline.allow(probe, "the local model daemon")
+        req = urllib.request.Request(probe)
         with urllib.request.urlopen(req, timeout=0.5) as r:
             alive = r.status == 200
     except Exception:  # noqa: BLE001 — not running is the common case
@@ -527,6 +544,8 @@ def _extract(text: str, marker: str) -> str | None:
 def _post_json(url: str, payload: dict, headers: dict) -> dict:
     data = json.dumps(payload).encode()
     h = {"content-type": "application/json", **headers}
+    from . import offline
+    offline.allow(url, "the model provider")
     req = urllib.request.Request(url, data=data, method="POST", headers=h)
     try:
         with urllib.request.urlopen(req, timeout=_TIMEOUT) as r:
