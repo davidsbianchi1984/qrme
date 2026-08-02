@@ -1,3 +1,5 @@
+# status: floor — 0 rows
+#
 # The accountless screen, on the three shells that are not a browser.
 # Checked by test_the_strangers_language_on_a_phone.py, and ratcheted.
 #

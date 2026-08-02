@@ -1,3 +1,5 @@
+# status: floor — 1 rows
+#
 # English refusals — the sentences this product says when it says no.
 # Checked by test_the_platform_refuses_in_one_language.py, both directions,
 # and ratcheted.

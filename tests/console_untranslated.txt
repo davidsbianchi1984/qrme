@@ -1,3 +1,5 @@
+# status: backlog — 1459 rows
+#
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
 # and ratcheted.
