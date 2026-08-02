@@ -4,6 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.7] — 2026-08-02
+
+### A guard ported before this repo needed it
+
+`test_a_screen_nothing_opens.py` holds every screen a shell declares to being
+reachable from somewhere in that shell, and every call to that shell's
+localizer to the number of arguments the localizer actually declares.
+
+The finding is the sibling product's: the synthetic-self screen shipped into
+three shells with its wording in ten languages, unreachable in all three, and
+on two of them written against a signature it did not have. A guard already
+existed to check those strings were present. They were.
+
+    asked     does the screen have its wording
+    mattered  does anything open the screen
+
+This repo's twenty iOS views, sixteen Android screens and seventeen Windows
+pages are all reachable, and every localizer call matches its shell's
+signature. That is why the port happens now rather than after something here
+breaks — the last four rounds each turned up a guard covering one surface of
+four, and the surfaces are the same three shells written the same way.
+
+**Two false positives were fixed before the guard was kept.** The first
+version required a screen to be constructed as `Name()` with no arguments, and
+called `DeskView`, `SignatureView` and `VoiceView` unreachable — all three are
+opened from `ManageView` with arguments. The second matched Kotlin composables
+against a corpus containing their own `fun Name(` declaration, which makes
+every screen its own caller.
+
+    asked     is the name written anywhere
+    mattered  is it written somewhere other than where it is defined
+
+Comments are stripped before any of it. Twice already in this audit a check has
+been satisfied by prose describing the thing it was looking for.
+
+### One thing the port found here, recorded rather than fixed
+
+This product's Windows shell makes exactly **two** calls to its localizer — the
+nav loop and one button — where its iOS shell makes seven and its Android shell
+eight. It renders nearly all of its chrome from XAML literals, so a German user
+gets a German nav pane and English everything else.
+
+That is a real gap and it is not what this release is about. It is written down
+on `test_the_call_extraction_finds_something`, whose floor is set at two for
+that reason: raising the floor to a comfortable number would have hidden it
+inside the guard meant to notice things like it.
+
 ## [0.30.6] — 2026-08-01
 
 ### The plan gate speaks the reader's language
