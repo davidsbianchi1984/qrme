@@ -2837,6 +2837,71 @@ def validation_detail(errors, language: str) -> list[dict]:
 _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 
 
+#: The label the form shows, for the fields a person types into one.
+#:
+#: `validation_message` used to render pydantic's own field name — a 422 on the
+#: sign-up form said `display_name — Field required` while the form beside it
+#: said **Profile name**, and had said it in ten languages since the console
+#: was localized.
+#:
+#:     asked     is the refusal a sentence in the reader's language
+#:     mattered  does it name the field the reader can see
+#:
+#: Server-side, where the sentence is composed, for the reason that sentence is
+#: composed here at all: nine clients rendering it is nine chances to render it
+#: differently, and six of those are in languages with no test runner in this
+#: repository.
+#:
+#: Wording ported from the console's own labels where one exists —
+#: `onb.profile.name`, `onb.persona`, `onb.email`, `onb.password` — so the
+#: sentence and the form agree by construction rather than by somebody keeping
+#: them in step. There is no mechanical mapping to port the rest: the console's
+#: rows are keyed by screen, and a name-match against them returns `title` →
+#: *"A profile depicts me"*, which is a heading. Guessing is what
+#: `validation_message`'s docstring declined to do, and this table does not.
+#:
+#: A field with no row keeps its identifier, exactly as before, and is recorded
+#: in `tests/field_labels_unmapped.txt`.
+_FIELD_LABELS: dict[str, dict[str, str]] = {
+    'display_name': {'en': 'Profile name', 'es': 'Nombre del perfil', 'fr': 'Nom du profil', 'de': 'Profilname', 'pt': 'Nome do perfil', 'it': 'Nome del profilo', 'ja': 'プロフィール名', 'zh': '资料名称', 'hi': 'प्रोफ़ाइल नाम', 'ar': 'اسم الملف'},
+    'persona': {'en': 'Persona', 'es': 'Persona', 'fr': 'Persona', 'de': 'Persona', 'pt': 'Persona', 'it': 'Persona', 'ja': 'ペルソナ', 'zh': '人设', 'hi': 'व्यक्तित्व', 'ar': 'الشخصية'},
+    'email': {'en': 'Email', 'es': 'Correo electrónico', 'fr': 'E-mail', 'de': 'E-Mail', 'pt': 'E-mail', 'it': 'E-mail', 'ja': 'メールアドレス', 'zh': '电子邮箱', 'hi': 'ईमेल', 'ar': 'البريد الإلكتروني'},
+    'password': {'en': 'Password', 'es': 'Contraseña', 'fr': 'Mot de passe', 'de': 'Passwort', 'pt': 'Palavra-passe', 'it': 'Password', 'ja': 'パスワード', 'zh': '密码', 'hi': 'पासवर्ड', 'ar': 'كلمة المرور'},
+    'birthdate': {'en': 'Date of birth', 'es': 'Fecha de nacimiento', 'fr': 'Date de naissance', 'de': 'Geburtsdatum', 'pt': 'Data de nascimento', 'it': 'Data di nascita', 'ja': '生年月日', 'zh': '出生日期', 'hi': 'जन्म तिथि', 'ar': 'تاريخ الميلاد'},
+    'reason': {'en': 'Reason', 'es': 'Motivo', 'fr': 'Motif', 'de': 'Grund', 'pt': 'Motivo', 'it': 'Motivo', 'ja': '理由', 'zh': '原因', 'hi': 'कारण', 'ar': 'السبب'},
+    'topic': {'en': 'Topic', 'es': 'Tema', 'fr': 'Sujet', 'de': 'Thema', 'pt': 'Tema', 'it': 'Argomento', 'ja': 'トピック', 'zh': '主题', 'hi': 'विषय', 'ar': 'الموضوع'},
+    'content': {'en': 'Content', 'es': 'Contenido', 'fr': 'Contenu', 'de': 'Inhalt', 'pt': 'Conteúdo', 'it': 'Contenuto', 'ja': '内容', 'zh': '内容', 'hi': 'सामग्री', 'ar': 'المحتوى'},
+    'message': {'en': 'Message', 'es': 'Mensaje', 'fr': 'Message', 'de': 'Nachricht', 'pt': 'Mensagem', 'it': 'Messaggio', 'ja': 'メッセージ', 'zh': '消息', 'hi': 'संदेश', 'ar': 'الرسالة'},
+    'title': {'en': 'Title', 'es': 'Título', 'fr': 'Titre', 'de': 'Titel', 'pt': 'Título', 'it': 'Titolo', 'ja': 'タイトル', 'zh': '标题', 'hi': 'शीर्षक', 'ar': 'العنوان'},
+    'purpose': {'en': 'Purpose', 'es': 'Propósito', 'fr': 'Objectif', 'de': 'Zweck', 'pt': 'Finalidade', 'it': 'Scopo', 'ja': '目的', 'zh': '用途', 'hi': 'उद्देश्य', 'ar': 'الغرض'},
+    'plan': {'en': 'Plan', 'es': 'Plan', 'fr': 'Formule', 'de': 'Tarif', 'pt': 'Plano', 'it': 'Piano', 'ja': 'プラン', 'zh': '方案', 'hi': 'योजना', 'ar': 'الخطة'},
+    'note': {'en': 'Note', 'es': 'Nota', 'fr': 'Note', 'de': 'Notiz', 'pt': 'Nota', 'it': 'Nota', 'ja': 'メモ', 'zh': '备注', 'hi': 'टिप्पणी', 'ar': 'ملاحظة'},
+    'objector_ref': {'en': 'Proof reference', 'es': 'Referencia de prueba', 'fr': 'Référence de preuve', 'de': 'Nachweisreferenz', 'pt': 'Referência de prova', 'it': 'Riferimento di prova', 'ja': '証明の参照番号', 'zh': '证明参考号', 'hi': 'प्रमाण संदर्भ', 'ar': 'مرجع الإثبات'},
+    'profile_id': {'en': 'Profile id', 'es': 'Id del perfil', 'fr': 'Identifiant du profil', 'de': 'Profil-ID', 'pt': 'Id do perfil', 'it': 'Id del profilo', 'ja': 'プロフィールID', 'zh': '资料 id', 'hi': 'प्रोफ़ाइल आईडी', 'ar': 'معرّف الملف'},
+    'price': {'en': 'Price', 'es': 'Precio', 'fr': 'Prix', 'de': 'Preis', 'pt': 'Preço', 'it': 'Prezzo', 'ja': '価格', 'zh': '价格', 'hi': 'मूल्य', 'ar': 'السعر'},
+    'currency': {'en': 'Currency', 'es': 'Moneda', 'fr': 'Devise', 'de': 'Währung', 'pt': 'Moeda', 'it': 'Valuta', 'ja': '通貨', 'zh': '货币', 'hi': 'मुद्रा', 'ar': 'العملة'},
+    'terms': {'en': 'Terms', 'es': 'Términos', 'fr': 'Conditions', 'de': 'Bedingungen', 'pt': 'Termos', 'it': 'Termini', 'ja': '条件', 'zh': '条款', 'hi': 'शर्तें', 'ar': 'الشروط'},
+    'scenario': {'en': 'Scenario', 'es': 'Escenario', 'fr': 'Scénario', 'de': 'Szenario', 'pt': 'Cenário', 'it': 'Scenario', 'ja': 'シナリオ', 'zh': '情景', 'hi': 'परिदृश्य', 'ar': 'السيناريو'},
+    'horizon': {'en': 'Time horizon', 'es': 'Horizonte temporal', 'fr': 'Horizon temporel', 'de': 'Zeithorizont', 'pt': 'Horizonte temporal', 'it': 'Orizzonte temporale', 'ja': '期間', 'zh': '时间范围', 'hi': 'समय-सीमा', 'ar': 'الأفق الزمني'},
+    'handle': {'en': 'Handle', 'es': 'Identificador', 'fr': 'Identifiant', 'de': 'Kürzel', 'pt': 'Identificador', 'it': 'Handle', 'ja': 'ハンドル名', 'zh': '账号名', 'hi': 'हैंडल', 'ar': 'المعرّف'},
+    'goal': {'en': 'Goal', 'es': 'Objetivo', 'fr': 'Objectif', 'de': 'Ziel', 'pt': 'Objetivo', 'it': 'Obiettivo', 'ja': '目標', 'zh': '目标', 'hi': 'लक्ष्य', 'ar': 'الهدف'},
+    'name': {'en': 'Name', 'es': 'Nombre', 'fr': 'Nom', 'de': 'Name', 'pt': 'Nome', 'it': 'Nome', 'ja': '名前', 'zh': '名称', 'hi': 'नाम', 'ar': 'الاسم'},
+}
+
+
+def field_label(name: str, language: str) -> str:
+    """The label a person sees beside this field, or its identifier.
+
+    Falls back to the identifier rather than to English: an unmapped field is
+    a name the reader was already being shown, and inventing a word for it
+    would be worse than the identifier they can at least match to the form.
+    """
+    row = _FIELD_LABELS.get(name)
+    if not row:
+        return name
+    return row.get(language) or row.get(DEFAULT) or name
+
+
 def validation_message(rows: list[dict], language: str) -> str:
     """One sentence, from rows a person was never going to read.
 
@@ -2864,9 +2929,14 @@ def validation_message(rows: list[dict], language: str) -> str:
     another. That is the failure `tests/refusals_untranslated.txt` refuses to
     ship for the plan gate, and it applies here too.
 
-    Mapping those names to the labels a form actually shows — *"Nome de
-    exibição"* rather than `display_name` — is a per-client table this does not
-    have, and is recorded as the remaining gap rather than guessed at.
+    **Since 0.40.8 the fields a person types into a form carry the label the
+    form shows** — `_FIELD_LABELS` above, ported from the console's own labels
+    where one exists so the sentence and the form agree by construction. A
+    field with no row keeps its identifier, which is what the paragraph above
+    describes and is still the right answer for it: an identifier the reader
+    can match to the form beats a word invented for them. The unmapped ones are
+    recorded in `tests/field_labels_unmapped.txt` and that record only
+    shrinks.
 
     Carries nothing `detail` does not: the same `loc` and the same already
     redacted `msg`, which is what `test_the_sentence_says_no_more_than_the_rows`
@@ -2878,7 +2948,7 @@ def validation_message(rows: list[dict], language: str) -> str:
         if where and where[0] in _WHERE_MARKERS:
             where = where[1:]
         name = ".".join(tr_refusal(p, language) if p == UNRECOGNISED_FIELD
-                        else p for p in where)
+                        else field_label(p, language) for p in where)
         said = str(row.get("msg", ""))
         parts.append(f"{name} — {said}" if name else said)
     return "; ".join(p for p in parts if p)

@@ -4,6 +4,70 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.8] — 2026-08-02
+
+### The refusal named the field the API calls it
+
+### The finding
+
+An earlier round took the 422 from `[{"type":"missing",...}]` to one sentence a
+person can read, in their own language. It stopped one step short, and said so
+in its own docstring:
+
+> Mapping those names to the labels a form actually shows — *"Nome de
+> exibição"* rather than `display_name` — is a per-client table this does not
+> have, and is recorded as the remaining gap rather than guessed at.
+
+So a person mistyping the sign-up form was told **`display_name — Field
+required`** while the form beside it said **Profile name**, and had said it in
+ten languages since the console was localized.
+
+    asked     is the refusal a sentence in the reader's language
+    mattered  does it name the field the reader can see
+
+### Where the table lives
+
+Server-side, beside the sentence, for the reason the sentence is composed there
+at all: nine clients rendering it is nine chances to render it differently, and
+six of those are in languages with no test runner in this repository.
+
+Wording is ported — from the console's own labels in QRME (`onb.profile.name`,
+`onb.persona`, `onb.email`, `onb.password`), and from QRME's table into the two
+siblings for every row they share. One vocabulary across three products is one
+thing to keep right; three is three.
+
+There is no mechanical mapping for the rest: the console's rows are keyed by
+screen, not by field, and a name-match across them returns `title` → *"A
+profile depicts me"*, which is a heading. Guessing is what the docstring above
+declined to do, and this table does not.
+
+### The identifier stays the fallback
+
+A field with no row keeps its API name. That is a decision, not a gap: an
+identifier a reader can match to the form in front of them beats a word
+invented for them — the same reasoning that keeps `QRME_ADMIN_TOKEN` in English
+in `refusals_untranslated.txt`. The unmapped fields are recorded, and the
+record only shrinks.
+
+### Changed
+
+- `_FIELD_LABELS` — 23 fields × ten languages — and `field_label()`;
+  `validation_message` renders the label where there is one.
+- `tests/field_labels_unmapped.txt` records the other 251, with a status line.
+- `tests/test_the_refusal_names_the_field_on_the_form.py` — 34 tests.
+
+Two things the guard caught in its own round. The field scan first read
+`models.py` alone and reported 168 fields; the account models — `email`,
+`password`, the whole sign-up form, which is the most person-facing surface
+there is — live in `routers/accounts.py`. And the table's first draft carried
+`grantee_name`, the sibling vault product's bequest field, copied across while
+working in both repositories in one sitting: correct, translated into ten
+languages, and on a field this product does not have. Both now fail a check.
+
+Four injections: the sentence back to the identifier, a label for a field no
+model declares, a row cut to three languages, and the refusal's wording drifted
+from the form's.
+
 ## [0.40.7] — 2026-08-02
 
 ### The record that outlived the code
