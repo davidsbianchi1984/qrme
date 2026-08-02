@@ -109,15 +109,28 @@ def _prose() -> list[str]:
         "the JSX text extractor failed, so this check would report a "
         f"comfortable zero:\n{proc.stderr}")
     found = json.loads(proc.stdout)
-    # Empty strings are dropped, and only empty ones. Three of them come from
-    # `alt=""` on decorative avatars in Wall.tsx, which is the correct
-    # accessibility marking rather than a missing translation — an empty alt
-    # tells a screen reader to skip the image, and filling it in would be a
-    # regression. Whitespace-bearing strings are kept: `" · "` is a separator
-    # somebody reads.
+    # Empty strings are dropped, and three of those come from `alt=""` on
+    # decorative avatars in Wall.tsx — the correct accessibility marking
+    # rather than a missing translation, since an empty alt tells a screen
+    # reader to skip the image.
+    #
+    # **Strings with no letter are dropped too, reversing this file's earlier
+    # rule.** It used to say: *"Whitespace-bearing strings are kept: `" · "`
+    # is a separator somebody reads."* That was a deliberate decision and it
+    # conflated two things. A separator is *rendered*; it is not *unreadable
+    # to a non-English speaker*. There is no Portuguese for `·`, and none for
+    # `⚠`, `%`, `.` or `—` either.
+    #
+    #     asked     is this string rendered to somebody
+    #     mattered  is this string one a non-English reader cannot read
+    #
+    # 117 of the rows in the record were punctuation, so the count this file
+    # exists to state honestly was overstated by that much. The sibling
+    # product hit the identical thing one release earlier with
+    # `"\(dim): \(n)%"` in the shells, and this is the same correction.
     return sorted({f"{s.removesuffix('.tsx')}: {text}"
                    for s in gated for text in found[f"src/screens/{s}"]
-                   if text != ""})
+                   if re.search(r"[A-Za-z]", text)})
 
 
 def _recorded() -> set[str]:

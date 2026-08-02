@@ -4,6 +4,40 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.10] — 2026-08-02
+
+### A rule reversed, and said so rather than changed quietly
+
+`test_the_nav_is_translated_and_nothing_behind_it_is.py` records how many
+English strings sit behind this console's forty-six translated sidebar labels.
+It kept punctuation, under a rule written into the file in its own words:
+
+> Whitespace-bearing strings are kept: `" · "` is a separator somebody reads.
+
+That was a deliberate decision and it conflated two different things. A
+separator is **rendered**; it is not **unreadable to a non-English speaker**.
+There is no Portuguese for `·`, and none for `⚠`, `%`, `.` or `—` either.
+
+    asked     is this string rendered to somebody
+    mattered  is this string one a non-English reader cannot read
+
+**117 of the rows in `console_untranslated.txt` were punctuation** — so the
+count this file exists to state honestly was overstated by that much. The
+ceiling is corrected from 1576 to **1459**.
+
+The sibling product hit the identical thing one release earlier, in the shells,
+where the extractor counted `"\(dim): \(n)%"` as English prose; 0.30.9
+corrected that and this is the same correction one surface over. Twice now the
+question has been *did the extractor find a string* when what mattered was
+*did it find a word*.
+
+### Nothing else changed here
+
+The round's work is the sibling product's: a QRME specialist could be reached
+from its monitoring path and not from its coach, so the person who typed a
+question got a weaker answer than the person whose watch noticed something.
+That fix is JIM-side. This repo carries the correction above and the version.
+
 ## [0.30.9] — 2026-08-02
 
 ### Two corrections carried in from the sibling's round
