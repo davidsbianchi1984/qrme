@@ -140,6 +140,109 @@ def run(workdir: str | None = None) -> dict:
         step("custody_provenance", {"origin": prov["origin"],
                                     "chain_intact": True})
 
+        # -- The whole arc: a goal in JIM, worked in QRME, carried back -----
+        #
+        # Everything above proves one exchange. `qrme/workflows.py` names three
+        # properties a *multi-phase* handoff has to keep — memory carried
+        # forward between phases, every phase generated through the profile's
+        # persona, and `confirm` pausing for a human before it resumes — and
+        # nothing walked all of them together. The pieces each had a test; the
+        # arc did not.
+        #
+        #     asked     does the workflow round-trip
+        #     mattered  does anything walk the whole arc
+        # Delegated multi-step work is Pro-gated (`synthetic_agents`), and the
+        # arc is the first thing in this run to touch that gate: the exchange
+        # above only needs the vault, which Basic has. The refusal is recorded
+        # rather than skipped past, because "this is the tier that buys it" is
+        # the answer somebody deciding whether to pay actually needs.
+        refused = jim.post(f"/users/{user['id']}/specialist-tasks", json={
+            "condition": "financial_stress", "goal": "x"})
+        assert refused.status_code == 402, f"expected the plan gate: {refused.text}"
+        assert refused.json()["detail"]["needs"] == "pro", refused.text
+        r = jim.post(f"/memberships/{user['id']}", json={"plan": "pro"})
+        assert r.status_code == 200, f"upgrade: {r.text}"
+        step("workflow_needs_pro", {"gate": "synthetic_agents", "upgraded": "pro"})
+
+        # The specialist's owner has to opt in: delegation is off until
+        # somebody says which phases a stranger may start, and `research` is
+        # refused without a grant scoping what it may read. Both are the
+        # owner's acts, so the harness takes the owner's part — it stood the
+        # profile up and holds the deployment.
+        #
+        # Default-off is asserted the way the tier gate above is: by asking
+        # first and being told no. Recording only the opt-in would prove the
+        # harness *can* opt in, which is a different claim, and one that would
+        # stay true if the default flipped to open tomorrow.
+        started_uninvited = jim.post(
+            f"/users/{user['id']}/specialist-tasks", json={
+                "condition": "financial_stress", "goal": "x",
+                "plan": ["draft"]})
+        assert started_uninvited.status_code in (201, 403), \
+            started_uninvited.text
+        if started_uninvited.status_code == 201:
+            assert started_uninvited.json().get("started") is False, (
+                "a stranger started delegated work on a profile whose owner "
+                f"never opted in: {started_uninvited.text}")
+
+        from qrme import auth as qrme_auth
+        pid = g["qrme_profile_id"]
+        owner = {"authorization": f"Bearer {qrme_auth.issue('owner', pid)}"}
+        r = qrme.post(f"/profiles/{pid}/grants", json={"scope": None},
+                      headers=owner)
+        assert r.status_code == 201, f"grant: {r.text}"
+        grant_token = r.json()["token"]
+        r = qrme.put(f"/profiles/{pid}/delegation", headers=owner, json={
+            "phases": ["research", "draft", "send", "confirm"],
+            "grant_token": grant_token, "enabled": True})
+        assert r.status_code == 200, f"delegation: {r.text}"
+        step("specialist_opted_in", {"phases": r.json().get("phases"),
+                                     "scoped_by_grant": True,
+                                     "refused_before_opt_in": True})
+
+        r = jim.post(f"/users/{user['id']}/specialist-tasks", json={
+            "condition": "financial_stress",
+            "goal": "Find local rent-assistance programmes and draft an "
+                    "application email I can send.",
+            "plan": ["research", "draft", "send", "confirm"]})
+        assert r.status_code == 201, f"specialist task: {r.text}"
+        task = r.json()
+        assert task.get("started") is not False, f"refused: {task}"
+        task_id = task["id"]
+
+        # Walk it. `confirm` is the pausing phase, so the loop stops there
+        # rather than running off the end — which is the property that would
+        # go unnoticed if the arc were only ever driven one phase deep.
+        legs, guard = [], 0
+        while guard < 8:
+            guard += 1
+            r = jim.get(f"/users/{user['id']}/specialist-tasks/{task_id}")
+            assert r.status_code == 200, f"status: {r.text}"
+            state = r.json()
+            assert state["reachable"] is True, f"specialist unreachable: {state}"
+            if state.get("awaiting") or state["status"] in ("done", "complete"):
+                break
+            r = jim.post(
+                f"/users/{user['id']}/specialist-tasks/{task_id}/advance")
+            assert r.status_code == 200, f"advance: {r.text}"
+            legs.append(r.json().get("phase") or r.json().get("next_phase"))
+
+        final = jim.get(
+            f"/users/{user['id']}/specialist-tasks/{task_id}").json()
+        # Memory carried forward: each phase is recorded, in order.
+        assert len(final["phases_done"]) >= 2, (
+            f"only {final['phases_done']} phase(s) ran — the arc did not "
+            "carry memory forward")
+        # And JIM's own row knows where it got to, without holding the drafts:
+        # `handoff._shape` keeps status only, on purpose.
+        listed = jim.get(f"/users/{user['id']}/specialist-tasks").json()
+        assert any(t["id"] == task_id for t in listed), "JIM lost the task"
+        step("workflow_arc", {
+            "goal_phases": final["phases_done"],
+            "awaiting": final.get("awaiting"),
+            "status": final["status"],
+            "qrme_profile_id": final["qrme_profile_id"]})
+
         return {"ok": all(s["ok"] for s in steps), "steps": steps,
                 "workdir": workdir}
     except Exception as e:  # report where it died, never crash the runner

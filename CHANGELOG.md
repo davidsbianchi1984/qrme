@@ -4,6 +4,76 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.10] — 2026-08-02
+
+### The workflow round-trips and nothing walked the whole arc
+
+### The finding
+
+`qrme/workflows.py` opens by naming three properties a delegated, multi-phase
+goal has to keep:
+
+  * memory is carried forward between phases,
+  * every phase is generated through the profile's persona,
+  * and `confirm` pauses for a human before the work goes out.
+
+Each had unit coverage on its own side of the wire. QRME tested `advance`.
+JIM tested `handoff.start` against a stub. What nothing did was walk the arc
+end to end: `suite/smoke.py` — the one check that boots all three products
+together — seeded them, wired the tandems, drove a single exchange, proved its
+custody through the vault, and stopped. `start_workflow`, `advance` and
+`specialist_tasks` were never called across the boundary at all.
+
+    asked     does the workflow round-trip
+    mattered  does anything walk the whole arc
+
+### What driving it found
+
+Two behaviours nothing had met end to end, both now recorded as steps rather
+than discovered as surprises:
+
+  * **Delegated work is Pro-gated.** The first `POST /users/{id}/specialist-tasks`
+    came back `402` naming `synthetic_agents`. The exchange the smoke check
+    already drove needs only the vault, which Basic has — so the run had never
+    touched that gate. The refusal is now asserted before the upgrade, because
+    "this is the tier that buys it" is the answer somebody deciding whether to
+    pay actually needs.
+  * **Delegation is off until the specialist's owner opts in**, and `research`
+    is refused unless a grant scopes what it may read. The run now proves the
+    default the way it proves the tier gate — by asking first and being told
+    no — then takes the owner's part: mints an owner token, creates the grant,
+    and `PUT`s the delegation policy.
+
+The arc then walks `research → draft → send` and stops at `confirm`, with
+`awaiting` naming what it is waiting for. Three phases carried forward, and a
+pause instead of an ending.
+
+### Checks
+
+`tests/test_suite_smoke.py` grew from three assertions on one run to eight
+named checks over a module-scoped run: the tier gate is named, the owner had
+to opt in, memory crossed more than one phase, `confirm` paused rather than
+completed, and JIM's surviving row still names the profile that did the work.
+
+Driven three ways before it was believed:
+
+  * make `confirm` complete instead of pause — and note what that looks like
+    from the outside: **four** phases done rather than three. A check that
+    counted phases would have read the regression as a *fuller* pass. Only the
+    check that asks whether it paused fails.
+  * stop carrying memory between phases — the arc dies naming the phase list
+    it did not build.
+  * open the delegation gate — which took **two** edits, not one. Flipping
+    `delegation.offer`, the advertised answer to "do you accept work", got
+    nothing started: `delegation.start` re-checks the policy itself. The
+    advertisement is not the gate, and the second check is the one that holds.
+
+### Also
+
+The failure the smoke fixture reports is now the step that died and how far the
+run got, rather than a truncated dump of the whole report with `...` where the
+answer was.
+
 ## [0.40.9] — 2026-08-02
 
 ### The README said v0.18.0
