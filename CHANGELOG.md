@@ -4,6 +4,49 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.2] — 2026-08-02
+
+### The refusals, finished
+
+0.24.0 translated the eleven refusals any route can raise and **wrote the rest
+down**. 142 sentences sat in `tests/refusals_untranslated.txt` from that day to this — the sentences
+this product says when it says no, still English on an account that had chosen
+otherwise.
+
+An owner who set Portuguese got a Portuguese sidebar, Portuguese answers from
+the model, and English the moment they were told no.
+
+
+    asked     is the refusal translated
+    mattered  is every refusal translated
+
+All 141 are now in `_REFUSALS`, in the nine languages beside English. The
+record is a decision rather than a backlog for the first time: one sentence, the `QRME_ADMIN_TOKEN` misconfiguration its own header
+already argued should stay English, because the person who can act on it is
+an operator and the fix is the name of an environment variable.
+
+### What deliberately stays an identifier
+
+Field names, header names, enum values and environment variables are not
+translated and are not meant to read as words — `base_age, robot_id, QRME_PDI_URL, approve/reject`. They are the API's own
+names, the same string in every language, and declining them into a sentence is
+the half-in-one-language failure the table exists to refuse.
+
+### The check that could not have caught a lie
+
+`test_every_translated_refusal_has_every_language` asks whether each row has
+all nine keys. A row whose nine values are the English sentence pasted nine
+times satisfies it exactly — and the table would then claim the refusal is
+handled while every reader still got English.
+
+    asked     does every refusal have every language
+    mattered  does every language say something other than the English
+
+That gap was harmless while eleven rows were added by hand and reviewed one at
+a time. It stops being harmless the moment 141 are added in one release, so
+`test_no_refusal_is_translated_into_english` was added first and injected
+against: an English value in one slot of one row fails it by name.
+
 ## [0.40.1] — 2026-08-02
 
 ### The objector could end a profile and could not read their own case
