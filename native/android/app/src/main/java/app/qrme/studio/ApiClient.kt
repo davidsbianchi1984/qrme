@@ -26,7 +26,11 @@ data class Objection(val id: String, val status: String, val reason: String?, va
  *  review, rather than after somebody gets round to it. */
 data class ObjectionOpened(
     val id: String, val status: String,
-    val profileStatus: String, val note: String,
+    val profileStatus: String,
+    // What it was before, so the sentence can say what a dismissal
+    // restores. Returned since objections shipped; no shell read it.
+    val priorStatus: String = "active",
+    val note: String,
 )
 data class ChatMessage(val content: String?, val status: String, val flagReason: String?,
                        val provenance: Provenance? = null, val watermarkLine: String? = null,
@@ -37,7 +41,12 @@ data class ChatMessage(val content: String?, val status: String, val flagReason:
 data class WatermarkRecovery(val recovered: Boolean, val reason: String?,
                              val profileId: String?, val verbatim: Boolean,
                              val similarity: Double, val matchedWindows: Int,
-                             val storedWindows: Int, val state: String?,
+                             val storedWindows: Int,
+                             // How many windows were looked at, which is the
+                             // denominator the shell's sentence names. iOS has
+                             // carried it since the mark shipped; this did not.
+                             val examinedWindows: Int = 0,
+                             val state: String?,
                              val bestSimilarity: Double?, val threshold: Double?,
                              val markLine: String?, val disclosure: String?,
                              val method: String?)

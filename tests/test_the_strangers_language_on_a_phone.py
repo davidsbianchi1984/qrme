@@ -308,7 +308,10 @@ def test_the_native_backlog_is_written_down_and_only_shrinks():
     ceiling = int(re.search(r"# ceiling: (\d+)",
                             SNAPSHOT.read_text(encoding="utf-8")).group(1))
     recorded = _recorded()
-    assert recorded, "the snapshot is empty but the round is not finished"
+    # It used to say "the snapshot is empty but the round is not finished".
+    # The round is finished, and an empty file is now the right answer — held
+    # up by `test_no_accountless_screen_has_english_of_its_own` below rather
+    # than by anybody's word.
     assert len(recorded) <= ceiling, (
         f"{len(recorded)} entries, above the {ceiling} this guard started at")
 
@@ -329,3 +332,168 @@ def test_the_screens_the_backlog_names_are_still_there():
         assert (REPO / screen).exists(), (
             f"{name}'s accountless screen is gone from {screen} — the "
             "backlog below is measuring nothing")
+
+
+# --- the round after that: the strings themselves ---------------------------
+#
+# `native_untranslated.txt` recorded three shells and only shrank, which made
+# the remainder a decision rather than an oversight. It could also be driven to
+# zero by deleting three lines: nothing here read the screens.
+#
+#     asked     is the backlog written down and shrinking
+#     mattered  did anything get translated
+#
+# So the floor is now held up by the screens rather than by the file. The
+# checks below borrow the *sibling guard's* extraction patterns rather than
+# writing their own, because two definitions of "an English string on a screen"
+# is two numbers that can disagree, and the disagreement would live in
+# whichever one nobody was reading.
+
+from tests.test_the_tabs_are_translated_and_the_screens_are_not import (  # noqa: E402
+    SHELLS as _COUNTED, _HAS_LETTER, _HOLE, _code as _screen_code)
+
+CONSOLE_TABLE = REPO / "app" / "src" / "l10n.ts"
+
+#: Keys the shells carry that the console has no row for, each with the reason.
+#: Everything else must be a port — a second translation of the same sentence
+#: is a second thing to keep in step, and it drifts first in the language
+#: nobody here reads.
+SHELL_ONLY = {
+    "pub.back.short": "a sheet's dismiss button; the console's `pub.back` says "
+                      "'Back to sign in', which is a browser's whole-page nav",
+    "pub.object.needid": "client-side validation; the console validates in the "
+                         "form and never composes this sentence",
+    "pub.mark.needtext": "the same, on the other pane",
+    "pub.object.ref.ph": "a placeholder; the console's field has none",
+}
+
+
+#: Literals the extraction sees and no reader reads. One entry, and it is an
+#: identifier prefix: `prf_…` is what a QRME profile id starts with, and it
+#: starts with that in all ten languages. Declared rather than translated,
+#: because a translated `prf_…` would be a wrong hint in nine of them — and
+#: declared rather than skipped by a widened pattern, because "strings that
+#: look like identifiers" is a rule that would quietly swallow real prose.
+NOT_PROSE = {
+    "prf_…": "the literal prefix of every profile id, in every language",
+}
+
+
+def _accountless_files(name: str) -> list[Path]:
+    """The screen, as files. Windows is two — the markup and the code-behind —
+    and the markup is where every one of its strings used to live, which is why
+    that shell's count was the largest of the nine."""
+    if name == "windows":
+        return [REPO / "native/windows/Views/WithoutAnAccountPage.xaml",
+                REPO / "native/windows/Views/WithoutAnAccountPage.xaml.cs"]
+    return [REPO / dict((n, scr) for n, _, _, scr in SHELLS)[name]]
+
+
+def _accountless_text(name: str) -> str:
+    out = []
+    for path in _accountless_files(name):
+        if not path.exists():
+            continue
+        text = _screen_code(path)
+        out.append(_accountless(name, text) if name == "android" else text)
+    return "\n".join(out)
+
+
+def test_no_accountless_screen_has_english_of_its_own():
+    """The strings, not the record of the strings.
+
+    Deleting three lines from `native_untranslated.txt` would have satisfied
+    the ratchet above with all three screens still in English. This reads the
+    screens.
+    """
+    left = []
+    for name, _, _, _ in SHELLS:
+        patterns = _COUNTED[name][2]
+        text = _accountless_text(name)
+        found = {s for pat in patterns for s in re.findall(pat, text)
+                 if _HAS_LETTER.search(_HOLE.sub("", s))}
+        left += [f"{name}: {s[:72]}" for s in sorted(found - set(NOT_PROSE))]
+    assert not left, (
+        f"{len(left)} English string(s) still on the one screen in each shell "
+        "built for somebody with no profile — and therefore no profile "
+        "language:\n    " + "\n    ".join(left))
+
+
+def test_the_screen_scan_is_reading_the_screens():
+    """A guard on the guard: a path that stopped resolving would report no
+    English and pass the check above on an empty string."""
+    for name, _, _, _ in SHELLS:
+        text = _accountless_text(name)
+        assert len(text) > 800, (
+            f"{name}'s accountless screen read as {len(text)} characters — the "
+            "check above is passing on nothing")
+
+
+def _keys_used(name: str) -> set[str]:
+    return set(re.findall(r'"(pub\.[\w.]+)"', _accountless_text(name)))
+
+
+def test_the_shells_say_what_the_console_says():
+    """Ported, not translated again.
+
+    The console had these sixty-four rows in ten languages before this round.
+    A shell that writes its own is a second wording of the same sentence, and
+    the drift shows up first in the language nobody here reads.
+    """
+    console = set(re.findall(
+        r'"(pub\.[\w.]+)":', CONSOLE_TABLE.read_text(encoding="utf-8")))
+    invented = []
+    for name, _, _, _ in SHELLS:
+        for key in sorted(_keys_used(name)):
+            if key.startswith("pub.state."):
+                continue          # substituted into a sentence, never shown raw
+            if key not in console and key not in SHELL_ONLY:
+                invented.append(f"{name}: {key}")
+    assert not invented, (
+        "these keys exist on a shell and not in the console's table, and are "
+        "not declared shell-only with a reason:\n    " + "\n    ".join(invented))
+
+
+def test_every_shell_only_key_is_still_used_by_a_shell():
+    """An exemption for a key nothing renders is a paragraph in front of
+    nothing."""
+    used = set().union(*(_keys_used(n) for n, _, _, _ in SHELLS))
+    stale = sorted(k for k in SHELL_ONLY if k not in used)
+    assert not stale, (
+        "these shell-only keys are on no screen — strike them:\n    "
+        + "\n    ".join(stale))
+
+
+def test_every_ported_row_carries_every_language():
+    """Ten languages, or the row is a promise the table does not keep.
+
+    A key present with three languages passes a check that only asks whether
+    the key is there, and answers the other seven readers in English.
+    """
+    langs = ("en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar")
+    thin = []
+    for name, l10n, _, _ in SHELLS:
+        path = REPO / l10n
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            m = re.search(r'"(pub\.[\w.]+)"', line)
+            if not m:
+                continue
+            missing = [c for c in langs
+                       if not re.search(rf'"{c}"\s*(?::|to|\])\s*=?\s*"', line)]
+            if missing:
+                thin.append(f"{name} {m.group(1)}: missing {', '.join(missing)}")
+    assert not thin, (
+        "these rows are not in every language:\n    " + "\n    ".join(thin))
+
+
+def test_every_not_prose_literal_is_still_on_a_screen():
+    """A guard on the exemption: a literal nothing renders any more is a hole
+    with a paragraph in front of it, which is how the seven ungated tables in
+    the release before this one looked."""
+    text = "\n".join(_accountless_text(n) for n, _, _, _ in SHELLS)
+    stale = sorted(k for k in NOT_PROSE if k not in text)
+    assert not stale, (
+        "these exempt literals are on no screen — strike them:\n    "
+        + "\n    ".join(stale))

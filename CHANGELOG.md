@@ -4,6 +4,70 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.6] — 2026-08-02
+
+### The stranger's language, finished
+
+Two rounds ago every shell learned to work out what language its reader speaks
+without a profile — `Locale.preferredLanguages`, the system locale list,
+`CurrentUICulture` — and the round stopped there, on purpose: twenty-odd
+sentences on each of three screens was its own round, and half-porting them
+would have been the per-client mistake in miniature. The remainder went into
+`native_untranslated.txt`, which only shrinks.
+
+This is that round. The accountless screen — the one a person reaches when they
+have found a synthetic profile of themselves, or are holding a screenshot and
+want to know whether a person wrote it — now speaks ten languages on iOS,
+Android and Windows.
+
+### Ported, not translated again
+
+The console has carried these sixty-four `pub.*` rows in ten languages since
+the browser's half was done. The shells took those rows rather than
+commissioning a second wording of the same sentence: two wordings is two things
+to keep in step, and the drift shows up first in the language nobody here
+reads. Four keys are new, and all four name UI only a shell has — a sheet's
+dismiss button, two client-side validation lines, and a placeholder.
+
+The counts fell with it: **iOS 280 → 260, Android 195 → 181, Windows 279 →
+262.** Windows fell furthest per screen because every one of its sentences was
+a XAML attribute, which is written once at parse time and cannot be re-read
+when the language changes; localizing them meant moving them to the code-behind
+first.
+
+### The ratchet was checking the record, not the screens
+
+`native_untranslated.txt` held the line at three entries and only shrank — and
+could have been driven to zero by deleting three lines, with all three screens
+still in English.
+
+    asked     is the backlog written down and shrinking
+    mattered  did anything get translated
+
+`test_no_accountless_screen_has_english_of_its_own` now reads the screens. It
+borrows the sibling guard's extraction patterns rather than writing its own,
+because two definitions of "an English string on a screen" is two numbers that
+can disagree, and the disagreement would live in whichever one nobody reads.
+
+### Changed
+
+- 33 `pub.*` rows in ten languages added to each shell's `L10n` table, plus a
+  `fill` helper: the console's rows carry `{id}`, `{now}` and `{matched}`, and
+  building those sentences by concatenation instead is how a translation ends
+  up in English word order in nine languages.
+- `prior_status` added to `ObjectionOpened` on all three shells and
+  `examined_windows` to Android's and Windows' `WatermarkRecovery` — both
+  returned by the API since those routes shipped, neither modelled, and the
+  console's sentences name them.
+- Every one of the three screens resolves its language once, at the top, so no
+  call site can quietly fall back to the profile's setting.
+- Six new tests. Four injections: an English sentence back on one shell, a
+  language taken from the profile, a string put back into XAML, and a row cut
+  to three languages — each caught by a different check.
+
+One literal is declared rather than translated: `prf_…`, the prefix of every
+profile id, which is `prf_…` in all ten languages.
+
 ## [0.40.5] — 2026-08-02
 
 ### The door they closed was the owner's

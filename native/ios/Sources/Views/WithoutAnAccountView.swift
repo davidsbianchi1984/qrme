@@ -23,6 +23,11 @@ struct WithoutAnAccountView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var pane: Pane = .object
 
+    /// The reader of this screen has no profile, so there is no profile
+    /// language to read. Resolved once here rather than at twenty call sites,
+    /// where one of them would eventually be `state.language`.
+    private var lang: String { L10n.deviceLanguage }
+
     // Objecting
     @State private var profileId = ""
     @State private var objectorRef = ""
@@ -42,8 +47,8 @@ struct WithoutAnAccountView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     Picker("", selection: $pane) {
-                        Text("A profile depicts me").tag(Pane.object)
-                        Text("Is this genuine?").tag(Pane.mark)
+                        Text(L10n.t("pub.object.title", lang)).tag(Pane.object)
+                        Text(L10n.t("pub.tab.mark", lang)).tag(Pane.mark)
                     }.pickerStyle(.segmented)
 
                     if pane == .object { objectPane } else { markPane }
@@ -52,15 +57,15 @@ struct WithoutAnAccountView: View {
                         Text(error).font(.footnote).foregroundStyle(Theme.red)
                     }
 
-                    Text("Nothing on this screen sends a credential. You do not need a profile to use it, and making one is not the price of objecting to one.")
+                    Text(L10n.t("pub.notoken", lang))
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }.padding(20)
             }
             .background(Theme.bg.ignoresSafeArea())
-            .navigationTitle("Without an account")
+            .navigationTitle(L10n.t("pub.sub", lang))
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Back") { dismiss() }
+                    Button(L10n.t("pub.back.short", lang)) { dismiss() }
                 }
             }
         }
@@ -70,21 +75,21 @@ struct WithoutAnAccountView: View {
 
     @ViewBuilder private var objectPane: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("A profile depicts me").font(.headline).foregroundStyle(Theme.txt)
-            Text("Opening an objection restricts the profile straight away — public surfaces off, no new interactors — before anybody reviews it. A dismissal puts it back to exactly what it was.")
+            Text(L10n.t("pub.object.title", lang)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("pub.object.restricts", lang))
                 .font(.footnote).foregroundStyle(Theme.t2)
 
-            field("The profile's id", $profileId)
-            field("Your proof reference", $objectorRef)
-            field("Why — in your own words", $reason)
+            field(L10n.t("pub.object.profileId", lang), $profileId)
+            field(L10n.t("pub.object.ref", lang), $objectorRef)
+            field(L10n.t("pub.object.reason", lang), $reason)
 
-            Text("The proof reference points at an identity check held outside this system. It is not a login, and it is what lets you object without one.")
+            Text(L10n.t("pub.object.ref.note", lang))
                 .font(.caption2).foregroundStyle(Theme.t3)
 
             Button(action: object) {
                 HStack {
                     if busy { ProgressView().tint(.white) }
-                    Text("Open it").bold()
+                    Text(L10n.t("pub.object.open", lang)).bold()
                 }
                 .frame(maxWidth: .infinity).padding(.vertical, 12)
                 .background(Theme.brand).foregroundStyle(.white)
@@ -96,15 +101,18 @@ struct WithoutAnAccountView: View {
 
         if let opened {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Opened — \(opened.id)").font(.headline).foregroundStyle(Theme.txt)
+                Text(L10n.fill("pub.object.opened", lang, ["id": opened.id])).font(.headline).foregroundStyle(Theme.txt)
                 if let note = opened.note {
                     Text(note).font(.footnote).foregroundStyle(Theme.t2)
                 }
                 if let status = opened.profile_status {
-                    Text("The profile is \(status) from this moment.")
+                    Text(L10n.fill("pub.object.opened.status", lang, [
+                        "now": L10n.t("pub.state.\(status)", lang),
+                        "before": L10n.t(
+                            "pub.state.\(opened.prior_status ?? "active")", lang)]))
                         .font(.footnote).foregroundStyle(Theme.t2)
                 }
-                Text("Write the id down. It is how you follow this case without an account — there is no inbox here to come back to.")
+                Text(L10n.t("pub.object.writeitdown", lang))
                     .font(.caption2).foregroundStyle(Theme.t3)
             }.card()
 
@@ -113,25 +121,25 @@ struct WithoutAnAccountView: View {
             // what had happened to it: `/audit` is owner- or reviewer-gated,
             // and they are neither.
             VStack(alignment: .leading, spacing: 6) {
-                Text(L10n.t("obj.timeline.title", L10n.deviceLanguage))
+                Text(L10n.t("obj.timeline.title", lang))
                     .font(.headline).foregroundStyle(Theme.txt)
                 if let timeline {
                     Text(timeline.note).font(.caption2).foregroundStyle(Theme.t2)
                     if timeline.events.isEmpty {
-                        Text(L10n.t("obj.timeline.empty", L10n.deviceLanguage))
+                        Text(L10n.t("obj.timeline.empty", lang))
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                     ForEach(timeline.events, id: \.id) { e in
-                        Text(L10n.t("obj.event.\(e.event)", L10n.deviceLanguage)
-                             + " · " + L10n.t("obj.actor.\(e.actor)", L10n.deviceLanguage)
+                        Text(L10n.t("obj.event.\(e.event)", lang)
+                             + " · " + L10n.t("obj.actor.\(e.actor)", lang)
                              + " · " + e.at
                              + (e.sealed
-                                ? " · " + L10n.t("obj.timeline.sealed", L10n.deviceLanguage)
+                                ? " · " + L10n.t("obj.timeline.sealed", lang)
                                 : ""))
                             .font(.caption2).foregroundStyle(Theme.t2)
                     }
                 } else {
-                    Button(L10n.t("obj.timeline.go", L10n.deviceLanguage)) {
+                    Button(L10n.t("obj.timeline.go", lang)) {
                         showTimeline(opened.id)
                     }.font(.caption).tint(Theme.brandA).disabled(busy)
                 }
@@ -153,11 +161,11 @@ struct WithoutAnAccountView: View {
 
     @ViewBuilder private var markPane: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Somebody sent me this").font(.headline).foregroundStyle(Theme.txt)
-            Text("Paste it. This asks whose work it is with no credential id, and keeps answering after the text has been reworded — which is the state text usually arrives in.")
+            Text(L10n.t("pub.mark.title", lang)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("pub.mark.explain", lang))
                 .font(.footnote).foregroundStyle(Theme.t2)
 
-            TextField("paste the text", text: $content, axis: .vertical)
+            TextField(L10n.t("pub.mark.paste", lang), text: $content, axis: .vertical)
                 .lineLimit(4...10).foregroundStyle(Theme.txt)
                 .padding(.horizontal, 12).padding(.vertical, 10)
                 .background(Theme.scrBot).clipShape(RoundedRectangle(cornerRadius: 11))
@@ -166,7 +174,7 @@ struct WithoutAnAccountView: View {
             Button(action: recover) {
                 HStack {
                     if busy { ProgressView().tint(.white) }
-                    Text("Ask who wrote it").bold()
+                    Text(L10n.t("pub.mark.ask", lang)).bold()
                 }
                 .frame(maxWidth: .infinity).padding(.vertical, 12)
                 .background(Theme.brand).foregroundStyle(.white)
@@ -179,22 +187,25 @@ struct WithoutAnAccountView: View {
         if let found {
             VStack(alignment: .leading, spacing: 6) {
                 if found.recovered {
-                    Text(found.state ?? "recovered").font(.headline)
-                        .foregroundStyle(Theme.txt)
-                    Text("Produced by a QRME synthetic profile.")
-                        .font(.footnote).foregroundStyle(Theme.t2)
-                    Text("\(found.matched_windows ?? 0) of \(found.stored_windows ?? 0) stored windows matched, out of \(found.examined_windows ?? 0) examined.")
+                    Text(L10n.fill("pub.mark.producedby", lang,
+                                   ["state": found.state ?? ""]))
+                        .font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.fill("pub.mark.windows", lang, [
+                        "matched": "\(found.matched_windows ?? 0)",
+                        "stored": "\(found.stored_windows ?? 0)",
+                        "examined": "\(found.examined_windows ?? 0)",
+                        "similarity": String(format: "%.2f", found.similarity ?? 0)]))
                         .font(.caption2).foregroundStyle(Theme.t3)
                     if found.verbatim == false {
-                        Text("The wording has changed since it was stamped. That does not make it less traceable — it is what the score is measuring.")
+                        Text(L10n.t("pub.mark.altered", lang))
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                 } else {
-                    Text("Not recognised").font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("pub.mark.unknown", lang)).font(.headline).foregroundStyle(Theme.txt)
                     if let reason = found.reason {
                         Text(reason).font(.footnote).foregroundStyle(Theme.t2)
                     }
-                    Text("This says nothing about whether a person wrote it. It says no profile on this deployment has stamped work sharing enough wording with it.")
+                    Text(L10n.fill("pub.mark.unknown.explain", lang, ["here": L10n.t("pub.mark.here", lang)]))
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }
             }.card()

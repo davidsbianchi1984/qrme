@@ -221,6 +221,10 @@ fun WelcomeScreen(vm: StudioViewModel) {
  */
 @Composable
 fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
+    // The reader of this screen has no profile, so there is no profile
+    // language to read. Resolved once here rather than at twenty call sites,
+    // where one of them would eventually be the profile's setting.
+    val lang = L10n.deviceLanguage()
     var pane by remember { mutableIntStateOf(0) }
     var profileId by remember { mutableStateOf("") }
     var objectorRef by remember { mutableStateOf("") }
@@ -235,13 +239,15 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
     Box(Modifier.fillMaxSize().background(Qrme.Bg)) {
         screenScroll {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Without an account", color = Qrme.Txt, fontSize = 20.sp,
+                Text(L10n.t("pub.sub", lang), color = Qrme.Txt, fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 TextButton(onClick = onBack) {
-                    Text("Back", color = Qrme.BrandA, fontSize = 13.sp) }
+                    Text(L10n.t("pub.back.short", lang), color = Qrme.BrandA,
+                        fontSize = 13.sp) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("A profile depicts me", "Is this genuine?")
+                listOf(L10n.t("pub.object.title", lang),
+                       L10n.t("pub.tab.mark", lang))
                     .forEachIndexed { i, label ->
                         FilterChip(
                             selected = pane == i, onClick = { pane = i },
@@ -256,17 +262,16 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
 
             if (pane == 0) {
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Opening an objection restricts the profile straight away — " +
-                         "public surfaces off, no new interactors — before anybody " +
-                         "reviews it. A dismissal puts it back to exactly what it was.",
+                    Text(L10n.t("pub.object.restricts", lang),
                         color = Qrme.T2, fontSize = 12.sp)
-                    labeledField("The profile's id", profileId, "prf_…") { profileId = it }
-                    labeledField("Your proof reference", objectorRef, "an id check held elsewhere") { objectorRef = it }
-                    labeledField("Why — in your own words", reason, "") { reason = it }
-                    Text("The proof reference points at an identity check held outside " +
-                         "this system. It is not a login, and it is what lets you " +
-                         "object without one.", color = Qrme.T3, fontSize = 11.sp)
-                    BrandButton("Open it",
+                    labeledField(L10n.t("pub.object.profileId", lang), profileId,
+                                 "prf_…") { profileId = it }
+                    labeledField(L10n.t("pub.object.ref", lang), objectorRef,
+                                 L10n.t("pub.object.ref.ph", lang)) { objectorRef = it }
+                    labeledField(L10n.t("pub.object.reason", lang), reason, "") { reason = it }
+                    Text(L10n.t("pub.object.ref.note", lang),
+                        color = Qrme.T3, fontSize = 11.sp)
+                    BrandButton(L10n.t("pub.object.open", lang),
                         enabled = profileId.isNotBlank() && objectorRef.isNotBlank(),
                         busy = busy) {
                         busy = true; error = null
@@ -279,20 +284,21 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                 }
                 opened?.let { o ->
                     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Opened — ${o.id}", color = Qrme.Txt, fontSize = 15.sp,
+                        Text(L10n.fill("pub.object.opened", lang, mapOf("id" to o.id)),
+                            color = Qrme.Txt, fontSize = 15.sp,
                             fontWeight = FontWeight.Bold)
                         Text(o.note, color = Qrme.T2, fontSize = 12.sp)
-                        Text("The profile is ${o.profileStatus} from this moment.",
+                        Text(L10n.fill("pub.object.opened.status", lang, mapOf(
+                                "now" to L10n.t("pub.state.${o.profileStatus}", lang),
+                                "before" to L10n.t("pub.state.${o.priorStatus}", lang))),
                             color = Qrme.T2, fontSize = 12.sp)
-                        Text("Write the id down. It is how you follow this case " +
-                             "without an account — there is no inbox here to come " +
-                             "back to.", color = Qrme.T3, fontSize = 11.sp)
+                        Text(L10n.t("pub.object.writeitdown", lang),
+                            color = Qrme.T3, fontSize = 11.sp)
                     }
                     // The record of their own case. Until this release the
                     // objector could end the profile from this very screen and
                     // could not read what had happened to it: `/audit` is
                     // owner- or reviewer-gated, and they are neither.
-                    val lang = L10n.deviceLanguage()
                     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(L10n.t("obj.timeline.title", lang), color = Qrme.Txt,
                             fontSize = 15.sp, fontWeight = FontWeight.Bold)
@@ -325,12 +331,10 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                 }
             } else {
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Paste it. This asks whose work it is with no credential id, " +
-                         "and keeps answering after the text has been reworded — which " +
-                         "is the state text usually arrives in.",
+                    Text(L10n.t("pub.mark.explain", lang),
                         color = Qrme.T2, fontSize = 12.sp)
-                    labeledField("Paste the text", content, "") { content = it }
-                    BrandButton("Ask who wrote it", enabled = content.isNotBlank(),
+                    labeledField(L10n.t("pub.mark.paste", lang), content, "") { content = it }
+                    BrandButton(L10n.t("pub.mark.ask", lang), enabled = content.isNotBlank(),
                                 busy = busy) {
                         busy = true; error = null; found = null
                         vm.call({ ApiClient.recoverWatermark(content) }) { r ->
@@ -342,25 +346,26 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                 found?.let { f ->
                     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (f.recovered) {
-                            Text(f.state ?: "recovered", color = Qrme.Txt,
-                                fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            Text("Produced by a QRME synthetic profile.",
-                                color = Qrme.T2, fontSize = 12.sp)
-                            Text("${f.matchedWindows} of ${f.storedWindows} stored " +
-                                 "windows matched.", color = Qrme.T3, fontSize = 11.sp)
+                            Text(L10n.fill("pub.mark.producedby", lang,
+                                    mapOf("state" to (f.state ?: ""))),
+                                color = Qrme.Txt, fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold)
+                            Text(L10n.fill("pub.mark.windows", lang, mapOf(
+                                    "matched" to f.matchedWindows.toString(),
+                                    "stored" to f.storedWindows.toString(),
+                                    "examined" to f.examinedWindows.toString(),
+                                    "similarity" to f.similarity.toString())),
+                                color = Qrme.T3, fontSize = 11.sp)
                             if (!f.verbatim) {
-                                Text("The wording has changed since it was stamped. " +
-                                     "That does not make it less traceable — it is " +
-                                     "what the score is measuring.",
+                                Text(L10n.t("pub.mark.altered", lang),
                                     color = Qrme.T3, fontSize = 11.sp)
                             }
                         } else {
-                            Text("Not recognised", color = Qrme.Txt, fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold)
+                            Text(L10n.t("pub.mark.unknown", lang), color = Qrme.Txt,
+                                fontSize = 15.sp, fontWeight = FontWeight.Bold)
                             f.reason?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
-                            Text("This says nothing about whether a person wrote it. " +
-                                 "It says no profile on this deployment has stamped " +
-                                 "work sharing enough wording with it.",
+                            Text(L10n.fill("pub.mark.unknown.explain", lang,
+                                    mapOf("here" to L10n.t("pub.mark.here", lang))),
                                 color = Qrme.T3, fontSize = 11.sp)
                         }
                     }
@@ -368,9 +373,7 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
             }
 
             error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
-            Text("Nothing on this screen sends a credential. You do not need a profile " +
-                 "to use it, and making one is not the price of objecting to one.",
-                color = Qrme.T3, fontSize = 10.sp)
+            Text(L10n.t("pub.notoken", lang), color = Qrme.T3, fontSize = 10.sp)
         }
     }
 }

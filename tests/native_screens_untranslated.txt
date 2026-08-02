@@ -39,6 +39,12 @@
 # localized, which is a measurement saying the opposite of the truth. The
 # counts below are what is actually unreadable.
 
-ios: 280
-android: 195
-windows: 279
+# 0.40.6 lowered all three: the accountless screen — the one built for a
+# person who has no profile and therefore no profile language — now reads its
+# strings from each shell's table. Windows fell furthest per screen because
+# every one of its sentences was a XAML attribute, which is written once at
+# parse time and cannot be re-read in another language; localizing them meant
+# moving them to the code-behind first.
+ios: 260
+android: 181
+windows: 262

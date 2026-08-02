@@ -32,7 +32,36 @@ public sealed partial class WithoutAnAccountPage : Page
         var lang = L10n.DeviceLanguage();
         TimelineTitle.Text = L10n.T("obj.timeline.title", lang);
         TimelineButton.Content = L10n.T("obj.timeline.go", lang);
+
+        // Every one of these used to be a XAML attribute, which is why this
+        // shell's count was the largest of the nine: an attribute is written
+        // once at parse time and cannot be re-read in another language. The
+        // wording is the console's `pub.*` rows, ported rather than
+        // translated a second time.
+        TitleText.Text = L10n.T("pub.sub", lang);
+        BackButton.Content = L10n.T("pub.back.short", lang);
+        LeadText.Text = L10n.T("pub.invite", lang) + " "
+                      + L10n.T("pub.invite.none", lang);
+        ObjectHeading.Text = L10n.T("pub.object.title", lang);
+        ObjectRestricts.Text = L10n.T("pub.object.restricts", lang);
+        ProfileBox.Header = L10n.T("pub.object.profileId", lang);
+        RefBox.Header = L10n.T("pub.object.ref", lang);
+        RefBox.PlaceholderText = L10n.T("pub.object.ref.ph", lang);
+        ReasonBox.Header = L10n.T("pub.object.reason", lang);
+        RefNote.Text = L10n.T("pub.object.ref.note", lang);
+        ObjectButton.Content = L10n.T("pub.object.open", lang);
+        WriteItDown.Text = L10n.T("pub.object.writeitdown", lang);
+        MarkHeading.Text = L10n.T("pub.mark.title", lang);
+        MarkExplain.Text = L10n.T("pub.mark.explain", lang);
+        ContentBox.PlaceholderText = L10n.T("pub.mark.paste", lang);
+        RecoverButton.Content = L10n.T("pub.mark.ask", lang);
+        NoTokenText.Text = L10n.T("pub.notoken", lang);
     }
+
+    /// <summary>This page's reader has no profile, so there is no profile
+    /// language to read. Resolved on every use rather than cached, because
+    /// the machine's language can change while the app is open.</summary>
+    private static string Lang => L10n.DeviceLanguage();
 
     private void OnBack(object sender, RoutedEventArgs e) =>
         Frame.Navigate(typeof(WelcomePage));
@@ -43,7 +72,7 @@ public sealed partial class WithoutAnAccountPage : Page
         var reference = RefBox.Text.Trim();
         if (pid.Length == 0 || reference.Length == 0)
         {
-            ShowError("Enter the profile's id and your proof reference.");
+            ShowError(L10n.T("pub.object.needid", Lang));
             return;
         }
         ErrorText.Visibility = Visibility.Collapsed;
@@ -52,10 +81,13 @@ public sealed partial class WithoutAnAccountPage : Page
         {
             var o = await ApiClient.Shared.OpenObjection(
                 pid, reference, ReasonBox.Text.Trim());
-            OpenedTitle.Text = $"Opened — {o.Id}";
+            OpenedTitle.Text = L10n.Fill("pub.object.opened", Lang, ("id", o.Id));
             OpenedNote.Text = (o.Note ?? "")
-                + (o.ProfileStatus is null
-                    ? "" : $" The profile is {o.ProfileStatus} from this moment.");
+                + (o.ProfileStatus is null ? "" : " " + L10n.Fill(
+                    "pub.object.opened.status", Lang,
+                    ("now", L10n.T($"pub.state.{o.ProfileStatus}", Lang)),
+                    ("before", L10n.T(
+                        $"pub.state.{o.PriorStatus ?? "active"}", Lang))));
             OpenedCard.Visibility = Visibility.Visible;
         }
         catch (Exception ex) { ShowError(ex.Message); }
@@ -119,7 +151,7 @@ public sealed partial class WithoutAnAccountPage : Page
     private async void OnRecover(object sender, RoutedEventArgs e)
     {
         var content = ContentBox.Text.Trim();
-        if (content.Length == 0) { ShowError("Paste the text first."); return; }
+        if (content.Length == 0) { ShowError(L10n.T("pub.mark.needtext", Lang)); return; }
         ErrorText.Visibility = Visibility.Collapsed;
         RecoverButton.IsEnabled = false;
         try
@@ -127,21 +159,22 @@ public sealed partial class WithoutAnAccountPage : Page
             var f = await ApiClient.Shared.RecoverWatermark(content);
             if (f.Recovered)
             {
-                FoundTitle.Text = f.State ?? "recovered";
-                FoundBody.Text = "Produced by a QRME synthetic profile.";
-                FoundDetail.Text =
-                    $"{f.MatchedWindows} of {f.StoredWindows} stored windows matched."
-                    + (f.Verbatim ? "" : " The wording has changed since it was "
-                        + "stamped — that does not make it less traceable, it is "
-                        + "what the score is measuring.");
+                FoundTitle.Text = L10n.Fill("pub.mark.producedby", Lang,
+                    ("state", f.State ?? ""));
+                FoundBody.Text = L10n.Fill("pub.mark.windows", Lang,
+                    ("matched", f.MatchedWindows.ToString()),
+                    ("stored", f.StoredWindows.ToString()),
+                    ("examined", f.ExaminedWindows.ToString()),
+                    ("similarity", f.Similarity.ToString("0.00")));
+                FoundDetail.Text = f.Verbatim
+                    ? "" : L10n.T("pub.mark.altered", Lang);
             }
             else
             {
-                FoundTitle.Text = "Not recognised";
+                FoundTitle.Text = L10n.T("pub.mark.unknown", Lang);
                 FoundBody.Text = f.Reason ?? "";
-                FoundDetail.Text = "This says nothing about whether a person wrote "
-                    + "it. It says no profile on this deployment has stamped work "
-                    + "sharing enough wording with it.";
+                FoundDetail.Text = L10n.Fill("pub.mark.unknown.explain", Lang,
+                    ("here", L10n.T("pub.mark.here", Lang)));
             }
             FoundCard.Visibility = Visibility.Visible;
         }

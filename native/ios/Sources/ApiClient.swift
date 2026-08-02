@@ -185,6 +185,9 @@ struct ObjectionOpened: Decodable {
     let profile_id: String
     let status: String
     let profile_status: String?
+    /// What it was before, so the sentence can say what a dismissal
+    /// restores. Returned since objections shipped; no shell read it.
+    let prior_status: String?
     let note: String?
 }
 

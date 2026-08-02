@@ -183,6 +183,9 @@ public record ObjectionOpened(
     [property: JsonPropertyName("profile_id")] string ProfileId,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("profile_status")] string? ProfileStatus,
+    // What it was before, so the sentence can say what a dismissal restores.
+    // Returned since objections shipped; no shell read it.
+    [property: JsonPropertyName("prior_status")] string? PriorStatus,
     [property: JsonPropertyName("note")] string? Note);
 
 /// <summary>One thing that happened on an objection. <c>Sealed</c> says the
@@ -291,6 +294,9 @@ public record WatermarkRecovery(
     [property: JsonPropertyName("similarity")] double Similarity,
     [property: JsonPropertyName("matched_windows")] int MatchedWindows,
     [property: JsonPropertyName("stored_windows")] int StoredWindows,
+    // How many windows were looked at, which is the denominator the page's
+    // sentence names. iOS has carried it since the mark shipped; this did not.
+    [property: JsonPropertyName("examined_windows")] int ExaminedWindows,
     [property: JsonPropertyName("state")] string? State,
     [property: JsonPropertyName("best_similarity")] double? BestSimilarity,
     [property: JsonPropertyName("threshold")] double? Threshold,

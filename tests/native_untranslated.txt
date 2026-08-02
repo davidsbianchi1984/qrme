@@ -1,26 +1,22 @@
 # The accountless screen, on the three shells that are not a browser.
 # Checked by test_the_strangers_language_on_a_phone.py, and ratcheted.
 #
-# The browser's half of this is finished: `Public.tsx` reads
-# `navigator.languages`, its frame is in ten languages, and the four public
-# routes answer in the reader's language.
+# **Empty, as of 0.40.6.** All three screens read their strings from their
+# shell's L10n table in the language the device is carrying, and the wording is
+# the console's `pub.*` rows ported rather than translated a second time.
 #
-# The three native shells carry the same screen for the same person and it is
-# English on all of them. This round supplied the missing input — every shell
-# can now resolve a device language without a profile, which nothing could do
-# before, because the only language variable in each app came from a profile
-# and the reader of this screen has none.
+# The file stays because the ratchet stays: a shell that grows a new English
+# sentence on this screen has to write it down here, and the ceiling below does
+# not move up.
 #
-# The strings are what is left. Roughly twenty sentences per screen, and the
-# console's `pub.*` rows are already translated into ten languages and are
-# close but not byte-identical, so this is a porting round rather than a
-# translating one.
+# What holds the floor is not this file. Three lines could always have been
+# deleted from it with all three screens still in English —
 #
-# Deliberately all three or none. Porting one shell would put the objector on
-# a localized iPhone and an English Android — which is the per-client mistake
-# this audit is named for, made on purpose.
+#     asked     is the backlog written down and shrinking
+#     mattered  did anything get translated
+#
+# — so `test_no_accountless_screen_has_english_of_its_own` now reads the
+# screens themselves, using the sibling guard's own extraction patterns so the
+# two cannot disagree about what an English string is.
 #
 # ceiling: 3
-ios: WithoutAnAccountView.swift — 22 sentences, no L10n. calls
-android: WithoutAnAccountScreen in Screens.kt — same screen, same state
-windows: WithoutAnAccountPage.xaml.cs — same screen, same state
