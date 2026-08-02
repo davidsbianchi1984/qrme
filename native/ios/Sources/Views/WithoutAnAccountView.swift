@@ -28,6 +28,7 @@ struct WithoutAnAccountView: View {
     @State private var objectorRef = ""
     @State private var reason = ""
     @State private var opened: ObjectionOpened?
+    @State private var timeline: ObjectionTimeline?
 
     // The mark
     @State private var content = ""
@@ -106,6 +107,45 @@ struct WithoutAnAccountView: View {
                 Text("Write the id down. It is how you follow this case without an account — there is no inbox here to come back to.")
                     .font(.caption2).foregroundStyle(Theme.t3)
             }.card()
+
+            // The record of their own case. Until this release the objector
+            // could end the profile from this very screen and could not read
+            // what had happened to it: `/audit` is owner- or reviewer-gated,
+            // and they are neither.
+            VStack(alignment: .leading, spacing: 6) {
+                Text(L10n.t("obj.timeline.title", L10n.deviceLanguage))
+                    .font(.headline).foregroundStyle(Theme.txt)
+                if let timeline {
+                    Text(timeline.note).font(.caption2).foregroundStyle(Theme.t2)
+                    if timeline.events.isEmpty {
+                        Text(L10n.t("obj.timeline.empty", L10n.deviceLanguage))
+                            .font(.caption2).foregroundStyle(Theme.t3)
+                    }
+                    ForEach(timeline.events, id: \.id) { e in
+                        Text(L10n.t("obj.event.\(e.event)", L10n.deviceLanguage)
+                             + " · " + L10n.t("obj.actor.\(e.actor)", L10n.deviceLanguage)
+                             + " · " + e.at
+                             + (e.sealed
+                                ? " · " + L10n.t("obj.timeline.sealed", L10n.deviceLanguage)
+                                : ""))
+                            .font(.caption2).foregroundStyle(Theme.t2)
+                    }
+                } else {
+                    Button(L10n.t("obj.timeline.go", L10n.deviceLanguage)) {
+                        showTimeline(opened.id)
+                    }.font(.caption).tint(Theme.brandA).disabled(busy)
+                }
+            }.card()
+        }
+    }
+
+    private func showTimeline(_ objectionId: String) {
+        busy = true; error = nil
+        Task {
+            do { timeline = try await ApiClient.shared
+                    .objectionTimeline(objectionId: objectionId) }
+            catch { self.error = error.localizedDescription }
+            busy = false
         }
     }
 

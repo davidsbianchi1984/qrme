@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { api, type EmbodimentConsistency, type ObjectionOpened,
+         type ObjectionTimeline,
          type ObjectionStatus, type WatermarkRecovery } from "../api";
 
 /**
@@ -115,6 +116,7 @@ function ObjectPane() {
   const [opened, setOpened] = useState<ObjectionOpened | null>(null);
   const [lookup, setLookup] = useState("");
   const [status, setStatus] = useState<ObjectionStatus | null>(null);
+  const [timeline, setTimeline] = useState<ObjectionTimeline | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -201,6 +203,34 @@ function ObjectPane() {
                 which stays gated. */}
           </p>
         )}
+      </div>
+
+      {/* The record of their own case. Public, because the party who raised
+          it has no account — and carrying no free text, which is what keeps
+          the full audit trail gated. Before this it was gated too, so the
+          person who could END the profile could not read what happened. */}
+      <div className="card">
+        <h3>{L("pub.timeline.title")}</h3>
+        <p className="muted small">{L("pub.timeline.lead")}</p>
+        <div className="row">
+          <button disabled={busy || !lookup.trim()} onClick={async () => {
+            setBusy(true); setError(null);
+            try { setTimeline(await api.objectionTimeline(lookup.trim())); }
+            catch (e) { setError(message(e)); }
+            setBusy(false);
+          }}>{L("pub.timeline.go")}</button>
+        </div>
+        {timeline && (timeline.events.length === 0
+          ? <p className="muted small">{L("pub.timeline.empty")}</p>
+          : <ul className="refs">
+              {timeline.events.map((e) => (
+                <li key={e.id}>
+                  <strong>{L(`pub.event.${e.event}`)}</strong>{" · "}
+                  {L(`pub.actor.${e.actor}`)}{" · "}{e.at}
+                  {e.sealed && <>{" · "}{L("pub.timeline.sealed")}</>}
+                </li>
+              ))}
+            </ul>)}
       </div>
 
       {error && <p className="error small">{error}</p>}

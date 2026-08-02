@@ -1216,6 +1216,13 @@ export interface VoiceprintStatus {
   disclosure: string;
 }
 // Extract-and-reconstruct: who produced this text, from the text alone.
+export interface ObjectionTimeline {
+  objection_id: string; profile_id: string; status: string;
+  reattested: boolean; vault_backed: boolean; note: string;
+  events: { id: string; event: string; actor: string;
+            sealed: boolean; at: string }[];
+}
+
 export interface WatermarkRecovery {
   recovered: boolean; reason?: string;
   profile_id?: string; watermark_id?: string; kind?: string;
@@ -3741,6 +3748,11 @@ export const api = {
     req<ObjectionStatus>(`/objections/${objectionId}`),
 
   // Owner- or reviewer-gated, because it quotes the objector's reason.
+  // The objector's own view: what happened, who did it, when. Public,
+  // because the party who raised the case has no account by design — and
+  // carrying no free text, which is what keeps `objectionAudit` gated.
+  objectionTimeline: (objectionId: string) =>
+    req<ObjectionTimeline>(`/objections/${objectionId}/timeline`),
   objectionAudit: (objectionId: string, token: string) =>
     req<ObjectionAudit>(`/objections/${objectionId}/audit`, { token }),
 

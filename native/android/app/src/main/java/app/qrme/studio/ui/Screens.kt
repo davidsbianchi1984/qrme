@@ -39,6 +39,7 @@ import app.qrme.studio.LicenseOffer
 import app.qrme.studio.Listing
 import app.qrme.studio.Objection
 import app.qrme.studio.ObjectionOpened
+import app.qrme.studio.ObjectionTimeline
 import app.qrme.studio.Pack
 import app.qrme.studio.PackRegistry
 import app.qrme.studio.Post
@@ -225,6 +226,7 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
     var objectorRef by remember { mutableStateOf("") }
     var reason by remember { mutableStateOf("") }
     var opened by remember { mutableStateOf<ObjectionOpened?>(null) }
+    var timeline by remember { mutableStateOf<ObjectionTimeline?>(null) }
     var content by remember { mutableStateOf("") }
     var found by remember { mutableStateOf<WatermarkRecovery?>(null) }
     var busy by remember { mutableStateOf(false) }
@@ -285,6 +287,40 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                         Text("Write the id down. It is how you follow this case " +
                              "without an account — there is no inbox here to come " +
                              "back to.", color = Qrme.T3, fontSize = 11.sp)
+                    }
+                    // The record of their own case. Until this release the
+                    // objector could end the profile from this very screen and
+                    // could not read what had happened to it: `/audit` is
+                    // owner- or reviewer-gated, and they are neither.
+                    val lang = L10n.deviceLanguage()
+                    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(L10n.t("obj.timeline.title", lang), color = Qrme.Txt,
+                            fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                        val tl = timeline
+                        if (tl == null) {
+                            BrandButton(L10n.t("obj.timeline.go", lang), busy = busy) {
+                                busy = true; error = null
+                                vm.call({ ApiClient.objectionTimeline(o.id) }) { r ->
+                                    busy = false
+                                    r.onSuccess { timeline = it }
+                                     .onFailure { error = it.message }
+                                }
+                            }
+                        } else {
+                            Text(tl.note, color = Qrme.T2, fontSize = 12.sp)
+                            if (tl.events.isEmpty()) {
+                                Text(L10n.t("obj.timeline.empty", lang),
+                                    color = Qrme.T3, fontSize = 11.sp)
+                            }
+                            tl.events.forEach { e ->
+                                val seal = if (e.sealed)
+                                    " \u00b7 " + L10n.t("obj.timeline.sealed", lang) else ""
+                                Text(L10n.t("obj.event.${e.event}", lang) + " \u00b7 " +
+                                     L10n.t("obj.actor.${e.actor}", lang) + " \u00b7 " +
+                                     e.at + seal,
+                                    color = Qrme.T2, fontSize = 11.sp)
+                            }
+                        }
                     }
                 }
             } else {

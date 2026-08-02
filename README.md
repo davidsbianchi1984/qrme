@@ -1002,6 +1002,7 @@ A real person (or their estate) can contest a profile that represents them —
 | `POST /profiles/{id}/objections/{obj}/attest` | owner | Re-attest the rights basis within the review window |
 | `POST /objections/{obj}/resolve` | reviewer (`QRME_ADMIN_TOKEN`) | `uphold` → **terminated** (content erased, tombstone left, chat 410); `dismiss` → back to **active** |
 | `POST /objections/{obj}/withdraw` | subject | A `subject_consent` subject withdraws consent — forces **termination**, honored even mid-review |
+| `GET /objections/{obj}/timeline` | anyone with the id | The objector's own record: event, actor, time, and whether the row is sealed in the vault. **No free text from anybody** — not their reason, not the reviewer's note. The full `/audit` stays owner- or reviewer-gated because it quotes prose; this carries the shape of what happened, which is the objector's to see |
 
 Profile lifecycle: **active** → `restricted` (objection pending) → `terminated` (erased) or back to active; and **active** → `departed` (memorial, via `/sunset`). `GET /profiles/{id}` reports the current `status`.
 

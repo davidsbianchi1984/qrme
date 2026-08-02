@@ -643,6 +643,14 @@ actor ApiClient {
         var req = URLRequest(url: url)
         req.httpMethod = method
         req.setValue("application/json", forHTTPHeaderField: "content-type")
+        // The other half of the accountless screen's language. `L10n` covers
+        // the words this shell owns; every sentence the *backend* composes for
+        // somebody with no profile — the objection it just opened, the profile
+        // it just terminated, the timeline note — is chosen from this header,
+        // and no native shell was sending it. The browser sends it for free,
+        // which is exactly why the phones were the ones still answering in
+        // English after the routes learned to speak.
+        req.setValue(L10n.deviceLanguage, forHTTPHeaderField: "accept-language")
         if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
         if let body { req.httpBody = try JSONSerialization.data(withJSONObject: body) }
 
@@ -872,6 +880,19 @@ actor ApiClient {
                           body: ["profile_id": profileId,
                                  "objector_ref": objectorRef,
                                  "reason": reason])
+    }
+
+    /// The objector's own record of their case. Public, like the route that
+    /// opens one — and it had to be built, because `/audit` is owner- or
+    /// reviewer-gated and the objector is neither. They could already END the
+    /// profile from this screen and could not read what happened.
+    ///
+    ///     asked     could the audit trail leak the objector's reason
+    ///     mattered  who is the audit trail for
+    ///
+    /// Carries no free text: event, actor, time, sealed. Nobody's prose.
+    func objectionTimeline(objectionId: String) async throws -> ObjectionTimeline {
+        try await request("/objections/\(objectionId)/timeline")
     }
 
     func objections(id: String, token: String) async throws -> [Objection] {
@@ -1348,4 +1369,22 @@ actor ApiClient {
         try await request("/profiles/\(id)/voiceprint", method: "DELETE",
                           token: token)
     }
+}
+
+struct ObjectionTimelineEvent: Decodable {
+    let id: String
+    let event: String
+    let actor: String
+    let sealed: Bool
+    let at: String
+}
+
+struct ObjectionTimeline: Decodable {
+    let objection_id: String
+    let profile_id: String
+    let status: String
+    let reattested: Bool
+    let vault_backed: Bool
+    let note: String
+    let events: [ObjectionTimelineEvent]
 }

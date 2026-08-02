@@ -185,6 +185,25 @@ public record ObjectionOpened(
     [property: JsonPropertyName("profile_status")] string? ProfileStatus,
     [property: JsonPropertyName("note")] string? Note);
 
+/// <summary>One thing that happened on an objection. <c>Sealed</c> says the
+/// row is held in the vault; it does not carry what is inside it, and neither
+/// does this record — there is no <c>Detail</c> here on purpose.</summary>
+public record ObjectionTimelineEvent(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("event")] string Event,
+    [property: JsonPropertyName("actor")] string Actor,
+    [property: JsonPropertyName("sealed")] bool Sealed,
+    [property: JsonPropertyName("at")] string At);
+
+public record ObjectionTimeline(
+    [property: JsonPropertyName("objection_id")] string ObjectionId,
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("reattested")] bool Reattested,
+    [property: JsonPropertyName("vault_backed")] bool VaultBacked,
+    [property: JsonPropertyName("note")] string Note,
+    [property: JsonPropertyName("events")] ObjectionTimelineEvent[] Events);
+
 public record InteractorCreated(
     [property: JsonPropertyName("id")] string Id,
     // The server has always returned this; the shell simply never kept it, so
@@ -586,6 +605,12 @@ public sealed class ApiClient
             ? abs.AbsolutePath
             : req.RequestUri?.ToString() ?? "";
 
+        // The other half of the accountless screen's language. `L10n` covers
+        // the words this shell owns; every sentence the *backend* composes for
+        // somebody with no profile is chosen from this header, and no native
+        // shell was sending it.
+        req.Headers.TryAddWithoutValidation("accept-language", L10n.DeviceLanguage());
+
         HttpResponseMessage res;
         try
         {
@@ -791,6 +816,24 @@ public sealed class ApiClient
             objector_ref = objectorRef,
             reason,
         }, null));
+
+    /// <summary>The objector's view of their own case: what happened, who did
+    /// it, when. No credential, because the person this belongs to has none.
+    ///
+    /// <para><c>/objections/{id}/audit</c> is owner- or reviewer-gated, and its
+    /// reason is sound about the free text — it can quote the objector's own
+    /// words back through a third party. It is wrong about who it locks out.
+    /// The objector wrote that reason, and could already end the profile
+    /// through the public <c>withdraw</c> and <c>revoke</c> routes:</para>
+    ///
+    /// <para><i>asked</i> — could the audit trail leak the objector's reason.
+    /// <i>mattered</i> — who is the audit trail for.</para>
+    ///
+    /// <para>So this is a second view rather than a wider one. Event, actor,
+    /// time, sealed. Nobody's prose, including the objector's own.</para></summary>
+    public Task<ObjectionTimeline> ObjectionTimeline(string objectionId) =>
+        Send<ObjectionTimeline>(new HttpRequestMessage(
+            HttpMethod.Get, $"/objections/{objectionId}/timeline"));
 
     public Task<Objection[]> Objections(string id, string token)
     {

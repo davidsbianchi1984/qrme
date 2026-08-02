@@ -56,6 +56,34 @@
                 </StackPanel>
             </Border>
 
+            <!-- The record of your own case -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock x:Name="TimelineTitle" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <!-- No placeholder: the sibling box above carries "prf_…"
+                         and is one of the 279 English literals recorded
+                         against this shell. Adding a second untranslatable
+                         hint to the one screen built for somebody who may not
+                         read English is the wrong direction, and the id is
+                         already shown to this reader on the card above. -->
+                    <TextBox x:Name="TimelineIdBox" />
+                    <Button x:Name="TimelineButton" HorizontalAlignment="Stretch" Height="42"
+                            Foreground="White" Click="OnTimeline">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource QrmeBrandA}" Offset="0" />
+                                <GradientStop Color="#FF3AA0FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <StackPanel x:Name="TimelineList" Spacing="4" Visibility="Collapsed" />
+                    <TextBlock x:Name="TimelineNote" Foreground="{StaticResource QrmeT3Brush}"
+                               FontSize="11" TextWrapping="Wrap" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+
             <!-- The mark -->
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">

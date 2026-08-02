@@ -180,6 +180,39 @@ def negotiate(header: str | None) -> str:
 #: new English — rather than quietly serving the old sentence in nine
 #: languages.
 _PUBLIC: dict[str, dict[str, str]] = {
+    "this is the record of your own case: what happened, who did it, and when. The reasons and other free text are not repeated here — you wrote yours, and nobody else's is yours to read": {
+        'es': 'este es el registro de su propio caso: qué ocurrió, quién lo hizo y cuándo. Los motivos y demás texto libre no se repiten aquí: el suyo lo escribió usted, y el de los demás no le corresponde leerlo',
+        'fr': "voici le registre de votre propre dossier : ce qui s'est passé, qui l'a fait et quand. Les motifs et autres textes libres ne sont pas repris ici — le vôtre, vous l'avez écrit, et celui des autres ne vous revient pas",
+        'de': 'dies ist die Akte Ihres eigenen Falls: was geschah, wer es tat und wann. Begründungen und anderer Freitext werden hier nicht wiederholt — Ihre haben Sie selbst geschrieben, und die anderer steht Ihnen nicht zu',
+        'pt': 'este é o registo do seu próprio caso: o que aconteceu, quem o fez e quando. Os motivos e outro texto livre não são repetidos aqui — o seu escreveu-o você, e o dos outros não lhe cabe ler',
+        'it': "questo è il registro del tuo caso: cosa è successo, chi lo ha fatto e quando. Le motivazioni e gli altri testi liberi non sono ripetuti qui — la tua l'hai scritta tu, e quella altrui non spetta a te leggerla",
+        'ja': 'これはあなた自身の案件の記録です。何が、誰によって、いつ行われたか。理由などの自由記述はここには載せません。あなたの理由はあなたが書いたものであり、他人のものはあなたが読むべきものではないからです。',
+        'zh': '这是你自己案件的记录：发生了什么、由谁执行、在何时。理由和其他自由文本不在此重复 — 你的理由是你自己写的，而别人的不该由你来读。',
+        'hi': 'यह आपके अपने मामले का रिकॉर्ड है: क्या हुआ, किसने किया, और कब। कारण और अन्य मुक्त पाठ यहाँ दोहराए नहीं जाते — अपना आपने लिखा था, और दूसरों का पढ़ना आपका काम नहीं।',
+        'ar': 'هذا سجل قضيتك أنت: ما الذي حدث، ومن فعله، ومتى. أما الأسباب وسائر النص الحر فلا تتكرر هنا — سببك كتبته أنت، وسبب غيرك ليس لك أن تقرأه',
+    },
+    'consent withdrawn; the profile is terminated and its content erased': {
+        'es': 'consentimiento retirado; el perfil queda terminado y su contenido borrado',
+        'fr': 'consentement retiré ; le profil est supprimé et son contenu effacé',
+        'de': 'Einwilligung zurückgezogen; das Profil ist beendet und sein Inhalt gelöscht',
+        'pt': 'consentimento retirado; o perfil é terminado e o seu conteúdo apagado',
+        'it': 'consenso ritirato; il profilo è terminato e i suoi contenuti cancellati',
+        'ja': '同意が撤回されました。プロフィールは終了し、その内容は消去されます。',
+        'zh': '同意已撤回；该资料已终止，其内容已被抹除。',
+        'hi': 'सहमति वापस ली गई; प्रोफ़ाइल समाप्त कर दी गई और उसकी सामग्री मिटा दी गई।',
+        'ar': 'سُحبت الموافقة؛ أُنهي الملف ومُحي محتواه',
+    },
+    'authorization revoked; the profile is terminated and its content erased': {
+        'es': 'autorización revocada; el perfil queda terminado y su contenido borrado',
+        'fr': 'autorisation révoquée ; le profil est supprimé et son contenu effacé',
+        'de': 'Autorisierung widerrufen; das Profil ist beendet und sein Inhalt gelöscht',
+        'pt': 'autorização revogada; o perfil é terminado e o seu conteúdo apagado',
+        'it': 'autorizzazione revocata; il profilo è terminato e i suoi contenuti cancellati',
+        'ja': '承認が取り消されました。プロフィールは終了し、その内容は消去されます。',
+        'zh': '授权已撤销；该资料已终止，其内容已被抹除。',
+        'hi': 'प्राधिकरण रद्द किया गया; प्रोफ़ाइल समाप्त कर दी गई और उसकी सामग्री मिटा दी गई।',
+        'ar': 'أُلغي التفويض؛ أُنهي الملف ومُحي محتواه',
+    },
     'no text to examine': {
         'es': 'no hay texto que examinar',
         'fr': 'aucun texte à examiner',

@@ -33,6 +33,23 @@ enum L10n {
                             "hi", "ar"]
 
     private static let table: [String: [String: String]] = [
+        "obj.timeline.title": ["en": "What has happened to your case", "es": "Qué ha pasado con su caso", "fr": "Ce qu'il est advenu de votre dossier", "de": "Was mit Ihrem Fall geschehen ist", "pt": "O que aconteceu ao seu caso", "it": "Cosa è successo al tuo caso", "ja": "あなたの案件の経過", "zh": "你的案件进展如何", "hi": "आपके मामले में क्या हुआ", "ar": "ما جرى في قضيتك"],
+        "obj.timeline.go": ["en": "Show the record", "es": "Ver el registro", "fr": "Afficher le registre", "de": "Akte anzeigen", "pt": "Ver o registo", "it": "Mostra il registro", "ja": "記録を見る", "zh": "查看记录", "hi": "रिकॉर्ड दिखाएँ", "ar": "أظهر السجل"],
+        "obj.timeline.sealed": ["en": "sealed in the vault", "es": "sellado en la bóveda", "fr": "scellé dans le coffre", "de": "im Tresor versiegelt", "pt": "selado no cofre", "it": "sigillato nella cassaforte", "ja": "保管庫に封印済み", "zh": "已封存于保险库", "hi": "वॉल्ट में सील किया गया", "ar": "مختوم في الخزنة"],
+        "obj.timeline.empty": ["en": "Nothing on this case yet.", "es": "Todavía nada en este caso.", "fr": "Rien encore sur ce dossier.", "de": "Zu diesem Fall noch nichts.", "pt": "Ainda nada neste caso.", "it": "Ancora nulla su questo caso.", "ja": "この案件にはまだ何もありません。", "zh": "此案件暂无记录。", "hi": "इस मामले पर अभी कुछ नहीं।", "ar": "لا شيء في هذه القضية بعد."],
+        "obj.event.opened": ["en": "opened", "es": "abierta", "fr": "ouverte", "de": "eröffnet", "pt": "aberta", "it": "aperta", "ja": "受理", "zh": "已提出", "hi": "खोला गया", "ar": "فُتحت"],
+        "obj.event.reattested": ["en": "basis re-attested", "es": "base reacreditada", "fr": "base réattestée", "de": "Grundlage erneut bestätigt", "pt": "base reatestada", "it": "base riattestata", "ja": "根拠を再証明", "zh": "已重新证明依据", "hi": "आधार पुनः प्रमाणित", "ar": "أُعيد إثبات الأساس"],
+        "obj.event.upheld": ["en": "upheld", "es": "estimada", "fr": "retenue", "de": "stattgegeben", "pt": "deferida", "it": "accolta", "ja": "認容", "zh": "已支持", "hi": "स्वीकृत", "ar": "قُبلت"],
+        "obj.event.dismissed": ["en": "dismissed", "es": "desestimada", "fr": "rejetée", "de": "abgewiesen", "pt": "indeferida", "it": "respinta", "ja": "却下", "zh": "已驳回", "hi": "खारिज", "ar": "رُفضت"],
+        "obj.event.withdrawn": ["en": "consent withdrawn", "es": "consentimiento retirado", "fr": "consentement retiré", "de": "Einwilligung zurückgezogen", "pt": "consentimento retirado", "it": "consenso ritirato", "ja": "同意の撤回", "zh": "已撤回同意", "hi": "सहमति वापस", "ar": "سُحبت الموافقة"],
+        "obj.event.revoked": ["en": "authorization revoked", "es": "autorización revocada", "fr": "autorisation révoquée", "de": "Autorisierung widerrufen", "pt": "autorização revogada", "it": "autorizzazione revocata", "ja": "承認の取り消し", "zh": "已撤销授权", "hi": "प्राधिकरण रद्द", "ar": "أُلغي التفويض"],
+        "obj.event.terminated": ["en": "profile terminated", "es": "perfil terminado", "fr": "profil supprimé", "de": "Profil beendet", "pt": "perfil terminado", "it": "profilo terminato", "ja": "プロフィール終了", "zh": "资料已终止", "hi": "प्रोफ़ाइल समाप्त", "ar": "أُنهي الملف"],
+        "obj.actor.objector": ["en": "you", "es": "usted", "fr": "vous", "de": "Sie", "pt": "você", "it": "tu", "ja": "あなた", "zh": "你", "hi": "आप", "ar": "أنت"],
+        "obj.actor.owner": ["en": "the owner", "es": "el titular", "fr": "le propriétaire", "de": "die Inhaberin oder der Inhaber", "pt": "o titular", "it": "il titolare", "ja": "所有者", "zh": "所有者", "hi": "स्वामी", "ar": "المالك"],
+        "obj.actor.reviewer": ["en": "a reviewer", "es": "un revisor", "fr": "un examinateur", "de": "eine prüfende Person", "pt": "um revisor", "it": "un revisore", "ja": "審査担当", "zh": "审核人", "hi": "समीक्षक", "ar": "مُراجِع"],
+        "obj.actor.subject": ["en": "the subject", "es": "el sujeto", "fr": "la personne concernée", "de": "die betroffene Person", "pt": "o titular dos dados", "it": "la persona interessata", "ja": "本人", "zh": "当事人", "hi": "संबंधित व्यक्ति", "ar": "الشخص المعني"],
+        "obj.actor.estate": ["en": "the estate", "es": "la sucesión", "fr": "la succession", "de": "der Nachlass", "pt": "o espólio", "it": "gli eredi", "ja": "遺族", "zh": "遗产代表", "hi": "संपदा", "ar": "الورثة"],
+        "obj.actor.system": ["en": "the platform", "es": "la plataforma", "fr": "la plateforme", "de": "die Plattform", "pt": "a plataforma", "it": "la piattaforma", "ja": "プラットフォーム", "zh": "平台", "hi": "प्लेटफ़ॉर्म", "ar": "المنصة"],
         "tab.overview": ["en": "Overview", "es": "Resumen", "fr": "Aperçu",
                          "de": "Übersicht", "pt": "Visão geral", "it": "Panoramica",
                          "ja": "概要", "zh": "概览", "hi": "अवलोकन", "ar": "نظرة عامة"],

@@ -205,6 +205,61 @@ def objection_audit(objection_id: str, request: Request) -> dict:
     }
 
 
+@router.get("/objections/{objection_id}/timeline")
+def objection_timeline(objection_id: str, request: Request,
+                       accept_language: str = Header(default="")) -> dict:
+    """The objector's view of their own case: what happened, who did it, when.
+
+    ## Why this exists separately from `/audit`
+
+    `/audit` is owner- or reviewer-gated, and its docstring gives the reason:
+    *"it can quote the objector's reason"*. That gate is right about the free
+    text and wrong about who it locks out. The objector **wrote** that reason.
+    Keeping them from the timeline of their own case in order to protect them
+    from their own words leaves the party with no account — a contested
+    person, sometimes a bereaved estate — unable to see what was done about
+    the thing they raised.
+
+        asked     could the audit trail leak the objector's reason
+        mattered  who is the audit trail for
+
+    They can already **end the profile** through `/withdraw` and `/revoke`,
+    both public. They could pull the lever and not read the record.
+
+    So this is the same timeline with the free text taken out: event, actor,
+    time, and whether it was sealed into the vault. `detail` never appears —
+    not the objector's reason, not the reviewer's note, not the owner's. The
+    shape of what happened is theirs; nobody's prose is.
+
+    Public, like the objection routes it belongs with, and localized: the
+    caller has no account, so `Accept-Language` is the only language there is.
+    """
+    language = i18n.negotiate(accept_language)
+    obj = _objection_or_404(objection_id)
+    rows = db.connect().execute(
+        "SELECT id, event, actor, pdi_key, created_at"
+        " FROM objection_events WHERE objection_id=? ORDER BY created_at, id",
+        (objection_id,)).fetchall()
+    return i18n.localize_public(
+        {
+            "objection_id": objection_id,
+            "profile_id": obj["profile_id"],
+            "status": obj["status"],
+            "reattested": bool(obj["reattested"]),
+            "vault_backed": request.app.state.pdi is not None,
+            "events": [
+                {"id": r["id"], "event": r["event"], "actor": r["actor"],
+                 "sealed": r["pdi_key"] is not None, "at": r["created_at"]}
+                for r in rows
+            ],
+            "note": "this is the record of your own case: what happened, who "
+                    "did it, and when. The reasons and other free text are "
+                    "not repeated here — you wrote yours, and nobody else's "
+                    "is yours to read",
+        },
+        language)
+
+
 @router.get("/profiles/{profile_id}/objections")
 def list_objections(profile_id: str, request: Request) -> list[dict]:
     profile_or_404(profile_id)
@@ -273,17 +328,31 @@ def resolve_objection(objection_id: str, body: ObjectionResolve,
 
 
 @router.post("/objections/{objection_id}/withdraw")
-def withdraw_consent(objection_id: str, request: Request) -> dict:
+def withdraw_consent(objection_id: str, request: Request,
+                     accept_language: str = Header(default="")) -> dict:
     """A ``subject_consent`` subject withdraws consent — honored immediately,
     even mid-review, forcing termination. Public: the subject acts through
-    their objection. (For ``estate_authorization``, use ``/revoke``.)"""
+    their objection. (For ``estate_authorization``, use ``/revoke``.)
+
+    Localized, like the objection routes it belongs with. It was not until
+    this release: of the four public routes on this surface, the two that
+    merely *open* or *read* an objection answered in the visitor's language
+    and the two that **end a profile** answered in English.
+
+        asked     are the public strings translated
+        mattered  does every public route accept the visitor's language
+    """
     return _force_terminate(objection_id, request, basis="subject_consent",
                             status="withdrawn", actor="subject",
-                            event="withdrawn")
+                            event="withdrawn",
+                            note="consent withdrawn; the profile is "
+                                 "terminated and its content erased",
+                            accept_language=accept_language)
 
 
 @router.post("/objections/{objection_id}/revoke")
-def revoke_authorization(objection_id: str, request: Request) -> dict:
+def revoke_authorization(objection_id: str, request: Request,
+                         accept_language: str = Header(default="")) -> dict:
     """Revoke the rights basis and force termination immediately. Works for
     ``subject_consent`` (the subject) and ``estate_authorization`` (the
     authorizing estate). ``public_figure_commentary`` has no consent to revoke
@@ -299,11 +368,15 @@ def revoke_authorization(objection_id: str, request: Request) -> dict:
             409, f"basis '{basis}' cannot be revoked; use the review path")
     actor = "subject" if basis == "subject_consent" else "estate"
     return _force_terminate(objection_id, request, basis=basis,
-                            status="revoked", actor=actor, event="revoked")
+                            status="revoked", actor=actor, event="revoked",
+                            note="authorization revoked; the profile is "
+                                 "terminated and its content erased",
+                            accept_language=accept_language)
 
 
 def _force_terminate(objection_id: str, request: Request, *, basis: str,
-                     status: str, actor: str, event: str) -> dict:
+                     status: str, actor: str, event: str,
+                     note: str = "", accept_language: str = "") -> dict:
     """Shared teardown for withdrawal/revocation: verify the basis, terminate,
     revoke tokens, close the objection, and audit both the decision and the
     termination."""
@@ -324,8 +397,15 @@ def _force_terminate(objection_id: str, request: Request, *, basis: str,
     conn.commit()
     _audit(request, objection_id, obj["profile_id"], event, actor)
     _audit(request, objection_id, obj["profile_id"], "terminated", "system")
-    return {"id": objection_id, "status": status,
-            "profile_status": "terminated"}
+    return i18n.localize_public(
+        {"id": objection_id, "status": status,
+         "profile_status": "terminated",
+         # The sentence matters more here than anywhere else on this surface:
+         # this is the response to somebody having just ended a synthetic
+         # profile of themselves, and "terminated" alone is a status code.
+         "note": note,
+         "timeline": f"/objections/{objection_id}/timeline"},
+        i18n.negotiate(accept_language))
 
 
 def _require_owner_or_reviewer(profile_id: str, request: Request) -> None:

@@ -24,7 +24,15 @@ namespace QrmeStudio.Views;
 /// Settings, where the credential is.</para></summary>
 public sealed partial class WithoutAnAccountPage : Page
 {
-    public WithoutAnAccountPage() => InitializeComponent();
+    public WithoutAnAccountPage()
+    {
+        InitializeComponent();
+        // The one screen in this shell whose reader has no profile, so the
+        // language comes from the machine rather than from a stored setting.
+        var lang = L10n.DeviceLanguage();
+        TimelineTitle.Text = L10n.T("obj.timeline.title", lang);
+        TimelineButton.Content = L10n.T("obj.timeline.go", lang);
+    }
 
     private void OnBack(object sender, RoutedEventArgs e) =>
         Frame.Navigate(typeof(WelcomePage));
@@ -52,6 +60,60 @@ public sealed partial class WithoutAnAccountPage : Page
         }
         catch (Exception ex) { ShowError(ex.Message); }
         finally { ObjectButton.IsEnabled = true; }
+    }
+
+    /// <summary>Read the record of a case you raised.
+    ///
+    /// <para>The objector could already end the profile from this page's
+    /// sibling routes and could not read what had been done about it: the full
+    /// audit is owner- or reviewer-gated because it quotes free text. This
+    /// carries the shape of what happened and none of the words — including
+    /// the objector's own, which is why the gate on the other view stands.</para></summary>
+    private async void OnTimeline(object sender, RoutedEventArgs e)
+    {
+        var lang = L10n.DeviceLanguage();
+        var id = TimelineIdBox.Text.Trim();
+        if (id.Length == 0)
+        {
+            ShowError(L10n.T("obj.timeline.need_id", lang));
+            return;
+        }
+        ErrorText.Visibility = Visibility.Collapsed;
+        TimelineButton.IsEnabled = false;
+        try
+        {
+            var t = await ApiClient.Shared.ObjectionTimeline(id);
+            TimelineList.Children.Clear();
+            if (t.Events.Length == 0)
+            {
+                TimelineList.Children.Add(new TextBlock
+                {
+                    Text = L10n.T("obj.timeline.empty", lang),
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                });
+            }
+            foreach (var ev in t.Events)
+            {
+                var line = L10n.T($"obj.event.{ev.Event}", lang)
+                    + " · " + L10n.T($"obj.actor.{ev.Actor}", lang)
+                    + " · " + ev.At
+                    + (ev.Sealed ? " · " + L10n.T("obj.timeline.sealed", lang) : "");
+                TimelineList.Children.Add(new TextBlock
+                {
+                    Text = line,
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                });
+            }
+            TimelineList.Visibility = Visibility.Visible;
+            // The backend's own sentence, already in the reader's language:
+            // it says the reasons are not repeated here and why.
+            TimelineNote.Text = t.Note;
+            TimelineNote.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally { TimelineButton.IsEnabled = true; }
     }
 
     private async void OnRecover(object sender, RoutedEventArgs e)

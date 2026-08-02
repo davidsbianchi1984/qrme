@@ -4,6 +4,83 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.41.0] — 2026-08-02
+
+### The objector could end a profile and could not read their own case
+
+`GET /objections/{id}/audit` is owner- or reviewer-gated, and its docstring
+gives the reason in its own words: *it can quote the objector's reason*. That
+gate is right about the free text and wrong about who it locks out. **The
+objector wrote that reason.**
+
+And they were not a bystander to the case. `POST /objections/{id}/withdraw`
+and `/revoke` are both public, and both **terminate the profile and erase its
+content**. The one party on this surface with no account — a contested person,
+sometimes a bereaved estate — could pull the lever and could not read the
+record of having pulled it.
+
+    asked     could the audit trail leak the objector's reason
+    mattered  who is the audit trail for
+
+**A second view, not a wider one.** `GET /objections/{id}/timeline` is public
+and localized and carries event, actor, time, sealed — and no `detail` at all.
+Not the objector's reason, not the reviewer's note, not the owner's. The shape
+of what happened is theirs; nobody's prose is. The `/audit` gate is untouched
+and `test_audit_is_owner_or_reviewer_gated` still passes.
+
+### The two routes that end a profile did not speak the visitor's language
+
+Of the four public routes on this surface, the two that merely open or read an
+objection negotiated `Accept-Language`. The two that terminate a synthetic
+profile of a real person answered `{"id": …, "status": "withdrawn",
+"profile_status": "terminated"}` — three enum values and no sentence, in any
+language. Both now carry a translated `note` and a pointer to the timeline.
+
+`test_the_stranger_has_a_language_too.py` did not catch this and is not wrong:
+it checks that the public *strings* are translated, and a route that produces
+no sentence has no string to find.
+
+    asked     are the public strings translated
+    mattered  does every public route accept the visitor's language
+
+### The language no client was sending
+
+The half of the same defect that lives on the other side of the wire. The
+routes above choose their language from `Accept-Language`. **No native shell
+was sending that header** — not this product's, and not either sibling's. The
+browser sends it unasked, which is exactly why the console looked correct and
+the three clients a contested person is most likely to be holding were the ones
+still answering in English.
+
+    asked     can the shell say it in the reader's language
+    mattered  does the reader's language ever reach the server
+
+One line in each shell's request helper, sourced from the device resolver the
+0.30.x rounds had already built and nothing had used.
+
+### Doors
+
+The timeline reaches the browser console, iOS, Android and Windows — event ·
+actor · time, sealed where the vault holds the row, in ten languages.
+
+### Two guards corrected after they passed something they should not have
+
+* **Windows' localizer had one signature and now has two.** `L10n.T(key)`
+  reads `AppState.Current.Language`, which is the profile's setting — the wrong
+  answer on the one screen whose reader has no profile, reachable by writing
+  nothing at all. A `T(key, lang)` overload was added, and the arity guard,
+  which read the *first* declaration it found, failed six correct call sites.
+  It reads every declaration now.
+
+      asked     does every call match the signature
+      mattered  does every call match a signature that exists
+
+* **The new header guard used `any` where it needed `all`.** PDI's iOS client
+  builds requests in two places — the shared helper and the intake submit its
+  accountless recipient uses. Hardcoding `"en"` on one of them passed, because
+  the other was still right. The union hid a surface inside the guard written
+  to stop exactly that.
+
 ## [0.40.0] — 2026-08-02
 
 > Staged as 0.30.10 and cut as **0.40.0**. The work below is unchanged; only

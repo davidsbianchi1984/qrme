@@ -173,6 +173,11 @@ object ApiClient {
         val conn = (URL(base + path).openConnection() as HttpURLConnection).apply {
             requestMethod = method
             setRequestProperty("content-type", "application/json")
+            // The other half of the accountless screen's language. `L10n`
+            // covers the words this shell owns; every sentence the *backend*
+            // composes for somebody with no profile is chosen from this
+            // header, and no native shell was sending it.
+            setRequestProperty("accept-language", L10n.deviceLanguage())
             token?.let { setRequestProperty("authorization", "Bearer $it") }
             connectTimeout = 8000; readTimeout = 8000
             if (body != null) {
@@ -343,6 +348,24 @@ object ApiClient {
     }
 
     // ---- objections (governance) ----
+
+    /** The objector's own record. Public, like the route that opens one —
+     *  built because `/audit` is owner- or reviewer-gated and the objector is
+     *  neither, so they could END the profile and not read what happened.
+     *  Carries no free text: event, actor, time, sealed. */
+    suspend fun objectionTimeline(objectionId: String): ObjectionTimeline {
+        val o = JSONObject(request("/objections/$objectionId/timeline"))
+        val arr = o.optJSONArray("events")
+        return ObjectionTimeline(
+            o.optString("status"),
+            o.optString("note"),
+            (0 until (arr?.length() ?: 0)).map { i ->
+                val e = arr!!.getJSONObject(i)
+                ObjectionTimelineEvent(e.optString("id"), e.optString("event"),
+                    e.optString("actor"), e.optBoolean("sealed"),
+                    e.optString("at"))
+            })
+    }
 
     suspend fun objections(id: String, token: String): List<Objection> {
         val arr = JSONArray(request("/profiles/$id/objections", token = token))
@@ -1181,3 +1204,9 @@ object ApiClient {
         return VoiceRevocation(o.optInt("samples_deleted"), o.optString("note", ""))
     }
 }
+
+data class ObjectionTimelineEvent(val id: String, val event: String,
+                                  val actor: String, val sealed: Boolean,
+                                  val at: String)
+data class ObjectionTimeline(val status: String, val note: String,
+                             val events: List<ObjectionTimelineEvent>)

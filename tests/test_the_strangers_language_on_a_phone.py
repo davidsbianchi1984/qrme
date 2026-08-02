@@ -122,6 +122,18 @@ def test_every_shell_can_resolve_a_language_without_a_profile():
           "guaranteed to be the default.")
 
 
+def _accountless(name: str, code: str) -> str:
+    """Android's whole console is one file, so the search is narrowed to the
+    accountless composable rather than the whole of Screens.kt."""
+    if name != "android":
+        return code
+    start = code.find("fun WithoutAnAccountScreen")
+    if start == -1:
+        return ""
+    end = code.find("\nfun ", start + 1)
+    return code[start:end if end != -1 else len(code)]
+
+
 def test_no_shell_takes_the_accountless_screens_language_from_a_profile():
     """The specific wrong answer, named.
 
@@ -134,21 +146,149 @@ def test_no_shell_takes_the_accountless_screens_language_from_a_profile():
         path = REPO / screen
         if not path.exists():
             continue
-        code = _code(path)
-        # Android's whole console is one file, so the search is narrowed to
-        # the accountless composable rather than the whole of Screens.kt.
-        if name == "android":
-            start = code.find("fun WithoutAnAccountScreen")
-            if start == -1:
-                continue
-            end = code.find("\nfun ", start + 1)
-            code = code[start:end if end != -1 else len(code)]
+        code = _accountless(name, _code(path))
         for wrong in ("state.language", "vm.language", "AppState.Language",
                       "State.Language"):
             assert wrong not in code, (
                 f"{name}'s accountless screen reads {wrong}, which is the "
                 "profile's setting — and its reader has no profile, so that "
                 f"value is always the default. Use {symbol}.")
+
+
+# --- the round after: the language nobody was sending -----------------------
+#
+# Supplying `deviceLanguage` fixed the words each shell owns. It did not fix
+# the ones it does not. `governance.py` composes the sentence a person reads
+# when they open an objection, when they end a profile, and on the timeline of
+# their own case, and it picks the language from `Accept-Language`. No native
+# shell was sending that header. The browser sends it without being asked,
+# which is exactly why the three clients a contested person is most likely to
+# be holding were the ones still answering in English after the routes learned
+# to speak.
+#
+#     asked     can the shell say it in the reader's language
+#     mattered  does the reader's language ever reach the server
+
+#: (label, the shell's HTTP client, the resolver as written at the call site)
+HTTP_CLIENTS = (
+    ("ios", "native/ios/Sources/ApiClient.swift", "L10n.deviceLanguage"),
+    ("android",
+     "native/android/app/src/main/java/app/qrme/studio/ApiClient.kt",
+     "L10n.deviceLanguage()"),
+    ("windows", "native/windows/ApiClient.cs", "L10n.DeviceLanguage()"),
+)
+
+#: How each shell asks its own chrome table for a string.
+TRANSLATOR = {"ios": "L10n.t(", "android": "L10n.t(", "windows": "L10n.T("}
+
+
+def test_every_shell_tells_the_server_what_language_its_reader_speaks():
+    """Both halves, because a header set to the wrong thing looks identical
+    to a header set to the right thing from the outside: the shell must send
+    `Accept-Language`, **and** what it sends must come from the device
+    resolver rather than a constant or the profile's setting."""
+    wrong = []
+    for name, client, resolver in HTTP_CLIENTS:
+        path = REPO / client
+        if not path.exists():
+            continue
+        lines = [ln for ln in _code(path).splitlines()
+                 if "accept-language" in ln.lower()]
+        if not lines:
+            wrong.append(f"{name}: {client} never sets an accept-language "
+                         "header, so every sentence the backend composes for "
+                         "a reader with no profile arrives in English")
+        elif [ln for ln in lines if resolver not in ln]:
+            # Every line, not any line. A client can build requests in more
+            # than one place — PDI's iOS client has the shared helper and the
+            # intake submit its accountless recipient uses — and an `any` here
+            # passed an injection that hardcoded "en" on one of them, because
+            # the other one was still right. The union hid a surface inside
+            # the guard written to stop exactly that.
+            #
+            #     asked     does this client send the reader's language
+            #     mattered  does every request this client makes send it
+            bad = len([ln for ln in lines if resolver not in ln])
+            wrong.append(f"{name}: {bad} of {len(lines)} accept-language "
+                         f"header(s) set without {resolver} — the header is "
+                         "there and the reader's language is not in it")
+    assert not wrong, "\n    ".join([""] + wrong)
+
+
+def _arity(code: str, open_paren: int) -> int:
+    """How many arguments the call whose `(` is at `open_paren` was given.
+
+    String-aware, because every one of these calls takes a quoted key first
+    and half of them build it by interpolation — a comma inside `"obj.event.
+    \\(e.event)"` is not an argument separator, and a scanner that thought it
+    was would find two arguments in a one-argument call and pass.
+    """
+    depth, args, quote, i, seen = 0, 1, "", open_paren, False
+    while i < len(code):
+        c = code[i]
+        if quote:
+            if c == "\\":
+                i += 2
+                continue
+            if c == quote:
+                quote = ""
+        else:
+            if depth == 1 and not c.isspace() and c not in ")]}":
+                # Anything at all between the brackets — including the opening
+                # quote of the key, which an earlier draft of this scanner
+                # skipped straight past, so `T("k")` counted as no arguments.
+                seen = True
+            if c in "\"'":
+                quote = c
+            elif c in "([{":
+                depth += 1
+            elif c in ")]}":
+                depth -= 1
+                if depth == 0:
+                    return args if seen else 0
+            elif c == "," and depth == 1:
+                args += 1
+        i += 1
+    raise AssertionError(f"unbalanced call at offset {open_paren}")
+
+
+def test_the_accountless_screen_never_asks_for_a_string_without_a_language():
+    """The Windows-shaped version of the same mistake.
+
+    iOS and Android cannot make it: both `t` functions require the language as
+    an argument, so a screen that forgets one does not compile. Windows'
+    `T(key)` reads `AppState.Current.Language` — the profile's setting — and
+    the accountless screen can reach it by writing nothing at all. The
+    existing check greps this screen for the profile's name and would not see
+    it, because the screen never names it; the overload does.
+    """
+    for name, _, symbol, screen in SHELLS:
+        path = REPO / screen
+        if not path.exists():
+            continue
+        code = _accountless(name, _code(path))
+        call = TRANSLATOR[name]
+        for m in re.finditer(re.escape(call), code):
+            n = _arity(code, m.end() - 1)
+            assert n >= 2, (
+                f"{name}: {screen} calls {call.rstrip('(')} with {n} "
+                "argument(s) at offset "
+                f"{m.start()} — no language, so it falls back to whatever the "
+                f"shell's default is. Pass {symbol}.")
+
+
+def test_the_arity_scanner_can_count():
+    """A guard on the guard: a scanner that returned 2 for everything would
+    pass the check above on a screen with no languages in it at all."""
+    def n(src: str) -> int:
+        return _arity(src, src.index("("))
+
+    assert n('L10n.T("k")') == 1
+    assert n('L10n.T("k", lang)') == 2
+    assert n('L10n.T("a, b")') == 1, "a comma inside a string"
+    assert n('L10n.t("obj.event.\\(e.event)", lang)') == 2
+    assert n('L10n.T(Fmt("a", "b"), lang)') == 2, "a nested call"
+    assert n("L10n.T()") == 0
 
 
 def _recorded() -> set[str]:
