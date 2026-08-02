@@ -4,6 +4,62 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.6] — 2026-08-01
+
+### The plan gate speaks the reader's language
+
+`refusals_untranslated.txt` carried this as an exception for four releases, in
+its own words: a template whose slots were English prose, where translating the
+frame alone would produce *"a sentence half in each language, at the one moment
+in this product that stands between somebody and a decision to pay"*.
+
+    asked     can the frame be translated
+    mattered  can the slots be
+
+They can. The capability descriptions and the billing period are a **closed set
+this product authors**, so they are `i18n.Term`s with translations rather than
+strangers — and `Term` is now exempt from the whitespace rule for exactly that
+reason. The rule catches prose *nobody wrote a translation for*; an unmapped
+`Term` still keeps the whole sentence English, so the exemption is paid for
+rather than a hole.
+
+The **plan titles** stay as they are. `Basic` and `Pro` are what the product is
+called on the pricing page, in the console's tabs and on a receipt, and
+somebody comparing a refusal against a price list needs the same word in both
+places.
+
+`Opening` capitalises **after** translation, never before: the vocabulary holds
+one form of each phrase and each language raises its own first letter from it.
+`str.capitalize()` was wrong here — it lower-cases the rest, which would have
+flattened German's nouns.
+
+### The console had the same defect one layer out
+
+The card under the message repeated, in English, what the message says: the
+plan you are on, the plan you need, the price, the period, and that billing is
+simulated. It was written when `message` was English too, so the repetition
+cost nothing — and the moment the sentence started arriving translated, it
+became the only English left on that card.
+
+    asked     is the refusal translated
+    mattered  is what surrounds it
+
+The duplicate is gone. The price and the simulated-billing disclosure are
+adjacent **inside** the message — the invariant that card was built to keep —
+now in ten languages rather than one, and the driven test asserts the pairing
+inside the sentence rather than in the markup.
+
+Seven injections, each caught by the right test. The seventh needed a new test
+first: everything asserted the plan gate by calling `localize_detail` directly,
+and every one of those passed while the handler's dict branch was dropping the
+template on the floor.
+
+    asked     does the module translate this shape
+    mattered  does the request path reach the code that does
+
+That test then failed for a second, correct reason — it sent `Accept-Language`
+with an owner token, and the credential decides the language here.
+
 ## [0.30.5] — 2026-08-01
 
 ### The plan gate said HTTP 402
