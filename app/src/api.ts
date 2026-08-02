@@ -1122,6 +1122,17 @@ export interface ChatReply {
   // Spec clauses 2/12: which role the profile worked in, and whether the
   // interactor declared it or the profile read it from the prompt.
   role_context?: { role: string; how: "declared" | "inferred" } | null;
+  /** Who actually wrote this, and what was asked for when they differ.
+   *
+   *  `generated_by` used to be the profile's stored *choice*, so an owner
+   *  whose own API key had expired read stub-written text labelled with the
+   *  model they had chosen. `degraded_from` is what makes the amber banner
+   *  possible: without it a record that suddenly says "local fallback" looks
+   *  like somebody changed a setting rather than a credential going dead. */
+  provenance?: {
+    generated_by?: string;
+    degraded_from?: string | null;
+  } | null;
 }
 export interface CompositionRow {
   source_profile_id: string;

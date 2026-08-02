@@ -4,6 +4,85 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.3] — 2026-08-02
+
+### The provenance named the model that was asked, not the one that answered
+
+`content_provenance` is this product's central claim, and its own docstring
+says so: *the verifiable basis of a piece of persona-generated content: which
+model produced it ... so nothing the platform emits is a black box.*
+
+It read the profile's **stored preference**:
+
+```python
+"generated_by": llm.resolve_choice(llm.get_choice(profile["id"])),
+```
+
+Meanwhile both network wrappers degrade rather than fail.
+`llm.FallbackProvider` catches any exception from the primary and returns the
+local stub's text, logging a warning. `cloud.CloudProvider` did the same and
+did not even log.
+
+So an owner sets their profile to Anthropic and brings their own API key. The
+key expires. The next post is written by the stub on their own machine, stamped
+`generated_by: "anthropic"`, watermarked, and published — and the only trace is
+a log line addressed to nobody.
+
+    asked     which model was this profile set to
+    mattered  which model actually wrote this
+
+**Degrading is still the behaviour.** A model outage should not take the
+product down, and that decision has not changed. What changed is what the
+platform then *says* about the result.
+
+### The rule was already written down, in the other product
+
+JIM-mini's `FallbackProvider` has carried it in its docstring for releases:
+
+> The degrade is recorded on the instance (`answered_by`, `failure`) so a
+> caller can tell the user the truth about who actually answered — **a log line
+> the user will never read is not disclosure.**
+
+The product that had the rule was the health app. The product that needed it
+was the one whose premise is that generated content carries a trustworthy
+account of where it came from.
+
+### What was built
+
+* A request-scoped record of who actually generated — the same idiom this
+  module already uses for the caller's API key, chosen because every call site
+  is `provider_for_profile(id).generate(…)`, built and discarded inline with
+  nothing left to interrogate.
+* Both wrappers record on **success and failure**. Recording only the degrade
+  leaves a stale one describing a later answer that was perfectly good.
+* `generated_by` now reports the truth, with `degraded_from` beside it —
+  without that second field a record that suddenly says "local fallback" reads
+  as somebody changing a setting rather than a credential going dead.
+* The console shows it, in amber, on the chat surface. A record nobody can see
+  is the same defect one layer up.
+
+### The caller's own key never rides along
+
+The reason for a degrade is now shown to the person and written to the log, and
+it comes from an exception this codebase did not raise. Some HTTP clients put
+the whole request — headers included — into the string form of their errors,
+and on this path the interesting header is the caller's API key. `llm.scrub`
+removes it before the reason is recorded or logged.
+
+### The generalisation
+
+A structural check requires that **every** `generate` answering a provider
+failure with somebody else's text records who answered. Two such wrappers exist
+today; the defect was that one of them was silent, so a check naming the known
+classes would have passed while a third went on lying.
+
+Its first draft read only dotted calls and reported the wrapper that had just
+been fixed — `cloud.py` calls `llm.note_answered_by(...)`, `llm.py` calls its
+own `note_answered_by(...)` unqualified.
+
+    asked     does the handler call llm.note_answered_by
+    mattered  does the handler record who answered
+
 ## [0.40.2] — 2026-08-02
 
 ### The refusals, finished

@@ -49,7 +49,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.40.2",
+    app = FastAPI(title="QRME", version="0.40.3",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -266,9 +266,15 @@ def create_app(pdi_client: PDIClient | None = None,
     @app.middleware("http")
     async def _llm_request_key(request: Request, call_next):
         token = llm.set_request_key(request.headers.get("x-llm-api-key"))
+        # Who actually generated is request-scoped for the same reason the key
+        # is, and cleared here for a reason the key does not have: a stale
+        # value is not merely useless, it is a false statement about the next
+        # request's content. See llm._ANSWERED_BY.
+        answered = llm.clear_answered_by()
         try:
             return await call_next(request)
         finally:
+            llm.clear_answered_by(answered)
             llm.reset_request_key(token)
 
     # The starter portraits. Mounted unconditionally: unlike the studio, these

@@ -1,9 +1,13 @@
 import { useRef, useState } from "react";
+import { t as tr, visitorLang } from "../l10n";
 import { api } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
-interface Msg { who: "you" | "assistant"; text: string; note?: string }
+interface Msg { who: "you" | "assistant"; text: string; note?: string;
+                /** Set when the model the owner chose did not answer and
+                 *  the local fallback wrote this instead. */
+                degradedFrom?: string | null }
 
 export function Chat({ onPlans }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
@@ -66,7 +70,11 @@ export function Chat({ onPlans }: {
       const text = pm.status === "approved"
         ? pm.content
         : "(this reply was held by moderation)";
-      setMsgs((m) => [...m, { who: "assistant", text, note }]);
+      // Who actually wrote it. Canned fallback text presented as the chosen
+      // model is a lie the reader has no way to detect from the words alone —
+      // the sibling product's Coach screen has said so in amber for releases.
+      const degradedFrom = reply.provenance?.degraded_from ?? null;
+      setMsgs((m) => [...m, { who: "assistant", text, note, degradedFrom }]);
     } catch (e) {
       setError(e);
     } finally {
@@ -92,6 +100,12 @@ export function Chat({ onPlans }: {
           <div key={i} className={"bubble " + m.who}>
             {m.text}
             {m.note && <div className="bubble-note">{m.note}</div>}
+            {m.degradedFrom && (
+              <div className="degraded">
+                ⚠ {tr("chat.degraded.head", visitorLang())}{" "}
+                {m.degradedFrom} {tr("chat.degraded.tail", visitorLang())}
+              </div>
+            )}
           </div>
         ))}
         {busy && <div className="bubble assistant thinking">…</div>}

@@ -372,6 +372,26 @@ def biometrics_recovered(biometrics: dict | None) -> bool:
         return False
 
 
+def _who_generated(profile_id: str) -> dict:
+    """The `generated_by` half of a provenance record, and the degrade beside
+    it when the model that answered is not the one that was asked.
+
+    Two keys rather than one, because they answer different questions and a
+    reader needs both: `generated_by` is the honest origin of the text, and
+    `degraded_from` is what the owner had configured — without it, a record
+    that suddenly says "local fallback" looks like a settings change rather
+    than an outage or a dead credential.
+    """
+    from . import llm
+    answered = llm.answered_by()
+    if answered is None:
+        return {"generated_by": llm.resolve_choice(llm.get_choice(profile_id)),
+                "degraded_from": None}
+    actual, asked = answered
+    return {"generated_by": actual, "degraded_from": asked if asked != actual
+            else None}
+
+
 def content_provenance(profile: dict, sources: list[dict],
                        status: str, flag_reason: str | None) -> dict:
     """The verifiable basis of a piece of persona-generated content: which
@@ -387,7 +407,22 @@ def content_provenance(profile: dict, sources: list[dict],
         "method": "generated in persona — grounded in the profile's core "
                   "identity and its consented source material, then "
                   "moderated before delivery",
-        "generated_by": llm.resolve_choice(llm.get_choice(profile["id"])),
+        # Who actually wrote it, not who was asked to.
+        #
+        # This read `resolve_choice(get_choice(...))` — the profile's stored
+        # preference — while `llm.FallbackProvider` and `cloud.CloudProvider`
+        # both degrade to the local stub whenever the network provider fails.
+        # An owner whose own API key had expired therefore got stub-written
+        # text stamped with the model they had chosen, watermarked, and
+        # published, and the only trace was a log line addressed to nobody.
+        #
+        #     asked     which model was this profile set to
+        #     mattered  which model actually wrote this
+        #
+        # `answered_by()` is None when nothing on this request went through a
+        # degrading wrapper, and the stored choice is then the honest answer —
+        # it is what `_build` resolved and what actually ran.
+        **_who_generated(profile["id"]),
         "language": i18n.effective_language(profile["id"]),
         "grounded_in": {"persona": True, "source_items": len(sources),
                         "by_kind": kinds},

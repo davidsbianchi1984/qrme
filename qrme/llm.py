@@ -59,6 +59,74 @@ def reset_request_key(token) -> None:
 def request_key() -> str | None:
     return _REQUEST_KEY.get()
 
+
+# Who actually generated this request's content.
+#
+# Every network provider here degrades to the local stub rather than failing —
+# a model outage should not break the product, and that decision stands. What
+# did not stand is what the platform then *said* about the result:
+# `common.content_provenance` stamped `generated_by` from the profile's stored
+# choice, so a person whose own key had expired got stub-written text labelled
+# with the model they had chosen, watermarked and published.
+#
+#     asked     which model was this profile set to
+#     mattered  which model actually wrote this
+#
+# The sibling product had already written the rule in its own FallbackProvider:
+# *a log line the user will never read is not disclosure*. This is that rule,
+# in the product whose premise is that generated content carries a trustworthy
+# account of where it came from.
+#
+# Request-scoped like the key above, because the provider is built and
+# discarded inline at every call site — `provider_for_profile(id).generate(…)`
+# — so there is no instance for a caller to interrogate afterwards.
+_ANSWERED_BY: ContextVar[tuple[str, str | None] | None] = ContextVar(
+    "qrme_llm_answered_by", default=None)
+
+#: What answers when a network provider will not. Named rather than spelled
+#: `"stub"` at each site: the person reading a provenance record needs to know
+#: this text came from the machine in front of them, not from the model they
+#: chose, and "stub" is this repository's word rather than theirs.
+LOCAL_FALLBACK = "local fallback"
+
+
+def note_answered_by(name: str, degraded_from: str | None = None) -> None:
+    """Record who produced this request's content, and what was asked for
+    instead when they are not the same."""
+    _ANSWERED_BY.set((name, degraded_from))
+
+
+def answered_by() -> tuple[str, str | None] | None:
+    """``(actual_provider, provider_asked_for_or_None)``, or None when nothing
+    on this request went through a degrading wrapper."""
+    return _ANSWERED_BY.get()
+
+
+def clear_answered_by(token=None):
+    """Middleware owns this: one request's degrade must not describe the next
+    one's content."""
+    if token is not None:
+        _ANSWERED_BY.reset(token)
+        return None
+    return _ANSWERED_BY.set(None)
+
+
+def scrub(text: object) -> str:
+    """A provider's failure, with the caller's own credential taken out.
+
+    The reason for a degrade is shown to the person and written to the log, and
+    it comes from an exception this codebase did not raise. Some HTTP clients
+    put the request — headers included — into the string form of their errors,
+    and on this path the interesting header is the caller's API key. It is
+    never ours to repeat.
+    """
+    said = str(text)
+    key = request_key()
+    if key:
+        said = said.replace(key, "<the key you sent>")
+    return said[:200]
+
+
 MODEL = os.environ.get("QRME_MODEL", "claude-opus-5")
 
 # Per-provider default models are overridable by env so an operator can pin a
@@ -220,8 +288,14 @@ class StubProvider:
 
 class FallbackProvider:
     """Wraps a network provider so any failure degrades to a local fallback
-    (the stub) instead of surfacing an error to the caller. Every degrade is
-    logged so outages are visible without breaking the product."""
+    (the stub) instead of surfacing an error to the caller.
+
+    The degrade is **recorded as well as logged**. It used to be only logged,
+    and `content_provenance` went on stamping the provider the profile had
+    chosen — so an expired key produced stub text labelled with the model the
+    owner thought had written it. A log line the user will never read is not
+    disclosure.
+    """
 
     def __init__(self, name: str, primary: Provider, fallback: Provider) -> None:
         self.name = name
@@ -230,11 +304,15 @@ class FallbackProvider:
 
     def generate(self, system: str, messages: list[dict]) -> str:
         try:
-            return self._primary.generate(system, messages)
+            text = self._primary.generate(system, messages)
         except Exception as exc:  # noqa: BLE001 — any provider failure degrades
+            reason = scrub(exc)
             logger.warning("provider %s failed, using local fallback: %s",
-                           self.name, exc)
+                           self.name, reason)
+            note_answered_by(LOCAL_FALLBACK, degraded_from=self.name)
             return self._fallback.generate(system, messages)
+        note_answered_by(self.name)
+        return text
 
 
 # --------------------------------------------------------------------------- #

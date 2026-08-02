@@ -21,6 +21,7 @@ intake where contribution data is stored).
 from __future__ import annotations
 
 import json
+import logging
 import urllib.error
 import urllib.request
 
@@ -115,16 +116,35 @@ class CloudModelClient:
             return False
 
 
+logger = logging.getLogger("qrme.cloud")
+
+
 class CloudProvider:
     """Greater-model inference with automatic local fallback."""
+
+    #: What this wrapper is, in the words a provenance record needs. The
+    #: gateway's model is not one of the registry names, so it cannot be
+    #: spelled by `resolve_choice` and has to say its own name here.
+    GREATER_MODEL = "cloud greater model"
 
     def __init__(self, client: CloudModelClient, fallback):
         self._client = client
         self._fallback = fallback
 
     def generate(self, system: str, messages: list[dict]) -> str:
+        from . import llm
         try:
-            return self._client.generate(system, messages)["content"].strip()
-        except Exception:
-            # The gateway being down never breaks the product.
+            text = self._client.generate(system, messages)["content"].strip()
+        except Exception as exc:  # noqa: BLE001 — the gateway never breaks us
+            # The gateway being down never breaks the product — but it does
+            # change who wrote the answer, and that is the reader's to know.
+            # This branch caught the exception and said nothing at all: no
+            # record, and unlike its sibling in `llm.FallbackProvider`, not
+            # even a log line.
+            logger.warning("cloud gateway failed, using local fallback: %s",
+                           llm.scrub(exc))
+            llm.note_answered_by(llm.LOCAL_FALLBACK,
+                                 degraded_from=self.GREATER_MODEL)
             return self._fallback.generate(system, messages)
+        llm.note_answered_by(self.GREATER_MODEL)
+        return text
