@@ -114,6 +114,37 @@ def _terminate(profile_id: str, request: Request) -> None:
                   "beacons", "creative_works", "perceptions", "active_handoffs",
                   "persona_embeddings", "biometric_context"):
         conn.execute(f"DELETE FROM {table} WHERE profile_id=?", (profile_id,))
+    # Capabilities *other people* hold over this profile.
+    #
+    # The list above is the list of places a profile's content lives, and it
+    # was complete. This one did not exist. Termination retires the owner's
+    # token and nothing else, so every capability a third party had been given
+    # — a licence bought, a skill grant issued, a package handed off, a wrist
+    # paired, a voice consented to, a contribution logged — stayed live on a
+    # profile that had just been torn down at its subject's request.
+    #
+    #     asked     can the owner still act on a terminated profile
+    #     mattered  can anyone still act on it
+    #
+    # A licence is the sharpest of them: `derive` mints a *new* profile from
+    # this one's persona, owned by the buyer, with its own owner token. That
+    # sale went through after the objection was upheld and the content erased.
+    for sql in (
+            "UPDATE license_grants   SET revoked=1 WHERE profile_id=?",
+            "UPDATE grants           SET revoked=1 WHERE profile_id=?",
+            "UPDATE handoffs         SET revoked=1, package=NULL"
+            " WHERE profile_id=?",
+            "UPDATE contribution_log SET revoked=1 WHERE profile_id=?"):
+        conn.execute(sql, (profile_id,))
+    for sql in (
+            "UPDATE voice_consents SET revoked_at=? WHERE profile_id=?"
+            " AND revoked_at IS NULL",
+            "UPDATE wearables      SET revoked_at=? WHERE profile_id=?"
+            " AND revoked_at IS NULL"):
+        conn.execute(sql, (db.utcnow(), profile_id))
+    # The standing offer goes with them: leaving it is leaving the shop window
+    # lit on a profile that no longer exists.
+    conn.execute("DELETE FROM license_offers WHERE profile_id=?", (profile_id,))
     conn.execute(
         "UPDATE profiles SET status='terminated', successor_owner=NULL"
         " WHERE id=?", (profile_id,))

@@ -49,7 +49,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.40.4",
+    app = FastAPI(title="QRME", version="0.40.5",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")

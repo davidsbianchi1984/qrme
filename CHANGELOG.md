@@ -4,6 +4,63 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.40.5] — 2026-08-02
+
+### The door they closed was the owner's
+
+Deletion in this product retires the owner's token. It retires nothing anybody
+else holds, and every audit that walked up to a terminated profile through an
+owner-gated route was told 401 and went away satisfied.
+
+`POST /profiles/{id}/license/acquire` is authorised by the **buyer's**
+interactor token, which termination never touches. Driven end to end against a
+profile whose subject objected and whose objection was upheld:
+
+    POST /objections/{id}/resolve   200  {"status": "upheld",
+                                          "profile_status": "terminated"}
+    POST .../license/acquire        201  the licence sells, the fee credits
+    POST .../license/{g}/derive     201  a new profile, seeded from the
+                                         erased persona, owned by the buyer,
+                                         with its own owner token
+
+    asked     can the owner still act on a terminated profile
+    mattered  can anyone still act on it
+
+The same hole one status over: a profile **restricted pending review** — the
+one whose subject is arguing in that moment that it should not exist — could be
+bought and cloned throughout the review. `succeed_profile` already refuses to
+hand a contested identity to a new owner, and `has_open_objection` sits in the
+same module for that check. Succession hands over the profile; derivation hands
+over a *copy* of it, permanently, to a stranger, and never asked.
+
+### The count
+
+Seven tables carry a `profile_id` beside a revocation flag or a live token — a
+capability somebody else holds over this profile. **Termination touched none of
+them.** Not the licence, not the skill grant, not the handoff package, not the
+paired wrist, not the voice consent, not the contribution log. `_terminate`
+walked fourteen tables and its docstring is about *reachability*; on
+reachability it was right, and capabilities were a list nobody had written.
+
+### Changed
+
+- `licensing.set_license`, `acquire_license` and `derive_agent` now call
+  `common.require_may_publish` — 410 for a departed or terminated profile, 403
+  for one under objection review. The gate at `derive` is the one that catches
+  a licence bought while the source was active and cashed in during the review.
+- `governance._terminate` revokes every capability a third party holds:
+  `license_grants`, `grants`, `handoffs`, `contribution_log`, `voice_consents`
+  and `wearables`, and takes the standing licence offer down with them.
+- `tests/test_termination_revokes_more_than_the_owners_token.py` — eleven
+  tests. The generalisation reads the schema rather than a list in the file, so
+  a capability table added next release is in scope by construction; the one
+  exemption (`referrals`) carries its reason, because an unexplained exemption
+  is what seven ungated tables looked like.
+
+A profile already derived under a licence bought while its source was active is
+left alone: it is its buyer's profile, with its own owner and its own
+provenance line, and tearing it down is a different decision from this one.
+
 ## [0.40.4] — 2026-08-02
 
 ### A memorial that kept posting

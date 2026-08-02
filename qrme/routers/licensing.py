@@ -22,7 +22,8 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import auth, db
-from ..common import age_of, interactor_or_404, profile_or_404, require_owner
+from ..common import (age_of, interactor_or_404, profile_or_404,
+                      require_may_publish, require_owner)
 from ..models import LicenseOffer
 
 
@@ -60,8 +61,12 @@ def _offer(profile_id: str) -> dict | None:
 
 @router.put("/profiles/{profile_id}/license")
 def set_license(profile_id: str, body: LicenseOffer, request: Request) -> dict:
-    profile_or_404(profile_id)
+    profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    # A memorial is not for sale. Sunset leaves the living owner their token,
+    # so this route stayed open on a departed profile long after the person
+    # whose expertise is being licensed could be asked about it.
+    require_may_publish(profile)
     if body.kind not in ("consult", "finetune", "clone"):
         raise HTTPException(422, "kind must be consult, finetune, or clone")
     allow = body.allow_derivatives or body.kind in ("finetune", "clone")
@@ -115,6 +120,14 @@ def unlist_license(profile_id: str, request: Request) -> None:
 def acquire_license(profile_id: str, request: Request) -> dict:
     """A buyer acquires a license against the source profile."""
     profile = profile_or_404(profile_id)
+    # Before the caller is identified, not after.
+    #
+    # Termination revokes the *owner's* token, so every owner-gated route on a
+    # terminated profile answers 401 and the profile reads as closed. This
+    # route is authorised by the **buyer's** interactor token, which
+    # termination never touches — so a profile terminated on an upheld
+    # objection went on selling licences to strangers.
+    require_may_publish(profile)
     buyer_id = _buyer(request)
     buyer = interactor_or_404(buyer_id)
     if profile["adult_mode"]:
@@ -180,6 +193,11 @@ def derive_agent(profile_id: str, grant_id: str, request: Request) -> dict:
     licensed expertise. The new profile is owned by the buyer, its persona
     seeded from the source, and its origin recorded in `licensed_from`."""
     source = profile_or_404(profile_id)
+    # The largest thing anyone can do with somebody else's profile: mint a new
+    # one from its persona, owned by the buyer, with its own owner token. It
+    # asked whether the *licence* was still good and never whether the
+    # *profile* was.
+    require_may_publish(source)
     buyer_id = _buyer(request)
     buyer = interactor_or_404(buyer_id)
     conn = db.connect()
