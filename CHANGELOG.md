@@ -4,6 +4,54 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.30.9] — 2026-08-02
+
+### Two corrections carried in from the sibling's round
+
+**A type-compatible argument swap, guarded.** JIM's Android client declares its
+shared helper `request(path, method, body, token)`, and three calls in that
+shell — plus one in PDI's — passed the verb first. Both arguments are `String`,
+so nothing complained; the request went to `base + "GET"` with the method set
+to a path. Two of them shipped in 0.30.7.
+
+    asked     does the call have the right number of arguments
+    mattered  does it have them in the right order
+
+There is no Kotlin toolchain in this build environment, which is the whole
+reason it sat there — the same reason forty one-argument `L10n.t` calls sat in
+that shell before 0.30.7. `test_a_screen_nothing_opens.py` now reads the
+helper's own declared signature and refuses an HTTP verb in the path slot.
+This repo's Android client is clean; the guard is here because the surfaces
+are the same three shells written the same way.
+
+### Last release's untranslated counts were overstated
+
+0.30.8 measured how much of each native shell is English behind a translated
+tab bar. The extractor counted **any string literal containing a letter**,
+which counted format fragments like `"\(dim): \(n)%"` — whose only letters are
+variable names nobody reads — as English prose. Roughly seventy-five of them
+across the nine shells.
+
+    asked     does this literal contain letters
+    mattered  does this literal contain words a reader reads
+
+The ratchet caught it the honest way: by firing on a card in the sibling
+product that had just been fully localized. A measurement that reports a
+regression where an improvement happened is worse than no measurement.
+
+Corrected figures for this product, now in `native_screens_untranslated.txt`:
+
+| shell | was recorded | actually |
+|---|---|---|
+| iOS | 289 | **280** |
+| Android | 205 | **195** |
+| Windows | 326 | **279** |
+
+The percentages in 0.30.8's table were computed the same wrong way and are
+restated here: QRME 2.4% / 3.9% / 0.7%. The shape of the finding does not
+change — these are still the worst three of the nine, and this product's
+Windows shell still answers in the reader's language exactly twice.
+
 ## [0.30.8] — 2026-08-02
 
 ### The console guard, asked of the phones
