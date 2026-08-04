@@ -1664,7 +1664,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop", "Corner").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop", "Corner", "People").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1682,7 +1682,8 @@ fun ManageScreen(vm: StudioViewModel) {
                 8 -> VoicePanel(vm)
                 9 -> DeskPanel(vm)
                 10 -> ShopPanel(vm)
-                else -> CornerPanel(vm)
+                11 -> CornerPanel(vm)
+                else -> PeoplePanel(vm)
             }
         }
     }
@@ -2579,6 +2580,163 @@ private fun CornerPanel(vm: StudioViewModel) {
                 }
             }
         }
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
+
+
+// ---- The people around a profile: friends, the wall, comments ----
+//
+// Nine routes the backend has carried since the community round, with a
+// door on every client but the phones. Three rules kept rather than
+// invented: a pinned row gets no remove control (deletion refuses with
+// 409 and the list says so); a blocked post or comment comes back to its
+// author with its status, because the words were recorded; and a
+// suggestion is shown with the reason the route returned for it.
+@Composable
+private fun PeoplePanel(vm: StudioViewModel) {
+    val lang = L10n.deviceLanguage()
+    var friends by remember { mutableStateOf<List<FriendRow>>(emptyList()) }
+    var suggested by remember { mutableStateOf<List<SuggestedRow>>(emptyList()) }
+    var posts by remember { mutableStateOf<List<WallPost>>(emptyList()) }
+    var comments by remember { mutableStateOf<List<CommentRow>>(emptyList()) }
+    var addId by remember { mutableStateOf("") }
+    var draft by remember { mutableStateOf("") }
+    var openPost by remember { mutableStateOf<String?>(null) }
+    var commentDraft by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.friends(vm.pid!!) }) { r ->
+            friends = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.suggestedFriends(vm.pid!!) }) { r ->
+            suggested = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.wall(vm.pid!!) }) { r ->
+            posts = r.getOrDefault(emptyList()) }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    fun openComments(postId: String) {
+        openPost = postId
+        vm.call({ ApiClient.comments("posts", postId, vm.token!!) }) { r ->
+            comments = r.getOrDefault(emptyList())
+            r.exceptionOrNull()?.let { note = it.message }
+        }
+    }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("people.friends", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            friends.forEach { f ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    val who = f.displayName ?: f.profileId
+                    Text(if (f.founder) "$who ★" else who, color = Qrme.Txt, fontSize = 12.sp)
+                    if (f.pinned) {
+                        Text(L10n.t("people.pinned", lang), color = Qrme.T3, fontSize = 11.sp)
+                    } else {
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.removeFriend(vm.pid!!, f.profileId,
+                                vm.token!!) }) { r ->
+                                r.exceptionOrNull()?.let { note = it.message }
+                                reload()
+                            }
+                        }) { Text(L10n.t("people.remove", lang), color = Qrme.Red, fontSize = 11.sp) }
+                    }
+                }
+            }
+            labeledField(L10n.t("people.add", lang), addId, "") { addId = it }
+            BrandButton(L10n.t("people.add.go", lang), enabled = addId.isNotBlank()) {
+                val who = addId.trim(); addId = ""
+                vm.call({ ApiClient.addFriend(vm.pid!!, who, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                    reload()
+                }
+            }
+        }
+
+        if (suggested.isNotEmpty()) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(L10n.t("people.suggested", lang), color = Qrme.Txt, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold)
+                Text(L10n.t("people.ranked", lang), color = Qrme.T2, fontSize = 11.sp)
+                suggested.forEach { s ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        val who = s.displayName ?: s.profileId
+                        val line = if (s.because.isNullOrBlank()) who else who + " · " + s.because
+                        Text(line, color = Qrme.T2, fontSize = 11.sp)
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.addFriend(vm.pid!!, s.profileId,
+                                vm.token!!) }) { r ->
+                                r.exceptionOrNull()?.let { note = it.message }
+                                reload()
+                            }
+                        }) { Text(L10n.t("people.add.go", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                    }
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("people.wall", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("people.say", lang), draft, "") { draft = it }
+            BrandButton(L10n.t("people.post", lang), enabled = draft.isNotBlank()) {
+                val words = draft; draft = ""
+                vm.call({ ApiClient.postToWall(vm.pid!!, words, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                    if (r.getOrNull()?.status == "blocked") {
+                        note = L10n.t("people.blocked", lang)
+                    }
+                    reload()
+                }
+            }
+            posts.forEach { p ->
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(p.body, color = Qrme.Txt, fontSize = 12.sp)
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        if (p.status == "blocked") {
+                            Text(L10n.t("people.blocked", lang), color = Qrme.T3, fontSize = 11.sp)
+                        } else {
+                            Text("", color = Qrme.T3, fontSize = 11.sp)
+                        }
+                        TextButton(onClick = { openComments(p.id) }) {
+                            Text(L10n.t("people.comments", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                        }
+                    }
+                }
+            }
+        }
+
+        openPost?.let { postId ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(L10n.t("people.comments", lang), color = Qrme.Txt, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold)
+                comments.forEach { c ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(c.body, color = Qrme.T2, fontSize = 11.sp)
+                        if (c.authorId == vm.pid) {
+                            TextButton(onClick = {
+                                vm.call({ ApiClient.deleteComment(c.id, vm.token!!) }) { r ->
+                                    r.exceptionOrNull()?.let { note = it.message }
+                                    openComments(postId)
+                                }
+                            }) { Text(L10n.t("people.withdraw", lang), color = Qrme.Red, fontSize = 11.sp) }
+                        }
+                    }
+                }
+                labeledField(L10n.t("people.reply", lang), commentDraft, "") { commentDraft = it }
+                BrandButton(L10n.t("people.send", lang), enabled = commentDraft.isNotBlank()) {
+                    val words = commentDraft; commentDraft = ""
+                    vm.call({ ApiClient.addComment("posts", postId, words, vm.token!!) }) { r ->
+                        r.exceptionOrNull()?.let { note = it.message }
+                        openComments(postId)
+                    }
+                }
+            }
+        }
+
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
 }

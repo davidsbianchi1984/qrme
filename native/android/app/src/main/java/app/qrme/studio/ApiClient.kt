@@ -1437,6 +1437,92 @@ object ApiClient {
             theme?.optString("bg") ?: "#1a1333",
             theme?.optString("accent") ?: "#7b5cff")
     }
+
+    // ---- the people around a profile: friends, the wall, comments ------
+
+    suspend fun friends(profileId: String): List<FriendRow> {
+        val o = JSONObject(request("/profiles/$profileId/friends"))
+        val out = mutableListOf<FriendRow>()
+        o.optJSONArray("friends")?.let { a ->
+            for (i in 0 until a.length()) {
+                val f = a.getJSONObject(i)
+                out.add(FriendRow(f.getString("profile_id"),
+                    if (f.isNull("display_name")) null else f.optString("display_name"),
+                    f.optBoolean("founder"), f.optBoolean("pinned"),
+                    f.optBoolean("mutual")))
+            }
+        }
+        return out
+    }
+
+    suspend fun suggestedFriends(profileId: String): List<SuggestedRow> {
+        val o = JSONObject(request("/profiles/$profileId/friends/suggested"))
+        val out = mutableListOf<SuggestedRow>()
+        o.optJSONArray("suggested")?.let { a ->
+            for (i in 0 until a.length()) {
+                val s = a.getJSONObject(i)
+                out.add(SuggestedRow(s.getString("profile_id"),
+                    if (s.isNull("display_name")) null else s.optString("display_name"),
+                    if (s.isNull("because")) null else s.optString("because")))
+            }
+        }
+        return out
+    }
+
+    suspend fun addFriend(profileId: String, friendId: String, token: String) {
+        request("/profiles/$profileId/friends", "POST",
+                JSONObject().put("friend_id", friendId), token)
+    }
+
+    /** Pinned rows refuse with 409; the list marks them so the control is
+     *  left off rather than offered and failing. */
+    suspend fun removeFriend(profileId: String, friendId: String, token: String) {
+        request("/profiles/$profileId/friends/$friendId", "DELETE", token = token)
+    }
+
+    private fun postOf(o: JSONObject) = WallPost(
+        o.getString("id"), o.optString("body"),
+        o.optString("status"), o.optInt("likes"))
+
+    suspend fun wall(profileId: String): List<WallPost> {
+        val o = JSONObject(request("/profiles/$profileId/wall"))
+        val out = mutableListOf<WallPost>()
+        o.optJSONArray("posts")?.let { a ->
+            for (i in 0 until a.length()) out.add(postOf(a.getJSONObject(i)))
+        }
+        return out
+    }
+
+    suspend fun postToWall(profileId: String, body: String,
+                           token: String): WallPost {
+        return postOf(JSONObject(request("/profiles/$profileId/wall", "POST",
+            JSONObject().put("body", body), token)))
+    }
+
+    suspend fun comments(kind: String, targetId: String,
+                         token: String): List<CommentRow> {
+        val o = JSONObject(request("/$kind/$targetId/comments", token = token))
+        val out = mutableListOf<CommentRow>()
+        o.optJSONArray("comments")?.let { a ->
+            for (i in 0 until a.length()) {
+                val c = a.getJSONObject(i)
+                out.add(CommentRow(c.getString("id"), c.optString("author_id"),
+                    c.optString("body"), c.optString("status")))
+            }
+        }
+        return out
+    }
+
+    suspend fun addComment(kind: String, targetId: String, body: String,
+                           token: String) {
+        request("/$kind/$targetId/comments", "POST",
+                JSONObject().put("body", body), token)
+    }
+
+    suspend fun deleteComment(commentId: String, token: String) {
+        request("/comments/$commentId", "DELETE", token = token)
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)
@@ -1460,3 +1546,17 @@ data class ObjectionTimelineEvent(val id: String, val event: String,
                                   val at: String)
 data class ObjectionTimeline(val status: String, val note: String,
                              val events: List<ObjectionTimelineEvent>)
+
+
+data class FriendRow(val profileId: String, val displayName: String?,
+                     val founder: Boolean, val pinned: Boolean,
+                     val mutual: Boolean)
+
+data class SuggestedRow(val profileId: String, val displayName: String?,
+                        val because: String?)
+
+data class WallPost(val id: String, val body: String, val status: String,
+                    val likes: Int)
+
+data class CommentRow(val id: String, val authorId: String,
+                      val body: String, val status: String)

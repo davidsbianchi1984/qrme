@@ -1666,3 +1666,105 @@ extension ApiClient {
                           token: token)
     }
 }
+
+// MARK: - The people around a profile: friends, the wall, and comments
+
+struct FriendRow: Decodable, Identifiable {
+    let profile_id: String
+    let display_name: String?
+    let handle: String?
+    let founder: Bool
+    let pinned: Bool
+    let mutual: Bool
+    var id: String { profile_id }
+}
+
+struct SuggestedRow: Decodable, Identifiable {
+    let profile_id: String
+    let display_name: String?
+    let because: String?
+    var id: String { profile_id }
+}
+
+struct WallPostRow: Decodable, Identifiable {
+    let id: String
+    let profile_id: String
+    let body: String
+    let created_at: String?
+    let likes: Int?
+    let status: String?
+}
+
+struct CommentRow: Decodable, Identifiable {
+    let id: String
+    let author_id: String
+    let body: String
+    let status: String
+    let flag_reason: String?
+}
+
+extension ApiClient {
+    func friends(profileId: String) async throws -> [FriendRow] {
+        struct Box: Decodable { let friends: [FriendRow] }
+        let box: Box = try await request("/profiles/\(profileId)/friends")
+        return box.friends
+    }
+
+    func suggestedFriends(profileId: String) async throws -> [SuggestedRow] {
+        struct Box: Decodable { let suggested: [SuggestedRow] }
+        let box: Box = try await request(
+            "/profiles/\(profileId)/friends/suggested")
+        return box.suggested
+    }
+
+    func addFriend(profileId: String, friendId: String,
+                   token: String) async throws -> [String: Bool] {
+        struct Added: Decodable { let added: Bool }
+        let out: Added = try await request(
+            "/profiles/\(profileId)/friends", method: "POST",
+            body: ["friend_id": friendId], token: token)
+        return ["added": out.added]
+    }
+
+    /// The pinned rows refuse with 409 — the list marks them `pinned` so a
+    /// client can leave the control off rather than offer one that fails.
+    func removeFriend(profileId: String, friendId: String,
+                      token: String) async throws {
+        struct Gone: Decodable { let removed: Bool? }
+        let _: Gone = try await request(
+            "/profiles/\(profileId)/friends/\(friendId)", method: "DELETE",
+            token: token)
+    }
+
+    func wall(profileId: String) async throws -> [WallPostRow] {
+        struct Box: Decodable { let posts: [WallPostRow] }
+        let box: Box = try await request("/profiles/\(profileId)/wall")
+        return box.posts
+    }
+
+    func postToWall(profileId: String, body: String,
+                    token: String) async throws -> WallPostRow {
+        try await request("/profiles/\(profileId)/wall", method: "POST",
+                          body: ["body": body], token: token)
+    }
+
+    func comments(kind: String, targetId: String,
+                  token: String) async throws -> [CommentRow] {
+        struct Box: Decodable { let comments: [CommentRow] }
+        let box: Box = try await request("/\(kind)/\(targetId)/comments",
+                                         token: token)
+        return box.comments
+    }
+
+    func addComment(kind: String, targetId: String, body: String,
+                    token: String) async throws -> CommentRow {
+        try await request("/\(kind)/\(targetId)/comments", method: "POST",
+                          body: ["body": body], token: token)
+    }
+
+    func deleteComment(commentId: String, token: String) async throws {
+        struct Gone: Decodable { let deleted: Bool? }
+        let _: Gone = try await request("/comments/\(commentId)",
+                                        method: "DELETE", token: token)
+    }
+}

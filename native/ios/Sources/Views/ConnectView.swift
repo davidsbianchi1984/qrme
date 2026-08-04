@@ -4,7 +4,7 @@ import SwiftUI
 /// connections, the connected-apps catalog, and robotic embodiment — behind
 /// one tab so the bar stays at five.
 struct ConnectView: View {
-    enum Tab: String, CaseIterable { case social = "Social", apps = "Apps", robots = "Robots", shop = "Shops", corner = "Corner" }
+    enum Tab: String, CaseIterable { case social = "Social", apps = "Apps", robots = "Robots", shop = "Shops", corner = "Corner", people = "People" }
     @State private var tab: Tab = .social
 
     var body: some View {
@@ -21,6 +21,7 @@ struct ConnectView: View {
             case .robots: RobotsView()
             case .shop: ShopSection()
             case .corner: CornerSection()
+            case .people: PeopleSection()
             }
         }
     }

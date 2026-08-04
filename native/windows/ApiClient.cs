@@ -433,6 +433,72 @@ public record PackInstalled(
     [property: JsonPropertyName("price_paid")] double PricePaid)
 {
     public int Count => InstalledItems ?? InstalledTasks?.Length ?? 0;
+
+    // -- the people around a profile: friends, the wall, comments --
+    // Nine routes the backend has carried since the community round; this
+    // shell is the last client to get a door for them.
+
+    public async Task<FriendRow[]> Friends(string profileId)
+    {
+        var box = await Send<FriendListBox>(Get($"/profiles/{profileId}/friends"));
+        return box.Friends;
+    }
+
+    public async Task<SuggestedRow[]> SuggestedFriends(string profileId)
+    {
+        var box = await Send<SuggestedBox>(
+            Get($"/profiles/{profileId}/friends/suggested"));
+        return box.Suggested;
+    }
+
+    public Task<FriendAdded> AddFriend(string profileId, string friendId,
+                                       string token) =>
+        Send<FriendAdded>(Post($"/profiles/{profileId}/friends",
+            new { friend_id = friendId }, token));
+
+    /// <summary>Pinned rows refuse with 409; the list marks them so the
+    /// control is left off rather than offered and failing.</summary>
+    public Task<FriendAdded> RemoveFriend(string profileId, string friendId,
+                                          string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/friends/{friendId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<FriendAdded>(req);
+    }
+
+    public async Task<WallPostRow[]> Wall(string profileId)
+    {
+        var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
+        return box.Posts;
+    }
+
+    public Task<WallPostRow> PostToWall(string profileId, string body,
+                                        string token) =>
+        Send<WallPostRow>(Post($"/profiles/{profileId}/wall",
+            new { body }, token));
+
+    public async Task<CommentRow[]> Comments(string kind, string targetId,
+                                             string token)
+    {
+        var box = await Send<CommentBox>(
+            Get($"/{kind}/{targetId}/comments", token));
+        return box.Comments;
+    }
+
+    public Task<CommentRow> AddComment(string kind, string targetId,
+                                       string body, string token) =>
+        Send<CommentRow>(Post($"/{kind}/{targetId}/comments",
+            new { body }, token));
+
+    public Task<CommentRow> DeleteComment(string commentId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/comments/{commentId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<CommentRow>(req);
+    }
+
 }
 
 public record GameSession(
@@ -1629,3 +1695,44 @@ public record ShopOrder(
     [property: JsonPropertyName("amount")] double Amount,
     [property: JsonPropertyName("currency")] string Currency,
     [property: JsonPropertyName("status")] string Status);
+
+
+public record FriendRow(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("founder")] bool Founder,
+    [property: JsonPropertyName("pinned")] bool Pinned,
+    [property: JsonPropertyName("mutual")] bool Mutual);
+
+public record FriendListBox(
+    [property: JsonPropertyName("friends")] FriendRow[] Friends);
+
+public record SuggestedRow(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("because")] string? Because);
+
+public record SuggestedBox(
+    [property: JsonPropertyName("suggested")] SuggestedRow[] Suggested);
+
+public record FriendAdded(
+    [property: JsonPropertyName("added")] bool? Added,
+    [property: JsonPropertyName("removed")] bool? Removed);
+
+public record WallPostRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("body")] string Body,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("likes")] int? Likes);
+
+public record WallBox(
+    [property: JsonPropertyName("posts")] WallPostRow[] Posts);
+
+public record CommentRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("author_id")] string AuthorId,
+    [property: JsonPropertyName("body")] string Body,
+    [property: JsonPropertyName("status")] string Status);
+
+public record CommentBox(
+    [property: JsonPropertyName("comments")] CommentRow[] Comments);

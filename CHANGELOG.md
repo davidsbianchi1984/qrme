@@ -4,6 +4,37 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.9] — 2026-08-04
+
+### The people around a profile reach the phones
+
+The community round built the friends list, the wall and comments, and
+every round since has treated them as done. The per-shell door audit
+said otherwise: nine routes with a door in the console and none on iOS,
+Android or Windows — twenty-seven rows sitting in the doorless records
+the whole time.
+
+    asked     does the platform have a social surface
+    mattered  can somebody holding a phone reach it
+
+A person on a phone was *on* the wall — their profile had one, others
+could read it — and could not post to it, could not see who the platform
+suggested they know, and could not take back a comment.
+
+Each shell gains a **People** screen carrying all nine, and each renders
+three rules the backend already decided rather than inventing a fourth
+opinion. **A pinned row gets no remove control** — the founder's two
+profiles refuse deletion with 409, and the list marks them `pinned`
+precisely so a client can leave the button off. **A blocked post or
+comment comes back to its author** — the write answers 201 with a
+status, because the words *were* recorded. **A suggestion carries the
+reason it was made**, including what the ranking never touches: source
+material, memories, anything vaulted.
+
+Fifteen strings per shell in ten languages, so the screens-untranslated
+ratchet does not move. The per-shell doorless records fall to ios 299,
+android 301, windows 299.
+
 ## [0.42.8] — 2026-08-04
 
 ### The record said nobody asks; the forms had started asking

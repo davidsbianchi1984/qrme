@@ -41,6 +41,7 @@ public sealed partial class ShellPage : Page
             case "desk": ContentFrame.Navigate(typeof(DeskPage)); break;
             case "shops": ContentFrame.Navigate(typeof(ShopsPage)); break;
             case "corner": ContentFrame.Navigate(typeof(CornerPage)); break;
+            case "people": ContentFrame.Navigate(typeof(PeoplePage)); break;
             case "signatures": ContentFrame.Navigate(typeof(SignaturesPage)); break;
             case "voice": ContentFrame.Navigate(typeof(VoicePage)); break;
             case "settings": ContentFrame.Navigate(typeof(SettingsPage)); break;
