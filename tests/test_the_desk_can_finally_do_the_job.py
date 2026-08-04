@@ -274,3 +274,72 @@ def test_on_a_rated_desk_a_minor_cannot_accept_a_connection(client):
                     json={"accept": True}, headers=ch)
     assert r.status_code == 403, r.text
     assert "18+" in r.json()["detail"]
+
+
+# --- the skill across the counter -------------------------------------------
+#
+# "Program access such as Cursor, and skills" — the desk's service is not only
+# a live link. QRME already had a two-party skill-grant system (`sharing.py`)
+# and a desk was already a surface it could ride; what was missing was the
+# *program* as a lendable kind, and a counter session as a surface whose
+# closing takes its grants with it. Both exist now, and the whole arc is
+# driven here: lend a program on the session, use it, close the counter,
+# and watch the permission die with the place that justified it.
+
+def _staffer(client):
+    """The person behind the counter, as themselves — the lender on a skill
+    grant is a person, and an id in a body is a claim, so they authenticate
+    with their own interactor token like anybody else."""
+    r = client.post("/interactors", json={"display_name": "Marcus",
+                                          "birthdate": "1970-01-01"})
+    assert r.status_code == 201, r.text
+    return r.json()
+
+
+def test_a_desk_can_lend_a_program_on_the_session(client):
+    desk, caller, dh, ch, sess = _counter(client)
+    staffer = _staffer(client)
+    sh = _bearer(staffer["token"])
+    r = client.post("/skill-grants", json={
+        "lender_id": staffer["id"], "borrower_id": caller["id"],
+        "surface": "desk_session", "surface_id": sess["id"],
+        "skill_kind": "app", "skill_ref": "cursor",
+        "title": "Cursor, driven through my connector for this repair"},
+        headers=sh)
+    assert r.status_code == 201, r.text
+    grant = r.json()
+    assert grant["state"] == "offered"
+    r = client.post(f"/skill-grants/{grant['id']}/accept",
+                    json={"actor_id": caller["id"]}, headers=ch)
+    assert r.status_code == 200, r.text
+    r = client.post(f"/skill-grants/{grant['id']}/use", json={
+        "borrower_id": caller["id"], "what": "refactor the invoice script"},
+        headers=ch)
+    assert r.status_code == 201, r.text
+    assert r.json()["skill_ref"] == "cursor"
+    log = client.get(f"/skill-grants/{grant['id']}/uses", headers=sh).json()
+    assert len(log["uses"]) == 1, log
+    assert log["uses"][0]["what"] == "refactor the invoice script", log
+
+
+def test_closing_the_counter_takes_its_lent_skills_with_it(client):
+    """The same rule the live links obey. Exchanges and watch parties already
+    close their grants when the place ends; a counter session that did not
+    would leave "use Cursor for this repair" standing after the repair."""
+    desk, caller, dh, ch, sess = _counter(client)
+    staffer = _staffer(client)
+    grant = client.post("/skill-grants", json={
+        "lender_id": staffer["id"], "borrower_id": caller["id"],
+        "surface": "desk_session", "surface_id": sess["id"],
+        "skill_kind": "app", "skill_ref": "cursor",
+        "title": "Cursor for this session"},
+        headers=_bearer(staffer["token"])).json()
+    client.post(f"/skill-grants/{grant['id']}/accept",
+                json={"actor_id": caller["id"]}, headers=ch)
+    client.post(f"/desk-sessions/{sess['id']}/close", headers=ch)
+    r = client.post(f"/skill-grants/{grant['id']}/use", json={
+        "borrower_id": caller["id"], "what": "one more thing"}, headers=ch)
+    assert r.status_code == 422, (
+        "the counter closed and the lent program still answered: " + r.text)
+    state = client.get(f"/skill-grants/{grant['id']}", headers=ch).json()
+    assert state["state"] == "closed", state

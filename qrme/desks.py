@@ -871,7 +871,11 @@ def end_connection(session_id: str, connection_id: str, by: str) -> dict:
 def close_session(session_id: str, by: str) -> dict:
     """Either side closes the counter. Every live connection ends with it —
     a session is the reason the links exist, and links must not outlive
-    their reason."""
+    their reason. The same rule reaches the *skill grants* lent on this
+    session: `sharing.close_surface` is called here the way exchanges and
+    watch parties already call it, because leaving that to each caller to
+    remember is how one of them forgets."""
+    from . import sharing
     s = _session_row(session_id)
     if s is None:
         raise DeskError("no such session")
@@ -886,6 +890,7 @@ def close_session(session_id: str, by: str) -> dict:
         "UPDATE desk_sessions SET status='closed', closed_at=?, closed_by=?"
         " WHERE id=?", (db.utcnow(), by, session_id))
     conn.commit()
+    sharing.close_surface("desk_session", session_id)
     return session(session_id)
 
 

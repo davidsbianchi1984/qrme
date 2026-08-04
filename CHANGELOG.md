@@ -45,6 +45,22 @@ sessions live on the Desk screen beside the bell; the caller's side —
 offers, the yes/no, the live token, the end — sits on the visitor half.
 
 
+### And the skill, not just the link
+
+"Program access such as Cursor, and skills" is the counter's whole trade,
+and half of it already existed: `sharing.py` has always been able to lend a
+skill two-party — offer, accept, a use log, either side closes — and a desk
+was already a surface it could ride. Two pieces were missing and are in:
+
+  * **`app` is a lendable kind** — "a connected program they can drive."
+    The program stays the lender's, driven through their own connector; the
+    borrower gets uses, one at a time, each written down.
+  * **A counter session is a surface** (`desk_session`), and closing the
+    session calls `sharing.close_surface` the way exchanges and watch
+    parties already do — so "use Cursor for this repair" dies with the
+    repair. Driven by removing the call and watching the lent program still
+    answer after the counter closed.
+
 ### The ratchets earned their keep
 
 The first full-suite run at this version failed four of this repository's own

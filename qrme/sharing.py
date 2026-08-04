@@ -54,6 +54,7 @@ from . import db
 SURFACES: dict[str, str] = {
     "room": "a room you are both in",
     "desk": "a live desk and its stream",
+    "desk_session": "a service session at a desk's counter",
     "party": "a watch party",
     "connection": "a one-to-one connection",
     "exchange": "an agreed piece of work",
@@ -67,6 +68,12 @@ SKILL_KINDS: dict[str, str] = {
     "profession": "their own stated expertise",
     "language": "translation between two languages they hold",
     "workflow": "a multi-step workflow they can run",
+    # The Geek Squad kind: the program itself — Cursor, a design suite, a
+    # bookkeeping app — driven through the lender's own connected-app
+    # connector, used one invocation at a time and logged like every other
+    # lent skill. The program is the lender's; the borrower gets uses, never
+    # the connector.
+    "app": "a connected program they can drive",
 }
 
 STATES = ("offered", "active", "declined", "closed")
