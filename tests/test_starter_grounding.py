@@ -77,7 +77,9 @@ def test_one_pack_leaves_room_in_the_prompt_budget(client):
     immediately competing with the grounding."""
     _seeded(client)
     marcus = _profile("Marcus Bell")
-    assert len(_sources(marcus["id"])) <= 4
+    # Three pack items and, since 0.42.1, the three dossier items — six of
+    # the eight seats, with two still left for an owner's own material.
+    assert len(_sources(marcus["id"])) == 6
 
 
 def test_the_rated_starter_is_grounded_like_every_other(client):
@@ -95,8 +97,12 @@ def test_the_rated_starter_is_grounded_like_every_other(client):
     vivienne = _profile("Vivienne Sable")
     assert vivienne["adult_mode"] == 1          # still age-walled
     titles = [s["title"] for s in _sources(vivienne["id"])]
-    assert len(titles) == 3
-    assert all(t.startswith("Cabaret & Burlesque Field Pack") for t in titles)
+    # The pack, and since 0.42.1 her dossier — grounded like every other
+    # starter in both halves.
+    assert len(titles) == 6
+    assert sum(t.startswith("Cabaret & Burlesque Field Pack")
+               for t in titles) == 3
+    assert "What I know" in titles and "Skills and services" in titles
 
 
 def test_her_pack_is_history_and_craft_not_content(client):
@@ -151,7 +157,13 @@ def test_an_owner_who_added_their_own_material_is_not_topped_up(client):
     out = client.post("/marketplace/seed").json()
     assert marcus["display_name"] not in out["grounded_handles"]
     titles = [s["title"] for s in _sources(marcus["id"])]
-    assert titles == ["my own notes"]
+    # The pack stayed out — that is the decision being respected. The three
+    # dossier items were already installed by the *first* seed, before the
+    # owner wrote anything, so nothing was pushed onto their decision; what
+    # matters is that re-seeding added no pack and no duplicates.
+    assert "my own notes" in titles
+    assert not any("Field Pack" in t for t in titles), titles
+    assert len(titles) == 4, titles
 
 
 def test_an_owner_who_removed_the_pack_does_not_get_it_back(client):
@@ -189,13 +201,17 @@ def test_a_deployment_seeded_before_this_gets_grounded_on_rerun(client):
     route the missing portraits took."""
     client.post("/marketplace/seed")          # the old world: no packs yet
     marcus = _profile("Marcus Bell")
-    assert list(_sources(marcus["id"])) == []
+    # The dossier needs no pack, so it lands even in the packless world —
+    # three items where there used to be none.
+    titles = [s["title"] for s in _sources(marcus["id"])]
+    assert len(titles) == 3 and not any("Field Pack" in t for t in titles)
 
     client.post("/packs/seed")
     out = client.post("/marketplace/seed").json()
     assert out["created"] == 0                # nothing new
     assert out["grounded"] == 34              # but everything grounded
-    assert len(_sources(marcus["id"])) == 3
+    # The pack, and the dossier that rides the same repair path.
+    assert len(_sources(marcus["id"])) == 6
 
 
 # -- money -------------------------------------------------------------------
@@ -229,7 +245,11 @@ def test_a_priced_pack_is_never_auto_installed(client):
 
     out = client.post("/marketplace/seed").json()
     marcus = _profile("Marcus Bell")
-    assert list(_sources(marcus["id"])) == []
+    # No pack was bought on the owner's behalf. The dossier still arrives —
+    # it is the deployment's own writing, not a purchase.
+    titles = [s["title"] for s in _sources(marcus["id"])]
+    assert not any("Field Pack" in t for t in titles), titles
+    assert "What I know" in titles
     assert "marcus_bell" not in out["grounded_handles"]
     # Everyone whose pack is still free is unaffected.
     assert out["grounded"] == 33

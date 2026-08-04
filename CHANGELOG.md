@@ -4,6 +4,72 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.1] — 2026-08-04
+
+### The starters can answer for their own trade
+
+### The finding
+
+The Starter Collection's grounding stopped at one Field Pack per industry —
+three items, installed in 0.3.1 so a physician persona would stop answering
+from tone alone. That fixed the cold start and no more: ask Dr. Osei what
+she actually knows, what she can do for you, or who she works with, and the
+honest answer was three pamphlets. The persona budget renders `sources[:8]`,
+so five of her eight seats were empty.
+
+    asked     does the starter have source material
+    mattered  can the starter answer for its own trade
+
+### What shipped
+
+`qrme/dossiers.py`: one dossier for every starter — the thirty-three and
+Vivienne Sable, by name, so a missing entry is a failing test rather than a
+quiet gap. Each installs:
+
+  * **What I know** — the trade in depth, in the starter's own voice;
+  * **Skills and services** — what they can actually do for somebody,
+    including across a desk session, with lent programs and skills;
+  * **Colleagues in the collection** — who they refer to and why, composed
+    from the same list that installs the *real friendships*, so the sentence
+    the persona says and the API's friends list cannot disagree;
+  * skill chips widened from three marketplace tags to eight or more.
+
+Installed by seed and by the startup repair — the dossiers arrive on the
+first launch after the upgrade, blank-aware per part so an owner's edits are
+never overwritten, and idempotent so a second seed press stacks nothing.
+
+Vivienne's dossier keeps the rated tier's hard lines in its own text:
+fictional by necessity, everything behind the age wall, referrals to the
+collection's ordinary professionals.
+
+### The dossier nearly starved the pack
+
+The first draft installed the dossier and left `_ground`'s blank-only check
+alone — so on the repair path the dossier arrived first, the pack's check
+saw "not blank", and every un-grounded deployment would have received the
+dossier *instead of* its Field Pack, forever. The 0.3.1 grounding tests
+caught it: `grounded` came back 0 where 34 belonged. The pack's blank check
+now excludes the dossier's three titles — the deployment's own writing is
+not an owner's decision.
+
+### Checks
+
+`tests/test_the_starters_know_their_trade.py`, 77 tests: the roster and the
+dossiers are the same set in both directions, every dossier clears
+substance floors, colleagues resolve and nobody refers to themselves,
+every named colleague is an actual friendship, the six sources fit the
+eight-seat prompt budget, and a distinctive phrase plus a colleague's name
+reach the rendered prompt.
+
+Two injections. The second earned its keep against this file's own first
+draft: removing the friendship install left `friends >= 2` green, because
+the two founder profiles alone satisfy a floor of two.
+
+    asked     does the starter have two friends
+    mattered  are the named colleagues among them
+
+The check now asks for the colleagues by id.
+
 ## [0.42.0] — 2026-08-04
 
 ### The desk can finally do the job

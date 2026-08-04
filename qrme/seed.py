@@ -612,6 +612,11 @@ def repair() -> dict:
                            (handle,)).fetchone()
         if row and _backfill(conn, row["profile_id"], handle):
             repaired.append(handle)
+        # The dossier arrives the same way the faces did: on the first
+        # launch after the upgrade, not only when somebody finds the seed
+        # button. Blank-aware, so it never overwrites an owner's edits.
+        if row and _dossier(conn, row["profile_id"], handle):
+            repaired.append(f"{handle} (dossier)")
     for handle in (FOUNDER_HANDLE, VERIFIED_HANDLE):
         row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                            (handle,)).fetchone()
@@ -653,9 +658,16 @@ def _ground(conn, profile_id: str, industry: str,
     from . import db                # deferred, like seed()'s own imports
 
     if not force:
+        # "Has nothing" must not count the dossier: those three items are
+        # the deployment's own writing (qrme/dossiers.py), installed by this
+        # same seed, and treating them as an owner's decision would mean the
+        # dossier arriving first forever blocks the pack — which is exactly
+        # what happened when 0.42.1's first draft left this line alone.
+        from .dossiers import TITLES as _DOSSIER_TITLES
         existing = conn.execute(
-            "SELECT 1 FROM source_items WHERE profile_id=? LIMIT 1",
-            (profile_id,)).fetchone()
+            "SELECT 1 FROM source_items WHERE profile_id=? AND"
+            " title NOT IN (?,?,?) LIMIT 1",
+            (profile_id, *_DOSSIER_TITLES)).fetchone()
         if existing:
             return 0
     pack = conn.execute(
@@ -690,6 +702,83 @@ def _ground(conn, profile_id: str, industry: str,
         (pack["id"], profile_id, db.utcnow()))
     conn.commit()
     return len(items)
+
+
+def _dossier(conn, profile_id: str, handle: str) -> bool:
+    """Install this starter's dossier: what they know, what they can do, and
+    who they would send you to — see :mod:`qrme.dossiers` for the finding.
+
+    Blank-aware per part, so it is a repair as well as an install:
+
+    * each of the three titled source items is added only if that title is
+      absent, so an owner who rewrote or removed one keeps their edit;
+    * skill chips are merged into the marketplace tags, never replacing an
+      owner's own;
+    * colleague friendships are made in both directions through
+      :func:`friends.befriend`, which already treats re-adding as a no-op —
+      and the prose the persona speaks is composed from the same list, so
+      the sentence and the graph cannot disagree.
+    """
+    import json
+
+    from . import db, friends
+    from .dossiers import DOSSIERS, TITLES, colleague_prose
+
+    entry = DOSSIERS.get(handle)
+    if entry is None:
+        return False
+    changed = False
+
+    name_of = {h: n for h, _ind, n, *_rest in STARTERS + RATED}
+    texts = {
+        TITLES[0]: entry["expertise"],
+        TITLES[1]: entry["services"],
+        TITLES[2]: colleague_prose(handle, name_of),
+    }
+    # The pack's blank-only rule, kept: an owner who wrote their *own*
+    # material (pack items carry a pack_id; dossier items carry these
+    # titles; anything else is the owner's) has made a decision about this
+    # profile's sources, and the dossier does not argue with it.
+    own = conn.execute(
+        "SELECT 1 FROM source_items WHERE profile_id=? AND pack_id IS NULL"
+        " AND title NOT IN (?,?,?) LIMIT 1",
+        (profile_id, *TITLES)).fetchone()
+    for title, content in ({} if own else texts).items():
+        if conn.execute(
+                "SELECT 1 FROM source_items WHERE profile_id=? AND title=?",
+                (profile_id, title)).fetchone():
+            continue
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), profile_id, "knowledge", title, content,
+             db.utcnow()))
+        changed = True
+
+    row = conn.execute("SELECT tags FROM marketplace WHERE profile_id=?",
+                       (profile_id,)).fetchone()
+    if row is not None:
+        tags = json.loads(row["tags"] or "[]")
+        merged = list(dict.fromkeys([*tags, *entry["skills"]]))
+        if merged != tags:
+            conn.execute("UPDATE marketplace SET tags=? WHERE profile_id=?",
+                         (json.dumps(merged), profile_id))
+            changed = True
+    conn.commit()
+
+    for colleague in entry["colleagues"]:
+        crow = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                            (colleague,)).fetchone()
+        if crow is None:
+            continue
+        for a, b in ((profile_id, crow["profile_id"]),
+                     (crow["profile_id"], profile_id)):
+            try:
+                if friends.befriend(a, b).get("added"):
+                    changed = True
+            except friends.FriendError:
+                pass
+    return changed
 
 
 def seed() -> dict:
@@ -786,6 +875,16 @@ def seed() -> dict:
         created.append({"handle": f"@{handle}", "industry": industry,
                         "profile_id": profile["id"], "name": name})
 
+    # The dossiers, as a second pass once every profile exists — a colleague
+    # friendship needs both ends standing, and the roster is a graph rather
+    # than a line.
+    dossiered = []
+    for handle, *_rest in STARTERS + RATED:
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (handle,)).fetchone()
+        if row and _dossier(conn, row["profile_id"], handle):
+            dossiered.append(handle)
+
     # Anybody who predates the founder, including profiles a deployment made
     # before this shipped. Runs last so it sees every profile created above.
     from . import friends as _friends
@@ -801,6 +900,10 @@ def seed() -> dict:
             # `repaired` because it answers a different question: not "did the
             # faces come back" but "do these specialists know anything".
             "grounded": len(grounded), "grounded_handles": grounded,
+            # Starters that just received their dossier — knowledge, skills
+            # and colleagues. The answer to "can this specialist speak for
+            # its own trade", separate from `grounded` (the industry pack).
+            "dossiered": len(dossiered), "dossiered_handles": dossiered,
             "industries": len(STARTERS), "rated": len(RATED),
             # Reported separately from the collection counts, because it is not
             # part of the collection: the starters are invented people and this
