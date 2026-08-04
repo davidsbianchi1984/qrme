@@ -1,4 +1,4 @@
-# status: backlog — 52 rows
+# status: floor — 52 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -23,31 +23,33 @@
 # surface without a drawing therefore fails, which is the whole point.
 #
 
-# **0.40.9 audited five of the seven.** Each was resolved by reading the
-# component's own heading and matching it to a screen title, rather than by
-# matching its name — which is what left them unresolved in the first place:
-# `Campaigns` draws "Where the Money Goes", `Org` draws "The Ecosystem",
-# `Simulate` draws "What Would They Do". None of those three share a word with
-# the component that renders them.
+# **0.40.9 audited five of the seven; 0.42.3 closed the last two.** The five
+# were resolved by reading the component's own heading and matching it to a
+# screen title, rather than by matching its name — which is what left them
+# unresolved in the first place: `Campaigns` draws "Where the Money Goes",
+# `Org` draws "The Ecosystem", `Simulate` draws "What Would They Do". None of
+# those three share a word with the component that renders them.
 #
-# `Discover` and `Wall` stay unaudited, and are the two worth looking at rather
-# than the five that were only unlabelled: no screen in the gallery carries
-# either heading, under that name or another. They may be genuinely undrawn, in
-# which case `undrawn=0` above has been false for as long as `unaudited` has
-# been hiding them — and `unaudited` is the softer word of the two.
+# `Discover` and `Wall` were the suspicion this file recorded, confirmed: no
+# screen in the gallery carried either heading under any name, because neither
+# had ever been drawn. Both surfaces shipped in the community round and were
+# iterated on for thirty versions with nothing in the gallery — `undrawn=0`
+# was false for exactly as long as `unaudited` was covering for it, and
+# `unaudited` was the softer word of the two. 185 and 186 are the drawings.
 #
 #     asked     is every component accounted for in this file
 #     mattered  does every component have a drawing
 #
-# ceiling: undrawn=0 unaudited=2
+# ceiling: undrawn=0 unaudited=0
 #
-# `unaudited` is the honest seed. These components predate the file and their
-# screens were not confirmed one by one — matching a component name against a
-# screen title resolved only ten of twenty-four, because titles are written for
-# the person using the app ("How Should They Work?") and component names are
-# written for the person editing it ("Delegate"). Guessing the rest would have
-# produced a mapping that looked complete and was not. `unaudited` is also
-# ratcheted downward, and is not a status a new component may use.
+# `unaudited` was the honest seed. These components predated the file and
+# their screens were not confirmed one by one — matching a component name
+# against a screen title resolved only ten of twenty-four, because titles are
+# written for the person using the app ("How Should They Work?") and component
+# names are written for the person editing it ("Delegate"). Guessing the rest
+# would have produced a mapping that looked complete and was not. The column
+# is now empty, its ceiling is zero, and it is not a status a new component
+# may use — from here every surface either has a drawing or fails the suite.
 
 Blend           142
 Chat            6,45,83
@@ -68,7 +70,7 @@ Stranger        180
 TheMark         181
 InWords         182
 Remainder       183
-Discover        unaudited
+Discover        185
 Market          152
 Exchanges       153
 Grants          154
@@ -97,7 +99,7 @@ Public          184
 Onboarding      1,39,41,42,47
 Org             146
 Simulate        143
-Wall            unaudited
+Wall            186
 ProviderTiles   22
 
 Problems        150

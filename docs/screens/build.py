@@ -3523,6 +3523,37 @@ SCREENS = [
     # the decision — announced bodies are listed and refused — and the last
     # is the check that stops a pack being fitted to a machine that cannot
     # physically do it.
+    # 185 and 186 close the manifest's `unaudited` column. Both surfaces had
+    # shipped, been iterated on for thirty versions, and never been drawn —
+    # `unaudited` was the soft word covering for `undrawn=0` being false.
+    # Each drawing leads with the sentence its component leads with, so the
+    # audit that matches headings to titles resolves them by reading.
+    dict(num=185, title="Discover", sub="Every card is a real profile",
+         accent="amber", tab=2, cards=[
+        dict(icon="people", color="amber", k="Starter collection",
+             s="33 trades, one press", pill=("READY", "good")),
+        dict(icon="search", color="cyan", k="Filter by tag",
+             s="music, carpentry, finance"),
+        dict(icon="book", color="brand", k="Each knows its trade",
+             s="pack and dossier installed"),
+        dict(icon="plus", color="green", k="Befriend a card",
+             s="a real friendship, both ways"),
+    ], button=("Install the starter collection", "brand")),
+    # 186: the wall's rule is the facade contract — a shared video is drawn
+    # from stored fields and nothing loads from the other platform until
+    # the viewer presses play. That rule is the card, because it is the one
+    # thing a screenshot of a feed cannot otherwise show.
+    dict(num=186, title="Wall", sub="The For You feed, and why",
+         accent="pink", tab=0, cards=[
+        dict(icon="pen", color="pink", k="Say something",
+             s="posts, photos, files, links"),
+        dict(icon="photo", color="cyan", k="Nothing until play",
+             s="the card names whose player"),
+        dict(icon="heart", color="red", k="Likes and comments",
+             s="withdraw only your own"),
+        dict(icon="eye", color="green", k="Cards say why",
+             s="friends, talked-to, your tags"),
+    ], button=("Post", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

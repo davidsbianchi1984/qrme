@@ -4,6 +4,25 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.3] — 2026-08-04
+
+### The last thirteen unaudited screens
+
+`ui_screens.txt` carried two components as `unaudited` since the file was
+seeded — the softer word, and it was covering: neither `Discover` nor
+`Wall` had ever been drawn. Both shipped in the community round and were
+iterated on for thirty versions with nothing in the gallery, which means
+`undrawn=0` was false for exactly that long.
+
+    asked     is every component accounted for in the manifest
+    mattered  does every component have a drawing
+
+Screens **185 Discover** (the starter collection, tag search, befriending
+from the card) and **186 Wall** (the For You feed and its facade contract —
+nothing loads from another platform until the viewer presses play) close
+the column. Both ceilings now read zero and the slack test keeps them
+there: from here a surface either has a drawing or fails the suite.
+
 ## [0.42.2] — 2026-08-04
 
 ### Version alignment

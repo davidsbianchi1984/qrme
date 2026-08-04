@@ -892,6 +892,26 @@ LESSONS: tuple[dict, ...] = (
               "describing the feature.",
          screens=(127, 128, 129),
          try_it="Ask it where to change your background."),
+    dict(key="discover", chapter="Meeting others", title="Discover",
+         what="The marketplace as cards — every one a real profile you can "
+              "talk to, not a listing about one. The starter collection is "
+              "thirty-three trades installed in one press, each arriving "
+              "with its industry's pack and its own dossier, and a search "
+              "by tag rather than by rank. Befriending from a card makes a "
+              "real friendship, in both directions.",
+         screens=(185,),
+         try_it="Install the starters, filter by a tag you care about, and "
+                "befriend one."),
+    dict(key="wall", chapter="Meeting others", title="The wall",
+         what="The For You feed, and its one rule: a shared video is drawn "
+              "from stored fields alone, and nothing loads from the other "
+              "platform until you press play — at which point the card says "
+              "whose player it is. Your own photos and footage upload as-is, "
+              "never AI-marked. Every card says why it reached you, and a "
+              "comment can be withdrawn — but only your own.",
+         screens=(186,),
+         try_it="Post something with a link, and watch nothing load until "
+                "you press play."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))

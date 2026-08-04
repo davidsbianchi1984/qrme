@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.42.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.42.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -383,6 +383,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/183-everything-else.svg"><img src="docs/screens/183-everything-else.svg" width="210" alt="Everything Else"></a><br><sub><b>183</b> · Everything Else</sub></td>
     <td align="center" width="33%"><a href="docs/screens/184-without-an-account.svg"><img src="docs/screens/184-without-an-account.svg" width="210" alt="Without An Account"></a><br><sub><b>184</b> · Without An Account</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/185-discover.svg"><img src="docs/screens/185-discover.svg" width="210" alt="Discover"></a><br><sub><b>185</b> · Discover</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/186-wall.svg"><img src="docs/screens/186-wall.svg" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
+    <td align="center" width="33%"></td>
     <td align="center" width="33%"></td>
   </tr>
 </table>
@@ -725,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.42.3** | **The last thirteen unaudited screens** — across the three repos, thirteen components had sat `unaudited` since the manifests were seeded; the audit confirmed eight of them had never been drawn at all. QRME's two were both in that eight: screens **185 Discover** and **186 Wall** are the drawings, both `unaudited` ceilings fell to zero, and `undrawn=0` is finally true rather than covered for |
 | **0.42.2** | **Version alignment** — JIM gained its money guardian; QRME's `GET /desks` now serves its warnings, listing real finance desks beside the tandem specialist |
 | **0.42.1** | **The starters can answer for their own trade** — one Field Pack left five of eight prompt seats empty on every starter. `dossiers.py` now gives all 34 — Vivienne Sable included — what-I-know, skills-and-services and colleagues source items, 8+ skill chips, and a colleague graph installed as real friendships, composed from the same list as the prose so chat and the API give one answer. 77 tests, both directions |
 | **0.42.0** | **The desk can finally do the job** — every desk surface let a person reach the counter and none let the desk do the work it exists for. Service sessions and connections shipped: the desk offers (screen, machine, program, files), only the caller's accept mints the link token — returned to them alone — and either side ends it, the token dying in the row. Rated desks gate the accept behind the same adult wall as every other surface . A desk can also lend a *skill* — `app` joins the lendable kinds (a connected program like Cursor, driven through the lender's own connector, every use logged), and a counter session is a grant surface that takes its skills with it when it closes |
