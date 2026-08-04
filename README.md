@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.43.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.43.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.43.1** | **The platform tells you what happened** — an inbox of deeds done to you (message, comment, friendship, signature, a place on a stream), named but never quoted, on the console and all three shells |
 | **0.43.0** | **The phone could be listed and could not do business** — 46 routes for staffing a desk, trading in the market and signing an exchange reached iOS, Android and Windows; **139 doorless rows struck**. Plus two guard-invisible image doors and a 204 that made every successful delete report failure |
 | **0.42.9** | **The people around a profile reach the phones** — friends, suggestions, the wall and comments gained People screens on iOS, Android and Windows; 27 rows struck from the per-shell doorless records, with the pinned/blocked/ranked-on rules rendered rather than re-decided |
 | **0.42.8** | **The record said nobody asks; the forms had started asking** — 107 of 251 recorded "no form asks for this" fields turned out to be bound to real console inputs; all now carry ten-language labels, leaving 144 rows that match the record's own rule; the agent-lights widget now shows an unlit retry dot when the backend is unreachable instead of silently vanishing |

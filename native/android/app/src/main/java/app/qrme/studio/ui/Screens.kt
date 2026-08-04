@@ -2608,6 +2608,7 @@ private fun PeoplePanel(vm: StudioViewModel) {
     var openPost by remember { mutableStateOf<String?>(null) }
     var commentDraft by remember { mutableStateOf("") }
     var note by remember { mutableStateOf<String?>(null) }
+    var inboxPage by remember { mutableStateOf<InboxPage?>(null) }
 
     fun reload() {
         vm.call({ ApiClient.friends(vm.pid!!) }) { r ->
@@ -2616,6 +2617,8 @@ private fun PeoplePanel(vm: StudioViewModel) {
             suggested = r.getOrDefault(emptyList()) }
         vm.call({ ApiClient.wall(vm.pid!!) }) { r ->
             posts = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.inbox(vm.pid!!, vm.token!!) }) { r ->
+            inboxPage = r.getOrNull() }
     }
     LaunchedEffect(Unit) { reload() }
 
@@ -2629,6 +2632,38 @@ private fun PeoplePanel(vm: StudioViewModel) {
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // What happened while you were away — the deed, never the words.
+        inboxPage?.takeIf { it.events.isNotEmpty() }?.let { page ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(L10n.t("inbox.title", lang), color = Qrme.Txt,
+                        fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    if (page.unseen > 0) {
+                        Text("${page.unseen} " + L10n.t("inbox.new", lang),
+                            color = Qrme.BrandA, fontSize = 11.sp)
+                    }
+                }
+                page.events.forEach { e ->
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(e.actorName ?: e.actorId,
+                            color = if (e.seen) Qrme.T3 else Qrme.Txt,
+                            fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(L10n.t("inbox.kind.${e.kind}", lang),
+                            color = Qrme.T3, fontSize = 12.sp)
+                    }
+                }
+                if (page.unseen > 0) {
+                    BrandButton(L10n.t("inbox.seen", lang)) {
+                        vm.call({ ApiClient.markInboxSeen(vm.pid!!,
+                            vm.token!!) }) { r ->
+                            r.exceptionOrNull()?.let { note = it.message }
+                            reload()
+                        }
+                    }
+                }
+            }
+        }
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("people.friends", lang), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)

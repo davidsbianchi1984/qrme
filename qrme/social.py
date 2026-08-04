@@ -27,7 +27,7 @@ from __future__ import annotations
 import json
 import re
 
-from . import db
+from . import db, inbox
 
 #: The switches that exist. Adding one is a decision made here, where the
 #: defaults live, rather than a string that quietly becomes load-bearing.
@@ -117,6 +117,9 @@ def send_message(sender_id: str, recipient_id: str, body: str) -> dict:
         " sent_at) VALUES (?,?,?,?,?,?)",
         (message_id, low, high, sender_id, body.strip(), db.utcnow()))
     conn.commit()
+    # The recipient hears *that*, not *what*: the words wait behind their
+    # own door, where they already are.
+    inbox.note(recipient_id, "message", sender_id, message_id)
     return _message(message_id)
 
 

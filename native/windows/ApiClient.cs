@@ -444,6 +444,15 @@ public record PackInstalled(
         return box.Friends;
     }
 
+    /// <summary>The deed, never the words: a row names the kind and the
+    /// actor; the sentence for each kind is this shell's, from L10n.</summary>
+    public Task<InboxPage> Inbox(string profileId, string token) =>
+        Send<InboxPage>(Get($"/profiles/{profileId}/inbox", token));
+
+    public Task<InboxSeen> MarkInboxSeen(string profileId, string token) =>
+        Send<InboxSeen>(Post($"/profiles/{profileId}/inbox/seen",
+            new { }, token));
+
     public async Task<SuggestedRow[]> SuggestedFriends(string profileId)
     {
         var box = await Send<SuggestedBox>(
@@ -1992,6 +2001,20 @@ public record FriendRow(
 
 public record FriendListBox(
     [property: JsonPropertyName("friends")] FriendRow[] Friends);
+
+public record InboxEvent(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("actor_id")] string ActorId,
+    [property: JsonPropertyName("actor_name")] string? ActorName,
+    [property: JsonPropertyName("seen")] bool Seen);
+
+public record InboxPage(
+    [property: JsonPropertyName("events")] InboxEvent[] Events,
+    [property: JsonPropertyName("unseen")] int Unseen);
+
+public record InboxSeen(
+    [property: JsonPropertyName("seen")] int Seen);
 
 public record SuggestedRow(
     [property: JsonPropertyName("profile_id")] string ProfileId,

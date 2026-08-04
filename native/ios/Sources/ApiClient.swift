@@ -1712,7 +1712,34 @@ struct CommentRow: Decodable, Identifiable {
     let flag_reason: String?
 }
 
+/// One deed done to this profile — the inbox names the deed, never the
+/// words. The sentence for each `kind` is this shell's, from L10n.
+struct InboxEvent: Decodable, Identifiable {
+    let id: String
+    let kind: String
+    let actor_id: String
+    let actor_name: String?
+    let ref: String?
+    let created_at: String
+    let seen: Bool
+}
+
+struct InboxPage: Decodable {
+    let events: [InboxEvent]
+    let unseen: Int
+}
+
 extension ApiClient {
+    func inbox(profileId: String, token: String) async throws -> InboxPage {
+        try await request("/profiles/\(profileId)/inbox", token: token)
+    }
+
+    func markInboxSeen(profileId: String, token: String) async throws {
+        struct Out: Decodable { let seen: Int }
+        let _: Out = try await request("/profiles/\(profileId)/inbox/seen",
+                                       method: "POST", token: token)
+    }
+
     func friends(profileId: String) async throws -> [FriendRow] {
         struct Box: Decodable { let friends: [FriendRow] }
         let box: Box = try await request("/profiles/\(profileId)/friends")

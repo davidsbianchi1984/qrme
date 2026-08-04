@@ -1269,6 +1269,16 @@ export interface ObjectionTimeline {
             sealed: boolean; at: string }[];
 }
 
+export interface InboxEvent {
+  id: string;
+  /** One of the closed set in qrme/inbox.py — message | comment | friend |
+   *  exchange_signed | guest_accepted. The sentence is the client's to
+   *  compose; the backend names the deed, never the words. */
+  kind: string;
+  actor_id: string; actor_name: string | null;
+  ref: string | null; created_at: string; seen: boolean;
+}
+
 export interface WatermarkRecovery {
   recovered: boolean; reason?: string;
   profile_id?: string; watermark_id?: string; kind?: string;
@@ -2933,6 +2943,12 @@ export const api = {
   addFriend: (profileId: string, friendId: string, token: string) =>
     req<unknown>(`/profiles/${profileId}/friends`,
       { method: "POST", body: { friend_id: friendId }, token }),
+  inbox: (profileId: string, token: string) =>
+    req<{ events: InboxEvent[]; unseen: number }>(
+      `/profiles/${profileId}/inbox`, { token }),
+  inboxSeen: (profileId: string, token: string) =>
+    req<{ seen: number }>(`/profiles/${profileId}/inbox/seen`,
+      { method: "POST", token }),
   feed: (profileId: string, adult = false) =>
     req<{ posts: WallPost[]; ranked_on: string[] }>(
       `/profiles/${profileId}/feed${adult ? "?adult=true" : ""}`),

@@ -27,6 +27,8 @@ public sealed partial class PeoplePage : Page
     {
         InitializeComponent();
         TitleText.Text = L10n.T("people.friends");
+        InboxTitle.Text = L10n.T("inbox.title");
+        InboxSeenButton.Content = L10n.T("inbox.seen");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -54,6 +56,22 @@ public sealed partial class PeoplePage : Page
         if (s.Pid is null) return;
         try
         {
+            // The deed, never the words: each row names the kind and the
+            // actor; the sentence per kind is this shell's, from L10n.
+            if (s.Token is not null)
+            {
+                var page = await ApiClient.Shared.Inbox(s.Pid, s.Token);
+                InboxCard.Visibility = page.Events.Length > 0
+                    ? Visibility.Visible : Visibility.Collapsed;
+                InboxTitle.Text = L10n.T("inbox.title")
+                    + (page.Unseen > 0
+                       ? $" · {page.Unseen} {L10n.T("inbox.new")}" : "");
+                InboxSeenButton.Visibility = page.Unseen > 0
+                    ? Visibility.Visible : Visibility.Collapsed;
+                InboxList.ItemsSource = page.Events.Select(ev => new Row(
+                    $"{ev.ActorName ?? ev.ActorId} "
+                    + L10n.T($"inbox.kind.{ev.Kind}"))).ToList();
+            }
             var friends = await ApiClient.Shared.Friends(s.Pid);
             FriendList.ItemsSource = friends.Select(f => new Row(
                 $"{f.ProfileId} · {f.DisplayName ?? ""}"
@@ -71,6 +89,17 @@ public sealed partial class PeoplePage : Page
                 .ToList();
         }
         catch { /* leave as-is */ }
+    }
+
+    private async void OnInboxSeen(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.MarkInboxSeen(s.Pid!, s.Token!);
+            await Load();
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
     }
 
     private async void OnAddFriend(object sender, RoutedEventArgs e)

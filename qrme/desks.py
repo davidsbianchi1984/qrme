@@ -32,7 +32,7 @@ from __future__ import annotations
 import os
 from datetime import datetime, timedelta, timezone
 
-from . import auth, db
+from . import auth, db, inbox
 
 
 def _public_base() -> str:
@@ -561,6 +561,15 @@ def decide_guest(desk_id: str, req_id: str, accept: bool) -> dict:
     conn.execute("UPDATE desk_guests SET status=?, decided_at=? WHERE id=?",
                  ("accepted" if accept else "declined", db.utcnow(), req_id))
     conn.commit()
+    # Acceptance reaches the guest's inbox; a decline does not. The yes is
+    # an invitation to act — come up on stream — while telling somebody a
+    # host said no delivers nothing they can do anything with.
+    if accept:
+        desk = conn.execute("SELECT owner_id FROM desks WHERE id=?",
+                            (desk_id,)).fetchone()
+        if desk is not None:
+            inbox.note(row["guest_id"], "guest_accepted", desk["owner_id"],
+                       desk_id)
     return guest_request(req_id)
 
 

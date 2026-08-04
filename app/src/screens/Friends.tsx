@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api, InboxEvent } from "../api";
+import { t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -17,6 +18,7 @@ export function Friends({ onPlans }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [inbox, setInbox] = useState<{ events: InboxEvent[]; unseen: number } | null>(null);
 
   function load() {
     if (!session.profileId) return;
@@ -25,8 +27,23 @@ export function Friends({ onPlans }: {
       const list = Array.isArray(s) ? s : (s.suggestions || []);
       setSuggested(list as { profile_id: string; display_name: string }[]);
     }).catch(() => setSuggested([]));
+    if (session.ownerToken) {
+      api.inbox(session.profileId, session.ownerToken)
+        .then(setInbox).catch(() => setInbox(null));
+    }
   }
   useEffect(load, [session.profileId]);
+
+  async function markSeen() {
+    if (!session.profileId || !session.ownerToken) return;
+    setBusy(true);
+    try {
+      await api.inboxSeen(session.profileId, session.ownerToken);
+      const fresh = await api.inbox(session.profileId, session.ownerToken);
+      setInbox(fresh);
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
 
   if (!session.profileId) return <div className="screen"><p className="muted center">Sign in first.</p></div>;
 
@@ -62,6 +79,30 @@ export function Friends({ onPlans }: {
       <header className="screen-head">
         <h2>Friends</h2>
       </header>
+
+      {inbox && inbox.events.length > 0 && (
+        <div className="card">
+          <h3>
+            {tr("inbox.title", visitorLang())}
+            {inbox.unseen > 0 && (
+              <span className="tag"> {inbox.unseen} {tr("inbox.new", visitorLang())}</span>
+            )}
+          </h3>
+          {inbox.events.map((e) => (
+            <div key={e.id} className={"friend-row" + (e.seen ? "" : " unseen")}>
+              <b>{e.actor_name || e.actor_id}</b>
+              <span className="muted small">
+                {tr(`inbox.kind.${e.kind}`, visitorLang())}
+              </span>
+            </div>
+          ))}
+          {inbox.unseen > 0 && (
+            <button className="chip" disabled={busy} onClick={markSeen}>
+              {tr("inbox.seen", visitorLang())}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="card">
         {(data?.friends || []).length === 0 && (

@@ -32,10 +32,53 @@ struct PeopleSection: View {
     @State private var commentDraft = ""
     @State private var note: String?
     @State private var busy = false
+    @State private var inboxPage: InboxPage?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
+                // What happened while you were away. The deed, never the
+                // words: a row names the kind and the actor, and the words
+                // stay behind their own doors below.
+                if let page = inboxPage, !page.events.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(L10n.t("inbox.title", state.language))
+                                .font(.headline).foregroundStyle(Theme.txt)
+                            if page.unseen > 0 {
+                                Text("\(page.unseen) " +
+                                     L10n.t("inbox.new", state.language))
+                                    .font(.caption2)
+                                    .foregroundStyle(Theme.brandA)
+                            }
+                        }
+                        ForEach(page.events) { e in
+                            HStack {
+                                Text(e.actor_name ?? e.actor_id)
+                                    .font(.caption).bold()
+                                    .foregroundStyle(
+                                        e.seen ? Theme.t2 : Theme.txt)
+                                Text(L10n.t("inbox.kind.\(e.kind)",
+                                            state.language))
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.t2)
+                                Spacer()
+                            }
+                        }
+                        if page.unseen > 0 {
+                            Button(L10n.t("inbox.seen", state.language)) {
+                                run {
+                                    try await ApiClient.shared.markInboxSeen(
+                                        profileId: state.pid!,
+                                        token: state.token!)
+                                }
+                            }.font(.caption).disabled(busy)
+                        }
+                    }
+                    .padding(12)
+                    .background(Theme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L10n.t("people.friends", state.language))
                         .font(.headline).foregroundStyle(Theme.txt)
@@ -170,6 +213,10 @@ struct PeopleSection: View {
         suggested = (try? await ApiClient.shared.suggestedFriends(
             profileId: pid)) ?? []
         posts = (try? await ApiClient.shared.wall(profileId: pid)) ?? []
+        if let token = state.token {
+            inboxPage = try? await ApiClient.shared.inbox(
+                profileId: pid, token: token)
+        }
     }
 
     private func run(_ op: @escaping () async throws -> Void) {

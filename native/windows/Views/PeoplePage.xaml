@@ -13,6 +13,26 @@
             <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" />
 
+            <!-- What happened while you were away: the deed, never the
+                 words. Hidden entirely while the inbox is empty. -->
+            <Border x:Name="InboxCard" Visibility="Collapsed"
+                    Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="InboxTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="InboxList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button x:Name="InboxSeenButton" Click="OnInboxSeen" />
+                </StackPanel>
+            </Border>
+
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">

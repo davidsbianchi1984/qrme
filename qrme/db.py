@@ -2069,6 +2069,16 @@ CREATE TABLE IF NOT EXISTS friendships (
     removed_at   TEXT,
     UNIQUE (profile_id, friend_id)
 );
+
+CREATE TABLE IF NOT EXISTS inbox_events (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),  -- the recipient
+    kind        TEXT NOT NULL,          -- inbox.KINDS
+    actor_id    TEXT NOT NULL REFERENCES profiles(id),
+    ref         TEXT,                   -- the thing acted on, by id
+    created_at  TEXT NOT NULL,
+    seen_at     TEXT
+);
 """
 
 _local = threading.local()

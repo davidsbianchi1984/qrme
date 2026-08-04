@@ -40,7 +40,7 @@ so rather than implying a payment processor that does not exist.
 
 from __future__ import annotations
 
-from . import db, ledger, moderation
+from . import db, inbox, ledger, moderation
 
 # What can be liked, commented on or shared. Kept as a closed set so a typo
 # in a path parameter cannot silently create a fifth kind of thing that no
@@ -76,6 +76,23 @@ def _check_subject(kind: str) -> None:
             f"cannot subscribe to {kind!r} — subscribing means 'tell me when "
             f"there is more from them', so it applies to "
             f"{' and '.join(SUBJECTS)}")
+
+
+def _owner_of(kind: str, target_id: str) -> str | None:
+    """Whose inbox a comment on this target belongs in.
+
+    ``None`` for a target with no single person behind it — a room message
+    belongs to the room — and the caller skips the note rather than guess.
+    """
+    if kind == "profile":
+        return target_id
+    queries = {"desk": "SELECT owner_id AS o FROM desks WHERE id=?",
+               "post": "SELECT profile_id AS o FROM posts WHERE id=?",
+               "listing": "SELECT profile_id AS o FROM listings WHERE id=?"}
+    if kind not in queries:
+        return None
+    row = db.connect().execute(queries[kind], (target_id,)).fetchone()
+    return row["o"] if row else None
 
 
 def target_exists(kind: str, target_id: str) -> bool:
@@ -209,6 +226,14 @@ def comment(kind: str, target_id: str, author_id: str, body: str,
          "approved" if verdict.approved else "blocked",
          None if verdict.approved else verdict.reason, db.utcnow()))
     conn.commit()
+    # Approved only, and the order is the point: a blocked comment is
+    # invisible to everyone but its author, and an inbox row announcing a
+    # thing the recipient can never see would be the filter advertising
+    # its own catch.
+    if verdict.approved:
+        owner = _owner_of(kind, target_id)
+        if owner is not None:
+            inbox.note(owner, "comment", author_id, row_id)
     return {
         "id": row_id, "target_kind": kind, "target_id": target_id,
         "author_id": author_id, "body": body.strip(),

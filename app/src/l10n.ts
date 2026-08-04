@@ -114,6 +114,63 @@ const CHROME: Table = {
     hi: "एजेंट लाइटें बैकएंड तक नहीं पहुँच पा रहीं — फिर से आज़माने के लिए दबाएँ",
     ar: "أضواء الوكلاء لا تصل إلى الخادم — اضغط لإعادة المحاولة",
   },
+  // The inbox card on Friends. The same rows the three shells carry — the
+  // backend names the deed, and every client composes the sentence from
+  // its own vocabulary.
+  "inbox.title": {
+    en: "What happened", es: "Qué pasó", fr: "Ce qui s'est passé",
+    de: "Was geschehen ist", pt: "O que aconteceu", it: "Cosa è successo",
+    ja: "何があったか", zh: "发生了什么", hi: "क्या हुआ", ar: "ما الذي حدث",
+  },
+  "inbox.new": {
+    en: "new", es: "nuevo", fr: "nouveau", de: "neu", pt: "novo",
+    it: "nuovo", ja: "新着", zh: "新", hi: "नया", ar: "جديد",
+  },
+  "inbox.seen": {
+    en: "Mark all seen", es: "Marcar todo como visto",
+    fr: "Tout marquer comme vu", de: "Alles als gesehen markieren",
+    pt: "Marcar tudo como visto", it: "Segna tutto come visto",
+    ja: "すべて既読にする", zh: "全部标为已读",
+    hi: "सभी को देखा हुआ चिह्नित करें", ar: "وضع علامة مقروء على الكل",
+  },
+  "inbox.kind.message": {
+    en: "sent you a message", es: "te envió un mensaje",
+    fr: "vous a envoyé un message", de: "hat dir eine Nachricht geschickt",
+    pt: "enviou uma mensagem para você", it: "ti ha inviato un messaggio",
+    ja: "からメッセージが届きました", zh: "给你发了一条消息",
+    hi: "ने आपको संदेश भेजा", ar: "أرسل لك رسالة",
+  },
+  "inbox.kind.comment": {
+    en: "commented on something of yours", es: "comentó algo tuyo",
+    fr: "a commenté quelque chose à vous", de: "hat etwas von dir kommentiert",
+    pt: "comentou algo seu", it: "ha commentato qualcosa di tuo",
+    ja: "があなたの投稿にコメントしました", zh: "评论了你的内容",
+    hi: "ने आपकी किसी चीज़ पर टिप्पणी की", ar: "علّق على شيء يخصك",
+  },
+  "inbox.kind.friend": {
+    en: "added you as a friend", es: "te añadió como amigo",
+    fr: "vous a ajouté comme ami", de: "hat dich als Freund hinzugefügt",
+    pt: "adicionou você como amigo", it: "ti ha aggiunto come amico",
+    ja: "があなたを友達に追加しました", zh: "把你加为好友",
+    hi: "ने आपको मित्र के रूप में जोड़ा", ar: "أضافك صديقًا",
+  },
+  "inbox.kind.exchange_signed": {
+    en: "signed your exchange", es: "firmó tu intercambio",
+    fr: "a signé votre échange", de: "hat deinen Austausch unterzeichnet",
+    pt: "assinou sua troca", it: "ha firmato il tuo scambio",
+    ja: "があなたの取引に署名しました", zh: "签署了你的交换协议",
+    hi: "ने आपके विनिमय पर हस्ताक्षर किए", ar: "وقّع على تبادلك",
+  },
+  "inbox.kind.guest_accepted": {
+    en: "gave you a place on their stream",
+    es: "te dio un lugar en su transmisión",
+    fr: "vous a donné une place dans son direct",
+    de: "hat dir einen Platz in seinem Stream gegeben",
+    pt: "deu a você um lugar na transmissão",
+    it: "ti ha dato un posto nella sua diretta",
+    ja: "が配信への出演を認めました", zh: "让你加入了他们的直播",
+    hi: "ने आपको अपनी स्ट्रीम में जगह दी", ar: "منحك مكانًا في بثه",
+  },
   "nav.corner": {
     en: "Your corner", es: "Tu rincón", fr: "Votre coin", de: "Deine Ecke",
     pt: "O seu cantinho", it: "Il tuo angolo", ja: "あなたのコーナー", zh: "你的角落",

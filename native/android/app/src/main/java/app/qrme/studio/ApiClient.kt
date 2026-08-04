@@ -1474,6 +1474,28 @@ object ApiClient {
                 JSONObject().put("friend_id", friendId), token)
     }
 
+    /** The deed, never the words: a row names the kind and the actor; the
+     *  sentence for each kind is this shell's, from L10n. */
+    suspend fun inbox(profileId: String, token: String): InboxPage {
+        val o = JSONObject(request("/profiles/$profileId/inbox", token = token))
+        val out = mutableListOf<InboxEvent>()
+        o.optJSONArray("events")?.let { a ->
+            for (i in 0 until a.length()) {
+                val e = a.getJSONObject(i)
+                out.add(InboxEvent(e.getString("id"), e.getString("kind"),
+                    e.getString("actor_id"),
+                    if (e.isNull("actor_name")) null
+                    else e.optString("actor_name"),
+                    e.optBoolean("seen")))
+            }
+        }
+        return InboxPage(out, o.optInt("unseen"))
+    }
+
+    suspend fun markInboxSeen(profileId: String, token: String) {
+        request("/profiles/$profileId/inbox/seen", "POST", token = token)
+    }
+
     /** Pinned rows refuse with 409; the list marks them so the control is
      *  left off rather than offered and failing. */
     suspend fun removeFriend(profileId: String, friendId: String, token: String) {
@@ -1928,6 +1950,11 @@ data class ObjectionTimeline(val status: String, val note: String,
 data class FriendRow(val profileId: String, val displayName: String?,
                      val founder: Boolean, val pinned: Boolean,
                      val mutual: Boolean)
+
+data class InboxEvent(val id: String, val kind: String, val actorId: String,
+                      val actorName: String?, val seen: Boolean)
+
+data class InboxPage(val events: List<InboxEvent>, val unseen: Int)
 
 data class SuggestedRow(val profileId: String, val displayName: String?,
                         val because: String?)

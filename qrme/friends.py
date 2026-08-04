@@ -35,7 +35,7 @@ Three decisions worth keeping in view:
 
 from __future__ import annotations
 
-from . import db, verification
+from . import db, inbox, verification
 
 # The founder's two profiles, in the order they stand. One constant, because
 # "who is pinned" is a product decision and should be greppable rather than
@@ -156,6 +156,7 @@ def befriend(profile_id: str, friend_id: str) -> dict:
             "UPDATE friendships SET state='active', removed_at=NULL WHERE id=?",
             (row["id"],))
         conn.commit()
+        inbox.note(friend_id, "friend", profile_id)
         return {"profile_id": profile_id, "friend_id": friend_id,
                 "added": True, "revived": True}
 
@@ -165,6 +166,9 @@ def befriend(profile_id: str, friend_id: str) -> dict:
         (db.new_id("frn"), profile_id, friend_id, "chosen", "active",
          db.utcnow()))
     conn.commit()
+    # The person on the other end hears about it — a friendship extended
+    # in silence is indistinguishable from one that never was.
+    inbox.note(friend_id, "friend", profile_id)
     return {"profile_id": profile_id, "friend_id": friend_id, "added": True}
 
 

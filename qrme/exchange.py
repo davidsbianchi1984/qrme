@@ -51,7 +51,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from . import db, sharing
+from . import db, inbox, sharing
 
 MAX_ITEMS = 40
 MAX_TEXT = 400
@@ -275,6 +275,11 @@ def sign(exchange_id: str, actor_id: str) -> dict:
     state = "signed" if _both_signed(exchange_id) else "proposed"
     conn.execute("UPDATE exchanges SET state=? WHERE id=?", (state, exchange_id))
     conn.commit()
+    # The other party hears that a signature landed — theirs is the next
+    # move either way, whether that is countersigning or noticing the deal
+    # just went live.
+    other = row["guest_id"] if actor_id == row["host_id"] else row["host_id"]
+    inbox.note(other, "exchange_signed", actor_id, exchange_id)
     return get(exchange_id)
 
 

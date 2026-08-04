@@ -4,6 +4,39 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.1] — 2026-08-04
+
+### The platform tells you what happened
+
+Every 0.42.x round built a way for one person to act on another — a
+message sent, a comment left under a post, a friendship extended, an
+exchange signed, a place on a stream granted — and every one shared a
+silence: the thing happened, and the person it happened to found out
+only by going to look.
+
+    asked     can the platform do this to a person
+    mattered  does the person ever hear about it
+
+`GET /profiles/{id}/inbox` is the window and `POST …/inbox/seen` is the
+one verb it takes. Five deeds note themselves at the deed, not at the
+router, so every path tells or none does. Three rules, each guarded:
+
+* **The inbox names the deed, never the words.** A row carries a kind,
+  an actor and a reference; the message itself stays behind the owner's
+  door where it already lives. The kinds are a closed set — a kind
+  invented in passing would render as its raw identifier in ten
+  languages at once.
+* **Your own deeds never land in your own inbox.** Telling somebody
+  what they just did is noise wearing the coat of news.
+* **A blocked comment produces no event, and a declined guest hears
+  nothing.** Announcing a thing the recipient can never see would be
+  the filter advertising its own catch; a decline delivers nothing a
+  person can act on.
+
+All four clients gain the door in the same cut — the console's Friends
+screen and each shell's People screen carry the card and the seen
+button, with the deed sentences in ten languages per shell.
+
 ## [0.43.0] — 2026-08-04
 
 ### The phone could be listed and could not do business
