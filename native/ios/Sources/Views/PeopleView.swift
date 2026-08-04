@@ -202,6 +202,10 @@ struct PeopleSection: View {
                 CrowdSection()
                 PartySection()
                 LendingSection()
+                PlaceSection()
+                CameraSection()
+                OrgSection()
+                TourSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

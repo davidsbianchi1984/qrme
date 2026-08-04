@@ -2562,3 +2562,265 @@ extension ApiClient {
         return (box.lending ?? []) + (box.borrowing ?? [])
     }
 }
+
+// MARK: - The place, the camera, the organization and the tour
+//
+// Four more blocks off the doorless records: what is live in the place you
+// are standing in (a lent microphone, a worn overlay, whose corner this
+// is), the camera with its published refusals, the owner's organization,
+// and the guided tour.
+
+struct WhoseCard: Decodable {
+    let surface: String?
+    let surface_id: String?
+    let display_name: String?
+    let anonymous: Bool?
+}
+
+struct MicDisclosure: Decodable {
+    struct Lent: Decodable, Identifiable {
+        let interactor_id: String?
+        let device: String?
+        var id: String { interactor_id ?? "?" }
+    }
+    let lent: [Lent]?
+    let note: String?
+}
+
+struct WornDisclosure: Decodable {
+    struct Worn: Decodable, Identifiable {
+        let interactor_id: String?
+        let kind: String?
+        let title: String?
+        var id: String { interactor_id ?? "?" }
+    }
+    let worn: [Worn]?
+}
+
+struct CameraVocabulary: Decodable {
+    let never: [String: String]?
+    let subjects: [String: String]?
+}
+
+struct CameraSession: Decodable {
+    let id: String?
+    let subject: String?
+    let state: String?
+    let record: Bool?
+    let ends_at: String?
+    var identity: String { id ?? "?" }
+}
+
+struct OrgCard: Decodable {
+    let id: String?
+    let name: String?
+    let departments: [OrgDepartment]?
+    var identity: String { id ?? name ?? "?" }
+}
+
+struct OrgDepartment: Decodable, Identifiable {
+    let name: String?
+    let role: String?
+    var id: String { name ?? "?" }
+}
+
+struct Coordination: Decodable, Identifiable {
+    let id: String?
+    let goal: String?
+    let status: String?
+    var identity: String { id ?? goal ?? "?" }
+}
+
+struct TutorialOutline: Decodable {
+    struct Chapter: Decodable, Identifiable {
+        let key: String?
+        let title: String?
+        var id: String { key ?? title ?? "?" }
+    }
+    let chapters: [Chapter]?
+    let lessons: [Chapter]?
+}
+
+struct TutorialStep: Decodable {
+    let key: String?
+    let title: String?
+    let body: String?
+    let next: String?
+}
+
+extension ApiClient {
+    // -- the place: whose it is, the microphone, the overlay --
+
+    func whose(surface: String, surfaceId: String) async throws -> WhoseCard {
+        try await request("/places/\(surface)/\(surfaceId)/whose")
+    }
+
+    func lendMicrophone(surface: String, surfaceId: String,
+                        interactorId: String,
+                        token: String) async throws -> MicDisclosure {
+        try await request("/places/\(surface)/\(surfaceId)/microphone",
+                          method: "POST",
+                          body: ["interactor_id": interactorId],
+                          token: token)
+    }
+
+    func takeBackMicrophone(surface: String, surfaceId: String,
+                            interactorId: String,
+                            token: String) async throws {
+        struct Out: Decodable { let taken_back: Bool? }
+        let _: Out = try await request(
+            "/places/\(surface)/\(surfaceId)/microphone", method: "DELETE",
+            body: ["interactor_id": interactorId], token: token)
+    }
+
+    func microphoneDisclosure(surface: String, surfaceId: String,
+                              token: String) async throws -> MicDisclosure {
+        try await request("/places/\(surface)/\(surfaceId)/microphone",
+                          token: token)
+    }
+
+    func wearOverlay(surface: String, surfaceId: String, interactorId: String,
+                     kind: String, title: String,
+                     token: String) async throws -> WornDisclosure.Worn {
+        try await request("/places/\(surface)/\(surfaceId)/overlay",
+                          method: "POST",
+                          body: ["interactor_id": interactorId, "kind": kind,
+                                 "title": title],
+                          token: token)
+    }
+
+    func takeOffOverlay(surface: String, surfaceId: String,
+                        interactorId: String, token: String) async throws {
+        struct Out: Decodable { let taken_off: Bool? }
+        let _: Out = try await request(
+            "/places/\(surface)/\(surfaceId)/overlay", method: "DELETE",
+            body: ["interactor_id": interactorId], token: token)
+    }
+
+    func wornOverlays(surface: String, surfaceId: String,
+                      token: String) async throws -> WornDisclosure {
+        try await request("/places/\(surface)/\(surfaceId)/overlay",
+                          token: token)
+    }
+
+    // -- the camera, refusals first --
+
+    func cameraVocabulary() async throws -> CameraVocabulary {
+        try await request("/camera/vocabulary")
+    }
+
+    func bystanderGuidance(subject: String) async throws -> [String: String] {
+        struct Out: Decodable { let guidance: String? }
+        let out: Out = try await request("/camera/bystanders/\(subject)")
+        return ["guidance": out.guidance ?? ""]
+    }
+
+    func openCamera(holderId: String, surface: String, surfaceId: String,
+                    subject: String, viewerKind: String, viewerId: String,
+                    minutes: Int,
+                    token: String) async throws -> CameraSession {
+        try await request("/camera/sessions", method: "POST",
+                          body: ["holder_id": holderId, "surface": surface,
+                                 "surface_id": surfaceId, "subject": subject,
+                                 "viewer_kind": viewerKind,
+                                 "viewer_id": viewerId, "minutes": minutes],
+                          token: token)
+    }
+
+    func cameraSession(sessionId: String,
+                       token: String) async throws -> CameraSession {
+        try await request("/camera/sessions/\(sessionId)", token: token)
+    }
+
+    func closeCamera(sessionId: String, actorId: String,
+                     token: String) async throws -> CameraSession {
+        try await request("/camera/sessions/\(sessionId)/close",
+                          method: "POST", body: ["actor_id": actorId],
+                          token: token)
+    }
+
+    func myCameras(holderId: String,
+                   token: String) async throws -> [CameraSession] {
+        try await request("/camera/live/\(holderId)", token: token)
+    }
+
+    func cameraDisclosure(surface: String, surfaceId: String,
+                          token: String) async throws -> [String: Bool] {
+        struct Out: Decodable { let live: Bool?; let recording: Bool? }
+        let out: Out = try await request(
+            "/camera/disclosure/\(surface)/\(surfaceId)", token: token)
+        return ["live": out.live ?? false,
+                "recording": out.recording ?? false]
+    }
+
+    // -- the organization --
+
+    func organizations(token: String) async throws -> [OrgCard] {
+        try await request("/organizations", token: token)
+    }
+
+    func createOrganization(name: String,
+                            token: String) async throws -> OrgCard {
+        try await request("/organizations", method: "POST",
+                          body: ["name": name], token: token)
+    }
+
+    func seedDemoOrganization(token: String) async throws -> OrgCard {
+        try await request("/organizations/demo", method: "POST", token: token)
+    }
+
+    func organization(orgId: String, token: String) async throws -> OrgCard {
+        try await request("/organizations/\(orgId)", token: token)
+    }
+
+    func addDepartment(orgId: String, name: String, role: String,
+                       profileId: String,
+                       token: String) async throws -> OrgDepartment {
+        try await request("/organizations/\(orgId)/departments",
+                          method: "POST",
+                          body: ["name": name, "role": role,
+                                 "profile_id": profileId],
+                          token: token)
+    }
+
+    func coordinate(orgId: String, goal: String,
+                    token: String) async throws -> Coordination {
+        try await request("/organizations/\(orgId)/coordinate",
+                          method: "POST", body: ["goal": goal], token: token)
+    }
+
+    func coordinations(orgId: String,
+                       token: String) async throws -> [Coordination] {
+        try await request("/organizations/\(orgId)/coordinations",
+                          token: token)
+    }
+
+    // -- the guided tour --
+
+    func tutorialOutline() async throws -> TutorialOutline {
+        try await request("/tutorial")
+    }
+
+    func tutorialStep(key: String) async throws -> TutorialStep {
+        try await request("/tutorial/steps/\(key)")
+    }
+
+    func tutorialForScreen(number: Int) async throws -> TutorialStep {
+        try await request("/tutorial/for-screen/\(number)")
+    }
+
+    func startTutorial(learnerId: String) async throws -> TutorialStep {
+        try await request("/tutorial/start", method: "POST",
+                          body: ["learner_id": learnerId, "lesson": ""])
+    }
+
+    func tutorialProgress(learnerId: String) async throws -> TutorialStep {
+        try await request("/tutorial/progress/\(learnerId)")
+    }
+
+    func markTutorialDone(learnerId: String,
+                          lesson: String) async throws -> TutorialStep {
+        try await request("/tutorial/done", method: "POST",
+                          body: ["learner_id": learnerId, "lesson": lesson])
+    }
+}

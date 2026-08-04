@@ -4,6 +4,39 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.3] — 2026-08-04
+
+### The place, the camera, the organization and the tour
+
+Four more blocks of the per-shell doorless record. The phone could
+stand in a room and not know whose corner it was, who had lent a
+microphone into it, or who was wearing what over their face — the
+disclosures the console has rendered since the live-place round, each
+addressed to everyone present precisely because a disclosure only its
+subject can see is not a disclosure. The camera existed with published
+refusals no phone could read. The owner's organization could
+coordinate and the phone could not found one. The guided tour could
+not be opened from the device most likely to be in a new user's hand.
+
+    asked     is the disclosure served
+    mattered  can the person standing in the place read it
+
+Twenty-seven routes gain doors on iOS, Android and Windows in one cut
+— **81 rows struck**; the records fall to ios 196, android 200,
+windows 198 — with the rules kept rather than invented: the camera
+opens with its refusals shown verbatim; only the holder opens a
+session and either party alone closes it; the organization answers
+only to its owner's account; the tour is anybody's. 44 shared strings
+per shell, in ten languages.
+
+### The evidence rule, applied twice
+
+`minutes` and `lesson` leave the field-label residue (143 → 141): the
+camera's minutes box and the tour's step box now ask a person for
+them. `minutes` arrives as JIM's existing row, ported rather than
+written twice. `learner_id`, `interactor_id` and `holder_id` stay —
+context-filled ids, the honest fallback.
+
 ## [0.43.2] — 2026-08-04
 
 ### The crowd, the couch and the loan

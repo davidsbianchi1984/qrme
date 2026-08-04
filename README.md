@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.43.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.43.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.43.3** | **The place, the camera, the organization and the tour** — whose-corner, microphone and overlay disclosures, the camera with its refusals, organizations and the guided tour reach all three shells; **81 doorless rows struck**, records fall to ios 196 / android 200 / windows 198 |
 | **0.43.2** | **The crowd, the couch and the loan** — the audience verbs (like, share, subscribe, gift), the watch party and skill grants reach all three shells; **84 doorless rows struck**, records fall to ios 223 / android 227 / windows 225 |
 | **0.43.1** | **The platform tells you what happened** — an inbox of deeds done to you (message, comment, friendship, signature, a place on a stream), named but never quoted, on the console and all three shells |
 | **0.43.0** | **The phone could be listed and could not do business** — 46 routes for staffing a desk, trading in the market and signing an exchange reached iOS, Android and Windows; **139 doorless rows struck**. Plus two guard-invisible image doors and a 204 that made every successful delete report failure |

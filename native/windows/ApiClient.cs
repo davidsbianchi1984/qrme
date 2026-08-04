@@ -621,6 +621,135 @@ public record PackInstalled(
     public Task<MyGrants> MyGrants(string personId, string token) =>
         Send<MyGrants>(Get($"/people/{personId}/skill-grants", token));
 
+    // -- the place, the camera, the organization and the tour -------------
+    // Four more blocks off the doorless records. Disclosure-first: who
+    // here has lent a microphone and who wears what are readable by
+    // everyone present.
+
+    public Task<WhoseCard> Whose(string surface, string surfaceId) =>
+        Send<WhoseCard>(Get($"/places/{surface}/{surfaceId}/whose"));
+
+    public Task<MicDisclosure> LendMicrophone(string surface,
+        string surfaceId, string interactorId, string token) =>
+        Send<MicDisclosure>(Post($"/places/{surface}/{surfaceId}/microphone",
+            new { interactor_id = interactorId }, token));
+
+    public Task<MicDisclosure> TakeBackMicrophone(string surface,
+        string surfaceId, string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/places/{surface}/{surfaceId}/microphone")
+        { Content = JsonContent.Create(new { interactor_id = interactorId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MicDisclosure>(req);
+    }
+
+    public Task<MicDisclosure> MicrophoneDisclosure(string surface,
+        string surfaceId, string token) =>
+        Send<MicDisclosure>(Get($"/places/{surface}/{surfaceId}/microphone",
+            token));
+
+    public Task<WornRow> WearOverlay(string surface, string surfaceId,
+        string interactorId, string kind, string title, string token) =>
+        Send<WornRow>(Post($"/places/{surface}/{surfaceId}/overlay",
+            new { interactor_id = interactorId, kind, title }, token));
+
+    public Task<WornRow> TakeOffOverlay(string surface, string surfaceId,
+        string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/places/{surface}/{surfaceId}/overlay")
+        { Content = JsonContent.Create(new { interactor_id = interactorId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<WornRow>(req);
+    }
+
+    public Task<WornDisclosure> WornOverlays(string surface, string surfaceId,
+        string token) =>
+        Send<WornDisclosure>(Get($"/places/{surface}/{surfaceId}/overlay",
+            token));
+
+    /// <summary>The published refusals, verbatim — a refused combination
+    /// is a decision, not a missing feature.</summary>
+    public Task<CameraVocabulary> CameraVocabulary() =>
+        Send<CameraVocabulary>(Get("/camera/vocabulary"));
+
+    public Task<BystanderNote> BystanderGuidance(string subject) =>
+        Send<BystanderNote>(Get($"/camera/bystanders/{subject}"));
+
+    public Task<CameraSession> OpenCamera(string holderId, string surface,
+        string surfaceId, string subject, string viewerId, int minutes,
+        string token) =>
+        Send<CameraSession>(Post("/camera/sessions", new
+        {
+            holder_id = holderId, surface, surface_id = surfaceId, subject,
+            viewer_kind = "person", viewer_id = viewerId, minutes
+        }, token));
+
+    public Task<CameraSession> CameraSessionOf(string sessionId,
+        string token) =>
+        Send<CameraSession>(Get($"/camera/sessions/{sessionId}", token));
+
+    public Task<CameraSession> CloseCamera(string sessionId, string actorId,
+        string token) =>
+        Send<CameraSession>(Post($"/camera/sessions/{sessionId}/close",
+            new { actor_id = actorId }, token));
+
+    public Task<CameraSession[]> MyCameras(string holderId, string token) =>
+        Send<CameraSession[]>(Get($"/camera/live/{holderId}", token));
+
+    public Task<CameraDisclosure> CameraDisclosureOf(string surface,
+        string surfaceId, string token) =>
+        Send<CameraDisclosure>(Get(
+            $"/camera/disclosure/{surface}/{surfaceId}", token));
+
+    public Task<OrgCard[]> Organizations(string token) =>
+        Send<OrgCard[]>(Get("/organizations", token));
+
+    public Task<OrgCard> CreateOrganization(string name, string token) =>
+        Send<OrgCard>(Post("/organizations", new { name }, token));
+
+    public Task<OrgCard> SeedDemoOrganization(string token) =>
+        Send<OrgCard>(Post("/organizations/demo", new { }, token));
+
+    public Task<OrgCard> OrganizationOf(string orgId, string token) =>
+        Send<OrgCard>(Get($"/organizations/{orgId}", token));
+
+    public Task<OrgDepartment> AddDepartment(string orgId, string name,
+        string role, string profileId, string token) =>
+        Send<OrgDepartment>(Post($"/organizations/{orgId}/departments",
+            new { name, role, profile_id = profileId }, token));
+
+    public Task<Coordination> Coordinate(string orgId, string goal,
+        string token) =>
+        Send<Coordination>(Post($"/organizations/{orgId}/coordinate",
+            new { goal }, token));
+
+    public Task<Coordination[]> Coordinations(string orgId, string token) =>
+        Send<Coordination[]>(Get($"/organizations/{orgId}/coordinations",
+            token));
+
+    public Task<TutorialOutline> TutorialOutline() =>
+        Send<TutorialOutline>(Get("/tutorial"));
+
+    public Task<TutorialStep> TutorialStepOf(string key) =>
+        Send<TutorialStep>(Get($"/tutorial/steps/{key}"));
+
+    public Task<TutorialStep> TutorialForScreen(int number) =>
+        Send<TutorialStep>(Get($"/tutorial/for-screen/{number}"));
+
+    public Task<TutorialStep> StartTutorial(string learnerId) =>
+        Send<TutorialStep>(Post("/tutorial/start",
+            new { learner_id = learnerId, lesson = "" }));
+
+    public Task<TutorialStep> TutorialProgress(string learnerId) =>
+        Send<TutorialStep>(Get($"/tutorial/progress/{learnerId}"));
+
+    public Task<TutorialStep> MarkTutorialDone(string learnerId,
+        string lesson) =>
+        Send<TutorialStep>(Post("/tutorial/done",
+            new { learner_id = learnerId, lesson }));
+
     public async Task<WallPostRow[]> Wall(string profileId)
     {
         var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
@@ -2370,3 +2499,66 @@ public record MyGrants(
     [property: JsonPropertyName("borrowing")] GrantCard[]? Borrowing);
 
 public record LeaveOut([property: JsonPropertyName("left")] bool? Left);
+
+public record WhoseCard(
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("anonymous")] bool? Anonymous);
+
+public record LentRow(
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    [property: JsonPropertyName("device")] string? Device);
+
+public record MicDisclosure(
+    [property: JsonPropertyName("lent")] LentRow[]? Lent);
+
+public record WornRow(
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("title")] string? Title);
+
+public record WornDisclosure(
+    [property: JsonPropertyName("worn")] WornRow[]? Worn);
+
+public record CameraVocabulary(
+    [property: JsonPropertyName("never")]
+    System.Collections.Generic.Dictionary<string, string>? Never);
+
+public record BystanderNote(
+    [property: JsonPropertyName("guidance")] string? Guidance);
+
+public record CameraSession(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("subject")] string? Subject,
+    [property: JsonPropertyName("state")] string? State);
+
+public record CameraDisclosure(
+    [property: JsonPropertyName("live")] bool? Live,
+    [property: JsonPropertyName("recording")] bool? Recording);
+
+public record OrgDepartment(
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("role")] string? Role);
+
+public record OrgCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("departments")] OrgDepartment[]? Departments);
+
+public record Coordination(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("goal")] string? Goal,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record TutorialChapter(
+    [property: JsonPropertyName("key")] string? Key,
+    [property: JsonPropertyName("title")] string? Title);
+
+public record TutorialOutline(
+    [property: JsonPropertyName("chapters")] TutorialChapter[]? Chapters,
+    [property: JsonPropertyName("lessons")] TutorialChapter[]? Lessons);
+
+public record TutorialStep(
+    [property: JsonPropertyName("key")] string? Key,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("body")] string? Body,
+    [property: JsonPropertyName("next")] string? Next);

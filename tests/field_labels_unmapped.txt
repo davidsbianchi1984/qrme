@@ -1,4 +1,4 @@
-# status: backlog — 143 rows
+# status: backlog — 141 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -93,14 +93,12 @@ items
 kinds
 learner_id
 lender_id
-lesson
 licensed_from
 llm_provider
 maturity
 media_ids
 mic_type
 minor_present
-minutes
 modality
 moderation_mode
 need

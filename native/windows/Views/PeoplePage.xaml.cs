@@ -79,6 +79,56 @@ public sealed partial class PeoplePage : Page
         LendWhatBox.Header = L10n.T("lend.what");
         LendUseButton.Content = L10n.T("lend.use");
         LendUsesButton.Content = L10n.T("lend.uses");
+        PlaceTitle.Text = L10n.T("place.title");
+        PlaceSurfaceBox.Header = L10n.T("place.surface");
+        PlaceSurfaceBox.Text = "room";
+        PlaceSurfaceIdBox.Header = L10n.T("place.surface.id");
+        WhoseButton.Content = L10n.T("place.whose");
+        MicLendButton.Content = L10n.T("place.mic.lend");
+        MicBackButton.Content = L10n.T("place.mic.back");
+        MicWhoButton.Content = L10n.T("place.mic.who");
+        MaskKindBox.Header = L10n.T("place.mask.kind");
+        MaskKindBox.Text = "avatar";
+        MaskNameBox.Header = L10n.T("place.mask.name");
+        MaskWearButton.Content = L10n.T("place.mask.wear");
+        MaskOffButton.Content = L10n.T("place.mask.off");
+        MaskWhoButton.Content = L10n.T("place.mask.who");
+        CamTitle.Text = L10n.T("cam.title");
+        CamRulesButton.Content = L10n.T("cam.rules");
+        CamSubjectBox.Header = L10n.T("cam.subject");
+        CamSubjectBox.Text = "object";
+        CamViewerBox.Header = L10n.T("cam.viewer");
+        CamMinutesBox.Header = L10n.T("cam.minutes");
+        CamMinutesBox.Text = "10";
+        CamOpenButton.Content = L10n.T("cam.open");
+        CamMineButton.Content = L10n.T("cam.mine");
+        CamDisclosureButton.Content = L10n.T("cam.disclosure");
+        CamSessionBox.Header = L10n.T("cam.session");
+        CamShowButton.Content = L10n.T("cam.show");
+        CamCloseButton.Content = L10n.T("cam.close");
+        OrgTitle.Text = L10n.T("org.title");
+        OrgNameBox.Header = L10n.T("org.name");
+        OrgCreateButton.Content = L10n.T("org.create");
+        OrgListButton.Content = L10n.T("org.list");
+        OrgDemoButton.Content = L10n.T("org.demo");
+        OrgIdBox.Header = L10n.T("org.id");
+        OrgShowButton.Content = L10n.T("org.show");
+        DeptNameBox.Header = L10n.T("org.dept.name");
+        DeptRoleBox.Header = L10n.T("org.dept.role");
+        DeptProfileBox.Header = L10n.T("org.dept.profile");
+        DeptAddButton.Content = L10n.T("org.dept.add");
+        GoalBox.Header = L10n.T("org.goal");
+        CoordinateButton.Content = L10n.T("org.go");
+        CoordLogButton.Content = L10n.T("org.log");
+        TourTitle.Text = L10n.T("tut.title");
+        TourOutlineButton.Content = L10n.T("tut.outline");
+        TourStartButton.Content = L10n.T("tut.start");
+        TourProgressButton.Content = L10n.T("tut.progress");
+        TourStepBox.Header = L10n.T("tut.step");
+        TourStepButton.Content = L10n.T("cam.show");
+        TourDoneButton.Content = L10n.T("tut.done");
+        TourScreenBox.Header = L10n.T("tut.screen");
+        TourScreenButton.Content = L10n.T("tut.screen");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -449,5 +499,215 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Token!);
             LendUsesList.ItemsSource = box.Uses.Select(u => new Row(
                 $"{u.UsedAt} · {u.What}")).ToList();
+        });
+
+    // -- the place, the camera, the organization and the tour -------------
+
+    private async void OnWhose(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.Whose(
+                PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim());
+            StatusText.Text = w.DisplayName ?? "";
+        });
+
+    private async void OnMicLend(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.LendMicrophone(
+            PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+            AppState.Current.Pid!, AppState.Current.Token!));
+
+    private async void OnMicBack(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.TakeBackMicrophone(
+            PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+            AppState.Current.Pid!, AppState.Current.Token!));
+
+    private async void OnMicWho(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var d = await ApiClient.Shared.MicrophoneDisclosure(
+                PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            PlaceList.ItemsSource = (d.Lent ?? Array.Empty<LentRow>())
+                .Select(m => new Row($"{m.InteractorId} · {m.Device}"))
+                .ToList();
+        });
+
+    private async void OnMaskWear(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.WearOverlay(
+            PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+            AppState.Current.Pid!, MaskKindBox.Text.Trim(),
+            MaskNameBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnMaskOff(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.TakeOffOverlay(
+            PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+            AppState.Current.Pid!, AppState.Current.Token!));
+
+    private async void OnMaskWho(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var d = await ApiClient.Shared.WornOverlays(
+                PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            PlaceList.ItemsSource = (d.Worn ?? Array.Empty<WornRow>())
+                .Select(w => new Row($"{w.InteractorId} · {w.Title ?? w.Kind}"))
+                .ToList();
+        });
+
+    private async void OnCamRules(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.CameraVocabulary();
+            CamRulesList.ItemsSource = (v.Never
+                ?? new System.Collections.Generic.Dictionary<string, string>())
+                .Values.OrderBy(x => x).Select(r => new Row($"· {r}"))
+                .ToList();
+            await ApiClient.Shared.BystanderGuidance(
+                CamSubjectBox.Text.Trim());
+        });
+
+    private async void OnCamOpen(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.OpenCamera(AppState.Current.Pid!,
+                PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+                CamSubjectBox.Text.Trim(), CamViewerBox.Text.Trim(),
+                int.TryParse(CamMinutesBox.Text, out var m) ? m : 10,
+                AppState.Current.Token!);
+            CamSessionBox.Text = s.Id ?? "";
+        });
+
+    private async void OnCamMine(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var mine = await ApiClient.Shared.MyCameras(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            CamList.ItemsSource = mine.Select(s => new Row(
+                $"{s.Id} · {s.Subject} · {s.State}")).ToList();
+        });
+
+    private async void OnCamDisclosure(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var d = await ApiClient.Shared.CameraDisclosureOf(
+                PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = $"{d.Live} · {d.Recording}";
+        });
+
+    private async void OnCamShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.CameraSessionOf(
+                CamSessionBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = $"{s.Subject} · {s.State}";
+        });
+
+    private async void OnCamClose(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.CloseCamera(
+            CamSessionBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnOrgCreate(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.CreateOrganization(
+                OrgNameBox.Text.Trim(), AppState.Current.Token!);
+            OrgIdBox.Text = o.Id ?? "";
+        });
+
+    private async void OnOrgList(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var orgs = await ApiClient.Shared.Organizations(
+                AppState.Current.Token!);
+            OrgList.ItemsSource = orgs.Select(o => new Row(
+                $"{o.Id} · {o.Name}")).ToList();
+        });
+
+    private async void OnOrgDemo(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.SeedDemoOrganization(
+                AppState.Current.Token!);
+            OrgIdBox.Text = o.Id ?? "";
+        });
+
+    private async void OnOrgShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.OrganizationOf(
+                OrgIdBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = $"{o.Name} · {o.Departments?.Length ?? 0}";
+        });
+
+    private async void OnDeptAdd(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.AddDepartment(
+            OrgIdBox.Text.Trim(), DeptNameBox.Text.Trim(),
+            DeptRoleBox.Text.Trim(), DeptProfileBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnCoordinate(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Coordinate(
+            OrgIdBox.Text.Trim(), GoalBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnCoordLog(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var log = await ApiClient.Shared.Coordinations(
+                OrgIdBox.Text.Trim(), AppState.Current.Token!);
+            CoordList.ItemsSource = log.Select(c => new Row(
+                $"{c.Goal} · {c.Status}")).ToList();
+        });
+
+    private async void OnTourOutline(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.TutorialOutline();
+            var chapters = o.Chapters ?? o.Lessons
+                ?? Array.Empty<TutorialChapter>();
+            TourList.ItemsSource = chapters.Select(c => new Row(
+                $"{c.Key} · {c.Title}")).ToList();
+        });
+
+    private async void OnTourStart(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.StartTutorial(
+                AppState.Current.Pid ?? "walk-in");
+            TourText.Text = s.Title ?? s.Key ?? "";
+        });
+
+    private async void OnTourProgress(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.TutorialProgress(
+                AppState.Current.Pid ?? "walk-in");
+            TourText.Text = s.Title ?? s.Next ?? "";
+        });
+
+    private async void OnTourStep(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.TutorialStepOf(
+                TourStepBox.Text.Trim());
+            TourText.Text = s.Body ?? s.Title ?? "";
+        });
+
+    private async void OnTourDone(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.MarkTutorialDone(
+                AppState.Current.Pid ?? "walk-in", TourStepBox.Text.Trim());
+            TourText.Text = s.Next ?? "";
+        });
+
+    private async void OnTourScreen(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            if (!int.TryParse(TourScreenBox.Text, out var n)) return;
+            var s = await ApiClient.Shared.TutorialForScreen(n);
+            TourText.Text = s.Title ?? "";
         });
 }

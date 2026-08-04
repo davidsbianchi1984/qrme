@@ -2138,6 +2138,224 @@ object ApiClient {
         return out
     }
 
+    // -- the place, the camera, the organization and the tour -------------
+    // Four more blocks off the doorless records. Disclosure-first: who
+    // here has lent a microphone and who wears what are readable by
+    // everyone present, because a disclosure only its subject can see is
+    // not a disclosure.
+
+    suspend fun whose(surface: String, surfaceId: String): String {
+        val o = JSONObject(request("/places/$surface/$surfaceId/whose"))
+        return o.optString("display_name")
+    }
+
+    suspend fun lendMicrophone(surface: String, surfaceId: String,
+                               interactorId: String, token: String) {
+        request("/places/$surface/$surfaceId/microphone", "POST",
+            JSONObject().put("interactor_id", interactorId), token)
+    }
+
+    suspend fun takeBackMicrophone(surface: String, surfaceId: String,
+                                   interactorId: String, token: String) {
+        request("/places/$surface/$surfaceId/microphone", "DELETE",
+            JSONObject().put("interactor_id", interactorId), token)
+    }
+
+    suspend fun microphoneDisclosure(surface: String, surfaceId: String,
+                                     token: String): List<String> {
+        val o = JSONObject(request("/places/$surface/$surfaceId/microphone",
+            token = token))
+        val out = mutableListOf<String>()
+        o.optJSONArray("lent")?.let { a ->
+            for (i in 0 until a.length()) {
+                val m = a.getJSONObject(i)
+                out.add(m.optString("interactor_id") + " · " +
+                    m.optString("device"))
+            }
+        }
+        return out
+    }
+
+    suspend fun wearOverlay(surface: String, surfaceId: String,
+                            interactorId: String, kind: String, title: String,
+                            token: String) {
+        request("/places/$surface/$surfaceId/overlay", "POST",
+            JSONObject().put("interactor_id", interactorId).put("kind", kind)
+                .put("title", title), token)
+    }
+
+    suspend fun takeOffOverlay(surface: String, surfaceId: String,
+                               interactorId: String, token: String) {
+        request("/places/$surface/$surfaceId/overlay", "DELETE",
+            JSONObject().put("interactor_id", interactorId), token)
+    }
+
+    suspend fun wornOverlays(surface: String, surfaceId: String,
+                             token: String): List<String> {
+        val o = JSONObject(request("/places/$surface/$surfaceId/overlay",
+            token = token))
+        val out = mutableListOf<String>()
+        o.optJSONArray("worn")?.let { a ->
+            for (i in 0 until a.length()) {
+                val w = a.getJSONObject(i)
+                out.add(w.optString("interactor_id") + " · " +
+                    w.optString("title", w.optString("kind")))
+            }
+        }
+        return out
+    }
+
+    /** The published refusals, verbatim — a client that knew only the
+     *  allowed combinations would draw a refused one as a missing feature
+     *  rather than a decision. */
+    suspend fun cameraRefusals(): List<String> {
+        val o = JSONObject(request("/camera/vocabulary"))
+        val out = mutableListOf<String>()
+        o.optJSONObject("never")?.let { n ->
+            for (key in n.keys()) out.add(n.optString(key))
+        }
+        return out
+    }
+
+    suspend fun bystanderGuidance(subject: String): String {
+        val o = JSONObject(request("/camera/bystanders/$subject"))
+        return o.optString("guidance")
+    }
+
+    suspend fun openCamera(holderId: String, surface: String,
+                           surfaceId: String, subject: String,
+                           viewerId: String, minutes: Int,
+                           token: String): String {
+        val o = JSONObject(request("/camera/sessions", "POST",
+            JSONObject().put("holder_id", holderId).put("surface", surface)
+                .put("surface_id", surfaceId).put("subject", subject)
+                .put("viewer_kind", "person").put("viewer_id", viewerId)
+                .put("minutes", minutes), token))
+        return o.optString("id")
+    }
+
+    suspend fun cameraSession(sessionId: String, token: String): String {
+        val o = JSONObject(request("/camera/sessions/$sessionId",
+            token = token))
+        return o.optString("subject") + " · " + o.optString("state")
+    }
+
+    suspend fun closeCamera(sessionId: String, actorId: String,
+                            token: String) {
+        request("/camera/sessions/$sessionId/close", "POST",
+            JSONObject().put("actor_id", actorId), token)
+    }
+
+    suspend fun myCameras(holderId: String, token: String): List<String> {
+        val a = org.json.JSONArray(request("/camera/live/$holderId",
+            token = token))
+        val out = mutableListOf<String>()
+        for (i in 0 until a.length()) {
+            val s = a.getJSONObject(i)
+            out.add(s.optString("id") + " · " + s.optString("subject"))
+        }
+        return out
+    }
+
+    suspend fun cameraDisclosure(surface: String, surfaceId: String,
+                                 token: String): String {
+        val o = JSONObject(request("/camera/disclosure/$surface/$surfaceId",
+            token = token))
+        return o.toString()
+    }
+
+    suspend fun organizations(token: String): List<Pair<String, String>> {
+        val a = org.json.JSONArray(request("/organizations", token = token))
+        val out = mutableListOf<Pair<String, String>>()
+        for (i in 0 until a.length()) {
+            val o = a.getJSONObject(i)
+            out.add(o.optString("id") to o.optString("name"))
+        }
+        return out
+    }
+
+    suspend fun createOrganization(name: String, token: String): String {
+        val o = JSONObject(request("/organizations", "POST",
+            JSONObject().put("name", name), token))
+        return o.optString("id")
+    }
+
+    suspend fun seedDemoOrganization(token: String): String {
+        val o = JSONObject(request("/organizations/demo", "POST",
+            token = token))
+        return o.optString("id")
+    }
+
+    suspend fun organization(orgId: String, token: String): String {
+        val o = JSONObject(request("/organizations/$orgId", token = token))
+        return o.optString("name") + " · " +
+            (o.optJSONArray("departments")?.length() ?: 0)
+    }
+
+    suspend fun addDepartment(orgId: String, name: String, role: String,
+                              profileId: String, token: String) {
+        request("/organizations/$orgId/departments", "POST",
+            JSONObject().put("name", name).put("role", role)
+                .put("profile_id", profileId), token)
+    }
+
+    suspend fun coordinate(orgId: String, goal: String, token: String) {
+        request("/organizations/$orgId/coordinate", "POST",
+            JSONObject().put("goal", goal), token)
+    }
+
+    suspend fun coordinations(orgId: String, token: String): List<String> {
+        val a = org.json.JSONArray(request(
+            "/organizations/$orgId/coordinations", token = token))
+        val out = mutableListOf<String>()
+        for (i in 0 until a.length()) {
+            val c = a.getJSONObject(i)
+            out.add(c.optString("goal") + " · " + c.optString("status"))
+        }
+        return out
+    }
+
+    suspend fun tutorialOutline(): List<Pair<String, String>> {
+        val o = JSONObject(request("/tutorial"))
+        val out = mutableListOf<Pair<String, String>>()
+        for (key in listOf("chapters", "lessons")) {
+            o.optJSONArray(key)?.let { a ->
+                for (i in 0 until a.length()) {
+                    val c = a.getJSONObject(i)
+                    out.add(c.optString("key") to c.optString("title"))
+                }
+            }
+        }
+        return out
+    }
+
+    suspend fun tutorialStep(key: String): String {
+        val o = JSONObject(request("/tutorial/steps/$key"))
+        return o.optString("body", o.optString("title"))
+    }
+
+    suspend fun tutorialForScreen(number: Int): String {
+        val o = JSONObject(request("/tutorial/for-screen/$number"))
+        return o.optString("title")
+    }
+
+    suspend fun startTutorial(learnerId: String): String {
+        val o = JSONObject(request("/tutorial/start", "POST",
+            JSONObject().put("learner_id", learnerId).put("lesson", "")))
+        return o.optString("title", o.optString("key"))
+    }
+
+    suspend fun tutorialProgress(learnerId: String): String {
+        val o = JSONObject(request("/tutorial/progress/$learnerId"))
+        return o.optString("title", o.optString("next"))
+    }
+
+    suspend fun markTutorialDone(learnerId: String, lesson: String): String {
+        val o = JSONObject(request("/tutorial/done", "POST",
+            JSONObject().put("learner_id", learnerId).put("lesson", lesson)))
+        return o.optString("next")
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

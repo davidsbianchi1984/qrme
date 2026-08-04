@@ -231,6 +231,134 @@
                     </ItemsControl>
                 </StackPanel>
             </Border>
+            <!-- The place you are in: whose it is, the lent microphone,
+                 the worn overlay — disclosure-first. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="PlaceTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="PlaceSurfaceBox" />
+                    <TextBox x:Name="PlaceSurfaceIdBox" />
+                    <Button x:Name="WhoseButton" Click="OnWhose" />
+                    <Button x:Name="MicLendButton" Click="OnMicLend" />
+                    <Button x:Name="MicBackButton" Click="OnMicBack" />
+                    <Button x:Name="MicWhoButton" Click="OnMicWho" />
+                    <TextBox x:Name="MaskKindBox" />
+                    <TextBox x:Name="MaskNameBox" />
+                    <Button x:Name="MaskWearButton" Click="OnMaskWear" />
+                    <Button x:Name="MaskOffButton" Click="OnMaskOff" />
+                    <Button x:Name="MaskWhoButton" Click="OnMaskWho" />
+                    <ItemsControl x:Name="PlaceList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The camera, refusals first. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="CamTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="CamRulesButton" Click="OnCamRules" />
+                    <ItemsControl x:Name="CamRulesList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="CamSubjectBox" />
+                    <TextBox x:Name="CamViewerBox" />
+                    <TextBox x:Name="CamMinutesBox" />
+                    <Button x:Name="CamOpenButton" Click="OnCamOpen" />
+                    <Button x:Name="CamMineButton" Click="OnCamMine" />
+                    <Button x:Name="CamDisclosureButton" Click="OnCamDisclosure" />
+                    <TextBox x:Name="CamSessionBox" />
+                    <Button x:Name="CamShowButton" Click="OnCamShow" />
+                    <Button x:Name="CamCloseButton" Click="OnCamClose" />
+                    <ItemsControl x:Name="CamList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The owner's organization. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="OrgTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="OrgNameBox" />
+                    <Button x:Name="OrgCreateButton" Click="OnOrgCreate" />
+                    <Button x:Name="OrgListButton" Click="OnOrgList" />
+                    <Button x:Name="OrgDemoButton" Click="OnOrgDemo" />
+                    <ItemsControl x:Name="OrgList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="OrgIdBox" />
+                    <Button x:Name="OrgShowButton" Click="OnOrgShow" />
+                    <TextBox x:Name="DeptNameBox" />
+                    <TextBox x:Name="DeptRoleBox" />
+                    <TextBox x:Name="DeptProfileBox" />
+                    <Button x:Name="DeptAddButton" Click="OnDeptAdd" />
+                    <TextBox x:Name="GoalBox" />
+                    <Button x:Name="CoordinateButton" Click="OnCoordinate" />
+                    <Button x:Name="CoordLogButton" Click="OnCoordLog" />
+                    <ItemsControl x:Name="CoordList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The guided tour. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="TourTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="TourOutlineButton" Click="OnTourOutline" />
+                    <Button x:Name="TourStartButton" Click="OnTourStart" />
+                    <Button x:Name="TourProgressButton" Click="OnTourProgress" />
+                    <ItemsControl x:Name="TourList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="TourStepBox" />
+                    <Button x:Name="TourStepButton" Click="OnTourStep" />
+                    <Button x:Name="TourDoneButton" Click="OnTourDone" />
+                    <TextBox x:Name="TourScreenBox" />
+                    <Button x:Name="TourScreenButton" Click="OnTourScreen" />
+                    <TextBlock x:Name="TourText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>
