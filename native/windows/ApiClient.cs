@@ -499,6 +499,288 @@ public record PackInstalled(
         return Send<CommentRow>(req);
     }
 
+
+    // -- standing behind the counter: desks, the market, exchanges --
+    // The caller's side shipped long ago; the other side of the same
+    // counter never reached any shell, nor did searching, pricing,
+    // selling or buying in the market, nor being party to an exchange.
+
+    public Task<DeskBrief[]> Desks() => Send<DeskBrief[]>(Get("/desks"));
+
+    public Task<DeskCard> OpenDesk(string ownerId, string displayName,
+                                   string trade, string attestor,
+                                   string basis, string location,
+                                   string blurb, string token) =>
+        Send<DeskCard>(Post("/desks", new {
+            owner_id = ownerId, display_name = displayName, trade, attestor,
+            basis, location, blurb }, token));
+
+    public Task<DeskCard> SetDeskPresence(string deskId, string presence,
+                                          string token) =>
+        Send<DeskCard>(Put($"/desks/{deskId}/presence", new { presence },
+                           token));
+
+    public Task<DeskCard> SetDeskPortrait(string deskId, string token) =>
+        Send<DeskCard>(Put($"/desks/{deskId}/portrait",
+                           new { asset = (string?)null }, token));
+
+    public Task<DeskCard> SetDeskCamera(string deskId, bool enabled,
+                                        string token) =>
+        Send<DeskCard>(Put($"/desks/{deskId}/camera", new { enabled },
+                           token));
+
+    public async Task<DeskRing[]> DeskRings(string deskId, string token)
+    {
+        var box = await Send<DeskRingBox>(Get($"/desks/{deskId}/rings",
+                                              token));
+        return box.Rings;
+    }
+
+    public Task<DeskRing> AckDeskRing(string deskId, string ringId,
+                                      string token) =>
+        Send<DeskRing>(Post($"/desks/{deskId}/rings/{ringId}/ack",
+                            new { }, token));
+
+    public Task<DeskGuest> AskToJoinDesk(string deskId, string note,
+                                         string token) =>
+        Send<DeskGuest>(Post($"/desks/{deskId}/guests", new { note }, token));
+
+    public async Task<DeskGuest[]> DeskGuests(string deskId, string token)
+    {
+        var box = await Send<DeskGuestBox>(Get($"/desks/{deskId}/guests",
+                                                token));
+        return box.Guests;
+    }
+
+    public Task<DeskGuest> AcceptDeskGuest(string deskId, string requestId,
+                                           string token) =>
+        Send<DeskGuest>(Post($"/desks/{deskId}/guests/{requestId}/accept",
+                             new { }, token));
+
+    public Task<DeskGuest> DeclineDeskGuest(string deskId, string requestId,
+                                            string token) =>
+        Send<DeskGuest>(Post($"/desks/{deskId}/guests/{requestId}/decline",
+                             new { }, token));
+
+    /// <summary>The caller's own way out — theirs to press, not the desk's.</summary>
+    public Task<DeskGuest> LeaveDesk(string deskId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/desks/{deskId}/guests/me");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DeskGuest>(req);
+    }
+
+    public Task<DeskBeacon> AddDeskBeacon(string deskId, string label,
+                                          string token) =>
+        Send<DeskBeacon>(Post($"/desks/{deskId}/beacons", new { label },
+                              token));
+
+    public async Task<DeskBeacon[]> DeskBeacons(string deskId, string token)
+    {
+        var box = await Send<DeskBeaconBox>(Get($"/desks/{deskId}/beacons",
+                                                 token));
+        return box.Beacons;
+    }
+
+    public Task<DeskBeacon> RemoveDeskBeacon(string beaconId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/desk-beacons/{beaconId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DeskBeacon>(req);
+    }
+
+    /// <summary>The sticker, as bytes an image control can show. Fetched
+    /// directly rather than through the JSON helper, which cannot carry an
+    /// image.</summary>
+    public Task<byte[]> DeskBeaconQr(string beaconId)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get,
+            $"/desk-beacons/{beaconId}/qr.svg");
+        return _http.SendAsync(req).ContinueWith(r =>
+            r.Result.Content.ReadAsByteArrayAsync().Result);
+    }
+
+    /// <summary>What the desk looks like right now, as a still.</summary>
+    public Task<byte[]> DeskView(string deskId)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get,
+            $"/desks/{deskId}/view.webp");
+        return _http.SendAsync(req).ContinueWith(r =>
+            r.Result.Content.ReadAsByteArrayAsync().Result);
+    }
+
+    public Task<DeskOverlay> DeskOverlay(string deskId) =>
+        Send<DeskOverlay>(Get($"/desks/{deskId}/overlay"));
+
+    public Task<LivePerson> DeskLivePerson(string deskId) =>
+        Send<LivePerson>(Get($"/desks/{deskId}/live-person"));
+
+    // -- the market, from both sides --
+
+    public Task<MarketCard[]> Marketplace() =>
+        Send<MarketCard[]>(Get("/marketplace"));
+
+    public Task<MarketSearchBox> MarketSearch(string query) =>
+        Send<MarketSearchBox>(Get(
+            $"/marketplace/search?q={Uri.EscapeDataString(query)}"));
+
+    public Task<string[]> MarketLocalities() =>
+        Send<string[]>(Get("/marketplace/localities"));
+
+    public Task<MarketAssistBox> MarketAssist(string need) =>
+        Send<MarketAssistBox>(Post("/marketplace/assist", new { need }));
+
+    /// <summary>The demo shelf: one press and the market has something on it.</summary>
+    public Task<MarketSeeded> SeedMarketplace() =>
+        Send<MarketSeeded>(Post("/marketplace/seed", new { }));
+
+    public Task<MarketListed> ListInMarketplace(string profileId,
+                                                string blurb,
+                                                string locality,
+                                                string[] tags, string token) =>
+        Send<MarketListed>(Post($"/profiles/{profileId}/marketplace",
+            new { blurb, locality, tags }, token));
+
+    public Task<MarketListed> UnlistFromMarketplace(string profileId,
+                                                    string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/marketplace");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketListed>(req);
+    }
+
+    public Task<MarketListed> RemoveMarketListing(string listingId,
+                                                  string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/marketplace/listings/{listingId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketListed>(req);
+    }
+
+    public Task<MarketOffer> ListingOffer(string listingId) =>
+        Send<MarketOffer>(Get($"/marketplace/listings/{listingId}/offer"));
+
+    public Task<MarketOffer> SetListingOffer(string listingId, double amount,
+                                             double? acceptPrice,
+                                             string token) =>
+        Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/offer",
+            new { amount, currency = "USD", accept_price = acceptPrice },
+            token));
+
+    public Task<MarketOffer> ClearListingOffer(string listingId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/marketplace/listings/{listingId}/offer");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketOffer>(req);
+    }
+
+    public Task<MarketOffer> PlaceListing(string listingId, string venue,
+                                          string token) =>
+        Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/place",
+            new { venue }, token));
+
+    public Task<MarketOffer> UnplaceListing(string listingId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/marketplace/listings/{listingId}/place");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketOffer>(req);
+    }
+
+    public Task<MarketSale> PurchaseListing(string listingId, string token) =>
+        Send<MarketSale>(Post($"/marketplace/listings/{listingId}/purchase",
+                              new { }, token));
+
+    public async Task<MarketSale[]> MarketSales(string token)
+    {
+        var box = await Send<MarketSalesBox>(Get("/marketplace/sales", token));
+        return box.Sales;
+    }
+
+    public Task<MarketSettings> MarketSettings(string interactorId,
+                                               string token) =>
+        Send<MarketSettings>(Get($"/marketplace/settings/{interactorId}",
+                                 token));
+
+    public Task<MarketSettings> SetMarketSettings(string interactorId,
+                                                  bool showOffers,
+                                                  string token) =>
+        Send<MarketSettings>(Put($"/marketplace/settings/{interactorId}",
+            new { show_offers = showOffers }, token));
+
+    // -- exchanges: two parties, one manifest --
+
+    public Task<ExchangeVocabulary> ExchangeVocabulary() =>
+        Send<ExchangeVocabulary>(Get("/exchanges/vocabulary"));
+
+    public Task<ExchangeDeal> ProposeExchange(string hostId, string guestId,
+                                              string work, string industry,
+                                              double fee, string token) =>
+        Send<ExchangeDeal>(Post("/exchanges", new {
+            host_id = hostId, guest_id = guestId, work, industry, fee },
+            token));
+
+    public Task<ExchangeDeal> Exchange(string exchangeId, string token) =>
+        Send<ExchangeDeal>(Get($"/exchanges/{exchangeId}", token));
+
+    public async Task<ExchangeDeal[]> MyExchanges(string partyId,
+                                                  string token)
+    {
+        var box = await Send<ExchangeBox>(
+            Get($"/parties/{partyId}/exchanges", token));
+        return box.Exchanges;
+    }
+
+    public Task<ExchangeItemRow> AddExchangeItem(string exchangeId,
+                                                 string direction,
+                                                 string name, string kind,
+                                                 string token) =>
+        Send<ExchangeItemRow>(Post($"/exchanges/{exchangeId}/items",
+            new { direction, name, kind }, token));
+
+    public Task<ExchangeItemRow> RemoveExchangeItem(string exchangeId,
+                                                    string itemId,
+                                                    string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/exchanges/{exchangeId}/items/{itemId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ExchangeItemRow>(req);
+    }
+
+    /// <summary>Each item is accepted separately — nothing moves by itself.</summary>
+    public Task<ExchangeItemRow> AcceptExchangeItem(string exchangeId,
+                                                    string itemId,
+                                                    string token) =>
+        Send<ExchangeItemRow>(Post(
+            $"/exchanges/{exchangeId}/items/{itemId}/accept", new { }, token));
+
+    /// <summary>Both parties sign the same manifest; any change clears both.</summary>
+    public Task<ExchangeDeal> SignExchange(string exchangeId, string actorId,
+                                           string token) =>
+        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/sign",
+            new { actor_id = actorId }, token));
+
+    public Task<ExchangeDeal> ReopenExchange(string exchangeId,
+                                             string actorId, string token) =>
+        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/reopen",
+            new { actor_id = actorId }, token));
+
+    public Task<ExchangeDeal> WithdrawFromExchange(string exchangeId,
+                                                   string actorId,
+                                                   string token) =>
+        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/withdraw",
+            new { actor_id = actorId }, token));
+
+    public Task<ExchangeChannel> ExchangeChannel(string exchangeId,
+                                                 string token) =>
+        Send<ExchangeChannel>(Get($"/exchanges/{exchangeId}/channel", token));
+
 }
 
 public record GameSession(
@@ -738,7 +1020,11 @@ public sealed class ApiClient
             catch { /* non-JSON error body */ }
             throw new HttpRequestException(said ?? $"HTTP {(int)res.StatusCode}");
         }
-        return JsonSerializer.Deserialize<T>(body)!;
+        // A 204 — or any success with an empty body — is the route saying
+        // "done, nothing to report". Deserializing "" throws, which turned
+        // every successful delete into an error on screen.
+        return JsonSerializer.Deserialize<T>(
+            string.IsNullOrWhiteSpace(body) ? "{}" : body)!;
     }
 
     private static HttpRequestMessage Get(string path, string token)
@@ -1736,3 +2022,107 @@ public record CommentRow(
 
 public record CommentBox(
     [property: JsonPropertyName("comments")] CommentRow[] Comments);
+
+
+public record DeskCard(
+    [property: JsonPropertyName("desk_id")] string DeskId,
+    [property: JsonPropertyName("display_name")] string DisplayName,
+    [property: JsonPropertyName("trade")] string? Trade,
+    [property: JsonPropertyName("location")] string? Location,
+    [property: JsonPropertyName("presence")] string Presence,
+    [property: JsonPropertyName("rated")] bool Rated,
+    [property: JsonPropertyName("desk_token")] string? DeskToken);
+
+public record DeskBrief(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("display_name")] string DisplayName,
+    [property: JsonPropertyName("trade")] string? Trade,
+    [property: JsonPropertyName("presence")] string Presence);
+
+public record DeskRing(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record DeskRingBox(
+    [property: JsonPropertyName("rings")] DeskRing[] Rings);
+
+public record DeskGuest(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("guest_id")] string GuestId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("status")] string Status);
+
+public record DeskGuestBox(
+    [property: JsonPropertyName("guests")] DeskGuest[] Guests);
+
+public record DeskBeacon(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("label")] string? Label);
+
+public record DeskBeaconBox(
+    [property: JsonPropertyName("beacons")] DeskBeacon[] Beacons);
+
+public record DeskOverlay(
+    [property: JsonPropertyName("likes")] int Likes,
+    [property: JsonPropertyName("shares")] int Shares,
+    [property: JsonPropertyName("waiting")] int Waiting);
+
+public record LivePerson(
+    [property: JsonPropertyName("desk_id")] string DeskId,
+    [property: JsonPropertyName("owner_id")] string? OwnerId);
+
+public record MarketCard(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("display_name")] string DisplayName,
+    [property: JsonPropertyName("blurb")] string? Blurb);
+
+public record MarketHit(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("title")] string Title);
+
+public record MarketSearchBox(
+    [property: JsonPropertyName("results")] MarketHit[] Results);
+
+public record MarketAssistBox(
+    [property: JsonPropertyName("suggestions")] string[] Suggestions);
+
+public record MarketSeeded(
+    [property: JsonPropertyName("created")] int Created);
+
+public record MarketListed(
+    [property: JsonPropertyName("listed")] bool? Listed);
+
+public record MarketOffer(
+    [property: JsonPropertyName("amount")] double? Amount,
+    [property: JsonPropertyName("currency")] string? Currency);
+
+public record MarketSale(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record MarketSalesBox(
+    [property: JsonPropertyName("sales")] MarketSale[] Sales);
+
+public record MarketSettings(
+    [property: JsonPropertyName("show_offers")] bool? ShowOffers);
+
+public record ExchangeVocabulary(
+    [property: JsonPropertyName("industries")] string[] Industries,
+    [property: JsonPropertyName("rules")] string[] Rules);
+
+public record ExchangeItemRow(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("kind")] string? Kind);
+
+public record ExchangeDeal(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("work")] string? Work,
+    [property: JsonPropertyName("state")] string State,
+    [property: JsonPropertyName("items")] ExchangeItemRow[]? Items);
+
+public record ExchangeBox(
+    [property: JsonPropertyName("exchanges")] ExchangeDeal[] Exchanges);
+
+public record ExchangeChannel(
+    [property: JsonPropertyName("room_id")] string? RoomId);

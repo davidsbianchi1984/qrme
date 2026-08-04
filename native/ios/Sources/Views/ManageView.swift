@@ -4,7 +4,7 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign", voice = "Voice", desk = "Desk" }
+    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign", voice = "Voice", desk = "Desk", counter = "Counter", trade = "Trade", deals = "Deals" }
     @State private var tab: Tab = .general
 
     var body: some View {
@@ -12,7 +12,7 @@ struct ManageView: View {
             Picker("", selection: $tab) {
                 ForEach(Tab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.menu).tint(Theme.brandA)
             .padding(.horizontal, 20).padding(.top, 12)
 
             switch tab {
@@ -26,6 +26,9 @@ struct ManageView: View {
             case .signatures: SignatureSection()
             case .voice: VoiceSection()
             case .desk: DeskSection()
+            case .counter: CounterSection()
+            case .trade: TradeSection()
+            case .deals: DealsSection()
             }
         }
     }

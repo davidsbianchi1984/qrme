@@ -1664,7 +1664,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop", "Corner", "People").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop", "Corner", "People", "Counter", "Trade", "Deals").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1683,7 +1683,10 @@ fun ManageScreen(vm: StudioViewModel) {
                 9 -> DeskPanel(vm)
                 10 -> ShopPanel(vm)
                 11 -> CornerPanel(vm)
-                else -> PeoplePanel(vm)
+                12 -> PeoplePanel(vm)
+                13 -> CounterPanel(vm)
+                14 -> TradePanel(vm)
+                else -> DealsPanel(vm)
             }
         }
     }
@@ -2735,6 +2738,467 @@ private fun PeoplePanel(vm: StudioViewModel) {
                     }
                 }
             }
+        }
+
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
+
+
+// ---- Standing behind the counter: desks, the market, exchanges ----
+//
+// The caller's side shipped long ago. What no shell could do was the
+// other side of the same counter — open a desk, staff it, decide who
+// comes through, print its sticker — nor search, price, sell or buy in
+// the market, nor be a party to an exchange at all.
+@Composable
+private fun CounterPanel(vm: StudioViewModel) {
+    val lang = L10n.deviceLanguage()
+    var deskId by remember { mutableStateOf("") }
+    var deskToken by remember { mutableStateOf("") }
+    var displayName by remember { mutableStateOf("") }
+    var trade by remember { mutableStateOf("") }
+    var attestor by remember { mutableStateOf("") }
+    var basis by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var blurb by remember { mutableStateOf("") }
+    var card by remember { mutableStateOf<DeskCard?>(null) }
+    var nearby by remember { mutableStateOf<List<DeskBrief>>(emptyList()) }
+    var rings by remember { mutableStateOf<List<DeskRing>>(emptyList()) }
+    var guests by remember { mutableStateOf<List<DeskGuest>>(emptyList()) }
+    var beacons by remember { mutableStateOf<List<DeskBeacon>>(emptyList()) }
+    var beaconLabel by remember { mutableStateOf("") }
+    var overlay by remember { mutableStateOf<DeskOverlay?>(null) }
+    var staffedBy by remember { mutableStateOf<String?>(null) }
+    var knockNote by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf<String?>(null) }
+
+    // The three presences the backend accepts, offered as the closed set
+    // it is — a free field would earn the refusal on every typo.
+    val presences = listOf("attended", "away", "closed")
+
+    fun reload() {
+        vm.call({ ApiClient.desks() }) { r -> nearby = r.getOrDefault(emptyList()) }
+        if (deskId.isBlank()) return
+        vm.call({ ApiClient.deskOverlay(deskId) }) { r -> overlay = r.getOrNull() }
+        vm.call({ ApiClient.deskLivePerson(deskId) }) { r -> staffedBy = r.getOrNull() }
+        if (deskToken.isBlank()) return
+        vm.call({ ApiClient.deskRings(deskId, deskToken) }) { r -> rings = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.deskGuests(deskId, deskToken) }) { r -> guests = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.deskBeacons(deskId, deskToken) }) { r -> beacons = r.getOrDefault(emptyList()) }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    fun act(op: suspend () -> Unit) {
+        note = null
+        vm.call({ op() }) { r ->
+            r.exceptionOrNull()?.let { note = it.message }
+            reload()
+        }
+    }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("counter.open", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("counter.attested", lang), color = Qrme.T2, fontSize = 11.sp)
+            labeledField(L10n.t("counter.name", lang), displayName, "") { displayName = it }
+            labeledField(L10n.t("counter.trade", lang), trade, "") { trade = it }
+            labeledField(L10n.t("counter.attestor", lang), attestor, "") { attestor = it }
+            labeledField(L10n.t("counter.basis", lang), basis, "") { basis = it }
+            labeledField(L10n.t("counter.where", lang), location, "") { location = it }
+            labeledField(L10n.t("counter.blurb", lang), blurb, "") { blurb = it }
+            BrandButton(L10n.t("counter.open.go", lang),
+                        enabled = displayName.isNotBlank() && trade.isNotBlank()
+                                  && attestor.isNotBlank() && basis.isNotBlank()) {
+                vm.call({ ApiClient.openDesk(vm.pid!!, displayName, trade, attestor,
+                    basis, location, blurb, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                    r.getOrNull()?.let {
+                        card = it; deskId = it.deskId; deskToken = it.deskToken ?: ""
+                    }
+                    reload()
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("counter.mine", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("counter.desk_id", lang), deskId, "") { deskId = it }
+            labeledField(L10n.t("counter.desk_token", lang), deskToken, "") { deskToken = it }
+            card?.let { Text(it.displayName + " · " + it.presence, color = Qrme.T2, fontSize = 12.sp) }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                presences.forEach { p ->
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.setDeskPresence(deskId, p, deskToken) }) { r ->
+                            card = r.getOrNull()
+                            r.exceptionOrNull()?.let { note = it.message }
+                        }
+                    }) { Text(L10n.t("counter.presence." + p, lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                }
+            }
+            TextButton(onClick = { act { ApiClient.setDeskCamera(deskId, true, deskToken) } }) {
+                Text(L10n.t("counter.camera", lang), color = Qrme.BrandA, fontSize = 11.sp)
+            }
+            TextButton(onClick = { act { ApiClient.setDeskPortrait(deskId, deskToken) } }) {
+                Text(L10n.t("counter.portrait", lang), color = Qrme.BrandA, fontSize = 11.sp)
+            }
+            if (deskId.isNotBlank()) {
+                Text(ApiClient.deskViewUrl(deskId), color = Qrme.T3, fontSize = 10.sp)
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("counter.bell", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            rings.forEach { r ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(r.note ?: r.id, color = Qrme.T2, fontSize = 11.sp)
+                    TextButton(onClick = { act { ApiClient.ackDeskRing(deskId, r.id, deskToken) } }) {
+                        Text(L10n.t("counter.ack", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                    }
+                }
+            }
+            Text(L10n.t("counter.guests", lang), color = Qrme.Txt, fontSize = 12.sp)
+            guests.forEach { g ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text((g.displayName ?: g.guestId) + " · " + g.status, color = Qrme.T2, fontSize = 11.sp)
+                    Row {
+                        TextButton(onClick = { act { ApiClient.acceptDeskGuest(deskId, g.id, deskToken) } }) {
+                            Text(L10n.t("counter.accept", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                        }
+                        TextButton(onClick = { act { ApiClient.declineDeskGuest(deskId, g.id, deskToken) } }) {
+                            Text(L10n.t("counter.decline", lang), color = Qrme.Red, fontSize = 11.sp)
+                        }
+                    }
+                }
+            }
+            overlay?.let {
+                Text(L10n.t("counter.waiting", lang) + " " + it.waiting, color = Qrme.T3, fontSize = 11.sp)
+            }
+            staffedBy?.let { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("counter.sticker", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("counter.sticker.note", lang), color = Qrme.T2, fontSize = 11.sp)
+            labeledField(L10n.t("counter.sticker.label", lang), beaconLabel, "") { beaconLabel = it }
+            BrandButton(L10n.t("counter.sticker.make", lang), enabled = beaconLabel.isNotBlank()) {
+                val label = beaconLabel; beaconLabel = ""
+                act { ApiClient.addDeskBeacon(deskId, label, deskToken) }
+            }
+            beacons.forEach { b ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text((b.label ?: b.id), color = Qrme.T2, fontSize = 11.sp)
+                    Text(ApiClient.deskBeaconQrUrl(b.id), color = Qrme.T3, fontSize = 9.sp)
+                    TextButton(onClick = { act { ApiClient.removeDeskBeacon(b.id, deskToken) } }) {
+                        Text(L10n.t("counter.sticker.drop", lang), color = Qrme.Red, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("counter.walkup", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            nearby.forEach { d ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(d.displayName + " · " + d.presence, color = Qrme.T2, fontSize = 11.sp)
+                    TextButton(onClick = { deskId = d.id }) {
+                        Text(L10n.t("counter.pick", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                    }
+                }
+            }
+            labeledField(L10n.t("counter.knock.note", lang), knockNote, "") { knockNote = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                BrandButton(L10n.t("counter.knock", lang), enabled = deskId.isNotBlank()) {
+                    val why = knockNote; knockNote = ""
+                    act { ApiClient.askToJoinDesk(deskId, why, vm.interactorToken ?: "") }
+                }
+                TextButton(onClick = { act { ApiClient.leaveDesk(deskId, vm.interactorToken ?: "") } }) {
+                    Text(L10n.t("counter.leave", lang), color = Qrme.Red, fontSize = 12.sp)
+                }
+            }
+        }
+
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
+
+@Composable
+private fun TradePanel(vm: StudioViewModel) {
+    val lang = L10n.deviceLanguage()
+    var cards by remember { mutableStateOf<List<MarketCard>>(emptyList()) }
+    var localities by remember { mutableStateOf<List<String>>(emptyList()) }
+    var query by remember { mutableStateOf("") }
+    var hits by remember { mutableStateOf<List<MarketHit>>(emptyList()) }
+    var need by remember { mutableStateOf("") }
+    var suggestions by remember { mutableStateOf<List<String>>(emptyList()) }
+    var listingId by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var acceptPrice by remember { mutableStateOf("") }
+    var venue by remember { mutableStateOf("") }
+    var offer by remember { mutableStateOf<MarketOffer?>(null) }
+    var sales by remember { mutableStateOf<List<MarketSale>>(emptyList()) }
+    var showOffers by remember { mutableStateOf(true) }
+    var blurb by remember { mutableStateOf("") }
+    var locality by remember { mutableStateOf("") }
+    var tags by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.marketplace() }) { r -> cards = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.marketLocalities() }) { r -> localities = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.marketSales(vm.token!!) }) { r -> sales = r.getOrDefault(emptyList()) }
+        vm.interactorId?.let { who ->
+            vm.call({ ApiClient.marketSettings(who, vm.token!!) }) { r ->
+                showOffers = r.getOrDefault(true)
+            }
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    fun act(op: suspend () -> Unit) {
+        note = null
+        vm.call({ op() }) { r ->
+            r.exceptionOrNull()?.let { note = it.message }
+            reload()
+        }
+    }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("trade.find", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("trade.query", lang), query, "") { query = it }
+            BrandButton(L10n.t("trade.search", lang), enabled = query.isNotBlank()) {
+                vm.call({ ApiClient.marketSearch(query) }) { r ->
+                    hits = r.getOrDefault(emptyList())
+                    r.exceptionOrNull()?.let { note = it.message }
+                }
+            }
+            hits.forEach { Text(it.title, color = Qrme.T2, fontSize = 11.sp) }
+            labeledField(L10n.t("trade.need", lang), need, "") { need = it }
+            BrandButton(L10n.t("trade.assist", lang), enabled = need.isNotBlank()) {
+                vm.call({ ApiClient.marketAssist(need) }) { r ->
+                    suggestions = r.getOrDefault(emptyList())
+                }
+            }
+            if (suggestions.isNotEmpty()) {
+                Text(suggestions.joinToString(" · "), color = Qrme.T3, fontSize = 11.sp)
+            }
+            if (localities.isNotEmpty()) {
+                Text(localities.joinToString(" · "), color = Qrme.T3, fontSize = 11.sp)
+            }
+            cards.forEach { Text(it.displayName, color = Qrme.T2, fontSize = 11.sp) }
+            TextButton(onClick = { act { ApiClient.seedMarketplace() } }) {
+                Text(L10n.t("trade.seed", lang), color = Qrme.BrandA, fontSize = 11.sp)
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("trade.stand", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("trade.blurb", lang), blurb, "") { blurb = it }
+            labeledField(L10n.t("trade.locality", lang), locality, "") { locality = it }
+            labeledField(L10n.t("trade.tags", lang), tags, "") { tags = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                BrandButton(L10n.t("trade.list", lang)) {
+                    act { ApiClient.listInMarketplace(vm.pid!!, blurb, locality,
+                        tags.split(",").map { it.trim() }.filter { it.isNotEmpty() },
+                        vm.token!!) }
+                }
+                TextButton(onClick = { act { ApiClient.unlistFromMarketplace(vm.pid!!, vm.token!!) } }) {
+                    Text(L10n.t("trade.unlist", lang), color = Qrme.Red, fontSize = 12.sp)
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("trade.price", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("trade.listing", lang), listingId, "") { listingId = it }
+            labeledField(L10n.t("trade.amount", lang), amount, "") { amount = it }
+            labeledField(L10n.t("trade.accept", lang), acceptPrice, "") { acceptPrice = it }
+            offer?.amount?.let {
+                Text(L10n.t("trade.asking", lang) + " " + it, color = Qrme.T2, fontSize = 11.sp)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                TextButton(onClick = {
+                    act { ApiClient.setListingOffer(listingId,
+                        amount.toDoubleOrNull() ?: 0.0, acceptPrice.toDoubleOrNull(), vm.token!!) }
+                }) { Text(L10n.t("trade.set", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                TextButton(onClick = {
+                    vm.call({ ApiClient.listingOffer(listingId) }) { r -> offer = r.getOrNull() }
+                }) { Text(L10n.t("trade.show", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                TextButton(onClick = { act { ApiClient.clearListingOffer(listingId, vm.token!!) } }) {
+                    Text(L10n.t("trade.clear", lang), color = Qrme.Red, fontSize = 11.sp)
+                }
+            }
+            labeledField(L10n.t("trade.venue", lang), venue, "") { venue = it }
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                TextButton(onClick = { act { ApiClient.placeListing(listingId, venue, vm.token!!) } }) {
+                    Text(L10n.t("trade.place", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                }
+                TextButton(onClick = { act { ApiClient.unplaceListing(listingId, vm.token!!) } }) {
+                    Text(L10n.t("trade.unplace", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                }
+                TextButton(onClick = { act { ApiClient.removeMarketListing(listingId, vm.token!!) } }) {
+                    Text(L10n.t("trade.pull", lang), color = Qrme.Red, fontSize = 11.sp)
+                }
+            }
+            BrandButton(L10n.t("trade.buy", lang), enabled = listingId.isNotBlank()) {
+                act { ApiClient.purchaseListing(listingId, vm.interactorToken ?: "") }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("trade.sales", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            sales.forEach { Text(it.id + " · " + it.status, color = Qrme.T2, fontSize = 11.sp) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(checked = showOffers, onCheckedChange = { want ->
+                    showOffers = want
+                    act { ApiClient.setMarketSettings(vm.interactorId ?: "", want, vm.token!!) }
+                })
+                Text(L10n.t("trade.show_offers", lang), color = Qrme.T2, fontSize = 12.sp)
+            }
+        }
+
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
+
+@Composable
+private fun DealsPanel(vm: StudioViewModel) {
+    val lang = L10n.deviceLanguage()
+    var vocabulary by remember { mutableStateOf<ExchangeVocabulary?>(null) }
+    var guestId by remember { mutableStateOf("") }
+    var work by remember { mutableStateOf("") }
+    var industry by remember { mutableStateOf("software") }
+    var fee by remember { mutableStateOf("") }
+    var exchangeId by remember { mutableStateOf("") }
+    var deal by remember { mutableStateOf<ExchangeDeal?>(null) }
+    var mine by remember { mutableStateOf<List<ExchangeDeal>>(emptyList()) }
+    var itemName by remember { mutableStateOf("") }
+    var channel by remember { mutableStateOf<String?>(null) }
+    var note by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.exchangeVocabulary() }) { r -> vocabulary = r.getOrNull() }
+        vm.call({ ApiClient.myExchanges(vm.pid!!, vm.token!!) }) { r ->
+            mine = r.getOrDefault(emptyList()) }
+        if (exchangeId.isBlank()) return
+        vm.call({ ApiClient.exchange(exchangeId, vm.token!!) }) { r -> deal = r.getOrNull() }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    fun act(op: suspend () -> Unit) {
+        note = null
+        vm.call({ op() }) { r ->
+            r.exceptionOrNull()?.let { note = it.message }
+            reload()
+        }
+    }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("deals.propose", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            vocabulary?.let { v ->
+                Text(v.rules.joinToString(" · "), color = Qrme.T2, fontSize = 11.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    v.industries.take(6).forEach { ind ->
+                        TextButton(onClick = { industry = ind }) {
+                            Text(ind, color = Qrme.BrandA, fontSize = 10.sp)
+                        }
+                    }
+                }
+            }
+            labeledField(L10n.t("deals.guest", lang), guestId, "") { guestId = it }
+            labeledField(L10n.t("deals.work", lang), work, "") { work = it }
+            labeledField(L10n.t("deals.fee", lang), fee, "") { fee = it }
+            BrandButton(L10n.t("deals.propose.go", lang),
+                        enabled = guestId.isNotBlank() && work.isNotBlank()) {
+                vm.call({ ApiClient.proposeExchange(vm.pid!!, guestId, work, industry,
+                    fee.toDoubleOrNull() ?: 0.0, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                    r.getOrNull()?.let { deal = it; exchangeId = it.id }
+                    reload()
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("deals.manifest", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("deals.id", lang), exchangeId, "") { exchangeId = it }
+            mine.forEach { d ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text((d.work ?: d.id) + " · " + d.state, color = Qrme.T2, fontSize = 11.sp)
+                    TextButton(onClick = { exchangeId = d.id }) {
+                        Text(L10n.t("deals.pick", lang), color = Qrme.BrandA, fontSize = 11.sp)
+                    }
+                }
+            }
+            deal?.let { d ->
+                Text((d.work ?: "") + " · " + d.state, color = Qrme.Txt, fontSize = 12.sp)
+                d.items.forEach { item ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(item.name + " · " + item.kind, color = Qrme.T2, fontSize = 11.sp)
+                        Row {
+                            TextButton(onClick = {
+                                act { ApiClient.acceptExchangeItem(exchangeId, item.id, vm.token!!) }
+                            }) { Text(L10n.t("deals.take", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                            TextButton(onClick = {
+                                act { ApiClient.removeExchangeItem(exchangeId, item.id, vm.token!!) }
+                            }) { Text(L10n.t("deals.drop", lang), color = Qrme.Red, fontSize = 11.sp) }
+                        }
+                    }
+                }
+            }
+            labeledField(L10n.t("deals.item", lang), itemName, "") { itemName = it }
+            BrandButton(L10n.t("deals.add", lang),
+                        enabled = exchangeId.isNotBlank() && itemName.isNotBlank()) {
+                val name = itemName; itemName = ""
+                act { ApiClient.addExchangeItem(exchangeId, "host_to_guest", name,
+                    "source", vm.token!!) }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("deals.sign", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("deals.sign.note", lang), color = Qrme.T2, fontSize = 11.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                TextButton(onClick = {
+                    vm.call({ ApiClient.signExchange(exchangeId, vm.pid!!, vm.token!!) }) { r ->
+                        deal = r.getOrNull()
+                        r.exceptionOrNull()?.let { note = it.message }
+                    }
+                }) { Text(L10n.t("deals.sign.go", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                TextButton(onClick = {
+                    vm.call({ ApiClient.reopenExchange(exchangeId, vm.pid!!, vm.token!!) }) { r ->
+                        deal = r.getOrNull()
+                    }
+                }) { Text(L10n.t("deals.reopen", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                TextButton(onClick = {
+                    vm.call({ ApiClient.withdrawFromExchange(exchangeId, vm.pid!!, vm.token!!) }) { r ->
+                        deal = r.getOrNull()
+                    }
+                }) { Text(L10n.t("deals.withdraw", lang), color = Qrme.Red, fontSize = 11.sp) }
+            }
+            TextButton(onClick = {
+                vm.call({ ApiClient.exchangeChannel(exchangeId, vm.token!!) }) { r ->
+                    channel = r.getOrNull()
+                }
+            }) { Text(L10n.t("deals.channel", lang), color = Qrme.BrandA, fontSize = 11.sp) }
+            channel?.let { Text(it, color = Qrme.T3, fontSize = 11.sp) }
         }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }

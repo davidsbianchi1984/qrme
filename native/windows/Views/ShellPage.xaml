@@ -51,6 +51,9 @@
             <NavigationViewItem Tag="people">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="People" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Tag="counter">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Shop" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Signatures" Tag="signatures">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Permissions" /></NavigationViewItem.Icon>
             </NavigationViewItem>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.CounterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <!-- Standing behind the counter: the desk staffed rather than knocked
+         at, the market searched and priced rather than only listed on, and
+         exchanges — two parties, one manifest. Every visible string is set
+         in code-behind from L10n. -->
+    <ScrollViewer>
+        <StackPanel MaxWidth="760" Spacing="16" Padding="28" HorizontalAlignment="Left">
+            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="AttestedText" FontSize="13" TextWrapping="Wrap"
+                       Foreground="{StaticResource QrmeT2Brush}" />
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBox x:Name="DeskNameBox" />
+                    <TextBox x:Name="TradeBox" />
+                    <TextBox x:Name="AttestorBox" />
+                    <TextBox x:Name="BasisBox" />
+                    <TextBox x:Name="WhereBox" />
+                    <TextBox x:Name="DeskBlurbBox" />
+                    <Button x:Name="OpenDeskButton" Click="OnOpenDesk" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBox x:Name="DeskIdBox" />
+                    <TextBox x:Name="DeskTokenBox" />
+                    <ComboBox x:Name="PresencePicker" />
+                    <Button x:Name="PresenceButton" Click="OnSetPresence" />
+                    <Button x:Name="CameraButton" Click="OnCamera" />
+                    <Button x:Name="PortraitButton" Click="OnPortrait" />
+                    <Button x:Name="ViewButton" Click="OnDeskView" />
+                    <ItemsControl x:Name="RingList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="RingIdBox" />
+                    <Button x:Name="AckButton" Click="OnAck" />
+                    <ItemsControl x:Name="GuestList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="GuestIdBox" />
+                    <Button x:Name="AcceptGuestButton" Click="OnAcceptGuest" />
+                    <Button x:Name="DeclineGuestButton" Click="OnDeclineGuest" />
+                    <TextBlock x:Name="WaitingText" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="StickerTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="StickerNote" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="StickerLabelBox" />
+                    <Button x:Name="MakeStickerButton" Click="OnMakeSticker" />
+                    <ItemsControl x:Name="BeaconList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="BeaconIdBox" />
+                    <Button x:Name="ShowQrButton" Click="OnShowQr" />
+                    <Button x:Name="DropStickerButton" Click="OnDropSticker" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="WalkupTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="DeskList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="KnockNoteBox" />
+                    <Button x:Name="KnockButton" Click="OnKnock" />
+                    <Button x:Name="LeaveButton" Click="OnLeave" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="FindTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="QueryBox" />
+                    <Button x:Name="SearchButton" Click="OnSearch" />
+                    <TextBox x:Name="NeedBox" />
+                    <Button x:Name="AssistButton" Click="OnAssist" />
+                    <Button x:Name="SeedButton" Click="OnSeed" />
+                    <ItemsControl x:Name="MarketList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="LocalitiesText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="StandTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="StandBlurbBox" />
+                    <TextBox x:Name="LocalityBox" />
+                    <TextBox x:Name="TagsBox" />
+                    <Button x:Name="ListMeButton" Click="OnListMe" />
+                    <Button x:Name="UnlistMeButton" Click="OnUnlistMe" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="PriceTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="ListingIdBox" />
+                    <TextBox x:Name="AmountBox" />
+                    <TextBox x:Name="AcceptBox" />
+                    <Button x:Name="SetOfferButton" Click="OnSetOffer" />
+                    <Button x:Name="ShowOfferButton" Click="OnShowOffer" />
+                    <Button x:Name="ClearOfferButton" Click="OnClearOffer" />
+                    <TextBox x:Name="VenueBox" />
+                    <Button x:Name="PlaceButton" Click="OnPlace" />
+                    <Button x:Name="UnplaceButton" Click="OnUnplace" />
+                    <Button x:Name="PullButton" Click="OnPull" />
+                    <Button x:Name="BuyButton" Click="OnBuy" />
+                    <ItemsControl x:Name="SalesList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ToggleSwitch x:Name="ShowOffersSwitch" Toggled="OnShowOffersToggled" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="DealsTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="RulesText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="GuestPartyBox" />
+                    <TextBox x:Name="WorkBox" />
+                    <TextBox x:Name="FeeBox" />
+                    <Button x:Name="ProposeButton" Click="OnPropose" />
+                    <TextBox x:Name="ExchangeIdBox" />
+                    <ItemsControl x:Name="DealList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="ItemNameBox" />
+                    <Button x:Name="AddItemButton" Click="OnAddItem" />
+                    <TextBox x:Name="ItemIdBox" />
+                    <Button x:Name="TakeItemButton" Click="OnTakeItem" />
+                    <Button x:Name="DropItemButton" Click="OnDropItem" />
+                    <Button x:Name="SignButton" Click="OnSign" />
+                    <Button x:Name="ReopenButton" Click="OnReopen" />
+                    <Button x:Name="WithdrawButton" Click="OnWithdraw" />
+                    <Button x:Name="ChannelButton" Click="OnChannel" />
+                    <TextBlock x:Name="StatusText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -4,6 +4,70 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.0] — 2026-08-04
+
+### The phone could be listed and could not do business
+
+Three blocks of the per-shell doorless record, read together, said one
+thing. The caller's side of a desk shipped long ago — ring the bell,
+join the stream, open a session — and no shell could ever *staff* one:
+open a desk, set its presence, decide who comes through, print the QR
+sticker that is its front door. The market screen could put a card up
+and could not search, price, place, sell or buy. Exchanges — two
+parties, one manifest, the platform's whole apparatus for agreeing to
+work — existed on no shell at all.
+
+    asked     can a phone be found on the platform
+    mattered  can a phone do business on it
+
+Forty-six routes, and a row for each in every one of the three records.
+iOS, Android and Windows each gain **Counter**, **Trade** and **Deals**,
+and each renders three rules the backend already decided rather than
+forming a fourth opinion: presence is the closed set the refusal names
+(`attended`, `away`, `closed`); both parties sign the same manifest and
+any change clears both signatures, each item accepted separately; and a
+desk is a real person, so opening one asks for the attestor and the
+basis rather than letting the refusal do it.
+
+**139 rows struck** — the largest bite taken out of this backlog since
+it was opened. The records fall to ios 251, android 255, windows 253;
+iOS's extra row comes off below, a door that was standing open all
+along.
+
+### Two doors the guard could not see
+
+`clientpaths.IOS` knew one call shape: a path handed to `request(...)`.
+A route that answers **bytes** — the QR sticker, the still of a desk —
+is not fetched that way: the shell builds a URL and an image view does
+the GET. Two live doors read as absent.
+
+The third time this lesson has come round; Android's `URL(` form is in
+the file for it, and PDI's ported verb assumption was the second.
+
+    asked     does the shell call the transport helper for this route
+    mattered  does the shell fetch this route at all
+
+The new rule then failed the same way its predecessors did, and the
+suite caught it before it shipped: declared `verb="GET"` on the claim
+that a URL built this way is a URL to *read*, it reported a phantom
+`GET /marketplace/listings/{id}` — the older `removeListing` builds its
+URL the same way and sets `httpMethod = "DELETE"` two lines down. So
+the verb is read, exactly as Kotlin's `requestMethod` is — and reading
+it found a fourth door nothing knew about: `unlistLicense`, the same
+idiom, on the ios doorless record since the licensing round. The same
+correction lands in JIM and PDI, where it takes one false row off each
+of their ios records too: doors that had been standing open the whole
+time.
+
+### A delete that worked reported a failure
+
+Driving the new bindings turned up the reason to drive them: several
+routes answer **204 No Content**, and all three shells decoded the body
+unconditionally. Zero bytes threw, so every successful delete put an
+error on the screen. An empty success now decodes as an empty object in
+each shell — and still throws for a response that genuinely needed
+content.
+
 ## [0.42.9] — 2026-08-04
 
 ### The people around a profile reach the phones

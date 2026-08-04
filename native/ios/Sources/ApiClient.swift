@@ -708,7 +708,16 @@ actor ApiClient {
             let said = (body?["message"] as? String) ?? (body?["detail"] as? String)
             throw ApiError.http(said ?? "HTTP \(http.statusCode)")
         }
-        return try JSONDecoder().decode(T.self, from: data)
+        // A 204 — or any success with an empty body — is the route saying
+        // "done, nothing to report". Decoding zero bytes throws, which
+        // turned every successful delete into a failure message on the
+        // screen. An empty object decodes into any shape whose fields are
+        // optional, and still throws for one that genuinely needed content.
+        //
+        //     asked     did the response parse
+        //     mattered  did the request succeed
+        let payload = data.isEmpty ? Data("{}".utf8) : data
+        return try JSONDecoder().decode(T.self, from: payload)
     }
 
     func health() async throws -> Health { try await request("/health") }
@@ -1766,5 +1775,463 @@ extension ApiClient {
         struct Gone: Decodable { let deleted: Bool? }
         let _: Gone = try await request("/comments/\(commentId)",
                                         method: "DELETE", token: token)
+    }
+}
+
+// MARK: - Standing behind the counter: desks, the market, exchanges
+//
+// The caller's side of a desk shipped long ago — ring the bell, join the
+// stream, open a session. What never reached a phone was the *other*
+// side: opening a desk, staffing it, deciding who comes through, and
+// putting its QR sticker on a wall. Same shape in the market (a card
+// could go up; nothing could search, price, sell or buy) and in
+// exchanges, which no shell had at all.
+
+struct DeskCard: Decodable, Identifiable {
+    let desk_id: String
+    let display_name: String
+    let trade: String?
+    let location: String?
+    let blurb: String?
+    let presence: String
+    let rated: Bool
+    let desk_token: String?
+    var id: String { desk_id }
+}
+
+struct DeskBrief: Decodable, Identifiable {
+    let id: String
+    let display_name: String
+    let trade: String?
+    let location: String?
+    let presence: String
+    let rated: Int?
+}
+
+struct DeskRing: Decodable, Identifiable {
+    let id: String
+    let caller_id: String?
+    let note: String?
+    let acked: Bool?
+    let at: String?
+}
+
+struct DeskGuest: Decodable, Identifiable {
+    let id: String
+    let guest_id: String
+    let display_name: String?
+    let note: String?
+    let status: String
+}
+
+struct DeskBeacon: Decodable, Identifiable {
+    let id: String
+    let label: String?
+    let url: String?
+}
+
+struct DeskOverlay: Decodable {
+    let comments: [String]?
+    let likes: Int
+    let shares: Int
+    let gift_total: Double?
+    let waiting: Int
+}
+
+struct LivePerson: Decodable {
+    let desk_id: String
+    let owner_id: String?
+}
+
+struct MarketCard: Decodable, Identifiable {
+    let profile_id: String
+    let display_name: String
+    let purpose: String?
+    let blurb: String?
+    let tags: [String]?
+    var id: String { profile_id }
+}
+
+struct MarketHit: Decodable, Identifiable {
+    let id: String
+    let kind: String?
+    let title: String
+    let blurb: String?
+}
+
+struct MarketSearch: Decodable {
+    let query: String
+    let scope: String?
+    let results: [MarketHit]
+}
+
+struct MarketAssist: Decodable {
+    let need: String
+    let suggestions: [String]
+    let note: String?
+}
+
+struct MarketOffer: Decodable {
+    let listing_id: String?
+    let amount: Double?
+    let currency: String?
+    let accept_price: Double?
+    let status: String?
+}
+
+struct MarketSale: Decodable, Identifiable {
+    let id: String
+    let listing_id: String?
+    let amount: Double?
+    let currency: String?
+    let status: String?
+}
+
+struct MarketSettings: Decodable {
+    let interactor_id: String?
+    let show_offers: Bool?
+}
+
+struct ExchangeVocabulary: Decodable {
+    let industries: [String]
+    let states: [String]
+    let directions: [String]
+    let max_items: Int
+    let rules: [String]
+}
+
+struct ExchangeItem: Decodable, Identifiable {
+    let id: String
+    let direction: String
+    let name: String
+    let kind: String
+    let accepted: Bool?
+}
+
+struct ExchangeDeal: Decodable, Identifiable {
+    let id: String
+    let host_id: String?
+    let guest_id: String?
+    let work: String?
+    let industry: String?
+    let state: String
+    let items: [ExchangeItem]?
+    let signed_by: [String]?
+}
+
+extension ApiClient {
+
+    // -- the desk, from behind it ---------------------------------------
+
+    func desks() async throws -> [DeskBrief] {
+        try await request("/desks")
+    }
+
+    func openDesk(ownerId: String, displayName: String, trade: String,
+                  attestor: String, basis: String, location: String?,
+                  blurb: String?, token: String) async throws -> DeskCard {
+        var body: [String: Any] = [
+            "owner_id": ownerId, "display_name": displayName, "trade": trade,
+            "attestor": attestor, "basis": basis]
+        if let location, !location.isEmpty { body["location"] = location }
+        if let blurb, !blurb.isEmpty { body["blurb"] = blurb }
+        return try await request("/desks", method: "POST", body: body,
+                                 token: token)
+    }
+
+    func setDeskPresence(deskId: String, presence: String,
+                         token: String) async throws -> DeskCard {
+        try await request("/desks/\(deskId)/presence", method: "PUT",
+                          body: ["presence": presence], token: token)
+    }
+
+    func setDeskPortrait(deskId: String, asset: String?,
+                         token: String) async throws -> DeskCard {
+        try await request("/desks/\(deskId)/portrait", method: "PUT",
+                          body: ["asset": asset as Any], token: token)
+    }
+
+    func setDeskCamera(deskId: String, enabled: Bool,
+                       token: String) async throws -> DeskCard {
+        try await request("/desks/\(deskId)/camera", method: "PUT",
+                          body: ["enabled": enabled], token: token)
+    }
+
+    func deskRings(deskId: String, token: String) async throws -> [DeskRing] {
+        struct Box: Decodable { let rings: [DeskRing] }
+        let box: Box = try await request("/desks/\(deskId)/rings",
+                                         token: token)
+        return box.rings
+    }
+
+    func ackDeskRing(deskId: String, ringId: String,
+                     token: String) async throws {
+        struct Ok: Decodable { let acked: Bool? }
+        let _: Ok = try await request(
+            "/desks/\(deskId)/rings/\(ringId)/ack", method: "POST",
+            token: token)
+    }
+
+    /// Knocking: the caller asks to come through to the desk.
+    func askToJoinDesk(deskId: String, note: String?,
+                       token: String) async throws -> DeskGuest {
+        try await request("/desks/\(deskId)/guests", method: "POST",
+                          body: ["note": note as Any], token: token)
+    }
+
+    func deskGuests(deskId: String, token: String) async throws -> [DeskGuest] {
+        struct Box: Decodable { let guests: [DeskGuest] }
+        let box: Box = try await request("/desks/\(deskId)/guests",
+                                         token: token)
+        return box.guests
+    }
+
+    func acceptDeskGuest(deskId: String, requestId: String,
+                         token: String) async throws -> DeskGuest {
+        try await request("/desks/\(deskId)/guests/\(requestId)/accept",
+                          method: "POST", token: token)
+    }
+
+    func declineDeskGuest(deskId: String, requestId: String,
+                          token: String) async throws -> DeskGuest {
+        try await request("/desks/\(deskId)/guests/\(requestId)/decline",
+                          method: "POST", token: token)
+    }
+
+    /// The caller's own way out — theirs to press, not the desk's.
+    func leaveDesk(deskId: String, token: String) async throws {
+        struct Ok: Decodable { let left: Bool? }
+        let _: Ok = try await request("/desks/\(deskId)/guests/me",
+                                      method: "DELETE", token: token)
+    }
+
+    func addDeskBeacon(deskId: String, label: String,
+                       token: String) async throws -> DeskBeacon {
+        try await request("/desks/\(deskId)/beacons", method: "POST",
+                          body: ["label": label], token: token)
+    }
+
+    func deskBeacons(deskId: String,
+                     token: String) async throws -> [DeskBeacon] {
+        struct Box: Decodable { let beacons: [DeskBeacon] }
+        let box: Box = try await request("/desks/\(deskId)/beacons",
+                                         token: token)
+        return box.beacons
+    }
+
+    func removeDeskBeacon(beaconId: String, token: String) async throws {
+        struct Ok: Decodable { let removed: Bool? }
+        let _: Ok = try await request("/desk-beacons/\(beaconId)",
+                                      method: "DELETE", token: token)
+    }
+
+    /// The sticker itself. A URL rather than bytes: the sticker is drawn
+    /// by an image view, and handing it a URL is one fetch, not two.
+    func deskBeaconQrUrl(beaconId: String) -> URL {
+        base.appendingPathComponent("/desk-beacons/\(beaconId)/qr.svg")
+    }
+
+    func deskOverlay(deskId: String) async throws -> DeskOverlay {
+        try await request("/desks/\(deskId)/overlay")
+    }
+
+    func deskLivePerson(deskId: String) async throws -> LivePerson {
+        try await request("/desks/\(deskId)/live-person")
+    }
+
+    /// What the desk looks like right now, as a still.
+    func deskViewUrl(deskId: String) -> URL {
+        base.appendingPathComponent("/desks/\(deskId)/view.webp")
+    }
+
+    // -- the market, from both sides ------------------------------------
+
+    func marketplace() async throws -> [MarketCard] {
+        try await request("/marketplace")
+    }
+
+    func marketSearch(_ query: String) async throws -> MarketSearch {
+        try await request("/marketplace/search", query: ["q": query])
+    }
+
+    func marketLocalities() async throws -> [String] {
+        try await request("/marketplace/localities")
+    }
+
+    func marketAssist(need: String) async throws -> MarketAssist {
+        try await request("/marketplace/assist", method: "POST",
+                          body: ["need": need])
+    }
+
+    /// The demo shelf: one press and the market has something on it.
+    func seedMarketplace() async throws -> [String: Int] {
+        struct Seeded: Decodable { let created: Int }
+        let out: Seeded = try await request("/marketplace/seed",
+                                            method: "POST")
+        return ["created": out.created]
+    }
+
+    func listInMarketplace(profileId: String, blurb: String, locality: String,
+                           tags: [String], token: String) async throws {
+        struct Ok: Decodable { let listed: Bool }
+        let _: Ok = try await request(
+            "/profiles/\(profileId)/marketplace", method: "POST",
+            body: ["blurb": blurb, "locality": locality, "tags": tags],
+            token: token)
+    }
+
+    func unlistFromMarketplace(profileId: String,
+                               token: String) async throws {
+        struct Ok: Decodable { let listed: Bool? }
+        let _: Ok = try await request("/profiles/\(profileId)/marketplace",
+                                      method: "DELETE", token: token)
+    }
+
+    func removeListing(listingId: String, token: String) async throws {
+        struct Ok: Decodable { let removed: Bool? }
+        let _: Ok = try await request("/marketplace/listings/\(listingId)",
+                                      method: "DELETE", token: token)
+    }
+
+    func listingOffer(listingId: String) async throws -> MarketOffer {
+        try await request("/marketplace/listings/\(listingId)/offer")
+    }
+
+    func setListingOffer(listingId: String, amount: Double, currency: String,
+                         acceptPrice: Double?,
+                         token: String) async throws -> MarketOffer {
+        var body: [String: Any] = ["amount": amount, "currency": currency]
+        if let acceptPrice { body["accept_price"] = acceptPrice }
+        return try await request(
+            "/marketplace/listings/\(listingId)/offer", method: "PUT",
+            body: body, token: token)
+    }
+
+    func clearListingOffer(listingId: String, token: String) async throws {
+        struct Ok: Decodable { let cleared: Bool? }
+        let _: Ok = try await request(
+            "/marketplace/listings/\(listingId)/offer", method: "DELETE",
+            token: token)
+    }
+
+    func placeListing(listingId: String, venue: String,
+                      token: String) async throws -> MarketOffer {
+        try await request("/marketplace/listings/\(listingId)/place",
+                          method: "PUT", body: ["venue": venue],
+                          token: token)
+    }
+
+    func unplaceListing(listingId: String, token: String) async throws {
+        struct Ok: Decodable { let placed: Bool? }
+        let _: Ok = try await request(
+            "/marketplace/listings/\(listingId)/place", method: "DELETE",
+            token: token)
+    }
+
+    func purchaseListing(listingId: String,
+                         token: String) async throws -> MarketSale {
+        try await request("/marketplace/listings/\(listingId)/purchase",
+                          method: "POST", token: token)
+    }
+
+    func marketSales(token: String) async throws -> [MarketSale] {
+        struct Box: Decodable { let sales: [MarketSale] }
+        let box: Box = try await request("/marketplace/sales", token: token)
+        return box.sales
+    }
+
+    func marketSettings(interactorId: String,
+                        token: String) async throws -> MarketSettings {
+        try await request("/marketplace/settings/\(interactorId)",
+                          token: token)
+    }
+
+    func setMarketSettings(interactorId: String, showOffers: Bool,
+                           token: String) async throws -> MarketSettings {
+        try await request("/marketplace/settings/\(interactorId)",
+                          method: "PUT", body: ["show_offers": showOffers],
+                          token: token)
+    }
+
+    // -- exchanges: two parties, one manifest ---------------------------
+
+    func exchangeVocabulary() async throws -> ExchangeVocabulary {
+        try await request("/exchanges/vocabulary")
+    }
+
+    func proposeExchange(hostId: String, guestId: String, work: String,
+                         industry: String, fee: Double,
+                         token: String) async throws -> ExchangeDeal {
+        try await request("/exchanges", method: "POST",
+                          body: ["host_id": hostId, "guest_id": guestId,
+                                 "work": work, "industry": industry,
+                                 "fee": fee], token: token)
+    }
+
+    func exchange(exchangeId: String,
+                  token: String) async throws -> ExchangeDeal {
+        try await request("/exchanges/\(exchangeId)", token: token)
+    }
+
+    func addExchangeItem(exchangeId: String, direction: String, name: String,
+                         kind: String,
+                         token: String) async throws -> ExchangeItem {
+        try await request("/exchanges/\(exchangeId)/items", method: "POST",
+                          body: ["direction": direction, "name": name,
+                                 "kind": kind], token: token)
+    }
+
+    func removeExchangeItem(exchangeId: String, itemId: String,
+                            token: String) async throws {
+        struct Ok: Decodable { let removed: Bool? }
+        let _: Ok = try await request(
+            "/exchanges/\(exchangeId)/items/\(itemId)", method: "DELETE",
+            token: token)
+    }
+
+    /// Each item is accepted separately — nothing moves by itself.
+    func acceptExchangeItem(exchangeId: String, itemId: String,
+                            token: String) async throws -> ExchangeItem {
+        try await request(
+            "/exchanges/\(exchangeId)/items/\(itemId)/accept",
+            method: "POST", token: token)
+    }
+
+    /// Both parties sign the same manifest; any change clears both.
+    func signExchange(exchangeId: String, actorId: String,
+                      token: String) async throws -> ExchangeDeal {
+        try await request("/exchanges/\(exchangeId)/sign", method: "POST",
+                          body: ["actor_id": actorId], token: token)
+    }
+
+    func reopenExchange(exchangeId: String, actorId: String,
+                        token: String) async throws -> ExchangeDeal {
+        try await request("/exchanges/\(exchangeId)/reopen", method: "POST",
+                          body: ["actor_id": actorId], token: token)
+    }
+
+    func withdrawFromExchange(exchangeId: String, actorId: String,
+                              token: String) async throws -> ExchangeDeal {
+        try await request("/exchanges/\(exchangeId)/withdraw",
+                          method: "POST", body: ["actor_id": actorId],
+                          token: token)
+    }
+
+    /// Every deal this party is in — the list a phone needs before it can
+    /// open one, which is why it belongs beside the rest of the block.
+    func myExchanges(partyId: String,
+                     token: String) async throws -> [ExchangeDeal] {
+        struct Box: Decodable { let exchanges: [ExchangeDeal] }
+        let box: Box = try await request("/parties/\(partyId)/exchanges",
+                                         token: token)
+        return box.exchanges
+    }
+
+    func exchangeChannel(exchangeId: String,
+                         token: String) async throws -> [String: String] {
+        struct Channel: Decodable { let room_id: String? }
+        let out: Channel = try await request(
+            "/exchanges/\(exchangeId)/channel", token: token)
+        return ["room_id": out.room_id ?? ""]
     }
 }

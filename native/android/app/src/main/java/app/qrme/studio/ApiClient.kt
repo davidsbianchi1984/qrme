@@ -1523,6 +1523,383 @@ object ApiClient {
         request("/comments/$commentId", "DELETE", token = token)
     }
 
+
+    // ---- standing behind the counter: desks, the market, exchanges ----
+    //
+    // The caller's side shipped long ago. What no shell could do was the
+    // other side of the same counter — open a desk, staff it, decide who
+    // comes through, print its sticker — nor search, price, sell or buy in
+    // the market, nor be a party to an exchange at all.
+
+    private fun deskCardOf(o: JSONObject) = DeskCard(
+        o.optString("desk_id"), o.optString("display_name"),
+        if (o.isNull("trade")) null else o.optString("trade"),
+        if (o.isNull("location")) null else o.optString("location"),
+        o.optString("presence"), o.optBoolean("rated"),
+        if (o.isNull("desk_token")) null else o.optString("desk_token"))
+
+    suspend fun desks(): List<DeskBrief> {
+        val a = JSONArray(request("/desks"))
+        val out = mutableListOf<DeskBrief>()
+        for (i in 0 until a.length()) {
+            val d = a.getJSONObject(i)
+            out.add(DeskBrief(d.getString("id"), d.optString("display_name"),
+                if (d.isNull("trade")) null else d.optString("trade"),
+                o2(d, "location"), d.optString("presence")))
+        }
+        return out
+    }
+
+    /** A 204 — or any success with an empty body — is the route saying
+     *  "done, nothing to report". `JSONObject("")` throws, which turned
+     *  every successful delete into an error on screen. */
+    private fun bodyOf(raw: String) =
+        JSONObject(if (raw.isBlank()) "{}" else raw)
+
+    private fun o2(o: JSONObject, key: String) =
+        if (o.isNull(key)) null else o.optString(key)
+
+    suspend fun openDesk(ownerId: String, displayName: String, trade: String,
+                         attestor: String, basis: String, location: String,
+                         blurb: String, token: String): DeskCard {
+        val body = JSONObject().put("owner_id", ownerId)
+            .put("display_name", displayName).put("trade", trade)
+            .put("attestor", attestor).put("basis", basis)
+        if (location.isNotBlank()) body.put("location", location)
+        if (blurb.isNotBlank()) body.put("blurb", blurb)
+        return deskCardOf(JSONObject(request("/desks", "POST", body, token)))
+    }
+
+    suspend fun setDeskPresence(deskId: String, presence: String,
+                                token: String): DeskCard {
+        return deskCardOf(JSONObject(request("/desks/$deskId/presence", "PUT",
+            JSONObject().put("presence", presence), token)))
+    }
+
+    suspend fun setDeskPortrait(deskId: String, token: String): DeskCard {
+        return deskCardOf(JSONObject(request("/desks/$deskId/portrait", "PUT",
+            JSONObject().put("asset", JSONObject.NULL), token)))
+    }
+
+    suspend fun setDeskCamera(deskId: String, enabled: Boolean,
+                              token: String): DeskCard {
+        return deskCardOf(JSONObject(request("/desks/$deskId/camera", "PUT",
+            JSONObject().put("enabled", enabled), token)))
+    }
+
+    suspend fun deskRings(deskId: String, token: String): List<DeskRing> {
+        val o = JSONObject(request("/desks/$deskId/rings", token = token))
+        val out = mutableListOf<DeskRing>()
+        o.optJSONArray("rings")?.let { a ->
+            for (i in 0 until a.length()) {
+                val r = a.getJSONObject(i)
+                out.add(DeskRing(r.getString("id"), o2(r, "note")))
+            }
+        }
+        return out
+    }
+
+    suspend fun ackDeskRing(deskId: String, ringId: String, token: String) {
+        request("/desks/$deskId/rings/$ringId/ack", "POST", token = token)
+    }
+
+    suspend fun askToJoinDesk(deskId: String, note: String, token: String) {
+        request("/desks/$deskId/guests", "POST",
+                JSONObject().put("note", note), token)
+    }
+
+    suspend fun deskGuests(deskId: String, token: String): List<DeskGuest> {
+        val o = JSONObject(request("/desks/$deskId/guests", token = token))
+        val out = mutableListOf<DeskGuest>()
+        o.optJSONArray("guests")?.let { a ->
+            for (i in 0 until a.length()) {
+                val g = a.getJSONObject(i)
+                out.add(DeskGuest(g.getString("id"), g.optString("guest_id"),
+                    o2(g, "display_name"), g.optString("status")))
+            }
+        }
+        return out
+    }
+
+    suspend fun acceptDeskGuest(deskId: String, requestId: String,
+                                token: String) {
+        request("/desks/$deskId/guests/$requestId/accept", "POST",
+                token = token)
+    }
+
+    suspend fun declineDeskGuest(deskId: String, requestId: String,
+                                 token: String) {
+        request("/desks/$deskId/guests/$requestId/decline", "POST",
+                token = token)
+    }
+
+    /** The caller's own way out — theirs to press, not the desk's. */
+    suspend fun leaveDesk(deskId: String, token: String) {
+        request("/desks/$deskId/guests/me", "DELETE", token = token)
+    }
+
+    suspend fun addDeskBeacon(deskId: String, label: String, token: String) {
+        request("/desks/$deskId/beacons", "POST",
+                JSONObject().put("label", label), token)
+    }
+
+    suspend fun deskBeacons(deskId: String, token: String): List<DeskBeacon> {
+        val o = JSONObject(request("/desks/$deskId/beacons", token = token))
+        val out = mutableListOf<DeskBeacon>()
+        o.optJSONArray("beacons")?.let { a ->
+            for (i in 0 until a.length()) {
+                val b = a.getJSONObject(i)
+                out.add(DeskBeacon(b.getString("id"), o2(b, "label")))
+            }
+        }
+        return out
+    }
+
+    suspend fun removeDeskBeacon(beaconId: String, token: String) {
+        request("/desk-beacons/$beaconId", "DELETE", token = token)
+    }
+
+    /** The sticker itself, as a URL an image view can fetch. Built with
+     *  `URL(...)` like the other byte-answering routes in this shell — the
+     *  JSON helper cannot carry an image, and the door is the fetch the
+     *  image view does. */
+    fun deskBeaconQrUrl(beaconId: String): String =
+        java.net.URL("$base/desk-beacons/$beaconId/qr.svg").toString()
+
+    /** What the desk looks like right now, as a still. */
+    fun deskViewUrl(deskId: String): String =
+        java.net.URL("$base/desks/$deskId/view.webp").toString()
+
+    suspend fun deskOverlay(deskId: String): DeskOverlay {
+        val o = JSONObject(request("/desks/$deskId/overlay"))
+        return DeskOverlay(o.optInt("likes"), o.optInt("shares"),
+                           o.optInt("waiting"))
+    }
+
+    suspend fun deskLivePerson(deskId: String): String {
+        val o = JSONObject(request("/desks/$deskId/live-person"))
+        return o.optString("owner_id")
+    }
+
+    // ---- the market, from both sides ----------------------------------
+
+    suspend fun marketplace(): List<MarketCard> {
+        val a = JSONArray(request("/marketplace"))
+        val out = mutableListOf<MarketCard>()
+        for (i in 0 until a.length()) {
+            val m = a.getJSONObject(i)
+            out.add(MarketCard(m.getString("profile_id"),
+                m.optString("display_name"), o2(m, "blurb")))
+        }
+        return out
+    }
+
+    suspend fun marketSearch(query: String): List<MarketHit> {
+        val o = JSONObject(request("/marketplace/search?q=" +
+            java.net.URLEncoder.encode(query, "UTF-8")))
+        val out = mutableListOf<MarketHit>()
+        o.optJSONArray("results")?.let { a ->
+            for (i in 0 until a.length()) {
+                val h = a.getJSONObject(i)
+                out.add(MarketHit(h.getString("id"), h.optString("title")))
+            }
+        }
+        return out
+    }
+
+    suspend fun marketLocalities(): List<String> {
+        val a = JSONArray(request("/marketplace/localities"))
+        return (0 until a.length()).map { a.getString(it) }
+    }
+
+    suspend fun marketAssist(need: String): List<String> {
+        val o = JSONObject(request("/marketplace/assist", "POST",
+            JSONObject().put("need", need)))
+        val out = mutableListOf<String>()
+        o.optJSONArray("suggestions")?.let { a ->
+            for (i in 0 until a.length()) out.add(a.getString(i))
+        }
+        return out
+    }
+
+    /** The demo shelf: one press and the market has something on it. */
+    suspend fun seedMarketplace(): Int {
+        val o = JSONObject(request("/marketplace/seed", "POST"))
+        return o.optInt("created")
+    }
+
+    suspend fun listInMarketplace(profileId: String, blurb: String,
+                                  locality: String, tags: List<String>,
+                                  token: String) {
+        val arr = JSONArray()
+        tags.forEach { arr.put(it) }
+        request("/profiles/$profileId/marketplace", "POST",
+                JSONObject().put("blurb", blurb).put("locality", locality)
+                    .put("tags", arr), token)
+    }
+
+    suspend fun unlistFromMarketplace(profileId: String, token: String) {
+        request("/profiles/$profileId/marketplace", "DELETE", token = token)
+    }
+
+    suspend fun removeMarketListing(listingId: String, token: String) {
+        request("/marketplace/listings/$listingId", "DELETE", token = token)
+    }
+
+    suspend fun listingOffer(listingId: String): MarketOffer {
+        val o = JSONObject(request("/marketplace/listings/$listingId/offer"))
+        return MarketOffer(if (o.isNull("amount")) null else o.optDouble("amount"),
+                           o.optString("currency"))
+    }
+
+    suspend fun setListingOffer(listingId: String, amount: Double,
+                                acceptPrice: Double?, token: String) {
+        val body = JSONObject().put("amount", amount).put("currency", "USD")
+        if (acceptPrice != null) body.put("accept_price", acceptPrice)
+        request("/marketplace/listings/$listingId/offer", "PUT", body, token)
+    }
+
+    suspend fun clearListingOffer(listingId: String, token: String) {
+        request("/marketplace/listings/$listingId/offer", "DELETE",
+                token = token)
+    }
+
+    suspend fun placeListing(listingId: String, venue: String, token: String) {
+        request("/marketplace/listings/$listingId/place", "PUT",
+                JSONObject().put("venue", venue), token)
+    }
+
+    suspend fun unplaceListing(listingId: String, token: String) {
+        request("/marketplace/listings/$listingId/place", "DELETE",
+                token = token)
+    }
+
+    suspend fun purchaseListing(listingId: String, token: String) {
+        request("/marketplace/listings/$listingId/purchase", "POST",
+                token = token)
+    }
+
+    suspend fun marketSales(token: String): List<MarketSale> {
+        val o = JSONObject(request("/marketplace/sales", token = token))
+        val out = mutableListOf<MarketSale>()
+        o.optJSONArray("sales")?.let { a ->
+            for (i in 0 until a.length()) {
+                val s = a.getJSONObject(i)
+                out.add(MarketSale(s.getString("id"), s.optString("status")))
+            }
+        }
+        return out
+    }
+
+    suspend fun marketSettings(interactorId: String, token: String): Boolean {
+        val o = JSONObject(request("/marketplace/settings/$interactorId",
+                                   token = token))
+        return o.optBoolean("show_offers", true)
+    }
+
+    suspend fun setMarketSettings(interactorId: String, showOffers: Boolean,
+                                  token: String) {
+        request("/marketplace/settings/$interactorId", "PUT",
+                JSONObject().put("show_offers", showOffers), token)
+    }
+
+    // ---- exchanges: two parties, one manifest --------------------------
+
+    suspend fun exchangeVocabulary(): ExchangeVocabulary {
+        val o = JSONObject(request("/exchanges/vocabulary"))
+        fun strings(key: String): List<String> {
+            val out = mutableListOf<String>()
+            o.optJSONArray(key)?.let { a ->
+                for (i in 0 until a.length()) out.add(a.getString(i))
+            }
+            return out
+        }
+        return ExchangeVocabulary(strings("industries"), strings("rules"))
+    }
+
+    private fun dealOf(o: JSONObject): ExchangeDeal {
+        val items = mutableListOf<ExchangeItemRow>()
+        o.optJSONArray("items")?.let { a ->
+            for (i in 0 until a.length()) {
+                val it = a.getJSONObject(i)
+                items.add(ExchangeItemRow(it.getString("id"),
+                    it.optString("name"), it.optString("kind")))
+            }
+        }
+        return ExchangeDeal(o.getString("id"), o2(o, "work"),
+                            o.optString("state"), items)
+    }
+
+    suspend fun proposeExchange(hostId: String, guestId: String, work: String,
+                                industry: String, fee: Double,
+                                token: String): ExchangeDeal {
+        return dealOf(JSONObject(request("/exchanges", "POST",
+            JSONObject().put("host_id", hostId).put("guest_id", guestId)
+                .put("work", work).put("industry", industry).put("fee", fee),
+            token)))
+    }
+
+    suspend fun exchange(exchangeId: String, token: String): ExchangeDeal {
+        return dealOf(JSONObject(request("/exchanges/$exchangeId",
+                                         token = token)))
+    }
+
+    suspend fun myExchanges(partyId: String,
+                            token: String): List<ExchangeDeal> {
+        val o = JSONObject(request("/parties/$partyId/exchanges",
+                                   token = token))
+        val out = mutableListOf<ExchangeDeal>()
+        o.optJSONArray("exchanges")?.let { a ->
+            for (i in 0 until a.length()) out.add(dealOf(a.getJSONObject(i)))
+        }
+        return out
+    }
+
+    suspend fun addExchangeItem(exchangeId: String, direction: String,
+                                name: String, kind: String, token: String) {
+        request("/exchanges/$exchangeId/items", "POST",
+                JSONObject().put("direction", direction).put("name", name)
+                    .put("kind", kind), token)
+    }
+
+    suspend fun removeExchangeItem(exchangeId: String, itemId: String,
+                                   token: String) {
+        request("/exchanges/$exchangeId/items/$itemId", "DELETE",
+                token = token)
+    }
+
+    /** Each item is accepted separately — nothing moves by itself. */
+    suspend fun acceptExchangeItem(exchangeId: String, itemId: String,
+                                   token: String) {
+        request("/exchanges/$exchangeId/items/$itemId/accept", "POST",
+                token = token)
+    }
+
+    /** Both parties sign the same manifest; any change clears both. */
+    suspend fun signExchange(exchangeId: String, actorId: String,
+                             token: String): ExchangeDeal {
+        return dealOf(JSONObject(request("/exchanges/$exchangeId/sign", "POST",
+            JSONObject().put("actor_id", actorId), token)))
+    }
+
+    suspend fun reopenExchange(exchangeId: String, actorId: String,
+                               token: String): ExchangeDeal {
+        return dealOf(JSONObject(request("/exchanges/$exchangeId/reopen",
+            "POST", JSONObject().put("actor_id", actorId), token)))
+    }
+
+    suspend fun withdrawFromExchange(exchangeId: String, actorId: String,
+                                     token: String): ExchangeDeal {
+        return dealOf(JSONObject(request("/exchanges/$exchangeId/withdraw",
+            "POST", JSONObject().put("actor_id", actorId), token)))
+    }
+
+    suspend fun exchangeChannel(exchangeId: String, token: String): String {
+        val o = JSONObject(request("/exchanges/$exchangeId/channel",
+                                   token = token))
+        return o.optString("room_id")
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)
@@ -1560,3 +1937,40 @@ data class WallPost(val id: String, val body: String, val status: String,
 
 data class CommentRow(val id: String, val authorId: String,
                       val body: String, val status: String)
+
+
+data class DeskCard(val deskId: String, val displayName: String,
+                    val trade: String?, val location: String?,
+                    val presence: String, val rated: Boolean,
+                    val deskToken: String?)
+
+data class DeskBrief(val id: String, val displayName: String,
+                     val trade: String?, val location: String?,
+                     val presence: String)
+
+data class DeskRing(val id: String, val note: String?)
+
+data class DeskGuest(val id: String, val guestId: String,
+                     val displayName: String?, val status: String)
+
+data class DeskBeacon(val id: String, val label: String?)
+
+data class DeskOverlay(val likes: Int, val shares: Int, val waiting: Int)
+
+data class MarketCard(val profileId: String, val displayName: String,
+                      val blurb: String?)
+
+data class MarketHit(val id: String, val title: String)
+
+data class MarketOffer(val amount: Double?, val currency: String)
+
+data class MarketSale(val id: String, val status: String)
+
+data class ExchangeVocabulary(val industries: List<String>,
+                              val rules: List<String>)
+
+data class ExchangeItemRow(val id: String, val name: String,
+                           val kind: String)
+
+data class ExchangeDeal(val id: String, val work: String?,
+                        val state: String, val items: List<ExchangeItemRow>)

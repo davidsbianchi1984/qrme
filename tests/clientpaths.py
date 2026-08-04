@@ -158,7 +158,40 @@ IOS = Language(
     re.compile(r"\\\((?:[^()]|\([^()]*\))*\)"),
     re.compile(r'"(/[^"\n]*)"'),
     (CallForm(re.compile(r"\brequest\s*(?:<[^>]*>)?\s*\("),
-              verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),),
+              verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),
+     # The image-URL form. A route answering **bytes** — a QR sticker, a
+     # still of a desk — is not fetched through the JSON helper: the shell
+     # builds a URL and hands it to an image view, which does the GET
+     # itself. That is a door in every sense a person cares about, and the
+     # `request(`-only rule could not see it.
+     #
+     # This is the third time this exact lesson has come round. Android's
+     # `URL(` form is here for it (the comment below says so), PDI's ported
+     # verb assumption was the second, and the count that produced this one
+     # said two live image doors were absent.
+     #
+     #     asked     does the shell call the transport helper for this route
+     #     mattered  does the shell fetch this route at all
+     #
+     # This form was first declared `verb="GET"` with the reasoning that a
+     # URL built this way is a URL to *read*, "and nothing in these shells
+     # writes that way". One shell did: `removeListing` wraps the same call
+     # in a `URLRequest` and sets `req.httpMethod = "DELETE"` two lines
+     # down — Swift's spelling of the exact idiom Kotlin's `URL(` form
+     # below already learned to read `requestMethod` for. The full suite
+     # caught it within the hour: a phantom `GET /marketplace/listings/{id}`
+     # against a DELETE-only route, the ported-assumption failure again,
+     # this time ported from one rule to its neighbour inside a single file.
+     #
+     #     asked     is every URL built this way handed to an image view
+     #     mattered  what verb does *this* call site actually send
+     #
+     # So the verb is read, exactly as Kotlin's is. Absent, GET stands —
+     # which is URLSession's own default for a bare URL, so the fallback is
+     # the platform's answer rather than a guess.
+     CallForm(re.compile(r"\bappendingPathComponent\s*\("), verb_after=400,
+              verb_in_body=re.compile(
+                  r'httpMethod\s*=\s*"(GET|POST|PUT|PATCH|DELETE)"')),),
 )
 # Kotlin interpolates bare identifiers as well as braced expressions, and the
 # clients use both. Its verb is positional, so it is only read when it sits
