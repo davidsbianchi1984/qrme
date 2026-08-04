@@ -668,3 +668,231 @@ def overlay(desk_id: str) -> dict:
         "on_stream": on_stream(desk_id),
         "waiting": _waiting(desk_id),
     }
+
+
+# --------------------------------------------------------------------------
+# The service itself: connections across the counter.
+#
+# Everything above this line lets a person *reach* the desk — the card, the
+# bell, the stream. None of it let the desk do the job it exists for. A
+# repair counter's whole trade is "hand me the thing": the staffer takes the
+# caller's screen, their machine, a program, and works on it. This is that,
+# with the counter's physics kept: the desk may only *offer* to take
+# something, the caller's accept is what hands it over, and either side can
+# take it back at any moment.
+
+CONNECTION_KINDS = ("screen_share", "remote_control", "app_access",
+                    "file_drop")
+
+#: What each kind means, in the words both parties are shown before either
+#: agrees to it. Kept beside the code that enforces it so the sentence and
+#: the behaviour cannot drift apart in two files.
+KIND_MEANS = {
+    "screen_share":   "they can see the screen you share, and nothing else",
+    "remote_control": "they can operate the machine you name, within the "
+                      "written scope, until either of you ends it",
+    "app_access":     "they can use the named program on your behalf for "
+                      "this session",
+    "file_drop":      "they can send you files and receive the ones you "
+                      "choose to hand over",
+}
+
+
+def _session_row(session_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM desk_sessions WHERE id=?", (session_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def _connection_row(connection_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM desk_connections WHERE id=?",
+        (connection_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def _shape_connection(c: dict, *, with_token: bool = False) -> dict:
+    out = {k: c[k] for k in ("id", "session_id", "kind", "target", "scope",
+                             "status", "offered_at", "answered_at",
+                             "ended_at", "ended_by")}
+    out["means"] = KIND_MEANS.get(c["kind"])
+    if with_token and c["status"] == "active":
+        out["token"] = c["token"]
+    return out
+
+
+def open_session(desk_id: str, caller_id: str,
+                 ring_id: str | None = None) -> dict:
+    """The staffer answers: a session with one named caller.
+
+    The caller must exist — a session is a pair of people, and half a pair
+    is a monologue. If a ring is named it must be this desk's, so a session
+    cannot launder a different desk's queue into its own history.
+    """
+    from .common import interactor_or_404  # local: avoid a module cycle
+    if _row(desk_id) is None:
+        raise DeskError("no such desk")
+    try:
+        interactor_or_404(caller_id)
+    except Exception:
+        raise DeskError("no such caller — sessions are with a real "
+                        "interactor, not a free-typed name")
+    if ring_id is not None:
+        ring_row = db.connect().execute(
+            "SELECT desk_id FROM desk_rings WHERE id=?",
+            (ring_id,)).fetchone()
+        if ring_row is None or ring_row["desk_id"] != desk_id:
+            raise DeskError("that ring is not this desk's")
+    session_id = db.new_id("dsn")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO desk_sessions (id, desk_id, caller_id, ring_id,"
+        " opened_at) VALUES (?,?,?,?,?)",
+        (session_id, desk_id, caller_id, ring_id, db.utcnow()))
+    conn.commit()
+    return session(session_id)
+
+
+def session(session_id: str, *, for_caller: bool = False) -> dict:
+    s = _session_row(session_id)
+    if s is None:
+        raise DeskError("no such session")
+    rows = db.connect().execute(
+        "SELECT * FROM desk_connections WHERE session_id=?"
+        " ORDER BY offered_at", (session_id,)).fetchall()
+    desk = _row(s["desk_id"])
+    return {
+        **{k: s[k] for k in ("id", "desk_id", "caller_id", "ring_id",
+                             "status", "opened_at", "closed_at",
+                             "closed_by")},
+        "desk_name": desk["display_name"] if desk else None,
+        "trade": desk["trade"] if desk else None,
+        # The token rides only to the caller: it is *their* machine the desk
+        # is being let into, so the secret that opens it is theirs to hold
+        # and to hand to their own tooling. The desk's view shows status.
+        "connections": [_shape_connection(dict(r), with_token=for_caller)
+                        for r in rows],
+    }
+
+
+def sessions_for_desk(desk_id: str) -> list[dict]:
+    rows = db.connect().execute(
+        "SELECT id FROM desk_sessions WHERE desk_id=? ORDER BY opened_at"
+        " DESC", (desk_id,)).fetchall()
+    return [session(r["id"]) for r in rows]
+
+
+def sessions_for_caller(caller_id: str) -> list[dict]:
+    rows = db.connect().execute(
+        "SELECT id FROM desk_sessions WHERE caller_id=? ORDER BY opened_at"
+        " DESC", (caller_id,)).fetchall()
+    return [session(r["id"], for_caller=True) for r in rows]
+
+
+def offer_connection(session_id: str, kind: str, target: str,
+                     scope: str | None = None) -> dict:
+    """The desk proposes to connect something. A proposal is all it is:
+    the row is born `offered`, carries no token, and grants nothing.
+
+    `remote_control` requires a written scope. Driving somebody's machine
+    under "whatever needs doing" is how a repair story becomes a horror
+    story, and the scope is what the caller is shown when asked to agree.
+    """
+    s = _session_row(session_id)
+    if s is None:
+        raise DeskError("no such session")
+    if s["status"] != "open":
+        raise DeskError("this session is closed")
+    if kind not in CONNECTION_KINDS:
+        raise DeskError(f"unknown connection kind {kind!r}; expected one of "
+                        f"{', '.join(CONNECTION_KINDS)}")
+    if not (target or "").strip():
+        raise DeskError("name what is being connected — a machine, a "
+                        "program, a screen")
+    if kind == "remote_control" and not (scope or "").strip():
+        raise DeskError("remote control needs a written scope: what on the "
+                        "machine may be touched, in words the caller will "
+                        "be shown")
+    cid = db.new_id("dcx")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO desk_connections (id, session_id, kind, target, scope,"
+        " offered_at) VALUES (?,?,?,?,?,?)",
+        (cid, session_id, kind, (target or "").strip(),
+         (scope or "").strip() or None, db.utcnow()))
+    conn.commit()
+    return _shape_connection(_connection_row(cid))
+
+
+def answer_connection(session_id: str, connection_id: str,
+                      accept: bool) -> dict:
+    """The caller's yes or no. Accepting mints the link token — the first
+    moment one exists — and it is returned to the caller alone."""
+    c = _connection_row(connection_id)
+    if c is None or c["session_id"] != session_id:
+        raise DeskError("no such connection in this session")
+    s = _session_row(session_id)
+    if s["status"] != "open":
+        raise DeskError("this session is closed")
+    if c["status"] != "offered":
+        raise DeskError(f"this connection is {c['status']}, not awaiting "
+                        "an answer")
+    conn = db.connect()
+    if not accept:
+        conn.execute(
+            "UPDATE desk_connections SET status='declined', answered_at=?"
+            " WHERE id=?", (db.utcnow(), connection_id))
+        conn.commit()
+        return _shape_connection(_connection_row(connection_id))
+    token = db.new_id("dlk")
+    conn.execute(
+        "UPDATE desk_connections SET status='active', token=?, answered_at=?"
+        " WHERE id=?", (token, db.utcnow(), connection_id))
+    conn.commit()
+    return _shape_connection(_connection_row(connection_id), with_token=True)
+
+
+def end_connection(session_id: str, connection_id: str, by: str) -> dict:
+    """Either side hangs up. The token is NULLed, not flagged — an ended
+    connection has no secret left to present."""
+    c = _connection_row(connection_id)
+    if c is None or c["session_id"] != session_id:
+        raise DeskError("no such connection in this session")
+    if c["status"] != "active":
+        raise DeskError(f"this connection is {c['status']}, not active")
+    conn = db.connect()
+    conn.execute(
+        "UPDATE desk_connections SET status='ended', token=NULL, ended_at=?,"
+        " ended_by=? WHERE id=?", (db.utcnow(), by, connection_id))
+    conn.commit()
+    return _shape_connection(_connection_row(connection_id))
+
+
+def close_session(session_id: str, by: str) -> dict:
+    """Either side closes the counter. Every live connection ends with it —
+    a session is the reason the links exist, and links must not outlive
+    their reason."""
+    s = _session_row(session_id)
+    if s is None:
+        raise DeskError("no such session")
+    if s["status"] == "closed":
+        return session(session_id)
+    conn = db.connect()
+    for row in conn.execute(
+            "SELECT id FROM desk_connections WHERE session_id=? AND"
+            " status='active'", (session_id,)).fetchall():
+        end_connection(session_id, row["id"], by)
+    conn.execute(
+        "UPDATE desk_sessions SET status='closed', closed_at=?, closed_by=?"
+        " WHERE id=?", (db.utcnow(), by, session_id))
+    conn.commit()
+    return session(session_id)
+
+
+def connection_token_live(token: str) -> bool:
+    """Whether a presented link token opens anything right now. The check a
+    desk's own tooling makes before letting a hand onto a machine."""
+    row = db.connect().execute(
+        "SELECT id FROM desk_connections WHERE token=? AND status='active'",
+        (token,)).fetchone()
+    return row is not None

@@ -527,6 +527,27 @@ public record RingReceipt(
     [property: JsonPropertyName("waiting")] int Waiting,
     [property: JsonPropertyName("note")] string Note);
 
+
+/// <summary>One connected thing across the counter. Token appears only in
+/// the caller's own view of an active link — the desk's never carries it.</summary>
+public record DeskConnection(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("session_id")] string SessionId,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("target")] string Target,
+    [property: JsonPropertyName("scope")] string? Scope,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("means")] string? Means,
+    [property: JsonPropertyName("token")] string? Token);
+
+public record DeskSession(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("desk_id")] string DeskId,
+    [property: JsonPropertyName("caller_id")] string CallerId,
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("desk_name")] string? DeskName,
+    [property: JsonPropertyName("connections")] DeskConnection[] Connections);
+
 // Signatures (docs/signatures.md). Windows reads and verifies; it does not
 // sign — see SignaturesPage for why.
 
@@ -1282,6 +1303,43 @@ public sealed class ApiClient
     /// <summary>The absolute URL of the desk's camera view.</summary>
     public string DeskViewUrl(string deskId) =>
         new Uri(_http.BaseAddress!, $"/desks/{deskId}/view.webp").ToString();
+
+
+    // MARK: Connections across the counter — the desk's actual service. The
+    // desk offers; only the caller's accept mints the link token, returned to
+    // the caller alone. Either side ends it.
+
+    public Task<DeskSession> OpenDeskSession(string deskId, string callerId, string token) =>
+        Send<DeskSession>(Post($"/desks/{deskId}/sessions", new { caller_id = callerId }, token));
+
+    public Task<DeskSession[]> DeskSessions(string deskId, string token) =>
+        Send<DeskSession[]>(Get($"/desks/{deskId}/sessions", token));
+
+    public Task<DeskSession> DeskSession(string sessionId, string token) =>
+        Send<DeskSession>(Get($"/desk-sessions/{sessionId}", token));
+
+    public Task<DeskConnection> OfferDeskConnection(string sessionId, string kind,
+        string target, string? scope, string token) =>
+        Send<DeskConnection>(Post($"/desk-sessions/{sessionId}/connections",
+            new { kind, target, scope }, token));
+
+    public Task<DeskConnection> AnswerDeskConnection(string sessionId,
+        string connectionId, bool accept, string token) =>
+        Send<DeskConnection>(Post(
+            $"/desk-sessions/{sessionId}/connections/{connectionId}/answer",
+            new { accept }, token));
+
+    public Task<DeskConnection> EndDeskConnection(string sessionId,
+        string connectionId, string token) =>
+        Send<DeskConnection>(Post(
+            $"/desk-sessions/{sessionId}/connections/{connectionId}/end",
+            new { }, token));
+
+    public Task<DeskSession> CloseDeskSession(string sessionId, string token) =>
+        Send<DeskSession>(Post($"/desk-sessions/{sessionId}/close", new { }, token));
+
+    public Task<DeskSession[]> MyDeskSessions(string interactorId, string token) =>
+        Send<DeskSession[]>(Get($"/interactors/{interactorId}/desk-sessions", token));
 
     // MARK: Signatures — the ceremony runs in a WebView2 (see SignaturesPage)
 

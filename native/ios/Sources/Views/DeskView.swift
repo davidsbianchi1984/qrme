@@ -30,6 +30,18 @@ struct DeskView: View {
     @State private var error: String?
     @State private var ringing = false
     @State private var base = ""
+    // The counter: the caller's own sessions with this desk's trade —
+    // offers to answer, live links to end. Loaded with the viewer's own
+    // interactor token; the link token only ever appears in their view.
+    @State private var mySessions: [DeskSession] = []
+    // Staffing the counter from the phone: the desk's own token, pasted the
+    // way the console does it — holding it is what makes you the desk.
+    @State private var deskToken = ""
+    @State private var staffSessions: [DeskSession] = []
+    @State private var newCallerId = ""
+    @State private var offerKind = "screen_share"
+    @State private var offerTarget = ""
+    @State private var offerScope = ""
 
     var body: some View {
         ScrollView {
@@ -41,6 +53,8 @@ struct DeskView: View {
                     header
                     stream
                     bell
+                    counter
+                    staffPanel
                     attestation
                 }
                 if let error {
@@ -229,6 +243,103 @@ struct DeskView: View {
         }
     }
 
+
+    /// Your side of the counter. Offers land here; nothing is connected
+    /// until you say yes, and any link — or the whole session — ends the
+    /// moment you want it back.
+    private var counter: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(L10n.t("desk.counter", L10n.deviceLanguage))
+                .font(.headline)
+            Button(L10n.t("desk.counter.show", L10n.deviceLanguage)) {
+                Task { await loadSessions() }
+            }
+            ForEach(mySessions) { session in
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text(session.desk_name ?? session.desk_id)
+                        Text(session.status).foregroundStyle(.secondary)
+                        if session.status == "open" {
+                            Button(L10n.t("desk.counter.close_all", L10n.deviceLanguage)) {
+                                Task { await closeSession(session.id) }
+                            }
+                        }
+                    }
+                    ForEach(session.connections) { link in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(link.kind) · \(link.target)")
+                            if let means = link.means {
+                                Text(means).font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if link.status == "offered" {
+                                HStack {
+                                    Button(L10n.t("desk.counter.connect", L10n.deviceLanguage)) {
+                                        Task { await answer(link, true) }
+                                    }
+                                    Button(L10n.t("desk.counter.decline", L10n.deviceLanguage)) {
+                                        Task { await answer(link, false) }
+                                    }
+                                }
+                            }
+                            if link.status == "active" {
+                                if let token = link.token {
+                                    Text(token).font(.caption.monospaced())
+                                }
+                                Button(L10n.t("desk.counter.end", L10n.deviceLanguage)) {
+                                    Task { await endLink(link) }
+                                }
+                            }
+                        }
+                    }
+                }
+                .padding(8)
+                .background(Color.secondary.opacity(0.08),
+                            in: RoundedRectangle(cornerRadius: 8))
+            }
+        }
+    }
+
+
+    /// The staffer's half, from the phone: open a session with a caller and
+    /// offer a connection. The offer grants nothing — their accept does.
+    private var staffPanel: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(L10n.t("desk.counter.staff", L10n.deviceLanguage))
+                .font(.headline)
+            SecureField(L10n.t("desk.counter.staff.token", L10n.deviceLanguage), text: $deskToken)
+            if !deskToken.isEmpty {
+                HStack {
+                    TextField(L10n.t("desk.counter.staff.caller", L10n.deviceLanguage),
+                              text: $newCallerId)
+                    Button(L10n.t("desk.counter.staff.open", L10n.deviceLanguage)) {
+                        Task { await openSession() }
+                    }.disabled(newCallerId.isEmpty)
+                }
+                ForEach(staffSessions) { session in
+                    VStack(alignment: .leading, spacing: 4) {
+                        HStack {
+                            Text(session.caller_id)
+                            Text(session.status).foregroundStyle(.secondary)
+                        }
+                        if session.status == "open" {
+                            TextField(L10n.t("desk.counter.staff.target", L10n.deviceLanguage),
+                                      text: $offerTarget)
+                            TextField(L10n.t("desk.counter.staff.scope", L10n.deviceLanguage),
+                                      text: $offerScope)
+                            Button(L10n.t("desk.counter.staff.offer", L10n.deviceLanguage)) {
+                                Task { await offerLink(session.id) }
+                            }.disabled(offerTarget.isEmpty)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color.secondary.opacity(0.08),
+                                in: RoundedRectangle(cornerRadius: 8))
+                }
+            }
+        }
+    }
+
     // MARK: actions
 
     private func load() async {
@@ -258,5 +369,67 @@ struct DeskView: View {
         } catch {
             self.error = error.localizedDescription
         }
+    }
+
+    private func loadSessions() async {
+        guard let callerId, let viewerToken else { return }
+        do {
+            mySessions = try await ApiClient.shared.myDeskSessions(
+                interactorId: callerId, token: viewerToken)
+        } catch { self.error = error.localizedDescription }
+    }
+
+    private func answer(_ link: DeskConnection, _ accept: Bool) async {
+        guard let viewerToken else { return }
+        do {
+            _ = try await ApiClient.shared.answerDeskConnection(
+                sessionId: link.session_id, connectionId: link.id,
+                accept: accept, token: viewerToken)
+            if let refreshed = try? await ApiClient.shared.deskSession(
+                sessionId: link.session_id, token: viewerToken) {
+                mySessions = mySessions.map {
+                    $0.id == refreshed.id ? refreshed : $0
+                }
+            }
+        } catch { self.error = error.localizedDescription }
+    }
+
+    private func endLink(_ link: DeskConnection) async {
+        guard let viewerToken else { return }
+        do {
+            _ = try await ApiClient.shared.endDeskConnection(
+                sessionId: link.session_id, connectionId: link.id,
+                token: viewerToken)
+            await loadSessions()
+        } catch { self.error = error.localizedDescription }
+    }
+
+    private func closeSession(_ sessionId: String) async {
+        guard let viewerToken else { return }
+        do {
+            _ = try await ApiClient.shared.closeDeskSession(
+                sessionId: sessionId, token: viewerToken)
+            await loadSessions()
+        } catch { self.error = error.localizedDescription }
+    }
+
+    private func openSession() async {
+        do {
+            _ = try await ApiClient.shared.openDeskSession(
+                deskId: deskId, callerId: newCallerId, token: deskToken)
+            staffSessions = try await ApiClient.shared.deskSessions(
+                deskId: deskId, token: deskToken)
+        } catch { self.error = error.localizedDescription }
+    }
+
+    private func offerLink(_ sessionId: String) async {
+        do {
+            _ = try await ApiClient.shared.offerDeskConnection(
+                sessionId: sessionId, kind: offerKind, target: offerTarget,
+                scope: offerScope.isEmpty ? nil : offerScope,
+                token: deskToken)
+            staffSessions = try await ApiClient.shared.deskSessions(
+                deskId: deskId, token: deskToken)
+        } catch { self.error = error.localizedDescription }
     }
 }

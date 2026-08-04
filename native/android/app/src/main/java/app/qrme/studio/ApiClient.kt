@@ -115,6 +115,19 @@ data class DeskCard(val deskId: String, val displayName: String,
 data class InteractorCreated(val id: String, val token: String?)
 data class StreamJoin(val roomId: String, val channel: String,
                       val presence: String, val ai: Boolean, val note: String)
+
+data class DeskConnection(val id: String, val sessionId: String,
+                          val kind: String, val target: String,
+                          val scope: String?, val status: String,
+                          val means: String?,
+                          // Caller's view of an active link only.
+                          val token: String?)
+
+data class DeskSession(val id: String, val deskId: String,
+                       val callerId: String, val status: String,
+                       val deskName: String?,
+                       val connections: List<DeskConnection>)
+
 data class RingReceipt(val ringId: String, val waiting: Int,
                        val presence: String, val note: String)
 
@@ -807,6 +820,82 @@ object ApiClient {
         val o = JSONObject(request("/desks/$deskId/bell", "POST", body, token))
         return RingReceipt(o.getString("ring_id"), o.optInt("waiting"),
             o.optString("presence", ""), o.optString("note", ""))
+    }
+
+
+    // ---- connections across the counter ----
+    // The desk offers; only the caller's accept mints the link token, and it
+    // is returned to the caller alone. Either side ends it.
+
+    private fun deskConnection(o: JSONObject) = DeskConnection(
+        o.getString("id"), o.getString("session_id"), o.getString("kind"),
+        o.getString("target"),
+        if (o.isNull("scope")) null else o.optString("scope"),
+        o.getString("status"),
+        if (o.isNull("means")) null else o.optString("means"),
+        if (o.isNull("token")) null else o.optString("token"))
+
+    private fun deskSession(o: JSONObject): DeskSession {
+        val links = o.optJSONArray("connections")
+        val parsed = mutableListOf<DeskConnection>()
+        if (links != null) for (i in 0 until links.length())
+            parsed.add(deskConnection(links.getJSONObject(i)))
+        return DeskSession(
+            o.getString("id"), o.getString("desk_id"),
+            o.getString("caller_id"), o.getString("status"),
+            if (o.isNull("desk_name")) null else o.optString("desk_name"),
+            parsed)
+    }
+
+    suspend fun openDeskSession(deskId: String, callerId: String,
+                                token: String): DeskSession {
+        val body = JSONObject().put("caller_id", callerId)
+        return deskSession(JSONObject(
+            request("/desks/$deskId/sessions", "POST", body, token)))
+    }
+
+    suspend fun deskSessions(deskId: String, token: String): List<DeskSession> {
+        val arr = JSONArray(request("/desks/$deskId/sessions", token = token))
+        return (0 until arr.length()).map { deskSession(arr.getJSONObject(it)) }
+    }
+
+    suspend fun deskSession(sessionId: String, token: String): DeskSession =
+        deskSession(JSONObject(request("/desk-sessions/$sessionId",
+                                       token = token)))
+
+    suspend fun offerDeskConnection(sessionId: String, kind: String,
+                                    target: String, scope: String?,
+                                    token: String): DeskConnection {
+        val body = JSONObject().put("kind", kind).put("target", target)
+        if (scope != null) body.put("scope", scope)
+        return deskConnection(JSONObject(request(
+            "/desk-sessions/$sessionId/connections", "POST", body, token)))
+    }
+
+    suspend fun answerDeskConnection(sessionId: String, connectionId: String,
+                                     accept: Boolean,
+                                     token: String): DeskConnection {
+        val body = JSONObject().put("accept", accept)
+        return deskConnection(JSONObject(request(
+            "/desk-sessions/$sessionId/connections/$connectionId/answer",
+            "POST", body, token)))
+    }
+
+    suspend fun endDeskConnection(sessionId: String, connectionId: String,
+                                  token: String): DeskConnection =
+        deskConnection(JSONObject(request(
+            "/desk-sessions/$sessionId/connections/$connectionId/end",
+            "POST", null, token)))
+
+    suspend fun closeDeskSession(sessionId: String, token: String): DeskSession =
+        deskSession(JSONObject(request("/desk-sessions/$sessionId/close",
+                                       "POST", null, token)))
+
+    suspend fun myDeskSessions(interactorId: String,
+                               token: String): List<DeskSession> {
+        val arr = JSONArray(request("/interactors/$interactorId/desk-sessions",
+                                    token = token))
+        return (0 until arr.length()).map { deskSession(arr.getJSONObject(it)) }
     }
 
     // ---- signatures ----

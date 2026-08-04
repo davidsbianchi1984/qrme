@@ -433,3 +433,133 @@ def scan_desk_beacon_card(beacon_id: str, request: Request) -> dict:
     if scanned is None:
         raise HTTPException(404, "no such desk beacon")
     return scanned
+
+
+# --------------------------------------------------------------------------
+# Connections across the counter — the service the desk exists to give.
+#
+# Consent shape, held by who authenticates what:
+#   * only the desk's token opens a session or *offers* a connection;
+#   * only the session's caller — their interactor token — can accept, and
+#     the accept is what mints the link token, returned to the caller alone;
+#   * either party ends a connection or closes the session, and ending kills
+#     the token in the row rather than marking it.
+
+
+class SessionOpen(BaseModel):
+    caller_id: str = Field(max_length=80)
+    ring_id: str | None = Field(default=None, max_length=80)
+
+
+class ConnectionOffer(BaseModel):
+    kind: str = Field(max_length=40)
+    target: str = Field(max_length=200)
+    scope: str | None = Field(default=None, max_length=500)
+
+
+class ConnectionAnswer(BaseModel):
+    accept: bool
+
+
+def _party(session_id: str, request: Request) -> str:
+    """Which side of the counter is calling: 'desk' or 'caller'. 403 for
+    anyone else — a desk session is exactly two people."""
+    s = desks._session_row(session_id)
+    if s is None:
+        raise HTTPException(404, "no such session")
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who["role"] == "desk" and who["subject_id"] == s["desk_id"]:
+        return "desk"
+    if who["role"] == "interactor" and who["subject_id"] == s["caller_id"]:
+        return "caller"
+    raise HTTPException(403, "not a party to this session")
+
+
+@router.post("/desks/{desk_id}/sessions", status_code=201)
+def open_desk_session(desk_id: str, body: SessionOpen,
+                      request: Request) -> dict:
+    """The staffer answers a caller: the counter opens."""
+    _require_desk(desk_id, request)
+    try:
+        return desks.open_session(desk_id, body.caller_id, body.ring_id)
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.get("/desks/{desk_id}/sessions")
+def desk_sessions(desk_id: str, request: Request) -> list[dict]:
+    _require_desk(desk_id, request)
+    return desks.sessions_for_desk(desk_id)
+
+
+@router.get("/desk-sessions/{session_id}")
+def desk_session(session_id: str, request: Request) -> dict:
+    """Either party's view. The caller's includes the live link tokens —
+    it is their machine the links open, so the secrets are theirs."""
+    party = _party(session_id, request)
+    try:
+        return desks.session(session_id, for_caller=(party == "caller"))
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.post("/desk-sessions/{session_id}/connections", status_code=201)
+def offer_desk_connection(session_id: str, body: ConnectionOffer,
+                          request: Request) -> dict:
+    """The desk proposes a connection. Desk-only on purpose: the party with
+    the expertise names what it needs; the party who owns the thing says
+    yes. Reversing that would have callers granting access nobody asked
+    for, to a desk that now holds it."""
+    if _party(session_id, request) != "desk":
+        raise HTTPException(403, "only the desk offers a connection — the "
+                                 "caller answers it")
+    try:
+        return desks.offer_connection(session_id, body.kind, body.target,
+                                      body.scope)
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.post("/desk-sessions/{session_id}/connections/{connection_id}/answer")
+def answer_desk_connection(session_id: str, connection_id: str,
+                           body: ConnectionAnswer, request: Request) -> dict:
+    """The caller's yes or no. On a rated desk the caller must also clear
+    the same verified-adult gate as every other rated surface."""
+    if _party(session_id, request) != "caller":
+        raise HTTPException(403, "only the caller answers an offer — it is "
+                                 "their machine the connection opens")
+    s = desks._session_row(session_id)
+    _gate_rated(s["desk_id"], request)
+    try:
+        return desks.answer_connection(session_id, connection_id,
+                                       body.accept)
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.post("/desk-sessions/{session_id}/connections/{connection_id}/end")
+def end_desk_connection(session_id: str, connection_id: str,
+                        request: Request) -> dict:
+    party = _party(session_id, request)
+    try:
+        return desks.end_connection(session_id, connection_id, party)
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.post("/desk-sessions/{session_id}/close")
+def close_desk_session(session_id: str, request: Request) -> dict:
+    party = _party(session_id, request)
+    try:
+        return desks.close_session(session_id, party)
+    except desks.DeskError as exc:
+        raise _fail(exc) from exc
+
+
+@router.get("/interactors/{interactor_id}/desk-sessions")
+def caller_desk_sessions(interactor_id: str, request: Request) -> list[dict]:
+    """The caller's own counter history, tokens included for live links."""
+    auth.require(request, "interactor", interactor_id)
+    return desks.sessions_for_caller(interactor_id)

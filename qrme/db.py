@@ -1594,6 +1594,44 @@ CREATE TABLE IF NOT EXISTS desk_guests (
     decided_at   TEXT
 );
 
+-- The desk's actual service: a staffer opens a session with a caller and
+-- *connects* something of theirs — a screen, their machine, a program —
+-- the way a repair counter takes the laptop across the counter. Geek Squad
+-- for whatever trade the desk is in.
+--
+-- Two tables because offer and access are different facts. A connection row
+-- in `offered` is a proposal and carries no token; the token exists only
+-- between the caller's accept and whichever side ends it, and ending NULLs
+-- it rather than flagging it, so an ended connection *cannot* authenticate —
+-- structurally, not by a check someone remembers to write.
+CREATE TABLE IF NOT EXISTS desk_sessions (
+    id        TEXT PRIMARY KEY,
+    desk_id   TEXT NOT NULL REFERENCES desks(id),
+    caller_id TEXT NOT NULL,           -- the interactor across the counter
+    ring_id   TEXT,                    -- the bell that started it, if one did
+    status    TEXT NOT NULL DEFAULT 'open',   -- open | closed
+    opened_at TEXT NOT NULL,
+    closed_at TEXT,
+    closed_by TEXT                     -- 'desk' | 'caller'
+);
+
+CREATE TABLE IF NOT EXISTS desk_connections (
+    id         TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL REFERENCES desk_sessions(id),
+    kind       TEXT NOT NULL,          -- screen_share | remote_control
+                                       -- | app_access | file_drop
+    target     TEXT NOT NULL,          -- what is being connected, by name
+    scope      TEXT,                   -- what may be touched, in words;
+                                       -- required for remote_control
+    status     TEXT NOT NULL DEFAULT 'offered',  -- offered | active
+                                                 -- | declined | ended
+    token      TEXT,                   -- live only while status='active'
+    offered_at TEXT NOT NULL,
+    answered_at TEXT,
+    ended_at   TEXT,
+    ended_by   TEXT                    -- 'desk' | 'caller'
+);
+
 -- A desk left behind as a printed code — the sticker on the shop door that
 -- says "I'm out back, ring the bell". Deliberately its own table rather than
 -- a nullable desk_id on `beacons`: that column is NOT NULL on every database

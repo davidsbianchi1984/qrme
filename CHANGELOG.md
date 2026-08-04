@@ -4,6 +4,68 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.0] — 2026-08-04
+
+### The desk can finally do the job
+
+### The finding
+
+Everything on a desk let a person *reach* it — the card, the bell, the
+stream, the printed code on the shop door. Nothing let the desk do the work
+those doors exist for. A repair counter's whole trade is "hand me the
+thing": the staffer takes the caller's screen, their machine, a program, and
+works on it — Geek Squad, for whatever trade the desk is in. QRME had the
+counter and no way to pass anything across it.
+
+    asked     can a person reach the desk
+    mattered  can the desk then do the work
+
+### What shipped
+
+Desk service sessions and connections, with the counter's physics kept:
+
+  * The desk's token opens a **session** with one named caller (optionally
+    citing the bell that started it — and only its own desk's bell).
+  * Inside a session the desk **offers** a connection — `screen_share`,
+    `remote_control`, `app_access`, `file_drop` — naming the target and, for
+    remote control, a written scope the caller is shown. Every offer carries
+    what agreeing to it *means*, in words, from one server-side table.
+  * An offer grants nothing. The **caller's accept** is what mints the link
+    token, and it is returned to the caller alone — it is their machine the
+    link opens, so the secret is theirs to hand to their own tooling. The
+    desk's view of the same session never carries it.
+  * Either side ends a link or closes the session; closing ends every live
+    link. Ending **NULLs the token in the row** — an ended connection has no
+    secret left to present, structurally, not by a flag someone checks.
+  * On a rated desk the accept sits behind the same verified-adult gate as
+    the card, the view, the bell and joining.
+
+Eight routes, all doored in the console the same round: the staffer's
+sessions live on the Desk screen beside the bell; the caller's side —
+offers, the yes/no, the live token, the end — sits on the visitor half.
+
+
+### The ratchets earned their keep
+
+The first full-suite run at this version failed four of this repository's own
+guards — the field-label map, the refusal table, the console-language
+snapshot and the per-shell doorless records — because a feature round adds
+fields, refusals, strings and routes, and every one of those surfaces is
+ratcheted. Each was settled the way the ratchets demand rather than by
+loosening them: the new fields and refusals are translated in ten languages,
+the Desk screen's new strings went through the console's own `t()` table
+instead of onto the backlog, and the eight new routes got real doors on all
+three native shells — models, client functions and screen calls — because the
+shell records had no headroom to record them as debt.
+
+### Checks
+
+`tests/test_the_desk_can_finally_do_the_job.py`, fourteen tests. Driven
+three ways before it was believed: making `end` keep the token in the row
+fails the row-level check ("NULLed is the contract"); handing the desk's
+view the token fails the caller-alone check; letting any desk's ring seed a
+session fails the queue-laundering check.
+
 ## [0.41.0] — 2026-08-02
 
 ### The workflow round-trips and nothing walked the whole arc

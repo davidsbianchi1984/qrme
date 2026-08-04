@@ -2056,6 +2056,38 @@ export type DeskRing = {
   [key: string]: unknown;
 };
 
+/** One connected thing across the counter. `token` only ever appears in the
+ *  caller's own view of an active link — it is their machine the link opens,
+ *  so the secret is theirs and the desk's view never carries it. */
+export type DeskConnection = {
+  id: string;
+  session_id: string;
+  kind: string;
+  target: string;
+  scope?: string | null;
+  status: string;          // offered | active | declined | ended
+  means?: string;          // what agreeing to this kind means, in words
+  token?: string;          // caller's view of an active link only
+  offered_at?: string;
+  answered_at?: string | null;
+  ended_at?: string | null;
+  ended_by?: string | null;
+};
+
+export type DeskSession = {
+  id: string;
+  desk_id: string;
+  caller_id: string;
+  ring_id?: string | null;
+  status: string;          // open | closed
+  desk_name?: string | null;
+  trade?: string | null;
+  opened_at?: string;
+  closed_at?: string | null;
+  closed_by?: string | null;
+  connections: DeskConnection[];
+};
+
 /** What a visitor sees standing in front of somebody's desk.
  *
  *  `designation` is the sentence the whole feature rests on — *Live person —
@@ -3147,6 +3179,38 @@ export const api = {
   stepDown: (deskId: string, token: string) =>
     req<{ stepped_down: boolean }>(`/desks/${deskId}/guests/me`,
       { method: "DELETE", token }),
+
+  // Connections across the counter — the service the desk exists to give.
+  // The desk offers (screen, machine, program, files); only the caller's
+  // accept mints the link token, and it comes back to the caller alone.
+  openDeskSession: (deskId: string, body: { caller_id: string;
+    ring_id?: string }, token: string) =>
+    req<DeskSession>(`/desks/${deskId}/sessions`,
+      { method: "POST", body, token }),
+  deskSessions: (deskId: string, token: string) =>
+    req<DeskSession[]>(`/desks/${deskId}/sessions`, { token }),
+  deskSession: (sessionId: string, token: string) =>
+    req<DeskSession>(`/desk-sessions/${sessionId}`, { token }),
+  offerDeskConnection: (sessionId: string, body: { kind: string;
+    target: string; scope?: string }, token: string) =>
+    req<DeskConnection>(`/desk-sessions/${sessionId}/connections`,
+      { method: "POST", body, token }),
+  answerDeskConnection: (sessionId: string, connectionId: string,
+    accept: boolean, token: string) =>
+    req<DeskConnection>(
+      `/desk-sessions/${sessionId}/connections/${connectionId}/answer`,
+      { method: "POST", body: { accept }, token }),
+  endDeskConnection: (sessionId: string, connectionId: string,
+    token: string) =>
+    req<DeskConnection>(
+      `/desk-sessions/${sessionId}/connections/${connectionId}/end`,
+      { method: "POST", token }),
+  closeDeskSession: (sessionId: string, token: string) =>
+    req<DeskSession>(`/desk-sessions/${sessionId}/close`,
+      { method: "POST", token }),
+  myDeskSessions: (interactorId: string, token: string) =>
+    req<DeskSession[]>(`/interactors/${interactorId}/desk-sessions`,
+      { token }),
 
   // ---------------------------------------------------------------------
   // The other side of a desk.

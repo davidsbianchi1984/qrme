@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import app.qrme.studio.ApiClient
+import app.qrme.studio.L10n
 import app.qrme.studio.DeskCard
 import app.qrme.studio.RingReceipt
 import app.qrme.studio.StreamJoin
@@ -61,6 +63,14 @@ fun DeskScreen(deskId: String, callerId: String? = null,
     var error by remember { mutableStateOf<String?>(null) }
     var ringing by remember { mutableStateOf(false) }
     var joined by remember { mutableStateOf<StreamJoin?>(null) }
+    // The counter: the caller's sessions (offers to answer, links to end)
+    // and, with a pasted desk token, the staffer's half.
+    var mySessions by remember { mutableStateOf<List<DeskSession>>(emptyList()) }
+    var deskToken by remember { mutableStateOf("") }
+    var staffSessions by remember { mutableStateOf<List<DeskSession>>(emptyList()) }
+    var newCallerId by remember { mutableStateOf("") }
+    var offerTarget by remember { mutableStateOf("") }
+    var offerScope by remember { mutableStateOf("") }
 
     suspend fun reload() {
         runCatching { ApiClient.desk(deskId, viewerToken) }
@@ -217,6 +227,149 @@ fun DeskScreen(deskId: String, callerId: String? = null,
                 // different words and the difference is the whole point.
                 Text(att.note, color = Qrme.T3, fontSize = 10.sp)
             }
+            }
+        }
+
+
+        // ---- your side of the counter -----------------------------------
+        // Nothing a desk offers is connected until you say yes; the link
+        // token comes to you alone, and any link — or the whole session —
+        // ends the moment you want it back.
+        if (callerId != null && viewerToken != null) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(L10n.t("desk.counter", L10n.deviceLanguage()), color = Qrme.Txt,
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.t("desk.counter.show", L10n.deviceLanguage()), color = Qrme.Green, fontSize = 12.sp,
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            runCatching {
+                                ApiClient.myDeskSessions(callerId, viewerToken)
+                            }.onSuccess { mySessions = it }
+                                .onFailure { error = it.message }
+                        }
+                    })
+                mySessions.forEach { session ->
+                    Text("${session.deskName ?: session.deskId} · ${session.status}",
+                        color = Qrme.T2, fontSize = 12.sp)
+                    if (session.status == "open") {
+                        Text(L10n.t("desk.counter.close_all", L10n.deviceLanguage()), color = Qrme.Red, fontSize = 11.sp,
+                            modifier = Modifier.clickable {
+                                scope.launch {
+                                    runCatching {
+                                        ApiClient.closeDeskSession(session.id,
+                                            viewerToken)
+                                    }.onFailure { error = it.message }
+                                    runCatching {
+                                        ApiClient.myDeskSessions(callerId,
+                                            viewerToken)
+                                    }.onSuccess { mySessions = it }
+                                }
+                            })
+                    }
+                    session.connections.forEach { link ->
+                        Text("${link.kind} · ${link.target} · ${link.status}",
+                            color = Qrme.Txt, fontSize = 11.sp)
+                        link.means?.let {
+                            Text(it, color = Qrme.T3, fontSize = 10.sp)
+                        }
+                        if (link.status == "offered") {
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Text(L10n.t("desk.counter.connect", L10n.deviceLanguage()), color = Qrme.Green,
+                                    fontSize = 11.sp,
+                                    modifier = Modifier.clickable {
+                                        scope.launch {
+                                            runCatching {
+                                                ApiClient.answerDeskConnection(
+                                                    link.sessionId, link.id,
+                                                    true, viewerToken)
+                                            }.onFailure { error = it.message }
+                                            runCatching {
+                                                ApiClient.deskSession(
+                                                    link.sessionId, viewerToken)
+                                            }.onSuccess { fresh ->
+                                                mySessions = mySessions.map {
+                                                    if (it.id == fresh.id) fresh
+                                                    else it
+                                                }
+                                            }
+                                        }
+                                    })
+                                Text(L10n.t("desk.counter.decline", L10n.deviceLanguage()), color = Qrme.Red, fontSize = 11.sp,
+                                    modifier = Modifier.clickable {
+                                        scope.launch {
+                                            runCatching {
+                                                ApiClient.answerDeskConnection(
+                                                    link.sessionId, link.id,
+                                                    false, viewerToken)
+                                            }.onFailure { error = it.message }
+                                        }
+                                    })
+                            }
+                        }
+                        if (link.status == "active") {
+                            link.token?.let {
+                                Text(it, color = Qrme.T3, fontSize = 10.sp)
+                            }
+                            Text(L10n.t("desk.counter.end", L10n.deviceLanguage()), color = Qrme.Red,
+                                fontSize = 11.sp,
+                                modifier = Modifier.clickable {
+                                    scope.launch {
+                                        runCatching {
+                                            ApiClient.endDeskConnection(
+                                                link.sessionId, link.id,
+                                                viewerToken)
+                                        }.onFailure { error = it.message }
+                                    }
+                                })
+                        }
+                    }
+                }
+            }
+        }
+
+        // ---- staffing the counter ---------------------------------------
+        // Holding the desk token is what makes you the desk. The offer
+        // grants nothing; the caller's accept does.
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("desk.counter.staff", L10n.deviceLanguage()), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("desk.counter.staff.token", L10n.deviceLanguage()), deskToken, "dsk_…") { deskToken = it }
+            if (deskToken.isNotBlank()) {
+                labeledField(L10n.t("desk.counter.staff.caller", L10n.deviceLanguage()), newCallerId, "usr_…") { newCallerId = it }
+                Text(L10n.t("desk.counter.staff.open", L10n.deviceLanguage()), color = Qrme.Green, fontSize = 12.sp,
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            runCatching {
+                                ApiClient.openDeskSession(deskId, newCallerId,
+                                    deskToken)
+                            }.onFailure { error = it.message }
+                            runCatching {
+                                ApiClient.deskSessions(deskId, deskToken)
+                            }.onSuccess { staffSessions = it }
+                        }
+                    })
+                staffSessions.forEach { session ->
+                    Text("${session.callerId} · ${session.status}",
+                        color = Qrme.T2, fontSize = 12.sp)
+                    if (session.status == "open") {
+                        labeledField(L10n.t("desk.counter.staff.target", L10n.deviceLanguage()), offerTarget, "their laptop") { offerTarget = it }
+                        labeledField(L10n.t("desk.counter.staff.scope", L10n.deviceLanguage()), offerScope,
+                            "printer driver only") { offerScope = it }
+                        Text(L10n.t("desk.counter.staff.offer", L10n.deviceLanguage()), color = Qrme.Green,
+                            fontSize = 11.sp,
+                            modifier = Modifier.clickable {
+                                scope.launch {
+                                    runCatching {
+                                        ApiClient.offerDeskConnection(
+                                            session.id, "screen_share",
+                                            offerTarget,
+                                            offerScope.ifBlank { null },
+                                            deskToken)
+                                    }.onFailure { error = it.message }
+                                }
+                            })
+                    }
+                }
             }
         }
 

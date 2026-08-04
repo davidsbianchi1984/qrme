@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  api, getBase, type Desk as DeskRow, type DeskBeacon, type DeskGuest,
-  type DeskOverlay, type DeskRing, type DeskScanCard, type LivePerson,
+  api, getBase, type Desk as DeskRow, type DeskBeacon, type DeskConnection,
+  type DeskGuest, type DeskOverlay, type DeskRing, type DeskScanCard,
+  type DeskSession, type LivePerson,
 } from "../api";
 import { Refusal } from "../Refusal";
+import { t as tr, visitorLang } from "../l10n";
 
 // A staffed counter somebody can walk up to.
 //
@@ -39,6 +41,16 @@ export function Desk({ onPlans }: {
     location: "", blurb: "",
   });
   const [label, setLabel] = useState("");
+  // Across the counter: the staffer's sessions, and the offer being drafted.
+  const [sessions, setSessions] = useState<DeskSession[]>([]);
+  const [sessionCaller, setSessionCaller] = useState("");
+  const [offer, setOffer] = useState({ kind: "screen_share", target: "",
+                                       scope: "" });
+  // The caller's side, held apart from the desk's on purpose — the same
+  // reason the desk token lives outside the shared session above.
+  const [callerId, setCallerId] = useState("");
+  const [callerToken, setCallerToken] = useState("");
+  const [mySessions, setMySessions] = useState<DeskSession[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [said, setSaid] = useState<string | null>(null);
@@ -53,6 +65,8 @@ export function Desk({ onPlans }: {
     api.deskBeacons(deskId, deskToken)
       .then((b) => setBeacons(b.beacons ?? [])).catch(() => setBeacons([]));
     api.deskLivePerson(deskId).then(setWho).catch(() => setWho(null));
+    api.deskSessions(deskId, deskToken)
+      .then(setSessions).catch(() => setSessions([]));
   }, [deskId, deskToken]);
   useEffect(load, [load]);
 
@@ -73,6 +87,104 @@ export function Desk({ onPlans }: {
 
       {!staffing && (
         <>
+          <h3>{tr("desk.mine.head", visitorLang())}</h3>
+          <p className="muted">{tr("desk.mine.pitch", visitorLang())}</p>
+          <div className="row">
+            <input placeholder={tr("desk.mine.your_id", visitorLang())} value={callerId}
+              onChange={(e) => setCallerId(e.target.value)} />
+            <input placeholder={tr("desk.mine.your_token", visitorLang())} type="password"
+              value={callerToken}
+              onChange={(e) => setCallerToken(e.target.value)} />
+            <button disabled={busy || !callerId.trim() || !callerToken.trim()}
+              onClick={() => run(async () => {
+                setMySessions(await api.myDeskSessions(
+                  callerId.trim(), callerToken.trim()));
+              })}>
+              {tr("desk.mine.show", visitorLang())}
+            </button>
+          </div>
+          {mySessions.map((s) => (
+            <div key={s.id} className="card">
+              <div className="row">
+                <strong>{s.desk_name ?? s.desk_id}</strong>
+                {s.trade && <span className="muted">{s.trade}</span>}
+                <span className="muted">{s.status}</span>
+                <button disabled={busy}
+                  onClick={() => run(async () => {
+                    const fresh = await api.deskSession(s.id, callerToken.trim());
+                    setMySessions((all) =>
+                      all.map((x) => (x.id === fresh.id ? fresh : x)));
+                  })}>
+                  {tr("desk.mine.refresh", visitorLang())}
+                </button>
+                {s.status === "open" && (
+                  <button disabled={busy}
+                    onClick={() => run(async () => {
+                      await api.closeDeskSession(s.id, callerToken.trim());
+                      setMySessions(await api.myDeskSessions(
+                        callerId.trim(), callerToken.trim()));
+                    }, "Session closed — every live link died with it.")}>
+                    {tr("desk.mine.close_all", visitorLang())}
+                  </button>
+                )}
+              </div>
+              {s.connections.map((c: DeskConnection) => (
+                <div key={c.id} className="card">
+                  <div className="row">
+                    <strong>{c.kind}</strong>
+                    <span>{c.target}</span>
+                    <span className="muted">{c.status}</span>
+                  </div>
+                  {/* The sentence they are agreeing to, from the server's own
+                      table — not re-written here where it could drift. */}
+                  {c.means && <p className="muted small">{c.means}</p>}
+                  {c.scope && <p className="muted small">{tr("desk.mine.scope", visitorLang())} {c.scope}</p>}
+                  {c.status === "offered" && (
+                    <div className="row">
+                      <button disabled={busy}
+                        onClick={() => run(async () => {
+                          await api.answerDeskConnection(
+                            s.id, c.id, true, callerToken.trim());
+                          setMySessions(await api.myDeskSessions(
+                            callerId.trim(), callerToken.trim()));
+                        }, "Connected. The link token below is yours alone.")}>
+                        {tr("desk.mine.connect", visitorLang())}
+                      </button>
+                      <button disabled={busy}
+                        onClick={() => run(async () => {
+                          await api.answerDeskConnection(
+                            s.id, c.id, false, callerToken.trim());
+                          setMySessions(await api.myDeskSessions(
+                            callerId.trim(), callerToken.trim()));
+                        }, "Declined.")}>
+                        {tr("desk.mine.no", visitorLang())}
+                      </button>
+                    </div>
+                  )}
+                  {c.status === "active" && (
+                    <>
+                      {c.token && (
+                        <p className="muted small">
+                          {tr("desk.mine.token", visitorLang())}{" "}
+                          <code>{c.token}</code>
+                        </p>
+                      )}
+                      <button disabled={busy}
+                        onClick={() => run(async () => {
+                          await api.endDeskConnection(
+                            s.id, c.id, callerToken.trim());
+                          setMySessions(await api.myDeskSessions(
+                            callerId.trim(), callerToken.trim()));
+                        }, "Ended — the token is dead.")}>
+                        {tr("desk.mine.end_link", visitorLang())}
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
+
           <h3>Open a desk</h3>
           <p className="muted">
             A desk claims a person is behind it, so it is opened with who
@@ -206,6 +318,76 @@ export function Desk({ onPlans }: {
                     api.ackRing(deskId, String(r.id), deskToken), "Answered.")}>
                   Answer
                 </button>
+              )}
+            </div>
+          ))}
+
+          <h3>{tr("desk.counter.head", visitorLang())}</h3>
+          <p className="muted">{tr("desk.counter.pitch", visitorLang())}</p>
+          <div className="row">
+            <input placeholder={tr("desk.counter.caller_id", visitorLang())} value={sessionCaller}
+              onChange={(e) => setSessionCaller(e.target.value)} />
+            <button disabled={busy || !sessionCaller.trim()}
+              onClick={() => run(() => api.openDeskSession(
+                deskId, { caller_id: sessionCaller.trim() }, deskToken),
+                "Session open.")}>
+              {tr("desk.counter.open", visitorLang())}
+            </button>
+          </div>
+          {sessions.map((s) => (
+            <div key={s.id} className="card">
+              <div className="row">
+                <strong>{s.caller_id}</strong>
+                <span className="muted">{s.status}</span>
+                {s.status === "open" && (
+                  <button disabled={busy}
+                    onClick={() => run(() =>
+                      api.closeDeskSession(s.id, deskToken), "Closed.")}>
+                    {tr("desk.counter.close", visitorLang())}
+                  </button>
+                )}
+              </div>
+              {s.connections.map((c: DeskConnection) => (
+                <div key={c.id} className="row">
+                  <span>{c.kind} · {c.target}</span>
+                  {c.scope && <span className="muted small">{c.scope}</span>}
+                  <span className="muted">{c.status}</span>
+                  {c.status === "active" && (
+                    <button disabled={busy}
+                      onClick={() => run(() =>
+                        api.endDeskConnection(s.id, c.id, deskToken),
+                        "Ended.")}>
+                      {tr("desk.counter.end", visitorLang())}
+                    </button>
+                  )}
+                </div>
+              ))}
+              {s.status === "open" && (
+                <div className="row">
+                  <select value={offer.kind}
+                    onChange={(e) => setOffer({ ...offer, kind: e.target.value })}>
+                    <option value="screen_share">{tr("desk.counter.kind.screen", visitorLang())}</option>
+                    <option value="remote_control">{tr("desk.counter.kind.remote", visitorLang())}</option>
+                    <option value="app_access">{tr("desk.counter.kind.app", visitorLang())}</option>
+                    <option value="file_drop">{tr("desk.counter.kind.files", visitorLang())}</option>
+                  </select>
+                  <input placeholder={tr("desk.counter.target", visitorLang())} value={offer.target}
+                    onChange={(e) => setOffer({ ...offer, target: e.target.value })} />
+                  <input
+                    placeholder={offer.kind === "remote_control"
+                      ? tr("desk.counter.scope_req", visitorLang())
+                      : tr("desk.counter.scope_opt", visitorLang())}
+                    value={offer.scope}
+                    onChange={(e) => setOffer({ ...offer, scope: e.target.value })} />
+                  <button disabled={busy || !offer.target.trim()
+                      || (offer.kind === "remote_control" && !offer.scope.trim())}
+                    onClick={() => run(() => api.offerDeskConnection(s.id, {
+                      kind: offer.kind, target: offer.target.trim(),
+                      scope: offer.scope.trim() || undefined }, deskToken),
+                      "Offered — their yes is what opens it.")}>
+                    {tr("desk.counter.offer", visitorLang())}
+                  </button>
+                </div>
               )}
             </div>
           ))}

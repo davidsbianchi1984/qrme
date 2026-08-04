@@ -77,6 +77,36 @@
                 </StackPanel>
             </Border>
 
+
+            <!-- Connections across the counter. The desk offers; only the
+                 caller's accept mints the link token, and it is returned to
+                 the caller alone. Either side ends a link or the session. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <!-- Every reader-facing string on this panel is set in the
+                         constructor from L10n.T — the tab bar is translated,
+                         and the ratchet holds the screens to its promise. -->
+                    <TextBlock x:Name="CounterHead" FontSize="14" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="CallerIdBox" />
+                    <TextBox x:Name="CallerTokenBox" />
+                    <Button x:Name="ShowSessionsButton" Click="OnShowSessions" />
+                    <StackPanel x:Name="SessionsPanel" Spacing="6" />
+
+                    <TextBlock x:Name="StaffHead" FontSize="14" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="DeskTokenBox" />
+                    <TextBox x:Name="SessionCallerBox" />
+                    <Button x:Name="OpenSessionButton" Click="OnOpenSession" />
+                    <TextBox x:Name="OfferTargetBox" />
+                    <TextBox x:Name="OfferScopeBox" />
+                    <Button x:Name="OfferButton" Click="OnOffer" />
+                    <TextBlock x:Name="CounterResult" FontSize="12" TextWrapping="Wrap"
+                               Visibility="Collapsed" Foreground="{StaticResource QrmeGreenBrush}" />
+                </StackPanel>
+            </Border>
+
             <TextBlock x:Name="ErrorText" FontSize="12" Visibility="Collapsed"
                        TextWrapping="Wrap" Foreground="{StaticResource QrmeRedBrush}" />
         </StackPanel>

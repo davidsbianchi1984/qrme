@@ -74,6 +74,29 @@ struct StreamJoin: Decodable {
     let note: String
 }
 
+
+struct DeskConnection: Decodable, Identifiable {
+    let id: String
+    let session_id: String
+    let kind: String
+    let target: String
+    let scope: String?
+    let status: String
+    let means: String?
+    // The caller's view of an active link only — the desk's never carries it.
+    let token: String?
+}
+
+struct DeskSession: Decodable, Identifiable {
+    let id: String
+    let desk_id: String
+    let caller_id: String
+    let status: String
+    let desk_name: String?
+    let trade: String?
+    let connections: [DeskConnection]
+}
+
 struct RingReceipt: Decodable {
     let ring_id: String
     let waiting: Int
@@ -1252,6 +1275,63 @@ actor ApiClient {
     func joinStream(deskId: String, token: String? = nil)
         async throws -> StreamJoin {
         try await request("/desks/\(deskId)/join", method: "POST",
+                          token: token)
+    }
+
+
+    // MARK: Connections across the counter — the desk's actual service.
+    // The desk offers; only the caller's accept mints the link token, and it
+    // is returned to the caller alone. Either side ends it.
+
+    func openDeskSession(deskId: String, callerId: String,
+                         token: String) async throws -> DeskSession {
+        try await request("/desks/\(deskId)/sessions", method: "POST",
+                          body: ["caller_id": callerId], token: token)
+    }
+
+    func deskSessions(deskId: String,
+                      token: String) async throws -> [DeskSession] {
+        try await request("/desks/\(deskId)/sessions", token: token)
+    }
+
+    func deskSession(sessionId: String,
+                     token: String) async throws -> DeskSession {
+        try await request("/desk-sessions/\(sessionId)", token: token)
+    }
+
+    func offerDeskConnection(sessionId: String, kind: String, target: String,
+                             scope: String?, token: String)
+        async throws -> DeskConnection {
+        var body: [String: Any] = ["kind": kind, "target": target]
+        if let scope { body["scope"] = scope }
+        return try await request("/desk-sessions/\(sessionId)/connections",
+                                 method: "POST", body: body, token: token)
+    }
+
+    func answerDeskConnection(sessionId: String, connectionId: String,
+                              accept: Bool, token: String)
+        async throws -> DeskConnection {
+        try await request(
+            "/desk-sessions/\(sessionId)/connections/\(connectionId)/answer",
+            method: "POST", body: ["accept": accept], token: token)
+    }
+
+    func endDeskConnection(sessionId: String, connectionId: String,
+                           token: String) async throws -> DeskConnection {
+        try await request(
+            "/desk-sessions/\(sessionId)/connections/\(connectionId)/end",
+            method: "POST", token: token)
+    }
+
+    func closeDeskSession(sessionId: String,
+                          token: String) async throws -> DeskSession {
+        try await request("/desk-sessions/\(sessionId)/close",
+                          method: "POST", token: token)
+    }
+
+    func myDeskSessions(interactorId: String,
+                        token: String) async throws -> [DeskSession] {
+        try await request("/interactors/\(interactorId)/desk-sessions",
                           token: token)
     }
 
