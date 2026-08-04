@@ -4,6 +4,14 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.4] — 2026-08-04
+
+### Version alignment
+
+The three products are cut together, so one number names one combination
+of all three. No QRME code changed — JIM's money guardian gained its
+native doors on iOS, Android and Windows in this round, and the finance desks QRME lists beside a money warning are now reachable from the phone that shows the warning.
+
 ## [0.42.3] — 2026-08-04
 
 ### The last thirteen unaudited screens

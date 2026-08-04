@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.42.3** ([changelog](CHANGELOG.md) ·
+**Current release: v0.42.4** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.42.4** | **Version alignment** — JIM's money guardian gained its native doors; the finance desks QRME serves beside a warning are now reachable from the phones that show it |
 | **0.42.3** | **The last thirteen unaudited screens** — across the three repos, thirteen components had sat `unaudited` since the manifests were seeded; the audit confirmed eight of them had never been drawn at all. QRME's two were both in that eight: screens **185 Discover** and **186 Wall** are the drawings, both `unaudited` ceilings fell to zero, and `undrawn=0` is finally true rather than covered for |
 | **0.42.2** | **Version alignment** — JIM gained its money guardian; QRME's `GET /desks` now serves its warnings, listing real finance desks beside the tandem specialist |
 | **0.42.1** | **The starters can answer for their own trade** — one Field Pack left five of eight prompt seats empty on every starter. `dossiers.py` now gives all 34 — Vivienne Sable included — what-I-know, skills-and-services and colleagues source items, 8+ skill chips, and a colleague graph installed as real friendships, composed from the same list as the prose so chat and the API give one answer. 77 tests, both directions |
