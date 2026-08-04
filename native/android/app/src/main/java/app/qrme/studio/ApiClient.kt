@@ -1301,7 +1301,91 @@ object ApiClient {
         val o = JSONObject(request("/profiles/$id/voiceprint", "DELETE", null, token))
         return VoiceRevocation(o.optInt("samples_deleted"), o.optString("note", ""))
     }
+
+    // ---- shops: storefronts, not desks (qrme/shops.py) ----
+
+    private fun shopOfferingOf(o: JSONObject) = ShopOffering(
+        o.getString("id"), o.optString("kind"), o.optString("title"),
+        o.optDouble("price", 0.0), o.optString("currency"),
+        o.optString("availability"), o.optInt("retired"))
+
+    private fun shopOrderOf(o: JSONObject) = ShopOrder(
+        o.getString("id"), o.optString("shop_id"), o.optString("title"),
+        o.optInt("quantity", 1), o.optDouble("amount", 0.0),
+        o.optString("currency"), o.optString("status"))
+
+    private fun shopDetailOf(o: JSONObject): ShopDetail {
+        val offs = mutableListOf<ShopOffering>()
+        o.optJSONArray("offerings")?.let { a ->
+            for (i in 0 until a.length()) offs.add(shopOfferingOf(a.getJSONObject(i)))
+        }
+        return ShopDetail(o.getString("id"), o.optString("name"),
+            if (o.isNull("blurb")) null else o.optString("blurb"),
+            if (o.isNull("seller")) null else o.optString("seller"), offs)
+    }
+
+    suspend fun listShops(): List<ShopCard> {
+        val a = org.json.JSONArray(request("/shops"))
+        return (0 until a.length()).map { i ->
+            val o = a.getJSONObject(i)
+            ShopCard(o.getString("id"), o.optString("name"),
+                o.optString("seller"),
+                if (o.isNull("tag")) null else o.optString("tag"),
+                o.optInt("offerings"))
+        }
+    }
+
+    suspend fun shopCard(shopId: String): ShopDetail =
+        shopDetailOf(JSONObject(request("/shops/$shopId")))
+
+    suspend fun openShop(profileId: String, name: String, token: String): ShopDetail =
+        shopDetailOf(JSONObject(request("/shops", "POST",
+            JSONObject().put("profile_id", profileId).put("name", name), token)))
+
+    suspend fun addShopOffering(shopId: String, kind: String, title: String,
+                                price: Double, token: String): ShopOffering =
+        shopOfferingOf(JSONObject(request("/shops/$shopId/offerings", "POST",
+            JSONObject().put("kind", kind).put("title", title).put("price", price),
+            token)))
+
+    suspend fun retireShopOffering(shopId: String, offeringId: String,
+                                   token: String): ShopOffering =
+        shopOfferingOf(JSONObject(
+            request("/shops/$shopId/offerings/$offeringId", "DELETE", null, token)))
+
+    /** The buyer's press — signed with the interactor's own token. */
+    suspend fun placeShopOrder(shopId: String, offeringId: String, buyerId: String,
+                               quantity: Int, token: String): ShopOrder =
+        shopOrderOf(JSONObject(request("/shops/$shopId/orders", "POST",
+            JSONObject().put("offering_id", offeringId).put("buyer_id", buyerId)
+                .put("quantity", quantity), token)))
+
+    suspend fun shopOrderBook(shopId: String, token: String): List<ShopOrder> {
+        val a = org.json.JSONArray(request("/shops/$shopId/orders", token = token))
+        return (0 until a.length()).map { shopOrderOf(a.getJSONObject(it)) }
+    }
+
+    suspend fun myShopOrders(buyerId: String, token: String): List<ShopOrder> {
+        val a = org.json.JSONArray(request("/shops/orders/of/$buyerId", token = token))
+        return (0 until a.length()).map { shopOrderOf(a.getJSONObject(it)) }
+    }
+
+    suspend fun advanceShopOrder(shopId: String, orderId: String, party: String,
+                                 to: String, token: String): ShopOrder =
+        shopOrderOf(JSONObject(request("/shops/$shopId/orders/$orderId/advance",
+            "POST", JSONObject().put("party", party).put("to", to), token)))
 }
+
+data class ShopCard(val id: String, val name: String, val seller: String,
+                    val tag: String?, val offerings: Int)
+data class ShopOffering(val id: String, val kind: String, val title: String,
+                        val price: Double, val currency: String,
+                        val availability: String, val retired: Int)
+data class ShopDetail(val id: String, val name: String, val blurb: String?,
+                      val seller: String?, val offerings: List<ShopOffering>)
+data class ShopOrder(val id: String, val shopId: String, val title: String,
+                     val quantity: Int, val amount: Double,
+                     val currency: String, val status: String)
 
 data class ObjectionTimelineEvent(val id: String, val event: String,
                                   val actor: String, val sealed: Boolean,

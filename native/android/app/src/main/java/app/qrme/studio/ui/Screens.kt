@@ -1664,7 +1664,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1680,7 +1680,8 @@ fun ManageScreen(vm: StudioViewModel) {
                 6 -> EarningsPanel(vm)
                 7 -> SignaturePanel(vm)
                 8 -> VoicePanel(vm)
-                else -> DeskPanel(vm)
+                9 -> DeskPanel(vm)
+                else -> ShopPanel(vm)
             }
         }
     }
@@ -2480,6 +2481,161 @@ private fun VoicePanel(vm: StudioViewModel) {
     VoiceScreen(vm)
 }
 
+
+// ---- Shops: storefronts, not desks ----
+
+// No bell, no sessions, no connection offers — that absence is the design.
+// Browsing and buying use the interactor identity the shell already holds;
+// the till uses the profile owner's token. Strings go through L10n so the
+// English count behind this shell's tabs does not grow.
+@Composable
+private fun ShopPanel(vm: StudioViewModel) {
+    val lang = L10n.deviceLanguage()
+    var cards by remember { mutableStateOf<List<ShopCard>>(emptyList()) }
+    var open by remember { mutableStateOf<ShopDetail?>(null) }
+    var mine by remember { mutableStateOf<List<ShopOrder>>(emptyList()) }
+    var myShop by remember { mutableStateOf<ShopDetail?>(null) }
+    var book by remember { mutableStateOf<List<ShopOrder>>(emptyList()) }
+    var shopName by remember { mutableStateOf("") }
+    var offerTitle by remember { mutableStateOf("") }
+    var offerPrice by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf<String?>(null) }
+
+    fun reload() { vm.call({ ApiClient.listShops() }) { r -> cards = r.getOrDefault(emptyList()) } }
+    LaunchedEffect(Unit) { reload() }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("shop.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("shop.sub", lang), color = Qrme.T2, fontSize = 12.sp)
+            cards.forEach { s ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    val meta = s.name + " · " + s.seller + (s.tag?.let { " · " + it } ?: "")
+                    Text(meta, color = Qrme.Txt, fontSize = 12.sp)
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.shopCard(s.id) }) { r -> open = r.getOrNull() }
+                    }) { Text(L10n.t("shop.browse", lang), color = Qrme.BrandA, fontSize = 12.sp) }
+                }
+            }
+        }
+
+        open?.let { shop ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(shop.name, color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                shop.offerings.forEach { o ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        val line = o.title + " · " + o.kind + " · " +
+                            "%.2f".format(o.price) + " " + o.currency
+                        Text(line, color = Qrme.T2, fontSize = 12.sp)
+                        TextButton(enabled = vm.interactorId != null, onClick = {
+                            vm.call({ ApiClient.placeShopOrder(shop.id, o.id,
+                                vm.interactorId!!, 1, vm.interactorToken!!) }) { r ->
+                                r.exceptionOrNull()?.let { note = it.message }
+                                vm.call({ ApiClient.myShopOrders(vm.interactorId!!,
+                                    vm.interactorToken!!) }) { m -> mine = m.getOrDefault(emptyList()) }
+                            }
+                        }) { Text(L10n.t("shop.order", lang), color = Qrme.BrandA, fontSize = 12.sp) }
+                    }
+                }
+                if (mine.isNotEmpty()) {
+                    Text(L10n.t("shop.mine", lang), color = Qrme.T2, fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+                mine.forEach { o ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        val line = o.title + " · " + "%.2f".format(o.amount) + " " +
+                            o.currency + " · " + o.status
+                        Text(line, color = Qrme.T3, fontSize = 11.sp)
+                        if (o.status == "placed") {
+                            TextButton(onClick = {
+                                vm.call({ ApiClient.advanceShopOrder(o.shopId, o.id,
+                                    "buyer", "cancelled", vm.interactorToken!!) }) { _ ->
+                                    vm.call({ ApiClient.myShopOrders(vm.interactorId!!,
+                                        vm.interactorToken!!) }) { m -> mine = m.getOrDefault(emptyList()) }
+                                }
+                            }) { Text(L10n.t("shop.cancel", lang), color = Qrme.Red, fontSize = 11.sp) }
+                        }
+                    }
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("shop.till", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("shop.till_note", lang), color = Qrme.T2, fontSize = 11.sp)
+            labeledField(L10n.t("shop.name", lang), shopName, "") { shopName = it }
+            BrandButton(L10n.t("shop.open", lang), enabled = shopName.isNotBlank()) {
+                vm.call({ ApiClient.openShop(vm.pid!!, shopName, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                    myShop = r.getOrNull()
+                    myShop?.let { till ->
+                        vm.call({ ApiClient.shopOrderBook(till.id, vm.token!!) }) { b ->
+                            book = b.getOrDefault(emptyList())
+                        }
+                    }
+                    reload()
+                }
+            }
+            myShop?.let { till ->
+                labeledField(L10n.t("shop.offer_title", lang), offerTitle, "") { offerTitle = it }
+                labeledField(L10n.t("shop.price", lang), offerPrice, "") { offerPrice = it }
+                BrandButton(L10n.t("shop.add", lang), enabled = offerTitle.isNotBlank()) {
+                    vm.call({ ApiClient.addShopOffering(till.id, "goods", offerTitle,
+                        offerPrice.toDoubleOrNull() ?: 0.0, vm.token!!) }) { r ->
+                        r.exceptionOrNull()?.let { note = it.message }
+                        offerTitle = ""; offerPrice = ""
+                        vm.call({ ApiClient.shopCard(till.id) }) { d -> myShop = d.getOrNull() }
+                    }
+                }
+                till.offerings.forEach { o ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        val line = o.title + " · " + "%.2f".format(o.price) + " " + o.currency
+                        Text(line, color = Qrme.T2, fontSize = 12.sp)
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.retireShopOffering(till.id, o.id, vm.token!!) }) { _ ->
+                                vm.call({ ApiClient.shopCard(till.id) }) { d -> myShop = d.getOrNull() }
+                            }
+                        }) { Text(L10n.t("shop.retire", lang), color = Qrme.Red, fontSize = 11.sp) }
+                    }
+                }
+                if (book.isNotEmpty()) {
+                    Text(L10n.t("shop.book", lang), color = Qrme.T2, fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold)
+                }
+                book.forEach { o ->
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        val line = o.title + " ×" + o.quantity + " · " +
+                            "%.2f".format(o.amount) + " " + o.currency + " · " + o.status
+                        Text(line, color = Qrme.T3, fontSize = 11.sp)
+                        val next = when (o.status) {
+                            "placed" -> "accepted"
+                            "accepted" -> "fulfilled"
+                            else -> null
+                        }
+                        next?.let { move ->
+                            TextButton(onClick = {
+                                vm.call({ ApiClient.advanceShopOrder(o.shopId, o.id,
+                                    "seller", move, vm.token!!) }) { _ ->
+                                    vm.call({ ApiClient.shopOrderBook(till.id, vm.token!!) }) { b ->
+                                        book = b.getOrDefault(emptyList())
+                                    }
+                                }
+                            }) {
+                                val label = if (move == "accepted")
+                                    L10n.t("shop.accept", lang) else L10n.t("shop.fulfil", lang)
+                                Text(label, color = Qrme.BrandA, fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
 
 // ---- A live desk: the person behind the counter, and the bell ----
 

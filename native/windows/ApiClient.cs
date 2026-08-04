@@ -1472,4 +1472,83 @@ public sealed class ApiClient
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<VoiceRevocation>(req);
     }
+
+    // -- shops: storefronts, not desks (qrme/shops.py) --
+
+    public Task<ShopCard[]> ListShops() =>
+        Send<ShopCard[]>(new HttpRequestMessage(HttpMethod.Get, "/shops"));
+
+    public Task<ShopDetail> ShopCard(string shopId) =>
+        Send<ShopDetail>(new HttpRequestMessage(HttpMethod.Get, $"/shops/{shopId}"));
+
+    public Task<ShopDetail> OpenShop(string profileId, string name, string token) =>
+        Send<ShopDetail>(Post("/shops",
+            new { profile_id = profileId, name }, token));
+
+    public Task<ShopOffering> AddShopOffering(string shopId, string kind,
+                                              string title, double price,
+                                              string token) =>
+        Send<ShopOffering>(Post($"/shops/{shopId}/offerings",
+            new { kind, title, price }, token));
+
+    public Task<ShopOffering> RetireShopOffering(string shopId,
+                                                 string offeringId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/shops/{shopId}/offerings/{offeringId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ShopOffering>(req);
+    }
+
+    /// <summary>The buyer's press — signed with the interactor's own token.</summary>
+    public Task<ShopOrder> PlaceShopOrder(string shopId, string offeringId,
+                                          string buyerId, int quantity,
+                                          string token) =>
+        Send<ShopOrder>(Post($"/shops/{shopId}/orders",
+            new { offering_id = offeringId, buyer_id = buyerId, quantity },
+            token));
+
+    public Task<ShopOrder[]> ShopOrderBook(string shopId, string token) =>
+        Send<ShopOrder[]>(Get($"/shops/{shopId}/orders", token));
+
+    public Task<ShopOrder[]> MyShopOrders(string buyerId, string token) =>
+        Send<ShopOrder[]>(Get($"/shops/orders/of/{buyerId}", token));
+
+    public Task<ShopOrder> AdvanceShopOrder(string shopId, string orderId,
+                                            string party, string to,
+                                            string token) =>
+        Send<ShopOrder>(Post($"/shops/{shopId}/orders/{orderId}/advance",
+            new { party, to }, token));
 }
+
+public record ShopCard(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("seller")] string Seller,
+    [property: JsonPropertyName("tag")] string? Tag,
+    [property: JsonPropertyName("offerings")] int Offerings);
+
+public record ShopOffering(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("price")] double Price,
+    [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("availability")] string Availability,
+    [property: JsonPropertyName("retired")] int Retired);
+
+public record ShopDetail(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("blurb")] string? Blurb,
+    [property: JsonPropertyName("seller")] string? Seller,
+    [property: JsonPropertyName("offerings")] ShopOffering[] Offerings);
+
+public record ShopOrder(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("shop_id")] string ShopId,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("quantity")] int Quantity,
+    [property: JsonPropertyName("amount")] double Amount,
+    [property: JsonPropertyName("currency")] string Currency,
+    [property: JsonPropertyName("status")] string Status);

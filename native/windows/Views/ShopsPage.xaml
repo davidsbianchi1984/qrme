@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.ShopsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <!-- Shops: storefronts, not desks. No bell, no sessions, no connection
+         offers — that absence is the design. Every visible string is set in
+         code-behind from L10n, because the English count behind this shell's
+         tabs is a ratchet this page must not feed. -->
+    <ScrollViewer>
+        <StackPanel MaxWidth="740" Spacing="16" Padding="28" HorizontalAlignment="Left">
+            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="LeadText" FontSize="13" TextWrapping="Wrap"
+                       Foreground="{StaticResource QrmeT2Brush}" />
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <ItemsControl x:Name="ShopList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" Foreground="{StaticResource QrmeTxtBrush}"
+                                           FontSize="12" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="BrowseShopId" />
+                    <Button x:Name="BrowseButton" Click="OnBrowse" />
+                    <ItemsControl x:Name="OfferingList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" Foreground="{StaticResource QrmeT2Brush}"
+                                           FontSize="12" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="OrderOfferingId" />
+                    <Button x:Name="OrderButton" Click="OnOrder" />
+                    <TextBlock x:Name="MineText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="TillTitle" FontWeight="Bold" FontSize="15"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="TillNote" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="ShopName" />
+                    <Button x:Name="OpenButton" Click="OnOpenShop" />
+                    <TextBox x:Name="OfferTitle" />
+                    <TextBox x:Name="OfferPrice" />
+                    <Button x:Name="AddButton" Click="OnAddOffering" />
+                    <TextBox x:Name="RetireOfferingId" />
+                    <Button x:Name="RetireButton" Click="OnRetire" />
+                    <ItemsControl x:Name="BookList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" Foreground="{StaticResource QrmeT2Brush}"
+                                           FontSize="12" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="AdvanceOrderId" />
+                    <Button x:Name="AcceptButton" Click="OnAccept" />
+                    <Button x:Name="FulfilButton" Click="OnFulfil" />
+                    <TextBlock x:Name="StatusText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

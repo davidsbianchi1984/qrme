@@ -4,6 +4,30 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.5] — 2026-08-04
+
+### A shop is not a desk
+
+The desk shipped as a geek squad for any industry — sessions, consent,
+connections, lent programs. What the platform still had nowhere to put was
+the ordinary case: a business or a person who simply sells things, and the
+nearest shelf would have hung "buy a candle" on the connection apparatus.
+
+    asked     can a specialist serve a caller at a counter
+    mattered  can a business or a person sell goods and services at all
+
+`qrme/shops.py` is the storefront on five rules: one shop per profile (a
+second open is an edit); an offering states kind, price in its own
+currency, and availability; the buyer is an *interactor* — the identity
+JIM's tandem already maintains; money is simulated with real accounting —
+fulfilment credits the creator ledger as `shop_sale`, and only fulfilment
+does; and both sides can let go, the buyer while `placed`, the seller by
+declining. Eight routes, and every one shipped with a door on all four
+clients in the same cut: the console (screen **187**, lesson included) and
+the iOS, Android and Windows shells — whose doorless records had one slot
+of headroom, which made "build the doors" the only honest option. A full
+shopping day writes nothing into any desk table, and a test proves it.
+
 ## [0.42.4] — 2026-08-04
 
 ### Version alignment

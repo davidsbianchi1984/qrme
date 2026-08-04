@@ -1,4 +1,4 @@
-# status: floor — 52 rows
+# status: floor — 53 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -100,6 +100,7 @@ Onboarding      1,39,41,42,47
 Org             146
 Simulate        143
 Wall            186
+Shops           187
 ProviderTiles   22
 
 Problems        150

@@ -912,6 +912,18 @@ LESSONS: tuple[dict, ...] = (
          screens=(186,),
          try_it="Post something with a link, and watch nothing load until "
                 "you press play."),
+    dict(key="shops", chapter="Meeting others", title="Shops",
+         what="A storefront, not a counter. Businesses and people list "
+              "goods and services — a price in its own currency, an "
+              "availability the seller states — and take orders. No "
+              "sessions and no connections: that is the desk's job, and "
+              "keeping them apart is what lets a candle be bought without "
+              "session semantics. Buying is the interactor's own act, the "
+              "same identity a conversation runs on; fulfilment credits "
+              "the seller's ledger — simulated money, real accounting.",
+         screens=(187,),
+         try_it="Open a shop on your profile, list one thing, and buy it "
+                "with an interactor token."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))

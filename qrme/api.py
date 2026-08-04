@@ -35,7 +35,7 @@ from .routers import (accounts as account_routes,
                       organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
                       frontpage, profiles, research, revisions, robots,
-                      sharing, signatures,
+                      sharing, shops as shop_routes, signatures,
                       social, steering,
                       summon, tiers as tier_routes, tutorial,
                       viewfinder as viewfinder_routes, wall,
@@ -49,7 +49,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.42.4",
+    app = FastAPI(title="QRME", version="0.42.5",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -158,6 +158,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(robots.router)
     app.include_router(signatures.router)
     app.include_router(desks.router)
+    app.include_router(shop_routes.router)
     # Last on purpose: these paths are generic (`/{kind}/{id}/like`), so every
     # concrete route above gets first refusal on a match.
     app.include_router(commerce.router)

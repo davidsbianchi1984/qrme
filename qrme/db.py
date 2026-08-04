@@ -1615,6 +1615,50 @@ CREATE TABLE IF NOT EXISTS desk_sessions (
     closed_by TEXT                     -- 'desk' | 'caller'
 );
 
+-- Shops: standalone storefronts. A shop is not a desk — it opens no
+-- sessions and lends no access; it lists goods and services and takes
+-- orders. One shop per profile, so "whose shop is this" has one answer
+-- and the marketplace card can carry it.
+CREATE TABLE IF NOT EXISTS shops (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL UNIQUE REFERENCES profiles(id),
+    name        TEXT NOT NULL,
+    blurb       TEXT,
+    tag         TEXT,                  -- one discovery tag, e.g. carpentry
+    status      TEXT NOT NULL DEFAULT 'open',   -- open | closed
+    created_at  TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS shop_offerings (
+    id          TEXT PRIMARY KEY,
+    shop_id     TEXT NOT NULL REFERENCES shops(id),
+    kind        TEXT NOT NULL,         -- goods | service
+    title       TEXT NOT NULL,
+    blurb       TEXT,
+    price       REAL NOT NULL,
+    currency    TEXT NOT NULL DEFAULT 'USD',
+    availability TEXT NOT NULL DEFAULT 'in_stock',  -- in_stock | made_to_order | unavailable
+    retired     INTEGER NOT NULL DEFAULT 0,
+    created_at  TEXT NOT NULL
+);
+
+-- Simulated money, real accounting: fulfilment credits the ledger the way
+-- a pack sale does. The buyer is an interactor — JIM places orders through
+-- the same per-user interactor its tandem already maintains.
+CREATE TABLE IF NOT EXISTS shop_orders (
+    id          TEXT PRIMARY KEY,
+    shop_id     TEXT NOT NULL REFERENCES shops(id),
+    offering_id TEXT NOT NULL REFERENCES shop_offerings(id),
+    buyer_id    TEXT NOT NULL,          -- interactor id
+    quantity    INTEGER NOT NULL DEFAULT 1,
+    amount      REAL NOT NULL,          -- price * quantity at order time
+    currency    TEXT NOT NULL,
+    note        TEXT,
+    status      TEXT NOT NULL DEFAULT 'placed',  -- placed | accepted | fulfilled | declined | cancelled
+    placed_at   TEXT NOT NULL,
+    settled_at  TEXT                    -- set on fulfilled/declined/cancelled
+);
+
 CREATE TABLE IF NOT EXISTS desk_connections (
     id         TEXT PRIMARY KEY,
     session_id TEXT NOT NULL REFERENCES desk_sessions(id),

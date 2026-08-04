@@ -174,6 +174,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "predict": ("what would they do", "what would he do", "what would she do",
                 "simulate", "simulation", "predict", "forecast",
                 "run a scenario"),
+    "shops": ("a shop", "open a shop", "sell something", "storefront",
+              "buy something", "order goods", "place an order", "my orders"),
     "proceeds": ("crowdfunding", "crowdfund", "donate", "donation",
                  "raise money", "fundraiser", "where the money goes",
                  "proceeds", "leave it to my family"),

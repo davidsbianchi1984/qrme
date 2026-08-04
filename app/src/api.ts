@@ -1017,6 +1017,25 @@ export type PlacementRemoved = {
   beacon_active: boolean;
 };
 
+export interface ShopCard {
+  id: string; profile_id: string; name: string; blurb?: string | null;
+  tag?: string | null; seller: string; offerings: number;
+}
+export interface ShopOffering {
+  id: string; shop_id: string; kind: string; title: string;
+  blurb?: string | null; price: number; currency: string;
+  availability: string; retired: number;
+}
+export interface ShopDetail extends Omit<ShopCard, "offerings"> {
+  offerings: ShopOffering[];
+}
+export interface ShopOrder {
+  id: string; shop_id: string; offering_id: string; buyer_id: string;
+  quantity: number; amount: number; currency: string; note?: string | null;
+  status: string; placed_at: string; settled_at?: string | null;
+  title: string; kind: string;
+}
+
 async function req<T>(
   path: string,
   opts: { method?: string; body?: unknown; token?: string } = {},
@@ -2955,6 +2974,37 @@ export const api = {
   // Typed off a running server rather than left as `unknown[]`: it answers a
   // bare array of listings, which the marketplace screen renders directly.
   marketplaceListings: () => req<Listing[]>(`/marketplace/listings`),
+  // -- shops: standalone storefronts (qrme/shops.py). Not desks: no
+  // sessions, no connections — offerings, orders, and a ledger entry on
+  // fulfilment. Shapes read off a running server.
+  listShops: (tag?: string) =>
+    req<ShopCard[]>(`/shops${tag ? `?tag=${encodeURIComponent(tag)}` : ""}`),
+  shopCard: (shopId: string) => req<ShopDetail>(`/shops/${shopId}`),
+  openShop: (body: { profile_id: string; name: string; blurb?: string;
+                     tag?: string }, token: string) =>
+    req<ShopDetail>(`/shops`, { method: "POST", body, token }),
+  addOffering: (shopId: string,
+                body: { kind: string; title: string; blurb?: string;
+                        price: number; currency?: string;
+                        availability?: string }, token: string) =>
+    req<ShopOffering>(`/shops/${shopId}/offerings`,
+      { method: "POST", body, token }),
+  retireOffering: (shopId: string, offeringId: string, token: string) =>
+    req<ShopOffering>(`/shops/${shopId}/offerings/${offeringId}`,
+      { method: "DELETE", token }),
+  placeShopOrder: (shopId: string,
+                   body: { offering_id: string; buyer_id: string;
+                           quantity?: number; note?: string },
+                   token: string) =>
+    req<ShopOrder>(`/shops/${shopId}/orders`, { method: "POST", body, token }),
+  shopOrderBook: (shopId: string, token: string) =>
+    req<ShopOrder[]>(`/shops/${shopId}/orders`, { token }),
+  myShopOrders: (buyerId: string, token: string) =>
+    req<ShopOrder[]>(`/shops/orders/of/${buyerId}`, { token }),
+  advanceShopOrder: (shopId: string, orderId: string,
+                     body: { party: string; to: string }, token: string) =>
+    req<ShopOrder>(`/shops/${shopId}/orders/${orderId}/advance`,
+      { method: "POST", body, token }),
   seedStarters: () =>
     req<{ created: string[]; skipped: string[]; repaired?: string[] }>(
       `/marketplace/seed`, { method: "POST" }),

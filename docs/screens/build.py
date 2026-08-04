@@ -3554,6 +3554,20 @@ SCREENS = [
         dict(icon="eye", color="green", k="Cards say why",
              s="friends, talked-to, your tags"),
     ], button=("Post", "brand")),
+    # 187: the storefront. The first card is the distinction that named
+    # the round — a shop is not a desk — because a screenshot of a store
+    # cannot otherwise show what was deliberately left out of it.
+    dict(num=187, title="Shops", sub="Goods and services, not sessions",
+         accent="gold", tab=2, cards=[
+        dict(icon="building", color="gold", k="A storefront",
+             s="no counter, no connections", pill=("OPEN", "good")),
+        dict(icon="list", color="brand", k="Goods and services",
+             s="price, currency, availability"),
+        dict(icon="person", color="cyan", k="Buyers are interactors",
+             s="the identity JIM already holds"),
+        dict(icon="coin", color="green", k="Paid on fulfilment",
+             s="simulated money, real ledger"),
+    ], button=("Order at the shown price", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

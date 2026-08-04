@@ -1016,6 +1016,24 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such shop': {
+        'es': 'no existe esa tienda', 'fr': "cette boutique n'existe pas",
+        'de': 'kein solcher Laden', 'pt': 'essa loja não existe',
+        'it': 'nessun negozio con questo nome', 'ja': 'そのショップは存在しません',
+        'zh': '没有这家店铺', 'hi': 'ऐसी कोई दुकान नहीं है', 'ar': 'لا يوجد متجر بهذا الاسم'},
+    'no such order': {
+        'es': 'no existe ese pedido', 'fr': "cette commande n'existe pas",
+        'de': 'keine solche Bestellung', 'pt': 'esse pedido não existe',
+        'it': 'nessun ordine con questo numero', 'ja': 'その注文は存在しません',
+        'zh': '没有这个订单', 'hi': 'ऐसा कोई ऑर्डर नहीं है', 'ar': 'لا يوجد طلب بهذا الرقم'},
+    'party is seller or buyer': {
+        'es': 'la parte es el vendedor o el comprador',
+        'fr': "la partie est le vendeur ou l'acheteur",
+        'de': 'die Partei ist Verkäufer oder Käufer',
+        'pt': 'a parte é o vendedor ou o comprador',
+        'it': "la parte è il venditore o l'acquirente",
+        'ja': '当事者は販売者か購入者です', 'zh': '当事方是卖家或买家',
+        'hi': 'पक्ष विक्रेता या खरीदार है', 'ar': 'الطرف هو البائع أو المشتري'},
     'this profile is restricted pending an objection review; it is not publishing new work while the objection is open': {
         'es': 'este perfil está restringido a la espera de la revisión de una objeción; no publica trabajo nuevo mientras la objeción esté abierta',
         'fr': "ce profil est restreint dans l'attente de l'examen d'une objection ; il ne publie pas de nouveau travail tant que l'objection est ouverte",
@@ -2907,6 +2925,12 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    'availability': {'en': 'Availability', 'es': 'Disponibilidad', 'fr': 'Disponibilité', 'de': 'Verfügbarkeit', 'pt': 'Disponibilidade', 'it': 'Disponibilità', 'ja': '在庫状況', 'zh': '供货情况', 'hi': 'उपलब्धता', 'ar': 'التوفر'},
+    'buyer_id': {'en': 'Buyer', 'es': 'Comprador', 'fr': 'Acheteur', 'de': 'Käufer', 'pt': 'Comprador', 'it': 'Acquirente', 'ja': '購入者', 'zh': '买家', 'hi': 'खरीदार', 'ar': 'المشتري'},
+    'offering_id': {'en': 'Offering', 'es': 'Artículo', 'fr': 'Article', 'de': 'Angebot', 'pt': 'Artigo', 'it': 'Articolo', 'ja': '商品', 'zh': '商品', 'hi': 'पेशकश', 'ar': 'المعروض'},
+    'party': {'en': 'Party', 'es': 'Parte', 'fr': 'Partie', 'de': 'Partei', 'pt': 'Parte', 'it': 'Parte', 'ja': '当事者', 'zh': '当事方', 'hi': 'पक्ष', 'ar': 'الطرف'},
+    'quantity': {'en': 'Quantity', 'es': 'Cantidad', 'fr': 'Quantité', 'de': 'Menge', 'pt': 'Quantidade', 'it': 'Quantità', 'ja': '数量', 'zh': '数量', 'hi': 'मात्रा', 'ar': 'الكمية'},
+    'tag': {'en': 'Tag', 'es': 'Etiqueta', 'fr': 'Étiquette', 'de': 'Schlagwort', 'pt': 'Etiqueta', 'it': 'Etichetta', 'ja': 'タグ', 'zh': '标签', 'hi': 'टैग', 'ar': 'الوسم'},
     'accept': {'en': 'Accept', 'es': 'Aceptar', 'fr': 'Accepter', 'de': 'Annehmen', 'pt': 'Aceitar', 'it': 'Accetta', 'ja': '承諾', 'zh': '接受', 'hi': 'स्वीकार करें', 'ar': 'قبول'},
     'ring_id': {'en': 'Bell ring', 'es': 'Toque de timbre', 'fr': 'Coup de sonnette', 'de': 'Klingelzeichen', 'pt': 'Toque de campainha', 'it': 'Squillo del campanello', 'ja': 'ベルの呼び出し', 'zh': '门铃记录', 'hi': 'घंटी की सूचना', 'ar': 'رنّة الجرس'},
     'display_name': {'en': 'Profile name', 'es': 'Nombre del perfil', 'fr': 'Nom du profil', 'de': 'Profilname', 'pt': 'Nome do perfil', 'it': 'Nome del profilo', 'ja': 'プロフィール名', 'zh': '资料名称', 'hi': 'प्रोफ़ाइल नाम', 'ar': 'اسم الملف'},

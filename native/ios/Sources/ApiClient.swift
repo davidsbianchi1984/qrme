@@ -1471,3 +1471,116 @@ struct ObjectionTimeline: Decodable {
     let note: String
     let events: [ObjectionTimelineEvent]
 }
+
+// MARK: - Shops — storefronts, not desks (qrme/shops.py)
+
+/// A storefront card. `offerings` is a count on the list and the rows on
+/// the detail — two types rather than one optional, so neither lies.
+struct ShopCardRow: Decodable, Identifiable {
+    let id: String
+    let profile_id: String
+    let name: String
+    let blurb: String?
+    let tag: String?
+    let seller: String
+    let offerings: Int
+}
+
+struct ShopOfferingRow: Decodable, Identifiable {
+    let id: String
+    let shop_id: String
+    let kind: String
+    let title: String
+    let blurb: String?
+    let price: Double
+    let currency: String
+    let availability: String
+    let retired: Int
+}
+
+struct ShopDetailRow: Decodable {
+    let id: String
+    let profile_id: String
+    let name: String
+    let blurb: String?
+    let tag: String?
+    let seller: String?
+    let offerings: [ShopOfferingRow]
+}
+
+struct ShopOrderRow: Decodable, Identifiable {
+    let id: String
+    let shop_id: String
+    let offering_id: String
+    let buyer_id: String
+    let quantity: Int
+    let amount: Double
+    let currency: String
+    let status: String
+    let title: String
+    let kind: String
+}
+
+extension ApiClient {
+    func listShops(tag: String? = nil) async throws -> [ShopCardRow] {
+        let q = tag.flatMap {
+            $0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        }
+        return try await request("/shops" + (q.map { "?tag=\($0)" } ?? ""))
+    }
+
+    func shopCard(shopId: String) async throws -> ShopDetailRow {
+        try await request("/shops/\(shopId)")
+    }
+
+    func openShop(profileId: String, name: String, blurb: String?,
+                  tag: String?, token: String) async throws -> ShopDetailRow {
+        var body: [String: Any] = ["profile_id": profileId, "name": name]
+        if let blurb, !blurb.isEmpty { body["blurb"] = blurb }
+        if let tag, !tag.isEmpty { body["tag"] = tag }
+        return try await request("/shops", method: "POST", body: body,
+                                 token: token)
+    }
+
+    func addShopOffering(shopId: String, kind: String, title: String,
+                         price: Double,
+                         token: String) async throws -> ShopOfferingRow {
+        try await request("/shops/\(shopId)/offerings", method: "POST",
+                          body: ["kind": kind, "title": title, "price": price],
+                          token: token)
+    }
+
+    func retireShopOffering(shopId: String, offeringId: String,
+                            token: String) async throws -> ShopOfferingRow {
+        try await request("/shops/\(shopId)/offerings/\(offeringId)",
+                          method: "DELETE", token: token)
+    }
+
+    /// The buyer's press — signed with the interactor's own token, the same
+    /// identity a conversation runs on.
+    func placeShopOrder(shopId: String, offeringId: String, buyerId: String,
+                        quantity: Int,
+                        token: String) async throws -> ShopOrderRow {
+        try await request("/shops/\(shopId)/orders", method: "POST",
+                          body: ["offering_id": offeringId,
+                                 "buyer_id": buyerId, "quantity": quantity],
+                          token: token)
+    }
+
+    func shopOrderBook(shopId: String,
+                       token: String) async throws -> [ShopOrderRow] {
+        try await request("/shops/\(shopId)/orders", token: token)
+    }
+
+    func myShopOrders(buyerId: String,
+                      token: String) async throws -> [ShopOrderRow] {
+        try await request("/shops/orders/of/\(buyerId)", token: token)
+    }
+
+    func advanceShopOrder(shopId: String, orderId: String, party: String,
+                          to: String, token: String) async throws -> ShopOrderRow {
+        try await request("/shops/\(shopId)/orders/\(orderId)/advance",
+                          method: "POST", body: ["party": party, "to": to],
+                          token: token)
+    }
+}

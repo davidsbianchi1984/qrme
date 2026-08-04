@@ -42,6 +42,9 @@
             <NavigationViewItem Content="Desk" Tag="desk">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Contact" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Tag="shops">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Shop" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Signatures" Tag="signatures">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Permissions" /></NavigationViewItem.Icon>
             </NavigationViewItem>
