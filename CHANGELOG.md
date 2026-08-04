@@ -4,6 +4,16 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.2] — 2026-08-04
+
+### Version alignment
+
+The three products are cut together, so one number names one combination
+of all three. QRME's part in this round is one door: `GET /desks` now
+serves JIM's money warnings, which list real finance desks — people with
+trades and locations — beside the tandem specialist as places a warning
+can send somebody.
+
 ## [0.42.1] — 2026-08-04
 
 ### The starters can answer for their own trade
