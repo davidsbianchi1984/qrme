@@ -1519,7 +1519,84 @@ public sealed class ApiClient
                                             string token) =>
         Send<ShopOrder>(Post($"/shops/{shopId}/orders/{orderId}/advance",
             new { party, to }, token));
+
+    // -- your corner: switches, messages, the homepage (qrme/social.py) --
+
+    public Task<System.Collections.Generic.Dictionary<string, bool>> Features(
+            string profileId, string token) =>
+        Send<System.Collections.Generic.Dictionary<string, bool>>(
+            Get($"/profiles/{profileId}/features", token));
+
+    public Task<System.Collections.Generic.Dictionary<string, bool>> SetFeature(
+            string profileId, string feature, bool enabled, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/features")
+        { Content = JsonContent.Create(new { feature, enabled }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<System.Collections.Generic.Dictionary<string, bool>>(req);
+    }
+
+    public Task<DmMessageRow> SendDm(string profileId, string to, string body,
+                                     string token) =>
+        Send<DmMessageRow>(Post($"/profiles/{profileId}/messages",
+            new { to, body }, token));
+
+    public Task<DmThreadBox> DmThreads(string profileId, string token) =>
+        Send<DmThreadBox>(Get($"/profiles/{profileId}/messages", token));
+
+    public Task<DmThreadView> DmThread(string profileId, string withId,
+                                       string token) =>
+        Send<DmThreadView>(Get(
+            $"/profiles/{profileId}/messages?with_id={withId}", token));
+
+    public Task<HomepageDoc> HomepageOf(string profileId, string? token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get,
+            $"/profiles/{profileId}/homepage");
+        if (token is not null) req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<HomepageDoc>(req);
+    }
+
+    public Task<HomepageDoc> EditHomepage(string profileId, string headline,
+                                          string about, string bg,
+                                          string accent, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/homepage")
+        { Content = JsonContent.Create(new { headline, about,
+            theme = new { bg, accent } }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<HomepageDoc>(req);
+    }
 }
+
+public record DmMessageRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("sender_id")] string SenderId,
+    [property: JsonPropertyName("body")] string Body);
+
+public record DmThreadRow(
+    [property: JsonPropertyName("other_id")] string OtherId,
+    [property: JsonPropertyName("other_name")] string? OtherName,
+    [property: JsonPropertyName("messages")] int Messages);
+
+public record DmThreadBox(
+    [property: JsonPropertyName("threads")] DmThreadRow[] Threads);
+
+public record DmThreadView(
+    [property: JsonPropertyName("with")] string With,
+    [property: JsonPropertyName("messages")] DmMessageRow[] Messages);
+
+public record HomepageTheme(
+    [property: JsonPropertyName("bg")] string Bg,
+    [property: JsonPropertyName("accent")] string Accent);
+
+public record HomepageDoc(
+    [property: JsonPropertyName("headline")] string Headline,
+    [property: JsonPropertyName("about")] string About,
+    [property: JsonPropertyName("theme")] HomepageTheme Theme,
+    [property: JsonPropertyName("editable")] bool Editable);
 
 public record ShopCard(
     [property: JsonPropertyName("id")] string Id,

@@ -1016,6 +1016,15 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'this homepage is not public': {
+        'es': 'esta página personal no es pública',
+        'fr': "cette page personnelle n'est pas publique",
+        'de': 'diese Startseite ist nicht öffentlich',
+        'pt': 'esta página pessoal não é pública',
+        'it': 'questa pagina personale non è pubblica',
+        'ja': 'このホームページは公開されていません',
+        'zh': '此主页未公开', 'hi': 'यह होमपेज सार्वजनिक नहीं है',
+        'ar': 'هذه الصفحة الشخصية ليست عامة'},
     'no such shop': {
         'es': 'no existe esa tienda', 'fr': "cette boutique n'existe pas",
         'de': 'kein solcher Laden', 'pt': 'essa loja não existe',
@@ -2925,6 +2934,8 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    'feature': {'en': 'Feature', 'es': 'Función', 'fr': 'Fonction', 'de': 'Funktion', 'pt': 'Função', 'it': 'Funzione', 'ja': '機能', 'zh': '功能', 'hi': 'सुविधा', 'ar': 'الميزة'},
+    'headline': {'en': 'Headline', 'es': 'Titular', 'fr': 'Accroche', 'de': 'Überschrift', 'pt': 'Título', 'it': 'Titolo', 'ja': '見出し', 'zh': '标题', 'hi': 'शीर्षक', 'ar': 'العنوان'},
     'availability': {'en': 'Availability', 'es': 'Disponibilidad', 'fr': 'Disponibilité', 'de': 'Verfügbarkeit', 'pt': 'Disponibilidade', 'it': 'Disponibilità', 'ja': '在庫状況', 'zh': '供货情况', 'hi': 'उपलब्धता', 'ar': 'التوفر'},
     'buyer_id': {'en': 'Buyer', 'es': 'Comprador', 'fr': 'Acheteur', 'de': 'Käufer', 'pt': 'Comprador', 'it': 'Acquirente', 'ja': '購入者', 'zh': '买家', 'hi': 'खरीदार', 'ar': 'المشتري'},
     'offering_id': {'en': 'Offering', 'es': 'Artículo', 'fr': 'Article', 'de': 'Angebot', 'pt': 'Artigo', 'it': 'Articolo', 'ja': '商品', 'zh': '商品', 'hi': 'पेशकश', 'ar': 'المعروض'},

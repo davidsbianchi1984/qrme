@@ -2026,6 +2026,39 @@ CREATE TABLE IF NOT EXISTS profile_verification (
 -- installed on every new profile, and if it were deleted outright the next
 -- install would put it straight back — a friend you cannot get rid of, which
 -- is furniture rather than a friendship.
+-- Per-profile feature switches. A feature a person turned off refuses by
+-- naming the switch, so "why can't I message them" has a real answer.
+CREATE TABLE IF NOT EXISTS feature_flags (
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    feature     TEXT NOT NULL,
+    enabled     INTEGER NOT NULL,
+    updated_at  TEXT NOT NULL,
+    PRIMARY KEY (profile_id, feature)
+);
+
+-- Direct messages between the *people* behind profiles — friends only,
+-- because the friendship graph is the consent record this platform
+-- already keeps. The thread key is the sorted pair, so one conversation
+-- has one identity from either side.
+CREATE TABLE IF NOT EXISTS dm_messages (
+    id          TEXT PRIMARY KEY,
+    low_id      TEXT NOT NULL,          -- min(profile ids)
+    high_id     TEXT NOT NULL,          -- max(profile ids)
+    sender_id   TEXT NOT NULL,
+    body        TEXT NOT NULL,
+    sent_at     TEXT NOT NULL
+);
+
+-- The homepage sandbox: an editable page like the old MySpace, stored as
+-- one validated JSON document. Sanitized at write: hex colors only,
+-- http(s) links only, plain text only, top friends drawn from real
+-- friendships. There is nowhere to put a script, structurally.
+CREATE TABLE IF NOT EXISTS homepages (
+    profile_id  TEXT PRIMARY KEY REFERENCES profiles(id),
+    doc         TEXT NOT NULL,          -- JSON: headline/about/theme/links/top_friends
+    updated_at  TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS friendships (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),

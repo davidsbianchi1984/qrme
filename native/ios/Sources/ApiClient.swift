@@ -1584,3 +1584,85 @@ extension ApiClient {
                           token: token)
     }
 }
+
+// MARK: - Your corner: switches, messages, the homepage (qrme/social.py)
+
+struct DmThreadRow: Decodable, Identifiable {
+    let other_id: String
+    let other_name: String?
+    let messages: Int
+    let last_at: String
+    var id: String { other_id }
+}
+
+struct DmMessageRow: Decodable, Identifiable {
+    let id: String
+    let sender_id: String
+    let body: String
+    let sent_at: String
+}
+
+struct HomepageDoc: Decodable {
+    struct Theme: Decodable { let bg: String; let accent: String }
+    struct Link: Decodable { let label: String; let url: String }
+    struct Top: Decodable { let profile_id: String; let display_name: String }
+    let profile_id: String
+    let display_name: String?
+    let headline: String
+    let about: String
+    let theme: Theme
+    let links: [Link]
+    let top_friends: [Top]
+    let editable: Bool
+}
+
+extension ApiClient {
+    func features(profileId: String,
+                  token: String) async throws -> [String: Bool] {
+        try await request("/profiles/\(profileId)/features", token: token)
+    }
+
+    func setFeature(profileId: String, feature: String, enabled: Bool,
+                    token: String) async throws -> [String: Bool] {
+        try await request("/profiles/\(profileId)/features", method: "PUT",
+                          body: ["feature": feature, "enabled": enabled],
+                          token: token)
+    }
+
+    func sendDm(profileId: String, to: String, body: String,
+                token: String) async throws -> DmMessageRow {
+        try await request("/profiles/\(profileId)/messages", method: "POST",
+                          body: ["to": to, "body": body], token: token)
+    }
+
+    func dmThreads(profileId: String, token: String) async throws -> [DmThreadRow] {
+        struct Box: Decodable { let threads: [DmThreadRow] }
+        let box: Box = try await request("/profiles/\(profileId)/messages",
+                                         token: token)
+        return box.threads
+    }
+
+    func dmThread(profileId: String, withId: String,
+                  token: String) async throws -> [DmMessageRow] {
+        struct Box: Decodable { let messages: [DmMessageRow] }
+        let q = withId.addingPercentEncoding(
+            withAllowedCharacters: .urlQueryAllowed) ?? withId
+        let box: Box = try await request(
+            "/profiles/\(profileId)/messages?with_id=\(q)", token: token)
+        return box.messages
+    }
+
+    func homepage(profileId: String,
+                  token: String? = nil) async throws -> HomepageDoc {
+        try await request("/profiles/\(profileId)/homepage", token: token)
+    }
+
+    func editHomepage(profileId: String, headline: String, about: String,
+                      bg: String, accent: String,
+                      token: String) async throws -> HomepageDoc {
+        try await request("/profiles/\(profileId)/homepage", method: "PUT",
+                          body: ["headline": headline, "about": about,
+                                 "theme": ["bg": bg, "accent": accent]],
+                          token: token)
+    }
+}

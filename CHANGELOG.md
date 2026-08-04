@@ -4,6 +4,36 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.7] — 2026-08-04
+
+### The person decides who reaches them
+
+The platform's people could befriend each other, meet at desks, buy from
+shops — and could not send each other a message, could not turn any of it
+off, and had no page of their own to point at.
+
+    asked     can profiles talk and present themselves
+    mattered  can the people behind them — on their own terms
+
+`qrme/social.py`, three surfaces sharing one idea. **Feature switches**:
+a named set per profile, default on, and everything downstream refuses
+*by naming the switch*, so "why can't I message them" always has an
+answer that is theirs. **Direct messages**: friends only — the
+friendship graph is the consent record the platform already keeps, and
+consent that only one person can end is not consent, so both directions
+must stand; one thread per pair; unfriending closes the door without
+deleting what was said. **The homepage sandbox**: a page like the old
+MySpace — headline, about, theme, links, top friends — validated so hard
+there is structurally nowhere to put a script: hex colors only, http(s)
+links only, plain text only, top friends from actual friends. A rejected
+edit changes nothing; the switch hides the page from everyone but its
+owner.
+
+Six routes, doored on all four clients: the console's **Your corner**
+screen (188) with the switches beside the other settings, and Corner
+panels on iOS, Android and Windows rendering their shells' own L10n
+tables in ten languages.
+
 ## [0.42.6] — 2026-08-04
 
 ### Version alignment

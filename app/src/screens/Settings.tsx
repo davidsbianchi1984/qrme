@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo,
          type WatermarkRecovery } from "../api";
 import { Refusal } from "../Refusal";
+import { t as tr, visitorLang } from "../l10n";
 import { Problems } from "../Problems";
 import { ProviderTiles } from "../ProviderTiles";
 import { useSession } from "../store";
@@ -238,7 +239,49 @@ function MailPanel({ onPlans }: { onPlans: () => void }) {
         </button>
       </>)}
       {note && <div className="muted small">{note}</div>}
+      <FeatureSwitches />
       <Refusal error={error} onPlans={onPlans} variant="inline" />
+    </div>
+  );
+}
+
+// The person's switches. Everything downstream refuses by naming the
+// switch, which is what makes a toggle worth having.
+function FeatureSwitches() {
+  const { session } = useSession();
+  const lang = visitorLang();
+  const [flags, setFlags] = useState<Record<string, boolean> | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!session.profileId || !session.ownerToken) return;
+    api.getFeatures(session.profileId, session.ownerToken)
+      .then(setFlags).catch(() => setFlags(null));
+  }, [session.profileId, session.ownerToken]);
+
+  if (!flags) return null;
+
+  async function flip(feature: string, enabled: boolean) {
+    if (!session.profileId || !session.ownerToken) return;
+    try {
+      setFlags(await api.setFeature(session.profileId, feature, enabled,
+                                    session.ownerToken));
+      setNote(null);
+    } catch (e) { setNote((e as Error).message); }
+  }
+
+  return (
+    <div className="card">
+      <h3>{tr("switches.title", lang)}</h3>
+      <p className="muted small">{tr("switches.note", lang)}</p>
+      {Object.entries(flags).map(([feature, on]) => (
+        <label key={feature} className="row">
+          <input type="checkbox" checked={on}
+                 onChange={(e) => flip(feature, e.target.checked)} />
+          <span>{tr(`switches.${feature}`, lang)}</span>
+        </label>
+      ))}
+      {note && <div className="muted small">{note}</div>}
     </div>
   );
 }

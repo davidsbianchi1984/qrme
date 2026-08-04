@@ -3568,6 +3568,20 @@ SCREENS = [
         dict(icon="coin", color="green", k="Paid on fulfilment",
              s="simulated money, real ledger"),
     ], button=("Order at the shown price", "brand")),
+    # 188: your corner — the MySpace idea with walls. The first card is
+    # the sandbox itself, because "you can edit your page" only matters
+    # if a stranger can safely be shown the result.
+    dict(num=188, title="Your Corner", sub="A homepage and your messages",
+         accent="pink", tab=0, cards=[
+        dict(icon="pen", color="pink", k="A page of yours",
+             s="headline, theme, top friends", pill=("YOURS", "good")),
+        dict(icon="shield", color="green", k="Sandbox walls",
+             s="hex colors, http links, text"),
+        dict(icon="chat", color="brand", k="Friends-only messages",
+             s="friendship is the consent"),
+        dict(icon="sliders", color="amber", k="Your switches",
+             s="refusals name the switch"),
+    ], button=("Save the page", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

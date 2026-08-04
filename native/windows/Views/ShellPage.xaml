@@ -45,6 +45,9 @@
             <NavigationViewItem Tag="shops">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Shop" /></NavigationViewItem.Icon>
             </NavigationViewItem>
+            <NavigationViewItem Tag="corner">
+                <NavigationViewItem.Icon><SymbolIcon Symbol="Home" /></NavigationViewItem.Icon>
+            </NavigationViewItem>
             <NavigationViewItem Content="Signatures" Tag="signatures">
                 <NavigationViewItem.Icon><SymbolIcon Symbol="Permissions" /></NavigationViewItem.Icon>
             </NavigationViewItem>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="QrmeStudio.Views.CornerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource QrmeScrBotBrush}">
+
+    <!-- Your corner: the homepage sandbox, friends-only messages, and the
+         switches. Every visible string is set in code-behind from L10n. -->
+    <ScrollViewer>
+        <StackPanel MaxWidth="740" Spacing="16" Padding="28" HorizontalAlignment="Left">
+            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="WallsText" FontSize="13" TextWrapping="Wrap"
+                       Foreground="{StaticResource QrmeT2Brush}" />
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBox x:Name="HeadlineBox" />
+                    <TextBox x:Name="AboutBox" />
+                    <TextBox x:Name="BgBox" />
+                    <TextBox x:Name="AccentBox" />
+                    <Button x:Name="SaveButton" HorizontalAlignment="Stretch" Click="OnSave" />
+                    <ToggleSwitch x:Name="MessagingSwitch" Toggled="OnMessagingToggled" />
+                    <ToggleSwitch x:Name="HomepageSwitch" Toggled="OnHomepageToggled" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MessagesTitle" FontWeight="Bold" FontSize="15"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="FriendsOnlyText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="ThreadList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" Foreground="{StaticResource QrmeTxtBrush}"
+                                           FontSize="12" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="WithBox" />
+                    <Button x:Name="OpenButton" Click="OnOpenThread" />
+                    <ItemsControl x:Name="MessageList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" Foreground="{StaticResource QrmeT2Brush}"
+                                           FontSize="12" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="DraftBox" />
+                    <Button x:Name="SendButton" Click="OnSend" />
+                    <TextBlock x:Name="StatusText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

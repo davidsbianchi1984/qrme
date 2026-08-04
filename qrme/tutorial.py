@@ -892,6 +892,18 @@ LESSONS: tuple[dict, ...] = (
               "describing the feature.",
          screens=(127, 128, 129),
          try_it="Ask it where to change your background."),
+    dict(key="corner", chapter="Being yourself", title="Your corner",
+         what="A homepage like the old MySpace — headline, about, theme, "
+              "links, top friends — and messages between the people behind "
+              "profiles. The page is a sandbox in the strict sense: colors "
+              "must be hex, links must be http(s), everything else is plain "
+              "text, and top friends must be actual friends, so there is "
+              "nowhere to put a script. Messages travel between friends "
+              "only, and the switches on Settings govern both: turn one "
+              "off and every refusal downstream names it.",
+         screens=(188,),
+         try_it="Pick two theme colors, save, and look at your page the "
+                "way a stranger would."),
     dict(key="discover", chapter="Meeting others", title="Discover",
          what="The marketplace as cards — every one a real profile you can "
               "talk to, not a listing about one. The starter collection is "

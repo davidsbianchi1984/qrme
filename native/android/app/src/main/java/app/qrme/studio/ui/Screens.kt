@@ -1664,7 +1664,7 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop").forEachIndexed { i, t ->
+            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop", "Corner").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(t, fontSize = 12.sp) })
             }
@@ -1681,7 +1681,8 @@ fun ManageScreen(vm: StudioViewModel) {
                 7 -> SignaturePanel(vm)
                 8 -> VoicePanel(vm)
                 9 -> DeskPanel(vm)
-                else -> ShopPanel(vm)
+                10 -> ShopPanel(vm)
+                else -> CornerPanel(vm)
             }
         }
     }
@@ -2481,6 +2482,106 @@ private fun VoicePanel(vm: StudioViewModel) {
     VoiceScreen(vm)
 }
 
+
+// ---- Your corner: switches, messages, the homepage ----
+
+// Strings through L10n; the server's refusal sentences — including the
+// ones that name a switch — arrive in the reader's language and are
+// shown verbatim.
+@Composable
+private fun CornerPanel(vm: StudioViewModel) {
+    val lang = L10n.deviceLanguage()
+    var flags by remember { mutableStateOf<Map<String, Boolean>>(emptyMap()) }
+    var headline by remember { mutableStateOf("") }
+    var about by remember { mutableStateOf("") }
+    var bg by remember { mutableStateOf("#1a1333") }
+    var accent by remember { mutableStateOf("#7b5cff") }
+    var threads by remember { mutableStateOf<List<DmThread>>(emptyList()) }
+    var withId by remember { mutableStateOf("") }
+    var thread by remember { mutableStateOf<List<DmMessage>>(emptyList()) }
+    var draft by remember { mutableStateOf("") }
+    var note by remember { mutableStateOf<String?>(null) }
+
+    fun reload() {
+        vm.call({ ApiClient.homepage(vm.pid!!, vm.token) }) { r ->
+            r.getOrNull()?.let { headline = it.headline; about = it.about
+                bg = it.bg; accent = it.accent }
+        }
+        vm.call({ ApiClient.features(vm.pid!!, vm.token!!) }) { r ->
+            flags = r.getOrDefault(emptyMap())
+        }
+        vm.call({ ApiClient.dmThreads(vm.pid!!, vm.token!!) }) { r ->
+            threads = r.getOrDefault(emptyList())
+        }
+    }
+    LaunchedEffect(Unit) { reload() }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("corner.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("corner.walls", lang), color = Qrme.T2, fontSize = 11.sp)
+            labeledField(L10n.t("corner.headline", lang), headline, "") { headline = it }
+            labeledField(L10n.t("corner.about", lang), about, "") { about = it }
+            labeledField(L10n.t("corner.bg", lang), bg, "") { bg = it }
+            labeledField(L10n.t("corner.accent", lang), accent, "") { accent = it }
+            BrandButton(L10n.t("corner.save", lang)) {
+                vm.call({ ApiClient.editHomepage(vm.pid!!, headline, about, bg,
+                    accent, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                }
+            }
+        }
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("corner.switches", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            flags.entries.sortedBy { it.key }.forEach { (feature, on) ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Switch(checked = on, onCheckedChange = { next ->
+                        vm.call({ ApiClient.setFeature(vm.pid!!, feature, next,
+                            vm.token!!) }) { r -> flags = r.getOrDefault(flags) }
+                    })
+                    Text(L10n.t("corner.switch." + feature, lang), color = Qrme.T2,
+                        fontSize = 12.sp)
+                }
+            }
+        }
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("corner.messages", lang), color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("corner.friends_only", lang), color = Qrme.T2, fontSize = 11.sp)
+            threads.forEach { t ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(t.otherName ?: t.otherId, color = Qrme.Txt, fontSize = 12.sp)
+                    TextButton(onClick = {
+                        withId = t.otherId
+                        vm.call({ ApiClient.dmThread(vm.pid!!, t.otherId, vm.token!!) }) { r ->
+                            thread = r.getOrDefault(emptyList())
+                        }
+                    }) { Text(L10n.t("corner.open", lang), color = Qrme.BrandA, fontSize = 12.sp) }
+                }
+            }
+            labeledField(L10n.t("corner.to", lang), withId, "") { withId = it }
+            thread.forEach { m ->
+                val line = (if (m.senderId == vm.pid) "→ " else "← ") + m.body
+                Text(line, color = Qrme.T3, fontSize = 11.sp)
+            }
+            labeledField(L10n.t("corner.send", lang), draft, "") { draft = it }
+            BrandButton(L10n.t("corner.send", lang),
+                        enabled = draft.isNotBlank() && withId.isNotBlank()) {
+                vm.call({ ApiClient.sendDm(vm.pid!!, withId, draft, vm.token!!) }) { r ->
+                    r.exceptionOrNull()?.let { note = it.message }
+                    draft = ""
+                    vm.call({ ApiClient.dmThread(vm.pid!!, withId, vm.token!!) }) { t ->
+                        thread = t.getOrDefault(emptyList())
+                    }
+                }
+            }
+        }
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
 
 // ---- Shops: storefronts, not desks ----
 

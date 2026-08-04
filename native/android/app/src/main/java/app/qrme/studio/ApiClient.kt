@@ -1374,7 +1374,75 @@ object ApiClient {
                                  to: String, token: String): ShopOrder =
         shopOrderOf(JSONObject(request("/shops/$shopId/orders/$orderId/advance",
             "POST", JSONObject().put("party", party).put("to", to), token)))
+
+    // ---- your corner: switches, messages, the homepage (qrme/social.py) ----
+
+    private fun flagsOf(o: JSONObject): Map<String, Boolean> {
+        val out = mutableMapOf<String, Boolean>()
+        o.keys().forEach { k -> out[k] = o.getBoolean(k) }
+        return out
+    }
+
+    suspend fun features(profileId: String, token: String): Map<String, Boolean> =
+        flagsOf(JSONObject(request("/profiles/$profileId/features", token = token)))
+
+    suspend fun setFeature(profileId: String, feature: String, enabled: Boolean,
+                           token: String): Map<String, Boolean> =
+        flagsOf(JSONObject(request("/profiles/$profileId/features", "PUT",
+            JSONObject().put("feature", feature).put("enabled", enabled), token)))
+
+    suspend fun sendDm(profileId: String, to: String, body: String, token: String) {
+        request("/profiles/$profileId/messages", "POST",
+                JSONObject().put("to", to).put("body", body), token)
+    }
+
+    suspend fun dmThreads(profileId: String, token: String): List<DmThread> {
+        val o = JSONObject(request("/profiles/$profileId/messages", token = token))
+        val a = o.optJSONArray("threads") ?: return emptyList()
+        return (0 until a.length()).map { i ->
+            val t = a.getJSONObject(i)
+            DmThread(t.optString("other_id"),
+                if (t.isNull("other_name")) null else t.optString("other_name"),
+                t.optInt("messages"))
+        }
+    }
+
+    suspend fun dmThread(profileId: String, withId: String,
+                         token: String): List<DmMessage> {
+        val o = JSONObject(request(
+            "/profiles/$profileId/messages?with_id=$withId", token = token))
+        val a = o.optJSONArray("messages") ?: return emptyList()
+        return (0 until a.length()).map { i ->
+            val m = a.getJSONObject(i)
+            DmMessage(m.getString("id"), m.optString("sender_id"),
+                      m.optString("body"))
+        }
+    }
+
+    suspend fun homepage(profileId: String, token: String?): HomepageDoc {
+        val o = JSONObject(request("/profiles/$profileId/homepage", token = token))
+        val theme = o.optJSONObject("theme")
+        return HomepageDoc(o.optString("headline"), o.optString("about"),
+            theme?.optString("bg") ?: "#1a1333",
+            theme?.optString("accent") ?: "#7b5cff")
+    }
+
+    suspend fun editHomepage(profileId: String, headline: String, about: String,
+                             bg: String, accent: String, token: String): HomepageDoc {
+        val body = JSONObject().put("headline", headline).put("about", about)
+            .put("theme", JSONObject().put("bg", bg).put("accent", accent))
+        val o = JSONObject(request("/profiles/$profileId/homepage", "PUT", body, token))
+        val theme = o.optJSONObject("theme")
+        return HomepageDoc(o.optString("headline"), o.optString("about"),
+            theme?.optString("bg") ?: "#1a1333",
+            theme?.optString("accent") ?: "#7b5cff")
+    }
 }
+
+data class DmThread(val otherId: String, val otherName: String?, val messages: Int)
+data class DmMessage(val id: String, val senderId: String, val body: String)
+data class HomepageDoc(val headline: String, val about: String,
+                       val bg: String, val accent: String)
 
 data class ShopCard(val id: String, val name: String, val seller: String,
                     val tag: String?, val offerings: Int)

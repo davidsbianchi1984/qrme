@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.42.6** ([changelog](CHANGELOG.md) ·
+**Current release: v0.42.7** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -388,7 +388,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
   <tr>
     <td align="center" width="33%"><a href="docs/screens/186-wall.svg"><img src="docs/screens/186-wall.svg" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
     <td align="center" width="33%"><a href="docs/screens/187-shops.svg"><img src="docs/screens/187-shops.svg" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
-    <td align="center" width="33%"></td>
+    <td align="center" width="33%"><a href="docs/screens/188-your-corner.svg"><img src="docs/screens/188-your-corner.svg" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
   </tr>
 </table>
 
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.42.7** | **The person decides who reaches them** — friends-only messages with per-profile feature switches that refuse by name, and a MySpace-style homepage sandbox (hex colors, http(s) links, plain text, actual friends) on all four clients |
 | **0.42.6** | **Version alignment** — JIM gained booking/scheduling with bottom-rung reminders and self-only email; a shop service can now be booked as one act, order and appointment together |
 | **0.42.5** | **A shop is not a desk** — standalone storefronts: one shop per profile, offerings with price/currency/availability, buyers are interactors, fulfilment (and only fulfilment) credits the ledger, both sides can let go. Eight routes with doors on all four clients in the same cut (console screen 187 + iOS/Android/Windows), and a test that a shopping day writes nothing into any desk table |
 | **0.42.4** | **Version alignment** — JIM's money guardian gained its native doors; the finance desks QRME serves beside a warning are now reachable from the phones that show it |

@@ -1017,6 +1017,22 @@ export type PlacementRemoved = {
   beacon_active: boolean;
 };
 
+export interface DmMessage {
+  id: string; low_id: string; high_id: string; sender_id: string;
+  body: string; sent_at: string;
+}
+export interface DmThread {
+  other_id: string; other_name?: string | null; messages: number;
+  last_at: string;
+}
+export interface Homepage {
+  profile_id: string; display_name?: string | null; headline: string;
+  about: string; theme: { bg: string; accent: string };
+  links: { label: string; url: string }[];
+  top_friends: { profile_id: string; display_name: string }[];
+  editable: boolean;
+}
+
 export interface ShopCard {
   id: string; profile_id: string; name: string; blurb?: string | null;
   tag?: string | null; seller: string; offerings: number;
@@ -2977,6 +2993,30 @@ export const api = {
   // -- shops: standalone storefronts (qrme/shops.py). Not desks: no
   // sessions, no connections — offerings, orders, and a ledger entry on
   // fulfilment. Shapes read off a running server.
+  // The person's own surfaces: switches, DMs, and the homepage sandbox.
+  getFeatures: (profileId: string, token: string) =>
+    req<Record<string, boolean>>(`/profiles/${profileId}/features`, { token }),
+  setFeature: (profileId: string, feature: string, enabled: boolean,
+               token: string) =>
+    req<Record<string, boolean>>(`/profiles/${profileId}/features`,
+      { method: "PUT", body: { feature, enabled }, token }),
+  sendDm: (profileId: string, to: string, body: string, token: string) =>
+    req<DmMessage>(`/profiles/${profileId}/messages`,
+      { method: "POST", body: { to, body }, token }),
+  dmThreads: (profileId: string, token: string) =>
+    req<{ threads: DmThread[] }>(`/profiles/${profileId}/messages`, { token }),
+  dmThread: (profileId: string, withId: string, token: string) =>
+    req<{ with: string; messages: DmMessage[] }>(
+      `/profiles/${profileId}/messages?with_id=${encodeURIComponent(withId)}`,
+      { token }),
+  homepage: (profileId: string, token?: string) =>
+    req<Homepage>(`/profiles/${profileId}/homepage`, { token }),
+  editHomepage: (profileId: string, body: {
+    headline?: string; about?: string; theme?: { bg: string; accent: string };
+    links?: { label: string; url: string }[]; top_friends?: string[];
+  }, token: string) =>
+    req<Homepage>(`/profiles/${profileId}/homepage`,
+      { method: "PUT", body, token }),
   listShops: (tag?: string) =>
     req<ShopCard[]>(`/shops${tag ? `?tag=${encodeURIComponent(tag)}` : ""}`),
   shopCard: (shopId: string) => req<ShopDetail>(`/shops/${shopId}`),

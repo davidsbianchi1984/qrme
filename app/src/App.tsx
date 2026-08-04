@@ -11,6 +11,7 @@ import { Desk } from "./screens/Desk";
 import { Discover } from "./screens/Discover";
 import { Market } from "./screens/Market";
 import { Shops } from "./screens/Shops";
+import { Corner } from "./screens/Corner";
 import { Exchanges } from "./screens/Exchanges";
 import { Identity } from "./screens/Identity";
 import { Presence } from "./screens/Presence";
@@ -56,7 +57,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "shop" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -65,6 +66,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "discover", label: "Discover", icon: "🛍" },
   { id: "market", label: "Marketplace", icon: "🏷" },
   { id: "shop", label: "Shops", icon: "🛒" },
+  { id: "corner", label: "Your corner", icon: "🏠" },
   { id: "wall", label: "Wall", icon: "🧱" },
   { id: "friends", label: "Friends", icon: "👥" },
   { id: "rooms", label: "Rooms", icon: "🎧" },
@@ -193,6 +195,7 @@ export function App() {
         {tab === "discover" && <Discover onPlans={toPlans} />}
         {tab === "market" && <Market onPlans={toPlans} />}
         {tab === "shop" && <Shops onPlans={toPlans} />}
+        {tab === "corner" && <Corner onPlans={toPlans} />}
         {tab === "wall" && <Wall onPlans={toPlans} />}
         {tab === "friends" && <Friends onPlans={toPlans} />}
         {tab === "rooms" && <Rooms onPlans={toPlans} />}
