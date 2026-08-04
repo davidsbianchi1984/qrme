@@ -476,6 +476,151 @@ public record PackInstalled(
         return Send<FriendAdded>(req);
     }
 
+    // -- the crowd, the couch and the loan --------------------------------
+    // Audience verbs, the watch party, and skill grants: three blocks the
+    // doorless records said this shell could not reach.
+
+    public Task<LikeOut> Like(string kind, string targetId, string token) =>
+        Send<LikeOut>(Post($"/{kind}/{targetId}/like", new { }, token));
+
+    public Task<LikeOut> Unlike(string kind, string targetId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/{kind}/{targetId}/like");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LikeOut>(req);
+    }
+
+    public Task<ShareOut> Share(string kind, string targetId, string token) =>
+        Send<ShareOut>(Post($"/{kind}/{targetId}/share",
+            new { channel = "link" }, token));
+
+    public Task<AudienceCounts> AudienceOf(string kind, string targetId,
+                                           string token) =>
+        Send<AudienceCounts>(Get($"/{kind}/{targetId}/audience", token));
+
+    public Task<SubscribeOut> Subscribe(string kind, string subjectId,
+                                        string token) =>
+        Send<SubscribeOut>(Post($"/{kind}/{subjectId}/subscribe",
+            new { tier = "follow" }, token));
+
+    public Task<SubscribeOut> Unsubscribe(string kind, string subjectId,
+                                          string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/{kind}/{subjectId}/subscribe");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SubscribeOut>(req);
+    }
+
+    public Task<SubscriberBox> Subscribers(string kind, string subjectId,
+                                           string token) =>
+        Send<SubscriberBox>(Get($"/{kind}/{subjectId}/subscribers", token));
+
+    /// <summary>A gift is a gift — the backend refuses to reverse it, and
+    /// requires the giver to be a verified adult.</summary>
+    public Task<GiftRow> Gift(string kind, string subjectId, double amount,
+                              string note, string token) =>
+        Send<GiftRow>(Post($"/{kind}/{subjectId}/gift",
+            new { amount, note }, token));
+
+    public Task<GiftBox> Gifts(string kind, string subjectId, string token) =>
+        Send<GiftBox>(Get($"/{kind}/{subjectId}/gifts", token));
+
+    public Task<PartyCard> StartParty(string postId, string hostId,
+                                      string title, string token) =>
+        Send<PartyCard>(Post("/watch-parties",
+            new { post_id = postId, host_id = hostId, title }, token));
+
+    public Task<PartyCard> Party(string partyId, string token) =>
+        Send<PartyCard>(Get($"/watch-parties/{partyId}", token));
+
+    public Task<PartyCard> JoinParty(string partyId, string memberId,
+                                     string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/members",
+            new { member_id = memberId, kind = "profile" }, token));
+
+    public Task<LeaveOut> LeaveParty(string partyId, string memberId,
+                                     string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/watch-parties/{partyId}/members/{memberId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LeaveOut>(req);
+    }
+
+    /// <summary>Moves a number; presses play on nobody's device.</summary>
+    public Task<PartyCard> SeekParty(string partyId, string hostId,
+                                     int positionS, string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/seek",
+            new { host_id = hostId, position_s = positionS, playing = true },
+            token));
+
+    public Task<PartyLine> SayInParty(string partyId, string memberId,
+                                      string body, string token) =>
+        Send<PartyLine>(Post($"/watch-parties/{partyId}/chat",
+            new { member_id = memberId, body }, token));
+
+    public Task<PartyChatBox> PartyChat(string partyId, string token) =>
+        Send<PartyChatBox>(Get($"/watch-parties/{partyId}/chat", token));
+
+    public Task<PartyCard> EndParty(string partyId, string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/end", new { },
+            token));
+
+    /// <summary>The sentence a synthetic member carries: it has not seen
+    /// the footage.</summary>
+    public Task<PartyContext> PartyContextOf(string partyId, string token) =>
+        Send<PartyContext>(Get($"/watch-parties/{partyId}/context", token));
+
+    public Task<GrantVocabulary> GrantVocabulary() =>
+        Send<GrantVocabulary>(Get("/skill-grants/vocabulary"));
+
+    public Task<GrantCard> OfferGrant(string lenderId, string borrowerId,
+                                      string surface, string surfaceId,
+                                      string skillKind, string skillRef,
+                                      string title, string token) =>
+        Send<GrantCard>(Post("/skill-grants", new
+        {
+            lender_id = lenderId, borrower_id = borrowerId, surface,
+            surface_id = surfaceId, skill_kind = skillKind,
+            skill_ref = skillRef, title
+        }, token));
+
+    public Task<GrantCard> Grant(string grantId, string token) =>
+        Send<GrantCard>(Get($"/skill-grants/{grantId}", token));
+
+    public Task<GrantCard> AcceptGrant(string grantId, string actorId,
+                                       string token) =>
+        Send<GrantCard>(Post($"/skill-grants/{grantId}/accept",
+            new { actor_id = actorId }, token));
+
+    public Task<GrantCard> DeclineGrant(string grantId, string actorId,
+                                        string token) =>
+        Send<GrantCard>(Post($"/skill-grants/{grantId}/decline",
+            new { actor_id = actorId }, token));
+
+    public Task<GrantCard> CloseGrant(string grantId, string actorId,
+                                      string token) =>
+        Send<GrantCard>(Post($"/skill-grants/{grantId}/close",
+            new { actor_id = actorId }, token));
+
+    public Task<GrantUse> UseGrant(string grantId, string borrowerId,
+                                   string what, string token) =>
+        Send<GrantUse>(Post($"/skill-grants/{grantId}/use",
+            new { borrower_id = borrowerId, what }, token));
+
+    public Task<GrantUseBox> GrantUses(string grantId, string token) =>
+        Send<GrantUseBox>(Get($"/skill-grants/{grantId}/uses", token));
+
+    public Task<GrantBox> GrantsInSurface(string surface, string surfaceId,
+                                          string token) =>
+        Send<GrantBox>(Get($"/surfaces/{surface}/{surfaceId}/skill-grants",
+            token));
+
+    public Task<MyGrants> MyGrants(string personId, string token) =>
+        Send<MyGrants>(Get($"/people/{personId}/skill-grants", token));
+
     public async Task<WallPostRow[]> Wall(string profileId)
     {
         var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
@@ -2149,3 +2294,79 @@ public record ExchangeBox(
 
 public record ExchangeChannel(
     [property: JsonPropertyName("room_id")] string? RoomId);
+
+public record LikeOut([property: JsonPropertyName("likes")] int Likes);
+
+public record ShareOut([property: JsonPropertyName("url")] string? Url);
+
+public record AudienceCounts(
+    [property: JsonPropertyName("likes")] int Likes,
+    [property: JsonPropertyName("comments")] int Comments,
+    [property: JsonPropertyName("shares")] int Shares,
+    [property: JsonPropertyName("subscribers")] int Subscribers);
+
+public record SubscribeOut([property: JsonPropertyName("tier")] string? Tier);
+
+public record SubscriberRow(
+    [property: JsonPropertyName("subscriber")] string? Subscriber,
+    [property: JsonPropertyName("tier")] string? Tier);
+
+public record SubscriberBox(
+    [property: JsonPropertyName("subscribers")] SubscriberRow[] Subscribers);
+
+public record GiftRow(
+    [property: JsonPropertyName("giver_id")] string? GiverId,
+    [property: JsonPropertyName("amount")] double Amount,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record GiftBox(
+    [property: JsonPropertyName("gifts")] GiftRow[] Gifts,
+    [property: JsonPropertyName("total")] double Total);
+
+public record PartyMember(
+    [property: JsonPropertyName("member_id")] string MemberId,
+    [property: JsonPropertyName("kind")] string? Kind);
+
+public record PartyCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("state")] string? State,
+    [property: JsonPropertyName("position_s")] int PositionS,
+    [property: JsonPropertyName("members")] PartyMember[]? Members);
+
+public record PartyLine(
+    [property: JsonPropertyName("member_id")] string? MemberId,
+    [property: JsonPropertyName("body")] string? Body);
+
+public record PartyChatBox(
+    [property: JsonPropertyName("lines")] PartyLine[] Lines);
+
+public record PartyContext(
+    [property: JsonPropertyName("you_have_not_seen_it")]
+    string? YouHaveNotSeenIt);
+
+public record GrantVocabulary(
+    [property: JsonPropertyName("terms")] string[] Terms);
+
+public record GrantCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("state")] string? State,
+    [property: JsonPropertyName("lender_id")] string? LenderId,
+    [property: JsonPropertyName("borrower_id")] string? BorrowerId);
+
+public record GrantBox(
+    [property: JsonPropertyName("grants")] GrantCard[] Grants);
+
+public record GrantUse(
+    [property: JsonPropertyName("used_at")] string? UsedAt,
+    [property: JsonPropertyName("what")] string? What);
+
+public record GrantUseBox(
+    [property: JsonPropertyName("uses")] GrantUse[] Uses);
+
+public record MyGrants(
+    [property: JsonPropertyName("lending")] GrantCard[]? Lending,
+    [property: JsonPropertyName("borrowing")] GrantCard[]? Borrowing);
+
+public record LeaveOut([property: JsonPropertyName("left")] bool? Left);

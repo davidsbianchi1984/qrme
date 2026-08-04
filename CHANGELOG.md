@@ -4,6 +4,44 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.2] — 2026-08-04
+
+### The crowd, the couch and the loan
+
+Back to the standing backlogs. Three blocks of the per-shell doorless
+record, read together: the phone could be liked and could not like
+anybody (nine audience routes), could be invited to a watch party the
+console started and could not start, seek, or speak in one (ten), and
+could neither lend a skill nor borrow one (ten).
+
+    asked     is the surface built
+    mattered  can somebody holding a phone stand in the crowd
+
+Twenty-nine routes gain doors on iOS, Android and Windows in one cut —
+**84 rows struck**; the records fall to ios 223, android 227,
+windows 225 — and the rules each block renders are the backend's, not
+the shell's: the numbers under the buttons come from one call; seek
+moves a number and presses play on nobody's device; a synthetic party
+guest carries the sentence that it has not seen the footage; a grant's
+terms are the vocabulary's own sentences, verbatim; and a gift is a
+gift — refused without a verified adult, irreversible by design.
+45 shared strings per shell, in ten languages.
+
+### The evidence rule, applied once
+
+`position_s` leaves the field-label residue (144 → 143): the party's
+seek box now asks a person for it on all three shells, which is the
+one direction the record moves. `host_id`, `lender_id` and `actor_id`
+stay — a context-filled id is not something a person types, and the
+identifier remains the honest fallback.
+
+### A guard that sampled
+
+The ten-language check first spot-checked eight keys, and an injection
+walked straight past it: a row outside the sample lost a language and
+the test stayed green. The key list is now read off the iOS table and
+required, complete, on all three shells.
+
 ## [0.43.1] — 2026-08-04
 
 ### The platform tells you what happened

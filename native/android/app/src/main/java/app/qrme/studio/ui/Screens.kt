@@ -2775,7 +2775,258 @@ private fun PeoplePanel(vm: StudioViewModel) {
             }
         }
 
+        CrowdBlock(vm) { note = it }
+        PartyBlock(vm) { note = it }
+        LendBlock(vm) { note = it }
+
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
+
+// The crowd, the couch and the loan — three blocks the doorless records
+// said this phone could not reach. Audience verbs first: the backend
+// reports the numbers and the caller's own state in one call, so the
+// buttons render without a second trip.
+@Composable
+private fun CrowdBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var kind by remember { mutableStateOf("profiles") }
+    var targetId by remember { mutableStateOf("") }
+    var counts by remember { mutableStateOf<AudienceCounts?>(null) }
+    var gifts by remember { mutableStateOf<List<GiftRow>>(emptyList()) }
+    var amount by remember { mutableStateOf("") }
+    var giftNote by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("crowd.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("crowd.target", lang), targetId, "") { targetId = it }
+        labeledField("kind", kind, "profiles | desks | posts | listings") { kind = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("crowd.like", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.like(kind, targetId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("crowd.unlike", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.unlike(kind, targetId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("crowd.share", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.share(kind, targetId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("crowd.counts", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.counts(kind, targetId, vm.token!!) }) { r ->
+                    counts = r.getOrNull()
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("crowd.follow", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.subscribe(kind, targetId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("crowd.unfollow", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.unsubscribe(kind, targetId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("crowd.subscribers", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.subscribers(kind, targetId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull()?.toString() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        counts?.let {
+            Text("♥ ${it.likes} · 💬 ${it.comments} · ↗ ${it.shares} · ⊕ ${it.subscribers}",
+                color = Qrme.T3, fontSize = 11.sp)
+        }
+        // A gift is a gift: said beside the button, not after the mistake.
+        Text(L10n.t("crowd.gift.note", lang), color = Qrme.T3, fontSize = 11.sp)
+        labeledField(L10n.t("crowd.gift.amount", lang), amount, "") { amount = it }
+        labeledField(L10n.t("crowd.gift.words", lang), giftNote, "") { giftNote = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("crowd.gift", lang),
+                enabled = targetId.isNotBlank() && amount.isNotBlank()) {
+                vm.call({ ApiClient.gift(kind, targetId,
+                    amount.toDoubleOrNull() ?: 0.0, giftNote, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("crowd.gifts", lang), enabled = targetId.isNotBlank()) {
+                vm.call({ ApiClient.gifts(kind, targetId, vm.token!!) }) { r ->
+                    gifts = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        gifts.forEach { g ->
+            Text("${g.giverId} · ${g.amount} · ${g.note}", color = Qrme.T3,
+                fontSize = 11.sp)
+        }
+    }
+}
+
+// The watch party: a room around a posted video. Seek moves a number and
+// presses play on nobody's device.
+@Composable
+private fun PartyBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var postId by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf("") }
+    var partyId by remember { mutableStateOf("") }
+    var card by remember { mutableStateOf<PartyCard?>(null) }
+    var lines by remember { mutableStateOf<List<PartyLine>>(emptyList()) }
+    var draft by remember { mutableStateOf("") }
+    var seekTo by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("party.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("party.post", lang), postId, "") { postId = it }
+        labeledField(L10n.t("party.name", lang), title, "") { title = it }
+        BrandButton(L10n.t("party.start", lang), enabled = postId.isNotBlank()) {
+            vm.call({ ApiClient.startParty(postId, vm.pid!!, title,
+                vm.token!!) }) { r ->
+                r.getOrNull()?.let { partyId = it.id; card = it }
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("party.id", lang), partyId, "") { partyId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("party.join", lang), enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.joinParty(partyId, vm.pid!!, vm.token!!) }) { r ->
+                    card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("party.show", lang), enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.party(partyId, vm.token!!) }) { r ->
+                    card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
+                vm.call({ ApiClient.partyChat(partyId, vm.token!!) }) { r ->
+                    lines = r.getOrDefault(emptyList()) }
+            }
+            BrandButton(L10n.t("party.leave", lang), enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.leaveParty(partyId, vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("party.end", lang), enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.endParty(partyId, vm.token!!) }) { r ->
+                    card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        card?.let {
+            Text("${it.title} · ${it.state} · ${it.positionS} · ${it.members}",
+                color = Qrme.T3, fontSize = 11.sp)
+        }
+        labeledField(L10n.t("party.seek", lang), seekTo, "") { seekTo = it }
+        BrandButton(L10n.t("party.seek.go", lang),
+            enabled = partyId.isNotBlank() && seekTo.isNotBlank()) {
+            vm.call({ ApiClient.seekParty(partyId, vm.pid!!,
+                seekTo.toIntOrNull() ?: 0, vm.token!!) }) { r ->
+                card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
+        }
+        lines.forEach { l ->
+            Text("${l.memberId}: ${l.body}", color = Qrme.T3, fontSize = 11.sp)
+        }
+        labeledField(L10n.t("party.say", lang), draft, "") { draft = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("people.send", lang),
+                enabled = partyId.isNotBlank() && draft.isNotBlank()) {
+                val words = draft; draft = ""
+                vm.call({ ApiClient.sayInParty(partyId, vm.pid!!, words,
+                    vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("party.context", lang), enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.partyContext(partyId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+// Skill grants: a skill lent into one place, used and never copied. The
+// terms shown are the backend's own sentences, verbatim.
+@Composable
+private fun LendBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var terms by remember { mutableStateOf<List<String>>(emptyList()) }
+    var mine by remember { mutableStateOf<List<GrantCard>>(emptyList()) }
+    var borrowerId by remember { mutableStateOf("") }
+    var surface by remember { mutableStateOf("room") }
+    var surfaceId by remember { mutableStateOf("") }
+    var skillKind by remember { mutableStateOf("") }
+    var skillRef by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf("") }
+    var grantId by remember { mutableStateOf("") }
+    var what by remember { mutableStateOf("") }
+    var uses by remember { mutableStateOf<List<GrantUse>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("lend.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("lend.rules", lang)) {
+            vm.call({ ApiClient.grantTerms() }) { r ->
+                terms = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        terms.forEach { Text("· $it", color = Qrme.T3, fontSize = 11.sp) }
+        labeledField(L10n.t("lend.borrower", lang), borrowerId, "") { borrowerId = it }
+        labeledField(L10n.t("lend.surface", lang), surface, "") { surface = it }
+        labeledField(L10n.t("lend.surface.id", lang), surfaceId, "") { surfaceId = it }
+        labeledField(L10n.t("lend.kind", lang), skillKind, "") { skillKind = it }
+        labeledField(L10n.t("lend.ref", lang), skillRef, "") { skillRef = it }
+        labeledField(L10n.t("lend.name", lang), title, "") { title = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("lend.offer", lang),
+                enabled = borrowerId.isNotBlank() && title.isNotBlank()) {
+                vm.call({ ApiClient.offerGrant(vm.pid!!, borrowerId, surface,
+                    surfaceId, skillKind, skillRef, title, vm.token!!) }) { r ->
+                    r.getOrNull()?.let { grantId = it.id }
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lend.mine", lang)) {
+                vm.call({ ApiClient.myGrants(vm.pid!!, vm.token!!) }) { r ->
+                    mine = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+                vm.call({ ApiClient.grantsInSurface(surface,
+                    surfaceId.ifBlank { "x" }, vm.token!!) }) { _ -> }
+            }
+        }
+        mine.forEach { g ->
+            Text("${g.id} · ${g.title} · ${g.state}", color = Qrme.T3,
+                fontSize = 11.sp)
+        }
+        labeledField(L10n.t("lend.id", lang), grantId, "") { grantId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("lend.accept", lang), enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.acceptGrant(grantId, vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lend.decline", lang), enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.declineGrant(grantId, vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lend.close", lang), enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.closeGrant(grantId, vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lend.show", lang), enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.grant(grantId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull()?.let { "${it.title} · ${it.state}" }
+                        ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("lend.what", lang), what, "") { what = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("lend.use", lang), enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.useGrant(grantId, vm.pid!!, what,
+                    vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lend.uses", lang), enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.grantUses(grantId, vm.token!!) }) { r ->
+                    uses = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        uses.forEach { u ->
+            Text("${u.usedAt} · ${u.what}", color = Qrme.T3, fontSize = 11.sp)
+        }
     }
 }
 

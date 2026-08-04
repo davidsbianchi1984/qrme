@@ -1922,6 +1922,222 @@ object ApiClient {
         return o.optString("room_id")
     }
 
+    // -- the crowd, the couch and the loan --------------------------------
+    // Audience verbs, the watch party, and skill grants: three blocks the
+    // doorless records said this phone could not reach.
+
+    suspend fun like(kind: String, targetId: String, token: String) {
+        request("/$kind/$targetId/like", "POST", token = token)
+    }
+
+    suspend fun unlike(kind: String, targetId: String, token: String) {
+        request("/$kind/$targetId/like", "DELETE", token = token)
+    }
+
+    suspend fun share(kind: String, targetId: String, token: String): String {
+        val o = JSONObject(request("/$kind/$targetId/share", "POST",
+            JSONObject().put("channel", "link"), token))
+        return o.optString("url")
+    }
+
+    suspend fun counts(kind: String, targetId: String,
+                       token: String): AudienceCounts {
+        val o = JSONObject(request("/$kind/$targetId/audience",
+            token = token))
+        return AudienceCounts(o.optInt("likes"), o.optInt("comments"),
+            o.optInt("shares"), o.optInt("subscribers"))
+    }
+
+    suspend fun subscribe(kind: String, subjectId: String, token: String) {
+        request("/$kind/$subjectId/subscribe", "POST",
+            JSONObject().put("tier", "follow"), token)
+    }
+
+    suspend fun unsubscribe(kind: String, subjectId: String, token: String) {
+        request("/$kind/$subjectId/subscribe", "DELETE",
+            token = token)
+    }
+
+    suspend fun subscribers(kind: String, subjectId: String,
+                            token: String): Int {
+        val o = JSONObject(request("/$kind/$subjectId/subscribers",
+            token = token))
+        return o.optJSONArray("subscribers")?.length() ?: 0
+    }
+
+    // A gift is a gift: the backend refuses to reverse it, and requires the
+    // giver to be a verified adult.
+    suspend fun gift(kind: String, subjectId: String, amount: Double,
+                     note: String, token: String) {
+        request("/$kind/$subjectId/gift", "POST",
+            JSONObject().put("amount", amount).put("note", note), token)
+    }
+
+    suspend fun gifts(kind: String, subjectId: String,
+                      token: String): List<GiftRow> {
+        val o = JSONObject(request("/$kind/$subjectId/gifts",
+            token = token))
+        val out = mutableListOf<GiftRow>()
+        o.optJSONArray("gifts")?.let { a ->
+            for (i in 0 until a.length()) {
+                val g = a.getJSONObject(i)
+                out.add(GiftRow(g.optString("giver_id"),
+                    g.optDouble("amount", 0.0), g.optString("note")))
+            }
+        }
+        return out
+    }
+
+    private fun partyOf(o: JSONObject) = PartyCard(
+        o.optString("id", o.optString("party_id")), o.optString("title"),
+        o.optString("state"), o.optInt("position_s"),
+        o.optJSONArray("members")?.length() ?: 0)
+
+    suspend fun startParty(postId: String, hostId: String, title: String,
+                           token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties", "POST",
+            JSONObject().put("post_id", postId).put("host_id", hostId)
+                .put("title", title), token)))
+
+    suspend fun party(partyId: String, token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties/$partyId",
+            token = token)))
+
+    suspend fun joinParty(partyId: String, memberId: String,
+                          token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties/$partyId/members",
+            "POST", JSONObject().put("member_id", memberId)
+                .put("kind", "profile"), token)))
+
+    suspend fun leaveParty(partyId: String, memberId: String, token: String) {
+        request("/watch-parties/$partyId/members/$memberId",
+            "DELETE", token = token)
+    }
+
+    // Moves a number; presses play on nobody's device.
+    suspend fun seekParty(partyId: String, hostId: String, positionS: Int,
+                          token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties/$partyId/seek",
+            "POST", JSONObject().put("host_id", hostId)
+                .put("position_s", positionS).put("playing", true), token)))
+
+    suspend fun sayInParty(partyId: String, memberId: String, body: String,
+                           token: String) {
+        request("/watch-parties/$partyId/chat", "POST",
+            JSONObject().put("member_id", memberId).put("body", body), token)
+    }
+
+    suspend fun partyChat(partyId: String, token: String): List<PartyLine> {
+        val o = JSONObject(request("/watch-parties/$partyId/chat",
+            token = token))
+        val out = mutableListOf<PartyLine>()
+        o.optJSONArray("lines")?.let { a ->
+            for (i in 0 until a.length()) {
+                val l = a.getJSONObject(i)
+                out.add(PartyLine(l.optString("member_id"),
+                    l.optString("body")))
+            }
+        }
+        return out
+    }
+
+    suspend fun endParty(partyId: String, token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties/$partyId/end",
+            "POST", token = token)))
+
+    /** The sentence a synthetic member carries: it has not seen the footage. */
+    suspend fun partyContext(partyId: String, token: String): String {
+        val o = JSONObject(request("/watch-parties/$partyId/context",
+            token = token))
+        return o.optString("you_have_not_seen_it")
+    }
+
+    private fun grantOf(o: JSONObject) = GrantCard(
+        o.optString("id", o.optString("grant_id")), o.optString("title"),
+        o.optString("state"), o.optString("lender_id"),
+        o.optString("borrower_id"))
+
+    suspend fun grantTerms(): List<String> {
+        val o = JSONObject(request("/skill-grants/vocabulary"))
+        val out = mutableListOf<String>()
+        o.optJSONArray("terms")?.let { a ->
+            for (i in 0 until a.length()) out.add(a.getString(i))
+        }
+        return out
+    }
+
+    suspend fun offerGrant(lenderId: String, borrowerId: String,
+                           surface: String, surfaceId: String,
+                           skillKind: String, skillRef: String, title: String,
+                           token: String): GrantCard =
+        grantOf(JSONObject(request("/skill-grants", "POST",
+            JSONObject().put("lender_id", lenderId)
+                .put("borrower_id", borrowerId).put("surface", surface)
+                .put("surface_id", surfaceId).put("skill_kind", skillKind)
+                .put("skill_ref", skillRef).put("title", title), token)))
+
+    suspend fun grant(grantId: String, token: String): GrantCard =
+        grantOf(JSONObject(request("/skill-grants/$grantId",
+            token = token)))
+
+    suspend fun acceptGrant(grantId: String, actorId: String, token: String) {
+        request("/skill-grants/$grantId/accept", "POST",
+            JSONObject().put("actor_id", actorId), token)
+    }
+
+    suspend fun declineGrant(grantId: String, actorId: String, token: String) {
+        request("/skill-grants/$grantId/decline", "POST",
+            JSONObject().put("actor_id", actorId), token)
+    }
+
+    suspend fun closeGrant(grantId: String, actorId: String, token: String) {
+        request("/skill-grants/$grantId/close", "POST",
+            JSONObject().put("actor_id", actorId), token)
+    }
+
+    suspend fun useGrant(grantId: String, borrowerId: String, what: String,
+                         token: String) {
+        request("/skill-grants/$grantId/use", "POST",
+            JSONObject().put("borrower_id", borrowerId).put("what", what),
+            token)
+    }
+
+    suspend fun grantUses(grantId: String, token: String): List<GrantUse> {
+        val o = JSONObject(request("/skill-grants/$grantId/uses",
+            token = token))
+        val out = mutableListOf<GrantUse>()
+        o.optJSONArray("uses")?.let { a ->
+            for (i in 0 until a.length()) {
+                val u = a.getJSONObject(i)
+                out.add(GrantUse(u.optString("used_at"), u.optString("what")))
+            }
+        }
+        return out
+    }
+
+    suspend fun grantsInSurface(surface: String, surfaceId: String,
+                                token: String): List<GrantCard> {
+        val o = JSONObject(request(
+            "/surfaces/$surface/$surfaceId/skill-grants", token = token))
+        val out = mutableListOf<GrantCard>()
+        o.optJSONArray("grants")?.let { a ->
+            for (i in 0 until a.length()) out.add(grantOf(a.getJSONObject(i)))
+        }
+        return out
+    }
+
+    suspend fun myGrants(personId: String, token: String): List<GrantCard> {
+        val o = JSONObject(request("/people/$personId/skill-grants",
+            token = token))
+        val out = mutableListOf<GrantCard>()
+        for (key in listOf("lending", "borrowing")) {
+            o.optJSONArray(key)?.let { a ->
+                for (i in 0 until a.length()) out.add(grantOf(a.getJSONObject(i)))
+            }
+        }
+        return out
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)
@@ -2001,3 +2217,21 @@ data class ExchangeItemRow(val id: String, val name: String,
 
 data class ExchangeDeal(val id: String, val work: String?,
                         val state: String, val items: List<ExchangeItemRow>)
+// Audience verbs, the watch party, and skill grants: three blocks the
+// doorless records said this phone could not reach.
+
+data class AudienceCounts(val likes: Int, val comments: Int, val shares: Int,
+                          val subscribers: Int)
+
+data class GiftRow(val giverId: String, val amount: Double, val note: String)
+
+data class PartyCard(val id: String, val title: String, val state: String,
+                     val positionS: Int, val members: Int)
+
+data class PartyLine(val memberId: String, val body: String)
+
+data class GrantCard(val id: String, val title: String, val state: String,
+                     val lenderId: String, val borrowerId: String)
+
+data class GrantUse(val usedAt: String, val what: String)
+

@@ -111,6 +111,126 @@
                                Foreground="{StaticResource QrmeT2Brush}" />
                 </StackPanel>
             </Border>
+            <!-- The crowd: like, share, subscribe, gift. The backend reports
+                 the numbers and the caller's own state in one call. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="CrowdTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="CrowdKindBox" />
+                    <TextBox x:Name="CrowdTargetBox" />
+                    <Button x:Name="LikeButton" Click="OnLike" />
+                    <Button x:Name="UnlikeButton" Click="OnUnlike" />
+                    <Button x:Name="ShareButton" Click="OnShare" />
+                    <Button x:Name="CountsButton" Click="OnCounts" />
+                    <Button x:Name="FollowButton" Click="OnFollow" />
+                    <Button x:Name="UnfollowButton" Click="OnUnfollow" />
+                    <Button x:Name="SubscribersButton" Click="OnSubscribers" />
+                    <TextBlock x:Name="CountsText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="GiftNoteText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="GiftAmountBox" />
+                    <TextBox x:Name="GiftWordsBox" />
+                    <Button x:Name="GiftButton" Click="OnGift" />
+                    <Button x:Name="GiftsButton" Click="OnGifts" />
+                    <ItemsControl x:Name="GiftList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The couch: a watch party around a posted video. Seek moves a
+                 number and presses play on nobody's device. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="PartyTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="PartyPostBox" />
+                    <TextBox x:Name="PartyNameBox" />
+                    <Button x:Name="PartyStartButton" Click="OnPartyStart" />
+                    <TextBox x:Name="PartyIdBox" />
+                    <Button x:Name="PartyJoinButton" Click="OnPartyJoin" />
+                    <Button x:Name="PartyShowButton" Click="OnPartyShow" />
+                    <Button x:Name="PartyLeaveButton" Click="OnPartyLeave" />
+                    <Button x:Name="PartyEndButton" Click="OnPartyEnd" />
+                    <TextBlock x:Name="PartyStateText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="PartySeekBox" />
+                    <Button x:Name="PartySeekButton" Click="OnPartySeek" />
+                    <ItemsControl x:Name="PartyChatList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="PartySayBox" />
+                    <Button x:Name="PartySayButton" Click="OnPartySay" />
+                    <Button x:Name="PartyContextButton" Click="OnPartyContext" />
+                    <TextBlock x:Name="PartyContextText" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- The loan: a skill lent into one place, used and never copied.
+                 The terms shown are the backend's own sentences. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="LendTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="LendRulesButton" Click="OnLendRules" />
+                    <ItemsControl x:Name="LendTermsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="LendBorrowerBox" />
+                    <TextBox x:Name="LendSurfaceBox" />
+                    <TextBox x:Name="LendSurfaceIdBox" />
+                    <TextBox x:Name="LendKindBox" />
+                    <TextBox x:Name="LendRefBox" />
+                    <TextBox x:Name="LendNameBox" />
+                    <Button x:Name="LendOfferButton" Click="OnLendOffer" />
+                    <Button x:Name="LendMineButton" Click="OnLendMine" />
+                    <ItemsControl x:Name="LendMineList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="LendIdBox" />
+                    <Button x:Name="LendAcceptButton" Click="OnLendAccept" />
+                    <Button x:Name="LendDeclineButton" Click="OnLendDecline" />
+                    <Button x:Name="LendCloseButton" Click="OnLendClose" />
+                    <Button x:Name="LendShowButton" Click="OnLendShow" />
+                    <TextBox x:Name="LendWhatBox" />
+                    <Button x:Name="LendUseButton" Click="OnLendUse" />
+                    <Button x:Name="LendUsesButton" Click="OnLendUses" />
+                    <ItemsControl x:Name="LendUsesList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

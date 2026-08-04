@@ -2262,3 +2262,303 @@ extension ApiClient {
         return ["room_id": out.room_id ?? ""]
     }
 }
+
+// MARK: - The crowd, the couch and the loan
+//
+// Three blocks the doorless records said the phones could not reach: the
+// audience verbs (like, share, subscribe, gift — the quiet half of being
+// seen), the watch party (a room around a posted video), and skill grants
+// (a skill lent into one place, used and never copied).
+
+struct AudienceCounts: Decodable {
+    let likes: Int?
+    let comments: Int?
+    let shares: Int?
+    let subscribers: Int?
+    let you_liked: Bool?
+}
+
+struct SubscriberRow: Decodable, Identifiable {
+    let id: String?
+    let actor_id: String?
+    let tier: String?
+    var identity: String { id ?? actor_id ?? "?" }
+}
+
+struct GiftRow: Decodable, Identifiable {
+    let id: String?
+    let giver_id: String?
+    let amount: Double?
+    let note: String?
+    var identity: String { id ?? "\(giver_id ?? "?")-\(amount ?? 0)" }
+}
+
+struct PartyCard: Decodable {
+    let id: String?
+    let party_id: String?
+    let post_id: String?
+    let host_id: String?
+    let title: String?
+    let state: String?
+    let position_s: Int?
+    let playing: Bool?
+    let members: [PartyMember]?
+    var identity: String { id ?? party_id ?? "?" }
+}
+
+struct PartyMember: Decodable, Identifiable {
+    let member_id: String
+    let kind: String?
+    let role: String?
+    let synthetic: Bool?
+    var id: String { member_id }
+}
+
+struct PartyLine: Decodable, Identifiable {
+    let id: String?
+    let member_id: String?
+    let body: String?
+    let at_position_s: Int?
+    var identity: String { id ?? "\(member_id ?? "?")-\(body ?? "")" }
+}
+
+struct GrantVocabulary: Decodable {
+    struct Entry: Decodable, Identifiable {
+        let key: String
+        let means: String
+        var id: String { key }
+    }
+    let surfaces: [Entry]
+    let skill_kinds: [Entry]
+    let states: [String]
+    let terms: [String]
+}
+
+struct GrantCard: Decodable, Identifiable {
+    let id: String?
+    let grant_id: String?
+    let lender_id: String?
+    let borrower_id: String?
+    let surface: String?
+    let surface_id: String?
+    let skill_kind: String?
+    let title: String?
+    let state: String?
+    var identity: String { id ?? grant_id ?? "?" }
+}
+
+struct GrantUse: Decodable, Identifiable {
+    let id: String?
+    let what: String?
+    let used_at: String?
+    var identity: String { id ?? used_at ?? "?" }
+}
+
+extension ApiClient {
+    // -- audience: like, share, subscribe, gift --
+
+    func like(kind: String, targetId: String, token: String) async throws {
+        struct Out: Decodable { let liked: Bool? }
+        let _: Out = try await request("/\(kind)/\(targetId)/like",
+                                       method: "POST", token: token)
+    }
+
+    func unlike(kind: String, targetId: String, token: String) async throws {
+        struct Out: Decodable { let liked: Bool? }
+        let _: Out = try await request("/\(kind)/\(targetId)/like",
+                                       method: "DELETE", token: token)
+    }
+
+    func share(kind: String, targetId: String,
+               token: String) async throws -> [String: String] {
+        struct Out: Decodable { let url: String? }
+        let out: Out = try await request("/\(kind)/\(targetId)/share",
+                                         method: "POST",
+                                         body: ["channel": "link"],
+                                         token: token)
+        return ["url": out.url ?? ""]
+    }
+
+    func audienceCounts(kind: String, targetId: String,
+                        token: String) async throws -> AudienceCounts {
+        try await request("/\(kind)/\(targetId)/audience", token: token)
+    }
+
+    func subscribe(kind: String, subjectId: String,
+                   token: String) async throws {
+        struct Out: Decodable { let tier: String? }
+        let _: Out = try await request("/\(kind)/\(subjectId)/subscribe",
+                                       method: "POST", body: ["tier": "follow"],
+                                       token: token)
+    }
+
+    func unsubscribe(kind: String, subjectId: String,
+                     token: String) async throws {
+        struct Out: Decodable { let cancelled: Bool? }
+        let _: Out = try await request("/\(kind)/\(subjectId)/subscribe",
+                                       method: "DELETE", token: token)
+    }
+
+    func subscribers(kind: String, subjectId: String,
+                     token: String) async throws -> [SubscriberRow] {
+        struct Box: Decodable { let subscribers: [SubscriberRow] }
+        let box: Box = try await request("/\(kind)/\(subjectId)/subscribers",
+                                         token: token)
+        return box.subscribers
+    }
+
+    func gift(kind: String, subjectId: String, amount: Double, note: String,
+              token: String) async throws -> GiftRow {
+        try await request("/\(kind)/\(subjectId)/gift", method: "POST",
+                          body: ["amount": amount, "note": note],
+                          token: token)
+    }
+
+    func gifts(kind: String, subjectId: String,
+               token: String) async throws -> [GiftRow] {
+        struct Box: Decodable { let gifts: [GiftRow] }
+        let box: Box = try await request("/\(kind)/\(subjectId)/gifts",
+                                         token: token)
+        return box.gifts
+    }
+
+    // -- the watch party --
+
+    func startParty(postId: String, hostId: String, title: String,
+                    token: String) async throws -> PartyCard {
+        try await request("/watch-parties", method: "POST",
+                          body: ["post_id": postId, "host_id": hostId,
+                                 "title": title],
+                          token: token)
+    }
+
+    func party(partyId: String, token: String) async throws -> PartyCard {
+        try await request("/watch-parties/\(partyId)", token: token)
+    }
+
+    func joinParty(partyId: String, memberId: String, kind: String,
+                   token: String) async throws -> PartyCard {
+        try await request("/watch-parties/\(partyId)/members",
+                          method: "POST",
+                          body: ["member_id": memberId, "kind": kind],
+                          token: token)
+    }
+
+    func leaveParty(partyId: String, memberId: String,
+                    token: String) async throws {
+        struct Out: Decodable { let left: Bool? }
+        let _: Out = try await request(
+            "/watch-parties/\(partyId)/members/\(memberId)",
+            method: "DELETE", token: token)
+    }
+
+    func seekParty(partyId: String, hostId: String, positionS: Int,
+                   playing: Bool, token: String) async throws -> PartyCard {
+        try await request("/watch-parties/\(partyId)/seek", method: "POST",
+                          body: ["host_id": hostId, "position_s": positionS,
+                                 "playing": playing],
+                          token: token)
+    }
+
+    func sayInParty(partyId: String, memberId: String, body: String,
+                    token: String) async throws -> PartyLine {
+        try await request("/watch-parties/\(partyId)/chat", method: "POST",
+                          body: ["member_id": memberId, "body": body],
+                          token: token)
+    }
+
+    func partyChat(partyId: String, token: String) async throws -> [PartyLine] {
+        struct Box: Decodable { let lines: [PartyLine] }
+        let box: Box = try await request("/watch-parties/\(partyId)/chat",
+                                         token: token)
+        return box.lines
+    }
+
+    func endParty(partyId: String, token: String) async throws -> PartyCard {
+        try await request("/watch-parties/\(partyId)/end", method: "POST",
+                          token: token)
+    }
+
+    /// What a synthetic member is allowed to know — including, explicitly,
+    /// that it has not seen the footage.
+    func partyContext(partyId: String,
+                      token: String) async throws -> [String: String] {
+        struct Ctx: Decodable { let you_have_not_seen_it: String? }
+        let out: Ctx = try await request("/watch-parties/\(partyId)/context",
+                                         token: token)
+        return ["you_have_not_seen_it": out.you_have_not_seen_it ?? ""]
+    }
+
+    // -- skill grants: lent, used, never copied --
+
+    func grantVocabulary() async throws -> GrantVocabulary {
+        try await request("/skill-grants/vocabulary")
+    }
+
+    func offerGrant(lenderId: String, borrowerId: String, surface: String,
+                    surfaceId: String, skillKind: String, skillRef: String,
+                    title: String, token: String) async throws -> GrantCard {
+        try await request("/skill-grants", method: "POST",
+                          body: ["lender_id": lenderId,
+                                 "borrower_id": borrowerId,
+                                 "surface": surface, "surface_id": surfaceId,
+                                 "skill_kind": skillKind,
+                                 "skill_ref": skillRef, "title": title],
+                          token: token)
+    }
+
+    func grant(grantId: String, token: String) async throws -> GrantCard {
+        try await request("/skill-grants/\(grantId)", token: token)
+    }
+
+    func acceptGrant(grantId: String, actorId: String,
+                     token: String) async throws -> GrantCard {
+        try await request("/skill-grants/\(grantId)/accept", method: "POST",
+                          body: ["actor_id": actorId], token: token)
+    }
+
+    func declineGrant(grantId: String, actorId: String,
+                      token: String) async throws -> GrantCard {
+        try await request("/skill-grants/\(grantId)/decline", method: "POST",
+                          body: ["actor_id": actorId], token: token)
+    }
+
+    func closeGrant(grantId: String, actorId: String,
+                    token: String) async throws -> GrantCard {
+        try await request("/skill-grants/\(grantId)/close", method: "POST",
+                          body: ["actor_id": actorId], token: token)
+    }
+
+    func useGrant(grantId: String, borrowerId: String, what: String,
+                  token: String) async throws -> GrantUse {
+        try await request("/skill-grants/\(grantId)/use", method: "POST",
+                          body: ["borrower_id": borrowerId, "what": what],
+                          token: token)
+    }
+
+    func grantUses(grantId: String, token: String) async throws -> [GrantUse] {
+        struct Box: Decodable { let uses: [GrantUse] }
+        let box: Box = try await request("/skill-grants/\(grantId)/uses",
+                                         token: token)
+        return box.uses
+    }
+
+    func grantsInSurface(surface: String, surfaceId: String,
+                         token: String) async throws -> [GrantCard] {
+        struct Box: Decodable { let grants: [GrantCard] }
+        let box: Box = try await request(
+            "/surfaces/\(surface)/\(surfaceId)/skill-grants", token: token)
+        return box.grants
+    }
+
+    func myGrants(personId: String,
+                  token: String) async throws -> [GrantCard] {
+        struct Box: Decodable {
+            let lending: [GrantCard]?
+            let borrowing: [GrantCard]?
+        }
+        let box: Box = try await request("/people/\(personId)/skill-grants",
+                                         token: token)
+        return (box.lending ?? []) + (box.borrowing ?? [])
+    }
+}

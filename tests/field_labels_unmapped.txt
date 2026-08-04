@@ -1,4 +1,4 @@
-# status: backlog — 144 rows
+# status: backlog — 143 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -115,7 +115,6 @@ persona_signature
 phases
 place
 playing
-position_s
 presence
 private
 proactive_min_interval_hours

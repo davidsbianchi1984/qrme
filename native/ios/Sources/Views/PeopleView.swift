@@ -199,6 +199,10 @@ struct PeopleSection: View {
                     }.card()
                 }
 
+                CrowdSection()
+                PartySection()
+                LendingSection()
+
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)
                 }

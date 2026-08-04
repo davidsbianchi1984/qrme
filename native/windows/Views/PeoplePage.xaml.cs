@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -29,6 +30,55 @@ public sealed partial class PeoplePage : Page
         TitleText.Text = L10n.T("people.friends");
         InboxTitle.Text = L10n.T("inbox.title");
         InboxSeenButton.Content = L10n.T("inbox.seen");
+        CrowdTitle.Text = L10n.T("crowd.title");
+        CrowdKindBox.Header = "kind";
+        CrowdKindBox.Text = "profiles";
+        CrowdTargetBox.Header = L10n.T("crowd.target");
+        LikeButton.Content = L10n.T("crowd.like");
+        UnlikeButton.Content = L10n.T("crowd.unlike");
+        ShareButton.Content = L10n.T("crowd.share");
+        CountsButton.Content = L10n.T("crowd.counts");
+        FollowButton.Content = L10n.T("crowd.follow");
+        UnfollowButton.Content = L10n.T("crowd.unfollow");
+        SubscribersButton.Content = L10n.T("crowd.subscribers");
+        GiftNoteText.Text = L10n.T("crowd.gift.note");
+        GiftAmountBox.Header = L10n.T("crowd.gift.amount");
+        GiftWordsBox.Header = L10n.T("crowd.gift.words");
+        GiftButton.Content = L10n.T("crowd.gift");
+        GiftsButton.Content = L10n.T("crowd.gifts");
+        PartyTitle.Text = L10n.T("party.title");
+        PartyPostBox.Header = L10n.T("party.post");
+        PartyNameBox.Header = L10n.T("party.name");
+        PartyStartButton.Content = L10n.T("party.start");
+        PartyIdBox.Header = L10n.T("party.id");
+        PartyJoinButton.Content = L10n.T("party.join");
+        PartyShowButton.Content = L10n.T("party.show");
+        PartyLeaveButton.Content = L10n.T("party.leave");
+        PartyEndButton.Content = L10n.T("party.end");
+        PartySeekBox.Header = L10n.T("party.seek");
+        PartySeekButton.Content = L10n.T("party.seek.go");
+        PartySayBox.Header = L10n.T("party.say");
+        PartySayButton.Content = L10n.T("people.send");
+        PartyContextButton.Content = L10n.T("party.context");
+        LendTitle.Text = L10n.T("lend.title");
+        LendRulesButton.Content = L10n.T("lend.rules");
+        LendBorrowerBox.Header = L10n.T("lend.borrower");
+        LendSurfaceBox.Header = L10n.T("lend.surface");
+        LendSurfaceBox.Text = "room";
+        LendSurfaceIdBox.Header = L10n.T("lend.surface.id");
+        LendKindBox.Header = L10n.T("lend.kind");
+        LendRefBox.Header = L10n.T("lend.ref");
+        LendNameBox.Header = L10n.T("lend.name");
+        LendOfferButton.Content = L10n.T("lend.offer");
+        LendMineButton.Content = L10n.T("lend.mine");
+        LendIdBox.Header = L10n.T("lend.id");
+        LendAcceptButton.Content = L10n.T("lend.accept");
+        LendDeclineButton.Content = L10n.T("lend.decline");
+        LendCloseButton.Content = L10n.T("lend.close");
+        LendShowButton.Content = L10n.T("lend.show");
+        LendWhatBox.Header = L10n.T("lend.what");
+        LendUseButton.Content = L10n.T("lend.use");
+        LendUsesButton.Content = L10n.T("lend.uses");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -198,4 +248,206 @@ public sealed partial class PeoplePage : Page
         }
         catch (Exception ex) { StatusText.Text = ex.Message; }
     }
+
+    // -- the crowd, the couch and the loan --------------------------------
+
+    private async Task Try(Func<Task> op)
+    {
+        try { StatusText.Text = ""; await op(); }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnLike(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Like(
+            CrowdKindBox.Text.Trim(), CrowdTargetBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnUnlike(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Unlike(
+            CrowdKindBox.Text.Trim(), CrowdTargetBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnShare(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Share(CrowdKindBox.Text.Trim(),
+                CrowdTargetBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = outp.Url ?? "";
+        });
+
+    private async void OnCounts(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.AudienceOf(CrowdKindBox.Text.Trim(),
+                CrowdTargetBox.Text.Trim(), AppState.Current.Token!);
+            CountsText.Text =
+                $"♥ {c.Likes} · 💬 {c.Comments} · ↗ {c.Shares} · ⊕ {c.Subscribers}";
+        });
+
+    private async void OnFollow(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Subscribe(
+            CrowdKindBox.Text.Trim(), CrowdTargetBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnUnfollow(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Unsubscribe(
+            CrowdKindBox.Text.Trim(), CrowdTargetBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnSubscribers(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var box = await ApiClient.Shared.Subscribers(
+                CrowdKindBox.Text.Trim(), CrowdTargetBox.Text.Trim(),
+                AppState.Current.Token!);
+            CountsText.Text = box.Subscribers.Length.ToString();
+        });
+
+    private async void OnGift(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Gift(
+            CrowdKindBox.Text.Trim(), CrowdTargetBox.Text.Trim(),
+            double.TryParse(GiftAmountBox.Text, out var a) ? a : 0,
+            GiftWordsBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnGifts(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var box = await ApiClient.Shared.Gifts(CrowdKindBox.Text.Trim(),
+                CrowdTargetBox.Text.Trim(), AppState.Current.Token!);
+            GiftList.ItemsSource = box.Gifts.Select(g => new Row(
+                $"{g.GiverId} · {g.Amount} · {g.Note}")).ToList();
+        });
+
+    private void ShowParty(PartyCard c) =>
+        PartyStateText.Text =
+            $"{c.Title} · {c.State} · {c.PositionS}s · {c.Members?.Length ?? 0}";
+
+    private async void OnPartyStart(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.StartParty(
+                PartyPostBox.Text.Trim(), AppState.Current.Pid!,
+                PartyNameBox.Text.Trim(), AppState.Current.Token!);
+            PartyIdBox.Text = c.Id ?? "";
+            ShowParty(c);
+        });
+
+    private async void OnPartyJoin(object sender, RoutedEventArgs e) =>
+        await Try(async () => ShowParty(await ApiClient.Shared.JoinParty(
+            PartyIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!)));
+
+    private async void OnPartyShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            ShowParty(await ApiClient.Shared.Party(PartyIdBox.Text.Trim(),
+                AppState.Current.Token!));
+            var chat = await ApiClient.Shared.PartyChat(
+                PartyIdBox.Text.Trim(), AppState.Current.Token!);
+            PartyChatList.ItemsSource = chat.Lines.Select(l => new Row(
+                $"{l.MemberId}: {l.Body}")).ToList();
+        });
+
+    private async void OnPartyLeave(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.LeaveParty(
+            PartyIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnPartyEnd(object sender, RoutedEventArgs e) =>
+        await Try(async () => ShowParty(await ApiClient.Shared.EndParty(
+            PartyIdBox.Text.Trim(), AppState.Current.Token!)));
+
+    private async void OnPartySeek(object sender, RoutedEventArgs e) =>
+        await Try(async () => ShowParty(await ApiClient.Shared.SeekParty(
+            PartyIdBox.Text.Trim(), AppState.Current.Pid!,
+            int.TryParse(PartySeekBox.Text, out var pos) ? pos : 0,
+            AppState.Current.Token!)));
+
+    private async void OnPartySay(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.SayInParty(PartyIdBox.Text.Trim(),
+                AppState.Current.Pid!, PartySayBox.Text.Trim(),
+                AppState.Current.Token!);
+            PartySayBox.Text = "";
+        });
+
+    private async void OnPartyContext(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var ctx = await ApiClient.Shared.PartyContextOf(
+                PartyIdBox.Text.Trim(), AppState.Current.Token!);
+            PartyContextText.Text = ctx.YouHaveNotSeenIt ?? "";
+        });
+
+    private async void OnLendRules(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.GrantVocabulary();
+            LendTermsList.ItemsSource =
+                v.Terms.Select(t => new Row($"· {t}")).ToList();
+        });
+
+    private async void OnLendOffer(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var g = await ApiClient.Shared.OfferGrant(AppState.Current.Pid!,
+                LendBorrowerBox.Text.Trim(), LendSurfaceBox.Text.Trim(),
+                LendSurfaceIdBox.Text.Trim(), LendKindBox.Text.Trim(),
+                LendRefBox.Text.Trim(), LendNameBox.Text.Trim(),
+                AppState.Current.Token!);
+            LendIdBox.Text = g.Id ?? "";
+        });
+
+    private async void OnLendMine(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var mine = await ApiClient.Shared.MyGrants(AppState.Current.Pid!,
+                AppState.Current.Token!);
+            var rows = (mine.Lending ?? Array.Empty<GrantCard>())
+                .Concat(mine.Borrowing ?? Array.Empty<GrantCard>())
+                .Select(g => new Row($"{g.Id} · {g.Title} · {g.State}"))
+                .ToList();
+            LendMineList.ItemsSource = rows;
+            var sid = LendSurfaceIdBox.Text.Trim();
+            await ApiClient.Shared.GrantsInSurface(LendSurfaceBox.Text.Trim(),
+                sid.Length == 0 ? "x" : sid, AppState.Current.Token!);
+        });
+
+    private async void OnLendAccept(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.AcceptGrant(
+            LendIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnLendDecline(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.DeclineGrant(
+            LendIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnLendClose(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.CloseGrant(
+            LendIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnLendShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var g = await ApiClient.Shared.Grant(LendIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = $"{g.Title} · {g.State}";
+        });
+
+    private async void OnLendUse(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.UseGrant(
+            LendIdBox.Text.Trim(), AppState.Current.Pid!,
+            LendWhatBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnLendUses(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var box = await ApiClient.Shared.GrantUses(LendIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            LendUsesList.ItemsSource = box.Uses.Select(u => new Row(
+                $"{u.UsedAt} · {u.What}")).ToList();
+        });
 }
