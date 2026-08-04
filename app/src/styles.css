@@ -451,3 +451,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 }
 .public-links { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
 .public-links button.linkish { display: block; margin: 6px auto 0; }
+
+/* The lights' unreachable state: the same dot, unlit. Gray on purpose —
+   the three live colors all mean "the backend answered". */
+.wl-dot-off { background: #3a3654; border-color: rgba(255,255,255,0.35); }

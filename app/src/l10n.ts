@@ -102,6 +102,18 @@ const CHROME: Table = {
     pt: "Lojas", it: "Negozi", ja: "ショップ", zh: "商店",
     hi: "दुकानें", ar: "المتاجر",
   },
+  "lights.unreachable": {
+    en: "The agent lights can’t reach the backend — press to retry",
+    es: "Las luces de agentes no alcanzan el servidor — pulsa para reintentar",
+    fr: "Les voyants d’agents n’atteignent pas le serveur — appuyez pour réessayer",
+    de: "Die Agenten-Lichter erreichen das Backend nicht — zum Wiederholen drücken",
+    pt: "As luzes dos agentes não alcançam o servidor — toque para tentar de novo",
+    it: "Le luci degli agenti non raggiungono il server — premi per riprovare",
+    ja: "エージェントライトがバックエンドに届きません — 押して再試行",
+    zh: "智能体指示灯无法连接后端 — 点按重试",
+    hi: "एजेंट लाइटें बैकएंड तक नहीं पहुँच पा रहीं — फिर से आज़माने के लिए दबाएँ",
+    ar: "أضواء الوكلاء لا تصل إلى الخادم — اضغط لإعادة المحاولة",
+  },
   "nav.corner": {
     en: "Your corner", es: "Tu rincón", fr: "Votre coin", de: "Deine Ecke",
     pt: "O seu cantinho", it: "Il tuo angolo", ja: "あなたのコーナー", zh: "你的角落",

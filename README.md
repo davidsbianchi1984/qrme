@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.42.7** ([changelog](CHANGELOG.md) ·
+**Current release: v0.42.8** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.42.8** | **The record said nobody asks; the forms had started asking** — 107 of 251 recorded "no form asks for this" fields turned out to be bound to real console inputs; all now carry ten-language labels, leaving 144 rows that match the record's own rule; the agent-lights widget now shows an unlit retry dot when the backend is unreachable instead of silently vanishing |
 | **0.42.7** | **The person decides who reaches them** — friends-only messages with per-profile feature switches that refuse by name, and a MySpace-style homepage sandbox (hex colors, http(s) links, plain text, actual friends) on all four clients |
 | **0.42.6** | **Version alignment** — JIM gained booking/scheduling with bottom-rung reminders and self-only email; a shop service can now be booked as one act, order and appointment together |
 | **0.42.5** | **A shop is not a desk** — standalone storefronts: one shop per profile, offerings with price/currency/availability, buyers are interactors, fulfilment (and only fulfilment) credits the ledger, both sides can let go. Eight routes with doors on all four clients in the same cut (console screen 187 + iOS/Android/Windows), and a test that a shopping day writes nothing into any desk table |

@@ -4,6 +4,45 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.42.8] — 2026-08-04
+
+### The record said nobody asks; the forms had started asking
+
+`tests/field_labels_unmapped.txt` holds the request-model fields whose
+identifier *is* the label, on its own stated rule: "map one when a form
+starts asking a person for it." Nobody had re-read the record against
+the forms since it was written — and eighteen releases of new screens
+had quietly broken its premise for 107 of its 251 rows.
+
+    asked     is every field labelled or recorded
+    mattered  is the recorded reason still true
+
+The audit is mechanical and evidence-bound: a field counts as *asked
+for* only when a console input is literally bound to it. Those 107 —
+the Corner page's whole document, the desk, shop, exchange and signing
+forms, the settings screen's connection fields — now carry hand-written
+labels in all ten languages, worded identically to JIM's table where
+the products share a name. The 144 rows that remain are what the record
+always claimed to hold: enum members a control sets, ids a client fills
+from the resource it is looking at, and flags a switch owns.
+
+### The lights say unreachable rather than vanish
+
+A field report in the same cut: the agent-lights pop-up — bottom-left,
+minimizable — gone. Driving the console in a browser showed it alive
+over a healthy backend; the disappearance lives on one path.
+`WatchLights` caught fetch errors with "keep the last face; a blip must
+not blank it" — and when the *first* fetch fails there is no last face,
+so the widget renders nothing, forever. A stored base address pointing
+at a backend too old to carry `/profiles/{id}/watch` turns that blip
+into a permanent absence that reads as the feature being removed.
+
+Unreachable is now a state the widget shows, not one it hides in: with
+a session present and no face, the minimized dot renders unlit gray,
+titled in the reader's language, and pressing it retries. The guard
+checks the dot is *reachable*, not merely present — the first draft
+checked presence, and an injected early `return null` sailed past it.
+
 ## [0.42.7] — 2026-08-04
 
 ### The person decides who reaches them

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, type WatchFace } from "./api";
+import { t as tr, visitorLang } from "./l10n";
 import { useSession } from "./store";
 
 /**
@@ -29,22 +30,37 @@ function worst(face: WatchFace): keyof typeof COLORS {
 export function WatchLights() {
   const { session } = useSession();
   const [face, setFace] = useState<WatchFace | null>(null);
+  // The first fetch failing is not a blip to ride out silently: a stored
+  // base address can point this console at a backend too old to have the
+  // watch route at all, and then "keep the last face" keeps nothing —
+  // the widget simply never appears, which reads as the feature being
+  // gone. Unreachable is a state the widget shows, not one it hides in.
+  const [unreachable, setUnreachable] = useState(false);
   const [min, setMin] = useState(() => localStorage.getItem(MIN_KEY) === "1");
 
-  useEffect(() => {
+  const load = useCallback(() => {
     const { profileId, ownerToken } = session;
     if (!profileId || !ownerToken) return;
-    let alive = true;
-    const load = () =>
-      api.watchFace(profileId, ownerToken)
-        .then((f) => { if (alive) setFace(f); })
-        .catch(() => { /* keep the last face; a blip must not blank it */ });
-    load();
-    const timer = setInterval(load, POLL_MS);
-    return () => { alive = false; clearInterval(timer); };
+    api.watchFace(profileId, ownerToken)
+      .then((f) => { setFace(f); setUnreachable(false); })
+      .catch(() => { setUnreachable(true); /* keep any last face */ });
   }, [session.profileId, session.ownerToken]);
 
-  if (!face) return null;
+  useEffect(() => {
+    load();
+    const timer = setInterval(load, POLL_MS);
+    return () => clearInterval(timer);
+  }, [load]);
+
+  if (!face) {
+    if (!unreachable || !session.profileId) return null;
+    return (
+      <button className="wl-dot wl-dot-off"
+              onClick={load}
+              aria-label={tr("lights.unreachable", visitorLang())}
+              title={tr("lights.unreachable", visitorLang())} />
+    );
+  }
   const tone = worst(face);
 
   const setMinimized = (v: boolean) => {
