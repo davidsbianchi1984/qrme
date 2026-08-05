@@ -1,86 +1,59 @@
-# status: backlog — 25 rows
+# status: floor — 1 row
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
 # and ratcheted.
 #
-# The sidebar has forty-six labels and every one of them is translated into
-# ten languages. There are forty-six screens behind those labels, and every
-# string on all of them is English.
+# ## What this file was for
 #
-# `l10n.ts` says so in its own first line — "chrome localization for the
-# desktop console" — and three rounds of language audit read that sentence as
-# a scope rather than as a finding. Each round widened correctly inside it:
-# Public.tsx, then Onboarding.tsx, then the native shells. None of them asked
+# The sidebar had forty-six labels, every one translated into ten languages,
+# and forty-six screens behind those labels on which every string was
+# English. `l10n.ts` said so in its own first line — "chrome localization for
+# the desktop console" — and three rounds of language audit read that
+# sentence as a scope rather than as a finding. Each widened correctly inside
+# it: Public.tsx, then Onboarding.tsx, then the native shells. None asked
 # what was on the other side of the forty-six translated words.
 #
 #     asked     is the chrome localized
 #     mattered  is anything behind the chrome localized
 #
-# This is worse than a console that is uniformly English, which is why it is
-# recorded separately from public_untranslated.txt rather than folded in. A
-# console with no translations tells a Spanish reader the truth on the first
-# screen. This one puts "Mercado", "Amigos" and "Ajustes" in the sidebar —
-# the app answering in their language — and then hands them 1576 English
-# strings the moment they click. The promise is made by the only part that
-# was kept.
+# That was worse than a console uniformly in English, which is why it was
+# recorded here rather than folded into public_untranslated.txt. A console
+# with no translations tells a Spanish reader the truth on the first screen.
+# That one put "Mercado", "Amigos" and "Ajustes" in the sidebar — the app
+# answering in their language — and then handed them 1576 English strings the
+# moment they clicked. The promise was made by the only part that was kept.
 #
-# Not translated in this round, and the reason is the same one that has held
-# for every ratchet in this repo: 1576 strings is not one round, and a
-# half-translated console is harder to use than an English one, because a
-# reader can no longer tell which screens they are able to read. The keys and
-# the `fill` machinery already exist; what does not exist is the decision
-# about order, and that decision belongs to somebody who knows which screens
-# matter to which market.
+# ## What it is for now
 #
-# The gated reader is a different argument from the accountless one, too.
-# They have a profile, the profile has a language, and the server already
-# honours it on every answer it writes — which is precisely what makes the
-# English here conspicuous: the model replies in Portuguese inside a frame
-# that cannot.
+# The count reached its floor in 0.46.3, over twenty-one releases and about
+# 1500 keys. It is no longer a backlog; it is a floor with one row on it, and
+# the ratchet holds it there in both directions — a new English string on a
+# gated screen fails the suite, and so does a row here that has been fixed
+# and not struck.
 #
-# ceiling: 25
+# Two corrections are worth keeping, because both were the count lying in a
+# direction that flattered nobody.
 #
-# **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
-# a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
-# — "a separator somebody reads" — which conflated *rendered* with *unreadable
-# to a non-English speaker*. There is no Portuguese for `·`.
+# **0.30.10.** 117 rows here were punctuation, not English: a bare `:`, a
+# `·`, a `%`, a `⚠`. The extractor kept them under a stated rule — "a
+# separator somebody reads" — which conflated *rendered* with *unreadable to
+# a non-English speaker*. There is no Portuguese for `·`.
 #
 #     asked     is this string rendered to somebody
 #     mattered  is this string one a non-English reader cannot read
 #
 # The count this file exists to state honestly was overstated by that much.
-Friends: Add
-Friends: Friends
-Friends: Loading, or no friends yet — add friends from Discover.
-Friends: Sign in first.
-Friends: Suggested
-Friends: founder
-Friends: remove
-Memory: AES-256-GCM · one row per conversation · erase by name
-Memory: Erase all
-Memory: Erase this one
-Memory: Loading…
-Memory: Memory Vault 🔒
-Memory: No memories yet — have a chat first.
-Memory: turns · last
-Memory: with
-Simulate: Horizon
-Simulate: Past runs
-Simulate: Prediction
-Simulate: Run a simulation of
-Simulate: Scenario
-Simulate: Simulations are owner-only — sign in with a profile you own.
-Simulate: What Would They Do
-Simulate: a watermarked prediction — never the person's actual word
-Simulate: e.g. the town council proposes paving over the garden
 #
-# One row of this screen's three is deliberate and stays. `AI ·` is quoted,
-# not written: the sentence beside it says the line comes back with that in
-# front of whatever you type, and the server hardcodes those two characters
-# into `design.line`. Translating the quotation to `IA ·` would put a word on
-# the screen that the product never produces — the paragraph would be
-# describing a designation nobody is shown. It is quoted the way `409` and
-# `#tag` are quoted, so it is English on purpose and recorded as such.
+# **0.45.9.** The one row below is deliberate and stays. `AI ·` is quoted,
+# not written: the sentence beside it on TheMark says the line comes back
+# with that in front of whatever you type, and the server hardcodes those two
+# characters into `design.line`. Translating the quotation to `IA ·` would
+# put a word on the screen that the product never produces — the paragraph
+# would be describing a designation nobody is shown. It is quoted the way
+# `409` and `#tag` are quoted, so it is English on purpose and recorded as
+# such. A floor of zero would have been a nicer number and a less honest one.
+#
+# ceiling: 1
 #
 TheMark: AI ·

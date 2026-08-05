@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type MemoryEntry } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -12,6 +13,7 @@ export function Memory({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [convos, setConvos] = useState<Awaited<ReturnType<typeof api.memories>>>([]);
   const [open, setOpen] = useState<string | null>(null);   // interactor_id
   const [entries, setEntries] = useState<MemoryEntry[]>([]);
@@ -35,8 +37,8 @@ export function Memory({ onPlans }: {
 
   async function eraseAll() {
     if (!session.profileId || !session.ownerToken || convos.length === 0) return;
-    if (!confirm(`Erase all ${convos.length} remembered conversation(s)? ` +
-                 "This cannot be undone.")) return;
+    if (!confirm(tr("mem.confirmall", lang)
+                   .replace("{n}", String(convos.length)))) return;
     try {
       for (const c of convos) {
         await api.clearMemory(session.profileId, c.interactor_id, session.ownerToken);
@@ -48,7 +50,7 @@ export function Memory({ onPlans }: {
 
   async function erase(interactorId: string, name: string) {
     if (!session.profileId || !session.ownerToken) return;
-    if (!confirm(`Erase the conversation with ${name}? This cannot be undone.`)) return;
+    if (!confirm(tr("mem.confirmone", lang).replace("{name}", name))) return;
     try {
       await api.clearMemory(session.profileId, interactorId, session.ownerToken);
       if (open === interactorId) { setOpen(null); setEntries([]); }
@@ -59,8 +61,8 @@ export function Memory({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Memory Vault 🔒</h2>
-        <span className="muted small">AES-256-GCM · one row per conversation · erase by name</span>
+        <h2>{tr("mem.title", lang)}</h2>
+        <span className="muted small">{tr("mem.pitch", lang)}</span>
       </header>
 
       <Refusal error={error} onPlans={onPlans} variant="inline" />
@@ -68,24 +70,39 @@ export function Memory({ onPlans }: {
       <div className="card">
         {convos.length > 0 && (
           <div className="actions" style={{ justifyContent: "flex-end", marginBottom: 8 }}>
-            <button className="danger" onClick={eraseAll}>Erase all</button>
+            <button className="danger" onClick={eraseAll}>
+              {tr("mem.eraseall", lang)}
+            </button>
           </div>
         )}
-        {convos.length === 0 && <p className="muted center">No memories yet — have a chat first.</p>}
+        {convos.length === 0 && (
+          <p className="muted center">{tr("mem.nomemories", lang)}</p>
+        )}
         {convos.map((c) => (
           <div key={c.interactor_id} className="convo-row">
+            {/* Two sentences with the names as holes, not four fragments
+                stitched by JSX: "with" sits between the names in English
+                and after both of them in Japanese. */}
             <div className="convo-names">
-              <b>{c.profile_name}</b>
-              <span className="muted small"> with </span>
-              <b>{c.interactor_name}</b>
-              <span className="muted small"> · {c.turns} turns · last {new Date(c.last_at).toLocaleDateString()}</span>
+              {fill(tr("mem.with", lang), {
+                profile: <b>{c.profile_name}</b>,
+                person: <b>{c.interactor_name}</b>,
+              })}
+              <span className="muted small">
+                {" "}
+                {fill(tr("mem.turns", lang), {
+                  n: c.turns,
+                  when: new Date(c.last_at).toLocaleDateString(),
+                })}
+              </span>
             </div>
             <div className="actions">
               <button onClick={() => view(c.interactor_id)}>
-                {open === c.interactor_id ? "Viewing" : "View"}
+                {open === c.interactor_id
+                  ? tr("mem.viewing", lang) : tr("mem.view", lang)}
               </button>
               <button className="danger" onClick={() => erase(c.interactor_id, c.interactor_name)}>
-                Erase this one
+                {tr("mem.erasethis", lang)}
               </button>
             </div>
           </div>
@@ -94,7 +111,9 @@ export function Memory({ onPlans }: {
 
       {open && (
         <div className="memory-list">
-          {entries.length === 0 && <div className="muted center">Loading…</div>}
+          {entries.length === 0 && (
+            <div className="muted center">{tr("mem.loading", lang)}</div>
+          )}
           {entries.map((e, i) => (
             <div className={"mem " + e.role} key={i}>
               <span className="mem-role">{e.role}</span>

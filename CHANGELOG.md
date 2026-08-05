@@ -4,6 +4,55 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.3] — 2026-08-05
+
+### The console record reaches its floor
+
+**25 → 1.** Twenty-one releases, about 1500 keys, forty-six screens. The
+last three:
+
+**What Would They Do** — the horizon list held its three English phrases
+in a `const`; it holds keys. The confidence note was four fragments
+around three numbers and is one sentence, because the count does not
+lead the clause in Japanese.
+
+**Memory Vault 🔒** — including both `confirm()` dialogs. A confirmation
+somebody cannot read is not a confirmation, and *this cannot be undone*
+is the sentence that most needs to arrive in the reader's language.
+
+**Friends** — the founder tag, the suggestion list, and the note that
+distinguishes *removed* from *there was nothing to remove*.
+
+38 keys.
+
+### What the file says now
+
+`console_untranslated.txt` opened by describing a console that hands a
+Spanish reader 1576 English strings the moment they click past a
+translated sidebar. That was true when it was written and has not been
+true for some time, so the header was rewritten: what it was for, what
+it is for now, and both corrections that mattered — the 117 punctuation
+rows struck in 0.30.10, and the one row that stays.
+
+**The floor is one, not zero.** `AI ·` on TheMark is quoted rather than
+written, and translating a quotation of what the server hardcodes would
+describe a designation nobody is shown. A floor of zero would have been
+a nicer number and a less honest one.
+
+### A format that had never met the number one
+
+Every ratchet's first line must read `# status: floor|backlog — N rows`,
+enforced across all of them by
+`test_every_ratchet_says_what_it_is_before_it_says_anything_else`. The
+pattern demanded the plural unconditionally, so landing on exactly one
+row forced a choice between *1 rows* at the top of a file about stating
+a count honestly, and a format that had simply never met the case.
+
+The pattern now requires the *right* form — `row` for one, `rows`
+otherwise — which is stricter than requiring one form of the word, not
+looser. It immediately found `refusals_untranslated.txt`, which has been
+sitting at one row and saying *1 rows*.
+
 ## [0.46.2] — 2026-08-05
 
 ### The front page, the price list, and who is in a life

@@ -101,7 +101,12 @@ def test_the_friends_screen_reads_the_flag_not_the_status(client):
     """Without this it says "removed" for somebody who was never there."""
     src = _markup("app/src/screens/Friends.tsx")
     assert "r.removed" in src
-    assert "Nothing to remove" in src
+    # The sentence moved into the l10n table, so the screen is asked for the
+    # lookup and the table is asked for the words. Matching the sentence in
+    # the screen would now match nothing; matching the key alone would pass
+    # with the table saying anything at all.
+    assert 'tr("frn.nothingtoremove", lang)' in src
+    assert "Nothing to remove" in _markup("app/src/l10n.ts")
 
 
 # --- who may take what back -------------------------------------------------

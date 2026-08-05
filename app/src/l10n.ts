@@ -6792,6 +6792,120 @@ const CHROME: Table = {
   "rel.n.professional": {
     en: "professional", es: "profesional", fr: "professionnel", de: "sachlich", pt: "profissional", it: "professionale", ja: "折り目正しい", zh: "专业", hi: "औपचारिक", ar: "رسمي",
   },
+  "sim.title": {
+    en: "What Would They Do", es: "Qué haría", fr: "Que ferait-il", de: "Was würden sie tun", pt: "O que faria", it: "Cosa farebbe", ja: "その人ならどうするか", zh: "换作他们会怎么做", hi: "वे क्या करते", ar: "ماذا كانوا سيفعلون",
+  },
+  "sim.pitch": {
+    en: "a watermarked prediction — never the person's actual word", es: "una predicción con marca de agua — nunca las palabras reales de la persona", fr: "une prédiction filigranée — jamais les mots réels de la personne", de: "eine mit Wasserzeichen versehene Vorhersage — nie die tatsächlichen Worte der Person", pt: "uma previsão com marca de água — nunca as palavras reais da pessoa", it: "una previsione filigranata — mai le parole vere della persona", ja: "電子透かし入りの予測です — その人が実際に言った言葉ではありません", zh: "一份带水印的预测——绝不是那个人真正说过的话", hi: "वॉटरमार्क लगी एक भविष्यवाणी — उस व्यक्ति के असली शब्द कभी नहीं", ar: "تنبّؤ موسوم بعلامة مائية — وليس كلام الشخص الفعلي أبدًا",
+  },
+  "sim.owneronly": {
+    en: "Simulations are owner-only — sign in with a profile you own.", es: "Las simulaciones son solo del propietario — inicia sesión con un perfil tuyo.", fr: "Les simulations sont réservées au propriétaire — connectez-vous avec un profil qui vous appartient.", de: "Simulationen sind nur für Besitzende — melden Sie sich mit einem eigenen Profil an.", pt: "As simulações são só do proprietário — inicie sessão com um perfil seu.", it: "Le simulazioni sono solo del proprietario — accedi con un profilo tuo.", ja: "シミュレーションは所有者専用です — ご自分のプロフィールでサインインしてください。", zh: "模拟仅限所有者——请用你自己拥有的档案登录。", hi: "सिमुलेशन केवल स्वामी के लिए हैं — अपनी ही किसी प्रोफ़ाइल से साइन इन कीजिए।", ar: "المحاكاة للمالك وحده — سجّل الدخول بملف تملكه.",
+  },
+  "sim.runof": {
+    en: "Run a simulation of {name}", es: "Simular a {name}", fr: "Lancer une simulation de {name}", de: "Eine Simulation von {name} laufen lassen", pt: "Simular {name}", it: "Esegui una simulazione di {name}", ja: "{name} をシミュレートする", zh: "模拟一下 {name}", hi: "{name} का सिमुलेशन चलाएँ", ar: "شغّل محاكاة لـ {name}",
+  },
+  "sim.scenario": {
+    en: "Scenario", es: "Escenario", fr: "Scénario", de: "Szenario", pt: "Cenário", it: "Scenario", ja: "状況", zh: "情境", hi: "परिदृश्य", ar: "السيناريو",
+  },
+  "sim.scenario.ph": {
+    en: "e.g. the town council proposes paving over the garden", es: "p. ej. el ayuntamiento propone asfaltar el jardín", fr: "p. ex. le conseil municipal propose de bitumer le jardin", de: "z. B. der Gemeinderat will den Garten asphaltieren", pt: "p. ex. a câmara propõe alcatroar o jardim", it: "es. il consiglio comunale propone di asfaltare il giardino", ja: "例: 町議会が庭を舗装する案を出した", zh: "例如：镇议会提议把花园铺成路面", hi: "उदा. नगर परिषद बग़ीचे पर सड़क बनाने का प्रस्ताव लाती है", ar: "مثال: يقترح المجلس البلدي تعبيد الحديقة",
+  },
+  "sim.horizon": {
+    en: "Horizon", es: "Horizonte", fr: "Horizon", de: "Zeithorizont", pt: "Horizonte", it: "Orizzonte", ja: "見通す範囲", zh: "时间跨度", hi: "अवधि", ar: "المدى",
+  },
+  "sim.h.immediate": {
+    en: "in the next moments", es: "en los próximos momentos", fr: "dans les instants qui viennent", de: "in den nächsten Augenblicken", pt: "nos próximos momentos", it: "nei prossimi istanti", ja: "これからの数瞬のうちに", zh: "在接下来的片刻里", hi: "अगले कुछ पलों में", ar: "في اللحظات القادمة",
+  },
+  "sim.h.short_term": {
+    en: "over days or weeks", es: "en días o semanas", fr: "sur des jours ou des semaines", de: "über Tage oder Wochen", pt: "ao longo de dias ou semanas", it: "nell'arco di giorni o settimane", ja: "数日から数週間のうちに", zh: "在几天到几周之内", hi: "कुछ दिनों या हफ़्तों में", ar: "خلال أيام أو أسابيع",
+  },
+  "sim.h.long_term": {
+    en: "over months or years", es: "en meses o años", fr: "sur des mois ou des années", de: "über Monate oder Jahre", pt: "ao longo de meses ou anos", it: "nell'arco di mesi o anni", ja: "数か月から数年のうちに", zh: "在几个月到几年之内", hi: "कुछ महीनों या सालों में", ar: "خلال شهور أو سنوات",
+  },
+  "sim.describe": {
+    en: "Describe the scenario first.", es: "Describe el escenario primero.", fr: "Décrivez d'abord le scénario.", de: "Beschreiben Sie zuerst das Szenario.", pt: "Descreva primeiro o cenário.", it: "Descrivi prima lo scenario.", ja: "先に状況を書いてください。", zh: "请先描述情境。", hi: "पहले परिदृश्य लिखिए।", ar: "صِف السيناريو أولًا.",
+  },
+  "sim.modeling": {
+    en: "Modeling…", es: "Modelando…", fr: "Modélisation…", de: "Wird modelliert…", pt: "A modelar…", it: "Modellazione…", ja: "モデル化中…", zh: "建模中…", hi: "मॉडल बन रहा है…", ar: "جارٍ النمذجة…",
+  },
+  "sim.run": {
+    en: "Run Simulation", es: "Ejecutar simulación", fr: "Lancer la simulation", de: "Simulation starten", pt: "Executar simulação", it: "Esegui la simulazione", ja: "シミュレーションを実行", zh: "运行模拟", hi: "सिमुलेशन चलाएँ", ar: "شغّل المحاكاة",
+  },
+  "sim.prediction": {
+    en: "Prediction", es: "Predicción", fr: "Prédiction", de: "Vorhersage", pt: "Previsão", it: "Previsione", ja: "予測", zh: "预测", hi: "भविष्यवाणी", ar: "التنبّؤ",
+  },
+  "sim.confidence": {
+    en: "confidence {score} — from {items} source item(s) and {turns} remembered turn(s)", es: "confianza {score} — a partir de {items} elemento(s) de origen y {turns} turno(s) recordado(s)", fr: "confiance {score} — à partir de {items} élément(s) source et {turns} tour(s) mémorisé(s)", de: "Zuversicht {score} — aus {items} Quellelement(en) und {turns} erinnerten Zug/Zügen", pt: "confiança {score} — a partir de {items} item(ns) de origem e {turns} turno(s) recordado(s)", it: "fiducia {score} — da {items} elemento/i di origine e {turns} turno/i ricordato/i", ja: "確信度 {score} — 出典 {items} 件と、記憶された往復 {turns} 件から", zh: "置信度 {score} —— 来自 {items} 项来源材料和 {turns} 个记住的对话回合", hi: "विश्वास {score} — {items} स्रोत-सामग्री और {turns} याद रखे गए संवाद से", ar: "درجة الثقة {score} — من {items} عنصر مصدر و{turns} دورًا محفوظًا",
+  },
+  "sim.pastruns": {
+    en: "Past runs", es: "Ejecuciones anteriores", fr: "Exécutions passées", de: "Frühere Läufe", pt: "Execuções anteriores", it: "Esecuzioni passate", ja: "過去の実行", zh: "过往的运行", hi: "पिछली बार", ar: "عمليات سابقة",
+  },
+  "mem.title": {
+    en: "Memory Vault 🔒", es: "Bóveda de memoria 🔒", fr: "Coffre de mémoire 🔒", de: "Gedächtnistresor 🔒", pt: "Cofre de memória 🔒", it: "Caveau della memoria 🔒", ja: "記憶の保管庫 🔒", zh: "记忆库 🔒", hi: "स्मृति-तिजोरी 🔒", ar: "خزنة الذاكرة 🔒",
+  },
+  "mem.pitch": {
+    en: "AES-256-GCM · one row per conversation · erase by name", es: "AES-256-GCM · una fila por conversación · borrar por nombre", fr: "AES-256-GCM · une ligne par conversation · effacer par nom", de: "AES-256-GCM · eine Zeile je Gespräch · nach Namen löschen", pt: "AES-256-GCM · uma linha por conversa · apagar por nome", it: "AES-256-GCM · una riga per conversazione · cancella per nome", ja: "AES-256-GCM · 会話ごとに一行 · 名前で消せます", zh: "AES-256-GCM · 每段对话一行 · 按名字抹除", hi: "AES-256-GCM · हर बातचीत के लिए एक पंक्ति · नाम से मिटाएँ", ar: "AES-256-GCM · سطر لكل محادثة · امحُ بالاسم",
+  },
+  "mem.eraseall": {
+    en: "Erase all", es: "Borrar todo", fr: "Tout effacer", de: "Alles löschen", pt: "Apagar tudo", it: "Cancella tutto", ja: "すべて消す", zh: "全部抹除", hi: "सब मिटाएँ", ar: "امحُ الكل",
+  },
+  "mem.confirmall": {
+    en: "Erase all {n} remembered conversation(s)? This cannot be undone.", es: "¿Borrar las {n} conversación(es) recordada(s)? Esto no se puede deshacer.", fr: "Effacer les {n} conversation(s) mémorisée(s) ? C'est irréversible.", de: "Alle {n} erinnerte(n) Gespräch(e) löschen? Das lässt sich nicht rückgängig machen.", pt: "Apagar as {n} conversa(s) recordada(s)? Isto não pode ser desfeito.", it: "Cancellare tutte le {n} conversazione/i ricordata/e? Non è reversibile.", ja: "記憶された会話 {n} 件をすべて消しますか？取り消せません。", zh: "抹除全部 {n} 段记住的对话？此操作无法撤销。", hi: "याद रखी गई सभी {n} बातचीत मिटा दें? यह वापस नहीं लाया जा सकता।", ar: "أتمحو كل المحادثات المحفوظة البالغة {n}؟ لا يمكن التراجع عن هذا.",
+  },
+  "mem.nomemories": {
+    en: "No memories yet — have a chat first.", es: "Todavía no hay recuerdos — habla un poco primero.", fr: "Pas encore de souvenirs — discutez d'abord.", de: "Noch keine Erinnerungen — führen Sie zuerst ein Gespräch.", pt: "Ainda não há memórias — converse primeiro.", it: "Ancora nessun ricordo — prima fai una chiacchierata.", ja: "まだ記憶はありません — まず少し話してみてください。", zh: "还没有记忆——先聊几句吧。", hi: "अभी कोई स्मृति नहीं — पहले थोड़ी बातचीत कीजिए।", ar: "لا ذكريات بعد — تحدّث قليلًا أولًا.",
+  },
+  "mem.with": {
+    en: "{profile} with {person}", es: "{profile} con {person}", fr: "{profile} avec {person}", de: "{profile} mit {person}", pt: "{profile} com {person}", it: "{profile} con {person}", ja: "{profile} と {person}", zh: "{profile} 与 {person}", hi: "{profile} और {person}", ar: "{profile} مع {person}",
+  },
+  "mem.turns": {
+    en: "· {n} turns · last {when}", es: "· {n} turnos · último {when}", fr: "· {n} tours · dernier {when}", de: "· {n} Züge · zuletzt {when}", pt: "· {n} turnos · último {when}", it: "· {n} turni · ultimo {when}", ja: "· {n} 往復 · 最後は {when}", zh: "· {n} 个回合 · 最近 {when}", hi: "· {n} बार · अंतिम {when}", ar: "· {n} دورة · آخرها {when}",
+  },
+  "mem.viewing": {
+    en: "Viewing", es: "Viendo", fr: "Affiché", de: "Wird angezeigt", pt: "A ver", it: "In lettura", ja: "表示中", zh: "查看中", hi: "देख रहे हैं", ar: "قيد العرض",
+  },
+  "mem.view": {
+    en: "View", es: "Ver", fr: "Voir", de: "Ansehen", pt: "Ver", it: "Vedi", ja: "見る", zh: "查看", hi: "देखें", ar: "اعرض",
+  },
+  "mem.erasethis": {
+    en: "Erase this one", es: "Borrar esta", fr: "Effacer celle-ci", de: "Diese löschen", pt: "Apagar esta", it: "Cancella questa", ja: "これを消す", zh: "抹除这一段", hi: "यह मिटाएँ", ar: "امحُ هذه",
+  },
+  "mem.confirmone": {
+    en: "Erase the conversation with {name}? This cannot be undone.", es: "¿Borrar la conversación con {name}? Esto no se puede deshacer.", fr: "Effacer la conversation avec {name} ? C'est irréversible.", de: "Das Gespräch mit {name} löschen? Das lässt sich nicht rückgängig machen.", pt: "Apagar a conversa com {name}? Isto não pode ser desfeito.", it: "Cancellare la conversazione con {name}? Non è reversibile.", ja: "{name} との会話を消しますか？取り消せません。", zh: "抹除与 {name} 的对话？此操作无法撤销。", hi: "{name} के साथ की बातचीत मिटा दें? यह वापस नहीं लाया जा सकता।", ar: "أتمحو المحادثة مع {name}؟ لا يمكن التراجع عن هذا.",
+  },
+  "mem.loading": {
+    en: "Loading…", es: "Cargando…", fr: "Chargement…", de: "Wird geladen…", pt: "A carregar…", it: "Caricamento…", ja: "読み込み中…", zh: "加载中…", hi: "लोड हो रहा है…", ar: "جارٍ التحميل…",
+  },
+  "frn.title": {
+    en: "Friends", es: "Amistades", fr: "Amis", de: "Freund:innen", pt: "Amigos", it: "Amici", ja: "友だち", zh: "好友", hi: "मित्र", ar: "الأصدقاء",
+  },
+  "frn.signin": {
+    en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
+  },
+  "frn.nofriends": {
+    en: "Loading, or no friends yet — add friends from Discover.", es: "Cargando, o todavía sin amistades — añádelas desde Descubrir.", fr: "Chargement, ou pas encore d'amis — ajoutez-en depuis Découvrir.", de: "Wird geladen, oder noch keine Freund:innen — fügen Sie welche unter Entdecken hinzu.", pt: "A carregar, ou ainda sem amigos — adicione a partir de Descobrir.", it: "Caricamento, o ancora nessun amico — aggiungine da Scopri.", ja: "読み込み中か、まだ友だちがいません — 「発見」から追加してください。", zh: "加载中，或者还没有好友——请从“发现”里添加。", hi: "लोड हो रहा है, या अभी कोई मित्र नहीं — “खोजें” से जोड़िए।", ar: "جارٍ التحميل، أو لا أصدقاء بعد — أضفهم من «استكشف».",
+  },
+  "frn.founder": {
+    en: "founder", es: "fundador", fr: "fondateur", de: "Gründer", pt: "fundador", it: "fondatore", ja: "創設者", zh: "创始人", hi: "संस्थापक", ar: "المؤسس",
+  },
+  "frn.remove": {
+    en: "remove", es: "quitar", fr: "retirer", de: "entfernen", pt: "remover", it: "rimuovi", ja: "外す", zh: "移除", hi: "हटाएँ", ar: "أزِل",
+  },
+  "frn.removed": {
+    en: "{name} removed.", es: "{name} eliminado.", fr: "{name} retiré.", de: "{name} entfernt.", pt: "{name} removido.", it: "{name} rimosso.", ja: "{name} を外しました。", zh: "已移除 {name}。", hi: "{name} हटा दिया गया।", ar: "أُزيل {name}.",
+  },
+  "frn.nothingtoremove": {
+    en: "Nothing to remove — {why}.", es: "Nada que quitar — {why}.", fr: "Rien à retirer — {why}.", de: "Nichts zu entfernen — {why}.", pt: "Nada para remover — {why}.", it: "Niente da rimuovere — {why}.", ja: "外すものがありません — {why}。", zh: "没有可移除的 —— {why}。", hi: "हटाने को कुछ नहीं — {why}।", ar: "لا شيء لإزالته — {why}.",
+  },
+  "frn.notafriend": {
+    en: "not a friend", es: "no es una amistad", fr: "pas un ami", de: "keine Freundschaft", pt: "não é amigo", it: "non è un amico", ja: "友だちではありません", zh: "不是好友", hi: "मित्र नहीं है", ar: "ليس صديقًا",
+  },
+  "frn.suggested": {
+    en: "Suggested", es: "Sugerencias", fr: "Suggestions", de: "Vorschläge", pt: "Sugestões", it: "Suggeriti", ja: "おすすめ", zh: "推荐", hi: "सुझाए गए", ar: "مقترحون",
+  },
+  "frn.add": {
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضِف",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

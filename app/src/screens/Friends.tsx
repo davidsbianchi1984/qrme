@@ -13,6 +13,7 @@ export function Friends({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [data, setData] = useState<Awaited<ReturnType<typeof api.friends>> | null>(null);
   const [suggested, setSuggested] = useState<{ profile_id: string; display_name: string }[]>([]);
   const [busy, setBusy] = useState(false);
@@ -45,7 +46,11 @@ export function Friends({ onPlans }: {
     finally { setBusy(false); }
   }
 
-  if (!session.profileId) return <div className="screen"><p className="muted center">Sign in first.</p></div>;
+  if (!session.profileId) {
+    return <div className="screen">
+      <p className="muted center">{tr("frn.signin", lang)}</p>
+    </div>;
+  }
 
   async function add(profileId: string) {
     setBusy(true); setError(null); setNote(null);
@@ -65,8 +70,10 @@ export function Friends({ onPlans }: {
     try {
       const r = await api.removeFriend(session.profileId!, profileId,
                                        session.ownerToken!);
-      setNote(r.removed ? `${name} removed.`
-                        : `Nothing to remove — ${r.reason || "not a friend"}.`);
+      setNote(r.removed
+        ? tr("frn.removed", lang).replace("{name}", name)
+        : tr("frn.nothingtoremove", lang)
+            .replace("{why}", r.reason || tr("frn.notafriend", lang)));
       load();
     } catch (e) { setError(e); }
     finally { setBusy(false); }
@@ -77,28 +84,28 @@ export function Friends({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Friends</h2>
+        <h2>{tr("frn.title", lang)}</h2>
       </header>
 
       {inbox && inbox.events.length > 0 && (
         <div className="card">
           <h3>
-            {tr("inbox.title", visitorLang())}
+            {tr("inbox.title", lang)}
             {inbox.unseen > 0 && (
-              <span className="tag"> {inbox.unseen} {tr("inbox.new", visitorLang())}</span>
+              <span className="tag"> {inbox.unseen} {tr("inbox.new", lang)}</span>
             )}
           </h3>
           {inbox.events.map((e) => (
             <div key={e.id} className={"friend-row" + (e.seen ? "" : " unseen")}>
               <b>{e.actor_name || e.actor_id}</b>
               <span className="muted small">
-                {tr(`inbox.kind.${e.kind}`, visitorLang())}
+                {tr(`inbox.kind.${e.kind}`, lang)}
               </span>
             </div>
           ))}
           {inbox.unseen > 0 && (
             <button className="chip" disabled={busy} onClick={markSeen}>
-              {tr("inbox.seen", visitorLang())}
+              {tr("inbox.seen", lang)}
             </button>
           )}
         </div>
@@ -106,7 +113,7 @@ export function Friends({ onPlans }: {
 
       <div className="card">
         {(data?.friends || []).length === 0 && (
-          <p className="muted center">Loading, or no friends yet — add friends from Discover.</p>
+          <p className="muted center">{tr("frn.nofriends", lang)}</p>
         )}
         {(data?.friends || []).map((f, i) => {
           const isFounder = f.pinned || (f.handle != null && founderHandles.has(f.handle));
@@ -114,7 +121,9 @@ export function Friends({ onPlans }: {
             <div key={f.profile_id} className={"friend-row" + (isFounder ? " founder" : "")}>
               <span className="friend-rank">{i + 1}</span>
               <b>{f.display_name}</b>
-              {isFounder && <span className="tag founder-tag">founder</span>}
+              {isFounder && (
+                <span className="tag founder-tag">{tr("frn.founder", lang)}</span>
+              )}
               {f.handle && <span className="muted small">@{f.handle}</span>}
               {/* Not offered on the founder's two rows. They are pinned by
                   the platform and answer 409, and the list marks them — so
@@ -122,7 +131,7 @@ export function Friends({ onPlans }: {
               {!isFounder && (
                 <button className="chip" disabled={busy}
                         onClick={() => remove(f.profile_id, f.display_name)}>
-                  remove
+                  {tr("frn.remove", lang)}
                 </button>
               )}
             </div>
@@ -132,11 +141,14 @@ export function Friends({ onPlans }: {
 
       {suggested.length > 0 && (
         <div className="card">
-          <h3>Suggested</h3>
+          <h3>{tr("frn.suggested", lang)}</h3>
           {suggested.map((s) => (
             <div key={s.profile_id} className="friend-row">
               <b>{s.display_name}</b>
-              <button className="primary" disabled={busy} onClick={() => add(s.profile_id)}>Add</button>
+              <button className="primary" disabled={busy}
+                      onClick={() => add(s.profile_id)}>
+                {tr("frn.add", lang)}
+              </button>
             </div>
           ))}
         </div>
