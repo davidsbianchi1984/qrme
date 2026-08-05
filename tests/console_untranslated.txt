@@ -1,4 +1,4 @@
-# status: backlog — 724 rows
+# status: backlog — 616 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 724
+# ceiling: 616
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -79,40 +79,6 @@ Audience: period
 Audience: received across
 Audience: shares
 Audience: stop following
-Beacons: ; a platform beacon sends them to an account somewhere else.
-Beacons: A QR image is free to ask for — fetching the picture is not a scan. Opening the page it points to
-Beacons: Collect
-Beacons: Connect
-Beacons: Connect a platform
-Beacons: Connected
-Beacons: Nothing yet.
-Beacons: Placements
-Beacons: Publish
-Beacons: Scanning it opens
-Beacons: So no screen here opens a scan page on its own. The links on
-Beacons: The code for
-Beacons: This code carries people
-Beacons: Two directions, never the same row.
-Beacons: Two kinds of code, and they look the same. A placed beacon brings somebody
-Beacons: What a scan costs to check
-Beacons: Where people find you
-Beacons: Without a handle the beacon has no account page to point at, so it falls back to a QRME summon link — still a working code, but it brings people here rather than to the platform.
-Beacons: and on a desk are deliberate presses, and following one adds to the number you were checking. The desk code also has a JSON twin — the same scan shaped for a native app drawing the overlay in place rather than for a browser — and it counts the same.
-Beacons: away
-Beacons: collect — pull it in
-Beacons: collected ·
-Beacons: disconnect
-Beacons: from QRME. A placed beacon does the opposite. Same picture, opposite destination.
-Beacons: here
-Beacons: is
-Beacons: one, and every scan surface counts it, because the server cannot tell an owner checking their own sticker from a stranger who found it. There is no preview that doesn't count.
-Beacons: publish — run it out there
-Beacons: published
-Beacons: pulls that account's content in to grow this profile.
-Beacons: runs the profile out on the platform. Kept apart so a read-only import can never also post.
-Beacons: show its code
-Beacons: the QR code for this platform presence
-Beacons: the handle, without the @
 Blend: A hybrid profile. It will say openly that it is a blend and never claim to be any single one of its constituents.
 Blend: Blend a Profile
 Blend: Blend another
@@ -212,42 +178,6 @@ Contest: the profile's id
 Contest: why — in your own words
 Contest: your proof reference
 Contest: · profile
-Delegate: A grant is a revocable scope. It is what a phase reads the profile's own material through, and it can be withdrawn mid-run — the work stops seeing what the grant covered from that moment, not at the end.
-Delegate: A single piece of work rather than a run with phases. It needs a grant, because it composes from the profile's own sources.
-Delegate: Advance
-Delegate: Answer &amp; continue
-Delegate: Answer and continue
-Delegate: Cancel
-Delegate: Compose from my sources
-Delegate: Delegation &amp; work
-Delegate: Hand it over
-Delegate: Mint a grant first.
-Delegate: Mint a grant over my sources
-Delegate: Nothing has been run yet.
-Delegate: One-off tasks
-Delegate: Refresh
-Delegate: Revoke
-Delegate: Run the next phase
-Delegate: Runs
-Delegate: Sign in as the owner to set delegation.
-Delegate: Start
-Delegate: The grant it reads through
-Delegate: The other side of the same policy. Everything above is what your own profile may do for you; this is you asking somebody else's to do something, inside the limits its owner published.
-Delegate: Topic
-Delegate: Turn delegation
-Delegate: Waiting on you:
-Delegate: What it may do unattended
-Delegate: What should it work on?
-Delegate: What will it take on?
-Delegate: Which sources its owner scoped is not shown, and is not yours to know.
-Delegate: Work you handed to somebody else's profile
-Delegate: You have to be talking to it already — delegated work is for somebody in a conversation, not a stranger holding a profile id, and starting one cold is refused by name.
-Delegate: Your answer
-Delegate: answer it, if it stopped to ask
-Delegate: next:
-Delegate: revoked
-Delegate: their profile id
-Delegate: what you want done
 Discover: AI
 Discover: Add friend
 Discover: Discover
@@ -736,41 +666,3 @@ Wall: what's on your wall
 Wall: withdraw
 Wall: ↗ share
 Wall: 💬 comments
-WatchParty: (at
-WatchParty: +15s
-WatchParty: A posted video, a shared position, and whoever you bring — including your own profiles.
-WatchParty: At
-WatchParty: Bring a profile
-WatchParty: Bringing a profile in speaks in its voice, so it needs that profile's own owner token — not yours as a person.
-WatchParty: Description:
-WatchParty: End the party
-WatchParty: Everything a synthetic profile in this party is given — and the absences are the point, so they are listed too.
-WatchParty: It can see
-WatchParty: Join
-WatchParty: Nothing said yet.
-WatchParty: Open
-WatchParty: Say it
-WatchParty: Start
-WatchParty: Start or join
-WatchParty: The room
-WatchParty: The room's position
-WatchParty: This moves a number. It does not press play on anybody's device — each person's own player still starts when they start it.
-WatchParty: Title:
-WatchParty: Transcript:
-WatchParty: Watch together
-WatchParty: What a profile in here knows
-WatchParty: Who is here
-WatchParty: a profile id of yours
-WatchParty: and the position (
-WatchParty: call it something
-WatchParty: on
-WatchParty: party id
-WatchParty: post id (a post with a video)
-WatchParty: profile
-WatchParty: recent line
-WatchParty: s ·
-WatchParty: s)
-WatchParty: s).
-WatchParty: say something
-WatchParty: synthetic
-WatchParty: −15s

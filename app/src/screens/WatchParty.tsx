@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type PartyContext, type PartyLine,
          type WatchParty as Party } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -32,6 +33,7 @@ export function WatchParty({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -79,7 +81,8 @@ export function WatchParty({ onPlans }: {
       // The reply carries a moderation verdict, so a line can come back
       // blocked. Say so rather than optimistically showing it in the room.
       if (posted.status !== "approved") {
-        setNote(`Held: ${posted.blocked_reason || posted.status}`);
+        setNote(tr("wp.held", lang).replace(
+          "{why}", posted.blocked_reason || posted.status));
       }
       const r = await api.watchPartyChat(party.id, token);
       setLines(r.lines);
@@ -90,163 +93,186 @@ export function WatchParty({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Watch together</h2>
-      <p className="muted small">
-        A posted video, a shared position, and whoever you bring — including
-        your own profiles.
-      </p>
+      <h2>{tr("wp.title", lang)}</h2>
+      <p className="muted small">{tr("wp.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Start or join</h3>
+        <h3>{tr("wp.startjoin", lang)}</h3>
         <div className="row">
           <input value={postId} onChange={(e) => setPostId(e.target.value)}
-                 placeholder="post id (a post with a video)" style={{ flex: 1 }} />
+                 placeholder={tr("wp.post.ph", lang)} style={{ flex: 1 }} />
           <input value={title} onChange={(e) => setTitle(e.target.value)}
-                 placeholder="call it something" />
+                 placeholder={tr("wp.title.ph", lang)} />
           <button disabled={!postId.trim() || !token} onClick={act(
             () => api.startWatchParty(
               { post_id: postId.trim(), host_id: me, title: title.trim() }, token),
-            "Open. Bring people in.")}>Start</button>
+            tr("wp.started.said", lang))}>{tr("wp.start", lang)}</button>
         </div>
         <div className="row">
           <input value={lookup} onChange={(e) => setLookup(e.target.value)}
-                 placeholder="party id" style={{ flex: 1 }} />
+                 placeholder={tr("wp.party.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!lookup.trim() || !token} onClick={act(
             () => api.joinWatchParty(lookup.trim(), { member_id: me }, token),
-            "You are in.")}>Join</button>
+            tr("wp.joined.said", lang))}>{tr("wp.join", lang)}</button>
           <button disabled={!lookup.trim() || !token} onClick={act(
-            () => api.watchParty(lookup.trim(), token))}>Open</button>
+            () => api.watchParty(lookup.trim(), token))}>
+            {tr("wp.open", lang)}
+          </button>
         </div>
       </div>
 
       {party && (
         <>
           <div className="card">
-            <h3>{party.title || "Watch party"}</h3>
+            <h3>{party.title || tr("wp.untitled", lang)}</h3>
             <p className="small">
-              <strong>{party.video.title}</strong> on {party.video.platform_name}
+              {fill(tr("wp.video.on", lang), {
+                title: <strong>{party.video.title}</strong>,
+                platform: party.video.platform_name,
+              })}
             </p>
             {/* The platform note, verbatim: nothing is requested from them
                 until somebody presses play. */}
             <p className="muted small">{party.video.note}</p>
             <p className="muted small">{party.note}</p>
             <p className="small">
-              At {party.position_s}s · {party.playing ? "playing" : "paused"} ·{" "}
-              {party.people} {party.people === 1 ? "person" : "people"},{" "}
-              {party.profiles} profile{party.profiles === 1 ? "" : "s"}
+              {fill(tr("wp.at", lang), {
+                n: party.position_s,
+                state: party.playing
+                  ? tr("wp.playing", lang) : tr("wp.paused", lang),
+                people: (party.people === 1
+                  ? tr("wp.person", lang) : tr("wp.people", lang)
+                ).replace("{n}", String(party.people)),
+                profiles: (party.profiles === 1
+                  ? tr("wp.profile", lang) : tr("wp.profiles", lang)
+                ).replace("{n}", String(party.profiles)),
+              })}
             </p>
           </div>
 
           <div className="card">
-            <h3>Who is here</h3>
+            <h3>{tr("wp.who", lang)}</h3>
             {party.members.map((m) => (
               <div key={m.member_id} className="row">
                 <div style={{ flex: 1 }}>
                   <strong>{m.display_name || m.member_id}</strong>
                   {/* Travels with every member, so the room can always say
                       who is not a person. */}
-                  {m.synthetic && <span className="chip"> synthetic</span>}
+                  {m.synthetic &&
+                    <span className="chip"> {tr("wp.synthetic", lang)}</span>}
                   <div className="muted small">{m.role}</div>
                 </div>
                 {(m.member_id === me || iAmHost) && (
                   <button onClick={act(
                     () => api.leaveWatchParty(party.id, m.member_id, token),
-                    m.member_id === me ? "You left." : "Removed.")}>
-                    {m.member_id === me ? "Leave" : "Remove"}
+                    m.member_id === me
+                      ? tr("wp.left.said", lang) : tr("wp.removed.said", lang))}>
+                    {m.member_id === me
+                      ? tr("wp.leave", lang) : tr("wp.remove", lang)}
                   </button>
                 )}
               </div>
             ))}
             <div className="row">
               <input value={bring} onChange={(e) => setBring(e.target.value)}
-                     placeholder="a profile id of yours" style={{ flex: 1 }} />
+                     placeholder={tr("wp.bring.ph", lang)} style={{ flex: 1 }} />
               <button disabled={!bring.trim()} onClick={act(
                 () => api.joinWatchParty(
                   party.id, { member_id: bring.trim(), kind: "profile" },
                   session.ownerToken || token),
-                "Brought in.")}>Bring a profile</button>
+                tr("wp.brought.said", lang))}>
+                {tr("wp.bring", lang)}
+              </button>
             </div>
-            <p className="muted small">
-              Bringing a profile in speaks in its voice, so it needs that
-              profile's own owner token — not yours as a person.
-            </p>
+            <p className="muted small">{tr("wp.bring.note", lang)}</p>
           </div>
 
           {iAmHost && (
             <div className="card">
-              <h3>The room's position</h3>
+              <h3>{tr("wp.position", lang)}</h3>
               <div className="row">
                 <button onClick={act(() => api.seekWatchParty(party.id, {
                   host_id: me, position_s: Math.max(0, party.position_s - 15),
-                }, token))}>−15s</button>
+                }, token))}>{tr("wp.back15", lang)}</button>
                 <button onClick={act(() => api.seekWatchParty(party.id, {
                   host_id: me, position_s: party.position_s + 15,
-                }, token))}>+15s</button>
+                }, token))}>{tr("wp.fwd15", lang)}</button>
                 <button onClick={act(() => api.seekWatchParty(party.id, {
                   host_id: me, position_s: party.position_s,
                   playing: !party.playing,
-                }, token))}>{party.playing ? "Mark paused" : "Mark playing"}</button>
+                }, token))}>
+                  {party.playing
+                    ? tr("wp.markpaused", lang) : tr("wp.markplaying", lang)}
+                </button>
                 <button onClick={async () => {
                   setError(null);
                   try {
                     const r = await api.endWatchParty(party.id, me, token);
-                    setNote(`Ended. ${r.grants_closed} grant(s) closed, `
-                      + `${r.microphones_returned} microphone(s) returned.`);
+                    setNote(tr("wp.ended.said", lang)
+                      .replace("{grants}", String(r.grants_closed))
+                      .replace("{mics}", String(r.microphones_returned)));
                     setParty(null); setLines([]); setCtx(null);
                   } catch (e) { fail(e); }
-                }}>End the party</button>
+                }}>{tr("wp.end", lang)}</button>
               </div>
-              <p className="muted small">
-                This moves a number. It does not press play on anybody's device
-                — each person's own player still starts when they start it.
-              </p>
+              <p className="muted small">{tr("wp.seek.note", lang)}</p>
             </div>
           )}
 
           <div className="card">
-            <h3>The room</h3>
-            {lines.length === 0 && <p className="muted small">Nothing said yet.</p>}
+            <h3>{tr("wp.room", lang)}</h3>
+            {lines.length === 0 &&
+              <p className="muted small">{tr("wp.nothing", lang)}</p>}
             {lines.map((l) => (
               <p key={l.id} className="small">
                 <strong>{l.display_name || l.member_id}</strong>
-                {l.synthetic && <span className="chip"> synthetic</span>}
+                {l.synthetic &&
+                  <span className="chip"> {tr("wp.synthetic", lang)}</span>}
                 {" — "}{l.body}
                 {l.position_s !== null && (
-                  <span className="muted"> (at {l.position_s}s)</span>
+                  <span className="muted">{" "}
+                    {fill(tr("wp.atpos", lang), { n: l.position_s })}</span>
                 )}
               </p>
             ))}
             <div className="row">
               <input value={say} onChange={(e) => setSay(e.target.value)}
-                     placeholder="say something" style={{ flex: 1 }}
+                     placeholder={tr("wp.say.ph", lang)} style={{ flex: 1 }}
                      onKeyDown={(e) => e.key === "Enter" && say.trim() && post()} />
-              <button disabled={!say.trim()} onClick={post}>Say it</button>
+              <button disabled={!say.trim()} onClick={post}>
+                {tr("wp.say", lang)}
+              </button>
             </div>
           </div>
 
           {ctx && (
             <div className="card">
-              <h3>What a profile in here knows</h3>
-              <p className="muted small">
-                Everything a synthetic profile in this party is given — and the
-                absences are the point, so they are listed too.
+              <h3>{tr("wp.knows", lang)}</h3>
+              <p className="muted small">{tr("wp.knows.pitch", lang)}</p>
+              <p className="small">
+                {fill(tr("wp.ctx.title", lang), {
+                  title: <strong>{ctx.watching.title}</strong>,
+                  platform: ctx.watching.platform,
+                })}
               </p>
               <p className="small">
-                Title: <strong>{ctx.watching.title}</strong> on{" "}
-                {ctx.watching.platform}
+                {fill(tr("wp.ctx.avail", lang), {
+                  desc: ctx.watching.description_available
+                    ? tr("wp.yes", lang) : tr("wp.notavail", lang),
+                  trans: ctx.watching.transcript_available
+                    ? tr("wp.yes", lang) : tr("wp.notavail", lang),
+                })}
+                {ctx.you_have_not_seen_it && tr("wp.notseen", lang)}
               </p>
               <p className="small">
-                Description: {ctx.watching.description_available ? "yes" : "not available"}
-                {" · "}Transcript:{" "}
-                {ctx.watching.transcript_available ? "yes" : "not available"}
-                {ctx.you_have_not_seen_it && " · it has not seen the video"}
-              </p>
-              <p className="small">
-                It can see {ctx.recent.length} recent line
-                {ctx.recent.length === 1 ? "" : "s"} and the position ({ctx.position_s}s).
+                {fill(tr("wp.cansee", lang), {
+                  n: ctx.recent.length,
+                  s: ctx.recent.length === 1 ? "" : "s",
+                  pos: ctx.position_s,
+                })}
               </p>
               {/* Verbatim. The claim and the object are the same thing, so
                   this cannot go stale while still looking honest. */}

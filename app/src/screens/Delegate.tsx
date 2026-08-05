@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   api, type Delegation, type Grant, type TaskRunResult, type Workflow,
 } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -35,6 +36,7 @@ export function Delegate({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const pid = session.profileId;
   const token = session.ownerToken;
 
@@ -74,7 +76,7 @@ export function Delegate({ onPlans }: {
     finally { setBusy(false); }
   }
 
-  if (!pid || !token) return <p>Sign in as the owner to set delegation.</p>;
+  if (!pid || !token) return <p>{tr("dlg.signin", lang)}</p>;
 
   // The server's own vocabulary, not a list retyped here. `phases` is what it
   // says may be delegated at all.
@@ -87,8 +89,7 @@ export function Delegate({ onPlans }: {
       ? active.filter((p) => p !== phase)
       : [...active, phase];
     if (next.length === 0) {
-      setError("A policy needs at least one phase. Turn delegation off "
-        + "instead if the profile should do nothing unattended.");
+      setError(tr("dlg.needone", lang));
       return;
     }
     run(() => api.setDelegation(pid!, {
@@ -99,35 +100,35 @@ export function Delegate({ onPlans }: {
       // the message says so plainly rather than being pre-empted here.
       grant_token: grant?.token,
       enabled: true,
-    }, token!), `Delegating: ${next.join(", ")}.`);
+    }, token!), tr("dlg.delegating.said", lang)
+      .replace("{what}", next.join(", ")));
   }
 
   return (
     <section className="screen">
-      <h2>Delegation &amp; work</h2>
+      <h2>{tr("dlg.title", lang)}</h2>
       <Refusal error={error} onPlans={onPlans} variant="inline" />
       {said && <p className="muted">{said}</p>}
 
-      <h3>The grant it reads through</h3>
-      <p className="muted">
-        A grant is a revocable scope. It is what a phase reads the profile's
-        own material through, and it can be withdrawn mid-run — the work stops
-        seeing what the grant covered from that moment, not at the end.
-      </p>
+      <h3>{tr("dlg.grant", lang)}</h3>
+      <p className="muted">{tr("dlg.grant.pitch", lang)}</p>
       {grant
         ? (
           <div className="card">
             <div className="row">
               <strong>{grant.id}</strong>
-              <span className="muted">{grant.scope.join(", ") || "no scope"}</span>
-              {grant.revoked && <span className="pill">revoked</span>}
+              <span className="muted">
+                {grant.scope.join(", ") || tr("dlg.noscope", lang)}
+              </span>
+              {grant.revoked &&
+                <span className="pill">{tr("dlg.revoked", lang)}</span>}
             </div>
             <button disabled={busy || grant.revoked}
               onClick={() => run(async () => {
                 await api.revokeGrant(grant.id, token);
                 setGrant({ ...grant, revoked: true });
-              }, "Revoked. Anything running stops reading through it now.")}>
-              Revoke
+              }, tr("dlg.revoked.said", lang))}>
+              {tr("dlg.revoke", lang)}
             </button>
           </div>
         )
@@ -135,16 +136,14 @@ export function Delegate({ onPlans }: {
           <button disabled={busy}
             onClick={() => run(async () => {
               setGrant(await api.createGrant(pid, ["sources"], token));
-            }, "Grant minted.")}>
-            Mint a grant over my sources
+            }, tr("dlg.minted.said", lang))}>
+            {tr("dlg.mint", lang)}
           </button>
         )}
 
-      <h3>What it may do unattended</h3>
+      <h3>{tr("dlg.unattended", lang)}</h3>
       <p className="muted">
-        {enabled
-          ? "On. Anything not ticked still stops and waits for you."
-          : "Off. Every phase stops and waits for you."}
+        {enabled ? tr("dlg.on", lang) : tr("dlg.off", lang)}
       </p>
       <div className="row">
         {phases.map((p) => (
@@ -160,31 +159,34 @@ export function Delegate({ onPlans }: {
         <button disabled={busy}
           onClick={() => run(() => api.setDelegation(pid, {
             phases: active, grant_token: grant?.token, enabled: !enabled,
-          }, token), enabled ? "Delegation off." : "Delegation on.")}>
-          Turn delegation {enabled ? "off" : "on"}
+          }, token), enabled
+            ? tr("dlg.off.said", lang) : tr("dlg.on.said", lang))}>
+          {enabled ? tr("dlg.turn.off", lang) : tr("dlg.turn.on", lang)}
         </button>
       )}
 
-      <h3>Runs</h3>
+      <h3>{tr("dlg.runs", lang)}</h3>
       <div className="row">
-        <input value={goal} placeholder="What should it work on?"
+        <input value={goal} placeholder={tr("dlg.goal.ph", lang)}
           onChange={(e) => setGoal(e.target.value)} />
         <button disabled={busy || !goal.trim()}
           onClick={() => run(async () => {
             await api.createWorkflow(pid, {
               goal: goal.trim(), grant_token: grant?.token }, token);
             setGoal("");
-          }, "Started.")}>
-          Start
+          }, tr("dlg.started.said", lang))}>
+          {tr("dlg.start", lang)}
         </button>
       </div>
-      {runs.length === 0 && <p className="muted">Nothing has been run yet.</p>}
+      {runs.length === 0 &&
+        <p className="muted">{tr("dlg.norun", lang)}</p>}
       {runs.map((w) => (
         <div key={w.id} className="card">
           <div className="row">
             <strong>{w.goal}</strong>
             <span className="muted">{w.status}</span>
-            {w.next_phase && <span className="pill">next: {w.next_phase}</span>}
+            {w.next_phase && <span className="pill">
+              {fill(tr("dlg.next", lang), { phase: w.next_phase })}</span>}
           </div>
           {w.plan?.length > 0 && (
             <p className="muted">
@@ -201,10 +203,11 @@ export function Delegate({ onPlans }: {
           {w.awaiting
             ? (
               <div className="row">
-                <span>Waiting on you: <strong>{w.awaiting}</strong></span>
+                <span>{fill(tr("dlg.waiting", lang),
+                  { what: <strong>{w.awaiting}</strong> })}</span>
                 <input
                   value={reply[w.id] ?? ""}
-                  placeholder="Your answer"
+                  placeholder={tr("dlg.answer.ph", lang)}
                   onChange={(e) =>
                     setReply({ ...reply, [w.id]: e.target.value })} />
                 <button disabled={busy || !(reply[w.id] ?? "").trim()}
@@ -212,8 +215,8 @@ export function Delegate({ onPlans }: {
                     await api.resumeWorkflow(pid, w.id,
                       (reply[w.id] ?? "").trim(), token);
                     setReply({ ...reply, [w.id]: "" });
-                  }, "Resumed.")}>
-                  Answer &amp; continue
+                  }, tr("dlg.resumed.said", lang))}>
+                  {tr("dlg.answer", lang)}
                 </button>
               </div>
             )
@@ -221,39 +224,37 @@ export function Delegate({ onPlans }: {
               <button disabled={busy}
                 onClick={() => run(() =>
                   api.advanceWorkflow(pid, w.id, token))}>
-                Advance
+                {tr("dlg.advance", lang)}
               </button>
             )}
           {w.status !== "done" && w.status !== "cancelled" && (
             <button disabled={busy}
               onClick={() => {
-                if (confirm("Cancel this run? What it has already done stays."))
-                  run(() => api.cancelWorkflow(pid, w.id, token), "Cancelled.");
+                if (confirm(tr("dlg.cancel.confirm", lang)))
+                  run(() => api.cancelWorkflow(pid, w.id, token),
+                      tr("dlg.cancelled.said", lang));
               }}>
-              Cancel
+              {tr("dlg.cancel", lang)}
             </button>
           )}
         </div>
       ))}
 
-      <h3>One-off tasks</h3>
-      <p className="muted">
-        A single piece of work rather than a run with phases. It needs a grant,
-        because it composes from the profile's own sources.
-      </p>
+      <h3>{tr("dlg.oneoff", lang)}</h3>
+      <p className="muted">{tr("dlg.oneoff.pitch", lang)}</p>
       <div className="row">
-        <input value={topic} placeholder="Topic"
+        <input value={topic} placeholder={tr("dlg.topic.ph", lang)}
           onChange={(e) => setTopic(e.target.value)} />
         <button disabled={busy || !topic.trim() || !grant || grant.revoked}
           onClick={() => run(async () => {
             await api.runTask(pid, {
               topic: topic.trim(), grant_token: grant!.token }, token);
             setTopic("");
-          }, "Done.")}>
-          Compose from my sources
+          }, tr("dlg.done.said", lang))}>
+          {tr("dlg.compose", lang)}
         </button>
       </div>
-      {!grant && <p className="muted">Mint a grant first.</p>}
+      {!grant && <p className="muted">{tr("dlg.mintfirst", lang)}</p>}
       {tasks.map((t) => (
         <div key={t.id} className="card">
           <div className="row">
@@ -263,45 +264,41 @@ export function Delegate({ onPlans }: {
         </div>
       ))}
 
-      <h3>Work you handed to somebody else's profile</h3>
-      <p className="muted small">
-        The other side of the same policy. Everything above is what your own
-        profile may do for you; this is you asking somebody else's to do
-        something, inside the limits its owner published.
-      </p>
+      <h3>{tr("dlg.handed", lang)}</h3>
+      <p className="muted small">{tr("dlg.handed.pitch", lang)}</p>
       <div className="card">
         <div className="row">
           <input value={theirs} onChange={(e) => setTheirs(e.target.value)}
-                 placeholder="their profile id" style={{ flex: 1 }} />
+                 placeholder={tr("dlg.theirs.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !theirs.trim()}
                   onClick={() => {
                     setError(null);
                     api.delegation(theirs.trim()).then(setOffer)
                       .catch((e) => { setOffer(null); setError(e); });
                   }}>
-            What will it take on?
+            {tr("dlg.whatwill", lang)}
           </button>
         </div>
         {offer && (
           <p className="small">
             {offer.delegation
-              ? `Accepts delegated work: ${offer.phases.join(", ")}`
-              : "Does not accept delegated work."}
+              ? tr("dlg.accepts", lang)
+                  .replace("{phases}", offer.phases.join(", "))
+              : tr("dlg.accepts.not", lang)}
             {" "}
             <span className="muted small">
               {/* The offer deliberately omits the grant id — which source
                   items the owner scoped is the owner's business, and the
                   caller only needs the shape of the request that will be
                   accepted. */}
-              Which sources its owner scoped is not shown, and is not yours
-              to know.
+              {tr("dlg.noscope.shown", lang)}
             </span>
           </p>
         )}
         <div className="row">
           <input value={handedGoal}
                  onChange={(e) => setHandedGoal(e.target.value)}
-                 placeholder="what you want done" style={{ flex: 1 }} />
+                 placeholder={tr("dlg.want.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !mine || !theirs.trim()
                             || !handedGoal.trim()}
                   onClick={async () => {
@@ -314,20 +311,19 @@ export function Delegate({ onPlans }: {
                       setHandedGoal("");
                     } catch (e) { setError(e); } finally { setBusy(false); }
                   }}>
-            Hand it over
+            {tr("dlg.handover", lang)}
           </button>
         </div>
-        <p className="muted small">
-          You have to be talking to it already — delegated work is for
-          somebody in a conversation, not a stranger holding a profile id, and
-          starting one cold is refused by name.
-        </p>
+        <p className="muted small">{tr("dlg.talking", lang)}</p>
         {handed && (
           <>
             <p className="small">
-              <code>{handed.id}</code> — {handed.status}
-              {handed.next_phase ? ` · next: ${handed.next_phase}` : ""}
-              {handed.awaiting ? ` · waiting on you: ${handed.awaiting}` : ""}
+              {fill(tr("dlg.handed.line", lang), {
+                id: <code>{handed.id}</code>, status: handed.status })}
+              {handed.next_phase && tr("dlg.handed.next", lang)
+                .replace("{phase}", handed.next_phase)}
+              {handed.awaiting && tr("dlg.handed.waiting", lang)
+                .replace("{what}", handed.awaiting)}
             </p>
             <div className="row">
               <button disabled={busy}
@@ -339,7 +335,7 @@ export function Delegate({ onPlans }: {
                         } catch (e) { setError(e); }
                         finally { setBusy(false); }
                       }}>
-                Run the next phase
+                {tr("dlg.nextphase", lang)}
               </button>
               <button disabled={busy}
                       onClick={async () => {
@@ -350,13 +346,13 @@ export function Delegate({ onPlans }: {
                         } catch (e) { setError(e); }
                         finally { setBusy(false); }
                       }}>
-                Refresh
+                {tr("dlg.refresh", lang)}
               </button>
             </div>
             <div className="row">
               <input value={answer}
                      onChange={(e) => setAnswer(e.target.value)}
-                     placeholder="answer it, if it stopped to ask"
+                     placeholder={tr("dlg.answerit.ph", lang)}
                      style={{ flex: 1 }} />
               <button disabled={busy || !answer.trim()}
                       onClick={async () => {
@@ -368,7 +364,7 @@ export function Delegate({ onPlans }: {
                         } catch (e) { setError(e); }
                         finally { setBusy(false); }
                       }}>
-                Answer and continue
+                {tr("dlg.answercont", lang)}
               </button>
             </div>
           </>

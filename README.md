@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.45.3** ([changelog](CHANGELOG.md) ·
+**Current release: v0.45.4** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.45.4** | **Two directions, one picture** — WatchParty, Delegate and Beacons fully localized; console-untranslated 724 → 616 |
 | **0.45.3** | **Three more, and the wrist among them** — Passing, Signing and Placements fully localized; console-untranslated 848 → 724 |
 | **0.45.2** | **The three biggest screens left** — Exchanges, Reaching and Visiting fully localized; console-untranslated 978 → 848 |
 | **0.45.1** | Version alignment with JIM's console-to-zero round |

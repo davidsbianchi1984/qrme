@@ -152,7 +152,13 @@ def test_a_placed_beacon_points_at_qrme(client):
 
 def test_the_screen_says_the_two_go_opposite_ways():
     src = _markup("app/src/screens/Beacons.tsx")
-    assert "away" in src and "here" in src
+    # Both words moved into the l10n table. Matching them in the screen would
+    # now succeed off the key names — `bcn.away`, `bcn.here` — which is a
+    # check that cannot fail for the right reason. So the screen is asked for
+    # the lookups, and the table is asked for the two English words.
+    assert 'tr("bcn.carries", lang)' in src and 'tr("bcn.lead", lang)' in src
+    l10n = _markup("app/src/l10n.ts")
+    assert 'en: "away"' in l10n and 'en: "here"' in l10n
 
 
 # --- collect and publish never share a row ----------------------------------

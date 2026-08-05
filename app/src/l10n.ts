@@ -4104,6 +4104,423 @@ const CHROME: Table = {
   "plc.sealed": {
     en: "Rated resolutions are sealed in the vault — so the record of who was age-checked is not this platform's to read.", es: "Las resoluciones con clasificación se sellan en la bóveda — así que el registro de quién pasó el control de edad no es de esta plataforma para leerlo.", fr: "Les résolutions classées sont scellées dans le coffre — le relevé de qui a subi la vérification d'âge n'appartient donc pas à cette plateforme.", de: "Altersbewertete Auflösungen werden im Tresor versiegelt — die Aufzeichnung, wer altersgeprüft wurde, steht dieser Plattform also nicht zum Lesen zu.", pt: "As resoluções classificadas são seladas no cofre — por isso o registo de quem passou a verificação de idade não é desta plataforma para ler.", it: "Le risoluzioni classificate sono sigillate nel caveau — quindi il registro di chi è stato verificato per l'età non spetta a questa piattaforma leggerlo.", ja: "レーティング対象の解決は保管庫に封印されます — ですから、誰が年齢確認を受けたかの記録は、このプラットフォームが読んでよいものではありません。", zh: "分级解析记录被封存在保险库中——因此，谁通过了年龄核验，这份记录不归本平台阅读。", hi: "श्रेणीबद्ध समाधान वॉल्ट में सीलबंद होते हैं — इसलिए किसकी आयु जाँची गई, वह रिकॉर्ड इस मंच के पढ़ने के लिए नहीं है।", ar: "الاستجابات المصنَّفة مختومة في الخزانة — فسجل من جرى التحقق من عمره ليس من حق هذه المنصة أن تقرأه.",
   },
+  "wp.title": {
+    en: "Watch together", es: "Ver juntos", fr: "Regarder ensemble", de: "Gemeinsam schauen", pt: "Ver juntos", it: "Guardare insieme", ja: "一緒に見る", zh: "一起看", hi: "साथ देखें", ar: "المشاهدة معًا",
+  },
+  "wp.lead": {
+    en: "A posted video, a shared position, and whoever you bring — including your own profiles.", es: "Un vídeo publicado, una posición compartida, y a quien traigas — incluidos tus propios perfiles.", fr: "Une vidéo publiée, une position partagée, et qui vous amenez — y compris vos propres profils.", de: "Ein veröffentlichtes Video, eine gemeinsame Position, und wen Sie mitbringen — auch Ihre eigenen Profile.", pt: "Um vídeo publicado, uma posição partilhada, e quem trouxer — incluindo os seus próprios perfis.", it: "Un video pubblicato, una posizione condivisa, e chiunque porti — compresi i tuoi profili.", ja: "投稿された動画と、共有された再生位置と、あなたが連れてくる誰か — 自分のプロフィールも含めて。", zh: "一段已发布的视频、一个共享的播放位置，以及你带来的任何人——包括你自己的资料。", hi: "एक पोस्ट किया गया वीडियो, एक साझा स्थिति, और जिसे भी आप लाएँ — अपनी प्रोफ़ाइलों सहित।", ar: "مقطع منشور، وموضع مشترك، ومن تحضره معك — بما في ذلك ملفاتك أنت.",
+  },
+  "wp.startjoin": {
+    en: "Start or join", es: "Empezar o unirse", fr: "Lancer ou rejoindre", de: "Starten oder beitreten", pt: "Começar ou entrar", it: "Avvia o unisciti", ja: "始めるか、参加するか", zh: "开始或加入", hi: "शुरू करें या शामिल हों", ar: "ابدأ أو انضم",
+  },
+  "wp.post.ph": {
+    en: "post id (a post with a video)", es: "id de la publicación (una con vídeo)", fr: "id du post (un post avec une vidéo)", de: "Beitrags-ID (ein Beitrag mit Video)", pt: "id da publicação (uma com vídeo)", it: "id del post (un post con un video)", ja: "投稿ID（動画のある投稿）", zh: "帖子 ID（含视频的帖子）", hi: "पोस्ट आईडी (वीडियो वाली पोस्ट)", ar: "معرّف المنشور (منشور فيه فيديو)",
+  },
+  "wp.title.ph": {
+    en: "call it something", es: "ponle un nombre", fr: "donnez-lui un nom", de: "nennen Sie es irgendwie", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "起个名字", hi: "इसे कोई नाम दें", ar: "سمّها بشيء",
+  },
+  "wp.start": {
+    en: "Start", es: "Empezar", fr: "Lancer", de: "Starten", pt: "Começar", it: "Avvia", ja: "始める", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
+  },
+  "wp.started.said": {
+    en: "Open. Bring people in.", es: "Abierta. Trae a gente.", fr: "Ouverte. Faites venir du monde.", de: "Offen. Holen Sie Leute dazu.", pt: "Aberta. Traga pessoas.", it: "Aperta. Porta gente.", ja: "開きました。人を呼んでください。", zh: "已开启。把人带进来吧。", hi: "खुल गई। लोगों को लाइए।", ar: "مفتوحة. أحضر الناس.",
+  },
+  "wp.party.ph": {
+    en: "party id", es: "id de la sala", fr: "id de la séance", de: "Party-ID", pt: "id da sessão", it: "id della festa", ja: "パーティID", zh: "放映会 ID", hi: "पार्टी आईडी", ar: "معرّف الجلسة",
+  },
+  "wp.join": {
+    en: "Join", es: "Unirse", fr: "Rejoindre", de: "Beitreten", pt: "Entrar", it: "Unisciti", ja: "参加", zh: "加入", hi: "शामिल हों", ar: "انضم",
+  },
+  "wp.joined.said": {
+    en: "You are in.", es: "Ya estás dentro.", fr: "Vous y êtes.", de: "Sie sind dabei.", pt: "Está dentro.", it: "Ci sei.", ja: "参加しました。", zh: "你已加入。", hi: "आप अंदर हैं।", ar: "أنت في الداخل.",
+  },
+  "wp.open": {
+    en: "Open", es: "Abrir", fr: "Ouvrir", de: "Öffnen", pt: "Abrir", it: "Apri", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتح",
+  },
+  "wp.untitled": {
+    en: "Watch party", es: "Sala de visionado", fr: "Séance de visionnage", de: "Watch-Party", pt: "Sessão de visionamento", it: "Festa di visione", ja: "視聴パーティ", zh: "观影派对", hi: "वॉच पार्टी", ar: "جلسة مشاهدة",
+  },
+  "wp.video.on": {
+    en: "{title} on {platform}", es: "{title} en {platform}", fr: "{title} sur {platform}", de: "{title} auf {platform}", pt: "{title} em {platform}", it: "{title} su {platform}", ja: "{platform} の {title}", zh: "{platform} 上的 {title}", hi: "{platform} पर {title}", ar: "{title} على {platform}",
+  },
+  "wp.at": {
+    en: "At {n}s · {state} · {people} · {profiles}", es: "En {n}s · {state} · {people} · {profiles}", fr: "À {n}s · {state} · {people} · {profiles}", de: "Bei {n}s · {state} · {people} · {profiles}", pt: "Em {n}s · {state} · {people} · {profiles}", it: "A {n}s · {state} · {people} · {profiles}", ja: "{n}秒地点 · {state} · {people} · {profiles}", zh: "位于 {n} 秒 · {state} · {people} · {profiles}", hi: "{n}से. पर · {state} · {people} · {profiles}", ar: "عند {n}ث · {state} · {people} · {profiles}",
+  },
+  "wp.playing": {
+    en: "playing", es: "reproduciendo", fr: "en lecture", de: "läuft", pt: "a reproduzir", it: "in riproduzione", ja: "再生中", zh: "播放中", hi: "चल रहा है", ar: "قيد التشغيل",
+  },
+  "wp.paused": {
+    en: "paused", es: "en pausa", fr: "en pause", de: "pausiert", pt: "em pausa", it: "in pausa", ja: "一時停止", zh: "已暂停", hi: "रुका हुआ", ar: "متوقف مؤقتًا",
+  },
+  "wp.people": {
+    en: "{n} people", es: "{n} personas", fr: "{n} personnes", de: "{n} Personen", pt: "{n} pessoas", it: "{n} persone", ja: "{n}人", zh: "{n} 人", hi: "{n} लोग", ar: "{n} أشخاص",
+  },
+  "wp.person": {
+    en: "{n} person", es: "{n} persona", fr: "{n} personne", de: "{n} Person", pt: "{n} pessoa", it: "{n} persona", ja: "{n}人", zh: "{n} 人", hi: "{n} व्यक्ति", ar: "{n} شخص",
+  },
+  "wp.profiles": {
+    en: "{n} profiles", es: "{n} perfiles", fr: "{n} profils", de: "{n} Profile", pt: "{n} perfis", it: "{n} profili", ja: "プロフィール{n}件", zh: "{n} 份资料", hi: "{n} प्रोफ़ाइलें", ar: "{n} ملفات",
+  },
+  "wp.profile": {
+    en: "{n} profile", es: "{n} perfil", fr: "{n} profil", de: "{n} Profil", pt: "{n} perfil", it: "{n} profilo", ja: "プロフィール{n}件", zh: "{n} 份资料", hi: "{n} प्रोफ़ाइल", ar: "{n} ملف",
+  },
+  "wp.who": {
+    en: "Who is here", es: "Quién está aquí", fr: "Qui est là", de: "Wer hier ist", pt: "Quem está aqui", it: "Chi c'è", ja: "誰がいるか", zh: "谁在这里", hi: "कौन यहाँ है", ar: "من الحاضر",
+  },
+  "wp.synthetic": {
+    en: "synthetic", es: "sintético", fr: "synthétique", de: "synthetisch", pt: "sintético", it: "sintetico", ja: "合成", zh: "合成", hi: "सिंथेटिक", ar: "اصطناعي",
+  },
+  "wp.leave": {
+    en: "Leave", es: "Salir", fr: "Quitter", de: "Verlassen", pt: "Sair", it: "Esci", ja: "退出", zh: "离开", hi: "बाहर जाएँ", ar: "غادر",
+  },
+  "wp.left.said": {
+    en: "You left.", es: "Has salido.", fr: "Vous êtes parti.", de: "Sie sind gegangen.", pt: "Saiu.", it: "Sei uscito.", ja: "退出しました。", zh: "你已离开。", hi: "आप बाहर आ गए।", ar: "غادرت.",
+  },
+  "wp.remove": {
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "外す", zh: "移出", hi: "हटाएँ", ar: "أخرِج",
+  },
+  "wp.removed.said": {
+    en: "Removed.", es: "Retirado.", fr: "Retiré.", de: "Entfernt.", pt: "Removido.", it: "Rimosso.", ja: "外しました。", zh: "已移出。", hi: "हटा दिया गया।", ar: "أُخرِج.",
+  },
+  "wp.bring.ph": {
+    en: "a profile id of yours", es: "un id de perfil tuyo", fr: "un id de profil à vous", de: "eine Ihrer Profil-IDs", pt: "um id de perfil seu", it: "un id di un tuo profilo", ja: "あなたのプロフィールID", zh: "你自己的某个资料 ID", hi: "आपकी किसी प्रोफ़ाइल की आईडी", ar: "معرّف ملف يخصّك",
+  },
+  "wp.bring": {
+    en: "Bring a profile", es: "Traer un perfil", fr: "Amener un profil", de: "Ein Profil mitbringen", pt: "Trazer um perfil", it: "Porta un profilo", ja: "プロフィールを連れてくる", zh: "带一份资料进来", hi: "एक प्रोफ़ाइल लाएँ", ar: "أحضِر ملفًا",
+  },
+  "wp.brought.said": {
+    en: "Brought in.", es: "Traído.", fr: "Amené.", de: "Dazugeholt.", pt: "Trazido.", it: "Portato dentro.", ja: "連れてきました。", zh: "已带入。", hi: "ले आए।", ar: "أُحضِر.",
+  },
+  "wp.bring.note": {
+    en: "Bringing a profile in speaks in its voice, so it needs that profile's own owner token — not yours as a person.", es: "Traer un perfil habla con su voz, así que necesita el token de propietario de ese perfil — no el tuyo como persona.", fr: "Amener un profil, c'est parler de sa voix : il faut donc le jeton de propriétaire de ce profil-là — pas le vôtre en tant que personne.", de: "Ein Profil mitzubringen spricht mit dessen Stimme, also braucht es das Besitzer-Token genau dieses Profils — nicht Ihres als Person.", pt: "Trazer um perfil fala com a voz dele, por isso precisa do token de proprietário desse perfil — não do seu como pessoa.", it: "Portare dentro un profilo parla con la sua voce, quindi serve il token da proprietario di quel profilo — non il tuo come persona.", ja: "プロフィールを連れてくることは、その声で話すことです。ですから、あなた個人のものではなく、そのプロフィール自身の所有者トークンが必要です。", zh: "把一份资料带进来，就是以它的声音说话，所以需要那份资料自己的所有者令牌——而不是你作为个人的令牌。", hi: "किसी प्रोफ़ाइल को लाना उसकी आवाज़ में बोलना है, इसलिए उसके लिए उसी प्रोफ़ाइल का अपना स्वामी टोकन चाहिए — एक व्यक्ति के रूप में आपका नहीं।", ar: "إحضار ملف يعني الكلام بصوته، فيلزمه رمز مالك ذلك الملف نفسه — لا رمزك أنت بصفتك شخصًا.",
+  },
+  "wp.position": {
+    en: "The room's position", es: "La posición de la sala", fr: "La position de la salle", de: "Die Position des Raums", pt: "A posição da sala", it: "La posizione della stanza", ja: "部屋の再生位置", zh: "房间的播放位置", hi: "कक्ष की स्थिति", ar: "موضع الغرفة",
+  },
+  "wp.back15": {
+    en: "−15s", es: "−15 s", fr: "−15 s", de: "−15 s", pt: "−15 s", it: "−15 s", ja: "−15秒", zh: "−15 秒", hi: "−15से.", ar: "−15ث",
+  },
+  "wp.fwd15": {
+    en: "+15s", es: "+15 s", fr: "+15 s", de: "+15 s", pt: "+15 s", it: "+15 s", ja: "+15秒", zh: "+15 秒", hi: "+15से.", ar: "+15ث",
+  },
+  "wp.markpaused": {
+    en: "Mark paused", es: "Marcar en pausa", fr: "Marquer en pause", de: "Als pausiert markieren", pt: "Marcar em pausa", it: "Segna in pausa", ja: "一時停止として記録", zh: "标记为暂停", hi: "रुका हुआ चिह्नित करें", ar: "علّمها متوقفة",
+  },
+  "wp.markplaying": {
+    en: "Mark playing", es: "Marcar reproduciendo", fr: "Marquer en lecture", de: "Als laufend markieren", pt: "Marcar a reproduzir", it: "Segna in riproduzione", ja: "再生中として記録", zh: "标记为播放", hi: "चालू चिह्नित करें", ar: "علّمها قيد التشغيل",
+  },
+  "wp.end": {
+    en: "End the party", es: "Terminar la sala", fr: "Terminer la séance", de: "Die Party beenden", pt: "Terminar a sessão", it: "Chiudi la festa", ja: "パーティを終える", zh: "结束派对", hi: "पार्टी समाप्त करें", ar: "أنهِ الجلسة",
+  },
+  "wp.ended.said": {
+    en: "Ended. {grants} grant(s) closed, {mics} microphone(s) returned.", es: "Terminada. {grants} concesión(es) cerradas, {mics} micrófono(s) devueltos.", fr: "Terminée. {grants} autorisation(s) fermée(s), {mics} microphone(s) rendu(s).", de: "Beendet. {grants} Freigabe(n) geschlossen, {mics} Mikrofon(e) zurückgegeben.", pt: "Terminada. {grants} concessão(ões) fechadas, {mics} microfone(s) devolvidos.", it: "Chiusa. {grants} concessione/i chiuse, {mics} microfono/i restituiti.", ja: "終了しました。許可 {grants} 件を閉じ、マイク {mics} 本を返却しました。", zh: "已结束。关闭了 {grants} 项授权，归还了 {mics} 只麦克风。", hi: "समाप्त। {grants} अनुदान बंद, {mics} माइक्रोफ़ोन लौटाए गए।", ar: "انتهت. أُغلقت {grants} من التصاريح، وأُعيد {mics} من الميكروفونات.",
+  },
+  "wp.seek.note": {
+    en: "This moves a number. It does not press play on anybody's device — each person's own player still starts when they start it.", es: "Esto mueve un número. No le da al play en el dispositivo de nadie — el reproductor de cada persona sigue arrancando cuando ella lo arranca.", fr: "Ceci déplace un nombre. Cela n'appuie pas sur lecture sur l'appareil de qui que ce soit — le lecteur de chacun démarre toujours quand il le démarre.", de: "Das verschiebt eine Zahl. Es drückt auf niemandes Gerät auf Play — der Player jeder Person startet weiterhin dann, wenn sie ihn startet.", pt: "Isto move um número. Não carrega em play no dispositivo de ninguém — o leitor de cada pessoa continua a arrancar quando ela o arranca.", it: "Questo sposta un numero. Non preme play sul dispositivo di nessuno — il lettore di ciascuno parte ancora quando è lui a farlo partire.", ja: "これは数字を動かすだけです。誰かの端末で再生を押すわけではありません — 各自のプレーヤーは、その人が始めたときに始まります。", zh: "这只是移动一个数字。它不会在任何人的设备上按下播放——每个人的播放器仍然由本人启动时才启动。", hi: "यह एक संख्या को हिलाता है। यह किसी के डिवाइस पर प्ले नहीं दबाता — हर व्यक्ति का अपना प्लेयर तभी शुरू होता है जब वह उसे शुरू करे।", ar: "هذا يحرّك رقمًا. ولا يضغط تشغيل على جهاز أحد — مشغّل كل شخص يبدأ حين يبدأه هو.",
+  },
+  "wp.room": {
+    en: "The room", es: "La sala", fr: "La salle", de: "Der Raum", pt: "A sala", it: "La stanza", ja: "部屋", zh: "房间", hi: "कक्ष", ar: "الغرفة",
+  },
+  "wp.nothing": {
+    en: "Nothing said yet.", es: "Nadie ha dicho nada.", fr: "Rien n'a encore été dit.", de: "Noch nichts gesagt.", pt: "Ainda nada dito.", it: "Ancora niente detto.", ja: "まだ何も言われていません。", zh: "还没有人说话。", hi: "अभी कुछ नहीं कहा गया।", ar: "لم يُقل شيء بعد.",
+  },
+  "wp.atpos": {
+    en: "(at {n}s)", es: "(en {n} s)", fr: "(à {n} s)", de: "(bei {n} s)", pt: "(em {n} s)", it: "(a {n} s)", ja: "（{n}秒地点）", zh: "（第 {n} 秒）", hi: "({n}से. पर)", ar: "(عند {n}ث)",
+  },
+  "wp.say.ph": {
+    en: "say something", es: "di algo", fr: "dites quelque chose", de: "sagen Sie etwas", pt: "diga algo", it: "di' qualcosa", ja: "何か言う", zh: "说点什么", hi: "कुछ कहें", ar: "قل شيئًا",
+  },
+  "wp.say": {
+    en: "Say it", es: "Decirlo", fr: "Envoyer", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "送る", zh: "说出来", hi: "कह दें", ar: "قلها",
+  },
+  "wp.held": {
+    en: "Held: {why}", es: "Retenido: {why}", fr: "Retenu : {why}", de: "Zurückgehalten: {why}", pt: "Retido: {why}", it: "Trattenuto: {why}", ja: "保留: {why}", zh: "已留置：{why}", hi: "रोका गया: {why}", ar: "محتجز: {why}",
+  },
+  "wp.knows": {
+    en: "What a profile in here knows", es: "Lo que sabe un perfil que esté aquí", fr: "Ce que sait un profil présent ici", de: "Was ein Profil hier drin weiß", pt: "O que sabe um perfil que esteja aqui", it: "Cosa sa un profilo che è qui dentro", ja: "ここにいるプロフィールが知っていること", zh: "这里的资料知道什么", hi: "यहाँ मौजूद प्रोफ़ाइल क्या जानती है", ar: "ما يعرفه ملف موجود هنا",
+  },
+  "wp.knows.pitch": {
+    en: "Everything a synthetic profile in this party is given — and the absences are the point, so they are listed too.", es: "Todo lo que se le da a un perfil sintético en esta sala — y las ausencias son el asunto, así que también se listan.", fr: "Tout ce qu'on donne à un profil synthétique dans cette séance — et les absences sont l'essentiel, elles sont donc listées aussi.", de: "Alles, was einem synthetischen Profil in dieser Party gegeben wird — und die Auslassungen sind der Punkt, also stehen sie auch da.", pt: "Tudo o que é dado a um perfil sintético nesta sessão — e as ausências são o essencial, por isso também são listadas.", it: "Tutto ciò che viene dato a un profilo sintetico in questa festa — e le assenze sono il punto, quindi sono elencate anch'esse.", ja: "このパーティにいる合成プロフィールに与えられるすべて — そして、与えられないものこそが要点なので、それも並べてあります。", zh: "在这场派对里，一份合成资料被给予的一切——而没有被给予的才是重点，所以也一并列出。", hi: "इस पार्टी में किसी सिंथेटिक प्रोफ़ाइल को जो कुछ दिया जाता है — और जो नहीं दिया जाता वही असल बात है, इसलिए वह भी सूचीबद्ध है।", ar: "كل ما يُعطى لملف اصطناعي في هذه الجلسة — والغياب هو المقصود، لذا يُذكر هو أيضًا.",
+  },
+  "wp.ctx.title": {
+    en: "Title: {title} on {platform}", es: "Título: {title} en {platform}", fr: "Titre : {title} sur {platform}", de: "Titel: {title} auf {platform}", pt: "Título: {title} em {platform}", it: "Titolo: {title} su {platform}", ja: "題名: {platform} の {title}", zh: "标题：{platform} 上的 {title}", hi: "शीर्षक: {platform} पर {title}", ar: "العنوان: {title} على {platform}",
+  },
+  "wp.ctx.avail": {
+    en: "Description: {desc} · Transcript: {trans}", es: "Descripción: {desc} · Transcripción: {trans}", fr: "Description : {desc} · Transcription : {trans}", de: "Beschreibung: {desc} · Transkript: {trans}", pt: "Descrição: {desc} · Transcrição: {trans}", it: "Descrizione: {desc} · Trascrizione: {trans}", ja: "説明: {desc} · 文字起こし: {trans}", zh: "简介：{desc} · 字幕文本：{trans}", hi: "विवरण: {desc} · प्रतिलेख: {trans}", ar: "الوصف: {desc} · النص المكتوب: {trans}",
+  },
+  "wp.yes": {
+    en: "yes", es: "sí", fr: "oui", de: "ja", pt: "sim", it: "sì", ja: "あり", zh: "有", hi: "हाँ", ar: "نعم",
+  },
+  "wp.notavail": {
+    en: "not available", es: "no disponible", fr: "non disponible", de: "nicht verfügbar", pt: "não disponível", it: "non disponibile", ja: "なし", zh: "不可用", hi: "उपलब्ध नहीं", ar: "غير متاح",
+  },
+  "wp.notseen": {
+    en: " · it has not seen the video", es: " · no ha visto el vídeo", fr: " · il n'a pas vu la vidéo", de: " · es hat das Video nicht gesehen", pt: " · não viu o vídeo", it: " · non ha visto il video", ja: " · 動画は見ていません", zh: " · 它没有看过这段视频", hi: " · इसने वीडियो नहीं देखा", ar: " · لم يشاهد المقطع",
+  },
+  "wp.cansee": {
+    en: "It can see {n} recent line{s} and the position ({pos}s).", es: "Puede ver {n} líneas recientes y la posición ({pos} s).", fr: "Il voit {n} lignes récentes et la position ({pos} s).", de: "Es sieht {n} aktuelle Zeilen und die Position ({pos} s).", pt: "Vê {n} linhas recentes e a posição ({pos} s).", it: "Vede {n} righe recenti e la posizione ({pos} s).", ja: "直近の発言{n}件と再生位置（{pos}秒）が見えています。", zh: "它能看到最近的 {n} 条发言和播放位置（第 {pos} 秒）。", hi: "यह हाल की {n} पंक्तियाँ और स्थिति ({pos}से.) देख सकता है।", ar: "يرى {n} من الأسطر الأخيرة والموضع ({pos}ث).",
+  },
+  "dlg.title": {
+    en: "Delegation & work", es: "Delegación y trabajo", fr: "Délégation et travail", de: "Delegation und Arbeit", pt: "Delegação e trabalho", it: "Delega e lavoro", ja: "委任と仕事", zh: "委托与工作", hi: "प्रत्यायोजन और काम", ar: "التفويض والعمل",
+  },
+  "dlg.signin": {
+    en: "Sign in as the owner to set delegation.", es: "Inicie sesión como propietario para configurar la delegación.", fr: "Connectez-vous comme propriétaire pour régler la délégation.", de: "Melden Sie sich als Besitzer an, um die Delegation zu setzen.", pt: "Entre como proprietário para definir a delegação.", it: "Accedi come proprietario per impostare la delega.", ja: "委任を設定するには所有者としてサインインしてください。", zh: "请以所有者身份登录以设置委托。", hi: "प्रत्यायोजन तय करने के लिए स्वामी के रूप में साइन इन करें।", ar: "سجّل الدخول بصفتك مالكًا لضبط التفويض.",
+  },
+  "dlg.grant": {
+    en: "The grant it reads through", es: "La concesión a través de la que lee", fr: "L'autorisation à travers laquelle il lit", de: "Die Freigabe, durch die es liest", pt: "A concessão através da qual lê", it: "La concessione attraverso cui legge", ja: "読み取りを通す許可", zh: "它据以读取的授权", hi: "वह अनुदान जिससे होकर यह पढ़ता है", ar: "التصريح الذي يقرأ من خلاله",
+  },
+  "dlg.grant.pitch": {
+    en: "A grant is a revocable scope. It is what a phase reads the profile's own material through, and it can be withdrawn mid-run — the work stops seeing what the grant covered from that moment, not at the end.", es: "Una concesión es un alcance revocable. Es aquello a través de lo cual una fase lee el material del propio perfil, y puede retirarse a mitad de ejecución — el trabajo deja de ver lo que la concesión cubría desde ese momento, no al final.", fr: "Une autorisation est une portée révocable. C'est à travers elle qu'une phase lit le matériel du profil, et elle peut être retirée en cours d'exécution — le travail cesse de voir ce qu'elle couvrait à partir de cet instant, pas à la fin.", de: "Eine Freigabe ist ein widerrufbarer Umfang. Durch sie liest eine Phase das eigene Material des Profils, und sie kann mitten im Lauf entzogen werden — die Arbeit sieht ab diesem Moment nicht mehr, was die Freigabe abdeckte, nicht erst am Ende.", pt: "Uma concessão é um âmbito revogável. É através dela que uma fase lê o material do próprio perfil, e pode ser retirada a meio da execução — o trabalho deixa de ver o que a concessão cobria a partir desse momento, não no fim.", it: "Una concessione è un ambito revocabile. È ciò attraverso cui una fase legge il materiale del profilo, e può essere ritirata a metà esecuzione — il lavoro smette di vedere ciò che copriva da quel momento, non alla fine.", ja: "許可とは、取り消しうる範囲のことです。各段階はそれを通してプロフィール自身の資料を読み、実行の途中でも取り下げられます — 仕事がその範囲を見られなくなるのは、終わりではなくその瞬間からです。", zh: "授权是一个可撤销的范围。各阶段正是透过它读取资料自身的素材，而且可以在运行途中撤回——工作从那一刻起就看不到授权所覆盖的内容，而不是等到结束。", hi: "अनुदान एक वापस लिया जा सकने वाला दायरा है। कोई चरण प्रोफ़ाइल की अपनी सामग्री इसी से होकर पढ़ता है, और इसे बीच में ही वापस लिया जा सकता है — काम उसी क्षण से वह देखना बंद कर देता है जो अनुदान में था, अंत में नहीं।", ar: "التصريح نطاق قابل للإلغاء. من خلاله يقرأ الطور مواد الملف نفسه، ويمكن سحبه في منتصف التنفيذ — فيتوقف العمل عن رؤية ما كان يغطيه من تلك اللحظة، لا عند النهاية.",
+  },
+  "dlg.noscope": {
+    en: "no scope", es: "sin alcance", fr: "aucune portée", de: "kein Umfang", pt: "sem âmbito", it: "nessun ambito", ja: "範囲なし", zh: "无范围", hi: "कोई दायरा नहीं", ar: "بلا نطاق",
+  },
+  "dlg.revoked": {
+    en: "revoked", es: "revocada", fr: "révoquée", de: "widerrufen", pt: "revogada", it: "revocata", ja: "取り消し済み", zh: "已撤销", hi: "निरस्त", ar: "مُلغى",
+  },
+  "dlg.revoke": {
+    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "取り消す", zh: "撤销", hi: "निरस्त करें", ar: "ألغِ",
+  },
+  "dlg.revoked.said": {
+    en: "Revoked. Anything running stops reading through it now.", es: "Revocada. Lo que esté en marcha deja de leer a través de ella ahora.", fr: "Révoquée. Tout ce qui tourne cesse de lire à travers elle dès maintenant.", de: "Widerrufen. Was läuft, liest ab jetzt nicht mehr hindurch.", pt: "Revogada. O que estiver a correr deixa de ler através dela agora.", it: "Revocata. Ciò che è in esecuzione smette di leggerci attraverso da adesso.", ja: "取り消しました。実行中のものは、今この瞬間からそれを通して読まなくなります。", zh: "已撤销。正在运行的一切从现在起不再透过它读取。", hi: "निरस्त। जो कुछ चल रहा है वह अभी से इसके ज़रिए पढ़ना बंद कर देता है।", ar: "أُلغي. وكل ما يعمل يتوقف الآن عن القراءة من خلاله.",
+  },
+  "dlg.mint": {
+    en: "Mint a grant over my sources", es: "Emitir una concesión sobre mis fuentes", fr: "Créer une autorisation sur mes sources", de: "Eine Freigabe über meine Quellen erzeugen", pt: "Emitir uma concessão sobre as minhas fontes", it: "Conia una concessione sulle mie fonti", ja: "自分の資料に対する許可を発行する", zh: "为我的素材铸造一份授权", hi: "मेरे स्रोतों पर अनुदान बनाएँ", ar: "أنشئ تصريحًا على مصادري",
+  },
+  "dlg.minted.said": {
+    en: "Grant minted.", es: "Concesión emitida.", fr: "Autorisation créée.", de: "Freigabe erzeugt.", pt: "Concessão emitida.", it: "Concessione coniata.", ja: "許可を発行しました。", zh: "授权已铸造。", hi: "अनुदान बन गया।", ar: "أُنشئ التصريح.",
+  },
+  "dlg.unattended": {
+    en: "What it may do unattended", es: "Lo que puede hacer sin supervisión", fr: "Ce qu'il peut faire sans surveillance", de: "Was es unbeaufsichtigt tun darf", pt: "O que pode fazer sem supervisão", it: "Cosa può fare senza sorveglianza", ja: "見ていないところで何をしてよいか", zh: "无人看管时它可以做什么", hi: "बिना निगरानी यह क्या कर सकता है", ar: "ما يجوز له فعله دون إشراف",
+  },
+  "dlg.on": {
+    en: "On. Anything not ticked still stops and waits for you.", es: "Activado. Lo que no esté marcado sigue parándose y esperándote.", fr: "Activé. Ce qui n'est pas coché s'arrête toujours et vous attend.", de: "An. Was nicht angehakt ist, hält weiterhin an und wartet auf Sie.", pt: "Ligado. O que não estiver assinalado continua a parar e a esperar por si.", it: "Attivo. Ciò che non è spuntato si ferma comunque e ti aspetta.", ja: "オンです。チェックされていないものは、やはり止まってあなたを待ちます。", zh: "已开启。未勾选的部分仍会停下来等你。", hi: "चालू। जिस पर निशान नहीं है वह फिर भी रुककर आपकी प्रतीक्षा करेगा।", ar: "مفعَّل. وما لم يُؤشَّر عليه يظل يتوقف وينتظرك.",
+  },
+  "dlg.off": {
+    en: "Off. Every phase stops and waits for you.", es: "Desactivado. Cada fase se para y te espera.", fr: "Désactivé. Chaque phase s'arrête et vous attend.", de: "Aus. Jede Phase hält an und wartet auf Sie.", pt: "Desligado. Cada fase para e espera por si.", it: "Spento. Ogni fase si ferma e ti aspetta.", ja: "オフです。すべての段階が止まってあなたを待ちます。", zh: "已关闭。每个阶段都会停下来等你。", hi: "बंद। हर चरण रुककर आपकी प्रतीक्षा करता है।", ar: "معطَّل. كل طور يتوقف وينتظرك.",
+  },
+  "dlg.needone": {
+    en: "A policy needs at least one phase. Turn delegation off instead if the profile should do nothing unattended.", es: "Una política necesita al menos una fase. Desactiva la delegación si el perfil no debe hacer nada sin supervisión.", fr: "Une politique exige au moins une phase. Désactivez plutôt la délégation si le profil ne doit rien faire sans surveillance.", de: "Eine Richtlinie braucht mindestens eine Phase. Schalten Sie die Delegation stattdessen aus, wenn das Profil unbeaufsichtigt nichts tun soll.", pt: "Uma política precisa de pelo menos uma fase. Desligue antes a delegação se o perfil não deve fazer nada sem supervisão.", it: "Una politica ha bisogno di almeno una fase. Spegni invece la delega se il profilo non deve fare nulla senza sorveglianza.", ja: "方針には少なくとも一つの段階が必要です。見ていないところで何もさせたくないなら、委任そのものをオフにしてください。", zh: "一条策略至少需要一个阶段。如果不希望资料在无人看管时做任何事，请直接关闭委托。", hi: "किसी नीति में कम से कम एक चरण चाहिए। यदि प्रोफ़ाइल को बिना निगरानी कुछ नहीं करना है, तो प्रत्यायोजन ही बंद कर दें।", ar: "السياسة تحتاج طورًا واحدًا على الأقل. أوقف التفويض بدلًا من ذلك إن كان الملف يجب ألا يفعل شيئًا دون إشراف.",
+  },
+  "dlg.delegating.said": {
+    en: "Delegating: {what}.", es: "Delegando: {what}.", fr: "Délégué : {what}.", de: "Delegiert: {what}.", pt: "A delegar: {what}.", it: "Delego: {what}.", ja: "委任中: {what}。", zh: "已委托：{what}。", hi: "प्रत्यायोजित: {what}।", ar: "مفوَّض: {what}.",
+  },
+  "dlg.turn.on": {
+    en: "Turn delegation on", es: "Activar la delegación", fr: "Activer la délégation", de: "Delegation einschalten", pt: "Ligar a delegação", it: "Attiva la delega", ja: "委任をオンにする", zh: "开启委托", hi: "प्रत्यायोजन चालू करें", ar: "فعّل التفويض",
+  },
+  "dlg.turn.off": {
+    en: "Turn delegation off", es: "Desactivar la delegación", fr: "Désactiver la délégation", de: "Delegation ausschalten", pt: "Desligar a delegação", it: "Disattiva la delega", ja: "委任をオフにする", zh: "关闭委托", hi: "प्रत्यायोजन बंद करें", ar: "عطّل التفويض",
+  },
+  "dlg.on.said": {
+    en: "Delegation on.", es: "Delegación activada.", fr: "Délégation activée.", de: "Delegation an.", pt: "Delegação ligada.", it: "Delega attiva.", ja: "委任をオンにしました。", zh: "委托已开启。", hi: "प्रत्यायोजन चालू।", ar: "فُعِّل التفويض.",
+  },
+  "dlg.off.said": {
+    en: "Delegation off.", es: "Delegación desactivada.", fr: "Délégation désactivée.", de: "Delegation aus.", pt: "Delegação desligada.", it: "Delega disattivata.", ja: "委任をオフにしました。", zh: "委托已关闭。", hi: "प्रत्यायोजन बंद।", ar: "عُطِّل التفويض.",
+  },
+  "dlg.runs": {
+    en: "Runs", es: "Ejecuciones", fr: "Exécutions", de: "Läufe", pt: "Execuções", it: "Esecuzioni", ja: "実行", zh: "运行", hi: "चलाए गए", ar: "التنفيذات",
+  },
+  "dlg.goal.ph": {
+    en: "What should it work on?", es: "¿En qué debería trabajar?", fr: "Sur quoi doit-il travailler ?", de: "Woran soll es arbeiten?", pt: "Em que deve trabalhar?", it: "Su cosa deve lavorare?", ja: "何に取り組ませますか？", zh: "让它做什么？", hi: "इसे किस पर काम करना चाहिए?", ar: "على ماذا يعمل؟",
+  },
+  "dlg.start": {
+    en: "Start", es: "Empezar", fr: "Lancer", de: "Starten", pt: "Começar", it: "Avvia", ja: "開始", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
+  },
+  "dlg.started.said": {
+    en: "Started.", es: "Iniciado.", fr: "Lancé.", de: "Gestartet.", pt: "Iniciado.", it: "Avviato.", ja: "開始しました。", zh: "已开始。", hi: "शुरू हो गया।", ar: "بدأ.",
+  },
+  "dlg.norun": {
+    en: "Nothing has been run yet.", es: "Todavía no se ha ejecutado nada.", fr: "Rien n'a encore été exécuté.", de: "Es wurde noch nichts ausgeführt.", pt: "Ainda não foi executado nada.", it: "Non è ancora stato eseguito nulla.", ja: "まだ何も実行されていません。", zh: "还没有运行过任何东西。", hi: "अभी तक कुछ नहीं चलाया गया।", ar: "لم يُنفَّذ شيء بعد.",
+  },
+  "dlg.next": {
+    en: "next: {phase}", es: "siguiente: {phase}", fr: "suivant : {phase}", de: "als Nächstes: {phase}", pt: "seguinte: {phase}", it: "prossimo: {phase}", ja: "次: {phase}", zh: "下一步：{phase}", hi: "अगला: {phase}", ar: "التالي: {phase}",
+  },
+  "dlg.waiting": {
+    en: "Waiting on you: {what}", es: "A la espera de ti: {what}", fr: "En attente de vous : {what}", de: "Wartet auf Sie: {what}", pt: "À espera de si: {what}", it: "In attesa di te: {what}", ja: "あなた待ち: {what}", zh: "等你：{what}", hi: "आपकी प्रतीक्षा: {what}", ar: "في انتظارك: {what}",
+  },
+  "dlg.answer.ph": {
+    en: "Your answer", es: "Tu respuesta", fr: "Votre réponse", de: "Ihre Antwort", pt: "A sua resposta", it: "La tua risposta", ja: "あなたの答え", zh: "你的回答", hi: "आपका उत्तर", ar: "إجابتك",
+  },
+  "dlg.answer": {
+    en: "Answer & continue", es: "Responder y continuar", fr: "Répondre et continuer", de: "Antworten und fortfahren", pt: "Responder e continuar", it: "Rispondi e continua", ja: "答えて続ける", zh: "回答并继续", hi: "उत्तर दें और जारी रखें", ar: "أجب وتابع",
+  },
+  "dlg.resumed.said": {
+    en: "Resumed.", es: "Reanudado.", fr: "Repris.", de: "Fortgesetzt.", pt: "Retomado.", it: "Ripreso.", ja: "再開しました。", zh: "已继续。", hi: "फिर शुरू।", ar: "استؤنف.",
+  },
+  "dlg.advance": {
+    en: "Advance", es: "Avanzar", fr: "Avancer", de: "Weiter", pt: "Avançar", it: "Avanza", ja: "次へ進める", zh: "推进", hi: "आगे बढ़ाएँ", ar: "تقدّم",
+  },
+  "dlg.cancel": {
+    en: "Cancel", es: "Cancelar", fr: "Annuler", de: "Abbrechen", pt: "Cancelar", it: "Annulla", ja: "中止", zh: "取消", hi: "रद्द करें", ar: "ألغِ",
+  },
+  "dlg.cancel.confirm": {
+    en: "Cancel this run? What it has already done stays.", es: "¿Cancelar esta ejecución? Lo que ya ha hecho se queda.", fr: "Annuler cette exécution ? Ce qui a déjà été fait reste.", de: "Diesen Lauf abbrechen? Was bereits getan wurde, bleibt.", pt: "Cancelar esta execução? O que já foi feito fica.", it: "Annullare questa esecuzione? Ciò che ha già fatto resta.", ja: "この実行を中止しますか？すでに済んだことはそのまま残ります。", zh: "要取消这次运行吗？它已经做完的部分会保留。", hi: "क्या यह चलना रद्द करें? जो कर चुका है वह बना रहेगा।", ar: "إلغاء هذا التنفيذ؟ ما أنجزه فعلًا يبقى.",
+  },
+  "dlg.cancelled.said": {
+    en: "Cancelled.", es: "Cancelado.", fr: "Annulé.", de: "Abgebrochen.", pt: "Cancelado.", it: "Annullato.", ja: "中止しました。", zh: "已取消。", hi: "रद्द कर दिया गया।", ar: "أُلغي.",
+  },
+  "dlg.oneoff": {
+    en: "One-off tasks", es: "Tareas sueltas", fr: "Tâches ponctuelles", de: "Einzelaufgaben", pt: "Tarefas avulsas", it: "Compiti singoli", ja: "単発の作業", zh: "一次性任务", hi: "एकबारगी काम", ar: "مهام مفردة",
+  },
+  "dlg.oneoff.pitch": {
+    en: "A single piece of work rather than a run with phases. It needs a grant, because it composes from the profile's own sources.", es: "Un solo trabajo en vez de una ejecución con fases. Necesita una concesión, porque compone a partir de las fuentes del propio perfil.", fr: "Un seul travail plutôt qu'une exécution en phases. Il faut une autorisation, car il compose à partir des sources du profil.", de: "Ein einzelnes Stück Arbeit statt eines Laufs mit Phasen. Es braucht eine Freigabe, weil es aus den eigenen Quellen des Profils zusammensetzt.", pt: "Um único trabalho em vez de uma execução com fases. Precisa de uma concessão, porque compõe a partir das fontes do próprio perfil.", it: "Un singolo lavoro invece di un'esecuzione a fasi. Serve una concessione, perché compone dalle fonti del profilo stesso.", ja: "段階に分かれた実行ではなく、ひとまとまりの作業です。プロフィール自身の資料から組み立てるため、許可が必要です。", zh: "这是单独一件工作，而不是分阶段的运行。它需要一份授权，因为它是从资料自身的素材中组织出来的。", hi: "चरणों वाले चलने के बजाय काम का एक टुकड़ा। इसे अनुदान चाहिए, क्योंकि यह प्रोफ़ाइल के अपने स्रोतों से रचता है।", ar: "قطعة عمل واحدة لا تنفيذًا بأطوار. تحتاج تصريحًا، لأنها تؤلّف من مصادر الملف نفسه.",
+  },
+  "dlg.topic.ph": {
+    en: "Topic", es: "Tema", fr: "Sujet", de: "Thema", pt: "Tema", it: "Argomento", ja: "題材", zh: "主题", hi: "विषय", ar: "الموضوع",
+  },
+  "dlg.compose": {
+    en: "Compose from my sources", es: "Componer desde mis fuentes", fr: "Composer à partir de mes sources", de: "Aus meinen Quellen zusammenstellen", pt: "Compor a partir das minhas fontes", it: "Componi dalle mie fonti", ja: "自分の資料から組み立てる", zh: "从我的素材中撰写", hi: "मेरे स्रोतों से रचें", ar: "ألّف من مصادري",
+  },
+  "dlg.done.said": {
+    en: "Done.", es: "Hecho.", fr: "Fait.", de: "Erledigt.", pt: "Feito.", it: "Fatto.", ja: "完了しました。", zh: "完成。", hi: "हो गया।", ar: "تمّ.",
+  },
+  "dlg.mintfirst": {
+    en: "Mint a grant first.", es: "Emite antes una concesión.", fr: "Créez d'abord une autorisation.", de: "Erzeugen Sie zuerst eine Freigabe.", pt: "Emita primeiro uma concessão.", it: "Prima conia una concessione.", ja: "先に許可を発行してください。", zh: "请先铸造一份授权。", hi: "पहले एक अनुदान बनाएँ।", ar: "أنشئ تصريحًا أولًا.",
+  },
+  "dlg.handed": {
+    en: "Work you handed to somebody else's profile", es: "Trabajo que has encargado al perfil de otra persona", fr: "Le travail que vous avez confié au profil de quelqu'un d'autre", de: "Arbeit, die Sie dem Profil einer anderen Person übergeben haben", pt: "Trabalho que entregou ao perfil de outra pessoa", it: "Lavoro che hai affidato al profilo di qualcun altro", ja: "他人のプロフィールに手渡した仕事", zh: "你交给别人资料去做的工作", hi: "वह काम जो आपने किसी और की प्रोफ़ाइल को सौंपा", ar: "عمل سلّمته لملف شخص آخر",
+  },
+  "dlg.handed.pitch": {
+    en: "The other side of the same policy. Everything above is what your own profile may do for you; this is you asking somebody else's to do something, inside the limits its owner published.", es: "La otra cara de la misma política. Todo lo de arriba es lo que tu propio perfil puede hacer por ti; esto es que tú le pidas al de otra persona que haga algo, dentro de los límites que publicó su propietario.", fr: "L'autre face de la même politique. Tout ce qui précède est ce que votre propre profil peut faire pour vous ; ici, c'est vous qui demandez à celui de quelqu'un d'autre de faire quelque chose, dans les limites publiées par son propriétaire.", de: "Die andere Seite derselben Richtlinie. Alles darüber ist, was Ihr eigenes Profil für Sie tun darf; hier bitten Sie das einer anderen Person, etwas zu tun — innerhalb der Grenzen, die deren Besitzer veröffentlicht hat.", pt: "O outro lado da mesma política. Tudo o que está acima é o que o seu próprio perfil pode fazer por si; isto é você a pedir ao de outra pessoa que faça algo, dentro dos limites que o proprietário dele publicou.", it: "L'altra faccia della stessa politica. Tutto quanto sopra è ciò che il tuo profilo può fare per te; questo sei tu che chiedi a quello di qualcun altro di fare qualcosa, entro i limiti pubblicati dal suo proprietario.", ja: "同じ方針のもう一方の側です。ここより上は、あなた自身のプロフィールがあなたのために何をしてよいかでした。こちらは、他人のプロフィールに何かを頼むこと — その所有者が公開した範囲の内側で。", zh: "同一套策略的另一面。上面写的是你自己的资料可以为你做什么；这里则是你请别人的资料去做某件事，在其所有者公开的限度之内。", hi: "उसी नीति का दूसरा पक्ष। ऊपर का सब कुछ यह है कि आपकी अपनी प्रोफ़ाइल आपके लिए क्या कर सकती है; यह वह है जहाँ आप किसी और की प्रोफ़ाइल से कुछ करने को कहते हैं — उन सीमाओं के भीतर जो उसके स्वामी ने प्रकाशित की हैं।", ar: "الوجه الآخر للسياسة نفسها. كل ما سبق هو ما يجوز لملفك أن يفعله من أجلك؛ وهذا أنت تطلب من ملف شخص آخر أن يفعل شيئًا، ضمن الحدود التي نشرها مالكه.",
+  },
+  "dlg.theirs.ph": {
+    en: "their profile id", es: "el id de su perfil", fr: "l'id de leur profil", de: "dessen Profil-ID", pt: "o id do perfil deles", it: "l'id del loro profilo", ja: "相手のプロフィールID", zh: "对方的资料 ID", hi: "उनकी प्रोफ़ाइल की आईडी", ar: "معرّف ملفهم",
+  },
+  "dlg.whatwill": {
+    en: "What will it take on?", es: "¿Qué aceptará hacer?", fr: "Que va-t-il accepter ?", de: "Was übernimmt es?", pt: "O que aceitará fazer?", it: "Cosa accetterà di fare?", ja: "何を引き受けますか？", zh: "它会承接什么？", hi: "यह क्या लेगा?", ar: "ماذا سيتولّى؟",
+  },
+  "dlg.accepts": {
+    en: "Accepts delegated work: {phases}", es: "Acepta trabajo delegado: {phases}", fr: "Accepte du travail délégué : {phases}", de: "Nimmt delegierte Arbeit an: {phases}", pt: "Aceita trabalho delegado: {phases}", it: "Accetta lavoro delegato: {phases}", ja: "委任された仕事を受けます: {phases}", zh: "接受委托的工作：{phases}", hi: "प्रत्यायोजित काम स्वीकारता है: {phases}", ar: "يقبل عملًا مفوَّضًا: {phases}",
+  },
+  "dlg.accepts.not": {
+    en: "Does not accept delegated work.", es: "No acepta trabajo delegado.", fr: "N'accepte pas de travail délégué.", de: "Nimmt keine delegierte Arbeit an.", pt: "Não aceita trabalho delegado.", it: "Non accetta lavoro delegato.", ja: "委任された仕事は受けません。", zh: "不接受委托的工作。", hi: "प्रत्यायोजित काम स्वीकार नहीं करता।", ar: "لا يقبل عملًا مفوَّضًا.",
+  },
+  "dlg.noscope.shown": {
+    en: "Which sources its owner scoped is not shown, and is not yours to know.", es: "Qué fuentes acotó su propietario no se muestra, y no te corresponde saberlo.", fr: "Quelles sources son propriétaire a délimitées n'est pas affiché, et ne vous regarde pas.", de: "Welche Quellen sein Besitzer eingegrenzt hat, wird nicht gezeigt und geht Sie nichts an.", pt: "Quais fontes o proprietário delimitou não é mostrado, e não lhe compete saber.", it: "Quali fonti il suo proprietario abbia delimitato non viene mostrato, e non ti spetta saperlo.", ja: "その所有者がどの資料を範囲に入れたかは表示されませんし、あなたが知ってよいことでもありません。", zh: "其所有者圈定了哪些素材不会显示，也不是你该知道的。", hi: "उसके स्वामी ने कौन-से स्रोत दायरे में रखे, यह नहीं दिखाया जाता, और यह जानना आपका हक़ नहीं।", ar: "أي المصادر حدّدها مالكه لا يُعرض، وليس من شأنك أن تعرفه.",
+  },
+  "dlg.want.ph": {
+    en: "what you want done", es: "qué quieres que se haga", fr: "ce que vous voulez faire faire", de: "was erledigt werden soll", pt: "o que quer que seja feito", it: "cosa vuoi che venga fatto", ja: "してほしいこと", zh: "你想让它做什么", hi: "आप क्या करवाना चाहते हैं", ar: "ما تريد إنجازه",
+  },
+  "dlg.handover": {
+    en: "Hand it over", es: "Encargarlo", fr: "Le confier", de: "Übergeben", pt: "Entregar", it: "Affidalo", ja: "手渡す", zh: "交出去", hi: "सौंप दें", ar: "سلّمه",
+  },
+  "dlg.talking": {
+    en: "You have to be talking to it already — delegated work is for somebody in a conversation, not a stranger holding a profile id, and starting one cold is refused by name.", es: "Tienes que estar ya hablando con él — el trabajo delegado es para alguien que está en una conversación, no para un desconocido con un id de perfil, y arrancar uno en frío se rechaza con su nombre.", fr: "Vous devez déjà être en train de lui parler — le travail délégué est pour quelqu'un dans une conversation, pas pour un inconnu tenant un id de profil, et en démarrer un à froid est refusé nommément.", de: "Sie müssen bereits mit ihm sprechen — delegierte Arbeit ist für jemanden in einem Gespräch, nicht für eine fremde Person mit einer Profil-ID, und einen kalten Start lehnt es namentlich ab.", pt: "Já tem de estar a falar com ele — o trabalho delegado é para alguém numa conversa, não para um desconhecido com um id de perfil, e começar um a frio é recusado pelo nome.", it: "Devi già starci parlando — il lavoro delegato è per qualcuno dentro una conversazione, non per uno sconosciuto con un id di profilo, e avviarne uno a freddo viene rifiutato per nome.", ja: "すでに会話していることが前提です — 委任された仕事は会話の中にいる人のためのもので、プロフィールIDを持っているだけの見知らぬ人のためではありません。何もないところから始めようとすると、その理由を名指しして拒否されます。", zh: "你必须已经在跟它对话——委托的工作是给对话中的人的，而不是给一个只握着资料 ID 的陌生人；冷启动会被指名拒绝。", hi: "आपका उससे पहले से बात करते होना ज़रूरी है — प्रत्यायोजित काम बातचीत में मौजूद किसी व्यक्ति के लिए है, प्रोफ़ाइल आईडी थामे किसी अजनबी के लिए नहीं, और ठंडे-ठंडे शुरू करने पर नाम लेकर इनकार होता है।", ar: "عليك أن تكون تحادثه أصلًا — العمل المفوَّض لمن هو داخل محادثة، لا لغريب يحمل معرّف ملف، وبدؤه على البارد مرفوض بالاسم.",
+  },
+  "dlg.handed.line": {
+    en: "{id} — {status}", es: "{id} — {status}", fr: "{id} — {status}", de: "{id} — {status}", pt: "{id} — {status}", it: "{id} — {status}", ja: "{id} — {status}", zh: "{id} — {status}", hi: "{id} — {status}", ar: "{id} — {status}",
+  },
+  "dlg.handed.next": {
+    en: " · next: {phase}", es: " · siguiente: {phase}", fr: " · suivant : {phase}", de: " · als Nächstes: {phase}", pt: " · seguinte: {phase}", it: " · prossimo: {phase}", ja: " · 次: {phase}", zh: " · 下一步：{phase}", hi: " · अगला: {phase}", ar: " · التالي: {phase}",
+  },
+  "dlg.handed.waiting": {
+    en: " · waiting on you: {what}", es: " · a la espera de ti: {what}", fr: " · en attente de vous : {what}", de: " · wartet auf Sie: {what}", pt: " · à espera de si: {what}", it: " · in attesa di te: {what}", ja: " · あなた待ち: {what}", zh: " · 等你：{what}", hi: " · आपकी प्रतीक्षा: {what}", ar: " · في انتظارك: {what}",
+  },
+  "dlg.nextphase": {
+    en: "Run the next phase", es: "Ejecutar la siguiente fase", fr: "Exécuter la phase suivante", de: "Nächste Phase ausführen", pt: "Executar a fase seguinte", it: "Esegui la fase successiva", ja: "次の段階を実行", zh: "运行下一阶段", hi: "अगला चरण चलाएँ", ar: "نفّذ الطور التالي",
+  },
+  "dlg.refresh": {
+    en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "حدّث",
+  },
+  "dlg.answerit.ph": {
+    en: "answer it, if it stopped to ask", es: "respóndele, si se paró a preguntar", fr: "répondez-lui, s'il s'est arrêté pour demander", de: "antworten Sie, falls es zum Fragen angehalten hat", pt: "responda-lhe, se parou para perguntar", it: "rispondigli, se si è fermato per chiedere", ja: "尋ねるために止まっていたら、答える", zh: "如果它停下来提问，就回答它", hi: "यदि यह पूछने के लिए रुका है तो उत्तर दें", ar: "أجبه، إن توقف ليسأل",
+  },
+  "dlg.answercont": {
+    en: "Answer and continue", es: "Responder y continuar", fr: "Répondre et continuer", de: "Antworten und fortfahren", pt: "Responder e continuar", it: "Rispondi e continua", ja: "答えて続ける", zh: "回答并继续", hi: "उत्तर दें और जारी रखें", ar: "أجب وتابع",
+  },
+  "bcn.title": {
+    en: "Where people find you", es: "Dónde te encuentra la gente", fr: "Où les gens vous trouvent", de: "Wo Leute Sie finden", pt: "Onde as pessoas o encontram", it: "Dove la gente ti trova", ja: "人があなたを見つける場所", zh: "别人在哪里找到你", hi: "लोग आपको कहाँ पाते हैं", ar: "أين يجدك الناس",
+  },
+  "bcn.here": {
+    en: "here", es: "aquí", fr: "ici", de: "hierher", pt: "aqui", it: "qui", ja: "ここ", zh: "这里", hi: "यहाँ", ar: "هنا",
+  },
+  "bcn.lead": {
+    en: "Two kinds of code, and they look the same. A placed beacon brings somebody {here}; a platform beacon sends them to an account somewhere else.", es: "Dos clases de código, y se ven iguales. Una baliza colocada trae a alguien {here}; una baliza de plataforma lo manda a una cuenta en otro sitio.", fr: "Deux sortes de code, et elles se ressemblent. Une balise posée amène quelqu'un {here} ; une balise de plateforme l'envoie vers un compte ailleurs.", de: "Zwei Arten von Code, und sie sehen gleich aus. Eine angebrachte Bake bringt jemanden {here}; eine Plattform-Bake schickt ihn zu einem Konto woanders.", pt: "Dois tipos de código, e parecem iguais. Uma baliza colocada traz alguém {here}; uma baliza de plataforma manda-o para uma conta noutro sítio.", it: "Due tipi di codice, e sembrano uguali. Un beacon posato porta qualcuno {here}; un beacon di piattaforma lo manda a un account altrove.", ja: "コードは二種類あり、見た目は同じです。設置したビーコンは人を{here}へ連れてきます。プラットフォームのビーコンは、よそにある別のアカウントへ送り出します。", zh: "有两种码，长得一模一样。放置的信标把人带到{here}；平台信标则把他们送往别处的某个账户。", hi: "दो तरह के कोड, और दोनों एक जैसे दिखते हैं। रखा हुआ बीकन किसी को {here} लाता है; प्लेटफ़ॉर्म बीकन उन्हें कहीं और के किसी खाते तक भेज देता है।", ar: "نوعان من الرموز، وشكلهما واحد. المنارة الموضوعة تجلب أحدهم إلى {here}؛ ومنارة المنصة ترسله إلى حساب في مكان آخر.",
+  },
+  "bcn.connect": {
+    en: "Connect a platform", es: "Conectar una plataforma", fr: "Connecter une plateforme", de: "Eine Plattform verbinden", pt: "Ligar uma plataforma", it: "Collega una piattaforma", ja: "プラットフォームをつなぐ", zh: "连接一个平台", hi: "कोई प्लेटफ़ॉर्म जोड़ें", ar: "اربط منصة",
+  },
+  "bcn.collect": {
+    en: "Collect", es: "Recoger", fr: "Collecter", de: "Sammeln", pt: "Recolher", it: "Raccogli", ja: "取り込み", zh: "收集", hi: "संग्रह", ar: "التجميع",
+  },
+  "bcn.publish": {
+    en: "Publish", es: "Publicar", fr: "Publier", de: "Veröffentlichen", pt: "Publicar", it: "Pubblica", ja: "発信", zh: "发布", hi: "प्रकाशन", ar: "النشر",
+  },
+  "bcn.directions": {
+    en: "Two directions, never the same row. {collect} pulls that account's content in to grow this profile. {publish} runs the profile out on the platform. Kept apart so a read-only import can never also post.", es: "Dos direcciones, nunca en la misma fila. {collect} trae el contenido de esa cuenta para hacer crecer este perfil. {publish} saca el perfil a la plataforma. Se mantienen separadas para que una importación de solo lectura no pueda además publicar.", fr: "Deux directions, jamais sur la même ligne. {collect} tire le contenu de ce compte pour faire grandir ce profil. {publish} fait sortir le profil sur la plateforme. Séparées, pour qu'un import en lecture seule ne puisse jamais aussi publier.", de: "Zwei Richtungen, nie in derselben Zeile. {collect} zieht die Inhalte jenes Kontos herein, um dieses Profil wachsen zu lassen. {publish} bringt das Profil auf der Plattform hinaus. Getrennt gehalten, damit ein Nur-Lese-Import nie auch posten kann.", pt: "Duas direções, nunca na mesma linha. {collect} puxa o conteúdo dessa conta para fazer crescer este perfil. {publish} leva o perfil para fora, na plataforma. Mantidas separadas para que uma importação só de leitura nunca possa também publicar.", it: "Due direzioni, mai sulla stessa riga. {collect} tira dentro i contenuti di quell'account per far crescere questo profilo. {publish} porta il profilo fuori sulla piattaforma. Tenute separate perché un'importazione in sola lettura non possa mai anche pubblicare.", ja: "向きは二つあり、同じ行に同居することはありません。{collect} は、そのアカウントの内容を取り込んでこのプロフィールを育てます。{publish} は、プロフィールをそのプラットフォームへ送り出します。読み取り専用の取り込みが投稿までできてしまわないよう、分けてあります。", zh: "两个方向，永不共处一行。{collect} 把那个账户的内容拉进来，用以充实这份资料。{publish} 则把资料发到那个平台上去。二者分开，好让只读的导入永远不可能同时发帖。", hi: "दो दिशाएँ, कभी एक ही पंक्ति में नहीं। {collect} उस खाते की सामग्री खींचकर इस प्रोफ़ाइल को बढ़ाता है। {publish} प्रोफ़ाइल को उस प्लेटफ़ॉर्म पर बाहर चलाता है। इन्हें अलग रखा गया है ताकि केवल-पढ़ने वाला आयात कभी पोस्ट भी न कर सके।", ar: "اتجاهان، ولا يجتمعان في صف واحد أبدًا. {collect} يسحب محتوى ذلك الحساب لينمو هذا الملف. و{publish} يُخرج الملف على المنصة. فُصلا كي لا يستطيع استيراد للقراءة فقط أن ينشر أيضًا.",
+  },
+  "bcn.opt.publish": {
+    en: "publish — run it out there", es: "publicar — sacarlo ahí fuera", fr: "publier — le faire sortir", de: "veröffentlichen — hinausbringen", pt: "publicar — levá-lo lá para fora", it: "pubblica — portalo là fuori", ja: "発信 — 外へ送り出す", zh: "发布 — 把它发到外面去", hi: "प्रकाशन — इसे बाहर चलाएँ", ar: "انشر — أخرِجه إلى هناك",
+  },
+  "bcn.opt.collect": {
+    en: "collect — pull it in", es: "recoger — traerlo aquí", fr: "collecter — le faire entrer", de: "sammeln — hereinholen", pt: "recolher — trazê-lo para dentro", it: "raccogli — tiralo dentro", ja: "取り込み — 中へ引き入れる", zh: "收集 — 把它拉进来", hi: "संग्रह — इसे भीतर खींचें", ar: "اجمع — اسحبه إلى الداخل",
+  },
+  "bcn.handle.ph": {
+    en: "the handle, without the @", es: "el alias, sin la @", fr: "l'identifiant, sans le @", de: "der Handle, ohne das @", pt: "o identificador, sem o @", it: "l'handle, senza la @", ja: "ハンドル名（@ なし）", zh: "用户名，不带 @", hi: "हैंडल, @ के बिना", ar: "المعرّف، دون @",
+  },
+  "bcn.connectbtn": {
+    en: "Connect", es: "Conectar", fr: "Connecter", de: "Verbinden", pt: "Ligar", it: "Collega", ja: "つなぐ", zh: "连接", hi: "जोड़ें", ar: "اربط",
+  },
+  "bcn.connected.said": {
+    en: "Connected.", es: "Conectado.", fr: "Connecté.", de: "Verbunden.", pt: "Ligado.", it: "Collegato.", ja: "つながりました。", zh: "已连接。", hi: "जुड़ गया।", ar: "تمّ الربط.",
+  },
+  "bcn.nohandle": {
+    en: "Without a handle the beacon has no account page to point at, so it falls back to a QRME summon link — still a working code, but it brings people here rather than to the platform.", es: "Sin alias, la baliza no tiene página de cuenta a la que apuntar, así que recae en un enlace de invocación de QRME — sigue siendo un código que funciona, pero trae a la gente aquí en vez de a la plataforma.", fr: "Sans identifiant, la balise n'a aucune page de compte à viser, elle retombe donc sur un lien d'appel QRME — un code qui marche toujours, mais qui amène les gens ici plutôt que sur la plateforme.", de: "Ohne Handle hat die Bake keine Kontoseite, auf die sie zeigen könnte, also fällt sie auf einen QRME-Summon-Link zurück — immer noch ein funktionierender Code, aber er bringt Leute hierher statt auf die Plattform.", pt: "Sem identificador, a baliza não tem página de conta para apontar, por isso recai num link de invocação do QRME — continua a ser um código que funciona, mas traz as pessoas para aqui e não para a plataforma.", it: "Senza handle il beacon non ha una pagina di account da puntare, quindi ripiega su un link di richiamo QRME — resta un codice funzionante, ma porta la gente qui invece che sulla piattaforma.", ja: "ハンドル名がなければ、ビーコンが指すべきアカウントのページがないため、QRME の呼び出しリンクに戻ります — 依然として機能するコードですが、人をプラットフォームではなくこちらへ連れてきます。", zh: "没有用户名，信标就没有可指向的账户页面，于是退回到 QRME 的召唤链接——仍是一个能用的码，但它把人带到这里，而不是那个平台。", hi: "हैंडल के बिना बीकन के पास इशारा करने को कोई खाता-पृष्ठ नहीं होता, इसलिए यह QRME के समन लिंक पर लौट आता है — कोड फिर भी काम करता है, पर लोगों को प्लेटफ़ॉर्म पर नहीं, यहाँ लाता है।", ar: "بلا معرّف لا تجد المنارة صفحة حساب تشير إليها، فترتدّ إلى رابط استدعاء في QRME — ويظل رمزًا عاملًا، لكنه يجلب الناس إلى هنا لا إلى المنصة.",
+  },
+  "bcn.connectedhdr": {
+    en: "Connected", es: "Conectadas", fr: "Connectées", de: "Verbunden", pt: "Ligadas", it: "Collegate", ja: "接続済み", zh: "已连接", hi: "जुड़े हुए", ar: "المرتبطة",
+  },
+  "bcn.none": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "bcn.counts": {
+    en: "{collected} collected · {published} published", es: "{collected} recogidos · {published} publicados", fr: "{collected} collectés · {published} publiés", de: "{collected} gesammelt · {published} veröffentlicht", pt: "{collected} recolhidos · {published} publicados", it: "{collected} raccolti · {published} pubblicati", ja: "取り込み {collected}件 · 発信 {published}件", zh: "已收集 {collected} · 已发布 {published}", hi: "{collected} संग्रहित · {published} प्रकाशित", ar: "{collected} مجموعة · {published} منشورة",
+  },
+  "bcn.showcode": {
+    en: "show its code", es: "mostrar su código", fr: "afficher son code", de: "seinen Code zeigen", pt: "mostrar o seu código", it: "mostra il suo codice", ja: "そのコードを表示", zh: "显示它的码", hi: "इसका कोड दिखाएँ", ar: "أظهر رمزه",
+  },
+  "bcn.disconnect": {
+    en: "disconnect", es: "desconectar", fr: "déconnecter", de: "trennen", pt: "desligar", it: "scollega", ja: "切断", zh: "断开", hi: "अलग करें", ar: "افصل",
+  },
+  "bcn.disconnected.said": {
+    en: "Disconnected.", es: "Desconectado.", fr: "Déconnecté.", de: "Getrennt.", pt: "Desligado.", it: "Scollegato.", ja: "切断しました。", zh: "已断开。", hi: "अलग कर दिया गया।", ar: "فُصل.",
+  },
+  "bcn.codefor": {
+    en: "The code for {platform}", es: "El código de {platform}", fr: "Le code pour {platform}", de: "Der Code für {platform}", pt: "O código de {platform}", it: "Il codice per {platform}", ja: "{platform} 用のコード", zh: "{platform} 的码", hi: "{platform} के लिए कोड", ar: "رمز {platform}",
+  },
+  "bcn.qralt": {
+    en: "the QR code for this platform presence", es: "el código QR de esta presencia en la plataforma", fr: "le QR code de cette présence sur la plateforme", de: "der QR-Code für diese Plattform-Präsenz", pt: "o código QR desta presença na plataforma", it: "il codice QR di questa presenza sulla piattaforma", ja: "このプラットフォーム上の存在を指す QR コード", zh: "此平台身份的二维码", hi: "इस प्लेटफ़ॉर्म उपस्थिति का QR कोड", ar: "رمز الاستجابة السريعة لهذا الحضور على المنصة",
+  },
+  "bcn.opens": {
+    en: "Scanning it opens {url}", es: "Escanearlo abre {url}", fr: "Le scanner ouvre {url}", de: "Das Scannen öffnet {url}", pt: "Digitalizá-lo abre {url}", it: "Scansionarlo apre {url}", ja: "スキャンすると {url} が開きます", zh: "扫描它会打开 {url}", hi: "इसे स्कैन करने पर {url} खुलता है", ar: "مسحه يفتح {url}",
+  },
+  "bcn.opens.handle": {
+    en: " — {handle} on {platform}.", es: " — {handle} en {platform}.", fr: " — {handle} sur {platform}.", de: " — {handle} auf {platform}.", pt: " — {handle} em {platform}.", it: " — {handle} su {platform}.", ja: " — {platform} の {handle}。", zh: " — {platform} 上的 {handle}。", hi: " — {platform} पर {handle}।", ar: " — {handle} على {platform}.",
+  },
+  "bcn.opens.summon": {
+    en: " — a QRME summon page, because this connection has no handle to build a platform link from.", es: " — una página de invocación de QRME, porque esta conexión no tiene alias con el que construir un enlace a la plataforma.", fr: " — une page d'appel QRME, car cette connexion n'a pas d'identifiant permettant de construire un lien vers la plateforme.", de: " — eine QRME-Summon-Seite, weil diese Verbindung keinen Handle hat, aus dem sich ein Plattform-Link bauen ließe.", pt: " — uma página de invocação do QRME, porque esta ligação não tem identificador com que construir um link para a plataforma.", it: " — una pagina di richiamo QRME, perché questa connessione non ha un handle con cui costruire un link alla piattaforma.", ja: " — QRME の呼び出しページです。この接続には、プラットフォームへのリンクを組み立てられるハンドル名がないからです。", zh: " — 一个 QRME 召唤页面，因为这个连接没有可用来构造平台链接的用户名。", hi: " — एक QRME समन पृष्ठ, क्योंकि इस कनेक्शन के पास ऐसा हैंडल नहीं जिससे प्लेटफ़ॉर्म लिंक बनाया जा सके।", ar: " — صفحة استدعاء في QRME، لأن هذا الارتباط بلا معرّف يُبنى منه رابط إلى المنصة.",
+  },
+  "bcn.away": {
+    en: "away", es: "fuera", fr: "ailleurs", de: "weg", pt: "para fora", it: "via", ja: "外へ", zh: "离开", hi: "दूर", ar: "بعيدًا",
+  },
+  "bcn.carries": {
+    en: "This code carries people {away} from QRME. A placed beacon does the opposite. Same picture, opposite destination.", es: "Este código lleva a la gente {away} de QRME. Una baliza colocada hace lo contrario. Misma imagen, destino opuesto.", fr: "Ce code emmène les gens {away} de QRME. Une balise posée fait l'inverse. Même image, destination opposée.", de: "Dieser Code trägt Leute {away} von QRME. Eine angebrachte Bake tut das Gegenteil. Dasselbe Bild, entgegengesetztes Ziel.", pt: "Este código leva as pessoas {away} do QRME. Uma baliza colocada faz o contrário. Mesma imagem, destino oposto.", it: "Questo codice porta la gente {away} da QRME. Un beacon posato fa l'opposto. Stessa immagine, destinazione opposta.", ja: "このコードは人を QRME から{away}運び出します。設置したビーコンはその逆をします。同じ絵で、行き先が逆です。", zh: "这个码把人从 QRME 带{away}。放置的信标做的正相反。同样的图，相反的去处。", hi: "यह कोड लोगों को QRME से {away} ले जाता है। रखा हुआ बीकन इसका उलटा करता है। तस्वीर वही, मंज़िल उलटी।", ar: "هذا الرمز يحمل الناس {away} عن QRME. والمنارة الموضوعة تفعل العكس. الصورة ذاتها، والوجهة معاكسة.",
+  },
+  "bcn.cost": {
+    en: "What a scan costs to check", es: "Lo que cuesta comprobar un escaneo", fr: "Ce que coûte la vérification d'un scan", de: "Was es kostet, einen Scan zu prüfen", pt: "O que custa verificar uma digitalização", it: "Quanto costa controllare una scansione", ja: "スキャンを確かめる代償", zh: "查一次扫描要付出什么", hi: "स्कैन जाँचने की क़ीमत", ar: "ما يكلّفه التحقق من مسحة",
+  },
+  "bcn.is": {
+    en: "is", es: "sí lo es", fr: "en est un", de: "ist einer", pt: "é", it: "lo è", ja: "そうです", zh: "就是", hi: "है", ar: "نعم",
+  },
+  "bcn.cost.pitch": {
+    en: "A QR image is free to ask for — fetching the picture is not a scan. Opening the page it points to {is} one, and every scan surface counts it, because the server cannot tell an owner checking their own sticker from a stranger who found it. There is no preview that doesn't count.", es: "Pedir una imagen QR es gratis — traer la imagen no es un escaneo. Abrir la página a la que apunta {is} uno, y todas las superficies de escaneo lo cuentan, porque el servidor no puede distinguir a un propietario comprobando su propia pegatina de un desconocido que la encontró. No hay vista previa que no cuente.", fr: "Demander une image QR est gratuit — récupérer l'image n'est pas un scan. Ouvrir la page vers laquelle elle pointe {is}, et toutes les surfaces de scan le comptent, car le serveur ne peut distinguer un propriétaire vérifiant son propre autocollant d'un inconnu qui l'a trouvé. Il n'existe aucun aperçu qui ne compte pas.", de: "Ein QR-Bild anzufordern ist frei — das Bild zu holen ist kein Scan. Die Seite zu öffnen, auf die es zeigt, {is} einer, und jede Scan-Oberfläche zählt ihn, denn der Server kann einen Besitzer, der seinen eigenen Aufkleber prüft, nicht von einer fremden Person unterscheiden, die ihn gefunden hat. Es gibt keine Vorschau, die nicht zählt.", pt: "Pedir uma imagem QR é grátis — obter a imagem não é uma digitalização. Abrir a página para que ela aponta {is} uma, e todas as superfícies de digitalização a contam, porque o servidor não consegue distinguir um proprietário a verificar o seu próprio autocolante de um desconhecido que o encontrou. Não há pré-visualização que não conte.", it: "Chiedere un'immagine QR è gratis — recuperare l'immagine non è una scansione. Aprire la pagina a cui punta {is} una, e ogni superficie di scansione la conta, perché il server non sa distinguere un proprietario che controlla il proprio adesivo da uno sconosciuto che l'ha trovato. Non esiste anteprima che non conti.", ja: "QR 画像を求めること自体は無料です — 画像を取得してもスキャンにはなりません。その指す先のページを開くこと{is}スキャンで、どのスキャン面もそれを数えます。自分のステッカーを確かめている所有者と、それを見つけた見知らぬ人とを、サーバーは区別できないからです。数えられないプレビューというものはありません。", zh: "索取二维码图片是免费的——取图不算一次扫描。打开它所指向的页面{is}一次扫描，而且每一个扫描入口都会计数，因为服务器无法分辨是所有者在查看自己的贴纸，还是陌生人发现了它。不存在不计数的预览。", hi: "QR छवि माँगना मुफ़्त है — तस्वीर लाना स्कैन नहीं। यह जिस पृष्ठ की ओर इशारा करता है उसे खोलना {is} एक स्कैन, और हर स्कैन सतह उसे गिनती है, क्योंकि सर्वर यह नहीं बता सकता कि अपना ही स्टिकर जाँचता स्वामी है या उसे पाने वाला कोई अजनबी। ऐसा कोई पूर्वावलोकन नहीं जो न गिना जाए।", ar: "طلب صورة الرمز مجاني — وجلب الصورة ليس مسحة. أما فتح الصفحة التي يشير إليها ف{is} مسحة، وكل سطح مسح يحصيها، لأن الخادم لا يميّز مالكًا يتفقّد ملصقه من غريب عثر عليه. ولا توجد معاينة لا تُحسب.",
+  },
+  "bcn.placements": {
+    en: "Placements", es: "Colocaciones", fr: "Placements", de: "Platzierungen", pt: "Colocações", it: "Collocamenti", ja: "掲載", zh: "投放", hi: "प्लेसमेंट", ar: "المواضع",
+  },
+  "bcn.cost.links": {
+    en: "So no screen here opens a scan page on its own. The links on {placements} and on a desk are deliberate presses, and following one adds to the number you were checking. The desk code also has a JSON twin — the same scan shaped for a native app drawing the overlay in place rather than for a browser — and it counts the same.", es: "Así que ninguna pantalla de aquí abre por su cuenta una página de escaneo. Los enlaces de {placements} y los de un mostrador son pulsaciones deliberadas, y seguir uno suma al número que estabas comprobando. El código del mostrador tiene además un gemelo JSON — el mismo escaneo con la forma que necesita una app nativa que dibuja la superposición en el sitio, en vez de un navegador — y cuenta igual.", fr: "Aucun écran ici n'ouvre donc de page de scan de lui-même. Les liens sur {placements} et sur un comptoir sont des pressions délibérées, et en suivre un ajoute au nombre que vous vérifiiez. Le code de comptoir a aussi un jumeau JSON — le même scan mis en forme pour une application native qui dessine la surimpression sur place plutôt que pour un navigateur — et il compte pareil.", de: "Deshalb öffnet hier kein Bildschirm von sich aus eine Scan-Seite. Die Links auf {placements} und an einem Tresen sind bewusste Klicks, und einem zu folgen erhöht genau die Zahl, die Sie geprüft haben. Der Tresen-Code hat außerdem einen JSON-Zwilling — derselbe Scan, geformt für eine native App, die die Überlagerung vor Ort zeichnet, statt für einen Browser — und er zählt genauso.", pt: "Por isso nenhum ecrã aqui abre uma página de digitalização por si próprio. As ligações em {placements} e num balcão são pressões deliberadas, e seguir uma acrescenta ao número que estava a verificar. O código do balcão tem ainda um gémeo JSON — a mesma digitalização com a forma de que precisa uma app nativa que desenha a sobreposição no local, em vez de um navegador — e conta igual.", it: "Perciò nessuna schermata qui apre da sola una pagina di scansione. I link su {placements} e su un banco sono pressioni deliberate, e seguirne uno si aggiunge al numero che stavi controllando. Il codice del banco ha anche un gemello JSON — la stessa scansione modellata per un'app nativa che disegna la sovrapposizione sul posto anziché per un browser — e conta allo stesso modo.", ja: "ですから、ここのどの画面も自分からスキャンのページを開いたりはしません。{placements} 上やデスク上のリンクは、意図して押すものであり、たどればまさにあなたが確かめていた数を増やします。デスクのコードには JSON の双子もあります — ブラウザ向けではなく、その場でオーバーレイを描くネイティブアプリ向けに形を整えた同じスキャンです — こちらも同じように数えられます。", zh: "所以这里没有任何页面会自行打开扫描页。{placements} 上和柜台上的链接都是有意的点击，点进去就会给你正在核对的那个数字加一。柜台的码还有一个 JSON 孪生体——同一次扫描，只是为就地绘制叠加层的原生应用而非浏览器塑形——它同样计数。", hi: "इसलिए यहाँ कोई स्क्रीन अपने आप स्कैन पृष्ठ नहीं खोलती। {placements} पर और किसी डेस्क पर मौजूद लिंक जान-बूझकर दबाए जाते हैं, और एक पर जाना उसी संख्या में जुड़ जाता है जिसे आप जाँच रहे थे। डेस्क कोड का एक JSON जुड़वाँ भी है — वही स्कैन, ब्राउज़र के लिए नहीं बल्कि उस नेटिव ऐप के लिए ढला जो ओवरले वहीं बनाता है — और वह भी उसी तरह गिना जाता है।", ar: "لذا لا تفتح أي شاشة هنا صفحة مسح من تلقاء نفسها. الروابط في {placements} وعلى مكتب ما ضغطات مقصودة، واتّباع أحدها يضيف إلى الرقم الذي كنت تتفقّده. ولرمز المكتب توأم بصيغة JSON — المسحة نفسها مصوغة لتطبيق أصلي يرسم الطبقة في مكانها لا لمتصفح — ويُحسب بالمثل.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, getBase, type SocialBeacon,
          type SocialConnection } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -31,6 +32,7 @@ import { useSession } from "../store";
  */
 export function Beacons({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -59,23 +61,22 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Where people find you</h2>
+      <h2>{tr("bcn.title", lang)}</h2>
       <p className="muted small">
-        Two kinds of code, and they look the same. A placed beacon brings
-        somebody <em>here</em>; a platform beacon sends them to an account
-        somewhere else.
+        {fill(tr("bcn.lead", lang),
+          { here: <em>{tr("bcn.here", lang)}</em> })}
       </p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Connect a platform</h3>
+        <h3>{tr("bcn.connect", lang)}</h3>
         <p className="muted small">
-          Two directions, never the same row. <strong>Collect</strong> pulls
-          that account's content in to grow this profile.{" "}
-          <strong>Publish</strong> runs the profile out on the platform. Kept
-          apart so a read-only import can never also post.
+          {fill(tr("bcn.directions", lang), {
+            collect: <strong>{tr("bcn.collect", lang)}</strong>,
+            publish: <strong>{tr("bcn.publish", lang)}</strong>,
+          })}
         </p>
         <div className="row">
           <select value={platform} onChange={(e) => setPlatform(e.target.value)}>
@@ -85,29 +86,28 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
           </select>
           <select value={direction}
                   onChange={(e) => setDirection(e.target.value)}>
-            <option value="publish">publish — run it out there</option>
-            <option value="collect">collect — pull it in</option>
+            <option value="publish">{tr("bcn.opt.publish", lang)}</option>
+            <option value="collect">{tr("bcn.opt.collect", lang)}</option>
           </select>
           <input value={handle} onChange={(e) => setHandle(e.target.value)}
-                 placeholder="the handle, without the @" style={{ flex: 1 }} />
+                 placeholder={tr("bcn.handle.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !me || !token}
                   onClick={act(async () => {
                     await api.connectSocial(me, {
                       platform, direction,
                       handle: handle.trim() || undefined }, token);
                     setHandle("");
-                  }, "Connected.")}>Connect</button>
+                  }, tr("bcn.connected.said", lang))}>
+            {tr("bcn.connectbtn", lang)}
+          </button>
         </div>
-        <p className="muted small">
-          Without a handle the beacon has no account page to point at, so it
-          falls back to a QRME summon link — still a working code, but it
-          brings people here rather than to the platform.
-        </p>
+        <p className="muted small">{tr("bcn.nohandle", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>Connected</h3>
-        {conns.length === 0 && <p className="muted small">Nothing yet.</p>}
+        <h3>{tr("bcn.connectedhdr", lang)}</h3>
+        {conns.length === 0 &&
+          <p className="muted small">{tr("bcn.none", lang)}</p>}
         {conns.map((c) => (
           <div key={c.id}>
             <p className="small">
@@ -115,7 +115,8 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
               {c.handle && ` · ${c.handle}`} · {c.status}
               <br />
               <span className="muted">
-                {c.collected} collected · {c.published} published
+                {fill(tr("bcn.counts", lang), {
+                  collected: c.collected, published: c.published })}
               </span>
             </p>
             <div className="row">
@@ -127,13 +128,13 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
                 <button className="chip" disabled={busy}
                         onClick={act(async () =>
                           setBeacon(await api.socialBeacon(c.id)))}>
-                  show its code
+                  {tr("bcn.showcode", lang)}
                 </button>
               )}
               <button className="chip" disabled={busy}
                       onClick={act(() => api.disconnectSocial(c.id, token),
-                        "Disconnected.")}>
-                disconnect
+                        tr("bcn.disconnected.said", lang))}>
+                {tr("bcn.disconnect", lang)}
               </button>
             </div>
           </div>
@@ -142,42 +143,37 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
 
       {beacon && (
         <div className="card">
-          <h3>The code for {beacon.platform}</h3>
+          <h3>{fill(tr("bcn.codefor", lang),
+            { platform: beacon.platform })}</h3>
           {/* Free to fetch. The scan surfaces are not — see below. */}
           <img src={getBase() + `/social/${beacon.connection}/qr.svg`}
                width={180} height={180}
-               alt="the QR code for this platform presence" />
+               alt={tr("bcn.qralt", lang)} />
           <p className="small">
-            Scanning it opens{" "}
-            <code>{beacon.presence_url}</code>
+            {fill(tr("bcn.opens", lang),
+              { url: <code>{beacon.presence_url}</code> })}
             {beacon.handle
-              ? ` — ${beacon.handle} on ${beacon.platform}.`
-              : " — a QRME summon page, because this connection has no "
-                + "handle to build a platform link from."}
+              ? tr("bcn.opens.handle", lang)
+                  .replace("{handle}", beacon.handle)
+                  .replace("{platform}", beacon.platform)
+              : tr("bcn.opens.summon", lang)}
           </p>
           <p className="muted small">
-            This code carries people <em>away</em> from QRME. A placed beacon
-            does the opposite. Same picture, opposite destination.
+            {fill(tr("bcn.carries", lang),
+              { away: <em>{tr("bcn.away", lang)}</em> })}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>What a scan costs to check</h3>
+        <h3>{tr("bcn.cost", lang)}</h3>
         <p className="muted small">
-          A QR image is free to ask for — fetching the picture is not a scan.
-          Opening the page it points to <em>is</em> one, and every scan
-          surface counts it, because the server cannot tell an owner checking
-          their own sticker from a stranger who found it. There is no preview
-          that doesn't count.
+          {fill(tr("bcn.cost.pitch", lang),
+            { is: <em>{tr("bcn.is", lang)}</em> })}
         </p>
         <p className="muted small">
-          So no screen here opens a scan page on its own. The links on{" "}
-          <strong>Placements</strong> and on a desk are deliberate presses,
-          and following one adds to the number you were checking. The desk
-          code also has a JSON twin — the same scan shaped for a native app
-          drawing the overlay in place rather than for a browser — and it
-          counts the same.
+          {fill(tr("bcn.cost.links", lang),
+            { placements: <strong>{tr("bcn.placements", lang)}</strong> })}
         </p>
       </div>
     </div>

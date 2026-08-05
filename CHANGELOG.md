@@ -4,6 +4,41 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.4] — 2026-08-05
+
+### Two directions, one picture
+
+The console-untranslated record falls **724 → 616**.
+
+**Watch together** — a posted video, a shared position, and whoever
+you bring, including your own profiles. Fifty-two `wp.*` keys. The
+sentence worth having in ten languages is the one about the seek
+buttons: *this moves a number, it does not press play on anybody's
+device*. Bringing a profile in speaks in its voice, so it needs that
+profile's own owner token — also translated, because it is the
+difference between a refusal that makes sense and one that does not.
+
+**Delegation and work** — fifty-six `dlg.*` keys, both halves: what
+your own profile may do unattended, and you asking somebody else's to
+do something inside the limits its owner published. Including the two
+sentences the screen is careful about — that delegated work is for
+somebody already in a conversation, and that which sources the other
+owner scoped is not yours to know.
+
+**Where people find you** — thirty-one `bcn.*` keys. Two kinds of QR
+code that look identical and go opposite ways, and the count that
+cannot be previewed: opening a scan page *is* a scan, on every surface,
+because the server cannot tell an owner checking their own sticker from
+a stranger who found it.
+
+139 keys, all ten languages, exact-sync held in both directions.
+
+The pinned check that the beacon screen names both directions was
+rewritten. Once the two words moved into the table, matching them in
+the screen succeeded off the key names — `bcn.away`, `bcn.here` — a
+check that could no longer fail for the right reason. It now asks the
+screen for the lookups and the table for the words.
+
 ## [0.45.3] — 2026-08-05
 
 ### Three more, and the wrist among them

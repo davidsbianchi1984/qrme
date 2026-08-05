@@ -209,14 +209,22 @@ def test_the_delegate_half_uses_the_interactor_token():
 def test_the_screen_says_you_must_be_talking_to_it():
     src = _markup("app/src/screens/Delegate.tsx")
     flat = " ".join(src.split())
-    assert "not a stranger holding a profile id" in flat
+    assert 'tr("dlg.talking", lang)' in flat, (
+        "the screen has stopped rendering the paragraph that says so")
+    l10n = " ".join(
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
+    assert "not a stranger holding a profile id" in l10n, (
+        "the sentence left the l10n table, so the screen looks up nothing")
 
 
 def test_the_screen_does_not_promise_to_show_the_scope():
     """The offer omits the grant id deliberately, and a screen that implied
     otherwise would be describing a different endpoint."""
     flat = " ".join(_markup("app/src/screens/Delegate.tsx").split())
-    assert "is not shown, and is not yours to know" in flat
+    assert 'tr("dlg.noscope.shown", lang)' in flat
+    l10n = " ".join(
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
+    assert "is not shown, and is not yours to know" in l10n
 
 
 # --- and one binding that wanted deleting rather than wiring ----------------
