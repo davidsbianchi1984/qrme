@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.46.4** ([changelog](CHANGELOG.md) ·
+**Current release: v0.46.5** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.46.5** | **The first screen, on all three phones** — Welcome and Settings localized on iOS, Android and Windows (703 → 590); the first-run screen reads the device's language because no profile exists yet to hold one; the Android shell did not compile and now does |
 | **0.46.4** | **The refusal names a field the form never named** — the signature box on Referrals had a placeholder and no label; the label is added, ported into the field table, and the record drops 124 → 123 (PDI's 91 → 51) |
 | **0.46.3** | **The console record reaches its floor** — Simulate, Memory and Friends localized; console-untranslated 25 → 1 after twenty-one releases, the last row kept on purpose because `AI ·` is quoted rather than written |
 | **0.46.2** | **The front page, the price list, and who is in a life** — Home, Plans, Relationships and Discover localized (console-untranslated 69 → 25); the relationship dropdowns were posting their visible label to the API, and now post the enum |

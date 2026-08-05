@@ -111,6 +111,10 @@ fun WelcomeScreen(vm: StudioViewModel) {
     var publicDoor by remember { mutableStateOf(false) }
     if (publicDoor) { WithoutAnAccountScreen(vm) { publicDoor = false }; return }
 
+    // The reader of this screen has no profile, so there is no profile
+    // language to read — the same case `WithoutAnAccountScreen` below already
+    // resolves this way, and `vm.language` is "en" until a profile exists.
+    val lang = L10n.deviceLanguage()
     var name by remember { mutableStateOf("") }
     var languages by remember { mutableStateOf<List<LanguageInfo>>(emptyList()) }
     var language by remember { mutableStateOf("en") }
@@ -131,20 +135,22 @@ fun WelcomeScreen(vm: StudioViewModel) {
                 contentAlignment = Alignment.Center) {
                 Text("✦", fontSize = 34.sp, color = Color.White)
             }
-            Text("Create your synthetic profile", color = Qrme.Txt, fontSize = 22.sp,
+            Text(L10n.t("nw.title", lang), color = Qrme.Txt, fontSize = 22.sp,
                 fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterHorizontally))
-            Text("A profile speaks in a voice you define — grounded in a persona, on your terms.",
+            Text(L10n.t("nw.sub", lang),
                 color = Qrme.T2, fontSize = 13.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
 
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                labeledField("Display name", name, "e.g. Ada") { name = it }
-                labeledField("Persona", persona, "Voice, history, values.") { persona = it }
-                Text("Kind", color = Qrme.T2, fontSize = 12.sp)
+                labeledField(L10n.t("nw.name", lang), name, L10n.t("nw.name.ph", lang)) { name = it }
+                labeledField(L10n.t("nw.persona", lang), persona, L10n.t("nw.persona.ph", lang)) { persona = it }
+                Text(L10n.t("nw.kind", lang), color = Qrme.T2, fontSize = 12.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     kinds.forEach { k ->
                         FilterChip(
                             selected = kind == k, onClick = { kind = k },
-                            label = { Text(k.replace('_', ' '), fontSize = 12.sp) },
+                            // `k.replace('_', ' ')` rendered the API's enum
+                            // member as if it were a word nobody wrote.
+                            label = { Text(L10n.t(kindKey(k), lang), fontSize = 12.sp) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = Qrme.BrandA,
                                 selectedLabelColor = Color.White,
@@ -153,9 +159,9 @@ fun WelcomeScreen(vm: StudioViewModel) {
                         )
                     }
                 }
-                labeledField("Birthdate", birthdate, "yyyy-MM-dd") { birthdate = it }
+                labeledField(L10n.t("nw.birthdate", lang), birthdate, "yyyy-MM-dd") { birthdate = it }
                 if (languages.isNotEmpty()) {
-                    Text("Language", color = Qrme.T2, fontSize = 12.sp)
+                    Text(L10n.t("nw.language", lang), color = Qrme.T2, fontSize = 12.sp)
                     languages.chunked(3).forEach { row ->
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             row.forEach { l ->
@@ -174,31 +180,35 @@ fun WelcomeScreen(vm: StudioViewModel) {
                 }
             }
             error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
-            BrandButton("Create profile", enabled = name.isNotBlank() && persona.isNotBlank(), busy = busy) {
+            BrandButton(L10n.t("nw.create", lang), enabled = name.isNotBlank() && persona.isNotBlank(), busy = busy) {
                 error = null
                 vm.createProfile(name, persona, kind, birthdate, language,
                     onError = { error = it }, onBusy = { busy = it })
             }
-            Text("By creating a profile you agree to the Terms of Service — profiles are " +
-                 "AI-generated synthetic content, never professional advice; you assume the " +
-                 "risks of AI interactions. Full terms: GET /terms · docs/terms.md",
-                color = Qrme.T3, fontSize = 9.sp)
+            // Consent to terms, in the reader's language. Built by `+` before
+            // this round, which is a sentence no table could ever hold.
+            Text(L10n.t("nw.terms", lang), color = Qrme.T3, fontSize = 9.sp)
             // The other reason somebody opens this app: they have found a
             // synthetic profile of themselves, or were sent something and
             // want to know whether a person wrote it. Both routes are public
             // on the backend and both sat behind the sign-in gate.
-            Text("Here about a profile, not for one?", color = Qrme.T2, fontSize = 13.sp)
+            Text(L10n.t("pub.invite", lang), color = Qrme.T2, fontSize = 13.sp)
             TextButton(onClick = { publicDoor = true }) {
-                Text("A profile depicts me · Is this genuine?",
+                Text(L10n.t("nw.door", lang),
                     color = Qrme.BrandA, fontSize = 13.sp)
             }
-            Text("Neither needs an account.", color = Qrme.T3, fontSize = 11.sp)
+            Text(L10n.t("pub.invite.none", lang), color = Qrme.T3, fontSize = 11.sp)
 
             Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app",
                 color = Qrme.T3, fontSize = 10.sp)
         }
     }
 }
+
+/** `self` / `other_person` / `fictional` are the API's members; these are the
+ *  words a person reads for them. */
+private fun kindKey(kind: String) =
+    if (kind == "other_person") "nw.kind.other" else "nw.kind.$kind"
 
 // ---- Without an account ----
 
@@ -643,12 +653,11 @@ fun SettingsScreen(vm: StudioViewModel) {
 
     screenScroll {
         Text(L10n.t("tab.settings", vm.language), color = Qrme.Txt, fontSize = 22.sp,
-        ProblemReportingCard()
             fontWeight = FontWeight.Bold)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Model", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Which LLM powers this profile. Unconfigured providers fall back to the offline stub.",
+            Text(L10n.t("ns.model", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("ns.model.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             providers.forEach { p ->
                 Row(Modifier.fillMaxWidth().clickable {
@@ -662,17 +671,18 @@ fun SettingsScreen(vm: StudioViewModel) {
                         .background(if (p.name == current) Qrme.BrandA else Qrme.Card))
                     Text(p.label, color = Qrme.Txt, fontSize = 14.sp,
                         modifier = Modifier.weight(1f).padding(start = 10.dp))
-                    Text(if (p.configured) "ready" else "no key",
+                    Text(L10n.t(if (p.configured) "ns.model.ready" else "ns.model.nokey", vm.language),
                         color = if (p.configured) Qrme.Green else Qrme.T3, fontSize = 12.sp)
                 }
             }
             if (effective.isNotEmpty())
-                Text("Effective now: $effective", color = Qrme.T2, fontSize = 12.sp)
+                Text(L10n.fill("ns.model.effective", vm.language, mapOf("name" to effective)),
+                    color = Qrme.T2, fontSize = 12.sp)
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Language", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("The profile speaks this language everywhere it appears — chat, posts, rooms, robot speech.",
+            Text(L10n.t("ns.lang", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("ns.lang.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             languages.chunked(3).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -697,8 +707,8 @@ fun SettingsScreen(vm: StudioViewModel) {
             }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Speak it natively (pre-translate)", color = Qrme.Txt, fontSize = 13.sp)
-                    Text("Off keeps the original voice — translate selectively below.",
+                    Text(L10n.t("ns.lang.pre", vm.language), color = Qrme.Txt, fontSize = 13.sp)
+                    Text(L10n.t("ns.lang.pre.sub", vm.language),
                         color = Qrme.T2, fontSize = 10.sp)
                 }
                 Switch(
@@ -712,9 +722,9 @@ fun SettingsScreen(vm: StudioViewModel) {
                 )
             }
             HorizontalDivider(color = Qrme.Line)
-            Text("Translate anything", color = Qrme.Txt, fontSize = 13.sp,
+            Text(L10n.t("ns.tr", vm.language), color = Qrme.Txt, fontSize = 13.sp,
                 fontWeight = FontWeight.Bold)
-            labeledField("", translateInput, "Paste or type text…") { translateInput = it }
+            labeledField("", translateInput, L10n.t("ns.tr.ph", vm.language)) { translateInput = it }
             SmallAction(L10n.t("action.translate", vm.language)) {
                 if (translateInput.isNotBlank() && language != "en") {
                     vm.call({ ApiClient.translate(vm.pid!!, vm.token!!, translateInput) }) { r ->
@@ -726,30 +736,32 @@ fun SettingsScreen(vm: StudioViewModel) {
                 Text(t.translation, color = Qrme.Txt, fontSize = 13.sp,
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(9.dp))
                         .background(Qrme.ScrBot).padding(10.dp))
-                Text("engine: ${t.engine}" + (t.note?.let { " — $it" } ?: ""),
+                Text(L10n.fill("ns.tr.engine", vm.language, mapOf("engine" to t.engine))
+                        + (t.note?.let { " — $it" } ?: ""),
                     color = Qrme.T3, fontSize = 10.sp)
             }
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Watermark", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Every piece of work your profile composes or generates carries this mark — on all textual and visual renders, at all times. Design it your way; the AI designation always stays.",
+            Text(L10n.t("ns.wm", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("ns.wm.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             if (wmLine.isNotEmpty())
                 Text(wmLine, color = Qrme.T2, fontSize = 12.sp, fontWeight = FontWeight.Bold,
                     modifier = Modifier.clip(RoundedCornerShape(12.dp))
                         .background(Qrme.ScrBot).padding(horizontal = 10.dp, vertical = 6.dp))
-            labeledField("Mark", wmMark, "✦") { wmMark = it }
-            labeledField("Label", wmLabel, "AI · ${vm.displayName}") { wmLabel = it }
+            labeledField(L10n.t("ns.wm.mark", vm.language), wmMark, "✦") { wmMark = it }
+            labeledField(L10n.t("ns.wm.label", vm.language), wmLabel,
+                "AI · ${vm.displayName}") { wmLabel = it }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                SmallAction("Save design") {
+                SmallAction(L10n.t("ns.wm.save", vm.language)) {
                     vm.call({ ApiClient.setWatermarkDesign(vm.pid!!, vm.token!!, wmMark, wmLabel) }) { r ->
                         r.onSuccess { wmLine = it.line; wmCustom = it.custom; wmSaved = true }
                          .onFailure { error = it.message }
                     }
                 }
-                if (wmCustom) SmallAction("Reset to default") {
+                if (wmCustom) SmallAction(L10n.t("ns.wm.reset", vm.language)) {
                     vm.call({ ApiClient.setWatermarkDesign(vm.pid!!, vm.token!!, null, null) }) { r ->
                         r.onSuccess {
                             wmLine = it.line; wmCustom = it.custom
@@ -757,17 +769,21 @@ fun SettingsScreen(vm: StudioViewModel) {
                         }
                     }
                 }
-                if (wmSaved) Text("✓ saved", color = Qrme.Green, fontSize = 12.sp)
+                if (wmSaved) Text(L10n.t("ns.wm.saved", vm.language), color = Qrme.Green, fontSize = 12.sp)
             }
         }
 
         WhoWroteThisCard(vm)
         ObjectToAProfileCard(vm)
+        // Was spliced between two arguments of the `Text(…)` above — a call
+        // in an argument list, which does not parse. It belongs here, beside
+        // the other cards, where the iOS shell has always had it.
+        ProblemReportingCard()
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Objections", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("ns.obj", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             if (objections.isEmpty()) {
-                Text("No objections — nobody has contested this profile.",
+                Text(L10n.t("ns.obj.none", vm.language),
                     color = Qrme.T2, fontSize = 13.sp)
             } else objections.forEach { o ->
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -777,9 +793,9 @@ fun SettingsScreen(vm: StudioViewModel) {
                     if (o.status == "open" && o.reattested == 0) {
                         TextButton(onClick = {
                             vm.call({ ApiClient.attest(vm.pid!!, o.id, vm.token!!) }) { reload() }
-                        }) { Text("Re-attest my rights basis", color = Qrme.BrandA, fontSize = 13.sp) }
+                        }) { Text(L10n.t("ns.obj.attest", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
                     } else if (o.reattested == 1) {
-                        Text("Basis re-attested · awaiting review", color = Qrme.Green, fontSize = 12.sp)
+                        Text(L10n.t("ns.obj.attested", vm.language), color = Qrme.Green, fontSize = 12.sp)
                     }
                 }
             }

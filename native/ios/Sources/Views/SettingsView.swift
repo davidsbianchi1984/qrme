@@ -22,8 +22,8 @@ struct SettingsView: View {
                     .font(.title2.bold()).foregroundStyle(Theme.txt)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Model").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Which LLM powers this profile. Unconfigured providers fall back to the offline stub.")
+                    Text(L10n.t("ns.model", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ns.model.sub", state.language))
                         .font(.footnote).foregroundStyle(Theme.t2)
                     ForEach(providers, id: \.name) { p in
                         Button { choose(p.name) } label: {
@@ -33,21 +33,21 @@ struct SettingsView: View {
                                     .frame(width: 16, height: 16)
                                 Text(p.label).font(.subheadline).foregroundStyle(Theme.txt)
                                 Spacer()
-                                Text(p.configured ? "ready" : "no key")
+                                Text(L10n.t(p.configured ? "ns.model.ready" : "ns.model.nokey", state.language))
                                     .font(.caption)
                                     .foregroundStyle(p.configured ? Theme.green : Theme.t3)
                             }
                         }
                     }
                     if !effective.isEmpty {
-                        Text("Effective now: \(effective)")
+                        Text(L10n.fill("ns.model.effective", state.language, ["name": effective]))
                             .font(.caption).foregroundStyle(Theme.t2)
                     }
                 }.card()
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Language").font(.headline).foregroundStyle(Theme.txt)
-                    Text("The profile speaks this language everywhere it appears — chat, posts, rooms, robot speech.")
+                    Text(L10n.t("ns.lang", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ns.lang.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     Picker("", selection: $language) {
                         ForEach(languages, id: \.code) { l in
@@ -58,17 +58,17 @@ struct SettingsView: View {
                     .onChange(of: language) { _ in applyLanguage() }
                     Toggle(isOn: $preTranslate) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Speak it natively (pre-translate)")
+                            Text(L10n.t("ns.lang.pre", state.language))
                                 .font(.subheadline).foregroundStyle(Theme.txt)
-                            Text("Off keeps the original voice — translate selectively below.")
+                            Text(L10n.t("ns.lang.pre.sub", state.language))
                                 .font(.caption2).foregroundStyle(Theme.t2)
                         }
                     }
                     .tint(Theme.green)
                     .onChange(of: preTranslate) { _ in applyLanguage() }
                     Divider().overlay(Theme.line)
-                    Text("Translate anything").font(.subheadline.bold()).foregroundStyle(Theme.txt)
-                    TextField("Paste or type text…", text: $translateInput, axis: .vertical)
+                    Text(L10n.t("ns.tr", state.language)).font(.subheadline.bold()).foregroundStyle(Theme.txt)
+                    TextField(L10n.t("ns.tr.ph", state.language), text: $translateInput, axis: .vertical)
                         .lineLimit(1...4).foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
@@ -83,15 +83,16 @@ struct SettingsView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 9))
-                        Text("engine: \(r.engine)" + (r.note.map { " — \($0)" } ?? ""))
+                        Text(L10n.fill("ns.tr.engine", state.language, ["engine": r.engine])
+                             + (r.note.map { " — \($0)" } ?? ""))
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                 }.card()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Objections").font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ns.obj", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     if objections.isEmpty {
-                        Text("No objections — nobody has contested this profile.")
+                        Text(L10n.t("ns.obj.none", state.language))
                             .font(.footnote).foregroundStyle(Theme.t2)
                     } else {
                         ForEach(objections, id: \.id) { o in
@@ -109,12 +110,12 @@ struct SettingsView: View {
                                     Text(reason).font(.footnote).foregroundStyle(Theme.txt)
                                 }
                                 if o.status == "open" && o.reattested == 0 {
-                                    Button("Re-attest my rights basis") { attest(o) }
+                                    Button(L10n.t("ns.obj.attest", state.language)) { attest(o) }
                                         .font(.caption.bold()).foregroundStyle(.white)
                                         .padding(.horizontal, 12).padding(.vertical, 7)
                                         .background(Theme.brandA).clipShape(Capsule())
                                 } else if o.reattested == 1 {
-                                    Text("Basis re-attested · awaiting review")
+                                    Text(L10n.t("ns.obj.attested", state.language))
                                         .font(.caption).foregroundStyle(Theme.green)
                                 }
                             }
@@ -210,8 +211,8 @@ struct WatermarkCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Watermark").font(.headline).foregroundStyle(Theme.txt)
-            Text("Every piece of work your profile composes or generates carries this mark — on all textual and visual renders, at all times. Design it your way; the AI designation always stays.")
+            Text(L10n.t("ns.wm", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("ns.wm.sub", state.language))
                 .font(.footnote).foregroundStyle(Theme.t2)
             if !line.isEmpty {
                 Text(line).font(.caption.bold()).foregroundStyle(Theme.t2)
@@ -220,29 +221,30 @@ struct WatermarkCard: View {
                     .clipShape(Capsule())
             }
             HStack(spacing: 8) {
-                TextField("mark (✦)", text: $mark)
+                TextField(L10n.t("ns.wm.mark", state.language), text: $mark)
                     .foregroundStyle(Theme.txt)
                     .padding(.horizontal, 10).padding(.vertical, 8)
                     .background(Theme.scrBot)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(width: 90)
-                TextField("label (AI · \(state.displayName))", text: $label)
+                TextField(L10n.fill("ns.wm.label.ph", state.language,
+                                    ["name": state.displayName]), text: $label)
                     .foregroundStyle(Theme.txt)
                     .padding(.horizontal, 10).padding(.vertical, 8)
                     .background(Theme.scrBot)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             HStack(spacing: 10) {
-                Button("Save design") { Task { await save() } }
+                Button(L10n.t("ns.wm.save", state.language)) { Task { await save() } }
                     .font(.caption.bold()).foregroundStyle(.white)
                     .padding(.horizontal, 12).padding(.vertical, 7)
                     .background(Theme.brand).clipShape(Capsule())
                 if custom {
-                    Button("Reset to default") { Task { await reset() } }
+                    Button(L10n.t("ns.wm.reset", state.language)) { Task { await reset() } }
                         .font(.caption).foregroundStyle(Theme.t2)
                 }
                 if saved {
-                    Text("✓ saved").font(.caption).foregroundStyle(Theme.green)
+                    Text(L10n.t("ns.wm.saved", state.language)).font(.caption).foregroundStyle(Theme.green)
                 }
             }
         }.card()
@@ -282,22 +284,22 @@ struct WatermarkCard: View {
 /// after the text has been rewritten — so the counts are shown rather than a
 /// bare yes, and below the threshold it deliberately names nobody.
 struct WhoWroteThisCard: View {
+    @EnvironmentObject var state: AppState
     @State private var text = ""
     @State private var result: WatermarkRecovery?
     @State private var busy = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Who wrote this?").font(.headline).foregroundStyle(Theme.txt)
-            Text("Paste any passage. If a profile here produced it, this names "
-                 + "it — even if the wording has since been changed.")
+            Text(L10n.t("ns.who", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("ns.who.sub", state.language))
                 .font(.footnote).foregroundStyle(Theme.t2)
-            TextField("Paste a passage…", text: $text, axis: .vertical)
+            TextField(L10n.t("ns.who.ph", state.language), text: $text, axis: .vertical)
                 .lineLimit(3...6)
                 .font(.subheadline).foregroundStyle(Theme.txt)
                 .padding(10).background(Theme.scrBot)
                 .clipShape(RoundedRectangle(cornerRadius: 11))
-            Button(busy ? "Checking…" : "Check this text") { check() }
+            Button(L10n.t(busy ? "ns.who.checking" : "ns.who.check", state.language)) { check() }
                 .font(.caption.bold()).foregroundStyle(.white)
                 .padding(.horizontal, 12).padding(.vertical, 9)
                 .background(Theme.brandA).clipShape(Capsule())
@@ -305,13 +307,13 @@ struct WhoWroteThisCard: View {
 
             if let r = result {
                 if r.recovered, let pid = r.profile_id {
-                    Text(r.state == "unaltered"
-                         ? "Written by \(pid), unaltered."
-                         : "Written by \(pid) — altered since.")
+                    Text(L10n.fill(r.state == "unaltered" ? "ns.who.by" : "ns.who.by.altered",
+                                   state.language, ["id": pid]))
                         .font(.subheadline.bold())
                         .foregroundStyle(r.verbatim == true ? Theme.green : Theme.amber)
                     if let matched = r.matched_windows, let stored = r.stored_windows {
-                        Text("\(matched) of \(stored) passages matched"
+                        Text(L10n.fill("ns.who.matched", state.language,
+                                       ["matched": "\(matched)", "stored": "\(stored)"])
                              + (r.similarity.map { " · similarity \($0)" } ?? ""))
                             .font(.caption).monospacedDigit().foregroundStyle(Theme.t2)
                     }
@@ -324,11 +326,11 @@ struct WhoWroteThisCard: View {
                 } else {
                     // Not "no" — the reason, because a coincidence must not
                     // read as an accusation either way.
-                    Text(r.reason ?? "No profile here produced this text.")
+                    Text(r.reason ?? L10n.t("ns.who.none", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     if let best = r.best_similarity, let threshold = r.threshold {
-                        Text("closest overlap \(best), below the \(threshold) "
-                             + "threshold for naming anyone")
+                        Text(L10n.fill("ns.who.below", state.language,
+                                       ["best": "\(best)", "threshold": "\(threshold)"]))
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                 }
@@ -362,6 +364,7 @@ struct WhoWroteThisCard: View {
 /// It is placed beside "Who wrote this?" because it is the same person at the
 /// next step: they have identified the profile, and now they want it stopped.
 struct ObjectToAProfileCard: View {
+    @EnvironmentObject var state: AppState
     @State private var profileId = ""
     @State private var contact = ""
     @State private var reason = ""
@@ -371,17 +374,15 @@ struct ObjectToAProfileCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Object to a profile").font(.headline).foregroundStyle(Theme.txt)
-            Text("If a synthetic profile here is of you and you did not agree "
-                 + "to it, say so. You do not need an account, and you do not "
-                 + "need to be signed in.")
+            Text(L10n.t("ns.object", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("ns.object.sub", state.language))
                 .font(.footnote).foregroundStyle(Theme.t2)
 
-            TextField("Profile id", text: $profileId)
+            TextField(L10n.t("ns.object.pid", state.language), text: $profileId)
                 .textFieldStyle(.roundedBorder).autocapitalization(.none)
-            TextField("How to reach you", text: $contact)
+            TextField(L10n.t("ns.object.contact", state.language), text: $contact)
                 .textFieldStyle(.roundedBorder).autocapitalization(.none)
-            TextField("What is wrong", text: $reason, axis: .vertical)
+            TextField(L10n.t("ns.object.reason", state.language), text: $reason, axis: .vertical)
                 .textFieldStyle(.roundedBorder).lineLimit(2...4)
 
             Button {
@@ -396,7 +397,7 @@ struct ObjectToAProfileCard: View {
                     busy = false
                 }
             } label: {
-                Text("Raise an objection").frame(maxWidth: .infinity)
+                Text(L10n.t("ns.object.go", state.language)).frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent).tint(Theme.brandA)
             .disabled(busy || profileId.trimmingCharacters(in: .whitespaces).isEmpty
@@ -406,8 +407,8 @@ struct ObjectToAProfileCard: View {
                 // The profile is restricted immediately, pending review. That
                 // is the part the person raising it needs told — the remedy is
                 // now, not after somebody gets round to it.
-                Text("Raised. The profile is \(r.profile_status ?? "restricted") "
-                     + "pending review.")
+                Text(L10n.fill("ns.object.raised", state.language,
+                               ["status": r.profile_status ?? "restricted"]))
                     .font(.footnote).foregroundStyle(Theme.green)
                 if let n = r.note {
                     Text(n).font(.caption2).foregroundStyle(Theme.t2)

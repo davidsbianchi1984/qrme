@@ -7,14 +7,14 @@
 
     <ScrollViewer>
         <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
-            <TextBlock Text="Settings" FontSize="22" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Model" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="ModelHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock Text="Which LLM powers this profile. Unconfigured providers fall back to the offline stub."
+                    <TextBlock x:Name="ModelSub"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
                     <ComboBox x:Name="ProviderBox" HorizontalAlignment="Stretch"
                               SelectionChanged="OnProviderPicked" />
@@ -25,19 +25,16 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Language" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="LangHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock Text="The profile speaks this language everywhere it appears — chat, posts, rooms, robot speech."
+                    <TextBlock x:Name="LangSub"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
                     <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch"
                               SelectionChanged="OnLanguagePicked" />
-                    <ToggleSwitch x:Name="PreTranslateToggle" Header="Speak it natively (pre-translate)"
-                                  OnContent="The persona speaks the language everywhere"
-                                  OffContent="Original voice kept — translate below"
+                    <ToggleSwitch x:Name="PreTranslateToggle"
                                   IsOn="True" Toggled="OnModeToggled" />
-                    <TextBox x:Name="TranslateBox" Header="Translate anything"
-                             PlaceholderText="Paste or type text…" />
-                    <Button Content="Translate" Click="OnTranslate"
+                    <TextBox x:Name="TranslateBox" />
+                    <Button x:Name="TranslateButton" Click="OnTranslate"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                     <TextBlock x:Name="TranslateOut" FontSize="13" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeTxtBrush}" Visibility="Collapsed" />
@@ -49,22 +46,22 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Watermark" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="WmHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock Text="Every piece of work your profile composes or generates carries this mark — on all textual and visual renders, at all times. Design it your way; the AI designation always stays."
+                    <TextBlock x:Name="WmSub"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
                     <TextBlock x:Name="WatermarkLine" FontSize="12" FontWeight="Bold"
                                Foreground="{StaticResource QrmeT2Brush}" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox x:Name="WatermarkMarkBox" Header="Mark" PlaceholderText="✦" Width="90" />
-                        <TextBox x:Name="WatermarkLabelBox" Header="Label" PlaceholderText="AI · your profile" Width="220" />
+                        <TextBox x:Name="WatermarkMarkBox" PlaceholderText="✦" Width="90" />
+                        <TextBox x:Name="WatermarkLabelBox" Width="220" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button Content="Save design" Click="OnSaveWatermark"
+                        <Button x:Name="WatermarkSaveButton" Click="OnSaveWatermark"
                                 Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
-                        <Button x:Name="WatermarkResetButton" Content="Reset to default"
+                        <Button x:Name="WatermarkResetButton"
                                 Click="OnResetWatermark" Visibility="Collapsed" />
-                        <TextBlock x:Name="WatermarkSaved" Text="✓ saved" FontSize="12"
+                        <TextBlock x:Name="WatermarkSaved" FontSize="12"
                                    Foreground="{StaticResource QrmeGreenBrush}" Visibility="Collapsed"
                                    VerticalAlignment="Center" />
                     </StackPanel>
@@ -74,9 +71,9 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Objections" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="ObjHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock x:Name="NoObjections" Text="No objections — nobody has contested this profile."
+                    <TextBlock x:Name="NoObjections"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="13" />
                     <ItemsControl x:Name="ObjectionsList">
                         <ItemsControl.ItemTemplate>
@@ -86,7 +83,7 @@
                                                Foreground="{StaticResource QrmeT2Brush}" />
                                     <TextBlock Text="{Binding Reason}" Foreground="{StaticResource QrmeTxtBrush}"
                                                FontSize="13" TextWrapping="Wrap" />
-                                    <Button Content="Re-attest my rights basis" Tag="{Binding Id}"
+                                    <Button x:Name="AttestButton" Tag="{Binding Id}"
                                             Click="OnAttest" Visibility="{Binding AttestVisibility}"
                                             Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
                                 </StackPanel>
@@ -176,14 +173,14 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Who wrote this?" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="WhoHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock FontSize="12" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="Paste any passage. If a profile here produced it, this names it — even if the wording has since been changed." />
+                               x:Name="WhoSub" />
                     <TextBox x:Name="RecoverBox" AcceptsReturn="True" TextWrapping="Wrap"
-                             Height="90" PlaceholderText="Paste a passage…" />
-                    <Button x:Name="RecoverButton" Content="Check this text" Click="OnRecover"
+                             Height="90" />
+                    <Button x:Name="RecoverButton" Click="OnRecover"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <TextBlock x:Name="RecoverVerdict" FontSize="14" FontWeight="Bold"
                                TextWrapping="Wrap" Visibility="Collapsed" />
@@ -205,16 +202,16 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Object to a profile" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="ObjectHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock FontSize="12" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="If a synthetic profile here is of you and you did not agree to it, say so. You do not need an account, and you do not need to be signed in." />
-                    <TextBox x:Name="ObjectProfileBox" PlaceholderText="Profile id" />
-                    <TextBox x:Name="ObjectContactBox" PlaceholderText="How to reach you" />
+                               x:Name="ObjectSub" />
+                    <TextBox x:Name="ObjectProfileBox" />
+                    <TextBox x:Name="ObjectContactBox" />
                     <TextBox x:Name="ObjectReasonBox" AcceptsReturn="True" TextWrapping="Wrap"
-                             Height="70" PlaceholderText="What is wrong" />
-                    <Button x:Name="ObjectButton" Content="Raise an objection" Click="OnRaiseObjection"
+                             Height="70" />
+                    <Button x:Name="ObjectButton" Click="OnRaiseObjection"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <TextBlock x:Name="ObjectVerdict" FontSize="13" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeTxtBrush}" />

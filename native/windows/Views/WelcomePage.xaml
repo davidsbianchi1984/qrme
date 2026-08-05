@@ -15,35 +15,36 @@
                     </LinearGradientBrush>
                 </Ellipse.Fill>
             </Ellipse>
-            <TextBlock Text="Create your synthetic profile" FontSize="22" FontWeight="Bold"
+            <TextBlock x:Name="TitleText" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" HorizontalAlignment="Center" TextWrapping="Wrap" />
-            <TextBlock Text="A profile speaks in a voice you define — grounded in a persona, on your terms."
+            <TextBlock x:Name="SubText"
                        FontSize="13" Foreground="{StaticResource QrmeT2Brush}" HorizontalAlignment="Center"
                        TextAlignment="Center" TextWrapping="Wrap" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="12">
-                    <TextBox x:Name="NameBox" Header="Display name" PlaceholderText="e.g. Ada" />
-                    <TextBox x:Name="PersonaBox" Header="Persona" PlaceholderText="Voice, history, values."
+                    <TextBox x:Name="NameBox" />
+                    <TextBox x:Name="PersonaBox"
                              AcceptsReturn="True" TextWrapping="Wrap" Height="80" />
-                    <ComboBox x:Name="KindBox" Header="Kind" SelectedIndex="0" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="self" />
-                        <ComboBoxItem Content="other_person" />
-                        <ComboBoxItem Content="fictional" />
-                    </ComboBox>
-                    <ComboBox x:Name="LanguageBox" Header="Language" HorizontalAlignment="Stretch" />
-                    <TextBox x:Name="BirthBox" Header="Birthdate (yyyy-MM-dd)" Text="1984-01-01" />
+                    <!-- The items carried the API's enum members as their visible text, and
+                         OnStart read that text back as the value to post. Translating
+                         the label would have posted the Spanish word as the kind, so
+                         the members move into `_kinds` in code-behind and only the word
+                         somebody reads is looked up. -->
+                    <ComboBox x:Name="KindBox" SelectedIndex="0" HorizontalAlignment="Stretch" />
+                    <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="BirthBox" Text="1984-01-01" />
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="By creating a profile you agree to the Terms of Service — profiles are AI-generated synthetic content, never professional advice; you assume the risks of AI interactions. Full terms: GET /terms · docs/terms.md"
+            <TextBlock x:Name="TermsText"
                        Foreground="{StaticResource QrmeT3Brush}" FontSize="10" TextWrapping="Wrap" />
 
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
 
-            <Button x:Name="StartButton" Content="Create profile" HorizontalAlignment="Stretch"
+            <Button x:Name="StartButton" HorizontalAlignment="Stretch"
                     Height="46" Foreground="White" Click="OnStart">
                 <Button.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -58,13 +59,13 @@
                  want to know whether a person wrote it. Both routes are
                  public on the backend and both sat behind this gate. -->
             <StackPanel Spacing="4" HorizontalAlignment="Center">
-                <TextBlock Text="Here about a profile, not for one?"
+                <TextBlock x:Name="InviteText"
                            Foreground="{StaticResource QrmeT2Brush}" FontSize="12"
                            HorizontalAlignment="Center" />
-                <Button Content="A profile depicts me · Is this genuine?"
+                <Button x:Name="DoorButton"
                         HorizontalAlignment="Center" Background="Transparent"
                         Foreground="{StaticResource QrmeBrandABrush}" Click="OnPublicDoor" />
-                <TextBlock Text="Neither needs an account."
+                <TextBlock x:Name="NoAccountText"
                            Foreground="{StaticResource QrmeT3Brush}" FontSize="11"
                            HorizontalAlignment="Center" />
             </StackPanel>

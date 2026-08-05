@@ -53,6 +53,54 @@ public sealed partial class SettingsPage : Page
         RelTypeBox.ItemsSource = RelationshipTypes
             .Select(t => t.Replace('_', ' ')).ToList();
         RelTypeBox.SelectedIndex = 2;   // friend
+        Localize();
+    }
+
+    /// Every visible string on the blocks this round covers, set from L10n
+    /// rather than from the markup. The steering, relationship and feedback
+    /// panels below still carry theirs in XAML and are counted as such.
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        TitleText.Text = L10n.T("tab.settings", lang);
+
+        ModelHead.Text = L10n.T("ns.model", lang);
+        ModelSub.Text = L10n.T("ns.model.sub", lang);
+
+        LangHead.Text = L10n.T("ns.lang", lang);
+        LangSub.Text = L10n.T("ns.lang.sub", lang);
+        PreTranslateToggle.Header = L10n.T("ns.lang.pre", lang);
+        PreTranslateToggle.OnContent = L10n.T("ns.lang.pre.on", lang);
+        PreTranslateToggle.OffContent = L10n.T("ns.lang.pre.off", lang);
+        TranslateBox.Header = L10n.T("ns.tr", lang);
+        TranslateBox.PlaceholderText = L10n.T("ns.tr.ph", lang);
+        TranslateButton.Content = L10n.T("action.translate", lang);
+
+        WmHead.Text = L10n.T("ns.wm", lang);
+        WmSub.Text = L10n.T("ns.wm.sub", lang);
+        WatermarkMarkBox.Header = L10n.T("ns.wm.mark", lang);
+        WatermarkLabelBox.Header = L10n.T("ns.wm.label", lang);
+        WatermarkLabelBox.PlaceholderText = L10n.Fill(
+            "ns.wm.label.ph", lang, ("name", AppState.Current.DisplayName));
+        WatermarkSaveButton.Content = L10n.T("ns.wm.save", lang);
+        WatermarkResetButton.Content = L10n.T("ns.wm.reset", lang);
+        WatermarkSaved.Text = L10n.T("ns.wm.saved", lang);
+
+        ObjHead.Text = L10n.T("ns.obj", lang);
+        NoObjections.Text = L10n.T("ns.obj.none", lang);
+        AttestButton.Content = L10n.T("ns.obj.attest", lang);
+
+        WhoHead.Text = L10n.T("ns.who", lang);
+        WhoSub.Text = L10n.T("ns.who.sub", lang);
+        RecoverBox.PlaceholderText = L10n.T("ns.who.ph", lang);
+        RecoverButton.Content = L10n.T("ns.who.check", lang);
+
+        ObjectHead.Text = L10n.T("ns.object", lang);
+        ObjectSub.Text = L10n.T("ns.object.sub", lang);
+        ObjectProfileBox.PlaceholderText = L10n.T("ns.object.pid", lang);
+        ObjectContactBox.PlaceholderText = L10n.T("ns.object.contact", lang);
+        ObjectReasonBox.PlaceholderText = L10n.T("ns.object.reason", lang);
+        ObjectButton.Content = L10n.T("ns.object.go", lang);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();

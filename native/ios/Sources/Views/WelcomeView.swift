@@ -1,8 +1,20 @@
 import SwiftUI
 
 /// First-run: name + persona + kind + birthdate -> POST /profiles.
+///
+/// ## The language of somebody who has not made a profile yet
+///
+/// `L10n.deviceLanguage` was written one round earlier for
+/// `WithoutAnAccountView`, whose reader has no profile to take a language
+/// from. This screen has exactly the same reader — the profile does not exist
+/// until the button at the bottom is pressed — and the picker in the middle of
+/// it is where the profile's language gets chosen in the first place.
+///
+/// `state.language` is `"en"` until a profile exists, so reading it here would
+/// have shown English to every reader on Earth and called it their setting.
 struct WelcomeView: View {
     @EnvironmentObject var state: AppState
+    private let lang = L10n.deviceLanguage
     @State private var name = ""
     @State private var persona = ""
     @State private var kind = "self"
@@ -32,33 +44,38 @@ struct WelcomeView: View {
                     .padding(.top, 40)
 
                 VStack(spacing: 6) {
-                    Text("Create your synthetic profile").font(.title2.bold()).foregroundStyle(Theme.txt)
-                    Text("A profile speaks in a voice you define — grounded in a persona, on your terms.")
+                    Text(L10n.t("nw.title", lang)).font(.title2.bold()).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nw.sub", lang))
                         .font(.footnote).foregroundStyle(Theme.t2)
                         .multilineTextAlignment(.center)
                 }
 
                 VStack(alignment: .leading, spacing: 14) {
-                    field("Display name") {
-                        TextField("e.g. Ada", text: $name).textFieldStyle(.plain).foregroundStyle(Theme.txt)
+                    field(L10n.t("nw.name", lang)) {
+                        TextField(L10n.t("nw.name.ph", lang), text: $name).textFieldStyle(.plain).foregroundStyle(Theme.txt)
                     }
-                    field("Persona") {
-                        TextField("Core identity: voice, history, values.", text: $persona, axis: .vertical)
+                    field(L10n.t("nw.persona", lang)) {
+                        TextField(L10n.t("nw.persona.ph", lang), text: $persona, axis: .vertical)
                             .lineLimit(2...4).foregroundStyle(Theme.txt)
                     }
-                    field("Kind") {
+                    field(L10n.t("nw.kind", lang)) {
+                        // Was `kind.replacingOccurrences(of: "_", with: " ").capitalized`,
+                        // which renders the API's enum member as if it were a
+                        // word — "Other Person" is not a label anybody wrote.
                         Picker("", selection: $kind) {
-                            ForEach(kinds, id: \.self) { Text($0.replacingOccurrences(of: "_", with: " ").capitalized).tag($0) }
+                            ForEach(kinds, id: \.self) { Text(L10n.t(kindKey($0), lang)).tag($0) }
                         }.pickerStyle(.segmented)
                     }
-                    field("Birthdate") {
+                    field(L10n.t("nw.birthdate", lang)) {
                         DatePicker("", selection: $birthdate, displayedComponents: .date)
                             .labelsHidden().colorScheme(.dark)
                     }
-                    field("Language") {
+                    field(L10n.t("nw.language", lang)) {
+                        // `/languages` returns English in the list with its own
+                        // label. Hardcoding it here meant filtering it back out
+                        // of the server's answer to avoid showing it twice.
                         Picker("", selection: $language) {
-                            Text("English").tag("en")
-                            ForEach(languages.filter { $0.code != "en" }, id: \.code) { l in
+                            ForEach(languages, id: \.code) { l in
                                 Text(l.label).tag(l.code)
                             }
                         }.pickerStyle(.menu).tint(Theme.brandA)
@@ -68,7 +85,7 @@ struct WelcomeView: View {
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
 
                 Button(action: create) {
-                    HStack { if busy { ProgressView().tint(.white) }; Text("Create profile").bold() }
+                    HStack { if busy { ProgressView().tint(.white) }; Text(L10n.t("nw.create", lang)).bold() }
                         .frame(maxWidth: .infinity).padding(.vertical, 14)
                         .background(Theme.brand).foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 13))
@@ -76,7 +93,9 @@ struct WelcomeView: View {
                 .disabled(name.isEmpty || persona.isEmpty || busy)
                 .opacity(name.isEmpty || persona.isEmpty ? 0.5 : 1)
 
-                Text("By creating a profile you agree to the Terms of Service — profiles are AI-generated synthetic content, never professional advice; you assume the risks of AI interactions. Full terms: GET /terms · docs/terms.md")
+                // Consent to terms, in the reader's language. A person cannot
+                // agree to a sentence they cannot read.
+                Text(L10n.t("nw.terms", lang))
                     .font(.caption2).foregroundStyle(Theme.t3)
 
                 // The other reason somebody opens this app: they have found a
@@ -86,13 +105,16 @@ struct WelcomeView: View {
                 // only from inside a signed-in tab bar — which asked the
                 // person objecting to a profile to make one first.
                 VStack(spacing: 6) {
-                    Text("Here about a profile, not for one?")
+                    // `pub.invite` and `pub.invite.none` are the accountless
+                    // screen's own rows, ported from the console. The door is
+                    // the same door; it says the same thing on both sides.
+                    Text(L10n.t("pub.invite", lang))
                         .font(.footnote).foregroundStyle(Theme.t2)
-                    Button("A profile depicts me · Is this genuine?") {
+                    Button(L10n.t("nw.door", lang)) {
                         publicDoor = true
                     }
                     .font(.footnote.bold()).foregroundStyle(Theme.brandA)
-                    Text("Neither needs an account.")
+                    Text(L10n.t("pub.invite.none", lang))
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }.padding(.top, 4)
 
@@ -104,6 +126,12 @@ struct WelcomeView: View {
         .task {
             languages = (try? await ApiClient.shared.languages())?.languages ?? []
         }
+    }
+
+    /// `self` / `other_person` / `fictional` are the API's members; these are
+    /// the words a person reads for them.
+    private func kindKey(_ kind: String) -> String {
+        kind == "other_person" ? "nw.kind.other" : "nw.kind.\(kind)"
     }
 
     private func field<Content: View>(_ label: String, @ViewBuilder _ content: () -> Content) -> some View {
@@ -125,7 +153,8 @@ struct WelcomeView: View {
                                                                  language: language)
                 state.signIn(r)
             } catch {
-                self.error = "Couldn't reach QRME — is the backend running? (\(error.localizedDescription))"
+                self.error = L10n.fill("nw.unreachable", lang,
+                                       ["detail": error.localizedDescription])
             }
             busy = false
         }

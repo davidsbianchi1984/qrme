@@ -4,6 +4,67 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.5] — 2026-08-05
+
+### The first screen, on all three phones
+
+Twenty-one releases took the console's untranslated record to its floor. The
+phones were never measured until the round that wrote
+`native_screens_untranslated.txt`, which counted 703 English strings behind
+QRME's three translated tab bars and recorded them honestly rather than
+pretending.
+
+This round takes the **first screen and the settings screen** on all three:
+**703 → 590**, sixty rows in ten languages, written once and generated into
+Swift, Kotlin and C# rather than typed three times.
+
+### The screen with no language to read
+
+`WelcomeView` renders before a profile exists, so `state.language` is `"en"`
+for every reader on Earth — and the language picker in the middle of that
+screen is where the profile's language gets chosen in the first place.
+
+`L10n.deviceLanguage` was written one release earlier for the accountless
+screen, whose reader is in exactly this position. All three shells now read
+the device here. What that changes most is the sentence above the button:
+**a person cannot agree to terms they cannot read.**
+
+### The Android shell did not compile
+
+`ProblemReportingCard()` sat between two arguments of a `Text(…)` call in
+`Screens.kt`. Kotlin does not accept that. The parentheses balance, so
+nothing counting brackets would have noticed, and there is no Kotlin compiler
+in this suite — it was found by reading the file while localizing it, which
+is not a method.
+
+The call moves to where the iOS shell has always had it, and the shape gets a
+check: two arguments with nothing between them. A `{` reopens statement
+context, so `vm.call({ … oauthState = st … })` is ordinary code — the first
+draft called both of those a defect and was fixed before it was kept.
+
+### Two pickers that posted their own labels
+
+The kind picker rendered the API's members as words (`other_person` →
+*"Other Person"*), and on Windows `OnStart` read that visible text back as
+the value to post — so translating the label would have posted the Spanish
+word as the kind. The members move into `_kinds`; only what somebody reads is
+looked up. This is the same defect the console's relationship dropdown had at
+0.46.2.
+
+### Every row, not every row of one prefix
+
+The shells' ten-language check has only ever looked at `pub.*` — the rows the
+accountless round ported, because that was the set that existed. It now
+checks every row of all three tables, plus that no translation loses or
+invents a `{slot}`.
+
+Its first draft read a line at a time and called fourteen complete rows
+incomplete: the tab labels were wrapped across three lines when they were
+written. A check that reports missing translations that are right there would
+have had somebody delete and retype them.
+
+Cut together with JIM-mini and PDI at app-v0.46.5.
+
 ## [0.46.4] — 2026-08-05
 
 ### The refusal names a field, and the form did not name it at all
