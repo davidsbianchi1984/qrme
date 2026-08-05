@@ -3,6 +3,7 @@ import { api, type Bystanders, type CameraDisclosure, type CameraSession,
          type CameraVocabulary, type MicPlaces, type MicVocabulary,
          type MicsHere, type OverlayCatalogue, type OverlaysHere,
          type WhosePlace } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -42,6 +43,7 @@ export function Live({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -121,17 +123,14 @@ export function Live({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>What is live here</h2>
-      <p className="muted small">
-        A camera, a microphone, a face over a camera. Whatever you put between
-        yourself and the people around you, they are told.
-      </p>
+      <h2>{tr("liv.title", lang)}</h2>
+      <p className="muted small">{tr("liv.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Share your camera</h3>
+        <h3>{tr("liv.share", lang)}</h3>
         <div className="row">
           <select value={subject} onChange={(e) => setSubject(e.target.value)}>
             {cam && Object.keys(cam.subjects).map((s) => (
@@ -143,10 +142,13 @@ export function Live({ onPlans }: {
             {cam?.viewers.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
           <input value={viewerId} onChange={(e) => setViewerId(e.target.value)}
-                 placeholder="who watches" style={{ flex: 1 }} />
+                 placeholder={tr("liv.who.ph", lang)} style={{ flex: 1 }} />
         </div>
         <p className="muted small">
-          {cam?.subjects[subject]?.means} — {cam?.subjects[subject]?.bystander_risk}
+          {fill(tr("liv.subjectline", lang), {
+            means: cam?.subjects[subject]?.means,
+            risk: cam?.subjects[subject]?.bystander_risk,
+          })}
         </p>
 
         {/* The refusal, in full, before the button rather than after it. */}
@@ -166,7 +168,7 @@ export function Live({ onPlans }: {
           </select>
           <input value={camSurfaceId}
                  onChange={(e) => setCamSurfaceId(e.target.value)}
-                 placeholder="which place" style={{ flex: 1 }} />
+                 placeholder={tr("liv.where.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!token || !viewerId.trim() || !camSurfaceId.trim()
                             || mayWatch === false}
                   onClick={async () => {
@@ -178,16 +180,20 @@ export function Live({ onPlans }: {
                 surface: camSurface, surface_id: camSurfaceId.trim(),
                 minutes: cam?.default_minutes,
               }, token);
-              setNote("Live. Your own screen shows it for the whole time.");
+              setNote(tr("liv.livenow.said", lang));
               api.liveCameras(me, token).then(setLive).catch(() => undefined);
               loadPlace();
             } catch (e) { fail(e); }
-          }}>Start sharing</button>
+          }}>{tr("liv.startsharing", lang)}</button>
         </div>
         {cam && (
           <p className="muted small">
-            {cam.surfaces[camSurface]}. Up to {cam.max_minutes} minutes,{" "}
-            {cam.records_by_default ? "recording" : "not recording"} by default.
+            {fill(tr("liv.upto", lang), {
+              surface: cam.surfaces[camSurface],
+              n: cam.max_minutes,
+              rec: cam.records_by_default
+                ? tr("liv.recording", lang) : tr("liv.notrecording", lang),
+            })}
           </p>
         )}
       </div>
@@ -195,35 +201,44 @@ export function Live({ onPlans }: {
       {/* Whose problem the room is, said plainly. */}
       {bys && (
         <div className="card">
-          <h3>Who else is in shot</h3>
+          <h3>{tr("liv.bystanders", lang)}</h3>
           <p className="small">{bys.risk}</p>
-          <p className="muted small">We cannot {bys.we_cannot}.</p>
-          <p className="muted small">You can {bys.you_can}.</p>
+          <p className="muted small">
+            {fill(tr("liv.wecannot", lang), { what: bys.we_cannot })}
+          </p>
+          <p className="muted small">
+            {fill(tr("liv.youcan", lang), { what: bys.you_can })}
+          </p>
           <p className="muted small"><em>{bys.why_it_is_yours}</em></p>
         </div>
       )}
 
       {live.length > 0 && (
         <div className="card">
-          <h3>Your camera is on</h3>
+          <h3>{tr("liv.camon", lang)}</h3>
           {live.map((s) => (
             <div key={s.id}>
               <div className="row">
                 <div style={{ flex: 1 }}>
                   <strong>{s.subject}</strong> — {s.subject_means}
                   <div className="muted small">
-                    in {s.surface} {s.surface_id} · {s.minutes} min ·{" "}
-                    {s.recording ? "recording" : "not recording"}
+                    {fill(tr("liv.camline", lang), {
+                      surface: s.surface, id: s.surface_id,
+                      minutes: s.minutes,
+                      rec: s.recording
+                        ? tr("liv.recording", lang)
+                        : tr("liv.notrecording", lang),
+                    })}
                   </div>
                 </div>
                 <button onClick={async () => {
                   setError(null); setNote(null);
                   try {
                     await api.closeCamera(s.id, me, token);
-                    setNote("Stopped.");
+                    setNote(tr("liv.stopped.said", lang));
                     api.liveCameras(me, token).then(setLive).catch(() => undefined);
                   } catch (e) { fail(e); }
-                }}>Stop</button>
+                }}>{tr("liv.stop", lang)}</button>
               </div>
               {/* Verbatim: the six things the person watching cannot do. */}
               <ul className="small">
@@ -237,7 +252,7 @@ export function Live({ onPlans }: {
       )}
 
       <div className="card">
-        <h3>Look at a place</h3>
+        <h3>{tr("liv.lookplace", lang)}</h3>
         <div className="row">
           <select value={surface} onChange={(e) => setSurface(e.target.value)}>
             {places?.places.map((p) => (
@@ -245,9 +260,9 @@ export function Live({ onPlans }: {
             ))}
           </select>
           <input value={surfaceId} onChange={(e) => setSurfaceId(e.target.value)}
-                 placeholder="its id" style={{ flex: 1 }} />
+                 placeholder={tr("liv.id.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!token || !surfaceId.trim()} onClick={loadPlace}>
-            Look
+            {tr("liv.look", lang)}
           </button>
         </div>
         <p className="muted small">
@@ -257,31 +272,36 @@ export function Live({ onPlans }: {
         {places && <p className="muted small">{places.room}</p>}
         {whose && (
           <p className="small">
-            This is {whose.display_name || whose.account_id}'s — {whose.is}.
+            {fill(tr("liv.whose", lang), {
+              who: whose.display_name || whose.account_id, is: whose.is })}
           </p>
         )}
         {disclosure && (
           <p className="small">
             {disclosure.note}
-            {disclosure.any_recording && <strong> Something is recording.</strong>}
+            {disclosure.any_recording &&
+              <strong> {tr("liv.somethingrec", lang)}</strong>}
           </p>
         )}
       </div>
 
       <div className="card">
-        <h3>Lend a microphone</h3>
+        <h3>{tr("liv.lendmic", lang)}</h3>
         {mic && (
           <>
             <ul className="small">{mic.rules.map((r) => <li key={r}>{r}</li>)}</ul>
             <p className="muted small">
-              Worn or clipped on only: {mic.personal.join(", ")}.
+              {fill(tr("liv.worn", lang),
+                { what: mic.personal.join(", ") })}
             </p>
             {/* One reason, repeated for every refused device, and it is the
                 reason that matters: their voices are not yours to lend. */}
             {mic.refused[0] && (
               <p className="muted small">
-                Refused — {mic.refused.map((r) => r.kind).join(", ")} —{" "}
-                {mic.refused[0].why}
+                {fill(tr("liv.refused", lang), {
+                  kinds: mic.refused.map((r) => r.kind).join(", "),
+                  why: mic.refused[0].why,
+                })}
               </p>
             )}
           </>
@@ -294,7 +314,8 @@ export function Live({ onPlans }: {
                 <div style={{ flex: 1 }}>
                   <strong>{m.device}</strong>
                   <div className="muted small">
-                    {m.gain} — hears {m.hears} · since {m.since}
+                    {fill(tr("liv.micline", lang), {
+                      gain: m.gain, hears: m.hears, since: m.since })}
                   </div>
                 </div>
                 {m.interactor_id === me && (
@@ -302,10 +323,10 @@ export function Live({ onPlans }: {
                     setError(null); setNote(null);
                     try {
                       await api.takeBackMicHere(surface, surfaceId.trim(), me, token);
-                      setNote("Taken back.");
+                      setNote(tr("liv.takenback.said", lang));
                       loadPlace();
                     } catch (e) { fail(e); }
-                  }}>Take it back</button>
+                  }}>{tr("liv.takeback", lang)}</button>
                 )}
               </div>
             ))}
@@ -318,11 +339,11 @@ export function Live({ onPlans }: {
             setNote(r.note);
             loadPlace();
           } catch (e) { fail(e); }
-        }}>Lend mine</button>
+        }}>{tr("liv.lendmine", lang)}</button>
       </div>
 
       <div className="card">
-        <h3>Wear something over your face</h3>
+        <h3>{tr("liv.wear", lang)}</h3>
         <div className="row">
           <select value={overlayKind}
                   onChange={(e) => setOverlayKind(e.target.value)}>
@@ -332,7 +353,7 @@ export function Live({ onPlans }: {
           </select>
           <input value={overlayTitle}
                  onChange={(e) => setOverlayTitle(e.target.value)}
-                 placeholder="call it something" style={{ flex: 1 }} />
+                 placeholder={tr("liv.callit.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!token || !surfaceId.trim() || !overlayTitle.trim()}
                   onClick={async () => {
             setError(null); setNote(null);
@@ -346,7 +367,7 @@ export function Live({ onPlans }: {
               setOverlayTitle("");
               loadPlace();
             } catch (e) { fail(e); }
-          }}>Wear it</button>
+          }}>{tr("liv.wearit", lang)}</button>
         </div>
         <p className="muted small">
           {overlays?.kinds.find((k) => k.kind === overlayKind)?.means}
@@ -365,10 +386,10 @@ export function Live({ onPlans }: {
                     setError(null); setNote(null);
                     try {
                       await api.takeOffOverlay(surface, surfaceId.trim(), me, token);
-                      setNote("Taken off.");
+                      setNote(tr("liv.takenoff.said", lang));
                       loadPlace();
                     } catch (e) { fail(e); }
-                  }}>Take it off</button>
+                  }}>{tr("liv.takeoff", lang)}</button>
                 )}
               </div>
             ))}

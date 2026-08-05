@@ -4,6 +4,46 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.5] — 2026-08-05
+
+### The objection, the camera, and the market
+
+The console-untranslated record falls **616 → 516**.
+
+**Contesting a profile** — forty-three `con.*` keys. The screen a
+person reaches when a profile here represents them, and the two
+shortcuts that skip review entirely because a standing party's rights
+outweigh preserving the profile. The status values themselves stay in
+the API's vocabulary, untranslated on the wire, because `Contest.tsx`
+compares against the literal `"open"` — a guard already stands on that
+and it still does.
+
+**What is live here** — thirty-five `liv.*` keys. A camera, a
+microphone, a face worn over a camera, and the sentence underneath all
+three: whatever you put between yourself and the people around you,
+they are told.
+
+**Marketplace** — thirty-nine `mkt.*` keys, including the one about
+your own search scope: *yours alone, behind your own token — it does
+not tell a seller where you are.*
+
+117 keys, all ten languages, exact-sync held in both directions.
+
+### The guard that would not say what to do
+
+Keys written as `tr(cond ? "a" : "b", lang)` render perfectly and are
+invisible to the dead-key check, because neither key is a literal after
+`tr(`. That shape has stranded keys in **three consecutive releases** —
+twelve, then two, then four. The check caught all of them; its message
+said *"wire them, or delete them"*, which is wrong advice, since the
+keys were already wired.
+
+    asked     is this key looked up
+    mattered  does the failure tell you what to do about it
+
+The check now looks for its own blind spot: when a dead key is one
+selected inside a `tr(` call, it says so and prints the fix.
+
 ## [0.45.4] — 2026-08-05
 
 ### Two directions, one picture

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type Listing, type Locality, type MarketPrefs, type MarketSearch,
          type Offer, type Order } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -28,6 +29,7 @@ export function Market({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -92,7 +94,10 @@ export function Market({ onPlans }: {
     setError(null); setNote(null);
     try {
       const order = await api.purchase(o.listing_id, o.price, token);
-      setNote(`Bought — order ${order.id}, ${order.status}. ${order.payment}`);
+      setNote(tr("mkt.bought.said", lang)
+        .replace("{id}", order.id)
+        .replace("{status}", order.status)
+        .replace("{payment}", order.payment));
       if (token) api.sales(token).then((r) => setSales(r.sales)).catch(() => undefined);
     } catch (e) { fail(e); }
   }
@@ -101,19 +106,19 @@ export function Market({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Marketplace</h2>
+      <h2>{tr("mkt.title", lang)}</h2>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Find something</h3>
+        <h3>{tr("mkt.find", lang)}</h3>
         <div className="row">
           <input value={q} onChange={(e) => setQ(e.target.value)}
-                 placeholder="a plumber, a therapist, a tutor…"
+                 placeholder={tr("mkt.q.ph", lang)}
                  onKeyDown={(e) => e.key === "Enter" && search()} />
-          <button onClick={search}>Search</button>
-          <button onClick={suggest}>Suggest words</button>
+          <button onClick={search}>{tr("mkt.search", lang)}</button>
+          <button onClick={suggest}>{tr("mkt.suggest", lang)}</button>
         </div>
         {ideas.length > 0 && (
           <div className="row">
@@ -126,10 +131,11 @@ export function Market({ onPlans }: {
         {found && (
           <>
             <p className="muted small">
-              {found.total} result{found.total === 1 ? "" : "s"} for
-              “{found.query}”, scope {found.scope}
-              {found.hidden_by_place > 0 &&
-                <> · {found.hidden_by_place} hidden by where you are looking</>}
+              {fill(found.total === 1
+                ? tr("mkt.result", lang) : tr("mkt.results", lang), {
+                n: found.total, q: found.query, scope: found.scope })}
+              {found.hidden_by_place > 0 && fill(tr("mkt.hidden", lang),
+                { n: found.hidden_by_place })}
             </p>
             {/* The backend's own sentence, not ours. */}
             <p className="muted small"><em>{found.ranking}</em></p>
@@ -138,8 +144,11 @@ export function Market({ onPlans }: {
       </div>
 
       <div className="card">
-        <h3>{found ? "Results" : "Everything listed"}</h3>
-        {rows.length === 0 && <p className="muted small">Nothing here.</p>}
+        <h3>
+          {found ? tr("mkt.hdr.results", lang) : tr("mkt.hdr.all", lang)}
+        </h3>
+        {rows.length === 0 &&
+          <p className="muted small">{tr("mkt.nothinghere", lang)}</p>}
         {rows.map((l) => (
           <div key={l.id} className="row">
             <div style={{ flex: 1 }}>
@@ -149,15 +158,20 @@ export function Market({ onPlans }: {
                 {l.tags.join(" · ")}{l.provider_name && <> — {l.provider_name}</>}
               </div>
             </div>
-            <button onClick={() => loadOffer(l.id)}>Price</button>
+            <button onClick={() => loadOffer(l.id)}>
+              {tr("mkt.price", lang)}
+            </button>
             {offers[l.id] && (
               <>
                 <span>
                   {offers[l.id]!.price.toFixed(2)} {offers[l.id]!.currency}
-                  {offers[l.id]!.stock !== null && <> · {offers[l.id]!.stock} left</>}
+                  {offers[l.id]!.stock !== null && fill(tr("mkt.left", lang),
+                    { n: offers[l.id]!.stock })}
                 </span>
                 <button disabled={!token || offers[l.id]!.status !== "open"}
-                        onClick={() => buy(offers[l.id]!)}>Buy</button>
+                        onClick={() => buy(offers[l.id]!)}>
+                  {tr("mkt.buy", lang)}
+                </button>
               </>
             )}
           </div>
@@ -170,24 +184,25 @@ export function Market({ onPlans }: {
       </div>
 
       <div className="card">
-        <h3>Where you are looking</h3>
-        {!token && <p className="muted small">Sign in to set this.</p>}
+        <h3>{tr("mkt.where", lang)}</h3>
+        {!token &&
+          <p className="muted small">{tr("mkt.signin", lang)}</p>}
         {prefs && (
           <>
             <div className="row">
-              <input value={prefs.locality || ""} placeholder="town"
+              <input value={prefs.locality || ""} placeholder={tr("mkt.town.ph", lang)}
                      onChange={(e) => setPrefs({ ...prefs, locality: e.target.value })} />
               <select value={prefs.scope}
                       onChange={(e) => setPrefs({ ...prefs, scope: e.target.value })}>
-                <option value="anywhere">anywhere</option>
-                <option value="locality">this town</option>
-                <option value="region">this region</option>
+                <option value="anywhere">{tr("mkt.anywhere", lang)}</option>
+                <option value="locality">{tr("mkt.thistown", lang)}</option>
+                <option value="region">{tr("mkt.thisregion", lang)}</option>
               </select>
               <label>
                 <input type="checkbox" checked={prefs.include_remote}
                        onChange={(e) =>
                          setPrefs({ ...prefs, include_remote: e.target.checked })} />
-                {" "}remote counts
+                {" "}{tr("mkt.remote", lang)}
               </label>
               <button onClick={async () => {
                 try {
@@ -195,31 +210,23 @@ export function Market({ onPlans }: {
                     locality: prefs.locality, scope: prefs.scope,
                     include_remote: prefs.include_remote,
                   }, token));
-                  setNote("Saved.");
+                  setNote(tr("mkt.saved.said", lang));
                 } catch (e) { fail(e); }
-              }}>Save</button>
+              }}>{tr("mkt.save", lang)}</button>
             </div>
-            <p className="muted small">
-              Yours alone, behind your own token. It narrows what you see and
-              nothing else — it does not tell a seller where you are.
-            </p>
+            <p className="muted small">{tr("mkt.yoursalone", lang)}</p>
           </>
         )}
       </div>
 
       <div className="card">
-        <h3>Put this profile in the directory</h3>
-        <p className="muted small">
-          Different from a listing: a listing sells one thing, this puts the
-          profile itself where people browsing can find it. Tags are how they
-          find it, and the card shows display information only — never
-          anything from inside the persona.
-        </p>
+        <h3>{tr("mkt.directory", lang)}</h3>
+        <p className="muted small">{tr("mkt.directory.pitch", lang)}</p>
         <div className="row">
           <input value={tags} onChange={(e) => setTags(e.target.value)}
-                 placeholder="tags, comma separated" style={{ flex: 1 }} />
+                 placeholder={tr("mkt.tags.ph", lang)} style={{ flex: 1 }} />
           <input value={blurb} onChange={(e) => setBlurb(e.target.value)}
-                 placeholder="a line about it" style={{ flex: 1 }} />
+                 placeholder={tr("mkt.blurb.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!session.profileId || !session.ownerToken}
                   onClick={async () => {
                     setError(null); setNote(null);
@@ -229,9 +236,9 @@ export function Market({ onPlans }: {
                                   .filter(Boolean),
                         blurb: blurb.trim() || undefined },
                         session.ownerToken!);
-                      setNote("Listed.");
+                      setNote(tr("mkt.listed.said", lang));
                     } catch (e) { fail(e); }
-                  }}>List it</button>
+                  }}>{tr("mkt.listit", lang)}</button>
           {/* Unlisting a profile that is not listed is a 404, so the
               refusal carries the fact rather than the button pretending it
               worked. The friends delete next door answers 200 for the same
@@ -243,35 +250,33 @@ export function Market({ onPlans }: {
                     try {
                       await api.unlistFromMarketplace(session.profileId!,
                                                       session.ownerToken!);
-                      setNote("Taken out of the directory.");
+                      setNote(tr("mkt.tookout.said", lang));
                     } catch (e) { fail(e); }
-                  }}>take it out</button>
+                  }}>{tr("mkt.takeout", lang)}</button>
         </div>
-        <p className="muted small">
-          Listing again replaces the tags and the line rather than adding a
-          second row — one profile is in the directory once.
-        </p>
+        <p className="muted small">{tr("mkt.replaces", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>Towns with listings</h3>
+        <h3>{tr("mkt.towns", lang)}</h3>
         {localities.length === 0 &&
-          <p className="muted small">
-            Nothing is placed yet. A listing with no place is everywhere, which
-            is the same as nowhere when somebody is looking for help nearby.
-          </p>}
+          <p className="muted small">{tr("mkt.noplace", lang)}</p>}
         {localities.map((l) => (
           <div key={l.locality + (l.region || "")} className="row">
             <strong>{l.locality}</strong>
             {l.region && <span className="muted">{l.region}</span>}
-            <span className="muted">{l.listings} listing{l.listings === 1 ? "" : "s"}</span>
+            <span className="muted">
+              {fill(l.listings === 1
+                ? tr("mkt.listing", lang) : tr("mkt.listings", lang),
+                { n: l.listings })}
+            </span>
           </div>
         ))}
       </div>
 
       {sales.length > 0 && (
         <div className="card">
-          <h3>What you have sold</h3>
+          <h3>{tr("mkt.sold", lang)}</h3>
           {sales.map((s) => (
             <div key={s.id} className="row">
               <strong>{s.title}</strong>

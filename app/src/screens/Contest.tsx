@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type HeldMessage, type ObjectionAudit, type ObjectionOpened,
          type ObjectionStatus } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -39,6 +40,7 @@ export function Contest({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -79,44 +81,40 @@ export function Contest({ onPlans }: {
     setError(null); setNote(null);
     try {
       const r = await fn();
-      setNote(`${said} The objection is ${r.status}; the profile is ${r.profile_status}.`);
+      setNote(tr("con.acted", lang)
+        .replace("{said}", said)
+        .replace("{status}", r.status)
+        .replace("{profile}", r.profile_status));
       if (lookup.trim()) check(lookup.trim());
     } catch (e) { fail(e); }
   };
 
   return (
     <div className="screen">
-      <h2>Contesting a profile</h2>
-      <p className="muted small">
-        If a profile here represents you, or somebody whose estate you speak
-        for, this is how you say so.
-      </p>
+      <h2>{tr("con.title", lang)}</h2>
+      <p className="muted small">{tr("con.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Open an objection</h3>
+        <h3>{tr("con.open", lang)}</h3>
         {/* Public on purpose. This sentence used to read "You do not need an
             account" — on a tab nobody without one could open, which made it
             a promise the app broke in the act of making it. The form is now
             also on the sign-in page, where the person it describes can
             actually reach it, and the copy points there instead of asserting
             something this surface cannot deliver. */}
-        <p className="muted small">
-          Objecting to a profile does not require joining the platform hosting
-          it: the same form is on the sign-in page, open to anybody. You are
-          seeing it here because you are signed in.
-        </p>
+        <p className="muted small">{tr("con.public", lang)}</p>
         <div className="row">
           <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
-                 placeholder="the profile's id" style={{ flex: 1 }} />
+                 placeholder={tr("con.pid.ph", lang)} style={{ flex: 1 }} />
           <input value={ref} onChange={(e) => setRef(e.target.value)}
-                 placeholder="your proof reference" />
+                 placeholder={tr("con.ref.ph", lang)} />
         </div>
         <div className="row">
           <input value={reason} onChange={(e) => setReason(e.target.value)}
-                 placeholder="why — in your own words" style={{ flex: 1 }} />
+                 placeholder={tr("con.why.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!profileId.trim() || !ref.trim()}
                   onClick={async () => {
             setError(null); setNote(null);
@@ -129,47 +127,50 @@ export function Contest({ onPlans }: {
               setLookup(o.id);
               check(o.id);
             } catch (e) { fail(e); }
-          }}>Open it</button>
+          }}>{tr("con.openit", lang)}</button>
         </div>
-        <p className="muted small">
-          The proof reference points at an identity check held outside this
-          system — it is not a login, and it is what lets you object without
-          one.
-        </p>
+        <p className="muted small">{tr("con.proofnote", lang)}</p>
       </div>
 
       {opened && (
         <div className="card">
-          <h3>Opened — {opened.id}</h3>
+          <h3>{fill(tr("con.opened", lang), { id: opened.id })}</h3>
           {/* Immediate, and reversible. Both halves, together. */}
           <p className="small">{opened.note}</p>
           <p className="small">
-            The profile is <strong>{opened.profile_status}</strong> from this
-            moment — before anybody reviews it. It was{" "}
-            <strong>{opened.prior_status}</strong>, and if the objection is
-            dismissed it goes back to exactly that.
+            {fill(tr("con.status", lang), {
+              now: <strong>{opened.profile_status}</strong>,
+              before: <strong>{opened.prior_status}</strong>,
+            })}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>Check a case</h3>
+        <h3>{tr("con.check", lang)}</h3>
         <div className="row">
           <input value={lookup} onChange={(e) => setLookup(e.target.value)}
-                 placeholder="objection id" style={{ flex: 1 }} />
+                 placeholder={tr("con.oid.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!lookup.trim()}
-                  onClick={() => check(lookup.trim())}>Check</button>
+                  onClick={() => check(lookup.trim())}>
+            {tr("con.checkbtn", lang)}
+          </button>
         </div>
         {status && (
           <>
             <p className="small">
-              <strong>{status.status}</strong> · profile {status.profile_id}
+              {fill(tr("con.caseline", lang), {
+                status: <strong>{status.status}</strong>,
+                pid: status.profile_id,
+              })}
             </p>
             <p className="muted small">
-              Your reference: {status.objector_ref} ·{" "}
-              {status.reattested
-                ? "the owner has re-attested their rights basis"
-                : "the owner has not yet re-attested their rights basis"}
+              {fill(tr("con.yourref", lang), {
+                ref: status.objector_ref,
+                reattested: status.reattested
+                  ? tr("con.reattested", lang)
+                  : tr("con.notreattested", lang),
+              })}
             </p>
           </>
         )}
@@ -177,22 +178,16 @@ export function Contest({ onPlans }: {
 
       {status && status.status === "open" && (
         <div className="card">
-          <h3>End it now</h3>
-          <p className="muted small">
-            Two shortcuts skip review entirely, because a standing party's
-            rights outweigh preserving the profile. Both terminate it
-            immediately, even mid-review. Each applies to one rights basis
-            only — if it is not the one this profile was made under, the
-            refusal says which one it is.
-          </p>
+          <h3>{tr("con.endnow", lang)}</h3>
+          <p className="muted small">{tr("con.shortcuts", lang)}</p>
           <div className="row">
             <button onClick={act(() => api.withdrawConsent(status.id),
-                                 "Consent withdrawn.")}>
-              I am the subject — withdraw my consent
+                                 tr("con.consent.said", lang))}>
+              {tr("con.subject", lang)}
             </button>
             <button onClick={act(() => api.revokeAuthorization(status.id),
-                                 "Authorization revoked.")}>
-              I speak for the estate — revoke
+                                 tr("con.auth.said", lang))}>
+              {tr("con.estate", lang)}
             </button>
           </div>
         </div>
@@ -200,22 +195,19 @@ export function Contest({ onPlans }: {
 
       {audit && (
         <div className="card">
-          <h3>What has happened to this case</h3>
+          <h3>{tr("con.happened", lang)}</h3>
           {/* The claim depends on the vault, so the claim states the vault. */}
           <p className="muted small">
             {audit.vault_backed
-              ? "Each event below is sealed into the vault, which hash-chains "
-                + "every write — so this timeline is independently "
-                + "tamper-evident."
-              : "No vault is configured on this deployment, so these events "
-                + "are recorded but not hash-chained. The timeline is the "
-                + "timeline; it is not independently tamper-evident."}
+              ? tr("con.sealedvault", lang) : tr("con.novault", lang)}
           </p>
           {audit.events.map((e) => (
             <div key={e.id}>
               <p className="small">
-                <strong>{e.event}</strong> by {e.actor} — {e.at}
-                {e.sealed && <span className="chip"> sealed</span>}
+                {fill(tr("con.event", lang), {
+                  event: <strong>{e.event}</strong>, who: e.actor, at: e.at })}
+                {e.sealed &&
+                  <span className="chip"> {tr("con.sealed", lang)}</span>}
               </p>
               {Object.keys(e.detail).length > 0 && (
                 <p className="muted small">
@@ -226,30 +218,26 @@ export function Contest({ onPlans }: {
               )}
             </div>
           ))}
-          <h4>Adjudicate</h4>
-          <p className="muted small">
-            Reviewer only — an owner must not decide an objection against
-            their own profile. Upholding terminates the profile and erases its
-            content; dismissing restores what it was.
-          </p>
+          <h4>{tr("con.adjudicate", lang)}</h4>
+          <p className="muted small">{tr("con.reviewer", lang)}</p>
           <div className="row">
             <button onClick={act(
               () => api.resolveObjection(audit.objection_id, "uphold", token),
-              "Upheld.")}>Uphold</button>
+              tr("con.upheld.said", lang))}>{tr("con.uphold", lang)}</button>
             <button onClick={act(
               () => api.resolveObjection(audit.objection_id, "dismiss", token),
-              "Dismissed.")}>Dismiss</button>
+              tr("con.dismissed.said", lang))}>
+              {tr("con.dismiss", lang)}
+            </button>
           </div>
         </div>
       )}
 
       <div className="card">
-        <h3>Waiting on you</h3>
-        <p className="muted small">
-          What this profile said, held for your approval before anybody sees
-          it. Only appears when the profile is set to manual moderation.
-        </p>
-        {queue.length === 0 && <p className="muted small">Nothing held.</p>}
+        <h3>{tr("con.waiting", lang)}</h3>
+        <p className="muted small">{tr("con.waiting.pitch", lang)}</p>
+        {queue.length === 0 &&
+          <p className="muted small">{tr("con.nothingheld", lang)}</p>}
         {queue.map((m) => (
           <div key={m.id}>
             <p className="small">{m.content}</p>
@@ -263,16 +251,16 @@ export function Contest({ onPlans }: {
                 setError(null); setNote(null);
                 try {
                   await api.approveMessage(m.id, token);
-                  setNote("Approved."); loadQueue();
+                  setNote(tr("con.approved.said", lang)); loadQueue();
                 } catch (e) { fail(e); }
-              }}>Approve</button>
+              }}>{tr("con.approve", lang)}</button>
               <button onClick={async () => {
                 setError(null); setNote(null);
                 try {
                   await api.rejectMessage(m.id, token);
-                  setNote("Rejected."); loadQueue();
+                  setNote(tr("con.rejected.said", lang)); loadQueue();
                 } catch (e) { fail(e); }
-              }}>Reject</button>
+              }}>{tr("con.reject", lang)}</button>
             </div>
           </div>
         ))}

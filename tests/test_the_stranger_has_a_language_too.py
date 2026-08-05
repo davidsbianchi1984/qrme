@@ -339,8 +339,40 @@ def test_no_key_is_translated_into_ten_languages_and_used_nowhere():
                                            text)}
     dead = sorted(k for k in table - used
                   if not any(k.startswith(p) for p in prefixes))
+
+    # The third possibility, and by now the likeliest one.
+    #
+    # "Wire them, or delete them" was the whole message for a long time, and
+    # it is bad advice for the commonest way a key goes dead here: written as
+    # `tr(cond ? "a" : "b", lang)`, where both keys are wired, both render,
+    # and neither is a literal after `tr(` so neither is seen. That shape has
+    # stranded keys in three consecutive releases. Twice the fix was applied
+    # from memory; the message never said it.
+    #
+    #     asked     is this key looked up
+    #     mattered  does the failure tell you what to do about it
+    #
+    # So the check now looks for its own blind spot and names it. Selecting
+    # the *key* inside the call hides it; selecting the *result* does not.
+    ternary = set()
+    for screen in list(SRC.rglob("*.tsx")) + list(SRC.rglob("*.ts")):
+        text = screen.read_text(encoding="utf-8")
+        for a, b in re.findall(
+                r'\b(?:t|tr|L)\(\s*[^,()]*?\?\s*"([\w.]+)"\s*:\s*"([\w.]+)"',
+                text, re.S):
+            ternary |= {a, b}
+    hidden = sorted(set(dead) & ternary)
+
+    advice = ("\n  Wire them, or delete them — but a translated string nobody "
+              "reads is the English still being read instead.")
+    if hidden:
+        advice = (
+            "\n  These are chosen inside the call — `tr(cond ? \"a\" : \"b\", "
+            "lang)` — so they do render, and this check cannot see them:\n    "
+            + "\n    ".join(hidden)
+            + "\n  Move the `tr(` inside each branch instead: "
+              "`cond ? tr(\"a\", lang) : tr(\"b\", lang)`."
+            + advice)
     assert not dead, (
         f"{len(dead)} key(s) are translated and looked up by nothing:\n    "
-        + "\n    ".join(dead)
-        + "\n  Wire them, or delete them — but a translated string nobody "
-          "reads is the English still being read instead.")
+        + "\n    ".join(dead) + advice)

@@ -1,4 +1,4 @@
-# status: backlog — 616 rows
+# status: backlog — 516 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 616
+# ceiling: 516
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -144,40 +144,6 @@ Chat: a trailhead, the kitchen
 Chat: every response is persona- &amp; relationship-conditioned
 Chat: hiking, cooking
 Chat: raining, quiet
-Contest: , and if the objection is dismissed it goes back to exactly that.
-Contest: Adjudicate
-Contest: Approve
-Contest: Check
-Contest: Check a case
-Contest: Contesting a profile
-Contest: Dismiss
-Contest: End it now
-Contest: I am the subject — withdraw my consent
-Contest: I speak for the estate — revoke
-Contest: If a profile here represents you, or somebody whose estate you speak for, this is how you say so.
-Contest: Nothing held.
-Contest: Objecting to a profile does not require joining the platform hosting it: the same form is on the sign-in page, open to anybody. You are seeing it here because you are signed in.
-Contest: Open an objection
-Contest: Open it
-Contest: Opened —
-Contest: Reject
-Contest: Reviewer only — an owner must not decide an objection against their own profile. Upholding terminates the profile and erases its content; dismissing restores what it was.
-Contest: The profile is
-Contest: The proof reference points at an identity check held outside this system — it is not a login, and it is what lets you object without one.
-Contest: Two shortcuts skip review entirely, because a standing party's rights outweigh preserving the profile. Both terminate it immediately, even mid-review. Each applies to one rights basis only — if it is not the one this profile was made under, the refusal says which one it is.
-Contest: Uphold
-Contest: Waiting on you
-Contest: What has happened to this case
-Contest: What this profile said, held for your approval before anybody sees it. Only appears when the profile is set to manual moderation.
-Contest: Your reference:
-Contest: by
-Contest: from this moment — before anybody reviews it. It was
-Contest: objection id
-Contest: sealed
-Contest: the profile's id
-Contest: why — in your own words
-Contest: your proof reference
-Contest: · profile
 Discover: AI
 Discover: Add friend
 Discover: Discover
@@ -328,39 +294,6 @@ Leaving: What leaves, and on what terms
 Leaving: consult
 Leaving: licence buys time with the profile; a licence that permits derivatives lets you build a new agent seeded from its persona, owned by you and marked with where it came from.
 Leaving: the profile to license
-Live: 's —
-Live: . Up to
-Live: A camera, a microphone, a face over a camera. Whatever you put between yourself and the people around you, they are told.
-Live: Lend a microphone
-Live: Lend mine
-Live: Look
-Live: Look at a place
-Live: Refused —
-Live: Share your camera
-Live: Something is recording.
-Live: Start sharing
-Live: Stop
-Live: Take it back
-Live: Take it off
-Live: This is
-Live: We cannot
-Live: Wear it
-Live: Wear something over your face
-Live: What is live here
-Live: Who else is in shot
-Live: Worn or clipped on only:
-Live: You can
-Live: Your camera is on
-Live: by default.
-Live: call it something
-Live: in
-Live: its id
-Live: min ·
-Live: minutes,
-Live: which place
-Live: who watches
-Live: · since
-Live: — hears
 Lobby: . Their link:
 Lobby: A lobby
 Lobby: A real person seats only themselves — an id in a request body is a claim, and the route checks it against the token. Somebody else's profile is a two-party agreement and lives in the lent- skills routes, which ask both sides.
@@ -392,39 +325,6 @@ Lobby: synthetic
 Lobby: synthetic · maturity
 Lobby: take this seat back
 Lobby: the member's id
-Market: Buy
-Market: Different from a listing: a listing sells one thing, this puts the profile itself where people browsing can find it. Tags are how they find it, and the card shows display information only — never anything from inside the persona.
-Market: Find something
-Market: List it
-Market: Listing again replaces the tags and the line rather than adding a second row — one profile is in the directory once.
-Market: Marketplace
-Market: Nothing here.
-Market: Nothing is placed yet. A listing with no place is everywhere, which is the same as nowhere when somebody is looking for help nearby.
-Market: Price
-Market: Put this profile in the directory
-Market: Save
-Market: Search
-Market: Sign in to set this.
-Market: Suggest words
-Market: Towns with listings
-Market: What you have sold
-Market: Where you are looking
-Market: Yours alone, behind your own token. It narrows what you see and nothing else — it does not tell a seller where you are.
-Market: a line about it
-Market: a plumber, a therapist, a tutor…
-Market: anywhere
-Market: for “
-Market: hidden by where you are looking
-Market: left
-Market: listing
-Market: remote counts
-Market: result
-Market: tags, comma separated
-Market: take it out
-Market: this region
-Market: this town
-Market: town
-Market: ”, scope
 Memory: AES-256-GCM · one row per conversation · erase by name
 Memory: Erase all
 Memory: Erase this one

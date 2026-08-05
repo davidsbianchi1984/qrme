@@ -4521,6 +4521,357 @@ const CHROME: Table = {
   "bcn.cost.links": {
     en: "So no screen here opens a scan page on its own. The links on {placements} and on a desk are deliberate presses, and following one adds to the number you were checking. The desk code also has a JSON twin — the same scan shaped for a native app drawing the overlay in place rather than for a browser — and it counts the same.", es: "Así que ninguna pantalla de aquí abre por su cuenta una página de escaneo. Los enlaces de {placements} y los de un mostrador son pulsaciones deliberadas, y seguir uno suma al número que estabas comprobando. El código del mostrador tiene además un gemelo JSON — el mismo escaneo con la forma que necesita una app nativa que dibuja la superposición en el sitio, en vez de un navegador — y cuenta igual.", fr: "Aucun écran ici n'ouvre donc de page de scan de lui-même. Les liens sur {placements} et sur un comptoir sont des pressions délibérées, et en suivre un ajoute au nombre que vous vérifiiez. Le code de comptoir a aussi un jumeau JSON — le même scan mis en forme pour une application native qui dessine la surimpression sur place plutôt que pour un navigateur — et il compte pareil.", de: "Deshalb öffnet hier kein Bildschirm von sich aus eine Scan-Seite. Die Links auf {placements} und an einem Tresen sind bewusste Klicks, und einem zu folgen erhöht genau die Zahl, die Sie geprüft haben. Der Tresen-Code hat außerdem einen JSON-Zwilling — derselbe Scan, geformt für eine native App, die die Überlagerung vor Ort zeichnet, statt für einen Browser — und er zählt genauso.", pt: "Por isso nenhum ecrã aqui abre uma página de digitalização por si próprio. As ligações em {placements} e num balcão são pressões deliberadas, e seguir uma acrescenta ao número que estava a verificar. O código do balcão tem ainda um gémeo JSON — a mesma digitalização com a forma de que precisa uma app nativa que desenha a sobreposição no local, em vez de um navegador — e conta igual.", it: "Perciò nessuna schermata qui apre da sola una pagina di scansione. I link su {placements} e su un banco sono pressioni deliberate, e seguirne uno si aggiunge al numero che stavi controllando. Il codice del banco ha anche un gemello JSON — la stessa scansione modellata per un'app nativa che disegna la sovrapposizione sul posto anziché per un browser — e conta allo stesso modo.", ja: "ですから、ここのどの画面も自分からスキャンのページを開いたりはしません。{placements} 上やデスク上のリンクは、意図して押すものであり、たどればまさにあなたが確かめていた数を増やします。デスクのコードには JSON の双子もあります — ブラウザ向けではなく、その場でオーバーレイを描くネイティブアプリ向けに形を整えた同じスキャンです — こちらも同じように数えられます。", zh: "所以这里没有任何页面会自行打开扫描页。{placements} 上和柜台上的链接都是有意的点击，点进去就会给你正在核对的那个数字加一。柜台的码还有一个 JSON 孪生体——同一次扫描，只是为就地绘制叠加层的原生应用而非浏览器塑形——它同样计数。", hi: "इसलिए यहाँ कोई स्क्रीन अपने आप स्कैन पृष्ठ नहीं खोलती। {placements} पर और किसी डेस्क पर मौजूद लिंक जान-बूझकर दबाए जाते हैं, और एक पर जाना उसी संख्या में जुड़ जाता है जिसे आप जाँच रहे थे। डेस्क कोड का एक JSON जुड़वाँ भी है — वही स्कैन, ब्राउज़र के लिए नहीं बल्कि उस नेटिव ऐप के लिए ढला जो ओवरले वहीं बनाता है — और वह भी उसी तरह गिना जाता है।", ar: "لذا لا تفتح أي شاشة هنا صفحة مسح من تلقاء نفسها. الروابط في {placements} وعلى مكتب ما ضغطات مقصودة، واتّباع أحدها يضيف إلى الرقم الذي كنت تتفقّده. ولرمز المكتب توأم بصيغة JSON — المسحة نفسها مصوغة لتطبيق أصلي يرسم الطبقة في مكانها لا لمتصفح — ويُحسب بالمثل.",
   },
+  "con.title": {
+    en: "Contesting a profile", es: "Impugnar un perfil", fr: "Contester un profil", de: "Einem Profil widersprechen", pt: "Contestar um perfil", it: "Contestare un profilo", ja: "プロフィールに異議を申し立てる", zh: "对一份资料提出异议", hi: "किसी प्रोफ़ाइल पर आपत्ति", ar: "الاعتراض على ملف",
+  },
+  "con.lead": {
+    en: "If a profile here represents you, or somebody whose estate you speak for, this is how you say so.", es: "Si un perfil de aquí le representa a usted, o a alguien cuya herencia usted representa, así es como lo dice.", fr: "Si un profil ici vous représente, ou représente quelqu'un dont vous gérez la succession, voici comment le dire.", de: "Wenn ein Profil hier Sie darstellt, oder jemanden, für dessen Nachlass Sie sprechen, sagen Sie es hier.", pt: "Se um perfil aqui o representa, ou representa alguém por cuja herança você fala, é assim que o diz.", it: "Se un profilo qui rappresenta te, o qualcuno della cui eredità parli, ecco come dirlo.", ja: "ここにあるプロフィールがあなた自身、またはあなたが遺産について代理する人を表しているなら、その旨はここから伝えます。", zh: "如果这里的某份资料代表的是你，或代表你为其遗产发声的人，这里就是你说出来的地方。", hi: "यदि यहाँ की कोई प्रोफ़ाइल आपको, या किसी ऐसे व्यक्ति को दर्शाती है जिसकी संपत्ति के लिए आप बोलते हैं, तो यह कहने का तरीक़ा यही है।", ar: "إن كان ملف هنا يمثّلك، أو يمثّل شخصًا تتحدث باسم تركته، فهذه هي طريقة قول ذلك.",
+  },
+  "con.open": {
+    en: "Open an objection", es: "Presentar una objeción", fr: "Déposer une contestation", de: "Einen Widerspruch eröffnen", pt: "Abrir uma contestação", it: "Apri una contestazione", ja: "異議を申し立てる", zh: "提出异议", hi: "आपत्ति दर्ज करें", ar: "افتح اعتراضًا",
+  },
+  "con.public": {
+    en: "Objecting to a profile does not require joining the platform hosting it: the same form is on the sign-in page, open to anybody. You are seeing it here because you are signed in.", es: "Objetar un perfil no exige unirse a la plataforma que lo aloja: el mismo formulario está en la página de inicio de sesión, abierto a cualquiera. Lo ve aquí porque ha iniciado sesión.", fr: "Contester un profil n'exige pas de rejoindre la plateforme qui l'héberge : le même formulaire est sur la page de connexion, ouvert à tous. Vous le voyez ici parce que vous êtes connecté.", de: "Einem Profil zu widersprechen erfordert nicht, der Plattform beizutreten, die es hostet: dasselbe Formular steht auf der Anmeldeseite, für alle offen. Sie sehen es hier, weil Sie angemeldet sind.", pt: "Contestar um perfil não exige aderir à plataforma que o aloja: o mesmo formulário está na página de início de sessão, aberto a qualquer pessoa. Vê-o aqui porque tem sessão iniciada.", it: "Contestare un profilo non richiede di iscriversi alla piattaforma che lo ospita: lo stesso modulo è nella pagina di accesso, aperto a chiunque. Lo vedi qui perché hai effettuato l'accesso.", ja: "プロフィールに異議を申し立てるのに、それを載せているプラットフォームへ参加する必要はありません。同じフォームはサインインのページにもあり、誰にでも開かれています。ここに見えているのは、あなたがサインインしているからです。", zh: "对一份资料提出异议，并不需要加入托管它的平台：同样的表单就在登录页上，任何人都可使用。你在这里看到它，只是因为你已经登录。", hi: "किसी प्रोफ़ाइल पर आपत्ति करने के लिए उसे होस्ट करने वाले मंच से जुड़ना ज़रूरी नहीं: वही फ़ॉर्म साइन-इन पृष्ठ पर है, सबके लिए खुला। यह आपको यहाँ इसलिए दिख रहा है क्योंकि आप साइन इन हैं।", ar: "الاعتراض على ملف لا يستلزم الانضمام إلى المنصة التي تستضيفه: النموذج نفسه على صفحة تسجيل الدخول، مفتوح للجميع. تراه هنا لأنك مسجّل الدخول.",
+  },
+  "con.pid.ph": {
+    en: "the profile's id", es: "el id del perfil", fr: "l'id du profil", de: "die ID des Profils", pt: "o id do perfil", it: "l'id del profilo", ja: "そのプロフィールのID", zh: "该资料的 ID", hi: "प्रोफ़ाइल की आईडी", ar: "معرّف الملف",
+  },
+  "con.ref.ph": {
+    en: "your proof reference", es: "su referencia de prueba", fr: "votre référence de preuve", de: "Ihr Nachweis-Referenz", pt: "a sua referência de prova", it: "il tuo riferimento di prova", ja: "あなたの証明資料の参照番号", zh: "你的证明凭据编号", hi: "आपका प्रमाण संदर्भ", ar: "مرجع إثباتك",
+  },
+  "con.why.ph": {
+    en: "why — in your own words", es: "por qué — con sus palabras", fr: "pourquoi — dans vos mots", de: "warum — in Ihren Worten", pt: "porquê — nas suas palavras", it: "perché — con parole tue", ja: "理由 — ご自身の言葉で", zh: "为什么——用你自己的话", hi: "क्यों — अपने शब्दों में", ar: "لماذا — بكلماتك أنت",
+  },
+  "con.openit": {
+    en: "Open it", es: "Presentarla", fr: "Déposer", de: "Eröffnen", pt: "Abrir", it: "Apri", ja: "申し立てる", zh: "提出", hi: "दर्ज करें", ar: "افتحه",
+  },
+  "con.proofnote": {
+    en: "The proof reference points at an identity check held outside this system — it is not a login, and it is what lets you object without one.", es: "La referencia de prueba apunta a una verificación de identidad guardada fuera de este sistema — no es un inicio de sesión, y es lo que le permite objetar sin uno.", fr: "La référence de preuve désigne une vérification d'identité conservée hors de ce système — ce n'est pas une connexion, et c'est ce qui vous permet de contester sans en avoir une.", de: "Der Nachweis verweist auf eine Identitätsprüfung außerhalb dieses Systems — es ist keine Anmeldung, und genau deshalb können Sie ohne eine widersprechen.", pt: "A referência de prova aponta para uma verificação de identidade guardada fora deste sistema — não é um início de sessão, e é o que lhe permite contestar sem um.", it: "Il riferimento di prova punta a una verifica d'identità conservata fuori da questo sistema — non è un accesso, ed è ciò che ti permette di contestare senza averne uno.", ja: "この参照番号は、このシステムの外で保管されている本人確認を指します — ログインではありません。そして、ログインなしで異議を申し立てられるのは、まさにそのおかげです。", zh: "证明凭据指向的是保存在本系统之外的一次身份核验——它不是登录凭证，而正是它让你在没有账户的情况下也能提出异议。", hi: "प्रमाण संदर्भ इस प्रणाली के बाहर रखी किसी पहचान-जाँच की ओर इशारा करता है — यह लॉगिन नहीं है, और यही आपको बिना लॉगिन के आपत्ति करने देता है।", ar: "مرجع الإثبات يشير إلى تحقق من الهوية محفوظ خارج هذا النظام — ليس تسجيل دخول، وهو ما يتيح لك الاعتراض دون واحد.",
+  },
+  "con.opened": {
+    en: "Opened — {id}", es: "Presentada — {id}", fr: "Déposée — {id}", de: "Eröffnet — {id}", pt: "Aberta — {id}", it: "Aperta — {id}", ja: "受付 — {id}", zh: "已提出 — {id}", hi: "दर्ज — {id}", ar: "فُتح — {id}",
+  },
+  "con.status": {
+    en: "The profile is {now} from this moment — before anybody reviews it. It was {before}, and if the objection is dismissed it goes back to exactly that.", es: "El perfil queda {now} desde este momento — antes de que nadie lo revise. Era {before}, y si la objeción se desestima vuelve exactamente a eso.", fr: "Le profil est {now} à partir de cet instant — avant que quiconque l'examine. Il était {before}, et si la contestation est rejetée il y revient exactement.", de: "Das Profil ist ab diesem Moment {now} — bevor es jemand prüft. Es war {before}, und wenn der Widerspruch abgewiesen wird, kehrt es genau dorthin zurück.", pt: "O perfil fica {now} a partir deste momento — antes de alguém o rever. Era {before}, e se a contestação for rejeitada volta exatamente a isso.", it: "Il profilo è {now} da questo momento — prima che qualcuno lo esamini. Era {before}, e se la contestazione viene respinta torna esattamente a quello.", ja: "プロフィールはこの瞬間から {now} になります — 誰かが審査するより前にです。それまでは {before} でした。異議が棄却されれば、まさにその状態へ戻ります。", zh: "从此刻起，该资料为 {now}——在任何人审查之前。它此前是 {before}；若异议被驳回，就完全恢复到那个状态。", hi: "इस क्षण से प्रोफ़ाइल {now} है — किसी के समीक्षा करने से पहले ही। यह {before} थी, और यदि आपत्ति खारिज हुई तो ठीक वैसी ही हो जाएगी।", ar: "الملف {now} من هذه اللحظة — قبل أن يراجعه أحد. كان {before}، وإن رُفض الاعتراض عاد إلى ذلك تمامًا.",
+  },
+  "con.check": {
+    en: "Check a case", es: "Consultar un caso", fr: "Vérifier un dossier", de: "Einen Fall prüfen", pt: "Consultar um caso", it: "Controlla un caso", ja: "案件を確認する", zh: "查询一宗案件", hi: "किसी मामले की जाँच", ar: "تفقّد قضية",
+  },
+  "con.oid.ph": {
+    en: "objection id", es: "id de la objeción", fr: "id de la contestation", de: "Widerspruchs-ID", pt: "id da contestação", it: "id della contestazione", ja: "異議のID", zh: "异议 ID", hi: "आपत्ति आईडी", ar: "معرّف الاعتراض",
+  },
+  "con.checkbtn": {
+    en: "Check", es: "Consultar", fr: "Vérifier", de: "Prüfen", pt: "Consultar", it: "Controlla", ja: "確認", zh: "查询", hi: "जाँचें", ar: "تفقّد",
+  },
+  "con.caseline": {
+    en: "{status} · profile {pid}", es: "{status} · perfil {pid}", fr: "{status} · profil {pid}", de: "{status} · Profil {pid}", pt: "{status} · perfil {pid}", it: "{status} · profilo {pid}", ja: "{status} · プロフィール {pid}", zh: "{status} · 资料 {pid}", hi: "{status} · प्रोफ़ाइल {pid}", ar: "{status} · الملف {pid}",
+  },
+  "con.yourref": {
+    en: "Your reference: {ref} · {reattested}", es: "Su referencia: {ref} · {reattested}", fr: "Votre référence : {ref} · {reattested}", de: "Ihre Referenz: {ref} · {reattested}", pt: "A sua referência: {ref} · {reattested}", it: "Il tuo riferimento: {ref} · {reattested}", ja: "あなたの参照番号: {ref} · {reattested}", zh: "你的凭据编号：{ref} · {reattested}", hi: "आपका संदर्भ: {ref} · {reattested}", ar: "مرجعك: {ref} · {reattested}",
+  },
+  "con.reattested": {
+    en: "the owner has re-attested their rights basis", es: "el propietario ha vuelto a acreditar su base de derechos", fr: "le propriétaire a réattesté sa base de droits", de: "der Besitzer hat seine Rechtsgrundlage erneut bestätigt", pt: "o proprietário voltou a atestar a sua base de direitos", it: "il proprietario ha riattestato la propria base di diritti", ja: "所有者は権利の根拠を再度証明しました", zh: "所有者已重新证实其权利依据", hi: "स्वामी ने अपना अधिकार-आधार फिर से प्रमाणित किया", ar: "أعاد المالك إثبات أساس حقوقه",
+  },
+  "con.notreattested": {
+    en: "the owner has not yet re-attested their rights basis", es: "el propietario aún no ha vuelto a acreditar su base de derechos", fr: "le propriétaire n'a pas encore réattesté sa base de droits", de: "der Besitzer hat seine Rechtsgrundlage noch nicht erneut bestätigt", pt: "o proprietário ainda não voltou a atestar a sua base de direitos", it: "il proprietario non ha ancora riattestato la propria base di diritti", ja: "所有者はまだ権利の根拠を再度証明していません", zh: "所有者尚未重新证实其权利依据", hi: "स्वामी ने अभी अपना अधिकार-आधार फिर से प्रमाणित नहीं किया", ar: "لم يُعد المالك بعدُ إثبات أساس حقوقه",
+  },
+  "con.endnow": {
+    en: "End it now", es: "Terminarlo ya", fr: "Y mettre fin maintenant", de: "Jetzt beenden", pt: "Terminar já", it: "Chiudila subito", ja: "今すぐ終わらせる", zh: "立刻终止", hi: "इसे अभी समाप्त करें", ar: "أنهِه الآن",
+  },
+  "con.shortcuts": {
+    en: "Two shortcuts skip review entirely, because a standing party's rights outweigh preserving the profile. Both terminate it immediately, even mid-review. Each applies to one rights basis only — if it is not the one this profile was made under, the refusal says which one it is.", es: "Dos atajos se saltan la revisión por completo, porque los derechos de una parte legitimada pesan más que conservar el perfil. Ambos lo terminan de inmediato, incluso a mitad de revisión. Cada uno se aplica a una sola base de derechos — si no es aquella bajo la que se creó este perfil, la negativa dice cuál es.", fr: "Deux raccourcis sautent entièrement l'examen, car les droits d'une partie ayant qualité l'emportent sur la conservation du profil. Tous deux y mettent fin immédiatement, même en cours d'examen. Chacun ne vaut que pour une base de droits — si ce n'est pas celle sous laquelle ce profil a été créé, le refus dit laquelle c'est.", de: "Zwei Abkürzungen überspringen die Prüfung ganz, weil die Rechte einer klagebefugten Partei schwerer wiegen als der Erhalt des Profils. Beide beenden es sofort, auch mitten in der Prüfung. Jede gilt nur für eine Rechtsgrundlage — ist es nicht die, unter der dieses Profil entstand, nennt die Ablehnung die richtige.", pt: "Dois atalhos saltam a revisão por completo, porque os direitos de uma parte legitimada pesam mais do que preservar o perfil. Ambos o terminam de imediato, mesmo a meio da revisão. Cada um aplica-se a uma só base de direitos — se não for aquela sob a qual este perfil foi feito, a recusa diz qual é.", it: "Due scorciatoie saltano del tutto l'esame, perché i diritti di una parte legittimata pesano più della conservazione del profilo. Entrambe lo terminano subito, anche a esame in corso. Ciascuna vale per una sola base di diritti — se non è quella sotto cui questo profilo è stato creato, il rifiuto dice qual è.", ja: "二つの近道は審査を完全に飛ばします。当事者としての権利は、プロフィールを残すことより重いからです。どちらも、審査の途中であっても直ちに終了させます。それぞれ一つの権利根拠にのみ適用され、このプロフィールが作られた根拠と違えば、拒否がどれなのかを告げます。", zh: "有两条捷径完全跳过审查，因为适格一方的权利重于保全这份资料。两者都会立即终止它，即使审查正在进行。每一条只适用于一种权利依据——若与这份资料创建时所依据的不同，拒绝会说明是哪一种。", hi: "दो शॉर्टकट समीक्षा को पूरी तरह छोड़ देते हैं, क्योंकि किसी वैध पक्ष के अधिकार प्रोफ़ाइल बचाए रखने से भारी हैं। दोनों इसे तुरंत समाप्त कर देते हैं, समीक्षा के बीच में भी। हर एक केवल एक अधिकार-आधार पर लागू होता है — यदि वह वही नहीं जिसके तहत यह प्रोफ़ाइल बनी थी, तो इनकार बता देता है कि वह कौन-सा है।", ar: "طريقان مختصران يتخطيان المراجعة كليًا، لأن حقوق طرف ذي صفة تعلو على الإبقاء على الملف. وكلاهما ينهيه فورًا، ولو في منتصف المراجعة. وكل منهما ينطبق على أساس حقوق واحد فقط — فإن لم يكن الأساس الذي أُنشئ عليه هذا الملف، قال الرفض أيّهما هو.",
+  },
+  "con.subject": {
+    en: "I am the subject — withdraw my consent", es: "Soy el sujeto — retiro mi consentimiento", fr: "Je suis la personne concernée — je retire mon consentement", de: "Ich bin die betroffene Person — Einwilligung zurückziehen", pt: "Sou o sujeito — retiro o meu consentimento", it: "Sono il soggetto — ritiro il mio consenso", ja: "私が本人です — 同意を撤回します", zh: "我就是本人——撤回我的同意", hi: "मैं ही वह व्यक्ति हूँ — अपनी सहमति वापस लेता/लेती हूँ", ar: "أنا المعني — أسحب موافقتي",
+  },
+  "con.estate": {
+    en: "I speak for the estate — revoke", es: "Hablo por la herencia — revocar", fr: "Je représente la succession — révoquer", de: "Ich spreche für den Nachlass — widerrufen", pt: "Falo pela herança — revogar", it: "Parlo per l'eredità — revoca", ja: "私は遺産の代理人です — 取り消します", zh: "我为遗产发声——予以撤销", hi: "मैं संपत्ति के लिए बोलता/बोलती हूँ — निरस्त करें", ar: "أتحدث باسم التركة — ألغِ",
+  },
+  "con.consent.said": {
+    en: "Consent withdrawn.", es: "Consentimiento retirado.", fr: "Consentement retiré.", de: "Einwilligung zurückgezogen.", pt: "Consentimento retirado.", it: "Consenso ritirato.", ja: "同意を撤回しました。", zh: "同意已撤回。", hi: "सहमति वापस ली गई।", ar: "سُحبت الموافقة.",
+  },
+  "con.auth.said": {
+    en: "Authorization revoked.", es: "Autorización revocada.", fr: "Autorisation révoquée.", de: "Autorisierung widerrufen.", pt: "Autorização revogada.", it: "Autorizzazione revocata.", ja: "権限を取り消しました。", zh: "授权已撤销。", hi: "प्राधिकरण निरस्त।", ar: "أُلغي التفويض.",
+  },
+  "con.acted": {
+    en: "{said} The objection is {status}; the profile is {profile}.", es: "{said} La objeción está {status}; el perfil está {profile}.", fr: "{said} La contestation est {status} ; le profil est {profile}.", de: "{said} Der Widerspruch ist {status}; das Profil ist {profile}.", pt: "{said} A contestação está {status}; o perfil está {profile}.", it: "{said} La contestazione è {status}; il profilo è {profile}.", ja: "{said} 異議は {status} です。プロフィールは {profile} です。", zh: "{said} 该异议为 {status}；该资料为 {profile}。", hi: "{said} आपत्ति {status} है; प्रोफ़ाइल {profile} है।", ar: "{said} الاعتراض {status}؛ والملف {profile}.",
+  },
+  "con.happened": {
+    en: "What has happened to this case", es: "Qué le ha pasado a este caso", fr: "Ce qui est arrivé à ce dossier", de: "Was mit diesem Fall geschehen ist", pt: "O que aconteceu a este caso", it: "Cos'è successo a questo caso", ja: "この案件に起きたこと", zh: "这宗案件经历了什么", hi: "इस मामले के साथ क्या हुआ", ar: "ما جرى لهذه القضية",
+  },
+  "con.sealedvault": {
+    en: "Each event below is sealed into the vault, which hash-chains every write — so this timeline is independently tamper-evident.", es: "Cada evento de abajo se sella en la bóveda, que encadena por hash cada escritura — así que esta cronología es verificable contra manipulación de forma independiente.", fr: "Chaque événement ci-dessous est scellé dans le coffre, qui chaîne par hachage chaque écriture — cette chronologie est donc indépendamment inviolable.", de: "Jedes Ereignis unten ist im Tresor versiegelt, der jeden Schreibvorgang per Hash verkettet — diese Chronik ist also unabhängig manipulationssicher nachweisbar.", pt: "Cada evento abaixo é selado no cofre, que encadeia por hash cada escrita — por isso esta cronologia é independentemente à prova de adulteração.", it: "Ogni evento qui sotto è sigillato nel caveau, che concatena per hash ogni scrittura — quindi questa cronologia è indipendentemente a prova di manomissione.", ja: "以下の各出来事は保管庫に封印されます。保管庫はすべての書き込みをハッシュで連鎖させるので、この経過は独立して改竄が判る形になっています。", zh: "下面每一项事件都被封存进保险库，而保险库对每一次写入做哈希链接——因此这条时间线可以独立验证是否被篡改。", hi: "नीचे की हर घटना वॉल्ट में सीलबंद है, जो हर लेखन को हैश-श्रृंखला में जोड़ता है — इसलिए यह समयरेखा स्वतंत्र रूप से छेड़छाड़-प्रमाणित है।", ar: "كل حدث أدناه مختوم في الخزانة التي تسلسل كل كتابة بالتجزئة — فهذا التسلسل الزمني قابل لكشف العبث باستقلال.",
+  },
+  "con.novault": {
+    en: "No vault is configured on this deployment, so these events are recorded but not hash-chained. The timeline is the timeline; it is not independently tamper-evident.", es: "No hay bóveda configurada en esta instalación, así que estos eventos quedan registrados pero no encadenados por hash. La cronología es la cronología; no es verificable de forma independiente contra manipulación.", fr: "Aucun coffre n'est configuré sur cette installation, ces événements sont donc consignés mais non chaînés par hachage. La chronologie est la chronologie ; elle n'est pas indépendamment inviolable.", de: "Auf dieser Installation ist kein Tresor konfiguriert, diese Ereignisse werden also verzeichnet, aber nicht per Hash verkettet. Die Chronik ist die Chronik; sie ist nicht unabhängig manipulationssicher.", pt: "Não há cofre configurado nesta instalação, por isso estes eventos são registados mas não encadeados por hash. A cronologia é a cronologia; não é independentemente à prova de adulteração.", it: "Su questa installazione non è configurato alcun caveau, quindi questi eventi sono registrati ma non concatenati per hash. La cronologia è la cronologia; non è indipendentemente a prova di manomissione.", ja: "この環境には保管庫が設定されていないため、これらの出来事は記録されますがハッシュで連鎖はしません。経過は経過であって、独立して改竄が判るものではありません。", zh: "本部署未配置保险库，因此这些事件只是被记录，并未做哈希链接。时间线就是时间线；它无法独立验证是否被篡改。", hi: "इस परिनियोजन में कोई वॉल्ट विन्यस्त नहीं है, इसलिए ये घटनाएँ दर्ज तो होती हैं पर हैश-श्रृंखला में नहीं। समयरेखा बस समयरेखा है; यह स्वतंत्र रूप से छेड़छाड़-प्रमाणित नहीं।", ar: "لا خزانة مهيأة في هذا التنصيب، فهذه الأحداث مسجّلة لا مُسلسَلة بالتجزئة. التسلسل الزمني تسلسل زمني؛ وليس قابلًا لكشف العبث باستقلال.",
+  },
+  "con.event": {
+    en: "{event} by {who} — {at}", es: "{event} por {who} — {at}", fr: "{event} par {who} — {at}", de: "{event} von {who} — {at}", pt: "{event} por {who} — {at}", it: "{event} da {who} — {at}", ja: "{event} — {who} により {at}", zh: "{event}，由 {who} 于 {at}", hi: "{event} — {who} द्वारा {at}", ar: "{event} بواسطة {who} — {at}",
+  },
+  "con.sealed": {
+    en: "sealed", es: "sellado", fr: "scellé", de: "versiegelt", pt: "selado", it: "sigillato", ja: "封印済み", zh: "已封存", hi: "सीलबंद", ar: "مختوم",
+  },
+  "con.adjudicate": {
+    en: "Adjudicate", es: "Resolver", fr: "Trancher", de: "Entscheiden", pt: "Decidir", it: "Decidi", ja: "裁定する", zh: "裁决", hi: "निर्णय दें", ar: "افصِل",
+  },
+  "con.reviewer": {
+    en: "Reviewer only — an owner must not decide an objection against their own profile. Upholding terminates the profile and erases its content; dismissing restores what it was.", es: "Solo el revisor — un propietario no debe decidir una objeción contra su propio perfil. Estimarla termina el perfil y borra su contenido; desestimarla restaura lo que era.", fr: "Vérificateur uniquement — un propriétaire ne doit pas trancher une contestation visant son propre profil. L'accueillir met fin au profil et efface son contenu ; la rejeter restaure ce qu'il était.", de: "Nur Prüfer — ein Besitzer darf einen Widerspruch gegen das eigene Profil nicht entscheiden. Stattgeben beendet das Profil und löscht seinen Inhalt; Abweisen stellt wieder her, was es war.", pt: "Só o revisor — um proprietário não deve decidir uma contestação contra o seu próprio perfil. Deferir termina o perfil e apaga o seu conteúdo; indeferir restaura o que era.", it: "Solo il revisore — un proprietario non deve decidere una contestazione contro il proprio profilo. Accoglierla termina il profilo e ne cancella il contenuto; respingerla ripristina ciò che era.", ja: "審査者のみ — 所有者が自分のプロフィールに対する異議を裁定してはなりません。認容はプロフィールを終了させ、その内容を消去します。棄却は元の状態に戻します。", zh: "仅限审核者——所有者不得裁决针对自己资料的异议。支持异议会终止该资料并抹除其内容；驳回则恢复原状。", hi: "केवल समीक्षक — कोई स्वामी अपनी ही प्रोफ़ाइल के विरुद्ध आपत्ति का निर्णय न करे। स्वीकार करने पर प्रोफ़ाइल समाप्त होकर उसकी सामग्री मिट जाती है; खारिज करने पर वह पहले जैसी बहाल हो जाती है।", ar: "للمراجع وحده — لا يجوز لمالك أن يفصل في اعتراض على ملفه هو. القبول يُنهي الملف ويمحو محتواه؛ والرفض يعيده إلى ما كان.",
+  },
+  "con.uphold": {
+    en: "Uphold", es: "Estimar", fr: "Accueillir", de: "Stattgeben", pt: "Deferir", it: "Accogli", ja: "認容", zh: "支持", hi: "स्वीकारें", ar: "اقبل",
+  },
+  "con.upheld.said": {
+    en: "Upheld.", es: "Estimada.", fr: "Accueillie.", de: "Stattgegeben.", pt: "Deferida.", it: "Accolta.", ja: "認容しました。", zh: "已支持。", hi: "स्वीकृत।", ar: "قُبل.",
+  },
+  "con.dismiss": {
+    en: "Dismiss", es: "Desestimar", fr: "Rejeter", de: "Abweisen", pt: "Indeferir", it: "Respingi", ja: "棄却", zh: "驳回", hi: "खारिज करें", ar: "ارفض",
+  },
+  "con.dismissed.said": {
+    en: "Dismissed.", es: "Desestimada.", fr: "Rejetée.", de: "Abgewiesen.", pt: "Indeferida.", it: "Respinta.", ja: "棄却しました。", zh: "已驳回。", hi: "खारिज।", ar: "رُفض.",
+  },
+  "con.waiting": {
+    en: "Waiting on you", es: "Esperándole a usted", fr: "En attente de vous", de: "Wartet auf Sie", pt: "À sua espera", it: "In attesa di te", ja: "あなた待ち", zh: "等你处理", hi: "आपकी प्रतीक्षा में", ar: "بانتظارك",
+  },
+  "con.waiting.pitch": {
+    en: "What this profile said, held for your approval before anybody sees it. Only appears when the profile is set to manual moderation.", es: "Lo que dijo este perfil, retenido para su aprobación antes de que nadie lo vea. Solo aparece cuando el perfil está en moderación manual.", fr: "Ce que ce profil a dit, retenu pour votre approbation avant que quiconque le voie. N'apparaît que si le profil est en modération manuelle.", de: "Was dieses Profil gesagt hat, zurückgehalten für Ihre Freigabe, bevor es jemand sieht. Erscheint nur, wenn das Profil auf manuelle Moderation gesetzt ist.", pt: "O que este perfil disse, retido para a sua aprovação antes de alguém o ver. Só aparece quando o perfil está em moderação manual.", it: "Ciò che questo profilo ha detto, trattenuto per la tua approvazione prima che qualcuno lo veda. Compare solo se il profilo è in moderazione manuale.", ja: "このプロフィールが言ったことを、誰かの目に触れる前にあなたの承認待ちとして保留しています。プロフィールが手動審査に設定されているときだけ現れます。", zh: "这份资料所说的话，在任何人看到之前先留待你批准。仅当资料被设为人工审核时才会出现。", hi: "इस प्रोफ़ाइल ने जो कहा, वह किसी के देखने से पहले आपकी स्वीकृति हेतु रोका गया है। यह केवल तब दिखता है जब प्रोफ़ाइल मैनुअल मॉडरेशन पर हो।", ar: "ما قاله هذا الملف، محتجزًا بانتظار موافقتك قبل أن يراه أحد. لا يظهر إلا إذا كان الملف مضبوطًا على المراجعة اليدوية.",
+  },
+  "con.nothingheld": {
+    en: "Nothing held.", es: "Nada retenido.", fr: "Rien de retenu.", de: "Nichts zurückgehalten.", pt: "Nada retido.", it: "Niente trattenuto.", ja: "保留中のものはありません。", zh: "没有留置内容。", hi: "कुछ नहीं रोका गया।", ar: "لا شيء محتجز.",
+  },
+  "con.approve": {
+    en: "Approve", es: "Aprobar", fr: "Approuver", de: "Freigeben", pt: "Aprovar", it: "Approva", ja: "承認", zh: "批准", hi: "स्वीकृत करें", ar: "وافِق",
+  },
+  "con.approved.said": {
+    en: "Approved.", es: "Aprobado.", fr: "Approuvé.", de: "Freigegeben.", pt: "Aprovado.", it: "Approvato.", ja: "承認しました。", zh: "已批准。", hi: "स्वीकृत।", ar: "تمت الموافقة.",
+  },
+  "con.reject": {
+    en: "Reject", es: "Rechazar", fr: "Rejeter", de: "Ablehnen", pt: "Rejeitar", it: "Rifiuta", ja: "却下", zh: "拒绝", hi: "अस्वीकारें", ar: "ارفض",
+  },
+  "con.rejected.said": {
+    en: "Rejected.", es: "Rechazado.", fr: "Rejeté.", de: "Abgelehnt.", pt: "Rejeitado.", it: "Rifiutato.", ja: "却下しました。", zh: "已拒绝。", hi: "अस्वीकृत।", ar: "رُفض.",
+  },
+  "liv.title": {
+    en: "What is live here", es: "Qué está en directo aquí", fr: "Ce qui est en direct ici", de: "Was hier live ist", pt: "O que está em direto aqui", it: "Cosa è in diretta qui", ja: "ここで生中継されているもの", zh: "此处正在直播什么", hi: "यहाँ क्या लाइव है", ar: "ما هو مباشر هنا",
+  },
+  "liv.lead": {
+    en: "A camera, a microphone, a face over a camera. Whatever you put between yourself and the people around you, they are told.", es: "Una cámara, un micrófono, una cara sobre una cámara. Lo que sea que ponga entre usted y la gente a su alrededor, a ellos se les dice.", fr: "Une caméra, un microphone, un visage par-dessus une caméra. Quoi que vous placiez entre vous et les gens autour de vous, on le leur dit.", de: "Eine Kamera, ein Mikrofon, ein Gesicht über einer Kamera. Was immer Sie zwischen sich und die Menschen um Sie herum stellen — es wird ihnen gesagt.", pt: "Uma câmara, um microfone, um rosto sobre uma câmara. O que quer que ponha entre si e as pessoas à sua volta, elas são informadas.", it: "Una telecamera, un microfono, un volto sopra una telecamera. Qualunque cosa metti tra te e le persone intorno a te, a loro viene detto.", ja: "カメラ、マイク、カメラの上に重ねる顔。自分と周りの人たちのあいだに何を置こうと、そのことは相手に伝えられます。", zh: "一台摄像头、一支麦克风、覆在摄像头上的一张脸。无论你在自己与周围的人之间放了什么，他们都会被告知。", hi: "एक कैमरा, एक माइक्रोफ़ोन, कैमरे पर चढ़ा एक चेहरा। आप अपने और आसपास के लोगों के बीच जो भी रखें, उन्हें बता दिया जाता है।", ar: "كاميرا، وميكروفون، ووجه فوق كاميرا. أيًّا كان ما تضعه بينك وبين من حولك، يُخبَرون به.",
+  },
+  "liv.share": {
+    en: "Share your camera", es: "Compartir tu cámara", fr: "Partager votre caméra", de: "Ihre Kamera teilen", pt: "Partilhar a sua câmara", it: "Condividi la tua telecamera", ja: "カメラを共有する", zh: "共享你的摄像头", hi: "अपना कैमरा साझा करें", ar: "شارك كاميرتك",
+  },
+  "liv.subjectline": {
+    en: "{means} — {risk}", es: "{means} — {risk}", fr: "{means} — {risk}", de: "{means} — {risk}", pt: "{means} — {risk}", it: "{means} — {risk}", ja: "{means} — {risk}", zh: "{means} — {risk}", hi: "{means} — {risk}", ar: "{means} — {risk}",
+  },
+  "liv.who.ph": {
+    en: "who watches", es: "quién mira", fr: "qui regarde", de: "wer zusieht", pt: "quem vê", it: "chi guarda", ja: "誰が見るか", zh: "谁在看", hi: "कौन देखता है", ar: "من يشاهد",
+  },
+  "liv.where.ph": {
+    en: "which place", es: "qué lugar", fr: "quel lieu", de: "welcher Ort", pt: "que lugar", it: "quale luogo", ja: "どの場所", zh: "哪个地点", hi: "कौन-सी जगह", ar: "أي مكان",
+  },
+  "liv.startsharing": {
+    en: "Start sharing", es: "Empezar a compartir", fr: "Commencer à partager", de: "Teilen starten", pt: "Começar a partilhar", it: "Inizia a condividere", ja: "共有を始める", zh: "开始共享", hi: "साझा करना शुरू करें", ar: "ابدأ المشاركة",
+  },
+  "liv.livenow.said": {
+    en: "Live. Your own screen shows it for the whole time.", es: "En directo. Su propia pantalla lo muestra todo el tiempo.", fr: "En direct. Votre propre écran l'affiche pendant toute la durée.", de: "Live. Ihr eigener Bildschirm zeigt es die ganze Zeit.", pt: "Em direto. O seu próprio ecrã mostra-o durante todo o tempo.", it: "In diretta. Il tuo stesso schermo lo mostra per tutto il tempo.", ja: "配信中です。あなた自身の画面にも、そのあいだずっと表示されます。", zh: "正在直播。你自己的屏幕全程都会显示它。", hi: "लाइव। आपकी अपनी स्क्रीन पूरे समय इसे दिखाती रहेगी।", ar: "مباشر. وشاشتك أنت تعرضه طوال الوقت.",
+  },
+  "liv.upto": {
+    en: "{surface}. Up to {n} minutes, {rec} by default.", es: "{surface}. Hasta {n} minutos, {rec} por defecto.", fr: "{surface}. Jusqu'à {n} minutes, {rec} par défaut.", de: "{surface}. Bis zu {n} Minuten, standardmäßig {rec}.", pt: "{surface}. Até {n} minutos, {rec} por omissão.", it: "{surface}. Fino a {n} minuti, {rec} per impostazione predefinita.", ja: "{surface}。最大 {n} 分、既定では{rec}。", zh: "{surface}。最长 {n} 分钟，默认{rec}。", hi: "{surface}। अधिकतम {n} मिनट, डिफ़ॉल्ट रूप से {rec}।", ar: "{surface}. حتى {n} دقيقة، و{rec} افتراضيًا.",
+  },
+  "liv.recording": {
+    en: "recording", es: "grabando", fr: "enregistre", de: "zeichnet auf", pt: "a gravar", it: "registra", ja: "録画あり", zh: "会录制", hi: "रिकॉर्डिंग", ar: "يسجّل",
+  },
+  "liv.notrecording": {
+    en: "not recording", es: "sin grabar", fr: "n'enregistre pas", de: "zeichnet nicht auf", pt: "sem gravar", it: "non registra", ja: "録画なし", zh: "不录制", hi: "रिकॉर्डिंग नहीं", ar: "لا يسجّل",
+  },
+  "liv.bystanders": {
+    en: "Who else is in shot", es: "Quién más sale en el plano", fr: "Qui d'autre est dans le champ", de: "Wer sonst im Bild ist", pt: "Quem mais está no enquadramento", it: "Chi altro è nell'inquadratura", ja: "ほかに誰が写るか", zh: "镜头里还有谁", hi: "फ़्रेम में और कौन है", ar: "من غيرك في الصورة",
+  },
+  "liv.wecannot": {
+    en: "We cannot {what}.", es: "No podemos {what}.", fr: "Nous ne pouvons pas {what}.", de: "Wir können {what} nicht.", pt: "Não podemos {what}.", it: "Non possiamo {what}.", ja: "私たちには{what}できません。", zh: "我们无法{what}。", hi: "हम {what} नहीं कर सकते।", ar: "لا نستطيع {what}.",
+  },
+  "liv.youcan": {
+    en: "You can {what}.", es: "Usted puede {what}.", fr: "Vous pouvez {what}.", de: "Sie können {what}.", pt: "Você pode {what}.", it: "Tu puoi {what}.", ja: "あなたは{what}できます。", zh: "你可以{what}。", hi: "आप {what} कर सकते हैं।", ar: "تستطيع أن {what}.",
+  },
+  "liv.camon": {
+    en: "Your camera is on", es: "Su cámara está encendida", fr: "Votre caméra est allumée", de: "Ihre Kamera ist an", pt: "A sua câmara está ligada", it: "La tua telecamera è accesa", ja: "カメラが入っています", zh: "你的摄像头开着", hi: "आपका कैमरा चालू है", ar: "كاميرتك تعمل",
+  },
+  "liv.camline": {
+    en: "in {surface} {id} · {minutes} min · {rec}", es: "en {surface} {id} · {minutes} min · {rec}", fr: "dans {surface} {id} · {minutes} min · {rec}", de: "in {surface} {id} · {minutes} Min · {rec}", pt: "em {surface} {id} · {minutes} min · {rec}", it: "in {surface} {id} · {minutes} min · {rec}", ja: "{surface} {id} にて · {minutes}分 · {rec}", zh: "位于 {surface} {id} · {minutes} 分钟 · {rec}", hi: "{surface} {id} में · {minutes} मिन · {rec}", ar: "في {surface} {id} · {minutes} دقيقة · {rec}",
+  },
+  "liv.stop": {
+    en: "Stop", es: "Parar", fr: "Arrêter", de: "Beenden", pt: "Parar", it: "Ferma", ja: "止める", zh: "停止", hi: "रोकें", ar: "أوقف",
+  },
+  "liv.stopped.said": {
+    en: "Stopped.", es: "Parado.", fr: "Arrêté.", de: "Beendet.", pt: "Parado.", it: "Fermato.", ja: "止めました。", zh: "已停止。", hi: "रुक गया।", ar: "تم الإيقاف.",
+  },
+  "liv.lookplace": {
+    en: "Look at a place", es: "Mirar un lugar", fr: "Regarder un lieu", de: "Einen Ort ansehen", pt: "Ver um lugar", it: "Guarda un luogo", ja: "場所を見る", zh: "查看一个地点", hi: "किसी जगह को देखें", ar: "انظر إلى مكان",
+  },
+  "liv.id.ph": {
+    en: "its id", es: "su id", fr: "son id", de: "seine ID", pt: "o seu id", it: "il suo id", ja: "その ID", zh: "它的 ID", hi: "इसकी आईडी", ar: "معرّفه",
+  },
+  "liv.look": {
+    en: "Look", es: "Mirar", fr: "Regarder", de: "Ansehen", pt: "Ver", it: "Guarda", ja: "見る", zh: "查看", hi: "देखें", ar: "انظر",
+  },
+  "liv.whose": {
+    en: "This is {who}'s — {is}.", es: "Esto es de {who} — {is}.", fr: "Ceci est à {who} — {is}.", de: "Das gehört {who} — {is}.", pt: "Isto é de {who} — {is}.", it: "Questo è di {who} — {is}.", ja: "これは {who} のものです — {is}。", zh: "这是 {who} 的 — {is}。", hi: "यह {who} का है — {is}।", ar: "هذا لـ {who} — {is}.",
+  },
+  "liv.somethingrec": {
+    en: "Something is recording.", es: "Algo está grabando.", fr: "Quelque chose enregistre.", de: "Etwas zeichnet auf.", pt: "Algo está a gravar.", it: "Qualcosa sta registrando.", ja: "何かが録画しています。", zh: "有东西正在录制。", hi: "कुछ रिकॉर्ड हो रहा है।", ar: "ثمة شيء يسجّل.",
+  },
+  "liv.lendmic": {
+    en: "Lend a microphone", es: "Prestar un micrófono", fr: "Prêter un microphone", de: "Ein Mikrofon leihen", pt: "Emprestar um microfone", it: "Presta un microfono", ja: "マイクを貸す", zh: "借出一支麦克风", hi: "एक माइक्रोफ़ोन उधार दें", ar: "أعِر ميكروفونًا",
+  },
+  "liv.worn": {
+    en: "Worn or clipped on only: {what}.", es: "Solo de llevar puesto o con pinza: {what}.", fr: "Porté ou clipsé uniquement : {what}.", de: "Nur getragen oder angeclipst: {what}.", pt: "Só para usar ao corpo ou com mola: {what}.", it: "Solo indossati o con clip: {what}.", ja: "身につけるか留めるものだけ: {what}。", zh: "只限佩戴或夹在身上的：{what}。", hi: "केवल पहने या क्लिप किए जाने वाले: {what}।", ar: "المحمول على الجسم أو المشبوك فقط: {what}.",
+  },
+  "liv.refused": {
+    en: "Refused — {kinds} — {why}", es: "Rechazados — {kinds} — {why}", fr: "Refusés — {kinds} — {why}", de: "Abgelehnt — {kinds} — {why}", pt: "Recusados — {kinds} — {why}", it: "Rifiutati — {kinds} — {why}", ja: "拒否 — {kinds} — {why}", zh: "已拒绝 — {kinds} — {why}", hi: "अस्वीकृत — {kinds} — {why}", ar: "مرفوض — {kinds} — {why}",
+  },
+  "liv.micline": {
+    en: "{gain} — hears {hears} · since {since}", es: "{gain} — oye {hears} · desde {since}", fr: "{gain} — entend {hears} · depuis {since}", de: "{gain} — hört {hears} · seit {since}", pt: "{gain} — ouve {hears} · desde {since}", it: "{gain} — sente {hears} · da {since}", ja: "{gain} — {hears} を拾う · {since} から", zh: "{gain} — 能听到 {hears} · 自 {since} 起", hi: "{gain} — {hears} सुनता है · {since} से", ar: "{gain} — يسمع {hears} · منذ {since}",
+  },
+  "liv.takeback": {
+    en: "Take it back", es: "Recuperarlo", fr: "Le reprendre", de: "Zurücknehmen", pt: "Retomá-lo", it: "Riprendilo", ja: "返してもらう", zh: "收回", hi: "वापस लें", ar: "استردّه",
+  },
+  "liv.takenback.said": {
+    en: "Taken back.", es: "Recuperado.", fr: "Repris.", de: "Zurückgenommen.", pt: "Retomado.", it: "Ripreso.", ja: "返してもらいました。", zh: "已收回。", hi: "वापस ले लिया गया।", ar: "استُرد.",
+  },
+  "liv.lendmine": {
+    en: "Lend mine", es: "Prestar el mío", fr: "Prêter le mien", de: "Meins leihen", pt: "Emprestar o meu", it: "Presta il mio", ja: "自分のを貸す", zh: "借出我的", hi: "मेरा उधार दें", ar: "أعِر ميكروفوني",
+  },
+  "liv.wear": {
+    en: "Wear something over your face", es: "Ponerse algo sobre la cara", fr: "Porter quelque chose sur votre visage", de: "Etwas über dem Gesicht tragen", pt: "Usar algo sobre o rosto", it: "Indossa qualcosa sul viso", ja: "顔の上に何かをまとう", zh: "在脸上戴点什么", hi: "अपने चेहरे पर कुछ पहनें", ar: "ارتدِ شيئًا فوق وجهك",
+  },
+  "liv.callit.ph": {
+    en: "call it something", es: "ponle un nombre", fr: "donnez-lui un nom", de: "nennen Sie es irgendwie", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "起个名字", hi: "इसे कोई नाम दें", ar: "سمّه بشيء",
+  },
+  "liv.wearit": {
+    en: "Wear it", es: "Ponérselo", fr: "Le porter", de: "Aufsetzen", pt: "Usá-lo", it: "Indossalo", ja: "まとう", zh: "戴上", hi: "पहनें", ar: "ارتدِه",
+  },
+  "liv.takeoff": {
+    en: "Take it off", es: "Quitárselo", fr: "L'enlever", de: "Abnehmen", pt: "Tirá-lo", it: "Toglilo", ja: "外す", zh: "取下", hi: "उतारें", ar: "انزعه",
+  },
+  "liv.takenoff.said": {
+    en: "Taken off.", es: "Quitado.", fr: "Enlevé.", de: "Abgenommen.", pt: "Tirado.", it: "Tolto.", ja: "外しました。", zh: "已取下。", hi: "उतार दिया गया।", ar: "نُزع.",
+  },
+  "mkt.title": {
+    en: "Marketplace", es: "Mercado", fr: "Place de marché", de: "Marktplatz", pt: "Mercado", it: "Mercato", ja: "マーケットプレイス", zh: "市集", hi: "बाज़ार", ar: "السوق",
+  },
+  "mkt.find": {
+    en: "Find something", es: "Buscar algo", fr: "Trouver quelque chose", de: "Etwas finden", pt: "Encontrar algo", it: "Trova qualcosa", ja: "何かを探す", zh: "找点什么", hi: "कुछ खोजें", ar: "ابحث عن شيء",
+  },
+  "mkt.q.ph": {
+    en: "a plumber, a therapist, a tutor…", es: "un fontanero, un terapeuta, un tutor…", fr: "un plombier, un thérapeute, un tuteur…", de: "Klempner, Therapeutin, Nachhilfe…", pt: "um canalizador, um terapeuta, um explicador…", it: "un idraulico, un terapeuta, un tutor…", ja: "配管工、セラピスト、家庭教師…", zh: "水管工、心理咨询师、家教…", hi: "एक प्लंबर, एक चिकित्सक, एक शिक्षक…", ar: "سبّاك، معالج، مدرّس خصوصي…",
+  },
+  "mkt.search": {
+    en: "Search", es: "Buscar", fr: "Rechercher", de: "Suchen", pt: "Pesquisar", it: "Cerca", ja: "検索", zh: "搜索", hi: "खोजें", ar: "ابحث",
+  },
+  "mkt.suggest": {
+    en: "Suggest words", es: "Sugerir palabras", fr: "Suggérer des mots", de: "Wörter vorschlagen", pt: "Sugerir palavras", it: "Suggerisci parole", ja: "言葉を提案", zh: "推荐词语", hi: "शब्द सुझाएँ", ar: "اقترح كلمات",
+  },
+  "mkt.results": {
+    en: "{n} results for “{q}”, scope {scope}", es: "{n} resultados para «{q}», ámbito {scope}", fr: "{n} résultats pour « {q} », portée {scope}", de: "{n} Ergebnisse für „{q}“, Bereich {scope}", pt: "{n} resultados para «{q}», âmbito {scope}", it: "{n} risultati per «{q}», ambito {scope}", ja: "「{q}」の結果 {n}件、範囲 {scope}", zh: "“{q}” 的 {n} 条结果，范围 {scope}", hi: "“{q}” के लिए {n} परिणाम, दायरा {scope}", ar: "{n} نتائج لـ«{q}»، النطاق {scope}",
+  },
+  "mkt.result": {
+    en: "{n} result for “{q}”, scope {scope}", es: "{n} resultado para «{q}», ámbito {scope}", fr: "{n} résultat pour « {q} », portée {scope}", de: "{n} Ergebnis für „{q}“, Bereich {scope}", pt: "{n} resultado para «{q}», âmbito {scope}", it: "{n} risultato per «{q}», ambito {scope}", ja: "「{q}」の結果 {n}件、範囲 {scope}", zh: "“{q}” 的 {n} 条结果，范围 {scope}", hi: "“{q}” के लिए {n} परिणाम, दायरा {scope}", ar: "نتيجة {n} لـ«{q}»، النطاق {scope}",
+  },
+  "mkt.hidden": {
+    en: " · {n} hidden by where you are looking", es: " · {n} ocultos por dónde está buscando", fr: " · {n} masqués par l'endroit où vous cherchez", de: " · {n} ausgeblendet durch Ihren Suchort", pt: " · {n} ocultos por onde está a procurar", it: " · {n} nascosti da dove stai cercando", ja: " · あなたの検索範囲により {n}件を非表示", zh: " · 因你所设定的查找范围而隐藏了 {n} 条", hi: " · आप जहाँ खोज रहे हैं उसके कारण {n} छिपे", ar: " · {n} مخفية بسبب موضع بحثك",
+  },
+  "mkt.hdr.results": {
+    en: "Results", es: "Resultados", fr: "Résultats", de: "Ergebnisse", pt: "Resultados", it: "Risultati", ja: "結果", zh: "结果", hi: "परिणाम", ar: "النتائج",
+  },
+  "mkt.hdr.all": {
+    en: "Everything listed", es: "Todo lo publicado", fr: "Tout ce qui est en vente", de: "Alles Eingestellte", pt: "Tudo o que está listado", it: "Tutto ciò che è in elenco", ja: "掲載されているすべて", zh: "所有已上架的", hi: "सूचीबद्ध सब कुछ", ar: "كل المعروض",
+  },
+  "mkt.nothinghere": {
+    en: "Nothing here.", es: "Nada aquí.", fr: "Rien ici.", de: "Nichts hier.", pt: "Nada aqui.", it: "Niente qui.", ja: "ここには何もありません。", zh: "这里没有内容。", hi: "यहाँ कुछ नहीं।", ar: "لا شيء هنا.",
+  },
+  "mkt.price": {
+    en: "Price", es: "Precio", fr: "Prix", de: "Preis", pt: "Preço", it: "Prezzo", ja: "価格", zh: "价格", hi: "दाम", ar: "السعر",
+  },
+  "mkt.left": {
+    en: " · {n} left", es: " · quedan {n}", fr: " · {n} restants", de: " · noch {n}", pt: " · restam {n}", it: " · ne restano {n}", ja: " · 残り{n}", zh: " · 剩 {n}", hi: " · {n} बचे", ar: " · بقي {n}",
+  },
+  "mkt.buy": {
+    en: "Buy", es: "Comprar", fr: "Acheter", de: "Kaufen", pt: "Comprar", it: "Compra", ja: "買う", zh: "购买", hi: "ख़रीदें", ar: "اشترِ",
+  },
+  "mkt.bought.said": {
+    en: "Bought — order {id}, {status}. {payment}", es: "Comprado — pedido {id}, {status}. {payment}", fr: "Acheté — commande {id}, {status}. {payment}", de: "Gekauft — Bestellung {id}, {status}. {payment}", pt: "Comprado — encomenda {id}, {status}. {payment}", it: "Comprato — ordine {id}, {status}. {payment}", ja: "購入しました — 注文 {id}、{status}。{payment}", zh: "已购买 — 订单 {id}，{status}。{payment}", hi: "ख़रीदा गया — ऑर्डर {id}, {status}। {payment}", ar: "تم الشراء — الطلب {id}، {status}. {payment}",
+  },
+  "mkt.where": {
+    en: "Where you are looking", es: "Dónde está buscando", fr: "Où vous cherchez", de: "Wo Sie suchen", pt: "Onde está a procurar", it: "Dove stai cercando", ja: "どこを探しているか", zh: "你在哪里查找", hi: "आप कहाँ खोज रहे हैं", ar: "أين تبحث",
+  },
+  "mkt.signin": {
+    en: "Sign in to set this.", es: "Inicie sesión para ajustarlo.", fr: "Connectez-vous pour le régler.", de: "Melden Sie sich an, um das zu setzen.", pt: "Inicie sessão para definir isto.", it: "Accedi per impostarlo.", ja: "設定するにはサインインしてください。", zh: "请登录以进行设置。", hi: "इसे तय करने के लिए साइन इन करें।", ar: "سجّل الدخول لضبط هذا.",
+  },
+  "mkt.town.ph": {
+    en: "town", es: "localidad", fr: "commune", de: "Ort", pt: "localidade", it: "comune", ja: "市区町村", zh: "城镇", hi: "क़स्बा", ar: "البلدة",
+  },
+  "mkt.anywhere": {
+    en: "anywhere", es: "en cualquier sitio", fr: "n'importe où", de: "überall", pt: "em qualquer lugar", it: "ovunque", ja: "どこでも", zh: "不限地点", hi: "कहीं भी", ar: "في أي مكان",
+  },
+  "mkt.thistown": {
+    en: "this town", es: "esta localidad", fr: "cette commune", de: "dieser Ort", pt: "esta localidade", it: "questo comune", ja: "この市区町村", zh: "本城镇", hi: "यही क़स्बा", ar: "هذه البلدة",
+  },
+  "mkt.thisregion": {
+    en: "this region", es: "esta región", fr: "cette région", de: "diese Region", pt: "esta região", it: "questa regione", ja: "この地域", zh: "本地区", hi: "यही क्षेत्र", ar: "هذه المنطقة",
+  },
+  "mkt.remote": {
+    en: "remote counts", es: "cuenta lo remoto", fr: "le à distance compte", de: "aus der Ferne zählt mit", pt: "conta o remoto", it: "conta anche a distanza", ja: "リモートも含める", zh: "远程也算", hi: "दूरस्थ भी गिना जाए", ar: "يُحتسب عن بُعد",
+  },
+  "mkt.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "احفظ",
+  },
+  "mkt.saved.said": {
+    en: "Saved.", es: "Guardado.", fr: "Enregistré.", de: "Gespeichert.", pt: "Guardado.", it: "Salvato.", ja: "保存しました。", zh: "已保存。", hi: "सहेज लिया गया।", ar: "حُفظ.",
+  },
+  "mkt.yoursalone": {
+    en: "Yours alone, behind your own token. It narrows what you see and nothing else — it does not tell a seller where you are.", es: "Solo suyo, tras su propio token. Estrecha lo que usted ve y nada más — no le dice a ningún vendedor dónde está.", fr: "À vous seul, derrière votre propre jeton. Cela restreint ce que vous voyez et rien d'autre — cela ne dit pas à un vendeur où vous êtes.", de: "Nur Ihres, hinter Ihrem eigenen Token. Es engt ein, was Sie sehen, und sonst nichts — es verrät keinem Verkäufer, wo Sie sind.", pt: "Só seu, atrás do seu próprio token. Estreita o que você vê e nada mais — não diz a nenhum vendedor onde você está.", it: "Solo tuo, dietro il tuo token. Restringe ciò che vedi e nient'altro — non dice a un venditore dove sei.", ja: "あなただけのもので、あなた自身のトークンの向こうにあります。見えるものを絞るだけで、それ以上のことはしません — 出品者にあなたの居場所を伝えたりはしません。", zh: "只属于你，藏在你自己的令牌之后。它只是收窄你看到的范围，别无其他——它不会告诉卖家你在哪里。", hi: "केवल आपका, आपके अपने टोकन के पीछे। यह बस यह सीमित करता है कि आपको क्या दिखे, और कुछ नहीं — यह किसी विक्रेता को आपका ठिकाना नहीं बताता।", ar: "لك وحدك، خلف رمزك أنت. يضيّق ما تراه لا أكثر — ولا يخبر بائعًا بمكانك.",
+  },
+  "mkt.directory": {
+    en: "Put this profile in the directory", es: "Poner este perfil en el directorio", fr: "Mettre ce profil dans l'annuaire", de: "Dieses Profil ins Verzeichnis stellen", pt: "Pôr este perfil no diretório", it: "Metti questo profilo nella directory", ja: "このプロフィールを名簿に載せる", zh: "把这份资料放进目录", hi: "इस प्रोफ़ाइल को निर्देशिका में रखें", ar: "ضع هذا الملف في الدليل",
+  },
+  "mkt.directory.pitch": {
+    en: "Different from a listing: a listing sells one thing, this puts the profile itself where people browsing can find it. Tags are how they find it, and the card shows display information only — never anything from inside the persona.", es: "Distinto de una publicación: una publicación vende una cosa, esto pone el perfil mismo donde quien navega puede encontrarlo. Las etiquetas son cómo lo encuentran, y la ficha muestra solo información de presentación — nunca nada de dentro de la persona.", fr: "Différent d'une annonce : une annonce vend une chose, ceci place le profil lui-même là où les gens qui parcourent peuvent le trouver. Les étiquettes servent à le trouver, et la fiche n'affiche que des informations de présentation — jamais rien de l'intérieur du personnage.", de: "Anders als ein Angebot: ein Angebot verkauft eine Sache, dies stellt das Profil selbst dorthin, wo Stöbernde es finden. Über Schlagwörter finden sie es, und die Karte zeigt nur Anzeigeinformationen — nie etwas aus dem Inneren der Persona.", pt: "Diferente de um anúncio: um anúncio vende uma coisa, isto põe o próprio perfil onde quem navega o pode encontrar. As etiquetas são como o encontram, e o cartão mostra apenas informação de apresentação — nunca nada de dentro da persona.", it: "Diverso da un annuncio: un annuncio vende una cosa, questo mette il profilo stesso dove chi sfoglia può trovarlo. I tag sono il modo in cui lo trovano, e la scheda mostra solo informazioni di presentazione — mai nulla dall'interno della persona.", ja: "出品とは違います。出品は一つのものを売りますが、これはプロフィールそのものを、見て回っている人が見つけられる場所に置きます。見つける手がかりはタグで、カードに出るのは表示用の情報だけです — 人格の内側にあるものは決して出ません。", zh: "这与挂牌不同：挂牌卖的是一样东西，而这是把资料本身放到浏览的人能找到的地方。标签是他们找到它的方式，卡片只显示展示性信息——绝不显示人格内部的任何内容。", hi: "किसी लिस्टिंग से अलग: लिस्टिंग एक चीज़ बेचती है, यह प्रोफ़ाइल को ही वहाँ रखता है जहाँ ब्राउज़ करने वाले उसे पा सकें। टैग ही खोजने का रास्ता हैं, और कार्ड केवल प्रदर्शन-जानकारी दिखाता है — व्यक्तित्व के भीतर से कभी कुछ नहीं।", ar: "يختلف عن الإعلان: الإعلان يبيع شيئًا واحدًا، أما هذا فيضع الملف نفسه حيث يجده المتصفحون. والوسوم هي سبيلهم إليه، والبطاقة تعرض معلومات العرض فقط — ولا شيء أبدًا من داخل الشخصية.",
+  },
+  "mkt.tags.ph": {
+    en: "tags, comma separated", es: "etiquetas, separadas por comas", fr: "étiquettes, séparées par des virgules", de: "Schlagwörter, durch Komma getrennt", pt: "etiquetas, separadas por vírgulas", it: "tag, separati da virgole", ja: "タグ（カンマ区切り）", zh: "标签，用逗号分隔", hi: "टैग, अल्पविराम से अलग", ar: "وسوم، مفصولة بفواصل",
+  },
+  "mkt.blurb.ph": {
+    en: "a line about it", es: "una línea sobre él", fr: "une ligne à son sujet", de: "eine Zeile dazu", pt: "uma linha sobre ele", it: "una riga su di esso", ja: "ひとことの説明", zh: "一句简介", hi: "इसके बारे में एक पंक्ति", ar: "سطر عنه",
+  },
+  "mkt.listit": {
+    en: "List it", es: "Publicarlo", fr: "L'inscrire", de: "Eintragen", pt: "Listá-lo", it: "Elencalo", ja: "載せる", zh: "上架", hi: "सूचीबद्ध करें", ar: "أدرِجه",
+  },
+  "mkt.listed.said": {
+    en: "Listed.", es: "Publicado.", fr: "Inscrit.", de: "Eingetragen.", pt: "Listado.", it: "Elencato.", ja: "載せました。", zh: "已上架。", hi: "सूचीबद्ध।", ar: "أُدرِج.",
+  },
+  "mkt.takeout": {
+    en: "take it out", es: "quitarlo", fr: "le retirer", de: "herausnehmen", pt: "retirá-lo", it: "toglilo", ja: "外す", zh: "撤下来", hi: "हटा दें", ar: "أخرِجه",
+  },
+  "mkt.tookout.said": {
+    en: "Taken out of the directory.", es: "Retirado del directorio.", fr: "Retiré de l'annuaire.", de: "Aus dem Verzeichnis entfernt.", pt: "Retirado do diretório.", it: "Tolto dalla directory.", ja: "名簿から外しました。", zh: "已从目录中移除。", hi: "निर्देशिका से हटा दिया गया।", ar: "أُخرِج من الدليل.",
+  },
+  "mkt.replaces": {
+    en: "Listing again replaces the tags and the line rather than adding a second row — one profile is in the directory once.", es: "Publicar de nuevo reemplaza las etiquetas y la línea en vez de añadir una segunda fila — un perfil está en el directorio una sola vez.", fr: "S'inscrire de nouveau remplace les étiquettes et la ligne au lieu d'ajouter une seconde entrée — un profil figure une seule fois dans l'annuaire.", de: "Erneutes Eintragen ersetzt Schlagwörter und Zeile, statt eine zweite Zeile hinzuzufügen — ein Profil steht genau einmal im Verzeichnis.", pt: "Listar de novo substitui as etiquetas e a linha em vez de acrescentar uma segunda entrada — um perfil está no diretório uma só vez.", it: "Elencare di nuovo sostituisce i tag e la riga invece di aggiungerne una seconda — un profilo è nella directory una volta sola.", ja: "もう一度載せると、二行目が増えるのではなく、タグと説明が置き換わります — 一つのプロフィールは名簿に一度だけです。", zh: "再次上架会替换标签和简介，而不是新增一行——一份资料在目录中只出现一次。", hi: "दोबारा सूचीबद्ध करने पर दूसरी पंक्ति जुड़ती नहीं, बल्कि टैग और पंक्ति बदल जाती है — एक प्रोफ़ाइल निर्देशिका में एक ही बार होती है।", ar: "الإدراج مجددًا يستبدل الوسوم والسطر بدل أن يضيف صفًا ثانيًا — الملف الواحد في الدليل مرة واحدة.",
+  },
+  "mkt.towns": {
+    en: "Towns with listings", es: "Localidades con publicaciones", fr: "Communes avec des annonces", de: "Orte mit Einträgen", pt: "Localidades com anúncios", it: "Comuni con annunci", ja: "掲載のある市区町村", zh: "有挂牌的城镇", hi: "जिन क़स्बों में लिस्टिंग हैं", ar: "البلدات التي فيها إعلانات",
+  },
+  "mkt.noplace": {
+    en: "Nothing is placed yet. A listing with no place is everywhere, which is the same as nowhere when somebody is looking for help nearby.", es: "Todavía no hay nada situado. Una publicación sin lugar está en todas partes, que es lo mismo que en ninguna cuando alguien busca ayuda cerca.", fr: "Rien n'est encore situé. Une annonce sans lieu est partout, ce qui revient à nulle part quand quelqu'un cherche de l'aide à proximité.", de: "Noch ist nichts verortet. Ein Eintrag ohne Ort ist überall, was dasselbe ist wie nirgends, wenn jemand Hilfe in der Nähe sucht.", pt: "Ainda não há nada situado. Um anúncio sem lugar está em toda a parte, o que é o mesmo que em lado nenhum quando alguém procura ajuda perto.", it: "Non è ancora collocato nulla. Un annuncio senza luogo è ovunque, che equivale a da nessuna parte quando qualcuno cerca aiuto lì vicino.", ja: "まだどこにも位置づけられていません。場所のない出品はどこにでもあることになり、近くで助けを探している人にとっては、どこにもないのと同じです。", zh: "尚未有任何条目标注地点。没有地点的挂牌等于遍布各处，而当有人就近寻求帮助时，这与哪里都不在是一回事。", hi: "अभी कुछ भी किसी जगह से नहीं जुड़ा। बिना जगह वाली लिस्टिंग हर जगह है, और जब कोई पास में मदद ढूँढ़ रहा हो तो यह कहीं न होने के बराबर है।", ar: "لم يُحدَّد موقع لشيء بعد. الإعلان بلا مكان هو في كل مكان، وهو ذاته لا مكان حين يبحث أحدهم عن عون قريب.",
+  },
+  "mkt.listings": {
+    en: "{n} listings", es: "{n} publicaciones", fr: "{n} annonces", de: "{n} Einträge", pt: "{n} anúncios", it: "{n} annunci", ja: "{n}件の掲載", zh: "{n} 条挂牌", hi: "{n} लिस्टिंग", ar: "{n} إعلانات",
+  },
+  "mkt.listing": {
+    en: "{n} listing", es: "{n} publicación", fr: "{n} annonce", de: "{n} Eintrag", pt: "{n} anúncio", it: "{n} annuncio", ja: "{n}件の掲載", zh: "{n} 条挂牌", hi: "{n} लिस्टिंग", ar: "إعلان {n}",
+  },
+  "mkt.sold": {
+    en: "What you have sold", es: "Lo que ha vendido", fr: "Ce que vous avez vendu", de: "Was Sie verkauft haben", pt: "O que vendeu", it: "Cosa hai venduto", ja: "売れたもの", zh: "你卖出了什么", hi: "आपने क्या बेचा", ar: "ما بعته",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

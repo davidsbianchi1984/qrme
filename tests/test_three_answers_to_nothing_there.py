@@ -180,7 +180,9 @@ def test_the_directory_card_carries_no_persona(client):
 
 
 def test_the_screen_says_listing_again_replaces():
-    assert "replaces the tags" in _markup("app/src/screens/Market.tsx")
+    assert 'tr("mkt.replaces", lang)' in _markup("app/src/screens/Market.tsx")
+    assert "replaces the tags" in _markup("app/src/l10n.ts"), (
+        "the sentence left the l10n table, so the screen looks up nothing")
 
 
 # --- the pinned rows --------------------------------------------------------
