@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, CampaignOut, DesigneeOut } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -19,6 +20,7 @@ export function Campaigns({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [proceeds, setProceeds] = useState<DesigneeOut[]>([]);
   const [drafts, setDrafts] = useState<DesigneeDraft[]>([
     { name: "", kind: "loved_one", share: 100 },
@@ -43,7 +45,7 @@ export function Campaigns({ onPlans }: {
   useEffect(load, [session.profileId]);
 
   if (!session.profileId || !session.ownerToken) {
-    return <div className="screen"><p className="muted center">Sign in first.</p></div>;
+    return <div className="screen"><p className="muted center">{tr("cmp.signin", lang)}</p></div>;
   }
 
   const totalShare = drafts.reduce((s, d) => s + (d.share || 0), 0);
@@ -83,7 +85,8 @@ export function Campaigns({ onPlans }: {
       const out = await api.donate(campaignId, {
         amount, giver_id: session.interactorId || undefined,
       });
-      setNote("Split: " + out.split.map((s) => `${s.name} $${s.amount.toFixed(2)}`).join(" · "));
+      setNote(tr("cmp.split", lang) + " "
+        + out.split.map((s) => `${s.name} $${s.amount.toFixed(2)}`).join(" · "));
       load();
     } catch (e) { setError(e); }
     finally { setBusy(false); }
@@ -92,46 +95,51 @@ export function Campaigns({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Where the Money Goes</h2>
-        <span className="muted small">crowdfunding, routed by you — donors always see the names</span>
+        <h2>{tr("cmp.title", lang)}</h2>
+        <span className="muted small">{tr("cmp.pitch", lang)}</span>
       </header>
 
       <div className="card">
-        <h3>Proceeds go to</h3>
+        <h3>{tr("cmp.proceeds", lang)}</h3>
         {!editing && proceeds.length === 0 && (
-          <p className="muted small">
-            Nobody designated yet — a campaign cannot exist until you say
-            where its money goes.
-          </p>
+          <p className="muted small">{tr("cmp.nobody", lang)}</p>
         )}
         {!editing && proceeds.map((p) => (
           <div key={p.id} className="friend-row">
             <span className="tag">{p.share}%</span>
             <b>{p.name}</b>
-            <span className="muted small">{p.kind === "loved_one" ? "loved one" : "organization"}</span>
+            <span className="muted small">
+              {p.kind === "loved_one" ? tr("cmp.lovedone", lang) : tr("cmp.organization", lang)}
+            </span>
           </div>
         ))}
         {editing && (
           <>
             {drafts.map((d, i) => (
               <div key={i} className="row">
-                <label>Name<input value={d.name}
+                <label>{tr("cmp.name", lang)}<input value={d.name}
                   onChange={(e) => setDrafts((x) => x.map((y, j) => j === i ? { ...y, name: e.target.value } : y))} /></label>
-                <label>Kind
+                <label>{tr("cmp.kind", lang)}
                   <select value={d.kind}
                     onChange={(e) => setDrafts((x) => x.map((y, j) => j === i ? { ...y, kind: e.target.value as DesigneeDraft["kind"] } : y))}>
-                    <option value="loved_one">loved one</option>
-                    <option value="organization">organization</option>
+                    <option value="loved_one">{tr("cmp.lovedone", lang)}</option>
+                    <option value="organization">{tr("cmp.organization", lang)}</option>
                   </select>
                 </label>
-                <label>Share %<input type="number" min={1} max={100} value={d.share} style={{ width: 64 }}
+                <label>{tr("cmp.share", lang)}<input type="number" min={1} max={100} value={d.share} style={{ width: 64 }}
                   onChange={(e) => setDrafts((x) => x.map((y, j) => j === i ? { ...y, share: Number(e.target.value) || 0 } : y))} /></label>
               </div>
             ))}
             <div className="row">
-              <button onClick={() => setDrafts((d) => [...d, { name: "", kind: "loved_one", share: 0 }])}>+ Add</button>
-              <span className={"tag" + (totalShare === 100 ? "" : " rated")}>{totalShare}% of 100</span>
-              <button className="primary" disabled={busy || totalShare !== 100} onClick={saveProceeds}>Save</button>
+              <button onClick={() => setDrafts((d) => [...d, { name: "", kind: "loved_one", share: 0 }])}>
+                {tr("cmp.add", lang)}
+              </button>
+              <span className={"tag" + (totalShare === 100 ? "" : " rated")}>
+                {fill(tr("cmp.of100", lang), { n: totalShare })}
+              </span>
+              <button className="primary" disabled={busy || totalShare !== 100} onClick={saveProceeds}>
+                {tr("cmp.save", lang)}
+              </button>
             </div>
           </>
         )}
@@ -141,39 +149,57 @@ export function Campaigns({ onPlans }: {
               ? proceeds.map((p) => ({ name: p.name, kind: p.kind as DesigneeDraft["kind"], share: p.share }))
               : drafts);
             setEditing(true);
-          }}>Edit designation</button>
+          }}>{tr("cmp.editdesig", lang)}</button>
         )}
       </div>
 
       <div className="card">
-        <h3>Open a campaign</h3>
+        <h3>{tr("cmp.opencamp", lang)}</h3>
         <div className="row">
-          <label>Title<input value={title} placeholder="Keep the garden going"
+          <label>{tr("cmp.titlelabel", lang)}<input value={title} placeholder={tr("cmp.title.ph", lang)}
                              onChange={(e) => setTitle(e.target.value)} /></label>
-          <label>Goal $<input type="number" min={1} value={goal} style={{ width: 90 }}
+          <label>{tr("cmp.goal", lang)}<input type="number" min={1} value={goal} style={{ width: 90 }}
                               onChange={(e) => setGoal(e.target.value)} /></label>
-          <label>Cause<input value={cause} placeholder="what it's for"
+          <label>{tr("cmp.cause", lang)}<input value={cause} placeholder={tr("cmp.cause.ph", lang)}
                              onChange={(e) => setCause(e.target.value)} /></label>
-          <button className="primary" disabled={busy || !title.trim()} onClick={createCampaign}>Open</button>
+          <button className="primary" disabled={busy || !title.trim()} onClick={createCampaign}>
+            {tr("cmp.open", lang)}
+          </button>
         </div>
       </div>
 
       {campaignsList.map((c) => (
         <div key={c.id} className="card">
-          <h3>{c.title} {c.status === "closed" && <span className="tag">closed</span>}</h3>
+          <h3>{c.title} {c.status === "closed" && <span className="tag">{tr("cmp.closed", lang)}</span>}</h3>
           {c.cause && <p className="muted small">{c.cause}</p>}
-          <p><b>${c.raised.toFixed(2)}</b> of ${c.goal.toFixed(2)} · {c.donors} donor{c.donors === 1 ? "" : "s"}</p>
+          {/* One sentence, not four fragments: a raised-of-goal line reads
+              backwards in Japanese and Chinese, and the donor count is a
+              separate string because most languages inflect it. */}
+          <p>
+            {fill(tr("cmp.raised", lang), {
+              raised: <b>${c.raised.toFixed(2)}</b>,
+              goal: `$${c.goal.toFixed(2)}`,
+            })}
+            {" · "}
+            {c.donors === 1
+              ? fill(tr("cmp.donor", lang), { n: c.donors })
+              : fill(tr("cmp.donors", lang), { n: c.donors })}
+          </p>
           <p className="muted small">
-            goes to: {c.proceeds_to.map((p) => `${p.name} (${p.share}%)`).join(" · ")}
+            {fill(tr("cmp.goesto", lang), {
+              names: c.proceeds_to.map((p) => `${p.name} (${p.share}%)`).join(" · "),
+            })}
           </p>
           {c.status === "open" && (
             <div className="row">
-              <label>Give $<input type="number" min={1} value={give[c.id] || ""} style={{ width: 90 }}
+              <label>{tr("cmp.give", lang)}<input type="number" min={1} value={give[c.id] || ""} style={{ width: 90 }}
                                   onChange={(e) => setGive((g) => ({ ...g, [c.id]: e.target.value }))} /></label>
-              <button className="primary" disabled={busy} onClick={() => donate(c.id)}>Donate</button>
+              <button className="primary" disabled={busy} onClick={() => donate(c.id)}>
+                {tr("cmp.donate", lang)}
+              </button>
               <button disabled={busy}
                       onClick={() => api.closeCampaign(c.id, session.ownerToken!).then(load).catch((e) => setError(e))}>
-                Close
+                {tr("cmp.close", lang)}
               </button>
             </div>
           )}

@@ -84,6 +84,58 @@ def test_no_tab_is_missing_a_language():
     assert not gaps, f"nav labels missing translations: {gaps}"
 
 
+def _every_row() -> dict[str, set[str]]:
+    """Every key in `CHROME`, mapped to the languages its row carries.
+
+    Split on the row headers rather than brace-matched, and string literals
+    are blanked first — otherwise a two-letter word followed by a colon
+    inside a translation ("así: ", "そこで: ") reads as a language code and
+    the audit reports gaps that are not there.
+    """
+    src = L10N.read_text(encoding="utf-8")
+    body = src[src.index("const CHROME: Table = {"):src.index("\n};\n\nexport function t(")]
+    heads = [(m.start(), m.group(1))
+             for m in re.finditer(r'^  "([\w.]+)":\s*\{', body, re.M)]
+    out: dict[str, set[str]] = {}
+    for i, (pos, key) in enumerate(heads):
+        end = heads[i + 1][0] if i + 1 < len(heads) else len(body)
+        chunk = re.sub(r'"(?:[^"\\]|\\.)*"', '""', body[pos:end])
+        out[key] = set(re.findall(r"\b([a-z]{2}):", chunk))
+    return out
+
+
+def test_no_row_of_the_table_is_missing_a_language():
+    """The check above, for the other 1471 keys.
+
+    `test_no_tab_is_missing_a_language` reads `nav.*` and nothing else, and
+    that was the whole table when it was written — `l10n.ts` opens by calling
+    itself "chrome localization for the desktop console" and for a long time
+    it was. It is now 1519 keys: forty-six screens moved into it one release
+    at a time, and every one of those rounds added rows that no completeness
+    check could see.
+
+    The gap is quiet in the way that matters. A key with no row at all renders
+    its own identifier — `org.title` in the heading — and somebody reports it.
+    A key missing one language falls back to English, which looks *deliberate*:
+    a Hindi reader sees an English heading on a Hindi page and has no way to
+    tell an untranslated string from a forgotten one. Nobody files that bug
+    either, and the ratchet cannot catch it, because the ratchet asks whether
+    the screen looks the key up, not whether the row answers in ten languages.
+
+        asked     is the sidebar translated everywhere
+        mattered  is the table translated everywhere
+
+    It was true when this test was added — all 1519 rows complete — so this
+    is a latch on work already done rather than a new backlog.
+    """
+    langs = _languages()
+    gaps = {k: sorted(langs - v) for k, v in _every_row().items() if langs - v}
+    assert not gaps, (
+        f"{len(gaps)} row(s) of the console table are short a language, so "
+        "those readers get English and cannot tell it was an oversight:\n    "
+        + "\n    ".join(f"{k}: no {', '.join(v)}" for k, v in sorted(gaps.items())))
+
+
 def test_the_unused_english_label_still_agrees():
     """`NAV` keeps an English `label` that nothing renders.
 

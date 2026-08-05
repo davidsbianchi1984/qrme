@@ -1,4 +1,4 @@
-# status: backlog — 338 rows
+# status: backlog — 254 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 338
+# ceiling: 254
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -70,34 +70,6 @@ Blend: share
 Blend: their
 Blend: their…
 Blend: whose persona mixes two or more existing ones, in the shares you choose — both grandparents at once, a mentor's judgment with a friend's humor. It is not following or friending: the sources are untouched, and the result is a new synthetic person that says openly who it is a blend of.
-Campaigns: % of 100
-Campaigns: + Add
-Campaigns: Cause
-Campaigns: Close
-Campaigns: Donate
-Campaigns: Edit designation
-Campaigns: Give $
-Campaigns: Goal $
-Campaigns: Keep the garden going
-Campaigns: Kind
-Campaigns: Name
-Campaigns: Nobody designated yet — a campaign cannot exist until you say where its money goes.
-Campaigns: Open
-Campaigns: Open a campaign
-Campaigns: Proceeds go to
-Campaigns: Save
-Campaigns: Share %
-Campaigns: Sign in first.
-Campaigns: Title
-Campaigns: Where the Money Goes
-Campaigns: closed
-Campaigns: crowdfunding, routed by you — donors always see the names
-Campaigns: donor
-Campaigns: goes to:
-Campaigns: loved one
-Campaigns: of $
-Campaigns: organization
-Campaigns: what it's for
 Chat: Advisor — weigh it and recommend
 Chat: Chat with
 Chat: Collaborator — work it with me
@@ -132,34 +104,6 @@ Friends: Sign in first.
 Friends: Suggested
 Friends: founder
 Friends: remove
-Grants: Accept
-Grants: Act on it
-Grants: Closed by
-Grants: Decline
-Grants: End it
-Grants: Every use
-Grants: Every use is written down and the lender can see it. So can you — that is the list below.
-Grants: In
-Grants: Lend something
-Grants: Lent skills
-Grants: Not used yet.
-Grants: Offer
-Grants: Open
-Grants: Open one
-Grants: Something you can do, made usable by somebody else, in one place, for as long as you both want it there.
-Grants: The terms
-Grants: Use
-Grants: Use it
-Grants: grant id
-Grants: time
-Grants: what for
-Grants: what to call it
-Grants: which one
-Grants: which skill
-Grants: who may use it
-Grants: why (optional)
-Grants: · by
-Grants: · used
 Guide: All of it
 Guide: Done — next
 Guide: Every screen in the gallery is explained by one of the lessons, and a test keeps that true — so a drawing can always be looked up.
@@ -270,34 +214,6 @@ Named: of
 Named: the place's id
 Named: · no account yet
 Named: …and in one place
-Org: (this profile)
-Org: Agent profile id
-Org: Coordinate
-Org: Department
-Org: Finance
-Org: Found
-Org: Found a demo org
-Org: Found an organization
-Org: Goal
-Org: Lead
-Org: Name
-Org: No departments yet — staff the first desk below.
-Org: Or meet it working: one press builds a demo team on your own account — two agents with a little knowledge each, granted and desked, ready to coordinate.
-Org: Past coordinations
-Org: Role
-Org: Sign in first.
-Org: Staff
-Org: The Ecosystem
-Org: The joint plan
-Org: departments that coordinate — your agents, your material, one joint plan
-Org: e.g. Bianchi & Sons
-Org: item(s) pulled
-Org: keeps the books
-Org: quote and schedule the restoration
-Org: scoped
-Org: sealed
-Org: sealed to vault
-Org: · agent:
 Plans: . Readable by
 Plans: End my subscription
 Plans: Erasure:

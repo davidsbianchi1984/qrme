@@ -5526,6 +5526,300 @@ const CHROME: Table = {
   "str.tag.eg": {
     en: "#tag", es: "#etiqueta", fr: "#mot-clé", de: "#schlagwort", pt: "#etiqueta", it: "#tag", ja: "#タグ", zh: "#标签", hi: "#टैग", ar: "#وسم",
   },
+  "cmp.title": {
+    en: "Where the Money Goes", es: "Adónde va el dinero", fr: "Où va l'argent", de: "Wohin das Geld geht", pt: "Para onde vai o dinheiro", it: "Dove vanno i soldi", ja: "お金の行き先", zh: "钱去了哪里", hi: "पैसा कहाँ जाता है", ar: "إلى أين يذهب المال",
+  },
+  "cmp.pitch": {
+    en: "crowdfunding, routed by you — donors always see the names", es: "financiación colectiva, encaminada por ti — quien dona siempre ve los nombres", fr: "financement participatif, dirigé par vous — les donateurs voient toujours les noms", de: "Crowdfunding, von Ihnen geleitet — Spendende sehen immer die Namen", pt: "financiamento coletivo, encaminhado por você — quem doa sempre vê os nomes", it: "raccolta fondi, indirizzata da te — chi dona vede sempre i nomi", ja: "クラウドファンディング、行き先を決めるのはあなた — 寄付する人には常に名前が見えます", zh: "众筹，由你决定去向 — 捐赠者始终看得到名字", hi: "क्राउडफंडिंग, रास्ता आप तय करते हैं — दान करने वाले नाम हमेशा देखते हैं", ar: "تمويل جماعي، أنت من يوجّهه — المتبرعون يرون الأسماء دائمًا",
+  },
+  "cmp.signin": {
+    en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
+  },
+  "cmp.proceeds": {
+    en: "Proceeds go to", es: "Lo recaudado va a", fr: "Les fonds vont à", de: "Die Erlöse gehen an", pt: "O arrecadado vai para", it: "Il ricavato va a", ja: "収益の行き先", zh: "所得款项归于", hi: "आय इन्हें जाती है", ar: "العائدات تذهب إلى",
+  },
+  "cmp.nobody": {
+    en: "Nobody designated yet — a campaign cannot exist until you say where its money goes.", es: "Todavía no hay nadie designado — una campaña no puede existir hasta que digas adónde va su dinero.", fr: "Personne n'est encore désigné — une campagne ne peut exister tant que vous n'avez pas dit où va son argent.", de: "Noch niemand benannt — eine Kampagne kann erst bestehen, wenn Sie sagen, wohin ihr Geld geht.", pt: "Ainda não há ninguém designado — uma campanha não pode existir enquanto não disser para onde vai o seu dinheiro.", it: "Nessuno designato ancora — una campagna non può esistere finché non dici dove vanno i suoi soldi.", ja: "まだ誰も指定されていません — お金の行き先を決めるまで、キャンペーンは存在できません。", zh: "尚未指定任何人 — 在你说明钱的去向之前，活动无法存在。", hi: "अभी किसी को नामित नहीं किया गया — जब तक आप यह न बताएँ कि पैसा कहाँ जाएगा, अभियान बन ही नहीं सकता।", ar: "لم يُحدَّد أحد بعد — لا يمكن أن توجد حملة قبل أن تقول إلى أين يذهب مالها.",
+  },
+  "cmp.lovedone": {
+    en: "loved one", es: "ser querido", fr: "proche", de: "Angehörige:r", pt: "ente querido", it: "persona cara", ja: "大切な人", zh: "亲人", hi: "प्रियजन", ar: "شخص عزيز",
+  },
+  "cmp.organization": {
+    en: "organization", es: "organización", fr: "organisation", de: "Organisation", pt: "organização", it: "organizzazione", ja: "団体", zh: "机构", hi: "संस्था", ar: "منظمة",
+  },
+  "cmp.name": {
+    en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名称", hi: "नाम", ar: "الاسم",
+  },
+  "cmp.kind": {
+    en: "Kind", es: "Tipo", fr: "Type", de: "Art", pt: "Tipo", it: "Tipo", ja: "種類", zh: "类型", hi: "प्रकार", ar: "النوع",
+  },
+  "cmp.share": {
+    en: "Share %", es: "Parte %", fr: "Part %", de: "Anteil %", pt: "Parte %", it: "Quota %", ja: "割合 %", zh: "份额 %", hi: "हिस्सा %", ar: "الحصة ٪",
+  },
+  "cmp.add": {
+    en: "+ Add", es: "+ Añadir", fr: "+ Ajouter", de: "+ Hinzufügen", pt: "+ Adicionar", it: "+ Aggiungi", ja: "+ 追加", zh: "+ 添加", hi: "+ जोड़ें", ar: "+ إضافة",
+  },
+  "cmp.of100": {
+    en: "{n}% of 100", es: "{n} % de 100", fr: "{n} % sur 100", de: "{n} % von 100", pt: "{n}% de 100", it: "{n}% su 100", ja: "100 のうち {n}%", zh: "{n}%，共 100%", hi: "100 में से {n}%", ar: "{n}٪ من 100",
+  },
+  "cmp.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
+  },
+  "cmp.editdesig": {
+    en: "Edit designation", es: "Editar designación", fr: "Modifier la désignation", de: "Benennung bearbeiten", pt: "Editar designação", it: "Modifica designazione", ja: "指定を編集", zh: "编辑指定", hi: "नामांकन संपादित करें", ar: "تعديل التحديد",
+  },
+  "cmp.opencamp": {
+    en: "Open a campaign", es: "Abrir una campaña", fr: "Ouvrir une campagne", de: "Eine Kampagne eröffnen", pt: "Abrir uma campanha", it: "Apri una campagna", ja: "キャンペーンを開く", zh: "开启一个活动", hi: "एक अभियान खोलें", ar: "افتح حملة",
+  },
+  "cmp.titlelabel": {
+    en: "Title", es: "Título", fr: "Titre", de: "Titel", pt: "Título", it: "Titolo", ja: "タイトル", zh: "标题", hi: "शीर्षक", ar: "العنوان",
+  },
+  "cmp.title.ph": {
+    en: "Keep the garden going", es: "Mantener el jardín", fr: "Faire vivre le jardin", de: "Den Garten am Leben halten", pt: "Manter o jardim", it: "Tenere in vita il giardino", ja: "庭を守り続ける", zh: "让这座花园继续", hi: "बग़ीचा चलता रहे", ar: "لنُبقِ الحديقة حيّة",
+  },
+  "cmp.goal": {
+    en: "Goal $", es: "Meta $", fr: "Objectif $", de: "Ziel $", pt: "Meta $", it: "Obiettivo $", ja: "目標 $", zh: "目标 $", hi: "लक्ष्य $", ar: "الهدف $",
+  },
+  "cmp.cause": {
+    en: "Cause", es: "Causa", fr: "Cause", de: "Zweck", pt: "Causa", it: "Causa", ja: "目的", zh: "缘由", hi: "उद्देश्य", ar: "السبب",
+  },
+  "cmp.cause.ph": {
+    en: "what it's for", es: "para qué es", fr: "à quoi ça sert", de: "wofür es ist", pt: "para que serve", it: "a cosa serve", ja: "何のためか", zh: "为了什么", hi: "यह किसलिए है", ar: "لماذا هو",
+  },
+  "cmp.open": {
+    en: "Open", es: "Abrir", fr: "Ouvrir", de: "Eröffnen", pt: "Abrir", it: "Apri", ja: "開く", zh: "开启", hi: "खोलें", ar: "افتح",
+  },
+  "cmp.closed": {
+    en: "closed", es: "cerrada", fr: "close", de: "geschlossen", pt: "encerrada", it: "chiusa", ja: "終了", zh: "已结束", hi: "बंद", ar: "مغلقة",
+  },
+  "cmp.raised": {
+    en: "{raised} of {goal}", es: "{raised} de {goal}", fr: "{raised} sur {goal}", de: "{raised} von {goal}", pt: "{raised} de {goal}", it: "{raised} su {goal}", ja: "{goal} のうち {raised}", zh: "{goal} 中的 {raised}", hi: "{goal} में से {raised}", ar: "{raised} من {goal}",
+  },
+  "cmp.donor": {
+    en: "{n} donor", es: "{n} donante", fr: "{n} donateur", de: "{n} Spender:in", pt: "{n} doador", it: "{n} donatore", ja: "寄付者 {n} 人", zh: "{n} 位捐赠者", hi: "{n} दानकर्ता", ar: "متبرع واحد",
+  },
+  "cmp.donors": {
+    en: "{n} donors", es: "{n} donantes", fr: "{n} donateurs", de: "{n} Spendende", pt: "{n} doadores", it: "{n} donatori", ja: "寄付者 {n} 人", zh: "{n} 位捐赠者", hi: "{n} दानकर्ता", ar: "{n} متبرعًا",
+  },
+  "cmp.goesto": {
+    en: "goes to: {names}", es: "va a: {names}", fr: "va à : {names}", de: "geht an: {names}", pt: "vai para: {names}", it: "va a: {names}", ja: "行き先: {names}", zh: "去向：{names}", hi: "जाता है: {names}", ar: "يذهب إلى: {names}",
+  },
+  "cmp.give": {
+    en: "Give $", es: "Dar $", fr: "Donner $", de: "Geben $", pt: "Dar $", it: "Dona $", ja: "寄付 $", zh: "捐赠 $", hi: "दें $", ar: "تبرّع $",
+  },
+  "cmp.donate": {
+    en: "Donate", es: "Donar", fr: "Faire un don", de: "Spenden", pt: "Doar", it: "Dona", ja: "寄付する", zh: "捐赠", hi: "दान करें", ar: "تبرّع",
+  },
+  "cmp.close": {
+    en: "Close", es: "Cerrar", fr: "Clore", de: "Schließen", pt: "Encerrar", it: "Chiudi", ja: "終了する", zh: "结束", hi: "बंद करें", ar: "أغلق",
+  },
+  "cmp.split": {
+    en: "Split:", es: "Reparto:", fr: "Répartition :", de: "Aufteilung:", pt: "Divisão:", it: "Ripartizione:", ja: "内訳:", zh: "分配：", hi: "बँटवारा:", ar: "التقسيم:",
+  },
+  "grt.title": {
+    en: "Lent skills", es: "Habilidades prestadas", fr: "Compétences prêtées", de: "Verliehene Fähigkeiten", pt: "Habilidades emprestadas", it: "Competenze prestate", ja: "貸したスキル", zh: "出借的技能", hi: "उधार दिए कौशल", ar: "مهارات معارة",
+  },
+  "grt.pitch": {
+    en: "Something you can do, made usable by somebody else, in one place, for as long as you both want it there.", es: "Algo que sabes hacer, puesto al alcance de otra persona, en un solo lugar, mientras los dos queráis que siga ahí.", fr: "Quelque chose que vous savez faire, rendu utilisable par quelqu'un d'autre, en un seul lieu, aussi longtemps que vous le voulez tous les deux.", de: "Etwas, das Sie können, für jemand anderen nutzbar gemacht, an einem Ort, solange Sie beide es dort haben wollen.", pt: "Algo que você sabe fazer, tornado utilizável por outra pessoa, num só lugar, enquanto os dois quiserem que fique lá.", it: "Qualcosa che sai fare, reso utilizzabile da qualcun altro, in un solo luogo, finché lo volete entrambi.", ja: "あなたにできることを、ひとつの場所で、他の誰かが使えるようにします。二人がそこに置いておきたいと思うあいだだけ。", zh: "你会做的一件事，在一个地方，让另一个人可以使用 — 只要你们两人都愿意它留在那里。", hi: "जो आप कर सकते हैं, वह एक जगह पर किसी और के काम आने लायक बना दिया जाता है — जब तक आप दोनों उसे वहाँ रखना चाहें।", ar: "شيء تجيده، يُتاح لشخص آخر لاستعماله، في مكان واحد، ما دمتما تريدان بقاءه هناك.",
+  },
+  "grt.terms": {
+    en: "The terms", es: "Las condiciones", fr: "Les conditions", de: "Die Bedingungen", pt: "As condições", it: "Le condizioni", ja: "条件", zh: "条款", hi: "शर्तें", ar: "الشروط",
+  },
+  "grt.lend": {
+    en: "Lend something", es: "Prestar algo", fr: "Prêter quelque chose", de: "Etwas verleihen", pt: "Emprestar algo", it: "Presta qualcosa", ja: "何かを貸す", zh: "出借一项技能", hi: "कुछ उधार दें", ar: "أعِر شيئًا",
+  },
+  "grt.who.ph": {
+    en: "who may use it", es: "quién puede usarlo", fr: "qui peut s'en servir", de: "wer es nutzen darf", pt: "quem pode usar", it: "chi può usarla", ja: "誰が使えるか", zh: "谁可以使用", hi: "इसे कौन उपयोग कर सकता है", ar: "من يجوز له استعماله",
+  },
+  "grt.which.ph": {
+    en: "which one", es: "cuál", fr: "lequel", de: "welcher", pt: "qual", it: "quale", ja: "どれか", zh: "哪一个", hi: "कौन-सा", ar: "أيّها",
+  },
+  "grt.skill.ph": {
+    en: "which skill", es: "qué habilidad", fr: "quelle compétence", de: "welche Fähigkeit", pt: "qual habilidade", it: "quale competenza", ja: "どのスキル", zh: "哪项技能", hi: "कौन-सा कौशल", ar: "أي مهارة",
+  },
+  "grt.call.ph": {
+    en: "what to call it", es: "cómo llamarlo", fr: "comment l'appeler", de: "wie es heißen soll", pt: "como chamar", it: "come chiamarla", ja: "何と呼ぶか", zh: "叫什么名字", hi: "इसे क्या नाम दें", ar: "بماذا تسمّيه",
+  },
+  "grt.offer": {
+    en: "Offer", es: "Ofrecer", fr: "Proposer", de: "Anbieten", pt: "Oferecer", it: "Offri", ja: "申し出る", zh: "提议", hi: "प्रस्ताव दें", ar: "اعرِض",
+  },
+  "grt.openone": {
+    en: "Open one", es: "Abrir uno", fr: "En ouvrir un", de: "Eines öffnen", pt: "Abrir um", it: "Aprine uno", ja: "ひとつ開く", zh: "打开一个", hi: "एक खोलें", ar: "افتح واحدًا",
+  },
+  "grt.id.ph": {
+    en: "grant id", es: "id de la cesión", fr: "identifiant du prêt", de: "Leih-ID", pt: "id da cessão", it: "id della concessione", ja: "許諾 ID", zh: "授权 id", hi: "ग्रांट आईडी", ar: "معرّف الإعارة",
+  },
+  "grt.open": {
+    en: "Open", es: "Abrir", fr: "Ouvrir", de: "Öffnen", pt: "Abrir", it: "Apri", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتح",
+  },
+  "grt.inplace": {
+    en: "In {where} ({id}) · {state} · {used}", es: "En {where} ({id}) · {state} · {used}", fr: "Dans {where} ({id}) · {state} · {used}", de: "In {where} ({id}) · {state} · {used}", pt: "Em {where} ({id}) · {state} · {used}", it: "In {where} ({id}) · {state} · {used}", ja: "{where}（{id}）にて · {state} · {used}", zh: "在 {where}（{id}） · {state} · {used}", hi: "{where} ({id}) में · {state} · {used}", ar: "في {where} ({id}) · {state} · {used}",
+  },
+  "grt.usedonce": {
+    en: "used {n} time", es: "usada {n} vez", fr: "utilisée {n} fois", de: "{n}-mal genutzt", pt: "usada {n} vez", it: "usata {n} volta", ja: "{n} 回使用", zh: "已使用 {n} 次", hi: "{n} बार उपयोग", ar: "استُعمل مرة واحدة",
+  },
+  "grt.usedmany": {
+    en: "used {n} times", es: "usada {n} veces", fr: "utilisée {n} fois", de: "{n}-mal genutzt", pt: "usada {n} vezes", it: "usata {n} volte", ja: "{n} 回使用", zh: "已使用 {n} 次", hi: "{n} बार उपयोग", ar: "استُعمل {n} مرة",
+  },
+  "grt.lending": {
+    en: "You are lending this.", es: "Tú prestas esto.", fr: "C'est vous qui prêtez.", de: "Sie verleihen dies.", pt: "Você está emprestando isto.", it: "Sei tu a prestarla.", ja: "あなたが貸しています。", zh: "这是你出借的。", hi: "यह आप उधार दे रहे हैं।", ar: "أنت من يُعير هذا.",
+  },
+  "grt.borrowing": {
+    en: "You are borrowing this.", es: "Tú tomas esto prestado.", fr: "C'est vous qui empruntez.", de: "Sie leihen dies.", pt: "Você está pegando isto emprestado.", it: "Sei tu a prenderla in prestito.", ja: "あなたが借りています。", zh: "这是你借用的。", hi: "यह आप उधार ले रहे हैं।", ar: "أنت من يستعير هذا.",
+  },
+  "grt.transfers": {
+    en: "Something is transferred by this grant.", es: "Esta cesión transfiere algo.", fr: "Ce prêt transfère quelque chose.", de: "Diese Leihe überträgt etwas.", pt: "Esta cessão transfere algo.", it: "Questa concessione trasferisce qualcosa.", ja: "この許諾では何かが移転します。", zh: "此授权会转移某种东西。", hi: "इस ग्रांट से कुछ हस्तांतरित होता है।", ar: "هذه الإعارة تنقل شيئًا.",
+  },
+  "grt.notransfer": {
+    en: "Nothing is transferred — the skill is used, never copied.", es: "No se transfiere nada — la habilidad se usa, nunca se copia.", fr: "Rien n'est transféré — la compétence est utilisée, jamais copiée.", de: "Nichts wird übertragen — die Fähigkeit wird genutzt, nie kopiert.", pt: "Nada é transferido — a habilidade é usada, nunca copiada.", it: "Non viene trasferito nulla — la competenza si usa, non si copia mai.", ja: "何も移転しません — スキルは使われるだけで、複製されることはありません。", zh: "什么都不会转移 — 技能只是被使用，绝不会被复制。", hi: "कुछ भी हस्तांतरित नहीं होता — कौशल का उपयोग होता है, नक़ल कभी नहीं।", ar: "لا شيء يُنقل — المهارة تُستعمل ولا تُنسخ أبدًا.",
+  },
+  "grt.eitherends": {
+    en: "Either of you can end it, alone.", es: "Cualquiera de los dos puede terminarla, por su cuenta.", fr: "L'un ou l'autre peut y mettre fin, seul.", de: "Jede:r von Ihnen kann sie allein beenden.", pt: "Qualquer um dos dois pode encerrá-la sozinho.", it: "Ciascuno dei due può chiuderla, da solo.", ja: "どちらか一方だけでも終わらせられます。", zh: "你们中的任何一方都可以单独结束它。", hi: "आप दोनों में से कोई भी इसे अकेले ख़त्म कर सकता है।", ar: "يمكن لأيٍّ منكما إنهاؤها بمفرده.",
+  },
+  "grt.closedby": {
+    en: "Closed by {who}: {why}", es: "Cerrada por {who}: {why}", fr: "Close par {who} : {why}", de: "Beendet von {who}: {why}", pt: "Encerrada por {who}: {why}", it: "Chiusa da {who}: {why}", ja: "{who} が終了しました: {why}", zh: "由 {who} 结束：{why}", hi: "{who} ने बंद की: {why}", ar: "أنهاها {who}: {why}",
+  },
+  "grt.you": {
+    en: "you", es: "ti", fr: "vous", de: "Ihnen", pt: "você", it: "te", ja: "あなた", zh: "你", hi: "आपने", ar: "أنت",
+  },
+  "grt.acton": {
+    en: "Act on it", es: "Actuar", fr: "Agir dessus", de: "Handeln", pt: "Agir", it: "Agisci", ja: "手を打つ", zh: "对它采取行动", hi: "इस पर कार्रवाई करें", ar: "تصرّف بشأنها",
+  },
+  "grt.accept": {
+    en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen", pt: "Aceitar", it: "Accetta", ja: "受け入れる", zh: "接受", hi: "स्वीकार करें", ar: "اقبل",
+  },
+  "grt.decline": {
+    en: "Decline", es: "Rechazar", fr: "Refuser", de: "Ablehnen", pt: "Recusar", it: "Rifiuta", ja: "断る", zh: "拒绝", hi: "अस्वीकार करें", ar: "ارفض",
+  },
+  "grt.why.ph": {
+    en: "why (optional)", es: "por qué (opcional)", fr: "pourquoi (facultatif)", de: "warum (optional)", pt: "porquê (opcional)", it: "perché (facoltativo)", ja: "理由（任意）", zh: "原因（可选）", hi: "क्यों (वैकल्पिक)", ar: "لماذا (اختياري)",
+  },
+  "grt.endit": {
+    en: "End it", es: "Terminarla", fr: "Y mettre fin", de: "Beenden", pt: "Encerrar", it: "Chiudila", ja: "終わらせる", zh: "结束它", hi: "इसे ख़त्म करें", ar: "أنهِها",
+  },
+  "grt.useit": {
+    en: "Use it", es: "Usarla", fr: "S'en servir", de: "Nutzen", pt: "Usar", it: "Usala", ja: "使う", zh: "使用它", hi: "इसका उपयोग करें", ar: "استعمِلها",
+  },
+  "grt.what.ph": {
+    en: "what for", es: "para qué", fr: "pour quoi faire", de: "wofür", pt: "para quê", it: "per cosa", ja: "何のために", zh: "用来做什么", hi: "किसलिए", ar: "لأجل ماذا",
+  },
+  "grt.use": {
+    en: "Use", es: "Usar", fr: "Utiliser", de: "Nutzen", pt: "Usar", it: "Usa", ja: "使用", zh: "使用", hi: "उपयोग", ar: "استعمِل",
+  },
+  "grt.written": {
+    en: "Every use is written down and the lender can see it. So can you — that is the list below.", es: "Cada uso queda anotado y quien presta puede verlo. Tú también — es la lista de abajo.", fr: "Chaque utilisation est consignée et le prêteur peut la voir. Vous aussi — c'est la liste ci-dessous.", de: "Jede Nutzung wird festgehalten und die verleihende Person kann sie sehen. Sie auch — das ist die Liste unten.", pt: "Cada uso fica registado e quem empresta pode vê-lo. Você também — é a lista abaixo.", it: "Ogni uso viene annotato e chi presta può vederlo. Anche tu — è l'elenco qui sotto.", ja: "使用はすべて記録され、貸した人が見られます。あなたも見られます — 下の一覧がそれです。", zh: "每一次使用都会被记录，出借的人看得到。你也看得到 — 就是下面这份清单。", hi: "हर उपयोग लिखा जाता है और उधार देने वाला उसे देख सकता है। आप भी — नीचे दी गई सूची वही है।", ar: "كل استعمال يُدوَّن ويستطيع المُعير رؤيته. وأنت أيضًا — القائمة أدناه هي هي.",
+  },
+  "grt.everyuse": {
+    en: "Every use", es: "Cada uso", fr: "Chaque utilisation", de: "Jede Nutzung", pt: "Cada uso", it: "Ogni uso", ja: "すべての使用", zh: "每一次使用", hi: "हर उपयोग", ar: "كل استعمال",
+  },
+  "grt.notused": {
+    en: "Not used yet.", es: "Aún sin usar.", fr: "Pas encore utilisée.", de: "Noch nicht genutzt.", pt: "Ainda não usada.", it: "Non ancora usata.", ja: "まだ使われていません。", zh: "尚未使用。", hi: "अभी तक उपयोग नहीं हुआ।", ar: "لم تُستعمل بعد.",
+  },
+  "grt.unlabelled": {
+    en: "(unlabelled)", es: "(sin etiqueta)", fr: "(sans intitulé)", de: "(ohne Angabe)", pt: "(sem rótulo)", it: "(senza etichetta)", ja: "（記載なし）", zh: "（未注明）", hi: "(बिना नाम)", ar: "(بدون وصف)",
+  },
+  "grt.by": {
+    en: "by {who}", es: "por {who}", fr: "par {who}", de: "von {who}", pt: "por {who}", it: "da {who}", ja: "{who} による", zh: "由 {who}", hi: "{who} द्वारा", ar: "بواسطة {who}",
+  },
+  "grt.offered": {
+    en: "Offered. Nothing is usable until they accept.", es: "Ofrecida. Nada se puede usar hasta que acepten.", fr: "Proposée. Rien n'est utilisable tant qu'ils n'ont pas accepté.", de: "Angeboten. Nutzbar ist nichts, bis angenommen wird.", pt: "Oferecida. Nada é utilizável até aceitarem.", it: "Offerta. Niente è utilizzabile finché non accettano.", ja: "申し出ました。相手が受け入れるまで、何も使えません。", zh: "已提议。在对方接受之前，什么都无法使用。", hi: "प्रस्ताव भेजा गया। जब तक वे स्वीकार न करें, कुछ भी उपयोग योग्य नहीं है।", ar: "عُرِضت. لا شيء قابل للاستعمال حتى يقبلوا.",
+  },
+  "grt.accepted": {
+    en: "Accepted. Now it is usable.", es: "Aceptada. Ahora se puede usar.", fr: "Acceptée. Elle est maintenant utilisable.", de: "Angenommen. Jetzt ist sie nutzbar.", pt: "Aceite. Agora é utilizável.", it: "Accettata. Ora è utilizzabile.", ja: "受け入れました。これで使えます。", zh: "已接受。现在可以使用了。", hi: "स्वीकार किया गया। अब यह उपयोग योग्य है।", ar: "قُبِلت. صارت قابلة للاستعمال الآن.",
+  },
+  "grt.declined": {
+    en: "Declined.", es: "Rechazada.", fr: "Refusée.", de: "Abgelehnt.", pt: "Recusada.", it: "Rifiutata.", ja: "断りました。", zh: "已拒绝。", hi: "अस्वीकार किया गया।", ar: "رُفِضت.",
+  },
+  "grt.closednote": {
+    en: "Closed. The next use is refused, not just the next grant.", es: "Cerrada. El próximo uso queda rechazado, no solo la próxima cesión.", fr: "Close. C'est la prochaine utilisation qui est refusée, pas seulement le prochain prêt.", de: "Beendet. Die nächste Nutzung wird abgelehnt, nicht erst die nächste Leihe.", pt: "Encerrada. O próximo uso é recusado, não apenas a próxima cessão.", it: "Chiusa. Il prossimo uso viene rifiutato, non solo la prossima concessione.", ja: "終了しました。次の許諾ではなく、次の使用が拒まれます。", zh: "已结束。被拒绝的是下一次使用，而不只是下一次授权。", hi: "बंद कर दी गई। अगला उपयोग ही अस्वीकार होगा, केवल अगली ग्रांट नहीं।", ar: "أُنهيت. الاستعمال التالي هو ما يُرفض، لا الإعارة التالية فقط.",
+  },
+  "org.title": {
+    en: "The Ecosystem", es: "El ecosistema", fr: "L'écosystème", de: "Das Ökosystem", pt: "O ecossistema", it: "L'ecosistema", ja: "エコシステム", zh: "生态系统", hi: "पारिस्थितिकी", ar: "المنظومة",
+  },
+  "org.pitch": {
+    en: "departments that coordinate — your agents, your material, one joint plan", es: "departamentos que se coordinan — tus agentes, tu material, un solo plan conjunto", fr: "des services qui se coordonnent — vos agents, votre matière, un seul plan commun", de: "Abteilungen, die sich abstimmen — Ihre Agenten, Ihr Material, ein gemeinsamer Plan", pt: "departamentos que se coordenam — os seus agentes, o seu material, um só plano conjunto", it: "reparti che si coordinano — i tuoi agenti, il tuo materiale, un solo piano comune", ja: "連携する部門 — あなたのエージェント、あなたの資料、ひとつの共同計画", zh: "彼此协调的部门 — 你的智能体，你的材料，一份共同的计划", hi: "आपस में तालमेल करते विभाग — आपके एजेंट, आपकी सामग्री, एक साझा योजना", ar: "أقسام تتنسّق — وكلاؤك، وموادّك، وخطة مشتركة واحدة",
+  },
+  "org.signin": {
+    en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
+  },
+  "org.foundorg": {
+    en: "Found an organization", es: "Fundar una organización", fr: "Fonder une organisation", de: "Eine Organisation gründen", pt: "Fundar uma organização", it: "Fonda un'organizzazione", ja: "組織を設立する", zh: "创建一个组织", hi: "एक संगठन बनाएँ", ar: "أسِّس منظمة",
+  },
+  "org.name": {
+    en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名称", hi: "नाम", ar: "الاسم",
+  },
+  "org.name.ph": {
+    en: "e.g. Bianchi & Sons", es: "p. ej. Bianchi & Sons", fr: "p. ex. Bianchi & Sons", de: "z. B. Bianchi & Sons", pt: "p. ex. Bianchi & Sons", it: "es. Bianchi & Sons", ja: "例: Bianchi & Sons", zh: "例如：Bianchi & Sons", hi: "उदा. Bianchi & Sons", ar: "مثال: Bianchi & Sons",
+  },
+  "org.found": {
+    en: "Found", es: "Fundar", fr: "Fonder", de: "Gründen", pt: "Fundar", it: "Fonda", ja: "設立", zh: "创建", hi: "बनाएँ", ar: "أسِّس",
+  },
+  "org.demopitch": {
+    en: "Or meet it working: one press builds a demo team on your own account — two agents with a little knowledge each, granted and desked, ready to coordinate.", es: "O velo funcionando: una pulsación crea un equipo de muestra en tu propia cuenta — dos agentes con algo de conocimiento cada uno, con cesión y escritorio, listos para coordinarse.", fr: "Ou voyez-le à l'œuvre : une pression construit une équipe de démonstration sur votre propre compte — deux agents ayant chacun un peu de savoir, dotés d'un prêt et d'un bureau, prêts à se coordonner.", de: "Oder erleben Sie es in Betrieb: ein Druck baut ein Demo-Team auf Ihrem eigenen Konto — zwei Agenten mit je etwas Wissen, verliehen und mit Schreibtisch, bereit zur Abstimmung.", pt: "Ou veja-o a funcionar: um toque cria uma equipa de demonstração na sua própria conta — dois agentes com algum conhecimento cada, com cessão e secretária, prontos a coordenar-se.", it: "Oppure guardalo all'opera: una pressione costruisce una squadra dimostrativa sul tuo account — due agenti con un po' di conoscenza ciascuno, con concessione e scrivania, pronti a coordinarsi.", ja: "あるいは動くところを見てください。一度押すだけで、あなた自身のアカウントにデモのチームができます — それぞれ少しの知識を持つ二体のエージェント、許諾とデスクを与えられ、連携の準備が整っています。", zh: "或者看它运转起来：按一下，就会在你自己的账户上搭起一支演示团队 — 两个各带一点知识的智能体，已获授权、已就位，随时可以协作。", hi: "या इसे चलते हुए देखें: एक बार दबाइए और आपके अपने खाते पर एक डेमो टीम बन जाती है — थोड़े-थोड़े ज्ञान वाले दो एजेंट, ग्रांट और डेस्क के साथ, तालमेल के लिए तैयार।", ar: "أو شاهدها وهي تعمل: ضغطة واحدة تبني فريقًا تجريبيًا على حسابك أنت — وكيلان لكلٍّ منهما قدر من المعرفة، مُعاران ولهما مكتب، جاهزان للتنسيق.",
+  },
+  "org.founddemo": {
+    en: "Found a demo org", es: "Fundar una organización de muestra", fr: "Fonder une organisation de démonstration", de: "Eine Demo-Organisation gründen", pt: "Fundar uma organização de demonstração", it: "Fonda un'organizzazione dimostrativa", ja: "デモ組織を設立", zh: "创建一个演示组织", hi: "एक डेमो संगठन बनाएँ", ar: "أسِّس منظمة تجريبية",
+  },
+  "org.nodepts": {
+    en: "No departments yet — staff the first desk below.", es: "Aún no hay departamentos — cubre el primer escritorio abajo.", fr: "Pas encore de service — pourvoyez le premier poste ci-dessous.", de: "Noch keine Abteilungen — besetzen Sie unten den ersten Schreibtisch.", pt: "Ainda não há departamentos — ocupe a primeira secretária abaixo.", it: "Nessun reparto ancora — assegna la prima scrivania qui sotto.", ja: "部門はまだありません — 下で最初のデスクに人を配してください。", zh: "还没有部门 — 在下面为第一张办公桌配上人手。", hi: "अभी कोई विभाग नहीं — नीचे पहली डेस्क पर किसी को बैठाइए।", ar: "لا أقسام بعد — اشغل المكتب الأول أدناه.",
+  },
+  "org.roleagent": {
+    en: "{role} · agent: {agent}", es: "{role} · agente: {agent}", fr: "{role} · agent : {agent}", de: "{role} · Agent: {agent}", pt: "{role} · agente: {agent}", it: "{role} · agente: {agent}", ja: "{role} · エージェント: {agent}", zh: "{role} · 智能体：{agent}", hi: "{role} · एजेंट: {agent}", ar: "{role} · الوكيل: {agent}",
+  },
+  "org.scoped": {
+    en: "scoped", es: "acotado", fr: "délimité", de: "eingegrenzt", pt: "delimitado", it: "delimitato", ja: "範囲あり", zh: "已限定范围", hi: "सीमित", ar: "محدَّد النطاق",
+  },
+  "org.department": {
+    en: "Department", es: "Departamento", fr: "Service", de: "Abteilung", pt: "Departamento", it: "Reparto", ja: "部門", zh: "部门", hi: "विभाग", ar: "القسم",
+  },
+  "org.dept.ph": {
+    en: "Finance", es: "Finanzas", fr: "Finances", de: "Finanzen", pt: "Finanças", it: "Finanze", ja: "経理", zh: "财务", hi: "वित्त", ar: "المالية",
+  },
+  "org.role": {
+    en: "Role", es: "Función", fr: "Rôle", de: "Rolle", pt: "Função", it: "Ruolo", ja: "役割", zh: "职责", hi: "भूमिका", ar: "الدور",
+  },
+  "org.role.ph": {
+    en: "keeps the books", es: "lleva las cuentas", fr: "tient les comptes", de: "führt die Bücher", pt: "faz a contabilidade", it: "tiene i conti", ja: "帳簿をつける", zh: "管账", hi: "हिसाब-किताब रखता है", ar: "يمسك الدفاتر",
+  },
+  "org.agentid": {
+    en: "Agent profile id", es: "Id del perfil del agente", fr: "Identifiant de profil de l'agent", de: "Profil-ID des Agenten", pt: "Id do perfil do agente", it: "Id del profilo dell'agente", ja: "エージェントのプロフィール ID", zh: "智能体档案 id", hi: "एजेंट प्रोफ़ाइल आईडी", ar: "معرّف ملف الوكيل",
+  },
+  "org.profile.ph": {
+    en: "(this profile)", es: "(este perfil)", fr: "(ce profil)", de: "(dieses Profil)", pt: "(este perfil)", it: "(questo profilo)", ja: "（このプロフィール）", zh: "（当前档案）", hi: "(यही प्रोफ़ाइल)", ar: "(هذا الملف)",
+  },
+  "org.staff": {
+    en: "Staff", es: "Cubrir", fr: "Pourvoir", de: "Besetzen", pt: "Ocupar", it: "Assegna", ja: "配置", zh: "配置人手", hi: "नियुक्त करें", ar: "اشغل",
+  },
+  "org.coordinate": {
+    en: "Coordinate", es: "Coordinar", fr: "Coordonner", de: "Abstimmen", pt: "Coordenar", it: "Coordina", ja: "連携する", zh: "开始协作", hi: "तालमेल करें", ar: "نسِّق",
+  },
+  "org.coordinating": {
+    en: "Coordinating…", es: "Coordinando…", fr: "Coordination…", de: "Wird abgestimmt…", pt: "A coordenar…", it: "Coordinamento…", ja: "連携中…", zh: "协作中…", hi: "तालमेल हो रहा है…", ar: "جارٍ التنسيق…",
+  },
+  "org.goal": {
+    en: "Goal", es: "Objetivo", fr: "Objectif", de: "Ziel", pt: "Objetivo", it: "Obiettivo", ja: "目標", zh: "目标", hi: "लक्ष्य", ar: "الهدف",
+  },
+  "org.goal.ph": {
+    en: "quote and schedule the restoration", es: "presupuestar y programar la restauración", fr: "chiffrer et planifier la restauration", de: "die Restaurierung anbieten und terminieren", pt: "orçamentar e agendar o restauro", it: "preventivare e programmare il restauro", ja: "修復の見積もりと日程を決める", zh: "为修复报价并排期", hi: "जीर्णोद्धार का अनुमान और समय तय करें", ar: "تسعير الترميم وجدولته",
+  },
+  "org.lead": {
+    en: "Lead", es: "Quien dirige", fr: "Chef de file", de: "Federführung", pt: "Quem lidera", it: "Chi guida", ja: "主導", zh: "主导方", hi: "अगुआ", ar: "القيادة",
+  },
+  "org.plan": {
+    en: "The joint plan", es: "El plan conjunto", fr: "Le plan commun", de: "Der gemeinsame Plan", pt: "O plano conjunto", it: "Il piano comune", ja: "共同計画", zh: "共同的计划", hi: "साझा योजना", ar: "الخطة المشتركة",
+  },
+  "org.sealedvault": {
+    en: "sealed to vault", es: "sellado en la bóveda", fr: "scellé au coffre", de: "im Tresor versiegelt", pt: "selado no cofre", it: "sigillato nel caveau", ja: "保管庫に封印", zh: "已封存入库", hi: "तिजोरी में सील", ar: "مختوم في الخزنة",
+  },
+  "org.items": {
+    en: "{n} item(s) pulled", es: "{n} elemento(s) consultado(s)", fr: "{n} élément(s) tiré(s)", de: "{n} Element(e) herangezogen", pt: "{n} item(ns) recolhido(s)", it: "{n} elemento/i attinto/i", ja: "{n} 件を参照", zh: "调取了 {n} 项", hi: "{n} वस्तु(एँ) ली गईं", ar: "سُحب {n} عنصرًا",
+  },
+  "org.past": {
+    en: "Past coordinations", es: "Coordinaciones anteriores", fr: "Coordinations passées", de: "Frühere Abstimmungen", pt: "Coordenações anteriores", it: "Coordinamenti passati", ja: "過去の連携", zh: "过往的协作", hi: "पिछले तालमेल", ar: "تنسيقات سابقة",
+  },
+  "org.sealed": {
+    en: "sealed", es: "sellada", fr: "scellée", de: "versiegelt", pt: "selada", it: "sigillato", ja: "封印済み", zh: "已封存", hi: "सील", ar: "مختوم",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

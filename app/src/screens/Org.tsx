@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, CoordinationOut, OrgOut } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -15,6 +16,7 @@ export function Org({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [orgs, setOrgs] = useState<OrgOut[]>([]);
   const [orgName, setOrgName] = useState("");
   const [deptName, setDeptName] = useState("");
@@ -44,7 +46,7 @@ export function Org({ onPlans }: {
   useEffect(load, [token]);
 
   if (!token) {
-    return <div className="screen"><p className="muted center">Sign in first.</p></div>;
+    return <div className="screen"><p className="muted center">{tr("org.signin", lang)}</p></div>;
   }
 
   async function createOrg() {
@@ -81,29 +83,27 @@ export function Org({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>The Ecosystem</h2>
-        <span className="muted small">departments that coordinate — your agents, your material, one joint plan</span>
+        <h2>{tr("org.title", lang)}</h2>
+        <span className="muted small">{tr("org.pitch", lang)}</span>
       </header>
 
       {!org && (
         <div className="card">
-          <h3>Found an organization</h3>
+          <h3>{tr("org.foundorg", lang)}</h3>
           <div className="row">
-            <label>Name<input value={orgName} placeholder="e.g. Bianchi & Sons"
+            <label>{tr("org.name", lang)}<input value={orgName} placeholder={tr("org.name.ph", lang)}
                               onChange={(e) => setOrgName(e.target.value)} /></label>
-            <button className="primary" disabled={busy || !orgName.trim()} onClick={createOrg}>Found</button>
+            <button className="primary" disabled={busy || !orgName.trim()} onClick={createOrg}>
+              {tr("org.found", lang)}
+            </button>
           </div>
-          <p className="muted small">
-            Or meet it working: one press builds a demo team on your own
-            account — two agents with a little knowledge each, granted and
-            desked, ready to coordinate.
-          </p>
+          <p className="muted small">{tr("org.demopitch", lang)}</p>
           <button disabled={busy} onClick={async () => {
             setBusy(true); setError(null);
             try { await api.seedDemoOrg(token!); load(); }
             catch (e) { setError(e); }
             finally { setBusy(false); }
-          }}>Found a demo org</button>
+          }}>{tr("org.founddemo", lang)}</button>
         </div>
       )}
 
@@ -112,40 +112,42 @@ export function Org({ onPlans }: {
           <div className="card">
             <h3>{org.name}</h3>
             {org.departments.length === 0 && (
-              <p className="muted small">No departments yet — staff the first desk below.</p>
+              <p className="muted small">{tr("org.nodepts", lang)}</p>
             )}
             {org.departments.map((d) => (
               <div key={d.id} className="friend-row">
                 <b>{d.name}</b>
-                <span className="muted small">{d.role} · agent: {d.agent}</span>
-                {d.scoped && <span className="tag">scoped</span>}
+                <span className="muted small">
+                  {fill(tr("org.roleagent", lang), { role: d.role, agent: d.agent })}
+                </span>
+                {d.scoped && <span className="tag">{tr("org.scoped", lang)}</span>}
               </div>
             ))}
             <div className="row">
-              <label>Department<input value={deptName} placeholder="Finance"
+              <label>{tr("org.department", lang)}<input value={deptName} placeholder={tr("org.dept.ph", lang)}
                                       onChange={(e) => setDeptName(e.target.value)} /></label>
-              <label>Role<input value={deptRole} placeholder="keeps the books"
+              <label>{tr("org.role", lang)}<input value={deptRole} placeholder={tr("org.role.ph", lang)}
                                 onChange={(e) => setDeptRole(e.target.value)} /></label>
-              <label>Agent profile id<input value={deptProfile} placeholder="(this profile)"
+              <label>{tr("org.agentid", lang)}<input value={deptProfile} placeholder={tr("org.profile.ph", lang)}
                                             onChange={(e) => setDeptProfile(e.target.value)} /></label>
               <button className="primary" disabled={busy || !deptName.trim() || !deptRole.trim()}
-                      onClick={addDept}>Staff</button>
+                      onClick={addDept}>{tr("org.staff", lang)}</button>
             </div>
           </div>
 
           {org.departments.length >= 2 && (
             <div className="card">
-              <h3>Coordinate</h3>
+              <h3>{tr("org.coordinate", lang)}</h3>
               <div className="row">
-                <label>Goal<input value={goal} placeholder="quote and schedule the restoration"
+                <label>{tr("org.goal", lang)}<input value={goal} placeholder={tr("org.goal.ph", lang)}
                                   onChange={(e) => setGoal(e.target.value)} /></label>
-                <label>Lead
+                <label>{tr("org.lead", lang)}
                   <select value={lead} onChange={(e) => setLead(e.target.value)}>
                     {org.departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
                 </label>
                 <button className="primary" disabled={busy || !goal.trim()} onClick={coordinate}>
-                  {busy ? "Coordinating…" : "Coordinate"}
+                  {busy ? tr("org.coordinating", lang) : tr("org.coordinate", lang)}
                 </button>
               </div>
             </div>
@@ -153,12 +155,17 @@ export function Org({ onPlans }: {
 
           {latest && (
             <div className="card">
-              <h3>The joint plan {latest.sealed && <span className="tag">sealed to vault</span>}</h3>
+              <h3>
+                {tr("org.plan", lang)}{" "}
+                {latest.sealed && <span className="tag">{tr("org.sealedvault", lang)}</span>}
+              </h3>
               <p style={{ whiteSpace: "pre-wrap" }}>{latest.plan}</p>
               {(latest.contributions || []).map((c) => (
                 <div key={c.department} className="friend-row">
                   <b>{c.department}</b>
-                  <span className="muted small">{c.items_read} item(s) pulled</span>
+                  <span className="muted small">
+                    {fill(tr("org.items", lang), { n: c.items_read })}
+                  </span>
                 </div>
               ))}
             </div>
@@ -166,14 +173,14 @@ export function Org({ onPlans }: {
 
           {history.length > 0 && (
             <div className="card">
-              <h3>Past coordinations</h3>
+              <h3>{tr("org.past", lang)}</h3>
               {history.slice().reverse().map((c) => (
                 <div key={c.id} className="friend-row">
                   <b>{c.goal.length > 50 ? c.goal.slice(0, 50) + "…" : c.goal}</b>
                   <span className="muted small">
                     {(c.departments || []).map((d) => d.name).join(" · ")}
                   </span>
-                  {c.sealed && <span className="tag">sealed</span>}
+                  {c.sealed && <span className="tag">{tr("org.sealed", lang)}</span>}
                 </div>
               ))}
             </div>

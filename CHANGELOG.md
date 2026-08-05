@@ -4,6 +4,57 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.8] — 2026-08-05
+
+### The money, the loan, and the firm
+
+The console-untranslated record falls **338 → 254**.
+
+**Where the money goes** — a campaign card said `$40.00 of $200.00 · 3
+donors` as four English fragments stitched by JSX, and a raised-of-goal
+line does not read in that order in Japanese or Chinese. It is one
+sentence in the table now, with the amounts as named holes, and the
+donor count is its own row because most of the ten languages inflect it.
+The designation copy is translated whole: *a campaign cannot exist until
+you say where its money goes.*
+
+**Lent skills** — the screen's four claims about what a grant is were
+string literals chosen inside a ternary, which is the shape that renders
+correctly and reads as English forever. All four are translated: that
+nothing is transferred, that the skill is used and never copied, that
+either party can end it alone, and that every use is written down where
+the borrower can read it too.
+
+**The ecosystem** — departments, roles, the demo org, the joint plan and
+the sealed tags. `item(s) pulled` and `· agent:` were fragments around a
+value and are now whole rows.
+
+98 keys across three screens, ten languages each, exact-sync held in
+both directions.
+
+### The table had 1519 rows and one of them was checked
+
+`test_no_tab_is_missing_a_language` reads `nav.*` and nothing else. That
+was the whole table when it was written — `l10n.ts` opens by calling
+itself "chrome localization for the desktop console" and for a long time
+that was true. Forty-six screens have moved into it since, one release
+at a time, and none of those rows had a completeness check.
+
+The gap is quiet in the way that matters. A key with no row at all
+renders its own identifier — `org.title` in the heading — and somebody
+reports it. A key missing *one* language falls back to English, which
+looks deliberate: a Hindi reader sees an English heading on a Hindi page
+with no way to tell an untranslated string from a forgotten one.
+
+    asked     is the sidebar translated everywhere
+    mattered  is the table translated everywhere
+
+`test_no_row_of_the_table_is_missing_a_language` now audits all 1519
+rows. It passed on the first run — every row was already complete — so
+this latches work already done rather than opening a backlog. Verified
+by deleting Hindi from one row and watching it name the row and the
+language.
+
 ## [0.45.7] — 2026-08-05
 
 ### The ledger, the name, and the stranger

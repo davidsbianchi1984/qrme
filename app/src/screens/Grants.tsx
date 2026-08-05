@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type SkillGrant, type SkillGrantUse,
          type SkillGrantVocabulary } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -28,6 +29,7 @@ export function Grants({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -76,7 +78,7 @@ export function Grants({ onPlans }: {
         lender_id: me, borrower_id: borrower.trim(), surface,
         surface_id: surfaceId.trim(), skill_kind: kind,
         skill_ref: ref.trim(), title: title.trim(),
-      }, token), "Offered. Nothing is usable until they accept.");
+      }, token), tr("grt.offered", lang));
     } catch (e) { fail(e); }
   }
 
@@ -97,35 +99,32 @@ export function Grants({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Lent skills</h2>
-      <p className="muted small">
-        Something you can do, made usable by somebody else, in one place, for as
-        long as you both want it there.
-      </p>
+      <h2>{tr("grt.title", lang)}</h2>
+      <p className="muted small">{tr("grt.pitch", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (
         <div className="card">
-          <h3>The terms</h3>
+          <h3>{tr("grt.terms", lang)}</h3>
           {/* The backend's own four sentences. */}
           <ul className="small">{vocab.terms.map((t) => <li key={t}>{t}</li>)}</ul>
         </div>
       )}
 
       <div className="card">
-        <h3>Lend something</h3>
+        <h3>{tr("grt.lend", lang)}</h3>
         <div className="row">
           <input value={borrower} onChange={(e) => setBorrower(e.target.value)}
-                 placeholder="who may use it" />
+                 placeholder={tr("grt.who.ph", lang)} />
           <select value={surface} onChange={(e) => setSurface(e.target.value)}>
             {vocab?.surfaces.map((s) => (
               <option key={s.key} value={s.key}>{s.key}</option>
             ))}
           </select>
           <input value={surfaceId} onChange={(e) => setSurfaceId(e.target.value)}
-                 placeholder="which one" />
+                 placeholder={tr("grt.which.ph", lang)} />
         </div>
         {/* There is deliberately no "everywhere" surface: a grant with no
             place is a permission nobody can see the edges of. */}
@@ -139,25 +138,25 @@ export function Grants({ onPlans }: {
             ))}
           </select>
           <input value={ref} onChange={(e) => setRef(e.target.value)}
-                 placeholder="which skill" style={{ flex: 1 }} />
+                 placeholder={tr("grt.skill.ph", lang)} style={{ flex: 1 }} />
         </div>
         <p className="muted small">
           {vocab?.skill_kinds.find((k) => k.key === kind)?.means}
         </p>
         <div className="row">
           <input value={title} onChange={(e) => setTitle(e.target.value)}
-                 placeholder="what to call it" style={{ flex: 1 }} />
+                 placeholder={tr("grt.call.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!me || !token || !borrower.trim() || !surfaceId.trim()
                             || !ref.trim() || !title.trim()}
-                  onClick={offer}>Offer</button>
+                  onClick={offer}>{tr("grt.offer", lang)}</button>
         </div>
       </div>
 
       <div className="card">
-        <h3>Open one</h3>
+        <h3>{tr("grt.openone", lang)}</h3>
         <div className="row">
           <input value={lookup} onChange={(e) => setLookup(e.target.value)}
-                 placeholder="grant id" style={{ flex: 1 }} />
+                 placeholder={tr("grt.id.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!lookup.trim() || !token} onClick={async () => {
             setError(null); setNote(null);
             try {
@@ -166,7 +165,7 @@ export function Grants({ onPlans }: {
               const log = await api.skillGrantUses(g.id, token);
               setUses(log.uses);
             } catch (e) { fail(e); }
-          }}>Open</button>
+          }}>{tr("grt.open", lang)}</button>
         </div>
       </div>
 
@@ -178,74 +177,78 @@ export function Grants({ onPlans }: {
               {grant.means} — {grant.skill_ref}
             </p>
             <p className="muted small">
-              In {grant.where} ({grant.surface_id}) · {grant.state} · used{" "}
-              {grant.used_count} time{grant.used_count === 1 ? "" : "s"}
+              {fill(tr("grt.inplace", lang), {
+                where: grant.where, id: grant.surface_id, state: grant.state,
+                used: grant.used_count === 1
+                  ? fill(tr("grt.usedonce", lang), { n: grant.used_count })
+                  : fill(tr("grt.usedmany", lang), { n: grant.used_count }),
+              })}
             </p>
             <p className="small">
-              {iAmLender ? "You are lending this." : "You are borrowing this."}
+              {iAmLender ? tr("grt.lending", lang) : tr("grt.borrowing", lang)}
             </p>
             {/* Both of these are the server's own claims about itself. */}
             <p className="muted small">
               {grant.transfers_anything
-                ? "Something is transferred by this grant."
-                : "Nothing is transferred — the skill is used, never copied."}
-              {grant.either_can_end_it && " Either of you can end it, alone."}
+                ? tr("grt.transfers", lang)
+                : tr("grt.notransfer", lang)}
+              {grant.either_can_end_it && " " + tr("grt.eitherends", lang)}
             </p>
             {grant.close_reason && (
               <p className="muted small">
-                Closed by {grant.closed_by === me ? "you" : grant.closed_by}:{" "}
-                {grant.close_reason}
+                {fill(tr("grt.closedby", lang), {
+                  who: grant.closed_by === me ? tr("grt.you", lang) : grant.closed_by,
+                  why: grant.close_reason,
+                })}
               </p>
             )}
           </div>
 
           <div className="card">
-            <h3>Act on it</h3>
+            <h3>{tr("grt.acton", lang)}</h3>
             <div className="row">
               <button disabled={grant.state !== "offered"}
                       onClick={act(() => api.acceptSkillGrant(grant.id, me, token),
-                                   "Accepted. Now it is usable.")}>Accept</button>
+                                   tr("grt.accepted", lang))}>{tr("grt.accept", lang)}</button>
               <button disabled={grant.state !== "offered"}
                       onClick={act(() => api.declineSkillGrant(grant.id, me, token),
-                                   "Declined.")}>Decline</button>
+                                   tr("grt.declined", lang))}>{tr("grt.decline", lang)}</button>
             </div>
             <div className="row">
               <input value={reason} onChange={(e) => setReason(e.target.value)}
-                     placeholder="why (optional)" style={{ flex: 1 }} />
+                     placeholder={tr("grt.why.ph", lang)} style={{ flex: 1 }} />
               {/* Never disabled by side. Whoever wants out, gets out. */}
               <button disabled={grant.state === "closed"}
                       onClick={act(
                         () => api.closeSkillGrant(grant.id, me, reason, token),
-                        "Closed. The next use is refused, not just the next grant.")}>
-                End it
+                        tr("grt.closednote", lang))}>
+                {tr("grt.endit", lang)}
               </button>
             </div>
           </div>
 
           {!iAmLender && (
             <div className="card">
-              <h3>Use it</h3>
+              <h3>{tr("grt.useit", lang)}</h3>
               <div className="row">
                 <input value={what} onChange={(e) => setWhat(e.target.value)}
-                       placeholder="what for" style={{ flex: 1 }} />
+                       placeholder={tr("grt.what.ph", lang)} style={{ flex: 1 }} />
                 <button disabled={!grant.active || !what.trim()} onClick={use}>
-                  Use
+                  {tr("grt.use", lang)}
                 </button>
               </div>
-              <p className="muted small">
-                Every use is written down and the lender can see it. So can you —
-                that is the list below.
-              </p>
+              <p className="muted small">{tr("grt.written", lang)}</p>
             </div>
           )}
 
           <div className="card">
-            <h3>Every use</h3>
-            {uses.length === 0 && <p className="muted small">Not used yet.</p>}
+            <h3>{tr("grt.everyuse", lang)}</h3>
+            {uses.length === 0 && <p className="muted small">{tr("grt.notused", lang)}</p>}
             {uses.map((u, i) => (
               <p key={`${u.used_at}-${i}`} className="small">
-                {u.what || "(unlabelled)"} — {u.used_at}
-                {u.borrower_id !== me && <> · by {u.borrower_id}</>}
+                {u.what || tr("grt.unlabelled", lang)} — {u.used_at}
+                {u.borrower_id !== me
+                  && <> · {fill(tr("grt.by", lang), { who: u.borrower_id })}</>}
               </p>
             ))}
           </div>
