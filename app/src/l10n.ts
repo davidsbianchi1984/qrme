@@ -2562,6 +2562,153 @@ const CHROME: Table = {
   "desk.card.counted": {
     en: "That read counted as a scan.", es: "Esa lectura contó como escaneo.", fr: "Cette lecture a compté comme un scan.", de: "Dieses Lesen zählte als Scan.", pt: "Essa leitura contou como digitalização.", it: "Quella lettura è contata come scansione.", ja: "この閲覧は1回のスキャンとして数えられました。", zh: "这次读取已计为一次扫描。", hi: "यह पढ़ना एक स्कैन के रूप में गिना गया।", ar: "حُسبت تلك القراءة مسحة.",
   },
+  "ref.title": {
+    en: "Handing it to somebody qualified", es: "Entregarlo a alguien cualificado", fr: "Le remettre à quelqu'un de qualifié", de: "Übergabe an jemand Qualifizierten", pt: "Entregá-lo a alguém qualificado", it: "Consegnarlo a qualcuno di qualificato", ja: "資格ある人へ手渡す", zh: "交给有资质的人", hi: "किसी योग्य व्यक्ति को सौंपना", ar: "تسليمه إلى مؤهل",
+  },
+  "ref.lead": {
+    en: "A profile is not a clinician. This is how a conversation with one reaches somebody who is — once, and only under your signature.", es: "Un perfil no es un clínico. Así es como una conversación con uno llega a alguien que sí lo es — una vez, y solo bajo tu firma.", fr: "Un profil n'est pas un clinicien. Voici comment une conversation avec l'un parvient à quelqu'un qui l'est — une fois, et seulement sous votre signature.", de: "Ein Profil ist kein Kliniker. So erreicht ein Gespräch mit einem jemanden, der einer ist — einmal, und nur unter Ihrer Unterschrift.", pt: "Um perfil não é um clínico. É assim que uma conversa com um chega a alguém que o é — uma vez, e só sob a sua assinatura.", it: "Un profilo non è un clinico. È così che una conversazione con uno arriva a qualcuno che lo è — una volta, e solo sotto la tua firma.", ja: "プロフィールは臨床医ではありません。これは、プロフィールとの会話を本物の臨床医へ届ける方法です — 一度だけ、あなたの署名の下でのみ。", zh: "资料并非临床医生。这就是让与它的对话抵达真正医生的方式 — 仅一次，且必须经你签名。", hi: "प्रोफ़ाइल चिकित्सक नहीं है। यह वह तरीक़ा है जिससे उसके साथ की बातचीत किसी असली चिकित्सक तक पहुँचती है — एक बार, और केवल आपके हस्ताक्षर के तहत।", ar: "الملف ليس طبيبًا سريريًا. هكذا تصل محادثة معه إلى من هو كذلك — مرة واحدة، وتحت توقيعك فقط.",
+  },
+  "ref.find": {
+    en: "Who can help", es: "Quién puede ayudar", fr: "Qui peut aider", de: "Wer helfen kann", pt: "Quem pode ajudar", it: "Chi può aiutare", ja: "助けられる人", zh: "谁能帮忙", hi: "कौन मदद कर सकता है", ar: "من يستطيع المساعدة",
+  },
+  "ref.find.pitch": {
+    en: "Expertise filters and geography ranks, never the other way round — a cardiologist two streets away is not a substitute for a psychiatrist. An empty list is an answer.", es: "La especialidad filtra y la geografía ordena, nunca al revés — un cardiólogo a dos calles no sustituye a un psiquiatra. Una lista vacía es una respuesta.", fr: "L'expertise filtre et la géographie classe, jamais l'inverse — un cardiologue à deux rues ne remplace pas un psychiatre. Une liste vide est une réponse.", de: "Fachgebiet filtert und Geografie sortiert, nie umgekehrt — ein Kardiologe zwei Straßen weiter ersetzt keinen Psychiater. Eine leere Liste ist eine Antwort.", pt: "A especialidade filtra e a geografia ordena, nunca ao contrário — um cardiologista a duas ruas não substitui um psiquiatra. Uma lista vazia é uma resposta.", it: "La specialità filtra e la geografia ordina, mai il contrario — un cardiologo a due strade non sostituisce uno psichiatra. Una lista vuota è una risposta.", ja: "専門で絞り、地理で並べる — 逆は決してしません。二筋先の循環器医は精神科医の代わりになりません。空のリストもひとつの答えです。", zh: "专长过滤，地理排序，绝不颠倒 — 两条街外的心脏科医生替代不了精神科医生。空列表也是一种回答。", hi: "विशेषज्ञता छानती है और भूगोल क्रम देता है, कभी उलटा नहीं — दो गली दूर का हृदय-रोग विशेषज्ञ मनोचिकित्सक का विकल्प नहीं। खाली सूची भी एक उत्तर है।", ar: "التخصص يرشّح والجغرافيا ترتّب، لا العكس أبدًا — طبيب قلب على بعد شارعين ليس بديلًا عن طبيب نفسي. القائمة الفارغة جواب.",
+  },
+  "ref.find.area.ph": {
+    en: "what you need, e.g. physiotherapy", es: "lo que necesitas, p. ej. fisioterapia", fr: "ce dont vous avez besoin, p. ex. kinésithérapie", de: "was Sie brauchen, z. B. Physiotherapie", pt: "o que precisa, p. ex. fisioterapia", it: "ciò che ti serve, es. fisioterapia", ja: "必要なもの（例: 理学療法）", zh: "你需要什么，如物理治疗", hi: "आपको क्या चाहिए, जैसे फ़िज़ियोथेरेपी", ar: "ما تحتاجه، مثل العلاج الطبيعي",
+  },
+  "ref.find.where.ph": {
+    en: "where you are", es: "dónde estás", fr: "où vous êtes", de: "wo Sie sind", pt: "onde está", it: "dove sei", ja: "あなたの居場所", zh: "你在哪里", hi: "आप कहाँ हैं", ar: "أين أنت",
+  },
+  "ref.find.go": {
+    en: "Find", es: "Buscar", fr: "Chercher", de: "Suchen", pt: "Procurar", it: "Cerca", ja: "探す", zh: "查找", hi: "खोजें", ar: "ابحث",
+  },
+  "ref.find.none": {
+    en: "Nobody listed for that yet — which is said plainly rather than offering a near-miss.", es: "Nadie listado para eso todavía — lo cual se dice claramente en vez de ofrecer un casi-acierto.", fr: "Personne d'inscrit pour cela encore — ce qui est dit clairement plutôt que d'offrir un à-peu-près.", de: "Dafür ist noch niemand gelistet — was klar gesagt wird, statt einen Beinahe-Treffer anzubieten.", pt: "Ninguém listado para isso ainda — o que se diz claramente em vez de oferecer um quase-acerto.", it: "Nessuno in elenco per questo ancora — il che viene detto chiaramente invece di offrire un quasi-risultato.", ja: "まだ該当者はいません — 近い候補を出すのではなく、そのまま率直に伝えます。", zh: "尚无人登记该项 — 直说无人，而非给出近似的替代。", hi: "इसके लिए अभी कोई सूचीबद्ध नहीं — जो साफ़ कहा जाता है, बजाय मिलते-जुलते विकल्प देने के।", ar: "لا أحد مدرج لذلك بعد — ويُقال ذلك بوضوح بدل تقديم شبه تطابق.",
+  },
+  "ref.find.matched": {
+    en: "matched on", es: "coincide en", fr: "correspond sur", de: "passt auf", pt: "corresponde em", it: "corrisponde su", ja: "一致項目:", zh: "匹配依据:", hi: "मिलान आधार:", ar: "تطابق على",
+  },
+  "ref.find.prepare": {
+    en: "Prepare", es: "Preparar", fr: "Préparer", de: "Vorbereiten", pt: "Preparar", it: "Prepara", ja: "準備", zh: "准备", hi: "तैयार करें", ar: "جهّز",
+  },
+  "ref.find.dir": {
+    en: "The directory — {n} {word} listed", es: "El directorio — {n} en la lista", fr: "L'annuaire — {n} inscrits", de: "Das Verzeichnis — {n} gelistet", pt: "O diretório — {n} listados", it: "L'elenco — {n} in lista", ja: "名簿 — {n}名掲載", zh: "名录 — 已列{n}人", hi: "निर्देशिका — {n} सूचीबद्ध", ar: "الدليل — {n} مدرجون",
+  },
+  "ref.add.name.ph": {
+    en: "name", es: "nombre", fr: "nom", de: "Name", pt: "nome", it: "nome", ja: "名前", zh: "姓名", hi: "नाम", ar: "الاسم",
+  },
+  "ref.add.area.ph": {
+    en: "area of expertise", es: "área de especialidad", fr: "domaine d'expertise", de: "Fachgebiet", pt: "área de especialidade", it: "area di competenza", ja: "専門分野", zh: "专长领域", hi: "विशेषज्ञता का क्षेत्र", ar: "مجال الخبرة",
+  },
+  "ref.add.where.ph": {
+    en: "where", es: "dónde", fr: "où", de: "wo", pt: "onde", it: "dove", ja: "場所", zh: "地点", hi: "कहाँ", ar: "أين",
+  },
+  "ref.add.contact.ph": {
+    en: "how to reach them", es: "cómo contactarle", fr: "comment le joindre", de: "wie man sie erreicht", pt: "como contactá-lo", it: "come raggiungerlo", ja: "連絡方法", zh: "如何联系", hi: "उन तक कैसे पहुँचें", ar: "كيف تصل إليه",
+  },
+  "ref.add.go": {
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+  },
+  "ref.sign": {
+    en: "Read this before you sign", es: "Lee esto antes de firmar", fr: "Lisez ceci avant de signer", de: "Lesen Sie das, bevor Sie unterschreiben", pt: "Leia isto antes de assinar", it: "Leggi questo prima di firmare", ja: "署名する前に読んでください", zh: "签名前请阅读", hi: "हस्ताक्षर से पहले इसे पढ़ें", ar: "اقرأ هذا قبل أن توقّع",
+  },
+  "ref.sign.nothing": {
+    en: "Nothing has gone anywhere yet. This is what would.", es: "Nada ha salido a ningún sitio todavía. Esto es lo que saldría.", fr: "Rien n'est encore parti nulle part. Voici ce qui partirait.", de: "Noch ist nichts irgendwohin gegangen. Das hier würde gehen.", pt: "Nada foi para lado nenhum ainda. Isto é o que iria.", it: "Niente è ancora andato da nessuna parte. Questo è ciò che andrebbe.", ja: "まだ何もどこへも送られていません。送られるとすればこれです。", zh: "尚未有任何内容发出。要发出的就是这些。", hi: "अभी कुछ भी कहीं नहीं गया। जाएगा तो यह जाएगा।", ar: "لم يذهب شيء إلى أي مكان بعد. هذا ما سيذهب.",
+  },
+  "ref.sign.summary": {
+    en: "The summary", es: "El resumen", fr: "Le résumé", de: "Die Zusammenfassung", pt: "O resumo", it: "Il riepilogo", ja: "要約", zh: "摘要", hi: "सारांश", ar: "الملخص",
+  },
+  "ref.sign.hash": {
+    en: "The signature is over these exact words — the challenge is their hash — so a summary changed afterwards cannot ride it.", es: "La firma cubre exactamente estas palabras — el desafío es su hash — así que un resumen cambiado después no puede aprovecharla.", fr: "La signature porte sur ces mots exacts — le défi est leur empreinte — donc un résumé modifié ensuite ne peut pas s'en servir.", de: "Die Unterschrift gilt genau diesen Worten — die Challenge ist ihr Hash — also kann eine später geänderte Zusammenfassung nicht auf ihr reiten.", pt: "A assinatura cobre exatamente estas palavras — o desafio é o seu hash — pelo que um resumo alterado depois não pode aproveitá-la.", it: "La firma copre esattamente queste parole — la challenge è il loro hash — quindi un riepilogo cambiato dopo non può cavalcarla.", ja: "署名はこの正確な文言に対して行われます — チャレンジはそのハッシュです — 後から変更された要約が署名に便乗することはできません。", zh: "签名覆盖的正是这些原话 — 挑战值是它们的哈希 — 因此事后改动的摘要无法搭上这个签名。", hi: "हस्ताक्षर ठीक इन्हीं शब्दों पर है — चुनौती उनका हैश है — इसलिए बाद में बदला गया सारांश उस पर सवार नहीं हो सकता।", ar: "التوقيع على هذه الكلمات بعينها — التحدي هو تجزئتها — فالملخص المعدل لاحقًا لا يمكنه ركوبه.",
+  },
+  "ref.sign.go": {
+    en: "Sign it with your device", es: "Fírmalo con tu dispositivo", fr: "Signez-le avec votre appareil", de: "Mit Ihrem Gerät unterschreiben", pt: "Assine com o seu dispositivo", it: "Firmalo con il tuo dispositivo", ja: "デバイスで署名する", zh: "用你的设备签名", hi: "अपने डिवाइस से हस्ताक्षर करें", ar: "وقّعه بجهازك",
+  },
+  "ref.sign.sid.ph": {
+    en: "the signature id the ceremony gave back", es: "el id de firma que devolvió la ceremonia", fr: "l'id de signature rendu par la cérémonie", de: "die Signatur-Id, die die Zeremonie zurückgab", pt: "o id de assinatura que a cerimónia devolveu", it: "l'id di firma restituito dalla cerimonia", ja: "セレモニーが返した署名ID", zh: "仪式返回的签名ID", hi: "समारोह से मिली हस्ताक्षर आईडी", ar: "معرّف التوقيع الذي أعادته المراسم",
+  },
+  "ref.sign.release": {
+    en: "Release it", es: "Liberarlo", fr: "Le libérer", de: "Freigeben", pt: "Libertá-lo", it: "Rilascialo", ja: "リリースする", zh: "放行", hi: "जारी करें", ar: "أطلقه",
+  },
+  "ref.link": {
+    en: "The link for the clinician", es: "El enlace para el clínico", fr: "Le lien pour le clinicien", de: "Der Link für den Kliniker", pt: "O link para o clínico", it: "Il link per il clinico", ja: "臨床医向けのリンク", zh: "给医生的链接", hi: "चिकित्सक के लिए लिंक", ar: "الرابط للطبيب",
+  },
+  "ref.link.once": {
+    en: "It opens once. A second attempt fails with the time of the first, rather than quietly working — a replayed link is something you should be able to find out about.", es: "Se abre una vez. Un segundo intento falla mostrando la hora del primero, en vez de funcionar en silencio — un enlace reutilizado es algo que deberías poder descubrir.", fr: "Il s'ouvre une fois. Une seconde tentative échoue avec l'heure de la première, plutôt que de marcher en silence — un lien rejoué est une chose que vous devez pouvoir découvrir.", de: "Er öffnet sich einmal. Ein zweiter Versuch scheitert mit der Zeit des ersten, statt still zu funktionieren — ein wiederverwendeter Link ist etwas, das Sie erfahren können sollten.", pt: "Abre uma vez. Uma segunda tentativa falha com a hora da primeira, em vez de funcionar em silêncio — um link repetido é algo que deve poder descobrir.", it: "Si apre una volta. Un secondo tentativo fallisce con l'ora del primo, invece di funzionare in silenzio — un link riusato è qualcosa che dovresti poter scoprire.", ja: "一度だけ開きます。二度目の試みは最初に開かれた時刻とともに失敗します。静かに動いたりはしません — 再利用されたリンクは、あなたが気づけるべきものだからです。", zh: "它只打开一次。第二次尝试会带着第一次的时间失败，而不是悄悄生效 — 被重放的链接是你应当能够察觉的事。", hi: "यह एक बार खुलता है। दूसरा प्रयास पहली बार के समय के साथ विफल होता है, चुपचाप काम नहीं करता — दोहराया गया लिंक ऐसी चीज़ है जिसका आपको पता चल सकना चाहिए।", ar: "يفتح مرة واحدة. المحاولة الثانية تفشل مع وقت الأولى بدل أن تعمل بصمت — الرابط المعاد تشغيله شيء ينبغي أن تستطيع اكتشافه.",
+  },
+  "ref.creds": {
+    en: "Your signing credentials", es: "Tus credenciales de firma", fr: "Vos identifiants de signature", de: "Ihre Signatur-Berechtigungen", pt: "As suas credenciais de assinatura", it: "Le tue credenziali di firma", ja: "署名クレデンシャル", zh: "你的签名凭证", hi: "आपके हस्ताक्षर क्रेडेंशियल", ar: "بيانات توقيعك",
+  },
+  "ref.creds.pitch": {
+    en: "A referral is a high-tier signature. What a credential can sign follows from how your identity was checked, and from whether the key stayed on one device.", es: "Un volante es una firma de nivel «high». Lo que una credencial puede firmar se sigue de cómo se verificó tu identidad, y de si la clave permaneció en un solo dispositivo.", fr: "Une orientation est une signature de niveau « high ». Ce qu'un identifiant peut signer découle de la façon dont votre identité a été vérifiée, et de si la clé est restée sur un seul appareil.", de: "Eine Überweisung ist eine Unterschrift der Stufe »high«. Was eine Berechtigung unterschreiben darf, folgt daraus, wie Ihre Identität geprüft wurde und ob der Schlüssel auf einem Gerät blieb.", pt: "Um encaminhamento é uma assinatura de nível «high». O que uma credencial pode assinar decorre de como a sua identidade foi verificada, e de se a chave ficou num só dispositivo.", it: "Un invio è una firma di livello «high». Ciò che una credenziale può firmare segue da come è stata verificata la tua identità, e da se la chiave è rimasta su un solo dispositivo.", ja: "紹介は「high」層の署名です。クレデンシャルが何に署名できるかは、本人確認の方法と、鍵が一台の端末に留まったかどうかで決まります。", zh: "转诊是「high」级签名。凭证能签什么，取决于你的身份如何核验、密钥是否只留在一台设备上。", hi: "रेफ़रल «high» स्तर का हस्ताक्षर है। क्रेडेंशियल क्या साइन कर सकता है, यह इस पर निर्भर है कि आपकी पहचान कैसे जाँची गई और कुंजी एक ही डिवाइस पर रही या नहीं।", ar: "الإحالة توقيع من مستوى «high». ما يمكن للاعتماد توقيعه يتبع كيفية التحقق من هويتك، وهل بقي المفتاح على جهاز واحد.",
+  },
+  "ref.creds.none": {
+    en: "None enrolled. The ceremony can enrol one.", es: "Ninguna inscrita. La ceremonia puede inscribir una.", fr: "Aucun enrôlé. La cérémonie peut en enrôler un.", de: "Keine registriert. Die Zeremonie kann eine registrieren.", pt: "Nenhuma inscrita. A cerimónia pode inscrever uma.", it: "Nessuna registrata. La cerimonia può registrarne una.", ja: "未登録です。セレモニーで登録できます。", zh: "尚未注册。可通过仪式注册一个。", hi: "कोई नामांकित नहीं। समारोह एक नामांकित कर सकता है।", ar: "لا شيء مسجل. يمكن للمراسم تسجيل واحد.",
+  },
+  "ref.creds.checked": {
+    en: "{name} — checked as {level}", es: "{name} — verificada como {level}", fr: "{name} — vérifié comme {level}", de: "{name} — geprüft als {level}", pt: "{name} — verificada como {level}", it: "{name} — verificata come {level}", ja: "{name} — {level}として確認済み", zh: "{name} — 核验为{level}", hi: "{name} — {level} के रूप में जाँची गई", ar: "{name} — تم التحقق كـ{level}",
+  },
+  "ref.creds.syncs": {
+    en: "· syncs between devices", es: "· se sincroniza entre dispositivos", fr: "· se synchronise entre appareils", de: "· synchronisiert zwischen Geräten", pt: "· sincroniza entre dispositivos", it: "· si sincronizza tra dispositivi", ja: "· 端末間で同期", zh: "· 在设备间同步", hi: "· डिवाइसों के बीच सिंक होती है", ar: "· يتزامن بين الأجهزة",
+  },
+  "ref.creds.cansign": {
+    en: "Can sign:", es: "Puede firmar:", fr: "Peut signer :", de: "Darf unterschreiben:", pt: "Pode assinar:", it: "Può firmare:", ja: "署名可能:", zh: "可签署:", hi: "साइन कर सकती है:", ar: "يمكنه التوقيع:",
+  },
+  "ref.creds.attestor.ph": {
+    en: "who checked it", es: "quién lo verificó", fr: "qui l'a vérifié", de: "wer es prüfte", pt: "quem verificou", it: "chi l'ha verificato", ja: "確認した者", zh: "由谁核验", hi: "किसने जाँचा", ar: "من تحقق منه",
+  },
+  "ref.creds.record": {
+    en: "Record a check", es: "Registrar una verificación", fr: "Enregistrer une vérification", de: "Prüfung erfassen", pt: "Registar uma verificação", it: "Registra una verifica", ja: "確認を記録", zh: "记录一次核验", hi: "जाँच दर्ज करें", ar: "سجّل تحققًا",
+  },
+  "ref.hist": {
+    en: "What you have released", es: "Lo que has liberado", fr: "Ce que vous avez libéré", de: "Was Sie freigegeben haben", pt: "O que libertou", it: "Ciò che hai rilasciato", ja: "リリース済みのもの", zh: "你已放行的内容", hi: "आपने जो जारी किया", ar: "ما أطلقته",
+  },
+  "ref.hist.cert": {
+    en: "certificate", es: "certificado", fr: "certificat", de: "Zertifikat", pt: "certificado", it: "certificato", ja: "証明書", zh: "证书", hi: "प्रमाणपत्र", ar: "الشهادة",
+  },
+  "ref.cert": {
+    en: "The certificate", es: "El certificado", fr: "Le certificat", de: "Das Zertifikat", pt: "O certificado", it: "Il certificato", ja: "証明書", zh: "证书内容", hi: "प्रमाणपत्र", ar: "الشهادة",
+  },
+  "ref.cert.line": {
+    en: "{name} signed {at}, identity checked as {level} ({tier}).", es: "{name} firmó el {at}, identidad verificada como {level} ({tier}).", fr: "{name} a signé le {at}, identité vérifiée comme {level} ({tier}).", de: "{name} unterschrieb am {at}, Identität geprüft als {level} ({tier}).", pt: "{name} assinou a {at}, identidade verificada como {level} ({tier}).", it: "{name} ha firmato il {at}, identità verificata come {level} ({tier}).", ja: "{name}が{at}に署名。本人確認は{level}（{tier}）。", zh: "{name}于{at}签署，身份核验为{level}（{tier}）。", hi: "{name} ने {at} को हस्ताक्षर किए, पहचान {level} ({tier}) के रूप में जाँची गई।", ar: "وقّع {name} في {at}، وتم التحقق من الهوية كـ{level} ({tier}).",
+  },
+  "ref.cert.shown": {
+    en: "What was on the screen", es: "Lo que estaba en pantalla", fr: "Ce qui était à l'écran", de: "Was auf dem Bildschirm stand", pt: "O que estava no ecrã", it: "Cosa c'era sullo schermo", ja: "画面に表示されていたもの", zh: "屏幕上显示的内容", hi: "स्क्रीन पर क्या था", ar: "ما كان على الشاشة",
+  },
+  "ref.cert.doc": {
+    en: "Document", es: "Documento", fr: "Document", de: "Dokument", pt: "Documento", it: "Documento", ja: "文書", zh: "文档", hi: "दस्तावेज़", ar: "الوثيقة",
+  },
+  "ref.notes": {
+    en: "What the clinician wrote back", es: "Lo que el clínico respondió", fr: "Ce que le clinicien a répondu", de: "Was der Kliniker zurückschrieb", pt: "O que o clínico respondeu", it: "Cosa ha risposto il clinico", ja: "臨床医からの返信", zh: "医生的回信", hi: "चिकित्सक ने क्या लिखा", ar: "ما كتبه الطبيب ردًا",
+  },
+  "ref.notes.pitch": {
+    en: "Their words, attributed to them. The profile never recites this as its own knowledge.", es: "Sus palabras, atribuidas a ellos. El perfil nunca recita esto como conocimiento propio.", fr: "Leurs mots, qui leur sont attribués. Le profil ne récite jamais cela comme son propre savoir.", de: "Ihre Worte, ihnen zugeschrieben. Das Profil gibt das nie als eigenes Wissen aus.", pt: "As palavras deles, atribuídas a eles. O perfil nunca recita isto como conhecimento próprio.", it: "Le loro parole, attribuite a loro. Il profilo non recita mai questo come conoscenza propria.", ja: "本人の言葉として帰属表示されます。プロフィールがこれを自分の知識として語ることは決してありません。", zh: "他们的话，署他们的名。资料绝不会把这当作自己的知识来复述。", hi: "उनके शब्द, उन्हीं के नाम। प्रोफ़ाइल इसे कभी अपने ज्ञान के रूप में नहीं दोहराता।", ar: "كلماتهم منسوبة إليهم. الملف لا يرددها أبدًا كمعرفته الخاصة.",
+  },
+  "ref.clin": {
+    en: "If you are the clinician", es: "Si tú eres el clínico", fr: "Si vous êtes le clinicien", de: "Wenn Sie der Kliniker sind", pt: "Se você é o clínico", it: "Se il clinico sei tu", ja: "あなたが臨床医なら", zh: "如果你是那位医生", hi: "यदि आप चिकित्सक हैं", ar: "إن كنت أنت الطبيب",
+  },
+  "ref.clin.pitch": {
+    en: "No account needed — the link is the credential, and it works once.", es: "No hace falta cuenta — el enlace es la credencial, y funciona una vez.", fr: "Aucun compte requis — le lien est l'identifiant, et il marche une fois.", de: "Kein Konto nötig — der Link ist die Berechtigung, und er funktioniert einmal.", pt: "Não é preciso conta — o link é a credencial, e funciona uma vez.", it: "Nessun account necessario — il link è la credenziale, e funziona una volta.", ja: "アカウント不要です — リンクそのものが資格情報で、一度だけ使えます。", zh: "无需账户 — 链接就是凭证，且只能用一次。", hi: "खाते की ज़रूरत नहीं — लिंक ही क्रेडेंशियल है, और एक बार चलता है।", ar: "لا حاجة لحساب — الرابط هو الاعتماد، ويعمل مرة واحدة.",
+  },
+  "ref.clin.id.ph": {
+    en: "referral id", es: "id del volante", fr: "id de l'orientation", de: "Überweisungs-Id", pt: "id do encaminhamento", it: "id dell'invio", ja: "紹介ID", zh: "转诊ID", hi: "रेफ़रल आईडी", ar: "معرّف الإحالة",
+  },
+  "ref.clin.token.ph": {
+    en: "the token from the link", es: "el token del enlace", fr: "le jeton du lien", de: "das Token aus dem Link", pt: "o token do link", it: "il token del link", ja: "リンクのトークン", zh: "链接中的令牌", hi: "लिंक से मिला टोकन", ar: "الرمز من الرابط",
+  },
+  "ref.clin.open": {
+    en: "Open it", es: "Abrirlo", fr: "L'ouvrir", de: "Öffnen", pt: "Abri-lo", it: "Aprilo", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتحه",
+  },
+  "ref.clin.reply": {
+    en: "Write back, once", es: "Responde, una vez", fr: "Répondez, une fois", de: "Zurückschreiben, einmal", pt: "Responda, uma vez", it: "Rispondi, una volta", ja: "一度だけ返信", zh: "回信，仅一次", hi: "एक बार जवाब लिखें", ar: "اكتب ردًا، مرة واحدة",
+  },
+  "ref.clin.reply.ph": {
+    en: "what you want the patient to know", es: "lo que quieres que el paciente sepa", fr: "ce que vous voulez que le patient sache", de: "was der Patient wissen soll", pt: "o que quer que o paciente saiba", it: "ciò che vuoi che il paziente sappia", ja: "患者に知らせたいこと", zh: "你想让患者知道的内容", hi: "आप मरीज़ को क्या बताना चाहते हैं", ar: "ما تريد أن يعرفه المريض",
+  },
+  "ref.clin.send": {
+    en: "Send it", es: "Enviarlo", fr: "L'envoyer", de: "Absenden", pt: "Enviá-lo", it: "Invialo", ja: "送信する", zh: "发送", hi: "भेजें", ar: "أرسله",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

@@ -4,6 +4,7 @@ import { api, openCeremony, type Certificate, type Clinician,
          type ReferralOpened, type ReferralPrepared,
          type SigningCredential } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -44,6 +45,7 @@ import { useSession } from "../store";
  */
 export function Referrals({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const interactor = session.interactorId || "";
   const token = session.interactorToken || session.ownerToken || "";
@@ -97,37 +99,27 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Handing it to somebody qualified</h2>
-      <p className="muted small">
-        A profile is not a clinician. This is how a conversation with one
-        reaches somebody who is — once, and only under your signature.
-      </p>
+      <h2>{tr("ref.title", lang)}</h2>
+      <p className="muted small">{tr("ref.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Who can help</h3>
-        <p className="muted small">
-          Expertise filters and geography ranks, never the other way round —
-          a cardiologist two streets away is not a substitute for a
-          psychiatrist. An empty list is an answer.
-        </p>
+        <h3>{tr("ref.find", lang)}</h3>
+        <p className="muted small">{tr("ref.find.pitch", lang)}</p>
         <div className="row">
           <input value={area} onChange={(e) => setArea(e.target.value)}
-                 placeholder="what you need, e.g. physiotherapy"
+                 placeholder={tr("ref.find.area.ph", lang)}
                  style={{ flex: 1 }} />
           <input value={where} onChange={(e) => setWhere(e.target.value)}
-                 placeholder="where you are" style={{ flex: 1 }} />
+                 placeholder={tr("ref.find.where.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !area.trim()}
                   onClick={act(async () => setFound(await api.clinicians(
-                    area.trim(), where.trim() || undefined)))}>Find</button>
+                    area.trim(), where.trim() || undefined)))}>{tr("ref.find.go", lang)}</button>
         </div>
         {found.length === 0 && (
-          <p className="muted small">
-            Nobody listed for that yet — which is said plainly rather than
-            offering a near-miss.
-          </p>
+          <p className="muted small">{tr("ref.find.none", lang)}</p>
         )}
         {found.map((cl) => (
           <div className="row" key={cl.id}>
@@ -136,7 +128,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
               <div className="muted small">
                 {cl.area}{cl.location && ` · ${cl.location}`} ·{" "}
                 {/* In words, not a score. */}
-                matched on {cl.match}
+                {tr("ref.find.matched", lang)} {cl.match}
                 {cl.in_your_area && " · near you"}
               </div>
             </div>
@@ -146,13 +138,15 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
                       setPrepared(await api.prepareReferral({
                         interactor_id: interactor, profile_id: me,
                         provider_id: cl.id }, token));
-                    })}>Prepare</button>
+                    })}>{tr("ref.find.prepare", lang)}</button>
           </div>
         ))}
         <details>
           <summary className="small">
-            The directory — {directory.length}{" "}
-            {directory.length === 1 ? "clinician" : "clinicians"} listed
+            {fill(tr("ref.find.dir", lang), {
+              n: directory.length,
+              word: directory.length === 1 ? "clinician" : "clinicians",
+            })}
           </summary>
           {directory.map((d) => (
             <p className="muted small" key={d.id}>
@@ -165,12 +159,10 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
 
       {prepared && (
         <div className="card">
-          <h3>Read this before you sign</h3>
+          <h3>{tr("ref.sign", lang)}</h3>
           {/* Nothing has been released at this point, and saying so is the
               reason prepare is a separate step at all. */}
-          <p className="muted small">
-            Nothing has gone anywhere yet. This is what would.
-          </p>
+          <p className="muted small">{tr("ref.sign.nothing", lang)}</p>
           <p className="small">{prepared.display_text}</p>
 
           {/* The single most important line in the package. */}
@@ -178,7 +170,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
             <p className="small">{prepared.package.specialist.note}</p>
           </div>
 
-          <h4>The summary</h4>
+          <h4>{tr("ref.sign.summary", lang)}</h4>
           {prepared.package.recent_exchange.map((m, i) => (
             <p className="small" key={i}>
               <strong>{m.role === "profile" ? "the profile" : "you"}</strong>:{" "}
@@ -186,17 +178,14 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
             </p>
           ))}
 
-          <p className="muted small">
-            The signature is over these exact words — the challenge is their
-            hash — so a summary changed afterwards cannot ride it.
-          </p>
+          <p className="muted small">{tr("ref.sign.hash", lang)}</p>
 
           <div className="row">
             <button disabled={busy} onClick={() => openCeremony({
               mode: "sign", challenge: prepared.sign.challenge,
               display_text: prepared.sign.display_text,
               meaning: String(prepared.sign.payload.meaning || ""),
-            })}>Sign it with your device</button>
+            })}>{tr("ref.sign.go", lang)}</button>
           </div>
           <div className="row">
             {/* `signature_id`, not `envelope_id` — the ceremony returns the
@@ -204,54 +193,46 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
                 checks the first. */}
             <input value={signatureId}
                    onChange={(e) => setSignatureId(e.target.value)}
-                   placeholder="the signature id the ceremony gave back"
+                   placeholder={tr("ref.sign.sid.ph", lang)}
                    style={{ flex: 1 }} />
             <button disabled={busy || !signatureId.trim()}
                     onClick={act(async () => {
                       const r = await api.releaseReferral(
                         prepared.referral_id, signatureId.trim(), token);
                       setReleased({ id: r.id, token: r.token });
-                    }, "Released.")}>Release it</button>
+                    }, "Released.")}>{tr("ref.sign.release", lang)}</button>
           </div>
         </div>
       )}
 
       {released && (
         <div className="card">
-          <h3>The link for the clinician</h3>
+          <h3>{tr("ref.link", lang)}</h3>
           <p className="small"><code>{released.token}</code></p>
-          <p className="muted small">
-            It opens once. A second attempt fails with the time of the first,
-            rather than quietly working — a replayed link is something you
-            should be able to find out about.
-          </p>
+          <p className="muted small">{tr("ref.link.once", lang)}</p>
         </div>
       )}
 
       <div className="card">
-        <h3>Your signing credentials</h3>
-        <p className="muted small">
-          A referral is a <strong>high</strong>-tier signature. What a
-          credential can sign follows from how your identity was checked, and
-          from whether the key stayed on one device.
-        </p>
+        <h3>{tr("ref.creds", lang)}</h3>
+        <p className="muted small">{tr("ref.creds.pitch", lang)}</p>
         {creds.length === 0 && (
-          <p className="muted small">
-            None enrolled. The ceremony can enrol one.
-          </p>
+          <p className="muted small">{tr("ref.creds.none", lang)}</p>
         )}
         {creds.map((cr) => (
           <div key={cr.id}>
             <p className="small">
-              <strong>{cr.display_name}</strong> — checked as{" "}
-              {cr.proofing_level.replace(/_/g, " ")}
+              {fill(tr("ref.creds.checked", lang), {
+                name: <strong>{cr.display_name}</strong>,
+                level: cr.proofing_level.replace(/_/g, " "),
+              })}
               {!cr.device_bound && (
-                <span className="muted"> · syncs between devices</span>
+                <span className="muted"> {tr("ref.creds.syncs", lang)}</span>
               )}
             </p>
             {/* The consequence, not the rule. */}
             <p className="muted small">
-              Can sign: {cr.can_sign.join(", ") || "nothing"}
+              {tr("ref.creds.cansign", lang)} {cr.can_sign.join(", ") || "nothing"}
               {!cr.can_sign.includes("high")
                 && " — not enough for a referral yet"}
             </p>
@@ -262,7 +243,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
 
       {history.length > 0 && (
         <div className="card">
-          <h3>What you have released</h3>
+          <h3>{tr("ref.hist", lang)}</h3>
           {history.map((h) => (
             <p className="small" key={h.id}>
               <code>{h.id}</code> ·{" "}
@@ -275,7 +256,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
                   <button className="chip" disabled={busy}
                           onClick={act(async () => setCert(
                             await api.certificate(h.signature_id!)))}>
-                    certificate
+                    {tr("ref.hist.cert", lang)}
                   </button>
                 </>
               )}
@@ -286,20 +267,23 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
 
       {cert && (
         <div className="card">
-          <h3>The certificate</h3>
+          <h3>{tr("ref.cert", lang)}</h3>
           <p className="small">
-            <strong>{cert.printed_name}</strong> signed{" "}
-            {cert.signed_at.replace("T", " ").slice(0, 16)}, identity checked
-            as {cert.identity_verified_as.replace(/_/g, " ")} ({cert.tier}).
+            {fill(tr("ref.cert.line", lang), {
+              name: <strong>{cert.printed_name}</strong>,
+              at: cert.signed_at.replace("T", " ").slice(0, 16),
+              level: cert.identity_verified_as.replace(/_/g, " "),
+              tier: cert.tier,
+            })}
           </p>
           <p className="small">{cert.meaning}</p>
           {/* The bytes that were actually shown, beside the hash of them. A
               signature over a document nobody saw is a signature over
               nothing, and this is the field that proves otherwise. */}
-          <h4>What was on the screen</h4>
+          <h4>{tr("ref.cert.shown", lang)}</h4>
           <p className="small">{cert.what_was_shown}</p>
           <p className="muted small">
-            Document <code>{cert.document_sha256.slice(0, 16)}…</code>
+            {tr("ref.cert.doc", lang)} <code>{cert.document_sha256.slice(0, 16)}…</code>
           </p>
           <p className="muted small">{cert.standard}</p>
         </div>
@@ -307,11 +291,8 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
 
       {notes.length > 0 && (
         <div className="card">
-          <h3>What the clinician wrote back</h3>
-          <p className="muted small">
-            Their words, attributed to them. The profile never recites this
-            as its own knowledge.
-          </p>
+          <h3>{tr("ref.notes", lang)}</h3>
+          <p className="muted small">{tr("ref.notes.pitch", lang)}</p>
           {notes.map((n) => (
             <p className="small" key={n.id}>
               <strong>{n.from}</strong> · {n.at.slice(0, 10)}<br />
@@ -322,19 +303,17 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
       )}
 
       <div className="card">
-        <h3>If you are the clinician</h3>
-        <p className="muted small">
-          No account needed — the link is the credential, and it works once.
-        </p>
+        <h3>{tr("ref.clin", lang)}</h3>
+        <p className="muted small">{tr("ref.clin.pitch", lang)}</p>
         <div className="row">
           <input value={openId} onChange={(e) => setOpenId(e.target.value)}
-                 placeholder="referral id" style={{ flex: 1 }} />
+                 placeholder={tr("ref.clin.id.ph", lang)} style={{ flex: 1 }} />
           <input value={openToken}
                  onChange={(e) => setOpenToken(e.target.value)}
-                 placeholder="the token from the link" style={{ flex: 1 }} />
+                 placeholder={tr("ref.clin.token.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !openId.trim() || !openToken.trim()}
                   onClick={act(async () => setOpened(await api.openReferral(
-                    openId.trim(), openToken.trim())))}>Open it</button>
+                    openId.trim(), openToken.trim())))}>{tr("ref.clin.open", lang)}</button>
         </div>
         {opened && (
           <>
@@ -348,10 +327,10 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
               </p>
             ))}
             <p className="muted small">{opened.note}</p>
-            <h4>Write back, once</h4>
+            <h4>{tr("ref.clin.reply", lang)}</h4>
             <p className="muted small">{opened.reply_note}</p>
             <textarea value={reply} onChange={(e) => setReply(e.target.value)}
-                      rows={3} placeholder="what you want the patient to know" />
+                      rows={3} placeholder={tr("ref.clin.reply.ph", lang)} />
             {/* The reply token, which arrived with the open — not the token
                 that opened it. */}
             <button disabled={busy || !reply.trim()}
@@ -359,7 +338,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
                       await api.replyToReferral(
                         opened.id, opened.reply_token, reply.trim());
                       setReply("");
-                    }, "Sent.")}>Send it</button>
+                    }, "Sent.")}>{tr("ref.clin.send", lang)}</button>
           </>
         )}
       </div>
@@ -368,6 +347,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
 }
 
 function AddProvider({ onAdded }: { onAdded: () => void }) {
+  const lang = visitorLang();
   const [name, setName] = useState("");
   const [area, setArea] = useState("");
   const [where, setWhere] = useState("");
@@ -376,13 +356,13 @@ function AddProvider({ onAdded }: { onAdded: () => void }) {
   return (
     <div className="row">
       <input value={name} onChange={(e) => setName(e.target.value)}
-             placeholder="name" style={{ flex: 1 }} />
+             placeholder={tr("ref.add.name.ph", lang)} style={{ flex: 1 }} />
       <input value={area} onChange={(e) => setArea(e.target.value)}
-             placeholder="area of expertise" style={{ flex: 1 }} />
+             placeholder={tr("ref.add.area.ph", lang)} style={{ flex: 1 }} />
       <input value={where} onChange={(e) => setWhere(e.target.value)}
-             placeholder="where" style={{ flex: 1 }} />
+             placeholder={tr("ref.add.where.ph", lang)} style={{ flex: 1 }} />
       <input value={contact} onChange={(e) => setContact(e.target.value)}
-             placeholder="how to reach them" style={{ flex: 1 }} />
+             placeholder={tr("ref.add.contact.ph", lang)} style={{ flex: 1 }} />
       <button disabled={busy || !name.trim() || !area.trim()}
               onClick={async () => {
                 setBusy(true);
@@ -394,7 +374,7 @@ function AddProvider({ onAdded }: { onAdded: () => void }) {
                   setName(""); setArea(""); setWhere(""); setContact("");
                   onAdded();
                 } finally { setBusy(false); }
-              }}>Add</button>
+              }}>{tr("ref.add.go", lang)}</button>
     </div>
   );
 }
@@ -408,6 +388,7 @@ function AddProvider({ onAdded }: { onAdded: () => void }) {
 function Reproof({ rowId, token, onDone }: {
   rowId: string; token: string; onDone: () => void;
 }) {
+  const lang = visitorLang();
   const [level, setLevel] = useState("document");
   const [attestor, setAttestor] = useState("");
   const [busy, setBusy] = useState(false);
@@ -419,7 +400,7 @@ function Reproof({ rowId, token, onDone }: {
         ))}
       </select>
       <input value={attestor} onChange={(e) => setAttestor(e.target.value)}
-             placeholder="who checked it" style={{ flex: 1 }} />
+             placeholder={tr("ref.creds.attestor.ph", lang)} style={{ flex: 1 }} />
       <button disabled={busy || !attestor.trim() || !token}
               onClick={async () => {
                 setBusy(true);
@@ -429,7 +410,7 @@ function Reproof({ rowId, token, onDone }: {
                     proofing_attestor: attestor.trim() }, token);
                   setAttestor(""); onDone();
                 } finally { setBusy(false); }
-              }}>Record a check</button>
+              }}>{tr("ref.creds.record", lang)}</button>
     </div>
   );
 }

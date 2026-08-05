@@ -1,4 +1,4 @@
-# status: backlog — 1225 rows
+# status: backlog — 1172 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1225
+# ceiling: 1172
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -817,59 +817,6 @@ Reaching: session
 Reaching: until
 Reaching: up ·
 Reaching: · score
-Referrals: , identity checked as
-Referrals: -tier signature. What a credential can sign follows from how your identity was checked, and from whether the key stayed on one device.
-Referrals: A profile is not a clinician. This is how a conversation with one reaches somebody who is — once, and only under your signature.
-Referrals: A referral is a
-Referrals: Add
-Referrals: Can sign:
-Referrals: Document
-Referrals: Expertise filters and geography ranks, never the other way round — a cardiologist two streets away is not a substitute for a psychiatrist. An empty list is an answer.
-Referrals: Find
-Referrals: Handing it to somebody qualified
-Referrals: If you are the clinician
-Referrals: It opens once. A second attempt fails with the time of the first, rather than quietly working — a replayed link is something you should be able to find out about.
-Referrals: No account needed — the link is the credential, and it works once.
-Referrals: Nobody listed for that yet — which is said plainly rather than offering a near-miss.
-Referrals: None enrolled. The ceremony can enrol one.
-Referrals: Nothing has gone anywhere yet. This is what would.
-Referrals: Open it
-Referrals: Prepare
-Referrals: Read this before you sign
-Referrals: Record a check
-Referrals: Release it
-Referrals: Send it
-Referrals: Sign it with your device
-Referrals: The certificate
-Referrals: The directory —
-Referrals: The link for the clinician
-Referrals: The signature is over these exact words — the challenge is their hash — so a summary changed afterwards cannot ride it.
-Referrals: The summary
-Referrals: Their words, attributed to them. The profile never recites this as its own knowledge.
-Referrals: What the clinician wrote back
-Referrals: What was on the screen
-Referrals: What you have released
-Referrals: Who can help
-Referrals: Write back, once
-Referrals: Your signing credentials
-Referrals: area of expertise
-Referrals: certificate
-Referrals: high
-Referrals: how to reach them
-Referrals: listed
-Referrals: matched on
-Referrals: name
-Referrals: referral id
-Referrals: signed
-Referrals: the signature id the ceremony gave back
-Referrals: the token from the link
-Referrals: what you need, e.g. physiotherapy
-Referrals: what you want the patient to know
-Referrals: where
-Referrals: where you are
-Referrals: who checked it
-Referrals: · syncs between devices
-Referrals: — checked as
 Relationships: 's life
 Relationships: Active relationships
 Relationships: Add a relationship

@@ -4,6 +4,22 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.7] — 2026-08-05
+
+### The handover speaks
+
+The Referrals screen — finding somebody qualified, the summary read
+before anything is signed, the signature that covers those exact
+bytes, the one-time link, the signing credentials with what each can
+actually sign, the certificate, and the clinician's own side of the
+door — is localized end to end: fifty-three strings become forty-nine
+`ref.*` keys in all ten languages. The sentences that carry the
+feature's honesty — that a profile is not a clinician, that nothing
+has gone anywhere yet, that the challenge is the hash of the words on
+screen, that a second open fails on purpose — are whole paragraphs in
+every language rather than fragments. The console-untranslated record
+falls **1225 → 1172**, exact-sync held in both directions.
+
 ## [0.44.6] — 2026-08-05
 
 ### The counter in the street speaks
