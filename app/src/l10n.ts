@@ -2856,6 +2856,147 @@ const CHROME: Table = {
   "rem.pub.cred": {
     en: "Credential {id} · {disclosure}", es: "Credencial {id} · {disclosure}", fr: "Justificatif {id} · {disclosure}", de: "Nachweis {id} · {disclosure}", pt: "Credencial {id} · {disclosure}", it: "Credenziale {id} · {disclosure}", ja: "証明 {id} · {disclosure}", zh: "凭证 {id} · {disclosure}", hi: "प्रमाण {id} · {disclosure}", ar: "الاعتماد {id} · {disclosure}",
   },
+  "idn.title": {
+    en: "Who this profile is", es: "Quién es este perfil", fr: "Qui est ce profil", de: "Wer dieses Profil ist", pt: "Quem é este perfil", it: "Chi è questo profilo", ja: "このプロフィールは誰か", zh: "这份资料是谁", hi: "यह प्रोफ़ाइल कौन है", ar: "من هذا الملف",
+  },
+  "idn.rules": {
+    en: "The rules", es: "Las reglas", fr: "Les règles", de: "Die Regeln", pt: "As regras", it: "Le regole", ja: "規則", zh: "规则", hi: "नियम", ar: "القواعد",
+  },
+  "idn.roster": {
+    en: "Your profiles", es: "Tus perfiles", fr: "Vos profils", de: "Ihre Profile", pt: "Os seus perfis", it: "I tuoi profili", ja: "あなたのプロフィール", zh: "你的资料", hi: "आपके प्रोफ़ाइल", ar: "ملفاتك",
+  },
+  "idn.roster.pitch": {
+    en: "Only you can see this list — it is the link between your separate personas, which is the thing anonymity is protecting.", es: "Solo tú puedes ver esta lista — es el vínculo entre tus personas separadas, que es justo lo que el anonimato protege.", fr: "Vous seul voyez cette liste — c'est le lien entre vos personnages distincts, et c'est précisément ce que l'anonymat protège.", de: "Nur Sie sehen diese Liste — sie ist die Verbindung zwischen Ihren getrennten Personas, und genau das schützt die Anonymität.", pt: "Só você vê esta lista — é a ligação entre as suas personas separadas, que é precisamente o que o anonimato protege.", it: "Solo tu vedi questa lista — è il legame tra le tue persone separate, ed è proprio ciò che l'anonimato protegge.", ja: "このリストを見られるのはあなただけです — 分かれたペルソナ同士をつなぐ糸であり、匿名性が守っているのはまさにそれです。", zh: "只有你能看到这份清单 — 它是你各个分身之间的连线，而这正是匿名性所保护的东西。", hi: "यह सूची केवल आप देख सकते हैं — यह आपके अलग-अलग व्यक्तित्वों के बीच की कड़ी है, और गुमनामी इसी की रक्षा करती है।", ar: "أنت وحدك من يرى هذه القائمة — إنها الرابط بين شخصياتك المنفصلة، وهو بالضبط ما تحميه السرية.",
+  },
+  "idn.roster.none": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "idn.roster.thisone": {
+    en: "this one", es: "este", fr: "celui-ci", de: "dieses", pt: "este", it: "questo", ja: "これ", zh: "当前这个", hi: "यही", ar: "هذا",
+  },
+  "idn.roster.anon": {
+    en: "anonymous", es: "anónimo", fr: "anonyme", de: "anonym", pt: "anónimo", it: "anonimo", ja: "匿名", zh: "匿名", hi: "गुमनाम", ar: "مجهول",
+  },
+  "idn.roster.verified": {
+    en: "verified ({level})", es: "verificado ({level})", fr: "vérifié ({level})", de: "verifiziert ({level})", pt: "verificado ({level})", it: "verificato ({level})", ja: "確認済み（{level}）", zh: "已验证（{level}）", hi: "सत्यापित ({level})", ar: "موثّق ({level})",
+  },
+  "idn.roster.notverified": {
+    en: "not verified", es: "no verificado", fr: "non vérifié", de: "nicht verifiziert", pt: "não verificado", it: "non verificato", ja: "未確認", zh: "未验证", hi: "असत्यापित", ar: "غير موثّق",
+  },
+  "idn.roster.unverifiable": {
+    en: "unverifiable — an invented person", es: "inverificable — una persona inventada", fr: "invérifiable — une personne inventée", de: "nicht verifizierbar — eine erfundene Person", pt: "não verificável — uma pessoa inventada", it: "non verificabile — una persona inventata", ja: "確認不能 — 架空の人物", zh: "无从验证 — 一个虚构的人", hi: "सत्यापन-अयोग्य — एक गढ़ा हुआ व्यक्ति", ar: "غير قابل للتوثيق — شخص مُختلق",
+  },
+  "idn.roster.move": {
+    en: "Move the badge here", es: "Mover la insignia aquí", fr: "Déplacer le badge ici", de: "Das Abzeichen hierher verschieben", pt: "Mover o distintivo para aqui", it: "Sposta qui il distintivo", ja: "バッジをここへ移す", zh: "把徽章移到这里", hi: "बैज यहाँ लाएँ", ar: "انقل الشارة إلى هنا",
+  },
+  "idn.ver": {
+    en: "Verification", es: "Verificación", fr: "Vérification", de: "Verifizierung", pt: "Verificação", it: "Verifica", ja: "本人確認", zh: "验证", hi: "सत्यापन", ar: "التوثيق",
+  },
+  "idn.ver.means": {
+    en: "{means} ({level}, rank {rank})", es: "{means} ({level}, rango {rank})", fr: "{means} ({level}, rang {rank})", de: "{means} ({level}, Rang {rank})", pt: "{means} ({level}, nível {rank})", it: "{means} ({level}, rango {rank})", ja: "{means}（{level}、ランク{rank}）", zh: "{means}（{level}，等级{rank}）", hi: "{means} ({level}, रैंक {rank})", ar: "{means} ({level}، رتبة {rank})",
+  },
+  "idn.ver.checkedby": {
+    en: "Checked by {who}", es: "Verificado por {who}", fr: "Vérifié par {who}", de: "Geprüft von {who}", pt: "Verificado por {who}", it: "Verificato da {who}", ja: "{who}が確認", zh: "由{who}核验", hi: "{who} ने जाँचा", ar: "تحقق منه {who}",
+  },
+  "idn.ver.withheld": {
+    en: "Who checked is withheld — it would point back to a name this profile does not publish.", es: "Quién lo verificó se reserva — señalaría de vuelta a un nombre que este perfil no publica.", fr: "Qui a vérifié est tenu secret — cela renverrait à un nom que ce profil ne publie pas.", de: "Wer geprüft hat, bleibt zurückgehalten — es würde auf einen Namen zurückweisen, den dieses Profil nicht veröffentlicht.", pt: "Quem verificou é reservado — apontaria de volta para um nome que este perfil não publica.", it: "Chi ha verificato è riservato — rimanderebbe a un nome che questo profilo non pubblica.", ja: "確認者は伏せられています — このプロフィールが公開していない名前を指し示してしまうからです。", zh: "核验者不予公开 — 那会指回这份资料并未公开的名字。", hi: "किसने जाँचा यह रोक रखा गया है — वह उस नाम की ओर संकेत करेगा जिसे यह प्रोफ़ाइल प्रकाशित नहीं करती।", ar: "يُحجب من تحقق — لأنه سيشير إلى اسم لا ينشره هذا الملف.",
+  },
+  "idn.ver.movehere": {
+    en: "Move it to this profile", es: "Moverla a este perfil", fr: "Le déplacer vers ce profil", de: "Zu diesem Profil verschieben", pt: "Movê-lo para este perfil", it: "Spostalo su questo profilo", ja: "このプロフィールへ移す", zh: "移到这份资料", hi: "इसे इस प्रोफ़ाइल पर लाएँ", ar: "انقلها إلى هذا الملف",
+  },
+  "idn.ver.how.ph": {
+    en: "how", es: "cómo", fr: "comment", de: "wie", pt: "como", it: "come", ja: "方法", zh: "如何核验", hi: "कैसे", ar: "كيف",
+  },
+  "idn.ver.record": {
+    en: "Record", es: "Registrar", fr: "Enregistrer", de: "Erfassen", pt: "Registar", it: "Registra", ja: "記録する", zh: "记录", hi: "दर्ज करें", ar: "سجّل",
+  },
+  "idn.anon": {
+    en: "Anonymity", es: "Anonimato", fr: "Anonymat", de: "Anonymität", pt: "Anonimato", it: "Anonimato", ja: "匿名性", zh: "匿名", hi: "गुमनामी", ar: "السرية",
+  },
+  "idn.anon.shown": {
+    en: "Shown as {name}. {note}", es: "Se muestra como {name}. {note}", fr: "Affiché comme {name}. {note}", de: "Angezeigt als {name}. {note}", pt: "Mostrado como {name}. {note}", it: "Mostrato come {name}. {note}", ja: "表示名は{name}。{note}", zh: "显示为{name}。{note}", hi: "{name} के रूप में दिखता है। {note}", ar: "يُعرض باسم {name}. {note}",
+  },
+  "idn.anon.reversible": {
+    en: "Reversible, from now on.", es: "Reversible, de ahora en adelante.", fr: "Réversible, à partir de maintenant.", de: "Umkehrbar, ab jetzt.", pt: "Reversível, de agora em diante.", it: "Reversibile, da ora in poi.", ja: "今後については元に戻せます。", zh: "自此可逆。", hi: "अब से प्रतिवर्ती।", ar: "قابل للتراجع، من الآن فصاعدًا.",
+  },
+  "idn.anon.withheld": {
+    en: "Withheld", es: "Reservado", fr: "Retenu", de: "Zurückgehalten", pt: "Reservado", it: "Riservato", ja: "伏せられるもの", zh: "不予公开", hi: "रोका गया", ar: "محجوب",
+  },
+  "idn.anon.notwithheld": {
+    en: "Not withheld", es: "No reservado", fr: "Non retenu", de: "Nicht zurückgehalten", pt: "Não reservado", it: "Non riservato", ja: "伏せられないもの", zh: "并未隐去", hi: "नहीं रोका गया", ar: "غير محجوب",
+  },
+  "idn.bubble": {
+    en: "The bubble", es: "La burbuja", fr: "La bulle", de: "Die Blase", pt: "A bolha", it: "La bolla", ja: "バブル", zh: "气泡", hi: "बुलबुला", ar: "الفقاعة",
+  },
+  "idn.bubble.showing": {
+    en: "Showing {asset}", es: "Mostrando {asset}", fr: "Affiche {asset}", de: "Zeigt {asset}", pt: "A mostrar {asset}", it: "Mostra {asset}", ja: "表示中: {asset}", zh: "正在显示 {asset}", hi: "दिखा रहा {asset}", ar: "يعرض {asset}",
+  },
+  "idn.bubble.portrait": {
+    en: "Or a portrait", es: "O un retrato", fr: "Ou un portrait", de: "Oder ein Porträt", pt: "Ou um retrato", it: "Oppure un ritratto", ja: "あるいは肖像", zh: "或者一幅肖像", hi: "या एक चित्र", ar: "أو صورة شخصية",
+  },
+  "idn.bubble.brief": {
+    en: "A brief is the description you would hand a generator. Nothing here draws it for you — picking one sets the asset, and the portrait itself is yours to make.", es: "Un brief es la descripción que le darías a un generador. Aquí nada lo dibuja por ti — elegir uno fija el recurso, y el retrato en sí es tuyo para hacerlo.", fr: "Un brief est la description que vous donneriez à un générateur. Rien ici ne le dessine pour vous — en choisir un fixe la ressource, et le portrait lui-même reste à vous de faire.", de: "Ein Briefing ist die Beschreibung, die Sie einem Generator geben würden. Hier zeichnet nichts für Sie — eines zu wählen setzt das Asset, und das Porträt selbst zu machen bleibt Ihre Sache.", pt: "Um briefing é a descrição que daria a um gerador. Aqui nada o desenha por si — escolher um define o recurso, e o retrato em si é seu para fazer.", it: "Un brief è la descrizione che daresti a un generatore. Qui nulla lo disegna per te — sceglierne uno imposta la risorsa, e il ritratto stesso sta a te farlo.", ja: "ブリーフとは、生成器に手渡す説明文のことです。ここで代わりに描くものは何もありません — 選ぶとアセットが設定されるだけで、肖像そのものを作るのはあなたです。", zh: "简述就是你会交给生成器的那段描述。这里没有任何东西替你作画 — 选中一条只是设定素材，肖像本身要由你自己来做。", hi: "ब्रीफ़ वह विवरण है जो आप किसी जनरेटर को सौंपते। यहाँ कुछ भी आपके लिए नहीं बनाता — एक चुनने से एसेट तय होता है, और चित्र स्वयं आपको बनाना है।", ar: "الموجز هو الوصف الذي تسلّمه لمولّد. لا شيء هنا يرسمه عنك — اختيار واحد يعيّن الأصل فقط، والصورة نفسها عليك أنت أن تصنعها.",
+  },
+  "idn.bubble.prompt": {
+    en: "Show the prompt", es: "Ver el prompt", fr: "Afficher le prompt", de: "Prompt anzeigen", pt: "Ver o prompt", it: "Mostra il prompt", ja: "プロンプトを表示", zh: "显示提示词", hi: "प्रॉम्प्ट दिखाएँ", ar: "أظهر الموجّه",
+  },
+  "idn.rename": {
+    en: "Rename", es: "Cambiar el nombre", fr: "Renommer", de: "Umbenennen", pt: "Mudar o nome", it: "Rinomina", ja: "名前を変える", zh: "改名", hi: "नाम बदलें", ar: "إعادة التسمية",
+  },
+  "idn.rename.ph": {
+    en: "a new display name", es: "un nuevo nombre visible", fr: "un nouveau nom affiché", de: "ein neuer Anzeigename", pt: "um novo nome visível", it: "un nuovo nome visibile", ja: "新しい表示名", zh: "新的显示名", hi: "नया प्रदर्शित नाम", ar: "اسم معروض جديد",
+  },
+  "idn.rename.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "احفظ",
+  },
+  "idn.export": {
+    en: "Take it with you", es: "Llévatelo contigo", fr: "Emportez-le avec vous", de: "Nehmen Sie es mit", pt: "Leve-o consigo", it: "Portalo con te", ja: "持って出る", zh: "带走它", hi: "अपने साथ ले जाएँ", ar: "خذه معك",
+  },
+  "idn.export.pitch": {
+    en: "Everything held about this profile, as rows. Leaving before you can take your things is not leaving.", es: "Todo lo que se guarda sobre este perfil, en filas. Irse antes de poder llevarte tus cosas no es irse.", fr: "Tout ce qui est détenu sur ce profil, en lignes. Partir avant de pouvoir emporter ses affaires, ce n'est pas partir.", de: "Alles, was über dieses Profil gehalten wird, als Zeilen. Zu gehen, bevor man seine Sachen mitnehmen kann, ist kein Gehen.", pt: "Tudo o que é guardado sobre este perfil, em linhas. Sair antes de poder levar as suas coisas não é sair.", it: "Tutto ciò che è custodito su questo profilo, in righe. Andarsene prima di poter portare via le proprie cose non è andarsene.", ja: "このプロフィールについて保持されているすべてを、行として。荷物を持ち出せないうちに去るのは、去ることではありません。", zh: "关于这份资料所保存的一切，以行的形式呈现。在还不能带走自己的东西之前离开，那不算离开。", hi: "इस प्रोफ़ाइल के बारे में रखा गया सब कुछ, पंक्तियों के रूप में। अपना सामान ले जा सकने से पहले जाना, जाना नहीं है।", ar: "كل ما هو محفوظ عن هذا الملف، في صفوف. المغادرة قبل أن تستطيع أخذ أشيائك ليست مغادرة.",
+  },
+  "idn.export.go": {
+    en: "Export", es: "Exportar", fr: "Exporter", de: "Exportieren", pt: "Exportar", it: "Esporta", ja: "エクスポート", zh: "导出", hi: "निर्यात करें", ar: "صدّر",
+  },
+  "idn.mem": {
+    en: "Memorial", es: "Memorial", fr: "Mémorial", de: "Gedenkseite", pt: "Memorial", it: "Memoriale", ja: "追悼", zh: "纪念", hi: "स्मारक", ar: "التذكار",
+  },
+  "idn.mem.line": {
+    en: "{status} · {n} relationship{s} touched", es: "{status} · {n} relaciones afectadas", fr: "{status} · {n} relations touchées", de: "{status} · {n} Beziehungen berührt", pt: "{status} · {n} relações tocadas", it: "{status} · {n} relazioni toccate", ja: "{status} · 関係{n}件に影響", zh: "{status} · 触及{n}段关系", hi: "{status} · {n} रिश्ते प्रभावित", ar: "{status} · {n} علاقات مسّها",
+  },
+  "idn.end": {
+    en: "Ending it", es: "Ponerle fin", fr: "Y mettre fin", de: "Es beenden", pt: "Pôr-lhe fim", it: "Metterci fine", ja: "終わらせる", zh: "结束它", hi: "इसे समाप्त करना", ar: "إنهاؤه",
+  },
+  "idn.end.pitch": {
+    en: "Two different endings, and the difference is what happens to the people who knew it.", es: "Dos finales distintos, y la diferencia es qué pasa con quienes lo conocieron.", fr: "Deux fins différentes, et la différence tient à ce qu'il advient de ceux qui l'ont connu.", de: "Zwei verschiedene Enden, und der Unterschied ist, was mit denen geschieht, die es kannten.", pt: "Dois finais diferentes, e a diferença está no que acontece a quem o conheceu.", it: "Due finali diversi, e la differenza è cosa succede a chi lo ha conosciuto.", ja: "終わり方は二つあり、違いは、これを知っていた人々に何が起こるかです。", zh: "两种不同的结局，区别在于认识它的人会怎样。", hi: "दो अलग अंत, और फ़र्क़ यह है कि जिन्होंने इसे जाना उनका क्या होता है।", ar: "نهايتان مختلفتان، والفرق هو ما يحدث لمن عرفوه.",
+  },
+  "idn.end.retire": {
+    en: "Retire", es: "Retirar", fr: "Retirer", de: "Zurückziehen", pt: "Retirar", it: "Ritira", ja: "引退させる", zh: "退隐", hi: "सेवानिवृत्त करें", ar: "تقاعد",
+  },
+  "idn.end.retire.note": {
+    en: "The profile departs. What it meant to the people who knew it stays readable, and so does the export.", es: "El perfil se marcha. Lo que significó para quienes lo conocieron sigue siendo legible, y la exportación también.", fr: "Le profil s'en va. Ce qu'il a représenté pour ceux qui l'ont connu reste lisible, et l'export aussi.", de: "Das Profil geht fort. Was es denen bedeutete, die es kannten, bleibt lesbar, und der Export ebenso.", pt: "O perfil parte. O que significou para quem o conheceu continua legível, e a exportação também.", it: "Il profilo se ne va. Ciò che ha significato per chi lo ha conosciuto resta leggibile, e anche l'esportazione.", ja: "プロフィールは去ります。それを知っていた人々にとっての意味は読める状態で残り、エクスポートも残ります。", zh: "资料就此离去。它对认识它的人意味着什么，仍可读；导出的内容也仍在。", hi: "प्रोफ़ाइल विदा लेती है। जिन्होंने इसे जाना उनके लिए इसका जो अर्थ था वह पठनीय रहता है, और निर्यात भी।", ar: "يرحل الملف. ويبقى ما عناه لمن عرفوه مقروءًا، ويبقى التصدير كذلك.",
+  },
+  "idn.end.retire.yes": {
+    en: "Yes, retire it", es: "Sí, retíralo", fr: "Oui, le retirer", de: "Ja, zurückziehen", pt: "Sim, retirá-lo", it: "Sì, ritiralo", ja: "はい、引退させます", zh: "是的，让它退隐", hi: "हाँ, सेवानिवृत्त करें", ar: "نعم، أحِله للتقاعد",
+  },
+  "idn.end.sunset.line": {
+    en: "{status} · {n} farewell{s} · memory {memory}", es: "{status} · {n} despedidas · memoria {memory}", fr: "{status} · {n} adieux · mémoire {memory}", de: "{status} · {n} Abschiede · Erinnerung {memory}", pt: "{status} · {n} despedidas · memória {memory}", it: "{status} · {n} addii · memoria {memory}", ja: "{status} · 別れの言葉{n}件 · 記憶 {memory}", zh: "{status} · {n}句告别 · 记忆 {memory}", hi: "{status} · {n} विदाई · स्मृति {memory}", ar: "{status} · {n} وداعات · الذاكرة {memory}",
+  },
+  "idn.end.delete": {
+    en: "Delete", es: "Eliminar", fr: "Supprimer", de: "Löschen", pt: "Eliminar", it: "Elimina", ja: "削除", zh: "删除", hi: "मिटाएँ", ar: "احذف",
+  },
+  "idn.end.delete.note": {
+    en: "Erased, not retired. Nothing stays, and there is no memorial.", es: "Borrado, no retirado. No queda nada, y no hay memorial.", fr: "Effacé, pas retiré. Rien ne reste, et il n'y a pas de mémorial.", de: "Gelöscht, nicht zurückgezogen. Nichts bleibt, und es gibt keine Gedenkseite.", pt: "Apagado, não retirado. Nada fica, e não há memorial.", it: "Cancellato, non ritirato. Non resta nulla, e non c'è memoriale.", ja: "引退ではなく消去です。何も残らず、追悼もありません。", zh: "是抹除，不是退隐。什么都不留下，也没有纪念。", hi: "मिटाया गया, सेवानिवृत्त नहीं। कुछ नहीं बचता, और कोई स्मारक नहीं।", ar: "مُحي لا متقاعد. لا يبقى شيء، ولا تذكار.",
+  },
+  "idn.end.delete.yes": {
+    en: "Yes, delete it", es: "Sí, elimínalo", fr: "Oui, le supprimer", de: "Ja, löschen", pt: "Sim, eliminá-lo", it: "Sì, eliminalo", ja: "はい、削除します", zh: "是的，删除它", hi: "हाँ, मिटा दें", ar: "نعم، احذفه",
+  },
+  "idn.end.erased": {
+    en: "What was erased", es: "Qué se borró", fr: "Ce qui a été effacé", de: "Was gelöscht wurde", pt: "O que foi apagado", it: "Cosa è stato cancellato", ja: "消去されたもの", zh: "抹除了什么", hi: "क्या मिटाया गया", ar: "ما الذي مُحي",
+  },
+  "idn.end.zeros": {
+    en: "{n} other kinds of record had nothing to erase.", es: "Otros {n} tipos de registro no tenían nada que borrar.", fr: "{n} autres sortes d'enregistrement n'avaient rien à effacer.", de: "{n} andere Arten von Datensätzen hatten nichts zu löschen.", pt: "Outros {n} tipos de registo não tinham nada para apagar.", it: "Altri {n} tipi di record non avevano nulla da cancellare.", ja: "他の{n}種類のレコードには消すものがありませんでした。", zh: "另有{n}类记录没有可抹除的内容。", hi: "अन्य {n} प्रकार के रिकॉर्ड में मिटाने को कुछ नहीं था।", ar: "لم يكن لدى {n} أنواع أخرى من السجلات ما يُمحى.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

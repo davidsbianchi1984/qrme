@@ -4,6 +4,23 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.9] — 2026-08-05
+
+### Who this profile is, in every language
+
+The Identity screen — the roster of your own profiles with the one
+badge shown as a thing that sits somewhere and can move, the
+verification claim and who checked it, anonymity with the withheld and
+the *not* withheld list at the same weight, the bubble, the rename,
+the export, the memorial, and the two different endings — is localized
+end to end: forty-nine strings become forty-seven `idn.*` keys in all
+ten languages. The sentences that carry the feature's honesty stay
+whole: that only you can see the roster because it is the link between
+your personas, that a withheld attestor would point back to a name
+this profile does not publish, and that deleting is erasure rather
+than retirement. The console-untranslated record falls **1121 →
+1072**, exact-sync held in both directions.
+
 ## [0.44.8] — 2026-08-05
 
 ### The tail of the audit speaks

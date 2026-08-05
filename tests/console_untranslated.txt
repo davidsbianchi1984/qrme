@@ -1,4 +1,4 @@
-# status: backlog — 1121 rows
+# status: backlog — 1072 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1121
+# ceiling: 1072
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -371,55 +371,6 @@ Home: 🎗 Where the money goes
 Home: 🏛 Departments that coordinate
 Home: 🔮 What would they do
 Home: 🫱🏽‍🫲🏻 Blend a profile
-Identity: , rank
-Identity: A brief is the description you would hand a generator. Nothing here draws it for you — picking one sets the asset, and the portrait itself is yours to make.
-Identity: Anonymity
-Identity: Checked by
-Identity: Delete
-Identity: Ending it
-Identity: Erased, not retired. Nothing stays, and there is no memorial.
-Identity: Everything held about this profile, as rows. Leaving before you can take your things is not leaving.
-Identity: Export
-Identity: Memorial
-Identity: Move it to this profile
-Identity: Move the badge here
-Identity: Not withheld
-Identity: Nothing yet.
-Identity: Only you can see this list — it is the link between your separate personas, which is the thing anonymity is protecting.
-Identity: Or a portrait
-Identity: Record
-Identity: Rename
-Identity: Retire
-Identity: Reversible, from now on.
-Identity: Save
-Identity: Show the prompt
-Identity: Showing
-Identity: Shown as
-Identity: Take it with you
-Identity: The bubble
-Identity: The profile departs. What it meant to the people who knew it stays readable, and so does the export.
-Identity: The rules
-Identity: Two different endings, and the difference is what happens to the people who knew it.
-Identity: Verification
-Identity: What was erased
-Identity: Who checked is withheld — it would point back to a name this profile does not publish.
-Identity: Who this profile is
-Identity: Withheld
-Identity: Yes, delete it
-Identity: Yes, retire it
-Identity: Your profiles
-Identity: a new display name
-Identity: anonymous
-Identity: farewell
-Identity: how
-Identity: other kinds of record had nothing to erase.
-Identity: relationship
-Identity: this one
-Identity: touched
-Identity: verified (
-Identity: · memory
-Identity: · not verified
-Identity: · unverifiable — an invented person
 InWords: . The text is not returned here, deliberately, and it is not public either. It is waiting in the mark screen's queue.
 InWords: A public post faces the widest audience there is, so it always runs the strict filter — and it carries a synthetic-media credential from the moment it exists.
 InWords: An interactor's message, a room turn, a listing. Done with this profile's own model, into its language unless you name another.

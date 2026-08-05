@@ -3,6 +3,7 @@ import { api, type Anonymity, type Avatar, type AvatarBrief, type Deleted,
          type Emblem, type IdentityVocabulary, type Memorial, type Sibling,
          type Sunset, type Verifiable, type Verification } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -37,6 +38,7 @@ export function Identity({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -102,40 +104,38 @@ export function Identity({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Who this profile is</h2>
+      <h2>{tr("idn.title", lang)}</h2>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (
         <div className="card">
-          <h3>The rules</h3>
+          <h3>{tr("idn.rules", lang)}</h3>
           {/* The backend's own six sentences. */}
           <ul className="small">{vocab.rules.map((r) => <li key={r}>{r}</li>)}</ul>
         </div>
       )}
 
       <div className="card">
-        <h3>Your profiles</h3>
-        <p className="muted small">
-          Only you can see this list — it is the link between your separate
-          personas, which is the thing anonymity is protecting.
-        </p>
-        {roster.length === 0 && <p className="muted small">Nothing yet.</p>}
+        <h3>{tr("idn.roster", lang)}</h3>
+        <p className="muted small">{tr("idn.roster.pitch", lang)}</p>
+        {roster.length === 0 && <p className="muted small">{tr("idn.roster.none", lang)}</p>}
         {roster.map((s) => (
           <div key={s.profile_id} className="row">
             <div style={{ flex: 1 }}>
               <strong>{s.shown_as}</strong>
-              {s.profile_id === me && <span className="chip"> this one</span>}
-              {s.anonymous && <span className="chip"> anonymous</span>}
+              {s.profile_id === me && <span className="chip"> {tr("idn.roster.thisone", lang)}</span>}
+              {s.anonymous && <span className="chip"> {tr("idn.roster.anon", lang)}</span>}
               <div className="muted small">
                 {s.kind} · {s.status}
                 {s.verified
-                  ? <> · <b>verified ({s.level})</b></>
+                  ? <> · <b>{fill(tr("idn.roster.verified", lang),
+                       { level: s.level })}</b></>
                   : s.can_be_verified
-                    ? <> · not verified</>
+                    ? <> · {tr("idn.roster.notverified", lang)}</>
                     /* Not the same as "not yet". There is nobody to check. */
-                    : <> · unverifiable — an invented person</>}
+                    : <> · {tr("idn.roster.unverifiable", lang)}</>}
               </div>
             </div>
             {/* The badge moves; it is not re-earned. Offered on any sibling
@@ -148,28 +148,30 @@ export function Identity({ onPlans }: {
                   setNote(`${r.note} It is now on ${s.shown_as}.`);
                   reload();
                 } catch (e) { fail(e); }
-              }}>Move the badge here</button>
+              }}>{tr("idn.roster.move", lang)}</button>
             )}
           </div>
         ))}
       </div>
 
       <div className="card">
-        <h3>Verification</h3>
+        <h3>{tr("idn.ver", lang)}</h3>
         {verification && !verification.verified && (
           <p className="small">{verification.note}</p>
         )}
         {verification && verification.verified && (
           <>
             <p className="small">
-              <b>{verification.means}</b> ({verification.level}, rank{" "}
-              {verification.rank})
+              {fill(tr("idn.ver.means", lang), {
+                means: <b>{verification.means}</b>,
+                level: verification.level, rank: verification.rank,
+              })}
             </p>
             <p className="muted small">
               {verification.attestor
-                ? <>Checked by {verification.attestor}</>
-                : <>Who checked is withheld — it would point back to a name
-                   this profile does not publish.</>}
+                ? fill(tr("idn.ver.checkedby", lang),
+                    { who: verification.attestor })
+                : tr("idn.ver.withheld", lang)}
               {verification.method && <> · {verification.method}</>}
               {" · "}{verification.checked_at}
             </p>
@@ -190,7 +192,7 @@ export function Identity({ onPlans }: {
                   setNote(r.note);
                   reload();
                 } catch (e) { fail(e); }
-              }}>Move it to this profile</button>
+              }}>{tr("idn.ver.movehere", lang)}</button>
             )}
           </div>
         )}
@@ -207,9 +209,9 @@ export function Identity({ onPlans }: {
                      placeholder={needsAttestor ? "who checked (required)" : "who checked"}
                      style={{ flex: 1 }} />
               <input value={method} onChange={(e) => setMethod(e.target.value)}
-                     placeholder="how" />
+                     placeholder={tr("idn.ver.how.ph", lang)} />
               <button disabled={needsAttestor && !attestor.trim()} onClick={claim}>
-                Record
+                {tr("idn.ver.record", lang)}
               </button>
             </div>
             <p className="muted small">
@@ -222,9 +224,11 @@ export function Identity({ onPlans }: {
 
       {anon && (
         <div className="card">
-          <h3>Anonymity</h3>
+          <h3>{tr("idn.anon", lang)}</h3>
           <p className="small">
-            Shown as <strong>{anon.shown_as}</strong>. {anon.note}
+            {fill(tr("idn.anon.shown", lang), {
+              name: <strong>{anon.shown_as}</strong>, note: anon.note,
+            })}
           </p>
           <div className="row">
             <button onClick={async () => {
@@ -239,12 +243,12 @@ export function Identity({ onPlans }: {
               {anon.anonymous ? "Publish my name again" : "Withhold my name"}
             </button>
             {anon.reversible && (
-              <span className="muted small">Reversible, from now on.</span>
+              <span className="muted small">{tr("idn.anon.reversible", lang)}</span>
             )}
           </div>
           <div className="row">
             <div style={{ flex: 1 }}>
-              <h4>Withheld</h4>
+              <h4>{tr("idn.anon.withheld", lang)}</h4>
               <ul className="small">
                 {anon.withheld.map((w) => <li key={w}>{w}</li>)}
               </ul>
@@ -253,7 +257,7 @@ export function Identity({ onPlans }: {
                 surprised by, and a screen that showed only the other one
                 would be promising something the product does not do. */}
             <div style={{ flex: 1 }}>
-              <h4>Not withheld</h4>
+              <h4>{tr("idn.anon.notwithheld", lang)}</h4>
               <ul className="small">
                 {anon.not_withheld.map((w) => <li key={w}>{w}</li>)}
               </ul>
@@ -263,13 +267,14 @@ export function Identity({ onPlans }: {
       )}
 
       <div className="card">
-        <h3>The bubble</h3>
+        <h3>{tr("idn.bubble", lang)}</h3>
         {avatar && (
           <>
             <p className="small">
               {avatar.placeholder || avatar.silhouette
                 ? "Nothing in it yet."
-                : <>Showing <code>{avatar.asset}</code></>}
+                : fill(tr("idn.bubble.showing", lang),
+                    { asset: <code>{avatar.asset}</code> })}
             </p>
             {/* Always displayed, by the product's own rule — so the screen
                 shows it rather than implying it is a setting. */}
@@ -293,12 +298,8 @@ export function Identity({ onPlans }: {
         </div>
         {briefs.length > 0 && (
           <>
-            <h4>Or a portrait</h4>
-            <p className="muted small">
-              A brief is the description you would hand a generator. Nothing
-              here draws it for you — picking one sets the asset, and the
-              portrait itself is yours to make.
-            </p>
+            <h4>{tr("idn.bubble.portrait", lang)}</h4>
+            <p className="muted small">{tr("idn.bubble.brief", lang)}</p>
             {briefs.slice(0, 3).map((b) => (
               <div key={b.handle} className="row">
                 <div style={{ flex: 1 }}>
@@ -311,7 +312,7 @@ export function Identity({ onPlans }: {
                     const full = await api.avatarBrief(b.handle);
                     setNote(full.prompt || full.portrait);
                   } catch (e) { fail(e); }
-                }}>Show the prompt</button>
+                }}>{tr("idn.bubble.prompt", lang)}</button>
               </div>
             ))}
           </>
@@ -319,59 +320,54 @@ export function Identity({ onPlans }: {
       </div>
 
       <div className="card">
-        <h3>Rename</h3>
+        <h3>{tr("idn.rename", lang)}</h3>
         <div className="row">
           <input value={name} onChange={(e) => setName(e.target.value)}
-                 placeholder="a new display name" style={{ flex: 1 }} />
+                 placeholder={tr("idn.rename.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!name.trim()} onClick={async () => {
             setError(null); setNote(null);
             try {
               await api.editProfile(me, { display_name: name.trim() }, token);
               setNote("Renamed."); setName(""); reload();
             } catch (e) { fail(e); }
-          }}>Save</button>
+          }}>{tr("idn.rename.save", lang)}</button>
         </div>
       </div>
 
       <div className="card">
-        <h3>Take it with you</h3>
-        <p className="muted small">
-          Everything held about this profile, as rows. Leaving before you can
-          take your things is not leaving.
-        </p>
+        <h3>{tr("idn.export", lang)}</h3>
+        <p className="muted small">{tr("idn.export.pitch", lang)}</p>
         <button onClick={async () => {
           setError(null); setNote(null);
           try {
             const data = await api.exportProfile(me, token);
             setNote(`Exported: ${Object.keys(data).join(", ")}.`);
           } catch (e) { fail(e); }
-        }}>Export</button>
+        }}>{tr("idn.export.go", lang)}</button>
       </div>
 
       {memorial && (
         <div className="card">
-          <h3>Memorial</h3>
+          <h3>{tr("idn.mem", lang)}</h3>
           <p className="small">{memorial.note}</p>
           <p className="muted small">
-            {memorial.status} · {memorial.relationships_touched} relationship
-            {memorial.relationships_touched === 1 ? "" : "s"} touched
+            {fill(tr("idn.mem.line", lang), {
+              status: memorial.status, n: memorial.relationships_touched,
+              s: memorial.relationships_touched === 1 ? "" : "s",
+            })}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>Ending it</h3>
-        <p className="muted small">
-          Two different endings, and the difference is what happens to the
-          people who knew it.
-        </p>
+        <h3>{tr("idn.end", lang)}</h3>
+        <p className="muted small">{tr("idn.end.pitch", lang)}</p>
 
         <div className="row">
           <div style={{ flex: 1 }}>
-            <strong>Retire</strong>
+            <strong>{tr("idn.end.retire", lang)}</strong>
             <div className="muted small">
-              The profile departs. What it meant to the people who knew it
-              stays readable, and so does the export.
+              {tr("idn.end.retire.note", lang)}
             </div>
           </div>
           {confirmEnd === "sunset" ? (
@@ -381,23 +377,25 @@ export function Identity({ onPlans }: {
                 setEnded(await api.sunsetProfile(me, token));
                 reload();
               } catch (e) { fail(e); }
-            }}>Yes, retire it</button>
+            }}>{tr("idn.end.retire.yes", lang)}</button>
           ) : (
-            <button onClick={() => setConfirmEnd("sunset")}>Retire</button>
+            <button onClick={() => setConfirmEnd("sunset")}>{tr("idn.end.retire", lang)}</button>
           )}
         </div>
         {ended && (
           <p className="small">
-            {ended.status} · {ended.farewells} farewell
-            {ended.farewells === 1 ? "" : "s"} · memory {ended.memory}
+            {fill(tr("idn.end.sunset.line", lang), {
+              status: ended.status, n: ended.farewells,
+              s: ended.farewells === 1 ? "" : "s", memory: ended.memory,
+            })}
           </p>
         )}
 
         <div className="row">
           <div style={{ flex: 1 }}>
-            <strong>Delete</strong>
+            <strong>{tr("idn.end.delete", lang)}</strong>
             <div className="muted small">
-              Erased, not retired. Nothing stays, and there is no memorial.
+              {tr("idn.end.delete.note", lang)}
             </div>
           </div>
           {confirmEnd === "delete" ? (
@@ -406,24 +404,25 @@ export function Identity({ onPlans }: {
               try {
                 setGone(await api.deleteProfile(me, token));
               } catch (e) { fail(e); }
-            }}>Yes, delete it</button>
+            }}>{tr("idn.end.delete.yes", lang)}</button>
           ) : (
-            <button onClick={() => setConfirmEnd("delete")}>Delete</button>
+            <button onClick={() => setConfirmEnd("delete")}>{tr("idn.end.delete", lang)}</button>
           )}
         </div>
         {/* The receipt, itemised. "Deleted" is a claim; these are evidence,
             and the row that reads `profile: 1` is the one that matters. */}
         {gone && (
           <>
-            <h4>What was erased</h4>
+            <h4>{tr("idn.end.erased", lang)}</h4>
             <ul className="small">
               {Object.entries(gone.deleted)
                 .filter(([, n]) => n > 0)
                 .map(([table, n]) => <li key={table}>{table}: {n}</li>)}
             </ul>
             <p className="muted small">
-              {Object.values(gone.deleted).filter((n) => n === 0).length} other
-              kinds of record had nothing to erase.
+              {fill(tr("idn.end.zeros", lang), {
+                n: Object.values(gone.deleted).filter((n) => n === 0).length,
+              })}
             </p>
           </>
         )}
