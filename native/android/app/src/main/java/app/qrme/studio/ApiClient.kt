@@ -2965,6 +2965,188 @@ object ApiClient {
                 .put("specialist_profile_id", specialistId), token)
     }
 
+    // -- the record, the veil and the exit: what the platform holds about
+    // a profile, what its anonymity hides, and how it ends ---------------
+
+    suspend fun memories(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/memories",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("interactor_name") + " \u00b7 " + o.optInt("turns")
+        }
+    }
+
+    suspend fun memory(id: String, interactorId: String,
+                       token: String): List<String> {
+        val arr = org.json.JSONArray(request(
+            "/profiles/$id/memory/$interactorId", token = token))
+        return (0 until arr.length()).map {
+            arr.getJSONObject(it).optString("content")
+        }
+    }
+
+    suspend fun eraseMemory(id: String, interactorId: String,
+                            token: String) {
+        request("/profiles/$id/memory/$interactorId", "DELETE",
+            token = token)
+    }
+
+    suspend fun thread(id: String, interactorId: String,
+                       token: String): String {
+        val o = JSONObject(request("/profiles/$id/thread/$interactorId",
+            token = token))
+        return (o.optJSONArray("messages")?.length() ?: 0).toString()
+    }
+
+    suspend fun engagement(id: String, interactorId: String,
+                           token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/engagement/$interactorId", token = token))
+        return o.optInt("sessions").toString()
+    }
+
+    /** The pair may read it — the person it is about, and the profile's
+     *  owner — and nobody else: it is that person's medical information. */
+    suspend fun clinicalNotes(id: String, interactorId: String,
+                              token: String): List<String> {
+        val arr = org.json.JSONArray(request(
+            "/profiles/$id/clinical-notes/$interactorId", token = token))
+        return (0 until arr.length()).map {
+            arr.getJSONObject(it).optString("note")
+        }
+    }
+
+    suspend fun embedding(id: String, interactorId: String,
+                          token: String) {
+        request("/profiles/$id/embedding/$interactorId", token = token)
+    }
+
+    suspend fun sources(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/sources",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("kind") + " \u00b7 " + o.optString("title")
+        }
+    }
+
+    suspend fun addSource(id: String, kind: String, title: String,
+                          content: String, token: String) {
+        request("/profiles/$id/sources", "POST",
+            JSONObject().put("kind", kind).put("title", title)
+                .put("content", content), token)
+    }
+
+    /** Public on purpose: how many relationships this profile holds, and
+     *  which model actually answers for it. */
+    suspend fun transparency(id: String): String {
+        val o = JSONObject(request("/profiles/$id/transparency"))
+        return o.optInt("active_relationships").toString() + " \u00b7 " +
+            o.optString("model_effective")
+    }
+
+    suspend fun exportProfile(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/export", token = token))
+        return (o.optJSONArray("messages")?.length() ?: 0).toString() +
+            " \u00b7 " + (o.optJSONArray("posts")?.length() ?: 0) +
+            " \u00b7 " + (o.optJSONArray("sources")?.length() ?: 0)
+    }
+
+    suspend fun profileStats(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/stats", token = token))
+        return o.optInt("sessions").toString() + " \u00b7 " +
+            o.optInt("memory_entries") + " \u00b7 " +
+            o.optInt("interactors") + " \u00b7 " + o.optInt("sources")
+    }
+
+    suspend fun feed(id: String): String {
+        val o = JSONObject(request("/profiles/$id/feed"))
+        val ranked = o.optJSONArray("ranked_on")
+        return (o.optJSONArray("posts")?.length() ?: 0).toString() +
+            " \u00b7 " + (ranked?.join(", ") ?: "")
+    }
+
+    suspend fun anonymity(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/anonymity",
+            token = token))
+        // What it does NOT hide renders first — the generous reading of
+        // "anonymous" is the dangerous one.
+        return o.optJSONArray("not_withheld")?.join(" \u00b7 ") ?: ""
+    }
+
+    suspend fun setAnonymity(id: String, anonymous: Boolean,
+                             token: String) {
+        request("/profiles/$id/anonymity", "PUT",
+            JSONObject().put("anonymous", anonymous), token)
+    }
+
+    /** Public: a claim a stranger can see is a claim a stranger should be
+     *  able to check. */
+    suspend fun verification(id: String): String {
+        val o = JSONObject(request("/profiles/$id/verification"))
+        return o.optString("level", "\u2014") + " \u00b7 " +
+            o.optString("attestor", "\u2014")
+    }
+
+    suspend fun claimVerification(id: String, level: String,
+                                  attestor: String, token: String) {
+        request("/profiles/$id/verification", "POST",
+            JSONObject().put("level", level).put("attestor", attestor)
+                .put("method", "document"), token)
+    }
+
+    suspend fun moveBadgeHere(id: String, token: String) {
+        request("/profiles/$id/verification/move", "POST", token = token)
+    }
+
+    suspend fun verifiable(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/verifiable",
+            token = token))
+        return o.optString("reason", o.optBoolean("can_verify").toString())
+    }
+
+    suspend fun editProfile(id: String, displayName: String,
+                            persona: String, token: String) {
+        val body = JSONObject()
+        if (displayName.isNotEmpty()) body.put("display_name", displayName)
+        if (persona.isNotEmpty()) body.put("persona", persona)
+        request("/profiles/$id", "PATCH", body, token)
+    }
+
+    suspend fun sunset(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/sunset", "POST",
+            token = token))
+        return o.optInt("farewells").toString()
+    }
+
+    /** Public memorial for a departed profile — never persona internals. */
+    suspend fun memorial(id: String): String {
+        val o = JSONObject(request("/profiles/$id/memorial"))
+        return o.optString("display_name") + " \u00b7 " +
+            o.optInt("relationships_touched")
+    }
+
+    suspend fun siblings(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/siblings",
+            token = token))
+        val arr = o.optJSONArray("profiles")
+        return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
+            arr!!.getJSONObject(it).optString("display_name")
+        }
+    }
+
+    suspend fun succeed(id: String, verificationRef: String,
+                        token: String): String {
+        val o = JSONObject(request("/profiles/$id/succeed", "POST",
+            JSONObject().put("verification_ref", verificationRef), token))
+        return o.optBoolean("succeeded").toString()
+    }
+
+    suspend fun deleteProfile(id: String, token: String) {
+        request("/profiles/$id", "DELETE", token = token)
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

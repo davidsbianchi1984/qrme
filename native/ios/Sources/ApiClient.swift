@@ -3508,6 +3508,168 @@ extension ApiClient {
                                  "specialist_profile_id": specialistId],
                           token: token)
     }
+
+    // -- the record, the veil and the exit: what the platform holds about
+    // a profile, what its anonymity hides, and how it ends ---------------
+
+    func memories(id: String, token: String) async throws -> [MemoryRow] {
+        try await request("/profiles/\(id)/memories", token: token)
+    }
+
+    func memory(id: String, interactorId: String,
+                token: String) async throws -> [MemoryTurn] {
+        try await request("/profiles/\(id)/memory/\(interactorId)",
+                          token: token)
+    }
+
+    func eraseMemory(id: String, interactorId: String,
+                     token: String) async throws {
+        struct Out: Decodable {}
+        let _: Out = try await request(
+            "/profiles/\(id)/memory/\(interactorId)", method: "DELETE",
+            token: token)
+    }
+
+    // -- between the profile and one person --
+
+    func thread(id: String, interactorId: String,
+                token: String) async throws -> ThreadOut {
+        try await request("/profiles/\(id)/thread/\(interactorId)",
+                          token: token)
+    }
+
+    func engagement(id: String, interactorId: String,
+                    token: String) async throws -> EngagementCard {
+        try await request("/profiles/\(id)/engagement/\(interactorId)",
+                          token: token)
+    }
+
+    /// The pair may read it — the person it is about, and the profile's
+    /// owner — and nobody else: it is that person's medical information.
+    func clinicalNotes(id: String, interactorId: String,
+                       token: String) async throws -> [ClinicalNote] {
+        try await request(
+            "/profiles/\(id)/clinical-notes/\(interactorId)",
+            token: token)
+    }
+
+    func embedding(id: String, interactorId: String,
+                   token: String) async throws -> EmbeddingCard {
+        try await request("/profiles/\(id)/embedding/\(interactorId)",
+                          token: token)
+    }
+
+    // -- source material --
+
+    func sources(id: String, token: String) async throws -> [SourceRow] {
+        try await request("/profiles/\(id)/sources", token: token)
+    }
+
+    func addSource(id: String, kind: String, title: String, content: String,
+                   token: String) async throws -> SourceRow {
+        try await request("/profiles/\(id)/sources", method: "POST",
+                          body: ["kind": kind, "title": title,
+                                 "content": content],
+                          token: token)
+    }
+
+    // -- the record --
+
+    /// Public on purpose: how many relationships this profile holds, and
+    /// which model actually answers for it.
+    func transparency(id: String) async throws -> TransparencyCard {
+        try await request("/profiles/\(id)/transparency")
+    }
+
+    func exportProfile(id: String, token: String) async throws -> ExportOut {
+        try await request("/profiles/\(id)/export", token: token)
+    }
+
+    func profileStats(id: String, token: String) async throws -> StatsCard {
+        try await request("/profiles/\(id)/stats", token: token)
+    }
+
+    func feed(id: String) async throws -> FeedOut {
+        try await request("/profiles/\(id)/feed")
+    }
+
+    // -- the veil --
+
+    func anonymity(id: String, token: String) async throws -> VeilCard {
+        try await request("/profiles/\(id)/anonymity", token: token)
+    }
+
+    func setAnonymity(id: String, anonymous: Bool,
+                      token: String) async throws -> VeilCard {
+        try await request("/profiles/\(id)/anonymity", method: "PUT",
+                          body: ["anonymous": anonymous], token: token)
+    }
+
+    // -- verification --
+
+    /// Public: a claim a stranger can see is a claim a stranger should be
+    /// able to check.
+    func verification(id: String) async throws -> VerificationCard {
+        try await request("/profiles/\(id)/verification")
+    }
+
+    func claimVerification(id: String, level: String, attestor: String,
+                           token: String) async throws -> VerificationCard {
+        try await request("/profiles/\(id)/verification", method: "POST",
+                          body: ["level": level, "attestor": attestor,
+                                 "method": "document"],
+                          token: token)
+    }
+
+    func moveBadgeHere(id: String, token: String) async throws
+        -> VerificationCard {
+        try await request("/profiles/\(id)/verification/move",
+                          method: "POST", token: token)
+    }
+
+    func verifiable(id: String, token: String) async throws -> VerifiableOut {
+        try await request("/profiles/\(id)/verifiable", token: token)
+    }
+
+    // -- the exit --
+
+    func editProfile(id: String, displayName: String?, persona: String?,
+                     token: String) async throws -> ProfilePatched {
+        var body: [String: Any] = [:]
+        if let displayName, !displayName.isEmpty {
+            body["display_name"] = displayName
+        }
+        if let persona, !persona.isEmpty { body["persona"] = persona }
+        return try await request("/profiles/\(id)", method: "PATCH",
+                                 body: body, token: token)
+    }
+
+    func sunset(id: String, token: String) async throws -> SunsetOut {
+        try await request("/profiles/\(id)/sunset", method: "POST",
+                          token: token)
+    }
+
+    /// Public memorial for a departed profile — never persona internals.
+    func memorial(id: String) async throws -> MemorialCard {
+        try await request("/profiles/\(id)/memorial")
+    }
+
+    func siblings(id: String, token: String) async throws -> RosterOut {
+        try await request("/profiles/\(id)/siblings", token: token)
+    }
+
+    func succeed(id: String, verificationRef: String,
+                 token: String) async throws -> SucceedOut {
+        try await request("/profiles/\(id)/succeed", method: "POST",
+                          body: ["verification_ref": verificationRef],
+                          token: token)
+    }
+
+    func deleteProfile(id: String, token: String) async throws {
+        struct Out: Decodable {}
+        let _: Out = try await request("/profiles/\(id)", method: "DELETE",
+                                       token: token)
+    }
 }
 
 struct WorkflowCard: Decodable, Identifiable {
@@ -3599,4 +3761,119 @@ struct PlacementCustody: Decodable {
 struct SpecialistRow: Decodable {
     let domain: String
     let specialist_profile_id: String
+}
+
+struct MemoryRow: Decodable, Identifiable {
+    let interactor_id: String
+    let interactor_name: String
+    let turns: Int
+    var id: String { interactor_id }
+}
+
+struct MemoryTurn: Decodable, Identifiable {
+    let id: String
+    let role: String
+    let content: String
+}
+
+struct ThreadOut: Decodable {
+    struct Turn: Decodable { let role: String?; let content: String? }
+    let messages: [Turn]
+}
+
+struct EngagementCard: Decodable {
+    let sessions: Int?
+    let score: Double?
+}
+
+struct ClinicalNote: Decodable {
+    let note: String?
+    let clinician: String?
+}
+
+struct EmbeddingCard: Decodable {
+    let profile_id: String?
+    let interactor_id: String?
+}
+
+struct SourceRow: Decodable, Identifiable {
+    let id: String
+    let kind: String
+    let title: String?
+    let vaulted: Bool?
+}
+
+struct TransparencyCard: Decodable {
+    let active_relationships: Int
+    let model_effective: String?
+    let policy: String
+}
+
+struct ExportOut: Decodable {
+    struct Msg: Decodable {}
+    let messages: [Msg]
+    let posts: [Msg]
+    let sources: [Msg]
+}
+
+struct StatsCard: Decodable {
+    let sessions: Int
+    let memory_entries: Int
+    let interactors: Int
+    let sources: Int
+}
+
+struct FeedOut: Decodable {
+    struct Entry: Decodable {}
+    let posts: [Entry]
+    let ranked_on: [String]
+    let never_ranked_on: [String]
+}
+
+struct VeilCard: Decodable {
+    let anonymous: Bool?
+    let withheld: [String]?
+    let not_withheld: [String]?
+}
+
+struct VerificationCard: Decodable {
+    let verified: Bool?
+    let level: String?
+    let attestor: String?
+    let means: String?
+}
+
+struct VerifiableOut: Decodable {
+    let can_verify: Bool
+    let reason: String?
+}
+
+struct ProfilePatched: Decodable {
+    let id: String
+    let display_name: String?
+}
+
+struct SunsetOut: Decodable {
+    let status: String?
+    let farewells: Int?
+}
+
+struct MemorialCard: Decodable {
+    let display_name: String?
+    let purpose: String?
+    let relationships_touched: Int?
+}
+
+struct RosterOut: Decodable {
+    struct Sibling: Decodable {
+        let id: String
+        let display_name: String?
+        let anonymous: Bool?
+    }
+    let profiles: [Sibling]?
+}
+
+struct SucceedOut: Decodable {
+    let succeeded: Bool
+    let memorial: Bool?
 }

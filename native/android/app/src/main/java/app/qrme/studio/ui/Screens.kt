@@ -2800,6 +2800,13 @@ private fun PeoplePanel(vm: StudioViewModel) {
         TaskBlock(vm) { note = it }
         PlcBlock(vm) { note = it }
         SpecBlock(vm) { note = it }
+        MemBlock(vm) { note = it }
+        PairBlock(vm) { note = it }
+        SrcBlock(vm) { note = it }
+        RecBlock(vm) { note = it }
+        VeilBlock(vm) { note = it }
+        BadgeBlock(vm) { note = it }
+        ExitBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -4039,6 +4046,239 @@ private fun SpecBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 vm.token!!) }) { r ->
                 domain = ""; specialistId = ""
                 onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+
+// The record, the veil and the exit: the memory list exists for choosing
+// what to erase; the veil's limits are half the payload; the badge is a
+// fact, not a word; and departing, memorializing and deleting are three
+// different ends with three different buttons.
+@Composable
+private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rows by remember { mutableStateOf(listOf<String>()) }
+    var visitorId by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.memories(vm.pid!!, vm.token!!) }) { r ->
+            rows = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("mem.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        rows.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        labeledField(L10n.t("mem.id", lang), visitorId, "") { visitorId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("mem.show", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.memory(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull()?.takeLast(3)?.joinToString(" \u00b7 ")
+                        ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("mem.erase", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.eraseMemory(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    visitorId = ""
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PairBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var visitorId by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("who.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("mem.id", lang), visitorId, "") { visitorId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("who.thread", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.thread(vm.pid!!, visitorId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("who.engagement", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.engagement(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("who.notes", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.clinicalNotes(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull()?.joinToString(" \u00b7 ")
+                        ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("who.embedding", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.embedding(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message ?: "\u2713") }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SrcBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rows by remember { mutableStateOf(listOf<String>()) }
+    var kind by remember { mutableStateOf("life_event") }
+    var title by remember { mutableStateOf("") }
+    var words by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.sources(vm.pid!!, vm.token!!) }) { r ->
+            rows = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("src.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        rows.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        labeledField(L10n.t("src.kind", lang), kind, "") { kind = it }
+        labeledField(L10n.t("src.name", lang), title, "") { title = it }
+        labeledField(L10n.t("src.words", lang), words, "") { words = it }
+        BrandButton(L10n.t("src.add", lang), enabled = words.isNotBlank()) {
+            vm.call({ ApiClient.addSource(vm.pid!!, kind, title, words,
+                vm.token!!) }) { r ->
+                title = ""; words = ""
+                onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun RecBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("rec.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("rec.transparency", lang)) {
+                vm.call({ ApiClient.transparency(vm.pid!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("rec.stats", lang)) {
+                vm.call({ ApiClient.profileStats(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("rec.export", lang)) {
+                vm.call({ ApiClient.exportProfile(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("rec.feed", lang)) {
+                vm.call({ ApiClient.feed(vm.pid!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun VeilBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("veil.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("veil.show", lang)) {
+                vm.call({ ApiClient.anonymity(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("veil.on", lang)) {
+                vm.call({ ApiClient.setAnonymity(vm.pid!!, true,
+                    vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("veil.off", lang)) {
+                vm.call({ ApiClient.setAnonymity(vm.pid!!, false,
+                    vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BadgeBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var level by remember { mutableStateOf("document") }
+    var attestor by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("ver.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("ver.show", lang)) {
+                vm.call({ ApiClient.verification(vm.pid!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("ver.able", lang)) {
+                vm.call({ ApiClient.verifiable(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("ver.level", lang), level, "") { level = it }
+        labeledField(L10n.t("ver.attestor", lang), attestor, "") { attestor = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("ver.claim", lang), enabled = level.isNotBlank()) {
+                vm.call({ ApiClient.claimVerification(vm.pid!!, level,
+                    attestor, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("ver.move", lang)) {
+                vm.call({ ApiClient.moveBadgeHere(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExitBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var newName by remember { mutableStateOf("") }
+    var newPersona by remember { mutableStateOf("") }
+    var reference by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("exit.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("exit.rename", lang), newName, "") { newName = it }
+        labeledField(L10n.t("exit.persona", lang), newPersona, "") { newPersona = it }
+        BrandButton(L10n.t("exit.save", lang),
+            enabled = newName.isNotBlank() || newPersona.isNotBlank()) {
+            vm.call({ ApiClient.editProfile(vm.pid!!, newName, newPersona,
+                vm.token!!) }) { r ->
+                newName = ""; newPersona = ""
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("exit.siblings", lang)) {
+                vm.call({ ApiClient.siblings(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("exit.memorial", lang)) {
+                vm.call({ ApiClient.memorial(vm.pid!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("exit.ref", lang), reference, "") { reference = it }
+        BrandButton(L10n.t("exit.succeed", lang),
+            enabled = reference.isNotBlank()) {
+            vm.call({ ApiClient.succeed(vm.pid!!, reference, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("exit.sunset", lang)) {
+                vm.call({ ApiClient.sunset(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("exit.delete", lang)) {
+                vm.call({ ApiClient.deleteProfile(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
         }
     }
 }

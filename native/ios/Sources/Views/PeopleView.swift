@@ -224,6 +224,13 @@ struct PeopleSection: View {
                 TaskSection()
                 PlacementSection()
                 SpecialistSection()
+                MemorySection()
+                PairSection()
+                SourceSection()
+                RecordSection()
+                VeilSection()
+                BadgeSection()
+                ExitSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

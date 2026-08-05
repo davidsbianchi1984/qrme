@@ -2679,8 +2679,142 @@ public sealed class ApiClient
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<SpecialistRow>(req);
     }
-}
 
+    // -- the record, the veil and the exit: what the platform holds about
+    // a profile, what its anonymity hides, and how it ends ---------------
+
+    public Task<MemoryRow[]> Memories(string profileId, string token) =>
+        Send<MemoryRow[]>(Get($"/profiles/{profileId}/memories", token));
+
+    public Task<MemoryTurn[]> Memory(string profileId, string interactorId,
+        string token) =>
+        Send<MemoryTurn[]>(Get(
+            $"/profiles/{profileId}/memory/{interactorId}", token));
+
+    public Task<MemoryTurn> EraseMemory(string profileId,
+        string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/memory/{interactorId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MemoryTurn>(req);
+    }
+
+    public Task<ThreadOut> ThreadOf(string profileId, string interactorId,
+        string token) =>
+        Send<ThreadOut>(Get(
+            $"/profiles/{profileId}/thread/{interactorId}", token));
+
+    public Task<EngagementCard> EngagementOf(string profileId,
+        string interactorId, string token) =>
+        Send<EngagementCard>(Get(
+            $"/profiles/{profileId}/engagement/{interactorId}", token));
+
+    /// <summary>The pair may read it — the person it is about, and the
+    /// profile's owner — and nobody else.</summary>
+    public Task<ClinicalNote[]> ClinicalNotes(string profileId,
+        string interactorId, string token) =>
+        Send<ClinicalNote[]>(Get(
+            $"/profiles/{profileId}/clinical-notes/{interactorId}", token));
+
+    public Task<EmbeddingCard> EmbeddingOf(string profileId,
+        string interactorId, string token) =>
+        Send<EmbeddingCard>(Get(
+            $"/profiles/{profileId}/embedding/{interactorId}", token));
+
+    public Task<SourceRow[]> Sources(string profileId, string token) =>
+        Send<SourceRow[]>(Get($"/profiles/{profileId}/sources", token));
+
+    public Task<SourceRow> AddSource(string profileId, string kind,
+        string title, string content, string token) =>
+        Send<SourceRow>(Post($"/profiles/{profileId}/sources",
+            new { kind, title, content }, token));
+
+    /// <summary>Public on purpose: how many relationships this profile
+    /// holds, and which model actually answers for it.</summary>
+    public Task<TransparencyCard> TransparencyOf(string profileId) =>
+        Send<TransparencyCard>(Get($"/profiles/{profileId}/transparency"));
+
+    public Task<ExportOut> ExportProfile(string profileId, string token) =>
+        Send<ExportOut>(Get($"/profiles/{profileId}/export", token));
+
+    public Task<StatsCard> ProfileStats(string profileId, string token) =>
+        Send<StatsCard>(Get($"/profiles/{profileId}/stats", token));
+
+    public Task<FeedOut> FeedOf(string profileId) =>
+        Send<FeedOut>(Get($"/profiles/{profileId}/feed"));
+
+    public Task<VeilCard> AnonymityOf(string profileId, string token) =>
+        Send<VeilCard>(Get($"/profiles/{profileId}/anonymity", token));
+
+    public Task<VeilCard> SetAnonymity(string profileId, bool anonymous,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/anonymity")
+        { Content = JsonContent.Create(new { anonymous }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<VeilCard>(req);
+    }
+
+    /// <summary>Public: a claim a stranger can see is a claim a stranger
+    /// should be able to check.</summary>
+    public Task<VerificationCard> VerificationOf(string profileId) =>
+        Send<VerificationCard>(Get($"/profiles/{profileId}/verification"));
+
+    public Task<VerificationCard> ClaimVerification(string profileId,
+        string level, string attestor, string token) =>
+        Send<VerificationCard>(Post($"/profiles/{profileId}/verification",
+            new { level, attestor, method = "document" }, token));
+
+    public Task<VerificationCard> MoveBadgeHere(string profileId,
+        string token) =>
+        Send<VerificationCard>(Post(
+            $"/profiles/{profileId}/verification/move", new { }, token));
+
+    public Task<VerifiableOut> VerifiableOf(string profileId,
+        string token) =>
+        Send<VerifiableOut>(Get($"/profiles/{profileId}/verifiable",
+            token));
+
+    public Task<ProfilePatched> EditProfile(string profileId,
+        string displayName, string persona, string token)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, string>();
+        if (displayName.Length > 0) body["display_name"] = displayName;
+        if (persona.Length > 0) body["persona"] = persona;
+        var req = new HttpRequestMessage(HttpMethod.Patch,
+            $"/profiles/{profileId}")
+        { Content = JsonContent.Create(body) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ProfilePatched>(req);
+    }
+
+    public Task<SunsetOut> Sunset(string profileId, string token) =>
+        Send<SunsetOut>(Post($"/profiles/{profileId}/sunset", new { },
+            token));
+
+    /// <summary>Public memorial for a departed profile — never persona
+    /// internals.</summary>
+    public Task<MemorialCard> MemorialOf(string profileId) =>
+        Send<MemorialCard>(Get($"/profiles/{profileId}/memorial"));
+
+    public Task<RosterOut> Siblings(string profileId, string token) =>
+        Send<RosterOut>(Get($"/profiles/{profileId}/siblings", token));
+
+    public Task<SucceedOut> Succeed(string profileId,
+        string verificationRef, string token) =>
+        Send<SucceedOut>(Post($"/profiles/{profileId}/succeed",
+            new { verification_ref = verificationRef }, token));
+
+    public Task<SucceedOut> DeleteProfile(string profileId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SucceedOut>(req);
+    }
+}
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("sender_id")] string SenderId,
@@ -3239,3 +3373,103 @@ public record SpecialistRow(
     [property: JsonPropertyName("domain")] string Domain,
     [property: JsonPropertyName("specialist_profile_id")]
     string SpecialistProfileId);
+
+public record MemoryRow(
+    [property: JsonPropertyName("interactor_id")] string InteractorId,
+    [property: JsonPropertyName("interactor_name")] string? InteractorName,
+    [property: JsonPropertyName("turns")] int Turns);
+
+public record MemoryTurn(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("role")] string? Role,
+    [property: JsonPropertyName("content")] string? Content);
+
+public record ThreadTurn(
+    [property: JsonPropertyName("role")] string? Role,
+    [property: JsonPropertyName("content")] string? Content);
+
+public record ThreadOut(
+    [property: JsonPropertyName("messages")] ThreadTurn[] Messages);
+
+public record EngagementCard(
+    [property: JsonPropertyName("sessions")] int? Sessions,
+    [property: JsonPropertyName("score")] double? Score);
+
+public record ClinicalNote(
+    [property: JsonPropertyName("note")] string? Note,
+    [property: JsonPropertyName("clinician")] string? Clinician);
+
+public record EmbeddingCard(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("interactor_id")] string? InteractorId);
+
+public record SourceRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("vaulted")] bool? Vaulted);
+
+public record TransparencyCard(
+    [property: JsonPropertyName("active_relationships")]
+    int ActiveRelationships,
+    [property: JsonPropertyName("model_effective")] string? ModelEffective,
+    [property: JsonPropertyName("policy")] string? Policy);
+
+public record ExportOut(
+    [property: JsonPropertyName("messages")] JsonElement[] Messages,
+    [property: JsonPropertyName("posts")] JsonElement[] Posts,
+    [property: JsonPropertyName("sources")] JsonElement[] Sources);
+
+public record StatsCard(
+    [property: JsonPropertyName("sessions")] int Sessions,
+    [property: JsonPropertyName("memory_entries")] int MemoryEntries,
+    [property: JsonPropertyName("interactors")] int Interactors,
+    [property: JsonPropertyName("sources")] int Sources);
+
+public record FeedOut(
+    [property: JsonPropertyName("posts")] JsonElement[] Posts,
+    [property: JsonPropertyName("ranked_on")] string[] RankedOn,
+    [property: JsonPropertyName("never_ranked_on")] string[] NeverRankedOn);
+
+public record VeilCard(
+    [property: JsonPropertyName("anonymous")] bool? Anonymous,
+    [property: JsonPropertyName("withheld")] string[]? Withheld,
+    [property: JsonPropertyName("not_withheld")] string[]? NotWithheld);
+
+public record VerificationCard(
+    [property: JsonPropertyName("verified")] bool? Verified,
+    [property: JsonPropertyName("level")] string? Level,
+    [property: JsonPropertyName("attestor")] string? Attestor,
+    [property: JsonPropertyName("means")] string? Means);
+
+public record VerifiableOut(
+    [property: JsonPropertyName("can_verify")] bool CanVerify,
+    [property: JsonPropertyName("reason")] string? Reason);
+
+public record ProfilePatched(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("display_name")] string? DisplayName);
+
+public record SunsetOut(
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("farewells")] int? Farewells,
+    [property: JsonPropertyName("succeeded")] bool? Succeeded,
+    [property: JsonPropertyName("memorial")] bool? Memorial);
+
+public record SucceedOut(
+    [property: JsonPropertyName("succeeded")] bool? Succeeded,
+    [property: JsonPropertyName("memorial")] bool? Memorial);
+
+public record MemorialCard(
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("purpose")] string? Purpose,
+    [property: JsonPropertyName("relationships_touched")]
+    int? RelationshipsTouched);
+
+public record RosterSibling(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("anonymous")] bool? Anonymous);
+
+public record RosterOut(
+    [property: JsonPropertyName("profiles")] RosterSibling[]? Profiles);

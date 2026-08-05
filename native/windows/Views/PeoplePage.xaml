@@ -717,6 +717,128 @@
                     <Button x:Name="SpecSetButton" Click="OnSpecSet" />
                 </StackPanel>
             </Border>
+
+            <!-- The record, the veil and the exit: the memory list exists
+                 for choosing what to erase; the veil's limits are half the
+                 payload; the badge is a fact, not a word; and departing,
+                 memorializing and deleting are three different ends. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MemTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="MemList" />
+                    <TextBox x:Name="MemIdBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="MemShowButton" Click="OnMemShow" />
+                        <Button x:Name="MemEraseButton" Click="OnMemErase" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Between you two. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="PairTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="PairIdBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="PairThreadButton" Click="OnPairThread" />
+                        <Button x:Name="PairEngagementButton" Click="OnPairEngagement" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="PairNotesButton" Click="OnPairNotes" />
+                        <Button x:Name="PairEmbeddingButton" Click="OnPairEmbedding" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Source material. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SrcTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="SrcList" />
+                    <TextBox x:Name="SrcKindBox" />
+                    <TextBox x:Name="SrcNameBox" />
+                    <TextBox x:Name="SrcWordsBox" />
+                    <Button x:Name="SrcAddButton" Click="OnSrcAdd" />
+                </StackPanel>
+            </Border>
+
+            <!-- The record. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="RecTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="RecTransparencyButton" Click="OnRecTransparency" />
+                        <Button x:Name="RecStatsButton" Click="OnRecStats" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="RecExportButton" Click="OnRecExport" />
+                        <Button x:Name="RecFeedButton" Click="OnRecFeed" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The veil. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="VeilTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="VeilShowButton" Click="OnVeilShow" />
+                        <Button x:Name="VeilOnButton" Click="OnVeilOn" />
+                        <Button x:Name="VeilOffButton" Click="OnVeilOff" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Verification. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="VerTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="VerShowButton" Click="OnVerShow" />
+                        <Button x:Name="VerAbleButton" Click="OnVerAble" />
+                    </StackPanel>
+                    <TextBox x:Name="VerLevelBox" />
+                    <TextBox x:Name="VerAttestorBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="VerClaimButton" Click="OnVerClaim" />
+                        <Button x:Name="VerMoveButton" Click="OnVerMove" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The exit. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="ExitTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="ExitNameBox" />
+                    <TextBox x:Name="ExitPersonaBox" />
+                    <Button x:Name="ExitSaveButton" Click="OnExitSave" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ExitSiblingsButton" Click="OnExitSiblings" />
+                        <Button x:Name="ExitMemorialButton" Click="OnExitMemorial" />
+                    </StackPanel>
+                    <TextBox x:Name="ExitRefBox" />
+                    <Button x:Name="ExitSucceedButton" Click="OnExitSucceed" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ExitSunsetButton" Click="OnExitSunset" />
+                        <Button x:Name="ExitDeleteButton" Click="OnExitDelete" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

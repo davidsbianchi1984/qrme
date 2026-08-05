@@ -2937,6 +2937,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'minutes': {'en': 'Minutes', 'es': 'Minutos', 'fr': 'Minutes', 'de': 'Minuten', 'pt': 'Minutos', 'it': 'Minuti', 'ja': '分', 'zh': '分钟', 'hi': 'मिनट', 'ar': 'الدقائق'},
     'lesson': {'en': 'Step', 'es': 'Paso', 'fr': 'Étape', 'de': 'Schritt', 'pt': 'Passo', 'it': 'Passo', 'ja': 'ステップ', 'zh': '步骤', 'hi': 'चरण', 'ar': 'الخطوة'},
     'position_s': {'en': 'Position, in seconds', 'es': 'Posición, en segundos', 'fr': 'Position, en secondes', 'de': 'Position, in Sekunden', 'pt': 'Posição, em segundos', 'it': 'Posizione, in secondi', 'ja': '位置（秒）', 'zh': '位置（秒）', 'hi': 'स्थिति, सेकंड में', 'ar': 'الموضع بالثواني'},
+    'verification_ref': {'en': 'Verification reference', 'es': 'Referencia de verificación', 'fr': 'Référence de vérification', 'de': 'Verifizierungsnachweis', 'pt': 'Referência de verificação', 'it': 'Riferimento di verifica', 'ja': '確認書類の参照', 'zh': '核验凭证', 'hi': 'सत्यापन संदर्भ', 'ar': 'مرجع التحقق'},
     'interactor_id': {'en': 'Visitor', 'es': 'Visitante', 'fr': 'Visiteur', 'de': 'Besucher', 'pt': 'Visitante', 'it': 'Visitatore', 'ja': '訪問者', 'zh': '访客', 'hi': 'आगंतुक', 'ar': 'الزائر'},
     'phases': {'en': 'Phases', 'es': 'Fases', 'fr': 'Phases', 'de': 'Phasen', 'pt': 'Fases', 'it': 'Fasi', 'ja': 'フェーズ', 'zh': '阶段', 'hi': 'चरण', 'ar': 'المراحل'},
     'items': {'en': 'Items', 'es': 'Elementos', 'fr': 'Éléments', 'de': 'Einträge', 'pt': 'Itens', 'it': 'Voci', 'ja': '項目', 'zh': '条目', 'hi': 'आइटम', 'ar': 'العناصر'},

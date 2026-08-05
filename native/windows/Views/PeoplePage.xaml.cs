@@ -277,6 +277,49 @@ public sealed partial class PeoplePage : Page
         SpecDomainBox.Header = L10n.T("spec.domain");
         SpecIdBox.Header = L10n.T("spec.id");
         SpecSetButton.Content = L10n.T("spec.set");
+        MemTitle.Text = L10n.T("mem.title");
+        MemIdBox.Header = L10n.T("mem.id");
+        MemShowButton.Content = L10n.T("mem.show");
+        MemEraseButton.Content = L10n.T("mem.erase");
+        PairTitle.Text = L10n.T("who.title");
+        PairIdBox.Header = L10n.T("mem.id");
+        PairThreadButton.Content = L10n.T("who.thread");
+        PairEngagementButton.Content = L10n.T("who.engagement");
+        PairNotesButton.Content = L10n.T("who.notes");
+        PairEmbeddingButton.Content = L10n.T("who.embedding");
+        SrcTitle.Text = L10n.T("src.title");
+        SrcKindBox.Header = L10n.T("src.kind");
+        SrcKindBox.Text = "life_event";
+        SrcNameBox.Header = L10n.T("src.name");
+        SrcWordsBox.Header = L10n.T("src.words");
+        SrcAddButton.Content = L10n.T("src.add");
+        RecTitle.Text = L10n.T("rec.title");
+        RecTransparencyButton.Content = L10n.T("rec.transparency");
+        RecStatsButton.Content = L10n.T("rec.stats");
+        RecExportButton.Content = L10n.T("rec.export");
+        RecFeedButton.Content = L10n.T("rec.feed");
+        VeilTitle.Text = L10n.T("veil.title");
+        VeilShowButton.Content = L10n.T("veil.show");
+        VeilOnButton.Content = L10n.T("veil.on");
+        VeilOffButton.Content = L10n.T("veil.off");
+        VerTitle.Text = L10n.T("ver.title");
+        VerShowButton.Content = L10n.T("ver.show");
+        VerAbleButton.Content = L10n.T("ver.able");
+        VerLevelBox.Header = L10n.T("ver.level");
+        VerLevelBox.Text = "document";
+        VerAttestorBox.Header = L10n.T("ver.attestor");
+        VerClaimButton.Content = L10n.T("ver.claim");
+        VerMoveButton.Content = L10n.T("ver.move");
+        ExitTitle.Text = L10n.T("exit.title");
+        ExitNameBox.Header = L10n.T("exit.rename");
+        ExitPersonaBox.Header = L10n.T("exit.persona");
+        ExitSaveButton.Content = L10n.T("exit.save");
+        ExitSiblingsButton.Content = L10n.T("exit.siblings");
+        ExitMemorialButton.Content = L10n.T("exit.memorial");
+        ExitRefBox.Header = L10n.T("exit.ref");
+        ExitSucceedButton.Content = L10n.T("exit.succeed");
+        ExitSunsetButton.Content = L10n.T("exit.sunset");
+        ExitDeleteButton.Content = L10n.T("exit.delete");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -316,6 +359,13 @@ public sealed partial class PeoplePage : Page
             var venues = await ApiClient.Shared.RatedVenues();
             PlcVenuesText.Text = string.Join(", ",
                 venues.Select(v => v.Key));
+            var memories = await ApiClient.Shared.Memories(
+                s.Pid, s.Token!);
+            MemList.ItemsSource = memories.Select(m => new Row(
+                $"{m.InteractorName} · {m.Turns}")).ToList();
+            var sources = await ApiClient.Shared.Sources(s.Pid, s.Token!);
+            SrcList.ItemsSource = sources.Select(r => new Row(
+                $"{r.Kind} · {r.Title}")).ToList();
         }
         catch (Exception ex) { StatusText.Text = ex.Message; }
     }
@@ -1483,4 +1533,206 @@ public sealed partial class PeoplePage : Page
             SpecList.ItemsSource = rows.Select(r => new Row(
                 $"{r.Domain} \u00b7 {r.SpecialistProfileId}")).ToList();
         });
+
+    // -- the record, the veil and the exit --------------------------------
+
+    private async void OnMemShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var turns = await ApiClient.Shared.Memory(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                turns.TakeLast(3).Select(t => t.Content));
+        });
+
+    private async void OnMemErase(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.EraseMemory(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            MemIdBox.Text = "";
+            var rows = await ApiClient.Shared.Memories(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            MemList.ItemsSource = rows.Select(m => new Row(
+                $"{m.InteractorName} \u00b7 {m.Turns}")).ToList();
+        });
+
+    private async void OnPairThread(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var t = await ApiClient.Shared.ThreadOf(
+                AppState.Current.Pid!, PairIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = t.Messages.Length.ToString();
+        });
+
+    private async void OnPairEngagement(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var g = await ApiClient.Shared.EngagementOf(
+                AppState.Current.Pid!, PairIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = (g.Sessions ?? 0).ToString();
+        });
+
+    private async void OnPairNotes(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var notes = await ApiClient.Shared.ClinicalNotes(
+                AppState.Current.Pid!, PairIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                notes.Select(n => n.Note));
+        });
+
+    private async void OnPairEmbedding(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.EmbeddingOf(
+                AppState.Current.Pid!, PairIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = "\u2713";
+        });
+
+    private async void OnSrcAdd(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.AddSource(
+                AppState.Current.Pid!, SrcKindBox.Text.Trim(),
+                SrcNameBox.Text.Trim(), SrcWordsBox.Text,
+                AppState.Current.Token!);
+            SrcNameBox.Text = ""; SrcWordsBox.Text = "";
+            var rows = await ApiClient.Shared.Sources(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            SrcList.ItemsSource = rows.Select(r => new Row(
+                $"{r.Kind} \u00b7 {r.Title}")).ToList();
+        });
+
+    private async void OnRecTransparency(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var t = await ApiClient.Shared.TransparencyOf(
+                AppState.Current.Pid!);
+            StatusText.Text =
+                $"{t.ActiveRelationships} \u00b7 {t.ModelEffective}";
+        });
+
+    private async void OnRecStats(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.ProfileStats(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = $"{s.Sessions} \u00b7 {s.MemoryEntries} "
+                + $"\u00b7 {s.Interactors} \u00b7 {s.Sources}";
+        });
+
+    private async void OnRecExport(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.ExportProfile(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = $"{o.Messages.Length} \u00b7 "
+                + $"{o.Posts.Length} \u00b7 {o.Sources.Length}";
+        });
+
+    private async void OnRecFeed(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var f = await ApiClient.Shared.FeedOf(AppState.Current.Pid!);
+            StatusText.Text = $"{f.Posts.Length} \u00b7 "
+                + string.Join(", ", f.RankedOn);
+        });
+
+    private async void OnVeilShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.AnonymityOf(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                v.NotWithheld ?? []);
+        });
+
+    private async void OnVeilOn(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.SetAnonymity(
+            AppState.Current.Pid!, true, AppState.Current.Token!));
+
+    private async void OnVeilOff(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.SetAnonymity(
+            AppState.Current.Pid!, false, AppState.Current.Token!));
+
+    private async void OnVerShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.VerificationOf(
+                AppState.Current.Pid!);
+            StatusText.Text =
+                $"{v.Level ?? "\u2014"} \u00b7 {v.Attestor ?? "\u2014"}";
+        });
+
+    private async void OnVerAble(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.VerifiableOf(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = v.Reason ?? v.CanVerify.ToString();
+        });
+
+    private async void OnVerClaim(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.ClaimVerification(
+            AppState.Current.Pid!, VerLevelBox.Text.Trim(),
+            VerAttestorBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnVerMove(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.MoveBadgeHere(
+            AppState.Current.Pid!, AppState.Current.Token!));
+
+    private async void OnExitSave(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.EditProfile(
+                AppState.Current.Pid!, ExitNameBox.Text.Trim(),
+                ExitPersonaBox.Text.Trim(), AppState.Current.Token!);
+            ExitNameBox.Text = ""; ExitPersonaBox.Text = "";
+        });
+
+    private async void OnExitSiblings(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var r = await ApiClient.Shared.Siblings(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                (r.Profiles ?? []).Select(x => x.DisplayName ?? x.Id));
+        });
+
+    private async void OnExitMemorial(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var m = await ApiClient.Shared.MemorialOf(
+                AppState.Current.Pid!);
+            StatusText.Text = $"{m.DisplayName} \u00b7 "
+                + $"{m.RelationshipsTouched ?? 0}";
+        });
+
+    private async void OnExitSucceed(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.Succeed(
+                AppState.Current.Pid!, ExitRefBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = (o.Succeeded ?? false).ToString();
+        });
+
+    private async void OnExitSunset(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.Sunset(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = (o.Farewells ?? 0).ToString();
+        });
+
+    private async void OnExitDelete(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.DeleteProfile(
+            AppState.Current.Pid!, AppState.Current.Token!));
 }

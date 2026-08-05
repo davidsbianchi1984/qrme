@@ -4,6 +4,43 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.7] — 2026-08-05
+
+### The record, the veil and the exit
+
+Seven more blocks off the per-shell doorless record — the memory
+list, the record between the profile and one person, source material,
+the profile's own ledger, anonymity, verification, and the ways a
+profile ends — and what they share is that every one is a promise the
+product makes in its own marketing: you own it, you can read it, you
+can erase it, and you can leave. A promise that can only be exercised
+at a desktop is a promise with office hours. The phones now keep it.
+
+Twenty-five routes gain doors on iOS, Android and Windows — **75 rows
+struck**; the records fall to ios 93, android 97, windows 96, under a
+hundred for the first time — each rendering its backend's rules: the
+memory list exists for choosing what to erase, and erase sits next to
+read; the pair reads the pair's record (thread, engagement, clinical
+notes, adaptation) and nobody else — an injection that unguarded the
+raw conversation read walked past the first version of this round's
+guard, which now pins the stranger's 403 on all four reads and on the
+erase; the veil's limits are half the payload, with what anonymity
+does NOT withhold rendered first; the badge is a fact, not a word —
+level and attestor travel with it, one badge per person, and the
+roster of your other profiles answers only to your own token;
+departing, memorializing and deleting are three different ends with
+three different buttons, and succession is reviewer-verified because
+the owner token is exactly the thing that may be unavailable. A
+second injection dropped one language from one row on one shell and
+the full-list rule caught it. 40 shared strings per shell, in ten
+languages.
+
+The field-label residue falls 135 → 134: `verification_ref` is typed
+into the succession form on all three shells, so its refusal now
+names the label on the form; `anonymous`, a flag the veil's switch
+owns, stays on the identifier fallback the record's doctrine
+prescribes.
+
 ## [0.43.6] — 2026-08-05
 
 ### The workshop in the pocket
