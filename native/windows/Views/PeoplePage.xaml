@@ -1133,6 +1133,108 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+
+            <!-- The birth. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="BornTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="BornOwnerBox" />
+                    <TextBox x:Name="BornNameBox" />
+                    <TextBox x:Name="BornSocialBox" />
+                    <TextBox x:Name="BornHumorBox" />
+                    <TextBox x:Name="BornMattersBox" />
+                    <TextBox x:Name="BornComfortBox" />
+                    <Button x:Name="BornMakeButton" Click="OnBornMake" />
+                    <TextBox x:Name="BornSourcesBox" />
+                    <Button x:Name="BornBlendButton" Click="OnBornBlend" />
+                    <TextBox x:Name="BornPackIndustryBox" />
+                    <TextBox x:Name="BornPackTitleBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="BornPackPublishButton" Click="OnBornPackPublish" />
+                        <Button x:Name="BornPackSeedButton" Click="OnBornPackSeed" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The mind at work. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MindTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="MindScenarioBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="MindSimulateButton" Click="OnMindSimulate" />
+                        <Button x:Name="MindRunsButton" Click="OnMindRuns" />
+                        <Button x:Name="MindTuneButton" Click="OnMindTune" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="MindCloudButton" Click="OnMindCloud" />
+                        <Button x:Name="MindRevokeButton" Click="OnMindRevoke" />
+                    </StackPanel>
+                    <TextBox x:Name="MindCidBox" />
+                    <Button x:Name="MindExcursionButton" Click="OnMindExcursion" />
+                </StackPanel>
+            </Border>
+
+            <!-- The reach. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="ReachTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ReachCheckinButton" Click="OnReachCheckin" />
+                        <Button x:Name="ReachRateUpButton" Click="OnReachRateUp" />
+                        <Button x:Name="ReachRateDownButton" Click="OnReachRateDown" />
+                    </StackPanel>
+                    <TextBox x:Name="ReachQuietStartBox" />
+                    <TextBox x:Name="ReachQuietEndBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ReachQuietSetButton" Click="OnReachQuietSet" />
+                        <Button x:Name="ReachReferralsButton" Click="OnReachReferrals" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The license. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="LicTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="LicAcquireButton" Click="OnLicAcquire" />
+                    <TextBox x:Name="LicGrantBox" />
+                    <Button x:Name="LicDeriveButton" Click="OnLicDerive" />
+                </StackPanel>
+            </Border>
+
+            <!-- The senses. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SensTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="SensSceneBox" />
+                    <TextBox x:Name="SensGoalBox" />
+                    <Button x:Name="SensPerceiveButton" Click="OnSensPerceive" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="SensMicsButton" Click="OnSensMics" />
+                        <Button x:Name="SensVocabButton" Click="OnSensVocab" />
+                        <Button x:Name="SensOverlaysButton" Click="OnSensOverlays" />
+                        <Button x:Name="SensHealthButton" Click="OnSensHealth" />
+                    </StackPanel>
+                    <TextBox x:Name="SensExpBox" />
+                    <Button x:Name="SensExpSetButton" Click="OnSensExpSet" />
+                    <TextBox x:Name="SensCredBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="SensCredRemoveButton" Click="OnSensCredRemove" />
+                        <Button x:Name="SensDeskJoinButton" Click="OnSensDeskJoin" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

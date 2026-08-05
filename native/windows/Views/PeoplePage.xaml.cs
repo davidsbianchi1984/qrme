@@ -445,6 +445,54 @@ public sealed partial class PeoplePage : Page
         WearKindBox.Header = L10n.T("wear.kind");
         WearPairButton.Content = L10n.T("wear.pair");
         WearUnpairButton.Content = L10n.T("wear.unpair");
+        BornTitle.Text = L10n.T("born.title");
+        BornOwnerBox.Header = L10n.T("born.owner");
+        BornNameBox.Header = L10n.T("born.name");
+        BornSocialBox.Header = L10n.T("born.social");
+        BornHumorBox.Header = L10n.T("born.humor");
+        BornMattersBox.Header = L10n.T("born.matters");
+        BornComfortBox.Header = L10n.T("born.comfort");
+        BornMakeButton.Content = L10n.T("born.make");
+        BornSourcesBox.Header = L10n.T("born.sources");
+        BornBlendButton.Content = L10n.T("born.blend");
+        BornPackIndustryBox.Header = L10n.T("born.pack.industry");
+        BornPackTitleBox.Header = L10n.T("born.pack.title");
+        BornPackPublishButton.Content = L10n.T("born.pack.publish");
+        BornPackSeedButton.Content = L10n.T("born.pack.seed");
+        MindTitle.Text = L10n.T("mind.title");
+        MindScenarioBox.Header = L10n.T("mind.scenario");
+        MindSimulateButton.Content = L10n.T("mind.simulate");
+        MindRunsButton.Content = L10n.T("mind.runs");
+        MindTuneButton.Content = L10n.T("mind.tune");
+        MindCloudButton.Content = L10n.T("mind.cloud");
+        MindRevokeButton.Content = L10n.T("mind.revoke");
+        MindCidBox.Header = L10n.T("people.add");
+        MindExcursionButton.Content = L10n.T("mind.excursion");
+        ReachTitle.Text = L10n.T("reach.title");
+        ReachCheckinButton.Content = L10n.T("reach.checkin");
+        ReachRateUpButton.Content = L10n.T("reach.rate.up");
+        ReachRateDownButton.Content = L10n.T("reach.rate.down");
+        ReachQuietStartBox.Header = L10n.T("reach.quiet.start");
+        ReachQuietEndBox.Header = L10n.T("reach.quiet.end");
+        ReachQuietSetButton.Content = L10n.T("reach.quiet.set");
+        ReachReferralsButton.Content = L10n.T("reach.referrals");
+        LicTitle.Text = L10n.T("lic.title");
+        LicAcquireButton.Content = L10n.T("lic.acquire");
+        LicGrantBox.Header = L10n.T("lic.grant");
+        LicDeriveButton.Content = L10n.T("lic.derive");
+        SensTitle.Text = L10n.T("sens.title");
+        SensSceneBox.Header = L10n.T("sens.scene");
+        SensGoalBox.Header = L10n.T("wrist.input");
+        SensPerceiveButton.Content = L10n.T("sens.perceive");
+        SensMicsButton.Content = L10n.T("sens.mics");
+        SensVocabButton.Content = L10n.T("sens.vocab");
+        SensOverlaysButton.Content = L10n.T("sens.overlays");
+        SensHealthButton.Content = L10n.T("life.status");
+        SensExpBox.Header = L10n.T("sens.exp");
+        SensExpSetButton.Content = L10n.T("sens.exp.set");
+        SensCredBox.Header = L10n.T("lic.grant");
+        SensCredRemoveButton.Content = L10n.T("exit.delete");
+        SensDeskJoinButton.Content = L10n.T("bcn.desk");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -2451,5 +2499,229 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Token!);
             WearNameBox.Text = "";
             StatusText.Text = outp.Revoked == true ? "\u2713" : "\u2014";
+        });
+
+    private async void OnBornMake(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Genesis(
+                BornOwnerBox.Text.Trim(), BornNameBox.Text.Trim(),
+                BornSocialBox.Text.Trim(), BornHumorBox.Text.Trim(),
+                BornMattersBox.Text.Trim(), BornComfortBox.Text.Trim());
+            StatusText.Text = outp.DisplayName ?? outp.Id ?? "";
+        });
+
+    private async void OnBornBlend(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var sources = BornSourcesBox.Text.Split(',')
+                .Select(x => x.Trim()).Where(x => x.Length > 0).ToArray();
+            var outp = await ApiClient.Shared.Composite(
+                BornOwnerBox.Text.Trim(), BornNameBox.Text.Trim(), sources);
+            StatusText.Text = outp.DisplayName ?? outp.Id ?? "";
+        });
+
+    private async void OnBornPackPublish(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.PublishPack(
+                BornPackIndustryBox.Text.Trim(),
+                BornPackTitleBox.Text.Trim(), AppState.Current.Token!);
+            BornPackTitleBox.Text = "";
+            StatusText.Text = outp.Title ?? outp.Id ?? "";
+        });
+
+    private async void OnBornPackSeed(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.SeedPacks();
+            StatusText.Text = (outp.Created ?? outp.Packs ?? 0).ToString();
+        });
+
+    private async void OnMindSimulate(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Simulate(
+                AppState.Current.Pid!, MindScenarioBox.Text.Trim(),
+                AppState.Current.Token!);
+            MindScenarioBox.Text = "";
+            StatusText.Text = outp.Narrative ?? outp.Id ?? "";
+        });
+
+    private async void OnMindRuns(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Simulations(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = outp.Length.ToString();
+        });
+
+    private async void OnMindTune(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Finetune(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = outp.Status ?? (outp.Examples ?? 0).ToString();
+        });
+
+    private async void OnMindCloud(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.CloudContribution(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = (outp.Enabled == true ? "on" : "off")
+                + " \u00b7 " + (outp.Contributed?.Length ?? 0);
+        });
+
+    private async void OnMindRevoke(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RevokeContributions(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = (outp.Revoked ?? 0).ToString();
+        });
+
+    private async void OnMindExcursion(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Excursion(
+                MindCidBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = (outp.Status ?? "\u2014") + " \u00b7 "
+                + (outp.Findings ?? "");
+        });
+
+    private async void OnReachCheckin(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ProactiveCheckin(
+                AppState.Current.Pid!, AppState.Current.InteractorId!,
+                AppState.Current.Token!);
+            StatusText.Text = outp.Message ?? outp.Reason ?? "";
+        });
+
+    private async void OnReachRateUp(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.GiveFeedback(
+                AppState.Current.Pid!, AppState.Current.InteractorId!,
+                "up", AppState.Current.InteractorToken!);
+            StatusText.Text = outp.Rating ?? "";
+        });
+
+    private async void OnReachRateDown(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.GiveFeedback(
+                AppState.Current.Pid!, AppState.Current.InteractorId!,
+                "down", AppState.Current.InteractorToken!);
+            StatusText.Text = outp.Rating ?? "";
+        });
+
+    private async void OnReachQuietSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            int? start = int.TryParse(ReachQuietStartBox.Text.Trim(),
+                out var a) ? a : null;
+            int? end = int.TryParse(ReachQuietEndBox.Text.Trim(),
+                out var b) ? b : null;
+            var outp = await ApiClient.Shared.SetQuietHours(
+                AppState.Current.InteractorId!, start, end,
+                AppState.Current.InteractorToken!);
+            StatusText.Text = (outp.QuietStart ?? -1) + "\u2013"
+                + (outp.QuietEnd ?? -1);
+        });
+
+    private async void OnReachReferrals(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.MyReferrals(
+                AppState.Current.InteractorId!,
+                AppState.Current.InteractorToken!);
+            StatusText.Text = outp.Length.ToString();
+        });
+
+    private async void OnLicAcquire(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.AcquireLicense(
+                AppState.Current.Pid!, AppState.Current.InteractorToken!);
+            LicGrantBox.Text = outp.Id ?? "";
+            StatusText.Text = outp.Id ?? "";
+        });
+
+    private async void OnLicDerive(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.DeriveAgent(
+                AppState.Current.Pid!, LicGrantBox.Text.Trim(),
+                AppState.Current.InteractorToken!);
+            StatusText.Text = outp.DisplayName ?? outp.Id ?? "";
+        });
+
+    private async void OnSensPerceive(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var objects = SensSceneBox.Text.Split(',')
+                .Select(x => x.Trim()).Where(x => x.Length > 0).ToArray();
+            var outp = await ApiClient.Shared.Perceive(
+                AppState.Current.Pid!, objects, SensGoalBox.Text.Trim(),
+                AppState.Current.Token!);
+            SensSceneBox.Text = ""; SensGoalBox.Text = "";
+            StatusText.Text = outp.Guidance ?? "";
+        });
+
+    private async void OnSensMics(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.MicrophonePlaces();
+            StatusText.Text = (outp.Places?.Count ?? 0).ToString();
+        });
+
+    private async void OnSensVocab(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.MicrophoneVocabulary();
+            StatusText.Text = (outp.Widths?.Count ?? 0).ToString();
+        });
+
+    private async void OnSensOverlays(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.OverlaysCatalogue();
+            StatusText.Text = (outp.Overlays?.Count ?? 0) + " \u00b7 "
+                + (outp.Refused?.Count ?? 0);
+        });
+
+    private async void OnSensHealth(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Health();
+            StatusText.Text = outp.Status ?? "ok";
+        });
+
+    private async void OnSensExpSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.SetExperience(
+                AppState.Current.Pid!, SensExpBox.Text.Trim(),
+                AppState.Current.Token!);
+            SensExpBox.Text = "";
+            StatusText.Text = outp.Experience.Length.ToString();
+        });
+
+    private async void OnSensCredRemove(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RemoveSigningCredential(
+                SensCredBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = outp.Removed == true ? "\u2713" : "\u2014";
+        });
+
+    private async void OnSensDeskJoin(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.JoinDeskStream(
+                SensCredBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = outp.Mode ?? outp.Status ?? "";
         });
 }

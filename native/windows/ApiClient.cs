@@ -3227,6 +3227,187 @@ public sealed class ApiClient
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<WearableRow>(req);
     }
+
+    // -- The birth --
+
+    /// <summary>The short interview a profile is born from.</summary>
+    public Task<GenesisOut> Genesis(string ownerId, string name,
+        string social, string humor, string matters, string comfort)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, object>
+        {
+            ["owner_id"] = ownerId,
+            ["verification"] = new System.Collections.Generic
+                .Dictionary<string, string> { ["birthdate"] = "1990-01-01" },
+            ["answers"] = new System.Collections.Generic
+                .Dictionary<string, string>
+            { ["social_style"] = social, ["humor"] = humor,
+              ["what_matters"] = matters, ["comfort"] = comfort },
+        };
+        if (name.Length > 0) body["display_name"] = name;
+        return Send<GenesisOut>(Post("/profiles/genesis", body));
+    }
+
+    /// <summary>A hybrid blended from several profiles; the blend is
+    /// recorded per-constituent.</summary>
+    public Task<GenesisOut> Composite(string ownerId, string name,
+        string[] sources) =>
+        Send<GenesisOut>(Post("/profiles/composite", new
+        {
+            owner_id = ownerId, display_name = name, terms_consent = true,
+            verification = new { birthdate = "1990-01-01" },
+            sources = sources.Select(sid => new { profile_id = sid })
+                .ToArray(),
+        }));
+
+    public Task<PackOut> PublishPack(string industry, string title,
+        string token) =>
+        Send<PackOut>(Post("/packs", new { industry, title,
+            items = new[] { new { title, content = title } } },
+            token));
+
+    /// <summary>One free Field Pack per industry.</summary>
+    public Task<PackSeedOut> SeedPacks() =>
+        Send<PackSeedOut>(Post("/packs/seed", new { }));
+
+    // -- The mind at work --
+
+    /// <summary>Owner-only; the narrative is watermarked synthetic.</summary>
+    public Task<SimulationOut> Simulate(string profileId, string scenario,
+        string token) =>
+        Send<SimulationOut>(Post($"/profiles/{profileId}/simulate",
+            new { scenario }, token));
+
+    public Task<SimulationOut[]> Simulations(string profileId,
+        string token) =>
+        Send<SimulationOut[]>(Get($"/profiles/{profileId}/simulations",
+            token));
+
+    public Task<FinetuneOut> Finetune(string profileId, string token) =>
+        Send<FinetuneOut>(Post($"/profiles/{profileId}/finetune",
+            new { }, token));
+
+    /// <summary>Exactly what would leave, and the log of what already
+    /// has.</summary>
+    public Task<ContributionView> CloudContribution(string profileId,
+        string token) =>
+        Send<ContributionView>(Get(
+            $"/profiles/{profileId}/cloud-contribution", token));
+
+    /// <summary>Off, and everything already contributed deleted.</summary>
+    public Task<RevokeOut> RevokeContributions(string profileId,
+        string token) =>
+        Send<RevokeOut>(Post(
+            $"/profiles/{profileId}/cloud-contribution/revoke",
+            new { }, token));
+
+    public Task<ExcursionOut> Excursion(string cid, string token) =>
+        Send<ExcursionOut>(Get($"/excursions/{cid}", token));
+
+    // -- The reach --
+
+    /// <summary>Allowed only when the owner opted in with proactive
+    /// scope.</summary>
+    public Task<CheckinOut> ProactiveCheckin(string profileId,
+        string interactorId, string token) =>
+        Send<CheckinOut>(Post(
+            $"/profiles/{profileId}/proactive/{interactorId}",
+            new { }, token));
+
+    /// <summary>The recipient's own window.</summary>
+    public Task<QuietHoursOut> SetQuietHours(string interactorId,
+        int? start, int? end, string token)
+    {
+        var body = new System.Collections.Generic
+            .Dictionary<string, object>();
+        if (start is not null) body["quiet_start"] = start;
+        if (end is not null) body["quiet_end"] = end;
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/interactors/{interactorId}/quiet-hours")
+        { Content = JsonContent.Create(body) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<QuietHoursOut>(req);
+    }
+
+    /// <summary>From the person who is rating — never in somebody
+    /// else's name.</summary>
+    public Task<FeedbackOut> GiveFeedback(string profileId,
+        string interactorId, string rating, string token) =>
+        Send<FeedbackOut>(Post(
+            $"/profiles/{profileId}/interactions/{interactorId}/feedback",
+            new { rating }, token));
+
+    public Task<ReferralRow[]> MyReferrals(string interactorId,
+        string token) =>
+        Send<ReferralRow[]>(Get($"/interactors/{interactorId}/referrals",
+            token));
+
+    // -- The license --
+
+    public Task<LicenseGrantOut> AcquireLicense(string profileId,
+        string token) =>
+        Send<LicenseGrantOut>(Post($"/profiles/{profileId}/license/acquire",
+            new { }, token));
+
+    /// <summary>The derived agent records its origin.</summary>
+    public Task<GenesisOut> DeriveAgent(string profileId, string grantId,
+        string token) =>
+        Send<GenesisOut>(Post(
+            $"/profiles/{profileId}/license/{grantId}/derive",
+            new { }, token));
+
+    // -- The senses --
+
+    /// <summary>Hands-free guidance from what the camera recognises.</summary>
+    public Task<PerceiveOut> Perceive(string profileId, string[] objects,
+        string goal, string token)
+    {
+        var body = new System.Collections.Generic
+            .Dictionary<string, object> { ["objects"] = objects };
+        if (goal.Length > 0) body["goal"] = goal;
+        return Send<PerceiveOut>(Post($"/profiles/{profileId}/perceive",
+            body, token));
+    }
+
+    public Task<MicPlacesOut> MicrophonePlaces() =>
+        Send<MicPlacesOut>(Get("/microphones/places"));
+
+    public Task<MicVocabularyOut> MicrophoneVocabulary() =>
+        Send<MicVocabularyOut>(Get("/microphones/vocabulary"));
+
+    public Task<OverlayCatalogue> OverlaysCatalogue() =>
+        Send<OverlayCatalogue>(Get("/overlays/catalogue"));
+
+    /// <summary>The whole list, replaced wholesale — a CV is a
+    /// statement.</summary>
+    public Task<ExperienceOut> SetExperience(string profileId, string title,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/experience")
+        { Content = JsonContent.Create(new
+            { entries = new[] { new { title } } }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ExperienceOut>(req);
+    }
+
+    // -- Doors the other shells already had --
+
+    public Task<HealthOut> Health() => Send<HealthOut>(Get("/health"));
+
+    /// <summary>Retire a signing credential.</summary>
+    public Task<RemovedOut> RemoveSigningCredential(string rowId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/signatures/credentials/{rowId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RemovedOut>(req);
+    }
+
+    /// <summary>Join the live stream whoever is watching shares.</summary>
+    public Task<DeskJoinOut> JoinDeskStream(string deskId, string token) =>
+        Send<DeskJoinOut>(Post($"/desks/{deskId}/join", new { }, token));
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
@@ -4206,3 +4387,115 @@ public record WearableBoard(
     [property: JsonPropertyName("wearables")] WearableRow[] Wearables,
     [property: JsonPropertyName("faces")] string[]? Faces,
     [property: JsonPropertyName("kinds")] string[]? Kinds);
+
+public record GenesisOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("kind")] string? Kind);
+
+public record PackOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("industry")] string? Industry);
+
+public record PackSeedOut(
+    [property: JsonPropertyName("created")] int? Created,
+    [property: JsonPropertyName("packs")] int? Packs);
+
+public record SimulationOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("scenario")] string? Scenario,
+    [property: JsonPropertyName("narrative")] string? Narrative);
+
+public record FinetuneOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("examples")] int? Examples);
+
+public record ContributionRow(
+    [property: JsonPropertyName("ref")] string? Ref,
+    [property: JsonPropertyName("revoked")] bool? Revoked);
+
+public record ContributionView(
+    [property: JsonPropertyName("opted_in")] bool? Enabled,
+    [property: JsonPropertyName("contributed")]
+    ContributionRow[]? Contributed);
+
+public record RevokeOut(
+    [property: JsonPropertyName("revoked")] int? Revoked,
+    [property: JsonPropertyName("deleted_at_gateway")]
+    bool? DeletedAtGateway);
+
+public record ExcursionOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("topic")] string? Topic,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("findings")] string? Findings);
+
+public record CheckinOut(
+    [property: JsonPropertyName("message")] string? Message,
+    [property: JsonPropertyName("reason")] string? Reason);
+
+public record QuietHoursOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("quiet_start")] int? QuietStart,
+    [property: JsonPropertyName("quiet_end")] int? QuietEnd);
+
+public record FeedbackOut(
+    [property: JsonPropertyName("rating")] string? Rating);
+
+public record ReferralRow(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("specialist_profile_id")]
+    string? SpecialistProfileId,
+    [property: JsonPropertyName("opened")] bool? Opened);
+
+public record LicenseGrantOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("price")] double? Price);
+
+public record PerceiveWatermark(
+    [property: JsonPropertyName("line")] string? Line);
+
+public record PerceiveOut(
+    [property: JsonPropertyName("guidance")] string? Guidance,
+    [property: JsonPropertyName("watermark")]
+    PerceiveWatermark? Watermark);
+
+public record MicPlacesOut(
+    [property: JsonPropertyName("places")]
+    System.Collections.Generic.Dictionary<string, string>? Places);
+
+public record MicVocabularyOut(
+    [property: JsonPropertyName("widths")]
+    System.Collections.Generic.Dictionary<string, string>? Widths);
+
+public record OverlayCatalogue(
+    [property: JsonPropertyName("overlays")]
+    System.Collections.Generic.Dictionary<string, string>? Overlays,
+    [property: JsonPropertyName("refused")]
+    System.Collections.Generic.Dictionary<string, string>? Refused);
+
+public record ExperienceEntryOut(
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("org")] string? Org,
+    [property: JsonPropertyName("period")] string? Period);
+
+public record ExperienceOut(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("experience")]
+    ExperienceEntryOut[] Experience);
+
+public record HealthOut(
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("cloud")] bool? Cloud,
+    [property: JsonPropertyName("offline")] bool? Offline);
+
+public record RemovedOut(
+    [property: JsonPropertyName("removed")] bool? Removed);
+
+public record DeskJoinOut(
+    [property: JsonPropertyName("mode")] string? Mode,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("room_id")] string? RoomId);

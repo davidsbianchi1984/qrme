@@ -3493,7 +3493,7 @@ object ApiClient {
     // ---- The sticker on the street ----
 
     /** The overlay's read: never the face without the disclosure. */
-    suspend fun beaconCard(id: String): String {
+    suspend fun beaconOverlayCard(id: String): String {
         val o = JSONObject(request("/b/$id/card"))
         return if (o.optBoolean("age_wall")) o.optString("note", "18+")
                else o.optString("display_name") + " \u00b7 " +
@@ -3655,6 +3655,207 @@ object ApiClient {
                                token: String): Boolean {
         return JSONObject(request("/profiles/$id/wearables/$name",
             "DELETE", token = token)).optBoolean("revoked")
+    }
+
+    // ---- The birth ----
+
+    /** The short interview a profile is born from. */
+    suspend fun genesis(ownerId: String, name: String, social: String,
+                        humor: String, matters: String,
+                        comfort: String): String {
+        val body = JSONObject()
+            .put("owner_id", ownerId)
+            .put("verification", JSONObject().put("birthdate", "1990-01-01"))
+            .put("answers", JSONObject().put("social_style", social)
+                .put("humor", humor).put("what_matters", matters)
+                .put("comfort", comfort))
+        if (name.isNotEmpty()) body.put("display_name", name)
+        val o = JSONObject(request("/profiles/genesis", "POST", body))
+        return o.optString("display_name", o.optString("id"))
+    }
+
+    /** A hybrid blended from several profiles; the blend is recorded. */
+    suspend fun composite(ownerId: String, name: String,
+                          sources: List<String>): String {
+        val arr = org.json.JSONArray()
+        sources.forEach { arr.put(JSONObject().put("profile_id", it)) }
+        val o = JSONObject(request("/profiles/composite", "POST",
+            JSONObject().put("owner_id", ownerId).put("display_name", name)
+                .put("terms_consent", true)
+                .put("verification",
+                    JSONObject().put("birthdate", "1990-01-01"))
+                .put("sources", arr)))
+        return o.optString("display_name", o.optString("id"))
+    }
+
+    suspend fun publishPack(industry: String, title: String,
+                            token: String): String {
+        val items = org.json.JSONArray().put(
+            JSONObject().put("title", title).put("content", title))
+        return JSONObject(request("/packs", "POST",
+            JSONObject().put("industry", industry).put("title", title)
+                .put("items", items), token)).optString("title")
+    }
+
+    /** One free Field Pack per industry. */
+    suspend fun seedPacks(): Int {
+        val o = JSONObject(request("/packs/seed", "POST", JSONObject()))
+        return o.optInt("created", o.optInt("packs"))
+    }
+
+    // ---- The mind at work ----
+
+    /** Owner-only; the narrative is watermarked synthetic. */
+    suspend fun simulate(id: String, scenario: String,
+                         token: String): String {
+        val o = JSONObject(request("/profiles/$id/simulate", "POST",
+            JSONObject().put("scenario", scenario), token))
+        return o.optString("narrative", o.optString("id"))
+    }
+
+    suspend fun simulations(id: String, token: String): Int {
+        return org.json.JSONArray(request("/profiles/$id/simulations",
+            token = token)).length()
+    }
+
+    suspend fun finetune(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/finetune", "POST",
+            JSONObject(), token))
+        return o.optString("status", o.optInt("examples").toString())
+    }
+
+    /** Exactly what would leave, and the log of what already has. */
+    suspend fun cloudContribution(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/cloud-contribution",
+            token = token))
+        val n = o.optJSONArray("contributed")?.length() ?: 0
+        return (if (o.optBoolean("opted_in")) "on" else "off") +
+            " \u00b7 " + n
+    }
+
+    /** Off, and everything already contributed deleted. */
+    suspend fun revokeContributions(id: String, token: String): Int {
+        return JSONObject(request(
+            "/profiles/$id/cloud-contribution/revoke", "POST",
+            JSONObject(), token)).optInt("revoked")
+    }
+
+    suspend fun excursion(cid: String, token: String): String {
+        val o = JSONObject(request("/excursions/$cid", token = token))
+        return o.optString("status") + " \u00b7 " + o.optString("findings")
+    }
+
+    // ---- The reach ----
+
+    /** Allowed only when the owner opted in with proactive scope. */
+    suspend fun proactiveCheckin(id: String, interactorId: String,
+                                 token: String): String {
+        val o = JSONObject(request("/profiles/$id/proactive/$interactorId",
+            "POST", JSONObject(), token))
+        return o.optString("message", o.optString("reason"))
+    }
+
+    /** The recipient's own window. */
+    suspend fun setQuietHours(interactorId: String, start: Int?, end: Int?,
+                              token: String): String {
+        val body = JSONObject()
+        if (start != null) body.put("quiet_start", start)
+        if (end != null) body.put("quiet_end", end)
+        val o = JSONObject(request("/interactors/$interactorId/quiet-hours",
+            "PUT", body, token))
+        return o.optInt("quiet_start", -1).toString() + "\u2013" +
+            o.optInt("quiet_end", -1)
+    }
+
+    /** From the person who is rating — never in somebody else's name. */
+    suspend fun giveFeedback(id: String, interactorId: String,
+                             rating: String, token: String): String {
+        return JSONObject(request(
+            "/profiles/$id/interactions/$interactorId/feedback", "POST",
+            JSONObject().put("rating", rating), token)).optString("rating")
+    }
+
+    suspend fun myReferrals(interactorId: String, token: String): Int {
+        return org.json.JSONArray(request(
+            "/interactors/$interactorId/referrals", token = token)).length()
+    }
+
+    // ---- The license ----
+
+    suspend fun acquireLicense(id: String, token: String): String {
+        return JSONObject(request("/profiles/$id/license/acquire", "POST",
+            JSONObject(), token)).optString("id")
+    }
+
+    /** The derived agent records its origin. */
+    suspend fun deriveAgent(id: String, grantId: String,
+                            token: String): String {
+        val o = JSONObject(request("/profiles/$id/license/$grantId/derive",
+            "POST", JSONObject(), token))
+        return o.optString("display_name", o.optString("id"))
+    }
+
+    // ---- The senses ----
+
+    /** Hands-free guidance from what the camera recognises. */
+    suspend fun perceive(id: String, objects: List<String>, goal: String,
+                         token: String): String {
+        val arr = org.json.JSONArray(); objects.forEach { arr.put(it) }
+        val body = JSONObject().put("objects", arr)
+        if (goal.isNotEmpty()) body.put("goal", goal)
+        return JSONObject(request("/profiles/$id/perceive", "POST", body,
+            token)).optString("guidance")
+    }
+
+    suspend fun microphonePlaces(): Int {
+        return (JSONObject(request("/microphones/places"))
+            .optJSONObject("places") ?: JSONObject()).length()
+    }
+
+    suspend fun microphoneVocabulary(): Int {
+        return (JSONObject(request("/microphones/vocabulary"))
+            .optJSONObject("widths") ?: JSONObject()).length()
+    }
+
+    suspend fun overlaysCatalogue(): String {
+        val o = JSONObject(request("/overlays/catalogue"))
+        val worn = o.optJSONObject("overlays") ?: JSONObject()
+        val refused = o.optJSONObject("refused") ?: JSONObject()
+        return worn.length().toString() + " \u00b7 " + refused.length()
+    }
+
+    /** The whole list, replaced wholesale — a CV is a statement. */
+    suspend fun setExperience(id: String, title: String,
+                              token: String): Int {
+        val entries = org.json.JSONArray()
+            .put(JSONObject().put("title", title))
+        return JSONObject(request("/profiles/$id/experience", "PUT",
+            JSONObject().put("entries", entries), token))
+            .getJSONArray("experience").length()
+    }
+
+    // ---- Doors the other shells already had ----
+
+    suspend fun health(): String {
+        return JSONObject(request("/health")).optString("status", "ok")
+    }
+
+    suspend fun marketplaceListings(): Int {
+        return org.json.JSONArray(request("/marketplace/listings")).length()
+    }
+
+    suspend fun listPacks(): Int {
+        return org.json.JSONArray(request("/packs")).length()
+    }
+
+    suspend fun signaturePolicy(): String {
+        return JSONObject(request("/signatures/policy")).toString()
+            .take(80)
+    }
+
+    /** Retire a signing credential. */
+    suspend fun removeSigningCredential(rowId: String, token: String) {
+        request("/signatures/credentials/$rowId", "DELETE", token = token)
     }
 
 }

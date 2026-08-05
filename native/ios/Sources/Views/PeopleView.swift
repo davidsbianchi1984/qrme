@@ -247,6 +247,11 @@ struct PeopleSection: View {
                 StampSection()
                 MediaSection()
                 WearableSection()
+                BirthSection()
+                MindSection()
+                ReachSection()
+                LicenseSection()
+                SensesSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

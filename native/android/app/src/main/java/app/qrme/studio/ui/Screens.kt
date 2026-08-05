@@ -2823,6 +2823,11 @@ private fun PeoplePanel(vm: StudioViewModel) {
         WmBlock(vm) { note = it }
         MedBlock(vm) { note = it }
         WearBlock(vm) { note = it }
+        BornBlock(vm) { note = it }
+        MindBlock(vm) { note = it }
+        ReachBlock(vm) { note = it }
+        LicBlock(vm) { note = it }
+        SensBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -4737,7 +4742,7 @@ private fun BcnBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         labeledField(L10n.t("bcn.id", lang), beaconId, "") { beaconId = it }
         BrandButton(L10n.t("bcn.card", lang),
             enabled = beaconId.isNotBlank()) {
-            vm.call({ ApiClient.beaconCard(beaconId) }) { r ->
+            vm.call({ ApiClient.beaconOverlayCard(beaconId) }) { r ->
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
         }
         BrandButton(L10n.t("bcn.desk", lang),
@@ -4913,6 +4918,243 @@ private fun WearBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 vm.token!!) }) { r ->
                 name = ""
                 onNote(if (r.getOrNull() == true) "\u2713"
+                       else r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+
+@Composable
+private fun BornBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var owner by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var social by remember { mutableStateOf("") }
+    var humor by remember { mutableStateOf("") }
+    var matters by remember { mutableStateOf("") }
+    var comfort by remember { mutableStateOf("") }
+    var sources by remember { mutableStateOf("") }
+    var industry by remember { mutableStateOf("") }
+    var packTitle by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("born.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("born.owner", lang), owner, "") { owner = it }
+        labeledField(L10n.t("born.name", lang), name, "") { name = it }
+        labeledField(L10n.t("born.social", lang), social, "") { social = it }
+        labeledField(L10n.t("born.humor", lang), humor, "") { humor = it }
+        labeledField(L10n.t("born.matters", lang), matters, "") {
+            matters = it }
+        labeledField(L10n.t("born.comfort", lang), comfort, "") {
+            comfort = it }
+        BrandButton(L10n.t("born.make", lang),
+            enabled = owner.isNotBlank() && social.isNotBlank() &&
+                humor.isNotBlank() && matters.isNotBlank() &&
+                comfort.isNotBlank()) {
+            vm.call({ ApiClient.genesis(owner, name, social, humor,
+                matters, comfort) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("born.sources", lang), sources, "") {
+            sources = it }
+        BrandButton(L10n.t("born.blend", lang),
+            enabled = owner.isNotBlank() && name.isNotBlank() &&
+                sources.isNotBlank()) {
+            vm.call({ ApiClient.composite(owner, name,
+                sources.split(",").map { it.trim() }) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("born.pack.industry", lang), industry, "") {
+            industry = it }
+        labeledField(L10n.t("born.pack.title", lang), packTitle, "") {
+            packTitle = it }
+        BrandButton(L10n.t("born.pack.publish", lang),
+            enabled = industry.isNotBlank() && packTitle.isNotBlank()) {
+            vm.call({ ApiClient.publishPack(industry, packTitle,
+                vm.token!!) }) { r ->
+                packTitle = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("born.pack.seed", lang)) {
+            vm.call({ ApiClient.seedPacks() }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun MindBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var scenario by remember { mutableStateOf("") }
+    var cid by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("mind.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("mind.scenario", lang), scenario, "") {
+            scenario = it }
+        BrandButton(L10n.t("mind.simulate", lang),
+            enabled = scenario.isNotBlank()) {
+            vm.call({ ApiClient.simulate(vm.pid!!, scenario,
+                vm.token!!) }) { r ->
+                scenario = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("mind.runs", lang)) {
+            vm.call({ ApiClient.simulations(vm.pid!!, vm.token!!) }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("mind.tune", lang)) {
+            vm.call({ ApiClient.finetune(vm.pid!!, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("mind.cloud", lang)) {
+            vm.call({ ApiClient.cloudContribution(vm.pid!!,
+                vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("mind.revoke", lang)) {
+            vm.call({ ApiClient.revokeContributions(vm.pid!!,
+                vm.token!!) }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("people.add", lang), cid, "") { cid = it }
+        BrandButton(L10n.t("mind.excursion", lang),
+            enabled = cid.isNotBlank()) {
+            vm.call({ ApiClient.excursion(cid, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun ReachBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var quietStart by remember { mutableStateOf("") }
+    var quietEnd by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("reach.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("reach.checkin", lang),
+            enabled = vm.interactorId != null) {
+            vm.call({ ApiClient.proactiveCheckin(vm.pid!!,
+                vm.interactorId!!, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("reach.rate.up", lang),
+            enabled = vm.interactorId != null) {
+            vm.call({ ApiClient.giveFeedback(vm.pid!!, vm.interactorId!!,
+                "up", vm.interactorToken!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("reach.rate.down", lang),
+            enabled = vm.interactorId != null) {
+            vm.call({ ApiClient.giveFeedback(vm.pid!!, vm.interactorId!!,
+                "down", vm.interactorToken!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("reach.quiet.start", lang), quietStart, "") {
+            quietStart = it }
+        labeledField(L10n.t("reach.quiet.end", lang), quietEnd, "") {
+            quietEnd = it }
+        BrandButton(L10n.t("reach.quiet.set", lang),
+            enabled = vm.interactorId != null) {
+            vm.call({ ApiClient.setQuietHours(vm.interactorId!!,
+                quietStart.toIntOrNull(), quietEnd.toIntOrNull(),
+                vm.interactorToken!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("reach.referrals", lang),
+            enabled = vm.interactorId != null) {
+            vm.call({ ApiClient.myReferrals(vm.interactorId!!,
+                vm.interactorToken!!) }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun LicBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var grantId by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("lic.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("lic.acquire", lang),
+            enabled = vm.interactorId != null) {
+            vm.call({ ApiClient.acquireLicense(vm.pid!!,
+                vm.interactorToken!!) }) { r ->
+                grantId = r.getOrNull() ?: grantId
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("lic.grant", lang), grantId, "") { grantId = it }
+        BrandButton(L10n.t("lic.derive", lang),
+            enabled = grantId.isNotBlank() && vm.interactorId != null) {
+            vm.call({ ApiClient.deriveAgent(vm.pid!!, grantId,
+                vm.interactorToken!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun SensBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var scene by remember { mutableStateOf("") }
+    var goal by remember { mutableStateOf("") }
+    var expTitle by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("sens.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("sens.scene", lang), scene, "") { scene = it }
+        labeledField(L10n.t("wrist.input", lang), goal, "") { goal = it }
+        BrandButton(L10n.t("sens.perceive", lang),
+            enabled = scene.isNotBlank()) {
+            vm.call({ ApiClient.perceive(vm.pid!!,
+                scene.split(",").map { it.trim() }, goal,
+                vm.token!!) }) { r ->
+                scene = ""; goal = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("sens.mics", lang)) {
+            vm.call({ ApiClient.microphonePlaces() }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("sens.vocab", lang)) {
+            vm.call({ ApiClient.microphoneVocabulary() }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("sens.overlays", lang)) {
+            vm.call({ ApiClient.overlaysCatalogue() }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("sens.exp", lang), expTitle, "") { expTitle = it }
+        BrandButton(L10n.t("sens.exp.set", lang),
+            enabled = expTitle.isNotBlank()) {
+            vm.call({ ApiClient.setExperience(vm.pid!!, expTitle,
+                vm.token!!) }) { r ->
+                expTitle = ""
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("life.status", lang)) {
+            vm.call({ ApiClient.health() + " \u00b7 " +
+                ApiClient.marketplaceListings() + " \u00b7 " +
+                ApiClient.listPacks() + " \u00b7 " +
+                ApiClient.signaturePolicy() }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("lic.grant", lang), expTitle, "") { expTitle = it }
+        BrandButton(L10n.t("exit.delete", lang),
+            enabled = expTitle.isNotBlank()) {
+            vm.call({ ApiClient.removeSigningCredential(expTitle,
+                vm.token!!) }) { r ->
+                onNote(if (r.isSuccess) "\u2713"
                        else r.exceptionOrNull()?.message) }
         }
     }

@@ -4,6 +4,32 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.2] — 2026-08-05
+
+### The last doors
+
+The per-shell doorless records run to **zero**: with this cut every
+route in the table has a door on iOS, Android and Windows. What was
+left was the deepest machinery — the interview a profile is born from
+(genesis and the hybrid blend, its constituents recorded in the open),
+the knowledge packs, the owner's simulations and offline fine-tuning,
+the cloud-contribution ledger that shows what would leave before it
+leaves, the profile's reach into a person's day (proactive check-ins,
+quiet hours, feedback, referrals), the license a stranger buys against
+an offer, and the senses (perceive, the microphone-lending vocabulary,
+the overlay catalogue, the experience list that refuses `years` by
+name).
+
+Twenty-seven routes gain their remaining doors — 21 on all three
+shells, plus the per-shell stragglers (health, the marketplace and
+pack listings, the signature policy and credential retirement, the
+desk stream join). **71 rows struck; the records fall to
+ios 0 / android 0 / windows 0**, and the emptiness itself is now a
+test: `test_no_route_in_the_table_lacks_a_door_anywhere`. Forty-two
+interface strings arrive in all ten languages on all three shells,
+and a live overload collision in the Android client
+(`beaconCard`) was found and renamed on the way.
+
 ## [0.44.1] — 2026-08-05
 
 ### The sticker, the queue and the stamp

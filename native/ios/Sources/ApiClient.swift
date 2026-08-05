@@ -4233,6 +4233,170 @@ struct SpecialistRow: Decodable {
         try await request("/profiles/\(id)/wearables/\(name)",
                           method: "DELETE", token: token)
     }
+
+    // -- the birth --
+
+    /// The short interview a profile is born from.
+    func genesis(ownerId: String, name: String, social: String,
+                 humor: String, matters: String,
+                 comfort: String) async throws -> GenesisOut {
+        var body: [String: Any] = [
+            "owner_id": ownerId,
+            "verification": ["birthdate": "1990-01-01"],
+            "answers": ["social_style": social, "humor": humor,
+                        "what_matters": matters, "comfort": comfort]]
+        if !name.isEmpty { body["display_name"] = name }
+        return try await request("/profiles/genesis", method: "POST",
+                                 body: body)
+    }
+
+    /// A hybrid blended from several existing profiles; the blend is
+    /// recorded per-constituent and published as its composition.
+    func composite(ownerId: String, name: String,
+                   sources: [String]) async throws -> GenesisOut {
+        try await request("/profiles/composite", method: "POST",
+                          body: ["owner_id": ownerId, "display_name": name,
+                                 "terms_consent": true,
+                                 "verification": ["birthdate": "1990-01-01"],
+                                 "sources": sources.map {
+                                     ["profile_id": $0] }])
+    }
+
+    func publishPack(industry: String, title: String,
+                     token: String) async throws -> PackOut {
+        try await request("/packs", method: "POST",
+                          body: ["industry": industry, "title": title,
+                                 "items": [["title": title,
+                                            "content": title]]],
+                          token: token)
+    }
+
+    /// One free Field Pack per industry.
+    func seedPacks() async throws -> PackSeedOut {
+        try await request("/packs/seed", method: "POST", body: [:])
+    }
+
+    // -- the mind at work --
+
+    /// Owner-only operational insight; the narrative is watermarked
+    /// synthetic and never distributed.
+    func simulate(id: String, scenario: String,
+                  token: String) async throws -> SimulationOut {
+        try await request("/profiles/\(id)/simulate", method: "POST",
+                          body: ["scenario": scenario], token: token)
+    }
+
+    func simulations(id: String,
+                     token: String) async throws -> [SimulationOut] {
+        try await request("/profiles/\(id)/simulations", token: token)
+    }
+
+    func finetune(id: String, token: String) async throws -> FinetuneOut {
+        try await request("/profiles/\(id)/finetune", method: "POST",
+                          body: [:], token: token)
+    }
+
+    /// Whether contribution is on, exactly what the next one would
+    /// contain, and the log of everything that has ever left.
+    func cloudContribution(id: String,
+                           token: String) async throws -> ContributionView {
+        try await request("/profiles/\(id)/cloud-contribution",
+                          token: token)
+    }
+
+    /// Off, and everything already contributed deleted at the gateway.
+    func revokeContributions(id: String,
+                             token: String) async throws -> RevokeOut {
+        try await request("/profiles/\(id)/cloud-contribution/revoke",
+                          method: "POST", body: [:], token: token)
+    }
+
+    func excursion(cid: String, token: String) async throws -> ExcursionOut {
+        try await request("/excursions/\(cid)", token: token)
+    }
+
+    // -- the reach --
+
+    /// Allowed only when the owner opted in with proactive scope.
+    func proactiveCheckin(id: String, interactorId: String,
+                          token: String) async throws -> CheckinOut {
+        try await request("/profiles/\(id)/proactive/\(interactorId)",
+                          method: "POST", body: [:], token: token)
+    }
+
+    /// The recipient's own window; a profile may not reach out
+    /// unprompted inside it.
+    func setQuietHours(interactorId: String, start: Int?, end: Int?,
+                       token: String) async throws -> QuietHoursOut {
+        var body: [String: Any] = [:]
+        if let start { body["quiet_start"] = start }
+        if let end { body["quiet_end"] = end }
+        return try await request(
+            "/interactors/\(interactorId)/quiet-hours", method: "PUT",
+            body: body, token: token)
+    }
+
+    /// A rating, from the person who is rating — never in somebody
+    /// else's name.
+    func giveFeedback(id: String, interactorId: String, rating: String,
+                      token: String) async throws -> FeedbackOut {
+        try await request(
+            "/profiles/\(id)/interactions/\(interactorId)/feedback",
+            method: "POST", body: ["rating": rating], token: token)
+    }
+
+    func myReferrals(interactorId: String,
+                     token: String) async throws -> [ReferralRow] {
+        try await request("/interactors/\(interactorId)/referrals",
+                          token: token)
+    }
+
+    // -- the license --
+
+    func acquireLicense(id: String,
+                        token: String) async throws -> LicenseGrantOut {
+        try await request("/profiles/\(id)/license/acquire",
+                          method: "POST", body: [:], token: token)
+    }
+
+    /// The buyer derives their own specialist agent from the licensed
+    /// expertise; its origin is recorded.
+    func deriveAgent(id: String, grantId: String,
+                     token: String) async throws -> GenesisOut {
+        try await request("/profiles/\(id)/license/\(grantId)/derive",
+                          method: "POST", body: [:], token: token)
+    }
+
+    // -- the senses --
+
+    /// Hands-free guidance from what the camera recognises.
+    func perceive(id: String, objects: [String], goal: String,
+                  token: String) async throws -> PerceiveOut {
+        var body: [String: Any] = ["objects": objects]
+        if !goal.isEmpty { body["goal"] = goal }
+        return try await request("/profiles/\(id)/perceive",
+                                 method: "POST", body: body, token: token)
+    }
+
+    func microphonePlaces() async throws -> MicPlacesOut {
+        try await request("/microphones/places")
+    }
+
+    func microphoneVocabulary() async throws -> MicVocabularyOut {
+        try await request("/microphones/vocabulary")
+    }
+
+    func overlaysCatalogue() async throws -> OverlayCatalogue {
+        try await request("/overlays/catalogue")
+    }
+
+    /// The whole experience list, replaced wholesale — a CV is a
+    /// statement, not a set of rows to patch one at a time.
+    func setExperience(id: String, entries: [[String: Any]],
+                       token: String) async throws -> ExperienceOut {
+        try await request("/profiles/\(id)/experience", method: "PUT",
+                          body: ["entries": entries], token: token)
+    }
 }
 
 struct MemoryRow: Decodable, Identifiable {
@@ -4723,4 +4887,115 @@ struct WearableBoard: Decodable {
     let faces: [String]?
     let kinds: [String]?
     let refused: [String: String]?
+}
+
+struct GenesisOut: Decodable {
+    let id: String?
+    let display_name: String?
+    let kind: String?
+    let owner_token: String?
+}
+
+struct PackOut: Decodable {
+    let id: String?
+    let title: String?
+    let industry: String?
+}
+
+struct PackSeedOut: Decodable {
+    let created: Int?
+    let packs: Int?
+}
+
+struct SimulationOut: Decodable {
+    let id: String?
+    let scenario: String?
+    let horizon: String?
+    let narrative: String?
+}
+
+struct FinetuneOut: Decodable {
+    let id: String?
+    let status: String?
+    let examples: Int?
+}
+
+struct ContributionView: Decodable {
+    let opted_in: Bool?
+    let contributed: [ContributionRow]?
+}
+
+struct ContributionRow: Decodable {
+    let ref: String?
+    let revoked: Bool?
+}
+
+struct RevokeOut: Decodable {
+    let revoked: Int?
+    let deleted_at_gateway: Bool?
+}
+
+struct ExcursionOut: Decodable {
+    let id: String?
+    let topic: String?
+    let status: String?
+    let findings: String?
+}
+
+struct CheckinOut: Decodable {
+    let message: String?
+    let reason: String?
+}
+
+struct QuietHoursOut: Decodable {
+    let id: String?
+    let quiet_start: Int?
+    let quiet_end: Int?
+}
+
+struct FeedbackOut: Decodable {
+    let rating: String?
+    let engagement: Double?
+}
+
+struct ReferralRow: Decodable {
+    let id: String?
+    let specialist_profile_id: String?
+    let opened: Bool?
+}
+
+struct LicenseGrantOut: Decodable {
+    let id: String?
+    let profile_id: String?
+    let buyer_id: String?
+    let price: Double?
+}
+
+struct PerceiveOut: Decodable {
+    let guidance: String?
+    let watermark: WatermarkBrief?
+    struct WatermarkBrief: Decodable { let line: String? }
+}
+
+struct MicPlacesOut: Decodable {
+    let places: [String: String]?
+}
+
+struct MicVocabularyOut: Decodable {
+    let widths: [String: String]?
+}
+
+struct OverlayCatalogue: Decodable {
+    let overlays: [String: String]?
+    let refused: [String: String]?
+}
+
+struct ExperienceOut: Decodable {
+    struct Entry: Decodable {
+        let title: String?
+        let org: String?
+        let period: String?
+    }
+    let profile_id: String?
+    let experience: [Entry]
 }
