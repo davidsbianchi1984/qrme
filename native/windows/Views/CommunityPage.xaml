@@ -8,28 +8,27 @@
     <Pivot MaxWidth="680" Margin="20,12" Foreground="{StaticResource QrmeTxtBrush}">
 
         <!-- Stranger: anonymous friendly matchmaking -->
-        <PivotItem Header="Stranger">
+        <PivotItem x:Name="StrangerPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border x:Name="JoinCard" Background="{StaticResource QrmeCardBrush}"
                             BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Meet a stranger" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="StrangerHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Anonymous matchmaking — they see only your alias, and either side can end it."
+                            <TextBlock x:Name="StrangerSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <ComboBox x:Name="TierBox" Header="Tier" HorizontalAlignment="Stretch"
+                            <ComboBox x:Name="TierBox" HorizontalAlignment="Stretch"
                                       SelectionChanged="OnTierChanged" />
                             <TextBlock x:Name="VerifyNote"
-                                       Text="The rated tier needs a verified 18+ identity. Enter your birthdate to verify — both sides of a rated match are verified adults, and messages run under the open filter."
                                        FontSize="11" TextWrapping="Wrap" Visibility="Collapsed"
                                        Foreground="{StaticResource QrmeAmberBrush}" />
-                            <TextBox x:Name="BirthdateBox" Header="Birthdate (YYYY-MM-DD)"
+                            <TextBox x:Name="BirthdateBox"
                                      Visibility="Collapsed" />
-                            <TextBox x:Name="AliasBox" Header="Alias (optional)" />
-                            <Button x:Name="JoinButton" Content="Find a match" Click="OnJoin"
+                            <TextBox x:Name="AliasBox" />
+                            <Button x:Name="JoinButton" Click="OnJoin"
                                     HorizontalAlignment="Stretch"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                         </StackPanel>
@@ -46,7 +45,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock x:Name="MatchTitle" FontWeight="Bold" FontSize="16"
                                            Foreground="{StaticResource QrmeTxtBrush}" />
-                                <Button Grid.Column="1" Content="End" Click="OnEnd"
+                                <Button Grid.Column="1" x:Name="EndButton" Click="OnEnd"
                                         Background="Transparent" FontSize="12"
                                         Foreground="{StaticResource QrmeRedBrush}" />
                             </Grid>
@@ -60,7 +59,7 @@
                                                            Foreground="{StaticResource QrmeT2Brush}" />
                                                 <TextBlock Text="{Binding Content}" FontSize="13" TextWrapping="Wrap"
                                                            Foreground="{StaticResource QrmeTxtBrush}" />
-                                                <TextBlock Text="blocked — only you can see this" FontSize="10"
+                                                <TextBlock x:Name="BlockedNote" FontSize="10"
                                                            Visibility="{Binding BlockedVisibility}"
                                                            Foreground="{StaticResource QrmeRedBrush}" />
                                             </StackPanel>
@@ -68,11 +67,11 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBox x:Name="StrangerDraft" PlaceholderText="Say something…" />
+                            <TextBox x:Name="StrangerDraft" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Send" Click="OnSendStranger"
+                                <Button x:Name="SendStrangerButton" Click="OnSendStranger"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
-                                <Button Content="Refresh" Click="OnRefreshStranger"
+                                <Button x:Name="RefreshStrangerButton" Click="OnRefreshStranger"
                                         Background="Transparent" FontSize="12"
                                         Foreground="{StaticResource QrmeBrandABrush}" />
                             </StackPanel>
@@ -85,20 +84,20 @@
         </PivotItem>
 
         <!-- Rooms: multiparty; the profile takes moderated turns -->
-        <PivotItem Header="Rooms">
+        <PivotItem x:Name="RoomsPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border x:Name="OpenCard" Background="{StaticResource QrmeCardBrush}"
                             BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Open a room" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="OpenRoomHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
                             <TextBlock x:Name="RoomBlurb"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <TextBox x:Name="TopicBox" Header="Topic" />
-                            <Button Content="Open room" Click="OnOpenRoom"
+                            <TextBox x:Name="TopicBox" />
+                            <Button x:Name="OpenRoomButton" Click="OnOpenRoom"
                                     HorizontalAlignment="Stretch"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                         </StackPanel>
@@ -115,7 +114,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock x:Name="RoomTitle" FontWeight="Bold" FontSize="16"
                                            Foreground="{StaticResource QrmeTxtBrush}" />
-                                <Button Grid.Column="1" Content="Leave" Click="OnLeaveRoom"
+                                <Button Grid.Column="1" x:Name="LeaveRoomButton" Click="OnLeaveRoom"
                                         Background="Transparent" FontSize="12"
                                         Foreground="{StaticResource QrmeRedBrush}" />
                             </Grid>
@@ -134,11 +133,11 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBox x:Name="RoomDraft" PlaceholderText="Say something…" />
+                            <TextBox x:Name="RoomDraft" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Send" Click="OnSendRoom"
+                                <Button x:Name="SendRoomButton" Click="OnSendRoom"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
-                                <Button Content="Let them talk" Click="OnAdvance"
+                                <Button x:Name="AdvanceButton" Click="OnAdvance"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                             </StackPanel>
                         </StackPanel>

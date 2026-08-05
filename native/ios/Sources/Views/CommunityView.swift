@@ -55,23 +55,23 @@ private struct StrangerSection: View {
                     conversation(cid)
                 } else {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Meet a stranger").font(.headline).foregroundStyle(Theme.txt)
-                        Text("Anonymous matchmaking — they see only your alias, and either side can end it.")
+                        Text(L10n.t("nc.stranger", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("nc.stranger.sub", state.language))
                             .font(.caption).foregroundStyle(Theme.t2)
                         Picker("", selection: $tier) {
-                            Text("Friendly").tag("friendly")
-                            Text("Rated 18+").tag("rated")
+                            Text(L10n.t("nc.tier.friendly", state.language)).tag("friendly")
+                            Text(L10n.t("nc.tier.rated", state.language)).tag("rated")
                         }.pickerStyle(.segmented)
                         if tier == "rated" && !state.interactorVerified {
-                            Text("The rated tier needs a verified 18+ identity. Enter your birthdate to verify — both sides of a rated match are verified adults, and messages run under the open filter.")
+                            Text(L10n.t("nc.rated.sub", state.language))
                                 .font(.caption).foregroundStyle(Theme.amber)
-                            TextField("birthdate (YYYY-MM-DD)", text: $birthdate)
+                            TextField(L10n.t("nc.birthdate.ph", state.language), text: $birthdate)
                                 .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                                 .padding(10).background(Theme.scrBot)
                                 .clipShape(RoundedRectangle(cornerRadius: 11))
                                 .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
                         }
-                        TextField("alias (optional)", text: $alias)
+                        TextField(L10n.t("nc.alias.ph", state.language), text: $alias)
                             .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
@@ -94,10 +94,11 @@ private struct StrangerSection: View {
     private func conversation(_ cid: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Talking with \(matchedWith ?? "a stranger")")
+                Text(L10n.fill("nc.talking", state.language,
+                               ["who": matchedWith ?? L10n.t("nc.a_stranger", state.language)]))
                     .font(.headline).foregroundStyle(Theme.txt)
                 Spacer()
-                Button("End") { end(cid) }
+                Button(L10n.t("nc.end", state.language)) { end(cid) }
                     .font(.caption.bold()).foregroundStyle(Theme.red)
             }
             ForEach(messages, id: \.id) { m in
@@ -106,7 +107,7 @@ private struct StrangerSection: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(m.content).font(.subheadline).foregroundStyle(Theme.txt)
                         if m.status == "blocked" {
-                            Text("blocked — only you can see this")
+                            Text(L10n.t("nc.blocked", state.language))
                                 .font(.caption2).foregroundStyle(Theme.red)
                         }
                     }
@@ -118,17 +119,17 @@ private struct StrangerSection: View {
                 }
             }
             HStack(spacing: 8) {
-                TextField("Say something…", text: $draft)
+                TextField(L10n.t("nc.say.ph", state.language), text: $draft)
                     .foregroundStyle(Theme.txt)
                     .padding(10).background(Theme.scrBot)
                     .clipShape(RoundedRectangle(cornerRadius: 11))
                     .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                Button("Send") { send(cid) }
+                Button(L10n.t("nc.send", state.language)) { send(cid) }
                     .font(.caption.bold()).foregroundStyle(.white)
                     .padding(.horizontal, 12).padding(.vertical, 10)
                     .background(Theme.brandA).clipShape(Capsule())
                     .disabled(draft.isEmpty)
-                Button("Refresh") { refresh(cid) }
+                Button(L10n.t("nc.refresh", state.language)) { refresh(cid) }
                     .font(.caption).foregroundStyle(Theme.brandA)
             }
         }.card()
@@ -222,15 +223,15 @@ private struct RoomsSection: View {
                     roomView(room)
                 } else {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Open a room").font(.headline).foregroundStyle(Theme.txt)
-                        Text("A group chat with you and \(state.displayName). Every profile turn is moderated; a room with a minor always runs strict.")
+                        Text(L10n.t("nc.room.open", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.fill("nc.room.sub", state.language, ["name": state.displayName]))
                             .font(.caption).foregroundStyle(Theme.t2)
-                        TextField("topic", text: $topic)
+                        TextField(L10n.t("nc.topic.ph", state.language), text: $topic)
                             .foregroundStyle(Theme.txt)
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
                             .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                        Button("Open room") { create() }
+                        Button(L10n.t("nc.room.here", state.language)) { create() }
                             .font(.subheadline.bold()).foregroundStyle(.white)
                             .frame(maxWidth: .infinity).padding(.vertical, 12)
                             .background(Theme.brand)
@@ -249,7 +250,7 @@ private struct RoomsSection: View {
             HStack {
                 Text(room.topic).font(.headline).foregroundStyle(Theme.txt)
                 Spacer()
-                Button("Leave") { self.room = nil; transcript = [] }
+                Button(L10n.t("nc.leave", state.language)) { self.room = nil; transcript = [] }
                     .font(.caption.bold()).foregroundStyle(Theme.red)
             }
             ForEach(transcript, id: \.id) { m in
@@ -266,12 +267,12 @@ private struct RoomsSection: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             HStack(spacing: 8) {
-                TextField("Say something…", text: $draft)
+                TextField(L10n.t("nc.say.ph", state.language), text: $draft)
                     .foregroundStyle(Theme.txt)
                     .padding(10).background(Theme.scrBot)
                     .clipShape(RoundedRectangle(cornerRadius: 11))
                     .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                Button("Send") { send(room.id) }
+                Button(L10n.t("nc.send", state.language)) { send(room.id) }
                     .font(.caption.bold()).foregroundStyle(.white)
                     .padding(.horizontal, 12).padding(.vertical, 10)
                     .background(Theme.brandA).clipShape(Capsule())

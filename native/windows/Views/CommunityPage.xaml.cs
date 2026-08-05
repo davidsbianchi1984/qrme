@@ -33,13 +33,44 @@ public sealed partial class CommunityPage : Page
     public CommunityPage()
     {
         InitializeComponent();
-        TierBox.ItemsSource = new[] { "Friendly", "Rated 18+" };
+        // `Tier` reads the selection by index, so the visible words are free
+        // to be looked up rather than compared against.
+        TierBox.ItemsSource = new[] { L10n.T("nc.tier.friendly"),
+                                      L10n.T("nc.tier.rated") };
         TierBox.SelectedIndex = 0;
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        StrangerPivot.Header = L10n.T("nc.stranger", lang);
+        StrangerHead.Text = L10n.T("nc.stranger", lang);
+        StrangerSub.Text = L10n.T("nc.stranger.sub", lang);
+        TierBox.Header = L10n.T("nc.tier", lang);
+        VerifyNote.Text = L10n.T("nc.rated.sub", lang);
+        BirthdateBox.Header = L10n.T("nc.birthdate.ph", lang);
+        AliasBox.Header = L10n.T("nc.alias.ph", lang);
+        JoinButton.Content = L10n.T("nc.find", lang);
+        EndButton.Content = L10n.T("nc.end", lang);
+        BlockedNote.Text = L10n.T("nc.blocked", lang);
+        StrangerDraft.PlaceholderText = L10n.T("nc.say.ph", lang);
+        SendStrangerButton.Content = L10n.T("nc.send", lang);
+        RefreshStrangerButton.Content = L10n.T("nc.refresh", lang);
+
+        RoomsPivot.Header = L10n.T("nc.rooms", lang);
+        OpenRoomHead.Text = L10n.T("nc.room.open", lang);
+        TopicBox.Header = L10n.T("nc.topic.ph", lang);
+        OpenRoomButton.Content = L10n.T("nc.room.here", lang);
+        LeaveRoomButton.Content = L10n.T("nc.leave", lang);
+        RoomDraft.PlaceholderText = L10n.T("nc.say.ph", lang);
+        SendRoomButton.Content = L10n.T("nc.send", lang);
+        AdvanceButton.Content = L10n.T("nc.lettalk", lang);
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e) =>
-        RoomBlurb.Text = $"A group chat with you and {AppState.Current.DisplayName}. " +
-                         "Every profile turn is moderated; a room with a minor always runs strict.";
+        RoomBlurb.Text = L10n.Fill("nc.room.sub", AppState.Current.Language,
+                                   ("name", AppState.Current.DisplayName));
 
     private string Tier => TierBox.SelectedIndex == 1 ? "rated" : "friendly";
 

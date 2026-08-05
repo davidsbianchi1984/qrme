@@ -96,21 +96,19 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Steering" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="StHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock Text="Shape how the profile comes across — tone, pace, manner, look, age. Steering, not piloting: it acts on its own within this shape."
+                    <TextBlock x:Name="StSub"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
                     <StackPanel x:Name="SteeringDials" Spacing="6" />
-                    <TextBox x:Name="AppearanceBox" Header="Appearance"
-                             PlaceholderText="How they look and present…" TextWrapping="Wrap" />
+                    <TextBox x:Name="AppearanceBox" TextWrapping="Wrap" />
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <TextBox x:Name="BaseAgeBox" Header="Base age" Width="90" />
-                        <ToggleSwitch x:Name="AgingToggle" Header="Ages over time"
-                                      OnContent="On" OffContent="Off" />
+                        <TextBox x:Name="BaseAgeBox" Width="90" />
+                        <ToggleSwitch x:Name="AgingToggle" />
                     </StackPanel>
                     <TextBlock x:Name="EffectiveAgeText" Foreground="{StaticResource QrmeT3Brush}"
                                FontSize="11" Visibility="Collapsed" />
-                    <Button Content="Apply steering" Click="OnApplySteering"
+                    <Button x:Name="ApplySteeringButton" Click="OnApplySteering"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                     <TextBlock x:Name="SteeringStatus" Foreground="{StaticResource QrmeGreenBrush}"
                                FontSize="12" TextWrapping="Wrap" Visibility="Collapsed" />
@@ -120,14 +118,14 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Your relationship" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="RelHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock Text="How the profile relates to you in chat — its framing, your nickname, the tone it takes."
+                    <TextBlock x:Name="RelSub"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
-                    <ComboBox x:Name="RelTypeBox" Header="Relationship" HorizontalAlignment="Stretch" />
-                    <TextBox x:Name="RelNicknameBox" PlaceholderText="Nickname it calls you (optional)" />
-                    <TextBox x:Name="RelToneBox" PlaceholderText="Tone (e.g. gentle, playful) — optional" />
-                    <Button Content="Save relationship" Click="OnSaveRelationship"
+                    <ComboBox x:Name="RelTypeBox" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="RelNicknameBox" />
+                    <TextBox x:Name="RelToneBox" />
+                    <Button x:Name="SaveRelButton" Click="OnSaveRelationship"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                     <TextBlock x:Name="RelStatus" Foreground="{StaticResource QrmeGreenBrush}"
                                FontSize="12" TextWrapping="Wrap" Visibility="Collapsed" />
@@ -137,21 +135,21 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Help us improve" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="FbHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBlock Text="Tell us how to make this better — an idea, a rough edge, a bug, or what you love. It goes straight to the team."
+                    <TextBlock x:Name="FbSub"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
-                    <ComboBox x:Name="FeedbackCategory" Header="Category" HorizontalAlignment="Stretch" />
-                    <TextBox x:Name="FeedbackMessage" PlaceholderText="What's on your mind?"
+                    <ComboBox x:Name="FeedbackCategory" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="FeedbackMessage"
                              TextWrapping="Wrap" AcceptsReturn="True" Height="80" />
-                    <ComboBox x:Name="FeedbackRating" Header="Rating (optional)" HorizontalAlignment="Stretch" />
-                    <Button x:Name="FeedbackSend" Content="Send feedback" Click="OnSendFeedback"
+                    <ComboBox x:Name="FeedbackRating" HorizontalAlignment="Stretch" />
+                    <Button x:Name="FeedbackSend" Click="OnSendFeedback"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                     <TextBlock x:Name="FeedbackThanks" Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
                                TextWrapping="Wrap" Visibility="Collapsed" />
                     <TextBlock x:Name="FeedbackTally" Foreground="{StaticResource QrmeT3Brush}" FontSize="11"
                                TextWrapping="Wrap" Visibility="Collapsed" />
-                    <TextBlock x:Name="FeedbackMineHeader" Text="Yours" FontWeight="Bold" FontSize="12"
+                    <TextBlock x:Name="FeedbackMineHeader" FontWeight="Bold" FontSize="12"
                                Foreground="{StaticResource QrmeTxtBrush}" Visibility="Collapsed" />
                     <ItemsControl x:Name="FeedbackMine">
                         <ItemsControl.ItemTemplate>
@@ -227,17 +225,17 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="When something breaks" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="PrHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="ProblemsExplain" FontSize="12" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT2Brush}" />
                     <StackPanel x:Name="ProblemsAsk" Orientation="Horizontal" Spacing="10">
-                        <Button x:Name="ProblemsYes" Content="Send counts" Click="OnProblemsYes" />
-                        <Button x:Name="ProblemsNo" Content="Do not send" Click="OnProblemsNo" />
+                        <Button x:Name="ProblemsYes" Click="OnProblemsYes" />
+                        <Button x:Name="ProblemsNo" Click="OnProblemsNo" />
                     </StackPanel>
-                    <ToggleSwitch x:Name="ProblemsSwitch" Header="Send failure counts"
+                    <ToggleSwitch x:Name="ProblemsSwitch"
                                   Toggled="OnProblemsToggled" Visibility="Collapsed" />
-                    <HyperlinkButton x:Name="ProblemsPreviewButton" Content="Show what would be sent"
+                    <HyperlinkButton x:Name="ProblemsPreviewButton"
                                      Click="OnProblemsPreview" />
                     <TextBlock x:Name="ProblemsPreview" FontSize="11" TextWrapping="Wrap"
                                FontFamily="Consolas" Visibility="Collapsed"

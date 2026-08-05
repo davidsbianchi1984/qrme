@@ -45,6 +45,6 @@
 # every one of its sentences was a XAML attribute, which is written once at
 # parse time and cannot be re-read in another language; localizing them meant
 # moving them to the code-behind first.
-ios: 217
-android: 158
-windows: 215
+ios: 171
+android: 128
+windows: 171

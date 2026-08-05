@@ -4,6 +4,48 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.6] — 2026-08-05
+
+### The rest of Settings, and Community
+
+Last release took the first screen and the governance half of Settings on all
+three shells. This one finishes Settings — steering, the relationship, the
+feedback card, and the consent notice for failure reporting — and does
+Community, the two screens where somebody meets a stranger or opens a room.
+
+**590 → 470.** iOS 217 → 171, Android 158 → 128, Windows 215 → 171.
+
+Seventy-five rows: sixty-eight written once and generated into Swift, Kotlin
+and C#, and seven — the relationship types — **ported verbatim from the
+console's own `rel.t.*`** rather than worded a second time.
+
+### Three pickers still rendering enum members as words
+
+`t.Replace('_', ' ')` and `$0.replacingOccurrences(…).capitalized` turned
+`romantic_partner` into *"Romantic Partner"* on the relationship picker of all
+three shells. That is not a label anybody wrote; it is the API's member with
+its underscore taken out. All three now look the word up, and all three read
+the value back by index, so the visible text is free to be a translation.
+
+The same shape was fixed on the console's dropdown at 0.46.2 and on the phones'
+kind picker at 0.46.5. This is the third client and the third round of it.
+
+### Two tallies that counted in English
+
+The feedback card's *"So far: 3 idea · 1 bug"* built its own sentence by
+joining the API's category names, inside a card that is otherwise translated.
+Both the prefix and the categories are looked up now.
+
+### One sentence, three wordings
+
+The consent notice for failure reporting said *"the day it happened"* on iOS,
+*"the day"* on Android, and *"the day"* with a different closing sentence on
+Windows — three versions of the paragraph that asks a person to agree to
+something. It is one row now. Consent is asked in the reader's language, and
+the same words, or it is not really asked.
+
+Cut together with JIM-mini and PDI at app-v0.46.6.
+
 ## [0.46.5] — 2026-08-05
 
 ### The first screen, on all three phones

@@ -12,20 +12,23 @@ struct SteeringCard: View {
     @State private var agingEnabled = false
     @State private var status: String?
 
-    private let groupLabels = ["system": "System", "behavior": "Behavior",
-                               "intimacy": "Intimacy (18+)"]
+    private let groupKeys = ["system": "ns.st.g.system",
+                             "behavior": "ns.st.g.behavior",
+                             "intimacy": "ns.st.g.intimacy"]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Steering").font(.headline).foregroundStyle(Theme.txt)
-            Text("Shape how \(state.displayName.isEmpty ? "the profile" : state.displayName) comes across — tone, pace, manner, look, age. Steering, not piloting: it acts on its own within this shape.")
+            Text(L10n.t("ns.st", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.fill("ns.st.sub", state.language, ["name": state.displayName.isEmpty
+                                        ? L10n.t("ns.st.the_profile", state.language)
+                                        : state.displayName]))
                 .font(.caption).foregroundStyle(Theme.t2)
 
             if let hub {
                 ForEach(["system", "behavior", "intimacy"], id: \.self) { group in
                     let dials = hub.dials.filter { $0.group == group }
                     if !dials.isEmpty {
-                        Text(groupLabels[group] ?? group.capitalized)
+                        Text(L10n.t(groupKeys[group] ?? group, state.language))
                             .font(.caption.bold()).foregroundStyle(Theme.brandA)
                         ForEach(dials) { dial in
                             dialRow(dial)
@@ -34,30 +37,30 @@ struct SteeringCard: View {
                 }
 
                 Divider().overlay(Theme.line)
-                Text("Appearance").font(.caption.bold()).foregroundStyle(Theme.brandA)
-                TextField("How they look and present…", text: $appearance, axis: .vertical)
+                Text(L10n.t("ns.st.appearance", state.language)).font(.caption.bold()).foregroundStyle(Theme.brandA)
+                TextField(L10n.t("ns.st.appearance.ph", state.language), text: $appearance, axis: .vertical)
                     .lineLimit(1...3).foregroundStyle(Theme.txt)
                     .padding(10).background(Theme.scrBot)
                     .clipShape(RoundedRectangle(cornerRadius: 11))
                     .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
 
-                Text("Age").font(.caption.bold()).foregroundStyle(Theme.brandA)
+                Text(L10n.t("ns.st.age", state.language)).font(.caption.bold()).foregroundStyle(Theme.brandA)
                 HStack(spacing: 10) {
-                    TextField("base age", text: $baseAge)
+                    TextField(L10n.t("ns.st.baseage", state.language), text: $baseAge)
                         .keyboardType(.numberPad).frame(width: 80)
                         .foregroundStyle(Theme.txt)
                         .padding(8).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 9))
-                    Toggle("Ages over time", isOn: $agingEnabled)
+                    Toggle(L10n.t("ns.st.aging", state.language), isOn: $agingEnabled)
                         .font(.caption).foregroundStyle(Theme.txt)
                         .tint(Theme.green)
                 }
                 if let eff = hub.age.effective_age {
-                    Text("Effective age now: \(eff)")
+                    Text(L10n.fill("ns.st.effective", state.language, ["age": "\(eff)"]))
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }
 
-                Button("Apply steering") { apply() }
+                Button(L10n.t("ns.st.apply", state.language)) { apply() }
                     .font(.caption.bold()).foregroundStyle(.white)
                     .padding(.horizontal, 12).padding(.vertical, 9)
                     .background(Theme.brandA).clipShape(Capsule())
@@ -117,7 +120,7 @@ struct SteeringCard: View {
                     agingEnabled: agingEnabled,
                     appearance: appearance.isEmpty ? nil : appearance)
                 hub = h
-                status = "Steering applied — it rides on every reply."
+                status = L10n.t("ns.st.applied", state.language)
             } catch { status = error.localizedDescription }
         }
     }
@@ -137,26 +140,29 @@ struct RelationshipCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Your relationship").font(.headline).foregroundStyle(Theme.txt)
-            Text("How the profile relates to you in chat — its framing, your nickname, the tone it takes.")
+            Text(L10n.t("ns.rel", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("ns.rel.sub", state.language))
                 .font(.caption).foregroundStyle(Theme.t2)
             Picker("", selection: $type) {
+                // `$0.replacingOccurrences(…).capitalized` renders the API's
+                // member as if it were a word. The seven labels are the
+                // console's own `rel.t.*` rows, ported rather than rewritten.
                 ForEach(types, id: \.self) {
-                    Text($0.replacingOccurrences(of: "_", with: " ").capitalized).tag($0)
+                    Text(L10n.t("ns.rel.t.\($0)", state.language)).tag($0)
                 }
             }
             .pickerStyle(.menu).tint(Theme.brandA)
-            TextField("nickname it calls you (optional)", text: $nickname)
+            TextField(L10n.t("ns.rel.nick.ph", state.language), text: $nickname)
                 .foregroundStyle(Theme.txt)
                 .padding(10).background(Theme.scrBot)
                 .clipShape(RoundedRectangle(cornerRadius: 11))
                 .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-            TextField("tone (e.g. gentle, playful) — optional", text: $tone)
+            TextField(L10n.t("ns.rel.tone.ph", state.language), text: $tone)
                 .foregroundStyle(Theme.txt)
                 .padding(10).background(Theme.scrBot)
                 .clipShape(RoundedRectangle(cornerRadius: 11))
                 .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-            Button("Save relationship") { save() }
+            Button(L10n.t("ns.rel.save", state.language)) { save() }
                 .font(.caption.bold()).foregroundStyle(.white)
                 .padding(.horizontal, 12).padding(.vertical, 9)
                 .background(Theme.brandA).clipShape(Capsule())
@@ -178,7 +184,8 @@ struct RelationshipCard: View {
                 let r = try await ApiClient.shared.setRelationship(
                     id: pid, token: token, interactorId: interactor!,
                     type: type, nickname: nickname, tone: tone)
-                status = "Saved — it now treats you as \(r.relationship_type.replacingOccurrences(of: "_", with: " "))."
+                status = L10n.fill("ns.rel.saved", state.language,
+                                   ["type": L10n.t("ns.rel.t.\(r.relationship_type)", state.language)])
             } catch { status = error.localizedDescription }
         }
     }

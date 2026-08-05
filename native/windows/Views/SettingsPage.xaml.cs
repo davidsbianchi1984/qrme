@@ -50,8 +50,11 @@ public sealed partial class SettingsPage : Page
         FeedbackCategory.SelectedIndex = 0;
         FeedbackRating.ItemsSource = new[] { "—", "1", "2", "3", "4", "5" };
         FeedbackRating.SelectedIndex = 0;
+        // `t.Replace('_', ' ')` rendered the API's member as if it were a
+        // word. `OnSaveRelationship` reads the value back by index, so the
+        // visible text is free to be the console's own `rel.t.*` wording.
         RelTypeBox.ItemsSource = RelationshipTypes
-            .Select(t => t.Replace('_', ' ')).ToList();
+            .Select(t => L10n.T($"ns.rel.t.{t}")).ToList();
         RelTypeBox.SelectedIndex = 2;   // friend
         Localize();
     }
@@ -101,6 +104,36 @@ public sealed partial class SettingsPage : Page
         ObjectContactBox.PlaceholderText = L10n.T("ns.object.contact", lang);
         ObjectReasonBox.PlaceholderText = L10n.T("ns.object.reason", lang);
         ObjectButton.Content = L10n.T("ns.object.go", lang);
+
+        StHead.Text = L10n.T("ns.st", lang);
+        StSub.Text = L10n.Fill("ns.st.sub", lang,
+                               ("name", L10n.T("ns.st.the_profile", lang)));
+        AppearanceBox.Header = L10n.T("ns.st.appearance", lang);
+        AppearanceBox.PlaceholderText = L10n.T("ns.st.appearance.ph", lang);
+        BaseAgeBox.Header = L10n.T("ns.st.baseage", lang);
+        AgingToggle.Header = L10n.T("ns.st.aging", lang);
+        ApplySteeringButton.Content = L10n.T("ns.st.apply", lang);
+
+        RelHead.Text = L10n.T("ns.rel", lang);
+        RelSub.Text = L10n.T("ns.rel.sub", lang);
+        RelTypeBox.Header = L10n.T("ns.rel.type", lang);
+        RelNicknameBox.PlaceholderText = L10n.T("ns.rel.nick.ph", lang);
+        RelToneBox.PlaceholderText = L10n.T("ns.rel.tone.ph", lang);
+        SaveRelButton.Content = L10n.T("ns.rel.save", lang);
+
+        FbHead.Text = L10n.T("ns.fb", lang);
+        FbSub.Text = L10n.T("ns.fb.sub", lang);
+        FeedbackCategory.Header = L10n.T("ns.fb.cat", lang);
+        FeedbackMessage.PlaceholderText = L10n.T("ns.fb.msg.ph", lang);
+        FeedbackRating.Header = L10n.T("ns.fb.rating.opt", lang);
+        FeedbackSend.Content = L10n.T("ns.fb.send", lang);
+        FeedbackMineHeader.Text = L10n.T("ns.fb.mine", lang);
+
+        PrHead.Text = L10n.T("ns.pr", lang);
+        ProblemsYes.Content = L10n.T("ns.pr.send", lang);
+        ProblemsNo.Content = L10n.T("ns.pr.dont", lang);
+        ProblemsSwitch.Header = L10n.T("ns.pr.toggle", lang);
+        ProblemsPreviewButton.Content = L10n.T("ns.pr.show", lang);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
@@ -516,23 +549,21 @@ public sealed partial class SettingsPage : Page
         {
             // Not a failure and not a thing to hide: this build has no address
             // compiled in, so there is nothing to consent to.
-            ProblemsExplain.Text = "This build reports nowhere. Failures are " +
-                "counted on this machine and never leave it.";
+            ProblemsExplain.Text = L10n.T("ns.pr.nowhere");
             ProblemsAsk.Visibility = Visibility.Collapsed;
             ProblemsSwitch.Visibility = Visibility.Collapsed;
             return;
         }
         if (!answered)
         {
-            ProblemsExplain.Text = "This app can send a count of what failed " +
-                "— the operation and the HTTP status, the day, and how many " +
-                "times. Not what you typed, not who you are, not which " +
-                "profile. Nothing that identifies you or anyone else.";
+            // Three wordings of one sentence across three shells before
+            // this round; one row now.
+            ProblemsExplain.Text = L10n.T("ns.pr.explain");
             ProblemsAsk.Visibility = Visibility.Visible;
             ProblemsSwitch.Visibility = Visibility.Collapsed;
             return;
         }
-        ProblemsExplain.Text = "Counts of what failed. Never what you typed.";
+        ProblemsExplain.Text = L10n.T("ns.pr.short");
         ProblemsAsk.Visibility = Visibility.Collapsed;
         ProblemsSwitch.Visibility = Visibility.Visible;
         ProblemsSwitch.IsOn = Problems.SendingEnabled();
@@ -562,17 +593,16 @@ public sealed partial class SettingsPage : Page
         if (ProblemsPreview.Visibility == Visibility.Visible)
         {
             ProblemsPreview.Visibility = Visibility.Collapsed;
-            ProblemsPreviewButton.Content = "Show what would be sent";
+            ProblemsPreviewButton.Content = L10n.T("ns.pr.show");
             return;
         }
         var owed = Problems.Report()["problems"]
             as List<Dictionary<string, object>> ?? new();
         ProblemsPreview.Text = owed.Count == 0
-            ? "Nothing is owed. Either nothing has failed, or everything that "
-              + "has was already reported."
+            ? L10n.T("ns.pr.owed")
             : string.Join("\n", owed.Select(r =>
                 $"{r["op"]} → {r["status"]}  ×{r["count"]}  {r["day"]}"));
         ProblemsPreview.Visibility = Visibility.Visible;
-        ProblemsPreviewButton.Content = "Hide what would be sent";
+        ProblemsPreviewButton.Content = L10n.T("ns.pr.hide");
     }
 }

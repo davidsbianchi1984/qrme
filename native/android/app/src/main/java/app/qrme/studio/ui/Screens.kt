@@ -778,7 +778,7 @@ fun SettingsScreen(vm: StudioViewModel) {
         // Was spliced between two arguments of the `Text(…)` above — a call
         // in an argument list, which does not parse. It belongs here, beside
         // the other cards, where the iOS shell has always had it.
-        ProblemReportingCard()
+        ProblemReportingCard(vm.language)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("ns.obj", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
@@ -837,9 +837,9 @@ private fun SteeringPanel(vm: StudioViewModel) {
     }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Steering", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        Text("Shape how the profile comes across — tone, pace, manner, look, age. " +
-             "Steering, not piloting: it acts on its own within this shape.",
+        Text(L10n.t("ns.st", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.fill("ns.st.sub", vm.language,
+                mapOf("name" to L10n.t("ns.st.the_profile", vm.language))),
             color = Qrme.T2, fontSize = 12.sp)
         hub?.let { h ->
             listOf("system", "behavior", "intimacy").forEach { group ->
@@ -874,20 +874,21 @@ private fun SteeringPanel(vm: StudioViewModel) {
                 }
             }
             OutlinedTextField(value = appearance, onValueChange = { appearance = it },
-                label = { Text("Appearance — how they look and present") },
+                label = { Text(L10n.t("ns.st.appearance.ph", vm.language)) },
                 modifier = Modifier.fillMaxWidth())
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(value = baseAge, onValueChange = { baseAge = it },
-                    label = { Text("Base age") }, modifier = Modifier.width(110.dp))
-                Text("Ages over time", color = Qrme.Txt, fontSize = 13.sp)
+                    label = { Text(L10n.t("ns.st.baseage", vm.language)) }, modifier = Modifier.width(110.dp))
+                Text(L10n.t("ns.st.aging", vm.language), color = Qrme.Txt, fontSize = 13.sp)
                 Switch(checked = agingEnabled, onCheckedChange = { agingEnabled = it },
                     colors = SwitchDefaults.colors(checkedTrackColor = Qrme.Green))
             }
             h.effectiveAge?.let {
-                Text("Effective age now: $it", color = Qrme.T3, fontSize = 11.sp)
+                Text(L10n.fill("ns.st.effective", vm.language, mapOf("age" to it.toString())),
+                    color = Qrme.T3, fontSize = 11.sp)
             }
-            SmallAction("Apply steering") {
+            SmallAction(L10n.t("ns.st.apply", vm.language)) {
                 status = null
                 vm.call({
                     ApiClient.setSteeringHub(vm.pid!!, vm.token!!,
@@ -917,9 +918,9 @@ private fun RelationshipPanel(vm: StudioViewModel) {
     var status by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Your relationship", color = Qrme.Txt, fontSize = 16.sp,
+        Text(L10n.t("ns.rel", vm.language), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
-        Text("How the profile relates to you in chat — its framing, your nickname, the tone it takes.",
+        Text(L10n.t("ns.rel.sub", vm.language),
             color = Qrme.T2, fontSize = 12.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -934,12 +935,12 @@ private fun RelationshipPanel(vm: StudioViewModel) {
             }
         }
         OutlinedTextField(value = nickname, onValueChange = { nickname = it },
-            label = { Text("Nickname it calls you (optional)") },
+            label = { Text(L10n.t("ns.rel.nick.ph", vm.language)) },
             modifier = Modifier.fillMaxWidth())
         OutlinedTextField(value = tone, onValueChange = { tone = it },
-            label = { Text("Tone (e.g. gentle, playful) — optional") },
+            label = { Text(L10n.t("ns.rel.tone.ph", vm.language)) },
             modifier = Modifier.fillMaxWidth())
-        SmallAction("Save relationship") {
+        SmallAction(L10n.t("ns.rel.save", vm.language)) {
             status = null
             vm.call({
                 val interactor = vm.interactorId
@@ -971,10 +972,9 @@ private fun FeedbackPanel(vm: StudioViewModel) {
     LaunchedEffect(Unit) { reload() }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Help us improve", color = Qrme.Txt, fontSize = 16.sp,
+        Text(L10n.t("ns.fb", vm.language), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
-        Text("Tell us how to make this better — an idea, a rough edge, a bug, " +
-             "or what you love. It goes straight to the team.",
+        Text(L10n.t("ns.fb.sub", vm.language),
             color = Qrme.T2, fontSize = 12.sp)
         Row(Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -988,7 +988,7 @@ private fun FeedbackPanel(vm: StudioViewModel) {
             }
         }
         OutlinedTextField(value = message, onValueChange = { message = it },
-            label = { Text("What's on your mind?") }, minLines = 2,
+            label = { Text(L10n.t("ns.fb.msg.ph", vm.language)) }, minLines = 2,
             modifier = Modifier.fillMaxWidth())
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             (1..5).forEach { n ->
@@ -997,7 +997,7 @@ private fun FeedbackPanel(vm: StudioViewModel) {
                     modifier = Modifier.clickable { rating = if (rating == n) 0 else n })
             }
         }
-        SmallAction("Send feedback") {
+        SmallAction(L10n.t("ns.fb.send", vm.language)) {
             if (message.isNotBlank())
                 vm.call({ ApiClient.submitFeedback(vm.token, category,
                     message.trim(), rating.takeIf { it > 0 }) }) {
@@ -1007,8 +1007,12 @@ private fun FeedbackPanel(vm: StudioViewModel) {
         }
         status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
         state?.takeIf { it.total > 0 }?.let { s ->
-            Text("So far: " + categories.filter { (s.tally[it] ?: 0) > 0 }
-                .joinToString(" · ") { "${s.tally[it]} $it" },
+            // The tally named its categories in English inside a sentence
+            // that is otherwise translated.
+            Text(L10n.fill("ns.fb.sofar", vm.language, mapOf("tally" to
+                categories.filter { (s.tally[it] ?: 0) > 0 }.joinToString(" · ") {
+                    "${s.tally[it]} ${L10n.t("ns.fb.c.$it", vm.language)}"
+                })),
                 color = Qrme.T3, fontSize = 11.sp)
             s.mine.take(4).forEach { f ->
                 Text("[${f.category}] ${f.message} · ${f.status}",
@@ -1508,8 +1512,8 @@ private fun StrangerPanel(vm: StudioViewModel) {
         val cid = connectionId
         if (cid == null) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Meet a stranger", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("Anonymous matchmaking — they see only your alias, and either side can end it.",
+                Text(L10n.t("nc.stranger", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.t("nc.stranger.sub", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("friendly" to "Friendly", "rated" to "Rated 18+").forEach { (t, label) ->
@@ -1522,8 +1526,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                     }
                 }
                 if (tier == "rated" && !vm.interactorVerified) {
-                    Text("The rated tier needs a verified 18+ identity. Enter your birthdate " +
-                         "to verify — both sides of a rated match are verified adults.",
+                    Text(L10n.t("nc.rated.sub", vm.language),
                         color = Qrme.Amber, fontSize = 11.sp)
                     labeledField("Birthdate", birthdate, "YYYY-MM-DD") { birthdate = it }
                 }
@@ -1534,7 +1537,8 @@ private fun StrangerPanel(vm: StudioViewModel) {
         } else {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Talking with ${matchedWith ?: "a stranger"}", color = Qrme.Txt,
+                    Text(L10n.fill("nc.talking", vm.language, mapOf("who" to
+                        (matchedWith ?: L10n.t("nc.a_stranger", vm.language)))), color = Qrme.Txt,
                         fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     TextButton(onClick = {
                         vm.interactorId?.let { me ->
@@ -1543,7 +1547,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                                 messages = emptyList(); waiting = false
                             }
                         }
-                    }) { Text("End", color = Qrme.Red, fontSize = 12.sp) }
+                    }) { Text(L10n.t("nc.end", vm.language), color = Qrme.Red, fontSize = 12.sp) }
                 }
                 messages.forEach { m ->
                     Column(
@@ -1555,7 +1559,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                         Text(m.from, color = Qrme.T3, fontSize = 10.sp)
                         Text(m.content, color = Qrme.Txt, fontSize = 13.sp)
                         if (m.status == "blocked")
-                            Text("blocked — only you can see this", color = Qrme.Red, fontSize = 10.sp)
+                            Text(L10n.t("nc.blocked", vm.language), color = Qrme.Red, fontSize = 10.sp)
                     }
                 }
                 labeledField("", draft, "Say something…") { draft = it }
@@ -1573,7 +1577,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                         }
                     }
                     TextButton(onClick = { refresh(cid) }) {
-                        Text("Refresh", color = Qrme.BrandA, fontSize = 12.sp)
+                        Text(L10n.t("nc.refresh", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
                     }
                 }
             }
@@ -1602,8 +1606,8 @@ private fun RoomsPanel(vm: StudioViewModel) {
         val current = room
         if (current == null) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Open a room", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("A group chat with you and ${vm.displayName}. Every profile turn is moderated; a room with a minor always runs strict.",
+                Text(L10n.t("nc.room.open", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.fill("nc.room.sub", vm.language, mapOf("name" to vm.displayName)),
                     color = Qrme.T2, fontSize = 12.sp)
                 labeledField("Topic", topic, "What's the room about?") { topic = it }
                 BrandButton("Open room", enabled = topic.isNotBlank(), busy = busy) {
@@ -1622,7 +1626,7 @@ private fun RoomsPanel(vm: StudioViewModel) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(current.topic, color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     TextButton(onClick = { room = null; transcript = emptyList() }) {
-                        Text("Leave", color = Qrme.Red, fontSize = 12.sp)
+                        Text(L10n.t("nc.leave", vm.language), color = Qrme.Red, fontSize = 12.sp)
                     }
                 }
                 transcript.forEach { m ->
@@ -5955,7 +5959,10 @@ private fun ObjectToAProfileCard(vm: StudioViewModel) {
  *    with a bright Yes and a grey No has made the choice already.
  */
 @Composable
-fun ProblemReportingCard() {
+// `lang` is passed in rather than read from a singleton: this card is the
+// one place in the app that asks for consent, and consent is asked in the
+// reader's language or it is not asked.
+fun ProblemReportingCard(lang: String) {
     var answered by remember { mutableStateOf(Problems.noticeAnswered()) }
     var sending by remember { mutableStateOf(Problems.sendingEnabled()) }
     var showing by remember { mutableStateOf(false) }
@@ -5967,19 +5974,17 @@ fun ProblemReportingCard() {
 
     Card(colors = CardDefaults.cardColors(containerColor = Qrme.Card2)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("When something breaks", style = MaterialTheme.typography.titleSmall)
+            Text(L10n.t("ns.pr", lang), style = MaterialTheme.typography.titleSmall)
 
             if (Problems.collectorUrl().isEmpty()) {
                 // Not a failure and not a thing to hide: this build has no
                 // address compiled in, so there is nothing to consent to.
-                Text("This build reports nowhere. Failures are counted on this " +
-                     "device and never leave it.",
+                Text(L10n.t("ns.pr.nowhere", lang),
                      style = MaterialTheme.typography.bodySmall)
             } else if (!answered) {
-                Text("This app can send a count of what failed — the operation " +
-                     "and the HTTP status, the day, and how many times. Not " +
-                     "what you typed, not who you are, not which profile. " +
-                     "Nothing that identifies you or anyone else.",
+                // Two wordings of one sentence — this said "the day" where
+                // the iOS shell said "the day it happened". One row now.
+                Text(L10n.t("ns.pr.explain", lang),
                      style = MaterialTheme.typography.bodySmall)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(onClick = {
@@ -5989,14 +5994,14 @@ fun ProblemReportingCard() {
                         // just agreed watches the buffer drain, instead of
                         // being told something happened later.
                         scope.launch(Dispatchers.IO) { Problems.send() }
-                    }) { Text("Send counts") }
+                    }) { Text(L10n.t("ns.pr.send", lang)) }
                     OutlinedButton(onClick = {
                         Problems.answerNotice(false); answered = true; sending = false
-                    }) { Text("Do not send") }
+                    }) { Text(L10n.t("ns.pr.dont", lang)) }
                 }
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Send failure counts", Modifier.weight(1f),
+                    Text(L10n.t("ns.pr.toggle", lang), Modifier.weight(1f),
                          style = MaterialTheme.typography.bodyMedium)
                     Switch(checked = sending, onCheckedChange = {
                         sending = it; Problems.setSending(it)
@@ -6005,13 +6010,11 @@ fun ProblemReportingCard() {
             }
 
             TextButton(onClick = { showing = !showing }) {
-                Text(if (showing) "Hide what would be sent"
-                     else "Show what would be sent")
+                Text(L10n.t(if (showing) "ns.pr.hide" else "ns.pr.show", lang))
             }
             if (showing) {
                 if (owed.isEmpty()) {
-                    Text("Nothing is owed. Either nothing has failed, or " +
-                         "everything that has was already reported.",
+                    Text(L10n.t("ns.pr.owed", lang),
                          style = MaterialTheme.typography.bodySmall)
                 } else {
                     owed.forEach { r ->

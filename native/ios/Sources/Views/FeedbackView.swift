@@ -14,22 +14,22 @@ struct FeedbackCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Help us improve").font(.headline).foregroundStyle(Theme.txt)
-            Text("Tell us how to make this better — an idea, a rough edge, a bug, or what you love. It goes straight to the team.")
+            Text(L10n.t("ns.fb", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("ns.fb.sub", state.language))
                 .font(.caption).foregroundStyle(Theme.t2)
 
             Picker("", selection: $category) {
-                ForEach(categories, id: \.self) { Text($0.capitalized).tag($0) }
+                ForEach(categories, id: \.self) { Text(L10n.t("ns.fb.c.\($0)", state.language)).tag($0) }
             }.pickerStyle(.segmented)
 
-            TextField("What's on your mind?", text: $message, axis: .vertical)
+            TextField(L10n.t("ns.fb.msg.ph", state.language), text: $message, axis: .vertical)
                 .lineLimit(2...5).foregroundStyle(Theme.txt)
                 .padding(10).background(Theme.scrBot)
                 .clipShape(RoundedRectangle(cornerRadius: 11))
                 .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
 
             HStack(spacing: 6) {
-                Text("Rating").font(.caption).foregroundStyle(Theme.t2)
+                Text(L10n.t("ns.fb.rating", state.language)).font(.caption).foregroundStyle(Theme.t2)
                 ForEach(1...5, id: \.self) { n in
                     Button { rating = (rating == n ? 0 : n) } label: {
                         Image(systemName: n <= rating ? "star.fill" : "star")
@@ -38,7 +38,7 @@ struct FeedbackCard: View {
                 }
             }
 
-            Button("Send feedback") { send() }
+            Button(L10n.t("ns.fb.send", state.language)) { send() }
                 .font(.caption.bold()).foregroundStyle(.white)
                 .padding(.horizontal, 12).padding(.vertical, 9)
                 .background(Theme.brandA).clipShape(Capsule())
@@ -48,12 +48,16 @@ struct FeedbackCard: View {
 
             if let st, st.total > 0 {
                 Divider().overlay(Theme.line)
-                Text("So far: " + categories.compactMap { c in
-                    (st.tally[c] ?? 0) > 0 ? "\(st.tally[c]!) \(c)" : nil
-                }.joined(separator: " · "))
+                // The tally named its categories in English inside a
+                // sentence that is otherwise translated.
+                Text(L10n.fill("ns.fb.sofar", state.language, ["tally":
+                    categories.compactMap { c in
+                        (st.tally[c] ?? 0) > 0
+                            ? "\(st.tally[c]!) \(L10n.t("ns.fb.c.\(c)", state.language))" : nil
+                    }.joined(separator: " · ")]))
                     .font(.caption2).foregroundStyle(Theme.t3)
                 if !st.mine.isEmpty {
-                    Text("Yours").font(.caption.bold()).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ns.fb.mine", state.language)).font(.caption.bold()).foregroundStyle(Theme.txt)
                     ForEach(st.mine.prefix(4), id: \.id) { f in
                         HStack {
                             Text("[\(f.category)] \(f.message)")

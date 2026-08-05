@@ -211,9 +211,13 @@ def test_the_watermark_advances_by_amount_and_not_by_a_flag():
 #
 # (shell, the file holding the card, the screen that must call it)
 NOTICE = (
+    # The call, not its arity: the Android card takes the reader's language
+    # since the round that localized it, and `ProblemReportingCard()` matched
+    # nothing the moment it did. What this asserts is that a screen calls the
+    # card, which is as true with an argument as without one.
     ("ios", "native/ios/Sources/Views/ProblemReportingCard.swift",
-     "native/ios/Sources/Views/SettingsView.swift", "ProblemReportingCard()"),
-    ("android", "native/android/app/src/main/java/app/qrme/studio/ui/Screens.kt", "native/android/app/src/main/java/app/qrme/studio/ui/Screens.kt", "ProblemReportingCard()"),
+     "native/ios/Sources/Views/SettingsView.swift", "ProblemReportingCard("),
+    ("android", "native/android/app/src/main/java/app/qrme/studio/ui/Screens.kt", "native/android/app/src/main/java/app/qrme/studio/ui/Screens.kt", "ProblemReportingCard("),
     ("windows", "native/windows/Views/SettingsPage.xaml.cs", "native/windows/Views/SettingsPage.xaml", "ProblemsExplain"),
 )
 
@@ -271,15 +275,26 @@ def test_neither_answer_is_the_pre_picked_one(shell, card, host, call):
         mattered  do the two answers differ in emphasis
     """
     body = _code(REPO / card) + _code(REPO / host)
+    # The two answers are looked up rather than written since the round that
+    # localized this card, so the card is asked for the lookup and the table
+    # is asked for the words. Matching the English in the card would now match
+    # nothing; matching the key alone would pass with the table saying
+    # anything at all — and this is the card that asks for consent.
+    for key in ("ns.pr.send", "ns.pr.dont"):
+        assert key in body, (
+            f"{shell}'s card does not look up {key!r} — a consent answer has "
+            "to come from the table, in the reader's language")
+    table = _code(REPO / "native/ios/Sources/L10n.swift")
     for wording in ("Send counts", "Do not send"):
-        assert wording in body, (
-            f"{shell}'s card is missing the {wording!r} answer")
+        assert wording in table, (
+            f"{wording!r} has left the shells' table, so {shell}'s card looks "
+            "up a key that resolves to nothing")
 
     # Everything on the line that declares each answer — the style it is given
     # and nothing belonging to anything else.
     lines = body.splitlines()
     marks = [i for i, line in enumerate(lines)
-             if "Send counts" in line or "Do not send" in line
+             if "ns.pr.send" in line or "ns.pr.dont" in line
              or "ProblemsYes" in line or "ProblemsNo" in line]
     # Two lines, not one: Swift puts the style on a wrapped modifier below the
     # label, and a one-line window missed exactly the injection this test was
