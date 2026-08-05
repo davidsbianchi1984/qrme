@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, type ConnJoined, type ConnMessage,
          type Summoned } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -43,6 +44,7 @@ import { useSession } from "../store";
  */
 export function Stranger() {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -77,33 +79,37 @@ export function Stranger() {
 
   return (
     <div className="screen">
-      <h2>Arriving, and strangers</h2>
+      <h2>{tr("str.title", lang)}</h2>
       <Refusal error={error} />
 
       {/* --- what a reference resolves to ------------------------------ */}
       <div className="card">
-        <h3>Follow a reference</h3>
+        <h3>{tr("str.follow.hdr", lang)}</h3>
         <p className="muted small">
-          An <code>@handle</code>, a <code>#tag</code>, or the id off a printed
-          sticker. Public, because somebody following one has no account yet —
-          which is the whole point of leaving one somewhere.
+          {fill(tr("str.ref.pitch", lang), {
+            handle: <code>{tr("str.handle.eg", lang)}</code>,
+            tag: <code>{tr("str.tag.eg", lang)}</code>,
+          })}
         </p>
         <input value={ref} onChange={(e) => setRef(e.target.value)}
-               placeholder="@rosa, #locksmith, or a beacon id" />
+               placeholder={tr("str.ref.ph", lang)} />
         <button disabled={!ref} onClick={() => go(
-          () => api.summon(ref), setFound)}>Follow it</button>
+          () => api.summon(ref), setFound)}>
+          {tr("str.followit", lang)}
+        </button>
         {found && (
           <div>
             {found.type === "beacon" && (
               <p className="muted small">
-                Left at {found.label || "somewhere"}
+                {fill(tr("str.leftat", lang), {
+                  where: found.label || tr("str.somewhere", lang) })}
                 {found.location && ` · ${found.location}`}
-                {typeof found.scans === "number"
-                  && ` · scanned ${found.scans} times`}
+                {typeof found.scans === "number" && tr("str.scanned", lang)
+                  .replace("{n}", String(found.scans))}
               </p>
             )}
             {cards.length === 0 && (
-              <p className="muted small">Nothing answers to that.</p>
+              <p className="muted small">{tr("str.nothing", lang)}</p>
             )}
             {cards.map((c) => (
               <div key={c.profile_id}>
@@ -113,10 +119,9 @@ export function Stranger() {
                 </p>
                 <p className="muted small">
                   {c.rated
-                    ? "18+ — this resolves to a wall unless you are signed in "
-                      + "as a verified adult."
+                    ? tr("str.agewall", lang)
                     : c.purpose.replace(/_/g, " ")}
-                  {c.status !== "active" && " · no longer answering"}
+                  {c.status !== "active" && tr("str.nolonger", lang)}
                 </p>
                 {c.note && <p className="muted small">{c.note}</p>}
               </div>
@@ -127,74 +132,71 @@ export function Stranger() {
 
       {/* --- anonymous matchmaking ------------------------------------- */}
       <div className="card">
-        <h3>Talk to a stranger</h3>
-        <p className="muted small">
-          No profile in this one — two people, each seeing only the alias the
-          other chose. Everything here goes out under your own credential:
-          the id in the request says whose turn it is, and the token says who
-          is asking, which is the part that used to be missing.
-        </p>
+        <h3>{tr("str.talk", lang)}</h3>
+        <p className="muted small">{tr("str.talk.pitch", lang)}</p>
         {!token && (
-          <p className="muted small">
-            You need an interactor of your own before you can queue.
-          </p>
+          <p className="muted small">{tr("str.needown", lang)}</p>
         )}
         <input value={alias} onChange={(e) => setAlias(e.target.value)}
-               placeholder="what to be called (defaults to Stranger)" />
+               placeholder={tr("str.alias.ph", lang)} />
         <select value={tier} onChange={(e) => setTier(e.target.value)}>
-          <option value="friendly">friendly</option>
+          <option value="friendly">{tr("str.friendly", lang)}</option>
           <option value="rated">18+</option>
         </select>
         <p className="muted small">
-          The 18+ queue needs a verified adult on <em>both</em> sides before
-          either is admitted to it.
+          {fill(tr("str.ratedqueue", lang),
+            { both: <em>{tr("str.both", lang)}</em> })}
         </p>
         <button disabled={!token || !me} onClick={() => go(
           () => api.joinQueue({ interactor_id: me, tier,
                                 ...(alias ? { alias } : {}) }, token),
           (j) => { setJoined(j); setMessages([]); })}>
-          {tier === "rated" ? "Join the 18+ queue" : "Find somebody"}
+          {tier === "rated"
+            ? tr("str.joinrated", lang) : tr("str.findsomebody", lang)}
         </button>
 
         {joined?.status === "waiting" && (
           <p className="muted small">
-            Waiting for somebody else on the {joined.tier} queue.
+            {fill(tr("str.waiting", lang), { tier: joined.tier })}
           </p>
         )}
 
         {cid && (
           <div>
             <p className="small">
-              Talking to <strong>{joined?.matched_with || "Stranger"}</strong>.
-              That is the name they chose, and all either of you gets.
+              {fill(tr("str.talkingto", lang), {
+                who: <strong>
+                  {joined?.matched_with || tr("str.stranger", lang)}
+                </strong>,
+              })}
             </p>
-            <button className="ghost" onClick={refresh}>Refresh</button>
+            <button className="ghost" onClick={refresh}>
+              {tr("str.refresh", lang)}
+            </button>
             {messages.map((m) => (
               <p key={m.id} className="small">
                 <strong>{m.from}</strong> {m.content}
                 {m.status === "blocked" && (
                   <span className="muted">
-                    {" "}· held back — only you can see this
+                    {" "}{tr("str.heldback", lang)}
                   </span>
                 )}
               </p>
             ))}
             <input value={draft} onChange={(e) => setDraft(e.target.value)}
-                   placeholder="say something" />
+                   placeholder={tr("str.say.ph", lang)} />
             <button disabled={!draft} onClick={() => go(
               () => api.sendToConnection(cid, { interactor_id: me,
                                                 message: draft }, token),
-              () => { setDraft(""); refresh(); })}>Send</button>
+              () => { setDraft(""); refresh(); })}>
+              {tr("str.send", lang)}
+            </button>
             <button className="ghost" onClick={() => go(
               () => api.endConnection(cid, me, token),
               () => { setJoined(null); setMessages([]); })}>
-              End it
+              {tr("str.endit", lang)}
             </button>
-            <p className="muted small">
-              Either side may end it, and ending returns any microphone lent
-              inside — the permission was scoped to this conversation and does
-              not survive it.
-            </p>
+            <p className="muted small">{tr("str.endnote", lang)}</p>
           </div>
         )}
       </div>

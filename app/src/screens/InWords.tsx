@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type HandleClaimed, type LanguageCatalogue,
          type LanguagePref, type ProfilePost, type Translated } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -41,6 +42,7 @@ import { useSession } from "../store";
  */
 export function InWords() {
   const { session } = useSession();
+  const uiLang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -78,31 +80,29 @@ export function InWords() {
   if (!me) {
     return (
       <div className="screen">
-        <h2>In its own words</h2>
-        <p className="muted">Choose a profile first.</p>
+        <h2>{tr("iw.title", uiLang)}</h2>
+        <p className="muted">{tr("iw.pickfirst", uiLang)}</p>
       </div>
     );
   }
 
   return (
     <div className="screen">
-      <h2>In its own words</h2>
+      <h2>{tr("iw.title", uiLang)}</h2>
       <Refusal error={error} />
       {said && <p className="small">{said}</p>}
 
       {/* --- the language ---------------------------------------------- */}
       <div className="card">
-        <h3>What it speaks</h3>
-        <p className="muted small">
-          Not a display setting. The persona writes in this language natively
-          on every surface it appears — chat, posts, rooms, a robot speaking
-          aloud — rather than writing English and translating afterwards.
-        </p>
+        <h3>{tr("iw.speaks", uiLang)}</h3>
+        <p className="muted small">{tr("iw.notdisplay", uiLang)}</p>
         {pref && (
           <p className="small">
-            Currently <strong>{pref.label}</strong>, {pref.mode === "pre"
-              ? "already in that language everywhere"
-              : "translated when asked for"}.
+            {fill(tr("iw.currently", uiLang), {
+              label: <strong>{pref.label}</strong>,
+              mode: pref.mode === "pre"
+                ? tr("iw.mode.pre", uiLang) : tr("iw.mode.ondemand", uiLang),
+            })}
           </p>
         )}
         <select value={lang} onChange={(e) => setLang(e.target.value)}>
@@ -111,42 +111,45 @@ export function InWords() {
           ))}
         </select>
         <select value={mode} onChange={(e) => setMode(e.target.value)}>
-          <option value="pre">everywhere, already</option>
-          <option value="on_demand">when asked for</option>
+          <option value="pre">{tr("iw.opt.pre", uiLang)}</option>
+          <option value="on_demand">{tr("iw.opt.ondemand", uiLang)}</option>
         </select>
         <button disabled={!token} onClick={() => go(
           () => api.setProfileLanguage(me, { language: lang, mode }, token),
-          (p) => { setPref(p); setSaid(`Now speaks ${p.label}.`); })}>
-          Set it
+          (p) => { setPref(p); setSaid(tr("iw.nowspeaks", uiLang)
+            .replace("{label}", p.label)); })}>
+          {tr("iw.setit", uiLang)}
         </button>
       </div>
 
       {/* --- translating something ------------------------------------- */}
       <div className="card">
-        <h3>Translate something it ran across</h3>
-        <p className="muted small">
-          An interactor's message, a room turn, a listing. Done with this
-          profile's own model, into its language unless you name another.
-        </p>
+        <h3>{tr("iw.translate.hdr", uiLang)}</h3>
+        <p className="muted small">{tr("iw.translate.pitch", uiLang)}</p>
         <textarea value={source} rows={3}
                   onChange={(e) => setSource(e.target.value)}
-                  placeholder="paste the text" />
+                  placeholder={tr("iw.paste.ph", uiLang)} />
         <select value={target} onChange={(e) => setTarget(e.target.value)}>
-          <option value="">into its own language</option>
+          <option value="">{tr("iw.intoown", uiLang)}</option>
           {(catalogue?.languages || []).map((l) => (
-            <option key={l.code} value={l.code}>into {l.label}</option>
+            <option key={l.code} value={l.code}>
+              {tr("iw.into", uiLang).replace("{label}", l.label)}
+            </option>
           ))}
         </select>
         <button disabled={!token || !source} onClick={() => go(
           () => api.translate(me, source, target || undefined, token),
-          setDone)}>Translate</button>
+          setDone)}>{tr("iw.translate", uiLang)}</button>
         {done && (
           <div>
             <p className="small">{done.translation}</p>
             <p className="muted small">
               {done.engine === "none"
-                ? `Not translated — ${done.note || "no model available"}.`
-                : `${done.language} · via ${done.engine}`}
+                ? tr("iw.nottranslated", uiLang).replace(
+                    "{why}", done.note || tr("iw.nomodel", uiLang))
+                : tr("iw.via", uiLang)
+                    .replace("{language}", done.language)
+                    .replace("{engine}", done.engine)}
             </p>
           </div>
         )}
@@ -154,57 +157,52 @@ export function InWords() {
 
       {/* --- the name it answers to ------------------------------------- */}
       <div className="card">
-        <h3>The name it answers to</h3>
+        <h3>{tr("iw.name", uiLang)}</h3>
         <p className="muted small">
-          Claiming a handle <strong>replaces</strong> whatever this profile had
-          — the old one stops resolving, and anything printed or shared that
-          named it stops working. That is why only its owner may do this, and
-          why the route asking for nothing was worth more than a second name.
+          {fill(tr("iw.claiming", uiLang),
+            { replaces: <strong>{tr("iw.replaces", uiLang)}</strong> })}
         </p>
         <input value={handle} onChange={(e) => setHandle(e.target.value)}
-               placeholder="rosa" />
+               placeholder={tr("iw.handle.ph", uiLang)} />
         <button disabled={!token || !handle} onClick={() => go(
           () => api.claimHandle(me, handle, token),
           (c) => { setClaimed(c);
-                   setSaid(`Answers to ${c.handle}.`); })}>
-          Claim it
+                   setSaid(tr("iw.answers", uiLang)
+                     .replace("{handle}", c.handle)); })}>
+          {tr("iw.claim", uiLang)}
         </button>
         {claimed && (
           <p className="muted small">
-            Anybody can now reach it at <code>{claimed.summon}</code>.
+            {fill(tr("iw.reachat", uiLang),
+              { url: <code>{claimed.summon}</code> })}
           </p>
         )}
       </div>
 
       {/* --- composing --------------------------------------------------- */}
       <div className="card">
-        <h3>Say something publicly</h3>
+        <h3>{tr("iw.saypublic", uiLang)}</h3>
         <input value={topic} onChange={(e) => setTopic(e.target.value)}
-               placeholder="what it should post about" />
+               placeholder={tr("iw.topic.ph", uiLang)} />
         <input value={surface} onChange={(e) => setSurface(e.target.value)}
-               placeholder="which surface (optional)" />
-        <p className="muted small">
-          A public post faces the widest audience there is, so it always runs
-          the strict filter — and it carries a synthetic-media credential from
-          the moment it exists.
-        </p>
+               placeholder={tr("iw.surface.ph", uiLang)} />
+        <p className="muted small">{tr("iw.public.pitch", uiLang)}</p>
         <button disabled={!token || !topic} onClick={() => go(
           () => api.composePost(me, {
             topic, ...(surface ? { surface } : {}),
           }, token), (p) => { setComposed(p); setTopic(""); })}>
-          Compose
+          {tr("iw.compose", uiLang)}
         </button>
         {composed && (
           composed.status === "approved" ? (
             <div>
               <p className="small">{composed.content}</p>
-              <p className="muted small">Published.</p>
+              <p className="muted small">{tr("iw.published", uiLang)}</p>
             </div>
           ) : (
             <p className="muted small">
-              Held — {composed.flag_reason || composed.status}. The text is not
-              returned here, deliberately, and it is not public either. It is
-              waiting in the mark screen's queue.
+              {fill(tr("iw.held", uiLang),
+                { why: composed.flag_reason || composed.status })}
             </p>
           )
         )}

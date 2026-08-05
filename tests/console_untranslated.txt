@@ -1,4 +1,4 @@
-# status: backlog — 425 rows
+# status: backlog — 338 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 425
+# ceiling: 338
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -50,35 +50,6 @@
 #     mattered  is this string one a non-English reader cannot read
 #
 # The count this file exists to state honestly was overstated by that much.
-Audience: . A gift reads who to credit from the profile itself; a subscription is told, so this screen shows you which account it named.
-Audience: Credited to
-Audience: Follow
-Audience: Follow somebody
-Audience: Gifts
-Audience: Nobody yet.
-Audience: Nothing yet.
-Audience: Send a gift
-Audience: The buyer's side of the ledger. The seller's side is on the marketplace screen — two questions, so two lists.
-Audience: This profile's audience
-Audience: Up to
-Audience: What you follow
-Audience: What you have bought
-Audience: Who follows this profile
-Audience: Who is following, and what they pay
-Audience: a note with it
-Audience: a profile id (blank means your own)
-Audience: charge another period
-Audience: charged, each one because somebody pressed a button.
-Audience: comments ·
-Audience: each — published so the limit can be said before somebody runs into it. Gifting needs a verified birthdate on the giver's account: an unverified age is not evidence of an adult.
-Audience: follow — free
-Audience: following ·
-Audience: likes ·
-Audience: paid
-Audience: period
-Audience: received across
-Audience: shares
-Audience: stop following
 Blend: A hybrid profile. It will say openly that it is a blend and never claim to be any single one of its constituents.
 Blend: Blend a Profile
 Blend: Blend another
@@ -223,35 +194,6 @@ Home: 🎗 Where the money goes
 Home: 🏛 Departments that coordinate
 Home: 🔮 What would they do
 Home: 🫱🏽‍🫲🏻 Blend a profile
-InWords: . The text is not returned here, deliberately, and it is not public either. It is waiting in the mark screen's queue.
-InWords: A public post faces the widest audience there is, so it always runs the strict filter — and it carries a synthetic-media credential from the moment it exists.
-InWords: An interactor's message, a room turn, a listing. Done with this profile's own model, into its language unless you name another.
-InWords: Anybody can now reach it at
-InWords: Choose a profile first.
-InWords: Claim it
-InWords: Claiming a handle
-InWords: Compose
-InWords: Currently
-InWords: Held —
-InWords: In its own words
-InWords: Not a display setting. The persona writes in this language natively on every surface it appears — chat, posts, rooms, a robot speaking aloud — rather than writing English and translating afterwards.
-InWords: Published.
-InWords: Say something publicly
-InWords: Set it
-InWords: The name it answers to
-InWords: Translate
-InWords: Translate something it ran across
-InWords: What it speaks
-InWords: everywhere, already
-InWords: into
-InWords: into its own language
-InWords: paste the text
-InWords: replaces
-InWords: rosa
-InWords: what it should post about
-InWords: whatever this profile had — the old one stops resolving, and anything printed or shared that named it stops working. That is why only its owner may do this, and why the route asking for nothing was worth more than a second name.
-InWords: when asked for
-InWords: which surface (optional)
 Inside: Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.
 Inside: Go in
 Inside: In a voice room your own microphone carries your voice to the other people; the profiles are reading text and have no ear. Lending yours gives them one — keyed to your voice and set narrow enough to reach only you, not the room. Everybody here is shown that you lent it, which is the whole point: a microphone the others cannot see is what this is built not to be.
@@ -400,35 +342,6 @@ Simulate: Simulations are owner-only — sign in with a profile you own.
 Simulate: What Would They Do
 Simulate: a watermarked prediction — never the person's actual word
 Simulate: e.g. the town council proposes paving over the garden
-Stranger: #tag
-Stranger: , a
-Stranger: , or the id off a printed sticker. Public, because somebody following one has no account yet — which is the whole point of leaving one somewhere.
-Stranger: . That is the name they chose, and all either of you gets.
-Stranger: @handle
-Stranger: @rosa, #locksmith, or a beacon id
-Stranger: An
-Stranger: Arriving, and strangers
-Stranger: Either side may end it, and ending returns any microphone lent inside — the permission was scoped to this conversation and does not survive it.
-Stranger: End it
-Stranger: Follow a reference
-Stranger: Follow it
-Stranger: Left at
-Stranger: No profile in this one — two people, each seeing only the alias the other chose. Everything here goes out under your own credential: the id in the request says whose turn it is, and the token says who is asking, which is the part that used to be missing.
-Stranger: Nothing answers to that.
-Stranger: Refresh
-Stranger: Send
-Stranger: Talk to a stranger
-Stranger: Talking to
-Stranger: The 18+ queue needs a verified adult on
-Stranger: Waiting for somebody else on the
-Stranger: You need an interactor of your own before you can queue.
-Stranger: both
-Stranger: friendly
-Stranger: queue.
-Stranger: say something
-Stranger: sides before either is admitted to it.
-Stranger: what to be called (defaults to Stranger)
-Stranger: · held back — only you can see this
 TheMark: AI ·
 TheMark: Choose a profile first.
 TheMark: Held back

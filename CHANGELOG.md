@@ -4,6 +4,38 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.7] — 2026-08-05
+
+### The ledger, the name, and the stranger
+
+The console-untranslated record falls **425 → 338**.
+
+**Who is following, and what they pay** — the sentence that keeps a
+count of presses from reading as elapsed time now exists in both the
+singular and the plural row, in all ten languages: *each one because
+somebody pressed a button.*
+
+**In its own words** — the language a persona writes in is not a display
+setting, and the screen still says so. Claiming a handle replaces
+whatever the profile had, and the old one stops resolving; that
+paragraph is translated whole rather than broken around its bolded verb.
+This screen already bound `lang` to the *profile's* chosen language, so
+the console's own language is bound separately as `uiLang` — the two are
+different questions and now have different names.
+
+**Arriving, and strangers** — the `@handle` and `#tag` examples went
+into the table too. They are format examples, but the word after the
+sigil is readable text, and a Spanish reader is better served by
+`@usuario` than by `@handle`.
+
+95 keys plus three placeholders, all ten languages, exact-sync held in
+both directions.
+
+The pinned check that a period is a press was tightened while it moved:
+it now requires the sentence **twice**, because the singular and plural
+rows are separate strings and the plural is the one somebody reads on a
+second press.
+
 ## [0.45.6] — 2026-08-05
 
 ### The lobby, the screen in the corridor, and a voice

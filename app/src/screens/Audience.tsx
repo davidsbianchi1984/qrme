@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type AudienceView, type GiftsView, type Order,
          type Subscription } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -34,6 +35,7 @@ import { useSession } from "../store";
  */
 export function Audience({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
   const account = session.accountId || "";
@@ -82,30 +84,32 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Who is following, and what they pay</h2>
+      <h2>{tr("aud.title", lang)}</h2>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {view && (
         <div className="card">
-          <h3>This profile's audience</h3>
+          <h3>{tr("aud.audience", lang)}</h3>
           <p className="small">
-            {view.subscribers} following · {view.likes} likes ·{" "}
-            {view.comments} comments · {view.shares} shares
+            {fill(tr("aud.counts", lang), {
+              subs: view.subscribers, likes: view.likes,
+              comments: view.comments, shares: view.shares,
+            })}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>Follow somebody</h3>
+        <h3>{tr("aud.follow.hdr", lang)}</h3>
         <div className="row">
           <input value={subject} onChange={(e) => setSubject(e.target.value)}
-                 placeholder="a profile id (blank means your own)"
+                 placeholder={tr("aud.subject.ph", lang)}
                  style={{ flex: 1 }} />
           <select value={tier} onChange={(e) => setTier(e.target.value)}>
-            <option value="follow">follow — free</option>
-            <option value="paid">paid</option>
+            <option value="follow">{tr("aud.tier.free", lang)}</option>
+            <option value="paid">{tr("aud.tier.paid", lang)}</option>
           </select>
           {tier === "paid" && (
             <input type="number" min={1} value={price}
@@ -121,31 +125,38 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
                       ? { tier, price, accept_price: price,
                           beneficiary: account }
                       : { tier }, interactorToken);
-                  }, "Following.")}>Follow</button>
+                  }, tr("aud.following.said", lang))}>
+            {tr("aud.follow", lang)}
+          </button>
         </div>
         {tier === "paid" && (
           <p className="muted small">
-            Credited to <code>{account || "— sign in —"}</code>. A gift reads
-            who to credit from the profile itself; a subscription is told, so
-            this screen shows you which account it named.
+            {fill(tr("aud.credited", lang), {
+              account: <code>{account || tr("aud.signin", lang)}</code>,
+            })}
           </p>
         )}
       </div>
 
       <div className="card">
-        <h3>What you follow</h3>
-        {mine.length === 0 && <p className="muted small">Nothing yet.</p>}
+        <h3>{tr("aud.youfollow", lang)}</h3>
+        {mine.length === 0 &&
+          <p className="muted small">{tr("aud.nothing", lang)}</p>}
         {mine.map((s) => (
           <div key={s.id}>
             <p className="small">
-              <code>{s.subject_id}</code> — {s.tier}
-              {s.price > 0 && ` · ${s.price.toFixed(2)} ${s.currency}`}
-              {" "}· {s.status}
+              {fill(tr("aud.subline", lang), {
+                id: <code>{s.subject_id}</code>, tier: s.tier,
+                price: s.price > 0
+                  ? ` · ${s.price.toFixed(2)} ${s.currency}` : "",
+                status: s.status,
+              })}
             </p>
             {/* A count of deliberate acts, not a duration. */}
             <p className="muted small">
-              {s.periods} period{s.periods === 1 ? "" : "s"} charged, each one
-              because somebody pressed a button. {s.billing}
+              {fill(s.periods === 1
+                ? tr("aud.period", lang) : tr("aud.periods", lang),
+                { n: s.periods, billing: s.billing })}
             </p>
             {s.status === "active" && (
               <div className="row">
@@ -153,15 +164,15 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
                   <button className="chip" disabled={busy}
                           onClick={act(() => api.renewSubscription(
                             s.id, account, interactorToken),
-                            "A period charged.")}>
-                    charge another period
+                            tr("aud.charged.said", lang))}>
+                    {tr("aud.charge", lang)}
                   </button>
                 )}
                 <button className="chip" disabled={busy}
                         onClick={act(() => api.unfollow(
                           "profiles", s.subject_id, interactorToken),
-                          "Cancelled — the history stays.")}>
-                  stop following
+                          tr("aud.stopped.said", lang))}>
+                  {tr("aud.stop", lang)}
                 </button>
               </div>
             )}
@@ -170,24 +181,27 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Who follows this profile</h3>
-        {theirs.length === 0 && <p className="muted small">Nobody yet.</p>}
+        <h3>{tr("aud.whofollows", lang)}</h3>
+        {theirs.length === 0 &&
+          <p className="muted small">{tr("aud.nobody", lang)}</p>}
         {theirs.map((s) => (
           <p className="small" key={s.id}>
-            <code>{s.subscriber}</code> — {s.tier} · {s.status} ·{" "}
-            {s.periods} period{s.periods === 1 ? "" : "s"}
+            {fill(s.periods === 1
+              ? tr("aud.followerline.one", lang)
+              : tr("aud.followerline", lang), {
+              who: <code>{s.subscriber}</code>, tier: s.tier,
+              status: s.status, n: s.periods,
+            })}
           </p>
         ))}
       </div>
 
       {gifts && (
         <div className="card">
-          <h3>Gifts</h3>
+          <h3>{tr("aud.gifts", lang)}</h3>
           <p className="muted small">
-            Up to {gifts.cap_per_gift.toFixed(2)} each — published so the
-            limit can be said before somebody runs into it. Gifting needs a
-            verified birthdate on the giver's account: an unverified age is
-            not evidence of an adult.
+            {fill(tr("aud.giftcap", lang),
+              { cap: gifts.cap_per_gift.toFixed(2) })}
           </p>
           <div className="row">
             <input type="number" min={1} value={amount}
@@ -195,7 +209,7 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
                    style={{ width: 100 }} />
             <input value={giftNote}
                    onChange={(e) => setGiftNote(e.target.value)}
-                   placeholder="a note with it" style={{ flex: 1 }} />
+                   placeholder={tr("aud.note.ph", lang)} style={{ flex: 1 }} />
             {/* No beneficiary field on purpose — the route reads it from
                 the subject so a giver cannot redirect it. */}
             <button disabled={busy || !interactorToken || !target}
@@ -204,11 +218,14 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
                         amount, note: giftNote.trim() || undefined },
                         interactorToken);
                       setGiftNote("");
-                    }, "Sent.")}>Send a gift</button>
+                    }, tr("aud.sent.said", lang))}>
+              {tr("aud.sendgift", lang)}
+            </button>
           </div>
           <p className="small">
-            {gifts.total.toFixed(2)} received across {gifts.gifts.length}{" "}
-            {gifts.gifts.length === 1 ? "gift" : "gifts"}.
+            {fill(gifts.gifts.length === 1
+              ? tr("aud.received.one", lang) : tr("aud.received", lang), {
+              total: gifts.total.toFixed(2), n: gifts.gifts.length })}
           </p>
           {gifts.gifts.map((g, i) => (
             <p className="muted small" key={g.id || i}>
@@ -220,12 +237,10 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
       )}
 
       <div className="card">
-        <h3>What you have bought</h3>
-        <p className="muted small">
-          The buyer's side of the ledger. The seller's side is on the
-          marketplace screen — two questions, so two lists.
-        </p>
-        {orders.length === 0 && <p className="muted small">Nothing yet.</p>}
+        <h3>{tr("aud.bought", lang)}</h3>
+        <p className="muted small">{tr("aud.bought.pitch", lang)}</p>
+        {orders.length === 0 &&
+          <p className="muted small">{tr("aud.nothing", lang)}</p>}
         {orders.map((o, i) => (
           <p className="small" key={String(o.id ?? i)}>
             <code>{String(o.id ?? "")}</code>

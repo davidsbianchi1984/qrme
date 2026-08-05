@@ -293,6 +293,13 @@ def test_the_screen_says_a_period_is_a_press():
     """`periods` is a count of presses. Rendered bare it reads as elapsed
     time, and somebody would reasonably conclude they are being billed on a
     schedule — which is the one thing this feature does not do."""
-    assert "pressed a button" in _markup("app/src/screens/Audience.tsx"), (
+    assert 'tr("aud.period' in _markup("app/src/screens/Audience.tsx"), (
         "periods are being shown without saying what they count, which "
         "reads as elapsed time")
+    # The sentence moved into the l10n table when the screen was localized.
+    # Both the singular and plural rows have to carry it: the plural is the
+    # one somebody reads on a second press, and it is the press that this
+    # sentence exists to name.
+    l10n = _markup("app/src/l10n.ts")
+    assert l10n.count("pressed a button") >= 2, (
+        "one of the two period rows has stopped saying what they count")

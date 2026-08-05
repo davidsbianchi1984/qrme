@@ -250,12 +250,18 @@ def test_the_screen_says_what_claiming_replaces():
     src = re.sub(r"^\s*//.*$", "", _src("app/src/screens/InWords.tsx"),
                  flags=re.M)
     flat = " ".join(src.split())
-    assert "the old one stops resolving" in flat
+    assert 'tr("iw.claiming", uiLang)' in flat
+    l10n = " ".join(
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
+    assert "the old one stops resolving" in l10n
 
 
 def test_the_screen_treats_language_as_more_than_a_display_setting():
     flat = " ".join(_src("app/src/screens/InWords.tsx").split())
-    assert "Not a display setting" in flat
+    assert 'tr("iw.notdisplay", uiLang)' in flat
+    l10n = " ".join(
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
+    assert "Not a display setting" in l10n
 
 
 def test_the_screen_reports_an_untranslated_answer_honestly():

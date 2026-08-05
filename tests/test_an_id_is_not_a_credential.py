@@ -294,9 +294,13 @@ def test_the_screen_says_what_the_alias_is_for():
     src = re.sub(r"^\s*//.*$", "", _src("app/src/screens/Stranger.tsx"),
                  flags=re.M)
     flat = " ".join(src.split())
-    assert "the name they chose, and all either of you gets" in flat
+    assert 'tr("str.talkingto", lang)' in flat
+    l10n = " ".join(
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
+    assert "the name they chose, and all either of you gets" in l10n
 
 
 def test_the_screen_marks_a_blocked_message_as_held_back():
     src = _src("app/src/screens/Stranger.tsx")
-    assert "only you can see this" in src
+    assert 'tr("str.heldback", lang)' in src
+    assert "only you can see this" in _src("app/src/l10n.ts")

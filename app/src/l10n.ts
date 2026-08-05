@@ -5232,6 +5232,300 @@ const CHROME: Table = {
   "vce.hold3": {
     en: "Withdrawing deletes the samples and silences the voice; the withdrawal stays on record.", es: "Retirarlo borra las muestras y silencia la voz; la retirada queda registrada.", fr: "Le retrait supprime les échantillons et fait taire la voix ; le retrait reste consigné.", de: "Der Widerruf löscht die Proben und bringt die Stimme zum Schweigen; der Widerruf bleibt verzeichnet.", pt: "Retirar apaga as amostras e silencia a voz; a retirada fica registada.", it: "Il ritiro cancella i campioni e zittisce la voce; il ritiro resta a verbale.", ja: "撤回すればサンプルは削除され、声は沈黙します。撤回したという事実は記録に残ります。", zh: "撤回会删除样本并让该声音沉默；而这次撤回本身会留在记录里。", hi: "वापस लेने पर नमूने मिट जाते हैं और आवाज़ चुप हो जाती है; वापस लेना रिकॉर्ड में बना रहता है।", ar: "السحب يحذف العينات ويُسكِت الصوت؛ ويبقى السحب مسجَّلًا.",
   },
+  "aud.title": {
+    en: "Who is following, and what they pay", es: "Quién sigue, y qué paga", fr: "Qui suit, et ce qu'ils paient", de: "Wer folgt, und was sie zahlen", pt: "Quem segue, e o que paga", it: "Chi segue, e cosa paga", ja: "誰がフォローし、いくら払っているか", zh: "谁在关注，以及他们付了什么", hi: "कौन अनुसरण कर रहा है, और क्या चुकाता है", ar: "من يتابع، وبكم",
+  },
+  "aud.audience": {
+    en: "This profile's audience", es: "El público de este perfil", fr: "Le public de ce profil", de: "Das Publikum dieses Profils", pt: "O público deste perfil", it: "Il pubblico di questo profilo", ja: "このプロフィールの聴衆", zh: "这份资料的受众", hi: "इस प्रोफ़ाइल के दर्शक", ar: "جمهور هذا الملف",
+  },
+  "aud.counts": {
+    en: "{subs} following · {likes} likes · {comments} comments · {shares} shares", es: "{subs} siguiendo · {likes} me gusta · {comments} comentarios · {shares} compartidos", fr: "{subs} abonnés · {likes} j'aime · {comments} commentaires · {shares} partages", de: "{subs} folgen · {likes} Likes · {comments} Kommentare · {shares} Teilungen", pt: "{subs} a seguir · {likes} gostos · {comments} comentários · {shares} partilhas", it: "{subs} seguono · {likes} mi piace · {comments} commenti · {shares} condivisioni", ja: "フォロー {subs} · いいね {likes} · コメント {comments} · シェア {shares}", zh: "{subs} 人关注 · {likes} 个赞 · {comments} 条评论 · {shares} 次分享", hi: "{subs} अनुसरण · {likes} पसंद · {comments} टिप्पणियाँ · {shares} साझा", ar: "{subs} متابعًا · {likes} إعجابًا · {comments} تعليقًا · {shares} مشاركة",
+  },
+  "aud.follow.hdr": {
+    en: "Follow somebody", es: "Seguir a alguien", fr: "Suivre quelqu'un", de: "Jemandem folgen", pt: "Seguir alguém", it: "Segui qualcuno", ja: "誰かをフォローする", zh: "关注某人", hi: "किसी का अनुसरण करें", ar: "تابِع أحدًا",
+  },
+  "aud.subject.ph": {
+    en: "a profile id (blank means your own)", es: "un id de perfil (en blanco significa el suyo)", fr: "un id de profil (vide signifie le vôtre)", de: "eine Profil-ID (leer heißt Ihre eigene)", pt: "um id de perfil (em branco significa o seu)", it: "un id di profilo (vuoto significa il tuo)", ja: "プロフィールID（空欄なら自分のもの）", zh: "一个资料 ID（留空表示你自己的）", hi: "प्रोफ़ाइल आईडी (ख़ाली का अर्थ आपकी अपनी)", ar: "معرّف ملف (الفراغ يعني ملفك)",
+  },
+  "aud.tier.free": {
+    en: "follow — free", es: "seguir — gratis", fr: "suivre — gratuit", de: "folgen — kostenlos", pt: "seguir — grátis", it: "segui — gratis", ja: "フォロー — 無料", zh: "关注 — 免费", hi: "अनुसरण — निःशुल्क", ar: "متابعة — مجانًا",
+  },
+  "aud.tier.paid": {
+    en: "paid", es: "de pago", fr: "payant", de: "bezahlt", pt: "pago", it: "a pagamento", ja: "有料", zh: "付费", hi: "सशुल्क", ar: "مدفوع",
+  },
+  "aud.follow": {
+    en: "Follow", es: "Seguir", fr: "Suivre", de: "Folgen", pt: "Seguir", it: "Segui", ja: "フォロー", zh: "关注", hi: "अनुसरण करें", ar: "تابِع",
+  },
+  "aud.following.said": {
+    en: "Following.", es: "Siguiendo.", fr: "Suivi.", de: "Folgt.", pt: "A seguir.", it: "Stai seguendo.", ja: "フォローしました。", zh: "已关注。", hi: "अनुसरण कर रहे हैं।", ar: "أنت تتابع الآن.",
+  },
+  "aud.credited": {
+    en: "Credited to {account}. A gift reads who to credit from the profile itself; a subscription is told, so this screen shows you which account it named.", es: "Se acredita a {account}. Un regalo lee a quién acreditar del propio perfil; a una suscripción se le dice, así que esta pantalla le muestra qué cuenta nombró.", fr: "Crédité à {account}. Un cadeau lit à qui créditer depuis le profil lui-même ; un abonnement, lui, se le fait dire — cet écran vous montre donc quel compte il a nommé.", de: "Gutgeschrieben an {account}. Ein Geschenk liest aus dem Profil selbst, wem es gutzuschreiben ist; einem Abonnement wird es gesagt — dieser Bildschirm zeigt Ihnen also, welches Konto es genannt hat.", pt: "Creditado a {account}. Um presente lê do próprio perfil a quem creditar; a uma subscrição isso é dito, por isso este ecrã mostra-lhe que conta ela nomeou.", it: "Accreditato a {account}. Un regalo legge dal profilo stesso a chi accreditare; a un abbonamento viene detto, quindi questa schermata ti mostra quale conto ha indicato.", ja: "入金先は {account} です。贈り物は誰に入金するかをプロフィール自身から読み取りますが、購読は告げられます。ですからこの画面は、それがどの口座を指定したかをお見せします。", zh: "入账至 {account}。赠礼从资料本身读取该记给谁；而订阅是被告知的，所以本页面会告诉你它指定了哪个账户。", hi: "{account} में जमा। उपहार यह प्रोफ़ाइल से ही पढ़ता है कि किसे जमा करना है; सदस्यता को बताया जाता है, इसलिए यह स्क्रीन दिखाती है कि उसने कौन-सा खाता बताया।", ar: "يُقيَّد لصالح {account}. الهدية تقرأ من الملف نفسه لمن تُقيَّد؛ أما الاشتراك فيُخبَر، لذا تُريك هذه الشاشة أي حساب سمّاه.",
+  },
+  "aud.signin": {
+    en: "— sign in —", es: "— inicie sesión —", fr: "— connectez-vous —", de: "— anmelden —", pt: "— inicie sessão —", it: "— accedi —", ja: "— サインイン —", zh: "— 请登录 —", hi: "— साइन इन करें —", ar: "— سجّل الدخول —",
+  },
+  "aud.youfollow": {
+    en: "What you follow", es: "Lo que sigue", fr: "Ce que vous suivez", de: "Wem Sie folgen", pt: "O que segue", it: "Cosa segui", ja: "あなたがフォローしているもの", zh: "你关注了什么", hi: "आप क्या अनुसरण करते हैं", ar: "ما تتابعه",
+  },
+  "aud.nothing": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "aud.subline": {
+    en: "{id} — {tier}{price} · {status}", es: "{id} — {tier}{price} · {status}", fr: "{id} — {tier}{price} · {status}", de: "{id} — {tier}{price} · {status}", pt: "{id} — {tier}{price} · {status}", it: "{id} — {tier}{price} · {status}", ja: "{id} — {tier}{price} · {status}", zh: "{id} — {tier}{price} · {status}", hi: "{id} — {tier}{price} · {status}", ar: "{id} — {tier}{price} · {status}",
+  },
+  "aud.periods": {
+    en: "{n} periods charged, each one because somebody pressed a button. {billing}", es: "{n} periodos cobrados, cada uno porque alguien pulsó un botón. {billing}", fr: "{n} périodes facturées, chacune parce que quelqu'un a appuyé sur un bouton. {billing}", de: "{n} Zeiträume berechnet, jeder davon, weil jemand einen Knopf gedrückt hat. {billing}", pt: "{n} períodos cobrados, cada um porque alguém carregou num botão. {billing}", it: "{n} periodi addebitati, ciascuno perché qualcuno ha premuto un pulsante. {billing}", ja: "{n} 期分を請求しました。そのいずれもが、誰かがボタンを押したからです。{billing}", zh: "已计费 {n} 期，每一期都是因为有人按了一次按钮。{billing}", hi: "{n} अवधियाँ प्रभारित, हर एक इसलिए कि किसी ने बटन दबाया। {billing}", ar: "قُيّدت {n} فترات، كلٌّ منها لأن أحدًا ضغط زرًّا. {billing}",
+  },
+  "aud.period": {
+    en: "{n} period charged, each one because somebody pressed a button. {billing}", es: "{n} periodo cobrado, cada uno porque alguien pulsó un botón. {billing}", fr: "{n} période facturée, chacune parce que quelqu'un a appuyé sur un bouton. {billing}", de: "{n} Zeitraum berechnet, jeder davon, weil jemand einen Knopf gedrückt hat. {billing}", pt: "{n} período cobrado, cada um porque alguém carregou num botão. {billing}", it: "{n} periodo addebitato, ciascuno perché qualcuno ha premuto un pulsante. {billing}", ja: "{n} 期分を請求しました。そのいずれもが、誰かがボタンを押したからです。{billing}", zh: "已计费 {n} 期，每一期都是因为有人按了一次按钮。{billing}", hi: "{n} अवधि प्रभारित, हर एक इसलिए कि किसी ने बटन दबाया। {billing}", ar: "قُيّدت فترة {n}، كلٌّ منها لأن أحدًا ضغط زرًّا. {billing}",
+  },
+  "aud.charge": {
+    en: "charge another period", es: "cobrar otro periodo", fr: "facturer une période de plus", de: "einen weiteren Zeitraum berechnen", pt: "cobrar mais um período", it: "addebita un altro periodo", ja: "もう一期分を請求する", zh: "再计费一期", hi: "एक और अवधि प्रभारित करें", ar: "اشحن فترة أخرى",
+  },
+  "aud.charged.said": {
+    en: "A period charged.", es: "Un periodo cobrado.", fr: "Une période facturée.", de: "Ein Zeitraum berechnet.", pt: "Um período cobrado.", it: "Un periodo addebitato.", ja: "一期分を請求しました。", zh: "已计费一期。", hi: "एक अवधि प्रभारित।", ar: "قُيّدت فترة.",
+  },
+  "aud.stop": {
+    en: "stop following", es: "dejar de seguir", fr: "ne plus suivre", de: "nicht mehr folgen", pt: "deixar de seguir", it: "smetti di seguire", ja: "フォローをやめる", zh: "取消关注", hi: "अनुसरण बंद करें", ar: "أوقف المتابعة",
+  },
+  "aud.stopped.said": {
+    en: "Cancelled — the history stays.", es: "Cancelado — el historial se queda.", fr: "Annulé — l'historique reste.", de: "Gekündigt — der Verlauf bleibt.", pt: "Cancelado — o histórico fica.", it: "Annullato — lo storico resta.", ja: "解約しました — 履歴は残ります。", zh: "已取消——历史记录保留。", hi: "रद्द — इतिहास बना रहता है।", ar: "أُلغي — ويبقى السجل.",
+  },
+  "aud.whofollows": {
+    en: "Who follows this profile", es: "Quién sigue este perfil", fr: "Qui suit ce profil", de: "Wer diesem Profil folgt", pt: "Quem segue este perfil", it: "Chi segue questo profilo", ja: "このプロフィールを誰がフォローしているか", zh: "谁在关注这份资料", hi: "इस प्रोफ़ाइल का अनुसरण कौन करता है", ar: "من يتابع هذا الملف",
+  },
+  "aud.nobody": {
+    en: "Nobody yet.", es: "Nadie todavía.", fr: "Personne pour l'instant.", de: "Noch niemand.", pt: "Ainda ninguém.", it: "Ancora nessuno.", ja: "まだ誰もいません。", zh: "还没有人。", hi: "अभी कोई नहीं।", ar: "لا أحد بعد.",
+  },
+  "aud.followerline": {
+    en: "{who} — {tier} · {status} · {n} periods", es: "{who} — {tier} · {status} · {n} periodos", fr: "{who} — {tier} · {status} · {n} périodes", de: "{who} — {tier} · {status} · {n} Zeiträume", pt: "{who} — {tier} · {status} · {n} períodos", it: "{who} — {tier} · {status} · {n} periodi", ja: "{who} — {tier} · {status} · {n}期", zh: "{who} — {tier} · {status} · {n} 期", hi: "{who} — {tier} · {status} · {n} अवधियाँ", ar: "{who} — {tier} · {status} · {n} فترات",
+  },
+  "aud.followerline.one": {
+    en: "{who} — {tier} · {status} · {n} period", es: "{who} — {tier} · {status} · {n} periodo", fr: "{who} — {tier} · {status} · {n} période", de: "{who} — {tier} · {status} · {n} Zeitraum", pt: "{who} — {tier} · {status} · {n} período", it: "{who} — {tier} · {status} · {n} periodo", ja: "{who} — {tier} · {status} · {n}期", zh: "{who} — {tier} · {status} · {n} 期", hi: "{who} — {tier} · {status} · {n} अवधि", ar: "{who} — {tier} · {status} · فترة {n}",
+  },
+  "aud.gifts": {
+    en: "Gifts", es: "Regalos", fr: "Cadeaux", de: "Geschenke", pt: "Presentes", it: "Regali", ja: "贈り物", zh: "赠礼", hi: "उपहार", ar: "الهدايا",
+  },
+  "aud.giftcap": {
+    en: "Up to {cap} each — published so the limit can be said before somebody runs into it. Gifting needs a verified birthdate on the giver's account: an unverified age is not evidence of an adult.", es: "Hasta {cap} cada uno — publicado para que el límite pueda decirse antes de que alguien choque con él. Regalar exige una fecha de nacimiento verificada en la cuenta de quien regala: una edad sin verificar no es prueba de ser adulto.", fr: "Jusqu'à {cap} chacun — publié pour que la limite puisse être dite avant que quelqu'un ne s'y heurte. Offrir exige une date de naissance vérifiée sur le compte du donneur : un âge non vérifié n'est pas une preuve d'être adulte.", de: "Bis zu {cap} je Stück — veröffentlicht, damit die Grenze gesagt werden kann, bevor jemand dagegenläuft. Schenken erfordert ein verifiziertes Geburtsdatum im Konto der schenkenden Person: ein unverifiziertes Alter ist kein Nachweis für Volljährigkeit.", pt: "Até {cap} cada — publicado para que o limite possa ser dito antes de alguém esbarrar nele. Presentear exige uma data de nascimento verificada na conta de quem oferece: uma idade não verificada não é prova de ser adulto.", it: "Fino a {cap} ciascuno — pubblicato perché il limite possa essere detto prima che qualcuno ci sbatta contro. Regalare richiede una data di nascita verificata sull'account di chi dona: un'età non verificata non è prova di essere adulti.", ja: "各 {cap} まで — 誰かがぶつかる前に上限を言えるよう公開しています。贈るには、贈る側のアカウントに確認済みの生年月日が必要です。未確認の年齢は、成人であることの証拠にはなりません。", zh: "每笔最多 {cap}——公开写出，好让这个上限能在有人撞上之前就被说清。赠礼要求赠出方账户有已验证的出生日期：未经验证的年龄，不构成成年的证据。", hi: "प्रत्येक अधिकतम {cap} — यह सीमा इसलिए प्रकाशित है कि किसी के टकराने से पहले ही कही जा सके। उपहार देने के लिए देने वाले के खाते में सत्यापित जन्मतिथि चाहिए: असत्यापित आयु वयस्क होने का प्रमाण नहीं।", ar: "حتى {cap} لكل هدية — منشور ليُقال الحد قبل أن يصطدم به أحد. والإهداء يتطلب تاريخ ميلاد موثّقًا في حساب المُهدي: العمر غير الموثّق ليس دليلًا على البلوغ.",
+  },
+  "aud.note.ph": {
+    en: "a note with it", es: "una nota con él", fr: "un mot avec", de: "eine Notiz dazu", pt: "um recado com ele", it: "un messaggio con esso", ja: "ひとこと添える", zh: "附一句话", hi: "इसके साथ एक नोट", ar: "ملاحظة معها",
+  },
+  "aud.sendgift": {
+    en: "Send a gift", es: "Enviar un regalo", fr: "Envoyer un cadeau", de: "Ein Geschenk senden", pt: "Enviar um presente", it: "Manda un regalo", ja: "贈り物を送る", zh: "送出赠礼", hi: "उपहार भेजें", ar: "أرسل هدية",
+  },
+  "aud.sent.said": {
+    en: "Sent.", es: "Enviado.", fr: "Envoyé.", de: "Gesendet.", pt: "Enviado.", it: "Inviato.", ja: "送りました。", zh: "已送出。", hi: "भेज दिया गया।", ar: "أُرسلت.",
+  },
+  "aud.received": {
+    en: "{total} received across {n} gifts.", es: "{total} recibido en {n} regalos.", fr: "{total} reçu sur {n} cadeaux.", de: "{total} erhalten über {n} Geschenke.", pt: "{total} recebido em {n} presentes.", it: "{total} ricevuti su {n} regali.", ja: "贈り物 {n} 件で {total} を受け取りました。", zh: "收到 {total}，来自 {n} 份赠礼。", hi: "{n} उपहारों में कुल {total} प्राप्त।", ar: "تلقّى {total} عبر {n} هدايا.",
+  },
+  "aud.received.one": {
+    en: "{total} received across {n} gift.", es: "{total} recibido en {n} regalo.", fr: "{total} reçu sur {n} cadeau.", de: "{total} erhalten über {n} Geschenk.", pt: "{total} recebido em {n} presente.", it: "{total} ricevuti su {n} regalo.", ja: "贈り物 {n} 件で {total} を受け取りました。", zh: "收到 {total}，来自 {n} 份赠礼。", hi: "{n} उपहार में कुल {total} प्राप्त।", ar: "تلقّى {total} عبر هدية {n}.",
+  },
+  "aud.bought": {
+    en: "What you have bought", es: "Lo que ha comprado", fr: "Ce que vous avez acheté", de: "Was Sie gekauft haben", pt: "O que comprou", it: "Cosa hai comprato", ja: "購入したもの", zh: "你买过什么", hi: "आपने क्या ख़रीदा", ar: "ما اشتريته",
+  },
+  "aud.bought.pitch": {
+    en: "The buyer's side of the ledger. The seller's side is on the marketplace screen — two questions, so two lists.", es: "El lado del comprador del libro. El del vendedor está en la pantalla del mercado — dos preguntas, así que dos listas.", fr: "Le côté acheteur du registre. Le côté vendeur est sur l'écran de la place de marché — deux questions, donc deux listes.", de: "Die Käuferseite des Buchs. Die Verkäuferseite steht auf dem Marktplatz-Bildschirm — zwei Fragen, also zwei Listen.", pt: "O lado do comprador do livro. O lado do vendedor está no ecrã do mercado — duas perguntas, por isso duas listas.", it: "Il lato acquirente del registro. Il lato venditore è nella schermata del mercato — due domande, quindi due elenchi.", ja: "帳簿の買い手側です。売り手側はマーケットプレイスの画面にあります — 問いが二つなので、一覧も二つです。", zh: "账本的买方一侧。卖方那一侧在市集页面上——两个问题，所以两份清单。", hi: "बही का ख़रीदार पक्ष। विक्रेता पक्ष बाज़ार स्क्रीन पर है — दो सवाल, इसलिए दो सूचियाँ।", ar: "جانب المشتري من الدفتر. أما جانب البائع فعلى شاشة السوق — سؤالان، فقائمتان.",
+  },
+  "iw.title": {
+    en: "In its own words", es: "Con sus propias palabras", fr: "Dans ses propres mots", de: "Mit seinen eigenen Worten", pt: "Nas suas próprias palavras", it: "Con parole sue", ja: "自分の言葉で", zh: "用它自己的话", hi: "अपने ही शब्दों में", ar: "بكلماته هو",
+  },
+  "iw.pickfirst": {
+    en: "Choose a profile first.", es: "Elija antes un perfil.", fr: "Choisissez d'abord un profil.", de: "Wählen Sie zuerst ein Profil.", pt: "Escolha primeiro um perfil.", it: "Scegli prima un profilo.", ja: "先にプロフィールを選んでください。", zh: "请先选择一份资料。", hi: "पहले एक प्रोफ़ाइल चुनें।", ar: "اختر ملفًا أولًا.",
+  },
+  "iw.speaks": {
+    en: "What it speaks", es: "Qué habla", fr: "Ce qu'il parle", de: "Was es spricht", pt: "O que fala", it: "Cosa parla", ja: "何語を話すか", zh: "它说什么语言", hi: "यह क्या बोलता है", ar: "بأي لغة يتكلم",
+  },
+  "iw.notdisplay": {
+    en: "Not a display setting. The persona writes in this language natively on every surface it appears — chat, posts, rooms, a robot speaking aloud — rather than writing English and translating afterwards.", es: "No es un ajuste de visualización. La persona escribe en este idioma de forma nativa en cada superficie donde aparece — chat, publicaciones, salas, un robot hablando en voz alta — en vez de escribir en inglés y traducir después.", fr: "Ce n'est pas un réglage d'affichage. Le personnage écrit nativement dans cette langue sur chaque surface où il apparaît — discussion, publications, salons, un robot parlant à voix haute — plutôt que d'écrire en anglais puis de traduire.", de: "Keine Anzeigeeinstellung. Die Persona schreibt auf jeder Oberfläche, auf der sie erscheint, von Haus aus in dieser Sprache — Chat, Beiträge, Räume, ein laut sprechender Roboter — statt Englisch zu schreiben und danach zu übersetzen.", pt: "Não é uma definição de visualização. A persona escreve nesta língua nativamente em todas as superfícies onde aparece — conversa, publicações, salas, um robô a falar em voz alta — em vez de escrever em inglês e traduzir depois.", it: "Non è un'impostazione di visualizzazione. La persona scrive in questa lingua in modo nativo su ogni superficie in cui appare — chat, post, stanze, un robot che parla ad alta voce — invece di scrivere in inglese e tradurre dopo.", ja: "これは表示設定ではありません。この人格は、現れるあらゆる面——チャット、投稿、ルーム、声に出して話すロボット——で、この言語をはじめから使って書きます。英語で書いてから訳すのではありません。", zh: "这不是显示设置。这个人格在它出现的每一个界面上——聊天、帖子、房间、出声说话的机器人——都以这门语言原生地书写，而不是先写英文再翻译。", hi: "यह कोई प्रदर्शन-सेटिंग नहीं है। यह व्यक्तित्व जहाँ भी प्रकट होता है — चैट, पोस्ट, कक्ष, ज़ोर से बोलता रोबोट — वहाँ मूल रूप से इसी भाषा में लिखता है, न कि अंग्रेज़ी में लिखकर बाद में अनुवाद करता है।", ar: "ليس إعدادًا للعرض. الشخصية تكتب بهذه اللغة أصالةً على كل سطح تظهر فيه — دردشة، منشورات، غرف، روبوت يتكلم بصوت عالٍ — لا أن تكتب بالإنجليزية ثم تترجم.",
+  },
+  "iw.currently": {
+    en: "Currently {label}, {mode}.", es: "Actualmente {label}, {mode}.", fr: "Actuellement {label}, {mode}.", de: "Derzeit {label}, {mode}.", pt: "Atualmente {label}, {mode}.", it: "Attualmente {label}, {mode}.", ja: "現在は {label}、{mode}。", zh: "当前为 {label}，{mode}。", hi: "फ़िलहाल {label}, {mode}।", ar: "حاليًا {label}، {mode}.",
+  },
+  "iw.mode.pre": {
+    en: "already in that language everywhere", es: "ya en ese idioma en todas partes", fr: "déjà dans cette langue partout", de: "überall schon in dieser Sprache", pt: "já nessa língua em toda a parte", it: "già in quella lingua ovunque", ja: "どこでもすでにその言語で", zh: "在所有地方都已使用该语言", hi: "हर जगह पहले से उसी भाषा में", ar: "بتلك اللغة في كل مكان أصلًا",
+  },
+  "iw.mode.ondemand": {
+    en: "translated when asked for", es: "traducido cuando se pide", fr: "traduit sur demande", de: "auf Anfrage übersetzt", pt: "traduzido quando pedido", it: "tradotto su richiesta", ja: "求められたときに翻訳", zh: "按需翻译", hi: "माँगे जाने पर अनूदित", ar: "يُترجَم عند الطلب",
+  },
+  "iw.opt.pre": {
+    en: "everywhere, already", es: "en todas partes, ya", fr: "partout, déjà", de: "überall, schon", pt: "em toda a parte, já", it: "ovunque, già", ja: "どこでも、すでに", zh: "所有地方，已经是", hi: "हर जगह, पहले से", ar: "في كل مكان، أصلًا",
+  },
+  "iw.opt.ondemand": {
+    en: "when asked for", es: "cuando se pide", fr: "sur demande", de: "auf Anfrage", pt: "quando pedido", it: "su richiesta", ja: "求められたとき", zh: "按需", hi: "माँगे जाने पर", ar: "عند الطلب",
+  },
+  "iw.setit": {
+    en: "Set it", es: "Fijarlo", fr: "Définir", de: "Setzen", pt: "Definir", it: "Imposta", ja: "設定する", zh: "设置", hi: "तय करें", ar: "اضبطه",
+  },
+  "iw.nowspeaks": {
+    en: "Now speaks {label}.", es: "Ahora habla {label}.", fr: "Parle maintenant {label}.", de: "Spricht jetzt {label}.", pt: "Agora fala {label}.", it: "Ora parla {label}.", ja: "これから {label} を話します。", zh: "现在说 {label}。", hi: "अब {label} बोलता है।", ar: "يتكلم الآن {label}.",
+  },
+  "iw.translate.hdr": {
+    en: "Translate something it ran across", es: "Traducir algo que encontró", fr: "Traduire quelque chose qu'il a rencontré", de: "Etwas übersetzen, dem es begegnet ist", pt: "Traduzir algo com que se cruzou", it: "Traduci qualcosa in cui si è imbattuto", ja: "出会ったものを翻訳する", zh: "翻译它遇到的内容", hi: "इसे जो मिला उसका अनुवाद करें", ar: "ترجم شيئًا صادفه",
+  },
+  "iw.translate.pitch": {
+    en: "An interactor's message, a room turn, a listing. Done with this profile's own model, into its language unless you name another.", es: "El mensaje de un interlocutor, un turno de sala, una publicación. Se hace con el modelo del propio perfil, a su idioma salvo que nombre otro.", fr: "Le message d'un interlocuteur, un tour de salon, une annonce. Fait avec le modèle du profil lui-même, vers sa langue sauf si vous en nommez une autre.", de: "Die Nachricht eines Gegenübers, ein Beitrag im Raum, ein Angebot. Mit dem eigenen Modell dieses Profils, in dessen Sprache, sofern Sie keine andere nennen.", pt: "A mensagem de um interlocutor, um turno de sala, um anúncio. Feito com o modelo do próprio perfil, para a sua língua a menos que nomeie outra.", it: "Il messaggio di un interlocutore, un turno di stanza, un annuncio. Fatto con il modello del profilo stesso, nella sua lingua a meno che tu ne indichi un'altra.", ja: "相手のメッセージ、ルームでの発言、出品。このプロフィール自身のモデルで、別の言語を指定しないかぎりその言語へ訳します。", zh: "对话者的消息、房间里的一次发言、一条挂牌。用这份资料自己的模型完成，译成它的语言，除非你另行指定。", hi: "किसी वार्ताकार का संदेश, कक्ष की एक बारी, कोई लिस्टिंग। इस प्रोफ़ाइल के अपने मॉडल से, और जब तक आप कोई और न बताएँ, इसी की भाषा में।", ar: "رسالة محاوِر، أو دور في غرفة، أو إعلان. يتم بنموذج هذا الملف نفسه، إلى لغته ما لم تسمِّ غيرها.",
+  },
+  "iw.paste.ph": {
+    en: "paste the text", es: "pegue el texto", fr: "collez le texte", de: "den Text einfügen", pt: "cole o texto", it: "incolla il testo", ja: "本文を貼り付け", zh: "粘贴文本", hi: "पाठ चिपकाएँ", ar: "الصق النص",
+  },
+  "iw.intoown": {
+    en: "into its own language", es: "a su propio idioma", fr: "vers sa propre langue", de: "in seine eigene Sprache", pt: "para a sua própria língua", it: "nella sua lingua", ja: "自分の言語へ", zh: "译成它自己的语言", hi: "इसकी अपनी भाषा में", ar: "إلى لغته هو",
+  },
+  "iw.into": {
+    en: "into {label}", es: "a {label}", fr: "vers {label}", de: "nach {label}", pt: "para {label}", it: "in {label}", ja: "{label} へ", zh: "译成 {label}", hi: "{label} में", ar: "إلى {label}",
+  },
+  "iw.translate": {
+    en: "Translate", es: "Traducir", fr: "Traduire", de: "Übersetzen", pt: "Traduzir", it: "Traduci", ja: "翻訳する", zh: "翻译", hi: "अनुवाद करें", ar: "ترجم",
+  },
+  "iw.nottranslated": {
+    en: "Not translated — {why}.", es: "Sin traducir — {why}.", fr: "Non traduit — {why}.", de: "Nicht übersetzt — {why}.", pt: "Não traduzido — {why}.", it: "Non tradotto — {why}.", ja: "翻訳されていません — {why}。", zh: "未翻译 — {why}。", hi: "अनूदित नहीं — {why}।", ar: "لم يُترجَم — {why}.",
+  },
+  "iw.nomodel": {
+    en: "no model available", es: "no hay modelo disponible", fr: "aucun modèle disponible", de: "kein Modell verfügbar", pt: "nenhum modelo disponível", it: "nessun modello disponibile", ja: "利用できるモデルがありません", zh: "没有可用的模型", hi: "कोई मॉडल उपलब्ध नहीं", ar: "لا نموذج متاح",
+  },
+  "iw.via": {
+    en: "{language} · via {engine}", es: "{language} · vía {engine}", fr: "{language} · via {engine}", de: "{language} · über {engine}", pt: "{language} · via {engine}", it: "{language} · tramite {engine}", ja: "{language} · {engine} 経由", zh: "{language} · 经由 {engine}", hi: "{language} · {engine} के ज़रिए", ar: "{language} · عبر {engine}",
+  },
+  "iw.name": {
+    en: "The name it answers to", es: "El nombre al que responde", fr: "Le nom auquel il répond", de: "Der Name, auf den es hört", pt: "O nome a que responde", it: "Il nome a cui risponde", ja: "それが応える名前", zh: "它应答的那个名字", hi: "वह नाम जिस पर यह जवाब देता है", ar: "الاسم الذي يستجيب له",
+  },
+  "iw.replaces": {
+    en: "replaces", es: "reemplaza", fr: "remplace", de: "ersetzt", pt: "substitui", it: "sostituisce", ja: "置き換えます", zh: "会替换", hi: "बदल देता है", ar: "يستبدل",
+  },
+  "iw.claiming": {
+    en: "Claiming a handle {replaces} whatever this profile had — the old one stops resolving, and anything printed or shared that named it stops working. That is why only its owner may do this, and why the route asking for nothing was worth more than a second name.", es: "Reclamar un alias {replaces} el que tuviera este perfil — el antiguo deja de resolver, y todo lo impreso o compartido que lo nombraba deja de funcionar. Por eso solo su propietario puede hacerlo, y por eso una ruta que no pedía nada valía más que un segundo nombre.", fr: "Revendiquer un identifiant {replaces} celui que ce profil avait — l'ancien cesse de résoudre, et tout ce qui a été imprimé ou partagé en le nommant cesse de fonctionner. C'est pourquoi seul son propriétaire peut le faire, et pourquoi une route qui ne demandait rien valait plus qu'un second nom.", de: "Einen Handle zu beanspruchen {replaces} den, den dieses Profil hatte — der alte löst nicht mehr auf, und alles Gedruckte oder Geteilte, das ihn nannte, funktioniert nicht mehr. Deshalb darf nur der Besitzer das tun, und deshalb war eine Route, die nichts verlangte, mehr wert als ein zweiter Name.", pt: "Reclamar um identificador {replaces} o que este perfil tinha — o antigo deixa de resolver, e tudo o que foi impresso ou partilhado a nomeá-lo deixa de funcionar. É por isso que só o seu proprietário pode fazê-lo, e porque uma rota que nada pedia valia mais do que um segundo nome.", it: "Rivendicare un handle {replaces} quello che questo profilo aveva — il vecchio smette di risolvere, e tutto ciò che è stato stampato o condiviso nominandolo smette di funzionare. Per questo solo il proprietario può farlo, e per questo una rotta che non chiedeva nulla valeva più di un secondo nome.", ja: "ハンドル名の取得は、このプロフィールが持っていたものを{replaces} — 古いほうは解決しなくなり、それを記した印刷物や共有されたものはすべて機能しなくなります。だからこそ、これができるのは所有者だけであり、だからこそ「何も求めない経路」は二つ目の名前より重い問題でした。", zh: "认领一个用户名会{replaces}这份资料原有的那个——旧的不再解析，任何印出来或分享出去、写着它的东西都会失效。这正是只有所有者才能这么做的原因，也是为什么一条什么都不要求的路由，比第二个名字更值得在意。", hi: "कोई हैंडल लेना इस प्रोफ़ाइल के पुराने हैंडल को {replaces} — पुराना हल होना बंद कर देता है, और जो कुछ भी छपा या साझा हुआ और उसे नाम देता था, वह काम करना बंद कर देता है। इसीलिए यह केवल इसका स्वामी कर सकता है, और इसीलिए कुछ भी न माँगने वाला रूट दूसरे नाम से ज़्यादा भारी था।", ar: "المطالبة بمعرّف {replaces} ما كان لهذا الملف — فيتوقف القديم عن الاستجابة، ويتوقف كل مطبوع أو مُشارَك سمّاه عن العمل. لذلك لا يفعل هذا إلا مالكه، ولذلك كان مسار لا يطلب شيئًا أخطر من اسم ثانٍ.",
+  },
+  "iw.claim": {
+    en: "Claim it", es: "Reclamarlo", fr: "Le revendiquer", de: "Beanspruchen", pt: "Reclamá-lo", it: "Rivendicalo", ja: "取得する", zh: "认领", hi: "इसे लें", ar: "طالِب به",
+  },
+  "iw.answers": {
+    en: "Answers to {handle}.", es: "Responde a {handle}.", fr: "Répond à {handle}.", de: "Hört auf {handle}.", pt: "Responde a {handle}.", it: "Risponde a {handle}.", ja: "{handle} に応えます。", zh: "它应答 {handle}。", hi: "{handle} पर जवाब देता है।", ar: "يستجيب لـ {handle}.",
+  },
+  "iw.reachat": {
+    en: "Anybody can now reach it at {url}.", es: "Ahora cualquiera puede alcanzarlo en {url}.", fr: "N'importe qui peut désormais le joindre à {url}.", de: "Jeder kann es jetzt unter {url} erreichen.", pt: "Qualquer pessoa pode agora alcançá-lo em {url}.", it: "Chiunque ora può raggiungerlo a {url}.", ja: "これで誰でも {url} で辿り着けます。", zh: "现在任何人都可以通过 {url} 找到它。", hi: "अब कोई भी इसे {url} पर पा सकता है।", ar: "بإمكان أي أحد الآن الوصول إليه عبر {url}.",
+  },
+  "iw.saypublic": {
+    en: "Say something publicly", es: "Decir algo públicamente", fr: "Dire quelque chose publiquement", de: "Etwas öffentlich sagen", pt: "Dizer algo publicamente", it: "Di' qualcosa pubblicamente", ja: "公に何か言う", zh: "公开说点什么", hi: "सार्वजनिक रूप से कुछ कहें", ar: "قل شيئًا علنًا",
+  },
+  "iw.topic.ph": {
+    en: "what it should post about", es: "sobre qué debería publicar", fr: "sur quoi il devrait publier", de: "worüber es posten soll", pt: "sobre o que deve publicar", it: "su cosa dovrebbe pubblicare", ja: "何について投稿するか", zh: "它该发些什么", hi: "इसे किस बारे में पोस्ट करना चाहिए", ar: "عمّ ينشر",
+  },
+  "iw.surface.ph": {
+    en: "which surface (optional)", es: "qué superficie (opcional)", fr: "quelle surface (facultatif)", de: "welche Oberfläche (optional)", pt: "que superfície (opcional)", it: "quale superficie (facoltativo)", ja: "どの面（任意）", zh: "哪个界面（可选）", hi: "कौन-सी सतह (वैकल्पिक)", ar: "أي سطح (اختياري)",
+  },
+  "iw.public.pitch": {
+    en: "A public post faces the widest audience there is, so it always runs the strict filter — and it carries a synthetic-media credential from the moment it exists.", es: "Una publicación pública se enfrenta al público más amplio que existe, así que siempre pasa el filtro estricto — y lleva una credencial de medio sintético desde el momento en que existe.", fr: "Une publication publique fait face au public le plus large qui soit, elle passe donc toujours le filtre strict — et elle porte un justificatif de média synthétique dès l'instant où elle existe.", de: "Ein öffentlicher Beitrag steht vor dem größtmöglichen Publikum, läuft also stets durch den strengen Filter — und trägt vom Moment seiner Entstehung an einen Nachweis als synthetisches Medium.", pt: "Uma publicação pública enfrenta o público mais vasto que há, por isso passa sempre o filtro estrito — e leva uma credencial de meio sintético desde o momento em que existe.", it: "Un post pubblico affronta il pubblico più ampio che ci sia, quindi passa sempre il filtro severo — e porta una credenziale di media sintetico dal momento in cui esiste.", ja: "公開の投稿は考えうる最も広い聴衆に向き合うので、つねに厳格なフィルタを通ります — そして存在した瞬間から合成メディアの証明を帯びます。", zh: "公开发布面对的是最广泛的受众，因此它总要通过严格过滤——而且从它存在的那一刻起就带有合成媒体凭据。", hi: "सार्वजनिक पोस्ट सबसे व्यापक दर्शकों का सामना करती है, इसलिए वह हमेशा कड़ा फ़िल्टर पार करती है — और अस्तित्व में आने के क्षण से ही सिंथेटिक-मीडिया क्रेडेंशियल साथ रखती है।", ar: "المنشور العلني يواجه أوسع جمهور ممكن، فيمرّ دائمًا بالمرشّح الصارم — ويحمل اعتماد وسائط اصطناعية منذ لحظة وجوده.",
+  },
+  "iw.compose": {
+    en: "Compose", es: "Redactar", fr: "Rédiger", de: "Verfassen", pt: "Redigir", it: "Componi", ja: "作成する", zh: "撰写", hi: "रचें", ar: "اكتب",
+  },
+  "iw.published": {
+    en: "Published.", es: "Publicado.", fr: "Publié.", de: "Veröffentlicht.", pt: "Publicado.", it: "Pubblicato.", ja: "公開しました。", zh: "已发布。", hi: "प्रकाशित।", ar: "نُشر.",
+  },
+  "iw.held": {
+    en: "Held — {why}. The text is not returned here, deliberately, and it is not public either. It is waiting in the mark screen's queue.", es: "Retenido — {why}. El texto no se devuelve aquí, a propósito, y tampoco es público. Está esperando en la cola de la pantalla de la marca.", fr: "Retenu — {why}. Le texte n'est pas renvoyé ici, délibérément, et il n'est pas public non plus. Il attend dans la file de l'écran de la marque.", de: "Zurückgehalten — {why}. Der Text wird hier absichtlich nicht zurückgegeben, und öffentlich ist er auch nicht. Er wartet in der Warteschlange des Kennzeichen-Bildschirms.", pt: "Retido — {why}. O texto não é devolvido aqui, deliberadamente, e também não é público. Está à espera na fila do ecrã da marca.", it: "Trattenuto — {why}. Il testo non viene restituito qui, di proposito, e non è nemmeno pubblico. Sta aspettando nella coda della schermata del contrassegno.", ja: "保留 — {why}。本文はここには意図的に返されませんし、公開もされていません。標章画面の待ち行列で待っています。", zh: "已留置 — {why}。文本被有意不在此返回，也并未公开。它正在标记页面的队列里等待。", hi: "रोका गया — {why}। पाठ यहाँ जान-बूझकर नहीं लौटाया जाता, और वह सार्वजनिक भी नहीं है। वह चिह्न-स्क्रीन की क़तार में प्रतीक्षा कर रहा है।", ar: "محتجز — {why}. لا يُعاد النص هنا عمدًا، وليس علنيًا أيضًا. إنه ينتظر في طابور شاشة العلامة.",
+  },
+  "str.title": {
+    en: "Arriving, and strangers", es: "Llegar, y los desconocidos", fr: "Arriver, et les inconnus", de: "Ankommen, und Fremde", pt: "Chegar, e desconhecidos", it: "Arrivare, e sconosciuti", ja: "たどり着くこと、そして見知らぬ人", zh: "抵达，以及陌生人", hi: "आना, और अजनबी", ar: "الوصول، والغرباء",
+  },
+  "str.follow.hdr": {
+    en: "Follow a reference", es: "Seguir una referencia", fr: "Suivre une référence", de: "Einer Referenz folgen", pt: "Seguir uma referência", it: "Segui un riferimento", ja: "参照をたどる", zh: "跟随一个引用", hi: "किसी संदर्भ का अनुसरण करें", ar: "اتبع مرجعًا",
+  },
+  "str.ref.pitch": {
+    en: "An {handle}, a {tag}, or the id off a printed sticker. Public, because somebody following one has no account yet — which is the whole point of leaving one somewhere.", es: "Un {handle}, una {tag}, o el id de una pegatina impresa. Público, porque quien sigue uno todavía no tiene cuenta — que es justo el sentido de dejar uno en algún sitio.", fr: "Un {handle}, un {tag}, ou l'id d'un autocollant imprimé. Public, car celui qui en suit un n'a pas encore de compte — c'est tout l'intérêt d'en laisser un quelque part.", de: "Ein {handle}, ein {tag}, oder die ID von einem gedruckten Aufkleber. Öffentlich, denn wer einem folgt, hat noch kein Konto — und genau darum lässt man einen irgendwo zurück.", pt: "Um {handle}, uma {tag}, ou o id de um autocolante impresso. Público, porque quem segue um ainda não tem conta — que é precisamente o objetivo de deixar um algures.", it: "Un {handle}, un {tag}, o l'id da un adesivo stampato. Pubblico, perché chi ne segue uno non ha ancora un account — che è proprio il senso di lasciarne uno da qualche parte.", ja: "{handle}、{tag}、あるいは印刷されたステッカーの ID。公開です。なぜなら、それをたどる人はまだアカウントを持っていないからで、どこかに置いておくことの意味はまさにそこにあります。", zh: "一个 {handle}、一个 {tag}，或者印在贴纸上的 ID。这是公开的，因为跟着它来的人还没有账户——而这正是把它留在某处的全部意义。", hi: "एक {handle}, एक {tag}, या किसी छपे स्टिकर से लिया गया आईडी। सार्वजनिक, क्योंकि जो इसका अनुसरण कर रहा है उसका अभी खाता नहीं है — और इसे कहीं छोड़ने का पूरा मक़सद यही है।", ar: "‏{handle}، أو {tag}، أو المعرّف من ملصق مطبوع. علني، لأن من يتبع واحدًا منها لا حساب له بعد — وهذا هو مغزى ترك واحد في مكان ما.",
+  },
+  "str.ref.ph": {
+    en: "@rosa, #locksmith, or a beacon id", es: "@rosa, #cerrajero, o un id de baliza", fr: "@rosa, #serrurier, ou un id de balise", de: "@rosa, #schlosser, oder eine Baken-ID", pt: "@rosa, #serralheiro, ou um id de baliza", it: "@rosa, #fabbro, o un id di beacon", ja: "@rosa、#鍵屋、またはビーコンID", zh: "@rosa、#锁匠，或一个信标 ID", hi: "@rosa, #तालासाज़, या कोई बीकन आईडी", ar: "@rosa، ‎#حدّاد_أقفال، أو معرّف منارة",
+  },
+  "str.followit": {
+    en: "Follow it", es: "Seguirlo", fr: "Le suivre", de: "Ihr folgen", pt: "Segui-lo", it: "Seguilo", ja: "たどる", zh: "跟随它", hi: "इसका अनुसरण करें", ar: "اتبعه",
+  },
+  "str.leftat": {
+    en: "Left at {where}", es: "Dejada en {where}", fr: "Laissée à {where}", de: "Hinterlassen bei {where}", pt: "Deixada em {where}", it: "Lasciata a {where}", ja: "{where} に置かれています", zh: "留在 {where}", hi: "{where} पर छोड़ा गया", ar: "تُرك في {where}",
+  },
+  "str.somewhere": {
+    en: "somewhere", es: "algún sitio", fr: "quelque part", de: "irgendwo", pt: "algures", it: "da qualche parte", ja: "どこか", zh: "某处", hi: "कहीं", ar: "مكان ما",
+  },
+  "str.scanned": {
+    en: " · scanned {n} times", es: " · escaneada {n} veces", fr: " · scannée {n} fois", de: " · {n}-mal gescannt", pt: " · digitalizada {n} vezes", it: " · scansionata {n} volte", ja: " · スキャン {n} 回", zh: " · 被扫描 {n} 次", hi: " · {n} बार स्कैन किया गया", ar: " · مُسحت {n} مرات",
+  },
+  "str.nothing": {
+    en: "Nothing answers to that.", es: "Nada responde a eso.", fr: "Rien ne répond à cela.", de: "Darauf hört nichts.", pt: "Nada responde a isso.", it: "Niente risponde a questo.", ja: "それに応えるものはありません。", zh: "没有任何东西应答它。", hi: "उस पर कुछ भी जवाब नहीं देता।", ar: "لا شيء يستجيب لذلك.",
+  },
+  "str.agewall": {
+    en: "18+ — this resolves to a wall unless you are signed in as a verified adult.", es: "+18 — esto lleva a un muro salvo que haya iniciado sesión como adulto verificado.", fr: "18+ — ceci aboutit à un mur sauf si vous êtes connecté en tant qu'adulte vérifié.", de: "18+ — das führt zu einer Sperre, wenn Sie nicht als verifizierte erwachsene Person angemeldet sind.", pt: "18+ — isto leva a um muro a menos que tenha sessão iniciada como adulto verificado.", it: "18+ — questo porta a un muro a meno che tu non sia connesso come adulto verificato.", ja: "18+ — 成人確認済みでサインインしていないかぎり、これは壁に行き着きます。", zh: "18+ — 除非你以已验证的成人身份登录，否则这会通向一道墙。", hi: "18+ — जब तक आप सत्यापित वयस्क के रूप में साइन इन न हों, यह एक दीवार पर जाकर रुकता है।", ar: "18+ — يفضي هذا إلى جدار ما لم تكن مسجّل الدخول كبالغ موثّق.",
+  },
+  "str.nolonger": {
+    en: " · no longer answering", es: " · ya no responde", fr: " · ne répond plus", de: " · antwortet nicht mehr", pt: " · já não responde", it: " · non risponde più", ja: " · もう応答していません", zh: " · 已不再应答", hi: " · अब जवाब नहीं देता", ar: " · لم يعد يستجيب",
+  },
+  "str.talk": {
+    en: "Talk to a stranger", es: "Hablar con un desconocido", fr: "Parler à un inconnu", de: "Mit einer fremden Person sprechen", pt: "Falar com um desconhecido", it: "Parla con uno sconosciuto", ja: "見知らぬ人と話す", zh: "和陌生人聊聊", hi: "किसी अजनबी से बात करें", ar: "تحدّث إلى غريب",
+  },
+  "str.talk.pitch": {
+    en: "No profile in this one — two people, each seeing only the alias the other chose. Everything here goes out under your own credential: the id in the request says whose turn it is, and the token says who is asking, which is the part that used to be missing.", es: "Aquí no hay perfil — dos personas, cada una viendo solo el alias que eligió la otra. Todo aquí sale con su propia credencial: el id en la petición dice de quién es el turno, y el token dice quién pregunta, que es la parte que antes faltaba.", fr: "Pas de profil ici — deux personnes, chacune ne voyant que l'alias choisi par l'autre. Tout part ici sous votre propre justificatif : l'id dans la requête dit à qui est le tour, et le jeton dit qui demande — c'est la partie qui manquait.", de: "Hier kein Profil — zwei Menschen, jeder sieht nur das Pseudonym, das der andere gewählt hat. Alles geht hier unter Ihrem eigenen Nachweis hinaus: die ID in der Anfrage sagt, wer an der Reihe ist, und das Token sagt, wer fragt — und genau das fehlte früher.", pt: "Sem perfil neste — duas pessoas, cada uma vendo apenas o pseudónimo que a outra escolheu. Tudo aqui sai sob a sua própria credencial: o id no pedido diz de quem é a vez, e o token diz quem está a perguntar, que é a parte que faltava.", it: "Qui nessun profilo — due persone, ciascuna vede solo l'alias che l'altra ha scelto. Tutto qui esce sotto la tua credenziale: l'id nella richiesta dice di chi è il turno, e il token dice chi sta chiedendo, che è la parte che prima mancava.", ja: "ここにプロフィールはありません — 二人の人間が、互いに相手の選んだ通称だけを見ています。ここから出ていくものはすべてあなた自身の資格情報のもとにあります。リクエスト内の ID は誰の番かを述べ、トークンは誰が尋ねているかを述べます。かつて欠けていたのは、後者でした。", zh: "这里没有资料——只有两个人，各自只看到对方选的化名。这里发出的一切都以你自己的凭据为准：请求里的 ID 说明轮到谁，令牌说明是谁在问，而后者正是过去缺失的那一半。", hi: "इसमें कोई प्रोफ़ाइल नहीं — दो लोग, हर एक को केवल वही उपनाम दिखता है जो दूसरे ने चुना। यहाँ से जो कुछ जाता है वह आपके अपने क्रेडेंशियल के तहत जाता है: अनुरोध का आईडी बताता है कि बारी किसकी है, और टोकन बताता है कि पूछ कौन रहा है — यही हिस्सा पहले ग़ायब था।", ar: "لا ملف هنا — شخصان، كلٌّ لا يرى إلا الاسم المستعار الذي اختاره الآخر. وكل ما يخرج من هنا يخرج باعتمادك أنت: المعرّف في الطلب يقول لمن الدور، والرمز يقول من يسأل، وهذا هو الجزء الذي كان ناقصًا.",
+  },
+  "str.needown": {
+    en: "You need an interactor of your own before you can queue.", es: "Necesita un interlocutor propio antes de poder ponerse en cola.", fr: "Il vous faut un interlocuteur à vous avant de pouvoir faire la queue.", de: "Sie brauchen ein eigenes Gegenüber, bevor Sie sich anstellen können.", pt: "Precisa de um interlocutor seu antes de poder entrar na fila.", it: "Ti serve un tuo interlocutore prima di poterti mettere in coda.", ja: "列に並ぶには、まずあなた自身の対話者が必要です。", zh: "在排队之前，你需要有一个属于自己的对话者身份。", hi: "क़तार में लगने से पहले आपको अपना एक वार्ताकार चाहिए।", ar: "تحتاج محاوِرًا خاصًا بك قبل أن تصطف.",
+  },
+  "str.alias.ph": {
+    en: "what to be called (defaults to Stranger)", es: "cómo quiere que le llamen (por defecto, Desconocido)", fr: "comment vous appeler (par défaut, Inconnu)", de: "wie Sie genannt werden möchten (Standard: Fremd)", pt: "como quer ser chamado (por omissão, Desconhecido)", it: "come farti chiamare (di default, Sconosciuto)", ja: "呼ばれ方（既定は「見知らぬ人」）", zh: "你想被怎么称呼（默认为“陌生人”）", hi: "आपको क्या कहा जाए (डिफ़ॉल्ट: अजनबी)", ar: "بمَ تُنادى (الافتراضي: غريب)",
+  },
+  "str.friendly": {
+    en: "friendly", es: "amistoso", fr: "amical", de: "freundlich", pt: "amigável", it: "amichevole", ja: "フレンドリー", zh: "友好", hi: "मैत्रीपूर्ण", ar: "ودّي",
+  },
+  "str.both": {
+    en: "both", es: "ambos", fr: "les deux", de: "beiden", pt: "ambos", it: "entrambi", ja: "双方", zh: "双方", hi: "दोनों", ar: "كلا",
+  },
+  "str.ratedqueue": {
+    en: "The 18+ queue needs a verified adult on {both} sides before either is admitted to it.", es: "La cola +18 exige un adulto verificado en {both} lados antes de admitir a ninguno.", fr: "La file 18+ exige un adulte vérifié des {both} côtés avant que l'un ou l'autre y soit admis.", de: "Die 18+-Warteschlange verlangt auf {both} Seiten eine verifizierte erwachsene Person, bevor eine von beiden zugelassen wird.", pt: "A fila 18+ exige um adulto verificado dos {both} lados antes de qualquer um ser admitido.", it: "La coda 18+ richiede un adulto verificato su {both} i lati prima che uno dei due vi sia ammesso.", ja: "18+ の待ち行列は、どちらかが入る前に{both}に成人確認済みの人がいることを求めます。", zh: "18+ 队列要求{both}都有已验证的成人，任何一方才会被放行进入。", hi: "18+ क़तार में किसी को भी प्रवेश देने से पहले {both} ओर सत्यापित वयस्क चाहिए।", ar: "طابور 18+ يشترط بالغًا موثّقًا على {both} الجانبين قبل السماح لأيٍّ منهما بالدخول.",
+  },
+  "str.joinrated": {
+    en: "Join the 18+ queue", es: "Entrar en la cola +18", fr: "Rejoindre la file 18+", de: "Der 18+-Warteschlange beitreten", pt: "Entrar na fila 18+", it: "Entra nella coda 18+", ja: "18+ の列に並ぶ", zh: "加入 18+ 队列", hi: "18+ क़तार में लगें", ar: "انضم إلى طابور 18+",
+  },
+  "str.findsomebody": {
+    en: "Find somebody", es: "Buscar a alguien", fr: "Trouver quelqu'un", de: "Jemanden finden", pt: "Encontrar alguém", it: "Trova qualcuno", ja: "誰かを探す", zh: "找个人", hi: "किसी को खोजें", ar: "ابحث عن أحد",
+  },
+  "str.waiting": {
+    en: "Waiting for somebody else on the {tier} queue.", es: "Esperando a alguien más en la cola {tier}.", fr: "En attente de quelqu'un d'autre dans la file {tier}.", de: "Warten auf jemand anderen in der {tier}-Warteschlange.", pt: "À espera de outra pessoa na fila {tier}.", it: "In attesa di qualcun altro nella coda {tier}.", ja: "{tier} の列で、ほかの誰かを待っています。", zh: "正在 {tier} 队列中等待另一个人。", hi: "{tier} क़तार में किसी और की प्रतीक्षा।", ar: "في انتظار شخص آخر في طابور {tier}.",
+  },
+  "str.talkingto": {
+    en: "Talking to {who}. That is the name they chose, and all either of you gets.", es: "Hablando con {who}. Ese es el nombre que eligió, y todo lo que cualquiera de los dos obtiene.", fr: "Vous parlez à {who}. C'est le nom qu'il a choisi, et tout ce que l'un ou l'autre obtient.", de: "Sie sprechen mit {who}. Das ist der Name, den sie gewählt haben, und alles, was jeder von Ihnen bekommt.", pt: "A falar com {who}. É esse o nome que escolheram, e tudo o que qualquer um de vocês obtém.", it: "Stai parlando con {who}. È il nome che ha scelto, e tutto ciò che ciascuno di voi ottiene.", ja: "{who} と話しています。それは相手が選んだ名前であり、互いに得られるのはそれだけです。", zh: "正在与 {who} 交谈。那是对方自己选的名字，也是你们彼此能得到的全部。", hi: "{who} से बात हो रही है। यही वह नाम है जो उन्होंने चुना, और आप दोनों में से किसी को बस इतना ही मिलता है।", ar: "تتحدث إلى {who}. هذا هو الاسم الذي اختاروه، وكل ما يناله أيٌّ منكما.",
+  },
+  "str.stranger": {
+    en: "Stranger", es: "Desconocido", fr: "Inconnu", de: "Fremd", pt: "Desconhecido", it: "Sconosciuto", ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी", ar: "غريب",
+  },
+  "str.refresh": {
+    en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "حدّث",
+  },
+  "str.heldback": {
+    en: " · held back — only you can see this", es: " · retenido — solo usted puede ver esto", fr: " · retenu — vous seul pouvez voir ceci", de: " · zurückgehalten — nur Sie sehen das", pt: " · retido — só você pode ver isto", it: " · trattenuto — solo tu puoi vederlo", ja: " · 保留 — これが見えるのはあなただけです", zh: " · 已留置 — 只有你能看到这条", hi: " · रोका गया — यह केवल आप देख सकते हैं", ar: " · محتجز — أنت وحدك ترى هذا",
+  },
+  "str.say.ph": {
+    en: "say something", es: "di algo", fr: "dites quelque chose", de: "sagen Sie etwas", pt: "diga algo", it: "di' qualcosa", ja: "何か言う", zh: "说点什么", hi: "कुछ कहें", ar: "قل شيئًا",
+  },
+  "str.send": {
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送る", zh: "发送", hi: "भेजें", ar: "أرسل",
+  },
+  "str.endit": {
+    en: "End it", es: "Terminarlo", fr: "Y mettre fin", de: "Beenden", pt: "Terminar", it: "Chiudila", ja: "終える", zh: "结束", hi: "समाप्त करें", ar: "أنهِها",
+  },
+  "str.endnote": {
+    en: "Either side may end it, and ending returns any microphone lent inside — the permission was scoped to this conversation and does not survive it.", es: "Cualquiera de las dos partes puede terminarlo, y terminar devuelve cualquier micrófono prestado dentro — el permiso estaba acotado a esta conversación y no la sobrevive.", fr: "L'un ou l'autre peut y mettre fin, et cela rend tout microphone prêté à l'intérieur — la permission était limitée à cette conversation et ne lui survit pas.", de: "Jede Seite darf es beenden, und das Beenden gibt jedes darin geliehene Mikrofon zurück — die Erlaubnis galt nur für dieses Gespräch und überdauert es nicht.", pt: "Qualquer um dos lados pode terminá-la, e terminar devolve qualquer microfone emprestado lá dentro — a permissão estava limitada a esta conversa e não lhe sobrevive.", it: "Ciascuna delle due parti può chiuderla, e chiuderla restituisce ogni microfono prestato all'interno — il permesso era limitato a questa conversazione e non le sopravvive.", ja: "どちらの側からでも終えられます。終えれば、その中で貸されたマイクはすべて返ります — 許可はこの会話に限られており、会話より長くは生きません。", zh: "任何一方都可以结束它，而结束会归还在其中借出的任何麦克风——那份许可的范围只限这次对话，不会比它活得更久。", hi: "कोई भी पक्ष इसे समाप्त कर सकता है, और समाप्त करने पर भीतर उधार दिया गया कोई भी माइक्रोफ़ोन लौट आता है — वह अनुमति केवल इसी बातचीत तक सीमित थी और उससे आगे नहीं टिकती।", ar: "لأي من الطرفين أن ينهيها، والإنهاء يعيد أي ميكروفون أُعير في داخلها — فالإذن كان محصورًا بهذه المحادثة ولا يبقى بعدها.",
+  },
+  "iw.handle.ph": {
+    en: "rosa", es: "rosa", fr: "rosa", de: "rosa", pt: "rosa", it: "rosa", ja: "rosa", zh: "rosa", hi: "rosa", ar: "rosa",
+  },
+  "str.handle.eg": {
+    en: "@handle", es: "@usuario", fr: "@identifiant", de: "@handle", pt: "@utilizador", it: "@handle", ja: "@ハンドル名", zh: "@用户名", hi: "@हैंडल", ar: "@معرّف",
+  },
+  "str.tag.eg": {
+    en: "#tag", es: "#etiqueta", fr: "#mot-clé", de: "#schlagwort", pt: "#etiqueta", it: "#tag", ja: "#タグ", zh: "#标签", hi: "#टैग", ar: "#وسم",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {
