@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.45.8** ([changelog](CHANGELOG.md) ·
+**Current release: v0.45.9** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.45.9** | **The thing named, what leaves, and the mark it carries** — Named, Leaving and TheMark localized (console-untranslated 254 → 180); one row kept on purpose, because `AI ·` is quoted rather than written |
 | **0.45.8** | **The money, the loan, and the firm** — Campaigns, Grants and Org fully localized (console-untranslated 338 → 254); the table's ten-language check widened from the sidebar to all 1519 rows |
 | **0.45.7** | **The ledger, the name, and the stranger** — Audience, InWords and Stranger fully localized; console-untranslated 425 → 338 |
 | **0.45.6** | **The lobby, the screen in the corridor, and a voice** — Lobby, Presence and Voice fully localized; console-untranslated 516 → 425 |

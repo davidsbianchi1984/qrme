@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type ObjectionRow, type ProfilePost,
          type WatermarkDesign } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -44,6 +45,7 @@ import { useSession } from "../store";
  */
 export function TheMark() {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -80,61 +82,63 @@ export function TheMark() {
   if (!me) {
     return (
       <div className="screen">
-        <h2>The mark</h2>
-        <p className="muted">Choose a profile first.</p>
+        <h2>{tr("mrk.title.short", lang)}</h2>
+        <p className="muted">{tr("mrk.chooseprofile", lang)}</p>
       </div>
     );
   }
 
   return (
     <div className="screen">
-      <h2>The mark, and what is said about it</h2>
+      <h2>{tr("mrk.title", lang)}</h2>
       <Refusal error={error} />
       {said && <p className="small">{said}</p>}
 
       {/* --- the mark --------------------------------------------------- */}
       <div className="card">
-        <h3>What every render says</h3>
+        <h3>{tr("mrk.everyrender", lang)}</h3>
         {design && (
           <div>
             <p className="small"><strong>{design.line}</strong></p>
             <p className="muted small">
               {design.custom
-                ? "Your design."
-                : "The default — you have not set one."}
-              {design.always_displayed && " Shown on everything, always."}
+                ? tr("mrk.yourdesign", lang)
+                : tr("mrk.thedefault", lang)}
+              {design.always_displayed && " " + tr("mrk.always", lang)}
             </p>
             <p className="muted small">{design.disclosure}</p>
           </div>
         )}
         <input value={mark} onChange={(e) => setMark(e.target.value)}
-               placeholder="the glyph (✦)" maxLength={8} />
+               placeholder={tr("mrk.glyph.ph", lang)} maxLength={8} />
         <input value={label} onChange={(e) => setLabel(e.target.value)}
-               placeholder="what to call it" maxLength={60} />
+               placeholder={tr("mrk.label.ph", lang)} maxLength={60} />
+        {/* One sentence with the designation as a hole, not three fragments
+            around a <strong>: the words on either side of "AI ·" do not stay
+            on either side of it in Japanese or Arabic. */}
         <p className="muted small">
-          Whatever you put here, the line comes back with{" "}
-          <strong>AI ·</strong> in front of it. The designation is not a field
-          you can empty — a label without it is rendered with it anyway.
+          {fill(tr("mrk.designation", lang), { ai: <strong>AI ·</strong> })}
         </p>
         <button disabled={!token} onClick={() => go(
           () => api.setWatermarkDesign(me, {
             ...(mark ? { mark } : {}), ...(label ? { label } : {}),
           }, token),
-          (d) => { setDesign(d); setSaid(`Now reads “${d.line}”.`); })}>
-          Set it
+          (d) => { setDesign(d);
+                   setSaid(tr("mrk.nowreads", lang).replace("{line}", d.line)); })}>
+          {tr("mrk.setit", lang)}
         </button>
         <button className="ghost" disabled={!token} onClick={() => go(
           () => api.setWatermarkDesign(me, { mark: "", label: "" }, token),
           (d) => { setDesign(d); setMark(""); setLabel("");
-                   setSaid("Back to the default."); })}>
-          Reset to the default
+                   setSaid(tr("mrk.backtodefault", lang)); })}>
+          {tr("mrk.reset", lang)}
         </button>
       </div>
 
       {/* --- published, and held ---------------------------------------- */}
       <div className="card">
-        <h3>Published</h3>
-        {live.length === 0 && <p className="muted small">Nothing yet.</p>}
+        <h3>{tr("mrk.published", lang)}</h3>
+        {live.length === 0 && <p className="muted small">{tr("mrk.nothingyet", lang)}</p>}
         {live.map((p) => (
           <div key={p.id}>
             <p className="small">{p.content}</p>
@@ -148,15 +152,10 @@ export function TheMark() {
 
       {token && (
         <div className="card">
-          <h3>Held back</h3>
-          <p className="muted small">
-            Only you see this. A held post is not a published one, and the
-            route that lists what this profile published used to hand these
-            out in full — text and the reason they were held — to anybody who
-            asked, with no credential at all.
-          </p>
+          <h3>{tr("mrk.heldback", lang)}</h3>
+          <p className="muted small">{tr("mrk.onlyyou", lang)}</p>
           {held.length === 0 && (
-            <p className="muted small">Nothing waiting.</p>
+            <p className="muted small">{tr("mrk.nothingwaiting", lang)}</p>
           )}
           {held.map((p) => (
             <div key={p.id}>
@@ -167,21 +166,17 @@ export function TheMark() {
               </p>
             </div>
           ))}
-          <button className="ghost" onClick={loadPosts}>Refresh</button>
+          <button className="ghost" onClick={loadPosts}>{tr("mrk.refresh", lang)}</button>
         </div>
       )}
 
       {/* --- somebody contesting it -------------------------------------- */}
       {token && (
         <div className="card">
-          <h3>Objections to this profile</h3>
-          <p className="muted small">
-            Somebody claiming this profile should not exist — a likeness used
-            without consent, an estate objecting. Opening one restricts the
-            profile straight away, pending review.
-          </p>
+          <h3>{tr("mrk.objections", lang)}</h3>
+          <p className="muted small">{tr("mrk.claiming", lang)}</p>
           {objections.length === 0 && (
-            <p className="muted small">None. </p>
+            <p className="muted small">{tr("mrk.none", lang)} </p>
           )}
           {objections.map((o) => (
             <div key={o.id}>
@@ -190,10 +185,12 @@ export function TheMark() {
                 {o.reason && ` — ${o.reason}`}
               </p>
               <p className="muted small">
-                Reference {o.objector_ref} · opened {o.created_at}
-                {o.reattested ? " · you have re-attested" : ""}
-                {o.status !== "open"
-                  && ` · would return to ${o.prior_status}`}
+                {fill(tr("mrk.refline", lang),
+                      { ref: o.objector_ref, at: o.created_at })}
+                {o.reattested ? " " + tr("mrk.reattested", lang) : ""}
+                {o.status !== "open" && " "
+                  + tr("mrk.wouldreturn", lang)
+                      .replace("{status}", o.prior_status)}
               </p>
               {o.status === "open" && !o.reattested && (
                 <button onClick={() => go(
@@ -201,17 +198,12 @@ export function TheMark() {
                   (r) => { setSaid(r.note);
                            go(() => api.profileObjections(me, token),
                               setObjections); })}>
-                  Re-attest the basis
+                  {tr("mrk.reattest", lang)}
                 </button>
               )}
             </div>
           ))}
-          <p className="muted small">
-            Re-attesting is all you can do here, deliberately. You cannot
-            resolve an objection against your own profile — that is a
-            reviewer's call, because an owner who could dismiss it would be
-            deciding their own case.
-          </p>
+          <p className="muted small">{tr("mrk.reattesting", lang)}</p>
         </div>
       )}
     </div>

@@ -287,13 +287,17 @@ def test_the_screen_separates_held_from_published():
     src = _markup("app/src/screens/TheMark.tsx")
     assert 'p.status !== "approved"' in src
     assert 'p.status === "approved"' in src
-    flat = " ".join(src.split())
-    assert "Only you see this" in flat
+    assert 'tr("mrk.onlyyou", lang)' in src
+    assert "Only you see this" in _markup("app/src/l10n.ts")
 
 
 def test_the_screen_says_the_owner_cannot_resolve_it():
-    flat = " ".join(_markup("app/src/screens/TheMark.tsx").split())
-    assert "deciding their own case" in flat
+    assert 'tr("mrk.reattesting", lang)' in _markup("app/src/screens/TheMark.tsx")
+    # Both halves, because the sentence is the point. The screen has to look
+    # it up and the table has to still be saying it — and it has to say it in
+    # every language, which the table-completeness check in
+    # test_nav_labels_are_localised.py holds for all ten.
+    assert "deciding their own case" in _markup("app/src/l10n.ts")
 
 
 def test_the_posts_binding_can_be_called_without_a_token():

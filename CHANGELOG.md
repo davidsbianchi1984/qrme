@@ -4,6 +4,50 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.9] — 2026-08-05
+
+### The thing named, what leaves, and the mark it carries
+
+The console-untranslated record falls **254 → 180**.
+
+**One thing, named** — six reads with six different answers to who may
+ask, and the paragraph explaining each is now a whole sentence rather
+than the words either side of an interpolated value. The campaign line
+was `{raised} of {goal} from {donors} donor(s) · {status}`: five
+fragments, and neither Japanese nor Chinese puts "of" between the two
+numbers.
+
+**What leaves, and on what terms** — the licence paragraph bolds the
+word *consult* in the middle of itself, so the sentence is one row with
+that word as a hole; it is an adjective in English and a prepositional
+phrase in most of the other nine, and it does not sit in the same
+place. The revoke result keeps its three separate outcomes — nothing
+ever left, deleted at the gateway, marked here but the gateway was
+unreachable — because a tick for all three would be the wrong
+reassurance in any language.
+
+**The mark, and what is said about it** — the objection copy, the held
+queue, and the sentence that an owner cannot resolve an objection
+against their own profile.
+
+99 keys across three screens, ten languages each.
+
+**One row of the seventy-five stays, on purpose.** `AI ·` in TheMark is
+quoted rather than written: the sentence beside it says the line comes
+back with those two characters in front of whatever you type, and the
+server hardcodes them into `design.line`. Translating the quotation to
+`IA ·` would put a word on the screen that the product never produces —
+the paragraph would be describing a designation nobody is shown. It is
+quoted the way `409` and `#tag` are quoted, and `console_untranslated.txt`
+now says so above the row rather than leaving the next reader to
+rediscover it.
+
+Two pinned prose checks were rewired as their sentences moved, and one
+of them tightened while it moved: `test_the_screen_labels_the_preview_by_
+whether_it_is_opted_in` matched a sentence in the screen, which after
+this round would have matched nothing useful — it now asks the screen
+for both lookups and the table for both English headings.
+
 ## [0.45.8] — 2026-08-05
 
 ### The money, the loan, and the firm

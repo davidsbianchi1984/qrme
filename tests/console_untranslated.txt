@@ -1,4 +1,4 @@
-# status: backlog — 254 rows
+# status: backlog — 180 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 254
+# ceiling: 180
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -155,31 +155,6 @@ Inside: Which room
 Inside: room id, from Rooms
 Inside: say something
 Inside: · since
-Leaving: , yours, licensed from
-Leaving: A dry run — nothing has been sent to produce this.
-Leaving: Acquire a licence
-Leaving: Buying one needs your token as a person, not as a profile's owner. A licence permitting derivatives is refused to a buyer under 18 at the till rather than at delivery — the fee moves when the licence is sold.
-Leaving: Consult only — this licence does not permit deriving an agent, and the button is absent rather than present and refused.
-Leaving: Contributing
-Leaving: Derive an agent from it
-Leaving: Falls back to
-Leaving: Keep the licence token:
-Leaving: Keep this owner token — it is shown once:
-Leaving: Licensing a profile
-Leaving: New profile
-Leaving: Note the persona name is already replaced. That is what the gateway would receive, not a summary of it.
-Leaving: Nothing, ever.
-Leaving: One agent per licence. Deriving again from the same grant is a 409, because a licence was sold for one.
-Leaving: Stop, and take back what has left
-Leaving: The other kind of leaving. A
-Leaving: The shared model
-Leaving: This profile is
-Leaving: Two different kinds of leaving. One sends an exchange with the names taken out; the other sends the profile itself.
-Leaving: What has actually left
-Leaving: What leaves, and on what terms
-Leaving: consult
-Leaving: licence buys time with the profile; a licence that permits derivatives lets you build a new agent seeded from its persona, owned by you and marked with where it came from.
-Leaving: the profile to license
 Memory: AES-256-GCM · one row per conversation · erase by name
 Memory: Erase all
 Memory: Erase this one
@@ -188,32 +163,6 @@ Memory: Memory Vault 🔒
 Memory: No memories yet — have a chat first.
 Memory: turns · last
 Memory: with
-Named: A campaign
-Named: A trip out to look something up. The owner's only, because it holds the brief that was sanitised before it went and the count of what was taken out of it.
-Named: An excursion
-Named: An organization
-Named: Look
-Named: Look it up
-Named: No departments yet.
-Named: No id, no token. It is the key the screens render, so anything that draws a light can ask what one means.
-Named: None of yours here.
-Named: One thing, named
-Named: Show mine
-Named: Six reads, six different answers to who is allowed to ask.
-Named: The most public read here, on purpose. It carries who the money goes to, and the person about to give some is the one entitled to see that — a fundraising page that hid its split would be the ordinary kind of dishonest. A campaign cannot even be created before the designation exists.
-Named: What the lights mean
-Named: What you are lending and borrowing
-Named: Where the money goes
-Named: Yours only. The route says so in its own words — it acts on somebody's behalf, so it has to know it is them.
-Named: a campaign id
-Named: an excursion id
-Named: an organization id
-Named: from
-Named: from:
-Named: of
-Named: the place's id
-Named: · no account yet
-Named: …and in one place
 Plans: . Readable by
 Plans: End my subscription
 Plans: Erasure:
@@ -258,30 +207,16 @@ Simulate: Simulations are owner-only — sign in with a profile you own.
 Simulate: What Would They Do
 Simulate: a watermarked prediction — never the person's actual word
 Simulate: e.g. the town council proposes paving over the garden
+#
+# One row of this screen's three is deliberate and stays. `AI ·` is quoted,
+# not written: the sentence beside it says the line comes back with that in
+# front of whatever you type, and the server hardcodes those two characters
+# into `design.line`. Translating the quotation to `IA ·` would put a word on
+# the screen that the product never produces — the paragraph would be
+# describing a designation nobody is shown. It is quoted the way `409` and
+# `#tag` are quoted, so it is English on purpose and recorded as such.
+#
 TheMark: AI ·
-TheMark: Choose a profile first.
-TheMark: Held back
-TheMark: None.
-TheMark: Nothing waiting.
-TheMark: Nothing yet.
-TheMark: Objections to this profile
-TheMark: Only you see this. A held post is not a published one, and the route that lists what this profile published used to hand these out in full — text and the reason they were held — to anybody who asked, with no credential at all.
-TheMark: Published
-TheMark: Re-attest the basis
-TheMark: Re-attesting is all you can do here, deliberately. You cannot resolve an objection against your own profile — that is a reviewer's call, because an owner who could dismiss it would be deciding their own case.
-TheMark: Reference
-TheMark: Refresh
-TheMark: Reset to the default
-TheMark: Set it
-TheMark: Somebody claiming this profile should not exist — a likeness used without consent, an estate objecting. Opening one restricts the profile straight away, pending review.
-TheMark: The mark
-TheMark: The mark, and what is said about it
-TheMark: What every render says
-TheMark: Whatever you put here, the line comes back with
-TheMark: in front of it. The designation is not a field you can empty — a label without it is rendered with it anyway.
-TheMark: the glyph (✦)
-TheMark: what to call it
-TheMark: · opened
 Wall: Attach your own photos, videos or files
 Wall: For you
 Wall: Its title, in your words

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type CloudStatus, type ContributionView,
          type DerivedAgent, type LicenseGrant,
          type RevokeResult } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -37,6 +38,7 @@ import { useSession } from "../store";
  */
 export function Leaving({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
   const buyerToken = session.interactorToken || "";
@@ -69,37 +71,36 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>What leaves, and on what terms</h2>
-      <p className="muted small">
-        Two different kinds of leaving. One sends an exchange with the names
-        taken out; the other sends the profile itself.
-      </p>
+      <h2>{tr("lvg.title", lang)}</h2>
+      <p className="muted small">{tr("lvg.pitch", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {status && (
         <div className="card">
-          <h3>The shared model</h3>
+          <h3>{tr("lvg.sharedmodel", lang)}</h3>
           <p className="small">
             {status.cloud
-              ? "A gateway is configured on this deployment."
-              : "No gateway is configured, so nothing can leave even if a "
-                + "profile is opted in."}
+              ? tr("lvg.gateway", lang)
+              : tr("lvg.nogateway", lang)}
           </p>
           <p className="muted small">
-            Falls back to {status.fallback}. {status.contribution}
+            {fill(tr("lvg.fallsback", lang),
+                  { to: status.fallback, note: status.contribution })}
           </p>
         </div>
       )}
 
       {view && (
         <div className="card">
-          <h3>Contributing</h3>
+          <h3>{tr("lvg.contributing", lang)}</h3>
           <p className="small">
-            This profile is <strong>
-              {view.opted_in ? "opted in" : "opted out"}
-            </strong>.
+            {fill(tr("lvg.profileis", lang), {
+              state: <strong>
+                {view.opted_in ? tr("lvg.optedin", lang) : tr("lvg.optedout", lang)}
+              </strong>,
+            })}
           </p>
           <p className="muted small">{view.policy}</p>
 
@@ -110,54 +111,49 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
                   when the profile is opted out would be a false alarm. */}
               <h4>
                 {view.opted_in
-                  ? "What would leave on the next thumbs-up"
-                  : "What would leave if you turned this back on"}
+                  ? tr("lvg.wouldleave.on", lang)
+                  : tr("lvg.wouldleave.off", lang)}
               </h4>
               <p className="muted small">
-                A dry run — nothing has been sent to produce this.
-                {!view.opted_in && " This profile is opted out, so nothing "
-                  + "is going anywhere."}
+                {tr("lvg.dryrun", lang)}
+                {!view.opted_in && " " + tr("lvg.optedoutnote", lang)}
               </p>
               {view.preview_next.exchange.map((m, i) => (
                 <p className="small" key={i}>
                   <strong>{m.role}</strong>: {m.content}
                 </p>
               ))}
-              <p className="muted small">
-                Note the persona name is already replaced. That is what the
-                gateway would receive, not a summary of it.
-              </p>
+              <p className="muted small">{tr("lvg.personareplaced", lang)}</p>
             </>
           )}
 
-          <h4>What has actually left</h4>
+          <h4>{tr("lvg.actuallyleft", lang)}</h4>
           {view.contributed.length === 0 && (
-            <p className="muted small">Nothing, ever.</p>
+            <p className="muted small">{tr("lvg.nothingever", lang)}</p>
           )}
           {view.contributed.map((c) => (
             <p className="small" key={c.ref}>
               <code>{c.ref}</code> · {c.at}
-              {c.revoked && " · deletion requested"}
+              {c.revoked && " " + tr("lvg.deletionrequested", lang)}
             </p>
           ))}
 
           <button disabled={busy || !me || !token}
                   onClick={act(async () => setRevoked(
                     await api.revokeContributions(me, token)),
-                    "Stopped.")}>
-            Stop, and take back what has left
+                    tr("lvg.stopped", lang))}>
+            {tr("lvg.stopandtake", lang)}
           </button>
           {revoked && (
             <p className="muted small">
               {/* Said apart, because true-because-nothing-left and
                   true-because-the-gateway-said-so are different facts. */}
               {revoked.revoked === 0
-                ? "Nothing had ever left, so there was nothing to delete."
-                : revoked.deleted_at_gateway
-                  ? `${revoked.revoked} item(s) requested deleted at the `
-                    + "gateway."
-                  : `${revoked.revoked} item(s) are marked revoked here, but `
-                    + "no gateway was reachable to delete them."}
+                ? tr("lvg.nothinghadleft", lang)
+                : fill(revoked.deleted_at_gateway
+                         ? tr("lvg.deletedatgateway", lang)
+                         : tr("lvg.markedrevoked", lang),
+                       { n: revoked.revoked })}
               {" "}{revoked.note}
             </p>
           )}
@@ -165,27 +161,24 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
       )}
 
       <div className="card">
-        <h3>Licensing a profile</h3>
+        <h3>{tr("lvg.licensing", lang)}</h3>
+        {/* "consult" is bolded inside the sentence, so the sentence is one
+            row with the word as a hole — it is an adjective in English and a
+            prepositional phrase in most of the others, and it does not sit
+            in the same place. */}
         <p className="muted small">
-          The other kind of leaving. A <strong>consult</strong> licence buys
-          time with the profile; a licence that permits derivatives lets you
-          build a new agent seeded from its persona, owned by you and marked
-          with where it came from.
+          {fill(tr("lvg.otherkind", lang),
+                { consult: <strong>{tr("lvg.consult", lang)}</strong> })}
         </p>
-        <p className="muted small">
-          Buying one needs your token as a person, not as a profile's owner.
-          A licence permitting derivatives is refused to a buyer under 18 at
-          the till rather than at delivery — the fee moves when the licence
-          is sold.
-        </p>
+        <p className="muted small">{tr("lvg.buying", lang)}</p>
         <div className="row">
           <input value={subject} onChange={(e) => setSubject(e.target.value)}
-                 placeholder="the profile to license" style={{ flex: 1 }} />
+                 placeholder={tr("lvg.subject.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !subject.trim() || !buyerToken}
                   onClick={act(async () => setGrant(
                     await api.acquireLicense(subject.trim(), buyerToken)),
-                    "Acquired.")}>
-            Acquire a licence
+                    tr("lvg.acquired", lang))}>
+            {tr("lvg.acquire", lang)}
           </button>
         </div>
         {grant && (
@@ -195,39 +188,35 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
               {grant.terms && ` · ${grant.terms}`}
             </p>
             <p className="muted small">
-              Keep the licence token: <code>{grant.token}</code>
+              {fill(tr("lvg.keeptoken", lang),
+                    { token: <code>{grant.token}</code> })}
             </p>
             {grant.can_derive ? (
               <button disabled={busy}
                       onClick={act(async () => setDerived(
                         await api.deriveAgent(grant.profile_id,
                                               grant.grant_id, buyerToken)),
-                        "Derived.")}>
-                Derive an agent from it
+                        tr("lvg.derived", lang))}>
+                {tr("lvg.derive", lang)}
               </button>
             ) : (
-              <p className="muted small">
-                Consult only — this licence does not permit deriving an
-                agent, and the button is absent rather than present and
-                refused.
-              </p>
+              <p className="muted small">{tr("lvg.consultonly", lang)}</p>
             )}
           </>
         )}
         {derived && (
           <>
             <p className="small">
-              New profile <code>{derived.derived_profile_id}</code>, yours,
-              licensed from <code>{derived.licensed_from}</code>.
+              {fill(tr("lvg.newprofile", lang), {
+                id: <code>{derived.derived_profile_id}</code>,
+                src: <code>{derived.licensed_from}</code>,
+              })}
             </p>
             <p className="muted small">
-              Keep this owner token — it is shown once:{" "}
-              <code>{derived.owner_token}</code>
+              {fill(tr("lvg.keepowner", lang),
+                    { token: <code>{derived.owner_token}</code> })}
             </p>
-            <p className="muted small">
-              One agent per licence. Deriving again from the same grant is a
-              409, because a licence was sold for one.
-            </p>
+            <p className="muted small">{tr("lvg.oneagent", lang)}</p>
           </>
         )}
       </div>

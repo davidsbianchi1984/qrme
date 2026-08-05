@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type CampaignOut, type Excursion, type LightLegend,
          type OrgOut, type PersonGrants, type PlaceGrants } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -39,6 +40,7 @@ import { useSession } from "../store";
  */
 export function Named({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const token = session.ownerToken || "";
   const myself = session.interactorId || "";
   const myToken = session.interactorToken || token;
@@ -69,16 +71,14 @@ export function Named({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>One thing, named</h2>
-      <p className="muted small">
-        Six reads, six different answers to who is allowed to ask.
-      </p>
+      <h2>{tr("nmd.title", lang)}</h2>
+      <p className="muted small">{tr("nmd.pitch", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
 
       {lights && (
         <div className="card">
-          <h3>What the lights mean</h3>
+          <h3>{tr("nmd.lights", lang)}</h3>
           <p className="muted small">{lights.question}</p>
           {/* Built from the mapping, not written beside it. A legend kept
               separately eventually describes a mapping the code does not
@@ -87,33 +87,26 @@ export function Named({ onPlans }: { onPlans: () => void }) {
             <p className="small" key={l.light}>
               <strong>{l.light}</strong> — {l.labels.join(", ")}
               <br />
-              <span className="muted">from: {l.statuses.join(", ")}</span>
+              <span className="muted">
+                {fill(tr("nmd.from", lang), { list: l.statuses.join(", ") })}
+              </span>
             </p>
           ))}
-          <p className="muted small">
-            No id, no token. It is the key the screens render, so anything
-            that draws a light can ask what one means.
-          </p>
+          <p className="muted small">{tr("nmd.noidnotoken", lang)}</p>
         </div>
       )}
 
       <div className="card">
-        <h3>A campaign</h3>
-        <p className="muted small">
-          The most public read here, on purpose. It carries who the money
-          goes to, and the person about to give some is the one entitled to
-          see that — a fundraising page that hid its split would be the
-          ordinary kind of dishonest. A campaign cannot even be created
-          before the designation exists.
-        </p>
+        <h3>{tr("nmd.campaign", lang)}</h3>
+        <p className="muted small">{tr("nmd.mostpublic", lang)}</p>
         <div className="row">
           <input value={campaignId}
                  onChange={(e) => setCampaignId(e.target.value)}
-                 placeholder="a campaign id" style={{ flex: 1 }} />
+                 placeholder={tr("nmd.campaign.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !campaignId.trim()}
                   onClick={act(async () =>
                     setCampaign(await api.campaign(campaignId.trim())))}>
-            Look it up
+            {tr("nmd.lookitup", lang)}
           </button>
         </div>
         {campaign && (
@@ -122,16 +115,20 @@ export function Named({ onPlans }: { onPlans: () => void }) {
               <strong>{campaign.title}</strong>
               {campaign.cause && ` — ${campaign.cause}`}
               <br />
-              {campaign.raised} of {campaign.goal} from{" "}
-              {campaign.donors} {campaign.donors === 1 ? "donor" : "donors"} ·{" "}
-              {campaign.status}
+              {fill(tr("nmd.raised", lang), {
+                raised: campaign.raised, goal: campaign.goal,
+                status: campaign.status,
+                donors: campaign.donors === 1
+                  ? fill(tr("nmd.donor", lang), { n: campaign.donors })
+                  : fill(tr("nmd.donors", lang), { n: campaign.donors }),
+              })}
             </p>
-            <h4>Where the money goes</h4>
+            <h4>{tr("nmd.moneygoes", lang)}</h4>
             {(campaign.proceeds_to || []).map((d) => (
               <p className="small" key={d.id}>
                 {d.name} — {d.share}% · {d.kind.replace(/_/g, " ")}
                 {!d.has_account && (
-                  <span className="muted"> · no account yet</span>
+                  <span className="muted"> · {tr("nmd.noaccount", lang)}</span>
                 )}
               </p>
             ))}
@@ -141,21 +138,21 @@ export function Named({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>An organization</h3>
+        <h3>{tr("nmd.org", lang)}</h3>
         <div className="row">
           <input value={orgId} onChange={(e) => setOrgId(e.target.value)}
-                 placeholder="an organization id" style={{ flex: 1 }} />
+                 placeholder={tr("nmd.org.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !orgId.trim() || !token}
                   onClick={act(async () =>
                     setOrg(await api.organization(orgId.trim(), token)))}>
-            Look it up
+            {tr("nmd.lookitup", lang)}
           </button>
         </div>
         {org && (
           <>
             <p className="small"><strong>{org.name}</strong></p>
             {(org.departments || []).length === 0 && (
-              <p className="muted small">No departments yet.</p>
+              <p className="muted small">{tr("nmd.nodepts", lang)}</p>
             )}
             {(org.departments || []).map((d, i) => (
               <p className="small" key={i}>{JSON.stringify(d)}</p>
@@ -165,19 +162,15 @@ export function Named({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>An excursion</h3>
-        <p className="muted small">
-          A trip out to look something up. The owner's only, because it holds
-          the brief that was sanitised before it went and the count of what
-          was taken out of it.
-        </p>
+        <h3>{tr("nmd.excursion", lang)}</h3>
+        <p className="muted small">{tr("nmd.tripout", lang)}</p>
         <div className="row">
           <input value={excId} onChange={(e) => setExcId(e.target.value)}
-                 placeholder="an excursion id" style={{ flex: 1 }} />
+                 placeholder={tr("nmd.excursion.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !excId.trim() || !token}
                   onClick={act(async () =>
                     setExcursion(await api.excursion(excId.trim(), token)))}>
-            Look it up
+            {tr("nmd.lookitup", lang)}
           </button>
         </div>
         {excursion && (
@@ -190,14 +183,15 @@ export function Named({ onPlans }: { onPlans: () => void }) {
                 with this much taken out of it first. */}
             <p className="muted small">
               {excursion.left_host
-                ? "This left the machine."
-                : "Nothing left this machine."}
+                ? tr("nmd.leftmachine", lang)
+                : tr("nmd.nothingleft", lang)}
               {" "}
               {excursion.redactions === 0
-                ? "Nothing was redacted from the brief."
-                : `${excursion.redactions} private term`
-                  + `${excursion.redactions === 1 ? "" : "s"} stripped from `
-                  + "the brief before it went."}
+                ? tr("nmd.noredactions", lang)
+                : fill(excursion.redactions === 1
+                         ? tr("nmd.redacted.one", lang)
+                         : tr("nmd.redacted.many", lang),
+                       { n: excursion.redactions })}
             </p>
             <p className="small">{excursion.brief}</p>
             {excursion.findings && (
@@ -205,29 +199,26 @@ export function Named({ onPlans }: { onPlans: () => void }) {
             )}
             <p className="muted small">
               {excursion.learned
-                ? "Folded back into the profile as a learned source."
-                : "Not learned — the findings sit here until you let them in."}
+                ? tr("nmd.learned", lang)
+                : tr("nmd.notlearned", lang)}
             </p>
           </>
         )}
       </div>
 
       <div className="card">
-        <h3>What you are lending and borrowing</h3>
+        <h3>{tr("nmd.lending", lang)}</h3>
         <button disabled={busy || !myself || !myToken}
                 onClick={act(async () =>
                   setMine(await api.grantsForPerson(myself, myToken)))}>
-          Show mine
+          {tr("nmd.showmine", lang)}
         </button>
         {mine && <p className="small">{JSON.stringify(mine)}</p>}
-        <p className="muted small">
-          Yours only. The route says so in its own words — it acts on
-          somebody's behalf, so it has to know it is them.
-        </p>
+        <p className="muted small">{tr("nmd.yoursonly", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>…and in one place</h3>
+        <h3>{tr("nmd.inoneplace", lang)}</h3>
         <div className="row">
           <select value={surface} onChange={(e) => setSurface(e.target.value)}>
             {["room", "profile", "org", "session"].map((s) => (
@@ -236,18 +227,18 @@ export function Named({ onPlans }: { onPlans: () => void }) {
           </select>
           <input value={surfaceId}
                  onChange={(e) => setSurfaceId(e.target.value)}
-                 placeholder="the place's id" style={{ flex: 1 }} />
+                 placeholder={tr("nmd.place.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !surfaceId.trim() || !myToken}
                   onClick={act(async () => setPlace(
                     await api.grantsInPlace(surface, surfaceId.trim(),
                                             myToken)))}>
-            Look
+            {tr("nmd.look", lang)}
           </button>
         </div>
         {place && (
           <>
             {place.grants.length === 0 && (
-              <p className="muted small">None of yours here.</p>
+              <p className="muted small">{tr("nmd.noneyours", lang)}</p>
             )}
             {place.grants.map((g, i) => (
               <p className="small" key={i}>{JSON.stringify(g)}</p>

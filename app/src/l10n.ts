@@ -5820,6 +5820,303 @@ const CHROME: Table = {
   "org.sealed": {
     en: "sealed", es: "sellada", fr: "scellée", de: "versiegelt", pt: "selada", it: "sigillato", ja: "封印済み", zh: "已封存", hi: "सील", ar: "مختوم",
   },
+  "mrk.title": {
+    en: "The mark, and what is said about it", es: "La marca, y lo que se dice de ella", fr: "La marque, et ce qu'on en dit", de: "Das Kennzeichen, und was darüber gesagt wird", pt: "A marca, e o que se diz dela", it: "Il marchio, e ciò che se ne dice", ja: "しるしと、それについて言われていること", zh: "标记，以及关于它的说法", hi: "निशान, और उसके बारे में जो कहा जाता है", ar: "العلامة، وما يُقال عنها",
+  },
+  "mrk.title.short": {
+    en: "The mark", es: "La marca", fr: "La marque", de: "Das Kennzeichen", pt: "A marca", it: "Il marchio", ja: "しるし", zh: "标记", hi: "निशान", ar: "العلامة",
+  },
+  "mrk.chooseprofile": {
+    en: "Choose a profile first.", es: "Elige primero un perfil.", fr: "Choisissez d'abord un profil.", de: "Wählen Sie zuerst ein Profil.", pt: "Escolha primeiro um perfil.", it: "Scegli prima un profilo.", ja: "先にプロフィールを選んでください。", zh: "请先选择一个档案。", hi: "पहले एक प्रोफ़ाइल चुनें।", ar: "اختر ملفًا أولًا.",
+  },
+  "mrk.everyrender": {
+    en: "What every render says", es: "Lo que dice cada representación", fr: "Ce que dit chaque rendu", de: "Was jede Darstellung sagt", pt: "O que diz cada renderização", it: "Ciò che dice ogni resa", ja: "描画のたびに表示されるもの", zh: "每一次呈现都会写着什么", hi: "हर प्रस्तुति क्या कहती है", ar: "ما تقوله كل عملية عرض",
+  },
+  "mrk.yourdesign": {
+    en: "Your design.", es: "Tu diseño.", fr: "Votre conception.", de: "Ihre Gestaltung.", pt: "O seu desenho.", it: "Il tuo disegno.", ja: "あなたが決めたものです。", zh: "由你设定。", hi: "आपका बनाया हुआ।", ar: "من تصميمك.",
+  },
+  "mrk.thedefault": {
+    en: "The default — you have not set one.", es: "El valor por defecto — no has fijado ninguno.", fr: "La valeur par défaut — vous n'en avez pas défini.", de: "Die Vorgabe — Sie haben keine festgelegt.", pt: "O predefinido — não definiu nenhum.", it: "Quello predefinito — non ne hai impostato uno.", ja: "既定のものです — まだ設定していません。", zh: "默认值 — 你还没有设定过。", hi: "यह डिफ़ॉल्ट है — आपने कोई तय नहीं किया।", ar: "الافتراضي — لم تضبط واحدًا.",
+  },
+  "mrk.always": {
+    en: "Shown on everything, always.", es: "Se muestra en todo, siempre.", fr: "Affiché sur tout, toujours.", de: "Wird auf allem gezeigt, immer.", pt: "Mostrado em tudo, sempre.", it: "Mostrato su tutto, sempre.", ja: "すべてに、常に表示されます。", zh: "始终显示在每一处。", hi: "हर चीज़ पर, हमेशा दिखता है।", ar: "يظهر على كل شيء، دائمًا.",
+  },
+  "mrk.glyph.ph": {
+    en: "the glyph (✦)", es: "el símbolo (✦)", fr: "le symbole (✦)", de: "das Zeichen (✦)", pt: "o símbolo (✦)", it: "il simbolo (✦)", ja: "記号（✦）", zh: "符号（✦）", hi: "चिह्न (✦)", ar: "الرمز (✦)",
+  },
+  "mrk.label.ph": {
+    en: "what to call it", es: "cómo llamarlo", fr: "comment l'appeler", de: "wie es heißen soll", pt: "como chamar", it: "come chiamarlo", ja: "何と呼ぶか", zh: "叫什么名字", hi: "इसे क्या नाम दें", ar: "بماذا تسمّيه",
+  },
+  "mrk.designation": {
+    en: "Whatever you put here, the line comes back with {ai} in front of it. The designation is not a field you can empty — a label without it is rendered with it anyway.", es: "Pongas lo que pongas aquí, la línea vuelve con {ai} delante. La designación no es un campo que puedas vaciar — una etiqueta sin ella se representa con ella de todos modos.", fr: "Quoi que vous mettiez ici, la ligne revient avec {ai} devant. La désignation n'est pas un champ que vous pouvez vider — un libellé sans elle est rendu avec elle malgré tout.", de: "Was Sie hier auch eintragen, die Zeile kommt mit {ai} davor zurück. Die Kennzeichnung ist kein Feld, das Sie leeren können — eine Beschriftung ohne sie wird trotzdem mit ihr dargestellt.", pt: "Ponha o que puser aqui, a linha volta com {ai} à frente. A designação não é um campo que possa esvaziar — um rótulo sem ela é apresentado com ela na mesma.", it: "Qualunque cosa tu metta qui, la riga torna con {ai} davanti. La designazione non è un campo che puoi svuotare — un'etichetta senza di essa viene resa lo stesso con essa.", ja: "ここに何を入れても、その行は先頭に {ai} が付いて返ってきます。この表示は空にできる項目ではありません — それを外したラベルも、付けられて描画されます。", zh: "无论你在这里填什么，那一行回来时前面都会带着 {ai}。这个标示不是一个你可以清空的字段——去掉它的标签，呈现时仍会带上它。", hi: "आप यहाँ जो भी डालें, वह पंक्ति आगे {ai} लगाकर ही लौटती है। यह पदनाम ऐसा खाना नहीं है जिसे आप ख़ाली कर सकें — इसके बिना लिखा लेबल भी इसी के साथ दिखाया जाता है।", ar: "مهما وضعت هنا، يعود السطر و{ai} أمامه. هذا التوصيف ليس حقلًا يمكنك إفراغه — والتسمية التي تخلو منه تُعرض به على أي حال.",
+  },
+  "mrk.setit": {
+    en: "Set it", es: "Fijarlo", fr: "Définir", de: "Festlegen", pt: "Definir", it: "Imposta", ja: "設定する", zh: "设定", hi: "तय करें", ar: "اضبطه",
+  },
+  "mrk.reset": {
+    en: "Reset to the default", es: "Volver al valor por defecto", fr: "Revenir à la valeur par défaut", de: "Auf die Vorgabe zurücksetzen", pt: "Voltar ao predefinido", it: "Torna al predefinito", ja: "既定に戻す", zh: "恢复默认", hi: "डिफ़ॉल्ट पर लौटें", ar: "أعِده إلى الافتراضي",
+  },
+  "mrk.nowreads": {
+    en: "Now reads “{line}”.", es: "Ahora dice «{line}».", fr: "Affiche maintenant « {line} ».", de: "Lautet jetzt „{line}“.", pt: "Agora diz «{line}».", it: "Ora recita «{line}».", ja: "現在は「{line}」と表示されます。", zh: "现在写作“{line}”。", hi: "अब यह “{line}” पढ़ा जाता है।", ar: "يقرأ الآن «{line}».",
+  },
+  "mrk.backtodefault": {
+    en: "Back to the default.", es: "De vuelta al valor por defecto.", fr: "Retour à la valeur par défaut.", de: "Zurück zur Vorgabe.", pt: "De volta ao predefinido.", it: "Tornato al predefinito.", ja: "既定に戻しました。", zh: "已恢复默认。", hi: "डिफ़ॉल्ट पर लौट आया।", ar: "عاد إلى الافتراضي.",
+  },
+  "mrk.published": {
+    en: "Published", es: "Publicado", fr: "Publié", de: "Veröffentlicht", pt: "Publicado", it: "Pubblicato", ja: "公開済み", zh: "已发布", hi: "प्रकाशित", ar: "المنشور",
+  },
+  "mrk.nothingyet": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "mrk.heldback": {
+    en: "Held back", es: "Retenido", fr: "Retenu", de: "Zurückgehalten", pt: "Retido", it: "Trattenuto", ja: "保留中", zh: "被扣下的", hi: "रोका गया", ar: "المحجوز",
+  },
+  "mrk.onlyyou": {
+    en: "Only you see this. A held post is not a published one, and the route that lists what this profile published used to hand these out in full — text and the reason they were held — to anybody who asked, with no credential at all.", es: "Solo tú ves esto. Una publicación retenida no es una publicada, y la ruta que enumera lo que este perfil publicó llegó a entregarlas enteras — el texto y el motivo de la retención — a quien las pidiera, sin credencial alguna.", fr: "Vous seul voyez ceci. Un billet retenu n'est pas un billet publié, et la route qui liste ce que ce profil a publié les livrait naguère en entier — le texte et le motif de la retenue — à quiconque le demandait, sans le moindre justificatif.", de: "Nur Sie sehen das. Ein zurückgehaltener Beitrag ist kein veröffentlichter, und die Route, die auflistet, was dieses Profil veröffentlicht hat, gab sie früher vollständig heraus — Text und Grund der Zurückhaltung — an jede:n, die:der fragte, ganz ohne Nachweis.", pt: "Só você vê isto. Uma publicação retida não é uma publicada, e a rota que lista o que este perfil publicou chegou a entregá-las por inteiro — o texto e o motivo da retenção — a quem quer que pedisse, sem credencial nenhuma.", it: "Solo tu vedi questo. Un post trattenuto non è un post pubblicato, e la rotta che elenca ciò che questo profilo ha pubblicato li consegnava per intero — testo e motivo della trattenuta — a chiunque lo chiedesse, senza alcuna credenziale.", ja: "これはあなたにしか見えません。保留された投稿は公開された投稿ではありません。それなのに、このプロフィールが公開したものを一覧するルートは、かつてこれらを丸ごと — 本文も、保留された理由も — 資格情報なしに、尋ねた誰にでも渡していました。", zh: "只有你看得到这些。被扣下的帖子不等于已发布的帖子，而那条列出此档案已发布内容的路由，过去会把它们整份交出去——正文，连同被扣下的理由——给任何来问的人，完全不需要凭证。", hi: "यह केवल आपको दिखता है। रोकी गई पोस्ट प्रकाशित पोस्ट नहीं होती, फिर भी जो रास्ता यह सूची देता है कि इस प्रोफ़ाइल ने क्या प्रकाशित किया, वह पहले इन्हें पूरा का पूरा — पाठ और रोके जाने का कारण दोनों — बिना किसी प्रमाण-पत्र के, हर पूछने वाले को सौंप देता था।", ar: "أنت وحدك ترى هذا. المنشور المحجوز ليس منشورًا صادرًا، ومع ذلك كان المسار الذي يسرد ما نشره هذا الملف يسلّمها كاملة — النص وسبب الحجز — لكل من يسأل، دون أي بيانات اعتماد على الإطلاق.",
+  },
+  "mrk.nothingwaiting": {
+    en: "Nothing waiting.", es: "Nada en espera.", fr: "Rien en attente.", de: "Nichts wartet.", pt: "Nada à espera.", it: "Niente in attesa.", ja: "待っているものはありません。", zh: "没有等待中的内容。", hi: "कुछ भी लंबित नहीं।", ar: "لا شيء في الانتظار.",
+  },
+  "mrk.refresh": {
+    en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "حدِّث",
+  },
+  "mrk.objections": {
+    en: "Objections to this profile", es: "Objeciones a este perfil", fr: "Contestations de ce profil", de: "Widersprüche gegen dieses Profil", pt: "Contestações a este perfil", it: "Contestazioni a questo profilo", ja: "このプロフィールへの異議", zh: "针对此档案的异议", hi: "इस प्रोफ़ाइल पर आपत्तियाँ", ar: "الاعتراضات على هذا الملف",
+  },
+  "mrk.claiming": {
+    en: "Somebody claiming this profile should not exist — a likeness used without consent, an estate objecting. Opening one restricts the profile straight away, pending review.", es: "Alguien sostiene que este perfil no debería existir — una imagen usada sin consentimiento, una herencia que se opone. Abrir una restringe el perfil de inmediato, a la espera de revisión.", fr: "Quelqu'un soutient que ce profil ne devrait pas exister — une ressemblance utilisée sans consentement, une succession qui s'y oppose. En ouvrir une restreint le profil aussitôt, en attendant l'examen.", de: "Jemand macht geltend, dieses Profil dürfe nicht bestehen — ein ohne Einwilligung genutztes Abbild, ein widersprechender Nachlass. Einen zu eröffnen beschränkt das Profil sofort, bis zur Prüfung.", pt: "Alguém sustenta que este perfil não devia existir — uma imagem usada sem consentimento, uma herança que se opõe. Abrir uma restringe o perfil de imediato, à espera de revisão.", it: "Qualcuno sostiene che questo profilo non dovrebbe esistere — una somiglianza usata senza consenso, un'eredità che si oppone. Aprirne una limita il profilo all'istante, in attesa di revisione.", ja: "このプロフィールは存在すべきでない、と誰かが申し立てています — 同意なく使われた肖像、異議を唱える遺族。異議が開かれた時点で、審査を待つあいだプロフィールはただちに制限されます。", zh: "有人主张这个档案不该存在——未经同意使用的肖像，提出反对的遗产继承方。一旦开启，档案会立即受限，等候审核。", hi: "कोई कह रहा है कि यह प्रोफ़ाइल होनी ही नहीं चाहिए — बिना सहमति इस्तेमाल की गई शक्ल, आपत्ति करता कोई उत्तराधिकार। आपत्ति खुलते ही प्रोफ़ाइल तुरंत सीमित हो जाती है, समीक्षा तक।", ar: "شخص يرى أن هذا الملف ينبغي ألا يوجد — شبَه استُعمل دون موافقة، أو تركة تعترض. فتح اعتراض يقيّد الملف فورًا، بانتظار المراجعة.",
+  },
+  "mrk.none": {
+    en: "None.", es: "Ninguna.", fr: "Aucune.", de: "Keine.", pt: "Nenhuma.", it: "Nessuna.", ja: "ありません。", zh: "没有。", hi: "कोई नहीं।", ar: "لا شيء.",
+  },
+  "mrk.refline": {
+    en: "Reference {ref} · opened {at}", es: "Referencia {ref} · abierta el {at}", fr: "Référence {ref} · ouverte le {at}", de: "Referenz {ref} · eröffnet am {at}", pt: "Referência {ref} · aberta a {at}", it: "Riferimento {ref} · aperta il {at}", ja: "参照 {ref} · 開始 {at}", zh: "编号 {ref} · 开启于 {at}", hi: "संदर्भ {ref} · खुली {at}", ar: "المرجع {ref} · فُتح في {at}",
+  },
+  "mrk.reattested": {
+    en: "· you have re-attested", es: "· has vuelto a acreditarlo", fr: "· vous avez ré-attesté", de: "· Sie haben erneut bekräftigt", pt: "· voltou a atestar", it: "· hai riattestato", ja: "· 再表明済み", zh: "· 你已重新声明", hi: "· आपने फिर से पुष्टि की", ar: "· أعدت التوثيق",
+  },
+  "mrk.wouldreturn": {
+    en: "· would return to {status}", es: "· volvería a {status}", fr: "· reviendrait à {status}", de: "· würde zu {status} zurückkehren", pt: "· voltaria a {status}", it: "· tornerebbe a {status}", ja: "· {status} に戻ります", zh: "· 将回到 {status}", hi: "· {status} पर लौटेगा", ar: "· سيعود إلى {status}",
+  },
+  "mrk.reattest": {
+    en: "Re-attest the basis", es: "Volver a acreditar la base", fr: "Ré-attester le fondement", de: "Die Grundlage erneut bekräftigen", pt: "Voltar a atestar a base", it: "Riattesta il fondamento", ja: "根拠を再表明する", zh: "重新声明依据", hi: "आधार की फिर से पुष्टि करें", ar: "أعِد توثيق الأساس",
+  },
+  "mrk.reattesting": {
+    en: "Re-attesting is all you can do here, deliberately. You cannot resolve an objection against your own profile — that is a reviewer's call, because an owner who could dismiss it would be deciding their own case.", es: "Volver a acreditar es lo único que puedes hacer aquí, y es a propósito. No puedes resolver una objeción contra tu propio perfil — eso le toca a quien revisa, porque un propietario que pudiera desestimarla estaría fallando su propio caso.", fr: "Ré-attester est tout ce que vous pouvez faire ici, à dessein. Vous ne pouvez pas trancher une contestation visant votre propre profil — cela revient à l'examinateur, car un propriétaire qui pourrait la rejeter jugerait sa propre cause.", de: "Erneut zu bekräftigen ist alles, was Sie hier tun können, und das mit Absicht. Sie können einen Widerspruch gegen Ihr eigenes Profil nicht entscheiden — das obliegt der prüfenden Person, denn wer ihn abweisen könnte, entschiede in eigener Sache.", pt: "Voltar a atestar é tudo o que pode fazer aqui, de propósito. Não pode resolver uma contestação ao seu próprio perfil — isso cabe a quem revê, porque um proprietário que pudesse rejeitá-la estaria a julgar a sua própria causa.", it: "Riattestare è tutto ciò che puoi fare qui, e non per caso. Non puoi risolvere una contestazione contro il tuo stesso profilo — spetta a chi revisiona, perché un proprietario che potesse respingerla deciderebbe la propria causa.", ja: "ここでできるのは再表明だけで、それは意図的なものです。自分のプロフィールに対する異議を、自分で解決することはできません — それは審査する側の判断です。取り下げられる所有者は、自分の件を自分で裁くことになるからです。", zh: "在这里你能做的只有重新声明，这是有意为之。你不能裁决针对你自己档案的异议——那是审核者的判断，因为一个可以驳回它的所有者，等于在裁决自己的案子。", hi: "यहाँ आप बस फिर से पुष्टि कर सकते हैं, और यह जानबूझकर है। अपनी ही प्रोफ़ाइल के ख़िलाफ़ आई आपत्ति को आप निपटा नहीं सकते — वह समीक्षक का फ़ैसला है, क्योंकि जो मालिक उसे ख़ारिज कर सकता हो, वह अपना ही मुक़दमा तय कर रहा होगा।", ar: "إعادة التوثيق هي كل ما يمكنك فعله هنا، وذلك عن قصد. لا يمكنك البتّ في اعتراض على ملفك أنت — فذلك قرار المراجِع، لأن مالكًا يستطيع ردّه سيكون قاضيًا في قضيته.",
+  },
+  "nmd.title": {
+    en: "One thing, named", es: "Una cosa, con nombre", fr: "Une chose, nommée", de: "Eine Sache, benannt", pt: "Uma coisa, com nome", it: "Una cosa, nominata", ja: "名指しされた、ひとつのもの", zh: "一件被指名的东西", hi: "एक चीज़, नाम लेकर", ar: "شيء واحد، مُسمًّى",
+  },
+  "nmd.pitch": {
+    en: "Six reads, six different answers to who is allowed to ask.", es: "Seis lecturas, seis respuestas distintas a quién puede preguntar.", fr: "Six lectures, six réponses différentes à la question de qui a le droit de demander.", de: "Sechs Abfragen, sechs verschiedene Antworten darauf, wer fragen darf.", pt: "Seis leituras, seis respostas diferentes a quem pode perguntar.", it: "Sei letture, sei risposte diverse a chi è ammesso a chiedere.", ja: "六つの読み取り、そして「誰が尋ねてよいか」への六つの異なる答え。", zh: "六种读取，对“谁可以问”给出六个不同的答案。", hi: "छह पठन, और “कौन पूछ सकता है” के छह अलग-अलग उत्तर।", ar: "ست قراءات، وست إجابات مختلفة عن مَن يحق له أن يسأل.",
+  },
+  "nmd.lights": {
+    en: "What the lights mean", es: "Qué significan las luces", fr: "Ce que signifient les voyants", de: "Was die Lichter bedeuten", pt: "O que significam as luzes", it: "Cosa significano le luci", ja: "ランプの意味", zh: "这些指示灯的含义", hi: "बत्तियों का मतलब", ar: "ماذا تعني الأضواء",
+  },
+  "nmd.from": {
+    en: "from: {list}", es: "de: {list}", fr: "d'après : {list}", de: "aus: {list}", pt: "de: {list}", it: "da: {list}", ja: "由来: {list}", zh: "来自：{list}", hi: "से: {list}", ar: "من: {list}",
+  },
+  "nmd.noidnotoken": {
+    en: "No id, no token. It is the key the screens render, so anything that draws a light can ask what one means.", es: "Sin id, sin token. Es la leyenda que dibujan las pantallas, así que cualquier cosa que pinte una luz puede preguntar qué significa.", fr: "Ni identifiant, ni jeton. C'est la légende que les écrans affichent, donc tout ce qui dessine un voyant peut demander ce qu'il veut dire.", de: "Keine ID, kein Token. Es ist die Legende, die die Bildschirme darstellen, also kann alles, was ein Licht zeichnet, nachfragen, was es bedeutet.", pt: "Sem id, sem token. É a legenda que os ecrãs desenham, por isso tudo o que pinta uma luz pode perguntar o que ela quer dizer.", it: "Nessun id, nessun token. È la legenda che le schermate disegnano, quindi qualsiasi cosa accenda una luce può chiedere cosa significhi.", ja: "ID もトークンも要りません。これは画面が描く凡例そのものなので、ランプを描くものなら何でも、その意味を尋ねられます。", zh: "不需要 id，也不需要令牌。这就是各个界面所绘制的图例，所以任何会点亮一盏灯的东西，都可以问它是什么意思。", hi: "न कोई आईडी, न टोकन। यही वह कुंजी है जिसे स्क्रीनें दिखाती हैं, इसलिए जो भी कोई बत्ती बनाता है, वह पूछ सकता है कि उसका अर्थ क्या है।", ar: "لا معرّف ولا رمز. هذا هو المفتاح الذي ترسمه الشاشات، فأي شيء يرسم ضوءًا يستطيع أن يسأل عن معناه.",
+  },
+  "nmd.campaign": {
+    en: "A campaign", es: "Una campaña", fr: "Une campagne", de: "Eine Kampagne", pt: "Uma campanha", it: "Una campagna", ja: "キャンペーン", zh: "一个活动", hi: "एक अभियान", ar: "حملة",
+  },
+  "nmd.mostpublic": {
+    en: "The most public read here, on purpose. It carries who the money goes to, and the person about to give some is the one entitled to see that — a fundraising page that hid its split would be the ordinary kind of dishonest. A campaign cannot even be created before the designation exists.", es: "La lectura más pública de aquí, a propósito. Lleva a quién va el dinero, y quien está a punto de dar algo es quien tiene derecho a verlo — una página de recaudación que ocultara su reparto sería deshonesta de la manera más corriente. Ni siquiera se puede crear una campaña antes de que exista la designación.", fr: "La lecture la plus publique d'ici, à dessein. Elle porte le nom de ceux à qui va l'argent, et la personne sur le point d'en donner est celle qui a le droit de le voir — une page de collecte qui cacherait sa répartition serait malhonnête de la manière la plus banale. On ne peut même pas créer une campagne avant que la désignation existe.", de: "Die öffentlichste Abfrage hier, mit Absicht. Sie trägt, an wen das Geld geht, und wer gleich welches gibt, hat ein Recht darauf, das zu sehen — eine Spendenseite, die ihre Aufteilung verbirgt, wäre auf die gewöhnlichste Art unehrlich. Eine Kampagne lässt sich nicht einmal anlegen, bevor die Benennung besteht.", pt: "A leitura mais pública daqui, de propósito. Leva a quem vai o dinheiro, e quem está prestes a dar algum é quem tem direito a vê-lo — uma página de angariação que escondesse a sua divisão seria desonesta da maneira mais banal. Nem sequer é possível criar uma campanha antes de a designação existir.", it: "La lettura più pubblica qui dentro, di proposito. Porta con sé a chi vanno i soldi, e chi sta per darne è la persona che ha diritto di vederlo — una pagina di raccolta che nascondesse la sua ripartizione sarebbe disonesta nel modo più ordinario. Una campagna non si può nemmeno creare prima che esista la designazione.", ja: "ここで最も公開された読み取りであり、それは意図的です。お金が誰に渡るのかを含んでおり、これから寄付しようとする人こそ、それを見る権利を持つ人です — 分配を隠す募金ページは、ごくありふれた種類の不誠実です。そもそも指定が存在するまで、キャンペーンを作ることさえできません。", zh: "这里最公开的一次读取，而且是有意如此。它带着钱的去向，而正要掏钱的人正是有权看到它的人——一个隐藏分配方式的募捐页面，是最普通的那种不诚实。在指定存在之前，活动甚至无法被创建。", hi: "यहाँ की सबसे सार्वजनिक पठन, और जानबूझकर। इसमें यह लिखा होता है कि पैसा किसे जाता है, और जो अभी देने वाला है वही उसे देखने का हक़दार है — जो चंदा-पन्ना अपना बँटवारा छिपाए, वह सबसे साधारण क़िस्म की बेईमानी है। नामांकन बने बिना अभियान बनाया ही नहीं जा सकता।", ar: "أكثر قراءة علنية هنا، عن قصد. فهي تحمل إلى مَن يذهب المال، ومَن يوشك أن يتبرّع هو صاحب الحق في رؤيته — وصفحة تبرعات تخفي توزيعها هي عدم أمانة من النوع العادي. بل لا يمكن إنشاء حملة أصلًا قبل أن يوجد التحديد.",
+  },
+  "nmd.campaign.ph": {
+    en: "a campaign id", es: "un id de campaña", fr: "un identifiant de campagne", de: "eine Kampagnen-ID", pt: "um id de campanha", it: "un id di campagna", ja: "キャンペーン ID", zh: "活动 id", hi: "अभियान आईडी", ar: "معرّف حملة",
+  },
+  "nmd.lookitup": {
+    en: "Look it up", es: "Buscarlo", fr: "Le chercher", de: "Nachschlagen", pt: "Procurar", it: "Cercalo", ja: "調べる", zh: "查一下", hi: "देखें", ar: "ابحث عنه",
+  },
+  "nmd.raised": {
+    en: "{raised} of {goal} from {donors} · {status}", es: "{raised} de {goal} de {donors} · {status}", fr: "{raised} sur {goal} de la part de {donors} · {status}", de: "{raised} von {goal} von {donors} · {status}", pt: "{raised} de {goal} de {donors} · {status}", it: "{raised} su {goal} da {donors} · {status}", ja: "{goal} のうち {raised}、{donors} から · {status}", zh: "{goal} 中的 {raised}，来自 {donors} · {status}", hi: "{goal} में से {raised}, {donors} से · {status}", ar: "{raised} من {goal}، من {donors} · {status}",
+  },
+  "nmd.donor": {
+    en: "{n} donor", es: "{n} donante", fr: "{n} donateur", de: "{n} Spender:in", pt: "{n} doador", it: "{n} donatore", ja: "寄付者 {n} 人", zh: "{n} 位捐赠者", hi: "{n} दानकर्ता", ar: "متبرع واحد",
+  },
+  "nmd.donors": {
+    en: "{n} donors", es: "{n} donantes", fr: "{n} donateurs", de: "{n} Spendenden", pt: "{n} doadores", it: "{n} donatori", ja: "寄付者 {n} 人", zh: "{n} 位捐赠者", hi: "{n} दानकर्ता", ar: "{n} متبرعًا",
+  },
+  "nmd.moneygoes": {
+    en: "Where the money goes", es: "Adónde va el dinero", fr: "Où va l'argent", de: "Wohin das Geld geht", pt: "Para onde vai o dinheiro", it: "Dove vanno i soldi", ja: "お金の行き先", zh: "钱去了哪里", hi: "पैसा कहाँ जाता है", ar: "إلى أين يذهب المال",
+  },
+  "nmd.noaccount": {
+    en: "no account yet", es: "todavía sin cuenta", fr: "pas encore de compte", de: "noch kein Konto", pt: "ainda sem conta", it: "ancora senza conto", ja: "まだ口座がありません", zh: "尚无账户", hi: "अभी कोई खाता नहीं", ar: "لا حساب بعد",
+  },
+  "nmd.org": {
+    en: "An organization", es: "Una organización", fr: "Une organisation", de: "Eine Organisation", pt: "Uma organização", it: "Un'organizzazione", ja: "組織", zh: "一个组织", hi: "एक संगठन", ar: "منظمة",
+  },
+  "nmd.org.ph": {
+    en: "an organization id", es: "un id de organización", fr: "un identifiant d'organisation", de: "eine Organisations-ID", pt: "um id de organização", it: "un id di organizzazione", ja: "組織 ID", zh: "组织 id", hi: "संगठन आईडी", ar: "معرّف منظمة",
+  },
+  "nmd.nodepts": {
+    en: "No departments yet.", es: "Todavía no hay departamentos.", fr: "Pas encore de service.", de: "Noch keine Abteilungen.", pt: "Ainda não há departamentos.", it: "Nessun reparto ancora.", ja: "部門はまだありません。", zh: "还没有部门。", hi: "अभी कोई विभाग नहीं।", ar: "لا أقسام بعد.",
+  },
+  "nmd.excursion": {
+    en: "An excursion", es: "Una salida", fr: "Une sortie", de: "Ein Ausflug", pt: "Uma saída", it: "Un'uscita", ja: "外出調査", zh: "一次外出查询", hi: "एक बाहरी खोज", ar: "رحلة استعلام",
+  },
+  "nmd.tripout": {
+    en: "A trip out to look something up. The owner's only, because it holds the brief that was sanitised before it went and the count of what was taken out of it.", es: "Una salida para consultar algo. Solo del propietario, porque guarda el encargo que se depuró antes de salir y la cuenta de lo que se le quitó.", fr: "Une sortie pour aller chercher quelque chose. Réservée au propriétaire, car elle conserve la consigne assainie avant son départ et le compte de ce qui en a été retiré.", de: "Ein Gang nach draußen, um etwas nachzuschlagen. Nur für die besitzende Person, denn er enthält den vor dem Weggang bereinigten Auftrag und die Zahl dessen, was daraus entfernt wurde.", pt: "Uma saída para consultar algo. Só do proprietário, porque guarda a incumbência que foi depurada antes de sair e a contagem do que lhe foi retirado.", it: "Un'uscita per andare a cercare qualcosa. Solo del proprietario, perché conserva l'incarico ripulito prima di partire e il conto di ciò che ne è stato tolto.", ja: "何かを調べに外へ出ること。所有者だけのものです。出ていく前に伏せ字にされた依頼文と、そこから取り除かれたものの件数を抱えているからです。", zh: "为了查点什么而出去一趟。只属于所有者，因为它保存着出发前被净化过的委托，以及从中被拿掉的东西的数目。", hi: "कुछ पता करने के लिए बाहर जाना। सिर्फ़ मालिक की, क्योंकि इसमें वह निर्देश रहता है जिसे जाने से पहले साफ़ किया गया था, और यह गिनती भी कि उसमें से क्या निकाला गया।", ar: "خرجة للبحث عن شيء. للمالك وحده، لأنها تحتفظ بالتكليف الذي نُقّي قبل خروجه، وبعدد ما أُزيل منه.",
+  },
+  "nmd.excursion.ph": {
+    en: "an excursion id", es: "un id de salida", fr: "un identifiant de sortie", de: "eine Ausflug-ID", pt: "um id de saída", it: "un id di uscita", ja: "外出調査 ID", zh: "外出查询 id", hi: "बाहरी खोज आईडी", ar: "معرّف رحلة",
+  },
+  "nmd.leftmachine": {
+    en: "This left the machine.", es: "Esto salió de la máquina.", fr: "Ceci a quitté la machine.", de: "Das hat die Maschine verlassen.", pt: "Isto saiu da máquina.", it: "Questo ha lasciato la macchina.", ja: "これはこの機械の外に出ました。", zh: "这离开了这台机器。", hi: "यह मशीन से बाहर गया।", ar: "هذا غادر الجهاز.",
+  },
+  "nmd.nothingleft": {
+    en: "Nothing left this machine.", es: "Nada salió de esta máquina.", fr: "Rien n'a quitté cette machine.", de: "Nichts hat diese Maschine verlassen.", pt: "Nada saiu desta máquina.", it: "Niente ha lasciato questa macchina.", ja: "この機械からは何も出ていません。", zh: "没有任何东西离开这台机器。", hi: "इस मशीन से कुछ भी बाहर नहीं गया।", ar: "لم يغادر شيء هذا الجهاز.",
+  },
+  "nmd.noredactions": {
+    en: "Nothing was redacted from the brief.", es: "No se tachó nada del encargo.", fr: "Rien n'a été caviardé dans la consigne.", de: "Aus dem Auftrag wurde nichts geschwärzt.", pt: "Nada foi ocultado da incumbência.", it: "Nulla è stato oscurato dall'incarico.", ja: "依頼文から伏せられたものはありません。", zh: "委托中没有任何内容被涂去。", hi: "निर्देश में से कुछ भी नहीं हटाया गया।", ar: "لم يُحجب شيء من التكليف.",
+  },
+  "nmd.redacted.one": {
+    en: "{n} private term stripped from the brief before it went.", es: "{n} término privado retirado del encargo antes de salir.", fr: "{n} terme privé retiré de la consigne avant son départ.", de: "{n} privater Begriff vor dem Weggang aus dem Auftrag entfernt.", pt: "{n} termo privado retirado da incumbência antes de sair.", it: "{n} termine privato tolto dall'incarico prima che partisse.", ja: "出ていく前に、依頼文から非公開の語を {n} 件取り除きました。", zh: "在发出之前，从委托中剔除了 {n} 个私密词条。", hi: "जाने से पहले निर्देश में से {n} निजी शब्द हटाया गया।", ar: "أُزيل مصطلح خاص واحد من التكليف قبل خروجه.",
+  },
+  "nmd.redacted.many": {
+    en: "{n} private terms stripped from the brief before it went.", es: "{n} términos privados retirados del encargo antes de salir.", fr: "{n} termes privés retirés de la consigne avant son départ.", de: "{n} private Begriffe vor dem Weggang aus dem Auftrag entfernt.", pt: "{n} termos privados retirados da incumbência antes de sair.", it: "{n} termini privati tolti dall'incarico prima che partisse.", ja: "出ていく前に、依頼文から非公開の語を {n} 件取り除きました。", zh: "在发出之前，从委托中剔除了 {n} 个私密词条。", hi: "जाने से पहले निर्देश में से {n} निजी शब्द हटाए गए।", ar: "أُزيل {n} مصطلحًا خاصًا من التكليف قبل خروجه.",
+  },
+  "nmd.learned": {
+    en: "Folded back into the profile as a learned source.", es: "Incorporado al perfil como una fuente aprendida.", fr: "Réintégré au profil comme source apprise.", de: "Als gelernte Quelle zurück ins Profil aufgenommen.", pt: "Reintegrado no perfil como fonte aprendida.", it: "Reintegrato nel profilo come fonte appresa.", ja: "学習済みの情報源として、プロフィールに取り込まれました。", zh: "已作为习得来源并回档案中。", hi: "सीखे गए स्रोत के रूप में प्रोफ़ाइल में वापस जोड़ा गया।", ar: "أُعيد دمجه في الملف بوصفه مصدرًا متعلَّمًا.",
+  },
+  "nmd.notlearned": {
+    en: "Not learned — the findings sit here until you let them in.", es: "Sin aprender — los hallazgos se quedan aquí hasta que los dejes entrar.", fr: "Non appris — les trouvailles restent ici jusqu'à ce que vous les laissiez entrer.", de: "Nicht gelernt — die Funde bleiben hier, bis Sie sie hereinlassen.", pt: "Não aprendido — os achados ficam aqui até os deixar entrar.", it: "Non appreso — i risultati restano qui finché non li fai entrare.", ja: "未学習です — 取り込むまで、見つかったことはここに置かれたままです。", zh: "尚未习得——在你放它们进去之前，这些发现就留在这里。", hi: "सीखा नहीं गया — जब तक आप अंदर न आने दें, ये निष्कर्ष यहीं पड़े रहते हैं।", ar: "لم يُتعلَّم — تبقى النتائج هنا إلى أن تسمح لها بالدخول.",
+  },
+  "nmd.lending": {
+    en: "What you are lending and borrowing", es: "Lo que prestas y lo que tomas prestado", fr: "Ce que vous prêtez et ce que vous empruntez", de: "Was Sie verleihen und leihen", pt: "O que empresta e o que pede emprestado", it: "Ciò che presti e ciò che prendi in prestito", ja: "あなたが貸しているものと借りているもの", zh: "你出借的和你借用的", hi: "आप क्या उधार दे रहे हैं और क्या ले रहे हैं", ar: "ما تُعيره وما تستعيره",
+  },
+  "nmd.showmine": {
+    en: "Show mine", es: "Mostrar los míos", fr: "Afficher les miens", de: "Meine anzeigen", pt: "Mostrar os meus", it: "Mostra i miei", ja: "自分のものを表示", zh: "显示我的", hi: "मेरे दिखाएँ", ar: "أظهر ما يخصّني",
+  },
+  "nmd.yoursonly": {
+    en: "Yours only. The route says so in its own words — it acts on somebody's behalf, so it has to know it is them.", es: "Solo los tuyos. La ruta lo dice con sus propias palabras — actúa en nombre de alguien, así que tiene que saber que es esa persona.", fr: "Les vôtres seulement. La route le dit dans ses propres mots — elle agit pour le compte de quelqu'un, elle doit donc savoir que c'est bien lui.", de: "Nur Ihre. Die Route sagt es mit eigenen Worten — sie handelt für jemanden, also muss sie wissen, dass Sie es sind.", pt: "Só os seus. A rota di-lo por palavras suas — age em nome de alguém, por isso tem de saber que é essa pessoa.", it: "Solo i tuoi. La rotta lo dice con parole sue — agisce per conto di qualcuno, quindi deve sapere che sei tu.", ja: "あなたのものだけです。ルート自身がそう言っています — 誰かの代わりに動くのだから、その本人であることを知らなければなりません。", zh: "只有你的。这条路由用它自己的话说了——它是代人行事的，所以它必须知道来者就是本人。", hi: "सिर्फ़ आपके। रास्ता ख़ुद अपने शब्दों में यह कहता है — यह किसी की ओर से काम करता है, इसलिए उसे पता होना चाहिए कि वह वही है।", ar: "ما يخصّك أنت فقط. المسار يقول ذلك بكلماته — إنه يتصرّف نيابةً عن أحد، فعليه أن يعرف أنه هو.",
+  },
+  "nmd.inoneplace": {
+    en: "…and in one place", es: "…y en un solo lugar", fr: "…et en un seul lieu", de: "…und an einem Ort", pt: "…e num só lugar", it: "…e in un solo luogo", ja: "…そして、ひとつの場所で", zh: "……以及在某一个地方", hi: "…और एक ही जगह पर", ar: "…وفي مكان واحد",
+  },
+  "nmd.place.ph": {
+    en: "the place's id", es: "el id del lugar", fr: "l'identifiant du lieu", de: "die ID des Orts", pt: "o id do lugar", it: "l'id del luogo", ja: "その場所の ID", zh: "该地点的 id", hi: "उस जगह की आईडी", ar: "معرّف المكان",
+  },
+  "nmd.look": {
+    en: "Look", es: "Mirar", fr: "Regarder", de: "Ansehen", pt: "Ver", it: "Guarda", ja: "見る", zh: "查看", hi: "देखें", ar: "انظر",
+  },
+  "nmd.noneyours": {
+    en: "None of yours here.", es: "Aquí no hay ninguno tuyo.", fr: "Aucun des vôtres ici.", de: "Keine von Ihnen hier.", pt: "Nenhum seu aqui.", it: "Nessuno dei tuoi qui.", ja: "ここにあなたのものはありません。", zh: "这里没有你的。", hi: "यहाँ आपका कोई नहीं।", ar: "لا شيء لك هنا.",
+  },
+  "lvg.title": {
+    en: "What leaves, and on what terms", es: "Qué sale, y con qué condiciones", fr: "Ce qui part, et à quelles conditions", de: "Was hinausgeht, und zu welchen Bedingungen", pt: "O que sai, e em que termos", it: "Cosa esce, e a quali condizioni", ja: "何が出ていくのか、どんな条件で", zh: "什么会离开，以及以什么条件", hi: "क्या बाहर जाता है, और किन शर्तों पर", ar: "ما الذي يخرج، وبأي شروط",
+  },
+  "lvg.pitch": {
+    en: "Two different kinds of leaving. One sends an exchange with the names taken out; the other sends the profile itself.", es: "Dos maneras distintas de salir. Una envía un intercambio con los nombres quitados; la otra envía el perfil mismo.", fr: "Deux façons différentes de partir. L'une envoie un échange dont les noms ont été retirés ; l'autre envoie le profil lui-même.", de: "Zwei verschiedene Arten des Hinausgehens. Die eine sendet einen Austausch ohne die Namen; die andere sendet das Profil selbst.", pt: "Duas maneiras diferentes de sair. Uma envia uma troca com os nomes retirados; a outra envia o próprio perfil.", it: "Due modi diversi di uscire. Uno manda uno scambio con i nomi tolti; l'altro manda il profilo stesso.", ja: "出ていき方は二種類あります。ひとつは名前を抜いたやり取りを送るもの、もうひとつはプロフィールそのものを送るものです。", zh: "两种不同的离开。一种是把名字去掉后送出一段对话；另一种是把档案本身送出去。", hi: "बाहर जाने के दो अलग तरीक़े। एक में नाम हटाकर एक संवाद भेजा जाता है; दूसरे में प्रोफ़ाइल ख़ुद भेजी जाती है।", ar: "نوعان مختلفان من الخروج. أحدهما يرسل محادثة نُزعت منها الأسماء؛ والآخر يرسل الملف نفسه.",
+  },
+  "lvg.sharedmodel": {
+    en: "The shared model", es: "El modelo compartido", fr: "Le modèle partagé", de: "Das gemeinsame Modell", pt: "O modelo partilhado", it: "Il modello condiviso", ja: "共有モデル", zh: "共享模型", hi: "साझा मॉडल", ar: "النموذج المشترك",
+  },
+  "lvg.gateway": {
+    en: "A gateway is configured on this deployment.", es: "Hay una pasarela configurada en esta instalación.", fr: "Une passerelle est configurée sur ce déploiement.", de: "Auf dieser Installation ist ein Gateway eingerichtet.", pt: "Há um gateway configurado nesta instalação.", it: "Su questa installazione è configurato un gateway.", ja: "この配備にはゲートウェイが設定されています。", zh: "本部署已配置网关。", hi: "इस तैनाती पर एक गेटवे कॉन्फ़िगर किया गया है।", ar: "توجد بوابة مُهيّأة على هذا التنصيب.",
+  },
+  "lvg.nogateway": {
+    en: "No gateway is configured, so nothing can leave even if a profile is opted in.", es: "No hay pasarela configurada, así que no puede salir nada aunque un perfil esté dado de alta.", fr: "Aucune passerelle n'est configurée, donc rien ne peut partir même si un profil a donné son accord.", de: "Es ist kein Gateway eingerichtet, also kann nichts hinausgehen, selbst wenn ein Profil zugestimmt hat.", pt: "Não há gateway configurado, por isso nada pode sair mesmo que um perfil tenha aderido.", it: "Non è configurato alcun gateway, quindi non può uscire nulla nemmeno se un profilo ha aderito.", ja: "ゲートウェイが設定されていないため、プロフィールが参加していても何も出ていけません。", zh: "未配置网关，因此即使某个档案已选择加入，也没有任何东西能离开。", hi: "कोई गेटवे कॉन्फ़िगर नहीं है, इसलिए प्रोफ़ाइल शामिल हो तब भी कुछ बाहर नहीं जा सकता।", ar: "لا توجد بوابة مُهيّأة، فلا شيء يستطيع الخروج حتى لو انضمّ ملف.",
+  },
+  "lvg.fallsback": {
+    en: "Falls back to {to}. {note}", es: "Recurre a {to}. {note}", fr: "Se rabat sur {to}. {note}", de: "Weicht auf {to} aus. {note}", pt: "Recorre a {to}. {note}", it: "Ripiega su {to}. {note}", ja: "{to} にフォールバックします。{note}", zh: "回退到 {to}。{note}", hi: "{to} पर लौट जाता है। {note}", ar: "يرجع إلى {to}. {note}",
+  },
+  "lvg.contributing": {
+    en: "Contributing", es: "Contribuir", fr: "Contribution", de: "Beitragen", pt: "Contribuir", it: "Contribuire", ja: "提供について", zh: "参与贡献", hi: "योगदान", ar: "المساهمة",
+  },
+  "lvg.profileis": {
+    en: "This profile is {state}.", es: "Este perfil está {state}.", fr: "Ce profil est {state}.", de: "Dieses Profil ist {state}.", pt: "Este perfil está {state}.", it: "Questo profilo è {state}.", ja: "このプロフィールは{state}です。", zh: "此档案已{state}。", hi: "यह प्रोफ़ाइल {state} है।", ar: "هذا الملف {state}.",
+  },
+  "lvg.optedin": {
+    en: "opted in", es: "dado de alta", fr: "inscrit", de: "zugestimmt", pt: "aderido", it: "aderito", ja: "参加中", zh: "选择加入", hi: "शामिल", ar: "منضمّ",
+  },
+  "lvg.optedout": {
+    en: "opted out", es: "dado de baja", fr: "retiré", de: "abgemeldet", pt: "fora", it: "non aderito", ja: "不参加", zh: "选择退出", hi: "बाहर", ar: "غير منضمّ",
+  },
+  "lvg.wouldleave.on": {
+    en: "What would leave on the next thumbs-up", es: "Qué saldría con el próximo pulgar arriba", fr: "Ce qui partirait au prochain pouce levé", de: "Was beim nächsten Daumen hoch hinausginge", pt: "O que sairia no próximo polegar para cima", it: "Cosa uscirebbe al prossimo pollice in su", ja: "次に高評価を押したとき、何が出ていくか", zh: "下一次点赞时会送出什么", hi: "अगली बार अंगूठा दिखाने पर क्या बाहर जाएगा", ar: "ما الذي سيخرج عند الإعجاب التالي",
+  },
+  "lvg.wouldleave.off": {
+    en: "What would leave if you turned this back on", es: "Qué saldría si volvieras a activarlo", fr: "Ce qui partirait si vous réactiviez ceci", de: "Was hinausginge, wenn Sie das wieder einschalten", pt: "O que sairia se voltasse a ligar isto", it: "Cosa uscirebbe se lo riattivassi", ja: "これをもう一度有効にしたら、何が出ていくか", zh: "如果你重新打开这个，会送出什么", hi: "अगर आप इसे फिर चालू करें तो क्या बाहर जाएगा", ar: "ما الذي سيخرج لو أعدت تشغيل هذا",
+  },
+  "lvg.dryrun": {
+    en: "A dry run — nothing has been sent to produce this.", es: "Un simulacro — no se ha enviado nada para producir esto.", fr: "Un essai à blanc — rien n'a été envoyé pour produire ceci.", de: "Ein Trockenlauf — es wurde nichts gesendet, um dies zu erzeugen.", pt: "Um ensaio — nada foi enviado para produzir isto.", it: "Una prova a vuoto — non è stato inviato nulla per produrre questo.", ja: "これは予行です — これを作るために何も送信していません。", zh: "这是一次试运行——为生成它，什么都没有被送出。", hi: "यह केवल पूर्वाभ्यास है — इसे बनाने के लिए कुछ भी भेजा नहीं गया।", ar: "هذه تجربة على الورق — لم يُرسل شيء لإنتاجها.",
+  },
+  "lvg.optedoutnote": {
+    en: "This profile is opted out, so nothing is going anywhere.", es: "Este perfil está dado de baja, así que no va nada a ninguna parte.", fr: "Ce profil est retiré, donc rien ne va nulle part.", de: "Dieses Profil ist abgemeldet, also geht nichts irgendwohin.", pt: "Este perfil está fora, por isso nada vai a lado nenhum.", it: "Questo profilo non ha aderito, quindi non va nulla da nessuna parte.", ja: "このプロフィールは不参加なので、どこにも何も出ていきません。", zh: "此档案已选择退出，所以什么都不会去到任何地方。", hi: "यह प्रोफ़ाइल बाहर है, इसलिए कुछ भी कहीं नहीं जा रहा।", ar: "هذا الملف غير منضمّ، فلا شيء ذاهب إلى أي مكان.",
+  },
+  "lvg.personareplaced": {
+    en: "Note the persona name is already replaced. That is what the gateway would receive, not a summary of it.", es: "Fíjate en que el nombre de la persona ya está sustituido. Eso es lo que recibiría la pasarela, no un resumen de ello.", fr: "Notez que le nom du personnage est déjà remplacé. C'est ce que recevrait la passerelle, non un résumé.", de: "Beachten Sie: Der Personenname ist bereits ersetzt. Genau das bekäme das Gateway, keine Zusammenfassung davon.", pt: "Repare que o nome da persona já está substituído. É isso que o gateway receberia, não um resumo disso.", it: "Nota che il nome della persona è già sostituito. È questo che riceverebbe il gateway, non un riassunto.", ja: "ペルソナ名がすでに置き換えられていることに注目してください。ゲートウェイが受け取るのはこれそのもので、その要約ではありません。", zh: "请注意，角色名已经被替换掉了。网关收到的就是这个，而不是它的摘要。", hi: "ध्यान दें कि व्यक्तित्व का नाम पहले ही बदल दिया गया है। गेटवे को यही मिलेगा, इसका सारांश नहीं।", ar: "لاحظ أن اسم الشخصية مُستبدَل بالفعل. هذا ما ستتلقّاه البوابة، لا خلاصة عنه.",
+  },
+  "lvg.actuallyleft": {
+    en: "What has actually left", es: "Lo que ha salido de verdad", fr: "Ce qui est réellement parti", de: "Was tatsächlich hinausgegangen ist", pt: "O que saiu de facto", it: "Cosa è uscito davvero", ja: "実際に出ていったもの", zh: "实际已经离开的", hi: "जो सचमुच बाहर गया", ar: "ما خرج فعلًا",
+  },
+  "lvg.nothingever": {
+    en: "Nothing, ever.", es: "Nada, nunca.", fr: "Rien, jamais.", de: "Nichts, nie.", pt: "Nada, nunca.", it: "Niente, mai.", ja: "何も、一度も。", zh: "从来没有。", hi: "कुछ भी नहीं, कभी नहीं।", ar: "لا شيء، قط.",
+  },
+  "lvg.deletionrequested": {
+    en: "· deletion requested", es: "· borrado solicitado", fr: "· suppression demandée", de: "· Löschung angefordert", pt: "· eliminação pedida", it: "· cancellazione richiesta", ja: "· 削除を依頼済み", zh: "· 已请求删除", hi: "· हटाने का अनुरोध", ar: "· طُلب الحذف",
+  },
+  "lvg.stopandtake": {
+    en: "Stop, and take back what has left", es: "Parar, y recuperar lo que ha salido", fr: "Arrêter, et reprendre ce qui est parti", de: "Beenden und zurückholen, was hinausgegangen ist", pt: "Parar, e recuperar o que saiu", it: "Ferma, e riprenditi ciò che è uscito", ja: "やめて、出ていったものを取り戻す", zh: "停止，并取回已经离开的", hi: "रोकें, और जो बाहर गया उसे वापस लें", ar: "أوقِف، واسترجع ما خرج",
+  },
+  "lvg.stopped": {
+    en: "Stopped.", es: "Detenido.", fr: "Arrêté.", de: "Beendet.", pt: "Parado.", it: "Fermato.", ja: "やめました。", zh: "已停止。", hi: "रोक दिया गया।", ar: "أُوقِف.",
+  },
+  "lvg.nothinghadleft": {
+    en: "Nothing had ever left, so there was nothing to delete.", es: "Nunca había salido nada, así que no había nada que borrar.", fr: "Rien n'était jamais parti, il n'y avait donc rien à supprimer.", de: "Es war nie etwas hinausgegangen, also gab es nichts zu löschen.", pt: "Nunca tinha saído nada, por isso não havia nada para apagar.", it: "Non era mai uscito nulla, quindi non c'era niente da cancellare.", ja: "そもそも何も出ていなかったので、削除するものはありませんでした。", zh: "从来没有任何东西离开过，所以没有什么可删除的。", hi: "कभी कुछ बाहर गया ही नहीं था, इसलिए हटाने को कुछ था ही नहीं।", ar: "لم يكن قد خرج شيء قط، فلم يكن هناك ما يُحذف.",
+  },
+  "lvg.deletedatgateway": {
+    en: "{n} item(s) requested deleted at the gateway.", es: "Se ha pedido borrar {n} elemento(s) en la pasarela.", fr: "Suppression de {n} élément(s) demandée à la passerelle.", de: "Löschung von {n} Eintrag/Einträgen am Gateway angefordert.", pt: "Pedido o apagamento de {n} item(ns) no gateway.", it: "Richiesta la cancellazione di {n} elemento/i al gateway.", ja: "ゲートウェイに {n} 件の削除を依頼しました。", zh: "已请求在网关删除 {n} 项。", hi: "गेटवे पर {n} वस्तु(एँ) हटाने का अनुरोध किया गया।", ar: "طُلب حذف {n} عنصرًا عند البوابة.",
+  },
+  "lvg.markedrevoked": {
+    en: "{n} item(s) are marked revoked here, but no gateway was reachable to delete them.", es: "{n} elemento(s) están marcados como revocados aquí, pero no se pudo alcanzar ninguna pasarela para borrarlos.", fr: "{n} élément(s) sont marqués révoqués ici, mais aucune passerelle n'était joignable pour les supprimer.", de: "{n} Eintrag/Einträge sind hier als widerrufen markiert, aber kein Gateway war erreichbar, um sie zu löschen.", pt: "{n} item(ns) estão marcados como revogados aqui, mas nenhum gateway estava acessível para os apagar.", it: "{n} elemento/i risultano revocati qui, ma nessun gateway era raggiungibile per cancellarli.", ja: "ここでは {n} 件を取り消し済みとしましたが、削除を依頼できるゲートウェイに届きませんでした。", zh: "此处已将 {n} 项标记为撤回，但没有可联系到的网关来删除它们。", hi: "यहाँ {n} वस्तु(एँ) रद्द के रूप में चिह्नित हैं, पर उन्हें हटाने के लिए कोई गेटवे पहुँच में नहीं था।", ar: "وُسم {n} عنصرًا بالإلغاء هنا، لكن لم تكن هناك بوابة يمكن بلوغها لحذفها.",
+  },
+  "lvg.licensing": {
+    en: "Licensing a profile", es: "Licenciar un perfil", fr: "Concéder une licence sur un profil", de: "Ein Profil lizenzieren", pt: "Licenciar um perfil", it: "Concedere in licenza un profilo", ja: "プロフィールのライセンス", zh: "为档案授权", hi: "प्रोफ़ाइल का लाइसेंस", ar: "ترخيص ملف",
+  },
+  "lvg.consult": {
+    en: "consult", es: "de consulta", fr: "de consultation", de: "Beratungs", pt: "de consulta", it: "di consultazione", ja: "相談用", zh: "咨询型", hi: "परामर्श", ar: "استشارة",
+  },
+  "lvg.otherkind": {
+    en: "The other kind of leaving. A {consult} licence buys time with the profile; a licence that permits derivatives lets you build a new agent seeded from its persona, owned by you and marked with where it came from.", es: "La otra manera de salir. Una licencia {consult} compra tiempo con el perfil; una licencia que permite derivados te deja construir un agente nuevo sembrado desde su persona, tuyo y marcado con su procedencia.", fr: "L'autre façon de partir. Une licence {consult} achète du temps avec le profil ; une licence autorisant les dérivés vous laisse construire un nouvel agent issu de son personnage, vous appartenant et marqué de son origine.", de: "Die andere Art des Hinausgehens. Eine {consult}-Lizenz kauft Zeit mit dem Profil; eine Lizenz, die Ableitungen erlaubt, lässt Sie einen neuen Agenten aus seiner Persona aufbauen, Ihnen gehörend und mit seiner Herkunft gekennzeichnet.", pt: "A outra maneira de sair. Uma licença {consult} compra tempo com o perfil; uma licença que permite derivados deixa-o construir um novo agente semeado a partir da sua persona, seu e marcado com a proveniência.", it: "L'altro modo di uscire. Una licenza {consult} compra tempo con il profilo; una licenza che permette derivati ti lascia costruire un nuovo agente seminato dalla sua persona, tuo e marcato con la provenienza.", ja: "もうひとつの出ていき方です。{consult}ライセンスはプロフィールとの時間を買うもの。派生を許すライセンスなら、そのペルソナを種にした新しいエージェントを作れます — あなたの所有となり、どこから来たかが刻まれます。", zh: "另一种离开。{consult}许可买的是与该档案相处的时间；允许衍生的许可则让你以它的角色为种子构建一个新的智能体，归你所有，并标明它从何而来。", hi: "बाहर जाने का दूसरा तरीक़ा। {consult} लाइसेंस प्रोफ़ाइल के साथ समय ख़रीदता है; और जो लाइसेंस व्युत्पत्ति की इजाज़त देता है, वह आपको उसके व्यक्तित्व से बीजित एक नया एजेंट बनाने देता है — आपका अपना, और यह अंकित कि वह कहाँ से आया।", ar: "الوجه الآخر للخروج. ترخيص {consult} يشتري وقتًا مع الملف؛ أما الترخيص الذي يسمح بالاشتقاق فيتيح لك بناء وكيل جديد مبذور من شخصيته، تملكه أنت، وموسوم بمصدره.",
+  },
+  "lvg.buying": {
+    en: "Buying one needs your token as a person, not as a profile's owner. A licence permitting derivatives is refused to a buyer under 18 at the till rather than at delivery — the fee moves when the licence is sold.", es: "Comprar una requiere tu token como persona, no como propietario de un perfil. Una licencia que permite derivados se le rechaza a quien tiene menos de 18 en la caja y no en la entrega — la tarifa se mueve cuando se vende la licencia.", fr: "En acheter une exige votre jeton en tant que personne, non en tant que propriétaire d'un profil. Une licence autorisant les dérivés est refusée à un acheteur de moins de 18 ans à la caisse plutôt qu'à la livraison — les frais bougent au moment de la vente.", de: "Eine zu kaufen verlangt Ihr Token als Person, nicht als Profilbesitzer. Eine Lizenz, die Ableitungen erlaubt, wird Käufer:innen unter 18 an der Kasse verweigert statt bei der Lieferung — das Entgelt fließt beim Verkauf.", pt: "Comprar uma exige o seu token como pessoa, não como proprietário de um perfil. Uma licença que permite derivados é recusada a um comprador com menos de 18 anos na caixa e não na entrega — a taxa move-se quando a licença é vendida.", it: "Comprarne una richiede il tuo token come persona, non come proprietario di un profilo. Una licenza che permette derivati viene rifiutata a un acquirente sotto i 18 anni alla cassa e non alla consegna — il compenso si muove quando la licenza è venduta.", ja: "購入には、プロフィール所有者としてではなく、一人の人としてのトークンが要ります。派生を許すライセンスは、引き渡しの時ではなくレジの時点で 18 歳未満の購入者に断られます — 料金はライセンスが売れた時に動くからです。", zh: "购买它需要你作为个人的令牌，而不是作为档案所有者的令牌。允许衍生的许可，会在收银台而不是在交付时拒绝未满 18 岁的买家——因为费用是在许可售出时就转移的。", hi: "इसे ख़रीदने के लिए प्रोफ़ाइल-स्वामी नहीं, बल्कि एक व्यक्ति के रूप में आपका टोकन चाहिए। व्युत्पत्ति की इजाज़त देने वाला लाइसेंस 18 से कम उम्र के ख़रीदार को सुपुर्दगी पर नहीं, काउंटर पर ही मना कर दिया जाता है — क्योंकि शुल्क लाइसेंस बिकते ही चला जाता है।", ar: "شراؤه يتطلّب رمزك بصفتك شخصًا، لا بصفتك مالك ملف. والترخيص الذي يسمح بالاشتقاق يُرفض لمشترٍ دون الثامنة عشرة عند الدفع لا عند التسليم — لأن الأجر ينتقل حين يُباع الترخيص.",
+  },
+  "lvg.subject.ph": {
+    en: "the profile to license", es: "el perfil a licenciar", fr: "le profil à licencier", de: "das zu lizenzierende Profil", pt: "o perfil a licenciar", it: "il profilo da licenziare", ja: "ライセンスするプロフィール", zh: "要授权的档案", hi: "जिस प्रोफ़ाइल का लाइसेंस लेना है", ar: "الملف المراد ترخيصه",
+  },
+  "lvg.acquire": {
+    en: "Acquire a licence", es: "Adquirir una licencia", fr: "Acquérir une licence", de: "Eine Lizenz erwerben", pt: "Adquirir uma licença", it: "Acquisisci una licenza", ja: "ライセンスを取得", zh: "取得许可", hi: "लाइसेंस लें", ar: "احصل على ترخيص",
+  },
+  "lvg.acquired": {
+    en: "Acquired.", es: "Adquirida.", fr: "Acquise.", de: "Erworben.", pt: "Adquirida.", it: "Acquisita.", ja: "取得しました。", zh: "已取得。", hi: "ले लिया गया।", ar: "تمّ الحصول عليه.",
+  },
+  "lvg.keeptoken": {
+    en: "Keep the licence token: {token}", es: "Guarda el token de la licencia: {token}", fr: "Conservez le jeton de licence : {token}", de: "Bewahren Sie das Lizenz-Token auf: {token}", pt: "Guarde o token da licença: {token}", it: "Conserva il token della licenza: {token}", ja: "ライセンスのトークンを保管してください: {token}", zh: "请保存许可令牌：{token}", hi: "लाइसेंस टोकन सँभालकर रखें: {token}", ar: "احتفظ برمز الترخيص: {token}",
+  },
+  "lvg.derive": {
+    en: "Derive an agent from it", es: "Derivar un agente de ella", fr: "En dériver un agent", de: "Einen Agenten daraus ableiten", pt: "Derivar um agente dela", it: "Derivane un agente", ja: "これからエージェントを派生させる", zh: "由它衍生一个智能体", hi: "इससे एक एजेंट बनाएँ", ar: "اشتقّ منه وكيلًا",
+  },
+  "lvg.derived": {
+    en: "Derived.", es: "Derivado.", fr: "Dérivé.", de: "Abgeleitet.", pt: "Derivado.", it: "Derivato.", ja: "派生しました。", zh: "已衍生。", hi: "बना दिया गया।", ar: "تمّ الاشتقاق.",
+  },
+  "lvg.consultonly": {
+    en: "Consult only — this licence does not permit deriving an agent, and the button is absent rather than present and refused.", es: "Solo consulta — esta licencia no permite derivar un agente, y el botón está ausente en lugar de presente y rechazado.", fr: "Consultation seule — cette licence ne permet pas de dériver un agent, et le bouton est absent plutôt que présent et refusé.", de: "Nur Beratung — diese Lizenz erlaubt kein Ableiten eines Agenten, und die Schaltfläche fehlt, statt da zu sein und abzulehnen.", pt: "Só consulta — esta licença não permite derivar um agente, e o botão está ausente em vez de presente e recusado.", it: "Solo consultazione — questa licenza non permette di derivare un agente, e il pulsante è assente anziché presente e rifiutato.", ja: "相談のみです — このライセンスではエージェントを派生できません。ボタンは、あって断るのではなく、そもそも置かれていません。", zh: "仅限咨询——此许可不允许衍生智能体，因此按钮是不存在的，而不是存在却被拒绝。", hi: "केवल परामर्श — यह लाइसेंस एजेंट बनाने की इजाज़त नहीं देता, और बटन मौजूद होकर मना करने के बजाय है ही नहीं।", ar: "للاستشارة فقط — هذا الترخيص لا يسمح باشتقاق وكيل، ولذلك لا وجود للزر أصلًا بدل أن يوجد ثم يرفض.",
+  },
+  "lvg.newprofile": {
+    en: "New profile {id}, yours, licensed from {src}.", es: "Perfil nuevo {id}, tuyo, licenciado desde {src}.", fr: "Nouveau profil {id}, le vôtre, sous licence de {src}.", de: "Neues Profil {id}, Ihres, lizenziert von {src}.", pt: "Perfil novo {id}, seu, licenciado a partir de {src}.", it: "Nuovo profilo {id}, tuo, licenziato da {src}.", ja: "新しいプロフィール {id}。あなたのもので、{src} からのライセンスです。", zh: "新档案 {id}，归你所有，授权自 {src}。", hi: "नई प्रोफ़ाइल {id}, आपकी, {src} से लाइसेंस पर।", ar: "ملف جديد {id}، ملكك، مرخَّص من {src}.",
+  },
+  "lvg.keepowner": {
+    en: "Keep this owner token — it is shown once: {token}", es: "Guarda este token de propietario — se muestra una sola vez: {token}", fr: "Conservez ce jeton de propriétaire — il n'est affiché qu'une fois : {token}", de: "Bewahren Sie dieses Besitzer-Token auf — es wird nur einmal gezeigt: {token}", pt: "Guarde este token de proprietário — só é mostrado uma vez: {token}", it: "Conserva questo token di proprietario — viene mostrato una sola volta: {token}", ja: "この所有者トークンを保管してください — 表示されるのは一度だけです: {token}", zh: "请保存这个所有者令牌——它只显示一次：{token}", hi: "यह स्वामी-टोकन सँभालकर रखें — यह एक ही बार दिखाया जाता है: {token}", ar: "احتفظ برمز المالك هذا — يُعرض مرة واحدة فقط: {token}",
+  },
+  "lvg.oneagent": {
+    en: "One agent per licence. Deriving again from the same grant is a 409, because a licence was sold for one.", es: "Un agente por licencia. Derivar otra vez de la misma cesión da un 409, porque se vendió una licencia para uno.", fr: "Un agent par licence. Dériver à nouveau depuis la même concession donne un 409, car une licence a été vendue pour un seul.", de: "Ein Agent pro Lizenz. Erneut aus derselben Gewährung abzuleiten ergibt ein 409, denn verkauft wurde eine Lizenz für einen.", pt: "Um agente por licença. Derivar outra vez da mesma cessão dá um 409, porque foi vendida uma licença para um.", it: "Un agente per licenza. Derivare di nuovo dalla stessa concessione dà un 409, perché una licenza è stata venduta per uno.", ja: "ライセンス一件につきエージェントは一体です。同じ許諾から再び派生させると 409 になります。ひとつ分として売られたライセンスだからです。", zh: "每份许可只对应一个智能体。用同一份授权再次衍生会返回 409，因为这份许可是按一个卖出的。", hi: "एक लाइसेंस पर एक ही एजेंट। उसी ग्रांट से दोबारा बनाने पर 409 मिलता है, क्योंकि लाइसेंस एक के लिए बेचा गया था।", ar: "وكيل واحد لكل ترخيص. والاشتقاق مرة أخرى من المنحة نفسها يعطي 409، لأن الترخيص بيع لواحد.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

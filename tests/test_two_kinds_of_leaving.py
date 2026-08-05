@@ -131,7 +131,15 @@ def test_the_screen_labels_the_preview_by_whether_it_is_opted_in():
     conversation is leaving."""
     src = _markup("app/src/screens/Leaving.tsx")
     assert "view.opted_in" in src
-    assert "would leave if you turned this back on" in src
+    # The heading moved into the l10n table, so the screen is asked for the
+    # two lookups and the table is asked for the English. Matching the
+    # sentence in the screen would now succeed off the key name alone —
+    # `lvg.wouldleave.off` contains none of the words that matter.
+    assert 'tr("lvg.wouldleave.on", lang)' in src
+    assert 'tr("lvg.wouldleave.off", lang)' in src
+    l10n = _markup("app/src/l10n.ts")
+    assert "would leave if you turned this back on" in l10n
+    assert "would leave on the next thumbs-up" in l10n
 
 
 # --- taking it back ---------------------------------------------------------
