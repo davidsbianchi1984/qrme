@@ -369,6 +369,43 @@ public sealed partial class PeoplePage : Page
         WristActionBox.Text = "advance";
         WristInputBox.Header = L10n.T("wrist.input");
         WristActButton.Content = L10n.T("wrist.act");
+        AcctTitle.Text = L10n.T("acct.title");
+        AcctEmailBox.Header = L10n.T("acct.email");
+        AcctNameBox.Header = L10n.T("acct.name");
+        AcctSignupButton.Content = L10n.T("acct.signup");
+        AcctSigninButton.Content = L10n.T("acct.signin");
+        AcctCodeBox.Header = L10n.T("acct.code");
+        AcctVerifyButton.Content = L10n.T("acct.verify");
+        AcctResendButton.Content = L10n.T("acct.resend");
+        AcctResetRequestButton.Content = L10n.T("acct.reset.request");
+        AcctResetButton.Content = L10n.T("acct.reset.do");
+        AcctOauthButton.Content = L10n.T("acct.oauth");
+        AcctOauthClaimButton.Content = "\u21bb";
+        TillTitle.Text = L10n.T("till.title");
+        TillPlansButton.Content = L10n.T("till.plans");
+        TillSubsButton.Content = L10n.T("till.subs");
+        TillOrdersButton.Content = L10n.T("till.orders");
+        TillSubIdBox.Header = L10n.T("wrist.id");
+        TillBeneficiaryBox.Header = L10n.T("till.beneficiary");
+        TillRenewButton.Content = L10n.T("till.renew");
+        TillProceedsButton.Content = L10n.T("till.proceeds");
+        TillCampaignsButton.Content = L10n.T("till.campaigns");
+        TillDesigneeBox.Header = L10n.T("till.designees");
+        TillSetButton.Content = L10n.T("till.set");
+        TillCampTitleBox.Header = L10n.T("till.camp.title");
+        TillCampGoalBox.Header = L10n.T("till.camp.goal");
+        TillCampAddButton.Content = L10n.T("till.camp.add");
+        LifeTitle.Text = L10n.T("life.title");
+        LifeCloudButton.Content = L10n.T("life.cloud");
+        LifeOfflineButton.Content = L10n.T("life.offline");
+        LifeLightsButton.Content = L10n.T("life.lights");
+        LifeTopicsButton.Content = L10n.T("life.help.topics");
+        LifeQuestionBox.Header = L10n.T("life.help");
+        LifeAskButton.Content = L10n.T("life.help.ask");
+        LifeProvidersButton.Content = L10n.T("life.providers");
+        LifeProvNameBox.Header = L10n.T("life.prov.name");
+        LifeProvAreaBox.Header = L10n.T("life.prov.area");
+        LifeProvAddButton.Content = L10n.T("life.prov.add");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -1995,5 +2032,202 @@ public sealed partial class PeoplePage : Page
                 WristInputBox.Text.Trim(), AppState.Current.Token!);
             WristInputBox.Text = "";
             StatusText.Text = outp.Status ?? "";
+        });
+
+    private string _oauthState = "";
+
+    private async void OnAcctSignup(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Signup(
+                AcctEmailBox.Text.Trim(), AcctPasswordBox.Password,
+                AcctNameBox.Text.Trim());
+            StatusText.Text = outp.CodeDelivery ?? "";
+        });
+
+    private async void OnAcctSignin(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Signin(
+                AcctEmailBox.Text.Trim(), AcctPasswordBox.Password);
+            StatusText.Text = outp.DisplayName ?? outp.Email ?? "";
+        });
+
+    private async void OnAcctVerify(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.VerifyEmail(
+                AcctEmailBox.Text.Trim(), AcctCodeBox.Text.Trim());
+            StatusText.Text = outp.Email ?? "";
+        });
+
+    private async void OnAcctResend(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ResendCode(
+                AcctEmailBox.Text.Trim());
+            StatusText.Text = outp.CodeDelivery ?? "";
+        });
+
+    private async void OnAcctResetRequest(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RequestPasswordReset(
+                AcctEmailBox.Text.Trim());
+            StatusText.Text = outp.CodeDelivery ?? "";
+        });
+
+    private async void OnAcctReset(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ResetPassword(
+                AcctEmailBox.Text.Trim(), AcctCodeBox.Text.Trim(),
+                AcctNewPasswordBox.Password);
+            AcctNewPasswordBox.Password = "";
+            StatusText.Text = outp.Reset == true ? "\u2713" : "";
+        });
+
+    private async void OnAcctOauth(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var doors = await ApiClient.Shared.OAuthProviders();
+            if (doors.Providers.Length == 0) { StatusText.Text = "\u2014"; return; }
+            var start = await ApiClient.Shared.OAuthStart(
+                doors.Providers[0].Provider);
+            _oauthState = start.State ?? "";
+            StatusText.Text = doors.Providers[0].Provider + " \u00b7 "
+                + (start.AuthorizeUrl ?? "");
+        });
+
+    private async void OnAcctOauthClaim(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.OAuthClaim(_oauthState);
+            StatusText.Text = outp.Ready == true
+                ? (outp.Email ?? "\u2713") : "\u2026";
+        });
+
+    private async void OnTillPlans(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Plans();
+            StatusText.Text = string.Join(" \u00b7 ",
+                outp.Plans.Select(pl => pl.Plan));
+        });
+
+    private async void OnTillSubs(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.MySubscriptions(
+                AppState.Current.Token!);
+            StatusText.Text = outp.Subscriptions.Length.ToString();
+        });
+
+    private async void OnTillOrders(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.MyOrders(
+                AppState.Current.Token!);
+            StatusText.Text = outp.Orders.Length.ToString();
+        });
+
+    private async void OnTillRenew(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RenewSubscription(
+                TillSubIdBox.Text.Trim(), TillBeneficiaryBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = (outp.Periods ?? 0).ToString();
+        });
+
+    private async void OnTillProceeds(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ProceedsOf(
+                AppState.Current.Pid!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                outp.ProceedsTo.Select(d => d.Name));
+        });
+
+    private async void OnTillSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.SetProceeds(AppState.Current.Pid!,
+                TillDesigneeBox.Text.Trim(), AppState.Current.Token!);
+            TillDesigneeBox.Text = "";
+            StatusText.Text = "\u2713";
+        });
+
+    private async void OnTillCampaigns(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.CampaignsOf(
+                AppState.Current.Pid!);
+            StatusText.Text = outp.Length.ToString();
+        });
+
+    private async void OnTillCampAdd(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            double.TryParse(TillCampGoalBox.Text.Trim(), out var goal);
+            var outp = await ApiClient.Shared.AddCampaign(
+                AppState.Current.Pid!, TillCampTitleBox.Text.Trim(), goal,
+                AppState.Current.Token!);
+            TillCampTitleBox.Text = ""; TillCampGoalBox.Text = "";
+            StatusText.Text = outp.Title ?? outp.Id;
+        });
+
+    private async void OnLifeCloud(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.CloudStatus();
+            StatusText.Text = (outp.Cloud ? "\u2601" : "\u2014")
+                + " \u00b7 " + (outp.Fallback ?? "");
+        });
+
+    private async void OnLifeOffline(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.OfflineStatus();
+            StatusText.Text = outp.Provider ?? "";
+        });
+
+    private async void OnLifeLights(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.AgentLights();
+            StatusText.Text = string.Join(" \u00b7 ", outp.Order);
+        });
+
+    private async void OnLifeTopics(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.HelpTopics();
+            StatusText.Text = outp.Topics.Length.ToString();
+        });
+
+    private async void OnLifeAsk(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.AskHelp(
+                LifeQuestionBox.Text.Trim());
+            LifeQuestionBox.Text = "";
+            StatusText.Text = outp.Answer;
+        });
+
+    private async void OnLifeProviders(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.LocalProviders();
+            StatusText.Text = outp.Length.ToString();
+        });
+
+    private async void OnLifeProvAdd(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.AddLocalProvider(
+                LifeProvNameBox.Text.Trim(), LifeProvAreaBox.Text.Trim());
+            LifeProvNameBox.Text = ""; LifeProvAreaBox.Text = "";
+            StatusText.Text = outp.Name ?? outp.Id;
         });
 }

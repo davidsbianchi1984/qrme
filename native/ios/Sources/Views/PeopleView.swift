@@ -238,6 +238,9 @@ struct PeopleSection: View {
                 EmbodimentSection()
                 SteeringSection()
                 WristSection()
+                KeysSection()
+                TillSection()
+                LifelineSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

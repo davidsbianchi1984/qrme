@@ -4,6 +4,31 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.0] — 2026-08-05
+
+### The keys, the till and the lifeline
+
+Three more blocks off the per-shell doorless record — the account
+(signup, sign-in, the emailed code, the password reset, the OAuth
+doors), the money (the price list, subscriptions, orders, proceeds and
+campaigns) and the app's own status and help. Every one is the frame
+around the product rather than the product: the key that gets you in,
+the till that takes your money, and the line you pull when neither
+works. Until this cut a phone could hold a profile in its hand and
+still have to borrow a desktop to make an account, read a price, or
+ask what a light means.
+
+Twenty-four routes gain doors on iOS, Android and Windows — **72 rows
+struck**; the records fall to ios 45 / android 49 / windows 48, under
+a guard that renders the rules rather than inventing them: the address
+is proven before sign-in works; no button is an address oracle; a
+reset kills every old session; the price list is public and generated
+from the same table the gate reads; nothing bills on a timer; a donor
+gives to the names on the proceeds list and a campaign cannot open
+until those names exist; help writes nothing and is public on purpose.
+Forty interface strings arrive in all ten languages on all three
+shells.
+
 ## [0.43.9] — 2026-08-05
 
 ### The face it shows the world

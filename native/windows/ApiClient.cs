@@ -2957,6 +2957,124 @@ public sealed class ApiClient
         return Send<WatchActOut>(Post($"/profiles/{profileId}/watch/act",
             body, token));
     }
+
+    // -- The keys: the account itself --
+
+    public Task<SignupOut> Signup(string email, string password,
+        string name)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, string>
+        { ["email"] = email, ["password"] = password };
+        if (name.Length > 0) body["display_name"] = name;
+        return Send<SignupOut>(Post("/signup", body));
+    }
+
+    /// <summary>Unknown address and wrong password get the same answer;
+    /// an unverified address cannot sign in at all.</summary>
+    public Task<SessionOut> Signin(string email, string password) =>
+        Send<SessionOut>(Post("/signin", new { email, password }));
+
+    public Task<SessionOut> VerifyEmail(string email, string code) =>
+        Send<SessionOut>(Post("/verify-email", new { email, code }));
+
+    /// <summary>Not an address oracle: same answer either way.</summary>
+    public Task<CodeDeliveryOut> ResendCode(string email) =>
+        Send<CodeDeliveryOut>(Post("/verify-email/resend", new { email }));
+
+    public Task<CodeDeliveryOut> RequestPasswordReset(string email) =>
+        Send<CodeDeliveryOut>(Post("/password/reset/request",
+            new { email }));
+
+    /// <summary>Every existing account session dies with the old
+    /// password.</summary>
+    public Task<ResetOut> ResetPassword(string email, string code,
+        string newPassword) =>
+        Send<ResetOut>(Post("/password/reset",
+            new System.Collections.Generic.Dictionary<string, string>
+            { ["email"] = email, ["code"] = code,
+              ["new_password"] = newPassword }));
+
+    public Task<OAuthProviderList> OAuthProviders() =>
+        Send<OAuthProviderList>(Get("/auth/oauth/providers"));
+
+    public Task<OAuthStartOut> OAuthStart(string provider) =>
+        Send<OAuthStartOut>(Post($"/auth/oauth/{provider}/start",
+            new { }));
+
+    /// <summary>One-time pickup; the first successful claim spends the
+    /// state.</summary>
+    public Task<OAuthClaimOut> OAuthClaim(string state) =>
+        Send<OAuthClaimOut>(Get("/auth/oauth/claim?state=" +
+            Uri.EscapeDataString(state)));
+
+    // -- The till --
+
+    /// <summary>Public: the terms are readable before any sign-in.</summary>
+    public Task<PlanCatalog> Plans() => Send<PlanCatalog>(Get("/plans"));
+
+    public Task<SubscriptionList> MySubscriptions(string token) =>
+        Send<SubscriptionList>(Get("/subscriptions", token));
+
+    /// <summary>Explicit on purpose: nothing bills on a timer.</summary>
+    public Task<SubscriptionRow> RenewSubscription(string subId,
+        string beneficiary, string token) =>
+        Send<SubscriptionRow>(Post($"/subscriptions/{subId}/renew",
+            new { beneficiary }, token));
+
+    public Task<OrderList> MyOrders(string token) =>
+        Send<OrderList>(Get("/orders", token));
+
+    /// <summary>Public: a donor gives to the names on this list, not the
+    /// platform.</summary>
+    public Task<ProceedsCard> ProceedsOf(string profileId) =>
+        Send<ProceedsCard>(Get($"/profiles/{profileId}/proceeds"));
+
+    public Task<ProceedsCard> SetProceeds(string profileId, string designee,
+        string token)
+    {
+        var d = new System.Collections.Generic.Dictionary<string, object>
+        { ["name"] = designee, ["kind"] = "loved_one", ["share"] = 100 };
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/proceeds")
+        { Content = JsonContent.Create(new { designees = new[] { d } }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ProceedsCard>(req);
+    }
+
+    public Task<CampaignRow[]> CampaignsOf(string profileId) =>
+        Send<CampaignRow[]>(Get($"/profiles/{profileId}/campaigns"));
+
+    public Task<CampaignRow> AddCampaign(string profileId, string title,
+        double goal, string token) =>
+        Send<CampaignRow>(Post($"/profiles/{profileId}/campaigns",
+            new { title, goal }, token));
+
+    // -- The lifeline --
+
+    public Task<CloudStatusCard> CloudStatus() =>
+        Send<CloudStatusCard>(Get("/cloud/status"));
+
+    public Task<OfflineStatusCard> OfflineStatus() =>
+        Send<OfflineStatusCard>(Get("/offline/status"));
+
+    /// <summary>The legend is built from the mapping the code has.</summary>
+    public Task<LightsLegend> AgentLights() =>
+        Send<LightsLegend>(Get("/agent/lights"));
+
+    public Task<HelpTopicList> HelpTopics() =>
+        Send<HelpTopicList>(Get("/help/topics"));
+
+    /// <summary>Public on purpose, and it writes nothing.</summary>
+    public Task<HelpAnswer> AskHelp(string question) =>
+        Send<HelpAnswer>(Post("/help", new { question }));
+
+    public Task<LocalProviderRow[]> LocalProviders() =>
+        Send<LocalProviderRow[]>(Get("/providers"));
+
+    public Task<LocalProviderRow> AddLocalProvider(string name,
+        string area) =>
+        Send<LocalProviderRow>(Post("/providers",
+            new { name, area, business = true }));
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
@@ -3729,3 +3847,128 @@ public record WatchFaceCard(
 
 public record WatchActOut(
     [property: JsonPropertyName("status")] string? Status);
+
+public record SignupOut(
+    [property: JsonPropertyName("account_id")] string? AccountId,
+    [property: JsonPropertyName("email")] string? Email,
+    [property: JsonPropertyName("verified")] bool? Verified,
+    [property: JsonPropertyName("code_delivery")] string? CodeDelivery);
+
+public record SessionOut(
+    [property: JsonPropertyName("account_id")] string? AccountId,
+    [property: JsonPropertyName("email")] string? Email,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("account_token")] string? AccountToken);
+
+public record CodeDeliveryOut(
+    [property: JsonPropertyName("email")] string? Email,
+    [property: JsonPropertyName("code_delivery")] string? CodeDelivery);
+
+public record ResetOut(
+    [property: JsonPropertyName("email")] string? Email,
+    [property: JsonPropertyName("reset")] bool? Reset);
+
+public record OAuthDoor(
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("configured")] bool? Configured);
+
+public record OAuthProviderList(
+    [property: JsonPropertyName("providers")] OAuthDoor[] Providers);
+
+public record OAuthStartOut(
+    [property: JsonPropertyName("authorize_url")] string? AuthorizeUrl,
+    [property: JsonPropertyName("state")] string? State);
+
+public record OAuthClaimOut(
+    [property: JsonPropertyName("ready")] bool? Ready,
+    [property: JsonPropertyName("email")] string? Email,
+    [property: JsonPropertyName("account_token")] string? AccountToken);
+
+public record PlanEntry(
+    [property: JsonPropertyName("plan")] string Plan,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("price_usd")] double? PriceUsd,
+    [property: JsonPropertyName("period")] string? Period);
+
+public record PlanCatalog(
+    [property: JsonPropertyName("plans")] PlanEntry[] Plans,
+    [property: JsonPropertyName("billing")] string? Billing);
+
+public record SubscriptionRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("subject_kind")] string? SubjectKind,
+    [property: JsonPropertyName("subject_id")] string? SubjectId,
+    [property: JsonPropertyName("tier")] string? Tier,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("periods")] int? Periods);
+
+public record SubscriptionList(
+    [property: JsonPropertyName("subscriptions")]
+    SubscriptionRow[] Subscriptions);
+
+public record OrderRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("listing_id")] string? ListingId,
+    [property: JsonPropertyName("price")] double? Price,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record OrderList(
+    [property: JsonPropertyName("orders")] OrderRow[] Orders);
+
+public record DesigneeRow(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("share")] int? Share);
+
+public record ProceedsCard(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("proceeds_to")] DesigneeRow[] ProceedsTo);
+
+public record CampaignRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("cause")] string? Cause,
+    [property: JsonPropertyName("goal")] double? Goal,
+    [property: JsonPropertyName("raised")] double? Raised,
+    [property: JsonPropertyName("donors")] int? Donors,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record CloudStatusCard(
+    [property: JsonPropertyName("cloud")] bool Cloud,
+    [property: JsonPropertyName("fallback")] string? Fallback,
+    [property: JsonPropertyName("contribution")] string? Contribution);
+
+public record OfflineStatusCard(
+    [property: JsonPropertyName("offline")] bool? Offline,
+    [property: JsonPropertyName("provider")] string? Provider,
+    [property: JsonPropertyName("cloud_attached")] bool? CloudAttached,
+    [property: JsonPropertyName("external_transmission_possible")]
+    bool? ExternalTransmissionPossible);
+
+public record LightRow(
+    [property: JsonPropertyName("light")] string Light,
+    [property: JsonPropertyName("labels")] string[]? Labels,
+    [property: JsonPropertyName("statuses")] string[]? Statuses);
+
+public record LightsLegend(
+    [property: JsonPropertyName("order")] string[] Order,
+    [property: JsonPropertyName("legend")] LightRow[] Legend,
+    [property: JsonPropertyName("question")] string? Question);
+
+public record HelpTopicList(
+    [property: JsonPropertyName("topics")] string[] Topics,
+    [property: JsonPropertyName("disclosure")] string? Disclosure);
+
+public record HelpAnswer(
+    [property: JsonPropertyName("answer")] string Answer,
+    [property: JsonPropertyName("source")] string? Source,
+    [property: JsonPropertyName("ai")] bool? Ai,
+    [property: JsonPropertyName("refused")] bool? Refused);
+
+public record LocalProviderRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("area")] string? Area,
+    [property: JsonPropertyName("location")] string? Location,
+    [property: JsonPropertyName("business")] bool? Business);

@@ -3919,6 +3919,151 @@ struct SpecialistRow: Decodable {
         return try await request("/profiles/\(id)/watch/act",
                                  method: "POST", body: body, token: token)
     }
+
+    // -- the keys: the account itself --
+
+    func signup(email: String, password: String,
+                displayName: String) async throws -> SignupOut {
+        var body: [String: Any] = ["email": email, "password": password]
+        if !displayName.isEmpty { body["display_name"] = displayName }
+        return try await request("/signup", method: "POST", body: body)
+    }
+
+    /// Unknown address and wrong password get the same answer; an
+    /// unverified address cannot sign in at all.
+    func signin(email: String, password: String) async throws -> SessionOut {
+        try await request("/signin", method: "POST",
+                          body: ["email": email, "password": password])
+    }
+
+    func verifyEmail(email: String, code: String) async throws -> SessionOut {
+        try await request("/verify-email", method: "POST",
+                          body: ["email": email, "code": code])
+    }
+
+    /// Same answer whether or not the address has an account — the
+    /// endpoint is not an address oracle, and neither is this button.
+    func resendCode(email: String) async throws -> CodeDelivery {
+        try await request("/verify-email/resend", method: "POST",
+                          body: ["email": email])
+    }
+
+    func requestPasswordReset(email: String) async throws -> CodeDelivery {
+        try await request("/password/reset/request", method: "POST",
+                          body: ["email": email])
+    }
+
+    /// Every existing account session dies with the old password.
+    func resetPassword(email: String, code: String,
+                       newPassword: String) async throws -> ResetOut {
+        try await request("/password/reset", method: "POST",
+                          body: ["email": email, "code": code,
+                                 "new_password": newPassword])
+    }
+
+    func oauthProviders() async throws -> OAuthProviderList {
+        try await request("/auth/oauth/providers")
+    }
+
+    func oauthStart(provider: String) async throws -> OAuthStartOut {
+        try await request("/auth/oauth/\(provider)/start",
+                          method: "POST", body: [:])
+    }
+
+    /// One-time pickup of a completed browser sign-in; the first
+    /// successful claim spends the state.
+    func oauthClaim(state: String) async throws -> OAuthClaimOut {
+        try await request("/auth/oauth/claim", query: ["state": state])
+    }
+
+    // -- the till --
+
+    /// Public — a paywall nobody can read the terms of before signing
+    /// in is one people bounce off.
+    func plans() async throws -> PlanCatalog {
+        try await request("/plans")
+    }
+
+    func mySubscriptions(token: String) async throws -> SubscriptionList {
+        try await request("/subscriptions", token: token)
+    }
+
+    /// Explicit on purpose: nothing bills on a timer, so renewing names
+    /// the beneficiary every time.
+    func renewSubscription(subId: String, beneficiary: String,
+                           token: String) async throws -> SubscriptionRow {
+        try await request("/subscriptions/\(subId)/renew", method: "POST",
+                          body: ["beneficiary": beneficiary], token: token)
+    }
+
+    func myOrders(token: String) async throws -> OrderList {
+        try await request("/orders", token: token)
+    }
+
+    /// Public: a donor gives to the names on this list, not to the
+    /// platform.
+    func proceedsOf(id: String) async throws -> ProceedsCard {
+        try await request("/profiles/\(id)/proceeds")
+    }
+
+    func setProceeds(id: String, designees: [[String: Any]],
+                     token: String) async throws -> ProceedsCard {
+        try await request("/profiles/\(id)/proceeds", method: "PUT",
+                          body: ["designees": designees], token: token)
+    }
+
+    func campaignsOf(id: String) async throws -> [CampaignRow] {
+        try await request("/profiles/\(id)/campaigns")
+    }
+
+    func addCampaign(id: String, title: String, goal: Double, cause: String,
+                     token: String) async throws -> CampaignRow {
+        var body: [String: Any] = ["title": title, "goal": goal]
+        if !cause.isEmpty { body["cause"] = cause }
+        return try await request("/profiles/\(id)/campaigns",
+                                 method: "POST", body: body, token: token)
+    }
+
+    // -- the lifeline --
+
+    func cloudStatus() async throws -> CloudStatusCard {
+        try await request("/cloud/status")
+    }
+
+    func offlineStatus() async throws -> OfflineStatusCard {
+        try await request("/offline/status")
+    }
+
+    /// The legend is built from the mapping, so the key on this screen
+    /// cannot describe lights the code does not have.
+    func agentLights() async throws -> LightsLegend {
+        try await request("/agent/lights")
+    }
+
+    func helpTopics() async throws -> HelpTopicList {
+        try await request("/help/topics")
+    }
+
+    /// Public on purpose: every screen can be somebody's first, and it
+    /// writes nothing.
+    func askHelp(question: String) async throws -> HelpAnswer {
+        try await request("/help", method: "POST",
+                          body: ["question": question])
+    }
+
+    func localProviders() async throws -> [LocalProviderRow] {
+        try await request("/providers")
+    }
+
+    func addLocalProvider(name: String, area: String, location: String,
+                          contact: String,
+                          business: Bool) async throws -> LocalProviderRow {
+        var body: [String: Any] = ["name": name, "area": area,
+                                   "business": business]
+        if !location.isEmpty { body["location"] = location }
+        if !contact.isEmpty { body["contact"] = contact }
+        return try await request("/providers", method: "POST", body: body)
+    }
 }
 
 struct MemoryRow: Decodable, Identifiable {
@@ -4155,4 +4300,154 @@ struct WatchFace: Decodable {
 
 struct WatchActOut: Decodable {
     let status: String?
+}
+
+struct SignupOut: Decodable {
+    let account_id: String?
+    let email: String?
+    let verified: Bool?
+    let code_delivery: String?
+}
+
+struct SessionOut: Decodable {
+    let account_id: String?
+    let email: String?
+    let display_name: String?
+    let account_token: String?
+}
+
+struct CodeDelivery: Decodable {
+    let email: String?
+    let code_delivery: String?
+}
+
+struct ResetOut: Decodable {
+    let email: String?
+    let reset: Bool?
+}
+
+struct OAuthProviderList: Decodable {
+    struct Door: Decodable {
+        let provider: String
+        let name: String?
+        let configured: Bool?
+    }
+    let providers: [Door]
+}
+
+struct OAuthStartOut: Decodable {
+    let authorize_url: String?
+    let state: String?
+}
+
+struct OAuthClaimOut: Decodable {
+    let ready: Bool?
+    let account_id: String?
+    let email: String?
+    let account_token: String?
+}
+
+struct PlanCatalog: Decodable {
+    struct Plan: Decodable {
+        let plan: String
+        let title: String?
+        let price_usd: Double?
+        let period: String?
+        let means: String?
+    }
+    let plans: [Plan]
+    let billing: String?
+}
+
+struct SubscriptionRow: Decodable, Identifiable {
+    let id: String
+    let subject_kind: String?
+    let subject_id: String?
+    let tier: String?
+    let price: Double?
+    let status: String?
+    let periods: Int?
+    let billing: String?
+}
+
+struct SubscriptionList: Decodable {
+    let subscriptions: [SubscriptionRow]
+}
+
+struct OrderRow: Decodable, Identifiable {
+    let id: String
+    let listing_id: String?
+    let price: Double?
+    let status: String?
+    let created_at: String?
+}
+
+struct OrderList: Decodable {
+    let orders: [OrderRow]
+}
+
+struct ProceedsCard: Decodable {
+    struct Designee: Decodable {
+        let name: String
+        let kind: String?
+        let share: Int?
+    }
+    let profile_id: String?
+    let proceeds_to: [Designee]
+}
+
+struct CampaignRow: Decodable, Identifiable {
+    let id: String
+    let title: String?
+    let cause: String?
+    let goal: Double?
+    let raised: Double?
+    let donors: Int?
+    let status: String?
+}
+
+struct CloudStatusCard: Decodable {
+    let cloud: Bool
+    let fallback: String?
+    let contribution: String?
+}
+
+struct OfflineStatusCard: Decodable {
+    let offline: Bool?
+    let provider: String?
+    let cloud_attached: Bool?
+    let external_transmission_possible: Bool?
+    let data_locality: String?
+}
+
+struct LightsLegend: Decodable {
+    struct Row: Decodable {
+        let light: String
+        let labels: [String]?
+        let statuses: [String]?
+    }
+    let order: [String]
+    let legend: [Row]
+    let question: String?
+}
+
+struct HelpTopicList: Decodable {
+    let topics: [String]
+    let disclosure: String?
+}
+
+struct HelpAnswer: Decodable {
+    let answer: String
+    let source: String?
+    let ai: Bool?
+    let refused: Bool?
+}
+
+struct LocalProviderRow: Decodable, Identifiable {
+    let id: String
+    let name: String?
+    let area: String?
+    let location: String?
+    let contact: String?
+    let business: Bool?
 }

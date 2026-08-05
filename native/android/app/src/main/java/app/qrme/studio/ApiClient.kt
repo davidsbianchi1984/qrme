@@ -3329,6 +3329,167 @@ object ApiClient {
         return o.optString("status")
     }
 
+    // ---- The keys: the account itself ----
+
+    suspend fun signup(email: String, password: String,
+                       name: String): String {
+        val body = JSONObject().put("email", email).put("password", password)
+        if (name.isNotEmpty()) body.put("display_name", name)
+        return JSONObject(request("/signup", "POST", body))
+            .optString("code_delivery")
+    }
+
+    /** Unknown address and wrong password get the same answer; an
+     *  unverified address cannot sign in at all. */
+    suspend fun signin(email: String, password: String): String {
+        val o = JSONObject(request("/signin", "POST",
+            JSONObject().put("email", email).put("password", password)))
+        return o.optString("display_name", o.optString("email"))
+    }
+
+    suspend fun verifyEmail(email: String, code: String): String {
+        return JSONObject(request("/verify-email", "POST",
+            JSONObject().put("email", email).put("code", code)))
+            .optString("email")
+    }
+
+    /** Not an address oracle: same answer either way. */
+    suspend fun resendCode(email: String): String {
+        return JSONObject(request("/verify-email/resend", "POST",
+            JSONObject().put("email", email))).optString("code_delivery")
+    }
+
+    suspend fun requestPasswordReset(email: String): String {
+        return JSONObject(request("/password/reset/request", "POST",
+            JSONObject().put("email", email))).optString("code_delivery")
+    }
+
+    /** Every existing account session dies with the old password. */
+    suspend fun resetPassword(email: String, code: String,
+                              newPassword: String): Boolean {
+        return JSONObject(request("/password/reset", "POST",
+            JSONObject().put("email", email).put("code", code)
+                .put("new_password", newPassword))).optBoolean("reset")
+    }
+
+    suspend fun oauthProviders(): List<String> {
+        val arr = JSONObject(request("/auth/oauth/providers"))
+            .getJSONArray("providers")
+        return (0 until arr.length()).map {
+            arr.getJSONObject(it).getString("provider")
+        }
+    }
+
+    suspend fun oauthStart(provider: String): Pair<String, String> {
+        val o = JSONObject(request("/auth/oauth/$provider/start", "POST",
+            JSONObject()))
+        return o.optString("state") to o.optString("authorize_url")
+    }
+
+    /** One-time pickup; the first successful claim spends the state. */
+    suspend fun oauthClaim(state: String): String {
+        val o = JSONObject(request("/auth/oauth/claim?state=" +
+            java.net.URLEncoder.encode(state, "UTF-8")))
+        return if (o.optBoolean("ready")) o.optString("email", "\u2713")
+               else "\u2026"
+    }
+
+    // ---- The till ----
+
+    /** Public: the terms are readable before any sign-in. */
+    suspend fun plans(): String {
+        val arr = JSONObject(request("/plans")).getJSONArray("plans")
+        return (0 until arr.length()).joinToString(" \u00b7 ") {
+            arr.getJSONObject(it).getString("plan")
+        }
+    }
+
+    suspend fun mySubscriptions(token: String): Int {
+        return JSONObject(request("/subscriptions", token = token))
+            .getJSONArray("subscriptions").length()
+    }
+
+    /** Explicit on purpose: nothing bills on a timer. */
+    suspend fun renewSubscription(subId: String, beneficiary: String,
+                                  token: String): Int {
+        return JSONObject(request("/subscriptions/$subId/renew", "POST",
+            JSONObject().put("beneficiary", beneficiary), token))
+            .optInt("periods")
+    }
+
+    suspend fun myOrders(token: String): Int {
+        return JSONObject(request("/orders", token = token))
+            .getJSONArray("orders").length()
+    }
+
+    /** Public: a donor gives to the names on this list, not the platform. */
+    suspend fun proceedsOf(id: String): String {
+        val arr = JSONObject(request("/profiles/$id/proceeds"))
+            .getJSONArray("proceeds_to")
+        return (0 until arr.length()).joinToString(" \u00b7 ") {
+            arr.getJSONObject(it).getString("name")
+        }
+    }
+
+    suspend fun setProceeds(id: String, designee: String, token: String) {
+        val d = JSONObject().put("name", designee).put("kind", "loved_one")
+            .put("share", 100)
+        request("/profiles/$id/proceeds", "PUT",
+            JSONObject().put("designees", org.json.JSONArray().put(d)), token)
+    }
+
+    suspend fun campaignsOf(id: String): Int {
+        return org.json.JSONArray(request("/profiles/$id/campaigns")).length()
+    }
+
+    suspend fun addCampaign(id: String, title: String, goal: Double,
+                            token: String): String {
+        return JSONObject(request("/profiles/$id/campaigns", "POST",
+            JSONObject().put("title", title).put("goal", goal), token))
+            .optString("title")
+    }
+
+    // ---- The lifeline ----
+
+    suspend fun cloudStatus(): String {
+        val o = JSONObject(request("/cloud/status"))
+        return (if (o.optBoolean("cloud")) "\u2601" else "\u2014") +
+            " \u00b7 " + o.optString("fallback")
+    }
+
+    suspend fun offlineStatus(): String {
+        return JSONObject(request("/offline/status")).optString("provider")
+    }
+
+    /** The legend is built from the mapping the code has. */
+    suspend fun agentLights(): String {
+        val arr = JSONObject(request("/agent/lights")).getJSONArray("order")
+        return (0 until arr.length()).joinToString(" \u00b7 ") {
+            arr.getString(it)
+        }
+    }
+
+    suspend fun helpTopics(): Int {
+        return JSONObject(request("/help/topics")).getJSONArray("topics")
+            .length()
+    }
+
+    /** Public on purpose, and it writes nothing. */
+    suspend fun askHelp(question: String): String {
+        return JSONObject(request("/help", "POST",
+            JSONObject().put("question", question))).optString("answer")
+    }
+
+    suspend fun localProviders(): Int {
+        return org.json.JSONArray(request("/providers")).length()
+    }
+
+    suspend fun addLocalProvider(name: String, area: String): String {
+        return JSONObject(request("/providers", "POST",
+            JSONObject().put("name", name).put("area", area)
+                .put("business", true))).optString("name")
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

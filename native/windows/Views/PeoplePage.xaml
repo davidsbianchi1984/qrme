@@ -955,6 +955,85 @@
                     <Button x:Name="WristActButton" Click="OnWristAct" />
                 </StackPanel>
             </Border>
+
+            <!-- The keys: the account itself. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="AcctTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="AcctEmailBox" />
+                    <PasswordBox x:Name="AcctPasswordBox" />
+                    <TextBox x:Name="AcctNameBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AcctSignupButton" Click="OnAcctSignup" />
+                        <Button x:Name="AcctSigninButton" Click="OnAcctSignin" />
+                    </StackPanel>
+                    <TextBox x:Name="AcctCodeBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AcctVerifyButton" Click="OnAcctVerify" />
+                        <Button x:Name="AcctResendButton" Click="OnAcctResend" />
+                    </StackPanel>
+                    <PasswordBox x:Name="AcctNewPasswordBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AcctResetRequestButton" Click="OnAcctResetRequest" />
+                        <Button x:Name="AcctResetButton" Click="OnAcctReset" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AcctOauthButton" Click="OnAcctOauth" />
+                        <Button x:Name="AcctOauthClaimButton" Click="OnAcctOauthClaim" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The till. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="TillTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="TillPlansButton" Click="OnTillPlans" />
+                        <Button x:Name="TillSubsButton" Click="OnTillSubs" />
+                        <Button x:Name="TillOrdersButton" Click="OnTillOrders" />
+                    </StackPanel>
+                    <TextBox x:Name="TillSubIdBox" />
+                    <TextBox x:Name="TillBeneficiaryBox" />
+                    <Button x:Name="TillRenewButton" Click="OnTillRenew" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="TillProceedsButton" Click="OnTillProceeds" />
+                        <Button x:Name="TillCampaignsButton" Click="OnTillCampaigns" />
+                    </StackPanel>
+                    <TextBox x:Name="TillDesigneeBox" />
+                    <Button x:Name="TillSetButton" Click="OnTillSet" />
+                    <TextBox x:Name="TillCampTitleBox" />
+                    <TextBox x:Name="TillCampGoalBox" />
+                    <Button x:Name="TillCampAddButton" Click="OnTillCampAdd" />
+                </StackPanel>
+            </Border>
+
+            <!-- The lifeline. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="LifeTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="LifeCloudButton" Click="OnLifeCloud" />
+                        <Button x:Name="LifeOfflineButton" Click="OnLifeOffline" />
+                        <Button x:Name="LifeLightsButton" Click="OnLifeLights" />
+                        <Button x:Name="LifeTopicsButton" Click="OnLifeTopics" />
+                    </StackPanel>
+                    <TextBox x:Name="LifeQuestionBox" />
+                    <Button x:Name="LifeAskButton" Click="OnLifeAsk" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="LifeProvidersButton" Click="OnLifeProviders" />
+                    </StackPanel>
+                    <TextBox x:Name="LifeProvNameBox" />
+                    <TextBox x:Name="LifeProvAreaBox" />
+                    <Button x:Name="LifeProvAddButton" Click="OnLifeProvAdd" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>
