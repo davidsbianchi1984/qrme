@@ -243,9 +243,18 @@ def test_the_screen_sends_the_interactor_token_not_the_owners():
 
 
 def test_the_screen_says_the_microphone_is_seen_by_everyone():
-    src = _markup("app/src/screens/Inside.tsx")
-    assert "a microphone the others cannot see" in src.replace("\n", " ") \
-        or "Everybody here is\n              shown that you lent it" in src
+    """The disclosure, in both halves.
+
+    The paragraph moved into the l10n table, so the screen is asked for the
+    lookup and the table is asked for the sentence. Either half alone would
+    pass while the other was gone: a screen that looks up a key the table
+    has dropped renders `ins.micpitch`, and a table that keeps the sentence
+    no screen reads is a translation nobody sees.
+    """
+    assert 'tr("ins.micpitch", lang)' in _markup("app/src/screens/Inside.tsx")
+    l10n = _markup("app/src/l10n.ts")
+    assert "a microphone the others cannot see" in l10n
+    assert "Everybody here is shown that you lent it" in l10n
 
 
 # --- the native shells, which all had to learn to send it -------------------

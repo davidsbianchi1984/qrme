@@ -6372,6 +6372,198 @@ const CHROME: Table = {
   "bld.another": {
     en: "Blend another", es: "Mezclar otra", fr: "En mélanger un autre", de: "Noch eine mischen", pt: "Misturar outra", it: "Mescolane un altro", ja: "もうひとつ混ぜる", zh: "再调配一个", hi: "एक और मिलाएँ", ar: "امزج آخر",
   },
+  "chat.with": {
+    en: "Chat with {name}", es: "Chat con {name}", fr: "Discussion avec {name}", de: "Chat mit {name}", pt: "Conversa com {name}", it: "Chat con {name}", ja: "{name} とのチャット", zh: "与 {name} 聊天", hi: "{name} से चैट", ar: "دردشة مع {name}",
+  },
+  "chat.pitch": {
+    en: "every response is persona- & relationship-conditioned", es: "cada respuesta está condicionada por la persona y por la relación", fr: "chaque réponse est conditionnée par le personnage et la relation", de: "jede Antwort ist von Persona und Beziehung geprägt", pt: "cada resposta é condicionada pela persona e pela relação", it: "ogni risposta è condizionata dalla persona e dalla relazione", ja: "どの返答も、ペルソナと関係性に条件づけられています", zh: "每一条回复都受人格与关系的调节", hi: "हर उत्तर व्यक्तित्व और रिश्ते से तय होता है", ar: "كل ردّ مشروط بالشخصية وبالعلاقة",
+  },
+  "chat.sayhello": {
+    en: "Say hello to {name}.", es: "Saluda a {name}.", fr: "Dites bonjour à {name}.", de: "Begrüßen Sie {name}.", pt: "Diga olá a {name}.", it: "Saluta {name}.", ja: "{name} に挨拶しましょう。", zh: "跟 {name} 打个招呼。", hi: "{name} को नमस्ते कहिए।", ar: "ألقِ التحية على {name}.",
+  },
+  "chat.held": {
+    en: "(this reply was held by moderation)", es: "(la moderación retuvo esta respuesta)", fr: "(la modération a retenu cette réponse)", de: "(die Moderation hat diese Antwort zurückgehalten)", pt: "(a moderação reteve esta resposta)", it: "(la moderazione ha trattenuto questa risposta)", ja: "（この返答はモデレーションが保留しました）", zh: "（这条回复被审核扣下了）", hi: "(यह उत्तर मॉडरेशन ने रोक लिया)", ar: "(حجزت المراجعة هذا الردّ)",
+  },
+  "chat.handoff": {
+    en: "specialist handoff: {state}", es: "traspaso a especialista: {state}", fr: "passage à un spécialiste : {state}", de: "Übergabe an Fachkraft: {state}", pt: "passagem a especialista: {state}", it: "passaggio a specialista: {state}", ja: "専門家への引き継ぎ: {state}", zh: "转交给专家：{state}", hi: "विशेषज्ञ को सौंपा गया: {state}", ar: "تحويل إلى مختص: {state}",
+  },
+  "chat.moderated": {
+    en: "{status} by moderation", es: "{status} por la moderación", fr: "{status} par la modération", de: "{status} durch die Moderation", pt: "{status} pela moderação", it: "{status} dalla moderazione", ja: "モデレーションにより {status}", zh: "被审核{status}", hi: "मॉडरेशन द्वारा {status}", ar: "‏{status} من قِبل المراجعة",
+  },
+  "chat.moderated.why": {
+    en: "{status} by moderation — {why}", es: "{status} por la moderación — {why}", fr: "{status} par la modération — {why}", de: "{status} durch die Moderation — {why}", pt: "{status} pela moderação — {why}", it: "{status} dalla moderazione — {why}", ja: "モデレーションにより {status} — {why}", zh: "被审核{status} — {why}", hi: "मॉडरेशन द्वारा {status} — {why}", ar: "‏{status} من قِبل المراجعة — {why}",
+  },
+  "chat.workedas": {
+    en: "worked as {role} ({how})", es: "trabajó como {role} ({how})", fr: "a travaillé en {role} ({how})", de: "arbeitete als {role} ({how})", pt: "trabalhou como {role} ({how})", it: "ha lavorato come {role} ({how})", ja: "{role} として動きました（{how}）", zh: "以 {role} 的方式工作（{how}）", hi: "{role} के रूप में काम किया ({how})", ar: "عمل بصفة {role} ({how})",
+  },
+  "chat.adapted": {
+    en: "adapted to where you are", es: "adaptado a dónde estás", fr: "adapté à l'endroit où vous êtes", de: "an Ihren Ort angepasst", pt: "adaptado ao sítio onde está", it: "adattato a dove ti trovi", ja: "あなたのいる場所に合わせました", zh: "已适配你所在的位置", hi: "आप जहाँ हैं उसके अनुसार ढाला गया", ar: "مُواءَم مع مكانك",
+  },
+  "chat.rolepick": {
+    en: "How should they work this turn?", es: "¿Cómo deberían trabajar en este turno?", fr: "Comment doivent-ils travailler ce tour-ci ?", de: "Wie sollen sie diesmal arbeiten?", pt: "Como devem trabalhar desta vez?", it: "Come dovrebbero lavorare stavolta?", ja: "今回はどう働いてほしいですか？", zh: "这一轮他们该怎么工作？", hi: "इस बार वे कैसे काम करें?", ar: "كيف ينبغي أن يعملوا هذه المرة؟",
+  },
+  "chat.role.read": {
+    en: "Let it read my prompt", es: "Que lea lo que le escribo", fr: "Qu'il lise ma demande", de: "Es soll meine Eingabe lesen", pt: "Que leia o que lhe escrevo", it: "Che legga la mia richiesta", ja: "書いた内容から判断させる", zh: "让它读我的提示自行判断", hi: "मेरा संदेश पढ़कर ख़ुद तय करे", ar: "دعه يقرأ ما كتبته",
+  },
+  "chat.role.advisor": {
+    en: "Advisor — weigh it and recommend", es: "Asesor — sopésalo y recomienda", fr: "Conseiller — pesez et recommandez", de: "Beratend — abwägen und empfehlen", pt: "Consultor — pondere e recomende", it: "Consulente — soppesa e consiglia", ja: "助言者 — 検討して勧める", zh: "顾问 — 权衡后给出建议", hi: "सलाहकार — तौलकर सुझाव दे", ar: "مستشار — يزن ويوصي",
+  },
+  "chat.role.collaborator": {
+    en: "Collaborator — work it with me", es: "Colaborador — trabájalo conmigo", fr: "Collaborateur — travaillez-le avec moi", de: "Mitarbeitend — gemeinsam daran arbeiten", pt: "Colaborador — trabalhe nisto comigo", it: "Collaboratore — lavoraci con me", ja: "協働者 — 一緒に進める", zh: "协作者 — 和我一起做", hi: "सहयोगी — मेरे साथ मिलकर करे", ar: "متعاون — نعمل عليه معًا",
+  },
+  "chat.role.operator": {
+    en: "Operator — just do it", es: "Operador — hazlo y ya", fr: "Exécutant — faites-le, simplement", de: "Ausführend — einfach machen", pt: "Operador — faça e pronto", it: "Esecutore — fallo e basta", ja: "実行者 — とにかくやる", zh: "执行者 — 直接去做", hi: "निष्पादक — बस कर दे", ar: "منفّذ — نفّذه فحسب",
+  },
+  "chat.where": {
+    en: "Where", es: "Dónde", fr: "Où", de: "Wo", pt: "Onde", it: "Dove", ja: "どこ", zh: "在哪里", hi: "कहाँ", ar: "أين",
+  },
+  "chat.where.ph": {
+    en: "a trailhead, the kitchen", es: "un sendero, la cocina", fr: "un départ de sentier, la cuisine", de: "ein Wanderparkplatz, die Küche", pt: "um início de trilho, a cozinha", it: "un imbocco di sentiero, la cucina", ja: "登山口、台所", zh: "步道入口、厨房", hi: "पगडंडी का मुहाना, रसोई", ar: "مبتدأ درب، المطبخ",
+  },
+  "chat.conditions": {
+    en: "Conditions", es: "Condiciones", fr: "Conditions", de: "Bedingungen", pt: "Condições", it: "Condizioni", ja: "状況", zh: "环境状况", hi: "हालात", ar: "الظروف",
+  },
+  "chat.conditions.ph": {
+    en: "raining, quiet", es: "lloviendo, tranquilo", fr: "il pleut, calme", de: "es regnet, ruhig", pt: "a chover, sossegado", it: "piove, tranquillo", ja: "雨、静か", zh: "在下雨、很安静", hi: "बारिश, शांत", ar: "تمطر، هادئ",
+  },
+  "chat.doing": {
+    en: "Doing", es: "Haciendo", fr: "En train de", de: "Dabei zu", pt: "A fazer", it: "Sto facendo", ja: "していること", zh: "正在做", hi: "कर रहे हैं", ar: "أفعل",
+  },
+  "chat.doing.ph": {
+    en: "hiking, cooking", es: "caminando, cocinando", fr: "randonnée, cuisine", de: "wandern, kochen", pt: "a caminhar, a cozinhar", it: "camminata, cucina", ja: "山歩き、料理", zh: "徒步、做饭", hi: "पैदल यात्रा, खाना बनाना", ar: "المشي، الطبخ",
+  },
+  "chat.wheretitle": {
+    en: "Tell it where you are — the reply meets you there", es: "Dile dónde estás — la respuesta te encuentra ahí", fr: "Dites-lui où vous êtes — la réponse vous y rejoint", de: "Sagen Sie, wo Sie sind — die Antwort trifft Sie dort", pt: "Diga-lhe onde está — a resposta encontra-o aí", it: "Digli dove sei — la risposta ti raggiunge lì", ja: "いる場所を伝えてください — 返答はそこに合わせて届きます", zh: "告诉它你在哪里——回复会到那里找你", hi: "बताइए आप कहाँ हैं — उत्तर आपसे वहीं मिलेगा", ar: "أخبره أين أنت — والردّ يلقاك هناك",
+  },
+  "chat.type.ph": {
+    en: "Type a message…", es: "Escribe un mensaje…", fr: "Tapez un message…", de: "Eine Nachricht schreiben…", pt: "Escreva uma mensagem…", it: "Scrivi un messaggio…", ja: "メッセージを入力…", zh: "输入一条消息…", hi: "एक संदेश लिखिए…", ar: "اكتب رسالة…",
+  },
+  "chat.send": {
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "أرسل",
+  },
+  "ins.title": {
+    en: "Inside a room", es: "Dentro de una sala", fr: "À l'intérieur d'une salle", de: "In einem Raum", pt: "Dentro de uma sala", it: "Dentro una stanza", ja: "部屋の中", zh: "在房间里面", hi: "एक कमरे के भीतर", ar: "داخل غرفة",
+  },
+  "ins.pitch": {
+    en: "Read it, say something, let the profiles take a turn. You have to be in the room — knowing its id is not the same as being here, and the id travels on stickers.", es: "Léela, di algo, deja que los perfiles tomen su turno. Tienes que estar en la sala — saber su id no es lo mismo que estar aquí, y el id viaja en pegatinas.", fr: "Lisez, dites quelque chose, laissez les profils prendre leur tour. Vous devez être dans la salle — connaître son identifiant n'équivaut pas à y être, et cet identifiant voyage sur des autocollants.", de: "Lesen Sie mit, sagen Sie etwas, lassen Sie die Profile an die Reihe. Sie müssen im Raum sein — die ID zu kennen ist nicht dasselbe wie hier zu sein, und die ID reist auf Aufklebern.", pt: "Leia, diga algo, deixe os perfis tomarem a vez. Tem de estar na sala — saber o id dela não é o mesmo que estar aqui, e o id viaja em autocolantes.", it: "Leggila, di' qualcosa, lascia che i profili facciano il loro turno. Devi essere nella stanza — conoscerne l'id non è lo stesso che essere qui, e l'id viaggia sugli adesivi.", ja: "読んで、何か言って、プロフィールにも順番を渡してください。あなたはこの部屋にいなければなりません — ID を知っていることと、ここにいることは別です。ID はステッカーに貼られて出回るものですから。", zh: "读一读，说点什么，也让档案们轮流开口。你必须在房间里——知道它的 id 并不等于人在这里，而 id 是会随贴纸到处走的。", hi: "पढ़िए, कुछ कहिए, प्रोफ़ाइलों को भी बारी लेने दीजिए। आपका कमरे में होना ज़रूरी है — उसकी आईडी जानना यहाँ होने के बराबर नहीं है, और आईडी स्टिकरों पर घूमती रहती है।", ar: "اقرأها، وقل شيئًا، ودع الملفات تأخذ دورها. عليك أن تكون في الغرفة — فمعرفة معرّفها ليست كالوجود هنا، والمعرّف يتنقّل على الملصقات.",
+  },
+  "ins.whichroom": {
+    en: "Which room", es: "Qué sala", fr: "Quelle salle", de: "Welcher Raum", pt: "Que sala", it: "Quale stanza", ja: "どの部屋", zh: "哪个房间", hi: "कौन-सा कमरा", ar: "أي غرفة",
+  },
+  "ins.roomid.ph": {
+    en: "room id, from Rooms", es: "id de sala, desde Salas", fr: "identifiant de salle, depuis Salles", de: "Raum-ID, aus Räume", pt: "id da sala, a partir de Salas", it: "id della stanza, da Stanze", ja: "部屋 ID（「部屋」から）", zh: "房间 id，来自“房间”", hi: "कमरे की आईडी, “कमरे” से", ar: "معرّف الغرفة، من «الغرف»",
+  },
+  "ins.goin": {
+    en: "Go in", es: "Entrar", fr: "Entrer", de: "Hineingehen", pt: "Entrar", it: "Entra", ja: "入る", zh: "进去", hi: "अंदर जाएँ", ar: "ادخل",
+  },
+  "ins.signinperson": {
+    en: "Sign in as a person first — a room turn is spoken by somebody, so a profile's owner token is refused here by name.", es: "Inicia sesión como persona primero — un turno en la sala lo dice alguien, así que el token de propietario de un perfil se rechaza aquí por su nombre.", fr: "Connectez-vous d'abord en tant que personne — un tour de parole dans la salle est prononcé par quelqu'un, donc le jeton de propriétaire d'un profil est ici refusé nommément.", de: "Melden Sie sich zuerst als Person an — ein Redebeitrag im Raum wird von jemandem gesprochen, deshalb wird das Besitzer-Token eines Profils hier ausdrücklich abgelehnt.", pt: "Inicie sessão como pessoa primeiro — um turno na sala é dito por alguém, por isso o token de proprietário de um perfil é aqui recusado pelo nome.", it: "Accedi prima come persona — un turno nella stanza lo pronuncia qualcuno, quindi il token di proprietario di un profilo qui viene rifiutato per nome.", ja: "まず一人の人としてサインインしてください — 部屋での発言は誰かが口にするものなので、プロフィールの所有者トークンはここで名指しで断られます。", zh: "请先以个人身份登录——房间里的发言是由某个人说出口的，所以档案的所有者令牌在这里会被指名拒绝。", hi: "पहले एक व्यक्ति के रूप में साइन इन कीजिए — कमरे में बारी कोई व्यक्ति बोलता है, इसलिए प्रोफ़ाइल-स्वामी का टोकन यहाँ नाम लेकर अस्वीकार किया जाता है।", ar: "سجّل الدخول بصفتك شخصًا أولًا — فالدور في الغرفة ينطق به أحد، ولذلك يُرفض رمز مالك الملف هنا بالاسم.",
+  },
+  "ins.whatsaid": {
+    en: "What has been said", es: "Lo que se ha dicho", fr: "Ce qui a été dit", de: "Was gesagt wurde", pt: "O que foi dito", it: "Cosa è stato detto", ja: "これまでの発言", zh: "已经说过的话", hi: "जो कहा जा चुका है", ar: "ما قيل",
+  },
+  "ins.nothingyet": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "ins.say.ph": {
+    en: "say something", es: "di algo", fr: "dites quelque chose", de: "sagen Sie etwas", pt: "diga algo", it: "di' qualcosa", ja: "何か言う", zh: "说点什么", hi: "कुछ कहिए", ar: "قل شيئًا",
+  },
+  "ins.sayit": {
+    en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
+  },
+  "ins.letthemtalk": {
+    en: "Let them talk", es: "Deja que hablen", fr: "Laissez-les parler", de: "Lassen Sie sie reden", pt: "Deixe-os falar", it: "Lascia che parlino", ja: "彼らに話させる", zh: "让他们说", hi: "उन्हें बोलने दीजिए", ar: "دعهم يتكلمون",
+  },
+  "ins.watermarked": {
+    en: "Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.", es: "Todo lo que un perfil dice aquí lleva marca de agua como medio sintético, en el momento en que se dice. Una sala con alguien menor de 18 dentro aplica moderación estricta para todos.", fr: "Tout ce qu'un profil dit ici est filigrané comme média synthétique, au moment même où c'est dit. Une salle où se trouve une personne de moins de 18 ans applique une modération stricte pour tout le monde.", de: "Alles, was ein Profil hier sagt, wird als synthetisches Medium mit einem Wasserzeichen versehen, im Moment des Sagens. Ein Raum, in dem jemand unter 18 ist, läuft für alle mit strenger Moderation.", pt: "Tudo o que um perfil diz aqui leva marca de água como meio sintético, no momento em que é dito. Uma sala com alguém com menos de 18 anos aplica moderação estrita para todos.", it: "Tutto ciò che un profilo dice qui viene filigranato come media sintetico, nel momento in cui viene detto. Una stanza in cui c'è qualcuno sotto i 18 anni applica moderazione severa per tutti.", ja: "ここでプロフィールが言うことはすべて、言われたその瞬間に合成メディアとして電子透かしが入ります。18 歳未満の人がいる部屋では、全員に対して厳格なモデレーションが働きます。", zh: "档案在这里说的每一句话，都会在出口的那一刻被打上合成媒体的水印。只要房间里有未满 18 岁的人，对所有人都会启用严格审核。", hi: "यहाँ कोई प्रोफ़ाइल जो भी कहती है, कहे जाने के उसी क्षण उस पर कृत्रिम माध्यम का वॉटरमार्क लग जाता है। जिस कमरे में 18 से कम उम्र का कोई हो, वहाँ सबके लिए सख़्त मॉडरेशन चलता है।", ar: "كل ما يقوله ملف هنا يُوسم بعلامة مائية بوصفه وسيطًا اصطناعيًا، لحظة قوله. وأي غرفة فيها من هو دون الثامنة عشرة تعمل بمراجعة صارمة على الجميع.",
+  },
+  "ins.microphones": {
+    en: "Microphones", es: "Micrófonos", fr: "Microphones", de: "Mikrofone", pt: "Microfones", it: "Microfoni", ja: "マイク", zh: "麦克风", hi: "माइक्रोफ़ोन", ar: "الميكروفونات",
+  },
+  "ins.micline": {
+    en: "{who} · {device} · {hears} · since {when}", es: "{who} · {device} · {hears} · desde {when}", fr: "{who} · {device} · {hears} · depuis {when}", de: "{who} · {device} · {hears} · seit {when}", pt: "{who} · {device} · {hears} · desde {when}", it: "{who} · {device} · {hears} · da {when}", ja: "{who} · {device} · {hears} · {when} から", zh: "{who} · {device} · {hears} · 自 {when}", hi: "{who} · {device} · {hears} · {when} से", ar: "{who} · {device} · {hears} · منذ {when}",
+  },
+  "ins.lendmic": {
+    en: "Lend them my microphone", es: "Prestarles mi micrófono", fr: "Leur prêter mon microphone", de: "Ihnen mein Mikrofon leihen", pt: "Emprestar-lhes o meu microfone", it: "Presta loro il mio microfono", ja: "自分のマイクを貸す", zh: "把我的麦克风借给他们", hi: "अपना माइक्रोफ़ोन उन्हें उधार दूँ", ar: "أعِرهم ميكروفوني",
+  },
+  "ins.lent": {
+    en: "Lent. Everyone here is shown that you did.", es: "Prestado. A todos los presentes se les muestra que lo hiciste.", fr: "Prêté. Tout le monde ici voit que vous l'avez fait.", de: "Verliehen. Allen hier wird gezeigt, dass Sie es getan haben.", pt: "Emprestado. A todos aqui é mostrado que o fez.", it: "Prestato. A tutti qui viene mostrato che l'hai fatto.", ja: "貸しました。ここにいる全員に、あなたが貸したことが表示されます。", zh: "已借出。这里的每个人都会看到是你借出的。", hi: "उधार दे दिया। यहाँ सबको दिखाया जाता है कि आपने ऐसा किया।", ar: "أُعير. ويُعرض على كل من هنا أنك فعلت ذلك.",
+  },
+  "ins.takeback": {
+    en: "Take my microphone back", es: "Recuperar mi micrófono", fr: "Reprendre mon microphone", de: "Mein Mikrofon zurücknehmen", pt: "Recuperar o meu microfone", it: "Riprenditi il mio microfono", ja: "マイクを返してもらう", zh: "把我的麦克风收回", hi: "अपना माइक्रोफ़ोन वापस लूँ", ar: "استرجع ميكروفوني",
+  },
+  "ins.takenback": {
+    en: "Taken back.", es: "Recuperado.", fr: "Repris.", de: "Zurückgenommen.", pt: "Recuperado.", it: "Ripreso.", ja: "返してもらいました。", zh: "已收回。", hi: "वापस ले लिया गया।", ar: "استُرجع.",
+  },
+  "ins.micpitch": {
+    en: "In a voice room your own microphone carries your voice to the other people; the profiles are reading text and have no ear. Lending yours gives them one — keyed to your voice and set narrow enough to reach only you, not the room. Everybody here is shown that you lent it, which is the whole point: a microphone the others cannot see is what this is built not to be.", es: "En una sala de voz tu propio micrófono lleva tu voz a las demás personas; los perfiles leen texto y no tienen oído. Prestar el tuyo les da uno — ajustado a tu voz y estrechado lo bastante para alcanzarte solo a ti, no a la sala. A todos los presentes se les muestra que lo prestaste, que es justamente el asunto: un micrófono que los demás no pueden ver es precisamente lo que esto está construido para no ser.", fr: "Dans une salle vocale, votre propre microphone porte votre voix jusqu'aux autres personnes ; les profils lisent du texte et n'ont pas d'oreille. Prêter le vôtre leur en donne une — accordée à votre voix et réglée assez étroitement pour ne capter que vous, pas la salle. Tout le monde ici voit que vous l'avez prêté, et c'est tout l'enjeu : un microphone que les autres ne peuvent pas voir est précisément ce que ceci est bâti pour ne pas être.", de: "In einem Sprachraum trägt Ihr eigenes Mikrofon Ihre Stimme zu den anderen Menschen; die Profile lesen Text und haben kein Ohr. Ihres zu verleihen gibt ihnen eines — auf Ihre Stimme abgestimmt und eng genug eingestellt, um nur Sie zu erreichen, nicht den Raum. Allen hier wird gezeigt, dass Sie es verliehen haben, und genau darum geht es: ein Mikrofon, das die anderen nicht sehen können, ist das, was dies ausdrücklich nicht sein soll.", pt: "Numa sala de voz o seu próprio microfone leva a sua voz às outras pessoas; os perfis leem texto e não têm ouvido. Emprestar o seu dá-lhes um — afinado à sua voz e estreitado o suficiente para alcançar apenas você, não a sala. A todos aqui é mostrado que o emprestou, e é esse justamente o ponto: um microfone que os outros não conseguem ver é precisamente o que isto foi construído para não ser.", it: "In una stanza vocale il tuo microfono porta la tua voce alle altre persone; i profili leggono testo e non hanno orecchio. Prestare il tuo gliene dà uno — tarato sulla tua voce e stretto quanto basta a raggiungere solo te, non la stanza. A tutti qui viene mostrato che l'hai prestato, ed è proprio questo il punto: un microfono che gli altri non possono vedere è esattamente ciò che questo è costruito per non essere.", ja: "音声の部屋では、あなたのマイクがあなたの声をほかの人たちに届けます。プロフィールたちは文字を読んでいるだけで、耳を持ちません。あなたのマイクを貸すと、彼らに耳がひとつできます — あなたの声に合わせられ、部屋ではなくあなただけに届くよう狭く設定された耳です。あなたが貸したことは、ここにいる全員に表示されます。それこそが要点です。ほかの人から見えないマイクこそ、この仕組みがそうならないように作られているものだからです。", zh: "在语音房间里，你自己的麦克风把你的声音送到其他人那里；档案们读的是文字，没有耳朵。把你的借出去，就等于给了他们一只耳朵——它对准你的声音，范围收得足够窄，只够到你，够不到整个房间。你借出这件事会显示给这里的每一个人，而这正是要点：一支别人看不见的麦克风，恰恰是这套设计刻意不要成为的东西。", hi: "आवाज़ वाले कमरे में आपका अपना माइक्रोफ़ोन आपकी आवाज़ बाक़ी लोगों तक पहुँचाता है; प्रोफ़ाइलें तो पाठ पढ़ रही होती हैं, उनके कान नहीं होते। अपना उधार देने से उन्हें एक कान मिल जाता है — आपकी आवाज़ पर सधा हुआ और इतना सँकरा कि वह सिर्फ़ आप तक पहुँचे, पूरे कमरे तक नहीं। आपने उधार दिया है, यह यहाँ सबको दिखाया जाता है, और यही तो पूरी बात है: जो माइक्रोफ़ोन बाक़ी लोग देख न सकें, यह व्यवस्था ठीक वही न होने के लिए बनाई गई है।", ar: "في غرفة صوتية يحمل ميكروفونك أنت صوتك إلى الآخرين؛ أما الملفات فتقرأ نصًا ولا أذن لها. وإعارتك ميكروفونك تمنحها أذنًا — مضبوطة على صوتك، وضيّقة بما يكفي لتبلغك أنت وحدك لا الغرفة. ويُعرض على كل من هنا أنك أعرته، وهذا هو بيت القصيد: فميكروفون لا يراه الآخرون هو بالضبط ما بُني هذا كي لا يكونه.",
+  },
+  "rms.title": {
+    en: "Rooms", es: "Salas", fr: "Salles", de: "Räume", pt: "Salas", it: "Stanze", ja: "部屋", zh: "房间", hi: "कमरे", ar: "الغرف",
+  },
+  "rms.pitch": {
+    en: "2D, AR and VR sessions · live desks", es: "sesiones 2D, RA y RV · escritorios en vivo", fr: "sessions 2D, RA et RV · bureaux en direct", de: "2D-, AR- und VR-Sitzungen · Schreibtische live", pt: "sessões 2D, RA e RV · secretárias em direto", it: "sessioni 2D, AR e VR · scrivanie dal vivo", ja: "2D・AR・VR のセッション · ライブのデスク", zh: "2D、AR 与 VR 会话 · 在线的工位", hi: "2D, AR और VR सत्र · लाइव डेस्क", ar: "جلسات ثنائية الأبعاد وواقع معزّز وواقع افتراضي · مكاتب مباشرة",
+  },
+  "rms.openroom": {
+    en: "Open a room", es: "Abrir una sala", fr: "Ouvrir une salle", de: "Einen Raum öffnen", pt: "Abrir uma sala", it: "Apri una stanza", ja: "部屋を開く", zh: "开一个房间", hi: "एक कमरा खोलें", ar: "افتح غرفة",
+  },
+  "rms.topic": {
+    en: "Topic", es: "Tema", fr: "Sujet", de: "Thema", pt: "Tema", it: "Argomento", ja: "話題", zh: "主题", hi: "विषय", ar: "الموضوع",
+  },
+  "rms.topic.ph": {
+    en: "what it's about", es: "de qué va", fr: "de quoi il s'agit", de: "worum es geht", pt: "sobre o que é", it: "di cosa si tratta", ja: "何についてか", zh: "关于什么", hi: "यह किस बारे में है", ar: "عمّ يدور",
+  },
+  "rms.kind": {
+    en: "Kind", es: "Tipo", fr: "Type", de: "Art", pt: "Tipo", it: "Tipo", ja: "種類", zh: "类型", hi: "प्रकार", ar: "النوع",
+  },
+  "rms.ch.chat": {
+    en: "Text", es: "Texto", fr: "Texte", de: "Text", pt: "Texto", it: "Testo", ja: "テキスト", zh: "文字", hi: "पाठ", ar: "نص",
+  },
+  "rms.ch.voice": {
+    en: "Voice chat only", es: "Solo voz", fr: "Voix seulement", de: "Nur Sprache", pt: "Só voz", it: "Solo voce", ja: "音声のみ", zh: "仅语音", hi: "केवल आवाज़", ar: "صوت فقط",
+  },
+  "rms.ch.video": {
+    en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo", it: "Video", ja: "ビデオ", zh: "视频", hi: "वीडियो", ar: "فيديو",
+  },
+  "rms.ch.ar": {
+    en: "AR", es: "RA", fr: "RA", de: "AR", pt: "RA", it: "AR", ja: "AR", zh: "AR", hi: "AR", ar: "واقع معزّز",
+  },
+  "rms.ch.vr": {
+    en: "VR", es: "RV", fr: "RV", de: "VR", pt: "RV", it: "VR", ja: "VR", zh: "VR", hi: "VR", ar: "واقع افتراضي",
+  },
+  "rms.open": {
+    en: "Open", es: "Abrir", fr: "Ouvrir", de: "Öffnen", pt: "Abrir", it: "Apri", ja: "開く", zh: "开启", hi: "खोलें", ar: "افتح",
+  },
+  "rms.signinpick": {
+    en: "Sign in and pick a profile first — the room opens with the two of you inside.", es: "Inicia sesión y elige un perfil primero — la sala se abre con los dos dentro.", fr: "Connectez-vous et choisissez d'abord un profil — la salle s'ouvre avec vous deux à l'intérieur.", de: "Melden Sie sich an und wählen Sie zuerst ein Profil — der Raum öffnet sich mit Ihnen beiden darin.", pt: "Inicie sessão e escolha primeiro um perfil — a sala abre com os dois lá dentro.", it: "Accedi e scegli prima un profilo — la stanza si apre con voi due dentro.", ja: "先にサインインしてプロフィールを選んでください — 部屋は、あなたたち二人が中にいる状態で開きます。", zh: "请先登录并选择一个档案——房间开启时，你们两个就在里面。", hi: "पहले साइन इन कीजिए और एक प्रोफ़ाइल चुनिए — कमरा आप दोनों के भीतर होते हुए खुलता है।", ar: "سجّل الدخول واختر ملفًا أولًا — فالغرفة تُفتح وأنتما الاثنان بداخلها.",
+  },
+  "rms.livenow": {
+    en: "Live now", es: "En directo ahora", fr: "En direct maintenant", de: "Jetzt live", pt: "Em direto agora", it: "Dal vivo adesso", ja: "いま開いているもの", zh: "此刻在线", hi: "अभी लाइव", ar: "مباشر الآن",
+  },
+  "rms.norooms": {
+    en: "No rooms open — start one above.", es: "No hay salas abiertas — abre una arriba.", fr: "Aucune salle ouverte — ouvrez-en une ci-dessus.", de: "Keine Räume offen — öffnen Sie oben einen.", pt: "Não há salas abertas — abra uma acima.", it: "Nessuna stanza aperta — aprine una qui sopra.", ja: "開いている部屋はありません — 上でひとつ開いてください。", zh: "没有开着的房间——请在上面开一个。", hi: "कोई कमरा खुला नहीं — ऊपर एक शुरू कीजिए।", ar: "لا غرف مفتوحة — افتح واحدة بالأعلى.",
+  },
+  "rms.untitled": {
+    en: "untitled room", es: "sala sin título", fr: "salle sans titre", de: "Raum ohne Titel", pt: "sala sem título", it: "stanza senza titolo", ja: "無題の部屋", zh: "未命名的房间", hi: "बिना नाम का कमरा", ar: "غرفة بلا عنوان",
+  },
+  "rms.inside": {
+    en: "{n} inside", es: "{n} dentro", fr: "{n} à l'intérieur", de: "{n} drinnen", pt: "{n} lá dentro", it: "{n} dentro", ja: "{n} 人が中にいます", zh: "{n} 人在里面", hi: "{n} भीतर", ar: "{n} في الداخل",
+  },
+  "rms.headset": {
+    en: "— join from a headset or phone; this desktop shows the room", es: "— únete desde unas gafas o un teléfono; este escritorio muestra la sala", fr: "— rejoignez depuis un casque ou un téléphone ; ce bureau montre la salle", de: "— treten Sie über Headset oder Telefon bei; dieser Desktop zeigt den Raum", pt: "— junte-se a partir de óculos ou telemóvel; este ambiente de trabalho mostra a sala", it: "— entra da un visore o dal telefono; questo desktop mostra la stanza", ja: "— ヘッドセットかスマートフォンから参加してください。このデスクトップは部屋を映すだけです", zh: "— 请从头显或手机加入；这台桌面只是把房间显示出来", hi: "— हेडसेट या फ़ोन से जुड़िए; यह डेस्कटॉप कमरे को दिखाता भर है", ar: "— انضمّ من نظّارة أو هاتف؛ هذا المكتب يعرض الغرفة فحسب",
+  },
+  "rms.livedesks": {
+    en: "Live desks", es: "Escritorios en vivo", fr: "Bureaux en direct", de: "Schreibtische live", pt: "Secretárias em direto", it: "Scrivanie dal vivo", ja: "ライブのデスク", zh: "在线的工位", hi: "लाइव डेस्क", ar: "مكاتب مباشرة",
+  },
+  "rms.nodesks": {
+    en: "Nobody is at a desk right now.", es: "Ahora mismo no hay nadie en un escritorio.", fr: "Personne n'est à un bureau en ce moment.", de: "Gerade sitzt niemand an einem Schreibtisch.", pt: "Neste momento não está ninguém numa secretária.", it: "In questo momento non c'è nessuno a una scrivania.", ja: "いまデスクにいる人はいません。", zh: "现在没有人在工位上。", hi: "अभी कोई डेस्क पर नहीं है।", ar: "لا أحد على مكتب الآن.",
+  },
+  "rms.live": {
+    en: "● live", es: "● en directo", fr: "● en direct", de: "● live", pt: "● em direto", it: "● dal vivo", ja: "● ライブ", zh: "● 在线", hi: "● लाइव", ar: "● مباشر",
+  },
+  "rms.away": {
+    en: "away", es: "ausente", fr: "absent", de: "abwesend", pt: "ausente", it: "assente", ja: "離席中", zh: "不在", hi: "अनुपस्थित", ar: "غائب",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { t as tr, visitorLang } from "../l10n";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { api } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -15,6 +15,7 @@ export function Chat({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -58,18 +59,27 @@ export function Chat({ onPlans }: {
       });
       const pm = reply.profile_message;
       const rc = reply.role_context;
+      // Takes the sentence, not the key. Passing the key would put the
+      // literal after `put(` instead of after `tr(`, where the dead-key
+      // guard looks — four live keys would have read as dead.
+      const put = (line: string, values: Record<string, string>) =>
+        Object.entries(values).reduce(
+          (out, [k, v]) => out.replace(`{${k}}`, v), line);
       const note = reply.handoff?.state
-        ? `specialist handoff: ${reply.handoff.state}`
+        ? put(tr("chat.handoff", lang), { state: reply.handoff.state })
         : pm.status !== "approved"
-          ? `${pm.status} by moderation${pm.flag_reason ? ` — ${pm.flag_reason}` : ""}`
+          ? pm.flag_reason
+            ? put(tr("chat.moderated.why", lang),
+                  { status: pm.status, why: pm.flag_reason })
+            : put(tr("chat.moderated", lang), { status: pm.status })
           : rc
-            ? `worked as ${rc.role} (${rc.how})`
+            ? put(tr("chat.workedas", lang), { role: rc.role, how: rc.how })
             : reply.environment
-              ? "adapted to where you are"
+              ? tr("chat.adapted", lang)
               : undefined;
       const text = pm.status === "approved"
         ? pm.content
-        : "(this reply was held by moderation)";
+        : tr("chat.held", lang);
       // Who actually wrote it. Canned fallback text presented as the chosen
       // model is a lie the reader has no way to detect from the words alone —
       // the sibling product's Coach screen has said so in amber for releases.
@@ -88,13 +98,19 @@ export function Chat({ onPlans }: {
   return (
     <div className="screen chat">
       <header className="screen-head">
-        <h2>Chat with {session.profile?.display_name}</h2>
-        <span className="muted small">every response is persona- &amp; relationship-conditioned</span>
+        <h2>
+          {fill(tr("chat.with", lang),
+                { name: session.profile?.display_name })}
+        </h2>
+        <span className="muted small">{tr("chat.pitch", lang)}</span>
       </header>
 
       <div className="messages" ref={listRef}>
         {msgs.length === 0 && (
-          <div className="muted center">Say hello to {session.profile?.display_name}.</div>
+          <div className="muted center">
+            {fill(tr("chat.sayhello", lang),
+                  { name: session.profile?.display_name })}
+          </div>
         )}
         {msgs.map((m, i) => (
           <div key={i} className={"bubble " + m.who}>
@@ -102,8 +118,8 @@ export function Chat({ onPlans }: {
             {m.note && <div className="bubble-note">{m.note}</div>}
             {m.degradedFrom && (
               <div className="degraded">
-                ⚠ {tr("chat.degraded.head", visitorLang())}{" "}
-                {m.degradedFrom} {tr("chat.degraded.tail", visitorLang())}
+                ⚠ {tr("chat.degraded.head", lang)}{" "}
+                {m.degradedFrom} {tr("chat.degraded.tail", lang)}
               </div>
             )}
           </div>
@@ -116,37 +132,42 @@ export function Chat({ onPlans }: {
       {/* Spec clauses 2/12 — advisor counsels, collaborator co-creates,
           operator executes. "Let it read my prompt" is the honest default:
           the profile infers from the wording and the reply says which. */}
-      <label className="role-pick">How should they work this turn?
+      <label className="role-pick">{tr("chat.rolepick", lang)}
         <select value={role} onChange={(e) => setRole(e.target.value)}>
-          <option value="">Let it read my prompt</option>
-          <option value="advisor">Advisor — weigh it and recommend</option>
-          <option value="collaborator">Collaborator — work it with me</option>
-          <option value="operator">Operator — just do it</option>
+          <option value="">{tr("chat.role.read", lang)}</option>
+          <option value="advisor">{tr("chat.role.advisor", lang)}</option>
+          <option value="collaborator">{tr("chat.role.collaborator", lang)}</option>
+          <option value="operator">{tr("chat.role.operator", lang)}</option>
         </select>
       </label>
 
       {whereOpen && (
         <div className="row" style={{ padding: "4px 0" }}>
-          <label>Where<input value={location} placeholder="a trailhead, the kitchen"
+          <label>{tr("chat.where", lang)}<input value={location}
+                             placeholder={tr("chat.where.ph", lang)}
                              onChange={(e) => setLocation(e.target.value)} /></label>
-          <label>Conditions<input value={conditions} placeholder="raining, quiet"
+          <label>{tr("chat.conditions", lang)}<input value={conditions}
+                                  placeholder={tr("chat.conditions.ph", lang)}
                                   onChange={(e) => setConditions(e.target.value)} /></label>
-          <label>Doing<input value={activity} placeholder="hiking, cooking"
+          <label>{tr("chat.doing", lang)}<input value={activity}
+                             placeholder={tr("chat.doing.ph", lang)}
                              onChange={(e) => setActivity(e.target.value)} /></label>
         </div>
       )}
 
       <div className="composer">
-        <button title="Tell it where you are — the reply meets you there"
+        <button title={tr("chat.wheretitle", lang)}
                 className={whereOpen ? "primary" : ""}
                 onClick={() => setWhereOpen((w) => !w)}>📍</button>
         <input
           value={input}
-          placeholder="Type a message…"
+          placeholder={tr("chat.type.ph", lang)}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
         />
-        <button className="primary" onClick={send} disabled={busy}>Send</button>
+        <button className="primary" onClick={send} disabled={busy}>
+          {tr("chat.send", lang)}
+        </button>
       </div>
     </div>
   );

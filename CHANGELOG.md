@@ -4,6 +4,55 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.1] — 2026-08-05
+
+### The room, the conversation, and the door to both
+
+The console-untranslated record falls **116 → 69**.
+
+**Rooms** — the channel list held its five English labels in a `const`
+beside the ids. It holds keys now, so the badge and the dropdown read the
+same row and a sixth channel cannot arrive half-named.
+
+**Chat with —** the role picker, the where-you-are fields, and the four
+notes a reply can carry about itself: a specialist handoff, a moderation
+hold, which role the profile chose, or that it adapted to where you said
+you were.
+
+**Inside a room** — the paragraph explaining that lending your microphone
+is a disclosure rather than a setting, translated whole.
+
+64 keys across three screens.
+
+### Two guards, one of them for a mistake I keep almost making
+
+`test_no_key_is_translated_into_ten_languages_and_used_nowhere` called
+five live keys dead. They are held in a table — `{ id: "chat", key:
+"rms.ch.chat" }` — and looked up as `tr(c.key, lang)`, so there is no
+literal after `tr(` anywhere and all five render. That is the same shape
+as the `nav.` template the check already excuses, arriving by a second
+road, and its advice — *wire them, or delete them* — would have had
+somebody delete five working translations. A `key:` field now counts as
+a lookup written down early, and the comment says why.
+
+`test_no_translation_is_carrying_an_english_word` is new. Every check
+before it asks whether a row *exists* and whether it has its ten
+languages; none can tell a finished Japanese sentence from one with
+`travels` still sitting in the middle. Two rows were drafted that way
+while writing this release — one `someone`, one `travels` — and both
+were caught by re-reading, which works right up until it doesn't.
+
+    asked     is the row translated
+    mattered  is the row translated all the way through
+
+The rule is narrow so it can be trusted: `ja` and `zh` only, a lowercase
+Latin word of four letters or more, present in the row's own English,
+standing bare rather than inside 「」, and only in rows whose English is
+prose rather than a list of values — `advance / assist / cancel` is
+three names, not a sentence, and demanding they be bracketed would make
+a placeholder worse in service of a rule about sentences. It passed on
+the whole table first run; verified by putting `travels` back.
+
 ## [0.46.0] — 2026-08-05
 
 ### The wall, the guide, and the blend

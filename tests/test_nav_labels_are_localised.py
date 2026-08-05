@@ -84,6 +84,49 @@ def test_no_tab_is_missing_a_language():
     assert not gaps, f"nav labels missing translations: {gaps}"
 
 
+def _table_rows() -> dict[str, dict[str, str]]:
+    """Every key in `CHROME`, mapped to its language → sentence."""
+    src = L10N.read_text(encoding="utf-8")
+    body = src[src.index("const CHROME: Table = {"):src.index("\n};\n\nexport function t(")]
+    heads = [(m.start(), m.group(1))
+             for m in re.finditer(r'^  "([\w.]+)":\s*\{', body, re.M)]
+    out: dict[str, dict[str, str]] = {}
+    for i, (pos, key) in enumerate(heads):
+        end = heads[i + 1][0] if i + 1 < len(heads) else len(body)
+        out[key] = dict(re.findall(r'\b([a-z]{2}):\s*"((?:[^"\\]|\\.)*)"',
+                                   body[pos:end]))
+    return out
+
+
+#: A quotation mark in any of the scripts the table uses. A Latin word
+#: touching one of these is being named, not spoken.
+_QUOTES = "「」『』\"'`“”‘’《》〈〉"
+
+
+def _bare_latin(sentence: str) -> list[str]:
+    """Lowercase Latin words standing on their own in a sentence.
+
+    Holes are removed first (`{name}` is Latin by construction and always
+    will be), capitalised words are skipped (`QRME`, `OAuth`, `Bianchi` are
+    names), and anything glued to a dot, slash or at-sign is skipped
+    (`smtp.gmail.com` is an address, not a sentence).
+    """
+    sentence = re.sub(r"\{\w+\}", " ", sentence)
+    out = []
+    for m in re.finditer(r"[A-Za-z]{4,}", sentence):
+        word = m.group()
+        if word != word.lower():
+            continue
+        before = sentence[m.start() - 1] if m.start() else " "
+        after = sentence[m.end()] if m.end() < len(sentence) else " "
+        if before in _QUOTES or after in _QUOTES:
+            continue
+        if before in ".@_-/" or after in ".@_-/":
+            continue
+        out.append(word)
+    return out
+
+
 def _every_row() -> dict[str, set[str]]:
     """Every key in `CHROME`, mapped to the languages its row carries.
 
@@ -134,6 +177,72 @@ def test_no_row_of_the_table_is_missing_a_language():
         f"{len(gaps)} row(s) of the console table are short a language, so "
         "those readers get English and cannot tell it was an oversight:\n    "
         + "\n    ".join(f"{k}: no {', '.join(v)}" for k, v in sorted(gaps.items())))
+
+
+#: Lowercase Latin tokens that are not English prose even though they look
+#: like it: a URI scheme, and the CJK rows are the only place they appear
+#: bare. Kept short on purpose — this is an exemption list, and every entry
+#: is a claim that a word is a name rather than a sentence.
+_NOT_PROSE = {"http", "https"}
+
+
+def test_no_translation_is_carrying_an_english_word():
+    """A row that is translated except for one word left in English.
+
+    Every check up to here asks whether a row *exists* and whether it has
+    its ten languages. None of them can tell a finished Japanese sentence
+    from one with `travels` still sitting in the middle of it, because both
+    are non-empty strings in the `ja` slot.
+
+    That is not hypothetical. Two rows were drafted with an English word
+    stranded inside the CJK text in the release this check was added in —
+    one `someone`, one `travels` — and both were caught by re-reading, which
+    is the review method that works right up until the day it doesn't. A
+    Japanese reader would have seen a clean sentence with one foreign word
+    in it, and had no way to tell a deliberate quotation from a slip.
+
+        asked     is the row translated
+        mattered  is the row translated all the way through
+
+    The rule is narrow so it can be trusted: only `ja` and `zh`, only a
+    lowercase Latin word of four letters or more, only when the same word
+    is in the row's own English, only when it is *bare* — not touching a
+    quote mark, and not part of a dotted or slashed token — and only in
+    rows whose English is prose rather than a list.
+
+    That last clause is what keeps the check honest. A handful of rows are
+    nothing but literal values a person is meant to type or recognise:
+    `pas.action.ph` is *advance, assist, cancel*, `rem.play.platform.ph`
+    is *steam, xbox, playstation*, `pas.assist` is the enum `assist`
+    itself. Those words are the same in every language because they are
+    names, and demanding they be translated or bracketed would make a
+    placeholder harder to use in service of a rule about sentences. Five
+    English words is the line: below it the row is a list, above it it is
+    something somebody reads.
+
+    Quoting is what makes the difference in the rows that *are* prose, and
+    the table already relies on it: `desk.there.pitch` names the API's own
+    `away` and `closed` states inside 「」. A word in brackets is being
+    *named*; a word in the open is being *read*. So when this fires the fix
+    is one of two things — translate the word, or quote it and mean it.
+    """
+    hits = []
+    for key, row in _table_rows().items():
+        english = row.get("en", "")
+        # Words, not tokens: "advance / assist / cancel" is three values and
+        # two slashes, and counting the slashes would call it a sentence.
+        if len(re.findall(r"[A-Za-z]+", english)) < 5:
+            continue
+        english = {w.lower() for w in re.findall(r"[A-Za-z]{4,}", english)}
+        for lang in ("ja", "zh"):
+            for word in _bare_latin(row.get(lang, "")):
+                if word in english and word not in _NOT_PROSE:
+                    hits.append(f"{key}/{lang}: {word!r}")
+    assert not hits, (
+        f"{len(hits)} translation(s) still carry an English word from their "
+        "own English row:\n    " + "\n    ".join(sorted(hits))
+        + "\n  Translate the word, or quote it — 「away」 reads as a name, "
+          "away reads as an oversight.")
 
 
 def test_the_unused_english_label_still_agrees():

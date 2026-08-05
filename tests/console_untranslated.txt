@@ -1,4 +1,4 @@
-# status: backlog — 116 rows
+# status: backlog — 69 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 116
+# ceiling: 69
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -50,23 +50,6 @@
 #     mattered  is this string one a non-English reader cannot read
 #
 # The count this file exists to state honestly was overstated by that much.
-Chat: Advisor — weigh it and recommend
-Chat: Chat with
-Chat: Collaborator — work it with me
-Chat: Conditions
-Chat: Doing
-Chat: How should they work this turn?
-Chat: Let it read my prompt
-Chat: Operator — just do it
-Chat: Say hello to
-Chat: Send
-Chat: Tell it where you are — the reply meets you there
-Chat: Type a message…
-Chat: Where
-Chat: a trailhead, the kitchen
-Chat: every response is persona- &amp; relationship-conditioned
-Chat: hiking, cooking
-Chat: raining, quiet
 Discover: AI
 Discover: Add friend
 Discover: Discover
@@ -96,23 +79,6 @@ Home: 🎗 Where the money goes
 Home: 🏛 Departments that coordinate
 Home: 🔮 What would they do
 Home: 🫱🏽‍🫲🏻 Blend a profile
-Inside: Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.
-Inside: Go in
-Inside: In a voice room your own microphone carries your voice to the other people; the profiles are reading text and have no ear. Lending yours gives them one — keyed to your voice and set narrow enough to reach only you, not the room. Everybody here is shown that you lent it, which is the whole point: a microphone the others cannot see is what this is built not to be.
-Inside: Inside a room
-Inside: Lend them my microphone
-Inside: Let them talk
-Inside: Microphones
-Inside: Nothing yet.
-Inside: Read it, say something, let the profiles take a turn. You have to be in the room — knowing its id is not the same as being here, and the id travels on stickers.
-Inside: Say it
-Inside: Sign in as a person first — a room turn is spoken by somebody, so a profile's owner token is refused here by name.
-Inside: Take my microphone back
-Inside: What has been said
-Inside: Which room
-Inside: room id, from Rooms
-Inside: say something
-Inside: · since
 Memory: AES-256-GCM · one row per conversation · erase by name
 Memory: Erase all
 Memory: Erase this one
@@ -143,19 +109,6 @@ Relationships: Type
 Relationships: acknowledges them truthfully if asked — disclosure by design
 Relationships: e.g. Sarah
 Relationships: people in
-Rooms: 2D, AR and VR sessions · live desks
-Rooms: Kind
-Rooms: Live desks
-Rooms: Live now
-Rooms: No rooms open — start one above.
-Rooms: Nobody is at a desk right now.
-Rooms: Open
-Rooms: Open a room
-Rooms: Rooms
-Rooms: Topic
-Rooms: inside
-Rooms: what it's about
-Rooms: — join from a headset or phone; this desktop shows the room
 Simulate: Horizon
 Simulate: Past runs
 Simulate: Prediction

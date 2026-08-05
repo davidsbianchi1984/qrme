@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -9,11 +10,11 @@ import { useSession } from "../store";
 // its badge; stepping inside one takes a headset or a phone, and the card
 // says so instead of pretending.
 const CHANNELS = [
-  { id: "chat", label: "Text" },
-  { id: "voice", label: "Voice chat only" },
-  { id: "video", label: "Video" },
-  { id: "ar", label: "AR" },
-  { id: "vr", label: "VR" },
+  { id: "chat", key: "rms.ch.chat" },
+  { id: "voice", key: "rms.ch.voice" },
+  { id: "video", key: "rms.ch.video" },
+  { id: "ar", key: "rms.ch.ar" },
+  { id: "vr", key: "rms.ch.vr" },
 ];
 
 export function Rooms({ onPlans }: {
@@ -22,6 +23,7 @@ export function Rooms({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [rooms, setRooms] = useState<Awaited<ReturnType<typeof api.listRooms>>>([]);
   const [desks, setDesks] = useState<Awaited<ReturnType<typeof api.listDesks>>>([]);
   const [topic, setTopic] = useState("");
@@ -37,7 +39,7 @@ export function Rooms({ onPlans }: {
 
   async function create() {
     if (!session.interactorId || !session.profileId) {
-      setError("Sign in and pick a profile first — the room opens with the two of you inside.");
+      setError(tr("rms.signinpick", lang));
       return;
     }
     setBusy(true); setError(null);
@@ -56,50 +58,64 @@ export function Rooms({ onPlans }: {
     finally { setBusy(false); }
   }
 
-  const badge = (ch: string) => CHANNELS.find((c) => c.id === ch)?.label || ch;
+  const badge = (ch: string) => {
+    const found = CHANNELS.find((c) => c.id === ch);
+    return found ? tr(found.key, lang) : ch;
+  };
 
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Rooms</h2>
-        <span className="muted small">2D, AR and VR sessions · live desks</span>
+        <h2>{tr("rms.title", lang)}</h2>
+        <span className="muted small">{tr("rms.pitch", lang)}</span>
       </header>
 
       <div className="card">
-        <h3>Open a room</h3>
+        <h3>{tr("rms.openroom", lang)}</h3>
         <div className="row">
-          <label>Topic<input value={topic} placeholder="what it's about" onChange={(e) => setTopic(e.target.value)} /></label>
-          <label>Kind
+          <label>{tr("rms.topic", lang)}<input value={topic} placeholder={tr("rms.topic.ph", lang)}
+                                onChange={(e) => setTopic(e.target.value)} /></label>
+          <label>{tr("rms.kind", lang)}
             <select value={channel} onChange={(e) => setChannel(e.target.value)}>
-              {CHANNELS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+              {CHANNELS.map((c) => (
+                <option key={c.id} value={c.id}>{tr(c.key, lang)}</option>
+              ))}
             </select>
           </label>
-          <button className="primary" disabled={busy} onClick={create}>Open</button>
+          <button className="primary" disabled={busy} onClick={create}>
+            {tr("rms.open", lang)}
+          </button>
         </div>
       </div>
 
       <div className="card">
-        <h3>Live now</h3>
-        {rooms.length === 0 && <p className="muted center">No rooms open — start one above.</p>}
+        <h3>{tr("rms.livenow", lang)}</h3>
+        {rooms.length === 0 && (
+          <p className="muted center">{tr("rms.norooms", lang)}</p>
+        )}
         {rooms.map((r) => (
           <div key={r.id} className="room-row">
             <span className={"tag ch-" + r.channel}>{badge(r.channel)}</span>
-            <b>{r.topic || "untitled room"}</b>
-            <span className="muted small">{r.participants} inside</span>
+            <b>{r.topic || tr("rms.untitled", lang)}</b>
+            <span className="muted small">
+              {fill(tr("rms.inside", lang), { n: r.participants })}
+            </span>
             {(r.channel === "ar" || r.channel === "vr") && (
-              <span className="muted small">— join from a headset or phone; this desktop shows the room</span>
+              <span className="muted small">{tr("rms.headset", lang)}</span>
             )}
           </div>
         ))}
       </div>
 
       <div className="card">
-        <h3>Live desks</h3>
-        {desks.length === 0 && <p className="muted center">Nobody is at a desk right now.</p>}
+        <h3>{tr("rms.livedesks", lang)}</h3>
+        {desks.length === 0 && (
+          <p className="muted center">{tr("rms.nodesks", lang)}</p>
+        )}
         {desks.map((d) => (
           <div key={d.id} className="room-row">
             <span className={"tag " + (d.presence === "attended" ? "live" : "")}>
-              {d.presence === "attended" ? "● live" : "away"}
+              {d.presence === "attended" ? tr("rms.live", lang) : tr("rms.away", lang)}
             </span>
             <b>{d.display_name}</b>
             <span className="muted small">{d.trade}{d.location ? ` · ${d.location}` : ""}</span>

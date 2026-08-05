@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.46.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.46.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.46.1** | **The room, the conversation, and the door to both** — Rooms, Chat and Inside localized (console-untranslated 116 → 69); the dead-key guard learns that a key can live in a table, and a new check catches an English word left inside a Japanese or Chinese sentence |
 | **0.46.0** | **The wall, the guide, and the blend** — Wall, Guide and Blend localized; console-untranslated 180 → 116, with no rows kept back |
 | **0.45.9** | **The thing named, what leaves, and the mark it carries** — Named, Leaving and TheMark localized (console-untranslated 254 → 180); one row kept on purpose, because `AI ·` is quoted rather than written |
 | **0.45.8** | **The money, the loan, and the firm** — Campaigns, Grants and Org fully localized (console-untranslated 338 → 254); the table's ten-language check widened from the sidebar to all 1519 rows |

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type MicsHere, type RoomMsg } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -38,6 +39,7 @@ import { useSession } from "../store";
  */
 export function Inside({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -69,41 +71,34 @@ export function Inside({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Inside a room</h2>
-      <p className="muted small">
-        Read it, say something, let the profiles take a turn. You have to be
-        in the room — knowing its id is not the same as being here, and the
-        id travels on stickers.
-      </p>
+      <h2>{tr("ins.title", lang)}</h2>
+      <p className="muted small">{tr("ins.pitch", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Which room</h3>
+        <h3>{tr("ins.whichroom", lang)}</h3>
         <div className="row">
           <input value={roomId} onChange={(e) => setRoomId(e.target.value)}
-                 placeholder="room id, from Rooms" style={{ flex: 1 }} />
+                 placeholder={tr("ins.roomid.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !open || !token} onClick={act(async () => {
             load();
           })}>
-            Go in
+            {tr("ins.goin", lang)}
           </button>
         </div>
         {!token && (
-          <p className="muted small">
-            Sign in as a person first — a room turn is spoken by somebody, so
-            a profile's owner token is refused here by name.
-          </p>
+          <p className="muted small">{tr("ins.signinperson", lang)}</p>
         )}
       </div>
 
       {open && (
         <>
           <div className="card">
-            <h3>What has been said</h3>
+            <h3>{tr("ins.whatsaid", lang)}</h3>
             {transcript.length === 0 && (
-              <p className="muted small">Nothing yet.</p>
+              <p className="muted small">{tr("ins.nothingyet", lang)}</p>
             )}
             {transcript.map((m) => (
               <p className="small" key={m.id}>
@@ -120,36 +115,34 @@ export function Inside({ onPlans }: { onPlans: () => void }) {
             ))}
             <div className="row">
               <input value={draft} onChange={(e) => setDraft(e.target.value)}
-                     placeholder="say something" style={{ flex: 1 }} />
+                     placeholder={tr("ins.say.ph", lang)} style={{ flex: 1 }} />
               <button disabled={busy || !token || !draft.trim()}
                       onClick={act(async () => {
                         const text = draft;
                         setDraft("");
                         await api.sayInRoom(open, me, text, token);
                       })}>
-                Say it
+                {tr("ins.sayit", lang)}
               </button>
               <button disabled={busy || !token}
                       onClick={act(async () => {
                         await api.advanceRoom(open, token);
                       })}>
-                Let them talk
+                {tr("ins.letthemtalk", lang)}
               </button>
             </div>
-            <p className="muted small">
-              Everything a profile says here is watermarked as synthetic
-              media, at the moment it is said. A room with anybody under 18 in
-              it runs strict moderation for everyone.
-            </p>
+            <p className="muted small">{tr("ins.watermarked", lang)}</p>
           </div>
 
           <div className="card">
-            <h3>Microphones</h3>
+            <h3>{tr("ins.microphones", lang)}</h3>
             {mics && <p className="muted small">{mics.note}</p>}
             {mics?.microphones_lent.map((m) => (
               <p className="small" key={m.interactor_id}>
-                <code>{m.interactor_id}</code> · {m.device} · {m.hears} ·
-                since {m.since}
+                {fill(tr("ins.micline", lang), {
+                  who: <code>{m.interactor_id}</code>, device: m.device,
+                  hears: m.hears, when: m.since,
+                })}
               </p>
             ))}
             <div className="row">
@@ -157,26 +150,19 @@ export function Inside({ onPlans }: { onPlans: () => void }) {
                 <button disabled={busy || !token || !me}
                         onClick={act(async () => {
                           await api.lendMicInRoom(open, me, token);
-                        }, "Lent. Everyone here is shown that you did.")}>
-                  Lend them my microphone
+                        }, tr("ins.lent", lang))}>
+                  {tr("ins.lendmic", lang)}
                 </button>
               ) : (
                 <button disabled={busy || !token}
                         onClick={act(async () => {
                           await api.takeBackMicInRoom(open, me, token);
-                        }, "Taken back.")}>
-                  Take my microphone back
+                        }, tr("ins.takenback", lang))}>
+                  {tr("ins.takeback", lang)}
                 </button>
               )}
             </div>
-            <p className="muted small">
-              In a voice room your own microphone carries your voice to the
-              other people; the profiles are reading text and have no ear.
-              Lending yours gives them one — keyed to your voice and set
-              narrow enough to reach only you, not the room. Everybody here is
-              shown that you lent it, which is the whole point: a microphone
-              the others cannot see is what this is built not to be.
-            </p>
+            <p className="muted small">{tr("ins.micpitch", lang)}</p>
           </div>
         </>
       )}
