@@ -273,8 +273,15 @@ def test_the_screen_draws_an_unrun_check_as_unrun():
     """The rendering half of the defect. A screen that drew absent as a tick
     would put the old lie back on the glass with the backend fixed."""
     flat = " ".join(_markup().split())
-    assert "did not run, so it is not a pass" in flat
+    # The sentence moved into the l10n table when the screen was localized.
+    # Both halves are asked: that the screen renders it on the undefined
+    # branch, and that the table still carries the words. Either alone would
+    # pass a screen that had stopped saying it.
+    assert 'tr("sgn.didnotrun", lang)' in flat
     assert "v === undefined" in flat
+    l10n = " ".join(
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
+    assert "did not run, so it is not a pass" in l10n
 
 
 def test_the_screen_shows_the_checks_and_not_only_the_verdict():

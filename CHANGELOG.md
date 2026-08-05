@@ -4,6 +4,35 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.3] — 2026-08-05
+
+### Three more, and the wrist among them
+
+The console-untranslated record falls **848 → 724**.
+
+**Beginning, and passing on** — how a profile starts, what it is
+taught, who holds it after, and the one press from a wrist. Fifty-three
+`pas.*` keys. The load-bearing sentence is the one about succession:
+the single route in this product an owner token cannot open, because
+the signal it answers is that the owner has died or cannot act. It now
+reads that way in ten languages, with the bolded clause interpolated
+rather than the sentence broken around it. The four genesis questions
+took their example answers into the table as well — *warm, but needs
+quiet evenings* is what a form like that is actually read from, and
+leaving it English would have left the question English.
+
+**Signing** — forty-four `sgn.*` keys, including the sentences the
+screen refuses to soften: a check that did not run is drawn as not run
+and never as a tick, and a package handed to you is checked without
+this platform vouching for it.
+
+**Where it is marketed** — forty-one `plc.*` keys. The venue note
+itself is still rendered verbatim from the payload and never
+retyped; what is translated is everything the console says around it.
+
+One hundred and thirty-eight keys, all ten languages, exact-sync held
+in both directions.
+
 ## [0.45.2] — 2026-08-05
 
 ### The three biggest screens left

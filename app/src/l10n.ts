@@ -3690,6 +3690,420 @@ const CHROME: Table = {
   "vis.scan.sharedroom": {
     en: " Scanning joins one shared room.", es: " Escanearlo lleva a una sala compartida.", fr: " Le scan fait rejoindre un salon partagé.", de: " Das Scannen führt in einen gemeinsamen Raum.", pt: " Digitalizar leva a uma sala partilhada.", it: " La scansione porta in una stanza condivisa.", ja: "スキャンすると共有ルームに参加します。", zh: "扫描后会加入同一个共享房间。", hi: " स्कैन करने पर एक साझा कक्ष में शामिल हो जाते हैं.", ar: " المسح يُدخلك غرفة مشتركة واحدة.",
   },
+  "pas.title": {
+    en: "Beginning, and passing on", es: "Comenzar, y pasar el testigo", fr: "Commencer, et transmettre", de: "Anfang, und Weitergabe", pt: "Começar, e passar adiante", it: "Iniziare, e passare oltre", ja: "始まりと、受け渡し", zh: "开始，以及传承", hi: "आरंभ, और आगे सौंपना", ar: "البداية، والتوريث",
+  },
+  "pas.lead": {
+    en: "How a profile starts, what it is taught, who holds it after, and the one press from a wrist.", es: "Cómo empieza un perfil, qué se le enseña, quién lo tiene después, y la única pulsación desde una muñeca.", fr: "Comment un profil commence, ce qu'on lui enseigne, qui le détient ensuite, et l'unique pression depuis un poignet.", de: "Wie ein Profil beginnt, was ihm beigebracht wird, wer es danach hält, und der eine Druck vom Handgelenk.", pt: "Como um perfil começa, o que lhe é ensinado, quem o detém depois, e o único toque a partir de um pulso.", it: "Come nasce un profilo, cosa gli viene insegnato, chi lo tiene dopo, e l'unica pressione da un polso.", ja: "プロフィールがどう始まり、何を教えられ、その後は誰が持ち、そして手首からの一押し。", zh: "一份资料如何开始、被教了什么、之后由谁持有，以及来自腕上的那一次按压。", hi: "प्रोफ़ाइल कैसे शुरू होती है, उसे क्या सिखाया जाता है, बाद में उसे कौन रखता है, और कलाई से वह एक दबाव।", ar: "كيف يبدأ الملف، وما الذي يُعلَّم إياه، ومن يحمله بعد ذلك، والضغطة الواحدة من معصم.",
+  },
+  "pas.born": {
+    en: "Born from four questions", es: "Nacido de cuatro preguntas", fr: "Né de quatre questions", de: "Aus vier Fragen geboren", pt: "Nascido de quatro perguntas", it: "Nato da quattro domande", ja: "四つの問いから生まれる", zh: "由四个问题诞生", hi: "चार सवालों से जन्मा", ar: "مولود من أربعة أسئلة",
+  },
+  "pas.born.pitch": {
+    en: "Leave the name blank and it picks its own from the answers. That is not decoration: a persona assembled from what somebody said about themselves should not then be handed a label by a form field.", es: "Deje el nombre en blanco y elegirá el suyo a partir de las respuestas. Eso no es adorno: a una persona construida con lo que alguien dijo de sí misma no se le debería después colgar una etiqueta desde un campo de formulario.", fr: "Laissez le nom vide et il choisira le sien à partir des réponses. Ce n'est pas décoratif : un personnage assemblé à partir de ce que quelqu'un a dit de lui-même ne devrait pas ensuite recevoir une étiquette d'un champ de formulaire.", de: "Lassen Sie den Namen leer, und es wählt sich seinen eigenen aus den Antworten. Das ist keine Zierde: einer Persona, die aus dem zusammengesetzt ist, was jemand über sich gesagt hat, sollte danach kein Etikett aus einem Formularfeld verpasst werden.", pt: "Deixe o nome em branco e ele escolhe o seu a partir das respostas. Isso não é enfeite: uma persona montada a partir do que alguém disse sobre si mesma não deve depois receber um rótulo de um campo de formulário.", it: "Lascia il nome vuoto e sceglierà il proprio dalle risposte. Non è un ornamento: a una persona costruita con ciò che qualcuno ha detto di sé non si dovrebbe poi appiccicare un'etichetta da un campo di modulo.", ja: "名前を空欄にすれば、答えの中から自分で選びます。これは飾りではありません。誰かが自分について語ったことから組み立てられた人格に、あとからフォームの入力欄でラベルを貼るべきではないからです。", zh: "把名字留空，它会从答案里为自己挑一个。这不是装饰：一个由某人对自己的讲述所拼成的人格，不该事后被一个表单字段贴上标签。", hi: "नाम ख़ाली छोड़िए और यह उत्तरों में से अपना नाम चुन लेगा। यह सजावट नहीं है: जो व्यक्तित्व किसी के अपने बारे में कहे से बना हो, उसे बाद में फ़ॉर्म के किसी खाने से लेबल नहीं थमाया जाना चाहिए।", ar: "اترك الاسم فارغًا فيختار اسمه من الإجابات. ليس هذا زينة: شخصية جُمعت مما قاله أحدهم عن نفسه لا ينبغي أن تُمنح بعدها تسمية من حقل في نموذج.",
+  },
+  "pas.q.social": {
+    en: "social style", es: "estilo social", fr: "style social", de: "Umgangsstil", pt: "estilo social", it: "stile sociale", ja: "人づきあい", zh: "社交方式", hi: "सामाजिक ढंग", ar: "الأسلوب الاجتماعي",
+  },
+  "pas.q.humor": {
+    en: "humor", es: "humor", fr: "humour", de: "Humor", pt: "humor", it: "umorismo", ja: "ユーモア", zh: "幽默", hi: "हास्य", ar: "روح الدعابة",
+  },
+  "pas.q.matters": {
+    en: "what matters", es: "lo que importa", fr: "ce qui compte", de: "was zählt", pt: "o que importa", it: "cosa conta", ja: "大切なこと", zh: "在意什么", hi: "क्या मायने रखता है", ar: "ما يهمّ",
+  },
+  "pas.q.comfort": {
+    en: "comfort", es: "consuelo", fr: "réconfort", de: "Trost", pt: "conforto", it: "conforto", ja: "慰め方", zh: "如何安慰", hi: "सांत्वना", ar: "المواساة",
+  },
+  "pas.h.social": {
+    en: "warm, but needs quiet evenings", es: "cálido, pero necesita tardes tranquilas", fr: "chaleureux, mais a besoin de soirées calmes", de: "warmherzig, braucht aber ruhige Abende", pt: "caloroso, mas precisa de noites sossegadas", it: "caloroso, ma ha bisogno di serate tranquille", ja: "温かいが、静かな夜が要る", zh: "热情，但需要安静的夜晚", hi: "गर्मजोशी भरा, पर शांत शामें चाहिए", ar: "دافئ، لكنه يحتاج أمسيات هادئة",
+  },
+  "pas.h.humor": {
+    en: "dry, gentle teasing", es: "seco, con bromas suaves", fr: "pince-sans-rire, taquin sans méchanceté", de: "trocken, sanft neckend", pt: "seco, com provocações suaves", it: "asciutto, prende in giro con garbo", ja: "淡々として、やさしくからかう", zh: "冷淡而温和的调侃", hi: "शुष्क, हल्की छेड़छाड़", ar: "ساخر بهدوء، يمازح برفق",
+  },
+  "pas.h.matters": {
+    en: "family, honesty, the garden", es: "la familia, la honestidad, el jardín", fr: "la famille, l'honnêteté, le jardin", de: "Familie, Ehrlichkeit, der Garten", pt: "a família, a honestidade, o jardim", it: "la famiglia, l'onestà, il giardino", ja: "家族、正直さ、庭", zh: "家人、诚实、那座花园", hi: "परिवार, ईमानदारी, बग़ीचा", ar: "العائلة، الصدق، الحديقة",
+  },
+  "pas.h.comfort": {
+    en: "sits with you rather than fixing it", es: "se sienta contigo en vez de arreglarlo", fr: "reste avec vous au lieu de tout réparer", de: "setzt sich zu Ihnen, statt es zu reparieren", pt: "fica consigo em vez de resolver", it: "ti sta accanto invece di sistemare le cose", ja: "解決しようとせず、そばに座る", zh: "不急着解决，只是陪着你", hi: "ठीक करने के बजाय साथ बैठता है", ar: "يجلس معك بدل أن يُصلح",
+  },
+  "pas.birth.ph": {
+    en: "your birthdate, YYYY-MM-DD", es: "su fecha de nacimiento, AAAA-MM-DD", fr: "votre date de naissance, AAAA-MM-JJ", de: "Ihr Geburtsdatum, JJJJ-MM-TT", pt: "a sua data de nascimento, AAAA-MM-DD", it: "la tua data di nascita, AAAA-MM-GG", ja: "生年月日（YYYY-MM-DD）", zh: "你的出生日期，YYYY-MM-DD", hi: "आपकी जन्मतिथि, YYYY-MM-DD", ar: "تاريخ ميلادك، سنة-شهر-يوم",
+  },
+  "pas.name.ph": {
+    en: "a name, or blank to let it choose", es: "un nombre, o en blanco para que elija", fr: "un nom, ou vide pour le laisser choisir", de: "ein Name, oder leer lassen, damit es wählt", pt: "um nome, ou em branco para que escolha", it: "un nome, o vuoto per lasciarlo scegliere", ja: "名前、または空欄にして選ばせる", zh: "一个名字，或留空让它自己选", hi: "एक नाम, या ख़ाली छोड़ें ताकि यह चुन ले", ar: "اسم، أو اتركه فارغًا ليختار",
+  },
+  "pas.bring": {
+    en: "Bring it into being", es: "Traerlo a la existencia", fr: "Le faire exister", de: "Ins Dasein rufen", pt: "Trazê-lo à existência", it: "Portalo all'esistenza", ja: "存在させる", zh: "让它成形", hi: "इसे अस्तित्व में लाएँ", ar: "أوجِده",
+  },
+  "pas.born.said": {
+    en: "Born.", es: "Nacido.", fr: "Né.", de: "Geboren.", pt: "Nascido.", it: "Nato.", ja: "生まれました。", zh: "已诞生。", hi: "जन्म हुआ।", ar: "وُلد.",
+  },
+  "pas.younamed": {
+    en: "You named it.", es: "Usted le puso nombre.", fr: "C'est vous qui l'avez nommé.", de: "Sie haben ihm den Namen gegeben.", pt: "Foi você que lhe deu o nome.", it: "Gli hai dato tu il nome.", ja: "あなたが名づけました。", zh: "是你为它命名的。", hi: "नाम आपने दिया।", ar: "أنت من سمّاه.",
+  },
+  "pas.itnamed": {
+    en: "It named itself from what you said.", es: "Se puso nombre a partir de lo que usted dijo.", fr: "Il s'est nommé à partir de ce que vous avez dit.", de: "Es hat sich aus dem benannt, was Sie gesagt haben.", pt: "Deu a si próprio um nome a partir do que você disse.", it: "Si è dato un nome da ciò che hai detto.", ja: "あなたの言葉から自ら名づけました。", zh: "它根据你说的话为自己命名。", hi: "आपने जो कहा, उसी से इसने अपना नाम रखा।", ar: "سمّى نفسه مما قلته.",
+  },
+  "pas.minor": {
+    en: "An owner under 18 needs a parent or guardian's consent, and the refusal says so rather than failing generically.", es: "Un propietario menor de 18 años necesita el consentimiento de un padre o tutor, y la negativa lo dice en vez de fallar de forma genérica.", fr: "Un propriétaire de moins de 18 ans a besoin du consentement d'un parent ou tuteur, et le refus le dit au lieu d'échouer de façon générique.", de: "Ein Besitzer unter 18 braucht die Zustimmung eines Elternteils oder Vormunds, und die Ablehnung sagt das, statt generisch zu scheitern.", pt: "Um proprietário com menos de 18 anos precisa do consentimento de um pai ou tutor, e a recusa di-lo em vez de falhar genericamente.", it: "Un proprietario minore di 18 anni ha bisogno del consenso di un genitore o tutore, e il rifiuto lo dice invece di fallire genericamente.", ja: "18歳未満の所有者には親または後見人の同意が必要で、拒否はその旨を告げます。ただ一般的なエラーになるのではありません。", zh: "未满 18 岁的所有者需要父母或监护人的同意，拒绝时会明说，而不是给出一个笼统的失败。", hi: "18 से कम आयु के स्वामी को माता-पिता या अभिभावक की सहमति चाहिए, और इनकार यही कहता है — सामान्य विफलता नहीं देता।", ar: "المالك دون الثامنة عشرة يحتاج موافقة أحد الوالدين أو الوصي، والرفض يقول ذلك بدل أن يفشل بصيغة عامة.",
+  },
+  "pas.on": {
+    en: "Passing it on", es: "Pasarlo a otro", fr: "Le transmettre", de: "Weitergeben", pt: "Passá-lo adiante", it: "Passarlo ad altri", ja: "受け渡す", zh: "把它传下去", hi: "इसे आगे सौंपना", ar: "توريثه",
+  },
+  "pas.cannot": {
+    en: "owner token cannot open", es: "un token de propietario no puede abrir", fr: "un jeton de propriétaire ne peut ouvrir", de: "das ein Besitzer-Token nicht öffnen kann", pt: "um token de proprietário não pode abrir", it: "un token da proprietario non può aprire", ja: "所有者トークンでは開けない", zh: "所有者令牌无法开启", hi: "स्वामी टोकन नहीं खोल सकता", ar: "لا يفتحه رمز المالك",
+  },
+  "pas.on.pitch": {
+    en: "The one route in this product an {cannot} — because the signal it answers is that the owner has died or cannot act, and requiring their authorisation would be requiring the one thing known to be unavailable. A reviewer holds it, against a verification reference kept out of band: a death certificate, a power of attorney.", es: "La única ruta de este producto que {cannot} — porque la señal a la que responde es que el propietario ha muerto o no puede actuar, y exigir su autorización sería exigir justo lo que se sabe que no está disponible. La tiene un revisor, contra una referencia de verificación guardada fuera de banda: un certificado de defunción, un poder notarial.", fr: "La seule route de ce produit qu'{cannot} — parce que le signal auquel elle répond est que le propriétaire est mort ou ne peut agir, et exiger son autorisation serait exiger précisément ce que l'on sait indisponible. C'est un vérificateur qui la détient, contre une référence de vérification conservée hors bande : un certificat de décès, une procuration.", de: "Der eine Weg in diesem Produkt, {cannot} — denn das Signal, auf das er antwortet, ist, dass der Besitzer gestorben ist oder nicht handeln kann, und seine Autorisierung zu verlangen hieße, genau das zu verlangen, was bekanntlich nicht verfügbar ist. Ein Prüfer hält ihn, gegen einen außerhalb geführten Verifikationsnachweis: eine Sterbeurkunde, eine Vollmacht.", pt: "A única via neste produto que {cannot} — porque o sinal a que responde é que o proprietário morreu ou não pode agir, e exigir a sua autorização seria exigir exatamente aquilo que se sabe indisponível. É um revisor que a detém, contra uma referência de verificação guardada fora de banda: uma certidão de óbito, uma procuração.", it: "L'unica via in questo prodotto che {cannot} — perché il segnale a cui risponde è che il proprietario è morto o non può agire, e pretendere la sua autorizzazione sarebbe pretendere proprio ciò che si sa non disponibile. La tiene un revisore, contro un riferimento di verifica conservato fuori banda: un certificato di morte, una procura.", ja: "この製品で唯一、{cannot}経路です — なぜなら、それが応じる合図は所有者が亡くなったか行為できないということであり、その承認を求めることは、手に入らないと分かっている当のものを求めることになるからです。代わりに審査者が持ち、帯域外で保管された確認資料——死亡証明書や委任状——に対して行使します。", zh: "本产品中唯一一条{cannot}的路径——因为它所回应的信号，正是所有者已故或无法行事；要求其授权，就等于要求那件已知无法取得的东西。它由一位审核者持有，凭据是带外保存的验证材料：死亡证明、授权委托书。", hi: "इस उत्पाद का वह एक रास्ता जिसे {cannot} — क्योंकि यह जिस संकेत का उत्तर देता है वह यही है कि स्वामी की मृत्यु हो चुकी है या वह कार्य नहीं कर सकता, और उसकी अनुमति माँगना ठीक उसी चीज़ को माँगना होगा जिसका उपलब्ध न होना पहले से ज्ञात है। इसे एक समीक्षक रखता है, बैंड से बाहर रखे सत्यापन संदर्भ के विरुद्ध: मृत्यु प्रमाणपत्र, मुख़्तारनामा।", ar: "الطريق الوحيد في هذا المنتج الذي {cannot} — لأن الإشارة التي يستجيب لها هي أن المالك قد توفي أو لا يستطيع التصرف، وطلب إذنه يعني طلب الشيء الوحيد المعروف أنه غير متاح. يحمله مراجع، مقابل مرجع تحقق يُحفظ خارج القناة: شهادة وفاة، أو توكيل رسمي.",
+  },
+  "pas.subject.ph": {
+    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "対象のプロフィール", zh: "该资料", hi: "वह प्रोफ़ाइल", ar: "الملف",
+  },
+  "pas.ref.ph": {
+    en: "verification reference", es: "referencia de verificación", fr: "référence de vérification", de: "Verifikationsnachweis", pt: "referência de verificação", it: "riferimento di verifica", ja: "確認資料の参照番号", zh: "验证凭据编号", hi: "सत्यापन संदर्भ", ar: "مرجع التحقق",
+  },
+  "pas.reviewer.ph": {
+    en: "reviewer token", es: "token de revisor", fr: "jeton de vérificateur", de: "Prüfer-Token", pt: "token de revisor", it: "token del revisore", ja: "審査者トークン", zh: "审核者令牌", hi: "समीक्षक टोकन", ar: "رمز المراجع",
+  },
+  "pas.passit": {
+    en: "Pass it on", es: "Pasarlo", fr: "Transmettre", de: "Weitergeben", pt: "Passar adiante", it: "Passalo", ja: "受け渡す", zh: "传下去", hi: "सौंप दें", ar: "ورّثه",
+  },
+  "pas.now": {
+    en: "Now {status}", es: "Ahora {status}", fr: "Désormais {status}", de: "Jetzt {status}", pt: "Agora {status}", it: "Ora {status}", ja: "現在は {status}", zh: "现在为 {status}", hi: "अब {status}", ar: "الآن {status}",
+  },
+  "pas.heldby": {
+    en: "— held by {who}", es: "— en manos de {who}", fr: "— détenu par {who}", de: "— gehalten von {who}", pt: "— detido por {who}", it: "— tenuto da {who}", ja: "— 保有者は {who}", zh: "— 由 {who} 持有", hi: "— {who} के पास", ar: "— يحمله {who}",
+  },
+  "pas.token.once": {
+    en: "Their owner token, shown once: {token}", es: "Su token de propietario, mostrado una sola vez: {token}", fr: "Son jeton de propriétaire, affiché une seule fois : {token}", de: "Ihr Besitzer-Token, einmalig angezeigt: {token}", pt: "O token de proprietário deles, mostrado uma só vez: {token}", it: "Il loro token da proprietario, mostrato una volta sola: {token}", ja: "その所有者トークン（一度だけ表示）: {token}", zh: "他们的所有者令牌，仅显示一次：{token}", hi: "उनका स्वामी टोकन, एक ही बार दिखाया गया: {token}", ar: "رمز المالك الخاص بهم، يُعرض مرة واحدة: {token}",
+  },
+  "pas.memorial": {
+    en: "Nobody was named, so it sunsets to memorial: frozen rather than orphaned. A profile whose owner has died and which nobody can reach is worse than one that has plainly stopped.", es: "No se nombró a nadie, así que se apaga como memorial: congelado en vez de huérfano. Un perfil cuyo propietario ha muerto y al que nadie puede llegar es peor que uno que se ha detenido claramente.", fr: "Personne n'a été désigné, il s'éteint donc en mémorial : figé plutôt qu'orphelin. Un profil dont le propriétaire est mort et que personne ne peut joindre est pire qu'un profil manifestement arrêté.", de: "Niemand wurde benannt, also geht es in einen Gedenkzustand über: eingefroren statt verwaist. Ein Profil, dessen Besitzer gestorben ist und das niemand erreichen kann, ist schlimmer als eines, das erkennbar aufgehört hat.", pt: "Ninguém foi nomeado, por isso apaga-se para memorial: congelado em vez de órfão. Um perfil cujo proprietário morreu e a que ninguém consegue chegar é pior do que um que claramente parou.", it: "Nessuno è stato nominato, quindi tramonta in memoriale: congelato anziché orfano. Un profilo il cui proprietario è morto e che nessuno può raggiungere è peggio di uno che si è chiaramente fermato.", ja: "誰も指名されなかったため、追悼状態へと沈みます。孤児になるのではなく凍結されるのです。所有者が亡くなり、誰も連絡が取れないプロフィールは、はっきり止まったものより悪いからです。", zh: "无人被指定，因此它落入纪念状态：冻结，而非无人认领。一份所有者已故、又无人能联系的资料，比一份明明白白停下来的更糟。", hi: "किसी का नाम नहीं दिया गया, इसलिए यह स्मारक-स्थिति में ढल जाती है: अनाथ नहीं, जमी हुई। जिस प्रोफ़ाइल का स्वामी मर चुका हो और जिस तक कोई पहुँच न सके, वह उससे बुरी है जो साफ़-साफ़ रुक गई हो।", ar: "لم يُسمَّ أحد، فيغرب إلى حالة تذكارية: مجمَّد لا يتيم. الملف الذي مات مالكه ولا يستطيع أحد الوصول إليه أسوأ من ملف توقّف بوضوح.",
+  },
+  "pas.contested": {
+    en: "A contested identity cannot be handed on: an open objection blocks this with a 409. Inheriting a profile somebody is disputing would settle the dispute by transfer rather than by resolving it.", es: "Una identidad impugnada no puede transmitirse: una objeción abierta bloquea esto con un 409. Heredar un perfil que alguien disputa resolvería la disputa por traspaso en vez de resolviéndola.", fr: "Une identité contestée ne peut être transmise : une contestation ouverte bloque ceci par un 409. Hériter d'un profil que quelqu'un conteste réglerait le litige par transfert au lieu de le résoudre.", de: "Eine bestrittene Identität kann nicht weitergegeben werden: ein offener Widerspruch blockiert dies mit einem 409. Ein Profil zu erben, das jemand bestreitet, würde den Streit durch Übertragung entscheiden statt durch Klärung.", pt: "Uma identidade contestada não pode ser passada adiante: uma contestação em aberto bloqueia isto com um 409. Herdar um perfil que alguém disputa resolveria a disputa por transferência em vez de a resolver.", it: "Un'identità contestata non può essere trasmessa: una contestazione aperta blocca questo con un 409. Ereditare un profilo che qualcuno sta contestando risolverebbe la disputa per trasferimento anziché risolvendola.", ja: "争われている身元は受け渡せません。異議が開いていれば 409 でこれを阻みます。誰かが争っているプロフィールを相続することは、争いを解決するのではなく、移転によって決着させてしまうからです。", zh: "存在争议的身份不能移交：一项未结异议会以 409 阻止此操作。继承一份有人正在争议的资料，等于以转移的方式了结争议，而不是解决它。", hi: "विवादित पहचान आगे नहीं सौंपी जा सकती: खुली आपत्ति इसे 409 से रोक देती है। जिस प्रोफ़ाइल पर कोई विवाद कर रहा हो उसे विरासत में लेना, विवाद को सुलझाने के बजाय हस्तांतरण से निपटा देना होगा।", ar: "الهوية المتنازع عليها لا تُورَّث: اعتراض مفتوح يمنع ذلك برمز 409. وراثة ملف يعترض عليه أحدهم تحسم النزاع بالنقل بدل أن تحلّه.",
+  },
+  "pas.taught": {
+    en: "What it can be taught", es: "Lo que se le puede enseñar", fr: "Ce qu'on peut lui enseigner", de: "Was ihm beigebracht werden kann", pt: "O que lhe pode ser ensinado", it: "Cosa gli si può insegnare", ja: "何を教えられるか", zh: "它可以被教什么", hi: "इसे क्या सिखाया जा सकता है", ar: "ما يمكن تعليمه إياه",
+  },
+  "pas.taught.pitch": {
+    en: "Publishing needs your owner token, and the account sales accrue to is read from it — not from the request. Naming somebody else's account in a body is how money ends up somewhere it was not earned.", es: "Publicar exige su token de propietario, y la cuenta a la que se acumulan las ventas se lee de él, no de la petición. Nombrar la cuenta de otro en un cuerpo es como el dinero acaba donde no se ganó.", fr: "Publier exige votre jeton de propriétaire, et le compte auquel les ventes sont créditées en est déduit — pas de la requête. Nommer le compte d'autrui dans un corps de requête, c'est ainsi que l'argent finit là où il n'a pas été gagné.", de: "Veröffentlichen erfordert Ihr Besitzer-Token, und das Konto, dem Verkäufe zufließen, wird daraus gelesen — nicht aus der Anfrage. Ein fremdes Konto im Body zu nennen ist der Weg, auf dem Geld dort landet, wo es nicht verdient wurde.", pt: "Publicar exige o seu token de proprietário, e a conta a que as vendas são creditadas é lida dele — não do pedido. Nomear a conta de outra pessoa num corpo é como o dinheiro acaba onde não foi ganho.", it: "Pubblicare richiede il tuo token da proprietario, e il conto su cui maturano le vendite si legge da lì — non dalla richiesta. Indicare il conto di qualcun altro nel corpo è il modo in cui il denaro finisce dove non è stato guadagnato.", ja: "公開にはあなたの所有者トークンが必要で、売上が入る口座はそこから読み取られます — リクエストからではありません。本文で他人の口座を指定できることこそ、稼いでいない場所へお金が流れる仕組みです。", zh: "发布需要你的所有者令牌，销售收入归属的账户从令牌中读取——而不是从请求里。在请求体中指定别人的账户，正是钱最终流向未曾赚取之处的方式。", hi: "प्रकाशन के लिए आपका स्वामी टोकन चाहिए, और बिक्री जिस खाते में जमा होगी वह उसी से पढ़ा जाता है — अनुरोध से नहीं। किसी और का खाता बॉडी में लिख देना ही वह तरीका है जिससे पैसा वहाँ पहुँचता है जहाँ वह कमाया नहीं गया।", ar: "النشر يتطلب رمز المالك الخاص بك، ويُقرأ منه الحساب الذي تُقيَّد فيه المبيعات — لا من الطلب. تسمية حساب شخص آخر في جسم الطلب هي الطريقة التي ينتهي بها المال في مكان لم يُكسَب فيه.",
+  },
+  "pas.industry.ph": {
+    en: "industry", es: "sector", fr: "secteur", de: "Branche", pt: "setor", it: "settore", ja: "業種", zh: "行业", hi: "उद्योग", ar: "القطاع",
+  },
+  "pas.packtitle.ph": {
+    en: "the pack's title", es: "el título del paquete", fr: "le titre du lot", de: "der Titel des Pakets", pt: "o título do pacote", it: "il titolo del pacchetto", ja: "パックの題名", zh: "知识包的标题", hi: "पैक का शीर्षक", ar: "عنوان الحزمة",
+  },
+  "pas.itemtitle.ph": {
+    en: "one item's title", es: "el título de un elemento", fr: "le titre d'un élément", de: "der Titel eines Postens", pt: "o título de um item", it: "il titolo di una voce", ja: "項目一つの題名", zh: "某一条目的标题", hi: "किसी एक मद का शीर्षक", ar: "عنوان بند واحد",
+  },
+  "pas.itemwhat.ph": {
+    en: "what it teaches", es: "qué enseña", fr: "ce qu'il enseigne", de: "was er lehrt", pt: "o que ensina", it: "cosa insegna", ja: "何を教えるか", zh: "它教什么", hi: "यह क्या सिखाता है", ar: "ما الذي يعلّمه",
+  },
+  "pas.publish": {
+    en: "Publish it", es: "Publicarlo", fr: "Le publier", de: "Veröffentlichen", pt: "Publicá-lo", it: "Pubblicalo", ja: "公開する", zh: "发布", hi: "इसे प्रकाशित करें", ar: "انشره",
+  },
+  "pas.published.said": {
+    en: "Published.", es: "Publicado.", fr: "Publié.", de: "Veröffentlicht.", pt: "Publicado.", it: "Pubblicato.", ja: "公開しました。", zh: "已发布。", hi: "प्रकाशित।", ar: "نُشر.",
+  },
+  "pas.packrules": {
+    en: "A pack needs at least one item, a price cannot be negative, and every item in a robot pack needs a task — the command verb. Three refusals, each naming what is missing.", es: "Un paquete necesita al menos un elemento, un precio no puede ser negativo, y cada elemento de un paquete para robots necesita una tarea — el verbo de mando. Tres negativas, cada una nombrando lo que falta.", fr: "Un lot doit contenir au moins un élément, un prix ne peut être négatif, et chaque élément d'un lot pour robot doit avoir une tâche — le verbe de commande. Trois refus, chacun nommant ce qui manque.", de: "Ein Paket braucht mindestens einen Posten, ein Preis darf nicht negativ sein, und jeder Posten in einem Roboterpaket braucht eine Aufgabe — das Befehlsverb. Drei Ablehnungen, jede benennt, was fehlt.", pt: "Um pacote precisa de pelo menos um item, um preço não pode ser negativo, e cada item de um pacote para robôs precisa de uma tarefa — o verbo de comando. Três recusas, cada uma a nomear o que falta.", it: "Un pacchetto ha bisogno di almeno una voce, un prezzo non può essere negativo, e ogni voce in un pacchetto per robot ha bisogno di un compito — il verbo di comando. Tre rifiuti, ciascuno nomina cosa manca.", ja: "パックには少なくとも一項目が必要で、価格は負にできず、ロボット用パックの各項目にはタスク——命令の動詞——が必要です。三つの拒否があり、それぞれ何が足りないかを名指しします。", zh: "一个知识包至少要有一个条目，价格不能为负，而机器人知识包中的每个条目都需要一个任务——即指令动词。三种拒绝，各自点名缺的是什么。", hi: "एक पैक में कम से कम एक मद चाहिए, दाम ऋणात्मक नहीं हो सकता, और रोबोट पैक की हर मद को एक कार्य चाहिए — आदेश-क्रिया। तीन इनकार, हर एक बताता है कि क्या ग़ायब है।", ar: "الحزمة تحتاج بندًا واحدًا على الأقل، والسعر لا يكون سالبًا، وكل بند في حزمة روبوت يحتاج مهمة — فعل الأمر. ثلاثة أنواع رفض، كل منها يسمّي ما ينقص.",
+  },
+  "pas.pack.row": {
+    en: "{title} — {n} item{s} · {price} · published by {who}", es: "{title} — {n} elementos · {price} · publicado por {who}", fr: "{title} — {n} éléments · {price} · publié par {who}", de: "{title} — {n} Posten · {price} · veröffentlicht von {who}", pt: "{title} — {n} itens · {price} · publicado por {who}", it: "{title} — {n} voci · {price} · pubblicato da {who}", ja: "{title} — {n}件 · {price} · 公開者 {who}", zh: "{title} — {n} 项 · {price} · 由 {who} 发布", hi: "{title} — {n} मदें · {price} · {who} द्वारा प्रकाशित", ar: "{title} — {n} بنود · {price} · نشره {who}",
+  },
+  "pas.free": {
+    en: "free", es: "gratis", fr: "gratuit", de: "kostenlos", pt: "grátis", it: "gratis", ja: "無料", zh: "免费", hi: "निःशुल्क", ar: "مجاني",
+  },
+  "pas.seed": {
+    en: "seed the starter packs", es: "sembrar los paquetes iniciales", fr: "semer les lots de départ", de: "die Startpakete anlegen", pt: "semear os pacotes iniciais", it: "semina i pacchetti iniziali", ja: "入門パックを投入する", zh: "导入入门知识包", hi: "शुरुआती पैक बोएँ", ar: "ازرع الحزم الابتدائية",
+  },
+  "pas.seeded": {
+    en: "{created} created, {skipped} already there, across {n} industries. Pressing again is safe.", es: "{created} creados, {skipped} ya estaban, en {n} sectores. Volver a pulsar es seguro.", fr: "{created} créés, {skipped} déjà présents, sur {n} secteurs. Appuyer de nouveau est sans risque.", de: "{created} angelegt, {skipped} bereits vorhanden, über {n} Branchen. Nochmal drücken ist unbedenklich.", pt: "{created} criados, {skipped} já lá estavam, em {n} setores. Voltar a carregar é seguro.", it: "{created} creati, {skipped} già presenti, su {n} settori. Premere di nuovo è sicuro.", ja: "{created}件を作成、{skipped}件はすでに存在、{n}業種にわたって。もう一度押しても安全です。", zh: "创建 {created} 个，已存在 {skipped} 个，覆盖 {n} 个行业。再按一次是安全的。", hi: "{created} बनाए गए, {skipped} पहले से मौजूद, {n} उद्योगों में। दोबारा दबाना सुरक्षित है।", ar: "أُنشئ {created}، و{skipped} موجودة أصلًا، عبر {n} قطاعات. الضغط مجددًا آمن.",
+  },
+  "pas.wrist": {
+    en: "One press from the wrist", es: "Una pulsación desde la muñeca", fr: "Une pression depuis le poignet", de: "Ein Druck vom Handgelenk", pt: "Um toque a partir do pulso", it: "Una pressione dal polso", ja: "手首からの一押し", zh: "来自腕上的一次按压", hi: "कलाई से एक दबाव", ar: "ضغطة واحدة من المعصم",
+  },
+  "pas.wrist.pitch": {
+    en: "Down the same paths the full apps use — same auth, same allowlists, same moderation. A shortcut that skipped any of those would be a second, weaker way in, which is exactly what a wrist should not be.", es: "Por los mismos caminos que usan las apps completas — misma autenticación, mismas listas de permitidos, misma moderación. Un atajo que se saltara alguno sería una segunda vía de entrada, más débil, que es justo lo que una muñeca no debe ser.", fr: "Par les mêmes chemins que les applications complètes — même authentification, mêmes listes d'autorisation, même modération. Un raccourci qui en sauterait un serait une deuxième voie d'accès, plus faible, ce qu'un poignet ne doit surtout pas être.", de: "Über dieselben Wege, die die vollen Apps nutzen — dieselbe Authentifizierung, dieselben Freigabelisten, dieselbe Moderation. Eine Abkürzung, die eines davon überspränge, wäre ein zweiter, schwächerer Zugang — genau das, was ein Handgelenk nicht sein darf.", pt: "Pelos mesmos caminhos que as apps completas usam — mesma autenticação, mesmas listas de permissões, mesma moderação. Um atalho que saltasse algum deles seria uma segunda via de entrada, mais fraca, que é exatamente o que um pulso não deve ser.", it: "Per le stesse strade che usano le app complete — stessa autenticazione, stesse liste di permessi, stessa moderazione. Una scorciatoia che ne saltasse una sarebbe una seconda via d'ingresso, più debole, che è esattamente ciò che un polso non deve essere.", ja: "フル機能のアプリと同じ経路を通ります — 同じ認証、同じ許可リスト、同じ審査。そのどれかを飛ばす近道は、二つ目の、より弱い入口になってしまいます。手首がそうであってはならないのは、まさにその点です。", zh: "走的是完整应用所走的同一条路——同样的认证、同样的白名单、同样的审核。任何跳过其中一项的捷径，都会成为第二条更薄弱的入口，而这恰恰是腕上设备最不该成为的东西。", hi: "उन्हीं रास्तों से जिनसे पूरे ऐप्स गुज़रते हैं — वही प्रमाणीकरण, वही अनुमति-सूचियाँ, वही मॉडरेशन। इनमें से किसी को छोड़ देने वाला शॉर्टकट भीतर आने का दूसरा, कमज़ोर रास्ता बन जाता — और कलाई को यही नहीं होना चाहिए।", ar: "عبر المسارات نفسها التي تسلكها التطبيقات الكاملة — التوثيق نفسه، وقوائم السماح نفسها، والمراجعة نفسها. أي اختصار يتخطى واحدًا منها سيكون مدخلًا ثانيًا أضعف، وهذا بالضبط ما لا ينبغي أن يكونه المعصم.",
+  },
+  "pas.id.ph": {
+    en: "its id", es: "su id", fr: "son id", de: "seine ID", pt: "o seu id", it: "il suo id", ja: "その ID", zh: "它的 ID", hi: "इसकी आईडी", ar: "معرّفه",
+  },
+  "pas.action.ph": {
+    en: "advance / assist / cancel", es: "avanzar / asistir / cancelar", fr: "avancer / assister / annuler", de: "weiter / helfen / abbrechen", pt: "avançar / assistir / cancelar", it: "avanza / assisti / annulla", ja: "advance / assist / cancel", zh: "advance / assist / cancel", hi: "advance / assist / cancel", ar: "advance / assist / cancel",
+  },
+  "pas.input.ph": {
+    en: "what it asked for", es: "lo que pidió", fr: "ce qu'il a demandé", de: "worum es gebeten hat", pt: "o que pediu", it: "cosa ha chiesto", ja: "求められた内容", zh: "它所要求的内容", hi: "इसने क्या माँगा", ar: "ما طلبه",
+  },
+  "pas.press": {
+    en: "Press it", es: "Pulsar", fr: "Appuyer", de: "Drücken", pt: "Carregar", it: "Premi", ja: "押す", zh: "按下", hi: "दबाएँ", ar: "اضغط",
+  },
+  "pas.done.said": {
+    en: "Done.", es: "Hecho.", fr: "Fait.", de: "Erledigt.", pt: "Feito.", it: "Fatto.", ja: "完了しました。", zh: "完成。", hi: "हो गया।", ar: "تمّ.",
+  },
+  "pas.assist": {
+    en: "assist", es: "asistir", fr: "assister", de: "helfen", pt: "assistir", it: "assisti", ja: "assist", zh: "assist", hi: "assist", ar: "assist",
+  },
+  "pas.assist.note": {
+    en: "{assist} needs input — the paused phase asked for something, and sending nothing would advance past the question rather than answer it.", es: "{assist} necesita una entrada — la fase en pausa pidió algo, y no enviar nada avanzaría más allá de la pregunta en vez de responderla.", fr: "{assist} exige une saisie — la phase en pause a demandé quelque chose, et n'envoyer rien avancerait au-delà de la question au lieu d'y répondre.", de: "{assist} braucht eine Eingabe — die pausierte Phase hat um etwas gebeten, und nichts zu senden würde an der Frage vorbei weitergehen, statt sie zu beantworten.", pt: "{assist} precisa de uma entrada — a fase em pausa pediu algo, e não enviar nada avançaria para além da pergunta em vez de a responder.", it: "{assist} richiede un input — la fase in pausa ha chiesto qualcosa, e non inviare nulla andrebbe oltre la domanda invece di rispondere.", ja: "{assist} には入力が必要です — 停止中の段階が何かを求めており、何も送らなければ問いに答えるのではなく問いを飛び越えてしまいます。", zh: "{assist} 需要输入——暂停的阶段提出了要求，什么都不发就会越过这个问题，而不是回答它。", hi: "{assist} को इनपुट चाहिए — रुके हुए चरण ने कुछ माँगा है, और कुछ न भेजना सवाल का उत्तर देने के बजाय उसे लाँघ जाना होगा।", ar: "{assist} يحتاج مُدخلًا — الطور المتوقف طلب شيئًا، وإرسال لا شيء يتجاوز السؤال بدل أن يجيبه.",
+  },
+  "sgn.title": {
+    en: "Signing", es: "Firma", fr: "Signature", de: "Signieren", pt: "Assinatura", it: "Firma", ja: "署名", zh: "签署", hi: "हस्ताक्षर", ar: "التوقيع",
+  },
+  "sgn.noaccount": {
+    en: "Signing is done as an account, not as a profile page. Sign in as an owner to enrol a credential.", es: "Se firma como cuenta, no como página de perfil. Inicie sesión como propietario para registrar una credencial.", fr: "On signe en tant que compte, pas en tant que page de profil. Connectez-vous comme propriétaire pour enregistrer un justificatif.", de: "Signiert wird als Konto, nicht als Profilseite. Melden Sie sich als Besitzer an, um einen Nachweis zu registrieren.", pt: "Assina-se como conta, não como página de perfil. Entre como proprietário para registar uma credencial.", it: "Si firma come account, non come pagina di profilo. Accedi come proprietario per registrare una credenziale.", ja: "署名はアカウントとして行うもので、プロフィールのページとしてではありません。資格情報を登録するには所有者としてサインインしてください。", zh: "签署是以账户身份进行的，而不是以资料页面的身份。请以所有者身份登录以注册凭据。", hi: "हस्ताक्षर खाते के रूप में होता है, प्रोफ़ाइल पृष्ठ के रूप में नहीं। क्रेडेंशियल दर्ज करने के लिए स्वामी के रूप में साइन इन करें।", ar: "التوقيع يتم بصفة حساب لا بصفة صفحة ملف. سجّل الدخول بصفتك مالكًا لتسجيل اعتماد.",
+  },
+  "sgn.lead": {
+    en: "A signature here is a device credential used with user verification over one exact document. What that does and does not prove is written below, in the words a counterparty will read.", es: "Una firma aquí es una credencial de dispositivo usada con verificación de usuario sobre un documento exacto. Lo que eso prueba y lo que no está escrito abajo, con las palabras que leerá la contraparte.", fr: "Une signature ici est un justificatif d'appareil utilisé avec vérification de l'utilisateur sur un document exact. Ce que cela prouve et ne prouve pas est écrit plus bas, dans les mots que lira la contrepartie.", de: "Eine Unterschrift ist hier ein Gerätenachweis, mit Nutzerverifikation über genau ein Dokument verwendet. Was das beweist und was nicht, steht unten — in den Worten, die eine Gegenpartei lesen wird.", pt: "Uma assinatura aqui é uma credencial de dispositivo usada com verificação do utilizador sobre um documento exato. O que isso prova e o que não prova está escrito abaixo, nas palavras que a contraparte vai ler.", it: "Una firma qui è una credenziale del dispositivo usata con verifica dell'utente su un documento esatto. Cosa dimostra e cosa no è scritto sotto, nelle parole che leggerà la controparte.", ja: "ここでの署名とは、利用者確認を伴って、ただ一つの文書に対して使われる端末の資格情報です。それが何を証明し、何を証明しないかは下に、相手方が読む言葉で書いてあります。", zh: "此处的签名，是在用户验证下针对某一份确切文件所使用的设备凭据。它能证明什么、不能证明什么，写在下方——用对方将会读到的措辞。", hi: "यहाँ हस्ताक्षर का अर्थ है एक डिवाइस क्रेडेंशियल, जो उपयोगकर्ता-सत्यापन के साथ ठीक एक दस्तावेज़ पर प्रयुक्त होता है। वह क्या सिद्ध करता है और क्या नहीं, नीचे लिखा है — उन्हीं शब्दों में जो सामने वाला पक्ष पढ़ेगा।", ar: "التوقيع هنا هو اعتماد جهاز يُستخدم مع تحقّق من المستخدم على وثيقة واحدة بعينها. ما يثبته وما لا يثبته مكتوب أدناه، بالألفاظ التي سيقرؤها الطرف المقابل.",
+  },
+  "sgn.enrol": {
+    en: "Enrol a credential", es: "Registrar una credencial", fr: "Enregistrer un justificatif", de: "Einen Nachweis registrieren", pt: "Registar uma credencial", it: "Registra una credenziale", ja: "資格情報を登録する", zh: "注册一个凭据", hi: "क्रेडेंशियल दर्ज करें", ar: "سجّل اعتمادًا",
+  },
+  "sgn.enrol.pitch": {
+    en: "The ceremony opens in its own window, on the API's own origin — WebAuthn refuses a credential whose relying party does not match, and this app's origin is not one it can match. That window carries no token; it hands the registration back here, and this screen makes the call.", es: "La ceremonia se abre en su propia ventana, en el origen de la propia API — WebAuthn rechaza una credencial cuya parte confiante no coincide, y el origen de esta app no es uno con el que pueda coincidir. Esa ventana no lleva token; devuelve el registro aquí, y es esta pantalla la que hace la llamada.", fr: "La cérémonie s'ouvre dans sa propre fenêtre, sur l'origine de l'API — WebAuthn refuse un justificatif dont la partie utilisatrice ne correspond pas, et l'origine de cette application n'en est pas une qu'il puisse faire correspondre. Cette fenêtre ne porte aucun jeton ; elle rend l'enregistrement ici, et c'est cet écran qui fait l'appel.", de: "Die Zeremonie öffnet sich in einem eigenen Fenster, auf der Origin der API — WebAuthn weist einen Nachweis zurück, dessen Relying Party nicht passt, und die Origin dieser App ist keine, die passen kann. Jenes Fenster trägt kein Token; es reicht die Registrierung hierher zurück, und dieser Bildschirm macht den Aufruf.", pt: "A cerimónia abre na sua própria janela, na origem da própria API — o WebAuthn recusa uma credencial cuja parte confiante não corresponde, e a origem desta app não é uma com que possa corresponder. Essa janela não leva token; devolve o registo para aqui, e é este ecrã que faz a chamada.", it: "La cerimonia si apre in una finestra propria, sull'origin dell'API — WebAuthn rifiuta una credenziale la cui relying party non corrisponde, e l'origin di questa app non è una che possa corrispondere. Quella finestra non porta token; restituisce la registrazione qui, ed è questa schermata a fare la chiamata.", ja: "この儀式は API 自身のオリジン上で、別のウィンドウとして開きます — WebAuthn は依拠当事者が一致しない資格情報を拒否し、このアプリのオリジンは一致し得ないからです。そのウィンドウはトークンを持たず、登録結果をここに返し、呼び出しはこの画面が行います。", zh: "该仪式在自己的窗口中打开，位于 API 自身的源上——WebAuthn 会拒绝依赖方不匹配的凭据，而本应用的源无法与之匹配。那个窗口不携带任何令牌；它把注册结果交回这里，由本页面发起调用。", hi: "यह प्रक्रिया अपनी अलग विंडो में, API के अपने ऑरिजिन पर खुलती है — WebAuthn ऐसे क्रेडेंशियल को अस्वीकार करता है जिसका रिलाइंग पार्टी मेल न खाए, और इस ऐप का ऑरिजिन मेल खा ही नहीं सकता। वह विंडो कोई टोकन नहीं ले जाती; वह पंजीकरण यहाँ लौटा देती है, और कॉल यही स्क्रीन करती है।", ar: "تُفتح المراسم في نافذتها الخاصة، على أصل واجهة البرمجة نفسها — إذ يرفض WebAuthn اعتمادًا لا يطابق الطرف المعتمِد، وأصل هذا التطبيق ليس مما يمكن أن يطابقه. تلك النافذة لا تحمل رمزًا؛ بل تعيد التسجيل إلى هنا، وهذه الشاشة هي التي تُجري النداء.",
+  },
+  "sgn.device.ph": {
+    en: "what to call this device", es: "cómo llamar a este dispositivo", fr: "comment appeler cet appareil", de: "wie dieses Gerät heißen soll", pt: "como chamar este dispositivo", it: "come chiamare questo dispositivo", ja: "この端末の呼び名", zh: "如何称呼这台设备", hi: "इस डिवाइस को क्या कहें", ar: "بمَ تسمّي هذا الجهاز",
+  },
+  "sgn.thisdevice": {
+    en: "This device", es: "Este dispositivo", fr: "Cet appareil", de: "Dieses Gerät", pt: "Este dispositivo", it: "Questo dispositivo", ja: "この端末", zh: "这台设备", hi: "यह डिवाइस", ar: "هذا الجهاز",
+  },
+  "sgn.checked": {
+    en: "How your identity was checked", es: "Cómo se comprobó su identidad", fr: "Comment votre identité a été vérifiée", de: "Wie Ihre Identität geprüft wurde", pt: "Como a sua identidade foi verificada", it: "Come è stata verificata la tua identità", ja: "本人確認の方法", zh: "你的身份是如何被核验的", hi: "आपकी पहचान कैसे जाँची गई", ar: "كيف جرى التحقق من هويتك",
+  },
+  "sgn.attestor.ph": {
+    en: "who checked it (required above self-asserted)", es: "quién lo comprobó (obligatorio por encima de autodeclarado)", fr: "qui l'a vérifié (obligatoire au-dessus d'auto-déclaré)", de: "wer es geprüft hat (oberhalb von selbsterklärt erforderlich)", pt: "quem verificou (obrigatório acima de autodeclarado)", it: "chi l'ha verificato (obbligatorio sopra l'autodichiarato)", ja: "誰が確認したか（自己申告より上の水準では必須）", zh: "由谁核验（高于自述级别时必填）", hi: "किसने जाँचा (स्व-घोषित से ऊपर आवश्यक)", ar: "من تحقّق منه (مطلوب فوق مستوى الإقرار الذاتي)",
+  },
+  "sgn.and": {
+    en: "and", es: "y", fr: "et", de: "und", pt: "e", it: "e", ja: "かつ", zh: "并且", hi: "और", ar: "و",
+  },
+  "sgn.tierpitch": {
+    en: "This fixes what the credential may sign. A self-asserted one signs the basic tier only; the high tier wants a document check {and} a key that stayed on one device.", es: "Esto fija qué puede firmar la credencial. Una autodeclarada firma solo el nivel básico; el nivel alto quiere una comprobación documental {and} una clave que se quedó en un único dispositivo.", fr: "Ceci fixe ce que le justificatif peut signer. Un justificatif auto-déclaré ne signe que le niveau de base ; le niveau élevé veut une vérification de document {and} une clé restée sur un seul appareil.", de: "Das legt fest, was der Nachweis signieren darf. Ein selbsterklärter signiert nur die Basisstufe; die hohe Stufe will eine Dokumentenprüfung {and} einen Schlüssel, der auf einem Gerät geblieben ist.", pt: "Isto fixa o que a credencial pode assinar. Uma autodeclarada assina apenas o nível básico; o nível alto quer uma verificação documental {and} uma chave que ficou num só dispositivo.", it: "Questo fissa cosa la credenziale può firmare. Una autodichiarata firma solo il livello base; il livello alto vuole una verifica documentale {and} una chiave rimasta su un solo dispositivo.", ja: "これは、その資格情報が何に署名してよいかを定めます。自己申告のものは基本の段階にのみ署名できます。高い段階は、書類による確認、{and}一台の端末から出なかった鍵を求めます。", zh: "这决定了该凭据可以签署什么。自述级别的凭据只能签署基础层级；高层级要求证件核验，{and}要求密钥始终留在一台设备上。", hi: "यह तय करता है कि क्रेडेंशियल क्या हस्ताक्षरित कर सकता है। स्व-घोषित केवल मूल स्तर पर हस्ताक्षर करता है; उच्च स्तर दस्तावेज़ जाँच {and} ऐसी कुंजी चाहता है जो एक ही डिवाइस पर बनी रही हो।", ar: "هذا يحدد ما يجوز للاعتماد توقيعه. الاعتماد المُقَرّ ذاتيًا يوقّع المستوى الأساسي فقط؛ أما المستوى العالي فيريد تحققًا من وثيقة {and} مفتاحًا لم يغادر جهازًا واحدًا.",
+  },
+  "sgn.open": {
+    en: "Open the ceremony", es: "Abrir la ceremonia", fr: "Ouvrir la cérémonie", de: "Die Zeremonie öffnen", pt: "Abrir a cerimónia", it: "Apri la cerimonia", ja: "儀式を開く", zh: "打开签署仪式", hi: "प्रक्रिया खोलें", ar: "افتح المراسم",
+  },
+  "sgn.waiting": {
+    en: "Waiting for the ceremony window.", es: "Esperando a la ventana de la ceremonia.", fr: "En attente de la fenêtre de cérémonie.", de: "Warten auf das Zeremonie-Fenster.", pt: "À espera da janela da cerimónia.", it: "In attesa della finestra della cerimonia.", ja: "儀式のウィンドウを待っています。", zh: "正在等待签署仪式窗口。", hi: "प्रक्रिया विंडो की प्रतीक्षा।", ar: "في انتظار نافذة المراسم.",
+  },
+  "sgn.blocked": {
+    en: "the ceremony window was blocked", es: "la ventana de la ceremonia fue bloqueada", fr: "la fenêtre de cérémonie a été bloquée", de: "das Zeremonie-Fenster wurde blockiert", pt: "a janela da cerimónia foi bloqueada", it: "la finestra della cerimonia è stata bloccata", ja: "儀式のウィンドウがブロックされました", zh: "签署仪式窗口被拦截", hi: "प्रक्रिया विंडो अवरुद्ध कर दी गई", ar: "حُجبت نافذة المراسم",
+  },
+  "sgn.incomplete": {
+    en: "the ceremony did not complete", es: "la ceremonia no se completó", fr: "la cérémonie ne s'est pas achevée", de: "die Zeremonie wurde nicht abgeschlossen", pt: "a cerimónia não se concluiu", it: "la cerimonia non si è conclusa", ja: "儀式が完了しませんでした", zh: "签署仪式未能完成", hi: "प्रक्रिया पूरी नहीं हुई", ar: "لم تكتمل المراسم",
+  },
+  "sgn.enrolled.said": {
+    en: "Enrolled — this credential can sign {what}.", es: "Registrada — esta credencial puede firmar {what}.", fr: "Enregistré — ce justificatif peut signer {what}.", de: "Registriert — dieser Nachweis kann {what} signieren.", pt: "Registada — esta credencial pode assinar {what}.", it: "Registrata — questa credenziale può firmare {what}.", ja: "登録しました — この資格情報は {what} に署名できます。", zh: "已注册 — 该凭据可以签署 {what}。", hi: "दर्ज हुआ — यह क्रेडेंशियल {what} पर हस्ताक्षर कर सकता है।", ar: "سُجّل — هذا الاعتماد يمكنه توقيع {what}.",
+  },
+  "sgn.nothingyet": {
+    en: "nothing yet", es: "nada todavía", fr: "rien pour l'instant", de: "noch nichts", pt: "nada ainda", it: "niente ancora", ja: "まだ何も", zh: "暂时什么都不能", hi: "अभी कुछ नहीं", ar: "لا شيء بعد",
+  },
+  "sgn.have": {
+    en: "What this account can sign with", es: "Con qué puede firmar esta cuenta", fr: "Ce avec quoi ce compte peut signer", de: "Womit dieses Konto signieren kann", pt: "Com que é que esta conta pode assinar", it: "Con cosa può firmare questo account", ja: "このアカウントが署名に使えるもの", zh: "本账户可以用什么来签署", hi: "यह खाता किससे हस्ताक्षर कर सकता है", ar: "بماذا يستطيع هذا الحساب التوقيع",
+  },
+  "sgn.none": {
+    en: "Nothing enrolled yet.", es: "Nada registrado todavía.", fr: "Rien d'enregistré pour l'instant.", de: "Noch nichts registriert.", pt: "Nada registado ainda.", it: "Ancora niente di registrato.", ja: "まだ何も登録されていません。", zh: "尚未注册任何凭据。", hi: "अभी कुछ दर्ज नहीं।", ar: "لم يُسجَّل شيء بعد.",
+  },
+  "sgn.cred.line": {
+    en: "{name} — checked as {level}", es: "{name} — comprobada como {level}", fr: "{name} — vérifié comme {level}", de: "{name} — geprüft als {level}", pt: "{name} — verificada como {level}", it: "{name} — verificata come {level}", ja: "{name} — 確認水準 {level}", zh: "{name} — 核验为 {level}", hi: "{name} — {level} के रूप में जाँचा गया", ar: "{name} — تم التحقق بوصفه {level}",
+  },
+  "sgn.syncs": {
+    en: "· syncs between devices", es: "· se sincroniza entre dispositivos", fr: "· se synchronise entre appareils", de: "· synchronisiert zwischen Geräten", pt: "· sincroniza entre dispositivos", it: "· si sincronizza tra dispositivi", ja: "· 端末間で同期される", zh: "· 会在设备间同步", hi: "· उपकरणों के बीच सिंक होता है", ar: "· يتزامن بين الأجهزة",
+  },
+  "sgn.revoked": {
+    en: "· revoked", es: "· revocada", fr: "· révoqué", de: "· widerrufen", pt: "· revogada", it: "· revocata", ja: "· 失効済み", zh: "· 已撤销", hi: "· निरस्त", ar: "· مُبطَل",
+  },
+  "sgn.signs": {
+    en: "Signs: {what}", es: "Firma: {what}", fr: "Signe : {what}", de: "Signiert: {what}", pt: "Assina: {what}", it: "Firma: {what}", ja: "署名可能: {what}", zh: "可签署：{what}", hi: "हस्ताक्षर करता है: {what}", ar: "يوقّع: {what}",
+  },
+  "sgn.signsnothing": {
+    en: "Signs nothing — revoked, or not proofed to any tier", es: "No firma nada — revocada, o sin comprobación para ningún nivel", fr: "Ne signe rien — révoqué, ou non vérifié pour aucun niveau", de: "Signiert nichts — widerrufen oder für keine Stufe geprüft", pt: "Não assina nada — revogada, ou sem verificação para qualquer nível", it: "Non firma nulla — revocata, o non verificata per alcun livello", ja: "何にも署名できません — 失効済みか、どの段階の確認も受けていません", zh: "什么都不能签署——已撤销，或未通过任何层级的核验", hi: "कुछ भी हस्ताक्षरित नहीं करता — निरस्त, या किसी स्तर के लिए प्रमाणित नहीं", ar: "لا يوقّع شيئًا — مُبطَل، أو غير مُتحقَّق لأي مستوى",
+  },
+  "sgn.revoke": {
+    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "失効させる", zh: "撤销", hi: "निरस्त करें", ar: "أبطِل",
+  },
+  "sgn.revoked.said": {
+    en: "Revoked, going forward. Anything already signed with it stays verifiable — its public key is in the evidence, not here.", es: "Revocada de aquí en adelante. Todo lo ya firmado con ella sigue siendo verificable — su clave pública está en la evidencia, no aquí.", fr: "Révoqué pour la suite. Tout ce qui a déjà été signé avec reste vérifiable — sa clé publique est dans la preuve, pas ici.", de: "Ab jetzt widerrufen. Alles, was damit bereits signiert wurde, bleibt überprüfbar — sein öffentlicher Schlüssel steckt im Beweis, nicht hier.", pt: "Revogada daqui para a frente. Tudo o que já foi assinado com ela continua verificável — a sua chave pública está na evidência, não aqui.", it: "Revocata d'ora in poi. Tutto ciò che è già stato firmato con essa resta verificabile — la sua chiave pubblica è nella prova, non qui.", ja: "以後は失効します。それですでに署名されたものは検証可能なままです — その公開鍵は証拠の中にあり、ここにあるのではありません。", zh: "自此撤销。已用它签署过的内容仍可验证——其公钥在证据里，而不在这里。", hi: "आगे के लिए निरस्त। इससे पहले हस्ताक्षरित हर चीज़ सत्यापन-योग्य बनी रहती है — उसकी सार्वजनिक कुंजी साक्ष्य में है, यहाँ नहीं।", ar: "أُبطِل من الآن فصاعدًا. كل ما وُقّع به سابقًا يبقى قابلًا للتحقق — مفتاحه العام في الدليل، لا هنا.",
+  },
+  "sgn.sign": {
+    en: "Sign a document", es: "Firmar un documento", fr: "Signer un document", de: "Ein Dokument signieren", pt: "Assinar um documento", it: "Firma un documento", ja: "文書に署名する", zh: "签署一份文件", hi: "किसी दस्तावेज़ पर हस्ताक्षर करें", ar: "وقّع وثيقة",
+  },
+  "sgn.doc.ph": {
+    en: "the exact text being signed", es: "el texto exacto que se firma", fr: "le texte exact qui est signé", de: "der genaue Text, der signiert wird", pt: "o texto exato que está a ser assinado", it: "il testo esatto che viene firmato", ja: "署名される正確な本文", zh: "被签署的确切文本", hi: "जिस पर हस्ताक्षर हो रहा है, वही ठीक पाठ", ar: "النص الدقيق الذي يجري توقيعه",
+  },
+  "sgn.meaning.ph": {
+    en: "what signing it means", es: "qué significa firmarlo", fr: "ce que le fait de signer signifie", de: "was das Signieren bedeutet", pt: "o que significa assiná-lo", it: "cosa significa firmarlo", ja: "署名することの意味", zh: "签署它意味着什么", hi: "इस पर हस्ताक्षर का अर्थ क्या है", ar: "ماذا يعني توقيعها",
+  },
+  "sgn.display.ph": {
+    en: "what you will be shown when you sign", es: "lo que se le mostrará al firmar", fr: "ce qui vous sera montré au moment de signer", de: "was Ihnen beim Signieren gezeigt wird", pt: "o que lhe será mostrado ao assinar", it: "cosa ti verrà mostrato quando firmi", ja: "署名時に表示される内容", zh: "签署时会向你展示的内容", hi: "हस्ताक्षर के समय आपको क्या दिखाया जाएगा", ar: "ما سيُعرض عليك عند التوقيع",
+  },
+  "sgn.is": {
+    en: "is", es: "es", fr: "est", de: "ist", pt: "é", it: "è", ja: "こそが", zh: "就是", hi: "ही है", ar: "هو",
+  },
+  "sgn.challenge": {
+    en: "The challenge {is} the hash of this document, so the signature covers these bytes and no others. Edit the text afterwards and the old signature will not carry — which is the point of it.", es: "El reto {is} el hash de este documento, así que la firma cubre estos bytes y ningunos otros. Edite el texto después y la firma antigua no valdrá — que es justo el sentido de todo esto.", fr: "Le défi {is} le condensat de ce document, si bien que la signature couvre ces octets et aucun autre. Modifiez le texte ensuite et l'ancienne signature ne suivra pas — c'est tout l'intérêt.", de: "Die Challenge {is} der Hash dieses Dokuments, also deckt die Signatur genau diese Bytes ab und keine anderen. Ändern Sie den Text danach, und die alte Signatur trägt nicht mehr — genau darum geht es.", pt: "O desafio {is} o hash deste documento, por isso a assinatura cobre estes bytes e mais nenhuns. Edite o texto depois e a assinatura antiga não acompanha — que é precisamente o objetivo.", it: "La sfida {is} l'hash di questo documento, quindi la firma copre questi byte e nessun altro. Modifica il testo dopo e la vecchia firma non regge — che è proprio il punto.", ja: "チャレンジ{is}この文書のハッシュです。ですから署名はこのバイト列だけを覆い、ほかは覆いません。あとから本文を編集すれば古い署名は通用しなくなります — それこそがこの仕組みの狙いです。", zh: "挑战值{is}这份文件的哈希，所以签名覆盖的正是这些字节，别无其他。事后修改文本，旧签名便不再成立——而这正是它的意义所在。", hi: "चैलेंज {is} इस दस्तावेज़ का हैश, इसलिए हस्ताक्षर ठीक इन्हीं बाइट्स को ढकता है, किन्हीं और को नहीं। बाद में पाठ बदलिए और पुराना हस्ताक्षर नहीं चलेगा — और यही इसका मक़सद है।", ar: "التحدي {is} بصمة هذه الوثيقة، فيغطي التوقيع هذه البايتات دون سواها. عدّل النص بعد ذلك ولن يصمد التوقيع القديم — وهذا هو المقصود منه.",
+  },
+  "sgn.mint": {
+    en: "Mint an envelope and sign it", es: "Emitir un sobre y firmarlo", fr: "Créer une enveloppe et la signer", de: "Einen Umschlag erzeugen und signieren", pt: "Emitir um envelope e assiná-lo", it: "Conia una busta e firmala", ja: "封筒を発行して署名する", zh: "铸造一个信封并签署它", hi: "एक लिफ़ाफ़ा बनाकर हस्ताक्षर करें", ar: "أنشئ ظرفًا ووقّعه",
+  },
+  "sgn.envelope": {
+    en: "Envelope {id}, good until {when}. Finish in the ceremony window.", es: "Sobre {id}, válido hasta {when}. Termine en la ventana de la ceremonia.", fr: "Enveloppe {id}, valable jusqu'à {when}. Terminez dans la fenêtre de cérémonie.", de: "Umschlag {id}, gültig bis {when}. Schließen Sie im Zeremonie-Fenster ab.", pt: "Envelope {id}, válido até {when}. Termine na janela da cerimónia.", it: "Busta {id}, valida fino a {when}. Concludi nella finestra della cerimonia.", ja: "封筒 {id}、{when} まで有効。儀式のウィンドウで完了してください。", zh: "信封 {id}，有效期至 {when}。请在签署仪式窗口中完成。", hi: "लिफ़ाफ़ा {id}, {when} तक वैध। प्रक्रिया विंडो में पूरा करें।", ar: "الظرف {id}، صالح حتى {when}. أكمِل في نافذة المراسم.",
+  },
+  "sgn.signedas": {
+    en: "Signed as {name}, proofed {level} — {tier} tier.", es: "Firmado como {name}, comprobado {level} — nivel {tier}.", fr: "Signé en tant que {name}, vérifié {level} — niveau {tier}.", de: "Signiert als {name}, geprüft {level} — Stufe {tier}.", pt: "Assinado como {name}, verificado {level} — nível {tier}.", it: "Firmato come {name}, verificato {level} — livello {tier}.", ja: "{name} として署名、確認水準 {level} — {tier} 段階。", zh: "以 {name} 身份签署，核验级别 {level} — {tier} 层级。", hi: "{name} के रूप में हस्ताक्षरित, {level} स्तर पर प्रमाणित — {tier} श्रेणी।", ar: "وُقّع باسم {name}، بمستوى تحقّق {level} — الفئة {tier}.",
+  },
+  "sgn.sigline": {
+    en: "Signature {id}. Over “{text}”, meaning “{meaning}”.", es: "Firma {id}. Sobre «{text}», con el significado «{meaning}».", fr: "Signature {id}. Sur « {text} », signifiant « {meaning} ».", de: "Signatur {id}. Über „{text}“, mit der Bedeutung „{meaning}“.", pt: "Assinatura {id}. Sobre «{text}», significando «{meaning}».", it: "Firma {id}. Su «{text}», con significato «{meaning}».", ja: "署名 {id}。「{text}」に対して、意味は「{meaning}」。", zh: "签名 {id}。针对“{text}”，含义为“{meaning}”。", hi: "हस्ताक्षर {id}। “{text}” पर, अर्थ “{meaning}”।", ar: "التوقيع {id}. على «{text}»، بمعنى «{meaning}».",
+  },
+  "sgn.check": {
+    en: "Check a package somebody handed you", es: "Comprobar un paquete que le han entregado", fr: "Vérifier un paquet qu'on vous a remis", de: "Ein Paket prüfen, das Ihnen jemand gegeben hat", pt: "Verificar um pacote que lhe entregaram", it: "Verifica un pacchetto che ti hanno consegnato", ja: "誰かから渡された証拠一式を確認する", zh: "核验别人交给你的证据包", hi: "किसी के दिए गए पैकेज को जाँचें", ar: "افحص حزمة سلّمها إليك أحدهم",
+  },
+  "sgn.check.pitch": {
+    en: "This asks nothing of us. The package carries its own public key and its own hashes, and the arithmetic either holds or it does not — a check that needed our blessing would be us vouching, which is the opposite of what the evidence is for.", es: "Esto no nos pide nada. El paquete lleva su propia clave pública y sus propios hashes, y la aritmética se sostiene o no — una comprobación que necesitara nuestra bendición sería nosotros avalando, que es lo contrario de para lo que sirve la evidencia.", fr: "Ceci ne nous demande rien. Le paquet porte sa propre clé publique et ses propres condensats, et l'arithmétique tient ou ne tient pas — une vérification qui aurait besoin de notre bénédiction reviendrait à ce que nous nous portions garants, soit l'inverse de ce à quoi sert la preuve.", de: "Das verlangt nichts von uns. Das Paket trägt seinen eigenen öffentlichen Schlüssel und seine eigenen Hashes, und die Arithmetik hält oder hält nicht — eine Prüfung, die unseren Segen bräuchte, wäre unser Bürgen, und das ist das Gegenteil dessen, wozu der Beweis da ist.", pt: "Isto não nos pede nada. O pacote leva a sua própria chave pública e os seus próprios hashes, e a aritmética ou se aguenta ou não — uma verificação que precisasse da nossa bênção seria nós a abonarmos, que é o contrário daquilo para que a evidência serve.", it: "Questo non chiede nulla a noi. Il pacchetto porta la propria chiave pubblica e i propri hash, e l'aritmetica regge o non regge — una verifica che avesse bisogno della nostra benedizione sarebbe noi che garantiamo, che è l'opposto di ciò a cui serve la prova.", ja: "これは私たちに何も求めません。この一式は自身の公開鍵と自身のハッシュを携えており、計算が合うか合わないか、それだけです — 私たちの承認を要する検証は、私たちが保証することになってしまい、証拠の目的とは正反対です。", zh: "这不需要我们做任何事。这个包自带公钥和哈希，算术要么成立要么不成立——一项需要我们首肯的核验，就等于由我们作保，而那与证据的用途恰恰相反。", hi: "यह हमसे कुछ नहीं माँगता। पैकेज अपनी सार्वजनिक कुंजी और अपने हैश साथ लाता है, और गणित या तो टिकता है या नहीं — जिस जाँच को हमारी स्वीकृति चाहिए हो, वह हमारी ज़मानत होगी, जो साक्ष्य के उद्देश्य के ठीक उलट है।", ar: "هذا لا يطلب منّا شيئًا. الحزمة تحمل مفتاحها العام وبصماتها، والحساب إما يستقيم أو لا — وفحصٌ يحتاج مباركتنا يعني أننا نضمن، وهو نقيض الغاية من الدليل.",
+  },
+  "sgn.paste.ph": {
+    en: "paste the evidence package (JSON)", es: "pegue el paquete de evidencia (JSON)", fr: "collez le paquet de preuve (JSON)", de: "das Beweispaket einfügen (JSON)", pt: "cole o pacote de evidência (JSON)", it: "incolla il pacchetto di prova (JSON)", ja: "証拠一式（JSON）を貼り付け", zh: "粘贴证据包（JSON）", hi: "साक्ष्य पैकेज चिपकाएँ (JSON)", ar: "الصق حزمة الدليل (JSON)",
+  },
+  "sgn.checkit": {
+    en: "Check it", es: "Comprobarlo", fr: "Vérifier", de: "Prüfen", pt: "Verificar", it: "Verifica", ja: "確認する", zh: "核验", hi: "जाँचें", ar: "افحصها",
+  },
+  "sgn.holds": {
+    en: "Holds up.", es: "Se sostiene.", fr: "Ça tient.", de: "Hält stand.", pt: "Aguenta-se.", it: "Regge.", ja: "成立します。", zh: "站得住。", hi: "टिकता है।", ar: "يصمد.",
+  },
+  "sgn.doesnot": {
+    en: "Does not hold up.", es: "No se sostiene.", fr: "Ça ne tient pas.", de: "Hält nicht stand.", pt: "Não se aguenta.", it: "Non regge.", ja: "成立しません。", zh: "站不住。", hi: "नहीं टिकता।", ar: "لا يصمد.",
+  },
+  "sgn.didnotrun": {
+    en: "· did not run, so it is not a pass", es: "· no se ejecutó, así que no es un aprobado", fr: "· n'a pas été exécuté, ce n'est donc pas une réussite", de: "· wurde nicht ausgeführt, gilt also nicht als bestanden", pt: "· não correu, por isso não é uma aprovação", it: "· non è stato eseguito, quindi non è un superamento", ja: "· 実行されていないので、合格ではありません", zh: "· 未运行，因此不算通过", hi: "· चला ही नहीं, इसलिए यह पास नहीं है", ar: "· لم يُنفَّذ، فليس نجاحًا",
+  },
+  "sgn.limits": {
+    en: "What this does not prove", es: "Lo que esto no prueba", fr: "Ce que cela ne prouve pas", de: "Was das nicht beweist", pt: "O que isto não prova", it: "Cosa questo non dimostra", ja: "これが証明しないこと", zh: "这不能证明什么", hi: "यह क्या सिद्ध नहीं करता", ar: "ما لا يثبته هذا",
+  },
+  "plc.title": {
+    en: "Where it is marketed", es: "Dónde se anuncia", fr: "Où il est diffusé", de: "Wo es beworben wird", pt: "Onde é divulgado", it: "Dove viene promosso", ja: "どこで宣伝されているか", zh: "它在哪里被推广", hi: "इसका प्रचार कहाँ है", ar: "أين يُعلَن عنه",
+  },
+  "plc.lead": {
+    en: "An adult-mode profile can be advertised at an adult venue, as a link or a printable code.", es: "Un perfil en modo adulto puede anunciarse en un local para adultos, como enlace o como código imprimible.", fr: "Un profil en mode adulte peut être diffusé sur un espace pour adultes, sous forme de lien ou de code imprimable.", de: "Ein Profil im Erwachsenenmodus kann an einem Erwachsenen-Ort beworben werden, als Link oder als druckbarer Code.", pt: "Um perfil em modo adulto pode ser divulgado num espaço para adultos, como ligação ou como código imprimível.", it: "Un profilo in modalità adulti può essere promosso in uno spazio per adulti, come link o come codice stampabile.", ja: "アダルトモードのプロフィールは、アダルト向けの場でリンクまたは印刷可能なコードとして宣伝できます。", zh: "成人模式的资料可以在成人场所进行推广，形式为链接或可打印的二维码。", hi: "वयस्क-मोड प्रोफ़ाइल का प्रचार किसी वयस्क स्थल पर लिंक या छपने योग्य कोड के रूप में किया जा सकता है।", ar: "يمكن الإعلان عن ملف في وضع البالغين في مكان للبالغين، كرابط أو كرمز قابل للطباعة.",
+  },
+  "plc.venues": {
+    en: "Venues", es: "Locales", fr: "Espaces", de: "Orte", pt: "Espaços", it: "Spazi", ja: "掲載先", zh: "场所", hi: "स्थल", ar: "الأماكن",
+  },
+  "plc.carries": {
+    en: "Carries: {what}.", es: "Admite: {what}.", fr: "Accueille : {what}.", de: "Führt: {what}.", pt: "Aceita: {what}.", it: "Ospita: {what}.", ja: "扱うもの: {what}。", zh: "承载：{what}。", hi: "रखता है: {what}।", ar: "يحمل: {what}.",
+  },
+  "plc.place": {
+    en: "Place this profile", es: "Colocar este perfil", fr: "Placer ce profil", de: "Dieses Profil platzieren", pt: "Colocar este perfil", it: "Colloca questo profilo", ja: "このプロフィールを掲載する", zh: "放置这份资料", hi: "इस प्रोफ़ाइल को रखें", ar: "ضع هذا الملف",
+  },
+  "plc.pick": {
+    en: "pick a venue", es: "elija un local", fr: "choisissez un espace", de: "einen Ort wählen", pt: "escolha um espaço", it: "scegli uno spazio", ja: "掲載先を選ぶ", zh: "选择场所", hi: "स्थल चुनें", ar: "اختر مكانًا",
+  },
+  "plc.label.ph": {
+    en: "what to call it (optional)", es: "cómo llamarlo (opcional)", fr: "comment l'appeler (facultatif)", de: "wie es heißen soll (optional)", pt: "como lhe chamar (opcional)", it: "come chiamarlo (facoltativo)", ja: "呼び名（任意）", zh: "如何称呼它（可选）", hi: "इसे क्या कहें (वैकल्पिक)", ar: "بمَ تسمّيه (اختياري)",
+  },
+  "plc.placebtn": {
+    en: "Place", es: "Colocar", fr: "Placer", de: "Platzieren", pt: "Colocar", it: "Colloca", ja: "掲載", zh: "放置", hi: "रखें", ar: "ضع",
+  },
+  "plc.adultonly": {
+    en: "Only an adult-mode profile can be placed at an adult venue, and the refusal says so rather than hiding the button.", es: "Solo un perfil en modo adulto puede colocarse en un local para adultos, y la negativa lo dice en vez de ocultar el botón.", fr: "Seul un profil en mode adulte peut être placé sur un espace pour adultes, et le refus le dit au lieu de cacher le bouton.", de: "Nur ein Profil im Erwachsenenmodus kann an einem Erwachsenen-Ort platziert werden, und die Ablehnung sagt das, statt den Knopf zu verstecken.", pt: "Só um perfil em modo adulto pode ser colocado num espaço para adultos, e a recusa di-lo em vez de esconder o botão.", it: "Solo un profilo in modalità adulti può essere collocato in uno spazio per adulti, e il rifiuto lo dice invece di nascondere il pulsante.", ja: "アダルト向けの場に掲載できるのはアダルトモードのプロフィールだけで、拒否はその旨を告げます。ボタンを隠したりはしません。", zh: "只有成人模式的资料才能放置在成人场所，拒绝时会明说，而不是把按钮藏起来。", hi: "वयस्क स्थल पर केवल वयस्क-मोड प्रोफ़ाइल ही रखी जा सकती है, और इनकार यही कहता है — बटन छिपाता नहीं।", ar: "لا يوضع في مكان للبالغين إلا ملف في وضع البالغين، والرفض يقول ذلك بدل أن يخفي الزر.",
+  },
+  "plc.publish": {
+    en: "Publish this", es: "Publicar esto", fr: "Publier ceci", de: "Dies veröffentlichen", pt: "Publicar isto", it: "Pubblica questo", ja: "これを公開する", zh: "发布这个", hi: "इसे प्रकाशित करें", ar: "انشر هذا",
+  },
+  "plc.qr.made": {
+    en: "the beacon's QR code", es: "el código QR de la baliza", fr: "le QR code de la balise", de: "der QR-Code der Bake", pt: "o código QR da baliza", it: "il codice QR del beacon", ja: "ビーコンの QR コード", zh: "该信标的二维码", hi: "बीकन का QR कोड", ar: "رمز الاستجابة السريعة للمنارة",
+  },
+  "plc.qr.row": {
+    en: "this beacon's QR code", es: "el código QR de esta baliza", fr: "le QR code de cette balise", de: "der QR-Code dieser Bake", pt: "o código QR desta baliza", it: "il codice QR di questo beacon", ja: "このビーコンの QR コード", zh: "此信标的二维码", hi: "इस बीकन का QR कोड", ar: "رمز الاستجابة السريعة لهذه المنارة",
+  },
+  "plc.printshare": {
+    en: "Print or share:", es: "Imprimir o compartir:", fr: "Imprimer ou partager :", de: "Drucken oder teilen:", pt: "Imprimir ou partilhar:", it: "Stampa o condividi:", ja: "印刷または共有:", zh: "打印或分享：", hi: "छापें या साझा करें:", ar: "اطبع أو شارك:",
+  },
+  "plc.thatone": {
+    en: "That is the one a phone camera lands on and the one the code encodes. {url} is the machine-readable surface for clients, not a link to give anybody.", es: "Esa es la que una cámara de móvil alcanza y la que codifica el código. {url} es la superficie legible por máquinas para los clientes, no un enlace para dar a nadie.", fr: "C'est celle sur laquelle atterrit l'appareil photo d'un téléphone et celle que le code encode. {url} est la surface lisible par machine pour les clients, pas un lien à donner à quiconque.", de: "Das ist die, auf der eine Handykamera landet, und die, die der Code kodiert. {url} ist die maschinenlesbare Oberfläche für Clients, kein Link, den man jemandem gibt.", pt: "É essa a que uma câmara de telemóvel alcança e a que o código codifica. {url} é a superfície legível por máquinas para os clientes, não uma ligação para dar a ninguém.", it: "È quella su cui atterra la fotocamera di un telefono ed è quella che il codice codifica. {url} è la superficie leggibile dalle macchine per i client, non un link da dare a qualcuno.", ja: "スマートフォンのカメラがたどり着くのはそちらで、コードが符号化しているのもそちらです。{url} はクライアント向けの機械可読な面であって、誰かに渡すリンクではありません。", zh: "手机摄像头落到的是那一个，二维码编码的也是那一个。{url} 是给客户端读取的机器可读接口，不是拿去给人的链接。", hi: "फ़ोन का कैमरा जिस पर पहुँचता है और कोड जिसे एन्कोड करता है, वह वही है। {url} क्लाइंट के लिए मशीन-पठनीय सतह है, किसी को देने वाला लिंक नहीं।", ar: "ذاك هو ما تصل إليه كاميرا الهاتف وما يرمّزه الرمز. أما {url} فهو السطح المقروء آليًا للعملاء، لا رابطًا يُعطى لأحد.",
+  },
+  "plc.alsoas": {
+    en: "Also reachable as {handle}.", es: "También accesible como {handle}.", fr: "Également joignable sous {handle}.", de: "Auch erreichbar als {handle}.", pt: "Também acessível como {handle}.", it: "Raggiungibile anche come {handle}.", ja: "{handle} でも到達できます。", zh: "也可以通过 {handle} 访问。", hi: "{handle} के रूप में भी पहुँचा जा सकता है।", ar: "يمكن الوصول إليه أيضًا باسم {handle}.",
+  },
+  "plc.nohandle": {
+    en: "This profile has not claimed a handle, so the code and the link are the only ways in.", es: "Este perfil no ha reclamado un alias, así que el código y el enlace son las únicas vías de entrada.", fr: "Ce profil n'a pas revendiqué d'identifiant, donc le code et le lien sont les seules entrées.", de: "Dieses Profil hat keinen Handle beansprucht, also sind der Code und der Link die einzigen Zugänge.", pt: "Este perfil não reclamou um identificador, por isso o código e a ligação são as únicas entradas.", it: "Questo profilo non ha rivendicato un handle, quindi il codice e il link sono gli unici ingressi.", ja: "このプロフィールはハンドルを取得していないため、入口はコードとリンクだけです。", zh: "这份资料尚未认领任何用户名，因此二维码和链接是仅有的入口。", hi: "इस प्रोफ़ाइल ने कोई हैंडल नहीं लिया है, इसलिए कोड और लिंक ही एकमात्र रास्ते हैं।", ar: "لم يطالب هذا الملف بمعرّف، فالرمز والرابط هما المدخلان الوحيدان.",
+  },
+  "plc.keepthis": {
+    en: "Keep this. The list below can reopen the beacon on whatever API this console is pointed at, but only this card knows the address the code was minted with.", es: "Guarde esto. La lista de abajo puede reabrir la baliza en la API a la que apunte esta consola, pero solo esta ficha conoce la dirección con la que se acuñó el código.", fr: "Gardez ceci. La liste ci-dessous peut rouvrir la balise sur l'API vers laquelle pointe cette console, mais seule cette fiche connaît l'adresse avec laquelle le code a été créé.", de: "Bewahren Sie das auf. Die Liste unten kann die Bake auf der API öffnen, auf die diese Konsole zeigt, aber nur diese Karte kennt die Adresse, mit der der Code erzeugt wurde.", pt: "Guarde isto. A lista abaixo pode reabrir a baliza na API para que esta consola aponta, mas só este cartão conhece o endereço com que o código foi cunhado.", it: "Conserva questo. L'elenco qui sotto può riaprire il beacon sull'API a cui punta questa console, ma solo questa scheda conosce l'indirizzo con cui il codice è stato coniato.", ja: "これは保管しておいてください。下の一覧は、このコンソールが向いている API 上でビーコンを開き直せますが、コードが発行されたときのアドレスを知っているのはこのカードだけです。", zh: "请保存这张卡片。下面的列表能在本控制台所指向的任意 API 上重新打开该信标，但只有这张卡片知道当初铸造该二维码时所用的地址。", hi: "इसे संभालकर रखें। नीचे की सूची इस कंसोल जिस भी API की ओर इंगित है, उस पर बीकन दोबारा खोल सकती है — पर कोड जिस पते के साथ बना था, वह केवल यही कार्ड जानता है।", ar: "احتفظ بهذه. القائمة أدناه تستطيع إعادة فتح المنارة على أي واجهة برمجة توجَّه إليها هذه اللوحة، لكن هذه البطاقة وحدها تعرف العنوان الذي سُكَّ به الرمز.",
+  },
+  "plc.placedat": {
+    en: "Placed at", es: "Colocado en", fr: "Placé sur", de: "Platziert bei", pt: "Colocado em", it: "Collocato su", ja: "掲載先", zh: "已放置于", hi: "रखा गया", ar: "موضوع في",
+  },
+  "plc.nowhere": {
+    en: "Nowhere yet.", es: "En ningún sitio todavía.", fr: "Nulle part pour l'instant.", de: "Noch nirgends.", pt: "Em lado nenhum ainda.", it: "Da nessuna parte per ora.", ja: "まだどこにもありません。", zh: "尚未放置。", hi: "अभी कहीं नहीं।", ar: "لا مكان بعد.",
+  },
+  "plc.signin": {
+    en: "Sign in as an owner.", es: "Inicie sesión como propietario.", fr: "Connectez-vous comme propriétaire.", de: "Melden Sie sich als Besitzer an.", pt: "Entre como proprietário.", it: "Accedi come proprietario.", ja: "所有者としてサインインしてください。", zh: "请以所有者身份登录。", hi: "स्वामी के रूप में साइन इन करें।", ar: "سجّل الدخول بصفتك مالكًا.",
+  },
+  "plc.row": {
+    en: "{venue} · {n} scan{s}", es: "{venue} · {n} escaneos", fr: "{venue} · {n} scans", de: "{venue} · {n} Scans", pt: "{venue} · {n} digitalizações", it: "{venue} · {n} scansioni", ja: "{venue} · スキャン{n}件", zh: "{venue} · {n} 次扫描", hi: "{venue} · {n} स्कैन", ar: "{venue} · {n} مسحة",
+  },
+  "plc.takendown": {
+    en: " · taken down", es: " · retirado", fr: " · retiré", de: " · abgenommen", pt: " · retirado", it: " · rimosso", ja: " · 取り下げ済み", zh: " · 已撤下", hi: " · हटाया गया", ar: " · مُزال",
+  },
+  "plc.openhere": {
+    en: "open here (counts as a scan)", es: "abrir aquí (cuenta como escaneo)", fr: "ouvrir ici (compte comme un scan)", de: "hier öffnen (zählt als Scan)", pt: "abrir aqui (conta como digitalização)", it: "apri qui (conta come scansione)", ja: "ここで開く（スキャン一回として数えます）", zh: "在此打开（计为一次扫描）", hi: "यहाँ खोलें (एक स्कैन गिना जाएगा)", ar: "افتح هنا (يُحسب مسحة)",
+  },
+  "plc.takedown": {
+    en: "Take down", es: "Retirar", fr: "Retirer", de: "Abnehmen", pt: "Retirar", it: "Rimuovi", ja: "取り下げる", zh: "撤下", hi: "हटाएँ", ar: "أزِل",
+  },
+  "plc.takendown.said": {
+    en: "Taken down. The beacon is {state} — anything already printed at the venue now stops resolving rather than pointing somewhere else.", es: "Retirado. La baliza está {state} — lo ya impreso en el local deja de resolver en vez de apuntar a otro sitio.", fr: "Retiré. La balise est {state} — ce qui est déjà imprimé sur place cesse de répondre au lieu de pointer ailleurs.", de: "Abgenommen. Die Bake ist {state} — was am Ort bereits gedruckt ist, löst nun nicht mehr auf, statt woanders hinzuzeigen.", pt: "Retirado. A baliza está {state} — o que já foi impresso no espaço deixa de resolver em vez de apontar para outro lado.", it: "Rimosso. Il beacon è {state} — ciò che è già stampato nello spazio smette di risolvere invece di puntare altrove.", ja: "取り下げました。ビーコンは{state}です — 会場にすでに印刷されたものは、別の場所を指すのではなく、応答しなくなります。", zh: "已撤下。信标{state}——场所里已经印出来的东西从此不再解析，而不是指向别处。", hi: "हटा दिया गया। बीकन {state} है — स्थल पर पहले से छपी कोई भी चीज़ अब कहीं और इशारा करने के बजाय हल होना बंद कर देती है।", ar: "أُزيل. المنارة {state} — وكل ما طُبع في المكان يتوقف عن الاستجابة بدل أن يشير إلى مكان آخر.",
+  },
+  "plc.stilllive": {
+    en: "still live", es: "todavía activa", fr: "toujours active", de: "noch aktiv", pt: "ainda ativa", it: "ancora attivo", ja: "まだ有効", zh: "仍然有效", hi: "अब भी सक्रिय", ar: "ما زالت فعّالة",
+  },
+  "plc.nolonger": {
+    en: "no longer live", es: "ya no activa", fr: "plus active", de: "nicht mehr aktiv", pt: "já não ativa", it: "non più attivo", ja: "もう有効ではない", zh: "不再有效", hi: "अब सक्रिय नहीं", ar: "لم تعد فعّالة",
+  },
+  "plc.brings": {
+    en: "What each venue brings", es: "Lo que aporta cada local", fr: "Ce que chaque espace apporte", de: "Was jeder Ort einbringt", pt: "O que cada espaço traz", it: "Cosa porta ogni spazio", ja: "掲載先ごとの成果", zh: "每个场所带来了什么", hi: "हर स्थल क्या लाता है", ar: "ماذا يجلب كل مكان",
+  },
+  "plc.countsonly": {
+    en: "Counts and rates only. Nobody who scans is identified, here or anywhere else.", es: "Solo recuentos y tasas. Nadie que escanee queda identificado, ni aquí ni en ninguna otra parte.", fr: "Uniquement des comptes et des taux. Personne qui scanne n'est identifié, ni ici ni ailleurs.", de: "Nur Zahlen und Quoten. Niemand, der scannt, wird identifiziert — hier nicht und nirgendwo sonst.", pt: "Apenas contagens e taxas. Ninguém que digitalize é identificado, aqui nem em lado nenhum.", it: "Solo conteggi e percentuali. Nessuno di chi scansiona viene identificato, né qui né altrove.", ja: "件数と割合だけです。スキャンした人が特定されることは、ここでも他のどこでもありません。", zh: "只有计数和比率。扫描的人不会被识别身份，无论在这里还是别处。", hi: "केवल गिनती और दरें। स्कैन करने वाला कोई भी पहचाना नहीं जाता — न यहाँ, न कहीं और।", ar: "أعداد ونسب فقط. لا يُعرَّف أي ماسح، لا هنا ولا في أي مكان آخر.",
+  },
+  "plc.venue.line": {
+    en: "{n} resolution{s} · {walled} reached the age wall · {verified} got through it", es: "{n} resoluciones · {walled} llegaron al muro de edad · {verified} lo pasaron", fr: "{n} résolutions · {walled} ont atteint le mur d'âge · {verified} l'ont franchi", de: "{n} Auflösungen · {walled} erreichten die Alterssperre · {verified} kamen durch", pt: "{n} resoluções · {walled} chegaram ao muro de idade · {verified} passaram-no", it: "{n} risoluzioni · {walled} hanno raggiunto il muro d'età · {verified} l'hanno superato", ja: "解決 {n}件 · うち {walled}件が年齢の壁に到達 · {verified}件が通過", zh: "{n} 次解析 · {walled} 次抵达年龄墙 · {verified} 次通过", hi: "{n} समाधान · {walled} आयु-दीवार तक पहुँचे · {verified} पार कर गए", ar: "{n} استجابات · وصل {walled} إلى بوابة العمر · واجتازها {verified}",
+  },
+  "plc.everything": {
+    en: "Everything else", es: "Todo lo demás", fr: "Tout le reste", de: "Alles andere", pt: "Todo o resto", it: "Tutto il resto", ja: "それ以外", zh: "其余的一切", hi: "बाक़ी सब", ar: "كل ما عدا ذلك",
+  },
+  "plc.direct": {
+    en: "Arrivals that did not come through a placement: {walled} walled, {verified} verified.", es: "Llegadas que no vinieron por una colocación: {walled} frenadas por el muro, {verified} verificadas.", fr: "Arrivées qui ne sont pas passées par un placement : {walled} arrêtées au mur, {verified} vérifiées.", de: "Ankünfte, die nicht über eine Platzierung kamen: {walled} an der Sperre, {verified} verifiziert.", pt: "Chegadas que não vieram por uma colocação: {walled} travadas no muro, {verified} verificadas.", it: "Arrivi che non sono passati da un collocamento: {walled} fermati al muro, {verified} verificati.", ja: "掲載を経由しなかった到達: 壁で止まった {walled}件、確認済み {verified}件。", zh: "并非经由投放而来的访问：{walled} 次被墙拦下，{verified} 次已验证。", hi: "जो आगमन किसी प्लेसमेंट से नहीं आए: {walled} दीवार पर रुके, {verified} सत्यापित।", ar: "الوافدون الذين لم يأتوا عبر وضعٍ ما: {walled} أوقفتهم البوابة، و{verified} تحققوا.",
+  },
+  "plc.funnel": {
+    en: "The funnel", es: "El embudo", fr: "L'entonnoir", de: "Der Trichter", pt: "O funil", it: "L'imbuto", ja: "流れ", zh: "漏斗", hi: "फ़नल", ar: "القمع",
+  },
+  "plc.funnel.line": {
+    en: "{res} resolutions → {views} verified views → {chat} people who talked", es: "{res} resoluciones → {views} vistas verificadas → {chat} personas que hablaron", fr: "{res} résolutions → {views} vues vérifiées → {chat} personnes qui ont parlé", de: "{res} Auflösungen → {views} verifizierte Aufrufe → {chat} Menschen, die sprachen", pt: "{res} resoluções → {views} visualizações verificadas → {chat} pessoas que falaram", it: "{res} risoluzioni → {views} visualizzazioni verificate → {chat} persone che hanno parlato", ja: "解決 {res}件 → 確認済み閲覧 {views}件 → 話した人 {chat}人", zh: "{res} 次解析 → {views} 次已验证浏览 → {chat} 人开口交谈", hi: "{res} समाधान → {views} सत्यापित दृश्य → {chat} लोग जिन्होंने बात की", ar: "{res} استجابات ← {views} مشاهدات موثّقة ← {chat} أشخاص تحدثوا",
+  },
+  "plc.through": {
+    en: "{pct}% get through the wall.", es: "El {pct}% pasa el muro.", fr: "{pct} % franchissent le mur.", de: "{pct}% kommen durch die Sperre.", pt: "{pct}% passam o muro.", it: "Il {pct}% supera il muro.", ja: "{pct}% が壁を通過します。", zh: "{pct}% 的人通过了这道墙。", hi: "{pct}% दीवार पार करते हैं।", ar: "يجتاز {pct}% البوابة.",
+  },
+  "plc.norate": {
+    en: "Nothing has got through yet, so there is no conversion to quote.", es: "Todavía no ha pasado nadie, así que no hay conversión que citar.", fr: "Personne n'est encore passé, il n'y a donc aucun taux de conversion à citer.", de: "Bisher ist nichts durchgekommen, also gibt es keine Konversion zu nennen.", pt: "Ainda não passou nada, por isso não há conversão para citar.", it: "Non è ancora passato nulla, quindi non c'è conversione da citare.", ja: "まだ何も通過していないため、引用できる転換率はありません。", zh: "还没有任何人通过，因此没有可引用的转化率。", hi: "अभी तक कुछ भी पार नहीं हुआ, इसलिए उद्धृत करने योग्य कोई रूपांतरण नहीं।", ar: "لم يجتز شيء بعد، فلا نسبة تحوّل يمكن ذكرها.",
+  },
+  "plc.chatrate": {
+    en: "{pct}% of those talk.", es: "De esos, el {pct}% habla.", fr: "{pct} % de ceux-là parlent.", de: "{pct}% davon sprechen.", pt: "Desses, {pct}% falam.", it: "Di quelli, il {pct}% parla.", ja: "そのうち {pct}% が話します。", zh: "其中 {pct}% 的人开口交谈。", hi: "उनमें से {pct}% बात करते हैं।", ar: "يتحدث {pct}% منهم.",
+  },
+  "plc.kept": {
+    en: "What is kept, and where", es: "Qué se guarda, y dónde", fr: "Ce qui est conservé, et où", de: "Was aufbewahrt wird, und wo", pt: "O que é guardado, e onde", it: "Cosa viene conservato, e dove", ja: "何が、どこに残るか", zh: "保留什么，保留在哪里", hi: "क्या रखा जाता है, और कहाँ", ar: "ما يُحفَظ، وأين",
+  },
+  "plc.novault": {
+    en: "This deployment has no vault, so nothing here is sealed. Rated resolutions are counted in the ordinary database.", es: "Esta instalación no tiene bóveda, así que aquí no hay nada sellado. Las resoluciones con clasificación se cuentan en la base de datos normal.", fr: "Cette installation n'a pas de coffre, donc rien ici n'est scellé. Les résolutions classées sont comptées dans la base de données ordinaire.", de: "Diese Installation hat keinen Tresor, also ist hier nichts versiegelt. Altersbewertete Auflösungen werden in der gewöhnlichen Datenbank gezählt.", pt: "Esta instalação não tem cofre, por isso nada aqui está selado. As resoluções classificadas são contadas na base de dados comum.", it: "Questa installazione non ha un caveau, quindi qui nulla è sigillato. Le risoluzioni classificate sono contate nel database ordinario.", ja: "この環境には保管庫がないため、ここでは何も封印されません。レーティング対象の解決は通常のデータベースで数えられます。", zh: "本部署没有保险库，因此这里没有任何内容被封存。分级解析记录被计入普通数据库。", hi: "इस परिनियोजन में कोई वॉल्ट नहीं है, इसलिए यहाँ कुछ भी सीलबंद नहीं। श्रेणीबद्ध समाधान सामान्य डेटाबेस में गिने जाते हैं।", ar: "هذا التنصيب بلا خزانة، فلا شيء هنا مختوم. تُحصى الاستجابات المصنَّفة في قاعدة البيانات العادية.",
+  },
+  "plc.reported": {
+    en: "Reported as: {what}", es: "Informado como: {what}", fr: "Signalé comme : {what}", de: "Gemeldet als: {what}", pt: "Reportado como: {what}", it: "Riportato come: {what}", ja: "報告内容: {what}", zh: "报告为：{what}", hi: "जैसा बताया गया: {what}", ar: "أُبلغ عنه بوصفه: {what}",
+  },
+  "plc.sealed": {
+    en: "Rated resolutions are sealed in the vault — so the record of who was age-checked is not this platform's to read.", es: "Las resoluciones con clasificación se sellan en la bóveda — así que el registro de quién pasó el control de edad no es de esta plataforma para leerlo.", fr: "Les résolutions classées sont scellées dans le coffre — le relevé de qui a subi la vérification d'âge n'appartient donc pas à cette plateforme.", de: "Altersbewertete Auflösungen werden im Tresor versiegelt — die Aufzeichnung, wer altersgeprüft wurde, steht dieser Plattform also nicht zum Lesen zu.", pt: "As resoluções classificadas são seladas no cofre — por isso o registo de quem passou a verificação de idade não é desta plataforma para ler.", it: "Le risoluzioni classificate sono sigillate nel caveau — quindi il registro di chi è stato verificato per l'età non spetta a questa piattaforma leggerlo.", ja: "レーティング対象の解決は保管庫に封印されます — ですから、誰が年齢確認を受けたかの記録は、このプラットフォームが読んでよいものではありません。", zh: "分级解析记录被封存在保险库中——因此，谁通过了年龄核验，这份记录不归本平台阅读。", hi: "श्रेणीबद्ध समाधान वॉल्ट में सीलबंद होते हैं — इसलिए किसकी आयु जाँची गई, वह रिकॉर्ड इस मंच के पढ़ने के लिए नहीं है।", ar: "الاستجابات المصنَّفة مختومة في الخزانة — فسجل من جرى التحقق من عمره ليس من حق هذه المنصة أن تقرأه.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

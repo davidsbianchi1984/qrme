@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, openCeremony, type SignatureEnvelope, type SignatureResult,
          type SigningCredential, type SigningPolicy,
          type VerifyVerdict } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -45,6 +46,7 @@ import { useSession } from "../store";
  */
 export function Signing() {
   const { session } = useSession();
+  const lang = visitorLang();
   const token = session.ownerToken || "";
 
   const [policy, setPolicy] = useState<SigningPolicy | null>(null);
@@ -107,7 +109,7 @@ export function Signing() {
         // The page surfaces its own error too; repeating it here is the
         // point, because the window may already have been closed.
         setError(new Error(String(msg.error
-          || "the ceremony did not complete")));
+          || tr("sgn.incomplete", lang))));
         return;
       }
       try {
@@ -118,11 +120,11 @@ export function Signing() {
             client_data_json: String(msg.client_data_json),
             challenge: job.challenge,
             proofing_level: level,
-            display_name: enrolName || "This device",
+            display_name: enrolName || tr("sgn.thisdevice", lang),
             ...(attestor ? { proofing_attestor: attestor } : {}),
           }, token);
-          setSaid(`Enrolled — this credential can sign `
-            + `${row.can_sign.join(", ") || "nothing yet"}.`);
+          setSaid(tr("sgn.enrolled.said", lang).replace(
+            "{what}", row.can_sign.join(", ") || tr("sgn.nothingyet", lang)));
           refresh();
         } else if (job.mode === "sign" && msg.mode === "sign"
                    && job.envelope) {
@@ -141,12 +143,13 @@ export function Signing() {
     }
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [token, level, enrolName, attestor]);
+  }, [token, level, enrolName, attestor, lang]);
 
   async function enrol() {
     setError(null); setSaid(""); setBusy(true);
     try {
-      const opts = await api.enrollOptions(enrolName || "This device", token);
+      const opts = await api.enrollOptions(
+        enrolName || tr("sgn.thisdevice", lang), token);
       // The challenge rides through the ceremony and comes back to
       // `enrollCredential`, which is how the server knows this registration
       // answers the challenge it just issued rather than an older one.
@@ -157,7 +160,7 @@ export function Signing() {
         display_name: opts.user.displayName,
       });
       if (!w) { pending.current = null; setBusy(false);
-        setError(new Error("the ceremony window was blocked")); }
+        setError(new Error(tr("sgn.blocked", lang))); }
       else setAwaiting(true);
     } catch (e) { setBusy(false); setError(e); }
   }
@@ -176,7 +179,7 @@ export function Signing() {
         display_text: env.display_text, meaning: env.meaning,
       });
       if (!w) { pending.current = null; setBusy(false);
-        setError(new Error("the ceremony window was blocked")); }
+        setError(new Error(tr("sgn.blocked", lang))); }
       else setAwaiting(true);
     } catch (e) { setBusy(false); setError(e); }
   }
@@ -196,39 +199,26 @@ export function Signing() {
   if (!token) {
     return (
       <div className="screen">
-        <h2>Signing</h2>
-        <p className="muted">
-          Signing is done as an account, not as a profile page. Sign in as an
-          owner to enrol a credential.
-        </p>
+        <h2>{tr("sgn.title", lang)}</h2>
+        <p className="muted">{tr("sgn.noaccount", lang)}</p>
       </div>
     );
   }
 
   return (
     <div className="screen">
-      <h2>Signing</h2>
-      <p className="muted">
-        A signature here is a device credential used with user verification
-        over one exact document. What that does and does not prove is written
-        below, in the words a counterparty will read.
-      </p>
+      <h2>{tr("sgn.title", lang)}</h2>
+      <p className="muted">{tr("sgn.lead", lang)}</p>
       <Refusal error={error} />
       {said && <p className="small">{said}</p>}
 
       {/* --- enrol ---------------------------------------------------- */}
       <div className="card">
-        <h3>Enrol a credential</h3>
-        <p className="muted small">
-          The ceremony opens in its own window, on the API's own origin —
-          WebAuthn refuses a credential whose relying party does not match,
-          and this app's origin is not one it can match. That window carries
-          no token; it hands the registration back here, and this screen makes
-          the call.
-        </p>
+        <h3>{tr("sgn.enrol", lang)}</h3>
+        <p className="muted small">{tr("sgn.enrol.pitch", lang)}</p>
         <input value={enrolName} onChange={(e) => setEnrolName(e.target.value)}
-               placeholder="what to call this device" />
-        <label className="small">How your identity was checked</label>
+               placeholder={tr("sgn.device.ph", lang)} />
+        <label className="small">{tr("sgn.checked", lang)}</label>
         <select value={level} onChange={(e) => setLevel(e.target.value)}>
           {(policy?.proofing_levels || ["self_asserted"]).map((p) => (
             <option key={p} value={p}>{p.replace(/_/g, " ")}</option>
@@ -236,39 +226,44 @@ export function Signing() {
         </select>
         {level !== "self_asserted" && (
           <input value={attestor} onChange={(e) => setAttestor(e.target.value)}
-                 placeholder="who checked it (required above self-asserted)" />
+                 placeholder={tr("sgn.attestor.ph", lang)} />
         )}
         <p className="muted small">
-          This fixes what the credential may sign. A self-asserted one signs
-          the basic tier only; the high tier wants a document check <em>and</em>
-          {" "}a key that stayed on one device.
+          {fill(tr("sgn.tierpitch", lang),
+            { and: <em>{tr("sgn.and", lang)}</em> })}
         </p>
-        <button disabled={busy} onClick={enrol}>Open the ceremony</button>
+        <button disabled={busy} onClick={enrol}>
+          {tr("sgn.open", lang)}
+        </button>
         {awaiting && (
-          <p className="muted small">Waiting for the ceremony window.</p>
+          <p className="muted small">{tr("sgn.waiting", lang)}</p>
         )}
       </div>
 
       {/* --- what is enrolled ----------------------------------------- */}
       <div className="card">
-        <h3>What this account can sign with</h3>
+        <h3>{tr("sgn.have", lang)}</h3>
         {creds.length === 0 && (
-          <p className="muted small">Nothing enrolled yet.</p>
+          <p className="muted small">{tr("sgn.none", lang)}</p>
         )}
         {creds.map((c) => (
           <div key={c.id} className="row">
             <div>
               <p className="small">
-                <strong>{c.display_name}</strong> — checked as{" "}
-                {c.proofing_level.replace(/_/g, " ")}
-                {!c.device_bound
-                  && <span className="muted"> · syncs between devices</span>}
-                {c.revoked_at && <span className="muted"> · revoked</span>}
+                {fill(tr("sgn.cred.line", lang), {
+                  name: <strong>{c.display_name}</strong>,
+                  level: c.proofing_level.replace(/_/g, " "),
+                })}
+                {!c.device_bound && <span className="muted">
+                  {" "}{tr("sgn.syncs", lang)}</span>}
+                {c.revoked_at && <span className="muted">
+                  {" "}{tr("sgn.revoked", lang)}</span>}
               </p>
               <p className="muted small">
                 {c.can_sign.length
-                  ? `Signs: ${c.can_sign.join(", ")}`
-                  : "Signs nothing — revoked, or not proofed to any tier"}
+                  ? tr("sgn.signs", lang)
+                      .replace("{what}", c.can_sign.join(", "))
+                  : tr("sgn.signsnothing", lang)}
               </p>
             </div>
             {!c.revoked_at && (
@@ -277,12 +272,10 @@ export function Signing() {
                         setError(null);
                         try {
                           await api.revokeCredential(c.id, token);
-                          setSaid("Revoked, going forward. Anything already "
-                                  + "signed with it stays verifiable — its "
-                                  + "public key is in the evidence, not here.");
+                          setSaid(tr("sgn.revoked.said", lang));
                           refresh();
                         } catch (e) { setError(e); }
-                      }}>Revoke</button>
+                      }}>{tr("sgn.revoke", lang)}</button>
             )}
           </div>
         ))}
@@ -290,44 +283,47 @@ export function Signing() {
 
       {/* --- sign something ------------------------------------------- */}
       <div className="card">
-        <h3>Sign a document</h3>
+        <h3>{tr("sgn.sign", lang)}</h3>
         <textarea value={document} rows={4}
                   onChange={(e) => setDocument(e.target.value)}
-                  placeholder="the exact text being signed" />
+                  placeholder={tr("sgn.doc.ph", lang)} />
         <input value={meaning} onChange={(e) => setMeaning(e.target.value)}
-               placeholder="what signing it means" />
+               placeholder={tr("sgn.meaning.ph", lang)} />
         <input value={displayText}
                onChange={(e) => setDisplayText(e.target.value)}
-               placeholder="what you will be shown when you sign" />
+               placeholder={tr("sgn.display.ph", lang)} />
         <select value={tier} onChange={(e) => setTier(e.target.value)}>
           {Object.keys(policy?.tiers || { basic: null }).map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
         </select>
         <p className="muted small">
-          The challenge <em>is</em> the hash of this document, so the signature
-          covers these bytes and no others. Edit the text afterwards and the
-          old signature will not carry — which is the point of it.
+          {fill(tr("sgn.challenge", lang),
+            { is: <em>{tr("sgn.is", lang)}</em> })}
         </p>
         <button disabled={busy || !document} onClick={mintAndSign}>
-          Mint an envelope and sign it
+          {tr("sgn.mint", lang)}
         </button>
         {envelope && !signed && (
           <p className="muted small">
-            Envelope {envelope.envelope_id}, good until {envelope.expires_at}.
-            Finish in the ceremony window.
+            {fill(tr("sgn.envelope", lang), {
+              id: envelope.envelope_id, when: envelope.expires_at })}
           </p>
         )}
         {signed && (
           <div>
             <p className="small">
-              Signed as <strong>{signed.signer.name}</strong>, proofed{" "}
-              {signed.signer.proofing_level.replace(/_/g, " ")} — {signed.tier}{" "}
-              tier.
+              {fill(tr("sgn.signedas", lang), {
+                name: <strong>{signed.signer.name}</strong>,
+                level: signed.signer.proofing_level.replace(/_/g, " "),
+                tier: signed.tier,
+              })}
             </p>
             <p className="muted small">
-              Signature {signed.signature_id}. Over “{signed.display_text}”,
-              meaning “{signed.meaning}”.
+              {fill(tr("sgn.sigline", lang), {
+                id: signed.signature_id, text: signed.display_text,
+                meaning: signed.meaning,
+              })}
             </p>
           </div>
         )}
@@ -335,22 +331,20 @@ export function Signing() {
 
       {/* --- check somebody else's ------------------------------------ */}
       <div className="card">
-        <h3>Check a package somebody handed you</h3>
-        <p className="muted small">
-          This asks nothing of us. The package carries its own public key and
-          its own hashes, and the arithmetic either holds or it does not — a
-          check that needed our blessing would be us vouching, which is the
-          opposite of what the evidence is for.
-        </p>
+        <h3>{tr("sgn.check", lang)}</h3>
+        <p className="muted small">{tr("sgn.check.pitch", lang)}</p>
         <textarea value={pasted} rows={5}
                   onChange={(e) => setPasted(e.target.value)}
-                  placeholder="paste the evidence package (JSON)" />
-        <button disabled={!pasted} onClick={verify}>Check it</button>
+                  placeholder={tr("sgn.paste.ph", lang)} />
+        <button disabled={!pasted} onClick={verify}>
+          {tr("sgn.checkit", lang)}
+        </button>
         {verdict && (
           <div>
             <p className="small">
               <strong>
-                {verdict.valid ? "Holds up." : "Does not hold up."}
+                {verdict.valid
+                  ? tr("sgn.holds", lang) : tr("sgn.doesnot", lang)}
               </strong>
             </p>
             {CHECKS.map((k) => {
@@ -360,7 +354,7 @@ export function Signing() {
                   {v === true ? "✓" : v === false ? "✗" : "—"}{" "}
                   {k.replace(/_/g, " ")}
                   {v === undefined && (
-                    <span> · did not run, so it is not a pass</span>
+                    <span> {tr("sgn.didnotrun", lang)}</span>
                   )}
                 </p>
               );
@@ -375,7 +369,7 @@ export function Signing() {
       {/* --- the rules ------------------------------------------------ */}
       {policy && (
         <div className="card">
-          <h3>What this does not prove</h3>
+          <h3>{tr("sgn.limits", lang)}</h3>
           <p className="muted small">{policy.standard}</p>
           {policy.limits.map((l, i) => (
             <p key={i} className="muted small">{l}</p>

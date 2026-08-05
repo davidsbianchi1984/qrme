@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, getBase, type PlacementAnalytics, type PlacementMade,
          type PlacementRow, type Venue } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -38,6 +39,7 @@ import { useSession } from "../store";
  */
 export function Placements({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -81,9 +83,9 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
     setError(null); setNote(null);
     try {
       const r = await api.removePlacement(id, token);
-      setNote(`Taken down. The beacon is ${r.beacon_active ? "still live"
-        : "no longer live"} — anything already printed at the venue now stops `
-        + "resolving rather than pointing somewhere else.");
+      setNote(tr("plc.takendown.said", lang).replace("{state}",
+        r.beacon_active
+          ? tr("plc.stilllive", lang) : tr("plc.nolonger", lang)));
       if (made?.placement_id === id) setMade(null);
       load();
     } catch (e) { fail(e); }
@@ -91,17 +93,14 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Where it is marketed</h2>
-      <p className="muted small">
-        An adult-mode profile can be advertised at an adult venue, as a link or
-        a printable code.
-      </p>
+      <h2>{tr("plc.title", lang)}</h2>
+      <p className="muted small">{tr("plc.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Venues</h3>
+        <h3>{tr("plc.venues", lang)}</h3>
         {venues.map((v) => (
           <div key={v.key}>
             <h4>
@@ -111,7 +110,8 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
             </h4>
             <p className="small">{v.blurb}</p>
             <p className="muted small">
-              Carries: {v.hosts.join(" and ")}.
+              {fill(tr("plc.carries", lang),
+                { what: v.hosts.join(" and ") })}
             </p>
             {/* Verbatim. Never summarised — "regardless of where the QR or
                 handle was found" is the load-bearing half. */}
@@ -121,34 +121,31 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Place this profile</h3>
+        <h3>{tr("plc.place", lang)}</h3>
         <div className="row">
           <select value={venue} onChange={(e) => setVenue(e.target.value)}>
-            <option value="">pick a venue</option>
+            <option value="">{tr("plc.pick", lang)}</option>
             {venues.map((v) => (
               <option key={v.key} value={v.key}>{v.name}</option>
             ))}
           </select>
           <input value={label} onChange={(e) => setLabel(e.target.value)}
-                 placeholder="what to call it (optional)"
+                 placeholder={tr("plc.label.ph", lang)}
                  style={{ flex: 1 }} />
           <button disabled={!me || !token || !venue} onClick={place}>
-            Place
+            {tr("plc.placebtn", lang)}
           </button>
         </div>
-        <p className="muted small">
-          Only an adult-mode profile can be placed at an adult venue, and the
-          refusal says so rather than hiding the button.
-        </p>
+        <p className="muted small">{tr("plc.adultonly", lang)}</p>
       </div>
 
       {made && (
         <div className="card">
-          <h3>Publish this</h3>
+          <h3>{tr("plc.publish", lang)}</h3>
           <img src={getBase() + made.qr_svg} width={180} height={180}
-               alt="the beacon's QR code" />
+               alt={tr("plc.qr.made", lang)} />
           <p className="small">
-            <strong>Print or share:</strong>{" "}
+            <strong>{tr("plc.printshare", lang)}</strong>{" "}
             <a href={made.scan_url} target="_blank" rel="noreferrer">
               {made.scan_url}
             </a>
@@ -156,30 +153,25 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
           {/* Said plainly, because the two urls look alike and one of them
               is a page of JSON. */}
           <p className="muted small">
-            That is the one a phone camera lands on and the one the code
-            encodes. <code>{made.summon_url}</code> is the machine-readable
-            surface for clients, not a link to give anybody.
+            {fill(tr("plc.thatone", lang),
+              { url: <code>{made.summon_url}</code> })}
           </p>
           <p className="muted small">
             {made.handle
-              ? <>Also reachable as {made.handle}.</>
-              : <>This profile has not claimed a handle, so the code and the
-                  link are the only ways in.</>}
+              ? fill(tr("plc.alsoas", lang), { handle: made.handle })
+              : tr("plc.nohandle", lang)}
           </p>
           <p className="muted small">{made.note}</p>
-          <p className="muted small">
-            Keep this. The list below can reopen the beacon on whatever API
-            this console is pointed at, but only this card knows the address
-            the code was minted with.
-          </p>
+          <p className="muted small">{tr("plc.keepthis", lang)}</p>
         </div>
       )}
 
       <div className="card">
-        <h3>Placed at</h3>
+        <h3>{tr("plc.placedat", lang)}</h3>
         {rows.length === 0 && (
           <p className="muted small">
-            {me && token ? "Nowhere yet." : "Sign in as an owner."}
+            {me && token
+              ? tr("plc.nowhere", lang) : tr("plc.signin", lang)}
           </p>
         )}
         {rows.map((r) => (
@@ -187,14 +179,17 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
             <div style={{ flex: 1 }}>
               <strong>{r.label}</strong>
               <div className="muted small">
-                {r.venue_name} · {r.scans} scan{r.scans === 1 ? "" : "s"}
-                {!r.active && " · taken down"}
+                {fill(tr("plc.row", lang), {
+                  venue: r.venue_name, n: r.scans,
+                  s: r.scans === 1 ? "" : "s",
+                })}
+                {!r.active && tr("plc.takendown", lang)}
               </div>
             </div>
             {/* Free to fetch: asking for the picture is not a scan, unlike
                 following the link beside it. */}
             <img src={getBase() + `/beacons/${r.beacon_id}/qr.svg`}
-                 width={56} height={56} alt="this beacon's QR code" />
+                 width={56} height={56} alt={tr("plc.qr.row", lang)} />
             {/* The list response carries no urls, so this is derived — and
                 deliberately labelled "on this deployment", because the
                 published link uses the configured public host and this one
@@ -206,25 +201,26 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
                 cannot resolve to a path, and this door counted as missing
                 for as long as it was written that way. */}
             <a href={getBase() + `/b/${r.beacon_id}`} target="_blank"
-               rel="noreferrer">open here (counts as a scan)</a>
-            <button onClick={() => remove(r.id)}>Take down</button>
+               rel="noreferrer">{tr("plc.openhere", lang)}</a>
+            <button onClick={() => remove(r.id)}>
+              {tr("plc.takedown", lang)}
+            </button>
           </div>
         ))}
       </div>
 
       {stats && (
         <div className="card">
-          <h3>What each venue brings</h3>
-          <p className="muted small">
-            Counts and rates only. Nobody who scans is identified, here or
-            anywhere else.
-          </p>
+          <h3>{tr("plc.brings", lang)}</h3>
+          <p className="muted small">{tr("plc.countsonly", lang)}</p>
           {stats.venues.map((v) => (
             <div key={v.placement_id}>
               <h4>{v.venue_name} — {v.label}</h4>
               <p className="small">
-                {v.scans} resolution{v.scans === 1 ? "" : "s"} ·{" "}
-                {v.walled} reached the age wall · {v.verified} got through it
+                {fill(tr("plc.venue.line", lang), {
+                  n: v.scans, s: v.scans === 1 ? "" : "s",
+                  walled: v.walled, verified: v.verified,
+                })}
               </p>
               {v.by_day.length > 0 && (
                 <p className="muted small">
@@ -233,31 +229,36 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
               )}
             </div>
           ))}
-          <h4>Everything else</h4>
+          <h4>{tr("plc.everything", lang)}</h4>
           <p className="muted small">
-            Arrivals that did not come through a placement:{" "}
-            {stats.direct.walled} walled, {stats.direct.verified} verified.
+            {fill(tr("plc.direct", lang), {
+              walled: stats.direct.walled,
+              verified: stats.direct.verified,
+            })}
           </p>
-          <h4>The funnel</h4>
+          <h4>{tr("plc.funnel", lang)}</h4>
           <p className="small">
-            {stats.funnel.resolutions} resolutions →{" "}
-            {stats.funnel.verified_views} verified views →{" "}
-            {stats.funnel.unique_chatters} people who talked
+            {fill(tr("plc.funnel.line", lang), {
+              res: stats.funnel.resolutions,
+              views: stats.funnel.verified_views,
+              chat: stats.funnel.unique_chatters,
+            })}
           </p>
           <p className="muted small">
-            {(stats.funnel.verified_rate * 100).toFixed(0)}% get through the
-            wall.{" "}
+            {fill(tr("plc.through", lang),
+              { pct: (stats.funnel.verified_rate * 100).toFixed(0) })}{" "}
             {/* Null, not zero, until something has. There is no rate yet, and
                 saying "0%" would be a claim rather than an absence. */}
             {stats.funnel.chat_rate === null
-              ? "Nothing has got through yet, so there is no conversion to quote."
-              : `${(stats.funnel.chat_rate * 100).toFixed(0)}% of those talk.`}
+              ? tr("plc.norate", lang)
+              : tr("plc.chatrate", lang).replace(
+                  "{pct}", (stats.funnel.chat_rate * 100).toFixed(0))}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>What is kept, and where</h3>
+        <h3>{tr("plc.kept", lang)}</h3>
         {custody ? (
           <>
             {/* Lead with the part addressed to the person reading this
@@ -265,17 +266,13 @@ export function Placements({ onPlans }: { onPlans: () => void }) {
                 which is the right message for whoever runs the deployment
                 and not something a creator can act on — so it is kept, and
                 kept second. */}
-            <p className="small">
-              This deployment has no vault, so nothing here is sealed. Rated
-              resolutions are counted in the ordinary database.
+            <p className="small">{tr("plc.novault", lang)}</p>
+            <p className="muted small">
+              {fill(tr("plc.reported", lang), { what: custody })}
             </p>
-            <p className="muted small">Reported as: {custody}</p>
           </>
         ) : (
-          <p className="muted small">
-            Rated resolutions are sealed in the vault — so the record of who
-            was age-checked is not this platform's to read.
-          </p>
+          <p className="muted small">{tr("plc.sealed", lang)}</p>
         )}
       </div>
     </div>

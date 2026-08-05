@@ -1,4 +1,4 @@
-# status: backlog — 848 rows
+# status: backlog — 724 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 848
+# ceiling: 724
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -557,88 +557,6 @@ Org: scoped
 Org: sealed
 Org: sealed to vault
 Org: · agent:
-Passing: A contested identity cannot be handed on: an open objection blocks this with a 409. Inheriting a profile somebody is disputing would settle the dispute by transfer rather than by resolving it.
-Passing: A pack needs at least one item, a price cannot be negative, and every item in a robot pack needs a task — the command verb. Three refusals, each naming what is missing.
-Passing: An owner under 18 needs a parent or guardian's consent, and the refusal says so rather than failing generically.
-Passing: Beginning, and passing on
-Passing: Born from four questions
-Passing: Bring it into being
-Passing: Down the same paths the full apps use — same auth, same allowlists, same moderation. A shortcut that skipped any of those would be a second, weaker way in, which is exactly what a wrist should not be.
-Passing: How a profile starts, what it is taught, who holds it after, and the one press from a wrist.
-Passing: Leave the name blank and it picks its own from the answers. That is not decoration: a persona assembled from what somebody said about themselves should not then be handed a label by a form field.
-Passing: Nobody was named, so it sunsets to memorial: frozen rather than orphaned. A profile whose owner has died and which nobody can reach is worse than one that has plainly stopped.
-Passing: Now
-Passing: One press from the wrist
-Passing: Pass it on
-Passing: Passing it on
-Passing: Press it
-Passing: Publish it
-Passing: Publishing needs your owner token, and the account sales accrue to is read from it — not from the request. Naming somebody else's account in a body is how money ends up somewhere it was not earned.
-Passing: The one route in this product an
-Passing: Their owner token, shown once:
-Passing: What it can be taught
-Passing: a name, or blank to let it choose
-Passing: advance / assist / cancel
-Passing: already there, across
-Passing: assist
-Passing: created,
-Passing: industries. Pressing again is safe.
-Passing: industry
-Passing: its id
-Passing: needs input — the paused phase asked for something, and sending nothing would advance past the question rather than answer it.
-Passing: one item's title
-Passing: owner token cannot open
-Passing: reviewer token
-Passing: seed the starter packs
-Passing: the pack's title
-Passing: the profile
-Passing: verification reference
-Passing: what it asked for
-Passing: what it teaches
-Passing: your birthdate, YYYY-MM-DD
-Passing: · published by
-Passing: — because the signal it answers is that the owner has died or cannot act, and requiring their authorisation would be requiring the one thing known to be unavailable. A reviewer holds it, against a verification reference kept out of band: a death certificate, a power of attorney.
-Passing: — held by
-Placements: % get through the wall.
-Placements: Also reachable as
-Placements: An adult-mode profile can be advertised at an adult venue, as a link or a printable code.
-Placements: Arrivals that did not come through a placement:
-Placements: Carries:
-Placements: Counts and rates only. Nobody who scans is identified, here or anywhere else.
-Placements: Everything else
-Placements: Keep this. The list below can reopen the beacon on whatever API this console is pointed at, but only this card knows the address the code was minted with.
-Placements: Only an adult-mode profile can be placed at an adult venue, and the refusal says so rather than hiding the button.
-Placements: Place
-Placements: Place this profile
-Placements: Placed at
-Placements: Print or share:
-Placements: Publish this
-Placements: Rated resolutions are sealed in the vault — so the record of who was age-checked is not this platform's to read.
-Placements: Reported as:
-Placements: Take down
-Placements: That is the one a phone camera lands on and the one the code encodes.
-Placements: The funnel
-Placements: This deployment has no vault, so nothing here is sealed. Rated resolutions are counted in the ordinary database.
-Placements: This profile has not claimed a handle, so the code and the link are the only ways in.
-Placements: Venues
-Placements: What each venue brings
-Placements: What is kept, and where
-Placements: Where it is marketed
-Placements: got through it
-Placements: is the machine-readable surface for clients, not a link to give anybody.
-Placements: open here (counts as a scan)
-Placements: people who talked
-Placements: pick a venue
-Placements: reached the age wall ·
-Placements: resolution
-Placements: resolutions →
-Placements: scan
-Placements: the beacon's QR code
-Placements: this beacon's QR code
-Placements: verified views →
-Placements: verified.
-Placements: walled,
-Placements: what to call it (optional)
 Plans: . Readable by
 Plans: End my subscription
 Plans: Erasure:
@@ -704,48 +622,6 @@ Rooms: Topic
 Rooms: inside
 Rooms: what it's about
 Rooms: — join from a headset or phone; this desktop shows the room
-Signing: , good until
-Signing: , proofed
-Signing: . Finish in the ceremony window.
-Signing: . Over “
-Signing: A signature here is a device credential used with user verification over one exact document. What that does and does not prove is written below, in the words a counterparty will read.
-Signing: Check a package somebody handed you
-Signing: Check it
-Signing: Enrol a credential
-Signing: Envelope
-Signing: How your identity was checked
-Signing: Mint an envelope and sign it
-Signing: Nothing enrolled yet.
-Signing: Open the ceremony
-Signing: Revoke
-Signing: Sign a document
-Signing: Signature
-Signing: Signed as
-Signing: Signing
-Signing: Signing is done as an account, not as a profile page. Sign in as an owner to enrol a credential.
-Signing: The ceremony opens in its own window, on the API's own origin — WebAuthn refuses a credential whose relying party does not match, and this app's origin is not one it can match. That window carries no token; it hands the registration back here, and this screen makes the call.
-Signing: The challenge
-Signing: This asks nothing of us. The package carries its own public key and its own hashes, and the arithmetic either holds or it does not — a check that needed our blessing would be us vouching, which is the opposite of what the evidence is for.
-Signing: This fixes what the credential may sign. A self-asserted one signs the basic tier only; the high tier wants a document check
-Signing: Waiting for the ceremony window.
-Signing: What this account can sign with
-Signing: What this does not prove
-Signing: a key that stayed on one device.
-Signing: and
-Signing: is
-Signing: paste the evidence package (JSON)
-Signing: the exact text being signed
-Signing: the hash of this document, so the signature covers these bytes and no others. Edit the text afterwards and the old signature will not carry — which is the point of it.
-Signing: tier.
-Signing: what signing it means
-Signing: what to call this device
-Signing: what you will be shown when you sign
-Signing: who checked it (required above self-asserted)
-Signing: · did not run, so it is not a pass
-Signing: · revoked
-Signing: · syncs between devices
-Signing: — checked as
-Signing: ”, meaning “
 Simulate: Horizon
 Simulate: Past runs
 Simulate: Prediction

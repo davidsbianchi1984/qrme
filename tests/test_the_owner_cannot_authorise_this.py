@@ -183,8 +183,11 @@ def test_it_cannot_happen_twice(client, reviewed):
 
 def test_the_screen_says_who_may_open_it():
     src = _prose("app/src/screens/Passing.tsx")
-    assert "reviewer" in src.lower()
-    assert "frozen rather than orphaned" in src
+    assert 'tr("pas.on.pitch", lang)' in src
+    assert 'tr("pas.memorial", lang)' in src
+    l10n = _prose("app/src/l10n.ts")
+    assert "reviewer" in l10n.lower()
+    assert "frozen rather than orphaned" in l10n
 
 
 # --- what it can be taught --------------------------------------------------
@@ -274,7 +277,9 @@ def test_assist_from_the_wrist_needs_input(client):
 
 def test_the_screen_says_the_wrist_is_not_a_shortcut():
     src = _prose("app/src/screens/Passing.tsx")
-    assert "same paths" in src or "weaker way in" in src
+    assert 'tr("pas.wrist.pitch", lang)' in src
+    l10n = _prose("app/src/l10n.ts")
+    assert "same paths" in l10n or "weaker way in" in l10n
 
 
 # --- the console half -------------------------------------------------------

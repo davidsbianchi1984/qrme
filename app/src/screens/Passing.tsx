@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, type PackSeed, type PackSummary, type Profile,
          type Succession } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -38,6 +39,7 @@ import { useSession } from "../store";
  */
 export function Passing({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
   const account = session.accountId || "";
@@ -79,50 +81,49 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Beginning, and passing on</h2>
-      <p className="muted small">
-        How a profile starts, what it is taught, who holds it after, and the
-        one press from a wrist.
-      </p>
+      <h2>{tr("pas.title", lang)}</h2>
+      <p className="muted small">{tr("pas.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Born from four questions</h3>
-        <p className="muted small">
-          Leave the name blank and it picks its own from the answers. That is
-          not decoration: a persona assembled from what somebody said about
-          themselves should not then be handed a label by a form field.
-        </p>
+        <h3>{tr("pas.born", lang)}</h3>
+        <p className="muted small">{tr("pas.born.pitch", lang)}</p>
+        {/* The label and the example both come from the table. The example
+            is the part a form like this is actually read from, so leaving it
+            in English would leave the question in English. */}
         {([
-          ["social_style", "warm, but needs quiet evenings"],
-          ["humor", "dry, gentle teasing"],
-          ["what_matters", "family, honesty, the garden"],
-          ["comfort", "sits with you rather than fixing it"],
-        ] as const).map(([k, hint]) => (
+          ["social_style", "social"],
+          ["humor", "humor"],
+          ["what_matters", "matters"],
+          ["comfort", "comfort"],
+        ] as const).map(([k, suffix]) => (
           <div className="row" key={k}>
             <label className="small" style={{ width: 130 }}>
-              {k.replace(/_/g, " ")}
+              {tr(`pas.q.${suffix}`, lang)}
             </label>
-            <input value={answers[k]} placeholder={hint} style={{ flex: 1 }}
+            <input value={answers[k]} style={{ flex: 1 }}
+                   placeholder={tr(`pas.h.${suffix}`, lang)}
                    onChange={(e) =>
                      setAnswers({ ...answers, [k]: e.target.value })} />
           </div>
         ))}
         <div className="row">
           <input value={birthdate} onChange={(e) => setBirthdate(e.target.value)}
-                 placeholder="your birthdate, YYYY-MM-DD" style={{ flex: 1 }} />
+                 placeholder={tr("pas.birth.ph", lang)} style={{ flex: 1 }} />
           <input value={chosenName}
                  onChange={(e) => setChosenName(e.target.value)}
-                 placeholder="a name, or blank to let it choose"
+                 placeholder={tr("pas.name.ph", lang)}
                  style={{ flex: 1 }} />
           <button disabled={busy || !account || !birthdate.trim()}
                   onClick={act(async () => setBorn(await api.genesis({
                     owner_id: account, verification: { birthdate },
                     answers,
                     display_name: chosenName.trim() || undefined,
-                  })), "Born.")}>Bring it into being</button>
+                  })), tr("pas.born.said", lang))}>
+            {tr("pas.bring", lang)}
+          </button>
         </div>
         {born && (
           <p className="small">
@@ -130,90 +131,72 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
             <br />
             <span className="muted">
               {chosenName.trim()
-                ? "You named it."
-                : "It named itself from what you said."}
+                ? tr("pas.younamed", lang) : tr("pas.itnamed", lang)}
             </span>
           </p>
         )}
-        <p className="muted small">
-          An owner under 18 needs a parent or guardian's consent, and the
-          refusal says so rather than failing generically.
-        </p>
+        <p className="muted small">{tr("pas.minor", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>Passing it on</h3>
+        <h3>{tr("pas.on", lang)}</h3>
         <p className="muted small">
-          The one route in this product an <strong>owner token cannot
-          open</strong> — because the signal it answers is that the owner has
-          died or cannot act, and requiring their authorisation would be
-          requiring the one thing known to be unavailable. A reviewer holds
-          it, against a verification reference kept out of band: a death
-          certificate, a power of attorney.
+          {fill(tr("pas.on.pitch", lang),
+            { cannot: <strong>{tr("pas.cannot", lang)}</strong> })}
         </p>
         <div className="row">
           <input value={subject} onChange={(e) => setSubject(e.target.value)}
-                 placeholder="the profile" style={{ flex: 1 }} />
+                 placeholder={tr("pas.subject.ph", lang)} style={{ flex: 1 }} />
           <input value={ref} onChange={(e) => setRef(e.target.value)}
-                 placeholder="verification reference" style={{ flex: 1 }} />
+                 placeholder={tr("pas.ref.ph", lang)} style={{ flex: 1 }} />
           <input value={reviewerToken} type="password"
                  onChange={(e) => setReviewerToken(e.target.value)}
-                 placeholder="reviewer token" style={{ flex: 1 }} />
+                 placeholder={tr("pas.reviewer.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !subject.trim() || !ref.trim()
                             || !reviewerToken}
                   onClick={act(async () => setPassed(await api.succeed(
                     subject.trim(), ref.trim(), reviewerToken)))}>
-            Pass it on
+            {tr("pas.passit", lang)}
           </button>
         </div>
         {passed && (
           <>
             <p className="small">
-              Now <strong>{passed.status}</strong>
+              {fill(tr("pas.now", lang),
+                { status: <strong>{passed.status}</strong> })}
               {passed.successor_owner && (
-                <> — held by <code>{passed.successor_owner}</code></>
+                <>{" "}{fill(tr("pas.heldby", lang),
+                  { who: <code>{passed.successor_owner}</code> })}</>
               )}
             </p>
             {passed.owner_token ? (
               <p className="muted small">
-                Their owner token, shown once:{" "}
-                <code>{passed.owner_token}</code>
+                {fill(tr("pas.token.once", lang),
+                  { token: <code>{passed.owner_token}</code> })}
               </p>
             ) : (
-              <p className="muted small">
-                Nobody was named, so it sunsets to memorial: frozen rather
-                than orphaned. A profile whose owner has died and which
-                nobody can reach is worse than one that has plainly stopped.
-              </p>
+              <p className="muted small">{tr("pas.memorial", lang)}</p>
             )}
           </>
         )}
-        <p className="muted small">
-          A contested identity cannot be handed on: an open objection blocks
-          this with a 409. Inheriting a profile somebody is disputing would
-          settle the dispute by transfer rather than by resolving it.
-        </p>
+        <p className="muted small">{tr("pas.contested", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>What it can be taught</h3>
-        <p className="muted small">
-          Publishing needs your owner token, and the account sales accrue to
-          is read from it — not from the request. Naming somebody else's
-          account in a body is how money ends up somewhere it was not earned.
-        </p>
+        <h3>{tr("pas.taught", lang)}</h3>
+        <p className="muted small">{tr("pas.taught.pitch", lang)}</p>
         <div className="row">
           <input value={packIndustry}
                  onChange={(e) => setPackIndustry(e.target.value)}
-                 placeholder="industry" style={{ width: 140 }} />
+                 placeholder={tr("pas.industry.ph", lang)} style={{ width: 140 }} />
           <input value={packTitle} onChange={(e) => setPackTitle(e.target.value)}
-                 placeholder="the pack's title" style={{ flex: 1 }} />
+                 placeholder={tr("pas.packtitle.ph", lang)} style={{ flex: 1 }} />
         </div>
         <div className="row">
           <input value={itemTitle} onChange={(e) => setItemTitle(e.target.value)}
-                 placeholder="one item's title" style={{ flex: 1 }} />
+                 placeholder={tr("pas.itemtitle.ph", lang)} style={{ flex: 1 }} />
           <input value={itemBody} onChange={(e) => setItemBody(e.target.value)}
-                 placeholder="what it teaches" style={{ flex: 1 }} />
+                 placeholder={tr("pas.itemwhat.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !packTitle.trim() || !itemTitle.trim()
                             || !token}
                   onClick={act(async () => setPublished(
@@ -222,28 +205,28 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
                       price: 0,
                       items: [{ title: itemTitle.trim(),
                                 content: itemBody.trim() }],
-                    }, token)), "Published.")}>
-            Publish it
+                    }, token)), tr("pas.published.said", lang))}>
+            {tr("pas.publish", lang)}
           </button>
         </div>
-        <p className="muted small">
-          A pack needs at least one item, a price cannot be negative, and
-          every item in a robot pack needs a task — the command verb. Three
-          refusals, each naming what is missing.
-        </p>
+        <p className="muted small">{tr("pas.packrules", lang)}</p>
         {published && (
           <p className="small">
-            <strong>{published.title}</strong> — {published.items}{" "}
-            {published.items === 1 ? "item" : "items"} ·{" "}
-            {published.free ? "free" : `${published.price} ${published.currency}`}
-            {" "}· published by {published.publisher}
+            {fill(tr("pas.pack.row", lang), {
+              title: <strong>{published.title}</strong>,
+              n: published.items,
+              s: published.items === 1 ? "" : "s",
+              price: published.free ? tr("pas.free", lang)
+                : `${published.price} ${published.currency}`,
+              who: published.publisher,
+            })}
           </p>
         )}
         <div className="row">
           <button className="chip" disabled={busy}
                   onClick={act(async () =>
                     setSeeded(await api.seedPacks()))}>
-            seed the starter packs
+            {tr("pas.seed", lang)}
           </button>
         </div>
         {seeded && (
@@ -251,19 +234,17 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
              press look like it failed rather than like there was nothing
              left to do. */
           <p className="muted small">
-            {seeded.created} created, {seeded.skipped} already there, across{" "}
-            {seeded.industries} industries. Pressing again is safe.
+            {fill(tr("pas.seeded", lang), {
+              created: seeded.created, skipped: seeded.skipped,
+              n: seeded.industries,
+            })}
           </p>
         )}
       </div>
 
       <div className="card">
-        <h3>One press from the wrist</h3>
-        <p className="muted small">
-          Down the same paths the full apps use — same auth, same allowlists,
-          same moderation. A shortcut that skipped any of those would be a
-          second, weaker way in, which is exactly what a wrist should not be.
-        </p>
+        <h3>{tr("pas.wrist", lang)}</h3>
+        <p className="muted small">{tr("pas.wrist.pitch", lang)}</p>
         <div className="row">
           <select value={target}
                   onChange={(e) => setTarget(
@@ -273,24 +254,24 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
             ))}
           </select>
           <input value={actId} onChange={(e) => setActId(e.target.value)}
-                 placeholder="its id" style={{ flex: 1 }} />
+                 placeholder={tr("pas.id.ph", lang)} style={{ flex: 1 }} />
           <input value={action} onChange={(e) => setAction(e.target.value)}
-                 placeholder="advance / assist / cancel"
+                 placeholder={tr("pas.action.ph", lang)}
                  style={{ width: 150 }} />
           <input value={actInput}
                  onChange={(e) => setActInput(e.target.value)}
-                 placeholder="what it asked for" style={{ flex: 1 }} />
+                 placeholder={tr("pas.input.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !me || !token || !actId.trim()}
                   onClick={act(() => api.watchAct(me, {
                     target, id: actId.trim(), action: action.trim(),
-                    input: actInput.trim() || undefined }, token), "Done.")}>
-            Press it
+                    input: actInput.trim() || undefined }, token),
+                    tr("pas.done.said", lang))}>
+            {tr("pas.press", lang)}
           </button>
         </div>
         <p className="muted small">
-          <em>assist</em> needs input — the paused phase asked for something,
-          and sending nothing would advance past the question rather than
-          answer it.
+          {fill(tr("pas.assist.note", lang),
+            { assist: <em>{tr("pas.assist", lang)}</em> })}
         </p>
       </div>
     </div>
