@@ -320,6 +320,55 @@ public sealed partial class PeoplePage : Page
         ExitSucceedButton.Content = L10n.T("exit.succeed");
         ExitSunsetButton.Content = L10n.T("exit.sunset");
         ExitDeleteButton.Content = L10n.T("exit.delete");
+        AvaTitle.Text = L10n.T("ava.title");
+        AvaShowButton.Content = L10n.T("ava.show");
+        AvaBriefsButton.Content = L10n.T("ava.briefs");
+        AvaAssetBox.Header = L10n.T("ava.asset");
+        AvaSetButton.Content = L10n.T("ava.set");
+        AvaHandleBox.Header = L10n.T("people.add");
+        AvaBriefButton.Content = L10n.T("ava.brief");
+        EmblTitle.Text = L10n.T("embl.title");
+        EmblListButton.Content = L10n.T("embl.list");
+        EmblRulesButton.Content = L10n.T("embl.rules");
+        EmblBadgeButton.Content = L10n.T("embl.badge");
+        EmblPickBox.Header = L10n.T("embl.pick");
+        EmblSetButton.Content = L10n.T("embl.set");
+        PgTitle.Text = L10n.T("pg.title");
+        PgShowButton.Content = L10n.T("pg.show");
+        PgThemesButton.Content = L10n.T("pg.themes");
+        FrontShowButton.Content = L10n.T("front.show");
+        PgThemeBox.Header = L10n.T("pg.theme");
+        PgTaglineBox.Header = L10n.T("pg.tagline");
+        PgAboutBox.Header = L10n.T("pg.about");
+        PgSaveButton.Content = L10n.T("pg.save");
+        SurfTitle.Text = L10n.T("surf.title");
+        SurfListButton.Content = L10n.T("surf.list");
+        CompShowButton.Content = L10n.T("comp.show");
+        SurfSetBox.Header = L10n.T("surf.title");
+        SurfSetButton.Content = L10n.T("surf.set");
+        FormTitle.Text = L10n.T("form.title");
+        FormNameBox.Header = L10n.T("form.name");
+        FormKindBox.Header = L10n.T("form.kind");
+        FormKindBox.Text = "speaker";
+        FormAddButton.Content = L10n.T("form.add");
+        FormSameButton.Content = L10n.T("form.same");
+        FormScreenBox.Header = L10n.T("plc.label");
+        FormScreensButton.Content = L10n.T("disp.title");
+        FormScreenAddButton.Content = L10n.T("src.add");
+        SteerTitle.Text = L10n.T("steer.title");
+        SteerShowButton.Content = L10n.T("steer.show");
+        SteerPaceBox.Header = L10n.T("steer.pace");
+        SteerAutonomyBox.Header = L10n.T("steer.autonomy");
+        SteerSetButton.Content = L10n.T("steer.set");
+        WristTitle.Text = L10n.T("wrist.title");
+        WristShowButton.Content = L10n.T("wrist.show");
+        WristTargetBox.Header = L10n.T("wrist.target");
+        WristTargetBox.Text = "workflow";
+        WristIdBox.Header = L10n.T("wrist.id");
+        WristActionBox.Header = L10n.T("wrist.action");
+        WristActionBox.Text = "advance";
+        WristInputBox.Header = L10n.T("wrist.input");
+        WristActButton.Content = L10n.T("wrist.act");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -1735,4 +1784,216 @@ public sealed partial class PeoplePage : Page
     private async void OnExitDelete(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.DeleteProfile(
             AppState.Current.Pid!, AppState.Current.Token!));
+
+    // -- the face it shows the world --------------------------------------
+
+    private async void OnAvaShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var a = await ApiClient.Shared.AvatarOf(AppState.Current.Pid!);
+            StatusText.Text = ((a.AiBadge ?? false) ? "AI" : "\u2014")
+                + $" \u00b7 {a.LikenessOf ?? "\u2014"}";
+        });
+
+    private async void OnAvaBriefs(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.AvatarBriefs();
+            StatusText.Text = (c.Briefs?.Length ?? 0).ToString();
+        });
+
+    private async void OnAvaSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.SetAvatar(AppState.Current.Pid!,
+                AvaAssetBox.Text.Trim(), AppState.Current.Token!);
+            AvaAssetBox.Text = "";
+        });
+
+    private async void OnAvaBrief(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var b = await ApiClient.Shared.AvatarBrief(
+                AvaHandleBox.Text.Trim());
+            StatusText.Text = b.Brief ?? "";
+        });
+
+    private async void OnEmblList(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.IdentityEmblems();
+            StatusText.Text = string.Join(" \u00b7 ",
+                (c.Emblems ?? []).Select(x => x.Emblem));
+        });
+
+    private async void OnEmblRules(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.IdentityVocabularyOf();
+            StatusText.Text = string.Join(" \u00b7 ",
+                v.WithheldWhenAnonymous);
+        });
+
+    private async void OnEmblBadge(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var b = await ApiClient.Shared.BadgeOf(AppState.Current.Pid!);
+            StatusText.Text =
+                $"{b.Level ?? "\u2014"} \u00b7 {b.Attestor ?? "\u2014"}";
+        });
+
+    private async void OnEmblSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.SetEmblem(AppState.Current.Pid!,
+                EmblPickBox.Text.Trim(), AppState.Current.Token!);
+            EmblPickBox.Text = "";
+        });
+
+    private async void OnPgShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var pg = await ApiClient.Shared.PageOf(AppState.Current.Pid!);
+            StatusText.Text =
+                $"{pg.Theme ?? "\u2014"} \u00b7 {pg.Tagline ?? "\u2014"}";
+        });
+
+    private async void OnPgThemes(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.PageThemes();
+            StatusText.Text = string.Join(" \u00b7 ",
+                (c.Themes ?? []).Select(t => t.Id));
+        });
+
+    private async void OnFrontShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var f = await ApiClient.Shared.FrontPage(AppState.Current.Pid!);
+            StatusText.Text = $"{f.DisplayName ?? "\u2014"} \u00b7 "
+                + (f.Purpose ?? "\u2014");
+        });
+
+    private async void OnPgSave(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.EditPage(AppState.Current.Pid!,
+                PgThemeBox.Text.Trim(), PgTaglineBox.Text.Trim(),
+                PgAboutBox.Text.Trim(), AppState.Current.Token!);
+            PgThemeBox.Text = ""; PgTaglineBox.Text = "";
+            PgAboutBox.Text = "";
+        });
+
+    private async void OnSurfList(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var su = await ApiClient.Shared.SurfacesOf(
+                AppState.Current.Pid!);
+            StatusText.Text = string.Join(" \u00b7 ", su.Surfaces);
+        });
+
+    private async void OnCompShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.CompositionOf(
+                AppState.Current.Pid!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                (c.Sources ?? []).Select(x => x.Name));
+        });
+
+    private async void OnSurfSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var parts = SurfSetBox.Text.Split(',')
+                .Select(x => x.Trim()).Where(x => x.Length > 0).ToArray();
+            await ApiClient.Shared.SetSurfaces(AppState.Current.Pid!,
+                parts, AppState.Current.Token!);
+            SurfSetBox.Text = "";
+        });
+
+    private async void OnFormAdd(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.AddEmbodiment(AppState.Current.Pid!,
+                FormNameBox.Text.Trim(), FormKindBox.Text.Trim(),
+                AppState.Current.Token!);
+            FormNameBox.Text = "";
+            var rows = await ApiClient.Shared.Embodiments(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            FormList.ItemsSource = rows.Select(r => new Row(
+                $"{r.Name} \u00b7 {r.Kind}")).ToList();
+        });
+
+    private async void OnFormSame(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.EmbodimentConsistency(
+                AppState.Current.Pid!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                (c.Embodiments ?? []).Select(x => x.Name));
+        });
+
+    private async void OnFormScreens(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var rows = await ApiClient.Shared.ProfileDisplays(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                rows.Displays.Select(r => r.Label));
+        });
+
+    private async void OnFormScreenAdd(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.AddProfileDisplay(AppState.Current.Pid!,
+                "wall_panel", FormScreenBox.Text.Trim(),
+                AppState.Current.Token!);
+            FormScreenBox.Text = "";
+        });
+
+    private async void OnSteerShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var st = await ApiClient.Shared.SteeringOf(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ", st.Values
+                .OrderBy(kv => kv.Key)
+                .Select(kv => $"{kv.Key} {kv.Value}"));
+        });
+
+    private async void OnSteerSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var values =
+                new System.Collections.Generic.Dictionary<string, int>();
+            if (int.TryParse(SteerPaceBox.Text.Trim(), out var pace))
+                values["pace"] = pace;
+            if (int.TryParse(SteerAutonomyBox.Text.Trim(), out var auto))
+                values["autonomy"] = auto;
+            await ApiClient.Shared.SetSteering(AppState.Current.Pid!,
+                values, AppState.Current.Token!);
+            SteerPaceBox.Text = ""; SteerAutonomyBox.Text = "";
+        });
+
+    private async void OnWristShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var f = await ApiClient.Shared.WatchFace(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = $"{f.Profile.Light} \u00b7 "
+                + $"{f.Summary.Working} \u00b7 "
+                + $"{f.Summary.NeedingAssistance} \u00b7 "
+                + $"{f.Summary.Stopped}";
+        });
+
+    private async void OnWristAct(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.WatchAct(
+                AppState.Current.Pid!, WristTargetBox.Text.Trim(),
+                WristIdBox.Text.Trim(), WristActionBox.Text.Trim(),
+                WristInputBox.Text.Trim(), AppState.Current.Token!);
+            WristInputBox.Text = "";
+            StatusText.Text = outp.Status ?? "";
+        });
 }

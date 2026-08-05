@@ -231,6 +231,13 @@ struct PeopleSection: View {
                 VeilSection()
                 BadgeSection()
                 ExitSection()
+                AvatarSection()
+                EmblemSection()
+                PageSection()
+                SurfaceSection()
+                EmbodimentSection()
+                SteeringSection()
+                WristSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

@@ -3761,6 +3761,164 @@ struct PlacementCustody: Decodable {
 struct SpecialistRow: Decodable {
     let domain: String
     let specialist_profile_id: String
+
+    // -- the face it shows the world: portrait, emblem, page, front,
+    // surfaces, blend, bodies, dials and the wrist -----------------------
+
+    /// Public: the portrait as it must be displayed — asset, AI badge,
+    /// and whose likeness it is.
+    func avatar(id: String) async throws -> AvatarCard {
+        try await request("/profiles/\(id)/avatar")
+    }
+
+    func setAvatar(id: String, asset: String,
+                   token: String) async throws -> AvatarCard {
+        try await request("/profiles/\(id)/avatar", method: "PUT",
+                          body: ["asset": asset], token: token)
+    }
+
+    /// Public because it is the honest version of "where did these faces
+    /// come from": every starter portrait is an invented person, and the
+    /// brief that produced it says so in its own constraints.
+    func avatarBriefs() async throws -> BriefCatalog {
+        try await request("/avatars/briefs")
+    }
+
+    func avatarBrief(handle: String) async throws -> BriefCard {
+        try await request("/avatars/briefs/\(handle)")
+    }
+
+    // -- the emblem and the badge --
+
+    func identityEmblems() async throws -> EmblemCatalog {
+        try await request("/identity/emblems")
+    }
+
+    func identityVocabulary() async throws -> IdentityVocabulary {
+        try await request("/identity/vocabulary")
+    }
+
+    func setEmblem(id: String, emblem: String,
+                   token: String) async throws -> EmblemOut {
+        try await request("/profiles/\(id)/emblem", method: "PUT",
+                          body: ["emblem": emblem], token: token)
+    }
+
+    /// Public, and not the same read as /verification: on an anonymous
+    /// profile the attestor is withheld, because "checked by Dr Okafor of
+    /// St Mary's" narrows an anonymous author to a city and a workplace.
+    func badge(id: String) async throws -> BadgeCard {
+        try await request("/profiles/\(id)/badge")
+    }
+
+    // -- the page --
+
+    func pageThemes() async throws -> ThemeCatalog {
+        try await request("/pages/themes")
+    }
+
+    func page(id: String) async throws -> PageCard {
+        try await request("/profiles/\(id)/page")
+    }
+
+    func editPage(id: String, theme: String?, tagline: String?,
+                  about: String?, token: String) async throws -> PageCard {
+        var body: [String: Any] = [:]
+        if let theme, !theme.isEmpty { body["theme"] = theme }
+        if let tagline, !tagline.isEmpty { body["tagline"] = tagline }
+        if let about, !about.isEmpty { body["about"] = about }
+        return try await request("/profiles/\(id)/page", method: "PUT",
+                                 body: body, token: token)
+    }
+
+    /// Everything a visitor's first screen needs, in one call — the
+    /// caller is a scan page on cellular, and five round trips is how a
+    /// page arrives in pieces.
+    func frontPage(id: String) async throws -> FrontCard {
+        try await request("/profiles/\(id)/front")
+    }
+
+    // -- surfaces and the blend --
+
+    func surfaces(id: String) async throws -> SurfacesCard {
+        try await request("/profiles/\(id)/surfaces")
+    }
+
+    func setSurfaces(id: String, surfaces: [String],
+                     token: String) async throws -> SurfacesCard {
+        try await request("/profiles/\(id)/surfaces", method: "PUT",
+                          body: ["surfaces": surfaces], token: token)
+    }
+
+    /// Public, the same open stance as /transparency: the blend is the
+    /// profile's provenance.
+    func composition(id: String) async throws -> CompositionCard {
+        try await request("/profiles/\(id)/composition")
+    }
+
+    // -- the bodies it lives in --
+
+    func embodiments(id: String,
+                     token: String) async throws -> [EmbodimentRow] {
+        try await request("/profiles/\(id)/embodiments", token: token)
+    }
+
+    func addEmbodiment(id: String, name: String, kind: String,
+                       token: String) async throws -> EmbodimentRow {
+        try await request("/profiles/\(id)/embodiments", method: "POST",
+                          body: ["name": name, "kind": kind,
+                                 "has_llm": false],
+                          token: token)
+    }
+
+    /// Public: anyone meeting the profile through any form can verify it
+    /// is the same personality.
+    func embodimentConsistency(id: String) async throws -> ConsistencyCard {
+        try await request("/profiles/\(id)/embodiment-consistency")
+    }
+
+    func profileDisplays(id: String,
+                         token: String) async throws -> ProfileDisplayList {
+        try await request("/profiles/\(id)/displays", token: token)
+    }
+
+    func addProfileDisplay(id: String, kind: String, label: String,
+                           token: String) async throws -> ProfileDisplayRow {
+        try await request("/profiles/\(id)/displays", method: "POST",
+                          body: ["kind": kind, "label": label],
+                          token: token)
+    }
+
+    // -- the dials --
+
+    func steering(id: String, token: String) async throws -> SteeringCard {
+        try await request("/profiles/\(id)/steering", token: token)
+    }
+
+    /// Dials are 0–100 integers. Intimacy is hard-clamped to 0 unless the
+    /// profile is adult-mode — it can never be raised on a non-rated
+    /// persona.
+    func setSteering(id: String, values: [String: Int],
+                     token: String) async throws -> SteeringCard {
+        try await request("/profiles/\(id)/steering", method: "PUT",
+                          body: ["values": values], token: token)
+    }
+
+    // -- the wrist --
+
+    func watchFace(id: String, token: String) async throws -> WatchFace {
+        try await request("/profiles/\(id)/watch", token: token)
+    }
+
+    func watchAct(id: String, target: String, targetId: String,
+                  action: String, input: String,
+                  token: String) async throws -> WatchActOut {
+        var body: [String: Any] = ["target": target, "id": targetId,
+                                   "action": action]
+        if !input.isEmpty { body["input"] = input }
+        return try await request("/profiles/\(id)/watch/act",
+                                 method: "POST", body: body, token: token)
+    }
 }
 
 struct MemoryRow: Decodable, Identifiable {
@@ -3876,4 +4034,125 @@ struct RosterOut: Decodable {
 struct SucceedOut: Decodable {
     let succeeded: Bool
     let memorial: Bool?
+}
+
+struct AvatarCard: Decodable {
+    let asset: String?
+    let ai_badge: Bool?
+    let likeness_of: String?
+}
+
+struct BriefCatalog: Decodable {
+    struct Brief: Decodable { let handle: String? }
+    let style: String?
+    let briefs: [Brief]?
+}
+
+struct BriefCard: Decodable {
+    let handle: String?
+    let brief: String?
+}
+
+struct EmblemCatalog: Decodable {
+    struct Emblem: Decodable { let emblem: String?; let field: String? }
+    let emblems: [Emblem]?
+    let note: String?
+}
+
+struct IdentityVocabulary: Decodable {
+    let withheld_when_anonymous: [String]
+    let never_withheld: [String]
+}
+
+struct EmblemOut: Decodable {
+    let emblem: String?
+    let note: String?
+}
+
+struct BadgeCard: Decodable {
+    let verified: Bool?
+    let level: String?
+    let attestor: String?
+}
+
+struct ThemeCatalog: Decodable {
+    struct Theme: Decodable { let id: String?; let label: String? }
+    let themes: [Theme]?
+    let layouts: [String]?
+}
+
+struct PageCard: Decodable {
+    let theme: String?
+    let tagline: String?
+    let about: String?
+}
+
+struct FrontCard: Decodable {
+    let display_name: String?
+    let purpose: String?
+}
+
+struct SurfacesCard: Decodable {
+    let surfaces: [String]
+}
+
+struct CompositionCard: Decodable {
+    struct Source: Decodable { let name: String?; let share: Double? }
+    let sources: [Source]?
+    let policy: String
+}
+
+struct EmbodimentRow: Decodable {
+    let name: String
+    let kind: String
+    let has_llm: Bool?
+}
+
+struct ConsistencyCard: Decodable {
+    struct Form: Decodable { let name: String?; let kind: String? }
+    let embodiments: [Form]?
+    let surfaces: [String]?
+}
+
+struct ProfileDisplayRow: Decodable, Identifiable {
+    let id: String
+    let kind: String?
+    let label: String?
+}
+
+struct ProfileDisplayList: Decodable {
+    let displays: [ProfileDisplayRow]
+}
+
+struct SteeringCard: Decodable {
+    struct Dial: Decodable { let name: String?; let group: String? }
+    let dials: [Dial]?
+    let values: [String: Int]
+    let adult_mode: Bool?
+}
+
+struct WatchFace: Decodable {
+    struct Chip: Decodable {
+        let display_name: String?
+        let light: String?
+        let pending_approvals: Int?
+    }
+    struct Agent: Decodable {
+        let id: String
+        let goal: String?
+        let light: String?
+    }
+    struct Summary: Decodable {
+        let working: Int
+        let needing_assistance: Int
+        let stopped: Int
+    }
+    let profile: Chip
+    let agents: [Agent]
+    let summary: Summary
+    let haptic: String?
+}
+
+struct WatchActOut: Decodable {
+    let status: String?
 }

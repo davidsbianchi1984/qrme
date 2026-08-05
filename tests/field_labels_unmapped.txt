@@ -1,4 +1,4 @@
-# status: backlog — 134 rows
+# status: backlog — 131 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -29,7 +29,6 @@ app
 appearance
 arg
 aspect
-asset
 at_position_s
 attestation_object
 audience
@@ -61,7 +60,6 @@ designees
 detail
 device
 effective_age
-emblem
 embodiment
 enabled
 entries
@@ -138,7 +136,6 @@ sources
 state
 status
 successor_owner
-surfaces
 task
 terms_consent
 transcript_chars

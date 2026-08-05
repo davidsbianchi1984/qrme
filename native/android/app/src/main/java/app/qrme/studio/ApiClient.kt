@@ -3147,6 +3147,188 @@ object ApiClient {
         request("/profiles/$id", "DELETE", token = token)
     }
 
+    // -- the face it shows the world: portrait, emblem, page, front,
+    // surfaces, blend, bodies, dials and the wrist -----------------------
+
+    /** Public: the portrait as it must be displayed — asset, AI badge,
+     *  and whose likeness it is. */
+    suspend fun avatar(id: String): String {
+        val o = JSONObject(request("/profiles/$id/avatar"))
+        return (if (o.optBoolean("ai_badge")) "AI" else "\u2014") +
+            " \u00b7 " + o.optString("likeness_of", "\u2014")
+    }
+
+    suspend fun setAvatar(id: String, asset: String, token: String) {
+        request("/profiles/$id/avatar", "PUT",
+            JSONObject().put("asset", asset), token)
+    }
+
+    suspend fun avatarBriefs(): String {
+        val o = JSONObject(request("/avatars/briefs"))
+        return (o.optJSONArray("briefs")?.length() ?: 0).toString()
+    }
+
+    suspend fun avatarBrief(handle: String): String {
+        val o = JSONObject(request("/avatars/briefs/$handle"))
+        return o.optString("brief")
+    }
+
+    suspend fun identityEmblems(): String {
+        val arr = JSONObject(request("/identity/emblems"))
+            .optJSONArray("emblems")
+        return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
+            arr!!.getJSONObject(it).optString("emblem")
+        }
+    }
+
+    suspend fun identityVocabulary(): String {
+        val o = JSONObject(request("/identity/vocabulary"))
+        return o.optJSONArray("withheld_when_anonymous")
+            ?.join(" \u00b7 ") ?: ""
+    }
+
+    suspend fun setEmblem(id: String, emblem: String, token: String) {
+        request("/profiles/$id/emblem", "PUT",
+            JSONObject().put("emblem", emblem), token)
+    }
+
+    /** Public, and not the same read as /verification: on an anonymous
+     *  profile the attestor is withheld. */
+    suspend fun badge(id: String): String {
+        val o = JSONObject(request("/profiles/$id/badge"))
+        return o.optString("level", "\u2014") + " \u00b7 " +
+            o.optString("attestor", "\u2014")
+    }
+
+    suspend fun pageThemes(): String {
+        val arr = JSONObject(request("/pages/themes"))
+            .optJSONArray("themes")
+        return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
+            arr!!.getJSONObject(it).optString("id")
+        }
+    }
+
+    suspend fun page(id: String): String {
+        val o = JSONObject(request("/profiles/$id/page"))
+        return o.optString("theme", "\u2014") + " \u00b7 " +
+            o.optString("tagline", "\u2014")
+    }
+
+    suspend fun editPage(id: String, theme: String, tagline: String,
+                         about: String, token: String) {
+        val body = JSONObject()
+        if (theme.isNotEmpty()) body.put("theme", theme)
+        if (tagline.isNotEmpty()) body.put("tagline", tagline)
+        if (about.isNotEmpty()) body.put("about", about)
+        request("/profiles/$id/page", "PUT", body, token)
+    }
+
+    /** Everything a visitor's first screen needs, in one call. */
+    suspend fun frontPage(id: String): String {
+        val o = JSONObject(request("/profiles/$id/front"))
+        return o.optString("display_name", "\u2014") + " \u00b7 " +
+            o.optString("purpose", "\u2014")
+    }
+
+    suspend fun surfaces(id: String): String {
+        val o = JSONObject(request("/profiles/$id/surfaces"))
+        return o.optJSONArray("surfaces")?.join(" \u00b7 ") ?: ""
+    }
+
+    suspend fun setSurfaces(id: String, surfaces: List<String>,
+                            token: String) {
+        request("/profiles/$id/surfaces", "PUT",
+            JSONObject().put("surfaces", org.json.JSONArray(surfaces)),
+            token)
+    }
+
+    /** Public, the same open stance as /transparency: the blend is the
+     *  profile's provenance. */
+    suspend fun composition(id: String): String {
+        val arr = JSONObject(request("/profiles/$id/composition"))
+            .optJSONArray("sources")
+        return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
+            arr!!.getJSONObject(it).optString("name")
+        }
+    }
+
+    suspend fun embodiments(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/embodiments",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("name") + " \u00b7 " + o.optString("kind")
+        }
+    }
+
+    suspend fun addEmbodiment(id: String, name: String, kind: String,
+                              token: String) {
+        request("/profiles/$id/embodiments", "POST",
+            JSONObject().put("name", name).put("kind", kind)
+                .put("has_llm", false), token)
+    }
+
+    /** Public: anyone meeting the profile through any form can verify it
+     *  is the same personality. */
+    suspend fun embodimentConsistency(id: String): String {
+        val arr = JSONObject(request("/profiles/$id/embodiment-consistency"))
+            .optJSONArray("embodiments")
+        return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
+            arr!!.getJSONObject(it).optString("name")
+        }
+    }
+
+    suspend fun profileDisplays(id: String, token: String): String {
+        val arr = JSONObject(request("/profiles/$id/displays",
+            token = token)).optJSONArray("displays")
+        return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
+            arr!!.getJSONObject(it).optString("label")
+        }
+    }
+
+    suspend fun addProfileDisplay(id: String, kind: String, label: String,
+                                  token: String) {
+        request("/profiles/$id/displays", "POST",
+            JSONObject().put("kind", kind).put("label", label), token)
+    }
+
+    suspend fun steering(id: String, token: String): String {
+        val vals = JSONObject(request("/profiles/$id/steering",
+            token = token)).optJSONObject("values")
+        return vals?.keys()?.asSequence()?.sorted()
+            ?.joinToString(" \u00b7 ") { "$it ${vals.optInt(it)}" } ?: ""
+    }
+
+    /** Dials are 0\u2013100 integers. Intimacy can never be raised on a
+     *  non-rated persona. */
+    suspend fun setSteering(id: String, values: Map<String, Int>,
+                            token: String) {
+        val v = JSONObject()
+        values.forEach { (k, n) -> v.put(k, n) }
+        request("/profiles/$id/steering", "PUT",
+            JSONObject().put("values", v), token)
+    }
+
+    suspend fun watchFace(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/watch", token = token))
+        val sum = o.getJSONObject("summary")
+        return o.getJSONObject("profile").optString("light") +
+            " \u00b7 " + sum.optInt("working") + " \u00b7 " +
+            sum.optInt("needing_assistance") + " \u00b7 " +
+            sum.optInt("stopped")
+    }
+
+    suspend fun watchAct(id: String, target: String, targetId: String,
+                         action: String, input: String,
+                         token: String): String {
+        val body = JSONObject().put("target", target).put("id", targetId)
+            .put("action", action)
+        if (input.isNotEmpty()) body.put("input", input)
+        val o = JSONObject(request("/profiles/$id/watch/act", "POST",
+            body, token))
+        return o.optString("status")
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

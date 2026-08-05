@@ -2814,6 +2814,149 @@ public sealed class ApiClient
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<SucceedOut>(req);
     }
+
+    // -- the face it shows the world: portrait, emblem, page, front,
+    // surfaces, blend, bodies, dials and the wrist -----------------------
+
+    /// <summary>Public: the portrait as it must be displayed — asset, AI
+    /// badge, and whose likeness it is.</summary>
+    public Task<AvatarCard> AvatarOf(string profileId) =>
+        Send<AvatarCard>(Get($"/profiles/{profileId}/avatar"));
+
+    public Task<AvatarCard> SetAvatar(string profileId, string asset,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/avatar")
+        { Content = JsonContent.Create(new { asset }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<AvatarCard>(req);
+    }
+
+    public Task<BriefCatalog> AvatarBriefs() =>
+        Send<BriefCatalog>(Get("/avatars/briefs"));
+
+    public Task<BriefCard> AvatarBrief(string handle) =>
+        Send<BriefCard>(Get($"/avatars/briefs/{handle}"));
+
+    public Task<EmblemCatalog> IdentityEmblems() =>
+        Send<EmblemCatalog>(Get("/identity/emblems"));
+
+    public Task<IdentityVocabulary> IdentityVocabularyOf() =>
+        Send<IdentityVocabulary>(Get("/identity/vocabulary"));
+
+    public Task<EmblemOut> SetEmblem(string profileId, string emblem,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/emblem")
+        { Content = JsonContent.Create(new { emblem }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<EmblemOut>(req);
+    }
+
+    /// <summary>Public, and not the same read as /verification: on an
+    /// anonymous profile the attestor is withheld.</summary>
+    public Task<BadgeCard> BadgeOf(string profileId) =>
+        Send<BadgeCard>(Get($"/profiles/{profileId}/badge"));
+
+    public Task<ThemeCatalog> PageThemes() =>
+        Send<ThemeCatalog>(Get("/pages/themes"));
+
+    public Task<PageCard> PageOf(string profileId) =>
+        Send<PageCard>(Get($"/profiles/{profileId}/page"));
+
+    public Task<PageCard> EditPage(string profileId, string theme,
+        string tagline, string about, string token)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, string>();
+        if (theme.Length > 0) body["theme"] = theme;
+        if (tagline.Length > 0) body["tagline"] = tagline;
+        if (about.Length > 0) body["about"] = about;
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/page")
+        { Content = JsonContent.Create(body) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<PageCard>(req);
+    }
+
+    /// <summary>Everything a visitor's first screen needs, in one
+    /// call.</summary>
+    public Task<FrontCard> FrontPage(string profileId) =>
+        Send<FrontCard>(Get($"/profiles/{profileId}/front"));
+
+    public Task<SurfacesCard> SurfacesOf(string profileId) =>
+        Send<SurfacesCard>(Get($"/profiles/{profileId}/surfaces"));
+
+    public Task<SurfacesCard> SetSurfaces(string profileId,
+        string[] surfaces, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/surfaces")
+        { Content = JsonContent.Create(new { surfaces }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SurfacesCard>(req);
+    }
+
+    /// <summary>Public, the same open stance as /transparency: the blend
+    /// is the profile's provenance.</summary>
+    public Task<CompositionCard> CompositionOf(string profileId) =>
+        Send<CompositionCard>(Get($"/profiles/{profileId}/composition"));
+
+    public Task<EmbodimentRow[]> Embodiments(string profileId,
+        string token) =>
+        Send<EmbodimentRow[]>(Get($"/profiles/{profileId}/embodiments",
+            token));
+
+    public Task<EmbodimentRow> AddEmbodiment(string profileId, string name,
+        string kind, string token) =>
+        Send<EmbodimentRow>(Post($"/profiles/{profileId}/embodiments",
+            new { name, kind, has_llm = false }, token));
+
+    /// <summary>Public: anyone meeting the profile through any form can
+    /// verify it is the same personality.</summary>
+    public Task<ConsistencyCard> EmbodimentConsistency(string profileId) =>
+        Send<ConsistencyCard>(Get(
+            $"/profiles/{profileId}/embodiment-consistency"));
+
+    public Task<ProfileDisplayList> ProfileDisplays(string profileId,
+        string token) =>
+        Send<ProfileDisplayList>(Get($"/profiles/{profileId}/displays",
+            token));
+
+    public Task<ProfileDisplayRow> AddProfileDisplay(string profileId,
+        string kind, string label, string token) =>
+        Send<ProfileDisplayRow>(Post($"/profiles/{profileId}/displays",
+            new { kind, label }, token));
+
+    public Task<SteeringCard> SteeringOf(string profileId, string token) =>
+        Send<SteeringCard>(Get($"/profiles/{profileId}/steering", token));
+
+    /// <summary>Dials are 0–100 integers. Intimacy can never be raised on
+    /// a non-rated persona.</summary>
+    public Task<SteeringCard> SetSteering(string profileId,
+        System.Collections.Generic.Dictionary<string, int> values,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/steering")
+        { Content = JsonContent.Create(new { values }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SteeringCard>(req);
+    }
+
+    public Task<WatchFaceCard> WatchFace(string profileId, string token) =>
+        Send<WatchFaceCard>(Get($"/profiles/{profileId}/watch", token));
+
+    public Task<WatchActOut> WatchAct(string profileId, string target,
+        string targetId, string action, string input, string token)
+    {
+        var body = new System.Collections.Generic.Dictionary<string, string>
+        { ["target"] = target, ["id"] = targetId, ["action"] = action };
+        if (input.Length > 0) body["input"] = input;
+        return Send<WatchActOut>(Post($"/profiles/{profileId}/watch/act",
+            body, token));
+    }
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
@@ -3473,3 +3616,116 @@ public record RosterSibling(
 
 public record RosterOut(
     [property: JsonPropertyName("profiles")] RosterSibling[]? Profiles);
+
+public record AvatarCard(
+    [property: JsonPropertyName("asset")] string? Asset,
+    [property: JsonPropertyName("ai_badge")] bool? AiBadge,
+    [property: JsonPropertyName("likeness_of")] string? LikenessOf);
+
+public record BriefEntry(
+    [property: JsonPropertyName("handle")] string? Handle);
+
+public record BriefCatalog(
+    [property: JsonPropertyName("style")] string? Style,
+    [property: JsonPropertyName("briefs")] BriefEntry[]? Briefs);
+
+public record BriefCard(
+    [property: JsonPropertyName("handle")] string? Handle,
+    [property: JsonPropertyName("brief")] string? Brief);
+
+public record EmblemEntry(
+    [property: JsonPropertyName("emblem")] string? Emblem,
+    [property: JsonPropertyName("field")] string? Field);
+
+public record EmblemCatalog(
+    [property: JsonPropertyName("emblems")] EmblemEntry[]? Emblems,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record IdentityVocabulary(
+    [property: JsonPropertyName("withheld_when_anonymous")]
+    string[] WithheldWhenAnonymous,
+    [property: JsonPropertyName("never_withheld")] string[] NeverWithheld);
+
+public record EmblemOut(
+    [property: JsonPropertyName("emblem")] string? Emblem,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record BadgeCard(
+    [property: JsonPropertyName("verified")] bool? Verified,
+    [property: JsonPropertyName("level")] string? Level,
+    [property: JsonPropertyName("attestor")] string? Attestor);
+
+public record ThemeEntry(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("label")] string? Label);
+
+public record ThemeCatalog(
+    [property: JsonPropertyName("themes")] ThemeEntry[]? Themes,
+    [property: JsonPropertyName("layouts")] string[]? Layouts);
+
+public record PageCard(
+    [property: JsonPropertyName("theme")] string? Theme,
+    [property: JsonPropertyName("tagline")] string? Tagline,
+    [property: JsonPropertyName("about")] string? About);
+
+public record FrontCard(
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("purpose")] string? Purpose);
+
+public record SurfacesCard(
+    [property: JsonPropertyName("surfaces")] string[] Surfaces);
+
+public record CompositionSource(
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("share")] double? Share);
+
+public record CompositionCard(
+    [property: JsonPropertyName("sources")] CompositionSource[]? Sources,
+    [property: JsonPropertyName("policy")] string? Policy);
+
+public record EmbodimentRow(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("has_llm")] bool? HasLlm);
+
+public record ConsistencyForm(
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("kind")] string? Kind);
+
+public record ConsistencyCard(
+    [property: JsonPropertyName("embodiments")]
+    ConsistencyForm[]? Embodiments,
+    [property: JsonPropertyName("surfaces")] string[]? Surfaces);
+
+public record ProfileDisplayRow(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("label")] string? Label);
+
+public record ProfileDisplayList(
+    [property: JsonPropertyName("displays")] ProfileDisplayRow[] Displays);
+
+public record SteeringCard(
+    [property: JsonPropertyName("values")]
+    System.Collections.Generic.Dictionary<string, int> Values,
+    [property: JsonPropertyName("adult_mode")] bool? AdultMode);
+
+public record WatchChip(
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("light")] string? Light,
+    [property: JsonPropertyName("pending_approvals")]
+    int? PendingApprovals);
+
+public record WatchSummary(
+    [property: JsonPropertyName("working")] int Working,
+    [property: JsonPropertyName("needing_assistance")]
+    int NeedingAssistance,
+    [property: JsonPropertyName("stopped")] int Stopped);
+
+public record WatchFaceCard(
+    [property: JsonPropertyName("profile")] WatchChip Profile,
+    [property: JsonPropertyName("summary")] WatchSummary Summary,
+    [property: JsonPropertyName("haptic")] string? Haptic);
+
+public record WatchActOut(
+    [property: JsonPropertyName("status")] string? Status);

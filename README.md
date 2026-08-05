@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.43.8** ([changelog](CHANGELOG.md) ·
+**Current release: v0.43.9** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.43.9** | **The face it shows the world** — the portrait, the emblem and badge, the page and themes, the front, the surfaces, the blend, the bodies, the dials and the wrist reach all three shells; **72 doorless rows struck**, records fall to ios 69 / android 73 / windows 72 |
 | **0.43.8** | Version alignment with JIM's watch-picker round (device picker, Fitbit seed, Bluetooth pairing) |
 | **0.43.7** | **The record, the veil and the exit** — the memory list, the pair's record, source material, the ledger (transparency/export/stats/feed), anonymity, verification and the three ways a profile ends reach all three shells; **75 doorless rows struck**, records fall to ios 93 / android 97 / windows 96 |
 | **0.43.6** | **The workshop in the pocket** — workflows and their pauses, the delegation envelope, the assistant's verbs, tasks under a revocable grant, rated placements and specialists reach all three shells; **84 doorless rows struck**, records fall to ios 118 / android 122 / windows 121 |

@@ -4,6 +4,33 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.9] — 2026-08-05
+
+### The face it shows the world
+
+Nine more blocks off the per-shell doorless record — the portrait, the
+emblem and the badge, the page and its themes, the front, the surfaces,
+the blend, the bodies, the dials and the wrist — and what they share is
+that every one is how a profile *looks* to somebody deciding whether to
+trust it. That decision happens on a phone held at a bus stop, not at a
+desk, and until this cut the phone could not check a single one of the
+claims the desktop could.
+
+Twenty-four routes gain doors on iOS, Android and Windows — **72 rows
+struck**; the records fall to ios 69, android 73, windows 72, under a
+guard that renders the rules rather than inventing them: the portrait
+travels with its AI badge and whose likeness it is; the public badge
+withholds the attestor while a profile is anonymous; the page is the
+owner's to write and anyone's to read, its themes a closed set; the
+blend answers 404 on a non-hybrid rather than pretending; the same
+personality is checkable across every body while the list of bodies
+stays the owner's; the dials are 0–100 integers and intimacy never
+rises on a non-rated persona; and the wrist reuses the full apps'
+paths — same auth, same allowlists — so a tap from a watch can do
+nothing a phone could not. Forty-three interface strings arrive in
+all ten languages on all three shells, and three more request fields
+(`asset`, `emblem`, `surfaces`) now refuse with the label on the form.
+
 ## [0.43.8] — 2026-08-05
 
 ### Version alignment

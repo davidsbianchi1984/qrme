@@ -839,6 +839,122 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+
+            <!-- The face it shows the world: portrait, emblem, page,
+                 surfaces, blend, bodies, dials and the wrist. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="AvaTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="AvaShowButton" Click="OnAvaShow" />
+                        <Button x:Name="AvaBriefsButton" Click="OnAvaBriefs" />
+                    </StackPanel>
+                    <TextBox x:Name="AvaAssetBox" />
+                    <Button x:Name="AvaSetButton" Click="OnAvaSet" />
+                    <TextBox x:Name="AvaHandleBox" />
+                    <Button x:Name="AvaBriefButton" Click="OnAvaBrief" />
+                </StackPanel>
+            </Border>
+
+            <!-- The emblem and the badge. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="EmblTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="EmblListButton" Click="OnEmblList" />
+                        <Button x:Name="EmblRulesButton" Click="OnEmblRules" />
+                        <Button x:Name="EmblBadgeButton" Click="OnEmblBadge" />
+                    </StackPanel>
+                    <TextBox x:Name="EmblPickBox" />
+                    <Button x:Name="EmblSetButton" Click="OnEmblSet" />
+                </StackPanel>
+            </Border>
+
+            <!-- The page and the first screen. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="PgTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="PgShowButton" Click="OnPgShow" />
+                        <Button x:Name="PgThemesButton" Click="OnPgThemes" />
+                        <Button x:Name="FrontShowButton" Click="OnFrontShow" />
+                    </StackPanel>
+                    <TextBox x:Name="PgThemeBox" />
+                    <TextBox x:Name="PgTaglineBox" />
+                    <TextBox x:Name="PgAboutBox" />
+                    <Button x:Name="PgSaveButton" Click="OnPgSave" />
+                </StackPanel>
+            </Border>
+
+            <!-- Surfaces and the blend. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SurfTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="SurfListButton" Click="OnSurfList" />
+                        <Button x:Name="CompShowButton" Click="OnCompShow" />
+                    </StackPanel>
+                    <TextBox x:Name="SurfSetBox" />
+                    <Button x:Name="SurfSetButton" Click="OnSurfSet" />
+                </StackPanel>
+            </Border>
+
+            <!-- The bodies it lives in. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="FormTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="FormList" />
+                    <TextBox x:Name="FormNameBox" />
+                    <TextBox x:Name="FormKindBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="FormAddButton" Click="OnFormAdd" />
+                        <Button x:Name="FormSameButton" Click="OnFormSame" />
+                    </StackPanel>
+                    <TextBox x:Name="FormScreenBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="FormScreensButton" Click="OnFormScreens" />
+                        <Button x:Name="FormScreenAddButton" Click="OnFormScreenAdd" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The dials. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SteerTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="SteerShowButton" Click="OnSteerShow" />
+                    <TextBox x:Name="SteerPaceBox" />
+                    <TextBox x:Name="SteerAutonomyBox" />
+                    <Button x:Name="SteerSetButton" Click="OnSteerSet" />
+                </StackPanel>
+            </Border>
+
+            <!-- The wrist. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="WristTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="WristShowButton" Click="OnWristShow" />
+                    <TextBox x:Name="WristTargetBox" />
+                    <TextBox x:Name="WristIdBox" />
+                    <TextBox x:Name="WristActionBox" />
+                    <TextBox x:Name="WristInputBox" />
+                    <Button x:Name="WristActButton" Click="OnWristAct" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>
