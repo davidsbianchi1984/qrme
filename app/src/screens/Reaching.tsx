@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, type Engagement, type FeedbackResult,
          type PersonaEmbedding, type ProactiveOutreach,
          type QuietHours } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -41,6 +42,7 @@ import { useSession } from "../store";
  */
 export function Reaching({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
   const myInteractor = session.interactorId || "";
@@ -70,94 +72,83 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Reaching out, and what stops it</h2>
-      <p className="muted small">
-        Four different refusals, and only two of them are yours to lift.
-      </p>
+      <h2>{tr("rch.title", lang)}</h2>
+      <p className="muted small">{tr("rch.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Somebody in particular</h3>
+        <h3>{tr("rch.who", lang)}</h3>
         <div className="row">
           <input value={person} onChange={(e) => setPerson(e.target.value)}
-                 placeholder="a person's id" style={{ flex: 1 }} />
+                 placeholder={tr("rch.who.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !who || !me || !token}
                   onClick={act(async () => {
                     setState(await api.engagement(me, who, token));
-                  })}>How are we going</button>
+                  })}>{tr("rch.how", lang)}</button>
         </div>
         {state && (
           <>
             <p className="small">
-              {state.interactions} exchange{state.interactions === 1 ? "" : "s"}
-              {" "}across {state.sessions}{" "}
-              session{state.sessions === 1 ? "" : "s"} · score{" "}
-              {state.score.toFixed(2)}
+              {fill(tr("rch.state", lang), {
+                n: state.interactions,
+                s: state.interactions === 1 ? "" : "s",
+                m: state.sessions,
+                t: state.sessions === 1 ? "" : "s",
+                score: state.score.toFixed(2),
+              })}
               <br />
               <span className="muted">
-                {state.feedback_pos} up · {state.feedback_neg} down
+                {fill(tr("rch.updown", lang), {
+                  up: state.feedback_pos, down: state.feedback_neg })}
               </span>
             </p>
-            <p className="muted small">
-              Readable by you and by them, and by nobody else. It is a record
-              of how often somebody talks to this profile, which is a fact
-              about them as much as about it.
-            </p>
+            <p className="muted small">{tr("rch.read", lang)}</p>
           </>
         )}
       </div>
 
       <div className="card">
-        <h3>Reaching out first</h3>
+        <h3>{tr("rch.first", lang)}</h3>
         <p className="muted small">
-          Three gates, and they refuse in three different sentences because
-          they are three different facts. <strong>Reactive-only</strong> means
-          you never switched outreach on. <strong>Awaiting a reply</strong>
-          {" "}means it already reached out and heard nothing — it will not
-          send twice into silence. <strong>Rate cap</strong> means it reached
-          out recently. And <strong>quiet hours</strong> is not yours at all.
+          {fill(tr("rch.gates", lang), {
+            reactive: <strong>{tr("rch.reactive", lang)}</strong>,
+            awaiting: <strong>{tr("rch.awaiting", lang)}</strong>,
+            ratecap: <strong>{tr("rch.ratecap", lang)}</strong>,
+            quiet: <strong>{tr("rch.quiet.low", lang)}</strong>,
+          })}
         </p>
         <button disabled={busy || !who || !me || !token}
                 onClick={act(async () => {
                   setSent(await api.reachOut(me, who, token));
-                }, "Sent.")}>Reach out now</button>
+                }, tr("rch.sent.said", lang))}>{tr("rch.now", lang)}</button>
         {sent && (
           <>
             <p className="muted small">
-              Its own reason for sending: <em>{sent.reason}</em>
+              {fill(tr("rch.reason", lang), { why: <em>{sent.reason}</em> })}
             </p>
             <p className="small">{sent.message.content}</p>
             <p className="muted small">
               {sent.message.status === "pending"
-                ? "Held for approval rather than delivered — an unprompted "
-                  + "message is exactly the kind that should not slip past "
-                  + "moderation."
-                : "Delivered, and watermarked like every other thing this "
-                  + "profile says."}
+                ? tr("rch.held", lang) : tr("rch.delivered", lang)}
             </p>
           </>
         )}
       </div>
 
       <div className="card">
-        <h3>Quiet hours</h3>
-        <p className="muted small">
-          The window during which nothing may reach out unprompted. Set by the
-          person it protects — sending this with an owner token is refused,
-          and that refusal is the point. A boundary your correspondent can
-          move is not one.
-        </p>
+        <h3>{tr("rch.quiet", lang)}</h3>
+        <p className="muted small">{tr("rch.quiet.pitch", lang)}</p>
         {myInteractor && interactorToken ? (
           <>
             <div className="row">
-              <label className="small">from{" "}
+              <label className="small">{tr("rch.from", lang)}{" "}
                 <input type="number" min={0} max={23} value={start}
                        onChange={(e) => setStart(Number(e.target.value))}
                        style={{ width: 70 }} />
               </label>
-              <label className="small">until{" "}
+              <label className="small">{tr("rch.until", lang)}{" "}
                 <input type="number" min={0} max={23} value={end}
                        onChange={(e) => setEnd(Number(e.target.value))}
                        style={{ width: 70 }} />
@@ -166,48 +157,40 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
                       onClick={act(async () => setWindow(
                         await api.setQuietHours(myInteractor, {
                           quiet_start: start, quiet_end: end },
-                          interactorToken)), "Set.")}>
-                Set my quiet hours
+                          interactorToken)), tr("rch.set.said", lang))}>
+                {tr("rch.set", lang)}
               </button>
               <button className="chip" disabled={busy}
                       onClick={act(async () => setWindow(
                         await api.setQuietHours(myInteractor, {
                           quiet_start: null, quiet_end: null },
-                          interactorToken)), "Cleared.")}>
-                clear
+                          interactorToken)), tr("rch.cleared.said", lang))}>
+                {tr("rch.clear", lang)}
               </button>
             </div>
             <p className="muted small">
-              Hours are UTC, 0 to 23. Both empty means no window.
-              {window_ && ` Currently ${window_.quiet_start ?? "—"} to `}
-              {window_ && `${window_.quiet_end ?? "—"}.`}
+              {tr("rch.utc", lang)}
+              {window_ && fill(tr("rch.currently", lang), {
+                a: window_.quiet_start ?? "—",
+                b: window_.quiet_end ?? "—",
+              })}
             </p>
             {start === end && (
               <p className="muted small">
-                Those are the <strong>same hour</strong>, which covers
-                nothing rather than everything — the window runs from the
-                first up to but not including the second. To be quiet all
-                day, end one hour before you start.
+                {fill(tr("rch.samehour", lang), {
+                  same: <strong>{tr("rch.samehour.term", lang)}</strong>,
+                })}
               </p>
             )}
           </>
         ) : (
-          <p className="muted small">
-            This is your own control, not one you hold over anybody else — so
-            it needs your token as a person rather than as a profile's owner.
-            Sign in as yourself to set it.
-          </p>
+          <p className="muted small">{tr("rch.notyours", lang)}</p>
         )}
       </div>
 
       <div className="card">
-        <h3>Rate an exchange</h3>
-        <p className="muted small">
-          Gated on the rater's own token. A rating in somebody else's name is
-          a lie about what they thought, and a thumbs-up is also the trigger
-          for contributing that exchange to the shared model — so it is not a
-          button anybody else gets to press for you.
-        </p>
+        <h3>{tr("rch.rate", lang)}</h3>
+        <p className="muted small">{tr("rch.rate.pitch", lang)}</p>
         <div className="row">
           {(["up", "down"] as const).map((r) => (
             <button key={r} className="chip"
@@ -215,34 +198,29 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
                     onClick={act(async () => setRated(
                       await api.rateExchange(me, myInteractor, r,
                                              interactorToken)))}>
-              {r === "up" ? "👍 good" : "👎 not good"}
+              {r === "up" ? tr("rch.up", lang) : tr("rch.down", lang)}
             </button>
           ))}
         </div>
         {rated && (
           <p className="muted small">
             {/* The two fields the read does not carry. */}
-            Last seen {rated.last_seen ?? "—"} ·{" "}
-            {rated.contributed
-              ? "this exchange was contributed to the shared model, "
-                + "anonymised"
-              : "nothing left this deployment"}
-            .
+            {fill(tr("rch.lastseen", lang), {
+              when: rated.last_seen ?? "—",
+              what: rated.contributed
+                ? tr("rch.contributed", lang) : tr("rch.nothingleft", lang),
+            })}
           </p>
         )}
       </div>
 
       <div className="card">
-        <h3>What it has learned about them</h3>
-        <p className="muted small">
-          A latent picture of one relationship, and what the profile actually
-          behaves from. Owner-only, and shown rather than described: a number
-          nobody can see is a number nobody can argue with.
-        </p>
+        <h3>{tr("rch.learned", lang)}</h3>
+        <p className="muted small">{tr("rch.learned.pitch", lang)}</p>
         <button disabled={busy || !who || !me || !token}
                 onClick={act(async () => {
                   setEmbedding(await api.personaEmbedding(me, who, token));
-                })}>Show it</button>
+                })}>{tr("rch.show", lang)}</button>
         {embedding && (
           <>
             {Object.entries(embedding.vector).map(([k, v]) => (
@@ -251,7 +229,8 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
               </p>
             ))}
             <p className="muted small">
-              Version {embedding.version}, moved {embedding.updated_at}.
+              {fill(tr("rch.version", lang), {
+                v: embedding.version, when: embedding.updated_at })}
             </p>
           </>
         )}

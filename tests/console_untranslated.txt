@@ -1,4 +1,4 @@
-# status: backlog — 978 rows
+# status: backlog — 848 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 978
+# ceiling: 848
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -258,50 +258,6 @@ Discover: The starter collection is 33 profiles across trades and interests, eac
 Discover: e.g. music, carpentry
 Discover: the marketplace · every card is a real profile
 Discover: ✓ real photo
-Exchanges: . It does not grant
-Exchanges: A document before it is a transfer. Both sides sign the same manifest, and only then does anything move.
-Exchanges: Accept
-Exchanges: Add
-Exchanges: Against fingerprint
-Exchanges: Ask again
-Exchanges: Can anything move?
-Exchanges: Exchanges
-Exchanges: How this works
-Exchanges: Included:
-Exchanges: No —
-Exchanges: Not included:
-Exchanges: Nothing listed yet.
-Exchanges: Nothing yet.
-Exchanges: Open
-Exchanges: Propose
-Exchanges: Propose one
-Exchanges: Remove
-Exchanges: Reopen to edit
-Exchanges: Sign
-Exchanges: Signatures
-Exchanges: The manifest
-Exchanges: This grants
-Exchanges: Unsigned:
-Exchanges: Waiting on:
-Exchanges: Withdraw
-Exchanges: Yes —
-Exchanges: Yours
-Exchanges: available.
-Exchanges: bytes
-Exchanges: fee
-Exchanges: guest → host
-Exchanges: host → guest
-Exchanges: item
-Exchanges: runs
-Exchanges: signed
-Exchanges: still to sign
-Exchanges: the other party's id
-Exchanges: what crosses
-Exchanges: what the work is, in one sentence
-Exchanges: · accepted
-Exchanges: · fee
-Exchanges: — against an older manifest, not this one
-Exchanges: — change the manifest and this changes, so the old signatures match nothing.
 Friends: Add
 Friends: Friends
 Friends: Loading, or no friends yet — add friends from Discover.
@@ -725,49 +681,6 @@ Presence: what to call it
 Presence: where it is
 Presence: your own HTML
 Presence: · showing
-Reaching: , moved
-Reaching: , which covers nothing rather than everything — the window runs from the first up to but not including the second. To be quiet all day, end one hour before you start.
-Reaching: A latent picture of one relationship, and what the profile actually behaves from. Owner-only, and shown rather than described: a number nobody can see is a number nobody can argue with.
-Reaching: Awaiting a reply
-Reaching: Four different refusals, and only two of them are yours to lift.
-Reaching: Gated on the rater's own token. A rating in somebody else's name is a lie about what they thought, and a thumbs-up is also the trigger for contributing that exchange to the shared model — so it is not a button anybody else gets to press for you.
-Reaching: Hours are UTC, 0 to 23. Both empty means no window.
-Reaching: How are we going
-Reaching: Its own reason for sending:
-Reaching: Last seen
-Reaching: Quiet hours
-Reaching: Rate an exchange
-Reaching: Rate cap
-Reaching: Reach out now
-Reaching: Reaching out first
-Reaching: Reaching out, and what stops it
-Reaching: Reactive-only
-Reaching: Readable by you and by them, and by nobody else. It is a record of how often somebody talks to this profile, which is a fact about them as much as about it.
-Reaching: Set my quiet hours
-Reaching: Show it
-Reaching: Somebody in particular
-Reaching: The window during which nothing may reach out unprompted. Set by the person it protects — sending this with an owner token is refused, and that refusal is the point. A boundary your correspondent can move is not one.
-Reaching: This is your own control, not one you hold over anybody else — so it needs your token as a person rather than as a profile's owner. Sign in as yourself to set it.
-Reaching: Those are the
-Reaching: Three gates, and they refuse in three different sentences because they are three different facts.
-Reaching: Version
-Reaching: What it has learned about them
-Reaching: a person's id
-Reaching: across
-Reaching: clear
-Reaching: down
-Reaching: exchange
-Reaching: from
-Reaching: is not yours at all.
-Reaching: means it already reached out and heard nothing — it will not send twice into silence.
-Reaching: means it reached out recently. And
-Reaching: means you never switched outreach on.
-Reaching: quiet hours
-Reaching: same hour
-Reaching: session
-Reaching: until
-Reaching: up ·
-Reaching: · score
 Relationships: 's life
 Relationships: Active relationships
 Relationships: Add a relationship
@@ -895,49 +808,6 @@ TheMark: in front of it. The designation is not a field you can empty — a labe
 TheMark: the glyph (✦)
 TheMark: what to call it
 TheMark: · opened
-Visiting: 18+ — sign in with a verified adult account to see any of it.
-Visiting: A printed code on a bench, at a meeting, on a counter. Where a profile is left is a decision about the profile — a recovery sponsor's code belongs at a meeting and not on a billboard — so only its owner may place one, list them, or pick one back up.
-Visiting: Ask to come up
-Visiting: Attested by
-Visiting: Coming up
-Visiting: In room
-Visiting: Leave this profile somewhere
-Visiting: Look
-Visiting: Never marked as AI: there is a real person on the other end.
-Visiting: Nothing else came back: not the name, not the portrait. The wall is drawn without ever holding what it refuses.
-Visiting: One room means the people who found the same sticker end up talking to it together. A rated profile is placed one-to-one and asking for a room is refused rather than quietly downgraded.
-Visiting: Pick it up
-Visiting: Place it
-Visiting: Print
-Visiting: Put a hand up
-Visiting: Ring the bell
-Visiting: Ring, or come in
-Visiting: Scan it
-Visiting: Stand in front of a desk
-Visiting: The card is public — a desk is a shopfront. So is the bell: the visitor at an empty chair is exactly the person who has no account yet. An 18+ stream is the one exception, because an anonymous ping channel to an adult performer is not something to hand out.
-Visiting: The overlay draws this over the sticker in the live viewfinder — nobody has navigated anywhere and the camera is still running. The mark travels
-Visiting: Two halves of the same idea: standing in front of somebody else's desk, and leaving your own profile somewhere for a stranger to find.
-Visiting: Visiting, and being found
-Visiting: Watch the stream
-Visiting: What a stranger sees when they scan it
-Visiting: Where it is already
-Visiting: You are not signed in as a visitor, so this would be refused.
-Visiting: a beacon id
-Visiting: a desk id, or scan the code on the counter
-Visiting: a private thread each
-Visiting: anything you want them to see (optional)
-Visiting: comments over the picture.
-Visiting: likes,
-Visiting: on
-Visiting: one room everybody joins
-Visiting: the card, so a surface cannot draw the face without also having been handed the disclosure to draw with it.
-Visiting: the stream is the host's call, so this asks rather than does — and it needs an account, because the host is deciding about a person rather than an anonymous request. Nothing is minted until you are somebody.
-Visiting: what to call it
-Visiting: where it is going
-Visiting: why you would like to come up
-Visiting: with
-Visiting: · picked up
-Visiting: — that is what the QR encodes.
 Voice: 1 · Permission
 Voice: 2 · Enrollment
 Voice: 3 · The voice

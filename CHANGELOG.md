@@ -4,6 +4,35 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.2] — 2026-08-05
+
+### The three biggest screens left
+
+The console-untranslated record falls **978 → 848**, and the three
+screens that come off it are the three largest on the backlog.
+
+**Exchanges** — the document two people sign before work changes
+hands. The manifest, the fingerprint it is signed against, and the rule
+the whole screen is arranged around: change one line and both
+signatures are cleared, visibly, in front of you. Forty-nine `exc.*`
+keys, and they include the sentences the screen *says back* after an
+act — *Signed — this manifest, and nothing it becomes later*, *The
+manifest changed, so both signatures were cleared* — which a Spanish
+reader was getting in English on the one screen where the wording is
+the product.
+
+**Reaching out, and what stops it** — four refusals that are four
+different facts, and the one of them that is not the owner's to lift.
+Forty-three `rch.*` keys, including the whole gates paragraph, which
+now interpolates its four bolded terms rather than being broken into
+five English fragments around them.
+
+**Visiting, and being found** — the visitor's side of a desk and the
+sticker a profile is left on. Fifty-seven `vis.*` keys.
+
+One hundred and forty-nine keys, all ten languages, exact-sync held in
+both directions and the dead-key guard green.
+
 ## [0.45.1] — 2026-08-05
 
 ### Version alignment

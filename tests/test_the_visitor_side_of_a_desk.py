@@ -351,7 +351,11 @@ def test_the_host_panel_reads_status_rather_than_state():
 
 def test_the_screen_says_why_the_guest_route_needs_an_account():
     flat = " ".join(_markup("app/src/screens/Visiting.tsx").split())
-    assert "Nothing is minted until you are somebody" in flat
+    assert 'tr("vis.hand.pitch", lang)' in flat, (
+        "the screen has stopped rendering the paragraph that says so")
+    l10n = " ".join(_src("app/src/l10n.ts").split())
+    assert "Nothing is minted until you are somebody" in l10n, (
+        "the sentence left the l10n table, so the screen looks up nothing")
 
 
 def test_the_screen_draws_the_age_wall_without_the_name():

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type Exchange, type ExchangeVocabulary } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -34,6 +35,7 @@ export function Exchanges({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
@@ -80,7 +82,7 @@ export function Exchanges({ onPlans }: {
         industry, fee: Number(fee) || 0,
       }, token);
       setMine((rows) => [x, ...rows]);
-      landed(x, "Draft opened. Nothing can move until both of you sign.");
+      landed(x, tr("exc.opened.said", lang));
       setWork("");
     } catch (e) { fail(e); }
   }
@@ -94,8 +96,7 @@ export function Exchanges({ onPlans }: {
         direction, name: itemName.trim(), kind: itemKind,
       }, token);
       landed(x, before > 0 && x.signatures.length === 0
-        ? "The manifest changed, so both signatures were cleared. Sign again."
-        : undefined);
+        ? tr("exc.cleared.said", lang) : undefined);
       setItemName("");
     } catch (e) { fail(e); }
   }
@@ -111,18 +112,15 @@ export function Exchanges({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Exchanges</h2>
-      <p className="muted small">
-        A document before it is a transfer. Both sides sign the same manifest,
-        and only then does anything move.
-      </p>
+      <h2>{tr("exc.title", lang)}</h2>
+      <p className="muted small">{tr("exc.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (
         <div className="card">
-          <h3>How this works</h3>
+          <h3>{tr("exc.how", lang)}</h3>
           {/* The backend's own five rules. Quoted, because a paraphrase here
               could drift from what the code actually enforces. */}
           <ul className="small">
@@ -132,39 +130,44 @@ export function Exchanges({ onPlans }: {
       )}
 
       <div className="card">
-        <h3>Propose one</h3>
+        <h3>{tr("exc.propose", lang)}</h3>
         <div className="row">
           <input value={guest} onChange={(e) => setGuest(e.target.value)}
-                 placeholder="the other party's id" />
+                 placeholder={tr("exc.guest.ph", lang)} />
           <select value={industry} onChange={(e) => setIndustry(e.target.value)}>
             {vocab?.industries.map((i) => <option key={i} value={i}>{i}</option>)}
           </select>
           <input value={fee} onChange={(e) => setFee(e.target.value)}
-                 style={{ width: 90 }} placeholder="fee" />
+                 style={{ width: 90 }} placeholder={tr("exc.fee.ph", lang)} />
         </div>
         <div className="row">
           <input value={work} onChange={(e) => setWork(e.target.value)}
                  style={{ flex: 1 }}
-                 placeholder="what the work is, in one sentence" />
+                 placeholder={tr("exc.work.ph", lang)} />
           <button disabled={!me || !token || !guest.trim() || !work.trim()}
-                  onClick={propose}>Propose</button>
+                  onClick={propose}>{tr("exc.propose.go", lang)}</button>
         </div>
       </div>
 
       <div className="card">
-        <h3>Yours</h3>
-        {mine.length === 0 && <p className="muted small">Nothing yet.</p>}
+        <h3>{tr("exc.yours", lang)}</h3>
+        {mine.length === 0 &&
+          <p className="muted small">{tr("exc.none", lang)}</p>}
         {mine.map((x) => (
           <div key={x.id} className="row">
             <div style={{ flex: 1 }}>
               <strong>{x.work}</strong>
               <div className="muted small">
-                {x.industry} · {x.state} · {x.items.length} item
-                {x.items.length === 1 ? "" : "s"}
-                {x.unsigned.length > 0 && <> · {x.unsigned.length} still to sign</>}
+                {fill(tr("exc.row", lang), {
+                  ind: x.industry, state: x.state, n: x.items.length,
+                  s: x.items.length === 1 ? "" : "s",
+                })}
+                {x.unsigned.length > 0 && <>{" "}
+                  {fill(tr("exc.row.tosign", lang), { n: x.unsigned.length })}
+                </>}
               </div>
             </div>
-            <button onClick={() => setOpen(x)}>Open</button>
+            <button onClick={() => setOpen(x)}>{tr("exc.open", lang)}</button>
           </div>
         ))}
       </div>
@@ -174,36 +177,48 @@ export function Exchanges({ onPlans }: {
           <div className="card">
             <h3>{open.work}</h3>
             <p className="muted small">
-              {open.industry} · {open.state} · fee {open.fee.toFixed(2)} —{" "}
-              {open.fee_note}
+              {fill(tr("exc.detail", lang), {
+                ind: open.industry, state: open.state,
+                fee: open.fee.toFixed(2), note: open.fee_note,
+              })}
             </p>
             {open.includes.length > 0 && (
-              <p className="small">Included: {open.includes.join(", ")}</p>
+              <p className="small">{fill(tr("exc.included", lang),
+                { list: open.includes.join(", ") })}</p>
             )}
             {/* Stated because an absent exclusion reads as an inclusion to
                 whoever paid. */}
             {open.excludes.length > 0 && (
-              <p className="small">Not included: {open.excludes.join(", ")}</p>
+              <p className="small">{fill(tr("exc.notincluded", lang),
+                { list: open.excludes.join(", ") })}</p>
             )}
             <p className="muted small">
-              This grants {open.grants}. It does not grant {open.does_not_grant}.
+              {fill(tr("exc.grants", lang),
+                { a: open.grants, b: open.does_not_grant })}
             </p>
           </div>
 
           <div className="card">
-            <h3>The manifest</h3>
+            <h3>{tr("exc.manifest", lang)}</h3>
             {open.items.length === 0 && (
-              <p className="muted small">Nothing listed yet.</p>
+              <p className="muted small">{tr("exc.manifest.none", lang)}</p>
             )}
             {open.items.map((it) => (
               <div key={it.id} className="row">
                 <div style={{ flex: 1 }}>
                   <strong>{it.name}</strong>
-                  {it.runs && <span className="chip"> runs</span>}
+                  {it.runs &&
+                    <span className="chip"> {tr("exc.runs", lang)}</span>}
                   <div className="muted small">
-                    {it.direction === "host_to_guest" ? "host → guest" : "guest → host"}
-                    {" · "}{it.kind}{it.bytes > 0 && <> · {it.bytes} bytes</>}
-                    {it.accepted_at && <> · accepted</>}
+                    {fill(tr("exc.item.line", lang), {
+                      dir: it.direction === "host_to_guest"
+                        ? tr("exc.h2g", lang) : tr("exc.g2h", lang),
+                      kind: it.kind,
+                    })}
+                    {it.bytes > 0 && <>{" "}
+                      {fill(tr("exc.item.bytes", lang), { n: it.bytes })}</>}
+                    {it.accepted_at &&
+                      <> {tr("exc.item.accepted", lang)}</>}
                   </div>
                 </div>
                 {/* Accepting is the receiving side's own act, one item at a
@@ -213,14 +228,14 @@ export function Exchanges({ onPlans }: {
                   <button
                     disabled={!open.channel.open}
                     onClick={act(() => api.acceptExchangeItem(open.id, it.id, me, token),
-                                 "Accepted. That one item, and nothing else.")}>
-                    Accept
+                                 tr("exc.accepted.said", lang))}>
+                    {tr("exc.accept", lang)}
                   </button>
                 )}
                 {open.state === "draft" && (
                   <button onClick={act(
                     () => api.removeExchangeItem(open.id, it.id, token))}>
-                    Remove
+                    {tr("exc.remove", lang)}
                   </button>
                 )}
               </div>
@@ -229,7 +244,7 @@ export function Exchanges({ onPlans }: {
             {open.state === "draft" && (
               <div className="row">
                 <input value={itemName} onChange={(e) => setItemName(e.target.value)}
-                       placeholder="what crosses" style={{ flex: 1 }} />
+                       placeholder={tr("exc.item.ph", lang)} style={{ flex: 1 }} />
                 <select value={itemKind}
                         onChange={(e) => setItemKind(e.target.value)}>
                   {vocab?.kinds.map((k) => (
@@ -238,10 +253,12 @@ export function Exchanges({ onPlans }: {
                 </select>
                 <select value={direction}
                         onChange={(e) => setDirection(e.target.value)}>
-                  <option value="host_to_guest">host → guest</option>
-                  <option value="guest_to_host">guest → host</option>
+                  <option value="host_to_guest">{tr("exc.h2g", lang)}</option>
+                  <option value="guest_to_host">{tr("exc.g2h", lang)}</option>
                 </select>
-                <button disabled={!itemName.trim()} onClick={addItem}>Add</button>
+                <button disabled={!itemName.trim()} onClick={addItem}>
+                  {tr("exc.add", lang)}
+                </button>
               </div>
             )}
             {/* The chosen kind's own meaning, including whether it runs. */}
@@ -253,26 +270,32 @@ export function Exchanges({ onPlans }: {
           </div>
 
           <div className="card">
-            <h3>Signatures</h3>
+            <h3>{tr("exc.sigs", lang)}</h3>
             <p className="muted small">
-              Against fingerprint <code>{open.fingerprint.slice(0, 16)}…</code> —
-              change the manifest and this changes, so the old signatures match
-              nothing.
+              {fill(tr("exc.sigs.against", lang),
+                { fp: <code>{open.fingerprint.slice(0, 16)}…</code> })}
             </p>
             {open.signatures.map((s) => (
               <p key={s.party_id} className="small">
-                {s.party_id === me ? "you" : s.party_id} signed {s.signed_at}
+                {fill(tr("exc.sig.line", lang), {
+                  who: s.party_id === me ? tr("exc.you", lang) : s.party_id,
+                  when: s.signed_at,
+                })}
                 {/* The server's own verdict on whether that signature still
                     applies, rather than this screen comparing hashes and
                     hoping it got it right. */}
                 {!s.matches_current && (
-                  <strong> — against an older manifest, not this one</strong>
+                  <strong> {tr("exc.sig.stale", lang)}</strong>
                 )}
               </p>
             ))}
             {open.unsigned.length > 0 && (
               <p className="muted small">
-                Waiting on: {open.unsigned.map((p) => p === me ? "you" : p).join(", ")}
+                {fill(tr("exc.waiting", lang), {
+                  who: open.unsigned
+                    .map((p) => p === me ? tr("exc.you", lang) : p)
+                    .join(", "),
+                })}
               </p>
             )}
 
@@ -290,35 +313,41 @@ export function Exchanges({ onPlans }: {
             <div className="row">
               <button disabled={iSigned || open.state === "withdrawn"}
                       onClick={act(() => api.signExchange(open.id, me, token),
-                                   "Signed — this manifest, and nothing it becomes later.")}>
-                Sign
+                                   tr("exc.signed.said", lang))}>
+                {tr("exc.sign", lang)}
               </button>
               <button onClick={act(() => api.reopenExchange(open.id, me, token),
-                                   "Reopened. Both signatures cleared.")}>
-                Reopen to edit
+                                   tr("exc.reopened.said", lang))}>
+                {tr("exc.reopen", lang)}
               </button>
               <button onClick={act(() => api.withdrawExchange(open.id, me, token),
-                                   "Withdrawn.")}>
-                Withdraw
+                                   tr("exc.withdrawn.said", lang))}>
+                {tr("exc.withdraw", lang)}
               </button>
             </div>
           </div>
 
           <div className="card">
-            <h3>Can anything move?</h3>
+            <h3>{tr("exc.move", lang)}</h3>
             {/* Two shapes, and the difference is the whole feature. */}
             {open.channel.open ? (
               <>
-                <p className="small">Yes — {open.channel.items.length} item
-                  {open.channel.items.length === 1 ? "" : "s"} available.</p>
+                <p className="small">{fill(tr("exc.move.yes", lang), {
+                  n: open.channel.items.length,
+                  s: open.channel.items.length === 1 ? "" : "s",
+                })}</p>
                 <p className="muted small">{open.channel.note}</p>
               </>
             ) : (
               <>
-                <p className="small">No — {open.channel.reason}.</p>
+                <p className="small">{fill(tr("exc.move.no", lang),
+                  { reason: open.channel.reason })}</p>
                 <p className="muted small">
-                  Unsigned: {open.channel.unsigned
-                    .map((p) => p === me ? "you" : p).join(", ")}
+                  {fill(tr("exc.unsigned", lang), {
+                    who: open.channel.unsigned
+                      .map((p) => p === me ? tr("exc.you", lang) : p)
+                      .join(", "),
+                  })}
                 </p>
               </>
             )}
@@ -328,7 +357,7 @@ export function Exchanges({ onPlans }: {
                 const c = await api.exchangeChannel(open.id, token);
                 setNote(c.open ? c.note : c.reason);
               } catch (e) { fail(e); }
-            }}>Ask again</button>
+            }}>{tr("exc.askagain", lang)}</button>
           </div>
         </>
       )}

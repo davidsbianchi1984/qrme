@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.45.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.45.2** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.45.2** | **The three biggest screens left** — Exchanges, Reaching and Visiting fully localized; console-untranslated 978 → 848 |
 | **0.45.1** | Version alignment with JIM's console-to-zero round |
 | **0.45.0** | **Under a thousand** — the Workshop and Bodies screens fully localized; the console-untranslated record crosses into three figures (1072 → 978) |
 | **0.44.9** | **Who this profile is, in every language** — the Identity screen fully localized (console-untranslated 1121 → 1072) |

@@ -202,7 +202,12 @@ def test_a_window_that_starts_where_it_ends_covers_nothing(client):
 
 
 def test_the_screen_warns_about_that_window():
-    assert "same hour" in _markup("app/src/screens/Reaching.tsx")
+    """The warning moved into the l10n table when the screen was localized,
+    so this asks two things instead of one: that the screen still looks the
+    sentence up, and that the sentence is still there to be looked up. Either
+    half alone would pass a screen that has stopped saying it."""
+    assert 'tr("rch.samehour", lang)' in _markup("app/src/screens/Reaching.tsx")
+    assert "same hour" in _src("app/src/l10n.ts")
 
 
 @pytest.mark.parametrize("body", [
@@ -347,8 +352,12 @@ def test_quiet_hours_are_sent_with_the_persons_token_not_the_owners():
 def test_the_screen_says_quiet_hours_are_not_the_owners_to_set():
     """Rendered, not just enforced. An owner who does not know why the
     control is absent will look for a bug."""
-    src = _markup("app/src/screens/Reaching.tsx")
-    assert "not yours" in src or "not one you hold over anybody else" in src
+    assert 'tr("rch.notyours", lang)' in _markup("app/src/screens/Reaching.tsx")
+    l10n = _src("app/src/l10n.ts")
+    assert "not one you hold over anybody else" in l10n
+    # And the gates paragraph, which is where the fourth refusal is named as
+    # somebody else's to lift.
+    assert "is not yours at all" in l10n
 
 
 def test_the_screen_renders_whether_the_exchange_left():

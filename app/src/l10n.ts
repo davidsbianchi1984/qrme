@@ -3243,6 +3243,453 @@ const CHROME: Table = {
   "rbt.log.none": {
     en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
   },
+  "exc.title": {
+    en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch", pt: "Trocas", it: "Scambi", ja: "取引", zh: "交换", hi: "आदान-प्रदान", ar: "التبادلات",
+  },
+  "exc.lead": {
+    en: "A document before it is a transfer. Both sides sign the same manifest, and only then does anything move.", es: "Un documento antes de ser una transferencia. Ambas partes firman el mismo manifiesto, y solo entonces se mueve algo.", fr: "Un document avant d'être un transfert. Les deux parties signent le même manifeste, et alors seulement quelque chose bouge.", de: "Ein Dokument, bevor es eine Übertragung ist. Beide Seiten unterschreiben dasselbe Manifest, und erst dann bewegt sich etwas.", pt: "Um documento antes de ser uma transferência. Ambos os lados assinam o mesmo manifesto, e só então algo se move.", it: "Un documento prima di essere un trasferimento. Entrambe le parti firmano lo stesso manifesto, e solo allora qualcosa si muove.", ja: "移転である前に、まず文書です。双方が同じ明細に署名し、そのあとで初めて何かが動きます。", zh: "在成为转移之前，它首先是一份文件。双方签署同一份清单，之后才会有任何东西移动。", hi: "हस्तांतरण होने से पहले यह एक दस्तावेज़ है। दोनों पक्ष एक ही सूची पर हस्ताक्षर करते हैं, और तभी कुछ हिलता है।", ar: "وثيقة قبل أن يكون نقلًا. يوقّع الطرفان البيان نفسه، وعندئذ فقط يتحرك شيء.",
+  },
+  "exc.how": {
+    en: "How this works", es: "Cómo funciona esto", fr: "Comment cela fonctionne", de: "Wie das funktioniert", pt: "Como isto funciona", it: "Come funziona", ja: "仕組み", zh: "运作方式", hi: "यह कैसे काम करता है", ar: "كيف يعمل هذا",
+  },
+  "exc.propose": {
+    en: "Propose one", es: "Proponer uno", fr: "En proposer un", de: "Einen vorschlagen", pt: "Propor um", it: "Proponine uno", ja: "提案する", zh: "提出一份", hi: "एक प्रस्तावित करें", ar: "اقترح واحدًا",
+  },
+  "exc.guest.ph": {
+    en: "the other party's id", es: "el id de la otra parte", fr: "l'id de l'autre partie", de: "die ID der anderen Partei", pt: "o id da outra parte", it: "l'id dell'altra parte", ja: "相手方のID", zh: "对方的 ID", hi: "दूसरे पक्ष की आईडी", ar: "معرّف الطرف الآخر",
+  },
+  "exc.fee.ph": {
+    en: "fee", es: "tarifa", fr: "honoraires", de: "Honorar", pt: "honorário", it: "compenso", ja: "報酬", zh: "费用", hi: "शुल्क", ar: "الأتعاب",
+  },
+  "exc.work.ph": {
+    en: "what the work is, in one sentence", es: "cuál es el trabajo, en una frase", fr: "en quoi consiste le travail, en une phrase", de: "worin die Arbeit besteht, in einem Satz", pt: "qual é o trabalho, numa frase", it: "qual è il lavoro, in una frase", ja: "その仕事は何か、ひと言で", zh: "这项工作是什么，一句话说明", hi: "काम क्या है, एक वाक्य में", ar: "ما هو العمل، في جملة واحدة",
+  },
+  "exc.propose.go": {
+    en: "Propose", es: "Proponer", fr: "Proposer", de: "Vorschlagen", pt: "Propor", it: "Proponi", ja: "提案", zh: "提出", hi: "प्रस्ताव दें", ar: "اقترح",
+  },
+  "exc.opened.said": {
+    en: "Draft opened. Nothing can move until both of you sign.", es: "Borrador abierto. Nada puede moverse hasta que ambos firmen.", fr: "Brouillon ouvert. Rien ne peut bouger tant que vous n'avez pas signé tous les deux.", de: "Entwurf eröffnet. Nichts kann sich bewegen, bis Sie beide unterschrieben haben.", pt: "Rascunho aberto. Nada pode mover-se até que ambos assinem.", it: "Bozza aperta. Niente può muoversi finché non firmate entrambi.", ja: "下書きを開きました。二人が署名するまで、何も動きません。", zh: "草稿已开启。在双方签署之前，任何东西都不会移动。", hi: "मसौदा खुल गया। जब तक आप दोनों हस्ताक्षर नहीं करते, कुछ नहीं हिलेगा।", ar: "فُتحت المسودة. لا شيء يتحرك حتى يوقّع كلاكما.",
+  },
+  "exc.cleared.said": {
+    en: "The manifest changed, so both signatures were cleared. Sign again.", es: "El manifiesto cambió, así que ambas firmas se borraron. Firme de nuevo.", fr: "Le manifeste a changé, donc les deux signatures ont été effacées. Signez à nouveau.", de: "Das Manifest hat sich geändert, deshalb wurden beide Unterschriften gelöscht. Bitte erneut unterschreiben.", pt: "O manifesto mudou, por isso ambas as assinaturas foram apagadas. Assine de novo.", it: "Il manifesto è cambiato, quindi entrambe le firme sono state cancellate. Firma di nuovo.", ja: "明細が変わったため、両方の署名が取り消されました。もう一度署名してください。", zh: "清单已变更，因此两份签名都已作废。请重新签署。", hi: "सूची बदल गई, इसलिए दोनों हस्ताक्षर मिटा दिए गए। फिर से हस्ताक्षर करें।", ar: "تغيّر البيان، فأُلغي التوقيعان. وقّع من جديد.",
+  },
+  "exc.yours": {
+    en: "Yours", es: "Los tuyos", fr: "Les vôtres", de: "Ihre", pt: "Os seus", it: "I tuoi", ja: "あなたのもの", zh: "你的", hi: "आपके", ar: "ما يخصّك",
+  },
+  "exc.none": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "exc.row": {
+    en: "{ind} · {state} · {n} item{s}", es: "{ind} · {state} · {n} elementos", fr: "{ind} · {state} · {n} éléments", de: "{ind} · {state} · {n} Posten", pt: "{ind} · {state} · {n} itens", it: "{ind} · {state} · {n} voci", ja: "{ind} · {state} · {n}件", zh: "{ind} · {state} · {n} 项", hi: "{ind} · {state} · {n} मदें", ar: "{ind} · {state} · {n} بنود",
+  },
+  "exc.row.tosign": {
+    en: "· {n} still to sign", es: "· faltan {n} por firmar", fr: "· {n} restent à signer", de: "· {n} müssen noch unterschreiben", pt: "· faltam {n} por assinar", it: "· {n} devono ancora firmare", ja: "· 未署名 {n} 名", zh: "· 还有 {n} 位未签", hi: "· {n} को अभी हस्ताक्षर करना है", ar: "· بقي {n} للتوقيع",
+  },
+  "exc.open": {
+    en: "Open", es: "Abrir", fr: "Ouvrir", de: "Öffnen", pt: "Abrir", it: "Apri", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتح",
+  },
+  "exc.detail": {
+    en: "{ind} · {state} · fee {fee} — {note}", es: "{ind} · {state} · tarifa {fee} — {note}", fr: "{ind} · {state} · honoraires {fee} — {note}", de: "{ind} · {state} · Honorar {fee} — {note}", pt: "{ind} · {state} · honorário {fee} — {note}", it: "{ind} · {state} · compenso {fee} — {note}", ja: "{ind} · {state} · 報酬 {fee} — {note}", zh: "{ind} · {state} · 费用 {fee} — {note}", hi: "{ind} · {state} · शुल्क {fee} — {note}", ar: "{ind} · {state} · الأتعاب {fee} — {note}",
+  },
+  "exc.included": {
+    en: "Included: {list}", es: "Incluido: {list}", fr: "Inclus : {list}", de: "Enthalten: {list}", pt: "Incluído: {list}", it: "Incluso: {list}", ja: "含まれるもの: {list}", zh: "包含：{list}", hi: "शामिल: {list}", ar: "مشمول: {list}",
+  },
+  "exc.notincluded": {
+    en: "Not included: {list}", es: "No incluido: {list}", fr: "Non inclus : {list}", de: "Nicht enthalten: {list}", pt: "Não incluído: {list}", it: "Non incluso: {list}", ja: "含まれないもの: {list}", zh: "不包含：{list}", hi: "शामिल नहीं: {list}", ar: "غير مشمول: {list}",
+  },
+  "exc.grants": {
+    en: "This grants {a}. It does not grant {b}.", es: "Esto concede {a}. No concede {b}.", fr: "Ceci accorde {a}. Cela n'accorde pas {b}.", de: "Dies gewährt {a}. Es gewährt nicht {b}.", pt: "Isto concede {a}. Não concede {b}.", it: "Questo concede {a}. Non concede {b}.", ja: "これが与えるのは {a} です。与えないのは {b} です。", zh: "这授予 {a}。它不授予 {b}。", hi: "यह {a} देता है। यह {b} नहीं देता।", ar: "هذا يمنح {a}. ولا يمنح {b}.",
+  },
+  "exc.manifest": {
+    en: "The manifest", es: "El manifiesto", fr: "Le manifeste", de: "Das Manifest", pt: "O manifesto", it: "Il manifesto", ja: "明細", zh: "清单", hi: "सूची", ar: "البيان",
+  },
+  "exc.manifest.none": {
+    en: "Nothing listed yet.", es: "Nada listado todavía.", fr: "Rien de listé pour l'instant.", de: "Noch nichts aufgeführt.", pt: "Nada listado ainda.", it: "Ancora niente in elenco.", ja: "まだ何も記載されていません。", zh: "尚未列出任何内容。", hi: "अभी कुछ सूचीबद्ध नहीं।", ar: "لم يُدرج شيء بعد.",
+  },
+  "exc.runs": {
+    en: "runs", es: "se ejecuta", fr: "s'exécute", de: "läuft", pt: "executa", it: "esegue", ja: "実行される", zh: "会运行", hi: "चलता है", ar: "يُنفَّذ",
+  },
+  "exc.h2g": {
+    en: "host → guest", es: "anfitrión → invitado", fr: "hôte → invité", de: "Gastgeber → Gast", pt: "anfitrião → convidado", it: "ospitante → ospite", ja: "ホスト → ゲスト", zh: "主人 → 客人", hi: "मेज़बान → अतिथि", ar: "المضيف ← الضيف",
+  },
+  "exc.g2h": {
+    en: "guest → host", es: "invitado → anfitrión", fr: "invité → hôte", de: "Gast → Gastgeber", pt: "convidado → anfitrião", it: "ospite → ospitante", ja: "ゲスト → ホスト", zh: "客人 → 主人", hi: "अतिथि → मेज़बान", ar: "الضيف ← المضيف",
+  },
+  "exc.item.line": {
+    en: "{dir} · {kind}", es: "{dir} · {kind}", fr: "{dir} · {kind}", de: "{dir} · {kind}", pt: "{dir} · {kind}", it: "{dir} · {kind}", ja: "{dir} · {kind}", zh: "{dir} · {kind}", hi: "{dir} · {kind}", ar: "{dir} · {kind}",
+  },
+  "exc.item.bytes": {
+    en: "· {n} bytes", es: "· {n} bytes", fr: "· {n} octets", de: "· {n} Bytes", pt: "· {n} bytes", it: "· {n} byte", ja: "· {n} バイト", zh: "· {n} 字节", hi: "· {n} बाइट", ar: "· {n} بايت",
+  },
+  "exc.item.accepted": {
+    en: "· accepted", es: "· aceptado", fr: "· accepté", de: "· angenommen", pt: "· aceite", it: "· accettato", ja: "· 受領済み", zh: "· 已接收", hi: "· स्वीकृत", ar: "· مقبول",
+  },
+  "exc.accept": {
+    en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen", pt: "Aceitar", it: "Accetta", ja: "受け取る", zh: "接收", hi: "स्वीकारें", ar: "اقبل",
+  },
+  "exc.accepted.said": {
+    en: "Accepted. That one item, and nothing else.", es: "Aceptado. Ese elemento, y nada más.", fr: "Accepté. Cet élément-là, et rien d'autre.", de: "Angenommen. Genau dieser Posten, und sonst nichts.", pt: "Aceite. Esse item, e mais nada.", it: "Accettato. Quella voce, e nient'altro.", ja: "受け取りました。その一件だけで、ほかは何もありません。", zh: "已接收。仅此一项，别无其他。", hi: "स्वीकृत। बस वही एक मद, और कुछ नहीं।", ar: "قُبل. ذلك البند وحده، ولا شيء غيره.",
+  },
+  "exc.remove": {
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "احذف",
+  },
+  "exc.item.ph": {
+    en: "what crosses", es: "qué cruza", fr: "ce qui passe", de: "was hinübergeht", pt: "o que atravessa", it: "cosa passa", ja: "何が渡るか", zh: "交付什么", hi: "क्या पार जाता है", ar: "ما الذي يعبر",
+  },
+  "exc.add": {
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+  },
+  "exc.sigs": {
+    en: "Signatures", es: "Firmas", fr: "Signatures", de: "Unterschriften", pt: "Assinaturas", it: "Firme", ja: "署名", zh: "签名", hi: "हस्ताक्षर", ar: "التوقيعات",
+  },
+  "exc.sigs.against": {
+    en: "Against fingerprint {fp} — change the manifest and this changes, so the old signatures match nothing.", es: "Contra la huella {fp} — cambie el manifiesto y esta cambia, así que las firmas antiguas no coinciden con nada.", fr: "Contre l'empreinte {fp} — changez le manifeste et elle change, donc les anciennes signatures ne correspondent à rien.", de: "Gegen den Fingerabdruck {fp} — ändern Sie das Manifest, ändert er sich, und die alten Unterschriften passen zu nichts mehr.", pt: "Contra a impressão {fp} — mude o manifesto e ela muda, por isso as assinaturas antigas não correspondem a nada.", it: "Contro l'impronta {fp} — cambia il manifesto e questa cambia, così le vecchie firme non corrispondono a niente.", ja: "指紋 {fp} に対して — 明細を変えればこれも変わるので、古い署名はどれとも一致しなくなります。", zh: "针对指纹 {fp} — 一旦改动清单，它就会变，于是旧签名与任何内容都不再匹配。", hi: "फ़िंगरप्रिंट {fp} के विरुद्ध — सूची बदलिए और यह बदल जाता है, इसलिए पुराने हस्ताक्षर किसी से मेल नहीं खाते।", ar: "مقابل البصمة {fp} — غيّر البيان تتغيّر هي، فلا تطابق التواقيع القديمة شيئًا.",
+  },
+  "exc.sig.line": {
+    en: "{who} signed {when}", es: "{who} firmó {when}", fr: "{who} a signé {when}", de: "{who} unterschrieb {when}", pt: "{who} assinou {when}", it: "{who} ha firmato {when}", ja: "{who} が {when} に署名", zh: "{who} 于 {when} 签署", hi: "{who} ने {when} को हस्ताक्षर किया", ar: "{who} وقّع في {when}",
+  },
+  "exc.sig.stale": {
+    en: "— against an older manifest, not this one", es: "— contra un manifiesto anterior, no este", fr: "— contre un manifeste antérieur, pas celui-ci", de: "— gegen ein älteres Manifest, nicht dieses", pt: "— contra um manifesto anterior, não este", it: "— contro un manifesto precedente, non questo", ja: "— これではなく、古い明細に対するもの", zh: "— 针对的是更早的清单，不是这一份", hi: "— किसी पुरानी सूची के विरुद्ध, इसके नहीं", ar: "— مقابل بيان أقدم، لا هذا",
+  },
+  "exc.waiting": {
+    en: "Waiting on: {who}", es: "A la espera de: {who}", fr: "En attente de : {who}", de: "Warten auf: {who}", pt: "À espera de: {who}", it: "In attesa di: {who}", ja: "待ち: {who}", zh: "等待：{who}", hi: "प्रतीक्षा: {who}", ar: "في انتظار: {who}",
+  },
+  "exc.you": {
+    en: "you", es: "usted", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "exc.sign": {
+    en: "Sign", es: "Firmar", fr: "Signer", de: "Unterschreiben", pt: "Assinar", it: "Firma", ja: "署名する", zh: "签署", hi: "हस्ताक्षर करें", ar: "وقّع",
+  },
+  "exc.signed.said": {
+    en: "Signed — this manifest, and nothing it becomes later.", es: "Firmado — este manifiesto, y nada en lo que se convierta después.", fr: "Signé — ce manifeste-ci, et rien de ce qu'il deviendra plus tard.", de: "Unterschrieben — dieses Manifest, und nichts, was später daraus wird.", pt: "Assinado — este manifesto, e nada no que ele se torne depois.", it: "Firmato — questo manifesto, e niente di ciò che diventerà poi.", ja: "署名しました — この明細に対してであり、後にそれが何になろうと関係ありません。", zh: "已签署 — 针对的是这份清单，而不是它日后变成的样子。", hi: "हस्ताक्षरित — यही सूची, और वह नहीं जो यह बाद में बन जाए।", ar: "وُقّع — هذا البيان، لا ما يصير إليه لاحقًا.",
+  },
+  "exc.reopen": {
+    en: "Reopen to edit", es: "Reabrir para editar", fr: "Rouvrir pour modifier", de: "Zum Bearbeiten wieder öffnen", pt: "Reabrir para editar", it: "Riapri per modificare", ja: "編集のため開き直す", zh: "重新打开以编辑", hi: "संपादन हेतु फिर खोलें", ar: "أعد الفتح للتعديل",
+  },
+  "exc.reopened.said": {
+    en: "Reopened. Both signatures cleared.", es: "Reabierto. Ambas firmas borradas.", fr: "Rouvert. Les deux signatures effacées.", de: "Wieder geöffnet. Beide Unterschriften gelöscht.", pt: "Reaberto. Ambas as assinaturas apagadas.", it: "Riaperto. Entrambe le firme cancellate.", ja: "開き直しました。両方の署名を取り消しました。", zh: "已重新打开。两份签名均已作废。", hi: "फिर खोला गया। दोनों हस्ताक्षर मिटे।", ar: "أُعيد فتحه. أُلغي التوقيعان.",
+  },
+  "exc.withdraw": {
+    en: "Withdraw", es: "Retirar", fr: "Retirer", de: "Zurückziehen", pt: "Retirar", it: "Ritira", ja: "取り下げる", zh: "撤回", hi: "वापस लें", ar: "اسحب",
+  },
+  "exc.withdrawn.said": {
+    en: "Withdrawn.", es: "Retirado.", fr: "Retiré.", de: "Zurückgezogen.", pt: "Retirado.", it: "Ritirato.", ja: "取り下げました。", zh: "已撤回。", hi: "वापस लिया गया।", ar: "سُحب.",
+  },
+  "exc.move": {
+    en: "Can anything move?", es: "¿Puede moverse algo?", fr: "Quelque chose peut-il bouger ?", de: "Kann sich etwas bewegen?", pt: "Pode mover-se alguma coisa?", it: "Può muoversi qualcosa?", ja: "何か動かせますか？", zh: "有东西可以移动吗？", hi: "क्या कुछ हिल सकता है?", ar: "هل يمكن لشيء أن يتحرك؟",
+  },
+  "exc.move.yes": {
+    en: "Yes — {n} item{s} available.", es: "Sí — {n} elementos disponibles.", fr: "Oui — {n} éléments disponibles.", de: "Ja — {n} Posten verfügbar.", pt: "Sim — {n} itens disponíveis.", it: "Sì — {n} voci disponibili.", ja: "はい — {n}件が利用できます。", zh: "可以 — {n} 项可用。", hi: "हाँ — {n} मदें उपलब्ध।", ar: "نعم — {n} بنود متاحة.",
+  },
+  "exc.move.no": {
+    en: "No — {reason}.", es: "No — {reason}.", fr: "Non — {reason}.", de: "Nein — {reason}.", pt: "Não — {reason}.", it: "No — {reason}.", ja: "いいえ — {reason}。", zh: "不行 — {reason}。", hi: "नहीं — {reason}।", ar: "لا — {reason}.",
+  },
+  "exc.unsigned": {
+    en: "Unsigned: {who}", es: "Sin firmar: {who}", fr: "Non signé : {who}", de: "Nicht unterschrieben: {who}", pt: "Por assinar: {who}", it: "Non firmato: {who}", ja: "未署名: {who}", zh: "未签署：{who}", hi: "अहस्ताक्षरित: {who}", ar: "دون توقيع: {who}",
+  },
+  "exc.askagain": {
+    en: "Ask again", es: "Preguntar de nuevo", fr: "Redemander", de: "Nochmal fragen", pt: "Perguntar de novo", it: "Chiedi di nuovo", ja: "もう一度尋ねる", zh: "再问一次", hi: "फिर पूछें", ar: "اسأل مجددًا",
+  },
+  "rch.title": {
+    en: "Reaching out, and what stops it", es: "Contactar, y qué lo impide", fr: "Prendre contact, et ce qui l'empêche", de: "Kontakt aufnehmen, und was das verhindert", pt: "Tomar a iniciativa, e o que a trava", it: "Farsi vivo, e cosa lo ferma", ja: "こちらから声をかけること、そしてそれを止めるもの", zh: "主动联系，以及什么会阻止它", hi: "पहल करके संपर्क, और उसे क्या रोकता है", ar: "المبادرة بالتواصل، وما يمنعها",
+  },
+  "rch.lead": {
+    en: "Four different refusals, and only two of them are yours to lift.", es: "Cuatro negativas distintas, y solo dos son suyas para levantar.", fr: "Quatre refus différents, et deux seulement vous appartiennent.", de: "Vier verschiedene Ablehnungen, und nur zwei davon können Sie aufheben.", pt: "Quatro recusas diferentes, e só duas são suas para levantar.", it: "Quattro rifiuti diversi, e solo due sono tuoi da togliere.", ja: "四つの異なる拒否があり、そのうちあなたが解除できるのは二つだけです。", zh: "四种不同的拒绝，其中只有两种是你能解除的。", hi: "चार अलग-अलग इनकार, और उनमें से केवल दो हटाना आपके हाथ में है।", ar: "أربعة أنواع من الرفض، اثنان منها فقط بيدك رفعهما.",
+  },
+  "rch.who": {
+    en: "Somebody in particular", es: "Alguien en concreto", fr: "Quelqu'un en particulier", de: "Eine bestimmte Person", pt: "Alguém em particular", it: "Qualcuno in particolare", ja: "特定の相手", zh: "某个具体的人", hi: "कोई ख़ास व्यक्ति", ar: "شخص بعينه",
+  },
+  "rch.who.ph": {
+    en: "a person's id", es: "el id de una persona", fr: "l'id d'une personne", de: "die ID einer Person", pt: "o id de uma pessoa", it: "l'id di una persona", ja: "人物のID", zh: "某人的 ID", hi: "किसी व्यक्ति की आईडी", ar: "معرّف شخص",
+  },
+  "rch.how": {
+    en: "How are we going", es: "Cómo vamos", fr: "Où en sommes-nous", de: "Wie steht es", pt: "Como vamos", it: "Come andiamo", ja: "関係はどうか", zh: "我们相处得如何", hi: "हम कैसे चल रहे हैं", ar: "كيف نمضي",
+  },
+  "rch.state": {
+    en: "{n} exchange{s} across {m} session{t} · score {score}", es: "{n} intercambios en {m} sesiones · puntuación {score}", fr: "{n} échanges sur {m} sessions · score {score}", de: "{n} Austausche über {m} Sitzungen · Wert {score}", pt: "{n} trocas em {m} sessões · pontuação {score}", it: "{n} scambi in {m} sessioni · punteggio {score}", ja: "{m}セッションにわたるやり取り{n}件 · スコア {score}", zh: "{m} 次会话中的 {n} 次往来 · 分数 {score}", hi: "{m} सत्रों में {n} आदान-प्रदान · अंक {score}", ar: "{n} تبادلات عبر {m} جلسات · الدرجة {score}",
+  },
+  "rch.updown": {
+    en: "{up} up · {down} down", es: "{up} a favor · {down} en contra", fr: "{up} pouces levés · {down} baissés", de: "{up} Daumen hoch · {down} runter", pt: "{up} a favor · {down} contra", it: "{up} pollici su · {down} giù", ja: "高評価{up} · 低評価{down}", zh: "{up} 个赞 · {down} 个踩", hi: "{up} पसंद · {down} नापसंद", ar: "{up} إعجاب · {down} عدم إعجاب",
+  },
+  "rch.read": {
+    en: "Readable by you and by them, and by nobody else. It is a record of how often somebody talks to this profile, which is a fact about them as much as about it.", es: "Legible por usted y por ellos, y por nadie más. Es un registro de con qué frecuencia alguien habla con este perfil, lo cual es un hecho sobre esa persona tanto como sobre él.", fr: "Lisible par vous et par eux, et par personne d'autre. C'est un relevé de la fréquence à laquelle quelqu'un parle à ce profil, ce qui est un fait sur cette personne autant que sur lui.", de: "Lesbar für Sie und für sie, und für niemanden sonst. Es ist eine Aufzeichnung, wie oft jemand mit diesem Profil spricht — eine Tatsache über die Person genauso wie über das Profil.", pt: "Legível por si e por eles, e por mais ninguém. É um registo da frequência com que alguém fala com este perfil, o que é um facto sobre essa pessoa tanto quanto sobre ele.", it: "Leggibile da te e da loro, e da nessun altro. È un registro di quanto spesso qualcuno parla con questo profilo, il che è un fatto su quella persona tanto quanto su di esso.", ja: "読めるのはあなたと相手だけで、ほかの誰でもありません。これは誰かがこのプロフィールとどれだけ話しているかの記録であり、プロフィールについてと同じくらいその人についての事実です。", zh: "只有你和对方能读到，别人都不能。它记录的是某人与这份资料交谈的频率——这既是关于资料的事实，也同样是关于那个人的事实。", hi: "इसे केवल आप और वे पढ़ सकते हैं, और कोई नहीं। यह इस बात का रिकॉर्ड है कि कोई इस प्रोफ़ाइल से कितनी बार बात करता है — जो प्रोफ़ाइल जितना ही उस व्यक्ति के बारे में भी तथ्य है।", ar: "يقرؤه أنت وهم، ولا أحد سواكما. إنه سجل لكم مرة يتحدث أحدهم إلى هذا الملف، وهي حقيقة عنه بقدر ما هي عن الملف.",
+  },
+  "rch.first": {
+    en: "Reaching out first", es: "Dar el primer paso", fr: "Faire le premier pas", de: "Von sich aus melden", pt: "Dar o primeiro passo", it: "Farsi vivo per primo", ja: "こちらから先に声をかける", zh: "率先联系", hi: "पहले पहल करना", ar: "المبادرة أولًا",
+  },
+  "rch.reactive": {
+    en: "Reactive-only", es: "Solo reactivo", fr: "Réactif seulement", de: "Nur reaktiv", pt: "Apenas reativo", it: "Solo reattivo", ja: "応答のみ", zh: "仅被动回应", hi: "केवल प्रतिक्रियात्मक", ar: "الرد فقط",
+  },
+  "rch.awaiting": {
+    en: "Awaiting a reply", es: "A la espera de respuesta", fr: "En attente d'une réponse", de: "Wartet auf Antwort", pt: "À espera de resposta", it: "In attesa di risposta", ja: "返信待ち", zh: "等待回复", hi: "उत्तर की प्रतीक्षा", ar: "بانتظار ردّ",
+  },
+  "rch.ratecap": {
+    en: "Rate cap", es: "Límite de frecuencia", fr: "Limite de fréquence", de: "Frequenzgrenze", pt: "Limite de frequência", it: "Limite di frequenza", ja: "頻度の上限", zh: "频率上限", hi: "दर-सीमा", ar: "حدّ التكرار",
+  },
+  "rch.quiet": {
+    en: "Quiet hours", es: "Horas de silencio", fr: "Heures calmes", de: "Ruhezeiten", pt: "Horas de silêncio", it: "Ore di silenzio", ja: "静かな時間帯", zh: "静默时段", hi: "शांत घंटे", ar: "ساعات الهدوء",
+  },
+  "rch.quiet.low": {
+    en: "quiet hours", es: "horas de silencio", fr: "heures calmes", de: "Ruhezeiten", pt: "horas de silêncio", it: "ore di silenzio", ja: "静かな時間帯", zh: "静默时段", hi: "शांत घंटे", ar: "ساعات الهدوء",
+  },
+  "rch.gates": {
+    en: "Three gates, and they refuse in three different sentences because they are three different facts. {reactive} means you never switched outreach on. {awaiting} means it already reached out and heard nothing — it will not send twice into silence. {ratecap} means it reached out recently. And {quiet} is not yours at all.", es: "Tres barreras, y rechazan con tres frases distintas porque son tres hechos distintos. {reactive} significa que nunca activó la iniciativa. {awaiting} significa que ya escribió y no obtuvo respuesta — no enviará dos veces al silencio. {ratecap} significa que escribió hace poco. Y {quiet} no es suya en absoluto.", fr: "Trois barrières, et elles refusent en trois phrases différentes parce que ce sont trois faits différents. {reactive} veut dire que vous n'avez jamais activé l'initiative. {awaiting} veut dire qu'il a déjà écrit et n'a rien entendu — il n'enverra pas deux fois dans le silence. {ratecap} veut dire qu'il a écrit récemment. Et {quiet} ne vous appartient pas du tout.", de: "Drei Schranken, und sie lehnen in drei verschiedenen Sätzen ab, weil es drei verschiedene Tatsachen sind. {reactive} heißt, Sie haben die Initiative nie eingeschaltet. {awaiting} heißt, es hat sich schon gemeldet und nichts gehört — es sendet nicht zweimal ins Schweigen. {ratecap} heißt, es hat sich kürzlich gemeldet. Und {quiet} gehört Ihnen gar nicht.", pt: "Três barreiras, e recusam em três frases diferentes porque são três factos diferentes. {reactive} significa que nunca ligou a iniciativa. {awaiting} significa que já escreveu e não ouviu nada — não enviará duas vezes para o silêncio. {ratecap} significa que escreveu há pouco. E {quiet} não é sua de todo.", it: "Tre barriere, e rifiutano con tre frasi diverse perché sono tre fatti diversi. {reactive} vuol dire che non hai mai attivato l'iniziativa. {awaiting} vuol dire che si è già fatto vivo e non ha sentito nulla — non manderà due volte nel silenzio. {ratecap} vuol dire che si è fatto vivo di recente. E {quiet} non è affatto tua.", ja: "門は三つあり、三つとも別々の事実なので、拒否の文も三通りです。{reactive} は、こちらからの発信を一度も有効にしていないという意味です。{awaiting} は、すでに声をかけて返事がなかったという意味です — 沈黙に向けて二度は送りません。{ratecap} は、つい最近声をかけたという意味です。そして {quiet} は、そもそもあなたのものではありません。", zh: "有三道关卡，它们用三种不同的说法拒绝，因为那是三个不同的事实。{reactive} 意味着你从未打开主动联系。{awaiting} 意味着它已经联系过却没有回音——它不会向沉默发送第二次。{ratecap} 意味着它最近刚联系过。而 {quiet} 根本不属于你。", hi: "तीन द्वार हैं, और वे तीन अलग वाक्यों में मना करते हैं क्योंकि वे तीन अलग तथ्य हैं। {reactive} का अर्थ है कि आपने पहल कभी चालू ही नहीं की। {awaiting} का अर्थ है कि यह पहले ही संपर्क कर चुका है और कुछ नहीं सुना — यह ख़ामोशी में दोबारा नहीं भेजेगा। {ratecap} का अर्थ है कि इसने हाल ही में संपर्क किया था। और {quiet} आपका है ही नहीं।", ar: "ثلاث بوابات، وترفض بثلاث جمل مختلفة لأنها ثلاث حقائق مختلفة. {reactive} يعني أنك لم تُفعّل المبادرة قط. {awaiting} يعني أنه بادر فعلًا ولم يسمع شيئًا — ولن يرسل مرتين إلى الصمت. {ratecap} يعني أنه بادر مؤخرًا. أما {quiet} فليست لك أصلًا.",
+  },
+  "rch.now": {
+    en: "Reach out now", es: "Contactar ahora", fr: "Prendre contact maintenant", de: "Jetzt melden", pt: "Contactar agora", it: "Fatti vivo ora", ja: "今すぐ声をかける", zh: "立即联系", hi: "अभी संपर्क करें", ar: "بادر الآن",
+  },
+  "rch.sent.said": {
+    en: "Sent.", es: "Enviado.", fr: "Envoyé.", de: "Gesendet.", pt: "Enviado.", it: "Inviato.", ja: "送信しました。", zh: "已发送。", hi: "भेज दिया गया।", ar: "أُرسل.",
+  },
+  "rch.reason": {
+    en: "Its own reason for sending: {why}", es: "Su propia razón para escribir: {why}", fr: "Sa propre raison d'écrire : {why}", de: "Sein eigener Grund für die Nachricht: {why}", pt: "A sua própria razão para escrever: {why}", it: "La sua ragione per scrivere: {why}", ja: "送信した理由（本人の言葉）: {why}", zh: "它自己给出的发送理由：{why}", hi: "भेजने का इसका अपना कारण: {why}", ar: "سببه هو للإرسال: {why}",
+  },
+  "rch.held": {
+    en: "Held for approval rather than delivered — an unprompted message is exactly the kind that should not slip past moderation.", es: "Retenido para aprobación en lugar de entregado — un mensaje no solicitado es justo el que no debería colarse sin moderación.", fr: "Retenu pour approbation plutôt que délivré — un message non sollicité est exactement celui qui ne doit pas échapper à la modération.", de: "Zur Freigabe zurückgehalten statt zugestellt — eine unaufgeforderte Nachricht ist genau die, die nicht an der Moderation vorbeirutschen sollte.", pt: "Retido para aprovação em vez de entregue — uma mensagem não solicitada é exatamente a que não deve escapar à moderação.", it: "Trattenuto per approvazione invece che consegnato — un messaggio non richiesto è proprio quello che non dovrebbe sfuggire alla moderazione.", ja: "配信ではなく承認待ちとして保留されました — こちらから送る一方的なメッセージこそ、審査をすり抜けてはならないものです。", zh: "被留待审核而非直接送出——未经请求的消息，正是不该绕过审核的那一类。", hi: "भेजने के बजाय अनुमोदन के लिए रोका गया — बिन माँगा संदेश ठीक वही है जिसे मॉडरेशन से बचकर नहीं निकलना चाहिए।", ar: "احتُجزت للموافقة بدل أن تُسلَّم — الرسالة غير المطلوبة هي بالضبط ما لا ينبغي أن يمرّ دون مراجعة.",
+  },
+  "rch.delivered": {
+    en: "Delivered, and watermarked like every other thing this profile says.", es: "Entregado, y con marca de agua como todo lo demás que dice este perfil.", fr: "Délivré, et filigrané comme tout ce que dit ce profil.", de: "Zugestellt, und mit Wasserzeichen wie alles andere, was dieses Profil sagt.", pt: "Entregue, e com marca de água como tudo o mais que este perfil diz.", it: "Consegnato, e filigranato come ogni altra cosa che questo profilo dice.", ja: "配信されました。このプロフィールが言う他のすべてと同じく、透かしが入っています。", zh: "已送达，并像这份资料所说的其他一切一样带有水印。", hi: "पहुँचा दिया गया, और इस प्रोफ़ाइल की हर दूसरी बात की तरह वॉटरमार्क सहित।", ar: "سُلّمت، وعليها علامة مائية مثل كل ما يقوله هذا الملف.",
+  },
+  "rch.quiet.pitch": {
+    en: "The window during which nothing may reach out unprompted. Set by the person it protects — sending this with an owner token is refused, and that refusal is the point. A boundary your correspondent can move is not one.", es: "La franja durante la cual nada puede escribir sin ser invitado. La fija la persona a quien protege — enviarlo con un token de propietario se rechaza, y ese rechazo es el punto. Un límite que su interlocutor puede mover no es un límite.", fr: "La plage durant laquelle rien ne peut écrire sans y avoir été invité. Fixée par la personne qu'elle protège — l'envoyer avec un jeton de propriétaire est refusé, et ce refus est tout l'intérêt. Une limite que votre correspondant peut déplacer n'en est pas une.", de: "Das Fenster, in dem sich nichts von sich aus melden darf. Gesetzt von der Person, die es schützt — mit einem Besitzer-Token gesendet, wird es abgelehnt, und diese Ablehnung ist der Punkt. Eine Grenze, die Ihr Gegenüber verschieben kann, ist keine.", pt: "A janela durante a qual nada pode escrever sem ser convidado. Definida pela pessoa que protege — enviá-la com um token de proprietário é recusado, e essa recusa é o ponto. Um limite que o seu interlocutor pode mover não é um limite.", it: "La finestra durante la quale nulla può farsi vivo senza essere invitato. La imposta la persona che protegge — inviarla con un token da proprietario viene rifiutato, e quel rifiuto è il punto. Un confine che il tuo interlocutore può spostare non è un confine.", ja: "こちらから声をかけてはならない時間帯です。守られる本人が設定します — 所有者トークンで送ると拒否され、その拒否こそが要点です。相手が動かせる境界は、境界ではありません。", zh: "在这段时间内，任何东西都不得主动来找你。由它所保护的那个人自己设定——用所有者令牌提交会被拒绝，而这个拒绝正是要点。你的对话方能移动的界线，就不算界线。", hi: "वह अवधि जिसमें बिना बुलाए कुछ भी संपर्क नहीं कर सकता। इसे वही व्यक्ति तय करता है जिसकी यह रक्षा करती है — स्वामी टोकन से भेजने पर इनकार होता है, और वही इनकार असल बात है। जिस सीमा को आपका वार्ताकार हिला सके, वह सीमा नहीं।", ar: "النافذة التي لا يجوز خلالها أن يبادر أحد بالتواصل. يضبطها الشخص الذي تحميه — وإرسالها برمز المالك مرفوض، وهذا الرفض هو المقصود. الحدّ الذي يستطيع مراسلك تحريكه ليس حدًّا.",
+  },
+  "rch.from": {
+    en: "from", es: "desde", fr: "de", de: "von", pt: "de", it: "dalle", ja: "開始", zh: "从", hi: "से", ar: "من",
+  },
+  "rch.until": {
+    en: "until", es: "hasta", fr: "à", de: "bis", pt: "até", it: "alle", ja: "終了", zh: "到", hi: "तक", ar: "إلى",
+  },
+  "rch.set": {
+    en: "Set my quiet hours", es: "Fijar mis horas de silencio", fr: "Définir mes heures calmes", de: "Meine Ruhezeiten festlegen", pt: "Definir as minhas horas de silêncio", it: "Imposta le mie ore di silenzio", ja: "自分の静かな時間帯を設定", zh: "设置我的静默时段", hi: "मेरे शांत घंटे तय करें", ar: "اضبط ساعات هدوئي",
+  },
+  "rch.set.said": {
+    en: "Set.", es: "Fijado.", fr: "Défini.", de: "Festgelegt.", pt: "Definido.", it: "Impostato.", ja: "設定しました。", zh: "已设置。", hi: "तय हो गया।", ar: "ضُبط.",
+  },
+  "rch.clear": {
+    en: "clear", es: "borrar", fr: "effacer", de: "löschen", pt: "limpar", it: "cancella", ja: "解除", zh: "清除", hi: "मिटाएँ", ar: "امسح",
+  },
+  "rch.cleared.said": {
+    en: "Cleared.", es: "Borrado.", fr: "Effacé.", de: "Gelöscht.", pt: "Limpo.", it: "Cancellato.", ja: "解除しました。", zh: "已清除。", hi: "मिट गया।", ar: "مُسح.",
+  },
+  "rch.utc": {
+    en: "Hours are UTC, 0 to 23. Both empty means no window.", es: "Las horas son UTC, de 0 a 23. Ambas vacías significa sin franja.", fr: "Les heures sont en UTC, de 0 à 23. Les deux vides signifie aucune plage.", de: "Stunden in UTC, 0 bis 23. Beide leer heißt kein Fenster.", pt: "As horas são UTC, de 0 a 23. Ambas vazias significa sem janela.", it: "Le ore sono UTC, da 0 a 23. Entrambe vuote significa nessuna finestra.", ja: "時刻は UTC、0 から 23 までです。両方空欄なら時間帯なしという意味です。", zh: "时间为 UTC，0 至 23。两个都留空表示没有静默时段。", hi: "घंटे UTC में हैं, 0 से 23। दोनों ख़ाली का अर्थ है कोई अवधि नहीं।", ar: "الساعات بتوقيت UTC، من 0 إلى 23. تركهما فارغين يعني ألا نافذة.",
+  },
+  "rch.currently": {
+    en: " Currently {a} to {b}.", es: " Actualmente de {a} a {b}.", fr: " Actuellement de {a} à {b}.", de: " Derzeit {a} bis {b}.", pt: " Atualmente de {a} a {b}.", it: " Attualmente dalle {a} alle {b}.", ja: "現在は {a} から {b} まで。", zh: "当前为 {a} 至 {b}。", hi: " फ़िलहाल {a} से {b} तक।", ar: " حاليًا من {a} إلى {b}.",
+  },
+  "rch.samehour.term": {
+    en: "same hour", es: "misma hora", fr: "même heure", de: "gleiche Stunde", pt: "mesma hora", it: "stessa ora", ja: "同じ時刻", zh: "同一小时", hi: "एक ही घंटा", ar: "الساعة نفسها",
+  },
+  "rch.samehour": {
+    en: "Those are the {same}, which covers nothing rather than everything — the window runs from the first up to but not including the second. To be quiet all day, end one hour before you start.", es: "Esas son la {same}, lo que no cubre nada en lugar de todo — la franja va desde la primera hasta la segunda sin incluirla. Para estar en silencio todo el día, termine una hora antes de empezar.", fr: "Ce sont la {same}, ce qui ne couvre rien plutôt que tout — la plage va de la première jusqu'à la seconde exclue. Pour être silencieux toute la journée, terminez une heure avant de commencer.", de: "Das ist die {same}, was nichts abdeckt statt alles — das Fenster läuft von der ersten bis ausschließlich der zweiten. Um den ganzen Tag still zu sein, enden Sie eine Stunde vor dem Beginn.", pt: "Essas são a {same}, o que não cobre nada em vez de tudo — a janela vai da primeira até à segunda, exclusive. Para ficar em silêncio o dia todo, termine uma hora antes de começar.", it: "Quelle sono la {same}, il che non copre niente invece che tutto — la finestra va dalla prima fino alla seconda esclusa. Per stare in silenzio tutto il giorno, finisci un'ora prima di iniziare.", ja: "それは {same} であり、すべてではなく何も覆いません — 時間帯は最初の時刻から二つ目の時刻の直前までです。一日中静かにするには、開始の一時間前に終わらせてください。", zh: "那是{same}，它覆盖的不是全部而是零——时段从第一个时刻起，到第二个时刻为止但不含它。若要整天静默，请把结束时间设在开始时间的前一小时。", hi: "वे {same} हैं, जो सब कुछ नहीं बल्कि कुछ भी नहीं ढकता — अवधि पहले से दूसरे तक चलती है, दूसरे को छोड़कर। पूरे दिन शांत रहने के लिए, शुरुआत से एक घंटा पहले समाप्त करें।", ar: "تلك هي {same}، وهي تغطي لا شيء بدل كل شيء — تمتد النافذة من الأولى حتى الثانية دون أن تشملها. لتظل هادئًا طوال اليوم، أنهِ قبل ساعة من موعد البدء.",
+  },
+  "rch.notyours": {
+    en: "This is your own control, not one you hold over anybody else — so it needs your token as a person rather than as a profile's owner. Sign in as yourself to set it.", es: "Este es su propio control, no uno que ejerza sobre nadie más — así que necesita su token como persona y no como propietario de un perfil. Inicie sesión como usted mismo para fijarlo.", fr: "C'est votre propre réglage, pas un pouvoir sur quelqu'un d'autre — il faut donc votre jeton en tant que personne, et non en tant que propriétaire d'un profil. Connectez-vous en votre nom pour le définir.", de: "Das ist Ihre eigene Einstellung, keine, die Sie über jemand anderen haben — es braucht also Ihr Token als Person und nicht als Profilbesitzer. Melden Sie sich als Sie selbst an, um es zu setzen.", pt: "Este é o seu próprio controlo, não um que exerça sobre outra pessoa — por isso precisa do seu token como pessoa e não como proprietário de um perfil. Entre como você mesmo para o definir.", it: "Questo è un tuo controllo, non uno che eserciti su qualcun altro — quindi serve il tuo token come persona e non come proprietario di un profilo. Accedi come te stesso per impostarlo.", ja: "これはあなた自身の設定であり、他人に対して持つ権限ではありません — ですからプロフィールの所有者としてではなく、一人の人としてのトークンが必要です。ご自身としてサインインして設定してください。", zh: "这是你自己的控制项，而不是你对别人行使的权力——所以它需要你作为个人的令牌，而非资料所有者的令牌。请以你自己的身份登录来设置。", hi: "यह आपका अपना नियंत्रण है, किसी और पर चलाया जाने वाला नहीं — इसलिए इसके लिए प्रोफ़ाइल-स्वामी नहीं, बल्कि एक व्यक्ति के रूप में आपका टोकन चाहिए। इसे तय करने के लिए ख़ुद के रूप में साइन इन करें।", ar: "هذا ضبط يخصّك أنت، لا سلطة تملكها على غيرك — لذا يلزمه رمزك بصفتك شخصًا لا بصفتك مالك ملف. سجّل الدخول بصفتك أنت لضبطه.",
+  },
+  "rch.rate": {
+    en: "Rate an exchange", es: "Valorar un intercambio", fr: "Noter un échange", de: "Einen Austausch bewerten", pt: "Avaliar uma troca", it: "Valuta uno scambio", ja: "やり取りを評価する", zh: "为一次往来评分", hi: "किसी आदान-प्रदान को आँकें", ar: "قيّم تبادلًا",
+  },
+  "rch.rate.pitch": {
+    en: "Gated on the rater's own token. A rating in somebody else's name is a lie about what they thought, and a thumbs-up is also the trigger for contributing that exchange to the shared model — so it is not a button anybody else gets to press for you.", es: "Sujeto al token de quien valora. Una valoración en nombre de otra persona es una mentira sobre lo que pensó, y un pulgar arriba es además lo que envía ese intercambio al modelo compartido — así que no es un botón que otro pueda pulsar por usted.", fr: "Conditionné au jeton de celui qui note. Une note au nom de quelqu'un d'autre est un mensonge sur ce qu'il a pensé, et un pouce levé déclenche aussi le versement de cet échange au modèle partagé — ce n'est donc pas un bouton qu'un autre presse à votre place.", de: "An das Token des Bewertenden gebunden. Eine Bewertung in fremdem Namen ist eine Lüge darüber, was diese Person dachte, und ein Daumen hoch löst außerdem aus, dass dieser Austausch ins geteilte Modell fließt — kein Knopf also, den jemand anderes für Sie drückt.", pt: "Dependente do token de quem avalia. Uma avaliação em nome de outra pessoa é uma mentira sobre o que ela pensou, e um polegar para cima é também o que envia essa troca para o modelo partilhado — por isso não é um botão que outro possa carregar por si.", it: "Vincolato al token di chi valuta. Una valutazione a nome di qualcun altro è una menzogna su ciò che ha pensato, e un pollice su è anche ciò che manda quello scambio al modello condiviso — quindi non è un pulsante che un altro preme al posto tuo.", ja: "評価する本人のトークンが必要です。他人の名前での評価はその人が何を思ったかについての嘘であり、しかも高評価は、そのやり取りを共有モデルへ提供する引き金でもあります — ですから、誰かが代わりに押してよいボタンではありません。", zh: "以评分者本人的令牌为准。以他人之名给出的评分，是对那个人想法的谎言；而点赞同时也是把这次往来贡献给共享模型的触发条件——所以这不是别人可以替你按下的按钮。", hi: "आँकने वाले के अपने टोकन पर निर्भर। किसी और के नाम पर दी गई राय उस व्यक्ति के विचार के बारे में झूठ है, और अंगूठा-ऊपर उस आदान-प्रदान को साझा मॉडल तक पहुँचाने का ट्रिगर भी है — इसलिए यह ऐसा बटन नहीं जिसे कोई और आपके लिए दबा सके।", ar: "مشروط برمز المقيّم نفسه. التقييم باسم شخص آخر كذب على ما ظنّه، كما أن الإعجاب هو أيضًا ما يدفع بذلك التبادل إلى النموذج المشترك — فليس زرًّا يضغطه غيرك نيابةً عنك.",
+  },
+  "rch.up": {
+    en: "👍 good", es: "👍 bien", fr: "👍 bien", de: "👍 gut", pt: "👍 bom", it: "👍 bene", ja: "👍 良い", zh: "👍 好", hi: "👍 अच्छा", ar: "👍 جيد",
+  },
+  "rch.down": {
+    en: "👎 not good", es: "👎 no está bien", fr: "👎 pas bien", de: "👎 nicht gut", pt: "👎 não foi bom", it: "👎 non va", ja: "👎 良くない", zh: "👎 不好", hi: "👎 अच्छा नहीं", ar: "👎 ليس جيدًا",
+  },
+  "rch.lastseen": {
+    en: "Last seen {when} · {what}.", es: "Visto por última vez {when} · {what}.", fr: "Vu pour la dernière fois {when} · {what}.", de: "Zuletzt gesehen {when} · {what}.", pt: "Visto pela última vez {when} · {what}.", it: "Visto l'ultima volta {when} · {what}.", ja: "最終確認 {when} · {what}。", zh: "最后一次出现 {when} · {what}。", hi: "अंतिम बार देखा गया {when} · {what}।", ar: "آخر ظهور {when} · {what}.",
+  },
+  "rch.contributed": {
+    en: "this exchange was contributed to the shared model, anonymised", es: "este intercambio se aportó al modelo compartido, anonimizado", fr: "cet échange a été versé au modèle partagé, anonymisé", de: "dieser Austausch wurde anonymisiert zum geteilten Modell beigesteuert", pt: "esta troca foi contribuída para o modelo partilhado, anonimizada", it: "questo scambio è stato conferito al modello condiviso, anonimizzato", ja: "このやり取りは匿名化のうえ共有モデルに提供されました", zh: "这次往来已匿名贡献给共享模型", hi: "यह आदान-प्रदान गुमनाम करके साझा मॉडल को दिया गया", ar: "أُسهم بهذا التبادل في النموذج المشترك بعد إخفاء الهوية",
+  },
+  "rch.nothingleft": {
+    en: "nothing left this deployment", es: "nada salió de esta instalación", fr: "rien n'a quitté cette installation", de: "nichts hat diese Installation verlassen", pt: "nada saiu desta instalação", it: "niente ha lasciato questa installazione", ja: "この環境から出たものはありません", zh: "没有任何东西离开本部署", hi: "इस परिनियोजन से कुछ बाहर नहीं गया", ar: "لم يغادر شيء هذا التنصيب",
+  },
+  "rch.learned": {
+    en: "What it has learned about them", es: "Lo que ha aprendido sobre ellos", fr: "Ce qu'il a appris sur eux", de: "Was es über sie gelernt hat", pt: "O que aprendeu sobre eles", it: "Cosa ha imparato su di loro", ja: "その人について学んだこと", zh: "它对他们了解到了什么", hi: "इसने उनके बारे में क्या सीखा", ar: "ما تعلّمه عنهم",
+  },
+  "rch.learned.pitch": {
+    en: "A latent picture of one relationship, and what the profile actually behaves from. Owner-only, and shown rather than described: a number nobody can see is a number nobody can argue with.", es: "Una imagen latente de una relación, y aquello desde lo que el perfil realmente actúa. Solo para el propietario, y mostrada en vez de descrita: un número que nadie puede ver es un número que nadie puede discutir.", fr: "Une image latente d'une relation, et ce à partir de quoi le profil se comporte réellement. Réservé au propriétaire, et montré plutôt que décrit : un nombre que personne ne voit est un nombre que personne ne peut contester.", de: "Ein latentes Bild einer Beziehung, und das, wovon aus sich das Profil tatsächlich verhält. Nur für den Besitzer, und gezeigt statt beschrieben: eine Zahl, die niemand sehen kann, ist eine Zahl, der niemand widersprechen kann.", pt: "Uma imagem latente de uma relação, e aquilo a partir do qual o perfil realmente se comporta. Só para o proprietário, e mostrada em vez de descrita: um número que ninguém pode ver é um número que ninguém pode contestar.", it: "Un'immagine latente di una relazione, e ciò da cui il profilo si comporta davvero. Solo per il proprietario, e mostrata anziché descritta: un numero che nessuno può vedere è un numero che nessuno può contestare.", ja: "ひとつの関係の潜在的な像であり、プロフィールが実際にそこから振る舞うものです。所有者のみが見られ、説明ではなく提示されます：誰にも見えない数字は、誰にも異議を唱えられない数字です。", zh: "一段关系的潜在图像，也是这份资料实际据以行事的东西。仅所有者可见，且是展示而非描述：没人看得见的数字，就是没人能反驳的数字。", hi: "एक रिश्ते की अव्यक्त तस्वीर, और वह जिससे प्रोफ़ाइल वास्तव में बरतती है। केवल स्वामी के लिए, और वर्णित नहीं बल्कि दिखाई गई: जो संख्या कोई देख न सके, वह संख्या कोई चुनौती भी नहीं दे सकता।", ar: "صورة كامنة لعلاقة واحدة، وهي ما يتصرف الملف انطلاقًا منه فعلًا. للمالك وحده، ومعروضة لا موصوفة: رقم لا يراه أحد رقم لا يجادله أحد.",
+  },
+  "rch.show": {
+    en: "Show it", es: "Mostrarlo", fr: "L'afficher", de: "Anzeigen", pt: "Mostrá-lo", it: "Mostralo", ja: "表示する", zh: "显示它", hi: "इसे दिखाएँ", ar: "اعرضه",
+  },
+  "rch.version": {
+    en: "Version {v}, moved {when}.", es: "Versión {v}, movida {when}.", fr: "Version {v}, modifiée {when}.", de: "Version {v}, bewegt {when}.", pt: "Versão {v}, movida {when}.", it: "Versione {v}, mossa {when}.", ja: "バージョン {v}、更新 {when}。", zh: "版本 {v}，变动于 {when}。", hi: "संस्करण {v}, हिला {when}।", ar: "الإصدار {v}، تحرّك {when}.",
+  },
+  "vis.title": {
+    en: "Visiting, and being found", es: "Visitar, y ser encontrado", fr: "Rendre visite, et être trouvé", de: "Zu Besuch, und gefunden werden", pt: "Visitar, e ser encontrado", it: "Far visita, ed essere trovato", ja: "訪ねること、そして見つけられること", zh: "造访，以及被找到", hi: "मिलने जाना, और मिल जाना", ar: "الزيارة، وأن يُعثَر عليك",
+  },
+  "vis.lead": {
+    en: "Two halves of the same idea: standing in front of somebody else's desk, and leaving your own profile somewhere for a stranger to find.", es: "Dos mitades de la misma idea: estar delante del mostrador de otra persona, y dejar su propio perfil en algún sitio para que lo encuentre un desconocido.", fr: "Deux moitiés d'une même idée : se tenir devant le comptoir de quelqu'un d'autre, et laisser son propre profil quelque part pour qu'un inconnu le trouve.", de: "Zwei Hälften derselben Idee: vor dem Tresen einer anderen Person zu stehen, und das eigene Profil irgendwo zu hinterlassen, damit eine fremde Person es findet.", pt: "Duas metades da mesma ideia: estar em frente ao balcão de outra pessoa, e deixar o seu próprio perfil algures para um desconhecido encontrar.", it: "Due metà della stessa idea: stare davanti al banco di qualcun altro, e lasciare il proprio profilo da qualche parte perché uno sconosciuto lo trovi.", ja: "同じ考えの二つの半分です：誰かのデスクの前に立つことと、見知らぬ人が見つけられるように自分のプロフィールをどこかに置いておくこと。", zh: "同一个想法的两半：站在别人的柜台前，以及把自己的资料留在某处让陌生人找到。", hi: "एक ही विचार के दो हिस्से: किसी और के डेस्क के सामने खड़ा होना, और अपनी प्रोफ़ाइल कहीं छोड़ देना ताकि कोई अजनबी उसे पा सके।", ar: "نصفان لفكرة واحدة: أن تقف أمام مكتب شخص آخر، وأن تترك ملفك في مكان ما ليعثر عليه غريب.",
+  },
+  "vis.desk": {
+    en: "Stand in front of a desk", es: "Ponerse ante un mostrador", fr: "Se tenir devant un comptoir", de: "Vor einem Tresen stehen", pt: "Ficar em frente a um balcão", it: "Mettersi davanti a un banco", ja: "デスクの前に立つ", zh: "站到柜台前", hi: "किसी डेस्क के सामने खड़े हों", ar: "قف أمام مكتب",
+  },
+  "vis.desk.pitch": {
+    en: "The card is public — a desk is a shopfront. So is the bell: the visitor at an empty chair is exactly the person who has no account yet. An 18+ stream is the one exception, because an anonymous ping channel to an adult performer is not something to hand out.", es: "La ficha es pública — un mostrador es un escaparate. También lo es el timbre: quien llega a una silla vacía es justo la persona que aún no tiene cuenta. Una emisión +18 es la única excepción, porque un canal anónimo de aviso a un artista adulto no es algo que se reparta.", fr: "La fiche est publique — un comptoir est une devanture. La sonnette aussi : le visiteur devant une chaise vide est précisément la personne qui n'a pas encore de compte. Un flux 18+ est la seule exception, car un canal de sonnette anonyme vers un artiste adulte n'est pas une chose à distribuer.", de: "Die Karte ist öffentlich — ein Tresen ist eine Ladenfront. Die Klingel auch: Wer vor einem leeren Stuhl steht, ist genau die Person, die noch kein Konto hat. Ein 18+-Stream ist die eine Ausnahme, denn ein anonymer Klingelkanal zu einer erwachsenen Darstellerin ist nichts, was man verteilt.", pt: "O cartão é público — um balcão é uma montra. A campainha também: quem chega a uma cadeira vazia é exatamente a pessoa que ainda não tem conta. Uma transmissão 18+ é a única exceção, porque um canal anónimo de aviso para um artista adulto não é coisa que se distribua.", it: "La scheda è pubblica — un banco è una vetrina. Lo è anche il campanello: chi si presenta a una sedia vuota è proprio la persona che non ha ancora un account. Uno stream 18+ è l'unica eccezione, perché un canale anonimo di richiamo verso un performer adulto non è cosa da distribuire.", ja: "カードは公開です — デスクは店先です。呼び鈴も同じで、空いた椅子の前に立つ訪問者こそ、まだアカウントを持っていない人です。18+ の配信だけは例外です。成人向けの演者へ匿名で呼び出せる経路は、配って回るものではないからです。", zh: "这张卡片是公开的——柜台就是店面。门铃也一样：站在空椅子前的访客，正是那个还没有账户的人。18+ 直播是唯一的例外，因为通往成人表演者的匿名呼叫通道，不是可以随便发放的东西。", hi: "कार्ड सार्वजनिक है — डेस्क एक दुकान का मुख है। घंटी भी वैसी ही है: ख़ाली कुर्सी के सामने खड़ा आगंतुक ठीक वही व्यक्ति है जिसका अभी खाता नहीं है। 18+ स्ट्रीम एकमात्र अपवाद है, क्योंकि किसी वयस्क कलाकार तक गुमनाम पिंग का रास्ता बाँटने की चीज़ नहीं है।", ar: "البطاقة عامة — المكتب واجهة متجر. والجرس كذلك: الزائر أمام كرسي فارغ هو بالضبط من لا حساب له بعد. البثّ لمن هم فوق 18 هو الاستثناء الوحيد، لأن قناة نداء مجهولة إلى مؤدٍّ بالغ ليست شيئًا يُوزَّع.",
+  },
+  "vis.desk.ph": {
+    en: "a desk id, or scan the code on the counter", es: "un id de mostrador, o escanee el código del mostrador", fr: "un id de comptoir, ou scannez le code sur le comptoir", de: "eine Tresen-ID, oder scannen Sie den Code auf der Theke", pt: "um id de balcão, ou digitalize o código no balcão", it: "un id di banco, o scansiona il codice sul bancone", ja: "デスクID、またはカウンターのコードをスキャン", zh: "柜台 ID，或扫描柜台上的二维码", hi: "डेस्क आईडी, या काउंटर पर लगा कोड स्कैन करें", ar: "معرّف مكتب، أو امسح الرمز على الطاولة",
+  },
+  "vis.look": {
+    en: "Look", es: "Mirar", fr: "Regarder", de: "Nachsehen", pt: "Ver", it: "Guarda", ja: "見る", zh: "看看", hi: "देखें", ar: "انظر",
+  },
+  "vis.here": {
+    en: "They are here.", es: "Están aquí.", fr: "Ils sont là.", de: "Sie sind da.", pt: "Estão aqui.", it: "Ci sono.", ja: "います。", zh: "对方在。", hi: "वे यहाँ हैं।", ar: "إنهم هنا.",
+  },
+  "vis.away": {
+    en: "They are away — ring the bell and they will see it.", es: "No están — toque el timbre y lo verán.", fr: "Ils sont absents — sonnez et ils le verront.", de: "Sie sind gerade weg — klingeln Sie, und sie sehen es.", pt: "Estão ausentes — toque a campainha e verão.", it: "Non ci sono — suona il campanello e lo vedranno.", ja: "席を外しています — 呼び鈴を鳴らせば気づきます。", zh: "对方不在——按门铃，他们会看到。", hi: "वे अभी नहीं हैं — घंटी बजाइए, वे देख लेंगे।", ar: "إنهم غائبون — اقرع الجرس وسيرونه.",
+  },
+  "vis.attested": {
+    en: "Attested by {who}: “{basis}”.", es: "Atestiguado por {who}: «{basis}».", fr: "Attesté par {who} : « {basis} ».", de: "Bezeugt von {who}: „{basis}“.", pt: "Atestado por {who}: «{basis}».", it: "Attestato da {who}: «{basis}».", ja: "{who} による証明: 「{basis}」。", zh: "由 {who} 证实：“{basis}”。", hi: "{who} द्वारा प्रमाणित: “{basis}”।", ar: "بشهادة {who}: «{basis}».",
+  },
+  "vis.signed": {
+    en: "Signed, so it can be checked.", es: "Firmado, así que puede comprobarse.", fr: "Signé, donc vérifiable.", de: "Unterschrieben, also überprüfbar.", pt: "Assinado, por isso pode ser verificado.", it: "Firmato, quindi verificabile.", ja: "署名済みなので確認できます。", zh: "已签署，因此可以核验。", hi: "हस्ताक्षरित, इसलिए जाँचा जा सकता है।", ar: "موقّع، فيمكن التحقق منه.",
+  },
+  "vis.recorded": {
+    en: "Recorded, not proven — nobody has signed for it.", es: "Registrado, no probado — nadie ha firmado por ello.", fr: "Consigné, non prouvé — personne n'a signé pour cela.", de: "Verzeichnet, nicht bewiesen — niemand hat dafür unterschrieben.", pt: "Registado, não provado — ninguém assinou por isso.", it: "Registrato, non provato — nessuno ha firmato per questo.", ja: "記録はありますが証明はされていません — 誰も署名していません。", zh: "有记录，但未获证明——没有人为此签署。", hi: "दर्ज है, सिद्ध नहीं — इसके लिए किसी ने हस्ताक्षर नहीं किए।", ar: "مسجَّل لا مُثبَت — لم يوقّع عليه أحد.",
+  },
+  "vis.agewall": {
+    en: "18+ — sign in with a verified adult account to see any of it.", es: "+18 — inicie sesión con una cuenta adulta verificada para ver algo de esto.", fr: "18+ — connectez-vous avec un compte adulte vérifié pour en voir quoi que ce soit.", de: "18+ — melden Sie sich mit einem verifizierten Erwachsenenkonto an, um überhaupt etwas zu sehen.", pt: "18+ — entre com uma conta adulta verificada para ver seja o que for.", it: "18+ — accedi con un account adulto verificato per vedere qualcosa.", ja: "18+ — 何かを見るには、成人確認済みのアカウントでサインインしてください。", zh: "18+ — 请使用已验证的成人账户登录，才能看到任何内容。", hi: "18+ — इसमें से कुछ भी देखने के लिए सत्यापित वयस्क खाते से साइन इन करें।", ar: "18+ — سجّل الدخول بحساب بالغ موثّق لترى أي شيء منه.",
+  },
+  "vis.ring": {
+    en: "Ring, or come in", es: "Llamar, o pasar", fr: "Sonner, ou entrer", de: "Klingeln, oder hereinkommen", pt: "Tocar, ou entrar", it: "Suona, o entra", ja: "呼ぶか、入るか", zh: "按铃，或进来", hi: "घंटी बजाएँ, या भीतर आएँ", ar: "اقرع، أو ادخل",
+  },
+  "vis.note.ph": {
+    en: "anything you want them to see (optional)", es: "lo que quiera que vean (opcional)", fr: "ce que vous voulez leur montrer (facultatif)", de: "was sie sehen sollen (optional)", pt: "o que quiser que vejam (opcional)", it: "ciò che vuoi che vedano (facoltativo)", ja: "見てほしいことがあれば（任意）", zh: "你希望他们看到的任何内容（可选）", hi: "जो आप उन्हें दिखाना चाहें (वैकल्पिक)", ar: "أي شيء تريدهم أن يروه (اختياري)",
+  },
+  "vis.ringbell": {
+    en: "Ring the bell", es: "Tocar el timbre", fr: "Sonner", de: "Klingeln", pt: "Tocar a campainha", it: "Suona il campanello", ja: "呼び鈴を鳴らす", zh: "按门铃", hi: "घंटी बजाएँ", ar: "اقرع الجرس",
+  },
+  "vis.waiting.one": {
+    en: "You are the only one waiting.", es: "Es el único que espera.", fr: "Vous êtes le seul à attendre.", de: "Sie sind die einzige wartende Person.", pt: "É o único à espera.", it: "Sei l'unico in attesa.", ja: "待っているのはあなただけです。", zh: "只有你一个人在等。", hi: "प्रतीक्षा में सिर्फ़ आप हैं।", ar: "أنت الوحيد المنتظر.",
+  },
+  "vis.waiting.n": {
+    en: "{n} waiting, including you.", es: "{n} esperando, incluido usted.", fr: "{n} en attente, vous compris.", de: "{n} warten, Sie eingeschlossen.", pt: "{n} à espera, incluindo você.", it: "{n} in attesa, te compreso.", ja: "あなたを含めて{n}人が待っています。", zh: "{n} 人在等，包括你。", hi: "{n} प्रतीक्षा में, आप सहित।", ar: "{n} في الانتظار، وأنت منهم.",
+  },
+  "vis.watch": {
+    en: "Watch the stream", es: "Ver la emisión", fr: "Regarder le flux", de: "Den Stream ansehen", pt: "Ver a transmissão", it: "Guarda lo stream", ja: "配信を見る", zh: "观看直播", hi: "स्ट्रीम देखें", ar: "شاهد البثّ",
+  },
+  "vis.inroom": {
+    en: "In room {room}. {likes} likes, {comments} comments over the picture. Never marked as AI: there is a real person on the other end.", es: "En la sala {room}. {likes} me gusta, {comments} comentarios sobre la imagen. Nunca marcado como IA: hay una persona real al otro lado.", fr: "Dans le salon {room}. {likes} j'aime, {comments} commentaires par-dessus l'image. Jamais marqué comme IA : il y a une vraie personne à l'autre bout.", de: "In Raum {room}. {likes} Likes, {comments} Kommentare über dem Bild. Nie als KI markiert: am anderen Ende ist ein echter Mensch.", pt: "Na sala {room}. {likes} gostos, {comments} comentários sobre a imagem. Nunca marcado como IA: há uma pessoa real do outro lado.", it: "Nella stanza {room}. {likes} mi piace, {comments} commenti sopra l'immagine. Mai contrassegnato come IA: dall'altra parte c'è una persona vera.", ja: "ルーム {room} にいます。いいね {likes} 件、映像の上のコメント {comments} 件。AI の表示は付きません：向こう側にいるのは本物の人間です。", zh: "在房间 {room}。{likes} 个赞，画面上有 {comments} 条评论。从不标记为 AI：另一端是真人。", hi: "कक्ष {room} में। {likes} पसंद, तस्वीर पर {comments} टिप्पणियाँ। कभी AI के रूप में चिह्नित नहीं: दूसरी ओर एक असली इंसान है।", ar: "في الغرفة {room}. {likes} إعجابًا، و{comments} تعليقًا فوق الصورة. لا يُوسَم أبدًا بأنه ذكاء اصطناعي: على الطرف الآخر إنسان حقيقي.",
+  },
+  "vis.hand": {
+    en: "Put a hand up", es: "Levantar la mano", fr: "Lever la main", de: "Sich melden", pt: "Levantar a mão", it: "Alza la mano", ja: "手を挙げる", zh: "举手", hi: "हाथ उठाएँ", ar: "ارفع يدك",
+  },
+  "vis.hand.on": {
+    en: "on", es: "en", fr: "sur", de: "auf", pt: "em", it: "su", ja: "に出る", zh: "上", hi: "पर", ar: "على",
+  },
+  "vis.hand.pitch": {
+    en: "Coming up {on} the stream is the host's call, so this asks rather than does — and it needs an account, because the host is deciding about a person rather than an anonymous request. Nothing is minted until you are somebody.", es: "Salir {on} la emisión lo decide el anfitrión, así que esto pide en vez de hacer — y necesita una cuenta, porque el anfitrión decide sobre una persona y no sobre una petición anónima. Nada se crea hasta que usted es alguien.", fr: "Passer {on} le flux relève de l'hôte, donc ceci demande au lieu de faire — et cela exige un compte, car l'hôte décide au sujet d'une personne et non d'une requête anonyme. Rien n'est créé tant que vous n'êtes pas quelqu'un.", de: "Ob Sie {on} den Stream kommen, entscheidet die gastgebende Person, also fragt dies, statt zu tun — und es braucht ein Konto, denn entschieden wird über einen Menschen, nicht über eine anonyme Anfrage. Nichts wird angelegt, bevor Sie jemand sind.", pt: "Aparecer {on} transmissão é decisão do anfitrião, por isso isto pede em vez de fazer — e precisa de conta, porque o anfitrião está a decidir sobre uma pessoa e não sobre um pedido anónimo. Nada é criado até você ser alguém.", it: "Salire {on} stream è una scelta di chi ospita, quindi questo chiede invece di fare — e richiede un account, perché chi ospita decide su una persona e non su una richiesta anonima. Niente viene creato finché non sei qualcuno.", ja: "配信{on}かどうかはホストの判断です。ですからこれは実行ではなく依頼です — そしてアカウントが必要です。ホストが判断しているのは匿名の要求ではなく一人の人間についてだからです。あなたが誰かになるまで、何も作られません。", zh: "能否{on}直播由主人决定，所以这是请求而非执行——而且需要账户，因为主人是在对一个人做决定，而不是对一个匿名请求。在你成为某个人之前，什么都不会被创建。", hi: "स्ट्रीम {on} आना मेज़बान का निर्णय है, इसलिए यह करता नहीं, पूछता है — और इसके लिए खाता चाहिए, क्योंकि मेज़बान किसी गुमनाम अनुरोध पर नहीं, एक व्यक्ति पर निर्णय ले रहा है। जब तक आप कोई नहीं हैं, कुछ भी नहीं बनाया जाता।", ar: "الظهور {on} البثّ قرار المضيف، فهذا يطلب ولا يفعل — ويحتاج حسابًا، لأن المضيف يقرر بشأن شخص لا بشأن طلب مجهول. لا يُنشأ شيء حتى تكون أحدًا.",
+  },
+  "vis.why.ph": {
+    en: "why you would like to come up", es: "por qué le gustaría salir", fr: "pourquoi vous aimeriez passer", de: "warum Sie dazukommen möchten", pt: "porque gostaria de aparecer", it: "perché vorresti salire", ja: "出たい理由", zh: "你希望上镜的原因", hi: "आप क्यों आना चाहेंगे", ar: "لماذا تودّ الظهور",
+  },
+  "vis.notvisitor": {
+    en: "You are not signed in as a visitor, so this would be refused.", es: "No ha iniciado sesión como visitante, así que esto se rechazaría.", fr: "Vous n'êtes pas connecté en tant que visiteur, donc ceci serait refusé.", de: "Sie sind nicht als Besucher angemeldet, also würde dies abgelehnt.", pt: "Não iniciou sessão como visitante, por isso isto seria recusado.", it: "Non hai effettuato l'accesso come visitatore, quindi questo verrebbe rifiutato.", ja: "訪問者としてサインインしていないため、これは拒否されます。", zh: "你尚未以访客身份登录，因此这会被拒绝。", hi: "आप आगंतुक के रूप में साइन इन नहीं हैं, इसलिए यह अस्वीकार होगा।", ar: "لم تسجّل الدخول بصفتك زائرًا، لذا سيُرفض هذا.",
+  },
+  "vis.askup": {
+    en: "Ask to come up", es: "Pedir salir", fr: "Demander à passer", de: "Um Teilnahme bitten", pt: "Pedir para aparecer", it: "Chiedi di salire", ja: "出たいと頼む", zh: "请求上镜", hi: "आने की अनुमति माँगें", ar: "اطلب الظهور",
+  },
+  "vis.hand.said": {
+    en: "Hand up. Nothing happens until they accept.", es: "Mano levantada. No pasa nada hasta que acepten.", fr: "Main levée. Rien ne se passe tant qu'ils n'acceptent pas.", de: "Hand oben. Nichts geschieht, bis sie zustimmen.", pt: "Mão no ar. Nada acontece até aceitarem.", it: "Mano alzata. Non succede niente finché non accettano.", ja: "手を挙げました。相手が受け入れるまで何も起きません。", zh: "手已举起。在对方接受之前，什么都不会发生。", hi: "हाथ उठा दिया। जब तक वे स्वीकार न करें, कुछ नहीं होगा।", ar: "رُفعت اليد. لا شيء يحدث حتى يقبلوا.",
+  },
+  "vis.hand.wait": {
+    en: "Waiting on the host.", es: "A la espera del anfitrión.", fr: "En attente de l'hôte.", de: "Wartet auf die gastgebende Person.", pt: "À espera do anfitrião.", it: "In attesa di chi ospita.", ja: "ホストの返事待ちです。", zh: "等待主人回应。", hi: "मेज़बान की प्रतीक्षा में।", ar: "في انتظار المضيف.",
+  },
+  "vis.hand.status": {
+    en: "Status: {status}.", es: "Estado: {status}.", fr: "Statut : {status}.", de: "Status: {status}.", pt: "Estado: {status}.", it: "Stato: {status}.", ja: "状態: {status}。", zh: "状态：{status}。", hi: "स्थिति: {status}।", ar: "الحالة: {status}.",
+  },
+  "vis.hand.onstream": {
+    en: " You are on the stream.", es: " Está en la emisión.", fr: " Vous êtes sur le flux.", de: " Sie sind im Stream.", pt: " Está na transmissão.", it: " Sei nello stream.", ja: " 配信に出ています。", zh: "你已在直播中。", hi: " आप स्ट्रीम पर हैं।", ar: " أنت على البثّ.",
+  },
+  "vis.leave": {
+    en: "Leave this profile somewhere", es: "Dejar este perfil en algún sitio", fr: "Laisser ce profil quelque part", de: "Dieses Profil irgendwo hinterlassen", pt: "Deixar este perfil algures", it: "Lascia questo profilo da qualche parte", ja: "このプロフィールをどこかに置く", zh: "把这份资料留在某处", hi: "इस प्रोफ़ाइल को कहीं छोड़ें", ar: "اترك هذا الملف في مكان ما",
+  },
+  "vis.leave.pitch": {
+    en: "A printed code on a bench, at a meeting, on a counter. Where a profile is left is a decision about the profile — a recovery sponsor's code belongs at a meeting and not on a billboard — so only its owner may place one, list them, or pick one back up.", es: "Un código impreso en un banco, en una reunión, en un mostrador. Dónde se deja un perfil es una decisión sobre el perfil — el código de un padrino de recuperación pertenece a una reunión y no a una valla publicitaria — así que solo su propietario puede colocarlo, listarlos o recogerlo.", fr: "Un code imprimé sur un banc, à une réunion, sur un comptoir. L'endroit où l'on laisse un profil est une décision au sujet du profil — le code d'un parrain de rétablissement a sa place à une réunion et non sur un panneau publicitaire — donc seul son propriétaire peut en poser un, les lister ou en reprendre un.", de: "Ein gedruckter Code auf einer Bank, bei einem Treffen, auf einem Tresen. Wo ein Profil hinterlassen wird, ist eine Entscheidung über das Profil — der Code eines Suchtpaten gehört zu einem Treffen und nicht auf eine Plakatwand — deshalb darf nur der Besitzer einen anbringen, sie auflisten oder wieder einsammeln.", pt: "Um código impresso num banco de jardim, numa reunião, num balcão. Onde um perfil é deixado é uma decisão sobre o perfil — o código de um padrinho de recuperação pertence a uma reunião e não a um outdoor — por isso só o seu proprietário pode colocar um, listá-los ou recolher um.", it: "Un codice stampato su una panchina, a un incontro, su un bancone. Dove si lascia un profilo è una decisione sul profilo — il codice di un padrino di recupero sta a un incontro e non su un cartellone — quindi solo il proprietario può posarne uno, elencarli o riprenderselo.", ja: "ベンチに、集まりの場に、カウンターに貼られた印刷コード。プロフィールをどこに置くかは、そのプロフィールについての判断です — 回復支援のスポンサーのコードは集まりの場にあるべきで、屋外広告にあるべきではありません — ですから設置も、一覧も、回収も、所有者だけができます。", zh: "印在长椅上、会场里、柜台上的一段代码。把资料留在哪里，是关于这份资料的决定——一位戒瘾互助担保人的代码属于聚会现场，而不属于广告牌——所以只有其所有者可以放置、列出或收回。", hi: "बेंच पर, किसी बैठक में, काउंटर पर छपा एक कोड। प्रोफ़ाइल कहाँ छोड़ी जाती है, यह उस प्रोफ़ाइल के बारे में निर्णय है — किसी रिकवरी प्रायोजक का कोड बैठक में जगह पाता है, होर्डिंग पर नहीं — इसलिए केवल इसका स्वामी ही इसे रख सकता, सूचीबद्ध कर सकता या वापस उठा सकता है।", ar: "رمز مطبوع على مقعد، في اجتماع، على طاولة. أين يُترك الملف قرارٌ بشأن الملف — رمز عرّاب التعافي مكانه اجتماع لا لوحة إعلانات — لذا لا يضعه أو يسرده أو يرفعه إلا مالكه.",
+  },
+  "vis.label.ph": {
+    en: "what to call it", es: "cómo llamarlo", fr: "comment l'appeler", de: "wie es heißen soll", pt: "como lhe chamar", it: "come chiamarlo", ja: "何と呼ぶか", zh: "给它起个名字", hi: "इसे क्या कहें", ar: "بمَ تسمّيه",
+  },
+  "vis.where.ph": {
+    en: "where it is going", es: "dónde va a ir", fr: "où il va", de: "wohin es kommt", pt: "onde vai ficar", it: "dove andrà", ja: "どこに置くか", zh: "它将放在哪里", hi: "यह कहाँ जाएगा", ar: "إلى أين سيذهب",
+  },
+  "vis.mode.chat": {
+    en: "a private thread each", es: "un hilo privado para cada uno", fr: "un fil privé pour chacun", de: "für jeden ein eigener privater Verlauf", pt: "uma conversa privada para cada um", it: "una conversazione privata a testa", ja: "一人ずつの個別スレッド", zh: "每人一条私密对话", hi: "हर एक के लिए निजी सूत्र", ar: "محادثة خاصة لكل واحد",
+  },
+  "vis.mode.room": {
+    en: "one room everybody joins", es: "una sala a la que entran todos", fr: "un salon où tout le monde entre", de: "ein Raum, dem alle beitreten", pt: "uma sala onde entram todos", it: "una stanza in cui entrano tutti", ja: "全員が入る一つのルーム", zh: "所有人共处一室", hi: "एक कक्ष जिसमें सब शामिल हों", ar: "غرفة واحدة ينضم إليها الجميع",
+  },
+  "vis.room.pitch": {
+    en: "One room means the people who found the same sticker end up talking to it together. A rated profile is placed one-to-one and asking for a room is refused rather than quietly downgraded.", es: "Una sala significa que quienes encontraron la misma pegatina acaban hablando con él juntos. Un perfil con clasificación se coloca uno a uno, y pedir una sala se rechaza en lugar de degradarse en silencio.", fr: "Un salon signifie que les personnes ayant trouvé le même autocollant finissent par lui parler ensemble. Un profil classé est posé en tête-à-tête, et demander un salon est refusé plutôt que discrètement rétrogradé.", de: "Ein Raum heißt: Wer denselben Aufkleber gefunden hat, spricht am Ende gemeinsam mit ihm. Ein altersbewertetes Profil wird eins zu eins angebracht, und die Bitte um einen Raum wird abgelehnt statt stillschweigend herabgestuft.", pt: "Uma sala significa que quem encontrou o mesmo autocolante acaba a falar com ele em conjunto. Um perfil classificado é colocado um-para-um e pedir uma sala é recusado em vez de silenciosamente rebaixado.", it: "Una stanza significa che chi ha trovato lo stesso adesivo finisce per parlargli insieme. Un profilo con classificazione si posa uno a uno, e chiedere una stanza viene rifiutato anziché declassato in silenzio.", ja: "一つのルームにするということは、同じステッカーを見つけた人たちが一緒に話すことになるという意味です。レーティングのあるプロフィールは一対一でのみ置かれ、ルームを求めると、黙って格下げされるのではなく拒否されます。", zh: "选择一个房间，意味着找到同一张贴纸的人最终会一起与它交谈。带分级的资料只能一对一放置，请求房间会被拒绝，而不是被悄悄降级。", hi: "एक कक्ष का अर्थ है कि जिन्हें वही स्टिकर मिला, वे मिलकर इससे बात करेंगे। श्रेणीबद्ध प्रोफ़ाइल एक-से-एक रखी जाती है, और कक्ष माँगने पर चुपचाप घटाया नहीं, बल्कि इनकार किया जाता है।", ar: "الغرفة الواحدة تعني أن من وجدوا الملصق نفسه سينتهي بهم الأمر يتحدثون إليه معًا. الملف المصنَّف يوضع واحدًا لواحد، وطلب غرفة يُرفض بدل أن يُخفَّض بصمت.",
+  },
+  "vis.place": {
+    en: "Place it", es: "Colocarlo", fr: "Le poser", de: "Anbringen", pt: "Colocá-lo", it: "Posalo", ja: "置く", zh: "放置", hi: "रखें", ar: "ضعه",
+  },
+  "vis.placed.said": {
+    en: "Placed.", es: "Colocado.", fr: "Posé.", de: "Angebracht.", pt: "Colocado.", it: "Posato.", ja: "置きました。", zh: "已放置。", hi: "रख दिया गया।", ar: "وُضع.",
+  },
+  "vis.print": {
+    en: "Print {url} — that is what the QR encodes.", es: "Imprima {url} — eso es lo que codifica el QR.", fr: "Imprimez {url} — c'est ce que le QR encode.", de: "Drucken Sie {url} — das ist es, was der QR-Code enthält.", pt: "Imprima {url} — é isso que o QR codifica.", it: "Stampa {url} — è questo che il QR codifica.", ja: "{url} を印刷してください — QR が符号化しているのはこれです。", zh: "打印 {url} — 这就是二维码所编码的内容。", hi: "{url} छापें — QR यही एन्कोड करता है।", ar: "اطبع {url} — هذا ما يرمّزه رمز الاستجابة السريعة.",
+  },
+  "vis.oneroom": {
+    en: " Everyone who scans it lands in one room.", es: " Todos los que lo escaneen llegan a una misma sala.", fr: " Tous ceux qui le scannent arrivent dans un même salon.", de: " Alle, die ihn scannen, landen in einem Raum.", pt: " Todos os que o digitalizarem chegam a uma mesma sala.", it: " Chiunque lo scansioni arriva in un'unica stanza.", ja: "スキャンした人は全員同じルームに入ります。", zh: "扫描它的人都会进入同一个房间。", hi: " जो भी इसे स्कैन करेगा, एक ही कक्ष में पहुँचेगा.", ar: " كل من يمسحه يصل إلى غرفة واحدة.",
+  },
+  "vis.already": {
+    en: "Where it is already", es: "Dónde está ya", fr: "Où il est déjà", de: "Wo es schon ist", pt: "Onde já está", it: "Dov'è già", ja: "すでに置いてある場所", zh: "它已经在哪里", hi: "यह पहले से कहाँ है", ar: "أين هو بالفعل",
+  },
+  "vis.pickedup": {
+    en: "· picked up", es: "· recogido", fr: "· repris", de: "· wieder eingesammelt", pt: "· recolhido", it: "· ripreso", ja: "· 回収済み", zh: "· 已收回", hi: "· उठा लिया गया", ar: "· مرفوع",
+  },
+  "vis.scans.none": {
+    en: "Not scanned yet", es: "Aún sin escanear", fr: "Pas encore scanné", de: "Noch nicht gescannt", pt: "Ainda não digitalizado", it: "Non ancora scansionato", ja: "まだスキャンされていません", zh: "尚未被扫描", hi: "अभी तक स्कैन नहीं", ar: "لم يُمسح بعد",
+  },
+  "vis.scans.n": {
+    en: "{n} scan{s}", es: "{n} escaneos", fr: "{n} scans", de: "{n} Scans", pt: "{n} digitalizações", it: "{n} scansioni", ja: "スキャン{n}件", zh: "{n} 次扫描", hi: "{n} स्कैन", ar: "{n} مسحة",
+  },
+  "vis.sharedroom": {
+    en: " · one shared room", es: " · una sala compartida", fr: " · un salon partagé", de: " · ein gemeinsamer Raum", pt: " · uma sala partilhada", it: " · una stanza condivisa", ja: " · 共有ルーム一つ", zh: " · 一个共享房间", hi: " · एक साझा कक्ष", ar: " · غرفة مشتركة واحدة",
+  },
+  "vis.pickup": {
+    en: "Pick it up", es: "Recogerlo", fr: "Le reprendre", de: "Wieder einsammeln", pt: "Recolhê-lo", it: "Riprendilo", ja: "回収する", zh: "收回", hi: "इसे उठाएँ", ar: "ارفعه",
+  },
+  "vis.pickedup.said": {
+    en: "Picked up. The paper is still on the wall, so the code keeps answering — with nothing.", es: "Recogido. El papel sigue en la pared, así que el código sigue respondiendo — sin nada.", fr: "Repris. Le papier est toujours au mur, donc le code continue de répondre — avec rien.", de: "Wieder eingesammelt. Das Papier hängt noch an der Wand, der Code antwortet also weiter — mit nichts.", pt: "Recolhido. O papel continua na parede, por isso o código continua a responder — com nada.", it: "Ripreso. La carta è ancora sul muro, quindi il codice continua a rispondere — con niente.", ja: "回収しました。紙は壁に貼られたままなので、コードは答え続けます — 中身は何もありません。", zh: "已收回。纸还贴在墙上，所以这个码仍会作答——但答不出任何东西。", hi: "उठा लिया गया। काग़ज़ अब भी दीवार पर है, इसलिए कोड जवाब देता रहेगा — पर कुछ भी नहीं के साथ।", ar: "رُفع. الورقة ما زالت على الجدار، فيظل الرمز يجيب — بلا شيء.",
+  },
+  "vis.scan": {
+    en: "What a stranger sees when they scan it", es: "Lo que ve un desconocido al escanearlo", fr: "Ce qu'un inconnu voit en le scannant", de: "Was eine fremde Person beim Scannen sieht", pt: "O que um desconhecido vê ao digitalizá-lo", it: "Cosa vede uno sconosciuto quando lo scansiona", ja: "見知らぬ人がスキャンしたときに見えるもの", zh: "陌生人扫描它时会看到什么", hi: "स्कैन करने पर किसी अजनबी को क्या दिखता है", ar: "ما يراه غريب حين يمسحه",
+  },
+  "vis.scan.with": {
+    en: "with", es: "con", fr: "avec", de: "mit", pt: "com", it: "con", ja: "とともに", zh: "随", hi: "साथ", ar: "مع",
+  },
+  "vis.scan.pitch": {
+    en: "The overlay draws this over the sticker in the live viewfinder — nobody has navigated anywhere and the camera is still running. The mark travels {with} the card, so a surface cannot draw the face without also having been handed the disclosure to draw with it.", es: "La superposición dibuja esto sobre la pegatina en el visor en vivo — nadie ha navegado a ningún sitio y la cámara sigue funcionando. La marca viaja {with} la ficha, así que una superficie no puede dibujar la cara sin que también se le haya entregado la advertencia para dibujarla con ella.", fr: "La surimpression dessine ceci par-dessus l'autocollant dans le viseur en direct — personne n'a navigué nulle part et la caméra tourne toujours. La marque voyage {with} la fiche, si bien qu'une surface ne peut pas dessiner le visage sans qu'on lui ait aussi remis la mention à dessiner avec.", de: "Die Überlagerung zeichnet dies im Live-Sucher über den Aufkleber — niemand hat irgendwohin navigiert und die Kamera läuft weiter. Das Kennzeichen reist {with} der Karte, sodass eine Oberfläche das Gesicht nicht zeichnen kann, ohne auch den Hinweis erhalten zu haben, den sie mitzeichnen muss.", pt: "A sobreposição desenha isto por cima do autocolante no visor ao vivo — ninguém navegou para lado nenhum e a câmara continua a correr. A marca viaja {with} o cartão, por isso uma superfície não pode desenhar o rosto sem lhe terem entregado também o aviso para desenhar com ele.", it: "La sovrapposizione disegna questo sopra l'adesivo nel mirino dal vivo — nessuno ha navigato da nessuna parte e la fotocamera è ancora accesa. Il contrassegno viaggia {with} la scheda, così una superficie non può disegnare il volto senza aver ricevuto anche l'avviso da disegnare insieme.", ja: "オーバーレイは、ライブのファインダー内でステッカーの上にこれを描きます — 誰もどこかへ遷移しておらず、カメラは動いたままです。この印はカード{with}移動するので、表示面は、一緒に描くべき開示表示を渡されないかぎり顔を描くことができません。", zh: "叠加层会在实时取景画面中把这些画在贴纸上方——没有人跳转到任何地方，摄像头仍在运行。这个标记{with}卡片一同传递，因此任何显示面若没有同时拿到该披露标识，就无法绘制这张脸。", hi: "ओवरले इसे लाइव व्यूफ़ाइंडर में स्टिकर के ऊपर बनाता है — कोई कहीं नहीं गया और कैमरा अब भी चल रहा है। यह चिह्न कार्ड के {with} चलता है, इसलिए कोई सतह चेहरा तब तक नहीं बना सकती जब तक उसे उसके साथ बनाने योग्य प्रकटीकरण भी न सौंपा गया हो।", ar: "تُظهر الطبقة هذا فوق الملصق في عدسة العرض الحي — لم ينتقل أحد إلى أي مكان، والكاميرا ما زالت تعمل. تنتقل العلامة {with} البطاقة، فلا تستطيع أي واجهة رسم الوجه دون أن يكون قد سُلِّم إليها الإفصاح لترسمه معه.",
+  },
+  "vis.beacon.ph": {
+    en: "a beacon id", es: "un id de baliza", fr: "un id de balise", de: "eine Baken-ID", pt: "um id de baliza", it: "un id di beacon", ja: "ビーコンID", zh: "信标 ID", hi: "बीकन आईडी", ar: "معرّف منارة",
+  },
+  "vis.scanit": {
+    en: "Scan it", es: "Escanearlo", fr: "Le scanner", de: "Scannen", pt: "Digitalizá-lo", it: "Scansionalo", ja: "スキャンする", zh: "扫描它", hi: "स्कैन करें", ar: "امسحه",
+  },
+  "vis.scan.wall.default": {
+    en: "18+ — open in QRME with a verified adult account.", es: "+18 — ábralo en QRME con una cuenta adulta verificada.", fr: "18+ — ouvrez dans QRME avec un compte adulte vérifié.", de: "18+ — in QRME mit einem verifizierten Erwachsenenkonto öffnen.", pt: "18+ — abra no QRME com uma conta adulta verificada.", it: "18+ — apri in QRME con un account adulto verificato.", ja: "18+ — 成人確認済みのアカウントで QRME から開いてください。", zh: "18+ — 请使用已验证的成人账户在 QRME 中打开。", hi: "18+ — सत्यापित वयस्क खाते से QRME में खोलें।", ar: "18+ — افتحه في QRME بحساب بالغ موثّق.",
+  },
+  "vis.scan.wall": {
+    en: "Nothing else came back: not the name, not the portrait. The wall is drawn without ever holding what it refuses.", es: "No volvió nada más: ni el nombre, ni el retrato. El muro se dibuja sin llegar a sostener nunca lo que rechaza.", fr: "Rien d'autre n'est revenu : ni le nom, ni le portrait. Le mur est dessiné sans jamais détenir ce qu'il refuse.", de: "Sonst kam nichts zurück: nicht der Name, nicht das Porträt. Die Sperre wird gezeichnet, ohne je zu halten, was sie verweigert.", pt: "Nada mais voltou: nem o nome, nem o retrato. O muro é desenhado sem nunca chegar a segurar o que recusa.", it: "Non è tornato altro: né il nome, né il ritratto. Il muro è disegnato senza mai tenere ciò che rifiuta.", ja: "ほかには何も返ってきませんでした。名前も、肖像も。この壁は、拒んでいるものを一度も手にしないまま描かれます。", zh: "别的什么都没返回：名字没有，肖像也没有。这道墙在绘制时，从未持有过它所拒绝的东西。", hi: "और कुछ वापस नहीं आया: न नाम, न चित्र। यह दीवार उसे कभी अपने पास रखे बिना ही खींची जाती है जिसे वह मना करती है।", ar: "لم يعد شيء آخر: لا الاسم ولا الصورة. يُرسم الجدار دون أن يمسك يومًا بما يرفضه.",
+  },
+  "vis.marked": {
+    en: "The disclosure is already in the image.", es: "La advertencia ya está en la imagen.", fr: "La mention est déjà dans l'image.", de: "Der Hinweis steckt bereits im Bild.", pt: "O aviso já está na imagem.", it: "L'avviso è già nell'immagine.", ja: "開示表示はすでに画像の中にあります。", zh: "披露标识已经在图像里。", hi: "प्रकटीकरण पहले से ही छवि में है।", ar: "الإفصاح موجود في الصورة أصلًا.",
+  },
+  "vis.unmarked": {
+    en: "The image is unmarked, so the badge must be composited over it.", es: "La imagen no lleva marca, así que el distintivo debe superponerse sobre ella.", fr: "L'image n'est pas marquée, il faut donc y incruster le badge.", de: "Das Bild ist ungekennzeichnet, das Abzeichen muss also darübergelegt werden.", pt: "A imagem não está marcada, por isso o distintivo tem de ser sobreposto.", it: "L'immagine non è contrassegnata, quindi il distintivo va sovrapposto.", ja: "画像に印がないため、バッジを上に合成する必要があります。", zh: "图像未带标记，因此必须把徽标叠加上去。", hi: "छवि पर चिह्न नहीं है, इसलिए बैज को उसके ऊपर जोड़ना होगा।", ar: "الصورة غير موسومة، فيجب تركيب الشارة فوقها.",
+  },
+  "vis.scan.sharedroom": {
+    en: " Scanning joins one shared room.", es: " Escanearlo lleva a una sala compartida.", fr: " Le scan fait rejoindre un salon partagé.", de: " Das Scannen führt in einen gemeinsamen Raum.", pt: " Digitalizar leva a uma sala partilhada.", it: " La scansione porta in una stanza condivisa.", ja: "スキャンすると共有ルームに参加します。", zh: "扫描后会加入同一个共享房间。", hi: " स्कैन करने पर एक साझा कक्ष में शामिल हो जाते हैं.", ar: " المسح يُدخلك غرفة مشتركة واحدة.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

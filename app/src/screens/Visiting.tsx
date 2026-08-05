@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, type BeaconScanCard, type BellRung, type DeskCard,
          type DeskGuest, type DeskJoined, type PlacedBeacon,
          type ProfileBeacon } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -46,6 +47,7 @@ import { useSession } from "../store";
  */
 export function Visiting() {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const ownerToken = session.ownerToken || "";
   const visitorToken = session.interactorToken || "";
@@ -83,29 +85,21 @@ export function Visiting() {
 
   return (
     <div className="screen">
-      <h2>Visiting, and being found</h2>
-      <p className="muted">
-        Two halves of the same idea: standing in front of somebody else's
-        desk, and leaving your own profile somewhere for a stranger to find.
-      </p>
+      <h2>{tr("vis.title", lang)}</h2>
+      <p className="muted">{tr("vis.lead", lang)}</p>
       <Refusal error={error} />
       {said && <p className="small">{said}</p>}
 
       {/* --- the visitor's side ---------------------------------------- */}
       <div className="card">
-        <h3>Stand in front of a desk</h3>
-        <p className="muted small">
-          The card is public — a desk is a shopfront. So is the bell: the
-          visitor at an empty chair is exactly the person who has no account
-          yet. An 18+ stream is the one exception, because an anonymous ping
-          channel to an adult performer is not something to hand out.
-        </p>
+        <h3>{tr("vis.desk", lang)}</h3>
+        <p className="muted small">{tr("vis.desk.pitch", lang)}</p>
         <input value={deskId} onChange={(e) => setDeskId(e.target.value)}
-               placeholder="a desk id, or scan the code on the counter" />
+               placeholder={tr("vis.desk.ph", lang)} />
         <button disabled={!deskId}
                 onClick={() => go(() => api.visitDesk(deskId), (c) => {
                   setCard(c); setRung(null); setJoined(null); setHand(null);
-                })}>Look</button>
+                })}>{tr("vis.look", lang)}</button>
 
         {card && (
           <div>
@@ -118,20 +112,18 @@ export function Visiting() {
             <p className="small"><strong>{card.designation}</strong></p>
             <p className="muted small">
               {card.presence === "attended"
-                ? "They are here."
-                : "They are away — ring the bell and they will see it."}
+                ? tr("vis.here", lang) : tr("vis.away", lang)}
             </p>
             <p className="muted small">
-              Attested by {card.attestation.attestor}: “
-              {card.attestation.basis}”.{" "}
+              {fill(tr("vis.attested", lang), {
+                who: card.attestation.attestor,
+                basis: card.attestation.basis,
+              })}{" "}
               {card.attestation.signed
-                ? "Signed, so it can be checked."
-                : "Recorded, not proven — nobody has signed for it."}
+                ? tr("vis.signed", lang) : tr("vis.recorded", lang)}
             </p>
             {card.age_wall && (
-              <p className="muted small">
-                18+ — sign in with a verified adult account to see any of it.
-              </p>
+              <p className="muted small">{tr("vis.agewall", lang)}</p>
             )}
           </div>
         )}
@@ -139,58 +131,57 @@ export function Visiting() {
 
       {card && !card.age_wall && (
         <div className="card">
-          <h3>Ring, or come in</h3>
+          <h3>{tr("vis.ring", lang)}</h3>
           <input value={note} onChange={(e) => setNote(e.target.value)}
-                 placeholder="anything you want them to see (optional)" />
+                 placeholder={tr("vis.note.ph", lang)} />
           <button onClick={() => go(
             () => api.ringBell(deskId, note ? { note } : {}),
-            (r) => { setRung(r); setSaid(r.note); })}>Ring the bell</button>
+            (r) => { setRung(r); setSaid(r.note); })}>
+            {tr("vis.ringbell", lang)}
+          </button>
           {rung && (
             <p className="muted small">
               {rung.waiting === 1
-                ? "You are the only one waiting."
-                : `${rung.waiting} waiting, including you.`}
+                ? tr("vis.waiting.one", lang)
+                : fill(tr("vis.waiting.n", lang), { n: rung.waiting })}
             </p>
           )}
 
           <button onClick={() => go(
             () => api.joinDesk(deskId, "audience"), setJoined)}>
-            Watch the stream
+            {tr("vis.watch", lang)}
           </button>
           {joined && (
             <p className="muted small">
-              In room {joined.room_id}. {joined.overlay.likes} likes,{" "}
-              {joined.overlay.comments.length} comments over the picture.
-              {" "}Never marked as AI: there is a real person on the other end.
+              {fill(tr("vis.inroom", lang), {
+                room: joined.room_id,
+                likes: joined.overlay.likes,
+                comments: joined.overlay.comments.length,
+              })}
             </p>
           )}
 
-          <h4>Put a hand up</h4>
+          <h4>{tr("vis.hand", lang)}</h4>
           <p className="muted small">
-            Coming up <em>on</em> the stream is the host's call, so this asks
-            rather than does — and it needs an account, because the host is
-            deciding about a person rather than an anonymous request. Nothing
-            is minted until you are somebody.
+            {fill(tr("vis.hand.pitch", lang),
+              { on: <em>{tr("vis.hand.on", lang)}</em> })}
           </p>
           <input value={why} onChange={(e) => setWhy(e.target.value)}
-                 placeholder="why you would like to come up" />
+                 placeholder={tr("vis.why.ph", lang)} />
           {!visitorToken && (
-            <p className="muted small">
-              You are not signed in as a visitor, so this would be refused.
-            </p>
+            <p className="muted small">{tr("vis.notvisitor", lang)}</p>
           )}
           <button disabled={!visitorToken} onClick={() => go(
             () => api.askToComeUp(deskId, { note: why }, visitorToken),
-            (g) => { setHand(g); setSaid("Hand up. Nothing happens until "
-                                         + "they accept."); })}>
-            Ask to come up
+            (g) => { setHand(g); setSaid(tr("vis.hand.said", lang)); })}>
+            {tr("vis.askup", lang)}
           </button>
           {hand && (
             <p className="muted small">
               {hand.status === "requested"
-                ? "Waiting on the host."
-                : `Status: ${hand.status}.`}
-              {hand.on_stream && " You are on the stream."}
+                ? tr("vis.hand.wait", lang)
+                : fill(tr("vis.hand.status", lang), { status: hand.status })}
+              {hand.on_stream && tr("vis.hand.onstream", lang)}
             </p>
           )}
         </div>
@@ -198,64 +189,58 @@ export function Visiting() {
 
       {/* --- leaving your profile somewhere ---------------------------- */}
       <div className="card">
-        <h3>Leave this profile somewhere</h3>
-        <p className="muted small">
-          A printed code on a bench, at a meeting, on a counter. Where a
-          profile is left is a decision about the profile — a recovery
-          sponsor's code belongs at a meeting and not on a billboard — so only
-          its owner may place one, list them, or pick one back up.
-        </p>
+        <h3>{tr("vis.leave", lang)}</h3>
+        <p className="muted small">{tr("vis.leave.pitch", lang)}</p>
         <input value={label} onChange={(e) => setLabel(e.target.value)}
-               placeholder="what to call it" />
+               placeholder={tr("vis.label.ph", lang)} />
         <input value={where} onChange={(e) => setWhere(e.target.value)}
-               placeholder="where it is going" />
+               placeholder={tr("vis.where.ph", lang)} />
         <select value={mode} onChange={(e) => setMode(e.target.value)}>
-          <option value="chat">a private thread each</option>
-          <option value="room">one room everybody joins</option>
+          <option value="chat">{tr("vis.mode.chat", lang)}</option>
+          <option value="room">{tr("vis.mode.room", lang)}</option>
         </select>
-        <p className="muted small">
-          One room means the people who found the same sticker end up talking
-          to it together. A rated profile is placed one-to-one and asking for
-          a room is refused rather than quietly downgraded.
-        </p>
+        <p className="muted small">{tr("vis.room.pitch", lang)}</p>
         <button disabled={!me || !ownerToken || !label}
                 onClick={() => go(
                   () => api.placeBeacon(me, {
                     label, ...(where ? { location: where } : {}), mode,
                   }, ownerToken),
-                  (b) => { setFresh(b); setSaid("Placed."); beacons(); })}>
-          Place it
+                  (b) => { setFresh(b); setSaid(tr("vis.placed.said", lang));
+                           beacons(); })}>
+          {tr("vis.place", lang)}
         </button>
         {fresh && (
           <p className="muted small">
-            Print <code>{fresh.scan_url}</code> — that is what the QR encodes.
-            {fresh.room_id && " Everyone who scans it lands in one room."}
+            {fill(tr("vis.print", lang),
+              { url: <code>{fresh.scan_url}</code> })}
+            {fresh.room_id && tr("vis.oneroom", lang)}
           </p>
         )}
 
         <button className="ghost" disabled={!me || !ownerToken}
-                onClick={beacons}>Where it is already</button>
+                onClick={beacons}>{tr("vis.already", lang)}</button>
         {placed.map((b) => (
           <div key={b.id} className="row">
             <div>
               <p className="small">
                 <strong>{b.label}</strong>
                 {b.location && <span className="muted"> · {b.location}</span>}
-                {!b.active && <span className="muted"> · picked up</span>}
+                {!b.active &&
+                  <span className="muted"> {tr("vis.pickedup", lang)}</span>}
               </p>
               <p className="muted small">
-                {b.scans === 0 ? "Not scanned yet"
-                  : `${b.scans} scan${b.scans === 1 ? "" : "s"}`}
-                {b.room_id && " · one shared room"}
+                {b.scans === 0 ? tr("vis.scans.none", lang)
+                  : fill(tr("vis.scans.n", lang),
+                         { n: b.scans, s: b.scans === 1 ? "" : "s" })}
+                {b.room_id && tr("vis.sharedroom", lang)}
               </p>
             </div>
             {b.active && (
               <button className="ghost" onClick={() => go(
                 () => api.pickUpBeacon(b.id, ownerToken),
-                () => { setSaid("Picked up. The paper is still on the wall, "
-                                + "so the code keeps answering — with "
-                                + "nothing."); beacons(); })}>
-                Pick it up
+                () => { setSaid(tr("vis.pickedup.said", lang));
+                        beacons(); })}>
+                {tr("vis.pickup", lang)}
               </button>
             )}
           </div>
@@ -264,22 +249,21 @@ export function Visiting() {
 
       {/* --- what a scanner gets --------------------------------------- */}
       <div className="card">
-        <h3>What a stranger sees when they scan it</h3>
+        <h3>{tr("vis.scan", lang)}</h3>
         <p className="muted small">
-          The overlay draws this over the sticker in the live viewfinder —
-          nobody has navigated anywhere and the camera is still running. The
-          mark travels <em>with</em> the card, so a surface cannot draw the
-          face without also having been handed the disclosure to draw with it.
+          {fill(tr("vis.scan.pitch", lang),
+            { with: <em>{tr("vis.scan.with", lang)}</em> })}
         </p>
         <input value={scanId} onChange={(e) => setScanId(e.target.value)}
-               placeholder="a beacon id" />
+               placeholder={tr("vis.beacon.ph", lang)} />
         <button disabled={!scanId} onClick={() => go(
-          () => api.beaconCard(scanId), setScanned)}>Scan it</button>
+          () => api.beaconCard(scanId), setScanned)}>
+          {tr("vis.scanit", lang)}
+        </button>
         {scanned && (scanned.age_wall ? (
           <p className="muted small">
-            {scanned.note || "18+ — open in QRME with a verified adult "
-              + "account."} Nothing else came back: not the name, not the
-            portrait. The wall is drawn without ever holding what it refuses.
+            {scanned.note || tr("vis.scan.wall.default", lang)}{" "}
+            {tr("vis.scan.wall", lang)}
           </p>
         ) : (
           <div>
@@ -290,9 +274,8 @@ export function Visiting() {
             <p className="small">{scanned.watermark}</p>
             <p className="muted small">
               {scanned.portrait_marked
-                ? "The disclosure is already in the image."
-                : "The image is unmarked, so the badge must be composited over it."}
-              {scanned.shared_room && " Scanning joins one shared room."}
+                ? tr("vis.marked", lang) : tr("vis.unmarked", lang)}
+              {scanned.shared_room && tr("vis.scan.sharedroom", lang)}
             </p>
           </div>
         ))}
