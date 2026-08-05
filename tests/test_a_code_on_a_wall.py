@@ -108,8 +108,11 @@ def test_every_way_of_reading_a_scan_counts_it(client):
 def test_the_console_says_a_scan_link_costs_one():
     """Rendered, not just documented. An owner who follows one of these
     without being told inflates the number they were checking."""
-    for rel in ("app/src/screens/Placements.tsx", "app/src/screens/Desk.tsx"):
-        assert "counts as a scan" in _markup(rel), rel
+    assert "counts as a scan" in _markup("app/src/screens/Placements.tsx")
+    # Desk's copy moved into the l10n table when the screen was localized;
+    # the screen must still look it up, and the table must still say it.
+    assert 'tr("desk.beacons.open"' in _markup("app/src/screens/Desk.tsx")
+    assert "counts as a scan" in _markup("app/src/l10n.ts")
 
 
 # --- the two directions -----------------------------------------------------

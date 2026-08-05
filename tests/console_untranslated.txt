@@ -1,4 +1,4 @@
-# status: backlog — 1281 rows
+# status: backlog — 1225 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1281
+# ceiling: 1225
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -248,62 +248,6 @@ Delegate: next:
 Delegate: revoked
 Delegate: their profile id
 Delegate: what you want done
-Desk: A desk claims a person is behind it, so it is opened with who attests that and on what basis — a guild, a licence number. The claim is shown to every visitor and can be burned, which is why it is asked for at the start rather than added later.
-Desk: Answer
-Desk: Attested by
-Desk: Away
-Desk: Beacons
-Desk: Clear camera
-Desk: Desk
-Desk: Desk id
-Desk: Desk token
-Desk: Is anybody there?
-Desk: Label (Shop window)
-Desk: Let them up
-Desk: Look and camera
-Desk: Name shown on the desk
-Desk: Nobody has rung.
-Desk: Nobody waiting.
-Desk: Not now
-Desk: On the stream
-Desk: On what basis
-Desk: Open a desk
-Desk: Open the desk
-Desk: Or take up a desk you already have
-Desk: Pick it up
-Desk: Place a beacon
-Desk: Portrait asset
-Desk: Printed:
-Desk: Set portrait
-Desk: Step down from the stream
-Desk: Take it up
-Desk: That read counted as a scan.
-Desk: The bell
-Desk: The desk as a sticker: somebody scans it in the street and reaches this counter. Picking one up retires it — the sticker on the wall stops working, which is the point.
-Desk: The one thing a visitor most wants to know.
-Desk: This desk is rated, so a scan lands on the age wall. A sticker carries no token that could clear it — that is the right answer rather than a gap.
-Desk: Trade
-Desk: What a scanner sees
-Desk: Where (optional)
-Desk: Who attests it
-Desk: Who wants to come up
-Desk: Your owner id
-Desk: answered
-Desk: closed
-Desk: comments ·
-Desk: likes ·
-Desk: open it here (counts as a scan)
-Desk: rated
-Desk: retired
-Desk: says come back;
-Desk: says the counter is shut. They are different promises and the desk gets to make either.
-Desk: scan
-Desk: shares
-Desk: the view from this desk
-Desk: this desk code's QR
-Desk: up,
-Desk: waiting ·
-Desk: · drawn over the picture at
 Discover: AI
 Discover: Add friend
 Discover: Discover

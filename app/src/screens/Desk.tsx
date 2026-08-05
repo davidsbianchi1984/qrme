@@ -5,7 +5,7 @@ import {
   type DeskSession, type LivePerson,
 } from "../api";
 import { Refusal } from "../Refusal";
-import { t as tr, visitorLang } from "../l10n";
+import { fill, t as tr, visitorLang } from "../l10n";
 
 // A staffed counter somebody can walk up to.
 //
@@ -81,7 +81,7 @@ export function Desk({ onPlans }: {
 
   return (
     <section className="screen">
-      <h2>Desk</h2>
+      <h2>{tr("desk.title", visitorLang())}</h2>
       <Refusal error={error} onPlans={onPlans} variant="inline" />
       {said && <p className="muted">{said}</p>}
 
@@ -185,27 +185,22 @@ export function Desk({ onPlans }: {
             </div>
           ))}
 
-          <h3>Open a desk</h3>
-          <p className="muted">
-            A desk claims a person is behind it, so it is opened with who
-            attests that and on what basis — a guild, a licence number. The
-            claim is shown to every visitor and can be burned, which is why it
-            is asked for at the start rather than added later.
-          </p>
+          <h3>{tr("desk.open.head", visitorLang())}</h3>
+          <p className="muted">{tr("desk.open.pitch", visitorLang())}</p>
           <div className="row">
-            <input placeholder="Your owner id" value={form.owner_id}
+            <input placeholder={tr("desk.open.owner.ph", visitorLang())} value={form.owner_id}
               onChange={(e) => setForm({ ...form, owner_id: e.target.value })} />
-            <input placeholder="Name shown on the desk" value={form.display_name}
+            <input placeholder={tr("desk.open.name.ph", visitorLang())} value={form.display_name}
               onChange={(e) => setForm({ ...form, display_name: e.target.value })} />
-            <input placeholder="Trade" value={form.trade}
+            <input placeholder={tr("desk.open.trade.ph", visitorLang())} value={form.trade}
               onChange={(e) => setForm({ ...form, trade: e.target.value })} />
           </div>
           <div className="row">
-            <input placeholder="Who attests it" value={form.attestor}
+            <input placeholder={tr("desk.open.attestor.ph", visitorLang())} value={form.attestor}
               onChange={(e) => setForm({ ...form, attestor: e.target.value })} />
-            <input placeholder="On what basis" value={form.basis}
+            <input placeholder={tr("desk.open.basis.ph", visitorLang())} value={form.basis}
               onChange={(e) => setForm({ ...form, basis: e.target.value })} />
-            <input placeholder="Where (optional)" value={form.location}
+            <input placeholder={tr("desk.open.where.ph", visitorLang())} value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })} />
           </div>
           <button
@@ -227,14 +222,14 @@ export function Desk({ onPlans }: {
               // not the person's.
               setDeskToken(d.desk_token ?? "");
             }, "Desk open.")}>
-            Open the desk
+            {tr("desk.open.go", visitorLang())}
           </button>
 
-          <h3>Or take up a desk you already have</h3>
+          <h3>{tr("desk.takeup.head", visitorLang())}</h3>
           <div className="row">
-            <input placeholder="Desk id" value={deskId}
+            <input placeholder={tr("desk.takeup.id.ph", visitorLang())} value={deskId}
               onChange={(e) => setDeskId(e.target.value)} />
-            <input type="password" placeholder="Desk token" value={deskToken}
+            <input type="password" placeholder={tr("desk.takeup.token.ph", visitorLang())} value={deskToken}
               onChange={(e) => setDeskToken(e.target.value)} />
             <button disabled={busy || !deskId.trim() || !deskToken.trim()}
               onClick={() => run(async () => {
@@ -243,7 +238,7 @@ export function Desk({ onPlans }: {
                 setDesk({ desk_id: deskId.trim(), display_name: w.whose ?? "",
                   trade: "", presence: "", rated: false });
               })}>
-              Take it up
+              {tr("desk.takeup.go", visitorLang())}
             </button>
           </div>
         </>
@@ -256,7 +251,7 @@ export function Desk({ onPlans }: {
               <strong>{desk.display_name}</strong>
               {desk.trade && <span className="muted">{desk.trade}</span>}
               {desk.location && <span className="muted">{desk.location}</span>}
-              {desk.rated && <span className="pill">rated</span>}
+              {desk.rated && <span className="pill">{tr("desk.rated", visitorLang())}</span>}
             </div>
             {/* The attestation, shown to the desk's own keeper as well as to
                 visitors. `burned` is the word the server uses for a claim that
@@ -278,7 +273,7 @@ export function Desk({ onPlans }: {
                 no camera, and the server says so in words rather than
                 letting a sample frame pass for a live one. */}
             <img src={getBase() + `/desks/${deskId}/view.webp`}
-                 width={240} alt="the view from this desk" />
+                 width={240} alt={tr("desk.view.alt", visitorLang())} />
             {desk.feed && (
               <p className="muted small">
                 {desk.feed.live ? "Live." : "Not live."} {desk.feed.note}
@@ -287,12 +282,8 @@ export function Desk({ onPlans }: {
             )}
           </div>
 
-          <h3>Is anybody there?</h3>
-          <p className="muted">
-            The one thing a visitor most wants to know. <em>Away</em> says come
-            back; <em>closed</em> says the counter is shut. They are different
-            promises and the desk gets to make either.
-          </p>
+          <h3>{tr("desk.there.head", visitorLang())}</h3>
+          <p className="muted">{tr("desk.there.pitch", visitorLang())}</p>
           <div className="row">
             {["attended", "away", "closed"].map((p) => (
               <button key={p} disabled={busy || desk.presence === p}
@@ -304,19 +295,19 @@ export function Desk({ onPlans }: {
             ))}
           </div>
 
-          <h3>The bell</h3>
-          {rings.length === 0 && <p className="muted">Nobody has rung.</p>}
+          <h3>{tr("desk.bell.head", visitorLang())}</h3>
+          {rings.length === 0 && <p className="muted">{tr("desk.bell.none", visitorLang())}</p>}
           {rings.map((r, i) => (
             <div key={String(r.id ?? i)} className="card">
               <div className="row">
                 <span>{String(r.note ?? "rang the bell")}</span>
-                {r.acked && <span className="muted">answered</span>}
+                {r.acked && <span className="muted">{tr("desk.bell.answered", visitorLang())}</span>}
               </div>
               {!r.acked && r.id && (
                 <button disabled={busy}
                   onClick={() => run(() =>
                     api.ackRing(deskId, String(r.id), deskToken), "Answered.")}>
-                  Answer
+                  {tr("desk.bell.answer", visitorLang())}
                 </button>
               )}
             </div>
@@ -392,8 +383,8 @@ export function Desk({ onPlans }: {
             </div>
           ))}
 
-          <h3>Who wants to come up</h3>
-          {guests.length === 0 && <p className="muted">Nobody waiting.</p>}
+          <h3>{tr("desk.guests.head", visitorLang())}</h3>
+          {guests.length === 0 && <p className="muted">{tr("desk.guests.none", visitorLang())}</p>}
           {guests.map((g, i) => (
             <div key={String(g.id ?? i)} className="card">
               <div className="row">
@@ -411,13 +402,13 @@ export function Desk({ onPlans }: {
                     onClick={() => run(() =>
                       api.acceptGuest(deskId, String(g.id), deskToken),
                       "They are up.")}>
-                    Let them up
+                    {tr("desk.guests.up", visitorLang())}
                   </button>
                   <button disabled={busy}
                     onClick={() => run(() =>
                       api.declineGuest(deskId, String(g.id), deskToken),
                       "Declined.")}>
-                    Not now
+                    {tr("desk.guests.no", visitorLang())}
                   </button>
                 </div>
               )}
@@ -426,16 +417,19 @@ export function Desk({ onPlans }: {
 
           {overlay && (
             <>
-              <h3>On the stream</h3>
+              <h3>{tr("desk.stream.head", visitorLang())}</h3>
               <p className="muted">
-                {overlay.on_stream.length} up, {overlay.waiting} waiting ·
-                {" "}{overlay.likes} likes · {overlay.comments.length} comments ·
-                {" "}{overlay.shares} shares
-                {overlay.gift_total > 0
-                  ? ` · ${overlay.gift_total} in gifts` : ""}
-                {" "}· drawn over the picture at{" "}
-                {Math.round(overlay.style.opacity * 100)}%,{" "}
-                {overlay.style.anchor.replace("-", " ")}
+                {fill(tr("desk.stream.line", visitorLang()), {
+                  up: overlay.on_stream.length,
+                  waiting: overlay.waiting,
+                  likes: overlay.likes,
+                  comments: overlay.comments.length,
+                  shares: overlay.shares,
+                  gifts: overlay.gift_total > 0
+                    ? ` · ${overlay.gift_total} in gifts` : "",
+                  pct: Math.round(overlay.style.opacity * 100),
+                  anchor: overlay.style.anchor.replace("-", " "),
+                })}
               </p>
               {/* The comments themselves, which the count was standing in
                   for. Rendering the array directly is what would have thrown
@@ -448,49 +442,46 @@ export function Desk({ onPlans }: {
               <button disabled={busy}
                 onClick={() => run(() => api.stepDown(deskId, deskToken),
                   "Stepped down.")}>
-                Step down from the stream
+                {tr("desk.stream.down", visitorLang())}
               </button>
             </>
           )}
 
-          <h3>Look and camera</h3>
+          <h3>{tr("desk.look.head", visitorLang())}</h3>
           <div className="row">
-            <input placeholder="Portrait asset"
+            <input placeholder={tr("desk.look.portrait.ph", visitorLang())}
               onChange={(e) => setForm({ ...form, blurb: e.target.value })} />
             <button disabled={busy}
               onClick={() => run(async () => {
                 setDesk(await api.setDeskPortrait(
                   deskId, form.blurb.trim() || null, deskToken));
               }, "Portrait set.")}>
-              Set portrait
+              {tr("desk.look.set", visitorLang())}
             </button>
             <button disabled={busy}
               onClick={() => run(async () => {
                 setDesk(await api.setDeskCamera(deskId, null, deskToken));
               }, "Camera cleared.")}>
-              Clear camera
+              {tr("desk.look.clear", visitorLang())}
             </button>
           </div>
 
-          <h3>Beacons</h3>
-          <p className="muted">
-            The desk as a sticker: somebody scans it in the street and reaches
-            this counter. Picking one up retires it — the sticker on the wall
-            stops working, which is the point.
-          </p>
+          <h3>{tr("desk.beacons.head", visitorLang())}</h3>
+          <p className="muted">{tr("desk.beacons.pitch", visitorLang())}</p>
           {beacons.map((b) => (
             <div key={b.id} className="card">
               <div className="row">
                 <strong>{b.label}</strong>
                 {b.location && <span className="muted">{b.location}</span>}
-                <span className="muted">{b.scans} scan{b.scans === 1 ? "" : "s"}</span>
-                {!b.active && <span className="muted">retired</span>}
+                <span className="muted">{fill(tr("desk.beacons.scans", visitorLang()),
+                  { n: b.scans, s: b.scans === 1 ? "" : "s" })}</span>
+                {!b.active && <span className="muted">{tr("desk.beacons.retired", visitorLang())}</span>}
               </div>
               {/* The picture to print. Fetching it is free; following the
                   link below it is not — the server counts that as a scan,
                   because it cannot tell the owner from a stranger. */}
               <img src={getBase() + `/desk-beacons/${b.id}/qr.svg`}
-                   width={120} height={120} alt="this desk code's QR" />
+                   width={120} height={120} alt={tr("desk.beacons.qr.alt", visitorLang())} />
               {/* Derived rather than taken from `b.scan_url`, which says the
                   same thing: the literal is what the route audit can read.
                   `scan_url` itself was a bare path until this link went to
@@ -498,8 +489,8 @@ export function Desk({ onPlans }: {
                   is absolute now, and describes the address the printed code
                   actually carries rather than this deployment's. */}
               <a href={getBase() + `/d/${b.id}`} target="_blank"
-                 rel="noreferrer">open it here (counts as a scan)</a>
-              <span className="muted small">Printed: {b.scan_url}</span>
+                 rel="noreferrer">{tr("desk.beacons.open", visitorLang())}</a>
+              <span className="muted small">{tr("desk.beacons.printed", visitorLang())} {b.scan_url}</span>
               {/* What a native app receives when its camera recognises this
                   code — the same scan as the page, shaped for drawing an
                   overlay in place. Offered because seeing it is the only way
@@ -508,19 +499,19 @@ export function Desk({ onPlans }: {
               <button disabled={busy}
                 onClick={() => run(async () =>
                   setCard(await api.deskScanCard(b.id)))}>
-                What a scanner sees
+                {tr("desk.beacons.card", visitorLang())}
               </button>
               {b.active && (
                 <button disabled={busy}
                   onClick={() => run(() =>
                     api.pickUpDeskBeacon(b.id, deskToken), "Picked up.")}>
-                  Pick it up
+                  {tr("desk.beacons.pickup", visitorLang())}
                 </button>
               )}
             </div>
           ))}
           <div className="row">
-            <input value={label} placeholder="Label (Shop window)"
+            <input value={label} placeholder={tr("desk.beacons.label.ph", visitorLang())}
               onChange={(e) => setLabel(e.target.value)} />
             <button disabled={busy || !label.trim()}
               onClick={() => run(async () => {
@@ -528,13 +519,13 @@ export function Desk({ onPlans }: {
                   deskToken);
                 setLabel("");
               }, "Placed.")}>
-              Place a beacon
+              {tr("desk.beacons.place", visitorLang())}
             </button>
           </div>
 
           {card && (
             <div className="card">
-              <h4>What a scanner sees</h4>
+              <h4>{tr("desk.beacons.card", visitorLang())}</h4>
               <p className="small">
                 {card.display_name} — {card.trade}
                 {card.location && ` · ${card.location}`}
@@ -544,18 +535,17 @@ export function Desk({ onPlans }: {
                 <strong>{card.designation}</strong> · {card.presence}
               </p>
               {card.age_wall && (
-                <p className="muted small">
-                  This desk is rated, so a scan lands on the age wall. A
-                  sticker carries no token that could clear it — that is the
-                  right answer rather than a gap.
-                </p>
+                <p className="muted small">{tr("desk.card.agewall", visitorLang())}</p>
               )}
               <p className="muted small">
-                Attested by {card.attestation.attestor}:{" "}
-                {card.attestation.basis}. {card.attestation.note}
+                {fill(tr("desk.card.attested", visitorLang()), {
+                  who: card.attestation.attestor,
+                  basis: card.attestation.basis,
+                  note: card.attestation.note,
+                })}
               </p>
               <p className="muted small">{card.feed.note}</p>
-              <p className="muted small">That read counted as a scan.</p>
+              <p className="muted small">{tr("desk.card.counted", visitorLang())}</p>
             </div>
           )}
         </>

@@ -2421,6 +2421,147 @@ const CHROME: Table = {
   "sell.place.clear": {
     en: "Clear the place", es: "Borrar el lugar", fr: "Effacer le lieu", de: "Ort löschen", pt: "Limpar o lugar", it: "Cancella il luogo", ja: "場所を消す", zh: "清除位置", hi: "स्थान हटाएँ", ar: "امسح المكان",
   },
+  "desk.title": {
+    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Schalter", pt: "Balcão", it: "Banco", ja: "デスク", zh: "柜台", hi: "डेस्क", ar: "المكتب",
+  },
+  "desk.open.head": {
+    en: "Open a desk", es: "Abrir un mostrador", fr: "Ouvrir un comptoir", de: "Einen Schalter eröffnen", pt: "Abrir um balcão", it: "Apri un banco", ja: "デスクを開く", zh: "开设柜台", hi: "डेस्क खोलें", ar: "افتح مكتبًا",
+  },
+  "desk.open.pitch": {
+    en: "A desk claims a person is behind it, so it is opened with who attests that and on what basis — a guild, a licence number. The claim is shown to every visitor and can be burned, which is why it is asked for at the start rather than added later.", es: "Un mostrador afirma que hay una persona detrás, así que se abre indicando quién lo atestigua y sobre qué base — un gremio, un número de licencia. La afirmación se muestra a cada visitante y puede quemarse, por eso se pide al principio y no se añade después.", fr: "Un comptoir affirme qu'une personne est derrière, il s'ouvre donc avec qui l'atteste et sur quelle base — une guilde, un numéro de licence. L'affirmation est montrée à chaque visiteur et peut être brûlée, c'est pourquoi elle est demandée au départ plutôt qu'ajoutée après.", de: "Ein Schalter behauptet, dass eine Person dahintersteht, also wird er mit der Angabe eröffnet, wer das bezeugt und auf welcher Grundlage — eine Zunft, eine Lizenznummer. Die Behauptung wird jedem Besucher gezeigt und kann verbrannt werden, weshalb sie am Anfang verlangt wird statt später ergänzt.", pt: "Um balcão afirma que há uma pessoa atrás dele, por isso abre-se indicando quem o atesta e com que base — uma guilda, um número de licença. A afirmação é mostrada a cada visitante e pode ser queimada, e é por isso que se pede no início em vez de se acrescentar depois.", it: "Un banco afferma che dietro c'è una persona, quindi si apre indicando chi lo attesta e su quale base — una gilda, un numero di licenza. L'affermazione è mostrata a ogni visitatore e può essere bruciata, per questo viene chiesta all'inizio invece di essere aggiunta dopo.", ja: "デスクは「人がいる」と主張するものです。だから開設時に、誰が何を根拠に証明するのか — 組合、免許番号 — を求めます。この主張はすべての訪問者に示され、焼却されることもあります。後から足すのではなく最初に求めるのはそのためです。", zh: "柜台声称背后有一个人，因此开设时就要写明由谁证明、依据是什么 — 行会、执照号码。这项声明会展示给每位访客，也可能被焚毁，所以在一开始就要求提供，而不是事后补上。", hi: "डेस्क दावा करता है कि उसके पीछे एक व्यक्ति है, इसलिए खोलते समय पूछा जाता है कि कौन इसकी पुष्टि करता है और किस आधार पर — कोई संघ, कोई लाइसेंस नंबर। यह दावा हर आगंतुक को दिखाया जाता है और जलाया भी जा सकता है, इसीलिए इसे बाद में जोड़ने के बजाय शुरू में ही माँगा जाता है।", ar: "المكتب يدّعي أن خلفه شخصًا، لذا يُفتح ببيان من يشهد بذلك وعلى أي أساس — نقابة، رقم رخصة. يُعرض الادعاء على كل زائر ويمكن حرقه، ولهذا يُطلب في البداية بدل إضافته لاحقًا.",
+  },
+  "desk.open.owner.ph": {
+    en: "Your owner id", es: "Tu id de propietario", fr: "Votre id de propriétaire", de: "Ihre Inhaber-Id", pt: "O seu id de proprietário", it: "Il tuo id proprietario", ja: "オーナーID", zh: "你的所有者ID", hi: "आपकी स्वामी आईडी", ar: "معرّف المالك",
+  },
+  "desk.open.name.ph": {
+    en: "Name shown on the desk", es: "Nombre mostrado en el mostrador", fr: "Nom affiché sur le comptoir", de: "Am Schalter gezeigter Name", pt: "Nome mostrado no balcão", it: "Nome mostrato sul banco", ja: "デスクに表示する名前", zh: "柜台上显示的名字", hi: "डेस्क पर दिखने वाला नाम", ar: "الاسم المعروض على المكتب",
+  },
+  "desk.open.trade.ph": {
+    en: "Trade", es: "Oficio", fr: "Métier", de: "Gewerbe", pt: "Ofício", it: "Mestiere", ja: "職種", zh: "行当", hi: "पेशा", ar: "الحرفة",
+  },
+  "desk.open.attestor.ph": {
+    en: "Who attests it", es: "Quién lo atestigua", fr: "Qui l'atteste", de: "Wer es bezeugt", pt: "Quem o atesta", it: "Chi lo attesta", ja: "証明する者", zh: "由谁证明", hi: "कौन पुष्टि करता है", ar: "من يشهد به",
+  },
+  "desk.open.basis.ph": {
+    en: "On what basis", es: "Sobre qué base", fr: "Sur quelle base", de: "Auf welcher Grundlage", pt: "Com que base", it: "Su quale base", ja: "その根拠", zh: "依据是什么", hi: "किस आधार पर", ar: "على أي أساس",
+  },
+  "desk.open.where.ph": {
+    en: "Where (optional)", es: "Dónde (opcional)", fr: "Où (facultatif)", de: "Wo (optional)", pt: "Onde (opcional)", it: "Dove (facoltativo)", ja: "場所（任意）", zh: "地点（可选）", hi: "कहाँ (वैकल्पिक)", ar: "أين (اختياري)",
+  },
+  "desk.open.go": {
+    en: "Open the desk", es: "Abrir el mostrador", fr: "Ouvrir le comptoir", de: "Schalter eröffnen", pt: "Abrir o balcão", it: "Apri il banco", ja: "デスクを開設", zh: "开设此柜台", hi: "डेस्क खोलें", ar: "افتح المكتب",
+  },
+  "desk.takeup.head": {
+    en: "Or take up a desk you already have", es: "O retoma un mostrador que ya tienes", fr: "Ou reprenez un comptoir que vous avez déjà", de: "Oder einen vorhandenen Schalter übernehmen", pt: "Ou retome um balcão que já tem", it: "Oppure riprendi un banco che hai già", ja: "または既存のデスクに就く", zh: "或接手你已有的柜台", hi: "या पहले से मौजूद डेस्क सँभालें", ar: "أو تولَّ مكتبًا لديك بالفعل",
+  },
+  "desk.takeup.id.ph": {
+    en: "Desk id", es: "Id del mostrador", fr: "Id du comptoir", de: "Schalter-Id", pt: "Id do balcão", it: "Id del banco", ja: "デスクID", zh: "柜台ID", hi: "डेस्क आईडी", ar: "معرّف المكتب",
+  },
+  "desk.takeup.token.ph": {
+    en: "Desk token", es: "Token del mostrador", fr: "Jeton du comptoir", de: "Schalter-Token", pt: "Token do balcão", it: "Token del banco", ja: "デスクトークン", zh: "柜台令牌", hi: "डेस्क टोकन", ar: "رمز المكتب",
+  },
+  "desk.takeup.go": {
+    en: "Take it up", es: "Retomarlo", fr: "Le reprendre", de: "Übernehmen", pt: "Retomá-lo", it: "Riprendilo", ja: "就く", zh: "接手", hi: "सँभालें", ar: "تولَّه",
+  },
+  "desk.rated": {
+    en: "rated", es: "clasificado", fr: "classé", de: "bewertet", pt: "classificado", it: "classificato", ja: "レーティング付き", zh: "分级", hi: "रेटेड", ar: "مصنّف",
+  },
+  "desk.view.alt": {
+    en: "the view from this desk", es: "la vista desde este mostrador", fr: "la vue depuis ce comptoir", de: "der Blick von diesem Schalter", pt: "a vista deste balcão", it: "la vista da questo banco", ja: "このデスクからの眺め", zh: "此柜台的画面", hi: "इस डेस्क से दृश्य", ar: "المشهد من هذا المكتب",
+  },
+  "desk.there.head": {
+    en: "Is anybody there?", es: "¿Hay alguien ahí?", fr: "Y a-t-il quelqu'un ?", de: "Ist jemand da?", pt: "Está alguém aí?", it: "C'è qualcuno?", ja: "誰かいますか？", zh: "有人在吗？", hi: "क्या कोई है?", ar: "هل من أحد هناك؟",
+  },
+  "desk.there.pitch": {
+    en: "The one thing a visitor most wants to know. Away says come back; closed says the counter is shut. They are different promises and the desk gets to make either.", es: "Lo que un visitante más quiere saber. «away» dice vuelve luego; «closed» dice que el mostrador está cerrado. Son promesas distintas y el mostrador puede hacer cualquiera.", fr: "La chose qu'un visiteur veut le plus savoir. « away » dit revenez ; « closed » dit que le comptoir est fermé. Ce sont des promesses différentes et le comptoir peut faire l'une ou l'autre.", de: "Das eine, was ein Besucher am meisten wissen will. »away« sagt komm wieder; »closed« sagt, der Schalter ist zu. Das sind verschiedene Versprechen, und der Schalter darf beide geben.", pt: "O que um visitante mais quer saber. «away» diz volte depois; «closed» diz que o balcão está fechado. São promessas diferentes e o balcão pode fazer qualquer uma.", it: "La cosa che un visitatore vuole sapere più di tutte. «away» dice torna dopo; «closed» dice che il banco è chiuso. Sono promesse diverse e il banco può fare l'una o l'altra.", ja: "訪問者が最も知りたいこと。「away」はまた来てくださいを、「closed」はカウンターが閉まっていることを意味します。異なる約束であり、デスクはどちらも選べます。", zh: "访客最想知道的一件事。「away」表示请再来；「closed」表示柜台已关。这是两种不同的承诺，柜台可以任选其一。", hi: "आगंतुक सबसे पहले यही जानना चाहता है। «away» कहता है फिर आना; «closed» कहता है काउंटर बंद है। ये अलग-अलग वादे हैं और डेस्क कोई भी कर सकता है।", ar: "أكثر ما يريد الزائر معرفته. «away» تقول عُد لاحقًا؛ و«closed» تقول إن المنضدة مغلقة. وعدان مختلفان وللمكتب أن يقطع أيًا منهما.",
+  },
+  "desk.bell.head": {
+    en: "The bell", es: "El timbre", fr: "La sonnette", de: "Die Klingel", pt: "A campainha", it: "Il campanello", ja: "ベル", zh: "门铃", hi: "घंटी", ar: "الجرس",
+  },
+  "desk.bell.none": {
+    en: "Nobody has rung.", es: "Nadie ha llamado.", fr: "Personne n'a sonné.", de: "Niemand hat geklingelt.", pt: "Ninguém tocou.", it: "Nessuno ha suonato.", ja: "誰も鳴らしていません。", zh: "无人按铃。", hi: "किसी ने घंटी नहीं बजाई।", ar: "لم يقرع أحد.",
+  },
+  "desk.bell.answered": {
+    en: "answered", es: "atendido", fr: "répondu", de: "beantwortet", pt: "atendido", it: "risposto", ja: "応答済み", zh: "已应答", hi: "उत्तर दिया", ar: "أُجيب",
+  },
+  "desk.bell.answer": {
+    en: "Answer", es: "Atender", fr: "Répondre", de: "Antworten", pt: "Atender", it: "Rispondi", ja: "応答", zh: "应答", hi: "उत्तर दें", ar: "أجب",
+  },
+  "desk.guests.head": {
+    en: "Who wants to come up", es: "Quién quiere subir", fr: "Qui veut monter", de: "Wer heraufkommen will", pt: "Quem quer subir", it: "Chi vuole salire", ja: "上がりたい人", zh: "谁想上来", hi: "कौन ऊपर आना चाहता है", ar: "من يريد الصعود",
+  },
+  "desk.guests.none": {
+    en: "Nobody waiting.", es: "Nadie esperando.", fr: "Personne n'attend.", de: "Niemand wartet.", pt: "Ninguém à espera.", it: "Nessuno in attesa.", ja: "待っている人はいません。", zh: "无人等待。", hi: "कोई प्रतीक्षा में नहीं।", ar: "لا أحد ينتظر.",
+  },
+  "desk.guests.up": {
+    en: "Let them up", es: "Déjales subir", fr: "Les laisser monter", de: "Herauflassen", pt: "Deixá-los subir", it: "Falli salire", ja: "上がってもらう", zh: "让他们上来", hi: "उन्हें ऊपर आने दें", ar: "دعهم يصعدون",
+  },
+  "desk.guests.no": {
+    en: "Not now", es: "Ahora no", fr: "Pas maintenant", de: "Jetzt nicht", pt: "Agora não", it: "Non ora", ja: "今は無理", zh: "现在不行", hi: "अभी नहीं", ar: "ليس الآن",
+  },
+  "desk.stream.head": {
+    en: "On the stream", es: "En la transmisión", fr: "Sur le flux", de: "Im Stream", pt: "Na transmissão", it: "In diretta", ja: "配信中", zh: "直播中", hi: "स्ट्रीम पर", ar: "على البث",
+  },
+  "desk.stream.line": {
+    en: "{up} up, {waiting} waiting · {likes} likes · {comments} comments · {shares} shares{gifts} · drawn over the picture at {pct}%, {anchor}", es: "{up} arriba, {waiting} esperando · {likes} me gusta · {comments} comentarios · {shares} compartidos{gifts} · dibujado sobre la imagen al {pct}%, {anchor}", fr: "{up} en haut, {waiting} en attente · {likes} j'aime · {comments} commentaires · {shares} partages{gifts} · dessiné sur l'image à {pct}%, {anchor}", de: "{up} oben, {waiting} wartend · {likes} Likes · {comments} Kommentare · {shares} geteilt{gifts} · über das Bild gezeichnet bei {pct}%, {anchor}", pt: "{up} em cima, {waiting} à espera · {likes} gostos · {comments} comentários · {shares} partilhas{gifts} · desenhado sobre a imagem a {pct}%, {anchor}", it: "{up} su, {waiting} in attesa · {likes} mi piace · {comments} commenti · {shares} condivisioni{gifts} · disegnato sull'immagine al {pct}%, {anchor}", ja: "{up}人が参加、{waiting}人待機 · いいね{likes} · コメント{comments} · シェア{shares}{gifts} · 画像上に{pct}%で描画、{anchor}", zh: "{up}人在线，{waiting}人等待 · {likes}赞 · {comments}评论 · {shares}分享{gifts} · 以{pct}%叠加在画面上，{anchor}", hi: "{up} ऊपर, {waiting} प्रतीक्षा में · {likes} पसंद · {comments} टिप्पणियाँ · {shares} साझा{gifts} · चित्र पर {pct}% पर आरेखित, {anchor}", ar: "{up} فوق، {waiting} ينتظرون · {likes} إعجابًا · {comments} تعليقًا · {shares} مشاركة{gifts} · مرسوم فوق الصورة بنسبة {pct}٪، {anchor}",
+  },
+  "desk.stream.down": {
+    en: "Step down from the stream", es: "Bajarse de la transmisión", fr: "Se retirer du flux", de: "Aus dem Stream aussteigen", pt: "Sair da transmissão", it: "Scendi dalla diretta", ja: "配信から降りる", zh: "退出直播", hi: "स्ट्रीम से उतरें", ar: "انزل من البث",
+  },
+  "desk.look.head": {
+    en: "Look and camera", es: "Aspecto y cámara", fr: "Apparence et caméra", de: "Aussehen und Kamera", pt: "Aspeto e câmara", it: "Aspetto e camera", ja: "外観とカメラ", zh: "外观与摄像头", hi: "रूप और कैमरा", ar: "المظهر والكاميرا",
+  },
+  "desk.look.portrait.ph": {
+    en: "Portrait asset", es: "Recurso de retrato", fr: "Ressource de portrait", de: "Porträt-Asset", pt: "Recurso de retrato", it: "Risorsa ritratto", ja: "ポートレート素材", zh: "肖像素材", hi: "पोर्ट्रेट एसेट", ar: "أصل الصورة الشخصية",
+  },
+  "desk.look.set": {
+    en: "Set portrait", es: "Fijar retrato", fr: "Définir le portrait", de: "Porträt setzen", pt: "Definir retrato", it: "Imposta ritratto", ja: "ポートレートを設定", zh: "设置肖像", hi: "पोर्ट्रेट लगाएँ", ar: "عيّن الصورة",
+  },
+  "desk.look.clear": {
+    en: "Clear camera", es: "Quitar cámara", fr: "Retirer la caméra", de: "Kamera entfernen", pt: "Limpar câmara", it: "Rimuovi camera", ja: "カメラを外す", zh: "清除摄像头", hi: "कैमरा हटाएँ", ar: "امسح الكاميرا",
+  },
+  "desk.beacons.head": {
+    en: "Beacons", es: "Balizas", fr: "Balises", de: "Baken", pt: "Balizas", it: "Beacon", ja: "ビーコン", zh: "信标", hi: "बीकन", ar: "المنارات",
+  },
+  "desk.beacons.pitch": {
+    en: "The desk as a sticker: somebody scans it in the street and reaches this counter. Picking one up retires it — the sticker on the wall stops working, which is the point.", es: "El mostrador como pegatina: alguien la escanea en la calle y llega a este mostrador. Recogerla la retira — la pegatina en la pared deja de funcionar, que es justo la idea.", fr: "Le comptoir en autocollant : quelqu'un le scanne dans la rue et atteint ce guichet. Le ramasser le retire — l'autocollant au mur cesse de fonctionner, et c'est le but.", de: "Der Schalter als Aufkleber: jemand scannt ihn auf der Straße und erreicht diesen Tresen. Ihn aufzuheben zieht ihn zurück — der Aufkleber an der Wand hört auf zu funktionieren, und genau das ist der Sinn.", pt: "O balcão como autocolante: alguém o digitaliza na rua e chega a este balcão. Apanhá-lo retira-o — o autocolante na parede deixa de funcionar, e é essa a ideia.", it: "Il banco come adesivo: qualcuno lo scansiona per strada e raggiunge questo bancone. Raccoglierlo lo ritira — l'adesivo sul muro smette di funzionare, ed è proprio il punto.", ja: "デスクをステッカーに：街で誰かがスキャンするとこのカウンターに届きます。回収すると引退します — 壁のステッカーは機能しなくなり、それこそが狙いです。", zh: "柜台化作贴纸：有人在街上扫一下就能到达这个柜台。收回它即让它退役 — 墙上的贴纸随即失效，这正是目的所在。", hi: "डेस्क एक स्टिकर के रूप में: कोई सड़क पर उसे स्कैन करता है और इस काउंटर तक पहुँचता है। उठा लेने से वह सेवानिवृत्त हो जाता है — दीवार का स्टिकर काम करना बंद कर देता है, और यही उद्देश्य है।", ar: "المكتب كملصق: يمسحه أحدهم في الشارع فيصل إلى هذه المنضدة. التقاطه يقاعده — يتوقف الملصق على الجدار عن العمل، وهذا هو المقصود.",
+  },
+  "desk.beacons.scans": {
+    en: "{n} scan{s}", es: "{n} escaneos", fr: "{n} scans", de: "{n} Scans", pt: "{n} digitalizações", it: "{n} scansioni", ja: "スキャン{n}件", zh: "{n}次扫描", hi: "{n} स्कैन", ar: "{n} مسحة",
+  },
+  "desk.beacons.retired": {
+    en: "retired", es: "retirada", fr: "retirée", de: "zurückgezogen", pt: "retirada", it: "ritirato", ja: "引退済み", zh: "已退役", hi: "सेवानिवृत्त", ar: "متقاعد",
+  },
+  "desk.beacons.qr.alt": {
+    en: "this desk code's QR", es: "el QR del código de este mostrador", fr: "le QR du code de ce comptoir", de: "der QR dieses Schalter-Codes", pt: "o QR do código deste balcão", it: "il QR del codice di questo banco", ja: "このデスクコードのQR", zh: "此柜台代码的二维码", hi: "इस डेस्क कोड का QR", ar: "رمز QR لهذا المكتب",
+  },
+  "desk.beacons.open": {
+    en: "open it here (counts as a scan)", es: "abrirlo aquí (cuenta como escaneo)", fr: "l'ouvrir ici (compte comme un scan)", de: "hier öffnen (zählt als Scan)", pt: "abrir aqui (conta como digitalização)", it: "aprilo qui (conta come scansione)", ja: "ここで開く（スキャンとして数えます）", zh: "在此打开（计为一次扫描）", hi: "यहाँ खोलें (स्कैन के रूप में गिना जाएगा)", ar: "افتحه هنا (يُحسب مسحة)",
+  },
+  "desk.beacons.printed": {
+    en: "Printed:", es: "Impreso:", fr: "Imprimé :", de: "Gedruckt:", pt: "Impresso:", it: "Stampato:", ja: "印刷内容：", zh: "印制内容：", hi: "मुद्रित:", ar: "المطبوع:",
+  },
+  "desk.beacons.card": {
+    en: "What a scanner sees", es: "Lo que ve quien escanea", fr: "Ce que voit le scanneur", de: "Was ein Scanner sieht", pt: "O que vê quem digitaliza", it: "Cosa vede chi scansiona", ja: "スキャンした人に見えるもの", zh: "扫描者看到的内容", hi: "स्कैन करने वाले को क्या दिखता है", ar: "ما يراه الماسح",
+  },
+  "desk.beacons.pickup": {
+    en: "Pick it up", es: "Recogerla", fr: "Le ramasser", de: "Aufheben", pt: "Apanhá-la", it: "Raccoglilo", ja: "回収する", zh: "收回", hi: "उठा लें", ar: "التقطه",
+  },
+  "desk.beacons.label.ph": {
+    en: "Label (Shop window)", es: "Etiqueta (Escaparate)", fr: "Étiquette (Vitrine)", de: "Beschriftung (Schaufenster)", pt: "Etiqueta (Montra)", it: "Etichetta (Vetrina)", ja: "ラベル（ショーウィンドウ）", zh: "标签（橱窗）", hi: "लेबल (दुकान की खिड़की)", ar: "التسمية (واجهة المتجر)",
+  },
+  "desk.beacons.place": {
+    en: "Place a beacon", es: "Colocar una baliza", fr: "Poser une balise", de: "Eine Bake platzieren", pt: "Colocar uma baliza", it: "Colloca un beacon", ja: "ビーコンを設置", zh: "放置信标", hi: "बीकन रखें", ar: "ضع منارة",
+  },
+  "desk.card.agewall": {
+    en: "This desk is rated, so a scan lands on the age wall. A sticker carries no token that could clear it — that is the right answer rather than a gap.", es: "Este mostrador está clasificado, así que un escaneo cae en el muro de edad. Una pegatina no lleva token que pueda superarlo — esa es la respuesta correcta, no un hueco.", fr: "Ce comptoir est classé, donc un scan tombe sur le mur d'âge. Un autocollant ne porte aucun jeton qui pourrait le franchir — c'est la bonne réponse, pas une lacune.", de: "Dieser Schalter ist bewertet, also landet ein Scan auf der Alterswand. Ein Aufkleber trägt kein Token, das sie überwinden könnte — das ist die richtige Antwort, keine Lücke.", pt: "Este balcão é classificado, por isso uma digitalização cai no muro de idade. Um autocolante não carrega token que o possa passar — essa é a resposta certa, não uma falha.", it: "Questo banco è classificato, quindi una scansione finisce sul muro dell'età. Un adesivo non porta alcun token che possa superarlo — quella è la risposta giusta, non una lacuna.", ja: "このデスクはレーティング付きのため、スキャンは年齢の壁に着地します。ステッカーはそれを通過できるトークンを持ちません — それは欠陥ではなく正しい答えです。", zh: "此柜台已分级，因此扫描会落在年龄墙上。贴纸不携带任何能通过它的令牌 — 这是正确的答案，而非缺口。", hi: "यह डेस्क रेटेड है, इसलिए स्कैन आयु-दीवार पर उतरता है। स्टिकर में ऐसा कोई टोकन नहीं जो उसे पार कर सके — यही सही उत्तर है, कोई कमी नहीं।", ar: "هذا المكتب مصنّف، فيهبط المسح على جدار العمر. الملصق لا يحمل رمزًا يجتازه — وهذا هو الجواب الصحيح لا ثغرة.",
+  },
+  "desk.card.attested": {
+    en: "Attested by {who}: {basis}. {note}", es: "Atestiguado por {who}: {basis}. {note}", fr: "Attesté par {who} : {basis}. {note}", de: "Bezeugt von {who}: {basis}. {note}", pt: "Atestado por {who}: {basis}. {note}", it: "Attestato da {who}: {basis}. {note}", ja: "{who}による証明：{basis}。{note}", zh: "由{who}证明：{basis}。{note}", hi: "{who} द्वारा पुष्टि: {basis}। {note}", ar: "شهد به {who}: {basis}. {note}",
+  },
+  "desk.card.counted": {
+    en: "That read counted as a scan.", es: "Esa lectura contó como escaneo.", fr: "Cette lecture a compté comme un scan.", de: "Dieses Lesen zählte als Scan.", pt: "Essa leitura contou como digitalização.", it: "Quella lettura è contata come scansione.", ja: "この閲覧は1回のスキャンとして数えられました。", zh: "这次读取已计为一次扫描。", hi: "यह पढ़ना एक स्कैन के रूप में गिना गया।", ar: "حُسبت تلك القراءة مسحة.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

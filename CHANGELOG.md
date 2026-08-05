@@ -4,6 +4,19 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.6] — 2026-08-05
+
+### The counter in the street speaks
+
+The Desk screen — the staffed counter itself: opening one with its
+attestation, the bell, the guests, the stream overlay, the beacons a
+stranger scans in the street and the card a scanner is shown — is
+localized end to end: fifty-six strings become forty-seven `desk.*`
+keys in all ten languages, joining the `desk.mine.*` and
+`desk.counter.*` keys the connection bracket already had. The
+console-untranslated record falls **1281 → 1225**, exact-sync held in
+both directions.
+
 ## [0.44.5] — 2026-08-05
 
 ### The counter speaks

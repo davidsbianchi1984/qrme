@@ -327,7 +327,9 @@ def test_the_host_panel_reads_the_count_as_a_count():
     src = _markup("app/src/screens/Desk.tsx")
     assert "overlay.waiting.length" not in src, (
         "`waiting` is a number — `.length` on it printed `undefined waiting`")
-    assert "{overlay.waiting} waiting" in src
+    # The line moved into the l10n table when the screen was localized; the
+    # count is still handed over as the number itself, never a `.length`.
+    assert "waiting: overlay.waiting," in src
     assert "overlay.comments.length" in src, (
         "and `comments` is the list, so the count comes from its length")
 
