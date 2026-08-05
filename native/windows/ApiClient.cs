@@ -903,6 +903,161 @@ public record PackInstalled(
         string token) =>
         Send<DockFace>(Get($"/dock/{profileId}/face/{name}", token));
 
+    // -- the signature, the mail server, the room's ear, the wall screen,
+    // the plan, the handoff and the campaign ------------------------------
+    // Seven small blocks that close out the mid-sized doorless groups.
+
+    public Task<SignatureCertificate> SignatureCertificateOf(string sigId) =>
+        Send<SignatureCertificate>(Get($"/signatures/{sigId}/certificate"));
+
+    /// <summary>No token, no lookup, no trust in this deployment beyond
+    /// the arithmetic.</summary>
+    public Task<SignatureVerdict> VerifySignaturePackage() =>
+        Send<SignatureVerdict>(Post("/signatures/verify",
+            new { package = new { } }));
+
+    public Task<ProofingOut> ReproofCredential(string rowId, string level,
+        string attestor, string token) =>
+        Send<ProofingOut>(Post($"/signatures/credentials/{rowId}/proofing",
+            new
+            {
+                proofing_level = level, proofing_attestor = attestor,
+                proofing_method = "document", proofing_ref = "in-person"
+            }, token));
+
+    /// <summary>The WebAuthn ceremony page, opened in a web view — never
+    /// re-implemented in the shell. The URL is taken off the same GET the
+    /// view will issue, so the door and the address cannot drift.</summary>
+    public string SignatureCeremonyUrl() =>
+        Get("/signatures/ceremony").RequestUri!.ToString();
+
+    public Task<MailSettingsCard> MailSettings() =>
+        Send<MailSettingsCard>(Get("/settings/mail"));
+
+    public Task<MailSettingsCard> SaveMailSettings(string host, int port,
+        string sender, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, "/settings/mail")
+        { Content = JsonContent.Create(new { host, port, sender }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MailSettingsCard>(req);
+    }
+
+    public Task<MailSettingsCard> ForgetMailSettings(string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, "/settings/mail");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MailSettingsCard>(req);
+    }
+
+    /// <summary>A settings screen that saves without ever proving it can
+    /// deliver is how an app ends up insisting it emailed somebody.</summary>
+    public Task<MailTestOut> TestMailSettings(string to, string token) =>
+        Send<MailTestOut>(Post("/settings/mail/test", new { to }, token));
+
+    public Task<RoomCard[]> Rooms() => Send<RoomCard[]>(Get("/rooms"));
+
+    public Task<MicDisclosure> LendRoomMic(string roomId,
+        string interactorId, string token) =>
+        Send<MicDisclosure>(Post($"/rooms/{roomId}/mic",
+            new { interactor_id = interactorId }, token));
+
+    public Task<MicDisclosure> TakeBackRoomMic(string roomId,
+        string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/rooms/{roomId}/mic/{interactorId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MicDisclosure>(req);
+    }
+
+    /// <summary>Readable by anyone in the room — a disclosure only its
+    /// subject can see is not a disclosure.</summary>
+    public Task<MicDisclosure> RoomMicDisclosure(string roomId,
+        string token) =>
+        Send<MicDisclosure>(Get($"/rooms/{roomId}/mic", token));
+
+    public Task<DisplayVocabulary> DisplayVocabulary() =>
+        Send<DisplayVocabulary>(Get("/displays/vocabulary"));
+
+    public Task<DisplayCard> DisplayOf(string displayId) =>
+        Send<DisplayCard>(Get($"/displays/{displayId}"));
+
+    public Task<DisplayCard> SetDisplayFaces(string displayId,
+        string[] faces, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/displays/{displayId}/faces")
+        { Content = JsonContent.Create(new { faces }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DisplayCard>(req);
+    }
+
+    public Task<DisplayCard> TakeDownDisplay(string displayId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/displays/{displayId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DisplayCard>(req);
+    }
+
+    public Task<MembershipCard> MembershipOf(string accountId,
+        string token) =>
+        Send<MembershipCard>(Get($"/memberships/{accountId}", token));
+
+    public Task<MembershipCard> JoinPlan(string accountId, string plan,
+        string token) =>
+        Send<MembershipCard>(Post($"/memberships/{accountId}",
+            new { plan }, token));
+
+    /// <summary>The account becomes a visitor and keeps its profiles — a
+    /// lapsed subscription is not a reason to delete somebody's
+    /// work.</summary>
+    public Task<MembershipCard> CancelMembership(string accountId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/memberships/{accountId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MembershipCard>(req);
+    }
+
+    public Task<HandoffCard> CreateHandoff(string interactorId,
+        string profileId, string providerId, string token) =>
+        Send<HandoffCard>(Post("/handoffs", new
+        {
+            interactor_id = interactorId, profile_id = profileId,
+            provider_id = providerId, consent = true
+        }, token));
+
+    public Task<HandoffCard> OpenHandoff(string handoffId,
+        string linkToken) =>
+        Send<HandoffCard>(Get($"/handoffs/{handoffId}?token={linkToken}"));
+
+    public Task<HandoffCard> RevokeHandoff(string handoffId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/handoffs/{handoffId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<HandoffCard>(req);
+    }
+
+    public Task<CampaignCard> CampaignOf(string campaignId) =>
+        Send<CampaignCard>(Get($"/campaigns/{campaignId}"));
+
+    /// <summary>No token required — a donor arriving from a beacon scan
+    /// has no account, and requiring one gates generosity behind
+    /// signup.</summary>
+    public Task<CampaignCard> Donate(string campaignId, double amount,
+        string note) =>
+        Send<CampaignCard>(Post($"/campaigns/{campaignId}/donate",
+            new { amount, note }));
+
+    public Task<CampaignCard> CloseCampaign(string campaignId,
+        string token) =>
+        Send<CampaignCard>(Post($"/campaigns/{campaignId}/close", new { },
+            token));
+
     public async Task<WallPostRow[]> Wall(string profileId)
     {
         var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
@@ -1462,6 +1617,9 @@ public sealed class ApiClient
         return JsonSerializer.Deserialize<T>(
             string.IsNullOrWhiteSpace(body) ? "{}" : body)!;
     }
+
+    private static HttpRequestMessage Get(string path) =>
+        new(HttpMethod.Get, path);
 
     private static HttpRequestMessage Get(string path, string token)
     {
@@ -2784,3 +2942,55 @@ public record DockSettings(
 public record DockFace(
     [property: JsonPropertyName("face")] string? Face,
     [property: JsonPropertyName("line")] string? Line);
+
+public record SignatureCertificate(
+    [property: JsonPropertyName("printed_name")] string? PrintedName,
+    [property: JsonPropertyName("meaning")] string? Meaning,
+    [property: JsonPropertyName("signed_at")] string? SignedAt);
+
+public record SignatureVerdict(
+    [property: JsonPropertyName("valid")] bool? Valid,
+    [property: JsonPropertyName("verified")] bool? Verified);
+
+public record ProofingOut(
+    [property: JsonPropertyName("proofing_level")] string? ProofingLevel);
+
+public record MailSettingsCard(
+    [property: JsonPropertyName("transport")] string? Transport,
+    [property: JsonPropertyName("host")] string? Host,
+    [property: JsonPropertyName("sender")] string? Sender);
+
+public record MailTestOut(
+    [property: JsonPropertyName("sent")] bool? Sent);
+
+public record RoomCard(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("topic")] string? Topic,
+    [property: JsonPropertyName("channel")] string? Channel,
+    [property: JsonPropertyName("participants")] int Participants);
+
+public record DisplayVocabulary(
+    [property: JsonPropertyName("never")]
+    System.Collections.Generic.Dictionary<string, string>? Never);
+
+public record DisplayCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("faces")] string[]? Faces);
+
+public record MembershipCard(
+    [property: JsonPropertyName("plan")] string? Plan,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record HandoffCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("provider")] string? Provider,
+    [property: JsonPropertyName("token")] string? Token,
+    [property: JsonPropertyName("sealed")] bool? Sealed);
+
+public record CampaignCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("raised")] double? Raised,
+    [property: JsonPropertyName("goal")] double? Goal,
+    [property: JsonPropertyName("status")] string? Status);

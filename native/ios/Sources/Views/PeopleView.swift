@@ -211,6 +211,13 @@ struct PeopleSection: View {
                 ObjectionSection()
                 LobbySection()
                 DockSection()
+                SealSection()
+                MailSection()
+                RoomsSection()
+                WallScreenSection()
+                PlanSection()
+                HandoffSection()
+                CampaignSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

@@ -3074,3 +3074,247 @@ extension ApiClient {
         return ["face": out.face ?? "", "line": out.line ?? ""]
     }
 }
+
+// MARK: - The signature, the mail server, the room's ear, the wall screen,
+// the plan, the handoff and the campaign
+//
+// Seven small blocks that close out the mid-sized doorless groups: the
+// signature evidence a person can read and a stranger can verify, the
+// deployment's own mail settings, the room-microphone disclosure, the
+// fixed screen's faces, the membership, the consented handoff, and the
+// crowdfunding campaign.
+
+struct SignatureCertificate: Decodable {
+    let printed_name: String?
+    let meaning: String?
+    let signed_at: String?
+}
+
+struct SignatureVerdict: Decodable {
+    let valid: Bool?
+    let verified: Bool?
+    var stands: Bool { valid ?? verified ?? false }
+}
+
+struct MailSettingsCard: Decodable {
+    let transport: String?
+    let host: String?
+    let sender: String?
+}
+
+struct RoomCard: Decodable, Identifiable {
+    let id: String
+    let topic: String?
+    let channel: String?
+    let participants: Int?
+}
+
+struct DisplayCard: Decodable {
+    let id: String?
+    let kind: String?
+    let faces: [String]?
+    let showing: String?
+}
+
+struct MembershipCard: Decodable {
+    let plan: String?
+    let status: String?
+}
+
+struct HandoffCard: Decodable {
+    let id: String?
+    let provider: String?
+    let token: String?
+    let sealed: Bool?
+    var identity: String { id ?? "?" }
+}
+
+struct CampaignCard: Decodable {
+    let id: String?
+    let title: String?
+    let raised: Double?
+    let goal: Double?
+    let status: String?
+}
+
+extension ApiClient {
+    // -- the signature --
+
+    func signatureCertificate(
+            sigId: String) async throws -> SignatureCertificate {
+        try await request("/signatures/\(sigId)/certificate")
+    }
+
+    /// No token, no lookup, no trust in this deployment beyond the
+    /// arithmetic.
+    func verifySignaturePackage(
+            package: [String: Any]) async throws -> SignatureVerdict {
+        try await request("/signatures/verify", method: "POST",
+                          body: ["package": package])
+    }
+
+    func reproofCredential(rowId: String, level: String, attestor: String,
+                           method: String, ref: String,
+                           token: String) async throws -> [String: String] {
+        struct Out: Decodable { let proofing_level: String? }
+        let out: Out = try await request(
+            "/signatures/credentials/\(rowId)/proofing", method: "POST",
+            body: ["proofing_level": level, "proofing_attestor": attestor,
+                   "proofing_method": method, "proofing_ref": ref],
+            token: token)
+        return ["proofing_level": out.proofing_level ?? ""]
+    }
+
+    /// The WebAuthn ceremony page, served from the relying party's own
+    /// origin — opened in a web view, never re-implemented in the shell.
+    func signatureCeremonyUrl() -> URL {
+        base.appendingPathComponent("/signatures/ceremony")
+    }
+
+    // -- the deployment's mail --
+
+    func mailSettings() async throws -> MailSettingsCard {
+        try await request("/settings/mail")
+    }
+
+    func saveMailSettings(host: String, port: Int, sender: String,
+                          token: String) async throws -> MailSettingsCard {
+        try await request("/settings/mail", method: "PUT",
+                          body: ["host": host, "port": port,
+                                 "sender": sender],
+                          token: token)
+    }
+
+    func forgetMailSettings(token: String) async throws {
+        struct Out: Decodable { let transport: String? }
+        let _: Out = try await request("/settings/mail", method: "DELETE",
+                                       token: token)
+    }
+
+    /// A settings screen that saves without ever proving it can deliver is
+    /// how an app ends up insisting it emailed somebody.
+    func testMailSettings(to: String, token: String) async throws {
+        struct Out: Decodable { let sent: Bool? }
+        let _: Out = try await request("/settings/mail/test", method: "POST",
+                                       body: ["to": to], token: token)
+    }
+
+    // -- the rooms and the lent ear --
+
+    func rooms() async throws -> [RoomCard] {
+        try await request("/rooms")
+    }
+
+    func lendRoomMic(roomId: String, interactorId: String,
+                     token: String) async throws {
+        struct Out: Decodable { let lent: Bool? }
+        let _: Out = try await request("/rooms/\(roomId)/mic",
+                                       method: "POST",
+                                       body: ["interactor_id": interactorId],
+                                       token: token)
+    }
+
+    func takeBackRoomMic(roomId: String, interactorId: String,
+                         token: String) async throws {
+        struct Out: Decodable { let taken_back: Bool? }
+        let _: Out = try await request(
+            "/rooms/\(roomId)/mic/\(interactorId)", method: "DELETE",
+            token: token)
+    }
+
+    /// Readable by anyone in the room — a disclosure only its subject can
+    /// see is not a disclosure.
+    func roomMicDisclosure(roomId: String,
+                           token: String) async throws -> MicDisclosure {
+        try await request("/rooms/\(roomId)/mic", token: token)
+    }
+
+    // -- the fixed screen --
+
+    func displayRules() async throws -> [String] {
+        struct Box: Decodable { let never: [String: String]? }
+        let box: Box = try await request("/displays/vocabulary")
+        return (box.never ?? [:]).values.sorted()
+    }
+
+    func display(displayId: String) async throws -> DisplayCard {
+        try await request("/displays/\(displayId)")
+    }
+
+    func setDisplayFaces(displayId: String, faces: [String],
+                         token: String) async throws -> DisplayCard {
+        try await request("/displays/\(displayId)/faces", method: "PUT",
+                          body: ["faces": faces], token: token)
+    }
+
+    func takeDownDisplay(displayId: String, token: String) async throws {
+        struct Out: Decodable { let taken_down: Bool? }
+        let _: Out = try await request("/displays/\(displayId)",
+                                       method: "DELETE", token: token)
+    }
+
+    // -- the membership --
+
+    func membership(accountId: String,
+                    token: String) async throws -> MembershipCard {
+        try await request("/memberships/\(accountId)", token: token)
+    }
+
+    func joinPlan(accountId: String, plan: String,
+                  token: String) async throws -> MembershipCard {
+        try await request("/memberships/\(accountId)", method: "POST",
+                          body: ["plan": plan], token: token)
+    }
+
+    /// The account becomes a visitor and keeps its profiles — a lapsed
+    /// subscription is not a reason to delete somebody's work.
+    func cancelMembership(accountId: String,
+                          token: String) async throws -> MembershipCard {
+        try await request("/memberships/\(accountId)", method: "DELETE",
+                          token: token)
+    }
+
+    // -- the handoff --
+
+    func createHandoff(interactorId: String, profileId: String,
+                       providerId: String,
+                       token: String) async throws -> HandoffCard {
+        try await request("/handoffs", method: "POST",
+                          body: ["interactor_id": interactorId,
+                                 "profile_id": profileId,
+                                 "provider_id": providerId,
+                                 "consent": true],
+                          token: token)
+    }
+
+    func openHandoff(handoffId: String,
+                     linkToken: String) async throws -> HandoffCard {
+        try await request("/handoffs/\(handoffId)?token=\(linkToken)")
+    }
+
+    func revokeHandoff(handoffId: String, token: String) async throws {
+        struct Out: Decodable { let revoked: Bool? }
+        let _: Out = try await request("/handoffs/\(handoffId)",
+                                       method: "DELETE", token: token)
+    }
+
+    // -- the campaign --
+
+    func campaign(campaignId: String) async throws -> CampaignCard {
+        try await request("/campaigns/\(campaignId)")
+    }
+
+    /// No token required — a donor arriving from a beacon scan has no
+    /// account, and requiring one gates generosity behind signup.
+    func donate(campaignId: String, amount: Double,
+                note: String) async throws -> CampaignCard {
+        try await request("/campaigns/\(campaignId)/donate", method: "POST",
+                          body: ["amount": amount, "note": note])
+    }
+
+    func closeCampaign(campaignId: String,
+                       token: String) async throws -> CampaignCard {
+        try await request("/campaigns/\(campaignId)/close", method: "POST",
+                          token: token)
+    }
+}

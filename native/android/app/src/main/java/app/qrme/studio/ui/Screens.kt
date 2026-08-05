@@ -2787,6 +2787,13 @@ private fun PeoplePanel(vm: StudioViewModel) {
         ObjectBlock(vm) { note = it }
         LobbyBlock(vm) { note = it }
         DockBlock(vm) { note = it }
+        SealBlock(vm) { note = it }
+        MailBlock(vm) { note = it }
+        RoomsBlock(vm) { note = it }
+        WallScreenBlock(vm) { note = it }
+        PlanBlock(vm) { note = it }
+        HandBlock(vm) { note = it }
+        CampBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -3517,6 +3524,250 @@ private fun DockBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         BrandButton(L10n.t("dock.set", lang)) {
             vm.call({ ApiClient.configureDock(vm.pid!!, corner, state,
                 vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+// Seven small blocks that close out the mid-sized doorless groups: the
+// signature a person can read and a stranger can verify, the mail
+// settings, the room's lent ear, the wall screen, the plan, the
+// consented handoff and the campaign.
+@Composable
+private fun SealBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var sigId by remember { mutableStateOf("") }
+    var credId by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("sig.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("sig.id", lang), sigId, "") { sigId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("sig.certificate", lang), enabled = sigId.isNotBlank()) {
+                vm.call({ ApiClient.signatureCertificate(sigId) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("sig.verify", lang)) {
+                vm.call({ ApiClient.verifySignaturePackage() }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("sig.ceremony", lang)) {
+                onNote(ApiClient.signatureCeremonyUrl())
+            }
+        }
+        labeledField(L10n.t("sig.credential", lang), credId, "") { credId = it }
+        BrandButton(L10n.t("sig.proofing", lang), enabled = credId.isNotBlank()) {
+            vm.call({ ApiClient.reproofCredential(credId, "verified",
+                vm.pid!!, vm.token!!) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun MailBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var host by remember { mutableStateOf("") }
+    var port by remember { mutableStateOf("587") }
+    var sender by remember { mutableStateOf("") }
+    var to by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("mail.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("mail.title", lang)) {
+            vm.call({ ApiClient.mailSettings() }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("mail.host", lang), host, "") { host = it }
+        labeledField(L10n.t("mail.port", lang), port, "") { port = it }
+        labeledField(L10n.t("mail.sender", lang), sender, "") { sender = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("mail.save", lang), enabled = host.isNotBlank()) {
+                vm.call({ ApiClient.saveMailSettings(host,
+                    port.toIntOrNull() ?: 587, sender, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("mail.forget", lang)) {
+                vm.call({ ApiClient.forgetMailSettings(vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("mail.to", lang), to, "") { to = it }
+        BrandButton(L10n.t("mail.test", lang), enabled = to.isNotBlank()) {
+            vm.call({ ApiClient.testMailSettings(to, vm.token!!) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rooms by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
+    var roomId by remember { mutableStateOf("") }
+    var rows by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("room.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("room.list", lang)) {
+            vm.call({ ApiClient.rooms() }) { r ->
+                rooms = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        rooms.forEach { (id, line) ->
+            TextButton(onClick = { roomId = id }) {
+                Text(line, color = Qrme.T3, fontSize = 11.sp)
+            }
+        }
+        labeledField(L10n.t("room.id", lang), roomId, "") { roomId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("room.mic.lend", lang), enabled = roomId.isNotBlank()) {
+                vm.call({ ApiClient.lendRoomMic(roomId, vm.pid!!,
+                    vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("room.mic.back", lang), enabled = roomId.isNotBlank()) {
+                vm.call({ ApiClient.takeBackRoomMic(roomId, vm.pid!!,
+                    vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("room.mic.who", lang), enabled = roomId.isNotBlank()) {
+                vm.call({ ApiClient.roomMicDisclosure(roomId, vm.token!!) }) { r ->
+                    rows = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        rows.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+    }
+}
+
+@Composable
+private fun WallScreenBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rules by remember { mutableStateOf<List<String>>(emptyList()) }
+    var displayId by remember { mutableStateOf("") }
+    var faces by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("disp.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("disp.rules", lang)) {
+            vm.call({ ApiClient.displayRules() }) { r ->
+                rules = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        rules.forEach { Text("· $it", color = Qrme.T3, fontSize = 11.sp) }
+        labeledField(L10n.t("disp.id", lang), displayId, "") { displayId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("disp.show", lang), enabled = displayId.isNotBlank()) {
+                vm.call({ ApiClient.display(displayId) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("disp.down", lang), enabled = displayId.isNotBlank()) {
+                vm.call({ ApiClient.takeDownDisplay(displayId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("disp.faces", lang), faces, "") { faces = it }
+        BrandButton(L10n.t("disp.faces", lang),
+            enabled = displayId.isNotBlank() && faces.isNotBlank()) {
+            vm.call({ ApiClient.setDisplayFaces(displayId,
+                faces.split(",").map { it.trim() }, vm.token!!) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun PlanBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var accountId by remember { mutableStateOf("") }
+    var plan by remember { mutableStateOf("basic") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("member.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("member.account", lang), accountId, "") { accountId = it }
+        labeledField(L10n.t("member.plan", lang), plan, "") { plan = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("member.show", lang), enabled = accountId.isNotBlank()) {
+                vm.call({ ApiClient.membership(accountId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("member.join", lang),
+                enabled = accountId.isNotBlank() && plan.isNotBlank()) {
+                vm.call({ ApiClient.joinPlan(accountId, plan, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("member.cancel", lang), enabled = accountId.isNotBlank()) {
+                vm.call({ ApiClient.cancelMembership(accountId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HandBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var providerId by remember { mutableStateOf("") }
+    var handoffId by remember { mutableStateOf("") }
+    var linkToken by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("hand.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("hand.provider", lang), providerId, "") { providerId = it }
+        BrandButton(L10n.t("hand.create", lang), enabled = providerId.isNotBlank()) {
+            vm.call({ ApiClient.createHandoff(vm.pid!!, vm.pid!!, providerId,
+                vm.token!!) }) { r ->
+                r.getOrNull()?.let { handoffId = it.first; linkToken = it.second }
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("hand.id", lang), handoffId, "") { handoffId = it }
+        labeledField(L10n.t("hand.token", lang), linkToken, "") { linkToken = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("hand.open", lang),
+                enabled = handoffId.isNotBlank() && linkToken.isNotBlank()) {
+                vm.call({ ApiClient.openHandoff(handoffId, linkToken) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("hand.revoke", lang), enabled = handoffId.isNotBlank()) {
+                vm.call({ ApiClient.revokeHandoff(handoffId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CampBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var campaignId by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var words by remember { mutableStateOf("") }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("camp.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("camp.id", lang), campaignId, "") { campaignId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("camp.show", lang), enabled = campaignId.isNotBlank()) {
+                vm.call({ ApiClient.campaign(campaignId) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("camp.close", lang), enabled = campaignId.isNotBlank()) {
+                vm.call({ ApiClient.closeCampaign(campaignId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("camp.amount", lang), amount, "") { amount = it }
+        labeledField(L10n.t("crowd.gift.words", lang), words, "") { words = it }
+        BrandButton(L10n.t("camp.give", lang),
+            enabled = campaignId.isNotBlank() && amount.isNotBlank()) {
+            vm.call({ ApiClient.donate(campaignId,
+                amount.toDoubleOrNull() ?: 0.0, words) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
         }
     }
 }

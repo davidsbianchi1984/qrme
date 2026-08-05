@@ -2562,6 +2562,178 @@ object ApiClient {
         return o.optString("line", o.toString())
     }
 
+    // -- the signature, the mail server, the room's ear, the wall screen,
+    // the plan, the handoff and the campaign -----------------------------
+    // Seven small blocks that close out the mid-sized doorless groups.
+
+    suspend fun signatureCertificate(sigId: String): String {
+        val o = JSONObject(request("/signatures/$sigId/certificate"))
+        return o.optString("printed_name") + " · " + o.optString("meaning") +
+            " · " + o.optString("signed_at")
+    }
+
+    /** No token, no lookup, no trust in this deployment beyond the
+     *  arithmetic. */
+    suspend fun verifySignaturePackage(): String {
+        val o = JSONObject(request("/signatures/verify", "POST",
+            JSONObject().put("package", JSONObject())))
+        return o.toString()
+    }
+
+    suspend fun reproofCredential(rowId: String, level: String,
+                                  attestor: String, token: String) {
+        request("/signatures/credentials/$rowId/proofing", "POST",
+            JSONObject().put("proofing_level", level)
+                .put("proofing_attestor", attestor)
+                .put("proofing_method", "document")
+                .put("proofing_ref", "in-person"), token)
+    }
+
+    /** The WebAuthn ceremony page, opened in a web view — never
+     *  re-implemented in the shell. */
+    fun signatureCeremonyUrl(): String =
+        java.net.URL("$base/signatures/ceremony").toString()
+
+    suspend fun mailSettings(): String {
+        val o = JSONObject(request("/settings/mail"))
+        return o.optString("transport") + " · " + o.optString("host")
+    }
+
+    suspend fun saveMailSettings(host: String, port: Int, sender: String,
+                                 token: String) {
+        request("/settings/mail", "PUT",
+            JSONObject().put("host", host).put("port", port)
+                .put("sender", sender), token)
+    }
+
+    suspend fun forgetMailSettings(token: String) {
+        request("/settings/mail", "DELETE", token = token)
+    }
+
+    /** A settings screen that saves without ever proving it can deliver is
+     *  how an app ends up insisting it emailed somebody. */
+    suspend fun testMailSettings(to: String, token: String) {
+        request("/settings/mail/test", "POST",
+            JSONObject().put("to", to), token)
+    }
+
+    suspend fun rooms(): List<Pair<String, String>> {
+        val a = org.json.JSONArray(request("/rooms"))
+        val out = mutableListOf<Pair<String, String>>()
+        for (i in 0 until a.length()) {
+            val r = a.getJSONObject(i)
+            out.add(r.getString("id") to (r.optString("topic") + " · " +
+                r.optString("channel") + " · " + r.optInt("participants")))
+        }
+        return out
+    }
+
+    suspend fun lendRoomMic(roomId: String, interactorId: String,
+                            token: String) {
+        request("/rooms/$roomId/mic", "POST",
+            JSONObject().put("interactor_id", interactorId), token)
+    }
+
+    suspend fun takeBackRoomMic(roomId: String, interactorId: String,
+                                token: String) {
+        request("/rooms/$roomId/mic/$interactorId", "DELETE", token = token)
+    }
+
+    /** Readable by anyone in the room — a disclosure only its subject can
+     *  see is not a disclosure. */
+    suspend fun roomMicDisclosure(roomId: String,
+                                  token: String): List<String> {
+        val o = JSONObject(request("/rooms/$roomId/mic", token = token))
+        val out = mutableListOf<String>()
+        o.optJSONArray("lent")?.let { a ->
+            for (i in 0 until a.length()) {
+                val m = a.getJSONObject(i)
+                out.add(m.optString("interactor_id") + " · " +
+                    m.optString("device"))
+            }
+        }
+        return out
+    }
+
+    suspend fun displayRules(): List<String> {
+        val o = JSONObject(request("/displays/vocabulary"))
+        val out = mutableListOf<String>()
+        o.optJSONObject("never")?.let { n ->
+            for (key in n.keys()) out.add(n.optString(key))
+        }
+        return out
+    }
+
+    suspend fun display(displayId: String): String {
+        val o = JSONObject(request("/displays/$displayId"))
+        return o.optString("kind") + " · " +
+            (o.optJSONArray("faces")?.toString() ?: "[]")
+    }
+
+    suspend fun setDisplayFaces(displayId: String, faces: List<String>,
+                                token: String) {
+        val arr = org.json.JSONArray()
+        faces.forEach { arr.put(it) }
+        request("/displays/$displayId/faces", "PUT",
+            JSONObject().put("faces", arr), token)
+    }
+
+    suspend fun takeDownDisplay(displayId: String, token: String) {
+        request("/displays/$displayId", "DELETE", token = token)
+    }
+
+    suspend fun membership(accountId: String, token: String): String {
+        val o = JSONObject(request("/memberships/$accountId", token = token))
+        return o.optString("plan") + " · " + o.optString("status")
+    }
+
+    suspend fun joinPlan(accountId: String, plan: String, token: String) {
+        request("/memberships/$accountId", "POST",
+            JSONObject().put("plan", plan), token)
+    }
+
+    /** The account becomes a visitor and keeps its profiles — a lapsed
+     *  subscription is not a reason to delete somebody's work. */
+    suspend fun cancelMembership(accountId: String, token: String) {
+        request("/memberships/$accountId", "DELETE", token = token)
+    }
+
+    suspend fun createHandoff(interactorId: String, profileId: String,
+                              providerId: String,
+                              token: String): Pair<String, String> {
+        val o = JSONObject(request("/handoffs", "POST",
+            JSONObject().put("interactor_id", interactorId)
+                .put("profile_id", profileId)
+                .put("provider_id", providerId).put("consent", true), token))
+        return o.optString("id") to o.optString("token")
+    }
+
+    suspend fun openHandoff(handoffId: String, linkToken: String): String {
+        val o = JSONObject(request("/handoffs/$handoffId?token=$linkToken"))
+        return o.optString("provider") + " · " + o.optBoolean("sealed")
+    }
+
+    suspend fun revokeHandoff(handoffId: String, token: String) {
+        request("/handoffs/$handoffId", "DELETE", token = token)
+    }
+
+    suspend fun campaign(campaignId: String): String {
+        val o = JSONObject(request("/campaigns/$campaignId"))
+        return o.optString("title") + " · " + o.optDouble("raised", 0.0) +
+            " / " + o.optDouble("goal", 0.0) + " · " + o.optString("status")
+    }
+
+    /** No token required — a donor arriving from a beacon scan has no
+     *  account, and requiring one gates generosity behind signup. */
+    suspend fun donate(campaignId: String, amount: Double, note: String) {
+        request("/campaigns/$campaignId/donate", "POST",
+            JSONObject().put("amount", amount).put("note", note))
+    }
+
+    suspend fun closeCampaign(campaignId: String, token: String) {
+        request("/campaigns/$campaignId/close", "POST", token = token)
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

@@ -484,6 +484,126 @@
                     <Button x:Name="DockSetButton" Click="OnDockSet" />
                 </StackPanel>
             </Border>
+            <!-- The signature a person reads and a stranger verifies. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SigTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="SigIdBox" />
+                    <Button x:Name="SigCertButton" Click="OnSigCert" />
+                    <Button x:Name="SigVerifyButton" Click="OnSigVerify" />
+                    <Button x:Name="SigCeremonyButton" Click="OnSigCeremony" />
+                    <TextBox x:Name="SigCredBox" />
+                    <Button x:Name="SigProofButton" Click="OnSigProof" />
+                </StackPanel>
+            </Border>
+
+            <!-- Where this deployment sends mail. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MailTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="MailShowButton" Click="OnMailShow" />
+                    <TextBox x:Name="MailHostBox" />
+                    <TextBox x:Name="MailPortBox" />
+                    <TextBox x:Name="MailSenderBox" />
+                    <Button x:Name="MailSaveButton" Click="OnMailSave" />
+                    <Button x:Name="MailForgetButton" Click="OnMailForget" />
+                    <TextBox x:Name="MailToBox" />
+                    <Button x:Name="MailTestButton" Click="OnMailTest" />
+                </StackPanel>
+            </Border>
+
+            <!-- The rooms and the lent ear. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="RoomsTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="RoomsListButton" Click="OnRoomsList" />
+                    <ItemsControl x:Name="RoomList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="RoomIdBox" />
+                    <Button x:Name="RoomMicLendButton" Click="OnRoomMicLend" />
+                    <Button x:Name="RoomMicBackButton" Click="OnRoomMicBack" />
+                    <Button x:Name="RoomMicWhoButton" Click="OnRoomMicWho" />
+                </StackPanel>
+            </Border>
+
+            <!-- The fixed screen. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="DispTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="DispRulesButton" Click="OnDispRules" />
+                    <ItemsControl x:Name="DispList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="DispIdBox" />
+                    <Button x:Name="DispShowButton" Click="OnDispShow" />
+                    <TextBox x:Name="DispFacesBox" />
+                    <Button x:Name="DispFacesButton" Click="OnDispFaces" />
+                    <Button x:Name="DispDownButton" Click="OnDispDown" />
+                </StackPanel>
+            </Border>
+
+            <!-- The membership. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MemberTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="MemberAccountBox" />
+                    <Button x:Name="MemberShowButton" Click="OnMemberShow" />
+                    <TextBox x:Name="MemberPlanBox" />
+                    <Button x:Name="MemberJoinButton" Click="OnMemberJoin" />
+                    <Button x:Name="MemberCancelButton" Click="OnMemberCancel" />
+                </StackPanel>
+            </Border>
+
+            <!-- The consented handoff. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="HandTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="HandProviderBox" />
+                    <Button x:Name="HandCreateButton" Click="OnHandCreate" />
+                    <TextBox x:Name="HandIdBox" />
+                    <TextBox x:Name="HandTokenBox" />
+                    <Button x:Name="HandOpenButton" Click="OnHandOpen" />
+                    <Button x:Name="HandRevokeButton" Click="OnHandRevoke" />
+                </StackPanel>
+            </Border>
+
+            <!-- The campaign. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="CampTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="CampIdBox" />
+                    <Button x:Name="CampShowButton" Click="OnCampShow" />
+                    <TextBox x:Name="CampAmountBox" />
+                    <TextBox x:Name="CampWordsBox" />
+                    <Button x:Name="CampGiveButton" Click="OnCampGive" />
+                    <Button x:Name="CampCloseButton" Click="OnCampClose" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

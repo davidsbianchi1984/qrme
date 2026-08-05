@@ -4,6 +4,46 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.5] — 2026-08-05
+
+### The seal, the mail and the screen
+
+Seven more blocks off the per-shell doorless record — signatures, the
+mail server, the room's ear, the wall screen, the plan, the handoff
+and the campaign — and what they share is an audience that is not the
+owner at the console: the person *accepting* a signature, the admin
+proving mail can actually leave the box, whoever walks into a room or
+past a wall panel, the account holder reading what their plan reaches,
+the provider on the far end of a handoff, and a donor arriving from a
+beacon scan with no account at all. Every one of those people is
+holding a phone, and until this cut the phone had no door.
+
+Twenty-five routes gain doors on iOS, Android and Windows — **74 rows
+struck**; the records fall to ios 146, android 150, windows 149 — each
+rendering its backend's rules: a verification asks nothing of this
+deployment (an empty package gets a verdict whose notes name the
+missing field, not an error); the mail read is public and the write is
+the deployment's, with the password never coming back out; the
+microphone disclosure is readable exactly where the microphone is — in
+the room, and an injection that widened it to anyone holding the room
+id went red before it shipped; what a wall screen shows is public on
+purpose and only its owner changes it; a lapsed plan keeps its
+profiles; a handoff exists only by consent, opens only by its token
+and dies revoked; a donation needs no token and closing the campaign
+needs the owner. 47 shared strings per shell, in ten languages — and a
+second injection that dropped one language from one row on one shell
+was caught by the full-list rule.
+
+On Windows the ceremony page's address is now taken off the same GET
+the web view will issue, so the door and the address cannot drift —
+and the last unstruck signatures row fell with it.
+
+The field-label residue falls 141 → 140: `faces` is typed into the
+wall-screen form on all three shells, so its refusal now names the
+label on the form; `interactor_id`, filled from the session rather
+than typed, stays on the identifier fallback the record's doctrine
+prescribes.
+
 ## [0.43.4] — 2026-08-04
 
 ### The body, the case and the lobby

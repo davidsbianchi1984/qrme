@@ -2937,6 +2937,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'minutes': {'en': 'Minutes', 'es': 'Minutos', 'fr': 'Minutes', 'de': 'Minuten', 'pt': 'Minutos', 'it': 'Minuti', 'ja': '分', 'zh': '分钟', 'hi': 'मिनट', 'ar': 'الدقائق'},
     'lesson': {'en': 'Step', 'es': 'Paso', 'fr': 'Étape', 'de': 'Schritt', 'pt': 'Passo', 'it': 'Passo', 'ja': 'ステップ', 'zh': '步骤', 'hi': 'चरण', 'ar': 'الخطوة'},
     'position_s': {'en': 'Position, in seconds', 'es': 'Posición, en segundos', 'fr': 'Position, en secondes', 'de': 'Position, in Sekunden', 'pt': 'Posição, em segundos', 'it': 'Posizione, in secondi', 'ja': '位置（秒）', 'zh': '位置（秒）', 'hi': 'स्थिति, सेकंड में', 'ar': 'الموضع بالثواني'},
+    'faces': {'en': 'Faces', 'es': 'Caras', 'fr': 'Faces', 'de': 'Ansichten', 'pt': 'Faces', 'it': 'Facce', 'ja': '表示面', 'zh': '显示面', 'hi': 'फ़ेस', 'ar': 'الأوجه'},
     'feature': {'en': 'Feature', 'es': 'Función', 'fr': 'Fonction', 'de': 'Funktion', 'pt': 'Função', 'it': 'Funzione', 'ja': '機能', 'zh': '功能', 'hi': 'सुविधा', 'ar': 'الميزة'},
     'headline': {'en': 'Headline', 'es': 'Titular', 'fr': 'Accroche', 'de': 'Überschrift', 'pt': 'Título', 'it': 'Titolo', 'ja': '見出し', 'zh': '标题', 'hi': 'शीर्षक', 'ar': 'العنوان'},
     'availability': {'en': 'Availability', 'es': 'Disponibilidad', 'fr': 'Disponibilité', 'de': 'Verfügbarkeit', 'pt': 'Disponibilidade', 'it': 'Disponibilità', 'ja': '在庫状況', 'zh': '供货情况', 'hi': 'उपलब्धता', 'ar': 'التوفر'},

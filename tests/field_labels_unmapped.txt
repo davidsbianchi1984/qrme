@@ -1,4 +1,4 @@
-# status: backlog — 141 rows
+# status: backlog — 140 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -69,7 +69,6 @@ envelope_id
 environment
 excludes
 face
-faces
 feedback_neg
 feedback_pos
 flag_reason

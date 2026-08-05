@@ -180,6 +180,57 @@ public sealed partial class PeoplePage : Page
         DockStateBox.Header = L10n.T("dock.state");
         DockStateBox.Text = "handle";
         DockSetButton.Content = L10n.T("dock.set");
+        SigTitle.Text = L10n.T("sig.title");
+        SigIdBox.Header = L10n.T("sig.id");
+        SigCertButton.Content = L10n.T("sig.certificate");
+        SigVerifyButton.Content = L10n.T("sig.verify");
+        SigCeremonyButton.Content = L10n.T("sig.ceremony");
+        SigCredBox.Header = L10n.T("sig.credential");
+        SigProofButton.Content = L10n.T("sig.proofing");
+        MailTitle.Text = L10n.T("mail.title");
+        MailShowButton.Content = L10n.T("mail.title");
+        MailHostBox.Header = L10n.T("mail.host");
+        MailPortBox.Header = L10n.T("mail.port");
+        MailPortBox.Text = "587";
+        MailSenderBox.Header = L10n.T("mail.sender");
+        MailSaveButton.Content = L10n.T("mail.save");
+        MailForgetButton.Content = L10n.T("mail.forget");
+        MailToBox.Header = L10n.T("mail.to");
+        MailTestButton.Content = L10n.T("mail.test");
+        RoomsTitle.Text = L10n.T("room.title");
+        RoomsListButton.Content = L10n.T("room.list");
+        RoomIdBox.Header = L10n.T("room.id");
+        RoomMicLendButton.Content = L10n.T("room.mic.lend");
+        RoomMicBackButton.Content = L10n.T("room.mic.back");
+        RoomMicWhoButton.Content = L10n.T("room.mic.who");
+        DispTitle.Text = L10n.T("disp.title");
+        DispRulesButton.Content = L10n.T("disp.rules");
+        DispIdBox.Header = L10n.T("disp.id");
+        DispShowButton.Content = L10n.T("disp.show");
+        DispFacesBox.Header = L10n.T("disp.faces");
+        DispFacesButton.Content = L10n.T("disp.faces");
+        DispDownButton.Content = L10n.T("disp.down");
+        MemberTitle.Text = L10n.T("member.title");
+        MemberAccountBox.Header = L10n.T("member.account");
+        MemberShowButton.Content = L10n.T("member.show");
+        MemberPlanBox.Header = L10n.T("member.plan");
+        MemberPlanBox.Text = "basic";
+        MemberJoinButton.Content = L10n.T("member.join");
+        MemberCancelButton.Content = L10n.T("member.cancel");
+        HandTitle.Text = L10n.T("hand.title");
+        HandProviderBox.Header = L10n.T("hand.provider");
+        HandCreateButton.Content = L10n.T("hand.create");
+        HandIdBox.Header = L10n.T("hand.id");
+        HandTokenBox.Header = L10n.T("hand.token");
+        HandOpenButton.Content = L10n.T("hand.open");
+        HandRevokeButton.Content = L10n.T("hand.revoke");
+        CampTitle.Text = L10n.T("camp.title");
+        CampIdBox.Header = L10n.T("camp.id");
+        CampShowButton.Content = L10n.T("camp.show");
+        CampAmountBox.Header = L10n.T("camp.amount");
+        CampWordsBox.Header = L10n.T("crowd.gift.words");
+        CampGiveButton.Content = L10n.T("camp.give");
+        CampCloseButton.Content = L10n.T("camp.close");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -957,4 +1008,165 @@ public sealed partial class PeoplePage : Page
         await Try(async () => await ApiClient.Shared.ConfigureDock(
             AppState.Current.Pid!, DockCornerBox.Text.Trim(),
             DockStateBox.Text.Trim(), AppState.Current.Token!));
+
+    // -- the signature, the mail, the rooms, the screen, the plan, the
+    // handoff and the campaign --------------------------------------------
+
+    private async void OnSigCert(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.SignatureCertificateOf(
+                SigIdBox.Text.Trim());
+            StatusText.Text = $"{c.PrintedName} · {c.Meaning} · {c.SignedAt}";
+        });
+
+    private async void OnSigVerify(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.VerifySignaturePackage();
+            StatusText.Text = $"{v.Valid ?? v.Verified}";
+        });
+
+    private void OnSigCeremony(object sender, RoutedEventArgs e) =>
+        StatusText.Text = ApiClient.Shared.SignatureCeremonyUrl();
+
+    private async void OnSigProof(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.ReproofCredential(
+            SigCredBox.Text.Trim(), "verified", AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnMailShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var m = await ApiClient.Shared.MailSettings();
+            StatusText.Text = $"{m.Transport} · {m.Host}";
+        });
+
+    private async void OnMailSave(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.SaveMailSettings(
+            MailHostBox.Text.Trim(),
+            int.TryParse(MailPortBox.Text, out var mp) ? mp : 587,
+            MailSenderBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnMailForget(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.ForgetMailSettings(
+            AppState.Current.Token!));
+
+    private async void OnMailTest(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.TestMailSettings(
+            MailToBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnRoomsList(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var rooms = await ApiClient.Shared.Rooms();
+            RoomList.ItemsSource = rooms.Select(r => new Row(
+                $"{r.Id} · {r.Topic} · {r.Channel} · {r.Participants}"))
+                .ToList();
+        });
+
+    private async void OnRoomMicLend(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.LendRoomMic(
+            RoomIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnRoomMicBack(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.TakeBackRoomMic(
+            RoomIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    private async void OnRoomMicWho(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var d = await ApiClient.Shared.RoomMicDisclosure(
+                RoomIdBox.Text.Trim(), AppState.Current.Token!);
+            RoomList.ItemsSource = (d.Lent ?? Array.Empty<LentRow>())
+                .Select(m => new Row($"{m.InteractorId} · {m.Device}"))
+                .ToList();
+        });
+
+    private async void OnDispRules(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.DisplayVocabulary();
+            DispList.ItemsSource = (v.Never
+                ?? new System.Collections.Generic.Dictionary<string, string>())
+                .Values.OrderBy(x => x).Select(r => new Row($"· {r}"))
+                .ToList();
+        });
+
+    private async void OnDispShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var d = await ApiClient.Shared.DisplayOf(DispIdBox.Text.Trim());
+            StatusText.Text =
+                $"{d.Kind} · {string.Join(", ", d.Faces ?? Array.Empty<string>())}";
+        });
+
+    private async void OnDispFaces(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.SetDisplayFaces(
+            DispIdBox.Text.Trim(),
+            DispFacesBox.Text.Split(',').Select(f => f.Trim())
+                .Where(f => f.Length > 0).ToArray(),
+            AppState.Current.Token!));
+
+    private async void OnDispDown(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.TakeDownDisplay(
+            DispIdBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnMemberShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var m = await ApiClient.Shared.MembershipOf(
+                MemberAccountBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = $"{m.Plan} · {m.Status}";
+        });
+
+    private async void OnMemberJoin(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.JoinPlan(
+            MemberAccountBox.Text.Trim(), MemberPlanBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnMemberCancel(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.CancelMembership(
+            MemberAccountBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnHandCreate(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var h = await ApiClient.Shared.CreateHandoff(
+                AppState.Current.Pid!, AppState.Current.Pid!,
+                HandProviderBox.Text.Trim(), AppState.Current.Token!);
+            HandIdBox.Text = h.Id ?? "";
+            HandTokenBox.Text = h.Token ?? "";
+        });
+
+    private async void OnHandOpen(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var h = await ApiClient.Shared.OpenHandoff(
+                HandIdBox.Text.Trim(), HandTokenBox.Text.Trim());
+            StatusText.Text = $"{h.Provider} · {h.Sealed}";
+        });
+
+    private async void OnHandRevoke(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.RevokeHandoff(
+            HandIdBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnCampShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.CampaignOf(CampIdBox.Text.Trim());
+            StatusText.Text = $"{c.Title} · {c.Raised} / {c.Goal} · {c.Status}";
+        });
+
+    private async void OnCampGive(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.Donate(
+            CampIdBox.Text.Trim(),
+            double.TryParse(CampAmountBox.Text, out var amt) ? amt : 0,
+            CampWordsBox.Text.Trim()));
+
+    private async void OnCampClose(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.CloseCampaign(
+            CampIdBox.Text.Trim(), AppState.Current.Token!));
 }
