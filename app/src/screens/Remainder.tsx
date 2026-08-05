@@ -3,6 +3,7 @@ import { api, type AppConnector, type Excursion, type FeedbackBoard,
          type GameSession, type PackDetail, type PackRegistry,
          type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -45,6 +46,7 @@ import { useSession } from "../store";
  */
 export function Remainder() {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -119,17 +121,14 @@ export function Remainder() {
 
   return (
     <div className="screen">
-      <h2>Everything else</h2>
+      <h2>{tr("rem.title", lang)}</h2>
       <Refusal error={error} />
       {said && <p className="small">{said}</p>}
 
       {/* --- feedback ---------------------------------------------------- */}
       <div className="card">
-        <h3>Tell us about the app</h3>
-        <p className="muted small">
-          Your own submissions come back to you and to nobody else. All anyone
-          else ever sees is the count by category.
-        </p>
+        <h3>{tr("rem.fb", lang)}</h3>
+        <p className="muted small">{tr("rem.fb.pitch", lang)}</p>
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           {(board?.categories || ["idea"]).map((c) => (
             <option key={c} value={c}>{c}</option>
@@ -137,11 +136,11 @@ export function Remainder() {
         </select>
         <textarea value={message} rows={3}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="what would make this better" />
+                  placeholder={tr("rem.fb.msg.ph", lang)} />
         <button disabled={!message} onClick={() => go(
           () => api.sendFeedback({ category, message }, token || undefined),
           (r) => { setMessage(""); setSaid(r.note); reload(); })}>
-          Send it
+          {tr("rem.fb.send", lang)}
         </button>
         {board && (
           <div>
@@ -151,7 +150,7 @@ export function Remainder() {
               </p>
             ))}
             <p className="muted small">
-              {board.total} in total across everybody.
+              {fill(tr("rem.fb.total", lang), { n: board.total })}
             </p>
           </div>
         )}
@@ -159,11 +158,8 @@ export function Remainder() {
 
       {/* --- mod registries ---------------------------------------------- */}
       <div className="card">
-        <h3>Where mods come from</h3>
-        <p className="muted small">
-          Third-party catalogues. `audience` says what each one stocks — task
-          mods for a robot body, or knowledge mods for a profile.
-        </p>
+        <h3>{tr("rem.mods", lang)}</h3>
+        <p className="muted small">{tr("rem.mods.pitch", lang)}</p>
         {lastSync.length > 0 && (
           <div>
             {lastSync.map((k) => (
@@ -182,8 +178,11 @@ export function Remainder() {
               <strong>{shopWindow.title}</strong> — {shopWindow.blurb}
             </p>
             <p className="muted small">
-              {shopWindow.publisher} · {shopWindow.items} items ·{" "}
-              {shopWindow.installs} installs
+              {fill(tr("rem.mods.counts", lang), {
+                pub: shopWindow.publisher,
+                items: shopWindow.items,
+                installs: shopWindow.installs,
+              })}
               {shopWindow.rated && " · 18+"}
             </p>
             {/* Titles only. The contents are what you are buying, and they
@@ -198,7 +197,9 @@ export function Remainder() {
             <div>
               <p className="small"><strong>{r.name}</strong> — {r.tagline}</p>
               <p className="muted small">
-                for a {r.audience} · {r.available} available, {r.synced} synced
+                {fill(tr("rem.mods.reg", lang), {
+                  aud: r.audience, avail: r.available, sync: r.synced,
+                })}
               </p>
             </div>
             <button className="ghost" disabled={!token} onClick={() => go(
@@ -210,15 +211,15 @@ export function Remainder() {
                   + `${out.skipped} already had.`);
                 setLastSync(out.packs);
                 reload();
-              })}>Sync</button>
+              })}>{tr("rem.mods.sync", lang)}</button>
           </div>
         ))}
       </div>
 
       {/* --- connected apps ---------------------------------------------- */}
       <div className="card">
-        <h3>Apps it is connected to</h3>
-        {apps.length === 0 && <p className="muted small">None yet.</p>}
+        <h3>{tr("rem.apps", lang)}</h3>
+        {apps.length === 0 && <p className="muted small">{tr("rem.apps.none", lang)}</p>}
         {apps.map((a) => (
           <p key={a.id} className="muted small">
             <strong>{a.label}</strong> — {a.directions.join(" and ")} ·{" "}
@@ -229,27 +230,23 @@ export function Remainder() {
           () => api.connectApp(me, { provider: "google", app: "calendar" },
                                token),
           () => { setSaid("Connected."); reload(); })}>
-          Connect Google Calendar
+          {tr("rem.apps.gcal", lang)}
         </button>
       </div>
 
       {/* --- excursions --------------------------------------------------- */}
       <div className="card">
-        <h3>Going out to look something up</h3>
-        <p className="muted small">
-          The question is stripped before it leaves. The answer says how much
-          was taken out and whether it left this machine at all — which is the
-          part worth reading, not the findings.
-        </p>
+        <h3>{tr("rem.trip", lang)}</h3>
+        <p className="muted small">{tr("rem.trip.pitch", lang)}</p>
         <input value={topic} onChange={(e) => setTopic(e.target.value)}
-               placeholder="topic" />
+               placeholder={tr("rem.trip.topic.ph", lang)} />
         <input value={question} onChange={(e) => setQuestion(e.target.value)}
-               placeholder="what to find out" />
+               placeholder={tr("rem.trip.q.ph", lang)} />
         <button disabled={!me || !token || !topic || !question}
                 onClick={() => go(
                   () => api.startExcursion(me, { topic, question }, token),
                   () => { setTopic(""); setQuestion(""); reload(); })}>
-          Go and look
+          {tr("rem.trip.go", lang)}
         </button>
         {trips.map((t) => (
           <div key={t.id}>
@@ -266,7 +263,7 @@ export function Remainder() {
               <button className="ghost" onClick={() => go(
                 () => api.learnFromExcursion(t.id, token),
                 (r) => { setSaid(r.note); reload(); })}>
-                Fold it in
+                {tr("rem.trip.fold", lang)}
               </button>
             )}
           </div>
@@ -275,10 +272,10 @@ export function Remainder() {
 
       {/* --- the steering hub --------------------------------------------- */}
       <div className="card">
-        <h3>Every dial in one place</h3>
+        <h3>{tr("rem.hub", lang)}</h3>
         {hub && (
           <p className="muted small">
-            {hub.dials.length} dials
+            {fill(tr("rem.hub.dials", lang), { n: hub.dials.length })}
             {hub.adult_mode
               ? ", including the ones only a rated profile has."
               : ". The rated-only ones are listed and refused here, rather "
@@ -304,23 +301,23 @@ export function Remainder() {
 
       {/* --- playing alongside -------------------------------------------- */}
       <div className="card">
-        <h3>Playing alongside somebody</h3>
-        <p className="muted small">
-          The companion plays within the game's rules. Fair play is enforced
-          rather than promised.
-        </p>
+        <h3>{tr("rem.play", lang)}</h3>
+        <p className="muted small">{tr("rem.play.pitch", lang)}</p>
         <input value={platform} onChange={(e) => setPlatform(e.target.value)}
-               placeholder="steam, xbox, playstation…" />
+               placeholder={tr("rem.play.platform.ph", lang)} />
         <input value={game} onChange={(e) => setGame(e.target.value)}
-               placeholder="which game" />
+               placeholder={tr("rem.play.game.ph", lang)} />
         <button disabled={!me || !token || !game} onClick={() => go(
           () => api.startGameSession(me, { platform, game }, token),
-          () => { setGame(""); reload(); })}>Start a session</button>
+          () => { setGame(""); reload(); })}>{tr("rem.play.start", lang)}</button>
         {games.map((g) => (
           <div key={g.id} className="row">
             <div>
               <p className="small">
-                <strong>{g.game}</strong> on {g.platform_label} · {g.role}
+                {fill(tr("rem.play.line", lang), {
+                  game: <strong>{g.game}</strong>,
+                  platform: g.platform_label, role: g.role,
+                })}
               </p>
               <p className="muted small">{g.status}</p>
             </div>
@@ -328,11 +325,11 @@ export function Remainder() {
               <>
                 <button className="ghost" onClick={() => go(
                   () => api.gameCallout(g.id, "what should I do here?", token),
-                  (c) => setSaid(c.line))}>Ask it</button>
+                  (c) => setSaid(c.line))}>{tr("rem.play.ask", lang)}</button>
                 <button className="ghost" onClick={() => go(
                   () => api.endGameSession(g.id, token),
                   (e) => { setSaid(`Ended after ${e.callouts} callouts.`);
-                           reload(); })}>End</button>
+                           reload(); })}>{tr("rem.play.end", lang)}</button>
               </>
             )}
           </div>
@@ -341,13 +338,8 @@ export function Remainder() {
 
       {/* --- the inspector -------------------------------------------------- */}
       <div className="card">
-        <h3>Look something up by its id</h3>
-        <p className="muted small">
-          Nine of these reads had a binding written for them and no screen
-          calling it. They are not nine features — they are one question asked
-          about nine kinds of record, so this is one control rather than nine
-          buttons nobody would find.
-        </p>
+        <h3>{tr("rem.look", lang)}</h3>
+        <p className="muted small">{tr("rem.look.pitch", lang)}</p>
         <select value={lookupKind}
                 onChange={(e) => { setLookupKind(e.target.value);
                                    setFound(null); }}>
@@ -356,9 +348,9 @@ export function Remainder() {
           ))}
         </select>
         <input value={lookupId} onChange={(e) => setLookupId(e.target.value)}
-               placeholder="the id" />
+               placeholder={tr("rem.look.id.ph", lang)} />
         <button disabled={!lookupId} onClick={() => go(
-          () => LOOKUPS[lookupKind](lookupId), setFound)}>Fetch it</button>
+          () => LOOKUPS[lookupKind](lookupId), setFound)}>{tr("rem.look.go", lang)}</button>
         {found !== null && (
           <pre className="small" style={{ whiteSpace: "pre-wrap",
                                           overflowX: "auto" }}>
@@ -369,58 +361,49 @@ export function Remainder() {
 
       {/* --- the portrait ---------------------------------------------------- */}
       <div className="card">
-        <h3>Its portrait</h3>
+        <h3>{tr("rem.avatar", lang)}</h3>
         <p className="muted small">
-          The mark is burned into the pixels rather than drawn over them, so
-          it survives a screenshot or a crop.
-          {limits && ` Up to ${Math.round(limits.image.max_bytes / 1e6)} MB `
-            + `for a picture, ${Math.round(limits.video.max_bytes / 1e6)} MB `
-            + "for video."}
+          {tr("rem.avatar.pitch", lang)}
+          {limits && tr("rem.avatar.limits", lang)
+            .replace("{img}", String(Math.round(limits.image.max_bytes / 1e6)))
+            .replace("{vid}", String(Math.round(limits.video.max_bytes / 1e6)))}
         </p>
         <input value={avatarAsset}
                onChange={(e) => setAvatarAsset(e.target.value)}
-               placeholder="an asset path" />
+               placeholder={tr("rem.avatar.asset.ph", lang)} />
         <button disabled={!me || !token || !avatarAsset} onClick={() => go(
           () => api.setAvatar(me, avatarAsset, token),
           () => { setAvatarAsset(""); setSaid("Portrait set."); })}>
-          Set it
+          {tr("rem.avatar.set", lang)}
         </button>
       </div>
 
       {/* --- publishing outward -------------------------------------------- */}
       <div className="card">
-        <h3>Publishing to a platform we do not run</h3>
-        <p className="muted small">
-          This is the one place a profile's words genuinely leave. It runs the
-          strict filter — not the profile's own setting — and it stamps a
-          synthetic-media credential, because content going somewhere we cannot
-          see is the case the mark exists for. It used to do neither.
-        </p>
+        <h3>{tr("rem.pub", lang)}</h3>
+        <p className="muted small">{tr("rem.pub.pitch", lang)}</p>
         <input value={socialId} onChange={(e) => setSocialId(e.target.value)}
-               placeholder="a publish connection id" />
+               placeholder={tr("rem.pub.cid.ph", lang)} />
         <textarea value={postText} rows={3}
                   onChange={(e) => setPostText(e.target.value)}
-                  placeholder="what to post" />
+                  placeholder={tr("rem.pub.text.ph", lang)} />
         <button disabled={!token || !socialId || !postText} onClick={() => go(
           () => api.publishSocial(socialId, { topic: "post",
                                               content: postText }, token),
           (r) => { setPublished(r); setPostText(""); })}>
-          Publish it
+          {tr("rem.pub.go", lang)}
         </button>
-        <h4>Or read from one</h4>
-        <p className="muted small">
-          The other direction on the same connection: what the account already
-          published becomes source material this profile is built from.
-        </p>
+        <h4>{tr("rem.pub.read", lang)}</h4>
+        <p className="muted small">{tr("rem.pub.read.pitch", lang)}</p>
         <textarea value={collectText} rows={2}
                   onChange={(e) => setCollectText(e.target.value)}
-                  placeholder="a post to read in" />
+                  placeholder={tr("rem.pub.collect.ph", lang)} />
         <button disabled={!token || !socialId || !collectText} onClick={() => go(
           () => api.collectSocial(socialId, [{ content: collectText }], token),
           (r) => { setCollectText("");
                    setSaid(`${r.ingested} in — ${r.total_sources} sources `
                      + "now feed this profile."); })}>
-          Read it in
+          {tr("rem.pub.collect", lang)}
         </button>
         {published && (
           <div>
@@ -430,8 +413,10 @@ export function Remainder() {
                 : `Held — ${published.flag_reason}.`}
             </p>
             <p className="muted small">
-              Credential {published.watermark.watermark_id} ·{" "}
-              {published.watermark.disclosure}
+              {fill(tr("rem.pub.cred", lang), {
+                id: published.watermark.watermark_id,
+                disclosure: published.watermark.disclosure,
+              })}
             </p>
           </div>
         )}

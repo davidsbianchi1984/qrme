@@ -2709,6 +2709,153 @@ const CHROME: Table = {
   "ref.clin.send": {
     en: "Send it", es: "Enviarlo", fr: "L'envoyer", de: "Absenden", pt: "Enviá-lo", it: "Invialo", ja: "送信する", zh: "发送", hi: "भेजें", ar: "أرسله",
   },
+  "rem.title": {
+    en: "Everything else", es: "Todo lo demás", fr: "Tout le reste", de: "Alles Übrige", pt: "Tudo o resto", it: "Tutto il resto", ja: "その他すべて", zh: "其他一切", hi: "बाक़ी सब", ar: "كل ما تبقى",
+  },
+  "rem.fb": {
+    en: "Tell us about the app", es: "Cuéntanos sobre la app", fr: "Parlez-nous de l'appli", de: "Erzählen Sie uns von der App", pt: "Fale-nos da app", it: "Parlaci dell'app", ja: "アプリについて教えてください", zh: "跟我们聊聊这个应用", hi: "ऐप के बारे में बताएँ", ar: "أخبرنا عن التطبيق",
+  },
+  "rem.fb.pitch": {
+    en: "Your own submissions come back to you and to nobody else. All anyone else ever sees is the count by category.", es: "Tus propios envíos vuelven a ti y a nadie más. Lo único que ve cualquier otro es el recuento por categoría.", fr: "Vos propres envois vous reviennent, à vous et à personne d'autre. Tout ce que les autres voient, c'est le décompte par catégorie.", de: "Ihre eigenen Einsendungen kommen zu Ihnen zurück und zu niemandem sonst. Alle anderen sehen nur die Anzahl je Kategorie.", pt: "Os seus próprios envios voltam para si e para mais ninguém. Tudo o que qualquer outro vê é a contagem por categoria.", it: "I tuoi invii tornano a te e a nessun altro. Tutto ciò che chiunque altro vede è il conteggio per categoria.", ja: "あなたの投稿が返ってくるのはあなたにだけで、他の誰にも返りません。他の人が見られるのはカテゴリ別の件数だけです。", zh: "你提交的内容只回到你这里，不给其他任何人。别人能看到的只有按类别的数量。", hi: "आपके भेजे गए संदेश केवल आपके पास लौटते हैं, किसी और के पास नहीं। बाक़ी सबको सिर्फ़ श्रेणीवार गिनती दिखती है।", ar: "ما ترسله يعود إليك وحدك لا إلى غيرك. كل ما يراه الآخرون هو العدد حسب الفئة.",
+  },
+  "rem.fb.msg.ph": {
+    en: "what would make this better", es: "qué lo mejoraría", fr: "ce qui rendrait cela meilleur", de: "was das besser machen würde", pt: "o que tornaria isto melhor", it: "cosa lo renderebbe migliore", ja: "何があれば良くなるか", zh: "怎样能做得更好", hi: "इसे बेहतर क्या बनाएगा", ar: "ما الذي يجعله أفضل",
+  },
+  "rem.fb.send": {
+    en: "Send it", es: "Enviarlo", fr: "L'envoyer", de: "Absenden", pt: "Enviá-lo", it: "Invialo", ja: "送信する", zh: "发送", hi: "भेजें", ar: "أرسله",
+  },
+  "rem.fb.total": {
+    en: "{n} in total across everybody.", es: "{n} en total entre todos.", fr: "{n} au total, tous confondus.", de: "{n} insgesamt über alle hinweg.", pt: "{n} no total entre todos.", it: "{n} in totale fra tutti.", ja: "全員合わせて{n}件。", zh: "所有人合计{n}条。", hi: "सब मिलाकर कुल {n}।", ar: "{n} إجمالًا من الجميع.",
+  },
+  "rem.mods": {
+    en: "Where mods come from", es: "De dónde vienen los mods", fr: "D'où viennent les mods", de: "Woher Mods kommen", pt: "De onde vêm os mods", it: "Da dove arrivano i mod", ja: "モッドの出どころ", zh: "模组从哪来", hi: "मॉड कहाँ से आते हैं", ar: "من أين تأتي الإضافات",
+  },
+  "rem.mods.pitch": {
+    en: "Third-party catalogues. `audience` says what each one stocks — task mods for a robot body, or knowledge mods for a profile.", es: "Catálogos de terceros. «audience» dice qué guarda cada uno — mods de tareas para un cuerpo robótico, o mods de conocimiento para un perfil.", fr: "Catalogues tiers. « audience » indique ce que chacun propose — des mods de tâches pour un corps robotique, ou des mods de savoir pour un profil.", de: "Kataloge Dritter. »audience« sagt, was jeder führt — Aufgaben-Mods für einen Roboterkörper oder Wissens-Mods für ein Profil.", pt: "Catálogos de terceiros. «audience» diz o que cada um tem — mods de tarefas para um corpo robótico, ou mods de conhecimento para um perfil.", it: "Cataloghi di terze parti. «audience» dice cosa tiene ciascuno — mod di compiti per un corpo robotico, o mod di conoscenza per un profilo.", ja: "サードパーティのカタログです。「audience」が各カタログの品揃えを示します — ロボット身体向けのタスクモッドか、プロフィール向けの知識モッドか。", zh: "第三方目录。「audience」说明各家备的是什么 — 给机器人身体的任务模组，还是给资料的知识模组。", hi: "तृतीय-पक्ष कैटलॉग। «audience» बताता है कि किसके पास क्या है — रोबोट शरीर के लिए कार्य-मॉड, या प्रोफ़ाइल के लिए ज्ञान-मॉड।", ar: "كتالوجات طرف ثالث. «audience» يقول ماذا يخزّن كل واحد — إضافات مهام لجسد آلي، أو إضافات معرفة لملف.",
+  },
+  "rem.mods.counts": {
+    en: "{pub} · {items} items · {installs} installs", es: "{pub} · {items} elementos · {installs} instalaciones", fr: "{pub} · {items} éléments · {installs} installations", de: "{pub} · {items} Elemente · {installs} Installationen", pt: "{pub} · {items} itens · {installs} instalações", it: "{pub} · {items} elementi · {installs} installazioni", ja: "{pub} · {items}項目 · {installs}インストール", zh: "{pub} · {items}项 · {installs}次安装", hi: "{pub} · {items} आइटम · {installs} इंस्टॉल", ar: "{pub} · {items} عنصرًا · {installs} تثبيتًا",
+  },
+  "rem.mods.reg": {
+    en: "for a {aud} · {avail} available, {sync} synced", es: "para un {aud} · {avail} disponibles, {sync} sincronizados", fr: "pour un {aud} · {avail} disponibles, {sync} synchronisés", de: "für ein {aud} · {avail} verfügbar, {sync} synchronisiert", pt: "para um {aud} · {avail} disponíveis, {sync} sincronizados", it: "per un {aud} · {avail} disponibili, {sync} sincronizzati", ja: "{aud}向け · {avail}件利用可能、{sync}件同期済み", zh: "面向{aud} · 可用{avail}项，已同步{sync}项", hi: "{aud} के लिए · {avail} उपलब्ध, {sync} सिंक", ar: "لـ{aud} · {avail} متاحة، {sync} متزامنة",
+  },
+  "rem.mods.sync": {
+    en: "Sync", es: "Sincronizar", fr: "Synchroniser", de: "Synchronisieren", pt: "Sincronizar", it: "Sincronizza", ja: "同期", zh: "同步", hi: "सिंक करें", ar: "زامن",
+  },
+  "rem.apps": {
+    en: "Apps it is connected to", es: "Apps a las que está conectado", fr: "Applis auxquelles il est connecté", de: "Apps, mit denen es verbunden ist", pt: "Apps a que está ligado", it: "App a cui è collegato", ja: "接続中のアプリ", zh: "它已连接的应用", hi: "जुड़े हुए ऐप", ar: "التطبيقات المتصل بها",
+  },
+  "rem.apps.none": {
+    en: "None yet.", es: "Ninguna todavía.", fr: "Aucune pour l'instant.", de: "Noch keine.", pt: "Nenhuma ainda.", it: "Ancora nessuna.", ja: "まだありません。", zh: "尚无。", hi: "अभी कोई नहीं।", ar: "لا شيء بعد.",
+  },
+  "rem.apps.gcal": {
+    en: "Connect Google Calendar", es: "Conectar Google Calendar", fr: "Connecter Google Agenda", de: "Google Kalender verbinden", pt: "Ligar o Google Calendar", it: "Collega Google Calendar", ja: "Googleカレンダーを接続", zh: "连接 Google 日历", hi: "Google कैलेंडर जोड़ें", ar: "اربط تقويم Google",
+  },
+  "rem.trip": {
+    en: "Going out to look something up", es: "Salir a consultar algo", fr: "Sortir chercher quelque chose", de: "Hinausgehen, um etwas nachzuschlagen", pt: "Sair para consultar algo", it: "Uscire a cercare qualcosa", ja: "何かを調べに出かける", zh: "出门去查点东西", hi: "कुछ पता करने बाहर जाना", ar: "الخروج للبحث عن شيء",
+  },
+  "rem.trip.pitch": {
+    en: "The question is stripped before it leaves. The answer says how much was taken out and whether it left this machine at all — which is the part worth reading, not the findings.", es: "La pregunta se despoja antes de salir. La respuesta dice cuánto se quitó y si llegó a salir de esta máquina — que es la parte que vale la pena leer, no los hallazgos.", fr: "La question est expurgée avant de partir. La réponse dit combien a été retiré et si elle a seulement quitté cette machine — c'est la partie qui mérite d'être lue, pas les résultats.", de: "Die Frage wird bereinigt, bevor sie geht. Die Antwort sagt, wie viel entfernt wurde und ob sie diese Maschine überhaupt verließ — das ist der lesenswerte Teil, nicht die Befunde.", pt: "A pergunta é despojada antes de sair. A resposta diz quanto foi retirado e se chegou a sair desta máquina — e é essa a parte que vale a pena ler, não os resultados.", it: "La domanda viene spogliata prima di partire. La risposta dice quanto è stato tolto e se è mai uscita da questa macchina — ed è quella la parte che vale la pena leggere, non i risultati.", ja: "質問は出発前に情報を削ぎ落とされます。答えは、どれだけ取り除かれたか、そしてそもそもこの機械を出たのかを述べます — 読む価値があるのは所見ではなくそちらです。", zh: "问题在离开前会被剥除信息。答案会说明删去了多少，以及它究竟有没有离开这台机器 — 值得读的是这部分，而非查到的结果。", hi: "प्रश्न निकलने से पहले छाँटा जाता है। उत्तर बताता है कि कितना हटाया गया और वह इस मशीन से बाहर गया भी या नहीं — पढ़ने लायक़ हिस्सा वही है, निष्कर्ष नहीं।", ar: "يُجرَّد السؤال قبل أن يغادر. والجواب يقول كم أُزيل وهل غادر هذه الآلة أصلًا — وهذا هو الجزء الجدير بالقراءة لا النتائج.",
+  },
+  "rem.trip.topic.ph": {
+    en: "topic", es: "tema", fr: "sujet", de: "Thema", pt: "tema", it: "argomento", ja: "トピック", zh: "主题", hi: "विषय", ar: "الموضوع",
+  },
+  "rem.trip.q.ph": {
+    en: "what to find out", es: "qué averiguar", fr: "ce qu'il faut découvrir", de: "was herauszufinden ist", pt: "o que descobrir", it: "cosa scoprire", ja: "調べる内容", zh: "要查什么", hi: "क्या पता करना है", ar: "ما المطلوب معرفته",
+  },
+  "rem.trip.go": {
+    en: "Go and look", es: "Ir a mirar", fr: "Aller voir", de: "Nachsehen gehen", pt: "Ir ver", it: "Vai a vedere", ja: "見に行く", zh: "去查看", hi: "जाकर देखें", ar: "اذهب وانظر",
+  },
+  "rem.trip.fold": {
+    en: "Fold it in", es: "Incorporarlo", fr: "L'intégrer", de: "Einarbeiten", pt: "Incorporá-lo", it: "Integralo", ja: "取り込む", zh: "并入", hi: "इसे समेट लें", ar: "أدمجه",
+  },
+  "rem.hub": {
+    en: "Every dial in one place", es: "Todos los diales en un sitio", fr: "Tous les réglages au même endroit", de: "Alle Regler an einem Ort", pt: "Todos os botões num só lugar", it: "Tutte le manopole in un posto", ja: "すべてのつまみを一箇所に", zh: "所有旋钮集于一处", hi: "सारे डायल एक जगह", ar: "كل الأقراص في مكان واحد",
+  },
+  "rem.hub.dials": {
+    en: "{n} dials", es: "{n} diales", fr: "{n} réglages", de: "{n} Regler", pt: "{n} botões", it: "{n} manopole", ja: "つまみ{n}個", zh: "{n}个旋钮", hi: "{n} डायल", ar: "{n} أقراص",
+  },
+  "rem.play": {
+    en: "Playing alongside somebody", es: "Jugar junto a alguien", fr: "Jouer aux côtés de quelqu'un", de: "An jemandes Seite spielen", pt: "Jogar ao lado de alguém", it: "Giocare accanto a qualcuno", ja: "誰かと並んで遊ぶ", zh: "陪某人一起玩", hi: "किसी के साथ खेलना", ar: "اللعب إلى جانب أحدهم",
+  },
+  "rem.play.pitch": {
+    en: "The companion plays within the game's rules. Fair play is enforced rather than promised.", es: "El acompañante juega dentro de las reglas del juego. El juego limpio se impone, no se promete.", fr: "Le compagnon joue dans les règles du jeu. Le fair-play est imposé, pas promis.", de: "Der Begleiter spielt innerhalb der Spielregeln. Fairplay wird erzwungen, nicht versprochen.", pt: "O companheiro joga dentro das regras do jogo. O jogo limpo é imposto, não prometido.", it: "Il compagno gioca dentro le regole del gioco. Il fair play è imposto, non promesso.", ja: "コンパニオンはゲームのルールの内側で遊びます。フェアプレーは約束ではなく強制されます。", zh: "同伴在游戏规则之内游玩。公平竞技是强制的，不是承诺的。", hi: "साथी खेल के नियमों के भीतर खेलता है। निष्पक्ष खेल का वादा नहीं, प्रवर्तन होता है।", ar: "الرفيق يلعب ضمن قواعد اللعبة. اللعب النظيف مفروض لا موعود.",
+  },
+  "rem.play.platform.ph": {
+    en: "steam, xbox, playstation…", es: "steam, xbox, playstation…", fr: "steam, xbox, playstation…", de: "steam, xbox, playstation…", pt: "steam, xbox, playstation…", it: "steam, xbox, playstation…", ja: "steam、xbox、playstation…", zh: "steam、xbox、playstation…", hi: "steam, xbox, playstation…", ar: "steam، xbox، playstation…",
+  },
+  "rem.play.game.ph": {
+    en: "which game", es: "qué juego", fr: "quel jeu", de: "welches Spiel", pt: "que jogo", it: "quale gioco", ja: "どのゲーム", zh: "哪款游戏", hi: "कौन-सा खेल", ar: "أي لعبة",
+  },
+  "rem.play.start": {
+    en: "Start a session", es: "Iniciar una sesión", fr: "Démarrer une session", de: "Sitzung starten", pt: "Iniciar uma sessão", it: "Avvia una sessione", ja: "セッションを開始", zh: "开始一局", hi: "सत्र शुरू करें", ar: "ابدأ جلسة",
+  },
+  "rem.play.line": {
+    en: "{game} on {platform} · {role}", es: "{game} en {platform} · {role}", fr: "{game} sur {platform} · {role}", de: "{game} auf {platform} · {role}", pt: "{game} em {platform} · {role}", it: "{game} su {platform} · {role}", ja: "{platform}の{game} · {role}", zh: "{platform}上的{game} · {role}", hi: "{platform} पर {game} · {role}", ar: "{game} على {platform} · {role}",
+  },
+  "rem.play.ask": {
+    en: "Ask it", es: "Preguntarle", fr: "Lui demander", de: "Fragen", pt: "Perguntar-lhe", it: "Chiediglielo", ja: "尋ねる", zh: "问它", hi: "इससे पूछें", ar: "اسأله",
+  },
+  "rem.play.end": {
+    en: "End", es: "Terminar", fr: "Terminer", de: "Beenden", pt: "Terminar", it: "Termina", ja: "終了", zh: "结束", hi: "समाप्त", ar: "أنهِ",
+  },
+  "rem.look": {
+    en: "Look something up by its id", es: "Buscar algo por su id", fr: "Chercher quelque chose par son id", de: "Etwas anhand seiner Id nachschlagen", pt: "Procurar algo pelo seu id", it: "Cerca qualcosa dal suo id", ja: "IDで何かを引く", zh: "按ID查找记录", hi: "आईडी से कुछ खोजें", ar: "ابحث عن شيء بمعرّفه",
+  },
+  "rem.look.pitch": {
+    en: "Nine of these reads had a binding written for them and no screen calling it. They are not nine features — they are one question asked about nine kinds of record, so this is one control rather than nine buttons nobody would find.", es: "Nueve de estas lecturas tenían un enlace escrito y ninguna pantalla que lo llamara. No son nueve funciones — son una pregunta hecha sobre nueve tipos de registro, así que esto es un control y no nueve botones que nadie encontraría.", fr: "Neuf de ces lectures avaient une liaison écrite et aucun écran pour l'appeler. Ce ne sont pas neuf fonctions — c'est une seule question posée sur neuf sortes d'enregistrement, donc voici un contrôle plutôt que neuf boutons introuvables.", de: "Neun dieser Abrufe hatten eine geschriebene Anbindung und keinen Bildschirm, der sie aufrief. Es sind nicht neun Funktionen — es ist eine Frage, gestellt zu neun Arten von Datensatz, also ist dies ein Bedienelement statt neun Knöpfe, die niemand fände.", pt: "Nove destas leituras tinham uma ligação escrita e nenhum ecrã a chamá-la. Não são nove funcionalidades — são uma pergunta feita sobre nove tipos de registo, por isso isto é um controlo em vez de nove botões que ninguém encontraria.", it: "Nove di queste letture avevano un binding scritto e nessuna schermata che lo chiamasse. Non sono nove funzioni — sono una domanda posta su nove tipi di record, quindi questo è un controllo invece di nove pulsanti che nessuno troverebbe.", ja: "これらの読み取りのうち九つには、バインディングだけが書かれ、それを呼ぶ画面がありませんでした。九つの機能ではなく、九種類のレコードに対する一つの問いです。だから九つのボタンではなく一つのコントロールにしてあります。", zh: "其中九项读取写好了绑定，却没有任何界面去调用。它们不是九个功能 — 而是对九类记录问同一个问题，所以这里是一个控件，而非九个没人找得到的按钮。", hi: "इनमें से नौ पठनों के लिए बाइंडिंग लिखी थी और कोई स्क्रीन उसे नहीं बुलाती थी। ये नौ सुविधाएँ नहीं — यह नौ प्रकार के रिकॉर्ड से पूछा गया एक ही प्रश्न है, इसलिए यह एक नियंत्रण है, न कि नौ बटन जो किसी को न मिलें।", ar: "تسع من هذه القراءات كُتب لها ربط ولم تستدعِها أي شاشة. ليست تسع ميزات — بل سؤال واحد يُطرح على تسعة أنواع من السجلات، فجعلناها أداة واحدة بدل تسعة أزرار لا يجدها أحد.",
+  },
+  "rem.look.id.ph": {
+    en: "the id", es: "el id", fr: "l'id", de: "die Id", pt: "o id", it: "l'id", ja: "ID", zh: "该ID", hi: "वह आईडी", ar: "المعرّف",
+  },
+  "rem.look.go": {
+    en: "Fetch it", es: "Traerlo", fr: "Le récupérer", de: "Holen", pt: "Buscá-lo", it: "Recuperalo", ja: "取得する", zh: "取回", hi: "लाएँ", ar: "أحضره",
+  },
+  "rem.avatar": {
+    en: "Its portrait", es: "Su retrato", fr: "Son portrait", de: "Sein Porträt", pt: "O seu retrato", it: "Il suo ritratto", ja: "その肖像", zh: "它的肖像", hi: "इसका चित्र", ar: "صورته",
+  },
+  "rem.avatar.pitch": {
+    en: "The mark is burned into the pixels rather than drawn over them, so it survives a screenshot or a crop.", es: "La marca se graba en los píxeles en vez de dibujarse encima, así que sobrevive a una captura o a un recorte.", fr: "La marque est gravée dans les pixels plutôt que dessinée par-dessus, elle survit donc à une capture d'écran ou à un recadrage.", de: "Das Zeichen wird in die Pixel gebrannt statt darübergezeichnet, also übersteht es einen Screenshot oder einen Zuschnitt.", pt: "A marca é gravada nos pixels em vez de desenhada por cima, por isso sobrevive a uma captura de ecrã ou a um recorte.", it: "Il marchio è bruciato nei pixel invece che disegnato sopra, quindi sopravvive a uno screenshot o a un ritaglio.", ja: "印は画素の上に描かれるのではなく焼き込まれるため、スクリーンショットや切り抜きにも残ります。", zh: "标记是烧进像素里的，而非画在上面，因此截图或裁剪都抹不掉它。", hi: "निशान पिक्सलों पर खींचा नहीं, उनमें जलाकर बैठाया जाता है, इसलिए स्क्रीनशॉट या कतरन के बाद भी बचा रहता है।", ar: "العلامة محروقة داخل البكسلات لا مرسومة فوقها، فتنجو من لقطة شاشة أو اقتصاص.",
+  },
+  "rem.avatar.limits": {
+    en: " Up to {img} MB for a picture, {vid} MB for video.", es: " Hasta {img} MB para una imagen, {vid} MB para vídeo.", fr: " Jusqu'à {img} Mo pour une image, {vid} Mo pour la vidéo.", de: " Bis zu {img} MB für ein Bild, {vid} MB für Video.", pt: " Até {img} MB para uma imagem, {vid} MB para vídeo.", it: " Fino a {img} MB per un'immagine, {vid} MB per il video.", ja: " 画像は最大{img} MB、動画は{vid} MBまで。", zh: " 图片最多{img} MB，视频最多{vid} MB。", hi: " चित्र के लिए {img} MB तक, वीडियो के लिए {vid} MB तक।", ar: " حتى {img} ميغابايت للصورة، و{vid} ميغابايت للفيديو.",
+  },
+  "rem.avatar.asset.ph": {
+    en: "an asset path", es: "una ruta de recurso", fr: "un chemin de ressource", de: "ein Asset-Pfad", pt: "um caminho de recurso", it: "un percorso di risorsa", ja: "アセットのパス", zh: "一个素材路径", hi: "एक एसेट पथ", ar: "مسار أصل",
+  },
+  "rem.avatar.set": {
+    en: "Set it", es: "Fijarlo", fr: "Le définir", de: "Setzen", pt: "Defini-lo", it: "Impostalo", ja: "設定する", zh: "设置", hi: "लगाएँ", ar: "عيّنه",
+  },
+  "rem.pub": {
+    en: "Publishing to a platform we do not run", es: "Publicar en una plataforma que no gestionamos", fr: "Publier sur une plateforme que nous n'exploitons pas", de: "Auf einer Plattform veröffentlichen, die wir nicht betreiben", pt: "Publicar numa plataforma que não gerimos", it: "Pubblicare su una piattaforma che non gestiamo", ja: "私たちが運営しないプラットフォームへの投稿", zh: "发布到我们并不运营的平台", hi: "ऐसे मंच पर प्रकाशन जो हम नहीं चलाते", ar: "النشر على منصة لا ندير نحن",
+  },
+  "rem.pub.pitch": {
+    en: "This is the one place a profile's words genuinely leave. It runs the strict filter — not the profile's own setting — and it stamps a synthetic-media credential, because content going somewhere we cannot see is the case the mark exists for. It used to do neither.", es: "Este es el único sitio donde las palabras de un perfil salen de verdad. Aplica el filtro estricto — no el ajuste del propio perfil — y estampa una credencial de medio sintético, porque el contenido que va a donde no podemos ver es justo el caso para el que existe la marca. Antes no hacía ninguna de las dos cosas.", fr: "C'est le seul endroit où les mots d'un profil partent vraiment. Il applique le filtre strict — pas le réglage du profil — et appose un justificatif de média synthétique, car un contenu qui part là où nous ne voyons pas est précisément le cas pour lequel la marque existe. Il ne faisait ni l'un ni l'autre auparavant.", de: "Das ist der eine Ort, an dem die Worte eines Profils wirklich hinausgehen. Er wendet den strengen Filter an — nicht die Einstellung des Profils — und prägt einen Synthetik-Medien-Nachweis auf, denn Inhalt, der dorthin geht, wo wir nicht sehen können, ist genau der Fall, für den das Zeichen existiert. Früher tat er beides nicht.", pt: "Este é o único sítio onde as palavras de um perfil saem mesmo. Aplica o filtro estrito — não a definição do próprio perfil — e carimba uma credencial de média sintética, porque conteúdo que vai para onde não podemos ver é precisamente o caso para que a marca existe. Antes não fazia nenhuma das duas.", it: "Questo è l'unico posto in cui le parole di un profilo escono davvero. Applica il filtro rigoroso — non l'impostazione del profilo — e imprime una credenziale di media sintetico, perché il contenuto che va dove non possiamo vedere è proprio il caso per cui il marchio esiste. Prima non faceva né l'una né l'altra cosa.", ja: "ここはプロフィールの言葉が本当に外へ出る唯一の場所です。プロフィール自身の設定ではなく厳格フィルタを適用し、合成メディアの証明を刻印します。私たちの見えない場所へ出ていく内容こそ、この印が存在する理由だからです。以前はそのどちらも行っていませんでした。", zh: "这是资料的话语真正离开的唯一出口。它执行严格过滤 — 而非资料自身的设置 — 并加盖合成媒体凭证，因为发往我们看不见之处的内容正是这枚标记存在的理由。此前它两样都没做。", hi: "यही एकमात्र जगह है जहाँ प्रोफ़ाइल के शब्द सचमुच बाहर जाते हैं। यह सख़्त फ़िल्टर लगाता है — प्रोफ़ाइल की अपनी सेटिंग नहीं — और सिंथेटिक-मीडिया प्रमाण मुहर करता है, क्योंकि जो सामग्री हमारी दृष्टि से बाहर जाती है वही वह स्थिति है जिसके लिए यह निशान बना है। पहले यह दोनों में से कुछ नहीं करता था।", ar: "هذا هو المكان الوحيد الذي تغادر منه كلمات الملف فعلًا. يطبّق المرشّح الصارم — لا إعداد الملف نفسه — ويختم اعتماد وسائط اصطناعية، لأن المحتوى الذاهب إلى حيث لا نرى هو بالضبط الحالة التي وُجدت العلامة لأجلها. ولم يكن يفعل أيًّا منهما من قبل.",
+  },
+  "rem.pub.cid.ph": {
+    en: "a publish connection id", es: "un id de conexión de publicación", fr: "un id de connexion de publication", de: "eine Veröffentlichungs-Verbindungs-Id", pt: "um id de ligação de publicação", it: "un id di connessione di pubblicazione", ja: "投稿用の接続ID", zh: "一个发布连接ID", hi: "एक प्रकाशन कनेक्शन आईडी", ar: "معرّف اتصال نشر",
+  },
+  "rem.pub.text.ph": {
+    en: "what to post", es: "qué publicar", fr: "quoi publier", de: "was gepostet wird", pt: "o que publicar", it: "cosa pubblicare", ja: "投稿する内容", zh: "要发什么", hi: "क्या पोस्ट करना है", ar: "ماذا تنشر",
+  },
+  "rem.pub.go": {
+    en: "Publish it", es: "Publicarlo", fr: "Le publier", de: "Veröffentlichen", pt: "Publicá-lo", it: "Pubblicalo", ja: "投稿する", zh: "发布", hi: "प्रकाशित करें", ar: "انشره",
+  },
+  "rem.pub.read": {
+    en: "Or read from one", es: "O leer desde una", fr: "Ou lire depuis l'une d'elles", de: "Oder von einer lesen", pt: "Ou ler de uma", it: "Oppure leggi da una", ja: "あるいは読み込む", zh: "或从中读入", hi: "या उसी से पढ़ें", ar: "أو اقرأ من واحدة",
+  },
+  "rem.pub.read.pitch": {
+    en: "The other direction on the same connection: what the account already published becomes source material this profile is built from.", es: "La otra dirección de la misma conexión: lo que la cuenta ya publicó se convierte en material de origen con el que se construye este perfil.", fr: "L'autre sens sur la même connexion : ce que le compte a déjà publié devient la matière première dont ce profil est construit.", de: "Die andere Richtung auf derselben Verbindung: was das Konto bereits veröffentlicht hat, wird zum Quellmaterial, aus dem dieses Profil gebaut ist.", pt: "A outra direção na mesma ligação: o que a conta já publicou torna-se material de origem com que este perfil é construído.", it: "L'altra direzione sulla stessa connessione: ciò che l'account ha già pubblicato diventa materiale di partenza da cui questo profilo è costruito.", ja: "同じ接続の逆方向です：そのアカウントが既に公開したものが、このプロフィールを形づくる材料になります。", zh: "同一连接的另一方向：该账号已经发布的内容，成为构建这份资料的素材。", hi: "उसी कनेक्शन की दूसरी दिशा: खाते ने जो पहले ही प्रकाशित किया है, वह इस प्रोफ़ाइल के निर्माण की सामग्री बन जाता है।", ar: "الاتجاه الآخر على الاتصال نفسه: ما نشره الحساب سابقًا يصير مادة يُبنى منها هذا الملف.",
+  },
+  "rem.pub.collect.ph": {
+    en: "a post to read in", es: "una publicación para leer", fr: "un post à lire", de: "ein Beitrag zum Einlesen", pt: "uma publicação para ler", it: "un post da leggere", ja: "読み込む投稿", zh: "要读入的一条帖子", hi: "पढ़ने के लिए एक पोस्ट", ar: "منشور لقراءته",
+  },
+  "rem.pub.collect": {
+    en: "Read it in", es: "Leerlo", fr: "L'importer", de: "Einlesen", pt: "Lê-lo", it: "Leggilo", ja: "読み込む", zh: "读入", hi: "पढ़ लें", ar: "اقرأه",
+  },
+  "rem.pub.cred": {
+    en: "Credential {id} · {disclosure}", es: "Credencial {id} · {disclosure}", fr: "Justificatif {id} · {disclosure}", de: "Nachweis {id} · {disclosure}", pt: "Credencial {id} · {disclosure}", it: "Credenziale {id} · {disclosure}", ja: "証明 {id} · {disclosure}", zh: "凭证 {id} · {disclosure}", hi: "प्रमाण {id} · {disclosure}", ar: "الاعتماد {id} · {disclosure}",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

@@ -201,7 +201,10 @@ def test_the_screen_shows_what_the_excursion_cost():
 
 
 def test_the_screen_says_the_strict_filter_runs_outward():
+    # The sentence moved into the l10n table when the screen was localized;
+    # the screen must still look it up, and the table must still say it.
+    src = (REPO / "app/src/screens/Remainder.tsx").read_text(encoding="utf-8")
+    assert 'tr("rem.pub.pitch", lang)' in src
     flat = " ".join(
-        (REPO / "app/src/screens/Remainder.tsx").read_text(
-            encoding="utf-8").split())
+        (REPO / "app/src/l10n.ts").read_text(encoding="utf-8").split())
     assert "not the profile's own setting" in flat

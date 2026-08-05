@@ -4,6 +4,21 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.8] — 2026-08-05
+
+### The tail of the audit speaks
+
+The Remainder screen — the six small features that each had a couple
+of routes and no door, kept honestly on one screen: app feedback, mod
+registries, connected apps, excursions, the steering hub, playing
+alongside somebody, the id inspector, the portrait, and the two halves
+of a social connection — is localized end to end: fifty-one strings
+become forty-nine `rem.*` keys in all ten languages. The paragraph
+that explains why the outward publish runs the strict filter and
+stamps a credential moved into the table with the rest, and the test
+that pinned it follows it there. The console-untranslated record falls
+**1172 → 1121**, exact-sync held in both directions.
+
 ## [0.44.7] — 2026-08-05
 
 ### The handover speaks

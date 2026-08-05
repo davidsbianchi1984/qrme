@@ -1,4 +1,4 @@
-# status: backlog — 1172 rows
+# status: backlog — 1121 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1172
+# ceiling: 1121
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -827,57 +827,6 @@ Relationships: Type
 Relationships: acknowledges them truthfully if asked — disclosure by design
 Relationships: e.g. Sarah
 Relationships: people in
-Remainder: Apps it is connected to
-Remainder: Ask it
-Remainder: Connect Google Calendar
-Remainder: Credential
-Remainder: End
-Remainder: Every dial in one place
-Remainder: Everything else
-Remainder: Fetch it
-Remainder: Fold it in
-Remainder: Go and look
-Remainder: Going out to look something up
-Remainder: Its portrait
-Remainder: Look something up by its id
-Remainder: Nine of these reads had a binding written for them and no screen calling it. They are not nine features — they are one question asked about nine kinds of record, so this is one control rather than nine buttons nobody would find.
-Remainder: None yet.
-Remainder: Or read from one
-Remainder: Playing alongside somebody
-Remainder: Publish it
-Remainder: Publishing to a platform we do not run
-Remainder: Read it in
-Remainder: Send it
-Remainder: Set it
-Remainder: Start a session
-Remainder: Sync
-Remainder: Tell us about the app
-Remainder: The companion plays within the game's rules. Fair play is enforced rather than promised.
-Remainder: The mark is burned into the pixels rather than drawn over them, so it survives a screenshot or a crop.
-Remainder: The other direction on the same connection: what the account already published becomes source material this profile is built from.
-Remainder: The question is stripped before it leaves. The answer says how much was taken out and whether it left this machine at all — which is the part worth reading, not the findings.
-Remainder: Third-party catalogues. `audience` says what each one stocks — task mods for a robot body, or knowledge mods for a profile.
-Remainder: This is the one place a profile's words genuinely leave. It runs the strict filter — not the profile's own setting — and it stamps a synthetic-media credential, because content going somewhere we cannot see is the case the mark exists for. It used to do neither.
-Remainder: Where mods come from
-Remainder: Your own submissions come back to you and to nobody else. All anyone else ever sees is the count by category.
-Remainder: a post to read in
-Remainder: a publish connection id
-Remainder: an asset path
-Remainder: available,
-Remainder: dials
-Remainder: for a
-Remainder: in total across everybody.
-Remainder: installs
-Remainder: items ·
-Remainder: on
-Remainder: steam, xbox, playstation…
-Remainder: synced
-Remainder: the id
-Remainder: topic
-Remainder: what to find out
-Remainder: what to post
-Remainder: what would make this better
-Remainder: which game
 Robots: A profile can speak through a robot. The personality, the memory and the voice are the same ones — only the form of expression changes.
 Robots: Bind
 Robots: Bind a body
