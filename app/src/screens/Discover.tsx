@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, getBase } from "../api";
+import { t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -13,6 +14,7 @@ export function Discover({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [cards, setCards] = useState<Awaited<ReturnType<typeof api.marketplace>>>([]);
   const [tag, setTag] = useState("");
   const [busy, setBusy] = useState(false);
@@ -28,18 +30,22 @@ export function Discover({ onPlans }: {
     setBusy(true); setError(null); setNote(null);
     try {
       const r = await api.seedStarters();
-      setNote(`Starter collection ready — ${r.created.length} new, ${r.skipped.length} already here.`);
+      setNote(tr("dsc.ready", lang)
+        .replace("{made}", String(r.created.length))
+        .replace("{had}", String(r.skipped.length)));
       load();
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
 
   async function befriend(profileId: string) {
-    if (!session.profileId || !session.ownerToken) { setError("Sign in first."); return; }
+    if (!session.profileId || !session.ownerToken) {
+      setError(tr("dsc.signin", lang)); return;
+    }
     setBusy(true); setError(null);
     try {
       await api.addFriend(session.profileId, profileId, session.ownerToken);
-      setNote("Added to your friends.");
+      setNote(tr("dsc.added", lang));
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
@@ -47,20 +53,16 @@ export function Discover({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Discover</h2>
-        <span className="muted small">the marketplace · every card is a real profile</span>
+        <h2>{tr("dsc.title", lang)}</h2>
+        <span className="muted small">{tr("dsc.pitch", lang)}</span>
       </header>
 
       {cards.length === 0 && (
         <div className="card">
-          <h3>Nothing listed yet</h3>
-          <p className="muted small">
-            The starter collection is 33 profiles across trades and
-            interests, each carrying its industry's knowledge pack — one
-            press to install, then talk to any of them.
-          </p>
+          <h3>{tr("dsc.nothinglisted", lang)}</h3>
+          <p className="muted small">{tr("dsc.starters", lang)}</p>
           <button className="primary" disabled={busy} onClick={installStarters}>
-            {busy ? "Installing…" : "Install the starter collection"}
+            {busy ? tr("dsc.installing", lang) : tr("dsc.install", lang)}
           </button>
         </div>
       )}
@@ -68,13 +70,15 @@ export function Discover({ onPlans }: {
       {cards.length > 0 && (
         <div className="card">
           <div className="row">
-            <label>Filter by tag
-              <input value={tag} placeholder="e.g. music, carpentry"
+            <label>{tr("dsc.filter", lang)}
+              <input value={tag} placeholder={tr("dsc.tag.ph", lang)}
                      onChange={(e) => setTag(e.target.value)} />
             </label>
-            <button onClick={() => load(tag.trim())}>Search</button>
+            <button onClick={() => load(tag.trim())}>
+              {tr("dsc.search", lang)}
+            </button>
             <button disabled={busy} onClick={installStarters}>
-              {busy ? "…" : "Refresh starters"}
+              {busy ? "…" : tr("dsc.refresh", lang)}
             </button>
           </div>
         </div>
@@ -92,9 +96,11 @@ export function Discover({ onPlans }: {
                   {c.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
                 </span>
               )}
-              {c.avatar_kind === "ai" && <span className="dc-badge ai">AI</span>}
+              {c.avatar_kind === "ai" && (
+                <span className="dc-badge ai">{tr("dsc.badge.ai", lang)}</span>
+              )}
               {c.avatar_kind === "real_photo" && (
-                <span className="dc-badge real">✓ real photo</span>
+                <span className="dc-badge real">{tr("dsc.badge.real", lang)}</span>
               )}
             </div>
             <b>{c.display_name}</b>
@@ -103,7 +109,9 @@ export function Discover({ onPlans }: {
               {c.tags.slice(0, 4).map((t) => <span key={t} className="tag">{t}</span>)}
             </div>
             <button className="primary" disabled={busy}
-                    onClick={() => befriend(c.profile_id)}>Add friend</button>
+                    onClick={() => befriend(c.profile_id)}>
+              {tr("dsc.addfriend", lang)}
+            </button>
           </div>
         ))}
       </div>

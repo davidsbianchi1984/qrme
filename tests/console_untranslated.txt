@@ -1,4 +1,4 @@
-# status: backlog — 69 rows
+# status: backlog — 25 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 69
+# ceiling: 25
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -50,16 +50,6 @@
 #     mattered  is this string one a non-English reader cannot read
 #
 # The count this file exists to state honestly was overstated by that much.
-Discover: AI
-Discover: Add friend
-Discover: Discover
-Discover: Filter by tag
-Discover: Nothing listed yet
-Discover: Search
-Discover: The starter collection is 33 profiles across trades and interests, each carrying its industry's knowledge pack — one press to install, then talk to any of them.
-Discover: e.g. music, carpentry
-Discover: the marketplace · every card is a real profile
-Discover: ✓ real photo
 Friends: Add
 Friends: Friends
 Friends: Loading, or no friends yet — add friends from Discover.
@@ -67,18 +57,6 @@ Friends: Sign in first.
 Friends: Suggested
 Friends: founder
 Friends: remove
-Home: AI Version —
-Home: Chat with
-Home: Home
-Home: Memory Vault
-Home: New in this release
-Home: Persona
-Home: Relationships
-Home: ● Online
-Home: 🎗 Where the money goes
-Home: 🏛 Departments that coordinate
-Home: 🔮 What would they do
-Home: 🫱🏽‍🫲🏻 Blend a profile
 Memory: AES-256-GCM · one row per conversation · erase by name
 Memory: Erase all
 Memory: Erase this one
@@ -87,28 +65,6 @@ Memory: Memory Vault 🔒
 Memory: No memories yet — have a chat first.
 Memory: turns · last
 Memory: with
-Plans: . Readable by
-Plans: End my subscription
-Plans: Erasure:
-Plans: Includes:
-Plans: Never held here whatever the plan:
-Plans: Not on this plan:
-Plans: Plans
-Plans: Reading a membership needs an owner token for a profile on this account. Sign in as an owner to see or change the plan.
-Plans: This account
-Plans: You are reading the price list without signing in, which is on purpose — nothing above this needs an account.
-Plans: your plan
-Plans: — in each of those the person exposed did not pick the plan.
-Relationships: 's life
-Relationships: Active relationships
-Relationships: Add a relationship
-Relationships: Name
-Relationships: Relationships
-Relationships: Tone
-Relationships: Type
-Relationships: acknowledges them truthfully if asked — disclosure by design
-Relationships: e.g. Sarah
-Relationships: people in
 Simulate: Horizon
 Simulate: Past runs
 Simulate: Prediction

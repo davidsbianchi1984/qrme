@@ -6564,6 +6564,234 @@ const CHROME: Table = {
   "rms.away": {
     en: "away", es: "ausente", fr: "absent", de: "abwesend", pt: "ausente", it: "assente", ja: "離席中", zh: "不在", hi: "अनुपस्थित", ar: "غائب",
   },
+  "pln.title": {
+    en: "Plans", es: "Planes", fr: "Formules", de: "Tarife", pt: "Planos", it: "Piani", ja: "プラン", zh: "方案", hi: "योजनाएँ", ar: "الخطط",
+  },
+  "pln.nocharge": {
+    en: "no charge", es: "sin coste", fr: "sans frais", de: "kostenlos", pt: "sem custo", it: "senza costi", ja: "無料", zh: "不收费", hi: "कोई शुल्क नहीं", ar: "بلا رسوم",
+  },
+  "pln.per": {
+    en: "a {period}", es: "al {period}", fr: "par {period}", de: "pro {period}", pt: "por {period}", it: "al {period}", ja: "{period}あたり", zh: "每{period}", hi: "प्रति {period}", ar: "لكل {period}",
+  },
+  "pln.yourplan": {
+    en: "your plan", es: "tu plan", fr: "votre formule", de: "Ihr Tarif", pt: "o seu plano", it: "il tuo piano", ja: "あなたのプラン", zh: "你的方案", hi: "आपकी योजना", ar: "خطتك",
+  },
+  "pln.includes": {
+    en: "Includes:", es: "Incluye:", fr: "Comprend :", de: "Enthält:", pt: "Inclui:", it: "Include:", ja: "含まれるもの:", zh: "包含：", hi: "इसमें शामिल:", ar: "يشمل:",
+  },
+  "pln.readingpublic": {
+    en: "reading public pages", es: "leer páginas públicas", fr: "lire les pages publiques", de: "öffentliche Seiten lesen", pt: "ler páginas públicas", it: "leggere pagine pubbliche", ja: "公開ページを読むこと", zh: "阅读公开页面", hi: "सार्वजनिक पन्ने पढ़ना", ar: "قراءة الصفحات العامة",
+  },
+  "pln.notonplan": {
+    en: "Not on this plan:", es: "No en este plan:", fr: "Pas dans cette formule :", de: "Nicht in diesem Tarif:", pt: "Não neste plano:", it: "Non in questo piano:", ja: "このプランに含まれないもの:", zh: "此方案不含：", hi: "इस योजना में नहीं:", ar: "ليس في هذه الخطة:",
+  },
+  "pln.movetofree": {
+    en: "Move to Free", es: "Pasar a Gratis", fr: "Passer à Gratuit", de: "Zu Kostenlos wechseln", pt: "Passar para Grátis", it: "Passa a Gratuito", ja: "無料プランに移る", zh: "转到免费方案", hi: "फ़्री पर जाएँ", ar: "انتقل إلى المجاني",
+  },
+  "pln.join": {
+    en: "Join {title}", es: "Unirse a {title}", fr: "Rejoindre {title}", de: "{title} beitreten", pt: "Aderir a {title}", it: "Passa a {title}", ja: "{title} に加入", zh: "加入 {title}", hi: "{title} लें", ar: "انضم إلى {title}",
+  },
+  "pln.youareon": {
+    en: "You are on {title}. {billing}", es: "Estás en {title}. {billing}", fr: "Vous êtes sur {title}. {billing}", de: "Sie sind auf {title}. {billing}", pt: "Está no {title}. {billing}", it: "Sei su {title}. {billing}", ja: "現在のプランは {title} です。{billing}", zh: "你当前的方案是 {title}。{billing}", hi: "आप {title} पर हैं। {billing}", ar: "أنت على {title}. {billing}",
+  },
+  "pln.thisaccount": {
+    en: "This account", es: "Esta cuenta", fr: "Ce compte", de: "Dieses Konto", pt: "Esta conta", it: "Questo account", ja: "このアカウント", zh: "此账户", hi: "यह खाता", ar: "هذا الحساب",
+  },
+  "pln.endsub": {
+    en: "End my subscription", es: "Terminar mi suscripción", fr: "Mettre fin à mon abonnement", de: "Mein Abonnement beenden", pt: "Terminar a minha subscrição", it: "Chiudi il mio abbonamento", ja: "購読を終了する", zh: "结束我的订阅", hi: "मेरी सदस्यता समाप्त करें", ar: "أنهِ اشتراكي",
+  },
+  "pln.ended": {
+    en: "Your subscription has ended. Your profiles are untouched — a lapsed plan is not a reason to delete anybody's work.", es: "Tu suscripción ha terminado. Tus perfiles quedan intactos — un plan vencido no es razón para borrar el trabajo de nadie.", fr: "Votre abonnement a pris fin. Vos profils restent intacts — une formule échue n'est pas une raison de supprimer le travail de quiconque.", de: "Ihr Abonnement ist beendet. Ihre Profile bleiben unberührt — ein abgelaufener Tarif ist kein Grund, jemandes Arbeit zu löschen.", pt: "A sua subscrição terminou. Os seus perfis ficam intactos — um plano caducado não é razão para apagar o trabalho de ninguém.", it: "Il tuo abbonamento è finito. I tuoi profili restano intatti — un piano scaduto non è un motivo per cancellare il lavoro di nessuno.", ja: "購読は終了しました。プロフィールには手を触れていません — プランが切れたことは、誰かの仕事を消してよい理由にはなりません。", zh: "你的订阅已经结束。你的档案原封未动——方案到期不是删除任何人劳动成果的理由。", hi: "आपकी सदस्यता समाप्त हो गई। आपकी प्रोफ़ाइलें ज्यों की त्यों हैं — योजना का बीत जाना किसी के काम को मिटाने का कारण नहीं है।", ar: "انتهى اشتراكك. ملفاتك كما هي لم تُمسّ — وانقضاء خطة ليس سببًا لحذف عمل أحد.",
+  },
+  "pln.needsowner": {
+    en: "Reading a membership needs an owner token for a profile on this account. Sign in as an owner to see or change the plan.", es: "Leer una membresía requiere un token de propietario de un perfil de esta cuenta. Inicia sesión como propietario para ver o cambiar el plan.", fr: "Lire une adhésion exige un jeton de propriétaire d'un profil de ce compte. Connectez-vous en propriétaire pour voir ou changer la formule.", de: "Eine Mitgliedschaft zu lesen verlangt ein Besitzer-Token für ein Profil dieses Kontos. Melden Sie sich als Besitzer an, um den Tarif zu sehen oder zu ändern.", pt: "Ler uma adesão exige um token de proprietário de um perfil desta conta. Inicie sessão como proprietário para ver ou mudar o plano.", it: "Leggere un'iscrizione richiede un token di proprietario di un profilo di questo account. Accedi come proprietario per vedere o cambiare il piano.", ja: "会員情報を読むには、このアカウントのプロフィールの所有者トークンが必要です。プランを見る、または変えるには、所有者としてサインインしてください。", zh: "读取会员信息需要本账户下某个档案的所有者令牌。请以所有者身份登录，以查看或更改方案。", hi: "सदस्यता पढ़ने के लिए इस खाते की किसी प्रोफ़ाइल का स्वामी-टोकन चाहिए। योजना देखने या बदलने के लिए स्वामी के रूप में साइन इन कीजिए।", ar: "قراءة العضوية تتطلّب رمز مالك لملف على هذا الحساب. سجّل الدخول بصفتك مالكًا لرؤية الخطة أو تغييرها.",
+  },
+  "pln.pricelist": {
+    en: "You are reading the price list without signing in, which is on purpose — nothing above this needs an account.", es: "Estás leyendo la lista de precios sin iniciar sesión, y es a propósito — nada de lo de arriba necesita una cuenta.", fr: "Vous lisez la grille tarifaire sans être connecté, et c'est voulu — rien de ce qui précède n'exige un compte.", de: "Sie lesen die Preisliste, ohne angemeldet zu sein, und das ist Absicht — nichts darüber braucht ein Konto.", pt: "Está a ler a lista de preços sem ter iniciado sessão, e é de propósito — nada acima disto precisa de uma conta.", it: "Stai leggendo il listino senza aver effettuato l'accesso, ed è voluto — nulla di quanto sta sopra richiede un account.", ja: "サインインせずに価格表を読んでいます。これは意図的です — ここより上のものに、アカウントは要りません。", zh: "你没有登录就在看价目表，这是有意的——上面的一切都不需要账户。", hi: "आप बिना साइन इन किए क़ीमतों की सूची पढ़ रहे हैं, और यह जानबूझकर है — इससे ऊपर की किसी चीज़ के लिए खाता ज़रूरी नहीं।", ar: "أنت تقرأ قائمة الأسعار دون تسجيل دخول، وهذا مقصود — فلا شيء فوق هذا يحتاج حسابًا.",
+  },
+  "pln.posture": {
+    en: "{title} — {means}. Readable by {who}.", es: "{title} — {means}. Pueden leerlo {who}.", fr: "{title} — {means}. Lisible par {who}.", de: "{title} — {means}. Lesbar für {who}.", pt: "{title} — {means}. Legível por {who}.", it: "{title} — {means}. Leggibile da {who}.", ja: "{title} — {means}。読めるのは {who} です。", zh: "{title} — {means}。可读者：{who}。", hi: "{title} — {means}। इसे {who} पढ़ सकते हैं।", ar: "{title} — {means}. يمكن أن يقرأه {who}.",
+  },
+  "pln.neverheld": {
+    en: "Never held here whatever the plan: {list} — in each of those the person exposed did not pick the plan.", es: "Nunca se guarda aquí, sea cual sea el plan: {list} — en cada uno de esos casos la persona expuesta no eligió el plan.", fr: "Jamais conservé ici quelle que soit la formule : {list} — dans chacun de ces cas, la personne exposée n'a pas choisi la formule.", de: "Wird hier nie gehalten, egal in welchem Tarif: {list} — in jedem dieser Fälle hat die bloßgestellte Person den Tarif nicht gewählt.", pt: "Nunca guardado aqui, seja qual for o plano: {list} — em cada um desses casos a pessoa exposta não escolheu o plano.", it: "Mai conservato qui qualunque sia il piano: {list} — in ognuno di quei casi la persona esposta non ha scelto il piano.", ja: "どのプランであれ、ここには決して置かれないもの: {list} — そのいずれの場合も、さらされる人はプランを選んでいません。", zh: "无论哪个方案，这里都绝不保存：{list} —— 在这些情形中的每一种，被暴露的那个人都不是选方案的人。", hi: "योजना कोई भी हो, ये यहाँ कभी नहीं रखे जाते: {list} — इनमें से हर मामले में, जो व्यक्ति उजागर होता है उसने योजना चुनी ही नहीं थी।", ar: "لا يُحفظ هنا أبدًا مهما كانت الخطة: {list} — وفي كل حالة من تلك، لم يكن الشخص المكشوف هو من اختار الخطة.",
+  },
+  "pln.erasure": {
+    en: "Erasure: {how}", es: "Borrado: {how}", fr: "Effacement : {how}", de: "Löschung: {how}", pt: "Apagamento: {how}", it: "Cancellazione: {how}", ja: "消去: {how}", zh: "抹除：{how}", hi: "मिटाना: {how}", ar: "المحو: {how}",
+  },
+  "hom.title": {
+    en: "Home", es: "Inicio", fr: "Accueil", de: "Start", pt: "Início", it: "Home", ja: "ホーム", zh: "主页", hi: "होम", ar: "الرئيسية",
+  },
+  "hom.online": {
+    en: "● Online", es: "● En línea", fr: "● En ligne", de: "● Online", pt: "● Ligado", it: "● Online", ja: "● オンライン", zh: "● 在线", hi: "● ऑनलाइन", ar: "● متصل",
+  },
+  "hom.aiversion": {
+    en: "AI Version — {what}", es: "Versión IA — {what}", fr: "Version IA — {what}", de: "KI-Fassung — {what}", pt: "Versão IA — {what}", it: "Versione IA — {what}", ja: "AI 版 — {what}", zh: "AI 版本 — {what}", hi: "AI संस्करण — {what}", ar: "نسخة ذكاء اصطناعي — {what}",
+  },
+  "hom.tile.memory": {
+    en: "Memory", es: "Memoria", fr: "Mémoire", de: "Gedächtnis", pt: "Memória", it: "Memoria", ja: "記憶", zh: "记忆", hi: "स्मृति", ar: "الذاكرة",
+  },
+  "hom.tile.entries": {
+    en: "entries", es: "entradas", fr: "entrées", de: "Einträge", pt: "entradas", it: "voci", ja: "件", zh: "条", hi: "प्रविष्टियाँ", ar: "مدخلات",
+  },
+  "hom.relationships": {
+    en: "Relationships", es: "Relaciones", fr: "Relations", de: "Beziehungen", pt: "Relações", it: "Relazioni", ja: "関係", zh: "关系", hi: "रिश्ते", ar: "العلاقات",
+  },
+  "hom.tile.connections": {
+    en: "connections", es: "conexiones", fr: "liens", de: "Verbindungen", pt: "ligações", it: "collegamenti", ja: "つながり", zh: "连接", hi: "जुड़ाव", ar: "روابط",
+  },
+  "hom.tile.engagement": {
+    en: "Engagement", es: "Interacción", fr: "Engagement", de: "Beteiligung", pt: "Envolvimento", it: "Coinvolgimento", ja: "関与度", zh: "参与度", hi: "जुड़ाव-स्तर", ar: "التفاعل",
+  },
+  "hom.tile.average": {
+    en: "average", es: "promedio", fr: "moyenne", de: "Durchschnitt", pt: "média", it: "media", ja: "平均", zh: "平均", hi: "औसत", ar: "المتوسط",
+  },
+  "hom.tile.moderation": {
+    en: "Moderation", es: "Moderación", fr: "Modération", de: "Moderation", pt: "Moderação", it: "Moderazione", ja: "モデレーション", zh: "审核", hi: "मॉडरेशन", ar: "المراجعة",
+  },
+  "hom.tile.passrate": {
+    en: "pass rate", es: "tasa de aprobación", fr: "taux de réussite", de: "Durchlaufquote", pt: "taxa de aprovação", it: "tasso di superamento", ja: "通過率", zh: "通过率", hi: "पास दर", ar: "نسبة الاجتياز",
+  },
+  "hom.persona": {
+    en: "Persona", es: "Persona", fr: "Personnage", de: "Persona", pt: "Persona", it: "Persona", ja: "ペルソナ", zh: "人格", hi: "व्यक्तित्व", ar: "الشخصية",
+  },
+  "hom.chatwith": {
+    en: "Chat with {name}", es: "Chatear con {name}", fr: "Discuter avec {name}", de: "Mit {name} chatten", pt: "Conversar com {name}", it: "Chatta con {name}", ja: "{name} とチャット", zh: "与 {name} 聊天", hi: "{name} से चैट करें", ar: "دردش مع {name}",
+  },
+  "hom.memoryvault": {
+    en: "Memory Vault", es: "Bóveda de memoria", fr: "Coffre de mémoire", de: "Gedächtnistresor", pt: "Cofre de memória", it: "Caveau della memoria", ja: "記憶の保管庫", zh: "记忆库", hi: "स्मृति-तिजोरी", ar: "خزنة الذاكرة",
+  },
+  "hom.newinrelease": {
+    en: "New in this release", es: "Novedades de esta versión", fr: "Nouveautés de cette version", de: "Neu in dieser Ausgabe", pt: "Novidades desta versão", it: "Novità di questa versione", ja: "このリリースで新しくなったこと", zh: "本次发布的新内容", hi: "इस रिलीज़ में नया", ar: "الجديد في هذا الإصدار",
+  },
+  "hom.blend": {
+    en: "🫱🏽‍🫲🏻 Blend a profile", es: "🫱🏽‍🫲🏻 Mezclar un perfil", fr: "🫱🏽‍🫲🏻 Mélanger un profil", de: "🫱🏽‍🫲🏻 Ein Profil mischen", pt: "🫱🏽‍🫲🏻 Misturar um perfil", it: "🫱🏽‍🫲🏻 Mescola un profilo", ja: "🫱🏽‍🫲🏻 プロフィールを混ぜる", zh: "🫱🏽‍🫲🏻 调配一个档案", hi: "🫱🏽‍🫲🏻 एक प्रोफ़ाइल मिलाएँ", ar: "🫱🏽‍🫲🏻 امزج ملفًا",
+  },
+  "hom.simulate": {
+    en: "🔮 What would they do", es: "🔮 Qué haría", fr: "🔮 Que ferait-il", de: "🔮 Was würden sie tun", pt: "🔮 O que faria", it: "🔮 Cosa farebbe", ja: "🔮 その人ならどうするか", zh: "🔮 换作他们会怎么做", hi: "🔮 वे क्या करते", ar: "🔮 ماذا كانوا سيفعلون",
+  },
+  "hom.money": {
+    en: "🎗 Where the money goes", es: "🎗 Adónde va el dinero", fr: "🎗 Où va l'argent", de: "🎗 Wohin das Geld geht", pt: "🎗 Para onde vai o dinheiro", it: "🎗 Dove vanno i soldi", ja: "🎗 お金の行き先", zh: "🎗 钱去了哪里", hi: "🎗 पैसा कहाँ जाता है", ar: "🎗 إلى أين يذهب المال",
+  },
+  "hom.departments": {
+    en: "🏛 Departments that coordinate", es: "🏛 Departamentos que se coordinan", fr: "🏛 Des services qui se coordonnent", de: "🏛 Abteilungen, die sich abstimmen", pt: "🏛 Departamentos que se coordenam", it: "🏛 Reparti che si coordinano", ja: "🏛 連携する部門", zh: "🏛 彼此协调的部门", hi: "🏛 आपस में तालमेल करते विभाग", ar: "🏛 أقسام تتنسّق",
+  },
+  "rel.title": {
+    en: "Relationships", es: "Relaciones", fr: "Relations", de: "Beziehungen", pt: "Relações", it: "Relazioni", ja: "関係", zh: "关系", hi: "रिश्ते", ar: "العلاقات",
+  },
+  "rel.peoplein": {
+    en: "people in {name}'s life", es: "personas en la vida de {name}", fr: "les gens dans la vie de {name}", de: "Menschen in {name}s Leben", pt: "pessoas na vida de {name}", it: "persone nella vita di {name}", ja: "{name} の人生にいる人たち", zh: "{name} 生命中的人", hi: "{name} के जीवन के लोग", ar: "الأشخاص في حياة {name}",
+  },
+  "rel.active": {
+    en: "Active relationships", es: "Relaciones activas", fr: "Relations actives", de: "Aktive Beziehungen", pt: "Relações ativas", it: "Relazioni attive", ja: "現在の関係", zh: "进行中的关系", hi: "सक्रिय रिश्ते", ar: "العلاقات القائمة",
+  },
+  "rel.acknowledges": {
+    en: "{name} acknowledges them truthfully if asked — disclosure by design", es: "{name} los reconoce con verdad si se le pregunta — divulgación por diseño", fr: "{name} les reconnaît en toute franchise si on le lui demande — la divulgation est voulue", de: "{name} bestätigt sie wahrheitsgemäß auf Nachfrage — Offenlegung von Entwurf her", pt: "{name} reconhece-os com verdade se lhe perguntarem — divulgação por desenho", it: "{name} li riconosce con sincerità se glielo chiedi — trasparenza per progetto", ja: "尋ねられれば、{name} は偽らずにそれを認めます — 開示は設計の一部です", zh: "如果被问起，{name} 会如实承认他们 —— 披露是设计的一部分", hi: "पूछे जाने पर {name} उन्हें सच-सच स्वीकार करता है — प्रकटीकरण डिज़ाइन का हिस्सा है", ar: "إن سُئل، يعترف {name} بهم بصدق — الإفصاح جزء من التصميم",
+  },
+  "rel.add": {
+    en: "Add a relationship", es: "Añadir una relación", fr: "Ajouter une relation", de: "Eine Beziehung hinzufügen", pt: "Adicionar uma relação", it: "Aggiungi una relazione", ja: "関係を追加する", zh: "添加一段关系", hi: "एक रिश्ता जोड़ें", ar: "أضف علاقة",
+  },
+  "rel.name": {
+    en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名字", hi: "नाम", ar: "الاسم",
+  },
+  "rel.name.ph": {
+    en: "e.g. Sarah", es: "p. ej. Sara", fr: "p. ex. Sarah", de: "z. B. Sarah", pt: "p. ex. Sara", it: "es. Sara", ja: "例: サラ", zh: "例如：莎拉", hi: "उदा. सारा", ar: "مثال: سارة",
+  },
+  "rel.type": {
+    en: "Type", es: "Tipo", fr: "Type", de: "Art", pt: "Tipo", it: "Tipo", ja: "種類", zh: "类型", hi: "प्रकार", ar: "النوع",
+  },
+  "rel.tone": {
+    en: "Tone", es: "Tono", fr: "Ton", de: "Ton", pt: "Tom", it: "Tono", ja: "口調", zh: "语气", hi: "लहजा", ar: "النبرة",
+  },
+  "rel.saving": {
+    en: "Saving…", es: "Guardando…", fr: "Enregistrement…", de: "Wird gespeichert…", pt: "A guardar…", it: "Salvataggio…", ja: "保存中…", zh: "保存中…", hi: "सहेजा जा रहा है…", ar: "جارٍ الحفظ…",
+  },
+  "rel.save": {
+    en: "Save relationship", es: "Guardar relación", fr: "Enregistrer la relation", de: "Beziehung speichern", pt: "Guardar relação", it: "Salva la relazione", ja: "関係を保存", zh: "保存这段关系", hi: "रिश्ता सहेजें", ar: "احفظ العلاقة",
+  },
+  "rel.t.family": {
+    en: "family", es: "familia", fr: "famille", de: "Familie", pt: "família", it: "famiglia", ja: "家族", zh: "家人", hi: "परिवार", ar: "عائلة",
+  },
+  "rel.t.grandchild": {
+    en: "grandchild", es: "nieto o nieta", fr: "petit-enfant", de: "Enkelkind", pt: "neto ou neta", it: "nipote", ja: "孫", zh: "孙辈", hi: "पोता-पोती", ar: "حفيد",
+  },
+  "rel.t.friend": {
+    en: "friend", es: "amistad", fr: "ami", de: "Freund:in", pt: "amigo", it: "amico", ja: "友人", zh: "朋友", hi: "मित्र", ar: "صديق",
+  },
+  "rel.t.romantic_partner": {
+    en: "romantic partner", es: "pareja", fr: "partenaire amoureux", de: "Partner:in", pt: "parceiro amoroso", it: "partner sentimentale", ja: "恋人", zh: "伴侣", hi: "जीवनसाथी", ar: "شريك عاطفي",
+  },
+  "rel.t.professional": {
+    en: "professional", es: "profesional", fr: "professionnel", de: "beruflich", pt: "profissional", it: "professionale", ja: "仕事上", zh: "职业往来", hi: "पेशेवर", ar: "مهني",
+  },
+  "rel.t.fan": {
+    en: "fan", es: "seguidor", fr: "admirateur", de: "Fan", pt: "fã", it: "fan", ja: "ファン", zh: "粉丝", hi: "प्रशंसक", ar: "معجب",
+  },
+  "rel.t.stranger": {
+    en: "stranger", es: "desconocido", fr: "inconnu", de: "fremd", pt: "desconhecido", it: "sconosciuto", ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी", ar: "غريب",
+  },
+  "rel.n.warm": {
+    en: "warm", es: "cálido", fr: "chaleureux", de: "warm", pt: "caloroso", it: "caloroso", ja: "あたたかい", zh: "温暖", hi: "गर्मजोशी भरा", ar: "دافئ",
+  },
+  "rel.n.friendly": {
+    en: "friendly", es: "amable", fr: "amical", de: "freundlich", pt: "amigável", it: "amichevole", ja: "親しみやすい", zh: "友好", hi: "मिलनसार", ar: "ودود",
+  },
+  "rel.n.playful": {
+    en: "playful", es: "juguetón", fr: "espiègle", de: "verspielt", pt: "brincalhão", it: "giocoso", ja: "遊び心のある", zh: "俏皮", hi: "मज़ाकिया", ar: "مرِح",
+  },
+  "rel.n.direct": {
+    en: "direct", es: "directo", fr: "direct", de: "direkt", pt: "direto", it: "diretto", ja: "率直", zh: "直接", hi: "सीधा", ar: "مباشر",
+  },
+  "dsc.title": {
+    en: "Discover", es: "Descubrir", fr: "Découvrir", de: "Entdecken", pt: "Descobrir", it: "Scopri", ja: "発見", zh: "发现", hi: "खोजें", ar: "استكشف",
+  },
+  "dsc.pitch": {
+    en: "the marketplace · every card is a real profile", es: "el mercado · cada tarjeta es un perfil real", fr: "la place de marché · chaque carte est un profil réel", de: "der Marktplatz · jede Karte ist ein echtes Profil", pt: "o mercado · cada cartão é um perfil real", it: "il mercato · ogni scheda è un profilo vero", ja: "マーケット · どのカードも実在のプロフィールです", zh: "市场 · 每一张卡片都是一个真实的档案", hi: "बाज़ार · हर कार्ड एक असली प्रोफ़ाइल है", ar: "السوق · كل بطاقة ملف حقيقي",
+  },
+  "dsc.nothinglisted": {
+    en: "Nothing listed yet", es: "Todavía no hay nada listado", fr: "Rien de listé pour l'instant", de: "Noch nichts gelistet", pt: "Ainda não há nada listado", it: "Ancora niente in vetrina", ja: "まだ何も出ていません", zh: "还没有任何上架内容", hi: "अभी कुछ सूचीबद्ध नहीं", ar: "لا شيء معروض بعد",
+  },
+  "dsc.starters": {
+    en: "The starter collection is 33 profiles across trades and interests, each carrying its industry's knowledge pack — one press to install, then talk to any of them.", es: "La colección inicial son 33 perfiles de oficios e intereses distintos, cada uno con el paquete de conocimiento de su sector — una pulsación para instalarla, y ya puedes hablar con cualquiera.", fr: "La collection de départ compte 33 profils de métiers et de centres d'intérêt, chacun portant le savoir de son secteur — une pression pour l'installer, puis parlez à n'importe lequel.", de: "Die Startsammlung sind 33 Profile aus Berufen und Interessen, jedes mit dem Wissenspaket seiner Branche — ein Druck zum Installieren, dann sprechen Sie mit jedem davon.", pt: "A coleção inicial são 33 perfis de ofícios e interesses, cada um com o pacote de conhecimento do seu setor — um toque para instalar, e depois fale com qualquer um.", it: "La raccolta iniziale è di 33 profili tra mestieri e interessi, ognuno con il pacchetto di conoscenza del suo settore — una pressione per installarla, poi parla con chi vuoi.", ja: "スターターコレクションは、さまざまな職種と関心にわたる 33 のプロフィールです。それぞれが自分の業界の知識パックを携えています — 一度押せば導入でき、あとは誰とでも話せます。", zh: "入门合集是横跨各行各业与兴趣的 33 个档案，每一个都带着自己行业的知识包——按一下即可安装，然后就能与其中任何一位交谈。", hi: "शुरुआती संग्रह में अलग-अलग पेशों और रुचियों की 33 प्रोफ़ाइलें हैं, हर एक अपने उद्योग का ज्ञान-पैक लिए हुए — एक बार दबाइए और यह इंस्टॉल हो जाता है, फिर इनमें से किसी से भी बात कीजिए।", ar: "المجموعة المبدئية ٣٣ ملفًا عبر حِرَف واهتمامات، يحمل كل منها حزمة معرفة مجاله — ضغطة واحدة للتثبيت، ثم حادِث أيًّا منها.",
+  },
+  "dsc.installing": {
+    en: "Installing…", es: "Instalando…", fr: "Installation…", de: "Wird installiert…", pt: "A instalar…", it: "Installazione…", ja: "導入中…", zh: "安装中…", hi: "इंस्टॉल हो रहा है…", ar: "جارٍ التثبيت…",
+  },
+  "dsc.install": {
+    en: "Install the starter collection", es: "Instalar la colección inicial", fr: "Installer la collection de départ", de: "Die Startsammlung installieren", pt: "Instalar a coleção inicial", it: "Installa la raccolta iniziale", ja: "スターターコレクションを導入", zh: "安装入门合集", hi: "शुरुआती संग्रह इंस्टॉल करें", ar: "ثبّت المجموعة المبدئية",
+  },
+  "dsc.ready": {
+    en: "Starter collection ready — {made} new, {had} already here.", es: "Colección inicial lista — {made} nuevos, {had} ya estaban.", fr: "Collection de départ prête — {made} nouveaux, {had} déjà présents.", de: "Startsammlung bereit — {made} neu, {had} schon vorhanden.", pt: "Coleção inicial pronta — {made} novos, {had} já cá estavam.", it: "Raccolta iniziale pronta — {made} nuovi, {had} già presenti.", ja: "スターターコレクションの準備ができました — 新規 {made} 件、既存 {had} 件。", zh: "入门合集已就绪 —— 新增 {made} 个，已有 {had} 个。", hi: "शुरुआती संग्रह तैयार — {made} नए, {had} पहले से मौजूद।", ar: "المجموعة المبدئية جاهزة — {made} جديدة، و{had} كانت هنا بالفعل.",
+  },
+  "dsc.filter": {
+    en: "Filter by tag", es: "Filtrar por etiqueta", fr: "Filtrer par mot-clé", de: "Nach Schlagwort filtern", pt: "Filtrar por etiqueta", it: "Filtra per tag", ja: "タグで絞り込む", zh: "按标签筛选", hi: "टैग से छाँटें", ar: "رشِّح بالوسم",
+  },
+  "dsc.tag.ph": {
+    en: "e.g. music, carpentry", es: "p. ej. música, carpintería", fr: "p. ex. musique, menuiserie", de: "z. B. Musik, Tischlerei", pt: "p. ex. música, carpintaria", it: "es. musica, falegnameria", ja: "例: 音楽、木工", zh: "例如：音乐、木工", hi: "उदा. संगीत, बढ़ईगीरी", ar: "مثال: موسيقى، نجارة",
+  },
+  "dsc.search": {
+    en: "Search", es: "Buscar", fr: "Chercher", de: "Suchen", pt: "Procurar", it: "Cerca", ja: "検索", zh: "搜索", hi: "खोजें", ar: "ابحث",
+  },
+  "dsc.refresh": {
+    en: "Refresh starters", es: "Actualizar la colección inicial", fr: "Actualiser la collection", de: "Startsammlung auffrischen", pt: "Atualizar a coleção inicial", it: "Aggiorna la raccolta iniziale", ja: "スターターを更新", zh: "刷新入门合集", hi: "शुरुआती संग्रह ताज़ा करें", ar: "حدّث المجموعة المبدئية",
+  },
+  "dsc.badge.ai": {
+    en: "AI", es: "IA", fr: "IA", de: "KI", pt: "IA", it: "IA", ja: "AI", zh: "AI", hi: "AI", ar: "ذكاء اصطناعي",
+  },
+  "dsc.badge.real": {
+    en: "✓ real photo", es: "✓ foto real", fr: "✓ vraie photo", de: "✓ echtes Foto", pt: "✓ foto real", it: "✓ foto vera", ja: "✓ 実写", zh: "✓ 真人照片", hi: "✓ असली तस्वीर", ar: "✓ صورة حقيقية",
+  },
+  "dsc.addfriend": {
+    en: "Add friend", es: "Añadir amistad", fr: "Ajouter en ami", de: "Als Freund:in hinzufügen", pt: "Adicionar amigo", it: "Aggiungi agli amici", ja: "友だちに追加", zh: "加为好友", hi: "मित्र बनाएँ", ar: "أضِف صديقًا",
+  },
+  "dsc.signin": {
+    en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
+  },
+  "dsc.added": {
+    en: "Added to your friends.", es: "Añadido a tus amistades.", fr: "Ajouté à vos amis.", de: "Zu Ihren Freund:innen hinzugefügt.", pt: "Adicionado aos seus amigos.", it: "Aggiunto ai tuoi amici.", ja: "友だちに追加しました。", zh: "已加入你的好友。", hi: "आपके मित्रों में जोड़ दिया गया।", ar: "أُضيف إلى أصدقائك.",
+  },
+  "rel.n.professional": {
+    en: "professional", es: "profesional", fr: "professionnel", de: "sachlich", pt: "profissional", it: "professionale", ja: "折り目正しい", zh: "专业", hi: "औपचारिक", ar: "رسمي",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

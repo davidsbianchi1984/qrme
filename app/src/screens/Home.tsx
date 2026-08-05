@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, type Stats } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -8,6 +9,7 @@ export function Home({ go }: {
         | "campaigns" | "org" | "plans") => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [stats, setStats] = useState<Stats | null>(null);
   const [error, setError] = useState<unknown>(null);
 
@@ -21,34 +23,44 @@ export function Home({ go }: {
 
   const p = session.profile;
   const tiles = [
-    { label: "Memory", value: stats ? String(stats.memory_entries) : "—", sub: "entries" },
-    { label: "Relationships", value: stats ? String(stats.relationship_graph) : "—", sub: "connections" },
     {
-      label: "Engagement",
-      value: stats?.engagement_average != null
-        ? `${Math.round(stats.engagement_average * 100)}%` : "—",
-      sub: "average",
+      key: "hom.tile.memory",
+      value: stats ? String(stats.memory_entries) : "—",
+      subKey: "hom.tile.entries",
     },
     {
-      label: "Moderation",
+      key: "hom.relationships",
+      value: stats ? String(stats.relationship_graph) : "—",
+      subKey: "hom.tile.connections",
+    },
+    {
+      key: "hom.tile.engagement",
+      value: stats?.engagement_average != null
+        ? `${Math.round(stats.engagement_average * 100)}%` : "—",
+      subKey: "hom.tile.average",
+    },
+    {
+      key: "hom.tile.moderation",
       value: stats?.moderation_pass_rate != null
         ? `${(stats.moderation_pass_rate * 100).toFixed(1)}%` : "—",
-      sub: "pass rate",
+      subKey: "hom.tile.passrate",
     },
   ];
 
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Home</h2>
-        <span className="dot-online">● Online</span>
+        <h2>{tr("hom.title", lang)}</h2>
+        <span className="dot-online">{tr("hom.online", lang)}</span>
       </header>
 
       <div className="profile-hero">
         <div className="orb big" />
         <div>
           <h3>{p?.display_name}</h3>
-          <div className="muted">AI Version — {p?.purpose || p?.kind}</div>
+          <div className="muted">
+            {fill(tr("hom.aiversion", lang), { what: p?.purpose || p?.kind })}
+          </div>
         </div>
       </div>
 
@@ -56,34 +68,38 @@ export function Home({ go }: {
 
       <div className="tiles">
         {tiles.map((t) => (
-          <div className="tile" key={t.label}>
-            <div className="tile-label">{t.label}</div>
+          <div className="tile" key={t.key}>
+            <div className="tile-label">{tr(t.key, lang)}</div>
             <div className="tile-value">{t.value}</div>
-            <div className="tile-sub">{t.sub}</div>
+            <div className="tile-sub">{tr(t.subKey, lang)}</div>
           </div>
         ))}
       </div>
 
       <div className="persona-card">
-        <div className="tile-label">Persona</div>
+        <div className="tile-label">{tr("hom.persona", lang)}</div>
         <p>{p?.persona}</p>
       </div>
 
       <div className="actions">
-        <button className="primary" onClick={() => go("chat")}>Chat with {p?.display_name}</button>
-        <button onClick={() => go("relationships")}>Relationships</button>
-        <button onClick={() => go("memory")}>Memory Vault</button>
+        <button className="primary" onClick={() => go("chat")}>
+          {fill(tr("hom.chatwith", lang), { name: p?.display_name })}
+        </button>
+        <button onClick={() => go("relationships")}>
+          {tr("hom.relationships", lang)}
+        </button>
+        <button onClick={() => go("memory")}>{tr("hom.memoryvault", lang)}</button>
       </div>
 
       {/* The doors this release opened — the front page names them, or
           testers never find them. */}
       <div className="card">
-        <h3>New in this release</h3>
+        <h3>{tr("hom.newinrelease", lang)}</h3>
         <div className="actions">
-          <button onClick={() => go("blend")}>🫱🏽‍🫲🏻 Blend a profile</button>
-          <button onClick={() => go("simulate")}>🔮 What would they do</button>
-          <button onClick={() => go("campaigns")}>🎗 Where the money goes</button>
-          <button onClick={() => go("org")}>🏛 Departments that coordinate</button>
+          <button onClick={() => go("blend")}>{tr("hom.blend", lang)}</button>
+          <button onClick={() => go("simulate")}>{tr("hom.simulate", lang)}</button>
+          <button onClick={() => go("campaigns")}>{tr("hom.money", lang)}</button>
+          <button onClick={() => go("org")}>{tr("hom.departments", lang)}</button>
         </div>
       </div>
     </div>

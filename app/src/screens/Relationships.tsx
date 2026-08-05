@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -9,6 +10,7 @@ export function Relationships({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [count, setCount] = useState<number | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [name, setName] = useState("");
@@ -51,46 +53,56 @@ export function Relationships({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Relationships</h2>
-        <span className="muted small">people in {session.profile?.display_name}'s life</span>
+        <h2>{tr("rel.title", lang)}</h2>
+        <span className="muted small">
+          {fill(tr("rel.peoplein", lang),
+                { name: session.profile?.display_name })}
+        </span>
       </header>
 
       <div className="tile wide">
-        <div className="tile-label">Active relationships</div>
+        <div className="tile-label">{tr("rel.active", lang)}</div>
         <div className="tile-value">{count ?? "—"}</div>
         <div className="tile-sub">
-          {session.profile?.display_name} acknowledges them truthfully if asked — disclosure by design
+          {fill(tr("rel.acknowledges", lang),
+                { name: session.profile?.display_name })}
         </div>
       </div>
 
       <Refusal error={error} onPlans={onPlans} variant="inline" />
 
       <div className="card">
-        <h3>Add a relationship</h3>
+        <h3>{tr("rel.add", lang)}</h3>
         <label>
-          Name
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Sarah" />
+          {tr("rel.name", lang)}
+          <input value={name} onChange={(e) => setName(e.target.value)}
+                 placeholder={tr("rel.name.ph", lang)} />
         </label>
+        {/* The option carried no `value`, so its text was the value sent to
+            the API. Translating the label alone would have posted the
+            Spanish word as a relationship type. The enum moves to `value`
+            and only the word somebody reads is looked up. */}
         <div className="row">
           <label>
-            Type
+            {tr("rel.type", lang)}
             <select value={type} onChange={(e) => setType(e.target.value)}>
-              {["family", "grandchild", "friend", "romantic_partner", "professional", "fan", "stranger"].map((t) => (
-                <option key={t}>{t}</option>
+              {["family", "grandchild", "friend", "romantic_partner",
+                "professional", "fan", "stranger"].map((t) => (
+                <option key={t} value={t}>{tr(`rel.t.${t}`, lang)}</option>
               ))}
             </select>
           </label>
           <label>
-            Tone
+            {tr("rel.tone", lang)}
             <select value={tone} onChange={(e) => setTone(e.target.value)}>
               {["warm", "friendly", "professional", "playful", "direct"].map((t) => (
-                <option key={t}>{t}</option>
+                <option key={t} value={t}>{tr(`rel.n.${t}`, lang)}</option>
               ))}
             </select>
           </label>
         </div>
         <button className="primary" onClick={add} disabled={busy}>
-          {busy ? "Saving…" : "Save relationship"}
+          {busy ? tr("rel.saving", lang) : tr("rel.save", lang)}
         </button>
       </div>
     </div>

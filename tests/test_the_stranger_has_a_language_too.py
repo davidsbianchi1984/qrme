@@ -344,15 +344,22 @@ def test_no_key_is_translated_into_ten_languages_and_used_nowhere():
         #
         # There is no literal after `tr(` anywhere, and all five rows render.
         # This is the same shape as the `nav.` template above and gets the
-        # same treatment: a `key:` field is a lookup written down early.
-        # Without it the check calls five live rows dead and tells somebody
-        # to delete the working translations — which is the failure the
-        # template escape already exists to prevent, arriving by a second
-        # road.
+        # same treatment: a field whose name says it holds a key is a lookup
+        # written down early. Without it the check calls five live rows dead
+        # and tells somebody to delete the working translations — which is
+        # the failure the template escape already exists to prevent,
+        # arriving by a second road.
         #
         #     asked     is this key looked up at the call site
         #     mattered  is this key reachable
-        used |= set(re.findall(r'\bkey:\s*"([\w.]+)"', text))
+        #
+        # Matched on the *suffix* rather than the exact word, because the
+        # first version of this line read `key:` alone and a table with two
+        # of them — `{ key: …, subKey: … }` on Home's stat tiles — put four
+        # more live rows back on the dead list one release later. The
+        # convention is "a field named for holding a key", and `subKey`,
+        # `labelKey` and `titleKey` are all that convention.
+        used |= set(re.findall(r'\b\w*[Kk]ey:\s*"([\w.]+)"', text))
     dead = sorted(k for k in table - used
                   if not any(k.startswith(p) for p in prefixes))
 

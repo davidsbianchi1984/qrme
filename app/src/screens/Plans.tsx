@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type Membership, type PlanCatalogue,
          type StoragePosture } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -34,6 +35,7 @@ import { useSession } from "../store";
  */
 export function Plans() {
   const { session } = useSession();
+  const lang = visitorLang();
   const account = session.accountId || "";
   const token = session.ownerToken || "";
 
@@ -61,7 +63,8 @@ export function Plans() {
     try {
       const m = await api.subscribe(account, plan, token);
       setMine(m);
-      setNote(`You are on ${m.title}. ${m.billing}`);
+      setNote(tr("pln.youareon", lang)
+        .replace("{title}", m.title).replace("{billing}", m.billing));
     } catch (e) { setError(e); } finally { setBusy(false); }
   }
 
@@ -72,14 +75,13 @@ export function Plans() {
       setMine(m);
       // Said every time, because "cancel my plan" and "delete my work" are
       // the two things somebody must never confuse at this button.
-      setNote("Your subscription has ended. Your profiles are untouched — a "
-              + "lapsed plan is not a reason to delete anybody's work.");
+      setNote(tr("pln.ended", lang));
     } catch (e) { setError(e); } finally { setBusy(false); }
   }
 
   return (
     <div className="screen">
-      <h2>Plans</h2>
+      <h2>{tr("pln.title", lang)}</h2>
 
       <Refusal error={error} />
       {note && <div className="card"><p className="small">{note}</p></div>}
@@ -98,33 +100,37 @@ export function Plans() {
         return (
           <div className="card" key={p.plan}>
             <h3>
-              {p.title} — {p.price_usd === 0 ? "no charge" : `$${p.price_usd}`}
-              {p.period ? ` a ${p.period}` : ""}
-              {current && <span className="pill"> your plan</span>}
+              {p.title} — {p.price_usd === 0
+                ? tr("pln.nocharge", lang) : `$${p.price_usd}`}
+              {p.period
+                ? " " + tr("pln.per", lang).replace("{period}", p.period) : ""}
+              {current && <span className="pill"> {tr("pln.yourplan", lang)}</span>}
             </h3>
             <p className="small">{p.means}</p>
 
             <p className="muted small">
-              <strong>Includes:</strong>{" "}
+              <strong>{tr("pln.includes", lang)}</strong>{" "}
               {p.includes.length
                 ? p.includes.map((c) => cat.capabilities[c]?.is || c).join("; ")
-                : "reading public pages"}
+                : tr("pln.readingpublic", lang)}
             </p>
             {p.locked.length > 0 && (
               <p className="muted small">
-                <strong>Not on this plan:</strong>{" "}
+                <strong>{tr("pln.notonplan", lang)}</strong>{" "}
                 {p.locked.map((c) => cat.capabilities[c]?.is || c).join("; ")}
               </p>
             )}
 
-            <Posture s={p.storage} />
+            <Posture s={p.storage} lang={lang} />
 
             {/* `visitor` is a state, not something to buy: it is what an
                 account becomes when it cancels. Offering it as a button
                 would read as a plan you could downgrade into. */}
             {p.plan !== "visitor" && account && token && !current && (
               <button disabled={busy} onClick={() => join(p.plan)}>
-                {p.price_usd === 0 ? "Move to Free" : `Join ${p.title}`}
+                {p.price_usd === 0
+                  ? tr("pln.movetofree", lang)
+                  : tr("pln.join", lang).replace("{title}", p.title)}
               </button>
             )}
           </div>
@@ -133,7 +139,7 @@ export function Plans() {
 
       {account && token ? (
         <div className="card">
-          <h3>This account</h3>
+          <h3>{tr("pln.thisaccount", lang)}</h3>
           {mine ? (
             <>
               <p className="small">
@@ -142,26 +148,20 @@ export function Plans() {
                   ? ` — $${mine.price_usd} a ${mine.period}. ${mine.billing}`
                   : ` — ${mine.billing}`}
               </p>
-              <Posture s={mine.storage} />
+              <Posture s={mine.storage} lang={lang} />
               {mine.price_usd > 0 && (
                 <button disabled={busy} onClick={leave}>
-                  End my subscription
+                  {tr("pln.endsub", lang)}
                 </button>
               )}
             </>
           ) : (
-            <p className="muted small">
-              Reading a membership needs an owner token for a profile on this
-              account. Sign in as an owner to see or change the plan.
-            </p>
+            <p className="muted small">{tr("pln.needsowner", lang)}</p>
           )}
         </div>
       ) : (
         <div className="card">
-          <p className="muted small">
-            You are reading the price list without signing in, which is on
-            purpose — nothing above this needs an account.
-          </p>
+          <p className="muted small">{tr("pln.pricelist", lang)}</p>
         </div>
       )}
     </div>
@@ -177,25 +177,29 @@ export function Plans() {
  * work. Summarising it into a tick would be the console taking the edge off
  * a statement the backend deliberately left sharp.
  */
-function Posture({ s }: { s: StoragePosture }) {
+function Posture({ s, lang }: { s: StoragePosture; lang: string }) {
   return (
     <>
+      {/* One sentence rather than the words either side of two values: the
+          clause naming who can read this does not sit last in Japanese. */}
       <p className="muted small">
-        <strong>{s.title}</strong> — {s.means}. Readable by{" "}
-        {s.who_can_read.join(", ")}.
+        {fill(tr("pln.posture", lang), {
+          title: <strong>{s.title}</strong>, means: s.means,
+          who: s.who_can_read.join(", "),
+        })}
       </p>
       {s.disclosure && (
         <div className="error"><p className="small">{s.disclosure}</p></div>
       )}
       {s.refused_here.length > 0 && (
         <p className="muted small">
-          Never held here whatever the plan:{" "}
-          {s.refused_here.map((r) => r.replace(/_/g, " ")).join(", ")} — in
-          each of those the person exposed did not pick the plan.
+          {fill(tr("pln.neverheld", lang), {
+            list: s.refused_here.map((r) => r.replace(/_/g, " ")).join(", "),
+          })}
         </p>
       )}
       <p className="muted small">
-        Erasure: {s.custody.erasure}
+        {fill(tr("pln.erasure", lang), { how: s.custody.erasure })}
       </p>
     </>
   );

@@ -4,6 +4,50 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.2] — 2026-08-05
+
+### The front page, the price list, and who is in a life
+
+The console-untranslated record falls **69 → 25**. Four screens this
+round rather than three, because they are small and the tail is short.
+
+**Home** — the four stat tiles held their label and their caption as
+English strings in a `const`. They hold keys now.
+
+**Plans** — the price list, the two custody paragraphs, and the sentence
+somebody reads after cancelling: *a lapsed plan is not a reason to
+delete anybody's work.* The storage posture was three fragments around
+two values and is one sentence; the clause naming who can read your work
+does not sit last in Japanese.
+
+**Relationships** — and a real bug found while translating it. The
+`<option>` elements carried no `value`, so **the visible text was the
+value posted to the API**. Translating the label alone would have sent
+*amistad* as a relationship type and *cálido* as a tone. The enum moved
+to `value` and only the word somebody reads is looked up. Worth saying
+plainly: this was not a localization defect, it was a latent one that
+localization walked into.
+
+**Discover** — the marketplace, the starter collection, and the two
+badges that say whether a face is a photograph or not.
+
+76 keys.
+
+### The dead-key guard, widened again — the same lesson, third time
+
+Last release taught it that a key can live in a table: `{ id: "chat",
+key: "rms.ch.chat" }`. This release it called four *more* live keys
+dead, because Home's tiles carry two of them — `{ key: …, subKey: … }` —
+and the check matched the literal word `key:`.
+
+    asked     is the field called `key`
+    mattered  is the field named for holding a key
+
+It matches the suffix now, so `subKey`, `labelKey` and `titleKey` are
+all the convention they look like. That is twice in two releases that
+this check has been wrong in the same direction, and both times its
+advice — *wire them, or delete them* — pointed at working code.
+
 ## [0.46.1] — 2026-08-05
 
 ### The room, the conversation, and the door to both
