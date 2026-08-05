@@ -2148,6 +2148,138 @@ const CHROME: Table = {
   "asst.media.open": {
     en: "open", es: "abrir", fr: "ouvrir", de: "öffnen", pt: "abrir", it: "apri", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتح",
   },
+  "set.title": {
+    en: "Control Center", es: "Centro de control", fr: "Centre de contrôle", de: "Kontrollzentrum", pt: "Centro de controlo", it: "Centro di controllo", ja: "コントロールセンター", zh: "控制中心", hi: "कंट्रोल सेंटर", ar: "مركز التحكم",
+  },
+  "set.tag": {
+    en: "you are in control", es: "tú tienes el control", fr: "vous avez le contrôle", de: "Sie haben die Kontrolle", pt: "você está no controlo", it: "sei tu al comando", ja: "主導権はあなたに", zh: "一切由你掌控", hi: "नियंत्रण आपके हाथ में", ar: "أنت المتحكم",
+  },
+  "set.api": {
+    en: "API connection — where this app's own server lives", es: "Conexión API — dónde vive el servidor de esta app", fr: "Connexion API — où vit le serveur de cette app", de: "API-Verbindung — wo der Server dieser App lebt", pt: "Ligação API — onde vive o servidor desta app", it: "Connessione API — dove vive il server di questa app", ja: "API接続 — このアプリのサーバーの場所", zh: "API连接 — 本应用服务器所在之处", hi: "API कनेक्शन — इस ऐप का सर्वर कहाँ है", ar: "اتصال API — أين يعيش خادم هذا التطبيق",
+  },
+  "set.api.lead": {
+    en: "This is the address of the QRME backend this console talks to (the desktop app starts its own; a phone points here over Wi-Fi). It is an address, not a secret — and it is not the model API key below: the two are different things.", es: "Esta es la dirección del backend de QRME con el que habla esta consola (la app de escritorio arranca el suyo; un teléfono apunta aquí por Wi-Fi). Es una dirección, no un secreto — y no es la clave API del modelo de abajo: son dos cosas distintas.", fr: "C'est l'adresse du backend QRME auquel cette console parle (l'app de bureau démarre le sien ; un téléphone pointe ici par Wi-Fi). C'est une adresse, pas un secret — et ce n'est pas la clé API du modèle ci-dessous : ce sont deux choses différentes.", de: "Dies ist die Adresse des QRME-Backends, mit dem diese Konsole spricht (die Desktop-App startet ihr eigenes; ein Telefon zeigt per WLAN hierher). Es ist eine Adresse, kein Geheimnis — und nicht der Modell-API-Schlüssel unten: das sind zwei verschiedene Dinge.", pt: "Este é o endereço do backend QRME com que esta consola fala (a app de desktop arranca o seu; um telemóvel aponta aqui por Wi-Fi). É um endereço, não um segredo — e não é a chave API do modelo abaixo: são coisas diferentes.", it: "Questo è l'indirizzo del backend QRME con cui parla questa console (l'app desktop avvia il suo; un telefono punta qui via Wi-Fi). È un indirizzo, non un segreto — e non è la chiave API del modello qui sotto: sono due cose diverse.", ja: "これはこのコンソールが話すQRMEバックエンドのアドレスです（デスクトップアプリは自前で起動し、スマホはWi-Fi経由でここを指します）。これはアドレスであり秘密ではなく、下のモデルAPIキーとも別物です。", zh: "这是本控制台连接的QRME后端地址（桌面应用自行启动；手机通过Wi-Fi指向这里）。它是地址而非机密 — 也不是下方的模型API密钥：两者是不同的东西。", hi: "यह उस QRME बैकएंड का पता है जिससे यह कंसोल बात करती है (डेस्कटॉप ऐप अपना खुद चलाता है; फ़ोन Wi-Fi से यहाँ इंगित करता है)। यह पता है, रहस्य नहीं — और नीचे वाली मॉडल API कुंजी नहीं है: दोनों अलग चीज़ें हैं।", ar: "هذا عنوان خادم QRME الذي تتحدث إليه هذه الوحدة (تطبيق سطح المكتب يشغّل خادمه؛ والهاتف يشير هنا عبر Wi-Fi). إنه عنوان لا سر — وليس مفتاح API النموذج أدناه: هما شيئان مختلفان.",
+  },
+  "set.api.url": {
+    en: "Backend base URL", es: "URL base del backend", fr: "URL de base du backend", de: "Backend-Basis-URL", pt: "URL base do backend", it: "URL base del backend", ja: "バックエンドのベースURL", zh: "后端基础URL", hi: "बैकएंड बेस URL", ar: "عنوان URL الأساسي للخادم",
+  },
+  "set.key": {
+    en: "Your model API key — who pays for the AI's words", es: "Tu clave API del modelo — quién paga las palabras de la IA", fr: "Votre clé API du modèle — qui paie les mots de l'IA", de: "Ihr Modell-API-Schlüssel — wer für die Worte der KI zahlt", pt: "A sua chave API do modelo — quem paga as palavras da IA", it: "La tua chiave API del modello — chi paga le parole dell'IA", ja: "モデルAPIキー — AIの言葉の支払いは誰か", zh: "你的模型API密钥 — 谁为AI的话语付费", hi: "आपकी मॉडल API कुंजी — AI के शब्दों का भुगतान कौन करता है", ar: "مفتاح API النموذج الخاص بك — من يدفع ثمن كلمات الذكاء الاصطناعي",
+  },
+  "set.key.lead": {
+    en: "Different from the connection above: that was where this app's server lives; this is whose credential the AI generation runs on. Paste your own key (Anthropic sk-ant-…, or OpenAI / xAI / Gemini for those providers) and your profiles' replies run on your credential. It is a secret: it stays on this device and rides only your own requests — the server never stores it. Leave it empty to use whatever key the deployment lends.", es: "Distinto de la conexión de arriba: aquello era dónde vive el servidor de esta app; esto es con qué credencial corre la generación de IA. Pega tu propia clave (Anthropic sk-ant-…, u OpenAI / xAI / Gemini para esos proveedores) y las respuestas de tus perfiles corren con tu credencial. Es un secreto: se queda en este dispositivo y viaja solo en tus propias peticiones — el servidor nunca la guarda. Déjala vacía para usar la clave que preste el despliegue.", fr: "Différent de la connexion ci-dessus : c'était où vit le serveur de cette app ; ici, c'est avec quelle référence tourne la génération d'IA. Collez votre propre clé (Anthropic sk-ant-…, ou OpenAI / xAI / Gemini pour ces fournisseurs) et les réponses de vos profils tournent sur votre référence. C'est un secret : elle reste sur cet appareil et ne voyage qu'avec vos propres requêtes — le serveur ne la stocke jamais. Laissez vide pour utiliser la clé prêtée par le déploiement.", de: "Anders als die Verbindung oben: das war, wo der Server dieser App lebt; dies ist, auf wessen Zugangsdaten die KI-Generierung läuft. Fügen Sie Ihren eigenen Schlüssel ein (Anthropic sk-ant-…, oder OpenAI / xAI / Gemini für diese Anbieter), und die Antworten Ihrer Profile laufen auf Ihren Zugangsdaten. Er ist geheim: er bleibt auf diesem Gerät und reist nur mit Ihren eigenen Anfragen — der Server speichert ihn nie. Leer lassen, um den vom Deployment geliehenen Schlüssel zu nutzen.", pt: "Diferente da ligação acima: aquilo era onde vive o servidor desta app; isto é com que credencial corre a geração de IA. Cole a sua própria chave (Anthropic sk-ant-…, ou OpenAI / xAI / Gemini para esses fornecedores) e as respostas dos seus perfis correm na sua credencial. É um segredo: fica neste dispositivo e viaja só nos seus próprios pedidos — o servidor nunca a guarda. Deixe vazio para usar a chave que o deployment empresta.", it: "Diverso dalla connessione sopra: quella era dove vive il server di questa app; questa è con quale credenziale gira la generazione IA. Incolla la tua chiave (Anthropic sk-ant-…, oppure OpenAI / xAI / Gemini per quei provider) e le risposte dei tuoi profili girano sulla tua credenziale. È un segreto: resta su questo dispositivo e viaggia solo con le tue richieste — il server non la conserva mai. Lasciala vuota per usare la chiave prestata dal deployment.", ja: "上の接続とは別物です。あれはサーバーの場所、これはAI生成が誰の資格情報で動くかです。自分のキー（Anthropicのsk-ant-…、または各プロバイダーのOpenAI / xAI / Gemini）を貼ると、プロフィールの返答はあなたの資格情報で動きます。これは秘密で、この端末に留まりあなた自身のリクエストにのみ載ります — サーバーは保存しません。空のままなら配備側のキーを使います。", zh: "与上面的连接不同：那是服务器的位置，这是AI生成使用谁的凭证。粘贴你自己的密钥（Anthropic的sk-ant-…，或相应提供方的OpenAI / xAI / Gemini），你的资料回复就用你的凭证运行。它是机密：只留在本设备、只随你自己的请求发送 — 服务器绝不存储。留空则使用部署方借出的密钥。", hi: "ऊपर के कनेक्शन से अलग: वह था सर्वर कहाँ है; यह है AI जनरेशन किसकी क्रेडेंशियल पर चलती है। अपनी कुंजी चिपकाएँ (Anthropic sk-ant-…, या उन प्रदाताओं के लिए OpenAI / xAI / Gemini) और आपके प्रोफ़ाइल के जवाब आपकी क्रेडेंशियल पर चलेंगे। यह रहस्य है: यह इसी डिवाइस पर रहती है और केवल आपके अनुरोधों के साथ जाती है — सर्वर इसे कभी नहीं रखता। खाली छोड़ें तो डिप्लॉयमेंट की कुंजी उपयोग होगी।", ar: "مختلف عن الاتصال أعلاه: ذاك كان مكان الخادم؛ وهذا هو بيان الاعتماد الذي يعمل عليه توليد الذكاء الاصطناعي. الصق مفتاحك (Anthropic sk-ant-…، أو OpenAI / xAI / Gemini لتلك الجهات) فتعمل ردود ملفاتك على اعتمادك. إنه سر: يبقى على هذا الجهاز ولا يسافر إلا مع طلباتك — والخادم لا يخزنه أبدًا. اتركه فارغًا لاستخدام مفتاح النشر المعار.",
+  },
+  "set.key.label": {
+    en: "API key", es: "Clave API", fr: "Clé API", de: "API-Schlüssel", pt: "Chave API", it: "Chiave API", ja: "APIキー", zh: "API密钥", hi: "API कुंजी", ar: "مفتاح API",
+  },
+  "set.key.ph": {
+    en: "sk-…", es: "sk-…", fr: "sk-…", de: "sk-…", pt: "sk-…", it: "sk-…", ja: "sk-…", zh: "sk-…", hi: "sk-…", ar: "sk-…",
+  },
+  "set.offline": {
+    en: "Offline status", es: "Estado sin conexión", fr: "État hors ligne", de: "Offline-Status", pt: "Estado offline", it: "Stato offline", ja: "オフライン状態", zh: "离线状态", hi: "ऑफ़लाइन स्थिति", ar: "حالة عدم الاتصال",
+  },
+  "set.offline.unreachable": {
+    en: "Not reachable — is the backend running?", es: "Inaccesible — ¿está corriendo el backend?", fr: "Injoignable — le backend tourne-t-il ?", de: "Nicht erreichbar — läuft das Backend?", pt: "Inacessível — o backend está a correr?", it: "Irraggiungibile — il backend è in esecuzione?", ja: "接続できません — バックエンドは起動していますか？", zh: "无法连接 — 后端在运行吗？", hi: "पहुँच नहीं — क्या बैकएंड चल रहा है?", ar: "غير قابل للوصول — هل الخادم يعمل؟",
+  },
+  "set.who": {
+    en: "Who wrote this? — check any text", es: "¿Quién escribió esto? — comprueba cualquier texto", fr: "Qui a écrit ceci ? — vérifiez n'importe quel texte", de: "Wer schrieb das? — jeden Text prüfen", pt: "Quem escreveu isto? — verifique qualquer texto", it: "Chi l'ha scritto? — verifica qualsiasi testo", ja: "誰が書いた？ — どんなテキストも確認", zh: "这是谁写的？— 核验任意文本", hi: "यह किसने लिखा? — कोई भी पाठ जाँचें", ar: "من كتب هذا؟ — تحقق من أي نص",
+  },
+  "set.who.lead": {
+    en: "Paste writing you think came from a profile here. It answers from the text alone, with no credential id, and still answers when the text has been edited.", es: "Pega un texto que creas que salió de un perfil de aquí. Responde solo a partir del texto, sin id de credencial, y sigue respondiendo aunque el texto haya sido editado.", fr: "Collez un texte qui, selon vous, vient d'un profil d'ici. Il répond à partir du texte seul, sans id de référence, et répond encore quand le texte a été modifié.", de: "Fügen Sie einen Text ein, der Ihrer Meinung nach von einem Profil hier stammt. Es antwortet aus dem Text allein, ohne Nachweis-Id, und antwortet auch, wenn der Text bearbeitet wurde.", pt: "Cole um texto que ache que veio de um perfil daqui. Responde só a partir do texto, sem id de credencial, e continua a responder mesmo com o texto editado.", it: "Incolla un testo che pensi venga da un profilo di qui. Risponde dal solo testo, senza id di credenziale, e risponde anche quando il testo è stato modificato.", ja: "ここのプロフィールが書いたと思われる文章を貼り付けてください。資格情報IDなしにテキストだけから答え、編集された後でも答えます。", zh: "粘贴你认为出自这里某个资料的文字。它仅凭文本作答，无需凭证ID，即使文本被编辑过也能作答。", hi: "वह लेख चिपकाएँ जो आपको लगता है यहाँ के किसी प्रोफ़ाइल से आया। यह केवल पाठ से उत्तर देता है, बिना क्रेडेंशियल आईडी के, और संपादित पाठ पर भी उत्तर देता है।", ar: "الصق نصًا تظن أنه صادر من ملف هنا. يجيب من النص وحده، بلا معرّف اعتماد، ويظل يجيب حتى بعد تعديل النص.",
+  },
+  "set.who.ph": {
+    en: "Paste the text…", es: "Pega el texto…", fr: "Collez le texte…", de: "Text einfügen…", pt: "Cole o texto…", it: "Incolla il testo…", ja: "テキストを貼り付け…", zh: "粘贴文本…", hi: "पाठ चिपकाएँ…", ar: "الصق النص…",
+  },
+  "set.who.by": {
+    en: "{mark} produced by {pid} · {state}", es: "{mark} producido por {pid} · {state}", fr: "{mark} produit par {pid} · {state}", de: "{mark} erzeugt von {pid} · {state}", pt: "{mark} produzido por {pid} · {state}", it: "{mark} prodotto da {pid} · {state}", ja: "{mark} 作成: {pid} · {state}", zh: "{mark} 由{pid}生成 · {state}", hi: "{mark} {pid} द्वारा निर्मित · {state}", ar: "{mark} أنتجه {pid} · {state}",
+  },
+  "set.who.match": {
+    en: "{m} of {s} passages match ({pct}% similar).", es: "{m} de {s} pasajes coinciden ({pct}% de similitud).", fr: "{m} passages sur {s} correspondent ({pct} % de similarité).", de: "{m} von {s} Passagen stimmen überein ({pct} % ähnlich).", pt: "{m} de {s} passagens coincidem ({pct}% de semelhança).", it: "{m} passaggi su {s} corrispondono ({pct}% simile).", ja: "{s}節中{m}節が一致（類似度{pct}%）。", zh: "{s}段中{m}段匹配（相似度{pct}%）。", hi: "{s} में से {m} अंश मेल खाते हैं ({pct}% समान)।", ar: "{m} من {s} مقاطع متطابقة (تشابه {pct}%).",
+  },
+  "set.who.none": {
+    en: "No profile here wrote this.", es: "Ningún perfil de aquí escribió esto.", fr: "Aucun profil d'ici n'a écrit ceci.", de: "Kein Profil hier hat das geschrieben.", pt: "Nenhum perfil daqui escreveu isto.", it: "Nessun profilo di qui l'ha scritto.", ja: "ここのプロフィールは書いていません。", zh: "这里没有资料写过这段文字。", hi: "यहाँ के किसी प्रोफ़ाइल ने यह नहीं लिखा।", ar: "لم يكتب هذا أي ملف هنا.",
+  },
+  "set.pair": {
+    en: "Open on your phone", es: "Abrir en tu teléfono", fr: "Ouvrir sur votre téléphone", de: "Auf dem Telefon öffnen", pt: "Abrir no telemóvel", it: "Apri sul telefono", ja: "スマホで開く", zh: "在手机上打开", hi: "फ़ोन पर खोलें", ar: "افتح على هاتفك",
+  },
+  "set.pair.alt": {
+    en: "QR code for the studio URL on this network", es: "Código QR de la URL del estudio en esta red", fr: "Code QR de l'URL du studio sur ce réseau", de: "QR-Code der Studio-URL in diesem Netzwerk", pt: "Código QR do URL do estúdio nesta rede", it: "Codice QR dell'URL dello studio su questa rete", ja: "このネットワーク上のスタジオURLのQRコード", zh: "本网络内工作室URL的二维码", hi: "इस नेटवर्क पर स्टूडियो URL का QR कोड", ar: "رمز QR لعنوان الاستوديو على هذه الشبكة",
+  },
+  "set.session": {
+    en: "Session", es: "Sesión", fr: "Session", de: "Sitzung", pt: "Sessão", it: "Sessione", ja: "セッション", zh: "会话", hi: "सत्र", ar: "الجلسة",
+  },
+  "set.session.profile": {
+    en: "Profile: {id}", es: "Perfil: {id}", fr: "Profil : {id}", de: "Profil: {id}", pt: "Perfil: {id}", it: "Profilo: {id}", ja: "プロフィール: {id}", zh: "资料：{id}", hi: "प्रोफ़ाइल: {id}", ar: "الملف: {id}",
+  },
+  "set.session.out": {
+    en: "Sign out & end session", es: "Cerrar sesión y terminarla", fr: "Se déconnecter et clore la session", de: "Abmelden & Sitzung beenden", pt: "Terminar sessão", it: "Esci e chiudi la sessione", ja: "サインアウトしてセッションを終了", zh: "退出并结束会话", hi: "साइन आउट करें और सत्र समाप्त करें", ar: "تسجيل الخروج وإنهاء الجلسة",
+  },
+  "set.mail": {
+    en: "Email delivery", es: "Envío de correo", fr: "Envoi d'e-mails", de: "E-Mail-Versand", pt: "Envio de e-mail", it: "Invio e-mail", ja: "メール配信", zh: "邮件投递", hi: "ईमेल डिलीवरी", ar: "تسليم البريد",
+  },
+  "set.mail.smtp": {
+    en: "Mail goes out through {host}{env}. New accounts must verify by email.", es: "El correo sale por {host}{env}. Las cuentas nuevas deben verificarse por email.", fr: "Le courrier part via {host}{env}. Les nouveaux comptes doivent se vérifier par e-mail.", de: "Mail geht über {host}{env} hinaus. Neue Konten müssen sich per E-Mail verifizieren.", pt: "O correio sai por {host}{env}. As contas novas têm de verificar por e-mail.", it: "La posta esce tramite {host}{env}. I nuovi account devono verificarsi via e-mail.", ja: "メールは{host}{env}経由で送信されます。新規アカウントはメール認証が必要です。", zh: "邮件经由{host}{env}发出。新账户必须通过邮件验证。", hi: "मेल {host}{env} से जाती है। नए खातों को ईमेल से सत्यापन करना होगा।", ar: "يخرج البريد عبر {host}{env}. يجب على الحسابات الجديدة التحقق بالبريد.",
+  },
+  "set.mail.none": {
+    en: "No mail server configured, so nothing can be emailed — verification messages are written to this app's log and signup on this machine simply goes straight in. Point it at a mail account below to send real verification links. For Gmail, turn on 2-Step Verification and create an App password; paste that here, not your normal password.", es: "No hay servidor de correo configurado, así que no se puede enviar nada — los mensajes de verificación se escriben en el log de esta app y el registro en esta máquina entra directamente. Apúntalo a una cuenta de correo abajo para enviar enlaces reales. Para Gmail, activa la verificación en dos pasos y crea una contraseña de aplicación; pega esa aquí, no tu contraseña normal.", fr: "Aucun serveur de messagerie configuré, donc rien ne peut être envoyé — les messages de vérification vont dans le journal de l'app et l'inscription sur cette machine entre directement. Pointez-le vers un compte mail ci-dessous pour envoyer de vrais liens. Pour Gmail, activez la validation en deux étapes et créez un mot de passe d'application ; collez celui-là ici, pas votre mot de passe habituel.", de: "Kein Mailserver konfiguriert, also kann nichts gemailt werden — Verifizierungsnachrichten landen im Log dieser App, und die Anmeldung auf dieser Maschine geht direkt durch. Richten Sie unten ein Mailkonto ein, um echte Links zu senden. Für Gmail: Bestätigung in zwei Schritten aktivieren und ein App-Passwort erstellen; das hier einfügen, nicht Ihr normales Passwort.", pt: "Nenhum servidor de correio configurado, portanto nada pode ser enviado — as mensagens de verificação vão para o log desta app e o registo nesta máquina entra diretamente. Aponte para uma conta de correio abaixo para enviar links reais. Para o Gmail, ative a verificação em dois passos e crie uma palavra-passe de app; cole essa aqui, não a sua normal.", it: "Nessun server di posta configurato, quindi non si può inviare nulla — i messaggi di verifica finiscono nel log dell'app e la registrazione su questa macchina entra direttamente. Puntalo a un account di posta qui sotto per inviare link veri. Per Gmail, attiva la verifica in due passaggi e crea una password per le app; incolla quella qui, non la tua normale.", ja: "メールサーバーが未設定のため送信できません — 認証メッセージはこのアプリのログに書かれ、この端末でのサインアップはそのまま通ります。実際の認証リンクを送るには下のメールアカウントを設定してください。Gmailの場合は2段階認証を有効にしてアプリパスワードを作成し、通常のパスワードではなくそれを貼り付けてください。", zh: "未配置邮件服务器，因此无法发送任何邮件 — 验证消息写入本应用日志，本机注册直接通过。在下方指向一个邮件账户即可发送真实验证链接。Gmail需开启两步验证并创建应用专用密码；粘贴该密码而非常规密码。", hi: "कोई मेल सर्वर कॉन्फ़िगर नहीं, इसलिए कुछ भी ईमेल नहीं हो सकता — सत्यापन संदेश ऐप के लॉग में लिखे जाते हैं और इस मशीन पर साइनअप सीधे हो जाता है। असली लिंक भेजने के लिए नीचे मेल खाता जोड़ें। Gmail के लिए 2-चरण सत्यापन चालू करें और ऐप पासवर्ड बनाएँ; वही यहाँ चिपकाएँ, अपना सामान्य पासवर्ड नहीं।", ar: "لا يوجد خادم بريد مهيأ، فلا يمكن إرسال شيء — رسائل التحقق تُكتب في سجل التطبيق والتسجيل على هذا الجهاز يمر مباشرة. وجّهه إلى حساب بريد أدناه لإرسال روابط حقيقية. لجيميل، فعّل التحقق بخطوتين وأنشئ كلمة مرور تطبيق؛ والصقها هنا لا كلمة مرورك العادية.",
+  },
+  "set.mail.host": {
+    en: "Mail server", es: "Servidor de correo", fr: "Serveur de messagerie", de: "Mailserver", pt: "Servidor de correio", it: "Server di posta", ja: "メールサーバー", zh: "邮件服务器", hi: "मेल सर्वर", ar: "خادم البريد",
+  },
+  "set.mail.host.ph": {
+    en: "smtp.gmail.com", es: "smtp.gmail.com", fr: "smtp.gmail.com", de: "smtp.gmail.com", pt: "smtp.gmail.com", it: "smtp.gmail.com", ja: "smtp.gmail.com", zh: "smtp.gmail.com", hi: "smtp.gmail.com", ar: "smtp.gmail.com",
+  },
+  "set.mail.port": {
+    en: "Port", es: "Puerto", fr: "Port", de: "Port", pt: "Porta", it: "Porta", ja: "ポート", zh: "端口", hi: "पोर्ट", ar: "المنفذ",
+  },
+  "set.mail.user": {
+    en: "Username", es: "Usuario", fr: "Nom d'utilisateur", de: "Benutzername", pt: "Utilizador", it: "Nome utente", ja: "ユーザー名", zh: "用户名", hi: "यूज़रनेम", ar: "اسم المستخدم",
+  },
+  "set.mail.user.ph": {
+    en: "you@gmail.com", es: "tu@gmail.com", fr: "vous@gmail.com", de: "sie@gmail.com", pt: "voce@gmail.com", it: "tu@gmail.com", ja: "you@gmail.com", zh: "you@gmail.com", hi: "aap@gmail.com", ar: "you@gmail.com",
+  },
+  "set.mail.pass": {
+    en: "Password", es: "Contraseña", fr: "Mot de passe", de: "Passwort", pt: "Palavra-passe", it: "Password", ja: "パスワード", zh: "密码", hi: "पासवर्ड", ar: "كلمة المرور",
+  },
+  "set.mail.pass.saved": {
+    en: "(saved — type to replace)", es: "(guardada — escribe para reemplazar)", fr: "(enregistré — tapez pour remplacer)", de: "(gespeichert — tippen zum Ersetzen)", pt: "(guardada — escreva para substituir)", it: "(salvata — digita per sostituire)", ja: "（保存済み — 入力で置き換え）", zh: "（已保存 — 输入即可替换）", hi: "(सहेजा गया — बदलने के लिए टाइप करें)", ar: "(محفوظة — اكتب للاستبدال)",
+  },
+  "set.mail.pass.ph": {
+    en: "app password", es: "contraseña de aplicación", fr: "mot de passe d'application", de: "App-Passwort", pt: "palavra-passe de app", it: "password per le app", ja: "アプリパスワード", zh: "应用专用密码", hi: "ऐप पासवर्ड", ar: "كلمة مرور التطبيق",
+  },
+  "set.mail.from": {
+    en: "From address", es: "Dirección del remitente", fr: "Adresse d'expéditeur", de: "Absenderadresse", pt: "Endereço do remetente", it: "Indirizzo mittente", ja: "送信元アドレス", zh: "发件地址", hi: "प्रेषक पता", ar: "عنوان المرسل",
+  },
+  "set.mail.link": {
+    en: "Link address", es: "Dirección de los enlaces", fr: "Adresse des liens", de: "Link-Adresse", pt: "Endereço dos links", it: "Indirizzo dei link", ja: "リンクアドレス", zh: "链接地址", hi: "लिंक पता", ar: "عنوان الروابط",
+  },
+  "set.mail.link.note": {
+    en: "— what verification links point at", es: "— adónde apuntan los enlaces de verificación", fr: "— où pointent les liens de vérification", de: "— worauf Verifizierungslinks zeigen", pt: "— para onde apontam os links de verificação", it: "— dove puntano i link di verifica", ja: "— 認証リンクの宛先", zh: "— 验证链接指向何处", hi: "— सत्यापन लिंक कहाँ इंगित करते हैं", ar: "— إلى أين تشير روابط التحقق",
+  },
+  "set.mail.link.ph": {
+    en: "http://127.0.0.1:8000", es: "http://127.0.0.1:8000", fr: "http://127.0.0.1:8000", de: "http://127.0.0.1:8000", pt: "http://127.0.0.1:8000", it: "http://127.0.0.1:8000", ja: "http://127.0.0.1:8000", zh: "http://127.0.0.1:8000", hi: "http://127.0.0.1:8000", ar: "http://127.0.0.1:8000",
+  },
+  "set.mail.clear": {
+    en: "Clear", es: "Borrar", fr: "Effacer", de: "Löschen", pt: "Limpar", it: "Cancella", ja: "クリア", zh: "清除", hi: "हटाएँ", ar: "مسح",
+  },
+  "set.mail.test": {
+    en: "Send a test message to", es: "Enviar un mensaje de prueba a", fr: "Envoyer un message de test à", de: "Testnachricht senden an", pt: "Enviar mensagem de teste para", it: "Invia un messaggio di prova a", ja: "テストメッセージの宛先", zh: "发送测试邮件至", hi: "परीक्षण संदेश भेजें", ar: "أرسل رسالة اختبار إلى",
+  },
+  "set.mail.test.ph": {
+    en: "you@example.com", es: "tu@example.com", fr: "vous@example.com", de: "sie@example.com", pt: "voce@example.com", it: "tu@example.com", ja: "you@example.com", zh: "you@example.com", hi: "aap@example.com", ar: "you@example.com",
+  },
+  "set.model": {
+    en: "Which model answers", es: "Qué modelo responde", fr: "Quel modèle répond", de: "Welches Modell antwortet", pt: "Que modelo responde", it: "Quale modello risponde", ja: "どのモデルが答えるか", zh: "由哪个模型作答", hi: "कौन-सा मॉडल जवाब देता है", ar: "أي نموذج يجيب",
+  },
+  "set.model.lead": {
+    en: "Your profile's replies can run on any of these. Pick one and every reply uses it; Automatic uses whichever is configured.", es: "Las respuestas de tu perfil pueden correr en cualquiera de estos. Elige uno y todas las respuestas lo usan; Automático usa el que esté configurado.", fr: "Les réponses de votre profil peuvent tourner sur n'importe lequel. Choisissez-en un et chaque réponse l'utilise ; Automatique utilise celui qui est configuré.", de: "Die Antworten Ihres Profils können auf jedem davon laufen. Wählen Sie eines, und jede Antwort nutzt es; Automatisch nutzt das jeweils Konfigurierte.", pt: "As respostas do seu perfil podem correr em qualquer um destes. Escolha um e todas as respostas o usam; Automático usa o que estiver configurado.", it: "Le risposte del tuo profilo possono girare su uno qualsiasi. Scegline uno e ogni risposta lo usa; Automatico usa quello configurato.", ja: "プロフィールの返答はどれでも動かせます。選べばすべての返答がそれを使い、「自動」は設定済みのものを使います。", zh: "你的资料回复可运行在任一模型上。选定后每条回复都用它；「自动」使用已配置的模型。", hi: "आपके प्रोफ़ाइल के जवाब इनमें से किसी पर चल सकते हैं। एक चुनें और हर जवाब उसी का उपयोग करेगा; स्वचालित जो कॉन्फ़िगर है उसे लेता है।", ar: "يمكن أن تعمل ردود ملفك على أي منها. اختر واحدًا فتستخدمه كل الردود؛ التلقائي يستخدم ما هو مهيأ.",
+  },
+  "set.model.stub": {
+    en: "⚠ Right now replies come from the built-in offline helper — no online model has a working key on this deployment. Pick a provider above and add its key.", es: "⚠ Ahora mismo las respuestas vienen del asistente offline integrado — ningún modelo en línea tiene clave válida en este despliegue. Elige un proveedor arriba y añade su clave.", fr: "⚠ En ce moment, les réponses viennent de l'assistant hors ligne intégré — aucun modèle en ligne n'a de clé valide sur ce déploiement. Choisissez un fournisseur ci-dessus et ajoutez sa clé.", de: "⚠ Derzeit kommen Antworten vom eingebauten Offline-Helfer — kein Online-Modell hat auf diesem Deployment einen gültigen Schlüssel. Wählen Sie oben einen Anbieter und fügen Sie dessen Schlüssel hinzu.", pt: "⚠ Neste momento as respostas vêm do assistente offline integrado — nenhum modelo online tem chave válida neste deployment. Escolha um fornecedor acima e adicione a sua chave.", it: "⚠ In questo momento le risposte vengono dall'assistente offline integrato — nessun modello online ha una chiave valida su questo deployment. Scegli un provider sopra e aggiungi la sua chiave.", ja: "⚠ 現在の返答は内蔵オフラインヘルパーからです — この配備で有効なキーを持つオンラインモデルがありません。上でプロバイダーを選びキーを追加してください。", zh: "⚠ 当前回复来自内置离线助手 — 此部署上没有任何在线模型持有有效密钥。请在上方选择提供方并添加其密钥。", hi: "⚠ अभी जवाब अंतर्निहित ऑफ़लाइन सहायक से आ रहे हैं — इस डिप्लॉयमेंट पर किसी ऑनलाइन मॉडल की कुंजी नहीं है। ऊपर प्रदाता चुनें और उसकी कुंजी जोड़ें।", ar: "⚠ الردود الآن من المساعد المدمج دون اتصال — لا يملك أي نموذج متصل مفتاحًا صالحًا في هذا النشر. اختر مزودًا أعلاه وأضف مفتاحه.",
+  },
+  "set.model.resolves": {
+    en: "⚠ Right now it resolves to {effective} — the one you picked has no key on this deployment yet.", es: "⚠ Ahora mismo se resuelve a {effective} — el que elegiste aún no tiene clave en este despliegue.", fr: "⚠ En ce moment, cela se résout en {effective} — celui que vous avez choisi n'a pas encore de clé sur ce déploiement.", de: "⚠ Derzeit löst es zu {effective} auf — das gewählte hat auf diesem Deployment noch keinen Schlüssel.", pt: "⚠ Neste momento resolve para {effective} — o que escolheu ainda não tem chave neste deployment.", it: "⚠ In questo momento si risolve in {effective} — quello scelto non ha ancora una chiave su questo deployment.", ja: "⚠ 現在は{effective}に解決されます — 選んだものはまだこの配備にキーがありません。", zh: "⚠ 当前解析为{effective} — 你选的那个在此部署上还没有密钥。", hi: "⚠ अभी यह {effective} पर हल होता है — आपके चुने हुए की इस डिप्लॉयमेंट पर अभी कुंजी नहीं है।", ar: "⚠ الآن يُحل إلى {effective} — الذي اخترته لا مفتاح له في هذا النشر بعد.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

@@ -4,6 +4,19 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.4] — 2026-08-05
+
+### The Control Center speaks
+
+The Settings screen — the console's Control Center, and the largest
+block left on the untranslated record — is localized end to end:
+sixty-six strings become forty-four `set.*` keys in all ten languages.
+The heavily interpolated paragraphs (the backend address, the model
+API key, the mail setup, the watermark recovery verdict, the honest
+warnings about which model actually answers) are whole sentences with
+named holes rather than fragments. The console-untranslated record
+falls **1403 → 1337**, exact-sync held in both directions.
+
 ## [0.44.3] — 2026-08-05
 
 ### The backlogs shrink from both ends

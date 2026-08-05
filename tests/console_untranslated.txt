@@ -1,4 +1,4 @@
-# status: backlog — 1403 rows
+# status: backlog — 1337 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1403
+# ceiling: 1337
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -1102,72 +1102,6 @@ Selling: your account
 Selling: · lifetime
 Selling: · paid
 Selling: — accrued
-Settings: % similar).
-Settings: (saved — type to replace)
-Settings: , or OpenAI / xAI / Gemini for those providers) and your profiles' replies run on your credential. It is a secret: it stays on this device and rides only your own requests — the server never stores it. Leave it empty to use whatever key the deployment lends.
-Settings: . New accounts must verify by email.
-Settings: . Paste your own key (Anthropic
-Settings: ; paste that here, not your normal password.
-Settings: API connection — where this app's own server lives
-Settings: API key
-Settings: App password
-Settings: Automatic
-Settings: Backend base URL
-Settings: Clear
-Settings: Control Center
-Settings: Different from the connection above: that was
-Settings: Email delivery
-Settings: From address
-Settings: Link address
-Settings: Mail goes out through
-Settings: Mail server
-Settings: No mail server configured, so
-Settings: No profile here wrote this.
-Settings: Not reachable — is the backend running?
-Settings: Offline status
-Settings: Open on your phone
-Settings: Password
-Settings: Paste the text…
-Settings: Paste writing you think came from a profile here. It answers from the text alone, with no credential id, and still answers when the text has been edited.
-Settings: Port
-Settings: Profile:
-Settings: QR code for the studio URL on this network
-Settings: Send a test message to
-Settings: Session
-Settings: Sign out &amp; end session
-Settings: This is the
-Settings: Username
-Settings: Which model answers
-Settings: Who wrote this? — check any text
-Settings: Your model API key — who pays for the AI's words
-Settings: Your profile's replies can run on any of these. Pick one and every reply uses it;
-Settings: address of the QRME backend
-Settings: app password
-Settings: built-in offline helper
-Settings: http://127.0.0.1:8000
-Settings: not
-Settings: nothing can be emailed
-Settings: of
-Settings: passages match (
-Settings: produced by
-Settings: sk-ant-…
-Settings: sk-…
-Settings: smtp.gmail.com
-Settings: the model API key below: the two are different things.
-Settings: this app's server lives; this is
-Settings: this console talks to (the desktop app starts its own; a phone points here over Wi-Fi). It is an address, not a secret — and it is
-Settings: uses whichever is configured.
-Settings: where
-Settings: whose credential the AI generation runs on
-Settings: you are in control
-Settings: you@example.com
-Settings: you@gmail.com
-Settings: — no online model has a working key on this deployment. Pick a provider above and add its key.
-Settings: — the one you picked has no key on this deployment yet.
-Settings: — verification messages are written to this app's log and signup on this machine simply goes straight in. Point it at a mail account below to send real verification links. For Gmail, turn on 2-Step Verification and create an
-Settings: — what verification links point at
-Settings: ⚠ Right now it resolves to
-Settings: ⚠ Right now replies come from the
 Signing: , good until
 Signing: , proofed
 Signing: . Finish in the ceremony window.
