@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, getBase, type MediaUpload, type WallComment, type WallPost } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -18,6 +19,7 @@ export function Wall({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const [posts, setPosts] = useState<WallPost[]>([]);
   const [mine, setMine] = useState<WallPost[]>([]);
   const [platforms, setPlatforms] = useState<string>("");
@@ -61,10 +63,11 @@ export function Wall({ onPlans }: {
         media_ids: uploads.map((u) => u.id),
       }, session.ownerToken);
       if (post.status === "blocked") {
-        setError(`Moderation held this post: ${post.blocked_reason}`);
+        setError(tr("wll.moderation", lang)
+          .replace("{why}", post.blocked_reason || ""));
       } else {
         setBody(""); setVideoUrl(""); setVideoTitle(""); setUploads([]);
-        setNote("Posted to your wall.");
+        setNote(tr("wll.posted", lang));
         load();
       }
     } catch (e) { setError(e); }
@@ -127,13 +130,13 @@ export function Wall({ onPlans }: {
       await api.deleteComment(commentId, session.ownerToken);
       const r = await api.postComments(postId);
       setComments(Array.isArray(r) ? r : r.comments || []);
-      setNote("Withdrawn.");
+      setNote(tr("wll.withdrawn", lang));
     } catch (e) { setError(e); }
   }
 
   async function share(postId: string) {
     if (!session.ownerToken) return;
-    try { await api.sharePost(postId, session.ownerToken); setNote("Shared."); }
+    try { await api.sharePost(postId, session.ownerToken); setNote(tr("wll.shared", lang)); }
     catch (e) { setError(e); }
   }
 
@@ -146,7 +149,9 @@ export function Wall({ onPlans }: {
           {(p.display_name || "Y").split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
         </span>}
         <div>
-      <b>{p.display_name || (p.profile_id === session.profileId ? "You" : "someone")}</b>
+      <b>{p.display_name
+            || (p.profile_id === session.profileId
+                  ? tr("wll.you", lang) : tr("wll.someone", lang))}</b>
       {p.reason && <div className="wp-reason">{p.reason}</div>}
         </div>
       </div>
@@ -165,7 +170,7 @@ export function Wall({ onPlans }: {
               ? <video key={m.id} src={getBase() + m.url} controls />
               : <a key={m.id} className="wp-file" href={getBase() + m.url}
                    target="_blank" rel="noreferrer" download={m.name || undefined}>
-                  📄 {m.name || "attached file"}
+                  📄 {m.name || tr("wll.attachedfile", lang)}
                 </a>)}
         </div>
       )}
@@ -173,14 +178,15 @@ export function Wall({ onPlans }: {
       {p.video && (
         <div className="wp-video">
       {playing === p.id ? (
-        <iframe src={p.video.embed_url} title={p.video.title || "shared video"}
+        <iframe src={p.video.embed_url}
+                title={p.video.title || tr("wll.sharedvideo", lang)}
                 allow="autoplay; encrypted-media; picture-in-picture"
                 allowFullScreen />
       ) : (
         <button className="wp-facade" onClick={() => setPlaying(p.id)}>
           <span className="wp-play">▶</span>
           <span>
-            <b>{p.video.title || "Shared video"}</b>
+            <b>{p.video.title || tr("wll.sharedvideo", lang)}</b>
             <span className="muted small"> · {p.video.platform_name}</span>
             <div className="muted small">{p.video.note}</div>
           </span>
@@ -193,13 +199,15 @@ export function Wall({ onPlans }: {
         <button onClick={() => toggleLike(p)}>
       {liked.has(p.id) ? "♥" : "♡"} {p.likes || 0}
         </button>
-        <button onClick={() => showComments(p.id)}>💬 comments</button>
-        <button onClick={() => share(p.id)}>↗ share</button>
+        <button onClick={() => showComments(p.id)}>{tr("wll.comments", lang)}</button>
+        <button onClick={() => share(p.id)}>{tr("wll.share", lang)}</button>
       </div>
 
       {openComments === p.id && (
         <div className="wp-comments">
-      {comments.length === 0 && <p className="muted small">No comments yet.</p>}
+      {comments.length === 0 && (
+        <p className="muted small">{tr("wll.nocomments", lang)}</p>
+      )}
       {comments.map((c) => (
         <div key={c.id} className="muted small">
           • {c.body}
@@ -208,16 +216,16 @@ export function Wall({ onPlans }: {
           {c.author_id && c.author_id === session.profileId && (
             <button className="chip"
                     onClick={() => withdrawComment(c.id, p.id)}>
-              withdraw
+              {tr("wll.withdraw", lang)}
             </button>
           )}
         </div>
       ))}
       <div className="voice-row">
-        <input value={draft} placeholder="say something kind"
+        <input value={draft} placeholder={tr("wll.comment.ph", lang)}
                onChange={(e) => setDraft(e.target.value)}
                onKeyDown={(e) => e.key === "Enter" && sendComment(p.id)} />
-        <button onClick={() => sendComment(p.id)}>Send</button>
+        <button onClick={() => sendComment(p.id)}>{tr("wll.send", lang)}</button>
       </div>
         </div>
       )}
@@ -227,27 +235,27 @@ export function Wall({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Wall</h2>
-        <span className="muted small">the For You feed · every card says why it's here</span>
+        <h2>{tr("wll.title", lang)}</h2>
+        <span className="muted small">{tr("wll.pitch", lang)}</span>
       </header>
 
       <div className="card">
-        <h3>Say something</h3>
-        <label>Post
-          <textarea rows={2} value={body} placeholder="what's on your wall"
+        <h3>{tr("wll.saysomething", lang)}</h3>
+        <label>{tr("wll.post", lang)}
+          <textarea rows={2} value={body} placeholder={tr("wll.body.ph", lang)}
                     onChange={(e) => setBody(e.target.value)} />
         </label>
         <div className="row">
-          <label>Share a video (optional)
-            <input value={videoUrl} placeholder="paste a link"
+          <label>{tr("wll.sharevideo", lang)}
+            <input value={videoUrl} placeholder={tr("wll.link.ph", lang)}
                    onChange={(e) => setVideoUrl(e.target.value)} />
           </label>
-          <label>Its title, in your words
-            <input value={videoTitle} placeholder="what you're sharing"
+          <label>{tr("wll.videotitle", lang)}
+            <input value={videoTitle} placeholder={tr("wll.videotitle.ph", lang)}
                    onChange={(e) => setVideoTitle(e.target.value)} />
           </label>
         </div>
-        <label>Attach your own photos, videos or files
+        <label>{tr("wll.attach", lang)}
           <input type="file" multiple
                  accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt,.csv,.md"
                  onChange={(e) => { pickFiles(e.target.files); e.target.value = ""; }} />
@@ -258,35 +266,40 @@ export function Wall({ onPlans }: {
               ? <img key={u.id} src={getBase() + u.url} alt="" />
               : u.kind === "video"
                 ? <video key={u.id} src={getBase() + u.url} />
-                : <span key={u.id} className="wp-file">📄 {u.name || "file"}</span>)}
-            <button onClick={() => setUploads([])}>clear</button>
+                : <span key={u.id} className="wp-file">
+                    📄 {u.name || tr("wll.file", lang)}
+                  </span>)}
+            <button onClick={() => setUploads([])}>{tr("wll.clear", lang)}</button>
           </div>
         )}
         {platforms && (
           <p className="muted small">
-            Links from {platforms} render right here — nothing loads from
-            their side until someone presses play. Your own photos and
-            footage upload as-is, never AI-marked.
+            {fill(tr("wll.linksfrom", lang), { platforms })}
           </p>
         )}
         <button className="primary" disabled={busy || uploading || !body.trim()}
-                onClick={publish}>{uploading ? "Uploading…" : "Post"}</button>
+                onClick={publish}>
+          {uploading ? tr("wll.uploading", lang) : tr("wll.post", lang)}
+        </button>
       </div>
 
       {posts.length === 0 && (
         <div className="card">
-          <p className="muted center">Nothing in the feed yet — friends'
-            posts, profiles you talk to, and tags you engage with land here.</p>
+          <p className="muted center">{tr("wll.emptyfeed", lang)}</p>
         </div>
       )}
 
       {mine.length > 0 && (
-        <div className="muted small" style={{ marginTop: 18 }}>Your wall</div>
+        <div className="muted small" style={{ marginTop: 18 }}>
+          {tr("wll.yourwall", lang)}
+        </div>
       )}
       {mine.map(renderPost)}
 
       {posts.length > 0 && (
-        <div className="muted small" style={{ marginTop: 18 }}>For you</div>
+        <div className="muted small" style={{ marginTop: 18 }}>
+          {tr("wll.foryou", lang)}
+        </div>
       )}
       {posts.map(renderPost)}
 

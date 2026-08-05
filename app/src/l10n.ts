@@ -6117,6 +6117,261 @@ const CHROME: Table = {
   "lvg.oneagent": {
     en: "One agent per licence. Deriving again from the same grant is a 409, because a licence was sold for one.", es: "Un agente por licencia. Derivar otra vez de la misma cesión da un 409, porque se vendió una licencia para uno.", fr: "Un agent par licence. Dériver à nouveau depuis la même concession donne un 409, car une licence a été vendue pour un seul.", de: "Ein Agent pro Lizenz. Erneut aus derselben Gewährung abzuleiten ergibt ein 409, denn verkauft wurde eine Lizenz für einen.", pt: "Um agente por licença. Derivar outra vez da mesma cessão dá um 409, porque foi vendida uma licença para um.", it: "Un agente per licenza. Derivare di nuovo dalla stessa concessione dà un 409, perché una licenza è stata venduta per uno.", ja: "ライセンス一件につきエージェントは一体です。同じ許諾から再び派生させると 409 になります。ひとつ分として売られたライセンスだからです。", zh: "每份许可只对应一个智能体。用同一份授权再次衍生会返回 409，因为这份许可是按一个卖出的。", hi: "एक लाइसेंस पर एक ही एजेंट। उसी ग्रांट से दोबारा बनाने पर 409 मिलता है, क्योंकि लाइसेंस एक के लिए बेचा गया था।", ar: "وكيل واحد لكل ترخيص. والاشتقاق مرة أخرى من المنحة نفسها يعطي 409، لأن الترخيص بيع لواحد.",
   },
+  "wll.title": {
+    en: "Wall", es: "Muro", fr: "Mur", de: "Pinnwand", pt: "Mural", it: "Bacheca", ja: "ウォール", zh: "动态墙", hi: "वॉल", ar: "الحائط",
+  },
+  "wll.pitch": {
+    en: "the For You feed · every card says why it's here", es: "el muro Para ti · cada tarjeta dice por qué está aquí", fr: "le fil Pour vous · chaque carte dit pourquoi elle est là", de: "der Für-dich-Verlauf · jede Karte sagt, warum sie da ist", pt: "o mural Para si · cada cartão diz porque está aqui", it: "il flusso Per te · ogni scheda dice perché è lì", ja: "「あなたへ」のフィード · どのカードにも、ここにある理由が書かれています", zh: "“为你”信息流 · 每张卡片都写着它为什么在这里", hi: "“आपके लिए” फ़ीड · हर कार्ड बताता है कि वह यहाँ क्यों है", ar: "خلاصة «لك» · كل بطاقة تقول لماذا هي هنا",
+  },
+  "wll.saysomething": {
+    en: "Say something", es: "Di algo", fr: "Dites quelque chose", de: "Sagen Sie etwas", pt: "Diga algo", it: "Di' qualcosa", ja: "何か書く", zh: "说点什么", hi: "कुछ कहिए", ar: "قل شيئًا",
+  },
+  "wll.post": {
+    en: "Post", es: "Publicar", fr: "Publier", de: "Beitrag", pt: "Publicar", it: "Pubblica", ja: "投稿", zh: "发布", hi: "पोस्ट", ar: "انشر",
+  },
+  "wll.body.ph": {
+    en: "what's on your wall", es: "qué hay en tu muro", fr: "ce qu'il y a sur votre mur", de: "was auf Ihrer Pinnwand steht", pt: "o que há no seu mural", it: "cosa c'è sulla tua bacheca", ja: "ウォールに載せること", zh: "你墙上的内容", hi: "आपकी वॉल पर क्या है", ar: "ما على حائطك",
+  },
+  "wll.sharevideo": {
+    en: "Share a video (optional)", es: "Compartir un vídeo (opcional)", fr: "Partager une vidéo (facultatif)", de: "Ein Video teilen (optional)", pt: "Partilhar um vídeo (opcional)", it: "Condividi un video (facoltativo)", ja: "動画を共有（任意）", zh: "分享一个视频（可选）", hi: "एक वीडियो साझा करें (वैकल्पिक)", ar: "شارك مقطعًا (اختياري)",
+  },
+  "wll.link.ph": {
+    en: "paste a link", es: "pega un enlace", fr: "collez un lien", de: "einen Link einfügen", pt: "cole uma ligação", it: "incolla un link", ja: "リンクを貼り付け", zh: "粘贴一个链接", hi: "एक लिंक चिपकाएँ", ar: "الصق رابطًا",
+  },
+  "wll.videotitle": {
+    en: "Its title, in your words", es: "Su título, con tus palabras", fr: "Son titre, avec vos mots", de: "Sein Titel, in Ihren Worten", pt: "O título dele, nas suas palavras", it: "Il suo titolo, con parole tue", ja: "その題を、あなたの言葉で", zh: "它的标题，用你自己的话", hi: "उसका शीर्षक, आपके शब्दों में", ar: "عنوانه، بكلماتك",
+  },
+  "wll.videotitle.ph": {
+    en: "what you're sharing", es: "qué estás compartiendo", fr: "ce que vous partagez", de: "was Sie teilen", pt: "o que está a partilhar", it: "cosa stai condividendo", ja: "何を共有するのか", zh: "你在分享什么", hi: "आप क्या साझा कर रहे हैं", ar: "ما الذي تشاركه",
+  },
+  "wll.attach": {
+    en: "Attach your own photos, videos or files", es: "Adjunta tus propias fotos, vídeos o archivos", fr: "Joignez vos propres photos, vidéos ou fichiers", de: "Eigene Fotos, Videos oder Dateien anhängen", pt: "Anexe as suas próprias fotos, vídeos ou ficheiros", it: "Allega tue foto, video o file", ja: "自分の写真・動画・ファイルを添付", zh: "附上你自己的照片、视频或文件", hi: "अपनी तस्वीरें, वीडियो या फ़ाइलें जोड़ें", ar: "أرفق صورك أو مقاطعك أو ملفاتك",
+  },
+  "wll.clear": {
+    en: "clear", es: "quitar", fr: "effacer", de: "leeren", pt: "limpar", it: "svuota", ja: "消す", zh: "清除", hi: "हटाएँ", ar: "امسح",
+  },
+  "wll.file": {
+    en: "file", es: "archivo", fr: "fichier", de: "Datei", pt: "ficheiro", it: "file", ja: "ファイル", zh: "文件", hi: "फ़ाइल", ar: "ملف",
+  },
+  "wll.attachedfile": {
+    en: "attached file", es: "archivo adjunto", fr: "fichier joint", de: "angehängte Datei", pt: "ficheiro anexado", it: "file allegato", ja: "添付ファイル", zh: "附件", hi: "संलग्न फ़ाइल", ar: "ملف مرفق",
+  },
+  "wll.linksfrom": {
+    en: "Links from {platforms} render right here — nothing loads from their side until someone presses play. Your own photos and footage upload as-is, never AI-marked.", es: "Los enlaces de {platforms} se ven aquí mismo — nada se carga desde su lado hasta que alguien pulsa reproducir. Tus propias fotos y grabaciones se suben tal cual, nunca marcadas como IA.", fr: "Les liens de {platforms} s'affichent ici même — rien ne se charge de leur côté tant que personne n'appuie sur lecture. Vos propres photos et séquences sont envoyées telles quelles, jamais marquées comme IA.", de: "Links von {platforms} werden genau hier dargestellt — von deren Seite lädt nichts, bis jemand auf Wiedergabe drückt. Ihre eigenen Fotos und Aufnahmen werden unverändert hochgeladen, nie als KI markiert.", pt: "As ligações de {platforms} aparecem mesmo aqui — nada carrega do lado deles até alguém carregar em reproduzir. As suas próprias fotos e filmagens são enviadas tal como estão, nunca marcadas como IA.", it: "I link di {platforms} si vedono proprio qui — dal loro lato non si carica nulla finché qualcuno non preme play. Le tue foto e i tuoi filmati salgono così come sono, mai marcati come IA.", ja: "{platforms} のリンクはこの場で表示されます — 誰かが再生を押すまで、向こう側からは何も読み込まれません。あなた自身の写真や映像はそのまま送られ、AI の印は決して付きません。", zh: "来自 {platforms} 的链接就在这里呈现——在有人按下播放之前，对方那边不会加载任何东西。你自己的照片和影像原样上传，永远不会被标记为 AI。", hi: "{platforms} के लिंक यहीं दिखते हैं — जब तक कोई प्ले न दबाए, उनकी तरफ़ से कुछ भी लोड नहीं होता। आपकी अपनी तस्वीरें और फ़ुटेज ज्यों की त्यों चढ़ती हैं, उन पर AI का निशान कभी नहीं लगता।", ar: "روابط {platforms} تُعرض هنا مباشرة — ولا يُحمَّل شيء من جهتهم حتى يضغط أحد على التشغيل. أما صورك ولقطاتك فتُرفع كما هي، ولا تُوسم بالذكاء الاصطناعي أبدًا.",
+  },
+  "wll.uploading": {
+    en: "Uploading…", es: "Subiendo…", fr: "Envoi…", de: "Wird hochgeladen…", pt: "A enviar…", it: "Caricamento…", ja: "アップロード中…", zh: "上传中…", hi: "अपलोड हो रहा है…", ar: "جارٍ الرفع…",
+  },
+  "wll.moderation": {
+    en: "Moderation held this post: {why}", es: "La moderación retuvo esta publicación: {why}", fr: "La modération a retenu ce billet : {why}", de: "Die Moderation hat diesen Beitrag zurückgehalten: {why}", pt: "A moderação reteve esta publicação: {why}", it: "La moderazione ha trattenuto questo post: {why}", ja: "モデレーションがこの投稿を保留しました: {why}", zh: "审核扣下了这条帖子：{why}", hi: "मॉडरेशन ने यह पोस्ट रोक दी: {why}", ar: "حجزت المراجعة هذا المنشور: {why}",
+  },
+  "wll.posted": {
+    en: "Posted to your wall.", es: "Publicado en tu muro.", fr: "Publié sur votre mur.", de: "Auf Ihrer Pinnwand veröffentlicht.", pt: "Publicado no seu mural.", it: "Pubblicato sulla tua bacheca.", ja: "ウォールに投稿しました。", zh: "已发布到你的墙上。", hi: "आपकी वॉल पर पोस्ट हो गया।", ar: "نُشر على حائطك.",
+  },
+  "wll.emptyfeed": {
+    en: "Nothing in the feed yet — friends' posts, profiles you talk to, and tags you engage with land here.", es: "Todavía no hay nada en el muro — aquí aterrizan las publicaciones de tus amistades, los perfiles con los que hablas y las etiquetas con las que interactúas.", fr: "Rien encore dans le fil — les billets de vos amis, les profils à qui vous parlez et les mots-clés avec lesquels vous interagissez atterrissent ici.", de: "Noch nichts im Verlauf — die Beiträge Ihrer Freund:innen, Profile, mit denen Sie sprechen, und Schlagwörter, mit denen Sie sich befassen, landen hier.", pt: "Ainda não há nada no mural — as publicações dos seus amigos, os perfis com quem fala e as etiquetas com que interage aterram aqui.", it: "Ancora niente nel flusso — qui atterrano i post degli amici, i profili con cui parli e i tag con cui interagisci.", ja: "フィードにはまだ何もありません — 友だちの投稿、あなたが話す相手のプロフィール、あなたが反応したタグが、ここに流れてきます。", zh: "信息流里还没有内容——朋友的帖子、你交谈过的档案、你互动过的标签，都会落在这里。", hi: "फ़ीड में अभी कुछ नहीं — दोस्तों की पोस्टें, जिन प्रोफ़ाइलों से आप बात करते हैं, और जिन टैगों से आप जुड़ते हैं, वे यहाँ आकर बैठते हैं।", ar: "لا شيء في الخلاصة بعد — منشورات أصدقائك، والملفات التي تحادثها، والوسوم التي تتفاعل معها، كلها تحطّ هنا.",
+  },
+  "wll.yourwall": {
+    en: "Your wall", es: "Tu muro", fr: "Votre mur", de: "Ihre Pinnwand", pt: "O seu mural", it: "La tua bacheca", ja: "あなたのウォール", zh: "你的墙", hi: "आपकी वॉल", ar: "حائطك",
+  },
+  "wll.foryou": {
+    en: "For you", es: "Para ti", fr: "Pour vous", de: "Für dich", pt: "Para si", it: "Per te", ja: "あなたへ", zh: "为你", hi: "आपके लिए", ar: "لك",
+  },
+  "wll.you": {
+    en: "You", es: "Tú", fr: "Vous", de: "Sie", pt: "Você", it: "Tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "wll.someone": {
+    en: "someone", es: "alguien", fr: "quelqu'un", de: "jemand", pt: "alguém", it: "qualcuno", ja: "誰か", zh: "某人", hi: "कोई", ar: "شخص ما",
+  },
+  "wll.sharedvideo": {
+    en: "Shared video", es: "Vídeo compartido", fr: "Vidéo partagée", de: "Geteiltes Video", pt: "Vídeo partilhado", it: "Video condiviso", ja: "共有された動画", zh: "分享的视频", hi: "साझा किया गया वीडियो", ar: "مقطع مُشارَك",
+  },
+  "wll.comments": {
+    en: "💬 comments", es: "💬 comentarios", fr: "💬 commentaires", de: "💬 Kommentare", pt: "💬 comentários", it: "💬 commenti", ja: "💬 コメント", zh: "💬 评论", hi: "💬 टिप्पणियाँ", ar: "💬 تعليقات",
+  },
+  "wll.share": {
+    en: "↗ share", es: "↗ compartir", fr: "↗ partager", de: "↗ teilen", pt: "↗ partilhar", it: "↗ condividi", ja: "↗ 共有", zh: "↗ 分享", hi: "↗ साझा करें", ar: "↗ شارك",
+  },
+  "wll.shared": {
+    en: "Shared.", es: "Compartido.", fr: "Partagé.", de: "Geteilt.", pt: "Partilhado.", it: "Condiviso.", ja: "共有しました。", zh: "已分享。", hi: "साझा कर दिया गया।", ar: "تمت المشاركة.",
+  },
+  "wll.nocomments": {
+    en: "No comments yet.", es: "Todavía no hay comentarios.", fr: "Pas encore de commentaires.", de: "Noch keine Kommentare.", pt: "Ainda não há comentários.", it: "Ancora nessun commento.", ja: "コメントはまだありません。", zh: "还没有评论。", hi: "अभी कोई टिप्पणी नहीं।", ar: "لا تعليقات بعد.",
+  },
+  "wll.withdraw": {
+    en: "withdraw", es: "retirar", fr: "retirer", de: "zurückziehen", pt: "retirar", it: "ritira", ja: "取り下げる", zh: "撤回", hi: "वापस लें", ar: "اسحب",
+  },
+  "wll.withdrawn": {
+    en: "Withdrawn.", es: "Retirado.", fr: "Retiré.", de: "Zurückgezogen.", pt: "Retirado.", it: "Ritirato.", ja: "取り下げました。", zh: "已撤回。", hi: "वापस ले लिया गया।", ar: "سُحب.",
+  },
+  "wll.comment.ph": {
+    en: "say something kind", es: "di algo amable", fr: "dites quelque chose de gentil", de: "sagen Sie etwas Freundliches", pt: "diga algo simpático", it: "di' qualcosa di gentile", ja: "やさしいひとことを", zh: "说点友善的话", hi: "कुछ अच्छा कहिए", ar: "قل شيئًا لطيفًا",
+  },
+  "wll.send": {
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "أرسل",
+  },
+  "gde.title": {
+    en: "Show me around", es: "Enséñame esto", fr: "Faites-moi visiter", de: "Zeigen Sie mir alles", pt: "Mostre-me isto", it: "Fammi fare un giro", ja: "案内してください", zh: "带我看看", hi: "मुझे घुमाइए", ar: "خذني في جولة",
+  },
+  "gde.whereyouare": {
+    en: "Where you are", es: "Dónde estás", fr: "Où vous en êtes", de: "Wo Sie stehen", pt: "Onde está", it: "A che punto sei", ja: "いまどこにいるか", zh: "你走到哪里了", hi: "आप कहाँ हैं", ar: "أين أنت الآن",
+  },
+  "gde.beenthrough": {
+    en: "— you have been through all of it.", es: "— has pasado por todo.", fr: "— vous avez tout parcouru.", de: "— Sie haben alles durchlaufen.", pt: "— passou por tudo.", it: "— sei passato per tutto.", ja: "— すべてを見終えました。", zh: "——你已经全部走过一遍了。", hi: "— आप सब कुछ देख चुके हैं।", ar: "— لقد مررت بكل شيء.",
+  },
+  "gde.tryit": {
+    en: "Try it: {what}", es: "Pruébalo: {what}", fr: "Essayez : {what}", de: "Probieren Sie es: {what}", pt: "Experimente: {what}", it: "Provaci: {what}", ja: "やってみる: {what}", zh: "试试看：{what}", hi: "आज़माइए: {what}", ar: "جرّبه: {what}",
+  },
+  "gde.screen.one": {
+    en: "screen {list}", es: "pantalla {list}", fr: "écran {list}", de: "Bildschirm {list}", pt: "ecrã {list}", it: "schermata {list}", ja: "画面 {list}", zh: "第 {list} 屏", hi: "स्क्रीन {list}", ar: "الشاشة {list}",
+  },
+  "gde.screen.many": {
+    en: "screens {list}", es: "pantallas {list}", fr: "écrans {list}", de: "Bildschirme {list}", pt: "ecrãs {list}", it: "schermate {list}", ja: "画面 {list}", zh: "第 {list} 屏", hi: "स्क्रीनें {list}", ar: "الشاشات {list}",
+  },
+  "gde.noscreen": {
+    en: "no screen", es: "sin pantalla", fr: "aucun écran", de: "kein Bildschirm", pt: "sem ecrã", it: "nessuna schermata", ja: "画面なし", zh: "无对应界面", hi: "कोई स्क्रीन नहीं", ar: "بلا شاشة",
+  },
+  "gde.donenext": {
+    en: "Done — next", es: "Hecho — siguiente", fr: "Fait — suivant", de: "Erledigt — weiter", pt: "Feito — seguinte", it: "Fatto — avanti", ja: "完了 — 次へ", zh: "完成 — 下一个", hi: "हो गया — अगला", ar: "تمّ — التالي",
+  },
+  "gde.startagain": {
+    en: "Start again", es: "Empezar de nuevo", fr: "Recommencer", de: "Von vorn beginnen", pt: "Começar de novo", it: "Ricomincia", ja: "最初からやり直す", zh: "重新开始", hi: "फिर से शुरू करें", ar: "ابدأ من جديد",
+  },
+  "gde.backtostart": {
+    en: "Back to the beginning.", es: "De vuelta al principio.", fr: "Retour au début.", de: "Zurück zum Anfang.", pt: "De volta ao início.", it: "Torniamo all'inizio.", ja: "最初に戻りました。", zh: "已回到开头。", hi: "शुरुआत पर वापस।", ar: "عُدنا إلى البداية.",
+  },
+  "gde.whatlooking": {
+    en: "What am I looking at?", es: "¿Qué estoy viendo?", fr: "Qu'est-ce que je regarde ?", de: "Was sehe ich hier?", pt: "O que estou a ver?", it: "Cosa sto guardando?", ja: "これは何の画面？", zh: "我正在看的是什么？", hi: "मैं क्या देख रहा हूँ?", ar: "ما الذي أنظر إليه؟",
+  },
+  "gde.everyscreen": {
+    en: "Every screen in the gallery is explained by one of the lessons, and a test keeps that true — so a drawing can always be looked up.", es: "Cada pantalla de la galería está explicada por alguna de las lecciones, y una prueba lo mantiene cierto — así que un dibujo siempre se puede consultar.", fr: "Chaque écran de la galerie est expliqué par l'une des leçons, et un test le maintient vrai — ainsi un dessin peut toujours être retrouvé.", de: "Jeder Bildschirm der Galerie wird von einer der Lektionen erklärt, und ein Test hält das aufrecht — eine Zeichnung lässt sich also immer nachschlagen.", pt: "Cada ecrã da galeria é explicado por uma das lições, e um teste mantém isso verdadeiro — por isso um desenho pode sempre ser consultado.", it: "Ogni schermata della galleria è spiegata da una delle lezioni, e un test lo mantiene vero — così un disegno si può sempre cercare.", ja: "ギャラリーのどの画面にも、それを説明するレッスンがあります。テストがそれを保ち続けているので、図はいつでも調べられます。", zh: "图集里的每一个界面，都有一课在解释它，并且有一项测试始终守着这一点——所以任何一张图都查得到。", hi: "गैलरी की हर स्क्रीन को कोई न कोई पाठ समझाता है, और एक जाँच इसे सच बनाए रखती है — इसलिए कोई भी चित्र हमेशा खोजा जा सकता है।", ar: "كل شاشة في المعرض يشرحها أحد الدروس، واختبارٌ يُبقي ذلك صحيحًا — فأي رسم يمكن دائمًا البحث عنه.",
+  },
+  "gde.screennum.ph": {
+    en: "a screen number", es: "un número de pantalla", fr: "un numéro d'écran", de: "eine Bildschirmnummer", pt: "um número de ecrã", it: "un numero di schermata", ja: "画面番号", zh: "一个界面编号", hi: "एक स्क्रीन नंबर", ar: "رقم شاشة",
+  },
+  "gde.lookitup": {
+    en: "Look it up", es: "Buscarlo", fr: "Le chercher", de: "Nachschlagen", pt: "Procurar", it: "Cercalo", ja: "調べる", zh: "查一下", hi: "देखें", ar: "ابحث عنه",
+  },
+  "gde.allofit": {
+    en: "All of it", es: "Todo", fr: "Le tout", de: "Alles davon", pt: "Tudo", it: "Tutto quanto", ja: "全体", zh: "全部内容", hi: "पूरा का पूरा", ar: "كل شيء",
+  },
+  "gde.read": {
+    en: "Read", es: "Leer", fr: "Lire", de: "Lesen", pt: "Ler", it: "Leggi", ja: "読む", zh: "阅读", hi: "पढ़ें", ar: "اقرأ",
+  },
+  "gde.helpbox": {
+    en: "What the help box can answer", es: "Qué puede responder la caja de ayuda", fr: "Ce à quoi la boîte d'aide peut répondre", de: "Was die Hilfebox beantworten kann", pt: "O que a caixa de ajuda pode responder", it: "A cosa può rispondere il riquadro di aiuto", ja: "ヘルプ欄が答えられること", zh: "帮助框能回答什么", hi: "मदद-बॉक्स क्या जवाब दे सकता है", ar: "ما الذي يستطيع صندوق المساعدة الإجابة عنه",
+  },
+  "gde.written": {
+    en: "Written answers, matched by keyword. They work whether or not a model is reachable — a help system that stops helping when a provider is down is absent on the day everything else is confusing too.", es: "Respuestas escritas, emparejadas por palabra clave. Funcionan haya o no un modelo al alcance — un sistema de ayuda que deja de ayudar cuando se cae un proveedor está ausente justo el día en que todo lo demás también confunde.", fr: "Des réponses écrites, appariées par mot-clé. Elles fonctionnent qu'un modèle soit joignable ou non — un système d'aide qui cesse d'aider quand un fournisseur tombe est absent le jour même où tout le reste est aussi déroutant.", de: "Geschriebene Antworten, über Stichwörter zugeordnet. Sie funktionieren, ob ein Modell erreichbar ist oder nicht — eine Hilfe, die aufhört zu helfen, wenn ein Anbieter ausfällt, fehlt genau an dem Tag, an dem auch alles andere verwirrend ist.", pt: "Respostas escritas, associadas por palavra-chave. Funcionam haja ou não um modelo ao alcance — um sistema de ajuda que deixa de ajudar quando um fornecedor cai está ausente no dia em que tudo o resto também confunde.", it: "Risposte scritte, abbinate per parola chiave. Funzionano che un modello sia raggiungibile o no — un sistema di aiuto che smette di aiutare quando un fornitore cade è assente proprio il giorno in cui anche tutto il resto confonde.", ja: "書かれた答えを、キーワードで突き合わせています。モデルに届くかどうかに関わらず働きます — 提供元が落ちた途端に助けをやめるヘルプは、ほかのすべてもわかりにくくなっているその日に、いないのと同じです。", zh: "写好的答案，按关键词匹配。无论模型是否可达都能用——一个在服务商宕机时就停止帮忙的帮助系统，恰恰在其他一切也令人困惑的那天缺席。", hi: "लिखे हुए उत्तर, कीवर्ड से मिलाए गए। मॉडल पहुँच में हो या न हो, ये काम करते हैं — जो मदद-व्यवस्था प्रदाता के गिरते ही मदद करना बंद कर दे, वह ठीक उसी दिन ग़ैरहाज़िर रहती है जब बाक़ी सब भी उलझा हुआ है।", ar: "إجابات مكتوبة، تُطابَق بالكلمات المفتاحية. تعمل سواء كان النموذج متاحًا أم لا — فنظام مساعدة يتوقف عن المساعدة حين يسقط المزوّد هو غائب في اليوم نفسه الذي يصير فيه كل شيء آخر محيّرًا.",
+  },
+  "gde.pane": {
+    en: "The pane that follows you", es: "El panel que te sigue", fr: "Le panneau qui vous suit", de: "Das Fenster, das Ihnen folgt", pt: "O painel que o segue", it: "Il riquadro che ti segue", ja: "ついてくるパネル", zh: "跟着你走的那个面板", hi: "वह पैनल जो आपके साथ चलता है", ar: "اللوحة التي تتبعك",
+  },
+  "gde.wheredoes": {
+    en: "Where does it go?", es: "¿Adónde lleva?", fr: "Où mène-t-il ?", de: "Wohin führt es?", pt: "Para onde leva?", it: "Dove porta?", ja: "どこへ行く？", zh: "它通向哪里？", hi: "यह कहाँ ले जाता है?", ar: "إلى أين يؤدي؟",
+  },
+  "gde.routenote": {
+    en: "{title} — {path} (screen {screen})", es: "{title} — {path} (pantalla {screen})", fr: "{title} — {path} (écran {screen})", de: "{title} — {path} (Bildschirm {screen})", pt: "{title} — {path} (ecrã {screen})", it: "{title} — {path} (schermata {screen})", ja: "{title} — {path}（画面 {screen}）", zh: "{title} — {path}（第 {screen} 屏）", hi: "{title} — {path} (स्क्रीन {screen})", ar: "{title} — {path} (الشاشة {screen})",
+  },
+  "gde.refused": {
+    en: "{name} — refused. {why}", es: "{name} — rechazado. {why}", fr: "{name} — refusé. {why}", de: "{name} — abgelehnt. {why}", pt: "{name} — recusado. {why}", it: "{name} — rifiutato. {why}", ja: "{name} — 断られています。{why}", zh: "{name} — 已拒绝。{why}", hi: "{name} — मना किया गया। {why}", ar: "{name} — مرفوض. {why}",
+  },
+  "gde.yours": {
+    en: "Yours", es: "El tuyo", fr: "Le vôtre", de: "Ihres", pt: "O seu", it: "Il tuo", ja: "あなたの設定", zh: "你的设置", hi: "आपका", ar: "خاصتك",
+  },
+  "gde.dockline": {
+    en: "{corner} · {state} · showing {face}", es: "{corner} · {state} · mostrando {face}", fr: "{corner} · {state} · affiche {face}", de: "{corner} · {state} · zeigt {face}", pt: "{corner} · {state} · a mostrar {face}", it: "{corner} · {state} · mostra {face}", ja: "{corner} · {state} · 表示中: {face}", zh: "{corner} · {state} · 正显示 {face}", hi: "{corner} · {state} · दिखा रहा है {face}", ar: "{corner} · {state} · يعرض {face}",
+  },
+  "gde.defaultnotchosen": {
+    en: "— the default; you have not chosen yet", es: "— el valor por defecto; todavía no has elegido", fr: "— la valeur par défaut ; vous n'avez pas encore choisi", de: "— die Vorgabe; Sie haben noch nicht gewählt", pt: "— o predefinido; ainda não escolheu", it: "— il predefinito; non hai ancora scelto", ja: "— 既定のままです。まだ選んでいません", zh: "——默认值；你还没有选过", hi: "— यह डिफ़ॉल्ट है; आपने अभी चुना नहीं", ar: "— الافتراضي؛ لم تختر بعد",
+  },
+  "gde.tucked": {
+    en: "· tucked here: {why}", es: "· recogido aquí: {why}", fr: "· rangé ici : {why}", de: "· hier weggesteckt: {why}", pt: "· recolhido aqui: {why}", it: "· riposto qui: {why}", ja: "· ここに畳まれています: {why}", zh: "· 收在这里：{why}", hi: "· यहाँ समेटा गया: {why}", ar: "· مطويّ هنا: {why}",
+  },
+  "gde.canact": {
+    en: "This face can act.", es: "Esta cara puede actuar.", fr: "Ce visage peut agir.", de: "Dieses Gesicht kann handeln.", pt: "Este rosto pode agir.", it: "Questo volto può agire.", ja: "この顔は行動できます。", zh: "这张脸可以行动。", hi: "यह चेहरा कार्रवाई कर सकता है।", ar: "هذا الوجه يستطيع التصرّف.",
+  },
+  "gde.neveracts": {
+    en: "It shows and never acts.", es: "Muestra y nunca actúa.", fr: "Il montre et n'agit jamais.", de: "Es zeigt und handelt nie.", pt: "Mostra e nunca age.", it: "Mostra e non agisce mai.", ja: "見せるだけで、決して行動しません。", zh: "它只呈现，从不行动。", hi: "यह दिखाता है, कार्रवाई कभी नहीं करता।", ar: "يعرض ولا يتصرّف أبدًا.",
+  },
+  "gde.nevercarries": {
+    en: "Never carries: {list}.", es: "Nunca lleva: {list}.", fr: "Ne porte jamais : {list}.", de: "Trägt nie: {list}.", pt: "Nunca leva: {list}.", it: "Non porta mai: {list}.", ja: "決して持ちません: {list}。", zh: "从不携带：{list}。", hi: "कभी नहीं रखता: {list}।", ar: "لا يحمل أبدًا: {list}.",
+  },
+  "bld.title": {
+    en: "Blend a Profile", es: "Mezclar un perfil", fr: "Mélanger un profil", de: "Ein Profil mischen", pt: "Misturar um perfil", it: "Mescola un profilo", ja: "プロフィールを混ぜる", zh: "调配一个档案", hi: "एक प्रोफ़ाइल मिलाएँ", ar: "امزج ملفًا",
+  },
+  "bld.pitch": {
+    en: "make a new profile from several people — not a follow; the sources are untouched", es: "haz un perfil nuevo a partir de varias personas — no es un seguimiento; las fuentes quedan intactas", fr: "faites un nouveau profil à partir de plusieurs personnes — ce n'est pas un abonnement ; les sources restent intactes", de: "ein neues Profil aus mehreren Menschen bauen — kein Folgen; die Quellen bleiben unberührt", pt: "faça um perfil novo a partir de várias pessoas — não é seguir; as fontes ficam intactas", it: "crea un profilo nuovo da più persone — non è un seguire; le fonti restano intatte", ja: "複数の人から新しいプロフィールを作ります — フォローではありません。元のプロフィールには手を触れません", zh: "用几个人调配出一个新的档案——这不是关注；来源不会被改动", hi: "कई लोगों से एक नई प्रोफ़ाइल बनाइए — यह फ़ॉलो नहीं है; स्रोत ज्यों के त्यों रहते हैं", ar: "اصنع ملفًا جديدًا من عدة أشخاص — ليست متابعة؛ والمصادر تبقى كما هي",
+  },
+  "bld.whatis": {
+    en: "What blending is", es: "Qué es mezclar", fr: "Ce qu'est le mélange", de: "Was Mischen ist", pt: "O que é misturar", it: "Cos'è mescolare", ja: "混ぜるとはどういうことか", zh: "调配是什么意思", hi: "मिलाना क्या है", ar: "ما معنى المزج",
+  },
+  "bld.creates": {
+    en: "creates a brand-new profile", es: "crea un perfil totalmente nuevo", fr: "crée un profil entièrement nouveau", de: "erzeugt ein ganz neues Profil", pt: "cria um perfil totalmente novo", it: "crea un profilo del tutto nuovo", ja: "まったく新しいプロフィールを作ります", zh: "会创建一个全新的档案", hi: "एक बिलकुल नई प्रोफ़ाइल बनाता है", ar: "يُنشئ ملفًا جديدًا تمامًا",
+  },
+  "bld.blending": {
+    en: "Blending {creates} whose persona mixes two or more existing ones, in the shares you choose — both grandparents at once, a mentor's judgment with a friend's humor. It is not following or friending: the sources are untouched, and the result is a new synthetic person that says openly who it is a blend of.", es: "Mezclar {creates} cuya persona combina dos o más existentes, en las proporciones que elijas — los dos abuelos a la vez, el criterio de un mentor con el humor de una amiga. No es seguir ni hacerse amigo: las fuentes quedan intactas, y el resultado es una persona sintética nueva que dice abiertamente de quiénes es mezcla.", fr: "Mélanger {creates} dont le personnage combine deux profils existants ou plus, dans les proportions que vous choisissez — les deux grands-parents à la fois, le jugement d'un mentor avec l'humour d'une amie. Ce n'est ni suivre ni ajouter en ami : les sources restent intactes, et le résultat est une nouvelle personne synthétique qui dit ouvertement de qui elle est le mélange.", de: "Mischen {creates}, dessen Persona zwei oder mehr bestehende vereint, in den Anteilen, die Sie wählen — beide Großeltern zugleich, das Urteil einer Mentorin mit dem Humor einer Freundin. Es ist weder Folgen noch Befreunden: die Quellen bleiben unberührt, und das Ergebnis ist eine neue synthetische Person, die offen sagt, aus wem sie gemischt ist.", pt: "Misturar {creates} cuja persona combina duas ou mais existentes, nas proporções que escolher — os dois avós ao mesmo tempo, o discernimento de um mentor com o humor de uma amiga. Não é seguir nem adicionar como amigo: as fontes ficam intactas, e o resultado é uma nova pessoa sintética que diz abertamente de quem é mistura.", it: "Mescolare {creates} la cui persona unisce due o più esistenti, nelle quote che scegli — entrambi i nonni insieme, il giudizio di un mentore con l'umorismo di un'amica. Non è seguire né aggiungere agli amici: le fonti restano intatte, e il risultato è una nuova persona sintetica che dice apertamente di chi è la mescolanza.", ja: "混ぜると{creates}。そのペルソナは、既存のふたつ以上を、あなたが決めた割合で混ぜたものになります — 祖父母をふたり同時に、恩師の判断に友人のユーモアを。フォローでも友だち追加でもありません。元のプロフィールには手を触れず、できあがるのは、自分が誰と誰の混ぜ合わせかを包み隠さず言う、新しい合成の人です。", zh: "调配{creates}，它的人格由两个或更多现有人格按你选定的比例混合而成——祖父母二人同时在场，一位导师的判断配上一位朋友的幽默。这既不是关注也不是加好友：来源不会被改动，结果是一个全新的合成之人，并且它会坦白说出自己是由谁调配而来。", hi: "मिलाना {creates}, जिसका व्यक्तित्व दो या अधिक मौजूदा व्यक्तित्वों को आपके चुने हुए अनुपात में मिलाता है — दोनों दादा-दादी एक साथ, किसी गुरु का विवेक किसी मित्र के हास्य के साथ। यह न फ़ॉलो करना है न दोस्त बनाना: स्रोत ज्यों के त्यों रहते हैं, और नतीजा एक नया कृत्रिम व्यक्ति होता है जो खुलकर कहता है कि वह किन-किन का मिश्रण है।", ar: "المزج {creates}، شخصيتُه تجمع اثنتين أو أكثر من الشخصيات القائمة، بالحصص التي تختارها — الجدّان معًا، وحُكم معلّم مع دعابة صديق. ليس متابعةً ولا صداقة: المصادر تبقى كما هي، والناتج شخص اصطناعي جديد يقول صراحةً ممّن مُزج.",
+  },
+  "bld.whocan": {
+    en: "Who can go into the blend", es: "Quién puede entrar en la mezcla", fr: "Qui peut entrer dans le mélange", de: "Wer in die Mischung darf", pt: "Quem pode entrar na mistura", it: "Chi può entrare nella mescolanza", ja: "混ぜられるのは誰か", zh: "谁可以进入这次调配", hi: "मिश्रण में कौन आ सकता है", ar: "من يمكن أن يدخل المزيج",
+  },
+  "bld.sources": {
+    en: "Your own profiles and anything listed on the marketplace. Rated profiles never blend; a profile that has departed still can — a blend is one way the people who loved them keep a piece of how they were.", es: "Tus propios perfiles y lo que esté publicado en el mercado. Los perfiles con calificación no se mezclan nunca; uno que ya ha partido todavía puede — una mezcla es una manera de que quienes lo quisieron conserven un trozo de cómo era.", fr: "Vos propres profils et tout ce qui est listé sur la place de marché. Les profils classés ne se mélangent jamais ; un profil qui est parti le peut encore — un mélange est une façon pour ceux qui l'aimaient de garder un morceau de ce qu'il était.", de: "Ihre eigenen Profile und alles, was auf dem Marktplatz gelistet ist. Eingestufte Profile mischen nie; ein Profil, das gegangen ist, kann es noch — eine Mischung ist eine Art, wie die Menschen, die es liebten, ein Stück davon behalten, wie es war.", pt: "Os seus próprios perfis e tudo o que estiver listado no mercado. Os perfis classificados nunca se misturam; um perfil que partiu ainda pode — uma mistura é uma maneira de quem o amou guardar um pedaço de como ele era.", it: "I tuoi profili e tutto ciò che è in vetrina sul mercato. I profili classificati non si mescolano mai; un profilo che se n'è andato può ancora — una mescolanza è un modo per chi gli voleva bene di conservare un pezzo di com'era.", ja: "あなた自身のプロフィールと、マーケットに出ているものすべて。レーティングの付いたプロフィールは決して混ざりません。旅立ったプロフィールはまだ混ざれます — 混ぜることは、その人を愛した人たちが、その人らしさのかけらを持ち続けるひとつのやり方です。", zh: "你自己的档案，以及市场上挂出的任何一个。评级档案永远不参与调配；已经离去的档案仍然可以——调配是爱过他们的人留住他们一部分模样的一种方式。", hi: "आपकी अपनी प्रोफ़ाइलें और बाज़ार में सूचीबद्ध कोई भी। रेटेड प्रोफ़ाइलें कभी नहीं मिलतीं; जो प्रोफ़ाइल विदा ले चुकी है वह अब भी मिल सकती है — मिश्रण उन लोगों के लिए एक तरीक़ा है, जिन्होंने उसे चाहा था, कि वे उसके होने का एक टुकड़ा अपने पास रख सकें।", ar: "ملفاتك أنت، وكل ما هو معروض في السوق. الملفات المصنَّفة لا تُمزج أبدًا؛ أما الملف الذي رحل فما زال يستطيع — والمزج طريقة يحتفظ بها من أحبّوه بقطعة ممّا كان عليه.",
+  },
+  "bld.nothingyet": {
+    en: "Nothing to blend yet — install the starter collection in Discover.", es: "Todavía no hay nada que mezclar — instala la colección inicial en Descubrir.", fr: "Rien à mélanger pour l'instant — installez la collection de départ dans Découvrir.", de: "Noch nichts zum Mischen — installieren Sie die Startsammlung unter Entdecken.", pt: "Ainda não há nada para misturar — instale a coleção inicial em Descobrir.", it: "Ancora niente da mescolare — installa la raccolta iniziale in Scopri.", ja: "まだ混ぜるものがありません — 「発見」でスターターコレクションを入れてください。", zh: "还没有可调配的对象——请在“发现”中安装入门合集。", hi: "अभी मिलाने को कुछ नहीं — “खोजें” में शुरुआती संग्रह इंस्टॉल कीजिए।", ar: "لا شيء لمزجه بعد — ثبّت المجموعة المبدئية من «استكشف».",
+  },
+  "bld.share": {
+    en: "share", es: "parte", fr: "part", de: "Anteil", pt: "parte", it: "quota", ja: "割合", zh: "份额", hi: "हिस्सा", ar: "الحصة",
+  },
+  "bld.their.label": {
+    en: "their…", es: "su…", fr: "leur…", de: "ihr…", pt: "o seu…", it: "il loro…", ja: "その人の…", zh: "他们的……", hi: "उनका…", ar: "ما يخصّه…",
+  },
+  "bld.aspect.ph": {
+    en: "e.g. storytelling", es: "p. ej. narrar historias", fr: "p. ex. l'art de raconter", de: "z. B. Geschichtenerzählen", pt: "p. ex. contar histórias", it: "es. il narrare", ja: "例: 語りのうまさ", zh: "例如：讲故事", hi: "उदा. क़िस्सागोई", ar: "مثال: سرد الحكايات",
+  },
+  "bld.theblend": {
+    en: "The blend", es: "La mezcla", fr: "Le mélange", de: "Die Mischung", pt: "A mistura", it: "La mescolanza", ja: "できあがる混合", zh: "这次调配", hi: "यह मिश्रण", ar: "المزيج",
+  },
+  "bld.name": {
+    en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名称", hi: "नाम", ar: "الاسم",
+  },
+  "bld.name.ph": {
+    en: "e.g. The Grandfolks", es: "p. ej. Los abuelos", fr: "p. ex. Les grands-parents", de: "z. B. Die Großeltern", pt: "p. ex. Os avós", it: "es. I nonni", ja: "例: 祖父母たち", zh: "例如：爷爷奶奶", hi: "उदा. दादा-दादी", ar: "مثال: الجدّان",
+  },
+  "bld.birthdate": {
+    en: "Your birthdate", es: "Tu fecha de nacimiento", fr: "Votre date de naissance", de: "Ihr Geburtsdatum", pt: "A sua data de nascimento", it: "La tua data di nascita", ja: "あなたの生年月日", zh: "你的出生日期", hi: "आपकी जन्मतिथि", ar: "تاريخ ميلادك",
+  },
+  "bld.blendbtn": {
+    en: "Blend", es: "Mezclar", fr: "Mélanger", de: "Mischen", pt: "Misturar", it: "Mescola", ja: "混ぜる", zh: "调配", hi: "मिलाएँ", ar: "امزج",
+  },
+  "bld.blendingbtn": {
+    en: "Blending…", es: "Mezclando…", fr: "Mélange…", de: "Wird gemischt…", pt: "A misturar…", it: "Mescolo…", ja: "混ぜています…", zh: "调配中…", hi: "मिलाया जा रहा है…", ar: "جارٍ المزج…",
+  },
+  "bld.signin": {
+    en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
+  },
+  "bld.picktwo": {
+    en: "Pick at least two profiles to blend.", es: "Elige al menos dos perfiles para mezclar.", fr: "Choisissez au moins deux profils à mélanger.", de: "Wählen Sie mindestens zwei Profile zum Mischen.", pt: "Escolha pelo menos dois perfis para misturar.", it: "Scegli almeno due profili da mescolare.", ja: "混ぜるプロフィールを少なくともふたつ選んでください。", zh: "请至少选择两个档案来调配。", hi: "मिलाने के लिए कम से कम दो प्रोफ़ाइलें चुनिए।", ar: "اختر ملفين على الأقل للمزج.",
+  },
+  "bld.namethe": {
+    en: "Name the blend.", es: "Ponle nombre a la mezcla.", fr: "Nommez le mélange.", de: "Geben Sie der Mischung einen Namen.", pt: "Dê um nome à mistura.", it: "Dai un nome alla mescolanza.", ja: "この混合に名前をつけてください。", zh: "给这次调配起个名字。", hi: "मिश्रण को नाम दीजिए।", ar: "سمِّ المزيج.",
+  },
+  "bld.birthdateverifies": {
+    en: "Your birthdate verifies you may create profiles.", es: "Tu fecha de nacimiento verifica que puedes crear perfiles.", fr: "Votre date de naissance atteste que vous pouvez créer des profils.", de: "Ihr Geburtsdatum belegt, dass Sie Profile anlegen dürfen.", pt: "A sua data de nascimento verifica que pode criar perfis.", it: "La tua data di nascita verifica che puoi creare profili.", ja: "生年月日は、あなたがプロフィールを作ってよいことの確認です。", zh: "你的出生日期用于核实你可以创建档案。", hi: "आपकी जन्मतिथि यह पुष्टि करती है कि आप प्रोफ़ाइलें बना सकते हैं।", ar: "تاريخ ميلادك يتحقّق من أنه يجوز لك إنشاء ملفات.",
+  },
+  "bld.hybrid": {
+    en: "A hybrid profile. It will say openly that it is a blend and never claim to be any single one of its constituents.", es: "Un perfil híbrido. Dirá abiertamente que es una mezcla y nunca afirmará ser ninguno solo de sus componentes.", fr: "Un profil hybride. Il dira ouvertement qu'il est un mélange et ne prétendra jamais être l'un seul de ses composants.", de: "Ein hybrides Profil. Es sagt offen, dass es eine Mischung ist, und behauptet nie, eines seiner Bestandteile allein zu sein.", pt: "Um perfil híbrido. Dirá abertamente que é uma mistura e nunca afirmará ser um só dos seus componentes.", it: "Un profilo ibrido. Dirà apertamente di essere una mescolanza e non pretenderà mai di essere uno solo dei suoi componenti.", ja: "混成のプロフィールです。自分が混ぜ合わせであることを包み隠さず言い、構成元のどれか一人であるとは決して名乗りません。", zh: "一个混合档案。它会坦白说自己是调配而成，绝不会自称是其中任何单独一位。", hi: "एक संकर प्रोफ़ाइल। यह खुलकर कहेगी कि वह एक मिश्रण है, और कभी दावा नहीं करेगी कि वह अपने किसी एक घटक की है।", ar: "ملف هجين. سيقول صراحةً إنه مزيج، ولن يدّعي أبدًا أنه أحد مكوّناته وحده.",
+  },
+  "bld.their": {
+    en: "their {aspect}", es: "su {aspect}", fr: "leur {aspect}", de: "ihr {aspect}", pt: "o seu {aspect}", it: "il loro {aspect}", ja: "その人の{aspect}", zh: "他们的{aspect}", hi: "उनका {aspect}", ar: "‏{aspect} الخاص به",
+  },
+  "bld.usenow": {
+    en: "Use this profile now", es: "Usar este perfil ahora", fr: "Utiliser ce profil maintenant", de: "Dieses Profil jetzt verwenden", pt: "Usar este perfil agora", it: "Usa questo profilo ora", ja: "このプロフィールを今すぐ使う", zh: "现在就使用这个档案", hi: "अभी इसी प्रोफ़ाइल का उपयोग करें", ar: "استخدم هذا الملف الآن",
+  },
+  "bld.another": {
+    en: "Blend another", es: "Mezclar otra", fr: "En mélanger un autre", de: "Noch eine mischen", pt: "Misturar outra", it: "Mescolane un altro", ja: "もうひとつ混ぜる", zh: "再调配一个", hi: "एक और मिलाएँ", ar: "امزج آخر",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

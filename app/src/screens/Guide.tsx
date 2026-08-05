@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type DockFace, type DockFaces, type DockSettings,
          type HelpTopics, type Lesson, type Progress,
          type Walkthrough } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -37,6 +38,7 @@ export function Guide({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
   const learner = session.interactorId || me;
@@ -73,7 +75,7 @@ export function Guide({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Show me around</h2>
+      <h2>{tr("gde.title", lang)}</h2>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
@@ -87,20 +89,22 @@ export function Guide({ onPlans }: {
 
       {progress && (
         <div className="card">
-          <h3>Where you are</h3>
+          <h3>{tr("gde.whereyouare", lang)}</h3>
           <p className="small">
             {progress.note}
-            {progress.finished && " — you have been through all of it."}
+            {progress.finished && " " + tr("gde.beenthrough", lang)}
           </p>
           {progress.step && (
             <>
               <h4>{progress.step.title}</h4>
               <p className="small">{progress.step.what}</p>
               <p className="muted small">
-                Try it: {progress.step.try_it}
+                {fill(tr("gde.tryit", lang), { what: progress.step.try_it })}
                 {progress.step.screens.length > 0 && (
-                  <> · screen{progress.step.screens.length === 1 ? "" : "s"}{" "}
-                    {progress.step.screens.join(", ")}</>
+                  <> · {fill(progress.step.screens.length === 1
+                               ? tr("gde.screen.one", lang)
+                               : tr("gde.screen.many", lang),
+                             { list: progress.step.screens.join(", ") })}</>
                 )}
               </p>
               <div className="row">
@@ -110,15 +114,15 @@ export function Guide({ onPlans }: {
                     setProgress(await api.finishLesson(
                       learner, progress.step!.key));
                   } catch (e) { fail(e); }
-                }}>Done — next</button>
+                }}>{tr("gde.donenext", lang)}</button>
                 <button disabled={!learner} onClick={async () => {
                   setError(null); setNote(null);
                   try {
                     setProgress(await api.startWalkthrough(
                       learner, walk?.chapters[0]?.steps[0]?.key || "welcome"));
-                    setNote("Back to the beginning.");
+                    setNote(tr("gde.backtostart", lang));
                   } catch (e) { fail(e); }
-                }}>Start again</button>
+                }}>{tr("gde.startagain", lang)}</button>
               </div>
             </>
           )}
@@ -126,34 +130,33 @@ export function Guide({ onPlans }: {
       )}
 
       <div className="card">
-        <h3>What am I looking at?</h3>
-        <p className="muted small">
-          Every screen in the gallery is explained by one of the lessons, and a
-          test keeps that true — so a drawing can always be looked up.
-        </p>
+        <h3>{tr("gde.whatlooking", lang)}</h3>
+        <p className="muted small">{tr("gde.everyscreen", lang)}</p>
         <div className="row">
           <input value={screen} onChange={(e) => setScreen(e.target.value)}
-                 placeholder="a screen number" style={{ flex: 1 }} />
+                 placeholder={tr("gde.screennum.ph", lang)} style={{ flex: 1 }} />
           <button disabled={!screen.trim()} onClick={async () => {
             setError(null); setNote(null);
             try {
               setOpen(await api.lessonForScreen(Number(screen.trim())));
             } catch (e) { fail(e); setOpen(null); }
-          }}>Look it up</button>
+          }}>{tr("gde.lookitup", lang)}</button>
         </div>
         {open && (
           <>
             <h4>{open.title}</h4>
             <p className="muted small">{open.chapter}</p>
             <p className="small">{open.what}</p>
-            <p className="muted small">Try it: {open.try_it}</p>
+            <p className="muted small">
+              {fill(tr("gde.tryit", lang), { what: open.try_it })}
+            </p>
           </>
         )}
       </div>
 
       {walk && (
         <div className="card">
-          <h3>All of it</h3>
+          <h3>{tr("gde.allofit", lang)}</h3>
           {walk.chapters.map((c) => (
             <div key={c.chapter}>
               <h4>{c.chapter}</h4>
@@ -163,16 +166,18 @@ export function Guide({ onPlans }: {
                     <strong>{s.title}</strong>
                     <div className="muted small">
                       {s.screens.length > 0
-                        ? <>screen{s.screens.length === 1 ? "" : "s"}{" "}
-                            {s.screens.join(", ")}</>
-                        : "no screen"}
+                        ? fill(s.screens.length === 1
+                                 ? tr("gde.screen.one", lang)
+                                 : tr("gde.screen.many", lang),
+                               { list: s.screens.join(", ") })
+                        : tr("gde.noscreen", lang)}
                     </div>
                   </div>
                   <button onClick={async () => {
                     setError(null);
                     try { setOpen(await api.lesson(s.key)); }
                     catch (e) { fail(e); }
-                  }}>Read</button>
+                  }}>{tr("gde.read", lang)}</button>
                 </div>
               ))}
             </div>
@@ -182,25 +187,20 @@ export function Guide({ onPlans }: {
 
       {topics && (
         <div className="card">
-          <h3>What the help box can answer</h3>
+          <h3>{tr("gde.helpbox", lang)}</h3>
           <p className="muted small">{topics.disclosure}</p>
           <div className="row">
             {topics.topics.map((t) => (
               <span key={t} className="chip">{t.replace(/_/g, " ")}</span>
             ))}
           </div>
-          <p className="muted small">
-            Written answers, matched by keyword. They work whether or not a
-            model is reachable — a help system that stops helping when a
-            provider is down is absent on the day everything else is confusing
-            too.
-          </p>
+          <p className="muted small">{tr("gde.written", lang)}</p>
         </div>
       )}
 
       {faces && (
         <div className="card">
-          <h3>The pane that follows you</h3>
+          <h3>{tr("gde.pane", lang)}</h3>
           {Object.entries(faces.faces).map(([name, shows]) => (
             <div key={name} className="row">
               <div style={{ flex: 1 }}>
@@ -211,27 +211,34 @@ export function Guide({ onPlans }: {
                 setError(null); setNote(null);
                 try {
                   const r = await api.dockRoute(name);
-                  setNote(`${r.title} — ${r.path} (screen ${r.screen})`);
+                  setNote(tr("gde.routenote", lang)
+                    .replace("{title}", r.title).replace("{path}", r.path)
+                    .replace("{screen}", String(r.screen)));
                   if (me && token) setFace(await api.dockFace(me, name, token));
                 } catch (e) { fail(e); }
-              }}>Where does it go?</button>
+              }}>{tr("gde.wheredoes", lang)}</button>
             </div>
           ))}
 
           {/* The more interesting half of the catalogue. */}
           {Object.entries(faces.refused).map(([name, why]) => (
             <p key={name} className="small">
-              <strong>{name}</strong> — refused. {why}
+              {fill(tr("gde.refused", lang),
+                    { name: <strong>{name}</strong>, why })}
             </p>
           ))}
 
           {dock && (
             <>
-              <h4>Yours</h4>
+              <h4>{tr("gde.yours", lang)}</h4>
               <p className="muted small">
-                {dock.corner} · {dock.state} · showing {dock.face}
-                {!dock.set && " — the default; you have not chosen yet"}
-                {dock.tucked && dock.why && <> · tucked here: {dock.why}</>}
+                {fill(tr("gde.dockline", lang), {
+                  corner: dock.corner, state: dock.state, face: dock.face,
+                })}
+                {!dock.set && " " + tr("gde.defaultnotchosen", lang)}
+                {dock.tucked && dock.why && (
+                  <> {fill(tr("gde.tucked", lang), { why: dock.why })}</>
+                )}
               </p>
               <div className="row">
                 {Object.keys(faces.corners).map((c) => (
@@ -264,9 +271,10 @@ export function Guide({ onPlans }: {
               <p className="small">{face.shows}</p>
               <p className="muted small">
                 {face.acts
-                  ? "This face can act."
-                  : "It shows and never acts."}{" "}
-                Never carries: {face.never.join(", ")}.
+                  ? tr("gde.canact", lang)
+                  : tr("gde.neveracts", lang)}{" "}
+                {fill(tr("gde.nevercarries", lang),
+                      { list: face.never.join(", ") })}
               </p>
             </>
           )}

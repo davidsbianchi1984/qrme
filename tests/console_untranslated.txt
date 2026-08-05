@@ -1,4 +1,4 @@
-# status: backlog — 180 rows
+# status: backlog — 116 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 180
+# ceiling: 116
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -50,26 +50,6 @@
 #     mattered  is this string one a non-English reader cannot read
 #
 # The count this file exists to state honestly was overstated by that much.
-Blend: A hybrid profile. It will say openly that it is a blend and never claim to be any single one of its constituents.
-Blend: Blend a Profile
-Blend: Blend another
-Blend: Blending
-Blend: Name
-Blend: Nothing to blend yet — install the starter collection in Discover.
-Blend: The blend
-Blend: Use this profile now
-Blend: What blending is
-Blend: Who can go into the blend
-Blend: Your birthdate
-Blend: Your own profiles and anything listed on the marketplace. Rated profiles never blend; a profile that has departed still can — a blend is one way the people who loved them keep a piece of how they were.
-Blend: creates a brand-new profile
-Blend: e.g. The Grandfolks
-Blend: e.g. storytelling
-Blend: make a new profile from several people — not a follow; the sources are untouched
-Blend: share
-Blend: their
-Blend: their…
-Blend: whose persona mixes two or more existing ones, in the shares you choose — both grandparents at once, a mentor's judgment with a friend's humor. It is not following or friending: the sources are untouched, and the result is a new synthetic person that says openly who it is a blend of.
 Chat: Advisor — weigh it and recommend
 Chat: Chat with
 Chat: Collaborator — work it with me
@@ -104,28 +84,6 @@ Friends: Sign in first.
 Friends: Suggested
 Friends: founder
 Friends: remove
-Guide: All of it
-Guide: Done — next
-Guide: Every screen in the gallery is explained by one of the lessons, and a test keeps that true — so a drawing can always be looked up.
-Guide: Look it up
-Guide: Never carries:
-Guide: Read
-Guide: Show me around
-Guide: Start again
-Guide: The pane that follows you
-Guide: Try it:
-Guide: What am I looking at?
-Guide: What the help box can answer
-Guide: Where does it go?
-Guide: Where you are
-Guide: Written answers, matched by keyword. They work whether or not a model is reachable — a help system that stops helping when a provider is down is absent on the day everything else is confusing too.
-Guide: Yours
-Guide: a screen number
-Guide: screen
-Guide: · screen
-Guide: · showing
-Guide: · tucked here:
-Guide: — refused.
 Home: AI Version —
 Home: Chat with
 Home: Home
@@ -217,25 +175,3 @@ Simulate: e.g. the town council proposes paving over the garden
 # `#tag` are quoted, so it is English on purpose and recorded as such.
 #
 TheMark: AI ·
-Wall: Attach your own photos, videos or files
-Wall: For you
-Wall: Its title, in your words
-Wall: Links from
-Wall: No comments yet.
-Wall: Nothing in the feed yet — friends' posts, profiles you talk to, and tags you engage with land here.
-Wall: Post
-Wall: Say something
-Wall: Send
-Wall: Share a video (optional)
-Wall: Wall
-Wall: Your wall
-Wall: clear
-Wall: paste a link
-Wall: render right here — nothing loads from their side until someone presses play. Your own photos and footage upload as-is, never AI-marked.
-Wall: say something kind
-Wall: the For You feed · every card says why it's here
-Wall: what you're sharing
-Wall: what's on your wall
-Wall: withdraw
-Wall: ↗ share
-Wall: 💬 comments

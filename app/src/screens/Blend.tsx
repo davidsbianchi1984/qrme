@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -21,6 +22,7 @@ export function Blend({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session, setSession } = useSession();
+  const lang = visitorLang();
   const [candidates, setCandidates] = useState<{ profile_id: string; display_name: string }[]>([]);
   const [picks, setPicks] = useState<Pick[]>([]);
   const [name, setName] = useState("");
@@ -54,10 +56,10 @@ export function Blend({ onPlans }: {
   const total = picks.reduce((s, p) => s + (p.weight || 0), 0);
 
   async function blend() {
-    if (!session.accountId) { setError("Sign in first."); return; }
-    if (picks.length < 2) { setError("Pick at least two profiles to blend."); return; }
-    if (!name.trim()) { setError("Name the blend."); return; }
-    if (!birthdate) { setError("Your birthdate verifies you may create profiles."); return; }
+    if (!session.accountId) { setError(tr("bld.signin", lang)); return; }
+    if (picks.length < 2) { setError(tr("bld.picktwo", lang)); return; }
+    if (!name.trim()) { setError(tr("bld.namethe", lang)); return; }
+    if (!birthdate) { setError(tr("bld.birthdateverifies", lang)); return; }
     setBusy(true); setError(null);
     try {
       const out = await api.createComposite({
@@ -83,33 +85,28 @@ export function Blend({ onPlans }: {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h2>Blend a Profile</h2>
-        <span className="muted small">make a new profile from several people — not a follow; the sources are untouched</span>
+        <h2>{tr("bld.title", lang)}</h2>
+        <span className="muted small">{tr("bld.pitch", lang)}</span>
       </header>
 
       {!made && (
         <>
           <div className="card">
-            <h3>What blending is</h3>
+            <h3>{tr("bld.whatis", lang)}</h3>
+            {/* The bolded clause sits mid-sentence, so the sentence is one
+                row with that clause as a hole. Japanese puts the verb where
+                English puts the object, and splitting at the <b> would have
+                handed a translator "Blending" and " whose persona mixes". */}
             <p className="muted small">
-              Blending <b>creates a brand-new profile</b> whose persona mixes
-              two or more existing ones, in the shares you choose — both
-              grandparents at once, a mentor's judgment with a friend's humor.
-              It is not following or friending: the sources are untouched, and
-              the result is a new synthetic person that says openly who it is
-              a blend of.
+              {fill(tr("bld.blending", lang),
+                    { creates: <b>{tr("bld.creates", lang)}</b> })}
             </p>
           </div>
           <div className="card">
-            <h3>Who can go into the blend</h3>
-            <p className="muted small">
-              Your own profiles and anything listed on the marketplace. Rated
-              profiles never blend; a profile that has departed still can —
-              a blend is one way the people who loved them keep a piece of
-              how they were.
-            </p>
+            <h3>{tr("bld.whocan", lang)}</h3>
+            <p className="muted small">{tr("bld.sources", lang)}</p>
             {candidates.length === 0 && (
-              <p className="muted center">Nothing to blend yet — install the starter collection in Discover.</p>
+              <p className="muted center">{tr("bld.nothingyet", lang)}</p>
             )}
             {candidates.map((c) => {
               const pick = picks.find((x) => x.profile_id === c.profile_id);
@@ -122,13 +119,13 @@ export function Blend({ onPlans }: {
                   </label>
                   {pick && (
                     <>
-                      <label>share
+                      <label>{tr("bld.share", lang)}
                         <input type="number" min={1} max={9} value={pick.weight}
                                style={{ width: 56 }}
                                onChange={(e) => setPick(c.profile_id, { weight: Number(e.target.value) || 1 })} />
                       </label>
-                      <label>their…
-                        <input value={pick.aspect} placeholder="e.g. storytelling"
+                      <label>{tr("bld.their.label", lang)}
+                        <input value={pick.aspect} placeholder={tr("bld.aspect.ph", lang)}
                                onChange={(e) => setPick(c.profile_id, { aspect: e.target.value })} />
                       </label>
                       {pct !== null && <span className="tag">{pct}%</span>}
@@ -140,14 +137,14 @@ export function Blend({ onPlans }: {
           </div>
 
           <div className="card">
-            <h3>The blend</h3>
+            <h3>{tr("bld.theblend", lang)}</h3>
             <div className="row">
-              <label>Name<input value={name} placeholder="e.g. The Grandfolks"
+              <label>{tr("bld.name", lang)}<input value={name} placeholder={tr("bld.name.ph", lang)}
                                 onChange={(e) => setName(e.target.value)} /></label>
-              <label>Your birthdate<input type="date" value={birthdate}
+              <label>{tr("bld.birthdate", lang)}<input type="date" value={birthdate}
                                           onChange={(e) => setBirthdate(e.target.value)} /></label>
               <button className="primary" disabled={busy || picks.length < 2} onClick={blend}>
-                {busy ? "Blending…" : "Blend"}
+                {busy ? tr("bld.blendingbtn", lang) : tr("bld.blendbtn", lang)}
               </button>
             </div>
           </div>
@@ -157,20 +154,23 @@ export function Blend({ onPlans }: {
       {made && (
         <div className="card">
           <h3>{made.display_name}</h3>
-          <p className="muted small">
-            A hybrid profile. It will say openly that it is a blend and never
-            claim to be any single one of its constituents.
-          </p>
+          <p className="muted small">{tr("bld.hybrid", lang)}</p>
           {made.composition.map((s) => (
             <div key={s.source_profile_id} className="friend-row">
               <span className="tag">{Math.round(s.weight * 100)}%</span>
               <b>{s.display_name}</b>
-              {s.aspect && <span className="muted small">their {s.aspect}</span>}
+              {s.aspect && (
+                <span className="muted small">
+                  {fill(tr("bld.their", lang), { aspect: s.aspect })}
+                </span>
+              )}
             </div>
           ))}
           <div className="row">
-            <button className="primary" onClick={adopt}>Use this profile now</button>
-            <button onClick={() => { setMade(null); setPicks([]); setName(""); }}>Blend another</button>
+            <button className="primary" onClick={adopt}>{tr("bld.usenow", lang)}</button>
+            <button onClick={() => { setMade(null); setPicks([]); setName(""); }}>
+              {tr("bld.another", lang)}
+            </button>
           </div>
         </div>
       )}

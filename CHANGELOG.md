@@ -4,6 +4,37 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.0] — 2026-08-05
+
+### The wall, the guide, and the blend
+
+The console-untranslated record falls **180 → 116**, and every one of the
+sixty-four rows went — no keeps this round.
+
+**Wall** — the For You feed. `Links from {platforms} render right here`
+was three fragments around a value and is now one sentence; the emoji
+labels keep their glyph and translate the word beside it, because `💬`
+is a picture and *comments* is not. The moderation refusal, the
+withdrawal, and the two words a card falls back to when it has no name —
+*You* and *someone* — were string literals nobody would have found by
+reading the screen for English.
+
+**Show me around** — the walkthrough's own copy, including the paragraph
+about why written answers keep working when a provider is down. The
+step's screen list has singular and plural rows, and `no screen` is its
+own row rather than an English default sitting inside a ternary.
+
+**Blend a Profile** — the sentence explaining what blending *is* bolds
+its main clause in the middle of itself, so it is one row with that
+clause as a hole. Splitting at the `<b>` would have handed a translator
+*"Blending"* and *" whose persona mixes"*, which is not a sentence in
+any of the ten. The four form refusals — sign in, pick two, name it,
+your birthdate — are translated too; they are the only text most people
+will see on this screen before it works.
+
+85 keys across three screens, ten languages each, exact-sync held in
+both directions.
+
 ## [0.45.9] — 2026-08-05
 
 ### The thing named, what leaves, and the mark it carries
