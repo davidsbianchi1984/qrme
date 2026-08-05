@@ -4,6 +4,16 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.8] — 2026-08-05
+
+### Version alignment
+
+The three products are cut together, so one number names one
+combination of all three. No QRME code changed — JIM's watch bridge
+gained the device picker (Apple Watch, Wear OS, Fitbit, Garmin), the
+Fitbit-aware seed, and Bluetooth pairing for speakers, glasses, AR/VR
+headsets and spatial displays. QRME's profiles and shells are untouched.
+
 ## [0.43.7] — 2026-08-05
 
 ### The record, the veil and the exit
