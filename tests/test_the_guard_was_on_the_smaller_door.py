@@ -221,7 +221,11 @@ def _markup(rel: str) -> str:
 
 def test_the_screen_says_who_may_take_one_down():
     src = _markup("app/src/screens/Selling.tsx")
-    assert "Only a claimant may take a listing down" in src
+    # The paragraph moved into the l10n table when the screen was localized;
+    # the screen must still look it up, and the table must still say it.
+    assert 'tr("sell.listing.rule", lang)' in src
+    assert "Only a claimant may take a listing down" in _markup(
+        "app/src/l10n.ts")
 
 
 def test_the_screen_calls_both_ends():

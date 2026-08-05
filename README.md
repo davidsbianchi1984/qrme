@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.44.4** ([changelog](CHANGELOG.md) ·
+**Current release: v0.44.5** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.44.5** | **The counter speaks** — the Selling screen fully localized (console-untranslated 1337 → 1281) |
 | **0.44.4** | **The Control Center speaks** — the Settings screen fully localized (console-untranslated 1403 → 1337) |
 | **0.44.3** | **The backlogs shrink from both ends** — the Assist screen fully localized (console-untranslated 1459 → 1403) and the field-label evidence pass maps seven newly-typed fields (residue 131 → 124) |
 | **0.44.2** | **The last doors** — genesis and hybrids, packs, simulations and fine-tuning, the contribution ledger, proactive reach and quiet hours, licensing, and the senses reach all three shells; **the doorless records run to zero** (ios 0 / android 0 / windows 0) |

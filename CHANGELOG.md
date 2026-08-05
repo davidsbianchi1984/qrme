@@ -4,6 +4,19 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.5] — 2026-08-05
+
+### The counter speaks
+
+The Selling screen — the seller's side of the counter: the offer, the
+licence holders, the earnings statement with its per-currency honesty,
+the payouts, the shop window and the place a listing names — is
+localized end to end: fifty-six strings become forty-seven `sell.*`
+keys in all ten languages. The mixed-currency caution and the claimant
+rule are whole sentences with named holes rather than fragments. The
+console-untranslated record falls **1337 → 1281**, exact-sync held in
+both directions.
+
 ## [0.44.4] — 2026-08-05
 
 ### The Control Center speaks

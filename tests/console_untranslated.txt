@@ -1,4 +1,4 @@
-# status: backlog — 1337 rows
+# status: backlog — 1281 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1337
+# ceiling: 1281
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -1046,62 +1046,6 @@ Rooms: Topic
 Rooms: inside
 Rooms: what it's about
 Rooms: — join from a headset or phone; this desktop shows the room
-Selling: , and the two are not added together — a total across currencies is not a number.
-Selling: , not to the profile you happen to be signed in as — a distinction that cost real money before this screen existed: the sale went through, the receipt said it was on your statement, and the statement was empty.
-Selling: A licence that permits derivatives can only be sold to a verified-18+ buyer. The check runs at the till, where the fee moves, rather than at delivery.
-Selling: A listing in the window
-Selling: A listing is a shop window; an offer is what makes it a shop. The sale accrues to
-Selling: A named locality you type, never coordinates and never anything read off an address or an IP. A rated listing is refused a location outright: where a performer physically is has nothing to do with browsing them.
-Selling: A price on it
-Selling: Accrued
-Selling: Clear the place
-Selling: Creating one needs no account — that is the design, and the seller is established when a price is attached. Signed in, the listing is recorded as yours, which is what lets you take it down again.
-Selling: Earnings
-Selling: No sales yet.
-Selling: Nobody yet.
-Selling: Not offered for licence. That is the ordinary state of a profile, not an error.
-Selling: Nothing to show — sign in as the profile's owner.
-Selling: Only a claimant may take a listing down or move it: whoever made it, the seller on its offer, or the owner of the profile it advertises. It used to take no credential at all, so anyone could remove anyone's — while the same stranger asking to withdraw the
-Selling: Pay out
-Selling: Post this offer
-Selling: Put a price on it
-Selling: Put it in the window
-Selling: Request a payout
-Selling: Revoke
-Selling: Revoking stops the buyer deriving from that licence. It does not unmake an agent already derived from it, and it does not take the fee off your statement — a sale that happened stays on the record.
-Selling: Say where it is
-Selling: Stop offering it
-Selling: Stop selling it
-Selling: Take it down
-Selling: The seller's side. What your profile is offered for, who holds a licence on it, what that has earned, and asking to be paid.
-Selling: Those are your
-Selling: USD
-Selling: What you are owed
-Selling: Where it is offered
-Selling: Who holds a licence
-Selling: Your offer
-Selling: across
-Selling: also served from anywhere
-Selling: blurb
-Selling: clone
-Selling: consult
-Selling: entries —
-Selling: figures. This account also earns in
-Selling: finetune
-Selling: listing id
-Selling: locality, e.g. Oakland, CA
-Selling: offer
-Selling: on it was told it was not theirs.
-Selling: price
-Selling: region
-Selling: sold
-Selling: stock (blank = unlimited)
-Selling: terms
-Selling: title
-Selling: your account
-Selling: · lifetime
-Selling: · paid
-Selling: — accrued
 Signing: , good until
 Signing: , proofed
 Signing: . Finish in the ceremony window.

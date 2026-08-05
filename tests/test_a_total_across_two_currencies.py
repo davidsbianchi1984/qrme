@@ -244,7 +244,12 @@ def test_the_screen_reads_mixed_before_it_draws_a_figure():
         "the breakdown is no longer conditional on `mixed`, so the screen "
         "either hides a second balance or shouts about one that is not "
         "there — the defect one layer up, moved into the console")
-    assert "and the two are not added together" in src, (
+    # The sentence moved into the l10n table when the screen was localized;
+    # the screen must still look it up, and the table must still say it.
+    assert 'tr("sell.earn.mixed", lang)' in src, (
+        "the sentence that tells the owner why there are two figures is gone")
+    l10n = _markup("app/src/l10n.ts")
+    assert "and the two are not added together" in l10n, (
         "the sentence that tells the owner why there are two figures is gone")
     assert "statement.by_currency[c]" in src
 

@@ -2280,6 +2280,147 @@ const CHROME: Table = {
   "set.model.resolves": {
     en: "⚠ Right now it resolves to {effective} — the one you picked has no key on this deployment yet.", es: "⚠ Ahora mismo se resuelve a {effective} — el que elegiste aún no tiene clave en este despliegue.", fr: "⚠ En ce moment, cela se résout en {effective} — celui que vous avez choisi n'a pas encore de clé sur ce déploiement.", de: "⚠ Derzeit löst es zu {effective} auf — das gewählte hat auf diesem Deployment noch keinen Schlüssel.", pt: "⚠ Neste momento resolve para {effective} — o que escolheu ainda não tem chave neste deployment.", it: "⚠ In questo momento si risolve in {effective} — quello scelto non ha ancora una chiave su questo deployment.", ja: "⚠ 現在は{effective}に解決されます — 選んだものはまだこの配備にキーがありません。", zh: "⚠ 当前解析为{effective} — 你选的那个在此部署上还没有密钥。", hi: "⚠ अभी यह {effective} पर हल होता है — आपके चुने हुए की इस डिप्लॉयमेंट पर अभी कुंजी नहीं है।", ar: "⚠ الآن يُحل إلى {effective} — الذي اخترته لا مفتاح له في هذا النشر بعد.",
   },
+  "sell.title": {
+    en: "What you are owed", es: "Lo que se te debe", fr: "Ce qui vous est dû", de: "Was Ihnen zusteht", pt: "O que lhe é devido", it: "Ciò che ti è dovuto", ja: "あなたへの支払い", zh: "你应得的", hi: "आपका बकाया", ar: "ما يُستحق لك",
+  },
+  "sell.lead": {
+    en: "The seller's side. What your profile is offered for, who holds a licence on it, what that has earned, and asking to be paid.", es: "El lado del vendedor. Por cuánto se ofrece tu perfil, quién tiene una licencia, qué ha ganado y cómo pedir el pago.", fr: "Le côté vendeur. À quel prix votre profil est offert, qui détient une licence, ce que cela a rapporté, et demander à être payé.", de: "Die Verkäuferseite. Wofür Ihr Profil angeboten wird, wer eine Lizenz hält, was das eingebracht hat, und die Auszahlung anfordern.", pt: "O lado do vendedor. Por quanto o seu perfil é oferecido, quem detém uma licença, o que isso rendeu, e pedir para ser pago.", it: "Il lato del venditore. A quanto è offerto il tuo profilo, chi ne detiene una licenza, cosa ha fruttato, e chiedere di essere pagato.", ja: "売り手側の画面。プロフィールの提供条件、ライセンス保持者、収益、そして支払いの請求。", zh: "卖方视角。你的资料以什么条件提供、谁持有许可、赚了多少、以及请求付款。", hi: "विक्रेता पक्ष। आपका प्रोफ़ाइल किस पर पेश है, किसके पास लाइसेंस है, उसने क्या कमाया, और भुगतान माँगना।", ar: "جانب البائع. بمَ يُعرض ملفك، ومن يحمل ترخيصًا عليه، وما كسبه، وطلب الدفع.",
+  },
+  "sell.offer": {
+    en: "Your offer", es: "Tu oferta", fr: "Votre offre", de: "Ihr Angebot", pt: "A sua oferta", it: "La tua offerta", ja: "あなたのオファー", zh: "你的报价", hi: "आपकी पेशकश", ar: "عرضك",
+  },
+  "sell.offer.none": {
+    en: "Not offered for licence. That is the ordinary state of a profile, not an error.", es: "No se ofrece bajo licencia. Ese es el estado normal de un perfil, no un error.", fr: "Non offert sous licence. C'est l'état ordinaire d'un profil, pas une erreur.", de: "Nicht zur Lizenz angeboten. Das ist der Normalzustand eines Profils, kein Fehler.", pt: "Não oferecido sob licença. É o estado normal de um perfil, não um erro.", it: "Non offerto in licenza. È lo stato ordinario di un profilo, non un errore.", ja: "ライセンス提供されていません。これはプロフィールの通常状態でありエラーではありません。", zh: "未提供许可。这是资料的常态，并非错误。", hi: "लाइसेंस के लिए पेश नहीं। यह प्रोफ़ाइल की सामान्य स्थिति है, त्रुटि नहीं।", ar: "غير معروض للترخيص. هذه الحالة العادية للملف، لا خطأ.",
+  },
+  "sell.offer.adult": {
+    en: "A licence that permits derivatives can only be sold to a verified-18+ buyer. The check runs at the till, where the fee moves, rather than at delivery.", es: "Una licencia que permite derivados solo puede venderse a un comprador verificado de 18+. La comprobación corre en la caja, donde se mueve el dinero, no en la entrega.", fr: "Une licence permettant des dérivés ne peut être vendue qu'à un acheteur vérifié 18+. Le contrôle se fait à la caisse, où l'argent bouge, pas à la livraison.", de: "Eine Lizenz, die Ableitungen erlaubt, kann nur an verifizierte 18+-Käufer verkauft werden. Die Prüfung läuft an der Kasse, wo die Gebühr fließt, nicht bei der Lieferung.", pt: "Uma licença que permite derivados só pode ser vendida a um comprador verificado 18+. A verificação corre na caixa, onde o dinheiro se move, não na entrega.", it: "Una licenza che permette derivati può essere venduta solo a un acquirente verificato 18+. Il controllo gira alla cassa, dove si muove il denaro, non alla consegna.", ja: "派生を許すライセンスは18歳以上と確認済みの購入者にのみ販売できます。確認は配達時ではなく、料金が動くレジで行われます。", zh: "允许派生的许可只能卖给经过验证的18+买家。核验在钱款流动的收银处进行，而非交付时。", hi: "व्युत्पन्न की अनुमति वाला लाइसेंस केवल सत्यापित 18+ खरीदार को बेचा जा सकता है। जाँच वहीं होती है जहाँ पैसा चलता है — काउंटर पर, डिलीवरी पर नहीं।", ar: "الترخيص الذي يسمح بالمشتقات لا يُباع إلا لمشترٍ موثق فوق 18. يجري الفحص عند الصندوق حيث يتحرك المال، لا عند التسليم.",
+  },
+  "sell.kind.consult": {
+    en: "consult", es: "consulta", fr: "consultation", de: "Beratung", pt: "consulta", it: "consulenza", ja: "相談", zh: "咨询", hi: "परामर्श", ar: "استشارة",
+  },
+  "sell.kind.finetune": {
+    en: "finetune", es: "ajuste fino", fr: "affinage", de: "Feinabstimmung", pt: "afinação", it: "messa a punto", ja: "微調整", zh: "微调", hi: "फ़ाइन-ट्यून", ar: "ضبط دقيق",
+  },
+  "sell.kind.clone": {
+    en: "clone", es: "clon", fr: "clone", de: "Klon", pt: "clone", it: "clone", ja: "クローン", zh: "克隆", hi: "क्लोन", ar: "استنساخ",
+  },
+  "sell.offer.price.ph": {
+    en: "price", es: "precio", fr: "prix", de: "Preis", pt: "preço", it: "prezzo", ja: "価格", zh: "价格", hi: "मूल्य", ar: "السعر",
+  },
+  "sell.offer.ccy.ph": {
+    en: "USD", es: "USD", fr: "USD", de: "USD", pt: "USD", it: "USD", ja: "USD", zh: "USD", hi: "USD", ar: "USD",
+  },
+  "sell.offer.terms.ph": {
+    en: "terms", es: "condiciones", fr: "conditions", de: "Bedingungen", pt: "condições", it: "condizioni", ja: "条件", zh: "条款", hi: "शर्तें", ar: "الشروط",
+  },
+  "sell.offer.post": {
+    en: "Post this offer", es: "Publicar esta oferta", fr: "Publier cette offre", de: "Dieses Angebot einstellen", pt: "Publicar esta oferta", it: "Pubblica questa offerta", ja: "このオファーを掲示", zh: "发布此报价", hi: "यह पेशकश डालें", ar: "انشر هذا العرض",
+  },
+  "sell.offer.stop": {
+    en: "Stop offering it", es: "Dejar de ofrecerlo", fr: "Cesser de l'offrir", de: "Nicht mehr anbieten", pt: "Deixar de oferecer", it: "Smetti di offrirlo", ja: "提供をやめる", zh: "停止提供", hi: "पेश करना बंद करें", ar: "أوقف عرضه",
+  },
+  "sell.holders": {
+    en: "Who holds a licence", es: "Quién tiene una licencia", fr: "Qui détient une licence", de: "Wer eine Lizenz hält", pt: "Quem detém uma licença", it: "Chi detiene una licenza", ja: "ライセンス保持者", zh: "谁持有许可", hi: "किसके पास लाइसेंस है", ar: "من يحمل ترخيصًا",
+  },
+  "sell.holders.none": {
+    en: "Nobody yet.", es: "Nadie todavía.", fr: "Personne pour l'instant.", de: "Noch niemand.", pt: "Ninguém ainda.", it: "Ancora nessuno.", ja: "まだ誰もいません。", zh: "尚无人。", hi: "अभी कोई नहीं।", ar: "لا أحد بعد.",
+  },
+  "sell.holders.revoke": {
+    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "失効させる", zh: "撤销", hi: "रद्द करें", ar: "إلغاء",
+  },
+  "sell.holders.rule": {
+    en: "Revoking stops the buyer deriving from that licence. It does not unmake an agent already derived from it, and it does not take the fee off your statement — a sale that happened stays on the record.", es: "Revocar impide que el comprador derive de esa licencia. No deshace un agente ya derivado, ni quita la tarifa de tu estado de cuenta — una venta ocurrida queda en el registro.", fr: "Révoquer empêche l'acheteur de dériver de cette licence. Cela ne défait pas un agent déjà dérivé, et ne retire pas les frais de votre relevé — une vente advenue reste au registre.", de: "Der Widerruf stoppt künftige Ableitungen aus dieser Lizenz. Er macht einen bereits abgeleiteten Agenten nicht ungeschehen und nimmt die Gebühr nicht von Ihrer Abrechnung — ein geschehener Verkauf bleibt verzeichnet.", pt: "Revogar impede o comprador de derivar dessa licença. Não desfaz um agente já derivado, nem tira a taxa do seu extrato — uma venda que aconteceu fica no registo.", it: "Revocare impedisce all'acquirente di derivare da quella licenza. Non disfa un agente già derivato, né toglie la tariffa dal tuo estratto — una vendita avvenuta resta a registro.", ja: "失効は購入者がそのライセンスから派生させることを止めます。既に派生したエージェントは消えず、明細から料金も消えません — 成立した販売は記録に残ります。", zh: "撤销会阻止买家继续从该许可派生。它不会撤销已派生的智能体，也不会从你的账单上抹去费用 — 已发生的销售留在记录上。", hi: "रद्द करने से खरीदार उस लाइसेंस से आगे व्युत्पन्न नहीं कर सकता। पहले से व्युत्पन्न एजेंट नहीं मिटता, न ही शुल्क आपके विवरण से हटता है — हुई बिक्री रिकॉर्ड में रहती है।", ar: "الإلغاء يمنع المشتري من الاشتقاق من ذلك الترخيص. لا يمحو وكيلاً مشتقًا بالفعل، ولا يزيل الرسوم من كشفك — البيع الذي حدث يبقى في السجل.",
+  },
+  "sell.earn": {
+    en: "Earnings", es: "Ganancias", fr: "Revenus", de: "Einnahmen", pt: "Ganhos", it: "Guadagni", ja: "収益", zh: "收入", hi: "कमाई", ar: "الأرباح",
+  },
+  "sell.earn.signin": {
+    en: "Nothing to show — sign in as the profile's owner.", es: "Nada que mostrar — inicia sesión como propietario del perfil.", fr: "Rien à montrer — connectez-vous comme propriétaire du profil.", de: "Nichts zu zeigen — melden Sie sich als Profilinhaber an.", pt: "Nada a mostrar — inicie sessão como proprietário do perfil.", it: "Niente da mostrare — accedi come proprietario del profilo.", ja: "表示できるものがありません — プロフィールの所有者としてサインインしてください。", zh: "无可显示 — 请以资料所有者身份登录。", hi: "दिखाने को कुछ नहीं — प्रोफ़ाइल स्वामी के रूप में साइन इन करें।", ar: "لا شيء للعرض — سجّل الدخول كمالك الملف.",
+  },
+  "sell.earn.line": {
+    en: "Accrued {a} · paid {p} · lifetime {l}", es: "Acumulado {a} · pagado {p} · histórico {l}", fr: "Accumulé {a} · payé {p} · cumul {l}", de: "Aufgelaufen {a} · ausgezahlt {p} · gesamt {l}", pt: "Acumulado {a} · pago {p} · total {l}", it: "Maturato {a} · pagato {p} · totale {l}", ja: "未払 {a} · 支払済 {p} · 累計 {l}", zh: "应收{a} · 已付{p} · 累计{l}", hi: "संचित {a} · भुगतान {p} · कुल {l}", ar: "مستحق {a} · مدفوع {p} · إجمالي {l}",
+  },
+  "sell.earn.mixed": {
+    en: "Those are your {ccy} figures. This account also earns in {others}, and the two are not added together — a total across currencies is not a number.", es: "Esas son tus cifras en {ccy}. Esta cuenta también gana en {others}, y no se suman — un total entre monedas no es un número.", fr: "Ce sont vos chiffres en {ccy}. Ce compte gagne aussi en {others}, et on ne les additionne pas — un total entre devises n'est pas un nombre.", de: "Das sind Ihre {ccy}-Zahlen. Dieses Konto verdient auch in {others}, und beides wird nicht addiert — eine Summe über Währungen ist keine Zahl.", pt: "Esses são os seus valores em {ccy}. Esta conta também ganha em {others}, e os dois não se somam — um total entre moedas não é um número.", it: "Quelle sono le tue cifre in {ccy}. Questo account guadagna anche in {others}, e le due non si sommano — un totale tra valute non è un numero.", ja: "これは{ccy}での数字です。このアカウントは{others}でも収益があり、両者は合算されません — 通貨をまたぐ合計は数字になりません。", zh: "这些是你的{ccy}数字。此账户还在{others}中有收入，两者不相加 — 跨币种的总额不是一个数。", hi: "ये आपके {ccy} आँकड़े हैं। यह खाता {others} में भी कमाता है, और दोनों जोड़े नहीं जाते — मुद्राओं के पार कुल कोई संख्या नहीं।", ar: "هذه أرقامك بعملة {ccy}. يكسب هذا الحساب أيضًا بعملات {others}، ولا يُجمعان — الإجمالي عبر العملات ليس رقمًا.",
+  },
+  "sell.earn.bycur": {
+    en: "{c} — accrued {a} · paid {p}", es: "{c} — acumulado {a} · pagado {p}", fr: "{c} — accumulé {a} · payé {p}", de: "{c} — aufgelaufen {a} · ausgezahlt {p}", pt: "{c} — acumulado {a} · pago {p}", it: "{c} — maturato {a} · pagato {p}", ja: "{c} — 未払 {a} · 支払済 {p}", zh: "{c} — 应收{a} · 已付{p}", hi: "{c} — संचित {a} · भुगतान {p}", ar: "{c} — مستحق {a} · مدفوع {p}",
+  },
+  "sell.earn.none": {
+    en: "No sales yet.", es: "Sin ventas todavía.", fr: "Pas encore de ventes.", de: "Noch keine Verkäufe.", pt: "Ainda sem vendas.", it: "Ancora nessuna vendita.", ja: "まだ販売はありません。", zh: "尚无销售。", hi: "अभी कोई बिक्री नहीं।", ar: "لا مبيعات بعد.",
+  },
+  "sell.earn.payout": {
+    en: "Request a payout", es: "Solicitar un pago", fr: "Demander un versement", de: "Auszahlung anfordern", pt: "Pedir um pagamento", it: "Richiedi un pagamento", ja: "支払いを請求", zh: "申请付款", hi: "भुगतान माँगें", ar: "اطلب دفعة",
+  },
+  "sell.earn.payoutc": {
+    en: "Pay out {c}", es: "Pagar {c}", fr: "Verser {c}", de: "{c} auszahlen", pt: "Pagar {c}", it: "Paga {c}", ja: "{c}を支払う", zh: "支付{c}", hi: "{c} का भुगतान", ar: "ادفع {c}",
+  },
+  "sell.earn.receipt": {
+    en: "{total} across {n} entries — {note}", es: "{total} en {n} entradas — {note}", fr: "{total} sur {n} entrées — {note}", de: "{total} über {n} Einträge — {note}", pt: "{total} em {n} entradas — {note}", it: "{total} su {n} voci — {note}", ja: "{n}件で{total} — {note}", zh: "{n}条共{total} — {note}", hi: "{n} प्रविष्टियों में {total} — {note}", ar: "{total} عبر {n} قيود — {note}",
+  },
+  "sell.listing": {
+    en: "A listing in the window", es: "Un anuncio en el escaparate", fr: "Une annonce en vitrine", de: "Ein Eintrag im Schaufenster", pt: "Um anúncio na montra", it: "Un annuncio in vetrina", ja: "ショーウィンドウの出品", zh: "橱窗里的商品", hi: "खिड़की में एक लिस्टिंग", ar: "إعلان في الواجهة",
+  },
+  "sell.listing.lead": {
+    en: "Creating one needs no account — that is the design, and the seller is established when a price is attached. Signed in, the listing is recorded as yours, which is what lets you take it down again.", es: "Crearlo no necesita cuenta — así está diseñado, y el vendedor se establece al fijar un precio. Con sesión iniciada, el anuncio queda registrado como tuyo, que es lo que te permite retirarlo.", fr: "En créer une ne demande aucun compte — c'est voulu, et le vendeur est établi quand un prix est attaché. Connecté, l'annonce est enregistrée comme la vôtre, ce qui vous permet de la retirer.", de: "Zum Erstellen braucht es kein Konto — das ist Absicht, und der Verkäufer steht fest, sobald ein Preis dranhängt. Angemeldet wird der Eintrag als Ihrer verzeichnet, was Ihnen erlaubt, ihn wieder zu entfernen.", pt: "Criar um não precisa de conta — é o design, e o vendedor fica estabelecido quando se anexa um preço. Com sessão iniciada, o anúncio fica registado como seu, o que lhe permite retirá-lo.", it: "Crearne uno non richiede account — è il design, e il venditore si stabilisce quando si attacca un prezzo. Con l'accesso, l'annuncio è registrato come tuo, il che ti permette di toglierlo.", ja: "作成にアカウントは不要です — それが設計であり、価格が付いた時点で売り手が確定します。サインインしていれば出品はあなたのものとして記録され、だからこそ取り下げられます。", zh: "创建无需账户 — 这是设计使然，卖家在附上价格时确立。登录后，商品会记录为你的，这正是你能将其下架的原因。", hi: "बनाने के लिए खाता नहीं चाहिए — यही डिज़ाइन है, और मूल्य जुड़ते ही विक्रेता स्थापित होता है। साइन इन करने पर लिस्टिंग आपकी दर्ज होती है, जिसी से आप उसे हटा सकते हैं।", ar: "إنشاؤه لا يتطلب حسابًا — هذا هو التصميم، ويتحدد البائع عند إرفاق سعر. عند تسجيل الدخول يُسجل الإعلان باسمك، وهذا ما يتيح لك إنزاله.",
+  },
+  "sell.listing.title.ph": {
+    en: "title", es: "título", fr: "titre", de: "Titel", pt: "título", it: "titolo", ja: "タイトル", zh: "标题", hi: "शीर्षक", ar: "العنوان",
+  },
+  "sell.listing.blurb.ph": {
+    en: "blurb", es: "descripción", fr: "descriptif", de: "Kurztext", pt: "descrição", it: "descrizione", ja: "紹介文", zh: "简介", hi: "विवरण", ar: "نبذة",
+  },
+  "sell.listing.put": {
+    en: "Put it in the window", es: "Ponerlo en el escaparate", fr: "Le mettre en vitrine", de: "Ins Schaufenster stellen", pt: "Pôr na montra", it: "Mettilo in vetrina", ja: "ウィンドウに出す", zh: "放入橱窗", hi: "खिड़की में रखें", ar: "ضعه في الواجهة",
+  },
+  "sell.listing.id.ph": {
+    en: "listing id", es: "id del anuncio", fr: "id de l'annonce", de: "Eintrags-Id", pt: "id do anúncio", it: "id dell'annuncio", ja: "出品ID", zh: "商品ID", hi: "लिस्टिंग आईडी", ar: "معرّف الإعلان",
+  },
+  "sell.listing.down": {
+    en: "Take it down", es: "Retirarlo", fr: "La retirer", de: "Herunternehmen", pt: "Retirá-lo", it: "Toglilo", ja: "取り下げる", zh: "下架", hi: "हटा लें", ar: "أنزله",
+  },
+  "sell.listing.rule": {
+    en: "Only a claimant may take a listing down or move it: whoever made it, the seller on its offer, or the owner of the profile it advertises. It used to take no credential at all, so anyone could remove anyone's — while the same stranger asking to withdraw the offer on it was told it was not theirs.", es: "Solo un reclamante puede retirar o mover un anuncio: quien lo creó, el vendedor de su oferta o el propietario del perfil que anuncia. Antes no requería credencial alguna, así que cualquiera podía quitar el de cualquiera — mientras al mismo desconocido que pedía retirar la oferta se le decía que no era suya.", fr: "Seul un ayant droit peut retirer ou déplacer une annonce : celui qui l'a créée, le vendeur de son offre, ou le propriétaire du profil annoncé. Avant, aucune référence n'était exigée : n'importe qui pouvait retirer celle de n'importe qui — alors que le même inconnu demandant à retirer l'offre s'entendait dire qu'elle n'était pas à lui.", de: "Nur ein Berechtigter darf einen Eintrag entfernen oder verschieben: wer ihn erstellte, der Verkäufer seines Angebots oder der Inhaber des beworbenen Profils. Früher brauchte es gar keine Berechtigung, sodass jeder jeden entfernen konnte — während derselbe Fremde beim Zurückziehen des Angebots hörte, es sei nicht seins.", pt: "Só um requerente pode retirar ou mover um anúncio: quem o criou, o vendedor da sua oferta ou o dono do perfil anunciado. Antes não exigia credencial nenhuma, e qualquer um podia remover o de qualquer um — enquanto ao mesmo estranho que pedia para retirar a oferta se dizia que não era dele.", it: "Solo un avente diritto può togliere o spostare un annuncio: chi l'ha creato, il venditore della sua offerta o il proprietario del profilo pubblicizzato. Prima non serviva alcuna credenziale, così chiunque poteva rimuovere quello di chiunque — mentre allo stesso estraneo che chiedeva di ritirare l'offerta si diceva che non era sua.", ja: "出品を取り下げ・移動できるのは権利者のみです：作成者、そのオファーの売り手、または宣伝されるプロフィールの所有者。かつては資格情報が一切不要で、誰でも他人の出品を消せました — 同じ他人がオファーの取り下げを求めると「あなたのものではない」と言われたのにです。", zh: "只有权利人才能下架或移动商品：创建者、其报价的卖家、或它所宣传资料的所有者。过去完全不需凭证，任何人都能删除任何人的商品 — 而同一个陌生人想撤回报价时却被告知那不是他的。", hi: "लिस्टिंग केवल दावेदार ही हटा या स्थानांतरित कर सकता है: जिसने बनाई, उसकी पेशकश का विक्रेता, या जिस प्रोफ़ाइल का विज्ञापन है उसका स्वामी। पहले कोई क्रेडेंशियल नहीं लगती थी, तो कोई भी किसी की भी हटा सकता था — जबकि वही अजनबी पेशकश वापस लेने पर सुनता था कि वह उसकी नहीं।", ar: "لا يُنزل الإعلان أو ينقله إلا صاحب حق: من أنشأه، أو بائع عرضه، أو مالك الملف المعلن عنه. لم يكن يتطلب أي اعتماد من قبل، فكان بوسع أي أحد إزالة إعلان أي أحد — بينما يُقال للغريب نفسه عند طلب سحب العرض إنه ليس له.",
+  },
+  "sell.price": {
+    en: "A price on it", es: "Un precio encima", fr: "Un prix dessus", de: "Ein Preis darauf", pt: "Um preço em cima", it: "Un prezzo sopra", ja: "価格を付ける", zh: "标上价格", hi: "इस पर मूल्य", ar: "سعر عليه",
+  },
+  "sell.price.lead": {
+    en: "A listing is a shop window; an offer is what makes it a shop. The sale accrues to your account, not to the profile you happen to be signed in as — a distinction that cost real money before this screen existed: the sale went through, the receipt said it was on your statement, and the statement was empty.", es: "Un anuncio es un escaparate; una oferta es lo que lo hace tienda. La venta se acredita a tu cuenta, no al perfil con el que estés conectado — una distinción que costó dinero real antes de esta pantalla: la venta pasó, el recibo decía que estaba en tu estado de cuenta, y el estado estaba vacío.", fr: "Une annonce est une vitrine ; une offre en fait une boutique. La vente est créditée à votre compte, pas au profil avec lequel vous êtes connecté — une distinction qui a coûté de l'argent réel avant cet écran : la vente est passée, le reçu disait qu'elle était sur votre relevé, et le relevé était vide.", de: "Ein Eintrag ist ein Schaufenster; ein Angebot macht daraus einen Laden. Der Verkauf fließt Ihrem Konto zu, nicht dem gerade angemeldeten Profil — ein Unterschied, der vor diesem Bildschirm echtes Geld kostete: der Verkauf ging durch, die Quittung verwies auf Ihre Abrechnung, und die war leer.", pt: "Um anúncio é uma montra; uma oferta é o que faz dela uma loja. A venda credita na sua conta, não no perfil com que estiver ligado — uma distinção que custou dinheiro real antes deste ecrã: a venda passou, o recibo dizia que estava no seu extrato, e o extrato estava vazio.", it: "Un annuncio è una vetrina; un'offerta è ciò che la rende un negozio. La vendita matura sul tuo account, non sul profilo con cui sei collegato — una distinzione che è costata denaro vero prima di questa schermata: la vendita è passata, la ricevuta diceva che era sul tuo estratto, e l'estratto era vuoto.", ja: "出品はショーウィンドウで、オファーがそれを店にします。売上はあなたのアカウントに入り、たまたまサインイン中のプロフィールには入りません — この画面ができる前に実際の損失を生んだ区別です：販売は成立し、領収書は明細にあると言い、明細は空でした。", zh: "商品是橱窗；报价才使其成为商店。销售记入你的账户，而非你恰好登录的资料 — 在此屏幕出现前这个区别曾造成真金白银的损失：销售成功了，收据说钱在你的账单上，而账单是空的。", hi: "लिस्टिंग खिड़की है; पेशकश उसे दुकान बनाती है। बिक्री आपके खाते में जमा होती है, उस प्रोफ़ाइल में नहीं जिससे आप साइन इन हैं — यह फ़र्क़ इस स्क्रीन से पहले असली पैसे का पड़ा: बिक्री हुई, रसीद ने कहा आपके विवरण में है, और विवरण ख़ाली था।", ar: "الإعلان واجهة؛ والعرض هو ما يجعله متجرًا. يُقيد البيع في حسابك لا في الملف الذي صادف أنك مسجل به — فرق كلف مالاً حقيقيًا قبل هذه الشاشة: تم البيع، وقال الإيصال إنه في كشفك، وكان الكشف فارغًا.",
+  },
+  "sell.price.stock.ph": {
+    en: "stock (blank = unlimited)", es: "existencias (vacío = ilimitado)", fr: "stock (vide = illimité)", de: "Bestand (leer = unbegrenzt)", pt: "stock (vazio = ilimitado)", it: "scorte (vuoto = illimitato)", ja: "在庫（空欄＝無制限）", zh: "库存（留空＝无限）", hi: "स्टॉक (खाली = असीमित)", ar: "المخزون (فارغ = غير محدود)",
+  },
+  "sell.price.put": {
+    en: "Put a price on it", es: "Ponerle un precio", fr: "Y mettre un prix", de: "Einen Preis draufsetzen", pt: "Pôr-lhe um preço", it: "Mettici un prezzo", ja: "価格を付ける", zh: "标价", hi: "मूल्य लगाएँ", ar: "ضع سعرًا عليه",
+  },
+  "sell.price.stop": {
+    en: "Stop selling it", es: "Dejar de venderlo", fr: "Cesser de le vendre", de: "Verkauf beenden", pt: "Deixar de vender", it: "Smetti di venderlo", ja: "販売をやめる", zh: "停止销售", hi: "बेचना बंद करें", ar: "أوقف بيعه",
+  },
+  "sell.price.sold": {
+    en: "sold {n}", es: "vendidos {n}", fr: "vendus {n}", de: "verkauft {n}", pt: "vendidos {n}", it: "venduti {n}", ja: "販売数{n}", zh: "已售{n}", hi: "बिके {n}", ar: "بيع {n}",
+  },
+  "sell.place": {
+    en: "Where it is offered", es: "Dónde se ofrece", fr: "Où c'est offert", de: "Wo es angeboten wird", pt: "Onde é oferecido", it: "Dove è offerto", ja: "提供される場所", zh: "提供地点", hi: "कहाँ पेश है", ar: "أين يُعرض",
+  },
+  "sell.place.lead": {
+    en: "A named locality you type, never coordinates and never anything read off an address or an IP. A rated listing is refused a location outright: where a performer physically is has nothing to do with browsing them.", es: "Una localidad con nombre que tú escribes, nunca coordenadas ni nada leído de una dirección o una IP. A un anuncio clasificado se le niega la ubicación de plano: dónde está físicamente un artista no tiene nada que ver con explorarlo.", fr: "Une localité nommée que vous tapez, jamais de coordonnées ni rien lu d'une adresse ou d'une IP. Une annonce classée se voit refuser toute localisation : où se trouve physiquement un artiste n'a rien à voir avec sa consultation.", de: "Ein benannter Ort, den Sie eintippen, nie Koordinaten und nie etwas aus Adresse oder IP. Einem bewerteten Eintrag wird der Standort rundweg verweigert: wo jemand physisch ist, hat mit dem Stöbern nichts zu tun.", pt: "Uma localidade nomeada que você escreve, nunca coordenadas nem nada lido de um endereço ou IP. A um anúncio classificado é recusada a localização de imediato: onde um artista está fisicamente nada tem a ver com o navegar por ele.", it: "Una località con nome che digiti tu, mai coordinate né nulla letto da un indirizzo o un IP. A un annuncio classificato la posizione è rifiutata in blocco: dove si trova fisicamente un artista non c'entra col suo essere sfogliato.", ja: "入力するのは地名だけで、座標や住所・IPから読み取ったものは決して使いません。レーティング付き出品には所在地が一切拒否されます：出演者が物理的にどこにいるかは、閲覧とは無関係です。", zh: "只用你输入的地名，绝不用坐标，也绝不读取地址或IP。分级商品被直接拒绝定位：表演者的实际位置与浏览毫无关系。", hi: "आप जो नामित स्थान टाइप करें वही, कभी निर्देशांक नहीं, न ही पते या IP से पढ़ा कुछ। रेटेड लिस्टिंग को स्थान सिरे से मना है: कलाकार शारीरिक रूप से कहाँ है, उसे ब्राउज़ करने से कोई मतलब नहीं।", ar: "بلدة مسماة تكتبها أنت، لا إحداثيات أبدًا ولا شيء يُقرأ من عنوان أو IP. الإعلان المصنّف يُرفض له الموقع رفضًا تامًا: مكان الفنان الفعلي لا علاقة له بتصفحه.",
+  },
+  "sell.place.loc.ph": {
+    en: "locality, e.g. Oakland, CA", es: "localidad, p. ej. Oakland, CA", fr: "localité, p. ex. Oakland, CA", de: "Ort, z. B. Oakland, CA", pt: "localidade, p. ex. Oakland, CA", it: "località, es. Oakland, CA", ja: "地名（例: Oakland, CA）", zh: "地名，如 Oakland, CA", hi: "स्थान, जैसे Oakland, CA", ar: "البلدة، مثل Oakland, CA",
+  },
+  "sell.place.region.ph": {
+    en: "region", es: "región", fr: "région", de: "Region", pt: "região", it: "regione", ja: "地域", zh: "地区", hi: "क्षेत्र", ar: "المنطقة",
+  },
+  "sell.place.remote": {
+    en: "also served from anywhere", es: "también se sirve desde cualquier lugar", fr: "aussi servi depuis n'importe où", de: "auch von überall bedient", pt: "também servido de qualquer lugar", it: "servito anche da ovunque", ja: "どこからでも提供可", zh: "也可远程提供", hi: "कहीं से भी सेवा उपलब्ध", ar: "يُقدَّم أيضًا من أي مكان",
+  },
+  "sell.place.say": {
+    en: "Say where it is", es: "Decir dónde está", fr: "Dire où c'est", de: "Sagen, wo es ist", pt: "Dizer onde está", it: "Di' dov'è", ja: "場所を示す", zh: "标明位置", hi: "बताएँ कहाँ है", ar: "قل أين هو",
+  },
+  "sell.place.clear": {
+    en: "Clear the place", es: "Borrar el lugar", fr: "Effacer le lieu", de: "Ort löschen", pt: "Limpar o lugar", it: "Cancella il luogo", ja: "場所を消す", zh: "清除位置", hi: "स्थान हटाएँ", ar: "امسح المكان",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

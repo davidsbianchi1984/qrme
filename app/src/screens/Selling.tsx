@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type EarningsStatement, type LicenseHolder,
          type LicenseOfferView, type Offer, type PayoutReceipt } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -41,6 +42,7 @@ import { useSession } from "../store";
  */
 export function Selling({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -90,17 +92,14 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>What you are owed</h2>
-      <p className="muted small">
-        The seller's side. What your profile is offered for, who holds a
-        licence on it, what that has earned, and asking to be paid.
-      </p>
+      <h2>{tr("sell.title", lang)}</h2>
+      <p className="muted small">{tr("sell.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Your offer</h3>
+        <h3>{tr("sell.offer", lang)}</h3>
         {offer ? (
           <p className="small">
             <strong>{offer.kind}</strong> · {money(offer.price, offer.currency)}
@@ -110,29 +109,22 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
               : " · consult only"}
           </p>
         ) : (
-          <p className="muted small">
-            Not offered for licence. That is the ordinary state of a profile,
-            not an error.
-          </p>
+          <p className="muted small">{tr("sell.offer.none", lang)}</p>
         )}
-        <p className="muted small">
-          A licence that permits derivatives can only be sold to a
-          verified-18+ buyer. The check runs at the till, where the fee moves,
-          rather than at delivery.
-        </p>
+        <p className="muted small">{tr("sell.offer.adult", lang)}</p>
         <div className="row">
           <select value={kind} onChange={(e) => setKind(e.target.value)}>
-            <option value="consult">consult</option>
-            <option value="finetune">finetune</option>
-            <option value="clone">clone</option>
+            <option value="consult">{tr("sell.kind.consult", lang)}</option>
+            <option value="finetune">{tr("sell.kind.finetune", lang)}</option>
+            <option value="clone">{tr("sell.kind.clone", lang)}</option>
           </select>
           <input value={price} onChange={(e) => setPrice(e.target.value)}
-                 placeholder="price" style={{ width: "6rem" }} />
+                 placeholder={tr("sell.offer.price.ph", lang)} style={{ width: "6rem" }} />
           <input value={currency} maxLength={3}
                  onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-                 placeholder="USD" style={{ width: "5rem" }} />
+                 placeholder={tr("sell.offer.ccy.ph", lang)} style={{ width: "5rem" }} />
           <input value={terms} onChange={(e) => setTerms(e.target.value)}
-                 placeholder="terms" style={{ flex: 1 }} />
+                 placeholder={tr("sell.offer.terms.ph", lang)} style={{ flex: 1 }} />
         </div>
         <div className="row">
           <button disabled={busy || !me || !token || !price.trim()}
@@ -141,7 +133,7 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                       kind, price: Number(price), currency,
                       terms: terms.trim() || undefined,
                     }, token)), "Offered.")}>
-            Post this offer
+            {tr("sell.offer.post", lang)}
           </button>
           {offer && (
             <button disabled={busy || !token}
@@ -149,16 +141,16 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                       await api.withdrawLicenseOffer(me, token);
                       setOffer(null);
                     }, "Withdrawn. Licences already sold still stand.")}>
-              Stop offering it
+              {tr("sell.offer.stop", lang)}
             </button>
           )}
         </div>
       </div>
 
       <div className="card">
-        <h3>Who holds a licence</h3>
+        <h3>{tr("sell.holders", lang)}</h3>
         {holders.length === 0 && (
-          <p className="muted small">Nobody yet.</p>
+          <p className="muted small">{tr("sell.holders.none", lang)}</p>
         )}
         {holders.map((h) => (
           <p className="small" key={h.id}>
@@ -174,55 +166,53 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                         onClick={act(async () => {
                           await api.revokeLicense(h.id, token);
                         }, "Revoked.")}>
-                  Revoke
+                  {tr("sell.holders.revoke", lang)}
                 </button>
               </>
             )}
           </p>
         ))}
-        <p className="muted small">
-          Revoking stops the buyer deriving from that licence. It does not
-          unmake an agent already derived from it, and it does not take the
-          fee off your statement — a sale that happened stays on the record.
-        </p>
+        <p className="muted small">{tr("sell.holders.rule", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>Earnings</h3>
+        <h3>{tr("sell.earn", lang)}</h3>
         {!statement && (
-          <p className="muted small">
-            Nothing to show — sign in as the profile's owner.
-          </p>
+          <p className="muted small">{tr("sell.earn.signin", lang)}</p>
         )}
         {statement && (
           <>
             <p className="small">
-              Accrued {money(statement.totals.accrued, statement.currency)} ·
-              paid {money(statement.totals.paid, statement.currency)} ·
-              lifetime {money(statement.totals.lifetime, statement.currency)}
+              {fill(tr("sell.earn.line", lang), {
+                a: money(statement.totals.accrued, statement.currency),
+                p: money(statement.totals.paid, statement.currency),
+                l: money(statement.totals.lifetime, statement.currency),
+              })}
             </p>
             {statement.totals.mixed && (
               <>
                 {/* The headline covers one currency. Saying so is the whole
                     fix: these figures used to be added together. */}
                 <p className="muted small">
-                  Those are your {statement.currency} figures. This account
-                  also earns in {statement.currencies
-                    .filter((c) => c !== statement.currency).join(", ")},
-                  and the two are not added together — a total across
-                  currencies is not a number.
+                  {fill(tr("sell.earn.mixed", lang), {
+                    ccy: statement.currency,
+                    others: statement.currencies
+                      .filter((c) => c !== statement.currency).join(", "),
+                  })}
                 </p>
                 {statement.currencies.map((c) => (
                   <p className="small" key={c}>
-                    <strong>{c}</strong> — accrued{" "}
-                    {money(statement.by_currency[c].accrued, c)} · paid{" "}
-                    {money(statement.by_currency[c].paid, c)}
+                    {fill(tr("sell.earn.bycur", lang), {
+                      c: <strong>{c}</strong>,
+                      a: money(statement.by_currency[c].accrued, c),
+                      p: money(statement.by_currency[c].paid, c),
+                    })}
                   </p>
                 ))}
               </>
             )}
             {statement.entries.length === 0 && (
-              <p className="muted small">No sales yet.</p>
+              <p className="muted small">{tr("sell.earn.none", lang)}</p>
             )}
             {statement.entries.slice(0, 12).map((e) => (
               <p className="small" key={e.id}>
@@ -234,7 +224,7 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                               || statement.totals.accrued <= 0}
                     onClick={act(async () => setReceipt(
                       await api.requestPayout(me, token)))}>
-              Request a payout
+              {tr("sell.earn.payout", lang)}
             </button>
             {statement.totals.mixed && statement.currencies
               .filter((c) => c !== statement.currency
@@ -243,13 +233,16 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                 <button key={c} disabled={busy || !token}
                         onClick={act(async () => setReceipt(
                           await api.requestPayout(me, token, c)))}>
-                  Pay out {c}
+                  {fill(tr("sell.earn.payoutc", lang), { c })}
                 </button>
               ))}
             {receipt && (
               <p className="muted small">
-                {money(receipt.total, receipt.currency)} across{" "}
-                {receipt.entries} entries — {receipt.note}
+                {fill(tr("sell.earn.receipt", lang), {
+                  total: money(receipt.total, receipt.currency),
+                  n: receipt.entries,
+                  note: receipt.note,
+                })}
                 {receipt.remaining.length > 0
                   && ` You still hold a balance in `
                      + `${receipt.remaining.join(", ")}.`}
@@ -260,19 +253,15 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>A listing in the window</h3>
-        <p className="muted small">
-          Creating one needs no account — that is the design, and the seller
-          is established when a price is attached. Signed in, the listing is
-          recorded as yours, which is what lets you take it down again.
-        </p>
+        <h3>{tr("sell.listing", lang)}</h3>
+        <p className="muted small">{tr("sell.listing.lead", lang)}</p>
         <div className="row">
           <input value={listingTitle}
                  onChange={(e) => setListingTitle(e.target.value)}
-                 placeholder="title" style={{ flex: 1 }} />
+                 placeholder={tr("sell.listing.title.ph", lang)} style={{ flex: 1 }} />
           <input value={listingBlurb}
                  onChange={(e) => setListingBlurb(e.target.value)}
-                 placeholder="blurb" style={{ flex: 1 }} />
+                 placeholder={tr("sell.listing.blurb.ph", lang)} style={{ flex: 1 }} />
         </div>
         <div className="row">
           <button disabled={busy || !token || !listingTitle.trim()}
@@ -285,42 +274,30 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                     }, token);
                     setListingId(made.id);
                   }, "Listed.")}>
-            Put it in the window
+            {tr("sell.listing.put", lang)}
           </button>
           <input value={listingId}
                  onChange={(e) => setListingId(e.target.value)}
-                 placeholder="listing id" style={{ flex: 1 }} />
+                 placeholder={tr("sell.listing.id.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !token || !listingId.trim()}
                   onClick={act(async () => {
                     await api.removeListing(listingId.trim(), token);
                     setListingId("");
                   }, "Taken down.")}>
-            Take it down
+            {tr("sell.listing.down", lang)}
           </button>
         </div>
-        <p className="muted small">
-          Only a claimant may take a listing down or move it: whoever made it,
-          the seller on its offer, or the owner of the profile it advertises.
-          It used to take no credential at all, so anyone could remove
-          anyone's — while the same stranger asking to withdraw the{" "}
-          <em>offer</em> on it was told it was not theirs.
-        </p>
+        <p className="muted small">{tr("sell.listing.rule", lang)}</p>
       </div>
 
       <div className="card">
-        <h3>A price on it</h3>
-        <p className="muted small">
-          A listing is a shop window; an offer is what makes it a shop. The
-          sale accrues to <strong>your account</strong>, not to the profile you
-          happen to be signed in as — a distinction that cost real money before
-          this screen existed: the sale went through, the receipt said it was on
-          your statement, and the statement was empty.
-        </p>
+        <h3>{tr("sell.price", lang)}</h3>
+        <p className="muted small">{tr("sell.price.lead", lang)}</p>
         <div className="row">
           <input value={askPrice} onChange={(e) => setAskPrice(e.target.value)}
-                 placeholder="price" style={{ width: "7rem" }} />
+                 placeholder={tr("sell.offer.price.ph", lang)} style={{ width: "7rem" }} />
           <input value={stock} onChange={(e) => setStock(e.target.value)}
-                 placeholder="stock (blank = unlimited)" style={{ flex: 1 }} />
+                 placeholder={tr("sell.price.stock.ph", lang)} style={{ flex: 1 }} />
         </div>
         <div className="row">
           <button disabled={busy || !token || !listingId.trim()
@@ -330,42 +307,37 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                       price: Number(askPrice), currency,
                       stock: stock.trim() ? Number(stock) : undefined,
                     }, token)), "Priced.")}>
-            Put a price on it
+            {tr("sell.price.put", lang)}
           </button>
           <button disabled={busy || !token || !listingId.trim()}
                   onClick={act(async () => {
                     await api.withdrawOffer(listingId.trim(), token);
                     setOfferOn(null);
                   }, "Stopped selling it. The window stays; receipts stay.")}>
-            Stop selling it
+            {tr("sell.price.stop", lang)}
           </button>
         </div>
         {offerOn && (
           <p className="small">
             {money(offerOn.price, offerOn.currency)} · {offerOn.status} ·{" "}
-            sold {offerOn.sold}
+            {fill(tr("sell.price.sold", lang), { n: offerOn.sold })}
             {offerOn.stock !== null && ` · ${offerOn.stock} left`}
           </p>
         )}
       </div>
 
       <div className="card">
-        <h3>Where it is offered</h3>
-        <p className="muted small">
-          A named locality you type, never coordinates and never anything read
-          off an address or an IP. A rated listing is refused a location
-          outright: where a performer physically is has nothing to do with
-          browsing them.
-        </p>
+        <h3>{tr("sell.place", lang)}</h3>
+        <p className="muted small">{tr("sell.place.lead", lang)}</p>
         <div className="row">
           <input value={locality} onChange={(e) => setLocality(e.target.value)}
-                 placeholder="locality, e.g. Oakland, CA" style={{ flex: 1 }} />
+                 placeholder={tr("sell.place.loc.ph", lang)} style={{ flex: 1 }} />
           <input value={region} onChange={(e) => setRegion(e.target.value)}
-                 placeholder="region" style={{ width: "9rem" }} />
+                 placeholder={tr("sell.place.region.ph", lang)} style={{ width: "9rem" }} />
           <label className="small">
             <input type="checkbox" checked={remote}
                    onChange={(e) => setRemote(e.target.checked)} />
-            {" "}also served from anywhere
+            {" "}{tr("sell.place.remote", lang)}
           </label>
         </div>
         <div className="row">
@@ -377,13 +349,13 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                       region: region.trim() || undefined, remote,
                     }, token);
                   }, "Placed.")}>
-            Say where it is
+            {tr("sell.place.say", lang)}
           </button>
           <button disabled={busy || !token || !listingId.trim()}
                   onClick={act(async () => {
                     await api.unplaceListing(listingId.trim(), token);
                   }, "Cleared — it is offered anywhere again.")}>
-            Clear the place
+            {tr("sell.place.clear", lang)}
           </button>
         </div>
       </div>
