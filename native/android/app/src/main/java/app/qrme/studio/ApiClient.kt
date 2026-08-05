@@ -2734,6 +2734,237 @@ object ApiClient {
         request("/campaigns/$campaignId/close", "POST", token = token)
     }
 
+    // -- the owner's workshop: workflows, delegation, the assistant,
+    // tasks under a grant, rated placements and specialists --------------
+
+    suspend fun workflows(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/workflows",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("goal") + " \u00b7 " + o.optString("status") +
+                " \u00b7 " + o.optString("next_phase", "\u2014")
+        }
+    }
+
+    suspend fun startWorkflow(id: String, goal: String,
+                              token: String): String {
+        val o = JSONObject(request("/profiles/$id/workflows", "POST",
+            JSONObject().put("goal", goal), token))
+        return o.optString("id")
+    }
+
+    suspend fun workflow(id: String, workflowId: String,
+                         token: String): String {
+        val o = JSONObject(request("/profiles/$id/workflows/$workflowId",
+            token = token))
+        return o.optString("status") + " \u00b7 " +
+            o.optString("next_phase", "\u2014")
+    }
+
+    suspend fun advanceWorkflow(id: String, workflowId: String,
+                                token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/workflows/$workflowId/advance", "POST",
+            token = token))
+        return o.optString("status") + " \u00b7 " +
+            o.optString("next_phase", "\u2014")
+    }
+
+    suspend fun resumeWorkflow(id: String, workflowId: String,
+                               input: String, token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/workflows/$workflowId/resume", "POST",
+            JSONObject().put("input", input), token))
+        return o.optString("status")
+    }
+
+    suspend fun cancelWorkflow(id: String, workflowId: String,
+                               token: String) {
+        request("/profiles/$id/workflows/$workflowId/cancel", "POST",
+            token = token)
+    }
+
+    /** A capability advertisement, readable without a token, so a caller
+     *  can decide whether a handoff is possible before attempting one. */
+    suspend fun delegationOffer(id: String): String {
+        val o = JSONObject(request("/profiles/$id/delegation"))
+        return if (o.optBoolean("delegation"))
+            o.optJSONArray("phases").let { arr ->
+                (0 until (arr?.length() ?: 0))
+                    .joinToString(", ") { arr!!.getString(it) }
+            }
+        else "\u2014"
+    }
+
+    suspend fun setDelegation(id: String, phases: List<String>,
+                              token: String) {
+        request("/profiles/$id/delegation", "PUT",
+            JSONObject().put("phases", org.json.JSONArray(phases)), token)
+    }
+
+    suspend fun startDelegatedWorkflow(id: String, interactorId: String,
+                                       goal: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/delegated-workflows",
+            "POST", JSONObject().put("goal", goal)
+                .put("interactor_id", interactorId), token))
+        return o.optString("id")
+    }
+
+    suspend fun delegatedWorkflow(id: String, workflowId: String,
+                                  token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/delegated-workflows/$workflowId", token = token))
+        return o.optString("status") + " \u00b7 " +
+            o.optString("delegated_to")
+    }
+
+    suspend fun advanceDelegatedWorkflow(id: String, workflowId: String,
+                                         token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/delegated-workflows/$workflowId/advance", "POST",
+            token = token))
+        return o.optString("status")
+    }
+
+    suspend fun resumeDelegatedWorkflow(id: String, workflowId: String,
+                                        input: String,
+                                        token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/delegated-workflows/$workflowId/resume", "POST",
+            JSONObject().put("input", input), token))
+        return o.optString("status")
+    }
+
+    suspend fun composeNote(id: String, moment: String,
+                            token: String): String {
+        val o = JSONObject(request("/profiles/$id/assist/compose", "POST",
+            JSONObject().put("kind", "note").put("moment", moment), token))
+        return o.optString("content")
+    }
+
+    suspend fun composedWorks(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/assist/works",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("kind") + " \u00b7 " + o.optString("moment")
+        }
+    }
+
+    suspend fun proofread(id: String, text: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/assist/proofread", "POST",
+            JSONObject().put("text", text), token))
+        return o.optString("edited",
+            o.optJSONArray("suggestions")?.join(" \u00b7 ") ?: "")
+    }
+
+    suspend fun triage(id: String, texts: List<String>, keep: Int,
+                       criteria: String, token: String): String {
+        val items = org.json.JSONArray()
+        texts.forEachIndexed { i, t ->
+            items.put(JSONObject().put("id", "i$i").put("text", t))
+        }
+        val o = JSONObject(request("/profiles/$id/assist/triage", "POST",
+            JSONObject().put("items", items).put("keep", keep)
+                .put("criteria", criteria), token))
+        val kept = o.optJSONArray("kept")
+        return (0 until (kept?.length() ?: 0)).joinToString(" \u00b7 ") {
+            kept!!.getJSONObject(it).optString("reason")
+        }
+    }
+
+    suspend fun mintTaskGrant(id: String,
+                              token: String): Pair<String, String> {
+        val o = JSONObject(request("/profiles/$id/grants", "POST",
+            JSONObject().put("scope", org.json.JSONArray(listOf("*"))),
+            token))
+        return o.optString("id") to o.optString("token")
+    }
+
+    suspend fun revokeTaskGrant(grantId: String, token: String) {
+        request("/grants/$grantId", "DELETE", token = token)
+    }
+
+    suspend fun runTask(id: String, topic: String, grantToken: String,
+                        token: String): String {
+        val o = JSONObject(request("/profiles/$id/tasks", "POST",
+            JSONObject().put("topic", topic).put("grant_token", grantToken),
+            token))
+        return o.optString("reason", o.optString("status"))
+    }
+
+    suspend fun tasksRun(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/tasks",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("topic") + " \u00b7 " + o.optString("status")
+        }
+    }
+
+    suspend fun ratedVenues(): List<String> {
+        val arr = org.json.JSONArray(request("/venues"))
+        return (0 until arr.length()).map {
+            arr.getJSONObject(it).optString("key")
+        }
+    }
+
+    suspend fun placeRated(id: String, venue: String, label: String,
+                           token: String): Pair<String, String> {
+        val body = JSONObject().put("venue", venue)
+        if (label.isNotEmpty()) body.put("label", label)
+        val o = JSONObject(request("/profiles/$id/placements", "POST",
+            body, token))
+        return o.optString("placement_id") to o.optString("scan_url")
+    }
+
+    suspend fun placements(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/placements",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("label", o.optString("venue_name")) + " \u00b7 " +
+                o.optInt("scans")
+        }
+    }
+
+    suspend fun placementAnalytics(id: String, token: String): String {
+        val f = JSONObject(request("/profiles/$id/placements/analytics",
+            token = token)).getJSONObject("funnel")
+        return f.optInt("resolutions").toString() + " \u2192 " +
+            f.optInt("verified_views") + " \u2192 " +
+            f.optInt("unique_chatters")
+    }
+
+    suspend fun placementCustody(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/placements/custody",
+            token = token))
+        return o.optInt("count").toString() + " \u00b7 " +
+            o.optBoolean("chain_intact")
+    }
+
+    suspend fun removePlacement(placementId: String, token: String) {
+        request("/placements/$placementId", "DELETE", token = token)
+    }
+
+    suspend fun specialists(id: String, token: String): List<String> {
+        val arr = org.json.JSONArray(request("/profiles/$id/specialists",
+            token = token))
+        return (0 until arr.length()).map {
+            val o = arr.getJSONObject(it)
+            o.optString("domain") + " \u00b7 " +
+                o.optString("specialist_profile_id")
+        }
+    }
+
+    suspend fun setSpecialist(id: String, domain: String,
+                              specialistId: String, token: String) {
+        request("/profiles/$id/specialists", "PUT",
+            JSONObject().put("domain", domain)
+                .put("specialist_profile_id", specialistId), token)
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.43.5** ([changelog](CHANGELOG.md) ·
+**Current release: v0.43.6** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.43.6** | **The workshop in the pocket** — workflows and their pauses, the delegation envelope, the assistant's verbs, tasks under a revocable grant, rated placements and specialists reach all three shells; **84 doorless rows struck**, records fall to ios 118 / android 122 / windows 121 |
 | **0.43.5** | **The seal, the mail and the screen** — signatures and verification, mail settings, rooms and the microphone disclosure, wall screens, memberships, consented handoffs and campaigns reach all three shells; **74 doorless rows struck**, records fall to ios 146 / android 150 / windows 149 |
 | **0.43.4** | **The body, the case and the lobby** — robot audit trails and dials, the medical referral flow, objections, the game lobby's honest roster and the helper dock reach all three shells; **75 doorless rows struck**, records fall to ios 171 / android 175 / windows 173 |
 | **0.43.3** | **The place, the camera, the organization and the tour** — whose-corner, microphone and overlay disclosures, the camera with its refusals, organizations and the guided tour reach all three shells; **81 doorless rows struck**, records fall to ios 196 / android 200 / windows 198 |

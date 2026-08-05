@@ -2794,6 +2794,12 @@ private fun PeoplePanel(vm: StudioViewModel) {
         PlanBlock(vm) { note = it }
         HandBlock(vm) { note = it }
         CampBlock(vm) { note = it }
+        WorkBlock(vm) { note = it }
+        DeleBlock(vm) { note = it }
+        AsstBlock(vm) { note = it }
+        TaskBlock(vm) { note = it }
+        PlcBlock(vm) { note = it }
+        SpecBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -3767,6 +3773,271 @@ private fun CampBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             enabled = campaignId.isNotBlank() && amount.isNotBlank()) {
             vm.call({ ApiClient.donate(campaignId,
                 amount.toDoubleOrNull() ?: 0.0, words) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+
+// The owner's workshop: a workflow pauses where the world has to answer,
+// delegation is off until the owner declares it, a task's grant can die
+// mid-run, and a rated placement resolves through the age wall.
+@Composable
+private fun WorkBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var flows by remember { mutableStateOf(listOf<String>()) }
+    var goal by remember { mutableStateOf("") }
+    var flowId by remember { mutableStateOf("") }
+    var answer by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.workflows(vm.pid!!, vm.token!!) }) { r ->
+            flows = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("work.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        flows.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        labeledField(L10n.t("work.goal", lang), goal, "") { goal = it }
+        BrandButton(L10n.t("work.start", lang), enabled = goal.isNotBlank()) {
+            vm.call({ ApiClient.startWorkflow(vm.pid!!, goal, vm.token!!) }) { r ->
+                r.getOrNull()?.let { flowId = it; goal = "" }
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("work.id", lang), flowId, "") { flowId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("work.show", lang), enabled = flowId.isNotBlank()) {
+                vm.call({ ApiClient.workflow(vm.pid!!, flowId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("work.advance", lang), enabled = flowId.isNotBlank()) {
+                vm.call({ ApiClient.advanceWorkflow(vm.pid!!, flowId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("work.cancel", lang), enabled = flowId.isNotBlank()) {
+                vm.call({ ApiClient.cancelWorkflow(vm.pid!!, flowId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("work.input", lang), answer, "") { answer = it }
+        BrandButton(L10n.t("work.resume", lang),
+            enabled = flowId.isNotBlank() && answer.isNotBlank()) {
+            vm.call({ ApiClient.resumeWorkflow(vm.pid!!, flowId, answer,
+                vm.token!!) }) { r ->
+                answer = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun DeleBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var offer by remember { mutableStateOf("") }
+    var phases by remember { mutableStateOf("draft,review") }
+    var visitorId by remember { mutableStateOf("") }
+    var goal by remember { mutableStateOf("") }
+    var flowId by remember { mutableStateOf("") }
+    var answer by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.delegationOffer(vm.pid!!) }) { r ->
+            offer = r.getOrNull() ?: "" }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("dele.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        if (offer.isNotEmpty())
+            Text(L10n.t("dele.offer", lang) + ": " + offer,
+                color = Qrme.T2, fontSize = 12.sp)
+        labeledField(L10n.t("dele.phases", lang), phases, "") { phases = it }
+        BrandButton(L10n.t("dele.allow", lang), enabled = phases.isNotBlank()) {
+            vm.call({ ApiClient.setDelegation(vm.pid!!,
+                phases.split(",").map { it.trim() }, vm.token!!) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("people.add", lang), visitorId, "") { visitorId = it }
+        labeledField(L10n.t("dele.goal", lang), goal, "") { goal = it }
+        BrandButton(L10n.t("dele.start", lang),
+            enabled = visitorId.isNotBlank() && goal.isNotBlank()) {
+            vm.call({ ApiClient.startDelegatedWorkflow(vm.pid!!, visitorId,
+                goal, vm.token!!) }) { r ->
+                r.getOrNull()?.let { flowId = it; goal = "" }
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("dele.id", lang), flowId, "") { flowId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("dele.show", lang), enabled = flowId.isNotBlank()) {
+                vm.call({ ApiClient.delegatedWorkflow(vm.pid!!, flowId,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("dele.advance", lang), enabled = flowId.isNotBlank()) {
+                vm.call({ ApiClient.advanceDelegatedWorkflow(vm.pid!!, flowId,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("work.input", lang), answer, "") { answer = it }
+        BrandButton(L10n.t("dele.resume", lang),
+            enabled = flowId.isNotBlank() && answer.isNotBlank()) {
+            vm.call({ ApiClient.resumeDelegatedWorkflow(vm.pid!!, flowId,
+                answer, vm.token!!) }) { r ->
+                answer = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun AsstBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var works by remember { mutableStateOf(listOf<String>()) }
+    var moment by remember { mutableStateOf("") }
+    var draft by remember { mutableStateOf("") }
+    var pile by remember { mutableStateOf("") }
+    var criteria by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.composedWorks(vm.pid!!, vm.token!!) }) { r ->
+            works = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("asst.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        works.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        labeledField(L10n.t("asst.moment", lang), moment, "") { moment = it }
+        BrandButton(L10n.t("asst.compose", lang), enabled = moment.isNotBlank()) {
+            vm.call({ ApiClient.composeNote(vm.pid!!, moment, vm.token!!) }) { r ->
+                moment = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("asst.text", lang), draft, "") { draft = it }
+        BrandButton(L10n.t("asst.proof", lang), enabled = draft.isNotBlank()) {
+            vm.call({ ApiClient.proofread(vm.pid!!, draft, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("asst.items", lang), pile, "") { pile = it }
+        labeledField(L10n.t("asst.criteria", lang), criteria, "") { criteria = it }
+        BrandButton(L10n.t("asst.triage", lang), enabled = pile.isNotBlank()) {
+            vm.call({ ApiClient.triage(vm.pid!!,
+                pile.split(";").map { it.trim() }, 1, criteria,
+                vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun TaskBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rows by remember { mutableStateOf(listOf<String>()) }
+    var grantId by remember { mutableStateOf("") }
+    var grantToken by remember { mutableStateOf("") }
+    var topic by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.tasksRun(vm.pid!!, vm.token!!) }) { r ->
+            rows = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("task.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        rows.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("task.grant", lang)) {
+                vm.call({ ApiClient.mintTaskGrant(vm.pid!!, vm.token!!) }) { r ->
+                    r.getOrNull()?.let { grantId = it.first
+                        grantToken = it.second }
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("task.revoke", lang),
+                enabled = grantId.isNotBlank()) {
+                vm.call({ ApiClient.revokeTaskGrant(grantId, vm.token!!) }) { r ->
+                    grantId = ""; grantToken = ""
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("task.topic", lang), topic, "") { topic = it }
+        BrandButton(L10n.t("task.run", lang),
+            enabled = topic.isNotBlank() && grantToken.isNotBlank()) {
+            vm.call({ ApiClient.runTask(vm.pid!!, topic, grantToken,
+                vm.token!!) }) { r ->
+                topic = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun PlcBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var venues by remember { mutableStateOf(listOf<String>()) }
+    var rows by remember { mutableStateOf(listOf<String>()) }
+    var venue by remember { mutableStateOf("") }
+    var label by remember { mutableStateOf("") }
+    var placementId by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.ratedVenues() }) { r ->
+            venues = r.getOrNull() ?: emptyList() }
+        vm.call({ ApiClient.placements(vm.pid!!, vm.token!!) }) { r ->
+            rows = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("plc.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        if (venues.isNotEmpty())
+            Text(L10n.t("plc.venues", lang) + ": " +
+                venues.joinToString(", "), color = Qrme.T2, fontSize = 12.sp)
+        rows.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        labeledField(L10n.t("plc.venue", lang), venue, "") { venue = it }
+        labeledField(L10n.t("plc.label", lang), label, "") { label = it }
+        BrandButton(L10n.t("plc.place", lang), enabled = venue.isNotBlank()) {
+            vm.call({ ApiClient.placeRated(vm.pid!!, venue, label,
+                vm.token!!) }) { r ->
+                r.getOrNull()?.let { placementId = it.first
+                    onNote(it.second) }
+                if (r.isFailure) onNote(r.exceptionOrNull()?.message) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("plc.stats", lang)) {
+                vm.call({ ApiClient.placementAnalytics(vm.pid!!,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("plc.custody", lang)) {
+                vm.call({ ApiClient.placementCustody(vm.pid!!,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("plc.id", lang), placementId, "") { placementId = it }
+        BrandButton(L10n.t("plc.remove", lang),
+            enabled = placementId.isNotBlank()) {
+            vm.call({ ApiClient.removePlacement(placementId, vm.token!!) }) { r ->
+                placementId = ""
+                onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun SpecBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rows by remember { mutableStateOf(listOf<String>()) }
+    var domain by remember { mutableStateOf("") }
+    var specialistId by remember { mutableStateOf("") }
+    LaunchedEffect(vm.pid) {
+        vm.call({ ApiClient.specialists(vm.pid!!, vm.token!!) }) { r ->
+            rows = r.getOrNull() ?: emptyList() }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("spec.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        rows.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+        labeledField(L10n.t("spec.domain", lang), domain, "") { domain = it }
+        labeledField(L10n.t("spec.id", lang), specialistId, "") { specialistId = it }
+        BrandButton(L10n.t("spec.set", lang),
+            enabled = domain.isNotBlank() && specialistId.isNotBlank()) {
+            vm.call({ ApiClient.setSpecialist(vm.pid!!, domain, specialistId,
+                vm.token!!) }) { r ->
+                domain = ""; specialistId = ""
                 onNote(r.exceptionOrNull()?.message) }
         }
     }

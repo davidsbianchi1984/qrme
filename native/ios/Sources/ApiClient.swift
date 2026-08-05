@@ -3317,4 +3317,286 @@ extension ApiClient {
         try await request("/campaigns/\(campaignId)/close", method: "POST",
                           token: token)
     }
+
+    // -- the owner's workshop: workflows, delegation, the assistant,
+    // tasks under a grant, rated placements and specialists ---------------
+
+    func workflows(id: String, token: String) async throws -> [WorkflowCard] {
+        try await request("/profiles/\(id)/workflows", token: token)
+    }
+
+    func startWorkflow(id: String, goal: String,
+                       token: String) async throws -> WorkflowCard {
+        try await request("/profiles/\(id)/workflows", method: "POST",
+                          body: ["goal": goal], token: token)
+    }
+
+    func workflow(id: String, workflowId: String,
+                  token: String) async throws -> WorkflowCard {
+        try await request("/profiles/\(id)/workflows/\(workflowId)",
+                          token: token)
+    }
+
+    func advanceWorkflow(id: String, workflowId: String,
+                         token: String) async throws -> WorkflowCard {
+        try await request("/profiles/\(id)/workflows/\(workflowId)/advance",
+                          method: "POST", token: token)
+    }
+
+    func resumeWorkflow(id: String, workflowId: String, input: String,
+                        token: String) async throws -> WorkflowCard {
+        try await request("/profiles/\(id)/workflows/\(workflowId)/resume",
+                          method: "POST", body: ["input": input],
+                          token: token)
+    }
+
+    func cancelWorkflow(id: String, workflowId: String,
+                        token: String) async throws -> WorkflowCard {
+        try await request("/profiles/\(id)/workflows/\(workflowId)/cancel",
+                          method: "POST", token: token)
+    }
+
+    // -- delegated work: what somebody else may start here --
+
+    /// A capability advertisement, readable without a token, so a caller
+    /// can decide whether a handoff is possible before attempting one.
+    func delegationOffer(id: String) async throws -> DelegationOffer {
+        try await request("/profiles/\(id)/delegation")
+    }
+
+    func setDelegation(id: String, phases: [String],
+                       token: String) async throws -> DelegationOffer {
+        try await request("/profiles/\(id)/delegation", method: "PUT",
+                          body: ["phases": phases], token: token)
+    }
+
+    func startDelegatedWorkflow(id: String, interactorId: String,
+                                goal: String,
+                                token: String) async throws -> WorkflowCard {
+        try await request("/profiles/\(id)/delegated-workflows",
+                          method: "POST",
+                          body: ["goal": goal,
+                                 "interactor_id": interactorId],
+                          token: token)
+    }
+
+    func delegatedWorkflow(id: String, workflowId: String,
+                           token: String) async throws -> WorkflowCard {
+        try await request(
+            "/profiles/\(id)/delegated-workflows/\(workflowId)",
+            token: token)
+    }
+
+    func advanceDelegatedWorkflow(id: String, workflowId: String,
+                                  token: String) async throws -> WorkflowCard {
+        try await request(
+            "/profiles/\(id)/delegated-workflows/\(workflowId)/advance",
+            method: "POST", token: token)
+    }
+
+    func resumeDelegatedWorkflow(id: String, workflowId: String,
+                                 input: String,
+                                 token: String) async throws -> WorkflowCard {
+        try await request(
+            "/profiles/\(id)/delegated-workflows/\(workflowId)/resume",
+            method: "POST", body: ["input": input], token: token)
+    }
+
+    // -- the assistant --
+
+    func composeNote(id: String, moment: String,
+                     token: String) async throws -> CreativeWork {
+        try await request("/profiles/\(id)/assist/compose", method: "POST",
+                          body: ["kind": "note", "moment": moment],
+                          token: token)
+    }
+
+    func composedWorks(id: String,
+                       token: String) async throws -> [CreativeWork] {
+        try await request("/profiles/\(id)/assist/works", token: token)
+    }
+
+    func proofread(id: String, text: String,
+                   token: String) async throws -> ProofreadOut {
+        try await request("/profiles/\(id)/assist/proofread",
+                          method: "POST", body: ["text": text], token: token)
+    }
+
+    func triage(id: String, items: [[String: String]], keep: Int,
+                criteria: String,
+                token: String) async throws -> TriageOut {
+        try await request("/profiles/\(id)/assist/triage", method: "POST",
+                          body: ["items": items, "keep": keep,
+                                 "criteria": criteria],
+                          token: token)
+    }
+
+    // -- autonomous tasks under a revocable grant --
+
+    func mintTaskGrant(id: String,
+                       token: String) async throws -> TaskGrant {
+        try await request("/profiles/\(id)/grants", method: "POST",
+                          body: ["scope": ["*"]], token: token)
+    }
+
+    func revokeTaskGrant(grantId: String, token: String) async throws {
+        struct Out: Decodable { let revoked: Bool? }
+        let _: Out = try await request("/grants/\(grantId)",
+                                       method: "DELETE", token: token)
+    }
+
+    func runTask(id: String, topic: String, grantToken: String,
+                 token: String) async throws -> TaskOut {
+        try await request("/profiles/\(id)/tasks", method: "POST",
+                          body: ["topic": topic, "grant_token": grantToken],
+                          token: token)
+    }
+
+    func tasksRun(id: String, token: String) async throws -> [TaskRow] {
+        try await request("/profiles/\(id)/tasks", token: token)
+    }
+
+    // -- rated placements: marketing at adult venues --
+
+    func ratedVenues() async throws -> [VenueCard] {
+        try await request("/venues")
+    }
+
+    func placeRated(id: String, venue: String, label: String,
+                    token: String) async throws -> PlacementMade {
+        try await request("/profiles/\(id)/placements", method: "POST",
+                          body: label.isEmpty
+                              ? ["venue": venue]
+                              : ["venue": venue, "label": label],
+                          token: token)
+    }
+
+    func placements(id: String,
+                    token: String) async throws -> [PlacementRow] {
+        try await request("/profiles/\(id)/placements", token: token)
+    }
+
+    func placementAnalytics(id: String,
+                            token: String) async throws -> PlacementStats {
+        try await request("/profiles/\(id)/placements/analytics",
+                          token: token)
+    }
+
+    func placementCustody(id: String,
+                          token: String) async throws -> PlacementCustody {
+        try await request("/profiles/\(id)/placements/custody",
+                          token: token)
+    }
+
+    func removePlacement(placementId: String, token: String) async throws {
+        struct Out: Decodable { let removed: Bool? }
+        let _: Out = try await request("/placements/\(placementId)",
+                                       method: "DELETE", token: token)
+    }
+
+    // -- domain specialists --
+
+    func specialists(id: String,
+                     token: String) async throws -> [SpecialistRow] {
+        try await request("/profiles/\(id)/specialists", token: token)
+    }
+
+    func setSpecialist(id: String, domain: String, specialistId: String,
+                       token: String) async throws -> SpecialistRow {
+        try await request("/profiles/\(id)/specialists", method: "PUT",
+                          body: ["domain": domain,
+                                 "specialist_profile_id": specialistId],
+                          token: token)
+    }
+}
+
+struct WorkflowCard: Decodable, Identifiable {
+    let id: String
+    let goal: String
+    let status: String
+    let next_phase: String?
+    let delegated_to: String?
+}
+
+struct DelegationOffer: Decodable {
+    let delegation: Bool?
+    let phases: [String]?
+    let enabled: Bool?
+}
+
+struct CreativeWork: Decodable, Identifiable {
+    let id: String
+    let kind: String
+    let moment: String
+    let content: String
+}
+
+struct ProofreadOut: Decodable {
+    let edited: String?
+    let suggestions: [String]
+    let status: String
+}
+
+struct TriageOut: Decodable {
+    struct Kept: Decodable { let id: String; let reason: String }
+    let reviewed: Int
+    let kept: [Kept]
+    let discarded_ids: [String]
+}
+
+struct TaskGrant: Decodable, Identifiable {
+    let id: String
+    let token: String
+    let scope: [String]
+}
+
+struct TaskOut: Decodable {
+    let status: String
+    let reason: String?
+}
+
+struct TaskRow: Decodable, Identifiable {
+    let id: String
+    let topic: String
+    let status: String
+}
+
+struct VenueCard: Decodable {
+    let key: String
+    let name: String
+    let hosts: [String]?
+}
+
+struct PlacementMade: Decodable {
+    let placement_id: String
+    let beacon_id: String
+    let scan_url: String
+    let rated: Bool
+}
+
+struct PlacementRow: Decodable, Identifiable {
+    let id: String
+    let venue_name: String
+    let label: String?
+    let scans: Int
+    let active: Bool
+}
+
+struct PlacementStats: Decodable {
+    struct Funnel: Decodable {
+        let resolutions: Int
+        let verified_views: Int
+        let unique_chatters: Int
+    }
+    let funnel: Funnel
+}
+
+struct PlacementCustody: Decodable {
+    let count: Int
+    let chain_intact: Bool
+}
+
+struct SpecialistRow: Decodable {
+    let domain: String
+    let specialist_profile_id: String
 }

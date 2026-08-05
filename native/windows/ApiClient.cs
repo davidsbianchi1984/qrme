@@ -2515,6 +2515,170 @@ public sealed class ApiClient
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<HomepageDoc>(req);
     }
+
+    // -- the owner's workshop: workflows, delegation, the assistant,
+    // tasks under a grant, rated placements and specialists ---------------
+
+    public Task<WorkflowCard[]> Workflows(string profileId, string token) =>
+        Send<WorkflowCard[]>(Get($"/profiles/{profileId}/workflows", token));
+
+    public Task<WorkflowCard> StartWorkflow(string profileId, string goal,
+        string token) =>
+        Send<WorkflowCard>(Post($"/profiles/{profileId}/workflows",
+            new { goal }, token));
+
+    public Task<WorkflowCard> WorkflowOf(string profileId,
+        string workflowId, string token) =>
+        Send<WorkflowCard>(Get(
+            $"/profiles/{profileId}/workflows/{workflowId}", token));
+
+    public Task<WorkflowCard> AdvanceWorkflow(string profileId,
+        string workflowId, string token) =>
+        Send<WorkflowCard>(Post(
+            $"/profiles/{profileId}/workflows/{workflowId}/advance",
+            new { }, token));
+
+    public Task<WorkflowCard> ResumeWorkflow(string profileId,
+        string workflowId, string input, string token) =>
+        Send<WorkflowCard>(Post(
+            $"/profiles/{profileId}/workflows/{workflowId}/resume",
+            new { input }, token));
+
+    public Task<WorkflowCard> CancelWorkflow(string profileId,
+        string workflowId, string token) =>
+        Send<WorkflowCard>(Post(
+            $"/profiles/{profileId}/workflows/{workflowId}/cancel",
+            new { }, token));
+
+    /// <summary>A capability advertisement, readable without a token, so
+    /// a caller can decide whether a handoff is possible before
+    /// attempting one.</summary>
+    public Task<DelegationOffer> DelegationOfferOf(string profileId) =>
+        Send<DelegationOffer>(Get($"/profiles/{profileId}/delegation"));
+
+    public Task<DelegationOffer> SetDelegation(string profileId,
+        string[] phases, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/delegation")
+        { Content = JsonContent.Create(new { phases }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DelegationOffer>(req);
+    }
+
+    public Task<WorkflowCard> StartDelegatedWorkflow(string profileId,
+        string interactorId, string goal, string token) =>
+        Send<WorkflowCard>(Post($"/profiles/{profileId}/delegated-workflows",
+            new { goal, interactor_id = interactorId }, token));
+
+    public Task<WorkflowCard> DelegatedWorkflowOf(string profileId,
+        string workflowId, string token) =>
+        Send<WorkflowCard>(Get(
+            $"/profiles/{profileId}/delegated-workflows/{workflowId}",
+            token));
+
+    public Task<WorkflowCard> AdvanceDelegatedWorkflow(string profileId,
+        string workflowId, string token) =>
+        Send<WorkflowCard>(Post(
+            $"/profiles/{profileId}/delegated-workflows/{workflowId}/advance",
+            new { }, token));
+
+    public Task<WorkflowCard> ResumeDelegatedWorkflow(string profileId,
+        string workflowId, string input, string token) =>
+        Send<WorkflowCard>(Post(
+            $"/profiles/{profileId}/delegated-workflows/{workflowId}/resume",
+            new { input }, token));
+
+    public Task<CreativeWork> ComposeNote(string profileId, string moment,
+        string token) =>
+        Send<CreativeWork>(Post($"/profiles/{profileId}/assist/compose",
+            new { kind = "note", moment }, token));
+
+    public Task<CreativeWork[]> ComposedWorks(string profileId,
+        string token) =>
+        Send<CreativeWork[]>(Get($"/profiles/{profileId}/assist/works",
+            token));
+
+    public Task<ProofreadOut> Proofread(string profileId, string text,
+        string token) =>
+        Send<ProofreadOut>(Post($"/profiles/{profileId}/assist/proofread",
+            new { text }, token));
+
+    public Task<TriageOut> Triage(string profileId, object[] items,
+        int keep, string criteria, string token) =>
+        Send<TriageOut>(Post($"/profiles/{profileId}/assist/triage",
+            new { items, keep, criteria }, token));
+
+    public Task<TaskGrant> MintTaskGrant(string profileId, string token) =>
+        Send<TaskGrant>(Post($"/profiles/{profileId}/grants",
+            new { scope = new[] { "*" } }, token));
+
+    public Task<TaskGrant> RevokeTaskGrant(string grantId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/grants/{grantId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<TaskGrant>(req);
+    }
+
+    public Task<TaskOut> RunTask(string profileId, string topic,
+        string grantToken, string token) =>
+        Send<TaskOut>(Post($"/profiles/{profileId}/tasks",
+            new { topic, grant_token = grantToken }, token));
+
+    public Task<TaskRow[]> TasksRun(string profileId, string token) =>
+        Send<TaskRow[]>(Get($"/profiles/{profileId}/tasks", token));
+
+    public Task<VenueCard[]> RatedVenues() =>
+        Send<VenueCard[]>(Get("/venues"));
+
+    public Task<PlacementMade> PlaceRated(string profileId, string venue,
+        string label, string token) =>
+        Send<PlacementMade>(Post($"/profiles/{profileId}/placements",
+            label.Length > 0 ? new { venue, label } : (object)new { venue },
+            token));
+
+    public Task<PlacementRow[]> Placements(string profileId,
+        string token) =>
+        Send<PlacementRow[]>(Get($"/profiles/{profileId}/placements",
+            token));
+
+    public Task<PlacementStats> PlacementAnalytics(string profileId,
+        string token) =>
+        Send<PlacementStats>(Get(
+            $"/profiles/{profileId}/placements/analytics", token));
+
+    public Task<PlacementCustody> PlacementCustodyOf(string profileId,
+        string token) =>
+        Send<PlacementCustody>(Get(
+            $"/profiles/{profileId}/placements/custody", token));
+
+    public Task<PlacementMade> RemovePlacement(string placementId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/placements/{placementId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<PlacementMade>(req);
+    }
+
+    public Task<SpecialistRow[]> Specialists(string profileId,
+        string token) =>
+        Send<SpecialistRow[]>(Get($"/profiles/{profileId}/specialists",
+            token));
+
+    public Task<SpecialistRow> SetSpecialist(string profileId,
+        string domain, string specialistId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/profiles/{profileId}/specialists")
+        {
+            Content = JsonContent.Create(new
+            { domain, specialist_profile_id = specialistId })
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SpecialistRow>(req);
+    }
 }
 
 public record DmMessageRow(
@@ -2994,3 +3158,84 @@ public record CampaignCard(
     [property: JsonPropertyName("raised")] double? Raised,
     [property: JsonPropertyName("goal")] double? Goal,
     [property: JsonPropertyName("status")] string? Status);
+
+public record WorkflowCard(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("goal")] string? Goal,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("next_phase")] string? NextPhase,
+    [property: JsonPropertyName("delegated_to")] string? DelegatedTo);
+
+public record DelegationOffer(
+    [property: JsonPropertyName("delegation")] bool? Delegation,
+    [property: JsonPropertyName("phases")] string[]? Phases,
+    [property: JsonPropertyName("enabled")] bool? Enabled);
+
+public record CreativeWork(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("moment")] string? Moment,
+    [property: JsonPropertyName("content")] string? Content);
+
+public record ProofreadOut(
+    [property: JsonPropertyName("edited")] string? Edited,
+    [property: JsonPropertyName("suggestions")] string[]? Suggestions,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record TriageKept(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("reason")] string? Reason);
+
+public record TriageOut(
+    [property: JsonPropertyName("reviewed")] int Reviewed,
+    [property: JsonPropertyName("kept")] TriageKept[] Kept,
+    [property: JsonPropertyName("discarded_ids")] string[] DiscardedIds);
+
+public record TaskGrant(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("token")] string? Token,
+    [property: JsonPropertyName("scope")] string[]? Scope,
+    [property: JsonPropertyName("revoked")] bool? Revoked);
+
+public record TaskOut(
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("reason")] string? Reason);
+
+public record TaskRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("topic")] string? Topic,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record VenueCard(
+    [property: JsonPropertyName("key")] string Key,
+    [property: JsonPropertyName("name")] string? Name);
+
+public record PlacementMade(
+    [property: JsonPropertyName("placement_id")] string? PlacementId,
+    [property: JsonPropertyName("beacon_id")] string? BeaconId,
+    [property: JsonPropertyName("scan_url")] string? ScanUrl,
+    [property: JsonPropertyName("removed")] bool? Removed);
+
+public record PlacementRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("venue_name")] string? VenueName,
+    [property: JsonPropertyName("label")] string? Label,
+    [property: JsonPropertyName("scans")] int Scans,
+    [property: JsonPropertyName("active")] bool Active);
+
+public record PlacementFunnel(
+    [property: JsonPropertyName("resolutions")] int Resolutions,
+    [property: JsonPropertyName("verified_views")] int VerifiedViews,
+    [property: JsonPropertyName("unique_chatters")] int UniqueChatters);
+
+public record PlacementStats(
+    [property: JsonPropertyName("funnel")] PlacementFunnel Funnel);
+
+public record PlacementCustody(
+    [property: JsonPropertyName("count")] int Count,
+    [property: JsonPropertyName("chain_intact")] bool ChainIntact);
+
+public record SpecialistRow(
+    [property: JsonPropertyName("domain")] string Domain,
+    [property: JsonPropertyName("specialist_profile_id")]
+    string SpecialistProfileId);

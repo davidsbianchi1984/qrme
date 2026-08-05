@@ -1,4 +1,4 @@
-# status: backlog — 140 rows
+# status: backlog — 135 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -86,9 +86,7 @@ humor
 includes
 interaction_scope
 interactions
-interactor_id
 interactor_message
-items
 kinds
 learner_id
 lender_id
@@ -109,7 +107,6 @@ package
 participants
 people
 persona_signature
-phases
 place
 playing
 presence
@@ -138,14 +135,12 @@ signature_id
 situation
 social_style
 sources
-specialist_profile_id
 state
 status
 successor_owner
 surfaces
 task
 terms_consent
-text
 transcript_chars
 transport
 turns

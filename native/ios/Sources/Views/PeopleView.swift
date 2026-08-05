@@ -218,6 +218,12 @@ struct PeopleSection: View {
                 PlanSection()
                 HandoffSection()
                 CampaignSection()
+                WorkSection()
+                DelegationSection()
+                AssistantSection()
+                TaskSection()
+                PlacementSection()
+                SpecialistSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

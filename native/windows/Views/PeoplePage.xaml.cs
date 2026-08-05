@@ -231,6 +231,52 @@ public sealed partial class PeoplePage : Page
         CampWordsBox.Header = L10n.T("crowd.gift.words");
         CampGiveButton.Content = L10n.T("camp.give");
         CampCloseButton.Content = L10n.T("camp.close");
+        WorkTitle.Text = L10n.T("work.title");
+        WorkGoalBox.Header = L10n.T("work.goal");
+        WorkStartButton.Content = L10n.T("work.start");
+        WorkIdBox.Header = L10n.T("work.id");
+        WorkShowButton.Content = L10n.T("work.show");
+        WorkAdvanceButton.Content = L10n.T("work.advance");
+        WorkCancelButton.Content = L10n.T("work.cancel");
+        WorkInputBox.Header = L10n.T("work.input");
+        WorkResumeButton.Content = L10n.T("work.resume");
+        DeleTitle.Text = L10n.T("dele.title");
+        DelePhasesBox.Header = L10n.T("dele.phases");
+        DelePhasesBox.Text = "draft,review";
+        DeleAllowButton.Content = L10n.T("dele.allow");
+        DeleVisitorBox.Header = L10n.T("people.add");
+        DeleGoalBox.Header = L10n.T("dele.goal");
+        DeleStartButton.Content = L10n.T("dele.start");
+        DeleIdBox.Header = L10n.T("dele.id");
+        DeleShowButton.Content = L10n.T("dele.show");
+        DeleAdvanceButton.Content = L10n.T("dele.advance");
+        DeleInputBox.Header = L10n.T("work.input");
+        DeleResumeButton.Content = L10n.T("dele.resume");
+        AsstTitle.Text = L10n.T("asst.title");
+        AsstMomentBox.Header = L10n.T("asst.moment");
+        AsstComposeButton.Content = L10n.T("asst.compose");
+        AsstTextBox.Header = L10n.T("asst.text");
+        AsstProofButton.Content = L10n.T("asst.proof");
+        AsstItemsBox.Header = L10n.T("asst.items");
+        AsstCriteriaBox.Header = L10n.T("asst.criteria");
+        AsstTriageButton.Content = L10n.T("asst.triage");
+        TaskTitle.Text = L10n.T("task.title");
+        TaskGrantButton.Content = L10n.T("task.grant");
+        TaskRevokeButton.Content = L10n.T("task.revoke");
+        TaskTopicBox.Header = L10n.T("task.topic");
+        TaskRunButton.Content = L10n.T("task.run");
+        PlcTitle.Text = L10n.T("plc.title");
+        PlcVenueBox.Header = L10n.T("plc.venue");
+        PlcLabelBox.Header = L10n.T("plc.label");
+        PlcPlaceButton.Content = L10n.T("plc.place");
+        PlcStatsButton.Content = L10n.T("plc.stats");
+        PlcCustodyButton.Content = L10n.T("plc.custody");
+        PlcIdBox.Header = L10n.T("plc.id");
+        PlcRemoveButton.Content = L10n.T("plc.remove");
+        SpecTitle.Text = L10n.T("spec.title");
+        SpecDomainBox.Header = L10n.T("spec.domain");
+        SpecIdBox.Header = L10n.T("spec.id");
+        SpecSetButton.Content = L10n.T("spec.set");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -249,8 +295,30 @@ public sealed partial class PeoplePage : Page
         WithdrawButton.Content = L10n.T("people.withdraw");
     }
 
-    protected override async void OnNavigatedTo(NavigationEventArgs e) =>
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
         await Load();
+        await LoadWorkshop();
+    }
+
+    /// <summary>What the workshop shows before any button: the delegation
+    /// offer this profile advertises, and the venues a rated placement
+    /// could go to — the same two reads the other shells do on appear.</summary>
+    private async Task LoadWorkshop()
+    {
+        var s = AppState.Current;
+        if (s.Pid is null) return;
+        try
+        {
+            var offer = await ApiClient.Shared.DelegationOfferOf(s.Pid);
+            DeleOfferText.Text = offer.Delegation == true
+                ? string.Join(", ", offer.Phases ?? []) : "—";
+            var venues = await ApiClient.Shared.RatedVenues();
+            PlcVenuesText.Text = string.Join(", ",
+                venues.Select(v => v.Key));
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
 
     private async System.Threading.Tasks.Task Load()
     {
@@ -1169,4 +1237,250 @@ public sealed partial class PeoplePage : Page
     private async void OnCampClose(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.CloseCampaign(
             CampIdBox.Text.Trim(), AppState.Current.Token!));
+
+    // -- the owner's workshop ---------------------------------------------
+
+    private string _grantId = "";
+    private string _grantToken = "";
+
+    private async void OnWorkStart(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var made = await ApiClient.Shared.StartWorkflow(
+                AppState.Current.Pid!, WorkGoalBox.Text.Trim(),
+                AppState.Current.Token!);
+            WorkIdBox.Text = made.Id;
+            WorkGoalBox.Text = "";
+            await ReloadWorkflows();
+        });
+
+    private async Task ReloadWorkflows()
+    {
+        var rows = await ApiClient.Shared.Workflows(
+            AppState.Current.Pid!, AppState.Current.Token!);
+        WorkList.ItemsSource = rows.Select(w => new Row(
+            $"{w.Goal} \u00b7 {w.Status} \u00b7 {w.NextPhase ?? "\u2014"}"))
+            .ToList();
+    }
+
+    private async void OnWorkShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.WorkflowOf(
+                AppState.Current.Pid!, WorkIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = $"{w.Status} \u00b7 {w.NextPhase ?? "\u2014"}";
+        });
+
+    private async void OnWorkAdvance(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.AdvanceWorkflow(
+                AppState.Current.Pid!, WorkIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = $"{w.Status} \u00b7 {w.NextPhase ?? "\u2014"}";
+            await ReloadWorkflows();
+        });
+
+    private async void OnWorkCancel(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.CancelWorkflow(
+                AppState.Current.Pid!, WorkIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            await ReloadWorkflows();
+        });
+
+    private async void OnWorkResume(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.ResumeWorkflow(
+                AppState.Current.Pid!, WorkIdBox.Text.Trim(),
+                WorkInputBox.Text.Trim(), AppState.Current.Token!);
+            WorkInputBox.Text = "";
+            StatusText.Text = w.Status ?? "";
+            await ReloadWorkflows();
+        });
+
+    private async void OnDeleAllow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var phases = DelePhasesBox.Text.Split(',')
+                .Select(x => x.Trim()).Where(x => x.Length > 0).ToArray();
+            var offer = await ApiClient.Shared.SetDelegation(
+                AppState.Current.Pid!, phases, AppState.Current.Token!);
+            DeleOfferText.Text = string.Join(", ", offer.Phases ?? []);
+        });
+
+    private async void OnDeleStart(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var made = await ApiClient.Shared.StartDelegatedWorkflow(
+                AppState.Current.Pid!, DeleVisitorBox.Text.Trim(),
+                DeleGoalBox.Text.Trim(), AppState.Current.Token!);
+            DeleIdBox.Text = made.Id;
+            DeleGoalBox.Text = "";
+        });
+
+    private async void OnDeleShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.DelegatedWorkflowOf(
+                AppState.Current.Pid!, DeleIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = $"{w.Status} \u00b7 {w.DelegatedTo}";
+        });
+
+    private async void OnDeleAdvance(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.AdvanceDelegatedWorkflow(
+                AppState.Current.Pid!, DeleIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = w.Status ?? "";
+        });
+
+    private async void OnDeleResume(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.ResumeDelegatedWorkflow(
+                AppState.Current.Pid!, DeleIdBox.Text.Trim(),
+                DeleInputBox.Text.Trim(), AppState.Current.Token!);
+            DeleInputBox.Text = "";
+            StatusText.Text = w.Status ?? "";
+        });
+
+    private async void OnAsstCompose(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var made = await ApiClient.Shared.ComposeNote(
+                AppState.Current.Pid!, AsstMomentBox.Text.Trim(),
+                AppState.Current.Token!);
+            AsstMomentBox.Text = "";
+            StatusText.Text = made.Content ?? "";
+            await ReloadWorks();
+        });
+
+    private async Task ReloadWorks()
+    {
+        var rows = await ApiClient.Shared.ComposedWorks(
+            AppState.Current.Pid!, AppState.Current.Token!);
+        AsstWorksList.ItemsSource = rows.Select(w => new Row(
+            $"{w.Kind} \u00b7 {w.Moment}")).ToList();
+    }
+
+    private async void OnAsstProof(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Proofread(
+                AppState.Current.Pid!, AsstTextBox.Text,
+                AppState.Current.Token!);
+            StatusText.Text = outp.Edited
+                ?? string.Join(" \u00b7 ", outp.Suggestions ?? []);
+        });
+
+    private async void OnAsstTriage(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var items = AsstItemsBox.Text.Split(';')
+                .Select(x => x.Trim()).Where(x => x.Length > 0)
+                .Select((t, i) => (object)new { id = $"i{i}", text = t })
+                .ToArray();
+            var outp = await ApiClient.Shared.Triage(
+                AppState.Current.Pid!, items, 1,
+                AsstCriteriaBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = string.Join(" \u00b7 ",
+                outp.Kept.Select(k => k.Reason));
+        });
+
+    private async void OnTaskGrant(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var g = await ApiClient.Shared.MintTaskGrant(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            _grantId = g.Id ?? "";
+            _grantToken = g.Token ?? "";
+            StatusText.Text = string.Join(",", g.Scope ?? []);
+        });
+
+    private async void OnTaskRevoke(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.RevokeTaskGrant(
+                _grantId, AppState.Current.Token!);
+            _grantId = ""; _grantToken = "";
+        });
+
+    private async void OnTaskRun(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RunTask(
+                AppState.Current.Pid!, TaskTopicBox.Text.Trim(),
+                _grantToken, AppState.Current.Token!);
+            TaskTopicBox.Text = "";
+            StatusText.Text = outp.Reason ?? outp.Status ?? "";
+            var rows = await ApiClient.Shared.TasksRun(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            TaskList.ItemsSource = rows.Select(t => new Row(
+                $"{t.Topic} \u00b7 {t.Status}")).ToList();
+        });
+
+    private async void OnPlcPlace(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var made = await ApiClient.Shared.PlaceRated(
+                AppState.Current.Pid!, PlcVenueBox.Text.Trim(),
+                PlcLabelBox.Text.Trim(), AppState.Current.Token!);
+            PlcIdBox.Text = made.PlacementId ?? "";
+            StatusText.Text = made.ScanUrl ?? "";
+            await ReloadPlacements();
+        });
+
+    private async Task ReloadPlacements()
+    {
+        var rows = await ApiClient.Shared.Placements(
+            AppState.Current.Pid!, AppState.Current.Token!);
+        PlcList.ItemsSource = rows.Select(r => new Row(
+            $"{r.Label ?? r.VenueName} \u00b7 {r.Scans}")).ToList();
+    }
+
+    private async void OnPlcStats(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.PlacementAnalytics(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = $"{s.Funnel.Resolutions} \u2192 "
+                + $"{s.Funnel.VerifiedViews} \u2192 "
+                + $"{s.Funnel.UniqueChatters}";
+        });
+
+    private async void OnPlcCustody(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var c = await ApiClient.Shared.PlacementCustodyOf(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = $"{c.Count} \u00b7 {c.ChainIntact}";
+        });
+
+    private async void OnPlcRemove(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.RemovePlacement(
+                PlcIdBox.Text.Trim(), AppState.Current.Token!);
+            PlcIdBox.Text = "";
+            await ReloadPlacements();
+        });
+
+    private async void OnSpecSet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.SetSpecialist(
+                AppState.Current.Pid!, SpecDomainBox.Text.Trim(),
+                SpecIdBox.Text.Trim(), AppState.Current.Token!);
+            SpecDomainBox.Text = ""; SpecIdBox.Text = "";
+            var rows = await ApiClient.Shared.Specialists(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            SpecList.ItemsSource = rows.Select(r => new Row(
+                $"{r.Domain} \u00b7 {r.SpecialistProfileId}")).ToList();
+        });
 }

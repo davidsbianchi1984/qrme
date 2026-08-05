@@ -604,6 +604,119 @@
                     <Button x:Name="CampCloseButton" Click="OnCampClose" />
                 </StackPanel>
             </Border>
+
+            <!-- The owner's workshop: workflows that pause where the world
+                 answers, the delegation envelope, the assistant's verbs,
+                 tasks under a revocable grant, rated placements behind the
+                 age wall, and the specialists a profile consults. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="WorkTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="WorkList" />
+                    <TextBox x:Name="WorkGoalBox" />
+                    <Button x:Name="WorkStartButton" Click="OnWorkStart" />
+                    <TextBox x:Name="WorkIdBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="WorkShowButton" Click="OnWorkShow" />
+                        <Button x:Name="WorkAdvanceButton" Click="OnWorkAdvance" />
+                        <Button x:Name="WorkCancelButton" Click="OnWorkCancel" />
+                    </StackPanel>
+                    <TextBox x:Name="WorkInputBox" />
+                    <Button x:Name="WorkResumeButton" Click="OnWorkResume" />
+                </StackPanel>
+            </Border>
+
+            <!-- Delegated work. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="DeleTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="DeleOfferText" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="DelePhasesBox" />
+                    <Button x:Name="DeleAllowButton" Click="OnDeleAllow" />
+                    <TextBox x:Name="DeleVisitorBox" />
+                    <TextBox x:Name="DeleGoalBox" />
+                    <Button x:Name="DeleStartButton" Click="OnDeleStart" />
+                    <TextBox x:Name="DeleIdBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="DeleShowButton" Click="OnDeleShow" />
+                        <Button x:Name="DeleAdvanceButton" Click="OnDeleAdvance" />
+                    </StackPanel>
+                    <TextBox x:Name="DeleInputBox" />
+                    <Button x:Name="DeleResumeButton" Click="OnDeleResume" />
+                </StackPanel>
+            </Border>
+
+            <!-- The assistant. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="AsstTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="AsstWorksList" />
+                    <TextBox x:Name="AsstMomentBox" />
+                    <Button x:Name="AsstComposeButton" Click="OnAsstCompose" />
+                    <TextBox x:Name="AsstTextBox" />
+                    <Button x:Name="AsstProofButton" Click="OnAsstProof" />
+                    <TextBox x:Name="AsstItemsBox" />
+                    <TextBox x:Name="AsstCriteriaBox" />
+                    <Button x:Name="AsstTriageButton" Click="OnAsstTriage" />
+                </StackPanel>
+            </Border>
+
+            <!-- Autonomous tasks under a revocable grant. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="TaskTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="TaskList" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="TaskGrantButton" Click="OnTaskGrant" />
+                        <Button x:Name="TaskRevokeButton" Click="OnTaskRevoke" />
+                    </StackPanel>
+                    <TextBox x:Name="TaskTopicBox" />
+                    <Button x:Name="TaskRunButton" Click="OnTaskRun" />
+                </StackPanel>
+            </Border>
+
+            <!-- Rated placements. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="PlcTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="PlcVenuesText" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="PlcList" />
+                    <TextBox x:Name="PlcVenueBox" />
+                    <TextBox x:Name="PlcLabelBox" />
+                    <Button x:Name="PlcPlaceButton" Click="OnPlcPlace" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="PlcStatsButton" Click="OnPlcStats" />
+                        <Button x:Name="PlcCustodyButton" Click="OnPlcCustody" />
+                    </StackPanel>
+                    <TextBox x:Name="PlcIdBox" />
+                    <Button x:Name="PlcRemoveButton" Click="OnPlcRemove" />
+                </StackPanel>
+            </Border>
+
+            <!-- Specialists. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SpecTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <ItemsControl x:Name="SpecList" />
+                    <TextBox x:Name="SpecDomainBox" />
+                    <TextBox x:Name="SpecIdBox" />
+                    <Button x:Name="SpecSetButton" Click="OnSpecSet" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

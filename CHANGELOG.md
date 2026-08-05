@@ -4,6 +4,38 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.6] — 2026-08-05
+
+### The workshop in the pocket
+
+Six more blocks off the per-shell doorless record — workflows, the
+delegation envelope, the assistant's verbs, autonomous tasks under a
+revocable grant, rated placements, and domain specialists — and what
+they share is that every one is work the profile does when the owner
+is not watching. That is exactly the work an owner checks from the
+device in their pocket: what ran, where it paused, who was allowed to
+start it, and how to pull the plug.
+
+Twenty-eight routes gain doors on iOS, Android and Windows — **84
+rows struck**; the records fall to ios 118, android 122, windows 121
+— each rendering its backend's rules: a workflow pauses where the
+world has to answer, and advance and resume are different buttons
+because they are different acts; delegation is off until the owner
+declares it, the offer answers a bare GET and never names the grant,
+and delegating `research` without a grant is refused while the owner
+is looking (an injection that unguarded the workflow list went red
+before it shipped, as did one that quietly dropped a shell's
+specialist door); a task's grant can die mid-run and the refusal says
+so; a rated placement takes an adult-mode profile only and every ref
+resolves through the age wall; the specialists are the owner's to
+attach. 50 shared strings per shell, in ten languages.
+
+The field-label residue falls 140 → 135: `interactor_id`, `phases`,
+`items`, `text` and `specialist_profile_id` are all typed into this
+round's forms on three shells, so their refusals now name the labels
+on the forms; `grant_token`, minted by a button and never typed,
+stays on the identifier fallback the record's doctrine prescribes.
+
 ## [0.43.5] — 2026-08-05
 
 ### The seal, the mail and the screen
