@@ -406,6 +406,45 @@ public sealed partial class PeoplePage : Page
         LifeProvNameBox.Header = L10n.T("life.prov.name");
         LifeProvAreaBox.Header = L10n.T("life.prov.area");
         LifeProvAddButton.Content = L10n.T("life.prov.add");
+        BcnTitle.Text = L10n.T("bcn.title");
+        BcnIdBox.Header = L10n.T("bcn.id");
+        BcnCardButton.Content = L10n.T("bcn.card");
+        BcnDeskButton.Content = L10n.T("bcn.desk");
+        BcnQrButton.Content = L10n.T("bcn.qr");
+        BcnCidBox.Header = L10n.T("people.add");
+        BcnSocialButton.Content = L10n.T("bcn.social");
+        BcnPairButton.Content = L10n.T("bcn.pair");
+        ModqTitle.Text = L10n.T("modq.title");
+        ModqShowButton.Content = L10n.T("modq.show");
+        ModqMsgBox.Header = L10n.T("modq.msg");
+        ModqApproveButton.Content = L10n.T("modq.approve");
+        ModqRejectButton.Content = L10n.T("modq.reject");
+        ModqInteractorBox.Header = L10n.T("people.add");
+        ModqContentBox.Header = L10n.T("modq.edit");
+        ModqEditButton.Content = L10n.T("modq.edit");
+        ModqRetractButton.Content = L10n.T("modq.retract");
+        RevwTitle.Text = L10n.T("revw.title");
+        RevwShowButton.Content = L10n.T("revw.show");
+        RevwInteractorBox.Header = L10n.T("people.add");
+        RevwRatingBox.Header = L10n.T("revw.rating");
+        RevwBodyBox.Header = L10n.T("revw.body");
+        RevwLeaveButton.Content = L10n.T("revw.leave");
+        WmTitle.Text = L10n.T("wm.title");
+        WmIdBox.Header = L10n.T("wm.id");
+        WmResolveButton.Content = L10n.T("wm.resolve");
+        WmContentBox.Header = L10n.T("wm.content");
+        WmVerifyButton.Content = L10n.T("wm.verify");
+        MedTitle.Text = L10n.T("med.title");
+        MedLimitsButton.Content = L10n.T("med.limits");
+        MedPlatformsButton.Content = L10n.T("med.platforms");
+        MedFilenameBox.Header = L10n.T("wear.name");
+        MedUploadButton.Content = L10n.T("med.upload");
+        WearTitle.Text = L10n.T("wear.title");
+        WearListButton.Content = L10n.T("wear.list");
+        WearNameBox.Header = L10n.T("wear.name");
+        WearKindBox.Header = L10n.T("wear.kind");
+        WearPairButton.Content = L10n.T("wear.pair");
+        WearUnpairButton.Content = L10n.T("wear.unpair");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -2229,5 +2268,188 @@ public sealed partial class PeoplePage : Page
                 LifeProvNameBox.Text.Trim(), LifeProvAreaBox.Text.Trim());
             LifeProvNameBox.Text = ""; LifeProvAreaBox.Text = "";
             StatusText.Text = outp.Name ?? outp.Id;
+        });
+
+    private async void OnBcnCard(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.BeaconCard(
+                BcnIdBox.Text.Trim());
+            StatusText.Text = outp.AgeWall == true
+                ? (outp.Note ?? "18+")
+                : (outp.DisplayName ?? "\u2014") + " \u00b7 "
+                  + (outp.Watermark ?? "");
+        });
+
+    private async void OnBcnDesk(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.DeskScanCard(
+                BcnIdBox.Text.Trim());
+            StatusText.Text = outp.DisplayName ?? outp.DeskId ?? "";
+        });
+
+    private void OnBcnQr(object sender, RoutedEventArgs e) =>
+        StatusText.Text =
+            ApiClient.Shared.BeaconQrUrl(BcnIdBox.Text.Trim()) + " \u00b7 "
+            + ApiClient.Shared.BeaconScanUrl(BcnIdBox.Text.Trim())
+            + " \u00b7 " + ApiClient.Shared.DeskScanUrl(
+                BcnIdBox.Text.Trim());
+
+    private async void OnBcnSocial(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.SocialBeacon(
+                BcnCidBox.Text.Trim());
+            StatusText.Text = (outp.Platform ?? "\u2014") + " \u00b7 "
+                + (outp.Handle ?? "") + " \u00b7 "
+                + ApiClient.Shared.SocialQrUrl(BcnCidBox.Text.Trim());
+        });
+
+    private async void OnBcnPair(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Pairing();
+            StatusText.Text = (outp.ConsoleUrl ?? "\u2014") + " \u00b7 "
+                + ApiClient.Shared.PairQrUrl();
+        });
+
+    private async void OnModqShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ModerationQueue(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = outp.Length.ToString();
+        });
+
+    private async void OnModqApprove(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ApproveMessage(
+                ModqMsgBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = outp.Status ?? "";
+        });
+
+    private async void OnModqReject(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RejectMessage(
+                ModqMsgBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = outp.Status ?? "";
+        });
+
+    private async void OnModqEdit(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.EditMessage(
+                AppState.Current.Pid!, ModqMsgBox.Text.Trim(),
+                ModqInteractorBox.Text.Trim(), ModqContentBox.Text.Trim(),
+                AppState.Current.Token!);
+            ModqContentBox.Text = "";
+            StatusText.Text = outp.Status ?? "";
+        });
+
+    private async void OnModqRetract(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.RetractMessage(
+                AppState.Current.Pid!, ModqMsgBox.Text.Trim(),
+                ModqInteractorBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = outp.Status ?? "";
+        });
+
+    private async void OnRevwShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ReviewsOf(
+                AppState.Current.Pid!);
+            StatusText.Text = outp.Reviews.Length + " \u00b7 "
+                + (outp.Rating?.Average ?? 0);
+        });
+
+    private async void OnRevwLeave(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            int.TryParse(RevwRatingBox.Text.Trim(), out var rating);
+            var outp = await ApiClient.Shared.LeaveReview(
+                AppState.Current.Pid!, RevwInteractorBox.Text.Trim(),
+                rating, RevwBodyBox.Text.Trim(), AppState.Current.Token!);
+            RevwBodyBox.Text = "";
+            StatusText.Text = (outp.Rating ?? 0).ToString();
+        });
+
+    private async void OnWmResolve(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.WatermarkCredentialOf(
+                WmIdBox.Text.Trim());
+            StatusText.Text = (outp.ProfileId ?? "\u2014") + " \u00b7 "
+                + (outp.Kind ?? "");
+        });
+
+    private async void OnWmVerify(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.VerifyWatermark(
+                WmIdBox.Text.Trim(), WmContentBox.Text.Trim());
+            StatusText.Text = (outp.Valid == true ? "\u2713" : "\u2717")
+                + " \u00b7 " + (outp.ContentMatches is null ? "\u2014"
+                    : (outp.ContentMatches == true ? "\u2713" : "\u2717"));
+        });
+
+    private async void OnMedLimits(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.MediaLimits();
+            StatusText.Text = (outp.MaxBytes ?? 0) + " \u00b7 "
+                + string.Join(" \u00b7 ", outp.Kinds ?? Array.Empty<string>());
+        });
+
+    private async void OnMedPlatforms(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.VideoPlatforms();
+            StatusText.Text = string.Join(" \u00b7 ",
+                outp.Platforms ?? Array.Empty<string>());
+        });
+
+    private async void OnMedUpload(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.UploadMedia(
+                AppState.Current.Pid!, MedFilenameBox.Text.Trim(),
+                System.Text.Encoding.UTF8.GetBytes("QRME"),
+                AppState.Current.Token!);
+            MedFilenameBox.Text = "";
+            StatusText.Text = outp.Kind ?? outp.Id ?? "";
+        });
+
+    private async void OnWearList(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.Wearables(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = outp.Wearables.Length + " \u00b7 "
+                + string.Join(" \u00b7 ", outp.Kinds ?? Array.Empty<string>());
+        });
+
+    private async void OnWearPair(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.PairWearable(
+                AppState.Current.Pid!, WearNameBox.Text.Trim(),
+                WearKindBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = (outp.Name ?? "\u2014") + " \u00b7 "
+                + (outp.Kind ?? "");
+        });
+
+    private async void OnWearUnpair(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.UnpairWearable(
+                AppState.Current.Pid!, WearNameBox.Text.Trim(),
+                AppState.Current.Token!);
+            WearNameBox.Text = "";
+            StatusText.Text = outp.Revoked == true ? "\u2713" : "\u2014";
         });
 }

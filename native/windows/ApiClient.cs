@@ -3075,6 +3075,158 @@ public sealed class ApiClient
         string area) =>
         Send<LocalProviderRow>(Post("/providers",
             new { name, area, business = true }));
+
+    // -- The sticker on the street --
+
+    /// <summary>The overlay's read: never the face without the
+    /// disclosure.</summary>
+    public Task<BeaconOverlayCard> BeaconCard(string beaconId) =>
+        Send<BeaconOverlayCard>(Get($"/b/{beaconId}/card"));
+
+    public string BeaconScanUrl(string beaconId) =>
+        Get($"/b/{beaconId}").RequestUri!.ToString();
+
+    public string BeaconQrUrl(string beaconId) =>
+        Get($"/beacons/{beaconId}/qr.svg").RequestUri!.ToString();
+
+    public Task<DeskScanCard> DeskScanCard(string beaconId) =>
+        Send<DeskScanCard>(Get($"/d/{beaconId}/card"));
+
+    public string DeskScanUrl(string beaconId) =>
+        Get($"/d/{beaconId}").RequestUri!.ToString();
+
+    public Task<SocialBeaconCard> SocialBeacon(string cid) =>
+        Send<SocialBeaconCard>(Get($"/social/{cid}/beacon"));
+
+    public string SocialQrUrl(string cid) =>
+        Get($"/social/{cid}/qr.svg").RequestUri!.ToString();
+
+    /// <summary>Same Wi-Fi, no app store.</summary>
+    public Task<PairCard> Pairing() => Send<PairCard>(Get("/pair"));
+
+    public string PairQrUrl() => Get("/pair/qr.svg").RequestUri!.ToString();
+
+    // -- The queue --
+
+    public Task<HeldMessage[]> ModerationQueue(string profileId,
+        string token) =>
+        Send<HeldMessage[]>(Get($"/profiles/{profileId}/moderation/queue",
+            token));
+
+    public Task<ModerationOut> ApproveMessage(string messageId,
+        string token) =>
+        Send<ModerationOut>(Post($"/moderation/{messageId}/approve",
+            new { }, token));
+
+    public Task<ModerationOut> RejectMessage(string messageId,
+        string token) =>
+        Send<ModerationOut>(Post($"/moderation/{messageId}/reject",
+            new { }, token));
+
+    /// <summary>Moderated as a fresh message, and it carries
+    /// forward.</summary>
+    public Task<ModerationOut> EditMessage(string profileId,
+        string messageId, string interactorId, string content, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Patch,
+            $"/profiles/{profileId}/messages/{messageId}")
+        { Content = JsonContent.Create(new
+            { interactor_id = interactorId, content }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ModerationOut>(req);
+    }
+
+    /// <summary>The row survives for the trail; the text stops being
+    /// shown.</summary>
+    public Task<ModerationOut> RetractMessage(string profileId,
+        string messageId, string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/messages/{messageId}")
+        { Content = JsonContent.Create(new
+            { interactor_id = interactorId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ModerationOut>(req);
+    }
+
+    // -- The reviews --
+
+    public Task<ReviewBoard> ReviewsOf(string profileId) =>
+        Send<ReviewBoard>(Get($"/profiles/{profileId}/reviews"));
+
+    /// <summary>One per interactor, edited rather than stacked.</summary>
+    public Task<ReviewOut> LeaveReview(string profileId,
+        string interactorId, int rating, string body, string token)
+    {
+        var payload = new System.Collections.Generic
+            .Dictionary<string, object>
+        { ["interactor_id"] = interactorId, ["rating"] = rating };
+        if (body.Length > 0) payload["body"] = body;
+        return Send<ReviewOut>(Post($"/profiles/{profileId}/reviews",
+            payload, token));
+    }
+
+    // -- The stamp --
+
+    public Task<WatermarkCredential> WatermarkCredentialOf(
+        string watermarkId) =>
+        Send<WatermarkCredential>(Get($"/watermarks/{watermarkId}"));
+
+    /// <summary>Valid + whether the presented content still matches the
+    /// hash issued at creation.</summary>
+    public Task<WatermarkCredential> VerifyWatermark(string watermarkId,
+        string content)
+    {
+        var payload = new System.Collections.Generic
+            .Dictionary<string, object>
+        { ["watermark_id"] = watermarkId };
+        if (content.Length > 0) payload["content"] = content;
+        return Send<WatermarkCredential>(Post("/watermarks/verify",
+            payload));
+    }
+
+    // -- The media --
+
+    public Task<MediaLimitsCard> MediaLimits() =>
+        Send<MediaLimitsCard>(Get("/media/limits"));
+
+    /// <summary>Raw bytes in the body; the kind is read from the
+    /// bytes.</summary>
+    public async Task<MediaOut> UploadMedia(string profileId,
+        string filename, byte[] bytes, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/profiles/{profileId}/media?filename=" +
+            Uri.EscapeDataString(filename))
+        { Content = new ByteArrayContent(bytes) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return await Send<MediaOut>(req);
+    }
+
+    public Task<VideoPlatformBoard> VideoPlatforms() =>
+        Send<VideoPlatformBoard>(Get("/videos/platforms"));
+
+    // -- The wearables --
+
+    /// <summary>A paired device is a screen and a set of buttons.</summary>
+    public Task<WearableBoard> Wearables(string profileId, string token) =>
+        Send<WearableBoard>(Get($"/profiles/{profileId}/wearables", token));
+
+    public Task<WearableRow> PairWearable(string profileId, string name,
+        string kind, string token) =>
+        Send<WearableRow>(Post($"/profiles/{profileId}/wearables",
+            new { name, kind }, token));
+
+    /// <summary>The record survives, so a lost watch cannot come back by
+    /// name.</summary>
+    public Task<WearableRow> UnpairWearable(string profileId, string name,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/wearables/{name}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<WearableRow>(req);
+    }
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
@@ -3972,3 +4124,85 @@ public record LocalProviderRow(
     [property: JsonPropertyName("area")] string? Area,
     [property: JsonPropertyName("location")] string? Location,
     [property: JsonPropertyName("business")] bool? Business);
+
+public record BeaconOverlayCard(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("watermark")] string? Watermark,
+    [property: JsonPropertyName("age_wall")] bool? AgeWall,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record DeskScanCard(
+    [property: JsonPropertyName("desk_id")] string? DeskId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("trade")] string? Trade);
+
+public record SocialBeaconCard(
+    [property: JsonPropertyName("connection")] string Connection,
+    [property: JsonPropertyName("platform")] string? Platform,
+    [property: JsonPropertyName("handle")] string? Handle,
+    [property: JsonPropertyName("presence_url")] string? PresenceUrl);
+
+public record PairCard(
+    [property: JsonPropertyName("console_url")] string? ConsoleUrl,
+    [property: JsonPropertyName("built")] bool? Built);
+
+public record HeldMessage(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    [property: JsonPropertyName("content")] string? Content,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record ModerationOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record ReviewRating(
+    [property: JsonPropertyName("average")] double? Average,
+    [property: JsonPropertyName("count")] int? Count);
+
+public record ReviewRow(
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    [property: JsonPropertyName("rating")] int? Rating,
+    [property: JsonPropertyName("body")] string? Body);
+
+public record ReviewBoard(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("rating")] ReviewRating? Rating,
+    [property: JsonPropertyName("reviews")] ReviewRow[] Reviews);
+
+public record ReviewOut(
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    [property: JsonPropertyName("rating")] int? Rating);
+
+public record WatermarkCredential(
+    [property: JsonPropertyName("watermark_id")] string? WatermarkId,
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("valid")] bool? Valid,
+    [property: JsonPropertyName("content_match")] bool? ContentMatches);
+
+public record MediaLimitsCard(
+    [property: JsonPropertyName("max_bytes")] long? MaxBytes,
+    [property: JsonPropertyName("kinds")] string[]? Kinds);
+
+public record MediaOut(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("ai_marked")] bool? AiMarked);
+
+public record VideoPlatformBoard(
+    [property: JsonPropertyName("platforms")] string[]? Platforms,
+    [property: JsonPropertyName("note")] string? Note);
+
+public record WearableRow(
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("faces")] string[]? Faces,
+    [property: JsonPropertyName("revoked")] bool? Revoked);
+
+public record WearableBoard(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("wearables")] WearableRow[] Wearables,
+    [property: JsonPropertyName("faces")] string[]? Faces,
+    [property: JsonPropertyName("kinds")] string[]? Kinds);

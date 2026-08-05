@@ -3490,6 +3490,173 @@ object ApiClient {
                 .put("business", true))).optString("name")
     }
 
+    // ---- The sticker on the street ----
+
+    /** The overlay's read: never the face without the disclosure. */
+    suspend fun beaconCard(id: String): String {
+        val o = JSONObject(request("/b/$id/card"))
+        return if (o.optBoolean("age_wall")) o.optString("note", "18+")
+               else o.optString("display_name") + " \u00b7 " +
+                   o.optString("watermark")
+    }
+
+    fun beaconScanUrl(id: String): String =
+        java.net.URL("$base/b/$id").toString()
+
+    fun beaconQrUrl(id: String): String =
+        java.net.URL("$base/beacons/$id/qr.svg").toString()
+
+    suspend fun deskScanCard(id: String): String {
+        val o = JSONObject(request("/d/$id/card"))
+        return o.optString("display_name", o.optString("desk_id"))
+    }
+
+    fun deskScanUrl(id: String): String =
+        java.net.URL("$base/d/$id").toString()
+
+    suspend fun socialBeacon(cid: String): String {
+        val o = JSONObject(request("/social/$cid/beacon"))
+        return o.optString("platform") + " \u00b7 " + o.optString("handle")
+    }
+
+    fun socialQrUrl(cid: String): String =
+        java.net.URL("$base/social/$cid/qr.svg").toString()
+
+    /** Same Wi-Fi, no app store. */
+    suspend fun pairing(): String {
+        return JSONObject(request("/pair")).optString("console_url")
+    }
+
+    fun pairQrUrl(): String = java.net.URL("$base/pair/qr.svg").toString()
+
+    // ---- The queue ----
+
+    suspend fun moderationQueue(id: String, token: String): Int {
+        return org.json.JSONArray(
+            request("/profiles/$id/moderation/queue", token = token)).length()
+    }
+
+    suspend fun approveMessage(messageId: String, token: String): String {
+        return JSONObject(request("/moderation/$messageId/approve", "POST",
+            JSONObject(), token)).optString("status")
+    }
+
+    suspend fun rejectMessage(messageId: String, token: String): String {
+        return JSONObject(request("/moderation/$messageId/reject", "POST",
+            JSONObject(), token)).optString("status")
+    }
+
+    /** Moderated as a fresh message, and it carries forward. */
+    suspend fun editMessage(id: String, messageId: String,
+                            interactorId: String, content: String,
+                            token: String): String {
+        return JSONObject(request("/profiles/$id/messages/$messageId",
+            "PATCH", JSONObject().put("interactor_id", interactorId)
+                .put("content", content), token)).optString("status")
+    }
+
+    /** The row survives for the trail; the text stops being shown. */
+    suspend fun retractMessage(id: String, messageId: String,
+                               interactorId: String, token: String): String {
+        return JSONObject(request("/profiles/$id/messages/$messageId",
+            "DELETE", JSONObject().put("interactor_id", interactorId),
+            token)).optString("status")
+    }
+
+    // ---- The reviews ----
+
+    suspend fun reviewsOf(id: String): String {
+        val o = JSONObject(request("/profiles/$id/reviews"))
+        val n = o.getJSONArray("reviews").length()
+        val avg = o.optJSONObject("rating")?.optDouble("average") ?: 0.0
+        return "$n \u00b7 $avg"
+    }
+
+    /** One per interactor, edited rather than stacked. */
+    suspend fun leaveReview(id: String, interactorId: String, rating: Int,
+                            text: String, token: String): Int {
+        val body = JSONObject().put("interactor_id", interactorId)
+            .put("rating", rating)
+        if (text.isNotEmpty()) body.put("body", text)
+        return JSONObject(request("/profiles/$id/reviews", "POST", body,
+            token)).optInt("rating")
+    }
+
+    // ---- The stamp ----
+
+    suspend fun watermarkCredential(id: String): String {
+        val o = JSONObject(request("/watermarks/$id"))
+        return o.optString("profile_id") + " \u00b7 " + o.optString("kind")
+    }
+
+    suspend fun verifyWatermark(id: String, content: String): String {
+        val body = JSONObject().put("watermark_id", id)
+        if (content.isNotEmpty()) body.put("content", content)
+        val o = JSONObject(request("/watermarks/verify", "POST", body))
+        return (if (o.optBoolean("valid")) "\u2713" else "\u2717") +
+            " \u00b7 " + o.optString("content_match", "\u2014")
+    }
+
+    // ---- The media ----
+
+    suspend fun mediaLimits(): String {
+        val o = JSONObject(request("/media/limits"))
+        return o.optInt("max_bytes").toString()
+    }
+
+    /** Raw bytes in the body; the kind is read from the bytes. */
+    suspend fun uploadMedia(id: String, filename: String, bytes: ByteArray,
+                            token: String): String =
+        withContext(Dispatchers.IO) {
+            val q = if (filename.isEmpty()) ""
+                    else "?filename=" +
+                        java.net.URLEncoder.encode(filename, "UTF-8")
+            val conn = (java.net.URL("$base/profiles/$id/media" + q)
+                .openConnection() as java.net.HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("authorization", "Bearer $token")
+                doOutput = true
+            }
+            conn.outputStream.use { it.write(bytes) }
+            val text = (if (conn.responseCode < 300) conn.inputStream
+                        else conn.errorStream).bufferedReader().readText()
+            JSONObject(text).optString("kind", JSONObject(text)
+                .optString("id"))
+        }
+
+    suspend fun videoPlatforms(): String {
+        val arr = JSONObject(request("/videos/platforms"))
+            .optJSONArray("platforms") ?: org.json.JSONArray()
+        return (0 until arr.length()).joinToString(" \u00b7 ") {
+            arr.getString(it)
+        }
+    }
+
+    // ---- The wearables ----
+
+    /** A paired device is a screen and a set of buttons. */
+    suspend fun wearables(id: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/wearables", token = token))
+        val kinds = o.optJSONArray("kinds") ?: org.json.JSONArray()
+        return o.getJSONArray("wearables").length().toString() +
+            " \u00b7 " + (0 until kinds.length()).joinToString(
+                " \u00b7 ") { kinds.getString(it) }
+    }
+
+    suspend fun pairWearable(id: String, name: String, kind: String,
+                             token: String): String {
+        val o = JSONObject(request("/profiles/$id/wearables", "POST",
+            JSONObject().put("name", name).put("kind", kind), token))
+        return o.optString("name") + " \u00b7 " + o.optString("kind")
+    }
+
+    /** The record survives, so a lost watch cannot come back by name. */
+    suspend fun unpairWearable(id: String, name: String,
+                               token: String): Boolean {
+        return JSONObject(request("/profiles/$id/wearables/$name",
+            "DELETE", token = token)).optBoolean("revoked")
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

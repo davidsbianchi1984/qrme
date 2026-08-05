@@ -1034,6 +1034,105 @@
                     <Button x:Name="LifeProvAddButton" Click="OnLifeProvAdd" />
                 </StackPanel>
             </Border>
+
+            <!-- The sticker on the street. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="BcnTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="BcnIdBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="BcnCardButton" Click="OnBcnCard" />
+                        <Button x:Name="BcnDeskButton" Click="OnBcnDesk" />
+                        <Button x:Name="BcnQrButton" Click="OnBcnQr" />
+                    </StackPanel>
+                    <TextBox x:Name="BcnCidBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="BcnSocialButton" Click="OnBcnSocial" />
+                        <Button x:Name="BcnPairButton" Click="OnBcnPair" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The queue. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="ModqTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="ModqShowButton" Click="OnModqShow" />
+                    <TextBox x:Name="ModqMsgBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ModqApproveButton" Click="OnModqApprove" />
+                        <Button x:Name="ModqRejectButton" Click="OnModqReject" />
+                    </StackPanel>
+                    <TextBox x:Name="ModqInteractorBox" />
+                    <TextBox x:Name="ModqContentBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="ModqEditButton" Click="OnModqEdit" />
+                        <Button x:Name="ModqRetractButton" Click="OnModqRetract" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- The reviews. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="RevwTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="RevwShowButton" Click="OnRevwShow" />
+                    <TextBox x:Name="RevwInteractorBox" />
+                    <TextBox x:Name="RevwRatingBox" />
+                    <TextBox x:Name="RevwBodyBox" />
+                    <Button x:Name="RevwLeaveButton" Click="OnRevwLeave" />
+                </StackPanel>
+            </Border>
+
+            <!-- The stamp. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="WmTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="WmIdBox" />
+                    <Button x:Name="WmResolveButton" Click="OnWmResolve" />
+                    <TextBox x:Name="WmContentBox" />
+                    <Button x:Name="WmVerifyButton" Click="OnWmVerify" />
+                </StackPanel>
+            </Border>
+
+            <!-- The media. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MedTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="MedLimitsButton" Click="OnMedLimits" />
+                        <Button x:Name="MedPlatformsButton" Click="OnMedPlatforms" />
+                    </StackPanel>
+                    <TextBox x:Name="MedFilenameBox" />
+                    <Button x:Name="MedUploadButton" Click="OnMedUpload" />
+                </StackPanel>
+            </Border>
+
+            <!-- The wearables. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="WearTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="WearListButton" Click="OnWearList" />
+                    <TextBox x:Name="WearNameBox" />
+                    <TextBox x:Name="WearKindBox" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="WearPairButton" Click="OnWearPair" />
+                        <Button x:Name="WearUnpairButton" Click="OnWearUnpair" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

@@ -2817,6 +2817,12 @@ private fun PeoplePanel(vm: StudioViewModel) {
         AcctBlock(vm) { note = it }
         TillBlock(vm) { note = it }
         LifeBlock(vm) { note = it }
+        BcnBlock(vm) { note = it }
+        ModqBlock(vm) { note = it }
+        RevwBlock(vm) { note = it }
+        WmBlock(vm) { note = it }
+        MedBlock(vm) { note = it }
+        WearBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -4715,6 +4721,199 @@ private fun LifeBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             vm.call({ ApiClient.addLocalProvider(provName, provArea) }) { r ->
                 provName = ""; provArea = ""
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+
+@Composable
+private fun BcnBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var beaconId by remember { mutableStateOf("") }
+    var cid by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("bcn.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("bcn.id", lang), beaconId, "") { beaconId = it }
+        BrandButton(L10n.t("bcn.card", lang),
+            enabled = beaconId.isNotBlank()) {
+            vm.call({ ApiClient.beaconCard(beaconId) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("bcn.desk", lang),
+            enabled = beaconId.isNotBlank()) {
+            vm.call({ ApiClient.deskScanCard(beaconId) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("bcn.qr", lang),
+            enabled = beaconId.isNotBlank()) {
+            onNote(ApiClient.beaconQrUrl(beaconId) + " \u00b7 " +
+                ApiClient.beaconScanUrl(beaconId) + " \u00b7 " +
+                ApiClient.deskScanUrl(beaconId))
+        }
+        labeledField(L10n.t("people.add", lang), cid, "") { cid = it }
+        BrandButton(L10n.t("bcn.social", lang), enabled = cid.isNotBlank()) {
+            vm.call({ ApiClient.socialBeacon(cid) +
+                " \u00b7 " + ApiClient.socialQrUrl(cid) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("bcn.pair", lang)) {
+            vm.call({ ApiClient.pairing() + " \u00b7 " +
+                ApiClient.pairQrUrl() }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun ModqBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var messageId by remember { mutableStateOf("") }
+    var interactorId by remember { mutableStateOf("") }
+    var content by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("modq.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("modq.show", lang)) {
+            vm.call({ ApiClient.moderationQueue(vm.pid!!, vm.token!!) }) { r ->
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("modq.msg", lang), messageId, "") {
+            messageId = it }
+        BrandButton(L10n.t("modq.approve", lang),
+            enabled = messageId.isNotBlank()) {
+            vm.call({ ApiClient.approveMessage(messageId, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("modq.reject", lang),
+            enabled = messageId.isNotBlank()) {
+            vm.call({ ApiClient.rejectMessage(messageId, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("people.add", lang), interactorId, "") {
+            interactorId = it }
+        labeledField(L10n.t("modq.edit", lang), content, "") { content = it }
+        BrandButton(L10n.t("modq.edit", lang),
+            enabled = messageId.isNotBlank() && interactorId.isNotBlank() &&
+                content.isNotBlank()) {
+            vm.call({ ApiClient.editMessage(vm.pid!!, messageId,
+                interactorId, content, vm.token!!) }) { r ->
+                content = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("modq.retract", lang),
+            enabled = messageId.isNotBlank() && interactorId.isNotBlank()) {
+            vm.call({ ApiClient.retractMessage(vm.pid!!, messageId,
+                interactorId, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun RevwBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var interactorId by remember { mutableStateOf("") }
+    var rating by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("revw.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("revw.show", lang)) {
+            vm.call({ ApiClient.reviewsOf(vm.pid!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("people.add", lang), interactorId, "") {
+            interactorId = it }
+        labeledField(L10n.t("revw.rating", lang), rating, "") { rating = it }
+        labeledField(L10n.t("revw.body", lang), text, "") { text = it }
+        BrandButton(L10n.t("revw.leave", lang),
+            enabled = interactorId.isNotBlank() && rating.isNotBlank()) {
+            vm.call({ ApiClient.leaveReview(vm.pid!!, interactorId,
+                rating.toIntOrNull() ?: 0, text, vm.token!!) }) { r ->
+                text = ""
+                onNote(r.getOrNull()?.toString()
+                    ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun WmBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var wmId by remember { mutableStateOf("") }
+    var content by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("wm.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("wm.id", lang), wmId, "") { wmId = it }
+        BrandButton(L10n.t("wm.resolve", lang), enabled = wmId.isNotBlank()) {
+            vm.call({ ApiClient.watermarkCredential(wmId) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("wm.content", lang), content, "") { content = it }
+        BrandButton(L10n.t("wm.verify", lang), enabled = wmId.isNotBlank()) {
+            vm.call({ ApiClient.verifyWatermark(wmId, content) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun MedBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var filename by remember { mutableStateOf("") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("med.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("med.limits", lang)) {
+            vm.call({ ApiClient.mediaLimits() }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("med.platforms", lang)) {
+            vm.call({ ApiClient.videoPlatforms() }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("wear.name", lang), filename, "") {
+            filename = it }
+        BrandButton(L10n.t("med.upload", lang),
+            enabled = filename.isNotBlank()) {
+            vm.call({ ApiClient.uploadMedia(vm.pid!!, filename,
+                "QRME".toByteArray(), vm.token!!) }) { r ->
+                filename = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun WearBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var name by remember { mutableStateOf("") }
+    var kind by remember { mutableStateOf("watch") }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("wear.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("wear.list", lang)) {
+            vm.call({ ApiClient.wearables(vm.pid!!, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("wear.name", lang), name, "") { name = it }
+        labeledField(L10n.t("wear.kind", lang), kind, "") { kind = it }
+        BrandButton(L10n.t("wear.pair", lang),
+            enabled = name.isNotBlank() && kind.isNotBlank()) {
+            vm.call({ ApiClient.pairWearable(vm.pid!!, name, kind,
+                vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        BrandButton(L10n.t("wear.unpair", lang),
+            enabled = name.isNotBlank()) {
+            vm.call({ ApiClient.unpairWearable(vm.pid!!, name,
+                vm.token!!) }) { r ->
+                name = ""
+                onNote(if (r.getOrNull() == true) "\u2713"
+                       else r.exceptionOrNull()?.message) }
         }
     }
 }

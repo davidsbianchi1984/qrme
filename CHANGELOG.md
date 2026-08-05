@@ -4,6 +4,30 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.1] — 2026-08-05
+
+### The sticker, the queue and the stamp
+
+Six more blocks off the per-shell doorless record — the beacon a
+stranger scans on the street (with the desk sticker, the social
+presence beacon, and pairing the console onto a phone), the moderation
+queue the owner works, the reviews readers trust, the watermark that
+proves provenance, the media that rides the wall, and the wearables on
+the wrist. What they share is the street: every one is where the
+product meets somebody who did not open the app on purpose.
+
+Twenty-four routes gain doors on iOS, Android and Windows — **71 rows
+struck**; the records fall to ios 21 / android 26 / windows 24, under
+a guard that renders the rules rather than inventing them: the overlay
+never draws the face without the disclosure; only the owner moderates
+and a resolved message stays resolved; you can change what you said
+and take it back, with the row surviving for the trail; a review
+requires having actually talked to it; a real credential on altered
+content says both things; the caps are published before an upload
+fails and authentic media is never AI-marked; a room-facing microphone
+is refused with the reason. Thirty-four interface strings arrive in
+all ten languages on all three shells.
+
 ## [0.44.0] — 2026-08-05
 
 ### The keys, the till and the lifeline

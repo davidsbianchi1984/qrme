@@ -4064,6 +4064,175 @@ struct SpecialistRow: Decodable {
         if !contact.isEmpty { body["contact"] = contact }
         return try await request("/providers", method: "POST", body: body)
     }
+
+    // -- the sticker on the street --
+
+    /// The in-camera overlay's read: who it is, one line of portrait, and
+    /// the mark — never the face without the disclosure to draw with it.
+    func beaconCard(id: String) async throws -> BeaconOverlayCard {
+        try await request("/b/\(id)/card")
+    }
+
+    /// Where the printed QR actually points; a phone camera opens URLs.
+    func beaconScanUrl(id: String) -> URL {
+        base.appendingPathComponent("/b/\(id)")
+    }
+
+    func beaconQrUrl(id: String) -> URL {
+        base.appendingPathComponent("/beacons/\(id)/qr.svg")
+    }
+
+    func deskScanCard(id: String) async throws -> DeskScanCard {
+        try await request("/d/\(id)/card")
+    }
+
+    func deskScanUrl(id: String) -> URL {
+        base.appendingPathComponent("/d/\(id)")
+    }
+
+    func socialBeacon(cid: String) async throws -> SocialBeaconCard {
+        try await request("/social/\(cid)/beacon")
+    }
+
+    func socialQrUrl(cid: String) -> URL {
+        base.appendingPathComponent("/social/\(cid)/qr.svg")
+    }
+
+    /// Same Wi-Fi, no app store: the console's URL on this network.
+    func pairing() async throws -> PairCard {
+        try await request("/pair")
+    }
+
+    func pairQrUrl() -> URL {
+        base.appendingPathComponent("/pair/qr.svg")
+    }
+
+    // -- the queue --
+
+    func moderationQueue(id: String,
+                         token: String) async throws -> [HeldMessage] {
+        try await request("/profiles/\(id)/moderation/queue", token: token)
+    }
+
+    func approveMessage(messageId: String,
+                        token: String) async throws -> ModerationOut {
+        try await request("/moderation/\(messageId)/approve",
+                          method: "POST", body: [:], token: token)
+    }
+
+    func rejectMessage(messageId: String,
+                       token: String) async throws -> ModerationOut {
+        try await request("/moderation/\(messageId)/reject",
+                          method: "POST", body: [:], token: token)
+    }
+
+    /// Moderated as a fresh message, and it carries forward — the next
+    /// reply reasons from the correction rather than the original.
+    func editMessage(id: String, messageId: String, interactorId: String,
+                     content: String, token: String) async throws -> ModerationOut {
+        try await request("/profiles/\(id)/messages/\(messageId)",
+                          method: "PATCH",
+                          body: ["interactor_id": interactorId,
+                                 "content": content], token: token)
+    }
+
+    /// The row survives for the moderation trail; the text stops being
+    /// shown.
+    func retractMessage(id: String, messageId: String, interactorId: String,
+                        token: String) async throws -> ModerationOut {
+        try await request("/profiles/\(id)/messages/\(messageId)",
+                          method: "DELETE",
+                          body: ["interactor_id": interactorId],
+                          token: token)
+    }
+
+    // -- the reviews --
+
+    func reviewsOf(id: String) async throws -> ReviewBoard {
+        try await request("/profiles/\(id)/reviews")
+    }
+
+    /// One per interactor, edited rather than stacked — and it requires
+    /// having actually talked to it.
+    func leaveReview(id: String, interactorId: String, rating: Int,
+                     text: String, token: String) async throws -> ReviewOut {
+        var body: [String: Any] = ["interactor_id": interactorId,
+                                   "rating": rating]
+        if !text.isEmpty { body["body"] = text }
+        return try await request("/profiles/\(id)/reviews",
+                                 method: "POST", body: body, token: token)
+    }
+
+    // -- the stamp --
+
+    func watermarkCredential(id: String) async throws -> WatermarkCredential {
+        try await request("/watermarks/\(id)")
+    }
+
+    /// Valid + whether the presented content still matches the hash
+    /// issued at creation.
+    func verifyWatermark(id: String,
+                         content: String) async throws -> WatermarkCredential {
+        var body: [String: Any] = ["watermark_id": id]
+        if !content.isEmpty { body["content"] = content }
+        return try await request("/watermarks/verify", method: "POST",
+                                 body: body)
+    }
+
+    // -- the media --
+
+    /// Published so a client can say so before an upload fails.
+    func mediaLimits() async throws -> MediaLimits {
+        try await request("/media/limits")
+    }
+
+    /// One photo, video or document, raw in the request body.
+    func uploadMedia(id: String, filename: String, data: Data,
+                     token: String) async throws -> MediaOut {
+        var url = base.appendingPathComponent("/profiles/\(id)/media")
+        if !filename.isEmpty,
+           var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            parts.queryItems = [URLQueryItem(name: "filename",
+                                             value: filename)]
+            url = parts.url ?? url
+        }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = data
+        let (out, resp) = try await URLSession.shared.data(for: req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("upload failed")
+        }
+        return try JSONDecoder().decode(MediaOut.self, from: out)
+    }
+
+    func videoPlatforms() async throws -> VideoPlatformBoard {
+        try await request("/videos/platforms")
+    }
+
+    // -- the wearables --
+
+    /// A paired device here is a screen and a set of buttons — no sensor
+    /// stream, no capture, nothing about a microphone.
+    func wearables(id: String, token: String) async throws -> WearableBoard {
+        try await request("/profiles/\(id)/wearables", token: token)
+    }
+
+    func pairWearable(id: String, name: String, kind: String,
+                      token: String) async throws -> WearableRow {
+        try await request("/profiles/\(id)/wearables", method: "POST",
+                          body: ["name": name, "kind": kind], token: token)
+    }
+
+    /// The record survives, so a device sent away cannot come back by
+    /// re-presenting the same name.
+    func unpairWearable(id: String, name: String,
+                        token: String) async throws -> WearableRow {
+        try await request("/profiles/\(id)/wearables/\(name)",
+                          method: "DELETE", token: token)
+    }
 }
 
 struct MemoryRow: Decodable, Identifiable {
@@ -4450,4 +4619,108 @@ struct LocalProviderRow: Decodable, Identifiable {
     let location: String?
     let contact: String?
     let business: Bool?
+}
+
+struct BeaconOverlayCard: Decodable {
+    let profile_id: String?
+    let display_name: String?
+    let watermark: String?
+    let age_wall: Bool?
+    let rated: Bool?
+    let note: String?
+}
+
+struct DeskScanCard: Decodable {
+    let desk_id: String?
+    let display_name: String?
+    let trade: String?
+    let age_wall: Bool?
+}
+
+struct SocialBeaconCard: Decodable {
+    let connection: String
+    let platform: String?
+    let handle: String?
+    let presence_url: String?
+    let qr_svg: String?
+}
+
+struct PairCard: Decodable {
+    let console_url: String?
+    let built: Bool?
+    let how: [String]?
+}
+
+struct HeldMessage: Decodable, Identifiable {
+    let id: String
+    let interactor_id: String?
+    let content: String?
+    let status: String?
+    let created_at: String?
+}
+
+struct ModerationOut: Decodable {
+    let id: String?
+    let status: String?
+}
+
+struct ReviewBoard: Decodable {
+    struct Rating: Decodable {
+        let average: Double?
+        let count: Int?
+    }
+    struct Row: Decodable {
+        let interactor_id: String?
+        let rating: Int?
+        let body: String?
+    }
+    let profile_id: String?
+    let rating: Rating?
+    let reviews: [Row]
+}
+
+struct ReviewOut: Decodable {
+    let interactor_id: String?
+    let rating: Int?
+}
+
+struct WatermarkCredential: Decodable {
+    let watermark_id: String?
+    let profile_id: String?
+    let kind: String?
+    let valid: Bool?
+    let content_match: Bool?
+    let issued_at: String?
+}
+
+struct MediaLimits: Decodable {
+    let max_bytes: Int?
+    let kinds: [String]?
+    let note: String?
+}
+
+struct MediaOut: Decodable {
+    let id: String?
+    let kind: String?
+    let ai_marked: Bool?
+}
+
+struct VideoPlatformBoard: Decodable {
+    let platforms: [String]?
+    let note: String?
+}
+
+struct WearableRow: Decodable {
+    let name: String?
+    let kind: String?
+    let faces: [String]?
+    let revoked: Bool?
+}
+
+struct WearableBoard: Decodable {
+    let profile_id: String?
+    let wearables: [WearableRow]
+    let faces: [String]?
+    let kinds: [String]?
+    let refused: [String: String]?
 }

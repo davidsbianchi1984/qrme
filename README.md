@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.44.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.44.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.44.1** | **The sticker, the queue and the stamp** — beacons/QR and pairing, the moderation queue with message edit/retract, reviews, watermark resolution and tamper-check, media upload and wearables reach all three shells; **71 doorless rows struck**, records fall to ios 21 / android 26 / windows 24 |
 | **0.44.0** | **The keys, the till and the lifeline** — accounts (signup, sign-in, verification, reset, OAuth), money (plans, subscriptions, orders, proceeds, campaigns) and status+help reach all three shells; **72 doorless rows struck**, records fall to ios 45 / android 49 / windows 48 |
 | **0.43.9** | **The face it shows the world** — the portrait, the emblem and badge, the page and themes, the front, the surfaces, the blend, the bodies, the dials and the wrist reach all three shells; **72 doorless rows struck**, records fall to ios 69 / android 73 / windows 72 |
 | **0.43.8** | Version alignment with JIM's watch-picker round (device picker, Fitbit seed, Bluetooth pairing) |

@@ -241,6 +241,12 @@ struct PeopleSection: View {
                 KeysSection()
                 TillSection()
                 LifelineSection()
+                BeaconSection()
+                QueueSection()
+                ReviewSection()
+                StampSection()
+                MediaSection()
+                WearableSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)
