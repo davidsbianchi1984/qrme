@@ -4,6 +4,27 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.4] — 2026-08-05
+
+### The refusal names a field, and the form did not name it at all
+
+`_FIELD_LABELS` puts the label a person can see into the 422 that names a
+field. The record of what is *not* mapped explains its own fallback: an
+identifier a reader can match to the form beats a word invented for them.
+That paragraph was doing two jobs. *Nobody labels it* was the reason not to
+invent a word, and it had quietly become the reason not to look.
+
+**Signature id** is QRME's one. The release box on Referrals had a
+placeholder and no name, so a 422 saying `signature_id` had nothing on the
+screen to match. The label is now `ref.sign.sid`, in ten languages, ported
+from the placeholder's own opening words; the field is mapped from the same
+wording, so the sentence and the box agree by construction.
+
+The record: 124 → 123. PDI's went 91 → 51 the same way — forty of its rows
+had a control and no label — and JIM's 100 → 99.
+
+Cut together with JIM-mini and PDI at app-v0.46.4.
+
 ## [0.46.3] — 2026-08-05
 
 ### The console record reaches its floor

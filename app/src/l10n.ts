@@ -2625,6 +2625,9 @@ const CHROME: Table = {
   "ref.sign.go": {
     en: "Sign it with your device", es: "Fírmalo con tu dispositivo", fr: "Signez-le avec votre appareil", de: "Mit Ihrem Gerät unterschreiben", pt: "Assine com o seu dispositivo", it: "Firmalo con il tuo dispositivo", ja: "デバイスで署名する", zh: "用你的设备签名", hi: "अपने डिवाइस से हस्ताक्षर करें", ar: "وقّعه بجهازك",
   },
+  "ref.sign.sid": {
+    en: "Signature id", es: "Id de firma", fr: "Id de signature", de: "Signatur-Id", pt: "Id de assinatura", it: "Id di firma", ja: "署名ID", zh: "签名ID", hi: "हस्ताक्षर आईडी", ar: "معرّف التوقيع",
+  },
   "ref.sign.sid.ph": {
     en: "the signature id the ceremony gave back", es: "el id de firma que devolvió la ceremonia", fr: "l'id de signature rendu par la cérémonie", de: "die Signatur-Id, die die Zeremonie zurückgab", pt: "o id de assinatura que a cerimónia devolveu", it: "l'id di firma restituito dalla cerimonia", ja: "セレモニーが返した署名ID", zh: "仪式返回的签名ID", hi: "समारोह से मिली हस्ताक्षर आईडी", ar: "معرّف التوقيع الذي أعادته المراسم",
   },

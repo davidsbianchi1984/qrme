@@ -191,10 +191,13 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
             {/* `signature_id`, not `envelope_id` — the ceremony returns the
                 first and the card above shows the second, and release
                 checks the first. */}
-            <input value={signatureId}
-                   onChange={(e) => setSignatureId(e.target.value)}
-                   placeholder={tr("ref.sign.sid.ph", lang)}
-                   style={{ flex: 1 }} />
+            {/* The box had a placeholder and no name, so a 422 naming
+                `signature_id` had nothing on the form to match it to. */}
+            <label style={{ flex: 1 }}>{tr("ref.sign.sid", lang)}
+              <input value={signatureId}
+                     onChange={(e) => setSignatureId(e.target.value)}
+                     placeholder={tr("ref.sign.sid.ph", lang)} />
+            </label>
             <button disabled={busy || !signatureId.trim()}
                     onClick={act(async () => {
                       const r = await api.releaseReferral(

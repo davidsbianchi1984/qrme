@@ -3093,7 +3093,8 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'viewer_id': {'en': 'Viewer id', 'es': 'Id del espectador', 'fr': 'Id du spectateur', 'de': 'Zuschauer-ID', 'pt': 'Id do espectador', 'it': 'Id dello spettatore', 'ja': '視聴者ID', 'zh': '观看者 id', 'hi': 'दर्शक आईडी', 'ar': 'معرّف المشاهد'},
     'viewer_kind': {'en': 'Viewer kind', 'es': 'Tipo de espectador', 'fr': 'Type de spectateur', 'de': 'Zuschauerart', 'pt': 'Tipo de espectador', 'it': 'Tipo di spettatore', 'ja': '視聴者種別', 'zh': '观看者类型', 'hi': 'दर्शक प्रकार', 'ar': 'نوع المشاهد'},
     'what': {'en': 'What', 'es': 'Qué', 'fr': 'Quoi', 'de': 'Was', 'pt': 'O quê', 'it': 'Cosa', 'ja': '内容', 'zh': '内容', 'hi': 'क्या', 'ar': 'ماذا'},
-    'work': {'en': 'Work', 'es': 'Trabajo', 'fr': 'Travail', 'de': 'Arbeit', 'pt': 'Trabalho', 'it': 'Lavoro', 'ja': '作業', 'zh': '工作', 'hi': 'काम', 'ar': 'العمل'},
+    'work': {'en': 'Work', 'es': 'Trabajo', 'fr': 'Travail', 'de': 'Arbeit', 'pt': 'Trabalho', 'it': 'Lavoro', 'ja': '作業', 'zh': '工作', 'hi': 'काम', 'ar': 'العمل'},    'signature_id': {'en': 'Signature id', 'es': 'Id de firma', 'fr': 'Id de signature', 'de': 'Signatur-Id', 'pt': 'Id de assinatura', 'it': 'Id di firma', 'ja': '署名ID', 'zh': '签名ID', 'hi': 'हस्ताक्षर आईडी', 'ar': 'معرّف التوقيع'},
+
 }
 
 
