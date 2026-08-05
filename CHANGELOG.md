@@ -4,6 +4,29 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.0] — 2026-08-05
+
+### Under a thousand
+
+Two screens, and the console-untranslated record crosses back into
+three figures for the first time: **1072 → 978**.
+
+The **Workshop** — the source material a profile is built from with
+the custody line drawn in plain sight, the dials that shape manner and
+never permissions, the CV, the specialists it hands work to, the forms
+it speaks through, the local fine-tune, and the public signature a
+stranger can check without an account — becomes forty-five `wsh.*`
+keys from forty-eight strings.
+
+**Bodies** — the market of robots checked against what the makers were
+actually saying, the binding, the task packs fitted to a particular
+machine rather than to the profile, the connectors, the command
+allowlist, what each skill will *not* do, and the owner-only log of
+everything a body in somebody's home has been told — becomes
+thirty-seven `rbt.*` keys from forty-six strings.
+
+All ten languages, exact-sync held in both directions.
+
 ## [0.44.9] — 2026-08-05
 
 ### Who this profile is, in every language

@@ -2997,6 +2997,252 @@ const CHROME: Table = {
   "idn.end.zeros": {
     en: "{n} other kinds of record had nothing to erase.", es: "Otros {n} tipos de registro no tenían nada que borrar.", fr: "{n} autres sortes d'enregistrement n'avaient rien à effacer.", de: "{n} andere Arten von Datensätzen hatten nichts zu löschen.", pt: "Outros {n} tipos de registo não tinham nada para apagar.", it: "Altri {n} tipi di record non avevano nulla da cancellare.", ja: "他の{n}種類のレコードには消すものがありませんでした。", zh: "另有{n}类记录没有可抹除的内容。", hi: "अन्य {n} प्रकार के रिकॉर्ड में मिटाने को कुछ नहीं था।", ar: "لم يكن لدى {n} أنواع أخرى من السجلات ما يُمحى.",
   },
+  "wsh.title": {
+    en: "What it is made of", es: "De qué está hecho", fr: "De quoi c'est fait", de: "Woraus es besteht", pt: "De que é feito", it: "Di cosa è fatto", ja: "何でできているか", zh: "它由什么构成", hi: "यह किससे बना है", ar: "مما هو مصنوع",
+  },
+  "wsh.lead": {
+    en: "The material a profile is built from, the manner it comes across in, and everything it can hand on to somebody who knows more.", es: "El material con el que se construye un perfil, la manera en que se presenta, y todo lo que puede pasar a alguien que sabe más.", fr: "La matière dont un profil est fait, la manière dont il se présente, et tout ce qu'il peut transmettre à quelqu'un qui en sait plus.", de: "Das Material, aus dem ein Profil gebaut ist, die Art, wie es rüberkommt, und alles, was es an jemanden weitergeben kann, der mehr weiß.", pt: "O material de que um perfil é feito, a maneira como se apresenta, e tudo o que pode passar a alguém que saiba mais.", it: "Il materiale di cui è fatto un profilo, il modo in cui si presenta, e tutto ciò che può passare a qualcuno che ne sa di più.", ja: "プロフィールを形づくる素材、その伝わり方、そしてより詳しい誰かへ渡せるすべて。", zh: "构成一份资料的材料、它给人的感觉，以及它能转交给更懂行者的一切。", hi: "जिस सामग्री से प्रोफ़ाइल बनी है, जिस ढंग से वह सामने आती है, और वह सब जो वह किसी अधिक जानकार को सौंप सकती है।", ar: "المادة التي يُبنى منها الملف، والطريقة التي يظهر بها، وكل ما يمكنه تسليمه لمن يعرف أكثر.",
+  },
+  "wsh.same": {
+    en: "The same personality, wherever it is met", es: "La misma personalidad, dondequiera que se la encuentre", fr: "La même personnalité, où qu'on la rencontre", de: "Dieselbe Persönlichkeit, wo immer man ihr begegnet", pt: "A mesma personalidade, onde quer que se a encontre", it: "La stessa personalità, ovunque la si incontri", ja: "どこで出会っても同じ人格", zh: "无论在哪里遇见，都是同一个性情", hi: "वही व्यक्तित्व, कहीं भी मिले", ar: "الشخصية نفسها، أينما قوبلت",
+  },
+  "wsh.same.sig": {
+    en: "Signature {sig} · invariant across {across}.", es: "Firma {sig} · invariante en {across}.", fr: "Signature {sig} · invariante sur {across}.", de: "Signatur {sig} · invariant über {across}.", pt: "Assinatura {sig} · invariante em {across}.", it: "Firma {sig} · invariante su {across}.", ja: "署名 {sig} · {across}をまたいで不変。", zh: "签名 {sig} · 在{across}间保持不变。", hi: "हस्ताक्षर {sig} · {across} में अपरिवर्तित।", ar: "التوقيع {sig} · ثابت عبر {across}.",
+  },
+  "wsh.same.public": {
+    en: "This check is public — anybody who meets {name} in any form can look up this signature from the sign-in page, with no profile of their own.", es: "Esta comprobación es pública — cualquiera que se encuentre con {name} en cualquier forma puede consultar esta firma desde la página de inicio de sesión, sin perfil propio.", fr: "Cette vérification est publique — quiconque rencontre {name} sous n'importe quelle forme peut consulter cette signature depuis la page de connexion, sans profil à lui.", de: "Diese Prüfung ist öffentlich — wer {name} in irgendeiner Form begegnet, kann diese Signatur von der Anmeldeseite aus nachschlagen, ganz ohne eigenes Profil.", pt: "Esta verificação é pública — qualquer pessoa que encontre {name} sob qualquer forma pode consultar esta assinatura na página de início de sessão, sem perfil próprio.", it: "Questo controllo è pubblico — chiunque incontri {name} in qualsiasi forma può cercare questa firma dalla pagina di accesso, senza avere un profilo.", ja: "この確認は公開されています — どんな形であれ{name}に出会った人は、自分のプロフィールを持たなくても、サインインページからこの署名を照会できます。", zh: "这项核验是公开的 — 任何以任何形式遇见{name}的人，都可以从登录页查询这个签名，无需拥有自己的资料。", hi: "यह जाँच सार्वजनिक है — जो कोई भी {name} से किसी भी रूप में मिले, वह बिना अपना प्रोफ़ाइल बनाए साइन-इन पृष्ठ से यह हस्ताक्षर देख सकता है।", ar: "هذا الفحص علني — كل من يلتقي {name} بأي صورة يمكنه البحث عن هذا التوقيع من صفحة الدخول، دون ملف خاص به.",
+  },
+  "wsh.same.also": {
+    en: "Also present on: {list}.", es: "También presente en: {list}.", fr: "Également présent sur : {list}.", de: "Ebenfalls vorhanden auf: {list}.", pt: "Também presente em: {list}.", it: "Presente anche su: {list}.", ja: "次にも存在します: {list}。", zh: "同样出现在: {list}。", hi: "यहाँ भी मौजूद: {list}।", ar: "موجود أيضًا على: {list}.",
+  },
+  "wsh.steer": {
+    en: "How it comes across", es: "Cómo se presenta", fr: "Comment il se présente", de: "Wie es rüberkommt", pt: "Como se apresenta", it: "Come si presenta", ja: "どう伝わるか", zh: "它给人的感觉", hi: "यह कैसे सामने आता है", ar: "كيف يظهر",
+  },
+  "wsh.steer.pitch": {
+    en: "Manner, not permissions. Steering never touches identity, boundaries, age-gating, or what the profile may be asked to do.", es: "Maneras, no permisos. El ajuste nunca toca la identidad, los límites, el control de edad ni lo que se le puede pedir al perfil.", fr: "La manière, pas les permissions. Le réglage ne touche jamais l'identité, les limites, le contrôle d'âge, ni ce qu'on peut demander au profil.", de: "Art, nicht Rechte. Die Steuerung berührt nie Identität, Grenzen, Altersprüfung oder das, worum das Profil gebeten werden darf.", pt: "Maneiras, não permissões. O ajuste nunca toca a identidade, os limites, o controlo de idade, nem o que se pode pedir ao perfil.", it: "Modi, non permessi. La regolazione non tocca mai identità, confini, verifica dell'età, o cosa si può chiedere al profilo.", ja: "権限ではなく物腰の設定です。ステアリングが、身元・境界・年齢確認・プロフィールに頼めることに触れることはありません。", zh: "调的是态度，不是权限。这些旋钮从不触及身份、边界、年龄限制，也不改变可以要求资料做什么。", hi: "यह ढंग है, अनुमतियाँ नहीं। स्टीयरिंग कभी पहचान, सीमाओं, आयु-द्वार, या प्रोफ़ाइल से क्या माँगा जा सकता है — इन्हें नहीं छूती।", ar: "أسلوب لا صلاحيات. التوجيه لا يمسّ الهوية ولا الحدود ولا بوابة العمر ولا ما يجوز أن يُطلب من الملف.",
+  },
+  "wsh.steer.noadult": {
+    en: "This is not an adult-mode profile, so the intimacy dial does not exist here at all.", es: "Este no es un perfil en modo adulto, así que el dial de intimidad no existe aquí en absoluto.", fr: "Ce n'est pas un profil en mode adulte, donc le réglage d'intimité n'existe pas ici du tout.", de: "Dies ist kein Profil im Erwachsenenmodus, daher gibt es den Intimitätsregler hier gar nicht.", pt: "Este não é um perfil em modo adulto, por isso o botão de intimidade não existe aqui de todo.", it: "Questo non è un profilo in modalità adulti, quindi la manopola dell'intimità qui non esiste affatto.", ja: "これはアダルトモードのプロフィールではないため、親密さのつまみはここには存在しません。", zh: "这不是成人模式的资料，因此这里根本不存在亲密度旋钮。", hi: "यह वयस्क-मोड प्रोफ़ाइल नहीं है, इसलिए यहाँ अंतरंगता डायल है ही नहीं।", ar: "هذا ليس ملفًا في وضع البالغين، لذا لا وجود لقرص الحميمية هنا إطلاقًا.",
+  },
+  "wsh.knows": {
+    en: "What it knows", es: "Lo que sabe", fr: "Ce qu'il sait", de: "Was es weiß", pt: "O que sabe", it: "Cosa sa", ja: "何を知っているか", zh: "它知道什么", hi: "यह क्या जानता है", ar: "ما يعرفه",
+  },
+  "wsh.knows.pitch": {
+    en: "Source material: the writing, conversations and life events the persona is built on.", es: "Material de origen: los escritos, conversaciones y hechos de vida sobre los que se construye la persona.", fr: "Matière première : les écrits, conversations et événements de vie sur lesquels le personnage est bâti.", de: "Quellmaterial: die Texte, Gespräche und Lebensereignisse, auf denen die Persona aufbaut.", pt: "Material de origem: os escritos, conversas e acontecimentos de vida sobre os quais a persona é construída.", it: "Materiale d'origine: scritti, conversazioni ed eventi di vita su cui è costruita la persona.", ja: "素材：このペルソナが築かれている文章、会話、人生の出来事。", zh: "源材料：这个人格所依托的文字、对话与人生事件。", hi: "स्रोत सामग्री: वे लेख, बातचीत और जीवन-घटनाएँ जिन पर यह व्यक्तित्व बना है।", ar: "المادة المصدر: الكتابات والمحادثات وأحداث الحياة التي بُنيت عليها الشخصية.",
+  },
+  "wsh.knows.what.ph": {
+    en: "what it is", es: "qué es", fr: "ce que c'est", de: "was es ist", pt: "o que é", it: "cos'è", ja: "それが何か", zh: "这是什么", hi: "यह क्या है", ar: "ما هو",
+  },
+  "wsh.knows.body.ph": {
+    en: "the material itself", es: "el material en sí", fr: "la matière elle-même", de: "das Material selbst", pt: "o próprio material", it: "il materiale stesso", ja: "素材そのもの", zh: "材料本身", hi: "स्वयं सामग्री", ar: "المادة نفسها",
+  },
+  "wsh.knows.add": {
+    en: "Add it", es: "Añadirlo", fr: "L'ajouter", de: "Hinzufügen", pt: "Adicioná-lo", it: "Aggiungilo", ja: "追加する", zh: "添加", hi: "जोड़ें", ar: "أضفه",
+  },
+  "wsh.knows.none": {
+    en: "Nothing added yet.", es: "Nada añadido todavía.", fr: "Rien d'ajouté pour l'instant.", de: "Noch nichts hinzugefügt.", pt: "Nada adicionado ainda.", it: "Ancora niente aggiunto.", ja: "まだ何も追加されていません。", zh: "尚未添加任何内容。", hi: "अभी कुछ नहीं जोड़ा गया।", ar: "لم يُضف شيء بعد.",
+  },
+  "wsh.knows.sealed": {
+    en: "Sealed in the vault. Only the reference is held here.", es: "Sellado en la bóveda. Aquí solo se guarda la referencia.", fr: "Scellé dans le coffre. Seule la référence est conservée ici.", de: "Im Tresor versiegelt. Hier wird nur die Referenz gehalten.", pt: "Selado no cofre. Só a referência é guardada aqui.", it: "Sigillato nel caveau. Qui si conserva solo il riferimento.", ja: "保管庫に封印済み。ここに保持されるのは参照だけです。", zh: "已封入保险库。此处只保存引用。", hi: "तिजोरी में सील। यहाँ केवल संदर्भ रखा गया है।", ar: "مختوم في الخزنة. لا يُحفظ هنا سوى المرجع.",
+  },
+  "wsh.knows.clear": {
+    en: "Stored in the clear on this deployment — that is what you are looking at.", es: "Almacenado en claro en este despliegue — eso es lo que estás viendo.", fr: "Stocké en clair sur ce déploiement — c'est ce que vous avez sous les yeux.", de: "Auf diesem Deployment im Klartext gespeichert — genau das sehen Sie hier.", pt: "Guardado em claro neste deployment — é isso que está a ver.", it: "Memorizzato in chiaro su questo deployment — è proprio ciò che stai guardando.", ja: "この配備では平文で保存されています — いま見ているのがそれです。", zh: "在本部署上以明文存储 — 你看到的就是它。", hi: "इस डिप्लॉयमेंट पर खुले रूप में संग्रहित — आप वही देख रहे हैं।", ar: "مخزّن بلا تشفير على هذا النشر — وهذا ما تنظر إليه.",
+  },
+  "wsh.spec": {
+    en: "Who it hands work to", es: "A quién pasa el trabajo", fr: "À qui il confie le travail", de: "An wen es Arbeit weitergibt", pt: "A quem passa o trabalho", it: "A chi passa il lavoro", ja: "仕事を誰に渡すか", zh: "它把活交给谁", hi: "यह काम किसे सौंपता है", ar: "لمن يسلّم العمل",
+  },
+  "wsh.spec.pitch": {
+    en: "A domain, and the profile that knows more about it. A question in that domain goes there instead of being guessed at here.", es: "Un dominio, y el perfil que sabe más de él. Una pregunta de ese dominio va allí en vez de adivinarse aquí.", fr: "Un domaine, et le profil qui en sait plus. Une question dans ce domaine y va au lieu d'être devinée ici.", de: "Ein Fachgebiet und das Profil, das mehr davon versteht. Eine Frage aus dem Gebiet geht dorthin, statt hier geraten zu werden.", pt: "Um domínio, e o perfil que sabe mais dele. Uma pergunta desse domínio vai para lá em vez de ser adivinhada aqui.", it: "Un dominio, e il profilo che ne sa di più. Una domanda in quel dominio va lì invece di essere indovinata qui.", ja: "ある領域と、その領域により詳しいプロフィール。その領域の問いは、ここで推測されるのではなくそちらへ回されます。", zh: "一个领域，以及更懂这个领域的资料。该领域的问题会转过去，而不是在这里靠猜。", hi: "एक क्षेत्र, और वह प्रोफ़ाइल जो उसके बारे में अधिक जानती है। उस क्षेत्र का प्रश्न यहाँ अनुमान लगाने के बजाय वहाँ जाता है।", ar: "مجال، والملف الذي يعرف عنه أكثر. السؤال في ذلك المجال يذهب إلى هناك بدل أن يُخمَّن هنا.",
+  },
+  "wsh.spec.domain.ph": {
+    en: "a domain, e.g. plumbing", es: "un dominio, p. ej. fontanería", fr: "un domaine, p. ex. plomberie", de: "ein Gebiet, z. B. Sanitär", pt: "um domínio, p. ex. canalização", it: "un dominio, es. idraulica", ja: "領域（例: 配管）", zh: "一个领域，如管道维修", hi: "एक क्षेत्र, जैसे नलसाज़ी", ar: "مجال، مثل السباكة",
+  },
+  "wsh.spec.id.ph": {
+    en: "the specialist's profile id", es: "el id de perfil del especialista", fr: "l'id de profil du spécialiste", de: "die Profil-Id des Spezialisten", pt: "o id de perfil do especialista", it: "l'id di profilo dello specialista", ja: "専門家のプロフィールID", zh: "该专家的资料ID", hi: "विशेषज्ञ की प्रोफ़ाइल आईडी", ar: "معرّف ملف المختص",
+  },
+  "wsh.spec.attach": {
+    en: "Attach", es: "Adjuntar", fr: "Rattacher", de: "Anhängen", pt: "Anexar", it: "Collega", ja: "紐付ける", zh: "挂接", hi: "जोड़ें", ar: "أرفق",
+  },
+  "wsh.spec.none": {
+    en: "Nothing handed on.", es: "Nada delegado.", fr: "Rien de transmis.", de: "Nichts weitergegeben.", pt: "Nada delegado.", it: "Niente passato ad altri.", ja: "渡しているものはありません。", zh: "尚未转交任何事。", hi: "कुछ नहीं सौंपा गया।", ar: "لم يُسلَّم شيء.",
+  },
+  "wsh.exp": {
+    en: "What it has done", es: "Lo que ha hecho", fr: "Ce qu'il a fait", de: "Was es getan hat", pt: "O que fez", it: "Cosa ha fatto", ja: "何をしてきたか", zh: "它做过什么", hi: "इसने क्या किया है", ar: "ما فعله",
+  },
+  "wsh.exp.pitch": {
+    en: "Replaced whole rather than edited row by row — a history is a statement, not a set of fields.", es: "Se reemplaza entero en vez de editarse fila a fila — una trayectoria es una declaración, no un conjunto de campos.", fr: "Remplacé en entier plutôt que modifié ligne par ligne — un parcours est une déclaration, pas un ensemble de champs.", de: "Ganz ersetzt statt Zeile für Zeile bearbeitet — ein Werdegang ist eine Aussage, kein Satz Felder.", pt: "Substituído por inteiro em vez de editado linha a linha — um percurso é uma declaração, não um conjunto de campos.", it: "Sostituito per intero invece che modificato riga per riga — una storia è una dichiarazione, non un insieme di campi.", ja: "行ごとの編集ではなく丸ごと差し替えます — 経歴はフィールドの集まりではなく、ひとつの表明だからです。", zh: "整体替换，而非逐行编辑 — 一段履历是一份声明，不是一组字段。", hi: "पंक्ति-दर-पंक्ति संपादन के बजाय पूरा बदला जाता है — इतिहास एक कथन है, फ़ील्डों का समूह नहीं।", ar: "يُستبدل كاملًا لا يُحرَّر سطرًا سطرًا — السيرة بيان لا مجموعة حقول.",
+  },
+  "wsh.exp.title.ph": {
+    en: "title", es: "cargo", fr: "intitulé", de: "Titel", pt: "cargo", it: "titolo", ja: "肩書", zh: "职位", hi: "पद", ar: "المسمى",
+  },
+  "wsh.exp.where.ph": {
+    en: "where", es: "dónde", fr: "où", de: "wo", pt: "onde", it: "dove", ja: "所属", zh: "在哪里", hi: "कहाँ", ar: "أين",
+  },
+  "wsh.exp.period.ph": {
+    en: "period, e.g. 2011–2019", es: "periodo, p. ej. 2011–2019", fr: "période, p. ex. 2011–2019", de: "Zeitraum, z. B. 2011–2019", pt: "período, p. ex. 2011–2019", it: "periodo, es. 2011–2019", ja: "期間（例: 2011–2019）", zh: "期间，如 2011–2019", hi: "अवधि, जैसे 2011–2019", ar: "الفترة، مثل 2011–2019",
+  },
+  "wsh.exp.add": {
+    en: "Add a line", es: "Añadir una línea", fr: "Ajouter une ligne", de: "Eine Zeile hinzufügen", pt: "Adicionar uma linha", it: "Aggiungi una riga", ja: "1行追加", zh: "添加一条", hi: "एक पंक्ति जोड़ें", ar: "أضف سطرًا",
+  },
+  "wsh.body": {
+    en: "What it speaks through", es: "A través de qué habla", fr: "Ce à travers quoi il parle", de: "Wodurch es spricht", pt: "Através de que fala", it: "Attraverso cosa parla", ja: "何を通して話すか", zh: "它通过什么发声", hi: "यह किसके माध्यम से बोलता है", ar: "عبر ماذا يتكلم",
+  },
+  "wsh.body.pitch": {
+    en: "A speaker, an earpiece, a hologram, a robot. The distinction that matters is whether the form can hold a conversation or only relay one.", es: "Un altavoz, un auricular, un holograma, un robot. La distinción que importa es si la forma puede sostener una conversación o solo transmitirla.", fr: "Une enceinte, une oreillette, un hologramme, un robot. La distinction qui compte est de savoir si la forme peut tenir une conversation ou seulement la relayer.", de: "Ein Lautsprecher, ein Ohrhörer, ein Hologramm, ein Roboter. Der Unterschied, auf den es ankommt, ist, ob die Form ein Gespräch führen oder es nur weiterreichen kann.", pt: "Uma coluna, um auricular, um holograma, um robô. A distinção que importa é se a forma consegue manter uma conversa ou apenas transmiti-la.", it: "Un altoparlante, un auricolare, un ologramma, un robot. La distinzione che conta è se la forma può sostenere una conversazione o solo trasmetterla.", ja: "スピーカー、イヤホン、ホログラム、ロボット。肝心な違いは、その形が会話を担えるのか、ただ中継するだけなのかです。", zh: "音箱、耳机、全息影像、机器人。真正要紧的分别是：这个形态能不能自己撑起一场对话，还是只能转达。", hi: "एक स्पीकर, एक इयरपीस, एक होलोग्राम, एक रोबोट। जो फ़र्क़ मायने रखता है वह यह है कि वह रूप बातचीत कर सकता है या केवल पहुँचा सकता है।", ar: "سماعة، أو سماعة أذن، أو صورة مجسمة، أو آلي. الفارق المهم هو هل يستطيع هذا الشكل إدارة محادثة أم مجرد نقلها.",
+  },
+  "wsh.body.name.ph": {
+    en: "what you call it", es: "cómo lo llamas", fr: "comment vous l'appelez", de: "wie Sie es nennen", pt: "como lhe chama", it: "come lo chiami", ja: "呼び名", zh: "你怎么称呼它", hi: "आप इसे क्या कहते हैं", ar: "بمَ تسميه",
+  },
+  "wsh.body.llm": {
+    en: "can hold a conversation", es: "puede sostener una conversación", fr: "peut tenir une conversation", de: "kann ein Gespräch führen", pt: "consegue manter uma conversa", it: "può sostenere una conversazione", ja: "会話ができる", zh: "能进行对话", hi: "बातचीत कर सकता है", ar: "يستطيع إدارة محادثة",
+  },
+  "wsh.body.add": {
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+  },
+  "wsh.fold": {
+    en: "Fold it back in", es: "Reincorporarlo", fr: "Le réintégrer", de: "Wieder einarbeiten", pt: "Reincorporá-lo", it: "Reintegralo", ja: "取り込み直す", zh: "重新并入", hi: "इसे वापस समेटें", ar: "أعد دمجه",
+  },
+  "wsh.fold.pitch": {
+    en: "Recompute the profile's own model from the history it already has. No body to send, and nothing to configure.", es: "Recalcula el modelo propio del perfil a partir del historial que ya tiene. No hay cuerpo que enviar ni nada que configurar.", fr: "Recalcule le modèle propre au profil à partir de l'historique qu'il possède déjà. Rien à envoyer, rien à configurer.", de: "Berechnet das eigene Modell des Profils aus der bereits vorhandenen Historie neu. Nichts zu senden und nichts zu konfigurieren.", pt: "Recalcula o modelo próprio do perfil a partir do histórico que já tem. Não há corpo para enviar nem nada para configurar.", it: "Ricalcola il modello proprio del profilo dalla storia che ha già. Niente da inviare e niente da configurare.", ja: "すでにある履歴から、プロフィール自身のモデルを再計算します。送るものも、設定するものもありません。", zh: "用它已有的历史重新计算这份资料自己的模型。没有要发送的内容，也没有要配置的东西。", hi: "जो इतिहास पहले से है उसी से प्रोफ़ाइल का अपना मॉडल फिर से गणना करता है। भेजने को कुछ नहीं, कॉन्फ़िगर करने को कुछ नहीं।", ar: "يعيد حساب نموذج الملف الخاص من التاريخ الموجود لديه أصلًا. لا شيء يُرسل ولا شيء يُهيَّأ.",
+  },
+  "wsh.fold.run": {
+    en: "Run it", es: "Ejecutarlo", fr: "Lancer", de: "Ausführen", pt: "Executá-lo", it: "Eseguilo", ja: "実行する", zh: "运行", hi: "चलाएँ", ar: "شغّله",
+  },
+  "wsh.fold.count": {
+    en: "{n} message{s} across {i} {people}.", es: "{n} mensajes con {i} {people}.", fr: "{n} messages auprès de {i} {people}.", de: "{n} Nachrichten über {i} {people}.", pt: "{n} mensagens com {i} {people}.", it: "{n} messaggi con {i} {people}.", ja: "{i}{people}にわたるメッセージ{n}件。", zh: "{i}{people}的{n}条消息。", hi: "{i} {people} के बीच {n} संदेश।", ar: "{n} رسائل عبر {i} {people}.",
+  },
+  "wsh.fold.computed": {
+    en: "Computed {when}.", es: "Calculado {when}.", fr: "Calculé {when}.", de: "Berechnet {when}.", pt: "Calculado {when}.", it: "Calcolato {when}.", ja: "計算場所: {when}。", zh: "计算于{when}。", hi: "{when} पर गणना।", ar: "حُسب {when}.",
+  },
+  "wsh.see": {
+    en: "Show it something", es: "Muéstrale algo", fr: "Montrez-lui quelque chose", de: "Zeigen Sie ihm etwas", pt: "Mostre-lhe algo", it: "Mostragli qualcosa", ja: "何かを見せる", zh: "给它看点东西", hi: "इसे कुछ दिखाएँ", ar: "أره شيئًا",
+  },
+  "wsh.see.pitch": {
+    en: "Name what is in front of you and what you are trying to do, and the profile talks you through it hands-free.", es: "Nombra lo que tienes delante y lo que intentas hacer, y el perfil te guía sin usar las manos.", fr: "Nommez ce qui est devant vous et ce que vous essayez de faire, et le profil vous guide sans les mains.", de: "Benennen Sie, was vor Ihnen liegt und was Sie vorhaben, und das Profil führt Sie freihändig hindurch.", pt: "Diga o que tem à frente e o que está a tentar fazer, e o perfil guia-o sem usar as mãos.", it: "Nomina ciò che hai davanti e ciò che stai cercando di fare, e il profilo ti guida a mani libere.", ja: "目の前にあるものと、やろうとしていることを言えば、プロフィールが手を使わずに案内します。", zh: "说出你面前有什么、你想做什么，资料就会免提地一步步带你做。", hi: "बताएँ कि आपके सामने क्या है और आप क्या करना चाहते हैं, और प्रोफ़ाइल बिना हाथ लगाए आपको समझाती चलेगी।", ar: "سمِّ ما أمامك وما تحاول فعله، فيرشدك الملف خطوة بخطوة دون استخدام يديك.",
+  },
+  "wsh.see.scene.ph": {
+    en: "what it can see, comma separated", es: "lo que puede ver, separado por comas", fr: "ce qu'il peut voir, séparé par des virgules", de: "was es sehen kann, kommagetrennt", pt: "o que consegue ver, separado por vírgulas", it: "cosa può vedere, separato da virgole", ja: "見えているもの（カンマ区切り）", zh: "它能看到什么，用逗号分隔", hi: "यह क्या देख सकता है, अल्पविराम से अलग", ar: "ما يمكنه رؤيته، مفصولًا بفواصل",
+  },
+  "wsh.see.goal.ph": {
+    en: "what you are trying to do", es: "qué intentas hacer", fr: "ce que vous essayez de faire", de: "was Sie vorhaben", pt: "o que está a tentar fazer", it: "cosa stai cercando di fare", ja: "やろうとしていること", zh: "你想做什么", hi: "आप क्या करना चाह रहे हैं", ar: "ما تحاول فعله",
+  },
+  "wsh.see.ask": {
+    en: "Ask", es: "Preguntar", fr: "Demander", de: "Fragen", pt: "Perguntar", it: "Chiedi", ja: "尋ねる", zh: "询问", hi: "पूछें", ar: "اسأل",
+  },
+  "wsh.see.recognised": {
+    en: "Recognised {n}: {list}", es: "Reconocidos {n}: {list}", fr: "Reconnus {n} : {list}", de: "Erkannt {n}: {list}", pt: "Reconhecidos {n}: {list}", it: "Riconosciuti {n}: {list}", ja: "認識 {n}件: {list}", zh: "识别到{n}项: {list}", hi: "पहचाने गए {n}: {list}", ar: "تعرّف على {n}: {list}",
+  },
+  "rbt.title": {
+    en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper", pt: "Corpos", it: "Corpi", ja: "身体", zh: "身体", hi: "शरीर", ar: "الأجساد",
+  },
+  "rbt.lead": {
+    en: "A profile can speak through a robot. The personality, the memory and the voice are the same ones — only the form of expression changes.", es: "Un perfil puede hablar a través de un robot. La personalidad, la memoria y la voz son las mismas — solo cambia la forma de expresión.", fr: "Un profil peut parler à travers un robot. La personnalité, la mémoire et la voix sont les mêmes — seule la forme d'expression change.", de: "Ein Profil kann durch einen Roboter sprechen. Persönlichkeit, Gedächtnis und Stimme sind dieselben — nur die Ausdrucksform ändert sich.", pt: "Um perfil pode falar através de um robô. A personalidade, a memória e a voz são as mesmas — só muda a forma de expressão.", it: "Un profilo può parlare attraverso un robot. La personalità, la memoria e la voce sono le stesse — cambia solo la forma di espressione.", ja: "プロフィールはロボットを通して話せます。人格も記憶も声も同じもので、変わるのは表現の形だけです。", zh: "资料可以通过机器人说话。性情、记忆与嗓音都是同一个 — 变的只是表达的形态。", hi: "प्रोफ़ाइल किसी रोबोट के माध्यम से बोल सकती है। व्यक्तित्व, स्मृति और आवाज़ वही रहती है — केवल अभिव्यक्ति का रूप बदलता है।", ar: "يمكن للملف أن يتكلم عبر آلي. الشخصية والذاكرة والصوت هي ذاتها — لا يتغير سوى شكل التعبير.",
+  },
+  "rbt.bind": {
+    en: "Bind a body", es: "Vincular un cuerpo", fr: "Lier un corps", de: "Einen Körper binden", pt: "Vincular um corpo", it: "Vincola un corpo", ja: "身体を紐付ける", zh: "绑定一具身体", hi: "एक शरीर बाँधें", ar: "اربط جسدًا",
+  },
+  "rbt.bind.name.ph": {
+    en: "what you call it", es: "cómo lo llamas", fr: "comment vous l'appelez", de: "wie Sie es nennen", pt: "como lhe chama", it: "come lo chiami", ja: "呼び名", zh: "你怎么称呼它", hi: "आप इसे क्या कहते हैं", ar: "بمَ تسميه",
+  },
+  "rbt.bind.pick": {
+    en: "pick a model", es: "elige un modelo", fr: "choisissez un modèle", de: "Modell wählen", pt: "escolha um modelo", it: "scegli un modello", ja: "モデルを選ぶ", zh: "选择型号", hi: "मॉडल चुनें", ar: "اختر طرازًا",
+  },
+  "rbt.bind.go": {
+    en: "Bind", es: "Vincular", fr: "Lier", de: "Binden", pt: "Vincular", it: "Vincola", ja: "紐付ける", zh: "绑定", hi: "बाँधें", ar: "اربط",
+  },
+  "rbt.invariant": {
+    en: "Invariant across {across}.", es: "Invariante en {across}.", fr: "Invariant sur {across}.", de: "Invariant über {across}.", pt: "Invariante em {across}.", it: "Invariante su {across}.", ja: "{across}をまたいで不変。", zh: "在{across}间保持不变。", hi: "{across} में अपरिवर्तित।", ar: "ثابت عبر {across}.",
+  },
+  "rbt.market": {
+    en: "The market", es: "El mercado", fr: "Le marché", de: "Der Markt", pt: "O mercado", it: "Il mercato", ja: "市場", zh: "市场", hi: "बाज़ार", ar: "السوق",
+  },
+  "rbt.market.line": {
+    en: "{n} bodies from {m} makers. {note} Checked against what the makers were saying on {date}.", es: "{n} cuerpos de {m} fabricantes. {note} Contrastado con lo que decían los fabricantes el {date}.", fr: "{n} corps de {m} fabricants. {note} Vérifié d'après ce que disaient les fabricants le {date}.", de: "{n} Körper von {m} Herstellern. {note} Abgeglichen mit dem, was die Hersteller am {date} sagten.", pt: "{n} corpos de {m} fabricantes. {note} Confrontado com o que os fabricantes diziam a {date}.", it: "{n} corpi da {m} produttori. {note} Confrontato con quanto dicevano i produttori il {date}.", ja: "{m}社の{n}機種。{note} {date}時点でメーカーが公表していた内容と突き合わせています。", zh: "来自{m}家厂商的{n}款身体。{note} 已对照厂商在{date}的说法核实。", hi: "{m} निर्माताओं के {n} शरीर। {note} {date} को निर्माताओं के कथन से मिलान किया गया।", ar: "{n} أجساد من {m} صانعين. {note} قوبلت بما كان الصانعون يقولونه في {date}.",
+  },
+  "rbt.conn": {
+    en: "Connections — skills and components", es: "Conexiones — habilidades y componentes", fr: "Connexions — compétences et composants", de: "Verbindungen — Fähigkeiten und Komponenten", pt: "Ligações — competências e componentes", it: "Connessioni — abilità e componenti", ja: "接続 — スキルと構成要素", zh: "连接 — 技能与组件", hi: "कनेक्शन — कौशल और घटक", ar: "الاتصالات — المهارات والمكونات",
+  },
+  "rbt.conn.pitch": {
+    en: "Two different things a body is given. A task pack teaches it verbs: each task in the pack becomes commandable, checked against what that model of body can physically do — a vacuum cannot be taught to fetch, and the refusal says which capability is missing rather than accepting the install and failing later. A connector is a service the profile's agents can collect from, act on, or produce into.", es: "Dos cosas distintas que se le dan a un cuerpo. Un paquete de tareas le enseña verbos: cada tarea del paquete se vuelve ordenable, contrastada con lo que ese modelo de cuerpo puede hacer físicamente — a una aspiradora no se le puede enseñar a traer cosas, y el rechazo dice qué capacidad falta en vez de aceptar la instalación y fallar después. Un conector es un servicio del que los agentes del perfil pueden recoger, sobre el que actuar, o al que producir.", fr: "Deux choses distinctes que l'on donne à un corps. Un pack de tâches lui apprend des verbes : chaque tâche du pack devient commandable, vérifiée par rapport à ce que ce modèle de corps peut physiquement faire — on ne peut pas apprendre à un aspirateur à rapporter, et le refus dit quelle capacité manque au lieu d'accepter l'installation et d'échouer plus tard. Un connecteur est un service dont les agents du profil peuvent collecter, sur lequel agir, ou vers lequel produire.", de: "Zwei verschiedene Dinge, die ein Körper bekommt. Ein Aufgabenpaket bringt ihm Verben bei: jede Aufgabe darin wird befehlbar, geprüft gegen das, was dieses Körpermodell physisch kann — einem Staubsauger kann man Apportieren nicht beibringen, und die Ablehnung nennt die fehlende Fähigkeit, statt die Installation anzunehmen und später zu scheitern. Ein Konnektor ist ein Dienst, aus dem die Agenten des Profils sammeln, auf den sie wirken oder in den sie produzieren können.", pt: "Duas coisas diferentes que se dão a um corpo. Um pacote de tarefas ensina-lhe verbos: cada tarefa do pacote torna-se comandável, confrontada com o que aquele modelo de corpo consegue fazer fisicamente — não se ensina um aspirador a ir buscar, e a recusa diz que capacidade falta em vez de aceitar a instalação e falhar depois. Um conector é um serviço de onde os agentes do perfil podem recolher, sobre o qual agir, ou para o qual produzir.", it: "Due cose diverse che si danno a un corpo. Un pacchetto di compiti gli insegna verbi: ogni compito del pacchetto diventa comandabile, verificato rispetto a ciò che quel modello di corpo può fare fisicamente — a un aspirapolvere non si può insegnare a riportare, e il rifiuto dice quale capacità manca invece di accettare l'installazione e fallire dopo. Un connettore è un servizio da cui gli agenti del profilo possono raccogliere, su cui agire, o verso cui produrre.", ja: "身体に与えられるものは二種類あります。タスクパックは動詞を教えます：パック内の各タスクが命令可能になり、その機種の身体が物理的に何をできるかと突き合わせて検査されます — 掃除機に「取ってくる」ことは教えられず、拒否は不足している能力を告げます。インストールを受理して後で失敗させたりはしません。コネクタは、プロフィールのエージェントが情報を集め、働きかけ、成果を書き出せるサービスです。", zh: "交给身体的是两样不同的东西。任务包教它动词：包中每项任务都变得可命令，并对照该型号身体在物理上做得到什么来核验 — 吸尘器学不会取物，拒绝时会说明缺哪项能力，而不是先接受安装、之后才失败。连接器则是一项服务，资料的代理可以从中收集、对其操作，或向其产出。", hi: "शरीर को दो अलग चीज़ें दी जाती हैं। टास्क पैक उसे क्रियाएँ सिखाता है: पैक का हर कार्य आदेश-योग्य बन जाता है, और जाँचा जाता है कि उस मॉडल का शरीर भौतिक रूप से क्या कर सकता है — वैक्यूम को «लाकर देना» नहीं सिखाया जा सकता, और इनकार बताता है कि कौन-सी क्षमता कम है, न कि इंस्टॉल स्वीकार कर बाद में विफल हो। कनेक्टर एक सेवा है जिससे प्रोफ़ाइल के एजेंट एकत्र कर सकते हैं, जिस पर कार्य कर सकते हैं, या जिसमें उत्पादन कर सकते हैं।", ar: "شيئان مختلفان يُمنحان للجسد. حزمة المهام تعلّمه أفعالًا: كل مهمة في الحزمة تصير قابلة للأمر، ويُتحقق منها مقابل ما يستطيع ذلك الطراز فعله فيزيائيًا — لا يمكن تعليم مكنسة أن تُحضر، والرفض يقول أي قدرة ناقصة بدل قبول التثبيت ثم الفشل لاحقًا. والموصّل خدمة يمكن لوكلاء الملف الجمع منها أو التصرف عليها أو الإنتاج إليها.",
+  },
+  "rbt.conn.shelf": {
+    en: "Skills you can fit", es: "Habilidades que puedes instalar", fr: "Compétences installables", de: "Fähigkeiten, die Sie einbauen können", pt: "Competências que pode instalar", it: "Abilità che puoi montare", ja: "取り付けられるスキル", zh: "你可以装配的技能", hi: "जो कौशल आप लगा सकते हैं", ar: "مهارات يمكنك تركيبها",
+  },
+  "rbt.conn.shelf.none": {
+    en: "No robot task packs published yet.", es: "Todavía no hay paquetes de tareas para robots publicados.", fr: "Aucun pack de tâches robot publié pour l'instant.", de: "Noch keine Roboter-Aufgabenpakete veröffentlicht.", pt: "Ainda não há pacotes de tarefas para robôs publicados.", it: "Nessun pacchetto di compiti per robot pubblicato finora.", ja: "ロボット用タスクパックはまだ公開されていません。", zh: "尚未发布任何机器人任务包。", hi: "अभी कोई रोबोट टास्क पैक प्रकाशित नहीं।", ar: "لم تُنشر حزم مهام آلية بعد.",
+  },
+  "rbt.conn.fit": {
+    en: "Fit to the open body", es: "Instalar en el cuerpo abierto", fr: "Installer sur le corps ouvert", de: "In den geöffneten Körper einbauen", pt: "Instalar no corpo aberto", it: "Monta sul corpo aperto", ja: "開いている身体に取り付ける", zh: "装配到已打开的身体", hi: "खुले शरीर पर लगाएँ", ar: "ركّبها على الجسد المفتوح",
+  },
+  "rbt.conn.openfirst": {
+    en: "Open a bound body below first — a task pack is fitted to a particular machine, not to the profile.", es: "Abre primero un cuerpo vinculado abajo — un paquete de tareas se instala en una máquina concreta, no en el perfil.", fr: "Ouvrez d'abord un corps lié ci-dessous — un pack de tâches s'installe sur une machine précise, pas sur le profil.", de: "Öffnen Sie zuerst unten einen gebundenen Körper — ein Aufgabenpaket wird in eine bestimmte Maschine eingebaut, nicht ins Profil.", pt: "Abra primeiro um corpo vinculado abaixo — um pacote de tarefas instala-se numa máquina concreta, não no perfil.", it: "Apri prima un corpo vincolato qui sotto — un pacchetto di compiti si monta su una macchina precisa, non sul profilo.", ja: "まず下で紐付け済みの身体を開いてください — タスクパックはプロフィールではなく、特定の機体に取り付けられます。", zh: "请先在下方打开一具已绑定的身体 — 任务包装配到具体的机器上，而不是资料上。", hi: "पहले नीचे कोई बँधा हुआ शरीर खोलें — टास्क पैक किसी ख़ास मशीन पर लगता है, प्रोफ़ाइल पर नहीं।", ar: "افتح أولًا جسدًا مربوطًا أدناه — حزمة المهام تُركَّب على آلة بعينها لا على الملف.",
+  },
+  "rbt.conn.fitted": {
+    en: "What is fitted", es: "Qué está instalado", fr: "Ce qui est installé", de: "Was eingebaut ist", pt: "O que está instalado", it: "Cosa è montato", ja: "取り付け済みのもの", zh: "已装配的内容", hi: "क्या लगा हुआ है", ar: "ما هو مركَّب",
+  },
+  "rbt.conn.fitted.none": {
+    en: "Nothing installed.", es: "Nada instalado.", fr: "Rien d'installé.", de: "Nichts installiert.", pt: "Nada instalado.", it: "Niente installato.", ja: "何も入っていません。", zh: "尚未安装任何内容。", hi: "कुछ स्थापित नहीं।", ar: "لا شيء مثبّت.",
+  },
+  "rbt.conn.remove": {
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "取り外す", zh: "移除", hi: "हटाएँ", ar: "أزل",
+  },
+  "rbt.conn.components": {
+    en: "Components it can reach", es: "Componentes a los que puede llegar", fr: "Composants qu'il peut atteindre", de: "Komponenten, die es erreichen kann", pt: "Componentes que consegue alcançar", it: "Componenti che può raggiungere", ja: "到達できる構成要素", zh: "它能触及的组件", hi: "जिन घटकों तक यह पहुँच सकता है", ar: "المكونات التي يمكنه بلوغها",
+  },
+  "rbt.conn.counts": {
+    en: "{apps} apps across {providers} providers.", es: "{apps} apps de {providers} proveedores.", fr: "{apps} applis chez {providers} fournisseurs.", de: "{apps} Apps über {providers} Anbieter.", pt: "{apps} apps de {providers} fornecedores.", it: "{apps} app da {providers} provider.", ja: "{providers}社にまたがる{apps}個のアプリ。", zh: "{providers}家提供方的{apps}个应用。", hi: "{providers} प्रदाताओं के {apps} ऐप।", ar: "{apps} تطبيقات عبر {providers} مزودين.",
+  },
+  "rbt.bound": {
+    en: "Bound bodies", es: "Cuerpos vinculados", fr: "Corps liés", de: "Gebundene Körper", pt: "Corpos vinculados", it: "Corpi vincolati", ja: "紐付け済みの身体", zh: "已绑定的身体", hi: "बँधे हुए शरीर", ar: "الأجساد المربوطة",
+  },
+  "rbt.bound.line": {
+    en: "{model} · {status} · bound {date}", es: "{model} · {status} · vinculado {date}", fr: "{model} · {status} · lié {date}", de: "{model} · {status} · gebunden {date}", pt: "{model} · {status} · vinculado {date}", it: "{model} · {status} · vincolato {date}", ja: "{model} · {status} · 紐付け {date}", zh: "{model} · {status} · 绑定于{date}", hi: "{model} · {status} · बँधा {date}", ar: "{model} · {status} · رُبط {date}",
+  },
+  "rbt.bound.open": {
+    en: "Open", es: "Abrir", fr: "Ouvrir", de: "Öffnen", pt: "Abrir", it: "Apri", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتح",
+  },
+  "rbt.bound.unbind": {
+    en: "Unbind", es: "Desvincular", fr: "Délier", de: "Lösen", pt: "Desvincular", it: "Svincola", ja: "解除", zh: "解绑", hi: "अलग करें", ar: "افصل",
+  },
+  "rbt.tell": {
+    en: "Tell it to do something", es: "Dile que haga algo", fr: "Dites-lui de faire quelque chose", de: "Sagen Sie ihm, etwas zu tun", pt: "Diga-lhe para fazer algo", it: "Digli di fare qualcosa", ja: "何かをするよう指示する", zh: "叫它做点什么", hi: "इसे कुछ करने को कहें", ar: "اطلب منه فعل شيء",
+  },
+  "rbt.tell.pitch": {
+    en: "What this body accepts. Not everything a robot can be told — what this model is permitted, plus any task modules it has learned.", es: "Lo que este cuerpo acepta. No todo lo que se le puede decir a un robot — lo que este modelo tiene permitido, más los módulos de tareas que haya aprendido.", fr: "Ce que ce corps accepte. Pas tout ce qu'on peut dire à un robot — ce que ce modèle a le droit de faire, plus les modules de tâches qu'il a appris.", de: "Was dieser Körper annimmt. Nicht alles, was man einem Roboter sagen kann — was diesem Modell erlaubt ist, plus die Aufgabenmodule, die es gelernt hat.", pt: "O que este corpo aceita. Não tudo o que se pode dizer a um robô — o que este modelo tem permitido, mais os módulos de tarefas que aprendeu.", it: "Cosa accetta questo corpo. Non tutto ciò che si può dire a un robot — ciò che a questo modello è permesso, più i moduli di compiti che ha imparato.", ja: "この身体が受け付けるもの。ロボット一般に言えることすべてではなく、この機種に許可されていること、それに学習したタスクモジュールです。", zh: "这具身体接受什么。不是机器人能被吩咐的一切 — 而是这个型号被允许做的，加上它学过的任务模块。", hi: "यह शरीर क्या स्वीकारता है। वह सब नहीं जो किसी रोबोट से कहा जा सकता है — बल्कि इस मॉडल को जिसकी अनुमति है, साथ ही जो टास्क मॉड्यूल इसने सीखे हैं।", ar: "ما يقبله هذا الجسد. ليس كل ما يمكن أن يُقال لآلي — بل ما يُسمح به لهذا الطراز، إضافة إلى وحدات المهام التي تعلّمها.",
+  },
+  "rbt.tell.say.ph": {
+    en: "say something about…", es: "di algo sobre…", fr: "dis quelque chose sur…", de: "sag etwas über…", pt: "diz algo sobre…", it: "di' qualcosa su…", ja: "…について何か言う", zh: "说点关于…", hi: "…के बारे में कुछ कहो", ar: "قل شيئًا عن…",
+  },
+  "rbt.tell.say": {
+    en: "Say it", es: "Dilo", fr: "Dis-le", de: "Sag es", pt: "Diz", it: "Dillo", ja: "言わせる", zh: "说出来", hi: "कहो", ar: "قله",
+  },
+  "rbt.learned": {
+    en: "What it has learned", es: "Lo que ha aprendido", fr: "Ce qu'il a appris", de: "Was es gelernt hat", pt: "O que aprendeu", it: "Cosa ha imparato", ja: "学んだこと", zh: "它学到了什么", hi: "इसने क्या सीखा", ar: "ما تعلّمه",
+  },
+  "rbt.learned.none": {
+    en: "No task modules installed. A robot pack adds verbs to the list above, checked against what this body can physically do.", es: "No hay módulos de tareas instalados. Un paquete de robot añade verbos a la lista de arriba, contrastados con lo que este cuerpo puede hacer físicamente.", fr: "Aucun module de tâches installé. Un pack robot ajoute des verbes à la liste ci-dessus, vérifiés par rapport à ce que ce corps peut physiquement faire.", de: "Keine Aufgabenmodule installiert. Ein Roboterpaket fügt der Liste oben Verben hinzu, geprüft gegen das, was dieser Körper physisch kann.", pt: "Nenhum módulo de tarefas instalado. Um pacote de robô acrescenta verbos à lista acima, confrontados com o que este corpo consegue fazer fisicamente.", it: "Nessun modulo di compiti installato. Un pacchetto robot aggiunge verbi alla lista sopra, verificati rispetto a ciò che questo corpo può fare fisicamente.", ja: "タスクモジュールは入っていません。ロボットパックは上のリストに動詞を追加し、この身体が物理的に何をできるかと突き合わせて検査されます。", zh: "未安装任务模块。机器人包会向上面的列表添加动词，并对照这具身体在物理上做得到什么来核验。", hi: "कोई टास्क मॉड्यूल स्थापित नहीं। रोबोट पैक ऊपर की सूची में क्रियाएँ जोड़ता है, जो इस शरीर की भौतिक क्षमता के विरुद्ध जाँची जाती हैं।", ar: "لا وحدات مهام مثبّتة. حزمة الآلي تضيف أفعالًا إلى القائمة أعلاه، مفحوصة مقابل ما يستطيع هذا الجسد فعله فيزيائيًا.",
+  },
+  "rbt.learned.from": {
+    en: "from {pack}", es: "de {pack}", fr: "de {pack}", de: "aus {pack}", pt: "de {pack}", it: "da {pack}", ja: "出典: {pack}", zh: "来自{pack}", hi: "{pack} से", ar: "من {pack}",
+  },
+  "rbt.steer": {
+    en: "How it comes across", es: "Cómo se presenta", fr: "Comment il se présente", de: "Wie es rüberkommt", pt: "Como se apresenta", it: "Come si presenta", ja: "どう伝わるか", zh: "它给人的感觉", hi: "यह कैसे सामने आता है", ar: "كيف يظهر",
+  },
+  "rbt.steer.pitch": {
+    en: "Steering shapes manner, not permissions. It never touches identity, boundaries, age-gating or what the body may be told to do.", es: "El ajuste da forma a la manera, no a los permisos. Nunca toca la identidad, los límites, el control de edad ni lo que se le puede ordenar al cuerpo.", fr: "Le réglage façonne la manière, pas les permissions. Il ne touche jamais l'identité, les limites, le contrôle d'âge ni ce qu'on peut ordonner au corps.", de: "Die Steuerung formt die Art, nicht die Rechte. Sie berührt nie Identität, Grenzen, Altersprüfung oder das, was dem Körper aufgetragen werden darf.", pt: "O ajuste molda a maneira, não as permissões. Nunca toca a identidade, os limites, o controlo de idade nem o que se pode ordenar ao corpo.", it: "La regolazione plasma i modi, non i permessi. Non tocca mai identità, confini, verifica dell'età o cosa si può ordinare al corpo.", ja: "ステアリングが形づくるのは物腰であって権限ではありません。身元・境界・年齢確認・身体に命じてよいことに触れることは決してありません。", zh: "这些旋钮塑造的是态度，不是权限。它们从不触及身份、边界、年龄限制，也不改变可以吩咐这具身体做什么。", hi: "स्टीयरिंग ढंग को आकार देती है, अनुमतियों को नहीं। यह कभी पहचान, सीमाओं, आयु-द्वार या शरीर को क्या कहा जा सकता है — इन्हें नहीं छूती।", ar: "التوجيه يشكّل الأسلوب لا الصلاحيات. ولا يمسّ أبدًا الهوية ولا الحدود ولا بوابة العمر ولا ما يجوز أن يُؤمر به الجسد.",
+  },
+  "rbt.steer.becomes": {
+    en: "What that becomes in a body", es: "En qué se convierte eso en un cuerpo", fr: "Ce que cela devient dans un corps", de: "Was daraus in einem Körper wird", pt: "No que isso se torna num corpo", it: "Cosa diventa in un corpo", ja: "それが身体では何になるか", zh: "这在身体上会变成什么", hi: "शरीर में यह क्या बन जाता है", ar: "ما يصير إليه ذلك في جسد",
+  },
+  "rbt.log": {
+    en: "Everything it has been told", es: "Todo lo que se le ha dicho", fr: "Tout ce qu'on lui a dit", de: "Alles, was ihm gesagt wurde", pt: "Tudo o que lhe foi dito", it: "Tutto ciò che gli è stato detto", ja: "命じられたことすべて", zh: "它被吩咐过的一切", hi: "इसे जो कुछ कहा गया", ar: "كل ما قيل له",
+  },
+  "rbt.log.pitch": {
+    en: "Owner-only, and kept for the obvious reason: a body in somebody's home should not be able to be sent anywhere with no record.", es: "Solo para el propietario, y guardado por la razón obvia: un cuerpo en casa de alguien no debería poder ser enviado a ningún sitio sin registro.", fr: "Réservé au propriétaire, et conservé pour la raison évidente : un corps chez quelqu'un ne devrait pas pouvoir être envoyé où que ce soit sans trace.", de: "Nur für den Besitzer, und aus dem offensichtlichen Grund aufbewahrt: ein Körper in jemandes Wohnung sollte nirgendwohin geschickt werden können, ohne dass es verzeichnet wird.", pt: "Só para o proprietário, e guardado pela razão óbvia: um corpo na casa de alguém não deveria poder ser enviado a lado nenhum sem registo.", it: "Solo per il proprietario, e conservato per la ragione ovvia: un corpo in casa di qualcuno non dovrebbe poter essere mandato da nessuna parte senza traccia.", ja: "所有者のみが見られ、理由は明白です：誰かの家にある身体が、記録も残さずどこかへ送られてよいはずがありません。", zh: "仅所有者可见，理由显而易见：一具身处别人家中的身体，不该能够在毫无记录的情况下被派往任何地方。", hi: "केवल स्वामी के लिए, और स्पष्ट कारण से रखा गया: किसी के घर में मौजूद शरीर को बिना किसी रिकॉर्ड के कहीं भी नहीं भेजा जा सकना चाहिए।", ar: "للمالك وحده، ويُحفظ لسبب بديهي: جسد في بيت أحدهم لا ينبغي أن يمكن إرساله إلى أي مكان دون سجل.",
+  },
+  "rbt.log.none": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

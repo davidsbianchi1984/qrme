@@ -4,6 +4,7 @@ import { api, type BoundRobot, type ConnectorCatalogue, type InstalledPack,
          type RobotModel, type RobotRow, type RobotSkill,
          type RobotSteering } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -43,6 +44,7 @@ import { useSession } from "../store";
  */
 export function Robots({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -143,22 +145,19 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Bodies</h2>
-      <p className="muted small">
-        A profile can speak through a robot. The personality, the memory and
-        the voice are the same ones — only the form of expression changes.
-      </p>
+      <h2>{tr("rbt.title", lang)}</h2>
+      <p className="muted small">{tr("rbt.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Bind a body</h3>
+        <h3>{tr("rbt.bind", lang)}</h3>
         <div className="row">
           <input value={name} onChange={(e) => setName(e.target.value)}
-                 placeholder="what you call it" style={{ flex: 1 }} />
+                 placeholder={tr("rbt.bind.name.ph", lang)} style={{ flex: 1 }} />
           <select value={model} onChange={(e) => setModel(e.target.value)}>
-            <option value="">pick a model</option>
+            <option value="">{tr("rbt.bind.pick", lang)}</option>
             {/* Grouped by whether you can actually get one. The announced
                 group is listed on purpose and is not selectable — binding
                 one answers 409 naming the status, and an option that only
@@ -182,7 +181,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
             })}
           </select>
           <button disabled={!me || !token || !name.trim() || !model}
-                  onClick={bind}>Bind</button>
+                  onClick={bind}>{tr("rbt.bind.go", lang)}</button>
         </div>
         {model && (() => {
           const m = catalogue.find((c) => c.model === model);
@@ -202,20 +201,23 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
               feature rests on, and it is the backend's sentence. */}
           <p className="small">{bound.identity.guarantee}</p>
           <p className="muted small">
-            Invariant across {bound.identity.invariant_across}.
+            {fill(tr("rbt.invariant", lang),
+              { across: bound.identity.invariant_across })}
           </p>
           <p className="muted small">{bound.note}</p>
         </div>
       )}
 
       <div className="card">
-        <h3>The market</h3>
+        <h3>{tr("rbt.market", lang)}</h3>
         {market && (
           <p className="muted small">
-            {market.robots.length} bodies from{" "}
-            {Object.keys(market.by_maker).length} makers. {market.note}{" "}
-            Checked against what the makers were saying on{" "}
-            <strong>{market.reviewed}</strong>.
+            {fill(tr("rbt.market.line", lang), {
+              n: market.robots.length,
+              m: Object.keys(market.by_maker).length,
+              note: market.note,
+              date: <strong>{market.reviewed}</strong>,
+            })}
           </p>
         )}
         <div className="row">
@@ -243,20 +245,12 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Connections — skills and components</h3>
-        <p className="muted small">
-          Two different things a body is given. A <strong>task pack</strong>
-          {" "}teaches it verbs: each task in the pack becomes commandable,
-          checked against what that model of body can physically do — a
-          vacuum cannot be taught to fetch, and the refusal says which
-          capability is missing rather than accepting the install and failing
-          later. A <strong>connector</strong> is a service the profile's
-          agents can collect from, act on, or produce into.
-        </p>
+        <h3>{tr("rbt.conn", lang)}</h3>
+        <p className="muted small">{tr("rbt.conn.pitch", lang)}</p>
 
-        <h4>Skills you can fit</h4>
+        <h4>{tr("rbt.conn.shelf", lang)}</h4>
         {shelf.length === 0 && (
-          <p className="muted small">No robot task packs published yet.</p>
+          <p className="muted small">{tr("rbt.conn.shelf.none", lang)}</p>
         )}
         {shelf.map((k) => (
           <p className="small" key={k.id}>
@@ -274,20 +268,17 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
                           .catch(() => undefined);
                       }
                     }, "Fitted.")}>
-              Fit to the open body
+              {tr("rbt.conn.fit", lang)}
             </button>
           </p>
         ))}
         {!open && (
-          <p className="muted small">
-            Open a bound body below first — a task pack is fitted to a
-            particular machine, not to the profile.
-          </p>
+          <p className="muted small">{tr("rbt.conn.openfirst", lang)}</p>
         )}
 
-        <h4>What is fitted</h4>
+        <h4>{tr("rbt.conn.fitted", lang)}</h4>
         {fitted.length === 0 && (
-          <p className="muted small">Nothing installed.</p>
+          <p className="muted small">{tr("rbt.conn.fitted.none", lang)}</p>
         )}
         {fitted.map((k) => (
           <p className="small" key={`${k.id}-${k.robot_id ?? "profile"}`}>
@@ -307,16 +298,18 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
                           .catch(() => undefined);
                       }
                     }, "Removed. Its tasks stop being commandable now.")}>
-              Remove
+              {tr("rbt.conn.remove", lang)}
             </button>
           </p>
         ))}
 
-        <h4>Components it can reach</h4>
+        <h4>{tr("rbt.conn.components", lang)}</h4>
         {connectors && (
           <p className="muted small">
-            {connectors.app_count} apps across {connectors.provider_count}{" "}
-            providers.
+            {fill(tr("rbt.conn.counts", lang), {
+              apps: connectors.app_count,
+              providers: connectors.provider_count,
+            })}
           </p>
         )}
         {connectors?.providers.map((prov) => (
@@ -328,7 +321,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Bound bodies</h3>
+        <h3>{tr("rbt.bound", lang)}</h3>
         {rows.length === 0 && (
           <p className="muted small">
             {me && token ? "Nothing bound yet." : "Sign in as an owner."}
@@ -339,14 +332,17 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
             <div style={{ flex: 1 }}>
               <strong>{r.name}</strong>
               <div className="muted small">
-                {r.model} · {r.status} · bound {r.created_at.slice(0, 10)}
+                {fill(tr("rbt.bound.line", lang), {
+                  model: r.model, status: r.status,
+                  date: r.created_at.slice(0, 10),
+                })}
               </div>
             </div>
-            <button onClick={() => loadBody(r.id)}>Open</button>
+            <button onClick={() => loadBody(r.id)}>{tr("rbt.bound.open", lang)}</button>
             {/* Named for what the response says — `unbound: true` — rather
                 than for the HTTP verb. "Delete my robot" and "stop this
                 profile speaking through it" are worth not confusing. */}
-            <button onClick={() => unbind(r.id)}>Unbind</button>
+            <button onClick={() => unbind(r.id)}>{tr("rbt.bound.unbind", lang)}</button>
           </div>
         ))}
       </div>
@@ -354,12 +350,8 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
       {chosen && (
         <>
           <div className="card">
-            <h3>Tell it to do something</h3>
-            <p className="muted small">
-              What this body accepts. Not everything a robot can be told —
-              what <em>this model</em> is permitted, plus any task modules it
-              has learned.
-            </p>
+            <h3>{tr("rbt.tell", lang)}</h3>
+            <p className="muted small">{tr("rbt.tell.pitch", lang)}</p>
             <div className="row">
               {chosen.commands.filter((c) => c !== "say").map((c) => (
                 <button key={c} className="chip" onClick={() => send(c)}>
@@ -376,23 +368,20 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
             {chosen.commands.includes("say") && (
               <div className="row">
                 <input value={say} onChange={(e) => setSay(e.target.value)}
-                       placeholder="say something about…"
+                       placeholder={tr("rbt.tell.say.ph", lang)}
                        style={{ flex: 1 }} />
                 <button disabled={!say.trim()}
                         onClick={() => { send("say", say.trim()); setSay(""); }}>
-                  Say it
+                  {tr("rbt.tell.say", lang)}
                 </button>
               </div>
             )}
           </div>
 
           <div className="card">
-            <h3>What it has learned</h3>
+            <h3>{tr("rbt.learned", lang)}</h3>
             {skills.length === 0 && (
-              <p className="muted small">
-                No task modules installed. A robot pack adds verbs to the list
-                above, checked against what this body can physically do.
-              </p>
+              <p className="muted small">{tr("rbt.learned.none", lang)}</p>
             )}
             {skills.map((s) => (
               <div key={s.task}>
@@ -401,19 +390,16 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
                     will not do, and that limit is the part that matters to
                     whoever is in the room with it. */}
                 <p className="small">{s.procedure}</p>
-                <p className="muted small">from {s.pack_title}</p>
+                <p className="muted small">{fill(tr("rbt.learned.from", lang),
+                  { pack: s.pack_title })}</p>
               </div>
             ))}
           </div>
 
           {steering && (
             <div className="card">
-              <h3>How it comes across</h3>
-              <p className="muted small">
-                Steering shapes manner, not permissions. It never touches
-                identity, boundaries, age-gating or what the body may be told
-                to do.
-              </p>
+              <h3>{tr("rbt.steer", lang)}</h3>
+              <p className="muted small">{tr("rbt.steer.pitch", lang)}</p>
               {steering.dials.map((d) => (
                 <div key={d.name}>
                   <label className="small">
@@ -425,7 +411,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
                   <div className="muted small">{d.low} → {d.high}</div>
                 </div>
               ))}
-              <h4>What that becomes in a body</h4>
+              <h4>{tr("rbt.steer.becomes", lang)}</h4>
               <p className="muted small">
                 {Object.entries(steering.behavior_profile)
                   .map(([k, v]) => `${k.replace(/_/g, " ")} ${v}`)
@@ -435,12 +421,9 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
           )}
 
           <div className="card">
-            <h3>Everything it has been told</h3>
-            <p className="muted small">
-              Owner-only, and kept for the obvious reason: a body in somebody's
-              home should not be able to be sent anywhere with no record.
-            </p>
-            {log.length === 0 && <p className="muted small">Nothing yet.</p>}
+            <h3>{tr("rbt.log", lang)}</h3>
+            <p className="muted small">{tr("rbt.log.pitch", lang)}</p>
+            {log.length === 0 && <p className="muted small">{tr("rbt.log.none", lang)}</p>}
             {log.map((c) => (
               <div className="row" key={c.id}>
                 <div style={{ flex: 1 }}>

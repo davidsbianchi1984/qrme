@@ -4,6 +4,7 @@ import { api, type Embodiment, type EmbodimentConsistency,
          type ProfileSteering, type SourceItem,
          type Specialist } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -43,6 +44,7 @@ import { useSession } from "../store";
  */
 export function Workshop({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -106,22 +108,21 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>What it is made of</h2>
-      <p className="muted small">
-        The material a profile is built from, the manner it comes across in,
-        and everything it can hand on to somebody who knows more.
-      </p>
+      <h2>{tr("wsh.title", lang)}</h2>
+      <p className="muted small">{tr("wsh.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {same && (
         <div className="card">
-          <h3>The same personality, wherever it is met</h3>
+          <h3>{tr("wsh.same", lang)}</h3>
           <p className="small">{same.guarantee}</p>
           <p className="muted small">
-            Signature <code>{same.signature}</code> · invariant across{" "}
-            {same.invariant_across}.
+            {fill(tr("wsh.same.sig", lang), {
+              sig: <code>{same.signature}</code>,
+              across: same.invariant_across,
+            })}
           </p>
           {/* Said because it is unusual and load-bearing: this one route
               needs no credential, so somebody who has just met the profile on
@@ -130,13 +131,12 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
               page grew a lookup for it — the person this sentence describes
               is not you, and was reading nothing. */}
           <p className="muted small">
-            This check is public — anybody who meets {same.name} in any form
-            can look up this signature from the sign-in page, with no profile
-            of their own.
+            {fill(tr("wsh.same.public", lang), { name: same.name })}
           </p>
           {same.surfaces.length > 0 && (
             <p className="muted small">
-              Also present on: {same.surfaces.join(", ")}.
+              {fill(tr("wsh.same.also", lang),
+                { list: same.surfaces.join(", ") })}
             </p>
           )}
         </div>
@@ -144,18 +144,12 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
 
       {steering && (
         <div className="card">
-          <h3>How it comes across</h3>
-          <p className="muted small">
-            Manner, not permissions. Steering never touches identity,
-            boundaries, age-gating, or what the profile may be asked to do.
-          </p>
+          <h3>{tr("wsh.steer", lang)}</h3>
+          <p className="muted small">{tr("wsh.steer.pitch", lang)}</p>
           {!steering.adult_mode && (
             /* Named rather than left as an absence: a dial that is missing
                because of what this profile is reads as a bug otherwise. */
-            <p className="muted small">
-              This is not an adult-mode profile, so the intimacy dial does
-              not exist here at all.
-            </p>
+            <p className="muted small">{tr("wsh.steer.noadult", lang)}</p>
           )}
           {steering.dials.map((d) => (
             <div key={d.name}>
@@ -173,11 +167,8 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
       )}
 
       <div className="card">
-        <h3>What it knows</h3>
-        <p className="muted small">
-          Source material: the writing, conversations and life events the
-          persona is built on.
-        </p>
+        <h3>{tr("wsh.knows", lang)}</h3>
+        <p className="muted small">{tr("wsh.knows.pitch", lang)}</p>
         <div className="row">
           <select value={srcKind} onChange={(e) => setSrcKind(e.target.value)}>
             {["writing", "conversation", "social_post", "photo", "voice_note",
@@ -186,10 +177,10 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
             ))}
           </select>
           <input value={srcTitle} onChange={(e) => setSrcTitle(e.target.value)}
-                 placeholder="what it is" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.knows.what.ph", lang)} style={{ flex: 1 }} />
         </div>
         <textarea value={srcBody} onChange={(e) => setSrcBody(e.target.value)}
-                  placeholder="the material itself" rows={3} />
+                  placeholder={tr("wsh.knows.body.ph", lang)} rows={3} />
         <button disabled={busy || !token || !srcBody.trim()}
                 onClick={act(async () => {
                   await api.addSource(me, {
@@ -199,9 +190,9 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
                   // contents after a successful submit is one people press
                   // twice.
                   setSrcTitle(""); setSrcBody("");
-                }, "Added.")}>Add it</button>
+                }, "Added.")}>{tr("wsh.knows.add", lang)}</button>
         {sources.length === 0 && (
-          <p className="muted small">Nothing added yet.</p>
+          <p className="muted small">{tr("wsh.knows.none", lang)}</p>
         )}
         {sources.map((s) => (
           <div key={s.id}>
@@ -215,16 +206,11 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
                 would hide which side of the custody line this account is
                 on. */}
             {s.pdi_key ? (
-              <p className="muted small">
-                Sealed in the vault. Only the reference is held here.
-              </p>
+              <p className="muted small">{tr("wsh.knows.sealed", lang)}</p>
             ) : (
               <>
                 <p className="muted small">{s.content}</p>
-                <p className="muted small">
-                  Stored in the clear on this deployment — that is what you
-                  are looking at.
-                </p>
+                <p className="muted small">{tr("wsh.knows.clear", lang)}</p>
               </>
             )}
           </div>
@@ -232,27 +218,24 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Who it hands work to</h3>
-        <p className="muted small">
-          A domain, and the profile that knows more about it. A question in
-          that domain goes there instead of being guessed at here.
-        </p>
+        <h3>{tr("wsh.spec", lang)}</h3>
+        <p className="muted small">{tr("wsh.spec.pitch", lang)}</p>
         <div className="row">
           <input value={domain} onChange={(e) => setDomain(e.target.value)}
-                 placeholder="a domain, e.g. plumbing" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.spec.domain.ph", lang)} style={{ flex: 1 }} />
           <input value={specialistId}
                  onChange={(e) => setSpecialistId(e.target.value)}
-                 placeholder="the specialist's profile id" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.spec.id.ph", lang)} style={{ flex: 1 }} />
           {/* One pair per call, despite the plural route. */}
           <button disabled={busy || !token || !domain.trim() || !specialistId.trim()}
                   onClick={act(async () => {
                     await api.attachSpecialist(
                       me, domain.trim(), specialistId.trim(), token);
                     setDomain(""); setSpecialistId("");
-                  }, "Attached.")}>Attach</button>
+                  }, "Attached.")}>{tr("wsh.spec.attach", lang)}</button>
         </div>
         {specialists.length === 0 && (
-          <p className="muted small">Nothing handed on.</p>
+          <p className="muted small">{tr("wsh.spec.none", lang)}</p>
         )}
         {specialists.map((s) => (
           <p className="small" key={s.domain}>
@@ -266,21 +249,18 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>What it has done</h3>
-        <p className="muted small">
-          Replaced whole rather than edited row by row — a history is a
-          statement, not a set of fields.
-        </p>
+        <h3>{tr("wsh.exp", lang)}</h3>
+        <p className="muted small">{tr("wsh.exp.pitch", lang)}</p>
         <div className="row">
           <input value={expTitle} onChange={(e) => setExpTitle(e.target.value)}
-                 placeholder="title" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.exp.title.ph", lang)} style={{ flex: 1 }} />
           <input value={expOrg} onChange={(e) => setExpOrg(e.target.value)}
-                 placeholder="where" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.exp.where.ph", lang)} style={{ flex: 1 }} />
           {/* `period`, and the placeholder says so — `years` is the natural
               word and it is not the field. */}
           <input value={expPeriod}
                  onChange={(e) => setExpPeriod(e.target.value)}
-                 placeholder="period, e.g. 2011–2019" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.exp.period.ph", lang)} style={{ flex: 1 }} />
         </div>
         <button disabled={busy || !token || !expTitle.trim()}
                 onClick={act(async () => {
@@ -291,7 +271,7 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
                   const r = await api.setExperience(me, next, token);
                   setExperience(r.experience);
                   setExpTitle(""); setExpOrg(""); setExpPeriod("");
-                }, "Saved.")}>Add a line</button>
+                }, "Saved.")}>{tr("wsh.exp.add", lang)}</button>
         {experience.map((e, i) => (
           <p className="small" key={e.id || i}>
             <strong>{e.title}</strong>
@@ -302,15 +282,11 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>What it speaks through</h3>
-        <p className="muted small">
-          A speaker, an earpiece, a hologram, a robot. The distinction that
-          matters is whether the form can hold a conversation or only relay
-          one.
-        </p>
+        <h3>{tr("wsh.body", lang)}</h3>
+        <p className="muted small">{tr("wsh.body.pitch", lang)}</p>
         <div className="row">
           <input value={bodyName} onChange={(e) => setBodyName(e.target.value)}
-                 placeholder="what you call it" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.body.name.ph", lang)} style={{ flex: 1 }} />
           <select value={bodyKind} onChange={(e) => setBodyKind(e.target.value)}>
             {/* The server's enum, exactly. Three of the words that came
                 naturally here — screen, wearable, vehicle — are not in it,
@@ -322,7 +298,7 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
           <label className="small">
             <input type="checkbox" checked={bodyLlm}
                    onChange={(e) => setBodyLlm(e.target.checked)} />
-            {" "}can hold a conversation
+            {" "}{tr("wsh.body.llm", lang)}
           </label>
           <button disabled={busy || !token || !bodyName.trim()}
                   onClick={act(async () => {
@@ -330,7 +306,7 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
                       name: bodyName.trim(), kind: bodyKind,
                       has_llm: bodyLlm }, token);
                     setBodyName("");
-                  }, "Added.")}>Add</button>
+                  }, "Added.")}>{tr("wsh.body.add", lang)}</button>
         </div>
         {bodies.map((b) => (
           <p className="small" key={b.name}>
@@ -343,28 +319,28 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Fold it back in</h3>
-        <p className="muted small">
-          Recompute the profile's own model from the history it already has.
-          No body to send, and nothing to configure.
-        </p>
+        <h3>{tr("wsh.fold", lang)}</h3>
+        <p className="muted small">{tr("wsh.fold.pitch", lang)}</p>
         <button disabled={busy || !token}
                 onClick={act(async () => setRun(await api.finetune(me, token)))}>
-          Run it
+          {tr("wsh.fold.run", lang)}
         </button>
         {run && (
           <>
             <p className="small">
-              {run.messages_processed} message
-              {run.messages_processed === 1 ? "" : "s"} across{" "}
-              {run.interactors} {run.interactors === 1 ? "person" : "people"}.
+              {fill(tr("wsh.fold.count", lang), {
+                n: run.messages_processed,
+                s: run.messages_processed === 1 ? "" : "s",
+                i: run.interactors,
+                people: run.interactors === 1 ? "person" : "people",
+              })}
             </p>
             {/* Almost every field here is a claim about what did not
                 happen, and those are the reason the feature reads the way
                 it does. Rendered from the answer rather than asserted by
                 the console. */}
             <p className="muted small">
-              Computed {run.computed}.{" "}
+              {fill(tr("wsh.fold.computed", lang), { when: run.computed })}{" "}
               {run.external_transmission
                 ? "Something was transmitted externally."
                 : "Nothing was transmitted anywhere."}{" "}
@@ -377,30 +353,29 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Show it something</h3>
-        <p className="muted small">
-          Name what is in front of you and what you are trying to do, and the
-          profile talks you through it hands-free.
-        </p>
+        <h3>{tr("wsh.see", lang)}</h3>
+        <p className="muted small">{tr("wsh.see.pitch", lang)}</p>
         <div className="row">
           <input value={scene} onChange={(e) => setScene(e.target.value)}
-                 placeholder="what it can see, comma separated"
+                 placeholder={tr("wsh.see.scene.ph", lang)}
                  style={{ flex: 1 }} />
           <input value={goal} onChange={(e) => setGoal(e.target.value)}
-                 placeholder="what you are trying to do" style={{ flex: 1 }} />
+                 placeholder={tr("wsh.see.goal.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !token || !scene.trim()}
                   onClick={act(async () => setSeen(await api.perceive(me, {
                     objects: scene.split(",").map((s) => s.trim())
                       .filter(Boolean),
                     goal: goal.trim() || undefined }, token)))}>
-            Ask
+            {tr("wsh.see.ask", lang)}
           </button>
         </div>
         {seen && (
           <>
             <p className="muted small">
-              Recognised {seen.recognized_count}:{" "}
-              {Object.values(seen.recognized).flat().join(", ")}
+              {fill(tr("wsh.see.recognised", lang), {
+                n: seen.recognized_count,
+                list: Object.values(seen.recognized).flat().join(", "),
+              })}
             </p>
             <p className="small">{seen.guidance}</p>
             {/* Beside the words, not under a link. Everything generated

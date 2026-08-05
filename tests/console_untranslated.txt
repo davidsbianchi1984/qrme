@@ -1,4 +1,4 @@
-# status: backlog — 1072 rows
+# status: backlog — 978 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1072
+# ceiling: 978
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -778,52 +778,6 @@ Relationships: Type
 Relationships: acknowledges them truthfully if asked — disclosure by design
 Relationships: e.g. Sarah
 Relationships: people in
-Robots: A profile can speak through a robot. The personality, the memory and the voice are the same ones — only the form of expression changes.
-Robots: Bind
-Robots: Bind a body
-Robots: Bodies
-Robots: Bound bodies
-Robots: Checked against what the makers were saying on
-Robots: Components it can reach
-Robots: Connections — skills and components
-Robots: Everything it has been told
-Robots: Fit to the open body
-Robots: How it comes across
-Robots: Invariant across
-Robots: No robot task packs published yet.
-Robots: No task modules installed. A robot pack adds verbs to the list above, checked against what this body can physically do.
-Robots: Nothing installed.
-Robots: Nothing yet.
-Robots: Open
-Robots: Open a bound body below first — a task pack is fitted to a particular machine, not to the profile.
-Robots: Owner-only, and kept for the obvious reason: a body in somebody's home should not be able to be sent anywhere with no record.
-Robots: Remove
-Robots: Say it
-Robots: Skills you can fit
-Robots: Steering shapes manner, not permissions. It never touches identity, boundaries, age-gating or what the body may be told to do.
-Robots: Tell it to do something
-Robots: The market
-Robots: Two different things a body is given. A
-Robots: Unbind
-Robots: What is fitted
-Robots: What it has learned
-Robots: What that becomes in a body
-Robots: What this body accepts. Not everything a robot can be told — what
-Robots: apps across
-Robots: bodies from
-Robots: connector
-Robots: from
-Robots: is a service the profile's agents can collect from, act on, or produce into.
-Robots: is permitted, plus any task modules it has learned.
-Robots: makers.
-Robots: pick a model
-Robots: providers.
-Robots: say something about…
-Robots: task pack
-Robots: teaches it verbs: each task in the pack becomes commandable, checked against what that model of body can physically do — a vacuum cannot be taught to fetch, and the refusal says which capability is missing rather than accepting the install and failing later. A
-Robots: this model
-Robots: what you call it
-Robots: · bound
 Rooms: 2D, AR and VR sessions · live desks
 Rooms: Kind
 Rooms: Live desks
@@ -1074,51 +1028,3 @@ WatchParty: s).
 WatchParty: say something
 WatchParty: synthetic
 WatchParty: −15s
-Workshop: A domain, and the profile that knows more about it. A question in that domain goes there instead of being guessed at here.
-Workshop: A speaker, an earpiece, a hologram, a robot. The distinction that matters is whether the form can hold a conversation or only relay one.
-Workshop: Add
-Workshop: Add a line
-Workshop: Add it
-Workshop: Also present on:
-Workshop: Ask
-Workshop: Attach
-Workshop: Computed
-Workshop: Fold it back in
-Workshop: How it comes across
-Workshop: Manner, not permissions. Steering never touches identity, boundaries, age-gating, or what the profile may be asked to do.
-Workshop: Name what is in front of you and what you are trying to do, and the profile talks you through it hands-free.
-Workshop: Nothing added yet.
-Workshop: Nothing handed on.
-Workshop: Recognised
-Workshop: Recompute the profile's own model from the history it already has. No body to send, and nothing to configure.
-Workshop: Replaced whole rather than edited row by row — a history is a statement, not a set of fields.
-Workshop: Run it
-Workshop: Sealed in the vault. Only the reference is held here.
-Workshop: Show it something
-Workshop: Signature
-Workshop: Source material: the writing, conversations and life events the persona is built on.
-Workshop: Stored in the clear on this deployment — that is what you are looking at.
-Workshop: The material a profile is built from, the manner it comes across in, and everything it can hand on to somebody who knows more.
-Workshop: The same personality, wherever it is met
-Workshop: This check is public — anybody who meets
-Workshop: This is not an adult-mode profile, so the intimacy dial does not exist here at all.
-Workshop: What it has done
-Workshop: What it is made of
-Workshop: What it knows
-Workshop: What it speaks through
-Workshop: Who it hands work to
-Workshop: a domain, e.g. plumbing
-Workshop: across
-Workshop: can hold a conversation
-Workshop: in any form can look up this signature from the sign-in page, with no profile of their own.
-Workshop: message
-Workshop: period, e.g. 2011–2019
-Workshop: the material itself
-Workshop: the specialist's profile id
-Workshop: title
-Workshop: what it can see, comma separated
-Workshop: what it is
-Workshop: what you are trying to do
-Workshop: what you call it
-Workshop: where
-Workshop: · invariant across

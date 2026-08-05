@@ -219,5 +219,9 @@ def test_the_connections_bracket_calls_all_four():
 def test_the_screen_says_a_pack_is_fitted_to_a_body_not_a_profile():
     """The distinction that decides whether the install goes where the owner
     meant. A profile pack teaches a persona; a robot pack teaches a machine."""
+    # The sentence moved into the l10n table when the screen was localized;
+    # the screen must still look it up, and the table must still say it.
     src = _markup("app/src/screens/Robots.tsx")
-    assert "fitted to a" in src.replace("\n", " ").replace("  ", " ")
+    assert 'tr("rbt.conn.openfirst", lang)' in src
+    table = _markup("app/src/l10n.ts").replace("\n", " ").replace("  ", " ")
+    assert "fitted to a" in table
