@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.44.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.44.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.44.3** | **The backlogs shrink from both ends** — the Assist screen fully localized (console-untranslated 1459 → 1403) and the field-label evidence pass maps seven newly-typed fields (residue 131 → 124) |
 | **0.44.2** | **The last doors** — genesis and hybrids, packs, simulations and fine-tuning, the contribution ledger, proactive reach and quiet hours, licensing, and the senses reach all three shells; **the doorless records run to zero** (ios 0 / android 0 / windows 0) |
 | **0.44.1** | **The sticker, the queue and the stamp** — beacons/QR and pairing, the moderation queue with message edit/retract, reviews, watermark resolution and tamper-check, media upload and wearables reach all three shells; **71 doorless rows struck**, records fall to ios 21 / android 26 / windows 24 |
 | **0.44.0** | **The keys, the till and the lifeline** — accounts (signup, sign-in, verification, reset, OAuth), money (plans, subscriptions, orders, proceeds, campaigns) and status+help reach all three shells; **72 doorless rows struck**, records fall to ios 45 / android 49 / windows 48 |

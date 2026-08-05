@@ -4,6 +4,7 @@ import { api, uploadMedia, type CreativeWork, type Proofread,
          type UploadedMedia, type WatermarkVerdict,
          type WearableView } from "../api";
 import { Refusal } from "../Refusal";
+import { fill, t as tr } from "../l10n";
 import { useSession } from "../store";
 
 /**
@@ -71,6 +72,14 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
   const [markContent, setMarkContent] = useState("");
   const [verdict, setVerdict] = useState<WatermarkVerdict | null>(null);
 
+  // The screen follows the profile's language, the way the chrome does.
+  const [lang, setLang] = useState<string>("en");
+  useEffect(() => {
+    if (!me) return;
+    api.getLanguage(me).then((r) => setLang(r.language || "en"))
+      .catch(() => setLang("en"));
+  }, [me]);
+
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -100,26 +109,20 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>What it can do for you</h2>
-      <p className="muted small">
-        Sort a pile, fix a draft, make something worth keeping — and every
-        generated thing carries a mark you can check.
-      </p>
+      <h2>{tr("asst.title", lang)}</h2>
+      <p className="muted small">{tr("asst.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       <div className="card">
-        <h3>Sort a pile</h3>
-        <p className="muted small">
-          One item per line. You get back the best few <em>with the reason
-          each one survived</em> — the ranking is meant to be arguable.
-        </p>
+        <h3>{tr("asst.pile", lang)}</h3>
+        <p className="muted small">{tr("asst.pile.lead", lang)}</p>
         <textarea value={pile} onChange={(e) => setPile(e.target.value)}
-                  rows={4} placeholder="one candidate per line" />
+                  rows={4} placeholder={tr("asst.pile.ph", lang)} />
         <div className="row">
           <input value={criteria} onChange={(e) => setCriteria(e.target.value)}
-                 placeholder="what best means to you" style={{ flex: 1 }} />
+                 placeholder={tr("asst.pile.best", lang)} style={{ flex: 1 }} />
           <input type="number" min={1} value={keep}
                  onChange={(e) => setKeep(Number(e.target.value))}
                  style={{ width: 80 }} />
@@ -131,12 +134,14 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                     setTriaged(await api.triage(
                       me, { items, keep: Math.min(keep, items.length),
                             criteria: criteria.trim() || undefined }, token));
-                  })}>Sort it</button>
+                  })}>{tr("asst.pile.go", lang)}</button>
         </div>
         {triaged && (
           <>
             <p className="small">
-              {triaged.reviewed} looked at, {triaged.kept.length} kept.
+              {fill(tr("asst.tally", lang),
+                    { reviewed: triaged.reviewed,
+                      kept: triaged.kept.length })}
             </p>
             {triaged.kept.map((k) => (
               <p className="small" key={k.id}>
@@ -147,7 +152,8 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
             ))}
             {triaged.discarded_ids.length > 0 && (
               <p className="muted small">
-                Set aside: {triaged.discarded_ids.length}.
+                {fill(tr("asst.aside", lang),
+                      { n: triaged.discarded_ids.length })}
               </p>
             )}
           </>
@@ -155,13 +161,13 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Fix a draft</h3>
+        <h3>{tr("asst.fix", lang)}</h3>
         <textarea value={draft} onChange={(e) => setDraft(e.target.value)}
-                  rows={3} placeholder="paste something you wrote" />
+                  rows={3} placeholder={tr("asst.fix.ph", lang)} />
         <button disabled={busy || !token || !draft.trim()}
                 onClick={act(async () =>
                   setFixed(await api.proofread(me, draft.trim(), token)))}>
-          Proofread
+          {tr("asst.fix.go", lang)}
         </button>
         {fixed && (
           <>
@@ -180,7 +186,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Make something to keep</h3>
+        <h3>{tr("asst.make", lang)}</h3>
         <div className="row">
           <select value={kind} onChange={(e) => setKind(e.target.value)}>
             {["note", "poem", "lyric", "music"].map((k) => (
@@ -188,15 +194,15 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
             ))}
           </select>
           <input value={moment} onChange={(e) => setMoment(e.target.value)}
-                 placeholder="the moment to capture" style={{ flex: 1 }} />
+                 placeholder={tr("asst.make.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !token || !moment.trim()}
                   onClick={act(async () => {
                     await api.compose(me, { kind, moment: moment.trim() },
                                       token);
                     setMoment("");
-                  }, "Made, and kept.")}>Compose</button>
+                  }, "Made, and kept.")}>{tr("asst.make.go", lang)}</button>
         </div>
-        {works.length === 0 && <p className="muted small">Nothing kept yet.</p>}
+        {works.length === 0 && <p className="muted small">{tr("asst.make.none", lang)}</p>}
         {works.map((w) => (
           <div key={w.id}>
             <p className="small">
@@ -208,7 +214,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
               <button className="chip"
                       onClick={() => { setMarkId(w.watermark.watermark_id);
                                        setMarkContent(w.content); }}>
-                check this mark
+                {tr("asst.make.check", lang)}
               </button>
             </p>
           </div>
@@ -216,35 +222,34 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>Check a mark</h3>
-        <p className="muted small">
-          Two questions, and they are not the same one: was this credential
-          issued here, and is this the content it was issued for.
-        </p>
+        <h3>{tr("asst.mark", lang)}</h3>
+        <p className="muted small">{tr("asst.mark.lead", lang)}</p>
         <div className="row">
           <input value={markId} onChange={(e) => setMarkId(e.target.value)}
-                 placeholder="a watermark id" style={{ flex: 1 }} />
+                 placeholder={tr("asst.mark.id", lang)} style={{ flex: 1 }} />
         </div>
         <textarea value={markContent}
                   onChange={(e) => setMarkContent(e.target.value)}
-                  rows={2} placeholder="the content to check against it" />
+                  rows={2} placeholder={tr("asst.mark.content", lang)} />
         <button disabled={busy || !markId.trim()}
                 onClick={act(async () => setVerdict(
                   await api.verifyWatermark(markId.trim(), markContent)))}>
-          Check it
+          {tr("asst.mark.go", lang)}
         </button>
         {verdict && (
           <>
             <p className="small">
-              <strong>{verdict.display.line}</strong> — issued{" "}
-              {verdict.issued_at.slice(0, 10)} for a {verdict.kind}.
+              <strong>{verdict.display.line}</strong> —{" "}
+              {fill(tr("asst.mark.issued", lang),
+                    { date: verdict.issued_at.slice(0, 10),
+                      kind: verdict.kind })}
             </p>
             {/* Both answers, always, and the mismatch loudest. Reporting
                 `valid` alone would call this genuine at the moment the
                 server said it had been altered. */}
             {verdict.content_match ? (
               <p className="small">
-                This is the content the credential was issued for.
+                {tr("asst.mark.match", lang)}
               </p>
             ) : (
               <div className="error">
@@ -260,31 +265,36 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
       </div>
 
       <div className="card">
-        <h3>What it is worn on</h3>
+        <h3>{tr("asst.worn", lang)}</h3>
         <label className="small">
           <input type="checkbox" checked={showRevoked}
                  onChange={(e) => setShowRevoked(e.target.checked)} />
-          {" "}include ones you have unpaired — the row stays, with the date
+          {" "}{tr("asst.worn.revoked", lang)}
         </label>
         {devices?.wearables.filter((w) => w.paired).length === 0 && (
-          <p className="muted small">Nothing paired.</p>
+          <p className="muted small">{tr("asst.worn.none", lang)}</p>
         )}
         {devices?.wearables.map((w) => (
           <p className="small" key={w.id}>
-            <strong>{w.name}</strong> — {w.kind} over {w.transport}
+            <strong>{w.name}</strong> —{" "}
+            {fill(tr("asst.worn.over", lang),
+                  { kind: w.kind, transport: w.transport })}
             {w.paired
-              ? <> · showing {w.faces.join(", ")}{" "}
+              ? <> · {fill(tr("asst.worn.showing", lang),
+                           { faces: w.faces.join(", ") })}{" "}
                   <button className="chip" disabled={busy}
                           onClick={act(() =>
                             api.unpairWearable(me, w.name, token),
-                            "Unpaired.")}>unpair</button></>
-              : <span className="muted"> · unpaired</span>}
+                            "Unpaired.")}>{
+                            tr("asst.worn.unpair", lang)}</button></>
+              : <span className="muted"> ·{" "}
+                  {tr("asst.worn.unpaired", lang)}</span>}
           </p>
         ))}
         <div className="row">
           <input value={deviceName}
                  onChange={(e) => setDeviceName(e.target.value)}
-                 placeholder="what you call it" style={{ flex: 1 }} />
+                 placeholder={tr("asst.worn.name", lang)} style={{ flex: 1 }} />
           <select value={deviceKind}
                   onChange={(e) => setDeviceKind(e.target.value)}>
             {Object.entries(devices?.kinds || {}).map(([k, where]) => (
@@ -296,11 +306,11 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                     await api.pairWearable(
                       me, { name: deviceName.trim(), kind: deviceKind }, token);
                     setDeviceName("");
-                  }, "Paired.")}>Pair</button>
+                  }, "Paired.")}>{tr("asst.worn.pair", lang)}</button>
         </div>
         {devices && Object.keys(devices.refused).length > 0 && (
           <>
-            <h4>What will not be paired</h4>
+            <h4>{tr("asst.worn.refused", lang)}</h4>
             {/* Verbatim, each of them. The argument is about the people who
                 walk into the room, and it is not the console's to shorten. */}
             {Object.entries(devices.refused).map(([k, why]) => (
@@ -312,21 +322,22 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
 
       {reviews && (
         <div className="card">
-          <h3>What people said</h3>
+          <h3>{tr("asst.said", lang)}</h3>
           {reviews.rating.count === 0 ? (
             <p className="muted small">{reviews.rating.note}</p>
           ) : (
             <p className="small">
-              {reviews.rating.average?.toFixed(1)} from{" "}
-              {reviews.rating.count} review
-              {reviews.rating.count === 1 ? "" : "s"}
+              {fill(tr("asst.said.from", lang),
+                    { avg: reviews.rating.average?.toFixed(1),
+                      count: reviews.rating.count })}
             </p>
           )}
           {reviews.reviews.map((r) => (
             <p className="small" key={r.id}>
               {"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}{" "}
               {r.body}
-              {r.edited && <span className="muted"> · edited</span>}
+              {r.edited && <span className="muted"> ·{" "}
+                {tr("asst.said.edited", lang)}</span>}
             </p>
           ))}
           {interactor && (
@@ -339,7 +350,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
               </select>
               <input value={reviewBody}
                      onChange={(e) => setReviewBody(e.target.value)}
-                     placeholder="what you thought" style={{ flex: 1 }} />
+                     placeholder={tr("asst.said.ph", lang)} style={{ flex: 1 }} />
               <button disabled={busy}
                       onClick={act(async () => {
                         await api.leaveReview(me, {
@@ -347,32 +358,29 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                           body: reviewBody.trim() || undefined },
                           interactorToken);
                         setReviewBody("");
-                      }, "Left.")}>Leave a review</button>
+                      }, "Left.")}>{
+                      tr("asst.said.leave", lang)}</button>
             </div>
           )}
           {/* The refusal it gives is a good one and worth saying up front. */}
-          <p className="muted small">
-            A review comes from somebody who actually talked to it — one per
-            person, edited rather than stacked.
-          </p>
+          <p className="muted small">{tr("asst.said.rule", lang)}</p>
         </div>
       )}
 
       {thread && (
         <div className="card">
-          <h3>Something you said</h3>
-          <p className="muted small">
-            You can correct or retract your own turn. The correction carries
-            forward: the next reply reasons from what you meant.
-          </p>
+          <h3>{tr("asst.you", lang)}</h3>
+          <p className="muted small">{tr("asst.you.lead", lang)}</p>
           {thread.messages.map((m) => (
             <div key={m.id}>
               <p className="small">
                 <strong>{m.role === "profile" ? "it" : "you"}</strong>:{" "}
                 {m.content}
                 {m.edited && (
-                  <span className="muted"> · edited{m.edit_count > 1
-                    ? ` ${m.edit_count} times` : ""}</span>
+                  <span className="muted"> · {m.edit_count > 1
+                    ? fill(tr("asst.you.times", lang),
+                           { n: m.edit_count })
+                    : tr("asst.said.edited", lang)}</span>
                 )}
               </p>
               {/* Marked rather than hidden. A conversation that quietly
@@ -380,8 +388,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                   answer is to an older question. */}
               {m.answers_stale_text && (
                 <p className="muted small">
-                  ↑ written before the message above it was changed, so it
-                  answers the older wording.
+                  {tr("asst.you.stale", lang)}
                 </p>
               )}
               {m.role !== "profile" && interactor && (
@@ -397,15 +404,16 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                               setEditing("");
                               setThread(await api.thread(me, interactor,
                                                          interactorToken));
-                            }, "Corrected.")}>Save</button>
-                    <button onClick={() => setEditing("")}>Cancel</button>
+                            }, "Corrected.")}>{
+                            tr("asst.you.save", lang)}</button>
+                    <button onClick={() => setEditing("")}>{tr("asst.you.cancel", lang)}</button>
                   </div>
                 ) : (
                   <div className="row">
                     <button className="chip"
                             onClick={() => { setEditing(m.id);
                                              setEditText(m.content); }}>
-                      correct it
+                      {tr("asst.you.correct", lang)}
                     </button>
                     <button className="chip" disabled={busy}
                             onClick={act(async () => {
@@ -413,7 +421,8 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                                                        interactorToken);
                               setThread(await api.thread(me, interactor,
                                                          interactorToken));
-                            }, "Taken back.")}>take it back</button>
+                            }, "Taken back.")}>{
+                            tr("asst.you.retract", lang)}</button>
                   </div>
                 )
               )}
@@ -423,11 +432,8 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
       )}
 
       <div className="card">
-        <h3>Add a photo or a document</h3>
-        <p className="muted small">
-          The kind is read from the bytes rather than the file name, and
-          nothing you took yourself is AI-marked.
-        </p>
+        <h3>{tr("asst.media", lang)}</h3>
+        <p className="muted small">{tr("asst.media.lead", lang)}</p>
         <input type="file" disabled={busy || !token}
                onChange={async (e) => {
                  const file = e.target.files?.[0];
@@ -438,8 +444,11 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                }} />
         {uploaded && (
           <p className="small">
-            {uploaded.name || uploaded.kind} — {uploaded.bytes} bytes ·{" "}
-            <a href={uploaded.url} target="_blank" rel="noreferrer">open</a>
+            {fill(tr("asst.media.bytes", lang),
+                  { name: uploaded.name || uploaded.kind,
+                    n: uploaded.bytes })} ·{" "}
+            <a href={uploaded.url} target="_blank" rel="noreferrer">{
+              tr("asst.media.open", lang)}</a>
             <span className="muted">
               {uploaded.ai_marked
                 ? " · marked as AI-generated"

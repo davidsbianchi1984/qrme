@@ -4,6 +4,27 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.44.3] — 2026-08-05
+
+### The backlogs shrink from both ends
+
+A ratchet round, worked the way the ratchets ask to be worked. The
+Assist screen — the largest single block on the gated console's
+untranslated record — is localized end to end: fifty-six strings
+become fifty-three `asst.*` keys in all ten languages, whole sentences
+with named holes rather than fragments, and the screen follows the
+profile's language the way the chrome does. The console-untranslated
+record falls **1459 → 1403**, exact-sync in both directions.
+
+The field-label evidence pass walked all 131 residue rows against
+every client form. Seven are now typed into forms this cut shipped —
+`beneficiary` and `designees` on the till, `comfort`, `humor`,
+`social_style`, `what_matters` and `sources` on the genesis and
+composite interviews — and each gains its ten-language label; the
+residue falls **131 → 124**. The rest stay on the identifier fallback
+with the evidence recorded: control-owned flags and client-filled ids,
+not things a person mistypes.
+
 ## [0.44.2] — 2026-08-05
 
 ### The last doors

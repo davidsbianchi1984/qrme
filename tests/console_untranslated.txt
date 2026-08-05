@@ -1,4 +1,4 @@
-# status: backlog — 1459 rows
+# status: backlog — 1403 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 1459
+# ceiling: 1403
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -50,62 +50,6 @@
 #     mattered  is this string one a non-English reader cannot read
 #
 # The count this file exists to state honestly was overstated by that much.
-Assist: A review comes from somebody who actually talked to it — one per person, edited rather than stacked.
-Assist: Add a photo or a document
-Assist: Cancel
-Assist: Check a mark
-Assist: Check it
-Assist: Compose
-Assist: Fix a draft
-Assist: Leave a review
-Assist: Make something to keep
-Assist: Nothing kept yet.
-Assist: Nothing paired.
-Assist: One item per line. You get back the best few
-Assist: Pair
-Assist: Proofread
-Assist: Save
-Assist: Set aside:
-Assist: Something you said
-Assist: Sort a pile
-Assist: Sort a pile, fix a draft, make something worth keeping — and every generated thing carries a mark you can check.
-Assist: Sort it
-Assist: The kind is read from the bytes rather than the file name, and nothing you took yourself is AI-marked.
-Assist: This is the content the credential was issued for.
-Assist: Two questions, and they are not the same one: was this credential issued here, and is this the content it was issued for.
-Assist: What it can do for you
-Assist: What it is worn on
-Assist: What people said
-Assist: What will not be paired
-Assist: You can correct or retract your own turn. The correction carries forward: the next reply reasons from what you meant.
-Assist: a watermark id
-Assist: bytes ·
-Assist: check this mark
-Assist: correct it
-Assist: for a
-Assist: from
-Assist: include ones you have unpaired — the row stays, with the date
-Assist: kept.
-Assist: looked at,
-Assist: one candidate per line
-Assist: open
-Assist: over
-Assist: paste something you wrote
-Assist: review
-Assist: take it back
-Assist: the content to check against it
-Assist: the moment to capture
-Assist: unpair
-Assist: what best means to you
-Assist: what you call it
-Assist: what you thought
-Assist: with the reason each one survived
-Assist: · edited
-Assist: · showing
-Assist: · unpaired
-Assist: — issued
-Assist: — the ranking is meant to be arguable.
-Assist: ↑ written before the message above it was changed, so it answers the older wording.
 Audience: . A gift reads who to credit from the profile itself; a subscription is told, so this screen shows you which account it named.
 Audience: Credited to
 Audience: Follow

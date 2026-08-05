@@ -1992,6 +1992,162 @@ const CHROME: Table = {
     hi: "खारिज",
     ar: "مرفوض",
   },
+  "asst.title": {
+    en: "What it can do for you", es: "Lo que puede hacer por ti", fr: "Ce qu'il peut faire pour vous", de: "Was es für Sie tun kann", pt: "O que pode fazer por si", it: "Cosa può fare per te", ja: "あなたのためにできること", zh: "它能为你做什么", hi: "यह आपके लिए क्या कर सकता है", ar: "ما يمكنه فعله من أجلك",
+  },
+  "asst.lead": {
+    en: "Sort a pile, fix a draft, make something worth keeping — and every generated thing carries a mark you can check.", es: "Ordena un montón, arregla un borrador, crea algo que valga la pena guardar — y todo lo generado lleva una marca que puedes comprobar.", fr: "Triez une pile, corrigez un brouillon, créez quelque chose à garder — et tout ce qui est généré porte une marque vérifiable.", de: "Einen Stapel sortieren, einen Entwurf verbessern, etwas Bleibendes schaffen — und alles Generierte trägt ein prüfbares Zeichen.", pt: "Ordene uma pilha, corrija um rascunho, crie algo que valha a pena guardar — e tudo o que é gerado traz uma marca verificável.", it: "Ordina una pila, sistema una bozza, crea qualcosa da tenere — e ogni cosa generata porta un marchio verificabile.", ja: "山を仕分け、下書きを直し、残す価値のあるものを作る — 生成されたものには必ず確認できるマークが付きます。", zh: "整理一堆、修改草稿、创作值得保留的东西 — 每件生成物都带有可核验的标记。", hi: "ढेर छाँटें, मसौदा सुधारें, रखने लायक कुछ बनाएँ — और हर जनित चीज़ पर जाँचने योग्य चिह्न होता है।", ar: "رتّب كومة، أصلح مسودة، اصنع شيئًا يستحق الحفظ — وكل ما يُولَّد يحمل علامة يمكنك التحقق منها.",
+  },
+  "asst.pile": {
+    en: "Sort a pile", es: "Ordenar un montón", fr: "Trier une pile", de: "Einen Stapel sortieren", pt: "Ordenar uma pilha", it: "Ordina una pila", ja: "山を仕分ける", zh: "整理一堆", hi: "ढेर छाँटें", ar: "ترتيب كومة",
+  },
+  "asst.pile.lead": {
+    en: "One item per line. You get back the best few with the reason each one survived — the ranking is meant to be arguable.", es: "Un elemento por línea. Recibes los mejores con la razón por la que cada uno sobrevivió — la clasificación está hecha para ser discutible.", fr: "Un élément par ligne. Vous recevez les meilleurs avec la raison pour laquelle chacun a survécu — le classement est fait pour être discutable.", de: "Ein Eintrag pro Zeile. Sie erhalten die besten zurück, mit dem Grund, warum jeder bestand — die Rangfolge soll anfechtbar sein.", pt: "Um item por linha. Recebe os melhores com a razão pela qual cada um sobreviveu — a classificação foi feita para ser discutível.", it: "Un elemento per riga. Ricevi i migliori con il motivo per cui ciascuno è sopravvissuto — la classifica è fatta per essere discutibile.", ja: "1行に1項目。最良のものが、それぞれが残った理由と共に返ります — 順位は議論できるように作られています。", zh: "每行一项。你会收到最好的几项及各自留下的理由 — 排名本就可以商榷。", hi: "प्रति पंक्ति एक आइटम। सर्वश्रेष्ठ कुछ, हर एक के बचने के कारण सहित मिलते हैं — रैंकिंग बहस योग्य होने के लिए ही है।", ar: "عنصر واحد في كل سطر. تستعيد الأفضل مع سبب بقاء كل منها — الترتيب مصمم ليكون قابلاً للنقاش.",
+  },
+  "asst.pile.ph": {
+    en: "one candidate per line", es: "un candidato por línea", fr: "un candidat par ligne", de: "ein Kandidat pro Zeile", pt: "um candidato por linha", it: "un candidato per riga", ja: "1行に1候補", zh: "每行一个候选", hi: "प्रति पंक्ति एक उम्मीदवार", ar: "مرشح واحد في كل سطر",
+  },
+  "asst.pile.best": {
+    en: "what best means to you", es: "qué significa mejor para ti", fr: "ce que « meilleur » veut dire pour vous", de: "was „am besten“ für Sie heißt", pt: "o que melhor significa para si", it: "cosa significa migliore per te", ja: "あなたにとっての「最良」とは", zh: "对你来说什么算最好", hi: "आपके लिए सर्वश्रेष्ठ का क्या अर्थ है", ar: "ما معنى الأفضل بالنسبة لك",
+  },
+  "asst.pile.go": {
+    en: "Sort it", es: "Ordenarlo", fr: "Trier", de: "Sortieren", pt: "Ordenar", it: "Ordina", ja: "仕分ける", zh: "整理", hi: "छाँटें", ar: "رتّب",
+  },
+  "asst.tally": {
+    en: "{reviewed} looked at, {kept} kept.", es: "{reviewed} revisados, {kept} conservados.", fr: "{reviewed} examinés, {kept} conservés.", de: "{reviewed} gesichtet, {kept} behalten.", pt: "{reviewed} analisados, {kept} mantidos.", it: "{reviewed} esaminati, {kept} tenuti.", ja: "{reviewed}件を確認し、{kept}件を残しました。", zh: "查看了{reviewed}项，保留了{kept}项。", hi: "{reviewed} देखे गए, {kept} रखे गए।", ar: "تمت مراجعة {reviewed}، واحتُفظ بـ {kept}.",
+  },
+  "asst.aside": {
+    en: "Set aside: {n}.", es: "Apartados: {n}.", fr: "Mis de côté : {n}.", de: "Beiseitegelegt: {n}.", pt: "Postos de lado: {n}.", it: "Messi da parte: {n}.", ja: "保留: {n}件。", zh: "搁置：{n}项。", hi: "अलग रखे: {n}।", ar: "وُضع جانبًا: {n}.",
+  },
+  "asst.fix": {
+    en: "Fix a draft", es: "Arreglar un borrador", fr: "Corriger un brouillon", de: "Einen Entwurf verbessern", pt: "Corrigir um rascunho", it: "Sistema una bozza", ja: "下書きを直す", zh: "修改草稿", hi: "मसौदा सुधारें", ar: "إصلاح مسودة",
+  },
+  "asst.fix.ph": {
+    en: "paste something you wrote", es: "pega algo que escribiste", fr: "collez quelque chose que vous avez écrit", de: "fügen Sie etwas Eigenes ein", pt: "cole algo que escreveu", it: "incolla qualcosa che hai scritto", ja: "自分で書いたものを貼り付け", zh: "粘贴你写的内容", hi: "अपना लिखा कुछ चिपकाएँ", ar: "الصق شيئًا كتبته",
+  },
+  "asst.fix.go": {
+    en: "Proofread", es: "Corregir", fr: "Relire", de: "Korrekturlesen", pt: "Rever", it: "Correggi", ja: "校正する", zh: "校对", hi: "प्रूफ़रीड करें", ar: "تدقيق",
+  },
+  "asst.make": {
+    en: "Make something to keep", es: "Crear algo para guardar", fr: "Créer quelque chose à garder", de: "Etwas Bleibendes schaffen", pt: "Criar algo para guardar", it: "Crea qualcosa da tenere", ja: "残すものを作る", zh: "创作可保留之物", hi: "रखने लायक कुछ बनाएँ", ar: "اصنع شيئًا للاحتفاظ به",
+  },
+  "asst.make.ph": {
+    en: "the moment to capture", es: "el momento a capturar", fr: "le moment à capturer", de: "der festzuhaltende Moment", pt: "o momento a capturar", it: "il momento da catturare", ja: "残したい瞬間", zh: "要记录的时刻", hi: "जो पल सहेजना है", ar: "اللحظة المراد التقاطها",
+  },
+  "asst.make.go": {
+    en: "Compose", es: "Componer", fr: "Composer", de: "Verfassen", pt: "Compor", it: "Componi", ja: "作る", zh: "创作", hi: "रचें", ar: "تأليف",
+  },
+  "asst.make.none": {
+    en: "Nothing kept yet.", es: "Nada guardado todavía.", fr: "Rien de gardé pour l'instant.", de: "Noch nichts aufbewahrt.", pt: "Ainda nada guardado.", it: "Ancora niente da tenere.", ja: "まだ何も残していません。", zh: "尚未保留任何内容。", hi: "अभी कुछ नहीं रखा गया।", ar: "لا شيء محفوظ بعد.",
+  },
+  "asst.make.check": {
+    en: "check this mark", es: "comprobar esta marca", fr: "vérifier cette marque", de: "dieses Zeichen prüfen", pt: "verificar esta marca", it: "verifica questo marchio", ja: "このマークを確認", zh: "核验此标记", hi: "यह चिह्न जाँचें", ar: "تحقق من هذه العلامة",
+  },
+  "asst.mark": {
+    en: "Check a mark", es: "Comprobar una marca", fr: "Vérifier une marque", de: "Ein Zeichen prüfen", pt: "Verificar uma marca", it: "Verifica un marchio", ja: "マークを確認", zh: "核验标记", hi: "चिह्न जाँचें", ar: "التحقق من علامة",
+  },
+  "asst.mark.lead": {
+    en: "Two questions, and they are not the same one: was this credential issued here, and is this the content it was issued for.", es: "Dos preguntas, y no son la misma: ¿se emitió aquí esta credencial, y es este el contenido para el que se emitió?", fr: "Deux questions, et ce ne sont pas les mêmes : cette référence a-t-elle été émise ici, et est-ce le contenu pour lequel elle a été émise ?", de: "Zwei Fragen, und es sind nicht dieselben: Wurde dieser Nachweis hier ausgestellt, und ist dies der Inhalt, für den er ausgestellt wurde?", pt: "Duas perguntas, e não são a mesma: esta credencial foi emitida aqui, e é este o conteúdo para o qual foi emitida?", it: "Due domande, e non sono la stessa: questa credenziale è stata emessa qui, ed è questo il contenuto per cui è stata emessa?", ja: "二つの問いは同じではありません：この資格情報はここで発行されたのか、そしてこれは発行対象の内容なのか。", zh: "两个问题，并不相同：此凭证是否在这里签发，以及这是否是它签发时对应的内容。", hi: "दो प्रश्न, और वे एक नहीं हैं: क्या यह क्रेडेंशियल यहाँ जारी हुआ, और क्या यही वह सामग्री है जिसके लिए जारी हुआ।", ar: "سؤالان وليسا واحدًا: هل صدر هذا الاعتماد هنا، وهل هذا هو المحتوى الذي صدر من أجله.",
+  },
+  "asst.mark.id": {
+    en: "a watermark id", es: "un id de marca de agua", fr: "un id de filigrane", de: "eine Wasserzeichen-Id", pt: "um id de marca de água", it: "un id di filigrana", ja: "ウォーターマークID", zh: "水印ID", hi: "वॉटरमार्क आईडी", ar: "معرّف علامة مائية",
+  },
+  "asst.mark.content": {
+    en: "the content to check against it", es: "el contenido a comprobar contra ella", fr: "le contenu à vérifier avec", de: "der dagegen zu prüfende Inhalt", pt: "o conteúdo a verificar contra ela", it: "il contenuto da verificare", ja: "照合する内容", zh: "用于核对的内容", hi: "जिससे मिलान करना है वह सामग्री", ar: "المحتوى المراد فحصه",
+  },
+  "asst.mark.go": {
+    en: "Check it", es: "Comprobar", fr: "Vérifier", de: "Prüfen", pt: "Verificar", it: "Verifica", ja: "確認する", zh: "核验", hi: "जाँचें", ar: "تحقق",
+  },
+  "asst.mark.issued": {
+    en: "issued {date} for a {kind}", es: "emitida el {date} para un {kind}", fr: "émise le {date} pour un {kind}", de: "ausgestellt am {date} für {kind}", pt: "emitida em {date} para {kind}", it: "emessa il {date} per {kind}", ja: "{date}に{kind}向けに発行", zh: "{date}为{kind}签发", hi: "{date} को {kind} के लिए जारी", ar: "صدرت في {date} لـ {kind}",
+  },
+  "asst.mark.match": {
+    en: "This is the content the credential was issued for.", es: "Este es el contenido para el que se emitió la credencial.", fr: "C'est le contenu pour lequel la référence a été émise.", de: "Dies ist der Inhalt, für den der Nachweis ausgestellt wurde.", pt: "Este é o conteúdo para o qual a credencial foi emitida.", it: "Questo è il contenuto per cui la credenziale è stata emessa.", ja: "これは資格情報の発行対象の内容です。", zh: "这是凭证签发时对应的内容。", hi: "यही वह सामग्री है जिसके लिए क्रेडेंशियल जारी हुआ।", ar: "هذا هو المحتوى الذي صدر الاعتماد من أجله.",
+  },
+  "asst.worn": {
+    en: "What it is worn on", es: "En qué se lleva", fr: "Sur quoi il se porte", de: "Worauf es getragen wird", pt: "Onde é usado", it: "Su cosa si indossa", ja: "身につける場所", zh: "佩戴之处", hi: "किस पर पहना जाता है", ar: "على ماذا يُرتدى",
+  },
+  "asst.worn.revoked": {
+    en: "include ones you have unpaired — the row stays, with the date", es: "incluir los que has desemparejado — la fila permanece, con la fecha", fr: "inclure ceux que vous avez désappairés — la ligne reste, avec la date", de: "auch entkoppelte zeigen — die Zeile bleibt, mit Datum", pt: "incluir os que desemparelhou — a linha fica, com a data", it: "includi quelli disaccoppiati — la riga resta, con la data", ja: "解除したものも表示 — 行は日付と共に残ります", zh: "包括已取消配对的 — 记录保留，附日期", hi: "अलग किए गए भी दिखाएँ — पंक्ति तिथि सहित रहती है", ar: "تضمين ما ألغيت إقرانه — يبقى الصف مع التاريخ",
+  },
+  "asst.worn.none": {
+    en: "Nothing paired.", es: "Nada emparejado.", fr: "Rien d'appairé.", de: "Nichts gekoppelt.", pt: "Nada emparelhado.", it: "Niente di accoppiato.", ja: "ペアリングなし。", zh: "未配对任何设备。", hi: "कुछ नहीं जुड़ा।", ar: "لا شيء مقترن.",
+  },
+  "asst.worn.over": {
+    en: "{kind} over {transport}", es: "{kind} por {transport}", fr: "{kind} via {transport}", de: "{kind} über {transport}", pt: "{kind} por {transport}", it: "{kind} via {transport}", ja: "{kind}（{transport}経由）", zh: "{kind}（经{transport}）", hi: "{kind}, {transport} से", ar: "{kind} عبر {transport}",
+  },
+  "asst.worn.showing": {
+    en: "showing {faces}", es: "mostrando {faces}", fr: "affiche {faces}", de: "zeigt {faces}", pt: "a mostrar {faces}", it: "mostra {faces}", ja: "{faces}を表示中", zh: "显示{faces}", hi: "{faces} दिखा रहा है", ar: "يعرض {faces}",
+  },
+  "asst.worn.unpair": {
+    en: "unpair", es: "desemparejar", fr: "désappairer", de: "entkoppeln", pt: "desemparelhar", it: "disaccoppia", ja: "解除", zh: "取消配对", hi: "अलग करें", ar: "إلغاء الإقران",
+  },
+  "asst.worn.unpaired": {
+    en: "unpaired", es: "desemparejado", fr: "désappairé", de: "entkoppelt", pt: "desemparelhado", it: "disaccoppiato", ja: "解除済み", zh: "已取消配对", hi: "अलग किया गया", ar: "غير مقترن",
+  },
+  "asst.worn.name": {
+    en: "what you call it", es: "cómo lo llamas", fr: "comment vous l'appelez", de: "wie Sie es nennen", pt: "como lhe chama", it: "come lo chiami", ja: "呼び名", zh: "你怎么称呼它", hi: "आप इसे क्या कहते हैं", ar: "ماذا تسميه",
+  },
+  "asst.worn.pair": {
+    en: "Pair", es: "Emparejar", fr: "Appairer", de: "Koppeln", pt: "Emparelhar", it: "Accoppia", ja: "ペアリング", zh: "配对", hi: "जोड़ें", ar: "إقران",
+  },
+  "asst.worn.refused": {
+    en: "What will not be paired", es: "Lo que no se emparejará", fr: "Ce qui ne sera pas appairé", de: "Was nicht gekoppelt wird", pt: "O que não será emparelhado", it: "Cosa non sarà accoppiato", ja: "ペアリングされないもの", zh: "不会被配对的设备", hi: "जो नहीं जोड़ा जाएगा", ar: "ما لن يُقرن",
+  },
+  "asst.said": {
+    en: "What people said", es: "Lo que dijo la gente", fr: "Ce que les gens ont dit", de: "Was die Leute sagten", pt: "O que as pessoas disseram", it: "Cosa ha detto la gente", ja: "人々の声", zh: "人们的评价", hi: "लोगों ने क्या कहा", ar: "ما قاله الناس",
+  },
+  "asst.said.from": {
+    en: "{avg} from {count} reviews", es: "{avg} de {count} reseñas", fr: "{avg} sur {count} avis", de: "{avg} aus {count} Bewertungen", pt: "{avg} de {count} avaliações", it: "{avg} da {count} recensioni", ja: "{count}件のレビューで{avg}", zh: "{count}条评价，平均{avg}", hi: "{count} समीक्षाओं से {avg}", ar: "{avg} من {count} مراجعة",
+  },
+  "asst.said.edited": {
+    en: "edited", es: "editada", fr: "modifié", de: "bearbeitet", pt: "editada", it: "modificata", ja: "編集済み", zh: "已编辑", hi: "संपादित", ar: "معدَّلة",
+  },
+  "asst.said.ph": {
+    en: "what you thought", es: "lo que pensaste", fr: "ce que vous en avez pensé", de: "was Sie dachten", pt: "o que achou", it: "cosa ne pensi", ja: "感想", zh: "你的想法", hi: "आपकी राय", ar: "ما رأيك",
+  },
+  "asst.said.leave": {
+    en: "Leave a review", es: "Dejar una reseña", fr: "Laisser un avis", de: "Bewertung abgeben", pt: "Deixar avaliação", it: "Lascia una recensione", ja: "レビューを書く", zh: "留下评价", hi: "समीक्षा दें", ar: "اترك مراجعة",
+  },
+  "asst.said.rule": {
+    en: "A review comes from somebody who actually talked to it — one per person, edited rather than stacked.", es: "Una reseña viene de alguien que realmente habló con él — una por persona, editada en vez de acumulada.", fr: "Un avis vient de quelqu'un qui lui a réellement parlé — un par personne, modifié plutôt qu'empilé.", de: "Eine Bewertung kommt von jemandem, der wirklich mit ihm sprach — eine pro Person, bearbeitet statt gestapelt.", pt: "Uma avaliação vem de alguém que realmente falou com ele — uma por pessoa, editada em vez de acumulada.", it: "Una recensione viene da chi ci ha davvero parlato — una a persona, modificata invece che accumulata.", ja: "レビューは実際に話した人からのもの — 一人一件、積み重ねではなく編集式です。", zh: "评价来自真正与之交谈过的人 — 每人一条，编辑而非叠加。", hi: "समीक्षा उसी से आती है जिसने वाकई बात की — प्रति व्यक्ति एक, जमा नहीं, संपादित।", ar: "المراجعة تأتي ممن تحدث إليه فعلاً — واحدة لكل شخص، تُعدَّل ولا تتكدس.",
+  },
+  "asst.you": {
+    en: "Something you said", es: "Algo que dijiste", fr: "Quelque chose que vous avez dit", de: "Etwas, das Sie sagten", pt: "Algo que disse", it: "Qualcosa che hai detto", ja: "あなたの発言", zh: "你说过的话", hi: "आपने जो कहा", ar: "شيء قلته",
+  },
+  "asst.you.lead": {
+    en: "You can correct or retract your own turn. The correction carries forward: the next reply reasons from what you meant.", es: "Puedes corregir o retirar tu propio turno. La corrección se propaga: la siguiente respuesta razona desde lo que quisiste decir.", fr: "Vous pouvez corriger ou retirer votre propre tour. La correction se propage : la réponse suivante raisonne à partir de ce que vous vouliez dire.", de: "Sie können Ihren eigenen Beitrag korrigieren oder zurücknehmen. Die Korrektur wirkt weiter: die nächste Antwort geht von dem aus, was Sie meinten.", pt: "Pode corrigir ou retirar a sua própria vez. A correção propaga-se: a próxima resposta raciocina a partir do que quis dizer.", it: "Puoi correggere o ritirare il tuo turno. La correzione si propaga: la risposta successiva ragiona da ciò che intendevi.", ja: "自分の発言は修正も撤回もできます。修正は引き継がれ、次の返答はあなたの意図から推論します。", zh: "你可以更正或撤回自己的发言。更正会延续：下一条回复将依据你的本意。", hi: "आप अपनी बारी सुधार या वापस ले सकते हैं। सुधार आगे बढ़ता है: अगला जवाब आपके आशय से तर्क करता है।", ar: "يمكنك تصحيح دورك أو سحبه. التصحيح يستمر: الرد التالي يستدل مما قصدته.",
+  },
+  "asst.you.times": {
+    en: "edited {n} times", es: "editado {n} veces", fr: "modifié {n} fois", de: "{n}-mal bearbeitet", pt: "editado {n} vezes", it: "modificato {n} volte", ja: "{n}回編集", zh: "编辑{n}次", hi: "{n} बार संपादित", ar: "عُدّل {n} مرات",
+  },
+  "asst.you.stale": {
+    en: "↑ written before the message above it was changed, so it answers the older wording.", es: "↑ escrito antes de que se cambiara el mensaje de arriba, así que responde a la redacción anterior.", fr: "↑ écrit avant la modification du message au-dessus, il répond donc à l'ancienne formulation.", de: "↑ geschrieben, bevor die Nachricht darüber geändert wurde — es beantwortet also den älteren Wortlaut.", pt: "↑ escrito antes de a mensagem acima ser alterada, por isso responde à redação anterior.", it: "↑ scritto prima che il messaggio sopra fosse cambiato, quindi risponde alla formulazione precedente.", ja: "↑ 上のメッセージが変更される前に書かれたため、以前の文面への返答です。", zh: "↑ 写于上方消息修改之前，因此回应的是旧的措辞。", hi: "↑ ऊपर का संदेश बदलने से पहले लिखा गया, इसलिए यह पुराने शब्दों का उत्तर है।", ar: "↑ كُتب قبل تغيير الرسالة أعلاه، فهو يجيب على الصياغة الأقدم.",
+  },
+  "asst.you.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
+  },
+  "asst.you.cancel": {
+    en: "Cancel", es: "Cancelar", fr: "Annuler", de: "Abbrechen", pt: "Cancelar", it: "Annulla", ja: "キャンセル", zh: "取消", hi: "रद्द करें", ar: "إلغاء",
+  },
+  "asst.you.correct": {
+    en: "correct it", es: "corregirlo", fr: "le corriger", de: "korrigieren", pt: "corrigir", it: "correggilo", ja: "修正する", zh: "更正", hi: "सुधारें", ar: "صحّحه",
+  },
+  "asst.you.retract": {
+    en: "take it back", es: "retirarlo", fr: "le retirer", de: "zurücknehmen", pt: "retirar", it: "ritiralo", ja: "取り消す", zh: "撤回", hi: "वापस लें", ar: "استرجعه",
+  },
+  "asst.media": {
+    en: "Add a photo or a document", es: "Añadir una foto o un documento", fr: "Ajouter une photo ou un document", de: "Foto oder Dokument hinzufügen", pt: "Adicionar uma foto ou documento", it: "Aggiungi una foto o un documento", ja: "写真や書類を追加", zh: "添加照片或文档", hi: "फ़ोटो या दस्तावेज़ जोड़ें", ar: "أضف صورة أو مستندًا",
+  },
+  "asst.media.lead": {
+    en: "The kind is read from the bytes rather than the file name, and nothing you took yourself is AI-marked.", es: "El tipo se lee de los bytes y no del nombre del archivo, y nada que hayas tomado tú lleva la marca de IA.", fr: "Le type est lu dans les octets et non dans le nom du fichier, et rien de ce que vous avez pris vous-même n'est marqué IA.", de: "Die Art wird aus den Bytes gelesen, nicht aus dem Dateinamen, und nichts Selbstaufgenommenes trägt das KI-Zeichen.", pt: "O tipo é lido dos bytes e não do nome do ficheiro, e nada que tenha captado tem marca de IA.", it: "Il tipo si legge dai byte e non dal nome del file, e nulla di ciò che hai scattato tu porta il marchio IA.", ja: "種類はファイル名ではなくバイト列から読み取られ、自分で撮ったものにAIマークは付きません。", zh: "类型从字节读取而非文件名，你自己拍摄的内容不会带AI标记。", hi: "प्रकार फ़ाइल नाम से नहीं, बाइट्स से पढ़ा जाता है, और आपकी खुद की ली गई चीज़ों पर AI-चिह्न नहीं होता।", ar: "يُقرأ النوع من البايتات لا من اسم الملف، وما التقطته بنفسك لا يحمل علامة الذكاء الاصطناعي.",
+  },
+  "asst.media.bytes": {
+    en: "{name} — {n} bytes", es: "{name} — {n} bytes", fr: "{name} — {n} octets", de: "{name} — {n} Bytes", pt: "{name} — {n} bytes", it: "{name} — {n} byte", ja: "{name} — {n}バイト", zh: "{name} — {n}字节", hi: "{name} — {n} बाइट", ar: "{name} — {n} بايت",
+  },
+  "asst.media.open": {
+    en: "open", es: "abrir", fr: "ouvrir", de: "öffnen", pt: "abrir", it: "apri", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتح",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

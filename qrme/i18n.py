@@ -2934,6 +2934,13 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    'beneficiary': {'en': 'Beneficiary', 'es': 'Beneficiario', 'fr': 'Bénéficiaire', 'de': 'Begünstigter', 'pt': 'Beneficiário', 'it': 'Beneficiario', 'ja': '受取人', 'zh': '受益人', 'hi': 'लाभार्थी', 'ar': 'المستفيد'},
+    'designees': {'en': 'Designees', 'es': 'Designados', 'fr': 'Désignataires', 'de': 'Benannte', 'pt': 'Designados', 'it': 'Designati', 'ja': '指定先', 'zh': '指定人', 'hi': 'नामित', 'ar': 'المعيَّنون'},
+    'comfort': {'en': 'How they comfort', 'es': 'Cómo consuelan', 'fr': 'Comment ils réconfortent', 'de': 'Wie sie trösten', 'pt': 'Como confortam', 'it': 'Come consolano', 'ja': '慰め方', 'zh': '如何安慰', 'hi': 'कैसे सांत्वना देते हैं', 'ar': 'كيف يواسون'},
+    'humor': {'en': 'Humor', 'es': 'Humor', 'fr': 'Humour', 'de': 'Humor', 'pt': 'Humor', 'it': 'Umorismo', 'ja': 'ユーモア', 'zh': '幽默', 'hi': 'हास्य', 'ar': 'روح الدعابة'},
+    'social_style': {'en': 'Social style', 'es': 'Estilo social', 'fr': 'Style social', 'de': 'Sozialer Stil', 'pt': 'Estilo social', 'it': 'Stile sociale', 'ja': '社交スタイル', 'zh': '社交风格', 'hi': 'सामाजिक शैली', 'ar': 'الأسلوب الاجتماعي'},
+    'what_matters': {'en': 'What matters', 'es': 'Lo que importa', 'fr': 'Ce qui compte', 'de': 'Was zählt', 'pt': 'O que importa', 'it': 'Ciò che conta', 'ja': '大切なこと', 'zh': '在乎的事', 'hi': 'क्या मायने रखता है', 'ar': 'ما يهم'},
+    'sources': {'en': 'Source profiles, comma-separated', 'es': 'Perfiles fuente, separados por comas', 'fr': 'Profils sources, séparés par des virgules', 'de': 'Quellprofile, kommagetrennt', 'pt': 'Perfis de origem, separados por vírgulas', 'it': 'Profili di origine, separati da virgole', 'ja': '元プロフィール（カンマ区切り）', 'zh': '来源资料，逗号分隔', 'hi': 'स्रोत प्रोफ़ाइल, अल्पविराम से', 'ar': 'الملفات المصدر مفصولة بفواصل'},
     'minutes': {'en': 'Minutes', 'es': 'Minutos', 'fr': 'Minutes', 'de': 'Minuten', 'pt': 'Minutos', 'it': 'Minuti', 'ja': '分', 'zh': '分钟', 'hi': 'मिनट', 'ar': 'الدقائق'},
     'lesson': {'en': 'Step', 'es': 'Paso', 'fr': 'Étape', 'de': 'Schritt', 'pt': 'Passo', 'it': 'Passo', 'ja': 'ステップ', 'zh': '步骤', 'hi': 'चरण', 'ar': 'الخطوة'},
     'position_s': {'en': 'Position, in seconds', 'es': 'Posición, en segundos', 'fr': 'Position, en secondes', 'de': 'Position, in Sekunden', 'pt': 'Posição, em segundos', 'it': 'Posizione, in secondi', 'ja': '位置（秒）', 'zh': '位置（秒）', 'hi': 'स्थिति, सेकंड में', 'ar': 'الموضع بالثواني'},
