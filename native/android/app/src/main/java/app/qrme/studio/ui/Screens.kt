@@ -2782,6 +2782,11 @@ private fun PeoplePanel(vm: StudioViewModel) {
         CameraBlock(vm) { note = it }
         OrgBlock(vm) { note = it }
         TourBlock(vm) { note = it }
+        BotBlock(vm) { note = it }
+        ReferBlock(vm) { note = it }
+        ObjectBlock(vm) { note = it }
+        LobbyBlock(vm) { note = it }
+        DockBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -3274,6 +3279,244 @@ private fun TourBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             vm.call({ ApiClient.tutorialForScreen(screenNo.toIntOrNull()
                 ?: 1) }) { r ->
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+// The body, the referral, the objection, the lobby and the dock — five
+// more blocks off the doorless records, each rendering its backend's
+// rules rather than inventing a sixth opinion.
+@Composable
+private fun BotBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var robotId by remember { mutableStateOf("") }
+    var pace by remember { mutableStateOf("") }
+    var rows by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("bot.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("bot.id", lang), robotId, "") { robotId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("bot.log", lang), enabled = robotId.isNotBlank()) {
+                vm.call({ ApiClient.robotCommands(robotId, vm.token!!) }) { r ->
+                    rows = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("bot.skills", lang), enabled = robotId.isNotBlank()) {
+                vm.call({ ApiClient.robotSkills(robotId, vm.token!!) }) { r ->
+                    rows = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("bot.dials", lang), enabled = robotId.isNotBlank()) {
+                vm.call({ ApiClient.robotSteering(robotId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("bot.unbind", lang), enabled = robotId.isNotBlank()) {
+                vm.call({ ApiClient.unbindRobot(robotId, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("bot.pace", lang), pace, "") { pace = it }
+        BrandButton(L10n.t("bot.dials.set", lang),
+            enabled = robotId.isNotBlank() && pace.isNotBlank()) {
+            vm.call({ ApiClient.steerRobot(robotId,
+                pace.toIntOrNull() ?: 50, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        rows.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+    }
+}
+
+@Composable
+private fun ReferBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var area by remember { mutableStateOf("") }
+    var providerId by remember { mutableStateOf("") }
+    var referralId by remember { mutableStateOf("") }
+    var signatureId by remember { mutableStateOf("") }
+    var linkToken by remember { mutableStateOf("") }
+    var reply by remember { mutableStateOf("") }
+    var found by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("refer.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("refer.area", lang), area, "") { area = it }
+        BrandButton(L10n.t("refer.match", lang), enabled = area.isNotBlank()) {
+            vm.call({ ApiClient.matchClinicians(area) }) { r ->
+                found = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        found.forEach { (id, line) ->
+            TextButton(onClick = { providerId = id }) {
+                Text(line, color = Qrme.T3, fontSize = 11.sp)
+            }
+        }
+        labeledField(L10n.t("refer.provider", lang), providerId, "") { providerId = it }
+        BrandButton(L10n.t("refer.prepare", lang), enabled = providerId.isNotBlank()) {
+            vm.call({ ApiClient.prepareReferral(vm.pid!!, vm.pid!!,
+                providerId, vm.token!!) }) { r ->
+                r.getOrNull()?.let { referralId = it }
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("refer.id", lang), referralId, "") { referralId = it }
+        labeledField(L10n.t("refer.signature", lang), signatureId, "") { signatureId = it }
+        BrandButton(L10n.t("refer.release", lang),
+            enabled = referralId.isNotBlank() && signatureId.isNotBlank()) {
+            vm.call({ ApiClient.releaseReferral(referralId, signatureId,
+                vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("refer.token", lang), linkToken, "") { linkToken = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("refer.open", lang),
+                enabled = referralId.isNotBlank() && linkToken.isNotBlank()) {
+                vm.call({ ApiClient.openReferral(referralId, linkToken) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("refer.words", lang), reply, "") { reply = it }
+        BrandButton(L10n.t("refer.reply", lang),
+            enabled = referralId.isNotBlank() && linkToken.isNotBlank()
+                && reply.isNotBlank()) {
+            vm.call({ ApiClient.replyToReferral(referralId, linkToken,
+                reply) }) { r -> onNote(r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+@Composable
+private fun ObjectBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var objectionId by remember { mutableStateOf("") }
+    var rows by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("object.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("object.id", lang), objectionId, "") { objectionId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("object.show", lang), enabled = objectionId.isNotBlank()) {
+                vm.call({ ApiClient.objection(objectionId) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("object.audit", lang), enabled = objectionId.isNotBlank()) {
+                vm.call({ ApiClient.objectionAudit(objectionId, vm.token!!) }) { r ->
+                    rows = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("object.withdraw", lang), enabled = objectionId.isNotBlank()) {
+                vm.call({ ApiClient.withdrawObjectionConsent(objectionId) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("object.revoke", lang), enabled = objectionId.isNotBlank()) {
+                vm.call({ ApiClient.revokeObjectionBasis(objectionId) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        // The reviewer's verb, drawn with its gate named: an owner cannot
+        // adjudicate an objection against their own profile.
+        BrandButton(L10n.t("object.resolve", lang) + " — " +
+            L10n.t("object.outcome", lang), enabled = objectionId.isNotBlank()) {
+            vm.call({ ApiClient.resolveObjection(objectionId, "dismiss",
+                vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        rows.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+    }
+}
+
+@Composable
+private fun LobbyBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var sessionId by remember { mutableStateOf("") }
+    var memberKind by remember { mutableStateOf("profile") }
+    var memberId by remember { mutableStateOf("") }
+    var role by remember { mutableStateOf("teammate") }
+    var rows by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("lobby.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        BrandButton(L10n.t("lobby.rules", lang)) {
+            vm.call({ ApiClient.lobbyRules() }) { r ->
+                rows = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("lobby.session", lang), sessionId, "") { sessionId = it }
+        labeledField(L10n.t("lobby.kind", lang), memberKind, "") { memberKind = it }
+        labeledField(L10n.t("lobby.member", lang), memberId, "") { memberId = it }
+        labeledField(L10n.t("lobby.role", lang), role, "") { role = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("lobby.seat", lang),
+                enabled = sessionId.isNotBlank() && memberId.isNotBlank()) {
+                vm.call({ ApiClient.seatInLobby(sessionId, memberKind,
+                    memberId, role, vm.token!!) }) { r ->
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lobby.roster", lang), enabled = sessionId.isNotBlank()) {
+                vm.call({ ApiClient.lobbyRoster(sessionId, vm.token!!) }) { r ->
+                    rows = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lobby.leave", lang),
+                enabled = sessionId.isNotBlank() && memberId.isNotBlank()) {
+                vm.call({ ApiClient.leaveLobby(sessionId, memberId,
+                    vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("lobby.context", lang), enabled = sessionId.isNotBlank()) {
+                vm.call({ ApiClient.lobbyContext(sessionId, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        rows.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+    }
+}
+
+@Composable
+private fun DockBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var faceName by remember { mutableStateOf("") }
+    var corner by remember { mutableStateOf("bottom_right") }
+    var state by remember { mutableStateOf("handle") }
+    var rows by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("dock.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("dock.faces", lang)) {
+                vm.call({ ApiClient.dockFaces() }) { r ->
+                    rows = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("dock.mine", lang)) {
+                vm.call({ ApiClient.dockSettings(vm.pid!!, vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        rows.forEach { f ->
+            TextButton(onClick = { faceName = f }) {
+                Text(f, color = Qrme.T3, fontSize = 11.sp)
+            }
+        }
+        labeledField(L10n.t("dock.face", lang), faceName, "") { faceName = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("dock.where", lang), enabled = faceName.isNotBlank()) {
+                vm.call({ ApiClient.dockWhere(faceName) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("dock.face", lang), enabled = faceName.isNotBlank()) {
+                vm.call({ ApiClient.dockFace(vm.pid!!, faceName,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("dock.corner", lang), corner, "") { corner = it }
+        labeledField(L10n.t("dock.state", lang), state, "") { state = it }
+        BrandButton(L10n.t("dock.set", lang)) {
+            vm.call({ ApiClient.configureDock(vm.pid!!, corner, state,
+                vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
         }
     }
 }

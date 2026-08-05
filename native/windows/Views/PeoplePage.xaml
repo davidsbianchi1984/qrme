@@ -359,6 +359,131 @@
                                Foreground="{StaticResource QrmeT2Brush}" />
                 </StackPanel>
             </Border>
+            <!-- The robot body: the owner's audit trail and dials. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="BotTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="BotIdBox" />
+                    <Button x:Name="BotLogButton" Click="OnBotLog" />
+                    <Button x:Name="BotSkillsButton" Click="OnBotSkills" />
+                    <Button x:Name="BotDialsButton" Click="OnBotDials" />
+                    <Button x:Name="BotUnbindButton" Click="OnBotUnbind" />
+                    <TextBox x:Name="BotPaceBox" />
+                    <Button x:Name="BotSteerButton" Click="OnBotSteer" />
+                    <ItemsControl x:Name="BotList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The medical referral: signed before released, opened once. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="ReferTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="ReferAreaBox" />
+                    <Button x:Name="ReferMatchButton" Click="OnReferMatch" />
+                    <ItemsControl x:Name="ClinicianList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="ReferProviderBox" />
+                    <Button x:Name="ReferPrepareButton" Click="OnReferPrepare" />
+                    <TextBox x:Name="ReferIdBox" />
+                    <TextBox x:Name="ReferSignatureBox" />
+                    <Button x:Name="ReferReleaseButton" Click="OnReferRelease" />
+                    <TextBox x:Name="ReferTokenBox" />
+                    <Button x:Name="ReferOpenButton" Click="OnReferOpen" />
+                    <TextBox x:Name="ReferWordsBox" />
+                    <Button x:Name="ReferReplyButton" Click="OnReferReply" />
+                </StackPanel>
+            </Border>
+
+            <!-- The objection: readable and endable by its own subject. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="ObjectTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="ObjectIdBox" />
+                    <Button x:Name="ObjectShowButton" Click="OnObjectShow" />
+                    <Button x:Name="ObjectAuditButton" Click="OnObjectAudit" />
+                    <Button x:Name="ObjectWithdrawButton" Click="OnObjectWithdraw" />
+                    <Button x:Name="ObjectRevokeButton" Click="OnObjectRevoke" />
+                    <Button x:Name="ObjectResolveButton" Click="OnObjectResolve" />
+                    <ItemsControl x:Name="ObjectList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The game lobby: the honest roster. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="LobbyTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="LobbyRulesButton" Click="OnLobbyRules" />
+                    <TextBox x:Name="LobbySessionBox" />
+                    <TextBox x:Name="LobbyKindBox" />
+                    <TextBox x:Name="LobbyMemberBox" />
+                    <TextBox x:Name="LobbyRoleBox" />
+                    <Button x:Name="LobbySeatButton" Click="OnLobbySeat" />
+                    <Button x:Name="LobbyRosterButton" Click="OnLobbyRoster" />
+                    <Button x:Name="LobbyLeaveButton" Click="OnLobbyLeave" />
+                    <Button x:Name="LobbyContextButton" Click="OnLobbyContext" />
+                    <ItemsControl x:Name="LobbyList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- The helper dock's own settings. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="DockTitle" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="DockFacesButton" Click="OnDockFaces" />
+                    <Button x:Name="DockMineButton" Click="OnDockMine" />
+                    <ItemsControl x:Name="DockList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBox x:Name="DockFaceBox" />
+                    <Button x:Name="DockWhereButton" Click="OnDockWhere" />
+                    <Button x:Name="DockFaceButton" Click="OnDockFace" />
+                    <TextBox x:Name="DockCornerBox" />
+                    <TextBox x:Name="DockStateBox" />
+                    <Button x:Name="DockSetButton" Click="OnDockSet" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

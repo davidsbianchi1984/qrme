@@ -2824,3 +2824,253 @@ extension ApiClient {
                           body: ["learner_id": learnerId, "lesson": lesson])
     }
 }
+
+// MARK: - The body, the referral, the objection, the lobby and the dock
+//
+// Five more blocks off the doorless records: the robot body's audit
+// trail and dials, the medical referral's sign-then-release flow, the
+// objection a person can read and end, the game lobby's honest roster,
+// and the helper dock's own settings.
+
+struct RobotCommandRow: Decodable {
+    let id: String?
+    let command: String?
+    let created_at: String?
+    var identity: String { id ?? created_at ?? "?" }
+}
+
+struct RobotSkillRow: Decodable, Identifiable {
+    let task: String?
+    let title: String?
+    let pack_title: String?
+    var id: String { task ?? title ?? "?" }
+}
+
+struct RobotSteering: Decodable {
+    let values: [String: Double]?
+    let behavior_profile: String?
+}
+
+struct ClinicianRow: Decodable, Identifiable {
+    let id: String?
+    let name: String?
+    let expertise: String?
+    var identity: String { id ?? name ?? "?" }
+}
+
+struct ReferralPackage: Decodable {
+    let id: String?
+    let referral_id: String?
+    let status: String?
+    var identity: String { id ?? referral_id ?? "?" }
+}
+
+struct ObjectionCard: Decodable {
+    let id: String?
+    let status: String?
+    let reattested: Bool?
+}
+
+struct ObjectionAudit: Decodable {
+    struct Event: Decodable {
+        let id: String?
+        let event: String?
+        let sealed: Bool?
+        var identity: String { id ?? event ?? "?" }
+    }
+    let status: String?
+    let events: [Event]?
+}
+
+struct LobbySeat: Decodable, Identifiable {
+    let member_id: String?
+    let member_kind: String?
+    let role: String?
+    let callsign: String?
+    var id: String { member_id ?? callsign ?? "?" }
+}
+
+struct DockSettings: Decodable {
+    let corner: String?
+    let state: String?
+    let face: String?
+    let wanted: String?
+}
+
+extension ApiClient {
+    // -- the robot body --
+
+    func unbindRobot(robotId: String, token: String) async throws {
+        struct Out: Decodable { let unbound: Bool? }
+        let _: Out = try await request("/robots/\(robotId)", method: "DELETE",
+                                       token: token)
+    }
+
+    /// Owner-only audit: everything this body has been told to do.
+    func robotCommands(robotId: String,
+                       token: String) async throws -> [RobotCommandRow] {
+        try await request("/robots/\(robotId)/commands", token: token)
+    }
+
+    func robotSkills(robotId: String,
+                     token: String) async throws -> [RobotSkillRow] {
+        try await request("/robots/\(robotId)/skills", token: token)
+    }
+
+    /// A body's dials — intimacy never applies to a body.
+    func robotSteering(robotId: String,
+                       token: String) async throws -> RobotSteering {
+        try await request("/robots/\(robotId)/steering", token: token)
+    }
+
+    func steerRobot(robotId: String, values: [String: Int],
+                    token: String) async throws -> RobotSteering {
+        try await request("/robots/\(robotId)/steering", method: "PUT",
+                          body: ["values": values], token: token)
+    }
+
+    // -- the medical referral: sign, then release --
+
+    func matchClinicians(area: String) async throws -> [ClinicianRow] {
+        try await request("/referrals/match?area=\(area)")
+    }
+
+    /// Nothing is released here: the package comes back to be read, and
+    /// the signature raised covers exactly those bytes.
+    func prepareReferral(interactorId: String, profileId: String,
+                         providerId: String,
+                         token: String) async throws -> ReferralPackage {
+        try await request("/referrals/prepare", method: "POST",
+                          body: ["interactor_id": interactorId,
+                                 "profile_id": profileId,
+                                 "provider_id": providerId],
+                          token: token)
+    }
+
+    func releaseReferral(referralId: String, signatureId: String,
+                         token: String) async throws -> ReferralPackage {
+        try await request("/referrals/\(referralId)/release", method: "POST",
+                          body: ["signature_id": signatureId], token: token)
+    }
+
+    /// The clinician's side: once, and a second attempt says so.
+    func openReferral(referralId: String,
+                      linkToken: String) async throws -> ReferralPackage {
+        try await request("/referrals/\(referralId)?token=\(linkToken)")
+    }
+
+    func replyToReferral(referralId: String, linkToken: String,
+                         content: String) async throws -> ReferralPackage {
+        try await request("/referrals/\(referralId)/reply?token=\(linkToken)",
+                          method: "POST", body: ["content": content])
+    }
+
+    // -- the objection --
+
+    func objection(objectionId: String) async throws -> ObjectionCard {
+        try await request("/objections/\(objectionId)")
+    }
+
+    func objectionAudit(objectionId: String,
+                        token: String) async throws -> ObjectionAudit {
+        try await request("/objections/\(objectionId)/audit", token: token)
+    }
+
+    func withdrawObjectionConsent(
+            objectionId: String) async throws -> ObjectionCard {
+        try await request("/objections/\(objectionId)/withdraw",
+                          method: "POST")
+    }
+
+    func revokeObjectionBasis(
+            objectionId: String) async throws -> ObjectionCard {
+        try await request("/objections/\(objectionId)/revoke", method: "POST")
+    }
+
+    /// Reviewer-only: an owner cannot adjudicate an objection against
+    /// their own profile, and the backend enforces it by role.
+    func resolveObjection(objectionId: String, outcome: String,
+                          token: String) async throws -> ObjectionCard {
+        try await request("/objections/\(objectionId)/resolve",
+                          method: "POST", body: ["outcome": outcome],
+                          token: token)
+    }
+
+    // -- the game lobby --
+
+    func lobbyRules() async throws -> [String] {
+        struct Box: Decodable { let rules: [String]? }
+        let box: Box = try await request("/gaming/lobby/vocabulary")
+        return box.rules ?? []
+    }
+
+    func seatInLobby(sessionId: String, memberKind: String, memberId: String,
+                     role: String, token: String) async throws -> LobbySeat {
+        try await request("/gaming/sessions/\(sessionId)/lobby",
+                          method: "POST",
+                          body: ["member_kind": memberKind,
+                                 "member_id": memberId, "role": role],
+                          token: token)
+    }
+
+    func lobbyRoster(sessionId: String,
+                     token: String) async throws -> [LobbySeat] {
+        struct Box: Decodable { let members: [LobbySeat]? }
+        let box: Box = try await request(
+            "/gaming/sessions/\(sessionId)/lobby", token: token)
+        return box.members ?? []
+    }
+
+    func leaveLobby(sessionId: String, memberId: String,
+                    token: String) async throws {
+        struct Out: Decodable { let left: Bool? }
+        let _: Out = try await request(
+            "/gaming/sessions/\(sessionId)/lobby", method: "DELETE",
+            body: ["member_id": memberId], token: token)
+    }
+
+    /// What a synthetic member is told — including that some of the other
+    /// callsigns are synthetic too.
+    func lobbyContext(sessionId: String,
+                      token: String) async throws -> [String: String] {
+        struct Ctx: Decodable { let note: String? }
+        let out: Ctx = try await request(
+            "/gaming/sessions/\(sessionId)/lobby/context", token: token)
+        return ["note": out.note ?? ""]
+    }
+
+    // -- the helper dock --
+
+    func dockFaces() async throws -> [String] {
+        struct Box: Decodable { let faces: [String]? }
+        let box: Box = try await request("/dock/faces")
+        return box.faces ?? []
+    }
+
+    /// The dock is read-only, so every face carries a way out of it.
+    func dockWhere(face: String) async throws -> [String: String] {
+        struct Out: Decodable { let screen: String?; let tab: String? }
+        let out: Out = try await request("/dock/where/\(face)")
+        return ["screen": out.screen ?? "", "tab": out.tab ?? ""]
+    }
+
+    func dockSettings(profileId: String,
+                      token: String) async throws -> DockSettings {
+        try await request("/dock/\(profileId)", token: token)
+    }
+
+    func configureDock(profileId: String, corner: String, state: String,
+                       token: String) async throws -> DockSettings {
+        try await request("/dock/\(profileId)", method: "PUT",
+                          body: ["corner": corner, "state": state],
+                          token: token)
+    }
+
+    func dockFace(profileId: String, name: String,
+                  token: String) async throws -> [String: String] {
+        struct Out: Decodable { let face: String?; let line: String? }
+        let out: Out = try await request("/dock/\(profileId)/face/\(name)",
+                                         token: token)
+        return ["face": out.face ?? "", "line": out.line ?? ""]
+    }
+}

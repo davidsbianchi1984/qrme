@@ -1,5 +1,4 @@
 DELETE /displays/{display_id}
-DELETE /gaming/sessions/{session_id}/lobby
 DELETE /grants/{grant_id}
 DELETE /handoffs/{handoff_id}
 DELETE /memberships/{account_id}
@@ -8,7 +7,6 @@ DELETE /profiles/{profile_id}
 DELETE /profiles/{profile_id}/memory/{interactor_id}
 DELETE /profiles/{profile_id}/messages/{message_id}
 DELETE /profiles/{profile_id}/wearables/{name}
-DELETE /robots/{robot_id}
 DELETE /rooms/{room_id}/mic/{interactor_id}
 DELETE /settings/mail
 DELETE /signatures/credentials/{row_id}
@@ -25,14 +23,7 @@ GET /d/{beacon_id}
 GET /d/{beacon_id}/card
 GET /displays/vocabulary
 GET /displays/{display_id}
-GET /dock/faces
-GET /dock/where/{face}
-GET /dock/{profile_id}
-GET /dock/{profile_id}/face/{name}
 GET /excursions/{cid}
-GET /gaming/lobby/vocabulary
-GET /gaming/sessions/{session_id}/lobby
-GET /gaming/sessions/{session_id}/lobby/context
 GET /handoffs/{handoff_id}
 GET /health
 GET /help/topics
@@ -44,8 +35,6 @@ GET /media/limits
 GET /memberships/{account_id}
 GET /microphones/places
 GET /microphones/vocabulary
-GET /objections/{objection_id}
-GET /objections/{objection_id}/audit
 GET /offline/status
 GET /orders
 GET /overlays/catalogue
@@ -99,11 +88,6 @@ GET /profiles/{profile_id}/wearables
 GET /profiles/{profile_id}/workflows
 GET /profiles/{profile_id}/workflows/{workflow_id}
 GET /providers
-GET /referrals/match
-GET /referrals/{referral_id}
-GET /robots/{robot_id}/commands
-GET /robots/{robot_id}/skills
-GET /robots/{robot_id}/steering
 GET /rooms
 GET /rooms/{room_id}/mic
 GET /settings/mail
@@ -121,15 +105,11 @@ PATCH /profiles/{profile_id}/messages/{message_id}
 POST /auth/oauth/{provider}/start
 POST /campaigns/{campaign_id}/close
 POST /campaigns/{campaign_id}/donate
-POST /gaming/sessions/{session_id}/lobby
 POST /handoffs
 POST /help
 POST /memberships/{account_id}
 POST /moderation/{message_id}/approve
 POST /moderation/{message_id}/reject
-POST /objections/{objection_id}/resolve
-POST /objections/{objection_id}/revoke
-POST /objections/{objection_id}/withdraw
 POST /packs
 POST /packs/seed
 POST /password/reset
@@ -170,9 +150,6 @@ POST /profiles/{profile_id}/workflows/{workflow_id}/advance
 POST /profiles/{profile_id}/workflows/{workflow_id}/cancel
 POST /profiles/{profile_id}/workflows/{workflow_id}/resume
 POST /providers
-POST /referrals/prepare
-POST /referrals/{referral_id}/release
-POST /referrals/{referral_id}/reply
 POST /rooms/{room_id}/mic
 POST /settings/mail/test
 POST /signatures/credentials/{row_id}/proofing
@@ -184,7 +161,6 @@ POST /verify-email
 POST /verify-email/resend
 POST /watermarks/verify
 PUT /displays/{display_id}/faces
-PUT /dock/{profile_id}
 PUT /interactors/{interactor_id}/quiet-hours
 PUT /profiles/{profile_id}/anonymity
 PUT /profiles/{profile_id}/avatar
@@ -196,5 +172,4 @@ PUT /profiles/{profile_id}/proceeds
 PUT /profiles/{profile_id}/specialists
 PUT /profiles/{profile_id}/steering
 PUT /profiles/{profile_id}/surfaces
-PUT /robots/{robot_id}/steering
 PUT /settings/mail

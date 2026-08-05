@@ -129,6 +129,57 @@ public sealed partial class PeoplePage : Page
         TourDoneButton.Content = L10n.T("tut.done");
         TourScreenBox.Header = L10n.T("tut.screen");
         TourScreenButton.Content = L10n.T("tut.screen");
+        BotTitle.Text = L10n.T("bot.title");
+        BotIdBox.Header = L10n.T("bot.id");
+        BotLogButton.Content = L10n.T("bot.log");
+        BotSkillsButton.Content = L10n.T("bot.skills");
+        BotDialsButton.Content = L10n.T("bot.dials");
+        BotUnbindButton.Content = L10n.T("bot.unbind");
+        BotPaceBox.Header = L10n.T("bot.pace");
+        BotSteerButton.Content = L10n.T("bot.dials.set");
+        ReferTitle.Text = L10n.T("refer.title");
+        ReferAreaBox.Header = L10n.T("refer.area");
+        ReferMatchButton.Content = L10n.T("refer.match");
+        ReferProviderBox.Header = L10n.T("refer.provider");
+        ReferPrepareButton.Content = L10n.T("refer.prepare");
+        ReferIdBox.Header = L10n.T("refer.id");
+        ReferSignatureBox.Header = L10n.T("refer.signature");
+        ReferReleaseButton.Content = L10n.T("refer.release");
+        ReferTokenBox.Header = L10n.T("refer.token");
+        ReferOpenButton.Content = L10n.T("refer.open");
+        ReferWordsBox.Header = L10n.T("refer.words");
+        ReferReplyButton.Content = L10n.T("refer.reply");
+        ObjectTitle.Text = L10n.T("object.title");
+        ObjectIdBox.Header = L10n.T("object.id");
+        ObjectShowButton.Content = L10n.T("object.show");
+        ObjectAuditButton.Content = L10n.T("object.audit");
+        ObjectWithdrawButton.Content = L10n.T("object.withdraw");
+        ObjectRevokeButton.Content = L10n.T("object.revoke");
+        ObjectResolveButton.Content =
+            $"{L10n.T("object.resolve")} — {L10n.T("object.outcome")}";
+        LobbyTitle.Text = L10n.T("lobby.title");
+        LobbyRulesButton.Content = L10n.T("lobby.rules");
+        LobbySessionBox.Header = L10n.T("lobby.session");
+        LobbyKindBox.Header = L10n.T("lobby.kind");
+        LobbyKindBox.Text = "profile";
+        LobbyMemberBox.Header = L10n.T("lobby.member");
+        LobbyRoleBox.Header = L10n.T("lobby.role");
+        LobbyRoleBox.Text = "teammate";
+        LobbySeatButton.Content = L10n.T("lobby.seat");
+        LobbyRosterButton.Content = L10n.T("lobby.roster");
+        LobbyLeaveButton.Content = L10n.T("lobby.leave");
+        LobbyContextButton.Content = L10n.T("lobby.context");
+        DockTitle.Text = L10n.T("dock.title");
+        DockFacesButton.Content = L10n.T("dock.faces");
+        DockMineButton.Content = L10n.T("dock.mine");
+        DockFaceBox.Header = L10n.T("dock.face");
+        DockWhereButton.Content = L10n.T("dock.where");
+        DockFaceButton.Content = L10n.T("dock.face");
+        DockCornerBox.Header = L10n.T("dock.corner");
+        DockCornerBox.Text = "bottom_right";
+        DockStateBox.Header = L10n.T("dock.state");
+        DockStateBox.Text = "handle";
+        DockSetButton.Content = L10n.T("dock.set");
         FriendIdBox.Header = L10n.T("people.add");
         AddFriendButton.Content = L10n.T("people.add.go");
         RemoveFriendButton.Content = L10n.T("people.remove");
@@ -710,4 +761,200 @@ public sealed partial class PeoplePage : Page
             var s = await ApiClient.Shared.TutorialForScreen(n);
             TourText.Text = s.Title ?? "";
         });
+
+    // -- the body, the referral, the objection, the lobby and the dock ----
+
+    private async void OnBotLog(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var log = await ApiClient.Shared.RobotCommands(
+                BotIdBox.Text.Trim(), AppState.Current.Token!);
+            BotList.ItemsSource = log.Select(c => new Row(
+                $"{c.CreatedAt} · {c.Command}")).ToList();
+        });
+
+    private async void OnBotSkills(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var skills = await ApiClient.Shared.RobotSkills(
+                BotIdBox.Text.Trim(), AppState.Current.Token!);
+            BotList.ItemsSource = skills.Select(sk => new Row(
+                $"{sk.Title} · {sk.PackTitle}")).ToList();
+        });
+
+    private async void OnBotDials(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.RobotSteeringOf(
+                BotIdBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = s.BehaviorProfile ?? "";
+        });
+
+    private async void OnBotUnbind(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.UnbindRobot(
+            BotIdBox.Text.Trim(), AppState.Current.Token!));
+
+    private async void OnBotSteer(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.SteerRobot(BotIdBox.Text.Trim(),
+                int.TryParse(BotPaceBox.Text, out var v) ? v : 50,
+                AppState.Current.Token!);
+            StatusText.Text = s.BehaviorProfile ?? "";
+        });
+
+    private async void OnReferMatch(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var found = await ApiClient.Shared.MatchClinicians(
+                ReferAreaBox.Text.Trim());
+            ClinicianList.ItemsSource = found.Select(c => new Row(
+                $"{c.Id} · {c.Name} · {c.Expertise}")).ToList();
+        });
+
+    private async void OnReferPrepare(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var pkg = await ApiClient.Shared.PrepareReferral(
+                AppState.Current.Pid!, AppState.Current.Pid!,
+                ReferProviderBox.Text.Trim(), AppState.Current.Token!);
+            ReferIdBox.Text = pkg.Id ?? pkg.ReferralId ?? "";
+        });
+
+    private async void OnReferRelease(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.ReleaseReferral(
+            ReferIdBox.Text.Trim(), ReferSignatureBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnReferOpen(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var pkg = await ApiClient.Shared.OpenReferral(
+                ReferIdBox.Text.Trim(), ReferTokenBox.Text.Trim());
+            StatusText.Text = pkg.Status ?? "";
+        });
+
+    private async void OnReferReply(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.ReplyToReferral(
+            ReferIdBox.Text.Trim(), ReferTokenBox.Text.Trim(),
+            ReferWordsBox.Text.Trim()));
+
+    private async void OnObjectShow(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.ObjectionOf(
+                ObjectIdBox.Text.Trim());
+            StatusText.Text = o.Status ?? "";
+        });
+
+    private async void OnObjectAudit(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var a = await ApiClient.Shared.ObjectionAuditOf(
+                ObjectIdBox.Text.Trim(), AppState.Current.Token!);
+            ObjectList.ItemsSource = (a.Events
+                ?? Array.Empty<ObjectionEvent>()).Select(ev => new Row(
+                    ev.Event + (ev.Sealed == true ? " ◆" : ""))).ToList();
+        });
+
+    private async void OnObjectWithdraw(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.WithdrawObjectionConsent(
+                ObjectIdBox.Text.Trim());
+            StatusText.Text = o.Status ?? "";
+        });
+
+    private async void OnObjectRevoke(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.RevokeObjectionBasis(
+                ObjectIdBox.Text.Trim());
+            StatusText.Text = o.Status ?? "";
+        });
+
+    private async void OnObjectResolve(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var o = await ApiClient.Shared.ResolveObjection(
+                ObjectIdBox.Text.Trim(), "dismiss",
+                AppState.Current.Token!);
+            StatusText.Text = o.Status ?? "";
+        });
+
+    private async void OnLobbyRules(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var v = await ApiClient.Shared.LobbyVocabulary();
+            LobbyList.ItemsSource = (v.Rules ?? Array.Empty<string>())
+                .Select(r => new Row($"· {r}")).ToList();
+        });
+
+    private async void OnLobbySeat(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.SeatInLobby(
+            LobbySessionBox.Text.Trim(), LobbyKindBox.Text.Trim(),
+            LobbyMemberBox.Text.Trim(), LobbyRoleBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnLobbyRoster(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var roster = await ApiClient.Shared.LobbyRosterOf(
+                LobbySessionBox.Text.Trim(), AppState.Current.Token!);
+            LobbyList.ItemsSource = (roster.Members
+                ?? Array.Empty<LobbySeatRow>()).Select(m => new Row(
+                    $"{m.Callsign ?? m.MemberId} · {m.MemberKind} · {m.Role}"))
+                .ToList();
+        });
+
+    private async void OnLobbyLeave(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.LeaveLobby(
+            LobbySessionBox.Text.Trim(), LobbyMemberBox.Text.Trim(),
+            AppState.Current.Token!));
+
+    private async void OnLobbyContext(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var ctx = await ApiClient.Shared.LobbyContextOf(
+                LobbySessionBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = ctx.Note ?? "";
+        });
+
+    private async void OnDockFaces(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var box = await ApiClient.Shared.DockFaces();
+            DockList.ItemsSource = (box.Faces ?? Array.Empty<string>())
+                .Select(f => new Row(f)).ToList();
+        });
+
+    private async void OnDockMine(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = await ApiClient.Shared.DockSettingsOf(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = $"{s.Corner} · {s.State}";
+        });
+
+    private async void OnDockWhere(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var w = await ApiClient.Shared.DockWhereOf(
+                DockFaceBox.Text.Trim());
+            StatusText.Text = $"{w.Screen} · {w.Tab}";
+        });
+
+    private async void OnDockFace(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var f = await ApiClient.Shared.DockFaceOf(
+                AppState.Current.Pid!, DockFaceBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = f.Line ?? f.Face ?? "";
+        });
+
+    private async void OnDockSet(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.ConfigureDock(
+            AppState.Current.Pid!, DockCornerBox.Text.Trim(),
+            DockStateBox.Text.Trim(), AppState.Current.Token!));
 }

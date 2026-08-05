@@ -2356,6 +2356,212 @@ object ApiClient {
         return o.optString("next")
     }
 
+    // -- the body, the referral, the objection, the lobby and the dock ----
+    // Five more blocks off the doorless records, each rendering its
+    // backend's rules: the command log is the owner's audit trail, a
+    // referral is signed before released and opens once, an objection's
+    // subject can end it, a roster says what every callsign is, and the
+    // dock reports where each face's real job lives.
+
+    suspend fun unbindRobot(robotId: String, token: String) {
+        request("/robots/$robotId", "DELETE", token = token)
+    }
+
+    suspend fun robotCommands(robotId: String, token: String): List<String> {
+        val a = org.json.JSONArray(request("/robots/$robotId/commands",
+            token = token))
+        val out = mutableListOf<String>()
+        for (i in 0 until a.length()) {
+            val c = a.getJSONObject(i)
+            out.add(c.optString("created_at") + " · " +
+                c.optString("command"))
+        }
+        return out
+    }
+
+    suspend fun robotSkills(robotId: String, token: String): List<String> {
+        val a = org.json.JSONArray(request("/robots/$robotId/skills",
+            token = token))
+        val out = mutableListOf<String>()
+        for (i in 0 until a.length()) {
+            val sk = a.getJSONObject(i)
+            out.add(sk.optString("title") + " · " + sk.optString("pack_title"))
+        }
+        return out
+    }
+
+    /** A body's dials — intimacy never applies to a body. */
+    suspend fun robotSteering(robotId: String, token: String): String {
+        val o = JSONObject(request("/robots/$robotId/steering",
+            token = token))
+        return o.optJSONObject("values")?.toString() ?: "{}"
+    }
+
+    suspend fun steerRobot(robotId: String, pace: Int,
+                           token: String): String {
+        val o = JSONObject(request("/robots/$robotId/steering", "PUT",
+            JSONObject().put("values", JSONObject().put("pace", pace)),
+            token))
+        return o.optJSONObject("values")?.toString() ?: "{}"
+    }
+
+    suspend fun matchClinicians(area: String): List<Pair<String, String>> {
+        val a = org.json.JSONArray(request("/referrals/match?area=$area"))
+        val out = mutableListOf<Pair<String, String>>()
+        for (i in 0 until a.length()) {
+            val c = a.getJSONObject(i)
+            out.add(c.optString("id") to (c.optString("name") + " · " +
+                c.optString("expertise")))
+        }
+        return out
+    }
+
+    /** Nothing is released here — the package comes back to be read. */
+    suspend fun prepareReferral(interactorId: String, profileId: String,
+                                providerId: String, token: String): String {
+        val o = JSONObject(request("/referrals/prepare", "POST",
+            JSONObject().put("interactor_id", interactorId)
+                .put("profile_id", profileId)
+                .put("provider_id", providerId), token))
+        return o.optString("id", o.optString("referral_id"))
+    }
+
+    suspend fun releaseReferral(referralId: String, signatureId: String,
+                                token: String) {
+        request("/referrals/$referralId/release", "POST",
+            JSONObject().put("signature_id", signatureId), token)
+    }
+
+    /** Once — a second attempt says so rather than quietly working. */
+    suspend fun openReferral(referralId: String, linkToken: String): String {
+        val o = JSONObject(request("/referrals/$referralId?token=$linkToken"))
+        return o.optString("status")
+    }
+
+    suspend fun replyToReferral(referralId: String, linkToken: String,
+                                content: String) {
+        request("/referrals/$referralId/reply?token=$linkToken", "POST",
+            JSONObject().put("content", content))
+    }
+
+    suspend fun objection(objectionId: String): String {
+        val o = JSONObject(request("/objections/$objectionId"))
+        return o.optString("status")
+    }
+
+    suspend fun objectionAudit(objectionId: String,
+                               token: String): List<String> {
+        val o = JSONObject(request("/objections/$objectionId/audit",
+            token = token))
+        val out = mutableListOf<String>()
+        o.optJSONArray("events")?.let { a ->
+            for (i in 0 until a.length()) {
+                val e = a.getJSONObject(i)
+                out.add(e.optString("event") +
+                    (if (e.optBoolean("sealed")) " ◆" else ""))
+            }
+        }
+        return out
+    }
+
+    suspend fun withdrawObjectionConsent(objectionId: String): String {
+        val o = JSONObject(request("/objections/$objectionId/withdraw",
+            "POST"))
+        return o.optString("status")
+    }
+
+    suspend fun revokeObjectionBasis(objectionId: String): String {
+        val o = JSONObject(request("/objections/$objectionId/revoke", "POST"))
+        return o.optString("status")
+    }
+
+    /** Reviewer-only — an owner cannot adjudicate an objection against
+     *  their own profile, and the backend enforces it by role. */
+    suspend fun resolveObjection(objectionId: String, outcome: String,
+                                 token: String): String {
+        val o = JSONObject(request("/objections/$objectionId/resolve", "POST",
+            JSONObject().put("outcome", outcome), token))
+        return o.optString("status")
+    }
+
+    suspend fun lobbyRules(): List<String> {
+        val o = JSONObject(request("/gaming/lobby/vocabulary"))
+        val out = mutableListOf<String>()
+        o.optJSONArray("rules")?.let { a ->
+            for (i in 0 until a.length()) out.add(a.getString(i))
+        }
+        return out
+    }
+
+    suspend fun seatInLobby(sessionId: String, memberKind: String,
+                            memberId: String, role: String, token: String) {
+        request("/gaming/sessions/$sessionId/lobby", "POST",
+            JSONObject().put("member_kind", memberKind)
+                .put("member_id", memberId).put("role", role), token)
+    }
+
+    /** The honest roster: what each callsign is travels with it. */
+    suspend fun lobbyRoster(sessionId: String,
+                            token: String): List<String> {
+        val o = JSONObject(request("/gaming/sessions/$sessionId/lobby",
+            token = token))
+        val out = mutableListOf<String>()
+        o.optJSONArray("members")?.let { a ->
+            for (i in 0 until a.length()) {
+                val m = a.getJSONObject(i)
+                out.add(m.optString("callsign", m.optString("member_id")) +
+                    " · " + m.optString("member_kind") + " · " +
+                    m.optString("role"))
+            }
+        }
+        return out
+    }
+
+    suspend fun leaveLobby(sessionId: String, memberId: String,
+                           token: String) {
+        request("/gaming/sessions/$sessionId/lobby", "DELETE",
+            JSONObject().put("member_id", memberId), token)
+    }
+
+    suspend fun lobbyContext(sessionId: String, token: String): String {
+        val o = JSONObject(request(
+            "/gaming/sessions/$sessionId/lobby/context", token = token))
+        return o.optString("note", o.toString())
+    }
+
+    suspend fun dockFaces(): List<String> {
+        val o = JSONObject(request("/dock/faces"))
+        val out = mutableListOf<String>()
+        o.optJSONArray("faces")?.let { a ->
+            for (i in 0 until a.length()) out.add(a.getString(i))
+        }
+        return out
+    }
+
+    /** The dock is read-only, so every face carries a way out of it. */
+    suspend fun dockWhere(face: String): String {
+        val o = JSONObject(request("/dock/where/$face"))
+        return o.optString("screen") + " · " + o.optString("tab")
+    }
+
+    suspend fun dockSettings(profileId: String, token: String): String {
+        val o = JSONObject(request("/dock/$profileId", token = token))
+        return o.optString("corner") + " · " + o.optString("state")
+    }
+
+    suspend fun configureDock(profileId: String, corner: String,
+                              state: String, token: String) {
+        request("/dock/$profileId", "PUT",
+            JSONObject().put("corner", corner).put("state", state), token)
+    }
+
+    suspend fun dockFace(profileId: String, name: String,
+                         token: String): String {
+        val o = JSONObject(request("/dock/$profileId/face/$name",
+            token = token))
+        return o.optString("line", o.toString())
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

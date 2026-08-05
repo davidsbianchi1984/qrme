@@ -4,6 +4,39 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.43.4] — 2026-08-04
+
+### The body, the case and the lobby
+
+Five more blocks of the per-shell doorless record, and the shape of
+what was missing differs by block: the robot body's owner could not
+audit from a phone what the body had been told to do; the referral
+flow existed end to end with no phone on either side of it; the person
+who raised an objection could read their case on the console and not
+on the device in their pocket; a lobby's honest roster — what every
+callsign *is* — was unreadable exactly where people game; and the
+dock, whose whole job is pointing at where features live, could not
+itself be found.
+
+    asked     does the audit trail exist
+    mattered  can its owner read it from the device they carry
+
+Twenty-five routes gain doors on iOS, Android and Windows in one cut
+— **75 rows struck**; the records fall to ios 171, android 175,
+windows 173 — each rendering its backend's rules: the command log
+answers to the owner alone and intimacy is never a body dial (an
+injection that let it through went red before it shipped); a referral
+opens exactly once; the objection's reviewer verb refuses the owner by
+role; the roster names each member's kind; and every dock face carries
+a way out of the read-only pane. 45 shared strings per shell, in ten
+languages.
+
+The field-label residue honestly stays at 141: every candidate this
+round's forms touch — `signature_id`, `corner`, `state`, `face`,
+`outcome`, `robot_id` — is an enum member or a context-filled id,
+exactly what the record's own doctrine keeps on the identifier
+fallback.
+
 ## [0.43.3] — 2026-08-04
 
 ### The place, the camera, the organization and the tour

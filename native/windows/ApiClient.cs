@@ -750,6 +750,159 @@ public record PackInstalled(
         Send<TutorialStep>(Post("/tutorial/done",
             new { learner_id = learnerId, lesson }));
 
+    // -- the body, the referral, the objection, the lobby and the dock ----
+    // Five more blocks off the doorless records, each rendering its
+    // backend's rules rather than inventing a sixth opinion.
+
+    public Task<RobotUnbound> UnbindRobot(string robotId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/robots/{robotId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RobotUnbound>(req);
+    }
+
+    /// <summary>Owner-only audit: everything this body has been told to
+    /// do.</summary>
+    public Task<RobotCommandRow[]> RobotCommands(string robotId,
+        string token) =>
+        Send<RobotCommandRow[]>(Get($"/robots/{robotId}/commands", token));
+
+    public Task<RobotSkillRow[]> RobotSkills(string robotId, string token) =>
+        Send<RobotSkillRow[]>(Get($"/robots/{robotId}/skills", token));
+
+    /// <summary>A body's dials — intimacy never applies to a body.</summary>
+    public Task<RobotSteering> RobotSteeringOf(string robotId,
+        string token) =>
+        Send<RobotSteering>(Get($"/robots/{robotId}/steering", token));
+
+    public Task<RobotSteering> SteerRobot(string robotId, int pace,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/robots/{robotId}/steering")
+        {
+            Content = JsonContent.Create(new
+            {
+                values = new System.Collections.Generic
+                    .Dictionary<string, int> { ["pace"] = pace }
+            })
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RobotSteering>(req);
+    }
+
+    public Task<ClinicianRow[]> MatchClinicians(string area) =>
+        Send<ClinicianRow[]>(Get($"/referrals/match?area={area}"));
+
+    /// <summary>Nothing is released here — the package comes back to be
+    /// read, and the signature raised covers exactly those bytes.</summary>
+    public Task<ReferralPackage> PrepareReferral(string interactorId,
+        string profileId, string providerId, string token) =>
+        Send<ReferralPackage>(Post("/referrals/prepare", new
+        {
+            interactor_id = interactorId, profile_id = profileId,
+            provider_id = providerId
+        }, token));
+
+    public Task<ReferralPackage> ReleaseReferral(string referralId,
+        string signatureId, string token) =>
+        Send<ReferralPackage>(Post($"/referrals/{referralId}/release",
+            new { signature_id = signatureId }, token));
+
+    /// <summary>Once — a second attempt says so rather than quietly
+    /// working.</summary>
+    public Task<ReferralPackage> OpenReferral(string referralId,
+        string linkToken) =>
+        Send<ReferralPackage>(Get(
+            $"/referrals/{referralId}?token={linkToken}"));
+
+    public Task<ReferralPackage> ReplyToReferral(string referralId,
+        string linkToken, string content) =>
+        Send<ReferralPackage>(Post(
+            $"/referrals/{referralId}/reply?token={linkToken}",
+            new { content }));
+
+    public Task<ObjectionCard> ObjectionOf(string objectionId) =>
+        Send<ObjectionCard>(Get($"/objections/{objectionId}"));
+
+    public Task<ObjectionAudit> ObjectionAuditOf(string objectionId,
+        string token) =>
+        Send<ObjectionAudit>(Get($"/objections/{objectionId}/audit", token));
+
+    public Task<ObjectionCard> WithdrawObjectionConsent(
+        string objectionId) =>
+        Send<ObjectionCard>(Post($"/objections/{objectionId}/withdraw",
+            new { }));
+
+    public Task<ObjectionCard> RevokeObjectionBasis(string objectionId) =>
+        Send<ObjectionCard>(Post($"/objections/{objectionId}/revoke",
+            new { }));
+
+    /// <summary>Reviewer-only — an owner cannot adjudicate an objection
+    /// against their own profile, and the backend enforces it by
+    /// role.</summary>
+    public Task<ObjectionCard> ResolveObjection(string objectionId,
+        string outcome, string token) =>
+        Send<ObjectionCard>(Post($"/objections/{objectionId}/resolve",
+            new { outcome }, token));
+
+    public Task<LobbyVocabulary> LobbyVocabulary() =>
+        Send<LobbyVocabulary>(Get("/gaming/lobby/vocabulary"));
+
+    public Task<LobbySeatRow> SeatInLobby(string sessionId,
+        string memberKind, string memberId, string role, string token) =>
+        Send<LobbySeatRow>(Post($"/gaming/sessions/{sessionId}/lobby", new
+        {
+            member_kind = memberKind, member_id = memberId, role
+        }, token));
+
+    /// <summary>The honest roster: what each callsign is travels with
+    /// it.</summary>
+    public Task<LobbyRoster> LobbyRosterOf(string sessionId, string token) =>
+        Send<LobbyRoster>(Get($"/gaming/sessions/{sessionId}/lobby", token));
+
+    public Task<LobbyLeft> LeaveLobby(string sessionId, string memberId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/gaming/sessions/{sessionId}/lobby")
+        { Content = JsonContent.Create(new { member_id = memberId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LobbyLeft>(req);
+    }
+
+    public Task<LobbyContext> LobbyContextOf(string sessionId,
+        string token) =>
+        Send<LobbyContext>(Get(
+            $"/gaming/sessions/{sessionId}/lobby/context", token));
+
+    public Task<DockFacesBox> DockFaces() =>
+        Send<DockFacesBox>(Get("/dock/faces"));
+
+    /// <summary>The dock is read-only, so every face carries a way out of
+    /// it.</summary>
+    public Task<DockWhere> DockWhereOf(string face) =>
+        Send<DockWhere>(Get($"/dock/where/{face}"));
+
+    public Task<DockSettings> DockSettingsOf(string profileId,
+        string token) =>
+        Send<DockSettings>(Get($"/dock/{profileId}", token));
+
+    public Task<DockSettings> ConfigureDock(string profileId, string corner,
+        string state, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/dock/{profileId}")
+        { Content = JsonContent.Create(new { corner, state }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DockSettings>(req);
+    }
+
+    public Task<DockFace> DockFaceOf(string profileId, string name,
+        string token) =>
+        Send<DockFace>(Get($"/dock/{profileId}/face/{name}", token));
+
     public async Task<WallPostRow[]> Wall(string profileId)
     {
         var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
@@ -2562,3 +2715,72 @@ public record TutorialStep(
     [property: JsonPropertyName("title")] string? Title,
     [property: JsonPropertyName("body")] string? Body,
     [property: JsonPropertyName("next")] string? Next);
+
+public record RobotUnbound(
+    [property: JsonPropertyName("unbound")] bool? Unbound);
+
+public record RobotCommandRow(
+    [property: JsonPropertyName("command")] string? Command,
+    [property: JsonPropertyName("created_at")] string? CreatedAt);
+
+public record RobotSkillRow(
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("pack_title")] string? PackTitle);
+
+public record RobotSteering(
+    [property: JsonPropertyName("behavior_profile")]
+    string? BehaviorProfile);
+
+public record ClinicianRow(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("expertise")] string? Expertise);
+
+public record ReferralPackage(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("referral_id")] string? ReferralId,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record ObjectionCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("status")] string? Status);
+
+public record ObjectionEvent(
+    [property: JsonPropertyName("event")] string? Event,
+    [property: JsonPropertyName("sealed")] bool? Sealed);
+
+public record ObjectionAudit(
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("events")] ObjectionEvent[]? Events);
+
+public record LobbyVocabulary(
+    [property: JsonPropertyName("rules")] string[]? Rules);
+
+public record LobbySeatRow(
+    [property: JsonPropertyName("member_id")] string? MemberId,
+    [property: JsonPropertyName("member_kind")] string? MemberKind,
+    [property: JsonPropertyName("role")] string? Role,
+    [property: JsonPropertyName("callsign")] string? Callsign);
+
+public record LobbyRoster(
+    [property: JsonPropertyName("members")] LobbySeatRow[]? Members);
+
+public record LobbyLeft([property: JsonPropertyName("left")] bool? Left);
+
+public record LobbyContext(
+    [property: JsonPropertyName("note")] string? Note);
+
+public record DockFacesBox(
+    [property: JsonPropertyName("faces")] string[]? Faces);
+
+public record DockWhere(
+    [property: JsonPropertyName("screen")] string? Screen,
+    [property: JsonPropertyName("tab")] string? Tab);
+
+public record DockSettings(
+    [property: JsonPropertyName("corner")] string? Corner,
+    [property: JsonPropertyName("state")] string? State);
+
+public record DockFace(
+    [property: JsonPropertyName("face")] string? Face,
+    [property: JsonPropertyName("line")] string? Line);
