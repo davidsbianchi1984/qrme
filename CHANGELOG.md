@@ -4,6 +4,34 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.45.6] — 2026-08-05
+
+### The lobby, the screen in the corridor, and a voice
+
+The console-untranslated record falls **516 → 425**.
+
+**Who is in the game with you** — forty-seven `lby.*` keys. The long
+sentence about what a synthetic member is told carries the argument
+this product exists for: a lobby that reads as friends when it is one
+player and several generated voices is exactly the impression to
+prevent. It now reads that way in ten languages.
+
+**Where this is seen** — the front page a stranger lands on, the page
+you build yourself, and the screens it hangs on. The distinction the
+screen turns on is translated with it: only you can see the list of
+physical places, but what any one screen is *showing* is public,
+because a fixture in a corridor displays to whoever walks past.
+
+**Voice** — thirty-one of the seventy-three `prs.*`/`vce.*` keys are
+the voice half, and they include all three of the sentences that always
+hold: the watermark, the attestation that is not a checkbox, and the
+withdrawal that deletes the samples and stays on record.
+
+120 keys, all ten languages, exact-sync held in both directions.
+
+The dead-key check passed on the first run this round — the message
+added at 0.45.5 did the work it was written for.
+
 ## [0.45.5] — 2026-08-05
 
 ### The objection, the camera, and the market

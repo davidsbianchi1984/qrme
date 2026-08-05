@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type Display, type DisplayCatalog, type Front,
          type PageCatalog, type ProfilePage } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -36,6 +37,7 @@ export function Presence({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
 
@@ -105,11 +107,13 @@ export function Presence({ onPlans }: {
       setPage(p);
       // The save succeeded whatever was stripped, so say what went.
       if (p.html_removed.length > 0) {
-        setNote(`Saved. These were removed: ${p.html_removed.join(", ")}.`);
+        setNote(tr("prs.saved.removed", lang)
+          .replace("{what}", p.html_removed.join(", ")));
       } else if (p.about_blocked) {
-        setNote(`Saved, but the about text is held: ${p.about_blocked}`);
+        setNote(tr("prs.saved.held", lang)
+          .replace("{why}", p.about_blocked));
       } else {
-        setNote("Saved.");
+        setNote(tr("prs.saved.said", lang));
       }
     } catch (e) { fail(e); }
   }
@@ -118,14 +122,14 @@ export function Presence({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>Where this is seen</h2>
+      <h2>{tr("prs.title", lang)}</h2>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {front && (
         <div className="card">
-          <h3>What a stranger lands on</h3>
+          <h3>{tr("prs.front", lang)}</h3>
           <p className="small">
             <strong>{front.display_name}</strong>
             {front.handle && <> · @{front.handle}</>}
@@ -135,16 +139,19 @@ export function Presence({ onPlans }: {
           <p className="muted small">{front.ai_disclosure}</p>
           <p className="muted small">
             {front.rating.count > 0
-              ? <>{front.rating.average} from {front.rating.count} review
-                  {front.rating.count === 1 ? "" : "s"}</>
+              ? fill(front.rating.count === 1
+                  ? tr("prs.review", lang) : tr("prs.reviews", lang),
+                  { avg: front.rating.average, n: front.rating.count })
               : front.rating.note}
-            {" · "}{front.talked_with} {front.talked_with === 1 ? "person has" : "people have"} talked with it
+            {fill(front.talked_with === 1
+                ? tr("prs.talked.one", lang) : tr("prs.talked", lang),
+                { n: front.talked_with })}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>The page you make yourself</h3>
+        <h3>{tr("prs.page", lang)}</h3>
         <div className="row">
           <select value={theme} onChange={(e) => setTheme(e.target.value)}>
             {pages?.themes.map((t) => (
@@ -155,59 +162,67 @@ export function Presence({ onPlans }: {
             {pages?.layouts.map((l) => <option key={l} value={l}>{l}</option>)}
           </select>
           <input value={tagline} onChange={(e) => setTagline(e.target.value)}
-                 placeholder="a tagline" style={{ flex: 1 }} />
+                 placeholder={tr("prs.tagline.ph", lang)} style={{ flex: 1 }} />
         </div>
         <p className="muted small">
           {pages?.themes.find((t) => t.id === theme)?.note}
         </p>
         <div className="row">
           <input value={about} onChange={(e) => setAbout(e.target.value)}
-                 placeholder="about" style={{ flex: 1 }} />
+                 placeholder={tr("prs.about.ph", lang)} style={{ flex: 1 }} />
         </div>
         <div className="row">
           <input value={html} onChange={(e) => setHtml(e.target.value)}
-                 placeholder="your own HTML" style={{ flex: 1 }} />
-          <button disabled={!token} onClick={savePage}>Save</button>
+                 placeholder={tr("prs.html.ph", lang)} style={{ flex: 1 }} />
+          <button disabled={!token} onClick={savePage}>
+            {tr("prs.save", lang)}
+          </button>
         </div>
         {/* Shown before the save, which is the whole reason the backend
             publishes them. */}
         {pages && (
           <p className="muted small">
-            These survive: {pages.html_tags.join(" ")}. Anything else is
-            removed on save, and the save still succeeds — so the list is
-            here rather than in a message afterwards.
+            {fill(tr("prs.survive", lang),
+              { tags: pages.html_tags.join(" ") })}
           </p>
         )}
         {page && page.html_removed.length > 0 && (
           <p className="small">
-            Last save removed: <strong>{page.html_removed.join(", ")}</strong>
+            {fill(tr("prs.lastremoved", lang),
+              { what: <strong>{page.html_removed.join(", ")}</strong> })}
           </p>
         )}
         {page?.about_blocked && (
           <div className="card error">
-            <p className="small">About text held: {page.about_blocked}</p>
+            <p className="small">{fill(tr("prs.held", lang),
+              { why: page.about_blocked })}</p>
           </div>
         )}
       </div>
 
       <div className="card">
-        <h3>Screens it is on</h3>
+        <h3>{tr("prs.screens", lang)}</h3>
         <p className="muted small">
-          Only you can see this list — it is a list of physical places. What
-          any one screen is <em>showing</em> is public, because a fixture in a
-          corridor displays to whoever walks past.
+          {fill(tr("prs.screens.pitch", lang),
+            { showing: <em>{tr("prs.showing", lang)}</em> })}
         </p>
-        {mine.length === 0 && <p className="muted small">None placed.</p>}
+        {mine.length === 0 &&
+          <p className="muted small">{tr("prs.noneplaced", lang)}</p>}
         {mine.map((d) => (
           <div key={d.id}>
             <div className="row">
               <div style={{ flex: 1 }}>
                 <strong>{d.label}</strong>
-                {!d.live && <span className="chip"> taken down</span>}
-                {d.passers_by && <span className="chip"> passers-by</span>}
+                {!d.live &&
+                  <span className="chip"> {tr("prs.takendown", lang)}</span>}
+                {d.passers_by &&
+                  <span className="chip"> {tr("prs.passersby", lang)}</span>}
                 <div className="muted small">
-                  {d.kind}{d.location && <> · {d.location}</>} · {d.size} ·{" "}
-                  {d.finish} · showing {d.faces.join(", ")}
+                  {fill(tr("prs.screenline", lang), {
+                    kind: <>{d.kind}{d.location && <> · {d.location}</>}</>,
+                    size: d.size, finish: d.finish,
+                    faces: d.faces.join(", "),
+                  })}
                 </div>
               </div>
               {d.live && (
@@ -215,10 +230,10 @@ export function Presence({ onPlans }: {
                   setError(null); setNote(null);
                   try {
                     await api.removeDisplay(d.id, token);
-                    setNote("Taken down. The record stays; the screen stops.");
+                    setNote(tr("prs.takendown.said", lang));
                     reload();
                   } catch (e) { fail(e); }
-                }}>Take down</button>
+                }}>{tr("prs.takedown", lang)}</button>
               )}
             </div>
             {d.live && cat && (
@@ -245,7 +260,7 @@ export function Presence({ onPlans }: {
           </div>
         ))}
 
-        <h4>Put it on a screen</h4>
+        <h4>{tr("prs.puton", lang)}</h4>
         <div className="row">
           <select value={kind} onChange={(e) => setKind(e.target.value)}>
             {cat?.kinds.map((k) => (
@@ -253,9 +268,9 @@ export function Presence({ onPlans }: {
             ))}
           </select>
           <input value={label} onChange={(e) => setLabel(e.target.value)}
-                 placeholder="what to call it" style={{ flex: 1 }} />
+                 placeholder={tr("prs.label.ph", lang)} style={{ flex: 1 }} />
           <input value={where} onChange={(e) => setWhere(e.target.value)}
-                 placeholder="where it is" />
+                 placeholder={tr("prs.where.ph", lang)} />
         </div>
         <div className="row">
           <select value={size} onChange={(e) => setSize(e.target.value)}>
@@ -274,38 +289,43 @@ export function Presence({ onPlans }: {
                 location: where.trim() || null, size, finish,
               }, token);
               setLabel(""); setWhere("");
-              setNote("Placed.");
+              setNote(tr("prs.placed.said", lang));
               reload();
             } catch (e) { fail(e); }
-          }}>Place</button>
+          }}>{tr("prs.place", lang)}</button>
         </div>
         {/* The distinction the vocabulary exists to draw. */}
         {chosen && (
           <p className="muted small">
-            {chosen.means} —{" "}
-            {chosen.passers_by
-              ? "read by people who did not choose to look at it."
-              : "faces you, in your own space."}
+            {fill(tr("prs.chosen", lang), {
+              means: chosen.means,
+              who: chosen.passers_by
+                ? tr("prs.passers.yes", lang) : tr("prs.passers.no", lang),
+            })}
           </p>
         )}
       </div>
 
       {cat && (
         <div className="card">
-          <h3>What a fixed screen never shows</h3>
+          <h3>{tr("prs.nevershows", lang)}</h3>
           {/* Verbatim. These sentences are the argument, made once, carefully. */}
           <ul className="small">
             {cat.never.map((n) => (
-              <li key={n.thing}><strong>{n.thing}</strong> — {n.why}</li>
+              <li key={n.thing}>{fill(tr("prs.never.row", lang), {
+                thing: <strong>{n.thing}</strong>, why: n.why })}</li>
             ))}
           </ul>
         </div>
       )}
 
       <div className="card">
-        <h3>Surfaces it appears on</h3>
+        <h3>{tr("prs.surfaces", lang)}</h3>
         <p className="muted small">
-          Currently: {surfaces.length > 0 ? surfaces.join(", ") : "none"}
+          {fill(tr("prs.currently", lang), {
+            what: surfaces.length > 0
+              ? surfaces.join(", ") : tr("prs.none", lang),
+          })}
         </p>
         <div className="row">
           {["web", "kiosk", "watch", "mobile", "wall"].map((s) => {

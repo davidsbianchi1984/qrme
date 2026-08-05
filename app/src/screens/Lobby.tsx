@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, type HandoffMade, type HandoffPackage, type Lobby as LobbyView,
          type LobbyContext, type LobbyVocabulary,
          type Provider } from "../api";
+import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -39,6 +40,7 @@ import { useSession } from "../store";
  */
 export function Lobby({ onPlans }: { onPlans: () => void }) {
   const { session } = useSession();
+  const lang = visitorLang();
   const me = session.profileId || "";
   const token = session.ownerToken || "";
   const interactor = session.interactorId || "";
@@ -85,29 +87,30 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
 
   return (
     <div className="screen">
-      <h2>Who is in the game with you</h2>
-      <p className="muted small">
-        And, below, how a conversation gets handed to somebody local.
-      </p>
+      <h2>{tr("lby.title", lang)}</h2>
+      <p className="muted small">{tr("lby.lead", lang)}</p>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
       {vocab && (
         <div className="card">
-          <h3>The line</h3>
+          <h3>{tr("lby.line", lang)}</h3>
           {/* The sentence the whole feature rests on. */}
           <p className="small">{vocab.fair_play}</p>
-          <h4>What nothing here will do</h4>
+          <h4>{tr("lby.never", lang)}</h4>
           {/* All twelve, verbatim. Each closes a route somebody would
               otherwise argue for, and a summary would lose the argument
               rather than make it. */}
           {vocab.never.map((n) => (
             <p className="muted small" key={n.thing}>
-              <strong>{n.thing.replace(/_/g, " ")}</strong> — {n.means}
+              {fill(tr("lby.never.row", lang), {
+                thing: <strong>{n.thing.replace(/_/g, " ")}</strong>,
+                means: n.means,
+              })}
             </p>
           ))}
-          <h4>The rules of the room</h4>
+          <h4>{tr("lby.rules", lang)}</h4>
           {vocab.rules.map((r, i) => (
             <p className="muted small" key={i}>{r}</p>
           ))}
@@ -115,38 +118,51 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
       )}
 
       <div className="card">
-        <h3>A lobby</h3>
+        <h3>{tr("lby.lobby", lang)}</h3>
         <div className="row">
           <input value={sessionId}
                  onChange={(e) => setSessionId(e.target.value)}
-                 placeholder="a gaming session id" style={{ flex: 1 }} />
+                 placeholder={tr("lby.session.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !sessionId.trim() || !token}
-                  onClick={loadLobby}>Open it</button>
+                  onClick={loadLobby}>{tr("lby.openit", lang)}</button>
         </div>
 
         {lobby && (
           <>
             <p className="small">
-              {lobby.game} on {lobby.platform} — {lobby.people}{" "}
-              {lobby.people === 1 ? "person" : "people"}, {lobby.profiles}{" "}
-              {lobby.profiles === 1 ? "profile" : "profiles"}, {lobby.agents}{" "}
-              {lobby.agents === 1 ? "agent" : "agents"}.
+              {fill(tr("lby.counts", lang), {
+                game: lobby.game, platform: lobby.platform,
+                people: (lobby.people === 1
+                  ? tr("lby.person", lang) : tr("lby.people", lang)
+                ).replace("{n}", String(lobby.people)),
+                profiles: (lobby.profiles === 1
+                  ? tr("lby.profile", lang) : tr("lby.profiles", lang)
+                ).replace("{n}", String(lobby.profiles)),
+                agents: (lobby.agents === 1
+                  ? tr("lby.agent", lang) : tr("lby.agents", lang)
+                ).replace("{n}", String(lobby.agents)),
+              })}
             </p>
             <p className="muted small">
-              {lobby.synthetic_seats_left} synthetic{" "}
-              {lobby.synthetic_seats_left === 1 ? "seat" : "seats"} left.
-              Everyone in a match is owed the knowledge of who is synthetic in
-              it, so this list says so per member rather than in a footnote.
+              {fill(tr("lby.seatsleft", lang), {
+                n: lobby.synthetic_seats_left,
+                seat: lobby.synthetic_seats_left === 1
+                  ? tr("lby.seat.one", lang) : tr("lby.seats", lang),
+              })}
             </p>
             {lobby.members.map((m) => (
               <div key={m.member_id}>
                 <p className="small">
-                  <strong>{m.callsign || m.member_id}</strong> — {m.role}
-                  {m.host && " · host"}
+                  {fill(tr("lby.member", lang), {
+                    who: <strong>{m.callsign || m.member_id}</strong>,
+                    role: m.role,
+                  })}
+                  {m.host && tr("lby.host", lang)}
                   <br />
                   <span className="muted">
                     {/* The server's own sentence for what this kind is. */}
-                    {m.is} · {m.does}
+                    {fill(tr("lby.isdoes", lang),
+                      { is: m.is, does: m.does })}
                   </span>
                 </p>
                 {/* The host may remove anybody; a player may remove
@@ -156,14 +172,14 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
                   <button className="chip" disabled={busy}
                           onClick={act(() => api.leaveLobby(
                             sessionId.trim(), m.member_id, token),
-                            "Out of the lobby.")}>
-                    take this seat back
+                            tr("lby.left.said", lang))}>
+                    {tr("lby.takeseat", lang)}
                   </button>
                 )}
               </div>
             ))}
 
-            <h4>Seat somebody</h4>
+            <h4>{tr("lby.seatsomebody", lang)}</h4>
             <div className="row">
               <select value={memberKind}
                       onChange={(e) => setMemberKind(e.target.value)}>
@@ -173,7 +189,7 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
               </select>
               <input value={memberId}
                      onChange={(e) => setMemberId(e.target.value)}
-                     placeholder="the member's id" style={{ flex: 1 }} />
+                     placeholder={tr("lby.member.ph", lang)} style={{ flex: 1 }} />
               <select value={role} onChange={(e) => setRole(e.target.value)}>
                 {vocab?.seats.map((s) => (
                   <option key={s.role} value={s.role}>{s.role}</option>
@@ -181,7 +197,7 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
               </select>
               <input value={callsign}
                      onChange={(e) => setCallsign(e.target.value)}
-                     placeholder="callsign" style={{ width: 120 }} />
+                     placeholder={tr("lby.callsign.ph", lang)} style={{ width: 120 }} />
               {/* `member_kind`, not `kind` — the read calls it one thing and
                   the write another, which is the mistake this binding was
                   written to stop repeating. */}
@@ -192,49 +208,37 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
                           role, callsign: callsign.trim() || undefined },
                           token);
                         setMemberId(""); setCallsign("");
-                      }, "Seated.")}>Seat</button>
+                      }, tr("lby.seated.said", lang))}>
+                {tr("lby.seat", lang)}
+              </button>
             </div>
-            <p className="muted small">
-              A real person seats only themselves — an id in a request body is
-              a claim, and the route checks it against the token. Somebody
-              else's profile is a two-party agreement and lives in the lent-
-              skills routes, which ask both sides.
-            </p>
+            <p className="muted small">{tr("lby.seatrule", lang)}</p>
           </>
         )}
       </div>
 
       {context && (
         <div className="card">
-          <h3>What a synthetic member is told</h3>
-          <p className="muted small">
-            Shown to you because it is the only way to check it. It says
-            openly that some of the others here are synthetic too — a model
-            that believes every callsign is a person will talk to them as
-            people, and a lobby that reads as friends when it is one player
-            and several generated voices is the impression this product
-            exists to prevent.
-          </p>
+          <h3>{tr("lby.told", lang)}</h3>
+          <p className="muted small">{tr("lby.told.pitch", lang)}</p>
           {/* Verbatim, and it is long on purpose. */}
           <p className="small">{context.instruction}</p>
           <p className="muted small">
-            {context.people} here{context.people === 1 ? "" : ""} ·{" "}
-            {context.synthetic_here} synthetic · maturity {context.maturity}
+            {fill(tr("lby.here", lang), {
+              n: context.people, syn: context.synthetic_here,
+              maturity: context.maturity,
+            })}
           </p>
         </div>
       )}
 
       <div className="card">
-        <h3>Handing it to somebody local</h3>
-        <p className="muted small">
-          The lighter of the two ways to pass a conversation on. A referral is
-          signed with your device and opens once; this one is consented and
-          revocable — and revoking purges the package rather than hiding it.
-        </p>
+        <h3>{tr("lby.handing", lang)}</h3>
+        <p className="muted small">{tr("lby.handing.pitch", lang)}</p>
         <div className="row">
           <select value={providerId}
                   onChange={(e) => setProviderId(e.target.value)}>
-            <option value="">pick somebody</option>
+            <option value="">{tr("lby.pick", lang)}</option>
             {providers.map((p) => (
               <option key={p.id} value={p.id}>{p.name} — {p.area}</option>
             ))}
@@ -242,7 +246,7 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
           <label className="small">
             <input type="checkbox" checked={consent}
                    onChange={(e) => setConsent(e.target.checked)} />
-            {" "}I agree to send this
+            {" "}{tr("lby.agree", lang)}
           </label>
           {/* Consent is a field on the request, not a UI convention: the
               route 403s without it, so an unchecked box is refused by the
@@ -251,40 +255,40 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
                   onClick={act(async () => setMade(await api.handoff({
                     interactor_id: interactor, provider_id: providerId,
                     profile_id: me || undefined, consent }, interactorToken)))}>
-            Hand it over
+            {tr("lby.handover", lang)}
           </button>
         </div>
         {made && (
           <>
             <p className="small">
-              To {made.provider} — {made.area}. Their link:{" "}
-              <code>{made.token}</code>
+              {fill(tr("lby.to", lang), {
+                who: made.provider, area: made.area,
+                link: <code>{made.token}</code>,
+              })}
             </p>
             <p className="muted small">
               {made.sealed
-                ? "The package is sealed in the vault."
-                : "No vault on this deployment, so the package sits in this "
-                  + "platform's database until you revoke it."}
+                ? tr("lby.sealed", lang) : tr("lby.unsealed", lang)}
             </p>
             <div className="row">
               <button disabled={busy}
                       onClick={act(async () => setOpened(
                         (await api.openHandoff(made.id, made.token)).package))}>
-                See what they will see
+                {tr("lby.seewhat", lang)}
               </button>
               <button disabled={busy}
                       onClick={act(async () => {
                         await api.revokeHandoff(made.id, interactorToken);
                         setMade(null); setOpened(null);
-                      }, "Revoked, and the package purged.")}>
-                Take it back
+                      }, tr("lby.revoked.said", lang))}>
+                {tr("lby.takeback", lang)}
               </button>
             </div>
           </>
         )}
         {opened && (
           <>
-            <h4>The package</h4>
+            <h4>{tr("lby.package", lang)}</h4>
             <p className="muted small">
               {opened.user} · {opened.provider_area}
               {opened.specialist && ` · via ${opened.specialist}`}
@@ -293,7 +297,8 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
             </p>
             {(opened.recent_exchange || []).map((m, i) => (
               <p className="small" key={i}>
-                <strong>{m.role === "profile" ? "the profile" : "you"}</strong>:{" "}
+                <strong>{m.role === "profile"
+                  ? tr("lby.theprofile", lang) : tr("lby.you", lang)}</strong>:{" "}
                 {m.content}
               </p>
             ))}

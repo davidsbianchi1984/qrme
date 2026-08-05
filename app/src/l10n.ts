@@ -4872,6 +4872,366 @@ const CHROME: Table = {
   "mkt.sold": {
     en: "What you have sold", es: "Lo que ha vendido", fr: "Ce que vous avez vendu", de: "Was Sie verkauft haben", pt: "O que vendeu", it: "Cosa hai venduto", ja: "売れたもの", zh: "你卖出了什么", hi: "आपने क्या बेचा", ar: "ما بعته",
   },
+  "lby.title": {
+    en: "Who is in the game with you", es: "Quién está en la partida contigo", fr: "Qui est dans la partie avec vous", de: "Wer mit Ihnen im Spiel ist", pt: "Quem está no jogo consigo", it: "Chi è in partita con te", ja: "誰が一緒にゲームにいるか", zh: "谁和你在同一局里", hi: "आपके साथ खेल में कौन है", ar: "من معك في اللعبة",
+  },
+  "lby.lead": {
+    en: "And, below, how a conversation gets handed to somebody local.", es: "Y, más abajo, cómo se pasa una conversación a alguien de la zona.", fr: "Et, plus bas, comment une conversation se transmet à quelqu'un du coin.", de: "Und, weiter unten, wie ein Gespräch an jemanden vor Ort übergeben wird.", pt: "E, mais abaixo, como uma conversa é entregue a alguém da zona.", it: "E, più sotto, come una conversazione viene affidata a qualcuno del posto.", ja: "そして下では、会話を地元の誰かに引き渡す方法を。", zh: "以及在下方：一段对话如何交给本地的某个人。", hi: "और नीचे, कोई बातचीत स्थानीय किसी व्यक्ति को कैसे सौंपी जाती है।", ar: "وأدناه، كيف تُسلَّم محادثة إلى شخص محلي.",
+  },
+  "lby.line": {
+    en: "The line", es: "La línea", fr: "La ligne", de: "Die Linie", pt: "A linha", it: "La linea", ja: "一線", zh: "那条界线", hi: "वह रेखा", ar: "الخط",
+  },
+  "lby.never": {
+    en: "What nothing here will do", es: "Lo que nada de aquí hará", fr: "Ce que rien ici ne fera", de: "Was hier nichts tun wird", pt: "O que nada aqui fará", it: "Cosa nulla qui farà", ja: "ここにあるものが決してしないこと", zh: "这里的一切都不会做什么", hi: "यहाँ कुछ भी क्या नहीं करेगा", ar: "ما لن يفعله أي شيء هنا",
+  },
+  "lby.never.row": {
+    en: "{thing} — {means}", es: "{thing} — {means}", fr: "{thing} — {means}", de: "{thing} — {means}", pt: "{thing} — {means}", it: "{thing} — {means}", ja: "{thing} — {means}", zh: "{thing} — {means}", hi: "{thing} — {means}", ar: "{thing} — {means}",
+  },
+  "lby.rules": {
+    en: "The rules of the room", es: "Las reglas de la sala", fr: "Les règles de la salle", de: "Die Regeln des Raums", pt: "As regras da sala", it: "Le regole della stanza", ja: "部屋のルール", zh: "这个房间的规矩", hi: "कक्ष के नियम", ar: "قواعد الغرفة",
+  },
+  "lby.lobby": {
+    en: "A lobby", es: "Una sala", fr: "Un salon", de: "Eine Lobby", pt: "Uma sala", it: "Una lobby", ja: "ロビー", zh: "一个大厅", hi: "एक लॉबी", ar: "ردهة",
+  },
+  "lby.session.ph": {
+    en: "a gaming session id", es: "un id de sesión de juego", fr: "un id de session de jeu", de: "eine Spielsitzungs-ID", pt: "um id de sessão de jogo", it: "un id di sessione di gioco", ja: "ゲームセッションのID", zh: "一个游戏会话 ID", hi: "किसी गेमिंग सत्र की आईडी", ar: "معرّف جلسة لعب",
+  },
+  "lby.openit": {
+    en: "Open it", es: "Abrirla", fr: "L'ouvrir", de: "Öffnen", pt: "Abrir", it: "Aprila", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتحها",
+  },
+  "lby.counts": {
+    en: "{game} on {platform} — {people}, {profiles}, {agents}.", es: "{game} en {platform} — {people}, {profiles}, {agents}.", fr: "{game} sur {platform} — {people}, {profiles}, {agents}.", de: "{game} auf {platform} — {people}, {profiles}, {agents}.", pt: "{game} em {platform} — {people}, {profiles}, {agents}.", it: "{game} su {platform} — {people}, {profiles}, {agents}.", ja: "{platform} の {game} — {people}、{profiles}、{agents}。", zh: "{platform} 上的 {game} — {people}、{profiles}、{agents}。", hi: "{platform} पर {game} — {people}, {profiles}, {agents}।", ar: "{game} على {platform} — {people}، {profiles}، {agents}.",
+  },
+  "lby.people": {
+    en: "{n} people", es: "{n} personas", fr: "{n} personnes", de: "{n} Personen", pt: "{n} pessoas", it: "{n} persone", ja: "{n}人", zh: "{n} 人", hi: "{n} लोग", ar: "{n} أشخاص",
+  },
+  "lby.person": {
+    en: "{n} person", es: "{n} persona", fr: "{n} personne", de: "{n} Person", pt: "{n} pessoa", it: "{n} persona", ja: "{n}人", zh: "{n} 人", hi: "{n} व्यक्ति", ar: "{n} شخص",
+  },
+  "lby.profiles": {
+    en: "{n} profiles", es: "{n} perfiles", fr: "{n} profils", de: "{n} Profile", pt: "{n} perfis", it: "{n} profili", ja: "プロフィール{n}件", zh: "{n} 份资料", hi: "{n} प्रोफ़ाइलें", ar: "{n} ملفات",
+  },
+  "lby.profile": {
+    en: "{n} profile", es: "{n} perfil", fr: "{n} profil", de: "{n} Profil", pt: "{n} perfil", it: "{n} profilo", ja: "プロフィール{n}件", zh: "{n} 份资料", hi: "{n} प्रोफ़ाइल", ar: "{n} ملف",
+  },
+  "lby.agents": {
+    en: "{n} agents", es: "{n} agentes", fr: "{n} agents", de: "{n} Agenten", pt: "{n} agentes", it: "{n} agenti", ja: "エージェント{n}体", zh: "{n} 个代理", hi: "{n} एजेंट", ar: "{n} وكلاء",
+  },
+  "lby.agent": {
+    en: "{n} agent", es: "{n} agente", fr: "{n} agent", de: "{n} Agent", pt: "{n} agente", it: "{n} agente", ja: "エージェント{n}体", zh: "{n} 个代理", hi: "{n} एजेंट", ar: "وكيل {n}",
+  },
+  "lby.seatsleft": {
+    en: "{n} synthetic {seat} left. Everyone in a match is owed the knowledge of who is synthetic in it, so this list says so per member rather than in a footnote.", es: "Quedan {n} {seat} sintéticos. A todos en una partida se les debe saber quién es sintético en ella, así que esta lista lo dice por miembro y no en una nota al pie.", fr: "Il reste {n} {seat} synthétiques. Chacun dans une partie a droit de savoir qui y est synthétique, donc cette liste le dit par membre et non en note de bas de page.", de: "Noch {n} synthetische {seat}. Jeder in einem Match hat ein Anrecht darauf zu wissen, wer darin synthetisch ist — diese Liste sagt es also pro Mitglied statt in einer Fußnote.", pt: "Restam {n} {seat} sintéticos. Todos numa partida têm direito a saber quem nela é sintético, por isso esta lista di-lo por membro e não numa nota de rodapé.", it: "Restano {n} {seat} sintetici. Chiunque sia in una partita ha diritto di sapere chi vi è sintetico, quindi questo elenco lo dice per ciascun membro e non in una nota.", ja: "合成の{seat}は残り {n} です。試合にいる全員には、その中で誰が合成なのかを知る筋合いがあります。ですからこの一覧は、脚注ではなくメンバーごとにそれを示します。", zh: "还剩 {n} 个合成{seat}。同场的每个人都有权知道其中谁是合成的，所以这份名单是逐个成员标明，而不是放在脚注里。", hi: "{n} सिंथेटिक {seat} शेष। किसी मैच में मौजूद हर व्यक्ति का हक़ है यह जानना कि उसमें कौन सिंथेटिक है, इसलिए यह सूची फ़ुटनोट में नहीं, हर सदस्य के लिए यह बताती है।", ar: "بقي {n} من {seat} الاصطناعية. لكل من في المباراة حق معرفة من فيها اصطناعي، لذا تقول هذه القائمة ذلك لكل عضو لا في حاشية.",
+  },
+  "lby.seats": {
+    en: "seats", es: "asientos", fr: "places", de: "Plätze", pt: "lugares", it: "posti", ja: "席", zh: "席位", hi: "सीटें", ar: "مقاعد",
+  },
+  "lby.seat.one": {
+    en: "seat", es: "asiento", fr: "place", de: "Platz", pt: "lugar", it: "posto", ja: "席", zh: "席位", hi: "सीट", ar: "مقعد",
+  },
+  "lby.member": {
+    en: "{who} — {role}", es: "{who} — {role}", fr: "{who} — {role}", de: "{who} — {role}", pt: "{who} — {role}", it: "{who} — {role}", ja: "{who} — {role}", zh: "{who} — {role}", hi: "{who} — {role}", ar: "{who} — {role}",
+  },
+  "lby.host": {
+    en: " · host", es: " · anfitrión", fr: " · hôte", de: " · Gastgeber", pt: " · anfitrião", it: " · ospitante", ja: " · ホスト", zh: " · 主机", hi: " · मेज़बान", ar: " · مضيف",
+  },
+  "lby.isdoes": {
+    en: "{is} · {does}", es: "{is} · {does}", fr: "{is} · {does}", de: "{is} · {does}", pt: "{is} · {does}", it: "{is} · {does}", ja: "{is} · {does}", zh: "{is} · {does}", hi: "{is} · {does}", ar: "{is} · {does}",
+  },
+  "lby.takeseat": {
+    en: "take this seat back", es: "recuperar este asiento", fr: "reprendre cette place", de: "diesen Platz zurücknehmen", pt: "retomar este lugar", it: "riprendi questo posto", ja: "この席を引き上げる", zh: "收回这个席位", hi: "यह सीट वापस लें", ar: "استردّ هذا المقعد",
+  },
+  "lby.left.said": {
+    en: "Out of the lobby.", es: "Fuera de la sala.", fr: "Sorti du salon.", de: "Aus der Lobby.", pt: "Fora da sala.", it: "Fuori dalla lobby.", ja: "ロビーから外れました。", zh: "已离开大厅。", hi: "लॉबी से बाहर।", ar: "خارج الردهة.",
+  },
+  "lby.seatsomebody": {
+    en: "Seat somebody", es: "Sentar a alguien", fr: "Asseoir quelqu'un", de: "Jemanden setzen", pt: "Sentar alguém", it: "Fai sedere qualcuno", ja: "誰かを座らせる", zh: "让某人入座", hi: "किसी को बैठाएँ", ar: "أجلِس أحدًا",
+  },
+  "lby.member.ph": {
+    en: "the member's id", es: "el id del miembro", fr: "l'id du membre", de: "die ID des Mitglieds", pt: "o id do membro", it: "l'id del membro", ja: "メンバーのID", zh: "成员的 ID", hi: "सदस्य की आईडी", ar: "معرّف العضو",
+  },
+  "lby.callsign.ph": {
+    en: "callsign", es: "indicativo", fr: "indicatif", de: "Rufzeichen", pt: "indicativo", it: "nominativo", ja: "コールサイン", zh: "呼号", hi: "कॉलसाइन", ar: "اسم النداء",
+  },
+  "lby.seat": {
+    en: "Seat", es: "Sentar", fr: "Asseoir", de: "Setzen", pt: "Sentar", it: "Siedi", ja: "座らせる", zh: "入座", hi: "बैठाएँ", ar: "أجلِس",
+  },
+  "lby.seated.said": {
+    en: "Seated.", es: "Sentado.", fr: "Assis.", de: "Gesetzt.", pt: "Sentado.", it: "Seduto.", ja: "座らせました。", zh: "已入座。", hi: "बैठा दिया गया।", ar: "جلس.",
+  },
+  "lby.seatrule": {
+    en: "A real person seats only themselves — an id in a request body is a claim, and the route checks it against the token. Somebody else's profile is a two-party agreement and lives in the lent-skills routes, which ask both sides.", es: "Una persona real solo se sienta a sí misma — un id en el cuerpo de una petición es una afirmación, y la ruta lo comprueba contra el token. El perfil de otra persona es un acuerdo entre dos partes y vive en las rutas de habilidades prestadas, que preguntan a ambos lados.", fr: "Une personne réelle ne s'assoit qu'elle-même — un id dans un corps de requête est une prétention, et la route la vérifie contre le jeton. Le profil de quelqu'un d'autre est un accord bipartite et vit dans les routes de compétences prêtées, qui interrogent les deux côtés.", de: "Ein echter Mensch setzt nur sich selbst — eine ID im Anfrage-Body ist eine Behauptung, und die Route prüft sie gegen das Token. Das Profil einer anderen Person ist eine Vereinbarung zu zweit und lebt in den Routen für geliehene Fertigkeiten, die beide Seiten fragen.", pt: "Uma pessoa real senta apenas a si mesma — um id no corpo de um pedido é uma alegação, e a rota verifica-o contra o token. O perfil de outra pessoa é um acordo entre duas partes e vive nas rotas de competências emprestadas, que perguntam a ambos os lados.", it: "Una persona reale fa sedere solo se stessa — un id nel corpo di una richiesta è un'affermazione, e la rotta la verifica contro il token. Il profilo di qualcun altro è un accordo tra due parti e vive nelle rotte delle abilità prestate, che interpellano entrambi.", ja: "実在の人が座らせられるのは自分だけです — リクエスト本文の ID は主張にすぎず、経路はそれをトークンと突き合わせます。他人のプロフィールは二者間の合意であり、双方に問い合わせる「貸し出した技能」の経路にあります。", zh: "真人只能让自己入座——请求体里的 ID 只是一个主张，路由会拿它和令牌核对。别人的资料属于双方协议，归在“出借技能”的路由里，那些路由会向双方询问。", hi: "कोई वास्तविक व्यक्ति केवल स्वयं को बैठाता है — अनुरोध की बॉडी में दी गई आईडी एक दावा है, और रूट उसे टोकन से जाँचता है। किसी और की प्रोफ़ाइल दो-पक्षीय सहमति है और वह उधार-दिए-कौशल वाले रूट्स में रहती है, जो दोनों पक्षों से पूछते हैं।", ar: "الشخص الحقيقي لا يُجلس إلا نفسه — والمعرّف في جسم الطلب ادعاء، والمسار يطابقه مع الرمز. أما ملف شخص آخر فاتفاق بين طرفين، ومكانه مسارات المهارات المُعارة التي تسأل الطرفين.",
+  },
+  "lby.told": {
+    en: "What a synthetic member is told", es: "Lo que se le dice a un miembro sintético", fr: "Ce qu'on dit à un membre synthétique", de: "Was einem synthetischen Mitglied gesagt wird", pt: "O que é dito a um membro sintético", it: "Cosa viene detto a un membro sintetico", ja: "合成メンバーに何が伝えられるか", zh: "一个合成成员被告知了什么", hi: "किसी सिंथेटिक सदस्य से क्या कहा जाता है", ar: "ما يُقال لعضو اصطناعي",
+  },
+  "lby.told.pitch": {
+    en: "Shown to you because it is the only way to check it. It says openly that some of the others here are synthetic too — a model that believes every callsign is a person will talk to them as people, and a lobby that reads as friends when it is one player and several generated voices is the impression this product exists to prevent.", es: "Se le muestra porque es la única forma de comprobarlo. Dice abiertamente que algunos de los demás aquí también son sintéticos — un modelo que crea que cada indicativo es una persona les hablará como a personas, y una sala que se lee como amigos cuando es un jugador y varias voces generadas es justo la impresión que este producto existe para impedir.", fr: "Montré parce que c'est la seule façon de le vérifier. Cela dit ouvertement que certains des autres ici sont eux aussi synthétiques — un modèle qui croit que chaque indicatif est une personne leur parlera comme à des personnes, et un salon qui se lit comme des amis alors qu'il s'agit d'un joueur et de plusieurs voix générées est précisément l'impression que ce produit existe pour empêcher.", de: "Ihnen gezeigt, weil es die einzige Möglichkeit ist, es zu prüfen. Es sagt offen, dass einige der anderen hier ebenfalls synthetisch sind — ein Modell, das jedes Rufzeichen für einen Menschen hält, wird mit ihnen wie mit Menschen sprechen, und eine Lobby, die sich wie Freunde liest, während sie ein Spieler und mehrere erzeugte Stimmen ist, ist genau der Eindruck, den dieses Produkt verhindern soll.", pt: "Mostrado a si porque é a única forma de o verificar. Diz abertamente que alguns dos outros aqui também são sintéticos — um modelo que acredite que cada indicativo é uma pessoa falará com eles como pessoas, e uma sala que se lê como amigos quando é um jogador e várias vozes geradas é exatamente a impressão que este produto existe para impedir.", it: "Mostrato a te perché è l'unico modo di verificarlo. Dice apertamente che alcuni degli altri qui sono anch'essi sintetici — un modello che crede che ogni nominativo sia una persona parlerà loro come a persone, e una lobby che si legge come amici quando è un giocatore e diverse voci generate è proprio l'impressione che questo prodotto esiste per impedire.", ja: "あなたに見せているのは、それが確かめる唯一の手段だからです。そこには、ここにいる他の何人かも合成である、と正面から書いてあります — すべてのコールサインを人だと思い込むモデルは、彼らに人として話しかけます。そして、実際には一人のプレイヤーと複数の生成された声にすぎないロビーが友だちの集まりのように読めること、それこそがこの製品が防ぐために存在する印象です。", zh: "把它展示给你，是因为这是核对它的唯一方式。它明白地写着：这里的另一些成员同样是合成的——一个以为每个呼号都是真人的模型，会把他们当人来交谈；而当一个大厅实际上只有一名玩家和若干生成的声音，却读起来像一群朋友时，这正是本产品存在的意义所要阻止的印象。", hi: "यह आपको इसलिए दिखाया जाता है क्योंकि इसे जाँचने का यही एकमात्र तरीक़ा है। इसमें खुलकर लिखा है कि यहाँ मौजूद कुछ अन्य भी सिंथेटिक हैं — जो मॉडल हर कॉलसाइन को व्यक्ति मान ले, वह उनसे व्यक्तियों की तरह बात करेगा; और जब असल में एक खिलाड़ी और कई उत्पन्न आवाज़ें हों, पर लॉबी दोस्तों जैसी पढ़ी जाए — यही वह छाप है जिसे रोकने के लिए यह उत्पाद मौजूद है।", ar: "يُعرض عليك لأنه السبيل الوحيد للتحقق منه. يقول صراحةً إن بعض الآخرين هنا اصطناعيون أيضًا — فنموذج يظن أن كل اسم نداء إنسان سيخاطبهم كبشر، وردهة تُقرأ كأنها أصدقاء وهي في الحقيقة لاعب واحد وعدة أصوات مولَّدة هي بالضبط الانطباع الذي وُجد هذا المنتج ليمنعه.",
+  },
+  "lby.here": {
+    en: "{n} here · {syn} synthetic · maturity {maturity}", es: "{n} aquí · {syn} sintéticos · madurez {maturity}", fr: "{n} ici · {syn} synthétiques · maturité {maturity}", de: "{n} hier · {syn} synthetisch · Reife {maturity}", pt: "{n} aqui · {syn} sintéticos · maturidade {maturity}", it: "{n} qui · {syn} sintetici · maturità {maturity}", ja: "ここに {n} · うち合成 {syn} · 成熟度 {maturity}", zh: "此处 {n} 位 · 其中 {syn} 位合成 · 成熟度 {maturity}", hi: "यहाँ {n} · {syn} सिंथेटिक · परिपक्वता {maturity}", ar: "هنا {n} · منهم {syn} اصطناعي · مستوى النضج {maturity}",
+  },
+  "lby.handing": {
+    en: "Handing it to somebody local", es: "Pasárselo a alguien de la zona", fr: "Le transmettre à quelqu'un du coin", de: "An jemanden vor Ort übergeben", pt: "Entregá-lo a alguém da zona", it: "Affidarlo a qualcuno del posto", ja: "地元の誰かに引き渡す", zh: "交给本地的某个人", hi: "इसे किसी स्थानीय व्यक्ति को सौंपना", ar: "تسليمه إلى شخص محلي",
+  },
+  "lby.handing.pitch": {
+    en: "The lighter of the two ways to pass a conversation on. A referral is signed with your device and opens once; this one is consented and revocable — and revoking purges the package rather than hiding it.", es: "La más ligera de las dos formas de pasar una conversación. Una derivación se firma con su dispositivo y se abre una vez; esta se consiente y es revocable — y revocarla purga el paquete en vez de esconderlo.", fr: "La plus légère des deux façons de transmettre une conversation. Une orientation est signée avec votre appareil et s'ouvre une fois ; celle-ci est consentie et révocable — et la révoquer purge le paquet au lieu de le cacher.", de: "Der leichtere der beiden Wege, ein Gespräch weiterzugeben. Eine Überweisung wird mit Ihrem Gerät signiert und öffnet einmal; diese hier ist eingewilligt und widerruflich — und der Widerruf löscht das Paket, statt es zu verbergen.", pt: "A mais leve das duas formas de passar uma conversa adiante. Um encaminhamento é assinado com o seu dispositivo e abre uma vez; esta é consentida e revogável — e revogar apaga o pacote em vez de o esconder.", it: "Il più leggero dei due modi di passare oltre una conversazione. Un rinvio è firmato con il tuo dispositivo e si apre una volta; questo è consentito e revocabile — e revocarlo cancella il pacchetto invece di nasconderlo.", ja: "会話を引き渡す二つの方法のうち、軽いほうです。紹介はあなたの端末で署名され、一度だけ開きます。こちらは同意にもとづき、取り消せます — そして取り消せば、隠すのではなく一式が消去されます。", zh: "把一段对话传出去的两种方式中较轻的一种。转介需用你的设备签署，且只能打开一次；这一种基于同意，并且可以撤销——而撤销会清除整个包，而不是把它藏起来。", hi: "बातचीत आगे सौंपने के दो तरीक़ों में हल्का वाला। रेफ़रल आपके डिवाइस से हस्ताक्षरित होता है और एक बार खुलता है; यह सहमति पर आधारित और वापस लेने योग्य है — और वापस लेने पर पैकेज छिपता नहीं, मिट जाता है।", ar: "الأخف بين طريقتي تمرير المحادثة. الإحالة تُوقَّع بجهازك وتُفتح مرة واحدة؛ أما هذه فبالموافقة وقابلة للإلغاء — والإلغاء يمحو الحزمة لا يخفيها.",
+  },
+  "lby.pick": {
+    en: "pick somebody", es: "elija a alguien", fr: "choisissez quelqu'un", de: "jemanden wählen", pt: "escolha alguém", it: "scegli qualcuno", ja: "誰かを選ぶ", zh: "选一个人", hi: "किसी को चुनें", ar: "اختر أحدًا",
+  },
+  "lby.agree": {
+    en: "I agree to send this", es: "Acepto enviar esto", fr: "J'accepte de l'envoyer", de: "Ich stimme zu, dies zu senden", pt: "Concordo em enviar isto", it: "Acconsento a inviarlo", ja: "これを送ることに同意します", zh: "我同意发送此内容", hi: "मैं इसे भेजने पर सहमत हूँ", ar: "أوافق على إرسال هذا",
+  },
+  "lby.handover": {
+    en: "Hand it over", es: "Pasarlo", fr: "Le transmettre", de: "Übergeben", pt: "Entregar", it: "Affidalo", ja: "引き渡す", zh: "交出去", hi: "सौंप दें", ar: "سلّمه",
+  },
+  "lby.to": {
+    en: "To {who} — {area}. Their link: {link}", es: "Para {who} — {area}. Su enlace: {link}", fr: "À {who} — {area}. Leur lien : {link}", de: "An {who} — {area}. Ihr Link: {link}", pt: "Para {who} — {area}. A ligação deles: {link}", it: "A {who} — {area}. Il loro link: {link}", ja: "{who} 宛 — {area}。相手のリンク: {link}", zh: "发给 {who} — {area}。他们的链接：{link}", hi: "{who} को — {area}। उनका लिंक: {link}", ar: "إلى {who} — {area}. رابطهم: {link}",
+  },
+  "lby.sealed": {
+    en: "The package is sealed in the vault.", es: "El paquete está sellado en la bóveda.", fr: "Le paquet est scellé dans le coffre.", de: "Das Paket ist im Tresor versiegelt.", pt: "O pacote está selado no cofre.", it: "Il pacchetto è sigillato nel caveau.", ja: "一式は保管庫に封印されています。", zh: "这个包已被封存在保险库中。", hi: "पैकेज वॉल्ट में सीलबंद है।", ar: "الحزمة مختومة في الخزانة.",
+  },
+  "lby.unsealed": {
+    en: "No vault on this deployment, so the package sits in this platform's database until you revoke it.", es: "No hay bóveda en esta instalación, así que el paquete se queda en la base de datos de esta plataforma hasta que lo revoque.", fr: "Pas de coffre sur cette installation, le paquet reste donc dans la base de données de cette plateforme jusqu'à ce que vous le révoquiez.", de: "Auf dieser Installation gibt es keinen Tresor, das Paket liegt also in der Datenbank dieser Plattform, bis Sie es widerrufen.", pt: "Não há cofre nesta instalação, por isso o pacote fica na base de dados desta plataforma até você o revogar.", it: "Su questa installazione non c'è un caveau, quindi il pacchetto resta nel database di questa piattaforma finché non lo revochi.", ja: "この環境には保管庫がないため、一式はあなたが取り消すまでこのプラットフォームのデータベースに置かれます。", zh: "本部署没有保险库，因此在你撤销之前，这个包就存放在本平台的数据库里。", hi: "इस परिनियोजन में कोई वॉल्ट नहीं, इसलिए जब तक आप इसे वापस न लें, पैकेज इस मंच के डेटाबेस में रहेगा।", ar: "لا خزانة في هذا التنصيب، فتبقى الحزمة في قاعدة بيانات هذه المنصة حتى تلغيها.",
+  },
+  "lby.seewhat": {
+    en: "See what they will see", es: "Ver lo que verán", fr: "Voir ce qu'ils verront", de: "Sehen, was sie sehen werden", pt: "Ver o que eles verão", it: "Vedi cosa vedranno", ja: "相手に見えるものを見る", zh: "看看他们会看到什么", hi: "देखें कि उन्हें क्या दिखेगा", ar: "انظر ما سيرونه",
+  },
+  "lby.takeback": {
+    en: "Take it back", es: "Recuperarlo", fr: "Le reprendre", de: "Zurücknehmen", pt: "Retomá-lo", it: "Riprendilo", ja: "取り戻す", zh: "收回", hi: "वापस लें", ar: "استردّه",
+  },
+  "lby.revoked.said": {
+    en: "Revoked, and the package purged.", es: "Revocado, y el paquete purgado.", fr: "Révoqué, et le paquet purgé.", de: "Widerrufen, und das Paket gelöscht.", pt: "Revogado, e o pacote apagado.", it: "Revocato, e il pacchetto cancellato.", ja: "取り消し、一式を消去しました。", zh: "已撤销，且该包已清除。", hi: "वापस लिया गया, और पैकेज मिटा दिया गया।", ar: "أُلغي، ومُحيت الحزمة.",
+  },
+  "lby.package": {
+    en: "The package", es: "El paquete", fr: "Le paquet", de: "Das Paket", pt: "O pacote", it: "Il pacchetto", ja: "一式", zh: "这个包", hi: "पैकेज", ar: "الحزمة",
+  },
+  "lby.theprofile": {
+    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "プロフィール", zh: "该资料", hi: "प्रोफ़ाइल", ar: "الملف",
+  },
+  "lby.you": {
+    en: "you", es: "usted", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "prs.title": {
+    en: "Where this is seen", es: "Dónde se ve esto", fr: "Où ceci est vu", de: "Wo das zu sehen ist", pt: "Onde isto é visto", it: "Dove lo si vede", ja: "これがどこで見られるか", zh: "这会在哪里被看到", hi: "यह कहाँ दिखता है", ar: "أين يُرى هذا",
+  },
+  "prs.front": {
+    en: "What a stranger lands on", es: "En qué aterriza un desconocido", fr: "Ce sur quoi un inconnu tombe", de: "Worauf eine fremde Person landet", pt: "Onde um desconhecido aterra", it: "Su cosa atterra uno sconosciuto", ja: "見知らぬ人が最初に開くもの", zh: "陌生人会落到哪个页面", hi: "कोई अजनबी कहाँ पहुँचता है", ar: "أين يحطّ الغريب",
+  },
+  "prs.reviews": {
+    en: "{avg} from {n} reviews", es: "{avg} de {n} reseñas", fr: "{avg} sur {n} avis", de: "{avg} aus {n} Bewertungen", pt: "{avg} de {n} avaliações", it: "{avg} su {n} recensioni", ja: "レビュー{n}件で {avg}", zh: "{n} 条评价，{avg} 分", hi: "{n} समीक्षाओं से {avg}", ar: "{avg} من {n} تقييمات",
+  },
+  "prs.review": {
+    en: "{avg} from {n} review", es: "{avg} de {n} reseña", fr: "{avg} sur {n} avis", de: "{avg} aus {n} Bewertung", pt: "{avg} de {n} avaliação", it: "{avg} su {n} recensione", ja: "レビュー{n}件で {avg}", zh: "{n} 条评价，{avg} 分", hi: "{n} समीक्षा से {avg}", ar: "{avg} من {n} تقييم",
+  },
+  "prs.talked": {
+    en: " · {n} people have talked with it", es: " · {n} personas han hablado con él", fr: " · {n} personnes lui ont parlé", de: " · {n} Personen haben mit ihm gesprochen", pt: " · {n} pessoas falaram com ele", it: " · {n} persone ci hanno parlato", ja: " · {n}人が話しました", zh: " · 已有 {n} 人与它交谈", hi: " · {n} लोगों ने इससे बात की", ar: " · تحدّث معه {n} أشخاص",
+  },
+  "prs.talked.one": {
+    en: " · {n} person has talked with it", es: " · {n} persona ha hablado con él", fr: " · {n} personne lui a parlé", de: " · {n} Person hat mit ihm gesprochen", pt: " · {n} pessoa falou com ele", it: " · {n} persona ci ha parlato", ja: " · {n}人が話しました", zh: " · 已有 {n} 人与它交谈", hi: " · {n} व्यक्ति ने इससे बात की", ar: " · تحدّث معه {n} شخص",
+  },
+  "prs.page": {
+    en: "The page you make yourself", es: "La página que haces tú", fr: "La page que vous faites vous-même", de: "Die Seite, die Sie selbst machen", pt: "A página que faz você mesmo", it: "La pagina che fai da te", ja: "自分で作るページ", zh: "你自己做的那个页面", hi: "वह पन्ना जो आप ख़ुद बनाते हैं", ar: "الصفحة التي تصنعها بنفسك",
+  },
+  "prs.tagline.ph": {
+    en: "a tagline", es: "un lema", fr: "une accroche", de: "ein Slogan", pt: "um lema", it: "uno slogan", ja: "キャッチコピー", zh: "一句标语", hi: "एक टैगलाइन", ar: "شعار",
+  },
+  "prs.about.ph": {
+    en: "about", es: "acerca de", fr: "à propos", de: "Über", pt: "sobre", it: "chi sei", ja: "自己紹介", zh: "关于", hi: "परिचय", ar: "نبذة",
+  },
+  "prs.html.ph": {
+    en: "your own HTML", es: "tu propio HTML", fr: "votre propre HTML", de: "Ihr eigenes HTML", pt: "o seu próprio HTML", it: "il tuo HTML", ja: "自分の HTML", zh: "你自己的 HTML", hi: "आपका अपना HTML", ar: "HTML خاص بك",
+  },
+  "prs.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "احفظ",
+  },
+  "prs.saved.said": {
+    en: "Saved.", es: "Guardado.", fr: "Enregistré.", de: "Gespeichert.", pt: "Guardado.", it: "Salvato.", ja: "保存しました。", zh: "已保存。", hi: "सहेज लिया गया।", ar: "حُفظ.",
+  },
+  "prs.saved.removed": {
+    en: "Saved. These were removed: {what}.", es: "Guardado. Se quitaron estos: {what}.", fr: "Enregistré. Ceci a été retiré : {what}.", de: "Gespeichert. Diese wurden entfernt: {what}.", pt: "Guardado. Estes foram removidos: {what}.", it: "Salvato. Questi sono stati rimossi: {what}.", ja: "保存しました。次のものは削除されました: {what}。", zh: "已保存。以下内容被移除：{what}。", hi: "सहेजा गया। ये हटा दिए गए: {what}।", ar: "حُفظ. أُزيلت هذه: {what}.",
+  },
+  "prs.saved.held": {
+    en: "Saved, but the about text is held: {why}", es: "Guardado, pero el texto de perfil queda retenido: {why}", fr: "Enregistré, mais le texte « à propos » est retenu : {why}", de: "Gespeichert, aber der Über-Text wird zurückgehalten: {why}", pt: "Guardado, mas o texto sobre si fica retido: {why}", it: "Salvato, ma il testo di presentazione è trattenuto: {why}", ja: "保存しましたが、自己紹介文は保留されています: {why}", zh: "已保存，但“关于”文本被留置：{why}", hi: "सहेजा गया, पर परिचय पाठ रोका गया है: {why}", ar: "حُفظ، لكن نص النبذة محتجز: {why}",
+  },
+  "prs.survive": {
+    en: "These survive: {tags}. Anything else is removed on save, and the save still succeeds — so the list is here rather than in a message afterwards.", es: "Estos sobreviven: {tags}. Todo lo demás se quita al guardar, y el guardado sigue funcionando — por eso la lista está aquí y no en un mensaje posterior.", fr: "Ceux-ci survivent : {tags}. Tout le reste est retiré à l'enregistrement, et l'enregistrement réussit quand même — la liste est donc ici plutôt que dans un message après coup.", de: "Diese überstehen es: {tags}. Alles andere wird beim Speichern entfernt, und das Speichern gelingt trotzdem — deshalb steht die Liste hier statt in einer Meldung danach.", pt: "Estes sobrevivem: {tags}. Tudo o resto é removido ao guardar, e a gravação continua a resultar — por isso a lista está aqui e não numa mensagem depois.", it: "Questi sopravvivono: {tags}. Tutto il resto viene rimosso al salvataggio, e il salvataggio riesce comunque — quindi l'elenco è qui e non in un messaggio dopo.", ja: "残るのは次のものです: {tags}。それ以外は保存時に取り除かれ、それでも保存自体は成功します — だからこの一覧は、あとからのメッセージではなくここにあります。", zh: "以下会保留：{tags}。其余内容在保存时会被移除，而保存仍然成功——所以这份清单放在这里，而不是事后的一条提示里。", hi: "ये बचे रहते हैं: {tags}। बाक़ी सब सहेजते समय हट जाता है, और सहेजना फिर भी सफल होता है — इसलिए यह सूची बाद के संदेश में नहीं, यहीं है।", ar: "هذه تبقى: {tags}. وكل ما عداها يُزال عند الحفظ، ويظل الحفظ ناجحًا — لذا القائمة هنا لا في رسالة بعد ذلك.",
+  },
+  "prs.lastremoved": {
+    en: "Last save removed: {what}", es: "El último guardado quitó: {what}", fr: "Le dernier enregistrement a retiré : {what}", de: "Beim letzten Speichern entfernt: {what}", pt: "A última gravação removeu: {what}", it: "L'ultimo salvataggio ha rimosso: {what}", ja: "前回の保存で削除されたもの: {what}", zh: "上次保存移除了：{what}", hi: "पिछली बार सहेजने पर हटा: {what}", ar: "آخر حفظ أزال: {what}",
+  },
+  "prs.held": {
+    en: "About text held: {why}", es: "Texto de perfil retenido: {why}", fr: "Texte « à propos » retenu : {why}", de: "Über-Text zurückgehalten: {why}", pt: "Texto sobre si retido: {why}", it: "Testo di presentazione trattenuto: {why}", ja: "自己紹介文は保留: {why}", zh: "“关于”文本被留置：{why}", hi: "परिचय पाठ रोका गया: {why}", ar: "نص النبذة محتجز: {why}",
+  },
+  "prs.screens": {
+    en: "Screens it is on", es: "Pantallas en las que está", fr: "Écrans où il se trouve", de: "Bildschirme, auf denen es läuft", pt: "Ecrãs em que está", it: "Schermi su cui è", ja: "載っている画面", zh: "它出现在哪些屏幕上", hi: "जिन स्क्रीनों पर यह है", ar: "الشاشات التي هو عليها",
+  },
+  "prs.showing": {
+    en: "showing", es: "mostrando", fr: "affichant", de: "zeigt", pt: "a mostrar", it: "mostra", ja: "表示中", zh: "正显示", hi: "दिखा रहा है", ar: "يعرض",
+  },
+  "prs.screens.pitch": {
+    en: "Only you can see this list — it is a list of physical places. What any one screen is {showing} is public, because a fixture in a corridor displays to whoever walks past.", es: "Solo usted puede ver esta lista — es una lista de lugares físicos. Lo que una pantalla concreta está {showing} es público, porque un panel en un pasillo se muestra a quien pase.", fr: "Vous seul voyez cette liste — c'est une liste de lieux physiques. Ce qu'un écran donné est en train d'{showing} est public, car un panneau dans un couloir s'affiche à qui passe.", de: "Nur Sie sehen diese Liste — sie ist eine Liste physischer Orte. Was ein einzelner Bildschirm gerade {showing}, ist öffentlich, denn eine Anzeige im Flur zeigt sich jedem Vorbeigehenden.", pt: "Só você pode ver esta lista — é uma lista de lugares físicos. O que um dado ecrã está a {showing} é público, porque um painel num corredor mostra-se a quem passa.", it: "Solo tu puoi vedere questo elenco — è un elenco di luoghi fisici. Ciò che un singolo schermo sta {showing} è pubblico, perché un pannello in un corridoio si mostra a chiunque passi.", ja: "この一覧を見られるのはあなただけです — これは物理的な場所の一覧だからです。ある画面が何を{showing}かは公開情報です。廊下の掲示は、通りかかった誰にでも見えるからです。", zh: "只有你能看到这份清单——它是一份实际地点的清单。而某一块屏幕正在{showing}什么则是公开的，因为走廊里的展示牌会显示给任何路过的人。", hi: "यह सूची केवल आप देख सकते हैं — यह भौतिक स्थानों की सूची है। कोई एक स्क्रीन क्या {showing} है, यह सार्वजनिक है, क्योंकि गलियारे में लगा पैनल हर राहगीर को दिखता है।", ar: "أنت وحدك ترى هذه القائمة — فهي قائمة أماكن مادية. أما ما {showing} شاشة بعينها فعلني، لأن لوحة في ممر تُعرض لكل مارّ.",
+  },
+  "prs.noneplaced": {
+    en: "None placed.", es: "Ninguna colocada.", fr: "Aucun posé.", de: "Keine platziert.", pt: "Nenhum colocado.", it: "Nessuno collocato.", ja: "設置されていません。", zh: "尚未放置。", hi: "कोई नहीं रखा गया।", ar: "لم يوضع أي منها.",
+  },
+  "prs.takendown": {
+    en: "taken down", es: "retirada", fr: "retiré", de: "abgenommen", pt: "retirado", it: "rimosso", ja: "撤去済み", zh: "已撤下", hi: "हटाया गया", ar: "مُزال",
+  },
+  "prs.passersby": {
+    en: "passers-by", es: "transeúntes", fr: "passants", de: "Vorübergehende", pt: "transeuntes", it: "passanti", ja: "通行人", zh: "路人", hi: "राहगीर", ar: "المارّة",
+  },
+  "prs.screenline": {
+    en: "{kind} · {size} · {finish} · showing {faces}", es: "{kind} · {size} · {finish} · mostrando {faces}", fr: "{kind} · {size} · {finish} · affiche {faces}", de: "{kind} · {size} · {finish} · zeigt {faces}", pt: "{kind} · {size} · {finish} · a mostrar {faces}", it: "{kind} · {size} · {finish} · mostra {faces}", ja: "{kind} · {size} · {finish} · 表示中 {faces}", zh: "{kind} · {size} · {finish} · 正显示 {faces}", hi: "{kind} · {size} · {finish} · दिखा रहा है {faces}", ar: "{kind} · {size} · {finish} · يعرض {faces}",
+  },
+  "prs.takedown": {
+    en: "Take down", es: "Retirar", fr: "Retirer", de: "Abnehmen", pt: "Retirar", it: "Rimuovi", ja: "撤去する", zh: "撤下", hi: "हटाएँ", ar: "أزِل",
+  },
+  "prs.takendown.said": {
+    en: "Taken down. The record stays; the screen stops.", es: "Retirada. El registro se queda; la pantalla para.", fr: "Retiré. Le relevé reste ; l'écran s'arrête.", de: "Abgenommen. Der Eintrag bleibt; der Bildschirm hört auf.", pt: "Retirado. O registo fica; o ecrã para.", it: "Rimosso. Il registro resta; lo schermo si ferma.", ja: "撤去しました。記録は残り、画面は止まります。", zh: "已撤下。记录保留；屏幕停止显示。", hi: "हटा दिया गया। रिकॉर्ड बना रहता है; स्क्रीन रुक जाती है।", ar: "أُزيل. يبقى السجل؛ وتتوقف الشاشة.",
+  },
+  "prs.puton": {
+    en: "Put it on a screen", es: "Ponerlo en una pantalla", fr: "Le mettre sur un écran", de: "Auf einen Bildschirm bringen", pt: "Pô-lo num ecrã", it: "Mettilo su uno schermo", ja: "画面に載せる", zh: "放到一块屏幕上", hi: "इसे किसी स्क्रीन पर रखें", ar: "ضعه على شاشة",
+  },
+  "prs.label.ph": {
+    en: "what to call it", es: "cómo llamarla", fr: "comment l'appeler", de: "wie es heißen soll", pt: "como lhe chamar", it: "come chiamarlo", ja: "呼び名", zh: "如何称呼它", hi: "इसे क्या कहें", ar: "بمَ تسمّيه",
+  },
+  "prs.where.ph": {
+    en: "where it is", es: "dónde está", fr: "où il est", de: "wo er steht", pt: "onde está", it: "dov'è", ja: "どこにあるか", zh: "它在哪里", hi: "यह कहाँ है", ar: "أين هو",
+  },
+  "prs.place": {
+    en: "Place", es: "Colocar", fr: "Poser", de: "Platzieren", pt: "Colocar", it: "Colloca", ja: "設置", zh: "放置", hi: "रखें", ar: "ضع",
+  },
+  "prs.placed.said": {
+    en: "Placed.", es: "Colocada.", fr: "Posé.", de: "Platziert.", pt: "Colocado.", it: "Collocato.", ja: "設置しました。", zh: "已放置。", hi: "रख दिया गया।", ar: "وُضع.",
+  },
+  "prs.chosen": {
+    en: "{means} — {who}", es: "{means} — {who}", fr: "{means} — {who}", de: "{means} — {who}", pt: "{means} — {who}", it: "{means} — {who}", ja: "{means} — {who}", zh: "{means} — {who}", hi: "{means} — {who}", ar: "{means} — {who}",
+  },
+  "prs.passers.yes": {
+    en: "read by people who did not choose to look at it.", es: "lo leen personas que no eligieron mirarlo.", fr: "lu par des gens qui n'ont pas choisi de le regarder.", de: "gelesen von Leuten, die nicht gewählt haben hinzusehen.", pt: "lido por pessoas que não escolheram olhar para ele.", it: "letto da persone che non hanno scelto di guardarlo.", ja: "見ようと選んだわけではない人に読まれます。", zh: "会被并未选择去看它的人读到。", hi: "उन लोगों द्वारा पढ़ा जाता है जिन्होंने इसे देखना चुना ही नहीं।", ar: "يقرؤه من لم يختاروا النظر إليه.",
+  },
+  "prs.passers.no": {
+    en: "faces you, in your own space.", es: "le mira a usted, en su propio espacio.", fr: "vous fait face, dans votre propre espace.", de: "steht Ihnen zugewandt, in Ihrem eigenen Raum.", pt: "fica virado para si, no seu próprio espaço.", it: "è rivolto a te, nel tuo spazio.", ja: "あなたのほうを向いて、あなたの空間に置かれます。", zh: "面向你，在你自己的空间里。", hi: "आपकी ओर मुख किए, आपके अपने स्थान में।", ar: "يواجهك، في مساحتك أنت.",
+  },
+  "prs.nevershows": {
+    en: "What a fixed screen never shows", es: "Lo que una pantalla fija nunca muestra", fr: "Ce qu'un écran fixe ne montre jamais", de: "Was ein fester Bildschirm nie zeigt", pt: "O que um ecrã fixo nunca mostra", it: "Cosa uno schermo fisso non mostra mai", ja: "固定画面が決して映さないもの", zh: "一块固定屏幕永不显示什么", hi: "कोई स्थिर स्क्रीन क्या कभी नहीं दिखाती", ar: "ما لا تعرضه شاشة ثابتة أبدًا",
+  },
+  "prs.never.row": {
+    en: "{thing} — {why}", es: "{thing} — {why}", fr: "{thing} — {why}", de: "{thing} — {why}", pt: "{thing} — {why}", it: "{thing} — {why}", ja: "{thing} — {why}", zh: "{thing} — {why}", hi: "{thing} — {why}", ar: "{thing} — {why}",
+  },
+  "prs.surfaces": {
+    en: "Surfaces it appears on", es: "Superficies en las que aparece", fr: "Surfaces où il apparaît", de: "Oberflächen, auf denen es erscheint", pt: "Superfícies em que aparece", it: "Superfici su cui appare", ja: "表示される面", zh: "它出现在哪些界面上", hi: "जिन सतहों पर यह दिखता है", ar: "الأسطح التي يظهر عليها",
+  },
+  "prs.currently": {
+    en: "Currently: {what}", es: "Actualmente: {what}", fr: "Actuellement : {what}", de: "Derzeit: {what}", pt: "Atualmente: {what}", it: "Attualmente: {what}", ja: "現在: {what}", zh: "当前：{what}", hi: "फ़िलहाल: {what}", ar: "حاليًا: {what}",
+  },
+  "prs.none": {
+    en: "none", es: "ninguna", fr: "aucune", de: "keine", pt: "nenhuma", it: "nessuna", ja: "なし", zh: "无", hi: "कोई नहीं", ar: "لا شيء",
+  },
+  "vce.title": {
+    en: "Voice", es: "Voz", fr: "Voix", de: "Stimme", pt: "Voz", it: "Voce", ja: "声", zh: "声音", hi: "आवाज़", ar: "الصوت",
+  },
+  "vce.lead": {
+    en: "your own voice, with your permission", es: "su propia voz, con su permiso", fr: "votre propre voix, avec votre permission", de: "Ihre eigene Stimme, mit Ihrer Erlaubnis", pt: "a sua própria voz, com a sua permissão", it: "la tua voce, con il tuo permesso", ja: "あなた自身の声を、あなたの許可のもとで", zh: "你自己的声音，经你许可", hi: "आपकी अपनी आवाज़, आपकी अनुमति से", ar: "صوتك أنت، بإذنك",
+  },
+  "vce.step1": {
+    en: "1 · Permission", es: "1 · Permiso", fr: "1 · Permission", de: "1 · Erlaubnis", pt: "1 · Permissão", it: "1 · Permesso", ja: "1 · 許可", zh: "1 · 许可", hi: "1 · अनुमति", ar: "1 · الإذن",
+  },
+  "vce.granted": {
+    en: "Granted for: {what}", es: "Concedido para: {what}", fr: "Accordé pour : {what}", de: "Erteilt für: {what}", pt: "Concedido para: {what}", it: "Concesso per: {what}", ja: "許可の範囲: {what}", zh: "已授权用于：{what}", hi: "इसके लिए दिया गया: {what}", ar: "ممنوح لـ: {what}",
+  },
+  "vce.withdraw": {
+    en: "Withdraw consent — delete the samples, retire the voice", es: "Retirar el consentimiento — borrar las muestras, retirar la voz", fr: "Retirer le consentement — supprimer les échantillons, retirer la voix", de: "Einwilligung zurückziehen — Proben löschen, Stimme stilllegen", pt: "Retirar o consentimento — apagar as amostras, retirar a voz", it: "Ritira il consenso — cancella i campioni, ritira la voce", ja: "同意を撤回する — サンプルを削除し、声を退役させる", zh: "撤回同意 — 删除样本，停用该声音", hi: "सहमति वापस लें — नमूने मिटाएँ, आवाज़ सेवानिवृत्त करें", ar: "اسحب الموافقة — احذف العينات، وأحِل الصوت",
+  },
+  "vce.ownvoice": {
+    en: "your own voice", es: "su propia voz", fr: "votre propre voix", de: "Ihre eigene Stimme", pt: "a sua própria voz", it: "la tua voce", ja: "あなた自身の声", zh: "你自己的声音", hi: "आपकी अपनी आवाज़", ar: "صوتك أنت",
+  },
+  "vce.nothingrec": {
+    en: "Nothing is recorded until you say so. QRME will only learn {own} — there is no path here for anybody else's.", es: "No se graba nada hasta que usted lo diga. QRME solo aprenderá {own} — aquí no hay ningún camino para la de otra persona.", fr: "Rien n'est enregistré tant que vous ne l'avez pas dit. QRME n'apprendra que {own} — il n'y a ici aucun chemin pour celle de quelqu'un d'autre.", de: "Es wird nichts aufgezeichnet, bis Sie es sagen. QRME lernt nur {own} — für die einer anderen Person gibt es hier keinen Weg.", pt: "Nada é gravado até você o dizer. O QRME só aprenderá {own} — aqui não há caminho para a de outra pessoa.", it: "Non si registra nulla finché non lo dici tu. QRME imparerà solo {own} — qui non c'è alcuna strada per quella di qualcun altro.", ja: "あなたがそう言うまで、何も録音されません。QRME が学ぶのは {own} だけです — ほかの誰かの声のための道筋は、ここにはありません。", zh: "在你说可以之前，什么都不会被录下。QRME 只会学习{own}——这里没有通往别人声音的路径。", hi: "जब तक आप न कहें, कुछ भी रिकॉर्ड नहीं होता। QRME केवल {own} सीखेगा — यहाँ किसी और की आवाज़ के लिए कोई रास्ता नहीं है।", ar: "لا يُسجَّل شيء حتى تأذن. لن يتعلم QRME إلا {own} — ولا سبيل هنا لصوت أحد غيرك.",
+  },
+  "vce.allow": {
+    en: "This is my own voice — allow enrollment", es: "Esta es mi propia voz — permitir el registro", fr: "C'est ma propre voix — autoriser l'enrôlement", de: "Das ist meine eigene Stimme — Erfassung erlauben", pt: "Esta é a minha própria voz — permitir o registo", it: "Questa è la mia voce — consenti l'arruolamento", ja: "これは私自身の声です — 登録を許可する", zh: "这是我自己的声音——允许录入", hi: "यह मेरी अपनी आवाज़ है — नामांकन की अनुमति दें", ar: "هذا صوتي أنا — اسمح بالتسجيل",
+  },
+  "vce.step2": {
+    en: "2 · Enrollment", es: "2 · Registro", fr: "2 · Enrôlement", de: "2 · Erfassung", pt: "2 · Registo", it: "2 · Arruolamento", ja: "2 · 登録", zh: "2 · 录入", hi: "2 · नामांकन", ar: "2 · التسجيل",
+  },
+  "vce.wherefrom": {
+    en: "Where from", es: "De dónde", fr: "D'où", de: "Woher", pt: "De onde", it: "Da dove", ja: "どこから", zh: "来自哪里", hi: "कहाँ से", ar: "من أين",
+  },
+  "vce.src.note": {
+    en: "A voice note", es: "Una nota de voz", fr: "Un message vocal", de: "Eine Sprachnachricht", pt: "Uma nota de voz", it: "Un messaggio vocale", ja: "ボイスメモ", zh: "一条语音留言", hi: "एक वॉइस नोट", ar: "رسالة صوتية",
+  },
+  "vce.src.call": {
+    en: "A call", es: "Una llamada", fr: "Un appel", de: "Ein Anruf", pt: "Uma chamada", it: "Una chiamata", ja: "通話", zh: "一次通话", hi: "एक कॉल", ar: "مكالمة",
+  },
+  "vce.src.direct": {
+    en: "A direct recording", es: "Una grabación directa", fr: "Un enregistrement direct", de: "Eine direkte Aufnahme", pt: "Uma gravação direta", it: "Una registrazione diretta", ja: "直接の録音", zh: "一段直接录音", hi: "सीधी रिकॉर्डिंग", ar: "تسجيل مباشر",
+  },
+  "vce.seconds": {
+    en: "Seconds of speech", es: "Segundos de habla", fr: "Secondes de parole", de: "Sekunden Sprache", pt: "Segundos de fala", it: "Secondi di parlato", ja: "発話の秒数", zh: "语音秒数", hi: "बोलने के सेकंड", ar: "ثوانٍ من الكلام",
+  },
+  "vce.addsample": {
+    en: "Add this sample", es: "Añadir esta muestra", fr: "Ajouter cet échantillon", de: "Diese Probe hinzufügen", pt: "Adicionar esta amostra", it: "Aggiungi questo campione", ja: "このサンプルを追加", zh: "添加此样本", hi: "यह नमूना जोड़ें", ar: "أضف هذه العينة",
+  },
+  "vce.samples": {
+    en: "{n} sample(s) · {s}s", es: "{n} muestra(s) · {s} s", fr: "{n} échantillon(s) · {s} s", de: "{n} Probe(n) · {s} s", pt: "{n} amostra(s) · {s} s", it: "{n} campione/i · {s} s", ja: "サンプル{n}件 · {s}秒", zh: "{n} 个样本 · {s} 秒", hi: "{n} नमूने · {s}से.", ar: "{n} عينة · {s}ث",
+  },
+  "vce.perturn": {
+    en: "about {n}s a turn", es: "unos {n} s por turno", fr: "environ {n} s par tour", de: "etwa {n} s pro Zug", pt: "cerca de {n} s por turno", it: "circa {n} s a turno", ja: "1ターンあたり約{n}秒", zh: "每轮约 {n} 秒", hi: "प्रति बारी लगभग {n}से.", ar: "نحو {n}ث لكل دور",
+  },
+  "vce.noturns": {
+    en: "no turns counted yet", es: "aún no se han contado turnos", fr: "aucun tour compté pour l'instant", de: "noch keine Züge gezählt", pt: "ainda sem turnos contados", it: "nessun turno conteggiato", ja: "ターンはまだ数えられていません", zh: "尚未统计轮次", hi: "अभी कोई बारी नहीं गिनी गई", ar: "لم تُحسب أدوار بعد",
+  },
+  "vce.needs": {
+    en: " · needs {n} samples and {s}s", es: " · necesita {n} muestras y {s} s", fr: " · il faut {n} échantillons et {s} s", de: " · braucht {n} Proben und {s} s", pt: " · precisa de {n} amostras e {s} s", it: " · servono {n} campioni e {s} s", ja: " · サンプル{n}件と{s}秒が必要", zh: " · 需要 {n} 个样本和 {s} 秒", hi: " · {n} नमूने और {s}से. चाहिए", ar: " · يحتاج {n} عينات و{s}ث",
+  },
+  "vce.ready": {
+    en: "ready", es: "listo", fr: "prêt", de: "bereit", pt: "pronto", it: "pronto", ja: "準備完了", zh: "就绪", hi: "तैयार", ar: "جاهز",
+  },
+  "vce.notyet": {
+    en: "not yet", es: "aún no", fr: "pas encore", de: "noch nicht", pt: "ainda não", it: "non ancora", ja: "まだ", zh: "还不行", hi: "अभी नहीं", ar: "ليس بعد",
+  },
+  "vce.stillwants": {
+    en: "Still wants: {what}.", es: "Todavía quiere: {what}.", fr: "Il manque encore : {what}.", de: "Fehlt noch: {what}.", pt: "Ainda falta: {what}.", it: "Manca ancora: {what}.", ja: "まだ必要: {what}。", zh: "还需要：{what}。", hi: "अभी और चाहिए: {what}।", ar: "ما زال يحتاج: {what}.",
+  },
+  "vce.step3": {
+    en: "3 · The voice", es: "3 · La voz", fr: "3 · La voix", de: "3 · Die Stimme", pt: "3 · A voz", it: "3 · La voce", ja: "3 · 声", zh: "3 · 声音", hi: "3 · आवाज़", ar: "3 · الصوت",
+  },
+  "vce.built": {
+    en: "Built {when} · {id}", es: "Creada {when} · {id}", fr: "Créée {when} · {id}", de: "Erstellt {when} · {id}", pt: "Criada {when} · {id}", it: "Creata {when} · {id}", ja: "作成 {when} · {id}", zh: "建立于 {when} · {id}", hi: "बना {when} · {id}", ar: "أُنشئ {when} · {id}",
+  },
+  "vce.sayit": {
+    en: "Say something in it", es: "Decir algo con ella", fr: "Dire quelque chose avec", de: "Etwas damit sagen", pt: "Dizer algo com ela", it: "Di' qualcosa con essa", ja: "この声で何か言う", zh: "用它说点什么", hi: "इसमें कुछ कहें", ar: "قل بها شيئًا",
+  },
+  "vce.speak": {
+    en: "Speak", es: "Hablar", fr: "Parler", de: "Sprechen", pt: "Falar", it: "Parla", ja: "話す", zh: "朗读", hi: "बोलें", ar: "انطق",
+  },
+  "vce.enough": {
+    en: "Enough of your voice is on record — mint the voiceprint.", es: "Hay suficiente de su voz registrada — acuñe la huella vocal.", fr: "Il y a assez de votre voix enregistrée — créez l'empreinte vocale.", de: "Genug Ihrer Stimme ist erfasst — erzeugen Sie den Stimmabdruck.", pt: "Há voz suficiente registada — cunhe a impressão vocal.", it: "C'è abbastanza della tua voce — conia l'impronta vocale.", ja: "十分な量の声が記録されました — 声紋を作成できます。", zh: "你的声音已录得足够——可以铸造声纹了。", hi: "आपकी आवाज़ पर्याप्त दर्ज हो चुकी — वॉइसप्रिंट बनाएँ।", ar: "سُجّل ما يكفي من صوتك — اسكك بصمة الصوت.",
+  },
+  "vce.addmore": {
+    en: "Add a few more samples first.", es: "Añada antes unas muestras más.", fr: "Ajoutez d'abord quelques échantillons.", de: "Fügen Sie zuerst noch ein paar Proben hinzu.", pt: "Acrescente primeiro mais algumas amostras.", it: "Aggiungi prima qualche altro campione.", ja: "先にもう少しサンプルを追加してください。", zh: "请先再添加几个样本。", hi: "पहले कुछ और नमूने जोड़ें।", ar: "أضف بضع عينات أخرى أولًا.",
+  },
+  "vce.build": {
+    en: "Build my voiceprint", es: "Crear mi huella vocal", fr: "Créer mon empreinte vocale", de: "Meinen Stimmabdruck erstellen", pt: "Criar a minha impressão vocal", it: "Crea la mia impronta vocale", ja: "自分の声紋を作る", zh: "建立我的声纹", hi: "मेरा वॉइसप्रिंट बनाएँ", ar: "أنشئ بصمة صوتي",
+  },
+  "vce.retired": {
+    en: "A previous voiceprint was retired when consent was withdrawn. That record stays.", es: "Se retiró una huella vocal anterior cuando se retiró el consentimiento. Ese registro se queda.", fr: "Une empreinte vocale antérieure a été retirée lors du retrait du consentement. Ce relevé reste.", de: "Ein früherer Stimmabdruck wurde stillgelegt, als die Einwilligung zurückgezogen wurde. Dieser Eintrag bleibt.", pt: "Uma impressão vocal anterior foi retirada quando o consentimento foi retirado. Esse registo fica.", it: "Un'impronta vocale precedente è stata ritirata quando il consenso è stato revocato. Quel registro resta.", ja: "同意が撤回された際に、以前の声紋は退役しました。その記録は残ります。", zh: "在同意被撤回时，此前的一份声纹已停用。该记录仍然保留。", hi: "सहमति वापस लिए जाने पर पिछला वॉइसप्रिंट सेवानिवृत्त कर दिया गया था। वह रिकॉर्ड बना रहता है।", ar: "أُحيل بصمة صوت سابقة عند سحب الموافقة. ويبقى ذلك السجل.",
+  },
+  "vce.holds": {
+    en: "What always holds", es: "Lo que siempre se cumple", fr: "Ce qui tient toujours", de: "Was immer gilt", pt: "O que vale sempre", it: "Ciò che vale sempre", ja: "つねに変わらないこと", zh: "始终成立的是什么", hi: "जो हमेशा लागू रहता है", ar: "ما يظل ثابتًا دومًا",
+  },
+  "vce.hold1": {
+    en: "Anything spoken in this voice carries a watermark and says it is synthesized.", es: "Todo lo dicho con esta voz lleva marca de agua y declara que es sintetizado.", fr: "Tout ce qui est dit avec cette voix porte un filigrane et déclare être synthétisé.", de: "Alles, was mit dieser Stimme gesprochen wird, trägt ein Wasserzeichen und sagt, dass es synthetisiert ist.", pt: "Tudo o que for dito nesta voz leva marca de água e diz que é sintetizado.", it: "Tutto ciò che viene detto con questa voce porta una filigrana e dichiara di essere sintetizzato.", ja: "この声で話されたものはすべて透かしを帯び、合成であることを自ら述べます。", zh: "以这个声音说出的任何内容都带有水印，并会声明它是合成的。", hi: "इस आवाज़ में कही गई हर बात पर वॉटरमार्क होता है और वह बताती है कि यह संश्लेषित है।", ar: "كل ما يُنطق بهذا الصوت يحمل علامة مائية ويقول إنه مُصطنَع.",
+  },
+  "vce.hold2": {
+    en: "Only your own voice — the permission is an attestation, not a checkbox.", es: "Solo su propia voz — el permiso es una declaración, no una casilla.", fr: "Uniquement votre propre voix — la permission est une attestation, pas une case à cocher.", de: "Nur Ihre eigene Stimme — die Erlaubnis ist eine Versicherung, kein Häkchen.", pt: "Só a sua própria voz — a permissão é uma declaração, não uma caixa de seleção.", it: "Solo la tua voce — il permesso è un'attestazione, non una casella.", ja: "あなた自身の声だけです — この許可はチェックボックスではなく、証明の言明です。", zh: "只限你自己的声音——这份许可是一项声明，而不是一个勾选框。", hi: "केवल आपकी अपनी आवाज़ — यह अनुमति एक अभिसाक्ष्य है, कोई चेकबॉक्स नहीं।", ar: "صوتك أنت وحده — والإذن إقرار لا مربع اختيار.",
+  },
+  "vce.hold3": {
+    en: "Withdrawing deletes the samples and silences the voice; the withdrawal stays on record.", es: "Retirarlo borra las muestras y silencia la voz; la retirada queda registrada.", fr: "Le retrait supprime les échantillons et fait taire la voix ; le retrait reste consigné.", de: "Der Widerruf löscht die Proben und bringt die Stimme zum Schweigen; der Widerruf bleibt verzeichnet.", pt: "Retirar apaga as amostras e silencia a voz; a retirada fica registada.", it: "Il ritiro cancella i campioni e zittisce la voce; il ritiro resta a verbale.", ja: "撤回すればサンプルは削除され、声は沈黙します。撤回したという事実は記録に残ります。", zh: "撤回会删除样本并让该声音沉默；而这次撤回本身会留在记录里。", hi: "वापस लेने पर नमूने मिट जाते हैं और आवाज़ चुप हो जाती है; वापस लेना रिकॉर्ड में बना रहता है।", ar: "السحب يحذف العينات ويُسكِت الصوت؛ ويبقى السحب مسجَّلًا.",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {

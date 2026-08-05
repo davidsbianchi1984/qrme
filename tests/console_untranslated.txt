@@ -1,4 +1,4 @@
-# status: backlog — 516 rows
+# status: backlog — 425 rows
 #
 # English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
@@ -39,7 +39,7 @@
 # English here conspicuous: the model replies in Portuguese inside a frame
 # that cannot.
 #
-# ceiling: 516
+# ceiling: 425
 #
 # **Corrected in 0.30.10.** 117 of the rows here were punctuation, not English:
 # a bare `:`, a `·`, a `%`, a `⚠`. The extractor kept them under a stated rule
@@ -294,37 +294,6 @@ Leaving: What leaves, and on what terms
 Leaving: consult
 Leaving: licence buys time with the profile; a licence that permits derivatives lets you build a new agent seeded from its persona, owned by you and marked with where it came from.
 Leaving: the profile to license
-Lobby: . Their link:
-Lobby: A lobby
-Lobby: A real person seats only themselves — an id in a request body is a claim, and the route checks it against the token. Somebody else's profile is a two-party agreement and lives in the lent- skills routes, which ask both sides.
-Lobby: And, below, how a conversation gets handed to somebody local.
-Lobby: Hand it over
-Lobby: Handing it to somebody local
-Lobby: I agree to send this
-Lobby: Open it
-Lobby: Seat
-Lobby: Seat somebody
-Lobby: See what they will see
-Lobby: Shown to you because it is the only way to check it. It says openly that some of the others here are synthetic too — a model that believes every callsign is a person will talk to them as people, and a lobby that reads as friends when it is one player and several generated voices is the impression this product exists to prevent.
-Lobby: Take it back
-Lobby: The lighter of the two ways to pass a conversation on. A referral is signed with your device and opens once; this one is consented and revocable — and revoking purges the package rather than hiding it.
-Lobby: The line
-Lobby: The package
-Lobby: The rules of the room
-Lobby: To
-Lobby: What a synthetic member is told
-Lobby: What nothing here will do
-Lobby: Who is in the game with you
-Lobby: a gaming session id
-Lobby: callsign
-Lobby: here
-Lobby: left. Everyone in a match is owed the knowledge of who is synthetic in it, so this list says so per member rather than in a footnote.
-Lobby: on
-Lobby: pick somebody
-Lobby: synthetic
-Lobby: synthetic · maturity
-Lobby: take this seat back
-Lobby: the member's id
 Memory: AES-256-GCM · one row per conversation · erase by name
 Memory: Erase all
 Memory: Erase this one
@@ -399,36 +368,6 @@ Plans: This account
 Plans: You are reading the price list without signing in, which is on purpose — nothing above this needs an account.
 Plans: your plan
 Plans: — in each of those the person exposed did not pick the plan.
-Presence: . Anything else is removed on save, and the save still succeeds — so the list is here rather than in a message afterwards.
-Presence: About text held:
-Presence: Currently:
-Presence: Last save removed:
-Presence: None placed.
-Presence: Only you can see this list — it is a list of physical places. What any one screen is
-Presence: Place
-Presence: Put it on a screen
-Presence: Save
-Presence: Screens it is on
-Presence: Surfaces it appears on
-Presence: Take down
-Presence: The page you make yourself
-Presence: These survive:
-Presence: What a fixed screen never shows
-Presence: What a stranger lands on
-Presence: Where this is seen
-Presence: a tagline
-Presence: about
-Presence: from
-Presence: is public, because a fixture in a corridor displays to whoever walks past.
-Presence: passers-by
-Presence: review
-Presence: showing
-Presence: taken down
-Presence: talked with it
-Presence: what to call it
-Presence: where it is
-Presence: your own HTML
-Presence: · showing
 Relationships: 's life
 Relationships: Active relationships
 Relationships: Add a relationship
@@ -514,36 +453,6 @@ TheMark: in front of it. The designation is not a field you can empty — a labe
 TheMark: the glyph (✦)
 TheMark: what to call it
 TheMark: · opened
-Voice: 1 · Permission
-Voice: 2 · Enrollment
-Voice: 3 · The voice
-Voice: A call
-Voice: A direct recording
-Voice: A previous voiceprint was retired when consent was withdrawn. That record stays.
-Voice: A voice note
-Voice: Add this sample
-Voice: Anything spoken in this voice carries a watermark and says it is synthesized.
-Voice: Build my voiceprint
-Voice: Built
-Voice: Granted for:
-Voice: Nothing is recorded until you say so. QRME will only learn
-Voice: Only your own voice — the permission is an attestation, not a checkbox.
-Voice: Say something in it
-Voice: Seconds of speech
-Voice: Speak
-Voice: Still wants:
-Voice: This is my own voice — allow enrollment
-Voice: Voice
-Voice: What always holds
-Voice: Where from
-Voice: Withdraw consent — delete the samples, retire the voice
-Voice: Withdrawing deletes the samples and silences the voice; the withdrawal stays on record.
-Voice: s
-Voice: sample(s) ·
-Voice: samples and
-Voice: your own voice
-Voice: your own voice, with your permission
-Voice: — there is no path here for anybody else's.
 Wall: Attach your own photos, videos or files
 Wall: For you
 Wall: Its title, in your words
