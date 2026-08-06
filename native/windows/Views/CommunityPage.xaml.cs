@@ -127,7 +127,7 @@ public sealed partial class CommunityPage : Page
             }
             else
             {
-                JoinButton.Content = "Waiting for a match — check again";
+                JoinButton.Content = L10n.T("nc.match.waiting");
             }
         }
         catch (Exception ex) { ShowStrangerError(ex.Message); }
@@ -184,7 +184,7 @@ public sealed partial class CommunityPage : Page
         StrangerList.ItemsSource = null;
         TalkCard.Visibility = Visibility.Collapsed;
         JoinCard.Visibility = Visibility.Visible;
-        JoinButton.Content = "Find a match";
+        JoinButton.Content = L10n.T("nc.match.find");
     }
 
     // -- Rooms --

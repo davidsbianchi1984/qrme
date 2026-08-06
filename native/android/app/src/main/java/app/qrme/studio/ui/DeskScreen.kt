@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun DeskScreen(deskId: String, callerId: String? = null,
-               viewerToken: String? = null) {
+               viewerToken: String? = null, lang: String = "en") {
     val scope = rememberCoroutineScope()
     var card by remember { mutableStateOf<DeskCard?>(null) }
     var receipt by remember { mutableStateOf<RingReceipt?>(null) }
@@ -86,10 +86,10 @@ fun DeskScreen(deskId: String, callerId: String? = null,
             // because where a performer physically is has nothing to do with
             // watching them. Still never marked AI — a real person is here.
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("18+ only", color = Qrme.Txt, fontSize = 20.sp,
+                Text(L10n.t("ndsk.adult", lang), color = Qrme.Txt, fontSize = 20.sp,
                     fontWeight = FontWeight.Bold)
                 Text(c.note ?: "", color = Qrme.T2, fontSize = 12.sp)
-                Text("A live person — not AI", color = Qrme.T3, fontSize = 11.sp)
+                Text(L10n.t("ndsk.human", lang), color = Qrme.T3, fontSize = 11.sp)
             }
             return@screenScroll
         }
@@ -117,7 +117,7 @@ fun DeskScreen(deskId: String, callerId: String? = null,
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                 ) {
                     Text(
-                        if (c.feed.live) "● LIVE" else "SAMPLE VIEW",
+                        L10n.t(if (c.feed.live) "ndsk.live" else "ndsk.sample", lang),
                         color = if (c.feed.live) Qrme.Red
                         else Color.White.copy(alpha = 0.85f),
                         fontSize = 11.sp, fontWeight = FontWeight.Bold)
@@ -164,13 +164,14 @@ fun DeskScreen(deskId: String, callerId: String? = null,
                         .padding(vertical = 14.dp),
                     Alignment.Center,
                 ) {
-                    Text(if (joined == null) "Join the live stream" else "Joined",
+                    Text(L10n.t(if (joined == null) "ndsk.join" else "ndsk.joined", lang),
                         color = Qrme.Txt, fontSize = 15.sp,
                         fontWeight = FontWeight.Bold)
                 }
                 joined?.let {
                     Text(it.note, color = Qrme.T2, fontSize = 12.sp)
-                    Text("Room ${it.roomId}", color = Qrme.T3, fontSize = 10.sp)
+                    Text(L10n.fill("ndsk.room", lang, mapOf("id" to it.roomId)),
+                        color = Qrme.T3, fontSize = 10.sp)
                 }
             }
 
@@ -197,7 +198,7 @@ fun DeskScreen(deskId: String, callerId: String? = null,
                             .padding(vertical = 14.dp),
                         Alignment.Center,
                     ) {
-                        Text(if (ringing) "Ringing…" else "🔔  Ring the bell",
+                        Text(L10n.t(if (ringing) "ndsk.ringing" else "ndsk.bell", lang),
                             color = Color.White, fontSize = 16.sp,
                             fontWeight = FontWeight.Bold)
                     }
@@ -205,23 +206,25 @@ fun DeskScreen(deskId: String, callerId: String? = null,
                     if (done != null) {
                         Text(done.note, color = Qrme.Green, fontSize = 12.sp)
                     } else if (c.waiting > 0) {
-                        Text("${c.waiting} waiting", color = Qrme.T3,
+                        Text(L10n.fill("ndsk.waiting", lang, mapOf("n" to "${c.waiting}")),
+                            color = Qrme.T3,
                             fontSize = 11.sp)
                     }
                 }
             } else {
-                Text("The bell is off while this desk is closed.",
+                Text(L10n.t("ndsk.bell.off", lang),
                     color = Qrme.T2, fontSize = 12.sp)
             }
 
             val att = c.attestation
             if (att != null) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Attested by ${att.attestor}", color = Qrme.Txt,
+                Text(L10n.fill("ndsk.attested", lang, mapOf("attestor" to att.attestor)),
+                    color = Qrme.Txt,
                     fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Text(att.basis, color = Qrme.T2, fontSize = 11.sp)
                 if (att.signed) {
-                    Text("✓ Signed", color = Qrme.Green, fontSize = 11.sp)
+                    Text("✓ " + L10n.t("ndsk.signed", lang), color = Qrme.Green, fontSize = 11.sp)
                 }
                 // Shipped with the claim, always: "recorded" and "proven" are
                 // different words and the difference is the whole point.

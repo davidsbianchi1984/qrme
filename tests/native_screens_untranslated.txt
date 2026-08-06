@@ -69,6 +69,29 @@
 # using it. iOS had it and hardcoded the English anyway. One control, three
 # states of done.
 
-ios: 34
-android: 12
-windows: 22
+# **Corrected in 0.47.0, and at its floor.** The extractor could not see a
+# string chosen by a condition. `Text(cond ? "Verifies" : "Does not verify")`
+# is not a literal at the start of an argument list, and every pattern here
+# looked only there.
+#
+#     asked     is this literal the first thing in a Text(…)
+#     mattered  does a person read it
+#
+# What that hid, in rounds that recorded these screens as finished: the
+# signing screen telling somebody whether their credential **verifies** and
+# whether it is **device-bound — cannot sync**; the voice screen's gate,
+# *Enough of your voice is on record — mint the voiceprint*; the desk's **Ring
+# the bell** and **● LIVE / SAMPLE VIEW**; the scanner's **Point at a QRME
+# code**. On all three shells. The record said 68 and the truth was 125.
+#
+# The remaining seven contain no English at all: `dsk_…`, `sig_…` and `prf_…`
+# are identifier prefixes shown as placeholders, `%.0fs` is a duration format,
+# and two are the extractor's own truncation of an interpolated format string
+# — a quote inside `${…}` ends the match early. They are left in the count
+# rather than special-cased out, because a rule that excuses strings is a rule
+# that can be taught to excuse the wrong ones.
+
+# status: floor — no English left
+ios: 2
+android: 2
+windows: 3

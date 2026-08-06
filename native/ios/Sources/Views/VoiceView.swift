@@ -112,7 +112,7 @@ struct VoiceView: View {
                 .font(.caption).foregroundStyle(Theme.t2)
 
             HStack(spacing: 12) {
-                Button(recorder.recording ? "Stop" : "Record a sample") {
+                Button(L10n.t(recorder.recording ? "nvoi.stop" : "nvoi.sample", state.language)) {
                     if recorder.recording { finishRecording() } else { startRecording() }
                 }
                 .font(.caption.bold()).foregroundStyle(.white)
@@ -140,7 +140,7 @@ struct VoiceView: View {
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                     Spacer()
-                    Text(e.ready ? "ready" : "not yet")
+                    Text(L10n.t(e.ready ? "nvoi.ready" : "nvoi.notyet", state.language))
                         .font(.caption2.bold())
                         .foregroundStyle(e.ready ? Theme.green : Theme.amber)
                 }
@@ -190,8 +190,8 @@ struct VoiceView: View {
                 }
             } else {
                 Text(status?.enrollment?.ready == true
-                     ? "Enough of your voice is on record — mint the voiceprint."
-                     : "Record a few more samples first.")
+                     ? L10n.t("nvoi.enough", state.language)
+                     : L10n.t("nvoi.more", state.language))
                     .font(.caption).foregroundStyle(Theme.t2)
                 Button(L10n.t("nvoi.build", state.language)) {
                     act {

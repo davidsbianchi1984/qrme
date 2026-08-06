@@ -146,7 +146,7 @@ public sealed partial class SettingsPage : Page
         {
             _providers = (await ApiClient.Shared.Models()).Providers;
             ProviderBox.ItemsSource = _providers.Select(p =>
-                $"{p.Label}  ({(p.Configured ? "ready" : "no key")})").ToList();
+                $"{p.Label}  ({L10n.T(p.Configured ? "nvoi.ready" : "ns.model.nokeyword")})").ToList();
             var current = await ApiClient.Shared.ProfileModel(s.Pid!);
             var idx = Array.FindIndex(_providers, p => p.Name == current.Provider);
             ProviderBox.SelectedIndex = idx >= 0 ? idx : 0;

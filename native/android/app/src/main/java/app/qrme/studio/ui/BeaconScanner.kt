@@ -76,7 +76,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * the real world with nothing saying so.
  */
 @Composable
-fun BeaconScannerScreen(onOpen: (String) -> Unit, onClose: () -> Unit) {
+fun BeaconScannerScreen(onOpen: (String) -> Unit, onClose: () -> Unit,
+                        lang: String = "en") {
     val context = LocalContext.current
     var granted by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(
@@ -90,9 +91,9 @@ fun BeaconScannerScreen(onOpen: (String) -> Unit, onClose: () -> Unit) {
         Box(Modifier.fillMaxSize().background(Qrme.Bg), Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Camera access is needed to read a beacon",
+                Text(L10n.t("nbcn.camera", lang),
                     color = Qrme.Txt, fontSize = 15.sp)
-                Text("Nothing is recorded — frames are read and discarded.",
+                Text(L10n.t("nbcn.nothing", lang),
                     color = Qrme.T2, fontSize = 12.sp)
                 ScanAction("Close") { onClose() }
             }
@@ -223,7 +224,7 @@ private fun BeaconCameraSurface(onOpen: (String) -> Unit, onClose: () -> Unit) {
                         Text(shown.displayName, color = Color.White,
                             fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         if (shown.sharedRoom) {
-                            Text("shared room — others may be here",
+                            Text(L10n.t("nbcn.shared", lang),
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontSize = 11.sp)
                         }
@@ -240,7 +241,7 @@ private fun BeaconCameraSurface(onOpen: (String) -> Unit, onClose: () -> Unit) {
             Box(Modifier.clip(CircleShape)
                 .background(Color.Black.copy(alpha = 0.45f))
                 .padding(horizontal = 14.dp, vertical = 8.dp)) {
-                Text(if (shown == null) "Point at a QRME code" else "Tap to open",
+                Text(L10n.t(if (shown == null) "nbcn.point" else "nbcn.tap", lang),
                     color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold)
             }

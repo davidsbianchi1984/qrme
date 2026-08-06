@@ -186,8 +186,8 @@ public sealed partial class SignaturesPage : Page
                 // every device in the owner's cloud account, which is a weaker
                 // claim that only they could have signed.
                 Custody = c.DeviceBound
-                    ? "device-bound — cannot sync"
-                    : "syncable — exists on their other devices",
+                    ? L10n.T("nsig.devicebound")
+                    : L10n.T("nsig.syncable"),
                 Tiers = $"can sign: {string.Join(", ", c.CanSign)}",
             }).ToList();
         }
@@ -242,7 +242,7 @@ public sealed partial class SignaturesPage : Page
 
     private void Verdict(TextBlock target, bool valid)
     {
-        target.Text = valid ? "Verifies" : "Does not verify";
+        target.Text = L10n.T(valid ? "nsig.verifies" : "nsig.noverify");
         target.Foreground = (SolidColorBrush)Application.Current.Resources[
             valid ? "QrmeGreenBrush" : "QrmeRedBrush"];
         target.Visibility = Visibility.Visible;

@@ -47,8 +47,8 @@ struct SignatureView: View {
                         // on every device in the user's cloud account, which is
                         // a weaker claim that only they could have signed.
                         Text(c.device_bound
-                             ? "device-bound — cannot sync"
-                             : "syncable — exists on your other devices")
+                             ? L10n.t("nsig.devicebound", state.language)
+                             : L10n.t("nsig.syncable", state.language))
                             .font(.caption2)
                             .foregroundStyle(c.device_bound ? .green : .orange)
                         Text(L10n.fill("nsig.cansign", state.language, ["levels":
@@ -93,7 +93,8 @@ struct SignatureView: View {
 
             if let receipt {
                 Section(L10n.t("nsig.signed", state.language)) {
-                    Label(receipt.verification.valid ? "Verifies" : "Does not verify",
+                    Label(L10n.t(receipt.verification.valid ? "nsig.verifies"
+                                 : "nsig.noverify", state.language),
                           systemImage: receipt.verification.valid
                           ? "checkmark.seal.fill" : "xmark.seal.fill")
                         .foregroundStyle(receipt.verification.valid ? .green : .red)

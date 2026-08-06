@@ -76,7 +76,7 @@ private struct StrangerSection: View {
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
                             .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                        Button(waiting ? "Waiting for a match — check again" : "Find a match") { join() }
+                        Button(L10n.t(waiting ? "nc.match.waiting" : "nc.match.find", state.language)) { join() }
                             .font(.subheadline.bold()).foregroundStyle(.white)
                             .frame(maxWidth: .infinity).padding(.vertical, 12)
                             .background(Theme.brand)

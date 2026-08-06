@@ -4,6 +4,58 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.0] — 2026-08-06
+
+### The ternary hid the sentence
+
+`Text(cond ? "Verifies" : "Does not verify")` was invisible to the
+measurement. Every pattern in the extractor looked for a literal at the
+**start** of an argument list, and a string chosen by a condition is not
+there.
+
+    asked     is this literal the first thing in a Text(…)
+    mattered  does a person read it
+
+What that hid, in rounds that recorded these screens as finished:
+
+* the signing screen telling somebody whether their credential **verifies**,
+  and whether it is **device-bound — cannot sync** or **syncable — exists on
+  your other devices**;
+* the voice screen's gate — *Enough of your voice is on record — mint the
+  voiceprint* — localized in 0.46.7, which left this behind;
+* the desk's **Ring the bell**, **● LIVE** and **SAMPLE VIEW**;
+* the scanner's **Point at a QRME code**.
+
+On all three shells, in each case.
+
+The record said 68. The truth was **125**.
+
+The widening counts phrases and not lone tokens, deliberately: `cond ? "on" :
+"off"` is as often an API value as a word, and the conservative direction for
+a rule that *raises* a ratcheted number is to under-count. Two new tests hold
+both halves of that — one fails if the rule stops matching, one fails if it
+starts matching tokens.
+
+### The floor
+
+**125 → 7**, and the seven contain no English at all: `dsk_…`, `sig_…` and
+`prf_…` are identifier prefixes shown as placeholders, `%.0fs` is a duration
+format, and two are the extractor's own truncation of an interpolated format
+string. They stay in the count rather than being special-cased out — a rule
+that excuses strings is a rule that can be taught to excuse the wrong ones.
+
+iOS 80 → 2, Android 43 → 2, Windows 89 → 3.
+
+### Four wordings settled
+
+The gaming blurb — Windows alone said **agent-operated**, the fact a reader
+most needs about the thing in the lobby beside them. The minor-in-lobby
+toggle, worded two ways. The robot-pack badge, **🤖 ROBOT** against **🤖 ROBOT
+TASKS**. The industry filter, with and without its example. The longer
+wording wins in each case, because in each case it says one more true thing.
+
+Cut together with JIM-mini and PDI at app-v0.47.0.
+
 ## [0.46.9] — 2026-08-06
 
 ### The button that ends the session

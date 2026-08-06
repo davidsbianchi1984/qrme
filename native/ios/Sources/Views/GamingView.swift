@@ -23,23 +23,23 @@ struct GamingSection: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Play alongside").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Bring this profile into a game as a companion or teammate. It talks in character and moderated — and always plays within the game's rules; it never cheats.")
+                    Text(L10n.t("ngam", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ngam.sub.full", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
-                    Picker("Platform", selection: $platform) {
+                    Picker(L10n.t("ngam.platform", state.language), selection: $platform) {
                         ForEach(platforms, id: \.self) { Text($0.capitalized).tag($0) }
                     }.pickerStyle(.menu).tint(Theme.brandA)
-                    Picker("Role", selection: $role) {
+                    Picker(L10n.t("ngam.role", state.language), selection: $role) {
                         ForEach(roles, id: \.self) {
                             Text($0.replacingOccurrences(of: "_", with: " ")).tag($0)
                         }
                     }.pickerStyle(.menu).tint(Theme.brandA)
-                    TextField("game title", text: $game)
+                    TextField(L10n.t("ngam.game", state.language), text: $game)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    Button("Start session") { start() }
+                    Button(L10n.t("ngam.start", state.language)) { start() }
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 10)
                         .background(Theme.brandA).clipShape(Capsule())
@@ -57,34 +57,38 @@ struct GamingSection: View {
                             Text(s.status.uppercased()).font(.caption2.bold())
                                 .foregroundStyle(s.status == "active" ? Theme.green : Theme.t3)
                         }
-                        Text("\(s.role.replacingOccurrences(of: "_", with: " ")) · \(s.callouts ?? 0) callouts")
+                        Text(L10n.fill("ngam.session", state.language,
+                             ["role": s.role.replacingOccurrences(of: "_", with: " "),
+                              "n": "\(s.callouts ?? 0)"]))
                             .font(.caption2).foregroundStyle(Theme.t2)
                         if s.status == "active" {
                             if openSession == s.id {
-                                TextField("what's happening in the match?", text: $situation)
+                                TextField(L10n.t("ngam.situation.ph", state.language), text: $situation)
                                     .foregroundStyle(Theme.txt)
                                     .padding(8).background(Theme.scrBot)
                                     .clipShape(RoundedRectangle(cornerRadius: 9))
-                                Toggle("A minor is in the lobby (forces strict)", isOn: $minorPresent)
+                                Toggle(L10n.t("ngam.minor", state.language), isOn: $minorPresent)
                                     .font(.caption).foregroundStyle(Theme.t2).tint(Theme.amber)
                                 HStack {
-                                    Button("Call it") { callout(s) }
+                                    Button(L10n.t("ngam.callit", state.language)) { callout(s) }
                                         .font(.caption.bold()).foregroundStyle(.white)
                                         .padding(.horizontal, 12).padding(.vertical, 8)
                                         .background(Theme.brandA).clipShape(Capsule())
-                                    Button("End") { end(s) }
+                                    Button(L10n.t("ngam.end", state.language)) { end(s) }
                                         .font(.caption).foregroundStyle(Theme.red)
                                 }
                                 if let l = lastLine {
                                     if l.status == "spoken", let line = l.line {
                                         Text("🎙 \(line)").font(.caption).foregroundStyle(Theme.green)
                                     } else {
-                                        Text("⚠️ held — \(l.flag_reason ?? "moderation")")
+                                        Text(L10n.fill("ngam.held", state.language,
+                                              ["reason": l.flag_reason
+                                                  ?? L10n.t("ngam.held.default", state.language)]))
                                             .font(.caption2).foregroundStyle(Theme.amber)
                                     }
                                 }
                             } else {
-                                Button("Open") { openSession = s.id; lastLine = nil }
+                                Button(L10n.t("nmg.open", state.language)) { openSession = s.id; lastLine = nil }
                                     .font(.caption.bold()).foregroundStyle(Theme.brandA)
                             }
                         }

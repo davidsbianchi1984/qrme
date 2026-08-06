@@ -7,18 +7,18 @@
 
     <ScrollViewer>
         <StackPanel MaxWidth="680" Spacing="16" Padding="28" HorizontalAlignment="Left">
-            <TextBlock Text="Gaming" FontSize="22" FontWeight="Bold"
+            <TextBlock x:Name="Title" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" />
-            <TextBlock Text="Bring this profile into a game as a companion or teammate — agent-operated. It talks in character and moderated, and always plays within the game's rules; it never cheats."
+            <TextBlock x:Name="Sub"
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <ComboBox x:Name="PlatformBox" Header="Platform" HorizontalAlignment="Stretch" />
-                    <ComboBox x:Name="RoleBox" Header="Role" HorizontalAlignment="Stretch" />
-                    <TextBox x:Name="GameBox" Header="Game title" PlaceholderText="Halo Infinite" />
-                    <Button Content="Start session" Click="OnStart"
+                    <ComboBox x:Name="PlatformBox" HorizontalAlignment="Stretch" />
+                    <ComboBox x:Name="RoleBox" HorizontalAlignment="Stretch" />
+                    <TextBox x:Name="GameBox" />
+                    <Button x:Name="StartButton" Click="OnStart"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                 </StackPanel>
             </Border>
@@ -46,16 +46,15 @@
                     BorderBrush="{StaticResource QrmeLineBrush}" BorderThickness="1"
                     CornerRadius="16" Padding="16" Visibility="Collapsed">
                 <StackPanel Spacing="10">
-                    <ComboBox x:Name="ActiveBox" Header="Active session" HorizontalAlignment="Stretch"
+                    <ComboBox x:Name="ActiveBox" HorizontalAlignment="Stretch"
                               SelectionChanged="OnActiveChanged" />
-                    <TextBox x:Name="SituationBox" Header="Situation"
-                             PlaceholderText="enemy on the flag, low shields" />
-                    <CheckBox x:Name="MinorCheck" Content="A minor is in the lobby (forces strict)"
+                    <TextBox x:Name="SituationBox" />
+                    <CheckBox x:Name="MinorCheck"
                               Foreground="{StaticResource QrmeT2Brush}" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Content="Call it" Click="OnCallout"
+                        <Button x:Name="CallButton" Click="OnCallout"
                                 Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
-                        <Button Content="End session" Click="OnEnd"
+                        <Button x:Name="EndButton" Click="OnEnd"
                                 Background="Transparent" Foreground="{StaticResource QrmeRedBrush}" />
                     </StackPanel>
                     <TextBlock x:Name="LineText" FontSize="12" TextWrapping="Wrap"

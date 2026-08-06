@@ -159,7 +159,7 @@ fun VoiceScreen(vm: StudioViewModel) {
 
                 Row(verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Pill(if (recording) "Stop" else "Record a sample",
+                    Pill(L10n.t(if (recording) "nvoi.stop" else "nvoi.sample", vm.language),
                         if (recording) Qrme.Red else Qrme.BrandA, enabled = !busy) {
                         if (recording) {
                             recording = false
@@ -202,7 +202,7 @@ fun VoiceScreen(vm: StudioViewModel) {
                                  "and %.0fs".format(e.wantSeconds),
                                 color = Qrme.T3, fontSize = 10.sp)
                         }
-                        Text(if (e.ready) "ready" else "not yet",
+                        Text(L10n.t(if (e.ready) "nvoi.ready" else "nvoi.notyet", vm.language),
                             color = if (e.ready) Qrme.Green else Qrme.Amber,
                             fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
@@ -240,8 +240,8 @@ fun VoiceScreen(vm: StudioViewModel) {
                     }
                 } else {
                     Text(if (enrol?.ready == true)
-                             "Enough of your voice is on record — mint the voiceprint."
-                         else "Record a few more samples first.",
+                             L10n.t("nvoi.enough", vm.language)
+                         else L10n.t("nvoi.more", vm.language),
                         color = Qrme.T2, fontSize = 12.sp)
                     Pill(L10n.t("nvoi.build", vm.language), Qrme.BrandA,
                         enabled = !busy && enrol?.ready == true) {

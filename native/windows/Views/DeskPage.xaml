@@ -11,10 +11,10 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Look up a desk" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="LookupHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBox x:Name="DeskIdBox" Header="Desk id" PlaceholderText="dsk_…" />
-                    <Button Content="Open" Click="OnOpen"
+                    <TextBox x:Name="DeskIdBox" PlaceholderText="dsk_…" />
+                    <Button x:Name="OpenButton" Click="OnOpen"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                 </StackPanel>
             </Border>
@@ -54,9 +54,8 @@
                     Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBox x:Name="NoteBox" Header="Anything they should know? (optional)"
-                             PlaceholderText="need a key cut" />
-                    <Button x:Name="RingButton" Content="🔔  Ring the bell" Click="OnRing"
+                    <TextBox x:Name="NoteBox" />
+                    <Button x:Name="RingButton" Click="OnRing"
                             HorizontalAlignment="Stretch" Padding="0,12"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <TextBlock x:Name="RingResult" FontSize="12" TextWrapping="Wrap"

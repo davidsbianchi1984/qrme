@@ -1207,7 +1207,7 @@ fun StudyScreen(vm: StudioViewModel) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(e.topic, color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                    Text(if (e.leftHost) "left host" else "stayed local",
+                    Text(L10n.t(if (e.leftHost) "nstu.lefthost" else "nstu.stayedlocal", vm.language),
                         color = if (e.leftHost) Qrme.Amber else Qrme.Green,
                         fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
@@ -1304,8 +1304,11 @@ private fun SocialPanel(vm: StudioViewModel) {
                         fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     c.handle?.let { Text(it, color = Qrme.T3, fontSize = 12.sp) }
                 }
-                Text(if (c.direction == "collect") "${c.collected} item(s) collected"
-                     else "${c.published} post(s) published",
+                Text(if (c.direction == "collect")
+                         L10n.fill("ncon.collected", vm.language,
+                                   mapOf("n" to "${c.collected}"))
+                     else L10n.fill("ncon.published", vm.language,
+                                    mapOf("n" to "${c.published}")),
                     color = Qrme.T2, fontSize = 12.sp)
                 if (c.status == "revoked") {
                     Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
@@ -1533,7 +1536,7 @@ private fun StrangerPanel(vm: StudioViewModel) {
                     labeledField("Birthdate", birthdate, "YYYY-MM-DD") { birthdate = it }
                 }
                 labeledField("Alias (optional)", alias, "Stranger") { alias = it }
-                BrandButton(if (waiting) "Waiting for a match — check again" else "Find a match",
+                BrandButton(L10n.t(if (waiting) "nc.match.waiting" else "nc.match.find", vm.language),
                     enabled = tier != "rated" || vm.interactorVerified || birthdate.isNotBlank()) { join() }
             }
         } else {
@@ -1933,7 +1936,7 @@ private fun SummonPanel(vm: StudioViewModel) {
     if (scanning) {
         BeaconScannerScreen(
             onOpen = { url -> scanning = false; runCatching { uriHandler.openUri(url) } },
-            onClose = { scanning = false })
+            onClose = { scanning = false }, lang = vm.language)
         return
     }
 
@@ -2152,8 +2155,8 @@ private fun PacksPanel(vm: StudioViewModel) {
         }) { r ->
             r.onSuccess {
                 status = if (p.audience == "robot")
-                    "installed — the body can now be commanded with these tasks"
-                else "installed — the pack now grounds this profile"
+                    L10n.t("nmg.pack.installed.robot", vm.language)
+                else L10n.t("nmg.pack.installed.pack", vm.language)
             }.onFailure { error = it.message }
             reload()
         }
@@ -2225,7 +2228,8 @@ private fun PacksPanel(vm: StudioViewModel) {
                         if (p.audience == "robot")
                             Text(L10n.t("nmg.pack.robot", vm.language), color = Qrme.BrandA, fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold)
-                        Text(if (p.free) "FREE" else "%.2f %s".format(p.price, p.currency),
+                        Text(if (p.free) L10n.t("nmg.pack.free", vm.language)
+                             else "%.2f %s".format(p.price, p.currency),
                             color = if (p.free) Qrme.Green else Qrme.Amber,
                             fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
@@ -2248,7 +2252,9 @@ private fun PacksPanel(vm: StudioViewModel) {
                         }
                     } else {
                         SmallAction(if (p.free) "Download"
-                                    else "Buy %.2f %s".format(p.price, p.currency)) {
+                                    else L10n.fill("nmg.packs.buy", vm.language,
+                                                   mapOf("price" to "%.2f".format(p.price),
+                                                         "currency" to p.currency))) {
                             install(p)
                         }
                     }
@@ -2403,8 +2409,8 @@ private fun SignaturePanel(vm: StudioViewModel) {
                     // every device in the user's cloud account, which is a
                     // weaker claim that only they could have signed.
                     Text(
-                        if (c.deviceBound) "device-bound — cannot sync"
-                        else "syncable — exists on your other devices",
+                        L10n.t(if (c.deviceBound) "nsig.devicebound"
+                               else "nsig.syncable", vm.language),
                         color = if (c.deviceBound) Qrme.Green else Qrme.Red,
                         fontSize = 11.sp)
                     Text(L10n.fill("nsig.cansign", vm.language, mapOf("levels" to
@@ -2462,7 +2468,7 @@ private fun SignaturePanel(vm: StudioViewModel) {
 
         receipt?.let { r ->
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(if (r.valid) "Verifies" else "Does not verify",
+                Text(L10n.t(if (r.valid) "nsig.verifies" else "nsig.noverify", vm.language),
                     color = if (r.valid) Qrme.Green else Qrme.Red,
                     fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 Text(r.signatureId, color = Qrme.T2, fontSize = 11.sp)
@@ -5805,7 +5811,8 @@ private fun DeskPanel(vm: StudioViewModel) {
     var open by remember { mutableStateOf(false) }
 
     if (open && deskId.isNotBlank()) {
-        DeskScreen(deskId = deskId.trim(), callerId = vm.interactorId,
+        DeskScreen(deskId = deskId.trim(), lang = vm.language,
+                   callerId = vm.interactorId,
             viewerToken = vm.interactorToken)
         return
     }

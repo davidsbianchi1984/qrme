@@ -17,6 +17,7 @@ import Vision
 /// worst version of this feature: a synthetic person appearing in the real
 /// world with nothing saying so.
 struct BeaconScannerView: View {
+    @EnvironmentObject var state: AppState
     @StateObject private var scanner = BeaconScanner()
 
     var body: some View {
@@ -33,8 +34,8 @@ struct BeaconScannerView: View {
             VStack {
                 Spacer()
                 Text(scanner.card == nil
-                     ? "Point at a QRME code"
-                     : "Tap to open")
+                     ? L10n.t("nbcn.point", state.language)
+                     : L10n.t("nbcn.tap", state.language))
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.85))
                     .padding(.horizontal, 14).padding(.vertical, 8)
@@ -97,7 +98,7 @@ private struct BeaconOverlay: View {
                     .font(.headline).foregroundStyle(.white)
                     .shadow(radius: 4)
                 if card.sharedRoom {
-                    Text("shared room — others may be here")
+                    Text(L10n.t("nbcn.shared", state.language))
                         .font(.caption2).foregroundStyle(.white.opacity(0.8))
                 }
             }

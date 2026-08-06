@@ -36,6 +36,12 @@ public sealed partial class DeskPage : Page
         OfferTargetBox.Header = L10n.T("desk.counter.staff.target");
         OfferScopeBox.Header = L10n.T("desk.counter.staff.scope");
         OfferButton.Content = L10n.T("desk.counter.staff.offer");
+        LookupHead.Text = L10n.T("ndsk");
+        DeskIdBox.Header = L10n.T("ndsk.id");
+        OpenButton.Content = L10n.T("nmg.open");
+        NoteBox.Header = L10n.T("ndsk.note.ph");
+        NoteBox.PlaceholderText = L10n.T("ndsk.needkey");
+        RingButton.Content = L10n.T("ndsk.bell");
     }
 
     private async void OnOpen(object sender, RoutedEventArgs e)
@@ -54,7 +60,7 @@ public sealed partial class DeskPage : Page
     private void Render(DeskCard d)
     {
         DeskImage.Source = new BitmapImage(new Uri(ApiClient.Shared.DeskViewUrl(d.DeskId)));
-        LiveBadge.Text = d.Feed.Live ? "● LIVE" : "SAMPLE VIEW";
+        LiveBadge.Text = L10n.T(d.Feed.Live ? "ndsk.live" : "ndsk.sample");
         FeedNote.Text = d.Feed.Live ? "" : d.Feed.Note;
 
         NameText.Text = d.DisplayName;
@@ -67,8 +73,9 @@ public sealed partial class DeskPage : Page
             _ => "Away from the desk",
         };
 
-        AttestorText.Text = $"Attested by {d.Attestation.Attestor}"
-            + (d.Attestation.Signed ? " · signed" : "");
+        AttestorText.Text = L10n.Fill("ndsk.attested", AppState.Current.Language,
+                                      ("attestor", d.Attestation.Attestor))
+            + (d.Attestation.Signed ? " · " + L10n.T("ndsk.signed") : "");
         BasisText.Text = d.Attestation.Basis;
         // Shipped with the claim, always: "recorded" and "proven" are
         // different words and the difference is the whole point.

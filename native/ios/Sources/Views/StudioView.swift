@@ -65,7 +65,7 @@ struct StudyView: View {
                         HStack {
                             Text(e.topic).font(.subheadline.bold()).foregroundStyle(Theme.txt)
                             Spacer()
-                            Text(e.left_host ? "left host" : "stayed local")
+                            Text(L10n.t(e.left_host ? "nstu.lefthost" : "nstu.stayedlocal", state.language))
                                 .font(.caption2.bold())
                                 .padding(.horizontal, 7).padding(.vertical, 3)
                                 .background((e.left_host ? Theme.amber : Theme.green).opacity(0.16))

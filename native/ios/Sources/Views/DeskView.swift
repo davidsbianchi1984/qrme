@@ -76,12 +76,12 @@ struct DeskView: View {
         VStack(alignment: .leading, spacing: 10) {
             Image(systemName: "18.circle.fill")
                 .font(.system(size: 44)).foregroundStyle(.orange)
-            Text("18+ only").font(.title3.weight(.bold))
+            Text(L10n.t("ndsk.adult", state.language)).font(.title3.weight(.bold))
             Text(card?.note ?? "")
                 .font(.footnote).foregroundStyle(.secondary)
             // Still true here, and worth saying: there is a person behind
             // this, so it never carries the AI mark.
-            Label("A live person — not AI", systemImage: "person.fill")
+            Label(L10n.t("ndsk.human", state.language), systemImage: "person.fill")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
@@ -105,7 +105,7 @@ struct DeskView: View {
                 // Never a watermark here. The one label this image carries
                 // says whether it is live — which is the thing a person
                 // staring at an empty chair actually needs to know.
-                Text(feed.live ? "● LIVE" : "SAMPLE VIEW")
+                Text(L10n.t(feed.live ? "ndsk.live" : "ndsk.sample", state.language))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(feed.live ? .red : .white.opacity(0.8))
                     .padding(.horizontal, 8).padding(.vertical, 4)
@@ -164,7 +164,7 @@ struct DeskView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "video.fill")
-                        Text(joined == nil ? "Join the live stream" : "Joined")
+                        Text(L10n.t(joined == nil ? "ndsk.join" : "ndsk.joined", state.language))
                             .font(.headline)
                     }
                     .frame(maxWidth: .infinity).padding(14)
@@ -173,7 +173,7 @@ struct DeskView: View {
                 }
                 if let joined {
                     Text(joined.note).font(.footnote).foregroundStyle(.secondary)
-                    Text("Room \(joined.room_id)")
+                    Text(L10n.fill("ndsk.room", state.language, ["id": joined.room_id]))
                         .font(.caption2.monospaced()).foregroundStyle(.secondary)
                 }
             }
@@ -185,7 +185,7 @@ struct DeskView: View {
     @ViewBuilder private var bell: some View {
         if let card, card.bell?.available == true {
             VStack(alignment: .leading, spacing: 10) {
-                TextField("Anything they should know? (optional)", text: $note)
+                TextField(L10n.t("ndsk.note.ph", state.language), text: $note)
                     .textFieldStyle(.roundedBorder)
 
                 Button {
@@ -193,7 +193,7 @@ struct DeskView: View {
                 } label: {
                     HStack(spacing: 10) {
                         Image(systemName: "bell.fill")
-                        Text(ringing ? "Ringing…" : "Ring the bell")
+                        Text(L10n.t(ringing ? "ndsk.ringing" : "ndsk.bell", state.language))
                             .font(.headline)
                     }
                     .frame(maxWidth: .infinity).padding(14)
@@ -207,12 +207,12 @@ struct DeskView: View {
                     Label(receipt.note, systemImage: "checkmark.circle.fill")
                         .font(.footnote).foregroundStyle(.green)
                 } else if let waiting = card.bell?.waiting, waiting > 0 {
-                    Text("\(waiting) waiting")
+                    Text(L10n.fill("ndsk.waiting", state.language, ["n": "\(waiting)"]))
                         .font(.caption).foregroundStyle(.secondary)
                 }
             }
         } else if card != nil {
-            Text("The bell is off while this desk is closed.")
+            Text(L10n.t("ndsk.bell.off", state.language))
                 .font(.footnote).foregroundStyle(.secondary)
         }
     }
@@ -223,12 +223,12 @@ struct DeskView: View {
         if let card {
             if let att = card.attestation {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Attested by \(att.attestor)")
+                Text(L10n.fill("ndsk.attested", state.language, ["attestor": att.attestor]))
                     .font(.caption.weight(.semibold))
                 Text(att.basis)
                     .font(.caption2).foregroundStyle(.secondary)
                 if att.signed {
-                    Label("Signed", systemImage: "checkmark.seal.fill")
+                    Label(L10n.t("ndsk.signed", state.language), systemImage: "checkmark.seal.fill")
                         .font(.caption2).foregroundStyle(.green)
                 }
                 // Shipped with the claim, always. "Recorded" and "proven" are

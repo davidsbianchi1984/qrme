@@ -332,8 +332,8 @@ public sealed partial class ReachPage : Page
             var r = await ApiClient.Shared.InstallPack(
                 packId, s.Pid!, s.Token!, acceptPrice: !pack.Free, robotId: robotId);
             var what = pack.Audience == "robot"
-                ? "tasks the body can now be commanded with"
-                : "items now grounding this profile";
+                ? L10n.T("nmg.pack.commandable")
+                : L10n.T("nmg.pack.grounding");
             PackStatus.Text = pack.Free
                 ? $"downloaded — {r.Count} {what}"
                 : $"bought for {r.PricePaid:F2} — {r.Count} {what}";

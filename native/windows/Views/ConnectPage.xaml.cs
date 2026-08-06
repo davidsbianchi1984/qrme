@@ -104,8 +104,8 @@ public sealed partial class ConnectPage : Page
                 Title = $"{Cap(c.Platform)} · {c.Direction}",
                 Handle = c.Handle ?? "",
                 Tally = c.Direction == "collect"
-                    ? $"{c.Collected} item(s) collected"
-                    : $"{c.Published} post(s) published",
+                    ? L10n.Fill("ncon.collected", lang, ("n", c.Collected.ToString()))
+                    : L10n.Fill("ncon.published", lang, ("n", c.Published.ToString())),
                 Collect = c.Direction == "collect",
                 Active = c.Status != "revoked",
             }).ToList();

@@ -100,7 +100,7 @@ public sealed partial class VoicePage : Page
         if (s.Enrollment is { } en)
         {
             CountsText.Text = $"{en.Samples} sample(s) · {en.Seconds:F1}s — "
-                            + (en.Ready ? "ready" : "not yet");
+                            + L10n.T(en.Ready ? "nvoi.ready" : "nvoi.notyet");
             var turnLine = en.MeanTurnSeconds is { } mean
                 ? $"about {mean:F1}s a turn"
                 : "no turns counted yet";
@@ -125,8 +125,8 @@ public sealed partial class VoicePage : Page
                 "A previous voiceprint was retired when consent was withdrawn. "
                 + "That record stays.",
             _ => s.Enrollment?.Ready == true
-                ? "Enough of your voice is on record — mint the voiceprint."
-                : "Record a few more samples first.",
+                ? L10n.T("nvoi.enough")
+                : L10n.T("nvoi.more"),
         };
         DisclosureText.Text = s.Disclosure;
     }
@@ -175,7 +175,7 @@ public sealed partial class VoicePage : Page
             _clock.Restart();
             _ticker.Start();
             ElapsedText.Visibility = Visibility.Visible;
-            RecordButton.Content = "Stop";
+            RecordButton.Content = L10n.T("nvoi.stop");
         }
         catch (UnauthorizedAccessException)
         {
@@ -197,7 +197,7 @@ public sealed partial class VoicePage : Page
         var seconds = Math.Round(_clock.Elapsed.TotalSeconds, 1);
         var reference = _file?.Name;
         await ReleaseCapture();
-        RecordButton.Content = "Record a sample";
+        RecordButton.Content = L10n.T("nvoi.sample");
         ElapsedText.Visibility = Visibility.Collapsed;
         if (seconds <= 0) return;
         await Call(async (pid, token) =>

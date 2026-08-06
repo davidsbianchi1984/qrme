@@ -17,16 +17,16 @@ struct PacksSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Knowledge packs").font(.headline).foregroundStyle(Theme.txt)
-                Text("Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly. 🤖 Robot task packs teach the body this profile embodies new commandable tasks, capability-checked at install.")
+                Text(L10n.t("nmg.packs", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                Text(L10n.t("nmg.packs.sub", state.language))
                     .font(.caption).foregroundStyle(Theme.t2)
                 HStack(spacing: 8) {
-                    TextField("filter by industry (e.g. finance)", text: $industry)
+                    TextField(L10n.t("nmg.filter.industry.full", state.language), text: $industry)
                         .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    Button("Browse") { Task { await load() } }
+                    Button(L10n.t("nmg.browse", state.language)) { Task { await load() } }
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 10)
                         .background(Theme.brandA).clipShape(Capsule())
@@ -34,15 +34,16 @@ struct PacksSection: View {
             }.card()
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("Pack sources").font(.subheadline.bold()).foregroundStyle(Theme.txt)
-                Text("Federated mod storefronts — sync a source and its catalog joins the marketplace, origin on every label.")
+                Text(L10n.t("nmg.packs.sources", state.language)).font(.subheadline.bold()).foregroundStyle(Theme.txt)
+                Text(L10n.t("nmg.packs.sources.sub", state.language))
                     .font(.caption2).foregroundStyle(Theme.t3)
                 ForEach(registries, id: \.key) { reg in
                     HStack(spacing: 8) {
                         VStack(alignment: .leading, spacing: 1) {
                             Text(reg.name).font(.caption.bold()).foregroundStyle(Theme.brandA)
                             Text(reg.tagline).font(.caption2).foregroundStyle(Theme.t2)
-                            Text("\(reg.synced)/\(reg.available) packs synced")
+                            Text(L10n.fill("nmg.packs.count", state.language,
+                             ["synced": "\(reg.synced)", "available": "\(reg.available)"]))
                                 .font(.caption2).foregroundStyle(Theme.t3)
                         }
                         Spacer()
@@ -69,7 +70,7 @@ struct PacksSection: View {
                         Text(pack.title).font(.subheadline.bold()).foregroundStyle(Theme.txt)
                         Spacer()
                         if pack.audience == "robot" {
-                            Text("🤖 ROBOT TASKS").font(.caption2.bold())
+                            Text(L10n.t("nmg.pack.robot.tasks", state.language)).font(.caption2.bold())
                                 .padding(.horizontal, 7).padding(.vertical, 3)
                                 .background(Theme.brandA.opacity(0.16))
                                 .foregroundStyle(Theme.brandA)
@@ -86,16 +87,18 @@ struct PacksSection: View {
                     if let blurb = pack.blurb {
                         Text(blurb).font(.caption).foregroundStyle(Theme.t2)
                     }
-                    Text("#\(pack.industry) · \(pack.items) items · \(pack.installs) installs · \(pack.publisher)")
+                    Text(L10n.fill("nmg.pack.meta", state.language,
+                         ["industry": pack.industry, "items": "\(pack.items)",
+                          "installs": "\(pack.installs)", "publisher": pack.publisher]))
                         .font(.caption2).foregroundStyle(Theme.t3)
                     if let url = pack.origin_url {
-                        Text("from \(url)").font(.caption2).foregroundStyle(Theme.brandA)
+                        Text(L10n.fill("nmg.pack.from", state.language, ["source": url])).font(.caption2).foregroundStyle(Theme.brandA)
                     }
                     HStack {
                         Spacer()
                         if installed.keys.contains(pack.id) {
-                            Text("Installed").font(.caption.bold()).foregroundStyle(Theme.green)
-                            Button("Remove") { uninstall(pack) }
+                            Text(L10n.t("nmg.packs.installed", state.language)).font(.caption.bold()).foregroundStyle(Theme.green)
+                            Button(L10n.t("nmg.remove", state.language)) { uninstall(pack) }
                                 .font(.caption).foregroundStyle(Theme.red)
                         } else {
                             Button(pack.free ? "Download"
@@ -160,8 +163,8 @@ struct PacksSection: View {
                     packId: pack.id, pid: pid, token: token,
                     acceptPrice: !pack.free, robotId: robotId)
                 let what = pack.audience == "robot"
-                    ? "tasks the body can now be commanded with"
-                    : "items now grounding this profile"
+                    ? L10n.t("nmg.pack.commandable", state.language)
+                    : L10n.t("nmg.pack.grounding", state.language)
                 status = pack.free
                     ? "downloaded — \(r.count) \(what)"
                     : String(format: "bought for %.2f — %d %@",

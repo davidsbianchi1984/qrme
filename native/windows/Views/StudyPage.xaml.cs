@@ -59,7 +59,7 @@ public sealed partial class StudyPage : Page
             {
                 Id = x.Id,
                 Topic = x.Topic,
-                Badge = x.LeftHost ? "left host" : "stayed local",
+                Badge = L10n.T(x.LeftHost ? "nstu.lefthost" : "nstu.stayedlocal"),
                 Redacted = x.Redactions > 0
                     ? L10n.Fill("nstu.redacted", AppState.Current.Language,
                                 ("n", x.Redactions.ToString())) : "",

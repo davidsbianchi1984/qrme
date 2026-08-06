@@ -25,7 +25,32 @@ public sealed partial class GamingPage : Page
         public override string ToString() => Title;
     }
 
-    public GamingPage() => InitializeComponent();
+    public GamingPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    /// Windows was the only shell that said *agent-operated* in the blurb —
+    /// the fact a reader most needs about the thing in the lobby beside them.
+    /// It is the wording all three carry now.
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Title.Text = L10n.T("tab.gaming", lang);
+        Sub.Text = L10n.T("ngam.sub.full", lang);
+        PlatformBox.Header = L10n.T("ngam.platform", lang);
+        RoleBox.Header = L10n.T("ngam.role", lang);
+        GameBox.Header = L10n.T("ngam.game", lang);
+        GameBox.PlaceholderText = L10n.T("ngam.game.ph", lang);
+        StartButton.Content = L10n.T("ngam.start", lang);
+        ActiveBox.Header = L10n.T("ngam.active", lang);
+        SituationBox.Header = L10n.T("ngam.situation", lang);
+        SituationBox.PlaceholderText = L10n.T("ngam.situation.example", lang);
+        MinorCheck.Content = L10n.T("ngam.minor", lang);
+        CallButton.Content = L10n.T("ngam.callit", lang);
+        EndButton.Content = L10n.T("ngam.end.session", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {

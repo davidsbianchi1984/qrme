@@ -91,8 +91,8 @@ private struct SocialSection: View {
                             if let h = c.handle { Text(h).font(.caption).foregroundStyle(Theme.t3) }
                         }
                         Text(c.direction == "collect"
-                             ? "\(c.collected) item(s) collected"
-                             : "\(c.published) post(s) published")
+                             ? L10n.fill("ncon.collected", state.language, ["n": "\(c.collected)"])
+                             : L10n.fill("ncon.published", state.language, ["n": "\(c.published)"]))
                             .font(.caption).foregroundStyle(Theme.t2)
                         if c.status == "revoked" {
                             Text(L10n.t("nmg.revoked", state.language)).font(.caption).foregroundStyle(Theme.red)
