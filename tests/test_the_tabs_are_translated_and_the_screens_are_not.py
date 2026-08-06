@@ -71,6 +71,27 @@ Three things, and only the first is a measurement:
    from the middle of an alarm. The backend has had this check for its own
    templates since the stranger's-language round; the shells never did.
 
+## What the Kotlin side could not see, and for how long
+
+**0.47.6.** The three products' Android records had been ground down to 2, 48
+and 75 over a dozen rounds, and every button on all three shells was English
+the whole time. Compose has no `Button(text)`: a button here is a `Box` with a
+`Text` inside, written once as a private composable and called by name —
+`SmallAction("Send")`, `BrandButton("Bind")`, `RobotAction("Fetch AED")`. The
+Kotlin pattern list was `Text(` and nothing else, so it read none of them.
+
+    asked     does the string start a `Text(`
+    mattered  does the string end up inside one
+
+Worst of the three is the sibling product's, where `RobotAction` is the
+**resuscitation surface** — *Start CPR (pre-authorized)*, *Confirm:
+unresponsive, not breathing*, *Auto-resuscitate*, *Stop CPR* — nine buttons in
+English on a screen this file's own opening section calls the case where
+English is a hazard rather than a discourtesy.
+
+The rule now derives the constructs from the shell instead of naming one; see
+`_kotlin_label_patterns`.
+
 ## Why this file is in this repo too
 
 The finding spans all nine shells; the fix that came with it is the sibling
@@ -111,9 +132,15 @@ _HAS_LETTER = re.compile(r"[A-Za-z]")
 #: card that had just been fully localized, which is a measurement telling the
 #: opposite of the truth.
 #:
+#: `\uXXXX` is on the list for the same reason and was added at 0.47.6: a
+#: button whose whole label is `"↻"` is a **refresh arrow**, and the four
+#: hex digits of its escape are not words a reader reads.
+#:
 #:     asked     does this literal contain letters
 #:     mattered  does this literal contain words a reader reads
-_HOLE = re.compile(r"\\\([^)]*\)|\$\{[^}]*\}|\$[A-Za-z_]\w*|\{[A-Za-z]\w*[^}]*\}")
+_HOLE = re.compile(
+    r"\\\([^)]*\)|\$\{[^}]*\}|\$[A-Za-z_]\w*|\{[A-Za-z]\w*[^}]*\}"
+    r"|\\u[0-9a-fA-F]{4}")
 
 #: What puts a string in front of a person, per shell. Deliberately a list of
 #: named constructs rather than "every literal": an icon name, a JSON key and
@@ -127,6 +154,116 @@ _SWIFT = [
 _KOTLIN = [r'\bText\(\s*"([^"]{2,})"']
 _XAML = [r'\bText="([^"]{2,})"', r'\bContent="([^"]{2,})"',
          r'\bHeader="([^"]{2,})"', r'\bPlaceholderText="([^"]{2,})"']
+
+#: **Added in 0.47.6, and the reason the list above is one entry long.**
+#:
+#: Compose has no `Button(text)`. A button on these shells is a `Box` with a
+#: `Text` inside it, written once as a private composable and called from
+#: everywhere — `SmallAction("Send")`, `BrandButton("Bind")`,
+#: `RobotAction("Start CPR (pre-authorized)")`. Every one of those is a
+#: string a person reads off a button, and none of them start with `Text(`,
+#: so `_KOTLIN` saw none of them. All three products' Android records read
+#: as very nearly localized while every button on them was English.
+#:
+#: The fix is not a fourth hard-coded name. It is to *derive* the list from
+#: the shell: a function with a `String` parameter whose body renders that
+#: parameter through `Text(` is, by construction, something that puts a string
+#: in front of a person, and the argument at that parameter's **position** is
+#: the string it puts there. Add a fifth wrapper tomorrow and this finds it,
+#: which is the property the four previous versions of this bug did not have.
+#:
+#:     asked     does the string start a `Text(`
+#:     mattered  does the string end up inside one
+#:
+#: **A function, not a `[A-Z]\w*` one.** The first draft of this required the
+#: capitalized name Compose composables conventionally have, and that is a
+#: convention rather than a rule — these shells break it. `labeledField` is
+#: the label above every text input on all three products, `medRow` the left
+#: column of the medical card, `ratingRow` and `sliderRow` the names of the
+#: things being rated. Requiring the capital would have found the buttons and
+#: left the field labels behind, which is this whole family of bug committed
+#: one more time inside its own fix.
+#:
+#: **A position, not argument zero.** The second draft read only the first
+#: argument, and `labeledField(label, value, placeholder, onChange)` renders
+#: two of them — the label above the box and the grey prompt inside it. The
+#: prompt is where these screens keep their examples (*Halo Infinite*, *need a
+#: key cut*, *What should it speak about?*), so reading argument zero alone
+#: would have left the more conversational half of every form in English.
+_KOTLIN_DECL = re.compile(r'\bfun\s+(\w+)\s*\(([^)]*)\)', re.S)
+
+
+def _kotlin_label_positions(base: Path) -> dict[str, set[int]]:
+    """{function name: argument positions it renders through `Text(`}."""
+    out: dict[str, set[int]] = {}
+    for path in sorted(base.rglob("*.kt")):
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for m in _KOTLIN_DECL.finditer(text):
+            name, params = m.group(1), m.group(2)
+            # The declaration's own body, bounded rather than parsed: a
+            # composable that renders its label does so within a few lines,
+            # and a brace-matcher here would be a parser for one regex's sake.
+            body = text[m.end():m.end() + 1600]
+            for i, decl in enumerate(params.split(",")):
+                head, _, kind = decl.partition(":")
+                if kind.strip().split(" ")[0].rstrip("?") != "String":
+                    continue
+                if re.search(r"\bText\(\s*%s\b" % re.escape(head.strip()), body):
+                    out.setdefault(name, set()).add(i)
+    return out
+
+
+def _kotlin_call_args(text: str, name: str):
+    """Top-level argument slices of every `name(…)` call in `text`.
+
+    Written out rather than regexed because the arguments here contain commas
+    inside lambdas, nested calls and strings — `split(",")` on the call site
+    would put `Modifier.padding(4.dp, 8.dp)` in two different positions.
+    """
+    for m in re.finditer(r"\b%s\s*\(" % re.escape(name), text):
+        i, depth, cur, parts, quote = m.end(), 1, "", [], None
+        while i < len(text) and depth:
+            ch = text[i]
+            if quote:
+                if ch == "\\":
+                    cur += text[i:i + 2]
+                    i += 2
+                    continue
+                if ch == quote:
+                    quote = None
+            elif ch in "\"'":
+                quote = ch
+            elif ch in "([{":
+                depth += 1
+            elif ch in ")]}":
+                depth -= 1
+                if not depth:
+                    break
+            elif ch == "," and depth == 1:
+                parts.append(cur)
+                cur = ""
+                i += 1
+                continue
+            cur += ch
+            i += 1
+        parts.append(cur)
+        yield parts
+
+
+_KOTLIN_LITERAL = re.compile(r'^\s*"((?:[^"\\]|\\.){2,})"\s*$')
+
+
+def _kotlin_labels(text: str, positions: dict[str, set[int]]) -> set[str]:
+    """Every literal this file hands to a label position."""
+    found = set()
+    for name, wanted in positions.items():
+        for args in _kotlin_call_args(text, name):
+            for i in wanted:
+                if i < len(args):
+                    lit = _KOTLIN_LITERAL.match(args[i])
+                    if lit:
+                        found.add(lit.group(1))
+    return found
 
 #: **Added in 0.47.0.** A string that is chosen by a ternary is not at the
 #: start of an argument list, so none of the patterns above could see it:
@@ -173,6 +310,7 @@ def _measure(shell: str) -> tuple[int, int]:
     base = REPO / rel
     if not base.exists():
         return 0, 0
+    positions = _kotlin_label_positions(base) if shell == "android" else {}
     english = calls = 0
     for path in sorted(base.rglob("*")):
         if path.suffix not in suffixes or "L10n" in path.name:
@@ -185,6 +323,8 @@ def _measure(shell: str) -> tuple[int, int]:
                   for s in pair
                   if _PHRASE.search(_HOLE.sub("", s).strip())
                   and _HAS_LETTER.search(_HOLE.sub("", s))}
+        found |= {s for s in _kotlin_labels(text, positions)
+                  if _HAS_LETTER.search(_HOLE.sub("", s))}
         english += len(found)
         calls += len(re.findall(call, text))
     return english, calls
@@ -263,6 +403,55 @@ def test_a_lone_token_in_a_ternary_is_not_counted():
     counted = {s for pat in _TERNARY for pair in re.findall(pat, source)
                for s in pair if _PHRASE.search(_HOLE.sub("", s).strip())}
     assert counted == set(), counted
+
+
+def test_the_shell_declares_the_buttons_this_rule_reads(tmp_path):
+    """A guard on the derivation. `_kotlin_label_positions` returning nothing
+    restores the exact blind spot it was written to close — every button on
+    the shell invisible — and would do it while every other test here passed,
+    which is how the blind spot lasted as long as it did."""
+    (tmp_path / "Widgets.kt").write_text(
+        "private fun SmallAction(text: String, onClick: () -> Unit) {\n"
+        "    Box(Modifier.clip(RoundedCornerShape(50))) { Text(text) }\n"
+        "}\n"
+        "internal fun labeledField(label: String, value: String,\n"
+        "                          placeholder: String, onChange: (String) -> Unit) {\n"
+        "    Column { Text(label)\n"
+        "        OutlinedTextField(value = value, onValueChange = onChange,\n"
+        "            placeholder = { Text(placeholder) }) }\n"
+        "}\n"
+        "private fun icon(name: String) { Image(painterResource(name)) }\n",
+        encoding="utf-8")
+    positions = _kotlin_label_positions(tmp_path)
+    assert positions == {"SmallAction": {0}, "labeledField": {0, 2}}, positions
+    # A function that takes a String and never renders it is not a label.
+    assert "icon" not in positions, positions
+    source = ('SmallAction("Send") { go() }\n'
+              'labeledField("Desk id", deskId, "dsk_…") { deskId = it }\n')
+    assert _kotlin_labels(source, positions) == {"Send", "Desk id", "dsk_…"}
+
+
+def test_a_comma_inside_an_argument_does_not_shift_the_positions():
+    """The reason `_kotlin_call_args` is a scanner and not a `split(",")`.
+    Getting this wrong reads a colour or a lambda as the label and reports a
+    localized screen — the quiet direction, again."""
+    positions = {"labeledField": {0, 2}}
+    source = ('labeledField("Price (USD)", price, "0.00") { price = it }\n'
+              'labeledField(t(k, l), v, join(a, b)) { v = it }\n'
+              'row(Modifier.padding(4.dp, 8.dp), "not a label")\n')
+    assert _kotlin_labels(source, positions) == {"Price (USD)", "0.00"}
+
+
+def test_the_real_android_shell_has_label_wrappers():
+    """The same guard against this repo's own sources rather than a fixture.
+    Compose has no `Button(text)`; if this shell suddenly declares no
+    label-bearing composable at all, the derivation has stopped deriving."""
+    base = REPO / "native/android"
+    if not base.exists():
+        pytest.skip("no android shell in this repo")
+    assert _kotlin_label_positions(base), (
+        "no label-bearing composable found in the Android shell — every "
+        "button on it is now invisible to the ratchet above")
 
 
 # --- the slots, which are the part that breaks silently -------------------

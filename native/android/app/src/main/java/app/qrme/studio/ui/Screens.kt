@@ -159,7 +159,7 @@ fun WelcomeScreen(vm: StudioViewModel) {
                         )
                     }
                 }
-                labeledField(L10n.t("nw.birthdate", lang), birthdate, "yyyy-MM-dd") { birthdate = it }
+                labeledField(L10n.t("nw.birthdate", lang), birthdate, L10n.t("nw.birthdate.ph", lang)) { birthdate = it }
                 if (languages.isNotEmpty()) {
                     Text(L10n.t("nw.language", lang), color = Qrme.T2, fontSize = 12.sp)
                     languages.chunked(3).forEach { row ->
@@ -276,7 +276,7 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                     Text(L10n.t("pub.object.restricts", lang),
                         color = Qrme.T2, fontSize = 12.sp)
                     labeledField(L10n.t("pub.object.profileId", lang), profileId,
-                                 "prf_…") { profileId = it }
+                                 L10n.t("nw.profile.ph", lang)) { profileId = it }
                     labeledField(L10n.t("pub.object.ref", lang), objectorRef,
                                  L10n.t("pub.object.ref.ph", lang)) { objectorRef = it }
                     labeledField(L10n.t("pub.object.reason", lang), reason, "") { reason = it }
@@ -420,9 +420,9 @@ fun OverviewScreen(vm: StudioViewModel) {
                 card == null -> Text(L10n.t("nov.error", vm.language),
                     color = Qrme.T2, fontSize = 13.sp)
                 else -> {
-                    cardRow("Kind", card!!.kind.replace('_', ' '))
-                    cardRow("Status", card!!.status ?: "active")
-                    cardRow("ID", card!!.id)
+                    cardRow(L10n.t("nw.kind", vm.language), card!!.kind.replace('_', ' '))
+                    cardRow(L10n.t("life.status", vm.language), card!!.status ?: "active")
+                    cardRow(L10n.t("nov.id", vm.language), card!!.id)
                 }
             }
         }
@@ -454,9 +454,9 @@ fun ComposeScreen(vm: StudioViewModel) {
         Text(L10n.t("tab.compose", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Text(L10n.t("ncmp.sub", vm.language), color = Qrme.T2, fontSize = 13.sp)
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            labeledField("Topic", topic, "What should it post about?") { topic = it }
+            labeledField(L10n.t("nc.topic.ph", vm.language), topic, L10n.t("ncmp.topic.ph", vm.language)) { topic = it }
         }
-        BrandButton("Compose post", enabled = topic.isNotBlank(), busy = busy) {
+        BrandButton(L10n.t("ncmp", vm.language), enabled = topic.isNotBlank(), busy = busy) {
             busy = true
             vm.call({ ApiClient.compose(vm.pid!!, vm.token!!, topic) }) {
                 result = it.getOrNull(); busy = false
@@ -562,7 +562,7 @@ fun RobotsScreen(vm: StudioViewModel) {
                     }
                 }
             }
-            BrandButton("Bind", enabled = catalog.isNotEmpty(), busy = busy) {
+            BrandButton(L10n.t("nrob.bind.go", vm.language), enabled = catalog.isNotEmpty(), busy = busy) {
                 busy = true; error = null
                 vm.call({ ApiClient.bindRobot(vm.pid!!, vm.token!!, chosen) }) { r ->
                     busy = false
@@ -575,7 +575,7 @@ fun RobotsScreen(vm: StudioViewModel) {
 
         if (robots.isNotEmpty()) {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                labeledField("Topic for \"say\"", topic, "What should it speak about?") { topic = it }
+                labeledField(L10n.t("nrob.topic", vm.language), topic, L10n.t("nrob.topic.ph", vm.language)) { topic = it }
             }
         }
 
@@ -753,7 +753,7 @@ fun SettingsScreen(vm: StudioViewModel) {
                         .background(Qrme.ScrBot).padding(horizontal = 10.dp, vertical = 6.dp))
             labeledField(L10n.t("ns.wm.mark", vm.language), wmMark, "✦") { wmMark = it }
             labeledField(L10n.t("ns.wm.label", vm.language), wmLabel,
-                "AI · ${vm.displayName}") { wmLabel = it }
+                L10n.t("ns.wm.label.example", vm.language).replace("{name}", vm.displayName)) { wmLabel = it }
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 SmallAction(L10n.t("ns.wm.save", vm.language)) {
@@ -1129,9 +1129,9 @@ fun ChatScreen(vm: StudioViewModel) {
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f)) {
-                labeledField("", draft, "Say something…") { draft = it }
+                labeledField("", draft, L10n.t("nc.say.ph", vm.language)) { draft = it }
             }
-            BrandButtonSmall(if (busy) "…" else "Send", enabled = draft.isNotBlank() && !busy) { send() }
+            BrandButtonSmall(if (busy) "…" else L10n.t("nc.send", vm.language), enabled = draft.isNotBlank() && !busy) { send() }
         }
     }
 }
@@ -1154,9 +1154,9 @@ fun StudioScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("Compose", "Posts", "Study").forEachIndexed { i, t ->
+            listOf("tab.compose", "tab.posts", "tab.study").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
-                    text = { Text(t, fontSize = 13.sp) })
+                    text = { Text(L10n.t(t, vm.language), fontSize = 13.sp) })
             }
         }
         Box(Modifier.weight(1f)) {
@@ -1190,8 +1190,8 @@ fun StudyScreen(vm: StudioViewModel) {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             labeledField(L10n.t("ncmp.topic", vm.language), topic,
                          L10n.t("nstu.topic.ph", vm.language)) { topic = it }
-            labeledField("Question", question, "What should it find out?") { question = it }
-            BrandButton("Go study", enabled = topic.isNotBlank() && question.isNotBlank(), busy = busy) {
+            labeledField(L10n.t("nstu.question", vm.language), question, L10n.t("nstu.question.ph", vm.language)) { question = it }
+            BrandButton(L10n.t("nstu.go", vm.language), enabled = topic.isNotBlank() && question.isNotBlank(), busy = busy) {
                 busy = true; error = null
                 vm.call({ ApiClient.startExcursion(vm.pid!!, vm.token!!, topic, question) }) { r ->
                     busy = false
@@ -1233,9 +1233,9 @@ fun ConnectScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("Social", "Apps", "Robots").forEachIndexed { i, t ->
+            listOf("ncon.tab.social", "ncon.tab.apps", "tab.robots").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
-                    text = { Text(t, fontSize = 13.sp) })
+                    text = { Text(L10n.t(t, vm.language), fontSize = 13.sp) })
             }
         }
         Box(Modifier.weight(1f)) {
@@ -1288,10 +1288,10 @@ private fun SocialPanel(vm: StudioViewModel) {
                     }
                 }
             }
-            labeledField("Handle (optional)", handle, "@you") { handle = it }
+            labeledField(L10n.t("ncon.h.handle", vm.language), handle, L10n.t("ncon.handle.example", vm.language)) { handle = it }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SmallAction("Connect to collect") { connect("collect") }
-                SmallAction("Connect to publish") { connect("publish") }
+                SmallAction(L10n.t("ncon.to.collect", vm.language)) { connect("collect") }
+                SmallAction(L10n.t("ncon.to.publish", vm.language)) { connect("publish") }
             }
         }
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
@@ -1316,7 +1316,7 @@ private fun SocialPanel(vm: StudioViewModel) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically) {
                         if (c.direction == "collect") {
-                            SmallAction("Collect sample") {
+                            SmallAction(L10n.t("ncon.collect.sample", vm.language)) {
                                 vm.call({ ApiClient.socialCollect(c.id, vm.token!!,
                                     "sample post from ${c.platform}") }) { r ->
                                     r.onSuccess { status = "collected one item from ${c.platform} — it now feeds training" }
@@ -1325,7 +1325,7 @@ private fun SocialPanel(vm: StudioViewModel) {
                                 }
                             }
                         } else {
-                            SmallAction("Publish update") {
+                            SmallAction(L10n.t("ncon.publish.update", vm.language)) {
                                 vm.call({ ApiClient.socialPublish(c.id, vm.token!!,
                                     "An update from my synthetic profile.") }) { r ->
                                     r.onSuccess { status = "published to ${c.platform}" }
@@ -1392,7 +1392,7 @@ private fun AppsPanel(vm: StudioViewModel) {
                     Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        SmallAction("Collect") {
+                        SmallAction(L10n.t("ncon.collect", vm.language)) {
                             vm.call({ ApiClient.appCollect(c.id, vm.token!!,
                                 "sample context from ${c.app}") }) { r ->
                                 r.onSuccess { status = "collected from ${c.label} — it now feeds training" }
@@ -1400,7 +1400,7 @@ private fun AppsPanel(vm: StudioViewModel) {
                             }
                         }
                         c.capabilities.firstOrNull()?.let { cap ->
-                            SmallAction("Invoke $cap") {
+                            SmallAction(L10n.t("ncon.invoke", vm.language).replace("{cap}", cap)) {
                                 vm.call({ ApiClient.appInvoke(c.id, vm.token!!, cap) }) { r ->
                                     r.onSuccess { status = it.result }
                                         .onFailure { error = it.message }
@@ -1438,9 +1438,9 @@ fun ChatHubScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("Profile", "Stranger", "Rooms").forEachIndexed { i, t ->
+            listOf("nc.t.profile", "nc.t.stranger", "nc.rooms").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
-                    text = { Text(t, fontSize = 13.sp) })
+                    text = { Text(L10n.t(t, vm.language), fontSize = 13.sp) })
             }
         }
         Box(Modifier.weight(1f)) {
@@ -1533,9 +1533,9 @@ private fun StrangerPanel(vm: StudioViewModel) {
                 if (tier == "rated" && !vm.interactorVerified) {
                     Text(L10n.t("nc.rated.sub", vm.language),
                         color = Qrme.Amber, fontSize = 11.sp)
-                    labeledField("Birthdate", birthdate, "YYYY-MM-DD") { birthdate = it }
+                    labeledField(L10n.t("nw.birthdate", vm.language), birthdate, L10n.t("nw.birthdate.ph", vm.language)) { birthdate = it }
                 }
-                labeledField("Alias (optional)", alias, "Stranger") { alias = it }
+                labeledField(L10n.t("nc.alias.ph", vm.language), alias, L10n.t("nc.alias.example", vm.language)) { alias = it }
                 BrandButton(L10n.t(if (waiting) "nc.match.waiting" else "nc.match.find", vm.language),
                     enabled = tier != "rated" || vm.interactorVerified || birthdate.isNotBlank()) { join() }
             }
@@ -1567,9 +1567,9 @@ private fun StrangerPanel(vm: StudioViewModel) {
                             Text(L10n.t("nc.blocked", vm.language), color = Qrme.Red, fontSize = 10.sp)
                     }
                 }
-                labeledField("", draft, "Say something…") { draft = it }
+                labeledField("", draft, L10n.t("nc.say.ph", vm.language)) { draft = it }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SmallAction("Send") {
+                    SmallAction(L10n.t("nc.send", vm.language)) {
                         val text = draft
                         if (text.isNotBlank()) {
                             draft = ""; error = null
@@ -1614,8 +1614,8 @@ private fun RoomsPanel(vm: StudioViewModel) {
                 Text(L10n.t("nc.room.open", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(L10n.fill("nc.room.sub", vm.language, mapOf("name" to vm.displayName)),
                     color = Qrme.T2, fontSize = 12.sp)
-                labeledField("Topic", topic, "What's the room about?") { topic = it }
-                BrandButton("Open room", enabled = topic.isNotBlank(), busy = busy) {
+                labeledField(L10n.t("nc.topic.ph", vm.language), topic, L10n.t("nc.room.topic.ph", vm.language)) { topic = it }
+                BrandButton(L10n.t("nc.room.here", vm.language), enabled = topic.isNotBlank(), busy = busy) {
                     busy = true; error = null
                     withInteractor(vm, { error = it; busy = false }) { me ->
                         vm.call({ ApiClient.createRoom(topic, vm.pid!!, me) }) { r ->
@@ -1646,9 +1646,9 @@ private fun RoomsPanel(vm: StudioViewModel) {
                             color = if (m.content == null) Qrme.T3 else Qrme.Txt, fontSize = 13.sp)
                     }
                 }
-                labeledField("", draft, "Say something…") { draft = it }
+                labeledField("", draft, L10n.t("nc.say.ph", vm.language)) { draft = it }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SmallAction("Send") {
+                    SmallAction(L10n.t("nc.send", vm.language)) {
                         val text = draft
                         if (text.isNotBlank() && !busy) {
                             draft = ""; busy = true; error = null
@@ -1663,7 +1663,7 @@ private fun RoomsPanel(vm: StudioViewModel) {
                             }
                         }
                     }
-                    SmallAction("Let them talk") {
+                    SmallAction(L10n.t("nc.lettalk", vm.language)) {
                         if (!busy) {
                             busy = true; error = null
                             vm.call({ ApiClient.roomAdvance(
@@ -1689,9 +1689,9 @@ fun ManageScreen(vm: StudioViewModel) {
     Column(Modifier.fillMaxSize()) {
         ScrollableTabRow(selectedTabIndex = seg, containerColor = Qrme.Card,
             contentColor = Qrme.BrandA, edgePadding = 0.dp) {
-            listOf("General", "Summon", "Market", "Packs", "Gaming", "License", "Earn", "Sign", "Voice", "Desk", "Shop", "Corner", "People", "Counter", "Trade", "Deals").forEachIndexed { i, t ->
+            listOf("nmg.t.general", "nmg.t.summon", "nmg.t.market", "nmg.t.packs", "tab.gaming", "nmg.t.license", "nmg.t.earn", "nsig.sign", "nmg.t.voice", "nmg.t.desk", "nmg.t.shop", "nmg.t.corner", "nmg.t.people", "nmg.t.counter", "nmg.t.trade", "nmg.t.deals").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
-                    text = { Text(t, fontSize = 12.sp) })
+                    text = { Text(L10n.t(t, vm.language), fontSize = 12.sp) })
             }
         }
         Box(Modifier.weight(1f)) {
@@ -1756,7 +1756,7 @@ private fun EarningsPanel(vm: StudioViewModel) {
                     Text(s.byKind.entries.sortedBy { it.key }
                         .joinToString(" · ") { "${it.key.replace('_', ' ')}: ${money(it.value, s.currency)}" },
                         color = Qrme.T3, fontSize = 10.sp)
-                BrandButton("Request payout", enabled = s.accrued > 0) {
+                BrandButton(L10n.t("nmg.payout.request", vm.language), enabled = s.accrued > 0) {
                     error = null
                     vm.call({ ApiClient.requestPayout(vm.pid!!, vm.token!!) }) { r ->
                         r.onSuccess { receipt = it; reload() }
@@ -1847,8 +1847,8 @@ private fun GamingPanel(vm: StudioViewModel) {
                             .padding(horizontal = 10.dp, vertical = 6.dp))
                 }
             }
-            labeledField("Game title", game, "Halo Infinite") { game = it }
-            SmallAction("Start session") {
+            labeledField(L10n.t("ngam.game", vm.language), game, L10n.t("ngam.game.ph", vm.language)) { game = it }
+            SmallAction(L10n.t("ngam.start", vm.language)) {
                 if (game.isNotBlank()) {
                     error = null
                     vm.call({ ApiClient.startGameSession(vm.pid!!, vm.token!!,
@@ -1875,8 +1875,8 @@ private fun GamingPanel(vm: StudioViewModel) {
                     color = Qrme.T2, fontSize = 11.sp)
                 if (s.status == "active") {
                     if (openSession == s.id) {
-                        labeledField("Situation", situation,
-                            "enemy on the flag, low shields") { situation = it }
+                        labeledField(L10n.t("ngam.situation", vm.language), situation,
+                            L10n.t("ngam.situation.example", vm.language)) { situation = it }
                         Row(Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically) {
@@ -1886,7 +1886,7 @@ private fun GamingPanel(vm: StudioViewModel) {
                                 onCheckedChange = { minorPresent = it })
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            SmallAction("Call it") {
+                            SmallAction(L10n.t("ngam.callit", vm.language)) {
                                 if (situation.isNotBlank())
                                     vm.call({ ApiClient.gameCallout(s.id, vm.token!!,
                                         situation, minorPresent) }) { r ->
@@ -1944,8 +1944,8 @@ private fun SummonPanel(vm: StudioViewModel) {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("nmg.handle", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(L10n.t("nmg.handle.sub", vm.language), color = Qrme.T2, fontSize = 12.sp)
-            labeledField("Handle", handle, "rosa_the_gardener") { handle = it }
-            SmallAction("Claim") {
+            labeledField(L10n.t("nmg.f.handle", vm.language), handle, L10n.t("nmg.handle.example", vm.language)) { handle = it }
+            SmallAction(L10n.t("nmg.claim", vm.language)) {
                 if (handle.isNotBlank()) {
                     error = null
                     vm.call({ ApiClient.claimHandle(vm.pid!!, handle,
@@ -1962,9 +1962,9 @@ private fun SummonPanel(vm: StudioViewModel) {
             Text(L10n.t("nmg.beacons", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(L10n.t("nmg.beacons.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
-            labeledField("Label", label, "Rosa's garden bench") { label = it }
-            labeledField("Location (optional)", location, "the community garden") { location = it }
-            SmallAction("Place beacon") {
+            labeledField(L10n.t("ns.wm.label", vm.language), label, L10n.t("nmg.beacon.label.example", vm.language)) { label = it }
+            labeledField(L10n.t("nmg.h.location", vm.language), location, L10n.t("nmg.location.example", vm.language)) { location = it }
+            SmallAction(L10n.t("nmg.beacon.place", vm.language)) {
                 if (label.isNotBlank()) {
                     error = null
                     vm.call({ ApiClient.placeBeacon(vm.pid!!, label, location) }) { r ->
@@ -1981,7 +1981,7 @@ private fun SummonPanel(vm: StudioViewModel) {
             Text(L10n.t("nmg.beacon.scan", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(L10n.t("nmg.beacon.scan.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
-            SmallAction("Open scanner") { scanning = true }
+            SmallAction(L10n.t("nmg.beacon.scan.go", vm.language)) { scanning = true }
         }
 
         beacons.forEach { b ->
@@ -2003,8 +2003,8 @@ private fun SummonPanel(vm: StudioViewModel) {
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("nmg.trysummon", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            labeledField("Reference", ref, "@handle · #tag · beacon id") { ref = it }
-            SmallAction("Summon") {
+            labeledField(L10n.t("nmg.summon.ref", vm.language), ref, L10n.t("nmg.summon.ph", vm.language)) { ref = it }
+            SmallAction(L10n.t("nmg.t.summon", vm.language)) {
                 if (ref.isNotBlank()) {
                     error = null; found = null
                     vm.call({ ApiClient.summon(ref) }) { r ->
@@ -2053,10 +2053,10 @@ private fun MarketPanel(vm: StudioViewModel) {
             Text(L10n.t("nmg.list", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(L10n.t("nmg.list.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
-            labeledField("Title", title, "Rosa — gardening wisdom") { title = it }
-            labeledField("Blurb (optional)", blurb, "What makes it worth summoning?") { blurb = it }
-            labeledField("Tags, comma separated", tags, "gardening, herbs") { tags = it }
-            SmallAction("Create listing") {
+            labeledField(L10n.t("nmg.h.title", vm.language), title, L10n.t("nmg.title.example", vm.language)) { title = it }
+            labeledField(L10n.t("nmg.h.blurb", vm.language), blurb, L10n.t("nmg.blurb.ph", vm.language)) { blurb = it }
+            labeledField(L10n.t("nmg.h.tags", vm.language), tags, L10n.t("nmg.tags.example", vm.language)) { tags = it }
+            SmallAction(L10n.t("nmg.create", vm.language)) {
                 if (title.isNotBlank()) {
                     error = null; status = null
                     val tagList = tags.split(",").map { it.trim() }.filter { it.isNotEmpty() }
@@ -2094,8 +2094,8 @@ private fun MarketPanel(vm: StudioViewModel) {
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            labeledField("Filter by tag", filterTag, "gardening") { filterTag = it }
-            SmallAction("Browse") { reload() }
+            labeledField(L10n.t("nmg.f.tag", vm.language), filterTag, L10n.t("nmg.filter.tag.example", vm.language)) { filterTag = it }
+            SmallAction(L10n.t("nmg.browse", vm.language)) { reload() }
         }
 
         listings.forEach { l ->
@@ -2183,8 +2183,8 @@ private fun PacksPanel(vm: StudioViewModel) {
                 fontWeight = FontWeight.Bold)
             Text(L10n.t("nmg.packs.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
-            labeledField("Filter by industry", industry, "finance") { industry = it }
-            SmallAction("Browse") { reload() }
+            labeledField(L10n.t("nmg.f.industry", vm.language), industry, L10n.t("nmg.filter.industry.example", vm.language)) { industry = it }
+            SmallAction(L10n.t("nmg.browse", vm.language)) { reload() }
         }
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("nmg.packs.sources", vm.language), color = Qrme.Txt, fontSize = 14.sp,
@@ -2206,7 +2206,7 @@ private fun PacksPanel(vm: StudioViewModel) {
                     if (reg.synced >= reg.available)
                         Text(L10n.t("nmg.packs.synced", vm.language), color = Qrme.Green, fontSize = 12.sp,
                             fontWeight = FontWeight.Bold)
-                    else SmallAction("Sync") {
+                    else SmallAction(L10n.t("nmg.packs.sync", vm.language)) {
                         vm.call({ ApiClient.syncRegistry(reg.key) }) {
                             status = "${reg.name} synced — its packs joined the marketplace"
                             reload()
@@ -2296,11 +2296,11 @@ private fun LicensePanel(vm: StudioViewModel) {
                     )
                 }
             }
-            labeledField("Price (USD)", price, "0") { price = it }
-            labeledField("Terms (optional)", terms, "attribution required") { terms = it }
+            labeledField(L10n.t("nmg.h.price", vm.language), price, "0") { price = it }
+            labeledField(L10n.t("nmg.h.terms", vm.language), terms, L10n.t("nmg.terms.example", vm.language)) { terms = it }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                SmallAction("Set offer") {
+                SmallAction(L10n.t("nmg.setoffer", vm.language)) {
                     error = null
                     vm.call({ ApiClient.setLicense(vm.pid!!, vm.token!!, kind,
                         price.toDoubleOrNull() ?: 0.0, terms) }) { r ->
@@ -2874,7 +2874,7 @@ private fun CrowdBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         Text(L10n.t("crowd.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
         labeledField(L10n.t("crowd.target", lang), targetId, "") { targetId = it }
-        labeledField("kind", kind, "profiles | desks | posts | listings") { kind = it }
+        labeledField(L10n.t("nmg.f.kind", vm.language), kind, L10n.t("nmg.f.kind.ph", vm.language)) { kind = it }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BrandButton(L10n.t("crowd.like", lang), enabled = targetId.isNotBlank()) {
                 vm.call({ ApiClient.like(kind, targetId, vm.token!!) }) { r ->
@@ -5821,8 +5821,8 @@ private fun DeskPanel(vm: StudioViewModel) {
             Text(L10n.t("ndsk.open", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
             Text(L10n.t("ndsk.note", vm.language), color = Qrme.T2, fontSize = 12.sp)
-            labeledField("Desk id", deskId, "dsk_…") { deskId = it }
-            SmallAction("Open") { if (deskId.isNotBlank()) open = true }
+            labeledField(L10n.t("ndsk.id", vm.language), deskId, L10n.t("ndsk.id.ph", vm.language)) { deskId = it }
+            SmallAction(L10n.t("corner.open", vm.language)) { if (deskId.isNotBlank()) open = true }
         }
     }
 }

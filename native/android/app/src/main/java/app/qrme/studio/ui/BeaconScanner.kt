@@ -95,7 +95,7 @@ fun BeaconScannerScreen(onOpen: (String) -> Unit, onClose: () -> Unit,
                     color = Qrme.Txt, fontSize = 15.sp)
                 Text(L10n.t("nbcn.nothing", lang),
                     color = Qrme.T2, fontSize = 12.sp)
-                ScanAction("Close") { onClose() }
+                ScanAction(L10n.t("nbcn.close", lang)) { onClose() }
             }
         }
         return
@@ -245,7 +245,7 @@ private fun BeaconCameraSurface(onOpen: (String) -> Unit, onClose: () -> Unit) {
                     color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold)
             }
-            ScanAction(if (shown?.openUrl != null) "Open" else "Close") {
+            ScanAction(L10n.t(if (shown?.openUrl != null) "corner.open" else "nbcn.close", lang)) {
                 val url = shown?.openUrl
                 if (url != null) onOpen(url) else onClose()
             }

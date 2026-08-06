@@ -4,6 +4,58 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.6] — 2026-08-06
+
+### Every button on the Android shell was English, and both guards said otherwise
+
+Compose has no `Button(text)`. A button on these shells is a `Box` with a
+`Text` inside it, written once as a private composable and called by name —
+`SmallAction("Send")`, `BrandButton("Bind")`, `labeledField("Desk id", id,
+"dsk_…")`. The untranslated-screens rule's Kotlin pattern list was `Text(` and
+nothing else, so it read none of them, and this shell's record has been sitting
+at **2** for two releases with 80 English strings on it.
+
+    asked     does the string start a `Text(`
+    mattered  does the string end up inside one
+
+The rule now derives the constructs from the shell rather than naming one: a
+function with a `String` parameter whose body renders that parameter through
+`Text(` is, by construction, something that puts a string in front of a person,
+and the argument at that parameter's **position** is the string it puts there.
+Not `[A-Z]\w*` — `labeledField` and `cardRow` break the capitalization
+convention Compose composables usually follow — and not argument zero, because
+`labeledField` renders both its label and the grey prompt inside the box, which
+is where these screens keep their examples.
+
+### The prune this round was going to make, withdrawn
+
+0.47.5 recorded **540 rows** translated into ten languages that nothing asks
+for, and said the way to work them off is by reading each one, because some are
+rows a screen *should* be asking for. This round read them, grouped them, and
+assembled a prune of 366 — rows for screens another shell has and this one does
+not. That prune ran, and was then withdrawn.
+
+**59 of the 154 rows it deleted from the Android table were strings still
+hardcoded on that shell.** `nmg.t.general` through `nmg.t.deals` — the sixteen
+labels of the Manage tab strip — were among them, sitting one line away from a
+`listOf("General", "Summon", "Market", …)` that put them on screen in English.
+14 of 133 on Windows were the same. The two guards shared one blind spot, so
+the screens read as asking for nothing and the rows read as asked for by
+nobody, and the second reading is what the delete was built on.
+
+    asked     is this row asked for
+    mattered  is this row asked for *by a call this guard can read*
+
+So the number came down by wiring instead: **91 call sites** now go through
+`L10n`, **33 rows** were added for the ones no table held, and the four
+segmented tab strips resolve keys instead of naming their screens in English.
+**540 to 350**, and no row deleted.
+
+The rule this round earned, written into the record file: *a row that looks
+dead is evidence about the guard before it is evidence about the row.*
+
+Cut together with JIM-mini and PDI at app-v0.47.6.
+
 ## [0.47.5] — 2026-08-06
 
 ### Three screens titled with their own key names

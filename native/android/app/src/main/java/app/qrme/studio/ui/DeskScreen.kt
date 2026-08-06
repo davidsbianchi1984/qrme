@@ -177,8 +177,8 @@ fun DeskScreen(deskId: String, callerId: String? = null,
 
             if (c.bellAvailable) {
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    labeledField("Anything they should know? (optional)", note,
-                        "need a key cut") { note = it }
+                    labeledField(L10n.t("ndsk.note.ph", lang), note,
+                        L10n.t("ndsk.needkey", lang)) { note = it }
                     Box(
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
                             .background(Qrme.BrandA)
@@ -336,9 +336,9 @@ fun DeskScreen(deskId: String, callerId: String? = null,
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(L10n.t("desk.counter.staff", L10n.deviceLanguage()), color = Qrme.Txt, fontSize = 14.sp,
                 fontWeight = FontWeight.Bold)
-            labeledField(L10n.t("desk.counter.staff.token", L10n.deviceLanguage()), deskToken, "dsk_…") { deskToken = it }
+            labeledField(L10n.t("desk.counter.staff.token", L10n.deviceLanguage()), deskToken, L10n.t("ndsk.id.ph", lang)) { deskToken = it }
             if (deskToken.isNotBlank()) {
-                labeledField(L10n.t("desk.counter.staff.caller", L10n.deviceLanguage()), newCallerId, "usr_…") { newCallerId = it }
+                labeledField(L10n.t("desk.counter.staff.caller", L10n.deviceLanguage()), newCallerId, L10n.t("ndsk.caller.ph", lang)) { newCallerId = it }
                 Text(L10n.t("desk.counter.staff.open", L10n.deviceLanguage()), color = Qrme.Green, fontSize = 12.sp,
                     modifier = Modifier.clickable {
                         scope.launch {
@@ -355,9 +355,9 @@ fun DeskScreen(deskId: String, callerId: String? = null,
                     Text("${session.callerId} · ${session.status}",
                         color = Qrme.T2, fontSize = 12.sp)
                     if (session.status == "open") {
-                        labeledField(L10n.t("desk.counter.staff.target", L10n.deviceLanguage()), offerTarget, "their laptop") { offerTarget = it }
+                        labeledField(L10n.t("desk.counter.staff.target", L10n.deviceLanguage()), offerTarget, L10n.t("ndsk.computer.ph", lang)) { offerTarget = it }
                         labeledField(L10n.t("desk.counter.staff.scope", L10n.deviceLanguage()), offerScope,
-                            "printer driver only") { offerScope = it }
+                            L10n.t("ndsk.program.ph", lang)) { offerScope = it }
                         Text(L10n.t("desk.counter.staff.offer", L10n.deviceLanguage()), color = Qrme.Green,
                             fontSize = 11.sp,
                             modifier = Modifier.clickable {
