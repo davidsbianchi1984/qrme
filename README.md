@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.47.7** ([changelog](CHANGELOG.md) ·
+**Current release: v0.47.8** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.47.8** | Cut together with the other two at one version; the round's work is PDI's Transfers screen |
 | **0.47.7** | **The other two syntaxes** — 0.47.6 derived the label rule for Kotlin and left Swift at eight hard-coded constructs and XAML at four attributes; the Windows code-behind sets half its labels by assignment, which `Text="` cannot match, so 91 call sites across nine shells were invisible |
 | **0.47.6** | **Every button on the Android shell was English** — Compose has no `Button(text)`, so the untranslated rule's `Text(` pattern read none of them; the rule now derives label-bearing functions and their argument positions from the shell, 91 call sites wired, and this round's 366-row prune withdrawn because 59 of its deletions were rows the shell should ask for (540 → 350) |
 | **0.47.5** | **Three screens titled with their own key names** — the dead-key guard ported from JIM-mini found `tab.compose`, `tab.posts` and `tab.robots` missing from the Android table, so those headings rendered the key; plus 540 dead rows recorded and ratcheted |
