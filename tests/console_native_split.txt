@@ -1,4 +1,4 @@
-# status: backlog — 26 rows
+# status: backlog — 24 rows
 #
 # English strings held by both the desktop console's table and a shell's, on
 # which no console row and no native row share a wording. Checked by
@@ -67,12 +67,21 @@
 #     jobs, recorded in `native_split_wordings.txt` for the same reason.
 #   * *Withdraw*. Reflexive on the console's exchange screen, transitive on the
 #     phone's people screen.
-#   * two rows on a third axis this round did not open: `action.sign_out` and
-#     `nc.t.stranger` disagree **between the shells**, not with the console, so
-#     no single native wording exists to adopt. The three native tables have
-#     never been compared with each other either. That is the next bite.
+#   * **Corrected in 0.48.2.** Two rows were recorded here as cases where the
+#     three shells disagree with each other, leaving no native wording to
+#     adopt. Only one of them was: `action.sign_out` really did read *Sair* on
+#     the phones and *Terminar sessão* on the desktop shell, and is now
+#     *Terminar sessão* everywhere — the pt-PT phrase for ending a session,
+#     where *Sair* means leave. **`nc.t.stranger` was not.** Both its keys are
+#     Android-only and agree with each other, so a native wording had been
+#     available the whole time; the row was a plain console disagreement
+#     misfiled as a harder one, and it is reconciled rather than recorded.
 #
-# ceiling: 26
+#     The third axis itself is now measured and closed —
+#     `test_the_three_shells_say_the_same_thing.py`, zero rows in all three
+#     products.
+#
+# ceiling: 24
 ios: vce.sayit :: nvoi.say  ("Say something in it")
 ios: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
 ios: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
@@ -83,7 +92,6 @@ ios: liv.wearit :: embl.set  ("Wear it")
 ios: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
 android: vce.sayit :: nvoi.say  ("Say something in it")
 android: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
-android: str.stranger :: nc.alias.example,nc.t.stranger  ("Stranger")
 android: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
 android: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
 android: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
@@ -92,7 +100,6 @@ android: liv.wearit :: embl.set  ("Wear it")
 android: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
 windows: vce.sayit :: nvoi.say  ("Say something in it")
 windows: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
-windows: signout :: action.sign_out  ("Sign out")
 windows: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
 windows: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
 windows: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")

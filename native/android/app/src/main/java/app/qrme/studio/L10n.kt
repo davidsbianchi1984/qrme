@@ -186,7 +186,7 @@ object L10n {
             "ja" to "翻訳", "zh" to "翻译", "hi" to "अनुवाद", "ar" to "ترجمة"),
         "action.sign_out" to mapOf(
             "en" to "Sign out", "es" to "Cerrar sesión", "fr" to "Se déconnecter",
-            "de" to "Abmelden", "pt" to "Sair", "it" to "Esci",
+            "de" to "Abmelden", "pt" to "Terminar sessão", "it" to "Esci",
             "ja" to "サインアウト", "zh" to "退出登录", "hi" to "साइन आउट",
             "ar" to "تسجيل الخروج"),
         "action.refresh" to mapOf(

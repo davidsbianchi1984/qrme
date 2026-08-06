@@ -4,6 +4,52 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.48.2] — 2026-08-06
+
+### The third axis, and how small it turned out to be
+
+0.48.0 compared keys inside one table. 0.48.1 compared the console's table with
+each shell's. Both rounds ended by naming the same gap: rows they could not
+reconcile because **the three shells disagreed with each other**, leaving no
+native wording for the console to adopt. Nothing had ever compared the shells.
+
+Measured for the first time, the axis holds almost nothing:
+
+| | same key, 2+ shells | disagreeing | same English, all three | with no shared wording |
+|---|---|---|---|---|
+| QRME | 1056 | **1** | 972 | **1** |
+| JIM-mini | 261 | 0 | 204 | **3** |
+| PDI | 51 | 0 | 47 | 0 |
+
+Four rows across three products, and `action.sign_out` in Portuguese was
+QRME's: the phones said *Sair*, the Windows shell *Terminar sessão*. *Sair* is
+*leave*; ending a session in pt-PT is *terminar sessão*, so the odd shell out
+was the correct one and the other two moved to it.
+
+Saying that plainly is the point. Two rounds pointed here as the next large
+thing and it is not large, and a guard built expecting otherwise would have
+been built to find far more than exists.
+
+### A correction to 0.48.1's record
+
+`console_native_split.txt` recorded two rows as third-axis cases. **Only one
+was.** `nc.t.stranger`'s two keys are Android-only and agree with each other,
+so a native wording had been available the whole time — the row was a plain
+console disagreement misfiled as a harder one. It is reconciled rather than
+recorded, and the record says so. QRME's console split went 26 → 24 rows,
+JIM-mini's 6 → 3.
+
+### Added
+
+- `tests/test_the_three_shells_say_the_same_thing.py` — per product, the keys
+  two shells share and disagree on, and the English strings all three hold with
+  no wording in common, matched exactly against `tests/native_shell_split.txt`.
+  Where two shells agree the third is the drift and follows them; where all
+  three differ there is no majority, the row is a judgement, and it is
+  recorded. Ported to JIM-mini and PDI in the same round.
+
+Cut together with JIM-mini and PDI at app-v0.48.2.
+
 ## [0.48.1] — 2026-08-06
 
 ### Two tables, one product, and nothing compared them

@@ -162,7 +162,7 @@ enum L10n {
                              "de": "Übersetzen", "pt": "Traduzir", "it": "Traduci",
                              "ja": "翻訳", "zh": "翻译", "hi": "अनुवाद", "ar": "ترجمة"],
         "action.sign_out": ["en": "Sign out", "es": "Cerrar sesión", "fr": "Se déconnecter",
-                            "de": "Abmelden", "pt": "Sair", "it": "Esci",
+                            "de": "Abmelden", "pt": "Terminar sessão", "it": "Esci",
                             "ja": "サインアウト", "zh": "退出登录", "hi": "साइन आउट",
                             "ar": "تسجيل الخروج"],
         "action.refresh": ["en": "Refresh", "es": "Actualizar", "fr": "Actualiser",

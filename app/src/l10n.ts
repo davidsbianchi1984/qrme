@@ -695,7 +695,7 @@ const CHROME: Table = {
   },
   "signout": {
     en: "Sign out", es: "Cerrar sesión", fr: "Se déconnecter", de: "Abmelden",
-    pt: "Sair", it: "Esci", ja: "サインアウト", zh: "退出登录",
+    pt: "Terminar sessão", it: "Esci", ja: "サインアウト", zh: "退出登录",
     hi: "साइन आउट", ar: "تسجيل الخروج",
   },
 
@@ -5500,7 +5500,7 @@ const CHROME: Table = {
     en: "Talking to {who}. That is the name they chose, and all either of you gets.", es: "Hablando con {who}. Ese es el nombre que eligió, y todo lo que cualquiera de los dos obtiene.", fr: "Vous parlez à {who}. C'est le nom qu'il a choisi, et tout ce que l'un ou l'autre obtient.", de: "Sie sprechen mit {who}. Das ist der Name, den sie gewählt haben, und alles, was jeder von Ihnen bekommt.", pt: "A falar com {who}. É esse o nome que escolheram, e tudo o que qualquer um de vocês obtém.", it: "Stai parlando con {who}. È il nome che ha scelto, e tutto ciò che ciascuno di voi ottiene.", ja: "{who} と話しています。それは相手が選んだ名前であり、互いに得られるのはそれだけです。", zh: "正在与 {who} 交谈。那是对方自己选的名字，也是你们彼此能得到的全部。", hi: "{who} से बात हो रही है। यही वह नाम है जो उन्होंने चुना, और आप दोनों में से किसी को बस इतना ही मिलता है।", ar: "تتحدث إلى {who}. هذا هو الاسم الذي اختاروه، وكل ما يناله أيٌّ منكما.",
   },
   "str.stranger": {
-    en: "Stranger", es: "Desconocido", fr: "Inconnu", de: "Fremd", pt: "Desconhecido", it: "Sconosciuto", ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी", ar: "غريب",
+    en: "Stranger", es: "Desconocido", fr: "Inconnu", de: "Fremder", pt: "Estranho", it: "Sconosciuto", ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी", ar: "غريب",
   },
   "str.refresh": {
     en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "حدّث",
