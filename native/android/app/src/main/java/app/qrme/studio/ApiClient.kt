@@ -1009,9 +1009,14 @@ object ApiClient {
     // ---- knowledge packs: buy/download expertise for the profile ----
 
     suspend fun packs(industry: String?): List<Pack> {
-        val path = if (industry.isNullOrBlank()) "/packs"
-        else "/packs?industry=" + java.net.URLEncoder.encode(industry, "UTF-8")
-        val arr = JSONArray(request(path))
+        // The path literal at the call site rather than one statement away in
+        // a `val path`. The route audit reads a call's arguments, and cannot
+        // follow a variable — so both spellings of this path read as no call
+        // at all, and `GET /packs` looked like a door Android did not have.
+        val arr = JSONArray(
+            if (industry.isNullOrBlank()) request("/packs")
+            else request("/packs?industry=" +
+                         java.net.URLEncoder.encode(industry, "UTF-8")))
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             Pack(o.getString("id"), o.optString("industry", ""),
@@ -1097,9 +1102,11 @@ object ApiClient {
     }
 
     suspend fun listings(tag: String?): List<Listing> {
-        val path = if (tag.isNullOrBlank()) "/marketplace/listings"
-        else "/marketplace/listings?tag=" + java.net.URLEncoder.encode(tag, "UTF-8")
-        val arr = JSONArray(request(path))
+        // Inlined for the same reason as `packs` above.
+        val arr = JSONArray(
+            if (tag.isNullOrBlank()) request("/marketplace/listings")
+            else request("/marketplace/listings?tag=" +
+                         java.net.URLEncoder.encode(tag, "UTF-8")))
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             val tagsArr = o.optJSONArray("tags")

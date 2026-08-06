@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.47.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.47.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.47.3** | A guard on the route audit itself — every path literal must sit inside a call shape it knows, or be recorded as not a request; found two Android calls here written one statement away from the call site |
 | **0.47.2** | The PaneFooter sign-out bug found and fixed here at 0.46.9 was never carried to the sibling — it is now, along with JIM's Family and Connect screens (386 → 229) |
 | **0.47.1** | The ternary blind spot was in all three products — widening ported to JIM and PDI, which were understating by 40 and 12 |
 | **0.47.0** | **The ternary hid the sentence, and then the floor** — a string chosen by a condition was invisible to the native-shell measurement, hiding the signing screen's *"Verifies"*, the voice-enrolment gate and the desk's *"Ring the bell"* on all three shells; the count corrected 68 → 125 and then run to 7, none of which is English |

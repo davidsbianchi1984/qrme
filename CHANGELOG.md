@@ -4,6 +4,33 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.3] — 2026-08-06
+
+### The literal one statement away from the call
+
+`clientpaths.py` is byte-identical in all three repos by design, so the new
+guard-on-guard it gained this round runs here too — and found two calls this
+shell's Android client makes that the route audit could not see:
+
+    val path = if (industry.isNullOrBlank()) "/packs"
+    else "/packs?industry=" + enc(industry)
+    val arr = JSONArray(request(path))
+
+The audit reads a call's arguments and cannot follow a variable, so both
+spellings of the path read as no call at all. Fixed at the call site rather
+than by teaching the extractor to chase assignments — a path spelled where it
+is sent is easier for a person to read too. `/marketplace/listings` was the
+same shape.
+
+This repo's doorless records have been at zero since 0.44.2, so nothing was
+inflated here; what was blind was the *refusal* check, which cannot notice a
+client asking for a route under the wrong verb if it cannot see the call.
+
+Two path literals stay recorded as deliberate non-calls: `DeskViewUrl` and the
+signing-ceremony URL both return an address for something else to open.
+
+Cut together with JIM-mini and PDI at app-v0.47.3.
+
 ## [0.47.2] — 2026-08-06
 
 ### The fix I found here and did not carry

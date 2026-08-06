@@ -159,36 +159,20 @@ IOS = Language(
     re.compile(r'"(/[^"\n]*)"'),
     (CallForm(re.compile(r"\brequest\s*(?:<[^>]*>)?\s*\("),
               verb_in_body=re.compile(r'method:\s*"([A-Z]+)"')),
-     # The image-URL form. A route answering **bytes** — a QR sticker, a
-     # still of a desk — is not fetched through the JSON helper: the shell
-     # builds a URL and hands it to an image view, which does the GET
-     # itself. That is a door in every sense a person cares about, and the
-     # `request(`-only rule could not see it.
-     #
-     # This is the third time this exact lesson has come round. Android's
-     # `URL(` form is here for it (the comment below says so), PDI's ported
-     # verb assumption was the second, and the count that produced this one
-     # said two live image doors were absent.
+     # The direct-URLRequest form: `base.appendingPathComponent("/…")`
+     # wrapped in a `URLRequest` with `req.httpMethod = "DELETE"` set two
+     # lines down — Swift's spelling of the idiom Kotlin's `URL(` form
+     # below already reads `requestMethod` for. QRME's copy of this rule
+     # was first written `verb="GET"` ("a URL built this way is a URL to
+     # read") and its own suite falsified that within the hour, so the rule
+     # arrives here with its premise: the verb is read, never assumed.
      #
      #     asked     does the shell call the transport helper for this route
      #     mattered  does the shell fetch this route at all
      #
-     # This form was first declared `verb="GET"` with the reasoning that a
-     # URL built this way is a URL to *read*, "and nothing in these shells
-     # writes that way". One shell did: `removeListing` wraps the same call
-     # in a `URLRequest` and sets `req.httpMethod = "DELETE"` two lines
-     # down — Swift's spelling of the exact idiom Kotlin's `URL(` form
-     # below already learned to read `requestMethod` for. The full suite
-     # caught it within the hour: a phantom `GET /marketplace/listings/{id}`
-     # against a DELETE-only route, the ported-assumption failure again,
-     # this time ported from one rule to its neighbour inside a single file.
-     #
-     #     asked     is every URL built this way handed to an image view
-     #     mattered  what verb does *this* call site actually send
-     #
-     # So the verb is read, exactly as Kotlin's is. Absent, GET stands —
-     # which is URLSession's own default for a bare URL, so the fallback is
-     # the platform's answer rather than a guess.
+     # Without it this audit could not see the call at all, and said so the
+     # quiet way: a live door sat on the ios doorless record as work to do.
+     # Absent a verb, GET stands — URLSession's own default for a bare URL.
      CallForm(re.compile(r"\bappendingPathComponent\s*\("), verb_after=400,
               verb_in_body=re.compile(
                   r'httpMethod\s*=\s*"(GET|POST|PUT|PATCH|DELETE)"')),),
@@ -232,7 +216,19 @@ ANDROID = Language(
      # the platform's answer rather than a guess.
      CallForm(re.compile(r"\bURL\s*\("), verb_after=400,
               verb_in_body=re.compile(
-                  r'requestMethod\s*=\s*"(GET|POST|PUT|PATCH|DELETE)"')),),
+                  r'requestMethod\s*=\s*"(GET|POST|PUT|PATCH|DELETE)"')),
+     # A third form, found by `unattributed()` on the day it was written: a
+     # named helper wrapping the direct connection, so the URL is built from a
+     # parameter and the path literal sits at the *caller*. `getArray` is one
+     # of these — it exists because a route answering a JSON array cannot use
+     # `request()`, which returns a JSONObject.
+     #
+     # No verb is read, and that is not the ported assumption the form above
+     # was corrected for. This helper sets no `requestMethod` at all, so the
+     # request is whatever HttpURLConnection sends by default, which is GET.
+     # The fallback is the platform's answer about this helper rather than a
+     # claim about the shell it was written in.
+     CallForm(re.compile(r"\bgetArray\s*\(")),),
 )
 # C# names the verb in the helper. `Send<Post>(Post(...))` is not ambiguous
 # here: the model type is followed by `>`, never by `(`.
@@ -476,6 +472,68 @@ def calls(lang: Language) -> dict[tuple[str, str], tuple[str, str]]:
                 found.setdefault((verb or form.default, path),
                                  (str(f.relative_to(REPO)), raw))
     return found
+
+
+def unattributed(lang: Language) -> list[str]:
+    """Every path literal this surface writes that no known call form encloses.
+
+    Four times now an extractor here has read one shape of call and reported a
+    new shape as no call at all: the nested template, the `<img src>`, the
+    `reqText` helper, and Android's direct-connection form. Each was found by
+    somebody going to build a door that already existed. The comment above
+    :func:`paths` says why that is the quiet failure — *an invention is found
+    only by somebody going to do the work and finding it done* — and then this
+    file went on relying on somebody doing exactly that.
+
+        asked     does the extractor understand the calls it knows about
+        mattered  does the extractor know about all the calls
+
+    So: rather than enumerate the blind spots as they are discovered, ask the
+    question that finds them. Every path-shaped literal is either inside a call
+    form's arguments — in which case :func:`calls` has seen it — or it is not,
+    and then it is one of two things. A path written but not requested here (a
+    URL handed to an image view, a link somebody clicks, a regex that happens
+    to look like a path), which belongs in the record beside this check. Or a
+    request the audit is blind to, which is a door the backlog is about to call
+    missing.
+
+    Two shapes turned up the first time this ran, both real:
+
+    * `getArray("/goals/$uid", token)` — a private helper in this shell's
+      Android client that opens its own connection. Six routes with working
+      doors sat in that shell's doorless backlog. They were not *entirely*
+      invisible, which is why no earlier check could have noticed: each path
+      was attributed under its **write** verb, from the `request(path, "POST",
+      …)` beside it, and only the GET was missing. A path-level comparison
+      reads that as covered.
+    * `val path = if (…) "/packs" else "/packs?industry=" + enc(x)` followed by
+      `request(path)` — the literal is one statement away from the call.
+
+    Comments are stripped with their newlines kept, so the positions this reads
+    are the ones in the file rather than the ones left after stripping.
+    """
+    out: list[str] = []
+    if not lang.root.exists():
+        return out
+    for f in sorted(lang.root.rglob("*")):
+        if f.suffix not in lang.suffixes or not f.is_file():
+            continue
+        text = _COMMENTS.sub(lambda m: "\n" * m.group(0).count("\n"),
+                             f.read_text(encoding="utf-8"))
+        bodies: list[tuple[int, int]] = []
+        for form in lang.calls:
+            for m in form.opener.finditer(text):
+                body = _call_body(text, m.end() - 1, form.delims)
+                if body:
+                    bodies.append((m.end(), m.end() + len(body)))
+        for m in lang.literal.finditer(text):
+            lit = next(g for g in m.groups() if g is not None)
+            if not _usable(normalise(lit, lang)):
+                continue
+            if any(s <= m.start() and m.end() <= e for s, e in bodies):
+                continue
+            out.append(f"{lang.name}: {f.relative_to(REPO)}  {lit}")
+    return sorted(out)
 
 
 def resolves(app, path: str) -> bool:
