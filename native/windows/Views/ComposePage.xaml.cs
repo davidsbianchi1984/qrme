@@ -6,7 +6,21 @@ namespace QrmeStudio.Views;
 
 public sealed partial class ComposePage : Page
 {
-    public ComposePage() => InitializeComponent();
+    public ComposePage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Title.Text = L10n.T("tab.compose", lang);
+        Sub.Text = L10n.T("ncmp.sub", lang);
+        TopicBox.Header = L10n.T("ncmp.topic", lang);
+        TopicBox.PlaceholderText = L10n.T("ncmp.topic.ph", lang);
+        SendButton.Content = L10n.T("ncmp", lang);
+    }
 
     private async void OnCompose(object sender, RoutedEventArgs e)
     {

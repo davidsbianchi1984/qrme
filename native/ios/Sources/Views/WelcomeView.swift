@@ -118,7 +118,8 @@ struct WelcomeView: View {
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }.padding(.top, 4)
 
-                Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app")
+                Text(L10n.fill("nov.backend", lang,
+                               ["command": "QRME_CORS_ORIGINS=* uvicorn qrme.api:app"]))
                     .font(.system(size: 10, design: .monospaced)).foregroundStyle(Theme.t3)
             }.padding(20)
         }

@@ -11,13 +11,13 @@ struct ComposeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Compose").font(.title2.bold()).foregroundStyle(Theme.txt)
-                Text("Give a topic — your profile writes a post in its own voice.")
+                Text(L10n.t("tab.compose", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
+                Text(L10n.t("ncmp.sub", state.language))
                     .font(.footnote).foregroundStyle(Theme.t2)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Topic").font(.subheadline).foregroundStyle(Theme.txt)
-                    TextField("What should it post about?", text: $topic, axis: .vertical)
+                    Text(L10n.t("ncmp.topic", state.language)).font(.subheadline).foregroundStyle(Theme.txt)
+                    TextField(L10n.t("ncmp.topic.ph", state.language), text: $topic, axis: .vertical)
                         .lineLimit(2...4).foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
@@ -25,7 +25,7 @@ struct ComposeView: View {
                 }.card()
 
                 Button(action: send) {
-                    HStack { if busy { ProgressView().tint(.white) }; Text("Compose post").bold() }
+                    HStack { if busy { ProgressView().tint(.white) }; Text(L10n.t("ncmp", state.language)).bold() }
                         .frame(maxWidth: .infinity).padding(.vertical, 14)
                         .background(Theme.brand).foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 13))
@@ -43,7 +43,7 @@ struct ComposeView: View {
                         Text(p.content ?? "· held for review ·")
                             .font(.subheadline).foregroundStyle(Theme.txt)
                         if let prov = p.provenance {
-                            ProvenanceFooter(provenance: prov)
+                            ProvenanceFooter(provenance: prov, lang: state.language)
                         }
                     }.card()
                 }

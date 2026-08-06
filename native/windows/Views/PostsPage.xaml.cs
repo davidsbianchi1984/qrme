@@ -10,7 +10,19 @@ public sealed partial class PostsPage : Page
 {
     public record PostRow(string Status, string Content, string Mark);
 
-    public PostsPage() => InitializeComponent();
+    public PostsPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Title.Text = L10n.T("tab.posts", lang);
+        Sub.Text = L10n.T("npst.sub", lang);
+        Empty.Text = L10n.T("npst.none", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {

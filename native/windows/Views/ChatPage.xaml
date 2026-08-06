@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Spacing="6">
-            <TextBlock Text="Chat" FontSize="22" FontWeight="Bold"
+            <TextBlock x:Name="Title" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" />
             <TextBlock x:Name="Subtitle" Foreground="{StaticResource QrmeT2Brush}"
                        FontSize="13" TextWrapping="Wrap" />
@@ -41,15 +41,15 @@
             <!-- Spec clauses 2/12 — advisor counsels, collaborator co-creates,
                  operator executes. "Read my prompt" is the honest default: the
                  profile infers from the wording and the reply says which. -->
-            <ComboBox x:Name="RoleBox" Header="How should they work this turn?"
+            <ComboBox x:Name="RoleBox"
                       HorizontalAlignment="Stretch" SelectedIndex="0" />
             <Grid ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="DraftBox" Grid.Column="0" PlaceholderText="Say something…" />
-                <Button x:Name="SendButton" Grid.Column="1" Content="Send" Height="36"
+                <TextBox x:Name="DraftBox" Grid.Column="0" />
+                <Button x:Name="SendButton" Grid.Column="1" Height="36"
                         Foreground="White" Click="OnSend">
                     <Button.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">

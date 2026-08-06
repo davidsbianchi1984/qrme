@@ -4,13 +4,29 @@ import SwiftUI
 /// connections, the connected-apps catalog, and robotic embodiment — behind
 /// one tab so the bar stays at five.
 struct ConnectView: View {
-    enum Tab: String, CaseIterable { case social = "Social", apps = "Apps", robots = "Robots", shop = "Shops", corner = "Corner", people = "People" }
+    /// Raw values are the section names; the words come from the table. They
+    /// were the same string until this round, which is how a translated tab
+    /// bar ended up with an English tab bar directly under it — the third
+    /// picker of exactly this shape in three releases.
+    enum Tab: String, CaseIterable {
+        case social, apps, robots, shop, corner, people
+
+        var key: String {
+            switch self {
+            case .social: return "ncon.tab.social"
+            case .apps: return "ncon.tab.apps"
+            case .shop: return "tab.shops"
+            default: return "tab.\(rawValue)"
+            }
+        }
+    }
+    @EnvironmentObject var state: AppState
     @State private var tab: Tab = .social
 
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $tab) {
-                ForEach(Tab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(Tab.allCases, id: \.self) { Text(L10n.t($0.key, state.language)).tag($0) }
             }
             .pickerStyle(.segmented)
             .padding(.horizontal, 20).padding(.top, 12)
@@ -46,20 +62,20 @@ private struct SocialSection: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Social platforms").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Collect pulls the account's content in to grow the profile; publish runs the profile on the platform (moderated).")
+                    Text(L10n.t("ncon.social", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ncon.social.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     Picker("", selection: $platform) {
                         ForEach(platforms, id: \.self) { Text($0.capitalized).tag($0) }
                     }.pickerStyle(.menu).tint(Theme.brandA)
-                    TextField("handle (optional)", text: $handle)
+                    TextField(L10n.t("ncon.handle.ph", state.language), text: $handle)
                         .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
                     HStack(spacing: 8) {
-                        smallButton("Connect to collect") { connect("collect") }
-                        smallButton("Connect to publish") { connect("publish") }
+                        smallButton(L10n.t("ncon.to.collect", state.language)) { connect("collect") }
+                        smallButton(L10n.t("ncon.to.publish", state.language)) { connect("publish") }
                     }
                 }.card()
 
@@ -79,15 +95,15 @@ private struct SocialSection: View {
                              : "\(c.published) post(s) published")
                             .font(.caption).foregroundStyle(Theme.t2)
                         if c.status == "revoked" {
-                            Text("revoked").font(.caption).foregroundStyle(Theme.red)
+                            Text(L10n.t("nmg.revoked", state.language)).font(.caption).foregroundStyle(Theme.red)
                         } else {
                             HStack(spacing: 8) {
                                 if c.direction == "collect" {
-                                    smallButton("Collect sample") { collect(c) }
+                                    smallButton(L10n.t("ncon.collect.sample", state.language)) { collect(c) }
                                 } else {
-                                    smallButton("Publish update") { publish(c) }
+                                    smallButton(L10n.t("ncon.publish.update", state.language)) { publish(c) }
                                 }
-                                Button("Disconnect") { revoke(c) }
+                                Button(L10n.t("ncon.disconnect", state.language)) { revoke(c) }
                                     .font(.caption).foregroundStyle(Theme.red)
                             }
                         }
@@ -163,15 +179,15 @@ private struct AppsSection: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Connected apps").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Apple, Google, Microsoft, and Canva apps the profile's agents can collect from, act through, and produce with.")
+                    Text(L10n.t("ncon.apps", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("ncon.apps.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     ForEach(flat.prefix(12), id: \.key) { entry in
                         HStack {
                             Text(entry.label).font(.subheadline).foregroundStyle(Theme.txt)
                             Text(entry.provider).font(.caption).foregroundStyle(Theme.t3)
                             Spacer()
-                            Button("Connect") { connect(entry.provider, entry.app) }
+                            Button(L10n.t("tab.connect", state.language)) { connect(entry.provider, entry.app) }
                                 .font(.caption.bold()).foregroundStyle(Theme.brandA)
                         }
                     }
@@ -188,10 +204,10 @@ private struct AppsSection: View {
                             Text(c.provider).font(.caption).foregroundStyle(Theme.t3)
                         }
                         if c.status == "revoked" {
-                            Text("revoked").font(.caption).foregroundStyle(Theme.red)
+                            Text(L10n.t("nmg.revoked", state.language)).font(.caption).foregroundStyle(Theme.red)
                         } else {
                             HStack(spacing: 8) {
-                                smallButton("Collect") { collect(c) }
+                                smallButton(L10n.t("ncon.collect", state.language)) { collect(c) }
                                 if let cap = c.capabilities.first {
                                     smallButton("Invoke \(cap)") { invoke(c, cap) }
                                 }

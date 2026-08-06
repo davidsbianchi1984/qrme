@@ -30,6 +30,10 @@ public sealed partial class WelcomePage : Page
         PersonaBox.Header = L10n.T("nw.persona", _lang);
         PersonaBox.PlaceholderText = L10n.T("nw.persona.ph", _lang);
         KindBox.Header = L10n.T("nw.kind", _lang);
+        // The sentence is prose; the command is typed verbatim and is the
+        // same in every language, so it goes in as a value.
+        BackendHint.Text = L10n.Fill("nov.backend", _lang,
+            ("command", "QRME_CORS_ORIGINS=* uvicorn qrme.api:app"));
         foreach (var kind in _kinds)
         {
             KindBox.Items.Add(new ComboBoxItem {

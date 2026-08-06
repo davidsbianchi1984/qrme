@@ -9,20 +9,20 @@
         <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="8">
                 <Ellipse Width="9" Height="9" Fill="{StaticResource QrmeGreenBrush}" VerticalAlignment="Center" />
-                <TextBlock Text="Profile live" Foreground="{StaticResource QrmeGreenBrush}"
+                <TextBlock x:Name="LiveText" Foreground="{StaticResource QrmeGreenBrush}"
                            FontWeight="Bold" FontSize="12" />
             </StackPanel>
             <TextBlock x:Name="Greeting" FontSize="28" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
-            <TextBlock Text="Your synthetic profile, as the world sees it."
+            <TextBlock x:Name="Sub"
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="14" TextWrapping="Wrap" />
-            <Button x:Name="RefreshButton" Content="Refresh" Click="OnRefresh"
+            <Button x:Name="RefreshButton" Click="OnRefresh"
                     Background="Transparent" FontSize="12"
                     Foreground="{StaticResource QrmeBrandABrush}" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Public card" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="CardHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <ProgressRing x:Name="Loading" IsActive="True" Foreground="{StaticResource QrmeBrandABrush}"
                                   Width="24" Height="24" HorizontalAlignment="Left" />

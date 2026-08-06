@@ -20,6 +20,11 @@ public sealed partial class ShellPage : Page
         foreach (var entry in Nav.MenuItems)
             if (entry is NavigationViewItem nvi && nvi.Tag is string tag)
                 nvi.Content = L10n.T($"tab.{tag}");
+        // Not a menu item: this one sits in the pane footer, which the loop
+        // above does not walk. It said "Sign out" in every language until this
+        // round, while the row it needed had been in the iOS and Android
+        // tables since they were written.
+        SignOutButton.Content = L10n.T("action.sign_out");
     }
 
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

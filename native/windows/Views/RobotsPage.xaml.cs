@@ -19,11 +19,31 @@ public sealed partial class RobotsPage : Page
             Commands.Contains("say") ? Visibility.Visible : Visibility.Collapsed;
         public Visibility CleanVisibility =>
             Commands.Contains("clean") ? Visibility.Visible : Visibility.Collapsed;
+        public string SayLabel => L10n.T("nrob.say");
+        public string CleanLabel => L10n.T("nrob.clean");
+        public string PatrolLabel => L10n.T("nrob.patrol");
+        public string DockLabel => L10n.T("nrob.dock");
     }
 
     private RobotSpec[] _catalog = Array.Empty<RobotSpec>();
 
-    public RobotsPage() => InitializeComponent();
+    public RobotsPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Title.Text = L10n.T("tab.robots", lang);
+        Sub.Text = L10n.T("nrob.sub", lang);
+        ModelBox.Header = L10n.T("nrob.bind", lang);
+        BindButton.Content = L10n.T("nrob.bind.go", lang);
+        TopicBox.Header = L10n.T("nrob.topic", lang);
+        TopicBox.PlaceholderText = L10n.T("nrob.topic.ph", lang);
+        ResultHead.Text = L10n.T("nrob.result", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {

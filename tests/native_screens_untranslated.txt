@@ -56,6 +56,19 @@
 # India or Egypt. The sibling product settled this wording rounds ago. It now
 # says: contact your local crisis line or emergency services.
 
-ios: 80
-android: 43
-windows: 89
+# 0.46.9 took the six screens that exist on all three shells at once —
+# Overview, Compose, Posts, Connect, Robots and Study — rather than one shell
+# at a time, because working them one at a time is what produced the split
+# wordings this arc keeps finding.
+#
+# The sharpest thing it found is not in these numbers. The Windows shell's
+# Sign out button lives in NavigationView.PaneFooter, and LocalizeNav() walks
+# Nav.MenuItems — so it never reached it. The button that ends a session read
+# "Sign out" in every language, while the row it needed, `action.sign_out`,
+# had been in the iOS and Android tables since they were written. Android was
+# using it. iOS had it and hardcoded the English anyway. One control, three
+# states of done.
+
+ios: 34
+android: 12
+windows: 22

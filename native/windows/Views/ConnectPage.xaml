@@ -8,23 +8,23 @@
     <Pivot MaxWidth="680" Margin="20,12" Foreground="{StaticResource QrmeTxtBrush}">
 
         <!-- Social platform connections -->
-        <PivotItem Header="Social">
+        <PivotItem x:Name="SocialPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Social platforms" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="SocialHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Collect pulls the account's content in to grow the profile; publish runs the profile on the platform (moderated)."
+                            <TextBlock x:Name="SocialSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <ComboBox x:Name="PlatformBox" Header="Platform" HorizontalAlignment="Stretch" />
-                            <TextBox x:Name="HandleBox" Header="Handle (optional)" />
+                            <ComboBox x:Name="PlatformBox" HorizontalAlignment="Stretch" />
+                            <TextBox x:Name="HandleBox" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Connect to collect" Click="OnConnectCollect"
+                                <Button x:Name="CollectButton" Click="OnConnectCollect"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
-                                <Button Content="Connect to publish" Click="OnConnectPublish"
+                                <Button x:Name="PublishButton" Click="OnConnectPublish"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                             </StackPanel>
                         </StackPanel>
@@ -53,13 +53,13 @@
                                                    Foreground="{StaticResource QrmeT2Brush}" />
                                         <StackPanel Orientation="Horizontal" Spacing="8"
                                                     Visibility="{Binding ActiveVisibility}">
-                                            <Button Content="Collect sample" Tag="{Binding Id}" Click="OnCollect"
+                                            <Button Content="{Binding CollectLabel}" Tag="{Binding Id}" Click="OnCollect"
                                                     Visibility="{Binding CollectVisibility}"
                                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
-                                            <Button Content="Publish update" Tag="{Binding Id}" Click="OnPublish"
+                                            <Button Content="{Binding PublishLabel}" Tag="{Binding Id}" Click="OnPublish"
                                                     Visibility="{Binding PublishVisibility}"
                                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
-                                            <Button Content="Disconnect" Tag="{Binding Id}" Click="OnRevoke"
+                                            <Button Content="{Binding DisconnectLabel}" Tag="{Binding Id}" Click="OnRevoke"
                                                     Background="Transparent" FontSize="12"
                                                     Foreground="{StaticResource QrmeRedBrush}" />
                                         </StackPanel>
@@ -73,15 +73,15 @@
         </PivotItem>
 
         <!-- Connected-apps catalog -->
-        <PivotItem Header="Apps">
+        <PivotItem x:Name="AppsPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Connected apps" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="AppsHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Apple, Google, Microsoft, and Canva apps the profile's agents can collect from, act through, and produce with."
+                            <TextBlock x:Name="AppsSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
                             <ItemsControl x:Name="CatalogList">
@@ -98,7 +98,7 @@
                                                 <TextBlock Text="{Binding Provider}" FontSize="11"
                                                            Foreground="{StaticResource QrmeT2Brush}" />
                                             </StackPanel>
-                                            <Button Grid.Column="1" Content="Connect" Tag="{Binding Key}"
+                                            <Button Grid.Column="1" Content="{Binding ConnectLabel}" Tag="{Binding Key}"
                                                     Click="OnAppConnect" VerticalAlignment="Center"
                                                     Background="Transparent" FontSize="12"
                                                     Foreground="{StaticResource QrmeBrandABrush}" />
@@ -130,7 +130,7 @@
                                         </Grid>
                                         <StackPanel Orientation="Horizontal" Spacing="8"
                                                     Visibility="{Binding ActiveVisibility}">
-                                            <Button Content="Collect" Tag="{Binding Id}" Click="OnAppCollect"
+                                            <Button Content="{Binding AppCollectLabel}" Tag="{Binding Id}" Click="OnAppCollect"
                                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                                             <Button Content="{Binding InvokeLabel}" Tag="{Binding Id}" Click="OnAppInvoke"
                                                     Visibility="{Binding InvokeVisibility}"

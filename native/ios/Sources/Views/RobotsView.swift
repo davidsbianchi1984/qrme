@@ -16,19 +16,19 @@ struct RobotsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Robots").font(.title2.bold()).foregroundStyle(Theme.txt)
-                Text("Same persona · a physical body. Commands follow a per-body allowlist.")
+                Text(L10n.t("tab.robots", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
+                Text(L10n.t("nrob.sub", state.language))
                     .font(.footnote).foregroundStyle(Theme.t2)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Bind a robot").font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nrob.bind", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     Picker("", selection: $chosen) {
                         ForEach(catalog, id: \.model) {
                             Text("\($0.label) · \($0.maker)").tag($0.model)
                         }
                     }.pickerStyle(.menu).tint(Theme.brandA)
                     Button(action: bind) {
-                        HStack { if busy { ProgressView().tint(.white) }; Text("Bind").bold() }
+                        HStack { if busy { ProgressView().tint(.white) }; Text(L10n.t("nrob.bind.go", state.language)).bold() }
                             .frame(maxWidth: .infinity).padding(.vertical, 12)
                             .background(Theme.brand).foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -39,8 +39,8 @@ struct RobotsView: View {
 
                 if !robots.isEmpty {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Topic for \"say\"").font(.caption).foregroundStyle(Theme.t2)
-                        TextField("What should it speak about?", text: $topic)
+                        Text(L10n.t("nrob.topic", state.language)).font(.caption).foregroundStyle(Theme.t2)
+                        TextField(L10n.t("nrob.topic.ph", state.language), text: $topic)
                             .foregroundStyle(Theme.txt)
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
@@ -59,22 +59,22 @@ struct RobotsView: View {
                         HStack(spacing: 8) {
                             let cmds = r.commands ?? []
                             if cmds.contains("say") {
-                                actionButton("Say") { command(r, "say", topic) }
+                                actionButton(L10n.t("nrob.say", state.language)) { command(r, "say", topic) }
                             }
                             if cmds.contains("clean") {
-                                actionButton("Clean") { command(r, "clean", nil) }
+                                actionButton(L10n.t("nrob.clean", state.language)) { command(r, "clean", nil) }
                             }
                             if cmds.contains("patrol") {
-                                actionButton("Patrol") { command(r, "patrol", nil) }
+                                actionButton(L10n.t("nrob.patrol", state.language)) { command(r, "patrol", nil) }
                             }
-                            actionButton("Dock") { command(r, "dock", nil) }
+                            actionButton(L10n.t("nrob.dock", state.language)) { command(r, "dock", nil) }
                         }
                     }.card()
                 }
 
                 if let lastResult {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Result").font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("nrob.result", state.language)).font(.headline).foregroundStyle(Theme.txt)
                         Text(lastResult).font(.subheadline).foregroundStyle(Theme.txt)
                     }.card()
                 }

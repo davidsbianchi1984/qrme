@@ -9,7 +9,20 @@ public sealed partial class OverviewPage : Page
 {
     public record CardRow(string Label, string Value);
 
-    public OverviewPage() => InitializeComponent();
+    public OverviewPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Sub.Text = L10n.T("nov.sub", lang);
+        LiveText.Text = L10n.T("nov.live", lang);
+        RefreshButton.Content = L10n.T("nov.refresh", lang);
+        CardHead.Text = L10n.T("nov", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {

@@ -22,6 +22,9 @@ public sealed partial class ConnectPage : Page
             Collect ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PublishVisibility =>
             Collect ? Visibility.Collapsed : Visibility.Visible;
+        public string CollectLabel => L10n.T("ncon.collect.sample");
+        public string PublishLabel => L10n.T("ncon.publish.update");
+        public string DisconnectLabel => L10n.T("ncon.disconnect");
     }
 
     public sealed class CatalogVm
@@ -30,6 +33,7 @@ public sealed partial class ConnectPage : Page
         public string App { get; init; } = "";
         public string Label { get; init; } = "";
         public string Key => $"{Provider}|{App}";
+        public string ConnectLabel => L10n.T("tab.connect");
     }
 
     public sealed class AppConnVm
@@ -42,6 +46,7 @@ public sealed partial class ConnectPage : Page
         public Visibility ActiveVisibility =>
             Active ? Visibility.Visible : Visibility.Collapsed;
         public string InvokeLabel => $"Invoke {Capability}";
+        public string AppCollectLabel => L10n.T("ncon.collect");
         public Visibility InvokeVisibility =>
             Capability.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -56,7 +61,26 @@ public sealed partial class ConnectPage : Page
     private SocialConn[] _social = Array.Empty<SocialConn>();
     private AppConn[] _appConns = Array.Empty<AppConn>();
 
-    public ConnectPage() => InitializeComponent();
+    public ConnectPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        SocialPivot.Header = L10n.T("ncon.tab.social", lang);
+        AppsPivot.Header = L10n.T("ncon.tab.apps", lang);
+        SocialHead.Text = L10n.T("ncon.social", lang);
+        SocialSub.Text = L10n.T("ncon.social.sub", lang);
+        PlatformBox.Header = L10n.T("ngam.platform", lang);
+        HandleBox.Header = L10n.T("ncon.h.handle", lang);
+        CollectButton.Content = L10n.T("ncon.to.collect", lang);
+        PublishButton.Content = L10n.T("ncon.to.publish", lang);
+        AppsHead.Text = L10n.T("ncon.apps", lang);
+        AppsSub.Text = L10n.T("ncon.apps.sub", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {

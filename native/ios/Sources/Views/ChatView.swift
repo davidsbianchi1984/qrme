@@ -27,8 +27,8 @@ struct ChatView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Chat").font(.title2.bold()).foregroundStyle(Theme.txt)
-                        Text("Talk with \(state.displayName) — replies are in character and moderated.")
+                        Text(L10n.t("tab.chat", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
+                        Text(L10n.fill("nchat.sub", state.language, ["name": state.displayName]))
                             .font(.footnote).foregroundStyle(Theme.t2)
 
                         ForEach(messages) { m in
@@ -65,16 +65,16 @@ struct ChatView: View {
             // operator executes. "Read my prompt" is the honest default: the
             // profile infers from the wording and the reply says which.
             Picker("", selection: $role) {
-                Text("Read my prompt").tag("")
-                Text("Advisor").tag("advisor")
-                Text("Collaborator").tag("collaborator")
-                Text("Operator").tag("operator")
+                Text(L10n.t("nchat.role.read", state.language)).tag("")
+                Text(L10n.t("nchat.role.advisor", state.language)).tag("advisor")
+                Text(L10n.t("nchat.role.collaborator", state.language)).tag("collaborator")
+                Text(L10n.t("nchat.role.operator", state.language)).tag("operator")
             }
             .pickerStyle(.segmented)
             .padding(.horizontal, 20).padding(.bottom, 6)
 
             HStack(spacing: 10) {
-                TextField("Say something…", text: $draft)
+                TextField(L10n.t("nchat.type.ph", state.language), text: $draft)
                     .foregroundStyle(Theme.txt)
                     .padding(.horizontal, 12).padding(.vertical, 10)
                     .background(Theme.scrBot)

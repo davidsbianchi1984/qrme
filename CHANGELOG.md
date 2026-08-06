@@ -4,6 +4,56 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.9] — 2026-08-06
+
+### The button that ends the session
+
+Windows' Sign out sits in `NavigationView.PaneFooter`. `LocalizeNav()` walks
+`Nav.MenuItems`. It never reached it, so the control that ends a session read
+**Sign out** in every language the shell offers.
+
+The row it needed, `action.sign_out`, has been in the iOS and Android tables
+since they were written. Android was using it. iOS had it and hardcoded the
+English next to it anyway. Windows did not have the row at all — the appender
+this round added it to one table out of three, which is how the gap showed up
+in the arithmetic before it showed up in a screenshot.
+
+One control, three states of done. All three ask the table now.
+
+### The nav's English defaults are gone
+
+Every `NavigationViewItem` carried `Content="Overview"`, `Content="Chat"` and
+so on — dead markup, overwritten at construction. Not harmless: `L10n.T`
+returns the key when a key is missing, and a plausible English default hides
+that. A missing `tab.study` would have rendered "Study" and looked correct.
+Four items already carried no `Content` for exactly this reason. Now none do.
+
+### Six screens, three shells, one pass
+
+Overview, Compose, Posts, Connect, Robots and Study — taken together rather
+than one shell at a time, because one-shell-at-a-time is what produces the
+split wordings this arc keeps finding.
+
+**212 → 68.** iOS 80 → 34, Android 43 → 12, Windows 89 → 22.
+
+### Two more pickers rendering their own enum
+
+`ConnectView.Tab` and `StudioView.Tab` on iOS had raw values that were both
+the API-side section names and the words a reader sees — the same shape as
+`ManageView.Tab` last release, and the relationship dropdown three before
+that. Neither was visible to the ratchet, because the English lives in the
+enum rather than in a `Text(…)`.
+
+### One picker, two wordings
+
+The chat role picker says *Advisor — weigh it and recommend* and *Operator —
+just do it* on the console and on Windows; on iOS and Android it said
+*Advisor* and *Operator* and left the reader to guess. This is the control
+that decides whether a synthetic profile recommends something or goes and
+does it. The explaining wording wins, taken verbatim from the console table.
+
+Cut together with JIM-mini and PDI at app-v0.46.9.
+
 ## [0.46.8] — 2026-08-06
 
 ### The crisis number that only works in one country

@@ -7,18 +7,18 @@
 
     <ScrollViewer>
         <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
-            <TextBlock Text="Knowledge Excursions" FontSize="22" FontWeight="Bold"
+            <TextBlock x:Name="Title" FontSize="22" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" />
-            <TextBlock Text="Send your profile out to study. Private names are redacted from everything outbound; findings come home for you to fold in."
+            <TextBlock x:Name="Sub"
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBox x:Name="TopicBox" Header="Topic" PlaceholderText="e.g. container gardening" />
-                    <TextBox x:Name="QuestionBox" Header="Question" PlaceholderText="What should it find out?"
+                    <TextBox x:Name="TopicBox" />
+                    <TextBox x:Name="QuestionBox"
                              AcceptsReturn="True" TextWrapping="Wrap" Height="70" />
-                    <Button x:Name="StudyButton" Content="Go study" HorizontalAlignment="Stretch"
+                    <Button x:Name="StudyButton" HorizontalAlignment="Stretch"
                             Height="42" Foreground="White" Click="OnStudy">
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -49,10 +49,10 @@
                                            FontSize="12" Visibility="{Binding RedactedVisibility}" />
                                 <TextBlock Text="{Binding Findings}" Foreground="{StaticResource QrmeTxtBrush}"
                                            FontSize="13" TextWrapping="Wrap" />
-                                <TextBlock Text="✓ folded into the profile's knowledge"
+                                <TextBlock Text="{Binding FoldedLabel}"
                                            Foreground="{StaticResource QrmeGreenBrush}" FontSize="12"
                                            Visibility="{Binding LearnedVisibility}" />
-                                <Button Content="Fold into knowledge" Tag="{Binding Id}" Click="OnLearn"
+                                <Button Content="{Binding FoldLabel}" Tag="{Binding Id}" Click="OnLearn"
                                         Visibility="{Binding LearnVisibility}"
                                         Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
                             </StackPanel>

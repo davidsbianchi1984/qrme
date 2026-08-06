@@ -70,7 +70,7 @@
                            HorizontalAlignment="Center" />
             </StackPanel>
 
-            <TextBlock Text="Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app"
+            <TextBlock x:Name="BackendHint"
                        FontFamily="Consolas" FontSize="11" Foreground="{StaticResource QrmeT2Brush}"
                        HorizontalAlignment="Center" />
         </StackPanel>

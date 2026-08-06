@@ -22,9 +22,27 @@ public sealed partial class StudyPage : Page
             Learned ? Visibility.Visible : Visibility.Collapsed;
         public Visibility LearnVisibility =>
             Learned ? Visibility.Collapsed : Visibility.Visible;
+        public string FoldedLabel => L10n.T("nstu.folded");
+        public string FoldLabel => L10n.T("nstu.fold");
     }
 
-    public StudyPage() => InitializeComponent();
+    public StudyPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Title.Text = L10n.T("nstu", lang);
+        Sub.Text = L10n.T("nstu.sub", lang);
+        TopicBox.Header = L10n.T("ncmp.topic", lang);
+        TopicBox.PlaceholderText = L10n.T("nstu.topic.ph", lang);
+        QuestionBox.Header = L10n.T("nstu.question", lang);
+        QuestionBox.PlaceholderText = L10n.T("nstu.question.ph", lang);
+        StudyButton.Content = L10n.T("nstu.go", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
 
@@ -43,7 +61,8 @@ public sealed partial class StudyPage : Page
                 Topic = x.Topic,
                 Badge = x.LeftHost ? "left host" : "stayed local",
                 Redacted = x.Redactions > 0
-                    ? $"{x.Redactions} private term(s) redacted from the outbound brief" : "",
+                    ? L10n.Fill("nstu.redacted", AppState.Current.Language,
+                                ("n", x.Redactions.ToString())) : "",
                 Findings = x.Findings,
                 Learned = x.Learned,
             }).ToList();

@@ -11,14 +11,14 @@ struct OverviewView: View {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 8) {
                     Circle().fill(Theme.green).frame(width: 8, height: 8)
-                    Text("Profile live").font(.caption.bold()).foregroundStyle(Theme.green)
+                    Text(L10n.t("nov.live", state.language)).font(.caption.bold()).foregroundStyle(Theme.green)
                 }
                 Text(state.displayName).font(.title.bold()).foregroundStyle(Theme.txt)
-                Text("Your synthetic profile, as the world sees it.")
+                Text(L10n.t("nov.sub", state.language))
                     .font(.subheadline).foregroundStyle(Theme.t2)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Public card").font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nov", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     if loading {
                         ProgressView().tint(Theme.brandA)
                     } else if let c = card {
@@ -26,12 +26,12 @@ struct OverviewView: View {
                         row("Status", (c.status ?? "active").capitalized)
                         row("ID", c.id)
                     } else {
-                        Text("Couldn't load the card — is the backend running?")
+                        Text(L10n.t("nov.error", state.language))
                             .font(.footnote).foregroundStyle(Theme.t2)
                     }
                 }.card()
 
-                Button("Sign out") { state.signOut() }
+                Button(L10n.t("action.sign_out", state.language)) { state.signOut() }
                     .font(.subheadline).foregroundStyle(Theme.t2)
                     .frame(maxWidth: .infinity).padding(.vertical, 12)
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.line, lineWidth: 1))

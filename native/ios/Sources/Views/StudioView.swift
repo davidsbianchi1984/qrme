@@ -3,13 +3,16 @@ import SwiftUI
 /// Studio: the profile's creative surface — Compose, the Posts feed, and
 /// Knowledge Excursions — grouped behind one tab so the bar stays tidy.
 struct StudioView: View {
-    enum Tab: String, CaseIterable { case compose = "Compose", posts = "Posts", study = "Study" }
+    /// Same split as `ConnectView.Tab`: raw values name the sections, the
+    /// table holds the words.
+    enum Tab: String, CaseIterable { case compose, posts, study }
+    @EnvironmentObject var state: AppState
     @State private var tab: Tab = .compose
 
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $tab) {
-                ForEach(Tab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(Tab.allCases, id: \.self) { Text(L10n.t("tab.\($0.rawValue)", state.language)).tag($0) }
             }
             .pickerStyle(.segmented)
             .padding(.horizontal, 20).padding(.top, 8)
@@ -37,18 +40,18 @@ struct StudyView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Knowledge Excursions").font(.title2.bold()).foregroundStyle(Theme.txt)
-                Text("Send your profile out to study. Private names are redacted from everything outbound; findings come home for you to fold in.")
+                Text(L10n.t("nstu", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
+                Text(L10n.t("nstu.sub", state.language))
                     .font(.footnote).foregroundStyle(Theme.t2)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    field("Topic") { TextField("e.g. container gardening", text: $topic)
+                    field(L10n.t("ncmp.topic", state.language)) { TextField(L10n.t("nstu.topic.ph", state.language), text: $topic)
                         .foregroundStyle(Theme.txt) }
-                    field("Question") { TextField("What should it find out?", text: $question,
+                    field(L10n.t("nstu.question", state.language)) { TextField(L10n.t("nstu.question.ph", state.language), text: $question,
                                                   axis: .vertical)
                         .lineLimit(1...3).foregroundStyle(Theme.txt) }
                     Button(action: start) {
-                        HStack { if busy { ProgressView().tint(.white) }; Text("Go study").bold() }
+                        HStack { if busy { ProgressView().tint(.white) }; Text(L10n.t("nstu.go", state.language)).bold() }
                             .frame(maxWidth: .infinity).padding(.vertical, 12)
                             .background(Theme.brand).foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
@@ -70,15 +73,15 @@ struct StudyView: View {
                                 .clipShape(Capsule())
                         }
                         if e.redactions > 0 {
-                            Text("\(e.redactions) private term\(e.redactions == 1 ? "" : "s") redacted from the outbound brief")
+                            Text(L10n.fill("nstu.redacted", state.language, ["n": "\(e.redactions)"]))
                                 .font(.caption).foregroundStyle(Theme.t2)
                         }
                         Text(e.findings).font(.footnote).foregroundStyle(Theme.txt)
                         if e.learned {
-                            Text("✓ folded into the profile's knowledge")
+                            Text(L10n.t("nstu.folded", state.language))
                                 .font(.caption).foregroundStyle(Theme.green)
                         } else {
-                            Button("Fold into knowledge") { learn(e) }
+                            Button(L10n.t("nstu.fold", state.language)) { learn(e) }
                                 .font(.caption.bold()).foregroundStyle(.white)
                                 .padding(.horizontal, 12).padding(.vertical, 7)
                                 .background(Theme.brandA).clipShape(Capsule())

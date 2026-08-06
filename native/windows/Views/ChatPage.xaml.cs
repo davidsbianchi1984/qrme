@@ -13,20 +13,28 @@ public sealed partial class ChatPage : Page
 
     private readonly ObservableCollection<BubbleRow> _messages = new();
 
-    // Index 0 is the empty default: "let it read my prompt".
-    private static readonly (string Value, string Label)[] Roles =
+    // Index 0 is the empty default: "let it read my prompt". The label is a
+    // key now — this shell and the console said what each role does while the
+    // phones said only "Advisor" and "Operator", on the control that decides
+    // whether a synthetic profile recommends something or goes and does it.
+    private static readonly (string Value, string Key)[] Roles =
     {
-        ("", "Read my prompt"),
-        ("advisor", "Advisor — weigh it and recommend"),
-        ("collaborator", "Collaborator — work it with me"),
-        ("operator", "Operator — just do it"),
+        ("", "nchat.role.read"),
+        ("advisor", "nchat.role.advisor"),
+        ("collaborator", "nchat.role.collaborator"),
+        ("operator", "nchat.role.operator"),
     };
 
     public ChatPage()
     {
         InitializeComponent();
-        RoleBox.ItemsSource = Roles.Select(r => r.Label).ToList();
+        var lang = AppState.Current.Language;
+        Title.Text = L10n.T("tab.chat", lang);
+        RoleBox.Header = L10n.T("nchat.rolepick", lang);
+        RoleBox.ItemsSource = Roles.Select(r => L10n.T(r.Key, lang)).ToList();
         RoleBox.SelectedIndex = 0;
+        DraftBox.PlaceholderText = L10n.T("nchat.type.ph", lang);
+        SendButton.Content = L10n.T("nchat.send", lang);
     }
 
     private string? SelectedRole()
@@ -37,7 +45,8 @@ public sealed partial class ChatPage : Page
 
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        Subtitle.Text = $"Talk with {AppState.Current.DisplayName} — replies are in character and moderated.";
+        Subtitle.Text = L10n.Fill("nchat.sub", AppState.Current.Language,
+                                  ("name", AppState.Current.DisplayName));
         MessagesList.ItemsSource = _messages;
     }
 

@@ -7,13 +7,13 @@
 
     <ScrollViewer>
         <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
-            <TextBlock Text="Posts" FontSize="22" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
-            <TextBlock Text="Everything your profile has posted."
+            <TextBlock x:Name="Title" FontSize="22" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="Sub"
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
 
             <ProgressRing x:Name="Loading" IsActive="True" Foreground="{StaticResource QrmeBrandABrush}"
                           Width="24" Height="24" HorizontalAlignment="Left" />
-            <TextBlock x:Name="Empty" Text="No posts yet — write one in Compose."
+            <TextBlock x:Name="Empty"
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="13" Visibility="Collapsed"
                        TextWrapping="Wrap" />
 

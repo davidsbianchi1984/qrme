@@ -9,13 +9,13 @@ struct PostsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Posts").font(.title2.bold()).foregroundStyle(Theme.txt)
-                Text("Everything your profile has posted.").font(.footnote).foregroundStyle(Theme.t2)
+                Text(L10n.t("tab.posts", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
+                Text(L10n.t("npst.sub", state.language)).font(.footnote).foregroundStyle(Theme.t2)
 
                 if loading {
                     ProgressView().tint(Theme.brandA).frame(maxWidth: .infinity)
                 } else if posts.isEmpty {
-                    Text("No posts yet — write one in Compose.")
+                    Text(L10n.t("npst.none", state.language))
                         .font(.footnote).foregroundStyle(Theme.t2).card()
                 } else {
                     ForEach(posts, id: \.id) { p in

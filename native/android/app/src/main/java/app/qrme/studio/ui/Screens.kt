@@ -199,7 +199,8 @@ fun WelcomeScreen(vm: StudioViewModel) {
             }
             Text(L10n.t("pub.invite.none", lang), color = Qrme.T3, fontSize = 11.sp)
 
-            Text("Start the backend:  QRME_CORS_ORIGINS=* uvicorn qrme.api:app",
+            Text(L10n.fill("nov.backend", lang,
+                    mapOf("command" to "QRME_CORS_ORIGINS=* uvicorn qrme.api:app")),
                 color = Qrme.T3, fontSize = 10.sp)
         }
     }
@@ -407,16 +408,16 @@ fun OverviewScreen(vm: StudioViewModel) {
     screenScroll {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(Modifier.size(8.dp).clip(CircleShape).background(Qrme.Green))
-            Text("Profile live", color = Qrme.Green, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nov.live", vm.language), color = Qrme.Green, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
         Text(vm.displayName, color = Qrme.Txt, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-        Text("Your synthetic profile, as the world sees it.", color = Qrme.T2, fontSize = 14.sp)
+        Text(L10n.t("nov.sub", vm.language), color = Qrme.T2, fontSize = 14.sp)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Public card", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nov", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             when {
                 !loaded -> CircularProgressIndicator(color = Qrme.BrandA, modifier = Modifier.size(22.dp))
-                card == null -> Text("Couldn't load the card — is the backend running?",
+                card == null -> Text(L10n.t("nov.error", vm.language),
                     color = Qrme.T2, fontSize = 13.sp)
                 else -> {
                     cardRow("Kind", card!!.kind.replace('_', ' '))
@@ -450,8 +451,8 @@ fun ComposeScreen(vm: StudioViewModel) {
     var result by remember { mutableStateOf<Post?>(null) }
 
     screenScroll {
-        Text("Compose", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("Give a topic — your profile writes a post in its own voice.", color = Qrme.T2, fontSize = 13.sp)
+        Text(L10n.t("tab.compose", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.t("ncmp.sub", vm.language), color = Qrme.T2, fontSize = 13.sp)
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             labeledField("Topic", topic, "What should it post about?") { topic = it }
         }
@@ -487,12 +488,12 @@ fun PostsScreen(vm: StudioViewModel) {
         vm.call({ ApiClient.posts(vm.pid!!) }) { r -> posts = r.getOrDefault(emptyList()) }
     }
     screenScroll {
-        Text("Posts", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("Everything your profile has posted.", color = Qrme.T2, fontSize = 13.sp)
+        Text(L10n.t("tab.posts", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.t("npst.sub", vm.language), color = Qrme.T2, fontSize = 13.sp)
         when {
             posts == null -> CircularProgressIndicator(color = Qrme.BrandA, modifier = Modifier.size(22.dp))
             posts!!.isEmpty() -> Column(Modifier.card()) {
-                Text("No posts yet — write one in Compose.", color = Qrme.T2, fontSize = 13.sp)
+                Text(L10n.t("npst.none", vm.language), color = Qrme.T2, fontSize = 13.sp)
             }
             else -> posts!!.forEach { p ->
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -541,12 +542,12 @@ fun RobotsScreen(vm: StudioViewModel) {
     }
 
     screenScroll {
-        Text("Robots", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("Same persona · a physical body. Commands follow a per-body allowlist.",
+        Text(L10n.t("tab.robots", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.t("nrob.sub", vm.language),
             color = Qrme.T2, fontSize = 13.sp)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Bind a robot", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nrob.bind", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             catalog.chunked(2).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     row.forEach { s ->
@@ -588,22 +589,22 @@ fun RobotsScreen(vm: StudioViewModel) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if ("say" in rob.commands)
                         TextButton(onClick = { command(rob, "say", topic) }) {
-                            Text("Say", color = Qrme.BrandA, fontSize = 13.sp) }
+                            Text(L10n.t("nrob.say", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
                     if ("clean" in rob.commands)
                         TextButton(onClick = { command(rob, "clean", null) }) {
-                            Text("Clean", color = Qrme.BrandA, fontSize = 13.sp) }
+                            Text(L10n.t("nrob.clean", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
                     if ("patrol" in rob.commands)
                         TextButton(onClick = { command(rob, "patrol", null) }) {
-                            Text("Patrol", color = Qrme.BrandA, fontSize = 13.sp) }
+                            Text(L10n.t("nrob.patrol", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
                     TextButton(onClick = { command(rob, "dock", null) }) {
-                        Text("Dock", color = Qrme.T2, fontSize = 13.sp) }
+                        Text(L10n.t("nrob.dock", vm.language), color = Qrme.T2, fontSize = 13.sp) }
                 }
             }
         }
 
         lastResult?.let { res ->
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Result", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.t("nrob.result", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Text(res, color = Qrme.Txt, fontSize = 14.sp)
             }
         }
@@ -1086,8 +1087,8 @@ fun ChatScreen(vm: StudioViewModel) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            Text("Chat", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            Text("Talk with ${vm.displayName} — replies are in character and moderated.",
+            Text(L10n.t("tab.chat", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.fill("nchat.sub", vm.language, mapOf("name" to vm.displayName)),
                 color = Qrme.T2, fontSize = 13.sp)
             messages.forEach { m ->
                 Row(Modifier.fillMaxWidth(),
@@ -1182,12 +1183,13 @@ fun StudyScreen(vm: StudioViewModel) {
     LaunchedEffect(Unit) { reload() }
 
     screenScroll {
-        Text("Knowledge Excursions", color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Text("Send your profile out to study. Private names are redacted from everything outbound; findings come home for you to fold in.",
+        Text(L10n.t("nstu", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.t("nstu.sub", vm.language),
             color = Qrme.T2, fontSize = 13.sp)
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            labeledField("Topic", topic, "e.g. container gardening") { topic = it }
+            labeledField(L10n.t("ncmp.topic", vm.language), topic,
+                         L10n.t("nstu.topic.ph", vm.language)) { topic = it }
             labeledField("Question", question, "What should it find out?") { question = it }
             BrandButton("Go study", enabled = topic.isNotBlank() && question.isNotBlank(), busy = busy) {
                 busy = true; error = null
@@ -1210,15 +1212,15 @@ fun StudyScreen(vm: StudioViewModel) {
                         fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
                 if (e.redactions > 0)
-                    Text("${e.redactions} private term(s) redacted from the outbound brief",
+                    Text(L10n.fill("nstu.redacted", vm.language, mapOf("n" to "${e.redactions}")),
                         color = Qrme.T2, fontSize = 12.sp)
                 Text(e.findings, color = Qrme.Txt, fontSize = 13.sp)
                 if (e.learned)
-                    Text("✓ folded into the profile's knowledge", color = Qrme.Green, fontSize = 12.sp)
+                    Text(L10n.t("nstu.folded", vm.language), color = Qrme.Green, fontSize = 12.sp)
                 else
                     TextButton(onClick = {
                         vm.call({ ApiClient.learn(e.id, vm.token!!) }) { reload() }
-                    }) { Text("Fold into knowledge", color = Qrme.BrandA, fontSize = 13.sp) }
+                    }) { Text(L10n.t("nstu.fold", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
             }
         }
     }
@@ -1269,8 +1271,8 @@ private fun SocialPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Social platforms", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Collect pulls the account's content in to grow the profile; publish runs the profile on the platform (moderated).",
+            Text(L10n.t("ncon.social", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("ncon.social.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             platforms.chunked(4).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -1331,7 +1333,7 @@ private fun SocialPanel(vm: StudioViewModel) {
                         }
                         TextButton(onClick = {
                             vm.call({ ApiClient.revokeSocial(c.id, vm.token!!) }) { reload() }
-                        }) { Text("Disconnect", color = Qrme.Red, fontSize = 12.sp) }
+                        }) { Text(L10n.t("ncon.disconnect", vm.language), color = Qrme.Red, fontSize = 12.sp) }
                     }
                 }
             }
@@ -1353,8 +1355,8 @@ private fun AppsPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Connected apps", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Apple, Google, Microsoft, and Canva apps the profile's agents can collect from, act through, and produce with.",
+            Text(L10n.t("ncon.apps", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("ncon.apps.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             catalog.take(12).forEach { entry ->
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -1370,7 +1372,7 @@ private fun AppsPanel(vm: StudioViewModel) {
                                 .onFailure { error = it.message }
                             reload()
                         }
-                    }) { Text("Connect", color = Qrme.BrandA, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
+                    }) { Text(L10n.t("tab.connect", vm.language), color = Qrme.BrandA, fontSize = 13.sp, fontWeight = FontWeight.Bold) }
                 }
             }
         }

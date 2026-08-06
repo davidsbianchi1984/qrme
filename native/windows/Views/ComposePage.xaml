@@ -7,16 +7,16 @@
 
     <ScrollViewer>
         <StackPanel MaxWidth="640" Spacing="14" Padding="28" HorizontalAlignment="Left">
-            <TextBlock Text="Compose" FontSize="22" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
-            <TextBlock Text="Give a topic — your profile writes a post in its own voice."
+            <TextBlock x:Name="Title" FontSize="22" FontWeight="Bold" Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="Sub"
                        Foreground="{StaticResource QrmeT2Brush}" FontSize="13" TextWrapping="Wrap" />
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBox x:Name="TopicBox" Header="Topic" PlaceholderText="What should it post about?"
+                    <TextBox x:Name="TopicBox"
                              AcceptsReturn="True" TextWrapping="Wrap" Height="80" />
-                    <Button x:Name="SendButton" Content="Compose post" HorizontalAlignment="Stretch"
+                    <Button x:Name="SendButton" HorizontalAlignment="Stretch"
                             Height="44" Foreground="White" Click="OnCompose">
                         <Button.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
