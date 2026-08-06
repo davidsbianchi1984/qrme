@@ -295,7 +295,7 @@ public sealed partial class SettingsPage : Page
                 EffectiveAgeText.Text = $"Effective age now: {eff}";
                 EffectiveAgeText.Visibility = Visibility.Visible;
             }
-            SteeringStatus.Text = "Steering applied — it rides on every reply.";
+            SteeringStatus.Text = L10n.T("ns.st.applied");
             SteeringStatus.Visibility = Visibility.Visible;
         }
         catch (Exception ex) { ShowError(ex.Message); }
@@ -331,7 +331,7 @@ public sealed partial class SettingsPage : Page
                 var parts = FeedbackCategories
                     .Where(c => fb.Tally.TryGetValue(c, out var n) && n > 0)
                     .Select(c => $"{fb.Tally[c]} {c}");
-                FeedbackTally.Text = "So far: " + string.Join(" · ", parts);
+                FeedbackTally.Text = L10n.T("fb.sofar").Replace("{list}", string.Join(" · ", parts));
                 FeedbackTally.Visibility = Visibility.Visible;
             }
             else FeedbackTally.Visibility = Visibility.Collapsed;
@@ -358,7 +358,7 @@ public sealed partial class SettingsPage : Page
             await ApiClient.Shared.SubmitFeedback(AppState.Current.Token, cat, message, rating);
             FeedbackMessage.Text = "";
             FeedbackRating.SelectedIndex = 0;
-            FeedbackThanks.Text = "Thank you — sent.";
+            FeedbackThanks.Text = L10n.T("fb.thanks");
             FeedbackThanks.Visibility = Visibility.Visible;
             await LoadFeedback();
         }
@@ -454,7 +454,7 @@ public sealed partial class SettingsPage : Page
         var why = ObjectReasonBox.Text?.Trim() ?? "";
         if (pid.Length == 0 || why.Length == 0)
         {
-            ObjectVerdict.Text = "A profile id and a reason are both needed.";
+            ObjectVerdict.Text = L10n.T("ns.pr.needboth");
             return;
         }
         try

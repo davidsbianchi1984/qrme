@@ -90,7 +90,7 @@ English on a screen this file's own opening section calls the case where
 English is a hazard rather than a discourtesy.
 
 The rule now derives the constructs from the shell instead of naming one; see
-`_kotlin_label_patterns`.
+`_label_positions`.
 
 ## Why this file is in this repo too
 
@@ -190,25 +190,45 @@ _XAML = [r'\bText="([^"]{2,})"', r'\bContent="([^"]{2,})"',
 #: prompt is where these screens keep their examples (*Halo Infinite*, *need a
 #: key cut*, *What should it speak about?*), so reading argument zero alone
 #: would have left the more conversational half of every form in English.
-_KOTLIN_DECL = re.compile(r'\bfun\s+(\w+)\s*\(([^)]*)\)', re.S)
+#: **0.47.7 — the same rule in the other two syntaxes.** 0.47.6 derived this
+#: for Kotlin and left `_SWIFT` at eight hard-coded constructs. SwiftUI does
+#: have `Button(_:)`, so the miss here is smaller than Compose's — but the
+#: shells wrap it anyway, and what they wrapped is not small: JIM's
+#: `answerButton` is the pair a person taps to say whether the help helped,
+#: and its `row` is the medical card a responder reads (*Age*, *Conditions*,
+#: *Resting HR*, *Contact*) — the iPhone half of exactly the card whose
+#: Android half was localized last round, which is the per-client mistake this
+#: audit is named for, created by its own fix.
+#:
+#: Swift's parameter list carries an argument label before the name
+#: (`func row(_ title: String, _ value: String)`), so the name to look for in
+#: the body is the *last* identifier before the colon.
+_DECL = {
+    ".kt": re.compile(r'\bfun\s+(\w+)\s*\(([^)]*)\)', re.S),
+    ".swift": re.compile(r'\bfunc\s+(\w+)\s*\(([^)]*)\)', re.S),
+}
 
 
-def _kotlin_label_positions(base: Path) -> dict[str, set[int]]:
+def _label_positions(base: Path, suffix: str) -> dict[str, set[int]]:
     """{function name: argument positions it renders through `Text(`}."""
     out: dict[str, set[int]] = {}
-    for path in sorted(base.rglob("*.kt")):
+    for path in sorted(base.rglob("*" + suffix)):
         text = path.read_text(encoding="utf-8", errors="ignore")
-        for m in _KOTLIN_DECL.finditer(text):
+        for m in _DECL[suffix].finditer(text):
             name, params = m.group(1), m.group(2)
-            # The declaration's own body, bounded rather than parsed: a
-            # composable that renders its label does so within a few lines,
-            # and a brace-matcher here would be a parser for one regex's sake.
+            # The declaration's own body, bounded rather than parsed: a view
+            # that renders its label does so within a few lines, and a
+            # brace-matcher here would be a parser for one regex's sake.
             body = text[m.end():m.end() + 1600]
             for i, decl in enumerate(params.split(",")):
                 head, _, kind = decl.partition(":")
                 if kind.strip().split(" ")[0].rstrip("?") != "String":
                     continue
-                if re.search(r"\bText\(\s*%s\b" % re.escape(head.strip()), body):
+                # `_ title` and `title` both bind `title` inside the body.
+                names = head.split()
+                if not names:
+                    continue
+                if re.search(r"\bText\(\s*%s\b" % re.escape(names[-1]), body):
                     out.setdefault(name, set()).add(i)
     return out
 
@@ -290,6 +310,28 @@ _TERNARY = [r'\?\s*"([^"]{2,})"\s*:\s*"([^"]{2,})"',
             r'\bif\s*\([^)]*\)\s*"([^"]{2,})"\s*else\s*"([^"]{2,})"']
 _PHRASE = re.compile(r"\S\s\S")
 
+#: **0.47.7 — the Windows half of the same blind spot.** `_XAML` reads
+#: attributes: `Text="…"`, `Content="…"`. Half of this shell's labels are not
+#: written in XAML at all. The settled idiom here is `x:Name` on the element
+#: and `Foo.Text = L10n.T("key")` in a `Localize()` the constructor calls, so
+#: a label that was never localized is sitting in the code-behind as
+#: `Foo.Text = "…"` — an assignment, which `Text="` cannot match.
+#:
+#:     asked     is this an attribute on an element
+#:     mattered  does this end up as the words on an element
+#:
+#: What it hid: the sibling product's resuscitation confirmation (*Confirm the
+#: person is unresponsive and not breathing normally.*), both waiver verdicts,
+#: *A responder needs a name.* and *Issue Medical ID* — the desktop half of
+#: the surface whose Android half was localized last round.
+#:
+#: Phrases only, and for the reason `_TERNARY` already gives: this shell sets
+#: `Box.Text = "advance"` and `Box.Text = "bottom_right"` as *default values*
+#: in input boxes, which are API tokens a person edits rather than prose a
+#: person reads. A rule that raises a ratcheted count under-counts on purpose.
+_ASSIGNED = [r'\.(?:Text|Content|Header|PlaceholderText)\s*=\s*'
+             r'"((?:[^"\\]|\\.){2,})"']
+
 SHELLS = {
     "ios": ("native/ios", {".swift"}, _SWIFT, r"\bL10n\s*\.\s*t\s*\("),
     "android": ("native/android", {".kt"}, _KOTLIN, r"\bL10n\s*\.\s*t\s*\("),
@@ -310,7 +352,8 @@ def _measure(shell: str) -> tuple[int, int]:
     base = REPO / rel
     if not base.exists():
         return 0, 0
-    positions = _kotlin_label_positions(base) if shell == "android" else {}
+    derive = {"android": ".kt", "ios": ".swift"}.get(shell)
+    positions = _label_positions(base, derive) if derive else {}
     english = calls = 0
     for path in sorted(base.rglob("*")):
         if path.suffix not in suffixes or "L10n" in path.name:
@@ -325,6 +368,10 @@ def _measure(shell: str) -> tuple[int, int]:
                   and _HAS_LETTER.search(_HOLE.sub("", s))}
         found |= {s for s in _kotlin_labels(text, positions)
                   if _HAS_LETTER.search(_HOLE.sub("", s))}
+        if path.suffix == ".cs":
+            found |= {s for pat in _ASSIGNED for s in re.findall(pat, text)
+                      if _PHRASE.search(_HOLE.sub("", s).strip())
+                      and _HAS_LETTER.search(_HOLE.sub("", s))}
         english += len(found)
         calls += len(re.findall(call, text))
     return english, calls
@@ -406,7 +453,7 @@ def test_a_lone_token_in_a_ternary_is_not_counted():
 
 
 def test_the_shell_declares_the_buttons_this_rule_reads(tmp_path):
-    """A guard on the derivation. `_kotlin_label_positions` returning nothing
+    """A guard on the derivation. `_label_positions` returning nothing
     restores the exact blind spot it was written to close — every button on
     the shell invisible — and would do it while every other test here passed,
     which is how the blind spot lasted as long as it did."""
@@ -422,7 +469,7 @@ def test_the_shell_declares_the_buttons_this_rule_reads(tmp_path):
         "}\n"
         "private fun icon(name: String) { Image(painterResource(name)) }\n",
         encoding="utf-8")
-    positions = _kotlin_label_positions(tmp_path)
+    positions = _label_positions(tmp_path, ".kt")
     assert positions == {"SmallAction": {0}, "labeledField": {0, 2}}, positions
     # A function that takes a String and never renders it is not a label.
     assert "icon" not in positions, positions
@@ -449,7 +496,7 @@ def test_the_real_android_shell_has_label_wrappers():
     base = REPO / "native/android"
     if not base.exists():
         pytest.skip("no android shell in this repo")
-    assert _kotlin_label_positions(base), (
+    assert _label_positions(base, ".kt"), (
         "no label-bearing composable found in the Android shell — every "
         "button on it is now invisible to the ratchet above")
 

@@ -49,6 +49,7 @@ enum L10n {
                             "hi", "ar"]
 
     private static let table: [String: [String: String]] = [
+        "nov.id": ["en": "ID", "es": "ID", "fr": "ID", "de": "ID", "pt": "ID", "it": "ID", "ja": "ID", "zh": "ID", "hi": "आईडी", "ar": "المعرّف"],
         "obj.timeline.title": ["en": "What has happened to your case", "es": "Qué ha pasado con su caso", "fr": "Ce qu'il est advenu de votre dossier", "de": "Was mit Ihrem Fall geschehen ist", "pt": "O que aconteceu ao seu caso", "it": "Cosa è successo al tuo caso", "ja": "あなたの案件の経過", "zh": "你的案件进展如何", "hi": "आपके मामले में क्या हुआ", "ar": "ما جرى في قضيتك"],
         "obj.timeline.go": ["en": "Show the record", "es": "Ver el registro", "fr": "Afficher le registre", "de": "Akte anzeigen", "pt": "Ver o registo", "it": "Mostra il registro", "ja": "記録を見る", "zh": "查看记录", "hi": "रिकॉर्ड दिखाएँ", "ar": "أظهر السجل"],
         "obj.timeline.sealed": ["en": "sealed in the vault", "es": "sellado en la bóveda", "fr": "scellé dans le coffre", "de": "im Tresor versiegelt", "pt": "selado no cofre", "it": "sigillato nella cassaforte", "ja": "保管庫に封印済み", "zh": "已封存于保险库", "hi": "वॉल्ट में सील किया गया", "ar": "مختوم في الخزنة"],

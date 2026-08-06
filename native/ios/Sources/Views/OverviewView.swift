@@ -22,9 +22,9 @@ struct OverviewView: View {
                     if loading {
                         ProgressView().tint(Theme.brandA)
                     } else if let c = card {
-                        row("Kind", c.kind.replacingOccurrences(of: "_", with: " ").capitalized)
-                        row("Status", (c.status ?? "active").capitalized)
-                        row("ID", c.id)
+                        row(L10n.t("nw.kind", state.language), c.kind.replacingOccurrences(of: "_", with: " ").capitalized)
+                        row(L10n.t("life.status", state.language), (c.status ?? "active").capitalized)
+                        row(L10n.t("nov.id", state.language), c.id)
                     } else {
                         Text(L10n.t("nov.error", state.language))
                             .font(.footnote).foregroundStyle(Theme.t2)

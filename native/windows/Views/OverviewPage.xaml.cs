@@ -48,7 +48,7 @@ public sealed partial class OverviewPage : Page
         }
         catch
         {
-            Empty.Text = "Couldn't load the card — is the backend running?";
+            Empty.Text = L10n.T("nov.error");
             Empty.Visibility = Visibility.Visible;
         }
         finally

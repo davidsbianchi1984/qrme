@@ -1,4 +1,4 @@
-# status: backlog — 350 rows
+# status: backlog — 347 rows
 #
 # Rows in a shell's L10n table that nothing in that shell asks for. Checked by
 # test_a_shell_asks_for_a_key_it_has.py, and ratcheted in two directions: no
@@ -54,8 +54,8 @@
 # shells, so the count could rise on one shell while the check passed, if the
 # total were not also held.
 #
-# ceiling: 150
-# total: 350
+# ceiling: 148
+# total: 347
 
 ios: acct.reset.code
 ios: action.refresh
@@ -66,7 +66,6 @@ ios: comp.title
 ios: front.title
 ios: inbox.empty
 ios: life.legend
-ios: life.status
 ios: nbcn.camera
 ios: nbcn.nothing
 ios: nc.find
@@ -341,7 +340,6 @@ windows: nmg.t.voice
 windows: nmg.tags.ph
 windows: nmg.terms.ph
 windows: nmg.title.ph
-windows: nov.error
 windows: nprv.generated
 windows: nprv.licensed
 windows: ns.fb.c.bug
@@ -359,7 +357,6 @@ windows: ns.obj.attested
 windows: ns.object.raised
 windows: ns.rel.saved
 windows: ns.st.age
-windows: ns.st.applied
 windows: ns.st.effective
 windows: ns.st.g.behavior
 windows: ns.st.g.intimacy

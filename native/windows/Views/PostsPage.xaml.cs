@@ -37,7 +37,7 @@ public sealed partial class PostsPage : Page
         }
         catch
         {
-            Empty.Text = "Couldn't load posts — is the backend running?";
+            Empty.Text = L10n.T("npst.error");
             Empty.Visibility = Visibility.Visible;
         }
         finally

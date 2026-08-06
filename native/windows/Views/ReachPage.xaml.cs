@@ -296,7 +296,7 @@ public sealed partial class ReachPage : Page
         try
         {
             await ApiClient.Shared.SyncRegistry(key);
-            PackStatus.Text = "source synced — its packs joined the marketplace";
+            PackStatus.Text = L10n.T("nrch.src.synced");
             PackStatus.Visibility = Visibility.Visible;
         }
         catch (Exception ex)
@@ -322,7 +322,7 @@ public sealed partial class ReachPage : Page
                 var robots = await ApiClient.Shared.Robots(s.Pid!, s.Token!);
                 if (robots.Length == 0)
                 {
-                    PackError.Text = "bind a robot first (Robots page) — task packs install onto a body";
+                    PackError.Text = L10n.T("nrch.needbody");
                     PackError.Visibility = Visibility.Visible;
                     return;
                 }
@@ -357,12 +357,12 @@ public sealed partial class ReachPage : Page
             if (robotId.Length > 0)
             {
                 await ApiClient.Shared.UninstallRobotPack(packId, robotId, s.Token!);
-                PackStatus.Text = "removed — the body's tasks were revoked";
+                PackStatus.Text = L10n.T("nrch.body.removed");
             }
             else
             {
                 await ApiClient.Shared.UninstallPack(packId, s.Pid!, s.Token!);
-                PackStatus.Text = "removed — the knowledge base shrank back";
+                PackStatus.Text = L10n.T("nrch.kb.removed");
             }
             PackStatus.Visibility = Visibility.Visible;
         }
@@ -508,7 +508,7 @@ public sealed partial class ReachPage : Page
                 .Select(t => t.Trim()).Where(t => t.Length > 0).ToArray();
             await ApiClient.Shared.CreateListing(
                 title, BlurbBox.Text.Trim(), tags, s.DisplayName, s.Pid!);
-            MarketStatus.Text = "listed — summonable by tag";
+            MarketStatus.Text = L10n.T("nrch.listed");
             MarketStatus.Visibility = Visibility.Visible;
             TitleBox.Text = ""; BlurbBox.Text = ""; TagsBox.Text = "";
             await ReloadListings();

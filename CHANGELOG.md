@@ -4,6 +4,49 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.7] — 2026-08-06
+
+### The other two syntaxes
+
+0.47.6 derived the Kotlin rule from the shell and left the other two as
+hard-coded lists: `_SWIFT` at eight constructs, `_XAML` at four attributes.
+Both had the same blind spot, and finding it was a matter of asking the same
+question one more time.
+
+**iOS** wraps its labels the way Compose does — `row`, `field`, `stat` — so the
+derivation now covers Swift too, reading the *last* identifier before the colon
+because Swift's parameter list carries an argument label in front of the name.
+
+**Windows** is the bigger half. `_XAML` reads attributes, and half of this
+shell's labels are not written in XAML at all: the settled idiom here is
+`x:Name` on the element and `Foo.Text = L10n.T("key")` in a `Localize()` the
+constructor calls. A label that was never localized therefore sits in the
+code-behind as an **assignment**, which `Text="` cannot match.
+
+    asked     is this an attribute on an element
+    mattered  does this end up as the words on an element
+
+**91 call sites across nine shells** — 16 on the iPhones, 33 on the desktops,
+in three products. Here that is the Overview card's *Kind / Status / ID*, the
+Reach page's five status verdicts, the Settings page's steering and feedback
+lines, the objection form's refusal, and both places the signing ceremony says
+*Follow the Windows Hello prompt.*
+
+Phrases only, and for the reason `_TERNARY` already gave: this shell sets
+`Box.Text = "advance"` and `Box.Text = "bottom_right"` as **default values** in
+input boxes — API tokens a person edits, not prose a person reads. A rule that
+raises a ratcheted count under-counts on purpose; the raw 28 on this shell is
+12 once that filter runs, and the 12 are the sentences.
+
+*So far: {list}* is one row with a slot rather than a translated half joined
+to a list, which is the rule the alarm rows have followed since they were
+written.
+
+Records back to their floors: **iOS 2, Android 2, Windows 3.** Dead rows 350 to
+347.
+
+Cut together with JIM-mini and PDI at app-v0.47.7.
+
 ## [0.47.6] — 2026-08-06
 
 ### Every button on the Android shell was English, and both guards said otherwise

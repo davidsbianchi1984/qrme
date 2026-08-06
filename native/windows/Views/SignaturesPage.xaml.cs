@@ -91,7 +91,7 @@ public sealed partial class SignaturesPage : Page
             var options = await ApiClient.Shared.EnrollOptions("QRME owner", token);
             _pendingEnvelope = "";
             _pendingChallenge = options.Challenge;
-            CeremonyStatus.Text = "Follow the Windows Hello prompt.";
+            CeremonyStatus.Text = L10n.T("nsig.hello.prompt");
             await RunCeremony(ApiClient.Shared.CeremonyUrl(
                 "enroll", options.Challenge, userId: options.User.Id,
                 userName: options.User.Name,
@@ -113,7 +113,7 @@ public sealed partial class SignaturesPage : Page
             var env = await ApiClient.Shared.RequestSignature(
                 document, MeaningBox.Text.Trim(), "basic", token);
             _pendingEnvelope = env.EnvelopeId;
-            CeremonyStatus.Text = "Follow the Windows Hello prompt.";
+            CeremonyStatus.Text = L10n.T("nsig.hello.prompt");
             await RunCeremony(ApiClient.Shared.CeremonyUrl(
                 "sign", env.Challenge, displayText: env.DisplayText,
                 meaning: env.Meaning));
