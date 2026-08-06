@@ -4,13 +4,29 @@ import SwiftUI
 /// (@handle + placed QR beacons), its marketplace listing, and the
 /// training-data license it is offered under.
 struct ManageView: View {
-    enum Tab: String, CaseIterable { case general = "General", summon = "Summon", market = "Market", packs = "Packs", gaming = "Gaming", license = "License", earnings = "Earn", signatures = "Sign", voice = "Voice", desk = "Desk", counter = "Counter", trade = "Trade", deals = "Deals" }
+    /// The raw values are the API-side names of the sections; the words a
+    /// person reads come from the table. They used to be the same string,
+    /// which is how this console ended up with an untranslated tab bar of its
+    /// own sitting behind the translated one.
+    enum Tab: String, CaseIterable {
+        case general, summon, market, packs, gaming, license, earnings,
+             signatures, voice, desk, counter, trade, deals
+
+        var key: String {
+            switch self {
+            case .earnings: return "nmg.t.earn"
+            case .signatures: return "nmg.t.sign"
+            default: return "nmg.t.\(rawValue)"
+            }
+        }
+    }
+    @EnvironmentObject var state: AppState
     @State private var tab: Tab = .general
 
     var body: some View {
         VStack(spacing: 0) {
             Picker("", selection: $tab) {
-                ForEach(Tab.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+                ForEach(Tab.allCases, id: \.self) { Text(L10n.t($0.key, state.language)).tag($0) }
             }
             .pickerStyle(.menu).tint(Theme.brandA)
             .padding(.horizontal, 20).padding(.top, 12)
@@ -46,14 +62,14 @@ private struct EarningsSection: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Earnings").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Everything this creator earns — pack sales, license fees, and verified venue-placement views — written to the ledger at transaction time.")
+                    Text(L10n.t("nmg.earnings", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.earnings.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     if let s = statement {
                         HStack(spacing: 12) {
-                            stat("Accrued", s.totals.accrued, s.currency, Theme.green)
-                            stat("Paid", s.totals.paid, s.currency, Theme.t2)
-                            stat("Lifetime", s.totals.lifetime, s.currency, Theme.brandA)
+                            stat(L10n.t("nmg.accrued", state.language), s.totals.accrued, s.currency, Theme.green)
+                            stat(L10n.t("nmg.paid", state.language), s.totals.paid, s.currency, Theme.t2)
+                            stat(L10n.t("nmg.lifetime", state.language), s.totals.lifetime, s.currency, Theme.brandA)
                         }
                         if !s.totals.by_kind.isEmpty {
                             Text(s.totals.by_kind.sorted { $0.key < $1.key }
@@ -61,13 +77,16 @@ private struct EarningsSection: View {
                                 .joined(separator: " · "))
                                 .font(.caption2).foregroundStyle(Theme.t3)
                         }
-                        Button("Request payout") { payout() }
+                        Button(L10n.t("nmg.payout.request", state.language)) { payout() }
                             .font(.caption.bold()).foregroundStyle(.white)
                             .padding(.horizontal, 12).padding(.vertical, 9)
                             .background(Theme.brandA).clipShape(Capsule())
                             .disabled(s.totals.accrued <= 0)
                         if let receipt {
-                            Text("Payout \(receipt.payout_id): \(money(receipt.total, s.currency)) across \(receipt.entries) entries (simulated transfer).")
+                            Text(L10n.fill("nmg.payout.done", state.language,
+                                           ["id": receipt.payout_id,
+                                            "total": money(receipt.total, s.currency),
+                                            "n": "\(receipt.entries)"]))
                                 .font(.caption).foregroundStyle(Theme.green)
                         }
                     } else {
@@ -77,7 +96,7 @@ private struct EarningsSection: View {
 
                 if let s = statement, !s.entries.isEmpty {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Ledger").font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("nmg.ledger", state.language)).font(.headline).foregroundStyle(Theme.txt)
                         ForEach(s.entries.prefix(20)) { e in
                             HStack {
                                 VStack(alignment: .leading, spacing: 1) {
@@ -162,7 +181,7 @@ private struct SummonSection: View {
                 Button { scanning = true } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "viewfinder")
-                        Text("Scan a beacon").font(.subheadline.weight(.semibold))
+                        Text(L10n.t("nmg.beacon.scan", state.language)).font(.subheadline.weight(.semibold))
                     }
                     .frame(maxWidth: .infinity).padding(12)
                     .background(Theme.brand)
@@ -172,53 +191,53 @@ private struct SummonSection: View {
                 .fullScreenCover(isPresented: $scanning) {
                     ZStack(alignment: .topTrailing) {
                         BeaconScannerView()
-                        Button("Done") { scanning = false }
+                        Button(L10n.t("nmg.done", state.language)) { scanning = false }
                             .padding().foregroundStyle(.white)
                     }
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("@handle").font(.headline).foregroundStyle(Theme.txt)
-                    Text("A unique name anyone can summon the profile by.")
+                    Text(L10n.t("nmg.handle", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.handle.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     HStack(spacing: 8) {
-                        TextField("handle", text: $handle)
+                        TextField(L10n.t("nmg.handle.ph", state.language), text: $handle)
                             .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
                             .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                        Button("Claim") { claim() }
+                        Button(L10n.t("nmg.claim", state.language)) { claim() }
                             .font(.caption.bold()).foregroundStyle(.white)
                             .padding(.horizontal, 12).padding(.vertical, 10)
                             .background(Theme.brandA).clipShape(Capsule())
                             .disabled(handle.isEmpty)
                     }
                     if let claimed {
-                        Text("claimed \(claimed)").font(.caption).foregroundStyle(Theme.green)
+                        Text(L10n.fill("nmg.claimed", state.language, ["handle": claimed])).font(.caption).foregroundStyle(Theme.green)
                     }
                 }.card()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Beacons").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Leave the profile behind somewhere physical — a placed QR that summons it. Pick it back up any time.")
+                    Text(L10n.t("nmg.beacons", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.beacons.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
-                    TextField("label (e.g. Rosa's garden bench)", text: $beaconLabel)
+                    TextField(L10n.t("nmg.beacon.label.ph", state.language), text: $beaconLabel)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    TextField("location (optional)", text: $beaconLocation)
+                    TextField(L10n.t("nmg.beacon.loc.ph", state.language), text: $beaconLocation)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    Button("Place beacon") { place() }
+                    Button(L10n.t("nmg.beacon.place", state.language)) { place() }
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 10)
                         .background(Theme.brandA).clipShape(Capsule())
                         .disabled(beaconLabel.isEmpty)
                     if let p = lastPlaced {
-                        Text("QR: \(p.qr_svg)").font(.caption2).foregroundStyle(Theme.t3)
+                        Text(L10n.fill("nmg.qr", state.language, ["svg": p.qr_svg])).font(.caption2).foregroundStyle(Theme.t3)
                     }
                 }.card()
 
@@ -228,29 +247,29 @@ private struct SummonSection: View {
                             Text(b.label).font(.subheadline.bold()).foregroundStyle(Theme.txt)
                             Spacer()
                             if b.active {
-                                Button("Pick up") { pickUp(b) }
+                                Button(L10n.t("nmg.beacon.pickup", state.language)) { pickUp(b) }
                                     .font(.caption.bold()).foregroundStyle(Theme.red)
                             } else {
-                                Text("picked up").font(.caption).foregroundStyle(Theme.t3)
+                                Text(L10n.t("nmg.beacon.pickedup", state.language)).font(.caption).foregroundStyle(Theme.t3)
                             }
                         }
                         HStack {
                             if let loc = b.location { Text(loc).font(.caption).foregroundStyle(Theme.t2) }
                             Spacer()
-                            Text("\(b.scans) scan(s)").font(.caption).foregroundStyle(Theme.t3)
+                            Text(L10n.fill("nmg.beacon.scans", state.language, ["n": "\(b.scans)"])).font(.caption).foregroundStyle(Theme.t3)
                         }
                     }.card()
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Try a summon").font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.trysummon", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     HStack(spacing: 8) {
-                        TextField("@handle · #tag · beacon id", text: $ref)
+                        TextField(L10n.t("nmg.summon.ph", state.language), text: $ref)
                             .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                             .padding(10).background(Theme.scrBot)
                             .clipShape(RoundedRectangle(cornerRadius: 11))
                             .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                        Button("Summon") { resolve() }
+                        Button(L10n.t("nmg.t.summon", state.language)) { resolve() }
                             .font(.caption.bold()).foregroundStyle(.white)
                             .padding(.horizontal, 12).padding(.vertical, 10)
                             .background(Theme.brandA).clipShape(Capsule())
@@ -266,7 +285,8 @@ private struct SummonSection: View {
                             }
                         }
                         if found.type == "beacon", let scans = found.scans {
-                            Text("beacon \"\(found.label ?? "")\" · \(scans) scan(s)")
+                            Text(L10n.fill("nmg.found.beacon", state.language,
+                                 ["label": found.label ?? "", "n": "\(scans)"]))
                                 .font(.caption).foregroundStyle(Theme.t2)
                         }
                     }
@@ -351,25 +371,25 @@ private struct MarketSection: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("List this profile").font(.headline).foregroundStyle(Theme.txt)
-                    Text("Share it on the marketplace — discoverable by #tag summons too.")
+                    Text(L10n.t("nmg.list", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.list.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
-                    TextField("title", text: $title)
+                    TextField(L10n.t("nmg.title.ph", state.language), text: $title)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    TextField("blurb (optional)", text: $blurb)
+                    TextField(L10n.t("nmg.blurb.ph", state.language), text: $blurb)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    TextField("tags, comma separated", text: $tags)
+                    TextField(L10n.t("nmg.tags.ph", state.language), text: $tags)
                         .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    Button("Create listing") { create() }
+                    Button(L10n.t("nmg.create", state.language)) { create() }
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 10)
                         .background(Theme.brandA).clipShape(Capsule())
@@ -380,7 +400,7 @@ private struct MarketSection: View {
                 if let status { Text(status).font(.caption).foregroundStyle(Theme.green) }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Wellbeing & quick browse")
+                    Text(L10n.t("nmg.wellbeing.head", state.language))
                         .font(.caption.bold()).foregroundStyle(Theme.txt)
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 8) {
@@ -398,17 +418,20 @@ private struct MarketSection: View {
                             }
                         }
                     }
-                    Text("The wellbeing starters — Dr. Lena Whitcomb (anxiety), Dr. Marcus Adeyemi (mood), Dr. Priya Nair (relationships) — offer education and support, never a substitute for professional care. In crisis, call or text 988.")
+                    // Was "In crisis, call or text 988." — a US number, shown to readers
+                    // in ten languages. The sibling product settled this: name the
+                    // category, not a number that only works in one country.
+                    Text(L10n.t("nmg.wellbeing", state.language))
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }.card()
 
                 HStack(spacing: 8) {
-                    TextField("filter by tag", text: $filterTag)
+                    TextField(L10n.t("nmg.filter.tag", state.language), text: $filterTag)
                         .foregroundStyle(Theme.txt).textInputAutocapitalization(.never)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    Button("Browse") { Task { await load() } }
+                    Button(L10n.t("nmg.browse", state.language)) { Task { await load() } }
                         .font(.caption.bold()).foregroundStyle(.white)
                         .padding(.horizontal, 12).padding(.vertical, 10)
                         .background(Theme.brandA).clipShape(Capsule())
@@ -429,7 +452,7 @@ private struct MarketSection: View {
                             }
                             Spacer()
                             if l.profile_id == state.pid {
-                                Button("Remove") { remove(l) }
+                                Button(L10n.t("nmg.remove", state.language)) { remove(l) }
                                     .font(.caption).foregroundStyle(Theme.red)
                             }
                         }
@@ -485,37 +508,40 @@ private struct LicenseSection: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("License this expertise").font(.headline).foregroundStyle(Theme.txt)
-                    Text("consult = use as-is · finetune / clone = buyers may derive their own agent (provenance recorded). Buyers acquire with their own verified identity, outside this app.")
+                    Text(L10n.t("nmg.license", state.language)).font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.license.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
                     Picker("", selection: $kind) {
                         ForEach(["consult", "finetune", "clone"], id: \.self) {
                             Text($0).tag($0)
                         }
                     }.pickerStyle(.segmented)
-                    TextField("price (USD)", text: $price)
+                    TextField(L10n.t("nmg.price.ph", state.language), text: $price)
                         .keyboardType(.decimalPad)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
-                    TextField("terms (optional)", text: $terms)
+                    TextField(L10n.t("nmg.terms.ph", state.language), text: $terms)
                         .foregroundStyle(Theme.txt)
                         .padding(10).background(Theme.scrBot)
                         .clipShape(RoundedRectangle(cornerRadius: 11))
                         .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
                     HStack(spacing: 8) {
-                        Button("Set offer") { set() }
+                        Button(L10n.t("nmg.setoffer", state.language)) { set() }
                             .font(.caption.bold()).foregroundStyle(.white)
                             .padding(.horizontal, 12).padding(.vertical, 10)
                             .background(Theme.brandA).clipShape(Capsule())
                         if offer != nil {
-                            Button("Unlist") { unlist() }
+                            Button(L10n.t("nmg.unlist", state.language)) { unlist() }
                                 .font(.caption).foregroundStyle(Theme.red)
                         }
                     }
                     if let offer {
-                        Text("offered: \(offer.kind) · \(offer.currency) \(String(format: "%.2f", offer.price))\(offer.allow_derivatives ? " · derivatives allowed" : "")")
+                        Text(L10n.fill(offer.allow_derivatives
+                                       ? "nmg.offered.derivatives" : "nmg.offered", state.language,
+                                       ["kind": offer.kind, "currency": offer.currency,
+                                        "price": String(format: "%.2f", offer.price)]))
                             .font(.caption).foregroundStyle(Theme.green)
                     }
                 }.card()
@@ -523,7 +549,7 @@ private struct LicenseSection: View {
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
 
                 if !grants.isEmpty {
-                    Text("Grants").font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("nmg.grants", state.language)).font(.headline).foregroundStyle(Theme.txt)
                 }
                 ForEach(grants, id: \.id) { g in
                     VStack(alignment: .leading, spacing: 4) {
@@ -532,14 +558,14 @@ private struct LicenseSection: View {
                                 .font(.subheadline.bold()).foregroundStyle(Theme.txt)
                             Spacer()
                             if g.revoked {
-                                Text("revoked").font(.caption).foregroundStyle(Theme.red)
+                                Text(L10n.t("nmg.revoked", state.language)).font(.caption).foregroundStyle(Theme.red)
                             } else {
-                                Button("Revoke") { revoke(g) }
+                                Button(L10n.t("nmg.revoke", state.language)) { revoke(g) }
                                     .font(.caption.bold()).foregroundStyle(Theme.red)
                             }
                         }
                         if let d = g.derived_profile_id {
-                            Text("derived agent: \(d)").font(.caption).foregroundStyle(Theme.t2)
+                            Text(L10n.fill("nmg.derived", state.language, ["id": d])).font(.caption).foregroundStyle(Theme.t2)
                         }
                     }.card()
                 }
@@ -597,9 +623,8 @@ private struct SignatureSection: View {
             NavigationStack { SignatureView(profileId: pid, token: token) }
         } else {
             VStack(spacing: 8) {
-                Text("Create a profile first").font(.subheadline.weight(.semibold))
-                Text("Signing credentials are bound to an account, so there has "
-                     + "to be one before a passkey can stand for it.")
+                Text(L10n.t("nmg.needprofile", state.language)).font(.subheadline.weight(.semibold))
+                Text(L10n.t("nsig.needaccount", state.language))
                     .font(.caption).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -619,9 +644,8 @@ private struct VoiceSection: View {
             VoiceView(profileId: pid, token: token)
         } else {
             VStack(spacing: 8) {
-                Text("Create a profile first").font(.subheadline.weight(.semibold))
-                Text("A voiceprint belongs to a profile and only its owner may "
-                     + "enroll one, so there has to be one to own it.")
+                Text(L10n.t("nmg.needprofile", state.language)).font(.subheadline.weight(.semibold))
+                Text(L10n.t("nvoi.needprofile", state.language))
                     .font(.caption).foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
@@ -644,17 +668,15 @@ private struct DeskSection: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Open a desk") {
+                Section(L10n.t("nmg.t.desk", state.language)) {
                     TextField("dsk_…", text: $deskId)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
-                    Button("Open") { open = true }
+                    Button(L10n.t("nmg.open", state.language)) { open = true }
                         .disabled(deskId.isEmpty)
                 }
                 Section {
-                    Text("A desk is a real person, not a synthetic profile — "
-                         + "so nothing here carries the AI mark. If they are "
-                         + "away from the desk, you can ring the bell.")
+                    Text(L10n.t("ndsk.note", state.language))
                         .font(.caption2).foregroundStyle(.secondary)
                 }
             }

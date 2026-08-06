@@ -8,19 +8,19 @@
     <Pivot MaxWidth="680" Margin="20,12" Foreground="{StaticResource QrmeTxtBrush}">
 
         <!-- Summon: @handle + placed QR beacons -->
-        <PivotItem Header="Summon">
+        <PivotItem x:Name="SummonPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="@handle" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="HandleHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="A unique name anyone can summon the profile by."
+                            <TextBlock x:Name="HandleSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <TextBox x:Name="HandleBox" PlaceholderText="rosa_the_gardener" />
-                            <Button Content="Claim" Click="OnClaim"
+                            <TextBox x:Name="HandleBox" />
+                            <Button x:Name="ClaimButton" Click="OnClaim"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                             <TextBlock x:Name="ClaimedText" FontSize="12" Visibility="Collapsed"
                                        Foreground="{StaticResource QrmeGreenBrush}" />
@@ -29,14 +29,14 @@
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Beacons" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="BeaconsHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Leave the profile behind somewhere physical — a placed QR that summons it. Pick it back up any time."
+                            <TextBlock x:Name="BeaconsSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <TextBox x:Name="BeaconLabelBox" Header="Label" PlaceholderText="Rosa's garden bench" />
-                            <TextBox x:Name="BeaconLocationBox" Header="Location (optional)" />
-                            <Button Content="Place beacon" Click="OnPlaceBeacon"
+                            <TextBox x:Name="BeaconLabelBox" />
+                            <TextBox x:Name="BeaconLocationBox" />
+                            <Button x:Name="PlaceBeaconButton" Click="OnPlaceBeacon"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                             <TextBlock x:Name="QrText" FontSize="10" Visibility="Collapsed"
                                        TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}" />
@@ -55,7 +55,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding Label}" FontWeight="Bold"
                                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                                            <Button Grid.Column="1" Content="Pick up" Tag="{Binding Id}"
+                                            <Button Grid.Column="1" Content="{Binding PickUpLabel}" Tag="{Binding Id}"
                                                     Click="OnPickUp" Visibility="{Binding ActiveVisibility}"
                                                     Background="Transparent" FontSize="12"
                                                     Foreground="{StaticResource QrmeRedBrush}" />
@@ -70,10 +70,10 @@
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Try a summon" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="TrySummonHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBox x:Name="RefBox" PlaceholderText="@handle · #tag · beacon id" />
-                            <Button Content="Summon" Click="OnSummon"
+                            <TextBox x:Name="RefBox" />
+                            <Button x:Name="SummonButton" Click="OnSummon"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                             <ItemsControl x:Name="SummonList">
                                 <ItemsControl.ItemTemplate>
@@ -98,21 +98,21 @@
         </PivotItem>
 
         <!-- Marketplace -->
-        <PivotItem Header="Market">
+        <PivotItem x:Name="MarketPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="List this profile" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="ListHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Share it on the marketplace — discoverable by #tag summons too."
+                            <TextBlock x:Name="ListSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <TextBox x:Name="TitleBox" Header="Title" />
-                            <TextBox x:Name="BlurbBox" Header="Blurb (optional)" />
-                            <TextBox x:Name="TagsBox" Header="Tags, comma separated" />
-                            <Button Content="Create listing" Click="OnCreateListing"
+                            <TextBox x:Name="TitleBox" />
+                            <TextBox x:Name="BlurbBox" />
+                            <TextBox x:Name="TagsBox" />
+                            <Button x:Name="CreateListingButton" Click="OnCreateListing"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                         </StackPanel>
                     </Border>
@@ -123,7 +123,7 @@
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="12" Padding="12">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Wellbeing &amp; quick browse" FontSize="13" FontWeight="Bold"
+                            <TextBlock x:Name="WellbeingHead" FontSize="13" FontWeight="Bold"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
                             <ItemsControl x:Name="QuickTags">
                                 <ItemsControl.ItemsPanel>
@@ -132,14 +132,14 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                            <TextBlock Text="The wellbeing starters — Dr. Lena Whitcomb (anxiety), Dr. Marcus Adeyemi (mood), Dr. Priya Nair (relationships) — offer education and support, never a substitute for professional care. In crisis, call or text 988."
+                            <TextBlock x:Name="WellbeingNote"
                                        FontSize="11" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
                         </StackPanel>
                     </Border>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBox x:Name="FilterTagBox" PlaceholderText="filter by tag" Width="240" />
-                        <Button Content="Browse" Click="OnBrowse"
+                        <TextBox x:Name="FilterTagBox" Width="240" />
+                        <Button x:Name="BrowseButton" Click="OnBrowse"
                                 Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     </StackPanel>
                     <ItemsControl x:Name="ListingList">
@@ -167,7 +167,7 @@
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding TagLine}" FontSize="11"
                                                        Foreground="{StaticResource QrmeT2Brush}" />
-                                            <Button Grid.Column="1" Content="Remove" Tag="{Binding Id}"
+                                            <Button Grid.Column="1" Content="{Binding RemoveLabel}" Tag="{Binding Id}"
                                                     Click="OnRemoveListing" Visibility="{Binding MineVisibility}"
                                                     Background="Transparent" FontSize="12"
                                                     Foreground="{StaticResource QrmeRedBrush}" />
@@ -182,20 +182,20 @@
         </PivotItem>
 
         <!-- Knowledge packs -->
-        <PivotItem Header="Packs">
+        <PivotItem x:Name="PacksPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Knowledge packs" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="PacksHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Make this profile smarter: a pack's curated items join its source material, grounding what it knows — and every reply's provenance shows the pack honestly. 🤖 Robot task packs teach the body this profile embodies new commandable tasks, capability-checked at install. Free packs download; priced packs are bought."
+                            <TextBlock x:Name="PacksSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBox x:Name="PackIndustryBox" PlaceholderText="filter by industry" Width="240" />
-                                <Button Content="Browse" Click="OnBrowsePacks"
+                                <TextBox x:Name="PackIndustryBox" Width="240" />
+                                <Button x:Name="BrowsePacksButton" Click="OnBrowsePacks"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                             </StackPanel>
                         </StackPanel>
@@ -203,9 +203,9 @@
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="12" Padding="12">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Pack sources" FontSize="13" FontWeight="Bold"
+                            <TextBlock x:Name="PackSourcesHead" FontSize="13" FontWeight="Bold"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Federated mod storefronts — sync a source and its catalog joins the marketplace, origin on every label."
+                            <TextBlock x:Name="PackSourcesSub"
                                        FontSize="11" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT3Brush}" />
                             <ItemsControl x:Name="RegistryList">
@@ -260,10 +260,10 @@
                                         <TextBlock Text="{Binding Meta}" FontSize="11"
                                                    Foreground="{StaticResource QrmeT3Brush}" />
                                         <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                                            <TextBlock Text="Installed" FontSize="12" FontWeight="Bold"
+                                            <TextBlock Text="{Binding InstalledLabel}" FontSize="12" FontWeight="Bold"
                                                        Foreground="{StaticResource QrmeGreenBrush}"
                                                        Visibility="{Binding InstalledVisibility}" />
-                                            <Button Content="Remove" Tag="{Binding Id}" Click="OnUninstallPack"
+                                            <Button Content="{Binding RemoveLabel}" Tag="{Binding Id}" Click="OnUninstallPack"
                                                     Visibility="{Binding InstalledVisibility}"
                                                     Background="Transparent" FontSize="12"
                                                     Foreground="{StaticResource QrmeRedBrush}" />
@@ -283,24 +283,24 @@
         </PivotItem>
 
         <!-- Licensing -->
-        <PivotItem Header="License">
+        <PivotItem x:Name="LicensePivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="License this expertise" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="LicenseHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="consult = use as-is · finetune / clone = buyers may derive their own agent (provenance recorded). Buyers acquire with their own verified identity, outside this app."
+                            <TextBlock x:Name="LicenseSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
-                            <ComboBox x:Name="KindBox" Header="Kind" HorizontalAlignment="Stretch" />
-                            <TextBox x:Name="PriceBox" Header="Price (USD)" PlaceholderText="0" />
-                            <TextBox x:Name="TermsBox" Header="Terms (optional)" />
+                            <ComboBox x:Name="KindBox" HorizontalAlignment="Stretch" />
+                            <TextBox x:Name="PriceBox" PlaceholderText="0" />
+                            <TextBox x:Name="TermsBox" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Set offer" Click="OnSetLicense"
+                                <Button x:Name="SetOfferButton" Click="OnSetLicense"
                                         Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
-                                <Button x:Name="UnlistButton" Content="Unlist" Click="OnUnlist"
+                                <Button x:Name="UnlistButton" Click="OnUnlist"
                                         Visibility="Collapsed" Background="Transparent" FontSize="12"
                                         Foreground="{StaticResource QrmeRedBrush}" />
                             </StackPanel>
@@ -324,10 +324,10 @@
                                             <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="13"
                                                        Foreground="{StaticResource QrmeTxtBrush}" />
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                                <TextBlock Text="revoked" FontSize="12"
+                                                <TextBlock Text="{Binding RevokedLabel}" FontSize="12"
                                                            Visibility="{Binding RevokedVisibility}"
                                                            Foreground="{StaticResource QrmeRedBrush}" />
-                                                <Button Content="Revoke" Tag="{Binding Id}" Click="OnRevokeGrant"
+                                                <Button Content="{Binding RevokeLabel}" Tag="{Binding Id}" Click="OnRevokeGrant"
                                                         Visibility="{Binding ActiveVisibility}"
                                                         Background="Transparent" FontSize="12"
                                                         Foreground="{StaticResource QrmeRedBrush}" />
@@ -344,37 +344,37 @@
             </ScrollViewer>
         </PivotItem>
 
-        <PivotItem Header="Earn">
+        <PivotItem x:Name="EarnPivot">
             <ScrollViewer>
                 <StackPanel Spacing="12" Padding="4">
                     <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                             BorderThickness="1" CornerRadius="16" Padding="16">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Earnings" FontWeight="Bold" FontSize="16"
+                            <TextBlock x:Name="EarningsHead" FontWeight="Bold" FontSize="16"
                                        Foreground="{StaticResource QrmeTxtBrush}" />
-                            <TextBlock Text="Everything this creator earns — pack sales, license fees, and verified venue-placement views — written to the ledger at transaction time."
+                            <TextBlock x:Name="EarningsSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
                             <StackPanel Orientation="Horizontal" Spacing="24">
                                 <StackPanel>
                                     <TextBlock x:Name="AccruedText" Text="—" FontSize="18" FontWeight="Bold"
                                                Foreground="{StaticResource QrmeGreenBrush}" />
-                                    <TextBlock Text="Accrued" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
+                                    <TextBlock x:Name="AccruedLabel" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
                                 </StackPanel>
                                 <StackPanel>
                                     <TextBlock x:Name="PaidText" Text="—" FontSize="18" FontWeight="Bold"
                                                Foreground="{StaticResource QrmeT2Brush}" />
-                                    <TextBlock Text="Paid" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
+                                    <TextBlock x:Name="PaidLabel" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
                                 </StackPanel>
                                 <StackPanel>
                                     <TextBlock x:Name="LifetimeText" Text="—" FontSize="18" FontWeight="Bold"
                                                Foreground="{StaticResource QrmeBrandABrush}" />
-                                    <TextBlock Text="Lifetime" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
+                                    <TextBlock x:Name="LifetimeLabel" FontSize="11" Foreground="{StaticResource QrmeT2Brush}" />
                                 </StackPanel>
                             </StackPanel>
                             <TextBlock x:Name="ByKindText" FontSize="11" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT3Brush}" Visibility="Collapsed" />
-                            <Button x:Name="PayoutButton" Content="Request payout" Click="OnRequestPayout"
+                            <Button x:Name="PayoutButton" Click="OnRequestPayout"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
                             <TextBlock x:Name="PayoutText" FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeGreenBrush}" Visibility="Collapsed" />

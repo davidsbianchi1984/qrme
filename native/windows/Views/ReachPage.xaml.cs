@@ -17,6 +17,7 @@ public sealed partial class ReachPage : Page
         public bool Active { get; init; }
         public Visibility ActiveVisibility =>
             Active ? Visibility.Visible : Visibility.Collapsed;
+        public string PickUpLabel => L10n.T("nmg.beacon.pickup");
     }
 
     public sealed class CardVm
@@ -35,6 +36,7 @@ public sealed partial class ReachPage : Page
         public bool Mine { get; init; }
         public Visibility MineVisibility =>
             Mine ? Visibility.Visible : Visibility.Collapsed;
+        public string RemoveLabel => L10n.T("nmg.remove");
     }
 
     public sealed class PackVm
@@ -50,6 +52,8 @@ public sealed partial class ReachPage : Page
             Installed ? Visibility.Visible : Visibility.Collapsed;
         public Visibility AvailableVisibility =>
             Installed ? Visibility.Collapsed : Visibility.Visible;
+        public string InstalledLabel => L10n.T("nmg.packs.installed");
+        public string RemoveLabel => L10n.T("nmg.remove");
     }
 
     public sealed class RegistryVm
@@ -59,7 +63,8 @@ public sealed partial class ReachPage : Page
         public string Tagline { get; init; } = "";
         public string SyncState { get; init; } = "";
         public bool CanSync { get; init; }
-        public string ActionLabel => CanSync ? "Sync" : "Synced";
+        public string ActionLabel =>
+            L10n.T(CanSync ? "nmg.packs.sync" : "nmg.packs.synced");
     }
 
     public sealed class GrantVm
@@ -72,6 +77,8 @@ public sealed partial class ReachPage : Page
             Revoked ? Visibility.Visible : Visibility.Collapsed;
         public Visibility ActiveVisibility =>
             Revoked ? Visibility.Collapsed : Visibility.Visible;
+        public string RevokedLabel => L10n.T("nmg.revoked");
+        public string RevokeLabel => L10n.T("nmg.revoke");
     }
 
     private static readonly string[] Kinds = { "consult", "finetune", "clone" };
@@ -81,7 +88,75 @@ public sealed partial class ReachPage : Page
         { "mental-health", "mood", "relationships",
           "healthcare", "finance", "fitness", "food" };
 
-    public ReachPage() => InitializeComponent();
+    public ReachPage()
+    {
+        InitializeComponent();
+        Localize();
+    }
+
+    /// Every visible word on this page, from the table. The same surface is
+    /// called Manage on the phones and Reach here, and until this round the
+    /// two of them disagreed about the packs paragraph as well as the name:
+    /// Windows told a reader that provenance names the pack, that a robot task
+    /// pack teaches a body new commandable tasks, and that free packs download
+    /// while priced ones are bought — three facts the phones left out. One row
+    /// now, the longer wording, on all three shells.
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        SummonPivot.Header = L10n.T("nmg.t.summon", lang);
+        MarketPivot.Header = L10n.T("nmg.t.market", lang);
+        PacksPivot.Header = L10n.T("nmg.t.packs", lang);
+        LicensePivot.Header = L10n.T("nmg.t.license", lang);
+        EarnPivot.Header = L10n.T("nmg.t.earn", lang);
+
+        HandleHead.Text = L10n.T("nmg.handle", lang);
+        HandleSub.Text = L10n.T("nmg.handle.sub", lang);
+        HandleBox.PlaceholderText = L10n.T("nmg.handle.example", lang);
+        ClaimButton.Content = L10n.T("nmg.claim", lang);
+        BeaconsHead.Text = L10n.T("nmg.beacons", lang);
+        BeaconsSub.Text = L10n.T("nmg.beacons.sub", lang);
+        BeaconLabelBox.Header = L10n.T("nmg.h.label", lang);
+        BeaconLabelBox.PlaceholderText = L10n.T("nmg.beacon.label.example", lang);
+        BeaconLocationBox.Header = L10n.T("nmg.h.location", lang);
+        PlaceBeaconButton.Content = L10n.T("nmg.beacon.place", lang);
+        TrySummonHead.Text = L10n.T("nmg.trysummon", lang);
+        RefBox.PlaceholderText = L10n.T("nmg.summon.ph", lang);
+        SummonButton.Content = L10n.T("nmg.t.summon", lang);
+
+        ListHead.Text = L10n.T("nmg.list", lang);
+        ListSub.Text = L10n.T("nmg.list.sub", lang);
+        TitleBox.Header = L10n.T("nmg.h.title", lang);
+        BlurbBox.Header = L10n.T("nmg.h.blurb", lang);
+        TagsBox.Header = L10n.T("nmg.h.tags", lang);
+        CreateListingButton.Content = L10n.T("nmg.create", lang);
+        WellbeingHead.Text = L10n.T("nmg.wellbeing.head", lang);
+        WellbeingNote.Text = L10n.T("nmg.wellbeing", lang);
+        FilterTagBox.PlaceholderText = L10n.T("nmg.filter.tag", lang);
+        BrowseButton.Content = L10n.T("nmg.browse", lang);
+
+        PacksHead.Text = L10n.T("nmg.packs", lang);
+        PacksSub.Text = L10n.T("nmg.packs.sub", lang);
+        PackIndustryBox.PlaceholderText = L10n.T("nmg.filter.industry", lang);
+        BrowsePacksButton.Content = L10n.T("nmg.browse", lang);
+        PackSourcesHead.Text = L10n.T("nmg.packs.sources", lang);
+        PackSourcesSub.Text = L10n.T("nmg.packs.sources.sub", lang);
+
+        LicenseHead.Text = L10n.T("nmg.license", lang);
+        LicenseSub.Text = L10n.T("nmg.license.sub", lang);
+        KindBox.Header = L10n.T("nmg.license.kind", lang);
+        PriceBox.Header = L10n.T("nmg.h.price", lang);
+        TermsBox.Header = L10n.T("nmg.h.terms", lang);
+        SetOfferButton.Content = L10n.T("nmg.setoffer", lang);
+        UnlistButton.Content = L10n.T("nmg.unlist", lang);
+
+        EarningsHead.Text = L10n.T("nmg.earnings", lang);
+        EarningsSub.Text = L10n.T("nmg.earnings.sub", lang);
+        AccruedLabel.Text = L10n.T("nmg.accrued", lang);
+        PaidLabel.Text = L10n.T("nmg.paid", lang);
+        LifetimeLabel.Text = L10n.T("nmg.lifetime", lang);
+        PayoutButton.Content = L10n.T("nmg.payout.request", lang);
+    }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
@@ -196,7 +271,11 @@ public sealed partial class ReachPage : Page
                        + (p.OriginUrl is { } u ? $" · from {u}" : ""),
                 PriceLabel = (p.Audience == "robot" ? "🤖 ROBOT · " : "")
                              + (p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}"),
-                ActionLabel = p.Free ? "Download" : $"Buy {p.Price:F2} {p.Currency}",
+                ActionLabel = p.Free
+                    ? L10n.T("nmg.packs.download")
+                    : L10n.Fill("nmg.packs.buy", AppState.Current.Language,
+                                ("price", p.Price.ToString("F2")),
+                                ("currency", p.Currency)),
                 Installed = _installedOn.ContainsKey(p.Id),
             }).ToList();
             PackError.Visibility = Visibility.Collapsed;

@@ -45,6 +45,17 @@
 # every one of its sentences was a XAML attribute, which is written once at
 # parse time and cannot be re-read in another language; localizing them meant
 # moving them to the code-behind first.
-ios: 133
-android: 96
-windows: 139
+# 0.46.8 lowered all three by finishing the console that runs a profile's
+# public reach. It is one surface under three names — `ManageView` on iOS,
+# `ReachPage` on Windows, loose panels in `Screens.kt` on Android — and its
+# own sub-tabs (Summon, Market, Packs, License, Earn) were English on every
+# shell, which is this arc's opening finding one level down.
+#
+# The line worth naming: the wellbeing card told readers in ten languages to
+# "call or text 988" — a US number that reaches nothing from Spain, Japan,
+# India or Egypt. The sibling product settled this wording rounds ago. It now
+# says: contact your local crisis line or emergency services.
+
+ios: 80
+android: 43
+windows: 89

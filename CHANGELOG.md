@@ -4,6 +4,61 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.8] — 2026-08-06
+
+### The crisis number that only works in one country
+
+The wellbeing card on the marketplace — the one introducing Dr. Lena
+Whitcomb, Dr. Marcus Adeyemi and Dr. Priya Nair — ended with *"In crisis,
+call or text 988."* That is the US Suicide & Crisis Lifeline. It reaches
+nothing from Spain, Japan, India or Egypt, and this round put that sentence
+into ten languages, which is what made it obvious: a translated instruction
+to dial a number that does not answer is worse than an untranslated one.
+
+It now says **contact your local crisis line or emergency services**. The
+sibling product settled this same question rounds ago and its wording was
+already there to copy.
+
+Two files still carry the number in starter-pack content served from the
+backend — `qrme/packs.py` and `qrme/seed.py`. That is a different surface,
+localized server-side, and it gets its own round.
+
+### The same surface has three names
+
+`ManageView` on iOS, `ReachPage` on Windows, six loose panels in `Screens.kt`
+on Android. One console — the owner's reach: their @handle, their placed QR
+beacons, their marketplace listing, their knowledge packs, the license their
+expertise is offered under, and what it has earned.
+
+Its **own sub-tabs were English on every shell**. Summon, Market, Packs,
+License, Earn — the tab bar behind the tab bar. That is the finding this
+whole arc opened with, one level down.
+
+The iOS tab enum was the cause: its raw values were both the API-side section
+names *and* the words a person read. Splitting them is the same fix as the
+relationship dropdown four releases ago and the kind picker three ago.
+
+**368 → 212.** iOS 133 → 80, Android 96 → 43, Windows 139 → 89.
+
+### One paragraph, two lengths
+
+Windows told a reader three things about knowledge packs that the phones did
+not: that a reply's provenance names the pack it drew on, that a robot task
+pack teaches a physical body new commandable tasks and is capability-checked
+at install, and that free packs download while priced ones are bought. Three
+facts, missing from two shells out of three.
+
+The longer wording wins and all three shells carry it now.
+
+### A shell that would not have compiled
+
+Three sections of the iOS console ended up with two `@EnvironmentObject`
+declarations of the same property — the bulk pass added one to sections that
+already had it under `private`. Two stored properties with one name do not
+compile. Caught before the guards ran, by reading the file.
+
+Cut together with JIM-mini and PDI at app-v0.46.8.
+
 ## [0.46.7] — 2026-08-06
 
 ### Two cards, done on two shells out of three

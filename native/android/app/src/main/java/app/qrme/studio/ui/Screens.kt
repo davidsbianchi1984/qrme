@@ -472,7 +472,7 @@ fun ComposeScreen(vm: StudioViewModel) {
                 HorizontalDivider(color = Qrme.Line)
                 Text(p.content ?: "· held for review ·", color = Qrme.Txt, fontSize = 14.sp)
                 Text(p.watermarkLine ?: "✦ AI", color = Qrme.T3, fontSize = 10.sp)
-                p.provenance?.let { ProvenanceFooter(it) }
+                p.provenance?.let { ProvenanceFooter(it, vm.language) }
             }
         }
     }
@@ -1306,7 +1306,7 @@ private fun SocialPanel(vm: StudioViewModel) {
                      else "${c.published} post(s) published",
                     color = Qrme.T2, fontSize = 12.sp)
                 if (c.status == "revoked") {
-                    Text("revoked", color = Qrme.Red, fontSize = 12.sp)
+                    Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically) {
@@ -1384,7 +1384,7 @@ private fun AppsPanel(vm: StudioViewModel) {
                     Text(c.provider, color = Qrme.T3, fontSize = 12.sp)
                 }
                 if (c.status == "revoked") {
-                    Text("revoked", color = Qrme.Red, fontSize = 12.sp)
+                    Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SmallAction("Collect") {
@@ -1732,9 +1732,8 @@ private fun EarningsPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Earnings", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Everything this creator earns — pack sales, license fees, and verified " +
-                 "venue-placement views — written to the ledger at transaction time.",
+            Text(L10n.t("nmg.earnings", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.earnings.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             statement?.let { s ->
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -1760,15 +1759,17 @@ private fun EarningsPanel(vm: StudioViewModel) {
                     }
                 }
                 receipt?.let {
-                    Text("Payout ${it.payoutId}: ${money(it.total, s.currency)} across " +
-                         "${it.entries} entries (simulated transfer).",
+                    Text(L10n.fill("nmg.payout.done", vm.language,
+                             mapOf("id" to it.payoutId,
+                                   "total" to money(it.total, s.currency),
+                                   "n" to "${it.entries}")),
                         color = Qrme.Green, fontSize = 12.sp)
                 }
             } ?: CircularProgressIndicator(color = Qrme.BrandA, modifier = Modifier.size(22.dp))
         }
         statement?.takeIf { it.entries.isNotEmpty() }?.let { s ->
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Ledger", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.t("nmg.ledger", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 s.entries.take(20).forEach { e ->
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column(Modifier.weight(1f)) {
@@ -1813,13 +1814,11 @@ private fun GamingPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Play alongside", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("ngam", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
-            Text("Bring this profile into a game as a companion or teammate. " +
-                 "It talks in character and moderated — and always plays " +
-                 "within the game's rules; it never cheats.",
+            Text(L10n.t("ngam.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
-            Text("Platform", color = Qrme.T3, fontSize = 11.sp)
+            Text(L10n.t("ngam.platform", vm.language), color = Qrme.T3, fontSize = 11.sp)
             Row(Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 platforms.forEach { p ->
@@ -1866,7 +1865,8 @@ private fun GamingPanel(vm: StudioViewModel) {
                         color = if (s.status == "active") Qrme.Green else Qrme.T3,
                         fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
-                Text("${s.role.replace("_", " ")} · ${s.callouts} callouts",
+                Text(L10n.fill("ngam.session", vm.language,
+                    mapOf("role" to s.role.replace("_", " "), "n" to "${s.callouts}")),
                     color = Qrme.T2, fontSize = 11.sp)
                 if (s.status == "active") {
                     if (openSession == s.id) {
@@ -1875,7 +1875,7 @@ private fun GamingPanel(vm: StudioViewModel) {
                         Row(Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically) {
-                            Text("Minor in lobby (forces strict)",
+                            Text(L10n.t("ngam.minor", vm.language),
                                 color = Qrme.T2, fontSize = 11.sp)
                             Switch(checked = minorPresent,
                                 onCheckedChange = { minorPresent = it })
@@ -1892,17 +1892,18 @@ private fun GamingPanel(vm: StudioViewModel) {
                                 vm.call({ ApiClient.endGameSession(s.id, vm.token!!) }) {
                                     openSession = null; reload()
                                 }
-                            }) { Text("End", color = Qrme.Red, fontSize = 12.sp) }
+                            }) { Text(L10n.t("ngam.end", vm.language), color = Qrme.Red, fontSize = 12.sp) }
                         }
                         lastLine?.let { l ->
                             if (l.status == "spoken" && l.line != null)
                                 Text("🎙 ${l.line}", color = Qrme.Green, fontSize = 12.sp)
-                            else Text("⚠️ held — ${l.flagReason ?: "moderation"}",
+                            else Text(L10n.fill("ngam.held", vm.language, mapOf("reason" to
+                                    (l.flagReason ?: L10n.t("ngam.held.default", vm.language)))),
                                 color = Qrme.Amber, fontSize = 11.sp)
                         }
                     } else {
                         TextButton(onClick = { openSession = s.id; lastLine = null }) {
-                            Text("Open", color = Qrme.BrandA, fontSize = 12.sp)
+                            Text(L10n.t("nmg.open", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
                         }
                     }
                 }
@@ -1936,8 +1937,8 @@ private fun SummonPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("@handle", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("A unique name anyone can summon the profile by.", color = Qrme.T2, fontSize = 12.sp)
+            Text(L10n.t("nmg.handle", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.handle.sub", vm.language), color = Qrme.T2, fontSize = 12.sp)
             labeledField("Handle", handle, "rosa_the_gardener") { handle = it }
             SmallAction("Claim") {
                 if (handle.isNotBlank()) {
@@ -1949,12 +1950,12 @@ private fun SummonPanel(vm: StudioViewModel) {
                     }
                 }
             }
-            claimed?.let { Text("claimed $it", color = Qrme.Green, fontSize = 12.sp) }
+            claimed?.let { Text(L10n.fill("nmg.claimed", vm.language, mapOf("handle" to it)), color = Qrme.Green, fontSize = 12.sp) }
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Beacons", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Leave the profile behind somewhere physical — a placed QR that summons it. Pick it back up any time.",
+            Text(L10n.t("nmg.beacons", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.beacons.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             labeledField("Label", label, "Rosa's garden bench") { label = it }
             labeledField("Location (optional)", location, "the community garden") { location = it }
@@ -1968,12 +1969,12 @@ private fun SummonPanel(vm: StudioViewModel) {
                     }
                 }
             }
-            lastQr?.let { Text("QR: $it", color = Qrme.T3, fontSize = 10.sp) }
+            lastQr?.let { Text(L10n.fill("nmg.qr", vm.language, mapOf("svg" to it)), color = Qrme.T3, fontSize = 10.sp) }
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Scan a beacon", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Point the camera at a QRME sticker and the profile appears on it — no page, no tap. A stock camera app can only open the link; this one can draw on the code.",
+            Text(L10n.t("nmg.beacon.scan", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.beacon.scan.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             SmallAction("Open scanner") { scanning = true }
         }
@@ -1985,18 +1986,18 @@ private fun SummonPanel(vm: StudioViewModel) {
                     if (b.active) {
                         TextButton(onClick = {
                             vm.call({ ApiClient.pickUpBeacon(b.id) }) { reload() }
-                        }) { Text("Pick up", color = Qrme.Red, fontSize = 12.sp) }
-                    } else Text("picked up", color = Qrme.T3, fontSize = 12.sp)
+                        }) { Text(L10n.t("nmg.beacon.pickup", vm.language), color = Qrme.Red, fontSize = 12.sp) }
+                    } else Text(L10n.t("nmg.beacon.pickedup", vm.language), color = Qrme.T3, fontSize = 12.sp)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(b.location ?: "", color = Qrme.T2, fontSize = 12.sp)
-                    Text("${b.scans} scan(s)", color = Qrme.T3, fontSize = 12.sp)
+                    Text(L10n.fill("nmg.beacon.scans", vm.language, mapOf("n" to "${b.scans}")), color = Qrme.T3, fontSize = 12.sp)
                 }
             }
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Try a summon", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.trysummon", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             labeledField("Reference", ref, "@handle · #tag · beacon id") { ref = it }
             SmallAction("Summon") {
                 if (ref.isNotBlank()) {
@@ -2017,7 +2018,8 @@ private fun SummonPanel(vm: StudioViewModel) {
                     }
                 }
                 if (f.type == "beacon")
-                    Text("beacon \"${f.label ?: ""}\" · ${f.scans ?: 0} scan(s)",
+                    Text(L10n.fill("nmg.found.beacon", vm.language,
+                            mapOf("label" to (f.label ?: ""), "n" to "${f.scans ?: 0}")),
                         color = Qrme.T2, fontSize = 11.sp)
             }
         }
@@ -2043,8 +2045,8 @@ private fun MarketPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("List this profile", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("Share it on the marketplace — discoverable by #tag summons too.",
+            Text(L10n.t("nmg.list", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.list.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             labeledField("Title", title, "Rosa — gardening wisdom") { title = it }
             labeledField("Blurb (optional)", blurb, "What makes it worth summoning?") { blurb = it }
@@ -2066,7 +2068,7 @@ private fun MarketPanel(vm: StudioViewModel) {
         status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Wellbeing & quick browse", color = Qrme.Txt, fontSize = 14.sp,
+            Text(L10n.t("nmg.wellbeing.head", vm.language), color = Qrme.Txt, fontSize = 14.sp,
                 fontWeight = FontWeight.Bold)
             Row(Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -2082,10 +2084,7 @@ private fun MarketPanel(vm: StudioViewModel) {
                             .padding(horizontal = 10.dp, vertical = 6.dp))
                 }
             }
-            Text("The wellbeing starters — Dr. Lena Whitcomb (anxiety), " +
-                 "Dr. Marcus Adeyemi (mood), Dr. Priya Nair (relationships) — " +
-                 "offer education and support, never a substitute for " +
-                 "professional care. In crisis, call or text 988.",
+            Text(L10n.t("nmg.wellbeing", vm.language),
                 color = Qrme.T3, fontSize = 10.sp)
         }
 
@@ -2107,7 +2106,7 @@ private fun MarketPanel(vm: StudioViewModel) {
                     if (l.profileId == vm.pid) {
                         TextButton(onClick = {
                             vm.call({ ApiClient.removeListing(l.id) }) { reload() }
-                        }) { Text("Remove", color = Qrme.Red, fontSize = 12.sp) }
+                        }) { Text(L10n.t("nmg.remove", vm.language), color = Qrme.Red, fontSize = 12.sp) }
                     }
                 }
             }
@@ -2175,22 +2174,17 @@ private fun PacksPanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Knowledge packs", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("nmg.packs", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
-            Text("Make this profile smarter: a pack's curated items join its " +
-                 "source material, grounding what it knows — and every " +
-                 "reply's provenance shows the pack honestly. 🤖 Robot task " +
-                 "packs teach the body this profile embodies new commandable " +
-                 "tasks, capability-checked at install.",
+            Text(L10n.t("nmg.packs.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             labeledField("Filter by industry", industry, "finance") { industry = it }
             SmallAction("Browse") { reload() }
         }
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Pack sources", color = Qrme.Txt, fontSize = 14.sp,
+            Text(L10n.t("nmg.packs.sources", vm.language), color = Qrme.Txt, fontSize = 14.sp,
                 fontWeight = FontWeight.Bold)
-            Text("Federated mod storefronts — sync a source and its catalog " +
-                 "joins the marketplace, origin on every label.",
+            Text(L10n.t("nmg.packs.sources.sub", vm.language),
                 color = Qrme.T3, fontSize = 10.sp)
             registries.forEach { reg ->
                 Row(Modifier.fillMaxWidth(),
@@ -2200,11 +2194,12 @@ private fun PacksPanel(vm: StudioViewModel) {
                         Text(reg.name, color = Qrme.BrandA, fontSize = 12.sp,
                             fontWeight = FontWeight.Bold)
                         Text(reg.tagline, color = Qrme.T2, fontSize = 10.sp)
-                        Text("${reg.synced}/${reg.available} packs synced",
+                        Text(L10n.fill("nmg.packs.count", vm.language,
+                    mapOf("synced" to "${reg.synced}", "available" to "${reg.available}")),
                             color = Qrme.T3, fontSize = 10.sp)
                     }
                     if (reg.synced >= reg.available)
-                        Text("Synced", color = Qrme.Green, fontSize = 12.sp,
+                        Text(L10n.t("nmg.packs.synced", vm.language), color = Qrme.Green, fontSize = 12.sp,
                             fontWeight = FontWeight.Bold)
                     else SmallAction("Sync") {
                         vm.call({ ApiClient.syncRegistry(reg.key) }) {
@@ -2226,7 +2221,7 @@ private fun PacksPanel(vm: StudioViewModel) {
                         fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (p.audience == "robot")
-                            Text("🤖 ROBOT", color = Qrme.BrandA, fontSize = 11.sp,
+                            Text(L10n.t("nmg.pack.robot", vm.language), color = Qrme.BrandA, fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold)
                         Text(if (p.free) "FREE" else "%.2f %s".format(p.price, p.currency),
                             color = if (p.free) Qrme.Green else Qrme.Amber,
@@ -2234,18 +2229,20 @@ private fun PacksPanel(vm: StudioViewModel) {
                     }
                 }
                 p.blurb?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
-                Text("#${p.industry} · ${p.items} items · ${p.installs} installs · ${p.publisher}",
+                Text(L10n.fill("nmg.pack.meta", vm.language,
+                            mapOf("industry" to p.industry, "items" to "${p.items}",
+                                  "installs" to "${p.installs}", "publisher" to p.publisher)),
                     color = Qrme.T3, fontSize = 11.sp)
                 p.originUrl?.let {
-                    Text("from $it", color = Qrme.BrandA, fontSize = 10.sp)
+                    Text(L10n.fill("nmg.pack.from", vm.language, mapOf("source" to it)), color = Qrme.BrandA, fontSize = 10.sp)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically) {
                     if (p.id in installed) {
-                        Text("Installed", color = Qrme.Green, fontSize = 12.sp,
+                        Text(L10n.t("nmg.packs.installed", vm.language), color = Qrme.Green, fontSize = 12.sp,
                             fontWeight = FontWeight.Bold)
                         TextButton(onClick = { uninstall(p) }) {
-                            Text("Remove", color = Qrme.Red, fontSize = 12.sp)
+                            Text(L10n.t("nmg.remove", vm.language), color = Qrme.Red, fontSize = 12.sp)
                         }
                     } else {
                         SmallAction(if (p.free) "Download"
@@ -2276,8 +2273,8 @@ private fun LicensePanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("License this expertise", color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text("consult = use as-is · finetune / clone = buyers may derive their own agent (provenance recorded). Buyers acquire with their own verified identity, outside this app.",
+            Text(L10n.t("nmg.license", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("nmg.license.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 kinds.forEach { k ->
@@ -2307,12 +2304,14 @@ private fun LicensePanel(vm: StudioViewModel) {
                         vm.call({ ApiClient.unlistLicense(vm.pid!!, vm.token!!) }) {
                             offer = null
                         }
-                    }) { Text("Unlist", color = Qrme.Red, fontSize = 12.sp) }
+                    }) { Text(L10n.t("nmg.unlist", vm.language), color = Qrme.Red, fontSize = 12.sp) }
                 }
             }
             offer?.let {
-                Text("offered: ${it.kind} · ${it.currency} ${it.price}" +
-                    if (it.allowDerivatives) " · derivatives allowed" else "",
+                Text(L10n.fill(if (it.allowDerivatives) "nmg.offered.derivatives"
+                               else "nmg.offered", vm.language,
+                        mapOf("kind" to it.kind, "currency" to it.currency,
+                              "price" to "${it.price}")),
                     color = Qrme.Green, fontSize = 12.sp)
             }
         }
@@ -2324,13 +2323,13 @@ private fun LicensePanel(vm: StudioViewModel) {
                     verticalAlignment = Alignment.CenterVertically) {
                     Text("${g.kind} → ${g.buyerId}", color = Qrme.Txt, fontSize = 13.sp,
                         fontWeight = FontWeight.Bold)
-                    if (g.revoked) Text("revoked", color = Qrme.Red, fontSize = 12.sp)
+                    if (g.revoked) Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
                     else TextButton(onClick = {
                         vm.call({ ApiClient.revokeLicense(g.id, vm.token!!) }) { reload() }
-                    }) { Text("Revoke", color = Qrme.Red, fontSize = 12.sp) }
+                    }) { Text(L10n.t("nmg.revoke", vm.language), color = Qrme.Red, fontSize = 12.sp) }
                 }
                 g.derivedProfileId?.let {
-                    Text("derived agent: $it", color = Qrme.T2, fontSize = 11.sp)
+                    Text(L10n.fill("nmg.derived", vm.language, mapOf("id" to it)), color = Qrme.T2, fontSize = 11.sp)
                 }
             }
         }
@@ -2338,14 +2337,15 @@ private fun LicensePanel(vm: StudioViewModel) {
 }
 
 @Composable
-private fun ProvenanceFooter(p: Provenance) {
+private fun ProvenanceFooter(p: Provenance, lang: String) {
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
         HorizontalDivider(color = Qrme.Line)
-        Text("Generated by ${p.generatedBy} · grounded in persona + " +
-            "${p.sourceItems} source item(s) · moderation: ${p.moderationStatus}",
+        Text(L10n.fill("nprv.generated", lang,
+                mapOf("model" to p.generatedBy, "n" to "${p.sourceItems}",
+                      "status" to p.moderationStatus)),
             color = Qrme.T2, fontSize = 10.sp)
         p.licensedFrom?.let {
-            Text("licensed from $it", color = Qrme.Amber, fontSize = 10.sp)
+            Text(L10n.fill("nprv.licensed", lang, mapOf("source" to it)), color = Qrme.Amber, fontSize = 10.sp)
         }
         Text(p.disclaimer, color = Qrme.T3, fontSize = 10.sp)
     }
@@ -2490,10 +2490,9 @@ private fun VoicePanel(vm: StudioViewModel) {
     if (vm.pid == null || vm.token == null) {
         screenScroll {
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Create a profile first", color = Qrme.Txt, fontSize = 16.sp,
+                Text(L10n.t("nmg.needprofile", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                     fontWeight = FontWeight.Bold)
-                Text("A voiceprint belongs to a profile and only its owner may "
-                    + "enroll one, so there has to be one to own it.",
+                Text(L10n.t("nvoi.needprofile", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
             }
         }
@@ -5810,11 +5809,9 @@ private fun DeskPanel(vm: StudioViewModel) {
     }
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Open a desk", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("ndsk.open", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
-            Text("A desk is a real person, not a synthetic profile — so nothing "
-                + "there carries the AI mark. If they are away from the desk, "
-                + "you can ring the bell.", color = Qrme.T2, fontSize = 12.sp)
+            Text(L10n.t("ndsk.note", vm.language), color = Qrme.T2, fontSize = 12.sp)
             labeledField("Desk id", deskId, "dsk_…") { deskId = it }
             SmallAction("Open") { if (deskId.isNotBlank()) open = true }
         }

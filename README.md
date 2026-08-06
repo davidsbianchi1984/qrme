@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.46.7** ([changelog](CHANGELOG.md) ·
+**Current release: v0.46.8** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.46.8** | **The reach console, and a crisis number that only works in one country** — Manage/Reach localized on iOS, Android and Windows including its own sub-tabs (368 → 212); the wellbeing card's *"call or text 988"* replaced with local crisis line or emergency services, in all ten languages |
 | **0.46.7** | **Signatures and Voice, and a gap on one shell** — both screens localized on iOS, Android and Windows (470 → 368); two cards localized on two shells last release and missed on Android are finished, at the cost of no new rows at all |
 | **0.46.6** | **The rest of Settings, and Community** — steering, relationship, feedback and the failure-report consent notice, plus the stranger and room screens, on all three shells (590 → 470); three relationship pickers stop rendering `romantic_partner` as a word |
 | **0.46.5** | **The first screen, on all three phones** — Welcome and Settings localized on iOS, Android and Windows (703 → 590); the first-run screen reads the device's language because no profile exists yet to hold one; the Android shell did not compile and now does |
