@@ -4,6 +4,18 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.4] — 2026-08-06
+
+### Version alignment
+
+No QRME code changed this round. The work was JIM-mini's Overview — the first
+screen a person sees after signing in — and the three tab strips whose English
+lived in a `case` clause of an `enum Tab: String`, which is the shape this
+repo found in its own pickers at 0.46.8 and JIM found in ConnectView at
+0.47.2. 229 → 150 across its three shells.
+
+Cut together with JIM-mini and PDI at app-v0.47.4.
+
 ## [0.47.3] — 2026-08-06
 
 ### The literal one statement away from the call
