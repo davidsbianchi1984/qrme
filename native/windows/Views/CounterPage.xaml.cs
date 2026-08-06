@@ -46,7 +46,7 @@ public sealed partial class CounterPage : Page
         DeskTokenBox.Header = L10n.T("counter.desk_token");
         PresencePicker.Header = L10n.T("counter.mine");
         PresencePicker.ItemsSource = Presences
-            .Select(p => L10n.T("counter.presence." + p)).ToList();
+            .Select(PresenceLabel).ToList();
         PresencePicker.SelectedIndex = 0;
         PresenceButton.Content = L10n.T("counter.mine");
         CameraButton.Content = L10n.T("counter.camera");
@@ -202,6 +202,16 @@ public sealed partial class CounterPage : Page
     private string Deal => ExchangeIdBox.Text.Trim();
 
     // -- the counter --
+
+    /// Literal keys rather than the prefix plus the API value: a key
+    /// built at runtime is a key the dead-key guard cannot see being
+    /// asked for.
+    private static string PresenceLabel(string state) => state switch
+    {
+        "attended" => L10n.T("counter.presence.attended"),
+        "away" => L10n.T("counter.presence.away"),
+        _ => L10n.T("counter.presence.closed"),
+    };
 
     private async void OnOpenDesk(object sender, RoutedEventArgs e)
     {

@@ -2569,7 +2569,7 @@ private fun CornerPanel(vm: StudioViewModel) {
                         vm.call({ ApiClient.setFeature(vm.pid!!, feature, next,
                             vm.token!!) }) { r -> flags = r.getOrDefault(flags) }
                     })
-                    Text(L10n.t("corner.switch." + feature, lang), color = Qrme.T2,
+                    Text(cornerSwitchLabel(feature, lang), color = Qrme.T2,
                         fontSize = 12.sp)
                 }
             }
@@ -5274,7 +5274,7 @@ private fun CounterPanel(vm: StudioViewModel) {
                             card = r.getOrNull()
                             r.exceptionOrNull()?.let { note = it.message }
                         }
-                    }) { Text(L10n.t("counter.presence." + p, lang), color = Qrme.BrandA, fontSize = 11.sp) }
+                    }) { Text(presenceLabel(p, lang), color = Qrme.BrandA, fontSize = 11.sp) }
                 }
             }
             TextButton(onClick = { act { ApiClient.setDeskCamera(deskId, true, deskToken) } }) {
@@ -6031,3 +6031,21 @@ fun ProblemReportingCard(lang: String) {
         }
     }
 }
+
+/**
+ * The three presence states and the two corner switches, in the reader's
+ * language.
+ *
+ * A `when` rather than a key built by concatenating the prefix with the API
+ * value: a key assembled at runtime is a key no guard can see being asked for,
+ * and the dead-key check would report all five rows as asked for by nobody.
+ */
+private fun presenceLabel(state: String, lang: String): String = when (state) {
+    "attended" -> L10n.t("counter.presence.attended", lang)
+    "away" -> L10n.t("counter.presence.away", lang)
+    else -> L10n.t("counter.presence.closed", lang)
+}
+
+private fun cornerSwitchLabel(feature: String, lang: String): String =
+    if (feature == "homepage") L10n.t("corner.switch.homepage", lang)
+    else L10n.t("corner.switch.messaging", lang)

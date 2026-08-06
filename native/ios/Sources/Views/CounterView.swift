@@ -91,7 +91,7 @@ struct CounterSection: View {
                     }
                     HStack {
                         ForEach(presences, id: \.self) { p in
-                            Button(L10n.t("counter.presence." + p,
+                            Button(presenceLabel(p,
                                           state.language)) {
                                 setPresence(p)
                             }.font(.caption2).disabled(busy || deskId.isEmpty)
@@ -694,5 +694,23 @@ struct DealsSection: View {
             deal = made
             exchangeId = made.id
         }
+    }
+}
+
+/// The three presence states, in the reader's language.
+///
+/// A switch rather than a key built by concatenating the prefix with the API
+/// value. A key assembled at runtime is a key no guard can see being asked
+/// for — the dead-key check reads literals, so all three rows would read as
+/// *nothing asks for this*, and the fix somebody reaches for when a guard
+/// says that is to delete the row.
+///
+///     asked     does the screen ask the table for this word
+///     mattered  can anything tell that it does
+func presenceLabel(_ state: String, _ lang: String) -> String {
+    switch state {
+    case "attended": return L10n.t("counter.presence.attended", lang)
+    case "away": return L10n.t("counter.presence.away", lang)
+    default: return L10n.t("counter.presence.closed", lang)
     }
 }

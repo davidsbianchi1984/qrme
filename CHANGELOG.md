@@ -4,6 +4,44 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.5] — 2026-08-06
+
+### Three screens titled with their own key names
+
+JIM-mini has had a guard since 0.44.x that asks whether every key a shell
+*asks for* is a key that shell *holds* — because `L10n.t` returns the key when
+there is no row, so a screen with a missing row renders its own source code
+where a heading belongs. It stayed in that one product for several releases
+while this repo carried the same three tables and the same risk.
+
+Ported here this round, and it found the defect it exists for on the first
+run. `tab.compose`, `tab.posts` and `tab.robots` are **screen headings** on
+Android, and the Android table held none of them. Those three screens have
+been titled `tab.compose`, `tab.posts` and `tab.robots`, in every language
+including English. The rows were lifted from the iOS table.
+
+    asked     does the screen call the localizer
+    mattered  does the localizer have anything to say
+
+### Keys built at runtime, again
+
+Four call sites asked for `"counter.presence." + p` and `"corner.switch." +
+feature`. A key assembled at runtime is a key no guard can see being asked
+for, so all five rows read as *nothing asks for this* — the direction that
+invites somebody to delete a row a screen is using. Each branch resolves on
+its own line now, the same fix this arc has applied twice already.
+
+### The other direction, recorded
+
+**540 rows** across the three shells are translated into ten languages and
+asked for by nothing. That is not one defect; it is the residue of thirty
+rounds in which rows were added ahead of the screens that would use them, or
+left behind when a screen was rewritten. It is recorded and ratcheted rather
+than deleted in one pass, because some of those rows are ones a screen
+*should* be asking for and is not — and a bulk delete would bury them.
+
+Cut together with JIM-mini and PDI at app-v0.47.5.
+
 ## [0.47.4] — 2026-08-06
 
 ### Version alignment

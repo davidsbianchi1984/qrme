@@ -113,6 +113,9 @@ object L10n {
         "obj.actor.subject" to mapOf("en" to "the subject", "es" to "el sujeto", "fr" to "la personne concernée", "de" to "die betroffene Person", "pt" to "o titular dos dados", "it" to "la persona interessata", "ja" to "本人", "zh" to "当事人", "hi" to "संबंधित व्यक्ति", "ar" to "الشخص المعني"),
         "obj.actor.estate" to mapOf("en" to "the estate", "es" to "la sucesión", "fr" to "la succession", "de" to "der Nachlass", "pt" to "o espólio", "it" to "gli eredi", "ja" to "遺族", "zh" to "遗产代表", "hi" to "संपदा", "ar" to "الورثة"),
         "obj.actor.system" to mapOf("en" to "the platform", "es" to "la plataforma", "fr" to "la plateforme", "de" to "die Plattform", "pt" to "a plataforma", "it" to "la piattaforma", "ja" to "プラットフォーム", "zh" to "平台", "hi" to "प्लेटफ़ॉर्म", "ar" to "المنصة"),
+        "tab.compose" to mapOf("en" to "Compose", "es" to "Redactar", "fr" to "Composer", "de" to "Verfassen", "pt" to "Compor", "it" to "Componi", "ja" to "作成", "zh" to "撰写", "hi" to "लिखें", "ar" to "إنشاء"),
+        "tab.posts" to mapOf("en" to "Posts", "es" to "Publicaciones", "fr" to "Publications", "de" to "Beiträge", "pt" to "Publicações", "it" to "Post", "ja" to "投稿", "zh" to "帖子", "hi" to "पोस्ट", "ar" to "منشورات"),
+        "tab.robots" to mapOf("en" to "Robots", "es" to "Robots", "fr" to "Robots", "de" to "Roboter", "pt" to "Robôs", "it" to "Robot", "ja" to "ロボット", "zh" to "机器人", "hi" to "रोबोट", "ar" to "روبوتات"),
         "tab.overview" to mapOf(
             "en" to "Overview", "es" to "Resumen", "fr" to "Aperçu",
             "de" to "Übersicht", "pt" to "Visão geral", "it" to "Panoramica",
