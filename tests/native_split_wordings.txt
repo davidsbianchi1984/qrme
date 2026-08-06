@@ -1,0 +1,126 @@
+# status: backlog — 42 rows
+#
+# One English string carried by two or more keys whose ten translations do not
+# agree. Checked by test_the_same_sentence_translated_twice.py, matched exactly
+# in both directions — a new one fails, and a reconciled one must be struck
+# from here rather than left to rot.
+#
+# ## What this measured, and what it found
+#
+# 0.47.9 corrected what `native_dead_keys.txt` meant: 263 of its 335 rows are
+# not waste but cross-shell asymmetry, a row one shell holds and another has
+# not been built to use. This round asked what those 263 are, and sixty of them
+# turned out to be a sentence the shell already says under a different key.
+#
+# `nc.find` is dead on the iPhone and on Android. The Windows shell uses it for
+# the Community screen's join button. The iPhone has that same button and calls
+# it `nc.match.find`. Two rows, one press:
+#
+#     es    Buscar una coincidencia   |   Buscar a alguien
+#     fr    Trouver une mise en relation | Trouver un binôme
+#     de    Eine Verbindung suchen    |   Gegenüber finden
+#
+# Counted across the whole table rather than only the dead rows: 54 English
+# strings under two or more keys on iOS, 55 on Android, 60 on Windows — about
+# 215 redundant rows, 2,150 translations maintained twice. In 43 of the 54 iOS
+# sets the copies had already drifted.
+#
+#     asked     is every string on the screen translated
+#     mattered  does the product say the same thing twice the same way
+#
+# ## A duplicate is a question, not a defect
+#
+# Three different things produce one English string under two keys, and only
+# the last was a bug:
+#
+#   1. English hides the gender. `ava.show`, `cam.show`, `lend.show`,
+#      `org.show` and `work.show` all read *Show it*; Spanish must pick
+#      *Mostrarlo* or *Mostrarla* by what *it* is. Five rows is the right
+#      number of rows.
+#   2. One English word is two words. `counter.trade` is a trade as in a craft
+#      — *Oficio*, *Métier*, *Gewerk*, 手艺. `tab.trade` is trade as in
+#      commerce — *Comercio*, *Négoce*, 交易. The translations are right and
+#      the English is wrong.
+#   3. The same thing said two ways for no reason. *Refresh* was *ताज़ा करें*
+#      on two screens and *रीफ़्रेश* on a third; *Send* was *إرسال* under two
+#      keys and *أرسل* under three. Nobody decided this.
+#
+# 0.48.0 reconciled the third kind — 34 sets, 351 language cells across the
+# three tables — and left the first two. **Everything below is a question
+# about the English, not a translation mistake**, which is why this is a
+# backlog and not a floor: each row is a decision somebody still owes about
+# what the screen should say, and the fix changes English words on screens.
+#
+# ## The two tabs with the same name
+#
+# Found by asking why two copies disagreed, and not by looking for it:
+# `tab.counter` and `tab.desk` are two separate entries in the same tab bar,
+# and in Spanish both read *Mostrador*, in French both *Comptoir*, in
+# Portuguese both *Balcão*. Three languages in which this product's own tab bar
+# named two destinations identically. The Manage screen's mirror of those tabs
+# had it right — `nmg.t.counter` is *Ventanilla* / *Guichet* / *Guichê* — so
+# the disagreement was the thing that pointed at it. Reconciled to the Manage
+# screen's wording; the Desk keeps *Mostrador* / *Comptoir* / *Balcão*.
+#
+# ## Where the duplicates came from
+#
+# Some of them came from this audit, under my own hand. 0.47.6 wired 91 Android
+# sites that Compose had hidden from the extractor, and did it by inserting new
+# rows — `nmg.t.desk`, `nmg.t.gaming`, `nmg.t.sign` — beside `tab.desk`,
+# `tab.gaming` and `nsig.sign`, which already held those words. 0.47.7 hit a
+# key collision on `nmg.filter.industry` and renamed around it to
+# `nmg.f.industry` rather than reconciling the two rows. The rule that would
+# have stopped both: before inserting a row, look for the sentence.
+#
+# ## What comes next
+#
+# The console has its own table, and `tab.trade` on the phone and the same tab
+# in the console are not compared by anything. That is the next bite, and it is
+# larger than this one.
+#
+# ceiling: 42
+
+# Ten of these are one English pronoun standing for a different object each time.
+ios: org.name place.mask.name  ("A name for it" — a mask's name and an organization's)
+ios: ava.set spec.set  ("Attach it" — an avatar and a specialist)
+ios: cam.close camp.close lend.close  ("Close it" — a camera, a campaign, a loan)
+ios: counter.open.go pub.object.open  ("Open it" — a desk and a contested object)
+ios: hand.revoke task.revoke  ("Revoke it" — a handoff and a task grant)
+ios: ava.show cam.show lend.show org.show work.show  ("Show it")
+ios: bot.dials.set steer.set  ("Steer it" — a robot and a persona)
+ios: modq.retract place.mic.back room.mic.back  ("Take it back" — a lent mic, a queued post)
+ios: counter.sticker.drop disp.down  ("Take it down" — a sticker and a display)
+ios: deals.drop place.mask.off veil.off  ("Take it off" — a mask, a veil, a deal)
+# One English word doing two jobs.
+ios: till.camp.goal work.goal  ("Goal" — a fundraising target and an objective)
+ios: ndsk.signed nsig.signed  ("Signed" — signed in at a desk, and a signed document)
+ios: counter.trade nmg.t.trade  ("Trade" — a craft, and commerce)
+ios: deals.withdraw people.withdraw  ("Withdraw" — withdraw yourself, and withdraw a request)
+android: org.name place.mask.name  ("A name for it")
+android: ava.set spec.set  ("Attach it")
+android: cam.close camp.close lend.close  ("Close it")
+android: counter.open.go pub.object.open  ("Open it")
+android: hand.revoke task.revoke  ("Revoke it")
+android: ava.show cam.show lend.show org.show work.show  ("Show it")
+android: bot.dials.set steer.set  ("Steer it")
+android: modq.retract place.mic.back room.mic.back  ("Take it back")
+android: counter.sticker.drop disp.down  ("Take it down")
+android: deals.drop place.mask.off veil.off  ("Take it off")
+android: till.camp.goal work.goal  ("Goal")
+android: ndsk.signed nsig.signed  ("Signed")
+android: counter.trade nmg.t.trade  ("Trade")
+android: deals.withdraw people.withdraw  ("Withdraw")
+windows: org.name place.mask.name  ("A name for it")
+windows: ava.set spec.set  ("Attach it")
+windows: cam.close camp.close lend.close  ("Close it")
+windows: counter.open.go pub.object.open  ("Open it")
+windows: hand.revoke task.revoke  ("Revoke it")
+windows: ava.show cam.show lend.show org.show work.show  ("Show it")
+windows: bot.dials.set steer.set  ("Steer it")
+windows: modq.retract place.mic.back room.mic.back  ("Take it back")
+windows: counter.sticker.drop disp.down  ("Take it down")
+windows: deals.drop place.mask.off veil.off  ("Take it off")
+windows: till.camp.goal work.goal  ("Goal")
+windows: ndsk.signed nsig.signed  ("Signed")
+windows: counter.trade nmg.t.trade tab.trade  ("Trade")
+windows: deals.withdraw people.withdraw  ("Withdraw")

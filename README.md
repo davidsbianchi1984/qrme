@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.47.9** ([changelog](CHANGELOG.md) ·
+**Current release: v0.48.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.48.0** | **The same sentence, translated twice** — 54 English strings under 2+ keys on iOS and 43 of them already drifted; 34 sets reconciled, 42 recorded as questions about the English; two tab-bar entries that read alike in three languages; and a `\u0027` that stops `L10n.swift` compiling |
 | **0.47.9** | **The number was mislabelled, and it was hiding a consent screen** — 263 of the 335 "dead" rows are asked for by a different shell, so they are screens saying less rather than waste; the voiceprint consent block's three sentences were hardcoded English on the iPhone, in an array a loop reads |
 | **0.47.8** | Cut together with the other two at one version; the round's work is PDI's Transfers screen |
 | **0.47.7** | **The other two syntaxes** — 0.47.6 derived the label rule for Kotlin and left Swift at eight hard-coded constructs and XAML at four attributes; the Windows code-behind sets half its labels by assignment, which `Text="` cannot match, so 91 call sites across nine shells were invisible |

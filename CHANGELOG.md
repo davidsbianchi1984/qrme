@@ -4,6 +4,99 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.48.0] — 2026-08-06
+
+### The same sentence, translated twice, and the two copies had drifted
+
+0.47.9 corrected what `native_dead_keys.txt` meant: 263 of its 335 rows are not
+waste but cross-shell asymmetry. This round asked what those 263 actually are,
+and **sixty of them are a sentence the shell already says under a different
+key**.
+
+`nc.find` is dead on the iPhone and on Android. The Windows shell uses it for
+the Community screen's join button. The iPhone has that same button and calls
+it `nc.match.find`:
+
+| | Windows (`nc.find`) | iPhone (`nc.match.find`) |
+|---|---|---|
+| es | Buscar una coincidencia | Buscar a alguien |
+| fr | Trouver une mise en relation | Trouver un binôme |
+| de | Eine Verbindung suchen | Gegenüber finden |
+
+An English reader sees one product. A Spanish reader sees a different button on
+the phone than on the desktop, for the same press.
+
+Counted across the whole table rather than only the dead rows: **54 English
+strings under two or more keys on iOS, 55 on Android, 60 on Windows** — about
+215 redundant rows, 2,150 translations maintained twice. *Send* exists under
+five keys. And in **43 of the 54** iOS sets the copies had already drifted.
+
+    asked     is every string on the screen translated
+    mattered  does the product say the same thing twice the same way
+
+### A duplicate is a question, not a defect
+
+Three things produce one English string under two keys, and only the last is a
+bug. The new record, `tests/native_split_wordings.txt`, says so at the top:
+
+1. **English hides the gender.** `ava.show`, `cam.show`, `lend.show`,
+   `org.show`, `work.show` all read *Show it*; Spanish must pick *Mostrarlo* or
+   *Mostrarla* by what *it* is. Five rows is the right number of rows.
+2. **One English word is two words.** `counter.trade` is a trade as in a craft
+   — *Oficio*, *Métier*, *Gewerk*, 手艺. `tab.trade` is trade as in commerce —
+   *Comercio*, *Négoce*, 交易. The translations are right; the English is wrong.
+3. **The same thing said two ways for no reason.** *Refresh* was *ताज़ा करें*
+   on two screens and *रीफ़्रेश* on a third. Nobody decided this.
+
+The third kind is reconciled: **34 sets, 351 language cells across the three
+tables.** The first two are recorded by name — 42 rows, every one of them a
+question about the English rather than a translation mistake.
+
+### Two tabs with the same name
+
+`tab.counter` and `tab.desk` are separate entries in the same tab bar. In
+Spanish both read *Mostrador*; in French both *Comptoir*; in Portuguese both
+*Balcão*. Three languages in which this product's own tab bar named two
+destinations identically. The Manage screen's mirror had it right —
+`nmg.t.counter` is *Ventanilla* / *Guichet* / *Guichê* — which is how it
+surfaced: by asking why the two copies disagreed.
+
+### A file that does not compile
+
+`people.say` and `party.say` both read *Say something*, and their Italian
+differed. One of them was `"it": "Di\u0027 qualcosa"` — a literal `\u0027` in
+a **Swift** string, where the escape is `\u{0027}` and the unbraced form is not
+an escape sequence at all. `L10n.swift` does not compile. No Swift toolchain
+runs in this repo's CI, so nothing had said so; the Android and Windows tables
+carry the row correctly. The guard now refuses `\uXXXX` in the Swift table.
+
+### Where some of the duplicates came from
+
+Under my own hand. 0.47.6 wired 91 Android sites Compose had hidden, and did it
+by inserting `nmg.t.desk`, `nmg.t.gaming` and `nmg.t.sign` beside `tab.desk`,
+`tab.gaming` and `nsig.sign`, which already held those words. 0.47.7 hit a key
+collision and renamed around it rather than reconciling the two rows. The rule
+that would have stopped both, now written down: before inserting a row, look
+for the sentence.
+
+### Added
+
+- `tests/test_the_same_sentence_translated_twice.py` — per shell, the English
+  strings carried by two or more keys whose ten translations disagree, matched
+  exactly against `tests/native_split_wordings.txt` in both directions, with a
+  ceiling on the total and a check that the Swift table holds no unbraced
+  unicode escape. Ported to JIM-mini and PDI in the same round.
+
+### Changed
+
+- 34 duplicate sets reconciled across the iOS, Android and Windows tables —
+  *Send*, *Refresh*, *Leave*, *Sign*, *Topic*, *Rating*, *Display name*, the
+  Manage screen's tab strip and the Desk/Counter vocabulary among them.
+- The Counter tab is now *Ventanilla* / *Guichet* / *Guichê*, distinct from the
+  Desk tab in every language.
+
+Cut together with JIM-mini and PDI at app-v0.48.0.
+
 ## [0.47.9] — 2026-08-06
 
 ### The number was mislabelled, and it was hiding a consent screen
