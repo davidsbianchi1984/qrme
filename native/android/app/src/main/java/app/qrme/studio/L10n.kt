@@ -178,7 +178,7 @@ object L10n {
             "ja" to "送信", "zh" to "发送", "hi" to "भेजें", "ar" to "إرسال"),
         "action.save" to mapOf(
             "en" to "Save", "es" to "Guardar", "fr" to "Enregistrer",
-            "de" to "Speichern", "pt" to "Salvar", "it" to "Salva",
+            "de" to "Speichern", "pt" to "Guardar", "it" to "Salva",
             "ja" to "保存", "zh" to "保存", "hi" to "सहेजें", "ar" to "حفظ"),
         "action.translate" to mapOf(
             "en" to "Translate", "es" to "Traducir", "fr" to "Traduire",

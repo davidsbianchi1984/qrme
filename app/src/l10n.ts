@@ -28,7 +28,7 @@ const CHROME: Table = {
   },
   "nav.chat": {
     en: "Chat", es: "Chat", fr: "Discussion", de: "Chat", pt: "Conversa",
-    it: "Chat", ja: "チャット", zh: "聊天", hi: "चैट", ar: "دردشة",
+    it: "Chat", ja: "チャット", zh: "聊天", hi: "चैट", ar: "محادثة",
   },
   "nav.discover": {
     en: "Discover", es: "Descubrir", fr: "Découvrir", de: "Entdecken",
@@ -41,7 +41,7 @@ const CHROME: Table = {
   },
   "nav.friends": {
     en: "Friends", es: "Amigos", fr: "Amis", de: "Freunde", pt: "Amigos",
-    it: "Amici", ja: "友達", zh: "好友", hi: "मित्र", ar: "الأصدقاء",
+    it: "Amici", ja: "友だち", zh: "好友", hi: "दोस्त", ar: "الأصدقاء",
   },
   "nav.rooms": {
     en: "Rooms", es: "Salas", fr: "Salons", de: "Räume", pt: "Salas",
@@ -59,7 +59,7 @@ const CHROME: Table = {
   },
   "nav.campaigns": {
     en: "Campaigns", es: "Campañas", fr: "Campagnes", de: "Kampagnen",
-    pt: "Campanhas", it: "Campagne", ja: "キャンペーン", zh: "众筹",
+    pt: "Campanhas", it: "Campagne", ja: "キャンペーン", zh: "筹款活动",
     hi: "अभियान", ar: "الحملات",
   },
   "nav.org": {
@@ -266,8 +266,8 @@ const CHROME: Table = {
     ja: "ホームページを見る", zh: "访问主页", hi: "होमपेज देखें", ar: "زر صفحة",
   },
   "corner.visit_id": {
-    en: "Profile id", es: "Id del perfil", fr: "Id du profil", de: "Profil-ID",
-    pt: "Id do perfil", it: "Id del profilo", ja: "プロフィールID", zh: "档案 ID",
+    en: "Profile id", es: "Id del perfil", fr: "Id du profil", de: "Profil-Id",
+    pt: "Id do perfil", it: "Id del profilo", ja: "プロフィールID", zh: "资料ID",
     hi: "प्रोफ़ाइल आईडी", ar: "معرّف الملف",
   },
   "corner.visit_go": {
@@ -307,7 +307,7 @@ const CHROME: Table = {
   },
   "corner.send": {
     en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar",
-    it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "أرسل",
+    it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "إرسال",
   },
   "switches.title": {
     en: "Your switches", es: "Tus interruptores", fr: "Vos interrupteurs",
@@ -375,8 +375,8 @@ const CHROME: Table = {
     ar: "لا متاجر بعد — افتح أول متجر أدناه.",
   },
   "shops.browse": {
-    en: "Browse", es: "Ver", fr: "Parcourir", de: "Ansehen",
-    pt: "Ver", it: "Sfoglia", ja: "見る", zh: "逛逛", hi: "देखें", ar: "تصفّح",
+    en: "Browse", es: "Explorar", fr: "Parcourir", de: "Stöbern",
+    pt: "Explorar", it: "Sfoglia", ja: "見てまわる", zh: "浏览", hi: "देखें", ar: "تصفّح",
   },
   "shops.buyer_id": {
     en: "Buyer (interactor id)", es: "Comprador (id de interactor)",
@@ -439,8 +439,8 @@ const CHROME: Table = {
     pt: "Etiqueta", it: "Etichetta", ja: "タグ", zh: "标签", hi: "टैग", ar: "الوسم",
   },
   "shops.blurb": {
-    en: "Blurb", es: "Descripción", fr: "Présentation", de: "Beschreibung",
-    pt: "Descrição", it: "Descrizione", ja: "紹介文", zh: "简介", hi: "विवरण", ar: "نبذة",
+    en: "Blurb", es: "Descripción breve", fr: "Description courte", de: "Kurzbeschreibung",
+    pt: "Descrição breve", it: "Descrizione breve", ja: "紹介文", zh: "简介", hi: "संक्षिप्त विवरण", ar: "وصف موجز",
   },
   "shops.open": {
     en: "Open the shop", es: "Abrir la tienda", fr: "Ouvrir la boutique",
@@ -481,7 +481,7 @@ const CHROME: Table = {
   },
   "shops.add": {
     en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen",
-    pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+    pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "إضافة",
   },
   "shops.retire": {
     en: "Retire", es: "Retirar", fr: "Retirer", de: "Zurückziehen",
@@ -494,11 +494,11 @@ const CHROME: Table = {
   },
   "shops.accept": {
     en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen",
-    pt: "Aceitar", it: "Accetta", ja: "受ける", zh: "接受", hi: "स्वीकारें", ar: "اقبل",
+    pt: "Aceitar", it: "Accetta", ja: "承諾", zh: "接受", hi: "स्वीकारें", ar: "قبول",
   },
   "shops.decline": {
     en: "Decline", es: "Rechazar", fr: "Refuser", de: "Ablehnen",
-    pt: "Recusar", it: "Rifiuta", ja: "断る", zh: "拒绝", hi: "अस्वीकारें", ar: "ارفض",
+    pt: "Recusar", it: "Rifiuta", ja: "辞退", zh: "拒绝", hi: "अस्वीकारें", ar: "رفض",
   },
   "shops.fulfil": {
     en: "Fulfil", es: "Completar", fr: "Exécuter", de: "Erfüllen",
@@ -510,8 +510,8 @@ const CHROME: Table = {
     hi: "प्रत्यायोजन", ar: "التفويض",
   },
   "nav.desk": {
-    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Tresen", pt: "Balcão",
-    it: "Banco", ja: "デスク", zh: "服务台", hi: "डेस्क", ar: "المكتب",
+    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Theke", pt: "Balcão",
+    it: "Banco", ja: "受付", zh: "服务台", hi: "डेस्क", ar: "المكتب",
   },
   "nav.voice": {
     en: "Voice", es: "Voz", fr: "Voix", de: "Stimme", pt: "Voz",
@@ -612,9 +612,9 @@ const CHROME: Table = {
     ar: "داخل الغرفة",
   },
   "nav.signing": {
-    en: "Signing", es: "Firmar", fr: "Signature",
-    de: "Signieren", pt: "Assinatura", it: "Firma",
-    ja: "署名", zh: "签名", hi: "हस्ताक्षर",
+    en: "Signing", es: "Firma", fr: "Signature",
+    de: "Unterzeichnung", pt: "Assinatura", it: "Firma",
+    ja: "署名", zh: "签署", hi: "हस्ताक्षर",
     ar: "التوقيع",
   },
   "nav.visiting": {
@@ -719,11 +719,11 @@ const CHROME: Table = {
     ar: "العودة لتسجيل الدخول",
   },
   "pub.tab.object": {
-    en: "Object to a profile", es: "Objetar a un perfil",
-    fr: "Contester un profil", de: "Einem Profil widersprechen",
-    pt: "Contestar um perfil", it: "Contestare un profilo",
+    en: "Object to a profile", es: "Objetar un perfil",
+    fr: "Contester un profil", de: "Einspruch gegen ein Profil",
+    pt: "Objetar a um perfil", it: "Obietta a un profilo",
     ja: "プロフィールに異議を申し立てる", zh: "对某个资料提出异议",
-    hi: "किसी प्रोफ़ाइल पर आपत्ति", ar: "الاعتراض على ملف",
+    hi: "किसी प्रोफ़ाइल पर आपत्ति करें", ar: "اعترض على ملف",
   },
   "pub.tab.mark": {
     en: "Is this genuine?", es: "¿Esto es auténtico?",
@@ -1376,7 +1376,7 @@ const CHROME: Table = {
     de: "Konto erstellen",
     pt: "Criar conta",
     it: "Crea account",
-    ja: "アカウントを作成",
+    ja: "アカウント作成",
     zh: "创建账户",
     hi: "खाता बनाएँ",
     ar: "إنشاء حساب",
@@ -1386,7 +1386,7 @@ const CHROME: Table = {
     es: "Iniciar sesión",
     fr: "Se connecter",
     de: "Anmelden",
-    pt: "Entrar",
+    pt: "Iniciar sessão",
     it: "Accedi",
     ja: "サインイン",
     zh: "登录",
@@ -1423,7 +1423,7 @@ const CHROME: Table = {
     fr: "E-mail",
     de: "E-Mail",
     pt: "E-mail",
-    it: "Email",
+    it: "E-mail",
     ja: "メールアドレス",
     zh: "电子邮箱",
     hi: "ईमेल",
@@ -1517,9 +1517,9 @@ const CHROME: Table = {
     en: "Reset code",
     es: "Código de restablecimiento",
     fr: "Code de réinitialisation",
-    de: "Zurücksetz-Code",
-    pt: "Código de reposição",
-    it: "Codice di reimpostazione",
+    de: "Zurücksetzcode",
+    pt: "Código de redefinição",
+    it: "Codice di ripristino",
     ja: "リセットコード",
     zh: "重置码",
     hi: "रीसेट कोड",
@@ -1593,7 +1593,7 @@ const CHROME: Table = {
     pt: "Nome do perfil",
     it: "Nome del profilo",
     ja: "プロフィール名",
-    zh: "档案名称",
+    zh: "资料名称",
     hi: "प्रोफ़ाइल नाम",
     ar: "اسم الملف",
   },
@@ -2026,7 +2026,7 @@ const CHROME: Table = {
     en: "paste something you wrote", es: "pega algo que escribiste", fr: "collez quelque chose que vous avez écrit", de: "fügen Sie etwas Eigenes ein", pt: "cole algo que escreveu", it: "incolla qualcosa che hai scritto", ja: "自分で書いたものを貼り付け", zh: "粘贴你写的内容", hi: "अपना लिखा कुछ चिपकाएँ", ar: "الصق شيئًا كتبته",
   },
   "asst.fix.go": {
-    en: "Proofread", es: "Corregir", fr: "Relire", de: "Korrekturlesen", pt: "Rever", it: "Correggi", ja: "校正する", zh: "校对", hi: "प्रूफ़रीड करें", ar: "تدقيق",
+    en: "Proofread", es: "Corregir", fr: "Relire", de: "Korrekturlesen", pt: "Revisar", it: "Correggi", ja: "校正", zh: "校对", hi: "प्रूफ़ पढ़ें", ar: "دقّق",
   },
   "asst.make": {
     en: "Make something to keep", es: "Crear algo para guardar", fr: "Créer quelque chose à garder", de: "Etwas Bleibendes schaffen", pt: "Criar algo para guardar", it: "Crea qualcosa da tenere", ja: "残すものを作る", zh: "创作可保留之物", hi: "रखने लायक कुछ बनाएँ", ar: "اصنع شيئًا للاحتفاظ به",
@@ -2035,7 +2035,7 @@ const CHROME: Table = {
     en: "the moment to capture", es: "el momento a capturar", fr: "le moment à capturer", de: "der festzuhaltende Moment", pt: "o momento a capturar", it: "il momento da catturare", ja: "残したい瞬間", zh: "要记录的时刻", hi: "जो पल सहेजना है", ar: "اللحظة المراد التقاطها",
   },
   "asst.make.go": {
-    en: "Compose", es: "Componer", fr: "Composer", de: "Verfassen", pt: "Compor", it: "Componi", ja: "作る", zh: "创作", hi: "रचें", ar: "تأليف",
+    en: "Compose", es: "Redactar", fr: "Composer", de: "Verfassen", pt: "Compor", it: "Componi", ja: "作成", zh: "撰写", hi: "लिखें", ar: "إنشاء",
   },
   "asst.make.none": {
     en: "Nothing kept yet.", es: "Nada guardado todavía.", fr: "Rien de gardé pour l'instant.", de: "Noch nichts aufbewahrt.", pt: "Ainda nada guardado.", it: "Ancora niente da tenere.", ja: "まだ何も残していません。", zh: "尚未保留任何内容。", hi: "अभी कुछ नहीं रखा गया।", ar: "لا شيء محفوظ بعد.",
@@ -2260,7 +2260,7 @@ const CHROME: Table = {
     en: "http://127.0.0.1:8000", es: "http://127.0.0.1:8000", fr: "http://127.0.0.1:8000", de: "http://127.0.0.1:8000", pt: "http://127.0.0.1:8000", it: "http://127.0.0.1:8000", ja: "http://127.0.0.1:8000", zh: "http://127.0.0.1:8000", hi: "http://127.0.0.1:8000", ar: "http://127.0.0.1:8000",
   },
   "set.mail.clear": {
-    en: "Clear", es: "Borrar", fr: "Effacer", de: "Löschen", pt: "Limpar", it: "Cancella", ja: "クリア", zh: "清除", hi: "हटाएँ", ar: "مسح",
+    en: "Clear", es: "Borrar", fr: "Effacer", de: "Löschen", pt: "Limpar", it: "Cancella", ja: "消す", zh: "清除", hi: "साफ़ करें", ar: "امسح",
   },
   "set.mail.test": {
     en: "Send a test message to", es: "Enviar un mensaje de prueba a", fr: "Envoyer un message de test à", de: "Testnachricht senden an", pt: "Enviar mensagem de teste para", it: "Invia un messaggio di prova a", ja: "テストメッセージの宛先", zh: "发送测试邮件至", hi: "परीक्षण संदेश भेजें", ar: "أرسل رسالة اختبار إلى",
@@ -2326,13 +2326,13 @@ const CHROME: Table = {
     en: "Nobody yet.", es: "Nadie todavía.", fr: "Personne pour l'instant.", de: "Noch niemand.", pt: "Ninguém ainda.", it: "Ancora nessuno.", ja: "まだ誰もいません。", zh: "尚无人。", hi: "अभी कोई नहीं।", ar: "لا أحد بعد.",
   },
   "sell.holders.revoke": {
-    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "失効させる", zh: "撤销", hi: "रद्द करें", ar: "إلغاء",
+    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "取り消す", zh: "撤销", hi: "रद्द करें", ar: "إبطال",
   },
   "sell.holders.rule": {
     en: "Revoking stops the buyer deriving from that licence. It does not unmake an agent already derived from it, and it does not take the fee off your statement — a sale that happened stays on the record.", es: "Revocar impide que el comprador derive de esa licencia. No deshace un agente ya derivado, ni quita la tarifa de tu estado de cuenta — una venta ocurrida queda en el registro.", fr: "Révoquer empêche l'acheteur de dériver de cette licence. Cela ne défait pas un agent déjà dérivé, et ne retire pas les frais de votre relevé — une vente advenue reste au registre.", de: "Der Widerruf stoppt künftige Ableitungen aus dieser Lizenz. Er macht einen bereits abgeleiteten Agenten nicht ungeschehen und nimmt die Gebühr nicht von Ihrer Abrechnung — ein geschehener Verkauf bleibt verzeichnet.", pt: "Revogar impede o comprador de derivar dessa licença. Não desfaz um agente já derivado, nem tira a taxa do seu extrato — uma venda que aconteceu fica no registo.", it: "Revocare impedisce all'acquirente di derivare da quella licenza. Non disfa un agente già derivato, né toglie la tariffa dal tuo estratto — una vendita avvenuta resta a registro.", ja: "失効は購入者がそのライセンスから派生させることを止めます。既に派生したエージェントは消えず、明細から料金も消えません — 成立した販売は記録に残ります。", zh: "撤销会阻止买家继续从该许可派生。它不会撤销已派生的智能体，也不会从你的账单上抹去费用 — 已发生的销售留在记录上。", hi: "रद्द करने से खरीदार उस लाइसेंस से आगे व्युत्पन्न नहीं कर सकता। पहले से व्युत्पन्न एजेंट नहीं मिटता, न ही शुल्क आपके विवरण से हटता है — हुई बिक्री रिकॉर्ड में रहती है।", ar: "الإلغاء يمنع المشتري من الاشتقاق من ذلك الترخيص. لا يمحو وكيلاً مشتقًا بالفعل، ولا يزيل الرسوم من كشفك — البيع الذي حدث يبقى في السجل.",
   },
   "sell.earn": {
-    en: "Earnings", es: "Ganancias", fr: "Revenus", de: "Einnahmen", pt: "Ganhos", it: "Guadagni", ja: "収益", zh: "收入", hi: "कमाई", ar: "الأرباح",
+    en: "Earnings", es: "Ingresos", fr: "Gains", de: "Erlöse", pt: "Ganhos", it: "Guadagni", ja: "収益", zh: "收益", hi: "कमाई", ar: "الأرباح",
   },
   "sell.earn.signin": {
     en: "Nothing to show — sign in as the profile's owner.", es: "Nada que mostrar — inicia sesión como propietario del perfil.", fr: "Rien à montrer — connectez-vous comme propriétaire du profil.", de: "Nichts zu zeigen — melden Sie sich als Profilinhaber an.", pt: "Nada a mostrar — inicie sessão como proprietário do perfil.", it: "Niente da mostrare — accedi come proprietario del profilo.", ja: "表示できるものがありません — プロフィールの所有者としてサインインしてください。", zh: "无可显示 — 请以资料所有者身份登录。", hi: "दिखाने को कुछ नहीं — प्रोफ़ाइल स्वामी के रूप में साइन इन करें।", ar: "لا شيء للعرض — سجّل الدخول كمالك الملف.",
@@ -2422,10 +2422,10 @@ const CHROME: Table = {
     en: "Clear the place", es: "Borrar el lugar", fr: "Effacer le lieu", de: "Ort löschen", pt: "Limpar o lugar", it: "Cancella il luogo", ja: "場所を消す", zh: "清除位置", hi: "स्थान हटाएँ", ar: "امسح المكان",
   },
   "desk.title": {
-    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Schalter", pt: "Balcão", it: "Banco", ja: "デスク", zh: "柜台", hi: "डेस्क", ar: "المكتب",
+    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Theke", pt: "Balcão", it: "Banco", ja: "受付", zh: "服务台", hi: "डेस्क", ar: "المكتب",
   },
   "desk.open.head": {
-    en: "Open a desk", es: "Abrir un mostrador", fr: "Ouvrir un comptoir", de: "Einen Schalter eröffnen", pt: "Abrir um balcão", it: "Apri un banco", ja: "デスクを開く", zh: "开设柜台", hi: "डेस्क खोलें", ar: "افتح مكتبًا",
+    en: "Open a desk", es: "Abrir un mostrador", fr: "Ouvrir un comptoir", de: "Eine Theke eröffnen", pt: "Abrir um balcão", it: "Apri un banco", ja: "受付を開く", zh: "开设服务台", hi: "एक डेस्क खोलें", ar: "افتح مكتبًا",
   },
   "desk.open.pitch": {
     en: "A desk claims a person is behind it, so it is opened with who attests that and on what basis — a guild, a licence number. The claim is shown to every visitor and can be burned, which is why it is asked for at the start rather than added later.", es: "Un mostrador afirma que hay una persona detrás, así que se abre indicando quién lo atestigua y sobre qué base — un gremio, un número de licencia. La afirmación se muestra a cada visitante y puede quemarse, por eso se pide al principio y no se añade después.", fr: "Un comptoir affirme qu'une personne est derrière, il s'ouvre donc avec qui l'atteste et sur quelle base — une guilde, un numéro de licence. L'affirmation est montrée à chaque visiteur et peut être brûlée, c'est pourquoi elle est demandée au départ plutôt qu'ajoutée après.", de: "Ein Schalter behauptet, dass eine Person dahintersteht, also wird er mit der Angabe eröffnet, wer das bezeugt und auf welcher Grundlage — eine Zunft, eine Lizenznummer. Die Behauptung wird jedem Besucher gezeigt und kann verbrannt werden, weshalb sie am Anfang verlangt wird statt später ergänzt.", pt: "Um balcão afirma que há uma pessoa atrás dele, por isso abre-se indicando quem o atesta e com que base — uma guilda, um número de licença. A afirmação é mostrada a cada visitante e pode ser queimada, e é por isso que se pede no início em vez de se acrescentar depois.", it: "Un banco afferma che dietro c'è una persona, quindi si apre indicando chi lo attesta e su quale base — una gilda, un numero di licenza. L'affermazione è mostrata a ogni visitatore e può essere bruciata, per questo viene chiesta all'inizio invece di essere aggiunta dopo.", ja: "デスクは「人がいる」と主張するものです。だから開設時に、誰が何を根拠に証明するのか — 組合、免許番号 — を求めます。この主張はすべての訪問者に示され、焼却されることもあります。後から足すのではなく最初に求めるのはそのためです。", zh: "柜台声称背后有一个人，因此开设时就要写明由谁证明、依据是什么 — 行会、执照号码。这项声明会展示给每位访客，也可能被焚毁，所以在一开始就要求提供，而不是事后补上。", hi: "डेस्क दावा करता है कि उसके पीछे एक व्यक्ति है, इसलिए खोलते समय पूछा जाता है कि कौन इसकी पुष्टि करता है और किस आधार पर — कोई संघ, कोई लाइसेंस नंबर। यह दावा हर आगंतुक को दिखाया जाता है और जलाया भी जा सकता है, इसीलिए इसे बाद में जोड़ने के बजाय शुरू में ही माँगा जाता है।", ar: "المكتب يدّعي أن خلفه شخصًا، لذا يُفتح ببيان من يشهد بذلك وعلى أي أساس — نقابة، رقم رخصة. يُعرض الادعاء على كل زائر ويمكن حرقه، ولهذا يُطلب في البداية بدل إضافته لاحقًا.",
@@ -2455,10 +2455,10 @@ const CHROME: Table = {
     en: "Or take up a desk you already have", es: "O retoma un mostrador que ya tienes", fr: "Ou reprenez un comptoir que vous avez déjà", de: "Oder einen vorhandenen Schalter übernehmen", pt: "Ou retome um balcão que já tem", it: "Oppure riprendi un banco che hai già", ja: "または既存のデスクに就く", zh: "或接手你已有的柜台", hi: "या पहले से मौजूद डेस्क सँभालें", ar: "أو تولَّ مكتبًا لديك بالفعل",
   },
   "desk.takeup.id.ph": {
-    en: "Desk id", es: "Id del mostrador", fr: "Id du comptoir", de: "Schalter-Id", pt: "Id do balcão", it: "Id del banco", ja: "デスクID", zh: "柜台ID", hi: "डेस्क आईडी", ar: "معرّف المكتب",
+    en: "Desk id", es: "Id del mostrador", fr: "Id du comptoir", de: "Theken-ID", pt: "Id do balcão", it: "Id del banco", ja: "受付ID", zh: "服务台 ID", hi: "डेस्क आईडी", ar: "معرّف المكتب",
   },
   "desk.takeup.token.ph": {
-    en: "Desk token", es: "Token del mostrador", fr: "Jeton du comptoir", de: "Schalter-Token", pt: "Token do balcão", it: "Token del banco", ja: "デスクトークン", zh: "柜台令牌", hi: "डेस्क टोकन", ar: "رمز المكتب",
+    en: "Desk token", es: "Token del mostrador", fr: "Jeton du comptoir", de: "Theken-Token", pt: "Token do balcão", it: "Token del banco", ja: "受付トークン", zh: "服务台令牌", hi: "डेस्क टोकन", ar: "رمز المكتب",
   },
   "desk.takeup.go": {
     en: "Take it up", es: "Retomarlo", fr: "Le reprendre", de: "Übernehmen", pt: "Retomá-lo", it: "Riprendilo", ja: "就く", zh: "接手", hi: "सँभालें", ar: "تولَّه",
@@ -2476,7 +2476,7 @@ const CHROME: Table = {
     en: "The one thing a visitor most wants to know. Away says come back; closed says the counter is shut. They are different promises and the desk gets to make either.", es: "Lo que un visitante más quiere saber. «away» dice vuelve luego; «closed» dice que el mostrador está cerrado. Son promesas distintas y el mostrador puede hacer cualquiera.", fr: "La chose qu'un visiteur veut le plus savoir. « away » dit revenez ; « closed » dit que le comptoir est fermé. Ce sont des promesses différentes et le comptoir peut faire l'une ou l'autre.", de: "Das eine, was ein Besucher am meisten wissen will. »away« sagt komm wieder; »closed« sagt, der Schalter ist zu. Das sind verschiedene Versprechen, und der Schalter darf beide geben.", pt: "O que um visitante mais quer saber. «away» diz volte depois; «closed» diz que o balcão está fechado. São promessas diferentes e o balcão pode fazer qualquer uma.", it: "La cosa che un visitatore vuole sapere più di tutte. «away» dice torna dopo; «closed» dice che il banco è chiuso. Sono promesse diverse e il banco può fare l'una o l'altra.", ja: "訪問者が最も知りたいこと。「away」はまた来てくださいを、「closed」はカウンターが閉まっていることを意味します。異なる約束であり、デスクはどちらも選べます。", zh: "访客最想知道的一件事。「away」表示请再来；「closed」表示柜台已关。这是两种不同的承诺，柜台可以任选其一。", hi: "आगंतुक सबसे पहले यही जानना चाहता है। «away» कहता है फिर आना; «closed» कहता है काउंटर बंद है। ये अलग-अलग वादे हैं और डेस्क कोई भी कर सकता है।", ar: "أكثر ما يريد الزائر معرفته. «away» تقول عُد لاحقًا؛ و«closed» تقول إن المنضدة مغلقة. وعدان مختلفان وللمكتب أن يقطع أيًا منهما.",
   },
   "desk.bell.head": {
-    en: "The bell", es: "El timbre", fr: "La sonnette", de: "Die Klingel", pt: "A campainha", it: "Il campanello", ja: "ベル", zh: "门铃", hi: "घंटी", ar: "الجرس",
+    en: "The bell", es: "La campana", fr: "La sonnette", de: "Die Klingel", pt: "A campainha", it: "Il campanello", ja: "呼び鈴", zh: "门铃", hi: "घंटी", ar: "الجرس",
   },
   "desk.bell.none": {
     en: "Nobody has rung.", es: "Nadie ha llamado.", fr: "Personne n'a sonné.", de: "Niemand hat geklingelt.", pt: "Ninguém tocou.", it: "Nessuno ha suonato.", ja: "誰も鳴らしていません。", zh: "无人按铃。", hi: "किसी ने घंटी नहीं बजाई।", ar: "لم يقرع أحد.",
@@ -2485,7 +2485,7 @@ const CHROME: Table = {
     en: "answered", es: "atendido", fr: "répondu", de: "beantwortet", pt: "atendido", it: "risposto", ja: "応答済み", zh: "已应答", hi: "उत्तर दिया", ar: "أُجيب",
   },
   "desk.bell.answer": {
-    en: "Answer", es: "Atender", fr: "Répondre", de: "Antworten", pt: "Atender", it: "Rispondi", ja: "応答", zh: "应答", hi: "उत्तर दें", ar: "أجب",
+    en: "Answer", es: "Responder", fr: "Répondre", de: "Antworten", pt: "Responder", it: "Rispondi", ja: "応答", zh: "回应", hi: "जवाब दें", ar: "رد",
   },
   "desk.guests.head": {
     en: "Who wants to come up", es: "Quién quiere subir", fr: "Qui veut monter", de: "Wer heraufkommen will", pt: "Quem quer subir", it: "Chi vuole salire", ja: "上がりたい人", zh: "谁想上来", hi: "कौन ऊपर आना चाहता है", ar: "من يريد الصعود",
@@ -2497,7 +2497,7 @@ const CHROME: Table = {
     en: "Let them up", es: "Déjales subir", fr: "Les laisser monter", de: "Herauflassen", pt: "Deixá-los subir", it: "Falli salire", ja: "上がってもらう", zh: "让他们上来", hi: "उन्हें ऊपर आने दें", ar: "دعهم يصعدون",
   },
   "desk.guests.no": {
-    en: "Not now", es: "Ahora no", fr: "Pas maintenant", de: "Jetzt nicht", pt: "Agora não", it: "Non ora", ja: "今は無理", zh: "现在不行", hi: "अभी नहीं", ar: "ليس الآن",
+    en: "Not now", es: "Ahora no", fr: "Pas maintenant", de: "Jetzt nicht", pt: "Agora não", it: "Non ora", ja: "今はやめる", zh: "暂不", hi: "अभी नहीं", ar: "ليس الآن",
   },
   "desk.stream.head": {
     en: "On the stream", es: "En la transmisión", fr: "Sur le flux", de: "Im Stream", pt: "Na transmissão", it: "In diretta", ja: "配信中", zh: "直播中", hi: "स्ट्रीम पर", ar: "على البث",
@@ -2512,7 +2512,7 @@ const CHROME: Table = {
     en: "Look and camera", es: "Aspecto y cámara", fr: "Apparence et caméra", de: "Aussehen und Kamera", pt: "Aspeto e câmara", it: "Aspetto e camera", ja: "外観とカメラ", zh: "外观与摄像头", hi: "रूप और कैमरा", ar: "المظهر والكاميرا",
   },
   "desk.look.portrait.ph": {
-    en: "Portrait asset", es: "Recurso de retrato", fr: "Ressource de portrait", de: "Porträt-Asset", pt: "Recurso de retrato", it: "Risorsa ritratto", ja: "ポートレート素材", zh: "肖像素材", hi: "पोर्ट्रेट एसेट", ar: "أصل الصورة الشخصية",
+    en: "Portrait asset", es: "Recurso del retrato", fr: "Fichier du portrait", de: "Porträt-Datei", pt: "Ficheiro do retrato", it: "File del ritratto", ja: "ポートレート素材", zh: "肖像素材", hi: "चित्र फ़ाइल", ar: "ملف الصورة",
   },
   "desk.look.set": {
     en: "Set portrait", es: "Fijar retrato", fr: "Définir le portrait", de: "Porträt setzen", pt: "Definir retrato", it: "Imposta ritratto", ja: "ポートレートを設定", zh: "设置肖像", hi: "पोर्ट्रेट लगाएँ", ar: "عيّن الصورة",
@@ -2521,7 +2521,7 @@ const CHROME: Table = {
     en: "Clear camera", es: "Quitar cámara", fr: "Retirer la caméra", de: "Kamera entfernen", pt: "Limpar câmara", it: "Rimuovi camera", ja: "カメラを外す", zh: "清除摄像头", hi: "कैमरा हटाएँ", ar: "امسح الكاميرا",
   },
   "desk.beacons.head": {
-    en: "Beacons", es: "Balizas", fr: "Balises", de: "Baken", pt: "Balizas", it: "Beacon", ja: "ビーコン", zh: "信标", hi: "बीकन", ar: "المنارات",
+    en: "Beacons", es: "Balizas", fr: "Balises", de: "Marken", pt: "Balizas", it: "Segnalini", ja: "ビーコン", zh: "信标", hi: "बीकन", ar: "المنارات",
   },
   "desk.beacons.pitch": {
     en: "The desk as a sticker: somebody scans it in the street and reaches this counter. Picking one up retires it — the sticker on the wall stops working, which is the point.", es: "El mostrador como pegatina: alguien la escanea en la calle y llega a este mostrador. Recogerla la retira — la pegatina en la pared deja de funcionar, que es justo la idea.", fr: "Le comptoir en autocollant : quelqu'un le scanne dans la rue et atteint ce guichet. Le ramasser le retire — l'autocollant au mur cesse de fonctionner, et c'est le but.", de: "Der Schalter als Aufkleber: jemand scannt ihn auf der Straße und erreicht diesen Tresen. Ihn aufzuheben zieht ihn zurück — der Aufkleber an der Wand hört auf zu funktionieren, und genau das ist der Sinn.", pt: "O balcão como autocolante: alguém o digitaliza na rua e chega a este balcão. Apanhá-lo retira-o — o autocolante na parede deixa de funcionar, e é essa a ideia.", it: "Il banco come adesivo: qualcuno lo scansiona per strada e raggiunge questo bancone. Raccoglierlo lo ritira — l'adesivo sul muro smette di funzionare, ed è proprio il punto.", ja: "デスクをステッカーに：街で誰かがスキャンするとこのカウンターに届きます。回収すると引退します — 壁のステッカーは機能しなくなり、それこそが狙いです。", zh: "柜台化作贴纸：有人在街上扫一下就能到达这个柜台。收回它即让它退役 — 墙上的贴纸随即失效，这正是目的所在。", hi: "डेस्क एक स्टिकर के रूप में: कोई सड़क पर उसे स्कैन करता है और इस काउंटर तक पहुँचता है। उठा लेने से वह सेवानिवृत्त हो जाता है — दीवार का स्टिकर काम करना बंद कर देता है, और यही उद्देश्य है।", ar: "المكتب كملصق: يمسحه أحدهم في الشارع فيصل إلى هذه المنضدة. التقاطه يقاعده — يتوقف الملصق على الجدار عن العمل، وهذا هو المقصود.",
@@ -2545,7 +2545,7 @@ const CHROME: Table = {
     en: "What a scanner sees", es: "Lo que ve quien escanea", fr: "Ce que voit le scanneur", de: "Was ein Scanner sieht", pt: "O que vê quem digitaliza", it: "Cosa vede chi scansiona", ja: "スキャンした人に見えるもの", zh: "扫描者看到的内容", hi: "स्कैन करने वाले को क्या दिखता है", ar: "ما يراه الماسح",
   },
   "desk.beacons.pickup": {
-    en: "Pick it up", es: "Recogerla", fr: "Le ramasser", de: "Aufheben", pt: "Apanhá-la", it: "Raccoglilo", ja: "回収する", zh: "收回", hi: "उठा लें", ar: "التقطه",
+    en: "Pick it up", es: "Recogerlo", fr: "Le reprendre", de: "Zurücknehmen", pt: "Recolher", it: "Ritira", ja: "引き上げる", zh: "收回", hi: "उठा लें", ar: "استرجعه",
   },
   "desk.beacons.label.ph": {
     en: "Label (Shop window)", es: "Etiqueta (Escaparate)", fr: "Étiquette (Vitrine)", de: "Beschriftung (Schaufenster)", pt: "Etiqueta (Montra)", it: "Etichetta (Vetrina)", ja: "ラベル（ショーウィンドウ）", zh: "标签（橱窗）", hi: "लेबल (दुकान की खिड़की)", ar: "التسمية (واجهة المتجر)",
@@ -2608,7 +2608,7 @@ const CHROME: Table = {
     en: "how to reach them", es: "cómo contactarle", fr: "comment le joindre", de: "wie man sie erreicht", pt: "como contactá-lo", it: "come raggiungerlo", ja: "連絡方法", zh: "如何联系", hi: "उन तक कैसे पहुँचें", ar: "كيف تصل إليه",
   },
   "ref.add.go": {
-    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "إضافة",
   },
   "ref.sign": {
     en: "Read this before you sign", es: "Lee esto antes de firmar", fr: "Lisez ceci avant de signer", de: "Lesen Sie das, bevor Sie unterschreiben", pt: "Leia isto antes de assinar", it: "Leggi questo prima di firmare", ja: "署名する前に読んでください", zh: "签名前请阅读", hi: "हस्ताक्षर से पहले इसे पढ़ें", ar: "اقرأ هذا قبل أن توقّع",
@@ -2641,7 +2641,7 @@ const CHROME: Table = {
     en: "It opens once. A second attempt fails with the time of the first, rather than quietly working — a replayed link is something you should be able to find out about.", es: "Se abre una vez. Un segundo intento falla mostrando la hora del primero, en vez de funcionar en silencio — un enlace reutilizado es algo que deberías poder descubrir.", fr: "Il s'ouvre une fois. Une seconde tentative échoue avec l'heure de la première, plutôt que de marcher en silence — un lien rejoué est une chose que vous devez pouvoir découvrir.", de: "Er öffnet sich einmal. Ein zweiter Versuch scheitert mit der Zeit des ersten, statt still zu funktionieren — ein wiederverwendeter Link ist etwas, das Sie erfahren können sollten.", pt: "Abre uma vez. Uma segunda tentativa falha com a hora da primeira, em vez de funcionar em silêncio — um link repetido é algo que deve poder descobrir.", it: "Si apre una volta. Un secondo tentativo fallisce con l'ora del primo, invece di funzionare in silenzio — un link riusato è qualcosa che dovresti poter scoprire.", ja: "一度だけ開きます。二度目の試みは最初に開かれた時刻とともに失敗します。静かに動いたりはしません — 再利用されたリンクは、あなたが気づけるべきものだからです。", zh: "它只打开一次。第二次尝试会带着第一次的时间失败，而不是悄悄生效 — 被重放的链接是你应当能够察觉的事。", hi: "यह एक बार खुलता है। दूसरा प्रयास पहली बार के समय के साथ विफल होता है, चुपचाप काम नहीं करता — दोहराया गया लिंक ऐसी चीज़ है जिसका आपको पता चल सकना चाहिए।", ar: "يفتح مرة واحدة. المحاولة الثانية تفشل مع وقت الأولى بدل أن تعمل بصمت — الرابط المعاد تشغيله شيء ينبغي أن تستطيع اكتشافه.",
   },
   "ref.creds": {
-    en: "Your signing credentials", es: "Tus credenciales de firma", fr: "Vos identifiants de signature", de: "Ihre Signatur-Berechtigungen", pt: "As suas credenciais de assinatura", it: "Le tue credenziali di firma", ja: "署名クレデンシャル", zh: "你的签名凭证", hi: "आपके हस्ताक्षर क्रेडेंशियल", ar: "بيانات توقيعك",
+    en: "Your signing credentials", es: "Tus credenciales de firma", fr: "Vos identifiants de signature", de: "Deine Signaturberechtigungen", pt: "As suas credenciais de assinatura", it: "Le tue credenziali di firma", ja: "あなたの署名用資格情報", zh: "你的签名凭据", hi: "आपके हस्ताक्षर क्रेडेंशियल", ar: "بيانات اعتماد التوقيع الخاصة بك",
   },
   "ref.creds.pitch": {
     en: "A referral is a high-tier signature. What a credential can sign follows from how your identity was checked, and from whether the key stayed on one device.", es: "Un volante es una firma de nivel «high». Lo que una credencial puede firmar se sigue de cómo se verificó tu identidad, y de si la clave permaneció en un solo dispositivo.", fr: "Une orientation est une signature de niveau « high ». Ce qu'un identifiant peut signer découle de la façon dont votre identité a été vérifiée, et de si la clé est restée sur un seul appareil.", de: "Eine Überweisung ist eine Unterschrift der Stufe »high«. Was eine Berechtigung unterschreiben darf, folgt daraus, wie Ihre Identität geprüft wurde und ob der Schlüssel auf einem Gerät blieb.", pt: "Um encaminhamento é uma assinatura de nível «high». O que uma credencial pode assinar decorre de como a sua identidade foi verificada, e de se a chave ficou num só dispositivo.", it: "Un invio è una firma di livello «high». Ciò che una credenziale può firmare segue da come è stata verificata la tua identità, e da se la chiave è rimasta su un solo dispositivo.", ja: "紹介は「high」層の署名です。クレデンシャルが何に署名できるかは、本人確認の方法と、鍵が一台の端末に留まったかどうかで決まります。", zh: "转诊是「high」级签名。凭证能签什么，取决于你的身份如何核验、密钥是否只留在一台设备上。", hi: "रेफ़रल «high» स्तर का हस्ताक्षर है। क्रेडेंशियल क्या साइन कर सकता है, यह इस पर निर्भर है कि आपकी पहचान कैसे जाँची गई और कुंजी एक ही डिवाइस पर रही या नहीं।", ar: "الإحالة توقيع من مستوى «high». ما يمكن للاعتماد توقيعه يتبع كيفية التحقق من هويتك، وهل بقي المفتاح على جهاز واحد.",
@@ -2704,7 +2704,7 @@ const CHROME: Table = {
     en: "Open it", es: "Abrirlo", fr: "L'ouvrir", de: "Öffnen", pt: "Abri-lo", it: "Aprilo", ja: "開く", zh: "打开", hi: "खोलें", ar: "افتحه",
   },
   "ref.clin.reply": {
-    en: "Write back, once", es: "Responde, una vez", fr: "Répondez, une fois", de: "Zurückschreiben, einmal", pt: "Responda, uma vez", it: "Rispondi, una volta", ja: "一度だけ返信", zh: "回信，仅一次", hi: "एक बार जवाब लिखें", ar: "اكتب ردًا، مرة واحدة",
+    en: "Write back, once", es: "Responder, una vez", fr: "Répondre, une fois", de: "Einmal zurückschreiben", pt: "Responder, uma vez", it: "Rispondi, una volta", ja: "一度だけ返信", zh: "回复（仅一次）", hi: "एक बार उत्तर लिखें", ar: "اكتب ردًا مرة واحدة",
   },
   "ref.clin.reply.ph": {
     en: "what you want the patient to know", es: "lo que quieres que el paciente sepa", fr: "ce que vous voulez que le patient sache", de: "was der Patient wissen soll", pt: "o que quer que o paciente saiba", it: "ciò che vuoi che il paziente sappia", ja: "患者に知らせたいこと", zh: "你想让患者知道的内容", hi: "आप मरीज़ को क्या बताना चाहते हैं", ar: "ما تريد أن يعرفه المريض",
@@ -2743,7 +2743,7 @@ const CHROME: Table = {
     en: "for a {aud} · {avail} available, {sync} synced", es: "para un {aud} · {avail} disponibles, {sync} sincronizados", fr: "pour un {aud} · {avail} disponibles, {sync} synchronisés", de: "für ein {aud} · {avail} verfügbar, {sync} synchronisiert", pt: "para um {aud} · {avail} disponíveis, {sync} sincronizados", it: "per un {aud} · {avail} disponibili, {sync} sincronizzati", ja: "{aud}向け · {avail}件利用可能、{sync}件同期済み", zh: "面向{aud} · 可用{avail}项，已同步{sync}项", hi: "{aud} के लिए · {avail} उपलब्ध, {sync} सिंक", ar: "لـ{aud} · {avail} متاحة، {sync} متزامنة",
   },
   "rem.mods.sync": {
-    en: "Sync", es: "Sincronizar", fr: "Synchroniser", de: "Synchronisieren", pt: "Sincronizar", it: "Sincronizza", ja: "同期", zh: "同步", hi: "सिंक करें", ar: "زامن",
+    en: "Sync", es: "Sincronizar", fr: "Synchroniser", de: "Abgleichen", pt: "Sincronizar", it: "Sincronizza", ja: "同期", zh: "同步", hi: "सिंक करें", ar: "زامِن",
   },
   "rem.apps": {
     en: "Apps it is connected to", es: "Apps a las que está conectado", fr: "Applis auxquelles il est connecté", de: "Apps, mit denen es verbunden ist", pt: "Apps a que está ligado", it: "App a cui è collegato", ja: "接続中のアプリ", zh: "它已连接的应用", hi: "जुड़े हुए ऐप", ar: "التطبيقات المتصل بها",
@@ -2890,10 +2890,10 @@ const CHROME: Table = {
     en: "unverifiable — an invented person", es: "inverificable — una persona inventada", fr: "invérifiable — une personne inventée", de: "nicht verifizierbar — eine erfundene Person", pt: "não verificável — uma pessoa inventada", it: "non verificabile — una persona inventata", ja: "確認不能 — 架空の人物", zh: "无从验证 — 一个虚构的人", hi: "सत्यापन-अयोग्य — एक गढ़ा हुआ व्यक्ति", ar: "غير قابل للتوثيق — شخص مُختلق",
   },
   "idn.roster.move": {
-    en: "Move the badge here", es: "Mover la insignia aquí", fr: "Déplacer le badge ici", de: "Das Abzeichen hierher verschieben", pt: "Mover o distintivo para aqui", it: "Sposta qui il distintivo", ja: "バッジをここへ移す", zh: "把徽章移到这里", hi: "बैज यहाँ लाएँ", ar: "انقل الشارة إلى هنا",
+    en: "Move the badge here", es: "Traer la insignia aquí", fr: "Déplacer le badge ici", de: "Abzeichen hierher holen", pt: "Trazer o selo para aqui", it: "Sposta qui il badge", ja: "バッジをここへ移す", zh: "把徽章移到这里", hi: "बैज यहाँ लाएँ", ar: "انقل الشارة إلى هنا",
   },
   "idn.ver": {
-    en: "Verification", es: "Verificación", fr: "Vérification", de: "Verifizierung", pt: "Verificação", it: "Verifica", ja: "本人確認", zh: "验证", hi: "सत्यापन", ar: "التوثيق",
+    en: "Verification", es: "Verificación", fr: "Vérification", de: "Verifizierung", pt: "Verificação", it: "Verifica", ja: "本人確認", zh: "身份核验", hi: "सत्यापन", ar: "التحقق",
   },
   "idn.ver.means": {
     en: "{means} ({level}, rank {rank})", es: "{means} ({level}, rango {rank})", fr: "{means} ({level}, rang {rank})", de: "{means} ({level}, Rang {rank})", pt: "{means} ({level}, nível {rank})", it: "{means} ({level}, rango {rank})", ja: "{means}（{level}、ランク{rank}）", zh: "{means}（{level}，等级{rank}）", hi: "{means} ({level}, रैंक {rank})", ar: "{means} ({level}، رتبة {rank})",
@@ -2950,7 +2950,7 @@ const CHROME: Table = {
     en: "a new display name", es: "un nuevo nombre visible", fr: "un nouveau nom affiché", de: "ein neuer Anzeigename", pt: "um novo nome visível", it: "un nuovo nome visibile", ja: "新しい表示名", zh: "新的显示名", hi: "नया प्रदर्शित नाम", ar: "اسم معروض جديد",
   },
   "idn.rename.save": {
-    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "احفظ",
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
   },
   "idn.export": {
     en: "Take it with you", es: "Llévatelo contigo", fr: "Emportez-le avec vous", de: "Nehmen Sie es mit", pt: "Leve-o consigo", it: "Portalo con te", ja: "持って出る", zh: "带走它", hi: "अपने साथ ले जाएँ", ar: "خذه معك",
@@ -3040,7 +3040,7 @@ const CHROME: Table = {
     en: "the material itself", es: "el material en sí", fr: "la matière elle-même", de: "das Material selbst", pt: "o próprio material", it: "il materiale stesso", ja: "素材そのもの", zh: "材料本身", hi: "स्वयं सामग्री", ar: "المادة نفسها",
   },
   "wsh.knows.add": {
-    en: "Add it", es: "Añadirlo", fr: "L'ajouter", de: "Hinzufügen", pt: "Adicioná-lo", it: "Aggiungilo", ja: "追加する", zh: "添加", hi: "जोड़ें", ar: "أضفه",
+    en: "Add it", es: "Añadirlo", fr: "L'ajouter", de: "Hinzufügen", pt: "Adicioná-lo", it: "Aggiungilo", ja: "追加する", zh: "添加", hi: "जोड़ें", ar: "أضِفه",
   },
   "wsh.knows.none": {
     en: "Nothing added yet.", es: "Nada añadido todavía.", fr: "Rien d'ajouté pour l'instant.", de: "Noch nichts hinzugefügt.", pt: "Nada adicionado ainda.", it: "Ancora niente aggiunto.", ja: "まだ何も追加されていません。", zh: "尚未添加任何内容。", hi: "अभी कुछ नहीं जोड़ा गया।", ar: "لم يُضف شيء بعد.",
@@ -3100,7 +3100,7 @@ const CHROME: Table = {
     en: "can hold a conversation", es: "puede sostener una conversación", fr: "peut tenir une conversation", de: "kann ein Gespräch führen", pt: "consegue manter uma conversa", it: "può sostenere una conversazione", ja: "会話ができる", zh: "能进行对话", hi: "बातचीत कर सकता है", ar: "يستطيع إدارة محادثة",
   },
   "wsh.body.add": {
-    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "إضافة",
   },
   "wsh.fold": {
     en: "Fold it back in", es: "Reincorporarlo", fr: "Le réintégrer", de: "Wieder einarbeiten", pt: "Reincorporá-lo", it: "Reintegralo", ja: "取り込み直す", zh: "重新并入", hi: "इसे वापस समेटें", ar: "أعد دمجه",
@@ -3130,7 +3130,7 @@ const CHROME: Table = {
     en: "what you are trying to do", es: "qué intentas hacer", fr: "ce que vous essayez de faire", de: "was Sie vorhaben", pt: "o que está a tentar fazer", it: "cosa stai cercando di fare", ja: "やろうとしていること", zh: "你想做什么", hi: "आप क्या करना चाह रहे हैं", ar: "ما تحاول فعله",
   },
   "wsh.see.ask": {
-    en: "Ask", es: "Preguntar", fr: "Demander", de: "Fragen", pt: "Perguntar", it: "Chiedi", ja: "尋ねる", zh: "询问", hi: "पूछें", ar: "اسأل",
+    en: "Ask", es: "Preguntar", fr: "Demander", de: "Fragen", pt: "Perguntar", it: "Chiedi", ja: "質問する", zh: "提问", hi: "पूछें", ar: "اسأل",
   },
   "wsh.see.recognised": {
     en: "Recognised {n}: {list}", es: "Reconocidos {n}: {list}", fr: "Reconnus {n} : {list}", de: "Erkannt {n}: {list}", pt: "Reconhecidos {n}: {list}", it: "Riconosciuti {n}: {list}", ja: "認識 {n}件: {list}", zh: "识别到{n}项: {list}", hi: "पहचाने गए {n}: {list}", ar: "تعرّف على {n}: {list}",
@@ -3151,7 +3151,7 @@ const CHROME: Table = {
     en: "pick a model", es: "elige un modelo", fr: "choisissez un modèle", de: "Modell wählen", pt: "escolha um modelo", it: "scegli un modello", ja: "モデルを選ぶ", zh: "选择型号", hi: "मॉडल चुनें", ar: "اختر طرازًا",
   },
   "rbt.bind.go": {
-    en: "Bind", es: "Vincular", fr: "Lier", de: "Binden", pt: "Vincular", it: "Vincola", ja: "紐付ける", zh: "绑定", hi: "बाँधें", ar: "اربط",
+    en: "Bind", es: "Vincular", fr: "Lier", de: "Binden", pt: "Vincular", it: "Collega", ja: "結び付ける", zh: "绑定", hi: "जोड़ें", ar: "اربط",
   },
   "rbt.invariant": {
     en: "Invariant across {across}.", es: "Invariante en {across}.", fr: "Invariant sur {across}.", de: "Invariant über {across}.", pt: "Invariante em {across}.", it: "Invariante su {across}.", ja: "{across}をまたいで不変。", zh: "在{across}间保持不变。", hi: "{across} में अपरिवर्तित।", ar: "ثابت عبر {across}.",
@@ -3187,7 +3187,7 @@ const CHROME: Table = {
     en: "Nothing installed.", es: "Nada instalado.", fr: "Rien d'installé.", de: "Nichts installiert.", pt: "Nada instalado.", it: "Niente installato.", ja: "何も入っていません。", zh: "尚未安装任何内容。", hi: "कुछ स्थापित नहीं।", ar: "لا شيء مثبّت.",
   },
   "rbt.conn.remove": {
-    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "取り外す", zh: "移除", hi: "हटाएँ", ar: "أزل",
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "إزالة",
   },
   "rbt.conn.components": {
     en: "Components it can reach", es: "Componentes a los que puede llegar", fr: "Composants qu'il peut atteindre", de: "Komponenten, die es erreichen kann", pt: "Componentes que consegue alcançar", it: "Componenti che può raggiungere", ja: "到達できる構成要素", zh: "它能触及的组件", hi: "जिन घटकों तक यह पहुँच सकता है", ar: "المكونات التي يمكنه بلوغها",
@@ -3268,7 +3268,7 @@ const CHROME: Table = {
     en: "what the work is, in one sentence", es: "cuál es el trabajo, en una frase", fr: "en quoi consiste le travail, en une phrase", de: "worin die Arbeit besteht, in einem Satz", pt: "qual é o trabalho, numa frase", it: "qual è il lavoro, in una frase", ja: "その仕事は何か、ひと言で", zh: "这项工作是什么，一句话说明", hi: "काम क्या है, एक वाक्य में", ar: "ما هو العمل، في جملة واحدة",
   },
   "exc.propose.go": {
-    en: "Propose", es: "Proponer", fr: "Proposer", de: "Vorschlagen", pt: "Propor", it: "Proponi", ja: "提案", zh: "提出", hi: "प्रस्ताव दें", ar: "اقترح",
+    en: "Propose", es: "Proponer", fr: "Proposer", de: "Vorschlagen", pt: "Propor", it: "Proponi", ja: "提案", zh: "提议", hi: "प्रस्ताव दें", ar: "اقترح",
   },
   "exc.opened.said": {
     en: "Draft opened. Nothing can move until both of you sign.", es: "Borrador abierto. Nada puede moverse hasta que ambos firmen.", fr: "Brouillon ouvert. Rien ne peut bouger tant que vous n'avez pas signé tous les deux.", de: "Entwurf eröffnet. Nichts kann sich bewegen, bis Sie beide unterschrieben haben.", pt: "Rascunho aberto. Nada pode mover-se até que ambos assinem.", it: "Bozza aperta. Niente può muoversi finché non firmate entrambi.", ja: "下書きを開きました。二人が署名するまで、何も動きません。", zh: "草稿已开启。在双方签署之前，任何东西都不会移动。", hi: "मसौदा खुल गया। जब तक आप दोनों हस्ताक्षर नहीं करते, कुछ नहीं हिलेगा।", ar: "فُتحت المسودة. لا شيء يتحرك حتى يوقّع كلاكما.",
@@ -3277,7 +3277,7 @@ const CHROME: Table = {
     en: "The manifest changed, so both signatures were cleared. Sign again.", es: "El manifiesto cambió, así que ambas firmas se borraron. Firme de nuevo.", fr: "Le manifeste a changé, donc les deux signatures ont été effacées. Signez à nouveau.", de: "Das Manifest hat sich geändert, deshalb wurden beide Unterschriften gelöscht. Bitte erneut unterschreiben.", pt: "O manifesto mudou, por isso ambas as assinaturas foram apagadas. Assine de novo.", it: "Il manifesto è cambiato, quindi entrambe le firme sono state cancellate. Firma di nuovo.", ja: "明細が変わったため、両方の署名が取り消されました。もう一度署名してください。", zh: "清单已变更，因此两份签名都已作废。请重新签署。", hi: "सूची बदल गई, इसलिए दोनों हस्ताक्षर मिटा दिए गए। फिर से हस्ताक्षर करें।", ar: "تغيّر البيان، فأُلغي التوقيعان. وقّع من جديد.",
   },
   "exc.yours": {
-    en: "Yours", es: "Los tuyos", fr: "Les vôtres", de: "Ihre", pt: "Os seus", it: "I tuoi", ja: "あなたのもの", zh: "你的", hi: "आपके", ar: "ما يخصّك",
+    en: "Yours", es: "Lo tuyo", fr: "Les vôtres", de: "Deine", pt: "Os seus", it: "I tuoi", ja: "あなたの投稿", zh: "你的", hi: "आपके", ar: "ما أرسلتَه",
   },
   "exc.none": {
     en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "尚无。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
@@ -3304,7 +3304,7 @@ const CHROME: Table = {
     en: "This grants {a}. It does not grant {b}.", es: "Esto concede {a}. No concede {b}.", fr: "Ceci accorde {a}. Cela n'accorde pas {b}.", de: "Dies gewährt {a}. Es gewährt nicht {b}.", pt: "Isto concede {a}. Não concede {b}.", it: "Questo concede {a}. Non concede {b}.", ja: "これが与えるのは {a} です。与えないのは {b} です。", zh: "这授予 {a}。它不授予 {b}。", hi: "यह {a} देता है। यह {b} नहीं देता।", ar: "هذا يمنح {a}. ولا يمنح {b}.",
   },
   "exc.manifest": {
-    en: "The manifest", es: "El manifiesto", fr: "Le manifeste", de: "Das Manifest", pt: "O manifesto", it: "Il manifesto", ja: "明細", zh: "清单", hi: "सूची", ar: "البيان",
+    en: "The manifest", es: "El manifiesto", fr: "Le manifeste", de: "Das Verzeichnis", pt: "O manifesto", it: "Il manifesto", ja: "明細", zh: "清单", hi: "सूचीपत्र", ar: "البيان",
   },
   "exc.manifest.none": {
     en: "Nothing listed yet.", es: "Nada listado todavía.", fr: "Rien de listé pour l'instant.", de: "Noch nichts aufgeführt.", pt: "Nada listado ainda.", it: "Ancora niente in elenco.", ja: "まだ何も記載されていません。", zh: "尚未列出任何内容。", hi: "अभी कुछ सूचीबद्ध नहीं।", ar: "لم يُدرج شيء بعد.",
@@ -3328,22 +3328,22 @@ const CHROME: Table = {
     en: "· accepted", es: "· aceptado", fr: "· accepté", de: "· angenommen", pt: "· aceite", it: "· accettato", ja: "· 受領済み", zh: "· 已接收", hi: "· स्वीकृत", ar: "· مقبول",
   },
   "exc.accept": {
-    en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen", pt: "Aceitar", it: "Accetta", ja: "受け取る", zh: "接收", hi: "स्वीकारें", ar: "اقبل",
+    en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen", pt: "Aceitar", it: "Accetta", ja: "承諾", zh: "接受", hi: "स्वीकारें", ar: "قبول",
   },
   "exc.accepted.said": {
     en: "Accepted. That one item, and nothing else.", es: "Aceptado. Ese elemento, y nada más.", fr: "Accepté. Cet élément-là, et rien d'autre.", de: "Angenommen. Genau dieser Posten, und sonst nichts.", pt: "Aceite. Esse item, e mais nada.", it: "Accettato. Quella voce, e nient'altro.", ja: "受け取りました。その一件だけで、ほかは何もありません。", zh: "已接收。仅此一项，别无其他。", hi: "स्वीकृत। बस वही एक मद, और कुछ नहीं।", ar: "قُبل. ذلك البند وحده، ولا شيء غيره.",
   },
   "exc.remove": {
-    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "احذف",
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "إزالة",
   },
   "exc.item.ph": {
     en: "what crosses", es: "qué cruza", fr: "ce qui passe", de: "was hinübergeht", pt: "o que atravessa", it: "cosa passa", ja: "何が渡るか", zh: "交付什么", hi: "क्या पार जाता है", ar: "ما الذي يعبر",
   },
   "exc.add": {
-    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "إضافة",
   },
   "exc.sigs": {
-    en: "Signatures", es: "Firmas", fr: "Signatures", de: "Unterschriften", pt: "Assinaturas", it: "Firme", ja: "署名", zh: "签名", hi: "हस्ताक्षर", ar: "التوقيعات",
+    en: "Signatures", es: "Firmas", fr: "Signatures", de: "Signaturen", pt: "Assinaturas", it: "Firme", ja: "署名", zh: "签名", hi: "हस्ताक्षर", ar: "التواقيع",
   },
   "exc.sigs.against": {
     en: "Against fingerprint {fp} — change the manifest and this changes, so the old signatures match nothing.", es: "Contra la huella {fp} — cambie el manifiesto y esta cambia, así que las firmas antiguas no coinciden con nada.", fr: "Contre l'empreinte {fp} — changez le manifeste et elle change, donc les anciennes signatures ne correspondent à rien.", de: "Gegen den Fingerabdruck {fp} — ändern Sie das Manifest, ändert er sich, und die alten Unterschriften passen zu nichts mehr.", pt: "Contra a impressão {fp} — mude o manifesto e ela muda, por isso as assinaturas antigas não correspondem a nada.", it: "Contro l'impronta {fp} — cambia il manifesto e questa cambia, così le vecchie firme non corrispondono a niente.", ja: "指紋 {fp} に対して — 明細を変えればこれも変わるので、古い署名はどれとも一致しなくなります。", zh: "针对指纹 {fp} — 一旦改动清单，它就会变，于是旧签名与任何内容都不再匹配。", hi: "फ़िंगरप्रिंट {fp} के विरुद्ध — सूची बदलिए और यह बदल जाता है, इसलिए पुराने हस्ताक्षर किसी से मेल नहीं खाते।", ar: "مقابل البصمة {fp} — غيّر البيان تتغيّر هي، فلا تطابق التواقيع القديمة شيئًا.",
@@ -3361,7 +3361,7 @@ const CHROME: Table = {
     en: "you", es: "usted", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
   },
   "exc.sign": {
-    en: "Sign", es: "Firmar", fr: "Signer", de: "Unterschreiben", pt: "Assinar", it: "Firma", ja: "署名する", zh: "签署", hi: "हस्ताक्षर करें", ar: "وقّع",
+    en: "Sign", es: "Firmar", fr: "Signer", de: "Signieren", pt: "Assinar", it: "Firma", ja: "署名する", zh: "签署", hi: "हस्ताक्षर करें", ar: "توقيع",
   },
   "exc.signed.said": {
     en: "Signed — this manifest, and nothing it becomes later.", es: "Firmado — este manifiesto, y nada en lo que se convierta después.", fr: "Signé — ce manifeste-ci, et rien de ce qu'il deviendra plus tard.", de: "Unterschrieben — dieses Manifest, und nichts, was später daraus wird.", pt: "Assinado — este manifesto, e nada no que ele se torne depois.", it: "Firmato — questo manifesto, e niente di ciò che diventerà poi.", ja: "署名しました — この明細に対してであり、後にそれが何になろうと関係ありません。", zh: "已签署 — 针对的是这份清单，而不是它日后变成的样子。", hi: "हस्ताक्षरित — यही सूची, और वह नहीं जो यह बाद में बन जाए।", ar: "وُقّع — هذا البيان، لا ما يصير إليه لاحقًا.",
@@ -3658,7 +3658,7 @@ const CHROME: Table = {
     en: " · one shared room", es: " · una sala compartida", fr: " · un salon partagé", de: " · ein gemeinsamer Raum", pt: " · uma sala partilhada", it: " · una stanza condivisa", ja: " · 共有ルーム一つ", zh: " · 一个共享房间", hi: " · एक साझा कक्ष", ar: " · غرفة مشتركة واحدة",
   },
   "vis.pickup": {
-    en: "Pick it up", es: "Recogerlo", fr: "Le reprendre", de: "Wieder einsammeln", pt: "Recolhê-lo", it: "Riprendilo", ja: "回収する", zh: "收回", hi: "इसे उठाएँ", ar: "ارفعه",
+    en: "Pick it up", es: "Recogerlo", fr: "Le reprendre", de: "Zurücknehmen", pt: "Recolher", it: "Ritira", ja: "引き上げる", zh: "收回", hi: "उठा लें", ar: "استرجعه",
   },
   "vis.pickedup.said": {
     en: "Picked up. The paper is still on the wall, so the code keeps answering — with nothing.", es: "Recogido. El papel sigue en la pared, así que el código sigue respondiendo — sin nada.", fr: "Repris. Le papier est toujours au mur, donc le code continue de répondre — avec rien.", de: "Wieder eingesammelt. Das Papier hängt noch an der Wand, der Code antwortet also weiter — mit nichts.", pt: "Recolhido. O papel continua na parede, por isso o código continua a responder — com nada.", it: "Ripreso. La carta è ancora sul muro, quindi il codice continua a rispondere — con niente.", ja: "回収しました。紙は壁に貼られたままなので、コードは答え続けます — 中身は何もありません。", zh: "已收回。纸还贴在墙上，所以这个码仍会作答——但答不出任何东西。", hi: "उठा लिया गया। काग़ज़ अब भी दीवार पर है, इसलिए कोड जवाब देता रहेगा — पर कुछ भी नहीं के साथ।", ar: "رُفع. الورقة ما زالت على الجدار، فيظل الرمز يجيب — بلا شيء.",
@@ -3760,7 +3760,7 @@ const CHROME: Table = {
     en: "The one route in this product an {cannot} — because the signal it answers is that the owner has died or cannot act, and requiring their authorisation would be requiring the one thing known to be unavailable. A reviewer holds it, against a verification reference kept out of band: a death certificate, a power of attorney.", es: "La única ruta de este producto que {cannot} — porque la señal a la que responde es que el propietario ha muerto o no puede actuar, y exigir su autorización sería exigir justo lo que se sabe que no está disponible. La tiene un revisor, contra una referencia de verificación guardada fuera de banda: un certificado de defunción, un poder notarial.", fr: "La seule route de ce produit qu'{cannot} — parce que le signal auquel elle répond est que le propriétaire est mort ou ne peut agir, et exiger son autorisation serait exiger précisément ce que l'on sait indisponible. C'est un vérificateur qui la détient, contre une référence de vérification conservée hors bande : un certificat de décès, une procuration.", de: "Der eine Weg in diesem Produkt, {cannot} — denn das Signal, auf das er antwortet, ist, dass der Besitzer gestorben ist oder nicht handeln kann, und seine Autorisierung zu verlangen hieße, genau das zu verlangen, was bekanntlich nicht verfügbar ist. Ein Prüfer hält ihn, gegen einen außerhalb geführten Verifikationsnachweis: eine Sterbeurkunde, eine Vollmacht.", pt: "A única via neste produto que {cannot} — porque o sinal a que responde é que o proprietário morreu ou não pode agir, e exigir a sua autorização seria exigir exatamente aquilo que se sabe indisponível. É um revisor que a detém, contra uma referência de verificação guardada fora de banda: uma certidão de óbito, uma procuração.", it: "L'unica via in questo prodotto che {cannot} — perché il segnale a cui risponde è che il proprietario è morto o non può agire, e pretendere la sua autorizzazione sarebbe pretendere proprio ciò che si sa non disponibile. La tiene un revisore, contro un riferimento di verifica conservato fuori banda: un certificato di morte, una procura.", ja: "この製品で唯一、{cannot}経路です — なぜなら、それが応じる合図は所有者が亡くなったか行為できないということであり、その承認を求めることは、手に入らないと分かっている当のものを求めることになるからです。代わりに審査者が持ち、帯域外で保管された確認資料——死亡証明書や委任状——に対して行使します。", zh: "本产品中唯一一条{cannot}的路径——因为它所回应的信号，正是所有者已故或无法行事；要求其授权，就等于要求那件已知无法取得的东西。它由一位审核者持有，凭据是带外保存的验证材料：死亡证明、授权委托书。", hi: "इस उत्पाद का वह एक रास्ता जिसे {cannot} — क्योंकि यह जिस संकेत का उत्तर देता है वह यही है कि स्वामी की मृत्यु हो चुकी है या वह कार्य नहीं कर सकता, और उसकी अनुमति माँगना ठीक उसी चीज़ को माँगना होगा जिसका उपलब्ध न होना पहले से ज्ञात है। इसे एक समीक्षक रखता है, बैंड से बाहर रखे सत्यापन संदर्भ के विरुद्ध: मृत्यु प्रमाणपत्र, मुख़्तारनामा।", ar: "الطريق الوحيد في هذا المنتج الذي {cannot} — لأن الإشارة التي يستجيب لها هي أن المالك قد توفي أو لا يستطيع التصرف، وطلب إذنه يعني طلب الشيء الوحيد المعروف أنه غير متاح. يحمله مراجع، مقابل مرجع تحقق يُحفظ خارج القناة: شهادة وفاة، أو توكيل رسمي.",
   },
   "pas.subject.ph": {
-    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "対象のプロフィール", zh: "该资料", hi: "वह प्रोफ़ाइल", ar: "الملف",
+    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "このプロフィール", zh: "这个资料", hi: "यह प्रोफ़ाइल", ar: "الملف",
   },
   "pas.ref.ph": {
     en: "verification reference", es: "referencia de verificación", fr: "référence de vérification", de: "Verifikationsnachweis", pt: "referência de verificação", it: "riferimento di verifica", ja: "確認資料の参照番号", zh: "验证凭据编号", hi: "सत्यापन संदर्भ", ar: "مرجع التحقق",
@@ -3853,7 +3853,7 @@ const CHROME: Table = {
     en: "{assist} needs input — the paused phase asked for something, and sending nothing would advance past the question rather than answer it.", es: "{assist} necesita una entrada — la fase en pausa pidió algo, y no enviar nada avanzaría más allá de la pregunta en vez de responderla.", fr: "{assist} exige une saisie — la phase en pause a demandé quelque chose, et n'envoyer rien avancerait au-delà de la question au lieu d'y répondre.", de: "{assist} braucht eine Eingabe — die pausierte Phase hat um etwas gebeten, und nichts zu senden würde an der Frage vorbei weitergehen, statt sie zu beantworten.", pt: "{assist} precisa de uma entrada — a fase em pausa pediu algo, e não enviar nada avançaria para além da pergunta em vez de a responder.", it: "{assist} richiede un input — la fase in pausa ha chiesto qualcosa, e non inviare nulla andrebbe oltre la domanda invece di rispondere.", ja: "{assist} には入力が必要です — 停止中の段階が何かを求めており、何も送らなければ問いに答えるのではなく問いを飛び越えてしまいます。", zh: "{assist} 需要输入——暂停的阶段提出了要求，什么都不发就会越过这个问题，而不是回答它。", hi: "{assist} को इनपुट चाहिए — रुके हुए चरण ने कुछ माँगा है, और कुछ न भेजना सवाल का उत्तर देने के बजाय उसे लाँघ जाना होगा।", ar: "{assist} يحتاج مُدخلًا — الطور المتوقف طلب شيئًا، وإرسال لا شيء يتجاوز السؤال بدل أن يجيبه.",
   },
   "sgn.title": {
-    en: "Signing", es: "Firma", fr: "Signature", de: "Signieren", pt: "Assinatura", it: "Firma", ja: "署名", zh: "签署", hi: "हस्ताक्षर", ar: "التوقيع",
+    en: "Signing", es: "Firma", fr: "Signature", de: "Unterzeichnung", pt: "Assinatura", it: "Firma", ja: "署名", zh: "签署", hi: "हस्ताक्षर", ar: "التوقيع",
   },
   "sgn.noaccount": {
     en: "Signing is done as an account, not as a profile page. Sign in as an owner to enrol a credential.", es: "Se firma como cuenta, no como página de perfil. Inicie sesión como propietario para registrar una credencial.", fr: "On signe en tant que compte, pas en tant que page de profil. Connectez-vous comme propriétaire pour enregistrer un justificatif.", de: "Signiert wird als Konto, nicht als Profilseite. Melden Sie sich als Besitzer an, um einen Nachweis zu registrieren.", pt: "Assina-se como conta, não como página de perfil. Entre como proprietário para registar uma credencial.", it: "Si firma come account, non come pagina di profilo. Accedi come proprietario per registrare una credenziale.", ja: "署名はアカウントとして行うもので、プロフィールのページとしてではありません。資格情報を登録するには所有者としてサインインしてください。", zh: "签署是以账户身份进行的，而不是以资料页面的身份。请以所有者身份登录以注册凭据。", hi: "हस्ताक्षर खाते के रूप में होता है, प्रोफ़ाइल पृष्ठ के रूप में नहीं। क्रेडेंशियल दर्ज करने के लिए स्वामी के रूप में साइन इन करें।", ar: "التوقيع يتم بصفة حساب لا بصفة صفحة ملف. سجّل الدخول بصفتك مالكًا لتسجيل اعتماد.",
@@ -3925,7 +3925,7 @@ const CHROME: Table = {
     en: "Signs nothing — revoked, or not proofed to any tier", es: "No firma nada — revocada, o sin comprobación para ningún nivel", fr: "Ne signe rien — révoqué, ou non vérifié pour aucun niveau", de: "Signiert nichts — widerrufen oder für keine Stufe geprüft", pt: "Não assina nada — revogada, ou sem verificação para qualquer nível", it: "Non firma nulla — revocata, o non verificata per alcun livello", ja: "何にも署名できません — 失効済みか、どの段階の確認も受けていません", zh: "什么都不能签署——已撤销，或未通过任何层级的核验", hi: "कुछ भी हस्ताक्षरित नहीं करता — निरस्त, या किसी स्तर के लिए प्रमाणित नहीं", ar: "لا يوقّع شيئًا — مُبطَل، أو غير مُتحقَّق لأي مستوى",
   },
   "sgn.revoke": {
-    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "失効させる", zh: "撤销", hi: "निरस्त करें", ar: "أبطِل",
+    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "取り消す", zh: "撤销", hi: "रद्द करें", ar: "إبطال",
   },
   "sgn.revoked.said": {
     en: "Revoked, going forward. Anything already signed with it stays verifiable — its public key is in the evidence, not here.", es: "Revocada de aquí en adelante. Todo lo ya firmado con ella sigue siendo verificable — su clave pública está en la evidencia, no aquí.", fr: "Révoqué pour la suite. Tout ce qui a déjà été signé avec reste vérifiable — sa clé publique est dans la preuve, pas ici.", de: "Ab jetzt widerrufen. Alles, was damit bereits signiert wurde, bleibt überprüfbar — sein öffentlicher Schlüssel steckt im Beweis, nicht hier.", pt: "Revogada daqui para a frente. Tudo o que já foi assinado com ela continua verificável — a sua chave pública está na evidência, não aqui.", it: "Revocata d'ora in poi. Tutto ciò che è già stato firmato con essa resta verificabile — la sua chiave pubblica è nella prova, non qui.", ja: "以後は失効します。それですでに署名されたものは検証可能なままです — その公開鍵は証拠の中にあり、ここにあるのではありません。", zh: "自此撤销。已用它签署过的内容仍可验证——其公钥在证据里，而不在这里。", hi: "आगे के लिए निरस्त। इससे पहले हस्ताक्षरित हर चीज़ सत्यापन-योग्य बनी रहती है — उसकी सार्वजनिक कुंजी साक्ष्य में है, यहाँ नहीं।", ar: "أُبطِل من الآن فصاعدًا. كل ما وُقّع به سابقًا يبقى قابلًا للتحقق — مفتاحه العام في الدليل، لا هنا.",
@@ -3991,7 +3991,7 @@ const CHROME: Table = {
     en: "An adult-mode profile can be advertised at an adult venue, as a link or a printable code.", es: "Un perfil en modo adulto puede anunciarse en un local para adultos, como enlace o como código imprimible.", fr: "Un profil en mode adulte peut être diffusé sur un espace pour adultes, sous forme de lien ou de code imprimable.", de: "Ein Profil im Erwachsenenmodus kann an einem Erwachsenen-Ort beworben werden, als Link oder als druckbarer Code.", pt: "Um perfil em modo adulto pode ser divulgado num espaço para adultos, como ligação ou como código imprimível.", it: "Un profilo in modalità adulti può essere promosso in uno spazio per adulti, come link o come codice stampabile.", ja: "アダルトモードのプロフィールは、アダルト向けの場でリンクまたは印刷可能なコードとして宣伝できます。", zh: "成人模式的资料可以在成人场所进行推广，形式为链接或可打印的二维码。", hi: "वयस्क-मोड प्रोफ़ाइल का प्रचार किसी वयस्क स्थल पर लिंक या छपने योग्य कोड के रूप में किया जा सकता है।", ar: "يمكن الإعلان عن ملف في وضع البالغين في مكان للبالغين، كرابط أو كرمز قابل للطباعة.",
   },
   "plc.venues": {
-    en: "Venues", es: "Locales", fr: "Espaces", de: "Orte", pt: "Espaços", it: "Spazi", ja: "掲載先", zh: "场所", hi: "स्थल", ar: "الأماكن",
+    en: "Venues", es: "Locales", fr: "Lieux", de: "Orte", pt: "Locais", it: "Luoghi", ja: "掲載先", zh: "场所", hi: "स्थल", ar: "الأماكن",
   },
   "plc.carries": {
     en: "Carries: {what}.", es: "Admite: {what}.", fr: "Accueille : {what}.", de: "Führt: {what}.", pt: "Aceita: {what}.", it: "Ospita: {what}.", ja: "扱うもの: {what}。", zh: "承载：{what}。", hi: "रखता है: {what}।", ar: "يحمل: {what}.",
@@ -4006,7 +4006,7 @@ const CHROME: Table = {
     en: "what to call it (optional)", es: "cómo llamarlo (opcional)", fr: "comment l'appeler (facultatif)", de: "wie es heißen soll (optional)", pt: "como lhe chamar (opcional)", it: "come chiamarlo (facoltativo)", ja: "呼び名（任意）", zh: "如何称呼它（可选）", hi: "इसे क्या कहें (वैकल्पिक)", ar: "بمَ تسمّيه (اختياري)",
   },
   "plc.placebtn": {
-    en: "Place", es: "Colocar", fr: "Placer", de: "Platzieren", pt: "Colocar", it: "Colloca", ja: "掲載", zh: "放置", hi: "रखें", ar: "ضع",
+    en: "Place", es: "Colocar", fr: "Placer", de: "Platzieren", pt: "Colocar", it: "Colloca", ja: "掲出", zh: "陈列", hi: "रखें", ar: "ضع",
   },
   "plc.adultonly": {
     en: "Only an adult-mode profile can be placed at an adult venue, and the refusal says so rather than hiding the button.", es: "Solo un perfil en modo adulto puede colocarse en un local para adultos, y la negativa lo dice en vez de ocultar el botón.", fr: "Seul un profil en mode adulte peut être placé sur un espace pour adultes, et le refus le dit au lieu de cacher le bouton.", de: "Nur ein Profil im Erwachsenenmodus kann an einem Erwachsenen-Ort platziert werden, und die Ablehnung sagt das, statt den Knopf zu verstecken.", pt: "Só um perfil em modo adulto pode ser colocado num espaço para adultos, e a recusa di-lo em vez de esconder o botão.", it: "Solo un profilo in modalità adulti può essere collocato in uno spazio per adulti, e il rifiuto lo dice invece di nascondere il pulsante.", ja: "アダルト向けの場に掲載できるのはアダルトモードのプロフィールだけで、拒否はその旨を告げます。ボタンを隠したりはしません。", zh: "只有成人模式的资料才能放置在成人场所，拒绝时会明说，而不是把按钮藏起来。", hi: "वयस्क स्थल पर केवल वयस्क-मोड प्रोफ़ाइल ही रखी जा सकती है, और इनकार यही कहता है — बटन छिपाता नहीं।", ar: "لا يوضع في مكان للبالغين إلا ملف في وضع البالغين، والرفض يقول ذلك بدل أن يخفي الزر.",
@@ -4132,7 +4132,7 @@ const CHROME: Table = {
     en: "party id", es: "id de la sala", fr: "id de la séance", de: "Party-ID", pt: "id da sessão", it: "id della festa", ja: "パーティID", zh: "放映会 ID", hi: "पार्टी आईडी", ar: "معرّف الجلسة",
   },
   "wp.join": {
-    en: "Join", es: "Unirse", fr: "Rejoindre", de: "Beitreten", pt: "Entrar", it: "Unisciti", ja: "参加", zh: "加入", hi: "शामिल हों", ar: "انضم",
+    en: "Join", es: "Unirse", fr: "Rejoindre", de: "Beitreten", pt: "Entrar", it: "Partecipa", ja: "参加", zh: "加入", hi: "शामिल हों", ar: "انضمام",
   },
   "wp.joined.said": {
     en: "You are in.", es: "Ya estás dentro.", fr: "Vous y êtes.", de: "Sie sind dabei.", pt: "Está dentro.", it: "Ci sei.", ja: "参加しました。", zh: "你已加入。", hi: "आप अंदर हैं।", ar: "أنت في الداخل.",
@@ -4174,13 +4174,13 @@ const CHROME: Table = {
     en: "synthetic", es: "sintético", fr: "synthétique", de: "synthetisch", pt: "sintético", it: "sintetico", ja: "合成", zh: "合成", hi: "सिंथेटिक", ar: "اصطناعي",
   },
   "wp.leave": {
-    en: "Leave", es: "Salir", fr: "Quitter", de: "Verlassen", pt: "Sair", it: "Esci", ja: "退出", zh: "离开", hi: "बाहर जाएँ", ar: "غادر",
+    en: "Leave", es: "Salir", fr: "Quitter", de: "Verlassen", pt: "Sair", it: "Esci", ja: "退出", zh: "离开", hi: "छोड़ें", ar: "مغادرة",
   },
   "wp.left.said": {
     en: "You left.", es: "Has salido.", fr: "Vous êtes parti.", de: "Sie sind gegangen.", pt: "Saiu.", it: "Sei uscito.", ja: "退出しました。", zh: "你已离开。", hi: "आप बाहर आ गए।", ar: "غادرت.",
   },
   "wp.remove": {
-    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "外す", zh: "移出", hi: "हटाएँ", ar: "أخرِج",
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "إزالة",
   },
   "wp.removed.said": {
     en: "Removed.", es: "Retirado.", fr: "Retiré.", de: "Entfernt.", pt: "Removido.", it: "Rimosso.", ja: "外しました。", zh: "已移出。", hi: "हटा दिया गया।", ar: "أُخرِج.",
@@ -4279,10 +4279,10 @@ const CHROME: Table = {
     en: "no scope", es: "sin alcance", fr: "aucune portée", de: "kein Umfang", pt: "sem âmbito", it: "nessun ambito", ja: "範囲なし", zh: "无范围", hi: "कोई दायरा नहीं", ar: "بلا نطاق",
   },
   "dlg.revoked": {
-    en: "revoked", es: "revocada", fr: "révoquée", de: "widerrufen", pt: "revogada", it: "revocata", ja: "取り消し済み", zh: "已撤销", hi: "निरस्त", ar: "مُلغى",
+    en: "revoked", es: "revocado", fr: "révoqué", de: "widerrufen", pt: "revogado", it: "revocato", ja: "取り消し済み", zh: "已撤回", hi: "वापस लिया गया", ar: "مُبطَل",
   },
   "dlg.revoke": {
-    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "取り消す", zh: "撤销", hi: "निरस्त करें", ar: "ألغِ",
+    en: "Revoke", es: "Revocar", fr: "Révoquer", de: "Widerrufen", pt: "Revogar", it: "Revoca", ja: "取り消す", zh: "撤销", hi: "रद्द करें", ar: "إبطال",
   },
   "dlg.revoked.said": {
     en: "Revoked. Anything running stops reading through it now.", es: "Revocada. Lo que esté en marcha deja de leer a través de ella ahora.", fr: "Révoquée. Tout ce qui tourne cesse de lire à travers elle dès maintenant.", de: "Widerrufen. Was läuft, liest ab jetzt nicht mehr hindurch.", pt: "Revogada. O que estiver a correr deixa de ler através dela agora.", it: "Revocata. Ciò che è in esecuzione smette di leggerci attraverso da adesso.", ja: "取り消しました。実行中のものは、今この瞬間からそれを通して読まなくなります。", zh: "已撤销。正在运行的一切从现在起不再透过它读取。", hi: "निरस्त। जो कुछ चल रहा है वह अभी से इसके ज़रिए पढ़ना बंद कर देता है।", ar: "أُلغي. وكل ما يعمل يتوقف الآن عن القراءة من خلاله.",
@@ -4369,7 +4369,7 @@ const CHROME: Table = {
     en: "A single piece of work rather than a run with phases. It needs a grant, because it composes from the profile's own sources.", es: "Un solo trabajo en vez de una ejecución con fases. Necesita una concesión, porque compone a partir de las fuentes del propio perfil.", fr: "Un seul travail plutôt qu'une exécution en phases. Il faut une autorisation, car il compose à partir des sources du profil.", de: "Ein einzelnes Stück Arbeit statt eines Laufs mit Phasen. Es braucht eine Freigabe, weil es aus den eigenen Quellen des Profils zusammensetzt.", pt: "Um único trabalho em vez de uma execução com fases. Precisa de uma concessão, porque compõe a partir das fontes do próprio perfil.", it: "Un singolo lavoro invece di un'esecuzione a fasi. Serve una concessione, perché compone dalle fonti del profilo stesso.", ja: "段階に分かれた実行ではなく、ひとまとまりの作業です。プロフィール自身の資料から組み立てるため、許可が必要です。", zh: "这是单独一件工作，而不是分阶段的运行。它需要一份授权，因为它是从资料自身的素材中组织出来的。", hi: "चरणों वाले चलने के बजाय काम का एक टुकड़ा। इसे अनुदान चाहिए, क्योंकि यह प्रोफ़ाइल के अपने स्रोतों से रचता है।", ar: "قطعة عمل واحدة لا تنفيذًا بأطوار. تحتاج تصريحًا، لأنها تؤلّف من مصادر الملف نفسه.",
   },
   "dlg.topic.ph": {
-    en: "Topic", es: "Tema", fr: "Sujet", de: "Thema", pt: "Tema", it: "Argomento", ja: "題材", zh: "主题", hi: "विषय", ar: "الموضوع",
+    en: "Topic", es: "Tema", fr: "Sujet", de: "Thema", pt: "Tema", it: "Argomento", ja: "話題", zh: "话题", hi: "विषय", ar: "الموضوع",
   },
   "dlg.compose": {
     en: "Compose from my sources", es: "Componer desde mis fuentes", fr: "Composer à partir de mes sources", de: "Aus meinen Quellen zusammenstellen", pt: "Compor a partir das minhas fontes", it: "Componi dalle mie fonti", ja: "自分の資料から組み立てる", zh: "从我的素材中撰写", hi: "मेरे स्रोतों से रचें", ar: "ألّف من مصادري",
@@ -4420,7 +4420,7 @@ const CHROME: Table = {
     en: " · waiting on you: {what}", es: " · a la espera de ti: {what}", fr: " · en attente de vous : {what}", de: " · wartet auf Sie: {what}", pt: " · à espera de si: {what}", it: " · in attesa di te: {what}", ja: " · あなた待ち: {what}", zh: " · 等你：{what}", hi: " · आपकी प्रतीक्षा: {what}", ar: " · في انتظارك: {what}",
   },
   "dlg.nextphase": {
-    en: "Run the next phase", es: "Ejecutar la siguiente fase", fr: "Exécuter la phase suivante", de: "Nächste Phase ausführen", pt: "Executar a fase seguinte", it: "Esegui la fase successiva", ja: "次の段階を実行", zh: "运行下一阶段", hi: "अगला चरण चलाएँ", ar: "نفّذ الطور التالي",
+    en: "Run the next phase", es: "Ejecutar la siguiente fase", fr: "Exécuter la phase suivante", de: "Nächste Phase ausführen", pt: "Executar a próxima fase", it: "Esegui la fase successiva", ja: "次のフェーズを実行", zh: "运行下一阶段", hi: "अगला चरण चलाएँ", ar: "شغّل المرحلة التالية",
   },
   "dlg.refresh": {
     en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "حدّث",
@@ -4444,7 +4444,7 @@ const CHROME: Table = {
     en: "Connect a platform", es: "Conectar una plataforma", fr: "Connecter une plateforme", de: "Eine Plattform verbinden", pt: "Ligar uma plataforma", it: "Collega una piattaforma", ja: "プラットフォームをつなぐ", zh: "连接一个平台", hi: "कोई प्लेटफ़ॉर्म जोड़ें", ar: "اربط منصة",
   },
   "bcn.collect": {
-    en: "Collect", es: "Recoger", fr: "Collecter", de: "Sammeln", pt: "Recolher", it: "Raccogli", ja: "取り込み", zh: "收集", hi: "संग्रह", ar: "التجميع",
+    en: "Collect", es: "Recopilar", fr: "Collecter", de: "Sammeln", pt: "Recolher", it: "Raccogli", ja: "収集", zh: "收集", hi: "संग्रह", ar: "اجمع",
   },
   "bcn.publish": {
     en: "Publish", es: "Publicar", fr: "Publier", de: "Veröffentlichen", pt: "Publicar", it: "Pubblica", ja: "発信", zh: "发布", hi: "प्रकाशन", ar: "النشر",
@@ -4462,7 +4462,7 @@ const CHROME: Table = {
     en: "the handle, without the @", es: "el alias, sin la @", fr: "l'identifiant, sans le @", de: "der Handle, ohne das @", pt: "o identificador, sem o @", it: "l'handle, senza la @", ja: "ハンドル名（@ なし）", zh: "用户名，不带 @", hi: "हैंडल, @ के बिना", ar: "المعرّف، دون @",
   },
   "bcn.connectbtn": {
-    en: "Connect", es: "Conectar", fr: "Connecter", de: "Verbinden", pt: "Ligar", it: "Collega", ja: "つなぐ", zh: "连接", hi: "जोड़ें", ar: "اربط",
+    en: "Connect", es: "Conectar", fr: "Connecter", de: "Verbinden", pt: "Conectar", it: "Connetti", ja: "接続", zh: "连接", hi: "कनेक्ट", ar: "اتصال",
   },
   "bcn.connected.said": {
     en: "Connected.", es: "Conectado.", fr: "Connecté.", de: "Verbunden.", pt: "Ligado.", it: "Collegato.", ja: "つながりました。", zh: "已连接。", hi: "जुड़ गया।", ar: "تمّ الربط.",
@@ -4642,13 +4642,13 @@ const CHROME: Table = {
     en: "Nothing held.", es: "Nada retenido.", fr: "Rien de retenu.", de: "Nichts zurückgehalten.", pt: "Nada retido.", it: "Niente trattenuto.", ja: "保留中のものはありません。", zh: "没有留置内容。", hi: "कुछ नहीं रोका गया।", ar: "لا شيء محتجز.",
   },
   "con.approve": {
-    en: "Approve", es: "Aprobar", fr: "Approuver", de: "Freigeben", pt: "Aprovar", it: "Approva", ja: "承認", zh: "批准", hi: "स्वीकृत करें", ar: "وافِق",
+    en: "Approve", es: "Aprobar", fr: "Approuver", de: "Freigeben", pt: "Aprovar", it: "Approva", ja: "承認", zh: "批准", hi: "स्वीकृत करें", ar: "الموافقة",
   },
   "con.approved.said": {
     en: "Approved.", es: "Aprobado.", fr: "Approuvé.", de: "Freigegeben.", pt: "Aprovado.", it: "Approvato.", ja: "承認しました。", zh: "已批准。", hi: "स्वीकृत।", ar: "تمت الموافقة.",
   },
   "con.reject": {
-    en: "Reject", es: "Rechazar", fr: "Rejeter", de: "Ablehnen", pt: "Rejeitar", it: "Rifiuta", ja: "却下", zh: "拒绝", hi: "अस्वीकारें", ar: "ارفض",
+    en: "Reject", es: "Rechazar", fr: "Rejeter", de: "Ablehnen", pt: "Rejeitar", it: "Rifiuta", ja: "却下", zh: "拒绝", hi: "अस्वीकार करें", ar: "الرفض",
   },
   "con.rejected.said": {
     en: "Rejected.", es: "Rechazado.", fr: "Rejeté.", de: "Abgelehnt.", pt: "Rejeitado.", it: "Rifiutato.", ja: "却下しました。", zh: "已拒绝。", hi: "अस्वीकृत।", ar: "رُفض.",
@@ -4702,7 +4702,7 @@ const CHROME: Table = {
     en: "in {surface} {id} · {minutes} min · {rec}", es: "en {surface} {id} · {minutes} min · {rec}", fr: "dans {surface} {id} · {minutes} min · {rec}", de: "in {surface} {id} · {minutes} Min · {rec}", pt: "em {surface} {id} · {minutes} min · {rec}", it: "in {surface} {id} · {minutes} min · {rec}", ja: "{surface} {id} にて · {minutes}分 · {rec}", zh: "位于 {surface} {id} · {minutes} 分钟 · {rec}", hi: "{surface} {id} में · {minutes} मिन · {rec}", ar: "في {surface} {id} · {minutes} دقيقة · {rec}",
   },
   "liv.stop": {
-    en: "Stop", es: "Parar", fr: "Arrêter", de: "Beenden", pt: "Parar", it: "Ferma", ja: "止める", zh: "停止", hi: "रोकें", ar: "أوقف",
+    en: "Stop", es: "Detener", fr: "Arrêter", de: "Stopp", pt: "Parar", it: "Ferma", ja: "停止", zh: "停止", hi: "रोकें", ar: "أوقف",
   },
   "liv.stopped.said": {
     en: "Stopped.", es: "Parado.", fr: "Arrêté.", de: "Beendet.", pt: "Parado.", it: "Fermato.", ja: "止めました。", zh: "已停止。", hi: "रुक गया।", ar: "تم الإيقاف.",
@@ -4825,7 +4825,7 @@ const CHROME: Table = {
     en: "remote counts", es: "cuenta lo remoto", fr: "le à distance compte", de: "aus der Ferne zählt mit", pt: "conta o remoto", it: "conta anche a distanza", ja: "リモートも含める", zh: "远程也算", hi: "दूरस्थ भी गिना जाए", ar: "يُحتسب عن بُعد",
   },
   "mkt.save": {
-    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "احفظ",
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
   },
   "mkt.saved.said": {
     en: "Saved.", es: "Guardado.", fr: "Enregistré.", de: "Gespeichert.", pt: "Guardado.", it: "Salvato.", ja: "保存しました。", zh: "已保存。", hi: "सहेज लिया गया।", ar: "حُفظ.",
@@ -4840,7 +4840,7 @@ const CHROME: Table = {
     en: "Different from a listing: a listing sells one thing, this puts the profile itself where people browsing can find it. Tags are how they find it, and the card shows display information only — never anything from inside the persona.", es: "Distinto de una publicación: una publicación vende una cosa, esto pone el perfil mismo donde quien navega puede encontrarlo. Las etiquetas son cómo lo encuentran, y la ficha muestra solo información de presentación — nunca nada de dentro de la persona.", fr: "Différent d'une annonce : une annonce vend une chose, ceci place le profil lui-même là où les gens qui parcourent peuvent le trouver. Les étiquettes servent à le trouver, et la fiche n'affiche que des informations de présentation — jamais rien de l'intérieur du personnage.", de: "Anders als ein Angebot: ein Angebot verkauft eine Sache, dies stellt das Profil selbst dorthin, wo Stöbernde es finden. Über Schlagwörter finden sie es, und die Karte zeigt nur Anzeigeinformationen — nie etwas aus dem Inneren der Persona.", pt: "Diferente de um anúncio: um anúncio vende uma coisa, isto põe o próprio perfil onde quem navega o pode encontrar. As etiquetas são como o encontram, e o cartão mostra apenas informação de apresentação — nunca nada de dentro da persona.", it: "Diverso da un annuncio: un annuncio vende una cosa, questo mette il profilo stesso dove chi sfoglia può trovarlo. I tag sono il modo in cui lo trovano, e la scheda mostra solo informazioni di presentazione — mai nulla dall'interno della persona.", ja: "出品とは違います。出品は一つのものを売りますが、これはプロフィールそのものを、見て回っている人が見つけられる場所に置きます。見つける手がかりはタグで、カードに出るのは表示用の情報だけです — 人格の内側にあるものは決して出ません。", zh: "这与挂牌不同：挂牌卖的是一样东西，而这是把资料本身放到浏览的人能找到的地方。标签是他们找到它的方式，卡片只显示展示性信息——绝不显示人格内部的任何内容。", hi: "किसी लिस्टिंग से अलग: लिस्टिंग एक चीज़ बेचती है, यह प्रोफ़ाइल को ही वहाँ रखता है जहाँ ब्राउज़ करने वाले उसे पा सकें। टैग ही खोजने का रास्ता हैं, और कार्ड केवल प्रदर्शन-जानकारी दिखाता है — व्यक्तित्व के भीतर से कभी कुछ नहीं।", ar: "يختلف عن الإعلان: الإعلان يبيع شيئًا واحدًا، أما هذا فيضع الملف نفسه حيث يجده المتصفحون. والوسوم هي سبيلهم إليه، والبطاقة تعرض معلومات العرض فقط — ولا شيء أبدًا من داخل الشخصية.",
   },
   "mkt.tags.ph": {
-    en: "tags, comma separated", es: "etiquetas, separadas por comas", fr: "étiquettes, séparées par des virgules", de: "Schlagwörter, durch Komma getrennt", pt: "etiquetas, separadas por vírgulas", it: "tag, separati da virgole", ja: "タグ（カンマ区切り）", zh: "标签，用逗号分隔", hi: "टैग, अल्पविराम से अलग", ar: "وسوم، مفصولة بفواصل",
+    en: "tags, comma separated", es: "etiquetas, separadas por comas", fr: "tags, séparés par des virgules", de: "Tags, kommagetrennt", pt: "etiquetas, separadas por vírgulas", it: "tag, separati da virgole", ja: "タグ（カンマ区切り）", zh: "标签，逗号分隔", hi: "टैग, अल्पविराम से", ar: "وسوم مفصولة بفواصل",
   },
   "mkt.blurb.ph": {
     en: "a line about it", es: "una línea sobre él", fr: "une ligne à son sujet", de: "eine Zeile dazu", pt: "uma linha sobre ele", it: "una riga su di esso", ja: "ひとことの説明", zh: "一句简介", hi: "इसके बारे में एक पंक्ति", ar: "سطر عنه",
@@ -4966,7 +4966,7 @@ const CHROME: Table = {
     en: "A real person seats only themselves — an id in a request body is a claim, and the route checks it against the token. Somebody else's profile is a two-party agreement and lives in the lent-skills routes, which ask both sides.", es: "Una persona real solo se sienta a sí misma — un id en el cuerpo de una petición es una afirmación, y la ruta lo comprueba contra el token. El perfil de otra persona es un acuerdo entre dos partes y vive en las rutas de habilidades prestadas, que preguntan a ambos lados.", fr: "Une personne réelle ne s'assoit qu'elle-même — un id dans un corps de requête est une prétention, et la route la vérifie contre le jeton. Le profil de quelqu'un d'autre est un accord bipartite et vit dans les routes de compétences prêtées, qui interrogent les deux côtés.", de: "Ein echter Mensch setzt nur sich selbst — eine ID im Anfrage-Body ist eine Behauptung, und die Route prüft sie gegen das Token. Das Profil einer anderen Person ist eine Vereinbarung zu zweit und lebt in den Routen für geliehene Fertigkeiten, die beide Seiten fragen.", pt: "Uma pessoa real senta apenas a si mesma — um id no corpo de um pedido é uma alegação, e a rota verifica-o contra o token. O perfil de outra pessoa é um acordo entre duas partes e vive nas rotas de competências emprestadas, que perguntam a ambos os lados.", it: "Una persona reale fa sedere solo se stessa — un id nel corpo di una richiesta è un'affermazione, e la rotta la verifica contro il token. Il profilo di qualcun altro è un accordo tra due parti e vive nelle rotte delle abilità prestate, che interpellano entrambi.", ja: "実在の人が座らせられるのは自分だけです — リクエスト本文の ID は主張にすぎず、経路はそれをトークンと突き合わせます。他人のプロフィールは二者間の合意であり、双方に問い合わせる「貸し出した技能」の経路にあります。", zh: "真人只能让自己入座——请求体里的 ID 只是一个主张，路由会拿它和令牌核对。别人的资料属于双方协议，归在“出借技能”的路由里，那些路由会向双方询问。", hi: "कोई वास्तविक व्यक्ति केवल स्वयं को बैठाता है — अनुरोध की बॉडी में दी गई आईडी एक दावा है, और रूट उसे टोकन से जाँचता है। किसी और की प्रोफ़ाइल दो-पक्षीय सहमति है और वह उधार-दिए-कौशल वाले रूट्स में रहती है, जो दोनों पक्षों से पूछते हैं।", ar: "الشخص الحقيقي لا يُجلس إلا نفسه — والمعرّف في جسم الطلب ادعاء، والمسار يطابقه مع الرمز. أما ملف شخص آخر فاتفاق بين طرفين، ومكانه مسارات المهارات المُعارة التي تسأل الطرفين.",
   },
   "lby.told": {
-    en: "What a synthetic member is told", es: "Lo que se le dice a un miembro sintético", fr: "Ce qu'on dit à un membre synthétique", de: "Was einem synthetischen Mitglied gesagt wird", pt: "O que é dito a um membro sintético", it: "Cosa viene detto a un membro sintetico", ja: "合成メンバーに何が伝えられるか", zh: "一个合成成员被告知了什么", hi: "किसी सिंथेटिक सदस्य से क्या कहा जाता है", ar: "ما يُقال لعضو اصطناعي",
+    en: "What a synthetic member is told", es: "Lo que se le dice a un miembro sintético", fr: "Ce qu'on dit à un membre synthétique", de: "Was einem synthetischen Mitglied gesagt wird", pt: "O que é dito a um membro sintético", it: "Cosa viene detto a un membro sintetico", ja: "合成メンバーに伝えられること", zh: "合成成员被告知的内容", hi: "सिंथेटिक सदस्य को क्या बताया जाता है", ar: "ما يُقال للعضو الاصطناعي",
   },
   "lby.told.pitch": {
     en: "Shown to you because it is the only way to check it. It says openly that some of the others here are synthetic too — a model that believes every callsign is a person will talk to them as people, and a lobby that reads as friends when it is one player and several generated voices is the impression this product exists to prevent.", es: "Se le muestra porque es la única forma de comprobarlo. Dice abiertamente que algunos de los demás aquí también son sintéticos — un modelo que crea que cada indicativo es una persona les hablará como a personas, y una sala que se lee como amigos cuando es un jugador y varias voces generadas es justo la impresión que este producto existe para impedir.", fr: "Montré parce que c'est la seule façon de le vérifier. Cela dit ouvertement que certains des autres ici sont eux aussi synthétiques — un modèle qui croit que chaque indicatif est une personne leur parlera comme à des personnes, et un salon qui se lit comme des amis alors qu'il s'agit d'un joueur et de plusieurs voix générées est précisément l'impression que ce produit existe pour empêcher.", de: "Ihnen gezeigt, weil es die einzige Möglichkeit ist, es zu prüfen. Es sagt offen, dass einige der anderen hier ebenfalls synthetisch sind — ein Modell, das jedes Rufzeichen für einen Menschen hält, wird mit ihnen wie mit Menschen sprechen, und eine Lobby, die sich wie Freunde liest, während sie ein Spieler und mehrere erzeugte Stimmen ist, ist genau der Eindruck, den dieses Produkt verhindern soll.", pt: "Mostrado a si porque é a única forma de o verificar. Diz abertamente que alguns dos outros aqui também são sintéticos — um modelo que acredite que cada indicativo é uma pessoa falará com eles como pessoas, e uma sala que se lê como amigos quando é um jogador e várias vozes geradas é exatamente a impressão que este produto existe para impedir.", it: "Mostrato a te perché è l'unico modo di verificarlo. Dice apertamente che alcuni degli altri qui sono anch'essi sintetici — un modello che crede che ogni nominativo sia una persona parlerà loro come a persone, e una lobby che si legge come amici quando è un giocatore e diverse voci generate è proprio l'impressione che questo prodotto esiste per impedire.", ja: "あなたに見せているのは、それが確かめる唯一の手段だからです。そこには、ここにいる他の何人かも合成である、と正面から書いてあります — すべてのコールサインを人だと思い込むモデルは、彼らに人として話しかけます。そして、実際には一人のプレイヤーと複数の生成された声にすぎないロビーが友だちの集まりのように読めること、それこそがこの製品が防ぐために存在する印象です。", zh: "把它展示给你，是因为这是核对它的唯一方式。它明白地写着：这里的另一些成员同样是合成的——一个以为每个呼号都是真人的模型，会把他们当人来交谈；而当一个大厅实际上只有一名玩家和若干生成的声音，却读起来像一群朋友时，这正是本产品存在的意义所要阻止的印象。", hi: "यह आपको इसलिए दिखाया जाता है क्योंकि इसे जाँचने का यही एकमात्र तरीक़ा है। इसमें खुलकर लिखा है कि यहाँ मौजूद कुछ अन्य भी सिंथेटिक हैं — जो मॉडल हर कॉलसाइन को व्यक्ति मान ले, वह उनसे व्यक्तियों की तरह बात करेगा; और जब असल में एक खिलाड़ी और कई उत्पन्न आवाज़ें हों, पर लॉबी दोस्तों जैसी पढ़ी जाए — यही वह छाप है जिसे रोकने के लिए यह उत्पाद मौजूद है।", ar: "يُعرض عليك لأنه السبيل الوحيد للتحقق منه. يقول صراحةً إن بعض الآخرين هنا اصطناعيون أيضًا — فنموذج يظن أن كل اسم نداء إنسان سيخاطبهم كبشر، وردهة تُقرأ كأنها أصدقاء وهي في الحقيقة لاعب واحد وعدة أصوات مولَّدة هي بالضبط الانطباع الذي وُجد هذا المنتج ليمنعه.",
@@ -5011,7 +5011,7 @@ const CHROME: Table = {
     en: "The package", es: "El paquete", fr: "Le paquet", de: "Das Paket", pt: "O pacote", it: "Il pacchetto", ja: "一式", zh: "这个包", hi: "पैकेज", ar: "الحزمة",
   },
   "lby.theprofile": {
-    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "プロフィール", zh: "该资料", hi: "प्रोफ़ाइल", ar: "الملف",
+    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "このプロフィール", zh: "这个资料", hi: "यह प्रोफ़ाइल", ar: "الملف",
   },
   "lby.you": {
     en: "you", es: "usted", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
@@ -5047,7 +5047,7 @@ const CHROME: Table = {
     en: "your own HTML", es: "tu propio HTML", fr: "votre propre HTML", de: "Ihr eigenes HTML", pt: "o seu próprio HTML", it: "il tuo HTML", ja: "自分の HTML", zh: "你自己的 HTML", hi: "आपका अपना HTML", ar: "HTML خاص بك",
   },
   "prs.save": {
-    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "احفظ",
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
   },
   "prs.saved.said": {
     en: "Saved.", es: "Guardado.", fr: "Enregistré.", de: "Gespeichert.", pt: "Guardado.", it: "Salvato.", ja: "保存しました。", zh: "已保存。", hi: "सहेज लिया गया।", ar: "حُفظ.",
@@ -5104,7 +5104,7 @@ const CHROME: Table = {
     en: "where it is", es: "dónde está", fr: "où il est", de: "wo er steht", pt: "onde está", it: "dov'è", ja: "どこにあるか", zh: "它在哪里", hi: "यह कहाँ है", ar: "أين هو",
   },
   "prs.place": {
-    en: "Place", es: "Colocar", fr: "Poser", de: "Platzieren", pt: "Colocar", it: "Colloca", ja: "設置", zh: "放置", hi: "रखें", ar: "ضع",
+    en: "Place", es: "Colocar", fr: "Placer", de: "Platzieren", pt: "Colocar", it: "Colloca", ja: "掲出", zh: "陈列", hi: "रखें", ar: "ضع",
   },
   "prs.placed.said": {
     en: "Placed.", es: "Colocada.", fr: "Posé.", de: "Platziert.", pt: "Colocado.", it: "Collocato.", ja: "設置しました。", zh: "已放置。", hi: "रख दिया गया।", ar: "وُضع.",
@@ -5140,13 +5140,13 @@ const CHROME: Table = {
     en: "your own voice, with your permission", es: "su propia voz, con su permiso", fr: "votre propre voix, avec votre permission", de: "Ihre eigene Stimme, mit Ihrer Erlaubnis", pt: "a sua própria voz, com a sua permissão", it: "la tua voce, con il tuo permesso", ja: "あなた自身の声を、あなたの許可のもとで", zh: "你自己的声音，经你许可", hi: "आपकी अपनी आवाज़, आपकी अनुमति से", ar: "صوتك أنت، بإذنك",
   },
   "vce.step1": {
-    en: "1 · Permission", es: "1 · Permiso", fr: "1 · Permission", de: "1 · Erlaubnis", pt: "1 · Permissão", it: "1 · Permesso", ja: "1 · 許可", zh: "1 · 许可", hi: "1 · अनुमति", ar: "1 · الإذن",
+    en: "1 · Permission", es: "1 · Permiso", fr: "1 · Autorisation", de: "1 · Erlaubnis", pt: "1 · Permissão", it: "1 · Autorizzazione", ja: "1 · 許可", zh: "1 · 许可", hi: "1 · अनुमति", ar: "1 · الإذن",
   },
   "vce.granted": {
     en: "Granted for: {what}", es: "Concedido para: {what}", fr: "Accordé pour : {what}", de: "Erteilt für: {what}", pt: "Concedido para: {what}", it: "Concesso per: {what}", ja: "許可の範囲: {what}", zh: "已授权用于：{what}", hi: "इसके लिए दिया गया: {what}", ar: "ممنوح لـ: {what}",
   },
   "vce.withdraw": {
-    en: "Withdraw consent — delete the samples, retire the voice", es: "Retirar el consentimiento — borrar las muestras, retirar la voz", fr: "Retirer le consentement — supprimer les échantillons, retirer la voix", de: "Einwilligung zurückziehen — Proben löschen, Stimme stilllegen", pt: "Retirar o consentimento — apagar as amostras, retirar a voz", it: "Ritira il consenso — cancella i campioni, ritira la voce", ja: "同意を撤回する — サンプルを削除し、声を退役させる", zh: "撤回同意 — 删除样本，停用该声音", hi: "सहमति वापस लें — नमूने मिटाएँ, आवाज़ सेवानिवृत्त करें", ar: "اسحب الموافقة — احذف العينات، وأحِل الصوت",
+    en: "Withdraw consent — delete the samples, retire the voice", es: "Retirar el consentimiento: borrar las muestras, retirar la voz", fr: "Retirer le consentement — supprimer les échantillons, retirer la voix", de: "Einwilligung zurückziehen — die Proben löschen, die Stimme stilllegen", pt: "Retirar o consentimento — apagar as amostras, retirar a voz", it: "Ritira il consenso: elimina i campioni, ritira la voce", ja: "同意を撤回する — サンプルを削除し、声を停止する", zh: "撤回同意 — 删除样本，停用这把声音", hi: "सहमति वापस लें — नमूने मिटाएँ, आवाज़ निवृत्त करें", ar: "اسحب الموافقة — احذف العيّنات وأوقف الصوت",
   },
   "vce.ownvoice": {
     en: "your own voice", es: "su propia voz", fr: "votre propre voix", de: "Ihre eigene Stimme", pt: "a sua própria voz", it: "la tua voce", ja: "あなた自身の声", zh: "你自己的声音", hi: "आपकी अपनी आवाज़", ar: "صوتك أنت",
@@ -5155,10 +5155,10 @@ const CHROME: Table = {
     en: "Nothing is recorded until you say so. QRME will only learn {own} — there is no path here for anybody else's.", es: "No se graba nada hasta que usted lo diga. QRME solo aprenderá {own} — aquí no hay ningún camino para la de otra persona.", fr: "Rien n'est enregistré tant que vous ne l'avez pas dit. QRME n'apprendra que {own} — il n'y a ici aucun chemin pour celle de quelqu'un d'autre.", de: "Es wird nichts aufgezeichnet, bis Sie es sagen. QRME lernt nur {own} — für die einer anderen Person gibt es hier keinen Weg.", pt: "Nada é gravado até você o dizer. O QRME só aprenderá {own} — aqui não há caminho para a de outra pessoa.", it: "Non si registra nulla finché non lo dici tu. QRME imparerà solo {own} — qui non c'è alcuna strada per quella di qualcun altro.", ja: "あなたがそう言うまで、何も録音されません。QRME が学ぶのは {own} だけです — ほかの誰かの声のための道筋は、ここにはありません。", zh: "在你说可以之前，什么都不会被录下。QRME 只会学习{own}——这里没有通往别人声音的路径。", hi: "जब तक आप न कहें, कुछ भी रिकॉर्ड नहीं होता। QRME केवल {own} सीखेगा — यहाँ किसी और की आवाज़ के लिए कोई रास्ता नहीं है।", ar: "لا يُسجَّل شيء حتى تأذن. لن يتعلم QRME إلا {own} — ولا سبيل هنا لصوت أحد غيرك.",
   },
   "vce.allow": {
-    en: "This is my own voice — allow enrollment", es: "Esta es mi propia voz — permitir el registro", fr: "C'est ma propre voix — autoriser l'enrôlement", de: "Das ist meine eigene Stimme — Erfassung erlauben", pt: "Esta é a minha própria voz — permitir o registo", it: "Questa è la mia voce — consenti l'arruolamento", ja: "これは私自身の声です — 登録を許可する", zh: "这是我自己的声音——允许录入", hi: "यह मेरी अपनी आवाज़ है — नामांकन की अनुमति दें", ar: "هذا صوتي أنا — اسمح بالتسجيل",
+    en: "This is my own voice — allow enrollment", es: "Esta es mi propia voz: permitir el registro", fr: "Ceci est ma propre voix — autoriser l'enregistrement", de: "Das ist meine eigene Stimme — Erfassung erlauben", pt: "Esta é a minha própria voz — permitir o registo", it: "Questa è la mia voce — consenti la registrazione", ja: "これは私自身の声です — 登録を許可する", zh: "这是我本人的声音 — 允许采集", hi: "यह मेरी अपनी आवाज़ है — नामांकन की अनुमति दें", ar: "هذا صوتي أنا — اسمح بالتسجيل",
   },
   "vce.step2": {
-    en: "2 · Enrollment", es: "2 · Registro", fr: "2 · Enrôlement", de: "2 · Erfassung", pt: "2 · Registo", it: "2 · Arruolamento", ja: "2 · 登録", zh: "2 · 录入", hi: "2 · नामांकन", ar: "2 · التسجيل",
+    en: "2 · Enrollment", es: "2 · Registro", fr: "2 · Enregistrement", de: "2 · Erfassung", pt: "2 · Registo", it: "2 · Registrazione", ja: "2 · 登録", zh: "2 · 采集", hi: "2 · नामांकन", ar: "2 · التسجيل",
   },
   "vce.wherefrom": {
     en: "Where from", es: "De dónde", fr: "D'où", de: "Woher", pt: "De onde", it: "Da dove", ja: "どこから", zh: "来自哪里", hi: "कहाँ से", ar: "من أين",
@@ -5194,13 +5194,13 @@ const CHROME: Table = {
     en: "ready", es: "listo", fr: "prêt", de: "bereit", pt: "pronto", it: "pronto", ja: "準備完了", zh: "就绪", hi: "तैयार", ar: "جاهز",
   },
   "vce.notyet": {
-    en: "not yet", es: "aún no", fr: "pas encore", de: "noch nicht", pt: "ainda não", it: "non ancora", ja: "まだ", zh: "还不行", hi: "अभी नहीं", ar: "ليس بعد",
+    en: "not yet", es: "todavía no", fr: "pas encore", de: "noch nicht", pt: "ainda não", it: "non ancora", ja: "まだです", zh: "尚未", hi: "अभी नहीं", ar: "ليس بعد",
   },
   "vce.stillwants": {
     en: "Still wants: {what}.", es: "Todavía quiere: {what}.", fr: "Il manque encore : {what}.", de: "Fehlt noch: {what}.", pt: "Ainda falta: {what}.", it: "Manca ancora: {what}.", ja: "まだ必要: {what}。", zh: "还需要：{what}。", hi: "अभी और चाहिए: {what}।", ar: "ما زال يحتاج: {what}.",
   },
   "vce.step3": {
-    en: "3 · The voice", es: "3 · La voz", fr: "3 · La voix", de: "3 · Die Stimme", pt: "3 · A voz", it: "3 · La voce", ja: "3 · 声", zh: "3 · 声音", hi: "3 · आवाज़", ar: "3 · الصوت",
+    en: "3 · The voice", es: "3 · La voz", fr: "3 · La voix", de: "3 · Die Stimme", pt: "3 · A voz", it: "3 · La voce", ja: "3 · その声", zh: "3 · 这把声音", hi: "3 · वह आवाज़", ar: "3 · الصوت",
   },
   "vce.built": {
     en: "Built {when} · {id}", es: "Creada {when} · {id}", fr: "Créée {when} · {id}", de: "Erstellt {when} · {id}", pt: "Criada {when} · {id}", it: "Creata {when} · {id}", ja: "作成 {when} · {id}", zh: "建立于 {when} · {id}", hi: "बना {when} · {id}", ar: "أُنشئ {when} · {id}",
@@ -5209,22 +5209,22 @@ const CHROME: Table = {
     en: "Say something in it", es: "Decir algo con ella", fr: "Dire quelque chose avec", de: "Etwas damit sagen", pt: "Dizer algo com ela", it: "Di' qualcosa con essa", ja: "この声で何か言う", zh: "用它说点什么", hi: "इसमें कुछ कहें", ar: "قل بها شيئًا",
   },
   "vce.speak": {
-    en: "Speak", es: "Hablar", fr: "Parler", de: "Sprechen", pt: "Falar", it: "Parla", ja: "話す", zh: "朗读", hi: "बोलें", ar: "انطق",
+    en: "Speak", es: "Hablar", fr: "Parler", de: "Sprechen", pt: "Falar", it: "Parla", ja: "話す", zh: "说话", hi: "बोलें", ar: "تحدّث",
   },
   "vce.enough": {
-    en: "Enough of your voice is on record — mint the voiceprint.", es: "Hay suficiente de su voz registrada — acuñe la huella vocal.", fr: "Il y a assez de votre voix enregistrée — créez l'empreinte vocale.", de: "Genug Ihrer Stimme ist erfasst — erzeugen Sie den Stimmabdruck.", pt: "Há voz suficiente registada — cunhe a impressão vocal.", it: "C'è abbastanza della tua voce — conia l'impronta vocale.", ja: "十分な量の声が記録されました — 声紋を作成できます。", zh: "你的声音已录得足够——可以铸造声纹了。", hi: "आपकी आवाज़ पर्याप्त दर्ज हो चुकी — वॉइसप्रिंट बनाएँ।", ar: "سُجّل ما يكفي من صوتك — اسكك بصمة الصوت.",
+    en: "Enough of your voice is on record — mint the voiceprint.", es: "Ya hay bastante de tu voz registrada: acuña la huella vocal.", fr: "Il y a assez de votre voix enregistrée — frappez l'empreinte vocale.", de: "Es ist genug von deiner Stimme aufgenommen — präge den Stimmabdruck.", pt: "Já há voz suficiente registada — cunhe a impressão vocal.", it: "C'è abbastanza della tua voce — conia l'impronta vocale.", ja: "あなたの声は十分に記録されました。声紋を作成できます。", zh: "你的声音已录够 — 可以铸造声纹了。", hi: "आपकी आवाज़ पर्याप्त दर्ज हो चुकी है — अब आवाज़-छाप बनाइए।", ar: "سُجّل ما يكفي من صوتك — اسكك بصمة الصوت.",
   },
   "vce.addmore": {
     en: "Add a few more samples first.", es: "Añada antes unas muestras más.", fr: "Ajoutez d'abord quelques échantillons.", de: "Fügen Sie zuerst noch ein paar Proben hinzu.", pt: "Acrescente primeiro mais algumas amostras.", it: "Aggiungi prima qualche altro campione.", ja: "先にもう少しサンプルを追加してください。", zh: "请先再添加几个样本。", hi: "पहले कुछ और नमूने जोड़ें।", ar: "أضف بضع عينات أخرى أولًا.",
   },
   "vce.build": {
-    en: "Build my voiceprint", es: "Crear mi huella vocal", fr: "Créer mon empreinte vocale", de: "Meinen Stimmabdruck erstellen", pt: "Criar a minha impressão vocal", it: "Crea la mia impronta vocale", ja: "自分の声紋を作る", zh: "建立我的声纹", hi: "मेरा वॉइसप्रिंट बनाएँ", ar: "أنشئ بصمة صوتي",
+    en: "Build my voiceprint", es: "Crear mi huella de voz", fr: "Construire mon empreinte vocale", de: "Meinen Stimmabdruck erstellen", pt: "Criar a minha impressão de voz", it: "Crea la mia impronta vocale", ja: "声紋を作成する", zh: "生成我的声纹", hi: "मेरी वाणी-छाप बनाएँ", ar: "ابنِ بصمتي الصوتية",
   },
   "vce.retired": {
-    en: "A previous voiceprint was retired when consent was withdrawn. That record stays.", es: "Se retiró una huella vocal anterior cuando se retiró el consentimiento. Ese registro se queda.", fr: "Une empreinte vocale antérieure a été retirée lors du retrait du consentement. Ce relevé reste.", de: "Ein früherer Stimmabdruck wurde stillgelegt, als die Einwilligung zurückgezogen wurde. Dieser Eintrag bleibt.", pt: "Uma impressão vocal anterior foi retirada quando o consentimento foi retirado. Esse registo fica.", it: "Un'impronta vocale precedente è stata ritirata quando il consenso è stato revocato. Quel registro resta.", ja: "同意が撤回された際に、以前の声紋は退役しました。その記録は残ります。", zh: "在同意被撤回时，此前的一份声纹已停用。该记录仍然保留。", hi: "सहमति वापस लिए जाने पर पिछला वॉइसप्रिंट सेवानिवृत्त कर दिया गया था। वह रिकॉर्ड बना रहता है।", ar: "أُحيل بصمة صوت سابقة عند سحب الموافقة. ويبقى ذلك السجل.",
+    en: "A previous voiceprint was retired when consent was withdrawn. That record stays.", es: "Una huella de voz anterior se retiró al retirarse el consentimiento. Ese registro permanece.", fr: "Une empreinte vocale antérieure a été retirée lors du retrait du consentement. Cette trace demeure.", de: "Ein früherer Stimmabdruck wurde stillgelegt, als die Einwilligung zurückgezogen wurde. Dieser Eintrag bleibt.", pt: "Uma impressão de voz anterior foi retirada quando o consentimento foi retirado. Esse registo permanece.", it: "Un'impronta vocale precedente è stata ritirata al ritiro del consenso. Quel registro resta.", ja: "同意が撤回された際に、以前の声紋は停止されました。その記録は残ります。", zh: "此前的一份声纹在同意被撤回时已停用。那条记录会留下。", hi: "सहमति वापस लेने पर पिछली वाणी-छाप निवृत्त कर दी गई थी। वह अभिलेख बना रहता है।", ar: "أُوقفت بصمة صوتية سابقة عند سحب الموافقة. ويبقى ذلك السجل.",
   },
   "vce.holds": {
-    en: "What always holds", es: "Lo que siempre se cumple", fr: "Ce qui tient toujours", de: "Was immer gilt", pt: "O que vale sempre", it: "Ciò che vale sempre", ja: "つねに変わらないこと", zh: "始终成立的是什么", hi: "जो हमेशा लागू रहता है", ar: "ما يظل ثابتًا دومًا",
+    en: "What always holds", es: "Lo que siempre se cumple", fr: "Ce qui vaut toujours", de: "Was immer gilt", pt: "O que vale sempre", it: "Ciò che vale sempre", ja: "常に守られること", zh: "始终成立的事", hi: "जो हमेशा लागू रहता है", ar: "ما يظل ساريًا دائمًا",
   },
   "vce.hold1": {
     en: "Anything spoken in this voice carries a watermark and says it is synthesized.", es: "Todo lo dicho con esta voz lleva marca de agua y declara que es sintetizado.", fr: "Tout ce qui est dit avec cette voix porte un filigrane et déclare être synthétisé.", de: "Alles, was mit dieser Stimme gesprochen wird, trägt ein Wasserzeichen und sagt, dass es synthetisiert ist.", pt: "Tudo o que for dito nesta voz leva marca de água e diz que é sintetizado.", it: "Tutto ciò che viene detto con questa voce porta una filigrana e dichiara di essere sintetizzato.", ja: "この声で話されたものはすべて透かしを帯び、合成であることを自ら述べます。", zh: "以这个声音说出的任何内容都带有水印，并会声明它是合成的。", hi: "इस आवाज़ में कही गई हर बात पर वॉटरमार्क होता है और वह बताती है कि यह संश्लेषित है।", ar: "كل ما يُنطق بهذا الصوت يحمل علامة مائية ويقول إنه مُصطنَع.",
@@ -5257,7 +5257,7 @@ const CHROME: Table = {
     en: "paid", es: "de pago", fr: "payant", de: "bezahlt", pt: "pago", it: "a pagamento", ja: "有料", zh: "付费", hi: "सशुल्क", ar: "مدفوع",
   },
   "aud.follow": {
-    en: "Follow", es: "Seguir", fr: "Suivre", de: "Folgen", pt: "Seguir", it: "Segui", ja: "フォロー", zh: "关注", hi: "अनुसरण करें", ar: "تابِع",
+    en: "Follow", es: "Seguir", fr: "Suivre", de: "Folgen", pt: "Seguir", it: "Segui", ja: "フォロー", zh: "关注", hi: "फ़ॉलो करें", ar: "متابعة",
   },
   "aud.following.said": {
     en: "Following.", es: "Siguiendo.", fr: "Suivi.", de: "Folgt.", pt: "A seguir.", it: "Stai seguendo.", ja: "フォローしました。", zh: "已关注。", hi: "अनुसरण कर रहे हैं।", ar: "أنت تتابع الآن.",
@@ -5317,7 +5317,7 @@ const CHROME: Table = {
     en: "a note with it", es: "una nota con él", fr: "un mot avec", de: "eine Notiz dazu", pt: "um recado com ele", it: "un messaggio con esso", ja: "ひとこと添える", zh: "附一句话", hi: "इसके साथ एक नोट", ar: "ملاحظة معها",
   },
   "aud.sendgift": {
-    en: "Send a gift", es: "Enviar un regalo", fr: "Envoyer un cadeau", de: "Ein Geschenk senden", pt: "Enviar um presente", it: "Manda un regalo", ja: "贈り物を送る", zh: "送出赠礼", hi: "उपहार भेजें", ar: "أرسل هدية",
+    en: "Send a gift", es: "Enviar un regalo", fr: "Envoyer un cadeau", de: "Ein Geschenk senden", pt: "Enviar um presente", it: "Invia un regalo", ja: "ギフトを送る", zh: "送礼物", hi: "उपहार भेजें", ar: "إرسال هدية",
   },
   "aud.sent.said": {
     en: "Sent.", es: "Enviado.", fr: "Envoyé.", de: "Gesendet.", pt: "Enviado.", it: "Inviato.", ja: "送りました。", zh: "已送出。", hi: "भेज दिया गया।", ar: "أُرسلت.",
@@ -5383,7 +5383,7 @@ const CHROME: Table = {
     en: "into {label}", es: "a {label}", fr: "vers {label}", de: "nach {label}", pt: "para {label}", it: "in {label}", ja: "{label} へ", zh: "译成 {label}", hi: "{label} में", ar: "إلى {label}",
   },
   "iw.translate": {
-    en: "Translate", es: "Traducir", fr: "Traduire", de: "Übersetzen", pt: "Traduzir", it: "Traduci", ja: "翻訳する", zh: "翻译", hi: "अनुवाद करें", ar: "ترجم",
+    en: "Translate", es: "Traducir", fr: "Traduire", de: "Übersetzen", pt: "Traduzir", it: "Traduci", ja: "翻訳", zh: "翻译", hi: "अनुवाद", ar: "ترجمة",
   },
   "iw.nottranslated": {
     en: "Not translated — {why}.", es: "Sin traducir — {why}.", fr: "Non traduit — {why}.", de: "Nicht übersetzt — {why}.", pt: "Não traduzido — {why}.", it: "Non tradotto — {why}.", ja: "翻訳されていません — {why}。", zh: "未翻译 — {why}。", hi: "अनूदित नहीं — {why}।", ar: "لم يُترجَم — {why}.",
@@ -5425,7 +5425,7 @@ const CHROME: Table = {
     en: "A public post faces the widest audience there is, so it always runs the strict filter — and it carries a synthetic-media credential from the moment it exists.", es: "Una publicación pública se enfrenta al público más amplio que existe, así que siempre pasa el filtro estricto — y lleva una credencial de medio sintético desde el momento en que existe.", fr: "Une publication publique fait face au public le plus large qui soit, elle passe donc toujours le filtre strict — et elle porte un justificatif de média synthétique dès l'instant où elle existe.", de: "Ein öffentlicher Beitrag steht vor dem größtmöglichen Publikum, läuft also stets durch den strengen Filter — und trägt vom Moment seiner Entstehung an einen Nachweis als synthetisches Medium.", pt: "Uma publicação pública enfrenta o público mais vasto que há, por isso passa sempre o filtro estrito — e leva uma credencial de meio sintético desde o momento em que existe.", it: "Un post pubblico affronta il pubblico più ampio che ci sia, quindi passa sempre il filtro severo — e porta una credenziale di media sintetico dal momento in cui esiste.", ja: "公開の投稿は考えうる最も広い聴衆に向き合うので、つねに厳格なフィルタを通ります — そして存在した瞬間から合成メディアの証明を帯びます。", zh: "公开发布面对的是最广泛的受众，因此它总要通过严格过滤——而且从它存在的那一刻起就带有合成媒体凭据。", hi: "सार्वजनिक पोस्ट सबसे व्यापक दर्शकों का सामना करती है, इसलिए वह हमेशा कड़ा फ़िल्टर पार करती है — और अस्तित्व में आने के क्षण से ही सिंथेटिक-मीडिया क्रेडेंशियल साथ रखती है।", ar: "المنشور العلني يواجه أوسع جمهور ممكن، فيمرّ دائمًا بالمرشّح الصارم — ويحمل اعتماد وسائط اصطناعية منذ لحظة وجوده.",
   },
   "iw.compose": {
-    en: "Compose", es: "Redactar", fr: "Rédiger", de: "Verfassen", pt: "Redigir", it: "Componi", ja: "作成する", zh: "撰写", hi: "रचें", ar: "اكتب",
+    en: "Compose", es: "Redactar", fr: "Composer", de: "Verfassen", pt: "Compor", it: "Componi", ja: "作成", zh: "撰写", hi: "लिखें", ar: "إنشاء",
   },
   "iw.published": {
     en: "Published.", es: "Publicado.", fr: "Publié.", de: "Veröffentlicht.", pt: "Publicado.", it: "Pubblicato.", ja: "公開しました。", zh: "已发布。", hi: "प्रकाशित।", ar: "نُشر.",
@@ -5491,7 +5491,7 @@ const CHROME: Table = {
     en: "Join the 18+ queue", es: "Entrar en la cola +18", fr: "Rejoindre la file 18+", de: "Der 18+-Warteschlange beitreten", pt: "Entrar na fila 18+", it: "Entra nella coda 18+", ja: "18+ の列に並ぶ", zh: "加入 18+ 队列", hi: "18+ क़तार में लगें", ar: "انضم إلى طابور 18+",
   },
   "str.findsomebody": {
-    en: "Find somebody", es: "Buscar a alguien", fr: "Trouver quelqu'un", de: "Jemanden finden", pt: "Encontrar alguém", it: "Trova qualcuno", ja: "誰かを探す", zh: "找个人", hi: "किसी को खोजें", ar: "ابحث عن أحد",
+    en: "Find somebody", es: "Encuentra a alguien", fr: "Trouver quelqu'un", de: "Jemanden finden", pt: "Encontre alguém", it: "Trova qualcuno", ja: "誰かを探す", zh: "找人", hi: "किसी को खोजें", ar: "ابحث عن شخص",
   },
   "str.waiting": {
     en: "Waiting for somebody else on the {tier} queue.", es: "Esperando a alguien más en la cola {tier}.", fr: "En attente de quelqu'un d'autre dans la file {tier}.", de: "Warten auf jemand anderen in der {tier}-Warteschlange.", pt: "À espera de outra pessoa na fila {tier}.", it: "In attesa di qualcun altro nella coda {tier}.", ja: "{tier} の列で、ほかの誰かを待っています。", zh: "正在 {tier} 队列中等待另一个人。", hi: "{tier} क़तार में किसी और की प्रतीक्षा।", ar: "في انتظار شخص آخر في طابور {tier}.",
@@ -5512,10 +5512,10 @@ const CHROME: Table = {
     en: "say something", es: "di algo", fr: "dites quelque chose", de: "sagen Sie etwas", pt: "diga algo", it: "di' qualcosa", ja: "何か言う", zh: "说点什么", hi: "कुछ कहें", ar: "قل شيئًا",
   },
   "str.send": {
-    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送る", zh: "发送", hi: "भेजें", ar: "أرسل",
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "إرسال",
   },
   "str.endit": {
-    en: "End it", es: "Terminarlo", fr: "Y mettre fin", de: "Beenden", pt: "Terminar", it: "Chiudila", ja: "終える", zh: "结束", hi: "समाप्त करें", ar: "أنهِها",
+    en: "End it", es: "Terminarla", fr: "Terminer", de: "Beenden", pt: "Encerrar", it: "Termina", ja: "終了する", zh: "结束", hi: "समाप्त करें", ar: "إنهاء",
   },
   "str.endnote": {
     en: "Either side may end it, and ending returns any microphone lent inside — the permission was scoped to this conversation and does not survive it.", es: "Cualquiera de las dos partes puede terminarlo, y terminar devuelve cualquier micrófono prestado dentro — el permiso estaba acotado a esta conversación y no la sobrevive.", fr: "L'un ou l'autre peut y mettre fin, et cela rend tout microphone prêté à l'intérieur — la permission était limitée à cette conversation et ne lui survit pas.", de: "Jede Seite darf es beenden, und das Beenden gibt jedes darin geliehene Mikrofon zurück — die Erlaubnis galt nur für dieses Gespräch und überdauert es nicht.", pt: "Qualquer um dos lados pode terminá-la, e terminar devolve qualquer microfone emprestado lá dentro — a permissão estava limitada a esta conversa e não lhe sobrevive.", it: "Ciascuna delle due parti può chiuderla, e chiuderla restituisce ogni microfono prestato all'interno — il permesso era limitato a questa conversazione e non le sopravvive.", ja: "どちらの側からでも終えられます。終えれば、その中で貸されたマイクはすべて返ります — 許可はこの会話に限られており、会話より長くは生きません。", zh: "任何一方都可以结束它，而结束会归还在其中借出的任何麦克风——那份许可的范围只限这次对话，不会比它活得更久。", hi: "कोई भी पक्ष इसे समाप्त कर सकता है, और समाप्त करने पर भीतर उधार दिया गया कोई भी माइक्रोफ़ोन लौट आता है — वह अनुमति केवल इसी बातचीत तक सीमित थी और उससे आगे नहीं टिकती।", ar: "لأي من الطرفين أن ينهيها، والإنهاء يعيد أي ميكروفون أُعير في داخلها — فالإذن كان محصورًا بهذه المحادثة ولا يبقى بعدها.",
@@ -5524,7 +5524,7 @@ const CHROME: Table = {
     en: "rosa", es: "rosa", fr: "rosa", de: "rosa", pt: "rosa", it: "rosa", ja: "rosa", zh: "rosa", hi: "rosa", ar: "rosa",
   },
   "str.handle.eg": {
-    en: "@handle", es: "@usuario", fr: "@identifiant", de: "@handle", pt: "@utilizador", it: "@handle", ja: "@ハンドル名", zh: "@用户名", hi: "@हैंडल", ar: "@معرّف",
+    en: "@handle", es: "@identificador", fr: "@identifiant", de: "@Kürzel", pt: "@identificador", it: "@handle", ja: "@ハンドル名", zh: "@账号名", hi: "@हैंडल", ar: "@المعرّف",
   },
   "str.tag.eg": {
     en: "#tag", es: "#etiqueta", fr: "#mot-clé", de: "#schlagwort", pt: "#etiqueta", it: "#tag", ja: "#タグ", zh: "#标签", hi: "#टैग", ar: "#وسم",
@@ -5572,7 +5572,7 @@ const CHROME: Table = {
     en: "Edit designation", es: "Editar designación", fr: "Modifier la désignation", de: "Benennung bearbeiten", pt: "Editar designação", it: "Modifica designazione", ja: "指定を編集", zh: "编辑指定", hi: "नामांकन संपादित करें", ar: "تعديل التحديد",
   },
   "cmp.opencamp": {
-    en: "Open a campaign", es: "Abrir una campaña", fr: "Ouvrir une campagne", de: "Eine Kampagne eröffnen", pt: "Abrir uma campanha", it: "Apri una campagna", ja: "キャンペーンを開く", zh: "开启一个活动", hi: "एक अभियान खोलें", ar: "افتح حملة",
+    en: "Open a campaign", es: "Abrir una campaña", fr: "Ouvrir une campagne", de: "Kampagne eröffnen", pt: "Abrir uma campanha", it: "Apri una campagna", ja: "キャンペーンを開く", zh: "发起筹款", hi: "अभियान खोलें", ar: "فتح حملة",
   },
   "cmp.titlelabel": {
     en: "Title", es: "Título", fr: "Titre", de: "Titel", pt: "Título", it: "Titolo", ja: "タイトル", zh: "标题", hi: "शीर्षक", ar: "العنوان",
@@ -5614,7 +5614,7 @@ const CHROME: Table = {
     en: "Donate", es: "Donar", fr: "Faire un don", de: "Spenden", pt: "Doar", it: "Dona", ja: "寄付する", zh: "捐赠", hi: "दान करें", ar: "تبرّع",
   },
   "cmp.close": {
-    en: "Close", es: "Cerrar", fr: "Clore", de: "Schließen", pt: "Encerrar", it: "Chiudi", ja: "終了する", zh: "结束", hi: "बंद करें", ar: "أغلق",
+    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغلاق",
   },
   "cmp.split": {
     en: "Split:", es: "Reparto:", fr: "Répartition :", de: "Aufteilung:", pt: "Divisão:", it: "Ripartizione:", ja: "内訳:", zh: "分配：", hi: "बँटवारा:", ar: "التقسيم:",
@@ -5626,7 +5626,7 @@ const CHROME: Table = {
     en: "Something you can do, made usable by somebody else, in one place, for as long as you both want it there.", es: "Algo que sabes hacer, puesto al alcance de otra persona, en un solo lugar, mientras los dos queráis que siga ahí.", fr: "Quelque chose que vous savez faire, rendu utilisable par quelqu'un d'autre, en un seul lieu, aussi longtemps que vous le voulez tous les deux.", de: "Etwas, das Sie können, für jemand anderen nutzbar gemacht, an einem Ort, solange Sie beide es dort haben wollen.", pt: "Algo que você sabe fazer, tornado utilizável por outra pessoa, num só lugar, enquanto os dois quiserem que fique lá.", it: "Qualcosa che sai fare, reso utilizzabile da qualcun altro, in un solo luogo, finché lo volete entrambi.", ja: "あなたにできることを、ひとつの場所で、他の誰かが使えるようにします。二人がそこに置いておきたいと思うあいだだけ。", zh: "你会做的一件事，在一个地方，让另一个人可以使用 — 只要你们两人都愿意它留在那里。", hi: "जो आप कर सकते हैं, वह एक जगह पर किसी और के काम आने लायक बना दिया जाता है — जब तक आप दोनों उसे वहाँ रखना चाहें।", ar: "شيء تجيده، يُتاح لشخص آخر لاستعماله، في مكان واحد، ما دمتما تريدان بقاءه هناك.",
   },
   "grt.terms": {
-    en: "The terms", es: "Las condiciones", fr: "Les conditions", de: "Die Bedingungen", pt: "As condições", it: "Le condizioni", ja: "条件", zh: "条款", hi: "शर्तें", ar: "الشروط",
+    en: "The terms", es: "Las condiciones", fr: "Les conditions", de: "Die Bedingungen", pt: "Os termos", it: "Le condizioni", ja: "条件を見る", zh: "查看条款", hi: "शर्तें", ar: "الشروط",
   },
   "grt.lend": {
     en: "Lend something", es: "Prestar algo", fr: "Prêter quelque chose", de: "Etwas verleihen", pt: "Emprestar algo", it: "Presta qualcosa", ja: "何かを貸す", zh: "出借一项技能", hi: "कुछ उधार दें", ar: "أعِر شيئًا",
@@ -5689,16 +5689,16 @@ const CHROME: Table = {
     en: "Act on it", es: "Actuar", fr: "Agir dessus", de: "Handeln", pt: "Agir", it: "Agisci", ja: "手を打つ", zh: "对它采取行动", hi: "इस पर कार्रवाई करें", ar: "تصرّف بشأنها",
   },
   "grt.accept": {
-    en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen", pt: "Aceitar", it: "Accetta", ja: "受け入れる", zh: "接受", hi: "स्वीकार करें", ar: "اقبل",
+    en: "Accept", es: "Aceptar", fr: "Accepter", de: "Annehmen", pt: "Aceitar", it: "Accetta", ja: "承諾", zh: "接受", hi: "स्वीकारें", ar: "قبول",
   },
   "grt.decline": {
-    en: "Decline", es: "Rechazar", fr: "Refuser", de: "Ablehnen", pt: "Recusar", it: "Rifiuta", ja: "断る", zh: "拒绝", hi: "अस्वीकार करें", ar: "ارفض",
+    en: "Decline", es: "Rechazar", fr: "Refuser", de: "Ablehnen", pt: "Recusar", it: "Rifiuta", ja: "辞退", zh: "拒绝", hi: "अस्वीकारें", ar: "رفض",
   },
   "grt.why.ph": {
     en: "why (optional)", es: "por qué (opcional)", fr: "pourquoi (facultatif)", de: "warum (optional)", pt: "porquê (opcional)", it: "perché (facoltativo)", ja: "理由（任意）", zh: "原因（可选）", hi: "क्यों (वैकल्पिक)", ar: "لماذا (اختياري)",
   },
   "grt.endit": {
-    en: "End it", es: "Terminarla", fr: "Y mettre fin", de: "Beenden", pt: "Encerrar", it: "Chiudila", ja: "終わらせる", zh: "结束它", hi: "इसे ख़त्म करें", ar: "أنهِها",
+    en: "End it", es: "Terminarla", fr: "Terminer", de: "Beenden", pt: "Encerrar", it: "Termina", ja: "終了する", zh: "结束", hi: "समाप्त करें", ar: "إنهاء",
   },
   "grt.useit": {
     en: "Use it", es: "Usarla", fr: "S'en servir", de: "Nutzen", pt: "Usar", it: "Usala", ja: "使う", zh: "使用它", hi: "इसका उपयोग करें", ar: "استعمِلها",
@@ -5779,7 +5779,7 @@ const CHROME: Table = {
     en: "Finance", es: "Finanzas", fr: "Finances", de: "Finanzen", pt: "Finanças", it: "Finanze", ja: "経理", zh: "财务", hi: "वित्त", ar: "المالية",
   },
   "org.role": {
-    en: "Role", es: "Función", fr: "Rôle", de: "Rolle", pt: "Função", it: "Ruolo", ja: "役割", zh: "职责", hi: "भूमिका", ar: "الدور",
+    en: "Role", es: "Función", fr: "Rôle", de: "Rolle", pt: "Função", it: "Ruolo", ja: "役割", zh: "角色", hi: "भूमिका", ar: "الدور",
   },
   "org.role.ph": {
     en: "keeps the books", es: "lleva las cuentas", fr: "tient les comptes", de: "führt die Bücher", pt: "faz a contabilidade", it: "tiene i conti", ja: "帳簿をつける", zh: "管账", hi: "हिसाब-किताब रखता है", ar: "يمسك الدفاتر",
@@ -5794,7 +5794,7 @@ const CHROME: Table = {
     en: "Staff", es: "Cubrir", fr: "Pourvoir", de: "Besetzen", pt: "Ocupar", it: "Assegna", ja: "配置", zh: "配置人手", hi: "नियुक्त करें", ar: "اشغل",
   },
   "org.coordinate": {
-    en: "Coordinate", es: "Coordinar", fr: "Coordonner", de: "Abstimmen", pt: "Coordenar", it: "Coordina", ja: "連携する", zh: "开始协作", hi: "तालमेल करें", ar: "نسِّق",
+    en: "Coordinate", es: "Coordinar", fr: "Coordonner", de: "Koordinieren", pt: "Coordenar", it: "Coordina", ja: "調整する", zh: "协调", hi: "समन्वय करें", ar: "نسّق",
   },
   "org.coordinating": {
     en: "Coordinating…", es: "Coordinando…", fr: "Coordination…", de: "Wird abgestimmt…", pt: "A coordenar…", it: "Coordinamento…", ja: "連携中…", zh: "协作中…", hi: "तालमेल हो रहा है…", ar: "جارٍ التنسيق…",
@@ -5914,7 +5914,7 @@ const CHROME: Table = {
     en: "Six reads, six different answers to who is allowed to ask.", es: "Seis lecturas, seis respuestas distintas a quién puede preguntar.", fr: "Six lectures, six réponses différentes à la question de qui a le droit de demander.", de: "Sechs Abfragen, sechs verschiedene Antworten darauf, wer fragen darf.", pt: "Seis leituras, seis respostas diferentes a quem pode perguntar.", it: "Sei letture, sei risposte diverse a chi è ammesso a chiedere.", ja: "六つの読み取り、そして「誰が尋ねてよいか」への六つの異なる答え。", zh: "六种读取，对“谁可以问”给出六个不同的答案。", hi: "छह पठन, और “कौन पूछ सकता है” के छह अलग-अलग उत्तर।", ar: "ست قراءات، وست إجابات مختلفة عن مَن يحق له أن يسأل.",
   },
   "nmd.lights": {
-    en: "What the lights mean", es: "Qué significan las luces", fr: "Ce que signifient les voyants", de: "Was die Lichter bedeuten", pt: "O que significam as luzes", it: "Cosa significano le luci", ja: "ランプの意味", zh: "这些指示灯的含义", hi: "बत्तियों का मतलब", ar: "ماذا تعني الأضواء",
+    en: "What the lights mean", es: "Qué significan las luces", fr: "Ce que disent les voyants", de: "Was die Lichter bedeuten", pt: "O que as luzes significam", it: "Cosa dicono le luci", ja: "ライトの意味", zh: "信号灯含义", hi: "बत्तियों का अर्थ", ar: "معنى الأضواء",
   },
   "nmd.from": {
     en: "from: {list}", es: "de: {list}", fr: "d'après : {list}", de: "aus: {list}", pt: "de: {list}", it: "da: {list}", ja: "由来: {list}", zh: "来自：{list}", hi: "से: {list}", ar: "من: {list}",
@@ -6127,10 +6127,10 @@ const CHROME: Table = {
     en: "the For You feed · every card says why it's here", es: "el muro Para ti · cada tarjeta dice por qué está aquí", fr: "le fil Pour vous · chaque carte dit pourquoi elle est là", de: "der Für-dich-Verlauf · jede Karte sagt, warum sie da ist", pt: "o mural Para si · cada cartão diz porque está aqui", it: "il flusso Per te · ogni scheda dice perché è lì", ja: "「あなたへ」のフィード · どのカードにも、ここにある理由が書かれています", zh: "“为你”信息流 · 每张卡片都写着它为什么在这里", hi: "“आपके लिए” फ़ीड · हर कार्ड बताता है कि वह यहाँ क्यों है", ar: "خلاصة «لك» · كل بطاقة تقول لماذا هي هنا",
   },
   "wll.saysomething": {
-    en: "Say something", es: "Di algo", fr: "Dites quelque chose", de: "Sagen Sie etwas", pt: "Diga algo", it: "Di' qualcosa", ja: "何か書く", zh: "说点什么", hi: "कुछ कहिए", ar: "قل شيئًا",
+    en: "Say something", es: "Di algo", fr: "Dites quelque chose", de: "Sag etwas", pt: "Diga algo", it: "Di' qualcosa", ja: "何か言う", zh: "说点什么", hi: "कुछ कहें", ar: "قل شيئًا",
   },
   "wll.post": {
-    en: "Post", es: "Publicar", fr: "Publier", de: "Beitrag", pt: "Publicar", it: "Pubblica", ja: "投稿", zh: "发布", hi: "पोस्ट", ar: "انشر",
+    en: "Post", es: "Publicar", fr: "Publier", de: "Posten", pt: "Publicar", it: "Pubblica", ja: "投稿", zh: "发布", hi: "पोस्ट करें", ar: "نشر",
   },
   "wll.body.ph": {
     en: "what's on your wall", es: "qué hay en tu muro", fr: "ce qu'il y a sur votre mur", de: "was auf Ihrer Pinnwand steht", pt: "o que há no seu mural", it: "cosa c'è sulla tua bacheca", ja: "ウォールに載せること", zh: "你墙上的内容", hi: "आपकी वॉल पर क्या है", ar: "ما على حائطك",
@@ -6211,13 +6211,13 @@ const CHROME: Table = {
     en: "say something kind", es: "di algo amable", fr: "dites quelque chose de gentil", de: "sagen Sie etwas Freundliches", pt: "diga algo simpático", it: "di' qualcosa di gentile", ja: "やさしいひとことを", zh: "说点友善的话", hi: "कुछ अच्छा कहिए", ar: "قل شيئًا لطيفًا",
   },
   "wll.send": {
-    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "أرسل",
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "إرسال",
   },
   "gde.title": {
     en: "Show me around", es: "Enséñame esto", fr: "Faites-moi visiter", de: "Zeigen Sie mir alles", pt: "Mostre-me isto", it: "Fammi fare un giro", ja: "案内してください", zh: "带我看看", hi: "मुझे घुमाइए", ar: "خذني في جولة",
   },
   "gde.whereyouare": {
-    en: "Where you are", es: "Dónde estás", fr: "Où vous en êtes", de: "Wo Sie stehen", pt: "Onde está", it: "A che punto sei", ja: "いまどこにいるか", zh: "你走到哪里了", hi: "आप कहाँ हैं", ar: "أين أنت الآن",
+    en: "Where you are", es: "Dónde estás", fr: "Où vous en êtes", de: "Wo du stehst", pt: "Onde você está", it: "A che punto sei", ja: "現在地", zh: "当前进度", hi: "आप कहाँ हैं", ar: "أين أنت",
   },
   "gde.beenthrough": {
     en: "— you have been through all of it.", es: "— has pasado por todo.", fr: "— vous avez tout parcouru.", de: "— Sie haben alles durchlaufen.", pt: "— passou por tudo.", it: "— sei passato per tutto.", ja: "— すべてを見終えました。", zh: "——你已经全部走过一遍了。", hi: "— आप सब कुछ देख चुके हैं।", ar: "— لقد مررت بكل شيء.",
@@ -6280,7 +6280,7 @@ const CHROME: Table = {
     en: "{name} — refused. {why}", es: "{name} — rechazado. {why}", fr: "{name} — refusé. {why}", de: "{name} — abgelehnt. {why}", pt: "{name} — recusado. {why}", it: "{name} — rifiutato. {why}", ja: "{name} — 断られています。{why}", zh: "{name} — 已拒绝。{why}", hi: "{name} — मना किया गया। {why}", ar: "{name} — مرفوض. {why}",
   },
   "gde.yours": {
-    en: "Yours", es: "El tuyo", fr: "Le vôtre", de: "Ihres", pt: "O seu", it: "Il tuo", ja: "あなたの設定", zh: "你的设置", hi: "आपका", ar: "خاصتك",
+    en: "Yours", es: "Lo tuyo", fr: "Les vôtres", de: "Deine", pt: "Os seus", it: "I tuoi", ja: "あなたの投稿", zh: "你的", hi: "आपके", ar: "ما أرسلتَه",
   },
   "gde.dockline": {
     en: "{corner} · {state} · showing {face}", es: "{corner} · {state} · mostrando {face}", fr: "{corner} · {state} · affiche {face}", de: "{corner} · {state} · zeigt {face}", pt: "{corner} · {state} · a mostrar {face}", it: "{corner} · {state} · mostra {face}", ja: "{corner} · {state} · 表示中: {face}", zh: "{corner} · {state} · 正显示 {face}", hi: "{corner} · {state} · दिखा रहा है {face}", ar: "{corner} · {state} · يعرض {face}",
@@ -6334,7 +6334,7 @@ const CHROME: Table = {
     en: "e.g. storytelling", es: "p. ej. narrar historias", fr: "p. ex. l'art de raconter", de: "z. B. Geschichtenerzählen", pt: "p. ex. contar histórias", it: "es. il narrare", ja: "例: 語りのうまさ", zh: "例如：讲故事", hi: "उदा. क़िस्सागोई", ar: "مثال: سرد الحكايات",
   },
   "bld.theblend": {
-    en: "The blend", es: "La mezcla", fr: "Le mélange", de: "Die Mischung", pt: "A mistura", it: "La mescolanza", ja: "できあがる混合", zh: "这次调配", hi: "यह मिश्रण", ar: "المزيج",
+    en: "The blend", es: "La mezcla", fr: "Le mélange", de: "Die Mischung", pt: "A mistura", it: "La miscela", ja: "ブレンド", zh: "混合来源", hi: "मिश्रण", ar: "المزيج",
   },
   "bld.name": {
     en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名称", hi: "नाम", ar: "الاسم",
@@ -6418,7 +6418,7 @@ const CHROME: Table = {
     en: "Operator — just do it", es: "Operador — hazlo y ya", fr: "Exécutant — faites-le, simplement", de: "Ausführend — einfach machen", pt: "Operador — faça e pronto", it: "Esecutore — fallo e basta", ja: "実行者 — とにかくやる", zh: "执行者 — 直接去做", hi: "निष्पादक — बस कर दे", ar: "منفّذ — نفّذه فحسب",
   },
   "chat.where": {
-    en: "Where", es: "Dónde", fr: "Où", de: "Wo", pt: "Onde", it: "Dove", ja: "どこ", zh: "在哪里", hi: "कहाँ", ar: "أين",
+    en: "Where", es: "Dónde", fr: "Où", de: "Wo", pt: "Onde", it: "Dove", ja: "場所", zh: "地点", hi: "कहाँ", ar: "أين",
   },
   "chat.where.ph": {
     en: "a trailhead, the kitchen", es: "un sendero, la cocina", fr: "un départ de sentier, la cuisine", de: "ein Wanderparkplatz, die Küche", pt: "um início de trilho, a cozinha", it: "un imbocco di sentiero, la cucina", ja: "登山口、台所", zh: "步道入口、厨房", hi: "पगडंडी का मुहाना, रसोई", ar: "مبتدأ درب، المطبخ",
@@ -6442,7 +6442,7 @@ const CHROME: Table = {
     en: "Type a message…", es: "Escribe un mensaje…", fr: "Tapez un message…", de: "Eine Nachricht schreiben…", pt: "Escreva uma mensagem…", it: "Scrivi un messaggio…", ja: "メッセージを入力…", zh: "输入一条消息…", hi: "एक संदेश लिखिए…", ar: "اكتب رسالة…",
   },
   "chat.send": {
-    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "أرسل",
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "إرسال",
   },
   "ins.title": {
     en: "Inside a room", es: "Dentro de una sala", fr: "À l'intérieur d'une salle", de: "In einem Raum", pt: "Dentro de uma sala", it: "Dentro una stanza", ja: "部屋の中", zh: "在房间里面", hi: "एक कमरे के भीतर", ar: "داخل غرفة",
@@ -6475,7 +6475,7 @@ const CHROME: Table = {
     en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
   },
   "ins.letthemtalk": {
-    en: "Let them talk", es: "Deja que hablen", fr: "Laissez-les parler", de: "Lassen Sie sie reden", pt: "Deixe-os falar", it: "Lascia che parlino", ja: "彼らに話させる", zh: "让他们说", hi: "उन्हें बोलने दीजिए", ar: "دعهم يتكلمون",
+    en: "Let them talk", es: "Déjalos hablar", fr: "Laissez-les parler", de: "Lass sie reden", pt: "Deixe-os falar", it: "Lasciali parlare", ja: "話させる", zh: "让他们说话", hi: "उन्हें बोलने दें", ar: "دعهم يتكلّمون",
   },
   "ins.watermarked": {
     en: "Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.", es: "Todo lo que un perfil dice aquí lleva marca de agua como medio sintético, en el momento en que se dice. Una sala con alguien menor de 18 dentro aplica moderación estricta para todos.", fr: "Tout ce qu'un profil dit ici est filigrané comme média synthétique, au moment même où c'est dit. Une salle où se trouve une personne de moins de 18 ans applique une modération stricte pour tout le monde.", de: "Alles, was ein Profil hier sagt, wird als synthetisches Medium mit einem Wasserzeichen versehen, im Moment des Sagens. Ein Raum, in dem jemand unter 18 ist, läuft für alle mit strenger Moderation.", pt: "Tudo o que um perfil diz aqui leva marca de água como meio sintético, no momento em que é dito. Uma sala com alguém com menos de 18 anos aplica moderação estrita para todos.", it: "Tutto ciò che un profilo dice qui viene filigranato come media sintetico, nel momento in cui viene detto. Una stanza in cui c'è qualcuno sotto i 18 anni applica moderazione severa per tutti.", ja: "ここでプロフィールが言うことはすべて、言われたその瞬間に合成メディアとして電子透かしが入ります。18 歳未満の人がいる部屋では、全員に対して厳格なモデレーションが働きます。", zh: "档案在这里说的每一句话，都会在出口的那一刻被打上合成媒体的水印。只要房间里有未满 18 岁的人，对所有人都会启用严格审核。", hi: "यहाँ कोई प्रोफ़ाइल जो भी कहती है, कहे जाने के उसी क्षण उस पर कृत्रिम माध्यम का वॉटरमार्क लग जाता है। जिस कमरे में 18 से कम उम्र का कोई हो, वहाँ सबके लिए सख़्त मॉडरेशन चलता है।", ar: "كل ما يقوله ملف هنا يُوسم بعلامة مائية بوصفه وسيطًا اصطناعيًا، لحظة قوله. وأي غرفة فيها من هو دون الثامنة عشرة تعمل بمراجعة صارمة على الجميع.",
@@ -6508,10 +6508,10 @@ const CHROME: Table = {
     en: "2D, AR and VR sessions · live desks", es: "sesiones 2D, RA y RV · escritorios en vivo", fr: "sessions 2D, RA et RV · bureaux en direct", de: "2D-, AR- und VR-Sitzungen · Schreibtische live", pt: "sessões 2D, RA e RV · secretárias em direto", it: "sessioni 2D, AR e VR · scrivanie dal vivo", ja: "2D・AR・VR のセッション · ライブのデスク", zh: "2D、AR 与 VR 会话 · 在线的工位", hi: "2D, AR और VR सत्र · लाइव डेस्क", ar: "جلسات ثنائية الأبعاد وواقع معزّز وواقع افتراضي · مكاتب مباشرة",
   },
   "rms.openroom": {
-    en: "Open a room", es: "Abrir una sala", fr: "Ouvrir une salle", de: "Einen Raum öffnen", pt: "Abrir uma sala", it: "Apri una stanza", ja: "部屋を開く", zh: "开一个房间", hi: "एक कमरा खोलें", ar: "افتح غرفة",
+    en: "Open a room", es: "Abrir una sala", fr: "Ouvrir un salon", de: "Einen Raum öffnen", pt: "Abrir uma sala", it: "Apri una stanza", ja: "ルームを開く", zh: "开一个房间", hi: "एक कक्ष खोलें", ar: "افتح غرفة",
   },
   "rms.topic": {
-    en: "Topic", es: "Tema", fr: "Sujet", de: "Thema", pt: "Tema", it: "Argomento", ja: "話題", zh: "主题", hi: "विषय", ar: "الموضوع",
+    en: "Topic", es: "Tema", fr: "Sujet", de: "Thema", pt: "Tema", it: "Argomento", ja: "話題", zh: "话题", hi: "विषय", ar: "الموضوع",
   },
   "rms.topic.ph": {
     en: "what it's about", es: "de qué va", fr: "de quoi il s'agit", de: "worum es geht", pt: "sobre o que é", it: "di cosa si tratta", ja: "何についてか", zh: "关于什么", hi: "यह किस बारे में है", ar: "عمّ يدور",
@@ -6709,7 +6709,7 @@ const CHROME: Table = {
     en: "Saving…", es: "Guardando…", fr: "Enregistrement…", de: "Wird gespeichert…", pt: "A guardar…", it: "Salvataggio…", ja: "保存中…", zh: "保存中…", hi: "सहेजा जा रहा है…", ar: "جارٍ الحفظ…",
   },
   "rel.save": {
-    en: "Save relationship", es: "Guardar relación", fr: "Enregistrer la relation", de: "Beziehung speichern", pt: "Guardar relação", it: "Salva la relazione", ja: "関係を保存", zh: "保存这段关系", hi: "रिश्ता सहेजें", ar: "احفظ العلاقة",
+    en: "Save relationship", es: "Guardar la relación", fr: "Enregistrer la relation", de: "Beziehung speichern", pt: "Guardar a relação", it: "Salva la relazione", ja: "関係を保存", zh: "保存关系", hi: "संबंध सहेजें", ar: "احفظ العلاقة",
   },
   "rel.t.family": {
     en: "family", es: "familia", fr: "famille", de: "Familie", pt: "família", it: "famiglia", ja: "家族", zh: "家人", hi: "परिवार", ar: "عائلة",
@@ -6808,7 +6808,7 @@ const CHROME: Table = {
     en: "Run a simulation of {name}", es: "Simular a {name}", fr: "Lancer une simulation de {name}", de: "Eine Simulation von {name} laufen lassen", pt: "Simular {name}", it: "Esegui una simulazione di {name}", ja: "{name} をシミュレートする", zh: "模拟一下 {name}", hi: "{name} का सिमुलेशन चलाएँ", ar: "شغّل محاكاة لـ {name}",
   },
   "sim.scenario": {
-    en: "Scenario", es: "Escenario", fr: "Scénario", de: "Szenario", pt: "Cenário", it: "Scenario", ja: "状況", zh: "情境", hi: "परिदृश्य", ar: "السيناريو",
+    en: "Scenario", es: "Escenario", fr: "Scénario", de: "Szenario", pt: "Cenário", it: "Scenario", ja: "シナリオ", zh: "情景", hi: "परिदृश्य", ar: "السيناريو",
   },
   "sim.scenario.ph": {
     en: "e.g. the town council proposes paving over the garden", es: "p. ej. el ayuntamiento propone asfaltar el jardín", fr: "p. ex. le conseil municipal propose de bitumer le jardin", de: "z. B. der Gemeinderat will den Garten asphaltieren", pt: "p. ex. a câmara propõe alcatroar o jardim", it: "es. il consiglio comunale propone di asfaltare il giardino", ja: "例: 町議会が庭を舗装する案を出した", zh: "例如：镇议会提议把花园铺成路面", hi: "उदा. नगर परिषद बग़ीचे पर सड़क बनाने का प्रस्ताव लाती है", ar: "مثال: يقترح المجلس البلدي تعبيد الحديقة",
@@ -6841,7 +6841,7 @@ const CHROME: Table = {
     en: "confidence {score} — from {items} source item(s) and {turns} remembered turn(s)", es: "confianza {score} — a partir de {items} elemento(s) de origen y {turns} turno(s) recordado(s)", fr: "confiance {score} — à partir de {items} élément(s) source et {turns} tour(s) mémorisé(s)", de: "Zuversicht {score} — aus {items} Quellelement(en) und {turns} erinnerten Zug/Zügen", pt: "confiança {score} — a partir de {items} item(ns) de origem e {turns} turno(s) recordado(s)", it: "fiducia {score} — da {items} elemento/i di origine e {turns} turno/i ricordato/i", ja: "確信度 {score} — 出典 {items} 件と、記憶された往復 {turns} 件から", zh: "置信度 {score} —— 来自 {items} 项来源材料和 {turns} 个记住的对话回合", hi: "विश्वास {score} — {items} स्रोत-सामग्री और {turns} याद रखे गए संवाद से", ar: "درجة الثقة {score} — من {items} عنصر مصدر و{turns} دورًا محفوظًا",
   },
   "sim.pastruns": {
-    en: "Past runs", es: "Ejecuciones anteriores", fr: "Exécutions passées", de: "Frühere Läufe", pt: "Execuções anteriores", it: "Esecuzioni passate", ja: "過去の実行", zh: "过往的运行", hi: "पिछली बार", ar: "عمليات سابقة",
+    en: "Past runs", es: "Ejecuciones pasadas", fr: "Exécutions passées", de: "Frühere Läufe", pt: "Execuções passadas", it: "Esecuzioni passate", ja: "過去の実行", zh: "历史运行", hi: "पिछले रन", ar: "التشغيلات السابقة",
   },
   "mem.title": {
     en: "Memory Vault 🔒", es: "Bóveda de memoria 🔒", fr: "Coffre de mémoire 🔒", de: "Gedächtnistresor 🔒", pt: "Cofre de memória 🔒", it: "Caveau della memoria 🔒", ja: "記憶の保管庫 🔒", zh: "记忆库 🔒", hi: "स्मृति-तिजोरी 🔒", ar: "خزنة الذاكرة 🔒",
@@ -6880,7 +6880,7 @@ const CHROME: Table = {
     en: "Loading…", es: "Cargando…", fr: "Chargement…", de: "Wird geladen…", pt: "A carregar…", it: "Caricamento…", ja: "読み込み中…", zh: "加载中…", hi: "लोड हो रहा है…", ar: "جارٍ التحميل…",
   },
   "frn.title": {
-    en: "Friends", es: "Amistades", fr: "Amis", de: "Freund:innen", pt: "Amigos", it: "Amici", ja: "友だち", zh: "好友", hi: "मित्र", ar: "الأصدقاء",
+    en: "Friends", es: "Amigos", fr: "Amis", de: "Freunde", pt: "Amigos", it: "Amici", ja: "友だち", zh: "好友", hi: "दोस्त", ar: "الأصدقاء",
   },
   "frn.signin": {
     en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
@@ -6907,7 +6907,7 @@ const CHROME: Table = {
     en: "Suggested", es: "Sugerencias", fr: "Suggestions", de: "Vorschläge", pt: "Sugestões", it: "Suggeriti", ja: "おすすめ", zh: "推荐", hi: "सुझाए गए", ar: "مقترحون",
   },
   "frn.add": {
-    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضِف",
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "إضافة",
   },
 };
 

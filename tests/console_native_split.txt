@@ -1,0 +1,101 @@
+# status: backlog — 26 rows
+#
+# English strings held by both the desktop console's table and a shell's, on
+# which no console row and no native row share a wording. Checked by
+# test_the_desktop_and_the_phone_say_different_things.py, matched exactly in
+# both directions.
+#
+# ## What this measured
+#
+# 0.48.0 compared keys inside one table. This is the same question one level
+# out: the console has `app/src/l10n.ts` (1,882 rows) and the shells have
+# theirs, and nothing had ever compared them.
+#
+#     ios       223 English strings in both tables, 102 with no agreed wording
+#     android   224                                 104
+#     windows   219                                 103
+#
+# Fifty keys are literally the same key in both tables. Two of those disagreed:
+# `corner.send` in Arabic, and `plc.venues` in French — *Espaces* on the
+# desktop, *Lieux* on the phone. Same key, same English, different word.
+#
+#     asked     does each table say the same thing twice the same way
+#     mattered  do the tables say the same thing as each other
+#
+# ## The register, which is not on this list
+#
+# The largest systematic cause is not vocabulary. It is who the product thinks
+# it is talking to:
+#
+#     German      Sie / Ihnen / Ihre      du / dein / dich
+#     console            204                     32
+#     phone                7                     60
+#
+# The desktop addresses a German reader formally and the phone informally. In a
+# language with a T–V distinction that is a claim about the relationship, and
+# this product made both at once — *Wo Sie stehen* on the desktop against *Wo
+# du stehst* on the phone, *Ihre Signatur-Berechtigungen* against *Deine
+# Signaturberechtigungen*. Spanish is milder and mostly settled (20 rows say
+# *usted* against 47 that say *tú* in the console, 2 against 13 on the phone);
+# French and Portuguese are formal on both sides, Italian informal on both.
+#
+# Every row this round reconciled moved onto the phones' wording, and so onto
+# *du* and *tú*. **The whole-table sweep is not done and is not on this list**,
+# because German T–V is not a pronoun substitution — *Wo Sie stehen* becomes
+# *Wo du stehst* — and the rule against machine-mangling text a person relies
+# on applies to 204 rows as much as to fourteen. It is named here so that the
+# next round does not have to find it again.
+#
+# ## What 0.48.0 did to this number
+#
+# Widened it. Reconciling the Desk and the Counter picked *Theke* for the Desk
+# so German would stop naming two tab-bar entries *Schalter*. The console still
+# said *Schalter*, and nothing compared the two tables, so a fix in one opened
+# a gap with the other. The round could not have known; this file is the answer
+# to that.
+#
+# ## What is left, and why
+#
+# Every row below is a question about the English rather than a translation
+# mistake — the same distinction `native_split_wordings.txt` leads with.
+#
+#   * the pronoun family. *Show it*, *Take it back / down / off*, *Wear it*,
+#     *Say something in it* — Spanish must agree with what *it* is, and the
+#     console's *it* and the phone's *it* are different objects.
+#   * *Trade*. The console's row is the trade a person practises (*Gewerbe*,
+#     手艺); the phones' is commerce (*Handel*, 交易). One English word, two
+#     jobs, recorded in `native_split_wordings.txt` for the same reason.
+#   * *Withdraw*. Reflexive on the console's exchange screen, transitive on the
+#     phone's people screen.
+#   * two rows on a third axis this round did not open: `action.sign_out` and
+#     `nc.t.stranger` disagree **between the shells**, not with the console, so
+#     no single native wording exists to adopt. The three native tables have
+#     never been compared with each other either. That is the next bite.
+#
+# ceiling: 26
+ios: vce.sayit :: nvoi.say  ("Say something in it")
+ios: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
+ios: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
+ios: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
+ios: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
+ios: desk.open.trade.ph :: counter.trade,nmg.t.trade  ("Trade")
+ios: liv.wearit :: embl.set  ("Wear it")
+ios: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
+android: vce.sayit :: nvoi.say  ("Say something in it")
+android: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
+android: str.stranger :: nc.alias.example,nc.t.stranger  ("Stranger")
+android: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
+android: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
+android: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
+android: desk.open.trade.ph :: counter.trade,nmg.t.trade  ("Trade")
+android: liv.wearit :: embl.set  ("Wear it")
+android: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
+windows: vce.sayit :: nvoi.say  ("Say something in it")
+windows: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
+windows: signout :: action.sign_out  ("Sign out")
+windows: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
+windows: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
+windows: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
+windows: desk.open.trade.ph :: counter.trade,nmg.t.trade,tab.trade  ("Trade")
+windows: liv.wearit :: embl.set  ("Wear it")
+windows: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")

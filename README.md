@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.48.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.48.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -730,6 +730,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.48.1** | **Two tables, one product** — 223 English strings live in both the console table and the iPhone's and 102 had no wording the two agreed on; the desktop says *Sie* (204 rows) where the phone says *du* (60); the voiceprint, desk and chrome surfaces reconciled, 102 → 8 |
 | **0.48.0** | **The same sentence, translated twice** — 54 English strings under 2+ keys on iOS and 43 of them already drifted; 34 sets reconciled, 42 recorded as questions about the English; two tab-bar entries that read alike in three languages; and a `\u0027` that stops `L10n.swift` compiling |
 | **0.47.9** | **The number was mislabelled, and it was hiding a consent screen** — 263 of the 335 "dead" rows are asked for by a different shell, so they are screens saying less rather than waste; the voiceprint consent block's three sentences were hardcoded English on the iPhone, in an array a loop reads |
 | **0.47.8** | Cut together with the other two at one version; the round's work is PDI's Transfers screen |

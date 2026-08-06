@@ -169,7 +169,7 @@ public static class L10n
         ["tab.voice"] = new() { ["en"] = "Voice", ["es"] = "Voz", ["fr"] = "Voix", ["de"] = "Stimme", ["pt"] = "Voz", ["it"] = "Voce", ["ja"] = "音声", ["zh"] = "语音", ["hi"] = "आवाज़", ["ar"] = "الصوت" },
         ["tab.settings"] = new() { ["en"] = "Settings", ["es"] = "Ajustes", ["fr"] = "Réglages", ["de"] = "Einstellungen", ["pt"] = "Configurações", ["it"] = "Impostazioni", ["ja"] = "設定", ["zh"] = "设置", ["hi"] = "सेटिंग्स", ["ar"] = "الإعدادات" },
         ["action.send"] = new() { ["en"] = "Send", ["es"] = "Enviar", ["fr"] = "Envoyer", ["de"] = "Senden", ["pt"] = "Enviar", ["it"] = "Invia", ["ja"] = "送信", ["zh"] = "发送", ["hi"] = "भेजें", ["ar"] = "إرسال" },
-        ["action.save"] = new() { ["en"] = "Save", ["es"] = "Guardar", ["fr"] = "Enregistrer", ["de"] = "Speichern", ["pt"] = "Salvar", ["it"] = "Salva", ["ja"] = "保存", ["zh"] = "保存", ["hi"] = "सहेजें", ["ar"] = "حفظ" },
+        ["action.save"] = new() { ["en"] = "Save", ["es"] = "Guardar", ["fr"] = "Enregistrer", ["de"] = "Speichern", ["pt"] = "Guardar", ["it"] = "Salva", ["ja"] = "保存", ["zh"] = "保存", ["hi"] = "सहेजें", ["ar"] = "حفظ" },
         ["action.translate"] = new() { ["en"] = "Translate", ["es"] = "Traducir", ["fr"] = "Traduire", ["de"] = "Übersetzen", ["pt"] = "Traduzir", ["it"] = "Traduci", ["ja"] = "翻訳", ["zh"] = "翻译", ["hi"] = "अनुवाद", ["ar"] = "ترجمة" },
         ["action.refresh"] = new() { ["en"] = "Refresh", ["es"] = "Actualizar", ["fr"] = "Actualiser", ["de"] = "Aktualisieren", ["pt"] = "Atualizar", ["it"] = "Aggiorna", ["ja"] = "更新", ["zh"] = "刷新", ["hi"] = "ताज़ा करें", ["ar"] = "تحديث" },
 

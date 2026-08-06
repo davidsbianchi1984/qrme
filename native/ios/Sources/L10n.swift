@@ -156,7 +156,7 @@ enum L10n {
                         "de": "Senden", "pt": "Enviar", "it": "Invia",
                         "ja": "送信", "zh": "发送", "hi": "भेजें", "ar": "إرسال"],
         "action.save": ["en": "Save", "es": "Guardar", "fr": "Enregistrer",
-                        "de": "Speichern", "pt": "Salvar", "it": "Salva",
+                        "de": "Speichern", "pt": "Guardar", "it": "Salva",
                         "ja": "保存", "zh": "保存", "hi": "सहेजें", "ar": "حفظ"],
         "action.translate": ["en": "Translate", "es": "Traducir", "fr": "Traduire",
                              "de": "Übersetzen", "pt": "Traduzir", "it": "Traduci",

@@ -4,6 +4,90 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.48.1] — 2026-08-06
+
+### Two tables, one product, and nothing compared them
+
+0.48.0 compared keys *inside* one table. This round asks the same question one
+level out. The desktop console has its own table — `app/src/l10n.ts`, 1,882
+rows — and the three shells have theirs.
+
+**223 English strings live in both the console table and the iOS table, and
+102 of them had no translation the two tables agreed on.** Android 104,
+Windows 103. Fifty keys are literally the same key in both tables, and two of
+those disagreed: `corner.send` in Arabic, and `plc.venues` in French —
+*Espaces* on the desktop, *Lieux* on the phone.
+
+    asked     does each table say the same thing twice the same way
+    mattered  do the tables say the same thing as each other
+
+### The register
+
+The largest systematic cause is not vocabulary. It is who the product thinks
+it is talking to.
+
+| German | Sie / Ihnen / Ihre | du / dein / dich |
+|---|---|---|
+| console | **204** | 32 |
+| phone | 7 | **60** |
+
+The desktop addresses a German reader formally, the phone informally — *Wo Sie
+stehen* against *Wo du stehst*, *Ihre Signatur-Berechtigungen* against *Deine
+Signaturberechtigungen*. In a language with a T–V distinction that is a claim
+about the relationship, and this product made both at once. Spanish is milder
+and mostly settled (20 *usted* rows against 47 *tú* in the console).
+
+Every row reconciled this round moved onto the phones' wording, and so onto
+*du* and *tú*. **The whole-table sweep is recorded, not done**: German T–V is
+not a pronoun substitution, and the rule against machine-mangling text a person
+relies on applies to 204 rows as much as to fourteen.
+
+### What 0.48.0 did to this number
+
+Widened it. Reconciling the Desk and the Counter picked *Theke* for the Desk so
+German would stop naming two tab-bar entries *Schalter*. The console still said
+*Schalter*, and nothing compared the two tables — a fix in one opening a gap
+with the other, which is this arc's shape committed once more inside its own
+fix.
+
+### The measurement was nearly the bug again, twice
+
+JIM-mini's console writes some rows escaped — `"\u7834\u68c4\u3059\u308b"`,
+which in TypeScript **is** 破棄する. The first version of this check compared
+source bytes, so nine of that repo's thirty-four "disagreements" were one
+string spelled two ways. Decoding came first; the count fell from 34 to 25
+before a line was fixed.
+
+Then the guard-on-the-guard for the decoder was written with its escapes
+*already decoded* — it asserted `_decode("破") == "破"`, which is true of any
+function that returns its argument, and it passed with the decoder switched
+off. The injection pass caught it. It is now built from an explicit backslash.
+
+### What was reconciled
+
+The voiceprint surface (`vce.*` against `nvoi.*`) — including *A previous
+voiceprint was retired when consent was withdrawn*, which differed in eight of
+nine languages, and *voiceprint* itself, *huella vocal* on the desktop against
+*huella de voz* on the phone. The desk surface. The chrome verbs 0.48.0 had
+already settled inside the native tables and the console had never been told
+about. QRME's count went **102 → 8** on iOS, 104 → 9, 103 → 9.
+
+### Added
+
+- `tests/test_the_desktop_and_the_phone_say_different_things.py` — per shell,
+  the English strings both tables hold with no wording they agree on, matched
+  exactly against `tests/console_native_split.txt`, with a ceiling, floors and
+  probes under both parses, and a decoder whose own test is built from a
+  literal backslash. Ported to JIM-mini and PDI in the same round.
+
+### Changed
+
+- 123 console rows moved onto the native wording across 381 language cells.
+- `action.save` in Portuguese moves the other way, to *Guardar*: *Salvar* is
+  pt-BR and every other Portuguese row in these products is pt-PT.
+
+Cut together with JIM-mini and PDI at app-v0.48.1.
+
 ## [0.48.0] — 2026-08-06
 
 ### The same sentence, translated twice, and the two copies had drifted
