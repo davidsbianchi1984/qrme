@@ -936,6 +936,18 @@ LESSONS: tuple[dict, ...] = (
          screens=(187,),
          try_it="Open a shop on your profile, list one thing, and buy it "
                 "with an interactor token."),
+    dict(key="stream", chapter="Meeting others", title="The stream",
+         what="One public card at a time — swipe, or use the arrow keys. "
+              "What plays is decided by who holds the file: footage this "
+              "deployment holds loops and moves you on, and anything on "
+              "somebody else's platform stays a card until you press it, so "
+              "flicking past fifty videos announces you to nobody. Every "
+              "fourth card is a place with a person in it — a live room you "
+              "can walk into, or a desk you can ring and buy from — and "
+              "both say what the press does before it is pressed.",
+         screens=(189, 190, 191),
+         try_it="Open the Feed tab with no account, swipe past an off-site "
+                "card, and watch it stay a card until you press play."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))

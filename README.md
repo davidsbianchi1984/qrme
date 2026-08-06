@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.48.3** ([changelog](CHANGELOG.md) ·
+**Current release: v0.49.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -390,6 +390,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/187-shops.svg"><img src="docs/screens/187-shops.svg" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
     <td align="center" width="33%"><a href="docs/screens/188-your-corner.svg"><img src="docs/screens/188-your-corner.svg" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/189-feed.svg"><img src="docs/screens/189-feed.svg" width="210" alt="Feed"></a><br><sub><b>189</b> · Feed</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/190-what-plays.svg"><img src="docs/screens/190-what-plays.svg" width="210" alt="What Plays"></a><br><sub><b>190</b> · What Plays</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/191-rooms-desks.svg"><img src="docs/screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a><br><sub><b>191</b> · Rooms &amp; Desks</sub></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -730,6 +735,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.49.0** | **The stream** — one public card at a time: footage this deployment holds loops, anything on somebody else's platform stays a card until pressed, and every fourth card is a live room or a desk with a person behind it. JIM-mini's Feed tab is a GET-only door onto the same stream |
 | **0.48.3** | Cut together at one version; the round's work is PDI's console — Custody and Continuity, 229 → 177 |
 | **0.48.2** | The third axis measured at last — the three shells against each other — and it held **one** row here: *Sign out* was *Sair* on the phones and *Terminar sessão* on the desktop shell. A 0.48.1 record entry corrected: one of its two "shells disagree" rows was not one |
 | **0.48.1** | **Two tables, one product** — 223 English strings live in both the console table and the iPhone's and 102 had no wording the two agreed on; the desktop says *Sie* (204 rows) where the phone says *du* (60); the voiceprint, desk and chrome surfaces reconciled, 102 → 8 |
@@ -2909,6 +2915,84 @@ the reason, and invisible to everyone else. On the way out, an adult profile's
 posts are walled out of an ordinary feed — a gate inherited from the *author*
 rather than judged per post, because otherwise an adult profile publishes past
 its own wall by writing something innocuous.
+
+## The stream — one card at a time, and who is allowed to play
+
+The wall's feed above is *yours*: ranked for one profile, explained row by row.
+The **stream** is the other kind — one public card filling the screen, swipe
+for the next, and the next. `GET /feed` and `GET /feed/{id}`, both readable
+without an account, because somebody who followed a link from a sticker on a
+shop window is a reader like any other.
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/189-feed.svg"><img src="docs/screens/189-feed.svg" width="210" alt="Feed"></a></td>
+    <td align="center" width="33%"><a href="docs/screens/190-what-plays.svg"><img src="docs/screens/190-what-plays.svg" width="210" alt="What Plays"></a></td>
+    <td align="center" width="33%"><a href="docs/screens/191-rooms-desks.svg"><img src="docs/screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a></td>
+  </tr>
+</table>
+
+**The rule the stream had to not break.** `post_videos` in `qrme/db.py` has
+carried the same comment since long before a stream existed: *the link and the
+id, never the file and never a thumbnail* — re-hosting somebody's video is a
+copyright problem, and a cached thumbnail is a copy of an image nobody granted.
+It is why a QRME wall renders without one request to YouTube.
+
+An endlessly autoplaying stream is the one surface where that promise is
+expensive to keep and cheap to lose. Flick past fifty cards and, done the
+ordinary way, you have announced your address and your taste to fifty companies
+for footage you never chose to watch.
+
+    asked     does the stream play the next thing
+    mattered  does swiping past something tell a stranger you were here
+
+So the line is drawn on **who holds the file**, and it is drawn on the server
+rather than left to four clients to remember:
+
+| the file is | `plays` | what the card is |
+| --- | --- | --- |
+| held by this deployment (`media`, `kind='video'`) | `true` | it plays, and it loops |
+| held by somebody else | `false` | a title, a platform name, a link — and no request until you press |
+
+`test_an_offsite_video_never_plays_by_itself` asserts that on the wire, where
+every client reads it, rather than in any one of them. It is easy to satisfy
+today and easy to lose the day a console decides autoplay is a nicer default.
+
+**Every fourth card is a place with a person in it.** This is the part a video
+app cannot do. Mixed into the recordings are **live rooms you can walk into**
+and **desks with a real human behind them**, with the shop behind the desk
+reachable without leaving the stream — browse it, see the prices, ring the
+bell. Both carry a plain sentence *before* the button, because both reach
+somebody:
+
+> Walking in puts you in the room with the people already there. Your
+> microphone is off until you turn it on.
+
+> Ringing reaches a person. Otis is at the desk — the bell is not a message,
+> it is somebody's attention.
+
+**Nothing is in the stream by default.** A post reaches it only if it is on the
+wall and approved; a desk only if it is not closed; a room only while it is
+active **and** attached to a desk that chose to be found — a room with nobody's
+desk behind it is a private conversation and is not in this stream at any
+ranking. A rated desk is *absent* for a reader who is not verified rather than
+blurred, and a shared link to one answers `404` rather than `403`, because a
+403 announces that the thing exists.
+
+And every card says why it is there, the same as the wall's feed does. A stream
+that cannot explain itself is one nobody can audit, including whoever wrote it.
+
+**On all four clients.** The stream is on the web console, on the iOS, Android
+and Windows shells, and reachable from JIM-mini's Feed tab. The phones read the
+same two routes and render the same `plays`, and the fourteen `feed.*` strings
+are the console's own rows copied into the three native tables so the desktop
+and the phone cannot drift apart on a surface new to both.
+
+What the phones do not have yet is the **gesture** — Previous and Next are
+buttons there. That is stated in each screen's own docstring rather than
+implied away, and it is not only a matter of effort: a stream a person can use
+only by dragging is one somebody with a motor impairment cannot use at all, so
+the buttons are the version that works for everybody while the swipe is built.
 
 ## Agreeing before work changes hands
 

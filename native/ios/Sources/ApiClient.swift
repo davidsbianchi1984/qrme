@@ -4065,6 +4065,22 @@ struct SpecialistRow: Decodable {
         return try await request("/providers", method: "POST", body: body)
     }
 
+    // -- the public stream --
+
+    /// One page of the public stream. No token: a person who followed a
+    /// shared link is a reader like any other, and the route says so.
+    func publicFeed(cursor: String? = nil) async throws -> FeedPage {
+        let tail = cursor.map { "&cursor=\($0)" } ?? ""
+        return try await request("/feed?limit=12" + tail)
+    }
+
+    /// One card, for a link somebody was sent. 404 rather than an empty
+    /// card when it is rated and this reader is not verified — a 403 would
+    /// announce that the item exists.
+    func feedItem(id: String) async throws -> FeedCard {
+        try await request("/feed/\(id)")
+    }
+
     // -- the sticker on the street --
 
     /// The in-camera overlay's read: who it is, one line of portrait, and
@@ -4792,6 +4808,44 @@ struct BeaconOverlayCard: Decodable {
     let age_wall: Bool?
     let rated: Bool?
     let note: String?
+}
+
+/// A page of the stream. `rules` is the server saying, in words a screen can
+/// show, what it will and will not play without being asked.
+struct FeedPage: Decodable {
+    let items: [FeedCard]
+    let cursor: String?
+}
+
+/// One card. `plays` is the server's and is never recomputed here: only
+/// footage this deployment holds comes back true, so scrolling past an
+/// off-site card makes no request to anybody else — see `qrme/feed.py`.
+struct FeedCard: Decodable {
+    let id: String
+    let kind: String
+    let reason: String?
+    let title: String?
+    let note: String?
+    let plays: Bool?
+    let loop: Bool?
+    let src: String?
+    let facade: FeedFacade?
+    let topic: String?
+    let channel: String?
+    let people: Int?
+    let entering: String?
+    let display_name: String?
+    let trade: String?
+    let presence: String?
+    let blurb: String?
+    let ringing: String?
+    let human: Bool?
+    let ai: Bool?
+}
+
+struct FeedFacade: Decodable {
+    let platform_name: String?
+    let url: String?
 }
 
 struct DeskScanCard: Decodable {

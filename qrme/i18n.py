@@ -1695,6 +1695,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'पेशकश का उत्तर केवल कॉल करने वाला देता है — कनेक्शन उसी की मशीन खोलता है',
         'ar': 'المتصل وحده يجيب على العرض — فالاتصال يفتح جهازه هو',
     },
+    'no such feed item': {
+        'es': 'no existe ese elemento del feed',
+        'fr': 'aucun élément de ce fil',
+        'de': 'kein solches Element im Feed',
+        'pt': 'não existe esse item do feed',
+        'it': 'nessun elemento di questo tipo nel feed',
+        'ja': 'そのフィード項目はありません',
+        'zh': '没有该信息流条目',
+        'hi': 'ऐसा कोई फ़ीड आइटम नहीं',
+        'ar': 'لا يوجد عنصر بهذا الوصف في التدفق',
+    },
     'no such desk': {
         'es': 'no existe ese escritorio',
         'fr': 'aucun bureau de ce nom',

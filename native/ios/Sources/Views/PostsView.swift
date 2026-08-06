@@ -34,6 +34,11 @@ struct PostsView: View {
                         }.card()
                     }
                 }
+
+                // The wall's posts, and beneath them the public stream those
+                // posts feed into — the same rows, ranked for nobody.
+                StreamSection()
+                SharedCardSection()
             }.padding(20)
         }
         .refreshable { await load() }

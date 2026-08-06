@@ -509,6 +509,120 @@ fun PostsScreen(vm: StudioViewModel) {
                 }
             }
         }
+        // The wall's posts, and beneath them the public stream those posts
+        // feed into — the same rows, ranked for nobody.
+        StreamSection(vm)
+    }
+}
+
+// ---- the public stream ----
+
+/**
+ * The stream, one card at a time.
+ *
+ * `plays` is read from the server and never recomputed: only footage this
+ * deployment holds comes back true, so scrolling past an off-site card makes
+ * no request to another company's server. `entering` and `ringing` are shown
+ * *before* their buttons, because a live room and a desk reach a person.
+ */
+@Composable
+fun StreamSection(vm: StudioViewModel) {
+    var cards by remember { mutableStateOf<List<FeedCard>>(emptyList()) }
+    var cursor by remember { mutableStateOf<String?>(null) }
+    var at by remember { mutableStateOf(0) }
+    var opened by remember { mutableStateOf<Set<String>>(emptySet()) }
+    var line by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        vm.call({ ApiClient.publicFeed() }) { r ->
+            r.getOrNull()?.let { cards = it.items; cursor = it.cursor }
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(L10n.t("feed.title", vm.language), color = Qrme.Txt, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(L10n.t("feed.sub", vm.language), color = Qrme.T2, fontSize = 13.sp)
+        if (cards.isEmpty()) {
+            Column(Modifier.card()) {
+                Text(L10n.t("feed.empty", vm.language), color = Qrme.T2, fontSize = 13.sp)
+            }
+        } else {
+            val c = cards[at.coerceIn(0, cards.size - 1)]
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // Spelled out: a key built at runtime is invisible to the
+                // guard that checks every asked-for key exists.
+                val kindLabel = when (c.kind) {
+                    "video" -> L10n.t("feed.kind.video", vm.language)
+                    "offsite" -> L10n.t("feed.kind.offsite", vm.language)
+                    "room" -> L10n.t("feed.kind.room", vm.language)
+                    else -> L10n.t("feed.kind.desk", vm.language)
+                }
+                Text(kindLabel, color = Qrme.BrandA,
+                    fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(c.reason, color = Qrme.T3, fontSize = 10.sp)
+                when (c.kind) {
+                    "offsite" -> {
+                        Text(c.title ?: "—", color = Qrme.Txt, fontSize = 14.sp)
+                        Text(c.platformName ?: "—", color = Qrme.T2, fontSize = 12.sp)
+                        // Nothing is requested until this press.
+                        if (!opened.contains(c.id)) {
+                            TextButton(onClick = { opened = opened + c.id; line = c.url }) {
+                                Text(L10n.t("feed.play", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
+                            }
+                        }
+                        Text(c.note ?: "", color = Qrme.T3, fontSize = 10.sp)
+                    }
+                    "room" -> {
+                        Text(c.topic ?: L10n.t("feed.room.untitled", vm.language),
+                            color = Qrme.Txt, fontSize = 14.sp)
+                        Text(c.entering ?: "", color = Qrme.T3, fontSize = 10.sp)
+                        TextButton(onClick = { line = c.entering }) {
+                            Text(L10n.t("feed.enter", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
+                        }
+                    }
+                    "desk" -> {
+                        Text(c.displayName ?: "—", color = Qrme.Txt, fontSize = 14.sp)
+                        Text((c.trade ?: "") + " · " + (c.presence ?: ""), color = Qrme.T2, fontSize = 12.sp)
+                        Text(c.ringing ?: "", color = Qrme.T3, fontSize = 10.sp)
+                        TextButton(onClick = { line = c.ringing }) {
+                            Text(L10n.t("feed.ring", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
+                        }
+                    }
+                    else -> {
+                        Text(c.title ?: "—", color = Qrme.Txt, fontSize = 14.sp)
+                        Text(c.note ?: "", color = Qrme.T3, fontSize = 10.sp)
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                TextButton(onClick = { at = (at - 1).coerceAtLeast(0) }) {
+                    Text(L10n.t("feed.back", vm.language), color = Qrme.T2, fontSize = 12.sp)
+                }
+                TextButton(onClick = {
+                    at = (at + 1).coerceAtMost(cards.size - 1)
+                    val more = cursor
+                    if (more != null && at >= cards.size - 2) {
+                        vm.call({ ApiClient.publicFeed(more) }) { r ->
+                            r.getOrNull()?.let { cards = cards + it.items; cursor = it.cursor }
+                        }
+                    }
+                }) {
+                    Text(L10n.t("feed.next", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
+                }
+            }
+        }
+        // A link somebody was sent, opened by the same rules as the stream.
+        var itemId by remember { mutableStateOf("") }
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(value = itemId, onValueChange = { itemId = it },
+                singleLine = true)
+            TextButton(onClick = {
+                vm.call({ ApiClient.feedItem(itemId) }) { r ->
+                    line = r.getOrNull()?.let { (it.title ?: it.displayName ?: it.id) }
+                }
+            }) {
+                Text(L10n.t("feed.play", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
+            }
+            line?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
+        }
     }
 }
 

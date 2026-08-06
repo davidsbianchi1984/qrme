@@ -22,6 +22,97 @@ const CHROME: Table = {
     ja: "プランを見る", zh: "查看方案", hi: "योजनाएँ देखें",
     ar: "عرض الخطط",
   },
+  "feed.title": {
+    en: "Feed", es: "Muro", fr: "Fil", de: "Feed", pt: "Fluxo",
+    it: "Flusso", ja: "フィード", zh: "动态", hi: "फ़ीड", ar: "التدفّق",
+  },
+  "feed.sub": {
+    en: "what is public, playing, and open right now",
+    es: "lo que es público, se está reproduciendo y está abierto ahora",
+    fr: "ce qui est public, en lecture et ouvert en ce moment",
+    de: "was gerade öffentlich, in Wiedergabe und offen ist",
+    pt: "o que é público, está a passar e está aberto agora",
+    it: "ciò che è pubblico, in riproduzione e aperto adesso",
+    ja: "いま公開され、再生中で、開いているもの",
+    zh: "此刻公开的、正在播放的、开着的",
+    hi: "अभी जो सार्वजनिक है, चल रहा है और खुला है",
+    ar: "ما هو علني ويُعرض ومفتوح الآن",
+  },
+  "feed.empty": {
+    en: "Nothing public yet. Post something to the wall, or open a desk.",
+    es: "Nada público todavía. Publica algo en el muro o abre un mostrador.",
+    fr: "Rien de public pour l'instant. Publiez sur le mur, ou ouvrez un comptoir.",
+    de: "Noch nichts Öffentliches. Poste etwas an die Wand, oder eröffne eine Theke.",
+    pt: "Ainda nada público. Publica algo no mural, ou abre um balcão.",
+    it: "Ancora nulla di pubblico. Pubblica sul muro, o apri un banco.",
+    ja: "まだ公開されたものはありません。ウォールに投稿するか、受付を開いてください。",
+    zh: "还没有公开内容。去墙上发点什么，或者开一个服务台。",
+    hi: "अभी कुछ भी सार्वजनिक नहीं। दीवार पर कुछ पोस्ट करें, या एक डेस्क खोलें।",
+    ar: "لا شيء علني بعد. انشر شيئًا على الحائط، أو افتح مكتبًا.",
+  },
+  "feed.kind.video": {
+    en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo",
+    it: "Video", ja: "動画", zh: "视频", hi: "वीडियो", ar: "فيديو",
+  },
+  "feed.kind.offsite": {
+    en: "Elsewhere", es: "En otro sitio", fr: "Ailleurs", de: "Anderswo",
+    pt: "Noutro sítio", it: "Altrove", ja: "よそのサイト", zh: "站外",
+    hi: "अन्यत्र", ar: "في موقع آخر",
+  },
+  "feed.kind.room": {
+    en: "Live room", es: "Sala en directo", fr: "Salon en direct",
+    de: "Live-Raum", pt: "Sala em direto", it: "Sala dal vivo",
+    ja: "ライブの部屋", zh: "直播房间", hi: "लाइव रूम", ar: "غرفة حيّة",
+  },
+  "feed.kind.desk": {
+    en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Theke", pt: "Balcão",
+    it: "Banco", ja: "受付", zh: "服务台", hi: "डेस्क", ar: "المكتب",
+  },
+  "feed.play": {
+    en: "Play it", es: "Reproducirlo", fr: "Le lire", de: "Abspielen",
+    pt: "Reproduzir", it: "Riproducilo", ja: "再生する", zh: "播放",
+    hi: "चलाएँ", ar: "شغّله",
+  },
+  "feed.enter": {
+    en: "Walk in", es: "Entrar", fr: "Entrer", de: "Hineingehen",
+    pt: "Entrar", it: "Entrare", ja: "入る", zh: "走进去",
+    hi: "अंदर जाएँ", ar: "ادخل",
+  },
+  "feed.ring": {
+    en: "Ring the bell", es: "Tocar el timbre", fr: "Sonner",
+    de: "Klingeln", pt: "Tocar a campainha", it: "Suonare il campanello",
+    ja: "呼び鈴を鳴らす", zh: "按响门铃", hi: "घंटी बजाएँ",
+    ar: "اقرع الجرس",
+  },
+  "feed.room.untitled": {
+    en: "No topic", es: "Sin tema", fr: "Sans sujet", de: "Kein Thema",
+    pt: "Sem tema", it: "Nessun argomento", ja: "話題なし", zh: "无话题",
+    hi: "कोई विषय नहीं", ar: "بلا موضوع",
+  },
+  "feed.desk.live": {
+    en: "camera on", es: "cámara encendida", fr: "caméra allumée",
+    de: "Kamera an", pt: "câmara ligada", it: "telecamera accesa",
+    ja: "カメラ入", zh: "摄像头开着", hi: "कैमरा चालू", ar: "الكاميرا تعمل",
+  },
+  // "Previous", not "Back". The word the shells use for leaving a screen is
+  // `pub.back.short`, and the same English under two keys is exactly what
+  // `test_the_desktop_and_the_phone_say_different_things` exists to catch —
+  // it caught this one. This control moves one card up a stream; it does not
+  // leave anything.
+  "feed.back": {
+    en: "Previous", es: "Anterior", fr: "Précédent", de: "Vorheriges",
+    pt: "Anterior", it: "Precedente", ja: "前へ", zh: "上一个",
+    hi: "पिछला", ar: "السابق",
+  },
+  "feed.next": {
+    en: "Next", es: "Siguiente", fr: "Suivant", de: "Weiter",
+    pt: "Seguinte", it: "Avanti", ja: "次へ", zh: "下一个",
+    hi: "अगला", ar: "التالي",
+  },
+  "nav.feed": {
+    en: "Feed", es: "Muro", fr: "Fil", de: "Feed", pt: "Fluxo",
+    it: "Flusso", ja: "フィード", zh: "动态", hi: "फ़ीड", ar: "التدفّق",
+  },
   "nav.home": {
     en: "Home", es: "Inicio", fr: "Accueil", de: "Start", pt: "Início",
     it: "Home", ja: "ホーム", zh: "主页", hi: "होम", ar: "الرئيسية",

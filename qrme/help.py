@@ -176,6 +176,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                 "run a scenario"),
     "shops": ("a shop", "open a shop", "sell something", "storefront",
               "buy something", "order goods", "place an order", "my orders"),
+    "stream": ("the feed", "the stream", "watch videos", "swipe videos",
+               "live rooms", "browse desks", "what is playing"),
     "corner": ("my homepage", "my page", "edit my page", "top friends",
                "send a message", "message a friend", "my messages",
                "turn off messaging", "my switches"),

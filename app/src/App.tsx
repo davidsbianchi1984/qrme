@@ -43,6 +43,7 @@ import { Grants } from "./screens/Grants";
 import { WatchParty } from "./screens/WatchParty";
 import { Voice } from "./screens/Voice";
 import { Wall } from "./screens/Wall";
+import { Feed } from "./screens/Feed";
 import { Friends } from "./screens/Friends";
 import { Rooms } from "./screens/Rooms";
 import { Blend } from "./screens/Blend";
@@ -57,10 +58,11 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
+  { id: "feed", label: "Feed", icon: "▶" },
   { id: "guide", label: "Show me around", icon: "🧭" },
   { id: "chat", label: "Chat", icon: "💬" },
   { id: "discover", label: "Discover", icon: "🛍" },
@@ -197,6 +199,7 @@ export function App() {
         {tab === "shop" && <Shops onPlans={toPlans} />}
         {tab === "corner" && <Corner onPlans={toPlans} />}
         {tab === "wall" && <Wall onPlans={toPlans} />}
+        {tab === "feed" && <Feed onPlans={() => setTab("plans")} />}
         {tab === "friends" && <Friends onPlans={toPlans} />}
         {tab === "rooms" && <Rooms onPlans={toPlans} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}

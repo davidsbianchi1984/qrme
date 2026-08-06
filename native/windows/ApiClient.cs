@@ -3076,6 +3076,24 @@ public sealed class ApiClient
         Send<LocalProviderRow>(Post("/providers",
             new { name, area, business = true }));
 
+    // -- The public stream --
+
+    /// <summary>One page of the public stream. No token: somebody who
+    /// followed a shared link is a reader like any other.</summary>
+    /// <remarks><c>plays</c> is the server's and is never recomputed here.
+    /// Only footage this deployment holds comes back true, so scrolling past
+    /// an off-site card makes no request to another company's server.</remarks>
+    public Task<FeedPage> PublicFeed(string? cursor = null) =>
+        Send<FeedPage>(Get(string.IsNullOrEmpty(cursor)
+            ? "/feed?limit=12"
+            : $"/feed?limit=12&cursor={cursor}"));
+
+    /// <summary>One card, for a link somebody was sent. A rated item a
+    /// reader is not verified for answers 404 rather than an empty card: a
+    /// 403 would announce that it exists.</summary>
+    public Task<FeedCard> FeedItem(string itemId) =>
+        Send<FeedCard>(Get($"/feed/{itemId}"));
+
     // -- The sticker on the street --
 
     /// <summary>The overlay's read: never the face without the
@@ -4305,6 +4323,35 @@ public record LocalProviderRow(
     [property: JsonPropertyName("area")] string? Area,
     [property: JsonPropertyName("location")] string? Location,
     [property: JsonPropertyName("business")] bool? Business);
+
+public record FeedPage(
+    [property: JsonPropertyName("items")] List<FeedCard>? Items,
+    [property: JsonPropertyName("cursor")] string? Cursor);
+
+/// <summary>One card of the public stream. <c>Plays</c> is the server's
+/// word: false means nothing loads until a person presses it.</summary>
+public record FeedCard(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("reason")] string? Reason,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("note")] string? Note,
+    [property: JsonPropertyName("plays")] bool? Plays,
+    [property: JsonPropertyName("loop")] bool? Loop,
+    [property: JsonPropertyName("src")] string? Src,
+    [property: JsonPropertyName("facade")] FeedFacade? Facade,
+    [property: JsonPropertyName("topic")] string? Topic,
+    [property: JsonPropertyName("entering")] string? Entering,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("trade")] string? Trade,
+    [property: JsonPropertyName("presence")] string? Presence,
+    [property: JsonPropertyName("ringing")] string? Ringing,
+    [property: JsonPropertyName("human")] bool? Human,
+    [property: JsonPropertyName("ai")] bool? Ai);
+
+public record FeedFacade(
+    [property: JsonPropertyName("platform_name")] string? PlatformName,
+    [property: JsonPropertyName("url")] string? Url);
 
 public record BeaconOverlayCard(
     [property: JsonPropertyName("profile_id")] string? ProfileId,

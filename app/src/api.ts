@@ -2841,6 +2841,66 @@ export type SocialBeacon = {
   qr_svg: string;
 };
 
+export interface FeedItem {
+  kind: "video" | "offsite" | "room" | "desk";
+  id: string;
+  reason: string;
+  at: string;
+  /** Decided by the server. The client renders it and never overrides it. */
+  plays: boolean;
+  loop?: boolean;
+  note?: string;
+  /** video */
+  src?: string;
+  profile?: { profile_id: string; name: string };
+  title?: string;
+  said?: string;
+  /** offsite */
+  facade?: { platform: string; platform_name: string; video_id: string;
+             url: string };
+  /** room */
+  topic?: string;
+  channel?: string;
+  people?: number;
+  entering?: string;
+  enter?: string;
+  /** desk */
+  display_name?: string;
+  trade?: string;
+  location?: string | null;
+  blurb?: string | null;
+  presence?: string;
+  rated?: boolean;
+  portrait?: string | null;
+  live?: boolean;
+  human?: boolean;
+  ai?: boolean;
+  ringing?: string;
+  ring?: string;
+  shop?: {
+    shop_id: string; name: string; blurb?: string | null; tag?: string | null;
+    offerings: { id: string; kind: string; title: string; price: number;
+                 currency: string; availability: string }[];
+    open: string;
+  } | null;
+}
+
+/** One page of the public stream. `rules` is the server saying, in words a
+ *  screen can show, what it will and will not play without being asked. */
+export interface FeedPage {
+  items: FeedItem[];
+  cursor: string | null;
+  counts: { video: number; offsite: number; room: number; desk: number };
+  rules: { plays: string; facade: string; public: string };
+}
+
+/** Both parameters are optional and neither is sent empty: `viewer=` would be
+ *  an account id the server then has to decide is not one. */
+const feedQuery = (cursor?: string, viewer?: string) =>
+  new URLSearchParams({
+    ...(cursor ? { cursor } : {}), ...(viewer ? { viewer } : {}),
+  }).toString();
+
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
   // boolean returned. Nothing called it — `healthInfo` below returns the
@@ -3088,6 +3148,24 @@ export const api = {
   listDesks: () =>
     req<{ id: string; display_name: string; trade: string; location?: string;
           blurb?: string; presence: string; rated: number }[]>(`/desks`),
+
+  // -- the feed (qrme/feed.py): one public stream, three kinds of card.
+  //
+  // `plays` is the server's, not ours. Footage this deployment holds comes
+  // back true; anything on somebody else's platform comes back false and
+  // stays a facade until a person presses it, so that scrolling past fifty
+  // cards does not announce the viewer to fifty other companies. The client
+  // reads that flag and never decides it — see the note in qrme/feed.py.
+  // The query is built above rather than inline, and that is not style.
+  // `tests/clientpaths.py` reads these literals to decide which routes have a
+  // door, and its template-literal pattern follows one level of nested braces.
+  // A first draft wrote the `URLSearchParams({ ...(cursor ? { cursor } : {}) })`
+  // straight into the template — three levels deep — and `GET /feed` came back
+  // doorless while the screen calling it was on screen.
+  publicFeed: (cursor?: string, viewer?: string) =>
+    req<FeedPage>(`/feed?${feedQuery(cursor, viewer)}`),
+  publicFeedItem: (id: string) =>
+    req<FeedItem>(`/feed/${encodeURIComponent(id)}`),
 
   // The profile's language: the console chrome follows it (l10n.ts).
   getLanguage: (profileId: string) =>

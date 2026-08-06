@@ -34,6 +34,35 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+            <!-- The public stream: the same rows, ranked for nobody. One card
+                 at a time, and what plays is the server's decision. -->
+            <TextBlock x:Name="StreamTitle" FontSize="18" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="StreamSub" Foreground="{StaticResource QrmeT2Brush}"
+                       FontSize="13" TextWrapping="Wrap" />
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="StreamKind" Foreground="{StaticResource QrmeBrandABrush}"
+                               FontSize="12" FontWeight="Bold" />
+                    <TextBlock x:Name="StreamReason" Foreground="{StaticResource QrmeT3Brush}" FontSize="10" />
+                    <TextBlock x:Name="StreamTitleLine" Foreground="{StaticResource QrmeTxtBrush}"
+                               FontSize="14" TextWrapping="Wrap" />
+                    <!-- Said before the button, because both reach a person. -->
+                    <TextBlock x:Name="StreamSays" Foreground="{StaticResource QrmeT3Brush}"
+                               FontSize="10" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button x:Name="StreamBack" Click="OnStreamBack" />
+                        <Button x:Name="StreamAct" Click="OnStreamAct" />
+                        <Button x:Name="StreamNext" Click="OnStreamNext" />
+                    </StackPanel>
+                    <TextBox x:Name="StreamItemId" />
+                    <Button x:Name="StreamOpen" Click="OnStreamOpen" />
+                    <TextBlock x:Name="StreamLine" Foreground="{StaticResource QrmeT3Brush}"
+                               FontSize="10" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

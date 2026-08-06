@@ -27,7 +27,8 @@ from .pdi_client import PDIClient
 from .routers import (accounts as account_routes,
                       apps, assistant, audience, avatars, commerce,
                       community, connections,
-                      desks, displays, dock, earnings, exchange, feedback,
+                      desks, displays, dock, earnings, exchange,
+                      feed as feed_routes, feedback,
                       friends,
                       gamelobby, gaming,
                       governance,
@@ -51,7 +52,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.48.3",
+    app = FastAPI(title="QRME", version="0.49.0",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -135,6 +136,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(viewfinder_routes.router)
     app.include_router(pages.router)
     app.include_router(wall.router)
+    app.include_router(feed_routes.router)
     app.include_router(exchange.router)
     app.include_router(watchparty.router)
     app.include_router(sharing.router)

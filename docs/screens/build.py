@@ -3554,6 +3554,51 @@ SCREENS = [
         dict(icon="eye", color="green", k="Cards say why",
              s="friends, talked-to, your tags"),
     ], button=("Post", "brand")),
+    # 189-191: the feed. Three screens because the surface makes three
+    # separate claims and a single screenshot of a video player makes none
+    # of them.
+    #
+    # 189 is the stream itself, and its second card is the one that matters:
+    # what plays is decided by who holds the file, not by what would keep
+    # somebody scrolling longest.
+    dict(num=189, title="Feed", sub="Public, playing, open right now",
+         accent="brand", tab=0, cards=[
+        dict(icon="expand", color="brand", k="One card at a time",
+             s="swipe, or the arrow keys"),
+        dict(icon="shield", color="green", k="QRME's own plays",
+             s="anyone else's waits for a press"),
+        dict(icon="headset", color="cyan", k="Live rooms mixed in",
+             s="every fourth card is a place"),
+        dict(icon="bell", color="amber", k="Desks with people",
+             s="ring one, or browse the shop"),
+    ], button=("Next", "brand")),
+    # 190: the facade rule, drawn as a screen because it is invisible in a
+    # working feed and obvious the moment it is gone. Scrolling past fifty
+    # cards should announce the viewer to nobody.
+    dict(num=190, title="What Plays", sub="Who holds the file decides",
+         accent="green", tab=0, cards=[
+        dict(icon="photo", color="green", k="Held here — it loops",
+             s="one server, the one you chose"),
+        dict(icon="lock", color="cyan", k="Held elsewhere — a card",
+             s="a title and a link, nothing else"),
+        dict(icon="finger", color="amber", k="Your press starts it",
+             s="and nothing before that does"),
+        dict(icon="eye", color="brand", k="Every card says why",
+             s="a feed that cannot explain itself"),
+    ], button=("Play it", "brand")),
+    # 191: the two cards that reach a person. Both sentences are rendered
+    # above the button on the real screen, and the order is the point.
+    dict(num=191, title="Rooms & Desks", sub="These reach a human being",
+         accent="amber", tab=0, cards=[
+        dict(icon="headset", color="cyan", k="Walking in puts you in it",
+             s="your mic is off until you turn it on"),
+        dict(icon="bell", color="amber", k="A bell reaches a person",
+             s="not a message they read later"),
+        dict(icon="person", color="green", k="Marked human, never AI",
+             s="the positive claim, attested"),
+        dict(icon="coin", color="gold", k="Buy without leaving",
+             s="the shop rides with the desk"),
+    ], button=("Ring the bell", "amber")),
     # 187: the storefront. The first card is the distinction that named
     # the round — a shop is not a desk — because a screenshot of a store
     # cannot otherwise show what was deliberately left out of it.

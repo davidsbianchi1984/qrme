@@ -4,6 +4,119 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.49.0] — 2026-08-06
+
+### The stream — one card at a time, and who is allowed to play
+
+One public feed a person swipes: a video that loops, a swipe, the next one —
+and mixed into it the two things this product has that a video app does not. A
+**live room you can walk into**, and a **desk with a real person behind it**,
+with the shop behind the desk browsable and buyable without leaving the stream.
+`GET /feed` and `GET /feed/{id}`, both readable without an account, because
+somebody who followed a link from a sticker on a shop window is a reader like
+any other.
+
+#### The line it had to not cross
+
+`post_videos` in `qrme/db.py` has carried the same comment since long before
+this surface existed: *the link and the id, never the file and never a
+thumbnail* — re-hosting somebody's video is a copyright problem and a cached
+thumbnail is a copy of an image nobody granted. It is why a QRME wall renders
+without one request to YouTube.
+
+An endlessly autoplaying stream is the one surface where that promise is
+expensive to keep and cheap to lose. Flick past fifty cards, done the ordinary
+way, and you have announced your address and your taste to fifty companies for
+footage you never chose to watch.
+
+    asked     does the stream play the next thing
+    mattered  does swiping past something tell a stranger you were here
+
+So the rule is drawn on **who holds the file**, and it is drawn on the server
+rather than left to four clients to remember. Footage this deployment holds
+(`media`, `kind='video'`) comes back `plays: true` and loops; everything else
+comes back `plays: false` with a facade — platform name, the poster's own
+title, a link — and makes its first request when somebody presses it.
+`test_an_offsite_video_never_plays_by_itself` asserts that on the wire, where
+every client reads it. It is easy to satisfy today and easy to lose the day a
+console decides autoplay is a nicer default.
+
+#### A room and a desk are people
+
+Every fourth card is a place with somebody in it. Both carry a plain sentence
+*before* the button, because both reach a human being: walking into a live room
+puts you in it with the people already there, and a bell is somebody's
+attention rather than a message they can read later. A desk says `human: true`,
+`ai: false`, and carries its shop's offerings inline.
+
+#### What is public is what somebody made public
+
+Nothing is in the stream by default. A post reaches it only if it is on the
+wall and approved; a desk only if it is not closed; a room only while it is
+active **and** attached to a desk that chose to be found — a room with nobody's
+desk behind it is a private conversation and is not in this stream at any
+ranking. A rated desk is absent rather than blurred for a reader who is not
+verified, and a shared link to one answers `404` rather than `403`, because a
+403 announces that the thing exists. `test_the_feed_never_reads_a_private_table`
+holds the feed's queries to what was published.
+
+### JIM-mini's Feed tab is a door, not a copy
+
+`GET /community/{user_id}/feed` carries the stream into JIM, GET-only by
+construction — no write route on that side and no binding in its console.
+QRME's cards pass through **whole**: re-deriving `plays` in JIM would be a
+second implementation of a one-place rule, wrong the first time QRME changed
+its mind. Its `posture` block gains the line this surface needed — *nothing
+about what was watched is stored here*.
+
+### Screens and lessons
+
+**189 Feed**, **190 What Plays**, **191 Rooms & Desks**, drawn on both
+platforms, with a `stream` lesson in the walkthrough. Two card titles and a
+subtitle were shortened by the generator's own width guard rather than by
+somebody noticing later.
+
+### One more of the family where the measurement was the bug
+
+`GET /feed` came back **doorless** while the screen calling it was on screen.
+The route was reachable; what could not read it was `tests/clientpaths.py`,
+whose template-literal pattern follows one level of nested braces and the first
+draft of the binding wrote `URLSearchParams({ ...(cursor ? { cursor } : {}) })`
+straight into the template — three deep. The fix is in the binding rather than
+the extractor, and the reason is a comment beside it, because the next person
+to write a query inline will hit the same wall. The deep-link binding was wired
+to a real use in the same pass: `#feed/<id>` opens that card first and the
+stream continues under it.
+
+The 0.48.x localization arc caught one too, on its first outing against new
+work: the stream's **Back** was the same English the phones already show under
+`pub.back.short`, translated differently in Chinese and Hindi. It is now
+**Previous** in both consoles, which is also what the control actually does —
+it moves one card up a stream rather than leaving anything. The guard was
+written three rounds ago against strings that had already drifted; this is the
+first time it stopped a drift on the way in.
+
+### The phones, because the record would not let it slide
+
+The first draft of this changelog said the stream had not reached iOS, Android
+or Windows and recorded the two routes as doorless. That was the wrong answer
+and a test said so: the per-shell records reached **zero** at 0.44.2 and
+`test_no_route_in_the_table_lacks_a_door_anywhere` pins them empty, so a new
+route without a door on every shell is a failure rather than a note. The
+friction did its job — the door got built instead.
+
+So the stream is on **all four clients**. The phones read the same `/feed` and
+`/feed/{item_id}`, render the same `plays`, and show `entering` and `ringing`
+before their buttons; the fourteen `feed.*` strings are the console's own rows,
+copied verbatim into the three native tables so the desktop and the phone
+cannot drift apart on a surface that is new to both. What the phones do not yet
+have is the *gesture*: Previous and Next are buttons there. That is stated in
+the screen's own docstring rather than hidden, and the reason is not only
+effort — a stream a person can use only by dragging is one somebody with a
+motor impairment cannot use at all.
+
+Cut together with JIM-mini and PDI at **app-v0.49.0**.
+
 ## [0.48.3] — 2026-08-06
 
 ### Cut together at one version

@@ -151,6 +151,18 @@ data class BeaconCard(val profileId: String, val displayName: String,
                       val portrait: String?, val label: String?,
                       val sharedRoom: Boolean, val openUrl: String?,
                       val ageWall: Boolean)
+data class FeedPage(val items: List<FeedCard>, val cursor: String?)
+/** One card of the public stream. `plays` is the server's word, not this
+ *  client's guess: false means nothing loads until somebody presses it. */
+data class FeedCard(val id: String, val kind: String, val reason: String,
+                    val title: String?, val note: String?,
+                    val plays: Boolean, val loop: Boolean, val src: String?,
+                    val platformName: String?, val url: String?,
+                    val topic: String?, val channel: String?,
+                    val people: Int, val entering: String?,
+                    val displayName: String?, val trade: String?,
+                    val presence: String?, val ringing: String?,
+                    val human: Boolean, val ai: Boolean)
 data class SummonCard(val profileId: String, val displayName: String, val handle: String?,
                       val status: String, val note: String?)
 data class SummonResult(val type: String, val label: String?, val scans: Int?,
@@ -762,6 +774,59 @@ object ApiClient {
             !o.isNull("shared_room"),
             if (o.isNull("open_url")) null else o.optString("open_url", null),
             o.optBoolean("age_wall", false))
+    }
+
+    // ---- the public stream ----
+
+    /**
+     * One page of the public stream. No token: a person who followed a
+     * shared link is a reader like any other.
+     *
+     * `plays` is read, never recomputed. Only footage this deployment holds
+     * comes back true, so scrolling past an off-site card makes no request
+     * to anybody else — `qrme/db.py` has said so about `post_videos` since
+     * long before a stream existed, and a client that decided otherwise
+     * would undo it for everyone on this phone.
+     */
+    suspend fun publicFeed(cursor: String? = null): FeedPage {
+        val tail = if (cursor.isNullOrEmpty()) "" else "&cursor=$cursor"
+        val o = JSONObject(request("/feed?limit=12" + tail))
+        val arr = o.optJSONArray("items")
+        val items = mutableListOf<FeedCard>()
+        for (i in 0 until (arr?.length() ?: 0)) {
+            items.add(feedCard(arr!!.getJSONObject(i)))
+        }
+        return FeedPage(items,
+            if (o.isNull("cursor")) null else o.optString("cursor"))
+    }
+
+    /**
+     * One card, for a link somebody was sent. A rated item a reader is not
+     * verified for answers 404 rather than an empty card: a 403 would
+     * announce that the item exists.
+     */
+    suspend fun feedItem(id: String): FeedCard =
+        feedCard(JSONObject(request("/feed/$id")))
+
+    private fun feedCard(o: JSONObject): FeedCard {
+        val f = o.optJSONObject("facade")
+        return FeedCard(
+            o.optString("id", ""), o.optString("kind", ""),
+            o.optString("reason", ""),
+            if (o.isNull("title")) null else o.optString("title"),
+            if (o.isNull("note")) null else o.optString("note"),
+            o.optBoolean("plays", false), o.optBoolean("loop", false),
+            if (o.isNull("src")) null else o.optString("src"),
+            f?.optString("platform_name"), f?.optString("url"),
+            if (o.isNull("topic")) null else o.optString("topic"),
+            if (o.isNull("channel")) null else o.optString("channel"),
+            o.optInt("people", 0),
+            if (o.isNull("entering")) null else o.optString("entering"),
+            if (o.isNull("display_name")) null else o.optString("display_name"),
+            if (o.isNull("trade")) null else o.optString("trade"),
+            if (o.isNull("presence")) null else o.optString("presence"),
+            if (o.isNull("ringing")) null else o.optString("ringing"),
+            o.optBoolean("human", false), o.optBoolean("ai", false))
     }
 
     // ---- live desks ----

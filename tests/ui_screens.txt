@@ -1,4 +1,4 @@
-# status: floor — 54 rows
+# status: floor — 55 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -102,6 +102,7 @@ Simulate        143
 Wall            186
 Shops           187
 Corner          188
+Feed            189,190,191
 ProviderTiles   22
 
 Problems        150
