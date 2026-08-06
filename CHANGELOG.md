@@ -4,6 +4,27 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.50.0] — 2026-08-06
+
+### Cut together at one version
+
+The three products are cut at one version, so this release exists here to keep
+that true. **No code changes in this repo this round.**
+
+The round's work is JIM-mini's: its coach gains a **presence** — the half that
+speaks first rather than waiting to be asked, modelled on the operating system
+in *Her* and deliberate about which parts of that are worth having.
+
+One thing there is QRME's business, because QRME is what it reaches into.
+`GET /presence/{user_id}/reach` hands somebody this platform's live rooms,
+staffed desks and synthetic profiles as **offers** — nothing joined, no bell
+rung on anybody's behalf, and no health context crossing over: the offer names
+an area, never a condition. That is the same posture the community door and
+the feed already keep, applied to a surface whose whole purpose is to suggest
+people, which is exactly where it would have been easiest to loosen.
+
+Cut together with JIM-mini and PDI at **app-v0.50.0**.
+
 ## [0.49.0] — 2026-08-06
 
 ### The stream — one card at a time, and who is allowed to play
