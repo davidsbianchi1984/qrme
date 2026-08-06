@@ -4,6 +4,48 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.46.7] — 2026-08-06
+
+### Two cards, done on two shells out of three
+
+`WhoWroteThisCard` and `ObjectToAProfileCard` — the pair a person contesting
+a profile reaches — were localized on iOS and Windows last release and left
+in English on Android.
+
+Not a scope decision: **every key they needed already existed**, so the fix
+cost zero new rows. The cause is where the code sits. Android's cards live
+five thousand lines from the screen that calls them, so working "the Settings
+screen" never touched them, and the changelog two releases ago says *all
+three shells or none* in as many words.
+
+### Signatures and Voice, on all three
+
+**470 → 368.** iOS 171 → 133, Android 128 → 96, Windows 171 → 139. Sixty
+rows, written once and generated into Swift, Kotlin and C#.
+
+### One promise, two wordings
+
+The voice consent copy said *the recording stays on this device* on the
+phones and *stays on this machine* on the desktop. Same assurance about where
+a recording of somebody's voice lives, stated twice. One row now — the third
+round running that this shape has turned up, and the one where it mattered
+most.
+
+Windows also had the attestation itself — *I attest this is accurate and
+complete* — as the literal default text of the box a person is agreeing with.
+It is looked up now, so the sentence somebody signs is in the language they
+read.
+
+### A check that was wrong about names
+
+The English-leak check flagged `Digital Asset Links`, `webauthn.dll`, `Edge`,
+`Windows Hello` and `WebAuthn` as untranslated English sitting inside the
+Japanese and Chinese rows. They are product and specification names; they
+stay English in every language. The check exists to catch a sentence somebody
+forgot to translate, not a name that has no translation.
+
+Cut together with JIM-mini and PDI at app-v0.46.7.
+
 ## [0.46.6] — 2026-08-05
 
 ### The rest of Settings, and Community

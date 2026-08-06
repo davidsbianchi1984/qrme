@@ -12,16 +12,16 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="1 · Permission" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="Step1" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="ConsentText" TextWrapping="Wrap" FontSize="12"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="Nothing is recorded until you say so. QRME will only learn your own voice — there is no path here for anybody else's." />
-                    <Button x:Name="GrantButton" Content="This is my own voice — allow enrollment"
+                               x:Name="NothingNote" />
+                    <Button x:Name="GrantButton"
                             Click="OnGrant"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <Button x:Name="RevokeButton" Visibility="Collapsed" Click="OnRevoke"
-                            Content="Withdraw consent — delete the samples, retire the voice"
+                            x:Name="WithdrawButton"
                             Background="{StaticResource QrmeRedBrush}" Foreground="White" />
                     <TextBlock x:Name="RevokedText" FontSize="11" Visibility="Collapsed"
                                TextWrapping="Wrap" Foreground="{StaticResource QrmeAmberBrush}" />
@@ -33,13 +33,13 @@
                     Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="2 · Enrollment" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="Step2" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock TextWrapping="Wrap" FontSize="12"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="Start recording and talk normally — a sentence or two about your day is better material than a read-aloud paragraph." />
+                               x:Name="TapNote" />
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Button x:Name="RecordButton" Content="Record a sample" Click="OnRecord"
+                        <Button x:Name="RecordButton" Click="OnRecord"
                                 Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                         <TextBlock x:Name="ElapsedText" FontSize="15" FontWeight="Bold"
                                    VerticalAlignment="Center" Visibility="Collapsed"
@@ -55,7 +55,7 @@
                                Foreground="{StaticResource QrmeT3Brush}" />
                     <TextBlock FontSize="10" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT3Brush}"
-                               Text="The recording stays on this machine. Only its length and turn count are sent." />
+                               x:Name="StaysNote" />
                 </StackPanel>
             </Border>
 
@@ -64,16 +64,16 @@
                     Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="3 · The voice" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="Step3" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="PrintText" FontSize="11" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT3Brush}" />
-                    <Button x:Name="BuildButton" Content="Build my voiceprint" Click="OnBuild"
+                    <Button x:Name="BuildButton" Click="OnBuild"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <StackPanel x:Name="SpeakPanel" Visibility="Collapsed" Spacing="8">
-                        <TextBox x:Name="SayBox" Header="Say something in it"
+                        <TextBox x:Name="SayBox"
                                  AcceptsReturn="True" TextWrapping="Wrap" Height="70" />
-                        <Button Content="Speak" Click="OnSpeak"
+                        <Button x:Name="SpeakButton" Click="OnSpeak"
                                 Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                         <TextBlock x:Name="BasisText" FontSize="11" TextWrapping="Wrap"
                                    Foreground="{StaticResource QrmeT2Brush}" />
@@ -86,14 +86,14 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="6">
-                    <TextBlock Text="What always holds" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="HoldsHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}"
-                               Text="· Anything spoken in this voice carries a watermark and says it is synthesized." />
+                               x:Name="HoldsMark" />
                     <TextBlock FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}"
-                               Text="· Only your own voice — the permission is an attestation, not a checkbox." />
+                               x:Name="HoldsOwn" />
                     <TextBlock FontSize="11" TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}"
-                               Text="· Withdrawing deletes the samples and silences the voice; the withdrawal stays on record." />
+                               x:Name="HoldsWithdraw" />
                     <TextBlock x:Name="DisclosureText" FontSize="10" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT3Brush}" />
                 </StackPanel>

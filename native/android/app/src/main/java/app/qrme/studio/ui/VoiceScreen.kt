@@ -112,13 +112,14 @@ fun VoiceScreen(vm: StudioViewModel) {
     screenScroll {
         // ---- 802: the permission, before anything is collected ----
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("1 · Permission", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("nvoi.step1", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
             if (consented) {
-                Text("Granted for ${consent!!.sources.joinToString(", ")}" +
+                Text(L10n.fill("nvoi.granted", vm.language,
+                        mapOf("sources" to consent!!.sources.joinToString(", "))) +
                      (consent.grantedAt?.let { " · ${it.take(10)}" } ?: ""),
                     color = Qrme.T2, fontSize = 12.sp)
-                Pill("Withdraw consent — delete the samples, retire the voice",
+                Pill(L10n.t("nvoi.withdraw", vm.language),
                     Qrme.Red, enabled = !busy) {
                     val pid = vm.pid ?: return@Pill
                     val token = vm.token ?: return@Pill
@@ -129,14 +130,14 @@ fun VoiceScreen(vm: StudioViewModel) {
                     }
                 }
                 revocation?.let {
-                    Text("${it.samplesDeleted} sample(s) deleted. ${it.note}",
+                    Text(L10n.fill("nvoi.deleted", vm.language,
+                            mapOf("n" to it.samplesDeleted.toString(), "note" to it.note)),
                         color = Qrme.Amber, fontSize = 11.sp)
                 }
             } else {
-                Text("Nothing is recorded until you say so. QRME will only learn " +
-                     "your own voice — there is no path here for anybody else's.",
+                Text(L10n.t("nvoi.nothing", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
-                Pill("This is my own voice — allow enrollment", Qrme.BrandA,
+                Pill(L10n.t("nvoi.attest", vm.language), Qrme.BrandA,
                     enabled = !busy) {
                     val pid = vm.pid ?: return@Pill
                     val token = vm.token ?: return@Pill
@@ -151,10 +152,9 @@ fun VoiceScreen(vm: StudioViewModel) {
         if (consented) {
             // ---- 806/808/810: samples, and what they amount to ----
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("2 · Enrollment", color = Qrme.Txt, fontSize = 16.sp,
+                Text(L10n.t("nvoi.step2", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                     fontWeight = FontWeight.Bold)
-                Text("Tap record and talk normally — a sentence or two about your " +
-                     "day is better material than a read-aloud paragraph.",
+                Text(L10n.t("nvoi.tap", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
 
                 Row(verticalAlignment = Alignment.CenterVertically,
@@ -186,15 +186,16 @@ fun VoiceScreen(vm: StudioViewModel) {
                     }
                 }
                 if (!micGranted) {
-                    Text("Microphone access is off for QRME — recording asks for " +
-                         "it the first time.", color = Qrme.T3, fontSize = 11.sp)
+                    Text(L10n.t("nvoi.micoff", vm.language), color = Qrme.T3, fontSize = 11.sp)
                 }
 
                 enrol?.let { e ->
                     Row(Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween) {
                         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                            Text("${e.samples} sample(s) · %.1fs".format(e.seconds),
+                            Text(L10n.fill("nvoi.samples", vm.language,
+                                mapOf("n" to e.samples.toString(),
+                                      "secs" to "%.1fs".format(e.seconds))),
                                 color = Qrme.Txt, fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold)
                             Text(turnLine(e) + " · needs ${e.wantSamples} samples " +
@@ -206,24 +207,25 @@ fun VoiceScreen(vm: StudioViewModel) {
                             fontSize = 11.sp, fontWeight = FontWeight.Bold)
                     }
                     if (!e.ready && e.needs.isNotEmpty()) {
-                        Text("Still wants: ${e.needs.joinToString(", ")}.",
+                        Text(L10n.fill("nvoi.needs", vm.language,
+                                mapOf("needs" to e.needs.joinToString(", "))),
                             color = Qrme.T2, fontSize = 11.sp)
                     }
                     Text(e.method, color = Qrme.T3, fontSize = 10.sp)
                 }
-                Text("The recording stays on this device. Only its length and " +
-                     "turn count are sent.", color = Qrme.T3, fontSize = 10.sp)
+                Text(L10n.t("nvoi.stays", vm.language), color = Qrme.T3, fontSize = 10.sp)
             }
 
             // ---- 812: the print, and speaking with it ----
             Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("3 · The voice", color = Qrme.Txt, fontSize = 16.sp,
+                Text(L10n.t("nvoi.step3", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                     fontWeight = FontWeight.Bold)
                 if (print != null && print.active) {
-                    Text("Built ${print.builtAt?.take(10) ?: "—"} · ${print.id}",
+                    Text(L10n.fill("nvoi.built", vm.language,
+                            mapOf("date" to (print.builtAt?.take(10) ?: "—"))) + " · ${print.id}",
                         color = Qrme.T3, fontSize = 10.sp)
-                    labeledField("Say something in it", say, "…") { say = it }
-                    Pill("Speak", Qrme.BrandA, enabled = !busy && say.isNotBlank()) {
+                    labeledField(L10n.t("nvoi.say", vm.language), say, "…") { say = it }
+                    Pill(L10n.t("nvoi.speak", vm.language), Qrme.BrandA, enabled = !busy && say.isNotBlank()) {
                         val pid = vm.pid ?: return@Pill
                         val token = vm.token ?: return@Pill
                         busy = true; error = null
@@ -241,15 +243,14 @@ fun VoiceScreen(vm: StudioViewModel) {
                              "Enough of your voice is on record — mint the voiceprint."
                          else "Record a few more samples first.",
                         color = Qrme.T2, fontSize = 12.sp)
-                    Pill("Build my voiceprint", Qrme.BrandA,
+                    Pill(L10n.t("nvoi.build", vm.language), Qrme.BrandA,
                         enabled = !busy && enrol?.ready == true) {
                         val pid = vm.pid ?: return@Pill
                         val token = vm.token ?: return@Pill
                         act { ApiClient.buildVoiceprint(pid, token) }
                     }
                     if (print != null && !print.active) {
-                        Text("A previous voiceprint was retired when consent was " +
-                             "withdrawn. That record stays.",
+                        Text(L10n.t("nvoi.retired", vm.language),
                             color = Qrme.T3, fontSize = 10.sp)
                     }
                 }
@@ -257,13 +258,12 @@ fun VoiceScreen(vm: StudioViewModel) {
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text("What always holds", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("nvoi.holds", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
-            listOf(
-                "Anything spoken in this voice carries a watermark and says it is synthesized.",
-                "Only your own voice — the permission is an attestation, not a checkbox.",
-                "Withdrawing deletes the samples and silences the voice; the withdrawal stays on record.",
-            ).forEach { Text("· $it", color = Qrme.T2, fontSize = 11.sp) }
+            // The bullet lives in the row rather than being prepended here:
+            // an RTL reader gets it on the correct side that way.
+            listOf("nvoi.holds.mark", "nvoi.holds.own", "nvoi.holds.withdraw")
+                .forEach { Text(L10n.t(it, vm.language), color = Qrme.T2, fontSize = 11.sp) }
             status?.disclosure?.takeIf { it.isNotBlank() }?.let {
                 Text(it, color = Qrme.T3, fontSize = 10.sp)
             }

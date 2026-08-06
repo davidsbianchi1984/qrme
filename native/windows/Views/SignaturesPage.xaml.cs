@@ -42,7 +42,29 @@ public sealed partial class SignaturesPage : Page
     private string _pendingChallenge = "";
     private bool _wired;
 
-    public SignaturesPage() => InitializeComponent();
+    public SignaturesPage()
+    {
+        InitializeComponent();
+        var lang = AppState.Current.Language;
+        HelloHead.Text = L10n.T("nsig.hello", lang);
+        CeremonyNote.Text = L10n.T("nsig.ceremony.win", lang);
+        DocumentBox.Header = L10n.T("nsig.signing", lang);
+        MeaningBox.Header = L10n.T("nsig.means", lang);
+        // The default was the attestation itself, in English, sitting in the
+        // box a person is agreeing with.
+        MeaningBox.Text = L10n.T("nsig.attest", lang);
+        EnrollButton.Content = L10n.T("nsig.register", lang);
+        SignButton.Content = L10n.T("nsig.sign", lang);
+        CredsHead.Text = L10n.T("nsig.creds.yours", lang);
+        NoCredsNote.Text = L10n.T("nsig.none", lang);
+        LookupHead.Text = L10n.T("nsig.lookup", lang);
+        SignatureIdBox.Header = L10n.T("nsig.sigid", lang);
+        FetchButton.Content = L10n.T("nsig.fetch", lang);
+        VerifyHead.Text = L10n.T("nsig.verify.other", lang);
+        EvidenceNote.Text = L10n.T("nsig.evidence.sub", lang);
+        PackageBox.Header = L10n.T("nsig.evidence", lang);
+        VerifyButton.Content = L10n.T("nsig.verify", lang);
+    }
 
     /// <summary>
     /// Start one ceremony in the embedded browser and hand the result to

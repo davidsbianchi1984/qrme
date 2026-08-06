@@ -67,10 +67,10 @@ struct VoiceView: View {
 
     private var permission: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("1 · Permission").font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("nvoi.step1", state.language)).font(.headline).foregroundStyle(Theme.txt)
             if consented {
                 Text(grantLine).font(.caption).foregroundStyle(Theme.t2)
-                Button("Withdraw consent — delete the samples, retire the voice") {
+                Button(L10n.t("nvoi.withdraw", state.language)) {
                     act { revocation = try await ApiClient.shared
                         .revokeVoiceprint(id: profileId, token: token) }
                 }
@@ -79,15 +79,15 @@ struct VoiceView: View {
                 .background(Theme.red).clipShape(Capsule())
                 .disabled(busy)
                 if let revocation {
-                    Text("\(revocation.samples_deleted) sample(s) deleted. \(revocation.note)")
+                    Text(L10n.fill("nvoi.deleted", state.language,
+                                   ["n": "\(revocation.samples_deleted)",
+                                    "note": revocation.note]))
                         .font(.caption2).foregroundStyle(Theme.amber)
                 }
             } else {
-                Text("Nothing is recorded until you say so. QRME will only "
-                     + "learn your own voice — there is no path here for "
-                     + "anybody else's.")
+                Text(L10n.t("nvoi.nothing", state.language))
                     .font(.caption).foregroundStyle(Theme.t2)
-                Button("This is my own voice — allow enrollment") {
+                Button(L10n.t("nvoi.attest", state.language)) {
                     act {
                         status = try await ApiClient.shared.grantVoiceConsent(
                             id: profileId, token: token,
@@ -107,9 +107,8 @@ struct VoiceView: View {
 
     private var enrollment: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("2 · Enrollment").font(.headline).foregroundStyle(Theme.txt)
-            Text("Tap record and talk normally — a sentence or two about your "
-                 + "day is better material than a read-aloud paragraph.")
+            Text(L10n.t("nvoi.step2", state.language)).font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("nvoi.tap", state.language))
                 .font(.caption).foregroundStyle(Theme.t2)
 
             HStack(spacing: 12) {
@@ -132,7 +131,9 @@ struct VoiceView: View {
             if let e = status?.enrollment {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("\(e.samples) sample(s) · \(String(format: "%.1f", e.seconds))s")
+                        Text(L10n.fill("nvoi.samples", state.language,
+                              ["n": "\(e.samples)",
+                               "secs": String(format: "%.1fs", e.seconds)]))
                             .font(.subheadline.bold()).foregroundStyle(Theme.txt)
                         Text(turnLine(e) + " · needs \(e.threshold.samples) samples and "
                              + "\(String(format: "%.0f", e.threshold.seconds))s")
@@ -144,14 +145,14 @@ struct VoiceView: View {
                         .foregroundStyle(e.ready ? Theme.green : Theme.amber)
                 }
                 if !e.ready, !e.needs.isEmpty {
-                    Text("Still wants: \(e.needs.joined(separator: ", ")).")
+                    Text(L10n.fill("nvoi.needs", state.language,
+                              ["needs": e.needs.joined(separator: ", ")]))
                         .font(.caption2).foregroundStyle(Theme.t2)
                 }
                 Text(e.method).font(.caption2).foregroundStyle(Theme.t3)
             }
 
-            Text("The recording stays on this device. Only its length and turn "
-                 + "count are sent.")
+            Text(L10n.t("nvoi.stays", state.language))
                 .font(.caption2).foregroundStyle(Theme.t3)
         }
         .card()
@@ -161,16 +162,16 @@ struct VoiceView: View {
 
     private var voiceprint: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("3 · The voice").font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("nvoi.step3", state.language)).font(.headline).foregroundStyle(Theme.txt)
             if let p = status?.voiceprint, p.active {
                 Text(builtLine).font(.caption2).foregroundStyle(Theme.t3)
-                TextField("Say something in it", text: $say, axis: .vertical)
+                TextField(L10n.t("nvoi.say", state.language), text: $say, axis: .vertical)
                     .lineLimit(2...4)
                     .font(.subheadline).foregroundStyle(Theme.txt)
                     .padding(10)
                     .background(Theme.scrBot)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                Button("Speak") {
+                Button(L10n.t("nvoi.speak", state.language)) {
                     act {
                         spoken = try await ApiClient.shared.speakInVoice(
                             id: profileId, token: token, text: say)
@@ -192,7 +193,7 @@ struct VoiceView: View {
                      ? "Enough of your voice is on record — mint the voiceprint."
                      : "Record a few more samples first.")
                     .font(.caption).foregroundStyle(Theme.t2)
-                Button("Build my voiceprint") {
+                Button(L10n.t("nvoi.build", state.language)) {
                     act {
                         status = try await ApiClient.shared
                             .buildVoiceprint(id: profileId, token: token)
@@ -203,8 +204,7 @@ struct VoiceView: View {
                 .background(Theme.brandA).clipShape(Capsule())
                 .disabled(busy || status?.enrollment?.ready != true)
                 if let p = status?.voiceprint, !p.active {
-                    Text("A previous voiceprint was retired when consent was "
-                         + "withdrawn. That record stays.")
+                    Text(L10n.t("nvoi.retired", state.language))
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }
             }
@@ -214,7 +214,7 @@ struct VoiceView: View {
 
     private var invariants: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("What always holds").font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("nvoi.holds", state.language)).font(.headline).foregroundStyle(Theme.txt)
             ForEach([
                 "Anything spoken in this voice carries a watermark and says it is synthesized.",
                 "Only your own voice — the permission is an attestation, not a checkbox.",

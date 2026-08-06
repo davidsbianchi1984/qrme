@@ -12,20 +12,19 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Sign with Windows Hello" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="HelloHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock TextWrapping="Wrap" FontSize="12"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="The ceremony runs in an embedded browser rather than through webauthn.dll interop — Edge already talks to Windows Hello, and nothing here has to marshal a struct by hand. It needs the deployment served over HTTPS on its own domain: WebAuthn refuses a mismatched relying party." />
-                    <TextBox x:Name="DocumentBox" Header="What you are signing"
+                               x:Name="CeremonyNote" />
+                    <TextBox x:Name="DocumentBox"
                              AcceptsReturn="True" TextWrapping="Wrap" Height="90" />
-                    <TextBox x:Name="MeaningBox" Header="What your signature means"
-                             Text="I attest this is accurate and complete" />
+                    <TextBox x:Name="MeaningBox" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Content="Register this device" Click="OnEnroll"
+                        <Button x:Name="EnrollButton" Click="OnEnroll"
                                 Background="{StaticResource QrmeCardBrush}"
                                 Foreground="{StaticResource QrmeTxtBrush}" />
-                        <Button x:Name="SignButton" Content="Sign" Click="OnSign"
+                        <Button x:Name="SignButton" Click="OnSign"
                                 Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     </StackPanel>
                     <TextBlock x:Name="CeremonyStatus" FontSize="12" TextWrapping="Wrap"
@@ -40,7 +39,7 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Your signing credentials" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="CredsHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <ItemsControl x:Name="CredentialList">
                         <ItemsControl.ItemTemplate>
@@ -60,17 +59,17 @@
                     </ItemsControl>
                     <TextBlock x:Name="CredentialsEmpty" FontSize="12" Visibility="Collapsed"
                                TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}"
-                               Text="No signing credentials enrolled for this account yet." />
+                               x:Name="NoCredsNote" />
                 </StackPanel>
             </Border>
 
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Look up a signature" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="LookupHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBox x:Name="SignatureIdBox" Header="Signature id" PlaceholderText="sig_…" />
-                    <Button Content="Fetch and re-verify" Click="OnFetch"
+                    <TextBox x:Name="SignatureIdBox" PlaceholderText="sig_…" />
+                    <Button x:Name="FetchButton" Click="OnFetch"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <TextBlock x:Name="VerdictText" FontSize="14" FontWeight="Bold"
                                Visibility="Collapsed" TextWrapping="Wrap" />
@@ -86,14 +85,14 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="Verify a package from elsewhere" FontWeight="Bold" FontSize="16"
+                    <TextBlock x:Name="VerifyHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock TextWrapping="Wrap" FontSize="12"
                                Foreground="{StaticResource QrmeT2Brush}"
-                               Text="Paste an evidence package a counterparty handed you. It is checked against its own contents — no account, no lookup, no trust in this deployment beyond the arithmetic." />
-                    <TextBox x:Name="PackageBox" Header="Evidence package (JSON)"
+                               x:Name="EvidenceNote" />
+                    <TextBox x:Name="PackageBox"
                              AcceptsReturn="True" TextWrapping="Wrap" Height="120" />
-                    <Button Content="Verify" Click="OnVerifyPackage"
+                    <Button x:Name="VerifyButton" Click="OnVerifyPackage"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <TextBlock x:Name="PackageVerdict" FontSize="13" FontWeight="Bold"
                                Visibility="Collapsed" TextWrapping="Wrap" />

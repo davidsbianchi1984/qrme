@@ -9,6 +9,7 @@ import SwiftUI
 /// stores that exact text alongside the signature, so a dispute reproduces the
 /// screen rather than arguing about it.
 struct SignatureView: View {
+    @EnvironmentObject var state: AppState
     let profileId: String
     let token: String
 
@@ -30,16 +31,17 @@ struct SignatureView: View {
 
     var body: some View {
         List {
-            Section("Signing credentials") {
+            Section(L10n.t("nsig.creds", state.language)) {
                 if credentials.isEmpty {
-                    Text("None yet. A signature needs a passkey bound to this account.")
+                    Text(L10n.t("nsig.none", state.language))
                         .font(.footnote).foregroundStyle(.secondary)
                 }
                 ForEach(credentials) { c in
                     VStack(alignment: .leading, spacing: 3) {
                         Text(c.display_name ?? c.credential_id)
                             .font(.subheadline.weight(.semibold))
-                        Text("verified at enrolment: \(c.proofing_level)")
+                        Text(L10n.fill("nsig.proofing", state.language,
+                                       ["level": L10n.t("nsig.level.\(c.proofing_level)", state.language)]))
                             .font(.caption).foregroundStyle(.secondary)
                         // Surfaced rather than buried: a syncable passkey lives
                         // on every device in the user's cloud account, which is
@@ -49,7 +51,9 @@ struct SignatureView: View {
                              : "syncable — exists on your other devices")
                             .font(.caption2)
                             .foregroundStyle(c.device_bound ? .green : .orange)
-                        Text("can sign: \(c.can_sign.joined(separator: ", "))")
+                        Text(L10n.fill("nsig.cansign", state.language, ["levels":
+                            c.can_sign.map { L10n.t("nsig.level.\($0)", state.language) }
+                                     .joined(separator: ", ")]))
                             .font(.caption2).foregroundStyle(.secondary)
 
                         // The screen enrolled these and could not take one
@@ -61,39 +65,34 @@ struct SignatureView: View {
                         Button(role: .destructive) {
                             revoking = c.credential_id
                         } label: {
-                            Text("Revoke this credential").font(.caption)
+                            Text(L10n.t("nsig.revoke.this", state.language)).font(.caption)
                         }
                         .disabled(busy)
                     }
                 }
-                Button("Enrol a passkey") { Task { await enrol() } }
+                Button(L10n.t("nsig.enrol", state.language)) { Task { await enrol() } }
                     .disabled(busy)
             }
 
-            Section("What you are signing") {
-                TextField("The document text", text: $document, axis: .vertical)
+            Section(L10n.t("nsig.signing", state.language)) {
+                TextField(L10n.t("nsig.doc", state.language), text: $document, axis: .vertical)
                     .lineLimit(3...8)
-                TextField("What your signature means", text: $meaning, axis: .vertical)
+                TextField(L10n.t("nsig.means", state.language), text: $meaning, axis: .vertical)
                 Picker("Assurance", selection: $tier) {
-                    Text("basic").tag("basic")
-                    Text("standard").tag("standard")
-                    Text("high").tag("high")
+                    Text(L10n.t("nsig.level.basic", state.language)).tag("basic")
+                    Text(L10n.t("nsig.level.standard", state.language)).tag("standard")
+                    Text(L10n.t("nsig.level.high", state.language)).tag("high")
                 }
-                Text("This exact text is hashed into the challenge and stored "
-                     + "with the signature. The system prompt cannot show it — "
-                     + "no passkey prompt can — so read it here.")
+                Text(L10n.t("nsig.hashed", state.language))
                     .font(.caption2).foregroundStyle(.secondary)
-                Text("Standard and high need an identity check beyond a "
-                     + "passkey — that is what the tier buys. Until one is "
-                     + "recorded against your credential, only basic will "
-                     + "sign.")
+                Text(L10n.t("nsig.tiers", state.language))
                     .font(.caption2).foregroundStyle(.secondary)
-                Button("Sign with Face ID") { Task { await sign() } }
+                Button(L10n.t("nsig.faceid", state.language)) { Task { await sign() } }
                     .disabled(busy || document.isEmpty || meaning.isEmpty)
             }
 
             if let receipt {
-                Section("Signed") {
+                Section(L10n.t("nsig.signed", state.language)) {
                     Label(receipt.verification.valid ? "Verifies" : "Does not verify",
                           systemImage: receipt.verification.valid
                           ? "checkmark.seal.fill" : "xmark.seal.fill")
@@ -108,7 +107,7 @@ struct SignatureView: View {
             }
 
             if let policy {
-                Section("Standard") {
+                Section(L10n.t("nsig.level.standard", state.language)) {
                     Text(policy.standard).font(.caption2).foregroundStyle(.secondary)
                 }
             }
@@ -118,27 +117,22 @@ struct SignatureView: View {
             }
 
             Section {
-                Text("Passkeys are bound to a verified domain. Against a LAN "
-                     + "dev server there is no such domain, so signing works "
-                     + "only on a deployment with associated domains "
-                     + "configured — see docs/signatures.md.")
+                Text(L10n.t("nsig.domain", state.language))
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }
         .confirmationDialog("Revoke this credential?",
                            isPresented: .constant(revoking != nil),
                            titleVisibility: .visible) {
-            Button("Revoke", role: .destructive) {
+            Button(L10n.t("nsig.revoke", state.language), role: .destructive) {
                 if let id = revoking { Task { await revoke(id) } }
                 revoking = nil
             }
-            Button("Keep it", role: .cancel) { revoking = nil }
+            Button(L10n.t("nsig.keep", state.language), role: .cancel) { revoking = nil }
         } message: {
-            Text("Signatures already made stay valid and stay in the audit "
-                 + "trail. This stops the credential being used again — which "
-                 + "is what you want if the device holding it is gone.")
+            Text(L10n.t("nsig.revoked.note", state.language))
         }
-        .navigationTitle("Signatures")
+        .navigationTitle(L10n.t("nsig", state.language))
         .task { await load() }
     }
 

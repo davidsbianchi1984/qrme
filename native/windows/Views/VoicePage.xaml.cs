@@ -42,6 +42,32 @@ public sealed partial class VoicePage : Page
         InitializeComponent();
         _ticker.Tick += (_, _) =>
             ElapsedText.Text = $"{_clock.Elapsed.TotalSeconds:F0}s";
+        Localize();
+    }
+
+    /// Every visible string on this page, from the table. The consent copy
+    /// said "stays on this machine" where the phones said "stays on this
+    /// device" — the same promise about where a recording lives, worded twice.
+    /// One row now, and this page says what they say.
+    private void Localize()
+    {
+        var lang = AppState.Current.Language;
+        Step1.Text = L10n.T("nvoi.step1", lang);
+        Step2.Text = L10n.T("nvoi.step2", lang);
+        Step3.Text = L10n.T("nvoi.step3", lang);
+        NothingNote.Text = L10n.T("nvoi.nothing", lang);
+        GrantButton.Content = L10n.T("nvoi.attest", lang);
+        TapNote.Text = L10n.T("nvoi.tap", lang);
+        RecordButton.Content = L10n.T("nvoi.record", lang);
+        StaysNote.Text = L10n.T("nvoi.stays", lang);
+        BuildButton.Content = L10n.T("nvoi.build", lang);
+        SayBox.Header = L10n.T("nvoi.say", lang);
+        SpeakButton.Content = L10n.T("nvoi.speak", lang);
+        WithdrawButton.Content = L10n.T("nvoi.withdraw", lang);
+        HoldsHead.Text = L10n.T("nvoi.holds", lang);
+        HoldsOwn.Text = L10n.T("nvoi.holds.own", lang);
+        HoldsMark.Text = L10n.T("nvoi.holds.mark", lang);
+        HoldsWithdraw.Text = L10n.T("nvoi.holds.withdraw", lang);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Load();

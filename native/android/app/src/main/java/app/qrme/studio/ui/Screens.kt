@@ -2384,17 +2384,18 @@ private fun SignaturePanel(vm: StudioViewModel) {
 
     screenScroll {
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Signing credentials", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("nsig.creds", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
             if (credentials.isEmpty()) {
-                Text("None yet. A signature needs a passkey bound to this account.",
+                Text(L10n.t("nsig.none", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
             }
             credentials.forEach { c ->
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(c.displayName ?: c.credentialId, color = Qrme.Txt,
                         fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text("verified at enrolment: ${c.proofingLevel}",
+                    Text(L10n.fill("nsig.proofing", vm.language, mapOf("level" to
+                            L10n.t("nsig.level.${c.proofingLevel}", vm.language))),
                         color = Qrme.T2, fontSize = 11.sp)
                     // Surfaced rather than buried: a syncable passkey lives on
                     // every device in the user's cloud account, which is a
@@ -2404,11 +2405,12 @@ private fun SignaturePanel(vm: StudioViewModel) {
                         else "syncable — exists on your other devices",
                         color = if (c.deviceBound) Qrme.Green else Qrme.Red,
                         fontSize = 11.sp)
-                    Text("can sign: ${c.canSign.joinToString(", ")}",
+                    Text(L10n.fill("nsig.cansign", vm.language, mapOf("levels" to
+                            c.canSign.joinToString(", ") { L10n.t("nsig.level.$it", vm.language) })),
                         color = Qrme.T3, fontSize = 10.sp)
                 }
             }
-            SmallAction("Enrol a passkey") {
+            SmallAction(L10n.t("nsig.enrol", vm.language)) {
                 val token = vm.token ?: return@SmallAction
                 error = null; busy = true
                 scope.launch {
@@ -2427,15 +2429,11 @@ private fun SignaturePanel(vm: StudioViewModel) {
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("What you are signing", color = Qrme.Txt, fontSize = 16.sp,
+            Text(L10n.t("nsig.signing", vm.language), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)
-            labeledField("Document", document, "the text being signed") { document = it }
-            labeledField("Meaning", meaning, "what your signature attests") { meaning = it }
-            Text("This exact text is hashed into the challenge and stored with "
-                + "the signature. The system prompt cannot show it — no passkey "
-                + "prompt can — so read it here. Standard and high need an "
-                + "identity check beyond a passkey; until one is recorded "
-                + "against your credential, only basic will sign.",
+            labeledField(L10n.t("nsig.doc", vm.language), document, "") { document = it }
+            labeledField(L10n.t("nsig.means", vm.language), meaning, "") { meaning = it }
+            Text(L10n.t("nsig.hashed", vm.language) + " " + L10n.t("nsig.tiers", vm.language),
                 color = Qrme.T3, fontSize = 11.sp)
             SmallAction(if (busy) "Working…" else "Sign") {
                 val token = vm.token ?: return@SmallAction
@@ -2474,9 +2472,7 @@ private fun SignaturePanel(vm: StudioViewModel) {
             }
         }
 
-        Text("Passkeys are bound to a verified domain via Digital Asset Links, "
-            + "so signing works only against a real deployment — not a LAN dev "
-            + "server. See docs/signatures.md.",
+        Text(L10n.t("nsig.domain.android", vm.language),
             color = Qrme.T3, fontSize = 11.sp)
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
@@ -5845,13 +5841,12 @@ private fun WhoWroteThisCard(vm: StudioViewModel) {
     var busy by remember { mutableStateOf(false) }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Who wrote this?", color = Qrme.Txt, fontSize = 16.sp,
+        Text(L10n.t("ns.who", vm.language), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
-        Text("Paste any passage. If a profile here produced it, this names it — " +
-             "even if the wording has since been changed.",
+        Text(L10n.t("ns.who.sub", vm.language),
             color = Qrme.T2, fontSize = 12.sp)
-        labeledField("", text, "Paste a passage…") { text = it }
-        SmallAction(if (busy) "Checking…" else "Check this text",
+        labeledField("", text, L10n.t("ns.who.ph", vm.language)) { text = it }
+        SmallAction(L10n.t(if (busy) "ns.who.checking" else "ns.who.check", vm.language),
             enabled = !busy && text.isNotBlank()) {
             busy = true
             vm.call({ ApiClient.recoverWatermark(text) }) { r ->
@@ -5861,21 +5856,24 @@ private fun WhoWroteThisCard(vm: StudioViewModel) {
         }
         result?.let { r ->
             if (r.recovered && r.profileId != null) {
-                Text(if (r.verbatim) "Written by ${r.profileId}, unaltered."
-                     else "Written by ${r.profileId} — altered since.",
+                Text(L10n.fill(if (r.verbatim) "ns.who.by" else "ns.who.by.altered",
+                               vm.language, mapOf("id" to r.profileId)),
                     color = if (r.verbatim) Qrme.Green else Qrme.Amber,
                     fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Text("${r.matchedWindows} of ${r.storedWindows} passages matched · " +
-                     "similarity ${r.similarity}", color = Qrme.T2, fontSize = 12.sp)
+                Text(L10n.fill("ns.who.matched", vm.language,
+                        mapOf("matched" to r.matchedWindows.toString(),
+                              "stored" to r.storedWindows.toString()))
+                        + " · ${r.similarity}", color = Qrme.T2, fontSize = 12.sp)
                 r.markLine?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
                 r.disclosure?.let { Text(it, color = Qrme.T3, fontSize = 10.sp) }
             } else {
                 // Not "no" — the reason, so a coincidence is not read either way.
-                Text(r.reason ?: "No profile here produced this text.",
+                Text(r.reason ?: L10n.t("ns.who.none", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
                 if (r.bestSimilarity != null && r.threshold != null) {
-                    Text("closest overlap ${r.bestSimilarity}, below the " +
-                         "${r.threshold} threshold for naming anyone",
+                    Text(L10n.fill("ns.who.below", vm.language,
+                            mapOf("best" to r.bestSimilarity.toString(),
+                                  "threshold" to r.threshold.toString())),
                         color = Qrme.T3, fontSize = 10.sp)
                 }
             }
@@ -5907,29 +5905,29 @@ private fun ObjectToAProfileCard(vm: StudioViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text("Object to a profile", color = Q.Txt, fontSize = 16.sp,
+        Text(L10n.t("ns.object", vm.language), color = Q.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
-        Text("If a synthetic profile here is of you and you did not agree to " +
-             "it, say so. You do not need an account, and you do not need to " +
-             "be signed in.", color = Q.T2, fontSize = 12.sp)
+        Text(L10n.t("ns.object.sub", vm.language),
+             color = Q.T2, fontSize = 12.sp)
         OutlinedTextField(value = profileId, onValueChange = { profileId = it },
-            label = { Text("Profile id") })
+            label = { Text(L10n.t("ns.object.pid", vm.language)) })
         OutlinedTextField(value = contact, onValueChange = { contact = it },
-            label = { Text("How to reach you") })
+            label = { Text(L10n.t("ns.object.contact", vm.language)) })
         OutlinedTextField(value = reason, onValueChange = { reason = it },
-            label = { Text("What is wrong") })
+            label = { Text(L10n.t("ns.object.reason", vm.language)) })
         Button(onClick = {
             vm.call({ ApiClient.openObjection(profileId.trim(), contact.trim(),
                 reason) }) { result = it; error = null }
         }, enabled = profileId.isNotBlank() && reason.isNotBlank(),
             colors = ButtonDefaults.buttonColors(containerColor = Q.BrandA)) {
-            Text("Raise an objection")
+            Text(L10n.t("ns.object.go", vm.language))
         }
         result?.let { r ->
             // Restricted immediately, pending review. That is the part the
             // person raising it needs told: the remedy is now, not after
             // somebody gets round to it.
-            Text("Raised. The profile is ${r.profileStatus} pending review.",
+            Text(L10n.fill("ns.object.raised", vm.language,
+                    mapOf("status" to r.profileStatus)),
                 color = Q.Green, fontSize = 12.sp)
             if (r.note.isNotBlank()) {
                 Text(r.note, color = Q.T2, fontSize = 11.sp)
