@@ -4,6 +4,24 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.2] — 2026-08-06
+
+### The fix I found here and did not carry
+
+At 0.46.9 this repo found that the Windows shell's **Sign out** sits in
+`NavigationView.PaneFooter` while the loop localizing the nav walks
+`Nav.MenuItems`, and fixed it. JIM-mini has the same file, the same loop and
+the same footer, and nobody checked. It has been saying *Sign out* in every
+language since.
+
+    asked     is the bug fixed
+    mattered  is the bug fixed in the other two products
+
+No QRME code changed this round. The finding is JIM's to fix and it is fixed
+there, along with Family and Connect on all three of its shells — 386 → 229.
+
+Cut together with JIM-mini and PDI at app-v0.47.2.
+
 ## [0.47.1] — 2026-08-06
 
 ### The blind spot was in all three products
