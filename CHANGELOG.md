@@ -12,8 +12,8 @@ The three products are cut at one version, so this release exists here to keep
 that true. **No code changes in this repo this round.**
 
 The round's work is JIM-mini's: its coach gains a **presence** — the half that
-speaks first rather than waiting to be asked, modelled on the operating system
-in *Her* and deliberate about which parts of that are worth having.
+speaks first rather than waiting to be asked, and is deliberate about which
+parts of a companion are worth having and which are the failure mode.
 
 One thing there is QRME's business, because QRME is what it reaches into.
 `GET /presence/{user_id}/reach` hands somebody this platform's live rooms,
