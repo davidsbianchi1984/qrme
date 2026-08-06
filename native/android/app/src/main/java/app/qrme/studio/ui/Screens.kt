@@ -244,6 +244,8 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
     var timeline by remember { mutableStateOf<ObjectionTimeline?>(null) }
     var content by remember { mutableStateOf("") }
     var found by remember { mutableStateOf<WatermarkRecovery?>(null) }
+    var countId by remember { mutableStateOf("") }
+    var counted by remember { mutableStateOf<ProfileAttention?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -258,7 +260,8 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(L10n.t("pub.object.title", lang),
-                       L10n.t("pub.tab.mark", lang))
+                       L10n.t("pub.tab.mark", lang),
+                       L10n.t("pub.count.title", lang))
                     .forEachIndexed { i, label ->
                         FilterChip(
                             selected = pane == i, onClick = { pane = i },
@@ -340,7 +343,7 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                         }
                     }
                 }
-            } else {
+            } else if (pane == 1) {
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(L10n.t("pub.mark.explain", lang),
                         color = Qrme.T2, fontSize = 12.sp)
@@ -379,6 +382,39 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                                     mapOf("here" to L10n.t("pub.mark.here", lang))),
                                 color = Qrme.T3, fontSize = 11.sp)
                         }
+                    }
+                }
+            } else {
+                // How many people is this thing talking to. Here rather than
+                // behind sign-in: making somebody get an account before they
+                // may learn the number is the same withholding with a form in
+                // front of it, and the withholding is the whole harm.
+                Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    labeledField(L10n.t("pub.count.id", lang), countId,
+                                 L10n.t("nw.profile.ph", lang)) { countId = it }
+                    BrandButton(L10n.t("pub.count.ask", lang),
+                                enabled = countId.isNotBlank(), busy = busy) {
+                        busy = true; error = null; counted = null
+                        vm.call({ ApiClient.profileAttention(countId.trim()) }) { r ->
+                            busy = false
+                            r.onSuccess { counted = it }.onFailure { error = it.message }
+                        }
+                    }
+                }
+                counted?.let { c ->
+                    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row {
+                            Text("" + c.peopleThisWeek + " \u00b7 "
+                                    + L10n.t("pub.count.week", lang),
+                                color = Qrme.Txt, fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.weight(1f))
+                            Text("" + c.peopleEver + " \u00b7 "
+                                    + L10n.t("pub.count.ever", lang),
+                                color = Qrme.T3, fontSize = 11.sp)
+                        }
+                        Text(c.says, color = Qrme.Txt, fontSize = 12.sp)
+                        Text(c.note, color = Qrme.T3, fontSize = 11.sp)
                     }
                 }
             }

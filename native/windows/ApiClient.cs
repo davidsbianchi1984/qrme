@@ -286,6 +286,20 @@ public record RoleContext(
 
 /// Extract and reconstruct: whose work is this, from the text alone. Never a
 /// bare yes — the counts travel with the claim so it can be checked.
+/// <summary>The count, and the three things it refuses to be. The refusals
+/// arrive as fields rather than prose so a page renders them beside the
+/// number instead of composing a reassuring sentence of its own.</summary>
+public record ProfileAttention(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("people_this_week")] int PeopleThisWeek,
+    [property: JsonPropertyName("people_ever")] int PeopleEver,
+    [property: JsonPropertyName("you_are_one_of_them")] bool YouAreOneOfThem,
+    [property: JsonPropertyName("says")] string Says,
+    [property: JsonPropertyName("ranks_people")] bool RanksPeople,
+    [property: JsonPropertyName("has_a_favourite")] bool HasAFavourite,
+    [property: JsonPropertyName("names_anybody")] bool NamesAnybody,
+    [property: JsonPropertyName("note")] string Note);
+
 public record WatermarkRecovery(
     [property: JsonPropertyName("recovered")] bool Recovered,
     [property: JsonPropertyName("reason")] string? Reason,
@@ -1905,6 +1919,12 @@ public sealed class ApiClient
     /// answering after the text has been edited. No token: a counterparty must
     /// be able to ask without an account here.
     /// </summary>
+    /// <summary>How many people a profile is talking to. Public, and no
+    /// token here on purpose: the count is a fact about the profile, not a
+    /// secret earned by intimacy.</summary>
+    public Task<ProfileAttention> ProfileAttention(string profileId) =>
+        Send<ProfileAttention>(Get($"/profiles/{profileId}/attention"));
+
     public Task<WatermarkRecovery> RecoverWatermark(string content) =>
         Send<WatermarkRecovery>(Post("/watermarks/recover", new { content }));
 

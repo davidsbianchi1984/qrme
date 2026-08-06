@@ -1117,6 +1117,37 @@ const CHROME: Table = {
     pt: "Consultar", it: "Controlla", ja: "確認", zh: "查询",
     hi: "जाँचें", ar: "تحقّق",
   },
+  "pub.count.title": {
+    en: "How many people is it talking to?",
+    es: "¿Con cuántas personas habla?",
+    fr: "À combien de personnes parle-t-il ?",
+    de: "Mit wie vielen Menschen spricht es?",
+    pt: "Com quantas pessoas fala?",
+    it: "Con quante persone parla?",
+    ja: "何人と話しているのか",
+    zh: "它在跟多少人说话？",
+    hi: "यह कितने लोगों से बात कर रहा है?",
+    ar: "مع كم شخصٍ يتحدّث؟",
+  },
+  "pub.count.id": {
+    en: "profile id", es: "id del perfil", fr: "identifiant du profil",
+    de: "Profil-ID", pt: "id do perfil", it: "id del profilo",
+    ja: "プロフィール ID", zh: "档案 ID", hi: "प्रोफ़ाइल आईडी",
+    ar: "معرّف الملف",
+  },
+  "pub.count.ask": {
+    en: "Ask for the count", es: "Pedir el recuento", fr: "Demander le décompte", de: "Nach der Zahl fragen", pt: "Pedir a contagem", it: "Chiedi il conteggio", ja: "人数をたずねる", zh: "查询人数", hi: "संख्या पूछें", ar: "اطلب العدد",
+  },
+  "pub.count.week": {
+    en: "this week", es: "esta semana", fr: "cette semaine",
+    de: "diese Woche", pt: "esta semana", it: "questa settimana",
+    ja: "今週", zh: "本周", hi: "इस सप्ताह", ar: "هذا الأسبوع",
+  },
+  "pub.count.ever": {
+    en: "altogether", es: "en total", fr: "au total", de: "insgesamt",
+    pt: "no total", it: "in tutto", ja: "のべ", zh: "总计",
+    hi: "कुल मिलाकर", ar: "إجمالاً",
+  },
   "pub.mark.title": {
     en: "Somebody sent me this", es: "Alguien me envió esto",
     fr: "Quelqu'un m'a envoyé ceci", de: "Jemand hat mir das geschickt",

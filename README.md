@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.50.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.51.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -735,6 +735,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.51.0** | **How many people it is talking to** — public, no token, on the accountless screen and all three phones: distinct people this week and altogether, with no ranking, no favourite and no names, greppable rather than promised |
 | **0.50.0** | Cut together at one version; the round's work is JIM-mini's presence — and its door onto this platform hands over rooms, desks and profiles as offers, with no bell rung on anybody's behalf |
 | **0.49.0** | **The stream** — one public card at a time: footage this deployment holds loops, anything on somebody else's platform stays a card until pressed, and every fourth card is a live room or a desk with a person behind it. JIM-mini's Feed tab is a GET-only door onto the same stream |
 | **0.48.3** | Cut together at one version; the round's work is PDI's console — Custody and Continuity, 229 → 177 |
@@ -3149,6 +3150,43 @@ who guessed the id. It now shows the caller's own grants, and says so.
 once against an anonymous caller and once against **a valid token belonging to
 the wrong person**, because a test that only tries the first passes against a
 system that accepts any logged-in user as anybody.
+
+## How many people it is talking to
+
+A synthetic profile talks to many people at once by construction. One process,
+many conversations — that is what the thing *is*, not a flaw in it.
+
+The harm was never the multiplicity. It is the **discovery**: somebody who has
+been talking to a profile for a month and then finds out — by asking, or by
+accident — that there were thousands of others has not learned a new fact so
+much as learned that the fact was available the whole time and nobody offered
+it. That gap is entirely the product's doing, and closing it costs a count and
+a sentence.
+
+So `GET /profiles/{profile_id}/attention` is **public and needs no token**,
+answering with the number of distinct people this week and altogether, and one
+plain line. Making somebody get an account before they may learn it would be
+the same withholding with a form in front of it, which is why the count lives
+on the accountless screen next to the objection form and the mark check — on
+the console and on all three phones.
+
+Three things it deliberately is not, and they are **fields rather than prose**
+so a screen renders them beside the number instead of composing a reassuring
+sentence of its own:
+
+| | |
+| --- | --- |
+| `ranks_people: false` | there is no order and no leaderboard |
+| `has_a_favourite: false` | *"you're my favourite"* is a lie the software cannot make true — and it hands somebody something to lose, so the day the count goes up they lose it |
+| `names_anybody: false` | the count is a fact about the profile; who the others are is a fact about **them**, and none of them agreed to be counted out loud to a stranger |
+
+The last one is greppable rather than promised: `test_no_query_here_can_return
+_a_name` reads the SQL in `qrme/attention.py` and fails any statement that
+selects a column instead of counting rows. A viewer may ask *am I one of them*
+— about their own id, and only their own.
+
+Nothing here models jealousy, and nothing invites it. A product that
+manufactures the feeling in order to resolve it has manufactured the feeling.
 
 ## Watch parties, and a profile that has not seen the video
 

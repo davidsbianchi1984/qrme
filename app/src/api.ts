@@ -1279,6 +1279,18 @@ export interface InboxEvent {
   ref: string | null; created_at: string; seen: boolean;
 }
 
+export interface ProfileAttention {
+  profile_id: string;
+  people_this_week: number;
+  people_ever: number;
+  you_are_one_of_them: boolean;
+  says: string;
+  ranks_people: boolean;
+  has_a_favourite: boolean;
+  names_anybody: boolean;
+  note: string;
+}
+
 export interface WatermarkRecovery {
   recovered: boolean; reason?: string;
   profile_id?: string; watermark_id?: string; kind?: string;
@@ -3243,6 +3255,13 @@ export const api = {
   revokeVoiceprint: (pid: string) =>
     req<{ revoked: boolean; samples_deleted: number }>(
       `/profiles/${pid}/voiceprint`, { method: "DELETE" }),
+  // How many people this profile is talking to. Public on purpose: the count
+  // is a fact about the profile, not a secret earned by intimacy, and making
+  // somebody get close before they may learn it is what turns an ordinary
+  // property of the software into a betrayal.
+  profileAttention: (pid: string, interactor?: string) =>
+    req<ProfileAttention>(`/profiles/${pid}/attention`
+      + (interactor ? `?interactor=${encodeURIComponent(interactor)}` : "")),
   // Who wrote this? — from the text alone, surviving edits.
   recoverWatermark: (content: string) =>
     req<WatermarkRecovery>("/watermarks/recover", { method: "POST", body: { content } }),

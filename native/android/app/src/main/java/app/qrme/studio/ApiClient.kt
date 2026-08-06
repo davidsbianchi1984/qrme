@@ -38,6 +38,14 @@ data class ChatMessage(val content: String?, val status: String, val flagReason:
                        // whether the owner declared it or the wording implied it.
                        val role: String? = null, val roleHow: String? = null)
 /** Extract and reconstruct: whose work is this, from the text alone. */
+/** The count, and the three things it refuses to be. The refusals arrive as
+ *  fields rather than prose so a screen renders them beside the number
+ *  instead of composing a reassuring sentence of its own. */
+data class ProfileAttention(val profileId: String, val peopleThisWeek: Int,
+                            val peopleEver: Int, val youAreOneOfThem: Boolean,
+                            val says: String, val ranksPeople: Boolean,
+                            val hasAFavourite: Boolean, val namesAnybody: Boolean,
+                            val note: String)
 data class WatermarkRecovery(val recovered: Boolean, val reason: String?,
                              val profileId: String?, val verbatim: Boolean,
                              val similarity: Double, val matchedWindows: Int,
@@ -562,6 +570,21 @@ object ApiClient {
      * answering after the text has been edited. Public: a counterparty must be
      * able to ask without an account here.
      */
+    /**
+     * How many people a profile is talking to. Public, and no token here on
+     * purpose: the count is a fact about the profile, not a secret earned by
+     * intimacy.
+     */
+    suspend fun profileAttention(profileId: String): ProfileAttention {
+        val o = JSONObject(request("/profiles/$profileId/attention"))
+        return ProfileAttention(
+            o.optString("profile_id"), o.optInt("people_this_week"),
+            o.optInt("people_ever"), o.optBoolean("you_are_one_of_them"),
+            o.optString("says"), o.optBoolean("ranks_people"),
+            o.optBoolean("has_a_favourite"), o.optBoolean("names_anybody"),
+            o.optString("note"))
+    }
+
     suspend fun recoverWatermark(content: String): WatermarkRecovery {
         val o = JSONObject(request("/watermarks/recover", "POST",
             JSONObject().put("content", content)))

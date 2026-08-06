@@ -55,6 +55,9 @@ public sealed partial class WithoutAnAccountPage : Page
         MarkExplain.Text = L10n.T("pub.mark.explain", lang);
         ContentBox.PlaceholderText = L10n.T("pub.mark.paste", lang);
         RecoverButton.Content = L10n.T("pub.mark.ask", lang);
+        CountHeading.Text = L10n.T("pub.count.title", lang);
+        CountIdBox.PlaceholderText = L10n.T("pub.count.id", lang);
+        CountButton.Content = L10n.T("pub.count.ask", lang);
         NoTokenText.Text = L10n.T("pub.notoken", lang);
     }
 
@@ -180,6 +183,31 @@ public sealed partial class WithoutAnAccountPage : Page
         }
         catch (Exception ex) { ShowError(ex.Message); }
         finally { RecoverButton.IsEnabled = true; }
+    }
+
+    /// <summary>How many people is this thing talking to.
+    ///
+    /// Here rather than behind sign-in: making somebody get an account before
+    /// they may learn the number is the same withholding with a form in front
+    /// of it, and the withholding is the whole harm.</summary>
+    private async void OnCount(object sender, RoutedEventArgs e)
+    {
+        var pid = CountIdBox.Text.Trim();
+        if (pid.Length == 0) { ShowError(L10n.T("pub.count.id", Lang)); return; }
+        ErrorText.Visibility = Visibility.Collapsed;
+        CountButton.IsEnabled = false;
+        try
+        {
+            var c = await ApiClient.Shared.ProfileAttention(pid);
+            CountNumbers.Text = c.PeopleThisWeek + " \u00b7 "
+                + L10n.T("pub.count.week", Lang) + "    " + c.PeopleEver
+                + " \u00b7 " + L10n.T("pub.count.ever", Lang);
+            CountSays.Text = c.Says;
+            CountNote.Text = c.Note;
+            CountCard.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally { CountButton.IsEnabled = true; }
     }
 
     private void ShowError(string message)

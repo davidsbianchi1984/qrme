@@ -4,6 +4,40 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.51.0] — 2026-08-06
+
+### How many people it is talking to, offered rather than asked for
+
+A synthetic profile talks to many people at once by construction. The harm was
+never the multiplicity — it is the **discovery**: finding out, late, that the
+number was available the whole time and nobody offered it. That gap is
+entirely the product's doing, and closing it costs a count and a sentence.
+
+`GET /profiles/{profile_id}/attention` is **public and needs no token** —
+distinct people this week and altogether, plus one plain line. Making somebody
+get an account first would be the same withholding with a form in front of it,
+so it lives on the accountless screen beside the objection form and the mark
+check, on the console and all three phones.
+
+Three refusals ride as **fields rather than prose**, so a screen renders them
+next to the number instead of composing a reassuring sentence of its own: no
+ranking, no favourite, no names. The last is greppable rather than promised —
+a test reads the SQL and fails any statement that selects a column instead of
+counting rows. A viewer may ask *am I one of them* about their own id, and
+only their own.
+
+*"You're my favourite"* is the obvious product move and it is a lie the
+software cannot make true. It also hands somebody something to lose, so the
+day the count goes up they lose it. Nothing here models jealousy and nothing
+invites it: a product that manufactures the feeling in order to resolve it has
+manufactured the feeling.
+
+The round's other work is JIM-mini's — a bearing dial, an ambient company
+beat, and an isolation signal whose beat points back at this platform's rooms,
+desks and people.
+
+Cut together with JIM-mini and PDI at **app-v0.51.0**.
+
 ## [0.50.0] — 2026-08-06
 
 ### Cut together at one version

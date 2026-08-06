@@ -391,6 +391,22 @@ struct RoleContext: Decodable {
 
 // MARK: Extract and reconstruct — whose work is this, from the text alone
 
+/// The count, and the three things it refuses to be. `ranksPeople`,
+/// `hasAFavourite` and `namesAnybody` arrive as fields rather than prose so a
+/// screen renders the refusals beside the number instead of composing a
+/// reassuring sentence of its own.
+struct ProfileAttention: Decodable {
+    let profile_id: String
+    let people_this_week: Int
+    let people_ever: Int
+    let you_are_one_of_them: Bool
+    let says: String
+    let ranks_people: Bool
+    let has_a_favourite: Bool
+    let names_anybody: Bool
+    let note: String
+}
+
 struct WatermarkRecovery: Decodable {
     let recovered: Bool
     let reason: String?
@@ -1008,6 +1024,14 @@ actor ApiClient {
     /// Whose work is this, from the text alone — no credential id, and it keeps
     /// answering after the text has been edited. Public: a counterparty must be
     /// able to ask without an account here.
+    /// How many people a profile is talking to.
+    ///
+    /// Public on purpose, and no token here on purpose: the count is a fact
+    /// about the profile, not a secret earned by intimacy.
+    func profileAttention(profileId: String) async throws -> ProfileAttention {
+        try await request("/profiles/\(profileId)/attention")
+    }
+
     func recoverWatermark(content: String) async throws -> WatermarkRecovery {
         try await request("/watermarks/recover", method: "POST",
                           body: ["content": content])

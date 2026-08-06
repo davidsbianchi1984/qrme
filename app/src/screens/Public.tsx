@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { api, type EmbodimentConsistency, type ObjectionOpened,
-         type ObjectionTimeline,
+         type ObjectionTimeline, type ProfileAttention,
          type ObjectionStatus, type WatermarkRecovery } from "../api";
 
 /**
@@ -88,11 +88,16 @@ export function Public({ start, onBack }: {
                 onClick={() => setPane("same")}>
           {L("pub.tab.same")}
         </button>
+        <button className={pane === "count" ? "tab active" : "tab"}
+                onClick={() => setPane("count")}>
+          {L("pub.count.title")}
+        </button>
       </div>
 
       {pane === "object" && <ObjectPane />}
       {pane === "mark" && <MarkPane />}
       {pane === "same" && <SamePane />}
+      {pane === "count" && <CountPane />}
 
       <p className="muted small">
         {L("pub.notoken")} {L("pub.notoken.signedin")}
@@ -101,8 +106,8 @@ export function Public({ start, onBack }: {
   );
 }
 
-/** The three questions a stranger arrives with. */
-export type Pane = "object" | "mark" | "same";
+/** The four questions a stranger arrives with. */
+export type Pane = "object" | "mark" | "same" | "count";
 
 function message(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
@@ -298,6 +303,64 @@ function SamePane() {
                     { forms: same.embodiments.map((e) => e.name).join(", ") })}
             </p>
           )}
+        </div>
+      )}
+
+      {error && <p className="error small">{error}</p>}
+    </>
+  );
+}
+
+/** How many people is this thing talking to.
+ *
+ *  Here rather than behind sign-in, and deliberately: a synthetic profile
+ *  talks to many people by construction, and the harm was never the
+ *  multiplicity — it is finding out, late, that the number was available the
+ *  whole time and nobody offered it. Making somebody get an account first is
+ *  the same withholding with a form in front of it.
+ *
+ *  What the answer does *not* contain is the other half: no names, no
+ *  ranking, and no favourite. Those three come back as fields so this screen
+ *  renders the refusals next to the number instead of composing a reassuring
+ *  sentence of its own.
+ */
+function CountPane() {
+  const [profileId, setProfileId] = useState("");
+  const [found, setFound] = useState<ProfileAttention | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function ask() {
+    setBusy(true); setError(null); setFound(null);
+    try { setFound(await api.profileAttention(profileId.trim())); }
+    catch (e) { setError(message(e)); }
+    setBusy(false);
+  }
+
+  return (
+    <>
+      <div className="card">
+        <h3>{L("pub.count.title")}</h3>
+        <input value={profileId} onChange={(e) => setProfileId(e.target.value)}
+               placeholder={L("pub.count.id")} />
+        <button disabled={busy || !profileId.trim()} onClick={ask}>
+          {L("pub.count.ask")}
+        </button>
+      </div>
+
+      {found && (
+        <div className="card">
+          {/* No punctuation between the interpolations: a bare separator is
+              JsxText, and the pre-session English ratchet counts JsxText —
+              correctly, since it cannot know a middot from a word. */}
+          <div className="row">
+            <span style={{ flex: 1 }}>{found.people_this_week}</span>
+            <span className="muted small">{L("pub.count.week")}</span>
+            <span style={{ flex: 1 }}>{found.people_ever}</span>
+            <span className="muted small">{L("pub.count.ever")}</span>
+          </div>
+          <p>{found.says}</p>
+          <p className="muted small">{found.note}</p>
         </div>
       )}
 

@@ -119,6 +119,38 @@
                 </StackPanel>
             </Border>
 
+            <!-- The count -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock x:Name="CountHeading" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="CountIdBox" />
+                    <Button x:Name="CountButton" HorizontalAlignment="Stretch"
+                            Height="42" Foreground="White" Click="OnCount">
+                        <Button.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="{StaticResource QrmeBrandA}" Offset="0" />
+                                <GradientStop Color="#FF3AA0FF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="CountCard" Background="{StaticResource QrmeCardBrush}"
+                    BorderBrush="{StaticResource QrmeLineBrush}" BorderThickness="1"
+                    CornerRadius="16" Padding="16" Visibility="Collapsed">
+                <StackPanel Spacing="6">
+                    <TextBlock x:Name="CountNumbers" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="CountSays" Foreground="{StaticResource QrmeT2Brush}"
+                               FontSize="12" TextWrapping="Wrap" />
+                    <TextBlock x:Name="CountNote" Foreground="{StaticResource QrmeT3Brush}"
+                               FontSize="11" TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
 
