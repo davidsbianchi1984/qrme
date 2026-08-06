@@ -310,6 +310,27 @@ _TERNARY = [r'\?\s*"([^"]{2,})"\s*:\s*"([^"]{2,})"',
             r'\bif\s*\([^)]*\)\s*"([^"]{2,})"\s*else\s*"([^"]{2,})"']
 _PHRASE = re.compile(r"\S\s\S")
 
+#: **0.47.9 — the fifth shape, and the Swift twin of the fourth.** 0.47.6 found
+#: that Compose builds a tab strip out of a `listOf` and renders it in a loop,
+#: so the strings never start a `Text(`. SwiftUI does the same thing with an
+#: array literal handed to `ForEach`, and that had never been read.
+#:
+#: What it hid was one screen, and the screen was the voiceprint consent block:
+#: the heading came from the table, and the three sentences underneath it —
+#: what a voiceprint permission actually *holds* — were English array elements.
+#: The rows existed. Both sibling shells were already asking for them. This
+#: shell showed the heading and then said, in English only, the three things
+#: that heading promises.
+#:
+#:     asked     is this literal the first thing in a `Text(`
+#:     mattered  does a loop put it on the screen
+#:
+#: Phrases only, the rule `_TERNARY` set: an array of API values (`["on",
+#: "off"]`) is as common as an array of sentences, and a rule that raises a
+#: ratcheted count under-counts on purpose.
+_ARRAY = [r'\[\s*((?:"[^"]{2,}"\s*,\s*){1,}"[^"]{2,}"\s*,?)\s*\]']
+_ELEMENT = re.compile(r'"([^"]{2,})"')
+
 #: **0.47.7 — the Windows half of the same blind spot.** `_XAML` reads
 #: attributes: `Text="…"`, `Content="…"`. Half of this shell's labels are not
 #: written in XAML at all. The settled idiom here is `x:Name` on the element
@@ -372,6 +393,10 @@ def _measure(shell: str) -> tuple[int, int]:
             found |= {s for pat in _ASSIGNED for s in re.findall(pat, text)
                       if _PHRASE.search(_HOLE.sub("", s).strip())
                       and _HAS_LETTER.search(_HOLE.sub("", s))}
+        found |= {s for pat in _ARRAY for body in re.findall(pat, text)
+                  for s in _ELEMENT.findall(body)
+                  if _PHRASE.search(_HOLE.sub("", s).strip())
+                  and _HAS_LETTER.search(_HOLE.sub("", s))}
         english += len(found)
         calls += len(re.findall(call, text))
     return english, calls

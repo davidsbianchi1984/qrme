@@ -4,6 +4,66 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.9] — 2026-08-06
+
+### The number was mislabelled, and it was hiding a consent screen
+
+`native_dead_keys.txt` has led with the word **backlog** for three releases,
+implying the work was deletion. **263 of its 335 rows are asked for by a
+different shell.** They are not rows nobody uses; they are rows *this* shell
+does not use and a sibling does — and every one is the same question: this
+screen exists on all three shells, so why does one of them say less?
+
+    asked     is this row used anywhere
+    mattered  does this shell say what its siblings say
+
+Only 72 rows are asked for by no shell at all. Those are the deletion
+candidates; the rest are a to-do list about screens, and the file now says so.
+
+### What the mislabelling was hiding
+
+The **voiceprint consent block**. Every shell shows a heading — *what this
+permission holds* — and beneath it three sentences: the watermark, the
+attestation, the withdrawal. Android and the desktop took all three from the
+table. The iPhone had them **hardcoded in English**, in an array handed to a
+`ForEach` — which is not the start of a `Text(`, and so was read by nothing.
+The screen showed a translated promise and then said, in one language only,
+the three things the promise consists of.
+
+It also prepended `"· "` to each line. Android's copy of the same block carries
+a note saying the bullet belongs *in* the row so an RTL reader gets it on the
+correct side. That note had been there since it was written.
+
+### The fifth shape
+
+`_ARRAY` is the Swift twin of the `listOf` shape 0.47.6 found in Kotlin: an
+array literal handed to a loop. Ported to all three repos, where it turned up
+**nothing else** — this screen was the only instance across nine shells, which
+is why it survived four rounds of widening.
+
+Phrases only, the rule `_TERNARY` set: an array of API values is as common as
+an array of sentences.
+
+### Also
+
+* `ns.pr.short` — *Counts of what failed. Never what you typed.* — was held by
+  the iPhone and said by both siblings. Now said here too.
+* Seven rows deleted for the honest reason: the desktop has no beacon-scanner
+  page, and `nsig.domain.android` / `nsig.ceremony.win` each explain one
+  platform's own constraint to shells that cannot hit it.
+
+### Named rather than counted
+
+**The iPhone's beacon scanner has no camera-permission state.** Android shows
+*Camera access is needed to read a beacon* and *Nothing is recorded — frames
+are read and discarded*; iOS guards on `AVCaptureDevice.default(for: .video)`
+and, when permission is refused, renders nothing at all. That is a missing
+screen state rather than a missing string, so it is recorded in the file rather
+than half-built here — and the second sentence is a privacy promise the Android
+reader is given and the iPhone reader is not.
+
+Cut together with JIM-mini and PDI at app-v0.47.9.
+
 ## [0.47.8] — 2026-08-06
 
 ### No changes in this repo

@@ -1,62 +1,63 @@
-# status: backlog — 347 rows
+# status: backlog — 335 rows
+#
+# ...but see below: only 72 of them are deletion work. The other 263 are a
+# to-do list about screens, and calling the whole number a backlog is the
+# thing 0.47.9 corrected.
 #
 # Rows in a shell's L10n table that nothing in that shell asks for. Checked by
 # test_a_shell_asks_for_a_key_it_has.py, and ratcheted in two directions: no
 # shell may hold more than `ceiling`, and the shells together may not hold more
 # than `total`.
 #
-# **Recorded at 0.47.5**, when the guard was ported here from JIM-mini, where
-# it had been running for several releases while this repo carried the same
-# three tables and the same risk. It found the defect it exists for on the
-# first run: three Android screen *headings* asked for `tab.compose`,
-# `tab.posts` and `tab.robots`, which that table did not hold — so those three
-# screens were titled with their own key names, in every language.
+# ## 0.47.9 — what these rows actually are
 #
-#     asked     does the screen call the localizer
-#     mattered  does the localizer have anything to say
+# For three releases this file called itself a **backlog** and implied the work
+# was deletion. That was wrong, and the number was hiding something worse than
+# waste.
 #
-# The other direction is this file.
+# **263 of the 335 rows here are asked for by a different shell.** They are not
+# rows nobody uses; they are rows *this* shell does not use and a sibling does.
+# Every one of them is the same question: this screen exists on all three
+# shells, so why does one of them say less?
 #
-# ## 0.47.6 — 540 to 350, and the prune that was withdrawn
+#     asked     is this row used anywhere
+#     mattered  does this shell say what its siblings say
 #
-# The 0.47.5 record said 540. This round set out to work that number down by
-# reading the rows in clusters, and the first pass produced a prune of 366 —
-# rows for screens *another* shell has and this one does not. That prune was
-# assembled, run, and then **withdrawn**, because of what the reading turned
-# up next.
+# Only 72 rows are asked for by no shell at all. Those are the deletion
+# candidates. The rest are a to-do list about screens.
 #
-# Every button on the Android shell was a hardcoded English string. Compose has
-# no `Button(text)`: a button here is a `Box` with a `Text` inside it, written
-# once as a private composable and called by name — `SmallAction("Send")`,
-# `BrandButton("Bind")`, `labeledField("Desk id", id, "dsk_…")`. Neither guard
-# could see through a wrapper, so those screens read as *asking for nothing*,
-# and the rows they should have been asking for read as *asked for by nobody*.
+# ### What that mislabelling was hiding
 #
-# **59 of the 154 rows that prune deleted from the Android table were strings
-# still hardcoded on that shell**, and 14 of 133 on Windows. `nmg.t.general`
-# through `nmg.t.deals` — the sixteen labels of the Manage tab strip — were
-# among them, sitting one line away from a `listOf("General", "Summon", …)`
-# that put them on screen in English.
+# The voiceprint consent block. Every shell shows a heading — *what this
+# permission holds* — and beneath it three sentences: the watermark, the
+# attestation, the withdrawal. Android and the desktop took all three from the
+# table. **The iPhone had them hardcoded in English**, in an array handed to a
+# `ForEach`, which is not the start of a `Text(` and so was read by nothing.
+# The screen showed a translated promise and then said, in one language only,
+# the three things the promise consists of.
 #
-#     asked     is this row asked for
-#     mattered  is this row asked for *by a call this guard can read*
+# It also prepended `"· "` to each line. Android's copy of the same block
+# carries a note saying the bullet belongs *in* the row so an RTL reader gets
+# it on the correct side. That note had been there since it was written.
 #
-# So the number came down by wiring rather than deleting: 80 label positions on
-# the Android shell now go through `L10n`, 33 rows were added for the ones no
-# table held, and the four segmented tab strips resolve their keys instead of
-# naming their screens in English.
+# ### Still open, and named rather than counted
 #
-# The 350 that remain are the honest residue, and they come off the same
-# way — by reading them. The rule this round earned: **a row that looks dead is
-# evidence about the guard before it is evidence about the row.**
+# **The iPhone's beacon scanner has no camera-permission state.** Android shows
+# *Camera access is needed to read a beacon* and *Nothing is recorded — frames
+# are read and discarded*; iOS guards on `AVCaptureDevice.default(for: .video)`
+# and, when permission is refused, renders nothing at all. That is a missing
+# screen state rather than a missing string, so the rows stay recorded here
+# until the state exists — the second of those sentences is a privacy promise
+# the Android reader is given and the iPhone reader is not.
 #
 # The two-direction ratchet is JIM's: `ceiling` is a maximum over the three
 # shells, so the count could rise on one shell while the check passed, if the
 # total were not also held.
 #
-# ceiling: 148
-# total: 347
+# ceiling: 143
+# total: 335
 
+# ios: 67 of 82 are asked for by another shell
 ios: acct.reset.code
 ios: action.refresh
 ios: action.save
@@ -112,13 +113,10 @@ ios: ns.fb.rating.opt
 ios: ns.lang.pre.off
 ios: ns.lang.pre.on
 ios: ns.model.nokeyword
-ios: ns.pr.short
 ios: ns.rel.type
 ios: ns.wm.label
 ios: nsig.attest
-ios: nsig.ceremony.win
 ios: nsig.creds.yours
-ios: nsig.domain.android
 ios: nsig.evidence
 ios: nsig.evidence.sub
 ios: nsig.fetch
@@ -131,9 +129,6 @@ ios: nsig.verify
 ios: nsig.verify.other
 ios: nvoi.built
 ios: nvoi.granted
-ios: nvoi.holds.mark
-ios: nvoi.holds.own
-ios: nvoi.holds.withdraw
 ios: nvoi.micoff
 ios: nvoi.owner
 ios: nvoi.record
@@ -146,6 +141,7 @@ ios: task.gid
 ios: task.list
 ios: work.phase
 
+# android: 83 of 110 are asked for by another shell
 android: acct.reset.code
 android: action.refresh
 android: action.save
@@ -226,7 +222,6 @@ android: ns.st.g.system
 android: ns.wm.label.ph
 android: nsig
 android: nsig.attest
-android: nsig.ceremony.win
 android: nsig.creds.yours
 android: nsig.domain
 android: nsig.evidence
@@ -258,6 +253,7 @@ android: task.list
 android: task.scope
 android: work.phase
 
+# windows: 113 of 143 are asked for by another shell
 windows: acct.password
 windows: acct.reset.code
 windows: acct.reset.new
@@ -274,11 +270,6 @@ windows: dele.offer
 windows: front.title
 windows: inbox.empty
 windows: life.legend
-windows: nbcn.camera
-windows: nbcn.nothing
-windows: nbcn.point
-windows: nbcn.shared
-windows: nbcn.tap
 windows: nc.a_stranger
 windows: nc.talking
 windows: ncon.handle.ph

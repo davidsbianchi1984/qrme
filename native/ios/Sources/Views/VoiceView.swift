@@ -215,12 +215,14 @@ struct VoiceView: View {
     private var invariants: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(L10n.t("nvoi.holds", state.language)).font(.headline).foregroundStyle(Theme.txt)
-            ForEach([
-                "Anything spoken in this voice carries a watermark and says it is synthesized.",
-                "Only your own voice — the permission is an attestation, not a checkbox.",
-                "Withdrawing deletes the samples and silences the voice; the withdrawal stays on record.",
-            ], id: \.self) { line in
-                Text("· " + line).font(.caption2).foregroundStyle(Theme.t2)
+            // The bullet lives in the row rather than being prepended here:
+            // an RTL reader gets it on the correct side that way. Android's
+            // copy of this block has carried that note since it was written;
+            // this shell prepended "· " and said all three lines in English.
+            ForEach(["nvoi.holds.mark", "nvoi.holds.own", "nvoi.holds.withdraw"],
+                    id: \.self) { key in
+                Text(L10n.t(key, state.language))
+                    .font(.caption2).foregroundStyle(Theme.t2)
             }
             if let d = status?.disclosure {
                 Text(d).font(.caption2).foregroundStyle(Theme.t3)

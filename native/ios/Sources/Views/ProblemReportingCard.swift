@@ -56,6 +56,11 @@ struct ProblemReportingCard: View {
                         .foregroundStyle(Theme.txt)
                 }
                 .tint(Theme.brandA)
+                // The one-line summary of the promise above. Both siblings
+                // have said it since the row was written; this shell held it
+                // and never asked.
+                Text(L10n.t("ns.pr.short", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t2)
             }
 
             Button(L10n.t(showing ? "ns.pr.hide" : "ns.pr.show", state.language)) { showing.toggle() }
