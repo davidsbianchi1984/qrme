@@ -4,6 +4,24 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.47.1] — 2026-08-06
+
+### The blind spot was in all three products
+
+0.47.0 found that this repo's native-shell measurement could not see a string
+chosen by a ternary. The other two products' guards are this one, copied — so
+the blind spot was in all three by construction, and the widening is ported
+to both this round along with the two tests that hold it in place.
+
+JIM was understating by **40**, PDI by **12**.
+
+No QRME code changed. What the correction found in JIM is in that repo's
+changelog and is worth reading: the fourteen rows that carve out its alarm
+surface localize what the alarm says once it is going, and not **Tap for
+emergency** — because the count they were chosen from could not see it.
+
+Cut together with JIM-mini and PDI at app-v0.47.1.
+
 ## [0.47.0] — 2026-08-06
 
 ### The ternary hid the sentence
