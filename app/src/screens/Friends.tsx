@@ -25,8 +25,7 @@ export function Friends({ onPlans }: {
     if (!session.profileId) return;
     api.friends(session.profileId).then(setData).catch((e) => setError(e));
     api.suggestedFriends(session.profileId).then((s) => {
-      const list = Array.isArray(s) ? s : (s.suggestions || []);
-      setSuggested(list as { profile_id: string; display_name: string }[]);
+      setSuggested(s.suggested);
     }).catch(() => setSuggested([]));
     if (session.ownerToken) {
       api.inbox(session.profileId, session.ownerToken)

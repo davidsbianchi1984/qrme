@@ -1136,10 +1136,11 @@ export interface Stats {
   memory_entries: number;
   moderation_pass_rate: number;
   relationship_graph: number;
-  engagement_average: number;
+  engagement_avg: number;
+  interactors: number;
   sources: number;
   posts: number;
-  surfaces: number;
+  surfaces: string[];
 }
 export interface ChatMessage {
   id: string;
@@ -1346,14 +1347,15 @@ export type Grant = {
 };
 
 /** Which phases the owner has authorised the profile to run unattended. */
+// `delegation` is a boolean and `phases` sits beside it — not nested under
+// it. The nested shape below was never what /profiles/{id}/delegation sends,
+// and TypeScript erased the difference at build time: `false?.enabled` is
+// `undefined`, so the screen read every profile as un-delegated and offered
+// no way to change that.
 export type Delegation = {
-  delegation: {
-    phases?: string[];
-    enabled?: boolean;
-    grant_id?: string | null;
-    [key: string]: unknown;
-  } | null;
+  delegation: boolean;
   phases: string[];
+  delegable: string[];
 };
 
 /** A run in progress. `awaiting` is what it is stopped on and waiting for a
@@ -3046,8 +3048,12 @@ export const api = {
                      handle?: string | null }[]; founder_handles: string[] }>(
       `/profiles/${profileId}/friends`),
   suggestedFriends: (profileId: string) =>
-    req<{ suggestions: { profile_id: string; display_name: string }[] } |
-        { profile_id: string; display_name: string }[]>(
+    // The key is `suggested`. Declaring `suggestions` — in both arms of a
+    // union, so neither could match — meant the reader's `?? []` fired every
+    // time and the list was permanently empty.
+    req<{ profile_id: string; suggested: { profile_id: string;
+          display_name: string }[]; ranked_on: string[];
+          never_ranked_on: string[]; excluded: string }>(
       `/profiles/${profileId}/friends/suggested`),
   addFriend: (profileId: string, friendId: string, token: string) =>
     req<unknown>(`/profiles/${profileId}/friends`,

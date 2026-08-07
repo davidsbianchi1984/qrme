@@ -1,0 +1,18 @@
+# status: backlog — 0 rows
+# ceiling: 0
+#
+# Console declarations the shape guard saw a route not satisfy, which are
+# real. There are none.
+#
+# `test_the_shape_the_console_expects.py` drives every GET this client binds
+# a declared shape to and checks each required field against what the route
+# actually sends — the name, and whether the declared type can hold what
+# arrives. The first run found four, all four were real, and all four are
+# fixed rather than recorded.
+#
+# The ceiling is zero and should stay there. This client marks a field
+# optional when it genuinely comes and goes, so a field that is missing is
+# missing — there is no legitimate state to record, only a declaration to
+# correct or a `?` to add.
+#
+# Ratcheted: this list may shrink and must never grow.

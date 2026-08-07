@@ -7,6 +7,7 @@ source material unattended, so the question this surface has to answer is not
 everything".
 """
 
+from qrme import delegation
 from tests.test_capabilities import make_profile, pdi_pair  # noqa: F401
 
 
@@ -46,7 +47,8 @@ def test_delegation_is_off_until_the_owner_turns_it_on(client):
     _relate(client, p, it["id"])
 
     offer = client.get(f"/profiles/{p['id']}/delegation").json()
-    assert offer == {"delegation": False, "phases": []}
+    assert offer == {"delegation": False, "phases": [],
+                     "delegable": list(delegation.DELEGABLE)}
 
     r = client.post(f"/profiles/{p['id']}/delegated-workflows",
                     json={"goal": "anything", "interactor_id": it["id"]},
@@ -89,7 +91,8 @@ def test_the_offer_never_leaks_the_grant(client):
                json={"phases": ["research"], "grant_token": grant["token"]})
 
     offer = client.get(f"/profiles/{p['id']}/delegation").json()
-    assert offer == {"delegation": True, "phases": ["research"]}
+    assert offer == {"delegation": True, "phases": ["research"],
+                     "delegable": list(delegation.DELEGABLE)}
     assert "grant_id" not in offer
 
 
@@ -267,3 +270,23 @@ def test_delegated_research_reads_only_the_granted_scope(pdi_pair):
         headers=_as(it["token"])).json()
     assert halted["status"] == "failed"
     assert "grant revoked" in halted["note"]
+
+
+def test_the_offer_says_what_may_be_delegated_not_only_what_is(client):
+    """A capability advertisement that only lists the owner's current choices
+    tells a client nothing while there are none — and a screen that draws its
+    toggles from it has nothing to draw, so delegation can never be switched
+    on from that screen. That is exactly what the console did, and nothing
+    said so, because `phases` is a real key with a real value and the console
+    was reading it for the wrong question."""
+    p = make_profile(client)
+    off = client.get(f"/profiles/{p['id']}/delegation").json()
+    assert off["delegation"] is False and off["phases"] == []
+    assert off["delegable"] == list(delegation.DELEGABLE)
+
+    client.put(f"/profiles/{p['id']}/delegation", json={"phases": ["draft"]})
+    on = client.get(f"/profiles/{p['id']}/delegation").json()
+    # The chosen list narrows; the vocabulary does not.
+    assert on["phases"] == ["draft"]
+    assert on["delegable"] == list(delegation.DELEGABLE)
+    assert set(on["phases"]) <= set(on["delegable"])

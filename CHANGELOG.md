@@ -4,6 +4,111 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.1] — 2026-08-07
+
+### The fourth client, and it was the only one wrong
+
+0.56.4 through 0.57.0 built one guard three times — for the Windows client's
+C# records, the iOS client's Swift structs, and the Android client's `org.json`
+reads. Nineteen defects in C#, nine in Swift, eight in Kotlin, and the running
+lesson of all three was that fixing a defect in one client is not fixing the
+defect.
+
+There is a fourth client, and it is the one most people use.
+`test_the_console_is_a_client_too.py` was written in 0.44 for exactly this
+blind spot — it found sixty-four routes a desktop owner could not reach — and
+it asks whether the console *calls* each route. It never asked what the
+console does with the answer.
+
+    asked     can the console reach every route
+    mattered  does the console read back what the route sends
+
+This client declares more than the other three combined: 246 shapes, 1,712
+fields, 194 GET bindings, each carrying its expected shape as a type argument.
+And TypeScript is erased at build time, so nothing checks a declaration
+against reality at runtime. A field the route does not send is `undefined`,
+and `{undefined}` in JSX renders as *nothing* — the layout closes up around it
+and the screen looks finished.
+
+### What it found — four, all real, all visible
+
+**The delegation screen could not delegate.** `/profiles/{id}/delegation`
+sends `{"delegation": false, "phases": [...]}` — a boolean, with the list
+beside it. The console declared `delegation` as an object-or-null and read
+`policy.delegation.phases` and `policy.delegation.enabled` off it. Both are
+`undefined` on a boolean, so the screen showed every profile as un-delegated
+and drew no phase toggles, and with no toggles there was no way to switch it
+on. Thirty lines further down the *same file* reads `offer.delegation` as a
+boolean and `offer.phases` at the top level, correctly. One screen, one
+response, two readings, and only one of them right.
+
+The route was also wrong to advertise only the chosen phases: a capability
+advertisement that lists what an owner has already picked says nothing while
+they have picked nothing. It now sends `delegable` — the vocabulary — beside
+`phases`, the choice.
+
+**A dashboard tile that has never shown a number.** Home reads
+`stats.engagement_average`; the route sends `engagement_avg`. The tile has
+rendered `—` since the day the field was named.
+
+**Suggested friends was always empty.** The route sends `suggested`; the
+console declared `suggestions`, in *both arms* of a union so neither could
+match, and the reader's `?? []` fired every time.
+
+**`Stats.surfaces` declared `number`** where the route sends a list.
+
+### The other three clients had none of them
+
+That is the inversion worth recording. Every release since 0.56.4 found the
+same defect sitting unfixed in a client nobody had checked yet. This one
+checked Windows, iOS and Android against all four findings and they were
+right in every case — `optBoolean("delegation")` in Kotlin,
+`JsonPropertyName("suggested")` in C#, `let suggested: [SuggestedRow]` in
+Swift. Three clients correct, one wrong, and the wrong one is the one a
+desktop owner actually opens.
+
+### Three of the first findings were the guard's own
+
+Thirty of the first run's thirty-eight findings came from reading the verb on
+one line. This client writes
+
+    req<WallPost>(`/profiles/${profileId}/wall`,
+      { method: "POST", body, token }),
+
+with the verb on the *second* line, so 174 writes were driven as GETs and
+compared against whatever the list route returns — every field missing, in
+five types at once. It is the third release running in which the check for
+*is this a GET* was itself the defect. Arguments are now read to the call's
+own closing paren.
+
+Emptying a nested type body instead of deleting it fixed a second: `delegation:
+{ ... } | null` had become `delegation: | null`, and the guard reported a real
+field as *declared `| null`*. And a union is satisfied by any arm, not by its
+first — the friends call was reported against a shape it never claimed to be
+the only one. It was wrong anyway, but a guard that is right by accident will
+be wrong on purpose next time.
+
+### Ported, and the ports found more
+
+| | shapes | fields | GETs | driven | found |
+|---|---|---|---|---|---|
+| QRME | 246 | 1,712 | 194 | 85 | **4** |
+| JIM-mini | 100 | 623 | 110 | 49 | **2** |
+| PDI | 33 | 224 | 60 | 27 | 0 |
+
+All six are fixed rather than recorded, and all three record files sit at a
+ceiling of zero. This client marks a field optional when it genuinely comes
+and goes, so a missing required field is missing — there is no legitimate
+state to record, only a declaration to correct or a `?` to add. That is a
+deliberate difference from the Swift guard, and it is why this one reads as a
+list of defects rather than a list of states.
+
+### The declaration now has teeth
+
+Putting the old delegation read back with the corrected type no longer
+renders wrong — it fails to compile: *Property 'phases' does not exist on type
+'boolean'*. The lie was invisible only because the declaration agreed with it.
+
 ## [0.57.0] — 2026-08-07
 
 ### Twelve routes out of forty-two, and twelve looked like all there were

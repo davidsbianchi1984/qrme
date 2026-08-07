@@ -31,6 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import clientpaths  # noqa: E402
 
+from qrme import delegation
 from tests.test_capabilities import auth_header, make_profile
 
 REPO = Path(__file__).resolve().parent.parent
@@ -89,7 +90,8 @@ def test_delegation_is_an_envelope_not_a_door(client):
     # Off until declared, and the offer answers a bare GET.
     offer = client.get(f"/profiles/{p['id']}/delegation",
                        headers={"authorization": ""}).json()
-    assert offer == {"delegation": False, "phases": []}
+    assert offer == {"delegation": False, "phases": [],
+                     "delegable": list(delegation.DELEGABLE)}
     # Delegating research without a grant would hand a caller the whole
     # vault, so it is refused at write — where the owner can read why.
     r = client.put(f"/profiles/{p['id']}/delegation",

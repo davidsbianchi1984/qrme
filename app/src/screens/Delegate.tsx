@@ -78,11 +78,16 @@ export function Delegate({ onPlans }: {
 
   if (!pid || !token) return <p>{tr("dlg.signin", lang)}</p>;
 
-  // The server's own vocabulary, not a list retyped here. `phases` is what it
-  // says may be delegated at all.
-  const phases = policy?.phases ?? [];
-  const active: string[] = (policy?.delegation?.phases as string[]) ?? [];
-  const enabled = policy?.delegation?.enabled ?? false;
+  // The server's own vocabulary, not a list retyped here. `delegable` is what
+  // it says may be delegated at all; `phases` is what this owner has chosen
+  // from it; `delegation` is the on/off itself, a boolean beside them rather
+  // than an object around them. Reading the chosen list as the vocabulary
+  // left nothing to draw whenever delegation was off — so it could not be
+  // turned on — and reading `.enabled` off a boolean was `undefined`, so it
+  // read as off even when it was on.
+  const phases = policy?.delegable ?? [];
+  const active: string[] = policy?.phases ?? [];
+  const enabled = policy?.delegation ?? false;
 
   function toggle(phase: string) {
     const next = active.includes(phase)

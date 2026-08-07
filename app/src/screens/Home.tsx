@@ -35,8 +35,8 @@ export function Home({ go }: {
     },
     {
       key: "hom.tile.engagement",
-      value: stats?.engagement_average != null
-        ? `${Math.round(stats.engagement_average * 100)}%` : "—",
+      value: stats?.engagement_avg != null
+        ? `${Math.round(stats.engagement_avg * 100)}%` : "—",
       subKey: "hom.tile.average",
     },
     {

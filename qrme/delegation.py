@@ -122,9 +122,16 @@ def offer(profile_id: str) -> dict:
     request that will be accepted.
     """
     policy = get_policy(profile_id)
+    # `delegable` is the vocabulary; `phases` is what this owner has chosen
+    # from it. The console rendered its toggles from `phases` and so had
+    # nothing to draw whenever delegation was off — which is every profile
+    # before the first time it is switched on, so it could never be switched
+    # on. A capability advertisement has to say what is possible, not only
+    # what is already true.
     if policy is None or not policy["enabled"]:
-        return {"delegation": False, "phases": []}
-    return {"delegation": True, "phases": policy["phases"]}
+        return {"delegation": False, "phases": [], "delegable": list(DELEGABLE)}
+    return {"delegation": True, "phases": policy["phases"],
+            "delegable": list(DELEGABLE)}
 
 
 def start(profile_id: str, interactor_id: str, goal: str,
