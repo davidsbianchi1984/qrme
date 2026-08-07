@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.57.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.57.2** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.57.2** | **Every guard reads the answer; none read the question** — nothing had ever checked a *request* body against the model FastAPI validates with. QRME's 192 writes are correct; the guard's own first run produced 82 findings that were all its own defect, and a fifth was caught only by comparing how much of each client it reached |
 | **0.57.1** | **The fourth client, and it was the only one wrong** — the console declares more than the three native clients combined and nothing had ever checked it. Four defects, all visible: the delegation screen could not delegate, a dashboard tile had never shown a number, suggested friends was always empty, and a list was declared a count. Windows, iOS and Android were right about all four |
 | **0.57.0** | **Twelve routes out of forty-two, and twelve looked like all there were** — the Kotlin guard travelled to JIM-mini and PDI by requiring a `JSONObject(` wrapper those clients do not use, so it read a quarter of one file and passed. Constructor made optional, parse-helper and chained reads added: QRME 135→169 routes, JIM 12→44, PDI 13→18. Three of the new findings were the guard's own defects, caught before shipping |
 | **0.56.9** | **The client that declares nothing was guessing hardest** — Kotlin has no structs to check, so nobody had; every `optString("k")` is a claim about a name *and* a type, and `org.json` never throws when either is wrong. Eight wrong reads, all already fixed in C#. Five faults in my own extractor found and fixed before any of them shipped |

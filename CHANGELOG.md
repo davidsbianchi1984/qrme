@@ -4,6 +4,77 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.2] — 2026-08-07
+
+### Every guard in this family reads the answer. None of them read the question
+
+0.56.4 through 0.57.1 asked four clients the same thing — C# records, Swift
+structs, Kotlin `org.json` reads, TypeScript type arguments — and the question
+was always *does this client understand what comes back*. Thirty-three defects
+across the four.
+
+Not one looked at what a client **sends**. The console guard makes that
+explicit in code: it skips any call carrying `method:`, which in this client is
+194 of them. Those calls were checked by nothing, in either direction, and a
+request body is the same defect in mirror image. If the model calls a field
+`title` and the client sends `name`, FastAPI either answers 422 — a button that
+does nothing, forever — or drops the value silently and stores the row without
+it. Both are invisible from the client, which sent something and got a
+response.
+
+    asked     does the client understand the answer
+    mattered  does the route understand the question
+
+### What it is checked against
+
+`app.openapi()`, not a regex over the Pydantic classes. The schema FastAPI
+publishes *is* what FastAPI validates against, so this guard cannot describe a
+rule the app does not enforce. Reading the models by hand would have been a
+fifth extractor to get wrong.
+
+Three questions: a required field the client never sends; a field the client
+sends that the model has no property for; and a write with no body at all to a
+route whose model requires one — listed separately because a guard that only
+walks bodies finds nothing wrong with sending none.
+
+| | writes | readable | matched a model | found |
+|---|---|---|---|---|
+| QRME | 192 | 162 | 158 | 0 |
+| JIM-mini | 113 | 70 | 92 | **2** |
+| PDI | 42 | 33 | 34 | 0 |
+
+QRME's writes are correct. That is a result, not an absence: three injected
+defects were confirmed to fail this guard before it shipped.
+
+### The first run's eighty-two findings were all mine
+
+A body written as the bare identifier `body` gets its shape from the enclosing
+function's parameter. The first version searched backwards for `(body: {` with
+no left edge, found the parameter of a *previous* property in the same object,
+and credited its fields to this call — `POST /profiles/{id}/chat` was reported
+as sending `birthdate` and `display_name`, which belong to `createProfile`
+forty lines above. Fifteen of forty-two lookups landed in the wrong function,
+and between them produced eighty-two findings, every one phrased as somebody
+else's defect. Bounding the search to the member fixed it, and the count went
+to zero.
+
+A spread produced the eighty-third: `{ ...(to ? { to } : {}), text }` became a
+field called `...(to ? {}`. A body this guard cannot read is now a body it
+refuses to judge — inventing a defect is worse than missing one.
+
+### And then the ratio caught a fourth
+
+Green in all three, and JIM-mini read 28 of its 113 writes against QRME's 162
+of 192. The parameter may be first or fifth: QRME writes `(body: { ... })` and
+JIM-mini writes `(uid, body: { ... }, token)`, and a pattern anchored on the
+opening paren reads one whole and the other at a quarter. Fourth time in this
+arc a borrowed pattern has read one product and quietly skipped another, and
+the first time the run was green either way — because a body it cannot read is
+a body it does not judge.
+
+Reach after the fix: QRME 99 → 162 readable, JIM-mini 28 → 70, PDI 25 → 33.
+JIM-mini's two findings only appeared on the far side of it.
+
 ## [0.57.1] — 2026-08-07
 
 ### The fourth client, and it was the only one wrong
