@@ -158,11 +158,12 @@ def prefs(interactor_id: str) -> dict:
     if row is None:
         return {"interactor_id": interactor_id, "locality": None,
                 "region": None, "scope": "anywhere", "include_remote": True,
-                "kinds": [], "tags": [], "updated_at": None}
+                "kinds_wanted": [], "tags": [], "updated_at": None}
     return {"interactor_id": row["interactor_id"], "locality": row["locality"],
             "region": row["region"], "scope": row["scope"],
             "include_remote": bool(row["include_remote"]),
-            "kinds": json.loads(row["kinds"]), "tags": json.loads(row["tags"]),
+            "kinds_wanted": json.loads(row["kinds"]),
+            "tags": json.loads(row["tags"]),
             "updated_at": row["updated_at"]}
 
 
@@ -188,7 +189,7 @@ def set_prefs(interactor_id: str, *, locality=None, region=None, scope=None,
         "locality": place, "region": reg, "scope": scope,
         "include_remote": cur["include_remote"] if include_remote is None
         else bool(include_remote),
-        "kinds": cur["kinds"] if kinds is None else list(kinds),
+        "kinds_wanted": cur["kinds_wanted"] if kinds is None else list(kinds),
         "tags": cur["tags"] if tags is None else list(tags),
     }
     conn = db.connect()
@@ -201,7 +202,7 @@ def set_prefs(interactor_id: str, *, locality=None, region=None, scope=None,
         " include_remote=excluded.include_remote, kinds=excluded.kinds,"
         " tags=excluded.tags, updated_at=excluded.updated_at",
         (interactor_id, new["locality"], new["region"], new["scope"],
-         int(new["include_remote"]), json.dumps(new["kinds"]),
+         int(new["include_remote"]), json.dumps(new["kinds_wanted"]),
          json.dumps(new["tags"]), db.utcnow()))
     conn.commit()
     return prefs(interactor_id)
@@ -325,8 +326,8 @@ def search_with_prefs(interactor_id: str | None, q: str | None = None,
         # A single saved kind or tag narrows; several mean "any of these",
         # which this filter cannot express, so it stays open rather than
         # silently picking one of them.
-        if over.get("kind") is None and len(p["kinds"]) == 1:
-            over["kind"] = p["kinds"][0]
+        if over.get("kind") is None and len(p["kinds_wanted"]) == 1:
+            over["kind"] = p["kinds_wanted"][0]
         if over.get("tag") is None and len(p["tags"]) == 1:
             over["tag"] = p["tags"][0]
     over = {k: v for k, v in over.items() if v is not None}

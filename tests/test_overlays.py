@@ -212,7 +212,7 @@ def test_the_refused_classes_are_named_with_their_reasons(client):
     """An absent option reads as a gap somebody files a bug about, or works
     around. Every one of these is a decision, so it is published as one."""
     out = client.get("/overlays/catalogue").json()
-    refused = {r["kind"]: r["why"] for r in out["refused"]}
+    refused = {r["kind"]: r["why"] for r in out["refusals"]}
     for expected in ("real_person", "public_figure", "another_user",
                      "age_shift", "badge_mimic"):
         assert expected in refused and refused[expected]

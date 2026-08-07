@@ -297,7 +297,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                  placeholder={tr("asst.worn.name", lang)} style={{ flex: 1 }} />
           <select value={deviceKind}
                   onChange={(e) => setDeviceKind(e.target.value)}>
-            {Object.entries(devices?.kinds || {}).map(([k, where]) => (
+            {Object.entries(devices?.kinds_worn || {}).map(([k, where]) => (
               <option key={k} value={k}>{k.replace(/_/g, " ")} — {where}</option>
             ))}
           </select>
@@ -308,12 +308,12 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                     setDeviceName("");
                   }, "Paired.")}>{tr("asst.worn.pair", lang)}</button>
         </div>
-        {devices && Object.keys(devices.refused).length > 0 && (
+        {devices && Object.keys(devices.refusal_reasons).length > 0 && (
           <>
             <h4>{tr("asst.worn.refused", lang)}</h4>
             {/* Verbatim, each of them. The argument is about the people who
                 walk into the room, and it is not the console's to shorten. */}
-            {Object.entries(devices.refused).map(([k, why]) => (
+            {Object.entries(devices.refusal_reasons).map(([k, why]) => (
               <p className="muted small" key={k}>{why}</p>
             ))}
           </>

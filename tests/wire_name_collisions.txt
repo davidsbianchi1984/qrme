@@ -1,5 +1,5 @@
-# status: backlog — 23 rows
-# ceiling: 23
+# status: backlog — 21 rows
+# ceiling: 21
 #
 # One wire field name carrying more than one type across this product's API.
 #
@@ -38,7 +38,6 @@ entries
 events
 goal
 items
-kinds
 members
 messages
 offerings
@@ -47,7 +46,6 @@ profile
 profiles
 providers
 rating
-refused
 scope
 sources
 subscribers

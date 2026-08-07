@@ -232,7 +232,7 @@ def microphone_vocabulary() -> dict:
     """
     return {
         "personal": list(roommic.PERSONAL_TYPES),
-        "refused": [
+        "refusals": [
             {"kind": k,
              "why": "it is pointed at the room, not at you — it would pick up "
                     "the people around you, and their voices are not yours "

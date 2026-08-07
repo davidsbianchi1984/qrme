@@ -46,10 +46,10 @@ def list_wearables(profile_id: str, request: Request,
     return {"profile_id": profile_id,
             "wearables": wearables.paired(profile_id, include_revoked),
             "faces": wearables.FACES,
-            "kinds": wearables.KINDS,
+            "kinds_worn": wearables.KINDS,
             # Said out loud, so a client can grey these out with the reason
             # rather than offering them and returning a 422.
-            "refused": {k: wearables.REFUSAL.format(kind=k, what=v)
+            "refusal_reasons": {k: wearables.REFUSAL.format(kind=k, what=v)
                         for k, v in wearables.REFUSED.items()}}
 
 

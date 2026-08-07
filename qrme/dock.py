@@ -211,7 +211,7 @@ def vocabulary() -> dict:
     """
     return {
         "faces": FACES,
-        "refused": REFUSED,
+        "refusal_reasons": REFUSED,
         "corners": CORNERS,
         "states": STATES,
         "default_state_on": DEFAULT_STATE_ON,

@@ -3773,10 +3773,10 @@ object ApiClient {
     /** A paired device is a screen and a set of buttons. */
     suspend fun wearables(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/wearables", token = token))
-        val kinds = o.optJSONArray("kinds") ?: org.json.JSONArray()
+        val worn = o.optJSONObject("kinds_worn") ?: JSONObject()
         return o.getJSONArray("wearables").length().toString() +
-            " \u00b7 " + (0 until kinds.length()).joinToString(
-                " \u00b7 ") { kinds.getString(it) }
+            " \u00b7 " + worn.keys().asSequence().joinToString(
+                " \u00b7 ") { "$it ${worn.optString(it)}" }
     }
 
     suspend fun pairWearable(id: String, name: String, kind: String,
@@ -3950,14 +3950,14 @@ object ApiClient {
 
     suspend fun microphoneVocabulary(): Int {
         return (JSONObject(request("/microphones/vocabulary"))
-            .optJSONObject("widths") ?: JSONObject()).length()
+            .optJSONArray("refusals") ?: org.json.JSONArray()).length()
     }
 
     suspend fun overlaysCatalogue(): String {
         val o = JSONObject(request("/overlays/catalogue"))
-        val worn = o.optJSONObject("overlays") ?: JSONObject()
-        val refused = o.optJSONObject("refused") ?: JSONObject()
-        return worn.length().toString() + " \u00b7 " + refused.length()
+        val kinds = o.optJSONArray("kinds") ?: org.json.JSONArray()
+        val refusals = o.optJSONArray("refusals") ?: org.json.JSONArray()
+        return kinds.length().toString() + " \u00b7 " + refusals.length()
     }
 
     /** The whole list, replaced wholesale — a CV is a statement. */

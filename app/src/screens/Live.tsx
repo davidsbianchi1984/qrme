@@ -296,11 +296,11 @@ export function Live({ onPlans }: {
             </p>
             {/* One reason, repeated for every refused device, and it is the
                 reason that matters: their voices are not yours to lend. */}
-            {mic.refused[0] && (
+            {mic.refusals[0] && (
               <p className="muted small">
                 {fill(tr("liv.refused", lang), {
-                  kinds: mic.refused.map((r) => r.kind).join(", "),
-                  why: mic.refused[0].why,
+                  kinds: mic.refusals.map((r) => r.kind).join(", "),
+                  why: mic.refusals[0].why,
                 })}
               </p>
             )}

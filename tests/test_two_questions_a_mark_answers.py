@@ -189,9 +189,9 @@ def test_the_refusals_are_published_before_anybody_tries(client):
     from the picker instead of letting somebody find out by failing."""
     p, head = _owner(client, "acct_micpub")
     view = client.get(f"/profiles/{p['id']}/wearables", headers=head).json()
-    assert view["refused"], "nothing is published as refused any more"
-    for kind, why in view["refused"].items():
-        assert kind not in view["kinds"], (
+    assert view["refusal_reasons"], "nothing is published as refused any more"
+    for kind, why in view["refusal_reasons"].items():
+        assert kind not in view["kinds_worn"], (
             f"{kind} is offered and refused at the same time")
         assert len(why) > 40, f"{kind} is refused without a reason"
 
@@ -349,7 +349,7 @@ def test_the_screen_asks_both_questions_of_a_mark():
 def test_the_refusal_paragraphs_are_rendered_not_retyped():
     import re
     src = _src("app/src/screens/Assist.tsx")
-    assert "devices.refused" in src
+    assert "devices.refusal_reasons" in src
     # Comments stripped: the docstring quotes the sentence on purpose, to say
     # why it is never retyped. It is the markup that must hold one copy.
     markup = re.sub(r"/\*.*?\*/", "", src, flags=re.S)

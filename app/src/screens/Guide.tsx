@@ -221,7 +221,7 @@ export function Guide({ onPlans }: {
           ))}
 
           {/* The more interesting half of the catalogue. */}
-          {Object.entries(faces.refused).map(([name, why]) => (
+          {Object.entries(faces.refusal_reasons).map(([name, why]) => (
             <p key={name} className="small">
               {fill(tr("gde.refused", lang),
                     { name: <strong>{name}</strong>, why })}

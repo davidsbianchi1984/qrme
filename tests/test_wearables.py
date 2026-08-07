@@ -150,9 +150,9 @@ def test_the_refusals_are_published_with_their_reason(client):
     me = make_profile(client, display_name="Owner")
     r = client.get(f"/profiles/{me['id']}/wearables",
                    headers=auth_header(me)).json()
-    assert set(r["refused"]) == set(wearables.REFUSED)
-    assert all("walks into the room" in v for v in r["refused"].values())
-    assert not set(r["kinds"]) & set(r["refused"])
+    assert set(r["refusal_reasons"]) == set(wearables.REFUSED)
+    assert all("walks into the room" in v for v in r["refusal_reasons"].values())
+    assert not set(r["kinds_worn"]) & set(r["refusal_reasons"])
 
 
 def test_pairing_a_microphone_kind_opens_no_channel(client):

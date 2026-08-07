@@ -4,6 +4,76 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.7] — 2026-08-07
+
+### `kinds` meant three things, and one of them crashed the client
+
+The two names 0.56.4 could not strike were `kinds` and `refused` — collisions
+that were always on the server and only became visible once the Windows client
+stopped under-declaring the wire. Splitting them turned up something better
+than a naming problem.
+
+`GET /profiles/{id}/wearables` sends `kinds` as a **map** — kind to where it is
+worn — and the Windows record declared `string[]`. `System.Text.Json` does not
+coerce an object into an array; it throws. So that call did not lose a field,
+it failed outright, and had done since the wearables board was written.
+
+    asked     do the names match
+    mattered  can the declared type decode what arrives
+
+#### Three meanings, three names
+
+**`kinds`** was a vocabulary of records, a map, and a filter selection:
+
+* the vocabularies (overlays, displays, exchanges, the lobby) keep `kinds`;
+* the wearables board's map becomes **`kinds_worn`** — kind → where it is worn;
+* a reader's marketplace preferences become **`kinds_wanted`**, because a
+  saved filter is a choice, not a vocabulary.
+
+**`refused`** was a boolean, a list of records, and a map:
+
+* the help answer's *did this refuse* keeps `refused`, the only boolean;
+* the vocabularies' lists become **`refusals`**;
+* the dock's and the wearables board's maps become **`refusal_reasons`**.
+
+Collision record 23 → 21.
+
+#### The check the guard did not have
+
+`test_the_shape_the_client_expects.py` compares declared **names** against the
+keys a route returns. `kinds` was returned, under exactly that name, as
+exactly the wrong kind of thing — so the guard saw nothing. `DockWhere.screen`
+declared `string` for an integer got through the same hole in 0.56.4 and was
+only caught by reading it.
+
+There is now a second assertion: drive the route, and check that each declared
+C# type *can decode the shape that arrived*. Coarse on purpose — list, object,
+string, number, bool — because that is the distinction a decoder actually
+throws on.
+
+It found five more, every one a live crash rather than a blank field:
+
+| record | declared | arrives as |
+|---|---|---|
+| `WearableBoard.faces` | `string[]` | a map |
+| `DockFacesBox.faces` | `string[]` | a map |
+| `MicPlacesOut.places` | `Dictionary` | a list |
+| `DisplayVocabulary.never` | `Dictionary` | a list |
+| `PageCard.theme` | `string` | a card with an id, a label and colours |
+
+All five corrected, with the screens that read them. The same check is now in
+JIM-mini and PDI, where both clients came back clean — as they did for the
+name check in 0.56.5.
+
+#### The other client that was guessing
+
+iOS carried the same fictions the Windows client did — `MicVocabularyOut.widths`
+and `OverlayCatalogue.overlays`/`refused` are fields no route has ever sent,
+and `WearableBoard.kinds`/`faces` were lists for maps. Corrected here. The
+shape guard reads the Windows client because it is the one place every wire
+name is declared with its type; nothing yet reads Swift or Kotlin the same
+way, and that is the next thing this guard is missing.
+
 ## [0.56.6] — 2026-08-07
 
 ### Reported from a phone: eight watch faces that were not on the page

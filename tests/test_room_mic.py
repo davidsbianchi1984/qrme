@@ -484,7 +484,7 @@ def test_a_refused_pairing_kind_gets_its_reason_not_unknown(client):
 def test_the_vocabulary_route_lists_what_can_and_cannot_be_lent(client):
     out = client.get("/microphones/vocabulary").json()
     assert "watch" in out["personal"]
-    refused = {r["kind"] for r in out["refused"]}
+    refused = {r["kind"] for r in out["refusals"]}
     assert "speakerphone" in refused and "room_array" in refused
-    assert all(r["why"] for r in out["refused"])
+    assert all(r["why"] for r in out["refusals"])
     assert out["room_gain"] == "near_field" and out["voice_focus"] is True

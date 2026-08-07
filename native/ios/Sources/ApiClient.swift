@@ -5023,9 +5023,11 @@ struct WearableRow: Decodable {
 struct WearableBoard: Decodable {
     let profile_id: String?
     let wearables: [WearableRow]
-    let faces: [String]?
-    let kinds: [String]?
-    let refused: [String: String]?
+    // Maps, not lists: `faces` is face -> what it shows, `kinds_worn` is
+    // kind -> where it is worn, `refusal_reasons` is kind -> why not.
+    let faces: [String: String]?
+    let kinds_worn: [String: String]?
+    let refusal_reasons: [String: String]?
 }
 
 struct GenesisOut: Decodable {
@@ -5120,13 +5122,27 @@ struct MicPlacesOut: Decodable {
     let places: [String: String]?
 }
 
+struct RefusedKind: Decodable {
+    let kind: String?
+    let why: String?
+}
+
 struct MicVocabularyOut: Decodable {
-    let widths: [String: String]?
+    let personal: [String]?
+    let refusals: [RefusedKind]?
+    let rules: [String]?
+}
+
+struct OverlayKind: Decodable {
+    let kind: String?
+    let covers_face: Bool?
+    let means: String?
 }
 
 struct OverlayCatalogue: Decodable {
-    let overlays: [String: String]?
-    let refused: [String: String]?
+    let kinds: [OverlayKind]?
+    let refusals: [RefusedKind]?
+    let rules: [String]?
 }
 
 struct ExperienceOut: Decodable {

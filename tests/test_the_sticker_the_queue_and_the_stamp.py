@@ -203,12 +203,12 @@ def test_a_wearable_is_a_screen_and_the_record_survives(client):
     p = make_profile(client)
     board = client.get(f"/profiles/{p['id']}/wearables",
                        headers=auth_header(p)).json()
-    assert board["kinds"]
+    assert board["kinds_worn"]
     # The refusals are said out loud, so a client can grey these out
     # with the reason rather than offering them and returning a 422.
-    assert board["refused"]
-    kind = next(iter(board["kinds"]))
-    refused_kind = next(iter(board["refused"]))
+    assert board["refusal_reasons"]
+    kind = next(iter(board["kinds_worn"]))
+    refused_kind = next(iter(board["refusal_reasons"]))
     r = client.post(f"/profiles/{p['id']}/wearables",
                     json={"name": "left wrist", "kind": kind},
                     headers=auth_header(p))

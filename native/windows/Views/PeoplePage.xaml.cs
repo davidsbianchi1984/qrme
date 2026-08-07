@@ -1266,8 +1266,8 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var box = await ApiClient.Shared.DockFaces();
-            DockList.ItemsSource = (box.Faces ?? Array.Empty<string>())
-                .Select(f => new Row(f)).ToList();
+            DockList.ItemsSource = (box.Faces ?? [])
+                .Select(f => new Row($"{f.Key} · {f.Value}")).ToList();
         });
 
     private async void OnDockMine(object sender, RoutedEventArgs e) =>
@@ -1380,10 +1380,8 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var v = await ApiClient.Shared.DisplayVocabulary();
-            DispList.ItemsSource = (v.Never
-                ?? new System.Collections.Generic.Dictionary<string, string>())
-                .Values.OrderBy(x => x).Select(r => new Row($"· {r}"))
-                .ToList();
+            DispList.ItemsSource = (v.Never ?? [])
+                .Select(r => new Row($"{r.Thing} · {r.Why}")).ToList();
         });
 
     private async void OnDispShow(object sender, RoutedEventArgs e) =>
@@ -1979,7 +1977,7 @@ public sealed partial class PeoplePage : Page
         {
             var pg = await ApiClient.Shared.PageOf(AppState.Current.Pid!);
             StatusText.Text =
-                $"{pg.Theme ?? "\u2014"} \u00b7 {pg.Tagline ?? "\u2014"}";
+                $"{pg.Theme?.Label ?? "\u2014"} \u00b7 {pg.Tagline ?? "\u2014"}";
         });
 
     private async void OnPgThemes(object sender, RoutedEventArgs e) =>
@@ -2483,7 +2481,8 @@ public sealed partial class PeoplePage : Page
             var outp = await ApiClient.Shared.Wearables(
                 AppState.Current.Pid!, AppState.Current.Token!);
             StatusText.Text = outp.Wearables.Length + " \u00b7 "
-                + string.Join(" \u00b7 ", outp.Kinds ?? Array.Empty<string>());
+                + string.Join(" \u00b7 ", (outp.KindsWorn ?? [])
+                    .Select(k => $"{k.Key} {k.Value}"));
         });
 
     private async void OnWearPair(object sender, RoutedEventArgs e) =>
@@ -2680,7 +2679,8 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var outp = await ApiClient.Shared.MicrophonePlaces();
-            StatusText.Text = (outp.Places?.Count ?? 0).ToString();
+            StatusText.Text = string.Join(" \u00b7 ",
+                (outp.Places ?? []).Select(x => x.Surface));
         });
 
     private async void OnSensVocab(object sender, RoutedEventArgs e) =>
@@ -2696,7 +2696,7 @@ public sealed partial class PeoplePage : Page
         {
             var outp = await ApiClient.Shared.OverlaysCatalogue();
             StatusText.Text = (outp.Kinds?.Length ?? 0) + " \u00b7 "
-                + (outp.Refused?.Length ?? 0);
+                + (outp.Refusals?.Length ?? 0);
         });
 
     private async void OnSensHealth(object sender, RoutedEventArgs e) =>

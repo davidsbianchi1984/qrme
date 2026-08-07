@@ -619,11 +619,11 @@ export type WearableView = {
   wearables: Wearable[];
   /** What each watch face shows, in the backend's words. */
   faces: Record<string, string>;
-  kinds: Record<string, string>;
+  kinds_worn: Record<string, string>;
   /** Room-facing microphones, each with the paragraph saying why it cannot
    *  be paired. Rendered verbatim: the argument is that the people who walk
    *  into the room did not agree to anything. */
-  refused: Record<string, string>;
+  refusal_reasons: Record<string, string>;
 };
 
 export type Review = {
@@ -1420,7 +1420,8 @@ export type Place = {
 
 export type MarketPrefs = {
   interactor_id: string; locality: string | null; region: string | null;
-  scope: string; include_remote: boolean; kinds: string[]; tags: string[];
+  scope: string; include_remote: boolean; kinds_wanted: string[];
+  tags: string[];
   updated_at: string | null;
 };
 
@@ -1868,7 +1869,7 @@ export type MicVocabulary = {
   /** Room-pointed devices, each with the same reason: "it is pointed at the
    *  room, not at you — it would pick up the people around you, and their
    *  voices are not yours to lend." */
-  refused: { kind: string; why: string }[];
+  refusals: { kind: string; why: string }[];
   gain_levels: { level: string; describes: string; reaches_others: boolean }[];
   room_gain: string; voice_focus: boolean; rules: string[];
 };
@@ -2069,7 +2070,7 @@ export type DockFaces = {
   /** What the dock will not carry, with the reason. `control` is refused
    *  because assist/halt/approve are *actions* and the dock does not act —
    *  it floats over the thing those buttons would stop. */
-  refused: Record<string, string>;
+  refusal_reasons: Record<string, string>;
   corners: Record<string, string>;
   states: Record<string, string>;
 };

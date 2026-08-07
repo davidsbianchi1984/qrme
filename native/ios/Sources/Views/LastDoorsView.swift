@@ -389,8 +389,8 @@ struct SensesSection: View {
                 Button(L10n.t("sens.overlays", state.language)) {
                     run {
                         let o = try await ApiClient.shared.overlaysCatalogue()
-                        line = "\((o.overlays ?? [:]).count) · "
-                            + "\((o.refused ?? [:]).count)"
+                        line = "\((o.kinds ?? []).count) · "
+                            + "\((o.refusals ?? []).count)"
                     }
                 }.font(.caption).disabled(busy)
             }

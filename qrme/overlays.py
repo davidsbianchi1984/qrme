@@ -206,7 +206,7 @@ def catalogue() -> dict:
                         for k, v in BACKDROP_SOURCES.items()],
         "never": [{"surface": k, "why": v}
                   for k, v in FORBIDDEN_SURFACES.items()],
-        "refused": [{"kind": k, "why": v} for k, v in REFUSED.items()],
+        "refusals": [{"kind": k, "why": v} for k, v in REFUSED.items()],
         "rules": [
             "everyone who can see you is told you are wearing one",
             "it can never depict a real, identifiable person",

@@ -3919,8 +3919,13 @@ public record LobbyLeft([property: JsonPropertyName("left")] bool? Left);
 public record LobbyContext(
     [property: JsonPropertyName("note")] string? Note);
 
+// Maps, not lists: face -> what it shows, and thing -> why it is never
+// glanced at. Declared as string[] this threw on every response.
 public record DockFacesBox(
-    [property: JsonPropertyName("faces")] string[]? Faces);
+    [property: JsonPropertyName("faces")]
+    System.Collections.Generic.Dictionary<string, string>? Faces,
+    [property: JsonPropertyName("never")]
+    System.Collections.Generic.Dictionary<string, string>? Never);
 
 public record DockWhere(
     [property: JsonPropertyName("face")] string? Face,
@@ -3964,9 +3969,12 @@ public record RoomCard(
     [property: JsonPropertyName("channel")] string? Channel,
     [property: JsonPropertyName("participants")] int Participants);
 
+public record NeverShown(
+    [property: JsonPropertyName("thing")] string? Thing,
+    [property: JsonPropertyName("why")] string? Why);
+
 public record DisplayVocabulary(
-    [property: JsonPropertyName("never")]
-    System.Collections.Generic.Dictionary<string, string>? Never);
+    [property: JsonPropertyName("never")] NeverShown[]? Never);
 
 public record DisplayCard(
     [property: JsonPropertyName("id")] string? Id,
@@ -4224,8 +4232,15 @@ public record ThemeCatalog(
     [property: JsonPropertyName("themes")] ThemeEntry[]? Themes,
     [property: JsonPropertyName("layouts")] string[]? Layouts);
 
+// The theme is a card of its own — an id, a label and the colours — not
+// the id on its own. `theme` carries both meanings across this API and is
+// on the collision record for it.
+public record PageTheme(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("label")] string? Label);
+
 public record PageCard(
-    [property: JsonPropertyName("theme")] string? Theme,
+    [property: JsonPropertyName("theme")] PageTheme? Theme,
     [property: JsonPropertyName("tagline")] string? Tagline,
     [property: JsonPropertyName("about")] string? About);
 
@@ -4538,8 +4553,12 @@ public record WearableRow(
 public record WearableBoard(
     [property: JsonPropertyName("profile_id")] string? ProfileId,
     [property: JsonPropertyName("wearables")] WearableRow[] Wearables,
-    [property: JsonPropertyName("faces")] string[]? Faces,
-    [property: JsonPropertyName("kinds")] string[]? Kinds);
+    [property: JsonPropertyName("faces")]
+    System.Collections.Generic.Dictionary<string, string>? Faces,
+    [property: JsonPropertyName("kinds_worn")]
+    System.Collections.Generic.Dictionary<string, string>? KindsWorn,
+    [property: JsonPropertyName("refusal_reasons")]
+    System.Collections.Generic.Dictionary<string, string>? RefusalReasons);
 
 public record GenesisOut(
     [property: JsonPropertyName("id")] string? Id,
@@ -4619,9 +4638,12 @@ public record PerceiveOut(
     [property: JsonPropertyName("watermark")]
     PerceiveWatermark? Watermark);
 
+public record MicPlace(
+    [property: JsonPropertyName("surface")] string? Surface,
+    [property: JsonPropertyName("why")] string? Why);
+
 public record MicPlacesOut(
-    [property: JsonPropertyName("places")]
-    System.Collections.Generic.Dictionary<string, string>? Places);
+    [property: JsonPropertyName("places")] MicPlace[]? Places);
 
 public record RefusedKind(
     [property: JsonPropertyName("kind")] string? Kind,
@@ -4629,7 +4651,7 @@ public record RefusedKind(
 
 public record MicVocabularyOut(
     [property: JsonPropertyName("personal")] string[]? Personal,
-    [property: JsonPropertyName("refused")] RefusedKind[]? Refused,
+    [property: JsonPropertyName("refusals")] RefusedKind[]? Refusals,
     [property: JsonPropertyName("rules")] string[]? Rules);
 
 public record OverlayKind(
@@ -4639,7 +4661,7 @@ public record OverlayKind(
 
 public record OverlayCatalogue(
     [property: JsonPropertyName("kinds")] OverlayKind[]? Kinds,
-    [property: JsonPropertyName("refused")] RefusedKind[]? Refused,
+    [property: JsonPropertyName("refusals")] RefusedKind[]? Refusals,
     [property: JsonPropertyName("rules")] string[]? Rules);
 
 public record ExperienceEntryOut(
