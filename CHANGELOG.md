@@ -4,6 +4,31 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.2] — 2026-08-07
+
+### The compiler nobody ran
+
+JIM-mini shipped a TypeScript error on `main` for several releases —
+`PresenceSpoken incorrectly extends PresenceBeat`, because one wire field name
+carried three incompatible types across its API. It survived because **no suite
+in any of these three repositories ran `tsc`**.
+
+This console typechecks clean and always did, but that was luck rather than a
+guarantee: nothing was checking. `tests/test_one_name_one_type_on_the_wire.py`
+now runs `tsc --noEmit` here too, and adds the general guard — reading every
+`JsonPropertyName` in the Windows client and failing when one wire name carries
+two types.
+
+**28 collisions found in this product**, recorded and ratcheted: `sources` is
+four different types, `messages` and `watermark` are three each, and `seen`,
+`revoked`, `reattested` and `available` are each a boolean in one place and a
+count in another — the sharp kind, because a decoder coerces rather than
+refusing and the reader gets a plausible wrong answer.
+
+Nothing is renamed here this round. The record is the finding; fixing 28 names
+across a console and three shells is its own work, and doing it badly in a
+hurry is how a rename becomes an outage.
+
 ## [0.56.1] — 2026-08-07
 
 ### Cut together at one version

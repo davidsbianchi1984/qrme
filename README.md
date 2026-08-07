@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.56.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.56.2** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -740,6 +740,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.56.2** | **The compiler nobody ran** — `tsc` is in the suite in all three repos now, along with a guard that fails when one wire name carries two types. 28 collisions found here and recorded: `sources` is four types, `messages` and `watermark` three each |
 | **0.56.1** | Cut together at one version; JIM-mini trains a real offline model from its own follow-up record, and PDI's HSM key path stopped being a seam |
 | **0.56.0** | **The count of what was synthetic** — `attention.py` tells you how divided a profile's attention is; nothing told *you* how one-sided yours had been. Counts from your own logs, readable by you alone, with a door to JIM-mini above the line — and four tests holding it to a count rather than a diagnosis, a notification, a signal somebody else can read, or a transcript with a referral stapled to it |
 | **0.55.0** | **The rule the record stated** — the field-label backlog's own header said *map one when a form starts asking a person for it*, and nothing was checking it; the blend screen had been asking for **share** and **their…** in ten languages while the refusal underneath said `weight` and `aspect`. Plus the guard that reads the screens, which failed first on an Arabic label written ten minutes earlier |
