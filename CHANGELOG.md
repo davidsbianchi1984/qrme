@@ -4,6 +4,60 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.55.0] — 2026-08-07
+
+### The rule the record stated, with something behind it at last
+
+`tests/field_labels_unmapped.txt` records the request-model fields that keep
+their API identifier in a 422 instead of the label a form shows, and its header
+gives a sound reason for each of them: enum members a control sets, ids a
+client fills in from the resource it is already looking at, flags a switch
+owns. Then it states the condition under which a row stops being defensible:
+
+> Map one when a form starts asking a person for it; the ceiling does not move
+> up.
+
+That sentence was the whole policy, and **nothing was checking it**. The
+ceiling stops the list growing. It says nothing about a field already on the
+list that a screen quietly grew an input for — the record would go on
+shrinking, every test would stay green, and the field would sit there being
+typed into a box by a person and named by an identifier in the refusal
+underneath it.
+
+It had already happened. `app/src/screens/Blend.tsx` has been asking for
+**share** and **their…** — labelled, in ten languages — since the blend screen
+was localized, and posting both up as `sources[].weight` and `sources[].aspect`.
+A German reader who left the box empty was told:
+
+    Quellprofile, kommagetrennt.0.weight — Pflichtfeld
+
+a sentence in their language with the API's English name for the box in the
+middle of it. Both fields now carry the label the form shows, borrowing the
+form's own noun in each language so the refusal and the box agree by
+construction rather than by somebody keeping them in step. The record drops
+from 123 rows to 121 and the ceiling follows it down.
+
+### The part that outlasts the two fields
+
+`tests/test_a_form_that_asks_for_it_has_a_label_for_it.py` reads the screens
+and asks the question the record could not: is any field **both** bound to a
+form control and sent in a request body, without a label? The AND is the whole
+guard — screens are full of object literals, and control bindings alone match
+local state that never leaves the browser. Either half alone reported dozens of
+fields no person types into; together they find exactly the population
+`_FIELD_LABELS` exists for, and QRME's is 52 fields, all of them now labelled.
+
+The guard earned its place on its first run by failing on work done ten minutes
+earlier: the Arabic label read *الجانب الذي يخصّه* where the form says
+*ما يخصّه…*, close enough to look finished and not the same words. The label
+was changed, not the check.
+
+Ported to JIM-mini and PDI in the same shape. PDI's copy of the record admits
+in its own header that a 0.46.4 sweep found **forty** rows with a control on a
+form and no label beside it — that sweep was somebody reading every screen by
+hand, and when it finished nothing was left behind to notice the forty-first.
+Now something is.
+
 ## [0.54.1] — 2026-08-07
 
 ### The twenty-four, read one at a time

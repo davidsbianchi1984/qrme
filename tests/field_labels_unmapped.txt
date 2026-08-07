@@ -1,4 +1,4 @@
-# status: backlog — 123 rows
+# status: backlog — 121 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -17,7 +17,7 @@
 # Map one when a form starts asking a person for it; the ceiling does not move
 # up.
 #
-# ceiling: 123
+# ceiling: 121
 account_id
 actor_id
 adult_mode
@@ -28,7 +28,6 @@ anonymous
 app
 appearance
 arg
-aspect
 at_position_s
 attestation_object
 audience
@@ -140,4 +139,3 @@ verification
 view_style
 watermark
 watermark_id
-weight
