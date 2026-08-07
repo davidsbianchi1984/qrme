@@ -4,6 +4,28 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.52.0] — 2026-08-07
+
+### Cut together at one version
+
+The three products are cut at one version, so this release exists here to keep
+that true. **No code changes in this repo this round.**
+
+The round's work is JIM-mini's, and it is a defect this repo knows by heart: a
+promise stated on the wire with nothing enforcing it. Its surface picker had
+reported `reads_health_aloud` since it shipped, and every reader was a screen
+rendering the word next to a button — the same shape as a binding that is not a
+door, or a refusal that names a field no form has. The decision now happens
+before anything is synthesised.
+
+The reason it belongs in this repo's story: **the enforcement point is the one
+that holds the thing**. QRME settled the same argument for the feed, where
+`plays` is decided by who holds the file rather than recomputed by four
+clients. A guardian deciding what a room may hear, and a platform deciding what
+a card may play, are the same rule about where a promise is kept.
+
+Cut together with JIM-mini and PDI at **app-v0.52.0**.
+
 ## [0.51.0] — 2026-08-06
 
 ### How many people it is talking to, offered rather than asked for

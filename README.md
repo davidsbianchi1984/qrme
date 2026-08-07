@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.51.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.52.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -735,6 +735,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.52.0** | Cut together at one version; the round's work is JIM-mini enforcing a promise that had been a caption — the same argument this repo settled for the feed, where the enforcement point is whoever holds the thing |
 | **0.51.0** | **How many people it is talking to** — public, no token, on the accountless screen and all three phones: distinct people this week and altogether, with no ranking, no favourite and no names, greppable rather than promised |
 | **0.50.0** | Cut together at one version; the round's work is JIM-mini's presence — and its door onto this platform hands over rooms, desks and profiles as offers, with no bell rung on anybody's behalf |
 | **0.49.0** | **The stream** — one public card at a time: footage this deployment holds loops, anything on somebody else's platform stays a card until pressed, and every fourth card is a live room or a desk with a person behind it. JIM-mini's Feed tab is a GET-only door onto the same stream |
