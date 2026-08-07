@@ -4,6 +4,42 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.5] — 2026-08-07
+
+### The guard travelled, and the two clients it met were not the same
+
+0.56.4 named the port of `test_the_shape_the_client_expects.py` to JIM-mini
+and PDI as this round's work. It is done, and the finding is what it says
+about the three clients rather than about any one of them.
+
+**Both siblings came out clean.** Every field their Windows clients declare is
+a field their routes send. Only QRME's client had been written from
+imagination — fourteen records guessing at shapes nobody had driven — and the
+guard travelling is what turns that from *a bug we fixed* into *a fact we
+know*.
+
+PDI's copy could not be a copy. Its client builds each `HttpRequestMessage`
+itself and carries the tenant token beside it, so a binding regex written for
+this product's `Get(path)` helper finds zero calls over there — and zero found
+reads exactly like zero wrong. Its version asserts on its own extractor for
+that reason. JIM's copy arms the crash watch and builds an adaptation profile
+before it drives, because twelve of its fields only exist once the feature is
+on and driving into a state beats recording that you did not.
+
+#### Two things the port fixed here as well
+
+The record parser counted a wrapped reason — an indented `#` continuing the
+line above — as an empty row. This repo's record has no wrapped lines yet, so
+nothing was failing; JIM's does, and it failed there first. Fixed in all
+three, because the next reason worth writing here will be too long for one
+line.
+
+And a deliberately malformed injection, made while checking JIM's guard fires,
+showed the record-block regex will run one record's body into the next when a
+paren is unbalanced — reporting fields against the wrong record name, which
+reads as a real finding and is not one. All three now assert that no extracted
+body contains another record.
+
 ## [0.56.4] — 2026-08-07
 
 ### A client record is a claim about a route, and nobody had checked one

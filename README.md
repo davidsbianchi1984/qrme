@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.56.4** ([changelog](CHANGELOG.md) ·
+**Current release: v0.56.5** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -740,6 +740,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.56.5** | **The guard travelled** — 0.56.4's shape guard ported to JIM-mini and PDI, and both siblings came out clean: only this client had been written from imagination. PDI's copy needed its own binding regex, because a pattern borrowed from here finds zero calls there and zero found reads like zero wrong |
 | **0.56.4** | **A client record is a claim about a route** — `share`'s unexplained side turned out to be a Windows record declaring `name` and `share` on a route that has only ever sent `display_name` and `weight`; the button wired to it drew separators with nothing between them. Fourteen records were the same guess. New guard drives every GET binding and checks the claim. Collisions 24 → 23 |
 | **0.56.3** | **The count and the state wore the same name** — `seen`, `available` and `revoked` were each a boolean *and* a tally of that boolean, and a decoder handed `1` where it wants `true` coerces rather than refusing. Counts renamed; a fourth row turned out to be a Windows decoder bug rather than a collision. Record 28 → 24 |
 | **0.56.2** | **The compiler nobody ran** — `tsc` is in the suite in all three repos now, along with a guard that fails when one wire name carries two types. 28 collisions found here and recorded: `sources` is four types, `messages` and `watermark` three each |

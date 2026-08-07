@@ -92,9 +92,15 @@ def _bindings() -> list[tuple[str, str]]:
 
 
 def _recorded() -> set[str]:
-    return {line.split("#")[0].strip()
-            for line in RECORD.read_text(encoding="utf-8").splitlines()
-            if line.strip() and not line.startswith("#")}
+    """Rows, with trailing reasons stripped.
+
+    A row's reason may wrap onto the next line — an indented `#` that is not a
+    row of its own. Filtering on the *result* rather than on the raw line is
+    what keeps a wrapped reason from counting as an empty row.
+    """
+    rows = (line.split("#")[0].strip()
+            for line in RECORD.read_text(encoding="utf-8").splitlines())
+    return {row for row in rows if row}
 
 
 def _returned_keys(body) -> set[str] | None:
@@ -227,6 +233,16 @@ def test_the_extractor_reads_the_bindings_and_the_records():
     names = {wire for fields in _records().values() for wire, _ in fields}
     assert len(_bindings()) >= 150, len(_bindings())
     assert len(names) >= 490, len(names)
+
+def test_no_extracted_record_swallowed_the_next_one():
+    """The block regex is non-greedy, so an unbalanced paren anywhere would let
+    one record's body run on into the next — and the fields would then be
+    reported against the wrong record name, which reads as a real finding and
+    is not one. Seen while injecting a deliberately malformed field to check
+    this guard fires.
+    """
+    for name, body in _RECORD_BLOCK.findall(_SRC):
+        assert "public record" not in body, name
 
 
 def test_the_guard_would_catch_a_fictional_field():
