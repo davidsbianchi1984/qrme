@@ -68,7 +68,7 @@ public sealed partial class WelcomePage : Page
         var persona = PersonaBox.Text.Trim();
         if (name.Length == 0 || persona.Length == 0)
         {
-            ShowError("Enter a display name and a persona to continue.");
+            ShowError(L10n.T("nw.needboth"));
             return;
         }
         var kind = KindBox.SelectedIndex >= 0 && KindBox.SelectedIndex < _kinds.Length

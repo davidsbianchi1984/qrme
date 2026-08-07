@@ -508,7 +508,7 @@ public sealed partial class SettingsPage : Page
             }
             else
             {
-                RecoverVerdict.Text = r.Reason ?? "No profile here produced this text.";
+                RecoverVerdict.Text = r.Reason ?? L10n.T("ns.who.none");
                 RecoverVerdict.Foreground = new SolidColorBrush(
                     Microsoft.UI.Colors.Gray);
                 RecoverCounts.Text = r.BestSimilarity is { } best && r.Threshold is { } th

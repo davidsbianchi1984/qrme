@@ -1,4 +1,4 @@
-# status: backlog — 335 rows
+# status: backlog — 328 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -54,8 +54,37 @@
 # shells, so the count could rise on one shell while the check passed, if the
 # total were not also held.
 #
-# ceiling: 143
-# total: 335
+# ### 0.54.0 — two of the named ones closed
+#
+# **The iPhone's camera-permission state now exists.** `configure()` used to
+# hit `AVCaptureDevice.default(for: .video)`, fail, and return — leaving a
+# black `CameraPreview` with "point at a beacon" floating over it. A person
+# who declined got a dead screen and no reason. `nbcn.camera` and
+# `nbcn.nothing` were in this shell's own table, translated ten ways, asked
+# for by nothing. The second is the one that mattered: *"Nothing is recorded —
+# frames are read and discarded"* is a promise about what this app does with a
+# camera, and only Android readers were being given it.
+#
+# **Windows was printing "scan(s)" and "picked up" in English.**
+# `ReachPage.ReloadBeacons` built its detail line with string literals while
+# `nmg.beacon.scans` and `nmg.beacon.pickedup` sat translated beside it. An
+# owner reading the app in German saw "Garten · 3 scan(s) · picked up" —
+# translated chrome around the two words carrying the meaning. Exactly the
+# shape 0.47.9 found in the iPhone's voiceprint consent block, in a different
+# shell.
+#
+# **And three more of the same, found by turning that into a guard.**
+# `test_a_shell_does_not_print_what_it_translated.py` extracts every string
+# literal from every screen and compares it against that shell's own table:
+# Windows typed out *"Enter a display name and a persona to continue."* and
+# *"No profile here produced this text."*, Android typed out *"Steering
+# applied — it rides on every reply."* Twenty-four more are recorded there,
+# and sorting them is real work rather than a sweep — a label is read, a value
+# is posted back to a route that compares against English, and translating one
+# of those turns a working form into a 422.
+#
+# ceiling: 139
+# total: 328
 
 # ios: 67 of 82 are asked for by another shell
 ios: acct.reset.code
@@ -67,8 +96,6 @@ ios: comp.title
 ios: front.title
 ios: inbox.empty
 ios: life.legend
-ios: nbcn.camera
-ios: nbcn.nothing
 ios: nc.find
 ios: nc.lettalk
 ios: nc.rooms
@@ -215,7 +242,6 @@ android: ns.rel.t.stranger
 android: ns.rel.type
 android: ns.st.age
 android: ns.st.appearance
-android: ns.st.applied
 android: ns.st.g.behavior
 android: ns.st.g.intimacy
 android: ns.st.g.system
@@ -293,10 +319,8 @@ windows: ngam.sub
 windows: nmg
 windows: nmg.beacon.label.ph
 windows: nmg.beacon.loc.ph
-windows: nmg.beacon.pickedup
 windows: nmg.beacon.scan
 windows: nmg.beacon.scan.sub
-windows: nmg.beacon.scans
 windows: nmg.blurb.ph
 windows: nmg.claimed
 windows: nmg.derived
@@ -358,7 +382,6 @@ windows: ns.who.by
 windows: ns.who.by.altered
 windows: ns.who.checking
 windows: ns.who.matched
-windows: ns.who.none
 windows: nsig
 windows: nsig.cansign
 windows: nsig.creds
@@ -388,7 +411,6 @@ windows: nvoi.needs
 windows: nvoi.owner
 windows: nvoi.retired
 windows: nvoi.samples
-windows: nw.needboth
 windows: plc.venues
 windows: pub.tab.mark
 windows: sig.package

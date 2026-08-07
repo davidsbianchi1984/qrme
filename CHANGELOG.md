@@ -4,6 +4,62 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.54.0] — 2026-08-07
+
+### The shells that say less
+
+`native_dead_keys.txt` has held ~335 rows for several releases: strings a
+shell has translated into ten languages that nothing in that shell asks for.
+0.47.9 corrected what the number *means* — 263 of them are asked for by a
+**different** shell, so they are not waste, they are a to-do list about
+screens. Each is the same question: this screen exists on all three shells, so
+why does one of them say less?
+
+This round answers it for the two the record had named, and then builds the
+guard that finds the rest.
+
+**The iPhone had no camera-permission state.** `configure()` hit
+`AVCaptureDevice.default(for: .video)`, failed, and returned — leaving a black
+`CameraPreview` with *"point at a beacon"* floating over it. Somebody who
+declined got a dead screen and no reason. `nbcn.camera` and `nbcn.nothing`
+were sitting in that shell's own table, translated ten ways, read by nothing.
+The second is the one that mattered: *"Nothing is recorded — frames are read
+and discarded"* is a promise about what this app does with a camera, and only
+Android readers had ever been given it.
+
+**Windows was printing "scan(s)" and "picked up" in English.**
+`ReachPage.ReloadBeacons` built its detail line from string literals while
+`nmg.beacon.scans` and `nmg.beacon.pickedup` sat translated beside them. An
+owner reading the app in German saw *"Garten · 3 scan(s) · picked up"* —
+translated chrome around the two words carrying the meaning.
+
+### Then the guard, and what the guard's own injection found
+
+`test_a_shell_does_not_print_what_it_translated.py` extracts every string
+literal from every screen and compares it against that shell's own table. It
+found three more immediately: Windows typing out *"Enter a display name and a
+persona to continue."* and *"No profile here produced this text."*, Android
+typing out *"Steering applied — it rides on every reply."*
+
+**The first version of that guard could not see the bug it was written for.**
+It matched assignments into display properties — `.Text =`, `.Content =` — and
+the beacon line was a literal inside an interpolated string in an object
+initializer. It reported all three shells clean. The injection pass caught it,
+and the detector now extracts literals rather than matching positions.
+
+A first, broader draft reported 88 hits of which 86 were protocol values —
+JSON field names, defaults a form posts back. That version is not in the
+repo: a guard that cries wolf 86 times out of 88 is one nobody reads. What
+ships skips single short words and reads only the view directories, with 24
+rows recorded and ratcheted. Sorting those is real work rather than a sweep —
+a **label** is read, a **value** is posted back to a route that compares
+against English, and translating one of those turns a working form into a
+422.
+
+Dead-key ratchet: **335 → 328**, ceiling **143 → 139**.
+
+Cut together with JIM-mini and PDI at **app-v0.54.0**.
+
 ## [0.53.1] — 2026-08-07
 
 ### Nothing reaches the other platform, and now something checks

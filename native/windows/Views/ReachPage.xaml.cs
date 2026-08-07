@@ -410,8 +410,16 @@ public sealed partial class ReachPage : Page
             {
                 Id = b.Id,
                 Label = b.Label,
-                Detail = $"{b.Location ?? "—"} · {b.Scans} scan(s)" +
-                         (b.Active ? "" : " · picked up"),
+                // "scan(s)" and "picked up" were English string literals
+                // here while `nmg.beacon.scans` and `nmg.beacon.pickedup` sat
+                // translated into ten languages in this shell's own table,
+                // asked for by nothing. An owner reading the app in German
+                // was shown "Garten · 3 scan(s) · picked up" — translated
+                // chrome around the two words carrying the meaning.
+                Detail = $"{b.Location ?? "—"} · "
+                         + L10n.Fill("nmg.beacon.scans", s.Language,
+                                     ("n", b.Scans.ToString()))
+                         + (b.Active ? "" : " · " + L10n.T("nmg.beacon.pickedup")),
                 Active = b.Active,
             }).ToList();
         }

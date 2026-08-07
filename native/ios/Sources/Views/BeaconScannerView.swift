@@ -20,7 +20,63 @@ struct BeaconScannerView: View {
     @EnvironmentObject var state: AppState
     @StateObject private var scanner = BeaconScanner()
 
+    /// Whether the camera has been allowed, refused, or not yet asked.
+    ///
+    /// Until this existed, `configure()` hit `AVCaptureDevice.default(for:
+    /// .video)`, failed silently, and returned — leaving the session stopped
+    /// behind a `CameraPreview` that renders black, with *"point at a
+    /// beacon"* floating over it. A person who declined the permission got a
+    /// dead screen and no idea why.
+    ///
+    /// The second line matters more than the first. Android's copy of this
+    /// state says **"Nothing is recorded — frames are read and discarded"**,
+    /// which is a promise about what this app does with a camera. The iPhone
+    /// reader was never given it, on the one screen where they are being
+    /// asked to hand over a viewfinder. Both rows were sitting translated in
+    /// this shell's own table, asked for by nothing.
+    @State private var allowed: Bool?
+
     var body: some View {
+        ZStack {
+            if allowed == false {
+                refused
+            } else {
+                scanning
+            }
+        }
+        .task { allowed = await BeaconScannerView.askForCamera() }
+    }
+
+    /// What a person sees when they have said no — the reason, the promise,
+    /// and a way back out, matching what Android has shown all along.
+    @ViewBuilder private var refused: some View {
+        VStack(spacing: 10) {
+            Text(L10n.t("nbcn.camera", state.language))
+                .font(.subheadline).foregroundStyle(Theme.txt)
+            Text(L10n.t("nbcn.nothing", state.language))
+                .font(.caption).foregroundStyle(Theme.t2)
+                .multilineTextAlignment(.center)
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Theme.bg)
+    }
+
+    /// Asks once, and reports what the answer was.
+    ///
+    /// `.notDetermined` is the only state that prompts; a previous refusal is
+    /// respected rather than re-asked, because a permission dialog that keeps
+    /// coming back is how people learn to dismiss them without reading.
+    static func askForCamera() async -> Bool {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized: return true
+        case .notDetermined:
+            return await AVCaptureDevice.requestAccess(for: .video)
+        default: return false
+        }
+    }
+
+    @ViewBuilder private var scanning: some View {
         ZStack {
             CameraPreview(session: scanner.session).ignoresSafeArea()
 

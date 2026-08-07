@@ -1048,7 +1048,7 @@ private fun SteeringPanel(vm: StudioViewModel) {
                         appearance.ifBlank { null })
                 }) { r ->
                     r.onSuccess { hub = it
-                        status = "Steering applied — it rides on every reply." }
+                        status = L10n.t("ns.st.applied", vm.language) }
                      .onFailure { status = it.message }
                 }
             }
