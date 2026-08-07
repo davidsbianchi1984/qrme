@@ -303,7 +303,7 @@ struct TradeSection: View {
     @State private var listingId = ""
     @State private var amount = ""
     @State private var acceptPrice = ""
-    @State private var venue = ""
+    @State private var locality = ""
     @State private var offer: MarketOffer?
     @State private var sales: [MarketSale] = []
     @State private var showOffers = true
@@ -431,15 +431,15 @@ struct TradeSection: View {
                         }.disabled(busy || listingId.isEmpty)
                     }
                     TextField(L10n.t("trade.venue", state.language),
-                              text: $venue)
+                              text: $locality)
                         .textFieldStyle(.roundedBorder)
                     HStack {
                         Button(L10n.t("trade.place", state.language)) {
                             run { _ = try await ApiClient.shared
                                 .placeListing(listingId: listingId,
-                                              venue: venue,
+                                              locality: locality,
                                               token: state.token ?? "") }
-                        }.disabled(busy || listingId.isEmpty || venue.isEmpty)
+                        }.disabled(busy || listingId.isEmpty || locality.isEmpty)
                         Button(L10n.t("trade.unplace", state.language)) {
                             run { try await ApiClient.shared
                                 .unplaceListing(listingId: listingId,

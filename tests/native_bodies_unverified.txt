@@ -1,0 +1,74 @@
+# status: backlog — 16 rows
+# ceiling: 16
+#
+# Native writes whose body the route cannot accept, which are real.
+#
+# The first honest run of `test_the_body_the_native_clients_send.py` found
+# seven distinct defects across the three shells — every one of them present
+# in each client that makes the call, which is the evidence that they are the
+# clients drifting from the model rather than one author's slip.
+#
+# One is fixed rather than recorded: `PUT /marketplace/listings/{}/place` sent
+# `venue`, a key from `qrme.rated.VENUES` belonging to a different model, where
+# `ListingPlace` requires `locality` — somewhere a person typed. That call
+# answered 422 on every press, so placing a listing has never worked from any
+# native shell. Windows, iOS and Android now send `locality`.
+#
+# The rest are here because each needs an input the shell does not collect, or
+# a decision about what a control should mean. Correcting the field name alone
+# would move the 422 rather than remove it, and inventing the missing value is
+# the thing this whole family of guards exists to stop.
+#
+# Ratcheted: this list may shrink and must never grow.
+#
+# -- a field the shell has nowhere to get -----------------------------------
+#
+# `CoordinateRequest` requires `from_department` as well as `goal`. All three
+# shells collect only the goal, so coordination 422s everywhere. The fix is a
+# department picker on three screens, fed by /organizations/{id}/departments.
+the Windows client: POST /organizations/{}/coordinate never sends required 'from_department'
+the iOS client: POST /organizations/{}/coordinate never sends required 'from_department'
+the Android client: POST /organizations/{}/coordinate never sends required 'from_department'
+#
+# `AcceptExchangeItem` sends an empty body; the route requires `actor_id`.
+# Which actor is a question the Windows shell can answer from AppState, but
+# only once it is settled whether accepting is done as the interactor or as
+# the profile — the other two shells do not offer the call at all.
+the Windows client: POST /exchanges/{}/items/{}/accept never sends required 'actor_id'
+#
+# -- a control that means something the server does not have ----------------
+#
+# `CameraSet` takes a `url` — "point the desk at its own camera, or clear it
+# back to the sample view". All three shells send `enabled: bool`, which is a
+# switch for a thing the route does not model: turning it *on* needs an
+# address the shells never ask for.
+the Windows client: PUT /desks/{}/camera sends 'enabled', which the model has no property for
+the iOS client: PUT /desks/{}/camera sends 'enabled', which the model has no property for
+the Android client: PUT /desks/{}/camera sends 'enabled', which the model has no property for
+#
+# `MarketPrefs` is where "here" is and how far out to look — scope, kinds,
+# tags, locality, region, include_remote. All three shells send `show_offers`,
+# a boolean with no counterpart, and Android *reads* it back off the response
+# too. What the switch on those screens ought to set is a product question.
+the Windows client: PUT /marketplace/settings/{} sends 'show_offers', which the model has no property for
+the iOS client: PUT /marketplace/settings/{} sends 'show_offers', which the model has no property for
+the Android client: PUT /marketplace/settings/{} sends 'show_offers', which the model has no property for
+#
+# -- a field sent to the wrong call -----------------------------------------
+#
+# Listing a profile takes `blurb` and `tags`; where it is offered is set by
+# `/place`. The shells send `locality` here, where it is discarded, and the
+# parameter is threaded down from a text box — so removing it is a change to
+# what those screens ask for, not a one-line edit.
+the Windows client: POST /profiles/{}/marketplace sends 'locality', which the model has no property for
+the iOS client: POST /profiles/{}/marketplace sends 'locality', which the model has no property for
+the Android client: POST /profiles/{}/marketplace sends 'locality', which the model has no property for
+#
+# `OfferIn` is price / currency / stock. Windows sends `amount` and
+# `accept_price`, neither of which exists, and omits the required `price` — so
+# putting a price on a listing 422s. The screen has an Amount box and an
+# Accept box; renaming the first is easy, but the second collects a
+# counter-offer floor the server has no concept of.
+the Windows client: PUT /marketplace/listings/{}/offer never sends required 'price'
+the Windows client: PUT /marketplace/listings/{}/offer sends 'amount', which the model has no property for
+the Windows client: PUT /marketplace/listings/{}/offer sends 'accept_price', which the model has no property for

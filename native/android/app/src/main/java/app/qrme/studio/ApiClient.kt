@@ -1922,9 +1922,14 @@ object ApiClient {
                 token = token)
     }
 
-    suspend fun placeListing(listingId: String, venue: String, token: String) {
+    // `locality` is what ListingPlace declares — somewhere a person typed.
+    // `venue` is a key from qrme.rated.VENUES and belongs to a different
+    // model; sent here it 422'd, so placing a listing has never worked from
+    // any native shell.
+    suspend fun placeListing(listingId: String, locality: String,
+                             token: String) {
         request("/marketplace/listings/$listingId/place", "PUT",
-                JSONObject().put("venue", venue), token)
+                JSONObject().put("locality", locality), token)
     }
 
     suspend fun unplaceListing(listingId: String, token: String) {

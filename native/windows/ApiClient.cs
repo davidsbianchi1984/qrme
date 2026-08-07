@@ -1318,10 +1318,10 @@ public record PackInstalled(
         return Send<MarketOffer>(req);
     }
 
-    public Task<MarketOffer> PlaceListing(string listingId, string venue,
+    public Task<MarketOffer> PlaceListing(string listingId, string locality,
                                           string token) =>
         Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/place",
-            new { venue }, token));
+            new { locality }, token));
 
     public Task<MarketOffer> UnplaceListing(string listingId, string token)
     {

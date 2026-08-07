@@ -2226,10 +2226,12 @@ extension ApiClient {
             token: token)
     }
 
-    func placeListing(listingId: String, venue: String,
+    // `locality` is what ListingPlace declares — somewhere a person typed.
+    // `venue` is a key from qrme.rated.VENUES and belongs to another model.
+    func placeListing(listingId: String, locality: String,
                       token: String) async throws -> MarketOffer {
         try await request("/marketplace/listings/\(listingId)/place",
-                          method: "PUT", body: ["venue": venue],
+                          method: "PUT", body: ["locality": locality],
                           token: token)
     }
 

@@ -4,6 +4,80 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.3] — 2026-08-07
+
+### The guard read one client and the finding came from four
+
+0.57.2 checked what the console sends against the model FastAPI validates
+with, and the defect that motivated it — a field all four clients sent and no
+model declared — was found by reading the four clients *by hand*. The guard
+read one.
+
+    asked     does the console send a body the route can accept
+    mattered  does any client send a body the route can accept
+
+So this release reads the other three. The comparison is the same and
+imported; only extraction differs, and it has to, because these clients share
+nothing:
+
+    C#      Post($"/organizations", new { name }, token)
+    Swift   request("/rooms", method: "POST", body: ["topic": t])
+    Kotlin  request("/profiles/$id/compose", "POST", JSONObject().put("topic", t))
+
+### Seven defects, each in every client that makes the call
+
+That agreement is the evidence: three independently written shells do not
+drift the same way by accident. **Placing a marketplace listing has never
+worked from any native surface.** `ListingPlace` requires `locality` —
+somewhere a person typed — and Windows, iOS and Android all send `venue`, a
+key from `qrme.rated.VENUES` belonging to a different model. Every press
+answered 422. All three now send `locality`.
+
+The other six are recorded rather than fixed, at a ceiling of sixteen rows,
+because each needs an input the shell does not collect or a decision about
+what a control should mean: coordination requires `from_department` and the
+screens ask only for a goal; `CameraSet` takes a URL where all three send an
+`enabled` boolean; `MarketPrefs` has no counterpart for the `show_offers`
+switch all three send *and* Android reads back; listing a profile takes blurb
+and tags while the shells also send a `locality` the route discards; and
+Windows puts a price on a listing with `amount` and `accept_price` where
+`OfferIn` requires `price`. Correcting a field name alone would move those
+422s rather than remove them.
+
+### Thirteen of the first twenty findings were the extractor
+
+Two faults, both already familiar:
+
+* **C# infers a property name.** `new { name }` declares `name`; reading only
+  the `x = y` form found `learner_id = learnerId` and missed every inferred
+  one, accusing eleven routes of never sending fields they send on every call.
+  Fifth time in this arc the extractor wrote the findings it reported.
+* **Nested keys are not top-level keys.** Swift's
+  `body: ["items": [["content": c]]]` sends `items`; a flat scan also found
+  `content`, and `/rooms` supplied `id` and `kind` from inside `participants`.
+  Sixth time — the console guard has `_top_level` for exactly this, and the
+  idea did not travel with the file.
+
+Kotlin needed the opposite of the Swift fix: the key sits *inside* the
+`.put(` parentheses, so emptying nested brackets removed every key in the file
+and turned the Android client into a hundred and forty false "never sends
+required". Depth has to be measured at the `.put`, not applied to the text.
+
+### And the reach floors caught a seventh
+
+Ported to PDI, the Windows reader found **zero writes**. That client builds
+its messages by hand — `new HttpRequestMessage(HttpMethod.Put, "/records") {
+Content = JsonContent.Create(new { key, value }) }` — where QRME wraps them in
+a helper. Zero found is indistinguishable from zero wrong, and only the
+per-client floor said so. The reader now knows both shapes, which also took
+QRME's own Windows count from 170 writes to 196.
+
+| | Windows | iOS | Android | found |
+|---|---|---|---|---|
+| QRME | 196 (181 readable) | 194 (129) | 194 (128) | **7** |
+| JIM-mini | 55 (51) | 55 (37) | 55 (37) | 0 |
+| PDI | 13 (12) | 12 (7) | 12 (9) | 0 |
+
 ## [0.57.2] — 2026-08-07
 
 ### Every guard in this family reads the answer. None of them read the question
