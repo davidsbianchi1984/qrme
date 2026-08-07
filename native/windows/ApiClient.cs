@@ -289,6 +289,37 @@ public record RoleContext(
 /// <summary>The count, and the three things it refuses to be. The refusals
 /// arrive as fields rather than prose so a page renders them beside the
 /// number instead of composing a reassuring sentence of its own.</summary>
+public record SolitudeTurns(
+    [property: JsonPropertyName("to_profiles")] int ToProfiles,
+    [property: JsonPropertyName("to_people")] int ToPeople);
+
+public record SolitudeOffer(
+    [property: JsonPropertyName("state")] string State,
+    [property: JsonPropertyName("why")] string? Why);
+
+public record Solitude(
+    [property: JsonPropertyName("interactor_id")] string InteractorId,
+    [property: JsonPropertyName("window_days")] int WindowDays,
+    [property: JsonPropertyName("turns")] SolitudeTurns Turns,
+    [property: JsonPropertyName("total_turns")] int TotalTurns,
+    // Null until there is any conversation at all to take a ratio of.
+    [property: JsonPropertyName("share_synthetic")] double? ShareSynthetic,
+    [property: JsonPropertyName("enough_to_say")] bool EnoughToSay,
+    [property: JsonPropertyName("note")] string Note,
+    [property: JsonPropertyName("offer")] SolitudeOffer? Offer);
+
+public record SolitudeReferral(
+    [property: JsonPropertyName("ref")] string Ref,
+    [property: JsonPropertyName("window_days")] int WindowDays,
+    [property: JsonPropertyName("turns")] SolitudeTurns Turns,
+    [property: JsonPropertyName("issued_at")] string IssuedAt,
+    [property: JsonPropertyName("product")] string Product);
+
+public record SolitudeDecision(
+    [property: JsonPropertyName("interactor_id")] string InteractorId,
+    [property: JsonPropertyName("state")] string State,
+    [property: JsonPropertyName("referral")] SolitudeReferral? Referral);
+
 public record ProfileAttention(
     [property: JsonPropertyName("profile_id")] string ProfileId,
     [property: JsonPropertyName("people_this_week")] int PeopleThisWeek,
@@ -1924,6 +1955,24 @@ public sealed class ApiClient
     /// secret earned by intimacy.</summary>
     public Task<ProfileAttention> ProfileAttention(string profileId) =>
         Send<ProfileAttention>(Get($"/profiles/{profileId}/attention"));
+
+    /// <summary>How much of this person's talking here went to a profile
+    /// rather than to a person. The mirror of ProfileAttention — and unlike
+    /// it, scoped to the account asking. There is no owner view of this and
+    /// there must never be one.</summary>
+    public Task<Solitude> Solitude(string interactorId) =>
+        Send<Solitude>(Get($"/interactors/{interactorId}/solitude"));
+
+    /// <summary>Take the JIM-mini door or close it. Closing is recorded so
+    /// the offer is not made a second time.</summary>
+    public Task<SolitudeDecision> SolitudeHandoff(string interactorId, bool accept) =>
+        Send<SolitudeDecision>(
+            Post($"/interactors/{interactorId}/solitude/handoff", new { accept }));
+
+    /// <summary>What would travel, readable before it does — counts and a
+    /// window, never a word anybody wrote.</summary>
+    public Task<SolitudeReferral> SolitudeReferral(string interactorId) =>
+        Send<SolitudeReferral>(Get($"/interactors/{interactorId}/solitude/referral"));
 
     public Task<WatermarkRecovery> RecoverWatermark(string content) =>
         Send<WatermarkRecovery>(Post("/watermarks/recover", new { content }));

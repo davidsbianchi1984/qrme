@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.55.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.56.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -395,6 +395,11 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
     <td align="center" width="33%"><a href="docs/screens/190-what-plays.svg"><img src="docs/screens/190-what-plays.svg" width="210" alt="What Plays"></a><br><sub><b>190</b> · What Plays</sub></td>
     <td align="center" width="33%"><a href="docs/screens/191-rooms-desks.svg"><img src="docs/screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a><br><sub><b>191</b> · Rooms &amp; Desks</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/192-your-side-of-it.svg"><img src="docs/screens/192-your-side-of-it.svg" width="210" alt="Your Side of It"></a><br><sub><b>192</b> · Your Side of It</sub></td>
+    <td align="center" width="33%"></td>
+    <td align="center" width="33%"></td>
+  </tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -735,6 +740,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.56.0** | **The count of what was synthetic** — `attention.py` tells you how divided a profile's attention is; nothing told *you* how one-sided yours had been. Counts from your own logs, readable by you alone, with a door to JIM-mini above the line — and four tests holding it to a count rather than a diagnosis, a notification, a signal somebody else can read, or a transcript with a referral stapled to it |
 | **0.55.0** | **The rule the record stated** — the field-label backlog's own header said *map one when a form starts asking a person for it*, and nothing was checking it; the blend screen had been asking for **share** and **their…** in ten languages while the refusal underneath said `weight` and `aspect`. Plus the guard that reads the screens, which failed first on an Arabic label written ten minutes earlier |
 | **0.54.1** | **The twenty-four, read one at a time** — twelve were labels and are keys now, including a signature attestation pre-filled in English while its translation sat beside it; twelve are values a route matches on and stay English. Plus one badge that had two words across shells |
 | **0.54.0** | **The shells that say less** — the iPhone had no camera-permission state, so a declined viewfinder showed a black screen instead of *nothing is recorded*; Windows printed "scan(s)" and "picked up" in English beside their own translations. Plus the guard that finds the rest — whose first version could not see the bug it was written for |

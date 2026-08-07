@@ -128,6 +128,7 @@ struct SettingsView: View {
 
                 WatermarkCard()
                 WhoWroteThisCard()
+                YourSideCard()
                 ObjectToAProfileCard()
                 ProblemReportingCard()
 
@@ -420,5 +421,114 @@ struct ObjectToAProfileCard: View {
         }
         .padding(14)
         .background(Theme.card).clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+}
+
+/// The other half of the multiplicity disclosure, on this phone.
+///
+/// Deliberately a card somebody opens rather than a banner that appears: a
+/// screen that showed itself when the ratio crossed a line would be the
+/// notification the backend refuses to send, moved into the shell.
+struct YourSideCard: View {
+    @EnvironmentObject var state: AppState
+    @State private var shape: Solitude?
+    @State private var referral: SolitudeReferral?
+    @State private var busy = false
+    @State private var error: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(L10n.t("ns.side", state.language)).font(.headline)
+                .foregroundStyle(Theme.txt)
+            Text(L10n.t("ns.side.sub", state.language))
+                .font(.footnote).foregroundStyle(Theme.t2)
+
+            if let s = shape {
+                HStack {
+                    Text(L10n.t("ns.side.toprofiles", state.language))
+                        .font(.subheadline).foregroundStyle(Theme.t2)
+                    Spacer()
+                    Text("\(s.turns.to_profiles)").font(.subheadline.bold())
+                        .foregroundStyle(Theme.txt)
+                }
+                HStack {
+                    Text(L10n.t("ns.side.topeople", state.language))
+                        .font(.subheadline).foregroundStyle(Theme.t2)
+                    Spacer()
+                    Text("\(s.turns.to_people)").font(.subheadline.bold())
+                        .foregroundStyle(Theme.txt)
+                }
+                // The server's own sentence, shown rather than paraphrased.
+                // Rewording it here is how a count becomes a verdict.
+                Text(s.note).font(.caption).foregroundStyle(Theme.t3)
+
+                if s.offer?.state == "available" {
+                    Text(s.offer?.why ?? "").font(.caption).foregroundStyle(Theme.t2)
+                    HStack(spacing: 8) {
+                        Button(L10n.t("ns.side.take", state.language)) { decide(true) }
+                            .font(.caption.bold()).foregroundStyle(.white)
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(Theme.brandA).clipShape(Capsule())
+                        Button(L10n.t("counter.decline", state.language)) { decide(false) }
+                            .font(.caption.bold()).foregroundStyle(Theme.t2)
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(Theme.scrBot).clipShape(Capsule())
+                    }
+                } else if s.offer?.state == "declined" {
+                    Text(L10n.t("ns.side.declined", state.language))
+                        .font(.caption).foregroundStyle(Theme.t3)
+                } else if s.offer?.state == "accepted" {
+                    if let r = referral {
+                        Text(r.ref).font(.caption.monospaced())
+                            .foregroundStyle(Theme.brandA)
+                        Text(L10n.t("ns.side.thatisall", state.language))
+                            .font(.caption).foregroundStyle(Theme.t3)
+                    } else {
+                        Button(L10n.t("ns.side.show", state.language)) { showReferral() }
+                            .font(.caption.bold()).foregroundStyle(Theme.brandA)
+                    }
+                }
+            }
+
+            if let error { Text(error).font(.caption).foregroundStyle(Theme.red) }
+            Button(L10n.t("ns.side.read", state.language)) { load() }
+                .font(.caption.bold()).foregroundStyle(.white)
+                .padding(.horizontal, 12).padding(.vertical, 8)
+                .background(Theme.brandA).clipShape(Capsule())
+                .disabled(busy)
+        }.card()
+    }
+
+    private func load() {
+        guard let who = state.interactorId else {
+            error = L10n.t("ns.side.signin", state.language); return
+        }
+        busy = true; error = nil
+        Task {
+            do { shape = try await ApiClient.shared.solitude(interactorId: who) }
+            catch { self.error = error.localizedDescription }
+            busy = false
+        }
+    }
+
+    private func decide(_ accept: Bool) {
+        guard let who = state.interactorId else { return }
+        busy = true; error = nil
+        Task {
+            do {
+                _ = try await ApiClient.shared.solitudeHandoff(
+                    interactorId: who, accept: accept)
+                shape = try await ApiClient.shared.solitude(interactorId: who)
+            } catch { self.error = error.localizedDescription }
+            busy = false
+        }
+    }
+
+    private func showReferral() {
+        guard let who = state.interactorId else { return }
+        Task {
+            do { referral = try await ApiClient.shared.solitudeReferral(interactorId: who) }
+            catch { self.error = error.localizedDescription }
+        }
     }
 }

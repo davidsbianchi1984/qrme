@@ -189,6 +189,40 @@
                 </StackPanel>
             </Border>
 
+            <!-- Your side of it: the mirror of the Attention card, scoped
+                 to the person asking. Deliberately a card somebody opens
+                 rather than a banner that appears — a panel that showed
+                 itself when the ratio crossed a line would be the
+                 notification the backend refuses to send, moved into the
+                 shell. Take and Not now are the same weight; a highlighted
+                 default is a thumb on the scale of a consent. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SideHead" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="SideSub" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <Button x:Name="SideReadButton" Click="OnReadMyCounts"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <TextBlock x:Name="SideCounts" FontSize="14" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="SideNote" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                    <TextBlock x:Name="SideWhy" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <StackPanel x:Name="SideChoice" Orientation="Horizontal"
+                                Spacing="8" Visibility="Collapsed">
+                        <Button x:Name="SideTakeButton" Click="OnTakeTheDoor" />
+                        <Button x:Name="SideNotNowButton" Click="OnCloseTheDoor" />
+                    </StackPanel>
+                    <Button x:Name="SideShowButton" Click="OnShowWhatWent"
+                            Visibility="Collapsed" />
+                    <TextBlock x:Name="SideReferral" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
             <!-- Raising an objection: the half of governance that belongs to
                  the person who is *not* the profile's owner. This shell
                  carried the owner's half (list objections against your own

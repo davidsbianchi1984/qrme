@@ -407,6 +407,44 @@ struct ProfileAttention: Decodable {
     let note: String
 }
 
+struct SolitudeTurns: Decodable {
+    let to_profiles: Int
+    let to_people: Int
+}
+
+struct SolitudeOffer: Decodable {
+    let state: String
+    let why: String?
+    let carries: [String]?
+    let does_not_carry: [String]?
+}
+
+struct Solitude: Decodable {
+    let interactor_id: String
+    let window_days: Int
+    let turns: SolitudeTurns
+    let total_turns: Int
+    /// Null until there is any conversation at all to take a ratio of.
+    let share_synthetic: Double?
+    let enough_to_say: Bool
+    let note: String
+    let offer: SolitudeOffer?
+}
+
+struct SolitudeReferral: Decodable {
+    let ref: String
+    let window_days: Int
+    let turns: SolitudeTurns
+    let issued_at: String
+    let product: String
+}
+
+struct SolitudeDecision: Decodable {
+    let interactor_id: String
+    let state: String
+    let referral: SolitudeReferral?
+}
+
 struct WatermarkRecovery: Decodable {
     let recovered: Bool
     let reason: String?
@@ -1030,6 +1068,29 @@ actor ApiClient {
     /// about the profile, not a secret earned by intimacy.
     func profileAttention(profileId: String) async throws -> ProfileAttention {
         try await request("/profiles/\(profileId)/attention")
+    }
+
+    // MARK: Your side of it
+
+    /// How much of *this person's* talking here went to a profile rather than
+    /// to a person. The mirror of `profileAttention`, and unlike it this one
+    /// is scoped to the account asking: there is no owner view of it and there
+    /// must never be one.
+    func solitude(interactorId: String) async throws -> Solitude {
+        try await request("/interactors/\(interactorId)/solitude")
+    }
+
+    /// Take the JIM-mini door or close it. Closing is recorded so the offer is
+    /// not made a second time.
+    func solitudeHandoff(interactorId: String,
+                         accept: Bool) async throws -> SolitudeDecision {
+        try await request("/interactors/\(interactorId)/solitude/handoff",
+                          method: "POST", body: ["accept": accept])
+    }
+
+    /// What would travel, readable before it does — counts and a window.
+    func solitudeReferral(interactorId: String) async throws -> SolitudeReferral {
+        try await request("/interactors/\(interactorId)/solitude/referral")
     }
 
     func recoverWatermark(content: String) async throws -> WatermarkRecovery {

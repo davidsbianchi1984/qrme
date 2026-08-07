@@ -46,6 +46,13 @@ data class ProfileAttention(val profileId: String, val peopleThisWeek: Int,
                             val says: String, val ranksPeople: Boolean,
                             val hasAFavourite: Boolean, val namesAnybody: Boolean,
                             val note: String)
+data class Solitude(val interactorId: String, val windowDays: Int,
+                    val toProfiles: Int, val toPeople: Int, val totalTurns: Int,
+                    val shareSynthetic: Double?, val enoughToSay: Boolean,
+                    val note: String, val offerState: String?, val why: String?)
+data class SolitudeReferral(val ref: String, val windowDays: Int,
+                            val toProfiles: Int, val toPeople: Int,
+                            val product: String)
 data class WatermarkRecovery(val recovered: Boolean, val reason: String?,
                              val profileId: String?, val verbatim: Boolean,
                              val similarity: Double, val matchedWindows: Int,
@@ -583,6 +590,39 @@ object ApiClient {
             o.optString("says"), o.optBoolean("ranks_people"),
             o.optBoolean("has_a_favourite"), o.optBoolean("names_anybody"),
             o.optString("note"))
+    }
+
+    // --- Your side of it ---------------------------------------------------
+    // The mirror of profileAttention, scoped to the account asking. There is
+    // no owner view of this and there must never be one.
+
+    suspend fun solitude(interactorId: String): Solitude {
+        val o = JSONObject(request("/interactors/$interactorId/solitude"))
+        val turns = o.optJSONObject("turns") ?: JSONObject()
+        val offer = o.optJSONObject("offer")
+        return Solitude(
+            o.optString("interactor_id"), o.optInt("window_days"),
+            turns.optInt("to_profiles"), turns.optInt("to_people"),
+            o.optInt("total_turns"),
+            if (o.isNull("share_synthetic")) null else o.optDouble("share_synthetic"),
+            o.optBoolean("enough_to_say"), o.optString("note"),
+            offer?.optString("state"), offer?.optString("why"))
+    }
+
+    /** Closing the door is recorded, so the offer is not made a second time. */
+    suspend fun solitudeHandoff(interactorId: String, accept: Boolean): String {
+        val o = JSONObject(request("/interactors/$interactorId/solitude/handoff",
+            "POST", JSONObject().put("accept", accept)))
+        return o.optString("state")
+    }
+
+    /** Counts and a window — readable before they travel, never a word. */
+    suspend fun solitudeReferral(interactorId: String): SolitudeReferral {
+        val o = JSONObject(request("/interactors/$interactorId/solitude/referral"))
+        val turns = o.optJSONObject("turns") ?: JSONObject()
+        return SolitudeReferral(o.optString("ref"), o.optInt("window_days"),
+            turns.optInt("to_profiles"), turns.optInt("to_people"),
+            o.optString("product"))
     }
 
     suspend fun recoverWatermark(content: String): WatermarkRecovery {

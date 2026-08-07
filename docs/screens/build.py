@@ -3599,6 +3599,22 @@ SCREENS = [
         dict(icon="coin", color="gold", k="Buy without leaving",
              s="the shop rides with the desk"),
     ], button=("Ring the bell", "amber")),
+    # 192: the other half of the multiplicity disclosure. Every card is a
+    # refusal, because the feature is a count and the work was deciding what
+    # the count must never turn into. The button is the offer and there is
+    # deliberately no second, brighter one beside it: a screen that made
+    # "take it" the obvious press would be putting a thumb on a consent.
+    dict(num=192, title="Your Side of It", sub="Counts from your own logs",
+         accent="cyan", tab=0, cards=[
+        dict(icon="chart", color="cyan", k="Two numbers, 28 days",
+             s="to a profile, and to a person"),
+        dict(icon="eye", color="brand", k="Only you can read it",
+             s="no owner view, no queue, no total"),
+        dict(icon="bell", color="amber", k="You ask, or silence",
+             s="it never arrives on its own", pill=("PULL", "good")),
+        dict(icon="lock", color="green", k="The door carries counts",
+             s="nothing you wrote goes with it"),
+    ], button=("Take the door, or not", "ghost")),
     # 187: the storefront. The first card is the distinction that named
     # the round — a shop is not a desk — because a screenshot of a store
     # cannot otherwise show what was deliberately left out of it.

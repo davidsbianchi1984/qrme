@@ -26,6 +26,7 @@ from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import (accounts as account_routes,
                       attention as attention_routes,
+                      solitude as solitude_routes,
                       apps, assistant, audience, avatars, commerce,
                       community, connections,
                       desks, displays, dock, earnings, exchange,
@@ -53,7 +54,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.55.0",
+    app = FastAPI(title="QRME", version="0.56.0",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -139,6 +140,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(wall.router)
     app.include_router(feed_routes.router)
     app.include_router(attention_routes.router)
+    app.include_router(solitude_routes.router)
     app.include_router(exchange.router)
     app.include_router(watchparty.router)
     app.include_router(sharing.router)

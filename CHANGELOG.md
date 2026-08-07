@@ -4,6 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.0] — 2026-08-07
+
+### The count of what was synthetic
+
+`attention.py` closed one half of the multiplicity problem: a profile talks to
+many people at once, and the number is offered rather than discovered. The
+other half was never reported at all. **A person can spend months here in
+conversation that is entirely synthetic, and the platform is the only party in
+a position to see it.**
+
+    asked     does a profile disclose how divided its attention is
+    mattered  does anybody tell the person how one-sided theirs has been
+
+`qrme/solitude.py` counts the turns in this account's own logs over 28 days —
+how many went to a profile, how many reached a person through a matched
+connection or a room — and reports the two numbers to that person and nobody
+else. Above 95%, with at least twenty turns behind it, the answer also carries
+a door: JIM-mini, which is built around somebody's own week rather than around
+keeping them here.
+
+### What it refuses to be, and what holds each refusal
+
+The counting is thirty lines. Nearly all of the work is the four things this
+must never become, because each is what a product with a growth target would
+build instead — and each has a test that the wrong version fails:
+
+* **Not a diagnosis.** The module does not decide anybody is lonely and the
+  word appears nowhere in what it returns. It cannot know: somebody with a full
+  life may talk to a profile every evening for reasons of their own. A count is
+  a fact; *"you seem lonely"* is a verdict this software has no standing to
+  reach and no way to check.
+* **Not a notification.** Nothing is pushed and no beat fires. A product that
+  watched somebody's conversations and then messaged them about it would be
+  performing the surveillance the count exists to disclose.
+* **Not readable by anybody else.** No route reaches it from outside the
+  person's own account — no owner view, no aggregate, no moderation queue. The
+  moment a second party can read it, it becomes a tool for finding the visitors
+  who have nobody else.
+* **Never carries a word anybody wrote.** The handoff is counts and a window.
+  JIM-mini is a health guardian; a referral from here carrying conversation
+  content would hand a medical product the transcript of somebody's private
+  evenings under the banner of helping.
+
+Declining is recorded and the offer does not return. An offer somebody declined
+that reappears next month is the product overriding an answer it already got,
+and the second asking is worse than the first.
+
 ## [0.55.0] — 2026-08-07
 
 ### The rule the record stated, with something behind it at last

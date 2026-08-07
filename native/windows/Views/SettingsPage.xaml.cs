@@ -93,6 +93,13 @@ public sealed partial class SettingsPage : Page
         NoObjections.Text = L10n.T("ns.obj.none", lang);
         AttestButton.Content = L10n.T("ns.obj.attest", lang);
 
+        SideHead.Text = L10n.T("ns.side", lang);
+        SideSub.Text = L10n.T("ns.side.sub", lang);
+        SideReadButton.Content = L10n.T("ns.side.read", lang);
+        SideTakeButton.Content = L10n.T("ns.side.take", lang);
+        SideNotNowButton.Content = L10n.T("counter.decline", lang);
+        SideShowButton.Content = L10n.T("ns.side.show", lang);
+
         WhoHead.Text = L10n.T("ns.who", lang);
         WhoSub.Text = L10n.T("ns.who.sub", lang);
         RecoverBox.PlaceholderText = L10n.T("ns.who.ph", lang);
@@ -485,6 +492,62 @@ public sealed partial class SettingsPage : Page
     /// and below the threshold nobody is named at all — ordinary phrases travel
     /// between unrelated texts, and a coincidence must not read as an accusation.
     /// </summary>
+    /// <summary>How much of this person's talking here went to a profile
+    /// rather than to a person. Nothing is pushed and nothing opens itself:
+    /// the counts appear because somebody pressed for them.</summary>
+    private async void OnReadMyCounts(object sender, RoutedEventArgs e)
+    {
+        var who = AppState.Shared.InteractorId;
+        if (string.IsNullOrEmpty(who))
+        {
+            SideNote.Text = L10n.T("ns.side.signin");
+            return;
+        }
+        SideReadButton.IsEnabled = false;
+        try
+        {
+            var s = await ApiClient.Shared.Solitude(who);
+            SideCounts.Text = $"{L10n.T("ns.side.toprofiles")} {s.Turns.ToProfiles}"
+                            + $"   {L10n.T("ns.side.topeople")} {s.Turns.ToPeople}";
+            // The server's own sentence, shown rather than paraphrased.
+            // Rewording it here is how a count becomes a verdict.
+            SideNote.Text = s.Note;
+            SideWhy.Text = s.Offer?.Why ?? "";
+            SideChoice.Visibility = s.Offer?.State == "available"
+                ? Visibility.Visible : Visibility.Collapsed;
+            SideShowButton.Visibility = s.Offer?.State == "accepted"
+                ? Visibility.Visible : Visibility.Collapsed;
+            if (s.Offer?.State == "declined") SideWhy.Text = L10n.T("ns.side.declined");
+        }
+        finally { SideReadButton.IsEnabled = true; }
+    }
+
+    private async void OnTakeTheDoor(object sender, RoutedEventArgs e) => await Decide(true);
+
+    /// <summary>Closing the door is recorded too, so the offer is not made a
+    /// second time. An offer somebody declined that reappears next month is
+    /// the product overriding an answer it already got.</summary>
+    private async void OnCloseTheDoor(object sender, RoutedEventArgs e) => await Decide(false);
+
+    private async System.Threading.Tasks.Task Decide(bool accept)
+    {
+        var who = AppState.Shared.InteractorId;
+        if (string.IsNullOrEmpty(who)) return;
+        await ApiClient.Shared.SolitudeHandoff(who, accept);
+        OnReadMyCounts(this, new RoutedEventArgs());
+    }
+
+    /// <summary>What would travel, readable before it does. A referral
+    /// somebody cannot look at is a referral they did not really consent
+    /// to.</summary>
+    private async void OnShowWhatWent(object sender, RoutedEventArgs e)
+    {
+        var who = AppState.Shared.InteractorId;
+        if (string.IsNullOrEmpty(who)) return;
+        var r = await ApiClient.Shared.SolitudeReferral(who);
+        SideReferral.Text = $"{r.Ref}   {L10n.T("ns.side.thatisall")}";
+    }
+
     private async void OnRecover(object sender, RoutedEventArgs e)
     {
         var text = RecoverBox.Text;

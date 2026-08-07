@@ -1,4 +1,4 @@
-# status: floor — 55 rows
+# status: floor — 56 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -52,6 +52,7 @@
 # may use — from here every surface either has a drawing or fails the suite.
 
 Blend           142
+Solitude        192
 Chat            6,45,83
 Desk            69,70
 Friends         84

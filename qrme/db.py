@@ -1483,6 +1483,18 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at    TEXT NOT NULL
 );
 
+-- One row per person who has been offered the JIM-mini door, and what they
+-- answered. The row exists so the offer is never made twice: an offer somebody
+-- declined that reappears next month is the product overriding an answer it
+-- already got. `referral` holds counts and a window and never anything that
+-- was said — see qrme/solitude.py.
+CREATE TABLE IF NOT EXISTS solitude_offers (
+    interactor_id TEXT PRIMARY KEY REFERENCES interactors(id),
+    state         TEXT NOT NULL,   -- accepted | declined
+    referral      TEXT,            -- JSON, only when accepted
+    decided_at    TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS engagement (
     profile_id    TEXT NOT NULL,
     interactor_id TEXT NOT NULL,

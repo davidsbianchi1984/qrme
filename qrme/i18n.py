@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no referral was issued': {
+        'es': 'no se emitió ninguna derivación',
+        'fr': "aucune orientation n'a été émise",
+        'de': 'es wurde keine Weiterleitung ausgestellt',
+        'pt': 'não foi emitido qualquer encaminhamento',
+        'it': 'non è stato emesso alcun rinvio',
+        'ja': '引き継ぎは発行されていません',
+        'zh': '没有签发任何转介',
+        'hi': 'कोई रेफ़रल जारी नहीं किया गया',
+        'ar': 'لم تُصدر أي إحالة',
+    },
     'this homepage is not public': {
         'es': 'esta página personal no es pública',
         'fr': "cette page personnelle n'est pas publique",

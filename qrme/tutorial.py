@@ -948,6 +948,22 @@ LESSONS: tuple[dict, ...] = (
          screens=(189, 190, 191),
          try_it="Open the Feed tab with no account, swipe past an off-site "
                 "card, and watch it stay a card until you press play."),
+    dict(key="yourside", chapter="Meeting others", title="Your side of it",
+         what="The Attention card on a profile says how divided its "
+              "attention is. This is the same honesty pointed the other "
+              "way: over the last four weeks, how many of your turns went "
+              "to a profile and how many reached a person. They are counts "
+              "from your own logs and nothing more — this platform does not "
+              "decide what they mean about you, does not send them to you "
+              "unasked, and shows them to nobody else. Above a threshold "
+              "the screen also offers a door to JIM-mini, which you can "
+              "take or close; closing it is remembered, so it is not "
+              "offered twice. What crosses if you take it is the two counts "
+              "and the window, never a word you wrote.",
+         screens=(192,),
+         try_it="Open Your Side after a few conversations, read the two "
+                "numbers, and press Show what went to see the whole "
+                "referral before it moves."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))

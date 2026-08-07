@@ -138,6 +138,11 @@ const CHROME: Table = {
     en: "Rooms", es: "Salas", fr: "Salons", de: "Räume", pt: "Salas",
     it: "Stanze", ja: "ルーム", zh: "房间", hi: "कक्ष", ar: "الغرف",
   },
+  "nav.solitude": {
+    en: "Your side", es: "Tu parte", fr: "Votre côté", de: "Deine Seite",
+    pt: "O teu lado", it: "Il tuo lato", ja: "あなたの側", zh: "你这一边",
+    hi: "आपका पक्ष", ar: "جانبك",
+  },
   "nav.blend": {
     en: "Blend", es: "Fusionar", fr: "Fusionner", de: "Mischen",
     pt: "Mesclar", it: "Fondere", ja: "ブレンド", zh: "融合",
@@ -6445,6 +6450,66 @@ const CHROME: Table = {
   },
   "bld.nothingyet": {
     en: "Nothing to blend yet — install the starter collection in Discover.", es: "Todavía no hay nada que mezclar — instala la colección inicial en Descubrir.", fr: "Rien à mélanger pour l'instant — installez la collection de départ dans Découvrir.", de: "Noch nichts zum Mischen — installieren Sie die Startsammlung unter Entdecken.", pt: "Ainda não há nada para misturar — instale a coleção inicial em Descobrir.", it: "Ancora niente da mescolare — installa la raccolta iniziale in Scopri.", ja: "まだ混ぜるものがありません — 「発見」でスターターコレクションを入れてください。", zh: "还没有可调配的对象——请在“发现”中安装入门合集。", hi: "अभी मिलाने को कुछ नहीं — “खोजें” में शुरुआती संग्रह इंस्टॉल कीजिए।", ar: "لا شيء لمزجه بعد — ثبّت المجموعة المبدئية من «استكشف».",
+  },
+  "sol.title": {
+    en: "Your side of it", es: "Tu parte", fr: "Votre côté", de: "Deine Seite", pt: "O teu lado", it: "Il tuo lato", ja: "あなたの側", zh: "你这一边", hi: "आपका पक्ष", ar: "جانبك أنت",
+  },
+  "sol.pitch": {
+    en: "Counts from your own logs. Nobody else can read them.", es: "Recuentos de tu propio registro. Nadie más puede verlos.", fr: "Des comptes tirés de votre propre journal. Personne d'autre ne peut les lire.", de: "Zahlen aus deinem eigenen Verlauf. Niemand sonst kann sie lesen.", pt: "Contagens do teu próprio registo. Mais ninguém as pode ler.", it: "Conteggi dal tuo registro. Nessun altro può leggerli.", ja: "あなた自身の記録からの件数です。他の誰にも見えません。", zh: "来自你自己记录的计数。别人看不到。", hi: "आपके अपने रिकॉर्ड से गिनती। इसे कोई और नहीं देख सकता।", ar: "أرقام من سجلّك أنت. لا يمكن لأحد غيرك قراءتها.",
+  },
+  "sol.counts": {
+    en: "What you sent", es: "Lo que enviaste", fr: "Ce que vous avez envoyé", de: "Was du gesendet hast", pt: "O que enviaste", it: "Cosa hai inviato", ja: "あなたが送ったもの", zh: "你发送的内容", hi: "आपने जो भेजा", ar: "ما أرسلتَه",
+  },
+  "sol.window": {
+    en: "Over the last {days} days.", es: "En los últimos {days} días.", fr: "Sur les {days} derniers jours.", de: "In den letzten {days} Tagen.", pt: "Nos últimos {days} dias.", it: "Negli ultimi {days} giorni.", ja: "過去 {days} 日間。", zh: "过去 {days} 天。", hi: "पिछले {days} दिनों में।", ar: "خلال آخر {days} يومًا.",
+  },
+  "sol.toprofiles": {
+    en: "To a profile", es: "A un perfil", fr: "À un profil", de: "An ein Profil", pt: "A um perfil", it: "A un profilo", ja: "プロフィール宛て", zh: "发给资料", hi: "प्रोफ़ाइल को", ar: "إلى ملف",
+  },
+  "sol.topeople": {
+    en: "To a person", es: "A una persona", fr: "À une personne", de: "An eine Person", pt: "A uma pessoa", it: "A una persona", ja: "人宛て", zh: "发给真人", hi: "किसी व्यक्ति को", ar: "إلى شخص",
+  },
+  "sol.tooearly": {
+    en: "Too little here yet to make a shape out of.", es: "Todavía hay muy poco como para ver una forma.", fr: "Trop peu ici pour l'instant pour en dégager une forme.", de: "Noch zu wenig, um daraus ein Muster zu machen.", pt: "Ainda há pouco aqui para formar um padrão.", it: "Ancora troppo poco per ricavarne una forma.", ja: "形と呼べるほどの量はまだありません。", zh: "目前还太少，看不出规律。", hi: "अभी इतना कम है कि कोई आकार नहीं बनता।", ar: "لا يزال القليل جدًا هنا لتكوين نمط.",
+  },
+  "sol.door": {
+    en: "A door, if you want it", es: "Una puerta, si la quieres", fr: "Une porte, si vous la voulez", de: "Eine Tür, wenn du sie willst", pt: "Uma porta, se a quiseres", it: "Una porta, se la vuoi", ja: "よければ、ひとつの扉", zh: "一扇门，如果你想要", hi: "एक दरवाज़ा, अगर आप चाहें", ar: "باب، إن أردته",
+  },
+  "sol.carries": {
+    en: "Carries:", es: "Lleva:", fr: "Emporte :", de: "Nimmt mit:", pt: "Leva:", it: "Porta con sé:", ja: "持っていくもの:", zh: "会带走：", hi: "साथ जाता है:", ar: "يحمل:",
+  },
+  "sol.notcarries": {
+    en: "Does not carry:", es: "No lleva:", fr: "N'emporte pas :", de: "Nimmt nicht mit:", pt: "Não leva:", it: "Non porta con sé:", ja: "持っていかないもの:", zh: "不会带走：", hi: "साथ नहीं जाता:", ar: "لا يحمل:",
+  },
+  "sol.take": {
+    en: "Take it", es: "Aceptar", fr: "La prendre", de: "Annehmen", pt: "Aceitar", it: "Accettala", ja: "受け取る", zh: "接受", hi: "लें", ar: "خذه",
+  },
+  "sol.notnow": {
+    en: "Not now", es: "Ahora no", fr: "Pas maintenant", de: "Jetzt nicht", pt: "Agora não", it: "Non ora", ja: "今はやめておく", zh: "暂时不用", hi: "अभी नहीं", ar: "ليس الآن",
+  },
+  "sol.declined": {
+    en: "You closed this door. It will not be offered again.", es: "Cerraste esta puerta. No se volverá a ofrecer.", fr: "Vous avez fermé cette porte. Elle ne sera plus proposée.", de: "Du hast diese Tür geschlossen. Sie wird nicht erneut angeboten.", pt: "Fechaste esta porta. Não voltará a ser oferecida.", it: "Hai chiuso questa porta. Non verrà più offerta.", ja: "この扉は閉じました。もう案内しません。", zh: "你关上了这扇门。不会再次提议。", hi: "आपने यह दरवाज़ा बंद किया। यह दोबारा नहीं दिखेगा।", ar: "أغلقتَ هذا الباب. لن يُعرض مرة أخرى.",
+  },
+  "sol.accepted": {
+    en: "Handed over", es: "Entregado", fr: "Transmis", de: "Übergeben", pt: "Entregue", it: "Consegnato", ja: "引き継ぎ済み", zh: "已交接", hi: "सौंपा गया", ar: "تم التسليم",
+  },
+  "sol.accepted.sub": {
+    en: "This is everything that went across.", es: "Esto es todo lo que cruzó.", fr: "Voici tout ce qui a traversé.", de: "Das ist alles, was hinübergegangen ist.", pt: "Isto é tudo o que passou.", it: "Questo è tutto ciò che è passato.", ja: "渡ったのはこれがすべてです。", zh: "这就是全部传递的内容。", hi: "बस इतना ही गया।", ar: "هذا كل ما انتقل.",
+  },
+  "sol.showreferral": {
+    en: "Show what went", es: "Ver qué se envió", fr: "Voir ce qui est parti", de: "Zeigen, was ging", pt: "Ver o que foi", it: "Mostra cosa è andato", ja: "渡った内容を見る", zh: "查看传递内容", hi: "देखें क्या गया", ar: "اعرض ما انتقل",
+  },
+  "sol.ref": {
+    en: "Referral code", es: "Código de derivación", fr: "Code d'orientation", de: "Weiterleitungscode", pt: "Código de encaminhamento", it: "Codice di rinvio", ja: "引き継ぎ番号", zh: "转介编号", hi: "रेफ़रल कोड", ar: "رمز الإحالة",
+  },
+  "sol.window.label": {
+    en: "Days counted", es: "Días contados", fr: "Jours comptés", de: "Gezählte Tage", pt: "Dias contados", it: "Giorni conteggiati", ja: "集計日数", zh: "统计天数", hi: "गिने गए दिन", ar: "الأيام المحسوبة",
+  },
+  "sol.thatisall": {
+    en: "Nothing you wrote went with it.", es: "Nada de lo que escribiste fue con ello.", fr: "Rien de ce que vous avez écrit n'est parti avec.", de: "Nichts von dem, was du geschrieben hast, ging mit.", pt: "Nada do que escreveste foi com isso.", it: "Nulla di ciò che hai scritto è andato con esso.", ja: "あなたが書いたものは何も含まれていません。", zh: "你写过的内容一个字也没跟着走。", hi: "आपने जो लिखा, उसमें से कुछ नहीं गया।", ar: "لم يذهب معه شيء مما كتبتَه.",
+  },
+  "sol.signin": {
+    en: "Sign in to see your own counts.", es: "Inicia sesión para ver tus recuentos.", fr: "Connectez-vous pour voir vos comptes.", de: "Melde dich an, um deine Zahlen zu sehen.", pt: "Inicia sessão para veres as tuas contagens.", it: "Accedi per vedere i tuoi conteggi.", ja: "自分の件数を見るにはサインインしてください。", zh: "登录后可查看你自己的计数。", hi: "अपनी गिनती देखने के लिए साइन इन करें।", ar: "سجّل الدخول لرؤية أرقامك.",
   },
   "bld.share": {
     en: "share", es: "parte", fr: "part", de: "Anteil", pt: "parte", it: "quota", ja: "割合", zh: "份额", hi: "हिस्सा", ar: "الحصة",

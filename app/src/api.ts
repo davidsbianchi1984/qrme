@@ -1291,6 +1291,42 @@ export interface ProfileAttention {
   note: string;
 }
 
+export interface SolitudeOffer {
+  state: "available" | "accepted" | "declined";
+  at?: string;
+  what?: string;
+  why?: string;
+  carries?: string[];
+  does_not_carry?: string[];
+  accept_at?: string;
+}
+
+export interface Solitude {
+  interactor_id: string;
+  window_days: number;
+  turns: { to_profiles: number; to_people: number };
+  total_turns: number;
+  /** null until there is any conversation at all to take a ratio of. */
+  share_synthetic: number | null;
+  enough_to_say: boolean;
+  note: string;
+  offer?: SolitudeOffer;
+}
+
+export interface SolitudeReferral {
+  ref: string;
+  window_days: number;
+  turns: { to_profiles: number; to_people: number };
+  issued_at: string;
+  product: string;
+}
+
+export interface SolitudeDecision {
+  interactor_id: string;
+  state: "accepted" | "declined";
+  referral: SolitudeReferral | null;
+}
+
 export interface WatermarkRecovery {
   recovered: boolean; reason?: string;
   profile_id?: string; watermark_id?: string; kind?: string;
@@ -3262,6 +3298,24 @@ export const api = {
   profileAttention: (pid: string, interactor?: string) =>
     req<ProfileAttention>(`/profiles/${pid}/attention`
       + (interactor ? `?interactor=${encodeURIComponent(interactor)}` : "")),
+  // The same honesty as `profileAttention`, pointed the other way. How much
+  // of *your* talking here went to a profile rather than to a person — counts
+  // from your own logs, readable by you and by nobody else. There is no owner
+  // view of this and there must never be one: the moment a second party can
+  // read it, a disclosure becomes a way to find the visitors who have nobody
+  // else to talk to.
+  solitude: (who: string) =>
+    req<Solitude>(`/interactors/${encodeURIComponent(who)}/solitude`),
+  // Take the door or close it. Declining is recorded so the offer does not
+  // come back — a second asking overrides an answer already given.
+  solitudeHandoff: (who: string, accept: boolean) =>
+    req<SolitudeDecision>(
+      `/interactors/${encodeURIComponent(who)}/solitude/handoff`,
+      { method: "POST", body: { accept } }),
+  // What would travel, before it travels. Counts and a window, never a word.
+  solitudeReferral: (who: string) =>
+    req<SolitudeReferral>(
+      `/interactors/${encodeURIComponent(who)}/solitude/referral`),
   // Who wrote this? — from the text alone, surviving edits.
   recoverWatermark: (content: string) =>
     req<WatermarkRecovery>("/watermarks/recover", { method: "POST", body: { content } }),

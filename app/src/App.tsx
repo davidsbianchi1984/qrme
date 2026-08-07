@@ -47,6 +47,7 @@ import { Feed } from "./screens/Feed";
 import { Friends } from "./screens/Friends";
 import { Rooms } from "./screens/Rooms";
 import { Blend } from "./screens/Blend";
+import { Solitude } from "./screens/Solitude";
 import { Simulate } from "./screens/Simulate";
 import { Campaigns } from "./screens/Campaigns";
 import { Org } from "./screens/Org";
@@ -58,7 +59,7 @@ import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -73,6 +74,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "friends", label: "Friends", icon: "👥" },
   { id: "rooms", label: "Rooms", icon: "🎧" },
   { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻" },
+  { id: "solitude", label: "Your side", icon: "🪞" },
   { id: "simulate", label: "What If", icon: "🔮" },
   { id: "campaigns", label: "Campaigns", icon: "🎗" },
   { id: "org", label: "Org", icon: "🏛" },
@@ -203,6 +205,7 @@ export function App() {
         {tab === "friends" && <Friends onPlans={toPlans} />}
         {tab === "rooms" && <Rooms onPlans={toPlans} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
+        {tab === "solitude" && <Solitude />}
         {tab === "simulate" && <Simulate onPlans={toPlans} />}
         {tab === "campaigns" && <Campaigns onPlans={toPlans} />}
         {tab === "org" && <Org onPlans={toPlans} />}

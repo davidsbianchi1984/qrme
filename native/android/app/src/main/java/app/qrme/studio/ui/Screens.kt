@@ -925,6 +925,7 @@ fun SettingsScreen(vm: StudioViewModel) {
         }
 
         WhoWroteThisCard(vm)
+        YourSideCard(vm)
         ObjectToAProfileCard(vm)
         // Was spliced between two arguments of the `Text(…)` above — a call
         // in an argument list, which does not parse. It belongs here, beside
@@ -6207,3 +6208,93 @@ private fun presenceLabel(state: String, lang: String): String = when (state) {
 private fun cornerSwitchLabel(feature: String, lang: String): String =
     if (feature == "homepage") L10n.t("corner.switch.homepage", lang)
     else L10n.t("corner.switch.messaging", lang)
+
+/**
+ * The other half of the multiplicity disclosure, on this phone.
+ *
+ * Deliberately a card somebody opens rather than a banner that appears: a card
+ * that showed itself when the ratio crossed a line would be the notification
+ * the backend refuses to send, moved into the shell. The two buttons are the
+ * same size and neither is highlighted, because a default is a thumb on the
+ * scale of a consent.
+ */
+@Composable
+private fun YourSideCard(vm: StudioViewModel) {
+    var shape by remember { mutableStateOf<Solitude?>(null) }
+    var referral by remember { mutableStateOf<SolitudeReferral?>(null) }
+    var busy by remember { mutableStateOf(false) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("ns.side", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("ns.side.sub", vm.language), color = Qrme.T2, fontSize = 12.sp)
+        val who = vm.interactorId
+        if (who.isNullOrBlank()) {
+            // Said rather than left to a 404. Without an interactor there is
+            // no "your own logs" to read, and a button that always failed
+            // would be the shell blaming the network for a missing account.
+            Text(L10n.t("ns.side.signin", vm.language), color = Qrme.T3,
+                fontSize = 12.sp)
+        } else {
+            SmallAction(L10n.t("ns.side.read", vm.language), enabled = !busy) {
+                busy = true
+                vm.call({ ApiClient.solitude(who) }) { r ->
+                    busy = false
+                    shape = r.getOrNull()
+                }
+            }
+        }
+        shape?.let { s ->
+            Row {
+                Text(L10n.t("ns.side.toprofiles", vm.language), color = Qrme.T2,
+                    fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("" + s.toProfiles, color = Qrme.Txt, fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+            Row {
+                Text(L10n.t("ns.side.topeople", vm.language), color = Qrme.T2,
+                    fontSize = 13.sp, modifier = Modifier.weight(1f))
+                Text("" + s.toPeople, color = Qrme.Txt, fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+            // The server's own sentence, shown rather than paraphrased.
+            // Rewording it here is how a count becomes a verdict.
+            Text(s.note, color = Qrme.T3, fontSize = 11.sp)
+            when (s.offerState) {
+                "available" -> {
+                    s.why?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SmallAction(L10n.t("ns.side.take", vm.language)) {
+                            vm.call({ ApiClient.solitudeHandoff(who ?: "", true) }) { _ ->
+                                vm.call({ ApiClient.solitude(who ?: "") }) { r ->
+                                    shape = r.getOrNull() }
+                            }
+                        }
+                        SmallAction(L10n.t("counter.decline", vm.language)) {
+                            vm.call({ ApiClient.solitudeHandoff(who ?: "", false) }) { _ ->
+                                vm.call({ ApiClient.solitude(who ?: "") }) { r ->
+                                    shape = r.getOrNull() }
+                            }
+                        }
+                    }
+                }
+                "declined" -> Text(L10n.t("ns.side.declined", vm.language),
+                    color = Qrme.T3, fontSize = 12.sp)
+                "accepted" -> {
+                    val ref = referral
+                    if (ref == null) {
+                        SmallAction(L10n.t("ns.side.show", vm.language)) {
+                            vm.call({ ApiClient.solitudeReferral(who ?: "") }) { r ->
+                                referral = r.getOrNull() }
+                        }
+                    } else {
+                        Text(ref.ref, color = Qrme.BrandA, fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold)
+                        Text(L10n.t("ns.side.thatisall", vm.language),
+                            color = Qrme.T3, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+    }
+}
