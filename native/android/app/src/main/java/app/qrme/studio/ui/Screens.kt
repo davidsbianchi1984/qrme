@@ -2356,10 +2356,10 @@ private fun PacksPanel(vm: StudioViewModel) {
                             fontWeight = FontWeight.Bold)
                         Text(reg.tagline, color = Qrme.T2, fontSize = 10.sp)
                         Text(L10n.fill("nmg.packs.count", vm.language,
-                    mapOf("synced" to "${reg.synced}", "available" to "${reg.available}")),
+                    mapOf("synced" to "${reg.synced}", "available" to "${reg.availablePacks}")),
                             color = Qrme.T3, fontSize = 10.sp)
                     }
-                    if (reg.synced >= reg.available)
+                    if (reg.synced >= reg.availablePacks)
                         Text(L10n.t("nmg.packs.synced", vm.language), color = Qrme.Green, fontSize = 12.sp,
                             fontWeight = FontWeight.Bold)
                     else SmallAction(L10n.t("nmg.packs.sync", vm.language)) {

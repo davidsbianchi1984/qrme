@@ -13,7 +13,7 @@ def test_registries_are_listed_with_sync_state(client):
     assert regs["robotmods"]["audience"] == "robot"
     assert regs["llmmods"]["name"] == "LLMmods.com"
     assert regs["llmmods"]["audience"] == "profile"
-    assert all(r["synced"] == 0 and r["available"] == 2 for r in regs.values())
+    assert all(r["synced"] == 0 and r["available_packs"] == 2 for r in regs.values())
 
     client.post("/packs/registries/robotmods/sync")
     regs = {r["key"]: r for r in client.get("/packs/registries").json()}

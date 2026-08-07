@@ -148,12 +148,12 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
             <p className="muted small">
               {/* Said apart, because true-because-nothing-left and
                   true-because-the-gateway-said-so are different facts. */}
-              {revoked.revoked === 0
+              {revoked.revoked_count === 0
                 ? tr("lvg.nothinghadleft", lang)
                 : fill(revoked.deleted_at_gateway
                          ? tr("lvg.deletedatgateway", lang)
                          : tr("lvg.markedrevoked", lang),
-                       { n: revoked.revoked })}
+                       { n: revoked.revoked_count })}
               {" "}{revoked.note}
             </p>
           )}

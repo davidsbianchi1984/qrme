@@ -59,7 +59,7 @@ def test_revoke_stops_future_and_deletes_past(cloud_pair):
     out = client.post(
         f"/profiles/{p['id']}/cloud-contribution/revoke").json()
     assert out["opted_in"] is False
-    assert out["revoked"] == 1
+    assert out["revoked_count"] == 1
     assert out["deleted_at_gateway"] is True
     assert fake.contributions == []            # gone at the gateway
 

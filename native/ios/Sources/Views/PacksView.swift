@@ -43,20 +43,20 @@ struct PacksSection: View {
                             Text(reg.name).font(.caption.bold()).foregroundStyle(Theme.brandA)
                             Text(reg.tagline).font(.caption2).foregroundStyle(Theme.t2)
                             Text(L10n.fill("nmg.packs.count", state.language,
-                             ["synced": "\(reg.synced)", "available": "\(reg.available)"]))
+                             ["synced": "\(reg.synced)", "available": "\(reg.available_packs)"]))
                                 .font(.caption2).foregroundStyle(Theme.t3)
                         }
                         Spacer()
-                        Button(reg.synced >= reg.available ? "Synced" : "Sync") {
+                        Button(reg.synced >= reg.available_packs ? "Synced" : "Sync") {
                             sync(reg)
                         }
                         .font(.caption.bold())
-                        .foregroundStyle(reg.synced >= reg.available ? Theme.green : .white)
+                        .foregroundStyle(reg.synced >= reg.available_packs ? Theme.green : .white)
                         .padding(.horizontal, 12).padding(.vertical, 8)
-                        .background(reg.synced >= reg.available
+                        .background(reg.synced >= reg.available_packs
                                     ? Theme.green.opacity(0.16) : Theme.brandA)
                         .clipShape(Capsule())
-                        .disabled(reg.synced >= reg.available)
+                        .disabled(reg.synced >= reg.available_packs)
                     }
                 }
             }.card()

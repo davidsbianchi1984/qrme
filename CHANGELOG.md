@@ -4,6 +4,41 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.3] — 2026-08-07
+
+### The count and the state wore the same name
+
+0.56.2 recorded 28 wire names in this product carrying more than one type, and
+said the record was the finding. Four of them turn out to be the *same*
+finding, four times over: **a boolean state and a count of that state sharing
+one field name.**
+
+| name | the state | the count |
+|---|---|---|
+| `seen` | has this inbox item been seen | how many were just marked seen |
+| `available` | is this desk free right now | how many packs a registry has |
+| `revoked` | is this grant revoked | how many contributions were revoked |
+
+That is the sharp kind of collision. A decoder handed `1` where it expects a
+boolean coerces rather than refusing, so a client asking *is this desk
+available* against the wrong route gets **yes** from a count of one — a
+plausible answer, arrived at from the wrong evidence, with nothing anywhere
+that would notice.
+
+The counts are renamed: `marked_seen`, `available_packs`, `revoked_count`. The
+states keep the names they always deserved. `InboxPage.unseen` already had the
+instinct next door.
+
+### The fourth was a client bug, not a collision
+
+`reattested` is a boolean on the wire everywhere — every route coerces the
+0/1 column with `bool()` before it leaves. The Windows client declared
+`int Reattested`, which means its decoder would have thrown on every objection
+status fetch. Nothing in the collision record could have told the two cases
+apart; reading the backend did.
+
+The record drops from 28 rows to 24, and the ceiling with it.
+
 ## [0.56.2] — 2026-08-07
 
 ### The compiler nobody ran

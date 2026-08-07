@@ -173,7 +173,7 @@ public record Objection(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("reason")] string? Reason,
-    [property: JsonPropertyName("reattested")] int Reattested);
+    [property: JsonPropertyName("reattested")] bool Reattested);
 
 /// <summary>What comes back from raising an objection. <c>ProfileStatus</c> is
 /// the part that matters to the person raising it: the profile is restricted
@@ -463,7 +463,7 @@ public record PackRegistry(
     [property: JsonPropertyName("url")] string Url,
     [property: JsonPropertyName("audience")] string Audience,
     [property: JsonPropertyName("tagline")] string Tagline,
-    [property: JsonPropertyName("available")] int Available,
+    [property: JsonPropertyName("available_packs")] int AvailablePacks,
     [property: JsonPropertyName("synced")] int Synced);
 
 public record InstalledPack(
@@ -3578,7 +3578,7 @@ public record InboxPage(
     [property: JsonPropertyName("unseen")] int Unseen);
 
 public record InboxSeen(
-    [property: JsonPropertyName("seen")] int Seen);
+    [property: JsonPropertyName("marked_seen")] int MarkedSeen);
 
 public record SuggestedRow(
     [property: JsonPropertyName("profile_id")] string ProfileId,
@@ -4538,7 +4538,7 @@ public record ContributionView(
     ContributionRow[]? Contributed);
 
 public record RevokeOut(
-    [property: JsonPropertyName("revoked")] int? Revoked,
+    [property: JsonPropertyName("revoked_count")] int? RevokedCount,
     [property: JsonPropertyName("deleted_at_gateway")]
     bool? DeletedAtGateway);
 

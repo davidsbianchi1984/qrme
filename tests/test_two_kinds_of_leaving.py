@@ -149,7 +149,7 @@ def test_revoking_reports_the_two_things_it_did(client):
     r = client.post(f"/profiles/{p['id']}/cloud-contribution/revoke",
                     headers=head).json()
     assert r["opted_in"] is False
-    assert "revoked" in r and "deleted_at_gateway" in r
+    assert "revoked_count" in r and "deleted_at_gateway" in r
 
 
 def test_deleted_at_gateway_is_true_vacuously_when_nothing_ever_left(client):
@@ -158,13 +158,13 @@ def test_deleted_at_gateway_is_true_vacuously_when_nothing_ever_left(client):
     p, head = _owner(client, "acct_vacuous")
     r = client.post(f"/profiles/{p['id']}/cloud-contribution/revoke",
                     headers=head).json()
-    assert r["revoked"] == 0
+    assert r["revoked_count"] == 0
     assert r["deleted_at_gateway"] is True
 
 
 def test_the_screen_tells_those_two_cases_apart():
     src = _markup("app/src/screens/Leaving.tsx")
-    assert "revoked.revoked === 0" in src, (
+    assert "revoked.revoked_count === 0" in src, (
         "one message covers both 'nothing ever left' and 'the gateway "
         "confirmed', which are different facts")
 

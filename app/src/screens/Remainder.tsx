@@ -198,7 +198,7 @@ export function Remainder() {
               <p className="small"><strong>{r.name}</strong> — {r.tagline}</p>
               <p className="muted small">
                 {fill(tr("rem.mods.reg", lang), {
-                  aud: r.audience, avail: r.available, sync: r.synced,
+                  aud: r.audience, avail: r.available_packs, sync: r.synced,
                 })}
               </p>
             </div>

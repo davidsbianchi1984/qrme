@@ -1,5 +1,5 @@
-# status: backlog — 28 rows
-# ceiling: 28
+# status: backlog — 24 rows
+# ceiling: 24
 #
 # One wire field name carrying more than one type across this product's API.
 #
@@ -32,7 +32,6 @@
 # meaning its own name, the way `spoken` became `spoken_steps`,
 # `deepened_line` and `spoken`.
 #
-available
 comments
 display
 entries
@@ -47,10 +46,7 @@ profile
 profiles
 providers
 rating
-reattested
-revoked
 scope
-seen
 share
 sources
 subscribers

@@ -110,4 +110,8 @@ def mark_seen(profile_id: str) -> dict:
         "UPDATE inbox_events SET seen_at=? WHERE profile_id=? AND"
         " seen_at IS NULL", (db.utcnow(), profile_id))
     conn.commit()
-    return {"seen": cur.rowcount}
+    # `marked_seen`, not `seen`. The row beside it uses `seen` for a boolean —
+    # *has this item been seen* — and one name meaning both the state and a
+    # count of it is a field no client can read without knowing which route
+    # it came from. `InboxPage.unseen` next door already had the instinct.
+    return {"marked_seen": cur.rowcount}

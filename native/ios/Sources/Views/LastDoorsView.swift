@@ -177,7 +177,7 @@ struct MindSection: View {
                         let o = try await ApiClient.shared
                             .revokeContributions(id: state.pid!,
                                                  token: state.token!)
-                        line = "\(o.revoked ?? 0)"
+                        line = "\(o.revoked_count ?? 0)"
                     }
                 }.font(.caption).disabled(busy)
                 TextField(L10n.t("people.add", state.language), text: $cid)

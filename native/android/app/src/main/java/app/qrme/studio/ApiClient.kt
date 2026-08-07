@@ -190,7 +190,7 @@ data class Pack(val id: String, val industry: String, val audience: String,
                 val installs: Int)
 data class PackRegistry(val key: String, val name: String, val url: String,
                         val audience: String, val tagline: String,
-                        val available: Int, val synced: Int)
+                        val availablePacks: Int, val synced: Int)
 data class InstalledPack(val id: String, val title: String, val pricePaid: Double,
                          val robotId: String)
 data class GameSession(val id: String, val platform: String, val game: String,
@@ -1163,7 +1163,7 @@ object ApiClient {
             val o = arr.getJSONObject(i)
             PackRegistry(o.getString("key"), o.optString("name", ""),
                 o.optString("url", ""), o.optString("audience", ""),
-                o.optString("tagline", ""), o.optInt("available"),
+                o.optString("tagline", ""), o.optInt("available_packs"),
                 o.optInt("synced"))
         }
     }
@@ -3872,7 +3872,7 @@ object ApiClient {
     suspend fun revokeContributions(id: String, token: String): Int {
         return JSONObject(request(
             "/profiles/$id/cloud-contribution/revoke", "POST",
-            JSONObject(), token)).optInt("revoked")
+            JSONObject(), token)).optInt("revoked_count")
     }
 
     suspend fun excursion(cid: String, token: String): String {

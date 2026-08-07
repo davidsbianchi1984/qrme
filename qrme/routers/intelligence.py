@@ -418,7 +418,7 @@ def revoke_contributions(profile_id: str, request: Request) -> dict:
     conn.commit()
     return {
         "opted_in": False,
-        "revoked": len(refs),
+        "revoked_count": len(refs),
         "deleted_at_gateway": bool(deleted_at_gateway),
         "note": "future contributions stopped; past items were requested "
                 "deleted by their anonymous refs",

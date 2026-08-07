@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.56.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.56.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -740,6 +740,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.56.3** | **The count and the state wore the same name** — `seen`, `available` and `revoked` were each a boolean *and* a tally of that boolean, and a decoder handed `1` where it wants `true` coerces rather than refusing. Counts renamed; a fourth row turned out to be a Windows decoder bug rather than a collision. Record 28 → 24 |
 | **0.56.2** | **The compiler nobody ran** — `tsc` is in the suite in all three repos now, along with a guard that fails when one wire name carries two types. 28 collisions found here and recorded: `sources` is four types, `messages` and `watermark` three each |
 | **0.56.1** | Cut together at one version; JIM-mini trains a real offline model from its own follow-up record, and PDI's HSM key path stopped being a seam |
 | **0.56.0** | **The count of what was synthetic** — `attention.py` tells you how divided a profile's attention is; nothing told *you* how one-sided yours had been. Counts from your own logs, readable by you alone, with a door to JIM-mini above the line — and four tests holding it to a count rather than a diagnosis, a notification, a signal somebody else can read, or a transcript with a referral stapled to it |

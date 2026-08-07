@@ -2467,7 +2467,7 @@ export type ContributionView = {
 
 export type RevokeResult = {
   opted_in: boolean;
-  revoked: number;
+  revoked_count: number;
   /** True vacuously when `revoked` is 0 — nothing ever left, so nothing
    *  needed deleting. Not the same claim as "the gateway confirmed", and a
    *  tick shown for both would be the wrong reassurance. */
@@ -2808,7 +2808,7 @@ export type PackDetail = {
 
 export type PackRegistry = {
   key: string; name: string; url: string; audience: string;
-  tagline: string; available: number; synced: number;
+  tagline: string; available_packs: number; synced: number;
 };
 
 /** An app this profile is connected to. `directions` is what the connection
@@ -3055,7 +3055,7 @@ export const api = {
     req<{ events: InboxEvent[]; unseen: number }>(
       `/profiles/${profileId}/inbox`, { token }),
   inboxSeen: (profileId: string, token: string) =>
-    req<{ seen: number }>(`/profiles/${profileId}/inbox/seen`,
+    req<{ marked_seen: number }>(`/profiles/${profileId}/inbox/seen`,
       { method: "POST", token }),
   feed: (profileId: string, adult = false) =>
     req<{ posts: WallPost[]; ranked_on: string[] }>(

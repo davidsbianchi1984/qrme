@@ -602,7 +602,7 @@ struct PackRegistry: Decodable {
     let url: String
     let audience: String
     let tagline: String
-    let available: Int
+    let available_packs: Int
     let synced: Int
 }
 
@@ -1820,7 +1820,7 @@ extension ApiClient {
     }
 
     func markInboxSeen(profileId: String, token: String) async throws {
-        struct Out: Decodable { let seen: Int }
+        struct Out: Decodable { let marked_seen: Int }
         let _: Out = try await request("/profiles/\(profileId)/inbox/seen",
                                        method: "POST", token: token)
     }
@@ -5070,7 +5070,7 @@ struct ContributionRow: Decodable {
 }
 
 struct RevokeOut: Decodable {
-    let revoked: Int?
+    let revoked_count: Int?
     let deleted_at_gateway: Bool?
 }
 

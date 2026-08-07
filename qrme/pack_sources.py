@@ -122,7 +122,7 @@ def registry_summaries() -> list[dict]:
             (key,)).fetchone()["n"]
         out.append({"key": key, "name": reg["name"], "url": reg["url"],
                     "audience": reg["audience"], "tagline": reg["tagline"],
-                    "available": len(reg["packs"]), "synced": synced})
+                    "available_packs": len(reg["packs"]), "synced": synced})
     return out
 
 

@@ -150,14 +150,14 @@ def test_looking_clears_the_count_and_keeps_the_record(client):
     b, hb = _mk(client, "Ben")
     client.post(f"/profiles/{a}/friends", json={"friend_id": b}, headers=ha)
     r = client.post(f"/profiles/{b}/inbox/seen", headers=hb)
-    assert r.status_code == 200 and r.json()["seen"] == 1
+    assert r.status_code == 200 and r.json()["marked_seen"] == 1
     page = client.get(f"/profiles/{b}/inbox", headers=hb).json()
     # A window, not a to-do list: the rows stay readable, only the count
     # goes to zero — and seeing twice is zero the second time.
     assert page["unseen"] == 0
     assert len(page["events"]) == 1 and page["events"][0]["seen"] is True
     assert client.post(f"/profiles/{b}/inbox/seen",
-                       headers=hb).json()["seen"] == 0
+                       headers=hb).json()["marked_seen"] == 0
 
 
 def test_the_inbox_is_the_owners_alone(client):
