@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.57.4** ([changelog](CHANGELOG.md) ·
+**Current release: v0.57.5** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.57.5** | **Nothing here builds the phones, so nothing here noticed when they stopped** — 0.57.4 shipped a Swift compile error because every guard reads these sources as text and none of them parse. A duplicate-declaration and brace-balance check for Swift, Kotlin and C#, narrow by design: it does not promise the shells build, only that they lack the mistake that got past everything else |
 | **0.57.4** | **The inputs the shells never asked for** — 0.57.3 recorded six native-write defects as *needing an input the shell does not collect*; this collects them. A department beside the goal, a camera address, a locality and an include-remote switch, `price` where the shells said `amount`, and the signed-in actor on an accept. Six dead buttons across three shells, and the record is empty. Also fixes a Swift compile error 0.57.3 introduced |
 | **0.57.3** | **The guard read one client and the finding came from four** — request bodies checked across the Windows, iOS and Android shells. Seven defects, each present in every client that makes the call, including a marketplace listing placement that has never worked on any native surface. Thirteen of the first twenty findings were the extractor's own, and a seventh defect surfaced only because PDI's Windows reader hit zero |
 | **0.57.2** | **Every guard reads the answer; none read the question** — nothing had ever checked a *request* body against the model FastAPI validates with. QRME's 192 writes are correct; the guard's own first run produced 82 findings that were all its own defect, and a fifth was caught only by comparing how much of each client it reached |
