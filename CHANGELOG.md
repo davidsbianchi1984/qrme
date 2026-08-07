@@ -4,6 +4,44 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.54.1] — 2026-08-07
+
+### The twenty-four, read one at a time
+
+0.54.0's new guard recorded twenty-four literals a shell shows that its own
+table already translates, and said sorting them was the work rather than a
+sweep. It was, and the split came out clean: **twelve were labels and are now
+keys; twelve are values and stay English.**
+
+The labels: the steering group headings — *Behavior*, *Intimacy (18+)* — on
+Android and Windows, the tier names *Friendly* and *Rated 18+* and the
+*Lifetime* total on Android, the packs **Download** button on both phones, and
+the signature attestation. That last one is the one worth naming: *"I attest
+this is accurate and complete"* was pre-filled in English on two shells while
+`nsig.attest` sat translated ten ways beside it. `meaning` is free text the
+server stores as given, so somebody signs in the words **they** would use
+rather than the ones this app happens to be written in.
+
+The values are values, and each was read rather than skipped: `stranger`,
+`professional` and `grandchild` are relationship kinds the steering API
+matches on; `standard` is a SwiftUI `.tag()` whose label was localized all
+along, so the guard was seeing the tag beside it; `restricted` is the fallback
+when the server does not name a profile status, so it must be the word the
+server would have sent. Translating any of them turns a working form into a
+422.
+
+### A split the sort exposed
+
+`nmg.pack.robot` (*🤖 ROBOT*) and `nmg.pack.robot.tasks` (*🤖 ROBOT TASKS*)
+were **both held by all three shells** for the same badge on the same kind of
+pack — iOS rendering one, Windows the other, Android the short one. One badge,
+one word, one key: all three now use `.tasks`, and the short row is deleted
+from all three tables rather than left translated ten ways for nobody.
+
+Dead-key ratchet: **328 → 311**, ceiling **139 → 134**.
+
+Cut together with JIM-mini and PDI at **app-v0.54.1**.
+
 ## [0.54.0] — 2026-08-07
 
 ### The shells that say less

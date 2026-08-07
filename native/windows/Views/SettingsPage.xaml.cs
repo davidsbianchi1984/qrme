@@ -240,8 +240,11 @@ public sealed partial class SettingsPage : Page
             string? lastGroup = null;
             var groupLabels = new System.Collections.Generic.Dictionary<string, string>
             {
-                ["system"] = "System", ["behavior"] = "Behavior",
-                ["intimacy"] = "Intimacy (18+)",
+                // Labels, not ids. The keys are what the steering API
+                // matches on and stay English; the words are read.
+                ["system"] = L10n.T("ns.st.g.system"),
+                ["behavior"] = L10n.T("ns.st.g.behavior"),
+                ["intimacy"] = L10n.T("ns.st.g.intimacy"),
             };
             foreach (var dial in hub.Dials)
             {

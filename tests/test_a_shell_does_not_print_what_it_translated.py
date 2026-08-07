@@ -78,25 +78,33 @@ SHELLS = {
 #: translates, kept with the reason it is still there. Ratcheted: the list may
 #: shrink and never grow.
 #:
-#: They are not all bugs, and sorting them is the work. A **label** is read; a
-#: **value** is posted back to a route that compares against English, and
-#: translating one of those turns a working form into a 422. `stranger`,
-#: `professional` and `grandchild` are relationship kinds the steering API
-#: matches on; `standard` is a signature level; `basic` is a plan id. Each
-#: needs its call site read before it moves.
+#: 0.54.1 read all twenty-four call sites, and the split was clean: **twelve
+#: were labels and are now keys**; the rest are below, and every one of them
+#: is a **value** — a string this shell posts back to a route that compares
+#: against English. Translating one turns a working form into a 422.
+#:
+#:   * `stranger`, `professional`, `grandchild` — relationship kinds in the
+#:     `types` list the steering API matches on;
+#:   * `standard` — a SwiftUI `.tag()` on a signature-level Picker. Its label
+#:     was localized all along; the guard was seeing the tag beside it;
+#:   * `restricted` — the fallback when the server does not name a profile
+#:     status, so it must be the word the server would have sent.
+#:
+#: Every remaining row is here because it was read, not because it was
+#: skipped.
 RECORDED = {
-    ("ios", "Download"), ("ios", "grandchild"), ("ios", "professional"),
-    ("ios", "stranger"), ("ios", "standard"), ("ios", "restricted"),
-    ("ios", "I attest this is accurate and complete"),
-    ("android", "Friendly"), ("android", "Rated 18+"), ("android", "Lifetime"),
-    ("android", "Download"), ("android", "grandchild"),
-    ("android", "professional"), ("android", "stranger"),
-    ("android", "Behavior"), ("android", "Intimacy (18+)"),
-    ("android", "I attest this is accurate and complete"),
-    ("windows", "\U0001f916 ROBOT"), ("windows", "grandchild"),
-    ("windows", "professional"), ("windows", "stranger"),
-    ("windows", "Behavior"), ("windows", "Intimacy (18+)"),
-    ("windows", "basis re-attested"),
+    ('android', 'grandchild'),
+    ('android', 'professional'),
+    ('android', 'stranger'),
+    ('ios', 'grandchild'),
+    ('ios', 'professional'),
+    ('ios', 'restricted'),
+    ('ios', 'standard'),
+    ('ios', 'stranger'),
+    ('windows', 'basis re-attested'),
+    ('windows', 'grandchild'),
+    ('windows', 'professional'),
+    ('windows', 'stranger'),
 }
 
 

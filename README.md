@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.54.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.54.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -735,6 +735,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.54.1** | **The twenty-four, read one at a time** — twelve were labels and are keys now, including a signature attestation pre-filled in English while its translation sat beside it; twelve are values a route matches on and stay English. Plus one badge that had two words across shells |
 | **0.54.0** | **The shells that say less** — the iPhone had no camera-permission state, so a declined viewfinder showed a black screen instead of *nothing is recorded*; Windows printed "scan(s)" and "picked up" in English beside their own translations. Plus the guard that finds the rest — whose first version could not see the bug it was written for |
 | **0.53.1** | **Nothing reaches the other platform** — the network is unplugged and a video is posted, the wall rendered and the feed loaded. The promise held; a `None` field and a sentence were all that had been guarding it |
 | **0.53.0** | Cut together at one version; the round's work audits promises this repo ships in the same shape — a claim about an absence has to be falsified from outside the claim, and saying only what you refuse is how a true sentence misleads |

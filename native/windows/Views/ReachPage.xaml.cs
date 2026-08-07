@@ -269,7 +269,14 @@ public sealed partial class ReachPage : Page
                 Blurb = p.Blurb ?? "",
                 Meta = $"#{p.Industry} · {p.Items} items · {p.Installs} installs · {p.Publisher}"
                        + (p.OriginUrl is { } u ? $" · from {u}" : ""),
-                PriceLabel = (p.Audience == "robot" ? "🤖 ROBOT · " : "")
+                // `nmg.pack.robot.tasks` rather than `nmg.pack.robot`: both
+                // rows existed on both shells with different words — "ROBOT"
+                // here, "ROBOT TASKS" on the iPhone — for the same badge on
+                // the same kind of pack. One badge, one word, one key; the
+                // short row is deleted rather than left translated ten ways
+                // for nobody.
+                PriceLabel = (p.Audience == "robot"
+                              ? L10n.T("nmg.pack.robot.tasks") + " · " : "")
                              + (p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}"),
                 ActionLabel = p.Free
                     ? L10n.T("nmg.packs.download")

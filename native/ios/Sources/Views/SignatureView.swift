@@ -17,7 +17,10 @@ struct SignatureView: View {
     @State private var revoking: String?
     @State private var policy: SignaturePolicy?
     @State private var document = ""
-    @State private var meaning = "I attest this is accurate and complete"
+    /// Free text the server stores as given (max 300), so the default
+    /// belongs in the reader's language — somebody signs in the words they
+    /// would use, not the ones this app happens to be written in.
+    @State private var meaning = L10n.t("nsig.attest", L10n.deviceLanguage)
     // `basic` is what a self-asserted credential can sign, and self-asserted
     // is all this screen can enrol. Defaulting to `standard` shipped a happy
     // path that always failed at the server.

@@ -101,7 +101,7 @@ struct PacksSection: View {
                             Button(L10n.t("nmg.remove", state.language)) { uninstall(pack) }
                                 .font(.caption).foregroundStyle(Theme.red)
                         } else {
-                            Button(pack.free ? "Download"
+                            Button(pack.free ? L10n.t("nmg.packs.download", state.language)
                                    : String(format: "Buy %.2f %@", pack.price, pack.currency)) {
                                 install(pack)
                             }

@@ -1,4 +1,4 @@
-# status: backlog — 328 rows
+# status: backlog — 311 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -83,8 +83,30 @@
 # is posted back to a route that compares against English, and translating one
 # of those turns a working form into a 422.
 #
-# ceiling: 139
-# total: 328
+# ### 0.54.1 — the twenty-four read, one at a time
+#
+# The guard added in 0.54.0 recorded twenty-four literals a shell shows that
+# its own table already translates, and said sorting them was the work. It
+# was. **Twelve were labels and are now keys**; the other twelve are values
+# this shell posts back to a route that compares against English, and
+# translating one turns a working form into a 422.
+#
+# The labels: the steering group headings (`Behavior`, `Intimacy (18+)`) on
+# Android and Windows, the tier names (`Friendly`, `Rated 18+`) and
+# `Lifetime` on Android, the packs `Download` button on both phones, and the
+# signature attestation — *"I attest this is accurate and complete"* — which
+# is free text the server stores as given, so somebody signs in the words
+# they would use rather than the ones this app happens to be written in.
+#
+# **And a split the sort exposed.** `nmg.pack.robot` ("🤖 ROBOT") and
+# `nmg.pack.robot.tasks` ("🤖 ROBOT TASKS") were both held by all three
+# shells for the same badge on the same kind of pack, with iOS using one and
+# Windows the other. One badge, one word, one key: all three now use
+# `.tasks`, and the short row is deleted from all three tables rather than
+# left translated ten ways for nobody.
+#
+# ceiling: 134
+# total: 311
 
 # ios: 67 of 82 are asked for by another shell
 ios: acct.reset.code
@@ -129,9 +151,7 @@ ios: nmg.license.kind
 ios: nmg.pack.free
 ios: nmg.pack.installed.pack
 ios: nmg.pack.installed.robot
-ios: nmg.pack.robot
 ios: nmg.packs.buy
-ios: nmg.packs.download
 ios: nmg.packs.sync
 ios: nmg.packs.synced
 ios: nov.refresh
@@ -142,7 +162,6 @@ ios: ns.lang.pre.on
 ios: ns.model.nokeyword
 ios: ns.rel.type
 ios: ns.wm.label
-ios: nsig.attest
 ios: nsig.creds.yours
 ios: nsig.evidence
 ios: nsig.evidence.sub
@@ -182,8 +201,6 @@ android: life.legend
 android: nc.birthdate.ph
 android: nc.find
 android: nc.tier
-android: nc.tier.friendly
-android: nc.tier.rated
 android: nchat.role.advisor
 android: nchat.role.collaborator
 android: nchat.role.operator
@@ -210,11 +227,8 @@ android: nmg.grants
 android: nmg.h.label
 android: nmg.handle.ph
 android: nmg.license.kind
-android: nmg.lifetime
 android: nmg.pack.commandable
 android: nmg.pack.grounding
-android: nmg.pack.robot.tasks
-android: nmg.packs.download
 android: nmg.paid
 android: nmg.price.ph
 android: nmg.t.gaming
@@ -242,12 +256,8 @@ android: ns.rel.t.stranger
 android: ns.rel.type
 android: ns.st.age
 android: ns.st.appearance
-android: ns.st.g.behavior
-android: ns.st.g.intimacy
-android: ns.st.g.system
 android: ns.wm.label.ph
 android: nsig
-android: nsig.attest
 android: nsig.creds.yours
 android: nsig.domain
 android: nsig.evidence
@@ -338,8 +348,6 @@ windows: nmg.pack.from
 windows: nmg.pack.installed.pack
 windows: nmg.pack.installed.robot
 windows: nmg.pack.meta
-windows: nmg.pack.robot
-windows: nmg.pack.robot.tasks
 windows: nmg.packs.count
 windows: nmg.payout.done
 windows: nmg.price.ph
@@ -373,9 +381,6 @@ windows: ns.object.raised
 windows: ns.rel.saved
 windows: ns.st.age
 windows: ns.st.effective
-windows: ns.st.g.behavior
-windows: ns.st.g.intimacy
-windows: ns.st.g.system
 windows: ns.tr.engine
 windows: ns.who.below
 windows: ns.who.by

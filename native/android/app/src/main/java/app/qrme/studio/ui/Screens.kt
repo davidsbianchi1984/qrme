@@ -972,8 +972,12 @@ private fun SteeringPanel(vm: StudioViewModel) {
     var baseAge by remember { mutableStateOf("") }
     var agingEnabled by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<String?>(null) }
-    val groupLabels = mapOf("system" to "System", "behavior" to "Behavior",
-        "intimacy" to "Intimacy (18+)")
+    // Labels, not ids. The keys on the left are what the steering API
+    // matches on and stay English; the words on the right are read.
+    val groupLabels = mapOf(
+        "system" to L10n.t("ns.st.g.system", vm.language),
+        "behavior" to L10n.t("ns.st.g.behavior", vm.language),
+        "intimacy" to L10n.t("ns.st.g.intimacy", vm.language))
 
     LaunchedEffect(Unit) {
         vm.call({ ApiClient.steeringHub(vm.pid!!, vm.token!!) }) { r ->
@@ -1671,7 +1675,8 @@ private fun StrangerPanel(vm: StudioViewModel) {
                 Text(L10n.t("nc.stranger.sub", vm.language),
                     color = Qrme.T2, fontSize = 12.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    listOf("friendly" to "Friendly", "rated" to "Rated 18+").forEach { (t, label) ->
+                    listOf("friendly" to L10n.t("nc.tier.friendly", vm.language),
+                           "rated" to L10n.t("nc.tier.rated", vm.language)).forEach { (t, label) ->
                         val on = tier == t
                         Text(label, color = if (on) Color.White else Qrme.Txt, fontSize = 12.sp,
                             modifier = Modifier.clip(RoundedCornerShape(50))
@@ -1894,7 +1899,7 @@ private fun EarningsPanel(vm: StudioViewModel) {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     listOf(Triple("Accrued", s.accrued, Qrme.Green),
                            Triple("Paid", s.paid, Qrme.T2),
-                           Triple("Lifetime", s.lifetime, Qrme.BrandA)).forEach { (l, v, c) ->
+                           Triple(L10n.t("nmg.lifetime", vm.language), s.lifetime, Qrme.BrandA)).forEach { (l, v, c) ->
                         Column {
                             Text(money(v, s.currency), color = c, fontSize = 15.sp,
                                 fontWeight = FontWeight.Bold)
@@ -2376,7 +2381,7 @@ private fun PacksPanel(vm: StudioViewModel) {
                         fontWeight = FontWeight.Bold)
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (p.audience == "robot")
-                            Text(L10n.t("nmg.pack.robot", vm.language), color = Qrme.BrandA, fontSize = 11.sp,
+                            Text(L10n.t("nmg.pack.robot.tasks", vm.language), color = Qrme.BrandA, fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold)
                         Text(if (p.free) L10n.t("nmg.pack.free", vm.language)
                              else "%.2f %s".format(p.price, p.currency),
@@ -2401,7 +2406,7 @@ private fun PacksPanel(vm: StudioViewModel) {
                             Text(L10n.t("nmg.remove", vm.language), color = Qrme.Red, fontSize = 12.sp)
                         }
                     } else {
-                        SmallAction(if (p.free) "Download"
+                        SmallAction(if (p.free) L10n.t("nmg.packs.download", vm.language)
                                     else L10n.fill("nmg.packs.buy", vm.language,
                                                    mapOf("price" to "%.2f".format(p.price),
                                                          "currency" to p.currency))) {
@@ -2527,7 +2532,10 @@ private fun SignaturePanel(vm: StudioViewModel) {
     val scope = rememberCoroutineScope()
     var credentials by remember { mutableStateOf<List<SigningCredential>>(emptyList()) }
     var document by remember { mutableStateOf("") }
-    var meaning by remember { mutableStateOf("I attest this is accurate and complete") }
+    // `meaning` is free text the server stores as given (max 300), so the
+    // default belongs in the reader's language: somebody signs in the words
+    // they would use, not in the ones this app happens to be written in.
+    var meaning by remember { mutableStateOf(L10n.t("nsig.attest", vm.language)) }
     var receipt by remember { mutableStateOf<SignatureReceipt?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
