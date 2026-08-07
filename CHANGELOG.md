@@ -4,6 +4,28 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.53.0] — 2026-08-07
+
+### Cut together at one version
+
+The three products are cut at one version, so this release exists here to keep
+that true. **No code changes in this repo this round.**
+
+The round's work is JIM-mini auditing its own promises, and the finding is one
+this repo should read twice: a block of refusals on the wire, guarded by tests
+that read the refusals back out of the dict that hardcodes them. The behaviour
+turned out to be correct — but nothing had been checking, and one sentence was
+wider than the truth.
+
+Both halves matter here. This repo ships posture and provenance blocks of the
+same shape on the feed, the wall and the marketplace, and the lesson transfers
+whole: **a claim about an absence has to be falsified from outside the claim**,
+by taking the action and looking at what changed. And **saying only what you
+refuse is how a true sentence misleads** — the reason this repo's own answers
+name what they keep rather than only what they do not.
+
+Cut together with JIM-mini and PDI at **app-v0.53.0**.
+
 ## [0.52.0] — 2026-08-07
 
 ### Cut together at one version
