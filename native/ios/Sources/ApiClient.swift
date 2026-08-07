@@ -3768,7 +3768,6 @@ struct WorkflowCard: Decodable, Identifiable {
 struct DelegationOffer: Decodable {
     let delegation: Bool?
     let phases: [String]?
-    let enabled: Bool?
 }
 
 struct CreativeWork: Decodable, Identifiable {
@@ -4615,10 +4614,18 @@ struct SucceedOut: Decodable {
     let memorial: Bool?
 }
 
+struct AvatarLikeness: Decodable {
+    let real_person: Bool?
+    let basis: String?
+    let attestor: String?
+    let note: String?
+}
+
 struct AvatarCard: Decodable {
     let asset: String?
-    let ai_badge: Bool?
-    let likeness_of: String?
+    let asset_marked: Bool?
+    let placeholder: Bool?
+    let likeness: AvatarLikeness?
 }
 
 struct BriefCatalog: Decodable {
@@ -4660,15 +4667,23 @@ struct ThemeCatalog: Decodable {
     let layouts: [String]?
 }
 
+// The theme is a card of its own — an id, a label and the colours — not the
+// id on its own.
+struct PageTheme: Decodable {
+    let id: String?
+    let label: String?
+}
+
 struct PageCard: Decodable {
-    let theme: String?
+    let theme: PageTheme?
     let tagline: String?
     let about: String?
 }
 
 struct FrontCard: Decodable {
     let display_name: String?
-    let purpose: String?
+    let headline: String?
+    let ai_disclosure: String?
 }
 
 struct SurfacesCard: Decodable {
@@ -4950,7 +4965,8 @@ struct SocialBeaconCard: Decodable {
 
 struct PairCard: Decodable {
     let console_url: String?
-    let built: Bool?
+    let console_built: Bool?
+    let reachable: Bool?
     let how: [String]?
 }
 
@@ -4996,9 +5012,17 @@ struct WatermarkCredential: Decodable {
     let issued_at: String?
 }
 
-struct MediaLimits: Decodable {
+// One limit per kind of media, not one limit and a list of kinds: video is
+// allowed sixty megabytes where an image gets eight.
+struct MediaLimit: Decodable {
     let max_bytes: Int?
-    let kinds: [String]?
+    let types: [String]?
+}
+
+struct MediaLimits: Decodable {
+    let image: MediaLimit?
+    let video: MediaLimit?
+    let file: MediaLimit?
     let note: String?
 }
 
@@ -5118,8 +5142,13 @@ struct PerceiveOut: Decodable {
     struct WatermarkBrief: Decodable { let line: String? }
 }
 
+struct MicPlace: Decodable {
+    let surface: String?
+    let why: String?
+}
+
 struct MicPlacesOut: Decodable {
-    let places: [String: String]?
+    let places: [MicPlace]?
 }
 
 struct RefusedKind: Decodable {

@@ -376,7 +376,7 @@ struct SensesSection: View {
                 Button(L10n.t("sens.mics", state.language)) {
                     run {
                         let o = try await ApiClient.shared.microphonePlaces()
-                        line = "\((o.places ?? [:]).count)"
+                        line = "\((o.places ?? []).count)"
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("sens.vocab", state.language)) {

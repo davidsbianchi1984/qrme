@@ -308,8 +308,8 @@ struct MediaSection: View {
                 Button(L10n.t("med.limits", state.language)) {
                     run {
                         let l = try await ApiClient.shared.mediaLimits()
-                        line = "\(l.max_bytes ?? 0) · "
-                            + (l.kinds ?? []).joined(separator: " · ")
+                        line = "image \((l.image?.max_bytes ?? 0) / 1_048_576)MB · "
+                            + "video \((l.video?.max_bytes ?? 0) / 1_048_576)MB"
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("med.platforms", state.language)) {

@@ -38,8 +38,8 @@ struct AvatarSection: View {
                     run {
                         let a = try await ApiClient.shared.avatar(
                             id: state.pid!)
-                        let badge = (a.ai_badge ?? false) ? "AI" : "—"
-                        let who = a.likeness_of ?? "—"
+                        let badge = (a.asset_marked ?? false) ? "AI" : "—"
+                        let who = a.likeness?.note ?? "—"
                         line = badge + " · " + who
                     }
                 }.font(.caption).disabled(busy)
@@ -173,7 +173,7 @@ struct PageSection: View {
                         let p = try await ApiClient.shared.page(
                             id: state.pid!)
                         let t = p.tagline ?? "—"
-                        line = (p.theme ?? "—") + " · " + t
+                        line = (p.theme?.label ?? "—") + " · " + t
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("pg.themes", state.language)) {
@@ -188,7 +188,7 @@ struct PageSection: View {
                         let f = try await ApiClient.shared.frontPage(
                             id: state.pid!)
                         let name = f.display_name ?? "—"
-                        line = name + " · " + (f.purpose ?? "—")
+                        line = name + " · " + (f.headline ?? "—")
                     }
                 }.font(.caption).disabled(busy)
             }

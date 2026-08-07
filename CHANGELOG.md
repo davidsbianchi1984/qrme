@@ -4,6 +4,68 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.8] — 2026-08-07
+
+### Fixing a defect in one client was not fixing the defect
+
+0.56.4 and 0.56.7 found nineteen defects in the Windows client and fixed them
+there. Then, chasing something else last release, I read the Swift file and
+found `MicVocabularyOut.widths` — a field no route has ever sent — sitting
+exactly where the Windows record's copy of it had been deleted two releases
+earlier. Four more like it. **Nothing would have told me.** The 0.56.7
+changelog said so and named this as the gap.
+
+    asked     is the client we check correct
+    mattered  is every client checked
+
+`test_the_shape_the_swift_client_expects.py` drives every GET binding in
+`native/ios/Sources/ApiClient.swift` and asks both halves of the same
+question: is each declared field a key the route returns, and can its declared
+type decode the shape that arrives.
+
+Nine fictions in this repo's Swift client, and **every one of them was already
+fixed on the Windows side**:
+
+| struct | what it declared | fixed on Windows in |
+|---|---|---|
+| `AvatarCard.ai_badge`, `.likeness_of` | fields no route emits | 0.56.4 |
+| `PairCard.built` | the server says `console_built` | 0.56.4 |
+| `FrontCard.purpose` | the front sends `headline` | 0.56.4 |
+| `DelegationOffer.enabled` | the server says `delegation` | 0.56.4 |
+| `MediaLimits.max_bytes`, `.kinds` | one limit for three media kinds | 0.56.4 |
+| `MicPlacesOut.places` | a map declared for a list | 0.56.7 |
+| `PageCard.theme` | a string for a card | 0.56.7 |
+
+All nine corrected, with the screens that read them.
+
+#### The extractor made the same mistake twice, in two languages
+
+Its first run reported fifty-odd findings. Most were artifacts: this client
+writes `struct Health: Decodable { let status: String }` on one line, and a
+pattern anchored on `\n}` misses that closing brace and runs on to the *next*
+struct's — reporting that struct's fields under this one's name. `ModelChoice`
+was accused of six fields that belong to `RobotSpec`.
+
+That is the same defect the C# guard grew an assertion for last release, for a
+different reason. So Swift has the same assertion now, and the reason it is
+written down twice is that writing it down once did not stop it happening
+again.
+
+#### What the siblings said
+
+JIM-mini and PDI both came back with **no fictions**, the third time in four
+releases those two clients have answered a new check cleanly. JIM records
+twenty-two conditional fields — continuity vectors, help tallies, presence
+areas — that appear only once an account has a history. Unlike the crash watch
+and the adaptation profile, which the fixture builds in two calls, continuity
+is derived from accumulated check-ins over time and has no route that builds
+one. A fixture that faked that history would be asserting against its own
+fiction, so the rows are recorded with the state named instead.
+
+Kotlin is still unread. It parses `JSONObject` by hand rather than declaring
+shapes, so there is nothing to compare — which is either a reason it cannot
+have this defect, or the reason nobody would find it.
+
 ## [0.56.7] — 2026-08-07
 
 ### `kinds` meant three things, and one of them crashed the client

@@ -1,0 +1,30 @@
+# status: backlog — 8 rows
+# ceiling: 8
+#
+# iOS fields the Swift shape guard saw a route not return, which are real.
+#
+# `test_the_shape_the_swift_client_expects.py` drives every GET binding in
+# `native/ios/Sources/ApiClient.swift` and checks each struct against what the
+# route actually sends — both the names and whether the declared type can
+# decode the shape that arrives.
+#
+# On its first run it found nine fictions in this client, every one of them a
+# defect already fixed on the Windows side in 0.56.4 and 0.56.7 and never
+# carried across: `AvatarCard.ai_badge`, `PairCard.built`, `FrontCard.purpose`,
+# `MediaLimits.max_bytes`, `MicPlacesOut.places` typed as a map for a list.
+# Fixing a defect in one client was not fixing the defect.
+#
+# These eight are the other answer, and they are the *same eight* the Windows
+# record holds — which is the strongest evidence that both lists are honest.
+# The field is real; the fixture is simply in the state where it is absent.
+#
+# Ratcheted: this list may shrink and must never grow.
+#
+BadgeCard.attestor            # once verified, and only on a named profile
+BadgeCard.level               # once verified
+VerificationCard.attestor     # once verified
+VerificationCard.level        # once verified
+VerificationCard.means        # once verified — the sentence the level means
+Solitude.offer                # once the 28-day window holds enough turns
+VoiceConsentState.sources     # once voice consent is granted
+VoiceConsentState.granted_at  # once voice consent is granted
