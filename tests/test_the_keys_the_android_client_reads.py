@@ -37,10 +37,26 @@ a reason it would never be found.
 
 ## What is checked
 
-Every `suspend fun` that binds a `JSONObject` to the result of a GET, and each
-key read **off that object by name** — not off a nested one, because
-`worn.optString(k)` inside the same function is a claim about `kinds_worn`'s
-contents rather than about the response.
+Every GET whose response this client reads, in the four shapes these three
+clients read one in:
+
+* bound and read by name — `val o = ...request(...)`, then `o.optString("k")`;
+* handed to a parse helper — `crashWatchOf(request(...))`, whose reads off its
+  `JSONObject` parameter are this route's claims one indirection away;
+* read inline — `request(...).getString("provider")`;
+* chained — `...request(...).getJSONArray("providers")`, where the chained key
+  is the claim and what hangs off it is not.
+
+The `JSONObject(` constructor around the call is **optional**, and that single
+character of laxity is most of this guard's reach. QRME's `request` returns a
+`String` and every read wraps it; JIM-mini's returns a `JSONObject` and none
+of them do. Requiring the wrapper read one client whole and the other at
+twelve routes out of forty-two — which looked exactly like a client with
+twelve routes.
+
+Keys read off a *nested* object are not claims about the response:
+`worn.optString(k)` is about `kinds_worn`'s contents, and crediting it to the
+top level accused three routes of fields they never read there.
 
 Scalar accessors are held to the coercion `org.json` actually performs:
 `optString` on a number or a boolean is a deliberate stringification and is
@@ -69,20 +85,30 @@ _SRC = ANDROID_CLIENT.read_text(encoding="utf-8")
 # its reads were credited to whatever route that chunk began with. The
 # voiceprint route was accused of reading thirteen shop fields.
 _FUNCTION = re.compile(r'\n    (?=(?:private )?(?:suspend )?fun )')
-# The binding must be the *whole* response. `val f = JSONObject(request(...))
-# .getJSONObject("funnel")` binds the funnel, and crediting its keys to the
-# top level accused the placements route of three fields it never reads there.
-# So: no chained accessor between the closing paren and the end of the line.
+# The binding must be the *whole* response. Admits every shape these three
+# clients use: a bare or fully-qualified `JSONObject`, the `request(` on the
+# same line or the next, and the verb passed either positionally or by
+# keyword.
+#
+# **The constructor is optional, and that is the whole reach of this guard.**
+# QRME's `request` returns a `String`, so its every read is wrapped —
+# `JSONObject(request(...))` — and a pattern that requires the wrapper reads
+# this client completely. Hand the same pattern to JIM-mini, whose `request`
+# returns a `JSONObject` already, and the ordinary line
+#
+#     val o = request("/money/$uid", token = token)
+#
+# matches nothing. Forty-two GETs in that client, twelve of them found, and
+# twelve found reads exactly like twelve is all there are. The C# guard
+# learned this in 0.56.5 and the lesson did not survive the language change:
+# a borrowed pattern that finds *some* of a file is worse than one that finds
+# none, because none is obviously broken.
 _BOUND = re.compile(
-    r'val (\w+) = JSONObject\(\s*request\(\s*"([^"]+)"([^\n]*)')
-# A binding whose statement chains straight into `.getJSONObject(...)` binds
-# that nested object, not the response. Checked on the statement text rather
-# than in the pattern above, because the chain often sits on the next line
-# and a multi-line regex for it was wrong twice.
-_CHAINED = re.compile(r'\)\s*\)\s*\.(?:opt|get)JSON')
+    r'val (\w+) = (?:(?:org\.json\.)?JSONObject\(\s*\n?\s*)?'
+    r'request\(\s*"([^"]+)"([^\n]*)')
 _INLINE = re.compile(
-    r'JSONObject\(\s*request\(\s*"([^"]+)"([^\n]*)\)\s*\)\s*\n?\s*'
-    r'\.(opt\w+|get\w+)\(\s*"([\w_]+)"')
+    r'(?:(?:org\.json\.)?JSONObject\(\s*\n?\s*)?request\(\s*"([^"]+)"([^\n]*?)'
+    r'\)\s*\)?\s*\n?\s*\.(opt\w+|get\w+)\(\s*"([\w_]+)"')
 
 # What org.json will hand back without complaining.
 ACCEPTS = {
@@ -108,17 +134,98 @@ def _is_get(rest: str) -> bool:
                                        '"PATCH"'))
 
 
+# `private fun crashWatchOf(o: JSONObject) = ...` — a parse helper. JIM-mini's
+# client routes nearly every route through one of nineteen of these, so its
+# reads sit one call away from the request that fetched them. A pattern that
+# only looks inside the calling function finds two routes there out of fifty.
+_HELPER = re.compile(
+    r'(?:private )?fun (\w+)\((\w+): (?:org\.json\.)?JSONObject')
+
+
+def _chain(text: str) -> tuple[str, str] | None:
+    """The accessor chained directly onto the request call, if there is one.
+
+    A binding that chains binds *that* value, not the response:
+    `val f = JSONObject(request(...)).getJSONObject("funnel")` holds the
+    funnel, and crediting `f`'s reads to the top level accused the placements
+    route of three fields it never reads there. But the chained key is itself
+    a claim — `funnel` has to be on the wire, as an object, for the line to
+    mean anything — so it is read rather than discarded.
+
+    **Anchored, not searched.** The first version scanned a 240-character
+    window for `).accessor("key")` and found, in two different functions, a
+    chain belonging to something else entirely:
+
+        val o = JSONObject(request("/displays/vocabulary"))
+        o.optJSONArray("never")?.let { a ->
+            out.add(a.getJSONObject(i).optString("why"))   // <- matched this
+
+    `why` is a key on the objects *inside* `never`, and `light` in the watch
+    face is a key inside `profile`. Both were reported as missing from the
+    response, and both were the guard reading a line it had no business
+    reading. So: walk the call's own parentheses to their close, and take the
+    chain only if it attaches there.
+    """
+    i = text.index("request(") + len("request(")
+    depth = 1
+    while i < len(text) and depth:
+        c = text[i]
+        if c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+        elif c == '"':
+            i += 1
+            while i < len(text) and text[i] != '"':
+                i += 2 if text[i] == "\\" else 1
+        i += 1
+    # An optional `)` for the `JSONObject(` wrapper, where this client uses one.
+    m = re.match(r'\)?\s*\n?\s*\.(opt\w+|get\w+)\(\s*"([\w_]+)"', text[i:])
+    return m.groups() if m else None
+
+
+def _helpers() -> dict[str, list[tuple[str, str]]]:
+    """Parse helper -> the keys it reads off its JSONObject parameter."""
+    out = {}
+    for body in _FUNCTION.split(_SRC):
+        m = _HELPER.search(body)
+        if not m:
+            continue
+        name, param = m.groups()
+        out[name] = re.findall(
+            r'\b%s\.(opt\w+|get\w+)\(\s*"([\w_]+)"' % re.escape(param), body)
+    return out
+
+
 def _reads() -> list[tuple[str, list[tuple[str, str]]]]:
     """[(path template, [(accessor, key)])] for every GET this client reads."""
     out = []
+    helpers = _helpers()
     for body in _FUNCTION.split(_SRC):
+        # A route handed straight to a parse helper: the helper's reads are
+        # this route's claims, one indirection away.
+        # The constructor is optional: QRME's `request` returns a String and
+        # is wrapped, JIM-mini's returns a JSONObject and is handed straight
+        # to the helper.
+        handed = re.search(
+            r'(\w+)\(\s*\n?\s*(?:(?:org\.json\.)?JSONObject\(\s*\n?\s*)?'
+            r'request\(\s*"([^"]+)"([^\n]*)', body)
+        if handed and handed.group(1) in helpers and _is_get(handed.group(3)):
+            keys = helpers[handed.group(1)]
+            if keys:
+                out.append((handed.group(2), keys))
+                continue
         bound = _BOUND.search(body)
         if not bound:
             continue
         var, path, rest = bound.groups()
         if not _is_get(rest):
             continue
-        if _CHAINED.search(body[bound.start():bound.start() + 240]):
+        chained = _chain(body[bound.start():])
+        if chained:
+            # The var holds the nested value, so its own reads say nothing
+            # about the response. The key that reached it does.
+            out.append((path, [chained]))
             continue
         keys = re.findall(
             r'\b%s\.(opt\w+|get\w+)\(\s*"([\w_]+)"' % re.escape(var), body)
@@ -150,6 +257,22 @@ def _drive(client, profile_id: str, interactor_id: str):
         for name, value in subs.items():
             path = path.replace("$" + name, value).replace(
                 "${" + name + "}", value)
+        # A query string this client builds by concatenation — `request(
+        # "/circle/$uid/messages?with_id=" + encode(withId), ...)` — reaches
+        # the extractor as the literal prefix only, because the value is on
+        # the next line and is not a literal at all. Driving that prefix asks
+        # for `?with_id=` with nothing after it, and JIM's route answers a
+        # *different* shape for the empty case: the thread list, with no
+        # `messages` key in it. The guard reported the client for reading a
+        # key the route sends perfectly well.
+        #
+        # It is the fixture that cannot reach this, not the client that is
+        # wrong, so it is unreachable rather than recorded. Recording it would
+        # have put this guard's own defect in the ratchet file and called it
+        # a backlog.
+        if path.rstrip().endswith(("=", "&", "?")):
+            yield template, None
+            continue
         if "$" in path or "{" in path:
             yield template, None
             continue
@@ -208,14 +331,33 @@ def test_the_unverified_record_only_shrinks():
         f"{len(_recorded())} rows recorded, above the {ceiling} ceiling")
 
 
+_VAR = re.compile(r'\$\{?(\w+)\}?')
+
+
+def test_every_recorded_row_names_a_read_this_client_still_makes():
+    """A row that describes nothing is a ratchet that has stopped ratcheting.
+
+    The Swift record grew this check in 0.56.8 for the same reason: once a
+    line is in the file the ceiling counts it, and a stale row buys headroom
+    for a defect nobody has fixed. The paths are compared in the shape the
+    findings are written in — the fixture's minted ids masked back to `{id}`.
+    """
+    asked = {f"{_VAR.sub('{id}', path)} {key}"
+             for path, keys in _reads() for _, key in keys}
+    stale = sorted(_recorded() - asked)
+    assert not stale, (
+        "these rows name reads the client no longer makes:\n    "
+        + "\n    ".join(stale) + "\n  Strike them.")
+
+
 # --- the scan has to be able to see, and to fail -----------------------------
 
 def test_the_extractor_reads_this_clients_calls():
     """Neither the C# nor the Swift pattern finds anything in a file that
     declares no shapes, and nothing found reads as nothing wrong."""
     reads = _reads()
-    assert len(reads) >= 120, len(reads)
-    assert sum(len(k) for _, k in reads) >= 200, sum(len(k) for _, k in reads)
+    assert len(reads) >= 165, len(reads)
+    assert sum(len(k) for _, k in reads) >= 370, sum(len(k) for _, k in reads)
 
 
 def test_no_function_body_swallowed_the_next_one():
@@ -238,7 +380,7 @@ def test_the_scan_reaches_a_real_share_of_the_routes(
         client, profile_id, interactor_id):
     driven = [f for _, f in _drive(client, profile_id, interactor_id)
               if f is not None]
-    assert len(driven) >= 25, (
+    assert len(driven) >= 80, (
         f"only {len(driven)} route(s) were reachable — the fixture or the "
         f"extractor has stopped working")
 

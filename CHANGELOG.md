@@ -4,6 +4,101 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.0] — 2026-08-07
+
+### Twelve routes out of forty-two, and twelve looked like all there were
+
+0.56.9 built a guard that reads the Kotlin client the way the C# and Swift
+guards read theirs, and closed by saying the next thing to do was give
+JIM-mini and PDI their own binding patterns. Handing the pattern across is
+where this went wrong, and the way it went wrong is the way it has gone wrong
+in every release since 0.56.4.
+
+QRME's `request` returns a `String`, so every read in that client wraps it:
+
+    val o = JSONObject(request("/profiles/$id/wearables", token = token))
+
+A pattern that requires the wrapper reads this client completely — 135 routes,
+252 keys, eight defects found. JIM-mini's `request` returns a `JSONObject`
+already, so its ordinary line is
+
+    val o = request("/money/$uid", token = token)
+
+and the wrapper is not there to match. Forty-two GETs in that client. The
+guard found twelve, reported nothing beyond the six states already recorded
+against the Swift client, and passed.
+
+Twelve found reads exactly like twelve is all there are. That is the whole
+defect: a borrowed pattern that finds *some* of a file is worse than one that
+finds none, because none is obviously broken and some is not. The C# guard
+learned this in 0.56.5 — where PDI's client makes its calls in a shape the
+borrowed regex could not see, and zero found looked like zero wrong — and the
+lesson did not survive the change of language.
+
+    asked     does the guard travel
+    mattered  does the guard see the same share of each file it travels to
+
+### What changed
+
+The constructor is now optional, which is one character of regex and most of
+this guard's reach. Two shapes were being dropped along with it and are now
+read: a call handed straight to a parse helper, and a call whose response is
+chained into immediately — `request("/models").getJSONArray("providers")`,
+where the chained key is a claim about the response and what hangs off it is
+not.
+
+| | routes read | keys read | GETs driven |
+|---|---|---|---|
+| QRME | 135 → **169** | 252 → **379** | 25 → **85** |
+| JIM-mini | 12 → **44** | 79 → **161** | 5 → **32** |
+| PDI | 13 → **18** | 26 → **31** | 5 → **15** |
+
+The floors under all three moved up to what each one honestly finds, so the
+reach cannot quietly fall back.
+
+### Two findings that were the guard's own defect, not the client's
+
+The first version of the chained-key read searched a 240-character window for
+`).accessor("key")`, and in two different functions found a chain that
+belonged to something else:
+
+    val o = JSONObject(request("/displays/vocabulary"))
+    o.optJSONArray("never")?.let { a ->
+        out.add(a.getJSONObject(i).optString("why"))
+
+`why` is a key on the objects *inside* `never`. `light`, in the watch face, is
+a key inside `profile`. Both were reported as missing from the response, and
+both routes send exactly what the client reads. The check now walks the call's
+own parentheses to their close and takes the chain only if it attaches there.
+
+The third was subtler and would have been recorded rather than noticed.
+JIM-mini builds one URL by concatenation:
+
+    request("/circle/$uid/messages?with_id=" +
+            java.net.URLEncoder.encode(withId, "UTF-8"), token = token)
+
+The extractor sees the literal prefix, because the value is on the next line
+and is not a literal at all. Driving `?with_id=` with nothing after it asks
+for the *thread list*, which the route answers with a different shape that has
+no `messages` key in it — and the client was reported for reading a key that
+route sends perfectly well. A half-built query string is not a path this
+fixture can drive, so it is unreachable rather than recorded. Recording it
+would have put this guard's own defect into the ratchet file and called it a
+backlog.
+
+### The record files, and a check that they still describe something
+
+JIM-mini records six rows: `note` on the adaptation profile, visible only
+while `built` is false, and five `ContinuityState` keys that need a history of
+check-ins and coach turns no route can manufacture. They are the same six the
+Swift guard recorded in 0.56.8 — the same routes, the same states, reached
+through a different language. Two independent extractors agreeing is the
+evidence that neither is inventing. PDI records none, at a ceiling of zero.
+
+All three files also gained a check that every recorded row still names a read
+the client makes. A row that describes nothing is a ratchet that has stopped
+ratcheting: it holds the ceiling up for a defect nobody has fixed.
+
 ## [0.56.9] — 2026-08-07
 
 ### The client that declares nothing was the one guessing hardest
