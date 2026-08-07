@@ -30,7 +30,8 @@ struct VoiceView: View {
     /// wrong, and this reads as what it is.
     private var grantLine: String {
         let sources = status?.consent.sources ?? []
-        var line = "Granted for " + sources.joined(separator: ", ")
+        var line = L10n.fill("nvoi.granted", state.language,
+                             ["sources": sources.joined(separator: ", ")])
         if let at = status?.consent.granted_at, at.count >= 10 {
             line += " · " + String(at.prefix(10))
         }
@@ -40,7 +41,7 @@ struct VoiceView: View {
     private var builtLine: String {
         guard let p = status?.voiceprint else { return "" }
         let day = p.built_at.map { String($0.prefix(10)) } ?? "—"
-        return "Built \(day) · \(p.id)"
+        return L10n.fill("nvoi.built", state.language, ["date": day]) + " · \(p.id)"
     }
 
     var body: some View {

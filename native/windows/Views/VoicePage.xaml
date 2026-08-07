@@ -15,13 +15,11 @@
                     <TextBlock x:Name="Step1" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="ConsentText" TextWrapping="Wrap" FontSize="12"
-                               Foreground="{StaticResource QrmeT2Brush}"
-                               x:Name="NothingNote" />
+                               Foreground="{StaticResource QrmeT2Brush}" />
                     <Button x:Name="GrantButton"
                             Click="OnGrant"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
-                    <Button x:Name="RevokeButton" Visibility="Collapsed" Click="OnRevoke"
-                            x:Name="WithdrawButton"
+                    <Button x:Name="WithdrawButton" Visibility="Collapsed" Click="OnRevoke"
                             Background="{StaticResource QrmeRedBrush}" Foreground="White" />
                     <TextBlock x:Name="RevokedText" FontSize="11" Visibility="Collapsed"
                                TextWrapping="Wrap" Foreground="{StaticResource QrmeAmberBrush}" />

@@ -4,6 +4,69 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.6] — 2026-08-07
+
+### The half of the Windows shell that is not code
+
+0.57.5 added a parse check for the native shells, globbed `*.swift`, `*.kt`
+and `*.cs`, and reported all three parseable. The Windows shell's **screens
+are not C#** — they are XAML, 3,700 lines of it, more than every `.cs` file in
+`Views/` put together — and the check never opened one.
+
+```
+asked     do the files that look like code still parse
+mattered  do the shells' screens still parse
+```
+
+Five pages across two products do not parse. Two of them are here. Each is a
+single element carrying `x:Name` twice:
+
+```xml
+<TextBlock x:Name="ConsentText" TextWrapping="Wrap" FontSize="12"
+           Foreground="{StaticResource QrmeT2Brush}"
+           x:Name="NothingNote" />
+```
+
+Duplicate attributes are forbidden by XML itself, so no conformant reader gets
+past the tag and the build stops there. It is 0.57.4's Swift defect in markup,
+arrived at the same way: a second name was needed and it went onto the element
+that was already there.
+
+### Added
+
+- Four markup checks in `test_the_shells_still_parse.py`, all of them things a
+  XAML compiler refuses outright rather than things a reviewer would prefer —
+  the page is well-formed XML; no two elements in it share a name; every
+  handler it names exists in its code-behind; every control the code-behind
+  drives is named in the page. Reach floors on all four, and four injected
+  defects confirming each can fail.
+- A state the desktop voice screen never had: with no profile it read
+  `AppState.Current.Pid`, found nothing and returned, leaving three cards of
+  headings over buttons that answered nothing. `nvoi.needprofile` — *Create a
+  profile first* — was in the table already, translated ten ways, asked for by
+  nobody.
+
+### Fixed
+
+- `SignaturesPage.xaml` and `VoicePage.xaml` each carried a duplicate
+  `x:Name`, and in both cases the code-behind drove **both** names, so the
+  rename had to decide which control was meant rather than drop an attribute.
+- The Windows voice screen printed seven sentences in English beside their own
+  translations — the consent line, the sample counts, what enrolment still
+  wants, when the voiceprint was built, what happens to a retired one, and how
+  many samples a withdrawal deleted. The iPhone built two of the same four the
+  same way. `test_a_shell_does_not_print_what_it_translated.py` compares
+  *literals* against the table, and every one of these is interpolated, so the
+  only signal was a row nothing asked for.
+- `nvoi.record` and `nvoi.sample` are both *Record a sample* in all ten
+  languages. Windows labelled one button from the first at load and the second
+  after a recording — one button changing which translation it answers to
+  halfway through. One key now; the short row is deleted from all three tables.
+
+### Changed
+
+- `native_dead_keys.txt`: 311 → 300 rows, ceiling 134 → 127.
+
 ## [0.57.5] — 2026-08-07
 
 ### Nothing here builds the phones, so nothing here noticed when they stopped

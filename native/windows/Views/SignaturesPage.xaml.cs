@@ -176,7 +176,7 @@ public sealed partial class SignaturesPage : Page
         try
         {
             var creds = await ApiClient.Shared.ListSigningCredentials(token);
-            CredentialsEmpty.Visibility =
+            NoCredsNote.Visibility =
                 creds.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             CredentialList.ItemsSource = creds.Select(c => new CredentialVm
             {

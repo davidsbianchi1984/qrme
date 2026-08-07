@@ -55,10 +55,9 @@ public sealed partial class VoicePage : Page
         Step1.Text = L10n.T("nvoi.step1", lang);
         Step2.Text = L10n.T("nvoi.step2", lang);
         Step3.Text = L10n.T("nvoi.step3", lang);
-        NothingNote.Text = L10n.T("nvoi.nothing", lang);
         GrantButton.Content = L10n.T("nvoi.attest", lang);
         TapNote.Text = L10n.T("nvoi.tap", lang);
-        RecordButton.Content = L10n.T("nvoi.record", lang);
+        RecordButton.Content = L10n.T("nvoi.sample", lang);
         StaysNote.Text = L10n.T("nvoi.stays", lang);
         BuildButton.Content = L10n.T("nvoi.build", lang);
         SayBox.Header = L10n.T("nvoi.say", lang);
@@ -78,7 +77,18 @@ public sealed partial class VoicePage : Page
     {
         var pid = AppState.Current.Pid;
         var token = AppState.Current.Token;
-        if (pid is null || token is null) return;
+        // Returning here left the page as furniture: three cards of headings
+        // over buttons that answered nothing, and no word about why. The
+        // sentence for this state was in the table already, translated ten
+        // ways, asked for by nobody.
+        if (pid is null || token is null)
+        {
+            ShowError(L10n.T("nvoi.needprofile", AppState.Current.Language));
+            GrantButton.IsEnabled = false;
+            RecordButton.IsEnabled = false;
+            BuildButton.IsEnabled = false;
+            return;
+        }
         try { Render(await ApiClient.Shared.Voiceprint(pid, token)); }
         catch (Exception ex) { ShowError(ex.Message); }
     }
@@ -86,28 +96,32 @@ public sealed partial class VoicePage : Page
     private void Render(VoiceprintStatus s)
     {
         var consented = s.Consent.Granted;
+        var lang = AppState.Current.Language;
         GrantButton.Visibility = consented ? Visibility.Collapsed : Visibility.Visible;
-        RevokeButton.Visibility = consented ? Visibility.Visible : Visibility.Collapsed;
+        WithdrawButton.Visibility = consented ? Visibility.Visible : Visibility.Collapsed;
         EnrollmentCard.Visibility = consented ? Visibility.Visible : Visibility.Collapsed;
         VoiceprintCard.Visibility = consented ? Visibility.Visible : Visibility.Collapsed;
 
         ConsentText.Text = consented
-            ? $"Granted for {string.Join(", ", s.Consent.Sources ?? Array.Empty<string>())}"
+            ? L10n.Fill("nvoi.granted", lang,
+                        ("sources", string.Join(", ", s.Consent.Sources ?? Array.Empty<string>())))
               + (s.Consent.GrantedAt is { Length: >= 10 } at ? $" · {at[..10]}" : "")
-            : "Nothing is recorded until you say so. QRME will only learn your own "
-              + "voice — there is no path here for anybody else's.";
+            : L10n.T("nvoi.nothing", lang);
 
         if (s.Enrollment is { } en)
         {
-            CountsText.Text = $"{en.Samples} sample(s) · {en.Seconds:F1}s — "
-                            + L10n.T(en.Ready ? "nvoi.ready" : "nvoi.notyet");
+            CountsText.Text = L10n.Fill("nvoi.samples", lang,
+                                        ("n", $"{en.Samples}"),
+                                        ("secs", $"{en.Seconds:F1}s"))
+                            + " — " + L10n.T(en.Ready ? "nvoi.ready" : "nvoi.notyet", lang);
             var turnLine = en.MeanTurnSeconds is { } mean
                 ? $"about {mean:F1}s a turn"
                 : "no turns counted yet";
             ThresholdText.Text = $"{turnLine} · needs {en.Threshold.Samples} samples "
                                + $"and {en.Threshold.Seconds:F0}s";
             NeedsText.Text = en.Needs.Length > 0
-                ? $"Still wants: {string.Join(", ", en.Needs)}." : "";
+                ? L10n.Fill("nvoi.needs", lang,
+                            ("needs", string.Join(", ", en.Needs))) : "";
             NeedsText.Visibility = !en.Ready && en.Needs.Length > 0
                 ? Visibility.Visible : Visibility.Collapsed;
             MethodText.Text = en.Method;
@@ -120,13 +134,13 @@ public sealed partial class VoicePage : Page
         PrintText.Text = s.Voiceprint switch
         {
             { Active: true } p =>
-                $"Built {(p.BuiltAt is { Length: >= 10 } b ? b[..10] : "—")} · {p.Id}",
-            { Active: false } =>
-                "A previous voiceprint was retired when consent was withdrawn. "
-                + "That record stays.",
+                L10n.Fill("nvoi.built", lang,
+                          ("date", p.BuiltAt is { Length: >= 10 } b ? b[..10] : "—"))
+                + $" · {p.Id}",
+            { Active: false } => L10n.T("nvoi.retired", lang),
             _ => s.Enrollment?.Ready == true
-                ? L10n.T("nvoi.enough")
-                : L10n.T("nvoi.more"),
+                ? L10n.T("nvoi.enough", lang)
+                : L10n.T("nvoi.more", lang),
         };
         DisclosureText.Text = s.Disclosure;
     }
@@ -141,7 +155,9 @@ public sealed partial class VoicePage : Page
         await Call(async (pid, token) =>
         {
             var r = await ApiClient.Shared.RevokeVoiceprint(pid, token);
-            RevokedText.Text = $"{r.SamplesDeleted} sample(s) deleted. {r.Note}";
+            RevokedText.Text = L10n.Fill("nvoi.deleted", AppState.Current.Language,
+                                         ("n", $"{r.SamplesDeleted}"),
+                                         ("note", r.Note));
             RevokedText.Visibility = Visibility.Visible;
             await Load();
         });

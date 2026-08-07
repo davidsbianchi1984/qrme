@@ -57,9 +57,8 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <TextBlock x:Name="CredentialsEmpty" FontSize="12" Visibility="Collapsed"
-                               TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}"
-                               x:Name="NoCredsNote" />
+                    <TextBlock x:Name="NoCredsNote" FontSize="12" Visibility="Collapsed"
+                               TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}" />
                 </StackPanel>
             </Border>
 

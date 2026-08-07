@@ -1,4 +1,4 @@
-# status: backlog — 311 rows
+# status: backlog — 300 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -105,8 +105,41 @@
 # `.tasks`, and the short row is deleted from all three tables rather than
 # left translated ten ways for nobody.
 #
-# ceiling: 134
-# total: 311
+# ### 0.57.6 — eleven rows off the voice screen, found from the other side
+#
+# Not looked for here. The round was fixing a Windows page that did not parse,
+# and the page was `VoicePage.xaml` — so the whole of `VoicePage.xaml.cs` got
+# read, and it prints seven sentences in English that its own table translates
+# ten ways:
+#
+#     ConsentText.Text = $"Granted for {string.Join(", ", sources)}"
+#     CountsText.Text  = $"{en.Samples} sample(s) · {en.Seconds:F1}s — "
+#     NeedsText.Text   = $"Still wants: {string.Join(", ", en.Needs)}."
+#     PrintText.Text   = $"Built {day} · {p.Id}"
+#
+# beside `nvoi.granted` ("Granted for {sources}"), `nvoi.samples`,
+# `nvoi.needs` and `nvoi.built`, each in ten languages, asked for by nobody.
+# The iPhone builds two of the same four the same way. This is exactly the
+# shape 0.47.9 named and 0.54.0 turned into a guard — and that guard compares
+# a *literal* against the table, so an interpolated string, which is what all
+# seven of these are, is invisible to it. A row nothing asks for was the only
+# signal, in a file that calls itself a backlog.
+#
+# **`nvoi.needprofile` was not that.** *"Create a profile first"* — the page
+# read `AppState.Current.Pid`, found nothing and `return`ed, leaving three
+# cards of headings over buttons that answered nothing and no word about why.
+# The sentence for the state was written and translated; the state had no
+# code. It says it now.
+#
+# **And one more split, the `nmg.pack.robot` shape again.** `nvoi.record` and
+# `nvoi.sample` are both "Record a sample" in all ten languages, held by all
+# three shells. Windows labelled the button from `.record` at load and from
+# `.sample` after the first recording — one button changing which translation
+# it answers to, halfway through. One key: `.sample`, and `.record` is
+# deleted from all three tables.
+#
+# ceiling: 127
+# total: 300
 
 # ios: 67 of 82 are asked for by another shell
 ios: acct.reset.code
@@ -173,11 +206,8 @@ ios: nsig.sigid
 ios: nsig.sign
 ios: nsig.verify
 ios: nsig.verify.other
-ios: nvoi.built
-ios: nvoi.granted
 ios: nvoi.micoff
 ios: nvoi.owner
-ios: nvoi.record
 ios: nw.needboth
 ios: pub.mark.needtext
 ios: pub.object.needid
@@ -277,7 +307,6 @@ android: nsig.signed
 android: nsig.verify
 android: nsig.verify.other
 android: nvoi.owner
-android: nvoi.record
 android: nw.needboth
 android: nw.unreachable
 android: pub.mark.needtext
@@ -407,15 +436,8 @@ windows: nsig.revoke.this
 windows: nsig.revoked.note
 windows: nsig.signed
 windows: nsig.tiers
-windows: nvoi.built
-windows: nvoi.deleted
-windows: nvoi.granted
 windows: nvoi.micoff
-windows: nvoi.needprofile
-windows: nvoi.needs
 windows: nvoi.owner
-windows: nvoi.retired
-windows: nvoi.samples
 windows: plc.venues
 windows: pub.tab.mark
 windows: sig.package
