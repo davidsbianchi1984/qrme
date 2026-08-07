@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.56.5** ([changelog](CHANGELOG.md) ·
+**Current release: v0.56.6** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -34,34 +34,34 @@ The full QRME product in two form factors — a **desktop app** and a **mobile a
 Wide, multi-panel workspace views — sidebar nav, live tiles, the conversation surface with its AI-context panel, the relationship table, and the memory vault. Regenerate with `python3 docs/desktop/build.py`.
 
 <table>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/01-home.svg"><img src="docs/desktop/01-home.svg" width="460" alt="Home"></a><br><sub><b>01</b> · Home</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/02-conversation.svg"><img src="docs/desktop/02-conversation.svg" width="460" alt="Conversation"></a><br><sub><b>02</b> · Conversation</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/03-relationships.svg"><img src="docs/desktop/03-relationships.svg" width="460" alt="Relationships"></a><br><sub><b>03</b> · Relationships</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/04-memory-vault.svg"><img src="docs/desktop/04-memory-vault.svg" width="460" alt="Memory Vault"></a><br><sub><b>04</b> · Memory Vault</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/05-marketplace-licensing.svg"><img src="docs/desktop/05-marketplace-licensing.svg" width="460" alt="Marketplace & Licensing"></a><br><sub><b>05</b> · Marketplace & Licensing</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/06-control-center.svg"><img src="docs/desktop/06-control-center.svg" width="460" alt="Control Center"></a><br><sub><b>06</b> · Control Center</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/07-live-desks.svg"><img src="docs/desktop/07-live-desks.svg" width="460" alt="Live Desks"></a><br><sub><b>07</b> · Live Desks</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/08-audience-commerce.svg"><img src="docs/desktop/08-audience-commerce.svg" width="460" alt="Audience & Commerce"></a><br><sub><b>08</b> · Audience &amp; Commerce</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/10-community.svg"><img src="docs/desktop/10-community.svg" width="460" alt="Community"></a><br><sub><b>10</b> · Community</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/11-channel-2.svg"><img src="docs/desktop/11-channel-2.svg" width="460" alt="Channel 2"></a><br><sub><b>11</b> · Channel 2 · every place at once</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/12-who-you-are.svg"><img src="docs/desktop/12-who-you-are.svg" width="460" alt="Who You Are"></a><br><sub><b>12</b> · Who you are · profiles and anonymity</sub></td>
-    <td align="center" width="50%"><a href="docs/desktop/13-camera-screens.svg"><img src="docs/desktop/13-camera-screens.svg" width="460" alt="Camera & Screens"></a><br><sub><b>13</b> · Camera &amp; screens · what others see of you</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="50%"><a href="docs/desktop/14-game-lobby.svg"><img src="docs/desktop/14-game-lobby.svg" width="460" alt="Game Lobby"></a><br><sub><b>14</b> · Game lobby · the roster and the rule</sub></td>
-  </tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/01-home.svg"><img src="docs/desktop/01-home.svg" width="460" alt="Home"></a><br><sub><b>01</b> · Home</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/02-conversation.svg"><img src="docs/desktop/02-conversation.svg" width="460" alt="Conversation"></a><br><sub><b>02</b> · Conversation</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/03-relationships.svg"><img src="docs/desktop/03-relationships.svg" width="460" alt="Relationships"></a><br><sub><b>03</b> · Relationships</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/04-memory-vault.svg"><img src="docs/desktop/04-memory-vault.svg" width="460" alt="Memory Vault"></a><br><sub><b>04</b> · Memory Vault</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/05-marketplace-licensing.svg"><img src="docs/desktop/05-marketplace-licensing.svg" width="460" alt="Marketplace & Licensing"></a><br><sub><b>05</b> · Marketplace & Licensing</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/06-control-center.svg"><img src="docs/desktop/06-control-center.svg" width="460" alt="Control Center"></a><br><sub><b>06</b> · Control Center</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/07-live-desks.svg"><img src="docs/desktop/07-live-desks.svg" width="460" alt="Live Desks"></a><br><sub><b>07</b> · Live Desks</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/08-audience-commerce.svg"><img src="docs/desktop/08-audience-commerce.svg" width="460" alt="Audience & Commerce"></a><br><sub><b>08</b> · Audience &amp; Commerce</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/09-signatures.svg"><img src="docs/desktop/09-signatures.svg" width="460" alt="Signatures"></a><br><sub><b>09</b> · Signatures</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/10-community.svg"><img src="docs/desktop/10-community.svg" width="460" alt="Community"></a><br><sub><b>10</b> · Community</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/11-channel-2.svg"><img src="docs/desktop/11-channel-2.svg" width="460" alt="Channel 2"></a><br><sub><b>11</b> · Channel 2 · every place at once</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/12-who-you-are.svg"><img src="docs/desktop/12-who-you-are.svg" width="460" alt="Who You Are"></a><br><sub><b>12</b> · Who you are · profiles and anonymity</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/desktop/13-camera-screens.svg"><img src="docs/desktop/13-camera-screens.svg" width="460" alt="Camera & Screens"></a><br><sub><b>13</b> · Camera &amp; screens · what others see of you</sub></td>
+<td align="center" width="50%"><a href="docs/desktop/14-game-lobby.svg"><img src="docs/desktop/14-game-lobby.svg" width="460" alt="Game Lobby"></a><br><sub><b>14</b> · Game lobby · the roster and the rule</sub></td>
+</tr>
 </table>
 
 ### Mobile app
@@ -71,87 +71,81 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 **Onboarding, identity & control**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="210" alt="Welcome"></a><br><sub><b>01</b> · Welcome</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="210" alt="Create Profile"></a><br><sub><b>02</b> · Create Profile</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/03-build-your-profile.svg"><img src="docs/screens/03-build-your-profile.svg" width="210" alt="Build Your Profile"></a><br><sub><b>03</b> · Build Your Profile</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/04-personality.svg"><img src="docs/screens/04-personality.svg" width="210" alt="Personality"></a><br><sub><b>04</b> · Personality</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="210" alt="Profile Home"></a><br><sub><b>05</b> · Profile Home</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/06-chat.svg"><img src="docs/screens/06-chat.svg" width="210" alt="Chat"></a><br><sub><b>06</b> · Chat</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="210" alt="Memory Vault"></a><br><sub><b>07</b> · Memory Vault</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/08-relationships.svg"><img src="docs/screens/08-relationships.svg" width="210" alt="Relationships"></a><br><sub><b>08</b> · Relationships</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/09-add-relationship.svg"><img src="docs/screens/09-add-relationship.svg" width="210" alt="Add Relationship"></a><br><sub><b>09</b> · Add Relationship</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/10-profile-health.svg"><img src="docs/screens/10-profile-health.svg" width="210" alt="Profile Health"></a><br><sub><b>10</b> · Profile Health</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/11-marketplace.svg"><img src="docs/screens/11-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>11</b> · Marketplace</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/12-licensing-center.svg"><img src="docs/screens/12-licensing-center.svg" width="210" alt="Licensing Center"></a><br><sub><b>12</b> · Licensing Center</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/13-embodiments.svg"><img src="docs/screens/13-embodiments.svg" width="210" alt="Embodiments"></a><br><sub><b>13</b> · Embodiments</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/14-control-center.svg"><img src="docs/screens/14-control-center.svg" width="210" alt="Control Center"></a><br><sub><b>14</b> · Control Center</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/15-design-language.svg"><img src="docs/screens/15-design-language.svg" width="210" alt="Design Language"></a><br><sub><b>15</b> · Design Language</sub></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="210" alt="Welcome"></a><br><sub><b>01</b> · Welcome</sub></td>
+<td align="center" width="25%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="210" alt="Create Profile"></a><br><sub><b>02</b> · Create Profile</sub></td>
+<td align="center" width="25%"><a href="docs/screens/03-build-your-profile.svg"><img src="docs/screens/03-build-your-profile.svg" width="210" alt="Build Your Profile"></a><br><sub><b>03</b> · Build Your Profile</sub></td>
+<td align="center" width="25%"><a href="docs/screens/04-personality.svg"><img src="docs/screens/04-personality.svg" width="210" alt="Personality"></a><br><sub><b>04</b> · Personality</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="210" alt="Profile Home"></a><br><sub><b>05</b> · Profile Home</sub></td>
+<td align="center" width="25%"><a href="docs/screens/06-chat.svg"><img src="docs/screens/06-chat.svg" width="210" alt="Chat"></a><br><sub><b>06</b> · Chat</sub></td>
+<td align="center" width="25%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="210" alt="Memory Vault"></a><br><sub><b>07</b> · Memory Vault</sub></td>
+<td align="center" width="25%"><a href="docs/screens/08-relationships.svg"><img src="docs/screens/08-relationships.svg" width="210" alt="Relationships"></a><br><sub><b>08</b> · Relationships</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/09-add-relationship.svg"><img src="docs/screens/09-add-relationship.svg" width="210" alt="Add Relationship"></a><br><sub><b>09</b> · Add Relationship</sub></td>
+<td align="center" width="25%"><a href="docs/screens/10-profile-health.svg"><img src="docs/screens/10-profile-health.svg" width="210" alt="Profile Health"></a><br><sub><b>10</b> · Profile Health</sub></td>
+<td align="center" width="25%"><a href="docs/screens/11-marketplace.svg"><img src="docs/screens/11-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>11</b> · Marketplace</sub></td>
+<td align="center" width="25%"><a href="docs/screens/12-licensing-center.svg"><img src="docs/screens/12-licensing-center.svg" width="210" alt="Licensing Center"></a><br><sub><b>12</b> · Licensing Center</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/13-embodiments.svg"><img src="docs/screens/13-embodiments.svg" width="210" alt="Embodiments"></a><br><sub><b>13</b> · Embodiments</sub></td>
+<td align="center" width="25%"><a href="docs/screens/14-control-center.svg"><img src="docs/screens/14-control-center.svg" width="210" alt="Control Center"></a><br><sub><b>14</b> · Control Center</sub></td>
+<td align="center" width="25%"><a href="docs/screens/15-design-language.svg"><img src="docs/screens/15-design-language.svg" width="210" alt="Design Language"></a><br><sub><b>15</b> · Design Language</sub></td>
+</tr>
 </table>
 
 **Companion, summoning & connection**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/16-genesis.svg"><img src="docs/screens/16-genesis.svg" width="210" alt="Genesis"></a><br><sub><b>16</b> · Genesis</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/17-summon-beacons.svg"><img src="docs/screens/17-summon-beacons.svg" width="210" alt="Summon & Beacons"></a><br><sub><b>17</b> · Summon & Beacons</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/18-proactive.svg"><img src="docs/screens/18-proactive.svg" width="210" alt="Proactive"></a><br><sub><b>18</b> · Proactive</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/19-transparency.svg"><img src="docs/screens/19-transparency.svg" width="210" alt="Transparency"></a><br><sub><b>19</b> · Transparency</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/20-connections.svg"><img src="docs/screens/20-connections.svg" width="210" alt="Connections"></a><br><sub><b>20</b> · Connections</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/21-rooms.svg"><img src="docs/screens/21-rooms.svg" width="210" alt="Rooms"></a><br><sub><b>21</b> · Rooms</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/22-providers.svg"><img src="docs/screens/22-providers.svg" width="210" alt="Providers"></a><br><sub><b>22</b> · Providers</sub></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/16-genesis.svg"><img src="docs/screens/16-genesis.svg" width="210" alt="Genesis"></a><br><sub><b>16</b> · Genesis</sub></td>
+<td align="center" width="25%"><a href="docs/screens/17-summon-beacons.svg"><img src="docs/screens/17-summon-beacons.svg" width="210" alt="Summon & Beacons"></a><br><sub><b>17</b> · Summon & Beacons</sub></td>
+<td align="center" width="25%"><a href="docs/screens/18-proactive.svg"><img src="docs/screens/18-proactive.svg" width="210" alt="Proactive"></a><br><sub><b>18</b> · Proactive</sub></td>
+<td align="center" width="25%"><a href="docs/screens/19-transparency.svg"><img src="docs/screens/19-transparency.svg" width="210" alt="Transparency"></a><br><sub><b>19</b> · Transparency</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/20-connections.svg"><img src="docs/screens/20-connections.svg" width="210" alt="Connections"></a><br><sub><b>20</b> · Connections</sub></td>
+<td align="center" width="25%"><a href="docs/screens/21-rooms.svg"><img src="docs/screens/21-rooms.svg" width="210" alt="Rooms"></a><br><sub><b>21</b> · Rooms</sub></td>
+<td align="center" width="25%"><a href="docs/screens/22-providers.svg"><img src="docs/screens/22-providers.svg" width="210" alt="Providers"></a><br><sub><b>22</b> · Providers</sub></td>
+</tr>
 </table>
 
 **Your data promise, lifecycle & the claims**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/23-cloud-model.svg"><img src="docs/screens/23-cloud-model.svg" width="210" alt="Cloud Model"></a><br><sub><b>23</b> · Cloud Model</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/24-offline-mode.svg"><img src="docs/screens/24-offline-mode.svg" width="210" alt="Offline Mode"></a><br><sub><b>24</b> · Offline Mode</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/25-objection-lifecycle.svg"><img src="docs/screens/25-objection-lifecycle.svg" width="210" alt="Objection & Lifecycle"></a><br><sub><b>25</b> · Objection & Lifecycle</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/26-memorial.svg"><img src="docs/screens/26-memorial.svg" width="210" alt="Memorial"></a><br><sub><b>26</b> · Memorial</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/27-ai-assistant.svg"><img src="docs/screens/27-ai-assistant.svg" width="210" alt="AI Assistant"></a><br><sub><b>27</b> · AI Assistant</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/28-specialists.svg"><img src="docs/screens/28-specialists.svg" width="210" alt="Specialists"></a><br><sub><b>28</b> · Specialists</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/29-tasks-grants.svg"><img src="docs/screens/29-tasks-grants.svg" width="210" alt="Tasks & Grants"></a><br><sub><b>29</b> · Tasks & Grants</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/30-fine-tune.svg"><img src="docs/screens/30-fine-tune.svg" width="210" alt="Fine-Tune"></a><br><sub><b>30</b> · Fine-Tune</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/31-your-data-promise.svg"><img src="docs/screens/31-your-data-promise.svg" width="210" alt="Your Data Promise"></a><br><sub><b>31</b> · Your Data Promise</sub></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/23-cloud-model.svg"><img src="docs/screens/23-cloud-model.svg" width="210" alt="Cloud Model"></a><br><sub><b>23</b> · Cloud Model</sub></td>
+<td align="center" width="25%"><a href="docs/screens/24-offline-mode.svg"><img src="docs/screens/24-offline-mode.svg" width="210" alt="Offline Mode"></a><br><sub><b>24</b> · Offline Mode</sub></td>
+<td align="center" width="25%"><a href="docs/screens/25-objection-lifecycle.svg"><img src="docs/screens/25-objection-lifecycle.svg" width="210" alt="Objection & Lifecycle"></a><br><sub><b>25</b> · Objection & Lifecycle</sub></td>
+<td align="center" width="25%"><a href="docs/screens/26-memorial.svg"><img src="docs/screens/26-memorial.svg" width="210" alt="Memorial"></a><br><sub><b>26</b> · Memorial</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/27-ai-assistant.svg"><img src="docs/screens/27-ai-assistant.svg" width="210" alt="AI Assistant"></a><br><sub><b>27</b> · AI Assistant</sub></td>
+<td align="center" width="25%"><a href="docs/screens/28-specialists.svg"><img src="docs/screens/28-specialists.svg" width="210" alt="Specialists"></a><br><sub><b>28</b> · Specialists</sub></td>
+<td align="center" width="25%"><a href="docs/screens/29-tasks-grants.svg"><img src="docs/screens/29-tasks-grants.svg" width="210" alt="Tasks & Grants"></a><br><sub><b>29</b> · Tasks & Grants</sub></td>
+<td align="center" width="25%"><a href="docs/screens/30-fine-tune.svg"><img src="docs/screens/30-fine-tune.svg" width="210" alt="Fine-Tune"></a><br><sub><b>30</b> · Fine-Tune</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/31-your-data-promise.svg"><img src="docs/screens/31-your-data-promise.svg" width="210" alt="Your Data Promise"></a><br><sub><b>31</b> · Your Data Promise</sub></td>
+</tr>
 </table>
 
 **Moderation, posting & the persona engine**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="210" alt="Moderation"></a><br><sub><b>32</b> · Moderation</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/33-posts.svg"><img src="docs/screens/33-posts.svg" width="210" alt="Posts"></a><br><sub><b>33</b> · Posts</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/34-adult-mode.svg"><img src="docs/screens/34-adult-mode.svg" width="210" alt="Adult Mode"></a><br><sub><b>34</b> · Adult Mode</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/35-aging-lifecycle.svg"><img src="docs/screens/35-aging-lifecycle.svg" width="210" alt="Aging & Lifecycle"></a><br><sub><b>35</b> · Aging & Lifecycle</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/36-multi-modal.svg"><img src="docs/screens/36-multi-modal.svg" width="210" alt="Multi-Modal"></a><br><sub><b>36</b> · Multi-Modal</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/37-persona-embedding.svg"><img src="docs/screens/37-persona-embedding.svg" width="210" alt="Persona Embedding"></a><br><sub><b>37</b> · Persona Embedding</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/38-surfaces.svg"><img src="docs/screens/38-surfaces.svg" width="210" alt="Surfaces"></a><br><sub><b>38</b> · Surfaces</sub></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="210" alt="Moderation"></a><br><sub><b>32</b> · Moderation</sub></td>
+<td align="center" width="25%"><a href="docs/screens/33-posts.svg"><img src="docs/screens/33-posts.svg" width="210" alt="Posts"></a><br><sub><b>33</b> · Posts</sub></td>
+<td align="center" width="25%"><a href="docs/screens/34-adult-mode.svg"><img src="docs/screens/34-adult-mode.svg" width="210" alt="Adult Mode"></a><br><sub><b>34</b> · Adult Mode</sub></td>
+<td align="center" width="25%"><a href="docs/screens/35-aging-lifecycle.svg"><img src="docs/screens/35-aging-lifecycle.svg" width="210" alt="Aging & Lifecycle"></a><br><sub><b>35</b> · Aging & Lifecycle</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/36-multi-modal.svg"><img src="docs/screens/36-multi-modal.svg" width="210" alt="Multi-Modal"></a><br><sub><b>36</b> · Multi-Modal</sub></td>
+<td align="center" width="25%"><a href="docs/screens/37-persona-embedding.svg"><img src="docs/screens/37-persona-embedding.svg" width="210" alt="Persona Embedding"></a><br><sub><b>37</b> · Persona Embedding</sub></td>
+<td align="center" width="25%"><a href="docs/screens/38-surfaces.svg"><img src="docs/screens/38-surfaces.svg" width="210" alt="Surfaces"></a><br><sub><b>38</b> · Surfaces</sub></td>
+</tr>
 </table>
 
 **Session lifecycle**
@@ -166,16 +160,15 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 **First-run — account, verification & guided setup**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/41-log-in.svg"><img src="docs/screens/41-log-in.svg" width="210" alt="Log In"></a><br><sub><b>41</b> · Log In (Apple · Google · Email)</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/42-verify-identity.svg"><img src="docs/screens/42-verify-identity.svg" width="210" alt="Verify Identity"></a><br><sub><b>42</b> · Verify Identity</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/43-enable-access.svg"><img src="docs/screens/43-enable-access.svg" width="210" alt="Enable Access"></a><br><sub><b>43</b> · Enable Access</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="210" alt="Avatar Studio"></a><br><sub><b>44</b> · Avatar Studio (2D &amp; 3D)</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/47-all-set.svg"><img src="docs/screens/47-all-set.svg" width="210" alt="All Set"></a><br><sub><b>47</b> · All Set</sub></td>
-    <td align="center" width="33%"></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/41-log-in.svg"><img src="docs/screens/41-log-in.svg" width="210" alt="Log In"></a><br><sub><b>41</b> · Log In (Apple · Google · Email)</sub></td>
+<td align="center" width="25%"><a href="docs/screens/42-verify-identity.svg"><img src="docs/screens/42-verify-identity.svg" width="210" alt="Verify Identity"></a><br><sub><b>42</b> · Verify Identity</sub></td>
+<td align="center" width="25%"><a href="docs/screens/43-enable-access.svg"><img src="docs/screens/43-enable-access.svg" width="210" alt="Enable Access"></a><br><sub><b>43</b> · Enable Access</sub></td>
+<td align="center" width="25%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="210" alt="Avatar Studio"></a><br><sub><b>44</b> · Avatar Studio (2D &amp; 3D)</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/47-all-set.svg"><img src="docs/screens/47-all-set.svg" width="210" alt="All Set"></a><br><sub><b>47</b> · All Set</sub></td>
+</tr>
 </table>
 
 **Immersive surfaces — avatar chat, AR / VR & live video**
@@ -191,215 +184,203 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 **Connections — social platforms & AI-integrated apps**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/48-social-connections.svg"><img src="docs/screens/48-social-connections.svg" width="210" alt="Social Connections"></a><br><sub><b>48</b> · Social Connections</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/49-connected-apps.svg"><img src="docs/screens/49-connected-apps.svg" width="210" alt="Connected Apps"></a><br><sub><b>49</b> · Connected Apps</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/50-knowledge-excursions.svg"><img src="docs/screens/50-knowledge-excursions.svg" width="210" alt="Knowledge Excursions"></a><br><sub><b>50</b> · Knowledge Excursions</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/51-files-photos.svg"><img src="docs/screens/51-files-photos.svg" width="210" alt="Files & Photos"></a><br><sub><b>51</b> · Files &amp; Photos</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/52-apple-intelligence.svg"><img src="docs/screens/52-apple-intelligence.svg" width="210" alt="Apple Intelligence"></a><br><sub><b>52</b> · Apple Intelligence</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/53-google-gemini.svg"><img src="docs/screens/53-google-gemini.svg" width="210" alt="Google Gemini"></a><br><sub><b>53</b> · Google Gemini</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/54-microsoft-copilot.svg"><img src="docs/screens/54-microsoft-copilot.svg" width="210" alt="Microsoft Copilot"></a><br><sub><b>54</b> · Microsoft Copilot</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/55-objection-revocation.svg"><img src="docs/screens/55-objection-revocation.svg" width="210" alt="Objection &amp; Revocation"></a><br><sub><b>55</b> · Objection &amp; Revocation</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/56-robotics.svg"><img src="docs/screens/56-robotics.svg" width="210" alt="Robotics"></a><br><sub><b>56</b> · Robotics</sub></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/48-social-connections.svg"><img src="docs/screens/48-social-connections.svg" width="210" alt="Social Connections"></a><br><sub><b>48</b> · Social Connections</sub></td>
+<td align="center" width="25%"><a href="docs/screens/49-connected-apps.svg"><img src="docs/screens/49-connected-apps.svg" width="210" alt="Connected Apps"></a><br><sub><b>49</b> · Connected Apps</sub></td>
+<td align="center" width="25%"><a href="docs/screens/50-knowledge-excursions.svg"><img src="docs/screens/50-knowledge-excursions.svg" width="210" alt="Knowledge Excursions"></a><br><sub><b>50</b> · Knowledge Excursions</sub></td>
+<td align="center" width="25%"><a href="docs/screens/51-files-photos.svg"><img src="docs/screens/51-files-photos.svg" width="210" alt="Files & Photos"></a><br><sub><b>51</b> · Files &amp; Photos</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/52-apple-intelligence.svg"><img src="docs/screens/52-apple-intelligence.svg" width="210" alt="Apple Intelligence"></a><br><sub><b>52</b> · Apple Intelligence</sub></td>
+<td align="center" width="25%"><a href="docs/screens/53-google-gemini.svg"><img src="docs/screens/53-google-gemini.svg" width="210" alt="Google Gemini"></a><br><sub><b>53</b> · Google Gemini</sub></td>
+<td align="center" width="25%"><a href="docs/screens/54-microsoft-copilot.svg"><img src="docs/screens/54-microsoft-copilot.svg" width="210" alt="Microsoft Copilot"></a><br><sub><b>54</b> · Microsoft Copilot</sub></td>
+<td align="center" width="25%"><a href="docs/screens/55-objection-revocation.svg"><img src="docs/screens/55-objection-revocation.svg" width="210" alt="Objection &amp; Revocation"></a><br><sub><b>55</b> · Objection &amp; Revocation</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/56-robotics.svg"><img src="docs/screens/56-robotics.svg" width="210" alt="Robotics"></a><br><sub><b>56</b> · Robotics</sub></td>
+</tr>
 </table>
 
 **Knowledge packs, robot task mods & embodiment**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/57-knowledge-packs.svg"><img src="docs/screens/57-knowledge-packs.svg" width="210" alt="Knowledge Packs"></a><br><sub><b>57</b> · Knowledge Packs</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/58-robot-task-packs.svg"><img src="docs/screens/58-robot-task-packs.svg" width="210" alt="Robot Task Packs"></a><br><sub><b>58</b> · Robot Task Packs</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/59-embodied-agent.svg"><img src="docs/screens/59-embodied-agent.svg" width="210" alt="Embodied Agent"></a><br><sub><b>59</b> · Embodied Agent</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/60-publish-a-pack.svg"><img src="docs/screens/60-publish-a-pack.svg" width="210" alt="Publish a Pack"></a><br><sub><b>60</b> · Publish a Pack</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/61-pack-registries.svg"><img src="docs/screens/61-pack-registries.svg" width="210" alt="Pack Registries"></a><br><sub><b>61</b> · Pack Registries</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/62-rated-placement.svg"><img src="docs/screens/62-rated-placement.svg" width="210" alt="Rated Placement"></a><br><sub><b>62</b> · Rated Placement (18+)</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/63-placement-analytics.svg"><img src="docs/screens/63-placement-analytics.svg" width="210" alt="Placement Analytics"></a><br><sub><b>63</b> · Placement Analytics</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/64-creator-payouts.svg"><img src="docs/screens/64-creator-payouts.svg" width="210" alt="Creator Payouts"></a><br><sub><b>64</b> · Creator Payouts</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/65-watch-remote.svg"><img src="docs/screens/65-watch-remote.svg" width="210" alt="Watch Remote"></a><br><sub><b>65</b> · Watch Remote</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/66-steering.svg"><img src="docs/screens/66-steering.svg" width="210" alt="Steering"></a><br><sub><b>66</b> · Steering</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/67-smart-glasses.svg"><img src="docs/screens/67-smart-glasses.svg" width="210" alt="Smart Glasses"></a><br><sub><b>67</b> · Smart Glasses</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/68-gaming-companion.svg"><img src="docs/screens/68-gaming-companion.svg" width="210" alt="Gaming Companion"></a><br><sub><b>68</b> · Gaming Companion</sub></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/57-knowledge-packs.svg"><img src="docs/screens/57-knowledge-packs.svg" width="210" alt="Knowledge Packs"></a><br><sub><b>57</b> · Knowledge Packs</sub></td>
+<td align="center" width="25%"><a href="docs/screens/58-robot-task-packs.svg"><img src="docs/screens/58-robot-task-packs.svg" width="210" alt="Robot Task Packs"></a><br><sub><b>58</b> · Robot Task Packs</sub></td>
+<td align="center" width="25%"><a href="docs/screens/59-embodied-agent.svg"><img src="docs/screens/59-embodied-agent.svg" width="210" alt="Embodied Agent"></a><br><sub><b>59</b> · Embodied Agent</sub></td>
+<td align="center" width="25%"><a href="docs/screens/60-publish-a-pack.svg"><img src="docs/screens/60-publish-a-pack.svg" width="210" alt="Publish a Pack"></a><br><sub><b>60</b> · Publish a Pack</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/61-pack-registries.svg"><img src="docs/screens/61-pack-registries.svg" width="210" alt="Pack Registries"></a><br><sub><b>61</b> · Pack Registries</sub></td>
+<td align="center" width="25%"><a href="docs/screens/62-rated-placement.svg"><img src="docs/screens/62-rated-placement.svg" width="210" alt="Rated Placement"></a><br><sub><b>62</b> · Rated Placement (18+)</sub></td>
+<td align="center" width="25%"><a href="docs/screens/63-placement-analytics.svg"><img src="docs/screens/63-placement-analytics.svg" width="210" alt="Placement Analytics"></a><br><sub><b>63</b> · Placement Analytics</sub></td>
+<td align="center" width="25%"><a href="docs/screens/64-creator-payouts.svg"><img src="docs/screens/64-creator-payouts.svg" width="210" alt="Creator Payouts"></a><br><sub><b>64</b> · Creator Payouts</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/65-watch-remote.svg"><img src="docs/screens/65-watch-remote.svg" width="210" alt="Watch Remote"></a><br><sub><b>65</b> · Watch Remote</sub></td>
+<td align="center" width="25%"><a href="docs/screens/66-steering.svg"><img src="docs/screens/66-steering.svg" width="210" alt="Steering"></a><br><sub><b>66</b> · Steering</sub></td>
+<td align="center" width="25%"><a href="docs/screens/67-smart-glasses.svg"><img src="docs/screens/67-smart-glasses.svg" width="210" alt="Smart Glasses"></a><br><sub><b>67</b> · Smart Glasses</sub></td>
+<td align="center" width="25%"><a href="docs/screens/68-gaming-companion.svg"><img src="docs/screens/68-gaming-companion.svg" width="210" alt="Gaming Companion"></a><br><sub><b>68</b> · Gaming Companion</sub></td>
+</tr>
 </table>
 
 **Live desks, the audience layer & commerce**
 
 <table>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/69-live-desks.svg"><img src="docs/screens/69-live-desks.svg" width="210" alt="Live Desks"></a><br><sub><b>69</b> · Live Desks</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/70-desk-beacons.svg"><img src="docs/screens/70-desk-beacons.svg" width="210" alt="Desk Beacons"></a><br><sub><b>70</b> · Desk Beacons</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/71-audience.svg"><img src="docs/screens/71-audience.svg" width="210" alt="Audience"></a><br><sub><b>71</b> · Audience</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/72-gifts-purchases.svg"><img src="docs/screens/72-gifts-purchases.svg" width="210" alt="Gifts &amp; Purchases"></a><br><sub><b>72</b> · Gifts &amp; Purchases</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/73-signatures.svg"><img src="docs/screens/73-signatures.svg" width="210" alt="Signatures"></a><br><sub><b>73</b> · Signatures</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/74-starter-collection.svg"><img src="docs/screens/74-starter-collection.svg" width="210" alt="Starter Collection"></a><br><sub><b>74</b> · Starter Collection</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/75-live-room.svg"><img src="docs/screens/75-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>75</b> · Live Room</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/76-rated-stream.svg"><img src="docs/screens/76-rated-stream.svg" width="210" alt="Rated Stream"></a><br><sub><b>76</b> · Rated Stream (18+)</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/77-search-place.svg"><img src="docs/screens/77-search-place.svg" width="210" alt="Search &amp; Place"></a><br><sub><b>77</b> · Search &amp; Place</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/78-marketplace-settings.svg"><img src="docs/screens/78-marketplace-settings.svg" width="210" alt="Marketplace Settings"></a><br><sub><b>78</b> · Marketplace Settings</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/79-search-assistant.svg"><img src="docs/screens/79-search-assistant.svg" width="210" alt="Search Assistant"></a><br><sub><b>79</b> · Search Assistant</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/80-profile.svg"><img src="docs/screens/80-profile.svg" width="210" alt="Profile"></a><br><sub><b>80</b> · Profile</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/81-lend-a-microphone.svg"><img src="docs/screens/81-lend-a-microphone.svg" width="210" alt="Lend a Microphone"></a><br><sub><b>81</b> · Lend a Microphone</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="210" alt="My Page"></a><br><sub><b>85</b> · My Page</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="210" alt="Customise"></a><br><sub><b>86</b> · Customise</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="210" alt="For You"></a><br><sub><b>87</b> · For You</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>99</b> · Posted Video · YouTube</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/112-the-agreement.svg"><img src="docs/screens/112-the-agreement.svg" width="210" alt="The Agreement"></a><br><sub><b>112</b> · The Agreement</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="210" alt="Delivery"></a><br><sub><b>114</b> · Delivery</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/115-watch-party.svg"><img src="docs/screens/115-watch-party.svg" width="210" alt="Watch Party"></a><br><sub><b>115</b> · Watch Party</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/116-lend-a-skill.svg"><img src="docs/screens/116-lend-a-skill.svg" width="210" alt="Lend a Skill"></a><br><sub><b>116</b> · Lend a Skill</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/117-edit-a-message.svg"><img src="docs/screens/117-edit-a-message.svg" width="210" alt="Edit a Message"></a><br><sub><b>117</b> · Edit a Message</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="210" alt="Stay Anonymous"></a><br><sub><b>118</b> · Stay Anonymous</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="210" alt="Lend It Anywhere"></a><br><sub><b>120</b> · Lend It Anywhere</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="210" alt="Wear a Character"></a><br><sub><b>121</b> · Wear a Character</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="210" alt="Game Lobby"></a><br><sub><b>122</b> · Game Lobby</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="210" alt="Masked and Real"></a><br><sub><b>123</b> · Masked and Real</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/124-your-background.svg"><img src="docs/screens/124-your-background.svg" width="210" alt="Your Background"></a><br><sub><b>124</b> · Your Background</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="210" alt="On a Screen"></a><br><sub><b>126</b> · On a Screen</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>127</b> · Show Me Around</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="210" alt="The Corner Pane"></a><br><sub><b>128</b> · The Corner Pane</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="210" alt="Where Is It"></a><br><sub><b>129</b> · Where Is It?</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="210" alt="Choose a Plan"></a><br><sub><b>130</b> · Choose a Plan</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/131-what-pro-adds.svg"><img src="docs/screens/131-what-pro-adds.svg" width="210" alt="What Pro Adds"></a><br><sub><b>131</b> · What Pro Adds</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/132-pick-a-plan.svg"><img src="docs/screens/132-pick-a-plan.svg" width="210" alt="Pick a Plan"></a><br><sub><b>132</b> · Pick a Plan</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/133-payment.svg"><img src="docs/screens/133-payment.svg" width="210" alt="Payment"></a><br><sub><b>133</b> · Payment</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/134-youre-on-basic.svg"><img src="docs/screens/134-youre-on-basic.svg" width="210" alt="You are on Basic"></a><br><sub><b>134</b> · You're on Basic</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/135-this-needs-pro.svg"><img src="docs/screens/135-this-needs-pro.svg" width="210" alt="This Needs Pro"></a><br><sub><b>135</b> · This Needs Pro</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/136-show-them.svg"><img src="docs/screens/136-show-them.svg" width="210" alt="Show Them"></a><br><sub><b>136</b> · Show Them</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/137-whats-in-shot.svg"><img src="docs/screens/137-whats-in-shot.svg" width="210" alt="Whats In Shot"></a><br><sub><b>137</b> · What's In Shot</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/138-youre-on-free.svg"><img src="docs/screens/138-youre-on-free.svg" width="210" alt="You are on Free"></a><br><sub><b>138</b> · You're on Free</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/139-where-it-lives.svg"><img src="docs/screens/139-where-it-lives.svg" width="210" alt="Where It Lives"></a><br><sub><b>139</b> · Where It Lives</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/140-not-on-free.svg"><img src="docs/screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/141-which-model-answers.svg"><img src="docs/screens/141-which-model-answers.svg" width="210" alt="Which Model Answers"></a><br><sub><b>141</b> · Which Model Answers</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/142-blend-a-profile.svg"><img src="docs/screens/142-blend-a-profile.svg" width="210" alt="Blend a Profile"></a><br><sub><b>142</b> · Blend a Profile</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/143-what-would-they-do.svg"><img src="docs/screens/143-what-would-they-do.svg" width="210" alt="What Would They Do"></a><br><sub><b>143</b> · What Would They Do</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/144-where-you-are.svg"><img src="docs/screens/144-where-you-are.svg" width="210" alt="Where You Are"></a><br><sub><b>144</b> · Where You Are</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/145-where-the-money-goes.svg"><img src="docs/screens/145-where-the-money-goes.svg" width="210" alt="Where the Money Goes"></a><br><sub><b>145</b> · Where the Money Goes</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/146-the-ecosystem.svg"><img src="docs/screens/146-the-ecosystem.svg" width="210" alt="The Ecosystem"></a><br><sub><b>146</b> · The Ecosystem</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/147-your-own-voice.svg"><img src="docs/screens/147-your-own-voice.svg" width="210" alt="Your Own Voice"></a><br><sub><b>147</b> · Your Own Voice</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/148-who-wrote-this.svg"><img src="docs/screens/148-who-wrote-this.svg" width="210" alt="Who Wrote This?"></a><br><sub><b>148</b> · Who Wrote This?</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/149-how-should-they-work.svg"><img src="docs/screens/149-how-should-they-work.svg" width="210" alt="How Should They Work?"></a><br><sub><b>149</b> · How Should They Work?</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/150-what-went-wrong.svg"><img src="docs/screens/150-what-went-wrong.svg" width="210" alt="What Went Wrong"></a><br><sub><b>150</b> · What Went Wrong</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/151-before-anything-is-sent.svg"><img src="docs/screens/151-before-anything-is-sent.svg" width="210" alt="Before Anything Is Sent"></a><br><sub><b>151</b> · Before Anything Is Sent</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/152-marketplace.svg"><img src="docs/screens/152-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/153-exchanges.svg"><img src="docs/screens/153-exchanges.svg" width="210" alt="Exchanges"></a><br><sub><b>153</b> · Exchanges</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/154-lent-skills.svg"><img src="docs/screens/154-lent-skills.svg" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/155-watch-together.svg"><img src="docs/screens/155-watch-together.svg" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/157-where-it-is-seen.svg"><img src="docs/screens/157-where-it-is-seen.svg" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/158-what-is-live.svg"><img src="docs/screens/158-what-is-live.svg" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/159-contest-a-profile.svg"><img src="docs/screens/159-contest-a-profile.svg" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/160-show-me-around.svg"><img src="docs/screens/160-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/161-not-on-this-plan.svg"><img src="docs/screens/161-not-on-this-plan.svg" width="210" alt="Not On This Plan"></a><br><sub><b>161</b> · Not On This Plan</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/162-where-it-is-marketed.svg"><img src="docs/screens/162-where-it-is-marketed.svg" width="210" alt="Where It Is Marketed"></a><br><sub><b>162</b> · Where It Is Marketed</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/163-a-body-to-speak-through.svg"><img src="docs/screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/164-what-it-is-made-of.svg"><img src="docs/screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/165-what-it-can-do-for-you.svg"><img src="docs/screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/166-somebody-qualified.svg"><img src="docs/screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/167-in-the-game-with-you.svg"><img src="docs/screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/169-where-people-find-you.svg"><img src="docs/screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/170-reaching-out-and-what-stops-it.svg"><img src="docs/screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/171-what-leaves-and-on-what-terms.svg"><img src="docs/screens/171-what-leaves-and-on-what-terms.svg" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/172-one-thing-named.svg"><img src="docs/screens/172-one-thing-named.svg" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/173-beginning-and-passing-on.svg"><img src="docs/screens/173-beginning-and-passing-on.svg" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/174-what-you-are-owed.svg"><img src="docs/screens/174-what-you-are-owed.svg" width="210" alt="What You Are Owed"></a><br><sub><b>174</b> · What You Are Owed</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/175-inside-a-room.svg"><img src="docs/screens/175-inside-a-room.svg" width="210" alt="Inside A Room"></a><br><sub><b>175</b> · Inside A Room</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/176-a-body-and-what-it-learns.svg"><img src="docs/screens/176-a-body-and-what-it-learns.svg" width="210" alt="A Body, And What It Learns"></a><br><sub><b>176</b> · A Body, And What It Learns</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/177-work-handed-over.svg"><img src="docs/screens/177-work-handed-over.svg" width="210" alt="Work Handed Over"></a><br><sub><b>177</b> · Work Handed Over</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/178-signed-and-checked.svg"><img src="docs/screens/178-signed-and-checked.svg" width="210" alt="Signed, And Checked"></a><br><sub><b>178</b> · Signed, And Checked</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/179-ringing-the-bell.svg"><img src="docs/screens/179-ringing-the-bell.svg" width="210" alt="Ringing The Bell"></a><br><sub><b>179</b> · Ringing The Bell</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/180-two-strangers.svg"><img src="docs/screens/180-two-strangers.svg" width="210" alt="Two Strangers"></a><br><sub><b>180</b> · Two Strangers</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/181-the-mark-and-the-held.svg"><img src="docs/screens/181-the-mark-and-the-held.svg" width="210" alt="The Mark, And The Held"></a><br><sub><b>181</b> · The Mark, And The Held</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/182-in-its-own-words.svg"><img src="docs/screens/182-in-its-own-words.svg" width="210" alt="In Its Own Words"></a><br><sub><b>182</b> · In Its Own Words</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/183-everything-else.svg"><img src="docs/screens/183-everything-else.svg" width="210" alt="Everything Else"></a><br><sub><b>183</b> · Everything Else</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/184-without-an-account.svg"><img src="docs/screens/184-without-an-account.svg" width="210" alt="Without An Account"></a><br><sub><b>184</b> · Without An Account</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/185-discover.svg"><img src="docs/screens/185-discover.svg" width="210" alt="Discover"></a><br><sub><b>185</b> · Discover</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/186-wall.svg"><img src="docs/screens/186-wall.svg" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/187-shops.svg"><img src="docs/screens/187-shops.svg" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/188-your-corner.svg"><img src="docs/screens/188-your-corner.svg" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/189-feed.svg"><img src="docs/screens/189-feed.svg" width="210" alt="Feed"></a><br><sub><b>189</b> · Feed</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/190-what-plays.svg"><img src="docs/screens/190-what-plays.svg" width="210" alt="What Plays"></a><br><sub><b>190</b> · What Plays</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/191-rooms-desks.svg"><img src="docs/screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a><br><sub><b>191</b> · Rooms &amp; Desks</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="docs/screens/192-your-side-of-it.svg"><img src="docs/screens/192-your-side-of-it.svg" width="210" alt="Your Side of It"></a><br><sub><b>192</b> · Your Side of It</sub></td>
-    <td align="center" width="33%"></td>
-    <td align="center" width="33%"></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/69-live-desks.svg"><img src="docs/screens/69-live-desks.svg" width="210" alt="Live Desks"></a><br><sub><b>69</b> · Live Desks</sub></td>
+<td align="center" width="25%"><a href="docs/screens/70-desk-beacons.svg"><img src="docs/screens/70-desk-beacons.svg" width="210" alt="Desk Beacons"></a><br><sub><b>70</b> · Desk Beacons</sub></td>
+<td align="center" width="25%"><a href="docs/screens/71-audience.svg"><img src="docs/screens/71-audience.svg" width="210" alt="Audience"></a><br><sub><b>71</b> · Audience</sub></td>
+<td align="center" width="25%"><a href="docs/screens/72-gifts-purchases.svg"><img src="docs/screens/72-gifts-purchases.svg" width="210" alt="Gifts &amp; Purchases"></a><br><sub><b>72</b> · Gifts &amp; Purchases</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/73-signatures.svg"><img src="docs/screens/73-signatures.svg" width="210" alt="Signatures"></a><br><sub><b>73</b> · Signatures</sub></td>
+<td align="center" width="25%"><a href="docs/screens/74-starter-collection.svg"><img src="docs/screens/74-starter-collection.svg" width="210" alt="Starter Collection"></a><br><sub><b>74</b> · Starter Collection</sub></td>
+<td align="center" width="25%"><a href="docs/screens/75-live-room.svg"><img src="docs/screens/75-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>75</b> · Live Room</sub></td>
+<td align="center" width="25%"><a href="docs/screens/76-rated-stream.svg"><img src="docs/screens/76-rated-stream.svg" width="210" alt="Rated Stream"></a><br><sub><b>76</b> · Rated Stream (18+)</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/77-search-place.svg"><img src="docs/screens/77-search-place.svg" width="210" alt="Search &amp; Place"></a><br><sub><b>77</b> · Search &amp; Place</sub></td>
+<td align="center" width="25%"><a href="docs/screens/78-marketplace-settings.svg"><img src="docs/screens/78-marketplace-settings.svg" width="210" alt="Marketplace Settings"></a><br><sub><b>78</b> · Marketplace Settings</sub></td>
+<td align="center" width="25%"><a href="docs/screens/79-search-assistant.svg"><img src="docs/screens/79-search-assistant.svg" width="210" alt="Search Assistant"></a><br><sub><b>79</b> · Search Assistant</sub></td>
+<td align="center" width="25%"><a href="docs/screens/80-profile.svg"><img src="docs/screens/80-profile.svg" width="210" alt="Profile"></a><br><sub><b>80</b> · Profile</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/81-lend-a-microphone.svg"><img src="docs/screens/81-lend-a-microphone.svg" width="210" alt="Lend a Microphone"></a><br><sub><b>81</b> · Lend a Microphone</sub></td>
+<td align="center" width="25%"><a href="docs/screens/82-agents.svg"><img src="docs/screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
+<td align="center" width="25%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
+<td align="center" width="25%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="210" alt="My Page"></a><br><sub><b>85</b> · My Page</sub></td>
+<td align="center" width="25%"><a href="docs/screens/86-customise.svg"><img src="docs/screens/86-customise.svg" width="210" alt="Customise"></a><br><sub><b>86</b> · Customise</sub></td>
+<td align="center" width="25%"><a href="docs/screens/87-for-you.svg"><img src="docs/screens/87-for-you.svg" width="210" alt="For You"></a><br><sub><b>87</b> · For You</sub></td>
+<td align="center" width="25%"><a href="docs/screens/88-your-devices.svg"><img src="docs/screens/88-your-devices.svg" width="210" alt="Your Devices"></a><br><sub><b>88</b> · Your Devices</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/89-live-room.svg"><img src="docs/screens/89-live-room.svg" width="210" alt="Live Room"></a><br><sub><b>89</b> · Live Room · chat + actions</sub></td>
+<td align="center" width="25%"><a href="docs/screens/99-posted-video.svg"><img src="docs/screens/99-posted-video.svg" width="210" alt="Posted Video"></a><br><sub><b>99</b> · Posted Video · YouTube</sub></td>
+<td align="center" width="25%"><a href="docs/screens/112-the-agreement.svg"><img src="docs/screens/112-the-agreement.svg" width="210" alt="The Agreement"></a><br><sub><b>112</b> · The Agreement</sub></td>
+<td align="center" width="25%"><a href="docs/screens/114-delivery.svg"><img src="docs/screens/114-delivery.svg" width="210" alt="Delivery"></a><br><sub><b>114</b> · Delivery</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/115-watch-party.svg"><img src="docs/screens/115-watch-party.svg" width="210" alt="Watch Party"></a><br><sub><b>115</b> · Watch Party</sub></td>
+<td align="center" width="25%"><a href="docs/screens/116-lend-a-skill.svg"><img src="docs/screens/116-lend-a-skill.svg" width="210" alt="Lend a Skill"></a><br><sub><b>116</b> · Lend a Skill</sub></td>
+<td align="center" width="25%"><a href="docs/screens/117-edit-a-message.svg"><img src="docs/screens/117-edit-a-message.svg" width="210" alt="Edit a Message"></a><br><sub><b>117</b> · Edit a Message</sub></td>
+<td align="center" width="25%"><a href="docs/screens/118-stay-anonymous.svg"><img src="docs/screens/118-stay-anonymous.svg" width="210" alt="Stay Anonymous"></a><br><sub><b>118</b> · Stay Anonymous</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/119-your-profiles.svg"><img src="docs/screens/119-your-profiles.svg" width="210" alt="Your Profiles"></a><br><sub><b>119</b> · Your Profiles</sub></td>
+<td align="center" width="25%"><a href="docs/screens/120-lend-it-anywhere.svg"><img src="docs/screens/120-lend-it-anywhere.svg" width="210" alt="Lend It Anywhere"></a><br><sub><b>120</b> · Lend It Anywhere</sub></td>
+<td align="center" width="25%"><a href="docs/screens/121-wear-a-character.svg"><img src="docs/screens/121-wear-a-character.svg" width="210" alt="Wear a Character"></a><br><sub><b>121</b> · Wear a Character</sub></td>
+<td align="center" width="25%"><a href="docs/screens/122-game-lobby.svg"><img src="docs/screens/122-game-lobby.svg" width="210" alt="Game Lobby"></a><br><sub><b>122</b> · Game Lobby</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/123-masked-and-real.svg"><img src="docs/screens/123-masked-and-real.svg" width="210" alt="Masked and Real"></a><br><sub><b>123</b> · Masked and Real</sub></td>
+<td align="center" width="25%"><a href="docs/screens/124-your-background.svg"><img src="docs/screens/124-your-background.svg" width="210" alt="Your Background"></a><br><sub><b>124</b> · Your Background</sub></td>
+<td align="center" width="25%"><a href="docs/screens/125-never-a-player.svg"><img src="docs/screens/125-never-a-player.svg" width="210" alt="Never a Player"></a><br><sub><b>125</b> · Never a Player</sub></td>
+<td align="center" width="25%"><a href="docs/screens/126-on-a-screen.svg"><img src="docs/screens/126-on-a-screen.svg" width="210" alt="On a Screen"></a><br><sub><b>126</b> · On a Screen</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/127-show-me-around.svg"><img src="docs/screens/127-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>127</b> · Show Me Around</sub></td>
+<td align="center" width="25%"><a href="docs/screens/128-the-corner-pane.svg"><img src="docs/screens/128-the-corner-pane.svg" width="210" alt="The Corner Pane"></a><br><sub><b>128</b> · The Corner Pane</sub></td>
+<td align="center" width="25%"><a href="docs/screens/129-where-is-it.svg"><img src="docs/screens/129-where-is-it.svg" width="210" alt="Where Is It"></a><br><sub><b>129</b> · Where Is It?</sub></td>
+<td align="center" width="25%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="210" alt="Choose a Plan"></a><br><sub><b>130</b> · Choose a Plan</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/131-what-pro-adds.svg"><img src="docs/screens/131-what-pro-adds.svg" width="210" alt="What Pro Adds"></a><br><sub><b>131</b> · What Pro Adds</sub></td>
+<td align="center" width="25%"><a href="docs/screens/132-pick-a-plan.svg"><img src="docs/screens/132-pick-a-plan.svg" width="210" alt="Pick a Plan"></a><br><sub><b>132</b> · Pick a Plan</sub></td>
+<td align="center" width="25%"><a href="docs/screens/133-payment.svg"><img src="docs/screens/133-payment.svg" width="210" alt="Payment"></a><br><sub><b>133</b> · Payment</sub></td>
+<td align="center" width="25%"><a href="docs/screens/134-youre-on-basic.svg"><img src="docs/screens/134-youre-on-basic.svg" width="210" alt="You are on Basic"></a><br><sub><b>134</b> · You're on Basic</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/135-this-needs-pro.svg"><img src="docs/screens/135-this-needs-pro.svg" width="210" alt="This Needs Pro"></a><br><sub><b>135</b> · This Needs Pro</sub></td>
+<td align="center" width="25%"><a href="docs/screens/136-show-them.svg"><img src="docs/screens/136-show-them.svg" width="210" alt="Show Them"></a><br><sub><b>136</b> · Show Them</sub></td>
+<td align="center" width="25%"><a href="docs/screens/137-whats-in-shot.svg"><img src="docs/screens/137-whats-in-shot.svg" width="210" alt="Whats In Shot"></a><br><sub><b>137</b> · What's In Shot</sub></td>
+<td align="center" width="25%"><a href="docs/screens/138-youre-on-free.svg"><img src="docs/screens/138-youre-on-free.svg" width="210" alt="You are on Free"></a><br><sub><b>138</b> · You're on Free</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/139-where-it-lives.svg"><img src="docs/screens/139-where-it-lives.svg" width="210" alt="Where It Lives"></a><br><sub><b>139</b> · Where It Lives</sub></td>
+<td align="center" width="25%"><a href="docs/screens/140-not-on-free.svg"><img src="docs/screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
+<td align="center" width="25%"><a href="docs/screens/141-which-model-answers.svg"><img src="docs/screens/141-which-model-answers.svg" width="210" alt="Which Model Answers"></a><br><sub><b>141</b> · Which Model Answers</sub></td>
+<td align="center" width="25%"><a href="docs/screens/142-blend-a-profile.svg"><img src="docs/screens/142-blend-a-profile.svg" width="210" alt="Blend a Profile"></a><br><sub><b>142</b> · Blend a Profile</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/143-what-would-they-do.svg"><img src="docs/screens/143-what-would-they-do.svg" width="210" alt="What Would They Do"></a><br><sub><b>143</b> · What Would They Do</sub></td>
+<td align="center" width="25%"><a href="docs/screens/144-where-you-are.svg"><img src="docs/screens/144-where-you-are.svg" width="210" alt="Where You Are"></a><br><sub><b>144</b> · Where You Are</sub></td>
+<td align="center" width="25%"><a href="docs/screens/145-where-the-money-goes.svg"><img src="docs/screens/145-where-the-money-goes.svg" width="210" alt="Where the Money Goes"></a><br><sub><b>145</b> · Where the Money Goes</sub></td>
+<td align="center" width="25%"><a href="docs/screens/146-the-ecosystem.svg"><img src="docs/screens/146-the-ecosystem.svg" width="210" alt="The Ecosystem"></a><br><sub><b>146</b> · The Ecosystem</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/147-your-own-voice.svg"><img src="docs/screens/147-your-own-voice.svg" width="210" alt="Your Own Voice"></a><br><sub><b>147</b> · Your Own Voice</sub></td>
+<td align="center" width="25%"><a href="docs/screens/148-who-wrote-this.svg"><img src="docs/screens/148-who-wrote-this.svg" width="210" alt="Who Wrote This?"></a><br><sub><b>148</b> · Who Wrote This?</sub></td>
+<td align="center" width="25%"><a href="docs/screens/149-how-should-they-work.svg"><img src="docs/screens/149-how-should-they-work.svg" width="210" alt="How Should They Work?"></a><br><sub><b>149</b> · How Should They Work?</sub></td>
+<td align="center" width="25%"><a href="docs/screens/150-what-went-wrong.svg"><img src="docs/screens/150-what-went-wrong.svg" width="210" alt="What Went Wrong"></a><br><sub><b>150</b> · What Went Wrong</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/151-before-anything-is-sent.svg"><img src="docs/screens/151-before-anything-is-sent.svg" width="210" alt="Before Anything Is Sent"></a><br><sub><b>151</b> · Before Anything Is Sent</sub></td>
+<td align="center" width="25%"><a href="docs/screens/152-marketplace.svg"><img src="docs/screens/152-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace</sub></td>
+<td align="center" width="25%"><a href="docs/screens/153-exchanges.svg"><img src="docs/screens/153-exchanges.svg" width="210" alt="Exchanges"></a><br><sub><b>153</b> · Exchanges</sub></td>
+<td align="center" width="25%"><a href="docs/screens/154-lent-skills.svg"><img src="docs/screens/154-lent-skills.svg" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/155-watch-together.svg"><img src="docs/screens/155-watch-together.svg" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
+<td align="center" width="25%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
+<td align="center" width="25%"><a href="docs/screens/157-where-it-is-seen.svg"><img src="docs/screens/157-where-it-is-seen.svg" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
+<td align="center" width="25%"><a href="docs/screens/158-what-is-live.svg"><img src="docs/screens/158-what-is-live.svg" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/159-contest-a-profile.svg"><img src="docs/screens/159-contest-a-profile.svg" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
+<td align="center" width="25%"><a href="docs/screens/160-show-me-around.svg"><img src="docs/screens/160-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
+<td align="center" width="25%"><a href="docs/screens/161-not-on-this-plan.svg"><img src="docs/screens/161-not-on-this-plan.svg" width="210" alt="Not On This Plan"></a><br><sub><b>161</b> · Not On This Plan</sub></td>
+<td align="center" width="25%"><a href="docs/screens/162-where-it-is-marketed.svg"><img src="docs/screens/162-where-it-is-marketed.svg" width="210" alt="Where It Is Marketed"></a><br><sub><b>162</b> · Where It Is Marketed</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/163-a-body-to-speak-through.svg"><img src="docs/screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
+<td align="center" width="25%"><a href="docs/screens/164-what-it-is-made-of.svg"><img src="docs/screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
+<td align="center" width="25%"><a href="docs/screens/165-what-it-can-do-for-you.svg"><img src="docs/screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
+<td align="center" width="25%"><a href="docs/screens/166-somebody-qualified.svg"><img src="docs/screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/167-in-the-game-with-you.svg"><img src="docs/screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
+<td align="center" width="25%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
+<td align="center" width="25%"><a href="docs/screens/169-where-people-find-you.svg"><img src="docs/screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
+<td align="center" width="25%"><a href="docs/screens/170-reaching-out-and-what-stops-it.svg"><img src="docs/screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/171-what-leaves-and-on-what-terms.svg"><img src="docs/screens/171-what-leaves-and-on-what-terms.svg" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
+<td align="center" width="25%"><a href="docs/screens/172-one-thing-named.svg"><img src="docs/screens/172-one-thing-named.svg" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
+<td align="center" width="25%"><a href="docs/screens/173-beginning-and-passing-on.svg"><img src="docs/screens/173-beginning-and-passing-on.svg" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
+<td align="center" width="25%"><a href="docs/screens/174-what-you-are-owed.svg"><img src="docs/screens/174-what-you-are-owed.svg" width="210" alt="What You Are Owed"></a><br><sub><b>174</b> · What You Are Owed</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/175-inside-a-room.svg"><img src="docs/screens/175-inside-a-room.svg" width="210" alt="Inside A Room"></a><br><sub><b>175</b> · Inside A Room</sub></td>
+<td align="center" width="25%"><a href="docs/screens/176-a-body-and-what-it-learns.svg"><img src="docs/screens/176-a-body-and-what-it-learns.svg" width="210" alt="A Body, And What It Learns"></a><br><sub><b>176</b> · A Body, And What It Learns</sub></td>
+<td align="center" width="25%"><a href="docs/screens/177-work-handed-over.svg"><img src="docs/screens/177-work-handed-over.svg" width="210" alt="Work Handed Over"></a><br><sub><b>177</b> · Work Handed Over</sub></td>
+<td align="center" width="25%"><a href="docs/screens/178-signed-and-checked.svg"><img src="docs/screens/178-signed-and-checked.svg" width="210" alt="Signed, And Checked"></a><br><sub><b>178</b> · Signed, And Checked</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/179-ringing-the-bell.svg"><img src="docs/screens/179-ringing-the-bell.svg" width="210" alt="Ringing The Bell"></a><br><sub><b>179</b> · Ringing The Bell</sub></td>
+<td align="center" width="25%"><a href="docs/screens/180-two-strangers.svg"><img src="docs/screens/180-two-strangers.svg" width="210" alt="Two Strangers"></a><br><sub><b>180</b> · Two Strangers</sub></td>
+<td align="center" width="25%"><a href="docs/screens/181-the-mark-and-the-held.svg"><img src="docs/screens/181-the-mark-and-the-held.svg" width="210" alt="The Mark, And The Held"></a><br><sub><b>181</b> · The Mark, And The Held</sub></td>
+<td align="center" width="25%"><a href="docs/screens/182-in-its-own-words.svg"><img src="docs/screens/182-in-its-own-words.svg" width="210" alt="In Its Own Words"></a><br><sub><b>182</b> · In Its Own Words</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/183-everything-else.svg"><img src="docs/screens/183-everything-else.svg" width="210" alt="Everything Else"></a><br><sub><b>183</b> · Everything Else</sub></td>
+<td align="center" width="25%"><a href="docs/screens/184-without-an-account.svg"><img src="docs/screens/184-without-an-account.svg" width="210" alt="Without An Account"></a><br><sub><b>184</b> · Without An Account</sub></td>
+<td align="center" width="25%"><a href="docs/screens/185-discover.svg"><img src="docs/screens/185-discover.svg" width="210" alt="Discover"></a><br><sub><b>185</b> · Discover</sub></td>
+<td align="center" width="25%"><a href="docs/screens/186-wall.svg"><img src="docs/screens/186-wall.svg" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/187-shops.svg"><img src="docs/screens/187-shops.svg" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
+<td align="center" width="25%"><a href="docs/screens/188-your-corner.svg"><img src="docs/screens/188-your-corner.svg" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
+<td align="center" width="25%"><a href="docs/screens/189-feed.svg"><img src="docs/screens/189-feed.svg" width="210" alt="Feed"></a><br><sub><b>189</b> · Feed</sub></td>
+<td align="center" width="25%"><a href="docs/screens/190-what-plays.svg"><img src="docs/screens/190-what-plays.svg" width="210" alt="What Plays"></a><br><sub><b>190</b> · What Plays</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/screens/191-rooms-desks.svg"><img src="docs/screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a><br><sub><b>191</b> · Rooms &amp; Desks</sub></td>
+<td align="center" width="25%"><a href="docs/screens/192-your-side-of-it.svg"><img src="docs/screens/192-your-side-of-it.svg" width="210" alt="Your Side of It"></a><br><sub><b>192</b> · Your Side of It</sub></td>
+</tr>
 </table>
 
 **69**, **75** and **76** carry the actual camera frames — the real photographs
@@ -740,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.56.6** | **Eight watch faces that were not on the page** — reported from a phone. An HTML table is as wide as its longest row, so one `<tr>` with fifteen cells beside rows of three left twelve blank columns everywhere and clipped the rest off a phone. Every gallery is a uniform grid now — four across for screens and watch faces, two for desktop frames — with a guard that reads the widest row, not the first |
 | **0.56.5** | **The guard travelled** — 0.56.4's shape guard ported to JIM-mini and PDI, and both siblings came out clean: only this client had been written from imagination. PDI's copy needed its own binding regex, because a pattern borrowed from here finds zero calls there and zero found reads like zero wrong |
 | **0.56.4** | **A client record is a claim about a route** — `share`'s unexplained side turned out to be a Windows record declaring `name` and `share` on a route that has only ever sent `display_name` and `weight`; the button wired to it drew separators with nothing between them. Fourteen records were the same guess. New guard drives every GET binding and checks the claim. Collisions 24 → 23 |
 | **0.56.3** | **The count and the state wore the same name** — `seen`, `available` and `revoked` were each a boolean *and* a tally of that boolean, and a decoder handed `1` where it wants `true` coerces rather than refusing. Counts renamed; a fourth row turned out to be a Windows decoder bug rather than a collision. Record 28 → 24 |
@@ -1187,25 +1169,23 @@ QRME had a watch *API* and no way to say **which watch**. `POST
 earbuds or glasses — and says which faces it may show.
 
 <table>
-  <tr>
-    <td align="center" width="25%"><a href="docs/watch/01-agents.svg"><img src="docs/watch/01-agents.svg" width="150" alt="Agents"></a><br><sub><b>01</b> · Agents</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/02-activity.svg"><img src="docs/watch/02-activity.svg" width="150" alt="Activity"></a><br><sub><b>02</b> · Activity</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/03-profile.svg"><img src="docs/watch/03-profile.svg" width="150" alt="Profile"></a><br><sub><b>03</b> · Profile</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/04-control.svg"><img src="docs/watch/04-control.svg" width="150" alt="Control"></a><br><sub><b>04</b> · Control</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/05-microphone.svg"><img src="docs/watch/05-microphone.svg" width="150" alt="Microphone"></a><br><sub><b>05</b> · Microphone</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="25%"><a href="docs/watch/06-identity.svg"><img src="docs/watch/06-identity.svg" width="150" alt="Identity"></a><br><sub><b>06</b> · Identity</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/07-on-camera.svg"><img src="docs/watch/07-on-camera.svg" width="150" alt="On Camera"></a><br><sub><b>07</b> · On Camera</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/08-lobby.svg"><img src="docs/watch/08-lobby.svg" width="150" alt="Lobby"></a><br><sub><b>08</b> · Lobby</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/09-screens.svg"><img src="docs/watch/09-screens.svg" width="150" alt="Screens"></a><br><sub><b>09</b> · Screens</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="25%"><a href="docs/watch/10-proceeds.svg"><img src="docs/watch/10-proceeds.svg" width="150" alt="Proceeds"></a><br><sub><b>10</b> · Proceeds</sub></td>
-    <td align="center" width="25%"><a href="docs/watch/11-coordination.svg"><img src="docs/watch/11-coordination.svg" width="150" alt="Coordination"></a><br><sub><b>11</b> · Coordination</sub></td>
-    <td align="center" width="25%"></td>
-    <td align="center" width="25%"></td>
-  </tr>
+<tr>
+<td align="center" width="25%"><a href="docs/watch/01-agents.svg"><img src="docs/watch/01-agents.svg" width="150" alt="Agents"></a><br><sub><b>01</b> · Agents</sub></td>
+<td align="center" width="25%"><a href="docs/watch/02-activity.svg"><img src="docs/watch/02-activity.svg" width="150" alt="Activity"></a><br><sub><b>02</b> · Activity</sub></td>
+<td align="center" width="25%"><a href="docs/watch/03-profile.svg"><img src="docs/watch/03-profile.svg" width="150" alt="Profile"></a><br><sub><b>03</b> · Profile</sub></td>
+<td align="center" width="25%"><a href="docs/watch/04-control.svg"><img src="docs/watch/04-control.svg" width="150" alt="Control"></a><br><sub><b>04</b> · Control</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/watch/05-microphone.svg"><img src="docs/watch/05-microphone.svg" width="150" alt="Microphone"></a><br><sub><b>05</b> · Microphone</sub></td>
+<td align="center" width="25%"><a href="docs/watch/06-identity.svg"><img src="docs/watch/06-identity.svg" width="150" alt="Identity"></a><br><sub><b>06</b> · Identity</sub></td>
+<td align="center" width="25%"><a href="docs/watch/07-on-camera.svg"><img src="docs/watch/07-on-camera.svg" width="150" alt="On Camera"></a><br><sub><b>07</b> · On Camera</sub></td>
+<td align="center" width="25%"><a href="docs/watch/08-lobby.svg"><img src="docs/watch/08-lobby.svg" width="150" alt="Lobby"></a><br><sub><b>08</b> · Lobby</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%"><a href="docs/watch/09-screens.svg"><img src="docs/watch/09-screens.svg" width="150" alt="Screens"></a><br><sub><b>09</b> · Screens</sub></td>
+<td align="center" width="25%"><a href="docs/watch/10-proceeds.svg"><img src="docs/watch/10-proceeds.svg" width="150" alt="Proceeds"></a><br><sub><b>10</b> · Proceeds</sub></td>
+<td align="center" width="25%"><a href="docs/watch/11-coordination.svg"><img src="docs/watch/11-coordination.svg" width="150" alt="Coordination"></a><br><sub><b>11</b> · Coordination</sub></td>
+</tr>
 </table>
 
 <table>
