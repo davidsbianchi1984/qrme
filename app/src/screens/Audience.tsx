@@ -225,7 +225,7 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
           <p className="small">
             {fill(gifts.gifts.length === 1
               ? tr("aud.received.one", lang) : tr("aud.received", lang), {
-              total: gifts.total.toFixed(2), n: gifts.gifts.length })}
+              total: gifts.total_amount.toFixed(2), n: gifts.gifts.length })}
           </p>
           {gifts.gifts.map((g, i) => (
             <p className="muted small" key={g.id || i}>

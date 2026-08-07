@@ -239,7 +239,7 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
             {receipt && (
               <p className="muted small">
                 {fill(tr("sell.earn.receipt", lang), {
-                  total: money(receipt.total, receipt.currency),
+                  total: money(receipt.total_amount, receipt.currency),
                   n: receipt.entries,
                   note: receipt.note,
                 })}

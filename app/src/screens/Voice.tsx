@@ -120,8 +120,8 @@ export function Voice({ onPlans }: {
                           "{n}", String(enrol.mean_turn_seconds))
                       : tr("vce.noturns", lang)}
                     {fill(tr("vce.needs", lang), {
-                      n: enrol.threshold.samples,
-                      s: enrol.threshold.seconds,
+                      n: enrol.ready_when.samples,
+                      s: enrol.ready_when.seconds,
                     })}
                   </div>
                 </div>

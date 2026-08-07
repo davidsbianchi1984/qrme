@@ -226,7 +226,7 @@ public sealed partial class ReachPage : Page
         try
         {
             var r = await ApiClient.Shared.RequestPayout(s.Pid!, s.Token!);
-            PayoutText.Text = $"Payout {r.PayoutId}: {Money(r.Total, "USD")} across " +
+            PayoutText.Text = $"Payout {r.PayoutId}: {Money(r.TotalAmount, "USD")} across " +
                               $"{r.Entries} entries (simulated transfer).";
             PayoutText.Visibility = Visibility.Visible;
             await ReloadEarnings();

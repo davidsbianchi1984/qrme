@@ -176,7 +176,7 @@ def analyze(profile_id: str) -> dict:
         "by_source": by_source,
         "ready": ready,
         "needs": missing,
-        "threshold": {"samples": READY_SAMPLES, "seconds": READY_SECONDS},
+        "ready_when": {"samples": READY_SAMPLES, "seconds": READY_SECONDS},
         "method": ("counted from the enrolled samples — no opaque score; a "
                    "thin enrollment is called thin rather than labelled ready"),
     }

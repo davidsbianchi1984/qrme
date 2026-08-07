@@ -85,7 +85,7 @@ private struct EarningsSection: View {
                         if let receipt {
                             Text(L10n.fill("nmg.payout.done", state.language,
                                            ["id": receipt.payout_id,
-                                            "total": money(receipt.total, s.currency),
+                                            "total": money(receipt.total_amount, s.currency),
                                             "n": "\(receipt.entries)"]))
                                 .font(.caption).foregroundStyle(Theme.green)
                         }

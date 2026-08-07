@@ -267,7 +267,7 @@ struct EarningsStatement: Decodable {
 
 struct PayoutReceipt: Decodable {
     let payout_id: String
-    let total: Double
+    let total_amount: Double
     let entries: Int
 }
 
@@ -294,7 +294,7 @@ struct VoiceEnrollment: Decodable {
     let mean_turn_seconds: Double?
     let ready: Bool
     let needs: [String]
-    let threshold: VoiceThreshold
+    let ready_when: VoiceThreshold
     let method: String
 }
 

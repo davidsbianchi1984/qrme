@@ -942,7 +942,7 @@ public sealed partial class PeoplePage : Page
             var d = await ApiClient.Shared.WornOverlays(
                 PlaceSurfaceBox.Text.Trim(), PlaceSurfaceIdBox.Text.Trim(),
                 AppState.Current.Token!);
-            PlaceList.ItemsSource = (d.Worn ?? Array.Empty<WornRow>())
+            PlaceList.ItemsSource = (d.Overlays ?? Array.Empty<WornRow>())
                 .Select(w => new Row($"{w.InteractorId} · {w.Title ?? w.Kind}"))
                 .ToList();
         });
@@ -1058,10 +1058,9 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var o = await ApiClient.Shared.TutorialOutline();
-            var chapters = o.Chapters ?? o.Lessons
-                ?? Array.Empty<TutorialChapter>();
-            TourList.ItemsSource = chapters.Select(c => new Row(
-                $"{c.Key} · {c.Title}")).ToList();
+            TourList.ItemsSource = (o.Chapters ?? Array.Empty<TutorialChapter>())
+                .Select(c => new Row(
+                    $"{c.Chapter} · {(c.Steps?.Length ?? 0)}")).ToList();
         });
 
     private async void OnTourStart(object sender, RoutedEventArgs e) =>
@@ -1069,7 +1068,7 @@ public sealed partial class PeoplePage : Page
         {
             var s = await ApiClient.Shared.StartTutorial(
                 AppState.Current.Pid ?? "walk-in");
-            TourText.Text = s.Title ?? s.Key ?? "";
+            TourText.Text = s.Step?.Title ?? s.Step?.Key ?? "";
         });
 
     private async void OnTourProgress(object sender, RoutedEventArgs e) =>
@@ -1077,7 +1076,8 @@ public sealed partial class PeoplePage : Page
         {
             var s = await ApiClient.Shared.TutorialProgress(
                 AppState.Current.Pid ?? "walk-in");
-            TourText.Text = s.Title ?? s.Next ?? "";
+            TourText.Text = s.Step is null ? ""
+                : $"{s.Step.Chapter} · {s.Step.Title} — {s.Step.TryIt}";
         });
 
     private async void OnTourStep(object sender, RoutedEventArgs e) =>
@@ -1085,7 +1085,7 @@ public sealed partial class PeoplePage : Page
         {
             var s = await ApiClient.Shared.TutorialStepOf(
                 TourStepBox.Text.Trim());
-            TourText.Text = s.Body ?? s.Title ?? "";
+            TourText.Text = s.What ?? s.Title ?? "";
         });
 
     private async void OnTourDone(object sender, RoutedEventArgs e) =>
@@ -1283,7 +1283,7 @@ public sealed partial class PeoplePage : Page
         {
             var w = await ApiClient.Shared.DockWhereOf(
                 DockFaceBox.Text.Trim());
-            StatusText.Text = $"{w.Screen} · {w.Tab}";
+            StatusText.Text = $"{w.Title} · {w.Path} · #{w.Screen}";
         });
 
     private async void OnDockFace(object sender, RoutedEventArgs e) =>
@@ -1915,8 +1915,8 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var a = await ApiClient.Shared.AvatarOf(AppState.Current.Pid!);
-            StatusText.Text = ((a.AiBadge ?? false) ? "AI" : "\u2014")
-                + $" \u00b7 {a.LikenessOf ?? "\u2014"}";
+            StatusText.Text = ((a.AssetMarked ?? false) ? "AI" : "\u2014")
+                + " \u00b7 " + (a.Likeness?.Note ?? "\u2014");
         });
 
     private async void OnAvaBriefs(object sender, RoutedEventArgs e) =>
@@ -1995,7 +1995,7 @@ public sealed partial class PeoplePage : Page
         {
             var f = await ApiClient.Shared.FrontPage(AppState.Current.Pid!);
             StatusText.Text = $"{f.DisplayName ?? "\u2014"} \u00b7 "
-                + (f.Purpose ?? "\u2014");
+                + (f.Headline ?? "\u2014") + " \u00b7 " + (f.AiDisclosure ?? "\u2014");
         });
 
     private async void OnPgSave(object sender, RoutedEventArgs e) =>
@@ -2022,7 +2022,9 @@ public sealed partial class PeoplePage : Page
             var c = await ApiClient.Shared.CompositionOf(
                 AppState.Current.Pid!);
             StatusText.Text = string.Join(" \u00b7 ",
-                (c.Sources ?? []).Select(x => x.Name));
+                (c.Sources ?? []).Select(x =>
+                    $"{x.DisplayName} {(int)Math.Round((x.Weight ?? 0) * 100)}%"
+                    + (x.Aspect is null ? "" : $" ({x.Aspect})")));
         });
 
     private async void OnSurfSet(object sender, RoutedEventArgs e) =>
@@ -2183,7 +2185,7 @@ public sealed partial class PeoplePage : Page
                 doors.Providers[0].Provider);
             _oauthState = start.State ?? "";
             StatusText.Text = doors.Providers[0].Provider + " \u00b7 "
-                + (start.AuthorizeUrl ?? "");
+                + (start.Url ?? "");
         });
 
     private async void OnAcctOauthClaim(object sender, RoutedEventArgs e) =>
@@ -2449,8 +2451,11 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var outp = await ApiClient.Shared.MediaLimits();
-            StatusText.Text = (outp.MaxBytes ?? 0) + " \u00b7 "
-                + string.Join(" \u00b7 ", outp.Kinds ?? Array.Empty<string>());
+            StatusText.Text = string.Join(" \u00b7 ", new[] {
+                ("image", outp.Image), ("video", outp.Video),
+                ("file", outp.File),
+            }.Where(p => p.Item2 is not null).Select(p =>
+                $"{p.Item1} {(p.Item2!.MaxBytes ?? 0) / (1024 * 1024)}MB"));
         });
 
     private async void OnMedPlatforms(object sender, RoutedEventArgs e) =>
@@ -2561,7 +2566,8 @@ public sealed partial class PeoplePage : Page
         {
             var outp = await ApiClient.Shared.Finetune(
                 AppState.Current.Pid!, AppState.Current.Token!);
-            StatusText.Text = outp.Status ?? (outp.Examples ?? 0).ToString();
+            StatusText.Text = $"{outp.Interactors ?? 0} · "
+                + $"{outp.MessagesProcessed ?? 0} · {outp.Computed}";
         });
 
     private async void OnMindCloud(object sender, RoutedEventArgs e) =>
@@ -2681,15 +2687,16 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var outp = await ApiClient.Shared.MicrophoneVocabulary();
-            StatusText.Text = (outp.Widths?.Count ?? 0).ToString();
+            StatusText.Text = string.Join(" · ",
+                outp.Personal ?? Array.Empty<string>());
         });
 
     private async void OnSensOverlays(object sender, RoutedEventArgs e) =>
         await Try(async () =>
         {
             var outp = await ApiClient.Shared.OverlaysCatalogue();
-            StatusText.Text = (outp.Overlays?.Count ?? 0) + " \u00b7 "
-                + (outp.Refused?.Count ?? 0);
+            StatusText.Text = (outp.Kinds?.Length ?? 0) + " \u00b7 "
+                + (outp.Refused?.Length ?? 0);
         });
 
     private async void OnSensHealth(object sender, RoutedEventArgs e) =>

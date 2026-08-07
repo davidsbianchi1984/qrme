@@ -301,7 +301,7 @@ def test_the_tip_jar_totals_up(client):
     client.post(f"/desks/{desk['desk_id']}/gift", json={"amount": 7.5},
                 headers=_who(client, "Cy", "1991-01-01"))
     jar = client.get(f"/desks/{desk['desk_id']}/gifts").json()
-    assert jar["total"] == 12.5
+    assert jar["total_amount"] == 12.5
     assert len(jar["gifts"]) == 2
     assert jar["cap_per_gift"] == commerce.GIFT_MAX
 

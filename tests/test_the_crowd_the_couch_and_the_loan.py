@@ -86,7 +86,7 @@ def test_a_gift_needs_a_verified_adult_and_says_it_cannot_be_reversed(client):
                     "note": "for the garden"}, headers=hs)
     assert r.status_code == 201, r.text
     jar = client.get(f"/profiles/{b}/gifts", headers=hb).json()
-    assert jar["total"] == 5.0 and len(jar["gifts"]) == 1
+    assert jar["total_amount"] == 5.0 and len(jar["gifts"]) == 1
 
 
 def _party(client):

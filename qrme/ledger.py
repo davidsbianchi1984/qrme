@@ -149,7 +149,7 @@ def payout(owner_id: str, currency: str | None = None) -> dict | None:
     remaining = sorted({r["currency"] for r in accrued
                         if r["currency"] != settle})
     return {"payout_id": payout_id, "owner_id": owner_id,
-            "total": round(sum(r["amount"] for r in rows), 2),
+            "total_amount": round(sum(r["amount"] for r in rows), 2),
             "currency": settle,
             "entries": len(rows), "at": db.utcnow(),
             "remaining": remaining,

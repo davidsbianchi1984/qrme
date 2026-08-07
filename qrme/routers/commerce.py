@@ -230,5 +230,5 @@ def list_gifts(kind: str, subject_id: str, request: Request) -> dict:
             403, "18+ only — present an interactor token whose verified "
                  "birthdate shows 18 or older")
     return {"gifts": commerce.gifts_for(resolved, subject_id),
-            "total": commerce.gift_total(resolved, subject_id),
+            "total_amount": commerce.gift_total(resolved, subject_id),
             "cap_per_gift": commerce.GIFT_MAX}

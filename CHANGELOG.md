@@ -4,6 +4,92 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.4] — 2026-08-07
+
+### A client record is a claim about a route, and nobody had checked one
+
+`share` sat on the collision record as *a double and an int*. The int was
+`DesigneeRow.share` — a percent of a legacy's proceeds, real and correct. The
+double was `CompositionSource.share`, and chasing it turned up something the
+collision record had no way to say:
+
+```csharp
+public record CompositionSource(
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("share")] double? Share);
+```
+
+`GET /profiles/{id}/composition` has never sent `name` or `share`. It sends
+`source_profile_id`, `display_name`, `weight` and `aspect`. Both fields
+decoded to null on every response the route ever returned, and the Windows
+blend button —
+
+```csharp
+string.Join(" · ", (c.Sources ?? []).Select(x => x.Name));
+```
+
+— drew a row of separators with nothing between them. It had never been run.
+
+**Fourteen records had the same disease.** `avatar` promised an `ai_badge` and
+a `likeness_of` that no route in this product emits. `/pair` read `built`
+where the server says `console_built`. `/tutorial` hedged across `chapters`
+*and* `lessons`, because whoever wrote it did not know which. `/dock/where`
+typed `screen` as a string for a value that is an integer. `/tutorial/start`,
+`/tutorial/done` and `/tutorial/progress` all decoded as a step when all three
+return a wrapper *around* a step. `RosterSibling` read `id` where the roster
+sends `profile_id`. Every one of them was a guess at a shape, written without
+driving the route, and every one shipped.
+
+    asked     do the names match
+    mattered  did anybody ever run the route
+
+#### The guard
+
+`tests/test_the_shape_the_client_expects.py` reads the Windows client's GET
+bindings — `Send<T>(Get("/path"))` — drives each against a live app, and
+asserts that every `JsonPropertyName` in `T` is a key the route actually
+returned. One level of nesting is followed, so a card's row type is checked
+against the rows.
+
+The assertion is one-directional on purpose. A record *omitting* a key is
+fine; a client decodes what it needs. A record *declaring* a key the route
+never sends is a promise the wire does not keep.
+
+Its own extractor was the first thing it caught. The regex that carves a
+record out of the file consumed the closing paren, so the field regex — which
+needs a `,` or a `)` after each property name — silently dropped the **last**
+field of every record. That is where `share`, `built` and `kinds` all sit. A
+count of wire names below the sibling guard's flat count now fails the suite.
+
+#### What the record says now
+
+Eight rows are in `tests/wire_shapes_unverified.txt`: fields that are real and
+simply absent in the fixture's state. `verification.level` appears the moment
+somebody has verified the profile. Each row names the state that produces it,
+because a guard that cannot tell a conditional field from a fiction is a guard
+nobody can trust. Ratcheted.
+
+#### The collisions the client had been hiding
+
+Correcting the records made the sibling guard fail with two names it had never
+seen: `kinds` and `refused`. Both were always colliding on the server — a
+string list of pairable device kinds beside an object list of overlay kinds; a
+boolean *this answer refused* beside a list of refusals. The client simply had
+not declared enough of the wire for the count to be true.
+
+The ratchet forbids the record growing, and that is the ratchet working: the
+answer is to pay down, not to record. Three names were split so each meaning
+has its own —
+
+* `total` → `total_amount` on the payout receipt and the gift box (money),
+  leaving `total` to the counts it also meant;
+* `threshold` → `ready_when` on voice enrollment (a samples-and-seconds
+  object), leaving `threshold` to the watermark's actual float threshold;
+* `share`, struck, once `CompositionSource` stopped inventing one.
+
+The record closes at 23, down from 24, with two names in it that were true all
+along and invisible.
+
 ## [0.56.3] — 2026-08-07
 
 ### The count and the state wore the same name

@@ -184,7 +184,7 @@ def test_the_gift_cap_is_published_before_anybody_hits_it(client):
     p, head, _, _ = _pair(client, "acct_giftcap")
     view = client.get(f"/profiles/{p['id']}/gifts", headers=head).json()
     assert view["cap_per_gift"] > 0
-    assert "total" in view
+    assert "total_amount" in view
 
 
 def test_a_gift_reads_its_beneficiary_from_the_subject(client):

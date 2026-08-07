@@ -81,7 +81,8 @@ data class LedgerEntry(val id: String, val kind: String, val memo: String?,
 data class EarningsStatement(val entries: List<LedgerEntry>, val accrued: Double,
                              val paid: Double, val lifetime: Double,
                              val byKind: Map<String, Double>, val currency: String)
-data class PayoutReceipt(val payoutId: String, val total: Double, val entries: Int)
+data class PayoutReceipt(val payoutId: String, val totalAmount: Double,
+                         val entries: Int)
 data class VoiceConsentState(val granted: Boolean, val sources: List<String>,
                             val grantedAt: String?)
 data class VoiceEnrollment(val samples: Int, val seconds: Double, val turns: Int,
@@ -535,7 +536,7 @@ object ApiClient {
     suspend fun requestPayout(id: String, token: String): PayoutReceipt {
         val o = JSONObject(request("/profiles/$id/earnings/payout", "POST",
             JSONObject(), token))
-        return PayoutReceipt(o.getString("payout_id"), o.optDouble("total"),
+        return PayoutReceipt(o.getString("payout_id"), o.optDouble("total_amount"),
             o.optInt("entries"))
     }
 

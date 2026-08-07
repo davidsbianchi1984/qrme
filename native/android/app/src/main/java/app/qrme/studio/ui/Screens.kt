@@ -1922,7 +1922,7 @@ private fun EarningsPanel(vm: StudioViewModel) {
                 receipt?.let {
                     Text(L10n.fill("nmg.payout.done", vm.language,
                              mapOf("id" to it.payoutId,
-                                   "total" to money(it.total, s.currency),
+                                   "total" to money(it.totalAmount, s.currency),
                                    "n" to "${it.entries}")),
                         color = Qrme.Green, fontSize = 12.sp)
                 }

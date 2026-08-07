@@ -87,7 +87,7 @@ public record VoiceEnrollment(
     [property: JsonPropertyName("mean_turn_seconds")] double? MeanTurnSeconds,
     [property: JsonPropertyName("ready")] bool Ready,
     [property: JsonPropertyName("needs")] string[] Needs,
-    [property: JsonPropertyName("threshold")] VoiceThreshold Threshold,
+    [property: JsonPropertyName("ready_when")] VoiceThreshold ReadyWhen,
     [property: JsonPropertyName("method")] string Method);
 
 public record VoiceprintRecord(
@@ -258,7 +258,7 @@ public record EarningsStatement(
 
 public record PayoutReceipt(
     [property: JsonPropertyName("payout_id")] string PayoutId,
-    [property: JsonPropertyName("total")] double Total,
+    [property: JsonPropertyName("total_amount")] double TotalAmount,
     [property: JsonPropertyName("entries")] int Entries);
 
 public record RelationshipState(
@@ -783,16 +783,19 @@ public record PackInstalled(
     public Task<TutorialStep> TutorialForScreen(int number) =>
         Send<TutorialStep>(Get($"/tutorial/for-screen/{number}"));
 
-    public Task<TutorialStep> StartTutorial(string learnerId) =>
-        Send<TutorialStep>(Post("/tutorial/start",
+    public Task<TutorialProgress> StartTutorial(string learnerId) =>
+        Send<TutorialProgress>(Post("/tutorial/start",
             new { learner_id = learnerId, lesson = "" }));
 
-    public Task<TutorialStep> TutorialProgress(string learnerId) =>
-        Send<TutorialStep>(Get($"/tutorial/progress/{learnerId}"));
+    /// <summary>Progress wraps the step — a learner id and where they are —
+    /// rather than being one, which is why this does not decode as a
+    /// <see cref="TutorialStep"/>.</summary>
+    public Task<TutorialProgress> TutorialProgress(string learnerId) =>
+        Send<TutorialProgress>(Get($"/tutorial/progress/{learnerId}"));
 
-    public Task<TutorialStep> MarkTutorialDone(string learnerId,
+    public Task<TutorialProgress> MarkTutorialDone(string learnerId,
         string lesson) =>
-        Send<TutorialStep>(Post("/tutorial/done",
+        Send<TutorialProgress>(Post("/tutorial/done",
             new { learner_id = learnerId, lesson }));
 
     // -- the body, the referral, the objection, the lobby and the dock ----
@@ -3740,7 +3743,7 @@ public record GiftRow(
 
 public record GiftBox(
     [property: JsonPropertyName("gifts")] GiftRow[] Gifts,
-    [property: JsonPropertyName("total")] double Total);
+    [property: JsonPropertyName("total_amount")] double TotalAmount);
 
 public record PartyMember(
     [property: JsonPropertyName("member_id")] string MemberId,
@@ -3807,7 +3810,8 @@ public record WornRow(
     [property: JsonPropertyName("title")] string? Title);
 
 public record WornDisclosure(
-    [property: JsonPropertyName("worn")] WornRow[]? Worn);
+    [property: JsonPropertyName("overlays")] WornRow[]? Overlays,
+    [property: JsonPropertyName("note")] string? Note);
 
 public record CameraVocabulary(
     [property: JsonPropertyName("never")]
@@ -3839,19 +3843,27 @@ public record Coordination(
     [property: JsonPropertyName("goal")] string? Goal,
     [property: JsonPropertyName("status")] string? Status);
 
-public record TutorialChapter(
-    [property: JsonPropertyName("key")] string? Key,
-    [property: JsonPropertyName("title")] string? Title);
-
-public record TutorialOutline(
-    [property: JsonPropertyName("chapters")] TutorialChapter[]? Chapters,
-    [property: JsonPropertyName("lessons")] TutorialChapter[]? Lessons);
-
 public record TutorialStep(
     [property: JsonPropertyName("key")] string? Key,
+    [property: JsonPropertyName("chapter")] string? Chapter,
     [property: JsonPropertyName("title")] string? Title,
-    [property: JsonPropertyName("body")] string? Body,
-    [property: JsonPropertyName("next")] string? Next);
+    [property: JsonPropertyName("try_it")] string? TryIt,
+    [property: JsonPropertyName("what")] string? What);
+
+// A chapter is a name and the steps under it. It never carried a `key` or a
+// `title` of its own — those belong to the steps, and reading them off the
+// chapter drew a tour with no chapter names in it.
+public record TutorialChapter(
+    [property: JsonPropertyName("chapter")] string? Chapter,
+    [property: JsonPropertyName("steps")] TutorialStep[]? Steps);
+
+public record TutorialOutline(
+    [property: JsonPropertyName("guide")] string? Guide,
+    [property: JsonPropertyName("chapters")] TutorialChapter[]? Chapters);
+
+public record TutorialProgress(
+    [property: JsonPropertyName("learner_id")] string? LearnerId,
+    [property: JsonPropertyName("step")] TutorialStep? Step);
 
 public record RobotUnbound(
     [property: JsonPropertyName("unbound")] bool? Unbound);
@@ -3911,8 +3923,12 @@ public record DockFacesBox(
     [property: JsonPropertyName("faces")] string[]? Faces);
 
 public record DockWhere(
-    [property: JsonPropertyName("screen")] string? Screen,
-    [property: JsonPropertyName("tab")] string? Tab);
+    [property: JsonPropertyName("face")] string? Face,
+    // An integer on the wire. Declared `string` here, this threw on every
+    // response the button ever got.
+    [property: JsonPropertyName("screen")] int? Screen,
+    [property: JsonPropertyName("path")] string? Path,
+    [property: JsonPropertyName("title")] string? Title);
 
 public record DockSettings(
     [property: JsonPropertyName("corner")] string? Corner,
@@ -3983,8 +3999,7 @@ public record WorkflowCard(
 
 public record DelegationOffer(
     [property: JsonPropertyName("delegation")] bool? Delegation,
-    [property: JsonPropertyName("phases")] string[]? Phases,
-    [property: JsonPropertyName("enabled")] bool? Enabled);
+    [property: JsonPropertyName("phases")] string[]? Phases);
 
 public record CreativeWork(
     [property: JsonPropertyName("id")] string Id,
@@ -4148,17 +4163,24 @@ public record MemorialCard(
     int? RelationshipsTouched);
 
 public record RosterSibling(
-    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("profile_id")] string ProfileId,
     [property: JsonPropertyName("display_name")] string? DisplayName,
     [property: JsonPropertyName("anonymous")] bool? Anonymous);
 
 public record RosterOut(
     [property: JsonPropertyName("profiles")] RosterSibling[]? Profiles);
 
+public record AvatarLikeness(
+    [property: JsonPropertyName("real_person")] bool? RealPerson,
+    [property: JsonPropertyName("basis")] string? Basis,
+    [property: JsonPropertyName("attestor")] string? Attestor,
+    [property: JsonPropertyName("note")] string? Note);
+
 public record AvatarCard(
     [property: JsonPropertyName("asset")] string? Asset,
-    [property: JsonPropertyName("ai_badge")] bool? AiBadge,
-    [property: JsonPropertyName("likeness_of")] string? LikenessOf);
+    [property: JsonPropertyName("asset_marked")] bool? AssetMarked,
+    [property: JsonPropertyName("placeholder")] bool? Placeholder,
+    [property: JsonPropertyName("likeness")] AvatarLikeness? Likeness);
 
 public record BriefEntry(
     [property: JsonPropertyName("handle")] string? Handle);
@@ -4173,7 +4195,8 @@ public record BriefCard(
 
 public record EmblemEntry(
     [property: JsonPropertyName("emblem")] string? Emblem,
-    [property: JsonPropertyName("field")] string? Field);
+    [property: JsonPropertyName("asset")] string? Asset,
+    [property: JsonPropertyName("means")] string? Means);
 
 public record EmblemCatalog(
     [property: JsonPropertyName("emblems")] EmblemEntry[]? Emblems,
@@ -4208,14 +4231,17 @@ public record PageCard(
 
 public record FrontCard(
     [property: JsonPropertyName("display_name")] string? DisplayName,
-    [property: JsonPropertyName("purpose")] string? Purpose);
+    [property: JsonPropertyName("headline")] string? Headline,
+    [property: JsonPropertyName("ai_disclosure")] string? AiDisclosure);
 
 public record SurfacesCard(
     [property: JsonPropertyName("surfaces")] string[] Surfaces);
 
 public record CompositionSource(
-    [property: JsonPropertyName("name")] string? Name,
-    [property: JsonPropertyName("share")] double? Share);
+    [property: JsonPropertyName("source_profile_id")] string? SourceProfileId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("weight")] double? Weight,
+    [property: JsonPropertyName("aspect")] string? Aspect);
 
 public record CompositionCard(
     [property: JsonPropertyName("sources")] CompositionSource[]? Sources,
@@ -4297,8 +4323,9 @@ public record OAuthProviderList(
     [property: JsonPropertyName("providers")] OAuthDoor[] Providers);
 
 public record OAuthStartOut(
-    [property: JsonPropertyName("authorize_url")] string? AuthorizeUrl,
-    [property: JsonPropertyName("state")] string? State);
+    [property: JsonPropertyName("provider")] string? Provider,
+    [property: JsonPropertyName("state")] string? State,
+    [property: JsonPropertyName("url")] string? Url);
 
 public record OAuthClaimOut(
     [property: JsonPropertyName("ready")] bool? Ready,
@@ -4442,7 +4469,8 @@ public record SocialBeaconCard(
 
 public record PairCard(
     [property: JsonPropertyName("console_url")] string? ConsoleUrl,
-    [property: JsonPropertyName("built")] bool? Built);
+    [property: JsonPropertyName("console_built")] bool? ConsoleBuilt,
+    [property: JsonPropertyName("reachable")] bool? Reachable);
 
 public record HeldMessage(
     [property: JsonPropertyName("id")] string Id,
@@ -4479,9 +4507,18 @@ public record WatermarkCredential(
     [property: JsonPropertyName("valid")] bool? Valid,
     [property: JsonPropertyName("content_match")] bool? ContentMatches);
 
-public record MediaLimitsCard(
+// One limit per kind of media, not one limit and a list of kinds: video is
+// allowed sixty megabytes where an image gets eight, and a single `max_bytes`
+// could only ever have been one of them.
+public record MediaLimit(
     [property: JsonPropertyName("max_bytes")] long? MaxBytes,
-    [property: JsonPropertyName("kinds")] string[]? Kinds);
+    [property: JsonPropertyName("types")] string[]? Types);
+
+public record MediaLimitsCard(
+    [property: JsonPropertyName("image")] MediaLimit? Image,
+    [property: JsonPropertyName("video")] MediaLimit? Video,
+    [property: JsonPropertyName("file")] MediaLimit? File,
+    [property: JsonPropertyName("detected_from")] string? DetectedFrom);
 
 public record MediaOut(
     [property: JsonPropertyName("id")] string? Id,
@@ -4525,8 +4562,11 @@ public record SimulationOut(
 
 public record FinetuneOut(
     [property: JsonPropertyName("id")] string? Id,
-    [property: JsonPropertyName("status")] string? Status,
-    [property: JsonPropertyName("examples")] int? Examples);
+    [property: JsonPropertyName("interactors")] int? Interactors,
+    [property: JsonPropertyName("messages_processed")] int? MessagesProcessed,
+    [property: JsonPropertyName("external_transmission")]
+    bool? ExternalTransmission,
+    [property: JsonPropertyName("computed")] string? Computed);
 
 public record ContributionRow(
     [property: JsonPropertyName("ref")] string? Ref,
@@ -4583,15 +4623,24 @@ public record MicPlacesOut(
     [property: JsonPropertyName("places")]
     System.Collections.Generic.Dictionary<string, string>? Places);
 
+public record RefusedKind(
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("why")] string? Why);
+
 public record MicVocabularyOut(
-    [property: JsonPropertyName("widths")]
-    System.Collections.Generic.Dictionary<string, string>? Widths);
+    [property: JsonPropertyName("personal")] string[]? Personal,
+    [property: JsonPropertyName("refused")] RefusedKind[]? Refused,
+    [property: JsonPropertyName("rules")] string[]? Rules);
+
+public record OverlayKind(
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("covers_face")] bool? CoversFace,
+    [property: JsonPropertyName("means")] string? Means);
 
 public record OverlayCatalogue(
-    [property: JsonPropertyName("overlays")]
-    System.Collections.Generic.Dictionary<string, string>? Overlays,
-    [property: JsonPropertyName("refused")]
-    System.Collections.Generic.Dictionary<string, string>? Refused);
+    [property: JsonPropertyName("kinds")] OverlayKind[]? Kinds,
+    [property: JsonPropertyName("refused")] RefusedKind[]? Refused,
+    [property: JsonPropertyName("rules")] string[]? Rules);
 
 public record ExperienceEntryOut(
     [property: JsonPropertyName("title")] string? Title,

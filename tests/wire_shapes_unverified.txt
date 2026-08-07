@@ -1,0 +1,30 @@
+# status: backlog — 8 rows
+# ceiling: 8
+#
+# Client fields the shape guard saw a route not return, which are real anyway.
+#
+# `test_the_shape_the_client_expects.py` drives every GET binding in the
+# Windows client and compares each record's `JsonPropertyName` set against the
+# keys the route actually sent back. Fourteen records failed that and were
+# wrong — `CompositionSource.name` and `.share` on a route that has only ever
+# sent `display_name` and `weight`, `PairCard.built` where the server says
+# `console_built`, `DockWhere.screen` typed `string` for an integer.
+#
+# These eight are the other answer. The field is real; the fixture is simply
+# in the state where it is absent. `verification.level` appears the moment
+# somebody has verified the profile, and a guard that could not tell that
+# apart from a fiction would be a guard nobody could trust — so each row names
+# the state that produces it, and a reader can go and check.
+#
+# Ratcheted: this list may shrink and must never grow. A row leaves it by
+# somebody driving the route in the state named beside it and asserting the
+# field is there — at which point the guard sees it and the row is stale.
+#
+BadgeCard.attestor          # once verified, and only on a named profile
+BadgeCard.level             # once verified
+VerificationCard.attestor   # once verified
+VerificationCard.level      # once verified
+VerificationCard.means      # once verified — the sentence the level means
+Solitude.offer              # once the 28-day window holds enough turns
+VoiceConsentState.sources   # once voice consent is granted
+VoiceConsentState.granted_at  # once voice consent is granted

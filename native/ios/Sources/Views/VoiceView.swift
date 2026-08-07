@@ -135,8 +135,8 @@ struct VoiceView: View {
                               ["n": "\(e.samples)",
                                "secs": String(format: "%.1fs", e.seconds)]))
                             .font(.subheadline.bold()).foregroundStyle(Theme.txt)
-                        Text(turnLine(e) + " · needs \(e.threshold.samples) samples and "
-                             + "\(String(format: "%.0f", e.threshold.seconds))s")
+                        Text(turnLine(e) + " · needs \(e.ready_when.samples) samples and "
+                             + "\(String(format: "%.0f", e.ready_when.seconds))s")
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                     Spacer()

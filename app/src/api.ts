@@ -995,7 +995,7 @@ export type Gift = {
 
 export type GiftsView = {
   gifts: Gift[];
-  total: number;
+  total_amount: number;
   /** Published so a screen can say the limit before somebody hits it. */
   cap_per_gift: number;
 };
@@ -1250,7 +1250,7 @@ export interface VoiceEnrollment {
   mean_turn_seconds: number | null; mean_chars_per_turn: number | null;
   by_source: Record<string, number>;
   ready: boolean; needs: string[];
-  threshold: { samples: number; seconds: number };
+  ready_when: { samples: number; seconds: number };
   method: string;
 }
 export interface VoiceprintStatus {
@@ -2550,7 +2550,7 @@ export type EarningsStatement = {
  *  holding a balance, so "you have been paid" and "you have been paid some
  *  of it" are distinguishable without a second request. */
 export type PayoutReceipt = {
-  payout_id: string; owner_id: string; total: number; currency: string;
+  payout_id: string; owner_id: string; total_amount: number; currency: string;
   entries: number; at: string; remaining: string[]; note: string;
 };
 
