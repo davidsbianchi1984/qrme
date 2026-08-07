@@ -2001,7 +2001,12 @@ struct MarketSale: Decodable, Identifiable {
 
 struct MarketSettings: Decodable {
     let interactor_id: String?
-    let show_offers: Bool?
+    let locality: String?
+    let region: String?
+    let scope: String?
+    let include_remote: Bool?
+    let kinds_wanted: [String]?
+    let tags: [String]?
 }
 
 struct ExchangeVocabulary: Decodable {
@@ -2063,10 +2068,12 @@ extension ApiClient {
                           body: ["asset": asset as Any], token: token)
     }
 
-    func setDeskCamera(deskId: String, enabled: Bool,
+    // The route points a desk at a camera by address and clears it with an
+    // empty one. `enabled` was a switch with nothing to switch on.
+    func setDeskCamera(deskId: String, url: String,
                        token: String) async throws -> DeskCard {
         try await request("/desks/\(deskId)/camera", method: "PUT",
-                          body: ["enabled": enabled], token: token)
+                          body: ["url": url], token: token)
     }
 
     func deskRings(deskId: String, token: String) async throws -> [DeskRing] {
@@ -2183,12 +2190,13 @@ extension ApiClient {
         return ["created": out.created]
     }
 
-    func listInMarketplace(profileId: String, blurb: String, locality: String,
+    // Listing takes a blurb and tags; where it is offered is `placeListing`.
+    func listInMarketplace(profileId: String, blurb: String,
                            tags: [String], token: String) async throws {
         struct Ok: Decodable { let listed: Bool }
         let _: Ok = try await request(
             "/profiles/\(profileId)/marketplace", method: "POST",
-            body: ["blurb": blurb, "locality": locality, "tags": tags],
+            body: ["blurb": blurb, "tags": tags],
             token: token)
     }
 
@@ -2209,11 +2217,11 @@ extension ApiClient {
         try await request("/marketplace/listings/\(listingId)/offer")
     }
 
-    func setListingOffer(listingId: String, amount: Double, currency: String,
-                         acceptPrice: Double?,
+    func setListingOffer(listingId: String, price: Double, currency: String,
+                         stock: Int?,
                          token: String) async throws -> MarketOffer {
-        var body: [String: Any] = ["amount": amount, "currency": currency]
-        if let acceptPrice { body["accept_price"] = acceptPrice }
+        var body: [String: Any] = ["price": price, "currency": currency]
+        if let stock { body["stock"] = stock }
         return try await request(
             "/marketplace/listings/\(listingId)/offer", method: "PUT",
             body: body, token: token)
@@ -2260,10 +2268,15 @@ extension ApiClient {
                           token: token)
     }
 
-    func setMarketSettings(interactorId: String, showOffers: Bool,
+    // MarketPrefs is where "here" is and how far out to look. `show_offers`
+    // was a switch for nothing.
+    func setMarketSettings(interactorId: String, locality: String,
+                           includeRemote: Bool,
                            token: String) async throws -> MarketSettings {
         try await request("/marketplace/settings/\(interactorId)",
-                          method: "PUT", body: ["show_offers": showOffers],
+                          method: "PUT",
+                          body: ["locality": locality,
+                                 "include_remote": includeRemote],
                           token: token)
     }
 
@@ -2870,10 +2883,13 @@ extension ApiClient {
                           token: token)
     }
 
-    func coordinate(orgId: String, goal: String,
+    func coordinate(orgId: String, goal: String, fromDepartment: String,
                     token: String) async throws -> Coordination {
         try await request("/organizations/\(orgId)/coordinate",
-                          method: "POST", body: ["goal": goal], token: token)
+                          method: "POST",
+                          body: ["goal": goal,
+                                 "from_department": fromDepartment],
+                          token: token)
     }
 
     func coordinations(orgId: String,

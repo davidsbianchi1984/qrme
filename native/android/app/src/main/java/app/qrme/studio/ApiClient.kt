@@ -1739,10 +1739,12 @@ object ApiClient {
             JSONObject().put("asset", JSONObject.NULL), token)))
     }
 
-    suspend fun setDeskCamera(deskId: String, enabled: Boolean,
+    // The route points a desk at a camera by address and clears it with an
+    // empty one. `enabled` was a switch with nothing to switch on.
+    suspend fun setDeskCamera(deskId: String, url: String,
                               token: String): DeskCard {
         return deskCardOf(JSONObject(request("/desks/$deskId/camera", "PUT",
-            JSONObject().put("enabled", enabled), token)))
+            JSONObject().put("url", url), token)))
     }
 
     suspend fun deskRings(deskId: String, token: String): List<DeskRing> {
@@ -1887,13 +1889,12 @@ object ApiClient {
     }
 
     suspend fun listInMarketplace(profileId: String, blurb: String,
-                                  locality: String, tags: List<String>,
-                                  token: String) {
+                                  tags: List<String>, token: String) {
         val arr = JSONArray()
         tags.forEach { arr.put(it) }
+        // Listing takes a blurb and tags; where it is offered is placeListing.
         request("/profiles/$profileId/marketplace", "POST",
-                JSONObject().put("blurb", blurb).put("locality", locality)
-                    .put("tags", arr), token)
+                JSONObject().put("blurb", blurb).put("tags", arr), token)
     }
 
     suspend fun unlistFromMarketplace(profileId: String, token: String) {
@@ -1910,10 +1911,11 @@ object ApiClient {
                            o.optString("currency"))
     }
 
-    suspend fun setListingOffer(listingId: String, amount: Double,
-                                acceptPrice: Double?, token: String) {
-        val body = JSONObject().put("amount", amount).put("currency", "USD")
-        if (acceptPrice != null) body.put("accept_price", acceptPrice)
+    suspend fun setListingOffer(listingId: String, price: Double,
+                                stock: Int?, token: String) {
+        // OfferIn is price / currency / stock.
+        val body = JSONObject().put("price", price).put("currency", "USD")
+        if (stock != null) body.put("stock", stock)
         request("/marketplace/listings/$listingId/offer", "PUT", body, token)
     }
 
@@ -1954,16 +1956,23 @@ object ApiClient {
         return out
     }
 
-    suspend fun marketSettings(interactorId: String, token: String): Boolean {
+    data class MarketPrefs(val locality: String,
+                           val includeRemote: Boolean)
+
+    suspend fun marketSettings(interactorId: String,
+                               token: String): MarketPrefs {
         val o = JSONObject(request("/marketplace/settings/$interactorId",
                                    token = token))
-        return o.optBoolean("show_offers", true)
+        return MarketPrefs(o.optString("locality", ""),
+                           o.optBoolean("include_remote", true))
     }
 
-    suspend fun setMarketSettings(interactorId: String, showOffers: Boolean,
-                                  token: String) {
+    // MarketPrefs is where "here" is and how far out to look.
+    suspend fun setMarketSettings(interactorId: String, locality: String,
+                                  includeRemote: Boolean, token: String) {
         request("/marketplace/settings/$interactorId", "PUT",
-                JSONObject().put("show_offers", showOffers), token)
+                JSONObject().put("locality", locality)
+                    .put("include_remote", includeRemote), token)
     }
 
     // ---- exchanges: two parties, one manifest --------------------------
@@ -2440,9 +2449,11 @@ object ApiClient {
                 .put("profile_id", profileId), token)
     }
 
-    suspend fun coordinate(orgId: String, goal: String, token: String) {
+    suspend fun coordinate(orgId: String, goal: String,
+                           fromDepartment: String, token: String) {
         request("/organizations/$orgId/coordinate", "POST",
-            JSONObject().put("goal", goal), token)
+            JSONObject().put("goal", goal)
+                .put("from_department", fromDepartment), token)
     }
 
     suspend fun coordinations(orgId: String, token: String): List<String> {

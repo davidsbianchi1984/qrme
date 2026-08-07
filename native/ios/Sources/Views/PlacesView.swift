@@ -246,6 +246,7 @@ struct OrgSection: View {
     @State private var deptRole = ""
     @State private var deptProfile = ""
     @State private var goal = ""
+    @State private var fromDept = ""
     @State private var log: [Coordination] = []
     @State private var note: String?
     @State private var busy = false
@@ -314,10 +315,15 @@ struct OrgSection: View {
             HStack {
                 TextField(L10n.t("org.goal", state.language), text: $goal)
                     .textFieldStyle(.roundedBorder)
+                TextField(L10n.t("org.department", state.language),
+                          text: $fromDept)
+                    .textFieldStyle(.roundedBorder)
                 Button(L10n.t("org.go", state.language)) {
                     run { _ = try await ApiClient.shared.coordinate(
-                        orgId: orgId, goal: goal, token: state.token!) }
-                }.disabled(busy || orgId.isEmpty || goal.isEmpty)
+                        orgId: orgId, goal: goal, fromDepartment: fromDept,
+                        token: state.token!) }
+                }.disabled(busy || orgId.isEmpty || goal.isEmpty
+                           || fromDept.isEmpty)
                 Button(L10n.t("org.log", state.language)) {
                     run { log = try await ApiClient.shared.coordinations(
                         orgId: orgId, token: state.token!) }

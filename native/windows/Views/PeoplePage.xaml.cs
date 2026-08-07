@@ -118,6 +118,7 @@ public sealed partial class PeoplePage : Page
         DeptProfileBox.Header = L10n.T("org.dept.profile");
         DeptAddButton.Content = L10n.T("org.dept.add");
         GoalBox.Header = L10n.T("org.goal");
+        FromDeptBox.Header = L10n.T("org.department");
         CoordinateButton.Content = L10n.T("org.go");
         CoordLogButton.Content = L10n.T("org.log");
         TourTitle.Text = L10n.T("tut.title");
@@ -1043,7 +1044,7 @@ public sealed partial class PeoplePage : Page
     private async void OnCoordinate(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.Coordinate(
             OrgIdBox.Text.Trim(), GoalBox.Text.Trim(),
-            AppState.Current.Token!));
+            FromDeptBox.Text.Trim(), AppState.Current.Token!));
 
     private async void OnCoordLog(object sender, RoutedEventArgs e) =>
         await Try(async () =>

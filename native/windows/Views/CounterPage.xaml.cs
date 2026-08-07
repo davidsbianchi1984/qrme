@@ -49,6 +49,7 @@ public sealed partial class CounterPage : Page
             .Select(PresenceLabel).ToList();
         PresencePicker.SelectedIndex = 0;
         PresenceButton.Content = L10n.T("counter.mine");
+        CamUrlBox.Header = L10n.T("counter.camera.url");
         CameraButton.Content = L10n.T("counter.camera");
         PortraitButton.Content = L10n.T("counter.portrait");
         ViewButton.Content = L10n.T("counter.bell");
@@ -83,7 +84,6 @@ public sealed partial class CounterPage : Page
         PriceTitle.Text = L10n.T("trade.price");
         ListingIdBox.Header = L10n.T("trade.listing");
         AmountBox.Header = L10n.T("trade.amount");
-        AcceptBox.Header = L10n.T("trade.accept");
         SetOfferButton.Content = L10n.T("trade.set");
         ShowOfferButton.Content = L10n.T("trade.show");
         ClearOfferButton.Content = L10n.T("trade.clear");
@@ -92,7 +92,8 @@ public sealed partial class CounterPage : Page
         UnplaceButton.Content = L10n.T("trade.unplace");
         PullButton.Content = L10n.T("trade.pull");
         BuyButton.Content = L10n.T("trade.buy");
-        ShowOffersSwitch.Header = L10n.T("trade.show_offers");
+        PrefLocalityBox.Header = L10n.T("trade.locality");
+        IncludeRemoteSwitch.Header = L10n.T("trade.include_remote");
         DealsTitle.Text = L10n.T("deals.propose");
         GuestPartyBox.Header = L10n.T("deals.guest");
         WorkBox.Header = L10n.T("deals.work");
@@ -174,7 +175,8 @@ public sealed partial class CounterPage : Page
                 {
                     var settings = await ApiClient.Shared.MarketSettings(
                         s.InteractorId, s.Token);
-                    ShowOffersSwitch.IsOn = settings.ShowOffers ?? true;
+                    PrefLocalityBox.Text = settings.Locality ?? "";
+                    IncludeRemoteSwitch.IsOn = settings.IncludeRemote ?? true;
                 }
                 if (s.Pid is not null)
                 {
@@ -235,7 +237,8 @@ public sealed partial class CounterPage : Page
     }
 
     private async void OnCamera(object sender, RoutedEventArgs e) =>
-        await Act(() => ApiClient.Shared.SetDeskCamera(Desk, true, DeskToken));
+        await Act(() => ApiClient.Shared.SetDeskCamera(
+            Desk, CamUrlBox.Text.Trim(), DeskToken));
 
     private async void OnPortrait(object sender, RoutedEventArgs e) =>
         await Act(() => ApiClient.Shared.SetDeskPortrait(Desk, DeskToken));
@@ -321,7 +324,7 @@ public sealed partial class CounterPage : Page
     {
         var s = AppState.Current;
         await Act(() => ApiClient.Shared.ListInMarketplace(s.Pid!,
-            StandBlurbBox.Text.Trim(), LocalityBox.Text.Trim(),
+            StandBlurbBox.Text.Trim(),
             TagsBox.Text.Split(',').Select(t => t.Trim())
                 .Where(t => t.Length > 0).ToArray(), s.Token!));
     }
@@ -332,11 +335,9 @@ public sealed partial class CounterPage : Page
 
     private async void OnSetOffer(object sender, RoutedEventArgs e)
     {
-        double.TryParse(AmountBox.Text, out var amount);
-        double? accept = double.TryParse(AcceptBox.Text, out var a)
-            ? a : null;
-        await Act(() => ApiClient.Shared.SetListingOffer(Listing, amount,
-            accept, AppState.Current.Token!));
+        double.TryParse(AmountBox.Text, out var price);
+        await Act(() => ApiClient.Shared.SetListingOffer(Listing, price,
+            null, AppState.Current.Token!));
     }
 
     private async void OnShowOffer(object sender, RoutedEventArgs e)
@@ -369,12 +370,13 @@ public sealed partial class CounterPage : Page
         await Act(() => ApiClient.Shared.PurchaseListing(Listing,
             AppState.Current.InteractorToken ?? ""));
 
-    private async void OnShowOffersToggled(object sender, RoutedEventArgs e)
+    private async void OnMarketPrefsChanged(object sender, RoutedEventArgs e)
     {
         if (_loading) return;
         var s = AppState.Current;
         await Act(() => ApiClient.Shared.SetMarketSettings(
-            s.InteractorId ?? "", ShowOffersSwitch.IsOn, s.Token!));
+            s.InteractorId ?? "", PrefLocalityBox.Text.Trim(),
+            IncludeRemoteSwitch.IsOn, s.Token!));
     }
 
     // -- the deals --
@@ -399,7 +401,8 @@ public sealed partial class CounterPage : Page
 
     private async void OnTakeItem(object sender, RoutedEventArgs e) =>
         await Act(() => ApiClient.Shared.AcceptExchangeItem(Deal,
-            ItemIdBox.Text.Trim(), AppState.Current.Token!));
+            ItemIdBox.Text.Trim(), AppState.Current.InteractorId ?? "",
+            AppState.Current.Token!));
 
     private async void OnDropItem(object sender, RoutedEventArgs e) =>
         await Act(() => ApiClient.Shared.RemoveExchangeItem(Deal,

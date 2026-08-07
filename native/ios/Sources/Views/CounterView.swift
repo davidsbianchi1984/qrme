@@ -21,6 +21,7 @@ struct CounterSection: View {
     @EnvironmentObject var state: AppState
     @State private var deskId = ""
     @State private var deskToken = ""
+    @State private var camUrl = ""
     @State private var displayName = ""
     @State private var trade = ""
     @State private var attestor = ""
@@ -97,9 +98,12 @@ struct CounterSection: View {
                             }.font(.caption2).disabled(busy || deskId.isEmpty)
                         }
                     }
+                    TextField(L10n.t("counter.camera.url", state.language),
+                              text: $camUrl)
+                        .textFieldStyle(.roundedBorder).font(.caption2)
                     Button(L10n.t("counter.camera", state.language)) {
                         run { card = try await ApiClient.shared.setDeskCamera(
-                            deskId: deskId, enabled: true, token: deskToken) }
+                            deskId: deskId, url: camUrl, token: deskToken) }
                     }.font(.caption2).disabled(busy || deskId.isEmpty)
                     Button(L10n.t("counter.portrait", state.language)) {
                         run { card = try await ApiClient.shared.setDeskPortrait(
@@ -302,13 +306,12 @@ struct TradeSection: View {
     @State private var suggestions: [String] = []
     @State private var listingId = ""
     @State private var amount = ""
-    @State private var acceptPrice = ""
     @State private var locality = ""
     @State private var offer: MarketOffer?
     @State private var sales: [MarketSale] = []
-    @State private var showOffers = true
+    @State private var includeRemote = true
+    @State private var prefLocality = ""
     @State private var blurb = ""
-    @State private var locality = ""
     @State private var tags = ""
     @State private var note: String?
     @State private var busy = false
@@ -365,9 +368,6 @@ struct TradeSection: View {
                     TextField(L10n.t("trade.blurb", state.language),
                               text: $blurb)
                         .textFieldStyle(.roundedBorder)
-                    TextField(L10n.t("trade.locality", state.language),
-                              text: $locality)
-                        .textFieldStyle(.roundedBorder)
                     TextField(L10n.t("trade.tags", state.language),
                               text: $tags)
                         .textFieldStyle(.roundedBorder)
@@ -376,7 +376,6 @@ struct TradeSection: View {
                             run { try await ApiClient.shared
                                 .listInMarketplace(
                                     profileId: state.pid ?? "", blurb: blurb,
-                                    locality: locality,
                                     tags: tags.split(separator: ",")
                                         .map { String($0)
                                             .trimmingCharacters(in: .whitespaces) },
@@ -400,9 +399,6 @@ struct TradeSection: View {
                     TextField(L10n.t("trade.amount", state.language),
                               text: $amount)
                         .textFieldStyle(.roundedBorder)
-                    TextField(L10n.t("trade.accept", state.language),
-                              text: $acceptPrice)
-                        .textFieldStyle(.roundedBorder)
                     if let offer, let shown = offer.amount {
                         let line = L10n.t("trade.asking", state.language)
                             + " " + String(shown)
@@ -414,9 +410,9 @@ struct TradeSection: View {
                                 offer = try await ApiClient.shared
                                     .setListingOffer(
                                         listingId: listingId,
-                                        amount: Double(amount) ?? 0,
+                                        price: Double(amount) ?? 0,
                                         currency: "USD",
-                                        acceptPrice: Double(acceptPrice),
+                                        stock: nil,
                                         token: state.token ?? "")
                             }
                         }.disabled(busy || listingId.isEmpty)
@@ -465,9 +461,13 @@ struct TradeSection: View {
                         let line = s.id + " · " + (s.status ?? "")
                         Text(line).font(.caption2).foregroundStyle(Theme.t2)
                     }
-                    Toggle(isOn: Binding(get: { showOffers },
-                                         set: { flipOffers($0) })) {
-                        Text(L10n.t("trade.show_offers", state.language))
+                    TextField(L10n.t("trade.locality", state.language),
+                              text: $prefLocality, onCommit: { savePrefs() })
+                        .textFieldStyle(.roundedBorder).font(.caption2)
+                    Toggle(isOn: Binding(get: { includeRemote },
+                                         set: { includeRemote = $0
+                                                savePrefs() })) {
+                        Text(L10n.t("trade.include_remote", state.language))
                             .font(.caption).foregroundStyle(Theme.t2)
                     }.disabled(busy)
                 }.card()
@@ -488,7 +488,8 @@ struct TradeSection: View {
         if let interactor = state.interactorId,
            let settings = try? await ApiClient.shared.marketSettings(
                 interactorId: interactor, token: token) {
-            showOffers = settings.show_offers ?? true
+            prefLocality = settings.locality ?? ""
+            includeRemote = settings.include_remote ?? true
         }
     }
 
@@ -501,11 +502,12 @@ struct TradeSection: View {
         }
     }
 
-    private func flipOffers(_ on: Bool) {
-        showOffers = on
+    // MarketPrefs is where "here" is and how far out to look.
+    private func savePrefs() {
         run {
             _ = try await ApiClient.shared.setMarketSettings(
-                interactorId: state.interactorId ?? "", showOffers: on,
+                interactorId: state.interactorId ?? "",
+                locality: prefLocality, includeRemote: includeRemote,
                 token: state.token ?? "")
         }
     }

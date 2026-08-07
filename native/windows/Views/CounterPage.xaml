@@ -36,6 +36,7 @@
                     <TextBox x:Name="DeskTokenBox" />
                     <ComboBox x:Name="PresencePicker" />
                     <Button x:Name="PresenceButton" Click="OnSetPresence" />
+                    <TextBox x:Name="CamUrlBox" />
                     <Button x:Name="CameraButton" Click="OnCamera" />
                     <Button x:Name="PortraitButton" Click="OnPortrait" />
                     <Button x:Name="ViewButton" Click="OnDeskView" />
@@ -150,7 +151,6 @@
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBox x:Name="ListingIdBox" />
                     <TextBox x:Name="AmountBox" />
-                    <TextBox x:Name="AcceptBox" />
                     <Button x:Name="SetOfferButton" Click="OnSetOffer" />
                     <Button x:Name="ShowOfferButton" Click="OnShowOffer" />
                     <Button x:Name="ClearOfferButton" Click="OnClearOffer" />
@@ -167,7 +167,8 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <ToggleSwitch x:Name="ShowOffersSwitch" Toggled="OnShowOffersToggled" />
+                    <TextBox x:Name="PrefLocalityBox" />
+                    <ToggleSwitch x:Name="IncludeRemoteSwitch" Toggled="OnMarketPrefsChanged" />
                 </StackPanel>
             </Border>
 

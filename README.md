@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.57.3** ([changelog](CHANGELOG.md) ·
+**Current release: v0.57.4** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.57.4** | **The inputs the shells never asked for** — 0.57.3 recorded six native-write defects as *needing an input the shell does not collect*; this collects them. A department beside the goal, a camera address, a locality and an include-remote switch, `price` where the shells said `amount`, and the signed-in actor on an accept. Six dead buttons across three shells, and the record is empty. Also fixes a Swift compile error 0.57.3 introduced |
 | **0.57.3** | **The guard read one client and the finding came from four** — request bodies checked across the Windows, iOS and Android shells. Seven defects, each present in every client that makes the call, including a marketplace listing placement that has never worked on any native surface. Thirteen of the first twenty findings were the extractor's own, and a seventh defect surfaced only because PDI's Windows reader hit zero |
 | **0.57.2** | **Every guard reads the answer; none read the question** — nothing had ever checked a *request* body against the model FastAPI validates with. QRME's 192 writes are correct; the guard's own first run produced 82 findings that were all its own defect, and a fifth was caught only by comparing how much of each client it reached |
 | **0.57.1** | **The fourth client, and it was the only one wrong** — the console declares more than the three native clients combined and nothing had ever checked it. Four defects, all visible: the delegation screen could not delegate, a dashboard tile had never shown a number, suggested friends was always empty, and a list was declared a count. Windows, iOS and Android were right about all four |

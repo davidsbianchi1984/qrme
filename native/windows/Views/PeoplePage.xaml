@@ -320,6 +320,7 @@
                     <TextBox x:Name="DeptProfileBox" />
                     <Button x:Name="DeptAddButton" Click="OnDeptAdd" />
                     <TextBox x:Name="GoalBox" />
+                    <TextBox x:Name="FromDeptBox" />
                     <Button x:Name="CoordinateButton" Click="OnCoordinate" />
                     <Button x:Name="CoordLogButton" Click="OnCoordLog" />
                     <ItemsControl x:Name="CoordList">

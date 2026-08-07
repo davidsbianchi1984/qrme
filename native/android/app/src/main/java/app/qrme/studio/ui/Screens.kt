@@ -3396,6 +3396,7 @@ private fun OrgBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var deptRole by remember { mutableStateOf("") }
     var deptProfile by remember { mutableStateOf("") }
     var goal by remember { mutableStateOf("") }
+    var fromDept by remember { mutableStateOf("") }
     var log by remember { mutableStateOf<List<String>>(emptyList()) }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -3439,10 +3440,13 @@ private fun OrgBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 onNote(r.exceptionOrNull()?.message) }
         }
         labeledField(L10n.t("org.goal", lang), goal, "") { goal = it }
+        labeledField(L10n.t("org.department", lang), fromDept, "") { fromDept = it }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BrandButton(L10n.t("org.go", lang),
-                enabled = orgId.isNotBlank() && goal.isNotBlank()) {
-                vm.call({ ApiClient.coordinate(orgId, goal, vm.token!!) }) { r ->
+                enabled = orgId.isNotBlank() && goal.isNotBlank()
+                    && fromDept.isNotBlank()) {
+                vm.call({ ApiClient.coordinate(orgId, goal, fromDept,
+                                               vm.token!!) }) { r ->
                     onNote(r.exceptionOrNull()?.message) }
             }
             BrandButton(L10n.t("org.log", lang), enabled = orgId.isNotBlank()) {
@@ -5353,6 +5357,7 @@ private fun CounterPanel(vm: StudioViewModel) {
     val lang = L10n.deviceLanguage()
     var deskId by remember { mutableStateOf("") }
     var deskToken by remember { mutableStateOf("") }
+    var camUrl by remember { mutableStateOf("") }
     var displayName by remember { mutableStateOf("") }
     var trade by remember { mutableStateOf("") }
     var attestor by remember { mutableStateOf("") }
@@ -5436,7 +5441,8 @@ private fun CounterPanel(vm: StudioViewModel) {
                     }) { Text(presenceLabel(p, lang), color = Qrme.BrandA, fontSize = 11.sp) }
                 }
             }
-            TextButton(onClick = { act { ApiClient.setDeskCamera(deskId, true, deskToken) } }) {
+            labeledField(L10n.t("counter.camera.url", lang), camUrl, "") { camUrl = it }
+            TextButton(onClick = { act { ApiClient.setDeskCamera(deskId, camUrl, deskToken) } }) {
                 Text(L10n.t("counter.camera", lang), color = Qrme.BrandA, fontSize = 11.sp)
             }
             TextButton(onClick = { act { ApiClient.setDeskPortrait(deskId, deskToken) } }) {
@@ -5536,11 +5542,11 @@ private fun TradePanel(vm: StudioViewModel) {
     var suggestions by remember { mutableStateOf<List<String>>(emptyList()) }
     var listingId by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
-    var acceptPrice by remember { mutableStateOf("") }
     var venue by remember { mutableStateOf("") }
     var offer by remember { mutableStateOf<MarketOffer?>(null) }
     var sales by remember { mutableStateOf<List<MarketSale>>(emptyList()) }
-    var showOffers by remember { mutableStateOf(true) }
+    var includeRemote by remember { mutableStateOf(true) }
+    var prefLocality by remember { mutableStateOf("") }
     var blurb by remember { mutableStateOf("") }
     var locality by remember { mutableStateOf("") }
     var tags by remember { mutableStateOf("") }
@@ -5552,7 +5558,9 @@ private fun TradePanel(vm: StudioViewModel) {
         vm.call({ ApiClient.marketSales(vm.token!!) }) { r -> sales = r.getOrDefault(emptyList()) }
         vm.interactorId?.let { who ->
             vm.call({ ApiClient.marketSettings(who, vm.token!!) }) { r ->
-                showOffers = r.getOrDefault(true)
+                r.getOrNull()?.let {
+                    prefLocality = it.locality; includeRemote = it.includeRemote
+                }
             }
         }
     }
@@ -5605,7 +5613,7 @@ private fun TradePanel(vm: StudioViewModel) {
             labeledField(L10n.t("trade.tags", lang), tags, "") { tags = it }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 BrandButton(L10n.t("trade.list", lang)) {
-                    act { ApiClient.listInMarketplace(vm.pid!!, blurb, locality,
+                    act { ApiClient.listInMarketplace(vm.pid!!, blurb,
                         tags.split(",").map { it.trim() }.filter { it.isNotEmpty() },
                         vm.token!!) }
                 }
@@ -5620,14 +5628,13 @@ private fun TradePanel(vm: StudioViewModel) {
                 fontWeight = FontWeight.Bold)
             labeledField(L10n.t("trade.listing", lang), listingId, "") { listingId = it }
             labeledField(L10n.t("trade.amount", lang), amount, "") { amount = it }
-            labeledField(L10n.t("trade.accept", lang), acceptPrice, "") { acceptPrice = it }
             offer?.amount?.let {
                 Text(L10n.t("trade.asking", lang) + " " + it, color = Qrme.T2, fontSize = 11.sp)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 TextButton(onClick = {
                     act { ApiClient.setListingOffer(listingId,
-                        amount.toDoubleOrNull() ?: 0.0, acceptPrice.toDoubleOrNull(), vm.token!!) }
+                        amount.toDoubleOrNull() ?: 0.0, null, vm.token!!) }
                 }) { Text(L10n.t("trade.set", lang), color = Qrme.BrandA, fontSize = 11.sp) }
                 TextButton(onClick = {
                     vm.call({ ApiClient.listingOffer(listingId) }) { r -> offer = r.getOrNull() }
@@ -5658,11 +5665,12 @@ private fun TradePanel(vm: StudioViewModel) {
                 fontWeight = FontWeight.Bold)
             sales.forEach { Text(it.id + " · " + it.status, color = Qrme.T2, fontSize = 11.sp) }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = showOffers, onCheckedChange = { want ->
-                    showOffers = want
-                    act { ApiClient.setMarketSettings(vm.interactorId ?: "", want, vm.token!!) }
+                Switch(checked = includeRemote, onCheckedChange = { want ->
+                    includeRemote = want
+                    act { ApiClient.setMarketSettings(vm.interactorId ?: "",
+                        prefLocality, want, vm.token!!) }
                 })
-                Text(L10n.t("trade.show_offers", lang), color = Qrme.T2, fontSize = 12.sp)
+                Text(L10n.t("trade.include_remote", lang), color = Qrme.T2, fontSize = 12.sp)
             }
         }
 

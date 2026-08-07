@@ -766,9 +766,9 @@ public record PackInstalled(
             new { name, role, profile_id = profileId }, token));
 
     public Task<Coordination> Coordinate(string orgId, string goal,
-        string token) =>
+        string fromDepartment, string token) =>
         Send<Coordination>(Post($"/organizations/{orgId}/coordinate",
-            new { goal }, token));
+            new { goal, from_department = fromDepartment }, token));
 
     public Task<Coordination[]> Coordinations(string orgId, string token) =>
         Send<Coordination[]>(Get($"/organizations/{orgId}/coordinations",
@@ -1163,9 +1163,9 @@ public record PackInstalled(
         Send<DeskCard>(Put($"/desks/{deskId}/portrait",
                            new { asset = (string?)null }, token));
 
-    public Task<DeskCard> SetDeskCamera(string deskId, bool enabled,
+    public Task<DeskCard> SetDeskCamera(string deskId, string url,
                                         string token) =>
-        Send<DeskCard>(Put($"/desks/{deskId}/camera", new { enabled },
+        Send<DeskCard>(Put($"/desks/{deskId}/camera", new { url },
                            token));
 
     public async Task<DeskRing[]> DeskRings(string deskId, string token)
@@ -1277,10 +1277,9 @@ public record PackInstalled(
 
     public Task<MarketListed> ListInMarketplace(string profileId,
                                                 string blurb,
-                                                string locality,
                                                 string[] tags, string token) =>
         Send<MarketListed>(Post($"/profiles/{profileId}/marketplace",
-            new { blurb, locality, tags }, token));
+            new { blurb, tags }, token));
 
     public Task<MarketListed> UnlistFromMarketplace(string profileId,
                                                     string token)
@@ -1303,11 +1302,11 @@ public record PackInstalled(
     public Task<MarketOffer> ListingOffer(string listingId) =>
         Send<MarketOffer>(Get($"/marketplace/listings/{listingId}/offer"));
 
-    public Task<MarketOffer> SetListingOffer(string listingId, double amount,
-                                             double? acceptPrice,
+    public Task<MarketOffer> SetListingOffer(string listingId, double price,
+                                             int? stock,
                                              string token) =>
         Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/offer",
-            new { amount, currency = "USD", accept_price = acceptPrice },
+            new { price, currency = "USD", stock },
             token));
 
     public Task<MarketOffer> ClearListingOffer(string listingId, string token)
@@ -1347,10 +1346,11 @@ public record PackInstalled(
                                  token));
 
     public Task<MarketSettings> SetMarketSettings(string interactorId,
-                                                  bool showOffers,
+                                                  string locality,
+                                                  bool includeRemote,
                                                   string token) =>
         Send<MarketSettings>(Put($"/marketplace/settings/{interactorId}",
-            new { show_offers = showOffers }, token));
+            new { locality, include_remote = includeRemote }, token));
 
     // -- exchanges: two parties, one manifest --
 
@@ -1395,9 +1395,11 @@ public record PackInstalled(
     /// <summary>Each item is accepted separately — nothing moves by itself.</summary>
     public Task<ExchangeItemRow> AcceptExchangeItem(string exchangeId,
                                                     string itemId,
+                                                    string actorId,
                                                     string token) =>
         Send<ExchangeItemRow>(Post(
-            $"/exchanges/{exchangeId}/items/{itemId}/accept", new { }, token));
+            $"/exchanges/{exchangeId}/items/{itemId}/accept",
+            new { actor_id = actorId }, token));
 
     /// <summary>Both parties sign the same manifest; any change clears both.</summary>
     public Task<ExchangeDeal> SignExchange(string exchangeId, string actorId,
@@ -3694,7 +3696,12 @@ public record MarketSalesBox(
     [property: JsonPropertyName("sales")] MarketSale[] Sales);
 
 public record MarketSettings(
-    [property: JsonPropertyName("show_offers")] bool? ShowOffers);
+    [property: JsonPropertyName("locality")] string? Locality,
+    [property: JsonPropertyName("region")] string? Region,
+    [property: JsonPropertyName("scope")] string? Scope,
+    [property: JsonPropertyName("include_remote")] bool? IncludeRemote,
+    [property: JsonPropertyName("kinds_wanted")] string[]? KindsWanted,
+    [property: JsonPropertyName("tags")] string[]? Tags);
 
 public record ExchangeVocabulary(
     [property: JsonPropertyName("industries")] string[] Industries,

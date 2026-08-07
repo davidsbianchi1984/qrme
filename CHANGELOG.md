@@ -4,6 +4,59 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.57.4] — 2026-08-07
+
+### The inputs the shells never asked for
+
+0.57.3 found seven defects in what the native clients send, fixed one, and
+recorded six with the same sentence beside each: *this needs an input the
+shell does not collect*. Recording was honest — inventing the missing value
+is what this family of guards exists to stop — but a recorded defect is still
+a dead button. This release collects the inputs.
+
+* **Coordination.** `CoordinateRequest` requires `from_department` as well as
+  a goal, and all three screens asked only for the goal, so coordinating an
+  organization answered 422 everywhere. Windows, iOS and Android now have a
+  department field beside the goal.
+* **The desk camera.** `CameraSet` takes a URL — "point the desk at its own
+  camera, or clear it back to the sample view" — and all three sent
+  `enabled: true`, a switch for a thing with no address. There is a camera
+  address field now, and clearing it clears the camera.
+* **Marketplace settings.** `MarketPrefs` is where "here" is and how far out
+  to look. The shells sent `show_offers`, which no model has ever had, and
+  Android read it back off the response as the whole answer. The screens now
+  carry a locality and an **include things offered remotely** switch, which
+  is the boolean that actually exists.
+* **Listing a profile.** The listing takes a blurb and tags; where it is
+  offered is `/place`'s job. The `locality` the shells also sent was
+  discarded on arrival, and its box is gone from the listing card — the place
+  card has always had its own.
+* **Putting a price on a listing.** `OfferIn` is price / currency / stock.
+  Windows and Android sent `amount`, iOS sent it too through a body the guard
+  could not read, and none sent the required `price`. "Lowest you would take"
+  collected a counter-offer floor the server has no concept of, and that box
+  is gone rather than left to look like it does something.
+* **Accepting an exchange item.** Windows sent an empty body where `actor_id`
+  is required; it now sends the signed-in interactor.
+
+`tests/native_bodies_unverified.txt` is empty, at a ceiling of zero.
+
+### A compile error 0.57.3 shipped
+
+Renaming iOS's `venue` to `locality` collided with a `locality` already
+declared in the same `TradeSection` — two `@State` properties of one name,
+which does not compile. Nothing here builds Swift, so nothing said so, and
+the request-body guard cannot see a syntax error because it reads the file as
+text. The duplicate is gone with the listing card's dead locality box.
+
+Worth stating plainly: the guard that found seven real defects would not have
+found that one, and the release that fixed them introduced it.
+
+### Also removed
+
+`trade.accept` and `trade.show_offers` are gone from all three L10n tables —
+ten languages each, for two controls that no longer exist.
+
 ## [0.57.3] — 2026-08-07
 
 ### The guard read one client and the finding came from four
