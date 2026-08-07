@@ -4,6 +4,44 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.53.1] — 2026-08-07
+
+### Nothing reaches the other platform, and now something checks
+
+`qrme/embeds.py` opens by naming the two things a video post could quietly
+stop doing: *"that nothing is copied, and that nothing is requested from the
+other platform until a viewer asks for it."* The first had real tests. The
+second had a field that is `None` and **a sentence promising a request will
+not happen**:
+
+    assert post["video"]["thumbnail"] is None
+    assert "until you press play" in entry["video"]["note"]
+
+Neither would notice a request happening. Add an oEmbed lookup for a real
+title tomorrow, keep `thumbnail` at `None`, leave the note alone, and every
+test in that file stays green while the module's central claim stops being
+true.
+
+So the network is unplugged and everything a viewer does is done: post a
+video, render the wall, read the post, load the public feed. **Nothing
+reached out** — the promise held, it simply had nothing checking it.
+
+Two things the guard's own injection pass found, in the guard:
+
+* the fixture **records as well as raises**. A thumbnail fetch written the way
+  somebody would actually write it — `try: urlopen(...) except Exception:
+  pass` — eats the raise, and a raise-only guard would have stayed green with
+  the request already made. The recorded list is what failed the test;
+* the source-level backstop was looking for `import urlopen`, which nobody
+  would ever write. `urlopen` is a function; the module is `urllib.request`.
+  The check now catches both `import X` and `from X import`.
+
+One more assertion in the same file keeps this from being satisfied by a
+feature that has stopped working: a card that renders nothing also makes no
+requests.
+
+Cut together with JIM-mini and PDI at **app-v0.53.1**.
+
 ## [0.53.0] — 2026-08-07
 
 ### Cut together at one version
