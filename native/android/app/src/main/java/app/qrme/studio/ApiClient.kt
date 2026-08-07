@@ -2668,8 +2668,8 @@ object ApiClient {
     suspend fun dockFaces(): List<String> {
         val o = JSONObject(request("/dock/faces"))
         val out = mutableListOf<String>()
-        o.optJSONArray("faces")?.let { a ->
-            for (i in 0 until a.length()) out.add(a.getString(i))
+        o.optJSONObject("faces")?.let { f ->
+            for (key in f.keys()) out.add("$key \u00b7 ${f.optString(key)}")
         }
         return out
     }
@@ -2794,8 +2794,9 @@ object ApiClient {
     suspend fun displayRules(): List<String> {
         val o = JSONObject(request("/displays/vocabulary"))
         val out = mutableListOf<String>()
-        o.optJSONObject("never")?.let { n ->
-            for (key in n.keys()) out.add(n.optString(key))
+        o.optJSONArray("never")?.let { a ->
+            for (i in 0 until a.length())
+                out.add(a.getJSONObject(i).optString("why"))
         }
         return out
     }
@@ -3290,8 +3291,9 @@ object ApiClient {
      *  and whose likeness it is. */
     suspend fun avatar(id: String): String {
         val o = JSONObject(request("/profiles/$id/avatar"))
-        return (if (o.optBoolean("ai_badge")) "AI" else "\u2014") +
-            " \u00b7 " + o.optString("likeness_of", "\u2014")
+        return (if (o.optBoolean("asset_marked")) "AI" else "\u2014") +
+            " \u00b7 " + (o.optJSONObject("likeness")
+                ?.optString("note") ?: "\u2014")
     }
 
     suspend fun setAvatar(id: String, asset: String, token: String) {
@@ -3346,8 +3348,8 @@ object ApiClient {
 
     suspend fun page(id: String): String {
         val o = JSONObject(request("/profiles/$id/page"))
-        return o.optString("theme", "\u2014") + " \u00b7 " +
-            o.optString("tagline", "\u2014")
+        return (o.optJSONObject("theme")?.optString("label") ?: "\u2014") +
+            " \u00b7 " + o.optString("tagline", "\u2014")
     }
 
     suspend fun editPage(id: String, theme: String, tagline: String,
@@ -3363,7 +3365,7 @@ object ApiClient {
     suspend fun frontPage(id: String): String {
         val o = JSONObject(request("/profiles/$id/front"))
         return o.optString("display_name", "\u2014") + " \u00b7 " +
-            o.optString("purpose", "\u2014")
+            o.optString("headline", "\u2014")
     }
 
     suspend fun surfaces(id: String): String {
@@ -3737,7 +3739,11 @@ object ApiClient {
 
     suspend fun mediaLimits(): String {
         val o = JSONObject(request("/media/limits"))
-        return o.optInt("max_bytes").toString()
+        // One limit per kind, not one limit: video gets sixty megabytes
+        // where an image gets eight.
+        return listOf("image", "video", "file").joinToString(" \u00b7 ") {
+            "$it ${(o.optJSONObject(it)?.optInt("max_bytes") ?: 0) / 1048576}MB"
+        }
     }
 
     /** Raw bytes in the body; the kind is read from the bytes. */
@@ -3945,7 +3951,7 @@ object ApiClient {
 
     suspend fun microphonePlaces(): Int {
         return (JSONObject(request("/microphones/places"))
-            .optJSONObject("places") ?: JSONObject()).length()
+            .optJSONArray("places") ?: org.json.JSONArray()).length()
     }
 
     suspend fun microphoneVocabulary(): Int {

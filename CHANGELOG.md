@@ -4,6 +4,73 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.9] — 2026-08-07
+
+### The client that declares nothing was the one guessing hardest
+
+0.56.8 left Kotlin out with a hedge:
+
+> *it parses `JSONObject` by hand rather than declaring shapes, so there is
+> nothing to compare — which is either a reason it cannot have this defect, or
+> the reason nobody would find it.*
+
+It was the second one. This client declares nothing, but every line is two
+claims at once — `o.optJSONObject("kinds_worn")` says the route sends that
+key *and* that it is an object — and both can be wrong. The way they go wrong
+here is worse than elsewhere, because `org.json` does not throw: `optString`
+on a missing key returns `""`, `optInt` on a string returns `0`, and
+`optJSONArray` on an object returns `null` into the `?:` beside it. A C#
+client with the wrong type crashes and somebody sees it. This one draws an
+empty screen.
+
+    asked     does the client declare the right shape
+    mattered  does the client ask for the right thing
+
+**Eight wrong reads, and every one was already fixed in C#** — six of them in
+Swift too. `ai_badge` and `likeness_of` on the avatar, `purpose` on the front,
+`max_bytes` on media limits, `theme` read as a string when it is a card,
+`places` and `never` read as maps when they are lists, `faces` read as a list
+when it is a map. Third client, third time the same eight-or-so defects were
+sitting there after being fixed elsewhere.
+
+#### Five faults in my own extractor, and I shipped none of them
+
+The first run reported fifty-odd findings. Almost none were real:
+
+1. the split was on `suspend fun`, so a plain `fun` helper between two of them
+   kept its reads in the preceding chunk — and because `o` is this client's
+   conventional name for a decoded body, they were credited to whatever route
+   that chunk began with. The voiceprint route was accused of reading thirteen
+   shop fields;
+2. `val f = JSONObject(request(...)).getJSONObject("funnel")` binds the
+   *funnel*, and its keys were read as the response's;
+3. `_INLINE` matched a POST reply and compared it to what GET returns;
+4. the GET check looked for the keyword `method` — this client passes the verb
+   **positionally**, `request(path, "DELETE", null, token)`, so a DELETE and a
+   POST were read as GETs. That fault was already fixed in one of the two
+   places it lived and not the other;
+5. and the boundary assertion, written for the third time in three languages,
+   **counted `suspend fun` when the split was on any `fun`** — so it passed
+   while the results were poisoned. Counting something other than the thing
+   you split on is not an assertion.
+
+Every one of those made the guard report things that were not true. None of
+them reached a release, because a list of findings is not a finding until each
+row has been read — but a fifth of this release was spent proving my own
+measurement wrong, which is the honest shape of the work and worth writing
+down rather than tidying away.
+
+Two thresholds were also mine rather than the code's: the reachable-route
+count and the key count, both set before the extractor tightened. They are set
+from what it actually finds now.
+
+#### The record
+
+Five rows, and they are the same conditionals the C# and Swift records hold —
+the solitude offer, and the attestor and level on a badge that nobody has
+verified yet. Rows are `<path> <key>` because this client has no struct to
+name. JIM-mini and PDI have the guard now too.
+
 ## [0.56.8] — 2026-08-07
 
 ### Fixing a defect in one client was not fixing the defect

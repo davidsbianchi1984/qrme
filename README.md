@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.56.8** ([changelog](CHANGELOG.md) ·
+**Current release: v0.56.9** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.56.9** | **The client that declares nothing was guessing hardest** — Kotlin has no structs to check, so nobody had; every `optString("k")` is a claim about a name *and* a type, and `org.json` never throws when either is wrong. Eight wrong reads, all already fixed in C#. Five faults in my own extractor found and fixed before any of them shipped |
 | **0.56.8** | **Fixing a defect in one client was not fixing the defect** — the shape guard now reads Swift too, and found nine fictions in the iOS client that had all been fixed on the Windows side releases earlier. Its own extractor made the same swallow-the-next-struct mistake the C# one did, in a different language |
 | **0.56.7** | **`kinds` meant three things, and one of them crashed the client** — `/wearables` sends it as a map where the record declared `string[]`, so that call threw rather than losing a field. `kinds`/`refused` split into six honest names (record 23 → 21), and the shape guard now checks that a declared type can decode what arrives — which found five more live crashes |
 | **0.56.6** | **Eight watch faces that were not on the page** — reported from a phone. An HTML table is as wide as its longest row, so one `<tr>` with fifteen cells beside rows of three left twelve blank columns everywhere and clipped the rest off a phone. Every gallery is a uniform grid now — four across for screens and watch faces, two for desktop frames — with a guard that reads the widest row, not the first |

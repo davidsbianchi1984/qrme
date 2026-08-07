@@ -1,0 +1,24 @@
+# status: backlog — 5 rows
+# ceiling: 5
+#
+# Keys the Android client reads that a route did not return, which are real.
+#
+# `test_the_keys_the_android_client_reads.py` drives every GET this client
+# reads a JSONObject off and checks each key by name and by accessor. It found
+# eight reads that were wrong, every one of them a defect already fixed in the
+# C# client and most of them in Swift too — `ai_badge`, `purpose`,
+# `max_bytes`, `theme` read as a string when it is a card.
+#
+# These five are the other answer, and they are the same conditionals the
+# other two clients' records hold. The key is real; the fixture is in the
+# state where it is absent.
+#
+# Rows are `<path> <key>` because this client has no struct to name.
+#
+# Ratcheted: this list may shrink and must never grow.
+#
+/interactors/{id}/solitude offer   # once the 28-day window holds enough turns
+/profiles/{id}/badge attestor      # once verified, and only on a named profile
+/profiles/{id}/badge level         # once verified
+/profiles/{id}/verification attestor  # once verified
+/profiles/{id}/verification level     # once verified
