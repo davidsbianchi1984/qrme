@@ -4,6 +4,24 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.56.1] — 2026-08-07
+
+### Cut together at one version
+
+The three products are cut at one version, so this release exists here to keep
+that true. **No code changes in this repo this round.**
+
+JIM-mini gained an offline fine-tune: a pass that reads a user's own answered
+follow-ups and trains weights by gradient descent, on their machine, with the
+network blocked — beside the adaptation profile that conditions a prompt, and
+deliberately in a separate table, because a reader who cannot tell which of the
+two they have has been told nothing useful.
+
+PDI implemented its KMS/HSM key provider, which had been a documented
+`NotImplementedError`. It unwraps a stored blob rather than fetching a key, binds
+the blob to the deployment with an encryption context, and refuses rather than
+falling back to a local key when the key store is unreachable.
+
 ## [0.56.0] — 2026-08-07
 
 ### The count of what was synthetic
