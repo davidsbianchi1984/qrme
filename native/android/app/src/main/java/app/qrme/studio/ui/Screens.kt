@@ -779,6 +779,7 @@ fun SettingsScreen(vm: StudioViewModel) {
     var wmLine by remember { mutableStateOf("") }
     var wmCustom by remember { mutableStateOf(false) }
     var wmSaved by remember { mutableStateOf(false) }
+    var llmKey by remember { mutableStateOf(vm.llmKey) }
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload() {
@@ -805,6 +806,18 @@ fun SettingsScreen(vm: StudioViewModel) {
     screenScroll {
         Text(L10n.t("tab.settings", vm.language), color = Qrme.Txt, fontSize = 22.sp,
             fontWeight = FontWeight.Bold)
+
+        // 0.58.0. The console has offered this since 0.4.3 and the phones
+        // never did: a key set there was used there, and the deployment's key
+        // used here, on the same account.
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("set.key", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("set.key.lead", vm.language), color = Qrme.T2, fontSize = 12.sp)
+            labeledField(L10n.t("set.key.label", vm.language), llmKey,
+                L10n.t("set.key.ph", vm.language)) { llmKey = it }
+            SmallAction(L10n.t("action.save", vm.language)) { vm.rememberLlmKey(llmKey) }
+        }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("ns.model", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)

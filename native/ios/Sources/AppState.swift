@@ -21,6 +21,16 @@ final class AppState: ObservableObject {
     // common actions) through L10n.
     @Published var language = "en"
 
+
+    /// The person's own model key, held on this device only and sent per
+    /// request as `x-llm-api-key`.
+    ///
+    /// The console has offered this since 0.4.3 and the phones never did — so
+    /// somebody who set their key in the console had it used there and the
+    /// deployment's key used here, on the same profile, with nothing saying
+    /// so. Never in the account and never on the wire except as the header.
+    @Published var llmKey = ""
+
     private let d = UserDefaults.standard
 
     init() {
@@ -31,6 +41,19 @@ final class AppState: ObservableObject {
         interactorToken = d.string(forKey: "qrme.interactor.token")
         interactorVerified = d.bool(forKey: "qrme.interactor.adult")
         language = d.string(forKey: "qrme.lang") ?? "en"
+        llmKey = d.string(forKey: "qrme.llmKey") ?? ""
+        let held = llmKey
+        Task { await ApiClient.shared.useLlmKey(held) }
+    }
+
+    /// Store or clear it. An empty string is the clear: there is no flag to
+    /// leave switched on by mistake, and no key means the deployment's.
+    func rememberLlmKey(_ key: String) {
+        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        llmKey = trimmed
+        if trimmed.isEmpty { d.removeObject(forKey: "qrme.llmKey") }
+        else { d.set(trimmed, forKey: "qrme.llmKey") }
+        Task { await ApiClient.shared.useLlmKey(trimmed) }
     }
 
     func rememberLanguage(_ code: String) {

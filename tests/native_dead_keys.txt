@@ -1,4 +1,4 @@
-# status: backlog — 276 rows
+# status: backlog — 273 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -153,13 +153,19 @@
 # The two files ask the same question from opposite ends, and this is the
 # first round where the answer met in the middle.
 #
-# ceiling: 104
-# total: 276
+# ### 0.58.0 — `action.save`, on all three
+#
+# The shells gained a Save button because they gained something to save: the
+# person's own model key, which the console has held since 0.4.3 and the
+# phones never did. The row was translated ten ways and asked for by nobody
+# because no shell had a form to save.
+#
+# ceiling: 103
+# total: 273
 
 # ios: 67 of 82 are asked for by another shell
 ios: acct.reset.code
 ios: action.refresh
-ios: action.save
 ios: action.send
 ios: cam.bystanders
 ios: comp.title
@@ -235,7 +241,6 @@ ios: work.phase
 # android: 83 of 110 are asked for by another shell
 android: acct.reset.code
 android: action.refresh
-android: action.save
 android: action.send
 android: asst.works
 android: cam.bystanders
@@ -336,7 +341,6 @@ android: work.phase
 windows: acct.password
 windows: acct.reset.code
 windows: acct.reset.new
-windows: action.save
 windows: action.send
 windows: asst.works
 windows: cam.bystanders

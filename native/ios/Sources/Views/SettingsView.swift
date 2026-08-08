@@ -4,6 +4,10 @@ import SwiftUI
 /// objections opened against it, with the owner's re-attest action.
 struct SettingsView: View {
     @EnvironmentObject var state: AppState
+    /// Edited here and only written to `AppState` on save, so a
+    /// half-typed key never reaches the wire. Saving an empty box is
+    /// the clear — no key means the deployment's.
+    @State private var llmKey = ""
     @State private var providers: [ProviderInfo] = []
     @State private var current = "auto"
     @State private var effective = ""
@@ -43,6 +47,26 @@ struct SettingsView: View {
                         Text(L10n.fill("ns.model.effective", state.language, ["name": effective]))
                             .font(.caption).foregroundStyle(Theme.t2)
                     }
+                }.card()
+
+                // 0.58.0. The console has offered this since 0.4.3 and the
+                // phones never did: a key set there was used there, and the
+                // deployment's key used here, on the same profile.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.t("set.key", state.language))
+                        .font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("set.key.lead", state.language))
+                        .font(.footnote).foregroundStyle(Theme.t2)
+                    Text(L10n.t("set.key.label", state.language))
+                        .font(.caption).foregroundStyle(Theme.t3)
+                    SecureField(L10n.t("set.key.ph", state.language), text: $llmKey)
+                        .textFieldStyle(.plain).foregroundStyle(Theme.txt)
+                    Button(L10n.t("action.save", state.language)) {
+                        state.rememberLlmKey(llmKey)
+                    }
+                    .font(.subheadline.bold()).foregroundStyle(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 9)
+                    .background(Theme.brandA).clipShape(Capsule())
                 }.card()
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -140,7 +164,8 @@ struct SettingsView: View {
             }.padding(20)
         }
         .refreshable { await load() }
-        .task { await load() }
+        .task {
+            llmKey = state.llmKey await load() }
     }
 
     private func load() async {

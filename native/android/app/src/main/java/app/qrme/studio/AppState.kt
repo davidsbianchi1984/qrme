@@ -25,6 +25,13 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
     // `interactorVerified` is true when the identity was minted with an 18+
     // birthdate — the key that opens the rated stranger tier.
     var interactorId by mutableStateOf<String?>(prefs.getString("interactor", null))
+
+    /** The person's own model key, held on this device only and sent per
+     *  request as `x-llm-api-key`. The console has offered this since 0.4.3
+     *  and the phones never did — so a key set in the console was used there
+     *  and the deployment's key used here, on the same account. */
+    var llmKey by mutableStateOf(prefs.getString("llmKey", "") ?: "")
+        private set
         private set
     var interactorVerified by mutableStateOf(prefs.getBoolean("interactor_adult", false))
         private set
@@ -79,5 +86,18 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
 
     fun <T> call(block: suspend () -> T, onResult: (Result<T>) -> Unit) {
         viewModelScope.launch { onResult(runCatching { block() }) }
+    }
+
+    init { ApiClient.llmKey = llmKey }
+
+    /** Store or clear it. Empty is the clear: no key means the deployment's,
+     *  and there is no flag to leave switched on by mistake. */
+    fun rememberLlmKey(key: String) {
+        val trimmed = key.trim()
+        llmKey = trimmed
+        ApiClient.llmKey = trimmed
+        prefs.edit().apply {
+            if (trimmed.isEmpty()) remove("llmKey") else putString("llmKey", trimmed)
+        }.apply()
     }
 }

@@ -69,6 +69,12 @@ public sealed partial class SettingsPage : Page
 
         ModelHead.Text = L10n.T("ns.model", lang);
         ModelSub.Text = L10n.T("ns.model.sub", lang);
+        KeyHead.Text = L10n.T("set.key", lang);
+        KeyLead.Text = L10n.T("set.key.lead", lang);
+        KeyBox.Header = L10n.T("set.key.label", lang);
+        KeyBox.PlaceholderText = L10n.T("set.key.ph", lang);
+        SaveKeyButton.Content = L10n.T("action.save", lang);
+        KeyBox.Password = AppState.Current.LlmKey;
 
         LangHead.Text = L10n.T("ns.lang", lang);
         LangSub.Text = L10n.T("ns.lang.sub", lang);
@@ -679,5 +685,14 @@ public sealed partial class SettingsPage : Page
                 $"{r["op"]} → {r["status"]}  ×{r["count"]}  {r["day"]}"));
         ProblemsPreview.Visibility = Visibility.Visible;
         ProblemsPreviewButton.Content = L10n.T("ns.pr.hide");
+    }
+
+    /// <summary>Store or clear the person's own model key. An empty box is
+    /// the clear — no key means the deployment's, and there is no flag to
+    /// leave switched on by mistake.</summary>
+    private void OnSaveKey(object sender, RoutedEventArgs e)
+    {
+        AppState.Current.RememberLlmKey(KeyBox.Password);
+        KeyBox.Password = AppState.Current.LlmKey;
     }
 }
