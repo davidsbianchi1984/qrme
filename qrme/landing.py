@@ -28,6 +28,8 @@ the sticker in 3D needs WebXR or the native apps; see docs/beacons.md.
 
 from __future__ import annotations
 
+from . import pagehead
+
 import html
 
 from . import avatars, db, identity
@@ -224,7 +226,7 @@ def desk_page(card: dict, label: str | None = None) -> str:
         # from whatever origin actually reached this page, which on a local
         # deployment is a LAN address rather than the public hostname. An
         # absolute URL here would ring a bell on a different machine, or none.
-        script = ("<script>" + _BELL_JS % {
+        script = (pagehead.script_open() + _BELL_JS % {
             "endpoint": _js(f"/desks/{desk_id}/bell")} + "</script>")
     else:
         bell = '<p class="status" id="bs">The bell is off while this desk is closed.</p>'

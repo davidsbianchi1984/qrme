@@ -20,6 +20,7 @@ from fastapi.exception_handlers import http_exception_handler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from . import pagehead
 from . import avatars as avatar_assets
 from . import i18n, llm, mobile, offline, tiers
 from . import terms as terms_mod
@@ -59,7 +60,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.59.2",
+    app = FastAPI(title="QRME", version="0.59.3",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -337,6 +338,35 @@ def create_app(pdi_client: PDIClient | None = None,
         seed_mod.repair()
     except Exception:
         pass
+
+    # What a page promises a browser before it says anything else.
+    #
+    # These products serve HTML a person reaches without an account, on a
+    # device that is not theirs: the sticker a stranger kneels over, the
+    # sealed-carrier card, the page a sign-in provider sends a browser back
+    # to. Measured over HTTP at 0.59.3, every one of them went out with no
+    # Content-Security-Policy, no X-Content-Type-Options, no X-Frame-Options
+    # and no Referrer-Policy — and nothing in-process could see that, because
+    # a TestClient reads none of those headers and a browser reads all of
+    # them.
+    #
+    # The nonce is minted before the route runs so the page builders can
+    # stamp it on their own inline script; the policy then names that nonce
+    # and nothing else, which is the difference between a header that stops
+    # an injected `<script>` and one that decorates the response.
+    #
+    #     asked     is the page correct
+    #     mattered  what can a page do that is not
+    @app.middleware("http")
+    async def _what_a_page_promises_a_browser(request: Request, call_next):
+        value = pagehead.new_nonce()
+        response = await call_next(request)
+        if response.headers.get("content-type", "").startswith("text/html"):
+            for key, header in pagehead.HEADERS.items():
+                response.headers.setdefault(key, header)
+            response.headers.setdefault("content-security-policy",
+                                        pagehead.policy(value))
+        return response
 
     # A failure the console can read.
     #

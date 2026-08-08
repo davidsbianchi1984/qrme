@@ -525,7 +525,7 @@ def test_the_bell_script_is_valid_javascript(client):
 
     created = _desk(client).json()
     placed = _beacon(client, created).json()
-    script = re.search(r"<script>(.*?)</script>",
+    script = re.search(r"<script[^>]*>(.*?)</script>",
                        client.get(f"/d/{placed['id']}").text, re.S).group(1)
     node = shutil.which("node")
     if node is None:                       # pragma: no cover - CI has node

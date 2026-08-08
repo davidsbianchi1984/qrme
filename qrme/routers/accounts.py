@@ -8,6 +8,8 @@ profile keeps its own owner capability token exactly as before. See
 
 from __future__ import annotations
 
+import html
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
@@ -243,16 +245,18 @@ def oauth_callback(provider: str, code: str = "", state: str = "",
     if error or not code:
         return HTMLResponse(
             f"<h2>Sign-in was not completed</h2>"
-            f"<p>{error or 'no code came back'} — you can close this window "
+            f"<p>{html.escape(error) or 'no code came back'} — you can close "
+            "this window "
             "and try again.</p>",
             status_code=400)
     try:
         done = oauth_mod.callback(provider, code, state)
     except oauth_mod.OAuthError as exc:
-        return HTMLResponse(f"<h2>Sign-in failed</h2><p>{exc.message}</p>",
+        return HTMLResponse(
+            f"<h2>Sign-in failed</h2><p>{html.escape(exc.message)}</p>",
                             status_code=exc.status)
     return HTMLResponse(
-        f"<h2>Signed in as {done['email']}</h2>"
+        f"<h2>Signed in as {html.escape(done['email'])}</h2>"
         "<p>You can close this window and return to the app.</p>")
 
 
