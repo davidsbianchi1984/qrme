@@ -4,6 +4,50 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.5] — 2026-08-08
+
+### The disclosure that showed nobody
+
+0.58.4 shipped a pinned table — each row a shell model held against the backend
+function whose `return` is its contract — and closed by naming where it should
+grow: the surfaces where an empty render reads as *nothing to report* rather
+than as a bug. The first one checked was worse than the guided tour.
+
+`GET /rooms/{id}/mic` and `GET /places/{surface}/{id}/microphone` answer with
+**`microphones_lent`**. All three shells read `lent`. The disclosure naming who
+in a room has lent the profiles an open microphone — device, gain, and since
+when — rendered as **nobody**, on the iPhone, on the Android and on Windows.
+
+The route's own docstring spends a paragraph on why that disclosure is readable
+by everyone present rather than by its subject alone, because a disclosure only
+its subject can see is not a disclosure. One that nobody can see is less than
+that.
+
+The inbox and the overlay disclosure were checked in the same pass and are
+correct. They are pinned anyway: a row that passes on the day it is written is
+the point of the table, not a wasted one.
+
+### Added
+
+- Six more pinned rows here, and the reader learned to follow three more
+  shapes, all of them assignment inside the one pinned function: `out = {...}`
+  with `out["k"] = …` after it, `rows = [{...} for r in …]`, and `rows = []`
+  with `rows.append(row)`. 0.58.4 named the last of those as a limit and
+  refused to guess past it. It is read now rather than guessed.
+- A `**spec` is resolved the same way — to a module-level dict of dicts whose
+  values all carry the same keys, directly or through the
+  `for _k, spec in SOMETHING.items()` that produced it — and refused outright
+  when it is anything else. The refusal is the feature: a pin this file cannot
+  read is one it must not invent.
+
+### Fixed
+
+- The live-microphone disclosure reads `microphones_lent` on the iPhone, the
+  Android (both the room and the place route) and Windows. It was reading
+  `lent`, and showing nobody.
+
+Suites: **1547 + 1520 = 3,067** across 217 files.
+
 ## [0.58.4] — 2026-08-08
 
 ### The key was right and the shape was wrong

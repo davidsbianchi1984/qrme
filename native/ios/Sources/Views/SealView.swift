@@ -180,7 +180,7 @@ struct RoomsSection: View {
                     run {
                         let d = try await ApiClient.shared.roomMicDisclosure(
                             roomId: roomId, token: state.token!)
-                        micList = d.lent ?? []
+                        micList = d.microphones_lent ?? []
                     }
                 }
             }.font(.caption).disabled(busy || roomId.isEmpty)

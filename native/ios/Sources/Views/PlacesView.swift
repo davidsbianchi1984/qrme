@@ -60,7 +60,7 @@ struct PlaceSection: View {
                             .microphoneDisclosure(
                                 surface: surface, surfaceId: surfaceId,
                                 token: state.token!)
-                        micList = d.lent ?? []
+                        micList = d.microphones_lent ?? []
                     }
                 }
             }.font(.caption).disabled(busy || surfaceId.isEmpty)

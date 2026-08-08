@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.58.4** ([changelog](CHANGELOG.md) ·
+**Current release: v0.58.5** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.58.5** | **The disclosure that showed nobody** — the mic routes answer with `microphones_lent` and all three shells read `lent`, so the list of who in a room has lent the profiles an open microphone rendered as nobody on every client. Six more pinned rows, and the reader now follows a list built by appending — the limit 0.58.4 named and refused to guess past |
 | **0.58.4** | **The key was right and the shape was wrong** — binding a decode site to its route is not derivable by reading this backend; four attempts are recorded and none shipped. What shipped instead pins a shell model to the function whose `return` is its contract, and the pinning found the guided tour blank on both phones: the outline read `key`/`title` off `{chapter, steps}`, and three buttons decoded `tutorial.where` as the step it wraps |
 | **0.58.3** | **The key the server never sends** — a `Decodable` property name *is* the wire key, and a wrong one fails on a phone rather than on a build machine. Four live breaks: the overlay disclosure showing nobody on both phones, Sign in with Google and Apple unable to start on either, the helper's *where does this live* line half blank on Android, and the referral list reading a boolean where a timestamp is |
 | **0.58.2** | **The colour that wasn't in the palette** — 0.58.1 checked the one receiver whose type is known for free; this checks all eight. The Android problem-report card painted itself with `Qrme.Card2` on a theme that declares `Card` and never a second, which Compose does not compile. The API clients came back clean across 1,613 call sites, and are asserted anyway |

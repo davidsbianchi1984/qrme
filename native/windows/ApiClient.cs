@@ -3825,7 +3825,8 @@ public record LentRow(
     [property: JsonPropertyName("device")] string? Device);
 
 public record MicDisclosure(
-    [property: JsonPropertyName("lent")] LentRow[]? Lent);
+    // `microphones_lent` on the wire. `lent` decoded to null on every call.
+    [property: JsonPropertyName("microphones_lent")] LentRow[]? Lent);
 
 public record WornRow(
     [property: JsonPropertyName("interactor_id")] string? InteractorId,

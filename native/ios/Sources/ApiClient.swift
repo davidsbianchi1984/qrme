@@ -2717,7 +2717,9 @@ struct MicDisclosure: Decodable {
         let device: String?
         var id: String { interactor_id ?? "?" }
     }
-    let lent: [Lent]?
+    // The route calls it `microphones_lent`. Reading `lent` got nil, and a
+    // disclosure that renders as an empty list is worse than no disclosure.
+    let microphones_lent: [Lent]?
     let note: String?
 }
 

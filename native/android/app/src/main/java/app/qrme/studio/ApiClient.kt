@@ -2322,7 +2322,7 @@ object ApiClient {
         val o = JSONObject(request("/places/$surface/$surfaceId/microphone",
             token = token))
         val out = mutableListOf<String>()
-        o.optJSONArray("lent")?.let { a ->
+        o.optJSONArray("microphones_lent")?.let { a ->
             for (i in 0 until a.length()) {
                 val m = a.getJSONObject(i)
                 out.add(m.optString("interactor_id") + " · " +
@@ -2807,7 +2807,7 @@ object ApiClient {
                                   token: String): List<String> {
         val o = JSONObject(request("/rooms/$roomId/mic", token = token))
         val out = mutableListOf<String>()
-        o.optJSONArray("lent")?.let { a ->
+        o.optJSONArray("microphones_lent")?.let { a ->
             for (i in 0 until a.length()) {
                 val m = a.getJSONObject(i)
                 out.add(m.optString("interactor_id") + " · " +
