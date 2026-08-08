@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.58.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.58.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.58.1** | **The member that isn't there** — with no Swift, Kotlin or C# compiler here, the native UI is checked by reading; this takes the next class of compile error that reading can catch. Each shell has one object the screens read their session from and one file declaring it, so a member it does not declare is not a style question. Clean in this product; the sibling shells had thirty-nine call sites that do not compile |
 | **0.58.0** | **The key the phones never carried** — auditing every header the console attaches to every request turned up one the shells do not send at all: `x-llm-api-key`, the person's own model key, pasted into the console since 0.4.3 and read by the backend per request. A key set on the desktop ran the desktop; the phone quietly ran the deployment's — same account, two credentials, nothing saying so. All three shells now hold one, offer a field for it under the console's own words, and send it |
 | **0.57.9** | **A funnel only funnels what goes into it** — comparing the three test directories turned up a guard that existed in the other two products and not in this one, the product whose whole premise is speaking in a person's language. Porting it exposed what it could not ask: **21 of 22 Windows sends, 3 of 4 on iOS and 1 of 2 on Android built their own request beside the shared helper** and carried no `Accept-Language`, so every refusal they drew from an expired token arrived in English. One dispatcher per shell, and a check that walks dispatch sites rather than header lines |
 | **0.57.8** | **The rows the guard skipped were the interesting ones** — the untranslated-literal check opened with `if "{" in english: continue`, so every row with a slot in it went unchecked for four releases. Those are most of what a screen says, and the sentence built around a value is the one a screen hand-builds. Twenty-seven sites: the whole provenance footer in English on the desktop and both phones, the watermark verdict, the objection status, the licence offer, the signing credential list. Slotted rows are compared by their fragments now; `native_dead_keys` 300 → 276 |

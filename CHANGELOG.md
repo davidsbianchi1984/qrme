@@ -4,6 +4,47 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.1] — 2026-08-08
+
+### The member that isn't there
+
+0.58.0 ended by restating the standing gap: no Swift, Kotlin or C# toolchain
+on this machine, so the native UI is asserted by reading and not by running —
+and that round widened the amount of screen riding on it. The honest response
+is not to pretend a compiler exists. It is to keep taking the classes of
+compile error that *can* be caught by reading. 0.57.5 took duplicate
+declarations and unbalanced braces; 0.57.6 took the markup; this takes the
+next one.
+
+Each shell has exactly one object the screens read their session from, and
+exactly one file that declares it — so `state.x` is not a guess about types.
+It is the one receiver in these trees whose declaration is known without
+resolving anything.
+
+```
+asked     do the screens parse, and do they say the right things
+mattered  is the thing they reach for actually there
+```
+
+### Added
+
+- `test_the_member_that_isnt_there.py`, in all three products: every member a
+  screen reaches for on its shell's state object must be declared by it.
+
+Clean here on the first run — the finding was next door, and this product
+gets the check because the next one could be here.
+
+### The trap it walked into first
+
+The first extractor reported four defects that were not there: `call` on the
+Kotlin view models and `IsSignedIn` / `IsEnrolled` on the C# ones. `fun <T>
+call(` puts a type parameter between the keyword and the name, and
+`public bool IsSignedIn => …` is expression-bodied with no `{` or `(` after
+it. Both shapes are matched now and tested for; a guard that reports four
+defects that are not there is one nobody reads.
+
+Suites: **1542 + 1502 = 3,044** across 215 files.
+
 ## [0.58.0] — 2026-08-08
 
 ### The key the phones never carried
