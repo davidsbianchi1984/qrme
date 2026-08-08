@@ -31,6 +31,7 @@ from __future__ import annotations
 from . import pagehead
 
 import html
+import json
 
 from . import avatars, db, identity
 
@@ -267,10 +268,23 @@ def desks_anon_cooldown() -> int:
     return desks.ANON_COOLDOWN_SECONDS
 
 
+def _js_literal(obj) -> str:
+    """Any JSON value, safe to drop **inside a `<script>` element**.
+
+    The one primitive `_js` is built on, and the one the string table is built
+    on too — because they had drifted apart. `json.dumps` escapes what would
+    end a JavaScript *string*; it has nothing to say about `</script`, which
+    ends the *element* whatever the JavaScript quoting says, closing the
+    page's own nonced script and leaving everything after it to be parsed as
+    markup.
+    """
+    return html.escape(json.dumps(obj, ensure_ascii=False),
+                       quote=False).replace("</", "<\\/")
+
+
 def _js(value: str) -> str:
     """A JS string literal safe to drop into an inline script."""
-    import json
-    return html.escape(json.dumps(value), quote=False).replace("</", "<\\/")
+    return _js_literal(value)
 
 
 def profile_page(profile: dict, base: str, label: str | None = None,

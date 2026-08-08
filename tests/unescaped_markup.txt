@@ -38,11 +38,11 @@
 # can put markup into.
 #
 # ceiling: 8
-landing.py:221: {desks_anon_cooldown()}
-landing.py:248: {blurb}
-landing.py:248: {dot}
-landing.py:248: {queued}
-landing.py:98: {_CSS}
-landing.py:98: {body}
-signing_page.py:140: {_CSS}
-signing_page.py:140: {script}
+landing.py: {_CSS}
+landing.py: {blurb}
+landing.py: {body}
+landing.py: {desks_anon_cooldown()}
+landing.py: {dot}
+landing.py: {queued}
+signing_page.py: {_CSS}
+signing_page.py: {script}

@@ -110,6 +110,11 @@ def _path_literals() -> int:
     return sum(len(clientpaths.paths(lang)) for lang in SURFACES.values())
 
 
+def _console_files() -> int:
+    from .test_a_value_in_a_script_is_not_markup import console_files
+    return len(console_files())
+
+
 def _markup_strings() -> int:
     from .test_a_page_never_prints_what_it_was_given import scanned
     return scanned()
@@ -153,6 +158,8 @@ RATCHETS: tuple[Ratchet, ...] = (
             "routes reachable by walking the included routers"),
     Ratchet("extractor.path_literals", 1120, _path_literals,
             "path literals found across all four surfaces"),
+    Ratchet("console.source_files", 52, _console_files,
+            "TypeScript sources the console sink sweep reads"),
     Ratchet("markup.strings_scanned", 16, _markup_strings,
             "f-strings in this package that build markup"),
     Ratchet("suite.guard_names", 1900, _guard_names,
