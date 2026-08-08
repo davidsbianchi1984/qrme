@@ -1,4 +1,4 @@
-# status: backlog — 300 rows
+# status: backlog — 276 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -138,8 +138,23 @@
 # it answers to, halfway through. One key: `.sample`, and `.record` is
 # deleted from all three tables.
 #
-# ceiling: 127
-# total: 300
+# ### 0.57.8 — twenty-four more, from the guard next door
+#
+# Not a grind. `test_a_shell_does_not_print_what_it_translated.py` learned to
+# read rows with a slot in them, and every row it reported was a row this file
+# was already carrying: held, translated ten ways, and asked for by nobody
+# because the screen was typing the English out by hand.
+#
+# Twenty-three on the Windows shell, one on Android. `ns.who.below`,
+# `ns.who.by`, `nsig.proofing`, `nprv.generated`, `nmg.packs.count` — and the
+# three `nsig.level.*` rows, which the iPhone had been reading all along while
+# the desktop printed `basic` and `standard` raw.
+#
+# The two files ask the same question from opposite ends, and this is the
+# first round where the answer met in the middle.
+#
+# ceiling: 104
+# total: 276
 
 # ios: 67 of 82 are asked for by another shell
 ios: acct.reset.code
@@ -275,7 +290,6 @@ android: ns.lang.pre.off
 android: ns.lang.pre.on
 android: ns.model.nokeyword
 android: ns.pr.short
-android: ns.rel.saved
 android: ns.rel.t.family
 android: ns.rel.t.fan
 android: ns.rel.t.friend
@@ -336,7 +350,6 @@ windows: front.title
 windows: inbox.empty
 windows: life.legend
 windows: nc.a_stranger
-windows: nc.talking
 windows: ncon.handle.ph
 windows: ndsk.adult
 windows: ndsk.bell.off
@@ -350,8 +363,6 @@ windows: ndsk.room
 windows: ndsk.waiting
 windows: ngam
 windows: ngam.end
-windows: ngam.held
-windows: ngam.held.default
 windows: ngam.session
 windows: ngam.situation.ph
 windows: ngam.sub
@@ -362,7 +373,6 @@ windows: nmg.beacon.scan
 windows: nmg.beacon.scan.sub
 windows: nmg.blurb.ph
 windows: nmg.claimed
-windows: nmg.derived
 windows: nmg.done
 windows: nmg.filter.industry.full
 windows: nmg.found.beacon
@@ -370,15 +380,11 @@ windows: nmg.grants
 windows: nmg.handle.ph
 windows: nmg.ledger
 windows: nmg.needprofile
-windows: nmg.offered
-windows: nmg.offered.derivatives
 windows: nmg.pack.free
 windows: nmg.pack.from
 windows: nmg.pack.installed.pack
 windows: nmg.pack.installed.robot
 windows: nmg.pack.meta
-windows: nmg.packs.count
-windows: nmg.payout.done
 windows: nmg.price.ph
 windows: nmg.qr
 windows: nmg.t.counter
@@ -392,8 +398,6 @@ windows: nmg.t.voice
 windows: nmg.tags.ph
 windows: nmg.terms.ph
 windows: nmg.title.ph
-windows: nprv.generated
-windows: nprv.licensed
 windows: ns.fb.c.bug
 windows: ns.fb.c.idea
 windows: ns.fb.c.improvement
@@ -402,22 +406,13 @@ windows: ns.fb.c.praise
 windows: ns.fb.rating
 windows: ns.fb.sofar
 windows: ns.lang.pre.sub
-windows: ns.model.effective
 windows: ns.model.nokey
 windows: ns.model.ready
 windows: ns.obj.attested
-windows: ns.object.raised
-windows: ns.rel.saved
 windows: ns.st.age
-windows: ns.st.effective
 windows: ns.tr.engine
-windows: ns.who.below
-windows: ns.who.by
-windows: ns.who.by.altered
 windows: ns.who.checking
-windows: ns.who.matched
 windows: nsig
-windows: nsig.cansign
 windows: nsig.creds
 windows: nsig.doc
 windows: nsig.domain
@@ -426,11 +421,7 @@ windows: nsig.enrol
 windows: nsig.faceid
 windows: nsig.hashed
 windows: nsig.keep
-windows: nsig.level.basic
-windows: nsig.level.high
-windows: nsig.level.standard
 windows: nsig.needaccount
-windows: nsig.proofing
 windows: nsig.revoke
 windows: nsig.revoke.this
 windows: nsig.revoked.note

@@ -125,8 +125,14 @@ struct ChatView: View {
                     if let prov = reply.provenance {
                         messages.append(Bubble(
                             mine: false,
-                            text: "ⓘ \(prov.generated_by) · persona + \(prov.grounded_in.source_items) source item(s) · moderated: \(prov.moderation.status)"
-                                  + (prov.licensed_from.map { " · licensed from \($0)" } ?? ""),
+                            text: "ⓘ " + L10n.fill("nprv.generated", state.language,
+                                                   ["model": prov.generated_by,
+                                                    "n": "\(prov.grounded_in.source_items)",
+                                                    "status": prov.moderation.status])
+                                  + (prov.licensed_from.map {
+                                        " · " + L10n.fill("nprv.licensed",
+                                                          state.language,
+                                                          ["source": $0]) } ?? ""),
                             pending: true))
                     }
                 } else {

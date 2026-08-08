@@ -88,12 +88,17 @@ public sealed partial class ChatPage : Page
                     $"◈ worked as {rc.Role} ({rc.How})",
                     HorizontalAlignment.Left));
             if (p.Status == "approved" && reply.Provenance is { } prov)
-                _messages.Add(new BubbleRow(
-                    $"ⓘ {prov.GeneratedBy} · persona + " +
-                    $"{prov.GroundedInInfo.SourceItems} source item(s) · " +
-                    $"moderated: {prov.Moderation.Status}" +
-                    (prov.LicensedFrom is { } lf ? $" · licensed from {lf}" : ""),
-                    HorizontalAlignment.Left));
+            {
+                var lang = AppState.Current.Language;
+                var trail = "ⓘ " + L10n.Fill(
+                    "nprv.generated", lang,
+                    ("model", prov.GeneratedBy),
+                    ("n", $"{prov.GroundedInInfo.SourceItems}"),
+                    ("status", prov.Moderation.Status));
+                if (prov.LicensedFrom is { } lf)
+                    trail += " · " + L10n.Fill("nprv.licensed", lang, ("source", lf));
+                _messages.Add(new BubbleRow(trail, HorizontalAlignment.Left));
+            }
         }
         catch (Exception ex)
         {

@@ -120,7 +120,9 @@ public sealed partial class CommunityPage : Page
             if (r.Status == "matched" && r.ConnectionId is not null)
             {
                 _connectionId = r.ConnectionId;
-                MatchTitle.Text = $"Talking with {r.MatchedWith ?? "a stranger"}";
+                MatchTitle.Text = L10n.Fill("nc.talking", AppState.Current.Language,
+                                            ("who", r.MatchedWith
+                                                 ?? L10n.T("nc.stranger")));
                 JoinCard.Visibility = Visibility.Collapsed;
                 TalkCard.Visibility = Visibility.Visible;
                 await RefreshStranger();

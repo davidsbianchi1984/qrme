@@ -118,7 +118,8 @@ public sealed partial class GamingPage : Page
                 SituationBox.Text.Trim(), MinorCheck.IsChecked == true);
             LineText.Text = r.Status == "spoken" && r.Line is { } line
                 ? $"🎙 {line}"
-                : $"⚠️ held — {r.FlagReason ?? "moderation"}";
+                : L10n.Fill("ngam.held", AppState.Current.Language,
+                            ("reason", r.FlagReason ?? L10n.T("ngam.held.default")));
             LineText.Visibility = Visibility.Visible;
         }
         catch (Exception ex)

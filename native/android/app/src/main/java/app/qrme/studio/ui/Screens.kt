@@ -1105,7 +1105,8 @@ private fun RelationshipPanel(vm: StudioViewModel) {
                 ApiClient.setRelationship(vm.pid!!, vm.token!!, interactor,
                     type, nickname, tone)
             }) { r ->
-                r.onSuccess { status = "Saved — it now treats you as ${it.replace('_', ' ')}." }
+                r.onSuccess { status = L10n.fill("ns.rel.saved", vm.language,
+                        mapOf("type" to it.replace('_', ' '))) }
                  .onFailure { status = it.message }
             }
         }
@@ -1223,10 +1224,13 @@ fun ChatScreen(vm: StudioViewModel) {
                                 (reply.roleHow?.let { " ($it)" } ?: ""), true)
                         },
                         reply.provenance?.let { prov ->
-                            Bubble(false, "ⓘ ${prov.generatedBy} · persona + " +
-                                "${prov.sourceItems} source item(s) · moderated: " +
-                                prov.moderationStatus +
-                                (prov.licensedFrom?.let { " · licensed from $it" } ?: ""),
+                            Bubble(false, "ⓘ " + L10n.fill("nprv.generated", vm.language,
+                                    mapOf("model" to prov.generatedBy,
+                                          "n" to prov.sourceItems.toString(),
+                                          "status" to prov.moderationStatus)) +
+                                (prov.licensedFrom?.let {
+                                    " · " + L10n.fill("nprv.licensed", vm.language,
+                                                      mapOf("source" to it)) } ?: ""),
                                 true)
                         },
                     )

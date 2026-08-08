@@ -226,8 +226,10 @@ public sealed partial class ReachPage : Page
         try
         {
             var r = await ApiClient.Shared.RequestPayout(s.Pid!, s.Token!);
-            PayoutText.Text = $"Payout {r.PayoutId}: {Money(r.TotalAmount, "USD")} across " +
-                              $"{r.Entries} entries (simulated transfer).";
+            PayoutText.Text = L10n.Fill("nmg.payout.done", AppState.Current.Language,
+                                        ("id", r.PayoutId),
+                                        ("total", Money(r.TotalAmount, "USD")),
+                                        ("n", $"{r.Entries}"));
             PayoutText.Visibility = Visibility.Visible;
             await ReloadEarnings();
         }
@@ -255,7 +257,9 @@ public sealed partial class ReachPage : Page
                     Key = r.Key,
                     Name = r.Name,
                     Tagline = r.Tagline,
-                    SyncState = $"{r.Synced}/{r.Available} packs synced",
+                    SyncState = L10n.Fill("nmg.packs.count", AppState.Current.Language,
+                                          ("synced", $"{r.Synced}"),
+                                          ("available", $"{r.Available}")),
                     CanSync = r.Synced < r.Available,
                 }).ToList();
             var catalog = await ApiClient.Shared.Packs(PackIndustryBox.Text.Trim());
@@ -563,7 +567,9 @@ public sealed partial class ReachPage : Page
             {
                 Id = g.Id,
                 Title = $"{g.Kind} → {g.BuyerId}",
-                Derived = g.DerivedProfileId is { } d ? $"derived agent: {d}" : "",
+                Derived = g.DerivedProfileId is { } d
+                    ? L10n.Fill("nmg.derived", AppState.Current.Language, ("id", d))
+                    : "",
                 Revoked = g.Revoked,
             }).ToList();
         }
@@ -572,8 +578,11 @@ public sealed partial class ReachPage : Page
 
     private void ShowOffer(LicenseOffer offer)
     {
-        OfferText.Text = $"offered: {offer.Kind} · {offer.Currency} {offer.Price:0.00}" +
-                         (offer.AllowDerivatives ? " · derivatives allowed" : "");
+        OfferText.Text = L10n.Fill(
+            offer.AllowDerivatives ? "nmg.offered.derivatives" : "nmg.offered",
+            AppState.Current.Language,
+            ("kind", offer.Kind), ("currency", offer.Currency),
+            ("price", $"{offer.Price:0.00}"));
         OfferText.Visibility = Visibility.Visible;
         UnlistButton.Visibility = Visibility.Visible;
     }

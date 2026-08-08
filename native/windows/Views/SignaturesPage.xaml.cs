@@ -143,8 +143,10 @@ public sealed partial class SignaturesPage : Page
                     S("credential_id"), S("attestation_object"),
                     S("client_data_json"), _pendingChallenge,
                     "QRME owner", token);
-                CeremonyStatus.Text =
-                    $"Registered. This credential can sign: {string.Join(", ", cred.CanSign)}.";
+                CeremonyStatus.Text = L10n.T("nsig.registered")
+                    + " " + L10n.Fill("nsig.cansign", AppState.Current.Language,
+                        ("levels", string.Join(", ", cred.CanSign.Select(
+                            l => L10n.T($"nsig.level.{l}")))));
             }
             else
             {
@@ -181,14 +183,17 @@ public sealed partial class SignaturesPage : Page
             CredentialList.ItemsSource = creds.Select(c => new CredentialVm
             {
                 Title = c.DisplayName ?? c.CredentialId,
-                Proofing = $"verified at enrolment: {c.ProofingLevel}",
+                Proofing = L10n.Fill("nsig.proofing", AppState.Current.Language,
+                    ("level", L10n.T($"nsig.level.{c.ProofingLevel}"))),
                 // Surfaced rather than buried: a syncable passkey exists on
                 // every device in the owner's cloud account, which is a weaker
                 // claim that only they could have signed.
                 Custody = c.DeviceBound
                     ? L10n.T("nsig.devicebound")
                     : L10n.T("nsig.syncable"),
-                Tiers = $"can sign: {string.Join(", ", c.CanSign)}",
+                Tiers = L10n.Fill("nsig.cansign", AppState.Current.Language,
+                    ("levels", string.Join(", ", c.CanSign.Select(
+                        l => L10n.T($"nsig.level.{l}"))))),
             }).ToList();
         }
         catch (Exception ex) { Fail(ex); }

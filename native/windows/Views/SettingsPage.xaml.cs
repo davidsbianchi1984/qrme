@@ -157,7 +157,8 @@ public sealed partial class SettingsPage : Page
             var current = await ApiClient.Shared.ProfileModel(s.Pid!);
             var idx = Array.FindIndex(_providers, p => p.Name == current.Provider);
             ProviderBox.SelectedIndex = idx >= 0 ? idx : 0;
-            EffectiveText.Text = $"Effective now: {current.Effective}";
+            EffectiveText.Text = L10n.Fill("ns.model.effective",
+                AppState.Current.Language, ("name", current.Effective));
 
             _languages = (await ApiClient.Shared.Languages()).Languages;
             LanguageBox.ItemsSource = _languages.Select(l => l.Label).ToList();
@@ -282,7 +283,8 @@ public sealed partial class SettingsPage : Page
             AgingToggle.IsOn = hub.Age.AgingEnabled;
             if (hub.Age.EffectiveAge is { } eff)
             {
-                EffectiveAgeText.Text = $"Effective age now: {eff}";
+                EffectiveAgeText.Text = L10n.Fill("ns.st.effective",
+                    AppState.Current.Language, ("age", $"{eff}"));
                 EffectiveAgeText.Visibility = Visibility.Visible;
             }
         }
@@ -302,7 +304,8 @@ public sealed partial class SettingsPage : Page
                 AppearanceBox.Text.Trim() is { Length: > 0 } a ? a : null);
             if (hub.Age.EffectiveAge is { } eff)
             {
-                EffectiveAgeText.Text = $"Effective age now: {eff}";
+                EffectiveAgeText.Text = L10n.Fill("ns.st.effective",
+                    AppState.Current.Language, ("age", $"{eff}"));
                 EffectiveAgeText.Visibility = Visibility.Visible;
             }
             SteeringStatus.Text = L10n.T("ns.st.applied");
@@ -325,7 +328,8 @@ public sealed partial class SettingsPage : Page
             var r = await ApiClient.Shared.SetRelationship(
                 s.Pid!, s.Token!, s.InteractorId!, type,
                 RelNicknameBox.Text.Trim(), RelToneBox.Text.Trim());
-            RelStatus.Text = $"Saved — it now treats you as {r.RelationshipType.Replace('_', ' ')}.";
+            RelStatus.Text = L10n.Fill("ns.rel.saved", AppState.Current.Language,
+                ("type", r.RelationshipType.Replace('_', ' ')));
             RelStatus.Visibility = Visibility.Visible;
         }
         catch (Exception ex) { ShowError(ex.Message); }
@@ -428,7 +432,8 @@ public sealed partial class SettingsPage : Page
         {
             var m = await ApiClient.Shared.SetModel(s.Pid!, s.Token!,
                                                     _providers[idx].Name);
-            EffectiveText.Text = $"Effective now: {m.Effective}";
+            EffectiveText.Text = L10n.Fill("ns.model.effective",
+                AppState.Current.Language, ("name", m.Effective));
         }
         catch (Exception ex) { ShowError(ex.Message); }
     }
@@ -475,7 +480,8 @@ public sealed partial class SettingsPage : Page
             // raising it needs told, because the remedy is now rather than
             // after somebody gets round to it.
             ObjectVerdict.Text =
-                $"Raised. The profile is {r.ProfileStatus ?? "restricted"} pending review.";
+                L10n.Fill("ns.object.raised", AppState.Current.Language,
+                          ("status", r.ProfileStatus ?? "restricted"));
             ObjectNote.Text = r.Note ?? "";
         }
         catch (System.Exception ex)
@@ -558,15 +564,17 @@ public sealed partial class SettingsPage : Page
             var r = await ApiClient.Shared.RecoverWatermark(text);
             if (r.Recovered && r.ProfileId is { } pid)
             {
-                RecoverVerdict.Text = r.Verbatim
-                    ? $"Written by {pid}, unaltered."
-                    : $"Written by {pid} — altered since.";
+                RecoverVerdict.Text = L10n.Fill(
+                    r.Verbatim ? "ns.who.by" : "ns.who.by.altered",
+                    AppState.Current.Language, ("id", pid));
                 RecoverVerdict.Foreground = new SolidColorBrush(r.Verbatim
                     ? Microsoft.UI.Colors.MediumSpringGreen
                     : Microsoft.UI.Colors.Orange);
-                RecoverCounts.Text =
-                    $"{r.MatchedWindows} of {r.StoredWindows} passages matched · "
-                  + $"similarity {r.Similarity}";
+                RecoverCounts.Text = L10n.Fill("ns.who.matched",
+                    AppState.Current.Language,
+                    ("matched", $"{r.MatchedWindows}"),
+                    ("stored", $"{r.StoredWindows}"))
+                  + $" · similarity {r.Similarity}";
                 RecoverDetail.Text = string.Join("  ", new[]
                 {
                     r.Display?.Line, r.Disclosure, r.Method,
@@ -578,7 +586,8 @@ public sealed partial class SettingsPage : Page
                 RecoverVerdict.Foreground = new SolidColorBrush(
                     Microsoft.UI.Colors.Gray);
                 RecoverCounts.Text = r.BestSimilarity is { } best && r.Threshold is { } th
-                    ? $"closest overlap {best}, below the {th} threshold for naming anyone"
+                    ? L10n.Fill("ns.who.below", AppState.Current.Language,
+                                ("best", $"{best}"), ("threshold", $"{th}"))
                     : "";
                 RecoverDetail.Text = r.Method ?? "";
             }

@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.57.7** ([changelog](CHANGELOG.md) ·
+**Current release: v0.57.8** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.57.8** | **The rows the guard skipped were the interesting ones** — the untranslated-literal check opened with `if "{" in english: continue`, so every row with a slot in it went unchecked for four releases. Those are most of what a screen says, and the sentence built around a value is the one a screen hand-builds. Twenty-seven sites: the whole provenance footer in English on the desktop and both phones, the watermark verdict, the objection status, the licence offer, the signing credential list. Slotted rows are compared by their fragments now; `native_dead_keys` 300 → 276 |
 | **0.57.7** | **The files the release never touched** — fifty-five cuts bumped `pyproject.toml`, `api.py`, `package.json`, the README banner and the changelog, and not one of them touched the three files the phones report their own version from. `MARKETING_VERSION` and `versionName` said `0.1.0`; the `.csproj` declared no version at all, so every Windows build since the shell was written reported `1.0.0`. A `versionCode` of `1` would have had the first Play upload refused outright. The same files carry what each shell is allowed to do, so those are checked here too |
 | **0.57.6** | **The half of the Windows shell that is not code** — 0.57.5 globbed `*.swift`, `*.kt` and `*.cs`, called that three shells and reported them parseable. The Windows shell's screens are XAML, and it never opened one. Two pages here carried `x:Name` twice on a single element, which no XML reader gets past; three more in JIM-mini. Four markup checks — well-formedness, one name per element, handlers that exist, controls the page declares — and the voice screen, read while fixing it, was printing seven sentences in English that its own table translates ten ways |
 | **0.57.5** | **Nothing here builds the phones, so nothing here noticed when they stopped** — 0.57.4 shipped a Swift compile error because every guard reads these sources as text and none of them parse. A duplicate-declaration and brace-balance check for Swift, Kotlin and C#, narrow by design: it does not promise the shells build, only that they lack the mistake that got past everything else |
