@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.58.9** ([changelog](CHANGELOG.md) ·
+**Current release: v0.59.0** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.59.0** | **A floor nobody raised** — two rounds found the same defect in two instruments, so this one swept every floor in the suite. 91 of them carried their own literal with no way to measure what they held, and every reachable one was decoration: l10n 10 against 945–961, path literals 40 against 1407, console call sites 200 against 429. `ratchets.py` is the convention — a floor plus the way to read the same quantity now — and the rest are held in a backlog that only shrinks |
 | **0.58.9** | **Ten against nine hundred and forty-five** — the L10n guard's floor has not moved since it was written: ten localizer calls, twenty table rows, against tables that now hold 1087–1115 rows and screens that make 945–961 calls. Narrowing the call pattern to `L10n.t("…")` blinds C# alone — Windows 945 → 52 — and 294 tests pass while the one failure names four rows as a backlog complaint. Per-shell floors on both halves, plus a spread across the three ports that needs no hand-chosen number |
 | **0.58.8** | **The route reader had one floor and four clients** — the console's extractor has been floored since it was the only client; the three shells had nothing. Blinding the iOS `request(` form drops it 430 → 11 call sites while `doorless` still reports zero, because the other clients cover for the blind one. Two floors now: an absolute one per client, and a spread across the three shells that needs no hand-chosen number |
 | **0.58.7** | **A wire model is data, and data has no methods** — every pin now asserts on both ends and three checks audit the readers themselves. The first run of that audit found a missing brace, not a reader bug: `SpecialistRow` was never closed and the `extension ApiClient` after it never opened, so ninety-five client methods were declared on a two-field wire model. Brace balance passed, the member check passed, the pins passed |

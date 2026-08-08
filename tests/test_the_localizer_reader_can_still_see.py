@@ -90,18 +90,17 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
 from .test_a_shell_asks_for_a_key_it_has import SHELLS, _asked, _held
 
 #: shell -> (floor under its extracted call sites, floor under its table rows).
-#: Measured, then set to about four-fifths — low enough not to trip on
-#: ordinary movement, high enough that a reader covering a fraction of the
-#: surface cannot pass. Per shell rather than one number, so a shell that
-#: genuinely grows can be raised on its own.
-FLOORS = {
-    "ios": (760, 860),
-    "android": (760, 890),
-    "windows": (750, 880),
-}
+#: The numbers themselves live in `ratchets.py`, which is what gets them
+#: audited against what they measure — 0.59.0's whole subject. Per shell
+#: rather than one number, so a shell that genuinely grows can be raised on
+#: its own.
+FLOORS = {shell: (ratchets.floor(f"l10n.asked.{shell}"),
+                  ratchets.floor(f"l10n.held.{shell}"))
+          for shell in ("ios", "android", "windows")}
 
 #: How far below the busiest shell the quietest may sit. The three are one
 #: client ported three times; see the docstring for the measured spreads.

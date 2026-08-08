@@ -1,0 +1,129 @@
+# status: backlog — 85 rows
+#
+# Every numeric floor in this suite still carrying its own literal: an
+# `assert <something> > <int>` with the number written into the assertion.
+#
+# ## What this counts, and why counting it is the point
+#
+# A floor answers one question every run — is the number satisfied — and that
+# is exactly the question that keeps passing after the number stops meaning
+# anything. Asking the second question, *is it still near what it measures*,
+# needs the measurement, and a literal inside an assertion has none attached.
+#
+#     asked     is the number satisfied
+#     mattered  is the number still near what it measures
+#
+# 0.58.8 found the route reader's floor was written when the console was the
+# only client. 0.58.9 found the localizer's was ten against nine hundred and
+# forty-five. Applying the same standard to everything reachable found that
+# every one of them had drifted below half:
+#
+#     l10n asked, per shell        10 against 945-961     ratio 0.01
+#     l10n held, per shell         20 against 1087-1115   ratio 0.02
+#     path literals, all surfaces  40 against 1407        ratio 0.03
+#     console call sites          200 against 429         ratio 0.47
+#
+# Those four are now in `ratchets.py`, registered with the way to measure the
+# same quantity, and audited every run. The rows below are what is left.
+#
+# ## How a row leaves this file
+#
+# Register it in `ratchets.py` with a `measure` callable and change the
+# assertion to `ratchets.floor("name")`. The sweep finds bare literals only,
+# so registering removes the row without anybody editing this list — and the
+# registered floor is then checked against reality on every run.
+#
+# Not every row here is wrong. Some of these numbers are small fixed
+# cardinalities that will never drift. Telling those apart from the decoration
+# requires knowing what each one measures, which is the work of registering
+# it, which is why they are counted rather than guessed at.
+#
+# The ceiling does not move up. A new bare floor is a new number nothing will
+# ever audit.
+#
+# ceiling: 85
+test_a_binding_is_not_a_door.py:134: len(found) > 20
+test_a_form_that_asks_for_it_has_a_label_for_it.py:128: controls > 10000
+test_a_form_that_asks_for_it_has_a_label_for_it.py:131: len(_asked_for()) >= 20
+test_a_memorial_does_not_keep_posting.py:160: len(found) >= 8
+test_a_native_binding_is_not_a_door_either.py:177: n > 20
+test_a_refusal_whose_english_is_not_a_constant.py:248: len(calls) >= 15
+test_a_screen_nothing_opens.py:170: len(found) >= 5
+test_a_shell_does_not_print_what_it_translated.py:350: len(_shown(spec)) > 100
+test_a_shell_does_not_print_what_it_translated.py:354: len(_fragments(spec)) >= 45
+test_error_report_carries_nothing_private.py:398: len(segments) > 30
+test_it_observes_and_talks.py:93: len(never[thing]) > 60
+test_nothing_leaves_the_host.py:161: len(sites) >= 5
+test_one_name_one_type_on_the_wire.py:134: len(_declared()) >= 400
+test_overlays.py:161: len(overlays.FACE_KINDS) >= 15
+test_seed_backfill.py:79: out['repaired'] >= 34
+test_spec_mined.py:147: conditioned['basis']['remembered_turns'] >= 12
+test_starter_profiles.py:15: len(industries) >= 30
+test_steering_hub.py:51: hub['age']['effective_age'] >= 41
+test_termination_revokes_more_than_the_owners_token.py:154: len(found) >= 7
+test_the_body_market.py:65: len(c['robots']) >= 30
+test_the_body_market.py:67: len(c['by_maker']) >= 15
+test_the_body_the_case_and_the_lobby.py:183: len(keys) >= 45
+test_the_body_the_native_clients_send.py:358: matched >= 155
+test_the_body_the_route_requires.py:246: len(writes) >= 185
+test_the_body_the_route_requires.py:247: len(readable) >= 155
+test_the_body_the_route_requires.py:254: len(models) >= 160
+test_the_body_the_route_requires.py:264: matched >= 150
+test_the_crowd_the_couch_and_the_loan.py:206: len(keys) >= 45
+test_the_desktop_and_the_phone_say_different_things.py:302: len(shared) > 120
+test_the_face_it_shows_the_world.py:251: len(keys) >= 43
+test_the_files_the_release_never_touched.py:230: len(sorted(REPO.glob('native/ios/Sources/**/*.swift'))) >= 40
+test_the_files_the_release_never_touched.py:231: len(sorted(REPO.glob('native/android/**/*.kt'))) >= 10
+test_the_key_the_server_never_sends.py:221: len(vocabulary) >= 500
+test_the_keys_the_android_client_reads.py:359: len(reads) >= 165
+test_the_keys_the_android_client_reads.py:360: sum((len(k) for _, k in reads)) >= 370
+test_the_keys_the_android_client_reads.py:383: len(driven) >= 80
+test_the_keys_the_till_and_the_lifeline.py:140: client.post('/auth/oauth/nobody/start', json={}).status_code >= 400
+test_the_keys_the_till_and_the_lifeline.py:284: len(keys) >= 40
+test_the_last_doors.py:247: len(keys) >= 42
+test_the_member_that_isnt_there.py:230: len(_declared(lang, REPO / decl)) >= 5
+test_the_member_that_isnt_there.py:239: len(keys) >= 12
+test_the_member_that_isnt_there.py:240: len(used) >= 10
+test_the_nav_is_translated_and_nothing_behind_it_is.py:227: len(nav) >= 40
+test_the_nav_is_translated_and_nothing_behind_it_is.py:253: len(nav_ids) >= 40
+test_the_objector_cannot_read_their_own_case.py:151: len(handlers) >= 8
+test_the_place_the_camera_the_org_and_the_tour.py:134: len(keys) >= 44
+test_the_platform_refuses_in_one_language.py:183: len(i18n._REFUSALS) >= 9
+test_the_readme_says_what_shipped.py:127: len(_rows()) >= 40
+test_the_readme_says_what_shipped.py:130: len(_released()) >= 40
+test_the_record_the_veil_and_the_exit.py:266: len(keys) >= 40
+test_the_refusal_has_somewhere_to_send_you.py:187: app.count('onPlans={toPlans}') >= 20
+test_the_refusal_names_the_field_on_the_form.py:104: len(found) >= 200
+test_the_refusal_that_handed_the_body_back.py:156: len(found) > 150
+test_the_refusal_that_handed_the_body_back.py:160: reached > 100
+test_the_refusal_that_handed_the_body_back.py:275: len(i18n._VALIDATION) >= 10
+test_the_seal_the_mail_and_the_screen.py:282: len(keys) >= 46
+test_the_shape_the_client_expects.py:306: len(driven) >= 30
+test_the_shape_the_client_expects.py:318: len(_bindings()) >= 150
+test_the_shape_the_client_expects.py:319: len(names) >= 490
+test_the_shape_the_console_expects.py:404: len(shapes) >= 240
+test_the_shape_the_console_expects.py:405: sum((len(f) for f in shapes.values())) >= 1700
+test_the_shape_the_console_expects.py:406: len(_gets()) >= 190
+test_the_shape_the_console_expects.py:456: len(driven) >= 60
+test_the_shape_the_swift_client_expects.py:218: len(_structs()) >= 200
+test_the_shape_the_swift_client_expects.py:219: fields >= 900
+test_the_shape_the_swift_client_expects.py:220: len(_bindings()) >= 150
+test_the_shape_the_swift_client_expects.py:227: len(driven) >= 25
+test_the_shells_still_parse.py:363: len(SWIFT) >= 40
+test_the_shells_still_parse.py:364: len(KOTLIN) >= 10
+test_the_shells_still_parse.py:365: len(CSHARP) >= 25
+test_the_shells_still_parse.py:375: len(XAML) >= 20
+test_the_shells_still_parse.py:378: named >= 900
+test_the_shells_still_parse.py:380: checked >= 340
+test_the_shells_still_parse.py:382: driven >= 780
+test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
+test_the_starters_know_their_trade.py:140: len(tags) >= 8
+test_the_starters_know_their_trade.py:69: len(d['expertise']) >= 350
+test_the_starters_know_their_trade.py:72: len(d['services']) >= 250
+test_the_sticker_the_queue_and_the_stamp.py:283: len(keys) >= 34
+test_the_stranger_has_a_language_too.py:118: len(keys) > 15
+test_the_strangers_language_on_a_phone.py:427: len(text) > 800
+test_the_tabs_are_translated_and_the_screens_are_not.py:448: english + calls >= 50
+test_the_tabs_are_translated_and_the_screens_are_not.py:637: len(rows) >= 10
+test_the_workshop_in_the_pocket.py:268: len(keys) >= 49
+test_two_questions_a_mark_answers.py:196: len(why) > 40
