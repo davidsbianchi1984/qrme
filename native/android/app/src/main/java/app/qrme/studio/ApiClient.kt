@@ -3771,6 +3771,9 @@ object ApiClient {
                         java.net.URLEncoder.encode(filename, "UTF-8")
             val conn = (java.net.URL("$base/profiles/$id/media" + q)
                 .openConnection() as java.net.HttpURLConnection).apply {
+                    // The second connection in this file, and the one the
+                    // shared helper's accept-language line never reached.
+                    setRequestProperty("accept-language", L10n.deviceLanguage())
                 requestMethod = "POST"
                 setRequestProperty("authorization", "Bearer $token")
                 doOutput = true

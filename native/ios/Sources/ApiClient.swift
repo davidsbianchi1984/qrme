@@ -712,6 +712,20 @@ actor ApiClient {
         if let u = URL(string: s.hasSuffix("/") ? String(s.dropLast()) : s) { base = u }
     }
 
+    /// Every request this client sends that does not go through `request`,
+    /// and the one place the reader's language is attached to it.
+    ///
+    /// Three calls in this file built their own `URLRequest` — the licence
+    /// unlist, the media upload, the raw reads — and set only
+    /// `authorization`. A token that has expired is not a principal, so the
+    /// refusal those calls draw falls back to the header, and the header was
+    /// not there. A funnel only funnels what goes into it.
+    private func dispatch(_ req: URLRequest) async throws -> (Data, URLResponse) {
+        var req = req
+        req.setValue(L10n.deviceLanguage, forHTTPHeaderField: "accept-language")
+        return try await URLSession.shared.data(for: req)
+    }
+
     private func request<T: Decodable>(_ path: String, method: String = "GET",
                                        body: [String: Any]? = nil, token: String? = nil,
                                        query: [String: String]? = nil) async throws -> T {
@@ -1288,7 +1302,7 @@ actor ApiClient {
     func removeListing(lid: String) async throws {
         var req = URLRequest(url: base.appendingPathComponent("/marketplace/listings/\(lid)"))
         req.httpMethod = "DELETE"
-        let (_, resp) = try await URLSession.shared.data(for: req)
+        let (_, resp) = try await dispatch(req)
         guard let http = resp as? HTTPURLResponse,
               (200..<300).contains(http.statusCode) else {
             throw ApiError.http("remove failed")
@@ -1311,7 +1325,7 @@ actor ApiClient {
         var req = URLRequest(url: base.appendingPathComponent("/profiles/\(id)/license"))
         req.httpMethod = "DELETE"
         req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
-        let (_, resp) = try await URLSession.shared.data(for: req)
+        let (_, resp) = try await dispatch(req)
         guard let http = resp as? HTTPURLResponse,
               (200..<300).contains(http.statusCode) else {
             throw ApiError.http("unlist failed")
@@ -4318,7 +4332,7 @@ struct SpecialistRow: Decodable {
         req.httpMethod = "POST"
         req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
         req.httpBody = data
-        let (out, resp) = try await URLSession.shared.data(for: req)
+        let (out, resp) = try await dispatch(req)
         guard let http = resp as? HTTPURLResponse,
               (200..<300).contains(http.statusCode) else {
             throw ApiError.http("upload failed")
