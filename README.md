@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.59.6** ([changelog](CHANGELOG.md) ·
+**Current release: v0.59.7** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.59.7** | **`req<T>` is a cast, and a cast is a claim nothing checks** — a route answers with a shape and a screen declares one, and between them sits a TypeScript generic the compiler cannot verify against anything: the body arrives through `JSON.parse`, which is `any`. Next door two screens declared an array where the route answers an object and threw `.map is not a function` during render. This console agrees on all 422 typed calls; the guard is here so it stays that way |
 | **0.59.6** | **The clients agreed with each other and were all wrong** — parity between clients is a relative check, and a relative check is satisfied by everybody being equally wrong. Next door a vault under customer custody required `x-tenant-key` on every record route and no client sent it, so pressing *hold our own key* locked all four clients out — including out of the button that undoes it. The new guard reads the requirement out of the **application's** dependency tree, then asks each client only about the routes it actually calls |
 | **0.59.5** | **The third sink, where both the escaping and the policy miss** — inside a `<script>` the HTML parser ends the element at the first `</script`, whatever the JavaScript quoting says, so a value can close the page's own nonced script and everything after it is markup. This product's `_js` composed both escapers correctly; the siblings' were bare `json.dumps`. All three now share one primitive, and every value entering a script is checked to pass through it. The consoles were swept too and are clean — no `dangerouslySetInnerHTML`, `innerHTML`, `eval` — now a floor |
 | **0.59.4** | **The sweep that found the last one, kept** — 0.59.3 found reflected XSS by walking every f-string that builds markup, by hand, once, and throwing the walk away. It is now a guard with a ratcheted record: **8 rows**, all pre-escaped composites the analysis cannot follow. It follows escaping through single assignments and helper returns (32 rows → 8 without it) and refuses to read `http://localhost:<port>` as a page. Put 0.59.3's defect back and it names the file, the line and the expression |
