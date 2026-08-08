@@ -159,7 +159,8 @@ struct MindSection: View {
                     run {
                         let o = try await ApiClient.shared.finetune(
                             id: state.pid!, token: state.token!)
-                        line = o.status ?? "\(o.examples ?? 0)"
+                        line = "\(o.messages_processed ?? 0) · "
+                             + (o.computed ?? "")
                     }
                 }.font(.caption).disabled(busy)
             }

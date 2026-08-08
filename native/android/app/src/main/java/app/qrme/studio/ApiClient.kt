@@ -2351,7 +2351,7 @@ object ApiClient {
         val o = JSONObject(request("/places/$surface/$surfaceId/overlay",
             token = token))
         val out = mutableListOf<String>()
-        o.optJSONArray("worn")?.let { a ->
+        o.optJSONArray("overlays")?.let { a ->
             for (i in 0 until a.length()) {
                 val w = a.getJSONObject(i)
                 out.add(w.optString("interactor_id") + " · " +
@@ -2699,7 +2699,7 @@ object ApiClient {
     /** The dock is read-only, so every face carries a way out of it. */
     suspend fun dockWhere(face: String): String {
         val o = JSONObject(request("/dock/where/$face"))
-        return o.optString("screen") + " · " + o.optString("tab")
+        return o.optString("screen") + " · " + o.optString("title")
     }
 
     suspend fun dockSettings(profileId: String, token: String): String {
@@ -3543,7 +3543,7 @@ object ApiClient {
     suspend fun oauthStart(provider: String): Pair<String, String> {
         val o = JSONObject(request("/auth/oauth/$provider/start", "POST",
             JSONObject()))
-        return o.optString("state") to o.optString("authorize_url")
+        return o.optString("state") to o.optString("url")
     }
 
     /** One-time pickup; the first successful claim spends the state. */
@@ -3890,7 +3890,8 @@ object ApiClient {
     suspend fun finetune(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/finetune", "POST",
             JSONObject(), token))
-        return o.optString("status", o.optInt("examples").toString())
+        return o.optInt("messages_processed").toString() + " · " +
+            o.optString("computed")
     }
 
     /** Exactly what would leave, and the log of what already has. */

@@ -95,7 +95,7 @@ struct PlaceSection: View {
                         let d = try await ApiClient.shared.wornOverlays(
                             surface: surface, surfaceId: surfaceId,
                             token: state.token!)
-                        wornList = d.worn ?? []
+                        wornList = d.overlays ?? []
                     }
                 }.disabled(busy || surfaceId.isEmpty)
             }.font(.caption)
@@ -368,7 +368,7 @@ struct TourSection: View {
                 Button(L10n.t("tut.outline", state.language)) {
                     run {
                         let o = try await ApiClient.shared.tutorialOutline()
-                        chapters = o.chapters ?? o.lessons ?? []
+                        chapters = o.chapters ?? []
                     }
                 }
                 Button(L10n.t("tut.start", state.language)) {

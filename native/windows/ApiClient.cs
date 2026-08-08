@@ -3813,7 +3813,8 @@ public record MyGrants(
     [property: JsonPropertyName("lending")] GrantCard[]? Lending,
     [property: JsonPropertyName("borrowing")] GrantCard[]? Borrowing);
 
-public record LeaveOut([property: JsonPropertyName("left")] bool? Left);
+public record LeaveOut([property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("members")] PartyMember[]? Members);
 
 public record WhoseCard(
     [property: JsonPropertyName("display_name")] string? DisplayName,
@@ -3936,7 +3937,8 @@ public record LobbySeatRow(
 public record LobbyRoster(
     [property: JsonPropertyName("members")] LobbySeatRow[]? Members);
 
-public record LobbyLeft([property: JsonPropertyName("left")] bool? Left);
+public record LobbyLeft([property: JsonPropertyName("seated")] bool? Seated,
+    [property: JsonPropertyName("id")] string? Id);
 
 public record LobbyContext(
     [property: JsonPropertyName("note")] string? Note);
@@ -4643,9 +4645,9 @@ public record FeedbackOut(
 
 public record ReferralRow(
     [property: JsonPropertyName("id")] string? Id,
-    [property: JsonPropertyName("specialist_profile_id")]
-    string? SpecialistProfileId,
-    [property: JsonPropertyName("opened")] bool? Opened);
+    [property: JsonPropertyName("provider_id")] string? ProviderId,
+    [property: JsonPropertyName("released")] bool? Released,
+    [property: JsonPropertyName("opened_at")] string? OpenedAt);
 
 public record LicenseGrantOut(
     [property: JsonPropertyName("id")] string? Id,

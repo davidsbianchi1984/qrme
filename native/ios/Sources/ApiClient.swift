@@ -2153,7 +2153,7 @@ extension ApiClient {
 
     /// The caller's own way out — theirs to press, not the desk's.
     func leaveDesk(deskId: String, token: String) async throws {
-        struct Ok: Decodable { let left: Bool? }
+        struct Ok: Decodable {}
         let _: Ok = try await request("/desks/\(deskId)/guests/me",
                                       method: "DELETE", token: token)
     }
@@ -2262,7 +2262,7 @@ extension ApiClient {
     }
 
     func clearListingOffer(listingId: String, token: String) async throws {
-        struct Ok: Decodable { let cleared: Bool? }
+        struct Ok: Decodable {}
         let _: Ok = try await request(
             "/marketplace/listings/\(listingId)/offer", method: "DELETE",
             token: token)
@@ -2580,7 +2580,7 @@ extension ApiClient {
 
     func leaveParty(partyId: String, memberId: String,
                     token: String) async throws {
-        struct Out: Decodable { let left: Bool? }
+        struct Out: Decodable {}
         let _: Out = try await request(
             "/watch-parties/\(partyId)/members/\(memberId)",
             method: "DELETE", token: token)
@@ -2728,7 +2728,7 @@ struct WornDisclosure: Decodable {
         let title: String?
         var id: String { interactor_id ?? "?" }
     }
-    let worn: [Worn]?
+    let overlays: [Worn]?
 }
 
 struct CameraVocabulary: Decodable {
@@ -2740,8 +2740,9 @@ struct CameraSession: Decodable {
     let id: String?
     let subject: String?
     let state: String?
-    let record: Bool?
-    let ends_at: String?
+    let recording: Bool?
+    let minutes: Int?
+    let opened_at: String?
     var identity: String { id ?? "?" }
 }
 
@@ -2772,7 +2773,6 @@ struct TutorialOutline: Decodable {
         var id: String { key ?? title ?? "?" }
     }
     let chapters: [Chapter]?
-    let lessons: [Chapter]?
 }
 
 struct TutorialStep: Decodable {
@@ -2801,7 +2801,7 @@ extension ApiClient {
     func takeBackMicrophone(surface: String, surfaceId: String,
                             interactorId: String,
                             token: String) async throws {
-        struct Out: Decodable { let taken_back: Bool? }
+        struct Out: Decodable {}
         let _: Out = try await request(
             "/places/\(surface)/\(surfaceId)/microphone", method: "DELETE",
             body: ["interactor_id": interactorId], token: token)
@@ -2825,7 +2825,7 @@ extension ApiClient {
 
     func takeOffOverlay(surface: String, surfaceId: String,
                         interactorId: String, token: String) async throws {
-        struct Out: Decodable { let taken_off: Bool? }
+        struct Out: Decodable {}
         let _: Out = try await request(
             "/places/\(surface)/\(surfaceId)/overlay", method: "DELETE",
             body: ["interactor_id": interactorId], token: token)
@@ -3160,7 +3160,7 @@ extension ApiClient {
 
     func leaveLobby(sessionId: String, memberId: String,
                     token: String) async throws {
-        struct Out: Decodable { let left: Bool? }
+        struct Out: Decodable {}
         let _: Out = try await request(
             "/gaming/sessions/\(sessionId)/lobby", method: "DELETE",
             body: ["member_id": memberId], token: token)
@@ -3353,7 +3353,7 @@ extension ApiClient {
 
     func takeBackRoomMic(roomId: String, interactorId: String,
                          token: String) async throws {
-        struct Out: Decodable { let taken_back: Bool? }
+        struct Out: Decodable {}
         let _: Out = try await request(
             "/rooms/\(roomId)/mic/\(interactorId)", method: "DELETE",
             token: token)
@@ -3385,7 +3385,7 @@ extension ApiClient {
     }
 
     func takeDownDisplay(displayId: String, token: String) async throws {
-        struct Out: Decodable { let taken_down: Bool? }
+        struct Out: Decodable {}
         let _: Out = try await request("/displays/\(displayId)",
                                        method: "DELETE", token: token)
     }
@@ -4837,8 +4837,11 @@ struct OAuthProviderList: Decodable {
 }
 
 struct OAuthStartOut: Decodable {
-    let authorize_url: String?
+    let provider: String?
     let state: String?
+    // The provider's authorize endpoint. Named `url` on the
+    // wire; a shell that reads `authorize_url` gets nil and opens nothing.
+    let url: String?
 }
 
 struct OAuthClaimOut: Decodable {
@@ -5133,8 +5136,10 @@ struct SimulationOut: Decodable {
 
 struct FinetuneOut: Decodable {
     let id: String?
-    let status: String?
-    let examples: Int?
+    let interactors: Int?
+    let messages_processed: Int?
+    let external_transmission: Bool?
+    let computed: String?
 }
 
 struct ContributionView: Decodable {
@@ -5177,8 +5182,11 @@ struct FeedbackOut: Decodable {
 
 struct ReferralRow: Decodable {
     let id: String?
-    let specialist_profile_id: String?
-    let opened: Bool?
+    let provider_id: String?
+    let released: Bool?
+    // A timestamp, not a flag: the row says *when* it was
+    // read, and `nil` is the not-yet.
+    let opened_at: String?
 }
 
 struct LicenseGrantOut: Decodable {

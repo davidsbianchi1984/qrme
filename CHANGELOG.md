@@ -4,6 +4,80 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.3] — 2026-08-08
+
+### The key the server never sends
+
+0.58.2 closed by naming where the seam goes next. The receivers whose type is
+known for free are checked now; the tier past them is the receiver whose
+members are *keyed* rather than named — `optString("worn")`,
+`GetProperty("mode")`, a `Decodable` property whose name **is** the wire key.
+A renamed backend field is the same silent break as a renamed method, except
+it does not fail on a build machine. It fails on a phone, as an empty list or
+a nil string, and the screen renders as though the server had nothing to say.
+
+Matching a key to the route it came from needs a type checker this machine
+does not have. Matching it to the backend's whole vocabulary does not, so the
+guard asks only what it can answer honestly:
+
+```
+is this key one the server can emit anywhere at all
+```
+
+Four live breaks, each of them a screen that renders empty:
+
+* `GET /places/{surface}/{id}/overlay` answers with `overlays`. The iPhone and
+  the Android read `worn`. That is the disclosure naming who in a place is
+  wearing a face over their camera — the reason the feature is allowed at all
+  — and on both phones it was always the empty list.
+* `POST /auth/oauth/{provider}/start` answers with `url`. Both phones read
+  `authorize_url`, got nil, and had nothing to open. **Sign in with Google and
+  Apple could not start on either.**
+* `/dock/where/{face}` answers with `screen`, `path` and `title`. The Android
+  helper printed `screen · tab`, so half of every *where does this live*
+  answer was blank.
+* `/interactors/{id}/referrals` answers with `provider_id` and `opened_at`.
+  All three shells read `specialist_profile_id` and a boolean `opened`.
+
+Windows had the overlay, the sign-in and the fine-tuning run right and the
+referral wrong; the iPhone had all four wrong. There is no shell that is
+reliably the correct one, which is the argument for checking all three.
+
+### Added
+
+- `test_the_key_the_server_never_sends.py`, in all three products: every key
+  a shell decodes must be one the backend can put on a response — read from
+  all four places a key reaches the wire (a dict literal, a key assigned after
+  the dict is built, a model field, and `dict(row)`, which makes every column
+  a key).
+
+### Fixed
+
+- The overlay disclosure on iPhone and Android reads `overlays`. It was
+  reading `worn`, and showing nobody.
+- Sign in with Google and Apple on iPhone and Android reads `url`. It was
+  reading `authorize_url`, and opening nothing.
+- The Android helper's *where does this live* line reads `title`, not `tab`.
+- The referral list on all three shells reads `provider_id` and `opened_at`.
+- The fine-tuning run on iPhone and Android reads the metrics the route
+  returns rather than a `status` and an `examples` count it never had.
+- Nine `Decodable` structs whose result is discarded named keys the routes do
+  not send. Nothing read them, so nothing broke — they were documentation of a
+  wire shape that was never true, and they are empty structs now.
+
+### The traps it walked into first
+
+Three, all in the reader. A regex that ends a struct at the first `\n}`
+swallows everything after a nested one, and `CustodyProvenance` has three.
+`var stands: Bool { valid ?? verified ?? false }` is a computed property and
+`let _: Ok = try await …` is a discarded binding; neither is a key.
+`case profileId = "profile_id"` renames it, so reporting `profileId` reports
+the shell's own spelling as the server's. And a fourth in the vocabulary
+rather than the reader: reading only dict literals reported some sixty fields
+that are on the wire every day.
+
+Suites: **1542 + 1518 = 3,060** across 216 files.
+
 ## [0.58.2] — 2026-08-08
 
 ### The colour that wasn't in the palette

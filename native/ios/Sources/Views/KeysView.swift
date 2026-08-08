@@ -113,7 +113,7 @@ struct KeysSection: View {
                                 provider: first.provider)
                             oauthState = s.state ?? ""
                             line = first.provider + " · "
-                                 + (s.authorize_url ?? "—")
+                                 + (s.url ?? "—")
                         } else { line = "—" }
                     }
                 }.font(.caption).disabled(busy)
