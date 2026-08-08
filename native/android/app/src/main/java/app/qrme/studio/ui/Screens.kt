@@ -6160,7 +6160,7 @@ fun ProblemReportingCard(lang: String) {
         (0 until (arr?.length() ?: 0)).mapNotNull { arr?.optJSONObject(it) }
     }
 
-    Card(colors = CardDefaults.cardColors(containerColor = Qrme.Card2)) {
+    Card(colors = CardDefaults.cardColors(containerColor = Qrme.Card)) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("ns.pr", lang), style = MaterialTheme.typography.titleSmall)
 

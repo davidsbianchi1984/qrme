@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.58.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.58.2** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.58.2** | **The colour that wasn't in the palette** — 0.58.1 checked the one receiver whose type is known for free; this checks all eight. The Android problem-report card painted itself with `Qrme.Card2` on a theme that declares `Card` and never a second, which Compose does not compile. The API clients came back clean across 1,613 call sites, and are asserted anyway |
 | **0.58.1** | **The member that isn't there** — with no Swift, Kotlin or C# compiler here, the native UI is checked by reading; this takes the next class of compile error that reading can catch. Each shell has one object the screens read their session from and one file declaring it, so a member it does not declare is not a style question. Clean in this product; the sibling shells had thirty-nine call sites that do not compile |
 | **0.58.0** | **The key the phones never carried** — auditing every header the console attaches to every request turned up one the shells do not send at all: `x-llm-api-key`, the person's own model key, pasted into the console since 0.4.3 and read by the backend per request. A key set on the desktop ran the desktop; the phone quietly ran the deployment's — same account, two credentials, nothing saying so. All three shells now hold one, offer a field for it under the console's own words, and send it |
 | **0.57.9** | **A funnel only funnels what goes into it** — comparing the three test directories turned up a guard that existed in the other two products and not in this one, the product whose whole premise is speaking in a person's language. Porting it exposed what it could not ask: **21 of 22 Windows sends, 3 of 4 on iOS and 1 of 2 on Android built their own request beside the shared helper** and carried no `Accept-Language`, so every refusal they drew from an expired token arrived in English. One dispatcher per shell, and a check that walks dispatch sites rather than header lines |
