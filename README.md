@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.59.1** ([changelog](CHANGELOG.md) ·
+**Current release: v0.59.2** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.59.2** | **A crash the browser threw away** — an unhandled 500 is rendered by Starlette *outside* every middleware the app adds, including CORS, so it went back with no `access-control-allow-origin` and the browser discarded it whole. Every crash reached its user as "Failed to fetch", indistinguishable from a backend that is not running. No in-process test could see it: a `TestClient` sends no `Origin` and applies no browser rule. Fixed with a catch-all inside the CORS layer, and guarded by a file that boots a real server |
 | **0.59.1** | **Three suites, and nothing comparing what they ask** — every guard here exists in three copies and the copies drift silently. A sweep of test-function names found 370 carried by all three and 140 by exactly two. Four of those were one defect in PDI. The shared vocabulary and the divergences are now written down, byte-identical in all three repos, so each product checks its own half with no sibling checkout — plus the live three-way comparison when they are on disk |
 | **0.59.0** | **A floor nobody raised** — two rounds found the same defect in two instruments, so this one swept every floor in the suite. 91 of them carried their own literal with no way to measure what they held, and every reachable one was decoration: l10n 10 against 945–961, path literals 40 against 1407, console call sites 200 against 429. `ratchets.py` is the convention — a floor plus the way to read the same quantity now — and the rest are held in a backlog that only shrinks |
 | **0.58.9** | **Ten against nine hundred and forty-five** — the L10n guard's floor has not moved since it was written: ten localizer calls, twenty table rows, against tables that now hold 1087–1115 rows and screens that make 945–961 calls. Narrowing the call pattern to `L10n.t("…")` blinds C# alone — Windows 945 → 52 — and 294 tests pass while the one failure names four rows as a backlog complaint. Per-shell floors on both halves, plus a spread across the three ports that needs no hand-chosen number |

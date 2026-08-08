@@ -12,6 +12,7 @@ Endpoints live in ``qrme/routers/``:
 
 from __future__ import annotations
 
+import logging
 import os
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
@@ -47,6 +48,10 @@ from .routers import (accounts as account_routes,
                       watch, watchparty, watermarks)
 
 
+#: The unhandled-error path logs here and nowhere else: the traceback
+#: stays on this machine, and what leaves is a status and a sentence.
+_log = logging.getLogger(__name__)
+
 def create_app(pdi_client: PDIClient | None = None,
                cloud_client: CloudModelClient | None = None) -> FastAPI:
     # The membership gate is an application-wide dependency rather than a call
@@ -54,7 +59,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="0.59.1",
+    app = FastAPI(title="QRME", version="0.59.2",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -174,17 +179,6 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(commerce.router)
     app.include_router(audience.router)
 
-    # Optional CORS for a packaged desktop/mobile front-end that calls the API
-    # from a different origin (e.g. the Electron app in app/). Off by default;
-    # set QRME_CORS_ORIGINS to a comma-separated allowlist, or "*" for any.
-    origins = os.environ.get("QRME_CORS_ORIGINS")
-    if origins:
-        from fastapi.middleware.cors import CORSMiddleware
-        allow = ["*"] if origins.strip() == "*" else [
-            o.strip() for o in origins.split(",") if o.strip()]
-        app.add_middleware(
-            CORSMiddleware, allow_origins=allow, allow_credentials=False,
-            allow_methods=["*"], allow_headers=["*"])
 
     # Every refusal, in the language of whoever is reading it.
     #
@@ -343,6 +337,66 @@ def create_app(pdi_client: PDIClient | None = None,
         seed_mod.repair()
     except Exception:
         pass
+
+    # A failure the console can read.
+    #
+    # An unhandled exception is rendered by Starlette's `ServerErrorMiddleware`,
+    # which sits *outside* every middleware this factory adds — including CORS.
+    # So a 500 went back to a browser with no `access-control-allow-origin`, the
+    # browser dropped the whole response, and the console reported a network
+    # error. Measured over HTTP at 0.59.2, in all three products:
+    #
+    #     GET /health   200   access-control-allow-origin: *
+    #     a 500         500   access-control-allow-origin: None
+    #
+    # No in-process test could see it: a `TestClient` never sends an `Origin`
+    # and never runs the browser's rule. And the consequence is worse here than
+    # the missing header suggests — this estate's consoles distinguish "the
+    # backend is unreachable" from "the backend refused", and a 500 the browser
+    # discards is indistinguishable from the first. The version-mismatch guard
+    # and the problem reporter both read a failure that never arrives.
+    #
+    # Registering `@app.exception_handler(Exception)` does not fix it: Starlette
+    # hands that handler to `ServerErrorMiddleware`, which is still outside the
+    # CORS layer. It has to be a middleware, and it has to sit *inside* CORS —
+    # which is why the CORS block below is the last one added.
+    #
+    #     asked     does the server answer when a route fails
+    #     mattered  does the answer reach the reader
+    #
+    # The body says nothing about what broke. The traceback is logged here and
+    # stays here; what leaves is a status and a sentence, which is the same
+    # posture every other refusal in this product takes.
+    @app.middleware("http")
+    async def _a_failure_the_console_can_read(request: Request, call_next):
+        try:
+            return await call_next(request)
+        except Exception:
+            _log.exception("unhandled error on %s %s",
+                           request.method, request.url.path)
+            return JSONResponse(
+                status_code=500,
+                content={"detail": "server_error",
+                         "message": "Something went wrong on our side. "
+                                    "Nothing you sent was recorded."})
+
+    # Last on purpose, and this is load-bearing. `add_middleware` inserts at
+    # the front, so the middleware registered last is the outermost — and CORS
+    # has to be outside the catch-all above, or the 500 it builds goes back
+    # without the header again. The three products used to disagree about this
+    # ordering: two added CORS before their request-scoped middleware and one
+    # after, which nothing was comparing.
+    # Optional CORS for a packaged desktop/mobile front-end that calls the API
+    # from a different origin (e.g. the Electron app in app/). Off by default;
+    # set QRME_CORS_ORIGINS to a comma-separated allowlist, or "*" for any.
+    origins = os.environ.get("QRME_CORS_ORIGINS")
+    if origins:
+        from fastapi.middleware.cors import CORSMiddleware
+        allow = ["*"] if origins.strip() == "*" else [
+            o.strip() for o in origins.split(",") if o.strip()]
+        app.add_middleware(
+            CORSMiddleware, allow_origins=allow, allow_credentials=False,
+            allow_methods=["*"], allow_headers=["*"])
 
     return app
 
