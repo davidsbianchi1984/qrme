@@ -116,6 +116,46 @@ lives in — no cross-module inference:
   statement.
 * `list(_PROGRAMS.values())` and a module table written as a dict
   comprehension, which is how PDI's compliance catalogue is built.
+
+## Auditing the reader, and what that turned up
+
+0.58.6 injected a defect into PDI's `ComplianceProgram` and this file did not
+fail. PDI writes `struct X: Decodable { let a: T; let b: T }` on one line and
+the property pattern required end-of-line, so the reader saw that struct as
+**empty** — and an empty set is a subset of anything, so the pin had passed
+against nothing for a release.
+
+Every pin now asserts on both ends: the model read something, and what it read
+shares at least one key with the contract. Deliberately not a size floor —
+`MicPlacesOut` and `ChainState` are honest one-property wrappers. Three more
+checks read the readers themselves against a second opinion: every struct whose
+conformance list mentions `Decodable` must be one `_STRUCT` can see, every C#
+record must survive paren-matching, and every property the language declares
+must be one the property pattern finds. A reader that goes blind is
+indistinguishable from a guard that is holding.
+
+### What the second opinion found on its first run
+
+Not a reader bug. A missing brace.
+
+`struct SpecialistRow: Decodable {` was never closed, and the
+`extension ApiClient {` that should have followed it was never opened.
+**Ninety-five client methods** — the whole *face it shows the world* block,
+avatar through experience — were declared as members of a two-field wire model
+rather than on the client. Every screen calling `ApiClient.shared.avatar(…)`
+had nothing to call.
+
+Three guards were in a position to see it and none did. Brace *balance*
+(0.57.5) passed: the file balances perfectly, one brace simply belongs to the
+wrong opener. The member check (0.58.1) passed: the methods are in
+`ApiClient.swift`, just nested inside a struct. This file's own pins passed:
+`SpecialistRow` is not pinned. What gave it away was a check written to audit
+the reader rather than the code — and what it caught was the thing nobody had
+thought to assert, because it is too obviously true to say out loud:
+
+    a wire model is data, and data has no methods
+
+That assertion is here now, and it costs one line to run.
 """
 
 from __future__ import annotations
@@ -568,9 +608,186 @@ def test_at_least_one_end_of_every_pin_is_present():
     csharp = _csharp_models(_code(REPO / WINDOWS))
     kotlin = _kotlin_functions(_code(REPO / ANDROID))
     for model, *_rest in PINS:
-        assert model in swift or model.split(".")[-1] in csharp, model
+        found = [k for k in (swift.get(model),
+                             csharp.get(model.split(".")[-1])) if k]
+        assert found, f"{model}: no shell declares it, or both read as empty"
     for func_name, _shapes in KOTLIN_PINS:
         assert func_name in kotlin, func_name
+
+
+def test_no_pin_reads_an_empty_or_unrelated_model():
+    """The hole 0.58.6 fell into, closed.
+
+    A model the reader parses as **empty** passes every comparison there is —
+    an empty set is a subset of anything — so a pin whose reader has gone
+    blind looks exactly like a pin that is holding. PDI's one-line structs
+    were read that way for a whole release, and the round that caught it
+    caught it by injecting, not by running.
+
+    Two floors, and neither of them is a size:
+
+        it read something         an empty model is a blind reader
+        it read the right thing   a model sharing no key with the contract
+                                  is reading some other shape entirely
+
+    Deliberately *not* `len(keys) >= 2`. `MicPlacesOut` and `ChainState` are
+    honest one-property wrappers, and a floor that called those defects would
+    be this file inventing work.
+    """
+    swift = _swift_models(_code(REPO / IOS))
+    csharp = _csharp_models(_code(REPO / WINDOWS))
+    blind = []
+    for model, module, func, container in PINS:
+        sent = contract(module, func, container)
+        for shell, models in (("ios", swift), ("windows", csharp)):
+            name = model if shell == "ios" else model.split(".")[-1]
+            if name not in models:
+                continue
+            keys = models[name]
+            if not keys:
+                blind.append(f"{shell}: {model} read as empty — the reader "
+                             f"cannot see this declaration")
+            elif not (keys & sent):
+                blind.append(f"{shell}: {model} reads {sorted(keys)}, and "
+                             f"{PKG}/{module}.py:{func} sends {sorted(sent)} "
+                             f"— not one key in common")
+    assert not blind, "\n    ".join([""] + blind) + (
+        "\n  A pin that reads nothing is a pin that checks nothing.")
+
+
+def test_no_kotlin_pin_reads_nothing():
+    """Same floor on the half that has no models to read."""
+    functions = _kotlin_functions(_code(REPO / ANDROID))
+    blind = []
+    for func_name, shapes in KOTLIN_PINS:
+        keys = functions.get(func_name) or set()
+        allowed: set[str] = set()
+        for row in shapes:
+            allowed |= contract(*row)
+        if not keys:
+            blind.append(f"android: {func_name} reads no keys at all")
+        elif not (keys & allowed):
+            blind.append(f"android: {func_name} reads {sorted(keys)} and "
+                         f"shares nothing with {sorted(allowed)}")
+    assert not blind, "\n    ".join([""] + blind)
+
+
+# --- the readers themselves, checked against a second opinion ---------------
+
+def test_the_swift_reader_sees_every_decodable_struct():
+    """`_STRUCT` matches a one-line declaration. A struct that spreads its
+    conformance list over two lines would be invisible — and invisible is
+    indistinguishable from correct, which is the whole lesson of 0.58.6."""
+    src = _code(REPO / IOS)
+    seen = {m.group(1) for m in _STRUCT.finditer(src)}
+    missed = []
+    for m in re.finditer(r'\bstruct\s+(\w+)\s*:', src):
+        head = src[m.end():m.end() + 200].split("{")[0]
+        if "Decodable" in head and m.group(1) not in seen:
+            missed.append(m.group(1))
+    assert not missed, (
+        f"the Swift reader cannot see {sorted(set(missed))} — widen _STRUCT")
+
+
+def test_the_csharp_reader_reads_a_whole_record():
+    """The record finder ends at the first `);`. Paren-matching is the second
+    opinion: where the two disagree the finder has truncated a record, and a
+    truncated record is a model with fewer keys than it really has."""
+    src = _code(REPO / WINDOWS)
+    truncated = []
+    for m in _CREC.finditer(src):
+        shipped = set(_CPROP.findall(src[m.end():src.find(");", m.end())]))
+        depth, i = 1, m.end()
+        while i < len(src) and depth:
+            depth += (src[i] == "(") - (src[i] == ")")
+            i += 1
+        whole = set(_CPROP.findall(src[m.end():i - 1]))
+        if shipped != whole:
+            truncated.append(f"{m.group(1)}: missed {sorted(whole - shipped)}")
+    assert not truncated, "\n    ".join([""] + truncated)
+
+
+def test_the_swift_reader_reads_every_property_it_can_see():
+    """A second opinion on the property pattern, found by where a declaration
+    *starts* rather than where it ends.
+
+    The both-ends floor below catches a reader that reads **nothing**. It does
+    not catch one that reads **less** — 0.58.6's bug left `ComplianceProgram`
+    with one of its two keys, which is still a non-empty set sharing a key
+    with the contract, and would have passed. Counting declaration starts is
+    simple enough to be a fair check on the pattern that parses their values.
+    """
+    src = _code(REPO / IOS)
+    starts = re.compile(r'(?:^|[{;])\s*(?:let|var)\s+(\w+)\s*:', re.M)
+    computed = re.compile(r'(?:^|[{;])\s*(?:let|var)\s+(\w+)\s*:[^\n=;{]*\{', re.M)
+    short = []
+    for m in _STRUCT.finditer(src):
+        body = _matched(src, m.end())
+        nested = {p for i in _STRUCT.finditer(body)
+                  for p in _STORED.findall(_matched(body, i.end()))}
+        inner_bodies = "".join(_matched(body, i.end())
+                               for i in _STRUCT.finditer(body))
+        outer = body
+        for chunk in (_matched(body, i.end()) for i in _STRUCT.finditer(body)):
+            outer = outer.replace(chunk, "")
+        expected = (set(starts.findall(outer)) - set(computed.findall(outer))
+                    - nested)
+        read = {renames.get(p, p) for renames in
+                [dict(_RENAME.findall(body))] for p in _STORED.findall(outer)}
+        missing = sorted(expected - {p for p in _STORED.findall(outer)})
+        if missing:
+            short.append(f"{m.group(1)}: declares {missing} and the reader "
+                         f"does not see them")
+    assert not short, "\n    ".join([""] + short) + (
+        "\n  The property pattern is narrower than the language.")
+
+
+def test_a_wire_model_holds_no_methods():
+    """The defect the second opinion turned up, checked directly.
+
+    `struct SpecialistRow: Decodable {` was missing its closing brace and the
+    `extension ApiClient {` that should have followed it. Ninety-five client
+    methods — the whole *face it shows the world* block, avatar through
+    experience — were declared as members of a two-field wire model instead of
+    on the client, so every screen calling `ApiClient.shared.avatar(…)` had
+    nothing to call.
+
+    Brace *balance* could not see it: the file balanced perfectly, one brace
+    simply belonged to the wrong opener. The member check could not see it
+    either: the methods are in `ApiClient.swift`, just nested. What gives it
+    away is the thing that is obviously true and was never asserted — a wire
+    model is data, and data has no methods.
+    """
+    src = _code(REPO / IOS)
+    holding = []
+    for m in _STRUCT.finditer(src):
+        body = _matched(src, m.end())
+        for inner in _STRUCT.finditer(body):
+            body = body.replace(_matched(body, inner.end()), "")
+        found = re.findall(r'^\s*func\s+(\w+)', body, re.M)
+        if found:
+            holding.append(f"{m.group(1)} holds {len(found)} method(s), "
+                           f"starting with {found[0]!r} — a brace is missing")
+    assert not holding, "\n    ".join([""] + holding) + (
+        "\n  A wire model is data. Methods in one mean a `}` went astray.")
+
+
+def test_a_one_line_struct_is_not_empty(tmp_path):
+    """0.58.6's own defect, as a unit. PDI writes them this way, and reading
+    such a struct as empty made its pin pass against nothing for a release."""
+    path = tmp_path / "ApiClient.swift"
+    path.write_text("struct Program: Decodable { let key: String; "
+                    "let label: String }\n")
+    assert _swift_models(path.read_text())["Program"] == {"key", "label"}
+
+
+def test_a_computed_property_is_still_not_a_key(tmp_path):
+    """The fix for the line above widened the property pattern. This is the
+    thing that widening must not break."""
+    src = ('struct Chapter: Decodable {\n'
+           '    let chapter: String?\n'
+           '    var id: String { chapter ?? "?" }\n}\n')
+    assert _swift_models(src)["Chapter"] == {"chapter"}
 
 
 def test_a_container_pin_reads_the_element_not_the_wrapper(tmp_path):

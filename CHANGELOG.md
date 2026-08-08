@@ -4,6 +4,58 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.7] — 2026-08-08
+
+### A wire model is data, and data has no methods
+
+0.58.6 closed by naming its own hole: a pin whose reader goes blind reads a
+model as **empty**, an empty set is a subset of anything, and the pin passes
+against nothing while looking exactly like a pin that is holding. That is the
+only way this table can lie, so this round went after it rather than after
+more surface.
+
+### Added
+
+- Every pin now asserts on **both ends**: the model read something, and what
+  it read shares at least one key with the contract. Deliberately not a size
+  floor — `MicPlacesOut` and `ChainState` are honest one-property wrappers,
+  and a floor that called those defects would be the file inventing work.
+- Three checks read the readers themselves against a second opinion. Every
+  struct whose conformance list mentions `Decodable` must be one the pattern
+  can see; every C# record read by the finder must survive paren-matching;
+  every property the language declares must be one the property pattern finds,
+  located by where a declaration *starts* rather than where it ends.
+
+### Fixed
+
+**The second opinion did not find a reader bug on its first run. It found a
+missing brace.**
+
+`struct SpecialistRow: Decodable {` was never closed, and the
+`extension ApiClient {` that should have followed it was never opened.
+**Ninety-five client methods** — the whole *face it shows the world* block,
+avatar through experience — were declared as members of a two-field wire model
+rather than on the client. Every screen calling `ApiClient.shared.avatar(…)`
+had nothing to call.
+
+Three guards were in a position to see it and none did:
+
+```
+brace balance (0.57.5)   passed — the file balances; one brace has the
+                         wrong opener
+the member check (0.58.1) passed — the methods are in ApiClient.swift,
+                         just nested inside a struct
+this file's own pins     passed — SpecialistRow is not pinned
+```
+
+What gave it away was a check written to audit the reader rather than the
+code, and what it caught was the thing nobody had thought to assert, because
+it is too obviously true to say out loud: **a wire model is data, and data has
+no methods.** That assertion is here now, and it costs one line to run.
+
+
+Suites: **1547 + 1528 = 3,075** across 217 files.
+
 ## [0.58.6] — 2026-08-08
 
 ### The refusal surfaces, and a reader that read a struct as empty

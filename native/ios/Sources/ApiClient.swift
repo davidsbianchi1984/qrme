@@ -3919,7 +3919,9 @@ struct PlacementCustody: Decodable {
 struct SpecialistRow: Decodable {
     let domain: String
     let specialist_profile_id: String
+}
 
+extension ApiClient {
     // -- the face it shows the world: portrait, emblem, page, front,
     // surfaces, blend, bodies, dials and the wrist -----------------------
 
