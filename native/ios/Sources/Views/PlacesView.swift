@@ -375,20 +375,20 @@ struct TourSection: View {
                     run {
                         let s = try await ApiClient.shared.startTutorial(
                             learnerId: state.pid ?? "walk-in")
-                        line = s.title ?? s.key ?? ""
+                        line = s.step?.title ?? s.note ?? ""
                     }
                 }
                 Button(L10n.t("tut.progress", state.language)) {
                     run {
                         let s = try await ApiClient.shared.tutorialProgress(
                             learnerId: state.pid ?? "walk-in")
-                        line = s.title ?? s.next ?? ""
+                        line = s.step?.title ?? s.note ?? ""
                     }
                 }
             }.font(.caption).disabled(busy)
             ForEach(chapters) { c in
-                let name = c.title ?? c.id
-                Button(name) { stepKey = c.key ?? "" }
+                let name = c.id
+                Button(name) { stepKey = c.steps?.first?.key ?? "" }
                     .font(.caption2).foregroundStyle(Theme.t2)
             }
             HStack {
@@ -399,7 +399,7 @@ struct TourSection: View {
                         let s = try await ApiClient.shared.markTutorialDone(
                             learnerId: state.pid ?? "walk-in",
                             lesson: stepKey)
-                        line = s.next ?? ""
+                        line = s.step?.title ?? s.note ?? ""
                     }
                 }.disabled(busy || stepKey.isEmpty)
             }.font(.caption)
@@ -416,7 +416,7 @@ struct TourSection: View {
                         } else if !stepKey.isEmpty {
                             let s = try await ApiClient.shared.tutorialStep(
                                 key: stepKey)
-                            line = s.body ?? s.title ?? ""
+                            line = s.what ?? s.title ?? ""
                         }
                     }
                 }.disabled(busy || (screenNo.isEmpty && stepKey.isEmpty))

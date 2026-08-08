@@ -2767,19 +2767,39 @@ struct Coordination: Decodable, Identifiable {
 }
 
 struct TutorialOutline: Decodable {
+    /// A chapter is a name and the lessons under it. `tutorial.outline`
+    /// sends `{"chapter": …, "steps": [...]}`; reading `key` and `title`
+    /// here made every row of the guided tour render as `?`.
     struct Chapter: Decodable, Identifiable {
-        let key: String?
-        let title: String?
-        var id: String { key ?? title ?? "?" }
+        let chapter: String?
+        let steps: [TutorialStep]?
+        var id: String { chapter ?? "?" }
     }
+    let guide: String?
     let chapters: [Chapter]?
 }
 
 struct TutorialStep: Decodable {
     let key: String?
+    let chapter: String?
     let title: String?
-    let body: String?
-    let next: String?
+    let try_it: String?
+    // The lesson itself. `tutorial.say` calls it `what`; reading `body` got
+    // nil and the screen fell back to repeating the title.
+    let what: String?
+}
+
+/// Where a learner is, from `/tutorial/start`, `/progress/{id}` and `/done`.
+/// All three answer with `tutorial.where`, which wraps the step — decoding
+/// them as a bare `TutorialStep` left every one of those buttons blank.
+struct TutorialWhere: Decodable {
+    let learner_id: String?
+    let guide: String?
+    let step: TutorialStep?
+    let done: Int?
+    let total: Int?
+    let finished: Bool?
+    let note: String?
 }
 
 extension ApiClient {
@@ -2946,17 +2966,17 @@ extension ApiClient {
         try await request("/tutorial/for-screen/\(number)")
     }
 
-    func startTutorial(learnerId: String) async throws -> TutorialStep {
+    func startTutorial(learnerId: String) async throws -> TutorialWhere {
         try await request("/tutorial/start", method: "POST",
                           body: ["learner_id": learnerId, "lesson": ""])
     }
 
-    func tutorialProgress(learnerId: String) async throws -> TutorialStep {
+    func tutorialProgress(learnerId: String) async throws -> TutorialWhere {
         try await request("/tutorial/progress/\(learnerId)")
     }
 
     func markTutorialDone(learnerId: String,
-                          lesson: String) async throws -> TutorialStep {
+                          lesson: String) async throws -> TutorialWhere {
         try await request("/tutorial/done", method: "POST",
                           body: ["learner_id": learnerId, "lesson": lesson])
     }

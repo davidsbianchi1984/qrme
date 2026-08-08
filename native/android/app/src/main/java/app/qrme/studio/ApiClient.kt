@@ -2476,12 +2476,14 @@ object ApiClient {
     suspend fun tutorialOutline(): List<Pair<String, String>> {
         val o = JSONObject(request("/tutorial"))
         val out = mutableListOf<Pair<String, String>>()
-        for (key in listOf("chapters", "lessons")) {
-            o.optJSONArray(key)?.let { a ->
-                for (i in 0 until a.length()) {
-                    val c = a.getJSONObject(i)
-                    out.add(c.optString("key") to c.optString("title"))
-                }
+        // A chapter is a name and the lessons under it. Reading `key` and
+        // `title` off the chapter gave every row an empty pair, and
+        // `lessons` was never a key the route sent.
+        o.optJSONArray("chapters")?.let { a ->
+            for (i in 0 until a.length()) {
+                val c = a.getJSONObject(i)
+                val first = c.optJSONArray("steps")?.optJSONObject(0)
+                out.add(c.optString("chapter") to (first?.optString("key") ?: ""))
             }
         }
         return out
@@ -2489,7 +2491,7 @@ object ApiClient {
 
     suspend fun tutorialStep(key: String): String {
         val o = JSONObject(request("/tutorial/steps/$key"))
-        return o.optString("body", o.optString("title"))
+        return o.optString("what", o.optString("title"))
     }
 
     suspend fun tutorialForScreen(number: Int): String {
@@ -2500,18 +2502,20 @@ object ApiClient {
     suspend fun startTutorial(learnerId: String): String {
         val o = JSONObject(request("/tutorial/start", "POST",
             JSONObject().put("learner_id", learnerId).put("lesson", "")))
-        return o.optString("title", o.optString("key"))
+        // All three of these answer with `tutorial.where`, which wraps
+        // the step. Reading the top level got nothing at all.
+        return o.optJSONObject("step")?.optString("title") ?: o.optString("note")
     }
 
     suspend fun tutorialProgress(learnerId: String): String {
         val o = JSONObject(request("/tutorial/progress/$learnerId"))
-        return o.optString("title", o.optString("next"))
+        return o.optJSONObject("step")?.optString("title") ?: o.optString("note")
     }
 
     suspend fun markTutorialDone(learnerId: String, lesson: String): String {
         val o = JSONObject(request("/tutorial/done", "POST",
             JSONObject().put("learner_id", learnerId).put("lesson", lesson)))
-        return o.optString("next")
+        return o.optJSONObject("step")?.optString("title") ?: o.optString("note")
     }
 
     // -- the body, the referral, the objection, the lobby and the dock ----

@@ -4,6 +4,67 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.4] — 2026-08-08
+
+### The key was right and the shape was wrong
+
+0.58.3 checked that every key a shell decodes is one the backend can send, and
+left a named gap: the check is a *union*, so a key read off the **wrong**
+response passes. The obvious next step was to bind each decode site to the
+route it calls and compare per route.
+
+### Four attempts at that, and why none of them shipped
+
+The binding is not derivable by reading this backend, and every narrowing that
+removed a false positive removed real coverage with it:
+
+1. **Route to handler to return.** Handlers delegate, wrap (`{"beacons": [...]}`)
+   and merge (`{**metrics}`). One level of following resolved 141 of some 400
+   routes, and the mismatch list was 41 rows of which the ones checked by hand
+   were the reader's fault.
+2. **Flat-only on both sides.** Coverage fell to 52 sites and the mismatch
+   rate stayed above four in ten.
+3. **Bind on the container key** — `chapters: [{...}]`. The first run reported
+   five defects that are not there: `llm.py` builds `{"messages": [...]}` as an
+   outbound *request*, and the backend's inputs share a vocabulary with its
+   outputs. Restricting to route-reachable returns fixed that and hid the real
+   finding instead.
+4. **Disjointness rather than subset**, to survive a key with two shapes. It
+   survives them by not judging them.
+
+The rule narrow enough to be sound covers two sites per product and finds
+nothing. That is the honest ceiling of inference here, and it is worth writing
+down rather than shipping a guard whose failures are mostly its own.
+
+### Added
+
+- `test_the_shape_inside_the_shape.py`, in all three products. It infers
+  nothing: each row **pins** a shell model to the backend function whose
+  `return` is that model's contract. A human read both ends once; the file
+  holds them together from then on. It is small on purpose and meant to grow
+  one verified row at a time.
+
+### Fixed
+
+The guided tour, broken on both phones and correct on Windows:
+
+- `/tutorial` sends `chapters: [{chapter, steps}]`. The iPhone read `key` and
+  `title` off the chapter, so every row of the outline rendered as `?`; the
+  Android read the same two and built a list of empty pairs. It also looped
+  over a `lessons` key the route has never sent.
+- `/tutorial/start`, `/tutorial/progress/{id}` and `/tutorial/done` all answer
+  with `tutorial.where`, which **wraps** the step. Both phones decoded the
+  wrapper as a bare step and read `title`, `key` and `next` off the top level.
+  All three buttons showed an empty line.
+- `/tutorial/steps/{key}` sends the lesson text as `what`. The iPhone read
+  `body`, got nil, and fell back to repeating the title.
+
+Windows had all four right — and carried a comment saying a chapter never had
+a `key` or a `title` of its own. Somebody fixed one shell and the note never
+crossed to the others, which is the argument for a file rather than a comment.
+
+Suites: **1547 + 1520 = 3,067** across 217 files.
+
 ## [0.58.3] — 2026-08-08
 
 ### The key the server never sends
