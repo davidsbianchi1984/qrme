@@ -4,6 +4,52 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.58.6] — 2026-08-08
+
+### The refusal surfaces, and a reader that read a struct as empty
+
+0.58.5 closed by naming this batch — the screens that render what the platform
+will **not** do, from data rather than prose, so the screen cannot drift from
+the behaviour. An empty render of one of those does not read as a bug. It
+reads as *no limits*, which is the worst failure mode a consent screen has.
+
+Five of them, read at both ends across all three shells: the overlay
+catalogue's kinds and its refusals, the microphone vocabulary's refusals, the
+places a wearable may be lent, and the cloud-contribution log. **All correct.**
+
+Two rounds running the finding was on every shell at once rather than on one —
+the shells agree with each other and disagree with the server. Cross-checking
+the clients against each other would have found neither the guided tour nor the
+microphone disclosure. This table is the only instrument in the repository that
+catches that, which is the argument for growing it on a round where it finds
+nothing.
+
+### Added
+
+- Nine more pinned rows: `OverlayCatalogue` with its kinds and refusals,
+  `MicVocabularyOut`, `MicPlacesOut` with its places, and `ContributionView`
+  with its log — plus the Kotlin reads of the same three routes.
+- The reader learned three more lookups, all still inside the one pinned
+  function or the module it lives in. `{**dict(r), …}` over
+  `conn.execute("SELECT id, condition, … FROM …")` — the column list is a
+  string literal right there, so the keys `dict(r)` carries are readable;
+  `SELECT *` is not, and is refused. A `**spec` bound by a *comprehension*
+  generator rather than a `for` statement. And `list(TABLE.values())` over a
+  module table written as a dict comprehension.
+
+### The trap it walked into first
+
+Injecting a defect into PDI's `ComplianceProgram` did not fail the guard, and
+that was the guard's fault rather than the injection's. PDI declares
+`struct X: Decodable { let a: T; let b: T }` on one line, and the property
+pattern required end-of-line — so it read that struct as **empty**, and an
+empty model passes every comparison. The pin had been checking nothing since
+the day it was written. Semicolon-separated properties are read now, computed
+ones are still excluded, and the round that found it is the round that
+injected rather than the round that wrote the pin.
+
+Suites: **1547 + 1520 = 3,067** across 217 files.
+
 ## [0.58.5] — 2026-08-08
 
 ### The disclosure that showed nobody
