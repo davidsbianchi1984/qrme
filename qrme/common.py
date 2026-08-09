@@ -520,3 +520,48 @@ def profile_scoped_tables() -> list[str]:
         if "profile_id" in columns:
             found.append(name)
     return sorted(found)
+
+#: What an export must never hand back, matched as **marks inside a column
+#: name** rather than as a list of exact names.
+#:
+#: The first cut of this was a list, and the guard next door caught it on its
+#: first run: `owner_token`, `qrme_interactor_token` and a third all sat in
+#: tables the export now reaches and none of them were in the list. A list of
+#: credential columns goes stale exactly the way the erase cascade's list of
+#: tables did, and for the same reason — somebody adds a column.
+#:
+#: Deliberately not the bare word `hash`: an audit chain's hash is a record,
+#: not a credential, and a person auditing their own export should be able to
+#: verify it.
+EXPORT_REDACTS = ("token", "secret", "password", "api_key", "private_key",
+                  "grant_hash", "check_value", "credential")
+
+
+def _public(row) -> dict:
+    """A row with every credential-bearing column dropped."""
+    return {k: v for k, v in dict(row).items()
+            if not any(mark in k.lower() for mark in EXPORT_REDACTS)}
+
+
+def export_rows(profile_id: str) -> dict[str, list[dict]]:
+    """Every row in this schema that names this profile, by table.
+
+    Derived from the schema for the same reason the erase cascade is: the
+    handler this replaced named six tables — `relationships`, `messages`,
+    `engagement`, `posts`, `surfaces` and the profile itself — under a
+    docstring reading *full data export — access everything, anytime (You Own
+    It)*, and a README row promising the same. Sixty-six tables carry a
+    `profile_id`.
+
+    Redaction is per column, not per table: a row is the person's history and
+    a token inside it is a live credential in whatever they do with the file.
+    """
+    conn = db.connect()
+    out: dict[str, list[dict]] = {}
+    for table in profile_scoped_tables():
+        rows = conn.execute(f"SELECT * FROM {table} WHERE profile_id=?",
+                            (profile_id,)).fetchall()
+        if not rows:
+            continue
+        out[table] = [_public(r) for r in rows]
+    return out

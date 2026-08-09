@@ -11,7 +11,7 @@ from fastapi import (APIRouter, Depends, Header, HTTPException,
 from .. import (auth, companion, composite, db, i18n, identity, persona,
                 storage, terms, tiers)
 from ..common import (
-    ERASE_KEEPS, profile_scoped_tables,
+    ERASE_KEEPS, export_rows, profile_scoped_tables,
     age_of, profile_or_404, profile_out, require_owner,
     source_items,
 )
@@ -417,7 +417,19 @@ def update_profile(profile_id: str, body: ProfileUpdate,
 
 @router.get("/profiles/{profile_id}/export")
 def export_profile(profile_id: str, request: Request) -> dict:
-    """Full data export — access everything, anytime (You Own It)."""
+    """Full data export — access everything, anytime (You Own It).
+
+    *Everything* is derived from the schema (`export_rows`), not from a list.
+    The handler this replaced named six tables under this same sentence, and
+    the README's *you own it* row points here, and the suite gateway's GDPR
+    Article 20 bundle is built on it — so six of sixty-six was the whole
+    tandem's answer to *give me my data*.
+
+    `tables` carries every scoped table with rows in it. The named keys above
+    it are kept because clients read them, and because the four that matter
+    most to a person reading their own bundle should not be buried in an
+    alphabetical map.
+    """
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
     conn = db.connect()
@@ -434,6 +446,9 @@ def export_profile(profile_id: str, request: Request) -> dict:
         "surfaces": [r["surface"] for r in conn.execute(
             "SELECT surface FROM surfaces WHERE profile_id=?",
             (profile_id,)).fetchall()],
+        "tables": export_rows(profile_id),
+        "note": "every table in this deployment that names this profile, with "
+                "live credentials dropped per column — see EXPORT_REDACTS",
     }
 
 
