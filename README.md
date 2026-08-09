@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.60.2** ([changelog](CHANGELOG.md) ·
+**Current release: v0.60.3** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.60.3** | **A check that cannot fail before the merge is not a check** — `ci.yml` carried the same blind trigger `native.yml` did, and had been red for 29 runs on four guards that shell out to the JSX-text extractor: the job running pytest installed no node dependencies, so they failed on the runner and passed everywhere else. Trigger fixed, dependencies installed, and a guard that reads the triggers themselves |
 | **0.60.2** | **The compiler was in the room the whole time and nothing listened** — `native.yml` had been red for 123 runs on a trigger the release loop never reached. Fixed, and the shells then named real defects: an Android L10n table too large to compile at all, 944 lines of `ApiClient` living inside a record's body, two records whose mid-list default swallowed the last positional argument, and a dozen members that were never there |
 | **0.60.1** | **A fix to the cascade fixes the next delete, not the last one** — every profile ended before 0.59.9 was ended by a list of 24 table names against a schema of 66, and the 42 tables it missed are still sitting in every deployment running since. `python -m qrme.orphans` is the reach-back: dry by default, `--apply` to clear, scope taken from the cascade's own reader. Its sharp property is not *does it find the orphans* but **does it leave a living profile alone** |
 | **0.60.0** | **An export is measured against the schema too** — `GET /profiles/{id}/export` says *access everything, anytime (You Own It)*, the README's capability table points at it, and the suite gateway's GDPR Article 20 bundle is built on it. It returned **6 tables of 66**. Now derived from the schema like the erase cascade, with live credentials dropped **per column by rule** — the first cut was a list of column names and the new guard caught three it missed on its first run |
