@@ -5381,7 +5381,7 @@ private fun CounterPanel(vm: StudioViewModel) {
     var basis by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var blurb by remember { mutableStateOf("") }
-    var card by remember { mutableStateOf<DeskCard?>(null) }
+    var card by remember { mutableStateOf<DeskOpened?>(null) }
     var nearby by remember { mutableStateOf<List<DeskBrief>>(emptyList()) }
     var rings by remember { mutableStateOf<List<DeskRing>>(emptyList()) }
     var guests by remember { mutableStateOf<List<DeskGuest>>(emptyList()) }

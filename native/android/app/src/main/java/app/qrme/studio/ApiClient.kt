@@ -1695,6 +1695,13 @@ object ApiClient {
     // comes through, print its sticker — nor search, price, sell or buy in
     // the market, nor be a party to an exchange at all.
 
+    private fun deskOpenedOf(o: JSONObject) = DeskOpened(
+        o.optString("desk_id"), o.optString("display_name"),
+        o.optString("trade").ifBlank { null },
+        o.optString("location").ifBlank { null },
+        o.optString("presence"), o.optBoolean("rated"),
+        o.optString("desk_token").ifBlank { null })
+
     private fun deskCardOf(o: JSONObject) = DeskCard(
         o.optString("desk_id"), o.optString("display_name"),
         if (o.isNull("trade")) null else o.optString("trade"),
@@ -1725,31 +1732,31 @@ object ApiClient {
 
     suspend fun openDesk(ownerId: String, displayName: String, trade: String,
                          attestor: String, basis: String, location: String,
-                         blurb: String, token: String): DeskCard {
+                         blurb: String, token: String): DeskOpened {
         val body = JSONObject().put("owner_id", ownerId)
             .put("display_name", displayName).put("trade", trade)
             .put("attestor", attestor).put("basis", basis)
         if (location.isNotBlank()) body.put("location", location)
         if (blurb.isNotBlank()) body.put("blurb", blurb)
-        return deskCardOf(JSONObject(request("/desks", "POST", body, token)))
+        return deskOpenedOf(JSONObject(request("/desks", "POST", body, token)))
     }
 
     suspend fun setDeskPresence(deskId: String, presence: String,
-                                token: String): DeskCard {
-        return deskCardOf(JSONObject(request("/desks/$deskId/presence", "PUT",
+                                token: String): DeskOpened {
+        return deskOpenedOf(JSONObject(request("/desks/$deskId/presence", "PUT",
             JSONObject().put("presence", presence), token)))
     }
 
-    suspend fun setDeskPortrait(deskId: String, token: String): DeskCard {
-        return deskCardOf(JSONObject(request("/desks/$deskId/portrait", "PUT",
+    suspend fun setDeskPortrait(deskId: String, token: String): DeskOpened {
+        return deskOpenedOf(JSONObject(request("/desks/$deskId/portrait", "PUT",
             JSONObject().put("asset", JSONObject.NULL), token)))
     }
 
     // The route points a desk at a camera by address and clears it with an
     // empty one. `enabled` was a switch with nothing to switch on.
     suspend fun setDeskCamera(deskId: String, url: String,
-                              token: String): DeskCard {
-        return deskCardOf(JSONObject(request("/desks/$deskId/camera", "PUT",
+                              token: String): DeskOpened {
+        return deskOpenedOf(JSONObject(request("/desks/$deskId/camera", "PUT",
             JSONObject().put("url", url), token)))
     }
 
@@ -4076,10 +4083,14 @@ data class CommentRow(val id: String, val authorId: String,
                       val body: String, val status: String)
 
 
-data class DeskCard(val deskId: String, val displayName: String,
-                    val trade: String?, val location: String?,
-                    val presence: String, val rated: Boolean,
-                    val deskToken: String?)
+/// What `POST /desks` hands back, and the only place the desk token appears.
+/// Deliberately not `DeskCard`: that is the public card `GET /desks/{id}`
+/// returns, with the attestation a visitor reads. Both carried one name in
+/// all three shells at once.
+data class DeskOpened(val deskId: String, val displayName: String,
+                      val trade: String?, val location: String?,
+                      val presence: String, val rated: Boolean,
+                      val deskToken: String?)
 
 data class DeskBrief(val id: String, val displayName: String,
                      val trade: String?, val location: String?,
