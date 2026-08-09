@@ -384,7 +384,7 @@ struct SensesSection: View {
                     run {
                         let o = try await ApiClient.shared
                             .microphoneVocabulary()
-                        line = "\((o.widths ?? [:]).count)"
+                        line = (o.personal ?? []).joined(separator: " · ")
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("sens.overlays", state.language)) {

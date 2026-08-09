@@ -96,6 +96,7 @@ import androidx.compose.ui.platform.LocalContext
 import app.qrme.studio.SignatureReceipt
 import app.qrme.studio.Signing
 import app.qrme.studio.SigningCredential
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -6131,10 +6132,10 @@ private fun ObjectToAProfileCard(vm: StudioViewModel) {
     var error by remember { mutableStateOf<String?>(null) }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(L10n.t("ns.object", vm.language), color = Q.Txt, fontSize = 16.sp,
+        Text(L10n.t("ns.object", vm.language), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
         Text(L10n.t("ns.object.sub", vm.language),
-             color = Q.T2, fontSize = 12.sp)
+             color = Qrme.T2, fontSize = 12.sp)
         OutlinedTextField(value = profileId, onValueChange = { profileId = it },
             label = { Text(L10n.t("ns.object.pid", vm.language)) })
         OutlinedTextField(value = contact, onValueChange = { contact = it },
@@ -6143,9 +6144,9 @@ private fun ObjectToAProfileCard(vm: StudioViewModel) {
             label = { Text(L10n.t("ns.object.reason", vm.language)) })
         Button(onClick = {
             vm.call({ ApiClient.openObjection(profileId.trim(), contact.trim(),
-                reason) }) { result = it; error = null }
+                reason) }) { result = it.getOrNull(); error = it.exceptionOrNull()?.message }
         }, enabled = profileId.isNotBlank() && reason.isNotBlank(),
-            colors = ButtonDefaults.buttonColors(containerColor = Q.BrandA)) {
+            colors = ButtonDefaults.buttonColors(containerColor = Qrme.BrandA)) {
             Text(L10n.t("ns.object.go", vm.language))
         }
         result?.let { r ->
@@ -6154,12 +6155,12 @@ private fun ObjectToAProfileCard(vm: StudioViewModel) {
             // somebody gets round to it.
             Text(L10n.fill("ns.object.raised", vm.language,
                     mapOf("status" to r.profileStatus)),
-                color = Q.Green, fontSize = 12.sp)
+                color = Qrme.Green, fontSize = 12.sp)
             if (r.note.isNotBlank()) {
-                Text(r.note, color = Q.T2, fontSize = 11.sp)
+                Text(r.note, color = Qrme.T2, fontSize = 11.sp)
             }
         }
-        error?.let { Text(it, color = Q.Red, fontSize = 12.sp) }
+        error?.let { Text(it, color = Qrme.Red, fontSize = 12.sp) }
     }
 }
 

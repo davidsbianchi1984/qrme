@@ -2585,7 +2585,7 @@ public sealed partial class PeoplePage : Page
         {
             var outp = await ApiClient.Shared.RevokeContributions(
                 AppState.Current.Pid!, AppState.Current.Token!);
-            StatusText.Text = (outp.Revoked ?? 0).ToString();
+            StatusText.Text = (outp.RevokedCount ?? 0).ToString();
         });
 
     private async void OnMindExcursion(object sender, RoutedEventArgs e) =>

@@ -642,6 +642,7 @@ object ApiClient {
             if (o.isNull("profile_id")) null else o.optString("profile_id"),
             o.optBoolean("verbatim"), o.optDouble("similarity", 0.0),
             o.optInt("matched_windows"), o.optInt("stored_windows"),
+            o.optInt("examined_windows"),
             if (o.isNull("state")) null else o.optString("state"),
             if (o.isNull("best_similarity")) null else o.optDouble("best_similarity"),
             if (o.isNull("threshold")) null else o.optDouble("threshold"),
@@ -1701,13 +1702,6 @@ object ApiClient {
         o.optString("location").ifBlank { null },
         o.optString("presence"), o.optBoolean("rated"),
         o.optString("desk_token").ifBlank { null })
-
-    private fun deskCardOf(o: JSONObject) = DeskCard(
-        o.optString("desk_id"), o.optString("display_name"),
-        if (o.isNull("trade")) null else o.optString("trade"),
-        if (o.isNull("location")) null else o.optString("location"),
-        o.optString("presence"), o.optBoolean("rated"),
-        if (o.isNull("desk_token")) null else o.optString("desk_token"))
 
     suspend fun desks(): List<DeskBrief> {
         val a = JSONArray(request("/desks"))

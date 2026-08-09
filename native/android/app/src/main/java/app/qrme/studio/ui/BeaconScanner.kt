@@ -102,12 +102,13 @@ fun BeaconScannerScreen(onOpen: (String) -> Unit, onClose: () -> Unit,
         return
     }
 
-    BeaconCameraSurface(onOpen = onOpen, onClose = onClose)
+    BeaconCameraSurface(onOpen = onOpen, onClose = onClose, lang = lang)
 }
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
-private fun BeaconCameraSurface(onOpen: (String) -> Unit, onClose: () -> Unit) {
+private fun BeaconCameraSurface(onOpen: (String) -> Unit, onClose: () -> Unit,
+                                lang: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val density = LocalDensity.current
     val executor = remember { Executors.newSingleThreadExecutor() }

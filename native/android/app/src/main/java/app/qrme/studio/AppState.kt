@@ -32,7 +32,6 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
      *  and the deployment's key used here, on the same account. */
     var llmKey by mutableStateOf(prefs.getString("llmKey", "") ?: "")
         private set
-        private set
     var interactorVerified by mutableStateOf(prefs.getBoolean("interactor_adult", false))
         private set
     // The profile's chosen language also drives the app chrome via L10n.
