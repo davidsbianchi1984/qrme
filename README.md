@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.60.0** ([changelog](CHANGELOG.md) ·
+**Current release: v0.60.1** ([changelog](CHANGELOG.md) ·
 [release notes](RELEASE_NOTES.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -721,6 +721,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.60.1** | **A fix to the cascade fixes the next delete, not the last one** — every profile ended before 0.59.9 was ended by a list of 24 table names against a schema of 66, and the 42 tables it missed are still sitting in every deployment running since. `python -m qrme.orphans` is the reach-back: dry by default, `--apply` to clear, scope taken from the cascade's own reader. Its sharp property is not *does it find the orphans* but **does it leave a living profile alone** |
 | **0.60.0** | **An export is measured against the schema too** — `GET /profiles/{id}/export` says *access everything, anytime (You Own It)*, the README's capability table points at it, and the suite gateway's GDPR Article 20 bundle is built on it. It returned **6 tables of 66**. Now derived from the schema like the erase cascade, with live credentials dropped **per column by rule** — the first cut was a list of column names and the new guard caught three it missed on its first run |
 | **0.59.9** | **An erase is measured against the schema, not a list somebody wrote** — `DELETE /profiles/{id}` says *the profile and every trace of it*. It named 24 tables; the schema has **66** with a `profile_id` column, so 42 survived — `clinical_notes`, `media` and `media_watermarks`, `anonymous_pictures`, `homepages`, `friendships`, `inbox_events`. The cascade is derived from the schema now, and a guard plants a row in every scoped table, deletes, and looks |
 | **0.59.8** | **The check that covered one client of four** — 0.59.7 asked whether the shape a screen declares is the shape its route answers with, and asked it of the console alone. The three shells decode the same answers into their own types, and a wrong one there throws the same way. Extended to all four clients (console 422 · iOS 300 · Android 316 · Windows 342); no disagreements, and the reach is now a record that cannot go down, because a reader that stops matching reports agreement |
@@ -4005,6 +4006,33 @@ window. A backend you already run yourself is left alone.
 npm dependencies too), prints the phone URL **with a QR code right in the
 terminal**, and starts the API on the network — scan, Add to Home Screen,
 done. Flags: `--port`, `--rebuild`, `--no-build`, `--print-only`.
+
+### Maintenance: rows the old profile delete left behind
+
+Before 0.59.9 the profile delete ran off a list of twenty-four table names
+against a schema of sixty-six. Every profile ended on a build older than that
+release left forty-two tables standing — `clinical_notes` and the `media`
+behind them, `media_watermarks`, `anonymous_pictures`, `homepages`,
+`friendships`, `inbox_events` — and nothing in the running product will ever
+look at them again, because the `profiles` row is gone and the API answers
+404. Fixing the cascade fixed the next delete. It did not reach back.
+
+```bash
+python -m qrme.orphans            # count them, change nothing
+python -m qrme.orphans --json     # the same survey, machine-readable
+python -m qrme.orphans --apply    # clear them
+```
+
+**Dry by default.** The command a person runs to find out how bad it is is not
+the command that changes it. A row counts as an orphan only when its
+`profile_id` names a profile that is not in `profiles`; rows with a NULL or
+empty subject are left alone. The scope is the delete cascade's own reader,
+so this is that cascade applied retroactively rather than a second list to
+keep in step.
+
+A deployment first installed on 0.59.9 or later has nothing to sweep, and the
+command says so in a sentence.
+
 
 The manual equivalent, if you prefer the steps separately:
 

@@ -4,6 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.60.1] — 2026-08-09
+
+### A fix to the cascade fixes the next delete, not the last one
+
+0.59.9 derived the profile delete from the schema. Every profile ended
+*before* that release was ended by a list of twenty-four table names against a
+schema of sixty-six, and the forty-two tables it missed are still sitting in
+every deployment that has been running since.
+
+Nothing in the product will ever look at them again, and that is the whole
+problem. The `profiles` row is gone, so the API answers 404, so no code path
+visits those rows — not visible, not reachable, still there.
+
+    asked     does the delete work now
+    mattered  what did it leave the last time it did not
+
+### Added
+
+- `python -m qrme.orphans` — a one-off maintenance sweep for the residue.
+  `survey()` reads and the command is **dry by default**; `--apply` is the
+  only thing that deletes, and `--json` gives the same survey machine-readable.
+- Its scope is the cascade's own reader (`common.profile_scoped_tables()`
+  minus `common.ERASE_KEEPS`) rather than a second list — this is that cascade
+  applied retroactively, and two readers of *which tables hold a profile's
+  data* is two things to keep in step.
+- A row counts as an orphan only when its `profile_id` names a profile not in
+  `profiles`. Rows with a NULL or empty subject are left alone: they are not
+  the residue of a deleted profile, and a command written for one problem does
+  not get to decide about a different one.
+- `test_what_the_old_cascade_left_behind.py`. The sharp property is not *does
+  it find the orphans* but **does it leave a living profile alone**, checked
+  with a live profile seeded beside the stranded one. Both directions were
+  confirmed by injection: a broken liveness filter reports 56 tables of a
+  living account's data, and a hand-written scope reports 52 tables the survey
+  cannot see.
+
+### Fixed
+
+- `test_the_member_that_isnt_there.py` read `AppState.Current.X` only when a
+  page spelled it out in full. A page that puts the singleton in a local first
+  — `var st = AppState.Current;` then `st.Uid` — was read as reaching for
+  nothing at all, and a row's floor stayed comfortably met on the call sites
+  it *could* see. Aliases are now expanded, and **only** when the name is
+  bound to that singleton and nothing else anywhere in the file: the first cut
+  rewrote whole files and reported twenty-eight perfectly real members as
+  missing, which is the failure mode this guard's own docstring is about.
+
 ## [0.60.0] — 2026-08-09
 
 ### An export is measured against the schema too — and drops the credentials
