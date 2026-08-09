@@ -4,6 +4,55 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.60.2] — 2026-08-09
+
+### The compiler was in the room the whole time and nothing listened
+
+`native.yml` builds the Swift, Kotlin and C# shells on three runners. It had
+been failing for 123 consecutive runs and no part of the loop read it: the
+workflow fired on `pull_request`, which never opens here because releases are
+fast-forward merges, and on `push` to `main`, which happens *after* the
+decision to ship. The trigger is any branch push now, and the result is the
+first green board this repo has ever had.
+
+    asked     do the shells read the members they name
+    mattered  do the shells compile
+
+Everything below was found by a compiler, not by reading.
+
+- **The Android shell could not be built at all.** `L10n.kt` is one `mapOf`
+  of 1,125 rows, which compiles into the object's static initializer, and the
+  JVM caps a single method at 64 KB. Past that there is no diagnostic to act
+  on — codegen fails with `Method too large` and no class is emitted. The
+  table is twelve functions now, joined by `table`
+- **Half of `ApiClient` was not in `ApiClient`.** 944 lines — friends, the
+  wall, the audience verbs, watch parties, skill grants, exchanges — sat
+  inside `record PackInstalled`'s body, where they could not see `Send`,
+  `Get` or `Post`, and where `PeoplePage` could not see them. A record body
+  is legal C#, so the file parsed; thirty methods the pages call did not
+  exist
+- **A defaulted parameter in the middle of a record's list** silently
+  swallows the last argument of every positional call. `WatermarkRecovery`
+  lost `method`; `ObjectionOpened` lost `note`
+- `AppState.kt` carried `private set` twice, a syntax error that hid every
+  member declared after it
+- `deskCardOf` built a seven-field shape out of a seventeen-field record and
+  had no caller left; `BeaconCameraSurface` read a `lang` it never took;
+  `Problems.send()` required an `appVersion` its caller does not pass
+- Names that were never there: `RevokeOut.Revoked` (it is `RevokedCount`),
+  `MicVocabularyOut.widths`, `WearableBoard.kinds`, `TutorialProgress.Next`,
+  `RosterSibling.Id`, a fifth `Api.shared` where the client is `ApiClient`
+- `AttestButton` and `BlockedNote` are `x:Name`d inside a `DataTemplate`,
+  which mints no code-behind field, so the localizer was setting text on
+  nothing. Both labels ride on the row now
+- Two `using` lists and one import list that did not ask for what the file
+  reaches for; two iOS calls that passed `query:` before `token:`; one
+  timeline row of five chained string operands the type checker gave up on
+
+Both C# record readers in `tests/` now end a record where C# does — at `);`,
+or at `)` before a body — after the move above took away the accident that
+had been hiding a bug in them.
+
 ## [0.60.1] — 2026-08-09
 
 ### A fix to the cascade fixes the next delete, not the last one

@@ -42,6 +42,7 @@
 # ever audit.
 #
 # ceiling: 85
+
 test_a_binding_is_not_a_door.py:134: len(found) > 20
 test_a_form_that_asks_for_it_has_a_label_for_it.py:128: controls > 10000
 test_a_form_that_asks_for_it_has_a_label_for_it.py:131: len(_asked_for()) >= 20
@@ -81,9 +82,9 @@ test_the_keys_the_android_client_reads.py:383: len(driven) >= 80
 test_the_keys_the_till_and_the_lifeline.py:140: client.post('/auth/oauth/nobody/start', json={}).status_code >= 400
 test_the_keys_the_till_and_the_lifeline.py:284: len(keys) >= 40
 test_the_last_doors.py:247: len(keys) >= 42
-test_the_member_that_isnt_there.py:271: len(_declared(lang, REPO / decl)) >= 5
 test_the_member_that_isnt_there.py:280: len(keys) >= 12
 test_the_member_that_isnt_there.py:281: len(used) >= 10
+test_the_member_that_isnt_there.py:271: len(_declared(lang, REPO / decl)) >= 5
 test_the_nav_is_translated_and_nothing_behind_it_is.py:227: len(nav) >= 40
 test_the_nav_is_translated_and_nothing_behind_it_is.py:253: len(nav_ids) >= 40
 test_the_objector_cannot_read_their_own_case.py:151: len(handlers) >= 8
@@ -98,9 +99,9 @@ test_the_refusal_that_handed_the_body_back.py:156: len(found) > 150
 test_the_refusal_that_handed_the_body_back.py:160: reached > 100
 test_the_refusal_that_handed_the_body_back.py:275: len(i18n._VALIDATION) >= 10
 test_the_seal_the_mail_and_the_screen.py:282: len(keys) >= 46
-test_the_shape_the_client_expects.py:306: len(driven) >= 30
-test_the_shape_the_client_expects.py:318: len(_bindings()) >= 150
-test_the_shape_the_client_expects.py:319: len(names) >= 490
+test_the_shape_the_client_expects.py:308: len(driven) >= 30
+test_the_shape_the_client_expects.py:320: len(_bindings()) >= 150
+test_the_shape_the_client_expects.py:321: len(names) >= 490
 test_the_shape_the_console_expects.py:404: len(shapes) >= 240
 test_the_shape_the_console_expects.py:405: sum((len(f) for f in shapes.values())) >= 1700
 test_the_shape_the_console_expects.py:406: len(_gets()) >= 190
@@ -117,9 +118,9 @@ test_the_shells_still_parse.py:378: named >= 900
 test_the_shells_still_parse.py:380: checked >= 340
 test_the_shells_still_parse.py:382: driven >= 780
 test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
-test_the_starters_know_their_trade.py:140: len(tags) >= 8
 test_the_starters_know_their_trade.py:69: len(d['expertise']) >= 350
 test_the_starters_know_their_trade.py:72: len(d['services']) >= 250
+test_the_starters_know_their_trade.py:140: len(tags) >= 8
 test_the_sticker_the_queue_and_the_stamp.py:283: len(keys) >= 34
 test_the_stranger_has_a_language_too.py:118: len(keys) > 15
 test_the_strangers_language_on_a_phone.py:427: len(text) > 800
