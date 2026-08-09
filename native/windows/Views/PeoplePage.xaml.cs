@@ -1095,7 +1095,7 @@ public sealed partial class PeoplePage : Page
         {
             var s = await ApiClient.Shared.MarkTutorialDone(
                 AppState.Current.Pid ?? "walk-in", TourStepBox.Text.Trim());
-            TourText.Text = s.Next ?? "";
+            TourText.Text = s.Step?.Title ?? "";
         });
 
     private async void OnTourScreen(object sender, RoutedEventArgs e) =>
@@ -1876,7 +1876,7 @@ public sealed partial class PeoplePage : Page
             var r = await ApiClient.Shared.Siblings(
                 AppState.Current.Pid!, AppState.Current.Token!);
             StatusText.Text = string.Join(" \u00b7 ",
-                (r.Profiles ?? []).Select(x => x.DisplayName ?? x.Id));
+                (r.Profiles ?? []).Select(x => x.DisplayName ?? x.ProfileId));
         });
 
     private async void OnExitMemorial(object sender, RoutedEventArgs e) =>

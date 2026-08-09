@@ -366,7 +366,8 @@ struct WearableSection: View {
                         let b = try await ApiClient.shared.wearables(
                             id: state.pid!, token: state.token!)
                         line = "\(b.wearables.count) · "
-                            + (b.kinds ?? []).joined(separator: " · ")
+                            + (b.kinds_worn ?? [:]).map { "\($0.key) \($0.value)" }
+                                .sorted().joined(separator: " · ")
                     }
                 }.font(.caption).disabled(busy)
                 TextField(L10n.t("wear.name", state.language), text: $name)

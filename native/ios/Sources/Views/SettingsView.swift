@@ -417,7 +417,7 @@ struct ObjectToAProfileCard: View {
                 Task {
                     busy = true; error = nil
                     do {
-                        result = try await Api.shared.openObjection(
+                        result = try await ApiClient.shared.openObjection(
                             profileId: profileId.trimmingCharacters(in: .whitespaces),
                             objectorRef: contact.trimmingCharacters(in: .whitespaces),
                             reason: reason)

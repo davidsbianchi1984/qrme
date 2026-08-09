@@ -454,7 +454,8 @@ object ApiClient {
         val o = JSONObject(request("/objections", "POST", body, null))
         return ObjectionOpened(
             o.getString("id"), o.optString("status", ""),
-            o.optString("profile_status", ""), o.optString("note", ""))
+            o.optString("profile_status", ""),
+            o.optString("prior_status", "active"), o.optString("note", ""))
     }
 
     // ---- chat (the core loop) ----

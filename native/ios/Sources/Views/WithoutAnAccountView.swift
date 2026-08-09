@@ -140,12 +140,15 @@ struct WithoutAnAccountView: View {
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
                     ForEach(timeline.events, id: \.id) { e in
-                        Text(L10n.t("obj.event.\(e.event)", lang)
-                             + " · " + L10n.t("obj.actor.\(e.actor)", lang)
-                             + " · " + e.at
-                             + (e.sealed
-                                ? " · " + L10n.t("obj.timeline.sealed", lang)
-                                : ""))
+                        // Built in steps: one chained expression of five
+                        // string operands is what the type checker gave up
+                        // on, and a row nobody could compile is a row
+                        // nobody ever read.
+                        let what = L10n.t("obj.event.\(e.event)", lang)
+                        let who = L10n.t("obj.actor.\(e.actor)", lang)
+                        let seal = e.sealed
+                            ? " · " + L10n.t("obj.timeline.sealed", lang) : ""
+                        Text(what + " · " + who + " · " + e.at + seal)
                             .font(.caption2).foregroundStyle(Theme.t2)
                     }
                 } else {
