@@ -16,6 +16,9 @@ public sealed partial class SettingsPage : Page
         public string Status { get; init; } = "";
         public string Reason { get; init; } = "";
         public bool CanAttest { get; init; }
+        // The label rides on the row, not on a page field: the button lives
+        // inside a DataTemplate, so there is no `AttestButton` to reach for.
+        public string AttestLabel { get; init; } = "";
         public Visibility AttestVisibility =>
             CanAttest ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -97,7 +100,6 @@ public sealed partial class SettingsPage : Page
 
         ObjHead.Text = L10n.T("ns.obj", lang);
         NoObjections.Text = L10n.T("ns.obj.none", lang);
-        AttestButton.Content = L10n.T("ns.obj.attest", lang);
 
         SideHead.Text = L10n.T("ns.side", lang);
         SideSub.Text = L10n.T("ns.side.sub", lang);
@@ -184,9 +186,10 @@ public sealed partial class SettingsPage : Page
             {
                 Id = o.Id,
                 Status = o.Status.ToUpper()
-                         + (o.Reattested == 1 ? " · basis re-attested" : ""),
+                         + (o.Reattested ? " · basis re-attested" : ""),
                 Reason = o.Reason ?? "",
-                CanAttest = o.Status == "open" && o.Reattested == 0,
+                CanAttest = o.Status == "open" && !o.Reattested,
+                AttestLabel = L10n.T("ns.obj.attest", AppState.Current.Language),
             }).ToList();
             NoObjections.Visibility =
                 objections.Length == 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -509,7 +512,7 @@ public sealed partial class SettingsPage : Page
     /// the counts appear because somebody pressed for them.</summary>
     private async void OnReadMyCounts(object sender, RoutedEventArgs e)
     {
-        var who = AppState.Shared.InteractorId;
+        var who = AppState.Current.InteractorId;
         if (string.IsNullOrEmpty(who))
         {
             SideNote.Text = L10n.T("ns.side.signin");
@@ -543,7 +546,7 @@ public sealed partial class SettingsPage : Page
 
     private async System.Threading.Tasks.Task Decide(bool accept)
     {
-        var who = AppState.Shared.InteractorId;
+        var who = AppState.Current.InteractorId;
         if (string.IsNullOrEmpty(who)) return;
         await ApiClient.Shared.SolitudeHandoff(who, accept);
         OnReadMyCounts(this, new RoutedEventArgs());
@@ -554,7 +557,7 @@ public sealed partial class SettingsPage : Page
     /// to.</summary>
     private async void OnShowWhatWent(object sender, RoutedEventArgs e)
     {
-        var who = AppState.Shared.InteractorId;
+        var who = AppState.Current.InteractorId;
         if (string.IsNullOrEmpty(who)) return;
         var r = await ApiClient.Shared.SolitudeReferral(who);
         SideReferral.Text = $"{r.Ref}   {L10n.T("ns.side.thatisall")}";

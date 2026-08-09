@@ -117,8 +117,8 @@ public sealed partial class VoicePage : Page
             var turnLine = en.MeanTurnSeconds is { } mean
                 ? $"about {mean:F1}s a turn"
                 : "no turns counted yet";
-            ThresholdText.Text = $"{turnLine} · needs {en.Threshold.Samples} samples "
-                               + $"and {en.Threshold.Seconds:F0}s";
+            ThresholdText.Text = $"{turnLine} · needs {en.ReadyWhen.Samples} samples "
+                               + $"and {en.ReadyWhen.Seconds:F0}s";
             NeedsText.Text = en.Needs.Length > 0
                 ? L10n.Fill("nvoi.needs", lang,
                             ("needs", string.Join(", ", en.Needs))) : "";

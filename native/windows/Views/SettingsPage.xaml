@@ -99,7 +99,7 @@
                                                Foreground="{StaticResource QrmeT2Brush}" />
                                     <TextBlock Text="{Binding Reason}" Foreground="{StaticResource QrmeTxtBrush}"
                                                FontSize="13" TextWrapping="Wrap" />
-                                    <Button x:Name="AttestButton" Tag="{Binding Id}"
+                                    <Button Content="{Binding AttestLabel}" Tag="{Binding Id}"
                                             Click="OnAttest" Visibility="{Binding AttestVisibility}"
                                             Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
                                 </StackPanel>

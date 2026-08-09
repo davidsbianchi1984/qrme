@@ -14,6 +14,9 @@ public sealed partial class CommunityPage : Page
         public string From { get; init; } = "";
         public string Content { get; init; } = "";
         public bool Blocked { get; init; }
+        // Carried on the row: the note sits inside a DataTemplate, where
+        // x:Name buys a code-behind field on nobody's copy of it.
+        public string BlockedLabel { get; init; } = "";
         public Visibility BlockedVisibility =>
             Blocked ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -53,7 +56,6 @@ public sealed partial class CommunityPage : Page
         AliasBox.Header = L10n.T("nc.alias.ph", lang);
         JoinButton.Content = L10n.T("nc.find", lang);
         EndButton.Content = L10n.T("nc.end", lang);
-        BlockedNote.Text = L10n.T("nc.blocked", lang);
         StrangerDraft.PlaceholderText = L10n.T("nc.say.ph", lang);
         SendStrangerButton.Content = L10n.T("nc.send", lang);
         RefreshStrangerButton.Content = L10n.T("nc.refresh", lang);
@@ -148,6 +150,7 @@ public sealed partial class CommunityPage : Page
                 From = m.From,
                 Content = m.Content,
                 Blocked = m.Status == "blocked",
+                BlockedLabel = L10n.T("nc.blocked", s.Language),
             }).ToList();
         }
         catch (Exception ex) { ShowStrangerError(ex.Message); }

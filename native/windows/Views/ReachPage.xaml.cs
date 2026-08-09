@@ -259,8 +259,8 @@ public sealed partial class ReachPage : Page
                     Tagline = r.Tagline,
                     SyncState = L10n.Fill("nmg.packs.count", AppState.Current.Language,
                                           ("synced", $"{r.Synced}"),
-                                          ("available", $"{r.Available}")),
-                    CanSync = r.Synced < r.Available,
+                                          ("available", $"{r.AvailablePacks}")),
+                    CanSync = r.Synced < r.AvailablePacks,
                 }).ToList();
             var catalog = await ApiClient.Shared.Packs(PackIndustryBox.Text.Trim());
             _installedOn = (await ApiClient.Shared.InstalledPacks(s.Pid!, s.Token!))

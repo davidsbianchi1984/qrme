@@ -1150,7 +1150,7 @@ actor ApiClient {
     func connectionMessages(cid: String, interactorId: String,
                             token: String) async throws -> [ConnMsg] {
         try await request("/connections/\(cid)/messages",
-                          query: ["interactor_id": interactorId], token: token)
+                          token: token, query: ["interactor_id": interactorId])
     }
 
     func sendConnectionMessage(cid: String, interactorId: String,
@@ -1165,8 +1165,8 @@ actor ApiClient {
                        token: String) async throws {
         struct Ok: Decodable {}
         let _: Ok = try await request("/connections/\(cid)/end", method: "POST",
-                                      query: ["interactor_id": interactorId],
-                                      token: token)
+                                      token: token,
+                                      query: ["interactor_id": interactorId])
     }
 
     func createRoom(topic: String, profileId: String,

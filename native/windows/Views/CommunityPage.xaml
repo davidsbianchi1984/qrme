@@ -59,7 +59,7 @@
                                                            Foreground="{StaticResource QrmeT2Brush}" />
                                                 <TextBlock Text="{Binding Content}" FontSize="13" TextWrapping="Wrap"
                                                            Foreground="{StaticResource QrmeTxtBrush}" />
-                                                <TextBlock x:Name="BlockedNote" FontSize="10"
+                                                <TextBlock Text="{Binding BlockedLabel}" FontSize="10"
                                                            Visibility="{Binding BlockedVisibility}"
                                                            Foreground="{StaticResource QrmeRedBrush}" />
                                             </StackPanel>

@@ -478,950 +478,6 @@ public record PackInstalled(
     [property: JsonPropertyName("price_paid")] double PricePaid)
 {
     public int Count => InstalledItems ?? InstalledTasks?.Length ?? 0;
-
-    // -- the people around a profile: friends, the wall, comments --
-    // Nine routes the backend has carried since the community round; this
-    // shell is the last client to get a door for them.
-
-    public async Task<FriendRow[]> Friends(string profileId)
-    {
-        var box = await Send<FriendListBox>(Get($"/profiles/{profileId}/friends"));
-        return box.Friends;
-    }
-
-    /// <summary>The deed, never the words: a row names the kind and the
-    /// actor; the sentence for each kind is this shell's, from L10n.</summary>
-    public Task<InboxPage> Inbox(string profileId, string token) =>
-        Send<InboxPage>(Get($"/profiles/{profileId}/inbox", token));
-
-    public Task<InboxSeen> MarkInboxSeen(string profileId, string token) =>
-        Send<InboxSeen>(Post($"/profiles/{profileId}/inbox/seen",
-            new { }, token));
-
-    public async Task<SuggestedRow[]> SuggestedFriends(string profileId)
-    {
-        var box = await Send<SuggestedBox>(
-            Get($"/profiles/{profileId}/friends/suggested"));
-        return box.Suggested;
-    }
-
-    public Task<FriendAdded> AddFriend(string profileId, string friendId,
-                                       string token) =>
-        Send<FriendAdded>(Post($"/profiles/{profileId}/friends",
-            new { friend_id = friendId }, token));
-
-    /// <summary>Pinned rows refuse with 409; the list marks them so the
-    /// control is left off rather than offered and failing.</summary>
-    public Task<FriendAdded> RemoveFriend(string profileId, string friendId,
-                                          string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/profiles/{profileId}/friends/{friendId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<FriendAdded>(req);
-    }
-
-    // -- the crowd, the couch and the loan --------------------------------
-    // Audience verbs, the watch party, and skill grants: three blocks the
-    // doorless records said this shell could not reach.
-
-    public Task<LikeOut> Like(string kind, string targetId, string token) =>
-        Send<LikeOut>(Post($"/{kind}/{targetId}/like", new { }, token));
-
-    public Task<LikeOut> Unlike(string kind, string targetId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/{kind}/{targetId}/like");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<LikeOut>(req);
-    }
-
-    public Task<ShareOut> Share(string kind, string targetId, string token) =>
-        Send<ShareOut>(Post($"/{kind}/{targetId}/share",
-            new { channel = "link" }, token));
-
-    public Task<AudienceCounts> AudienceOf(string kind, string targetId,
-                                           string token) =>
-        Send<AudienceCounts>(Get($"/{kind}/{targetId}/audience", token));
-
-    public Task<SubscribeOut> Subscribe(string kind, string subjectId,
-                                        string token) =>
-        Send<SubscribeOut>(Post($"/{kind}/{subjectId}/subscribe",
-            new { tier = "follow" }, token));
-
-    public Task<SubscribeOut> Unsubscribe(string kind, string subjectId,
-                                          string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/{kind}/{subjectId}/subscribe");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<SubscribeOut>(req);
-    }
-
-    public Task<SubscriberBox> Subscribers(string kind, string subjectId,
-                                           string token) =>
-        Send<SubscriberBox>(Get($"/{kind}/{subjectId}/subscribers", token));
-
-    /// <summary>A gift is a gift — the backend refuses to reverse it, and
-    /// requires the giver to be a verified adult.</summary>
-    public Task<GiftRow> Gift(string kind, string subjectId, double amount,
-                              string note, string token) =>
-        Send<GiftRow>(Post($"/{kind}/{subjectId}/gift",
-            new { amount, note }, token));
-
-    public Task<GiftBox> Gifts(string kind, string subjectId, string token) =>
-        Send<GiftBox>(Get($"/{kind}/{subjectId}/gifts", token));
-
-    public Task<PartyCard> StartParty(string postId, string hostId,
-                                      string title, string token) =>
-        Send<PartyCard>(Post("/watch-parties",
-            new { post_id = postId, host_id = hostId, title }, token));
-
-    public Task<PartyCard> Party(string partyId, string token) =>
-        Send<PartyCard>(Get($"/watch-parties/{partyId}", token));
-
-    public Task<PartyCard> JoinParty(string partyId, string memberId,
-                                     string token) =>
-        Send<PartyCard>(Post($"/watch-parties/{partyId}/members",
-            new { member_id = memberId, kind = "profile" }, token));
-
-    public Task<LeaveOut> LeaveParty(string partyId, string memberId,
-                                     string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/watch-parties/{partyId}/members/{memberId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<LeaveOut>(req);
-    }
-
-    /// <summary>Moves a number; presses play on nobody's device.</summary>
-    public Task<PartyCard> SeekParty(string partyId, string hostId,
-                                     int positionS, string token) =>
-        Send<PartyCard>(Post($"/watch-parties/{partyId}/seek",
-            new { host_id = hostId, position_s = positionS, playing = true },
-            token));
-
-    public Task<PartyLine> SayInParty(string partyId, string memberId,
-                                      string body, string token) =>
-        Send<PartyLine>(Post($"/watch-parties/{partyId}/chat",
-            new { member_id = memberId, body }, token));
-
-    public Task<PartyChatBox> PartyChat(string partyId, string token) =>
-        Send<PartyChatBox>(Get($"/watch-parties/{partyId}/chat", token));
-
-    public Task<PartyCard> EndParty(string partyId, string token) =>
-        Send<PartyCard>(Post($"/watch-parties/{partyId}/end", new { },
-            token));
-
-    /// <summary>The sentence a synthetic member carries: it has not seen
-    /// the footage.</summary>
-    public Task<PartyContext> PartyContextOf(string partyId, string token) =>
-        Send<PartyContext>(Get($"/watch-parties/{partyId}/context", token));
-
-    public Task<GrantVocabulary> GrantVocabulary() =>
-        Send<GrantVocabulary>(Get("/skill-grants/vocabulary"));
-
-    public Task<GrantCard> OfferGrant(string lenderId, string borrowerId,
-                                      string surface, string surfaceId,
-                                      string skillKind, string skillRef,
-                                      string title, string token) =>
-        Send<GrantCard>(Post("/skill-grants", new
-        {
-            lender_id = lenderId, borrower_id = borrowerId, surface,
-            surface_id = surfaceId, skill_kind = skillKind,
-            skill_ref = skillRef, title
-        }, token));
-
-    public Task<GrantCard> Grant(string grantId, string token) =>
-        Send<GrantCard>(Get($"/skill-grants/{grantId}", token));
-
-    public Task<GrantCard> AcceptGrant(string grantId, string actorId,
-                                       string token) =>
-        Send<GrantCard>(Post($"/skill-grants/{grantId}/accept",
-            new { actor_id = actorId }, token));
-
-    public Task<GrantCard> DeclineGrant(string grantId, string actorId,
-                                        string token) =>
-        Send<GrantCard>(Post($"/skill-grants/{grantId}/decline",
-            new { actor_id = actorId }, token));
-
-    public Task<GrantCard> CloseGrant(string grantId, string actorId,
-                                      string token) =>
-        Send<GrantCard>(Post($"/skill-grants/{grantId}/close",
-            new { actor_id = actorId }, token));
-
-    public Task<GrantUse> UseGrant(string grantId, string borrowerId,
-                                   string what, string token) =>
-        Send<GrantUse>(Post($"/skill-grants/{grantId}/use",
-            new { borrower_id = borrowerId, what }, token));
-
-    public Task<GrantUseBox> GrantUses(string grantId, string token) =>
-        Send<GrantUseBox>(Get($"/skill-grants/{grantId}/uses", token));
-
-    public Task<GrantBox> GrantsInSurface(string surface, string surfaceId,
-                                          string token) =>
-        Send<GrantBox>(Get($"/surfaces/{surface}/{surfaceId}/skill-grants",
-            token));
-
-    public Task<MyGrants> MyGrants(string personId, string token) =>
-        Send<MyGrants>(Get($"/people/{personId}/skill-grants", token));
-
-    // -- the place, the camera, the organization and the tour -------------
-    // Four more blocks off the doorless records. Disclosure-first: who
-    // here has lent a microphone and who wears what are readable by
-    // everyone present.
-
-    public Task<WhoseCard> Whose(string surface, string surfaceId) =>
-        Send<WhoseCard>(Get($"/places/{surface}/{surfaceId}/whose"));
-
-    public Task<MicDisclosure> LendMicrophone(string surface,
-        string surfaceId, string interactorId, string token) =>
-        Send<MicDisclosure>(Post($"/places/{surface}/{surfaceId}/microphone",
-            new { interactor_id = interactorId }, token));
-
-    public Task<MicDisclosure> TakeBackMicrophone(string surface,
-        string surfaceId, string interactorId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/places/{surface}/{surfaceId}/microphone")
-        { Content = JsonContent.Create(new { interactor_id = interactorId }) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MicDisclosure>(req);
-    }
-
-    public Task<MicDisclosure> MicrophoneDisclosure(string surface,
-        string surfaceId, string token) =>
-        Send<MicDisclosure>(Get($"/places/{surface}/{surfaceId}/microphone",
-            token));
-
-    public Task<WornRow> WearOverlay(string surface, string surfaceId,
-        string interactorId, string kind, string title, string token) =>
-        Send<WornRow>(Post($"/places/{surface}/{surfaceId}/overlay",
-            new { interactor_id = interactorId, kind, title }, token));
-
-    public Task<WornRow> TakeOffOverlay(string surface, string surfaceId,
-        string interactorId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/places/{surface}/{surfaceId}/overlay")
-        { Content = JsonContent.Create(new { interactor_id = interactorId }) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<WornRow>(req);
-    }
-
-    public Task<WornDisclosure> WornOverlays(string surface, string surfaceId,
-        string token) =>
-        Send<WornDisclosure>(Get($"/places/{surface}/{surfaceId}/overlay",
-            token));
-
-    /// <summary>The published refusals, verbatim — a refused combination
-    /// is a decision, not a missing feature.</summary>
-    public Task<CameraVocabulary> CameraVocabulary() =>
-        Send<CameraVocabulary>(Get("/camera/vocabulary"));
-
-    public Task<BystanderNote> BystanderGuidance(string subject) =>
-        Send<BystanderNote>(Get($"/camera/bystanders/{subject}"));
-
-    public Task<CameraSession> OpenCamera(string holderId, string surface,
-        string surfaceId, string subject, string viewerId, int minutes,
-        string token) =>
-        Send<CameraSession>(Post("/camera/sessions", new
-        {
-            holder_id = holderId, surface, surface_id = surfaceId, subject,
-            viewer_kind = "person", viewer_id = viewerId, minutes
-        }, token));
-
-    public Task<CameraSession> CameraSessionOf(string sessionId,
-        string token) =>
-        Send<CameraSession>(Get($"/camera/sessions/{sessionId}", token));
-
-    public Task<CameraSession> CloseCamera(string sessionId, string actorId,
-        string token) =>
-        Send<CameraSession>(Post($"/camera/sessions/{sessionId}/close",
-            new { actor_id = actorId }, token));
-
-    public Task<CameraSession[]> MyCameras(string holderId, string token) =>
-        Send<CameraSession[]>(Get($"/camera/live/{holderId}", token));
-
-    public Task<CameraDisclosure> CameraDisclosureOf(string surface,
-        string surfaceId, string token) =>
-        Send<CameraDisclosure>(Get(
-            $"/camera/disclosure/{surface}/{surfaceId}", token));
-
-    public Task<OrgCard[]> Organizations(string token) =>
-        Send<OrgCard[]>(Get("/organizations", token));
-
-    public Task<OrgCard> CreateOrganization(string name, string token) =>
-        Send<OrgCard>(Post("/organizations", new { name }, token));
-
-    public Task<OrgCard> SeedDemoOrganization(string token) =>
-        Send<OrgCard>(Post("/organizations/demo", new { }, token));
-
-    public Task<OrgCard> OrganizationOf(string orgId, string token) =>
-        Send<OrgCard>(Get($"/organizations/{orgId}", token));
-
-    public Task<OrgDepartment> AddDepartment(string orgId, string name,
-        string role, string profileId, string token) =>
-        Send<OrgDepartment>(Post($"/organizations/{orgId}/departments",
-            new { name, role, profile_id = profileId }, token));
-
-    public Task<Coordination> Coordinate(string orgId, string goal,
-        string fromDepartment, string token) =>
-        Send<Coordination>(Post($"/organizations/{orgId}/coordinate",
-            new { goal, from_department = fromDepartment }, token));
-
-    public Task<Coordination[]> Coordinations(string orgId, string token) =>
-        Send<Coordination[]>(Get($"/organizations/{orgId}/coordinations",
-            token));
-
-    public Task<TutorialOutline> TutorialOutline() =>
-        Send<TutorialOutline>(Get("/tutorial"));
-
-    public Task<TutorialStep> TutorialStepOf(string key) =>
-        Send<TutorialStep>(Get($"/tutorial/steps/{key}"));
-
-    public Task<TutorialStep> TutorialForScreen(int number) =>
-        Send<TutorialStep>(Get($"/tutorial/for-screen/{number}"));
-
-    public Task<TutorialProgress> StartTutorial(string learnerId) =>
-        Send<TutorialProgress>(Post("/tutorial/start",
-            new { learner_id = learnerId, lesson = "" }));
-
-    /// <summary>Progress wraps the step — a learner id and where they are —
-    /// rather than being one, which is why this does not decode as a
-    /// <see cref="TutorialStep"/>.</summary>
-    public Task<TutorialProgress> TutorialProgress(string learnerId) =>
-        Send<TutorialProgress>(Get($"/tutorial/progress/{learnerId}"));
-
-    public Task<TutorialProgress> MarkTutorialDone(string learnerId,
-        string lesson) =>
-        Send<TutorialProgress>(Post("/tutorial/done",
-            new { learner_id = learnerId, lesson }));
-
-    // -- the body, the referral, the objection, the lobby and the dock ----
-    // Five more blocks off the doorless records, each rendering its
-    // backend's rules rather than inventing a sixth opinion.
-
-    public Task<RobotUnbound> UnbindRobot(string robotId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/robots/{robotId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<RobotUnbound>(req);
-    }
-
-    /// <summary>Owner-only audit: everything this body has been told to
-    /// do.</summary>
-    public Task<RobotCommandRow[]> RobotCommands(string robotId,
-        string token) =>
-        Send<RobotCommandRow[]>(Get($"/robots/{robotId}/commands", token));
-
-    public Task<RobotSkillRow[]> RobotSkills(string robotId, string token) =>
-        Send<RobotSkillRow[]>(Get($"/robots/{robotId}/skills", token));
-
-    /// <summary>A body's dials — intimacy never applies to a body.</summary>
-    public Task<RobotSteering> RobotSteeringOf(string robotId,
-        string token) =>
-        Send<RobotSteering>(Get($"/robots/{robotId}/steering", token));
-
-    public Task<RobotSteering> SteerRobot(string robotId, int pace,
-        string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Put,
-            $"/robots/{robotId}/steering")
-        {
-            Content = JsonContent.Create(new
-            {
-                values = new System.Collections.Generic
-                    .Dictionary<string, int> { ["pace"] = pace }
-            })
-        };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<RobotSteering>(req);
-    }
-
-    public Task<ClinicianRow[]> MatchClinicians(string area) =>
-        Send<ClinicianRow[]>(Get($"/referrals/match?area={area}"));
-
-    /// <summary>Nothing is released here — the package comes back to be
-    /// read, and the signature raised covers exactly those bytes.</summary>
-    public Task<ReferralPackage> PrepareReferral(string interactorId,
-        string profileId, string providerId, string token) =>
-        Send<ReferralPackage>(Post("/referrals/prepare", new
-        {
-            interactor_id = interactorId, profile_id = profileId,
-            provider_id = providerId
-        }, token));
-
-    public Task<ReferralPackage> ReleaseReferral(string referralId,
-        string signatureId, string token) =>
-        Send<ReferralPackage>(Post($"/referrals/{referralId}/release",
-            new { signature_id = signatureId }, token));
-
-    /// <summary>Once — a second attempt says so rather than quietly
-    /// working.</summary>
-    public Task<ReferralPackage> OpenReferral(string referralId,
-        string linkToken) =>
-        Send<ReferralPackage>(Get(
-            $"/referrals/{referralId}?token={linkToken}"));
-
-    public Task<ReferralPackage> ReplyToReferral(string referralId,
-        string linkToken, string content) =>
-        Send<ReferralPackage>(Post(
-            $"/referrals/{referralId}/reply?token={linkToken}",
-            new { content }));
-
-    public Task<ObjectionCard> ObjectionOf(string objectionId) =>
-        Send<ObjectionCard>(Get($"/objections/{objectionId}"));
-
-    public Task<ObjectionAudit> ObjectionAuditOf(string objectionId,
-        string token) =>
-        Send<ObjectionAudit>(Get($"/objections/{objectionId}/audit", token));
-
-    public Task<ObjectionCard> WithdrawObjectionConsent(
-        string objectionId) =>
-        Send<ObjectionCard>(Post($"/objections/{objectionId}/withdraw",
-            new { }));
-
-    public Task<ObjectionCard> RevokeObjectionBasis(string objectionId) =>
-        Send<ObjectionCard>(Post($"/objections/{objectionId}/revoke",
-            new { }));
-
-    /// <summary>Reviewer-only — an owner cannot adjudicate an objection
-    /// against their own profile, and the backend enforces it by
-    /// role.</summary>
-    public Task<ObjectionCard> ResolveObjection(string objectionId,
-        string outcome, string token) =>
-        Send<ObjectionCard>(Post($"/objections/{objectionId}/resolve",
-            new { outcome }, token));
-
-    public Task<LobbyVocabulary> LobbyVocabulary() =>
-        Send<LobbyVocabulary>(Get("/gaming/lobby/vocabulary"));
-
-    public Task<LobbySeatRow> SeatInLobby(string sessionId,
-        string memberKind, string memberId, string role, string token) =>
-        Send<LobbySeatRow>(Post($"/gaming/sessions/{sessionId}/lobby", new
-        {
-            member_kind = memberKind, member_id = memberId, role
-        }, token));
-
-    /// <summary>The honest roster: what each callsign is travels with
-    /// it.</summary>
-    public Task<LobbyRoster> LobbyRosterOf(string sessionId, string token) =>
-        Send<LobbyRoster>(Get($"/gaming/sessions/{sessionId}/lobby", token));
-
-    public Task<LobbyLeft> LeaveLobby(string sessionId, string memberId,
-        string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/gaming/sessions/{sessionId}/lobby")
-        { Content = JsonContent.Create(new { member_id = memberId }) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<LobbyLeft>(req);
-    }
-
-    public Task<LobbyContext> LobbyContextOf(string sessionId,
-        string token) =>
-        Send<LobbyContext>(Get(
-            $"/gaming/sessions/{sessionId}/lobby/context", token));
-
-    public Task<DockFacesBox> DockFaces() =>
-        Send<DockFacesBox>(Get("/dock/faces"));
-
-    /// <summary>The dock is read-only, so every face carries a way out of
-    /// it.</summary>
-    public Task<DockWhere> DockWhereOf(string face) =>
-        Send<DockWhere>(Get($"/dock/where/{face}"));
-
-    public Task<DockSettings> DockSettingsOf(string profileId,
-        string token) =>
-        Send<DockSettings>(Get($"/dock/{profileId}", token));
-
-    public Task<DockSettings> ConfigureDock(string profileId, string corner,
-        string state, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Put,
-            $"/dock/{profileId}")
-        { Content = JsonContent.Create(new { corner, state }) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<DockSettings>(req);
-    }
-
-    public Task<DockFace> DockFaceOf(string profileId, string name,
-        string token) =>
-        Send<DockFace>(Get($"/dock/{profileId}/face/{name}", token));
-
-    // -- the signature, the mail server, the room's ear, the wall screen,
-    // the plan, the handoff and the campaign ------------------------------
-    // Seven small blocks that close out the mid-sized doorless groups.
-
-    public Task<SignatureCertificate> SignatureCertificateOf(string sigId) =>
-        Send<SignatureCertificate>(Get($"/signatures/{sigId}/certificate"));
-
-    /// <summary>No token, no lookup, no trust in this deployment beyond
-    /// the arithmetic.</summary>
-    public Task<SignatureVerdict> VerifySignaturePackage() =>
-        Send<SignatureVerdict>(Post("/signatures/verify",
-            new { package = new { } }));
-
-    public Task<ProofingOut> ReproofCredential(string rowId, string level,
-        string attestor, string token) =>
-        Send<ProofingOut>(Post($"/signatures/credentials/{rowId}/proofing",
-            new
-            {
-                proofing_level = level, proofing_attestor = attestor,
-                proofing_method = "document", proofing_ref = "in-person"
-            }, token));
-
-    /// <summary>The WebAuthn ceremony page, opened in a web view — never
-    /// re-implemented in the shell. The URL is taken off the same GET the
-    /// view will issue, so the door and the address cannot drift.</summary>
-    public string SignatureCeremonyUrl() =>
-        Get("/signatures/ceremony").RequestUri!.ToString();
-
-    public Task<MailSettingsCard> MailSettings() =>
-        Send<MailSettingsCard>(Get("/settings/mail"));
-
-    public Task<MailSettingsCard> SaveMailSettings(string host, int port,
-        string sender, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Put, "/settings/mail")
-        { Content = JsonContent.Create(new { host, port, sender }) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MailSettingsCard>(req);
-    }
-
-    public Task<MailSettingsCard> ForgetMailSettings(string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete, "/settings/mail");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MailSettingsCard>(req);
-    }
-
-    /// <summary>A settings screen that saves without ever proving it can
-    /// deliver is how an app ends up insisting it emailed somebody.</summary>
-    public Task<MailTestOut> TestMailSettings(string to, string token) =>
-        Send<MailTestOut>(Post("/settings/mail/test", new { to }, token));
-
-    public Task<RoomCard[]> Rooms() => Send<RoomCard[]>(Get("/rooms"));
-
-    public Task<MicDisclosure> LendRoomMic(string roomId,
-        string interactorId, string token) =>
-        Send<MicDisclosure>(Post($"/rooms/{roomId}/mic",
-            new { interactor_id = interactorId }, token));
-
-    public Task<MicDisclosure> TakeBackRoomMic(string roomId,
-        string interactorId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/rooms/{roomId}/mic/{interactorId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MicDisclosure>(req);
-    }
-
-    /// <summary>Readable by anyone in the room — a disclosure only its
-    /// subject can see is not a disclosure.</summary>
-    public Task<MicDisclosure> RoomMicDisclosure(string roomId,
-        string token) =>
-        Send<MicDisclosure>(Get($"/rooms/{roomId}/mic", token));
-
-    public Task<DisplayVocabulary> DisplayVocabulary() =>
-        Send<DisplayVocabulary>(Get("/displays/vocabulary"));
-
-    public Task<DisplayCard> DisplayOf(string displayId) =>
-        Send<DisplayCard>(Get($"/displays/{displayId}"));
-
-    public Task<DisplayCard> SetDisplayFaces(string displayId,
-        string[] faces, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Put,
-            $"/displays/{displayId}/faces")
-        { Content = JsonContent.Create(new { faces }) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<DisplayCard>(req);
-    }
-
-    public Task<DisplayCard> TakeDownDisplay(string displayId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/displays/{displayId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<DisplayCard>(req);
-    }
-
-    public Task<MembershipCard> MembershipOf(string accountId,
-        string token) =>
-        Send<MembershipCard>(Get($"/memberships/{accountId}", token));
-
-    public Task<MembershipCard> JoinPlan(string accountId, string plan,
-        string token) =>
-        Send<MembershipCard>(Post($"/memberships/{accountId}",
-            new { plan }, token));
-
-    /// <summary>The account becomes a visitor and keeps its profiles — a
-    /// lapsed subscription is not a reason to delete somebody's
-    /// work.</summary>
-    public Task<MembershipCard> CancelMembership(string accountId,
-        string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/memberships/{accountId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MembershipCard>(req);
-    }
-
-    public Task<HandoffCard> CreateHandoff(string interactorId,
-        string profileId, string providerId, string token) =>
-        Send<HandoffCard>(Post("/handoffs", new
-        {
-            interactor_id = interactorId, profile_id = profileId,
-            provider_id = providerId, consent = true
-        }, token));
-
-    public Task<HandoffCard> OpenHandoff(string handoffId,
-        string linkToken) =>
-        Send<HandoffCard>(Get($"/handoffs/{handoffId}?token={linkToken}"));
-
-    public Task<HandoffCard> RevokeHandoff(string handoffId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/handoffs/{handoffId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<HandoffCard>(req);
-    }
-
-    public Task<CampaignCard> CampaignOf(string campaignId) =>
-        Send<CampaignCard>(Get($"/campaigns/{campaignId}"));
-
-    /// <summary>No token required — a donor arriving from a beacon scan
-    /// has no account, and requiring one gates generosity behind
-    /// signup.</summary>
-    public Task<CampaignCard> Donate(string campaignId, double amount,
-        string note) =>
-        Send<CampaignCard>(Post($"/campaigns/{campaignId}/donate",
-            new { amount, note }));
-
-    public Task<CampaignCard> CloseCampaign(string campaignId,
-        string token) =>
-        Send<CampaignCard>(Post($"/campaigns/{campaignId}/close", new { },
-            token));
-
-    public async Task<WallPostRow[]> Wall(string profileId)
-    {
-        var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
-        return box.Posts;
-    }
-
-    public Task<WallPostRow> PostToWall(string profileId, string body,
-                                        string token) =>
-        Send<WallPostRow>(Post($"/profiles/{profileId}/wall",
-            new { body }, token));
-
-    public async Task<CommentRow[]> Comments(string kind, string targetId,
-                                             string token)
-    {
-        var box = await Send<CommentBox>(
-            Get($"/{kind}/{targetId}/comments", token));
-        return box.Comments;
-    }
-
-    public Task<CommentRow> AddComment(string kind, string targetId,
-                                       string body, string token) =>
-        Send<CommentRow>(Post($"/{kind}/{targetId}/comments",
-            new { body }, token));
-
-    public Task<CommentRow> DeleteComment(string commentId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/comments/{commentId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<CommentRow>(req);
-    }
-
-
-    // -- standing behind the counter: desks, the market, exchanges --
-    // The caller's side shipped long ago; the other side of the same
-    // counter never reached any shell, nor did searching, pricing,
-    // selling or buying in the market, nor being party to an exchange.
-
-    public Task<DeskBrief[]> Desks() => Send<DeskBrief[]>(Get("/desks"));
-
-    public Task<DeskOpened> OpenDesk(string ownerId, string displayName,
-                                   string trade, string attestor,
-                                   string basis, string location,
-                                   string blurb, string token) =>
-        Send<DeskOpened>(Post("/desks", new {
-            owner_id = ownerId, display_name = displayName, trade, attestor,
-            basis, location, blurb }, token));
-
-    public Task<DeskOpened> SetDeskPresence(string deskId, string presence,
-                                          string token) =>
-        Send<DeskOpened>(Put($"/desks/{deskId}/presence", new { presence },
-                           token));
-
-    public Task<DeskOpened> SetDeskPortrait(string deskId, string token) =>
-        Send<DeskOpened>(Put($"/desks/{deskId}/portrait",
-                           new { asset = (string?)null }, token));
-
-    public Task<DeskOpened> SetDeskCamera(string deskId, string url,
-                                        string token) =>
-        Send<DeskOpened>(Put($"/desks/{deskId}/camera", new { url },
-                           token));
-
-    public async Task<DeskRing[]> DeskRings(string deskId, string token)
-    {
-        var box = await Send<DeskRingBox>(Get($"/desks/{deskId}/rings",
-                                              token));
-        return box.Rings;
-    }
-
-    public Task<DeskRing> AckDeskRing(string deskId, string ringId,
-                                      string token) =>
-        Send<DeskRing>(Post($"/desks/{deskId}/rings/{ringId}/ack",
-                            new { }, token));
-
-    public Task<DeskGuest> AskToJoinDesk(string deskId, string note,
-                                         string token) =>
-        Send<DeskGuest>(Post($"/desks/{deskId}/guests", new { note }, token));
-
-    public async Task<DeskGuest[]> DeskGuests(string deskId, string token)
-    {
-        var box = await Send<DeskGuestBox>(Get($"/desks/{deskId}/guests",
-                                                token));
-        return box.Guests;
-    }
-
-    public Task<DeskGuest> AcceptDeskGuest(string deskId, string requestId,
-                                           string token) =>
-        Send<DeskGuest>(Post($"/desks/{deskId}/guests/{requestId}/accept",
-                             new { }, token));
-
-    public Task<DeskGuest> DeclineDeskGuest(string deskId, string requestId,
-                                            string token) =>
-        Send<DeskGuest>(Post($"/desks/{deskId}/guests/{requestId}/decline",
-                             new { }, token));
-
-    /// <summary>The caller's own way out — theirs to press, not the desk's.</summary>
-    public Task<DeskGuest> LeaveDesk(string deskId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/desks/{deskId}/guests/me");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<DeskGuest>(req);
-    }
-
-    public Task<DeskBeacon> AddDeskBeacon(string deskId, string label,
-                                          string token) =>
-        Send<DeskBeacon>(Post($"/desks/{deskId}/beacons", new { label },
-                              token));
-
-    public async Task<DeskBeacon[]> DeskBeacons(string deskId, string token)
-    {
-        var box = await Send<DeskBeaconBox>(Get($"/desks/{deskId}/beacons",
-                                                 token));
-        return box.Beacons;
-    }
-
-    public Task<DeskBeacon> RemoveDeskBeacon(string beaconId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/desk-beacons/{beaconId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<DeskBeacon>(req);
-    }
-
-    /// <summary>The sticker, as bytes an image control can show. Fetched
-    /// directly rather than through the JSON helper, which cannot carry an
-    /// image.</summary>
-    public Task<byte[]> DeskBeaconQr(string beaconId)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Get,
-            $"/desk-beacons/{beaconId}/qr.svg");
-        return Dispatch(req).ContinueWith(r =>
-            r.Result.Content.ReadAsByteArrayAsync().Result);
-    }
-
-    /// <summary>What the desk looks like right now, as a still.</summary>
-    public Task<byte[]> DeskView(string deskId)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Get,
-            $"/desks/{deskId}/view.webp");
-        return Dispatch(req).ContinueWith(r =>
-            r.Result.Content.ReadAsByteArrayAsync().Result);
-    }
-
-    public Task<DeskOverlay> DeskOverlay(string deskId) =>
-        Send<DeskOverlay>(Get($"/desks/{deskId}/overlay"));
-
-    public Task<LivePerson> DeskLivePerson(string deskId) =>
-        Send<LivePerson>(Get($"/desks/{deskId}/live-person"));
-
-    // -- the market, from both sides --
-
-    public Task<MarketCard[]> Marketplace() =>
-        Send<MarketCard[]>(Get("/marketplace"));
-
-    public Task<MarketSearchBox> MarketSearch(string query) =>
-        Send<MarketSearchBox>(Get(
-            $"/marketplace/search?q={Uri.EscapeDataString(query)}"));
-
-    public Task<string[]> MarketLocalities() =>
-        Send<string[]>(Get("/marketplace/localities"));
-
-    public Task<MarketAssistBox> MarketAssist(string need) =>
-        Send<MarketAssistBox>(Post("/marketplace/assist", new { need }));
-
-    /// <summary>The demo shelf: one press and the market has something on it.</summary>
-    public Task<MarketSeeded> SeedMarketplace() =>
-        Send<MarketSeeded>(Post("/marketplace/seed", new { }));
-
-    public Task<MarketListed> ListInMarketplace(string profileId,
-                                                string blurb,
-                                                string[] tags, string token) =>
-        Send<MarketListed>(Post($"/profiles/{profileId}/marketplace",
-            new { blurb, tags }, token));
-
-    public Task<MarketListed> UnlistFromMarketplace(string profileId,
-                                                    string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/profiles/{profileId}/marketplace");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MarketListed>(req);
-    }
-
-    public Task<MarketListed> RemoveMarketListing(string listingId,
-                                                  string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/marketplace/listings/{listingId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MarketListed>(req);
-    }
-
-    public Task<MarketOffer> ListingOffer(string listingId) =>
-        Send<MarketOffer>(Get($"/marketplace/listings/{listingId}/offer"));
-
-    public Task<MarketOffer> SetListingOffer(string listingId, double price,
-                                             int? stock,
-                                             string token) =>
-        Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/offer",
-            new { price, currency = "USD", stock },
-            token));
-
-    public Task<MarketOffer> ClearListingOffer(string listingId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/marketplace/listings/{listingId}/offer");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MarketOffer>(req);
-    }
-
-    public Task<MarketOffer> PlaceListing(string listingId, string locality,
-                                          string token) =>
-        Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/place",
-            new { locality }, token));
-
-    public Task<MarketOffer> UnplaceListing(string listingId, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/marketplace/listings/{listingId}/place");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<MarketOffer>(req);
-    }
-
-    public Task<MarketSale> PurchaseListing(string listingId, string token) =>
-        Send<MarketSale>(Post($"/marketplace/listings/{listingId}/purchase",
-                              new { }, token));
-
-    public async Task<MarketSale[]> MarketSales(string token)
-    {
-        var box = await Send<MarketSalesBox>(Get("/marketplace/sales", token));
-        return box.Sales;
-    }
-
-    public Task<MarketSettings> MarketSettings(string interactorId,
-                                               string token) =>
-        Send<MarketSettings>(Get($"/marketplace/settings/{interactorId}",
-                                 token));
-
-    public Task<MarketSettings> SetMarketSettings(string interactorId,
-                                                  string locality,
-                                                  bool includeRemote,
-                                                  string token) =>
-        Send<MarketSettings>(Put($"/marketplace/settings/{interactorId}",
-            new { locality, include_remote = includeRemote }, token));
-
-    // -- exchanges: two parties, one manifest --
-
-    public Task<ExchangeVocabulary> ExchangeVocabulary() =>
-        Send<ExchangeVocabulary>(Get("/exchanges/vocabulary"));
-
-    public Task<ExchangeDeal> ProposeExchange(string hostId, string guestId,
-                                              string work, string industry,
-                                              double fee, string token) =>
-        Send<ExchangeDeal>(Post("/exchanges", new {
-            host_id = hostId, guest_id = guestId, work, industry, fee },
-            token));
-
-    public Task<ExchangeDeal> Exchange(string exchangeId, string token) =>
-        Send<ExchangeDeal>(Get($"/exchanges/{exchangeId}", token));
-
-    public async Task<ExchangeDeal[]> MyExchanges(string partyId,
-                                                  string token)
-    {
-        var box = await Send<ExchangeBox>(
-            Get($"/parties/{partyId}/exchanges", token));
-        return box.Exchanges;
-    }
-
-    public Task<ExchangeItemRow> AddExchangeItem(string exchangeId,
-                                                 string direction,
-                                                 string name, string kind,
-                                                 string token) =>
-        Send<ExchangeItemRow>(Post($"/exchanges/{exchangeId}/items",
-            new { direction, name, kind }, token));
-
-    public Task<ExchangeItemRow> RemoveExchangeItem(string exchangeId,
-                                                    string itemId,
-                                                    string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Delete,
-            $"/exchanges/{exchangeId}/items/{itemId}");
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return Send<ExchangeItemRow>(req);
-    }
-
-    /// <summary>Each item is accepted separately — nothing moves by itself.</summary>
-    public Task<ExchangeItemRow> AcceptExchangeItem(string exchangeId,
-                                                    string itemId,
-                                                    string actorId,
-                                                    string token) =>
-        Send<ExchangeItemRow>(Post(
-            $"/exchanges/{exchangeId}/items/{itemId}/accept",
-            new { actor_id = actorId }, token));
-
-    /// <summary>Both parties sign the same manifest; any change clears both.</summary>
-    public Task<ExchangeDeal> SignExchange(string exchangeId, string actorId,
-                                           string token) =>
-        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/sign",
-            new { actor_id = actorId }, token));
-
-    public Task<ExchangeDeal> ReopenExchange(string exchangeId,
-                                             string actorId, string token) =>
-        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/reopen",
-            new { actor_id = actorId }, token));
-
-    public Task<ExchangeDeal> WithdrawFromExchange(string exchangeId,
-                                                   string actorId,
-                                                   string token) =>
-        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/withdraw",
-            new { actor_id = actorId }, token));
-
-    public Task<ExchangeChannel> ExchangeChannel(string exchangeId,
-                                                 string token) =>
-        Send<ExchangeChannel>(Get($"/exchanges/{exchangeId}/channel", token));
-
 }
 
 public record GameSession(
@@ -3515,6 +2571,950 @@ public sealed class ApiClient
     /// <summary>Join the live stream whoever is watching shares.</summary>
     public Task<DeskJoinOut> JoinDeskStream(string deskId, string token) =>
         Send<DeskJoinOut>(Post($"/desks/{deskId}/join", new { }, token));
+
+    // -- the people around a profile: friends, the wall, comments --
+    // Nine routes the backend has carried since the community round; this
+    // shell is the last client to get a door for them.
+
+    public async Task<FriendRow[]> Friends(string profileId)
+    {
+        var box = await Send<FriendListBox>(Get($"/profiles/{profileId}/friends"));
+        return box.Friends;
+    }
+
+    /// <summary>The deed, never the words: a row names the kind and the
+    /// actor; the sentence for each kind is this shell's, from L10n.</summary>
+    public Task<InboxPage> Inbox(string profileId, string token) =>
+        Send<InboxPage>(Get($"/profiles/{profileId}/inbox", token));
+
+    public Task<InboxSeen> MarkInboxSeen(string profileId, string token) =>
+        Send<InboxSeen>(Post($"/profiles/{profileId}/inbox/seen",
+            new { }, token));
+
+    public async Task<SuggestedRow[]> SuggestedFriends(string profileId)
+    {
+        var box = await Send<SuggestedBox>(
+            Get($"/profiles/{profileId}/friends/suggested"));
+        return box.Suggested;
+    }
+
+    public Task<FriendAdded> AddFriend(string profileId, string friendId,
+                                       string token) =>
+        Send<FriendAdded>(Post($"/profiles/{profileId}/friends",
+            new { friend_id = friendId }, token));
+
+    /// <summary>Pinned rows refuse with 409; the list marks them so the
+    /// control is left off rather than offered and failing.</summary>
+    public Task<FriendAdded> RemoveFriend(string profileId, string friendId,
+                                          string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/friends/{friendId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<FriendAdded>(req);
+    }
+
+    // -- the crowd, the couch and the loan --------------------------------
+    // Audience verbs, the watch party, and skill grants: three blocks the
+    // doorless records said this shell could not reach.
+
+    public Task<LikeOut> Like(string kind, string targetId, string token) =>
+        Send<LikeOut>(Post($"/{kind}/{targetId}/like", new { }, token));
+
+    public Task<LikeOut> Unlike(string kind, string targetId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/{kind}/{targetId}/like");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LikeOut>(req);
+    }
+
+    public Task<ShareOut> Share(string kind, string targetId, string token) =>
+        Send<ShareOut>(Post($"/{kind}/{targetId}/share",
+            new { channel = "link" }, token));
+
+    public Task<AudienceCounts> AudienceOf(string kind, string targetId,
+                                           string token) =>
+        Send<AudienceCounts>(Get($"/{kind}/{targetId}/audience", token));
+
+    public Task<SubscribeOut> Subscribe(string kind, string subjectId,
+                                        string token) =>
+        Send<SubscribeOut>(Post($"/{kind}/{subjectId}/subscribe",
+            new { tier = "follow" }, token));
+
+    public Task<SubscribeOut> Unsubscribe(string kind, string subjectId,
+                                          string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/{kind}/{subjectId}/subscribe");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SubscribeOut>(req);
+    }
+
+    public Task<SubscriberBox> Subscribers(string kind, string subjectId,
+                                           string token) =>
+        Send<SubscriberBox>(Get($"/{kind}/{subjectId}/subscribers", token));
+
+    /// <summary>A gift is a gift — the backend refuses to reverse it, and
+    /// requires the giver to be a verified adult.</summary>
+    public Task<GiftRow> Gift(string kind, string subjectId, double amount,
+                              string note, string token) =>
+        Send<GiftRow>(Post($"/{kind}/{subjectId}/gift",
+            new { amount, note }, token));
+
+    public Task<GiftBox> Gifts(string kind, string subjectId, string token) =>
+        Send<GiftBox>(Get($"/{kind}/{subjectId}/gifts", token));
+
+    public Task<PartyCard> StartParty(string postId, string hostId,
+                                      string title, string token) =>
+        Send<PartyCard>(Post("/watch-parties",
+            new { post_id = postId, host_id = hostId, title }, token));
+
+    public Task<PartyCard> Party(string partyId, string token) =>
+        Send<PartyCard>(Get($"/watch-parties/{partyId}", token));
+
+    public Task<PartyCard> JoinParty(string partyId, string memberId,
+                                     string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/members",
+            new { member_id = memberId, kind = "profile" }, token));
+
+    public Task<LeaveOut> LeaveParty(string partyId, string memberId,
+                                     string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/watch-parties/{partyId}/members/{memberId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LeaveOut>(req);
+    }
+
+    /// <summary>Moves a number; presses play on nobody's device.</summary>
+    public Task<PartyCard> SeekParty(string partyId, string hostId,
+                                     int positionS, string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/seek",
+            new { host_id = hostId, position_s = positionS, playing = true },
+            token));
+
+    public Task<PartyLine> SayInParty(string partyId, string memberId,
+                                      string body, string token) =>
+        Send<PartyLine>(Post($"/watch-parties/{partyId}/chat",
+            new { member_id = memberId, body }, token));
+
+    public Task<PartyChatBox> PartyChat(string partyId, string token) =>
+        Send<PartyChatBox>(Get($"/watch-parties/{partyId}/chat", token));
+
+    public Task<PartyCard> EndParty(string partyId, string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/end", new { },
+            token));
+
+    /// <summary>The sentence a synthetic member carries: it has not seen
+    /// the footage.</summary>
+    public Task<PartyContext> PartyContextOf(string partyId, string token) =>
+        Send<PartyContext>(Get($"/watch-parties/{partyId}/context", token));
+
+    public Task<GrantVocabulary> GrantVocabulary() =>
+        Send<GrantVocabulary>(Get("/skill-grants/vocabulary"));
+
+    public Task<GrantCard> OfferGrant(string lenderId, string borrowerId,
+                                      string surface, string surfaceId,
+                                      string skillKind, string skillRef,
+                                      string title, string token) =>
+        Send<GrantCard>(Post("/skill-grants", new
+        {
+            lender_id = lenderId, borrower_id = borrowerId, surface,
+            surface_id = surfaceId, skill_kind = skillKind,
+            skill_ref = skillRef, title
+        }, token));
+
+    public Task<GrantCard> Grant(string grantId, string token) =>
+        Send<GrantCard>(Get($"/skill-grants/{grantId}", token));
+
+    public Task<GrantCard> AcceptGrant(string grantId, string actorId,
+                                       string token) =>
+        Send<GrantCard>(Post($"/skill-grants/{grantId}/accept",
+            new { actor_id = actorId }, token));
+
+    public Task<GrantCard> DeclineGrant(string grantId, string actorId,
+                                        string token) =>
+        Send<GrantCard>(Post($"/skill-grants/{grantId}/decline",
+            new { actor_id = actorId }, token));
+
+    public Task<GrantCard> CloseGrant(string grantId, string actorId,
+                                      string token) =>
+        Send<GrantCard>(Post($"/skill-grants/{grantId}/close",
+            new { actor_id = actorId }, token));
+
+    public Task<GrantUse> UseGrant(string grantId, string borrowerId,
+                                   string what, string token) =>
+        Send<GrantUse>(Post($"/skill-grants/{grantId}/use",
+            new { borrower_id = borrowerId, what }, token));
+
+    public Task<GrantUseBox> GrantUses(string grantId, string token) =>
+        Send<GrantUseBox>(Get($"/skill-grants/{grantId}/uses", token));
+
+    public Task<GrantBox> GrantsInSurface(string surface, string surfaceId,
+                                          string token) =>
+        Send<GrantBox>(Get($"/surfaces/{surface}/{surfaceId}/skill-grants",
+            token));
+
+    public Task<MyGrants> MyGrants(string personId, string token) =>
+        Send<MyGrants>(Get($"/people/{personId}/skill-grants", token));
+
+    // -- the place, the camera, the organization and the tour -------------
+    // Four more blocks off the doorless records. Disclosure-first: who
+    // here has lent a microphone and who wears what are readable by
+    // everyone present.
+
+    public Task<WhoseCard> Whose(string surface, string surfaceId) =>
+        Send<WhoseCard>(Get($"/places/{surface}/{surfaceId}/whose"));
+
+    public Task<MicDisclosure> LendMicrophone(string surface,
+        string surfaceId, string interactorId, string token) =>
+        Send<MicDisclosure>(Post($"/places/{surface}/{surfaceId}/microphone",
+            new { interactor_id = interactorId }, token));
+
+    public Task<MicDisclosure> TakeBackMicrophone(string surface,
+        string surfaceId, string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/places/{surface}/{surfaceId}/microphone")
+        { Content = JsonContent.Create(new { interactor_id = interactorId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MicDisclosure>(req);
+    }
+
+    public Task<MicDisclosure> MicrophoneDisclosure(string surface,
+        string surfaceId, string token) =>
+        Send<MicDisclosure>(Get($"/places/{surface}/{surfaceId}/microphone",
+            token));
+
+    public Task<WornRow> WearOverlay(string surface, string surfaceId,
+        string interactorId, string kind, string title, string token) =>
+        Send<WornRow>(Post($"/places/{surface}/{surfaceId}/overlay",
+            new { interactor_id = interactorId, kind, title }, token));
+
+    public Task<WornRow> TakeOffOverlay(string surface, string surfaceId,
+        string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/places/{surface}/{surfaceId}/overlay")
+        { Content = JsonContent.Create(new { interactor_id = interactorId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<WornRow>(req);
+    }
+
+    public Task<WornDisclosure> WornOverlays(string surface, string surfaceId,
+        string token) =>
+        Send<WornDisclosure>(Get($"/places/{surface}/{surfaceId}/overlay",
+            token));
+
+    /// <summary>The published refusals, verbatim — a refused combination
+    /// is a decision, not a missing feature.</summary>
+    public Task<CameraVocabulary> CameraVocabulary() =>
+        Send<CameraVocabulary>(Get("/camera/vocabulary"));
+
+    public Task<BystanderNote> BystanderGuidance(string subject) =>
+        Send<BystanderNote>(Get($"/camera/bystanders/{subject}"));
+
+    public Task<CameraSession> OpenCamera(string holderId, string surface,
+        string surfaceId, string subject, string viewerId, int minutes,
+        string token) =>
+        Send<CameraSession>(Post("/camera/sessions", new
+        {
+            holder_id = holderId, surface, surface_id = surfaceId, subject,
+            viewer_kind = "person", viewer_id = viewerId, minutes
+        }, token));
+
+    public Task<CameraSession> CameraSessionOf(string sessionId,
+        string token) =>
+        Send<CameraSession>(Get($"/camera/sessions/{sessionId}", token));
+
+    public Task<CameraSession> CloseCamera(string sessionId, string actorId,
+        string token) =>
+        Send<CameraSession>(Post($"/camera/sessions/{sessionId}/close",
+            new { actor_id = actorId }, token));
+
+    public Task<CameraSession[]> MyCameras(string holderId, string token) =>
+        Send<CameraSession[]>(Get($"/camera/live/{holderId}", token));
+
+    public Task<CameraDisclosure> CameraDisclosureOf(string surface,
+        string surfaceId, string token) =>
+        Send<CameraDisclosure>(Get(
+            $"/camera/disclosure/{surface}/{surfaceId}", token));
+
+    public Task<OrgCard[]> Organizations(string token) =>
+        Send<OrgCard[]>(Get("/organizations", token));
+
+    public Task<OrgCard> CreateOrganization(string name, string token) =>
+        Send<OrgCard>(Post("/organizations", new { name }, token));
+
+    public Task<OrgCard> SeedDemoOrganization(string token) =>
+        Send<OrgCard>(Post("/organizations/demo", new { }, token));
+
+    public Task<OrgCard> OrganizationOf(string orgId, string token) =>
+        Send<OrgCard>(Get($"/organizations/{orgId}", token));
+
+    public Task<OrgDepartment> AddDepartment(string orgId, string name,
+        string role, string profileId, string token) =>
+        Send<OrgDepartment>(Post($"/organizations/{orgId}/departments",
+            new { name, role, profile_id = profileId }, token));
+
+    public Task<Coordination> Coordinate(string orgId, string goal,
+        string fromDepartment, string token) =>
+        Send<Coordination>(Post($"/organizations/{orgId}/coordinate",
+            new { goal, from_department = fromDepartment }, token));
+
+    public Task<Coordination[]> Coordinations(string orgId, string token) =>
+        Send<Coordination[]>(Get($"/organizations/{orgId}/coordinations",
+            token));
+
+    public Task<TutorialOutline> TutorialOutline() =>
+        Send<TutorialOutline>(Get("/tutorial"));
+
+    public Task<TutorialStep> TutorialStepOf(string key) =>
+        Send<TutorialStep>(Get($"/tutorial/steps/{key}"));
+
+    public Task<TutorialStep> TutorialForScreen(int number) =>
+        Send<TutorialStep>(Get($"/tutorial/for-screen/{number}"));
+
+    public Task<TutorialProgress> StartTutorial(string learnerId) =>
+        Send<TutorialProgress>(Post("/tutorial/start",
+            new { learner_id = learnerId, lesson = "" }));
+
+    /// <summary>Progress wraps the step — a learner id and where they are —
+    /// rather than being one, which is why this does not decode as a
+    /// <see cref="TutorialStep"/>.</summary>
+    public Task<TutorialProgress> TutorialProgress(string learnerId) =>
+        Send<TutorialProgress>(Get($"/tutorial/progress/{learnerId}"));
+
+    public Task<TutorialProgress> MarkTutorialDone(string learnerId,
+        string lesson) =>
+        Send<TutorialProgress>(Post("/tutorial/done",
+            new { learner_id = learnerId, lesson }));
+
+    // -- the body, the referral, the objection, the lobby and the dock ----
+    // Five more blocks off the doorless records, each rendering its
+    // backend's rules rather than inventing a sixth opinion.
+
+    public Task<RobotUnbound> UnbindRobot(string robotId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/robots/{robotId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RobotUnbound>(req);
+    }
+
+    /// <summary>Owner-only audit: everything this body has been told to
+    /// do.</summary>
+    public Task<RobotCommandRow[]> RobotCommands(string robotId,
+        string token) =>
+        Send<RobotCommandRow[]>(Get($"/robots/{robotId}/commands", token));
+
+    public Task<RobotSkillRow[]> RobotSkills(string robotId, string token) =>
+        Send<RobotSkillRow[]>(Get($"/robots/{robotId}/skills", token));
+
+    /// <summary>A body's dials — intimacy never applies to a body.</summary>
+    public Task<RobotSteering> RobotSteeringOf(string robotId,
+        string token) =>
+        Send<RobotSteering>(Get($"/robots/{robotId}/steering", token));
+
+    public Task<RobotSteering> SteerRobot(string robotId, int pace,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/robots/{robotId}/steering")
+        {
+            Content = JsonContent.Create(new
+            {
+                values = new System.Collections.Generic
+                    .Dictionary<string, int> { ["pace"] = pace }
+            })
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RobotSteering>(req);
+    }
+
+    public Task<ClinicianRow[]> MatchClinicians(string area) =>
+        Send<ClinicianRow[]>(Get($"/referrals/match?area={area}"));
+
+    /// <summary>Nothing is released here — the package comes back to be
+    /// read, and the signature raised covers exactly those bytes.</summary>
+    public Task<ReferralPackage> PrepareReferral(string interactorId,
+        string profileId, string providerId, string token) =>
+        Send<ReferralPackage>(Post("/referrals/prepare", new
+        {
+            interactor_id = interactorId, profile_id = profileId,
+            provider_id = providerId
+        }, token));
+
+    public Task<ReferralPackage> ReleaseReferral(string referralId,
+        string signatureId, string token) =>
+        Send<ReferralPackage>(Post($"/referrals/{referralId}/release",
+            new { signature_id = signatureId }, token));
+
+    /// <summary>Once — a second attempt says so rather than quietly
+    /// working.</summary>
+    public Task<ReferralPackage> OpenReferral(string referralId,
+        string linkToken) =>
+        Send<ReferralPackage>(Get(
+            $"/referrals/{referralId}?token={linkToken}"));
+
+    public Task<ReferralPackage> ReplyToReferral(string referralId,
+        string linkToken, string content) =>
+        Send<ReferralPackage>(Post(
+            $"/referrals/{referralId}/reply?token={linkToken}",
+            new { content }));
+
+    public Task<ObjectionCard> ObjectionOf(string objectionId) =>
+        Send<ObjectionCard>(Get($"/objections/{objectionId}"));
+
+    public Task<ObjectionAudit> ObjectionAuditOf(string objectionId,
+        string token) =>
+        Send<ObjectionAudit>(Get($"/objections/{objectionId}/audit", token));
+
+    public Task<ObjectionCard> WithdrawObjectionConsent(
+        string objectionId) =>
+        Send<ObjectionCard>(Post($"/objections/{objectionId}/withdraw",
+            new { }));
+
+    public Task<ObjectionCard> RevokeObjectionBasis(string objectionId) =>
+        Send<ObjectionCard>(Post($"/objections/{objectionId}/revoke",
+            new { }));
+
+    /// <summary>Reviewer-only — an owner cannot adjudicate an objection
+    /// against their own profile, and the backend enforces it by
+    /// role.</summary>
+    public Task<ObjectionCard> ResolveObjection(string objectionId,
+        string outcome, string token) =>
+        Send<ObjectionCard>(Post($"/objections/{objectionId}/resolve",
+            new { outcome }, token));
+
+    public Task<LobbyVocabulary> LobbyVocabulary() =>
+        Send<LobbyVocabulary>(Get("/gaming/lobby/vocabulary"));
+
+    public Task<LobbySeatRow> SeatInLobby(string sessionId,
+        string memberKind, string memberId, string role, string token) =>
+        Send<LobbySeatRow>(Post($"/gaming/sessions/{sessionId}/lobby", new
+        {
+            member_kind = memberKind, member_id = memberId, role
+        }, token));
+
+    /// <summary>The honest roster: what each callsign is travels with
+    /// it.</summary>
+    public Task<LobbyRoster> LobbyRosterOf(string sessionId, string token) =>
+        Send<LobbyRoster>(Get($"/gaming/sessions/{sessionId}/lobby", token));
+
+    public Task<LobbyLeft> LeaveLobby(string sessionId, string memberId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/gaming/sessions/{sessionId}/lobby")
+        { Content = JsonContent.Create(new { member_id = memberId }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LobbyLeft>(req);
+    }
+
+    public Task<LobbyContext> LobbyContextOf(string sessionId,
+        string token) =>
+        Send<LobbyContext>(Get(
+            $"/gaming/sessions/{sessionId}/lobby/context", token));
+
+    public Task<DockFacesBox> DockFaces() =>
+        Send<DockFacesBox>(Get("/dock/faces"));
+
+    /// <summary>The dock is read-only, so every face carries a way out of
+    /// it.</summary>
+    public Task<DockWhere> DockWhereOf(string face) =>
+        Send<DockWhere>(Get($"/dock/where/{face}"));
+
+    public Task<DockSettings> DockSettingsOf(string profileId,
+        string token) =>
+        Send<DockSettings>(Get($"/dock/{profileId}", token));
+
+    public Task<DockSettings> ConfigureDock(string profileId, string corner,
+        string state, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/dock/{profileId}")
+        { Content = JsonContent.Create(new { corner, state }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DockSettings>(req);
+    }
+
+    public Task<DockFace> DockFaceOf(string profileId, string name,
+        string token) =>
+        Send<DockFace>(Get($"/dock/{profileId}/face/{name}", token));
+
+    // -- the signature, the mail server, the room's ear, the wall screen,
+    // the plan, the handoff and the campaign ------------------------------
+    // Seven small blocks that close out the mid-sized doorless groups.
+
+    public Task<SignatureCertificate> SignatureCertificateOf(string sigId) =>
+        Send<SignatureCertificate>(Get($"/signatures/{sigId}/certificate"));
+
+    /// <summary>No token, no lookup, no trust in this deployment beyond
+    /// the arithmetic.</summary>
+    public Task<SignatureVerdict> VerifySignaturePackage() =>
+        Send<SignatureVerdict>(Post("/signatures/verify",
+            new { package = new { } }));
+
+    public Task<ProofingOut> ReproofCredential(string rowId, string level,
+        string attestor, string token) =>
+        Send<ProofingOut>(Post($"/signatures/credentials/{rowId}/proofing",
+            new
+            {
+                proofing_level = level, proofing_attestor = attestor,
+                proofing_method = "document", proofing_ref = "in-person"
+            }, token));
+
+    /// <summary>The WebAuthn ceremony page, opened in a web view — never
+    /// re-implemented in the shell. The URL is taken off the same GET the
+    /// view will issue, so the door and the address cannot drift.</summary>
+    public string SignatureCeremonyUrl() =>
+        Get("/signatures/ceremony").RequestUri!.ToString();
+
+    public Task<MailSettingsCard> MailSettings() =>
+        Send<MailSettingsCard>(Get("/settings/mail"));
+
+    public Task<MailSettingsCard> SaveMailSettings(string host, int port,
+        string sender, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put, "/settings/mail")
+        { Content = JsonContent.Create(new { host, port, sender }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MailSettingsCard>(req);
+    }
+
+    public Task<MailSettingsCard> ForgetMailSettings(string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, "/settings/mail");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MailSettingsCard>(req);
+    }
+
+    /// <summary>A settings screen that saves without ever proving it can
+    /// deliver is how an app ends up insisting it emailed somebody.</summary>
+    public Task<MailTestOut> TestMailSettings(string to, string token) =>
+        Send<MailTestOut>(Post("/settings/mail/test", new { to }, token));
+
+    public Task<RoomCard[]> Rooms() => Send<RoomCard[]>(Get("/rooms"));
+
+    public Task<MicDisclosure> LendRoomMic(string roomId,
+        string interactorId, string token) =>
+        Send<MicDisclosure>(Post($"/rooms/{roomId}/mic",
+            new { interactor_id = interactorId }, token));
+
+    public Task<MicDisclosure> TakeBackRoomMic(string roomId,
+        string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/rooms/{roomId}/mic/{interactorId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MicDisclosure>(req);
+    }
+
+    /// <summary>Readable by anyone in the room — a disclosure only its
+    /// subject can see is not a disclosure.</summary>
+    public Task<MicDisclosure> RoomMicDisclosure(string roomId,
+        string token) =>
+        Send<MicDisclosure>(Get($"/rooms/{roomId}/mic", token));
+
+    public Task<DisplayVocabulary> DisplayVocabulary() =>
+        Send<DisplayVocabulary>(Get("/displays/vocabulary"));
+
+    public Task<DisplayCard> DisplayOf(string displayId) =>
+        Send<DisplayCard>(Get($"/displays/{displayId}"));
+
+    public Task<DisplayCard> SetDisplayFaces(string displayId,
+        string[] faces, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Put,
+            $"/displays/{displayId}/faces")
+        { Content = JsonContent.Create(new { faces }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DisplayCard>(req);
+    }
+
+    public Task<DisplayCard> TakeDownDisplay(string displayId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/displays/{displayId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DisplayCard>(req);
+    }
+
+    public Task<MembershipCard> MembershipOf(string accountId,
+        string token) =>
+        Send<MembershipCard>(Get($"/memberships/{accountId}", token));
+
+    public Task<MembershipCard> JoinPlan(string accountId, string plan,
+        string token) =>
+        Send<MembershipCard>(Post($"/memberships/{accountId}",
+            new { plan }, token));
+
+    /// <summary>The account becomes a visitor and keeps its profiles — a
+    /// lapsed subscription is not a reason to delete somebody's
+    /// work.</summary>
+    public Task<MembershipCard> CancelMembership(string accountId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/memberships/{accountId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MembershipCard>(req);
+    }
+
+    public Task<HandoffCard> CreateHandoff(string interactorId,
+        string profileId, string providerId, string token) =>
+        Send<HandoffCard>(Post("/handoffs", new
+        {
+            interactor_id = interactorId, profile_id = profileId,
+            provider_id = providerId, consent = true
+        }, token));
+
+    public Task<HandoffCard> OpenHandoff(string handoffId,
+        string linkToken) =>
+        Send<HandoffCard>(Get($"/handoffs/{handoffId}?token={linkToken}"));
+
+    public Task<HandoffCard> RevokeHandoff(string handoffId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/handoffs/{handoffId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<HandoffCard>(req);
+    }
+
+    public Task<CampaignCard> CampaignOf(string campaignId) =>
+        Send<CampaignCard>(Get($"/campaigns/{campaignId}"));
+
+    /// <summary>No token required — a donor arriving from a beacon scan
+    /// has no account, and requiring one gates generosity behind
+    /// signup.</summary>
+    public Task<CampaignCard> Donate(string campaignId, double amount,
+        string note) =>
+        Send<CampaignCard>(Post($"/campaigns/{campaignId}/donate",
+            new { amount, note }));
+
+    public Task<CampaignCard> CloseCampaign(string campaignId,
+        string token) =>
+        Send<CampaignCard>(Post($"/campaigns/{campaignId}/close", new { },
+            token));
+
+    public async Task<WallPostRow[]> Wall(string profileId)
+    {
+        var box = await Send<WallBox>(Get($"/profiles/{profileId}/wall"));
+        return box.Posts;
+    }
+
+    public Task<WallPostRow> PostToWall(string profileId, string body,
+                                        string token) =>
+        Send<WallPostRow>(Post($"/profiles/{profileId}/wall",
+            new { body }, token));
+
+    public async Task<CommentRow[]> Comments(string kind, string targetId,
+                                             string token)
+    {
+        var box = await Send<CommentBox>(
+            Get($"/{kind}/{targetId}/comments", token));
+        return box.Comments;
+    }
+
+    public Task<CommentRow> AddComment(string kind, string targetId,
+                                       string body, string token) =>
+        Send<CommentRow>(Post($"/{kind}/{targetId}/comments",
+            new { body }, token));
+
+    public Task<CommentRow> DeleteComment(string commentId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/comments/{commentId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<CommentRow>(req);
+    }
+
+
+    // -- standing behind the counter: desks, the market, exchanges --
+    // The caller's side shipped long ago; the other side of the same
+    // counter never reached any shell, nor did searching, pricing,
+    // selling or buying in the market, nor being party to an exchange.
+
+    public Task<DeskBrief[]> Desks() => Send<DeskBrief[]>(Get("/desks"));
+
+    public Task<DeskOpened> OpenDesk(string ownerId, string displayName,
+                                   string trade, string attestor,
+                                   string basis, string location,
+                                   string blurb, string token) =>
+        Send<DeskOpened>(Post("/desks", new {
+            owner_id = ownerId, display_name = displayName, trade, attestor,
+            basis, location, blurb }, token));
+
+    public Task<DeskOpened> SetDeskPresence(string deskId, string presence,
+                                          string token) =>
+        Send<DeskOpened>(Put($"/desks/{deskId}/presence", new { presence },
+                           token));
+
+    public Task<DeskOpened> SetDeskPortrait(string deskId, string token) =>
+        Send<DeskOpened>(Put($"/desks/{deskId}/portrait",
+                           new { asset = (string?)null }, token));
+
+    public Task<DeskOpened> SetDeskCamera(string deskId, string url,
+                                        string token) =>
+        Send<DeskOpened>(Put($"/desks/{deskId}/camera", new { url },
+                           token));
+
+    public async Task<DeskRing[]> DeskRings(string deskId, string token)
+    {
+        var box = await Send<DeskRingBox>(Get($"/desks/{deskId}/rings",
+                                              token));
+        return box.Rings;
+    }
+
+    public Task<DeskRing> AckDeskRing(string deskId, string ringId,
+                                      string token) =>
+        Send<DeskRing>(Post($"/desks/{deskId}/rings/{ringId}/ack",
+                            new { }, token));
+
+    public Task<DeskGuest> AskToJoinDesk(string deskId, string note,
+                                         string token) =>
+        Send<DeskGuest>(Post($"/desks/{deskId}/guests", new { note }, token));
+
+    public async Task<DeskGuest[]> DeskGuests(string deskId, string token)
+    {
+        var box = await Send<DeskGuestBox>(Get($"/desks/{deskId}/guests",
+                                                token));
+        return box.Guests;
+    }
+
+    public Task<DeskGuest> AcceptDeskGuest(string deskId, string requestId,
+                                           string token) =>
+        Send<DeskGuest>(Post($"/desks/{deskId}/guests/{requestId}/accept",
+                             new { }, token));
+
+    public Task<DeskGuest> DeclineDeskGuest(string deskId, string requestId,
+                                            string token) =>
+        Send<DeskGuest>(Post($"/desks/{deskId}/guests/{requestId}/decline",
+                             new { }, token));
+
+    /// <summary>The caller's own way out — theirs to press, not the desk's.</summary>
+    public Task<DeskGuest> LeaveDesk(string deskId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/desks/{deskId}/guests/me");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DeskGuest>(req);
+    }
+
+    public Task<DeskBeacon> AddDeskBeacon(string deskId, string label,
+                                          string token) =>
+        Send<DeskBeacon>(Post($"/desks/{deskId}/beacons", new { label },
+                              token));
+
+    public async Task<DeskBeacon[]> DeskBeacons(string deskId, string token)
+    {
+        var box = await Send<DeskBeaconBox>(Get($"/desks/{deskId}/beacons",
+                                                 token));
+        return box.Beacons;
+    }
+
+    public Task<DeskBeacon> RemoveDeskBeacon(string beaconId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/desk-beacons/{beaconId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<DeskBeacon>(req);
+    }
+
+    /// <summary>The sticker, as bytes an image control can show. Fetched
+    /// directly rather than through the JSON helper, which cannot carry an
+    /// image.</summary>
+    public Task<byte[]> DeskBeaconQr(string beaconId)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get,
+            $"/desk-beacons/{beaconId}/qr.svg");
+        return Dispatch(req).ContinueWith(r =>
+            r.Result.Content.ReadAsByteArrayAsync().Result);
+    }
+
+    /// <summary>What the desk looks like right now, as a still.</summary>
+    public Task<byte[]> DeskView(string deskId)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get,
+            $"/desks/{deskId}/view.webp");
+        return Dispatch(req).ContinueWith(r =>
+            r.Result.Content.ReadAsByteArrayAsync().Result);
+    }
+
+    public Task<DeskOverlay> DeskOverlay(string deskId) =>
+        Send<DeskOverlay>(Get($"/desks/{deskId}/overlay"));
+
+    public Task<LivePerson> DeskLivePerson(string deskId) =>
+        Send<LivePerson>(Get($"/desks/{deskId}/live-person"));
+
+    // -- the market, from both sides --
+
+    public Task<MarketCard[]> Marketplace() =>
+        Send<MarketCard[]>(Get("/marketplace"));
+
+    public Task<MarketSearchBox> MarketSearch(string query) =>
+        Send<MarketSearchBox>(Get(
+            $"/marketplace/search?q={Uri.EscapeDataString(query)}"));
+
+    public Task<string[]> MarketLocalities() =>
+        Send<string[]>(Get("/marketplace/localities"));
+
+    public Task<MarketAssistBox> MarketAssist(string need) =>
+        Send<MarketAssistBox>(Post("/marketplace/assist", new { need }));
+
+    /// <summary>The demo shelf: one press and the market has something on it.</summary>
+    public Task<MarketSeeded> SeedMarketplace() =>
+        Send<MarketSeeded>(Post("/marketplace/seed", new { }));
+
+    public Task<MarketListed> ListInMarketplace(string profileId,
+                                                string blurb,
+                                                string[] tags, string token) =>
+        Send<MarketListed>(Post($"/profiles/{profileId}/marketplace",
+            new { blurb, tags }, token));
+
+    public Task<MarketListed> UnlistFromMarketplace(string profileId,
+                                                    string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/marketplace");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketListed>(req);
+    }
+
+    public Task<MarketListed> RemoveMarketListing(string listingId,
+                                                  string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/marketplace/listings/{listingId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketListed>(req);
+    }
+
+    public Task<MarketOffer> ListingOffer(string listingId) =>
+        Send<MarketOffer>(Get($"/marketplace/listings/{listingId}/offer"));
+
+    public Task<MarketOffer> SetListingOffer(string listingId, double price,
+                                             int? stock,
+                                             string token) =>
+        Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/offer",
+            new { price, currency = "USD", stock },
+            token));
+
+    public Task<MarketOffer> ClearListingOffer(string listingId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/marketplace/listings/{listingId}/offer");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketOffer>(req);
+    }
+
+    public Task<MarketOffer> PlaceListing(string listingId, string locality,
+                                          string token) =>
+        Send<MarketOffer>(Put($"/marketplace/listings/{listingId}/place",
+            new { locality }, token));
+
+    public Task<MarketOffer> UnplaceListing(string listingId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/marketplace/listings/{listingId}/place");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MarketOffer>(req);
+    }
+
+    public Task<MarketSale> PurchaseListing(string listingId, string token) =>
+        Send<MarketSale>(Post($"/marketplace/listings/{listingId}/purchase",
+                              new { }, token));
+
+    public async Task<MarketSale[]> MarketSales(string token)
+    {
+        var box = await Send<MarketSalesBox>(Get("/marketplace/sales", token));
+        return box.Sales;
+    }
+
+    public Task<MarketSettings> MarketSettings(string interactorId,
+                                               string token) =>
+        Send<MarketSettings>(Get($"/marketplace/settings/{interactorId}",
+                                 token));
+
+    public Task<MarketSettings> SetMarketSettings(string interactorId,
+                                                  string locality,
+                                                  bool includeRemote,
+                                                  string token) =>
+        Send<MarketSettings>(Put($"/marketplace/settings/{interactorId}",
+            new { locality, include_remote = includeRemote }, token));
+
+    // -- exchanges: two parties, one manifest --
+
+    public Task<ExchangeVocabulary> ExchangeVocabulary() =>
+        Send<ExchangeVocabulary>(Get("/exchanges/vocabulary"));
+
+    public Task<ExchangeDeal> ProposeExchange(string hostId, string guestId,
+                                              string work, string industry,
+                                              double fee, string token) =>
+        Send<ExchangeDeal>(Post("/exchanges", new {
+            host_id = hostId, guest_id = guestId, work, industry, fee },
+            token));
+
+    public Task<ExchangeDeal> Exchange(string exchangeId, string token) =>
+        Send<ExchangeDeal>(Get($"/exchanges/{exchangeId}", token));
+
+    public async Task<ExchangeDeal[]> MyExchanges(string partyId,
+                                                  string token)
+    {
+        var box = await Send<ExchangeBox>(
+            Get($"/parties/{partyId}/exchanges", token));
+        return box.Exchanges;
+    }
+
+    public Task<ExchangeItemRow> AddExchangeItem(string exchangeId,
+                                                 string direction,
+                                                 string name, string kind,
+                                                 string token) =>
+        Send<ExchangeItemRow>(Post($"/exchanges/{exchangeId}/items",
+            new { direction, name, kind }, token));
+
+    public Task<ExchangeItemRow> RemoveExchangeItem(string exchangeId,
+                                                    string itemId,
+                                                    string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/exchanges/{exchangeId}/items/{itemId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<ExchangeItemRow>(req);
+    }
+
+    /// <summary>Each item is accepted separately — nothing moves by itself.</summary>
+    public Task<ExchangeItemRow> AcceptExchangeItem(string exchangeId,
+                                                    string itemId,
+                                                    string actorId,
+                                                    string token) =>
+        Send<ExchangeItemRow>(Post(
+            $"/exchanges/{exchangeId}/items/{itemId}/accept",
+            new { actor_id = actorId }, token));
+
+    /// <summary>Both parties sign the same manifest; any change clears both.</summary>
+    public Task<ExchangeDeal> SignExchange(string exchangeId, string actorId,
+                                           string token) =>
+        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/sign",
+            new { actor_id = actorId }, token));
+
+    public Task<ExchangeDeal> ReopenExchange(string exchangeId,
+                                             string actorId, string token) =>
+        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/reopen",
+            new { actor_id = actorId }, token));
+
+    public Task<ExchangeDeal> WithdrawFromExchange(string exchangeId,
+                                                   string actorId,
+                                                   string token) =>
+        Send<ExchangeDeal>(Post($"/exchanges/{exchangeId}/withdraw",
+            new { actor_id = actorId }, token));
+
+    public Task<ExchangeChannel> ExchangeChannel(string exchangeId,
+                                                 string token) =>
+        Send<ExchangeChannel>(Get($"/exchanges/{exchangeId}/channel", token));
+
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
