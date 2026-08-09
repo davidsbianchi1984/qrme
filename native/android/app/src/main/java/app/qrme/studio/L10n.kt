@@ -50,7 +50,16 @@ object L10n {
         return "en"
     }
 
-    private val table: Map<String, Map<String, String>> = mapOf(
+    /**
+     * Built from several functions rather than one literal.
+     *
+     * A single `mapOf` of this many rows compiles the whole table into the
+     * object's static initializer, and the JVM caps one method at 64 KB —
+     * past that the Kotlin backend fails codegen outright with "Method too
+     * large" and this shell cannot be built at all. Each part is its own
+     * method; `table` is the join.
+     */
+    private fun tablePart1(): Map<String, Map<String, String>> = mapOf(
         "corner.title" to mapOf("en" to "Your corner", "es" to "Tu rincón", "fr" to "Votre coin", "de" to "Deine Ecke", "pt" to "O seu cantinho", "it" to "Il tuo angolo", "ja" to "あなたのコーナー", "zh" to "你的角落", "hi" to "आपका कोना", "ar" to "ركنك"),
         "corner.walls" to mapOf("en" to "Hex colors, http(s) links, plain text, real friends — the sandbox walls.", "es" to "Colores hex, enlaces http(s), texto plano, amigos reales — los muros del sandbox.", "fr" to "Couleurs hex, liens http(s), texte brut, vrais amis — les murs du bac à sable.", "de" to "Hex-Farben, http(s)-Links, Klartext, echte Freunde — die Wände der Sandbox.", "pt" to "Cores hex, links http(s), texto simples, amigos reais — as paredes da sandbox.", "it" to "Colori hex, link http(s), testo semplice, amici veri — i muri della sandbox.", "ja" to "16進カラー、http(s) リンク、プレーンテキスト、実際の友だち — サンドボックスの壁。", "zh" to "十六进制颜色、http(s) 链接、纯文本、真实好友 — 沙盒之墙。", "hi" to "हेक्स रंग, http(s) लिंक, सादा पाठ, असली दोस्त — सैंडबॉक्स की दीवारें।", "ar" to "ألوان سداسية وروابط http(s) ونص عادي وأصدقاء حقيقيون — جدران الصندوق الرملي."),
         "corner.headline" to mapOf("en" to "Headline", "es" to "Titular", "fr" to "Accroche", "de" to "Überschrift", "pt" to "Título", "it" to "Titolo", "ja" to "見出し", "zh" to "标题", "hi" to "शीर्षक", "ar" to "العنوان"),
@@ -160,6 +169,9 @@ object L10n {
             "en" to "Studio", "es" to "Estudio", "fr" to "Studio",
             "de" to "Studio", "pt" to "Estúdio", "it" to "Studio",
             "ja" to "スタジオ", "zh" to "工作室", "hi" to "स्टूडियो", "ar" to "الاستوديو"),
+    )
+
+    private fun tablePart2(): Map<String, Map<String, String>> = mapOf(
         "tab.connect" to mapOf(
             "en" to "Connect", "es" to "Conectar", "fr" to "Connecter",
             "de" to "Verbinden", "pt" to "Conectar", "it" to "Connetti",
@@ -285,6 +297,9 @@ object L10n {
         "ns.st.g.behavior" to mapOf("en" to "Behavior", "es" to "Comportamiento", "fr" to "Comportement", "de" to "Verhalten", "pt" to "Comportamento", "it" to "Comportamento", "ja" to "ふるまい", "zh" to "行为", "hi" to "व्यवहार", "ar" to "السلوك"),
         "ns.st.g.intimacy" to mapOf("en" to "Intimacy (18+)", "es" to "Intimidad (18+)", "fr" to "Intimité (18+)", "de" to "Intimität (18+)", "pt" to "Intimidade (18+)", "it" to "Intimità (18+)", "ja" to "親密さ（18+）", "zh" to "亲密（18+）", "hi" to "अंतरंगता (18+)", "ar" to "الحميمية (18+)"),
         "ns.st.appearance" to mapOf("en" to "Appearance", "es" to "Aspecto", "fr" to "Apparence", "de" to "Aussehen", "pt" to "Aparência", "it" to "Aspetto", "ja" to "見た目", "zh" to "外观", "hi" to "रूप", "ar" to "المظهر"),
+    )
+
+    private fun tablePart3(): Map<String, Map<String, String>> = mapOf(
         "ns.st.appearance.ph" to mapOf("en" to "How they look and present…", "es" to "Cómo se ve y se presenta…", "fr" to "Son allure et sa présentation…", "de" to "Wie es aussieht und auftritt…", "pt" to "Como se vê e se apresenta…", "it" to "Come appare e si presenta…", "ja" to "どんな見た目で、どう振る舞うか…", "zh" to "长什么样、如何呈现…", "hi" to "यह कैसा दिखता और पेश आता है…", "ar" to "كيف يبدو وكيف يقدّم نفسه…"),
         "ns.st.age" to mapOf("en" to "Age", "es" to "Edad", "fr" to "Âge", "de" to "Alter", "pt" to "Idade", "it" to "Età", "ja" to "年齢", "zh" to "年龄", "hi" to "आयु", "ar" to "العمر"),
         "ns.st.baseage" to mapOf("en" to "Base age", "es" to "Edad base", "fr" to "Âge de départ", "de" to "Ausgangsalter", "pt" to "Idade base", "it" to "Età di base", "ja" to "基準年齢", "zh" to "基准年龄", "hi" to "आधार आयु", "ar" to "العمر الأساسي"),
@@ -385,6 +400,9 @@ object L10n {
         "nsig.fetch" to mapOf("en" to "Fetch and re-verify", "es" to "Obtener y volver a verificar", "fr" to "Récupérer et revérifier", "de" to "Abrufen und erneut prüfen", "pt" to "Obter e verificar de novo", "it" to "Recupera e verifica di nuovo", "ja" to "取得して再検証", "zh" to "取回并重新验证", "hi" to "लाएँ और फिर से जाँचें", "ar" to "اجلب وأعد التحقق"),
         "nsig.verify.other" to mapOf("en" to "Verify a package from elsewhere", "es" to "Verificar un paquete de otro sitio", "fr" to "Vérifier un dossier venu d'ailleurs", "de" to "Ein Paket von anderswo prüfen", "pt" to "Verificar um pacote vindo de outro lado", "it" to "Verifica un pacchetto proveniente da altrove", "ja" to "他所から届いた一式を検証する", "zh" to "验证来自别处的凭据包", "hi" to "कहीं और से आया पैकेज जाँचें", "ar" to "تحقّق من حزمة واردة من مكان آخر"),
         "nsig.evidence" to mapOf("en" to "Evidence package (JSON)", "es" to "Paquete de evidencias (JSON)", "fr" to "Dossier de preuves (JSON)", "de" to "Nachweispaket (JSON)", "pt" to "Pacote de evidências (JSON)", "it" to "Pacchetto di prove (JSON)", "ja" to "証拠一式（JSON）", "zh" to "证据包（JSON）", "hi" to "साक्ष्य पैकेज (JSON)", "ar" to "حزمة الأدلة (JSON)"),
+    )
+
+    private fun tablePart4(): Map<String, Map<String, String>> = mapOf(
         "nsig.evidence.sub" to mapOf("en" to "Paste an evidence package a counterparty handed you. It is checked against its own contents — no account, no lookup, no trust in this deployment beyond the arithmetic.", "es" to "Pega un paquete de evidencias que te haya entregado la otra parte. Se comprueba contra su propio contenido: sin cuenta, sin consulta, sin más confianza en este despliegue que la aritmética.", "fr" to "Collez un dossier de preuves qu'une contrepartie vous a remis. Il est vérifié contre son propre contenu — pas de compte, pas de recherche, aucune confiance envers ce déploiement au-delà de l'arithmétique.", "de" to "Füge ein Nachweispaket ein, das eine Gegenpartei dir gegeben hat. Es wird gegen seinen eigenen Inhalt geprüft — kein Konto, keine Abfrage, kein Vertrauen in diese Installation über die Rechnung hinaus.", "pt" to "Cole um pacote de evidências que a contraparte lhe entregou. É verificado contra o seu próprio conteúdo — sem conta, sem consulta, sem confiança nesta instalação para além da aritmética.", "it" to "Incolla un pacchetto di prove che una controparte ti ha consegnato. Viene verificato rispetto al proprio contenuto: nessun account, nessuna ricerca, nessuna fiducia in questa installazione oltre l'aritmetica.", "ja" to "相手方から渡された証拠一式を貼り付けてください。それ自身の中身に照らして検証されます — アカウントも照会も不要で、この環境に対する信頼も計算以上には要りません。", "zh" to "粘贴对方交给你的证据包。它会依据自身内容被核验 — 不需要账号，不需要查询，除了算术之外不需要信任这个部署。", "hi" to "प्रतिपक्ष द्वारा दिया गया साक्ष्य पैकेज चिपकाएँ। इसे इसकी अपनी सामग्री के विरुद्ध जाँचा जाता है — न खाता, न कोई खोज, न गणित से आगे इस परिनियोजन पर कोई भरोसा।", "ar" to "الصق حزمة أدلة سلّمها لك الطرف الآخر. يجري التحقق منها في ضوء محتواها نفسه — بلا حساب، وبلا استعلام، وبلا ثقة بهذا النشر أبعد من الحساب."),
         "nsig.verify" to mapOf("en" to "Verify", "es" to "Verificar", "fr" to "Vérifier", "de" to "Prüfen", "pt" to "Verificar", "it" to "Verifica", "ja" to "検証する", "zh" to "验证", "hi" to "जाँचें", "ar" to "تحقّق"),
         "nvoi.step1" to mapOf("en" to "1 · Permission", "es" to "1 · Permiso", "fr" to "1 · Autorisation", "de" to "1 · Erlaubnis", "pt" to "1 · Permissão", "it" to "1 · Autorizzazione", "ja" to "1 · 許可", "zh" to "1 · 许可", "hi" to "1 · अनुमति", "ar" to "1 · الإذن"),
@@ -485,6 +503,9 @@ object L10n {
         "nsig.needaccount" to mapOf("en" to "Signing credentials are bound to an account, so there has to be one before a passkey can stand for it.", "es" to "Las credenciales de firma están ligadas a una cuenta, así que tiene que existir una antes de que una clave de acceso pueda representarla.", "fr" to "Les identifiants de signature sont liés à un compte : il faut donc qu'il en existe un avant qu'une clé d'accès puisse le représenter.", "de" to "Signaturanmeldedaten sind an ein Konto gebunden, also muss es eines geben, bevor ein Passkey dafür einstehen kann.", "pt" to "As credenciais de assinatura estão ligadas a uma conta, por isso tem de existir uma antes de que uma chave de acesso possa representá-la.", "it" to "Le credenziali di firma sono legate a un account, quindi ne deve esistere uno prima che una passkey possa rappresentarlo.", "ja" to "署名の資格情報はアカウントに結び付いています。パスキーがそれを代理する前に、アカウントが存在している必要があります。", "zh" to "签名凭据与账户绑定，因此必须先有账户，通行密钥才能代表它。", "hi" to "हस्ताक्षर की प्रमाण-सामग्री किसी खाते से बँधी होती है, इसलिए पासकी उसका प्रतिनिधित्व कर सके, उससे पहले खाता होना ज़रूरी है।", "ar" to "بيانات اعتماد التوقيع مرتبطة بحساب، فلا بدّ من وجود حساب قبل أن يقوم مفتاح المرور مقامه."),
         "ndsk.note" to mapOf("en" to "A desk is a real person, not a synthetic profile — so nothing here carries the AI mark. If they are away from the desk, you can ring the bell.", "es" to "Un mostrador es una persona real, no un perfil sintético, así que nada de esto lleva la marca de IA. Si no está en el mostrador, puedes tocar el timbre.", "fr" to "Un guichet, c'est une personne réelle, pas un profil synthétique — rien ici ne porte donc la marque IA. Si elle s'est absentée, vous pouvez sonner.", "de" to "Ein Schalter ist ein echter Mensch, kein synthetisches Profil — nichts hier trägt daher die KI-Kennzeichnung. Ist die Person nicht da, kannst du klingeln.", "pt" to "Um balcão é uma pessoa real, não um perfil sintético — por isso nada aqui leva a marca de IA. Se estiver ausente do balcão, pode tocar a campainha.", "it" to "Un banco è una persona reale, non un profilo sintetico — quindi qui nulla porta il contrassegno IA. Se non è al banco, puoi suonare il campanello.", "ja" to "受付にいるのは合成プロフィールではなく実在の人です。ですからここには AI の印は付きません。席を外している場合は、ベルを鳴らせます。", "zh" to "柜台后面是真人，不是合成资料 — 所以这里的内容都不带 AI 标记。如果对方不在柜台，你可以按铃。", "hi" to "डेस्क पर एक असली व्यक्ति होता है, कोई कृत्रिम प्रोफ़ाइल नहीं — इसलिए यहाँ कुछ भी AI चिह्न नहीं रखता। अगर वे डेस्क पर न हों, तो आप घंटी बजा सकते हैं।", "ar" to "المكتب شخص حقيقي لا ملف اصطناعي — ولذلك لا يحمل شيء هنا علامة الذكاء الاصطناعي. وإن كان صاحبه بعيدًا عن المكتب، فبإمكانك قرع الجرس."),
         "nmg.claimed" to mapOf("en" to "claimed {handle}", "es" to "reclamado {handle}", "fr" to "réservé {handle}", "de" to "gesichert {handle}", "pt" to "reservado {handle}", "it" to "riservato {handle}", "ja" to "取得しました {handle}", "zh" to "已认领 {handle}", "hi" to "लिया गया {handle}", "ar" to "تمّت المطالبة بـ {handle}"),
+    )
+
+    private fun tablePart5(): Map<String, Map<String, String>> = mapOf(
         "nmg.qr" to mapOf("en" to "QR: {svg}", "es" to "QR: {svg}", "fr" to "QR : {svg}", "de" to "QR: {svg}", "pt" to "QR: {svg}", "it" to "QR: {svg}", "ja" to "QR：{svg}", "zh" to "二维码：{svg}", "hi" to "QR: {svg}", "ar" to "رمز الاستجابة: {svg}"),
         "nmg.found.beacon" to mapOf("en" to "beacon “{label}” · {n} scan(s)", "es" to "baliza “{label}” · {n} escaneo(s)", "fr" to "balise « {label} » · {n} scan(s)", "de" to "Marke „{label}“ · {n} Scan(s)", "pt" to "farol “{label}” · {n} leitura(s)", "it" to "faro “{label}” · {n} scansione/i", "ja" to "ビーコン「{label}」・スキャン {n} 件", "zh" to "信标“{label}” · {n} 次扫描", "hi" to "बीकन “{label}” · {n} स्कैन", "ar" to "منارة “{label}” · {n} مسح"),
         "nmg.offered.derivatives" to mapOf("en" to "offered: {kind} · {currency} {price} · derivatives allowed", "es" to "ofrecido: {kind} · {currency} {price} · se permiten derivados", "fr" to "proposé : {kind} · {currency} {price} · dérivés autorisés", "de" to "angeboten: {kind} · {currency} {price} · Ableitungen erlaubt", "pt" to "oferecido: {kind} · {currency} {price} · derivados permitidos", "it" to "offerto: {kind} · {currency} {price} · derivati consentiti", "ja" to "提供中：{kind} · {currency} {price} · 派生可", "zh" to "已报价：{kind} · {currency} {price} · 允许派生", "hi" to "प्रस्तावित: {kind} · {currency} {price} · व्युत्पन्न की अनुमति", "ar" to "معروض: {kind} · {currency} {price} · المشتقات مسموحة"),
@@ -585,6 +606,9 @@ object L10n {
         "nsig.devicebound" to mapOf("en" to "device-bound — cannot sync", "es" to "ligada al dispositivo: no se sincroniza", "fr" to "liée à l'appareil — ne se synchronise pas", "de" to "an das Gerät gebunden — nicht synchronisierbar", "pt" to "ligada ao dispositivo — não sincroniza", "it" to "legata al dispositivo — non si sincronizza", "ja" to "この端末に固定 — 同期されません", "zh" to "绑定本设备 — 无法同步", "hi" to "इसी डिवाइस से बँधी — सिंक नहीं होती", "ar" to "مرتبط بالجهاز — لا يُزامَن"),
         "nsig.syncable" to mapOf("en" to "syncable — exists on your other devices", "es" to "sincronizable: existe en tus otros dispositivos", "fr" to "synchronisable — présente sur vos autres appareils", "de" to "synchronisierbar — auf deinen anderen Geräten vorhanden", "pt" to "sincronizável — existe nos seus outros dispositivos", "it" to "sincronizzabile — presente sui tuoi altri dispositivi", "ja" to "同期可能 — お使いの他の端末にも存在します", "zh" to "可同步 — 也存在于你的其他设备上", "hi" to "सिंक हो सकती है — आपके अन्य उपकरणों पर भी है", "ar" to "قابل للمزامنة — موجود على أجهزتك الأخرى"),
         "nvoi.enough" to mapOf("en" to "Enough of your voice is on record — mint the voiceprint.", "es" to "Ya hay bastante de tu voz registrada: acuña la huella vocal.", "fr" to "Il y a assez de votre voix enregistrée — frappez l'empreinte vocale.", "de" to "Es ist genug von deiner Stimme aufgenommen — präge den Stimmabdruck.", "pt" to "Já há voz suficiente registada — cunhe a impressão vocal.", "it" to "C'è abbastanza della tua voce — conia l'impronta vocale.", "ja" to "あなたの声は十分に記録されました。声紋を作成できます。", "zh" to "你的声音已录够 — 可以铸造声纹了。", "hi" to "आपकी आवाज़ पर्याप्त दर्ज हो चुकी है — अब आवाज़-छाप बनाइए।", "ar" to "سُجّل ما يكفي من صوتك — اسكك بصمة الصوت."),
+    )
+
+    private fun tablePart6(): Map<String, Map<String, String>> = mapOf(
         "nvoi.more" to mapOf("en" to "Record a few more samples first.", "es" to "Graba antes algunas muestras más.", "fr" to "Enregistrez d'abord quelques échantillons de plus.", "de" to "Nimm zuerst noch ein paar Proben auf.", "pt" to "Grave primeiro mais algumas amostras.", "it" to "Registra prima qualche campione in più.", "ja" to "先に、もう少しサンプルを録音してください。", "zh" to "请先再录几段样本。", "hi" to "पहले कुछ और नमूने रिकॉर्ड कीजिए।", "ar" to "سجّل بضع عيّنات أخرى أولًا."),
         "nvoi.sample" to mapOf("en" to "Record a sample", "es" to "Grabar una muestra", "fr" to "Enregistrer un échantillon", "de" to "Eine Probe aufnehmen", "pt" to "Gravar uma amostra", "it" to "Registra un campione", "ja" to "サンプルを録音", "zh" to "录一段样本", "hi" to "एक नमूना रिकॉर्ड करें", "ar" to "سجّل عيّنة"),
         "nvoi.stop" to mapOf("en" to "Stop", "es" to "Detener", "fr" to "Arrêter", "de" to "Stopp", "pt" to "Parar", "it" to "Ferma", "ja" to "停止", "zh" to "停止", "hi" to "रोकें", "ar" to "أوقف"),
@@ -685,6 +709,9 @@ object L10n {
         "inbox.empty" to mapOf("en" to "Nothing yet — what happens to you lands here.", "es" to "Nada todavía: lo que te suceda aparecerá aquí.", "fr" to "Rien pour l'instant — ce qui vous arrive s'affiche ici.", "de" to "Noch nichts — was dir geschieht, landet hier.", "pt" to "Nada ainda — o que acontecer com você aparece aqui.", "it" to "Ancora niente — ciò che ti accade arriva qui.", "ja" to "まだ何もありません。あなたに起きたことがここに届きます。", "zh" to "暂无内容——发生在你身上的事会显示在这里。", "hi" to "अभी कुछ नहीं — आपके साथ जो होगा वह यहाँ दिखेगा।", "ar" to "لا شيء بعد — ما يحدث لك يظهر هنا."),
         "inbox.kind.message" to mapOf("en" to "sent you a message", "es" to "te envió un mensaje", "fr" to "vous a envoyé un message", "de" to "hat dir eine Nachricht geschickt", "pt" to "enviou uma mensagem para você", "it" to "ti ha inviato un messaggio", "ja" to "からメッセージが届きました", "zh" to "给你发了一条消息", "hi" to "ने आपको संदेश भेजा", "ar" to "أرسل لك رسالة"),
         "inbox.kind.comment" to mapOf("en" to "commented on something of yours", "es" to "comentó algo tuyo", "fr" to "a commenté quelque chose à vous", "de" to "hat etwas von dir kommentiert", "pt" to "comentou algo seu", "it" to "ha commentato qualcosa di tuo", "ja" to "があなたの投稿にコメントしました", "zh" to "评论了你的内容", "hi" to "ने आपकी किसी चीज़ पर टिप्पणी की", "ar" to "علّق على شيء يخصك"),
+    )
+
+    private fun tablePart7(): Map<String, Map<String, String>> = mapOf(
         "inbox.kind.friend" to mapOf("en" to "added you as a friend", "es" to "te añadió como amigo", "fr" to "vous a ajouté comme ami", "de" to "hat dich als Freund hinzugefügt", "pt" to "adicionou você como amigo", "it" to "ti ha aggiunto come amico", "ja" to "があなたを友達に追加しました", "zh" to "把你加为好友", "hi" to "ने आपको मित्र के रूप में जोड़ा", "ar" to "أضافك صديقًا"),
         "inbox.kind.exchange_signed" to mapOf("en" to "signed your exchange", "es" to "firmó tu intercambio", "fr" to "a signé votre échange", "de" to "hat deinen Austausch unterzeichnet", "pt" to "assinou sua troca", "it" to "ha firmato il tuo scambio", "ja" to "があなたの取引に署名しました", "zh" to "签署了你的交换协议", "hi" to "ने आपके विनिमय पर हस्ताक्षर किए", "ar" to "وقّع على تبادلك"),
         "inbox.kind.guest_accepted" to mapOf("en" to "gave you a place on their stream", "es" to "te dio un lugar en su transmisión", "fr" to "vous a donné une place dans son direct", "de" to "hat dir einen Platz in seinem Stream gegeben", "pt" to "deu a você um lugar na transmissão", "it" to "ti ha dato un posto nella sua diretta", "ja" to "が配信への出演を認めました", "zh" to "让你加入了他们的直播", "hi" to "ने आपको अपनी स्ट्रीम में जगह दी", "ar" to "منحك مكانًا في بثه"),
@@ -785,6 +812,9 @@ object L10n {
         "bot.log" to mapOf("en" to "Everything it was told to do", "es" to "Todo lo que se le ordenó", "fr" to "Tout ce qu'on lui a demandé", "de" to "Alles, was ihm befohlen wurde", "pt" to "Tudo o que lhe foi ordenado", "it" to "Tutto ciò che gli è stato detto di fare", "ja" to "命じられたことの全記録", "zh" to "它被要求做过的一切", "hi" to "इसे जो भी कहा गया", "ar" to "كل ما أُمر به"),
         "bot.skills" to mapOf("en" to "What is installed on it", "es" to "Lo que lleva instalado", "fr" to "Ce qui est installé dessus", "de" to "Was darauf installiert ist", "pt" to "O que está instalado nele", "it" to "Cosa c'è installato", "ja" to "搭載スキル", "zh" to "已安装的技能", "hi" to "इस पर क्या स्थापित है", "ar" to "ما المثبت عليه"),
         "bot.dials" to mapOf("en" to "Its dials", "es" to "Sus diales", "fr" to "Ses cadrans", "de" to "Seine Regler", "pt" to "Seus mostradores", "it" to "Le sue manopole", "ja" to "ダイヤルを見る", "zh" to "它的旋钮", "hi" to "इसके डायल", "ar" to "أقراصه"),
+    )
+
+    private fun tablePart8(): Map<String, Map<String, String>> = mapOf(
         "bot.dials.set" to mapOf("en" to "Steer it", "es" to "Dirigirlo", "fr" to "Le piloter", "de" to "Steuern", "pt" to "Guiá-lo", "it" to "Guidalo", "ja" to "操縦する", "zh" to "调控", "hi" to "चलाएँ", "ar" to "وجّهه"),
         "bot.pace" to mapOf("en" to "Pace", "es" to "Ritmo", "fr" to "Rythme", "de" to "Tempo", "pt" to "Ritmo", "it" to "Ritmo", "ja" to "ペース", "zh" to "节奏", "hi" to "गति", "ar" to "الإيقاع"),
         "refer.title" to mapOf("en" to "The medical referral", "es" to "La derivación médica", "fr" to "L'orientation médicale", "de" to "Die Überweisung", "pt" to "O encaminhamento médico", "it" to "L'invio medico", "ja" to "医療紹介", "zh" to "医疗转诊", "hi" to "चिकित्सा रेफ़रल", "ar" to "الإحالة الطبية"),
@@ -885,6 +915,9 @@ object L10n {
         "dele.title" to mapOf("en" to "Delegated work", "es" to "Trabajo delegado", "fr" to "Travail délégué", "de" to "Delegierte Arbeit", "pt" to "Trabalho delegado", "it" to "Lavoro delegato", "ja" to "委任された作業", "zh" to "委托的工作", "hi" to "सौंपा गया काम", "ar" to "العمل المفوَّض"),
         "dele.phases" to mapOf("en" to "Phases others may start", "es" to "Fases que otros pueden iniciar", "fr" to "Phases que d'autres peuvent lancer", "de" to "Phasen, die andere starten dürfen", "pt" to "Fases que outros podem iniciar", "it" to "Fasi che altri possono avviare", "ja" to "他者が開始できるフェーズ", "zh" to "他人可启动的阶段", "hi" to "चरण जो दूसरे शुरू कर सकते हैं", "ar" to "المراحل التي يجوز للآخرين بدؤها"),
         "dele.allow" to mapOf("en" to "Allow it", "es" to "Permitirlo", "fr" to "L'autoriser", "de" to "Erlauben", "pt" to "Permiti-lo", "it" to "Consentilo", "ja" to "許可する", "zh" to "允许", "hi" to "अनुमति दें", "ar" to "اسمح به"),
+    )
+
+    private fun tablePart9(): Map<String, Map<String, String>> = mapOf(
         "dele.offer" to mapOf("en" to "What it offers", "es" to "Lo que ofrece", "fr" to "Ce qu'il propose", "de" to "Was es anbietet", "pt" to "O que oferece", "it" to "Cosa offre", "ja" to "提供内容", "zh" to "它提供什么", "hi" to "यह क्या देता है", "ar" to "ما الذي يعرضه"),
         "dele.goal" to mapOf("en" to "Goal for it", "es" to "Objetivo para él", "fr" to "Objectif pour lui", "de" to "Ziel dafür", "pt" to "Objetivo para ele", "it" to "Obiettivo per esso", "ja" to "依頼する目標", "zh" to "交办目标", "hi" to "इसके लिए लक्ष्य", "ar" to "الهدف المطلوب"),
         "dele.start" to mapOf("en" to "Hand it work", "es" to "Encargarle trabajo", "fr" to "Lui confier du travail", "de" to "Arbeit übergeben", "pt" to "Entregar-lhe trabalho", "it" to "Affidagli lavoro", "ja" to "作業を任せる", "zh" to "交办工作", "hi" to "काम सौंपें", "ar" to "أسنِد له العمل"),
@@ -985,6 +1018,9 @@ object L10n {
         "front.show" to mapOf("en" to "One call, everything a visitor needs", "es" to "Una llamada, todo lo que necesita un visitante", "fr" to "Un appel, tout ce qu'il faut au visiteur", "de" to "Ein Aufruf, alles für den Besucher", "pt" to "Uma chamada, tudo o que o visitante precisa", "it" to "Una chiamata, tutto ciò che serve al visitatore", "ja" to "1回の呼び出しで訪問者に必要な全て", "zh" to "一次调用，访客所需的一切", "hi" to "एक कॉल, आगंतुक की हर ज़रूरत", "ar" to "نداء واحد وكل ما يحتاجه الزائر"),
         "surf.title" to mapOf("en" to "The surfaces", "es" to "Las superficies", "fr" to "Les surfaces", "de" to "Die Oberflächen", "pt" to "As superfícies", "it" to "Le superfici", "ja" to "サーフェス", "zh" to "呈现面", "hi" to "सतहें", "ar" to "الأسطح"),
         "surf.list" to mapOf("en" to "Where it renders", "es" to "Dónde se muestra", "fr" to "Où il s'affiche", "de" to "Wo es erscheint", "pt" to "Onde aparece", "it" to "Dove appare", "ja" to "表示される場所", "zh" to "呈现于何处", "hi" to "कहाँ दिखता है", "ar" to "أين يظهر"),
+    )
+
+    private fun tablePart10(): Map<String, Map<String, String>> = mapOf(
         "surf.set" to mapOf("en" to "Set the list", "es" to "Fijar la lista", "fr" to "Définir la liste", "de" to "Liste festlegen", "pt" to "Definir a lista", "it" to "Imposta l'elenco", "ja" to "リストを設定", "zh" to "设置列表", "hi" to "सूची तय करें", "ar" to "حدّد القائمة"),
         "comp.title" to mapOf("en" to "The blend", "es" to "La mezcla", "fr" to "Le mélange", "de" to "Die Mischung", "pt" to "A mistura", "it" to "La miscela", "ja" to "ブレンド", "zh" to "混合来源", "hi" to "मिश्रण", "ar" to "المزيج"),
         "comp.show" to mapOf("en" to "What a hybrid is made of", "es" to "De qué está hecho un híbrido", "fr" to "De quoi est fait un hybride", "de" to "Woraus ein Hybrid besteht", "pt" to "De que é feito um híbrido", "it" to "Di cosa è fatto un ibrido", "ja" to "ハイブリッドの構成", "zh" to "混合体的构成", "hi" to "हाइब्रिड किससे बना है", "ar" to "ممَّ يتكوّن الهجين"),
@@ -1085,6 +1121,9 @@ object L10n {
         "born.social" to mapOf("en" to "Social style", "es" to "Estilo social", "fr" to "Style social", "de" to "Sozialer Stil", "pt" to "Estilo social", "it" to "Stile sociale", "ja" to "社交スタイル", "zh" to "社交风格", "hi" to "सामाजिक शैली", "ar" to "الأسلوب الاجتماعي"),
         "born.humor" to mapOf("en" to "Humor", "es" to "Humor", "fr" to "Humour", "de" to "Humor", "pt" to "Humor", "it" to "Umorismo", "ja" to "ユーモア", "zh" to "幽默", "hi" to "हास्य", "ar" to "روح الدعابة"),
         "born.matters" to mapOf("en" to "What matters", "es" to "Lo que importa", "fr" to "Ce qui compte", "de" to "Was zählt", "pt" to "O que importa", "it" to "Ciò che conta", "ja" to "大切なこと", "zh" to "在乎的事", "hi" to "क्या मायने रखता है", "ar" to "ما يهم"),
+    )
+
+    private fun tablePart11(): Map<String, Map<String, String>> = mapOf(
         "born.comfort" to mapOf("en" to "How they comfort", "es" to "Cómo consuelan", "fr" to "Comment ils réconfortent", "de" to "Wie sie trösten", "pt" to "Como confortam", "it" to "Come consolano", "ja" to "慰め方", "zh" to "如何安慰", "hi" to "कैसे सांत्वना देते हैं", "ar" to "كيف يواسون"),
         "born.make" to mapOf("en" to "Bring it to life", "es" to "Darle vida", "fr" to "Lui donner vie", "de" to "Zum Leben erwecken", "pt" to "Dar-lhe vida", "it" to "Dargli vita", "ja" to "命を吹き込む", "zh" to "赋予生命", "hi" to "जीवन दें", "ar" to "بث الحياة فيه"),
         "born.blend" to mapOf("en" to "Blend a hybrid", "es" to "Mezclar un híbrido", "fr" to "Fusionner un hybride", "de" to "Hybrid mischen", "pt" to "Misturar um híbrido", "it" to "Fondi un ibrido", "ja" to "ハイブリッドを合成", "zh" to "混合体", "hi" to "संकर मिलाएँ", "ar" to "مزج هجين"),
@@ -1185,6 +1224,9 @@ object L10n {
         "trade.asking" to mapOf("en" to "Asking:", "es" to "Precio:", "fr" to "Prix :", "de" to "Preis:", "pt" to "Preço:", "it" to "Prezzo:", "ja" to "希望価格:", "zh" to "要价:", "hi" to "मांग:", "ar" to "المطلوب:"),
         "trade.set" to mapOf("en" to "Set", "es" to "Fijar", "fr" to "Définir", "de" to "Setzen", "pt" to "Definir", "it" to "Imposta", "ja" to "設定", "zh" to "设定", "hi" to "तय करें", "ar" to "حدّد"),
         "trade.show" to mapOf("en" to "Show", "es" to "Ver", "fr" to "Voir", "de" to "Zeigen", "pt" to "Ver", "it" to "Mostra", "ja" to "表示", "zh" to "查看", "hi" to "दिखाएँ", "ar" to "أظهر"),
+    )
+
+    private fun tablePart12(): Map<String, Map<String, String>> = mapOf(
         "trade.clear" to mapOf("en" to "Clear", "es" to "Borrar", "fr" to "Effacer", "de" to "Löschen", "pt" to "Limpar", "it" to "Cancella", "ja" to "消す", "zh" to "清除", "hi" to "साफ़ करें", "ar" to "امسح"),
         "trade.venue" to mapOf("en" to "Where to place it", "es" to "Dónde colocarlo", "fr" to "Où le placer", "de" to "Wo platzieren", "pt" to "Onde colocar", "it" to "Dove metterlo", "ja" to "掲出場所", "zh" to "陈列位置", "hi" to "कहाँ रखें", "ar" to "أين تضعه"),
         "trade.place" to mapOf("en" to "Place", "es" to "Colocar", "fr" to "Placer", "de" to "Platzieren", "pt" to "Colocar", "it" to "Colloca", "ja" to "掲出", "zh" to "陈列", "hi" to "रखें", "ar" to "ضع"),
@@ -1211,4 +1253,18 @@ object L10n {
         "deals.channel" to mapOf("en" to "Open the channel", "es" to "Abrir el canal", "fr" to "Ouvrir le canal", "de" to "Kanal öffnen", "pt" to "Abrir o canal", "it" to "Apri il canale", "ja" to "チャンネルを開く", "zh" to "打开频道", "hi" to "चैनल खोलें", "ar" to "افتح القناة"),
         "deals.pick" to mapOf("en" to "Open", "es" to "Abrir", "fr" to "Ouvrir", "de" to "Öffnen", "pt" to "Abrir", "it" to "Apri", "ja" to "開く", "zh" to "打开", "hi" to "खोलें", "ar" to "افتح"),
     )
+
+    private val table: Map<String, Map<String, String>> =
+        tablePart1() +
+        tablePart2() +
+        tablePart3() +
+        tablePart4() +
+        tablePart5() +
+        tablePart6() +
+        tablePart7() +
+        tablePart8() +
+        tablePart9() +
+        tablePart10() +
+        tablePart11() +
+        tablePart12()
 }

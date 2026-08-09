@@ -72,7 +72,9 @@ _BINDING = re.compile(
 # below — which needs a `,` or `)` after the property name — silently drops the
 # *last* field of every record, which is where `share`, `built` and `kinds` all
 # happen to sit.
-_RECORD_BLOCK = re.compile(r'public record (\w+)\((.*?\));', re.S)
+# A record ends at `);`, or at `)` before a body — the second shape is
+# legal C# and reading past it swallows the record declared next.
+_RECORD_BLOCK = re.compile(r'public record (\w+)\((.*?\))\s*[;{]', re.S)
 _FIELD = re.compile(
     r'JsonPropertyName\("([\w_]+)"\)\]\s+([\w\[\]\?<>,\.\s]+?)\s+\w+\s*[,)]')
 
