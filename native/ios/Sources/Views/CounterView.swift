@@ -28,7 +28,7 @@ struct CounterSection: View {
     @State private var basis = ""
     @State private var location = ""
     @State private var blurb = ""
-    @State private var card: DeskCard?
+    @State private var card: DeskOpened?
     @State private var nearby: [DeskBrief] = []
     @State private var rings: [DeskRing] = []
     @State private var guests: [DeskGuest] = []

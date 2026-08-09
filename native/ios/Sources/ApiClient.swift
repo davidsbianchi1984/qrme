@@ -1933,7 +1933,12 @@ extension ApiClient {
 // could go up; nothing could search, price, sell or buy) and in
 // exchanges, which no shell had at all.
 
-struct DeskCard: Decodable, Identifiable {
+/// What `POST /desks` hands back, and the only place the desk token appears.
+/// Deliberately not `DeskCard`: that is the public card `GET /desks/{id}`
+/// returns, with the attestation a visitor reads. Both carried one name, and
+/// Swift called the lookup ambiguous while C# read the pair as partial
+/// declarations of one positional record.
+struct DeskOpened: Decodable, Identifiable {
     let desk_id: String
     let display_name: String
     let trade: String?
@@ -2080,7 +2085,7 @@ extension ApiClient {
 
     func openDesk(ownerId: String, displayName: String, trade: String,
                   attestor: String, basis: String, location: String?,
-                  blurb: String?, token: String) async throws -> DeskCard {
+                  blurb: String?, token: String) async throws -> DeskOpened {
         var body: [String: Any] = [
             "owner_id": ownerId, "display_name": displayName, "trade": trade,
             "attestor": attestor, "basis": basis]
@@ -2091,13 +2096,13 @@ extension ApiClient {
     }
 
     func setDeskPresence(deskId: String, presence: String,
-                         token: String) async throws -> DeskCard {
+                         token: String) async throws -> DeskOpened {
         try await request("/desks/\(deskId)/presence", method: "PUT",
                           body: ["presence": presence], token: token)
     }
 
     func setDeskPortrait(deskId: String, asset: String?,
-                         token: String) async throws -> DeskCard {
+                         token: String) async throws -> DeskOpened {
         try await request("/desks/\(deskId)/portrait", method: "PUT",
                           body: ["asset": asset as Any], token: token)
     }
@@ -2105,7 +2110,7 @@ extension ApiClient {
     // The route points a desk at a camera by address and clears it with an
     // empty one. `enabled` was a switch with nothing to switch on.
     func setDeskCamera(deskId: String, url: String,
-                       token: String) async throws -> DeskCard {
+                       token: String) async throws -> DeskOpened {
         try await request("/desks/\(deskId)/camera", method: "PUT",
                           body: ["url": url], token: token)
     }

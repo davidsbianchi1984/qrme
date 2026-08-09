@@ -37,7 +37,7 @@ struct ManageView: View {
             case .market: MarketSection()
             case .packs: ScrollView { PacksSection().padding(20) }
             case .gaming: GamingSection()
-            case .license: LicenseSection()
+            case .license: ManageLicenseSection()
             case .earnings: EarningsSection()
             case .signatures: SignatureSection()
             case .voice: VoiceSection()
@@ -495,7 +495,7 @@ private struct MarketSection: View {
 
 // MARK: License — offer the profile's expertise; see and revoke grants
 
-private struct LicenseSection: View {
+private struct ManageLicenseSection: View {
     @EnvironmentObject var state: AppState
     @State private var kind = "consult"
     @State private var price = ""
