@@ -4,6 +4,64 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.59.9] — 2026-08-08
+
+### An erase is measured against the schema, not against a list somebody wrote
+
+`DELETE /profiles/{id}` says *delete the profile and every trace of it —
+anytime*. It named twenty-four tables in a tuple. This schema has **sixty-six**
+with a `profile_id` column, so the delete left forty-two standing:
+
+    anonymous_pictures   clinical_notes   media          media_watermarks
+    homepages            friendships      inbox_events   displays
+    embodiments          excursions       campaigns      game_sessions
+    departments          delegated_workflows             environment_context
+    …and twenty-eight more
+
+`clinical_notes` and `media` are the sharp ones: a clinical note and the
+photographs behind it, belonging to a profile the API answers 404 for.
+`media_watermarks` is the identifier tying a rendered likeness back to the
+person it was made from.
+
+The sibling vault had already fixed this shape and the fix had not travelled.
+Its docstring already said the general thing: *a migration that adds a table
+is covered by writing it, not by remembering this function.*
+
+    asked     did we delete what the handler names
+    mattered  did we delete what the schema holds
+
+### Why the list kept losing
+
+It was not neglect. Both siblings' lists had been *corrected*, more than once,
+and every correction was right. JIM-mini's most recent one found a watch
+channel outliving its account and added three tables — `watch_channels`,
+`contribution_log`, `waivers` — because those three carried a live credential
+rather than a record. That fix was correct and did nothing about the next
+table, and `crash_watches` and `vigils` are the same kind of row and were
+still standing after it.
+
+A list is a claim about a schema, made once, by somebody who could see the
+schema that day.
+
+### How it is checked
+
+By writing a row into **every** scoped table, erasing, and looking. Not by
+exercising features until rows appear: the tables a test can reach through the
+API are the tables somebody thought to wire, which is the same blind spot as
+the list. The rows are synthetic and go in through SQL — the question is
+whether the cascade reaches a table, and a row is a row.
+
+Plus the structural half, which is the part that survives the next migration:
+the handler must not carry a list of table names at all, and must ask the
+schema.
+
+### The test does not borrow the reader it is checking
+
+The first cut planted rows in the cascade's own table reader. Narrowing the
+cascade narrowed the planting with it, so injecting the old hand-written list
+reported *a blind reader* rather than *forty-odd surviving tables*. It reads
+the schema itself now, and the injection names every table by name.
+
 ## [0.59.8] — 2026-08-08
 
 ### The check that covered one client of four

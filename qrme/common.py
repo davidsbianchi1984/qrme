@@ -488,3 +488,35 @@ def content_provenance(profile: dict, sources: list[dict],
                       "above are the derivation trail — this is a character "
                       "speaking, not a verified factual source.",
     }
+
+#: Tables a profile erase must **not** clear, and why.
+#:
+#: Empty on purpose. A row here is a promise broken deliberately, so it needs
+#: a sentence beside it naming whose promise and why — the sibling vault keeps
+#: its hash-chained audit log for exactly that reason and nothing here has the
+#: same standing.
+ERASE_KEEPS: frozenset[str] = frozenset()
+
+
+def profile_scoped_tables() -> list[str]:
+    """Every table in this schema with a `profile_id` column.
+
+    Read from the schema rather than written down. The list this replaced
+    named twenty-four tables while the schema had grown to sixty-six, so a
+    delete advertised as *the profile and every trace of it* left forty-two
+    tables standing — among them `clinical_notes`, `media` and
+    `media_watermarks`, `anonymous_pictures`, `homepages` and `friendships`.
+
+    A migration that adds a table is covered by writing it, not by remembering
+    the delete handler.
+    """
+    conn = db.connect()
+    found = []
+    for row in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' "
+            "AND name NOT LIKE 'sqlite_%'").fetchall():
+        name = row[0]
+        columns = {c[1] for c in conn.execute(f"PRAGMA table_info({name})")}
+        if "profile_id" in columns:
+            found.append(name)
+    return sorted(found)

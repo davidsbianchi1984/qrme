@@ -11,6 +11,7 @@ from fastapi import (APIRouter, Depends, Header, HTTPException,
 from .. import (auth, companion, composite, db, i18n, identity, persona,
                 storage, terms, tiers)
 from ..common import (
+    ERASE_KEEPS, profile_scoped_tables,
     age_of, profile_or_404, profile_out, require_owner,
     source_items,
 )
@@ -453,13 +454,18 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     if vaulted:
         deleted["pdi_records"] = sum(
             1 for key in vaulted if pdi is not None and pdi.delete(key))
-    for table in ("source_items", "relationships", "messages", "engagement",
-                  "posts", "surfaces", "persona_embeddings", "specialists",
-                  "biometric_context", "grants", "tasks", "finetune_runs",
-                  "marketplace", "handles", "beacons", "creative_works",
-                  "perceptions", "active_handoffs", "workflows", "objections",
-                  "proactive_state", "license_offers", "license_grants",
-                  "contribution_log"):
+    # Derived from the schema, not written down. The list that stood here
+    # named twenty-four tables and this schema has sixty-six with a
+    # `profile_id` column, so "every trace of it" left forty-two standing —
+    # `clinical_notes`, `media` and `media_watermarks`, `anonymous_pictures`,
+    # `homepages`, `friendships`, `inbox_events` among them. A migration that
+    # adds a table is covered by writing it.
+    #
+    #     asked     did we delete what the handler names
+    #     mattered  did we delete what the schema holds
+    for table in profile_scoped_tables():
+        if table in ERASE_KEEPS:
+            continue
         deleted[table] = conn.execute(
             f"DELETE FROM {table} WHERE profile_id=?", (profile_id,)).rowcount
     # Also drop any conversation that had handed off *to* this profile.
