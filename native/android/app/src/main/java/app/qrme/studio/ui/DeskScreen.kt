@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import app.qrme.studio.ApiClient
+import app.qrme.studio.DeskSession
 import app.qrme.studio.L10n
 import app.qrme.studio.DeskCard
 import app.qrme.studio.RingReceipt

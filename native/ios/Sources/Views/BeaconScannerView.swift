@@ -122,6 +122,7 @@ struct BeaconCard: Equatable {
 
 /// The portrait, pinned to the sticker.
 private struct BeaconOverlay: View {
+    @EnvironmentObject var state: AppState
     let card: BeaconCard
     let quad: CGRect
 

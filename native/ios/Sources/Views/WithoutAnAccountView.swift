@@ -18,6 +18,7 @@ import SwiftUI
 /// objections against your own profile and attesting to them stays in Manage,
 /// where the credential is.
 struct WithoutAnAccountView: View {
+    @EnvironmentObject var state: AppState
     enum Pane: String, CaseIterable { case object, mark, count }
 
     @Environment(\.dismiss) private var dismiss

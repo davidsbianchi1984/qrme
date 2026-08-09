@@ -17,6 +17,7 @@ import SwiftUI
 /// says to ring it; this is that bell, on the screen the visitor is already
 /// looking at.
 struct DeskView: View {
+    @EnvironmentObject var state: AppState
     let deskId: String
     var callerId: String? = nil
     /// The viewer's interactor token. An 18+ stream checks its verified

@@ -148,7 +148,7 @@ struct SettingsView: View {
                     }
                 }.card()
 
-                SteeringCard()
+                SteeringPanel()
 
                 WatermarkCard()
                 WhoWroteThisCard()

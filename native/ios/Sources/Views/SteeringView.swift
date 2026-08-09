@@ -3,7 +3,7 @@ import SwiftUI
 /// Steering, not piloting: the owner shapes how the profile comes across —
 /// tone, pace, manner — plus its appearance and age, in one hub. The profile
 /// still acts autonomously within that shape.
-struct SteeringCard: View {
+struct SteeringPanel: View {
     @EnvironmentObject var state: AppState
     @State private var hub: SteeringHubState?
     @State private var values: [String: Double] = [:]

@@ -4,6 +4,7 @@ import SwiftUI
 /// consent-first matchmaking), or open a multiparty room where the profile
 /// takes moderated turns of its own.
 struct ChatHubView: View {
+    @EnvironmentObject var state: AppState
     enum Tab: String, CaseIterable { case profile = "Profile", stranger = "Stranger", rooms = "Rooms" }
     @State private var tab: Tab = .profile
 
@@ -18,7 +19,7 @@ struct ChatHubView: View {
             switch tab {
             case .profile: ChatView()
             case .stranger: StrangerSection()
-            case .rooms: RoomsSection()
+            case .rooms: CommunityRoomsSection()
             }
         }
     }
@@ -207,7 +208,7 @@ private struct StrangerSection: View {
 
 // MARK: Rooms — multiparty; the profile takes moderated turns
 
-private struct RoomsSection: View {
+private struct CommunityRoomsSection: View {
     @EnvironmentObject var state: AppState
     @State private var topic = ""
     @State private var room: RoomCreated?

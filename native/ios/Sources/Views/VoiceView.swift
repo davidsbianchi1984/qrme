@@ -12,6 +12,7 @@ import SwiftUI
 /// the recording stays in this app's container and the profile database is
 /// told its name, never its bytes.
 struct VoiceView: View {
+    @EnvironmentObject var state: AppState
     let profileId: String
     let token: String
 
