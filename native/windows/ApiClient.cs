@@ -1146,26 +1146,26 @@ public record PackInstalled(
 
     public Task<DeskBrief[]> Desks() => Send<DeskBrief[]>(Get("/desks"));
 
-    public Task<DeskCard> OpenDesk(string ownerId, string displayName,
+    public Task<DeskOpened> OpenDesk(string ownerId, string displayName,
                                    string trade, string attestor,
                                    string basis, string location,
                                    string blurb, string token) =>
-        Send<DeskCard>(Post("/desks", new {
+        Send<DeskOpened>(Post("/desks", new {
             owner_id = ownerId, display_name = displayName, trade, attestor,
             basis, location, blurb }, token));
 
-    public Task<DeskCard> SetDeskPresence(string deskId, string presence,
+    public Task<DeskOpened> SetDeskPresence(string deskId, string presence,
                                           string token) =>
-        Send<DeskCard>(Put($"/desks/{deskId}/presence", new { presence },
+        Send<DeskOpened>(Put($"/desks/{deskId}/presence", new { presence },
                            token));
 
-    public Task<DeskCard> SetDeskPortrait(string deskId, string token) =>
-        Send<DeskCard>(Put($"/desks/{deskId}/portrait",
+    public Task<DeskOpened> SetDeskPortrait(string deskId, string token) =>
+        Send<DeskOpened>(Put($"/desks/{deskId}/portrait",
                            new { asset = (string?)null }, token));
 
-    public Task<DeskCard> SetDeskCamera(string deskId, string url,
+    public Task<DeskOpened> SetDeskCamera(string deskId, string url,
                                         string token) =>
-        Send<DeskCard>(Put($"/desks/{deskId}/camera", new { url },
+        Send<DeskOpened>(Put($"/desks/{deskId}/camera", new { url },
                            token));
 
     public async Task<DeskRing[]> DeskRings(string deskId, string token)
@@ -3631,7 +3631,11 @@ public record CommentBox(
     [property: JsonPropertyName("comments")] CommentRow[] Comments);
 
 
-public record DeskCard(
+/// What `POST /desks` hands back, and the only place the desk token is ever
+/// shown. Deliberately not `DeskCard`: that is the *public* card
+/// `GET /desks/{id}` returns, with the attestation, feed and bell a visitor
+/// reads. Both existed under one name and the compiler refused the file.
+public record DeskOpened(
     [property: JsonPropertyName("desk_id")] string DeskId,
     [property: JsonPropertyName("display_name")] string DisplayName,
     [property: JsonPropertyName("trade")] string? Trade,

@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import app.qrme.studio.ApiClient
+import app.qrme.studio.L10n
 import app.qrme.studio.StudioViewModel
 import app.qrme.studio.VoiceEnrollment
 import app.qrme.studio.VoiceRevocation
