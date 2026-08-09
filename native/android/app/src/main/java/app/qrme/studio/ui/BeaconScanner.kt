@@ -1,6 +1,7 @@
 package app.qrme.studio.ui
 
 import android.Manifest
+import app.qrme.studio.L10n
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.RectF

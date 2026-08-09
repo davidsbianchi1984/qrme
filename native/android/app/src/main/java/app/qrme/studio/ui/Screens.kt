@@ -1,6 +1,10 @@
 package app.qrme.studio.ui
 
 import androidx.compose.foundation.background
+import app.qrme.studio.MainActivity
+import app.qrme.studio.Problems
+import org.json.JSONObject
+import org.json.JSONArray
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
