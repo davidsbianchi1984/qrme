@@ -1,9 +1,14 @@
 # Standing the beta up
 
-**Status: written, never yet run.** The compose file and proxy config were
-built by reading the three Dockerfiles and the existing test harness, and
-nothing here has met a real host. The first run will find something. Where a
-step is a guess rather than a fact, it says so.
+**Status: run once, for real.** First stood up in August 2026 on a 4 GB VPS
+with all four names live. The prediction below — *the first run will find
+something* — held: every container came up healthy, certificates issued
+themselves, and all three consoles rendered as blank dark pages, because the
+nonce Content-Security-Policy meant for the server-rendered pages was also
+stamped on the console bundles, whose external scripts no nonce can reach.
+Fixed in each product's `pagehead.console_policy`, and the bare domain now
+redirects to `/app/`. Where a step below is a guess rather than a fact, it
+still says so.
 
 Four containers behind a reverse proxy on one box: the three products, each
 serving its own console and API on one origin, plus the shared gateway.
