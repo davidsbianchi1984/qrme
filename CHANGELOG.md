@@ -4,6 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.60.10] - 2026-08-10
+
+### Fixed
+
+- **The console was blanked by its own Content-Security-Policy.** The nonce
+  policy written for the server-rendered pages was stamped on every HTML
+  response — including the console's `index.html`, whose script and stylesheet
+  are external files no per-response nonce can reach. A browser refused the
+  bundle and rendered a dark, empty page: HTML 200, nothing running. That is
+  what the first real deployment served on all three domains, while every
+  in-process test passed, because a `TestClient` reads the policy and enforces
+  none of it. `pagehead.console_policy` now names `'self'` where the page
+  policy names a nonce — still refusing inline script — and the over-HTTP
+  suite builds its own console dist so the measurement runs on CI whether or
+  not `app/` was built.
+- **The release-bodies sweep could not start, and then measured the fetch.**
+  An edit had left its embedded Python unparseable, so every scheduled run
+  died before deciding anything — in a place no interpreter, linter or test
+  reads. Repaired, its first honest run accused the kept `app-v0.24.0` of
+  losing a frozen body it visibly still carries: paginated output was re-split
+  by a regex that matched a `]` `[` pair inside a release body's own markdown,
+  and dropped what it broke. `gh api --slurp` now returns pagination as one
+  JSON document, a guard proves the fetch returned every release the record
+  names, and two local tests hold the line: the workflows' scripts must parse,
+  and the staleness decision is driven with this product's own frozen opening.
+
+### Added
+
+- **The beta topology.** `docker/beta-compose.yml`, `docker/beta.Caddyfile`
+  and `docs/beta-deploy.md`: the three products and the shared gateway behind
+  one reverse proxy on one host, real secrets from a single `.env` that fails
+  closed on any missing value, certificates obtained and renewed unattended.
+  First stood up on a real host this release, which is how the console
+  blanking above was found.
+- **The front door.** The bare domain answered `{"detail": "Not Found"}`,
+  because the console lives under `/app` and nothing said so. `/` now
+  redirects to `/app/` whenever a console is mounted — headless deployments
+  keep their honest 404.
+- **Nightly backups, running rather than written down.** A `backup` service
+  takes a `sqlite3 .backup` of each database and a copy of the collector
+  ledger into `/root/backups` daily, keeping fourteen days. The copies do not
+  leave the host, and the deploy doc says so.
+- **Bootstrap is idempotent by validation.** A saved PDI tenant token the
+  vault still honours is kept; minting happens only when there is none or it
+  is refused — so a restart reuses the first tenant instead of abandoning its
+  sealed records.
+
 ## [0.60.9] - 2026-08-10
 
 ### No change to this product
