@@ -1,0 +1,207 @@
+# The beta topology: three products and a gateway on one host.
+#
+# `docker-compose.yml` next door is a **test harness** — throwaway
+# credentials, the stub model, and an `e2e` container that runs the flow and
+# exits. This file is its production-shaped sibling: real secrets from
+# `.env`, the real model, no verdict container, and a reverse proxy in front
+# holding certificates for three domains.
+#
+#   docker compose -f docker/beta-compose.yml --env-file .env up -d --build
+#
+# See docs/beta-deploy.md for the checklist, and each product's
+# docs/hosting.md for what its variables mean — this file does not restate
+# them, because a second copy of a table is a second thing to drift.
+#
+# ## What each container is
+#
+# Every product image is a **two-stage build**: Node builds the console, and
+# the Python API serves both it and the API on one origin. So there is no
+# separate front-end to host and no CORS to arrange — one container per
+# product, one domain each.
+#
+#   pdi       8100   the vault. Starts first; the other two seal into it.
+#   qrme      8000   synthetic profiles
+#   jim       8200   the health guardian
+#   cloudgw   8300   shared: greater model, contributions, error reports
+#   caddy     80/443 the only container with a published port
+#
+# `expose` rather than `ports` on the four services is deliberate: they speak
+# plain HTTP and carry bearer tokens, so they are reachable only by the proxy
+# on the compose network, never from the internet. Terminating TLS in front
+# of them is not optional — see the TLS section of docs/hosting.md.
+#
+# ## Build contexts
+#
+# Defaults assume the three repositories are cloned as siblings:
+#
+#   /srv/qrme  /srv/jim-mini  /srv/pdi
+#
+# Override with QRME_CONTEXT / JIM_CONTEXT / PDI_CONTEXT for another layout.
+
+services:
+
+  # --- the vault ---------------------------------------------------------
+  #
+  # First, and healthy before anything else starts: QRME and JIM both seal
+  # into it, and a product that starts without its vault starts degraded in
+  # a way its callers cannot see.
+  pdi:
+    build:
+      context: ${PDI_CONTEXT:-../../pdi}
+    restart: unless-stopped
+    environment:
+      # Whoever holds this can decrypt. PDI's own hosting doc is blunt about
+      # it: "If the operator sets PDI_MASTER_KEY, the operator can decrypt."
+      PDI_MASTER_KEY: ${PDI_MASTER_KEY:?set PDI_MASTER_KEY in .env}
+      PDI_ADMIN_TOKEN: ${PDI_ADMIN_TOKEN:?set PDI_ADMIN_TOKEN in .env}
+      PDI_PUBLIC_URL: ${PDI_PUBLIC_URL:?set PDI_PUBLIC_URL in .env}
+      PDI_DB: /data/pdi.db
+    volumes:
+      - pdi-data:/data
+    expose:
+      - "8100"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8100/health').status==200 else 1)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # --- one-shot: mint the tenant tokens ----------------------------------
+  #
+  # The same `docker/bootstrap.py` the test harness runs, and for the same
+  # reason: PDI's dev-open admin mode is open only to callers on the same
+  # machine, and a container on a compose network is not that. It fails
+  # closed, so this presents the admin token like a real deployment does.
+  #
+  # Runs as root because the `shared` volume is created empty and
+  # root-owned; the product images run as non-root service users and only
+  # read from it.
+  #
+  # Idempotency: minting runs on every `up`, so a restart creates a second
+  # tenant rather than reusing the first. Harmless for a beta — the newest
+  # token is the one the services source — but it is why this is not yet a
+  # production topology, and docs/beta-deploy.md says so out loud.
+  bootstrap:
+    build:
+      context: ${QRME_CONTEXT:-..}
+    user: "0:0"
+    depends_on:
+      pdi:
+        condition: service_healthy
+    environment:
+      PDI_URL: http://pdi:8100
+      PDI_ADMIN_TOKEN: ${PDI_ADMIN_TOKEN:?}
+    volumes:
+      - shared:/shared
+      - ./:/work:ro
+    command: ["python", "/work/bootstrap.py"]
+    restart: "no"
+
+  # --- synthetic profiles ------------------------------------------------
+  qrme:
+    build:
+      context: ${QRME_CONTEXT:-..}
+    restart: unless-stopped
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    environment:
+      # Advertised by GET /pair, so the QR a phone scans has to point at the
+      # public name rather than the container.
+      QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}
+      # Without this, anyone who finds the URL can create profiles here.
+      QRME_SIGNUP_KEY: ${QRME_SIGNUP_KEY:?set QRME_SIGNUP_KEY in .env}
+      QRME_DB: /data/qrme.db
+      QRME_PDI_URL: http://pdi:8100
+      # The real model, not the harness stub. Without a key the module falls
+      # back to the deterministic stub and says so — which is the wrong
+      # answer on a box testers are using, so both are set together.
+      QRME_LLM: anthropic
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in .env}
+    volumes:
+      - shared:/shared
+      - qrme-data:/data
+    expose:
+      - "8000"
+    command: ["sh", "-c", ". /shared/qrme.env; exec uvicorn qrme.api:app --host 0.0.0.0 --port 8000"]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # --- the health guardian -----------------------------------------------
+  jim:
+    build:
+      context: ${JIM_CONTEXT:-../../jim-mini}
+    restart: unless-stopped
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    environment:
+      JIM_PUBLIC_URL: ${JIM_PUBLIC_URL:?set JIM_PUBLIC_URL in .env}
+      JIM_SIGNUP_KEY: ${JIM_SIGNUP_KEY:?set JIM_SIGNUP_KEY in .env}
+      JIM_DB: /data/jim.db
+      JIM_QRME_URL: http://qrme:8000
+      JIM_PDI_URL: http://pdi:8100
+      JIM_LLM: anthropic
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?}
+    volumes:
+      - shared:/shared
+      - jim-data:/data
+    expose:
+      - "8200"
+    command: ["sh", "-c", ". /shared/jim.env; exec uvicorn jim.api:app --host 0.0.0.0 --port 8200"]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8200/health').status==200 else 1)\""]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # --- the shared gateway ------------------------------------------------
+  #
+  # Its own image on purpose: several deployments share it, so it has a
+  # different lifecycle and no reason to carry a Node toolchain. This is
+  # also what makes the consoles' error reporting live — but only from the
+  # next release, because the collector address is compiled into installers
+  # at build time. See docs/cloudgw-deploy.md.
+  cloudgw:
+    build:
+      context: ${QRME_CONTEXT:-..}
+      dockerfile: cloudgw/Dockerfile
+    restart: unless-stopped
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?}
+      CLOUDGW_TOKENS: ${CLOUDGW_TOKENS:?set CLOUDGW_TOKENS in .env}
+      CLOUDGW_PROBLEM_READERS: ops
+      CLOUDGW_PROBLEMS_PATH: /data/problems.json
+    volumes:
+      - cloudgw-data:/data
+    expose:
+      - "8300"
+
+  # --- the only door to the internet -------------------------------------
+  #
+  # Caddy obtains and renews certificates for all four names by itself. The
+  # `caddy-data` volume holds them: without it, every restart asks Let's
+  # Encrypt for new ones and rate limits eventually refuse.
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on: [qrme, jim, pdi, cloudgw]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./beta.Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  shared:
+  pdi-data:
+  qrme-data:
+  jim-data:
+  cloudgw-data:
+  caddy-data:
+  caddy-config:

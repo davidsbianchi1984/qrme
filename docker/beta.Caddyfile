@@ -1,0 +1,32 @@
+# One name per product, and the gateway on a subdomain.
+#
+# Caddy obtains a certificate for each name on first request and renews it
+# without being asked. Nothing here mentions certificates because there is
+# nothing to say: the names have to resolve to this host, and that is the
+# whole prerequisite.
+#
+# The apex names carry `www` beside them so a visitor who types the prefix
+# out of habit lands in the same place rather than on a certificate error.
+# Both are served, rather than one redirecting to the other, because a beta
+# tester who bookmarked either should keep working.
+#
+# Change a name here and change it in `.env` too — the products advertise
+# their own address in QR codes and pairing responses, and a proxy that
+# serves a name the app does not know about produces links that resolve to
+# somewhere the app cannot describe.
+
+sntheticprofiles.com, www.sntheticprofiles.com {
+	reverse_proxy qrme:8000
+}
+
+jim-mini.com, www.jim-mini.com {
+	reverse_proxy jim:8200
+}
+
+pdisystems.net, www.pdisystems.net {
+	reverse_proxy pdi:8100
+}
+
+gw.pdisystems.net {
+	reverse_proxy cloudgw:8300
+}
