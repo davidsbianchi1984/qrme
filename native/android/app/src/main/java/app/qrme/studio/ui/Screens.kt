@@ -817,6 +817,7 @@ fun SettingsScreen(vm: StudioViewModel) {
     var wmCustom by remember { mutableStateOf(false) }
     var wmSaved by remember { mutableStateOf(false) }
     var llmKey by remember { mutableStateOf(vm.llmKey) }
+    var inviteKey by remember { mutableStateOf(vm.signupKey) }
     var error by remember { mutableStateOf<String?>(null) }
 
     fun reload() {
@@ -854,6 +855,18 @@ fun SettingsScreen(vm: StudioViewModel) {
             labeledField(L10n.t("set.key.label", vm.language), llmKey,
                 L10n.t("set.key.ph", vm.language)) { llmKey = it }
             SmallAction(L10n.t("action.save", vm.language)) { vm.rememberLlmKey(llmKey) }
+        }
+
+        // The deployment invite key. A published deployment gates account
+        // creation behind one; this phone talks to whichever backend the
+        // connection above names, so it needs the same door the console has.
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("set.invite", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("set.invite.lead", vm.language), color = Qrme.T2, fontSize = 12.sp)
+            labeledField(L10n.t("set.invite", vm.language), inviteKey,
+                L10n.t("set.invite", vm.language)) { inviteKey = it }
+            SmallAction(L10n.t("action.save", vm.language)) { vm.rememberSignupKey(inviteKey) }
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {

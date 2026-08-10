@@ -714,6 +714,14 @@ actor ApiClient {
     private var llmKey = ""
 
     func useLlmKey(_ key: String) { llmKey = key }
+
+    /// The deployment invite key: a published deployment sets
+    /// QRME_SIGNUP_KEY and refuses account creation without it. Sent as
+    /// `x-signup-key` on every request; the backend reads it only on the
+    /// routes it gates.
+    private var signupKey = ""
+
+    func useSignupKey(_ key: String) { signupKey = key }
     var base = URL(string: "http://127.0.0.1:8000")!
 
     func setBase(_ s: String) {
@@ -736,6 +744,9 @@ actor ApiClient {
         // context var for the length of the call and never writes it down.
         if !llmKey.isEmpty {
             req.setValue(llmKey, forHTTPHeaderField: "x-llm-api-key")
+        }
+        if !signupKey.isEmpty {
+            req.setValue(signupKey, forHTTPHeaderField: "x-signup-key")
         }
         return try await URLSession.shared.data(for: req)
     }
@@ -764,6 +775,9 @@ actor ApiClient {
         // context var for the length of the call and never writes it down.
         if !llmKey.isEmpty {
             req.setValue(llmKey, forHTTPHeaderField: "x-llm-api-key")
+        }
+        if !signupKey.isEmpty {
+            req.setValue(signupKey, forHTTPHeaderField: "x-signup-key")
         }
         if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
         if let body { req.httpBody = try JSONSerialization.data(withJSONObject: body) }

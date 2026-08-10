@@ -9,11 +9,17 @@ changes; new acceptances record the new version.
 
 from __future__ import annotations
 
-TERMS_VERSION = "1.0"
+TERMS_VERSION = "1.1"
 
 DOCUMENT = "docs/terms.md"
 
 KEY_POINTS = [
+    "This is a beta: features change, data may be lost or reset, and no "
+    "fees are charged while the beta runs — displayed plan prices begin "
+    "only after the beta, with notice and renewed agreement.",
+    "Ability is not a gate: everything works by text alone, voice is "
+    "optional, and anything that stands in your way, reported through "
+    "the help surface, becomes tracked work.",
     "Profiles are AI-generated synthetic content — not the statements of a "
     "real person, and never professional (medical/legal/financial) advice.",
     "In an emergency call 911; in crisis call or text 988 (US).",

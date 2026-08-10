@@ -282,8 +282,8 @@ def require(plan: str, kind: str) -> None:
         f"{SENSITIVE[kind]}. The free plan stores everything in the clear, "
         "and this is not ours to expose on somebody else's behalf — the "
         "person in the frame is often not the person who chose the plan. "
-        "Basic seals it in the vault for $20 a month, and the vault itself "
-        "is free to host."
+        "Basic seals it in the vault — free during the beta, $20 a month "
+        "after — and the vault itself is free to host."
     )
 
 

@@ -75,20 +75,27 @@ PLANS: dict[str, dict] = {
                  "vault, nothing encrypted under a key you hold, and the "
                  "people running this deployment can read it.",
     },
+    # Beta pricing: both paid plans are $0 while the beta runs. The tiers
+    # keep their names and their gates — what a tester chooses is still
+    # recorded and enforced — but nobody pays to test. The intended prices
+    # ($20 Basic, $130 Pro) return when the beta ends, and each plan's own
+    # copy says so, at the moment of choosing rather than in a footnote.
     "basic": {
-        "price_usd": 20,
+        "price_usd": 0,
         "period": "month",
         "title": "Basic",
-        "means": "the same features as Free, in the encrypted vault. Twenty "
-                 "dollars buys privacy, not capability.",
+        "means": "the same features as Free, in the encrypted vault — "
+                 "privacy, not capability. Free during the beta; $20/month "
+                 "when the beta ends.",
     },
     "pro": {
-        "price_usd": 130,
+        "price_usd": 0,
         "period": "month",
         "title": "Pro",
         "means": "everything in Basic, plus the marketplace, connectors, "
                  "skills, downloads, connections, and every modifier and "
-                 "builder for your agent.",
+                 "builder for your agent. Free during the beta; $130/month "
+                 "when the beta ends.",
     },
 }
 ORDER = ("visitor", "free", "basic", "pro")

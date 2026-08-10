@@ -41,6 +41,19 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="10">
+                    <TextBlock x:Name="InviteHead" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="InviteLead" TextWrapping="Wrap" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <PasswordBox x:Name="InviteBox" />
+                    <Button x:Name="SaveInviteButton" Click="OnSaveInvite"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
                     <TextBlock x:Name="LangHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="LangSub"

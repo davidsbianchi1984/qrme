@@ -79,6 +79,12 @@ public sealed partial class SettingsPage : Page
         SaveKeyButton.Content = L10n.T("action.save", lang);
         KeyBox.Password = AppState.Current.LlmKey;
 
+        InviteHead.Text = L10n.T("set.invite", lang);
+        InviteLead.Text = L10n.T("set.invite.lead", lang);
+        InviteBox.PlaceholderText = L10n.T("set.invite", lang);
+        SaveInviteButton.Content = L10n.T("action.save", lang);
+        InviteBox.Password = AppState.Current.SignupKey;
+
         LangHead.Text = L10n.T("ns.lang", lang);
         LangSub.Text = L10n.T("ns.lang.sub", lang);
         PreTranslateToggle.Header = L10n.T("ns.lang.pre", lang);
@@ -697,5 +703,13 @@ public sealed partial class SettingsPage : Page
     {
         AppState.Current.RememberLlmKey(KeyBox.Password);
         KeyBox.Password = AppState.Current.LlmKey;
+    }
+
+    /// <summary>The deployment invite key, same clearing rule: empty means
+    /// none, and a deployment that never gated signup never needs one.</summary>
+    private void OnSaveInvite(object sender, RoutedEventArgs e)
+    {
+        AppState.Current.RememberSignupKey(InviteBox.Password);
+        InviteBox.Password = AppState.Current.SignupKey;
     }
 }

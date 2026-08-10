@@ -843,9 +843,10 @@ LESSONS: tuple[dict, ...] = (
          screens=(126,), try_it="Place one and choose what it shows."),
     dict(key="plans", chapter="Being yourself", title="What it costs",
          what="Free makes things: your own profiles and your own agent, with "
-              "everything stored in the clear. Basic is $20 a month and is "
-              "the same app with all of it sealed in the vault. Pro is $130 a "
-              "month and adds everything that leaves your account — the "
+              "everything stored in the clear. Basic is the same app with all "
+              "of it sealed in the vault (free during the beta, $20 a month "
+              "after). Pro adds everything that leaves your account (free "
+              "during the beta, $130 a month after) — the "
               "marketplace, connectors, skills, downloads, connections, and "
               "every builder. Reading is free and always was: a scanned "
               "beacon needs no account at all. Billing here is simulated and "
@@ -872,7 +873,7 @@ LESSONS: tuple[dict, ...] = (
               "vault — the people who run it can read it and a lawful request "
               "reaches it. You have access to it for as long as you have an "
               "account. Basic seals the same work under a key you can hold, "
-              "and that is the only thing the $20 buys: the features are "
+              "and that is the only thing Basic buys: the features are "
               "identical. A few things are never left open whatever you have "
               "chosen — source material about somebody who is not you, a "
               "clinician's note about a real person, and anything behind the "

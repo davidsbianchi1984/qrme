@@ -53,6 +53,16 @@ export const CONSOLE_VERSION: string =
 // x-llm-api-key so generations run on the user's own credential. The backend
 // never persists it; without one, the deployment's key (if any) answers.
 export function getLlmKey(): string { return localStorage.getItem("qrme.llmKey") || ""; }
+// The deployment invite key: a published deployment sets QRME_SIGNUP_KEY and
+// refuses account creation without it. Stored on this device once typed,
+// sent as x-signup-key on every request — the backend reads it only on the
+// routes it gates, so carrying it everywhere costs nothing and means the
+// mail-settings screen works on a gated deployment too.
+export function getSignupKey(): string { return localStorage.getItem("qrme.signupKey") || ""; }
+export function setSignupKey(key: string) {
+  if (key.trim()) localStorage.setItem("qrme.signupKey", key.trim());
+  else localStorage.removeItem("qrme.signupKey");
+}
 export function setLlmKey(key: string) {
   if (key.trim()) localStorage.setItem("qrme.llmKey", key.trim());
   else localStorage.removeItem("qrme.llmKey");
@@ -1060,6 +1070,8 @@ async function req<T>(
   if (opts.token) headers["authorization"] = `Bearer ${opts.token}`;
   const llmKey = getLlmKey();
   if (llmKey) headers["x-llm-api-key"] = llmKey;
+  const signupKey = getSignupKey();
+  if (signupKey) headers["x-signup-key"] = signupKey;
   let res: Response;
   try {
     res = await fetch(getBase() + path, {
@@ -2960,7 +2972,8 @@ export const api = {
   // check would have found it and lost the version with it. Deleted
   // rather than wired: not every unused binding wants a screen.
 
-  healthInfo: () => req<{ status?: string; version?: string }>("/health"),
+  healthInfo: () => req<{ status?: string; version?: string;
+                          signup_key?: boolean }>("/health"),
 
   // How to open this studio on a phone: its URL on the local network.
   pair: () => req<PairInfo>("/pair"),

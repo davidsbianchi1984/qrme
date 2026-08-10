@@ -30,10 +30,19 @@ def test_what_a_plan_includes_is_computed_not_typed(client):
 
 
 def test_the_plans_are_the_prices_that_were_agreed(client):
-    assert tiers.PLANS["basic"]["price_usd"] == 20
+    """The agreement changed on 2026-08-10: every plan is $0 while the beta
+    runs. The tiers keep their gates — the plan a tester chooses is still
+    recorded and enforced — and each paid plan's own copy names the price
+    that returns when the beta ends ($20 Basic, $130 Pro), so the zero is
+    a disclosed decision rather than a forgotten number."""
+    assert tiers.PLANS["basic"]["price_usd"] == 0
     assert tiers.PLANS["basic"]["period"] == "month"
-    assert tiers.PLANS["pro"]["price_usd"] == 130
+    assert "beta" in tiers.PLANS["basic"]["means"]
+    assert "$20" in tiers.PLANS["basic"]["means"]
+    assert tiers.PLANS["pro"]["price_usd"] == 0
     assert tiers.PLANS["pro"]["period"] == "month"
+    assert "beta" in tiers.PLANS["pro"]["means"]
+    assert "$130" in tiers.PLANS["pro"]["means"]
     assert tiers.PLANS["visitor"]["price_usd"] == 0
 
 
@@ -109,7 +118,7 @@ def test_a_basic_account_is_turned_away_from_pro_features(client):
     detail = r.json()["detail"]
     assert detail["reason"] == "plan"
     assert detail["needs"] == "pro" and detail["have"] == "basic"
-    assert detail["price_usd"] == 130
+    assert detail["price_usd"] == 0  # free during the beta
 
 
 def test_the_refusal_is_structured_because_402_is_already_spoken(client):

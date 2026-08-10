@@ -30,6 +30,7 @@ final class AppState: ObservableObject {
     /// deployment's key used here, on the same profile, with nothing saying
     /// so. Never in the account and never on the wire except as the header.
     @Published var llmKey = ""
+    @Published var signupKey = ""
 
     private let d = UserDefaults.standard
 
@@ -44,6 +45,9 @@ final class AppState: ObservableObject {
         llmKey = d.string(forKey: "qrme.llmKey") ?? ""
         let held = llmKey
         Task { await ApiClient.shared.useLlmKey(held) }
+        signupKey = d.string(forKey: "qrme.signupKey") ?? ""
+        let invite = signupKey
+        Task { await ApiClient.shared.useSignupKey(invite) }
     }
 
     /// Store or clear it. An empty string is the clear: there is no flag to
@@ -54,6 +58,16 @@ final class AppState: ObservableObject {
         if trimmed.isEmpty { d.removeObject(forKey: "qrme.llmKey") }
         else { d.set(trimmed, forKey: "qrme.llmKey") }
         Task { await ApiClient.shared.useLlmKey(trimmed) }
+    }
+
+    /// The deployment invite key, same clearing rule: empty means none, and
+    /// a deployment that never gated signup never needs one.
+    func rememberSignupKey(_ key: String) {
+        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        signupKey = trimmed
+        if trimmed.isEmpty { d.removeObject(forKey: "qrme.signupKey") }
+        else { d.set(trimmed, forKey: "qrme.signupKey") }
+        Task { await ApiClient.shared.useSignupKey(trimmed) }
     }
 
     func rememberLanguage(_ code: String) {

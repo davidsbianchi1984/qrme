@@ -8,6 +8,7 @@ struct SettingsView: View {
     /// half-typed key never reaches the wire. Saving an empty box is
     /// the clear — no key means the deployment's.
     @State private var llmKey = ""
+    @State private var inviteKey = ""
     @State private var providers: [ProviderInfo] = []
     @State private var current = "auto"
     @State private var effective = ""
@@ -63,6 +64,25 @@ struct SettingsView: View {
                         .textFieldStyle(.plain).foregroundStyle(Theme.txt)
                     Button(L10n.t("action.save", state.language)) {
                         state.rememberLlmKey(llmKey)
+                    }
+                    .font(.subheadline.bold()).foregroundStyle(.white)
+                    .padding(.horizontal, 14).padding(.vertical, 9)
+                    .background(Theme.brandA).clipShape(Capsule())
+                }.card()
+
+                // The deployment invite key. A published deployment gates
+                // account creation behind one; this phone talks to whichever
+                // backend the connection above names, so it needs the same
+                // door the console has.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.t("set.invite", state.language))
+                        .font(.headline).foregroundStyle(Theme.txt)
+                    Text(L10n.t("set.invite.lead", state.language))
+                        .font(.footnote).foregroundStyle(Theme.t2)
+                    SecureField(L10n.t("set.invite", state.language), text: $inviteKey)
+                        .textFieldStyle(.plain).foregroundStyle(Theme.txt)
+                    Button(L10n.t("action.save", state.language)) {
+                        state.rememberSignupKey(inviteKey)
                     }
                     .font(.subheadline.bold()).foregroundStyle(.white)
                     .padding(.horizontal, 14).padding(.vertical, 9)
@@ -166,6 +186,7 @@ struct SettingsView: View {
         .refreshable { await load() }
         .task {
             llmKey = state.llmKey
+            inviteKey = state.signupKey
             await load()
         }
     }

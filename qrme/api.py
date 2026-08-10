@@ -82,11 +82,16 @@ def create_app(pdi_client: PDIClient | None = None,
         # install answers /health perfectly well and then serves an older
         # API — which is how a user who installed three upgrades kept
         # meeting the first version's signup.
+        # Whether account creation here needs an invite key, so the
+        # signup screen can ask for one instead of collecting a form that
+        # ends in a 403 the person cannot answer. The key itself never
+        # appears anywhere — only the fact that one is required.
         return {"status": "ok", "version": app.version,
                 "pdi": app.state.pdi is not None,
                 "cloud": app.state.cloud is not None,
                 "offline": offline.enabled(),
-                "console": mobile.console_dir() is not None}
+                "console": mobile.console_dir() is not None,
+                "signup_key": bool(os.environ.get("QRME_SIGNUP_KEY"))}
 
     # -- run it from your phone ---------------------------------------------
 
