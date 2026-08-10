@@ -147,16 +147,19 @@ If ops gets `403` and consoles `200`, the two are the wrong way round in
 
 ## 6. Back up the three databases
 
-SQLite files on named volumes. They survive a redeploy; they do not survive
-the volume being removed, and nothing here copies them anywhere else.
+Running, not instructions: the `backup` service copies each SQLite file
+(via `sqlite3 .backup`, so a mid-write copy cannot ship a corrupt file) and
+the collector's ledger into `/root/backups` on the host once a day, and
+keeps fourteen days. Check it worked:
 
 ```bash
-docker run --rm -v qrme_pdi-data:/d -v /root/backups:/b alpine \
-  sh -c 'cp /d/pdi.db /b/pdi-$(date +%F).db'
+ls -la /root/backups
 ```
 
-Same shape for `qrme-data` and `jim-data`. Put it in `cron`. This is the
-step most likely to be skipped and most expensive to have skipped.
+What it does **not** do is leave the machine. A dead disk takes the copies
+with it. Downloading `/root/backups` somewhere else now and then — or
+pointing a cron job at it from another box — is still a manual step, and
+the one that matters in the fire that actually burns.
 
 ---
 
@@ -164,13 +167,8 @@ step most likely to be skipped and most expensive to have skipped.
 
 Stated plainly, so nobody infers otherwise:
 
-- **`bootstrap` is not idempotent.** It mints tenants on every `up`, so a
-  restart creates a second tenant rather than reusing the first. The newest
-  token is the one the services source, so it works — but old tenants
-  accumulate, and that is a real thing to fix before this stops being a
-  beta.
-- **No backups are configured.** Section 6 is instructions, not a running
-  job.
+- **Backups do not leave the host.** The nightly job in section 6 covers a
+  bad deploy or a wrong deletion; it does not cover the disk dying.
 - **One host, no redundancy.** The box goes down, everything goes down.
 - **No log aggregation, no alerting, no metrics.** `docker compose logs` is
   the whole observability story.

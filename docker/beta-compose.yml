@@ -77,10 +77,9 @@ services:
   # root-owned; the product images run as non-root service users and only
   # read from it.
   #
-  # Idempotency: minting runs on every `up`, so a restart creates a second
-  # tenant rather than reusing the first. Harmless for a beta — the newest
-  # token is the one the services source — but it is why this is not yet a
-  # production topology, and docs/beta-deploy.md says so out loud.
+  # Idempotent by validation: the script keeps a saved token that PDI still
+  # honours and mints only when there is none, so a restart reuses the first
+  # tenant instead of abandoning its records. See bootstrap.py's docstring.
   bootstrap:
     build:
       context: ${QRME_CONTEXT:-..}
@@ -179,6 +178,48 @@ services:
       - cloudgw-data:/data
     expose:
       - "8300"
+
+  # --- the nightly copy ----------------------------------------------------
+  #
+  # docs/beta-deploy.md § 6 called backups "the step most likely to be
+  # skipped and most expensive to have skipped", and then left them as
+  # instructions. This is the running job: once a day, a `.backup` of each
+  # SQLite file and a copy of the collector's ledger into /root/backups on
+  # the host, keeping fourteen days.
+  #
+  # `sqlite3 .backup` rather than `cp`, because copying a live database
+  # mid-write produces a file that opens and lies. The backup API takes a
+  # consistent snapshot while the products keep writing.
+  #
+  # What this is not: off-host. A dead disk takes the copies with it; these
+  # cover the likelier failures — a bad deploy, a wrong deletion, a volume
+  # removed by hand. Copying /root/backups somewhere else is still yours.
+  backup:
+    image: alpine:3
+    restart: unless-stopped
+    volumes:
+      - pdi-data:/live/pdi:ro
+      - qrme-data:/live/qrme:ro
+      - jim-data:/live/jim:ro
+      - cloudgw-data:/live/cloudgw:ro
+      - /root/backups:/backups
+    command:
+      - sh
+      - -c
+      - |
+        apk add --no-cache sqlite >/dev/null
+        while true; do
+          stamp=$$(date +%F)
+          for name in pdi qrme jim; do
+            db="/live/$$name/$$name.db"
+            [ -f "$$db" ] && sqlite3 "$$db" ".backup /backups/$$name-$$stamp.db" \
+              && echo "backup: $$name-$$stamp.db"
+          done
+          [ -f /live/cloudgw/problems.json ] \
+            && cp /live/cloudgw/problems.json "/backups/problems-$$stamp.json"
+          find /backups -name '*-20*' -mtime +14 -delete
+          sleep 86400
+        done
 
   # --- the only door to the internet -------------------------------------
   #
