@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.60.10** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.61.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -720,7 +720,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
-| **0.60.10** | **The beta stands up** — three products behind one proxy on one host, and the first real run found what no in-process test could: every console blanked by its own Content-Security-Policy. A policy of its own for `/app`, the bare domain now lands on the console, backups become a nightly job instead of instructions, bootstrap keeps its tenants across restarts, and the release-bodies sweep survives its first honest run — twice repaired, then proven against the live releases |
+| **0.61.0** | **The beta stands up** — three products behind one proxy on one host, and the first real run found what no in-process test could: every console blanked by its own Content-Security-Policy. A policy of its own for `/app`, the bare domain now lands on the console, backups become a nightly job instead of instructions, bootstrap keeps its tenants across restarts, and the release-bodies sweep survives its first honest run — twice repaired, then proven against the live releases |
 | **0.60.9** | **No change to this product** — the release-body work ends: every inherited body rebuilt from its own CHANGELOG entry, the record at a ceiling of 0 with one release kept deliberately, and three checks that reported success while doing nothing fixed. Carried here to keep the three at one version |
 | **0.60.8** | **No change to this product** -- carried from PDI's round: a release checklist naming every version field, byte-identical in all three, and the deletion of `RELEASE_NOTES.md` after 412 of 530 releases proved to carry one frozen v0.24.0 body. A reader replaces the writer. Carried here to keep the three at one version |
 | **0.60.7** | **No change to this product** — PDI's console round: a screen that imports the translator is not a translated screen. Two of its screens sat on the finished side of the ledger for twelve releases holding fifteen English strings; a guard now names that state on the round it happens. 91 → 32. Carried here to keep the three at one version |
