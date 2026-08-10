@@ -1,12 +1,29 @@
 # QRME Terms of Service
 
-*Version 1.0 — effective 2026-07-24. Served by the API at `GET /terms`;
+*Version 1.1 — effective 2026-08-10. Served by the API at `GET /terms`;
 acceptance is recorded (version + timestamp) when a profile is created.
 This is a template maintained with the product — have counsel review and
 localize it before commercial launch.*
 
 **By creating a profile or otherwise using QRME (the "Service"), you agree
 to these Terms. If you do not agree, do not use the Service.**
+
+## Beta status
+
+The Service is currently a **beta**. That means, concretely:
+
+- It is offered for testing and evaluation. Features may change, break, or
+  be removed without notice, and availability is not guaranteed.
+- **Your data may be lost.** Backups are best-effort; the beta may be reset
+  or migrated. Do not make the Service the only home of anything you cannot
+  afford to lose.
+- **No fees are charged during the beta.** Plans that display a future
+  price are free while the beta runs; the displayed price is the intended
+  charge after the beta ends, and no charge will begin without notice and
+  your renewed agreement.
+- The operator may suspend or end the beta, or any tester's access, at any
+  time. Where practical, reasonable notice will be given before data is
+  removed.
 
 ## 1. What the Service is — and is not
 
@@ -117,3 +134,16 @@ takedown) follows the documented governance flows.
 moderation on every reply, age gating at both ends, the objection/
 takedown flow, watermarked synthetic media, and robot command
 allowlists — is documented in the README.*
+
+## Accessibility commitment
+
+Ability is not a gate to this Service. Every feature is usable by text
+alone — nothing requires hearing or speech — and voice interaction is an
+additional input path, never a requirement. The operator maintains an
+active accessibility program driving screen-reader, keyboard-only,
+reduced-motion and related support to complete, with gaps recorded as
+tracked work. If a disability — named anywhere or not — stands between
+you and any part of the Service, say so through the Service's help
+surface; such reports are treated as sensitive and become tracked work.
+Nothing in these Terms limits rights you hold under applicable
+accessibility law.
