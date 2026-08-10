@@ -55,8 +55,9 @@ layout.
 
 ## 2. The secrets, generated on the host
 
-Five of these are generated and never seen again; one you paste. All of them
-live in exactly one file, which never enters git.
+Three of these are generated and never seen again; two stay empty while the
+beta runs open; one you paste. All of them live in exactly one file, which
+never enters git.
 
 ```bash
 cd /srv/qrme
@@ -65,8 +66,13 @@ cat > .env <<EOF
 # --- generated ---------------------------------------------------------
 PDI_MASTER_KEY=$(openssl rand -base64 32)
 PDI_ADMIN_TOKEN=$(openssl rand -hex 24)
-QRME_SIGNUP_KEY=$(openssl rand -base64 24)
-JIM_SIGNUP_KEY=$(openssl rand -base64 24)
+
+# --- empty while signup is open ----------------------------------------
+# Fill these in (openssl rand -base64 24) when account creation should
+# need an invite key; the signup screens start asking for one on the next
+# restart, and existing accounts are untouched.
+QRME_SIGNUP_KEY=
+JIM_SIGNUP_KEY=
 CLOUDGW_TOKENS=consoles:$(openssl rand -hex 24),ops:$(openssl rand -hex 24)
 
 # --- the public names --------------------------------------------------
@@ -90,9 +96,10 @@ recoverable in any useful sense:
   the operator can decrypt.*
 - **the `consoles` token** — it gets compiled into every installer you ship.
 
-Nothing in the compose file has a default for any of these. Each one is
-`${VAR:?}`, so a missing value stops the stack with the variable's name
-rather than starting it quietly degraded.
+The signup keys are the one deliberate exception: the compose file defaults
+them to empty, and empty means open signup — the beta's posture. Everything
+else is `${VAR:?}`, so a missing value stops the stack with the variable's
+name rather than starting it quietly degraded.
 
 ## 3. Up
 

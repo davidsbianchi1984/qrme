@@ -108,8 +108,10 @@ services:
       # Advertised by GET /pair, so the QR a phone scans has to point at the
       # public name rather than the container.
       QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}
-      # Without this, anyone who finds the URL can create profiles here.
-      QRME_SIGNUP_KEY: ${QRME_SIGNUP_KEY:?set QRME_SIGNUP_KEY in .env}
+      # Empty means open signup, which is the beta's posture. Set a value
+      # when account creation should need an invite key — the consoles ask
+      # for it exactly when /health says the deployment is gated.
+      QRME_SIGNUP_KEY: ${QRME_SIGNUP_KEY:-}
       QRME_DB: /data/qrme.db
       QRME_PDI_URL: http://pdi:8100
       # The real model, not the harness stub. Without a key the module falls
@@ -139,7 +141,8 @@ services:
         condition: service_completed_successfully
     environment:
       JIM_PUBLIC_URL: ${JIM_PUBLIC_URL:?set JIM_PUBLIC_URL in .env}
-      JIM_SIGNUP_KEY: ${JIM_SIGNUP_KEY:?set JIM_SIGNUP_KEY in .env}
+      # Empty means open signup, same as QRME's key above.
+      JIM_SIGNUP_KEY: ${JIM_SIGNUP_KEY:-}
       JIM_DB: /data/jim.db
       JIM_QRME_URL: http://qrme:8000
       JIM_PDI_URL: http://pdi:8100
