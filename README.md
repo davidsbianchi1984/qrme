@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.62.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.63.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -746,6 +746,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.63.0** | **The talk surface shows the face, and the face has a deck** — the microphone opens a full listening screen with the profile's portrait front and centre, pulsing while it listens, the reply spoken back (the orb only for a profile with no portrait yet); Identity's portrait card becomes a deck — characters, your own photos, a five-angle capture, and the avatar systems people already live in as imports with provenance on the record (`GET /avatars/market`, `POST /profiles/{id}/avatar/import`); the chat scrolls to the newest reply as it commits; `POST /social/{cid}/scrape` keeps what a public page shows anybody as a source item; and the console fits the phone it runs on — grid tracks clamp, `100dvh`, the sidebar scrolls on its own |
 | **0.62.0** | **Cut in step** — JIM's phones reached parity with its console — eleven rounds in one branch: every backend route gained a door on iOS, Android and Windows (the doorless ledgers close at the four by-design rows), the voice pair landed on all three shells with the device's own voice as fallback, Android learned to say PATCH through a test-pinned override, and the most-touched screens swapped their English for the ten-language tables. No QRME code changed. |
 | **0.61.1** | **Ability is not a gate** — an accessibility statement with a door under it: the Accessibility screen reachable before sign-in (`#access`), three questions with no account, no token and no name (the table has no identity column to fill), sealed to the PDI vault and read only under the reviewer token. Signup opens for the beta behind a keyhole that stays. The known-gaps ledger opened at three rows and closes at zero — wall uploads describe what they show, the chat log tells the screen reader, the shells carry the per-need statement — every closure held by a test, and Terms 1.2 says only what is true |
 | **0.61.0** | **The beta stands up** — three products behind one proxy on one host, and the first real run found what no in-process test could: every console blanked by its own Content-Security-Policy. A policy of its own for `/app`, the bare domain now lands on the console, backups become a nightly job instead of instructions, bootstrap keeps its tenants across restarts, and the release-bodies sweep survives its first honest run — twice repaired, then proven against the live releases |

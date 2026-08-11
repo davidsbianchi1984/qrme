@@ -4,6 +4,64 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.63.0] - 2026-08-11
+
+### Added
+
+- **The chat follows the conversation.** The reply used to land below the
+  fold and stay there; the log now scrolls to the newest message as it
+  commits — an effect keyed to the messages themselves rather than a
+  callback racing the render — and an approved profile's replies are
+  spoken aloud while talk mode is open, through the same approved-only
+  speech gate the speaker toggle uses.
+- **The talk surface shows the face.** The microphone was a button that
+  filled the composer; it now opens a full-screen talk surface with the
+  profile's portrait front and centre, pulsing while it listens, the
+  transcript shown as it is heard, the reply spoken back. The sibling
+  product's Guardian is a voice with no face, so its surface is an orb;
+  a synthetic profile is a persona, and a persona has a face. The orb
+  appears only for a profile with no portrait yet, next to a pointer at
+  where to get one.
+- **The avatar deck.** Identity's portrait card becomes a deck with
+  three shelves. *Pick a character*: the starter portraits as a tappable
+  grid — the asset path comes from the brief itself, because the server
+  names where its portraits live and the client never spells a path.
+  *Your own face*: import a photo through the existing media door, or
+  capture it with the camera from five angles — front, left, right, up,
+  down — every frame uploaded and kept as provenance, the front frame
+  becoming the portrait. *An avatar you already have*: Ready Player Me,
+  Bitmoji, Meta Avatars, Apple Memoji, Xbox, ZEPETO, Mii — imports, not
+  integrations: the person exports on the provider's own surface and
+  hands QRME the image; nothing calls a provider API or holds a provider
+  credential, and the provider's license keeps governing the avatar.
+  `GET /avatars/market` lists the shelf with the how-to for every
+  source; `POST /profiles/{id}/avatar/import` (owner-only) sets the
+  portrait through the same pipeline as a starter face — the AI badge
+  and the likeness record ride on the render — and writes the import
+  onto the profile's record as a source item. Doors on the console and
+  all three native shells.
+- **The imported link, finally visited.** A social connection has
+  carried the account's public address since the day it was pasted, and
+  the profile only ever knew the handle. `POST /social/{cid}/scrape`
+  goes to the address and keeps what a browser would show anybody — the
+  title, the metadata bio, the visible text — as a source item on the
+  profile's own record, provenance written in. An offline deployment
+  refuses before any socket opens; the gate lives inside the fetcher
+  itself, so a second caller added tomorrow inherits the check.
+
+### Fixed
+
+- **The console fits the phone it runs on.** Two layout defects, one
+  root: a grid item refuses to shrink below its content, so the content
+  pane grew past its track, the app overflowed the viewport, and the
+  page itself half-scrolled instead of the pane. `min-height` and
+  `min-width` zero let the tracks clamp; the app height tracks `100dvh`
+  where the browser has it, so the bottom row sits above the URL bar;
+  the sidebar scrolls on its own where a landscape phone gets the
+  desktop column; the onboarding card no longer overflows a narrow
+  screen. The same defect was in all three consoles and is fixed in all
+  three.
+
 ## [0.62.0] - 2026-08-11
 
 ### Version alignment
