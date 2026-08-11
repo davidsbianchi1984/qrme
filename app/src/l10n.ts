@@ -738,18 +738,18 @@ const CHROME: Table = {
     hi: "अपने शब्दों में", ar: "بكلماته",
   },
   "nav.remainder": {
-    en: "Everything else", es: "Todo lo demás", fr: "Le reste",
-    de: "Alles Übrige", pt: "Tudo o resto", it: "Tutto il resto",
-    ja: "そのほか", zh: "其他", hi: "बाकी सब", ar: "كل ما تبقى",
+    en: "Miscellaneous", es: "Misceláneo", fr: "Divers",
+    de: "Verschiedenes", pt: "Diversos", it: "Varie",
+    ja: "その他いろいろ", zh: "杂项", hi: "विविध", ar: "متفرقات",
   },
   "nav.named": {
-    en: "One thing, named", es: "Una cosa, con nombre",
-    fr: "Une chose, nommée", de: "Eine Sache, benannt",
-    pt: "Uma coisa, nomeada", it: "Una cosa, per nome",
-    ja: "名指しでひとつ", zh: "指名一件事", hi: "एक चीज़, नाम से",
-    ar: "شيء واحد، بالاسم",
+    en: "Look one thing up", es: "Consulta una cosa",
+    fr: "Consulter une chose", de: "Eine Sache nachschlagen",
+    pt: "Consultar uma coisa", it: "Cerca una cosa",
+    ja: "ひとつ調べる", zh: "查一件事", hi: "एक चीज़ देखें",
+    ar: "ابحث عن شيء واحد",
   },
-  "nav.passing": {
+  "idn.passing": {
     en: "Beginning and passing on", es: "Comienzo y sucesión",
     fr: "Naissance et transmission", de: "Anfang und Übergabe",
     pt: "Início e sucessão", it: "Inizio e successione",
@@ -3166,7 +3166,7 @@ const CHROME: Table = {
     en: "Send it", es: "Enviarlo", fr: "L'envoyer", de: "Absenden", pt: "Enviá-lo", it: "Invialo", ja: "送信する", zh: "发送", hi: "भेजें", ar: "أرسله",
   },
   "rem.title": {
-    en: "Everything else", es: "Todo lo demás", fr: "Tout le reste", de: "Alles Übrige", pt: "Tudo o resto", it: "Tutto il resto", ja: "その他すべて", zh: "其他一切", hi: "बाक़ी सब", ar: "كل ما تبقى",
+    en: "Miscellaneous", es: "Misceláneo", fr: "Divers", de: "Verschiedenes", pt: "Diversos", it: "Varie", ja: "その他いろいろ", zh: "杂项", hi: "विविध", ar: "متفرقات",
   },
   "rem.fb": {
     en: "Tell us about the app", es: "Cuéntanos sobre la app", fr: "Parlez-nous de l'appli", de: "Erzählen Sie uns von der App", pt: "Fale-nos da app", it: "Parlaci dell'app", ja: "アプリについて教えてください", zh: "跟我们聊聊这个应用", hi: "ऐप के बारे में बताएँ", ar: "أخبرنا عن التطبيق",
@@ -5244,6 +5244,12 @@ const CHROME: Table = {
   "mkt.nothinghere": {
     en: "Nothing here.", es: "Nada aquí.", fr: "Rien ici.", de: "Nichts hier.", pt: "Nada aqui.", it: "Niente qui.", ja: "ここには何もありません。", zh: "这里没有内容。", hi: "यहाँ कुछ नहीं।", ar: "لا شيء هنا.",
   },
+  "mkt.folders.pitch": {
+    en: "Shelved by first tag — open a folder to browse it.", es: "Ordenado por la primera etiqueta: abre una carpeta para explorarla.", fr: "Rangé par première étiquette — ouvrez un dossier pour le parcourir.", de: "Nach erstem Schlagwort einsortiert — öffne einen Ordner zum Stöbern.", pt: "Arrumado pela primeira etiqueta — abra uma pasta para a percorrer.", it: "Ordinato per prima etichetta — apri una cartella per sfogliarla.", ja: "最初のタグごとに棚分けされています。フォルダーを開いて閲覧してください。", zh: "按第一个标签归类——打开文件夹即可浏览。", hi: "पहले टैग के अनुसार रखा गया — ब्राउज़ करने के लिए फ़ोल्डर खोलें।", ar: "مرتّب حسب الوسم الأول — افتح مجلدًا لتصفحه.",
+  },
+  "mkt.folder.other": {
+    en: "unsorted", es: "sin clasificar", fr: "non classé", de: "unsortiert", pt: "por arrumar", it: "non ordinato", ja: "未分類", zh: "未分类", hi: "बिना छाँटे", ar: "غير مصنّف",
+  },
   "mkt.price": {
     en: "Price", es: "Precio", fr: "Prix", de: "Preis", pt: "Preço", it: "Prezzo", ja: "価格", zh: "价格", hi: "दाम", ar: "السعر",
   },
@@ -5871,8 +5877,11 @@ const CHROME: Table = {
   "iw.topic.ph": {
     en: "what it should post about", es: "sobre qué debería publicar", fr: "sur quoi il devrait publier", de: "worüber es posten soll", pt: "sobre o que deve publicar", it: "su cosa dovrebbe pubblicare", ja: "何について投稿するか", zh: "它该发些什么", hi: "इसे किस बारे में पोस्ट करना चाहिए", ar: "عمّ ينشر",
   },
-  "iw.surface.ph": {
-    en: "which surface (optional)", es: "qué superficie (opcional)", fr: "quelle surface (facultatif)", de: "welche Oberfläche (optional)", pt: "que superfície (opcional)", it: "quale superficie (facoltativo)", ja: "どの面（任意）", zh: "哪个界面（可选）", hi: "कौन-सी सतह (वैकल्पिक)", ar: "أي سطح (اختياري)",
+  "iw.surface.inapp": {
+    en: "Post here on QRME", es: "Publicar aquí en QRME", fr: "Publier ici sur QRME", de: "Hier auf QRME posten", pt: "Publicar aqui no QRME", it: "Pubblica qui su QRME", ja: "QRME 内に投稿", zh: "在 QRME 站内发布", hi: "यहीं QRME पर पोस्ट करें", ar: "انشر هنا على QRME",
+  },
+  "iw.surface.none": {
+    en: "No connected surface yet — the post stays here on QRME. To publish onto a platform, connect one under Connections to the world.", es: "Aún no hay superficie conectada: la publicación se queda aquí en QRME. Para publicar en una plataforma, conecta una en Conexiones con el mundo.", fr: "Aucune surface connectée pour l'instant — la publication reste ici sur QRME. Pour publier sur une plateforme, connectez-en une dans Connexions au monde.", de: "Noch keine verbundene Oberfläche — der Beitrag bleibt hier auf QRME. Um auf einer Plattform zu veröffentlichen, verbinde eine unter Verbindungen zur Welt.", pt: "Ainda sem superfície ligada — a publicação fica aqui no QRME. Para publicar numa plataforma, ligue uma em Ligações com o mundo.", it: "Nessuna superficie collegata — il post resta qui su QRME. Per pubblicare su una piattaforma, collegane una in Connessioni con il mondo.", ja: "接続済みのサーフェスはまだありません。投稿は QRME 内に残ります。プラットフォームへ公開するには「世界とのつながり」で接続してください。", zh: "尚未连接任何平台——帖子会留在 QRME 站内。要发布到平台，请先在“与世界的连接”里连接一个。", hi: "अभी कोई जुड़ी सतह नहीं — पोस्ट यहीं QRME पर रहेगी। किसी प्लेटफ़ॉर्म पर प्रकाशित करने के लिए ‘दुनिया से जुड़ाव’ में एक जोड़ें।", ar: "لا يوجد سطح متصل بعد — يبقى المنشور هنا على QRME. للنشر على منصة، اربط واحدة في «روابط مع العالم».",
   },
   "iw.public.pitch": {
     en: "A public post faces the widest audience there is, so it always runs the strict filter — and it carries a synthetic-media credential from the moment it exists.", es: "Una publicación pública se enfrenta al público más amplio que existe, así que siempre pasa el filtro estricto — y lleva una credencial de medio sintético desde el momento en que existe.", fr: "Une publication publique fait face au public le plus large qui soit, elle passe donc toujours le filtre strict — et elle porte un justificatif de média synthétique dès l'instant où elle existe.", de: "Ein öffentlicher Beitrag steht vor dem größtmöglichen Publikum, läuft also stets durch den strengen Filter — und trägt vom Moment seiner Entstehung an einen Nachweis als synthetisches Medium.", pt: "Uma publicação pública enfrenta o público mais vasto que há, por isso passa sempre o filtro estrito — e leva uma credencial de meio sintético desde o momento em que existe.", it: "Un post pubblico affronta il pubblico più ampio che ci sia, quindi passa sempre il filtro severo — e porta una credenziale di media sintetico dal momento in cui esiste.", ja: "公開の投稿は考えうる最も広い聴衆に向き合うので、つねに厳格なフィルタを通ります — そして存在した瞬間から合成メディアの証明を帯びます。", zh: "公开发布面对的是最广泛的受众，因此它总要通过严格过滤——而且从它存在的那一刻起就带有合成媒体凭据。", hi: "सार्वजनिक पोस्ट सबसे व्यापक दर्शकों का सामना करती है, इसलिए वह हमेशा कड़ा फ़िल्टर पार करती है — और अस्तित्व में आने के क्षण से ही सिंथेटिक-मीडिया क्रेडेंशियल साथ रखती है।", ar: "المنشور العلني يواجه أوسع جمهور ممكن، فيمرّ دائمًا بالمرشّح الصارم — ويحمل اعتماد وسائط اصطناعية منذ لحظة وجوده.",
@@ -6361,7 +6370,7 @@ const CHROME: Table = {
     en: "Re-attesting is all you can do here, deliberately. You cannot resolve an objection against your own profile — that is a reviewer's call, because an owner who could dismiss it would be deciding their own case.", es: "Volver a acreditar es lo único que puedes hacer aquí, y es a propósito. No puedes resolver una objeción contra tu propio perfil — eso le toca a quien revisa, porque un propietario que pudiera desestimarla estaría fallando su propio caso.", fr: "Ré-attester est tout ce que vous pouvez faire ici, à dessein. Vous ne pouvez pas trancher une contestation visant votre propre profil — cela revient à l'examinateur, car un propriétaire qui pourrait la rejeter jugerait sa propre cause.", de: "Erneut zu bekräftigen ist alles, was Sie hier tun können, und das mit Absicht. Sie können einen Widerspruch gegen Ihr eigenes Profil nicht entscheiden — das obliegt der prüfenden Person, denn wer ihn abweisen könnte, entschiede in eigener Sache.", pt: "Voltar a atestar é tudo o que pode fazer aqui, de propósito. Não pode resolver uma contestação ao seu próprio perfil — isso cabe a quem revê, porque um proprietário que pudesse rejeitá-la estaria a julgar a sua própria causa.", it: "Riattestare è tutto ciò che puoi fare qui, e non per caso. Non puoi risolvere una contestazione contro il tuo stesso profilo — spetta a chi revisiona, perché un proprietario che potesse respingerla deciderebbe la propria causa.", ja: "ここでできるのは再表明だけで、それは意図的なものです。自分のプロフィールに対する異議を、自分で解決することはできません — それは審査する側の判断です。取り下げられる所有者は、自分の件を自分で裁くことになるからです。", zh: "在这里你能做的只有重新声明，这是有意为之。你不能裁决针对你自己档案的异议——那是审核者的判断，因为一个可以驳回它的所有者，等于在裁决自己的案子。", hi: "यहाँ आप बस फिर से पुष्टि कर सकते हैं, और यह जानबूझकर है। अपनी ही प्रोफ़ाइल के ख़िलाफ़ आई आपत्ति को आप निपटा नहीं सकते — वह समीक्षक का फ़ैसला है, क्योंकि जो मालिक उसे ख़ारिज कर सकता हो, वह अपना ही मुक़दमा तय कर रहा होगा।", ar: "إعادة التوثيق هي كل ما يمكنك فعله هنا، وذلك عن قصد. لا يمكنك البتّ في اعتراض على ملفك أنت — فذلك قرار المراجِع، لأن مالكًا يستطيع ردّه سيكون قاضيًا في قضيته.",
   },
   "nmd.title": {
-    en: "One thing, named", es: "Una cosa, con nombre", fr: "Une chose, nommée", de: "Eine Sache, benannt", pt: "Uma coisa, com nome", it: "Una cosa, nominata", ja: "名指しされた、ひとつのもの", zh: "一件被指名的东西", hi: "एक चीज़, नाम लेकर", ar: "شيء واحد، مُسمًّى",
+    en: "Look one thing up", es: "Consulta una cosa", fr: "Consulter une chose", de: "Eine Sache nachschlagen", pt: "Consultar uma coisa", it: "Cerca una cosa", ja: "ひとつ調べる", zh: "查一件事", hi: "एक चीज़ देखें", ar: "ابحث عن شيء واحد",
   },
   "nmd.pitch": {
     en: "Six reads, six different answers to who is allowed to ask.", es: "Seis lecturas, seis respuestas distintas a quién puede preguntar.", fr: "Six lectures, six réponses différentes à la question de qui a le droit de demander.", de: "Sechs Abfragen, sechs verschiedene Antworten darauf, wer fragen darf.", pt: "Seis leituras, seis respostas diferentes a quem pode perguntar.", it: "Sei letture, sei risposte diverse a chi è ammesso a chiedere.", ja: "六つの読み取り、そして「誰が尋ねてよいか」への六つの異なる答え。", zh: "六种读取，对“谁可以问”给出六个不同的答案。", hi: "छह पठन, और “कौन पूछ सकता है” के छह अलग-अलग उत्तर।", ar: "ست قراءات، وست إجابات مختلفة عن مَن يحق له أن يسأل.",

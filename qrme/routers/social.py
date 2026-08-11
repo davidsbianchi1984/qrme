@@ -136,6 +136,10 @@ def connect_platform(profile_id: str, body: SocialConnect, request: Request) -> 
     cid = db.new_id("soc")
     handle = (body.handle or "").strip()
     platform = body.platform
+    if handle.startswith("#"):
+        raise HTTPException(
+            422, "a hashtag names a topic, not an account — give the "
+                 "account's handle or paste its link")
     if handle.startswith(("http://", "https://")):
         # A pasted link names its own platform and account; what it says
         # wins over the dropdown, because the link is the thing imported.

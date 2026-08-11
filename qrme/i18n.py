@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'a hashtag names a topic, not an account — give the account\'s handle or paste its link': {
+        'es': 'un hashtag nombra un tema, no una cuenta: da el identificador de la cuenta o pega su enlace.',
+        'fr': "un hashtag désigne un sujet, pas un compte — donnez l'identifiant du compte ou collez son lien.",
+        'de': 'ein Hashtag benennt ein Thema, kein Konto — gib den Handle des Kontos an oder füge seinen Link ein.',
+        'pt': 'uma hashtag nomeia um tema, não uma conta — dê o identificador da conta ou cole o seu link.',
+        'it': 'un hashtag nomina un argomento, non un account — indica l\'handle dell\'account o incolla il suo link.',
+        'ja': 'ハッシュタグはトピックの名前であり、アカウントではありません。アカウントのハンドルを入力するか、リンクを貼り付けてください。',
+        'zh': '话题标签指的是话题，不是账号——请提供账号的用户名或粘贴其链接。',
+        'hi': 'हैशटैग किसी विषय का नाम है, खाते का नहीं — खाते का हैंडल दें या उसका लिंक चिपकाएँ।',
+        'ar': 'الوسم يسمي موضوعًا لا حسابًا — أعطِ معرّف الحساب أو الصق رابطه.',
+    },
     'that link\'s site is not a platform this deployment recognises — pick the platform and type the handle instead': {
         'es': 'el sitio de ese enlace no es una plataforma que este despliegue reconozca: elige la plataforma y escribe el identificador en su lugar.',
         'fr': "le site de ce lien n'est pas une plateforme reconnue par ce déploiement — choisissez la plateforme et saisissez l'identifiant à la place.",

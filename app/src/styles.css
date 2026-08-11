@@ -138,7 +138,8 @@ button.primary {
   border: 0; border-radius: 12px; padding: 12px 18px; font-weight: 700; font-size: 14px;
 }
 button.primary:disabled { opacity: 0.6; }
-.actions button:not(.primary), .card button:not(.primary) {
+.actions button:not(.primary), .card button:not(.primary),
+.screen-head button:not(.primary) {
   background: rgba(255,255,255,0.05); color: var(--txt);
   border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; font-weight: 600;
 }
@@ -165,7 +166,15 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
    22px inset): the composer stops short of that corner instead of hiding
    its most important button under the "?" bubble. */
 .composer { display: flex; gap: 10px; margin-top: 12px; padding-right: 76px; }
-.composer input { margin-top: 0; }
+.composer input { margin-top: 0; min-width: 0; }
+/* On a vertical phone the input is squeezed between the mic and Send; the
+   field must win the space and the hint must fit inside what is left. */
+@media (max-width: 480px) {
+  .composer { gap: 6px; padding-right: 60px; }
+  .composer input { flex: 1; padding: 10px 8px; }
+  .composer input::placeholder { font-size: 12px; }
+  .composer button { padding: 10px 12px; }
+}
 
 /* ---- memory ---- */
 .memory-list { display: flex; flex-direction: column; gap: 8px; }

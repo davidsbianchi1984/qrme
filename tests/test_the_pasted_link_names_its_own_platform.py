@@ -46,6 +46,15 @@ def test_an_at_prefixed_path_is_still_the_handle(client, profile_id):
     assert r.json()["handle"] == "@dana.grows"
 
 
+def test_a_hashtag_is_told_apart_from_an_account(client, profile_id):
+    """The field report tried a hashtag where a handle goes. A # names a
+    topic; silently storing it would build a connection to nobody."""
+    r = _connect(client, profile_id, platform="instagram",
+                 direction="collect", handle="#gardening")
+    assert r.status_code == 422
+    assert "hashtag" in r.json()["detail"]
+
+
 def test_an_unrecognised_site_is_refused_with_the_fix(client, profile_id):
     r = _connect(client, profile_id, platform="x", direction="collect",
                  handle="https://example.org/dana")

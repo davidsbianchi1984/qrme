@@ -577,6 +577,21 @@ over a grid of boxes and the reason a room like this is worth having.
   </tr>
 </table>
 
+**The vastscape is the room's biggest screen, borrowed.** Watch-together as it
+looks when the thing being watched fills the wall a console or TV casts to, and
+everyone watching is present as their own face — an avatar bubble resting *in*
+the scape, not a strip of tiles down an edge. On a phone the app is the window;
+here the phone is only the remote, which is the whole point: the picture belongs
+to the room, and presence has to live inside it, where a couch full of people
+would actually be.
+
+<table>
+  <tr>
+    <td align="center" width="60%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="330" alt="The vastscape"></a><br><sub><b>194</b> · The vastscape · cast to the TV</sub></td>
+    <td align="center" width="40%"><a href="docs/screens/195-vastscape-held.svg"><img src="docs/screens/195-vastscape-held.svg" width="190" alt="Vastscape, held"></a><br><sub><b>195</b> · Vastscape · the phone as remote</sub></td>
+  </tr>
+</table>
+
 The strip changes with the room and only with the room. An audio room has no
 gift button because there is no stage to gift at; a posted video has no bell and
 no guest request because there is nobody at a desk to ring and no host to ask.

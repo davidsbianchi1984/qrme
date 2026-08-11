@@ -106,9 +106,8 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "stranger", label: "Strangers", icon: "🎭" },
   { id: "themark", label: "The mark", icon: "✦" },
   { id: "inwords", label: "In its words", icon: "🗣" },
-  { id: "remainder", label: "Everything else", icon: "🧩" },
-  { id: "named", label: "One thing, named", icon: "🔎" },
-  { id: "passing", label: "Beginning and passing on", icon: "🕊" },
+  { id: "remainder", label: "Miscellaneous", icon: "🧩" },
+  { id: "named", label: "Look one thing up", icon: "🔎" },
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
   { id: "plans", label: "Plans", icon: "🎟" },
@@ -223,7 +222,10 @@ export function App() {
         {tab === "memory" && <Memory onPlans={toPlans} />}
         {tab === "delegate" && <Delegate onPlans={toPlans} />}
         {tab === "desk" && <Desk onPlans={toPlans} />}
-        {tab === "identity" && <Identity onPlans={toPlans} />}
+        {/* Beginning and passing on left the sidebar deliberately: it is not
+            a place anybody visits daily, it is an option taken from Identity
+            when pre-building an account or deciding how it ends. */}
+        {tab === "identity" && <Identity onPlans={toPlans} onPassing={() => setTab("passing")} />}
         {tab === "presence" && <Presence onPlans={toPlans} />}
         {tab === "live" && <Live onPlans={toPlans} />}
         {tab === "contest" && <Contest onPlans={toPlans} />}

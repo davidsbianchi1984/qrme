@@ -680,8 +680,12 @@ LESSONS: tuple[dict, ...] = (
               "the platform, the position and the recent chat — and it has "
               "not seen the video. You can read the exact instruction it was "
               "given about that, which tells it to say so rather than invent "
-              "an opinion about footage nobody showed it.",
-         screens=(155,),
+              "an opinion about footage nobody showed it. On the room's "
+              "biggest screen — the vastscape a console or TV casts to — "
+              "everyone watching is present as their own face, an avatar "
+              "bubble resting in the picture, and the phone is only the "
+              "remote.",
+         screens=(155, 194, 195),
          try_it="Open a party and read 'What a profile in here knows'."),
     dict(key="lobby", chapter="Working", title="Who is in the game with you",
          what="A profile can sit in a lobby beside you as a companion, a "

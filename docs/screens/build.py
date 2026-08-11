@@ -2351,6 +2351,47 @@ def ar_presence(x, y, w, h, people):
     return o
 
 
+def vastscape_scene(x, y, w, h, people):
+    """The vastscape: what is being watched fills the wall, and the people
+    watching rest inside it as their own faces — profile bubbles in the
+    scape, not a strip of tiles down an edge.
+
+    Drawn for the screen a console or TV casts to. On a phone the app is the
+    window; here the room's biggest screen is the window and the phone is
+    only the remote — so presence has to live *inside* the picture, where a
+    couch full of people would actually be.
+    """
+    o = [rrect(x, y, w, h, 18, "#070517")]
+    # The wall: a vast landscape being watched, drawn not photographed.
+    wx, wy = x + w * 0.06, y + h * 0.07
+    ww, wh = w * 0.88, h * 0.56
+    o.append(rrect(wx, wy, ww, wh, 10, "#0d0a26", A(C["brandA"], 0.45), 1.2))
+    for i, a in enumerate((0.16, 0.11, 0.07)):
+        o.append(rrect(wx + 2, wy + 2 + i * wh * 0.16, ww - 4, wh * 0.16, 4,
+                       A(C["indigo"], a)))
+    o.append(f'<circle cx="{wx+ww*0.68:.1f}" cy="{wy+wh*0.42:.1f}" '
+             f'r="{wh*0.16:.1f}" fill="{A(C["amber"], 0.85)}"/>')
+    o.append(f'<path d="M{wx:.1f} {wy+wh*0.78:.1f} L{wx+ww*0.22:.1f} '
+             f'{wy+wh*0.52:.1f} L{wx+ww*0.44:.1f} {wy+wh*0.80:.1f} '
+             f'L{wx+ww*0.66:.1f} {wy+wh*0.60:.1f} L{wx+ww:.1f} '
+             f'{wy+wh*0.84:.1f} L{wx+ww:.1f} {wy+wh:.1f} L{wx:.1f} '
+             f'{wy+wh:.1f} Z" fill="{A(C["brandA"], 0.30)}"/>')
+    o.append(f'<path d="M{wx:.1f} {wy+wh*0.88:.1f} L{wx+ww*0.30:.1f} '
+             f'{wy+wh*0.68:.1f} L{wx+ww*0.58:.1f} {wy+wh*0.90:.1f} '
+             f'L{wx+ww*0.82:.1f} {wy+wh*0.72:.1f} L{wx+ww:.1f} '
+             f'{wy+wh*0.92:.1f} L{wx+ww:.1f} {wy+wh:.1f} L{wx:.1f} '
+             f'{wy+wh:.1f} Z" fill="{A(C["indigo"], 0.5)}"/>')
+    # The cast pill: this frame is the TV's, and says so.
+    pw_ = tw.width("CAST · ON THE TV", 8.6, 700) + 16
+    o.append(rrect(wx + 10, wy + 10, pw_, 20, 10, "rgba(8,6,20,0.72)"))
+    o.append(text(wx + 10 + pw_ / 2, wy + 24, "CAST · ON THE TV", 8.6,
+                  C["cyan"], 700, "middle"))
+    # The watchers, resting in the scape below the wall — the same marked
+    # bubbles AR uses, because presence is presence on every surface.
+    o += ar_presence(x, y, w, h, people)
+    return o
+
+
 def space_scene(x, y, w, h, avatars, label="VR", uid="sp"):
     """A room that is not a place: the 3-D space people meet inside.
 
@@ -2542,6 +2583,8 @@ def render_full(spec):
         out += space_scene(sx, sy, sw, sh, spec["space"]["avatars"],
                            label=spec["space"].get("label", "VR"),
                            uid=f's{spec["num"]}')
+    elif spec.get("vastscape"):
+        out += vastscape_scene(sx, sy, sw, sh, spec["vastscape"]["avatars"])
     elif spec.get("facade"):
         # Full screen on a video nobody has pressed play on yet is an empty
         # screen, and drawing a still from the video would be a picture of the
@@ -3658,6 +3701,30 @@ SCREENS = [
         dict(icon="flag", color="amber", k="Becomes tracked work",
              s="a ledger that only shrinks"),
     ], button=("Send the report", "brand")),
+    # The vastscape: watch-together, seen from the couch. What is being
+    # watched fills the wall a console or TV casts to, and everyone watching
+    # is present as their own face — an avatar bubble resting in the scape.
+    # The phone is the remote here, not the window; that is the whole point.
+    dict(num=194, title="The Vastscape", full=True, landscape=True,
+         accent="brand",
+         vastscape=dict(avatars=[
+             ("Marcus Bell", frames.PORTRAITS[1][1], 0.16, 0.80, 0.9),
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.38, 0.84, 1.0),
+             ("Priya Raman", frames.PORTRAITS[2][1], 0.62, 0.82, 0.9),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.84, 0.80, 0.95),
+         ]),
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
+    dict(num=195, title="Vastscape Held", full=True, accent="brand",
+         vastscape=dict(avatars=[
+             ("David Bianchi", frames.FOUNDER_VERIFIED[1], 0.30, 0.72, 0.95),
+             ("Dr. Amara Osei", frames.PORTRAITS[0][1], 0.70, 0.72, 0.95),
+         ]),
+         held=[("?", None, "brandA", "Help"),
+               (None, "rotate", "cyan", "Landscape"),
+               (None, "shrink", "t2", "Back to app")],
+         live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
+                   ("heart", "pink"), ("share", "cyan")]),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

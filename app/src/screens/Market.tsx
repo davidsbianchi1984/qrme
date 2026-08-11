@@ -45,6 +45,9 @@ export function Market({ onPlans }: {
   const [error, setError] = useState<unknown>(null);
   const [tags, setTags] = useState("");
   const [blurb, setBlurb] = useState("");
+  // Which folder of the shelved catalogue is open. One at a time — the
+  // point of folders is not seeing everything at once.
+  const [openFolder, setOpenFolder] = useState<string | null>(null);
 
   const fail = (e: unknown) => setError(e);
 
@@ -104,6 +107,48 @@ export function Market({ onPlans }: {
 
   const rows = found ? found.results : listings;
 
+  // The shelves: a listing's first tag is its folder. Search results stay
+  // flat — a search is already a filter — but browsing gets folders, so a
+  // long catalogue is a shelf to open rather than a wall to scroll.
+  const folders = new Map<string, Listing[]>();
+  if (!found) {
+    for (const l of listings) {
+      const f = (l.tags[0] || "").trim().toLowerCase();
+      folders.set(f, [...(folders.get(f) || []), l]);
+    }
+  }
+  const folderNames = [...folders.keys()]
+    .sort((a, b) => (folders.get(b)!.length - folders.get(a)!.length) ||
+                    a.localeCompare(b));
+
+  const listingRow = (l: Listing) => (
+    <div key={l.id} className="row">
+      <div style={{ flex: 1 }}>
+        <strong>{l.title}</strong>
+        <div className="muted small">{l.blurb}</div>
+        <div className="muted small">
+          {l.tags.join(" · ")}{l.provider_name && <> — {l.provider_name}</>}
+        </div>
+      </div>
+      <button onClick={() => loadOffer(l.id)}>
+        {tr("mkt.price", lang)}
+      </button>
+      {offers[l.id] && (
+        <>
+          <span>
+            {offers[l.id]!.price.toFixed(2)} {offers[l.id]!.currency}
+            {offers[l.id]!.stock !== null && fill(tr("mkt.left", lang),
+              { n: offers[l.id]!.stock })}
+          </span>
+          <button disabled={!token || offers[l.id]!.status !== "open"}
+                  onClick={() => buy(offers[l.id]!)}>
+            {tr("mkt.buy", lang)}
+          </button>
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="screen">
       <h2>{tr("mkt.title", lang)}</h2>
@@ -140,46 +185,6 @@ export function Market({ onPlans }: {
             {/* The backend's own sentence, not ours. */}
             <p className="muted small"><em>{found.ranking}</em></p>
           </>
-        )}
-      </div>
-
-      <div className="card">
-        <h3>
-          {found ? tr("mkt.hdr.results", lang) : tr("mkt.hdr.all", lang)}
-        </h3>
-        {rows.length === 0 &&
-          <p className="muted small">{tr("mkt.nothinghere", lang)}</p>}
-        {rows.map((l) => (
-          <div key={l.id} className="row">
-            <div style={{ flex: 1 }}>
-              <strong>{l.title}</strong>
-              <div className="muted small">{l.blurb}</div>
-              <div className="muted small">
-                {l.tags.join(" · ")}{l.provider_name && <> — {l.provider_name}</>}
-              </div>
-            </div>
-            <button onClick={() => loadOffer(l.id)}>
-              {tr("mkt.price", lang)}
-            </button>
-            {offers[l.id] && (
-              <>
-                <span>
-                  {offers[l.id]!.price.toFixed(2)} {offers[l.id]!.currency}
-                  {offers[l.id]!.stock !== null && fill(tr("mkt.left", lang),
-                    { n: offers[l.id]!.stock })}
-                </span>
-                <button disabled={!token || offers[l.id]!.status !== "open"}
-                        onClick={() => buy(offers[l.id]!)}>
-                  {tr("mkt.buy", lang)}
-                </button>
-              </>
-            )}
-          </div>
-        ))}
-        {Object.values(offers).some(Boolean) && (
-          <p className="muted small">
-            {Object.values(offers).find(Boolean)!.payment}
-          </p>
         )}
       </div>
 
@@ -272,6 +277,39 @@ export function Market({ onPlans }: {
             </span>
           </div>
         ))}
+      </div>
+
+      <div className="card">
+        <h3>
+          {found ? tr("mkt.hdr.results", lang) : tr("mkt.hdr.all", lang)}
+        </h3>
+        {rows.length === 0 &&
+          <p className="muted small">{tr("mkt.nothinghere", lang)}</p>}
+        {/* Search results stay flat; browsing gets folders — a listing's
+            first tag is its shelf, opened one at a time. */}
+        {found && rows.map(listingRow)}
+        {!found && folderNames.length > 0 && (
+          <>
+            <p className="muted small">{tr("mkt.folders.pitch", lang)}</p>
+            <div className="actions" style={{ marginTop: 0 }}>
+              {folderNames.map((f) => (
+                <button key={f || "other"} className="chip"
+                        onClick={() =>
+                          setOpenFolder(openFolder === f ? null : f)}>
+                  {(f || tr("mkt.folder.other", lang))
+                    + " · " + folders.get(f)!.length}
+                </button>
+              ))}
+            </div>
+            {openFolder !== null && folders.has(openFolder) &&
+              folders.get(openFolder)!.map(listingRow)}
+          </>
+        )}
+        {Object.values(offers).some(Boolean) && (
+          <p className="muted small">
+            {Object.values(offers).find(Boolean)!.payment}
+          </p>
+        )}
       </div>
 
       {sales.length > 0 && (

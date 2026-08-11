@@ -379,7 +379,14 @@ def message_out(row: dict) -> MessageOut:
 
 
 def source_items(profile_id: str, pdi=None) -> list[dict]:
-    """Source items with content resolved from the PDI vault if sealed."""
+    """Source items with content resolved from the PDI vault if sealed.
+
+    A sealed item whose readback fails resolves to ``content: None`` — the
+    profile simply cannot recall that item this turn. The alternative was
+    the field report: one erroring vault record inside the chat route, and
+    every conversation with the profile answered 500 from the moment its
+    first page was fetched and sealed.
+    """
     rows = db.connect().execute(
         "SELECT * FROM source_items WHERE profile_id=?"
         " ORDER BY created_at DESC, rowid DESC", (profile_id,),
@@ -388,8 +395,11 @@ def source_items(profile_id: str, pdi=None) -> list[dict]:
     for row in rows:
         item = dict(row)
         if item["pdi_key"] and pdi is not None:
-            raw = pdi.get(item["pdi_key"])
-            item["content"] = json.loads(raw)["content"] if raw else None
+            try:
+                raw = pdi.get(item["pdi_key"])
+                item["content"] = json.loads(raw)["content"] if raw else None
+            except Exception:                              # noqa: BLE001
+                item["content"] = None
         out.append(item)
     return out
 

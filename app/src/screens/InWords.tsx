@@ -63,6 +63,7 @@ export function InWords() {
 
   const [topic, setTopic] = useState("");
   const [surface, setSurface] = useState("");
+  const [surfaces, setSurfaces] = useState<string[]>([]);
   const [composed, setComposed] = useState<ProfilePost | null>(null);
 
   async function go<T>(work: () => Promise<T>, then: (v: T) => void) {
@@ -75,6 +76,10 @@ export function InWords() {
     if (me) go(() => api.profileLanguage(me), (p) => {
       setPref(p); setLang(p.language); setMode(p.mode);
     });
+    // The surfaces this profile can actually speak on — a picker, not a
+    // blank the person has to already know the answer to.
+    if (me) api.surfaces(me).then((s) => setSurfaces(s.surfaces))
+      .catch(() => setSurfaces([]));
   }, [me]);
 
   if (!me) {
@@ -184,8 +189,17 @@ export function InWords() {
         <h3>{tr("iw.saypublic", uiLang)}</h3>
         <input value={topic} onChange={(e) => setTopic(e.target.value)}
                placeholder={tr("iw.topic.ph", uiLang)} />
-        <input value={surface} onChange={(e) => setSurface(e.target.value)}
-               placeholder={tr("iw.surface.ph", uiLang)} />
+        {/* A picker over the surfaces the profile actually has, not a blank
+            the person must already know the answer to. No surfaces yet →
+            the post stays in-app, and the line below says where to get one. */}
+        {surfaces.length > 0 ? (
+          <select value={surface} onChange={(e) => setSurface(e.target.value)}>
+            <option value="">{tr("iw.surface.inapp", uiLang)}</option>
+            {surfaces.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        ) : (
+          <p className="muted small">{tr("iw.surface.none", uiLang)}</p>
+        )}
         <p className="muted small">{tr("iw.public.pitch", uiLang)}</p>
         <button disabled={!token || !topic} onClick={() => go(
           () => api.composePost(me, {

@@ -32,10 +32,13 @@ import { useSession } from "../store";
  * - the itemised deletion receipt, one count per table. "Deleted" is a claim;
  *   twenty-five numbers are evidence.
  */
-export function Identity({ onPlans }: {
+export function Identity({ onPlans, onPassing }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
   onPlans: () => void;
+  /** Beginning and passing on — pre-building, recovery, how it ends. An
+   *  option taken from here rather than a tab lived in. */
+  onPassing: () => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -198,7 +201,15 @@ export function Identity({ onPlans }: {
 
   return (
     <div className="screen">
-      <h2>{tr("idn.title", lang)}</h2>
+      <header className="screen-head">
+        <h2>{tr("idn.title", lang)}</h2>
+        {/* Beginning and passing on left the sidebar: pre-building an
+            account, recovery, and how it ends are options taken from the
+            identity they concern. */}
+        <button className="chip" onClick={onPassing}>
+          {tr("idn.passing", lang)}
+        </button>
+      </header>
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
