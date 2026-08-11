@@ -605,6 +605,13 @@ class FeedbackSubmit(BaseModel):
     rating: int | None = None         # optional 1..5 satisfaction
 
 
+class AccessReportSubmit(BaseModel):
+    doing: str                         # what you were trying to do
+    wall: str                          # what stood in the way
+    help: str | None = None           # what would help, in your words
+    lang: str = "en"                  # the language the report is written in
+
+
 class GameSessionCreate(BaseModel):
     platform: str                      # a catalog gaming app key
     game: str                          # free-text title

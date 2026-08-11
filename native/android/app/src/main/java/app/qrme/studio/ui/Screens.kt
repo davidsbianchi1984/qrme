@@ -1021,6 +1021,7 @@ fun SettingsScreen(vm: StudioViewModel) {
         RelationshipPanel(vm)
 
         FeedbackPanel(vm)
+        AccessPanel(vm)
 
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
@@ -1174,6 +1175,64 @@ private fun RelationshipPanel(vm: StudioViewModel) {
             }
         }
         status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+    }
+}
+
+/** Ability is not a gate: the accessibility report door. Three questions,
+ *  none a diagnosis, sent with no token — the person this card exists for
+ *  may be the person the signup shut out. The reviewer row reads them back
+ *  with the deployment's own token, never a profile's. */
+@Composable
+private fun AccessPanel(vm: StudioViewModel) {
+    var doing by remember { mutableStateOf("") }
+    var wall by remember { mutableStateOf("") }
+    var help by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf<String?>(null) }
+    var reviewer by remember { mutableStateOf("") }
+    var reports by remember { mutableStateOf<List<AccessReportRow>?>(null) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("ns.acc", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("ns.acc.lead", vm.language), color = Qrme.T2, fontSize = 12.sp)
+        OutlinedTextField(value = doing, onValueChange = { doing = it },
+            label = { Text(L10n.t("ns.acc.doing.ph", vm.language)) },
+            modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = wall, onValueChange = { wall = it },
+            label = { Text(L10n.t("ns.acc.wall.ph", vm.language)) }, minLines = 2,
+            modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = help, onValueChange = { help = it },
+            label = { Text(L10n.t("ns.acc.help.ph", vm.language)) },
+            modifier = Modifier.fillMaxWidth())
+        SmallAction(L10n.t("ns.acc.send", vm.language)) {
+            if (doing.isNotBlank() && wall.isNotBlank())
+                vm.call({ ApiClient.sendAccessReport(doing.trim(), wall.trim(),
+                    help.trim(), vm.language) }) {
+                    status = L10n.t("ns.acc.sent", vm.language)
+                    doing = ""; wall = ""; help = ""
+                }
+        }
+        status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+
+        OutlinedTextField(value = reviewer, onValueChange = { reviewer = it },
+            label = { Text(L10n.t("ns.acc.token.ph", vm.language)) },
+            modifier = Modifier.fillMaxWidth())
+        SmallAction(L10n.t("ns.acc.load", vm.language)) {
+            vm.call({ ApiClient.accessReports(reviewer.trim()) }) { r ->
+                reports = r.getOrNull()
+            }
+        }
+        reports?.let { rs ->
+            if (rs.isEmpty())
+                Text(L10n.t("ns.acc.none", vm.language), color = Qrme.T3, fontSize = 11.sp)
+            else rs.take(6).forEach { r ->
+                Text(r.doing, color = Qrme.Txt, fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold)
+                Text(r.wall, color = Qrme.T2, fontSize = 11.sp)
+                r.help?.let { h -> Text(h, color = Qrme.T2, fontSize = 11.sp) }
+                Text("${r.lang} · ${r.createdAt}", color = Qrme.T3, fontSize = 10.sp)
+            }
+        }
     }
 }
 

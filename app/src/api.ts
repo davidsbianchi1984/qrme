@@ -2806,6 +2806,16 @@ export type FeedbackBoard = {
   categories: string[];
 };
 
+/** Accessibility reports, for the deployment's reviewer. Three answers in
+ *  the writer's own words and language — never a name, never a diagnosis:
+ *  the table they come from has no submitter column to select. */
+export type AccessReports = {
+  reports: { id: string; lang: string; doing: string; wall: string;
+             help: string | null; status: string; pdi_key: string | null;
+             created_at: string }[];
+  total: number;
+};
+
 /** A third-party catalogue of task or knowledge mods. `audience` says which
  *  kind of thing it stocks — a robot body or a profile. */
 export type RegistrySynced = {
@@ -4795,6 +4805,17 @@ export const api = {
                  token?: string) =>
     req<{ id: string; category: string; status: string; note: string }>(
       "/feedback", { method: "POST", body, ...(token ? { token } : {}) }),
+
+  // The accessibility door. The POST is deliberately tokenless — the person
+  // it exists for may be the person the signup shut out — and the GET takes
+  // the *reviewer* token, never an owner's: reports are read by whoever
+  // stands for the deployment, same role that adjudicates objections.
+  sendAccessReport: (body: { doing: string; wall: string; help?: string;
+                             lang?: string }) =>
+    req<{ id: string; status: string; note: string }>(
+      "/access/reports", { method: "POST", body }),
+  accessReports: (reviewerToken: string) =>
+    req<AccessReports>("/access/reports", { token: reviewerToken }),
 
   packRegistries: (token: string) =>
     req<PackRegistry[]>("/packs/registries", { token }),

@@ -213,6 +213,23 @@ LESSONS: tuple[dict, ...] = (
          screens=(184,),
          try_it="Sign out and open the link under the sign-in form. Every "
                 "control on that page works with no profile at all."),
+    dict(key="access", chapter="Out in the world",
+         title="Ability is not a gate",
+         what="The accessibility statement, and the door it promises. If how "
+              "your body or mind works stands between you and this product, "
+              "that is a defect in the product — not in you. The statement "
+              "lists who is expected here (blind, deaf, mute, motor, "
+              "cognitive, dyslexic, motion-sensitive people — and every need "
+              "the list forgot), and every sentence on it is checked against "
+              "behavior by the suite. The report asks three questions and no "
+              "diagnosis: what were you trying to do, what stood in the way, "
+              "what would help. No account — `#access` in the URL opens it "
+              "before sign-in — no name, and your words stay on this "
+              "deployment, read with the reviewer token and turned into "
+              "rows in a backlog that only shrinks.",
+         screens=(193,),
+         try_it="Sign out, open the Accessibility link under the sign-in "
+                "form, and read the statement in your own language."),
     dict(key="inwords", chapter="Out in the world",
          title="In its own words",
          what="Four things about how a profile presents itself in language. "

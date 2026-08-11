@@ -3,6 +3,7 @@ import { fill, t as tr, visitorLang } from "../l10n";
 import { api, type EmbodimentConsistency, type ObjectionOpened,
          type ObjectionTimeline, type ProfileAttention,
          type ObjectionStatus, type WatermarkRecovery } from "../api";
+import { Access } from "./Access";
 
 /**
  * The console, for somebody who does not have an account and should not need
@@ -92,12 +93,20 @@ export function Public({ start, onBack }: {
                 onClick={() => setPane("count")}>
           {L("pub.count.title")}
         </button>
+        <button className={pane === "access" ? "tab active" : "tab"}
+                onClick={() => setPane("access")}>
+          {L("pub.tab.access")}
+        </button>
       </div>
 
       {pane === "object" && <ObjectPane />}
       {pane === "mark" && <MarkPane />}
       {pane === "same" && <SamePane />}
       {pane === "count" && <CountPane />}
+      {/* The accessibility statement and its report door. Here as well as on
+          the signed-in tab, and deliberately: the person this screen exists
+          for may be the person the signup shut out. */}
+      {pane === "access" && <Access />}
 
       <p className="muted small">
         {L("pub.notoken")} {L("pub.notoken.signedin")}
@@ -106,8 +115,8 @@ export function Public({ start, onBack }: {
   );
 }
 
-/** The four questions a stranger arrives with. */
-export type Pane = "object" | "mark" | "same" | "count";
+/** The five questions a stranger arrives with. */
+export type Pane = "object" | "mark" | "same" | "count" | "access";
 
 function message(e: unknown): string {
   return e instanceof Error ? e.message : String(e);

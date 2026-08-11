@@ -3643,6 +3643,21 @@ SCREENS = [
         dict(icon="sliders", color="amber", k="Your switches",
              s="refusals name the switch"),
     ], button=("Save the page", "brand")),
+    # 193: ability is not a gate. The statement, the behavior behind it, and
+    # the report door on one screen — reachable before sign-in like 184,
+    # because the person it exists for may be the person the signup shut
+    # out. The form's three questions are the cards; none is a diagnosis.
+    dict(num=193, title="Ability Is Not A Gate", sub="Say what stood in the way",
+         accent="green", tab=0, cards=[
+        dict(icon="shieldok", color="green", k="Everything works by text",
+             s="voice optional, images described"),
+        dict(icon="chat", color="brand", k="No name, no diagnosis",
+             s="doing, the wall, what would help"),
+        dict(icon="lock", color="silver", k="Stays on this deployment",
+             s="sealed to the vault, never relayed"),
+        dict(icon="flag", color="amber", k="Becomes tracked work",
+             s="a ledger that only shrinks"),
+    ], button=("Send the report", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

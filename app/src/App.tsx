@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
-import { t } from "./l10n";
+import { t, visitorLang } from "./l10n";
 import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
 import { Public, type Pane as PublicPane } from "./screens/Public";
@@ -54,12 +54,13 @@ import { Org } from "./screens/Org";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Settings } from "./screens/Settings";
+import { Access } from "./screens/Access";
 import { Help } from "./Help";
 import { ProblemNotice } from "./ProblemNotice";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "settings";
+type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -111,6 +112,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
   { id: "plans", label: "Plans", icon: "🎟" },
+  { id: "access", label: "Accessibility", icon: "♿" },
   { id: "settings", label: "Control", icon: "⚙" },
 ];
 
@@ -133,6 +135,13 @@ export function App() {
       .then((r) => setLang(r.language || "en"))
       .catch(() => setLang("en"));
   }, [session.profileId]);
+  // The document's own language attribute, so a screen reader pronounces
+  // the page in the language it is actually written in. index.html ships
+  // lang="en" and that was the end of the story; the app renders Spanish
+  // under an English tag and every synthesized voice read it wrong.
+  useEffect(() => {
+    document.documentElement.lang = session.profileId ? lang : visitorLang();
+  }, [lang, session.profileId]);
 
   // No profile yet → onboarding owns the whole window, *except* for the two
   // things QRME's backend deliberately lets a stranger do.
@@ -150,7 +159,8 @@ export function App() {
   if (!session.profileId) {
     const door = publicDoor
       ?? (window.location.hash === "#object" ? "object"
-        : window.location.hash === "#mark" ? "mark" : null);
+        : window.location.hash === "#mark" ? "mark"
+        : window.location.hash === "#access" ? "access" : null);
     return (
       <>
         <VersionGuard />
@@ -243,6 +253,7 @@ export function App() {
         {tab === "robots" && <Robots onPlans={toPlans} />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}
+        {tab === "access" && <Access />}
         {tab === "settings" && <Settings onPlans={toPlans} />}
       </main>
 

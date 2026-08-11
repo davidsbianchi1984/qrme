@@ -440,6 +440,10 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                          "who wrote this", "who made this", "is this real",
                          "is this genuine", "did a person write this",
                          "is this ai", "same one i met", "met it before"),
+    "access": ("accessibility", "a disability", "screen reader",
+               "cannot use", "can't use", "report a barrier",
+               "what stood in the way", "i am blind", "i am deaf",
+               "ability"),
     # "Where is the tour" is a different question from "show me around",
     # which _WALKTHROUGH already answers by starting one. These are the words
     # for the screen that lists it, and for the dock's own settings.

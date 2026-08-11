@@ -29,7 +29,7 @@ from .pdi_client import PDIClient
 from .routers import (accounts as account_routes,
                       attention as attention_routes,
                       solitude as solitude_routes,
-                      apps, assistant, audience, avatars, commerce,
+                      access, apps, assistant, audience, avatars, commerce,
                       community, connections,
                       desks, displays, dock, earnings, exchange,
                       feed as feed_routes, feedback,
@@ -172,6 +172,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(avatars.router)
     app.include_router(steering.router)
     app.include_router(feedback.router)
+    app.include_router(access.router)
     app.include_router(account_routes.router)
     app.include_router(gaming.router)
     app.include_router(models.router)

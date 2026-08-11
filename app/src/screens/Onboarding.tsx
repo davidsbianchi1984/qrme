@@ -365,7 +365,7 @@ function ProfileCreate() {
 export function Onboarding({ onPublic }: {
   /** The two doors that open without an account. Passed in rather than
    *  routed here, so the link and the `#object` hash land in one place. */
-  onPublic: (door: "object" | "mark") => void;
+  onPublic: (door: "object" | "mark" | "access") => void;
 }) {
   const { session } = useSession();
   const accountReady = Boolean(session.accountToken);
@@ -392,6 +392,12 @@ export function Onboarding({ onPublic }: {
           </button>
           <button className="linkish" onClick={() => onPublic("mark")}>
             {tr("pub.tab.mark", visitorLang())}
+          </button>
+          {/* The accessibility statement and its report door, upfront —
+              before the account, because the person it exists for may be
+              the person this signup shut out. */}
+          <button className="linkish" onClick={() => onPublic("access")}>
+            {tr("acc.title", visitorLang())}
           </button>
           <p className="muted small">
             {tr("pub.invite.none", visitorLang())}

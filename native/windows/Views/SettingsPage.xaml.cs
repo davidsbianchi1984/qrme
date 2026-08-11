@@ -150,6 +150,16 @@ public sealed partial class SettingsPage : Page
         FeedbackSend.Content = L10n.T("ns.fb.send", lang);
         FeedbackMineHeader.Text = L10n.T("ns.fb.mine", lang);
 
+        AccHead.Text = L10n.T("ns.acc", lang);
+        AccLead.Text = L10n.T("ns.acc.lead", lang);
+        AccDoing.PlaceholderText = L10n.T("ns.acc.doing.ph", lang);
+        AccWall.PlaceholderText = L10n.T("ns.acc.wall.ph", lang);
+        AccHelp.PlaceholderText = L10n.T("ns.acc.help.ph", lang);
+        AccSend.Content = L10n.T("ns.acc.send", lang);
+        AccReviewerBox.PlaceholderText = L10n.T("ns.acc.token.ph", lang);
+        AccLoad.Content = L10n.T("ns.acc.load", lang);
+        AccEmpty.Text = L10n.T("ns.acc.none", lang);
+
         PrHead.Text = L10n.T("ns.pr", lang);
         ProblemsYes.Content = L10n.T("ns.pr.send", lang);
         ProblemsNo.Content = L10n.T("ns.pr.dont", lang);
@@ -390,6 +400,40 @@ public sealed partial class SettingsPage : Page
             FeedbackThanks.Text = L10n.T("fb.thanks");
             FeedbackThanks.Visibility = Visibility.Visible;
             await LoadFeedback();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    // The accessibility door: tokenless on purpose — the person it exists
+    // for may be the person the signup shut out.
+    private async void OnSendAccessReport(object sender, RoutedEventArgs e)
+    {
+        var doing = AccDoing.Text.Trim();
+        var wall = AccWall.Text.Trim();
+        if (doing.Length == 0 || wall.Length == 0) return;
+        try
+        {
+            await ApiClient.Shared.SendAccessReport(
+                doing, wall, AccHelp.Text.Trim(), AppState.Current.Language);
+            AccDoing.Text = ""; AccWall.Text = ""; AccHelp.Text = "";
+            AccThanks.Text = L10n.T("ns.acc.sent", AppState.Current.Language);
+            AccThanks.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnLoadAccessReports(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var state = await ApiClient.Shared.AccessReports(AccReviewerBox.Password.Trim());
+            AccEmpty.Visibility = state.Total == 0 ? Visibility.Visible : Visibility.Collapsed;
+            AccReportsList.ItemsSource = state.Reports.Take(6).Select(r => new FeedbackRow
+            {
+                Line = $"{r.Doing} — {r.Wall}"
+                       + (r.Help is { Length: > 0 } h ? $" ({h})" : "")
+                       + $" · {r.Lang} · {r.CreatedAt}",
+            }).ToList();
         }
         catch (Exception ex) { ShowError(ex.Message); }
     }

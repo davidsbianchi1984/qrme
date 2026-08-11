@@ -180,6 +180,8 @@ struct SettingsView: View {
 
                 FeedbackCard()
 
+                AccessCard()
+
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
             }.padding(20)
         }

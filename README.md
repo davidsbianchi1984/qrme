@@ -23,6 +23,31 @@ workflows, and enhance operational decision-making — running more efficiently
 and taking over mundane or outdated tasks and roles — all within the same
 secure, private network environment.
 
+## Ability is not a gate
+
+If how a person's body or mind works stands between them and this product,
+that is a defect in the product — not in them. This is stated upfront, before
+features, because it shapes them: we build for blind and low-vision people,
+deaf and hard-of-hearing people, mute and nonspeaking people, people with
+limited mobility or amputation or tremor, autistic and cognitively different
+people, people with dyslexia, people sensitive to motion — and for every need
+not on that list, which is a gap in the list, not in the person.
+
+What is true today, enforced by the suite rather than promised: every
+function works by text alone and voice is always optional; every image in
+the console carries a description (`test_ability_is_not_a_gate.py` fails on
+one that does not); no step is timed; the console honours
+`prefers-reduced-motion`; and the known gaps live in
+[`tests/a11y_backlog.txt`](tests/a11y_backlog.txt), a ledger that only
+shrinks. Anything that stands in your way can be reported from the
+**Accessibility** screen — reachable *before* sign-in (`#access`), in ten
+languages, with three questions and no diagnosis: what were you trying to
+do, what stood in the way, what would help. Reports stay on the deployment
+that received them (sealed to the PDI vault when one is configured, never
+relayed to the shared error collector), are read with the deployment's
+reviewer token, and become rows in that only-shrinks ledger. That is the
+whole loop: your words become tracked work.
+
 
 ## App screens
 
@@ -379,6 +404,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <tr>
 <td align="center" width="25%"><a href="docs/screens/191-rooms-desks.svg"><img src="docs/screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a><br><sub><b>191</b> · Rooms &amp; Desks</sub></td>
 <td align="center" width="25%"><a href="docs/screens/192-your-side-of-it.svg"><img src="docs/screens/192-your-side-of-it.svg" width="210" alt="Your Side of It"></a><br><sub><b>192</b> · Your Side of It</sub></td>
+<td align="center" width="25%"><a href="docs/screens/193-ability-is-not-a-gate.svg"><img src="docs/screens/193-ability-is-not-a-gate.svg" width="210" alt="Ability Is Not A Gate"></a><br><sub><b>193</b> · Ability Is Not A Gate</sub></td>
 </tr>
 </table>
 

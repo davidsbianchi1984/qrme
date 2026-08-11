@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'say what you were trying to do and what stood in the way': {
+        'es': 'di qué intentabas hacer y qué se interpuso',
+        'fr': "dites ce que vous essayiez de faire et ce qui s'y est opposé",
+        'de': 'sag, was du versucht hast und was im Weg stand',
+        'pt': 'diga o que você estava tentando fazer e o que ficou no caminho',
+        'it': 'di\' cosa stavi cercando di fare e cosa ti ha ostacolato',
+        'ja': '何をしようとして、何が妨げになったかを書いてください',
+        'zh': '请写出你想做什么，以及是什么挡住了你',
+        'hi': 'बताइए कि आप क्या करने की कोशिश कर रहे थे और क्या आड़े आया',
+        'ar': 'اذكر ما كنت تحاول فعله وما الذي وقف في طريقك',
+    },
     'no referral was issued': {
         'es': 'no se emitió ninguna derivación',
         'fr': "aucune orientation n'a été émise",
@@ -2956,6 +2967,12 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The accessibility report's three questions, worded as the form asks
+    # them — a refusal that names one of these should read like the form.
+    'doing': {'en': 'What were you trying to do?', 'es': '¿Qué intentabas hacer?', 'fr': 'Qu’essayiez-vous de faire ?', 'de': 'Was hast du versucht zu tun?', 'pt': 'O que você estava tentando fazer?', 'it': 'Cosa stavi cercando di fare?', 'ja': '何をしようとしていましたか？', 'zh': '你当时想做什么？', 'hi': 'आप क्या करने की कोशिश कर रहे थे?', 'ar': 'ما الذي كنت تحاول فعله؟'},
+    'wall': {'en': 'What stood in the way?', 'es': '¿Qué se interpuso?', 'fr': 'Qu’est-ce qui a fait obstacle ?', 'de': 'Was stand im Weg?', 'pt': 'O que ficou no caminho?', 'it': 'Cosa ti ha ostacolato?', 'ja': '何が妨げになりましたか？', 'zh': '是什么挡住了你？', 'hi': 'क्या आड़े आया?', 'ar': 'ما الذي وقف في الطريق؟'},
+    'help': {'en': 'What would help?', 'es': '¿Qué ayudaría?', 'fr': 'Qu’est-ce qui aiderait ?', 'de': 'Was würde helfen?', 'pt': 'O que ajudaria?', 'it': 'Cosa aiuterebbe?', 'ja': '何があれば助かりますか？', 'zh': '什么会有帮助？', 'hi': 'क्या मदद करेगा?', 'ar': 'ما الذي قد يساعد؟'},
+    'lang': {'en': 'Language', 'es': 'Idioma', 'fr': 'Langue', 'de': 'Sprache', 'pt': 'Idioma', 'it': 'Lingua', 'ja': '言語', 'zh': '语言', 'hi': 'भाषा', 'ar': 'اللغة'},
     'beneficiary': {'en': 'Beneficiary', 'es': 'Beneficiario', 'fr': 'Bénéficiaire', 'de': 'Begünstigter', 'pt': 'Beneficiário', 'it': 'Beneficiario', 'ja': '受取人', 'zh': '受益人', 'hi': 'लाभार्थी', 'ar': 'المستفيد'},
     'designees': {'en': 'Designees', 'es': 'Designados', 'fr': 'Désignataires', 'de': 'Benannte', 'pt': 'Designados', 'it': 'Designati', 'ja': '指定先', 'zh': '指定人', 'hi': 'नामित', 'ar': 'المعيَّنون'},
     'comfort': {'en': 'How they comfort', 'es': 'Cómo consuelan', 'fr': 'Comment ils réconfortent', 'de': 'Wie sie trösten', 'pt': 'Como confortam', 'it': 'Come consolano', 'ja': '慰め方', 'zh': '如何安慰', 'hi': 'कैसे सांत्वना देते हैं', 'ar': 'كيف يواسون'},

@@ -624,6 +624,12 @@ struct PackInstalled: Decodable {
 }
 
 struct FeedbackReceipt: Decodable { let id: String; let status: String; let note: String? }
+struct AccessReceipt: Decodable { let id: String; let status: String; let note: String? }
+struct AccessReportRow: Decodable {
+    let id: String; let lang: String; let doing: String; let wall: String
+    let help: String?; let status: String; let created_at: String
+}
+struct AccessReportsState: Decodable { let reports: [AccessReportRow]; let total: Int }
 struct FeedbackItem: Decodable {
     let id: String
     let category: String
@@ -902,6 +908,22 @@ actor ApiClient {
 
     func feedback(token: String?) async throws -> FeedbackState {
         try await request("/feedback", token: token)
+    }
+
+    /// The accessibility door: tokenless on purpose — the person it exists
+    /// for may be the person the signup shut out. The words stay on the
+    /// deployment; nothing here reaches the problems collector.
+    func sendAccessReport(doing: String, wall: String, help: String?,
+                          lang: String) async throws -> AccessReceipt {
+        var body: [String: Any] = ["doing": doing, "wall": wall, "lang": lang]
+        if let help, !help.isEmpty { body["help"] = help }
+        return try await request("/access/reports", method: "POST", body: body,
+                                 token: nil)
+    }
+
+    /// Reviewer-token read — the deployment's steward, never a profile owner.
+    func accessReports(reviewerToken: String) async throws -> AccessReportsState {
+        try await request("/access/reports", token: reviewerToken)
     }
 
     func translate(id: String, token: String, text: String,

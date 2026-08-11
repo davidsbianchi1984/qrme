@@ -71,6 +71,8 @@ data class Provenance(val generatedBy: String, val sourceItems: Int,
 data class LanguageInfo(val code: String, val label: String)
 data class FeedbackItem(val category: String, val message: String, val status: String)
 data class FeedbackState(val mine: List<FeedbackItem>, val tally: Map<String, Int>, val total: Int)
+data class AccessReportRow(val doing: String, val wall: String, val help: String?,
+                           val lang: String, val createdAt: String)
 data class SteeringDial(val name: String, val group: String, val label: String,
                         val low: String, val high: String, val min: Int, val max: Int)
 data class SteeringHubState(val dials: List<SteeringDial>, val values: Map<String, Int>,
@@ -687,6 +689,30 @@ object ApiClient {
         rating?.let { body.put("rating", it) }
         return JSONObject(request("/feedback", "POST", body, token))
             .optString("status", "received")
+    }
+
+    /** The accessibility door: tokenless on purpose — the person it exists
+     *  for may be the person the signup shut out. The words stay on the
+     *  deployment; nothing here reaches the problems collector. */
+    suspend fun sendAccessReport(doing: String, wall: String, help: String?,
+                                 lang: String): String {
+        val body = JSONObject().put("doing", doing).put("wall", wall)
+            .put("lang", lang)
+        help?.takeIf { it.isNotBlank() }?.let { body.put("help", it) }
+        return JSONObject(request("/access/reports", "POST", body))
+            .optString("status", "received")
+    }
+
+    /** Reviewer-token read — the deployment's steward, never a profile. */
+    suspend fun accessReports(reviewerToken: String): List<AccessReportRow> {
+        val o = JSONObject(request("/access/reports", token = reviewerToken))
+        val arr = o.optJSONArray("reports")
+        return (0 until (arr?.length() ?: 0)).map { i ->
+            val r = arr!!.getJSONObject(i)
+            AccessReportRow(r.optString("doing", ""), r.optString("wall", ""),
+                r.optString("help", "").takeIf { it.isNotBlank() },
+                r.optString("lang", ""), r.optString("created_at", ""))
+        }
     }
 
     suspend fun feedback(token: String?): FeedbackState {
