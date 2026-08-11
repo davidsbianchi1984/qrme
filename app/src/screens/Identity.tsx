@@ -58,6 +58,7 @@ export function Identity({ onPlans, onPassing }: {
                                          how: string }[]>([]);
   const [marketKey, setMarketKey] = useState("ready_player_me");
   const [marketUrl, setMarketUrl] = useState("");
+  const [marketTorso, setMarketTorso] = useState("");
   const [capturing, setCapturing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const captureAngles = ["front", "left", "right", "up", "down"];
@@ -138,7 +139,9 @@ export function Identity({ onPlans, onPassing }: {
     setError(null); setNote(null);
     try {
       await api.importAvatar(me,
-        { source: marketKey, asset: marketUrl.trim() }, token);
+        { source: marketKey, asset: marketUrl.trim(),
+          ...(marketTorso.trim() ? { torso: marketTorso.trim() } : {}) },
+        token);
       setNote(tr("idn.deck.done", lang));
       setMarketUrl("");
       reloadAvatar();
@@ -479,6 +482,12 @@ export function Identity({ onPlans, onPassing }: {
           </select>
           <input value={marketUrl} placeholder={tr("idn.deck.url.ph", lang)}
                  onChange={(e) => setMarketUrl(e.target.value)}
+                 style={{ flex: 1 }} />
+          {/* Optional: the same avatar's upper-torso export, for surfaces
+              that stand the figure in a scene at 1:1. */}
+          <input value={marketTorso}
+                 placeholder={tr("idn.deck.torso.ph", lang)}
+                 onChange={(e) => setMarketTorso(e.target.value)}
                  style={{ flex: 1 }} />
           <button disabled={!marketUrl.trim()} onClick={importMarket}>
             {tr("idn.deck.import", lang)}

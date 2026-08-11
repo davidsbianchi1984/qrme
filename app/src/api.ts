@@ -1710,6 +1710,9 @@ export type EmblemSet = {
 export type Avatar = {
   profile_id: string; asset: string | null; silhouette: boolean;
   asset_marked: boolean;
+  /** The upper-torso form — the figure that stands in a live feed or an
+   *  AR scene at 1:1; the circular bubble is only the avatar-less form. */
+  torso?: string | null;
   /** Always displayed, by the product's own rule. */
   watermark: { mark: string; label: string; line: string; custom: boolean;
                always_displayed: boolean; disclosure: string };
@@ -3079,7 +3082,8 @@ export const api = {
   // marketplace, the starter collection, and the rooms.
   friends: (profileId: string) =>
     req<{ friends: { profile_id: string; display_name: string; pinned?: boolean;
-                     handle?: string | null }[]; founder_handles: string[] }>(
+                     handle?: string | null; avatar?: string | null;
+                     founder?: boolean }[]; founder_handles: string[] }>(
       `/profiles/${profileId}/friends`),
   suggestedFriends: (profileId: string) =>
     // The key is `suggested`. Declaring `suggestions` — in both arms of a
@@ -3922,7 +3926,8 @@ export const api = {
     req<{ sources: { key: string; name: string; how: string }[]; note: string }>(
       "/avatars/market"),
   importAvatar: (profileId: string, body: { source: string; asset: string;
-                                            extra?: string[] },
+                                            extra?: string[];
+                                            torso?: string },
                  token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar/import`,
       { method: "POST", body, token }),

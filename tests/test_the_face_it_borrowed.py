@@ -65,6 +65,28 @@ def test_the_capture_keeps_every_angle_it_took(client, profile_id):
     assert any(s["title"] == "avatar import — capture" for s in sources)
 
 
+def test_the_torso_stands_beside_the_face(client, profile_id):
+    """The upper-torso form: the figure that stands in a live feed or an AR
+    scene at 1:1 scale. The circular bubble is only the form of a profile
+    that has no avatar yet — an imported avatar can bring its torso along,
+    and every surface reads it from the same render the badge rides on."""
+    r = client.post(f"/profiles/{profile_id}/avatar/import", json={
+        "source": "ready_player_me",
+        "asset": "https://models.readyplayer.me/abc.png",
+        "torso": "https://models.readyplayer.me/abc-halfbody.png",
+    })
+    assert r.status_code == 201, r.text
+    out = client.get(f"/profiles/{profile_id}/avatar").json()
+    assert out["torso"] == "https://models.readyplayer.me/abc-halfbody.png"
+
+
+def test_the_bubble_is_the_form_of_the_avatarless(client, profile_id):
+    """Before any import the render carries no torso — the bubble is the
+    fallback form, never a second picture of nobody."""
+    out = client.get(f"/profiles/{profile_id}/avatar").json()
+    assert out["torso"] is None
+
+
 def test_an_unknown_source_is_refused_with_the_pointer(client, profile_id):
     r = client.post(f"/profiles/{profile_id}/avatar/import", json={
         "source": "made_up_platform", "asset": "x.png",

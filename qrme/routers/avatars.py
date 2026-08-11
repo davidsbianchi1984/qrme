@@ -51,6 +51,10 @@ class AvatarImport(BaseModel):
     extra: list[str] = Field(default_factory=list, max_length=12,
                              description="Additional frames — the selfie"
                                          " capture posts every angle it took.")
+    torso: str | None = Field(default=None, max_length=500,
+                              description="The upper-torso form of the same"
+                                          " avatar — the figure that stands"
+                                          " in a live feed or AR at 1:1.")
 
 
 @router.get("/avatars/market")
@@ -77,7 +81,8 @@ def import_avatar(profile_id: str, body: AvatarImport,
     try:
         return avatars.import_avatar(
             profile_id, source=body.source, asset=body.asset,
-            extra=body.extra, pdi=request.app.state.pdi)
+            extra=body.extra, torso=body.torso,
+            pdi=request.app.state.pdi)
     except ValueError as e:
         raise HTTPException(422, str(e))
 

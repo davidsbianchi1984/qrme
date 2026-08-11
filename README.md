@@ -554,6 +554,14 @@ float on the glass. The camera frame is a real photograph and carries no AI
 mark; the people standing in it are synthetic and carry theirs, which is the
 single place a missing badge would matter most.
 
+The circular bubble is only the form of a profile that has no avatar yet. A
+profile with an imported avatar renders as its **upper torso, scaled 1:1 in
+the live feed** — the figure standing in the room, not a coin floating over
+it. The torso travels in the same render the badge rides on
+(`GET /profiles/{id}/avatar` → `torso`), imported beside the face through
+`POST /profiles/{id}/avatar/import`, and withheld for an anonymous profile
+for the same reason the face is.
+
 <table>
   <tr>
     <td align="center" width="30%"><a href="docs/screens/106-ar-room.svg"><img src="docs/screens/106-ar-room.svg" width="190" alt="AR room"></a><br><sub><b>106</b> · AR · full screen</sub></td>

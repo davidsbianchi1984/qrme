@@ -6903,6 +6903,9 @@ const CHROME: Table = {
   "bld.another": {
     en: "Blend another", es: "Mezclar otra", fr: "En mélanger un autre", de: "Noch eine mischen", pt: "Misturar outra", it: "Mescolane un altro", ja: "もうひとつ混ぜる", zh: "再调配一个", hi: "एक और मिलाएँ", ar: "امزج آخر",
   },
+  "chat.you": {
+    en: "You", es: "Tú", fr: "Vous", de: "Du", pt: "Você", it: "Tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
   "chat.with": {
     en: "Chat with {name}", es: "Chat con {name}", fr: "Discussion avec {name}", de: "Chat mit {name}", pt: "Conversa com {name}", it: "Chat con {name}", ja: "{name} とのチャット", zh: "与 {name} 聊天", hi: "{name} से चैट", ar: "دردشة مع {name}",
   },
@@ -6974,6 +6977,9 @@ const CHROME: Table = {
   },
   "idn.deck.url.ph": {
     en: "image link or export URL", es: "enlace de imagen o URL de exportación", fr: "lien d'image ou URL d'export", de: "Bildlink oder Export-URL", pt: "link da imagem ou URL de exportação", it: "link dell'immagine o URL di esportazione", ja: "画像リンクまたはエクスポートURL", zh: "图片链接或导出网址", hi: "छवि लिंक या निर्यात URL", ar: "رابط الصورة أو رابط التصدير",
+  },
+  "idn.deck.torso.ph": {
+    en: "upper-torso image (optional)", es: "imagen de medio cuerpo (opcional)", fr: "image en buste (facultatif)", de: "Oberkörper-Bild (optional)", pt: "imagem de meio corpo (opcional)", it: "immagine a mezzo busto (facoltativa)", ja: "上半身の画像（任意）", zh: "上半身图像（可选）", hi: "ऊपरी धड़ की छवि (वैकल्पिक)", ar: "صورة الجذع العلوي (اختياري)",
   },
   "idn.deck.import": {
     en: "Import it", es: "Importarlo", fr: "L'importer", de: "Importieren", pt: "Importá-lo", it: "Importalo", ja: "取り込む", zh: "导入", hi: "आयात करें", ar: "استيراده",
@@ -7262,6 +7268,9 @@ const CHROME: Table = {
   },
   "hom.persona": {
     en: "Persona", es: "Persona", fr: "Personnage", de: "Persona", pt: "Persona", it: "Persona", ja: "ペルソナ", zh: "人格", hi: "व्यक्तित्व", ar: "الشخصية",
+  },
+  "hom.friends": {
+    en: "Top friends", es: "Mejores amigos", fr: "Meilleurs amis", de: "Engste Freunde", pt: "Melhores amigos", it: "Migliori amici", ja: "トップフレンド", zh: "挚友", hi: "खास दोस्त", ar: "أفضل الأصدقاء",
   },
   "hom.chatwith": {
     en: "Chat with {name}", es: "Chatear con {name}", fr: "Discuter avec {name}", de: "Mit {name} chatten", pt: "Conversar com {name}", it: "Chatta con {name}", ja: "{name} とチャット", zh: "与 {name} 聊天", hi: "{name} से चैट करें", ar: "دردش مع {name}",

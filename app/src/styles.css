@@ -156,6 +156,48 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 
 /* ---- chat ---- */
 .chat { display: flex; flex-direction: column; height: calc(100% - 4px); }
+/* The chat wears the space the VR room and the vastscape draw: a grid
+   receding to a vanishing point, with the session's people present as
+   bubbles. Inline SVG so nothing is fetched and nothing can 404. */
+.chat-space {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='420'%3E%3Crect width='600' height='420' fill='%230c0920'/%3E%3Ccircle cx='300' cy='96' r='70' fill='%237b5cff' fill-opacity='0.10'/%3E%3Cg stroke='%237b5cff' stroke-opacity='0.14'%3E%3Cpath d='M300 96 L-320 420'/%3E%3Cpath d='M300 96 L-120 420'/%3E%3Cpath d='M300 96 L60 420'/%3E%3Cpath d='M300 96 L200 420'/%3E%3Cpath d='M300 96 L300 420'/%3E%3Cpath d='M300 96 L400 420'/%3E%3Cpath d='M300 96 L540 420'/%3E%3Cpath d='M300 96 L720 420'/%3E%3Cpath d='M300 96 L920 420'/%3E%3Cpath d='M0 128 L600 128'/%3E%3Cpath d='M0 160 L600 160'/%3E%3Cpath d='M0 205 L600 205'/%3E%3Cpath d='M0 265 L600 265'/%3E%3Cpath d='M0 340 L600 340'/%3E%3C/g%3E%3C/svg%3E")
+    center top / 100% 100% no-repeat, #0c0920;
+  border-radius: 14px; padding: 10px;
+}
+.chat-presence {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; gap: 26px; justify-content: center;
+  padding: 10px 0 6px;
+}
+.presence-one { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.presence-bubble {
+  width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+  border: 1.5px solid rgba(159,216,232,0.55);
+  box-shadow: 0 0 18px rgba(123,92,255,0.55);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 18px; color: #fff;
+}
+.presence-bubble.orbfill { background: radial-gradient(circle at 36% 30%, #d9ccff, #7b5cff 40%, #3f3bc0 78%, #140f34); border: 0; }
+.presence-bubble.youfill { background: rgba(12,9,32,0.85); }
+.presence-name {
+  font-size: 10px; font-weight: 700; color: #dff3ff;
+  background: rgba(8,6,20,0.7); border-radius: 8px; padding: 2px 8px;
+}
+/* The upper-torso form, standing in the space at full figure. */
+.presence-torso {
+  width: 68px; height: 92px; object-fit: cover; object-position: top;
+  border-radius: 14px 14px 8px 8px;
+  border: 1.5px solid rgba(159,216,232,0.55);
+  box-shadow: 0 0 18px rgba(123,92,255,0.55);
+}
+/* The front page's top friends: the same faces the spaces use. */
+.top-friends { margin: 4px 0 18px; }
+.friends-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+.friends-row button {
+  background: none; border: 0; padding: 0; display: flex;
+  flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+}
 .messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 8px 2px; }
 .bubble { max-width: 78%; padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.45; }
 .bubble.assistant { align-self: flex-start; background: var(--card); border: 1px solid var(--line); }
@@ -516,6 +558,15 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   background: radial-gradient(circle at 34% 30%, #b0e8ff, #40b0ff 45%, #1a4a90 80%, #0a1430);
   box-shadow: 0 0 46px rgba(64,176,255,0.5); }
 .talk-orb.listening { animation: talk-pulse 1.6s ease-in-out infinite; }
+/* The upper-torso form, standing on the talk surface at full figure. */
+.talk-torso {
+  width: min(46vw, 220px); height: min(62vw, 300px);
+  object-fit: cover; object-position: top;
+  border-radius: 26px 26px 14px 14px;
+  border: 2px solid rgba(159,216,232,0.55);
+  box-shadow: 0 0 34px rgba(123,92,255,0.6);
+}
+.talk-torso.listening { animation: talk-pulse 1.6s ease-in-out infinite; }
 @keyframes talk-pulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 34px rgba(64,224,255,0.35); }
   50% { transform: scale(1.05); box-shadow: 0 0 64px rgba(64,224,255,0.6); }

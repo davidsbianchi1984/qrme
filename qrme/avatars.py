@@ -356,7 +356,8 @@ IMPORT_SOURCES = {m["key"] for m in MARKET} | {"photos", "capture"}
 
 
 def import_avatar(profile_id: str, *, source: str, asset: str,
-                  extra: list[str] | None = None, pdi=None) -> dict:
+                  extra: list[str] | None = None, torso: str | None = None,
+                  pdi=None) -> dict:
     """Attach an avatar that arrived from outside the starter collection.
 
     ``asset`` is a media reference the existing upload door minted, or a
@@ -374,7 +375,7 @@ def import_avatar(profile_id: str, *, source: str, asset: str,
     conn = db.connect()
     item_id = db.new_id("src")
     provenance = {"avatar_import": source, "asset": asset,
-                  "extra_frames": extra or []}
+                  "extra_frames": extra or [], "torso": torso}
     import json as _json
     content, pdi_key = _json.dumps(provenance), None
     if pdi is not None:
@@ -388,7 +389,29 @@ def import_avatar(profile_id: str, *, source: str, asset: str,
          db.utcnow()),
     )
     conn.commit()
+    if torso:
+        set_torso(profile_id, torso)
     return set_avatar(profile_id, asset)
+
+
+def set_torso(profile_id: str, asset: str) -> None:
+    """Attach the upper-torso form — the figure that stands in a live feed
+    or an AR scene at 1:1 scale, where the circular bubble is only the form
+    of a profile that has no avatar yet."""
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO avatar_torsos (profile_id, asset, created_at)"
+        " VALUES (?,?,?) ON CONFLICT(profile_id)"
+        " DO UPDATE SET asset=excluded.asset, created_at=excluded.created_at",
+        (profile_id, asset, db.utcnow()))
+    conn.commit()
+
+
+def torso_of(profile_id: str) -> str | None:
+    row = db.connect().execute(
+        "SELECT asset FROM avatar_torsos WHERE profile_id=?",
+        (profile_id,)).fetchone()
+    return row["asset"] if row else None
 
 
 def set_avatar(profile_id: str, asset: str) -> dict:
@@ -450,6 +473,11 @@ def render(profile_id: str) -> dict:
         # is mandatory or merely additive. False is the safe answer and is what
         # an unknown asset gets.
         "asset_marked": asset_is_marked(asset),
+        # The upper-torso form, for surfaces that stand the avatar in a
+        # scene at 1:1 — a live feed, AR, the vastscape. Withheld for an
+        # anonymous profile for the same reason the face is: a torso is a
+        # picture of somebody too.
+        "torso": None if anonymous else torso_of(profile_id),
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # A portrait with no asset yet is still an answer: surfaces fall back

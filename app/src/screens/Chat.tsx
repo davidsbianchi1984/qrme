@@ -58,6 +58,14 @@ export function Chat({ onPlans }: {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [msgs, busy]);
 
+  // The face is part of the room, not only the talk overlay: the presence
+  // bubble at the top of the space needs it from the first render.
+  useEffect(() => {
+    if (!session.profileId) return;
+    api.avatar(session.profileId, session.ownerToken || "")
+      .then(setTalkAvatar).catch(() => setTalkAvatar(null));
+  }, [session.profileId, session.ownerToken]);
+
   function speakAloud(text: string) {
     if (!("speechSynthesis" in window)) return;
     const u = new SpeechSynthesisUtterance(text);
@@ -167,7 +175,40 @@ export function Chat({ onPlans }: {
 
       {/* role=log + aria-live: a screen reader is told when the reply
           arrives, instead of the conversation advancing silently. */}
-      <div className="messages" role="log" aria-live="polite" ref={listRef}>
+      <div className="messages chat-space" role="log" aria-live="polite"
+           ref={listRef}>
+        {/* Who is in the session, as bubbles resting in the space — the
+            same presence the VR room and the vastscape draw. Sticky, so
+            they stay in the room while the transcript scrolls. */}
+        <div className="chat-presence" aria-hidden="true">
+          <div className="presence-one">
+            {/* The torso form stands in the space at full figure; the
+                circular bubble is only the form of a profile that has no
+                avatar (or no torso) yet. */}
+            {talkAvatar?.torso ? (
+              <img className="presence-torso"
+                   src={talkAvatar.torso.startsWith("http")
+                          ? talkAvatar.torso
+                          : getBase() + talkAvatar.torso} alt="" />
+            ) : talkAvatar && talkAvatar.asset && !talkAvatar.placeholder ? (
+              <img className="presence-bubble"
+                   src={talkAvatar.asset.startsWith("http")
+                          ? talkAvatar.asset
+                          : getBase() + talkAvatar.asset} alt="" />
+            ) : (
+              <div className="presence-bubble orbfill" />
+            )}
+            <span className="presence-name">
+              {session.profile?.display_name}
+            </span>
+          </div>
+          <div className="presence-one">
+            <div className="presence-bubble youfill">
+              {tr("chat.you", lang).slice(0, 1)}
+            </div>
+            <span className="presence-name">{tr("chat.you", lang)}</span>
+          </div>
+        </div>
         {msgs.length === 0 && (
           <div className="muted center">
             {fill(tr("chat.sayhello", lang),
@@ -223,7 +264,16 @@ export function Chat({ onPlans }: {
           <button className="talk-close" onClick={() => {
             setTalking(false); window.speechSynthesis?.cancel();
           }}>×</button>
-          {talkAvatar && talkAvatar.asset && !talkAvatar.placeholder ? (
+          {/* The torso form stands at full figure where there is one; the
+              circular face is next; the orb is only for a profile with no
+              portrait at all. */}
+          {talkAvatar?.torso ? (
+            <img className={"talk-torso" + (listening ? " listening" : "")}
+                 src={talkAvatar.torso.startsWith("http")
+                        ? talkAvatar.torso
+                        : getBase() + talkAvatar.torso}
+                 alt={session.profile?.display_name || ""} />
+          ) : talkAvatar && talkAvatar.asset && !talkAvatar.placeholder ? (
             <div className={"talk-face" + (listening ? " listening" : "")}>
               <img src={talkAvatar.asset.startsWith("http")
                           ? talkAvatar.asset

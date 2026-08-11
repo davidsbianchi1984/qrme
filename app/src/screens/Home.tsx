@@ -6,12 +6,14 @@ import { useSession } from "../store";
 
 export function Home({ go }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
-        | "campaigns" | "org" | "plans") => void;
+        | "campaigns" | "org" | "plans" | "friends") => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
   const [stats, setStats] = useState<Stats | null>(null);
   const [face, setFace] = useState<Avatar | null>(null);
+  const [pals, setPals] = useState<
+    Awaited<ReturnType<typeof api.friends>>["friends"]>([]);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -24,6 +26,10 @@ export function Home({ go }: {
     // fallback for a profile that has none yet.
     api.avatar(session.profileId, session.ownerToken)
       .then(setFace).catch(() => setFace(null));
+    // The top of the friends list belongs on the front page — the founder
+    // pins first, then the oldest friendships, as faces not rows.
+    api.friends(session.profileId)
+      .then((r) => setPals(r.friends.slice(0, 6))).catch(() => setPals([]));
   }, [session.profileId, session.ownerToken]);
 
   const p = session.profile;
@@ -76,6 +82,28 @@ export function Home({ go }: {
       </div>
 
       <Refusal error={error} onPlans={() => go("plans")} variant="inline" />
+
+      {pals.length > 0 && (
+        <div className="top-friends">
+          <div className="tile-label">{tr("hom.friends", lang)}</div>
+          <div className="friends-row">
+            {pals.map((f) => (
+              <button key={f.profile_id} onClick={() => go("friends")}>
+                {f.avatar ? (
+                  <img className="presence-bubble" alt=""
+                       src={f.avatar.startsWith("http")
+                              ? f.avatar : getBase() + f.avatar} />
+                ) : (
+                  <div className="presence-bubble orbfill">
+                    {f.display_name.slice(0, 1)}
+                  </div>
+                )}
+                <span className="presence-name">{f.display_name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="tiles">
         {tiles.map((t) => (

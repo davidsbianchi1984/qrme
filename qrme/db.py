@@ -1521,6 +1521,17 @@ CREATE TABLE IF NOT EXISTS remembrances (
     PRIMARY KEY (profile_id, interactor_id)
 );
 
+-- The upper-torso form of an avatar: the figure that stands in a live feed
+-- or an AR scene at 1:1 scale. The circular bubble is only the form of a
+-- profile that has no avatar yet; a profile with a torso renders as one.
+-- Its own table because this schema has no migrations — a new table is the
+-- only shape that arrives everywhere.
+CREATE TABLE IF NOT EXISTS avatar_torsos (
+    profile_id  TEXT PRIMARY KEY REFERENCES profiles(id),
+    asset       TEXT NOT NULL,
+    created_at  TEXT NOT NULL
+);
+
 -- One row per person who has been offered the JIM-mini door, and what they
 -- answered. The row exists so the offer is never made twice: an offer somebody
 -- declined that reappears next month is the product overriding an answer it
