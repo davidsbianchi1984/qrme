@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.qrme.studio.AccessReportRow
 import app.qrme.studio.ApiClient
 import app.qrme.studio.AudienceCounts
 import app.qrme.studio.CommentRow
