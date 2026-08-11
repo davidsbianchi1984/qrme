@@ -4,6 +4,55 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.61.1] - 2026-08-11
+
+### Added
+
+- **Ability is not a gate.** An accessibility statement with a door under it,
+  on every client. The console's new **Accessibility** screen — reachable
+  *before* sign-in via `#access`, from the public landing's tab row and from
+  onboarding — names the needs this product is built for (blind, deaf, mute,
+  motor, cognitive, dyslexia, motion sensitivity) and says, for anything the
+  list misses, that the gap is in the list and not in the person. Under the
+  statement sits a three-question report form: what were you trying to do,
+  what stood in the way, what would help. `POST /access/reports` takes those
+  answers with **no account, no token and no name** — the `access_reports`
+  table has no identity column to fill, which is where that promise actually
+  lives — and seals each report to the PDI vault when one is configured.
+  Reports are never relayed to the shared error collector; they are read back
+  by `GET /access/reports` under the deployment's reviewer token alone. The
+  iOS, Android and Windows shells carry the same statement and the same form.
+  Screen 193, tutorial lesson, helper-dock directions and ten-language copy
+  throughout.
+- **The wall's uploads say what they show.** The composer asks for a
+  description in the uploader's own words; it rides the upload, lands in the
+  new `media_alt` table, and returns on every read — the receipt, the post,
+  the feed — as the image's `alt`, read aloud by screen readers.
+- **A ledger of known gaps that only shrinks.** `tests/a11y_backlog.txt`
+  opened this release with three admitted barriers and closes it at zero:
+  wall uploads with no description, chat replies no screen reader was told
+  about (the conversation log is an `aria-live` region now), and shells that
+  carried the form without the statement. Each closure is held by a test —
+  one of them shared across the three products, taking the common guard
+  manifest to 461 — and the ceiling ratchet means a new gap can only enter by
+  a visible, deliberate edit.
+- **The console honours `prefers-reduced-motion`**, sets the document's
+  language attribute to the visitor's language, and every image carries a
+  description — each enforced by `test_ability_is_not_a_gate.py` rather than
+  promised.
+
+### Changed
+
+- **Signup opens for the beta.** `QRME_SIGNUP_KEY` gains a keyhole: set, it
+  gates signup with an invite key; empty or unset, signup is open — and open
+  is now the shipped default in `docker/beta-compose.yml`, which is the
+  beta's posture. Free tiers stand while testing lasts, and the terms say so.
+- **Terms 1.2.** Version 1.1 said the beta is a beta and free means free for
+  now; 1.2 adds the accessibility commitment in the same
+  no-claims-without-behavior voice — barriers "can be reported from the
+  Accessibility screen — no account, no diagnosis", naming the real door
+  rather than an aspiration.
+
 ## [0.61.0] - 2026-08-10
 
 ### Fixed
@@ -10599,6 +10648,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   per-OS installer release workflow.
 
 [Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.16.0...HEAD
+[0.61.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.61.1
 [0.19.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.19.1
 [0.19.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.19.0
 [0.18.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.18.0

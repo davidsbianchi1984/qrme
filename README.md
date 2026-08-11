@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.61.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.61.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -746,6 +746,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.61.1** | **Ability is not a gate** — an accessibility statement with a door under it: the Accessibility screen reachable before sign-in (`#access`), three questions with no account, no token and no name (the table has no identity column to fill), sealed to the PDI vault and read only under the reviewer token. Signup opens for the beta behind a keyhole that stays. The known-gaps ledger opened at three rows and closes at zero — wall uploads describe what they show, the chat log tells the screen reader, the shells carry the per-need statement — every closure held by a test, and Terms 1.2 says only what is true |
 | **0.61.0** | **The beta stands up** — three products behind one proxy on one host, and the first real run found what no in-process test could: every console blanked by its own Content-Security-Policy. A policy of its own for `/app`, the bare domain now lands on the console, backups become a nightly job instead of instructions, bootstrap keeps its tenants across restarts, and the release-bodies sweep survives its first honest run — twice repaired, then proven against the live releases |
 | **0.60.9** | **No change to this product** — the release-body work ends: every inherited body rebuilt from its own CHANGELOG entry, the record at a ceiling of 0 with one release kept deliberately, and three checks that reported success while doing nothing fixed. Carried here to keep the three at one version |
 | **0.60.8** | **No change to this product** -- carried from PDI's round: a release checklist naming every version field, byte-identical in all three, and the deletion of `RELEASE_NOTES.md` after 412 of 530 releases proved to carry one frozen v0.24.0 body. A reader replaces the writer. Carried here to keep the three at one version |
