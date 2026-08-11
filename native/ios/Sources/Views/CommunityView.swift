@@ -211,6 +211,7 @@ private struct StrangerSection: View {
 private struct CommunityRoomsSection: View {
     @EnvironmentObject var state: AppState
     @State private var topic = ""
+    @State private var templates: [RoomTemplate] = []
     @State private var room: RoomCreated?
     @State private var transcript: [RoomMsg] = []
     @State private var draft = ""
@@ -238,7 +239,24 @@ private struct CommunityRoomsSection: View {
                             .background(Theme.brand)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .disabled(topic.isEmpty || busy)
+                        // The standing rooms: tapping one fills the topic,
+                        // so the empty screen a newcomer meets still offers
+                        // somewhere to go.
+                        if !templates.isEmpty {
+                            Text(L10n.t("nc.room.standing", state.language))
+                                .font(.caption.bold()).foregroundStyle(Theme.t2)
+                            ForEach(templates) { t in
+                                let name = t.topic ?? t.key
+                                let channel = t.channel ?? "chat"
+                                Button("\(name) · \(channel)") {
+                                    topic = name
+                                }.font(.caption2).foregroundStyle(Theme.brandA)
+                            }
+                        }
                     }.card()
+                    .task {
+                        templates = (try? await ApiClient.shared.roomTemplates()) ?? []
+                    }
                 }
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
             }.padding(20)

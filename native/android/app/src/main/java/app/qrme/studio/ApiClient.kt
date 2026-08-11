@@ -2830,6 +2830,19 @@ object ApiClient {
         return out
     }
 
+    /** The standing rooms: blueprints the server keeps so the Rooms door
+     *  never greets a newcomer with an empty list. (topic, channel, pitch). */
+    suspend fun roomTemplates(): List<Triple<String, String, String>> {
+        val a = org.json.JSONArray(request("/rooms/templates"))
+        val out = mutableListOf<Triple<String, String, String>>()
+        for (i in 0 until a.length()) {
+            val t = a.getJSONObject(i)
+            out.add(Triple(t.optString("topic"), t.optString("channel"),
+                t.optString("pitch")))
+        }
+        return out
+    }
+
     suspend fun lendRoomMic(roomId: String, interactorId: String,
                             token: String) {
         request("/rooms/$roomId/mic", "POST",

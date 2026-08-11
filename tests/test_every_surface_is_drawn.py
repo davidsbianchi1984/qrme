@@ -55,6 +55,7 @@ NOT_A_SURFACE = {
     "l10n",         # not a component at all
     "Help",         # the assistant dock, drawn inside the screens it floats over
     "WatchLights",  # the always-on widget; its own gallery lives in the watch faces
+    "Footsteps",   # the corner counter; fixed chrome over every screen, like the version guard
     "VersionGuard", # a failure banner, deliberately not part of the tour
 }
 

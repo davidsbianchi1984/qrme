@@ -336,6 +336,7 @@ enum L10n {
         "nc.room.open": ["en": "Open a room", "es": "Abrir una sala", "fr": "Ouvrir un salon", "de": "Einen Raum öffnen", "pt": "Abrir uma sala", "it": "Apri una stanza", "ja": "ルームを開く", "zh": "开一个房间", "hi": "एक कक्ष खोलें", "ar": "افتح غرفة"],
         "nc.room.here": ["en": "Open room", "es": "Sala abierta", "fr": "Salon ouvert", "de": "Offener Raum", "pt": "Sala aberta", "it": "Stanza aperta", "ja": "開いているルーム", "zh": "已开房间", "hi": "खुला कक्ष", "ar": "غرفة مفتوحة"],
         "nc.topic.ph": ["en": "Topic", "es": "Tema", "fr": "Sujet", "de": "Thema", "pt": "Tema", "it": "Argomento", "ja": "話題", "zh": "话题", "hi": "विषय", "ar": "الموضوع"],
+        "nc.room.standing": ["en": "Standing rooms", "es": "Salas permanentes", "fr": "Salles permanentes", "de": "Ständige Räume", "pt": "Salas permanentes", "it": "Stanze permanenti", "ja": "常設の部屋", "zh": "常设房间", "hi": "स्थायी कमरे", "ar": "غرف دائمة"],
         "nc.leave": ["en": "Leave", "es": "Salir", "fr": "Quitter", "de": "Verlassen", "pt": "Sair", "it": "Esci", "ja": "退出", "zh": "离开", "hi": "छोड़ें", "ar": "مغادرة"],
         "nc.say.ph": ["en": "Say something…", "es": "Di algo…", "fr": "Dites quelque chose…", "de": "Sag etwas…", "pt": "Diga alguma coisa…", "it": "Di' qualcosa…", "ja": "何か話しかけて…", "zh": "说点什么…", "hi": "कुछ कहिए…", "ar": "قل شيئًا…"],
         "nc.send": ["en": "Send", "es": "Enviar", "fr": "Envoyer", "de": "Senden", "pt": "Enviar", "it": "Invia", "ja": "送信", "zh": "发送", "hi": "भेजें", "ar": "إرسال"],

@@ -26,6 +26,8 @@ export function Rooms({ onPlans }: {
   const lang = visitorLang();
   const [rooms, setRooms] = useState<Awaited<ReturnType<typeof api.listRooms>>>([]);
   const [desks, setDesks] = useState<Awaited<ReturnType<typeof api.listDesks>>>([]);
+  const [templates, setTemplates] =
+    useState<Awaited<ReturnType<typeof api.roomTemplates>>>([]);
   const [topic, setTopic] = useState("");
   const [channel, setChannel] = useState("voice");
   const [busy, setBusy] = useState(false);
@@ -34,8 +36,30 @@ export function Rooms({ onPlans }: {
   function load() {
     api.listRooms().then(setRooms).catch((e) => setError(e));
     api.listDesks().then(setDesks).catch(() => setDesks([]));
+    api.roomTemplates().then(setTemplates).catch(() => setTemplates([]));
   }
   useEffect(load, []);
+
+  // One press on a standing room: the same door as typing the topic by
+  // hand — you and your profile open it together, anyone else joins.
+  async function openTemplate(t: { topic: string; channel: string }) {
+    if (!session.interactorId || !session.profileId) {
+      setError(tr("rms.signinpick", lang));
+      return;
+    }
+    setBusy(true); setError(null);
+    try {
+      await api.createRoom({
+        topic: t.topic, channel: t.channel,
+        participants: [
+          { kind: "user", id: session.interactorId },
+          { kind: "profile", id: session.profileId },
+        ],
+      });
+      load();
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
 
   async function create() {
     if (!session.interactorId || !session.profileId) {
@@ -86,6 +110,22 @@ export function Rooms({ onPlans }: {
             {tr("rms.open", lang)}
           </button>
         </div>
+      </div>
+
+      <div className="card">
+        <h3>{tr("rms.standing", lang)}</h3>
+        <p className="muted small">{tr("rms.standing.pitch", lang)}</p>
+        {templates.map((t) => (
+          <div key={t.key} className="room-row">
+            <span className={"tag ch-" + t.channel}>{badge(t.channel)}</span>
+            <b>{t.topic}</b>
+            <span className="muted small">{t.pitch}</span>
+            <button className="ghost" disabled={busy}
+                    onClick={() => openTemplate(t)}>
+              {tr("rms.standing.open", lang)}
+            </button>
+          </div>
+        ))}
       </div>
 
       <div className="card">

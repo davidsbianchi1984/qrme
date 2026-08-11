@@ -2997,7 +2997,8 @@ export const api = {
   // rather than wired: not every unused binding wants a screen.
 
   healthInfo: () => req<{ status?: string; version?: string;
-                          signup_key?: boolean }>("/health"),
+                          signup_key?: boolean;
+                          footsteps?: number }>("/health"),
 
   // How to open this studio on a phone: its URL on the local network.
   pair: () => req<PairInfo>("/pair"),
@@ -3223,6 +3224,11 @@ export const api = {
   listRooms: () =>
     req<{ id: string; topic?: string | null; channel: string;
           participants: number; created_at: string }[]>(`/rooms`),
+  // The standing rooms: blueprints shown when the live list is empty,
+  // each one press away from being a real room through createRoom.
+  roomTemplates: () =>
+    req<{ key: string; topic: string; channel: string; pitch: string;
+          presence: string }[]>(`/rooms/templates`),
   createRoom: (body: { topic?: string; channel: string;
                        participants: { kind: string; id: string }[] }) =>
     req<{ id: string }>(`/rooms`, { method: "POST", body }),

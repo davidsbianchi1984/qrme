@@ -70,9 +70,41 @@ public sealed partial class CommunityPage : Page
         AdvanceButton.Content = L10n.T("nc.lettalk", lang);
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e) =>
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    {
         RoomBlurb.Text = L10n.Fill("nc.room.sub", AppState.Current.Language,
                                    ("name", AppState.Current.DisplayName));
+        await LoadTemplates();
+    }
+
+    /// <summary>The standing rooms: tapping one fills the topic, so the
+    /// empty screen a newcomer meets still offers somewhere to go.</summary>
+    private async System.Threading.Tasks.Task LoadTemplates()
+    {
+        try
+        {
+            var templates = await ApiClient.Shared.RoomTemplates();
+            if (templates.Length == 0) return;
+            StandingHead.Text = L10n.T("nc.room.standing",
+                                       AppState.Current.Language);
+            StandingHead.Visibility = Visibility.Visible;
+            TemplatesPanel.Children.Clear();
+            foreach (var t in templates)
+            {
+                var b = new Button
+                {
+                    Content = $"{t.Topic} · {t.Channel}",
+                    Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+                        Microsoft.UI.Colors.Transparent),
+                    FontSize = 11,
+                };
+                var topic = t.Topic ?? t.Key;
+                b.Click += (_, _) => TopicBox.Text = topic;
+                TemplatesPanel.Children.Add(b);
+            }
+        }
+        catch { /* unreachable backend: the create form still stands */ }
+    }
 
     private string Tier => TierBox.SelectedIndex == 1 ? "rated" : "friendly";
 

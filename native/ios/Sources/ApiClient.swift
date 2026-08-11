@@ -3315,6 +3315,17 @@ struct RoomCard: Decodable, Identifiable {
     let participants: Int?
 }
 
+/// A standing room: a blueprint the server keeps so the Rooms door never
+/// greets a newcomer with an empty list. Opening one goes through the same
+/// POST /rooms as a typed topic.
+struct RoomTemplate: Decodable, Identifiable {
+    let key: String
+    let topic: String?
+    let channel: String?
+    let pitch: String?
+    var id: String { key }
+}
+
 struct DisplayCard: Decodable {
     let id: String?
     let kind: String?
@@ -3409,6 +3420,10 @@ extension ApiClient {
 
     func rooms() async throws -> [RoomCard] {
         try await request("/rooms")
+    }
+
+    func roomTemplates() async throws -> [RoomTemplate] {
+        try await request("/rooms/templates")
     }
 
     func lendRoomMic(roomId: String, interactorId: String,

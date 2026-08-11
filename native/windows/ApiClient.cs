@@ -3167,6 +3167,9 @@ public sealed class ApiClient
 
     public Task<RoomCard[]> Rooms() => Send<RoomCard[]>(Get("/rooms"));
 
+    public Task<RoomTemplate[]> RoomTemplates() =>
+        Send<RoomTemplate[]>(Get("/rooms/templates"));
+
     public Task<MicDisclosure> LendRoomMic(string roomId,
         string interactorId, string token) =>
         Send<MicDisclosure>(Post($"/rooms/{roomId}/mic",
@@ -4066,6 +4069,15 @@ public record RoomCard(
     [property: JsonPropertyName("topic")] string? Topic,
     [property: JsonPropertyName("channel")] string? Channel,
     [property: JsonPropertyName("participants")] int Participants);
+
+/// <summary>A standing room: a blueprint the server keeps so the Rooms door
+/// never greets a newcomer with an empty list. Opening one goes through the
+/// same POST /rooms as a typed topic.</summary>
+public record RoomTemplate(
+    [property: JsonPropertyName("key")] string Key,
+    [property: JsonPropertyName("topic")] string? Topic,
+    [property: JsonPropertyName("channel")] string? Channel,
+    [property: JsonPropertyName("pitch")] string? Pitch);
 
 public record NeverShown(
     [property: JsonPropertyName("thing")] string? Thing,

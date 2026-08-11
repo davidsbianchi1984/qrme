@@ -3204,8 +3204,20 @@ const CHROME: Table = {
   "rem.apps.none": {
     en: "None yet.", es: "Ninguna todavía.", fr: "Aucune pour l'instant.", de: "Noch keine.", pt: "Nenhuma ainda.", it: "Ancora nessuna.", ja: "まだありません。", zh: "尚无。", hi: "अभी कोई नहीं।", ar: "لا شيء بعد.",
   },
-  "rem.apps.gcal": {
-    en: "Connect Google Calendar", es: "Conectar Google Calendar", fr: "Connecter Google Agenda", de: "Google Kalender verbinden", pt: "Ligar o Google Calendar", it: "Collega Google Calendar", ja: "Googleカレンダーを接続", zh: "连接 Google 日历", hi: "Google कैलेंडर जोड़ें", ar: "اربط تقويم Google",
+  "rem.apps.count": {
+    en: "{apps} apps across {providers} providers", es: "{apps} apps de {providers} proveedores", fr: "{apps} applis chez {providers} fournisseurs", de: "{apps} Apps von {providers} Anbietern", pt: "{apps} apps de {providers} fornecedores", it: "{apps} app di {providers} fornitori", ja: "{providers}社の{apps}個のアプリ", zh: "{providers} 家提供方的 {apps} 个应用", hi: "{providers} प्रदाताओं के {apps} ऐप", ar: "{apps} تطبيقًا من {providers} مزوّدين",
+  },
+  "rem.apps.provider": {
+    en: "Provider", es: "Proveedor", fr: "Fournisseur", de: "Anbieter", pt: "Fornecedor", it: "Fornitore", ja: "プロバイダー", zh: "提供方", hi: "प्रदाता", ar: "المزوّد",
+  },
+  "rem.apps.app": {
+    en: "App", es: "App", fr: "Appli", de: "App", pt: "App", it: "App", ja: "アプリ", zh: "应用", hi: "ऐप", ar: "التطبيق",
+  },
+  "rem.apps.pick": {
+    en: "Choose…", es: "Elegir…", fr: "Choisir…", de: "Auswählen…", pt: "Escolher…", it: "Scegli…", ja: "選択…", zh: "选择…", hi: "चुनें…", ar: "اختر…",
+  },
+  "rem.apps.connect": {
+    en: "Connect", es: "Conectar", fr: "Connecter", de: "Verbinden", pt: "Conectar", it: "Connetti", ja: "接続", zh: "连接", hi: "कनेक्ट", ar: "اتصال",
   },
   "rem.trip": {
     en: "Going out to look something up", es: "Salir a consultar algo", fr: "Sortir chercher quelque chose", de: "Hinausgehen, um etwas nachzuschlagen", pt: "Sair para consultar algo", it: "Uscire a cercare qualcosa", ja: "何かを調べに出かける", zh: "出门去查点东西", hi: "कुछ पता करने बाहर जाना", ar: "الخروج للبحث عن شيء",
@@ -7151,6 +7163,23 @@ const CHROME: Table = {
   },
   "rms.signinpick": {
     en: "Sign in and pick a profile first — the room opens with the two of you inside.", es: "Inicia sesión y elige un perfil primero — la sala se abre con los dos dentro.", fr: "Connectez-vous et choisissez d'abord un profil — la salle s'ouvre avec vous deux à l'intérieur.", de: "Melden Sie sich an und wählen Sie zuerst ein Profil — der Raum öffnet sich mit Ihnen beiden darin.", pt: "Inicie sessão e escolha primeiro um perfil — a sala abre com os dois lá dentro.", it: "Accedi e scegli prima un profilo — la stanza si apre con voi due dentro.", ja: "先にサインインしてプロフィールを選んでください — 部屋は、あなたたち二人が中にいる状態で開きます。", zh: "请先登录并选择一个档案——房间开启时，你们两个就在里面。", hi: "पहले साइन इन कीजिए और एक प्रोफ़ाइल चुनिए — कमरा आप दोनों के भीतर होते हुए खुलता है।", ar: "سجّل الدخول واختر ملفًا أولًا — فالغرفة تُفتح وأنتما الاثنان بداخلها.",
+  },
+  // The footsteps chip in the corner. The same two rows stand verbatim in
+  // the JIM-mini and PDI consoles — one wording, one translation.
+  "steps.count": {
+    en: "{n} footsteps here", es: "{n} pasos por aquí", fr: "{n} pas par ici", de: "{n} Fußspuren hier", pt: "{n} passos por aqui", it: "{n} passi qui", ja: "ここに{n}の足あと", zh: "这里有 {n} 个足迹", hi: "यहाँ {n} क़दमों के निशान", ar: "{n} أثر أقدام هنا",
+  },
+  "steps.tip": {
+    en: "How many people hold accounts here", es: "Cuántas personas tienen cuenta aquí", fr: "Combien de personnes ont un compte ici", de: "Wie viele Menschen hier ein Konto haben", pt: "Quantas pessoas têm conta aqui", it: "Quante persone hanno un account qui", ja: "ここにアカウントを持つ人の数", zh: "这里有多少人持有账户", hi: "यहाँ कितने लोगों के खाते हैं", ar: "كم شخصًا يملك حسابًا هنا",
+  },
+  "rms.standing": {
+    en: "Standing rooms", es: "Salas permanentes", fr: "Salles permanentes", de: "Ständige Räume", pt: "Salas permanentes", it: "Stanze permanenti", ja: "常設の部屋", zh: "常设房间", hi: "स्थायी कमरे", ar: "غرف دائمة",
+  },
+  "rms.standing.pitch": {
+    en: "Always here to open — press one and you are inside with your profile, and anyone else can join.", es: "Siempre listas para abrir — pulsa una y estás dentro con tu perfil, y cualquiera puede unirse.", fr: "Toujours là, prêtes à ouvrir — appuyez sur l'une d'elles et vous êtes à l'intérieur avec votre profil, et n'importe qui peut vous rejoindre.", de: "Immer da, bereit zum Öffnen — drücken Sie auf einen und Sie sind mit Ihrem Profil drinnen, und alle anderen können dazukommen.", pt: "Sempre aqui, prontas a abrir — carrega numa e estás lá dentro com o teu perfil, e qualquer pessoa pode juntar-se.", it: "Sempre qui, pronte da aprire — premine una e sei dentro con il tuo profilo, e chiunque può unirsi.", ja: "いつでも開ける部屋です — ひとつ押せば、あなたとプロフィールが中に入り、誰でも参加できます。", zh: "随时可以开启——按下一个，你和你的档案就在里面，任何人都能加入。", hi: "हमेशा खोलने को तैयार — एक दबाइए और आप अपनी प्रोफ़ाइल के साथ भीतर हैं, और कोई भी जुड़ सकता है।", ar: "جاهزة للفتح دائمًا — اضغط واحدة وستكون بداخلها مع ملفك، ويمكن لأي شخص الانضمام.",
+  },
+  "rms.standing.open": {
+    en: "Step inside", es: "Entrar", fr: "Entrer", de: "Eintreten", pt: "Entrar", it: "Entra", ja: "中に入る", zh: "走进去", hi: "भीतर आइए", ar: "ادخل",
   },
   "rms.livenow": {
     en: "Live now", es: "En directo ahora", fr: "En direct maintenant", de: "Jetzt live", pt: "Em direto agora", it: "Dal vivo adesso", ja: "いま開いているもの", zh: "此刻在线", hi: "अभी लाइव", ar: "مباشر الآن",

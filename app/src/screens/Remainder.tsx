@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, type AppConnector, type Excursion, type FeedbackBoard,
-         type GameSession, type PackDetail, type PackRegistry,
-         type SocialPublished, type SteeringHub } from "../api";
+import { api, type AppConnector, type ConnectorCatalogue, type Excursion,
+         type FeedbackBoard, type GameSession, type PackDetail,
+         type PackRegistry, type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
@@ -59,6 +59,11 @@ export function Remainder() {
 
   const [registries, setRegistries] = useState<PackRegistry[]>([]);
   const [apps, setApps] = useState<AppConnector[]>([]);
+  // The connect picker reads the whole catalog — forty apps across six
+  // providers — where this card used to offer exactly one hardcoded button.
+  const [connCatalog, setConnCatalog] = useState<ConnectorCatalogue | null>(null);
+  const [connProvider, setConnProvider] = useState("");
+  const [connApp, setConnApp] = useState("");
   const [trips, setTrips] = useState<Excursion[]>([]);
   const [hub, setHub] = useState<SteeringHub | null>(null);
   const [games, setGames] = useState<GameSession[]>([]);
@@ -102,6 +107,9 @@ export function Remainder() {
 
   useEffect(reload, [me, token]);
   useEffect(() => { go(() => api.mediaLimits(), setLimits); }, []);
+  useEffect(() => {
+    api.connectorCatalogue().then(setConnCatalog).catch(() => setConnCatalog(null));
+  }, []);
 
   /* Eleven bindings existed for eleven single reads, each fetching one thing
      by its id, and no screen called any of them. They are not eleven
@@ -226,12 +234,60 @@ export function Remainder() {
             {a.capabilities.join(", ")} · {a.status}
           </p>
         ))}
-        <button className="ghost" disabled={!me || !token} onClick={() => go(
-          () => api.connectApp(me, { provider: "google", app: "calendar" },
-                               token),
-          () => { setSaid("Connected."); reload(); })}>
-          {tr("rem.apps.gcal", lang)}
-        </button>
+        {/* This used to be one hardcoded Google Calendar button in front of
+            a forty-app catalog the backend had all along. The picker asks
+            the catalog instead of pretending its first entry is its only
+            one. */}
+        {connCatalog && (
+          <>
+            <p className="muted small">
+              {fill(tr("rem.apps.count", lang), {
+                apps: connCatalog.app_count,
+                providers: connCatalog.provider_count,
+              })}
+            </p>
+            <div className="row">
+              <label>{tr("rem.apps.provider", lang)}
+                <select value={connProvider} onChange={(e) => {
+                  setConnProvider(e.target.value); setConnApp("");
+                }}>
+                  <option value="">{tr("rem.apps.pick", lang)}</option>
+                  {connCatalog.providers.map((p) => (
+                    <option key={p.provider} value={p.provider}>{p.label}</option>
+                  ))}
+                </select>
+              </label>
+              <label>{tr("rem.apps.app", lang)}
+                <select value={connApp} disabled={!connProvider}
+                        onChange={(e) => setConnApp(e.target.value)}>
+                  <option value="">{tr("rem.apps.pick", lang)}</option>
+                  {connCatalog.providers
+                    .find((p) => p.provider === connProvider)
+                    ?.apps.map((a) => (
+                      <option key={a.app} value={a.app}>{a.label}</option>
+                    ))}
+                </select>
+              </label>
+              <button className="ghost" disabled={!me || !token || !connApp}
+                      onClick={() => go(
+                        () => api.connectApp(
+                          me, { provider: connProvider, app: connApp }, token),
+                        () => { setSaid("Connected."); setConnApp(""); reload(); })}>
+                {tr("rem.apps.connect", lang)}
+              </button>
+            </div>
+            {connProvider && connApp && (() => {
+              const entry = connCatalog.providers
+                .find((p) => p.provider === connProvider)
+                ?.apps.find((a) => a.app === connApp);
+              return entry ? (
+                <p className="muted small">
+                  {entry.directions.join(" and ")} · {entry.capabilities.join(", ")}
+                </p>
+              ) : null;
+            })()}
+          </>
+        )}
       </div>
 
       {/* --- excursions --------------------------------------------------- */}

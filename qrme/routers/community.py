@@ -43,6 +43,40 @@ _CHANNEL_NOTES = {
     "vr": "shared virtual-reality space; participants meet as avatars",
 }
 
+# Standing rooms. The field report behind them: a new user opened the Rooms
+# screen, found the list empty, and left — a screen whose whole pitch is
+# company greeted them with nobody. These are blueprints, not rooms: reference
+# data in the manner of the connector catalog, each one press away from being
+# a real room with the presser inside it. Opening one goes through the same
+# POST /rooms as typing the topic by hand, so a template grants nothing the
+# form does not.
+ROOM_TEMPLATES = [
+    {"key": "front-porch", "topic": "The Front Porch", "channel": "chat",
+     "pitch": "easy talk with whoever wanders past — no agenda, no ending"},
+    {"key": "coffee-counter", "topic": "Coffee Counter", "channel": "voice",
+     "pitch": "morning voices over whatever is in your cup"},
+    {"key": "show-and-tell", "topic": "Show & Tell", "channel": "video",
+     "pitch": "bring one thing you made, found, or fixed, and show it"},
+    {"key": "book-corner", "topic": "Book Corner", "channel": "chat",
+     "pitch": "what you are reading, one chapter at a time"},
+    {"key": "game-night", "topic": "Game Night", "channel": "voice",
+     "pitch": "party voice for whatever you are playing tonight"},
+    {"key": "family-table", "topic": "Family Table", "channel": "video",
+     "pitch": "the standing call a scattered family keeps"},
+    {"key": "quiet-study", "topic": "Quiet Study", "channel": "chat",
+     "pitch": "working alongside each other, mostly in silence"},
+    {"key": "town-hall", "topic": "Town Hall", "channel": "voice",
+     "pitch": "the open floor: raise anything, everyone hears it"},
+    {"key": "workbench", "topic": "The Workbench", "channel": "ar",
+     "pitch": "a shared bench anchored where you stand — hold up the work"},
+    {"key": "morning-walk", "topic": "Morning Walk", "channel": "ar",
+     "pitch": "company on your walk, anchored to the street you are on"},
+    {"key": "gallery-walk", "topic": "Gallery Walk", "channel": "vr",
+     "pitch": "wander a shared space hung with what the room brings"},
+    {"key": "vastscape", "topic": "The Vastscape", "channel": "vr",
+     "pitch": "watch together on the big screen, avatars in the scene"},
+]
+
 
 # --------------------------------------------------------------------------- #
 # rooms
@@ -252,6 +286,20 @@ def microphone_vocabulary() -> dict:
             "it ends when the room does",
         ],
     }
+
+
+@router.get("/rooms/templates")
+def room_templates() -> list[dict]:
+    """The standing rooms: blueprints a client shows when the live list is
+    empty (and above it when it is not), each openable with one press.
+
+    Open, because it describes the feature rather than anybody's room — the
+    person it exists for is by construction the person who has not joined
+    anything yet. The channel note rides along so the picker can say what
+    kind of place each one is without a second request.
+    """
+    return [{**t, "presence": _CHANNEL_NOTES[t["channel"]]}
+            for t in ROOM_TEMPLATES]
 
 
 @router.get("/rooms")

@@ -22,7 +22,7 @@ from fastapi.responses import JSONResponse
 
 from . import pagehead
 from . import avatars as avatar_assets
-from . import i18n, llm, mobile, offline, tiers
+from . import db, i18n, llm, mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
@@ -86,12 +86,23 @@ def create_app(pdi_client: PDIClient | None = None,
         # signup screen can ask for one instead of collecting a form that
         # ends in a 403 the person cannot answer. The key itself never
         # appears anywhere — only the fact that one is required.
+        # The footsteps: how many people hold accounts here. An aggregate,
+        # not a roster — no name, email or id rides with the number. Only
+        # verified accounts count, because an unverified row is a mistyped
+        # address as often as a person. It lives on /health rather than a
+        # route of its own because every client already reads /health at
+        # launch for the version check, so the count arrives through a
+        # door that already exists.
+        footsteps = db.connect().execute(
+            "SELECT COUNT(*) FROM accounts"
+            " WHERE verified_at IS NOT NULL").fetchone()[0]
         return {"status": "ok", "version": app.version,
                 "pdi": app.state.pdi is not None,
                 "cloud": app.state.cloud is not None,
                 "offline": offline.enabled(),
                 "console": mobile.console_dir() is not None,
-                "signup_key": bool(os.environ.get("QRME_SIGNUP_KEY"))}
+                "signup_key": bool(os.environ.get("QRME_SIGNUP_KEY")),
+                "footsteps": footsteps}
 
     # -- run it from your phone ---------------------------------------------
 

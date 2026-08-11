@@ -57,6 +57,7 @@ import { Settings } from "./screens/Settings";
 import { Access } from "./screens/Access";
 import { Help } from "./Help";
 import { ProblemNotice } from "./ProblemNotice";
+import { Footsteps } from "./Footsteps";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
@@ -163,6 +164,7 @@ export function App() {
     return (
       <>
         <VersionGuard />
+        <Footsteps />
         {door
           ? <Public start={door} onBack={() => {
               setPublicDoor(null);
@@ -176,6 +178,7 @@ export function App() {
   return (
     <div className="app">
       <VersionGuard />
+      <Footsteps />
       <aside className="sidebar">
         <div className="brand">
           <span className="orb" />

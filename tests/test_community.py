@@ -79,6 +79,39 @@ def test_room_channels_video_ar_vr(client):
         assert hint in room["presence"]
 
 
+def test_the_standing_rooms_are_one_press_from_real(client):
+    """The templates route answers openly, and each blueprint opens.
+
+    The field report behind it: a new user opened the Rooms screen, found the
+    live list empty, and left. The person the templates exist for is by
+    construction the person who has not joined anything yet — so the list
+    must answer without a token, and opening one must go through the same
+    door as typing the topic by hand.
+    """
+    from qrme.routers.community import _CHANNEL_NOTES, ROOM_TEMPLATES
+
+    listed = client.get("/rooms/templates").json()
+    assert len(listed) == len(ROOM_TEMPLATES)
+    for entry in listed:
+        assert entry["channel"] in _CHANNEL_NOTES
+        # The channel note rides along so the picker can say what kind of
+        # place each one is without a second request.
+        assert entry["presence"] == _CHANNEL_NOTES[entry["channel"]]
+        assert entry["topic"] and entry["pitch"]
+
+    user = make_interactor(client, "Newcomer", "1990-01-01")
+    dana = make_profile(client)
+    chosen = listed[0]
+    room = client.post("/rooms", json={
+        "topic": chosen["topic"], "channel": chosen["channel"],
+        "participants": [{"kind": "user", "id": user},
+                         {"kind": "profile", "id": dana["id"]}]})
+    assert room.status_code == 201
+    assert room.json()["topic"] == chosen["topic"]
+    live = client.get("/rooms").json()
+    assert chosen["topic"] in {r["topic"] for r in live}
+
+
 def test_room_with_minor_runs_strict(client):
     minor = make_interactor(client, "Teen", "2012-06-01")
     dana = make_profile(client)

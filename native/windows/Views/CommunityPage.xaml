@@ -100,6 +100,13 @@
                             <Button x:Name="OpenRoomButton" Click="OnOpenRoom"
                                     HorizontalAlignment="Stretch"
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                            <!-- The standing rooms: tapping one fills the topic,
+                                 so the empty screen a newcomer meets still
+                                 offers somewhere to go. -->
+                            <TextBlock x:Name="StandingHead" FontWeight="Bold" FontSize="12"
+                                       Visibility="Collapsed"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <StackPanel x:Name="TemplatesPanel" Spacing="2" />
                         </StackPanel>
                     </Border>
                     <Border x:Name="RoomCard" Background="{StaticResource QrmeCardBrush}"

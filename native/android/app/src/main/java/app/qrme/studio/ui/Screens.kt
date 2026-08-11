@@ -1898,11 +1898,20 @@ private fun StrangerPanel(vm: StudioViewModel) {
 @Composable
 private fun RoomsPanel(vm: StudioViewModel) {
     var topic by remember { mutableStateOf("") }
+    var templates by remember {
+        mutableStateOf<List<Triple<String, String, String>>>(emptyList())
+    }
     var room by remember { mutableStateOf<RoomCreated?>(null) }
     var transcript by remember { mutableStateOf<List<RoomMsg>>(emptyList()) }
     var draft by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        vm.call({ ApiClient.roomTemplates() }) { r ->
+            r.onSuccess { templates = it }
+        }
+    }
 
     fun reload(roomId: String) {
         val tok = vm.interactorToken ?: return
@@ -1926,6 +1935,18 @@ private fun RoomsPanel(vm: StudioViewModel) {
                             busy = false
                             r.onSuccess { room = it; topic = ""; transcript = emptyList() }
                                 .onFailure { error = it.message }
+                        }
+                    }
+                }
+                // The standing rooms: tapping one fills the topic, so the
+                // empty screen a newcomer meets still offers somewhere to go.
+                if (templates.isNotEmpty()) {
+                    Text(L10n.t("nc.room.standing", vm.language), color = Qrme.T2,
+                        fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    templates.forEach { (tTopic, tChannel, _) ->
+                        TextButton(onClick = { topic = tTopic }) {
+                            Text("$tTopic · $tChannel", color = Qrme.BrandA,
+                                fontSize = 11.sp)
                         }
                     }
                 }
