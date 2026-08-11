@@ -27,6 +27,7 @@ export function Wall({ onPlans }: {
   const [videoUrl, setVideoUrl] = useState("");
   const [videoTitle, setVideoTitle] = useState("");
   const [uploads, setUploads] = useState<MediaUpload[]>([]);
+  const [mediaAlt, setMediaAlt] = useState("");
   const [uploading, setUploading] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null);   // post id
   const [liked, setLiked] = useState<Set<string>>(new Set());
@@ -79,9 +80,11 @@ export function Wall({ onPlans }: {
     setUploading(true); setError(null);
     try {
       for (const file of Array.from(files)) {
-        const up = await api.uploadMedia(session.profileId, file, session.ownerToken);
+        const up = await api.uploadMedia(session.profileId, file,
+                                         session.ownerToken, mediaAlt.trim());
         setUploads((cur) => [...cur, up]);
       }
+      setMediaAlt("");
     } catch (e) { setError(e); }
     finally { setUploading(false); }
   }
@@ -165,7 +168,7 @@ export function Wall({ onPlans }: {
       {(p.media || []).length > 0 && (
         <div className="wp-media">
           {(p.media || []).map((m) => m.kind === "image"
-            ? <img key={m.id} src={getBase() + m.url} alt="" />
+            ? <img key={m.id} src={getBase() + m.url} alt={m.alt || ""} />
             : m.kind === "video"
               ? <video key={m.id} src={getBase() + m.url} controls />
               : <a key={m.id} className="wp-file" href={getBase() + m.url}
@@ -255,6 +258,10 @@ export function Wall({ onPlans }: {
                    onChange={(e) => setVideoTitle(e.target.value)} />
           </label>
         </div>
+        <label>{tr("wll.alt", lang)}
+          <input value={mediaAlt} placeholder={tr("wll.alt.ph", lang)}
+                 onChange={(e) => setMediaAlt(e.target.value)} />
+        </label>
         <label>{tr("wll.attach", lang)}
           <input type="file" multiple
                  accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt,.csv,.md"
@@ -263,7 +270,7 @@ export function Wall({ onPlans }: {
         {uploads.length > 0 && (
           <div className="wp-uploads">
             {uploads.map((u) => u.kind === "image"
-              ? <img key={u.id} src={getBase() + u.url} alt="" />
+              ? <img key={u.id} src={getBase() + u.url} alt={u.alt || ""} />
               : u.kind === "video"
                 ? <video key={u.id} src={getBase() + u.url} />
                 : <span key={u.id} className="wp-file">

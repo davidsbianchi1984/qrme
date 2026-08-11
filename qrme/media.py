@@ -121,7 +121,8 @@ def _sniff(data: bytes, name: str | None = None) -> tuple[str, str]:
     return "file", ext if ext in _TEXT_EXTS else ".txt"
 
 
-def save(profile_id: str, data: bytes, name: str | None = None) -> dict:
+def save(profile_id: str, data: bytes, name: str | None = None,
+         alt: str | None = None) -> dict:
     """Store one upload for this profile and return its serving facts."""
     if not data:
         raise MediaError(422, "the upload arrived empty")
@@ -138,15 +139,21 @@ def save(profile_id: str, data: bytes, name: str | None = None) -> dict:
     # The display name is the uploader's own, kept for the card and nothing
     # else — the file on disk is named by its id and whitelisted extension.
     display = (name or "").strip()[:120] or None
+    description = (alt or "").strip()[:300] or None
     conn = db.connect()
     conn.execute(
         "INSERT INTO media (id, profile_id, kind, filename, name, bytes,"
         " created_at) VALUES (?,?,?,?,?,?,?)",
         (media_id, profile_id, kind, filename, display, len(data),
          db.utcnow()))
+    if description:
+        conn.execute(
+            "INSERT INTO media_alt (media_id, alt, created_at)"
+            " VALUES (?,?,?)", (media_id, description, db.utcnow()))
     conn.commit()
     return {"id": media_id, "kind": kind, "url": f"{ROUTE}/{filename}",
-            "name": display, "bytes": len(data), "ai_marked": False}
+            "name": display, "bytes": len(data), "alt": description,
+            "ai_marked": False}
 
 
 def check_owned(profile_id: str, media_ids: list[str]) -> None:
@@ -166,8 +173,10 @@ def attach(post_id: str, profile_id: str, media_ids: list[str]) -> list[dict]:
     conn = db.connect()
     out = []
     for media_id in media_ids:
-        row = conn.execute("SELECT * FROM media WHERE id=?",
-                           (media_id,)).fetchone()
+        row = conn.execute(
+            "SELECT m.*, a.alt AS alt FROM media m"
+            " LEFT JOIN media_alt a ON a.media_id = m.id WHERE m.id=?",
+            (media_id,)).fetchone()
         if row is None or row["profile_id"] != profile_id:
             raise MediaError(422, f"no upload {media_id!r} on this profile")
         conn.execute(
@@ -181,7 +190,9 @@ def attach(post_id: str, profile_id: str, media_ids: list[str]) -> list[dict]:
 def row_facade(row) -> dict:
     return {"id": row["id"], "kind": row["kind"],
             "url": f"{ROUTE}/{row['filename']}",
-            "name": row["name"], "ai_marked": False}
+            "name": row["name"],
+            "alt": row["alt"] if "alt" in row.keys() else None,
+            "ai_marked": False}
 
 
 def for_posts(post_ids: list[str]) -> dict[str, list[dict]]:
@@ -190,8 +201,9 @@ def for_posts(post_ids: list[str]) -> dict[str, list[dict]]:
         return {}
     marks = ",".join("?" * len(post_ids))
     rows = db.connect().execute(
-        f"SELECT pm.post_id, m.* FROM post_media pm"
+        f"SELECT pm.post_id, m.*, a.alt AS alt FROM post_media pm"
         f" JOIN media m ON m.id = pm.media_id"
+        f" LEFT JOIN media_alt a ON a.media_id = m.id"
         f" WHERE pm.post_id IN ({marks}) ORDER BY pm.rowid", post_ids
     ).fetchall()
     out: dict[str, list[dict]] = {}

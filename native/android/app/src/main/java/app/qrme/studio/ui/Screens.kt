@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -1196,6 +1197,16 @@ private fun AccessPanel(vm: StudioViewModel) {
         Text(L10n.t("ns.acc", vm.language), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
         Text(L10n.t("ns.acc.lead", vm.language), color = Qrme.T2, fontSize = 12.sp)
+        // The per-need statement the console makes, not just its form.
+        Text(L10n.t("ns.acc.needs.title", vm.language), color = Qrme.Txt,
+            fontSize = 13.sp, fontWeight = FontWeight.Bold)
+        listOf("blind", "deaf", "mute", "motor", "cognitive",
+            "dyslexia", "motion").forEach { need ->
+            Text("• " + L10n.t("ns.acc.needs.$need", vm.language),
+                color = Qrme.T2, fontSize = 12.sp)
+        }
+        Text(L10n.t("ns.acc.needs.more", vm.language), color = Qrme.T2,
+            fontSize = 12.sp, fontStyle = FontStyle.Italic)
         OutlinedTextField(value = doing, onValueChange = { doing = it },
             label = { Text(L10n.t("ns.acc.doing.ph", vm.language)) },
             modifier = Modifier.fillMaxWidth())

@@ -6603,6 +6603,12 @@ const CHROME: Table = {
   "wll.attach": {
     en: "Attach your own photos, videos or files", es: "Adjunta tus propias fotos, vídeos o archivos", fr: "Joignez vos propres photos, vidéos ou fichiers", de: "Eigene Fotos, Videos oder Dateien anhängen", pt: "Anexe as suas próprias fotos, vídeos ou ficheiros", it: "Allega tue foto, video o file", ja: "自分の写真・動画・ファイルを添付", zh: "附上你自己的照片、视频或文件", hi: "अपनी तस्वीरें, वीडियो या फ़ाइलें जोड़ें", ar: "أرفق صورك أو مقاطعك أو ملفاتك",
   },
+  "wll.alt": {
+    en: "Describe what it shows", es: "Describe lo que muestra", fr: "Décrivez ce que cela montre", de: "Beschreibe, was zu sehen ist", pt: "Descreva o que mostra", it: "Descrivi cosa mostra", ja: "何が写っているか説明", zh: "描述它显示的内容", hi: "बताएँ कि इसमें क्या दिख रहा है", ar: "صف ما تُظهره",
+  },
+  "wll.alt.ph": {
+    en: "For people who can't see it — read aloud by screen readers", es: "Para quien no puede verlo — lo leen en voz alta los lectores de pantalla", fr: "Pour celles et ceux qui ne peuvent pas le voir — lu à voix haute par les lecteurs d'écran", de: "Für Menschen, die es nicht sehen können — von Screenreadern vorgelesen", pt: "Para quem não consegue ver — lido em voz alta pelos leitores de ecrã", it: "Per chi non può vederlo — letto ad alta voce dagli screen reader", ja: "見えない人のために — スクリーンリーダーが読み上げます", zh: "为看不到的人准备——屏幕阅读器会朗读", hi: "जो इसे देख नहीं सकते उनके लिए — स्क्रीन रीडर इसे पढ़कर सुनाता है", ar: "لمن لا يستطيع رؤيته — تقرؤه قارئات الشاشة بصوت مسموع",
+  },
   "wll.clear": {
     en: "clear", es: "quitar", fr: "effacer", de: "leeren", pt: "limpar", it: "svuota", ja: "消す", zh: "清除", hi: "हटाएँ", ar: "امسح",
   },

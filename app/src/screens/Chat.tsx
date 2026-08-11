@@ -105,7 +105,9 @@ export function Chat({ onPlans }: {
         <span className="muted small">{tr("chat.pitch", lang)}</span>
       </header>
 
-      <div className="messages" ref={listRef}>
+      {/* role=log + aria-live: a screen reader is told when the reply
+          arrives, instead of the conversation advancing silently. */}
+      <div className="messages" role="log" aria-live="polite" ref={listRef}>
         {msgs.length === 0 && (
           <div className="muted center">
             {fill(tr("chat.sayhello", lang),

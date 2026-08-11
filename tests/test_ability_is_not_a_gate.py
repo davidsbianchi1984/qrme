@@ -69,9 +69,9 @@ def test_every_console_image_says_what_it_shows():
     """No ``<img>`` without an ``alt`` — the statement claims described
     images, so an undescribed one is a failing test, not a style nit.
 
-    ``alt=""`` passes: an explicitly empty description is a decision (and
-    the wall's empty ones are a recorded backlog row); a missing attribute
-    is the absence of one.
+    ``alt=""`` passes: an explicitly empty description is a decision — the
+    wall's upload form asks for one, so an empty alt is an uploader who
+    chose to leave it blank; a missing attribute is the absence of one.
     """
     naked = []
     for path in CONSOLE.rglob("*.tsx"):
@@ -104,3 +104,80 @@ def test_the_a11y_backlog_only_shrinks():
         "added without raising the ceiling in the same deliberate edit")
     for row in rows:
         assert ": " in row, f"a backlog row names no surface: {row!r}"
+
+
+def test_the_wall_upload_asks_and_the_picture_answers(client):
+    """A struck backlog row, held shut: the upload form asks what the file
+    shows, the words ride to the server, and every read of that media —
+    the upload receipt, the post, the feed hydration — carries them back
+    as the image's alt."""
+    from tests.test_capabilities import auth_header, make_profile
+    png = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
+
+    me = make_profile(client, display_name="Describer")
+    up = client.post(
+        f"/profiles/{me['id']}/media?alt=my%20dog%20asleep%20on%20the%20porch",
+        content=png, headers=auth_header(me))
+    assert up.status_code == 201, up.text
+    picture = up.json()
+    assert picture["alt"] == "my dog asleep on the porch"
+
+    r = client.post(f"/profiles/{me['id']}/wall",
+                    json={"body": "Sunday.", "media_ids": [picture["id"]]},
+                    headers=auth_header(me))
+    assert r.status_code == 201, r.text
+    assert r.json()["media"][0]["alt"] == "my dog asleep on the porch"
+    posts = client.get(f"/profiles/{me['id']}/wall").json()["posts"]
+    assert posts[0]["media"][0]["alt"] == "my dog asleep on the porch"
+
+    # And the console form actually asks — the question is wired into the
+    # composer, not only accepted by the route.
+    wall_src = (CONSOLE / "screens" / "Wall.tsx").read_text(encoding="utf-8")
+    assert 'tr("wll.alt"' in wall_src and "mediaAlt" in wall_src, (
+        "the wall composer no longer asks what an upload shows")
+
+
+def test_the_chat_tells_the_screen_reader():
+    """A struck backlog row, held shut: the conversation log is an
+    aria-live region, so a screen reader hears the reply arrive instead
+    of sitting in silence wondering whether anything happened."""
+    chat_src = (CONSOLE / "screens" / "Chat.tsx").read_text(encoding="utf-8")
+    assert 'aria-live=' in chat_src and 'role="log"' in chat_src, (
+        "Chat.tsx lost its aria-live log region")
+
+
+def test_the_shells_carry_the_statement():
+    """A struck backlog row, held shut: the phones and the desktop carry
+    the same per-need statement the console makes — every named need, in
+    every supported language — not just the report form under a lead."""
+    needs = ["title", "blind", "deaf", "mute", "motor", "cognitive",
+             "dyslexia", "motion", "more"]
+    langs = ["en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar"]
+    l10n_files = [
+        REPO / "native" / "ios" / "Sources" / "L10n.swift",
+        REPO / "native" / "android" / "app" / "src" / "main" / "java"
+             / "app" / "qrme" / "studio" / "L10n.kt",
+        REPO / "native" / "windows" / "L10n.cs",
+    ]
+    for path in l10n_files:
+        src = path.read_text(encoding="utf-8")
+        for need in needs:
+            key_line = next((line for line in src.splitlines()
+                             if f"ns.acc.needs.{need}" in line), None)
+            assert key_line, f"{path.name} lacks ns.acc.needs.{need}"
+            for lang in langs:
+                assert f'"{lang}"' in key_line, (
+                    f"{path.name} ns.acc.needs.{need} lacks {lang}")
+    views = [
+        REPO / "native" / "ios" / "Sources" / "Views" / "AccessView.swift",
+        REPO / "native" / "android" / "app" / "src" / "main" / "java"
+             / "app" / "qrme" / "studio" / "ui" / "Screens.kt",
+        REPO / "native" / "windows" / "Views" / "SettingsPage.xaml.cs",
+    ]
+    for path in views:
+        src = path.read_text(encoding="utf-8")
+        assert "ns.acc.needs.title" in src and "ns.acc.needs.more" in src, (
+            f"{path.name} shows the form without the statement")
+        for need in ["blind", "deaf", "mute", "motor", "cognitive",
+                     "dyslexia", "motion"]:
+            assert need in src, f"{path.name} dropped the need {need!r}"

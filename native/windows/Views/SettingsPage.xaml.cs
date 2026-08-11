@@ -152,6 +152,12 @@ public sealed partial class SettingsPage : Page
 
         AccHead.Text = L10n.T("ns.acc", lang);
         AccLead.Text = L10n.T("ns.acc.lead", lang);
+        AccNeedsTitle.Text = L10n.T("ns.acc.needs.title", lang);
+        AccNeedsList.Text = string.Join("\n", new[]
+        {
+            "blind", "deaf", "mute", "motor", "cognitive", "dyslexia", "motion",
+        }.Select(need => "• " + L10n.T($"ns.acc.needs.{need}", lang)));
+        AccNeedsMore.Text = L10n.T("ns.acc.needs.more", lang);
         AccDoing.PlaceholderText = L10n.T("ns.acc.doing.ph", lang);
         AccWall.PlaceholderText = L10n.T("ns.acc.wall.ph", lang);
         AccHelp.PlaceholderText = L10n.T("ns.acc.help.ph", lang);

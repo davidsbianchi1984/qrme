@@ -678,6 +678,8 @@ export type MessageRevision = Record<string, unknown>;
 export type UploadedMedia = {
   id: string; kind: string; url: string;
   name: string | null;
+  /** What the upload shows, in the uploader's words — the image's alt. */
+  alt?: string | null;
   bytes: number;
   /** False for a photograph somebody took. Authentic media is never
    *  AI-marked, which is the whole point of the mark meaning something. */
@@ -1121,7 +1123,7 @@ export interface VideoFacade {
 }
 export interface MediaUpload {
   id: string; kind: "image" | "video" | "file"; url: string;
-  name?: string | null; ai_marked: false;
+  name?: string | null; alt?: string | null; ai_marked: false;
 }
 export interface WallPost {
   id: string; profile_id: string; display_name?: string;
@@ -3098,11 +3100,14 @@ export const api = {
                 token: string) =>
     req<WallPost>(`/profiles/${profileId}/wall`,
       { method: "POST", body, token }),
-  uploadMedia: async (profileId: string, file: File, token: string) => {
+  uploadMedia: async (profileId: string, file: File, token: string,
+                      alt = "") => {
     // Raw bytes, not multipart — the backend reads the kind from the bytes;
-    // the filename is a display hint only.
+    // the filename is a display hint only. `alt` is the uploader's own words
+    // for what the file shows, served to people who cannot see it.
     const res = await fetch(getBase() +
-      `/profiles/${profileId}/media?filename=${encodeURIComponent(file.name)}`, {
+      `/profiles/${profileId}/media?filename=${encodeURIComponent(file.name)}` +
+      (alt ? `&alt=${encodeURIComponent(alt)}` : ""), {
       method: "POST", body: file,
       headers: { authorization: `Bearer ${token}` },
     });
@@ -5264,8 +5269,12 @@ export function ceremonyOrigin(base: string = getBase()): string {
  *  never chooses the kind, so it rides as a query parameter. Written by hand
  *  rather than through `req()` because `req()` serialises JSON. */
 export async function uploadMedia(profileId: string, file: File,
-                                  token: string): Promise<UploadedMedia> {
-  const q = file.name ? `?filename=${encodeURIComponent(file.name)}` : "";
+                                  token: string,
+                                  alt = ""): Promise<UploadedMedia> {
+  const parts = [];
+  if (file.name) parts.push(`filename=${encodeURIComponent(file.name)}`);
+  if (alt) parts.push(`alt=${encodeURIComponent(alt)}`);
+  const q = parts.length ? `?${parts.join("&")}` : "";
   const res = await fetch(`${getBase()}/profiles/${profileId}/media${q}`, {
     method: "POST",
     headers: { "content-type": "application/octet-stream",

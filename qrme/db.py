@@ -1268,6 +1268,15 @@ CREATE TABLE IF NOT EXISTS post_media (
     PRIMARY KEY (post_id, media_id)
 );
 
+-- What the upload shows, in the uploader's words, for people who cannot see
+-- it — served as the image's alt text. A side table rather than a column on
+-- `media` because that table shipped and this schema has no migrations.
+CREATE TABLE IF NOT EXISTS media_alt (
+    media_id   TEXT PRIMARY KEY REFERENCES media(id),
+    alt        TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
 -- Edits to a message already sent. One row per revision, so the trail is the
 -- history rather than only the latest text.
 --
