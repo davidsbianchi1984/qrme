@@ -21,6 +21,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import urllib.parse
 
 from fastapi import APIRouter, HTTPException, Request, Response
 
@@ -55,6 +56,41 @@ _PLATFORM_URL = {
     "pinterest": "https://pinterest.com/{h}",
     "discord": "https://discord.com/users/{h}",
 }
+
+# The pasted link, read for what it already says. A person holds a URL far
+# more often than a bare handle; the host names the platform and the path
+# names the account, so the form must not ask anybody to transcribe either.
+_HOST_PLATFORM = {
+    "instagram.com": "instagram", "x.com": "x", "twitter.com": "x",
+    "tiktok.com": "tiktok", "facebook.com": "facebook",
+    "linkedin.com": "linkedin", "youtube.com": "youtube",
+    "reddit.com": "reddit", "threads.net": "threads", "wa.me": "whatsapp",
+    "meta.com": "meta", "mastodon.social": "mastodon", "twitch.tv": "twitch",
+    "snapchat.com": "snapchat", "roblox.com": "roblox",
+    "pinterest.com": "pinterest", "discord.com": "discord",
+}
+
+#: Path segments platforms put before the account name (linkedin.com/in/…,
+#: reddit.com/user/…, discord.com/users/…, snapchat.com/add/…).
+_LINK_PREFIXES = {"in", "user", "users", "add"}
+
+
+def _from_link(url: str) -> tuple[str, str]:
+    """(platform, handle) read out of a pasted profile link."""
+    parts = urllib.parse.urlsplit(url)
+    host = (parts.hostname or "").lower().removeprefix("www.")
+    platform = _HOST_PLATFORM.get(host)
+    if platform is None:
+        raise HTTPException(
+            422, "that link's site is not a platform this deployment "
+                 "recognises — pick the platform and type the handle instead")
+    segments = [s for s in parts.path.split("/")
+                if s and s.lower() not in _LINK_PREFIXES]
+    if not segments:
+        raise HTTPException(
+            400, "that link has no account in it — paste the profile's own "
+                 "page, not the platform's front door")
+    return platform, segments[0]
 
 
 def _public_base() -> str:
@@ -98,19 +134,25 @@ def connect_platform(profile_id: str, body: SocialConnect, request: Request) -> 
     require_owner(profile_id, request)
     conn = db.connect()
     cid = db.new_id("soc")
-    handle = (body.handle or "").lstrip("@") or None
+    handle = (body.handle or "").strip()
+    platform = body.platform
+    if handle.startswith(("http://", "https://")):
+        # A pasted link names its own platform and account; what it says
+        # wins over the dropdown, because the link is the thing imported.
+        platform, handle = _from_link(handle)
+    handle = handle.lstrip("@") or None
     conn.execute(
         "INSERT INTO social_connections (id, profile_id, platform, direction,"
         " handle, scope, status, collected, published, created_at)"
         " VALUES (?,?,?,?,?,?, 'active', 0, 0, ?)",
-        (cid, profile_id, body.platform, body.direction, handle,
+        (cid, profile_id, platform, body.direction, handle,
          json.dumps(body.scope), db.utcnow()),
     )
     if body.direction == "publish":
         conn.execute(
             "INSERT OR IGNORE INTO surfaces (profile_id, surface, created_at)"
             " VALUES (?,?,?)",
-            (profile_id, f"social:{body.platform}", db.utcnow()),
+            (profile_id, f"social:{platform}", db.utcnow()),
         )
     conn.commit()
     return _out(_conn_or_404(cid))

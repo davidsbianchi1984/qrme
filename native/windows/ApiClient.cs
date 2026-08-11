@@ -1882,6 +1882,13 @@ public sealed class ApiClient
         Send<MemoryTurn[]>(Get(
             $"/profiles/{profileId}/memory/{interactorId}", token));
 
+    // The distilled long memory of one person — what survived the window.
+    public Task<RemembranceOut> Remembrance(string profileId,
+        string interactorId, string token) =>
+        Send<RemembranceOut>(Get(
+            $"/profiles/{profileId}/memory/{interactorId}/remembrance",
+            token));
+
     public Task<MemoryTurn> EraseMemory(string profileId,
         string interactorId, string token)
     {
@@ -4173,6 +4180,10 @@ public record MemoryRow(
     [property: JsonPropertyName("interactor_id")] string InteractorId,
     [property: JsonPropertyName("interactor_name")] string? InteractorName,
     [property: JsonPropertyName("turns")] int Turns);
+
+public record RemembranceOut(
+    [property: JsonPropertyName("content")] string? Content,
+    [property: JsonPropertyName("covers")] int Covers);
 
 public record MemoryTurn(
     [property: JsonPropertyName("id")] string? Id,

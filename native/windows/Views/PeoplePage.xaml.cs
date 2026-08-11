@@ -1715,11 +1715,17 @@ public sealed partial class PeoplePage : Page
     private async void OnMemShow(object sender, RoutedEventArgs e) =>
         await Try(async () =>
         {
+            // The remembrance leads: what the profile still carries of this
+            // person past the recent window, then the last turns.
+            var kept = await ApiClient.Shared.Remembrance(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                AppState.Current.Token!);
             var turns = await ApiClient.Shared.Memory(
                 AppState.Current.Pid!, MemIdBox.Text.Trim(),
                 AppState.Current.Token!);
-            StatusText.Text = string.Join(" \u00b7 ",
-                turns.TakeLast(3).Select(t => t.Content));
+            var parts = turns.TakeLast(3).Select(t => t.Content).ToList();
+            if (kept.Content is not null) parts.Insert(0, kept.Content);
+            StatusText.Text = string.Join(" \u00b7 ", parts);
         });
 
     private async void OnMemErase(object sender, RoutedEventArgs e) =>

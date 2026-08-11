@@ -1016,6 +1016,28 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'that link\'s site is not a platform this deployment recognises — pick the platform and type the handle instead': {
+        'es': 'el sitio de ese enlace no es una plataforma que este despliegue reconozca: elige la plataforma y escribe el identificador en su lugar.',
+        'fr': "le site de ce lien n'est pas une plateforme reconnue par ce déploiement — choisissez la plateforme et saisissez l'identifiant à la place.",
+        'de': 'die Website dieses Links ist keine Plattform, die diese Installation kennt — wähle die Plattform und gib stattdessen den Handle ein.',
+        'pt': 'o site desse link não é uma plataforma que esta instalação reconheça — escolha a plataforma e escreva o identificador em vez disso.',
+        'it': 'il sito di quel link non è una piattaforma riconosciuta da questa installazione — scegli la piattaforma e digita l\'handle al suo posto.',
+        'ja': 'そのリンクのサイトは、この環境が認識するプラットフォームではありません。代わりにプラットフォームを選んでハンドルを入力してください。',
+        'zh': '该链接的网站不是此部署可识别的平台——请改为选择平台并输入账号名。',
+        'hi': 'उस लिंक की साइट ऐसी प्लेटफ़ॉर्म नहीं है जिसे यह परिनियोजन पहचानता हो — इसके बजाय प्लेटफ़ॉर्म चुनें और हैंडल लिखें।',
+        'ar': 'موقع هذا الرابط ليس منصة يتعرف عليها هذا النشر — اختر المنصة واكتب المعرّف بدلًا من ذلك.',
+    },
+    'that link has no account in it — paste the profile\'s own page, not the platform\'s front door': {
+        'es': 'ese enlace no contiene ninguna cuenta: pega la página propia del perfil, no la portada de la plataforma.',
+        'fr': "ce lien ne contient aucun compte — collez la page du profil lui-même, pas la porte d'entrée de la plateforme.",
+        'de': 'dieser Link enthält kein Konto — füge die eigene Seite des Profils ein, nicht die Startseite der Plattform.',
+        'pt': 'esse link não contém nenhuma conta — cole a página do próprio perfil, não a porta de entrada da plataforma.',
+        'it': 'quel link non contiene alcun account — incolla la pagina del profilo stesso, non l\'ingresso della piattaforma.',
+        'ja': 'そのリンクにはアカウントが含まれていません。プラットフォームの入口ではなく、プロフィール自身のページを貼り付けてください。',
+        'zh': '该链接里没有账号——请粘贴档案自己的页面，而不是平台的首页。',
+        'hi': 'उस लिंक में कोई खाता नहीं है — प्लेटफ़ॉर्म का मुख्य द्वार नहीं, प्रोफ़ाइल का अपना पेज चिपकाएँ।',
+        'ar': 'هذا الرابط لا يحتوي على حساب — الصق صفحة الملف نفسه، لا الباب الأمامي للمنصة.',
+    },
     'this deployment is offline — nothing leaves this machine, so the page cannot be fetched. Paste the content into collect instead.': {
         'es': 'este despliegue está sin conexión: nada sale de esta máquina, así que la página no puede traerse. Pega el contenido en recopilar en su lugar.',
         'fr': "ce déploiement est hors ligne — rien ne quitte cette machine, la page ne peut donc pas être récupérée. Collez plutôt le contenu dans la collecte.",

@@ -1509,6 +1509,18 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at    TEXT NOT NULL
 );
 
+-- The remembrance: what a profile still knows of one person past the
+-- recent-transcript window. One row per (profile, interactor), folded
+-- forward as turns age out; the DELETE that erases memory erases this too.
+CREATE TABLE IF NOT EXISTS remembrances (
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    content       TEXT NOT NULL,
+    covers        INTEGER NOT NULL, -- oldest approved turns folded in so far
+    updated_at    TEXT NOT NULL,
+    PRIMARY KEY (profile_id, interactor_id)
+);
+
 -- One row per person who has been offered the JIM-mini door, and what they
 -- answered. The row exists so the offer is never made twice: an offer somebody
 -- declined that reappears next month is the product overriding an answer it

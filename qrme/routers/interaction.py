@@ -4,12 +4,14 @@ engagement/feedback (with opt-in cloud contribution), memory, moderation."""
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (adaptation, auth, companion, db, engagement, i18n, llm,
-                moderation, persona, referral, roles, voiceprint, watermark)
+                moderation, offline, persona, referral, remembrance, roles,
+                scrape, voiceprint, watermark)
 from ..common import (require_may_publish, 
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -25,6 +27,48 @@ from ..models import (
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
+
+_URL_RE = re.compile(r"https?://[^\s<>()\"']+")
+
+#: What is carried of a handed page. One turn's grounding, not an archive.
+_PAGE_CAP = 2000
+
+
+def _handed_link_block(message: str) -> str | None:
+    """A prompt block for the first link in the person's message.
+
+    The profile either read the page — through the same offline-gated
+    fetcher every outbound path uses — or is told plainly that it did not,
+    so it never answers about a page it has not seen.
+    """
+    m = _URL_RE.search(message)
+    if not m:
+        return None
+    url = m.group(0)
+    if offline.enabled():
+        return (f"The person's message includes a link ({url}), but this "
+                "deployment is offline and you have not visited it. If asked "
+                "about its contents, say you could not open it; never guess "
+                "at what it says.")
+    try:
+        page = scrape.extract(scrape.fetch(url))
+    except Exception:
+        return (f"The person's message includes a link ({url}) that could "
+                "not be reached just now. If asked about its contents, say "
+                "you could not open it; never guess at what it says.")
+    parts = [f"The person handed you a link and you have just read the "
+             f"page:\nURL: {url}"]
+    if page.get("title"):
+        parts.append("Title: " + page["title"])
+    if page.get("description"):
+        parts.append("Description: " + page["description"])
+    if page.get("text"):
+        parts.append("What the page says (truncated): "
+                     + page["text"][:_PAGE_CAP])
+    parts.append("Draw on this honestly when you reply; do not invent "
+                 "details the page does not carry.")
+    return "\n".join(parts)
+
 
 router = APIRouter()
 
@@ -243,6 +287,22 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     system = persona.build_system_prompt(
         speaking_profile, relationship if handoff is None else None,
         engagement_state, sources=sources, clinical_notes=notes)
+    provider = llm.provider_for_profile(profile_id, cloud=cloud)
+    # The remembrance: turns older than the window, folded down and carried,
+    # so a friendship does not reset at message thirty-one. Distilled by the
+    # profile's own provider — the voice that speaks is the voice that
+    # remembers.
+    remembered = remembrance.refresh(
+        profile_id, body.interactor_id, MEMORY_WINDOW, provider)
+    if remembered:
+        system += ("\n\nWhat you remember from your earlier conversations "
+                   "with this person, before the recent transcript:\n"
+                   + remembered)
+    # The link handed mid-conversation: read it where this deployment may,
+    # and say so plainly where it may not.
+    page_block = _handed_link_block(body.message)
+    if page_block:
+        system += "\n\n" + page_block
     # Attention conditioning from the latent embedding (claims 21/22).
     attention = adaptation.attention_prompt(
         adaptation.get(profile_id, body.interactor_id))
@@ -269,8 +329,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += (f"\n\nHonesty about multiplicity: you also hold {others} "
                    "other ongoing relationship(s). If asked, acknowledge "
                    "this truthfully and kindly — never deny it.")
-    reply = llm.provider_for_profile(profile_id, cloud=cloud).generate(
-        system, llm_messages)
+    reply = provider.generate(system, llm_messages)
 
     verdict = moderation.review(reply, relationship, interactor,
                                 maturity=profile["maturity"])
@@ -603,6 +662,19 @@ def view_memory(profile_id: str, interactor_id: str,
     return [message_out(dict(row)) for row in rows]
 
 
+@router.get("/profiles/{profile_id}/memory/{interactor_id}/remembrance")
+def view_remembrance(profile_id: str, interactor_id: str,
+                     request: Request) -> dict:
+    """The distilled long memory — readable by the two people it is of."""
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    row = remembrance.get(profile_id, interactor_id)
+    if row is None:
+        return {"content": None, "covers": 0, "updated_at": None}
+    return {"content": row["content"], "covers": row["covers"],
+            "updated_at": row["updated_at"]}
+
+
 @router.delete("/profiles/{profile_id}/memory/{interactor_id}", status_code=204)
 def clear_memory(profile_id: str, interactor_id: str,
                  request: Request) -> None:
@@ -614,6 +686,8 @@ def clear_memory(profile_id: str, interactor_id: str,
     conn.execute("DELETE FROM engagement WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))
     conn.execute("DELETE FROM proactive_state WHERE profile_id=? AND interactor_id=?",
+                 (profile_id, interactor_id))
+    conn.execute("DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))
     conn.commit()
     clear_active_handoff(profile_id, interactor_id)

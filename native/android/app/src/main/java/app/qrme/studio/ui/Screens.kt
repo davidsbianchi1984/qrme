@@ -4426,10 +4426,17 @@ private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         labeledField(L10n.t("mem.id", lang), visitorId, "") { visitorId = it }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BrandButton(L10n.t("mem.show", lang), enabled = visitorId.isNotBlank()) {
-                vm.call({ ApiClient.memory(vm.pid!!, visitorId,
-                    vm.token!!) }) { r ->
-                    onNote(r.getOrNull()?.takeLast(3)?.joinToString(" \u00b7 ")
-                        ?: r.exceptionOrNull()?.message) }
+                // The remembrance leads: what the profile still carries of
+                // this person past the recent window, then the last turns.
+                vm.call({
+                    val kept = runCatching {
+                        ApiClient.remembrance(vm.pid!!, visitorId, vm.token!!)
+                    }.getOrNull()
+                    val recent = ApiClient.memory(vm.pid!!, visitorId,
+                        vm.token!!).takeLast(3)
+                    (listOfNotNull(kept) + recent).joinToString(" \u00b7 ")
+                }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
             }
             BrandButton(L10n.t("mem.erase", lang), enabled = visitorId.isNotBlank()) {
                 vm.call({ ApiClient.eraseMemory(vm.pid!!, visitorId,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type MemoryEntry } from "../api";
+import { api, type MemoryEntry, type Remembrance } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -17,6 +17,7 @@ export function Memory({ onPlans }: {
   const [convos, setConvos] = useState<Awaited<ReturnType<typeof api.memories>>>([]);
   const [open, setOpen] = useState<string | null>(null);   // interactor_id
   const [entries, setEntries] = useState<MemoryEntry[]>([]);
+  const [kept, setKept] = useState<Remembrance | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   function load() {
@@ -28,10 +29,11 @@ export function Memory({ onPlans }: {
 
   async function view(interactorId: string) {
     if (!session.profileId || !session.ownerToken) return;
-    setOpen(interactorId); setEntries([]);
+    setOpen(interactorId); setEntries([]); setKept(null);
     try {
       const data = await api.memory(session.profileId, interactorId, session.ownerToken);
       setEntries(Array.isArray(data) ? data : data.history || []);
+      setKept(await api.remembrance(session.profileId, interactorId, session.ownerToken));
     } catch (e) { setError(e); }
   }
 
@@ -108,6 +110,18 @@ export function Memory({ onPlans }: {
           </div>
         ))}
       </div>
+
+      {open && kept?.content && (
+        // The remembrance: what the profile still carries of this person
+        // from turns older than the recent transcript. Erased with the rest.
+        <div className="card remembrance">
+          <b>{tr("mem.kept", lang)}</b>
+          <p>{kept.content}</p>
+          <span className="muted small">
+            {fill(tr("mem.kept.covers", lang), { n: kept.covers })}
+          </span>
+        </div>
+      )}
 
       {open && (
         <div className="memory-list">

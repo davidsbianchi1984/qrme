@@ -3728,6 +3728,19 @@ extension ApiClient {
                           token: token)
     }
 
+    struct Remembrance: Decodable {
+        let content: String?
+        let covers: Int
+    }
+
+    /// The distilled long memory of one person — what survived the window.
+    func remembrance(id: String, interactorId: String,
+                     token: String) async throws -> Remembrance {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/remembrance",
+            token: token)
+    }
+
     func eraseMemory(id: String, interactorId: String,
                      token: String) async throws {
         struct Out: Decodable {}

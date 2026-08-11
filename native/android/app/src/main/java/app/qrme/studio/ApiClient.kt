@@ -3189,6 +3189,14 @@ object ApiClient {
         }
     }
 
+    // The distilled long memory of one person — what survived the window.
+    suspend fun remembrance(id: String, interactorId: String,
+                            token: String): String? {
+        val o = org.json.JSONObject(request(
+            "/profiles/$id/memory/$interactorId/remembrance", token = token))
+        return if (o.isNull("content")) null else o.optString("content")
+    }
+
     suspend fun eraseMemory(id: String, interactorId: String,
                             token: String) {
         request("/profiles/$id/memory/$interactorId", "DELETE",

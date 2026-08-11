@@ -38,11 +38,18 @@ struct MemorySection: View {
             HStack {
                 Button(L10n.t("mem.show", state.language)) {
                     run {
+                        // The remembrance leads: what the profile still
+                        // carries of this person past the recent window.
+                        let kept = try? await ApiClient.shared.remembrance(
+                            id: state.pid!, interactorId: visitorId,
+                            token: state.token!)
                         let turns = try await ApiClient.shared.memory(
                             id: state.pid!, interactorId: visitorId,
                             token: state.token!)
-                        line = turns.suffix(3).map(\.content)
+                        let recent = turns.suffix(3).map(\.content)
                             .joined(separator: " · ")
+                        line = [kept?.content, recent.isEmpty ? nil : recent]
+                            .compactMap { $0 }.joined(separator: " · ")
                     }
                 }.font(.caption).disabled(busy || visitorId.isEmpty)
                 Button(L10n.t("mem.erase", state.language)) {

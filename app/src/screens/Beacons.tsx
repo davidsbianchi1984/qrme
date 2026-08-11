@@ -89,7 +89,13 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
             <option value="publish">{tr("bcn.opt.publish", lang)}</option>
             <option value="collect">{tr("bcn.opt.collect", lang)}</option>
           </select>
-          <input value={handle} onChange={(e) => setHandle(e.target.value)}
+          <input value={handle} onChange={(e) => {
+                   const v = e.target.value;
+                   setHandle(v);
+                   // A pasted link is something to fetch: pre-select collect
+                   // (still a dropdown — the choice stays changeable).
+                   if (v.startsWith("http")) setDirection("collect");
+                 }}
                  placeholder={tr("bcn.handle.ph", lang)} style={{ flex: 1 }} />
           <button disabled={busy || !me || !token}
                   onClick={act(async () => {

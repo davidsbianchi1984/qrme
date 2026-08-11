@@ -4912,7 +4912,7 @@ const CHROME: Table = {
     en: "collect — pull it in", es: "recoger — traerlo aquí", fr: "collecter — le faire entrer", de: "sammeln — hereinholen", pt: "recolher — trazê-lo para dentro", it: "raccogli — tiralo dentro", ja: "取り込み — 中へ引き入れる", zh: "收集 — 把它拉进来", hi: "संग्रह — इसे भीतर खींचें", ar: "اجمع — اسحبه إلى الداخل",
   },
   "bcn.handle.ph": {
-    en: "the handle, without the @", es: "el alias, sin la @", fr: "l'identifiant, sans le @", de: "der Handle, ohne das @", pt: "o identificador, sem o @", it: "l'handle, senza la @", ja: "ハンドル名（@ なし）", zh: "用户名，不带 @", hi: "हैंडल, @ के बिना", ar: "المعرّف، دون @",
+    en: "the handle — or paste the profile's link", es: "el alias — o pega el enlace del perfil", fr: "l'identifiant — ou collez le lien du profil", de: "der Handle — oder füge den Link des Profils ein", pt: "o identificador — ou cole o link do perfil", it: "l'handle — oppure incolla il link del profilo", ja: "ハンドル名 — またはプロフィールのリンクを貼り付け", zh: "用户名——或粘贴该主页的链接", hi: "हैंडल — या प्रोफ़ाइल का लिंक चिपकाएँ", ar: "المعرّف — أو الصق رابط الملف الشخصي",
   },
   "bcn.connectbtn": {
     en: "Connect", es: "Conectar", fr: "Connecter", de: "Verbinden", pt: "Conectar", it: "Connetti", ja: "接続", zh: "连接", hi: "कनेक्ट", ar: "اتصال",
@@ -7475,6 +7475,12 @@ const CHROME: Table = {
   },
   "mem.loading": {
     en: "Loading…", es: "Cargando…", fr: "Chargement…", de: "Wird geladen…", pt: "A carregar…", it: "Caricamento…", ja: "読み込み中…", zh: "加载中…", hi: "लोड हो रहा है…", ar: "جارٍ التحميل…",
+  },
+  "mem.kept": {
+    en: "What it remembers from earlier conversations", es: "Lo que recuerda de conversaciones anteriores", fr: "Ce qu'il retient des conversations précédentes", de: "Was es aus früheren Gesprächen behält", pt: "O que recorda de conversas anteriores", it: "Ciò che ricorda delle conversazioni precedenti", ja: "以前の会話から覚えていること", zh: "它从早前对话中记住的内容", hi: "पहले की बातचीत से जो याद है", ar: "ما يتذكره من محادثات سابقة",
+  },
+  "mem.kept.covers": {
+    en: "{n} older turns folded into this remembrance", es: "{n} turnos antiguos plegados en este recuerdo", fr: "{n} tours plus anciens fondus dans ce souvenir", de: "{n} ältere Beiträge in diese Erinnerung eingefaltet", pt: "{n} turnos antigos condensados nesta lembrança", it: "{n} turni più vecchi condensati in questo ricordo", ja: "古い{n}件のやり取りをこの記憶に織り込み済み", zh: "已把 {n} 条较早的对话并入这段记忆", hi: "{n} पुराने संदेश इस स्मृति में समेटे गए", ar: "طُويت {n} من الأدوار الأقدم في هذه الذكرى",
   },
   "frn.title": {
     en: "Friends", es: "Amigos", fr: "Amis", de: "Freunde", pt: "Amigos", it: "Amici", ja: "友だち", zh: "好友", hi: "दोस्त", ar: "الأصدقاء",

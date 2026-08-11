@@ -1240,6 +1240,9 @@ export interface SimulationOut {
 }
 export interface Interactor { id: string; display_name: string; token: string }
 export interface MemoryEntry { role: string; content: string; at?: string }
+export interface Remembrance {
+  content: string | null; covers: number; updated_at: string | null;
+}
 
 // ---- endpoints ----
 export interface PairInfo {
@@ -3312,6 +3315,11 @@ export const api = {
   memory: (profileId: string, interactorId: string, token: string) =>
     req<{ history: MemoryEntry[] } | MemoryEntry[]>(
       `/profiles/${profileId}/memory/${interactorId}`, { token }),
+
+  // The distilled long memory of one person — what survived the window.
+  remembrance: (profileId: string, interactorId: string, token: string) =>
+    req<Remembrance>(
+      `/profiles/${profileId}/memory/${interactorId}/remembrance`, { token }),
 
   clearMemory: (profileId: string, interactorId: string, token: string) =>
     req<unknown>(`/profiles/${profileId}/memory/${interactorId}`, {
