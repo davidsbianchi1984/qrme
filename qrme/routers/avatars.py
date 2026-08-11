@@ -40,6 +40,48 @@ def set_avatar(profile_id: str, body: AvatarSet, request: Request) -> dict:
     return avatars.set_avatar(profile_id, body.asset)
 
 
+class AvatarImport(BaseModel):
+    source: str = Field(min_length=1, max_length=40,
+                        description="An import source from GET /avatars/market,"
+                                    " or 'photos' / 'capture' for the owner's"
+                                    " own face.")
+    asset: str = Field(min_length=1, max_length=500,
+                       description="Media reference from the upload door, or a"
+                                   " direct URL to the avatar image.")
+    extra: list[str] = Field(default_factory=list, max_length=12,
+                             description="Additional frames — the selfie"
+                                         " capture posts every angle it took.")
+
+
+@router.get("/avatars/market")
+def avatar_market() -> dict:
+    """The import shelf of the avatar deck: avatar systems a person may
+    already have a face in, each with how to export it. Imports, not
+    integrations — the provider's license governs the avatar, and QRME never
+    holds a provider credential."""
+    return {"sources": list(avatars.MARKET),
+            "note": "export your avatar on the provider's own surface, then "
+                    "import the image or link here — the AI badge and the "
+                    "likeness record ride on it like any other portrait"}
+
+
+@router.post("/profiles/{profile_id}/avatar/import", status_code=201)
+def import_avatar(profile_id: str, body: AvatarImport,
+                  request: Request) -> dict:
+    """Owner brings a face from outside the starter collection — their own
+    photos, the selfie capture's frames, or an avatar exported from a market
+    system — and it becomes the profile's portrait with its provenance
+    written onto the record."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return avatars.import_avatar(
+            profile_id, source=body.source, asset=body.asset,
+            extra=body.extra, pdi=request.app.state.pdi)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
 @router.get("/avatars/briefs")
 def list_briefs() -> dict:
     """The starter collection's art direction, generation-ready.

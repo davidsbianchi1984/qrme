@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
-import { api } from "../api";
+import { api, getBase, type Avatar } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -40,6 +40,13 @@ export function Chat({ onPlans }: {
   const Recognition: (new () => any) | undefined =
     (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
   const [listening, setListening] = useState(false);
+  // The talk surface: a full listening overlay in the sibling product's
+  // shape — except this product's speaker has a face. The profile's avatar
+  // is what you look at while it listens and answers; the abstract orb only
+  // appears when the profile has no portrait yet.
+  const [talking, setTalking] = useState(false);
+  const [talkAvatar, setTalkAvatar] = useState<Avatar | null>(null);
+  const [heard, setHeard] = useState("");
 
   // The conversation follows itself. The previous version scrolled from
   // `finally` inside a requestAnimationFrame, which can fire before React
@@ -58,12 +65,28 @@ export function Chat({ onPlans }: {
     window.speechSynthesis.speak(u);
   }
 
-  function listen() {
-    if (!Recognition || listening) return;
+  function openTalk() {
+    setTalking(true);
+    setHeard("");
+    if (session.profileId) {
+      api.avatar(session.profileId, session.ownerToken || "")
+        .then(setTalkAvatar).catch(() => setTalkAvatar(null));
+    }
+    talkListen();
+  }
+
+  // Listen → send → speak the reply → listen again, until closed. The
+  // transcript is shown while it is being heard, so the surface never
+  // swallows words silently.
+  function talkListen() {
+    if (!Recognition) return;
     const rec = new Recognition();
     rec.lang = lang;
-    rec.onresult = (e: any) =>
-      setInput((v) => (v ? v + " " : "") + e.results[0][0].transcript);
+    rec.onresult = (e: any) => {
+      const text = e.results[0][0].transcript;
+      setHeard(text);
+      setInput(text);
+    };
     rec.onend = () => setListening(false);
     rec.onerror = () => setListening(false);
     setListening(true);
@@ -124,7 +147,7 @@ export function Chat({ onPlans }: {
       // the sibling product's Coach screen has said so in amber for releases.
       const degradedFrom = reply.provenance?.degraded_from ?? null;
       setMsgs((m) => [...m, { who: "assistant", text, note, degradedFrom }]);
-      if (speakOn && pm.status === "approved") speakAloud(text);
+      if ((speakOn || talking) && pm.status === "approved") speakAloud(text);
     } catch (e) {
       setError(e);
     } finally {
@@ -194,6 +217,45 @@ export function Chat({ onPlans }: {
         </div>
       )}
 
+      {talking && (
+        <div className="talk-overlay" role="dialog"
+             aria-label={tr("chat.talk", lang)}>
+          <button className="talk-close" onClick={() => {
+            setTalking(false); window.speechSynthesis?.cancel();
+          }}>×</button>
+          {talkAvatar && talkAvatar.asset && !talkAvatar.placeholder ? (
+            <div className={"talk-face" + (listening ? " listening" : "")}>
+              <img src={talkAvatar.asset.startsWith("http")
+                          ? talkAvatar.asset
+                          : getBase() + talkAvatar.asset}
+                   alt={session.profile?.display_name || ""} />
+            </div>
+          ) : (
+            <div className={"talk-orb" + (listening ? " listening" : "")} />
+          )}
+          <div className="talk-name">{session.profile?.display_name}</div>
+          <div className="talk-state muted small">
+            {listening ? tr("chat.talk.listening", lang)
+                       : tr("chat.talk.tap", lang)}
+          </div>
+          {heard && <div className="talk-heard">{heard}</div>}
+          {talkAvatar && (!talkAvatar.asset || talkAvatar.placeholder) && (
+            <div className="muted small">{tr("chat.talk.noface", lang)}</div>
+          )}
+          <div className="row" style={{ justifyContent: "center" }}>
+            {!listening && (
+              <button className="primary" onClick={talkListen}>
+                {tr("chat.talk.again", lang)}
+              </button>
+            )}
+            <button className="primary" disabled={busy || !input.trim()}
+                    onClick={() => { setHeard(""); send(); }}>
+              {tr("chat.send", lang)}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="composer">
         <button title={tr("chat.wheretitle", lang)}
                 className={whereOpen ? "primary" : ""}
@@ -207,7 +269,7 @@ export function Chat({ onPlans }: {
           <button title={tr("chat.mic", lang)}
                   aria-label={tr("chat.mic", lang)}
                   className={listening ? "primary" : ""}
-                  onClick={listen}>🎤</button>
+                  onClick={openTalk}>🎤</button>
         )}
         <input
           value={input}

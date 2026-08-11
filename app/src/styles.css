@@ -32,7 +32,10 @@ label { display: block; font-size: 12px; color: var(--t2); margin-bottom: 14px; 
 code, .mono { font-family: ui-monospace, Menlo, monospace; }
 
 /* ---- app shell ---- */
-.app { display: grid; grid-template-columns: 232px 1fr; height: 100%; }
+/* 100dvh where the browser has it: on a phone, 100% tracks the layout
+   viewport, which is taller than what is actually visible while the URL bar
+   is up — the bottom row sat under it. Browsers without dvh keep 100%. */
+.app { display: grid; grid-template-columns: 232px 1fr; height: 100%; height: 100dvh; }
 .sidebar {
   background: linear-gradient(180deg, #1b1445, #100b2c);
   border-right: 1px solid var(--line);
@@ -46,6 +49,7 @@ code, .mono { font-family: ui-monospace, Menlo, monospace; }
      that survives the next tab being added. */
   padding: 20px 14px 214px; display: flex; flex-direction: column;
   overflow-y: auto;
+  overflow-y: auto; min-height: 0;
 }
 .brand { display: flex; gap: 10px; align-items: center; margin-bottom: 22px; padding: 0 6px; }
 .brand-name { font-weight: 800; letter-spacing: 0.5px; }
@@ -61,7 +65,10 @@ nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .nav-icon { width: 18px; text-align: center; }
 .signout { background: rgba(255,255,255,0.05); color: var(--t2); border: 1px solid var(--line); border-radius: 10px; padding: 9px; font-size: 12px; }
 
-.content { overflow-y: auto; padding: 30px 34px; }
+/* min-height/min-width zero: a grid item refuses to shrink below its
+   content by default, so this pane grew past its track, the app overflowed
+   the viewport, and the page itself scrolled instead of the pane. */
+.content { overflow-y: auto; padding: 30px 34px; min-height: 0; min-width: 0; }
 .screen { max-width: 720px; }
 .screen-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
 .screen-head h2 { margin: 0; font-size: 22px; letter-spacing: -0.3px; }
@@ -79,7 +86,7 @@ nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .orb.big { width: 76px; height: 76px; }
 
 /* ---- onboarding ---- */
-.onboarding { display: grid; place-items: center; height: 100%; padding: 24px; }
+.onboarding { display: grid; place-items: center; height: 100%; padding: 24px; overflow-y: auto; }
 .onboard-card {
   width: 440px; background: linear-gradient(160deg, var(--card), var(--card2));
   border: 1px solid var(--line); border-radius: 20px; padding: 28px; text-align: center;
@@ -465,3 +472,46 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
     transition: none !important;
   }
 }
+
+
+/* ---- the talk surface ---------------------------------------------------
+   Full-screen listening mode. The profile's portrait is the thing you look
+   at while it listens and answers — a persona has a face, so the abstract
+   orb is only the fallback for a profile that has none yet. */
+.talk-overlay { position: fixed; inset: 0; z-index: 60;
+  background: rgba(7,10,20,0.96); backdrop-filter: blur(10px);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; padding: 24px; text-align: center; }
+.talk-close { position: absolute; top: calc(14px + env(safe-area-inset-top));
+  right: 18px; background: transparent; border: 0; color: var(--t2);
+  font-size: 30px; line-height: 1; }
+.talk-face { width: min(58vw, 260px); height: min(58vw, 260px);
+  border-radius: 50%; overflow: hidden; border: 3px solid var(--line);
+  box-shadow: 0 0 40px rgba(64,224,255,0.25); }
+.talk-face img { width: 100%; height: 100%; object-fit: cover; }
+.talk-face.listening { animation: talk-pulse 1.6s ease-in-out infinite;
+  border-color: var(--brand, #40e0ff); }
+.talk-orb { width: min(50vw, 200px); height: min(50vw, 200px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #b0e8ff, #40b0ff 45%, #1a4a90 80%, #0a1430);
+  box-shadow: 0 0 46px rgba(64,176,255,0.5); }
+.talk-orb.listening { animation: talk-pulse 1.6s ease-in-out infinite; }
+@keyframes talk-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 34px rgba(64,224,255,0.35); }
+  50% { transform: scale(1.05); box-shadow: 0 0 64px rgba(64,224,255,0.6); }
+}
+.talk-name { font-size: 20px; font-weight: 800; }
+.talk-heard { max-width: 480px; font-size: 15px; color: var(--txt);
+  background: rgba(255,255,255,0.05); border: 1px solid var(--line);
+  border-radius: 14px; padding: 10px 14px; }
+
+/* ---- the avatar deck ---------------------------------------------------- */
+.deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px; margin: 8px 0 14px; }
+.deck-face { padding: 0; border: 2px solid var(--line); border-radius: 12px;
+  overflow: hidden; background: transparent; aspect-ratio: 1; }
+.deck-face:hover { border-color: var(--brand, #40e0ff); }
+.deck-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.capture { margin: 10px 0; }
+.capture video { width: 100%; max-width: 320px; border-radius: 14px;
+  border: 1px solid var(--line); margin-bottom: 8px; }

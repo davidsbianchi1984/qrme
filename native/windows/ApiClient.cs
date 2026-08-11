@@ -2024,6 +2024,22 @@ public sealed class ApiClient
         return Send<AvatarCard>(req);
     }
 
+    public record MarketSource(string Key, string Name, string How);
+    public record MarketShelf(MarketSource[] Sources, string Note);
+
+    public Task<MarketShelf> AvatarMarket() =>
+        Send<MarketShelf>(Get("/avatars/market"));
+
+    public Task<AvatarCard> ImportAvatar(string profileId, string source,
+        string asset, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/profiles/{profileId}/avatar/import")
+        { Content = JsonContent.Create(new { source, asset }) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<AvatarCard>(req);
+    }
+
     public Task<BriefCatalog> AvatarBriefs() =>
         Send<BriefCatalog>(Get("/avatars/briefs"));
 

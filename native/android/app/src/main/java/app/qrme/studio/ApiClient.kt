@@ -3367,6 +3367,16 @@ object ApiClient {
             JSONObject().put("asset", asset), token)
     }
 
+    suspend fun avatarMarket(): Int {
+        val o = JSONObject(request("/avatars/market"))
+        return o.optJSONArray("sources")?.length() ?: 0
+    }
+
+    suspend fun importAvatar(id: String, source: String, asset: String, token: String) {
+        request("/profiles/$id/avatar/import", "POST",
+            JSONObject().put("source", source).put("asset", asset), token)
+    }
+
     suspend fun avatarBriefs(): String {
         val o = JSONObject(request("/avatars/briefs"))
         return (o.optJSONArray("briefs")?.length() ?: 0).toString()

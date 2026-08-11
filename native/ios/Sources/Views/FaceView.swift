@@ -26,6 +26,7 @@ struct AvatarSection: View {
     @EnvironmentObject var state: AppState
     @State private var asset = ""
     @State private var handle = ""
+    @State private var importUrl = ""
     @State private var line: String?
     @State private var busy = false
 
@@ -73,6 +74,23 @@ struct AvatarSection: View {
                         line = b.brief
                     }
                 }.font(.caption).disabled(busy || handle.isEmpty)
+            }
+            Text(L10n.t("ava.market", state.language))
+                .font(.caption.bold()).foregroundStyle(Theme.txt)
+            HStack {
+                TextField(L10n.t("ava.url.ph", state.language),
+                          text: $importUrl)
+                    .textFieldStyle(.roundedBorder)
+                Button(L10n.t("ava.import", state.language)) {
+                    run {
+                        let shelf = try await ApiClient.shared.avatarMarket()
+                        _ = try await ApiClient.shared.importAvatar(
+                            id: state.pid!, source: "other",
+                            asset: importUrl, token: state.token!)
+                        line = "\(shelf.sources.count) · imported"
+                        importUrl = ""
+                    }
+                }.font(.caption).disabled(busy || importUrl.isEmpty)
             }
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)

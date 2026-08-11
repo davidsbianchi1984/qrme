@@ -329,6 +329,9 @@ public sealed partial class PeoplePage : Page
         AvaSetButton.Content = L10n.T("ava.set");
         AvaHandleBox.Header = L10n.T("people.add");
         AvaBriefButton.Content = L10n.T("ava.brief");
+        AvaMarketTitle.Text = L10n.T("ava.market");
+        AvaImportBox.Header = L10n.T("ava.url.ph");
+        AvaImportButton.Content = L10n.T("ava.import");
         EmblTitle.Text = L10n.T("embl.title");
         EmblListButton.Content = L10n.T("embl.list");
         EmblRulesButton.Content = L10n.T("embl.rules");
@@ -1940,6 +1943,16 @@ public sealed partial class PeoplePage : Page
             var b = await ApiClient.Shared.AvatarBrief(
                 AvaHandleBox.Text.Trim());
             StatusText.Text = b.Brief ?? "";
+        });
+
+    private async void OnAvaImport(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var shelf = await ApiClient.Shared.AvatarMarket();
+            await ApiClient.Shared.ImportAvatar(AppState.Current.Pid!,
+                "other", AvaImportBox.Text.Trim(), AppState.Current.Token!);
+            StatusText.Text = $"{shelf.Sources.Length} · imported";
+            AvaImportBox.Text = "";
         });
 
     private async void OnEmblList(object sender, RoutedEventArgs e) =>

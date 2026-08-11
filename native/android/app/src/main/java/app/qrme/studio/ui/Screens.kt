@@ -4648,6 +4648,7 @@ private fun AvaBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     val lang = L10n.deviceLanguage()
     var asset by remember { mutableStateOf("") }
     var handle by remember { mutableStateOf("") }
+    var importUrl by remember { mutableStateOf("") }
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("ava.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
@@ -4671,6 +4672,18 @@ private fun AvaBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         BrandButton(L10n.t("ava.brief", lang), enabled = handle.isNotBlank()) {
             vm.call({ ApiClient.avatarBrief(handle) }) { r ->
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        Text(L10n.t("ava.market", lang), color = Qrme.Txt, fontSize = 13.sp,
+            fontWeight = FontWeight.Bold)
+        labeledField(L10n.t("ava.url.ph", lang), importUrl, "") { importUrl = it }
+        BrandButton(L10n.t("ava.import", lang), enabled = importUrl.isNotBlank()) {
+            vm.call({
+                val n = ApiClient.avatarMarket()
+                ApiClient.importAvatar(vm.pid!!, "other", importUrl, vm.token!!)
+                n
+            }) { r ->
+                importUrl = ""
+                onNote(r.getOrNull()?.toString() ?: r.exceptionOrNull()?.message) }
         }
     }
 }

@@ -318,6 +318,79 @@ def catalog() -> list[dict]:
     return [brief(handle) for handle in BRIEFS]
 
 
+#: Where an avatar somebody already owns can come from. These are import
+#: sources, not integrations: the person exports their avatar on the
+#: provider's own surface (every one of these ships an export or share
+#: image), then hands the file or link to QRME. Nothing here calls a
+#: provider's API, holds a provider credential, or claims a partnership —
+#: the honest verb is *import*, and the provider's own license keeps
+#: governing what the person may do with their avatar.
+MARKET: tuple[dict, ...] = (
+    {"key": "ready_player_me", "name": "Ready Player Me",
+     "how": "Open your avatar at readyplayer.me, use Share/Export to get the "
+            "portrait image or the .glb link, and paste it here."},
+    {"key": "bitmoji", "name": "Bitmoji (Snap)",
+     "how": "In the Bitmoji or Snapchat app, share a sticker of your avatar "
+            "to save it as an image, then upload or paste it here."},
+    {"key": "meta_avatar", "name": "Meta Avatar",
+     "how": "In Instagram/Facebook settings → Avatar, share your avatar as "
+            "a sticker image, then upload or paste it here."},
+    {"key": "apple_memoji", "name": "Apple Memoji",
+     "how": "In Messages, send yourself a Memoji sticker, save it as an "
+            "image, then upload or paste it here."},
+    {"key": "xbox_avatar", "name": "Xbox Avatar",
+     "how": "In the Xbox Avatar Editor, take an avatar photo, save it, then "
+            "upload or paste it here."},
+    {"key": "zepeto", "name": "ZEPETO",
+     "how": "In ZEPETO, save a portrait shot of your character, then upload "
+            "or paste it here."},
+    {"key": "nintendo_mii", "name": "Nintendo Mii",
+     "how": "On Switch, pose your Mii in the editor and take a screenshot, "
+            "then upload or paste it here."},
+    {"key": "other", "name": "Somewhere else",
+     "how": "Any avatar you have the right to use: upload the image or "
+            "paste a direct link."},
+)
+
+IMPORT_SOURCES = {m["key"] for m in MARKET} | {"photos", "capture"}
+
+
+def import_avatar(profile_id: str, *, source: str, asset: str,
+                  extra: list[str] | None = None, pdi=None) -> dict:
+    """Attach an avatar that arrived from outside the starter collection.
+
+    ``asset`` is a media reference the existing upload door minted, or a
+    direct URL. The import is written onto the profile's own record as a
+    source item — which provider or path it came from, when, and any extra
+    frames (the selfie capture posts every angle it took) — so the face's
+    provenance survives next to the face. The render pipeline is unchanged:
+    the AI badge and the likeness record ride on this avatar exactly as they
+    do on a starter portrait.
+    """
+    if source not in IMPORT_SOURCES:
+        raise ValueError(
+            "unknown avatar source — GET /avatars/market lists the import "
+            "sources this deployment recognises")
+    conn = db.connect()
+    item_id = db.new_id("src")
+    provenance = {"avatar_import": source, "asset": asset,
+                  "extra_frames": extra or []}
+    import json as _json
+    content, pdi_key = _json.dumps(provenance), None
+    if pdi is not None:
+        pdi_key = f"qrme/{profile_id}/sources/{item_id}"
+        pdi.put(pdi_key, content)
+        content = None
+    conn.execute(
+        "INSERT INTO source_items (id, profile_id, kind, title, content,"
+        " pdi_key, created_at) VALUES (?,?,'photo',?,?,?,?)",
+        (item_id, profile_id, f"avatar import — {source}", content, pdi_key,
+         db.utcnow()),
+    )
+    conn.commit()
+    return set_avatar(profile_id, asset)
+
+
 def set_avatar(profile_id: str, asset: str) -> dict:
     """Attach a rendered portrait to a profile."""
     conn = db.connect()

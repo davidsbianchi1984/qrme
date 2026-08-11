@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { api, type Anonymity, type Avatar, type AvatarBrief, type Deleted,
+import { useEffect, useRef, useState } from "react";
+import { api, getBase, type Anonymity, type Avatar, type AvatarBrief, type Deleted,
          type Emblem, type IdentityVocabulary, type Memorial, type Sibling,
          type Sunset, type Verifiable, type Verification } from "../api";
 import { Refusal } from "../Refusal";
@@ -48,6 +48,99 @@ export function Identity({ onPlans }: {
   const [verifiable, setVerifiable] = useState<Verifiable | null>(null);
   const [anon, setAnon] = useState<Anonymity | null>(null);
   const [avatar, setAvatar] = useState<Avatar | null>(null);
+  // The avatar deck: market import sources, the file input, and the selfie
+  // capture (camera frames from several angles, uploaded through the same
+  // media door as any photo, then imported as the portrait).
+  const [market, setMarket] = useState<{ key: string; name: string;
+                                         how: string }[]>([]);
+  const [marketKey, setMarketKey] = useState("ready_player_me");
+  const [marketUrl, setMarketUrl] = useState("");
+  const [capturing, setCapturing] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const captureAngles = ["front", "left", "right", "up", "down"];
+  const [captured, setCaptured] = useState<string[]>([]);
+
+  const reloadAvatar = () =>
+    api.avatar(me, token).then(setAvatar).catch(() => undefined);
+
+  // One camera frame, as a JPEG file the media door already accepts.
+  const frameToFile = (angle: string): File | null => {
+    const v = videoRef.current;
+    if (!v || !v.videoWidth) return null;
+    const c = document.createElement("canvas");
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    c.getContext("2d")!.drawImage(v, 0, 0);
+    const data = c.toDataURL("image/jpeg", 0.92);
+    const bytes = atob(data.split(",")[1]);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new File([arr], `capture-${angle}.jpg`, { type: "image/jpeg" });
+  };
+
+  async function startCapture() {
+    setError(null); setCaptured([]);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" } });
+      setCapturing(true);
+      // The ref renders with `capturing`; attach on the next frame.
+      requestAnimationFrame(() => {
+        if (videoRef.current) videoRef.current.srcObject = stream;
+      });
+    } catch (e) { fail(e); }
+  }
+
+  function stopCapture() {
+    const s = videoRef.current?.srcObject as MediaStream | null;
+    s?.getTracks().forEach((t) => t.stop());
+    setCapturing(false);
+  }
+
+  async function snapAngle(angle: string) {
+    const file = frameToFile(angle);
+    if (!file) return;
+    try {
+      const saved = await api.uploadMedia(me, file, token);
+      setCaptured((c) => [...c, saved.url]);
+    } catch (e) { fail(e); }
+  }
+
+  async function finishCapture() {
+    stopCapture();
+    if (captured.length === 0) return;
+    try {
+      // The first frame taken (front) becomes the portrait; every angle
+      // travels with it as provenance.
+      await api.importAvatar(me,
+        { source: "capture", asset: captured[0], extra: captured.slice(1) },
+        token);
+      setNote(tr("idn.deck.done", lang));
+      setCaptured([]);
+      reloadAvatar();
+    } catch (e) { fail(e); }
+  }
+
+  async function importPhoto(file: File) {
+    setError(null); setNote(null);
+    try {
+      const saved = await api.uploadMedia(me, file, token);
+      await api.importAvatar(me, { source: "photos", asset: saved.url }, token);
+      setNote(tr("idn.deck.done", lang));
+      reloadAvatar();
+    } catch (e) { fail(e); }
+  }
+
+  async function importMarket() {
+    if (!marketUrl.trim()) return;
+    setError(null); setNote(null);
+    try {
+      await api.importAvatar(me,
+        { source: marketKey, asset: marketUrl.trim() }, token);
+      setNote(tr("idn.deck.done", lang));
+      setMarketUrl("");
+      reloadAvatar();
+    } catch (e) { fail(e); }
+  }
   const [emblems, setEmblems] = useState<Emblem[]>([]);
   const [briefs, setBriefs] = useState<AvatarBrief[]>([]);
   const [memorial, setMemorial] = useState<Memorial | null>(null);
@@ -71,6 +164,7 @@ export function Identity({ onPlans }: {
     }).catch(fail);
     api.emblems().then((r) => setEmblems(r.emblems)).catch(() => undefined);
     api.avatarBriefs().then((r) => setBriefs(r.briefs)).catch(() => undefined);
+    api.avatarMarket().then((r) => setMarket(r.sources)).catch(() => undefined);
   }, []);
 
   function reload() {
@@ -296,6 +390,95 @@ export function Identity({ onPlans }: {
             }}>{e.emblem}</button>
           ))}
         </div>
+        {/* ---- the avatar deck ---------------------------------------
+            Three shelves. Characters: the starter portraits, pick one and
+            it becomes the face. Your own face: import a photo, or capture
+            it from several angles with the camera. Market: an avatar the
+            person already owns somewhere else, imported — the provider's
+            license governs it, and the import is on the record. */}
+        <h4>{tr("idn.deck.characters", lang)}</h4>
+        {/* The asset path comes from the brief itself — the server names
+            where its portraits live; the client never spells a path. */}
+        <div className="deck-grid">
+          {briefs.filter((b) => b.asset).slice(0, 12).map((b) => (
+            <button key={b.handle} className="deck-face" title={b.handle}
+                    onClick={async () => {
+                      setError(null); setNote(null);
+                      try {
+                        await api.setAvatar(me, b.asset!, token);
+                        setNote(tr("idn.deck.done", lang));
+                        reloadAvatar();
+                      } catch (e) { fail(e); }
+                    }}>
+              <img src={getBase() + b.asset} alt={b.handle} loading="lazy" />
+            </button>
+          ))}
+        </div>
+
+        <h4>{tr("idn.deck.own", lang)}</h4>
+        <p className="muted small">{tr("idn.deck.own.sub", lang)}</p>
+        <div className="row">
+          <label className="chip" style={{ marginBottom: 0 }}>
+            {tr("idn.deck.upload", lang)}
+            <input type="file" accept="image/*" style={{ display: "none" }}
+                   onChange={(e) => {
+                     const f = e.target.files?.[0];
+                     if (f) importPhoto(f);
+                     e.target.value = "";
+                   }} />
+          </label>
+          {!capturing ? (
+            <button className="chip" onClick={startCapture}>
+              {tr("idn.deck.capture", lang)}
+            </button>
+          ) : (
+            <button className="chip" onClick={finishCapture}
+                    disabled={captured.length === 0}>
+              {tr("idn.deck.capture.done", lang)}
+            </button>
+          )}
+        </div>
+        {capturing && (
+          <div className="capture">
+            <video ref={videoRef} autoPlay playsInline muted />
+            <div className="row">
+              {captureAngles.map((a) => (
+                <button key={a} className="chip"
+                        disabled={captured.length >= captureAngles.length}
+                        onClick={() => snapAngle(a)}>
+                  {tr(`idn.deck.angle.${a}`, lang)}
+                </button>
+              ))}
+            </div>
+            <p className="muted small">
+              {fill(tr("idn.deck.frames", lang),
+                    { n: captured.length, total: captureAngles.length })}
+            </p>
+          </div>
+        )}
+
+        <h4>{tr("idn.deck.market", lang)}</h4>
+        <p className="muted small">{tr("idn.deck.market.sub", lang)}</p>
+        <div className="row">
+          <select value={marketKey}
+                  onChange={(e) => setMarketKey(e.target.value)}>
+            {market.map((m) => (
+              <option key={m.key} value={m.key}>{m.name}</option>
+            ))}
+          </select>
+          <input value={marketUrl} placeholder={tr("idn.deck.url.ph", lang)}
+                 onChange={(e) => setMarketUrl(e.target.value)}
+                 style={{ flex: 1 }} />
+          <button disabled={!marketUrl.trim()} onClick={importMarket}>
+            {tr("idn.deck.import", lang)}
+          </button>
+        </div>
+        {market.find((m) => m.key === marketKey) && (
+          <p className="muted small">
+            {market.find((m) => m.key === marketKey)!.how}
+          </p>
+        )}
+
         {briefs.length > 0 && (
           <>
             <h4>{tr("idn.bubble.portrait", lang)}</h4>

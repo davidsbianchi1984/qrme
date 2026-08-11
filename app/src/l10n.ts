@@ -6906,6 +6906,72 @@ const CHROME: Table = {
   "bcn.scraped.said": {
     en: "Fetched — the page's public words now feed this profile's training.", es: "Traída: las palabras públicas de la página ahora alimentan el entrenamiento de este perfil.", fr: "Récupérée — les mots publics de la page nourrissent désormais l'entraînement de ce profil.", de: "Geholt — die öffentlichen Worte der Seite fließen jetzt in das Training dieses Profils ein.", pt: "Buscada — as palavras públicas da página agora alimentam o treino deste perfil.", it: "Recuperata — le parole pubbliche della pagina ora alimentano l'addestramento di questo profilo.", ja: "取得しました — ページの公開されている言葉が、このプロフィールの学習に使われます。", zh: "已抓取 — 页面上的公开文字现在用于训练此档案。", hi: "ले आए — पेज के सार्वजनिक शब्द अब इस प्रोफ़ाइल के प्रशिक्षण में जाते हैं।", ar: "جُلبت — كلمات الصفحة العلنية تغذي الآن تدريب هذا الملف.",
   },
+  "chat.talk": {
+    en: "Talk to the profile", es: "Habla con el perfil", fr: "Parlez au profil", de: "Mit dem Profil sprechen", pt: "Fale com o perfil", it: "Parla con il profilo", ja: "プロフィールと話す", zh: "与档案对话", hi: "प्रोफ़ाइल से बात करें", ar: "تحدث مع الملف",
+  },
+  "chat.talk.listening": {
+    en: "Listening…", es: "Escuchando…", fr: "À l'écoute…", de: "Hört zu…", pt: "A ouvir…", it: "In ascolto…", ja: "聞いています…", zh: "正在聆听…", hi: "सुन रहा है…", ar: "يستمع…",
+  },
+  "chat.talk.tap": {
+    en: "Heard you — send it, or speak again.", es: "Te escuché: envíalo o habla de nuevo.", fr: "Je vous ai entendu — envoyez, ou parlez encore.", de: "Gehört — abschicken oder noch einmal sprechen.", pt: "Ouvi — envie, ou fale novamente.", it: "Ti ho sentito — invia, o parla di nuovo.", ja: "聞き取りました — 送信するか、もう一度話してください。", zh: "听到了 — 发送，或再说一次。", hi: "सुन लिया — भेजें, या फिर से बोलें।", ar: "سمعتك — أرسلها أو تحدث مرة أخرى.",
+  },
+  "chat.talk.again": {
+    en: "Speak again", es: "Habla de nuevo", fr: "Parler encore", de: "Noch einmal sprechen", pt: "Falar novamente", it: "Parla di nuovo", ja: "もう一度話す", zh: "再说一次", hi: "फिर से बोलें", ar: "تحدث مرة أخرى",
+  },
+  "chat.talk.noface": {
+    en: "This profile has no portrait yet — pick one in Identity, under the avatar deck.", es: "Este perfil aún no tiene retrato: elige uno en Identidad, en la baraja de avatares.", fr: "Ce profil n'a pas encore de portrait — choisissez-en un dans Identité, sous le jeu d'avatars.", de: "Dieses Profil hat noch kein Porträt — wähle eines unter Identität im Avatar-Deck.", pt: "Este perfil ainda não tem retrato — escolha um em Identidade, no baralho de avatares.", it: "Questo profilo non ha ancora un ritratto — scegline uno in Identità, nel mazzo degli avatar.", ja: "このプロフィールにはまだ肖像がありません — アイデンティティのアバターデッキから選んでください。", zh: "此档案还没有肖像 — 在“身份”的头像卡组中选择一个。", hi: "इस प्रोफ़ाइल का अभी कोई चित्र नहीं है — पहचान में अवतार डेक से एक चुनें।", ar: "لا صورة لهذا الملف بعد — اختر واحدة في الهوية، ضمن مجموعة الصور الرمزية.",
+  },
+  "idn.deck.characters": {
+    en: "Pick a character", es: "Elige un personaje", fr: "Choisissez un personnage", de: "Wähle eine Figur", pt: "Escolha um personagem", it: "Scegli un personaggio", ja: "キャラクターを選ぶ", zh: "选择一个角色", hi: "एक किरदार चुनें", ar: "اختر شخصية",
+  },
+  "idn.deck.own": {
+    en: "Your own face", es: "Tu propio rostro", fr: "Votre propre visage", de: "Dein eigenes Gesicht", pt: "O seu próprio rosto", it: "Il tuo volto", ja: "あなた自身の顔", zh: "你自己的脸", hi: "आपका अपना चेहरा", ar: "وجهك أنت",
+  },
+  "idn.deck.own.sub": {
+    en: "Import a photo, or capture your face from several angles with the camera.", es: "Importa una foto o captura tu rostro desde varios ángulos con la cámara.", fr: "Importez une photo, ou capturez votre visage sous plusieurs angles avec la caméra.", de: "Importiere ein Foto oder nimm dein Gesicht mit der Kamera aus mehreren Winkeln auf.", pt: "Importe uma foto ou capture o seu rosto de vários ângulos com a câmara.", it: "Importa una foto, o cattura il tuo volto da più angolazioni con la fotocamera.", ja: "写真を取り込むか、カメラで複数の角度から顔を撮影します。", zh: "导入一张照片，或用相机从多个角度采集你的脸。", hi: "एक फ़ोटो आयात करें, या कैमरे से कई कोणों से अपना चेहरा कैप्चर करें।", ar: "استورد صورة، أو التقط وجهك من عدة زوايا بالكاميرا.",
+  },
+  "idn.deck.upload": {
+    en: "Import a photo", es: "Importar una foto", fr: "Importer une photo", de: "Ein Foto importieren", pt: "Importar uma foto", it: "Importa una foto", ja: "写真を取り込む", zh: "导入照片", hi: "फ़ोटो आयात करें", ar: "استيراد صورة",
+  },
+  "idn.deck.capture": {
+    en: "Capture with the camera", es: "Capturar con la cámara", fr: "Capturer avec la caméra", de: "Mit der Kamera aufnehmen", pt: "Capturar com a câmara", it: "Cattura con la fotocamera", ja: "カメラで撮影", zh: "用相机采集", hi: "कैमरे से कैप्चर करें", ar: "التقاط بالكاميرا",
+  },
+  "idn.deck.capture.done": {
+    en: "Use these frames", es: "Usar estas tomas", fr: "Utiliser ces prises", de: "Diese Aufnahmen verwenden", pt: "Usar estes quadros", it: "Usa questi scatti", ja: "この写真を使う", zh: "使用这些画面", hi: "इन फ़्रेमों का उपयोग करें", ar: "استخدام هذه اللقطات",
+  },
+  "idn.deck.angle.front": {
+    en: "Front", es: "De frente", fr: "De face", de: "Vorne", pt: "De frente", it: "Frontale", ja: "正面", zh: "正面", hi: "सामने", ar: "أمامي",
+  },
+  "idn.deck.angle.left": {
+    en: "Left", es: "Izquierda", fr: "Gauche", de: "Links", pt: "Esquerda", it: "Sinistra", ja: "左", zh: "左侧", hi: "बाएँ", ar: "يسار",
+  },
+  "idn.deck.angle.right": {
+    en: "Right", es: "Derecha", fr: "Droite", de: "Rechts", pt: "Direita", it: "Destra", ja: "右", zh: "右侧", hi: "दाएँ", ar: "يمين",
+  },
+  "idn.deck.angle.up": {
+    en: "Up", es: "Arriba", fr: "Vers le haut", de: "Oben", pt: "Para cima", it: "In alto", ja: "上", zh: "上方", hi: "ऊपर", ar: "أعلى",
+  },
+  "idn.deck.angle.down": {
+    en: "Down", es: "Abajo", fr: "Vers le bas", de: "Unten", pt: "Para baixo", it: "In basso", ja: "下", zh: "下方", hi: "नीचे", ar: "أسفل",
+  },
+  "idn.deck.frames": {
+    en: "{n} of {total} angles captured", es: "{n} de {total} ángulos capturados", fr: "{n} angles sur {total} capturés", de: "{n} von {total} Winkeln aufgenommen", pt: "{n} de {total} ângulos capturados", it: "{n} angolazioni su {total} catturate", ja: "{total} 角度中 {n} 件を撮影済み", zh: "已采集 {n}/{total} 个角度", hi: "{total} में से {n} कोण कैप्चर हुए", ar: "التُقطت {n} من أصل {total} زوايا",
+  },
+  "idn.deck.market": {
+    en: "An avatar you already have", es: "Un avatar que ya tienes", fr: "Un avatar que vous avez déjà", de: "Ein Avatar, den du schon hast", pt: "Um avatar que já tem", it: "Un avatar che hai già", ja: "すでに持っているアバター", zh: "你已有的头像", hi: "एक अवतार जो आपके पास पहले से है", ar: "صورة رمزية تملكها بالفعل",
+  },
+  "idn.deck.market.sub": {
+    en: "Export it on the provider's own surface, then import the image or link here. The provider's license keeps governing it, and the import is written on this profile's record.", es: "Expórtalo en la plataforma del proveedor y luego importa aquí la imagen o el enlace. La licencia del proveedor lo sigue rigiendo, y la importación queda en el registro de este perfil.", fr: "Exportez-le sur la plateforme du fournisseur, puis importez ici l'image ou le lien. La licence du fournisseur continue de s'appliquer, et l'import est inscrit au dossier de ce profil.", de: "Exportiere ihn auf der Plattform des Anbieters und importiere hier das Bild oder den Link. Die Lizenz des Anbieters gilt weiter, und der Import steht in der Akte dieses Profils.", pt: "Exporte-o na plataforma do fornecedor e importe aqui a imagem ou o link. A licença do fornecedor continua a regê-lo, e a importação fica no registo deste perfil.", it: "Esportalo sulla piattaforma del fornitore, poi importa qui l'immagine o il link. La licenza del fornitore continua a valere, e l'importazione è scritta nel fascicolo di questo profilo.", ja: "提供元のサービスでエクスポートし、画像またはリンクをここに取り込みます。提供元のライセンスが引き続き適用され、取り込みはこのプロフィールの記録に残ります。", zh: "先在提供方的平台上导出，再把图片或链接导入这里。提供方的许可仍然适用，导入会写入此档案的记录。", hi: "प्रदाता के अपने मंच पर निर्यात करें, फिर छवि या लिंक यहाँ आयात करें। प्रदाता का लाइसेंस लागू रहता है, और आयात इस प्रोफ़ाइल के रिकॉर्ड में दर्ज होता है।", ar: "صدّرها على منصة المزوّد نفسها ثم استورد الصورة أو الرابط هنا. يظل ترخيص المزوّد ساريًا، ويُدوَّن الاستيراد في سجل هذا الملف.",
+  },
+  "idn.deck.url.ph": {
+    en: "image link or export URL", es: "enlace de imagen o URL de exportación", fr: "lien d'image ou URL d'export", de: "Bildlink oder Export-URL", pt: "link da imagem ou URL de exportação", it: "link dell'immagine o URL di esportazione", ja: "画像リンクまたはエクスポートURL", zh: "图片链接或导出网址", hi: "छवि लिंक या निर्यात URL", ar: "رابط الصورة أو رابط التصدير",
+  },
+  "idn.deck.import": {
+    en: "Import it", es: "Importarlo", fr: "L'importer", de: "Importieren", pt: "Importá-lo", it: "Importalo", ja: "取り込む", zh: "导入", hi: "आयात करें", ar: "استيراده",
+  },
+  "idn.deck.done": {
+    en: "This is the profile's face now — the AI badge and the likeness record ride on it.", es: "Este es ahora el rostro del perfil: la insignia de IA y el registro de semejanza lo acompañan.", fr: "C'est désormais le visage du profil — le badge IA et le registre de ressemblance l'accompagnent.", de: "Das ist jetzt das Gesicht des Profils — das KI-Abzeichen und der Ähnlichkeitsnachweis begleiten es.", pt: "Este é agora o rosto do perfil — o distintivo de IA e o registo de semelhança acompanham-no.", it: "Questo è ora il volto del profilo — il badge IA e il registro della somiglianza lo accompagnano.", ja: "これがこのプロフィールの顔になりました — AIバッジと肖像の記録が常に付随します。", zh: "这就是此档案的脸了 — AI 徽章与肖像记录随之附带。", hi: "अब यही प्रोफ़ाइल का चेहरा है — AI बैज और समरूपता रिकॉर्ड इसके साथ रहते हैं।", ar: "هذا هو وجه الملف الآن — تصاحبه شارة الذكاء الاصطناعي وسجل الشبه.",
+  },
   "chat.speak": {
     en: "Speak replies aloud", es: "Leer las respuestas en voz alta", fr: "Lire les réponses à voix haute", de: "Antworten laut vorlesen", pt: "Ler as respostas em voz alta", it: "Leggi le risposte ad alta voce", ja: "返答を声に出して読む", zh: "朗读回复", hi: "उत्तर ज़ोर से सुनाएँ", ar: "قراءة الردود بصوت عالٍ",
   },

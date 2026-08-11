@@ -1718,6 +1718,7 @@ export type Avatar = {
 
 export type AvatarBrief = {
   handle: string; portrait: string; style: string; prompt?: string;
+  asset?: string | null;
 };
 
 /** What sunsetting did. `archive_key` is non-null only where a vault holds it. */
@@ -3908,6 +3909,15 @@ export const api = {
   setAvatar: (profileId: string, asset: string, token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar`,
       { method: "PUT", body: { asset }, token }),
+
+  avatarMarket: () =>
+    req<{ sources: { key: string; name: string; how: string }[]; note: string }>(
+      "/avatars/market"),
+  importAvatar: (profileId: string, body: { source: string; asset: string;
+                                            extra?: string[] },
+                 token: string) =>
+    req<Avatar>(`/profiles/${profileId}/avatar/import`,
+      { method: "POST", body, token }),
 
   avatarBriefs: () =>
     req<{ style: string; briefs: AvatarBrief[] }>("/avatars/briefs"),

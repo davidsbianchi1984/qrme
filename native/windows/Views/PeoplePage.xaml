@@ -856,6 +856,9 @@
                     <Button x:Name="AvaSetButton" Click="OnAvaSet" />
                     <TextBox x:Name="AvaHandleBox" />
                     <Button x:Name="AvaBriefButton" Click="OnAvaBrief" />
+                    <TextBlock x:Name="AvaMarketTitle" FontWeight="Bold" FontSize="13" />
+                    <TextBox x:Name="AvaImportBox" />
+                    <Button x:Name="AvaImportButton" Click="OnAvaImport" />
                 </StackPanel>
             </Border>
 

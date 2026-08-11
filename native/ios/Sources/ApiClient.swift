@@ -3991,6 +3991,20 @@ extension ApiClient {
         try await request("/avatars/briefs")
     }
 
+    struct MarketSource: Decodable { let key: String; let name: String; let how: String }
+    struct MarketShelf: Decodable { let sources: [MarketSource]; let note: String }
+
+    func avatarMarket() async throws -> MarketShelf {
+        try await request("/avatars/market")
+    }
+
+    func importAvatar(id: String, source: String, asset: String,
+                      token: String) async throws -> AvatarCard {
+        try await request("/profiles/\(id)/avatar/import", method: "POST",
+                          body: ["source": source, "asset": asset],
+                          token: token)
+    }
+
     func avatarBrief(handle: String) async throws -> BriefCard {
         try await request("/avatars/briefs/\(handle)")
     }
