@@ -4740,8 +4740,8 @@ export const api = {
   myOrders: (token: string) => req<{ orders: Order[] }>("/orders", { token }),
 
   // ---------------------------------------------------------------------
-  // Where people find you: a platform connection, and the code that points
-  // at it.
+  // Connections to the world: a platform connection, and the code that
+  // points at it.
   //
   // A connection has a **direction**, and the two never overlap: `collect`
   // pulls an account's content in to grow the profile, `publish` runs the

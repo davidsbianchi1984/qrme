@@ -114,6 +114,9 @@ button.linkish { background: none; border: 0; color: var(--brand); font-weight: 
 /* ---- tiles / cards ---- */
 .profile-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
 .profile-hero h3 { margin: 0; font-size: 20px; }
+/* The profile's actual portrait, same footprint as the orb it replaces. */
+.hero-face { width: 76px; height: 76px; border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--line); flex-shrink: 0; }
 .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .tile, .card, .persona-card {
   background: linear-gradient(160deg, var(--card), var(--card2));
@@ -138,6 +141,14 @@ button.primary:disabled { opacity: 0.6; }
 .actions button:not(.primary), .card button:not(.primary) {
   background: rgba(255,255,255,0.05); color: var(--txt);
   border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px; font-weight: 600;
+}
+/* A label that opens the file picker is a button to the person pressing it;
+   the element differs, the look must not. */
+label.chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.05); color: var(--txt);
+  border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px;
+  font-weight: 600; font-size: 14px; cursor: pointer; width: auto;
 }
 button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red) !important; border: 1px solid var(--red) !important; }
 .error { background: rgba(224,104,122,0.12); color: var(--red); border: 1px solid var(--red); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 10px 0; }

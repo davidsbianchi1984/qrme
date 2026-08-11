@@ -6,7 +6,7 @@ import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 /**
- * Where people find you: a code on a wall, and a code on a platform.
+ * Connections to the world: a code on a wall, and a code on a platform.
  *
  * Both are QR pictures and they look identical, so the screen says what each
  * one does. A **placed beacon** lands a stranger on QRME — the profile answers

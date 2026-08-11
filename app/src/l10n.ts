@@ -676,11 +676,11 @@ const CHROME: Table = {
     ar: "من يتابع",
   },
   "nav.beacons": {
-    en: "Where people find you", es: "Dónde te encuentran",
-    fr: "Où l'on vous trouve", de: "Wo man dich findet",
-    pt: "Onde te encontram", it: "Dove ti trovano",
-    ja: "見つけられる場所", zh: "别人从哪里找到你",
-    hi: "लोग आपको कहाँ पाते हैं", ar: "أين يجدونك",
+    en: "Connections to the world", es: "Conexiones con el mundo",
+    fr: "Connexions au monde", de: "Verbindungen zur Welt",
+    pt: "Ligações com o mundo", it: "Connessioni con il mondo",
+    ja: "世界とのつながり", zh: "与世界的连接",
+    hi: "दुनिया से जुड़ाव", ar: "روابط مع العالم",
   },
   "nav.reaching": {
     en: "Reaching out", es: "Contactar", fr: "Prendre contact",
@@ -4885,7 +4885,7 @@ const CHROME: Table = {
     en: "Answer and continue", es: "Responder y continuar", fr: "Répondre et continuer", de: "Antworten und fortfahren", pt: "Responder e continuar", it: "Rispondi e continua", ja: "答えて続ける", zh: "回答并继续", hi: "उत्तर दें और जारी रखें", ar: "أجب وتابع",
   },
   "bcn.title": {
-    en: "Where people find you", es: "Dónde te encuentra la gente", fr: "Où les gens vous trouvent", de: "Wo Leute Sie finden", pt: "Onde as pessoas o encontram", it: "Dove la gente ti trova", ja: "人があなたを見つける場所", zh: "别人在哪里找到你", hi: "लोग आपको कहाँ पाते हैं", ar: "أين يجدك الناس",
+    en: "Connections to the world", es: "Conexiones con el mundo", fr: "Connexions au monde", de: "Verbindungen zur Welt", pt: "Ligações com o mundo", it: "Connessioni con il mondo", ja: "世界とのつながり", zh: "与世界的连接", hi: "दुनिया से जुड़ाव", ar: "روابط مع العالم",
   },
   "bcn.here": {
     en: "here", es: "aquí", fr: "ici", de: "hierher", pt: "aqui", it: "qui", ja: "ここ", zh: "这里", hi: "यहाँ", ar: "هنا",

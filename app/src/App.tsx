@@ -96,7 +96,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "referrals", label: "Somebody qualified", icon: "🩺" },
   { id: "lobby", label: "In the game", icon: "🎮" },
   { id: "audience", label: "Who follows", icon: "💛" },
-  { id: "beacons", label: "Where people find you", icon: "🔳" },
+  { id: "beacons", label: "Connections to the world", icon: "🔳" },
   { id: "reaching", label: "Reaching out", icon: "🌙" },
   { id: "leaving", label: "What leaves", icon: "📤" },
   { id: "selling", label: "What you are owed", icon: "💰" },

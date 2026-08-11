@@ -494,7 +494,7 @@ LESSONS: tuple[dict, ...] = (
          try_it="Reach out twice in a row and read the second refusal — it "
                 "is a different sentence from the first."),
     dict(key="beacons", chapter="Out in the world",
-         title="Where people find you",
+         title="Connections to the world",
          what="Two kinds of QR code, and they look identical. A placed "
               "beacon brings a stranger *here* — the profile answers them "
               "on QRME. A platform beacon sends them *away*, to an account "

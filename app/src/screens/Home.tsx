@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type Stats } from "../api";
+import { api, getBase, type Avatar, type Stats } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -11,6 +11,7 @@ export function Home({ go }: {
   const { session } = useSession();
   const lang = visitorLang();
   const [stats, setStats] = useState<Stats | null>(null);
+  const [face, setFace] = useState<Avatar | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -19,6 +20,10 @@ export function Home({ go }: {
       .stats(session.profileId, session.ownerToken)
       .then(setStats)
       .catch(setError);
+    // The hero shows the profile's actual portrait; the orb is only the
+    // fallback for a profile that has none yet.
+    api.avatar(session.profileId, session.ownerToken)
+      .then(setFace).catch(() => setFace(null));
   }, [session.profileId, session.ownerToken]);
 
   const p = session.profile;
@@ -55,7 +60,13 @@ export function Home({ go }: {
       </header>
 
       <div className="profile-hero">
-        <div className="orb big" />
+        {face && face.asset && !face.placeholder ? (
+          <img className="hero-face" alt=""
+               src={face.asset.startsWith("http")
+                      ? face.asset : getBase() + face.asset} />
+        ) : (
+          <div className="orb big" />
+        )}
         <div>
           <h3>{p?.display_name}</h3>
           <div className="muted">
