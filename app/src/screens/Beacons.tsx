@@ -131,6 +131,16 @@ export function Beacons({ onPlans }: { onPlans: () => void }) {
                   {tr("bcn.showcode", lang)}
                 </button>
               )}
+              {/* Only a collect connection with a handle has an address
+                  to visit; the server answers 400/409 for the rest, so the
+                  button is absent rather than present and refused. */}
+              {c.direction === "collect" && c.handle && (
+                <button className="chip" disabled={busy}
+                        onClick={act(() => api.scrapeSocial(c.id, token),
+                          tr("bcn.scraped.said", lang))}>
+                  {tr("bcn.scrape", lang)}
+                </button>
+              )}
               <button className="chip" disabled={busy}
                       onClick={act(() => api.disconnectSocial(c.id, token),
                         tr("bcn.disconnected.said", lang))}>

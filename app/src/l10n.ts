@@ -6900,6 +6900,18 @@ const CHROME: Table = {
   "chat.pitch": {
     en: "every response is persona- & relationship-conditioned", es: "cada respuesta está condicionada por la persona y por la relación", fr: "chaque réponse est conditionnée par le personnage et la relation", de: "jede Antwort ist von Persona und Beziehung geprägt", pt: "cada resposta é condicionada pela persona e pela relação", it: "ogni risposta è condizionata dalla persona e dalla relazione", ja: "どの返答も、ペルソナと関係性に条件づけられています", zh: "每一条回复都受人格与关系的调节", hi: "हर उत्तर व्यक्तित्व और रिश्ते से तय होता है", ar: "كل ردّ مشروط بالشخصية وبالعلاقة",
   },
+  "bcn.scrape": {
+    en: "Fetch the page", es: "Traer la página", fr: "Récupérer la page", de: "Die Seite holen", pt: "Buscar a página", it: "Recupera la pagina", ja: "ページを取得", zh: "抓取页面", hi: "पेज लाएँ", ar: "جلب الصفحة",
+  },
+  "bcn.scraped.said": {
+    en: "Fetched — the page's public words now feed this profile's training.", es: "Traída: las palabras públicas de la página ahora alimentan el entrenamiento de este perfil.", fr: "Récupérée — les mots publics de la page nourrissent désormais l'entraînement de ce profil.", de: "Geholt — die öffentlichen Worte der Seite fließen jetzt in das Training dieses Profils ein.", pt: "Buscada — as palavras públicas da página agora alimentam o treino deste perfil.", it: "Recuperata — le parole pubbliche della pagina ora alimentano l'addestramento di questo profilo.", ja: "取得しました — ページの公開されている言葉が、このプロフィールの学習に使われます。", zh: "已抓取 — 页面上的公开文字现在用于训练此档案。", hi: "ले आए — पेज के सार्वजनिक शब्द अब इस प्रोफ़ाइल के प्रशिक्षण में जाते हैं।", ar: "جُلبت — كلمات الصفحة العلنية تغذي الآن تدريب هذا الملف.",
+  },
+  "chat.speak": {
+    en: "Speak replies aloud", es: "Leer las respuestas en voz alta", fr: "Lire les réponses à voix haute", de: "Antworten laut vorlesen", pt: "Ler as respostas em voz alta", it: "Leggi le risposte ad alta voce", ja: "返答を声に出して読む", zh: "朗读回复", hi: "उत्तर ज़ोर से सुनाएँ", ar: "قراءة الردود بصوت عالٍ",
+  },
+  "chat.mic": {
+    en: "Speak instead of typing", es: "Habla en lugar de escribir", fr: "Parlez au lieu de taper", de: "Sprechen statt tippen", pt: "Fale em vez de digitar", it: "Parla invece di scrivere", ja: "入力の代わりに話す", zh: "用说话代替打字", hi: "टाइप करने की जगह बोलें", ar: "تحدّث بدل الكتابة",
+  },
   "chat.sayhello": {
     en: "Say hello to {name}.", es: "Saluda a {name}.", fr: "Dites bonjour à {name}.", de: "Begrüßen Sie {name}.", pt: "Diga olá a {name}.", it: "Saluta {name}.", ja: "{name} に挨拶しましょう。", zh: "跟 {name} 打个招呼。", hi: "{name} को नमस्ते कहिए।", ar: "ألقِ التحية على {name}.",
   },

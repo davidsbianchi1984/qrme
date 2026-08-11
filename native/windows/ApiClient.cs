@@ -1188,6 +1188,13 @@ public sealed class ApiClient
         res.EnsureSuccessStatusCode();
     }
 
+    public async Task SocialScrape(string cid, string token)
+    {
+        var req = Post($"/social/{cid}/scrape", new { }, token);
+        var res = await Dispatch(req);
+        res.EnsureSuccessStatusCode();
+    }
+
     public async Task SocialPublish(string cid, string token, string content)
     {
         var req = Post($"/social/{cid}/publish", new { content }, token);

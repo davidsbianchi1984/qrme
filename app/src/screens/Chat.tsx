@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { api } from "../api";
 import { Refusal } from "../Refusal";
@@ -30,6 +30,45 @@ export function Chat({ onPlans }: {
   // "read my prompt and decide", which is what the backend does on its own.
   const [role, setRole] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
+  // Voice: replies read aloud by the device's own engine, and a microphone
+  // that fills the composer. Both feature-detected — the mic button simply
+  // does not render on a browser without SpeechRecognition, because a
+  // control that cannot work is worse than no control.
+  const [speakOn, setSpeakOn] = useState(false);
+  // TS's DOM lib does not ship SpeechRecognition types; the constructor is
+  // feature-detected and driven through the three members every engine has.
+  const Recognition: (new () => any) | undefined =
+    (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
+  const [listening, setListening] = useState(false);
+
+  // The conversation follows itself. The previous version scrolled from
+  // `finally` inside a requestAnimationFrame, which can fire before React
+  // commits the reply bubble — it measured yesterday's scrollHeight and the
+  // newest message sat below the fold until the reader dragged it up. An
+  // effect runs after the commit, so it sees the bubble it is scrolling to;
+  // keying on busy too means the thinking indicator is followed as well.
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+  }, [msgs, busy]);
+
+  function speakAloud(text: string) {
+    if (!("speechSynthesis" in window)) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    window.speechSynthesis.speak(u);
+  }
+
+  function listen() {
+    if (!Recognition || listening) return;
+    const rec = new Recognition();
+    rec.lang = lang;
+    rec.onresult = (e: any) =>
+      setInput((v) => (v ? v + " " : "") + e.results[0][0].transcript);
+    rec.onend = () => setListening(false);
+    rec.onerror = () => setListening(false);
+    setListening(true);
+    rec.start();
+  }
 
   async function send() {
     const message = input.trim();
@@ -85,13 +124,11 @@ export function Chat({ onPlans }: {
       // the sibling product's Coach screen has said so in amber for releases.
       const degradedFrom = reply.provenance?.degraded_from ?? null;
       setMsgs((m) => [...m, { who: "assistant", text, note, degradedFrom }]);
+      if (speakOn && pm.status === "approved") speakAloud(text);
     } catch (e) {
       setError(e);
     } finally {
       setBusy(false);
-      requestAnimationFrame(() =>
-        listRef.current?.scrollTo({ top: listRef.current.scrollHeight }),
-      );
     }
   }
 
@@ -161,6 +198,17 @@ export function Chat({ onPlans }: {
         <button title={tr("chat.wheretitle", lang)}
                 className={whereOpen ? "primary" : ""}
                 onClick={() => setWhereOpen((w) => !w)}>📍</button>
+        <button title={tr("chat.speak", lang)}
+                aria-label={tr("chat.speak", lang)}
+                aria-pressed={speakOn}
+                className={speakOn ? "primary" : ""}
+                onClick={() => setSpeakOn((s) => !s)}>{speakOn ? "🔊" : "🔇"}</button>
+        {Recognition && (
+          <button title={tr("chat.mic", lang)}
+                  aria-label={tr("chat.mic", lang)}
+                  className={listening ? "primary" : ""}
+                  onClick={listen}>🎤</button>
+        )}
         <input
           value={input}
           placeholder={tr("chat.type.ph", lang)}

@@ -983,6 +983,12 @@ actor ApiClient {
                                       token: token)
     }
 
+    func socialScrape(cid: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/social/\(cid)/scrape", method: "POST",
+                                      token: token)
+    }
+
     func socialPublish(cid: String, token: String, content: String) async throws {
         struct Ok: Decodable {}
         let _: Ok = try await request("/social/\(cid)/publish", method: "POST",

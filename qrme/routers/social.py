@@ -24,7 +24,7 @@ import os
 
 from fastapi import APIRouter, HTTPException, Request, Response
 
-from .. import catalog, db, moderation, watermark
+from .. import catalog, db, moderation, offline, scrape, watermark
 from ..common import profile_or_404, require_owner, source_items
 from ..models import SocialCollect, SocialConnect, SocialPublish
 
@@ -181,6 +181,72 @@ def collect(cid: str, body: SocialCollect, request: Request) -> dict:
         "ingested": ingested,
         "total_sources": len(source_items(row["profile_id"], pdi)),
         "note": "collected content now feeds this profile's training",
+    }
+
+
+@router.post("/social/{cid}/scrape", status_code=201)
+def scrape_page(cid: str, request: Request) -> dict:
+    """Go to the imported link and take the words that are publicly there.
+
+    The collect door stores what the owner pastes; this one visits the
+    address the connection has carried since it was made — the platform's
+    public page for the handle — and stores what a browser would show
+    anybody: title, the bio line in the page's metadata, the visible text.
+    One source item per visit, with the URL and the fetch time written into
+    it, so the profile's material says where it came from.
+    """
+    row = _conn_or_404(cid)
+    require_owner(row["profile_id"], request)
+    if row["direction"] != "collect":
+        raise HTTPException(409, "this connection is for publishing, not collecting")
+    if row["status"] != "active":
+        raise HTTPException(409, "connection has been revoked")
+    if offline.enabled():
+        raise HTTPException(
+            409, "this deployment is offline — nothing leaves this machine, "
+                 "so the page cannot be fetched. Paste the content into "
+                 "collect instead.")
+    if not row["handle"] or row["platform"] not in _PLATFORM_URL:
+        raise HTTPException(
+            400, "this connection has no public address to visit — reconnect "
+                 "with the account's handle, or paste content into collect")
+    url = _PLATFORM_URL[row["platform"]].format(h=row["handle"])
+    try:
+        page = scrape.extract(scrape.fetch(url))
+    except Exception as e:                                     # noqa: BLE001
+        raise HTTPException(
+            502, f"could not fetch {url} — {e.__class__.__name__}: {e}")
+    parts = [p for p in (page["description"], page["text"]) if p]
+    if not (page["title"] or parts):
+        raise HTTPException(
+            502, f"{url} answered with nothing readable — no title, no "
+                 "description, no text")
+    body_text = "\n\n".join(parts) + f"\n\nFetched from {url} at {db.utcnow()}"
+    pdi = request.app.state.pdi
+    conn = db.connect()
+    item_id = db.new_id("src")
+    title = f"{row['platform']} · {page['title'] or row['handle']}"
+    content, pdi_key = body_text, None
+    if pdi is not None:
+        pdi_key = f"qrme/{row['profile_id']}/sources/{item_id}"
+        pdi.put(pdi_key, json.dumps({"content": body_text}))
+        content = None                     # only the reference stays local
+    conn.execute(
+        "INSERT INTO source_items (id, profile_id, kind, title, content,"
+        " pdi_key, created_at) VALUES (?,?,'social_post',?,?,?,?)",
+        (item_id, row["profile_id"], title, content, pdi_key, db.utcnow()),
+    )
+    conn.execute("UPDATE social_connections SET collected = collected + 1 WHERE id=?",
+                 (cid,))
+    conn.commit()
+    return {
+        "connection": cid,
+        "platform": row["platform"],
+        "url": url,
+        "title": page["title"],
+        "ingested": 1,
+        "total_sources": len(source_items(row["profile_id"], pdi)),
+        "note": "the page's public words now feed this profile's training",
     }
 
 

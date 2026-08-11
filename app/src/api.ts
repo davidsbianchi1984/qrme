@@ -2891,6 +2891,11 @@ export type SocialCollected = {
   total_sources: number; note: string;
 };
 
+export type SocialScraped = {
+  connection: string; platform: string; url: string; title: string | null;
+  ingested: number; total_sources: number; note: string;
+};
+
 export type SocialConnection = {
   id: string;
   profile_id: string;
@@ -4882,6 +4887,8 @@ export const api = {
                   token: string) =>
     req<SocialCollected>(`/social/${cid}/collect`,
       { method: "POST", body: { items }, token }),
+  scrapeSocial: (cid: string, token: string) =>
+    req<SocialScraped>(`/social/${cid}/scrape`, { method: "POST", token }),
   publishSocial: (cid: string, body: { topic: string; content: string },
                   token: string) =>
     req<SocialPublished>(`/social/${cid}/publish`,

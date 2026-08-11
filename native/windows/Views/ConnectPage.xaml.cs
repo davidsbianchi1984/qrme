@@ -22,7 +22,11 @@ public sealed partial class ConnectPage : Page
             Collect ? Visibility.Visible : Visibility.Collapsed;
         public Visibility PublishVisibility =>
             Collect ? Visibility.Collapsed : Visibility.Visible;
+        public bool HasHandle { get; init; }
+        public Visibility ScrapeVisibility =>
+            Collect && HasHandle ? Visibility.Visible : Visibility.Collapsed;
         public string CollectLabel => L10n.T("ncon.collect.sample");
+        public string ScrapeLabel => L10n.T("ncon.scrape");
         public string PublishLabel => L10n.T("ncon.publish.update");
         public string DisconnectLabel => L10n.T("ncon.disconnect");
     }
@@ -109,6 +113,7 @@ public sealed partial class ConnectPage : Page
                     : L10n.Fill("ncon.published", AppState.Current.Language,
                                 ("n", c.Published.ToString())),
                 Collect = c.Direction == "collect",
+                HasHandle = !string.IsNullOrEmpty(c.Handle),
                 Active = c.Status != "revoked",
             }).ToList();
         }
@@ -144,6 +149,20 @@ public sealed partial class ConnectPage : Page
             await ApiClient.Shared.SocialCollect(
                 cid, s.Token!, $"sample post from {conn?.Platform}");
             ShowSocialStatus($"collected one item from {conn?.Platform} — it now feeds training");
+            await ReloadSocial();
+        }
+        catch (Exception ex) { ShowSocialError(ex.Message); }
+    }
+
+    private async void OnScrape(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string cid) return;
+        var conn = _social.FirstOrDefault(c => c.Id == cid);
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.SocialScrape(cid, s.Token!);
+            ShowSocialStatus($"fetched {conn?.Platform} — the page now feeds training");
             await ReloadSocial();
         }
         catch (Exception ex) { ShowSocialError(ex.Message); }

@@ -1617,6 +1617,16 @@ private fun SocialPanel(vm: StudioViewModel) {
                                     reload()
                                 }
                             }
+                            val h = c.handle
+                            if (h != null && h.isNotEmpty()) {
+                                SmallAction(L10n.t("ncon.scrape", vm.language)) {
+                                    vm.call({ ApiClient.socialScrape(c.id, vm.token!!) }) { r ->
+                                        r.onSuccess { status = "fetched ${c.platform} — the page now feeds training" }
+                                            .onFailure { error = it.message }
+                                        reload()
+                                    }
+                                }
+                            }
                         } else {
                             SmallAction(L10n.t("ncon.publish.update", vm.language)) {
                                 vm.call({ ApiClient.socialPublish(c.id, vm.token!!,

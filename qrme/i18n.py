@@ -1016,6 +1016,28 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'this deployment is offline — nothing leaves this machine, so the page cannot be fetched. Paste the content into collect instead.': {
+        'es': 'este despliegue está sin conexión: nada sale de esta máquina, así que la página no puede traerse. Pega el contenido en recopilar en su lugar.',
+        'fr': "ce déploiement est hors ligne — rien ne quitte cette machine, la page ne peut donc pas être récupérée. Collez plutôt le contenu dans la collecte.",
+        'de': 'diese Installation ist offline — nichts verlässt diesen Rechner, also kann die Seite nicht geholt werden. Füge den Inhalt stattdessen ins Sammeln ein.',
+        'pt': 'esta instalação está offline — nada sai desta máquina, então a página não pode ser buscada. Cole o conteúdo em recolher em vez disso.',
+        'it': 'questa installazione è offline — nulla esce da questa macchina, quindi la pagina non può essere recuperata. Incolla invece il contenuto nella raccolta.',
+        'ja': 'この環境はオフラインです — このマシンから何も出ないため、ページを取得できません。代わりに内容を収集に貼り付けてください。',
+        'zh': '此部署处于离线状态 — 任何内容都不会离开这台机器，因此无法抓取页面。请改为将内容粘贴到采集中。',
+        'hi': 'यह परिनियोजन ऑफ़लाइन है — इस मशीन से कुछ बाहर नहीं जाता, इसलिए पेज नहीं लाया जा सकता। इसके बजाय सामग्री को संग्रह में चिपकाएँ।',
+        'ar': 'هذا النشر دون اتصال — لا شيء يغادر هذا الجهاز، لذا لا يمكن جلب الصفحة. الصق المحتوى في الجمع بدلًا من ذلك.',
+    },
+    'this connection has no public address to visit — reconnect with the account\'s handle, or paste content into collect': {
+        'es': 'esta conexión no tiene dirección pública que visitar: reconecta con el identificador de la cuenta o pega contenido en recopilar',
+        'fr': "cette connexion n'a pas d'adresse publique à visiter — reconnectez avec l'identifiant du compte, ou collez le contenu dans la collecte",
+        'de': 'diese Verbindung hat keine öffentliche Adresse zum Besuchen — verbinde neu mit der Kennung des Kontos oder füge Inhalt ins Sammeln ein',
+        'pt': 'esta ligação não tem endereço público para visitar — volte a ligar com o identificador da conta, ou cole conteúdo em recolher',
+        'it': "questa connessione non ha un indirizzo pubblico da visitare — ricollega con l'handle dell'account, o incolla il contenuto nella raccolta",
+        'ja': 'この接続には訪問できる公開アドレスがありません — アカウントのハンドルで接続し直すか、内容を収集に貼り付けてください',
+        'zh': '此连接没有可访问的公开地址 — 请用账户的用户名重新连接，或将内容粘贴到采集中',
+        'hi': 'इस कनेक्शन के पास जाने योग्य कोई सार्वजनिक पता नहीं है — खाते के हैंडल से फिर से जोड़ें, या सामग्री को संग्रह में चिपकाएँ',
+        'ar': 'لا يملك هذا الاتصال عنوانًا علنيًا لزيارته — أعد الربط بمعرّف الحساب، أو الصق المحتوى في الجمع',
+    },
     'say what you were trying to do and what stood in the way': {
         'es': 'di qué intentabas hacer y qué se interpuso',
         'fr': "dites ce que vous essayiez de faire et ce qui s'y est opposé",
