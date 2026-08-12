@@ -57,7 +57,8 @@ def _owns_profile(profile_id: str, subject_id: str) -> bool:
 
 
 class StartIn(BaseModel):
-    post_id: str
+    post_id: str = ""
+    video_url: str = ""
     host_id: str
     title: str = ""
 
@@ -82,15 +83,19 @@ class SayIn(BaseModel):
 
 @router.post("/watch-parties", status_code=201)
 def start(body: StartIn, request: Request) -> dict:
-    """Open a party around a posted video.
+    """Open a party around a posted video, or straight from a video link.
 
-    Anchored to the post rather than a raw URL, so the party inherits its
-    author's rating, its moderation verdict, and the fact that the link was
-    checked against the platform allowlist when it was posted.
+    A post-anchored party inherits its author's rating, its moderation
+    verdict, and the allowlist check the link faced when it was posted. A
+    `video_url` faces the same allowlist on the way in and hangs off the
+    party itself — no post is fabricated to hold it. A URL pasted into
+    `post_id` is recognised for what it is, because that is the field every
+    client's one input box sends.
     """
     require_self(body.host_id, request)
     try:
-        return watchparty.start(body.post_id, body.host_id, body.title)
+        return watchparty.start(body.video_url.strip() or body.post_id,
+                                body.host_id, body.title)
     except watchparty.PartyError as exc:
         raise _fail(exc) from None
 

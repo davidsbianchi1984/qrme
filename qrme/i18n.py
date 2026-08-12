@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'nothing posted has that id — give the id of a posted video, or paste the video\'s own link': {
+        'es': 'nada publicado tiene ese id — da el id de un vídeo publicado, o pega el enlace del propio vídeo',
+        'fr': "rien de publié ne porte cet id — donnez l'id d'une vidéo publiée, ou collez le lien de la vidéo elle-même",
+        'de': 'nichts Veröffentlichtes trägt diese ID — gib die ID eines veröffentlichten Videos an, oder füge den Link des Videos selbst ein',
+        'pt': 'nada publicado tem esse id — dá o id de um vídeo publicado, ou cola o link do próprio vídeo',
+        'it': "niente di pubblicato ha quell'id — dai l'id di un video pubblicato, o incolla il link del video stesso",
+        'ja': 'そのIDの投稿はありません — 投稿された動画のIDを入力するか、動画自体のリンクを貼り付けてください',
+        'zh': '没有帖子是这个 ID — 请提供已发布视频的帖子 ID，或直接粘贴视频链接',
+        'hi': 'इस आईडी की कोई पोस्ट नहीं है — किसी पोस्ट किए गए वीडियो की आईडी दें, या वीडियो का लिंक चिपकाएँ',
+        'ar': 'لا يوجد منشور بهذا المعرّف — أعط معرّف فيديو منشور، أو الصق رابط الفيديو نفسه',
+    },
     'say what is being rehearsed — an empty scenario gives the counterpart nothing to play': {
         'es': 'di qué se ensaya — un escenario vacío no le da nada que interpretar a la contraparte',
         'fr': "dites ce qui se répète — un scénario vide ne donne rien à jouer à l'interlocuteur",

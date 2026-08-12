@@ -4594,7 +4594,7 @@ const CHROME: Table = {
     en: "Start or join", es: "Empezar o unirse", fr: "Lancer ou rejoindre", de: "Starten oder beitreten", pt: "Começar ou entrar", it: "Avvia o unisciti", ja: "始めるか、参加するか", zh: "开始或加入", hi: "शुरू करें या शामिल हों", ar: "ابدأ أو انضم",
   },
   "wp.post.ph": {
-    en: "post id (a post with a video)", es: "id de la publicación (una con vídeo)", fr: "id du post (un post avec une vidéo)", de: "Beitrags-ID (ein Beitrag mit Video)", pt: "id da publicação (uma com vídeo)", it: "id del post (un post con un video)", ja: "投稿ID（動画のある投稿）", zh: "帖子 ID（含视频的帖子）", hi: "पोस्ट आईडी (वीडियो वाली पोस्ट)", ar: "معرّف المنشور (منشور فيه فيديو)",
+    en: "video link, or the id of a posted video", es: "enlace del vídeo, o id de un vídeo publicado", fr: "lien de la vidéo, ou id d'une vidéo publiée", de: "Videolink, oder die ID eines veröffentlichten Videos", pt: "link do vídeo, ou id de um vídeo publicado", it: "link del video, o id di un video pubblicato", ja: "動画リンク、または投稿された動画のID", zh: "视频链接，或已发布视频的 ID", hi: "वीडियो लिंक, या पोस्ट किए गए वीडियो की आईडी", ar: "رابط الفيديو، أو معرّف فيديو منشور",
   },
   "wp.title.ph": {
     en: "call it something", es: "ponle un nombre", fr: "donnez-lui un nom", de: "nennen Sie es irgendwie", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "起个名字", hi: "इसे कोई नाम दें", ar: "سمّها بشيء",

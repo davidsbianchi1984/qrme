@@ -108,7 +108,10 @@ export function WatchParty({ onPlans }: {
                  placeholder={tr("wp.title.ph", lang)} />
           <button disabled={!postId.trim() || !token} onClick={act(
             () => api.startWatchParty(
-              { post_id: postId.trim(), host_id: me, title: title.trim() }, token),
+              postId.trim().toLowerCase().startsWith("http")
+                ? { video_url: postId.trim(), host_id: me, title: title.trim() }
+                : { post_id: postId.trim(), host_id: me, title: title.trim() },
+              token),
             tr("wp.started.said", lang))}>{tr("wp.start", lang)}</button>
         </div>
         <div className="row">

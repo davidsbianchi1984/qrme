@@ -3893,7 +3893,10 @@ export const api = {
   watchParty: (partyId: string, token: string) =>
     req<WatchParty>(`/watch-parties/${partyId}`, { token }),
 
-  startWatchParty: (body: { post_id: string; host_id: string; title?: string },
+  // One anchor, two names: the id of a posted video, or `video_url` — a
+  // pasted link that faces the same platform allowlist a wall post's does.
+  startWatchParty: (body: { post_id?: string; video_url?: string;
+                            host_id: string; title?: string },
                     token: string) =>
     req<WatchParty>("/watch-parties", { method: "POST", body, token }),
 

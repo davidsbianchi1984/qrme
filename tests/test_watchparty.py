@@ -209,3 +209,79 @@ def test_the_route_publishes_the_blindness_to_members_only(client):
 
     assert client.get(f"/watch-parties/{party['id']}/context",
                       headers={"authorization": ""}).status_code == 401
+
+
+# -- a pasted link is met, not refused ----------------------------------------
+#
+# The field report that forced this was a screenshot: a YouTube link pasted
+# into the screen's one field, answered with "that post has no video to
+# watch" — technically true and humanly useless. A pasted link is the most
+# natural input that field gets.
+
+def test_a_pasted_link_starts_a_party(client):
+    me = make_profile(client, display_name="Host")
+    r = client.post("/watch-parties",
+                    json={"video_url": "https://youtu.be/dQw4w9WgXcQ",
+                          "host_id": me["id"], "title": "movie night"},
+                    headers=auth_header(me))
+    assert r.status_code == 201
+    party = r.json()
+    assert party["video"]["platform_name"] == "YouTube"
+    assert party["video"]["video_id"] == "dQw4w9WgXcQ"
+    assert party["title"] == "movie night"
+
+
+def test_a_link_pasted_into_the_post_id_field_is_recognised(client):
+    """Every client's one input box sends `post_id`, so a URL arriving under
+    that name is what the deployed field actually produces."""
+    me = make_profile(client, display_name="Host")
+    r = client.post("/watch-parties",
+                    json={"post_id": "https://youtu.be/dQw4w9WgXcQ",
+                          "host_id": me["id"]},
+                    headers=auth_header(me))
+    assert r.status_code == 201
+    assert r.json()["video"]["platform_name"] == "YouTube"
+
+
+def test_a_link_party_faces_the_same_allowlist_a_post_does(client):
+    """Nothing plays in a party that could not have been posted."""
+    me = make_profile(client, display_name="Host")
+    r = client.post("/watch-parties",
+                    json={"video_url": "https://example.com/watch?v=abc",
+                          "host_id": me["id"]},
+                    headers=auth_header(me))
+    assert r.status_code == 422
+    assert "not one of them" in r.json()["detail"]
+
+
+def test_a_link_party_fabricates_no_post_on_anybodys_wall(client):
+    """The video hangs off the party's own id — no posts row exists for it,
+    so it can never surface on a wall or in a feed."""
+    me = make_profile(client, display_name="Host")
+    party = watchparty.start_from_url("https://youtu.be/dQw4w9WgXcQ",
+                                      me["id"])
+    assert party["post_id"] == party["id"]
+    assert db.connect().execute("SELECT 1 FROM posts WHERE id=?",
+                                (party["id"],)).fetchone() is None
+
+
+def test_a_link_party_still_tells_the_profile_it_has_not_seen_it(client):
+    """The blindness instruction does not depend on how the party started."""
+    me = make_profile(client, display_name="Host")
+    party = watchparty.start_from_url("https://youtu.be/dQw4w9WgXcQ",
+                                      me["id"])
+    ctx = watchparty.prompt_context(party["id"])
+    assert ctx["you_have_not_seen_it"] is True
+    assert ctx["watching"]["platform"] == "YouTube"
+
+
+def test_a_wrong_id_names_both_ways_in(client):
+    """The refusal tells you what the field takes — an id or a link — instead
+    of blaming a post nobody named."""
+    me = make_profile(client, display_name="Host")
+    r = client.post("/watch-parties",
+                    json={"post_id": "not-a-real-post",
+                          "host_id": me["id"]},
+                    headers=auth_header(me))
+    assert r.status_code == 422
+    assert "paste the video's own link" in r.json()["detail"]

@@ -72,30 +72,71 @@ def _party(party_id: str):
 
 
 def start(post_id: str, host_id: str, title: str = "") -> dict:
-    """Open a party around a posted video.
+    """Open a party around a posted video, or straight from a pasted link.
 
-    Anchored to the post rather than to a raw URL, so the party inherits
-    everything a post already carries — its author's rating, its moderation
-    verdict, the fact that the link was checked against the platform allowlist
-    when it was posted.
+    Anchored to a post when given one, so the party inherits everything a
+    post already carries — its author's rating, its moderation verdict, the
+    fact that the link was checked against the platform allowlist when it
+    was posted. A pasted video link is met too, because it is the most
+    natural thing to put in the one field this screen has: the field report
+    that forced the issue was a screenshot of a YouTube link answered with
+    "that post has no video to watch" — technically true and humanly
+    useless. A link that reaches this function by either name goes through
+    :func:`start_from_url`.
     """
-    video = embeds.facade(post_id)
-    if video is None:
-        raise PartyError("that post has no video to watch")
+    anchor = (post_id or "").strip()
+    if anchor.lower().startswith(("http://", "https://")):
+        return start_from_url(anchor, host_id, title)
     post = db.connect().execute("SELECT status FROM posts WHERE id=?",
-                                (post_id,)).fetchone()
+                                (anchor,)).fetchone()
     if post is None:
-        raise PartyError("no such post")
+        # Checked before the video lookup, so the answer names what is
+        # actually wrong. The old order answered a pasted URL with "that
+        # post has no video to watch", which blamed a post nobody named.
+        raise PartyError("nothing posted has that id — give the id of a "
+                         "posted video, or paste the video's own link")
     if post["status"] != "approved":
         raise PartyError("that post is not visible, so it cannot be watched "
                          "together")
+    video = embeds.facade(anchor)
+    if video is None:
+        raise PartyError("that post has no video to watch")
 
     pid = db.new_id("wpt")
     db.connect().execute(
         "INSERT INTO watch_parties (id, post_id, host_id, title, position_s,"
         " playing, created_at) VALUES (?,?,?,?,0,0,?)",
-        (pid, post_id, host_id, (title or "").strip() or None, db.utcnow()))
+        (pid, anchor, host_id, (title or "").strip() or None, db.utcnow()))
     db.connect().commit()
+    join(pid, host_id, kind="person", role="host")
+    return get(pid)
+
+
+def start_from_url(url: str, host_id: str, title: str = "") -> dict:
+    """Open a party straight from a video link, with no post behind it.
+
+    The link faces exactly the gate a wall post's video faces —
+    :func:`embeds.parse`, the platform allowlist — so nothing plays here
+    that could not have been posted. The video hangs off the party's own id
+    in ``post_videos`` rather than off a fabricated post, so nobody's wall
+    grows an entry they never wrote. What a post-anchored party inherits
+    and this one cannot — an author and their rating — is covered where it
+    already lives: the room's maturity is decided by who is in it
+    (:func:`_maturity`), not by who posted the video.
+    """
+    try:
+        embeds.parse(url)
+    except embeds.EmbedError as exc:
+        raise PartyError(str(exc)) from None
+    pid = db.new_id("wpt")
+    db.connect().execute(
+        "INSERT INTO watch_parties (id, post_id, host_id, title, position_s,"
+        " playing, created_at) VALUES (?,?,?,?,0,0,?)",
+        (pid, pid, host_id, (title or "").strip() or None, db.utcnow()))
+    db.connect().commit()
+    # Keyed by the party's own id: `facade(post_id)` serves it unchanged,
+    # and no posts row exists for it, so it can never surface on a wall.
+    embeds.attach(pid, url, "")
     join(pid, host_id, kind="person", role="host")
     return get(pid)
 

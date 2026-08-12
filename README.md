@@ -3301,6 +3301,18 @@ A watch party (`qrme/watchparty.py`, `POST /watch-parties`) is a posted video
 plus everyone who turned up — and on this platform that includes **synthetic
 profiles**, which is where the honesty problem is.
 
+**A pasted link works too.** The screen has one field, and the most natural
+thing to put in it is a YouTube link — the field report that forced the issue
+was exactly that, answered with "that post has no video to watch". So `start`
+takes either the id of a posted video or a `video_url` (a URL pasted into
+`post_id` is recognised for what it is): the link faces the **same platform
+allowlist** a wall post's video does, and the video hangs off the party's own
+id — no post is fabricated on anybody's wall to hold it, so it can never
+surface in a feed. What a post-anchored party inherits and a link-anchored one
+cannot — an author and their rating — is covered where it already lives: the
+room's maturity is decided by who is in it (a minor in the room forces
+strict), not by who posted the video.
+
 **A profile has not seen the video. It cannot.** Nothing here fetches it,
 nothing transcribes it, and a profile saying *"the bit at four minutes was
 great"* would be fabricating — the most ordinary-looking lie this product could

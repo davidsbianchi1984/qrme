@@ -685,7 +685,10 @@ LESSONS: tuple[dict, ...] = (
     dict(key="party", chapter="Working", title="Watching together",
          what="A posted video, a position everybody shares, and whoever you "
               "bring — including your own profiles, which are marked as "
-              "synthetic to everyone in the room. The host moves the "
+              "synthetic to everyone in the room. You can also just paste a "
+              "video link: it faces the same platform allowlist a wall "
+              "post's video does, and the party carries it itself, so "
+              "nobody's wall grows a post they never wrote. The host moves the "
               "position, and moving it moves a number: nobody's player starts "
               "on their device but their own. The part worth looking at is "
               "what a profile in the room actually knows. It gets the title, "
