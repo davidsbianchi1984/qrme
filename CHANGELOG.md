@@ -4,6 +4,49 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.68.0] - 2026-08-12
+
+### Added
+
+- **The memory door.** `GET /profiles/{id}/memory/{interactor}/account`
+  answers "what do you remember about me" from the records rather than by
+  generation — the distilled paragraph as it stands, how many turns were
+  folded into it, how many are still in the recent window, first and last
+  contact. `POST .../memory/{interactor}/forget` is the scalpel beside the
+  erase-all: every turn whose text carries the named words is deleted, and
+  the distilled remembrance is dropped to re-fold from what remains, never
+  from what was struck. Both doors answer to owner or interactor, in the
+  console and all three shells.
+- **The steering lock.** `POST /profiles/{id}/steering/lock` holds the dials
+  where they stand: while the lock holds, every steering write — the owner's
+  own slip, a compromised session, any future automation — answers 423 in
+  the reader's language, through the steering door, the hub, and the robot
+  door alike. `DELETE` turns the key; the lock and the key are both the
+  owner's.
+- **The card carried in.** `POST /profiles/import/card` reads a
+  `chara_card_v2` / `chara_card_v3` character card — raw JSON or embedded in
+  a PNG's text chunk — and seeds a fictional profile through the same
+  creation path as every other: identity into the persona, greeting and
+  example dialogue into source material with honest provenance. What it
+  refuses, it names: `system_prompt`, `post_history_instructions` and
+  jailbreak blocks are harness instructions aimed at somebody else's model,
+  withheld item by item in `withholdings` with reasons.
+- **The room that forgets on purpose.** `POST /profiles/{id}/rehearsal`
+  opens a practice room for the hard conversation: the profile plays the
+  named counterpart, every reply is marked `remembered: false`, the
+  transcript lives only in the room, and closing the room wipes it. Nothing
+  said inside ever reaches messages, engagement or the remembrance.
+
+### Fixed
+
+- The identity camera never rendered after permission was granted — the
+  stream was attached in a frame callback that raced the conditional
+  `<video>` element's mount. The stream now attaches from an effect keyed on
+  the capturing state, and unmounting releases the camera.
+- A departed or restricted profile could be made to speak in a rehearsal
+  room; both rehearsal doors now ask `require_may_publish` before anything
+  else, exactly as chat and compose do.
+
 ## [0.67.0] - 2026-08-12
 
 ### Added
