@@ -21,6 +21,8 @@ struct ChatView: View {
     // Spec clauses 2/12. Empty means "read my prompt and decide", which is what
     // the backend does on its own — and the reply says which way it went.
     @State private var role = ""
+    @State private var rehearsal: ApiClient.RehearsalRoom?
+    @State private var rhScenario = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -61,6 +63,27 @@ struct ChatView: View {
                 }
             }
 
+            // Rehearsal: practice the hard conversation — the transcript
+            // lives only in the room, and closing the room wipes it.
+            HStack(spacing: 8) {
+                if let room = rehearsal {
+                    Text("🎭 " + room.scenario)
+                        .font(.caption).foregroundStyle(Theme.t2)
+                        .lineLimit(1)
+                    Spacer()
+                    Button(L10n.t("cht.rh.close", state.language)) { closeRoom() }
+                        .font(.caption.bold()).foregroundStyle(Theme.red)
+                } else {
+                    TextField(L10n.t("cht.rh.scenario.ph", state.language),
+                              text: $rhScenario)
+                        .font(.caption).textFieldStyle(.roundedBorder)
+                    Button(L10n.t("cht.rh.open", state.language)) { openRoom() }
+                        .font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        .disabled(rhScenario.isEmpty || busy)
+                }
+            }
+            .padding(.horizontal, 20).padding(.bottom, 6)
+
             // Spec clauses 2/12 — advisor counsels, collaborator co-creates,
             // operator executes. "Read my prompt" is the honest default: the
             // profile infers from the wording and the reply says which.
@@ -93,6 +116,34 @@ struct ChatView: View {
         }
     }
 
+    private func openRoom() {
+        guard let pid = state.pid else { return }
+        busy = true; error = nil
+        Task {
+            do {
+                var interactor = state.interactorId
+                if interactor == nil {
+                    let created = try await ApiClient.shared.createInteractor(name: "You")
+                    state.rememberInteractor(created.id, token: created.token)
+                    interactor = created.id
+                }
+                rehearsal = try await ApiClient.shared.openRehearsal(
+                    id: pid, interactorId: interactor!, scenario: rhScenario)
+                rhScenario = ""
+            } catch { self.error = error.localizedDescription }
+            busy = false
+        }
+    }
+
+    private func closeRoom() {
+        guard let pid = state.pid, let room = rehearsal else { return }
+        Task {
+            try? await ApiClient.shared.closeRehearsal(
+                id: pid, rehearsalId: room.id)
+            rehearsal = nil
+        }
+    }
+
     private func send() {
         guard let pid = state.pid, let token = state.token else { return }
         let text = draft
@@ -107,6 +158,17 @@ struct ChatView: View {
                     let created = try await ApiClient.shared.createInteractor(name: "You")
                     state.rememberInteractor(created.id, token: created.token)
                     interactor = created.id
+                }
+                // An open rehearsal room takes the turn: nothing lands in
+                // the remembered conversation, and the bubble says so.
+                if let room = rehearsal {
+                    let turn = try await ApiClient.shared.rehearse(
+                        id: pid, rehearsalId: room.id, message: text)
+                    messages.append(Bubble(
+                        mine: false, text: turn.reply, pending: false,
+                        mark: "🎭 " + room.scenario))
+                    busy = false
+                    return
                 }
                 let reply = try await ApiClient.shared.chat(
                     id: pid, token: token, interactorId: interactor!,

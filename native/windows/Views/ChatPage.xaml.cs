@@ -47,7 +47,52 @@ public sealed partial class ChatPage : Page
     {
         Subtitle.Text = L10n.Fill("nchat.sub", AppState.Current.Language,
                                   ("name", AppState.Current.DisplayName));
+        RehearsalBox.PlaceholderText = L10n.T("cht.rh.scenario.ph");
+        RehearsalButton.Content = L10n.T("cht.rh.open");
         MessagesList.ItemsSource = _messages;
+    }
+
+    private string? _rehearsalId;
+    private string _rehearsalScenario = "";
+
+    // Rehearsal: open a room whose transcript lives only until it closes;
+    // while it stands, sends go there and nothing is remembered.
+    private async void OnRehearsal(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        ErrorText.Visibility = Visibility.Collapsed;
+        try
+        {
+            if (_rehearsalId is { } roomId)
+            {
+                await ApiClient.Shared.CloseRehearsal(s.Pid!, roomId);
+                _rehearsalId = null;
+                RehearsalButton.Content = L10n.T("cht.rh.open");
+                RehearsalLine.Visibility = Visibility.Collapsed;
+                RehearsalBox.Visibility = Visibility.Visible;
+                return;
+            }
+            var scenario = RehearsalBox.Text.Trim();
+            if (scenario.Length == 0) return;
+            if (string.IsNullOrEmpty(s.InteractorId))
+            {
+                var created = await ApiClient.Shared.CreateInteractor("You");
+                s.RememberInteractor(created.Id, token: created.Token);
+            }
+            var room = await ApiClient.Shared.OpenRehearsal(
+                s.Pid!, s.InteractorId!, scenario);
+            _rehearsalId = room.Id;
+            _rehearsalScenario = room.Scenario;
+            RehearsalBox.Text = ""; RehearsalBox.Visibility = Visibility.Collapsed;
+            RehearsalButton.Content = L10n.T("cht.rh.close");
+            RehearsalLine.Text = "🎭 " + room.Scenario;
+            RehearsalLine.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex)
+        {
+            ErrorText.Text = ex.Message;
+            ErrorText.Visibility = Visibility.Visible;
+        }
     }
 
     private async void OnSend(object sender, RoutedEventArgs e)
@@ -62,6 +107,17 @@ public sealed partial class ChatPage : Page
         ErrorText.Visibility = Visibility.Collapsed;
         try
         {
+            // An open rehearsal room takes the turn: nothing lands in the
+            // remembered conversation, and the bubble says so.
+            if (_rehearsalId is { } openRoom)
+            {
+                var turn = await ApiClient.Shared.Rehearse(
+                    s.Pid!, openRoom, text);
+                _messages.Add(new BubbleRow(turn.Reply, HorizontalAlignment.Left));
+                _messages.Add(new BubbleRow("🎭 " + _rehearsalScenario,
+                                            HorizontalAlignment.Left));
+                return;
+            }
             // Lazily mint the device owner's interactor identity once.
             if (string.IsNullOrEmpty(s.InteractorId))
             {

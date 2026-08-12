@@ -329,6 +329,40 @@ object ApiClient {
             o.getString("kind"), o.getString("owner_token"))
     }
 
+    /** A character card as a profile seed; withheld pieces are named. */
+    suspend fun importCard(cardJSON: String, birthdate: String,
+                           language: String? = null): ProfileCreated {
+        val body = JSONObject()
+            .put("owner_id", "owner-1")
+            .put("card", JSONObject(cardJSON))
+            .put("verification", JSONObject().put("birthdate", birthdate))
+            .put("terms_consent", true)
+        if (!language.isNullOrBlank() && language != "en") body.put("language", language)
+        val o = JSONObject(request("/profiles/import/card", "POST", body))
+        return ProfileCreated(o.getString("id"), o.getString("display_name"),
+            o.getString("kind"), o.getString("owner_token"))
+    }
+
+    /** Rehearsal rooms: practice the hard conversation, nothing remembered. */
+    suspend fun openRehearsal(id: String, interactorId: String,
+                              scenario: String): Pair<String, String> {
+        val o = JSONObject(request("/profiles/$id/rehearsal", "POST",
+            JSONObject().put("interactor_id", interactorId)
+                .put("scenario", scenario)))
+        return o.getString("id") to o.getString("scenario")
+    }
+
+    suspend fun rehearse(id: String, rehearsalId: String,
+                         message: String): String {
+        val o = JSONObject(request("/profiles/$id/rehearsal/$rehearsalId/say",
+            "POST", JSONObject().put("message", message)))
+        return o.getString("reply")
+    }
+
+    suspend fun closeRehearsal(id: String, rehearsalId: String) {
+        request("/profiles/$id/rehearsal/$rehearsalId", "DELETE")
+    }
+
     suspend fun profile(id: String): ProfileCard {
         val o = JSONObject(request("/profiles/$id"))
         return ProfileCard(o.getString("id"), o.getString("display_name"),

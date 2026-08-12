@@ -7098,6 +7098,33 @@ const CHROME: Table = {
   "chat.wheretitle": {
     en: "Tell it where you are — the reply meets you there", es: "Dile dónde estás — la respuesta te encuentra ahí", fr: "Dites-lui où vous êtes — la réponse vous y rejoint", de: "Sagen Sie, wo Sie sind — die Antwort trifft Sie dort", pt: "Diga-lhe onde está — a resposta encontra-o aí", it: "Digli dove sei — la risposta ti raggiunge lì", ja: "いる場所を伝えてください — 返答はそこに合わせて届きます", zh: "告诉它你在哪里——回复会到那里找你", hi: "बताइए आप कहाँ हैं — उत्तर आपसे वहीं मिलेगा", ar: "أخبره أين أنت — والردّ يلقاك هناك",
   },
+  "onb.card": {
+    en: "Or carry in a character card", es: "O trae una tarjeta de personaje", fr: "Ou apportez une carte de personnage", de: "Oder eine Charakterkarte mitbringen", pt: "Ou traga um cartão de personagem", it: "Oppure porta una scheda del personaggio", ja: "またはキャラクターカードを持ち込む", zh: "或导入一张角色卡", hi: "या एक चरित्र कार्ड ले आएँ", ar: "أو أحضر بطاقة شخصية",
+  },
+  "onb.card.ph": {
+    en: "Paste the card JSON here, or choose its PNG below", es: "Pega aquí el JSON de la tarjeta, o elige su PNG abajo", fr: "Collez ici le JSON de la carte, ou choisissez son PNG ci-dessous", de: "Füge hier das JSON der Karte ein oder wähle unten ihr PNG", pt: "Cola aqui o JSON do cartão, ou escolhe o PNG abaixo", it: "Incolla qui il JSON della scheda, o scegli il suo PNG sotto", ja: "カードのJSONをここに貼るか、下でPNGを選択", zh: "在此粘贴角色卡 JSON，或在下方选择其 PNG", hi: "कार्ड का JSON यहाँ चिपकाएँ, या नीचे उसका PNG चुनें", ar: "الصق JSON البطاقة هنا، أو اختر صورتها PNG أدناه",
+  },
+  "onb.card.import": {
+    en: "Import the card", es: "Importar la tarjeta", fr: "Importer la carte", de: "Karte importieren", pt: "Importar o cartão", it: "Importa la scheda", ja: "カードを取り込む", zh: "导入角色卡", hi: "कार्ड आयात करें", ar: "استورد البطاقة",
+  },
+  "onb.card.withheld": {
+    en: "Withheld, by name:", es: "Retenido, por nombre:", fr: "Retenu, nommément :", de: "Zurückbehalten, namentlich:", pt: "Retido, pelo nome:", it: "Trattenuto, per nome:", ja: "持ち込まなかったもの：", zh: "未携带的内容（逐项）：", hi: "रोका गया, नाम सहित:", ar: "محجوب، بالاسم:",
+  },
+  "cht.rh": {
+    en: "Rehearsal", es: "Ensayo", fr: "Répétition", de: "Probe", pt: "Ensaio", it: "Prova", ja: "リハーサル", zh: "排练", hi: "पूर्वाभ्यास", ar: "بروفة",
+  },
+  "cht.rh.pitch": {
+    en: "Practice the hard conversation — nothing said here is remembered, and closing the room wipes it.", es: "Practica la conversación difícil — nada de lo dicho aquí se recuerda, y cerrar la sala lo borra.", fr: "Répétez la conversation difficile — rien de ce qui se dit ici n'est retenu, et fermer la salle l'efface.", de: "Übe das schwere Gespräch — nichts hier Gesagtes wird erinnert, und das Schließen des Raums löscht es.", pt: "Pratica a conversa difícil — nada do que é dito aqui fica lembrado, e fechar a sala apaga tudo.", it: "Prova la conversazione difficile — nulla di ciò che si dice qui viene ricordato, e chiudere la stanza lo cancella.", ja: "難しい会話の練習を — ここで話したことは記憶されず、部屋を閉じれば消えます。", zh: "练习那场艰难的对话 — 这里说的话不会被记住，关闭房间即全部抹除。", hi: "कठिन बातचीत का अभ्यास करें — यहाँ कही कोई बात याद नहीं रखी जाती, और कमरा बंद करते ही मिट जाती है।", ar: "تدرّب على الحديث الصعب — لا يُتذكّر ما يُقال هنا، وإغلاق الغرفة يمحوه.",
+  },
+  "cht.rh.scenario.ph": {
+    en: "What are you rehearsing?", es: "¿Qué estás ensayando?", fr: "Que répétez-vous ?", de: "Was probst du?", pt: "O que estás a ensaiar?", it: "Cosa stai provando?", ja: "何を練習しますか？", zh: "你要排练什么？", hi: "आप किसका अभ्यास कर रहे हैं?", ar: "ما الذي تتدرب عليه؟",
+  },
+  "cht.rh.open": {
+    en: "Open the room", es: "Abrir la sala", fr: "Ouvrir la salle", de: "Raum öffnen", pt: "Abrir a sala", it: "Apri la stanza", ja: "ルームを開く", zh: "开启房间", hi: "कमरा खोलें", ar: "افتح الغرفة",
+  },
+  "cht.rh.close": {
+    en: "Close and wipe", es: "Cerrar y borrar", fr: "Fermer et effacer", de: "Schließen und löschen", pt: "Fechar e apagar", it: "Chiudi e cancella", ja: "閉じて消去", zh: "关闭并抹除", hi: "बंद करें और मिटाएँ", ar: "أغلق وامحُ",
+  },
   "chat.type.ph": {
     en: "Type a message…", es: "Escribe un mensaje…", fr: "Tapez un message…", de: "Eine Nachricht schreiben…", pt: "Escreva uma mensagem…", it: "Scrivi un messaggio…", ja: "メッセージを入力…", zh: "输入一条消息…", hi: "एक संदेश लिखिए…", ar: "اكتب رسالة…",
   },

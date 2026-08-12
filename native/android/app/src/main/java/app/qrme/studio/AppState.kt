@@ -78,6 +78,23 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun importCard(
+        cardJSON: String, birthdate: String, language: String? = null,
+        onError: (String) -> Unit, onBusy: (Boolean) -> Unit,
+    ) {
+        onBusy(true)
+        viewModelScope.launch {
+            runCatching { ApiClient.importCard(cardJSON, birthdate, language) }
+                .onSuccess { r ->
+                    pid = r.id; token = r.ownerToken; displayName = r.displayName
+                    prefs.edit().putString("pid", r.id).putString("token", r.ownerToken)
+                        .putString("name", r.displayName).apply()
+                }
+                .onFailure { onError(it.message ?: "") }
+            onBusy(false)
+        }
+    }
+
     fun signOut() {
         pid = null; token = null; displayName = ""
         interactorId = null; interactorToken = null; interactorVerified = false

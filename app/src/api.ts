@@ -3051,6 +3051,29 @@ export const api = {
     verification: { birthdate: string }; purpose?: string;
   }) => req<Profile>("/profiles", { method: "POST", body }),
 
+  // A character card as a profile seed; what is refused is named.
+  importCard: (body: {
+    owner_id: string; verification: { birthdate: string };
+    card?: Record<string, unknown>; content?: string; plan?: string;
+  }) =>
+    req<Profile & { owner_token: string; carried: Record<string, unknown>;
+                    withholdings: { item: string; reason: string }[] }>(
+      "/profiles/import/card", { method: "POST", body }),
+
+  // Rehearsal rooms: practice the hard conversation, nothing remembered.
+  openRehearsal: (profileId: string, interactorId: string, scenario: string) =>
+    req<{ id: string; scenario: string; turns: number; remembered: boolean }>(
+      `/profiles/${profileId}/rehearsal`,
+      { method: "POST", body: { interactor_id: interactorId, scenario } }),
+  rehearse: (profileId: string, rehearsalId: string, message: string) =>
+    req<{ id: string; reply: string; turns: number; remembered: boolean }>(
+      `/profiles/${profileId}/rehearsal/${rehearsalId}/say`,
+      { method: "POST", body: { message } }),
+  closeRehearsal: (profileId: string, rehearsalId: string) =>
+    req<{ id: string; turns: number; erased: boolean }>(
+      `/profiles/${profileId}/rehearsal/${rehearsalId}`,
+      { method: "DELETE" }),
+
   getProfile: (id: string) => req<Profile>(`/profiles/${id}`),
 
   stats: (id: string, token: string) =>

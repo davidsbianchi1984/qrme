@@ -11,6 +11,23 @@ namespace QrmeStudio;
 
 // MARK: wire models (mirror qrme/models.py + routers)
 
+public record RehearsalRoom(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("scenario")] string Scenario,
+    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("remembered")] bool Remembered);
+
+public record RehearsalTurn(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("reply")] string Reply,
+    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("remembered")] bool Remembered);
+
+public record RehearsalClosed(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("erased")] bool Erased);
+
 public record ProfileCreated(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("display_name")] string DisplayName,
@@ -801,6 +818,47 @@ public sealed class ApiClient
         if (token is not null) req.Headers.Add("authorization", $"Bearer {token}");
         return req;
     }
+
+    /// <summary>A character card as a profile seed; withheld pieces are
+    /// named by the response, and harness instructions never ride in.</summary>
+    public Task<ProfileCreated> ImportCard(string cardJson, string birthdate,
+                                           string? language = null)
+    {
+        var card = System.Text.Json.JsonSerializer
+            .Deserialize<System.Text.Json.JsonElement>(cardJson);
+        return Send<ProfileCreated>(Post("/profiles/import/card",
+            language is { Length: > 0 } && language != "en"
+                ? new
+                  {
+                      owner_id = "owner-1",
+                      card,
+                      verification = new { birthdate },
+                      language,
+                      terms_consent = true,
+                  }
+                : (object)new
+                  {
+                      owner_id = "owner-1",
+                      card,
+                      verification = new { birthdate },
+                      terms_consent = true,
+                  }));
+    }
+
+    /// <summary>Rehearsal rooms: nothing said inside is remembered.</summary>
+    public Task<RehearsalRoom> OpenRehearsal(string pid, string interactorId,
+                                             string scenario) =>
+        Send<RehearsalRoom>(Post($"/profiles/{pid}/rehearsal",
+            new { interactor_id = interactorId, scenario }));
+
+    public Task<RehearsalTurn> Rehearse(string pid, string rehearsalId,
+                                        string message) =>
+        Send<RehearsalTurn>(Post($"/profiles/{pid}/rehearsal/{rehearsalId}/say",
+            new { message }));
+
+    public Task<RehearsalClosed> CloseRehearsal(string pid, string rehearsalId) =>
+        Send<RehearsalClosed>(new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{pid}/rehearsal/{rehearsalId}"));
 
     public Task<ProfileCreated> CreateProfile(string name, string persona, string kind,
                                               string birthdate, string? language = null) =>

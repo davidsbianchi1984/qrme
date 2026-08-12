@@ -29,6 +29,9 @@ export function Chat({ onPlans }: {
   // Spec clauses 2/12: how the profile should work this turn. Empty means
   // "read my prompt and decide", which is what the backend does on its own.
   const [role, setRole] = useState("");
+  const [rehearsal, setRehearsal] = useState<{ id: string; scenario: string } | null>(null);
+  const [rhScenario, setRhScenario] = useState("");
+  const [rhOpen, setRhOpen] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   // Voice: replies read aloud by the device's own engine, and a microphone
   // that fills the composer. Both feature-detected — the mic button simply
@@ -117,6 +120,19 @@ export function Chat({ onPlans }: {
             local_time: new Date().toTimeString().slice(0, 5),
           }
         : undefined;
+    // An open rehearsal room takes the turn: the reply comes back marked
+    // for what it is, and nothing lands in the remembered conversation.
+    if (rehearsal) {
+      try {
+        const turn = await api.rehearse(
+          session.profileId, rehearsal.id, message);
+        setMsgs((m) => [...m, {
+          who: "assistant", text: turn.reply,
+          note: "🎭 " + rehearsal.scenario }]);
+      } catch (e) { setError(e); }
+      finally { setBusy(false); }
+      return;
+    }
     try {
       const reply = await api.chat(session.profileId, {
         interactor_id: session.interactorId,
@@ -280,7 +296,53 @@ export function Chat({ onPlans }: {
         </div>
       )}
 
+      {/* Rehearsal: practice the hard conversation — the transcript lives
+          only in the room, and closing the room wipes it. While a room is
+          open, turns go there instead of the remembered conversation. */}
+      {rhOpen && (
+        <div className="card">
+          <h3>{tr("cht.rh", lang)}</h3>
+          <p className="muted small">{tr("cht.rh.pitch", lang)}</p>
+          {rehearsal ? (
+            <div className="row">
+              <span className="muted small" style={{ flex: 1 }}>
+                🎭 {rehearsal.scenario}
+              </span>
+              <button className="danger" onClick={async () => {
+                if (!session.profileId) return;
+                try {
+                  await api.closeRehearsal(session.profileId, rehearsal.id);
+                } catch { /* the room may already be gone */ }
+                setRehearsal(null);
+              }}>{tr("cht.rh.close", lang)}</button>
+            </div>
+          ) : (
+            <div className="row">
+              <input value={rhScenario}
+                     placeholder={tr("cht.rh.scenario.ph", lang)}
+                     onChange={(e) => setRhScenario(e.target.value)}
+                     style={{ flex: 1 }} />
+              <button className="primary"
+                      disabled={busy || !rhScenario.trim()}
+                      onClick={async () => {
+                        if (!session.profileId || !session.interactorId) return;
+                        try {
+                          const room = await api.openRehearsal(
+                            session.profileId, session.interactorId,
+                            rhScenario.trim());
+                          setRehearsal({ id: room.id, scenario: room.scenario });
+                          setRhScenario("");
+                        } catch (e) { setError(e); }
+                      }}>{tr("cht.rh.open", lang)}</button>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="composer">
+        <button title={tr("cht.rh", lang)}
+                className={rhOpen || rehearsal ? "primary" : ""}
+                onClick={() => setRhOpen((o) => !o)}>🎭</button>
         <button title={tr("chat.wheretitle", lang)}
                 className={whereOpen ? "primary" : ""}
                 onClick={() => setWhereOpen((w) => !w)}>📍</button>

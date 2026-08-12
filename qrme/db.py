@@ -990,6 +990,20 @@ CREATE TABLE IF NOT EXISTS steering_settings (
     updated_at TEXT NOT NULL
 );
 
+-- Rehearsal rooms: practice the hard conversation with nothing
+-- remembered. The transcript lives only here, only until the room is
+-- closed; nothing in it ever reaches messages, engagement or the
+-- remembrance — a rehearsal that counted against the relationship
+-- would not be a rehearsal.
+CREATE TABLE IF NOT EXISTS rehearsals (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL,
+    interactor_id TEXT NOT NULL,
+    scenario      TEXT NOT NULL,
+    transcript    TEXT NOT NULL DEFAULT '[]',   -- JSON turns, wiped on close
+    created_at    TEXT NOT NULL
+);
+
 -- The steering lock: while a row stands here, no dial on the subject
 -- moves — not by the owner's own slip, not by anyone else. The lock and
 -- the key are both the owner's.

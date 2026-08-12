@@ -72,6 +72,19 @@ class ProfileCreate(BaseModel):
     language: str | None = None        # chosen at the setup gateway
 
 
+class CardImport(BaseModel):
+    """A character card as a profile seed (qrme/cardimport.py): the card
+    as raw JSON in ``card``, or a PNG with one embedded as base64 in
+    ``content`` — the same name every upload door uses."""
+    terms_consent: bool = True
+    owner_id: str
+    plan: str | None = None
+    verification: Verification
+    card: dict | None = None
+    content: str | None = None
+    language: str | None = None
+
+
 class ProfileUpdate(BaseModel):
     """Owner control: edit the profile anytime."""
 
@@ -138,6 +151,16 @@ class RelationshipSet(BaseModel):
     nickname: str | None = None
     tone: str | None = None
     boundaries: list[str] = Field(default_factory=list)
+
+
+class RehearsalOpen(BaseModel):
+    """A practice room: the hard conversation, with nothing remembered."""
+    interactor_id: str
+    scenario: str
+
+
+class RehearsalSay(BaseModel):
+    message: str
 
 
 class ChatRequest(BaseModel):

@@ -1016,6 +1016,39 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'say what is being rehearsed — an empty scenario gives the counterpart nothing to play': {
+        'es': 'di qué se ensaya — un escenario vacío no le da nada que interpretar a la contraparte',
+        'fr': "dites ce qui se répète — un scénario vide ne donne rien à jouer à l'interlocuteur",
+        'de': 'sag, was geprobt wird — ein leeres Szenario gibt dem Gegenüber nichts zu spielen',
+        'pt': 'diz o que se ensaia — um cenário vazio não dá nada à contraparte para representar',
+        'it': "di' cosa si prova — uno scenario vuoto non dà nulla da recitare alla controparte",
+        'ja': '何を練習するのか言ってください — 空のシナリオでは相手役に演じるものがありません',
+        'zh': '说明要排练什么 — 空白的情境让对手无从扮演',
+        'hi': 'बताएँ क्या अभ्यास हो रहा है — खाली परिदृश्य में सामने वाले के निभाने को कुछ नहीं',
+        'ar': 'قل ما الذي يُتدرَّب عليه — سيناريو فارغ لا يعطي الطرف الآخر شيئًا يؤديه',
+    },
+    'an empty line rehearses nothing': {
+        'es': 'una línea vacía no ensaya nada',
+        'fr': 'une réplique vide ne répète rien',
+        'de': 'eine leere Zeile probt nichts',
+        'pt': 'uma fala vazia não ensaia nada',
+        'it': 'una battuta vuota non prova nulla',
+        'ja': '空のセリフでは何も練習できません',
+        'zh': '空白的台词排练不了任何东西',
+        'hi': 'खाली पंक्ति से कोई अभ्यास नहीं होता',
+        'ar': 'سطر فارغ لا يتدرب على شيء',
+    },
+    'no such rehearsal — the room may already be closed and wiped': {
+        'es': 'no existe ese ensayo — puede que la sala ya esté cerrada y borrada',
+        'fr': "cette répétition n'existe pas — la salle est peut-être déjà fermée et effacée",
+        'de': 'keine solche Probe — der Raum ist womöglich schon geschlossen und gelöscht',
+        'pt': 'esse ensaio não existe — a sala pode já estar fechada e apagada',
+        'it': "quella prova non esiste — la stanza potrebbe essere già chiusa e cancellata",
+        'ja': 'そのリハーサルはありません — 部屋はすでに閉じられ消去されたのかもしれません',
+        'zh': '没有这个排练 — 房间可能已被关闭并抹除',
+        'hi': 'ऐसा कोई पूर्वाभ्यास नहीं — कमरा शायद पहले ही बंद और मिटाया जा चुका है',
+        'ar': 'لا بروفة كهذه — لعل الغرفة أُغلقت ومُحيت بالفعل',
+    },
     'the steering is locked; these dials do not move until the owner unlocks them': {
         'es': 'la dirección está bloqueada; estos diales no se mueven hasta que el propietario los desbloquee',
         'fr': "le pilotage est verrouillé ; ces cadrans ne bougeront pas tant que le propriétaire ne les aura pas déverrouillés",
@@ -3265,6 +3298,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'surface': {'en': 'Surface', 'es': 'Superficie', 'fr': 'Surface', 'de': 'Fläche', 'pt': 'Superfície', 'it': 'Superficie', 'ja': 'サーフェス', 'zh': '表面', 'hi': 'सतह', 'ar': 'السطح'},
     'surface_id': {'en': 'Surface id', 'es': 'Id de la superficie', 'fr': 'Id de la surface', 'de': 'Flächen-ID', 'pt': 'Id da superfície', 'it': 'Id della superficie', 'ja': 'サーフェスID', 'zh': '表面 id', 'hi': 'सतह आईडी', 'ar': 'معرّف السطح'},
     'tagline': {'en': 'Tagline', 'es': 'Lema', 'fr': 'Slogan', 'de': 'Slogan', 'pt': 'Slogan', 'it': 'Slogan', 'ja': 'キャッチフレーズ', 'zh': '标语', 'hi': 'टैगलाइन', 'ar': 'الشعار'},
+    'card': {'en': 'Character card', 'es': 'Tarjeta de personaje', 'fr': 'Carte de personnage', 'de': 'Charakterkarte', 'pt': 'Cartão de personagem', 'it': 'Scheda del personaggio', 'ja': 'キャラクターカード', 'zh': '角色卡', 'hi': 'चरित्र कार्ड', 'ar': 'بطاقة الشخصية'},
     'tags': {'en': 'Tags', 'es': 'Etiquetas', 'fr': 'Mots-clés', 'de': 'Schlagwörter', 'pt': 'Etiquetas', 'it': 'Tag', 'ja': 'タグ', 'zh': '标签', 'hi': 'टैग', 'ar': 'الوسوم'},
     'target': {'en': 'Target', 'es': 'Objetivo', 'fr': 'Cible', 'de': 'Ziel', 'pt': 'Alvo', 'it': 'Obiettivo', 'ja': 'ターゲット', 'zh': '目标', 'hi': 'लक्ष्य', 'ar': 'الهدف'},
     'theme': {'en': 'Theme', 'es': 'Tema', 'fr': 'Thème', 'de': 'Design', 'pt': 'Tema', 'it': 'Tema', 'ja': 'テーマ', 'zh': '主题', 'hi': 'थीम', 'ar': 'السمة'},

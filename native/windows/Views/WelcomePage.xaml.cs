@@ -46,6 +46,9 @@ public sealed partial class WelcomePage : Page
         BirthBox.Header = L10n.T("nw.birthdate", _lang);
         TermsText.Text = L10n.T("nw.terms", _lang);
         StartButton.Content = L10n.T("nw.create", _lang);
+        CardHead.Text = L10n.T("nw.card", _lang);
+        CardBox.PlaceholderText = L10n.T("nw.card.ph", _lang);
+        ImportCardButton.Content = L10n.T("nw.card.import", _lang);
         InviteText.Text = L10n.T("pub.invite", _lang);
         DoorButton.Content = L10n.T("nw.door", _lang);
         NoAccountText.Text = L10n.T("pub.invite.none", _lang);
@@ -90,6 +93,29 @@ public sealed partial class WelcomePage : Page
         {
             ShowError(L10n.Fill("nw.unreachable", _lang, ("detail", ex.Message)));
             StartButton.IsEnabled = true;
+        }
+    }
+
+    private async void OnImportCard(object sender, RoutedEventArgs e)
+    {
+        var cardJson = CardBox.Text.Trim();
+        if (cardJson.Length == 0) return;
+        ImportCardButton.IsEnabled = false;
+        try
+        {
+            var language = LanguageBox.SelectedIndex >= 0
+                           && LanguageBox.SelectedIndex < _languages.Length
+                ? _languages[LanguageBox.SelectedIndex].Code
+                : null;
+            var result = await ApiClient.Shared.ImportCard(
+                cardJson, BirthBox.Text.Trim(), language);
+            AppState.Current.SignIn(result);
+            Frame.Navigate(typeof(ShellPage));
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex.Message);
+            ImportCardButton.IsEnabled = true;
         }
     }
 

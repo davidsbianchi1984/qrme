@@ -23,7 +23,8 @@ from ..common import (require_may_publish,
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
     InteractorCreate, MemoryForget, MessageOut, QuietHoursSet,
-    RelationshipSet, VoiceConsent, VoiceSample, VoiceSay,
+    RehearsalOpen, RehearsalSay, RelationshipSet, VoiceConsent,
+    VoiceSample, VoiceSay,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -658,6 +659,103 @@ def get_engagement(profile_id: str, interactor_id: str,
     if state is None:
         raise HTTPException(404, "no engagement recorded")
     return EngagementOut(**{k: state[k] for k in EngagementOut.model_fields})
+
+
+# -- Rehearsal rooms: practice the hard conversation, nothing remembered -----
+
+#: Turns a rehearsal holds while open. A practice room, not an archive.
+_REHEARSAL_WINDOW = 20
+
+_REHEARSAL_FRAME = (
+    "This is a rehearsal. The person is practicing a hard conversation "
+    "and you are playing the counterpart described below, in character, "
+    "so they can find their words before the real one. Stay realistic — "
+    "a rehearsal against a pushover teaches nothing — but never cruel. "
+    "Nothing said here is remembered afterward, by either of you.\n\n"
+    "The conversation being rehearsed: ")
+
+
+def _rehearsal_or_404(rehearsal_id: str, profile_id: str) -> dict:
+    row = db.connect().execute(
+        "SELECT * FROM rehearsals WHERE id=? AND profile_id=?",
+        (rehearsal_id, profile_id)).fetchone()
+    if row is None:
+        raise HTTPException(404, "no such rehearsal — the room may "
+                                 "already be closed and wiped")
+    return dict(row)
+
+
+@router.post("/profiles/{profile_id}/rehearsal", status_code=201)
+def open_rehearsal(profile_id: str, body: RehearsalOpen,
+                   request: Request) -> dict:
+    """Open a practice room with this profile. What is said inside never
+    reaches messages, engagement or the remembrance — a rehearsal that
+    counted against the relationship would not be a rehearsal."""
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, body.interactor_id, request)
+    scenario = (body.scenario or "").strip()
+    if not scenario:
+        raise HTTPException(
+            422, "say what is being rehearsed — an empty scenario gives "
+                 "the counterpart nothing to play")
+    conn = db.connect()
+    rehearsal_id = db.new_id("rhs")
+    conn.execute(
+        "INSERT INTO rehearsals (id, profile_id, interactor_id, scenario,"
+        " created_at) VALUES (?,?,?,?,?)",
+        (rehearsal_id, profile_id, body.interactor_id, scenario,
+         db.utcnow()))
+    conn.commit()
+    return {"id": rehearsal_id, "scenario": scenario, "turns": 0,
+            "remembered": False}
+
+
+@router.post("/profiles/{profile_id}/rehearsal/{rehearsal_id}/say")
+def rehearse(profile_id: str, rehearsal_id: str, body: RehearsalSay,
+             request: Request) -> dict:
+    """One practice turn. The transcript lives only in the room, only
+    until it closes; the reply is marked for what it is."""
+    profile = profile_or_404(profile_id)
+    row = _rehearsal_or_404(rehearsal_id, profile_id)
+    require_owner_or_interactor(profile_id, row["interactor_id"], request)
+    message = (body.message or "").strip()
+    if not message:
+        raise HTTPException(422, "an empty line rehearses nothing")
+
+    transcript = json.loads(row["transcript"])
+    system = (persona.build_system_prompt(dict(profile), None, None)
+              + "\n\n" + _REHEARSAL_FRAME + row["scenario"])
+    turns = ([{"role": "user" if m["role"] == "interactor" else "assistant",
+               "content": m["content"]}
+              for m in transcript[-_REHEARSAL_WINDOW:]]
+             + [{"role": "user", "content": message}])
+    provider = llm.provider_for_profile(profile_id,
+                                        cloud=request.app.state.cloud)
+    reply = provider.generate(system, turns)
+
+    transcript += [{"role": "interactor", "content": message},
+                   {"role": "profile", "content": reply}]
+    conn = db.connect()
+    conn.execute("UPDATE rehearsals SET transcript=? WHERE id=?",
+                 (json.dumps(transcript), rehearsal_id))
+    conn.commit()
+    return {"id": rehearsal_id, "reply": reply,
+            "turns": len(transcript) // 2, "remembered": False}
+
+
+@router.delete("/profiles/{profile_id}/rehearsal/{rehearsal_id}")
+def close_rehearsal(profile_id: str, rehearsal_id: str,
+                    request: Request) -> dict:
+    """Close the room and wipe it. The row and its transcript go
+    together; what was practiced stays with the person who practiced."""
+    profile_or_404(profile_id)
+    row = _rehearsal_or_404(rehearsal_id, profile_id)
+    require_owner_or_interactor(profile_id, row["interactor_id"], request)
+    turns = len(json.loads(row["transcript"])) // 2
+    conn = db.connect()
+    conn.execute("DELETE FROM rehearsals WHERE id=?", (rehearsal_id,))
+    conn.commit()
+    return {"id": rehearsal_id, "turns": turns, "erased": True}
 
 
 # -- Persistent memory management (PRD 6.4) ----------------------------------

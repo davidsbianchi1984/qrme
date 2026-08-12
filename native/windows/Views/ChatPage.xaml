@@ -38,6 +38,20 @@
         <StackPanel Grid.Row="2" Spacing="8">
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
+            <!-- Rehearsal: practice the hard conversation — the transcript
+                 lives only in the room, and closing the room wipes it. -->
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="RehearsalBox" Grid.Column="0" />
+                <Button x:Name="RehearsalButton" Grid.Column="1" Height="32"
+                        Click="OnRehearsal" Background="Transparent" FontSize="12"
+                        Foreground="{StaticResource QrmeBrandABrush}" />
+            </Grid>
+            <TextBlock x:Name="RehearsalLine" FontSize="11" TextWrapping="Wrap"
+                       Foreground="{StaticResource QrmeT2Brush}" Visibility="Collapsed" />
             <!-- Spec clauses 2/12 — advisor counsels, collaborator co-creates,
                  operator executes. "Read my prompt" is the honest default: the
                  profile infers from the wording and the reply says which. -->

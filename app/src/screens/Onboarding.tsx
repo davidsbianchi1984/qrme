@@ -296,6 +296,9 @@ function ProfileCreate() {
   const [birthdate, setBirthdate] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [cardText, setCardText] = useState("");
+  const [cardPng, setCardPng] = useState<string | null>(null);
+  const [withheld, setWithheld] = useState<string | null>(null);
 
   async function create() {
     setBusy(true);
@@ -329,6 +332,41 @@ function ProfileCreate() {
     }
   }
 
+  async function importCard() {
+    setBusy(true); setError(null); setWithheld(null);
+    try {
+      let card: Record<string, unknown> | undefined;
+      if (cardText.trim()) card = JSON.parse(cardText);
+      const profile = await api.importCard({
+        owner_id: session.accountId || "owner-desktop",
+        verification: { birthdate },
+        card, content: cardPng ?? undefined,
+      });
+      if (profile.withholdings.length > 0) {
+        setWithheld(profile.withholdings.map((w) => w.item).join(" · "));
+      }
+      const me = await api.createInteractor({ display_name: "You", birthdate });
+      await api.setRelationship(profile.id, me.id, {
+        relationship_type: "friend", nickname: "me", tone: "warm",
+      }, profile.owner_token);
+      setSession({
+        profileId: profile.id, ownerToken: profile.owner_token,
+        profile, interactorId: me.id, interactorToken: me.token,
+      });
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  function pickCardPng(file: File | null) {
+    if (!file) { setCardPng(null); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = String(reader.result || "");
+      setCardPng(url.slice(url.indexOf(",") + 1) || null);
+    };
+    reader.readAsDataURL(file);
+  }
+
   return (
     <>
       <label>
@@ -358,6 +396,25 @@ function ProfileCreate() {
       <p className="hint">
         {tr("onb.signedin", visitorLang())} <code>{session.accountEmail}</code> {tr("onb.undercount", visitorLang())}
       </p>
+
+      {/* Or carry in a character card — chara_card_v2/v3 as JSON or a PNG
+          with one embedded. What the platform refuses to carry (harness
+          instructions), it names. */}
+      <label>
+        {tr("onb.card", visitorLang())}
+        <textarea rows={2} value={cardText}
+                  placeholder={tr("onb.card.ph", visitorLang())}
+                  onChange={(e) => setCardText(e.target.value)} />
+      </label>
+      <input type="file" accept="image/png"
+             onChange={(e) => pickCardPng(e.target.files?.[0] ?? null)} />
+      <button disabled={busy || !birthdate || (!cardText.trim() && !cardPng)}
+              onClick={importCard}>
+        {tr("onb.card.import", visitorLang())}
+      </button>
+      {withheld && (
+        <p className="hint">{tr("onb.card.withheld", visitorLang())} {withheld}</p>
+      )}
     </>
   );
 }

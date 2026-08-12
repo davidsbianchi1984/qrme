@@ -8,17 +8,17 @@ import json
 from fastapi import (APIRouter, Depends, Header, HTTPException,
                      Request)
 
-from .. import (auth, companion, composite, db, i18n, identity, persona,
-                storage, terms, tiers)
+from .. import (auth, cardimport, companion, composite, db, i18n, identity,
+                persona, storage, terms, tiers)
 from ..common import (
     ERASE_KEEPS, export_rows, profile_scoped_tables,
     age_of, profile_or_404, profile_out, require_owner,
     source_items,
 )
 from ..models import (
-    CompositeCreate, EmbodimentAdd, GenesisCreate, MarketplaceList,
-    ProfileCreate, ProfileOut, ProfileUpdate, SourceAdd, SucceedRequest,
-    SurfacesSet,
+    CardImport, CompositeCreate, EmbodimentAdd, GenesisCreate,
+    MarketplaceList, ProfileCreate, ProfileOut, ProfileUpdate, SourceAdd,
+    SucceedRequest, SurfacesSet,
 )
 
 router = APIRouter()
@@ -491,6 +491,58 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     conn.commit()
     auth.revoke_subject(profile_id)   # the owner token dies with the profile
     return {"deleted": deleted}
+
+
+@router.post("/profiles/import/card", status_code=201,
+             dependencies=[Depends(auth.require_signup_key)])
+def import_character_card(body: CardImport, request: Request) -> dict:
+    """A character card as a profile seed — chara_card_v2/v3 as raw JSON,
+    or a PNG with one embedded. The card's identity fields become a
+    fictional profile through the same creation path as every other; its
+    greeting and example dialogue land as source material; and the fields
+    that are harness instructions rather than identity are withheld, each
+    named with its reason — a quiet omission and a lie differ only in
+    tense."""
+    try:
+        seed = cardimport.parse(body.card, body.content)
+    except cardimport.CardError as exc:
+        raise HTTPException(422, str(exc)) from None
+
+    created = create_profile(ProfileCreate(
+        terms_consent=body.terms_consent, owner_id=body.owner_id,
+        plan=body.plan, kind="fictional", display_name=seed["name"],
+        persona=seed["persona"], verification=body.verification,
+        language=body.language))
+
+    # The card's texts land as source material with honest provenance —
+    # readable, editable, erasable like anything else the profile knows.
+    profile_id = created["id"]
+    pdi = request.app.state.pdi
+    conn = db.connect()
+    carried: dict = {"display_name": seed["name"], "persona": True,
+                     "spec": seed["spec"], "tags": seed["tags"]}
+    for kind, title, text in (
+            ("writing", "greeting", seed["greeting"]),
+            ("conversation", "example dialogue", seed["example_dialogue"]),
+            ("writing", "creator notes", seed["creator_notes"])):
+        if not text:
+            continue
+        item_id = db.new_id("src")
+        content, pdi_key = text, None
+        if pdi is not None:
+            pdi_key = f"qrme/{profile_id}/sources/{item_id}"
+            pdi.put(pdi_key, json.dumps({"content": text}))
+            content = None
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, created_at) VALUES (?,?,?,?,?,?,?)",
+            (item_id, profile_id, kind, title, content, pdi_key,
+             db.utcnow()))
+        carried[title] = True
+    conn.commit()
+
+    return {**created, "carried": carried,
+            "withholdings": seed["withholdings"]}
 
 
 # -- Source material: the data the profile is built from ---------------------

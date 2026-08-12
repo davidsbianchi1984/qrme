@@ -165,6 +165,7 @@ fun WelcomeScreen(vm: StudioViewModel) {
     var birthdate by remember { mutableStateOf("1984-01-01") }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    var cardJSON by remember { mutableStateOf("") }
     val kinds = listOf("self", "other_person", "fictional")
 
     Box(Modifier.fillMaxSize().background(Qrme.Bg)) {
@@ -227,6 +228,19 @@ fun WelcomeScreen(vm: StudioViewModel) {
             // Consent to terms, in the reader's language. Built by `+` before
             // this round, which is a sentence no table could ever hold.
             Text(L10n.t("nw.terms", lang), color = Qrme.T3, fontSize = 9.sp)
+            // Or carry in a character card; what is refused is named by the
+            // response, and harness instructions never ride in.
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(L10n.t("nw.card", lang), color = Qrme.Txt, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                labeledField(L10n.t("nw.card", lang), cardJSON,
+                    L10n.t("nw.card.ph", lang)) { cardJSON = it }
+                BrandButton(L10n.t("nw.card.import", lang),
+                    enabled = cardJSON.isNotBlank(), busy = busy) {
+                    error = null
+                    vm.importCard(cardJSON, birthdate, language,
+                        onError = { error = it }, onBusy = { busy = it })
+                }
+            }
             // The other reason somebody opens this app: they have found a
             // synthetic profile of themselves, or were sent something and
             // want to know whether a person wrote it. Both routes are public
@@ -1343,6 +1357,8 @@ fun ChatScreen(vm: StudioViewModel) {
     // Spec clauses 2/12. Empty means "read my prompt and decide", which is what
     // the backend does on its own — and the reply says which way it went.
     var role by remember { mutableStateOf("") }
+    var rehearsal by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var rhScenario by remember { mutableStateOf("") }
 
     fun send() {
         val text = draft
@@ -1350,6 +1366,19 @@ fun ChatScreen(vm: StudioViewModel) {
         draft = ""
         messages = messages + Bubble(true, text, false)
         busy = true; error = null
+        // An open rehearsal room takes the turn: nothing lands in the
+        // remembered conversation, and the bubble says so.
+        rehearsal?.let { (roomId, scenario) ->
+            vm.call({ ApiClient.rehearse(vm.pid!!, roomId, text) }) { r ->
+                busy = false
+                r.onSuccess { reply ->
+                    messages = messages + Bubble(false, reply, false,
+                        mark = "\ud83c\udfad " + scenario)
+                }
+                r.onFailure { error = it.message }
+            }
+            return
+        }
         vm.call({
             var interactor = vm.interactorId
             var minted: String? = null
@@ -1416,6 +1445,47 @@ fun ChatScreen(vm: StudioViewModel) {
                 }
             }
             error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
+        }
+        // Rehearsal: practice the hard conversation — the transcript lives
+        // only in the room, and closing the room wipes it.
+        Row(Modifier.padding(horizontal = 20.dp).padding(bottom = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            rehearsal?.let { (roomId, scenario) ->
+                Text("\ud83c\udfad " + scenario, color = Qrme.T2,
+                    fontSize = 12.sp, modifier = Modifier.weight(1f))
+                SmallAction(L10n.t("cht.rh.close", vm.language)) {
+                    vm.call({ ApiClient.closeRehearsal(vm.pid!!, roomId) }) {
+                        rehearsal = null
+                    }
+                }
+            } ?: run {
+                Box(Modifier.weight(1f)) {
+                    labeledField("", rhScenario,
+                        L10n.t("cht.rh.scenario.ph", vm.language)) { rhScenario = it }
+                }
+                SmallAction(L10n.t("cht.rh.open", vm.language),
+                    enabled = rhScenario.isNotBlank() && !busy) {
+                    vm.call({
+                        var interactor = vm.interactorId
+                        var minted: String? = null
+                        if (interactor == null) {
+                            val created = ApiClient.createInteractor("You")
+                            interactor = created.id
+                            minted = created.token
+                        }
+                        Triple(interactor!!, minted,
+                            ApiClient.openRehearsal(vm.pid!!, interactor, rhScenario))
+                    }) { r ->
+                        r.onSuccess { (interactor, minted, room) ->
+                            vm.rememberInteractor(interactor, minted)
+                            rehearsal = room
+                            rhScenario = ""
+                        }
+                        r.onFailure { error = it.message }
+                    }
+                }
+            }
         }
         // Spec clauses 2/12 — advisor counsels, collaborator co-creates,
         // operator executes. "Read my prompt" is the honest default: the

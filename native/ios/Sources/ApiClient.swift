@@ -733,6 +733,7 @@ struct Excursion: Decodable {
 
 enum ApiError: LocalizedError {
     case http(String)
+    case badBody
     var errorDescription: String? { if case let .http(m) = self { return m }; return nil }
 }
 
@@ -873,6 +874,60 @@ actor ApiClient {
         ]
         if let language, language != "en" { body["language"] = language }
         return try await request("/profiles", method: "POST", body: body)
+    }
+
+    /// A character card as a profile seed. What is refused is named in
+    /// `withholdings`; harness instructions never ride in.
+    func importCard(cardJSON: String, birthdate: String,
+                    language: String? = nil) async throws -> ProfileCreated {
+        guard let data = cardJSON.data(using: .utf8),
+              let card = try? JSONSerialization.jsonObject(with: data)
+                as? [String: Any] else {
+            throw ApiError.badBody
+        }
+        var body: [String: Any] = [
+            "owner_id": "owner-1",
+            "card": card,
+            "verification": ["birthdate": birthdate],
+            "terms_consent": true,
+        ]
+        if let language, language != "en" { body["language"] = language }
+        return try await request("/profiles/import/card", method: "POST",
+                                 body: body)
+    }
+
+    struct RehearsalRoom: Decodable {
+        let id: String
+        let scenario: String
+        let turns: Int
+        let remembered: Bool
+    }
+
+    struct RehearsalTurn: Decodable {
+        let id: String
+        let reply: String
+        let turns: Int
+        let remembered: Bool
+    }
+
+    /// Rehearsal rooms: practice the hard conversation, nothing remembered.
+    func openRehearsal(id: String, interactorId: String,
+                       scenario: String) async throws -> RehearsalRoom {
+        try await request("/profiles/\(id)/rehearsal", method: "POST",
+                          body: ["interactor_id": interactorId,
+                                 "scenario": scenario])
+    }
+
+    func rehearse(id: String, rehearsalId: String,
+                  message: String) async throws -> RehearsalTurn {
+        try await request("/profiles/\(id)/rehearsal/\(rehearsalId)/say",
+                          method: "POST", body: ["message": message])
+    }
+
+    func closeRehearsal(id: String, rehearsalId: String) async throws {
+        struct Out: Decodable { let id: String }
+        let _: Out = try await request(
+            "/profiles/\(id)/rehearsal/\(rehearsalId)", method: "DELETE")
     }
 
     func profile(_ id: String) async throws -> ProfileCard {

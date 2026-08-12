@@ -49,6 +49,15 @@
                 <Button.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                         <GradientStop Color="{StaticResource QrmeBrandA}" Offset="0" />
+            <!-- Or carry in a character card; the response names what it
+                 refused to carry. -->
+            <TextBlock x:Name="CardHead" FontSize="13" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBox x:Name="CardBox" AcceptsReturn="True" TextWrapping="Wrap" Height="60" />
+            <Button x:Name="ImportCardButton" HorizontalAlignment="Stretch"
+                    Click="OnImportCard" Background="Transparent"
+                    Foreground="{StaticResource QrmeBrandABrush}" FontSize="12" />
+
                         <GradientStop Color="#FF3AA0FF" Offset="1" />
                     </LinearGradientBrush>
                 </Button.Background>

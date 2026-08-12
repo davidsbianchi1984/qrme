@@ -22,6 +22,7 @@ struct WelcomeView: View {
     @State private var language = "en"
     @State private var birthdate = Date(timeIntervalSince1970: 441_763_200) // 1984-01-01
     @State private var busy = false
+    @State private var cardJSON = ""
     @State private var error: String?
     /// Not everybody who opens this app wants a profile. Some are here
     /// *because* of one.
@@ -98,6 +99,20 @@ struct WelcomeView: View {
                 Text(L10n.t("nw.terms", lang))
                     .font(.caption2).foregroundStyle(Theme.t3)
 
+                // Or carry in a character card: chara_card_v2/v3 JSON. What
+                // the platform refuses to carry, the response names.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.t("nw.card", lang))
+                        .font(.footnote.bold()).foregroundStyle(Theme.txt)
+                    TextField(L10n.t("nw.card.ph", lang), text: $cardJSON,
+                              axis: .vertical)
+                        .lineLimit(2...4).font(.caption)
+                        .textFieldStyle(.roundedBorder)
+                    Button(L10n.t("nw.card.import", lang)) { importCard() }
+                        .font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        .disabled(cardJSON.isEmpty || busy)
+                }.card()
+
                 // The other reason somebody opens this app: they have found a
                 // synthetic profile of themselves, or they were sent
                 // something and want to know whether a person wrote it. Both
@@ -142,6 +157,18 @@ struct WelcomeView: View {
                 .padding(.horizontal, 12).padding(.vertical, 10)
                 .background(Theme.scrBot).clipShape(RoundedRectangle(cornerRadius: 11))
                 .overlay(RoundedRectangle(cornerRadius: 11).stroke(Theme.line, lineWidth: 1))
+        }
+    }
+
+    private func importCard() {
+        busy = true; error = nil
+        Task {
+            do {
+                let r = try await ApiClient.shared.importCard(
+                    cardJSON: cardJSON, birthdate: iso, language: language)
+                state.signIn(r)
+            } catch { self.error = error.localizedDescription }
+            busy = false
         }
     }
 
