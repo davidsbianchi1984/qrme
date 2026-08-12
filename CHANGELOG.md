@@ -4,6 +4,41 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.65.0] - 2026-08-12
+
+### Added
+
+- **The door into a live room.** `POST /rooms/{room_id}/join` seats a
+  signed-in interactor in a standing room that is already open — eight
+  seats, the same seat held on a second knock, "this room has closed"
+  and "this room is full — eight seats, and every one taken" refused in
+  the speaker's language. The lobby's pitch had promised "step in
+  beside them" while every press opened a fresh, empty room; the
+  promise has behavior under it now. The console lists the live rooms
+  with a Join on each row, and all three phones walk through the same
+  door.
+- **A standing room is one place, not a stamp.** Pressing a standing
+  room's name used to mint a fresh copy of it — twelve presses of "The
+  front porch" made twelve empty porches, and nobody ever met anybody.
+  `POST /rooms/templates/{key}/open` now joins the newest live room
+  holding that topic when one has a free seat (or already holds you),
+  and only opens it fresh when nobody has it open — with you and your
+  profile in it, as rooms always have. A full porch gets a second
+  table: when all eight seats are taken, the next press opens the room
+  again rather than turning anyone away. The response says which
+  happened, unknown keys are refused by name, opening fresh without a
+  profile picked is refused with directions — all in ten languages —
+  and the console, iOS, Android and Windows each press through it.
+
+### Fixed
+
+- **A face is a door to the person.** Tapping a friend's picture on
+  the console's home screen landed on the list of friends — the place
+  the strip's label already goes. The faces now open that friend's own
+  page, the one a visitor sees — portrait, tagline, about, links —
+  with a translated Close to step back out. Reported from the field,
+  fixed the same day.
+
 ## [0.64.0] - 2026-08-12
 
 ### Added
