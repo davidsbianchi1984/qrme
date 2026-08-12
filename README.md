@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.65.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.66.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -769,6 +769,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.66.0** | **Cut in step** — no QRME code changed; JIM-mini's coach became an offline add-and-norm stack over stored knowledge and current readings, with a jampacked pack, deposits from paid model turns, and a curriculum JIM studies on one press |
 | **0.65.0** | **A standing room is one place, not a stamp** — the standing rooms stop minting copies: `POST /rooms/templates/{key}/open` joins the newest live room with a free seat and only opens fresh when nobody has it open, a full porch gets a second table, and `POST /rooms/{room_id}/join` gives the lobby's “step in beside them” pitch real behavior — eight seats, refusals in ten languages, all four clients through both doors; and a friend's face on the home screen now opens that friend's page, not the list it sat in |
 | **0.64.0** | **The catalog steps out, the rooms stand ready, the footsteps show** — the connected-apps card asks the forty-app catalog instead of offering one hardcoded button; twelve standing rooms answer at `GET /rooms/templates`, one press from real on the console and all three phones; a footsteps counter rides `/health` into every console's corner (and shrank to a footprint the same evening, on a field report); the chat handed back its walls — presence rendering belongs to the rooms and the vastscape, a text thread is its own scene; and the social scrape refuses a login wall in ten languages instead of storing the platform's words as the person's |
 | **0.63.0** | **The talk surface shows the face, and the face has a deck** — the microphone opens a full listening screen with the profile's portrait front and centre, pulsing while it listens, the reply spoken back (the orb only for a profile with no portrait yet); Identity's portrait card becomes a deck — characters, your own photos, a five-angle capture, and the avatar systems people already live in as imports with provenance on the record (`GET /avatars/market`, `POST /profiles/{id}/avatar/import`); the chat scrolls to the newest reply as it commits; `POST /social/{cid}/scrape` keeps what a public page shows anybody as a source item; and the console fits the phone it runs on — grid tracks clamp, `100dvh`, the sidebar scrolls on its own |
