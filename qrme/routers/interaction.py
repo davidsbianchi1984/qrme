@@ -691,7 +691,8 @@ def open_rehearsal(profile_id: str, body: RehearsalOpen,
     """Open a practice room with this profile. What is said inside never
     reaches messages, engagement or the remembrance — a rehearsal that
     counted against the relationship would not be a rehearsal."""
-    profile_or_404(profile_id)
+    profile = profile_or_404(profile_id)
+    require_may_publish(dict(profile))
     require_owner_or_interactor(profile_id, body.interactor_id, request)
     scenario = (body.scenario or "").strip()
     if not scenario:
@@ -716,6 +717,10 @@ def rehearse(profile_id: str, rehearsal_id: str, body: RehearsalSay,
     """One practice turn. The transcript lives only in the room, only
     until it closes; the reply is marked for what it is."""
     profile = profile_or_404(profile_id)
+    # A rehearsal still puts words in the profile's mouth: a departed
+    # profile is a memorial and a restricted one is under objection
+    # review, and neither speaks — not even in a room that forgets.
+    require_may_publish(dict(profile))
     row = _rehearsal_or_404(rehearsal_id, profile_id)
     require_owner_or_interactor(profile_id, row["interactor_id"], request)
     message = (body.message or "").strip()
