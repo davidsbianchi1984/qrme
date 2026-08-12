@@ -26,28 +26,11 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 README = os.path.join(ROOT, "README.md")
-GALLERY = os.path.join(ROOT, "docs", "gallery.md")
 SCREENS = os.path.join(ROOT, "docs", "screens")
 
 
 def _readme() -> str:
-    """The gallery page and the README, together.
-
-    The tour moved whole to docs/gallery.md so the front page reads as a
-    front page; the README keeps a curated handful. The guards hold the
-    pair: a screen is shown if either page shows it, every reference on
-    either page must resolve, and the sequence is the gallery page's —
-    because that is the tour.
-    """
-    out = []
-    for path in (GALLERY, README):
-        with open(path, encoding="utf-8") as fh:
-            out.append(fh.read())
-    return "\n".join(out)
-
-
-def _gallery() -> str:
-    with open(GALLERY, encoding="utf-8") as fh:
+    with open(README, encoding="utf-8") as fh:
         return fh.read()
 
 
@@ -60,11 +43,7 @@ def _referenced(src: str) -> list[str]:
     each is preserved.
     """
     seen: dict[str, None] = {}
-    # The README says `docs/screens/…`; the gallery page lives inside docs/
-    # and says `screens/…`, because a link is written relative to the file
-    # it renders from. Both are the same folder.
-    for name in re.findall(r"(?:docs/|(?<![\w/])(?=screens/))screens/([\w\-.]+\.svg)",
-                           src):
+    for name in re.findall(r"docs/screens/([\w\-.]+\.svg)", src):
         seen.setdefault(name, None)
     return list(seen)
 
@@ -117,7 +96,7 @@ def test_the_gallery_runs_in_order_and_skips_nothing():
     appearing is exactly what nobody re-reads a 1,800-line README to find.
     """
     numbers: list[int] = []
-    for name in _referenced(_gallery()):
+    for name in _referenced(_readme()):
         head = name.split("-", 1)[0]
         if head.isdigit():
             n = int(head)

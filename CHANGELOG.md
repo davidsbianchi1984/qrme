@@ -4,6 +4,87 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.64.0] - 2026-08-12
+
+### Added
+
+- **The remembrance.** What a profile keeps of a person between
+  conversations, distilled: `GET /profiles/{id}/memory/{interactor}/
+  remembrance` reads it, the chat carries it into every reply, and
+  erasing the memory erases it. On the console's Memory screen and all
+  three phones.
+- **The handed link.** Paste a URL into the chat and the profile reads
+  the page's public words before answering — with the offline posture
+  saying so honestly when nothing may leave the machine.
+- **The pasted link connects the account.** The social connect form
+  reads a pasted profile link for what it already says — the host names
+  the platform, the path names the account — and refuses a hashtag with
+  a sentence that explains itself, in ten languages.
+- **The torso form.** An avatar can carry an upper-torso render,
+  imported beside the face; the talk overlay stands it at full figure,
+  and the AR rule is written where the feature lives: upper torso,
+  scaled 1:1 in the live feed.
+- **Marketplace folders.** The catalogue groups by each listing's first
+  tag into folders, the feature cards move above the list, and search
+  results stay flat.
+- **Top friends on the front page.** The faces the spaces use, as a
+  strip on Home, the founder standing first.
+- **The vastscape.** Watch-together on a TV or console, presence
+  bubbles resting in the scene — drawn as screens 194 and 195 and
+  taught by the party lesson.
+- **The connections catalog steps out.** The backend has carried a
+  forty-app catalog across six providers — Apple Intelligence, Google
+  Gemini, Microsoft Copilot, Canva, smart glasses, gaming consoles —
+  and the console's connected-apps card offered exactly one hardcoded
+  Google Calendar button in front of it. The card now asks the catalog:
+  provider picker, app picker, the chosen app's directions and
+  capabilities shown before connecting.
+- **The standing rooms.** A new user opened the Rooms screen, found the
+  list empty, and left. Twelve standing rooms — blueprints, not rooms —
+  answer at `GET /rooms/templates`, from The Front Porch (chat) to The
+  Vastscape (VR, watch-together). Opening one goes through the same
+  `POST /rooms` as typing the topic by hand, so a template grants
+  nothing the form does not. The console shows them above the live list
+  with one-press "Step inside"; all three phones fold them into their
+  rooms doors.
+- **The footsteps.** A counter in the console's top-right corner: how
+  many people hold verified accounts, as an aggregate — no name, email
+  or id rides with the number. It travels on `/health`, the request
+  every client already makes at launch for the version handshake, so it
+  cost no new door. The sibling products carry the same chip in the
+  same corner in the same ten-language wording.
+
+### Changed
+
+- **The chat hands back its walls.** The receding-grid backdrop and the
+  sticky presence bubbles floated the session's names and portraits
+  over the words people were trying to read; both came out on a field
+  report the same evening they shipped. Presence rendering belongs to
+  the rooms and the vastscape, where there is a scene to stand in — a
+  text thread is its own scene. The talk overlay's avatar and the front
+  page's top-friends strip stay exactly as they were.
+- **The footsteps chip shrank to a footprint** — just the mark and the
+  number, the sentence in the tooltip — after it sat on top of the
+  chat's wardrobe box on a phone.
+
+### Fixed
+
+- **The vault hiccup no longer silences the chat.** A failed readback
+  of one sealed source item used to 500 the whole conversation; the
+  chat now degrades to the sources it can reach and says nothing false
+  about the ones it cannot.
+- **The guard that only existed where the bug never was.** The
+  `</script>` hardening of `_js` shipped in 0.63.0 in all three
+  products; the test holding it existed in none. It stands in all three
+  suites now and enters the shared manifest.
+- **The login wall is not source material.** A Facebook import
+  "succeeded" by storing the platform's login page as the profile's
+  source material — which the persona then quoted back in chat as
+  though it were the owner's own writing. The fetch now recognises a
+  wall by its title and refuses with the honest workaround, translated
+  into all ten languages: copy the profile's text while signed in and
+  paste it into collect.
+
 ## [0.63.0] - 2026-08-11
 
 ### Added
