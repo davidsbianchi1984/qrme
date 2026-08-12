@@ -4,6 +4,41 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.67.0] - 2026-08-12
+
+### Added
+
+- **The licence carries the substance.** A finetune or clone derive now
+  copies the profile's own knowledge items, steering dials, appearance and
+  demographics onto the buyer's agent; a clone adds an aggregate adaptation
+  summary — dimension means across every relationship, count only. What may
+  never travel stays behind by rule: interactor messages and per-relationship
+  embeddings, the voice print, vaulted content, and marketplace pack items.
+  Every derivation writes a manifest (`carried` / `withholdings`, each
+  withholding with its reason), returned to the buyer at derive time and
+  readable on the owner's grants list, in the console and all three shells.
+- **AI for lease.** `POST /organizations/{org_id}/lease` seats somebody
+  else's consult-licensed specialist as a department: the fee accrues to the
+  specialist's owner at seating time, the lease rides the owner's licences
+  list beside grants, and the same revoke door covers both. A revoked lease
+  — or a terminated source profile — leaves the department standing but
+  silent, named in every coordination it no longer speaks in.
+- **The moving image.** The avatar response carries a motion block — style
+  (still / breathe / lively, set through the existing avatar door), energy
+  and warmth derived live from the latent persona embeddings, and a tempo
+  the clients animate at. Derived, not stored, and riding the same response
+  as the AI badge, so nothing can animate the face without the disclosure.
+- **The room is remembered.** A chat turn without fresh environment context
+  recalls the latest stored context (six-hour window); the prompt treats it
+  as where the person most likely still is, and the echo marks it
+  `remembered` so clients can tell fresh from recalled.
+
+### Fixed
+
+- Termination now revokes an organization's lease along with every other
+  capability a third party holds — a terminated specialist's desk went on
+  speaking in coordinations before the guard caught it.
+
 ## [0.66.0] - 2026-08-12
 
 ### Version alignment
