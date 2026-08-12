@@ -6264,6 +6264,21 @@ const CHROME: Table = {
   "org.profile.ph": {
     en: "(this profile)", es: "(este perfil)", fr: "(ce profil)", de: "(dieses Profil)", pt: "(este perfil)", it: "(questo profilo)", ja: "（このプロフィール）", zh: "（当前档案）", hi: "(यही प्रोफ़ाइल)", ar: "(هذا الملف)",
   },
+  "org.lease": {
+    en: "Lease it in", es: "Arrendarlo", fr: "Le louer", de: "Anmieten", pt: "Arrendá-lo", it: "Prenderlo in leasing", ja: "リースで迎える", zh: "租入", hi: "लीज़ पर लें", ar: "استئجاره",
+  },
+  "org.lease.pitch": {
+    en: "AI for lease: seat somebody else's licensed specialist as a department. The fee goes to its owner, who can revoke the lease at any time.", es: "IA en arriendo: incorpora el especialista licenciado de otra persona como departamento. La tarifa va a su dueño, que puede revocar el arriendo en cualquier momento.", fr: "IA en location : installez le spécialiste sous licence de quelqu'un d'autre comme département. Les frais vont à son propriétaire, qui peut révoquer la location à tout moment.", de: "KI zur Miete: setze den lizenzierten Spezialisten eines anderen als Abteilung ein. Die Gebühr geht an den Eigentümer, der die Miete jederzeit widerrufen kann.", pt: "IA para arrendar: instale o especialista licenciado de outra pessoa como departamento. A taxa vai para o dono, que pode revogar o arrendamento a qualquer momento.", it: "IA in leasing: insedia lo specialista con licenza di qualcun altro come dipartimento. Il compenso va al proprietario, che può revocare il leasing in ogni momento.", ja: "リース型AI：他の人のライセンス付きスペシャリストを部門として迎えます。料金は持ち主に入り、持ち主はいつでもリースを取り消せます。", zh: "AI 租赁：把别人已授权的专家安排为一个部门。费用归其所有者，所有者可随时撤销租约。", hi: "लीज़ पर एआई: किसी और के लाइसेंस-प्राप्त विशेषज्ञ को विभाग की तरह बैठाएँ। शुल्क उसके मालिक को जाता है, जो कभी भी लीज़ रद्द कर सकता है।", ar: "ذكاء اصطناعي للإيجار: عيّن اختصاصي شخص آخر المرخّص قسمًا لديك. الرسم يذهب إلى مالكه، وله أن يلغي الإيجار متى شاء.",
+  },
+  "org.leased": {
+    en: "leased", es: "arrendado", fr: "loué", de: "gemietet", pt: "arrendado", it: "in leasing", ja: "リース中", zh: "租入", hi: "लीज़ पर", ar: "مستأجر",
+  },
+  "org.lease.revoked": {
+    en: "lease revoked", es: "arriendo revocado", fr: "location révoquée", de: "Miete widerrufen", pt: "arrendamento revogado", it: "leasing revocato", ja: "リース取消", zh: "租约已撤销", hi: "लीज़ रद्द", ar: "أُلغي الإيجار",
+  },
+  "org.specialistid": {
+    en: "Specialist profile id", es: "Id del perfil especialista", fr: "Id du profil spécialiste", de: "Profil-ID des Spezialisten", pt: "Id do perfil especialista", it: "Id del profilo specialista", ja: "スペシャリストのプロフィールID", zh: "专家资料 id", hi: "विशेषज्ञ प्रोफ़ाइल आईडी", ar: "معرّف ملف الاختصاصي",
+  },
   "org.staff": {
     en: "Staff", es: "Cubrir", fr: "Pourvoir", de: "Besetzen", pt: "Ocupar", it: "Assegna", ja: "配置", zh: "配置人手", hi: "नियुक्त करें", ar: "اشغل",
   },

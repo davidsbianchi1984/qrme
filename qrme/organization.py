@@ -66,13 +66,19 @@ def view(org_id: str) -> dict:
         " JOIN profiles p ON p.id=d.profile_id"
         " WHERE d.org_id=? ORDER BY d.created_at, d.rowid",
         (org_id,)).fetchall()
-    return {
-        "id": org["id"], "name": org["name"], "created_at": org["created_at"],
-        "departments": [{
+    departments = []
+    for r in rows:
+        lease = _lease_for_department(conn, r["id"])
+        departments.append({
             "id": r["id"], "name": r["name"], "role": r["role"],
             "profile_id": r["profile_id"], "agent": r["display_name"],
             "scoped": r["grant_id"] is not None,
-        } for r in rows],
+            "leased": lease is not None,
+            "lease_revoked": bool(lease["revoked"]) if lease else False,
+        })
+    return {
+        "id": org["id"], "name": org["name"], "created_at": org["created_at"],
+        "departments": departments,
     }
 
 
@@ -114,6 +120,69 @@ def add_department(org: dict, name: str, role: str, profile: dict,
             f"the organization already has a department named {name!r}")
     conn.commit()
     return view(org["id"])
+
+
+def lease_department(org: dict, source: dict, name: str, role: str) -> dict:
+    """AI for lease: seat somebody else's licensed specialist as a department.
+
+    The Metro pitch's commercial model, with behavior: the specialist must be
+    offered for license, the lease fee accrues to its owner at seating time,
+    and the lease is the recorded authorization that lets a stranger's agent
+    cross into this organization. The owner can revoke it at any time; a
+    revoked lease leaves the department standing but silent.
+    """
+    conn = db.connect()
+    if source["owner_id"] == org["owner_id"]:
+        raise OrganizationError(
+            "this profile is already the organization's own — staff it as a "
+            "department; a lease is for somebody else's specialist")
+    if source["status"] != "active":
+        raise OrganizationError(
+            f"this specialist is {source['status']} and not for lease")
+    if source["adult_mode"]:
+        raise OrganizationError("a rated profile cannot staff a department")
+    offer = conn.execute("SELECT * FROM license_offers WHERE profile_id=?",
+                         (source["id"],)).fetchone()
+    if offer is None:
+        raise OrganizationError(
+            "this profile is not offered for license — a lease is licensed "
+            "use, and there are no terms to lease under")
+    staffed = conn.execute("SELECT COUNT(*) FROM departments WHERE org_id=?",
+                           (org["id"],)).fetchone()[0]
+    if staffed >= MAX_DEPARTMENTS:
+        raise OrganizationError(
+            f"an organization holds at most {MAX_DEPARTMENTS} departments — "
+            "a coordination is one model call per desk, and the cap is what "
+            "keeps one press from becoming a bill")
+    dept_id = db.new_id("dep")
+    try:
+        conn.execute(
+            "INSERT INTO departments (id, org_id, name, role, profile_id,"
+            " grant_id, created_at) VALUES (?,?,?,?,?,NULL,?)",
+            (dept_id, org["id"], name, role, source["id"], db.utcnow()))
+    except Exception:
+        raise OrganizationError(
+            f"the organization already has a department named {name!r}")
+    lease_id = db.new_id("lse")
+    conn.execute(
+        "INSERT INTO license_leases (id, profile_id, org_id, department_id,"
+        " revoked, created_at) VALUES (?,?,?,?,0,?)",
+        (lease_id, source["id"], org["id"], dept_id, db.utcnow()))
+    conn.commit()
+    # The fee accrues to the specialist's owner at seating time, like any
+    # license sale.
+    from . import ledger
+    ledger.credit(source["owner_id"], "lease_fee", lease_id,
+                  offer["price"], offer["currency"],
+                  memo=f"lease · {source['display_name']} → {org['name']}")
+    return {"lease_id": lease_id, "department_id": dept_id,
+            "org": view(org["id"])}
+
+
+def _lease_for_department(conn, department_id: str):
+    return conn.execute(
+        "SELECT * FROM license_leases WHERE department_id=?",
+        (department_id,)).fetchone()
 
 
 def _scoped_items(department, pdi) -> list[dict]:
@@ -181,6 +250,15 @@ def coordinate(org: dict, goal: str, from_department_id: str,
             silenced.append({"department_id": dept["id"],
                              "department": dept["name"],
                              "profile_status": profile["status"]})
+            continue
+        # A leased desk speaks under its lease. Revoked, it stands but is
+        # silent — and is named, exactly like a departed agent, so the plan
+        # never reads as the whole organization's while a desk is dark.
+        lease = _lease_for_department(conn, dept["id"])
+        if lease is not None and lease["revoked"]:
+            silenced.append({"department_id": dept["id"],
+                             "department": dept["name"],
+                             "profile_status": "lease_revoked"})
             continue
         items = _scoped_items(dept, pdi)
         system = persona.build_system_prompt(profile, None, None,

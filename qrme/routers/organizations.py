@@ -13,7 +13,8 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import auth, db, organization
 from ..common import profile_or_404
-from ..models import CoordinateRequest, DepartmentAdd, OrganizationCreate
+from ..models import (CoordinateRequest, DepartmentAdd, LeaseRequest,
+                      OrganizationCreate)
 
 router = APIRouter()
 
@@ -77,6 +78,21 @@ def add_department(org_id: str, body: DepartmentAdd,
     try:
         return organization.add_department(org, body.name, body.role,
                                            profile, body.grant_token)
+    except organization.OrganizationError as e:
+        raise HTTPException(422, str(e))
+
+
+@router.post("/organizations/{org_id}/lease", status_code=201)
+def lease_specialist(org_id: str, body: LeaseRequest,
+                     request: Request) -> dict:
+    """AI for lease: seat somebody else's licensed specialist as one of this
+    organization's departments. The fee accrues to the specialist's owner;
+    the lease is revocable from the owner's side at any time."""
+    org = _org_or_404(org_id, request)
+    source = profile_or_404(body.profile_id)
+    try:
+        return organization.lease_department(org, source, body.name,
+                                             body.role)
     except organization.OrganizationError as e:
         raise HTTPException(422, str(e))
 

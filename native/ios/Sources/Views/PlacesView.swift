@@ -311,6 +311,19 @@ struct OrgSection: View {
                         orgId: orgId, name: deptName, role: deptRole,
                         profileId: deptProfile, token: state.token!) }
                 }.disabled(busy || orgId.isEmpty || deptName.isEmpty)
+                // AI for lease: the same three fields, but the profile id
+                // names somebody else's licensed specialist. The fee goes
+                // to its owner, who can revoke the lease at any time.
+                Button(L10n.t("org.lease", state.language)) {
+                    run {
+                        let lease = try await ApiClient.shared.leaseSpecialist(
+                            orgId: orgId, profileId: deptProfile,
+                            name: deptName, role: deptRole,
+                            token: state.token!)
+                        note = lease.lease_id
+                    }
+                }.disabled(busy || orgId.isEmpty || deptName.isEmpty
+                           || deptProfile.isEmpty)
             }.font(.caption)
             HStack {
                 TextField(L10n.t("org.goal", state.language), text: $goal)

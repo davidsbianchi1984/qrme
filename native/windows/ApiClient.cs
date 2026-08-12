@@ -2940,6 +2940,14 @@ public sealed class ApiClient
         Send<OrgDepartment>(Post($"/organizations/{orgId}/departments",
             new { name, role, profile_id = profileId }, token));
 
+    /// <summary>AI for lease: seat somebody else's licensed specialist as a
+    /// department; the fee accrues to its owner, who can revoke any time.
+    /// </summary>
+    public Task<LeaseOut> LeaseSpecialist(string orgId, string profileId,
+        string name, string role, string token) =>
+        Send<LeaseOut>(Post($"/organizations/{orgId}/lease",
+            new { profile_id = profileId, name, role }, token));
+
     public Task<Coordination> Coordinate(string orgId, string goal,
         string fromDepartment, string token) =>
         Send<Coordination>(Post($"/organizations/{orgId}/coordinate",
@@ -3964,6 +3972,12 @@ public record OrgCard(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("name")] string? Name,
     [property: JsonPropertyName("departments")] OrgDepartment[]? Departments);
+
+/// <summary>AI for lease: the receipt for seating somebody else's licensed
+/// specialist as a department.</summary>
+public record LeaseOut(
+    [property: JsonPropertyName("lease_id")] string LeaseId,
+    [property: JsonPropertyName("department_id")] string DepartmentId);
 
 public record Coordination(
     [property: JsonPropertyName("id")] string? Id,

@@ -3626,6 +3626,15 @@ private fun OrgBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 deptProfile, vm.token!!) }) { r ->
                 onNote(r.exceptionOrNull()?.message) }
         }
+        // AI for lease: same three fields, but the profile id names somebody
+        // else's licensed specialist; the fee goes to its owner.
+        BrandButton(L10n.t("org.lease", lang),
+            enabled = orgId.isNotBlank() && deptName.isNotBlank()
+                && deptProfile.isNotBlank()) {
+            vm.call({ ApiClient.leaseSpecialist(orgId, deptProfile, deptName,
+                deptRole, vm.token!!) }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
         labeledField(L10n.t("org.goal", lang), goal, "") { goal = it }
         labeledField(L10n.t("org.department", lang), fromDept, "") { fromDept = it }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

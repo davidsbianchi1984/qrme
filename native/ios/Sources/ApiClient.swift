@@ -2839,6 +2839,13 @@ struct OrgDepartment: Decodable, Identifiable {
     var id: String { name ?? "?" }
 }
 
+/// AI for lease: the receipt for seating somebody else's licensed
+/// specialist as a department.
+struct LeaseOut: Decodable {
+    let lease_id: String
+    let department_id: String
+}
+
 struct Coordination: Decodable, Identifiable {
     let id: String?
     let goal: String?
@@ -3014,6 +3021,17 @@ extension ApiClient {
                           method: "POST",
                           body: ["name": name, "role": role,
                                  "profile_id": profileId],
+                          token: token)
+    }
+
+    /// AI for lease: seat somebody else's licensed specialist as a
+    /// department. The fee accrues to the specialist's owner, who can
+    /// revoke the lease at any time.
+    func leaseSpecialist(orgId: String, profileId: String, name: String,
+                         role: String, token: String) async throws -> LeaseOut {
+        try await request("/organizations/\(orgId)/lease", method: "POST",
+                          body: ["profile_id": profileId, "name": name,
+                                 "role": role],
                           token: token)
     }
 

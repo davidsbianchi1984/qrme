@@ -417,6 +417,14 @@ class DepartmentAdd(BaseModel):
     grant_token: str | None = None     # revocable scope for its data pulls
 
 
+class LeaseRequest(BaseModel):
+    """AI for lease: somebody else's licensed specialist, seated as a
+    department under a revocable lease."""
+    profile_id: str                    # the specialist offered for license
+    name: str                          # department name it will hold
+    role: str                          # what it does for the team
+
+
 class CoordinateRequest(BaseModel):
     goal: str
     from_department: str               # department id that leads the plan

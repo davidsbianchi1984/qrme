@@ -118,6 +118,7 @@ public sealed partial class PeoplePage : Page
         DeptRoleBox.Header = L10n.T("org.dept.role");
         DeptProfileBox.Header = L10n.T("org.dept.profile");
         DeptAddButton.Content = L10n.T("org.dept.add");
+        LeaseButton.Content = L10n.T("org.lease");
         GoalBox.Header = L10n.T("org.goal");
         FromDeptBox.Header = L10n.T("org.department");
         CoordinateButton.Content = L10n.T("org.go");
@@ -1045,6 +1046,18 @@ public sealed partial class PeoplePage : Page
             OrgIdBox.Text.Trim(), DeptNameBox.Text.Trim(),
             DeptRoleBox.Text.Trim(), DeptProfileBox.Text.Trim(),
             AppState.Current.Token!));
+
+    // AI for lease: the same three fields, but the profile id names somebody
+    // else's licensed specialist; the fee goes to its owner, who can revoke.
+    private async void OnLease(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var lease = await ApiClient.Shared.LeaseSpecialist(
+                OrgIdBox.Text.Trim(), DeptProfileBox.Text.Trim(),
+                DeptNameBox.Text.Trim(), DeptRoleBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = lease.LeaseId;
+        });
 
     private async void OnCoordinate(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.Coordinate(

@@ -2508,6 +2508,17 @@ object ApiClient {
                 .put("profile_id", profileId), token)
     }
 
+    /** AI for lease: seat somebody else's licensed specialist as a
+     *  department; the fee accrues to its owner, who can revoke any time. */
+    suspend fun leaseSpecialist(orgId: String, profileId: String,
+                                name: String, role: String,
+                                token: String): String {
+        val o = JSONObject(request("/organizations/$orgId/lease", "POST",
+            JSONObject().put("profile_id", profileId).put("name", name)
+                .put("role", role), token))
+        return o.optString("lease_id")
+    }
+
     suspend fun coordinate(orgId: String, goal: String,
                            fromDepartment: String, token: String) {
         request("/organizations/$orgId/coordinate", "POST",

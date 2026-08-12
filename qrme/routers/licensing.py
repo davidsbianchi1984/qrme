@@ -316,6 +316,17 @@ def list_licenses(profile_id: str, request: Request) -> list[dict]:
                     "manifest": ({"carried": json.loads(manifest["carried"]),
                                   "withheld": json.loads(manifest["withheld"])}
                                  if manifest else None)})
+    # Leases ride the same list: an organization holding the profile as a
+    # leased department is a licensee like any buyer, and the owner's view of
+    # who uses their expertise should not depend on which table it sits in.
+    for lease in conn.execute(
+            "SELECT l.*, o.name AS org_name FROM license_leases l"
+            " JOIN organizations o ON o.id=l.org_id WHERE l.profile_id=?"
+            " ORDER BY l.created_at", (profile_id,)).fetchall():
+        out.append({"id": lease["id"], "buyer_id": lease["org_name"],
+                    "kind": "lease", "derived_profile_id": None,
+                    "revoked": bool(lease["revoked"]),
+                    "created_at": lease["created_at"], "manifest": None})
     return out
 
 
@@ -390,13 +401,26 @@ def derive_agent(profile_id: str, grant_id: str, request: Request) -> dict:
 
 @router.delete("/licenses/{grant_id}")
 def revoke_license(grant_id: str, request: Request) -> dict:
-    """The source owner revokes a license."""
+    """The source owner revokes a license — a buyer's grant or an
+    organization's lease; both live on the owner's licenses list and both
+    revoke through this one door."""
     conn = db.connect()
     grant = conn.execute("SELECT * FROM license_grants WHERE id=?",
                          (grant_id,)).fetchone()
-    if grant is None:
+    if grant is not None:
+        require_owner(grant["profile_id"], request)
+        conn.execute("UPDATE license_grants SET revoked=1 WHERE id=?",
+                     (grant_id,))
+        conn.commit()
+        return {"grant_id": grant_id, "revoked": True}
+    lease = conn.execute("SELECT * FROM license_leases WHERE id=?",
+                         (grant_id,)).fetchone()
+    if lease is None:
         raise HTTPException(404, "license not found")
-    require_owner(grant["profile_id"], request)
-    conn.execute("UPDATE license_grants SET revoked=1 WHERE id=?", (grant_id,))
+    require_owner(lease["profile_id"], request)
+    # The department stands but is silent from the next coordination on —
+    # revocation is the owner's hand on the switch, not a renegotiation.
+    conn.execute("UPDATE license_leases SET revoked=1 WHERE id=?",
+                 (grant_id,))
     conn.commit()
     return {"grant_id": grant_id, "revoked": True}

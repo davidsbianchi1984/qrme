@@ -819,6 +819,22 @@ CREATE TABLE IF NOT EXISTS license_manifests (
     created_at TEXT NOT NULL
 );
 
+-- AI for lease: an organization seats somebody else's licensed specialist as
+-- one of its departments. The lease is the authorization that crosses the
+-- account boundary — departments otherwise require the org's own profiles —
+-- and it is revocable from the specialist owner's side: a revoked lease
+-- leaves the department standing but silent, named in every coordination it
+-- no longer speaks in. Consult-class use only; nothing is derived and no
+-- substance travels.
+CREATE TABLE IF NOT EXISTS license_leases (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),    -- leased specialist
+    org_id        TEXT NOT NULL REFERENCES organizations(id),
+    department_id TEXT NOT NULL REFERENCES departments(id),
+    revoked       INTEGER NOT NULL DEFAULT 0,
+    created_at    TEXT NOT NULL
+);
+
 -- Local log of every cloud contribution: exactly what left, when, under which
 -- opaque ref. The gateway never sees profile ids — the ref is random, and only
 -- this table maps it back — so contributions stay anonymous at the gateway

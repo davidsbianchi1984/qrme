@@ -1194,7 +1194,15 @@ export interface OrgOut {
   id: string;
   name: string;
   departments: { id: string; name: string; role: string;
-                 profile_id: string; agent: string; scoped: boolean }[];
+                 profile_id: string; agent: string; scoped: boolean;
+                 leased: boolean; lease_revoked: boolean }[];
+}
+/** AI for lease: a stranger's licensed specialist, seated as a department
+ *  under a revocable lease. */
+export interface LeaseOut {
+  lease_id: string;
+  department_id: string;
+  org: OrgOut;
 }
 export interface CoordinationOut {
   id: string;
@@ -3337,6 +3345,14 @@ export const api = {
     name: string; role: string; profile_id: string; grant_token?: string;
   }, token: string) =>
     req<OrgOut>(`/organizations/${orgId}/departments`,
+      { method: "POST", body, token }),
+  // AI for lease: seat somebody else's licensed specialist as a department.
+  // The fee accrues to the specialist's owner; the lease is revocable from
+  // the owner's side (their licenses list, the same revoke door as grants).
+  leaseSpecialist: (orgId: string, body: {
+    profile_id: string; name: string; role: string;
+  }, token: string) =>
+    req<LeaseOut>(`/organizations/${orgId}/lease`,
       { method: "POST", body, token }),
   coordinate: (orgId: string, body: { goal: string; from_department: string },
                token: string) =>

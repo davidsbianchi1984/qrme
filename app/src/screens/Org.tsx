@@ -6,10 +6,10 @@ import { useSession } from "../store";
 
 // The operational ecosystem (PDI proposal): departments staffed by your own
 // profiles as role agents, coordinating on one goal — each pulls its own
-// scoped material, the lead agent composes the joint plan. Candidate agents
-// are the profiles this account holds plus the marketplace is NOT offered:
-// a department staffed by a stranger's agent would read your material on
-// somebody else's model choices, and the backend refuses it anyway.
+// scoped material, the lead agent composes the joint plan. Staffing takes
+// the profiles this account holds; a stranger's specialist enters only
+// through a **lease** — licensed use, fee to its owner, revocable from the
+// owner's side — never as ordinary staff on your material.
 export function Org({ onPlans }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
@@ -22,6 +22,9 @@ export function Org({ onPlans }: {
   const [deptName, setDeptName] = useState("");
   const [deptRole, setDeptRole] = useState("");
   const [deptProfile, setDeptProfile] = useState("");
+  const [leaseProfile, setLeaseProfile] = useState("");
+  const [leaseName, setLeaseName] = useState("");
+  const [leaseRole, setLeaseRole] = useState("");
   const [goal, setGoal] = useState("");
   const [lead, setLead] = useState("");
   const [latest, setLatest] = useState<CoordinationOut | null>(null);
@@ -65,6 +68,19 @@ export function Org({ onPlans }: {
         profile_id: deptProfile.trim() || session.profileId!,
       }, token!);
       setDeptName(""); setDeptRole(""); setDeptProfile(""); load();
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  async function leaseIn() {
+    if (!org) return;
+    setBusy(true); setError(null);
+    try {
+      await api.leaseSpecialist(org.id, {
+        profile_id: leaseProfile.trim(), name: leaseName.trim(),
+        role: leaseRole.trim(),
+      }, token!);
+      setLeaseProfile(""); setLeaseName(""); setLeaseRole(""); load();
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
@@ -121,6 +137,12 @@ export function Org({ onPlans }: {
                   {fill(tr("org.roleagent", lang), { role: d.role, agent: d.agent })}
                 </span>
                 {d.scoped && <span className="tag">{tr("org.scoped", lang)}</span>}
+                {d.leased && (
+                  <span className="tag">
+                    {tr(d.lease_revoked ? "org.lease.revoked" : "org.leased",
+                        lang)}
+                  </span>
+                )}
               </div>
             ))}
             <div className="row">
@@ -132,6 +154,17 @@ export function Org({ onPlans }: {
                                             onChange={(e) => setDeptProfile(e.target.value)} /></label>
               <button className="primary" disabled={busy || !deptName.trim() || !deptRole.trim()}
                       onClick={addDept}>{tr("org.staff", lang)}</button>
+            </div>
+            <p className="muted small">{tr("org.lease.pitch", lang)}</p>
+            <div className="row">
+              <label>{tr("org.specialistid", lang)}<input value={leaseProfile} placeholder={tr("org.profile.ph", lang)}
+                                            onChange={(e) => setLeaseProfile(e.target.value)} /></label>
+              <label>{tr("org.department", lang)}<input value={leaseName} placeholder={tr("org.dept.ph", lang)}
+                                      onChange={(e) => setLeaseName(e.target.value)} /></label>
+              <label>{tr("org.role", lang)}<input value={leaseRole} placeholder={tr("org.role.ph", lang)}
+                                onChange={(e) => setLeaseRole(e.target.value)} /></label>
+              <button disabled={busy || !leaseProfile.trim() || !leaseName.trim() || !leaseRole.trim()}
+                      onClick={leaseIn}>{tr("org.lease", lang)}</button>
             </div>
           </div>
 

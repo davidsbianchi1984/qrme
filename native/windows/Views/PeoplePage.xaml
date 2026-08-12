@@ -319,6 +319,7 @@
                     <TextBox x:Name="DeptRoleBox" />
                     <TextBox x:Name="DeptProfileBox" />
                     <Button x:Name="DeptAddButton" Click="OnDeptAdd" />
+                    <Button x:Name="LeaseButton" Click="OnLease" />
                     <TextBox x:Name="GoalBox" />
                     <TextBox x:Name="FromDeptBox" />
                     <Button x:Name="CoordinateButton" Click="OnCoordinate" />
