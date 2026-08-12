@@ -61,8 +61,29 @@ export function Identity({ onPlans, onPassing }: {
   const [marketTorso, setMarketTorso] = useState("");
   const [capturing, setCapturing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const captureAngles = ["front", "left", "right", "up", "down"];
   const [captured, setCaptured] = useState<string[]>([]);
+
+  // The stream attaches in an effect, not in the click handler: the <video>
+  // only exists after React commits the `capturing` render, and a single
+  // requestAnimationFrame raced that commit — permission granted, camera
+  // running, and a screen showing nothing. The effect runs after commit by
+  // definition, and the explicit play() is for the phones, which do not
+  // autoplay a stream attached after mount.
+  useEffect(() => {
+    if (capturing && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => undefined);
+    }
+  }, [capturing]);
+
+  // Leaving the screen mid-capture must release the camera — a light that
+  // stays on after the person walked away is a promise broken.
+  useEffect(() => () => {
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+  }, []);
 
   const reloadAvatar = () =>
     api.avatar(me, token).then(setAvatar).catch(() => undefined);
@@ -86,17 +107,15 @@ export function Identity({ onPlans, onPassing }: {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user" } });
-      setCapturing(true);
-      // The ref renders with `capturing`; attach on the next frame.
-      requestAnimationFrame(() => {
-        if (videoRef.current) videoRef.current.srcObject = stream;
-      });
+      streamRef.current = stream;
+      setCapturing(true);   // the effect above attaches it after commit
     } catch (e) { fail(e); }
   }
 
   function stopCapture() {
-    const s = videoRef.current?.srcObject as MediaStream | null;
-    s?.getTracks().forEach((t) => t.stop());
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
     setCapturing(false);
   }
 
