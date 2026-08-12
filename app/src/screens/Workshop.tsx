@@ -49,6 +49,7 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
   const token = session.ownerToken || "";
 
   const [steering, setSteering] = useState<ProfileSteering | null>(null);
+  const [lockReason, setLockReason] = useState("");
   const [sources, setSources] = useState<SourceItem[]>([]);
   const [specialists, setSpecialists] = useState<Specialist[]>([]);
   const [experience, setExperience] = useState<ExperienceEntry[]>([]);
@@ -159,10 +160,34 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
               </label>
               <input type="range" min={d.min} max={d.max}
                      value={steering.values[d.name] ?? d.default}
+                     disabled={!!steering.lock}
                      onChange={(e) => steer(d.name, Number(e.target.value))} />
               <div className="muted small">{d.low} → {d.high}</div>
             </div>
           ))}
+          {/* The personality nobody can move: while the lock stands, no
+              steering write lands — the owner's own slip included. */}
+          {steering.lock ? (
+            <div className="row">
+              <span className="muted small" style={{ flex: 1 }}>
+                🔒 {tr("wsh.locked", lang)}
+                {steering.lock.reason ? ` — ${steering.lock.reason}` : ""}
+              </span>
+              <button onClick={act(async () => {
+                await api.unlockSteering(me, token);
+              })}>{tr("wsh.unlock", lang)}</button>
+            </div>
+          ) : (
+            <div className="row">
+              <input value={lockReason} placeholder={tr("wsh.lock.ph", lang)}
+                     onChange={(e) => setLockReason(e.target.value)}
+                     style={{ flex: 1 }} />
+              <button onClick={act(async () => {
+                await api.lockSteering(me, lockReason.trim() || null, token);
+                setLockReason("");
+              })}>{tr("wsh.lock", lang)}</button>
+            </div>
+          )}
         </div>
       )}
 

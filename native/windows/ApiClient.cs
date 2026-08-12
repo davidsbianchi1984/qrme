@@ -242,12 +242,21 @@ public record SteeringAgeBlock(
 public record SteeringAppearance(
     [property: JsonPropertyName("description")] string? Description);
 
+public record SteeringUnlocked(
+    [property: JsonPropertyName("subject_id")] string SubjectId);
+
+public record SteeringLockOut(
+    [property: JsonPropertyName("subject_id")] string SubjectId,
+    [property: JsonPropertyName("reason")] string? Reason,
+    [property: JsonPropertyName("locked_at")] string LockedAt);
+
 public record SteeringHubState(
     [property: JsonPropertyName("adult_mode")] bool AdultMode,
     [property: JsonPropertyName("dials")] SteeringDial[] Dials,
     [property: JsonPropertyName("values")] System.Collections.Generic.Dictionary<string, int> Values,
     [property: JsonPropertyName("age")] SteeringAgeBlock Age,
-    [property: JsonPropertyName("appearance")] SteeringAppearance Appearance);
+    [property: JsonPropertyName("appearance")] SteeringAppearance Appearance,
+    [property: JsonPropertyName("lock")] SteeringLockOut? Lock);
 
 public record LedgerEntry(
     [property: JsonPropertyName("id")] string Id,
@@ -1009,6 +1018,20 @@ public sealed class ApiClient
 
     public Task<SteeringHubState> SteeringHub(string id, string token) =>
         Send<SteeringHubState>(Get($"/profiles/{id}/steering/hub", token));
+
+    /// <summary>The personality nobody can move: while the lock stands,
+    /// no steering write lands. The key is the owner's.</summary>
+    public Task<SteeringLockOut> LockSteering(string pid, string token) =>
+        Send<SteeringLockOut>(Post($"/profiles/{pid}/steering/lock",
+            new { }, token));
+
+    public Task<SteeringUnlocked> UnlockSteering(string pid, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{pid}/steering/lock");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<SteeringUnlocked>(req);
+    }
 
     public Task<SteeringHubState> SetSteeringHub(string id, string token,
         System.Collections.Generic.Dictionary<string, int>? values,

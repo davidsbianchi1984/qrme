@@ -461,11 +461,15 @@ export type PlacementCustody = Record<string, unknown>;
 /** A profile's dials. Same catalogue as a robot's, plus one difference the
  *  read carries and the robot's does not: `adult_mode`, which is what
  *  decides whether the intimacy dial exists at all. */
+export type SteeringLock = {
+  subject_id: string; reason: string | null; locked_at: string;
+};
 export type ProfileSteering = {
   subject: string; subject_id: string;
   dials: SteeringDial[];
   values: Record<string, number>;
   adult_mode: boolean;
+  lock?: SteeringLock | null;
 };
 
 /** The write answers without the catalogue, and without a body's derived
@@ -4466,6 +4470,15 @@ export const api = {
                        token: string) =>
     req<ProfileSteeringSet>(`/profiles/${profileId}/steering`,
       { method: "PUT", body: { values }, token }),
+
+  // The personality nobody can move: while the lock stands, no steering
+  // write lands — the owner's own slip included. The key is the owner's.
+  lockSteering: (profileId: string, reason: string | null, token: string) =>
+    req<SteeringLock>(`/profiles/${profileId}/steering/lock`,
+      { method: "POST", body: reason ? { reason } : {}, token }),
+  unlockSteering: (profileId: string, token: string) =>
+    req<{ subject_id: string; lock: null }>(
+      `/profiles/${profileId}/steering/lock`, { method: "DELETE", token }),
 
   sources: (profileId: string, token: string) =>
     req<SourceItem[]>(`/profiles/${profileId}/sources`, { token }),

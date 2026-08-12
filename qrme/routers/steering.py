@@ -37,6 +37,11 @@ class SteeringSet(BaseModel):
     values: dict[str, int] = Field(default_factory=dict)
 
 
+class SteeringLockSet(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    reason: str | None = None
+
+
 class SteeringAge(BaseModel):
     base_age: int | None = None
     aging_enabled: bool | None = None
@@ -64,20 +69,46 @@ def get_profile_steering(profile_id: str, request: Request) -> dict:
     adult = bool(profile["adult_mode"])
     return {"subject": "profile", "subject_id": profile_id,
             "dials": steering.spec(adult), "values": steering.get(profile_id),
-            "adult_mode": adult}
+            "adult_mode": adult, "lock": steering.lock_of(profile_id)}
 
 
 @router.put("/profiles/{profile_id}/steering")
 def set_profile_steering(profile_id: str, body: SteeringSet,
                          request: Request) -> dict:
     """Steer a profile. Intimacy is hard-clamped to 0 unless the profile is
-    adult-mode — it can never be raised on a non-rated persona."""
+    adult-mode — it can never be raised on a non-rated persona. A locked
+    profile refuses the write with 423."""
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
     adult = bool(profile["adult_mode"])
-    values = steering.set_dials(profile_id, body.values, adult)
+    try:
+        values = steering.set_dials(profile_id, body.values, adult)
+    except steering.SteeringLocked as exc:
+        raise HTTPException(423, str(exc)) from None
     return {"subject": "profile", "subject_id": profile_id,
             "values": values, "adult_mode": adult}
+
+
+@router.post("/profiles/{profile_id}/steering/lock", status_code=201)
+def lock_profile_steering(profile_id: str, body: SteeringLockSet,
+                          request: Request) -> dict:
+    """The personality nobody can move: lock the dials where they stand.
+    While the lock holds, every steering write — the owner's own slip, a
+    compromised session, any future automation — is refused with 423. The
+    lock and the key are both the owner's."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return steering.lock(profile_id, body.reason)
+
+
+@router.delete("/profiles/{profile_id}/steering/lock")
+def unlock_profile_steering(profile_id: str, request: Request) -> dict:
+    """Turn the key. Unlocking is the same owner authority that locked —
+    and never anything less."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    steering.unlock(profile_id)
+    return {"subject_id": profile_id, "lock": None}
 
 
 def _age_block(profile: dict) -> dict:
@@ -98,6 +129,7 @@ def get_steering_hub(profile_id: str, request: Request) -> dict:
     return {
         "subject_id": profile_id, "adult_mode": adult,
         "dials": steering.spec(adult), "values": steering.get(profile_id),
+        "lock": steering.lock_of(profile_id),
         "age": _age_block(profile),
         "appearance": {
             "description": profile["appearance"],
@@ -118,7 +150,10 @@ def set_steering_hub(profile_id: str, body: SteeringHub,
     conn = db.connect()
 
     if body.values is not None:
-        steering.set_dials(profile_id, body.values, adult)
+        try:
+            steering.set_dials(profile_id, body.values, adult)
+        except steering.SteeringLocked as exc:
+            raise HTTPException(423, str(exc)) from None
 
     if body.age is not None:
         sets, params = [], []
@@ -172,7 +207,10 @@ def set_robot_steering(robot_id: str, body: SteeringSet,
     _robot_owned(robot_id, request)
     values = body.values.copy()
     values.pop("intimacy", None)
-    steering.set_dials(robot_id, values, adult=False)
+    try:
+        steering.set_dials(robot_id, values, adult=False)
+    except steering.SteeringLocked as exc:
+        raise HTTPException(423, str(exc)) from None
     return {"subject": "robot", "subject_id": robot_id,
             "values": steering.get(robot_id),
             "behavior_profile": steering.robot_profile(robot_id)}

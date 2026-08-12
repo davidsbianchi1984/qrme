@@ -235,12 +235,19 @@ struct SteeringAgeBlock: Decodable {
 
 struct SteeringAppearance: Decodable { let description: String? }
 
+struct SteeringLockOut: Decodable {
+    let subject_id: String
+    let reason: String?
+    let locked_at: String
+}
+
 struct SteeringHubState: Decodable {
     let adult_mode: Bool
     let dials: [SteeringDial]
     let values: [String: Int]
     let age: SteeringAgeBlock
     let appearance: SteeringAppearance
+    let lock: SteeringLockOut?
 }
 
 struct LedgerEntry: Decodable, Identifiable {
@@ -4234,6 +4241,22 @@ extension ApiClient {
                      token: String) async throws -> SteeringCard {
         try await request("/profiles/\(id)/steering", method: "PUT",
                           body: ["values": values], token: token)
+    }
+
+    /// The personality nobody can move: while the lock stands, no
+    /// steering write lands. The key is the owner's.
+    func lockSteering(id: String, token: String,
+                      reason: String?) async throws -> SteeringLockOut {
+        var body: [String: Any] = [:]
+        if let reason, !reason.isEmpty { body["reason"] = reason }
+        return try await request("/profiles/\(id)/steering/lock",
+                                 method: "POST", body: body, token: token)
+    }
+
+    func unlockSteering(id: String, token: String) async throws {
+        struct Out: Decodable { let subject_id: String }
+        let _: Out = try await request("/profiles/\(id)/steering/lock",
+                                       method: "DELETE", token: token)
     }
 
     // -- the wrist --

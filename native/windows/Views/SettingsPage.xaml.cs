@@ -309,6 +309,13 @@ public sealed partial class SettingsPage : Page
                 _dialSliders[dial.Name] = slider;
                 SteeringDials.Children.Add(slider);
             }
+            _steeringLocked = hub.Lock is not null;
+            ApplySteeringButton.IsEnabled = !_steeringLocked;
+            SteeringLockButton.Content = _steeringLocked
+                ? L10n.T("ns.st.unlock") : L10n.T("ns.st.lock");
+            SteeringLockedText.Text = L10n.T("ns.st.locked");
+            SteeringLockedText.Visibility = _steeringLocked
+                ? Visibility.Visible : Visibility.Collapsed;
             AppearanceBox.Text = hub.Appearance.Description ?? "";
             BaseAgeBox.Text = hub.Age.BaseAge?.ToString() ?? "";
             AgingToggle.IsOn = hub.Age.AgingEnabled;
@@ -318,6 +325,22 @@ public sealed partial class SettingsPage : Page
                     AppState.Current.Language, ("age", $"{eff}"));
                 EffectiveAgeText.Visibility = Visibility.Visible;
             }
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private bool _steeringLocked;
+
+    private async void OnSteeringLock(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            if (_steeringLocked)
+                await ApiClient.Shared.UnlockSteering(s.Pid!, s.Token!);
+            else
+                await ApiClient.Shared.LockSteering(s.Pid!, s.Token!);
+            await LoadSteering();
         }
         catch (Exception ex) { ShowError(ex.Message); }
     }

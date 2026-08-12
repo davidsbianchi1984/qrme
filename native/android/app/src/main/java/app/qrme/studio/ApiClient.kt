@@ -77,7 +77,8 @@ data class SteeringDial(val name: String, val group: String, val label: String,
                         val low: String, val high: String, val min: Int, val max: Int)
 data class SteeringHubState(val dials: List<SteeringDial>, val values: Map<String, Int>,
                             val baseAge: Int?, val agingEnabled: Boolean,
-                            val effectiveAge: Int?, val appearance: String?)
+                            val effectiveAge: Int?, val appearance: String?,
+                            val locked: Boolean)
 data class LedgerEntry(val id: String, val kind: String, val memo: String?,
                        val amount: Double, val status: String)
 data class EarningsStatement(val entries: List<LedgerEntry>, val accrued: Double,
@@ -513,7 +514,18 @@ object ApiClient {
             age.optBoolean("aging_enabled"),
             if (age.isNull("effective_age")) null else age.optInt("effective_age"),
             if (appearance.isNull("description")) null
-            else appearance.optString("description", null))
+            else appearance.optString("description", null),
+            !o.isNull("lock"))
+    }
+
+    /** The personality nobody can move: while the lock stands, no
+     *  steering write lands. The key is the owner's. */
+    suspend fun lockSteering(id: String, token: String) {
+        request("/profiles/$id/steering/lock", "POST", JSONObject(), token)
+    }
+
+    suspend fun unlockSteering(id: String, token: String) {
+        request("/profiles/$id/steering/lock", "DELETE", token = token)
     }
 
     suspend fun setSteeringHub(id: String, token: String,

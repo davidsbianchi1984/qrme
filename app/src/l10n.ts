@@ -3483,6 +3483,18 @@ const CHROME: Table = {
   "wsh.same.also": {
     en: "Also present on: {list}.", es: "También presente en: {list}.", fr: "Également présent sur : {list}.", de: "Ebenfalls vorhanden auf: {list}.", pt: "Também presente em: {list}.", it: "Presente anche su: {list}.", ja: "次にも存在します: {list}。", zh: "同样出现在: {list}。", hi: "यहाँ भी मौजूद: {list}।", ar: "موجود أيضًا على: {list}.",
   },
+  "wsh.lock": {
+    en: "Lock the dials", es: "Bloquear los diales", fr: "Verrouiller les cadrans", de: "Die Regler sperren", pt: "Bloquear os mostradores", it: "Blocca le manopole", ja: "ダイヤルをロック", zh: "锁定旋钮", hi: "डायल लॉक करें", ar: "اقفل الأقراص",
+  },
+  "wsh.lock.ph": {
+    en: "Why, in your own words (optional)", es: "Por qué, con tus palabras (opcional)", fr: "Pourquoi, avec vos mots (facultatif)", de: "Warum, in deinen Worten (optional)", pt: "Porquê, nas suas palavras (opcional)", it: "Perché, con parole tue (facoltativo)", ja: "理由（任意・自分の言葉で）", zh: "原因（可选，用你自己的话）", hi: "क्यों, अपने शब्दों में (वैकल्पिक)", ar: "لماذا، بكلماتك (اختياري)",
+  },
+  "wsh.locked": {
+    en: "Locked — nothing moves these dials until you unlock them.", es: "Bloqueado — nada mueve estos diales hasta que los desbloquees.", fr: "Verrouillé — rien ne bouge ces cadrans tant que vous ne les déverrouillez pas.", de: "Gesperrt — nichts bewegt diese Regler, bis du sie entsperrst.", pt: "Bloqueado — nada move estes mostradores até os desbloqueares.", it: "Bloccato — nulla muove queste manopole finché non le sblocchi.", ja: "ロック中 — 解除するまで、何もこのダイヤルを動かせません。", zh: "已锁定 — 在你解锁之前，任何东西都无法移动这些旋钮。", hi: "लॉक है — जब तक आप नहीं खोलते, कुछ भी ये डायल नहीं हिला सकता।", ar: "مقفل — لا شيء يحرّك هذه الأقراص حتى تفتحها.",
+  },
+  "wsh.unlock": {
+    en: "Unlock", es: "Desbloquear", fr: "Déverrouiller", de: "Entsperren", pt: "Desbloquear", it: "Sblocca", ja: "ロック解除", zh: "解锁", hi: "अनलॉक करें", ar: "افتح القفل",
+  },
   "wsh.steer": {
     en: "How it comes across", es: "Cómo se presenta", fr: "Comment il se présente", de: "Wie es rüberkommt", pt: "Como se apresenta", it: "Come si presenta", ja: "どう伝わるか", zh: "它给人的感觉", hi: "यह कैसे सामने आता है", ar: "كيف يظهر",
   },

@@ -97,10 +97,47 @@ def get(subject_id: str) -> dict[str, int]:
     return {name: int(stored.get(name, DEFAULT)) for name in DIALS}
 
 
+class SteeringLocked(Exception):
+    """The dials are locked and a write tried to move them."""
+
+
+def lock(subject_id: str, reason: str | None = None) -> dict:
+    """Lock the dials where they stand. While the lock holds, nothing moves
+    them — not the owner's own slip, not a compromised session, not any
+    future automation. The lock and the key are both the owner's."""
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO steering_locks (subject_id, reason, locked_at)"
+        " VALUES (?,?,?) ON CONFLICT (subject_id) DO UPDATE SET"
+        " reason=excluded.reason, locked_at=excluded.locked_at",
+        (subject_id, (reason or "").strip() or None, db.utcnow()))
+    conn.commit()
+    return lock_of(subject_id)
+
+
+def unlock(subject_id: str) -> None:
+    conn = db.connect()
+    conn.execute("DELETE FROM steering_locks WHERE subject_id=?",
+                 (subject_id,))
+    conn.commit()
+
+
+def lock_of(subject_id: str) -> dict | None:
+    row = db.connect().execute(
+        "SELECT * FROM steering_locks WHERE subject_id=?",
+        (subject_id,)).fetchone()
+    return dict(row) if row else None
+
+
 def set_dials(subject_id: str, values: dict, adult: bool) -> dict[str, int]:
     """Persist dial changes. Unknown dials are ignored; each is clamped to
     0–100; the intimacy dial is hard-clamped to 0 unless the subject is
-    adult-mode, so it can never be raised on a non-rated profile."""
+    adult-mode, so it can never be raised on a non-rated profile. A locked
+    subject refuses the write outright — the personality nobody can move."""
+    if lock_of(subject_id) is not None:
+        raise SteeringLocked(
+            "the steering is locked; these dials do not move until the "
+            "owner unlocks them")
     current = get(subject_id)
     for name, raw in values.items():
         if name not in DIALS:

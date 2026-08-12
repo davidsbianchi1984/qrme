@@ -990,6 +990,15 @@ CREATE TABLE IF NOT EXISTS steering_settings (
     updated_at TEXT NOT NULL
 );
 
+-- The steering lock: while a row stands here, no dial on the subject
+-- moves — not by the owner's own slip, not by anyone else. The lock and
+-- the key are both the owner's.
+CREATE TABLE IF NOT EXISTS steering_locks (
+    subject_id TEXT PRIMARY KEY,
+    reason     TEXT,
+    locked_at  TEXT NOT NULL
+);
+
 -- The creator ledger: one row per money event, written at sale time so a
 -- creator's statement is a record, not a reconstruction. Simulated money,
 -- like every payment on the platform — but the accounting is real.

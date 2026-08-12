@@ -1110,7 +1110,23 @@ private fun SteeringPanel(vm: StudioViewModel) {
                 Text(L10n.fill("ns.st.effective", vm.language, mapOf("age" to it.toString())),
                     color = Qrme.T3, fontSize = 11.sp)
             }
-            SmallAction(L10n.t("ns.st.apply", vm.language)) {
+            // The personality nobody can move: while the lock stands,
+            // no steering write lands.
+            if (h.locked) {
+                Text(L10n.t("ns.st.locked", vm.language), color = Qrme.Amber, fontSize = 12.sp)
+                SmallAction(L10n.t("ns.st.unlock", vm.language)) {
+                    vm.call({ ApiClient.unlockSteering(vm.pid!!, vm.token!!)
+                        ApiClient.steeringHub(vm.pid!!, vm.token!!) }) { r ->
+                        r.getOrNull()?.let { hub = it } }
+                }
+            } else {
+                SmallAction(L10n.t("ns.st.lock", vm.language)) {
+                    vm.call({ ApiClient.lockSteering(vm.pid!!, vm.token!!)
+                        ApiClient.steeringHub(vm.pid!!, vm.token!!) }) { r ->
+                        r.getOrNull()?.let { hub = it } }
+                }
+            }
+            SmallAction(L10n.t("ns.st.apply", vm.language), enabled = !h.locked) {
                 status = null
                 vm.call({
                     ApiClient.setSteeringHub(vm.pid!!, vm.token!!,

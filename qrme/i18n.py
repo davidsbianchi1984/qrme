@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'the steering is locked; these dials do not move until the owner unlocks them': {
+        'es': 'la dirección está bloqueada; estos diales no se mueven hasta que el propietario los desbloquee',
+        'fr': "le pilotage est verrouillé ; ces cadrans ne bougeront pas tant que le propriétaire ne les aura pas déverrouillés",
+        'de': 'die Steuerung ist gesperrt; diese Regler bewegen sich nicht, bis der Eigentümer sie entsperrt',
+        'pt': 'a direção está bloqueada; estes mostradores não se movem até o proprietário os desbloquear',
+        'it': 'lo sterzo è bloccato; queste manopole non si muovono finché il proprietario non le sblocca',
+        'ja': 'ステアリングはロックされています。所有者が解除するまで、これらのダイヤルは動きません',
+        'zh': '转向已锁定；在所有者解锁之前，这些旋钮不会移动',
+        'hi': 'स्टीयरिंग बंद है; जब तक स्वामी नहीं खोलते, ये डायल नहीं हिलेंगे',
+        'ar': 'التوجيه مقفل؛ لا تتحرك هذه الأقراص حتى يفتحها المالك',
+    },
     'say what to forget — empty words strike nothing': {
         'es': 'di qué olvidar — las palabras vacías no borran nada',
         'fr': "dites quoi oublier — des mots vides n'effacent rien",

@@ -60,10 +60,26 @@ struct SteeringPanel: View {
                         .font(.caption2).foregroundStyle(Theme.t3)
                 }
 
-                Button(L10n.t("ns.st.apply", state.language)) { apply() }
-                    .font(.caption.bold()).foregroundStyle(.white)
-                    .padding(.horizontal, 12).padding(.vertical, 9)
-                    .background(Theme.brandA).clipShape(Capsule())
+                HStack(spacing: 10) {
+                    Button(L10n.t("ns.st.apply", state.language)) { apply() }
+                        .font(.caption.bold()).foregroundStyle(.white)
+                        .padding(.horizontal, 12).padding(.vertical, 9)
+                        .background(Theme.brandA).clipShape(Capsule())
+                        .disabled(hub.lock != nil)
+                    // The personality nobody can move: while the lock
+                    // stands, no steering write lands.
+                    if hub.lock != nil {
+                        Button(L10n.t("ns.st.unlock", state.language)) { setLock(false) }
+                            .font(.caption.bold()).foregroundStyle(Theme.txt)
+                    } else {
+                        Button(L10n.t("ns.st.lock", state.language)) { setLock(true) }
+                            .font(.caption.bold()).foregroundStyle(Theme.txt)
+                    }
+                }
+                if hub.lock != nil {
+                    Text(L10n.t("ns.st.locked", state.language))
+                        .font(.caption2).foregroundStyle(Theme.amber)
+                }
                 if let status {
                     Text(status).font(.caption).foregroundStyle(Theme.green)
                 }
@@ -105,6 +121,23 @@ struct SteeringPanel: View {
             appearance = h.appearance.description ?? ""
             baseAge = h.age.base_age.map(String.init) ?? ""
             agingEnabled = h.age.aging_enabled
+        }
+    }
+
+    private func setLock(_ on: Bool) {
+        guard let pid = state.pid, let token = state.token else { return }
+        status = nil
+        Task {
+            do {
+                if on {
+                    _ = try await ApiClient.shared.lockSteering(
+                        id: pid, token: token, reason: nil)
+                } else {
+                    try await ApiClient.shared.unlockSteering(
+                        id: pid, token: token)
+                }
+                await load()
+            } catch { status = error.localizedDescription }
         }
     }
 
