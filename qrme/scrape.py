@@ -100,3 +100,27 @@ def extract(html: str) -> dict:
     body = _TAGS.sub(" ", _STRIP.sub(" ", html))
     text = _WS.sub(" ", _html.unescape(body)).strip()[:_MAX_TEXT]
     return {"title": title, "description": description, "text": text}
+
+
+# What a platform's front door says instead of showing the profile. The
+# phrases are checked against the page's *title*, because that is where a
+# wall announces itself — "Log into Facebook", "Login • Instagram",
+# "Sign Up | LinkedIn" — while a real profile page titles itself with the
+# person. Kept deliberately short: a profile whose bio merely mentions
+# signing in must not be refused over its own words.
+_WALL = re.compile(
+    r"\b(log ?in|log into|sign ?in|sign ?up|create an account"
+    r"|join facebook)\b", re.I)
+
+
+def wall(page: dict) -> bool:
+    """True when the fetched page is a login wall, not the profile.
+
+    The field report behind it: a Facebook import "succeeded" and what
+    it stored — what the persona then quoted back in chat — was the
+    login page, because that is all Facebook shows a signed-out
+    visitor. A wall's words are the platform's, not the person's, and
+    material that feeds a profile's training must never be them.
+    """
+    title = page.get("title") or ""
+    return bool(_WALL.search(title))

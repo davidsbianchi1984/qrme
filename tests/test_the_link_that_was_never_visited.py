@@ -98,6 +98,41 @@ def test_publish_connections_do_not_scrape(client, profile_id):
     assert r.status_code == 409
 
 
+_WALL_PAGE = """
+<html><head><title>Log into Facebook</title>
+<meta property="og:description" content="Log into Facebook to start sharing and connecting with your friends, family, and people you know." />
+</head><body><p>Log into Facebook to start sharing.</p></body></html>
+"""
+
+
+def test_a_login_wall_is_a_refusal_not_a_source(client, profile_id,
+                                                monkeypatch):
+    """A wall's words are the platform's, not the person's.
+
+    The field report: a Facebook import "succeeded", and what it stored —
+    what the persona then quoted back in chat as though it were the
+    owner's own writing — was the login page, because that is all
+    Facebook shows a signed-out visitor. The fetch now recognises the
+    wall and refuses with the honest workaround, and nothing lands in
+    the profile's source material.
+    """
+    conn = _connect(client, profile_id, platform="facebook",
+                    direction="collect", handle="dana.grows")
+    monkeypatch.setattr(scrape, "fetch", lambda url: _WALL_PAGE)
+    r = client.post(f"/social/{conn['id']}/scrape")
+    assert r.status_code == 422
+    assert "login wall" in r.json()["detail"]
+    assert "collect" in r.json()["detail"]     # the workaround, named
+    sources = client.get(f"/profiles/{profile_id}/sources").json()
+    assert not [s for s in sources if s["kind"] == "social_post"]
+    # A profile whose bio merely mentions signing in is not a wall: the
+    # check reads the title, where a wall announces itself.
+    assert not scrape.wall({"title": "Dana Grows (@dana.grows)",
+                            "description": "I post about how to sign in "
+                                           "to your own life.",
+                            "text": "sign up for my newsletter"})
+
+
 def test_a_page_with_nothing_readable_is_a_failure_not_a_source(client,
                                                                 profile_id,
                                                                 monkeypatch):

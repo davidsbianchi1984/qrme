@@ -1016,6 +1016,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'that platform shows a signed-out visitor only its login wall, so there is nothing of the account to import — copy the profile\'s text while signed in and paste it into collect instead': {
+        'es': 'esa plataforma solo muestra su muro de inicio de sesión a un visitante sin sesión, así que no hay nada de la cuenta que importar: copia el texto del perfil con la sesión iniciada y pégalo en recopilar.',
+        'fr': "cette plateforme ne montre à un visiteur non connecté que son mur de connexion, il n'y a donc rien du compte à importer — copiez le texte du profil en étant connecté et collez-le dans la collecte.",
+        'de': 'diese Plattform zeigt einem nicht angemeldeten Besucher nur ihre Anmeldewand, es gibt also nichts vom Konto zu importieren — kopiere den Text des Profils im angemeldeten Zustand und füge ihn beim Sammeln ein.',
+        'pt': 'essa plataforma mostra a um visitante sem sessão apenas o seu muro de início de sessão, por isso não há nada da conta para importar — copia o texto do perfil com sessão iniciada e cola-o na recolha.',
+        'it': 'quella piattaforma mostra a un visitatore non connesso solo il proprio muro di accesso, quindi non c\'è nulla dell\'account da importare — copia il testo del profilo da connesso e incollalo nella raccolta.',
+        'ja': 'そのプラットフォームは、ログインしていない訪問者にはログイン画面しか見せないため、アカウントから取り込めるものはありません。ログインした状態でプロフィールの文章をコピーし、収集に貼り付けてください。',
+        'zh': '该平台对未登录的访客只显示登录墙，因此没有任何账号内容可导入——请在登录状态下复制个人主页的文字，粘贴到收集里。',
+        'hi': 'वह प्लैटफ़ॉर्म बिना साइन-इन आगंतुक को केवल अपनी लॉगिन दीवार दिखाता है, इसलिए खाते से आयात करने को कुछ नहीं है — साइन इन करके प्रोफ़ाइल का पाठ कॉपी करें और उसे संग्रह में चिपकाएँ।',
+        'ar': 'تلك المنصة لا تُظهر للزائر غير المسجّل سوى جدار تسجيل الدخول، فلا شيء من الحساب يمكن استيراده — انسخ نص الملف وأنت مسجّل الدخول وألصقه في التجميع.',
+    },
     'a hashtag names a topic, not an account — give the account\'s handle or paste its link': {
         'es': 'un hashtag nombra un tema, no una cuenta: da el identificador de la cuenta o pega su enlace.',
         'fr': "un hashtag désigne un sujet, pas un compte — donnez l'identifiant du compte ou collez son lien.",

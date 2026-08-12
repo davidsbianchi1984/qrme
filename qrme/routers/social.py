@@ -262,6 +262,16 @@ def scrape_page(cid: str, request: Request) -> dict:
     except Exception as e:                                     # noqa: BLE001
         raise HTTPException(
             502, f"could not fetch {url} — {e.__class__.__name__}: {e}")
+    # A wall's words are the platform's, not the person's. Before this
+    # check, a Facebook import "succeeded" by storing the login page as
+    # source material — which the persona then quoted back in chat as
+    # though it were the owner's own writing.
+    if scrape.wall(page):
+        raise HTTPException(
+            422, "that platform shows a signed-out visitor only its login "
+                 "wall, so there is nothing of the account to import — "
+                 "copy the profile's text while signed in and paste it "
+                 "into collect instead")
     parts = [p for p in (page["description"], page["text"]) if p]
     if not (page["title"] or parts):
         raise HTTPException(
