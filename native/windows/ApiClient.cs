@@ -540,7 +540,7 @@ public record ManifestWithheld(
 public record LicenseManifest(
     [property: JsonPropertyName("carried")]
     System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement> Carried,
-    [property: JsonPropertyName("withheld")] ManifestWithheld[] Withheld);
+    [property: JsonPropertyName("withholdings")] ManifestWithheld[] Withholdings);
 
 public record LicenseGrant(
     [property: JsonPropertyName("id")] string Id,

@@ -166,7 +166,7 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                   {Object.keys(h.manifest.carried).join(", ") || "—"}
                   {" · "}
                   {tr("lic.manifest.withheld", lang)}:{" "}
-                  {h.manifest.withheld.map((w) => w.item).join(", ")}
+                  {h.manifest.withholdings.map((w) => w.item).join(", ")}
                 </span>
               </>
             )}

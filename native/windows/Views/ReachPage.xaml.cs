@@ -575,7 +575,7 @@ public sealed partial class ReachPage : Page
                     ? $"{L10n.T("nmg.manifest.carried")}: " +
                       $"{string.Join(", ", m.Carried.Keys.OrderBy(k => k))} · " +
                       $"{L10n.T("nmg.manifest.withheld")}: " +
-                      $"{string.Join(", ", m.Withheld.Select(w => w.Item))}"
+                      $"{string.Join(", ", m.Withholdings.Select(w => w.Item))}"
                     : "",
                 Revoked = g.Revoked,
             }).ToList();

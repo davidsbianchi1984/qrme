@@ -683,34 +683,24 @@ struct LicenseOffer: Decodable {
     let allow_derivatives: Bool
 }
 
+/// Accepts any JSON value and keeps nothing — the manifest's carried block
+/// is a heterogeneous object and the shell only needs its key names.
+enum ManifestAny: Decodable {
+    case ignored
+    init(from decoder: Decoder) throws { self = .ignored }
+}
+
 /// What a derivation handed over and what stayed behind, written server-side
 /// at derive time. `carried` arrives as a heterogeneous object; the shell
 /// shows its keys — the names of what traveled — and the typed withheld rows.
+struct ManifestWithheld: Decodable {
+    let item: String
+    let reason: String
+}
+
 struct LicenseManifest: Decodable {
-    struct Withheld: Decodable {
-        let item: String
-        let reason: String
-    }
-
-    let carried: [String]
-    let withheld: [Withheld]
-
-    private struct DynamicKey: CodingKey {
-        var stringValue: String
-        var intValue: Int? { nil }
-        init?(stringValue: String) { self.stringValue = stringValue }
-        init?(intValue: Int) { nil }
-    }
-
-    private enum Keys: String, CodingKey { case carried, withheld }
-
-    init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: Keys.self)
-        let carriedKeys = try c.nestedContainer(keyedBy: DynamicKey.self,
-                                                forKey: .carried)
-        carried = carriedKeys.allKeys.map(\.stringValue).sorted()
-        withheld = try c.decode([Withheld].self, forKey: .withheld)
-    }
+    let carried: [String: ManifestAny]
+    let withholdings: [ManifestWithheld]
 }
 
 struct LicenseGrant: Decodable {

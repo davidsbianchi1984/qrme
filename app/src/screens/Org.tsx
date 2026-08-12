@@ -139,8 +139,8 @@ export function Org({ onPlans }: {
                 {d.scoped && <span className="tag">{tr("org.scoped", lang)}</span>}
                 {d.leased && (
                   <span className="tag">
-                    {tr(d.lease_revoked ? "org.lease.revoked" : "org.leased",
-                        lang)}
+                    {d.lease_revoked ? tr("org.lease.revoked", lang)
+                                     : tr("org.leased", lang)}
                   </span>
                 )}
               </div>

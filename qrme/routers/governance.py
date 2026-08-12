@@ -131,6 +131,10 @@ def _terminate(profile_id: str, request: Request) -> None:
     # sale went through after the objection was upheld and the content erased.
     for sql in (
             "UPDATE license_grants   SET revoked=1 WHERE profile_id=?",
+            # A lease is a licence held by an organization: the terminated
+            # specialist's desk goes dark in the next coordination, exactly
+            # like a buyer's grant dies at the same moment.
+            "UPDATE license_leases   SET revoked=1 WHERE profile_id=?",
             "UPDATE grants           SET revoked=1 WHERE profile_id=?",
             "UPDATE handoffs         SET revoked=1, package=NULL"
             " WHERE profile_id=?",

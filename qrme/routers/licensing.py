@@ -159,7 +159,7 @@ def _transfer_substance(conn, source: dict, new_id: str, kind: str) -> dict:
                          "reason": "the voice is the person's biometric "
                                    "likeness; their consent does not "
                                    "transfer with a license"})
-    return {"carried": carried, "withheld": withheld}
+    return {"carried": carried, "withholdings": withheld}
 
 router = APIRouter()
 
@@ -314,7 +314,7 @@ def list_licenses(profile_id: str, request: Request) -> list[dict]:
             (r["id"],)).fetchone()
         out.append({**dict(r), "revoked": bool(r["revoked"]),
                     "manifest": ({"carried": json.loads(manifest["carried"]),
-                                  "withheld": json.loads(manifest["withheld"])}
+                                  "withholdings": json.loads(manifest["withheld"])}
                                  if manifest else None)})
     # Leases ride the same list: an organization holding the profile as a
     # leased department is a licensee like any buyer, and the owner's view of
@@ -389,7 +389,7 @@ def derive_agent(profile_id: str, grant_id: str, request: Request) -> dict:
         "INSERT INTO license_manifests (grant_id, carried, withheld,"
         " created_at) VALUES (?,?,?,?)",
         (grant_id, json.dumps(manifest["carried"]),
-         json.dumps(manifest["withheld"]), db.utcnow()))
+         json.dumps(manifest["withholdings"]), db.utcnow()))
     conn.execute("UPDATE license_grants SET derived_profile_id=? WHERE id=?",
                  (new_id, grant_id))
     conn.commit()

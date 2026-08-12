@@ -2525,7 +2525,7 @@ export type LicenseGrant = {
  *  reason), written at derive time and readable by both parties. */
 export type LicenseManifest = {
   carried: Record<string, unknown>;
-  withheld: { item: string; reason: string }[];
+  withholdings: { item: string; reason: string }[];
 };
 
 export type DerivedAgent = {

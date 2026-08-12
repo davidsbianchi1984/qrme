@@ -204,9 +204,12 @@ data class Listing(val id: String, val kind: String, val title: String, val blur
                    val tags: List<String>, val profileId: String?)
 data class LicenseOffer(val kind: String, val price: Double, val currency: String,
                         val allowDerivatives: Boolean)
-/** What a derivation handed over (`carried` key names) and what stayed
- *  behind (the withheld item names), written server-side at derive time. */
-data class LicenseManifest(val carried: List<String>, val withheld: List<String>)
+/** What a derivation handed over and what stayed behind, written
+ *  server-side at derive time. `carried` is a heterogeneous object; the
+ *  shell keeps its key names and the typed withheld rows. */
+data class ManifestWithheld(val item: String, val reason: String)
+data class LicenseManifest(val carried: List<String>,
+                           val withholdings: List<ManifestWithheld>)
 data class LicenseGrant(val id: String, val buyerId: String, val kind: String,
                         val derivedProfileId: String?, val revoked: Boolean,
                         val manifest: LicenseManifest? = null)
@@ -1322,9 +1325,11 @@ object ApiClient {
             val manifest = o.optJSONObject("manifest")?.let { m ->
                 val carried = m.optJSONObject("carried")
                     ?.keys()?.asSequence()?.sorted()?.toList() ?: emptyList()
-                val withheldArr = m.optJSONArray("withheld")
+                val withheldArr = m.optJSONArray("withholdings")
                 val withheld = (0 until (withheldArr?.length() ?: 0)).map { j ->
-                    withheldArr!!.getJSONObject(j).optString("item", "")
+                    val w = withheldArr!!.getJSONObject(j)
+                    ManifestWithheld(w.optString("item", ""),
+                                     w.optString("reason", ""))
                 }
                 LicenseManifest(carried, withheld)
             }

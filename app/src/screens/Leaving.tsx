@@ -225,7 +225,7 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
             </p>
             <p className="muted small">
               <strong>{tr("lic.manifest.withheld", lang)}</strong>:{" "}
-              {derived.manifest.withheld
+              {derived.manifest.withholdings
                 .map((w) => `${w.item} — ${w.reason}`).join(" · ")}
             </p>
             <p className="muted small">{tr("lvg.oneagent", lang)}</p>

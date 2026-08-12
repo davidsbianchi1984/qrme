@@ -62,7 +62,7 @@ def test_a_finetune_carries_knowledge_and_characteristics(client):
 
     # A finetune does not carry the adaptation summary — the manifest says so.
     assert "adaptation_summary" not in manifest["carried"]
-    assert any(w["item"] == "adaptation summary" for w in manifest["withheld"])
+    assert any(w["item"] == "adaptation summary" for w in manifest["withholdings"])
 
 
 def test_a_clone_adds_the_aggregate_adaptation_summary(client):
@@ -122,7 +122,7 @@ def test_raw_interactor_data_never_travels(client):
                           (child_id,)).fetchall():
         assert "private worry" not in (s["content"] or "")
     assert any("raw interactor data never travels" in w["reason"]
-               for w in derived["manifest"]["withheld"])
+               for w in derived["manifest"]["withholdings"])
 
 
 def test_vaulted_and_pack_content_stay_behind(client):
@@ -150,7 +150,7 @@ def test_vaulted_and_pack_content_stay_behind(client):
 
     manifest = derived["manifest"]
     assert manifest["carried"]["knowledge_items"] == 1
-    reasons = " · ".join(w["reason"] for w in manifest["withheld"])
+    reasons = " · ".join(w["reason"] for w in manifest["withholdings"])
     assert "vault" in reasons and "pack" in reasons
 
     mine = {"authorization": f"Bearer {derived['owner_token']}"}
@@ -170,7 +170,7 @@ def test_the_voice_is_withheld_by_name(client):
     derived = client.post(
         f"/profiles/{p['id']}/license/{g['grant_id']}/derive",
         headers=hdr).json()
-    voice = [w for w in derived["manifest"]["withheld"]
+    voice = [w for w in derived["manifest"]["withholdings"]
              if w["item"] == "voice print"]
     assert voice and "biometric" in voice[0]["reason"]
     # And no voice rows exist for the child.

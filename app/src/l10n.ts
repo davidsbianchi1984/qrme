@@ -6277,7 +6277,7 @@ const CHROME: Table = {
     en: "lease revoked", es: "arriendo revocado", fr: "location révoquée", de: "Miete widerrufen", pt: "arrendamento revogado", it: "leasing revocato", ja: "リース取消", zh: "租约已撤销", hi: "लीज़ रद्द", ar: "أُلغي الإيجار",
   },
   "org.specialistid": {
-    en: "Specialist profile id", es: "Id del perfil especialista", fr: "Id du profil spécialiste", de: "Profil-ID des Spezialisten", pt: "Id do perfil especialista", it: "Id del profilo specialista", ja: "スペシャリストのプロフィールID", zh: "专家资料 id", hi: "विशेषज्ञ प्रोफ़ाइल आईडी", ar: "معرّف ملف الاختصاصي",
+    en: "Specialist profile id", es: "Id del perfil especialista", fr: "Id du profil spécialiste", de: "ID des Spezialistenprofils", pt: "Id do perfil especialista", it: "Id del profilo specialista", ja: "専門家プロフィールID", zh: "专家档案ID", hi: "विशेषज्ञ प्रोफ़ाइल आईडी", ar: "معرّف ملف المتخصص",
   },
   "org.staff": {
     en: "Staff", es: "Cubrir", fr: "Pourvoir", de: "Besetzen", pt: "Ocupar", it: "Assegna", ja: "配置", zh: "配置人手", hi: "नियुक्त करें", ar: "اشغل",
