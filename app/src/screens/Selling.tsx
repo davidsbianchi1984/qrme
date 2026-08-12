@@ -158,6 +158,18 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
             {h.derived_profile_id
               ? " · an agent has been derived from it"
               : " · nothing derived yet"}
+            {h.manifest && (
+              <>
+                <br />
+                <span className="muted">
+                  {tr("lic.manifest.carried", lang)}:{" "}
+                  {Object.keys(h.manifest.carried).join(", ") || "—"}
+                  {" · "}
+                  {tr("lic.manifest.withheld", lang)}:{" "}
+                  {h.manifest.withheld.map((w) => w.item).join(", ")}
+                </span>
+              </>
+            )}
             {h.revoked ? " · revoked" : ""}
             {!h.revoked && (
               <>

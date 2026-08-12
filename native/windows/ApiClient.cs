@@ -530,12 +530,25 @@ public record LicenseOffer(
     [property: JsonPropertyName("terms")] string? Terms,
     [property: JsonPropertyName("allow_derivatives")] bool AllowDerivatives);
 
+public record ManifestWithheld(
+    [property: JsonPropertyName("item")] string Item,
+    [property: JsonPropertyName("reason")] string Reason);
+
+/// <summary>What a derivation handed over and what stayed behind, written
+/// server-side at derive time. Carried is a heterogeneous object; the shell
+/// shows its key names.</summary>
+public record LicenseManifest(
+    [property: JsonPropertyName("carried")]
+    System.Collections.Generic.Dictionary<string, System.Text.Json.JsonElement> Carried,
+    [property: JsonPropertyName("withheld")] ManifestWithheld[] Withheld);
+
 public record LicenseGrant(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("buyer_id")] string BuyerId,
     [property: JsonPropertyName("kind")] string Kind,
     [property: JsonPropertyName("derived_profile_id")] string? DerivedProfileId,
-    [property: JsonPropertyName("revoked")] bool Revoked);
+    [property: JsonPropertyName("revoked")] bool Revoked,
+    [property: JsonPropertyName("manifest")] LicenseManifest? Manifest);
 
 public record Excursion(
     [property: JsonPropertyName("id")] string Id,

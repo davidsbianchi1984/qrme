@@ -683,12 +683,43 @@ struct LicenseOffer: Decodable {
     let allow_derivatives: Bool
 }
 
+/// What a derivation handed over and what stayed behind, written server-side
+/// at derive time. `carried` arrives as a heterogeneous object; the shell
+/// shows its keys — the names of what traveled — and the typed withheld rows.
+struct LicenseManifest: Decodable {
+    struct Withheld: Decodable {
+        let item: String
+        let reason: String
+    }
+
+    let carried: [String]
+    let withheld: [Withheld]
+
+    private struct DynamicKey: CodingKey {
+        var stringValue: String
+        var intValue: Int? { nil }
+        init?(stringValue: String) { self.stringValue = stringValue }
+        init?(intValue: Int) { nil }
+    }
+
+    private enum Keys: String, CodingKey { case carried, withheld }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: Keys.self)
+        let carriedKeys = try c.nestedContainer(keyedBy: DynamicKey.self,
+                                                forKey: .carried)
+        carried = carriedKeys.allKeys.map(\.stringValue).sorted()
+        withheld = try c.decode([Withheld].self, forKey: .withheld)
+    }
+}
+
 struct LicenseGrant: Decodable {
     let id: String
     let buyer_id: String
     let kind: String
     let derived_profile_id: String?
     let revoked: Bool
+    let manifest: LicenseManifest?
 }
 
 struct Excursion: Decodable {

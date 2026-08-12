@@ -2676,6 +2676,12 @@ private fun LicensePanel(vm: StudioViewModel) {
                 g.derivedProfileId?.let {
                     Text(L10n.fill("nmg.derived", vm.language, mapOf("id" to it)), color = Qrme.T2, fontSize = 11.sp)
                 }
+                g.manifest?.let { m ->
+                    Text("${L10n.t("nmg.manifest.carried", vm.language)}: ${m.carried.joinToString(", ")}",
+                        color = Qrme.T2, fontSize = 11.sp)
+                    Text("${L10n.t("nmg.manifest.withheld", vm.language)}: ${m.withheld.joinToString(", ")}",
+                        color = Qrme.T2, fontSize = 11.sp)
+                }
             }
         }
     }

@@ -6594,6 +6594,12 @@ const CHROME: Table = {
   "lvg.oneagent": {
     en: "One agent per licence. Deriving again from the same grant is a 409, because a licence was sold for one.", es: "Un agente por licencia. Derivar otra vez de la misma cesión da un 409, porque se vendió una licencia para uno.", fr: "Un agent par licence. Dériver à nouveau depuis la même concession donne un 409, car une licence a été vendue pour un seul.", de: "Ein Agent pro Lizenz. Erneut aus derselben Gewährung abzuleiten ergibt ein 409, denn verkauft wurde eine Lizenz für einen.", pt: "Um agente por licença. Derivar outra vez da mesma cessão dá um 409, porque foi vendida uma licença para um.", it: "Un agente per licenza. Derivare di nuovo dalla stessa concessione dà un 409, perché una licenza è stata venduta per uno.", ja: "ライセンス一件につきエージェントは一体です。同じ許諾から再び派生させると 409 になります。ひとつ分として売られたライセンスだからです。", zh: "每份许可只对应一个智能体。用同一份授权再次衍生会返回 409，因为这份许可是按一个卖出的。", hi: "एक लाइसेंस पर एक ही एजेंट। उसी ग्रांट से दोबारा बनाने पर 409 मिलता है, क्योंकि लाइसेंस एक के लिए बेचा गया था।", ar: "وكيل واحد لكل ترخيص. والاشتقاق مرة أخرى من المنحة نفسها يعطي 409، لأن الترخيص بيع لواحد.",
   },
+  "lic.manifest.carried": {
+    en: "What traveled", es: "Lo que viajó", fr: "Ce qui a voyagé", de: "Was mitging", pt: "O que viajou", it: "Cosa ha viaggiato", ja: "引き継がれたもの", zh: "随附转移的内容", hi: "जो साथ गया", ar: "ما انتقل",
+  },
+  "lic.manifest.withheld": {
+    en: "What stayed behind, and why", es: "Lo que se quedó, y por qué", fr: "Ce qui est resté, et pourquoi", de: "Was zurückblieb, und warum", pt: "O que ficou, e porquê", it: "Cosa è rimasto, e perché", ja: "残されたものと、その理由", zh: "留下的内容及原因", hi: "जो पीछे रहा, और क्यों", ar: "ما بقي، ولماذا",
+  },
   "wll.title": {
     en: "Wall", es: "Muro", fr: "Mur", de: "Pinnwand", pt: "Mural", it: "Bacheca", ja: "ウォール", zh: "动态墙", hi: "वॉल", ar: "الحائط",
   },

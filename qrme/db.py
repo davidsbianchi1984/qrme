@@ -805,6 +805,20 @@ CREATE TABLE IF NOT EXISTS license_grants (
     created_at         TEXT NOT NULL
 );
 
+-- What a derived agent actually received, written at derive time. The amended
+-- claims draw the line the manifest records: parameter-level substance (the
+-- profile's own knowledge, its characteristics, an aggregate adaptation
+-- summary) travels; raw user data — interactor messages, per-relationship
+-- embeddings, the person's voice, vaulted content — never does. One row per
+-- derivation, so both parties can always read back what crossed and what was
+-- withheld, and why.
+CREATE TABLE IF NOT EXISTS license_manifests (
+    grant_id   TEXT PRIMARY KEY REFERENCES license_grants(id),
+    carried    TEXT NOT NULL,    -- JSON: what traveled, by name and count
+    withheld   TEXT NOT NULL,    -- JSON: [{item, reason}] — what stayed behind
+    created_at TEXT NOT NULL
+);
+
 -- Local log of every cloud contribution: exactly what left, when, under which
 -- opaque ref. The gateway never sees profile ids — the ref is random, and only
 -- this table maps it back — so contributions stay anonymous at the gateway

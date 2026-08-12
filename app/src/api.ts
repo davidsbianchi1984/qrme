@@ -2508,12 +2508,20 @@ export type LicenseGrant = {
   can_derive: boolean;
 };
 
+/** What a derivation actually handed over, and what stayed behind (with the
+ *  reason), written at derive time and readable by both parties. */
+export type LicenseManifest = {
+  carried: Record<string, unknown>;
+  withheld: { item: string; reason: string }[];
+};
+
 export type DerivedAgent = {
   derived_profile_id: string;
   owner_id: string;
   licensed_from: string;
   kind: string;
   owner_token: string;
+  manifest: LicenseManifest;
 };
 
 /** The offer an owner has posted — what their profile is licensed for and
@@ -2537,6 +2545,7 @@ export type LicenseHolder = {
   derived_profile_id: string | null;
   revoked: boolean;
   created_at: string;
+  manifest: LicenseManifest | null;   // null until an agent is derived
 };
 
 export type LedgerEntry = {

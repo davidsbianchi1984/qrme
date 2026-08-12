@@ -72,6 +72,7 @@ public sealed partial class ReachPage : Page
         public string Id { get; init; } = "";
         public string Title { get; init; } = "";
         public string Derived { get; init; } = "";
+        public string Manifest { get; init; } = "";
         public bool Revoked { get; init; }
         public Visibility RevokedVisibility =>
             Revoked ? Visibility.Visible : Visibility.Collapsed;
@@ -569,6 +570,12 @@ public sealed partial class ReachPage : Page
                 Title = $"{g.Kind} → {g.BuyerId}",
                 Derived = g.DerivedProfileId is { } d
                     ? L10n.Fill("nmg.derived", AppState.Current.Language, ("id", d))
+                    : "",
+                Manifest = g.Manifest is { } m
+                    ? $"{L10n.T("nmg.manifest.carried")}: " +
+                      $"{string.Join(", ", m.Carried.Keys.OrderBy(k => k))} · " +
+                      $"{L10n.T("nmg.manifest.withheld")}: " +
+                      $"{string.Join(", ", m.Withheld.Select(w => w.Item))}"
                     : "",
                 Revoked = g.Revoked,
             }).ToList();

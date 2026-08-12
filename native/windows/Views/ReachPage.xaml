@@ -335,6 +335,9 @@
                                         </Grid>
                                         <TextBlock Text="{Binding Derived}" FontSize="11"
                                                    Foreground="{StaticResource QrmeT2Brush}" />
+                                        <TextBlock Text="{Binding Manifest}" FontSize="11"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>

@@ -12,10 +12,21 @@ Kinds:
 - ``clone``    — the buyer may derive a full stand-alone copy.
 
 `finetune`/`clone` set ``allow_derivatives``; ``consult`` does not.
+
+**What a derivation carries.** The amended claims draw the line: what may
+travel is parameter-level substance — "latent embeddings that maintain
+cross-session state for consistent agent behavior **without storing raw user
+data**". So a derive copies the profile's own substance (its knowledge items,
+its characteristics, and — on a clone — an aggregate adaptation summary), and
+never the raw material underneath: interactor messages and per-relationship
+embeddings, the person's voice, vaulted content, and marketplace pack items
+all stay behind. Every derivation writes a **manifest** recording exactly
+what crossed and what was withheld, and why, readable by both parties.
 """
 
 from __future__ import annotations
 
+import json
 import secrets
 from datetime import date
 
@@ -37,6 +48,118 @@ def _derived_persona(source: dict, kind: str) -> str:
     return (f"A specialist agent whose expertise is licensed from "
             f"{source['display_name']}. Draw on that expertise:\n\n{base}\n\n"
             "(Licensed derivative — stay within the licensed domain.)")
+
+
+def _adaptation_summary(conn, profile_id: str) -> dict | None:
+    """Aggregate the source's latent persona embeddings into one disposition
+    vector — dimension means across every relationship, plus how many fed it.
+
+    This is the artifact the amended claims let travel: cross-session state at
+    the parameter level. No interactor ids, no per-relationship vectors, no
+    message content — a buyer learns how the persona carries itself overall,
+    never with whom."""
+    rows = conn.execute(
+        "SELECT vector FROM persona_embeddings WHERE profile_id=?",
+        (profile_id,)).fetchall()
+    if not rows:
+        return None
+    dims: dict[str, float] = {}
+    for row in rows:
+        for name, value in json.loads(row["vector"]).items():
+            dims[name] = dims.get(name, 0.0) + value
+    return {"disposition": {n: round(v / len(rows), 3)
+                            for n, v in dims.items()},
+            "relationships_aggregated": len(rows)}
+
+
+def _transfer_substance(conn, source: dict, new_id: str, kind: str) -> dict:
+    """Copy the licensed substance onto the derived profile and return the
+    manifest (`carried` / `withheld`) describing what crossed the line."""
+    carried: dict = {}
+    withheld: list[dict] = []
+
+    # The profile's own knowledge travels; anything whose custody is not the
+    # owner's to hand over does not.
+    items = conn.execute(
+        "SELECT * FROM source_items WHERE profile_id=? ORDER BY created_at",
+        (source["id"],)).fetchall()
+    copied = vaulted = packed = 0
+    for item in items:
+        if item["pack_id"]:
+            packed += 1
+            continue
+        if item["content"] is None or item["pdi_key"]:
+            vaulted += 1
+            continue
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), new_id, item["kind"], item["title"],
+             item["content"], db.utcnow()))
+        copied += 1
+    if copied:
+        carried["knowledge_items"] = copied
+    if vaulted:
+        withheld.append({"item": f"{vaulted} vaulted source item(s)",
+                         "reason": "sealed in the PDI vault; custody does "
+                                   "not transfer with a license"})
+    if packed:
+        withheld.append({"item": f"{packed} knowledge-pack item(s)",
+                         "reason": "marketplace pack content stays under "
+                                   "its own license"})
+
+    # Characteristics: the dials, appearance and demographics that make the
+    # expertise speak the way it does.
+    dials_row = conn.execute(
+        "SELECT dials FROM steering_settings WHERE subject_id=?",
+        (source["id"],)).fetchone()
+    if dials_row and json.loads(dials_row["dials"]):
+        conn.execute(
+            "INSERT INTO steering_settings (subject_id, dials, updated_at)"
+            " VALUES (?,?,?) ON CONFLICT (subject_id) DO UPDATE SET"
+            " dials=excluded.dials, updated_at=excluded.updated_at",
+            (new_id, dials_row["dials"], db.utcnow()))
+        carried["steering_dials"] = len(json.loads(dials_row["dials"]))
+    extras = {}
+    if source["appearance"]:
+        extras["appearance"] = source["appearance"]
+    if source["demographics"] and json.loads(source["demographics"]):
+        extras["demographics"] = source["demographics"]
+    if extras:
+        placeholders = ", ".join(f"{k}=?" for k in extras)
+        conn.execute(f"UPDATE profiles SET {placeholders} WHERE id=?",
+                     (*extras.values(), new_id))
+        carried["characteristics"] = sorted(extras)
+
+    # A clone also carries the adaptation artifact — aggregated, anonymous.
+    if kind == "clone":
+        summary = _adaptation_summary(conn, source["id"])
+        if summary:
+            conn.execute(
+                "INSERT INTO source_items (id, profile_id, kind, title,"
+                " content, pdi_key, pack_id, created_at)"
+                " VALUES (?,?,?,?,?,NULL,NULL,?)",
+                (db.new_id("src"), new_id, "knowledge",
+                 "licensed adaptation summary",
+                 json.dumps(summary), db.utcnow()))
+            carried["adaptation_summary"] = summary
+    else:
+        withheld.append({"item": "adaptation summary",
+                         "reason": "aggregate disposition travels on a "
+                                   "clone license only"})
+
+    # What never travels, whatever the kind.
+    withheld.append({"item": "interactor messages and per-relationship "
+                             "embeddings",
+                     "reason": "raw interactor data never travels — the "
+                               "relationships belong to the people in them"})
+    if conn.execute("SELECT 1 FROM voice_consents WHERE profile_id=?"
+                    " AND revoked_at IS NULL", (source["id"],)).fetchone():
+        withheld.append({"item": "voice print",
+                         "reason": "the voice is the person's biometric "
+                                   "likeness; their consent does not "
+                                   "transfer with a license"})
+    return {"carried": carried, "withheld": withheld}
 
 router = APIRouter()
 
@@ -179,11 +302,21 @@ def list_licenses(profile_id: str, request: Request) -> list[dict]:
     """Owner view: who holds a license on this profile."""
     profile_or_404(profile_id)
     require_owner(profile_id, request)
-    rows = db.connect().execute(
+    conn = db.connect()
+    rows = conn.execute(
         "SELECT id, buyer_id, kind, derived_profile_id, revoked, created_at"
         " FROM license_grants WHERE profile_id=? ORDER BY created_at",
         (profile_id,)).fetchall()
-    return [{**dict(r), "revoked": bool(r["revoked"])} for r in rows]
+    out = []
+    for r in rows:
+        manifest = conn.execute(
+            "SELECT carried, withheld FROM license_manifests WHERE grant_id=?",
+            (r["id"],)).fetchone()
+        out.append({**dict(r), "revoked": bool(r["revoked"]),
+                    "manifest": ({"carried": json.loads(manifest["carried"]),
+                                  "withheld": json.loads(manifest["withheld"])}
+                                 if manifest else None)})
+    return out
 
 
 @router.post("/profiles/{profile_id}/license/{grant_id}/derive",
@@ -235,13 +368,24 @@ def derive_agent(profile_id: str, grant_id: str, request: Request) -> dict:
          derived_persona, "enterprise_agent", source["maturity"], profile_id,
          db.utcnow()),
     )
+    # The buyer paid for expertise; hand the expertise over, not a paragraph
+    # about it. Substance crosses under the manifest's rules — the profile's
+    # own knowledge and characteristics travel, raw interactor data, voice,
+    # vaulted and pack content never do — and the manifest is written in the
+    # same transaction as the derivation it describes.
+    manifest = _transfer_substance(conn, source, new_id, offer["kind"])
+    conn.execute(
+        "INSERT INTO license_manifests (grant_id, carried, withheld,"
+        " created_at) VALUES (?,?,?,?)",
+        (grant_id, json.dumps(manifest["carried"]),
+         json.dumps(manifest["withheld"]), db.utcnow()))
     conn.execute("UPDATE license_grants SET derived_profile_id=? WHERE id=?",
                  (new_id, grant_id))
     conn.commit()
     token = auth.issue("owner", new_id)
     return {"derived_profile_id": new_id, "owner_id": buyer_id,
             "licensed_from": profile_id, "kind": offer["kind"],
-            "owner_token": token}
+            "owner_token": token, "manifest": manifest}
 
 
 @router.delete("/licenses/{grant_id}")

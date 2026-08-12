@@ -204,8 +204,12 @@ data class Listing(val id: String, val kind: String, val title: String, val blur
                    val tags: List<String>, val profileId: String?)
 data class LicenseOffer(val kind: String, val price: Double, val currency: String,
                         val allowDerivatives: Boolean)
+/** What a derivation handed over (`carried` key names) and what stayed
+ *  behind (the withheld item names), written server-side at derive time. */
+data class LicenseManifest(val carried: List<String>, val withheld: List<String>)
 data class LicenseGrant(val id: String, val buyerId: String, val kind: String,
-                        val derivedProfileId: String?, val revoked: Boolean)
+                        val derivedProfileId: String?, val revoked: Boolean,
+                        val manifest: LicenseManifest? = null)
 
 class ApiException(message: String) : Exception(message)
 
@@ -1315,9 +1319,18 @@ object ApiClient {
         val arr = JSONArray(request("/profiles/$id/licenses", token = token))
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
+            val manifest = o.optJSONObject("manifest")?.let { m ->
+                val carried = m.optJSONObject("carried")
+                    ?.keys()?.asSequence()?.sorted()?.toList() ?: emptyList()
+                val withheldArr = m.optJSONArray("withheld")
+                val withheld = (0 until (withheldArr?.length() ?: 0)).map { j ->
+                    withheldArr!!.getJSONObject(j).optString("item", "")
+                }
+                LicenseManifest(carried, withheld)
+            }
             LicenseGrant(o.getString("id"), o.optString("buyer_id", ""),
                 o.optString("kind", ""), o.optString("derived_profile_id", null),
-                o.optBoolean("revoked"))
+                o.optBoolean("revoked"), manifest)
         }
     }
 

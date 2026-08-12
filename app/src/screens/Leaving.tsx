@@ -216,6 +216,18 @@ export function Leaving({ onPlans }: { onPlans: () => void }) {
               {fill(tr("lvg.keepowner", lang),
                     { token: <code>{derived.owner_token}</code> })}
             </p>
+            <p className="small">
+              <strong>{tr("lic.manifest.carried", lang)}</strong>:{" "}
+              {Object.entries(derived.manifest.carried)
+                .map(([k, v]) => `${k}: ${typeof v === "object"
+                  ? JSON.stringify(v) : String(v)}`)
+                .join(" · ") || "—"}
+            </p>
+            <p className="muted small">
+              <strong>{tr("lic.manifest.withheld", lang)}</strong>:{" "}
+              {derived.manifest.withheld
+                .map((w) => `${w.item} — ${w.reason}`).join(" · ")}
+            </p>
             <p className="muted small">{tr("lvg.oneagent", lang)}</p>
           </>
         )}

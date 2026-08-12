@@ -567,6 +567,12 @@ private struct ManageLicenseSection: View {
                         if let d = g.derived_profile_id {
                             Text(L10n.fill("nmg.derived", state.language, ["id": d])).font(.caption).foregroundStyle(Theme.t2)
                         }
+                        if let m = g.manifest {
+                            Text("\(L10n.t("nmg.manifest.carried", state.language)): \(m.carried.joined(separator: ", "))")
+                                .font(.caption).foregroundStyle(Theme.t2)
+                            Text("\(L10n.t("nmg.manifest.withheld", state.language)): \(m.withheld.map(\.item).joined(separator: ", "))")
+                                .font(.caption).foregroundStyle(Theme.t2)
+                        }
                     }.card()
                 }
             }.padding(20)
