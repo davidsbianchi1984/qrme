@@ -22,8 +22,8 @@ from ..common import (require_may_publish,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
-    InteractorCreate, MessageOut, QuietHoursSet, RelationshipSet,
-    VoiceConsent, VoiceSample, VoiceSay,
+    InteractorCreate, MemoryForget, MessageOut, QuietHoursSet,
+    RelationshipSet, VoiceConsent, VoiceSample, VoiceSay,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -711,6 +711,69 @@ def view_remembrance(profile_id: str, interactor_id: str,
         return {"content": None, "covers": 0, "updated_at": None}
     return {"content": row["content"], "covers": row["covers"],
             "updated_at": row["updated_at"]}
+
+
+@router.get("/profiles/{profile_id}/memory/{interactor_id}/account")
+def memory_account(profile_id: str, interactor_id: str,
+                   request: Request) -> dict:
+    """What do you remember about me — answered from the records, not by
+    generation: the distilled paragraph as it actually stands, how many
+    turns it was folded from, how many are still in the recent window, and
+    when the conversation first and last moved. A trust door tells the
+    truth it can prove; the persona's own telling is a chat away."""
+    profile = profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    stats = db.connect().execute(
+        "SELECT COUNT(*) AS turns, MIN(created_at) AS first_at,"
+        " MAX(created_at) AS last_at FROM messages"
+        " WHERE profile_id=? AND interactor_id=? AND status='approved'",
+        (profile_id, interactor_id)).fetchone()
+    row = remembrance.get(profile_id, interactor_id)
+    folded = row["covers"] if row else 0
+    return {
+        "profile_name": profile["display_name"],
+        "remembers": row["content"] if row else None,
+        "folded_turns": folded,
+        "recent_turns": max(stats["turns"] - folded, 0),
+        "first_at": stats["first_at"],
+        "last_at": stats["last_at"],
+    }
+
+
+@router.post("/profiles/{profile_id}/memory/{interactor_id}/forget")
+def forget_one_thing(profile_id: str, interactor_id: str, body: MemoryForget,
+                     request: Request) -> dict:
+    """Forget that one thing — without burning the whole friendship. Every
+    turn whose text carries the words is deleted, and the distilled
+    remembrance is dropped so it re-folds from what remains, never from
+    what was struck. Erase-all stays at its own door; this is the
+    scalpel."""
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    about = (body.about or "").strip()
+    if not about:
+        raise HTTPException(
+            422, "say what to forget — empty words strike nothing")
+    conn = db.connect()
+    hits = [r["id"] for r in conn.execute(
+        "SELECT id FROM messages WHERE profile_id=? AND interactor_id=?"
+        " AND instr(lower(content), lower(?)) > 0",
+        (profile_id, interactor_id, about))]
+    row = remembrance.get(profile_id, interactor_id)
+    in_remembrance = bool(row and about.lower() in row["content"].lower())
+    if not hits and not in_remembrance:
+        raise HTTPException(
+            404, "nothing remembered here carries those words")
+    for message_id in hits:
+        conn.execute("DELETE FROM messages WHERE id=?", (message_id,))
+    if row:
+        # The paragraph may hold the thing in other words; re-fold it from
+        # the turns that survive rather than trying to edit a memory.
+        conn.execute(
+            "DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
+            (profile_id, interactor_id))
+    conn.commit()
+    return {"forgotten_turns": len(hits), "remembrance_reset": bool(row)}
 
 
 @router.delete("/profiles/{profile_id}/memory/{interactor_id}", status_code=204)

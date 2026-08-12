@@ -1251,6 +1251,14 @@ export interface MemoryEntry { role: string; content: string; at?: string }
 export interface Remembrance {
   content: string | null; covers: number; updated_at: string | null;
 }
+export interface MemoryAccount {
+  profile_name: string;
+  remembers: string | null;
+  folded_turns: number;
+  recent_turns: number;
+  first_at: string | null;
+  last_at: string | null;
+}
 
 // ---- endpoints ----
 export interface PairInfo {
@@ -3379,6 +3387,19 @@ export const api = {
     req<unknown>(`/profiles/${profileId}/memory/${interactorId}`, {
       method: "DELETE", token,
     }),
+
+  // What do you remember about me — answered from the records.
+  memoryAccount: (profileId: string, interactorId: string, token: string) =>
+    req<MemoryAccount>(
+      `/profiles/${profileId}/memory/${interactorId}/account`, { token }),
+
+  // Forget that one thing: the turns that carry the words are deleted and
+  // the kept memory is re-folded from what remains.
+  forgetMemory: (profileId: string, interactorId: string, about: string,
+                 token: string) =>
+    req<{ forgotten_turns: number; remembrance_reset: boolean }>(
+      `/profiles/${profileId}/memory/${interactorId}/forget`,
+      { method: "POST", body: { about }, token }),
   // The voiceprint, in FIG. 800's order (qrme/voiceprint.py).
   voiceprint: (pid: string) =>
     req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`),

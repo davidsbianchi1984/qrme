@@ -3257,6 +3257,25 @@ object ApiClient {
         return if (o.isNull("content")) null else o.optString("content")
     }
 
+    // What do you remember about me — answered from the records.
+    suspend fun memoryAccount(id: String, interactorId: String,
+                              token: String): String {
+        val o = org.json.JSONObject(request(
+            "/profiles/$id/memory/$interactorId/account", token = token))
+        val kept = if (o.isNull("remembers")) "" else o.optString("remembers")
+        return kept + " · " + o.optInt("folded_turns") + "+" +
+            o.optInt("recent_turns")
+    }
+
+    // Forget that one thing; the kept memory re-folds from what remains.
+    suspend fun forgetMemory(id: String, interactorId: String, about: String,
+                             token: String): String {
+        val o = org.json.JSONObject(request(
+            "/profiles/$id/memory/$interactorId/forget", "POST",
+            JSONObject().put("about", about), token = token))
+        return o.optInt("forgotten_turns").toString()
+    }
+
     suspend fun eraseMemory(id: String, interactorId: String,
                             token: String) {
         request("/profiles/$id/memory/$interactorId", "DELETE",

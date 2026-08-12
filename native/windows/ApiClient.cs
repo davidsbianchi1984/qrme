@@ -1902,6 +1902,19 @@ public sealed class ApiClient
             $"/profiles/{profileId}/memory/{interactorId}/remembrance",
             token));
 
+    /// <summary>What do you remember about me — from the records.</summary>
+    public Task<MemoryAccountOut> MemoryAccount(string profileId,
+        string interactorId, string token) =>
+        Send<MemoryAccountOut>(Get(
+            $"/profiles/{profileId}/memory/{interactorId}/account", token));
+
+    /// <summary>Forget that one thing; the kept memory re-folds.</summary>
+    public Task<ForgetOut> ForgetMemory(string profileId,
+        string interactorId, string about, string token) =>
+        Send<ForgetOut>(Post(
+            $"/profiles/{profileId}/memory/{interactorId}/forget",
+            new { about }, token));
+
     public Task<MemoryTurn> EraseMemory(string profileId,
         string interactorId, string token)
     {
@@ -4237,6 +4250,15 @@ public record MemoryRow(
 public record RemembranceOut(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("covers")] int Covers);
+
+public record MemoryAccountOut(
+    [property: JsonPropertyName("remembers")] string? Remembers,
+    [property: JsonPropertyName("folded_turns")] int FoldedTurns,
+    [property: JsonPropertyName("recent_turns")] int RecentTurns);
+
+public record ForgetOut(
+    [property: JsonPropertyName("forgotten_turns")] int ForgottenTurns,
+    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
 
 public record MemoryTurn(
     [property: JsonPropertyName("id")] string? Id,

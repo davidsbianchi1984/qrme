@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type MemoryEntry, type Remembrance } from "../api";
+import { api, type MemoryAccount, type MemoryEntry, type Remembrance } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -18,6 +18,9 @@ export function Memory({ onPlans }: {
   const [open, setOpen] = useState<string | null>(null);   // interactor_id
   const [entries, setEntries] = useState<MemoryEntry[]>([]);
   const [kept, setKept] = useState<Remembrance | null>(null);
+  const [account, setAccount] = useState<MemoryAccount | null>(null);
+  const [forgetWords, setForgetWords] = useState("");
+  const [forgot, setForgot] = useState<number | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   function load() {
@@ -30,10 +33,23 @@ export function Memory({ onPlans }: {
   async function view(interactorId: string) {
     if (!session.profileId || !session.ownerToken) return;
     setOpen(interactorId); setEntries([]); setKept(null);
+    setAccount(null); setForgot(null);
     try {
       const data = await api.memory(session.profileId, interactorId, session.ownerToken);
       setEntries(Array.isArray(data) ? data : data.history || []);
       setKept(await api.remembrance(session.profileId, interactorId, session.ownerToken));
+      setAccount(await api.memoryAccount(session.profileId, interactorId, session.ownerToken));
+    } catch (e) { setError(e); }
+  }
+
+  async function forget() {
+    if (!session.profileId || !session.ownerToken || !open || !forgetWords.trim()) return;
+    try {
+      const out = await api.forgetMemory(
+        session.profileId, open, forgetWords.trim(), session.ownerToken);
+      setForgot(out.forgotten_turns); setForgetWords("");
+      await view(open); setForgot(out.forgotten_turns);
+      load();
     } catch (e) { setError(e); }
   }
 
@@ -120,6 +136,32 @@ export function Memory({ onPlans }: {
           <span className="muted small">
             {fill(tr("mem.kept.covers", lang), { n: kept.covers })}
           </span>
+        </div>
+      )}
+
+      {open && account && (
+        // The account: what it remembers, answered from the records — the
+        // honest counts around the kept paragraph.
+        <div className="card">
+          <b>{tr("mem.account", lang)}</b>
+          <p className="muted small">
+            {fill(tr("mem.account.span", lang), {
+              folded: account.folded_turns, recent: account.recent_turns,
+            })}
+          </p>
+          {/* Forget that one thing — the scalpel beside the erase-all. */}
+          <div className="row">
+            <input value={forgetWords} placeholder={tr("mem.forget.ph", lang)}
+                   onChange={(e) => setForgetWords(e.target.value)}
+                   style={{ flex: 1 }} />
+            <button className="danger" disabled={!forgetWords.trim()}
+                    onClick={forget}>{tr("mem.forget", lang)}</button>
+          </div>
+          {forgot !== null && (
+            <p className="muted small">
+              {fill(tr("mem.forgot", lang), { n: forgot })}
+            </p>
+          )}
         </div>
       )}
 

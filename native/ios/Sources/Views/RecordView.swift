@@ -22,6 +22,7 @@ struct MemorySection: View {
     @EnvironmentObject var state: AppState
     @State private var rows: [MemoryRow] = []
     @State private var visitorId = ""
+    @State private var forgetWords = ""
     @State private var line: String?
     @State private var busy = false
 
@@ -60,6 +61,33 @@ struct MemorySection: View {
                         visitorId = ""
                     }
                 }.font(.caption).disabled(busy || visitorId.isEmpty)
+                // The account: the kept paragraph and the honest counts.
+                Button(L10n.t("mem.account", state.language)) {
+                    run {
+                        let a = try await ApiClient.shared.memoryAccount(
+                            id: state.pid!, interactorId: visitorId,
+                            token: state.token!)
+                        line = (a.remembers ?? "—") + " · "
+                            + String(a.folded_turns) + "+"
+                            + String(a.recent_turns)
+                    }
+                }.font(.caption).disabled(busy || visitorId.isEmpty)
+            }
+            // Forget that one thing — the scalpel beside the erase-all.
+            HStack {
+                TextField(L10n.t("mem.forget.ph", state.language),
+                          text: $forgetWords)
+                    .textFieldStyle(.roundedBorder)
+                Button(L10n.t("mem.forget", state.language)) {
+                    run {
+                        let out = try await ApiClient.shared.forgetMemory(
+                            id: state.pid!, interactorId: visitorId,
+                            about: forgetWords, token: state.token!)
+                        forgetWords = ""
+                        line = String(out.forgotten_turns)
+                    }
+                }.font(.caption)
+                    .disabled(busy || visitorId.isEmpty || forgetWords.isEmpty)
             }
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)

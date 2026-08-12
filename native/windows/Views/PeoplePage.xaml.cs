@@ -285,6 +285,9 @@ public sealed partial class PeoplePage : Page
         MemIdBox.Header = L10n.T("mem.id");
         MemShowButton.Content = L10n.T("mem.show");
         MemEraseButton.Content = L10n.T("mem.erase");
+        MemAccountButton.Content = L10n.T("mem.account");
+        MemForgetBox.PlaceholderText = L10n.T("mem.forget.ph");
+        MemForgetButton.Content = L10n.T("mem.forget");
         PairTitle.Text = L10n.T("who.title");
         PairIdBox.Header = L10n.T("mem.id");
         PairThreadButton.Content = L10n.T("who.thread");
@@ -1760,6 +1763,29 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Pid!, AppState.Current.Token!);
             MemList.ItemsSource = rows.Select(m => new Row(
                 $"{m.InteractorName} \u00b7 {m.Turns}")).ToList();
+        });
+
+    private async void OnMemAccount(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // The account: the kept paragraph and the honest counts.
+            var a = await ApiClient.Shared.MemoryAccount(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = (a.Remembers ?? "—") + " · "
+                + a.FoldedTurns + "+" + a.RecentTurns;
+        });
+
+    private async void OnMemForget(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // Forget that one thing; the kept memory re-folds from what
+            // remains, never from what was struck.
+            var outp = await ApiClient.Shared.ForgetMemory(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                MemForgetBox.Text.Trim(), AppState.Current.Token!);
+            MemForgetBox.Text = "";
+            StatusText.Text = outp.ForgottenTurns.ToString();
         });
 
     private async void OnPairThread(object sender, RoutedEventArgs e) =>

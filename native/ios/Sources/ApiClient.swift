@@ -3812,6 +3812,33 @@ extension ApiClient {
             token: token)
     }
 
+    struct MemoryAccount: Decodable {
+        let remembers: String?
+        let folded_turns: Int
+        let recent_turns: Int
+    }
+
+    /// What do you remember about me — answered from the records.
+    func memoryAccount(id: String, interactorId: String,
+                       token: String) async throws -> MemoryAccount {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/account",
+            token: token)
+    }
+
+    struct ForgetOut: Decodable {
+        let forgotten_turns: Int
+        let remembrance_reset: Bool
+    }
+
+    /// Forget that one thing; the kept memory re-folds from what remains.
+    func forgetMemory(id: String, interactorId: String, about: String,
+                      token: String) async throws -> ForgetOut {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/forget",
+            method: "POST", body: ["about": about], token: token)
+    }
+
     func eraseMemory(id: String, interactorId: String,
                      token: String) async throws {
         struct Out: Decodable {}

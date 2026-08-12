@@ -120,6 +120,12 @@ class InteractorCreate(BaseModel):
     birthdate: date | None = None
 
 
+class MemoryForget(BaseModel):
+    # The words to strike: turns containing them are deleted and the
+    # distilled remembrance is re-folded from what remains.
+    about: str
+
+
 class QuietHoursSet(BaseModel):
     # UTC-hour window [start, end) during which no unprompted outreach is sent;
     # both None clears it. A window may wrap midnight (start > end).

@@ -4472,6 +4472,7 @@ private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     val lang = L10n.deviceLanguage()
     var rows by remember { mutableStateOf(listOf<String>()) }
     var visitorId by remember { mutableStateOf("") }
+    var forgetWords by remember { mutableStateOf("") }
     LaunchedEffect(vm.pid) {
         vm.call({ ApiClient.memories(vm.pid!!, vm.token!!) }) { r ->
             rows = r.getOrNull() ?: emptyList() }
@@ -4501,6 +4502,22 @@ private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                     visitorId = ""
                     onNote(r.exceptionOrNull()?.message) }
             }
+            // The account: the kept paragraph and the honest counts.
+            BrandButton(L10n.t("mem.account", lang), enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.memoryAccount(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        // Forget that one thing — the scalpel beside the erase-all.
+        labeledField(L10n.t("mem.forget", lang), forgetWords,
+            L10n.t("mem.forget.ph", lang)) { forgetWords = it }
+        BrandButton(L10n.t("mem.forget", lang),
+            enabled = visitorId.isNotBlank() && forgetWords.isNotBlank()) {
+            vm.call({ ApiClient.forgetMemory(vm.pid!!, visitorId,
+                forgetWords, vm.token!!) }) { r ->
+                forgetWords = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
         }
     }
 }

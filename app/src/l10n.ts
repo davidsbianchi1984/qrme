@@ -7553,6 +7553,21 @@ const CHROME: Table = {
   "mem.kept": {
     en: "What it remembers from earlier conversations", es: "Lo que recuerda de conversaciones anteriores", fr: "Ce qu'il retient des conversations précédentes", de: "Was es aus früheren Gesprächen behält", pt: "O que recorda de conversas anteriores", it: "Ciò che ricorda delle conversazioni precedenti", ja: "以前の会話から覚えていること", zh: "它从早前对话中记住的内容", hi: "पहले की बातचीत से जो याद है", ar: "ما يتذكره من محادثات سابقة",
   },
+  "mem.account": {
+    en: "What it remembers", es: "Lo que recuerda", fr: "Ce qu'il retient", de: "Was es sich merkt", pt: "O que ele lembra", it: "Ciò che ricorda", ja: "覚えていること", zh: "它记得什么", hi: "यह क्या याद रखता है", ar: "ما يتذكره",
+  },
+  "mem.account.span": {
+    en: "{folded} turns folded into the kept memory, {recent} still in the recent window", es: "{folded} turnos plegados en la memoria guardada, {recent} aún en la ventana reciente", fr: "{folded} tours fondus dans la mémoire gardée, {recent} encore dans la fenêtre récente", de: "{folded} Beiträge in die bewahrte Erinnerung eingefaltet, {recent} noch im jüngsten Fenster", pt: "{folded} turnos condensados na memória guardada, {recent} ainda na janela recente", it: "{folded} turni condensati nella memoria conservata, {recent} ancora nella finestra recente", ja: "{folded}件を保存記憶に織り込み済み、{recent}件は直近の窓に残っています", zh: "{folded} 条已并入保存的记忆，{recent} 条仍在近期窗口", hi: "{folded} संदेश सहेजी स्मृति में समेटे गए, {recent} अभी हाल की खिड़की में", ar: "طُوي {folded} من الأدوار في الذاكرة المحفوظة و{recent} ما زالت في النافذة الأخيرة",
+  },
+  "mem.forget.ph": {
+    en: "Words to forget", es: "Palabras a olvidar", fr: "Mots à oublier", de: "Zu vergessende Worte", pt: "Palavras a esquecer", it: "Parole da dimenticare", ja: "忘れさせる言葉", zh: "要忘记的词", hi: "भुलाने के शब्द", ar: "كلمات تُنسى",
+  },
+  "mem.forget": {
+    en: "Forget this", es: "Olvidar esto", fr: "Oublier cela", de: "Das vergessen", pt: "Esquecer isto", it: "Dimentica questo", ja: "これを忘れる", zh: "忘记这件事", hi: "इसे भुला दो", ar: "انسَ هذا",
+  },
+  "mem.forgot": {
+    en: "{n} turns forgotten — the kept memory will be re-written from what remains.", es: "{n} turnos olvidados — la memoria guardada se reescribirá a partir de lo que queda.", fr: "{n} tours oubliés — la mémoire gardée sera réécrite à partir de ce qui reste.", de: "{n} Beiträge vergessen — die bewahrte Erinnerung wird aus dem Verbliebenen neu geschrieben.", pt: "{n} turnos esquecidos — a memória guardada será reescrita a partir do que resta.", it: "{n} turni dimenticati — la memoria conservata sarà riscritta da ciò che resta.", ja: "{n}件を忘れました — 保存記憶は残ったものから書き直されます。", zh: "已忘记 {n} 条 — 保存的记忆将根据剩余内容重写。", hi: "{n} संदेश भुला दिए गए — सहेजी स्मृति शेष से फिर लिखी जाएगी।", ar: "نُسي {n} من الأدوار — ستُعاد كتابة الذاكرة المحفوظة مما تبقّى.",
+  },
   "mem.kept.covers": {
     en: "{n} older turns folded into this remembrance", es: "{n} turnos antiguos plegados en este recuerdo", fr: "{n} tours plus anciens fondus dans ce souvenir", de: "{n} ältere Beiträge in diese Erinnerung eingefaltet", pt: "{n} turnos antigos condensados nesta lembrança", it: "{n} turni più vecchi condensati in questo ricordo", ja: "古い{n}件のやり取りをこの記憶に織り込み済み", zh: "已把 {n} 条较早的对话并入这段记忆", hi: "{n} पुराने संदेश इस स्मृति में समेटे गए", ar: "طُويت {n} من الأدوار الأقدم في هذه الذكرى",
   },
