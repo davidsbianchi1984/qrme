@@ -251,6 +251,87 @@ def create_room(body: RoomCreate) -> dict:
     }
 
 
+@router.post("/rooms/templates/{key}/open", status_code=201)
+def open_standing_room(key: str, request: Request,
+                       profile_id: str | None = None) -> dict:
+    """Step into a standing room — the room, not a copy of it.
+
+    The one-press open used to mint a fresh room every press, so twelve
+    templates always on screen meant a live list filling with identical
+    Front Porches. A standing room is one place: this joins the newest
+    live room carrying the template's topic that still has a seat, and
+    only opens a new one when there is none — or when every porch is
+    full, because an overflowing table gets a second table, not a
+    refusal.
+
+    Opening fresh needs a profile alongside the person (a room of one is
+    not a room), so ``profile_id`` rides as a query field; joining an
+    already-live room needs only the person.
+    """
+    template = next((t for t in ROOM_TEMPLATES if t["key"] == key), None)
+    if template is None:
+        raise HTTPException(404, "no standing room by that name")
+    principal = auth.principal(request)
+    if principal is None or principal.get("role") != "interactor":
+        raise HTTPException(401, "authentication required")
+    who = principal["subject_id"]
+    interactor_or_404(who)
+    seats = 8
+    conn = db.connect()
+    live = conn.execute(
+        "SELECT * FROM rooms WHERE status='active' AND topic=?"
+        " ORDER BY created_at DESC, rowid DESC",
+        (template["topic"],)).fetchall()
+    for row in live:
+        present = _participants(row["id"])
+        already = any(p["kind"] == "user" and p["ref_id"] == who
+                      for p in present)
+        if already or len(present) < seats:
+            conn.execute(
+                "INSERT OR IGNORE INTO room_participants (room_id, kind,"
+                " ref_id) VALUES (?,'user',?)", (row["id"], who))
+            conn.commit()
+            return {
+                "id": row["id"], "topic": row["topic"],
+                "channel": row["channel"],
+                "presence": _CHANNEL_NOTES[row["channel"]],
+                "opened": "joined",
+                "participants": [
+                    {"kind": p["kind"], "id": p["ref_id"],
+                     "display": _display(p["kind"], p["ref_id"])}
+                    for p in _participants(row["id"])
+                ],
+            }
+    if profile_id is None:
+        raise HTTPException(
+            409, "nobody has this room open yet, and a room opens with you "
+                 "and a profile in it — pick a profile first")
+    profile = profile_or_404(profile_id)
+    if profile["status"] == "departed":
+        raise HTTPException(410, f"profile {profile_id} has departed")
+    room_id = db.new_id("room")
+    conn.execute(
+        "INSERT INTO rooms (id, topic, channel, status, created_at)"
+        " VALUES (?,?,?,'active',?)",
+        (room_id, template["topic"], template["channel"], db.utcnow()))
+    for kind, ref in (("user", who), ("profile", profile_id)):
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?,?,?)", (room_id, kind, ref))
+    conn.commit()
+    return {
+        "id": room_id, "topic": template["topic"],
+        "channel": template["channel"],
+        "presence": _CHANNEL_NOTES[template["channel"]],
+        "opened": "created",
+        "participants": [
+            {"kind": p["kind"], "id": p["ref_id"],
+             "display": _display(p["kind"], p["ref_id"])}
+            for p in _participants(room_id)
+        ],
+    }
+
+
 @router.post("/rooms/{room_id}/join", status_code=201)
 def join_room(room_id: str, request: Request) -> dict:
     """Step into a live room.

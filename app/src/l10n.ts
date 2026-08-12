@@ -7259,6 +7259,9 @@ const CHROME: Table = {
   "pln.erasure": {
     en: "Erasure: {how}", es: "Borrado: {how}", fr: "Effacement : {how}", de: "Löschung: {how}", pt: "Apagamento: {how}", it: "Cancellazione: {how}", ja: "消去: {how}", zh: "抹除：{how}", hi: "मिटाना: {how}", ar: "المحو: {how}",
   },
+  "hom.visit.close": {
+    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغलاق",
+  },
   "hom.title": {
     en: "Home", es: "Inicio", fr: "Accueil", de: "Start", pt: "Início", it: "Home", ja: "ホーム", zh: "主页", hi: "होम", ar: "الرئيسية",
   },

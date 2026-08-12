@@ -43,23 +43,21 @@ export function Rooms({ onPlans, onInside }: {
   }
   useEffect(load, []);
 
-  // One press on a standing room: the same door as typing the topic by
-  // hand — you and your profile open it together, anyone else joins.
-  async function openTemplate(t: { topic: string; channel: string }) {
-    if (!session.interactorId || !session.profileId) {
+  // One press on a standing room: the room, not a copy of it. The first
+  // build minted a fresh room every press — twelve templates always on
+  // screen, a live list filling with identical Front Porches. The server
+  // joins the live one with a seat left and opens fresh only when nobody
+  // is there, and the press lands you Inside either way.
+  async function openTemplate(t: { key: string }) {
+    if (!session.interactorToken || !session.profileId) {
       setError(tr("rms.signinpick", lang));
       return;
     }
     setBusy(true); setError(null);
     try {
-      await api.createRoom({
-        topic: t.topic, channel: t.channel,
-        participants: [
-          { kind: "user", id: session.interactorId },
-          { kind: "profile", id: session.profileId },
-        ],
-      });
-      load();
+      const room = await api.openStandingRoom(
+        t.key, session.profileId, session.interactorToken);
+      onInside(room.id);
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }

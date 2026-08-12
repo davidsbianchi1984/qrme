@@ -3175,6 +3175,15 @@ public sealed class ApiClient
     public Task<RoomCreated> JoinRoom(string roomId, string token) =>
         Send<RoomCreated>(Post($"/rooms/{roomId}/join", new { }, token));
 
+    /// <summary>Step into a standing room — the room, not a copy of it:
+    /// joins the live one with a seat left, opens it fresh only when nobody
+    /// is there.</summary>
+    public Task<RoomCreated> OpenStandingRoom(string key, string profileId,
+        string token) =>
+        Send<RoomCreated>(Post(
+            $"/rooms/templates/{key}/open?profile_id={Uri.EscapeDataString(profileId)}",
+            new { }, token));
+
     public Task<MicDisclosure> LendRoomMic(string roomId,
         string interactorId, string token) =>
         Send<MicDisclosure>(Post($"/rooms/{roomId}/mic",

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, getBase, type Avatar, type Stats } from "../api";
+import { api, getBase, type Avatar, type ProfilePage, type Stats } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -14,6 +14,11 @@ export function Home({ go }: {
   const [face, setFace] = useState<Avatar | null>(null);
   const [pals, setPals] = useState<
     Awaited<ReturnType<typeof api.friends>>["friends"]>([]);
+  // The face you clicked, and their page as a visitor sees it. The field
+  // report behind it: tapping a friend's picture went to the whole
+  // friends list — a particular person's face led to a crowd.
+  const [visiting, setVisiting] = useState<
+    { name: string; avatar: string | null; page: ProfilePage } | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -85,10 +90,18 @@ export function Home({ go }: {
 
       {pals.length > 0 && (
         <div className="top-friends">
-          <div className="tile-label">{tr("hom.friends", lang)}</div>
+          {/* The label is the door to the whole list; a face is the door
+              to that person. */}
+          <button className="tile-label linkish" onClick={() => go("friends")}>
+            {tr("hom.friends", lang)}
+          </button>
           <div className="friends-row">
             {pals.map((f) => (
-              <button key={f.profile_id} onClick={() => go("friends")}>
+              <button key={f.profile_id} onClick={() =>
+                api.page(f.profile_id)
+                  .then((page) => setVisiting(
+                    { name: f.display_name, avatar: f.avatar ?? null, page }))
+                  .catch(setError)}>
                 {f.avatar ? (
                   <img className="presence-bubble" alt=""
                        src={f.avatar.startsWith("http")
@@ -102,6 +115,42 @@ export function Home({ go }: {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {visiting && (
+        <div className="card friend-visit">
+          <div className="friend-visit-head">
+            {visiting.avatar ? (
+              <img className="presence-bubble" alt=""
+                   src={visiting.avatar.startsWith("http")
+                          ? visiting.avatar : getBase() + visiting.avatar} />
+            ) : (
+              <div className="presence-bubble orbfill">
+                {visiting.name.slice(0, 1)}
+              </div>
+            )}
+            <div>
+              <h3>{visiting.name}</h3>
+              {visiting.page.tagline && (
+                <p className="muted small">{visiting.page.tagline}</p>
+              )}
+            </div>
+            <button className="ghost" onClick={() => setVisiting(null)}>
+              {tr("hom.visit.close", lang)}
+            </button>
+          </div>
+          {visiting.page.about && (
+            <p className="small">{visiting.page.about}</p>
+          )}
+          {visiting.page.links.length > 0 && (
+            <p className="muted small">
+              {visiting.page.links.map((l) => (
+                <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
+                   style={{ marginRight: 10 }}>{l.label || l.url}</a>
+              ))}
+            </p>
+          )}
         </div>
       )}
 

@@ -155,6 +155,82 @@ def test_a_stranger_can_step_into_a_live_room_and_speak(client):
     assert any(m["sender_kind"] == "user" for m in transcript)
 
 
+def test_a_standing_room_is_one_place_not_a_stamp(client):
+    """The one-press open used to mint a fresh room every press; twelve
+    templates always on screen meant a live list filling with identical
+    Front Porches. Opening a standing room is being in the porch: the
+    first press opens it, every later press joins the one that is live.
+    """
+    from qrme.routers.community import ROOM_TEMPLATES
+
+    porch = ROOM_TEMPLATES[0]
+    first = make_interactor(client, "First", "1990-01-01")
+    dana = make_profile(client)
+
+    r = client.post(f"/rooms/templates/{porch['key']}/open",
+                    params={"profile_id": dana["id"]},
+                    headers=as_interactor(first))
+    assert r.status_code == 201, r.text
+    opened = r.json()
+    assert opened["opened"] == "created"
+    assert opened["topic"] == porch["topic"]
+    assert opened["channel"] == porch["channel"]
+
+    # The same person pressing again is still in the same porch.
+    again = client.post(f"/rooms/templates/{porch['key']}/open",
+                        headers=as_interactor(first)).json()
+    assert again["id"] == opened["id"] and again["opened"] == "joined"
+
+    # Somebody else pressing walks into the porch, not a copy of it.
+    second = make_interactor(client, "Second", "1991-01-01")
+    walked = client.post(f"/rooms/templates/{porch['key']}/open",
+                         headers=as_interactor(second)).json()
+    assert walked["id"] == opened["id"] and walked["opened"] == "joined"
+
+    # One porch on the live list, not three.
+    live = client.get("/rooms").json()
+    assert len([room for room in live
+                if room["topic"] == porch["topic"]]) == 1
+
+    # An unknown template is a 404; opening fresh with no profile is a
+    # refusal that says what to do, not a room of one.
+    assert client.post("/rooms/templates/no-such-porch/open",
+                       headers=as_interactor(first)).status_code == 404
+    lonely = make_interactor(client, "Lonely", "1994-01-01")
+    other = ROOM_TEMPLATES[1]
+    r = client.post(f"/rooms/templates/{other['key']}/open",
+                    headers=as_interactor(lonely))
+    assert r.status_code == 409
+    assert "pick a profile" in r.json()["detail"]
+
+
+def test_a_full_porch_gets_a_second_table(client):
+    """When every seat in the live porch is taken, the next press opens
+    another porch rather than refusing — an overflowing table gets a
+    second table."""
+    from qrme.routers.community import ROOM_TEMPLATES
+
+    porch = ROOM_TEMPLATES[0]
+    dana = make_profile(client)
+    seats = 8
+    opener = make_interactor(client, "Opener", "1990-01-01")
+    first = client.post(f"/rooms/templates/{porch['key']}/open",
+                        params={"profile_id": dana["id"]},
+                        headers=as_interactor(opener)).json()
+    for i in range(seats - 2):                    # fill the remaining seats
+        walker = make_interactor(client, f"W{i}", "1991-01-01")
+        joined = client.post(f"/rooms/templates/{porch['key']}/open",
+                             headers=as_interactor(walker)).json()
+        assert joined["id"] == first["id"]
+
+    ninth = make_interactor(client, "Ninth", "1992-01-01")
+    overflow = client.post(f"/rooms/templates/{porch['key']}/open",
+                           params={"profile_id": dana["id"]},
+                           headers=as_interactor(ninth)).json()
+    assert overflow["opened"] == "created"
+    assert overflow["id"] != first["id"]
+
+
 def test_a_full_room_turns_the_next_joiner_away(client):
     """The table seats eight — RoomCreate's own maximum, enforced at the
     join door too, because a limit that differs by door is two limits."""

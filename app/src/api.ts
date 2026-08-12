@@ -3238,6 +3238,14 @@ export const api = {
     req<{ id: string; topic?: string | null; channel: string;
           participants: { kind: string; id: string; display: string }[] }>(
       `/rooms/${roomId}/join`, { method: "POST", token }),
+  // Step into a standing room — the room, not a copy of it: joins the
+  // live one with a seat left, opens it fresh only when nobody is there.
+  openStandingRoom: (key: string, profileId: string, token: string) =>
+    req<{ id: string; topic?: string | null; channel: string;
+          opened: string;
+          participants: { kind: string; id: string; display: string }[] }>(
+      `/rooms/templates/${key}/open?profile_id=${encodeURIComponent(profileId)}`,
+      { method: "POST", token }),
   // Inside a room: read it, speak in it, let the profiles take a turn. All
   // three carry the interactor token, and the speaker is read from it rather
   // than from `sender_id` in the body — which is what let anybody holding a

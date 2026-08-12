@@ -3434,6 +3434,15 @@ extension ApiClient {
                                        method: "POST", token: token)
     }
 
+    /// Step into a standing room — the room, not a copy of it: joins the
+    /// live one with a seat left, opens it fresh only when nobody is there.
+    func openStandingRoom(key: String, profileId: String,
+                          token: String) async throws -> RoomCreated {
+        try await request("/rooms/templates/\(key)/open",
+                          method: "POST", token: token,
+                          query: ["profile_id": profileId])
+    }
+
     func lendRoomMic(roomId: String, interactorId: String,
                      token: String) async throws {
         struct Out: Decodable { let lent: Bool? }

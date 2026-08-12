@@ -239,9 +239,11 @@ private struct CommunityRoomsSection: View {
                             .background(Theme.brand)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                             .disabled(topic.isEmpty || busy)
-                        // The standing rooms: tapping one fills the topic,
-                        // so the empty screen a newcomer meets still offers
-                        // somewhere to go.
+                        // The standing rooms: tapping one steps into the
+                        // room itself — the live one when somebody is
+                        // there, opened fresh when nobody is. The first
+                        // build only filled the topic field, which minted
+                        // a copy per press.
                         if !templates.isEmpty {
                             Text(L10n.t("nc.room.standing", state.language))
                                 .font(.caption.bold()).foregroundStyle(Theme.t2)
@@ -249,7 +251,7 @@ private struct CommunityRoomsSection: View {
                                 let name = t.topic ?? t.key
                                 let channel = t.channel ?? "chat"
                                 Button("\(name) · \(channel)") {
-                                    topic = name
+                                    openStanding(t.key)
                                 }.font(.caption2).foregroundStyle(Theme.brandA)
                             }
                         }
@@ -312,6 +314,21 @@ private struct CommunityRoomsSection: View {
                 room = try await ApiClient.shared.createRoom(
                     topic: topic, profileId: pid, interactorId: interactor)
                 topic = ""
+                transcript = []
+            } catch { self.error = error.localizedDescription }
+            busy = false
+        }
+    }
+
+    private func openStanding(_ key: String) {
+        guard let pid = state.pid else { return }
+        busy = true; error = nil
+        Task {
+            do {
+                _ = try await ensureInteractor(state)
+                room = try await ApiClient.shared.openStandingRoom(
+                    key: key, profileId: pid,
+                    token: state.interactorToken ?? "")
                 transcript = []
             } catch { self.error = error.localizedDescription }
             busy = false

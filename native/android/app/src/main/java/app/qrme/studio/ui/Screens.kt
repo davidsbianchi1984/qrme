@@ -1938,13 +1938,25 @@ private fun RoomsPanel(vm: StudioViewModel) {
                         }
                     }
                 }
-                // The standing rooms: tapping one fills the topic, so the
-                // empty screen a newcomer meets still offers somewhere to go.
+                // The standing rooms: tapping one steps into the room
+                // itself — the live one when somebody is there, opened
+                // fresh when nobody is. The first build only filled the
+                // topic field, which minted a copy per press.
                 if (templates.isNotEmpty()) {
                     Text(L10n.t("nc.room.standing", vm.language), color = Qrme.T2,
                         fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    templates.forEach { (tTopic, tChannel, _) ->
-                        TextButton(onClick = { topic = tTopic }) {
+                    templates.forEach { (tKey, tTopic, tChannel) ->
+                        TextButton(onClick = {
+                            busy = true; error = null
+                            withInteractor(vm, { error = it; busy = false }) { _ ->
+                                vm.call({ ApiClient.openStandingRoom(tKey,
+                                    vm.pid!!, vm.interactorToken.orEmpty()) }) { r ->
+                                    busy = false
+                                    r.onSuccess { room = it; transcript = emptyList() }
+                                        .onFailure { error = it.message }
+                                }
+                            }
+                        }) {
                             Text("$tTopic · $tChannel", color = Qrme.BrandA,
                                 fontSize = 11.sp)
                         }

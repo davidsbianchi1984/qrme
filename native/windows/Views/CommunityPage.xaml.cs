@@ -77,8 +77,10 @@ public sealed partial class CommunityPage : Page
         await LoadTemplates();
     }
 
-    /// <summary>The standing rooms: tapping one fills the topic, so the
-    /// empty screen a newcomer meets still offers somewhere to go.</summary>
+    /// <summary>The standing rooms: tapping one steps into the room itself
+    /// — the live one when somebody is there, opened fresh when nobody is.
+    /// The first build only filled the topic field, which minted a copy per
+    /// press.</summary>
     private async System.Threading.Tasks.Task LoadTemplates()
     {
         try
@@ -98,8 +100,25 @@ public sealed partial class CommunityPage : Page
                         Microsoft.UI.Colors.Transparent),
                     FontSize = 11,
                 };
-                var topic = t.Topic ?? t.Key;
-                b.Click += (_, _) => TopicBox.Text = topic;
+                var key = t.Key;
+                b.Click += async (_, _) =>
+                {
+                    RoomError.Visibility = Visibility.Collapsed;
+                    try
+                    {
+                        var s = AppState.Current;
+                        await EnsureInteractor();
+                        var room = await ApiClient.Shared.OpenStandingRoom(
+                            key, s.Pid!, s.InteractorToken!);
+                        _roomId = room.Id;
+                        RoomTitle.Text = room.Topic;
+                        RoomList.ItemsSource = null;
+                        OpenCard.Visibility = Visibility.Collapsed;
+                        RoomCard.Visibility = Visibility.Visible;
+                        await ReloadRoom();
+                    }
+                    catch (Exception ex) { ShowRoomError(ex.Message); }
+                };
                 TemplatesPanel.Children.Add(b);
             }
         }

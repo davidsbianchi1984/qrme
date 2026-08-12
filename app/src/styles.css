@@ -387,6 +387,13 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .vg-close { margin-left: auto; background: none; border: 0; color: #ffb3c0;
   font-size: 18px; line-height: 1; cursor: pointer; }
 
+/* A friend's page, visited from their face on the front page. */
+.friend-visit-head { display: flex; align-items: center; gap: 12px; }
+.friend-visit-head h3 { margin: 0; }
+.friend-visit-head button { margin-left: auto; }
+.tile-label.linkish { background: none; border: 0; cursor: pointer;
+  color: inherit; font: inherit; padding: 0; text-align: left; }
+
 /* The footsteps in the corner: how many people hold accounts here. A quiet
    chip, not a banner — it shares the fixed layer with the version guard but
    never competes with it for attention. */

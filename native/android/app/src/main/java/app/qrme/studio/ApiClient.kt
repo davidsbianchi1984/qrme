@@ -2831,14 +2831,14 @@ object ApiClient {
     }
 
     /** The standing rooms: blueprints the server keeps so the Rooms door
-     *  never greets a newcomer with an empty list. (topic, channel, pitch). */
+     *  never greets a newcomer with an empty list. (key, topic, channel). */
     suspend fun roomTemplates(): List<Triple<String, String, String>> {
         val a = org.json.JSONArray(request("/rooms/templates"))
         val out = mutableListOf<Triple<String, String, String>>()
         for (i in 0 until a.length()) {
             val t = a.getJSONObject(i)
-            out.add(Triple(t.optString("topic"), t.optString("channel"),
-                t.optString("pitch")))
+            out.add(Triple(t.getString("key"), t.optString("topic"),
+                t.optString("channel")))
         }
         return out
     }
@@ -2847,6 +2847,18 @@ object ApiClient {
      *  is being there once, and the table seats eight. */
     suspend fun joinRoom(roomId: String, token: String) {
         request("/rooms/$roomId/join", "POST", token = token)
+    }
+
+    /** Step into a standing room — the room, not a copy of it: joins the
+     *  live one with a seat left, opens it fresh only when nobody is
+     *  there. */
+    suspend fun openStandingRoom(key: String, profileId: String,
+                                 token: String): RoomCreated {
+        val o = JSONObject(request(
+            "/rooms/templates/$key/open?profile_id=$profileId", "POST",
+            token = token))
+        return RoomCreated(o.getString("id"), o.getString("topic"),
+            o.getString("channel"))
     }
 
     suspend fun lendRoomMic(roomId: String, interactorId: String,
