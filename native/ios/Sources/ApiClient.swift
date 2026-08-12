@@ -3426,6 +3426,14 @@ extension ApiClient {
         try await request("/rooms/templates")
     }
 
+    /// Step into a live room: the token names the joiner, joining twice
+    /// is being there once, and the table seats eight.
+    func joinRoom(roomId: String, token: String) async throws {
+        struct Out: Decodable { let id: String? }
+        let _: Out = try await request("/rooms/\(roomId)/join",
+                                       method: "POST", token: token)
+    }
+
     func lendRoomMic(roomId: String, interactorId: String,
                      token: String) async throws {
         struct Out: Decodable { let lent: Bool? }

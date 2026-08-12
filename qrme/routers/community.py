@@ -251,6 +251,52 @@ def create_room(body: RoomCreate) -> dict:
     }
 
 
+@router.post("/rooms/{room_id}/join", status_code=201)
+def join_room(room_id: str, request: Request) -> dict:
+    """Step into a live room.
+
+    The standing rooms shipped with a pitch that said "anyone else can
+    join", and the live list showed rooms with their heads counted — but
+    participants were frozen at creation, so the sentence was a claim
+    without behavior. This is the behavior.
+
+    The token names the joiner: a room id rides on beacons and printed
+    stickers, so "knows the id" cannot stand in for "is this person".
+    Joining twice is being there once. The table seats eight, the same
+    number the create form holds, because a limit that differs by door
+    is two limits.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    principal = auth.principal(request)
+    if principal is None or principal.get("role") != "interactor":
+        raise HTTPException(401, "authentication required")
+    who = principal["subject_id"]
+    interactor_or_404(who)
+    seats = 8                       # RoomCreate's max_length, the one table
+    present = _participants(room_id)
+    if any(p["kind"] == "user" and p["ref_id"] == who for p in present):
+        pass                        # already here; joining twice is being here once
+    elif len(present) >= seats:
+        raise HTTPException(
+            409, "this room is full — eight seats, and every one taken")
+    conn = db.connect()
+    conn.execute(
+        "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+        " VALUES (?,'user',?)", (room_id, who))
+    conn.commit()
+    return {
+        "id": room_id, "topic": room["topic"], "channel": room["channel"],
+        "presence": _CHANNEL_NOTES[room["channel"]],
+        "participants": [
+            {"kind": p["kind"], "id": p["ref_id"],
+             "display": _display(p["kind"], p["ref_id"])}
+            for p in _participants(room_id)
+        ],
+    }
+
+
 @router.get("/microphones/vocabulary")
 def microphone_vocabulary() -> dict:
     """What may be lent, at what width, and what is refused.

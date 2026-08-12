@@ -165,6 +165,14 @@ struct RoomsSection: View {
             }
             TextField(L10n.t("room.id", state.language), text: $roomId)
                 .textFieldStyle(.roundedBorder)
+            // The list used to show rooms nobody could enter — the door
+            // in was frozen at creation. Joining takes the interactor
+            // token; a room id alone is not being here.
+            Button(L10n.t("room.join", state.language)) {
+                run { try await ApiClient.shared.joinRoom(
+                    roomId: roomId, token: state.interactorToken ?? "") }
+            }.font(.caption).disabled(busy || roomId.isEmpty
+                                      || state.interactorToken == nil)
             HStack {
                 Button(L10n.t("room.mic.lend", state.language)) {
                     run { try await ApiClient.shared.lendRoomMic(

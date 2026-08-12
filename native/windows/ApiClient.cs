@@ -3170,6 +3170,11 @@ public sealed class ApiClient
     public Task<RoomTemplate[]> RoomTemplates() =>
         Send<RoomTemplate[]>(Get("/rooms/templates"));
 
+    /// <summary>Step into a live room: the token names the joiner, joining
+    /// twice is being there once, and the table seats eight.</summary>
+    public Task<RoomCreated> JoinRoom(string roomId, string token) =>
+        Send<RoomCreated>(Post($"/rooms/{roomId}/join", new { }, token));
+
     public Task<MicDisclosure> LendRoomMic(string roomId,
         string interactorId, string token) =>
         Send<MicDisclosure>(Post($"/rooms/{roomId}/mic",

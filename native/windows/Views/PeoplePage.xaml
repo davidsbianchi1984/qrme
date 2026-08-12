@@ -533,6 +533,9 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <TextBox x:Name="RoomIdBox" />
+                    <!-- The list used to show rooms nobody could enter — the
+                         door in was frozen at creation. -->
+                    <Button x:Name="RoomJoinButton" Click="OnRoomJoin" />
                     <Button x:Name="RoomMicLendButton" Click="OnRoomMicLend" />
                     <Button x:Name="RoomMicBackButton" Click="OnRoomMicBack" />
                     <Button x:Name="RoomMicWhoButton" Click="OnRoomMicWho" />

@@ -3232,6 +3232,12 @@ export const api = {
   createRoom: (body: { topic?: string; channel: string;
                        participants: { kind: string; id: string }[] }) =>
     req<{ id: string }>(`/rooms`, { method: "POST", body }),
+  // Step into a live room: the token names the joiner, joining twice is
+  // being there once, and the table seats eight.
+  joinRoom: (roomId: string, token: string) =>
+    req<{ id: string; topic?: string | null; channel: string;
+          participants: { kind: string; id: string; display: string }[] }>(
+      `/rooms/${roomId}/join`, { method: "POST", token }),
   // Inside a room: read it, speak in it, let the profiles take a turn. All
   // three carry the interactor token, and the speaker is read from it rather
   // than from `sender_id` in the body — which is what let anybody holding a

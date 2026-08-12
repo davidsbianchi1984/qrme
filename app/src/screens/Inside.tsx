@@ -37,13 +37,18 @@ import { useSession } from "../store";
  * somebody else cannot see is the thing this feature exists not to be. The
  * list is rendered whether or not you are the lender.
  */
-export function Inside({ onPlans }: { onPlans: () => void }) {
+export function Inside({ onPlans, start = "" }: {
+  onPlans: () => void;
+  /** A room id handed in by the Rooms screen's join — the field is
+   *  prefilled so the person lands in the room they just entered. */
+  start?: string;
+}) {
   const { session } = useSession();
   const lang = visitorLang();
   const me = session.interactorId || "";
   const token = session.interactorToken || "";
 
-  const [roomId, setRoomId] = useState("");
+  const [roomId, setRoomId] = useState(start);
   const [transcript, setTranscript] = useState<RoomMsg[]>([]);
   const [mics, setMics] = useState<MicsHere | null>(null);
   const [draft, setDraft] = useState("");

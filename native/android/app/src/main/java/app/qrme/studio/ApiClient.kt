@@ -2843,6 +2843,12 @@ object ApiClient {
         return out
     }
 
+    /** Step into a live room: the token names the joiner, joining twice
+     *  is being there once, and the table seats eight. */
+    suspend fun joinRoom(roomId: String, token: String) {
+        request("/rooms/$roomId/join", "POST", token = token)
+    }
+
     suspend fun lendRoomMic(roomId: String, interactorId: String,
                             token: String) {
         request("/rooms/$roomId/mic", "POST",

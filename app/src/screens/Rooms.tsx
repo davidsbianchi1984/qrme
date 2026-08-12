@@ -17,10 +17,13 @@ const CHANNELS = [
   { id: "vr", key: "rms.ch.vr" },
 ];
 
-export function Rooms({ onPlans }: {
+export function Rooms({ onPlans, onInside }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
   onPlans: () => void;
+  /** After a join, the Inside screen opens on the room just entered —
+   *  threaded from the shell for the same reason as onPlans. */
+  onInside: (roomId: string) => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -143,6 +146,20 @@ export function Rooms({ onPlans }: {
             {(r.channel === "ar" || r.channel === "vr") && (
               <span className="muted small">{tr("rms.headset", lang)}</span>
             )}
+            {/* The list used to show rooms nobody could enter — the door
+                in was frozen at creation. Joining takes the interactor
+                token, and lands you Inside. */}
+            <button className="ghost" disabled={busy || !session.interactorToken}
+                    onClick={async () => {
+                      setBusy(true); setError(null);
+                      try {
+                        await api.joinRoom(r.id, session.interactorToken!);
+                        onInside(r.id);
+                      } catch (e) { setError(e); }
+                      finally { setBusy(false); }
+                    }}>
+              {tr("rms.standing.open", lang)}
+            </button>
           </div>
         ))}
       </div>

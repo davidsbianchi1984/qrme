@@ -126,6 +126,8 @@ export function App() {
   // Threaded into every screen that can be refused. A plan gate
   // names a plan, so the refusal has to be able to reach one.
   const toPlans = () => setTab("plans");
+  // A join on the Rooms screen lands the person Inside, on that room.
+  const [insideRoom, setInsideRoom] = useState("");
   // The chrome follows the profile's language (server-side setting; the
   // content always did — this closes the frame around it).
   const [lang, setLang] = useState<string>("en");
@@ -215,7 +217,7 @@ export function App() {
         {tab === "wall" && <Wall onPlans={toPlans} />}
         {tab === "feed" && <Feed onPlans={() => setTab("plans")} />}
         {tab === "friends" && <Friends onPlans={toPlans} />}
-        {tab === "rooms" && <Rooms onPlans={toPlans} />}
+        {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
         {tab === "solitude" && <Solitude />}
         {tab === "simulate" && <Simulate onPlans={toPlans} />}
@@ -246,7 +248,7 @@ export function App() {
         {tab === "reaching" && <Reaching onPlans={toPlans} />}
         {tab === "leaving" && <Leaving onPlans={toPlans} />}
         {tab === "selling" && <Selling onPlans={toPlans} />}
-        {tab === "inside" && <Inside onPlans={toPlans} />}
+        {tab === "inside" && <Inside onPlans={toPlans} start={insideRoom} />}
         {tab === "signing" && <Signing />}
         {tab === "visiting" && <Visiting />}
         {tab === "stranger" && <Stranger />}

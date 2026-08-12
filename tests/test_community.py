@@ -112,6 +112,72 @@ def test_the_standing_rooms_are_one_press_from_real(client):
     assert chosen["topic"] in {r["topic"] for r in live}
 
 
+def test_a_stranger_can_step_into_a_live_room_and_speak(client):
+    """The standing rooms shipped saying "anyone else can join" while
+    participants were frozen at creation — a claim without behavior, live
+    in a tagged release for one evening. This is the behavior, held.
+
+    The token names the joiner: a room id rides on beacons and printed
+    stickers, so knowing it cannot stand in for being a person. Joining
+    twice is being there once. And a joiner is a participant in full —
+    they can read the transcript and speak, which is the entire point of
+    walking in.
+    """
+    host = make_interactor(client, "Host", "1990-01-01")
+    dana = make_profile(client)
+    room = client.post("/rooms", json={
+        "topic": "open house", "channel": "chat",
+        "participants": [{"kind": "user", "id": host},
+                         {"kind": "profile", "id": dana["id"]}]}).json()
+    before = len(room["participants"])
+
+    # No token, no entry: the id is printed on stickers.
+    assert client.post(f"/rooms/{room['id']}/join").status_code == 401
+
+    guest = make_interactor(client, "Guest", "1992-01-01")
+    joined = client.post(f"/rooms/{room['id']}/join",
+                         headers=as_interactor(guest))
+    assert joined.status_code == 201, joined.text
+    assert len(joined.json()["participants"]) == before + 1
+
+    # Joining twice is being there once.
+    again = client.post(f"/rooms/{room['id']}/join",
+                        headers=as_interactor(guest)).json()
+    assert len(again["participants"]) == before + 1
+
+    # A joiner is a participant in full.
+    r = client.post(f"/rooms/{room['id']}/messages",
+                    headers=as_interactor(guest),
+                    json={"sender_id": guest, "message": "hello from the door"})
+    assert r.status_code == 201
+    transcript = client.get(f"/rooms/{room['id']}/messages",
+                            headers=as_interactor(guest)).json()
+    assert any(m["sender_kind"] == "user" for m in transcript)
+
+
+def test_a_full_room_turns_the_next_joiner_away(client):
+    """The table seats eight — RoomCreate's own maximum, enforced at the
+    join door too, because a limit that differs by door is two limits."""
+    dana = make_profile(client)
+    seats = 8
+    founders = [make_interactor(client, f"F{i}", "1990-01-01")
+                for i in range(seats - 1)]
+    room = client.post("/rooms", json={
+        "topic": "packed house", "channel": "chat",
+        "participants": [{"kind": "profile", "id": dana["id"]}]
+        + [{"kind": "user", "id": f} for f in founders]}).json()
+    assert len(room["participants"]) == seats
+
+    late = make_interactor(client, "Late", "1993-01-01")
+    r = client.post(f"/rooms/{room['id']}/join", headers=as_interactor(late))
+    assert r.status_code == 409
+    assert "full" in r.json()["detail"]
+    # But somebody already inside "joins" without a seat being asked for.
+    already = client.post(f"/rooms/{room['id']}/join",
+                          headers=as_interactor(founders[0]))
+    assert already.status_code == 201
+
+
 def test_room_with_minor_runs_strict(client):
     minor = make_interactor(client, "Teen", "2012-06-01")
     dana = make_profile(client)

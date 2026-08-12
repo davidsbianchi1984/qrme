@@ -202,6 +202,7 @@ public sealed partial class PeoplePage : Page
         RoomsTitle.Text = L10n.T("room.title");
         RoomsListButton.Content = L10n.T("room.list");
         RoomIdBox.Header = L10n.T("room.id");
+        RoomJoinButton.Content = L10n.T("room.join");
         RoomMicLendButton.Content = L10n.T("room.mic.lend");
         RoomMicBackButton.Content = L10n.T("room.mic.back");
         RoomMicWhoButton.Content = L10n.T("room.mic.who");
@@ -1360,6 +1361,13 @@ public sealed partial class PeoplePage : Page
                 $"{r.Id} · {r.Topic} · {r.Channel} · {r.Participants}"))
                 .ToList();
         });
+
+    // The list used to show rooms nobody could enter — the door in was
+    // frozen at creation. Joining takes the interactor token; a room id
+    // alone is not being here.
+    private async void OnRoomJoin(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.JoinRoom(
+            RoomIdBox.Text.Trim(), AppState.Current.InteractorToken!));
 
     private async void OnRoomMicLend(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.LendRoomMic(

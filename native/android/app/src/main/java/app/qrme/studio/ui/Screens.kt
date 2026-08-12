@@ -4011,6 +4011,13 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             }
         }
         labeledField(L10n.t("room.id", lang), roomId, "") { roomId = it }
+        // The list used to show rooms nobody could enter — the door in
+        // was frozen at creation. Joining takes the interactor token; a
+        // room id alone is not being here.
+        BrandButton(L10n.t("room.join", lang), enabled = roomId.isNotBlank()) {
+            vm.call({ ApiClient.joinRoom(roomId, vm.interactorToken.orEmpty()) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BrandButton(L10n.t("room.mic.lend", lang), enabled = roomId.isNotBlank()) {
                 vm.call({ ApiClient.lendRoomMic(roomId, vm.pid!!,
