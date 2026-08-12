@@ -422,6 +422,70 @@ def set_avatar(profile_id: str, asset: str) -> dict:
     return render(profile_id)
 
 
+MOTION_STYLES = ("still", "breathe", "lively")
+
+
+def set_motion(profile_id: str, style: str) -> None:
+    """The user-defined half of the moving image: how the portrait carries
+    itself. The rest of the motion block is derived, not stored."""
+    if style not in MOTION_STYLES:
+        raise ValueError("motion style must be one of "
+                         + ", ".join(MOTION_STYLES))
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO avatar_motion (profile_id, style, updated_at)"
+        " VALUES (?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
+        " style=excluded.style, updated_at=excluded.updated_at",
+        (profile_id, style, db.utcnow()))
+    conn.commit()
+
+
+def motion_of(profile_id: str) -> dict:
+    """The moving image (claims 3/13): animation parameters for the portrait,
+    derived live from the interaction history.
+
+    ``energy`` and ``warmth`` are the profile's aggregate disposition — the
+    means of its latent persona embeddings across every relationship — so the
+    picture literally "dynamically update[s] based on interaction history"
+    (clause 3). ``tempo_ms`` is the idle-breath period the client animates
+    at; speaking and listening scale from it. A "still" style pins everything
+    flat without hiding the history that would otherwise move it.
+    """
+    import json as _json
+    conn = db.connect()
+    row = conn.execute("SELECT style FROM avatar_motion WHERE profile_id=?",
+                       (profile_id,)).fetchone()
+    style = row["style"] if row else "breathe"
+    vectors = conn.execute(
+        "SELECT vector FROM persona_embeddings WHERE profile_id=?",
+        (profile_id,)).fetchall()
+    energy = warmth = None
+    if vectors:
+        dims = [_json.loads(v["vector"]) for v in vectors]
+        energy = round(sum(d.get("engagement", 0.5) for d in dims)
+                       / len(dims), 3)
+        warmth = round(sum(d.get("warmth", 0.2) for d in dims)
+                       / len(dims), 3)
+    energy = 0.5 if energy is None else energy
+    warmth = 0.2 if warmth is None else warmth
+    # Faster breath the livelier the style and the higher the engagement;
+    # never below one second, so the face breathes rather than flickers.
+    base = {"still": 0, "breathe": 5200, "lively": 3400}[style]
+    tempo = 0 if style == "still" else max(1000, int(base * (1.2 - energy)))
+    return {
+        "style": style,
+        "energy": energy,
+        "warmth": warmth,
+        "tempo_ms": tempo,
+        "states": {
+            "idle": "still" if style == "still" else "breathe",
+            "speaking": "still" if style == "still" else "mouth-and-hands",
+            "listening": "still" if style == "still" else "nod",
+        },
+        "updated_with": len(vectors),
+    }
+
+
 def render(profile_id: str) -> dict:
     """A profile's portrait *as it must be displayed*.
 
@@ -480,6 +544,11 @@ def render(profile_id: str) -> dict:
         "torso": None if anonymous else torso_of(profile_id),
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
+        # The moving image: how the portrait moves, derived from the
+        # interaction history. It rides the same response as the badge and
+        # the likeness record, so nothing can animate the face without
+        # having been handed the disclosure alongside it.
+        "motion": motion_of(profile_id),
         # A portrait with no asset yet is still an answer: surfaces fall back
         # to initials rather than showing an unbadged placeholder. Never true
         # for an anonymous profile — the silhouette *is* the picture there, and

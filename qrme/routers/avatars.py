@@ -22,6 +22,10 @@ class AvatarSet(BaseModel):
     asset: str = Field(min_length=1, max_length=500,
                        description="Asset reference or URL of the rendered "
                                    "portrait.")
+    motion_style: str | None = Field(
+        default=None, max_length=20,
+        description="How the portrait moves: still, breathe, or lively. "
+                    "The animation itself follows the interaction history.")
 
 
 @router.get("/profiles/{profile_id}/avatar")
@@ -34,9 +38,14 @@ def get_avatar(profile_id: str) -> dict:
 
 @router.put("/profiles/{profile_id}/avatar")
 def set_avatar(profile_id: str, body: AvatarSet, request: Request) -> dict:
-    """Owner attaches a rendered portrait."""
+    """Owner attaches a rendered portrait — and, optionally, how it moves."""
     profile_or_404(profile_id)
     require_owner(profile_id, request)
+    if body.motion_style is not None:
+        try:
+            avatars.set_motion(profile_id, body.motion_style)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
     return avatars.set_avatar(profile_id, body.asset)
 
 

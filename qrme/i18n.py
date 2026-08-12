@@ -3139,6 +3139,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'horizon': {'en': 'Time horizon', 'es': 'Horizonte temporal', 'fr': 'Horizon temporel', 'de': 'Zeithorizont', 'pt': 'Horizonte temporal', 'it': 'Orizzonte temporale', 'ja': '期間', 'zh': '时间范围', 'hi': 'समय-सीमा', 'ar': 'الأفق الزمني'},
     'handle': {'en': 'Handle', 'es': 'Identificador', 'fr': 'Identifiant', 'de': 'Kürzel', 'pt': 'Identificador', 'it': 'Handle', 'ja': 'ハンドル名', 'zh': '账号名', 'hi': 'हैंडल', 'ar': 'المعرّف'},
     'goal': {'en': 'Goal', 'es': 'Objetivo', 'fr': 'Objectif', 'de': 'Ziel', 'pt': 'Objetivo', 'it': 'Obiettivo', 'ja': '目標', 'zh': '目标', 'hi': 'लक्ष्य', 'ar': 'الهدف'},
+    'motion_style': {'en': 'Motion style', 'es': 'Estilo de movimiento', 'fr': 'Style de mouvement', 'de': 'Bewegungsstil', 'pt': 'Estilo de movimento', 'it': 'Stile di movimento', 'ja': '動きのスタイル', 'zh': '动态样式', 'hi': 'गति शैली', 'ar': 'نمط الحركة'},
     'name': {'en': 'Name', 'es': 'Nombre', 'fr': 'Nom', 'de': 'Name', 'pt': 'Nome', 'it': 'Nome', 'ja': '名前', 'zh': '名称', 'hi': 'नाम', 'ar': 'الاسم'},
     'about': {'en': 'About', 'es': 'Acerca de', 'fr': 'À propos', 'de': 'Über', 'pt': 'Sobre', 'it': 'Info', 'ja': '自己紹介', 'zh': '关于', 'hi': 'परिचय', 'ar': 'نبذة'},
     'accent': {'en': 'Accent', 'es': 'Acento', 'fr': 'Accent', 'de': 'Akzent', 'pt': 'Realce', 'it': 'Accento', 'ja': 'アクセント', 'zh': '强调色', 'hi': 'उभार रंग', 'ar': 'اللون المميز'},

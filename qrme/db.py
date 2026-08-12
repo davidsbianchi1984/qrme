@@ -819,6 +819,18 @@ CREATE TABLE IF NOT EXISTS license_manifests (
     created_at TEXT NOT NULL
 );
 
+-- The moving image (claims 3/13: "the graphical image is a moving or video
+-- image"): the owner's chosen motion style for the profile's portrait. The
+-- animation parameters themselves are derived live in avatars.render() from
+-- the profile's interaction history, so the picture updates with the
+-- relationship the way the clause describes; this row stores only the
+-- user-defined half.
+CREATE TABLE IF NOT EXISTS avatar_motion (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    style      TEXT NOT NULL,      -- still | breathe | lively
+    updated_at TEXT NOT NULL
+);
+
 -- AI for lease: an organization seats somebody else's licensed specialist as
 -- one of its departments. The lease is the authorization that crosses the
 -- account boundary — departments otherwise require the org's own profiles —

@@ -1728,6 +1728,11 @@ export type Avatar = {
               basis?: string | null; attestor?: string | null;
               revocable?: boolean };
   placeholder: boolean;
+  /** The moving image: animation parameters derived from the interaction
+   *  history. `tempo_ms` is the idle-breath period; 0 means pinned still. */
+  motion: { style: string; energy: number; warmth: number; tempo_ms: number;
+            states: { idle: string; speaking: string; listening: string };
+            updated_with: number };
 };
 
 export type AvatarBrief = {
@@ -3963,9 +3968,12 @@ export const api = {
     req<Avatar>(`/profiles/${profileId}/avatar`, { token }),
   // Takes `asset`, not a brief — the brief is the prompt you would hand a
   // generator, and generating is not this endpoint's job.
-  setAvatar: (profileId: string, asset: string, token: string) =>
+  setAvatar: (profileId: string, asset: string, token: string,
+              motionStyle?: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar`,
-      { method: "PUT", body: { asset }, token }),
+      { method: "PUT",
+        body: motionStyle ? { asset, motion_style: motionStyle } : { asset },
+        token }),
 
   avatarMarket: () =>
     req<{ sources: { key: string; name: string; how: string }[]; note: string }>(

@@ -390,6 +390,31 @@ export function Identity({ onPlans, onPassing }: {
               {avatar.watermark.line} — {avatar.watermark.disclosure}
             </p>
             <p className="muted small">{avatar.likeness.note}</p>
+            {/* The moving image: the style is the owner's choice; the
+                animation itself follows the interaction history, so the
+                numbers here change as the relationships do. */}
+            <p className="small">
+              {tr("idn.motion", lang)}{" "}
+              {["still", "breathe", "lively"].map((s) => (
+                <button key={s} className="chip"
+                        disabled={!avatar.asset && s !== "still"}
+                        style={s === avatar.motion.style
+                          ? { fontWeight: 700 } : undefined}
+                        onClick={async () => {
+                          setError(null);
+                          try {
+                            setAvatar(await api.setAvatar(
+                              me, avatar.asset ?? "", token, s));
+                          } catch (err) { fail(err); }
+                        }}>{s}</button>
+              ))}
+              {avatar.motion.tempo_ms > 0 && (
+                <span className="motion-dot" aria-hidden
+                      style={{ animationDuration:
+                               `${avatar.motion.tempo_ms}ms` }} />
+              )}
+            </p>
+            <p className="muted small">{tr("idn.motion.note", lang)}</p>
           </>
         )}
         <div className="row">

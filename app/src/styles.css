@@ -573,6 +573,18 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   background: rgba(255,255,255,0.05); border: 1px solid var(--line);
   border-radius: 14px; padding: 10px 14px; }
 
+/* The moving image: a breath the length of motion.tempo_ms — the duration
+   arrives inline from the avatar response, so the dot beats at the
+   profile's own pace and changes as its relationships do. */
+.motion-dot { display: inline-block; width: 10px; height: 10px;
+  margin-left: 8px; border-radius: 50%; background: var(--acc, #7b5cff);
+  vertical-align: middle;
+  animation: motion-breathe 5.2s ease-in-out infinite; }
+@keyframes motion-breathe {
+  0%, 100% { transform: scale(0.8); opacity: 0.55; }
+  50% { transform: scale(1.25); opacity: 1; }
+}
+
 /* ---- the avatar deck ---------------------------------------------------- */
 .deck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
   gap: 8px; margin: 8px 0 14px; }
