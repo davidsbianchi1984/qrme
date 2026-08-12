@@ -2567,7 +2567,20 @@ struct PartyCard: Decodable {
     let position_s: Int?
     let playing: Bool?
     let members: [PartyMember]?
+    /// Whether the host put it on the public surfaces. The id stays the
+    /// private door either way.
+    let `public`: Bool?
     var identity: String { id ?? party_id ?? "?" }
+}
+
+/// A public browse card: counts and a facade, never member names and never
+/// a line of chat — those stay members-only.
+struct PublicPartyCard: Decodable, Identifiable {
+    let id: String
+    let title: String?
+    let people: Int?
+    let profiles: Int?
+    let joining: String?
 }
 
 struct PartyMember: Decodable, Identifiable {
@@ -2741,6 +2754,26 @@ extension ApiClient {
     func endParty(partyId: String, token: String) async throws -> PartyCard {
         try await request("/watch-parties/\(partyId)/end", method: "POST",
                           token: token)
+    }
+
+    /// The browse door: parties whose hosts chose to be found. No token —
+    /// public means public. Counts and a facade; names stay members-only.
+    func publicParties() async throws -> [PublicPartyCard] {
+        struct Box: Decodable { let parties: [PublicPartyCard] }
+        let box: Box = try await request("/watch-parties/public")
+        return box.parties
+    }
+
+    /// Host only, both directions — the id stays the private door.
+    func publishParty(partyId: String, token: String) async throws -> PartyCard {
+        try await request("/watch-parties/\(partyId)/listing", method: "POST",
+                          token: token)
+    }
+
+    func unpublishParty(partyId: String,
+                        token: String) async throws -> PartyCard {
+        try await request("/watch-parties/\(partyId)/listing",
+                          method: "DELETE", token: token)
     }
 
     /// What a synthetic member is allowed to know — including, explicitly,

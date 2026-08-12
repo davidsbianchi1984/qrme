@@ -153,6 +153,22 @@
                 <StackPanel Spacing="8">
                     <TextBlock x:Name="PartyTitle" FontSize="15" FontWeight="Bold"
                                Foreground="{StaticResource QrmeTxtBrush}" />
+                    <!-- The browse door. The id box below stays the private
+                         one: these rows join without ever showing an id. -->
+                    <Button x:Name="PartyPublicButton" Click="OnPartyPublicList" />
+                    <ItemsControl x:Name="PartyPublicList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Line}" FontSize="12"
+                                               VerticalAlignment="Center"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                    <Button Content="{Binding Action}" Tag="{Binding Id}"
+                                            Click="OnPartyPublicJoin" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <TextBox x:Name="PartyPostBox" />
                     <TextBox x:Name="PartyNameBox" />
                     <Button x:Name="PartyStartButton" Click="OnPartyStart" />
@@ -161,6 +177,10 @@
                     <Button x:Name="PartyShowButton" Click="OnPartyShow" />
                     <Button x:Name="PartyLeaveButton" Click="OnPartyLeave" />
                     <Button x:Name="PartyEndButton" Click="OnPartyEnd" />
+                    <!-- Host only, both directions; the id keeps working
+                         either way. -->
+                    <Button x:Name="PartyPublishButton" Click="OnPartyPublish" />
+                    <Button x:Name="PartyUnpublishButton" Click="OnPartyUnpublish" />
                     <TextBlock x:Name="PartyStateText" FontSize="12" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeT2Brush}" />
                     <TextBox x:Name="PartySeekBox" />

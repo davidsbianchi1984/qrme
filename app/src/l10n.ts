@@ -68,6 +68,16 @@ const CHROME: Table = {
     en: "Desk", es: "Mostrador", fr: "Comptoir", de: "Theke", pt: "Balcão",
     it: "Banco", ja: "受付", zh: "服务台", hi: "डेस्क", ar: "المكتب",
   },
+  "feed.kind.party": {
+    en: "Watch party", es: "Sala de visionado", fr: "Séance partagée",
+    de: "Watch-Party", pt: "Sessão conjunta", it: "Visione insieme",
+    ja: "ウォッチパーティ", zh: "放映会", hi: "वॉच पार्टी", ar: "جلسة مشاهدة",
+  },
+  "feed.joinparty": {
+    en: "Join the party", es: "Unirse a la sala", fr: "Rejoindre la séance",
+    de: "Der Party beitreten", pt: "Entrar na sessão", it: "Unisciti alla visione",
+    ja: "パーティに参加", zh: "加入放映会", hi: "पार्टी में शामिल हों", ar: "انضم إلى الجلسة",
+  },
   "feed.play": {
     en: "Play it", es: "Reproducirlo", fr: "Le lire", de: "Abspielen",
     pt: "Reproduzir", it: "Riproducilo", ja: "再生する", zh: "播放",
@@ -4607,6 +4617,30 @@ const CHROME: Table = {
   },
   "wp.party.ph": {
     en: "party id", es: "id de la sala", fr: "id de la séance", de: "Party-ID", pt: "id da sessão", it: "id della festa", ja: "パーティID", zh: "放映会 ID", hi: "पार्टी आईडी", ar: "معرّف الجلسة",
+  },
+  "wp.party.note": {
+    en: "An id is the private door — for jumping into a specific room somebody shared with you.", es: "Un id es la puerta privada — para entrar en una sala concreta que alguien compartió contigo.", fr: "Un id est la porte privée — pour rejoindre une séance précise que quelqu'un a partagée avec vous.", de: "Eine ID ist die private Tür — um in einen bestimmten Raum zu springen, den jemand mit dir geteilt hat.", pt: "Um id é a porta privada — para entrar numa sessão específica que alguém partilhou contigo.", it: "Un id è la porta privata — per entrare in una stanza precisa che qualcuno ha condiviso con te.", ja: "IDはプライベートな入口です — 誰かに共有された特定のルームに入るためのものです。", zh: "ID 是私密入口 — 用于进入别人分享给你的特定放映会。", hi: "आईडी निजी दरवाज़ा है — किसी के साझा किए गए खास कमरे में जाने के लिए।", ar: "المعرّف هو الباب الخاص — للدخول إلى جلسة محددة شاركها معك أحدهم.",
+  },
+  "wp.pub.title": {
+    en: "Open to everyone", es: "Abiertas a todos", fr: "Ouvertes à tous", de: "Offen für alle", pt: "Abertas a todos", it: "Aperte a tutti", ja: "誰でも参加できます", zh: "向所有人开放", hi: "सबके लिए खुली", ar: "مفتوحة للجميع",
+  },
+  "wp.ispublic": {
+    en: "public", es: "pública", fr: "publique", de: "öffentlich", pt: "pública", it: "pubblica", ja: "公開", zh: "公开", hi: "सार्वजनिक", ar: "عامة",
+  },
+  "wp.makepublic": {
+    en: "Make it public", es: "Hacerla pública", fr: "La rendre publique", de: "Öffentlich machen", pt: "Torná-la pública", it: "Rendila pubblica", ja: "公開する", zh: "设为公开", hi: "सार्वजनिक करें", ar: "اجعلها عامة",
+  },
+  "wp.makeprivate": {
+    en: "Take it private", es: "Hacerla privada", fr: "La rendre privée", de: "Privat machen", pt: "Torná-la privada", it: "Rendila privata", ja: "非公開にする", zh: "设为私密", hi: "निजी करें", ar: "اجعلها خاصة",
+  },
+  "wp.public.said": {
+    en: "On the public surfaces now — people can join from the card.", es: "Ya está en las superficies públicas — la gente puede unirse desde la tarjeta.", fr: "Sur les surfaces publiques maintenant — on peut rejoindre depuis la carte.", de: "Jetzt auf den öffentlichen Flächen — Leute können über die Karte beitreten.", pt: "Já está nas superfícies públicas — as pessoas podem entrar pelo cartão.", it: "Ora è sulle superfici pubbliche — si può entrare dalla scheda.", ja: "公開されました — カードから参加できます。", zh: "已公开 — 大家可以从卡片加入。", hi: "अब सार्वजनिक सतहों पर है — लोग कार्ड से जुड़ सकते हैं।", ar: "أصبحت على الواجهات العامة الآن — يمكن للناس الانضمام من البطاقة.",
+  },
+  "wp.private.said": {
+    en: "Off the public surfaces. The id still works.", es: "Fuera de las superficies públicas. El id sigue funcionando.", fr: "Retirée des surfaces publiques. L'id fonctionne toujours.", de: "Von den öffentlichen Flächen genommen. Die ID funktioniert weiter.", pt: "Fora das superfícies públicas. O id continua a funcionar.", it: "Tolta dalle superfici pubbliche. L'id funziona ancora.", ja: "非公開になりました。IDは引き続き使えます。", zh: "已从公开界面撤下。ID 仍然有效。", hi: "सार्वजनिक सतहों से हट गई। आईडी अब भी काम करती है।", ar: "أُزيلت من الواجهات العامة. المعرّف لا يزال يعمل.",
+  },
+  "wp.pub.note": {
+    en: "Public puts a card on the feed and the open list; joining stays each person's own press. Taking it private closes the browse door — the id keeps working.", es: "Pública pone una tarjeta en el feed y en la lista abierta; unirse sigue siendo decisión de cada uno. Hacerla privada cierra la puerta de búsqueda — el id sigue funcionando.", fr: "Publique place une carte dans le fil et la liste ouverte ; rejoindre reste le geste de chacun. La rendre privée ferme la porte de découverte — l'id fonctionne toujours.", de: "Öffentlich legt eine Karte in den Feed und die offene Liste; beitreten bleibt jedem selbst überlassen. Privat schließt die Stöbertür — die ID funktioniert weiter.", pt: "Pública põe um cartão no feed e na lista aberta; entrar continua a ser o gesto de cada um. Torná-la privada fecha a porta de descoberta — o id continua a funcionar.", it: "Pubblica mette una scheda nel feed e nell'elenco aperto; entrare resta un gesto di ciascuno. Renderla privata chiude la porta di scoperta — l'id funziona ancora.", ja: "公開するとフィードと公開リストにカードが載ります。参加は各自の操作のままです。非公開にすると閲覧の入口が閉じます — IDは引き続き使えます。", zh: "公开会在信息流和公开列表放一张卡片；加入仍由每个人自己决定。设为私密会关闭浏览入口 — ID 仍然有效。", hi: "सार्वजनिक करने पर फ़ीड और खुली सूची में कार्ड आता है; जुड़ना हर व्यक्ति का अपना कदम रहता है। निजी करने से ब्राउज़ का दरवाज़ा बंद होता है — आईडी काम करती रहती है।", ar: "العامة تضع بطاقة في الخلاصة والقائمة المفتوحة؛ ويبقى الانضمام فعل كل شخص بنفسه. جعلها خاصة يغلق باب التصفح — والمعرّف يظل يعمل.",
   },
   "wp.join": {
     en: "Join", es: "Unirse", fr: "Rejoindre", de: "Beitreten", pt: "Entrar", it: "Partecipa", ja: "参加", zh: "加入", hi: "शामिल हों", ar: "انضمام",

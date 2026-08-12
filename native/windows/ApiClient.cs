@@ -2882,6 +2882,26 @@ public sealed class ApiClient
         Send<PartyCard>(Post($"/watch-parties/{partyId}/end", new { },
             token));
 
+    /// <summary>The browse door: parties whose hosts chose to be found.
+    /// No token — public means public. Counts and a facade; member names
+    /// stay members-only.</summary>
+    public Task<PublicPartyBox> PublicParties() =>
+        Send<PublicPartyBox>(Get("/watch-parties/public"));
+
+    /// <summary>Host only, both directions — the id stays the private
+    /// door.</summary>
+    public Task<PartyCard> PublishParty(string partyId, string token) =>
+        Send<PartyCard>(Post($"/watch-parties/{partyId}/listing", new { },
+            token));
+
+    public Task<PartyCard> UnpublishParty(string partyId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/watch-parties/{partyId}/listing");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<PartyCard>(req);
+    }
+
     /// <summary>The sentence a synthetic member carries: it has not seen
     /// the footage.</summary>
     public Task<PartyContext> PartyContextOf(string partyId, string token) =>
@@ -3989,6 +4009,17 @@ public record PartyLine(
 
 public record PartyChatBox(
     [property: JsonPropertyName("lines")] PartyLine[] Lines);
+
+/// <summary>A public browse card: counts and a facade, never member names
+/// and never a line of chat — those stay members-only.</summary>
+public record PublicPartyCard(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("people")] int People,
+    [property: JsonPropertyName("joining")] string? Joining);
+
+public record PublicPartyBox(
+    [property: JsonPropertyName("parties")] PublicPartyCard[] Parties);
 
 public record PartyContext(
     [property: JsonPropertyName("you_have_not_seen_it")]

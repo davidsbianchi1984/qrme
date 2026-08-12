@@ -24,6 +24,9 @@ namespace QrmeStudio.Views;
 public sealed partial class PeoplePage : Page
 {
     public record Row(string Line);
+    /// <summary>A public party row: the label, the button's word, and the
+    /// id the join carries — never shown, only carried.</summary>
+    public record PubRow(string Line, string Action, string Id);
 
     public PeoplePage()
     {
@@ -56,6 +59,9 @@ public sealed partial class PeoplePage : Page
         PartyShowButton.Content = L10n.T("party.show");
         PartyLeaveButton.Content = L10n.T("party.leave");
         PartyEndButton.Content = L10n.T("party.end");
+        PartyPublicButton.Content = L10n.T("party.pub");
+        PartyPublishButton.Content = L10n.T("party.pub.make");
+        PartyUnpublishButton.Content = L10n.T("party.pub.unmake");
         PartySeekBox.Header = L10n.T("party.seek");
         PartySeekButton.Content = L10n.T("party.seek.go");
         PartySayBox.Header = L10n.T("party.say");
@@ -808,6 +814,35 @@ public sealed partial class PeoplePage : Page
 
     private async void OnPartyEnd(object sender, RoutedEventArgs e) =>
         await Try(async () => ShowParty(await ApiClient.Shared.EndParty(
+            PartyIdBox.Text.Trim(), AppState.Current.Token!)));
+
+    // The browse door. The id box stays the private one — these rows join
+    // without ever showing an id.
+    private async void OnPartyPublicList(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var box = await ApiClient.Shared.PublicParties();
+            PartyPublicList.ItemsSource = box.Parties.Select(c => new PubRow(
+                $"{c.Title} · {c.People}", L10n.T("party.join"), c.Id))
+                .ToList();
+        });
+
+    private async void OnPartyPublicJoin(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var id = (string)((Button)sender).Tag;
+            PartyIdBox.Text = id;
+            ShowParty(await ApiClient.Shared.JoinParty(
+                id, AppState.Current.Pid!, AppState.Current.Token!));
+        });
+
+    // Host only, both directions; the id keeps working either way.
+    private async void OnPartyPublish(object sender, RoutedEventArgs e) =>
+        await Try(async () => ShowParty(await ApiClient.Shared.PublishParty(
+            PartyIdBox.Text.Trim(), AppState.Current.Token!)));
+
+    private async void OnPartyUnpublish(object sender, RoutedEventArgs e) =>
+        await Try(async () => ShowParty(await ApiClient.Shared.UnpublishParty(
             PartyIdBox.Text.Trim(), AppState.Current.Token!)));
 
     private async void OnPartySeek(object sender, RoutedEventArgs e) =>

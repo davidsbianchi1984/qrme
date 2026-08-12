@@ -3382,10 +3382,30 @@ private fun PartyBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var lines by remember { mutableStateOf<List<PartyLine>>(emptyList()) }
     var draft by remember { mutableStateOf("") }
     var seekTo by remember { mutableStateOf("") }
+    var openParties by remember {
+        mutableStateOf<List<Triple<String, String, Int>>>(emptyList()) }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("party.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
+        // The browse door. The id field below stays the private one — these
+        // rows join without ever showing an id.
+        BrandButton(L10n.t("party.pub", lang)) {
+            vm.call({ ApiClient.publicParties() }) { r ->
+                openParties = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        openParties.forEach { (pid, ptitle, people) ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text("$ptitle · $people", color = Qrme.T3, fontSize = 11.sp,
+                    modifier = Modifier.weight(1f))
+                BrandButton(L10n.t("party.join", lang)) {
+                    vm.call({ ApiClient.joinParty(pid, vm.pid!!, vm.token!!) }) { r ->
+                        card = r.getOrNull(); partyId = pid
+                        onNote(r.exceptionOrNull()?.message) }
+                }
+            }
+        }
         labeledField(L10n.t("party.post", lang), postId, "") { postId = it }
         labeledField(L10n.t("party.name", lang), title, "") { title = it }
         BrandButton(L10n.t("party.start", lang), enabled = postId.isNotBlank()) {
@@ -3412,6 +3432,19 @@ private fun PartyBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             }
             BrandButton(L10n.t("party.end", lang), enabled = partyId.isNotBlank()) {
                 vm.call({ ApiClient.endParty(partyId, vm.token!!) }) { r ->
+                    card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Host only, both directions; the id keeps working either way.
+            BrandButton(L10n.t("party.pub.make", lang),
+                enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.publishParty(partyId, vm.token!!) }) { r ->
+                    card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("party.pub.unmake", lang),
+                enabled = partyId.isNotBlank()) {
+                vm.call({ ApiClient.unpublishParty(partyId, vm.token!!) }) { r ->
                     card = r.getOrNull(); onNote(r.exceptionOrNull()?.message) }
             }
         }

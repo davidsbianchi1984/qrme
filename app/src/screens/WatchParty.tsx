@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type PartyContext, type PartyLine,
+import { api, type PartyContext, type PartyLine, type PublicParty,
          type WatchParty as Party } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
@@ -47,6 +47,14 @@ export function WatchParty({ onPlans }: {
   const [bring, setBring] = useState("");
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [open, setOpen] = useState<PublicParty[]>([]);
+
+  // The browse door: the parties whose hosts chose to be found. The id
+  // stays the private door — these cards join without ever showing one.
+  useEffect(() => {
+    api.publicWatchParties().then((r) => setOpen(r.parties))
+      .catch(() => undefined);
+  }, [party]);
 
   const fail = (e: unknown) => setError(e);
 
@@ -125,12 +133,42 @@ export function WatchParty({ onPlans }: {
             {tr("wp.open", lang)}
           </button>
         </div>
+        <p className="muted small">{tr("wp.party.note", lang)}</p>
       </div>
+
+      {open.length > 0 && !party && (
+        <div className="card">
+          <h3>{tr("wp.pub.title", lang)}</h3>
+          {open.map((c) => (
+            <div key={c.id} className="row">
+              <div style={{ flex: 1 }}>
+                <strong>{c.title || tr("wp.untitled", lang)}</strong>
+                <div className="muted small">
+                  {c.video?.platform_name}
+                  {" · "}
+                  {(c.people === 1
+                    ? tr("wp.person", lang) : tr("wp.people", lang)
+                  ).replace("{n}", String(c.people))}
+                </div>
+                {/* Before the button, in the server's own words: joining
+                    puts your name in front of everyone in the room. */}
+                <div className="muted small">{c.joining}</div>
+              </div>
+              <button disabled={!token} onClick={act(
+                () => api.joinWatchParty(c.id, { member_id: me }, token),
+                tr("wp.joined.said", lang))}>{tr("wp.join", lang)}</button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {party && (
         <>
           <div className="card">
-            <h3>{party.title || tr("wp.untitled", lang)}</h3>
+            <h3>{party.title || tr("wp.untitled", lang)}
+              {party.public &&
+                <span className="chip"> {tr("wp.ispublic", lang)}</span>}
+            </h3>
             <p className="small">
               {fill(tr("wp.video.on", lang), {
                 title: <strong>{party.video.title}</strong>,
@@ -222,6 +260,22 @@ export function WatchParty({ onPlans }: {
                 }}>{tr("wp.end", lang)}</button>
               </div>
               <p className="muted small">{tr("wp.seek.note", lang)}</p>
+              <div className="row">
+                {party.public ? (
+                  <button onClick={act(
+                    () => api.unpublishWatchParty(party.id, token),
+                    tr("wp.private.said", lang))}>
+                    {tr("wp.makeprivate", lang)}
+                  </button>
+                ) : (
+                  <button onClick={act(
+                    () => api.publishWatchParty(party.id, token),
+                    tr("wp.public.said", lang))}>
+                    {tr("wp.makepublic", lang)}
+                  </button>
+                )}
+              </div>
+              <p className="muted small">{tr("wp.pub.note", lang)}</p>
             </div>
           )}
 

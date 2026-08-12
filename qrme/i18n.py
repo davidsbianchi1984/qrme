@@ -1016,6 +1016,39 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'only the host decides where a party can be found': {
+        'es': 'solo el anfitrión decide dónde se puede encontrar una sala',
+        'fr': "seul l'hôte décide où une séance peut être trouvée",
+        'de': 'nur der Gastgeber entscheidet, wo eine Party zu finden ist',
+        'pt': 'só o anfitrião decide onde uma sessão pode ser encontrada',
+        'it': "solo l'ospite decide dove una festa può essere trovata",
+        'ja': 'パーティを公開する場所を決められるのはホストだけです',
+        'zh': '只有主持人能决定放映会在哪里被找到',
+        'hi': 'केवल मेज़बान तय करता है कि पार्टी कहाँ मिल सकती है',
+        'ar': 'المضيف وحده يقرر أين يمكن العثور على الجلسة',
+    },
+    'a public party needs a title people can find it by': {
+        'es': 'una sala pública necesita un título por el que la gente pueda encontrarla',
+        'fr': "une séance publique a besoin d'un titre par lequel on peut la trouver",
+        'de': 'eine öffentliche Party braucht einen Titel, unter dem man sie finden kann',
+        'pt': 'uma sessão pública precisa de um título pelo qual as pessoas a encontrem',
+        'it': 'una festa pubblica ha bisogno di un titolo con cui trovarla',
+        'ja': '公開パーティには、人が見つけられるタイトルが必要です',
+        'zh': '公开放映会需要一个能让人找到它的标题',
+        'hi': 'सार्वजनिक पार्टी को एक शीर्षक चाहिए जिससे लोग उसे ढूँढ सकें',
+        'ar': 'الجلسة العامة تحتاج إلى عنوان يجدها الناس به',
+    },
+    'that title cannot stand on a public surface': {
+        'es': 'ese título no puede estar en una superficie pública',
+        'fr': 'ce titre ne peut pas figurer sur une surface publique',
+        'de': 'dieser Titel kann auf einer öffentlichen Fläche nicht stehen',
+        'pt': 'esse título não pode ficar numa superfície pública',
+        'it': 'quel titolo non può stare su una superficie pubblica',
+        'ja': 'そのタイトルは公開の場には掲載できません',
+        'zh': '这个标题不能出现在公开界面上',
+        'hi': 'वह शीर्षक सार्वजनिक सतह पर नहीं रह सकता',
+        'ar': 'هذا العنوان لا يمكن أن يظهر على واجهة عامة',
+    },
     'nothing posted has that id — give the id of a posted video, or paste the video\'s own link': {
         'es': 'nada publicado tiene ese id — da el id de un vídeo publicado, o pega el enlace del propio vídeo',
         'fr': "rien de publié ne porte cet id — donnez l'id d'une vidéo publiée, ou collez le lien de la vidéo elle-même",

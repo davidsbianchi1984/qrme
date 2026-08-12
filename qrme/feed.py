@@ -13,6 +13,8 @@ Three kinds of item, from three surfaces that already exist:
     offsite  a public wall post pointing at a video on somebody else's site
     room     a public room that is live right now
     desk     a public desk, attended or ringable, with its shop behind it
+    party    a watch party whose host chose to be found (join from the card;
+             the party id stays the private door)
 
 **Public means deliberately public.** Nothing appears here by default. A post
 reaches the feed only if it is on the wall, approved by moderation, and its
@@ -348,6 +350,13 @@ def stream(viewer_profile_id: str | None = None, cursor: str | None = None,
                   if viewer_adult or not r["rated"]]
         places += [_desk_item(r) for r in _open_desks(limit)
                    if viewer_adult or not r["rated"]]
+        # Watch parties whose hosts chose to be found — the third kind of
+        # live door, riding the same rotation. The card is already built to
+        # the feed's own rules by watchparty.public_listings: counts and a
+        # facade, `plays: False`, and a `joining` sentence said before the
+        # press, because joining puts a name in front of a room.
+        from . import watchparty
+        places += watchparty.public_listings(limit)
 
     items = _interleave(recordings, places)
     nxt = _cursor({"before": rows[-1]["created_at"]}) if len(rows) == limit \
@@ -358,7 +367,8 @@ def stream(viewer_profile_id: str | None = None, cursor: str | None = None,
         "counts": {"video": sum(1 for i in items if i["kind"] == "video"),
                    "offsite": sum(1 for i in items if i["kind"] == "offsite"),
                    "room": sum(1 for i in items if i["kind"] == "room"),
-                   "desk": sum(1 for i in items if i["kind"] == "desk")},
+                   "desk": sum(1 for i in items if i["kind"] == "desk"),
+                   "party": sum(1 for i in items if i["kind"] == "party")},
         "rules": {
             "plays": PLAYS_NOTE,
             "facade": ("Anything this deployment does not hold stays a card "

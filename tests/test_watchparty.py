@@ -285,3 +285,98 @@ def test_a_wrong_id_names_both_ways_in(client):
                     headers=auth_header(me))
     assert r.status_code == 422
     assert "paste the video's own link" in r.json()["detail"]
+
+
+# -- public is a browse door; the id stays the private one --------------------
+#
+# "IDs should be for just jumping into specific rooms or private rooms" — the
+# design in one sentence. A party is private by default and reachable only by
+# its id; publishing is the host's deliberate act, and what it opens is a
+# card a stranger can join from without ever seeing an id.
+
+def _hosted_party(client, title="movie night"):
+    me = make_profile(client, display_name="Host")
+    r = client.post("/watch-parties",
+                    json={"video_url": "https://youtu.be/dQw4w9WgXcQ",
+                          "host_id": me["id"], "title": title},
+                    headers=auth_header(me))
+    return me, r.json()
+
+
+def test_a_party_is_private_until_the_host_publishes_it(client):
+    me, party = _hosted_party(client)
+    assert party["public"] is False
+    assert client.get("/watch-parties/public").json()["parties"] == []
+
+    r = client.post(f"/watch-parties/{party['id']}/listing",
+                    headers=auth_header(me))
+    assert r.status_code == 201
+    assert r.json()["public"] is True
+    cards = client.get("/watch-parties/public").json()["parties"]
+    assert [c["id"] for c in cards] == [party["id"]]
+
+
+def test_only_the_host_moves_it_between_public_and_private(client):
+    me, party = _hosted_party(client)
+    other = make_profile(client, display_name="Guest")
+    assert client.post(f"/watch-parties/{party['id']}/listing",
+                       headers=auth_header(other)).status_code == 403
+    client.post(f"/watch-parties/{party['id']}/listing",
+                headers=auth_header(me))
+    assert client.delete(f"/watch-parties/{party['id']}/listing",
+                         headers=auth_header(other)).status_code == 403
+
+
+def test_unpublishing_closes_the_browse_door_not_the_room(client):
+    me, party = _hosted_party(client)
+    client.post(f"/watch-parties/{party['id']}/listing",
+                headers=auth_header(me))
+    r = client.delete(f"/watch-parties/{party['id']}/listing",
+                      headers=auth_header(me))
+    assert r.json()["public"] is False
+    assert client.get("/watch-parties/public").json()["parties"] == []
+    # The id keeps working: the host still reads the room.
+    assert client.get(f"/watch-parties/{party['id']}",
+                      headers=auth_header(me)).status_code == 200
+
+
+def test_the_public_card_carries_counts_and_a_facade_never_names(client):
+    """Member names and chat stay members-only; a browse card that listed
+    who is inside would publish presence nobody agreed to."""
+    me, party = _hosted_party(client)
+    client.post(f"/watch-parties/{party['id']}/listing",
+                headers=auth_header(me))
+    watchparty.say(party["id"], me["id"], "just us so far")
+    card = client.get("/watch-parties/public").json()["parties"][0]
+    assert card["people"] == 1 and card["video"]["platform_name"] == "YouTube"
+    assert card["plays"] is False
+    assert "joining" in card
+    flat = str(card)
+    assert "Host" not in flat and "just us so far" not in flat
+
+
+def test_a_public_party_needs_a_findable_title(client):
+    me, party = _hosted_party(client, title="")
+    r = client.post(f"/watch-parties/{party['id']}/listing",
+                    headers=auth_header(me))
+    assert r.status_code == 422
+    assert "needs a title" in r.json()["detail"]
+
+
+def test_ending_a_party_takes_it_off_the_public_surfaces(client):
+    me, party = _hosted_party(client)
+    client.post(f"/watch-parties/{party['id']}/listing",
+                headers=auth_header(me))
+    client.post(f"/watch-parties/{party['id']}/end", headers=auth_header(me))
+    assert client.get("/watch-parties/public").json()["parties"] == []
+
+
+def test_a_public_party_rides_the_feed_beside_rooms_and_desks(client):
+    from qrme import feed
+    me, party = _hosted_party(client)
+    client.post(f"/watch-parties/{party['id']}/listing",
+                headers=auth_header(me))
+    page = feed.stream()
+    kinds = [i["kind"] for i in page["items"]]
+    assert "party" in kinds
+    assert page["counts"]["party"] == 1

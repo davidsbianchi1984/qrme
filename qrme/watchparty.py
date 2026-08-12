@@ -170,6 +170,83 @@ def join(party_id: str, who_id: str, kind: str = "person",
     return get(party_id)
 
 
+def publish(party_id: str, host_id: str) -> dict:
+    """Make the party findable. The host's call, and a deliberate act.
+
+    The id stays the private door — anyone holding it can still jump
+    straight in — and publishing opens the browse door: a card on the
+    public surfaces that a stranger joins from without ever seeing the id.
+    The title is what strangers browse by, so it is required and it faces
+    the strict filter, the rule every public surface here already runs on.
+    """
+    row = _party(party_id)
+    if row is None:
+        raise PartyError("no such watch party")
+    if row["host_id"] != host_id:
+        raise PartyError("only the host decides where a party can be found")
+    title = (row["title"] or "").strip()
+    if not title:
+        raise PartyError("a public party needs a title people can find it by")
+    verdict = moderation.review(title, None, {"birthdate": None},
+                                maturity="strict")
+    if not verdict.approved:
+        raise PartyError("that title cannot stand on a public surface")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO watch_party_listings (party_id, created_at) VALUES (?,?)"
+        " ON CONFLICT(party_id) DO NOTHING", (party_id, db.utcnow()))
+    conn.commit()
+    return get(party_id)
+
+
+def unpublish(party_id: str, host_id: str) -> dict:
+    """Take the party off the public surfaces. The id keeps working — this
+    closes the browse door, not the room."""
+    row = _party(party_id)
+    if row is None:
+        raise PartyError("no such watch party")
+    if row["host_id"] != host_id:
+        raise PartyError("only the host decides where a party can be found")
+    db.connect().execute("DELETE FROM watch_party_listings WHERE party_id=?",
+                         (party_id,))
+    db.connect().commit()
+    return get(party_id)
+
+
+#: What pressing Join on a public card does, said before it is pressed — the
+#: same courtesy the feed's room cards already extend, because joining puts
+#: your name in front of everyone in the room.
+JOINING = ("joining adds you to the room's member list, visible to everyone "
+           "in it — the video still only plays when you press play")
+
+
+def public_listings(limit: int = 24) -> list[dict]:
+    """The cards a stranger browses. Counts and the facade — never member
+    names and never a line of chat, which stay members-only."""
+    rows = db.connect().execute(
+        "SELECT p.*, l.created_at AS listed_at FROM watch_party_listings l"
+        "  JOIN watch_parties p ON p.id = l.party_id"
+        " ORDER BY l.created_at DESC LIMIT ?", (limit,)).fetchall()
+    cards = []
+    for r in rows:
+        people = members(r["id"])
+        cards.append({
+            "kind": "party",
+            "id": r["id"],
+            "title": r["title"],
+            "video": embeds.facade(r["post_id"]),
+            "people": sum(1 for m in people if m["kind"] == "person"),
+            "profiles": sum(1 for m in people if m["kind"] == "profile"),
+            "playing": bool(r["playing"]),
+            "plays": False,
+            "joining": JOINING,
+            "join": f"/watch-parties/{r['id']}/members",
+            "reason": "watching together right now",
+            "at": r["listed_at"],
+        })
+    return cards
+
+
 def leave(party_id: str, who_id: str) -> dict:
     db.connect().execute(
         "UPDATE watch_party_members SET left_at=? WHERE party_id=? AND"
@@ -194,6 +271,10 @@ def end(party_id: str, host_id: str) -> dict:
     conn = db.connect()
     conn.execute("UPDATE watch_party_members SET left_at=? WHERE party_id=?"
                  " AND left_at IS NULL", (db.utcnow(), party_id))
+    # An ended party leaves the public surfaces with everything else — a
+    # browse card for a room nobody is in would be an invitation to nowhere.
+    conn.execute("DELETE FROM watch_party_listings WHERE party_id=?",
+                 (party_id,))
     conn.commit()
     from . import roommic
     return {"party_id": party_id, "ended": True,
@@ -347,9 +428,12 @@ def get(party_id: str) -> dict:
     if row is None:
         raise PartyError("no such watch party")
     people = members(party_id)
+    listed = db.connect().execute(
+        "SELECT 1 FROM watch_party_listings WHERE party_id=?",
+        (party_id,)).fetchone() is not None
     return {
         "id": row["id"], "post_id": row["post_id"], "host_id": row["host_id"],
-        "title": row["title"],
+        "title": row["title"], "public": listed,
         "video": embeds.facade(row["post_id"]),
         "position_s": row["position_s"], "playing": bool(row["playing"]),
         "members": people,

@@ -100,6 +100,39 @@ def start(body: StartIn, request: Request) -> dict:
         raise _fail(exc) from None
 
 
+@router.get("/watch-parties/public")
+def browse(limit: int = 24) -> dict:
+    """The parties whose hosts chose to be found — no token, because public
+    means public. Counts and the video facade only: member names and chat
+    stay members-only, and the id on each card is a join door, not a key
+    that unlocks anything a member could not already see."""
+    return {"parties": watchparty.public_listings(max(1, min(limit, 100)))}
+
+
+@router.post("/watch-parties/{party_id}/listing", status_code=201)
+def publish(party_id: str, request: Request) -> dict:
+    """Put the party on the public surfaces. Host only, and a deliberate
+    act — the id stays the private door either way."""
+    party = _party_or_404(party_id)
+    require_self(party["host_id"], request)
+    try:
+        return watchparty.publish(party_id, party["host_id"])
+    except watchparty.PartyError as exc:
+        raise _fail(exc) from None
+
+
+@router.delete("/watch-parties/{party_id}/listing")
+def unpublish(party_id: str, request: Request) -> dict:
+    """Take it back off the public surfaces. The room stays open and the id
+    keeps working."""
+    party = _party_or_404(party_id)
+    require_self(party["host_id"], request)
+    try:
+        return watchparty.unpublish(party_id, party["host_id"])
+    except watchparty.PartyError as exc:
+        raise _fail(exc) from None
+
+
 @router.get("/watch-parties/{party_id}")
 def read(party_id: str, request: Request) -> dict:
     """Who is in the room and where it has got to — members only."""

@@ -2305,6 +2305,26 @@ object ApiClient {
         partyOf(JSONObject(request("/watch-parties/$partyId/end",
             "POST", token = token)))
 
+    /** The browse door: parties whose hosts chose to be found. No token —
+     *  public means public; counts and a facade, names stay members-only. */
+    suspend fun publicParties(): List<Triple<String, String, Int>> {
+        val o = JSONObject(request("/watch-parties/public"))
+        val arr = o.getJSONArray("parties")
+        return (0 until arr.length()).map { i ->
+            val p = arr.getJSONObject(i)
+            Triple(p.getString("id"), p.optString("title"), p.optInt("people"))
+        }
+    }
+
+    /** Host only, both directions — the id stays the private door. */
+    suspend fun publishParty(partyId: String, token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties/$partyId/listing",
+            "POST", token = token)))
+
+    suspend fun unpublishParty(partyId: String, token: String): PartyCard =
+        partyOf(JSONObject(request("/watch-parties/$partyId/listing",
+            "DELETE", token = token)))
+
     /** The sentence a synthetic member carries: it has not seen the footage. */
     suspend fun partyContext(partyId: String, token: String): String {
         val o = JSONObject(request("/watch-parties/$partyId/context",

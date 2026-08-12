@@ -149,11 +149,28 @@ struct PartySection: View {
     @State private var context = ""
     @State private var note: String?
     @State private var busy = false
+    @State private var openParties: [PublicPartyCard] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(L10n.t("party.title", state.language))
                 .font(.headline).foregroundStyle(Theme.txt)
+            // The browse door. The id field below stays the private one —
+            // these rows join without ever showing an id.
+            Button(L10n.t("party.pub", state.language)) {
+                run { openParties = try await ApiClient.shared.publicParties() }
+            }.font(.caption).disabled(busy)
+            ForEach(openParties) { p in
+                HStack {
+                    Text("\(p.title ?? "") · \(p.people ?? 0)")
+                        .font(.caption2).foregroundStyle(Theme.t2)
+                    Button(L10n.t("party.join", state.language)) {
+                        run { card = try await ApiClient.shared.joinParty(
+                            partyId: p.id, memberId: state.pid!,
+                            kind: "profile", token: state.token!) }
+                    }.font(.caption2).disabled(busy)
+                }
+            }
             TextField(L10n.t("party.post", state.language), text: $postId)
                 .textFieldStyle(.roundedBorder)
             HStack {
@@ -193,6 +210,18 @@ struct PartySection: View {
                 }
                 Button(L10n.t("party.end", state.language)) {
                     run { card = try await ApiClient.shared.endParty(
+                        partyId: partyId, token: state.token!) }
+                }
+            }.font(.caption).disabled(busy || partyId.isEmpty)
+            HStack {
+                // Host only, both directions; the id keeps working either
+                // way — public opens the browse door, it never closes this one.
+                Button(L10n.t("party.pub.make", state.language)) {
+                    run { card = try await ApiClient.shared.publishParty(
+                        partyId: partyId, token: state.token!) }
+                }
+                Button(L10n.t("party.pub.unmake", state.language)) {
+                    run { card = try await ApiClient.shared.unpublishParty(
                         partyId: partyId, token: state.token!) }
                 }
             }.font(.caption).disabled(busy || partyId.isEmpty)

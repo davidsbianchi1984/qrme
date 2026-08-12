@@ -196,6 +196,25 @@ export function Feed({ onPlans }: { onPlans: () => void }) {
             </>
           )}
 
+          {item.kind === "party" && (
+            <>
+              <p><strong>{item.title || tr("feed.room.untitled", lang)}</strong></p>
+              <p className="muted small">
+                {item.video?.platform_name}
+                {typeof item.people === "number" ? ` · ${item.people}` : ""}
+              </p>
+              {/* Before the button. Joining puts your name in the room. */}
+              <p className="muted small">{item.joining}</p>
+              <button className="primary"
+                      disabled={busy || !session.interactorId || !session.interactorToken}
+                      onClick={() => api.joinWatchParty(item.id, {
+                        member_id: session.interactorId!,
+                      }, session.interactorToken!).catch((e) => setError(e))}>
+                {tr("feed.joinparty", lang)}
+              </button>
+            </>
+          )}
+
           <div className="row">
             <button disabled={at === 0} onClick={() => go(-1)}>
               {tr("feed.back", lang)}

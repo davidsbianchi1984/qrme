@@ -496,7 +496,9 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "grants": ("lend", "borrow", "lent", "share a skill", "let them use",
                "grant", "loan", "use my", "revoke", "stop letting them"),
     "party": ("watch together", "watch party", "watch with", "same video",
-              "sync video", "viewing party", "watch a video together"),
+              "sync video", "viewing party", "watch a video together",
+              "make a party public", "public party", "find a party",
+              "open parties"),
 }
 
 

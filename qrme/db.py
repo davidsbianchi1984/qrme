@@ -1255,6 +1255,16 @@ CREATE TABLE IF NOT EXISTS watch_parties (
     created_at TEXT NOT NULL
 );
 
+-- A party the host chose to make findable. Public is a deliberate act and a
+-- separate row, never a default and never a column that could ship set: the
+-- party id stays the private door (share it, jump straight in), and this
+-- listing is the browse door — the card a stranger joins from without ever
+-- seeing an id. Delisted when the host takes it back, and when the party ends.
+CREATE TABLE IF NOT EXISTS watch_party_listings (
+    party_id   TEXT PRIMARY KEY REFERENCES watch_parties(id),
+    created_at TEXT NOT NULL
+);
+
 -- Who is in the room. `kind` separates a real account from a synthetic
 -- profile, because nearly every rule differs between them — and because a room
 -- where you cannot tell which of the names is a person is the room this

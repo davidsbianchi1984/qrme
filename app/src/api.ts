@@ -1602,6 +1602,9 @@ export type PartyMember = {
 
 export type WatchParty = {
   id: string; post_id: string; host_id: string; title: string | null;
+  /** Whether the host put it on the public surfaces. The id stays the
+   *  private door either way. */
+  public: boolean;
   video: PartyVideo;
   position_s: number; playing: boolean;
   members: PartyMember[];
@@ -1610,6 +1613,18 @@ export type WatchParty = {
   loads_on_press: boolean;
   /** "the room shares a position, not a player" — the server's sentence. */
   note: string;
+};
+
+/** A public browse card: counts and the facade, never member names and
+ *  never a line of chat — those stay members-only. */
+export type PublicParty = {
+  kind: "party"; id: string; title: string | null;
+  video: PartyVideo | null;
+  people: number; profiles: number; playing: boolean;
+  plays: boolean;
+  /** What pressing Join does, said before it is pressed. */
+  joining: string;
+  join: string; reason: string; at: string;
 };
 
 export type PartyLine = {
@@ -2963,7 +2978,7 @@ export type SocialBeacon = {
 };
 
 export interface FeedItem {
-  kind: "video" | "offsite" | "room" | "desk";
+  kind: "video" | "offsite" | "room" | "desk" | "party";
   id: string;
   reason: string;
   at: string;
@@ -3004,6 +3019,13 @@ export interface FeedItem {
                  currency: string; availability: string }[];
     open: string;
   } | null;
+  /** party — a watch party whose host chose to be found. Counts and a
+   *  facade only; joining is each viewer's own press. */
+  video?: PartyVideo | null;
+  profiles?: number;
+  playing?: boolean;
+  joining?: string;
+  join?: string;
 }
 
 /** One page of the public stream. `rules` is the server saying, in words a
@@ -3011,7 +3033,8 @@ export interface FeedItem {
 export interface FeedPage {
   items: FeedItem[];
   cursor: string | null;
-  counts: { video: number; offsite: number; room: number; desk: number };
+  counts: { video: number; offsite: number; room: number; desk: number;
+            party: number };
   rules: { plays: string; facade: string; public: string };
 }
 
@@ -3899,6 +3922,20 @@ export const api = {
                             host_id: string; title?: string },
                     token: string) =>
     req<WatchParty>("/watch-parties", { method: "POST", body, token }),
+
+  // The browse door. Public means public: no token. The id on each card is
+  // a join door, not a key — chat and member names stay members-only.
+  publicWatchParties: () =>
+    req<{ parties: PublicParty[] }>("/watch-parties/public", {}),
+
+  // Host only, both directions. Publishing is a deliberate act; taking it
+  // back closes the browse door and the id keeps working.
+  publishWatchParty: (partyId: string, token: string) =>
+    req<WatchParty>(`/watch-parties/${partyId}/listing`,
+                    { method: "POST", token }),
+  unpublishWatchParty: (partyId: string, token: string) =>
+    req<WatchParty>(`/watch-parties/${partyId}/listing`,
+                    { method: "DELETE", token }),
 
   // Returns the whole party. `kind: "profile"` needs that profile's own
   // owner token — bringing a synthetic profile into a room speaks in its

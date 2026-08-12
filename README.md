@@ -3313,6 +3313,20 @@ cannot — an author and their rating — is covered where it already lives: the
 room's maturity is decided by who is in it (a minor in the room forces
 strict), not by who posted the video.
 
+**Private by default; public is the host's deliberate act.** The party id is
+the private door — share it and somebody jumps straight into your room — and
+that is all a party is until the host publishes it (`POST
+/watch-parties/{id}/listing`, host-only; `DELETE` takes it back; ending the
+party delists it). Published, a **card** rides `GET /watch-parties/public`
+(tokenless — public means public) and the feed's live rotation beside rooms
+and desks (`kind: "party"`, and JIM's Feed tab inherits it through the same
+door): the title — required, and moderated at the strict filter like every
+public surface — the video facade, and **counts, never names**: who is inside
+and what was said stay members-only, and joining from the card is each
+viewer's own press, said out loud before the button. The card's join is the
+same members door as ever; publishing never weakens what a member token
+protects.
+
 **A profile has not seen the video. It cannot.** Nothing here fetches it,
 nothing transcribes it, and a profile saying *"the bit at four minutes was
 great"* would be fabricating — the most ordinary-looking lie this product could
