@@ -89,7 +89,12 @@ LESSONS: tuple[dict, ...] = (
     dict(key="make_one", chapter="Getting started", title="Making a profile",
          what="You describe who it is and it answers in character from the "
               "first message. Genesis builds one from four questions if you "
-              "would rather be asked than write.",
+              "would rather be asked than write. A character card you "
+              "already have — chara_card_v2 or v3, as JSON or a PNG with "
+              "the card inside — imports as a new fictional profile: its "
+              "greeting, example dialogue and creator notes are carried in "
+              "as source material, and its hidden harness instructions are "
+              "withheld by name, each with the reason said out loud.",
          screens=(3, 4, 5, 16),
          try_it="Create one, or open Genesis and answer the four."),
     dict(key="blend", chapter="Getting started", title="Blending a profile",
@@ -104,7 +109,14 @@ LESSONS: tuple[dict, ...] = (
               "remembers you specifically, and treats you according to the "
               "relationship you have with it. Tell it where you are — a "
               "trailhead in the rain, a kitchen at seven — and the reply "
-              "meets you there instead of nowhere.",
+              "meets you there instead of nowhere. The memory answers to "
+              "you: ask for an account of what it holds — counted from the "
+              "record, never guessed — and have it forget one named thing "
+              "without erasing the friendship. And when a conversation is "
+              "coming that you dread, open a rehearsal room and practice "
+              "it: the profile plays the counterpart, nothing said inside "
+              "enters its memory, and closing the room erases the "
+              "transcript.",
          screens=(6, 7, 8, 9, 144),
          try_it="Send one message and open the why."),
     dict(key="health", chapter="Getting started", title="How it is doing",
@@ -743,7 +755,11 @@ LESSONS: tuple[dict, ...] = (
               "permissions. A domain can be handed to a specialist profile "
               "that knows more. And the fine-tune recomputes the profile's "
               "own model from history it already has, on this machine, with "
-              "nothing transmitted anywhere — the answer says so itself.",
+              "nothing transmitted anywhere — the answer says so itself. "
+              "When the dials sit where you want them, lock the steering: "
+              "while the lock is on nothing moves them — the hub, a bound "
+              "robot, your own slip — and every attempt is refused with "
+              "the reason you gave until you unlock it.",
          screens=(164,),
          try_it="Add a piece of writing, then move the warmth dial."),
     dict(key="bodies", chapter="Working", title="A body to speak through",

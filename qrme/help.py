@@ -94,8 +94,37 @@ TOPICS: dict[str, tuple[tuple[str, ...], str]] = {
          "privacy", "what it knows"),
         "Each profile keeps memory per person, so what it remembers of you is "
         "yours and separate from everyone else's. The Memory Vault lists it, "
-        "and you can delete any of it. Deleting a profile purges its vault "
-        "records too.",
+        "and you can delete any of it. You can also ask a profile for an "
+        "account of what it holds about you — counted from the record, not "
+        "guessed — and have it forget one named thing without erasing the "
+        "relationship. Deleting a profile purges its vault records too.",
+    ),
+    "steering_lock": (
+        ("steering lock", "lock the dials", "dials locked", "locked dials",
+         "lock steering", "unlock the steering"),
+        "An owner can lock a profile's steering. While the lock is on, no "
+        "dial moves — not from the steering page, not from the hub, not on "
+        "a bound robot, not even by the owner's own slip — and every "
+        "attempt is refused with the lock's own reason until the owner "
+        "unlocks it.",
+    ),
+    "card_import": (
+        ("character card", "sillytavern", "chara card", "import a card",
+         "card import", "png card"),
+        "A character card — chara_card_v2 or v3, as JSON or embedded in a "
+        "PNG — imports as a new fictional profile. The description, "
+        "greeting, example dialogue and creator notes are carried in as "
+        "source material; the card's hidden harness instructions are "
+        "withheld by name, and the response says exactly what was kept "
+        "out and why.",
+    ),
+    "rehearsal": (
+        ("rehearse", "rehearsal", "practice a conversation",
+         "practise a conversation", "hard conversation"),
+        "A rehearsal room lets you practice a hard conversation with a "
+        "profile playing the counterpart. Nothing said inside reaches its "
+        "memory, the relationship or engagement — every reply says so — "
+        "and closing the room erases the transcript.",
     ),
     "reviews": (
         ("review", "reviews", "rating", "ratings", "stars",
@@ -168,7 +197,8 @@ _WALKTHROUGH: dict[str, tuple[tuple[str, ...], str]] = {
 # looking for overlays types *change my face*; nobody types *overlays*.
 DIRECTIONS: dict[str, tuple[str, ...]] = {
     "make_one": ("make a profile", "new profile", "create a profile",
-                 "add a profile", "genesis"),
+                 "add a profile", "genesis", "character card",
+                 "import a card", "sillytavern", "chara card"),
     "blend": ("blend", "hybrid", "combine profiles", "mix profiles",
               "both grandparents", "composite", "merge two profiles"),
     "predict": ("what would they do", "what would he do", "what would she do",
@@ -192,7 +222,10 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                   "operational ecosystem"),
     "talk": ("send a message", "chat with", "talk to it", "message it",
              "where i am", "knows where i am", "my location", "environment",
-             "the weather here"),
+             "the weather here", "rehearse", "rehearsal",
+             "practice a conversation", "practise a conversation",
+             "what does it remember about me", "make it forget",
+             "forget one thing"),
     "health": ("profile health", "how is it doing", "stats", "transparency",
                "what it knows", "sources"),
     "control": ("control center", "moderation", "boundaries", "steering",
@@ -367,7 +400,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "workshop": ("source material", "sources", "what it knows",
                  "train it", "fine-tune", "finetune", "specialists",
                  "hand off a domain", "experience", "cv", "dials",
-                 "steering", "how it comes across", "made of"),
+                 "steering", "how it comes across", "made of",
+                 "lock the dials", "steering lock", "unlock the steering"),
     "bodies": ("robot", "robots", "a body", "humanoid", "android",
                "my robot", "bind a robot", "embodiment", "speak through",
                "task pack", "robot skills"),
