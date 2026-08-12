@@ -161,8 +161,9 @@ struct PartySection: View {
                 run { openParties = try await ApiClient.shared.publicParties() }
             }.font(.caption).disabled(busy)
             ForEach(openParties) { p in
+                let label = (p.title ?? "") + " · " + String(p.people ?? 0)
                 HStack {
-                    Text("\(p.title ?? "") · \(p.people ?? 0)")
+                    Text(label)
                         .font(.caption2).foregroundStyle(Theme.t2)
                     Button(L10n.t("party.join", state.language)) {
                         run { card = try await ApiClient.shared.joinParty(

@@ -279,7 +279,11 @@ def test_no_two_party_route_accepts_an_anonymous_caller(client):
             if inner is not None:
                 yield from walk(inner.routes)
 
-    OPEN = {"/exchanges/vocabulary", "/skill-grants/vocabulary"}
+    # The vocabularies, and the party browse list: deliberately public reads.
+    # The browse card carries counts and a facade, never member names or a
+    # line of chat — everything a member token protects still requires one.
+    OPEN = {"/exchanges/vocabulary", "/skill-grants/vocabulary",
+            "/watch-parties/public"}
     unguarded = []
     for route in walk(app.routes):
         if not any(route.path.startswith(p) for p in
