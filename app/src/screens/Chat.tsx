@@ -58,8 +58,8 @@ export function Chat({ onPlans }: {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [msgs, busy]);
 
-  // The face is part of the room, not only the talk overlay: the presence
-  // bubble at the top of the space needs it from the first render.
+  // Loaded on mount so the talk overlay opens with the face (or torso)
+  // already in hand instead of flashing the placeholder.
   useEffect(() => {
     if (!session.profileId) return;
     api.avatar(session.profileId, session.ownerToken || "")
@@ -175,40 +175,14 @@ export function Chat({ onPlans }: {
 
       {/* role=log + aria-live: a screen reader is told when the reply
           arrives, instead of the conversation advancing silently. */}
-      <div className="messages chat-space" role="log" aria-live="polite"
+      {/* The presence bubbles and the receding-grid backdrop stood here
+          for one release and came back out on a field report: the names
+          and portraits floated over the words people were trying to
+          read. Presence rendering belongs to the rooms and the
+          vastscape, where there is a scene to stand in — a text thread
+          is its own scene. */}
+      <div className="messages" role="log" aria-live="polite"
            ref={listRef}>
-        {/* Who is in the session, as bubbles resting in the space — the
-            same presence the VR room and the vastscape draw. Sticky, so
-            they stay in the room while the transcript scrolls. */}
-        <div className="chat-presence" aria-hidden="true">
-          <div className="presence-one">
-            {/* The torso form stands in the space at full figure; the
-                circular bubble is only the form of a profile that has no
-                avatar (or no torso) yet. */}
-            {talkAvatar?.torso ? (
-              <img className="presence-torso"
-                   src={talkAvatar.torso.startsWith("http")
-                          ? talkAvatar.torso
-                          : getBase() + talkAvatar.torso} alt="" />
-            ) : talkAvatar && talkAvatar.asset && !talkAvatar.placeholder ? (
-              <img className="presence-bubble"
-                   src={talkAvatar.asset.startsWith("http")
-                          ? talkAvatar.asset
-                          : getBase() + talkAvatar.asset} alt="" />
-            ) : (
-              <div className="presence-bubble orbfill" />
-            )}
-            <span className="presence-name">
-              {session.profile?.display_name}
-            </span>
-          </div>
-          <div className="presence-one">
-            <div className="presence-bubble youfill">
-              {tr("chat.you", lang).slice(0, 1)}
-            </div>
-            <span className="presence-name">{tr("chat.you", lang)}</span>
-          </div>
-        </div>
         {msgs.length === 0 && (
           <div className="muted center">
             {fill(tr("chat.sayhello", lang),

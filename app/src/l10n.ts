@@ -6915,9 +6915,6 @@ const CHROME: Table = {
   "bld.another": {
     en: "Blend another", es: "Mezclar otra", fr: "En mélanger un autre", de: "Noch eine mischen", pt: "Misturar outra", it: "Mescolane un altro", ja: "もうひとつ混ぜる", zh: "再调配一个", hi: "एक और मिलाएँ", ar: "امزج آخر",
   },
-  "chat.you": {
-    en: "You", es: "Tú", fr: "Vous", de: "Du", pt: "Você", it: "Tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
-  },
   "chat.with": {
     en: "Chat with {name}", es: "Chat con {name}", fr: "Discussion avec {name}", de: "Chat mit {name}", pt: "Conversa com {name}", it: "Chat con {name}", ja: "{name} とのチャット", zh: "与 {name} 聊天", hi: "{name} से चैट", ar: "دردشة مع {name}",
   },

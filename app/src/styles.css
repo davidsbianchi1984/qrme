@@ -156,21 +156,11 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 
 /* ---- chat ---- */
 .chat { display: flex; flex-direction: column; height: calc(100% - 4px); }
-/* The chat wears the space the VR room and the vastscape draw: a grid
-   receding to a vanishing point, with the session's people present as
-   bubbles. Inline SVG so nothing is fetched and nothing can 404. */
-.chat-space {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='420'%3E%3Crect width='600' height='420' fill='%230c0920'/%3E%3Ccircle cx='300' cy='96' r='70' fill='%237b5cff' fill-opacity='0.10'/%3E%3Cg stroke='%237b5cff' stroke-opacity='0.14'%3E%3Cpath d='M300 96 L-320 420'/%3E%3Cpath d='M300 96 L-120 420'/%3E%3Cpath d='M300 96 L60 420'/%3E%3Cpath d='M300 96 L200 420'/%3E%3Cpath d='M300 96 L300 420'/%3E%3Cpath d='M300 96 L400 420'/%3E%3Cpath d='M300 96 L540 420'/%3E%3Cpath d='M300 96 L720 420'/%3E%3Cpath d='M300 96 L920 420'/%3E%3Cpath d='M0 128 L600 128'/%3E%3Cpath d='M0 160 L600 160'/%3E%3Cpath d='M0 205 L600 205'/%3E%3Cpath d='M0 265 L600 265'/%3E%3Cpath d='M0 340 L600 340'/%3E%3C/g%3E%3C/svg%3E")
-    center top / 100% 100% no-repeat, #0c0920;
-  border-radius: 14px; padding: 10px;
-}
-.chat-presence {
-  position: sticky; top: 0; z-index: 2;
-  display: flex; gap: 26px; justify-content: center;
-  padding: 10px 0 6px;
-}
-.presence-one { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* The chat once wore the VR-grid backdrop with sticky presence bubbles;
+   both came out on a field report — the names and portraits floated over
+   the words. The bubble classes below survive because the front page's
+   top-friends strip wears them; presence-in-a-scene lives in the rooms
+   and the vastscape now. */
 .presence-bubble {
   width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
   border: 1.5px solid rgba(159,216,232,0.55);
@@ -179,17 +169,9 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
   font-weight: 700; font-size: 18px; color: #fff;
 }
 .presence-bubble.orbfill { background: radial-gradient(circle at 36% 30%, #d9ccff, #7b5cff 40%, #3f3bc0 78%, #140f34); border: 0; }
-.presence-bubble.youfill { background: rgba(12,9,32,0.85); }
 .presence-name {
   font-size: 10px; font-weight: 700; color: #dff3ff;
   background: rgba(8,6,20,0.7); border-radius: 8px; padding: 2px 8px;
-}
-/* The upper-torso form, standing in the space at full figure. */
-.presence-torso {
-  width: 68px; height: 92px; object-fit: cover; object-position: top;
-  border-radius: 14px 14px 8px 8px;
-  border: 1.5px solid rgba(159,216,232,0.55);
-  box-shadow: 0 0 18px rgba(123,92,255,0.55);
 }
 /* The front page's top friends: the same faces the spaces use. */
 .top-friends { margin: 4px 0 18px; }
@@ -408,9 +390,9 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* The footsteps in the corner: how many people hold accounts here. A quiet
    chip, not a banner — it shares the fixed layer with the version guard but
    never competes with it for attention. */
-.footsteps { position: fixed; top: 10px; right: 12px; z-index: 90;
-  padding: 4px 10px; border-radius: 999px; background: rgba(13, 23, 41, .85);
-  border: 1px solid #2f4a72; color: #9fb4d8; font-size: 12px;
+.footsteps { position: fixed; top: 6px; right: 8px; z-index: 90;
+  padding: 1px 6px; border-radius: 999px; background: rgba(13, 23, 41, .85);
+  border: 1px solid #2f4a72; color: #9fb4d8; font-size: 9px;
   line-height: 1.4; pointer-events: auto; }
 
 /* The error-reporting notice: shown once, before anything is sent. Calm on
