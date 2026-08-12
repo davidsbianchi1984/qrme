@@ -1016,6 +1016,28 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'say what to forget — empty words strike nothing': {
+        'es': 'di qué olvidar — las palabras vacías no borran nada',
+        'fr': "dites quoi oublier — des mots vides n'effacent rien",
+        'de': 'sag, was vergessen werden soll — leere Worte streichen nichts',
+        'pt': 'diz o que esquecer — palavras vazias não riscam nada',
+        'it': 'di\' cosa dimenticare — parole vuote non cancellano nulla',
+        'ja': '何を忘れるか言ってください — 空の言葉では何も消せません',
+        'zh': '说明要忘记什么 — 空洞的词语抹不掉任何东西',
+        'hi': 'बताएँ क्या भुलाना है — खाली शब्द कुछ नहीं मिटाते',
+        'ar': 'قل ما الذي يُنسى — الكلمات الفارغة لا تمحو شيئًا',
+    },
+    'nothing remembered here carries those words': {
+        'es': 'nada de lo recordado aquí lleva esas palabras',
+        'fr': 'rien de ce qui est retenu ici ne porte ces mots',
+        'de': 'nichts hier Erinnertes trägt diese Worte',
+        'pt': 'nada do que aqui se lembra carrega essas palavras',
+        'it': 'nulla di ciò che è ricordato qui porta quelle parole',
+        'ja': 'ここで記憶されているものに、その言葉はありません',
+        'zh': '这里记住的内容中没有这些词',
+        'hi': 'यहाँ याद रखी किसी बात में वे शब्द नहीं हैं',
+        'ar': 'لا شيء مما هو محفوظ هنا يحمل تلك الكلمات',
+    },
     'that platform shows a signed-out visitor only its login wall, so there is nothing of the account to import — copy the profile\'s text while signed in and paste it into collect instead': {
         'es': 'esa plataforma solo muestra su muro de inicio de sesión a un visitante sin sesión, así que no hay nada de la cuenta que importar: copia el texto del perfil con la sesión iniciada y pégalo en recopilar.',
         'fr': "cette plateforme ne montre à un visiteur non connecté que son mur de connexion, il n'y a donc rien du compte à importer — copiez le texte du profil en étant connecté et collez-le dans la collecte.",

@@ -7554,7 +7554,7 @@ const CHROME: Table = {
     en: "What it remembers from earlier conversations", es: "Lo que recuerda de conversaciones anteriores", fr: "Ce qu'il retient des conversations précédentes", de: "Was es aus früheren Gesprächen behält", pt: "O que recorda de conversas anteriores", it: "Ciò che ricorda delle conversazioni precedenti", ja: "以前の会話から覚えていること", zh: "它从早前对话中记住的内容", hi: "पहले की बातचीत से जो याद है", ar: "ما يتذكره من محادثات سابقة",
   },
   "mem.account": {
-    en: "What it remembers", es: "Lo que recuerda", fr: "Ce qu'il retient", de: "Was es sich merkt", pt: "O que ele lembra", it: "Ciò che ricorda", ja: "覚えていること", zh: "它记得什么", hi: "यह क्या याद रखता है", ar: "ما يتذكره",
+    en: "What it remembers", es: "Lo que recuerda", fr: "Ce qu'il retient", de: "Was es sich merkt", pt: "O que ele lembra", it: "Cosa ricorda", ja: "記憶しているもの", zh: "它记得什么", hi: "यह क्या याद रखता है", ar: "ما الذي يتذكره",
   },
   "mem.account.span": {
     en: "{folded} turns folded into the kept memory, {recent} still in the recent window", es: "{folded} turnos plegados en la memoria guardada, {recent} aún en la ventana reciente", fr: "{folded} tours fondus dans la mémoire gardée, {recent} encore dans la fenêtre récente", de: "{folded} Beiträge in die bewahrte Erinnerung eingefaltet, {recent} noch im jüngsten Fenster", pt: "{folded} turnos condensados na memória guardada, {recent} ainda na janela recente", it: "{folded} turni condensati nella memoria conservata, {recent} ancora nella finestra recente", ja: "{folded}件を保存記憶に織り込み済み、{recent}件は直近の窓に残っています", zh: "{folded} 条已并入保存的记忆，{recent} 条仍在近期窗口", hi: "{folded} संदेश सहेजी स्मृति में समेटे गए, {recent} अभी हाल की खिड़की में", ar: "طُوي {folded} من الأدوار في الذاكرة المحفوظة و{recent} ما زالت في النافذة الأخيرة",
