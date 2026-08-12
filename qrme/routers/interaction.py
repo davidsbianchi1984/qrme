@@ -34,6 +34,29 @@ _URL_RE = re.compile(r"https?://[^\s<>()\"']+")
 _PAGE_CAP = 2000
 
 
+def remembered_environment(profile_id: str,
+                           interactor_id: str) -> dict | None:
+    """The latest stored environment for this relationship, if it is recent
+    enough to plausibly still be the room (six hours; location changes
+    faster than a persona should presume)."""
+    row = db.connect().execute(
+        "SELECT data, created_at FROM environment_context"
+        " WHERE profile_id=? AND interactor_id=?"
+        " ORDER BY created_at DESC, rowid DESC LIMIT 1",
+        (profile_id, interactor_id)).fetchone()
+    if row is None:
+        return None
+    from datetime import datetime, timedelta
+    try:
+        seen = datetime.fromisoformat(row["created_at"].replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    from datetime import timezone
+    if datetime.now(timezone.utc) - seen > timedelta(hours=6):
+        return None
+    return json.loads(row["data"])
+
+
 def _handed_link_block(message: str) -> str | None:
     """A prompt block for the first link in the person's message.
 
@@ -312,12 +335,27 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += ("\n\nCurrent situation from real-time monitoring: "
                    + json.dumps(body.biometrics, sort_keys=True)
                    + ". Respond with appropriate care.")
-    if body.environment:
+    # The room is remembered, not just heard (spec clause 1: the profile
+    # "dynamically adapt[s] to environmental data"). A turn that carries
+    # environment speaks from it; a turn that doesn't reads the latest
+    # stored context back — recent only, because yesterday's café is not a
+    # room anyone is still in. The echo marks remembered context as such,
+    # so a client can tell fresh data from recalled data.
+    environment = body.environment
+    if environment is None:
+        remembered = remembered_environment(profile_id, body.interactor_id)
+        if remembered:
+            environment = {**remembered, "remembered": True}
+    if environment:
         system += ("\n\nThe person's current environment: "
-                   + json.dumps(body.environment, sort_keys=True)
+                   + json.dumps(environment, sort_keys=True)
                    + ". Let your reply be contextually relevant to where "
                      "they are and what surrounds them — naturally, without "
-                     "reciting this data back.")
+                     "reciting this data back."
+                   + (" This context was captured earlier in the "
+                      "conversation; treat it as where they most likely "
+                      "still are, not as certainty."
+                      if environment.get("remembered") else ""))
     # Role-specific context (spec clauses 2/12): declared on the turn, or
     # read from the prompt itself. Shapes how the profile works this turn —
     # persona, relationship, memory and moderation apply unchanged.
@@ -383,7 +421,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         # embodiment — the same signature over voice, text, and a hologram.
         persona_signature=persona.identity_signature(profile)["signature"],
         embodiment=embodiment_name,
-        environment=body.environment,
+        environment=environment,
         role_context=role_context,
     )
 
