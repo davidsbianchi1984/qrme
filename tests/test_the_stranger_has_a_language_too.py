@@ -209,6 +209,11 @@ def test_the_extractor_can_still_see():
         "nonetheless one sentence to whoever reads it.",
         "Wrapped around",
         "an interpolated value.",
+        # Chosen at render time, laid out as text: the shape a field report
+        # found the vault light hiding two English words in.
+        "a chosen branch",
+        "the other branch",
+        "a guarded phrase",
         "a placeholder",
         "a title",
         "an aria label",

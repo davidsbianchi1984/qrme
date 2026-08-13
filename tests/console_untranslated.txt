@@ -1,6 +1,30 @@
-# status: floor — 1 row
+# status: backlog — 58 rows
 #
-# English on QRME's gated console. Checked by
+# ## 0.69.1: the reader learned to see a sentence chosen at render time
+#
+# A field report on PDI — "It seems to be blocking the PDI menus" — began
+# with a pill sitting on a tab bar and ended here. The pill's own words,
+# *vault answering*, were English on a console that translates everything
+# else, and the extractor behind every count in this estate reported the
+# file clean: `{ok ? "vault answering" : "vault degraded"}` is a
+# `ConditionalExpression`, not a `JsxText` node, so a sentence chosen at
+# render time was text to the reader and nothing at all to the reader of
+# the reader.
+#
+#     asked     what text does this file place between its tags
+#     mattered  what words does this screen put on the glass
+#
+# The extractor now reads string literals in child position — both branches
+# of a ternary, either side of `&&`, the pieces of a concatenation — and
+# skips anything with no letter in it, because a spacer is drawn but is not
+# a word. It still refuses call arguments, so `t("key", lang)` stays a key.
+#
+# 57 rows below are what that widening found. They are not new English;
+# they are English this file has been unable to see for as long as it has
+# existed, and the honest thing is the number rather than the floor it was
+# resting on. The direction of travel is unchanged — the rows come off one
+# screen at a time — but the count they come off is the true one.
+## English on QRME's gated console. Checked by
 # test_the_nav_is_translated_and_nothing_behind_it_is.py, both directions,
 # and ratcheted.
 #
@@ -54,6 +78,68 @@
 # `409` and `#tag` are quoted, so it is English on purpose and recorded as
 # such. A floor of zero would have been a nicer number and a less honest one.
 #
-# ceiling: 1
 #
+# ceiling: 58
+#
+# The ceiling was 1 and is 58: the reader widened, not the console.
+# Every row it gained was already on the glass. Raising a ceiling is the
+# one move this estate treats as a claim rather than a chore, so it is
+# written here beside the reason, and the next rounds take it back down.
+Assist: it
+Assist: this content does not match the credential
+Assist: you
+Assist: · marked as AI-generated
+Assist: · not AI-marked, because you made it
+Desk: Live.
+Desk: No person attested.
+Desk: Not live.
+Desk: · CLAIM BURNED
+Identity: Nothing in it yet.
+Identity: Publish my name again
+Identity: Withhold my name
+Identity: — who checked is part of the record, not a footnote.
+Lobby: s
+Referrals: not opened yet
+Referrals: nothing
+Referrals: the patient
+Referrals: the profile
+Referrals: you
+Referrals: · near you
+Referrals: — not enough for a referral yet
+Remainder: , including the ones only a rated profile has.
+Remainder: . The rated-only ones are listed and refused here, rather
+Remainder: left this machine
+Remainder: never left this machine
+Remainder: nothing needed stripping
+Remainder: than hidden, so the refusal has something to point at.
+Remainder: · 18+ only
+Remainder: · folded in
+Remainder: · free
+Robots: Hide the full list
+Robots: Nothing bound yet.
+Robots: Show the full list
+Robots: Sign in as an owner.
+Robots: on the profile itself
+Robots: · cannot speak in character
+Robots: · free
+Robots: — cannot be bound yet
+Selling: · a buyer may derive an agent
+Selling: · an agent has been derived from it
+Selling: · consult only
+Selling: · nothing derived yet
+Selling: · revoked
+Settings: Clear key
+Settings: Save
+Settings: Save key
+Settings: Save mail settings
+Settings: Saved ✓
+Settings: Saving…
+Settings: Send test email
+Settings: Sending…
 TheMark: AI ·
+Workshop: No vault here, so the result stays in the clear.
+Workshop: Nothing was transmitted anywhere.
+Workshop: Something was transmitted externally.
+Workshop: The result is sealed in the vault.
+Workshop: · answers for itself
+Workshop: · relays only

@@ -285,6 +285,12 @@ def test_the_extractor_can_still_see():
         "nonetheless one sentence to whoever reads it.",
         "Wrapped around",
         "an interpolated value.",
+        # Chosen at render time and laid out as text all the same: the shape
+        # a field report caught the PDI vault light hiding two English words
+        # in, and the shape this extractor could not see until it did.
+        "a chosen branch",
+        "the other branch",
+        "a guarded phrase",
         "a placeholder",
         "a title",
         "an aria label",

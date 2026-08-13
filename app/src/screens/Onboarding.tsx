@@ -22,9 +22,10 @@ function PasswordField(props: {
                placeholder={props.placeholder}
                onChange={(e) => props.onChange(e.target.value)} />
         <button type="button" className="pw-toggle" tabIndex={-1}
-                aria-label={shown ? "Hide password" : "Show password"}
+                aria-label={shown ? tr("onb.hide.password", visitorLang())
+                                  : tr("onb.show.password", visitorLang())}
                 onClick={() => setShown(!shown)}>
-          {shown ? "Hide" : "Show"}
+          {shown ? tr("onb.hide", visitorLang()) : tr("onb.show", visitorLang())}
         </button>
       </span>
     </label>
@@ -242,7 +243,7 @@ function AccountGate() {
         <button className="primary"
                 disabled={busy || !email.trim() || !password || !passwordsMatch}
                 onClick={signup}>
-          {busy ? "Creating…" : tr("onb.create", visitorLang())}
+          {busy ? tr("onb.creating", visitorLang()) : tr("onb.create", visitorLang())}
         </button>
       )}
       {mode === "code" && (<>
@@ -250,7 +251,7 @@ function AccountGate() {
                 onClick={() => run(
                   () => accountApi.verifyEmail({ email: email.trim(), code: code.trim() }),
                   finishSession)}>
-          {busy ? "Checking…" : "Verify & continue"}
+          {busy ? tr("onb.checking", visitorLang()) : tr("onb.verify.go", visitorLang())}
         </button>
         <button className="linkish" disabled={busy}
                 onClick={() => run(() => accountApi.resendCode(email.trim()),
@@ -263,7 +264,7 @@ function AccountGate() {
                 onClick={() => run(
                   () => accountApi.signin({ email: email.trim(), password }),
                   finishSession)}>
-          {busy ? "Signing in…" : tr("onb.signin", visitorLang())}
+          {busy ? tr("onb.signingin", visitorLang()) : tr("onb.signin", visitorLang())}
         </button>
         <button className="linkish" onClick={() => switchMode("reset")}>{tr("onb.forgot", visitorLang())}</button>
       </>)}
@@ -274,7 +275,7 @@ function AccountGate() {
                 onClick={() => run(
                   () => accountApi.resetPassword({ email: email.trim(), code: code.trim(), new_password: password }),
                   () => { switchMode("signin"); setNotice("Password changed — sign in with the new one."); })}>
-          {busy ? "Resetting…" : "Set new password"}
+          {busy ? tr("onb.resetting", visitorLang()) : tr("onb.reset.set", visitorLang())}
         </button>
         <button className="linkish" onClick={() => switchMode("signin")}>{tr("onb.back", visitorLang())}</button>
       </>)}
@@ -391,7 +392,8 @@ function ProfileCreate() {
       <Refusal error={error} variant="inline" />
 
       <button className="primary" disabled={busy || !birthdate} onClick={create}>
-        {busy ? "Creating…" : "Create My Profile"}
+        {busy ? tr("onb.creating", visitorLang())
+              : tr("onb.create.profile", visitorLang())}
       </button>
       <p className="hint">
         {tr("onb.signedin", visitorLang())} <code>{session.accountEmail}</code> {tr("onb.undercount", visitorLang())}
