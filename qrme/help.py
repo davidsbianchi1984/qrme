@@ -91,13 +91,17 @@ TOPICS: dict[str, tuple[tuple[str, ...], str]] = {
     ),
     "memory": (
         ("memory", "remember", "forget", "delete", "erase", "vault",
-         "privacy", "what it knows"),
+         "privacy", "what it knows", "edit", "rewrite", "curate",
+         "delete a message", "strike"),
         "Each profile keeps memory per person, so what it remembers of you is "
         "yours and separate from everyone else's. The Memory Vault lists it, "
         "and you can delete any of it. You can also ask a profile for an "
         "account of what it holds about you — counted from the record, not "
         "guessed — and have it forget one named thing without erasing the "
-        "relationship. Deleting a profile purges its vault records too.",
+        "relationship. Deleting a profile purges its vault records too. The "
+        "transcript itself has checkboxes and a pen: Edit mode deletes the "
+        "turns you tick, and a tap rewrites one in place — the fact of the "
+        "edit is recorded, the old words are not.",
     ),
     "steering_lock": (
         ("steering lock", "lock the dials", "dials locked", "locked dials",

@@ -129,6 +129,21 @@ LESSONS: tuple[dict, ...] = (
               "any of it off. Nothing here runs without an owner enabling it.",
          screens=(14, 15, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40),
          try_it="Open the Control Center and turn one dial."),
+    dict(key="curation", chapter="You are in control",
+         title="The checkboxes and the pen",
+         what="A transcript is a record of a relationship, and the person in "
+              "it may curate it. Edit mode puts a clear box beside every "
+              "turn: tick what should never have been said and delete it — "
+              "scoped to the two of you, so a borrowed id strikes nothing — "
+              "or tap one turn and rewrite it in place. New words face "
+              "moderation exactly like spoken ones. A rewritten profile turn "
+              "drops its synthetic-media credential, because a content-hash "
+              "credential must not vouch for words it never saw. And the "
+              "record keeps the fact of the edit, never the old words: "
+              "deleting is forgetting, not archiving.",
+         screens=(7,),
+         try_it="Open a conversation's memory, press Edit, and rewrite one "
+                "turn."),
     dict(key="model", chapter="You are in control", title="Who is answering",
          what="Every profile's replies come from a model you can see and "
               "change — a tile per provider with its own glyph, one click "
@@ -307,7 +322,12 @@ LESSONS: tuple[dict, ...] = (
               "given, so a bare request with nothing in it closed somebody "
               "else's conversation and handed back any microphone lent inside "
               "it. An id is a claim. Your token is the answer, and the same "
-              "rule already guarded rooms.",
+              "rule already guarded rooms. Matching had a listening problem "
+              "too: a match is made by whichever side arrives second, and the "
+              "first had no way to hear about it — re-joining only re-queued "
+              "them under a fresh name. The waiting side now has its own "
+              "read, and every client polls it while it waits: the answer is "
+              "matched, waiting, or idle, and never a new place in line.",
          screens=(180,),
          try_it="Follow an @handle, then join the friendly queue and see what "
                 "the other person is called."),
@@ -651,7 +671,12 @@ LESSONS: tuple[dict, ...] = (
               "you. You read the message when it happens: it is yours. The "
               "log keeps the shape of the bug and none of the instance. "
               "Before a single report is sent, the app asks, and shows you "
-              "the exact thing it would send.",
+              "the exact thing it would send. And the reports funnel home "
+              "now: with no external collector stamped into the build, the "
+              "console posts to this deployment's own backend, and the same "
+              "card retrieves the aggregate — every client's failures folded "
+              "into counters, no messages to leak — behind QRME_PROBLEMS_KEY, "
+              "or freely from the backend's own machine.",
          screens=(150, 151),
          try_it="Open Control and press 'Show me exactly what would be shared'."),
     dict(key="exchanges", chapter="Working", title="Agreeing before it moves",
@@ -815,7 +840,13 @@ LESSONS: tuple[dict, ...] = (
               "is not hidden beside what is, at the same size. And there are "
               "two ways to end a profile: retire it, and what it meant to the "
               "people who knew it stays readable; or delete it, which gives "
-              "you a receipt itemising every kind of record it erased.",
+              "you a receipt itemising every kind of record it erased. "
+              "Moving a profile is a QR code now too: the export card mints "
+              "a single-use ticket, good for ten minutes, and the code "
+              "carries a ticketed URL and never the owner token — a code on "
+              "a screen is legible to every camera in the room. The bundle "
+              "is served exactly once, and asking for the code's picture "
+              "again does not spend it.",
          screens=(156,),
          try_it="Open Identity and look at the 'not withheld' column."),
     dict(key="presence", chapter="Being yourself",
