@@ -21,7 +21,8 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from .. import authoring, i18n, llm, offline, widgets
-from ..common import profile_or_404, require_owner
+from ..common import (profile_or_404, require_may_publish,
+                      require_may_speak, require_owner)
 
 router = APIRouter()
 
@@ -98,8 +99,14 @@ def authoring_turn(profile_id: str, body: AgentTurn, request: Request) -> dict:
     key is driving their own key, and the house key is the fallback it always
     was.
     """
-    profile_or_404(profile_id)
+    profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    # The page this agent edits is the profile's public face, so the gate is
+    # the publishing one. A departed profile is a memorial — nobody
+    # redecorates a memorial — and a profile restricted pending an objection
+    # review is not putting new work in front of the person contesting it,
+    # whether a person typed the change or a model did.
+    require_may_publish(profile)
     provider = llm.provider_for_profile(profile_id,
                                         cloud=request.app.state.cloud)
     try:
@@ -197,8 +204,12 @@ def run_widget(profile_id: str, widget_id: str, body: WidgetRun,
     was fine; the code was not, and telling those apart is the difference
     between an editor and a wall.
     """
-    profile_or_404(profile_id)
+    profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
+    # The narrower gate: a widget's answer goes to its author and nobody
+    # else, so a contested profile may still run its own code — but a
+    # terminated one does nothing at all, and a memorial does not compute.
+    require_may_speak(profile)
     try:
         answer = widgets.run(profile_id, widget_id, body.inputs)
     except widgets.WidgetError as exc:

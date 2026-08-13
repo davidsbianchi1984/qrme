@@ -3725,6 +3725,21 @@ SCREENS = [
                (None, "shrink", "t2", "Back to app")],
          live_bar=[("mic", "amber"), ("comeup", "green"), ("gift", "gold"),
                    ("heart", "pink"), ("share", "cyan")]),
+    # 196: the Widgets screen. The first card is the box, because "write
+    # your own code here" is a sentence that only means anything once
+    # somebody knows what the code cannot reach — and the second is the
+    # agent, whose steps are shown under its prose for the same reason.
+    dict(num=196, title="Widgets", sub="Tools you write, for your profile only",
+         accent="cyan", tab=2, cards=[
+        dict(icon="shieldok", color="green", k="It runs in a box",
+             s="no network, no files, seconds", pill=("BOXED", "good")),
+        dict(icon="sparkle", color="brand", k="Ask in words",
+             s="ten tools, all of them yours"),
+        dict(icon="list", color="cyan", k="What it did",
+             s="a line per door it went through"),
+        dict(icon="doc", color="amber", k="A new version",
+             s="the one that answered is named"),
+    ], button=("Run it and see", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

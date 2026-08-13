@@ -600,6 +600,24 @@ would actually be.
   </tr>
 </table>
 
+**Widgets — somebody's own code, and the agent that writes it.** A widget is a
+function they wrote, kept against their profile and run on the backend in a box
+with no network, no files but its own, no way to start another program and a
+few seconds of time (`qrme/widgets.py`, proven by sixteen escape attempts in
+`tests/test_the_widget_cannot_leave_its_box.py`). Above the editor is the other
+half: say what you want changed and an agent does it, through the same doors
+you would have used. Its reach is a written list of ten — `qrme/authoring.py` —
+every row resolving to a route a guard checks, and the profile is bound from
+your session rather than named by the model. What it did is listed under what
+it said, because an agent that describes an edit in prose is asking to be
+believed and the steps are the part you can check.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/196-widgets.svg"><img src="docs/screens/196-widgets.svg" width="210" alt="Widgets"></a><br><sub><b>196</b> · Widgets · your own tools, boxed</sub></td>
+  </tr>
+</table>
+
 The strip changes with the room and only with the room. An audio room has no
 gift button because there is no stage to gift at; a posted video has no bell and
 no guest request because there is nobody at a desk to ring and no host to ask.

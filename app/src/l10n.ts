@@ -112,42 +112,114 @@ const CHROME: Table = {
   // `test_the_desktop_and_the_phone_say_different_things` exists to catch —
   // it caught this one. This control moves one card up a stream; it does not
   // leave anything.
-  "nav.studio": { en: "Widgets", es: "Widgets", fr: "Widgets", de: "Widgets", pt: "Widgets", it: "Widget", ja: "ウィジェット", zh: "小工具", hi: "विजेट", ar: "الأدوات" },
-  "hom.studio": { en: "Write your own tool", es: "Escribe tu propia herramienta", fr: "Écrivez votre propre outil", de: "Schreiben Sie Ihr eigenes Werkzeug", pt: "Escreva a sua própria ferramenta", it: "Scrivi il tuo strumento", ja: "自分の道具を作る", zh: "写你自己的工具", hi: "अपना ख़ुद का उपकरण लिखें", ar: "اكتب أداتك الخاصة" },
-  "studio.title": { en: "Widgets", es: "Widgets", fr: "Widgets", de: "Widgets", pt: "Widgets", it: "Widget", ja: "ウィジェット", zh: "小工具", hi: "विजेट", ar: "الأدوات" },
-  "studio.sub": { en: "tools you write, for your profile only", es: "herramientas que escribes, solo para tu perfil", fr: "des outils que vous écrivez, pour votre profil seul", de: "Werkzeuge, die Sie schreiben — nur für Ihr Profil", pt: "ferramentas que escreve, só para o seu perfil", it: "strumenti che scrivi, solo per il tuo profilo", ja: "あなたが書く、あなたのプロフィールだけの道具", zh: "你自己写的工具，只用于你的档案", hi: "आपके लिखे उपकरण, केवल आपकी प्रोफ़ाइल के लिए", ar: "أدوات تكتبها، لملفك وحده" },
-  "studio.yours": { en: "Your widgets", es: "Tus widgets", fr: "Vos widgets", de: "Ihre Widgets", pt: "Os seus widgets", it: "I tuoi widget", ja: "あなたのウィジェット", zh: "你的小工具", hi: "आपके विजेट", ar: "أدواتك" },
-  "studio.none": { en: "None yet. Write one.", es: "Ninguno todavía. Escribe uno.", fr: "Aucun pour l'instant. Écrivez-en un.", de: "Noch keine. Schreiben Sie eines.", pt: "Ainda nenhum. Escreva um.", it: "Ancora nessuno. Scrivine uno.", ja: "まだありません。作ってみてください。", zh: "还没有。写一个吧。", hi: "अभी कोई नहीं। एक लिखें।", ar: "لا شيء بعد. اكتب واحدة." },
-  "studio.new": { en: "New", es: "Nuevo", fr: "Nouveau", de: "Neu", pt: "Novo", it: "Nuovo", ja: "新規", zh: "新建", hi: "नया", ar: "جديدة" },
-  "studio.remove": { en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "إزالة" },
-  "studio.name": { en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名称", hi: "नाम", ar: "الاسم" },
-  "studio.name.ph": { en: "what this one does", es: "qué hace este", fr: "ce que fait celui-ci", de: "was dieses tut", pt: "o que este faz", it: "che cosa fa questo", ja: "この道具の役割", zh: "它做什么", hi: "यह क्या करता है", ar: "ما تفعله هذه" },
-  "studio.source": { en: "Code", es: "Código", fr: "Code", de: "Code", pt: "Código", it: "Codice", ja: "コード", zh: "代码", hi: "कोड", ar: "الشيفرة" },
-  "studio.save": { en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ" },
-  "studio.saving": { en: "Saving…", es: "Guardando…", fr: "Enregistrement…", de: "Wird gespeichert…", pt: "A guardar…", it: "Salvataggio…", ja: "保存中…", zh: "保存中…", hi: "सहेजा जा रहा है…", ar: "جارٍ الحفظ…" },
-  "studio.run": { en: "Run", es: "Ejecutar", fr: "Exécuter", de: "Ausführen", pt: "Executar", it: "Esegui", ja: "実行", zh: "运行", hi: "चलाएँ", ar: "تشغيل" },
-  "studio.limits.line": { en: "Each run may spend {seconds} seconds and {memory} MB, and hold {size} KB of code.", es: "Cada ejecución puede gastar {seconds} segundos y {memory} MB, y guardar {size} KB de código.", fr: "Chaque exécution peut dépenser {seconds} secondes et {memory} Mo, et garder {size} Ko de code.", de: "Jeder Lauf darf {seconds} Sekunden und {memory} MB verbrauchen und {size} KB Code halten.", pt: "Cada execução pode gastar {seconds} segundos e {memory} MB, e guardar {size} KB de código.", it: "Ogni esecuzione può spendere {seconds} secondi e {memory} MB, e conservare {size} KB di codice.", ja: "1回の実行で使えるのは {seconds} 秒と {memory} MB、コードは {size} KB までです。", zh: "每次运行可用 {seconds} 秒、{memory} MB，代码最多 {size} KB。", hi: "हर बार चलाने पर {seconds} सेकंड, {memory} MB, और {size} KB तक कोड।", ar: "كل تشغيل يمكنه استهلاك {seconds} ثانية و{memory} ميغابايت، والاحتفاظ بـ {size} كيلوبايت من الشيفرة." },
-  "studio.version": { en: "version {n}", es: "versión {n}", fr: "version {n}", de: "Fassung {n}", pt: "versão {n}", it: "versione {n}", ja: "バージョン {n}", zh: "版本 {n}", hi: "संस्करण {n}", ar: "الإصدار {n}" },
-  "studio.took": { en: "took {ms} ms", es: "tardó {ms} ms", fr: "a pris {ms} ms", de: "brauchte {ms} ms", pt: "demorou {ms} ms", it: "ha impiegato {ms} ms", ja: "{ms} ミリ秒かかりました", zh: "用时 {ms} 毫秒", hi: "{ms} मि.से. लगे", ar: "استغرقت {ms} مللي ثانية" },
-  "studio.walls": { en: "Your widget runs with no network, no files but its own, and no way to start another program. It cannot reach anybody else's profile, and nobody else's can reach yours.", es: "Tu widget se ejecuta sin red, sin más archivos que los suyos y sin poder iniciar otro programa. No puede llegar al perfil de nadie más, ni el de nadie más al tuyo.", fr: "Votre widget s'exécute sans réseau, sans autres fichiers que les siens, et sans pouvoir lancer un autre programme. Il ne peut atteindre le profil de personne d'autre, ni celui de personne le vôtre.", de: "Ihr Widget läuft ohne Netzwerk, ohne fremde Dateien und ohne die Möglichkeit, ein anderes Programm zu starten. Es erreicht kein fremdes Profil, und keines erreicht Ihres.", pt: "O seu widget corre sem rede, sem outros ficheiros além dos seus e sem poder iniciar outro programa. Não chega ao perfil de mais ninguém, nem o de ninguém chega ao seu.", it: "Il tuo widget gira senza rete, senza file che non siano i suoi e senza poter avviare un altro programma. Non raggiunge il profilo di nessun altro, né quello di altri raggiunge il tuo.", ja: "ウィジェットはネットワークなし、自分のファイル以外なし、別のプログラムを起動する手段なしで動きます。他人のプロフィールには届かず、他人のものもあなたには届きません。", zh: "你的小工具在没有网络、没有自身之外的文件、也无法启动其他程序的环境中运行。它接触不到别人的档案，别人的也接触不到你的。", hi: "आपका विजेट बिना नेटवर्क, अपनी फ़ाइलों के अलावा कुछ नहीं, और कोई दूसरा प्रोग्राम शुरू किए बिना चलता है। यह किसी और की प्रोफ़ाइल तक नहीं पहुँचता, न किसी और का आपकी तक।", ar: "تعمل أداتك دون شبكة، ودون ملفات غير ملفاتها، ودون القدرة على تشغيل برنامج آخر. لا تصل إلى ملف أي شخص آخر، ولا يصل ملف أحد إليك." },
-  "studio.owneronly": { en: "Sign in as the owner of a profile to write widgets for it.", es: "Inicia sesión como propietario de un perfil para escribir widgets.", fr: "Connectez-vous en tant que propriétaire d'un profil pour y écrire des widgets.", de: "Melden Sie sich als Eigentümer eines Profils an, um Widgets dafür zu schreiben.", pt: "Inicie sessão como proprietário de um perfil para escrever widgets.", it: "Accedi come proprietario di un profilo per scrivere widget.", ja: "ウィジェットを書くには、プロフィールの持ち主としてサインインしてください。", zh: "以档案所有者身份登录后才能编写小工具。", hi: "विजेट लिखने के लिए प्रोफ़ाइल के स्वामी के रूप में साइन इन करें।", ar: "سجّل الدخول بصفتك مالك ملف لتكتب له أدوات." },
-  "studio.noBox": { en: "This deployment cannot build the box a widget runs in, so nothing will run here. You can still write and keep them.", es: "Esta instalación no puede construir la caja donde se ejecuta un widget, así que aquí no se ejecutará nada. Aun así puedes escribirlos y guardarlos.", fr: "Ce déploiement ne peut pas construire la boîte dans laquelle s'exécute un widget ; rien ne s'exécutera ici. Vous pouvez tout de même les écrire et les garder.", de: "Diese Installation kann die Box, in der ein Widget läuft, nicht bauen — hier läuft nichts. Schreiben und behalten können Sie sie trotzdem.", pt: "Esta instalação não consegue construir a caixa onde um widget corre, por isso nada correrá aqui. Ainda assim pode escrevê-los e guardá-los.", it: "Questa installazione non può costruire la scatola in cui gira un widget, quindi qui non girerà nulla. Puoi comunque scriverli e conservarli.", ja: "この配備ではウィジェットを走らせる箱を作れないため、ここでは何も実行されません。作成と保存はできます。", zh: "本部署无法构建运行小工具的沙箱，因此这里不会运行任何东西。你仍然可以编写并保存。", hi: "यह डिप्लॉयमेंट वह बॉक्स नहीं बना सकता जिसमें विजेट चलता है, इसलिए यहाँ कुछ नहीं चलेगा। आप फिर भी लिख और रख सकते हैं।", ar: "لا يستطيع هذا النشر بناء الصندوق الذي تعمل فيه الأداة، لذا لن يُشغَّل شيء هنا. لا يزال بإمكانك كتابتها والاحتفاظ بها." },
-  "studio.truncated": { en: "Your widget returned more than can be shown.", es: "Tu widget devolvió más de lo que se puede mostrar.", fr: "Votre widget a renvoyé plus que ce qui peut être affiché.", de: "Ihr Widget hat mehr zurückgegeben, als angezeigt werden kann.", pt: "O seu widget devolveu mais do que é possível mostrar.", it: "Il tuo widget ha restituito più di quanto si possa mostrare.", ja: "ウィジェットの戻り値が表示できる量を超えました。", zh: "小工具返回的内容超出可显示的大小。", hi: "आपके विजेट ने दिखाने योग्य से अधिक लौटाया।", ar: "أعادت أداتك أكثر مما يمكن عرضه." },
-  "studio.status.ok": { en: "It ran", es: "Se ejecutó", fr: "Exécuté", de: "Gelaufen", pt: "Executou", it: "Eseguito", ja: "実行しました", zh: "已运行", hi: "चल गया", ar: "عملت" },
-  "studio.status.error": { en: "It stopped on an error", es: "Se detuvo por un error", fr: "Arrêté sur une erreur", de: "Mit einem Fehler gestoppt", pt: "Parou com um erro", it: "Si è fermato per un errore", ja: "エラーで止まりました", zh: "因错误停止", hi: "त्रुटि पर रुका", ar: "توقفت عند خطأ" },
-  "studio.status.timeout": { en: "It ran too long", es: "Se ejecutó demasiado tiempo", fr: "Trop long à s'exécuter", de: "Zu lange gelaufen", pt: "Demorou demasiado", it: "Ha girato troppo a lungo", ja: "時間がかかりすぎました", zh: "运行时间过长", hi: "बहुत देर तक चला", ar: "استغرقت وقتًا أطول من المسموح" },
-  "studio.status.killed": { en: "It was stopped", es: "Fue detenido", fr: "Il a été arrêté", de: "Es wurde gestoppt", pt: "Foi parado", it: "È stato fermato", ja: "停止されました", zh: "已被停止", hi: "रोक दिया गया", ar: "أُوقفت" },
-  "studio.status.refused": { en: "It did not run", es: "No se ejecutó", fr: "Il n'a pas été exécuté", de: "Es lief nicht", pt: "Não foi executado", it: "Non è stato eseguito", ja: "実行されませんでした", zh: "未运行", hi: "चला ही नहीं", ar: "لم تُشغَّل" },
-  "studio.ask.title": { en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sagen Sie es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات" },
-  "studio.ask.sub": { en: "Say what you would like changed and it will do it, through the same doors you use yourself.", es: "Di qué quieres cambiar y lo hará, por las mismas puertas que usas tú.", fr: "Dites ce que vous voulez changer et il le fera, par les mêmes portes que vous.", de: "Sagen Sie, was Sie ändern möchten — es geht durch dieselben Türen wie Sie selbst.", pt: "Diga o que quer mudar e ele fá-lo-á, pelas mesmas portas que você usa.", it: "Dì che cosa vuoi cambiare e lo farà, dalle stesse porte che usi tu.", ja: "変えたいことを書いてください。あなた自身が通るのと同じ入口を通って実行します。", zh: "说出你想改动什么，它会照做 — 走的是你自己也走的那些入口。", hi: "बताइए आप क्या बदलना चाहते हैं; यह वही रास्ते इस्तेमाल करके कर देगा जो आप ख़ुद इस्तेमाल करते हैं।", ar: "قل ما تريد تغييره وسيفعله، عبر الأبواب نفسها التي تستخدمها أنت." },
-  "studio.ask.ph": { en: "Make my page darker, and put Ana in my Top 8", es: "Oscurece mi página y pon a Ana en mi Top 8", fr: "Assombris ma page et mets Ana dans mon Top 8", de: "Mach meine Seite dunkler und setz Ana in meine Top 8", pt: "Escurece a minha página e põe a Ana no meu Top 8", it: "Rendi la mia pagina più scura e metti Ana nella mia Top 8", ja: "ページをもっと暗くして、Ana をトップ 8 に入れて", zh: "把我的页面调暗一些，并把 Ana 放进我的前八位", hi: "मेरा पेज गहरा कर दो, और Ana को मेरे टॉप 8 में डाल दो", ar: "اجعل صفحتي أغمق، وضع Ana ضمن أفضل ٨ لدي" },
-  "studio.ask.go": { en: "Ask", es: "Pedir", fr: "Demander", de: "Fragen", pt: "Pedir", it: "Chiedi", ja: "頼む", zh: "发送", hi: "कहें", ar: "اطلب" },
-  "studio.ask.working": { en: "Working…", es: "Trabajando…", fr: "En cours…", de: "Arbeitet…", pt: "A trabalhar…", it: "Sto lavorando…", ja: "作業中…", zh: "正在处理…", hi: "काम चल रहा है…", ar: "جارٍ العمل…" },
-  "studio.ask.forget": { en: "Forget this conversation", es: "Olvidar esta conversación", fr: "Oublier cette conversation", de: "Dieses Gespräch vergessen", pt: "Esquecer esta conversa", it: "Dimentica questa conversazione", ja: "この会話を忘れる", zh: "忘掉这段对话", hi: "यह बातचीत भूल जाइए", ar: "انسَ هذه المحادثة" },
-  "studio.ask.nomodel": { en: "No model is configured here, so it cannot answer. Bring your own key in Settings.", es: "Aquí no hay ningún modelo configurado, así que no puede responder. Trae tu propia clave en Ajustes.", fr: "Aucun modèle n'est configuré ici, il ne peut donc pas répondre. Apportez votre propre clé dans les Réglages.", de: "Hier ist kein Modell eingerichtet, es kann also nicht antworten. Hinterlegen Sie Ihren eigenen Schlüssel in den Einstellungen.", pt: "Não há aqui nenhum modelo configurado, por isso não pode responder. Traga a sua própria chave nas Definições.", it: "Qui non è configurato alcun modello, quindi non può rispondere. Porta la tua chiave nelle Impostazioni.", ja: "ここではモデルが設定されていないため、応答できません。設定でご自身のキーを登録してください。", zh: "这里没有配置模型，因此无法回应。请在设置中填入你自己的密钥。", hi: "यहाँ कोई मॉडल कॉन्फ़िगर नहीं है, इसलिए यह उत्तर नहीं दे सकता। सेटिंग्स में अपनी कुंजी डालिए।", ar: "لا يوجد نموذج مُهيّأ هنا، لذا لا يمكنه الإجابة. أضِف مفتاحك الخاص من الإعدادات." },
-  "studio.reach.show": { en: "What it can touch", es: "Qué puede tocar", fr: "Ce qu'il peut toucher", de: "Woran es darf", pt: "Ao que pode tocar", it: "Che cosa può toccare", ja: "触れられる範囲", zh: "它能动哪些东西", hi: "यह किन चीज़ों तक पहुँचता है", ar: "ما الذي يمكنه المساس به" },
-  "studio.reach.hide": { en: "Hide the list", es: "Ocultar la lista", fr: "Masquer la liste", de: "Liste ausblenden", pt: "Ocultar a lista", it: "Nascondi l'elenco", ja: "一覧を閉じる", zh: "收起列表", hi: "सूची छिपाएँ", ar: "إخفاء القائمة" },
-  "studio.step": { en: "{tool} — answered {code}", es: "{tool} — respondió {code}", fr: "{tool} — a répondu {code}", de: "{tool} — antwortete {code}", pt: "{tool} — respondeu {code}", it: "{tool} — ha risposto {code}", ja: "{tool} — 応答 {code}", zh: "{tool} — 返回 {code}", hi: "{tool} — उत्तर {code}", ar: "{tool} — أجاب {code}" },
+  "nav.studio": {
+    en: "Widgets", es: "Widgets", fr: "Widgets", de: "Widgets", pt: "Widgets", it: "Widget", ja: "ウィジェット", zh: "小工具", hi: "विजेट", ar: "الأدوات",
+  },
+  "hom.studio": {
+    en: "Write your own tool", es: "Escribe tu propia herramienta", fr: "Écrivez votre propre outil", de: "Schreiben Sie Ihr eigenes Werkzeug", pt: "Escreva a sua própria ferramenta", it: "Scrivi il tuo strumento", ja: "自分の道具を作る", zh: "写你自己的工具", hi: "अपना ख़ुद का उपकरण लिखें", ar: "اكتب أداتك الخاصة",
+  },
+  "studio.title": {
+    en: "Widgets", es: "Widgets", fr: "Widgets", de: "Widgets", pt: "Widgets", it: "Widget", ja: "ウィジェット", zh: "小工具", hi: "विजेट", ar: "الأدوات",
+  },
+  "studio.sub": {
+    en: "tools you write, for your profile only", es: "herramientas que escribes, solo para tu perfil", fr: "des outils que vous écrivez, pour votre profil seul", de: "Werkzeuge, die Sie schreiben — nur für Ihr Profil", pt: "ferramentas que escreve, só para o seu perfil", it: "strumenti che scrivi, solo per il tuo profilo", ja: "あなたが書く、あなたのプロフィールだけの道具", zh: "你自己写的工具，只用于你的档案", hi: "आपके लिखे उपकरण, केवल आपकी प्रोफ़ाइल के लिए", ar: "أدوات تكتبها، لملفك وحده",
+  },
+  "studio.yours": {
+    en: "Your widgets", es: "Tus widgets", fr: "Vos widgets", de: "Ihre Widgets", pt: "Os seus widgets", it: "I tuoi widget", ja: "あなたのウィジェット", zh: "你的小工具", hi: "आपके विजेट", ar: "أدواتك",
+  },
+  "studio.none": {
+    en: "None yet. Write one.", es: "Ninguno todavía. Escribe uno.", fr: "Aucun pour l'instant. Écrivez-en un.", de: "Noch keine. Schreiben Sie eines.", pt: "Ainda nenhum. Escreva um.", it: "Ancora nessuno. Scrivine uno.", ja: "まだありません。作ってみてください。", zh: "还没有。写一个吧。", hi: "अभी कोई नहीं। एक लिखें।", ar: "لا شيء بعد. اكتب واحدة.",
+  },
+  "studio.new": {
+    en: "New", es: "Nuevo", fr: "Nouveau", de: "Neu", pt: "Novo", it: "Nuovo", ja: "新規", zh: "新建", hi: "नया", ar: "جديدة",
+  },
+  "studio.remove": {
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "إزالة",
+  },
+  "studio.name": {
+    en: "Name", es: "Nombre", fr: "Nom", de: "Name", pt: "Nome", it: "Nome", ja: "名前", zh: "名称", hi: "नाम", ar: "الاسم",
+  },
+  "studio.name.ph": {
+    en: "what this one does", es: "qué hace este", fr: "ce que fait celui-ci", de: "was dieses tut", pt: "o que este faz", it: "che cosa fa questo", ja: "この道具の役割", zh: "它做什么", hi: "यह क्या करता है", ar: "ما تفعله هذه",
+  },
+  "studio.source": {
+    en: "Code", es: "Código", fr: "Code", de: "Code", pt: "Código", it: "Codice", ja: "コード", zh: "代码", hi: "कोड", ar: "الشيفرة",
+  },
+  "studio.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
+  },
+  "studio.saving": {
+    en: "Saving…", es: "Guardando…", fr: "Enregistrement…", de: "Wird gespeichert…", pt: "A guardar…", it: "Salvataggio…", ja: "保存中…", zh: "保存中…", hi: "सहेजा जा रहा है…", ar: "جارٍ الحفظ…",
+  },
+  "studio.run": {
+    en: "Run", es: "Ejecutar", fr: "Exécuter", de: "Ausführen", pt: "Executar", it: "Esegui", ja: "実行", zh: "运行", hi: "चलाएँ", ar: "تشغيل",
+  },
+  "studio.limits.line": {
+    en: "Each run may spend {seconds} seconds and {memory} MB, and hold {size} KB of code.", es: "Cada ejecución puede gastar {seconds} segundos y {memory} MB, y guardar {size} KB de código.", fr: "Chaque exécution peut dépenser {seconds} secondes et {memory} Mo, et garder {size} Ko de code.", de: "Jeder Lauf darf {seconds} Sekunden und {memory} MB verbrauchen und {size} KB Code halten.", pt: "Cada execução pode gastar {seconds} segundos e {memory} MB, e guardar {size} KB de código.", it: "Ogni esecuzione può spendere {seconds} secondi e {memory} MB, e conservare {size} KB di codice.", ja: "1回の実行で使えるのは {seconds} 秒と {memory} MB、コードは {size} KB までです。", zh: "每次运行可用 {seconds} 秒、{memory} MB，代码最多 {size} KB。", hi: "हर बार चलाने पर {seconds} सेकंड, {memory} MB, और {size} KB तक कोड।", ar: "كل تشغيل يمكنه استهلاك {seconds} ثانية و{memory} ميغابايت، والاحتفاظ بـ {size} كيلوبايت من الشيفرة.",
+  },
+  "studio.version": {
+    en: "version {n}", es: "versión {n}", fr: "version {n}", de: "Fassung {n}", pt: "versão {n}", it: "versione {n}", ja: "バージョン {n}", zh: "版本 {n}", hi: "संस्करण {n}", ar: "الإصدار {n}",
+  },
+  "studio.took": {
+    en: "took {ms} ms", es: "tardó {ms} ms", fr: "a pris {ms} ms", de: "brauchte {ms} ms", pt: "demorou {ms} ms", it: "ha impiegato {ms} ms", ja: "{ms} ミリ秒かかりました", zh: "用时 {ms} 毫秒", hi: "{ms} मि.से. लगे", ar: "استغرقت {ms} مللي ثانية",
+  },
+  "studio.walls": {
+    en: "Your widget runs with no network, no files but its own, and no way to start another program. It cannot reach anybody else's profile, and nobody else's can reach yours.", es: "Tu widget se ejecuta sin red, sin más archivos que los suyos y sin poder iniciar otro programa. No puede llegar al perfil de nadie más, ni el de nadie más al tuyo.", fr: "Votre widget s'exécute sans réseau, sans autres fichiers que les siens, et sans pouvoir lancer un autre programme. Il ne peut atteindre le profil de personne d'autre, ni celui de personne le vôtre.", de: "Ihr Widget läuft ohne Netzwerk, ohne fremde Dateien und ohne die Möglichkeit, ein anderes Programm zu starten. Es erreicht kein fremdes Profil, und keines erreicht Ihres.", pt: "O seu widget corre sem rede, sem outros ficheiros além dos seus e sem poder iniciar outro programa. Não chega ao perfil de mais ninguém, nem o de ninguém chega ao seu.", it: "Il tuo widget gira senza rete, senza file che non siano i suoi e senza poter avviare un altro programma. Non raggiunge il profilo di nessun altro, né quello di altri raggiunge il tuo.", ja: "ウィジェットはネットワークなし、自分のファイル以外なし、別のプログラムを起動する手段なしで動きます。他人のプロフィールには届かず、他人のものもあなたには届きません。", zh: "你的小工具在没有网络、没有自身之外的文件、也无法启动其他程序的环境中运行。它接触不到别人的档案，别人的也接触不到你的。", hi: "आपका विजेट बिना नेटवर्क, अपनी फ़ाइलों के अलावा कुछ नहीं, और कोई दूसरा प्रोग्राम शुरू किए बिना चलता है। यह किसी और की प्रोफ़ाइल तक नहीं पहुँचता, न किसी और का आपकी तक।", ar: "تعمل أداتك دون شبكة، ودون ملفات غير ملفاتها، ودون القدرة على تشغيل برنامج آخر. لا تصل إلى ملف أي شخص آخر، ولا يصل ملف أحد إليك.",
+  },
+  "studio.owneronly": {
+    en: "Sign in as the owner of a profile to write widgets for it.", es: "Inicia sesión como propietario de un perfil para escribir widgets.", fr: "Connectez-vous en tant que propriétaire d'un profil pour y écrire des widgets.", de: "Melden Sie sich als Eigentümer eines Profils an, um Widgets dafür zu schreiben.", pt: "Inicie sessão como proprietário de um perfil para escrever widgets.", it: "Accedi come proprietario di un profilo per scrivere widget.", ja: "ウィジェットを書くには、プロフィールの持ち主としてサインインしてください。", zh: "以档案所有者身份登录后才能编写小工具。", hi: "विजेट लिखने के लिए प्रोफ़ाइल के स्वामी के रूप में साइन इन करें।", ar: "سجّل الدخول بصفتك مالك ملف لتكتب له أدوات.",
+  },
+  "studio.noBox": {
+    en: "This deployment cannot build the box a widget runs in, so nothing will run here. You can still write and keep them.", es: "Esta instalación no puede construir la caja donde se ejecuta un widget, así que aquí no se ejecutará nada. Aun así puedes escribirlos y guardarlos.", fr: "Ce déploiement ne peut pas construire la boîte dans laquelle s'exécute un widget ; rien ne s'exécutera ici. Vous pouvez tout de même les écrire et les garder.", de: "Diese Installation kann die Box, in der ein Widget läuft, nicht bauen — hier läuft nichts. Schreiben und behalten können Sie sie trotzdem.", pt: "Esta instalação não consegue construir a caixa onde um widget corre, por isso nada correrá aqui. Ainda assim pode escrevê-los e guardá-los.", it: "Questa installazione non può costruire la scatola in cui gira un widget, quindi qui non girerà nulla. Puoi comunque scriverli e conservarli.", ja: "この配備ではウィジェットを走らせる箱を作れないため、ここでは何も実行されません。作成と保存はできます。", zh: "本部署无法构建运行小工具的沙箱，因此这里不会运行任何东西。你仍然可以编写并保存。", hi: "यह डिप्लॉयमेंट वह बॉक्स नहीं बना सकता जिसमें विजेट चलता है, इसलिए यहाँ कुछ नहीं चलेगा। आप फिर भी लिख और रख सकते हैं।", ar: "لا يستطيع هذا النشر بناء الصندوق الذي تعمل فيه الأداة، لذا لن يُشغَّل شيء هنا. لا يزال بإمكانك كتابتها والاحتفاظ بها.",
+  },
+  "studio.truncated": {
+    en: "Your widget returned more than can be shown.", es: "Tu widget devolvió más de lo que se puede mostrar.", fr: "Votre widget a renvoyé plus que ce qui peut être affiché.", de: "Ihr Widget hat mehr zurückgegeben, als angezeigt werden kann.", pt: "O seu widget devolveu mais do que é possível mostrar.", it: "Il tuo widget ha restituito più di quanto si possa mostrare.", ja: "ウィジェットの戻り値が表示できる量を超えました。", zh: "小工具返回的内容超出可显示的大小。", hi: "आपके विजेट ने दिखाने योग्य से अधिक लौटाया।", ar: "أعادت أداتك أكثر مما يمكن عرضه.",
+  },
+  "studio.status.ok": {
+    en: "It ran", es: "Se ejecutó", fr: "Exécuté", de: "Gelaufen", pt: "Executou", it: "Eseguito", ja: "実行しました", zh: "已运行", hi: "चल गया", ar: "عملت",
+  },
+  "studio.status.error": {
+    en: "It stopped on an error", es: "Se detuvo por un error", fr: "Arrêté sur une erreur", de: "Mit einem Fehler gestoppt", pt: "Parou com um erro", it: "Si è fermato per un errore", ja: "エラーで止まりました", zh: "因错误停止", hi: "त्रुटि पर रुका", ar: "توقفت عند خطأ",
+  },
+  "studio.status.timeout": {
+    en: "It ran too long", es: "Se ejecutó demasiado tiempo", fr: "Trop long à s'exécuter", de: "Zu lange gelaufen", pt: "Demorou demasiado", it: "Ha girato troppo a lungo", ja: "時間がかかりすぎました", zh: "运行时间过长", hi: "बहुत देर तक चला", ar: "استغرقت وقتًا أطول من المسموح",
+  },
+  "studio.status.killed": {
+    en: "It was stopped", es: "Fue detenido", fr: "Il a été arrêté", de: "Es wurde gestoppt", pt: "Foi parado", it: "È stato fermato", ja: "停止されました", zh: "已被停止", hi: "रोक दिया गया", ar: "أُوقفت",
+  },
+  "studio.status.refused": {
+    en: "It did not run", es: "No se ejecutó", fr: "Il n'a pas été exécuté", de: "Es lief nicht", pt: "Não foi executado", it: "Non è stato eseguito", ja: "実行されませんでした", zh: "未运行", hi: "चला ही नहीं", ar: "لم تُشغَّل",
+  },
+  "studio.ask.title": {
+    en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sagen Sie es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
+  },
+  "studio.ask.sub": {
+    en: "Say what you would like changed and it will do it, through the same doors you use yourself.", es: "Di qué quieres cambiar y lo hará, por las mismas puertas que usas tú.", fr: "Dites ce que vous voulez changer et il le fera, par les mêmes portes que vous.", de: "Sagen Sie, was Sie ändern möchten — es geht durch dieselben Türen wie Sie selbst.", pt: "Diga o que quer mudar e ele fá-lo-á, pelas mesmas portas que você usa.", it: "Dì che cosa vuoi cambiare e lo farà, dalle stesse porte che usi tu.", ja: "変えたいことを書いてください。あなた自身が通るのと同じ入口を通って実行します。", zh: "说出你想改动什么，它会照做 — 走的是你自己也走的那些入口。", hi: "बताइए आप क्या बदलना चाहते हैं; यह वही रास्ते इस्तेमाल करके कर देगा जो आप ख़ुद इस्तेमाल करते हैं।", ar: "قل ما تريد تغييره وسيفعله، عبر الأبواب نفسها التي تستخدمها أنت.",
+  },
+  "studio.ask.ph": {
+    en: "Make my page darker, and put Ana in my Top 8", es: "Oscurece mi página y pon a Ana en mi Top 8", fr: "Assombris ma page et mets Ana dans mon Top 8", de: "Mach meine Seite dunkler und setz Ana in meine Top 8", pt: "Escurece a minha página e põe a Ana no meu Top 8", it: "Rendi la mia pagina più scura e metti Ana nella mia Top 8", ja: "ページをもっと暗くして、Ana をトップ 8 に入れて", zh: "把我的页面调暗一些，并把 Ana 放进我的前八位", hi: "मेरा पेज गहरा कर दो, और Ana को मेरे टॉप 8 में डाल दो", ar: "اجعل صفحتي أغمق، وضع Ana ضمن أفضل ٨ لدي",
+  },
+  "studio.ask.go": {
+    en: "Ask", es: "Pedir", fr: "Demander", de: "Fragen", pt: "Pedir", it: "Chiedi", ja: "頼む", zh: "发送", hi: "कहें", ar: "اطلب",
+  },
+  "studio.ask.working": {
+    en: "Working…", es: "Trabajando…", fr: "En cours…", de: "Arbeitet…", pt: "A trabalhar…", it: "Sto lavorando…", ja: "作業中…", zh: "正在处理…", hi: "काम चल रहा है…", ar: "جارٍ العمل…",
+  },
+  "studio.ask.forget": {
+    en: "Forget this conversation", es: "Olvidar esta conversación", fr: "Oublier cette conversation", de: "Dieses Gespräch vergessen", pt: "Esquecer esta conversa", it: "Dimentica questa conversazione", ja: "この会話を忘れる", zh: "忘掉这段对话", hi: "यह बातचीत भूल जाइए", ar: "انسَ هذه المحادثة",
+  },
+  "studio.ask.nomodel": {
+    en: "No model is configured here, so it cannot answer. Bring your own key in Settings.", es: "Aquí no hay ningún modelo configurado, así que no puede responder. Trae tu propia clave en Ajustes.", fr: "Aucun modèle n'est configuré ici, il ne peut donc pas répondre. Apportez votre propre clé dans les Réglages.", de: "Hier ist kein Modell eingerichtet, es kann also nicht antworten. Hinterlegen Sie Ihren eigenen Schlüssel in den Einstellungen.", pt: "Não há aqui nenhum modelo configurado, por isso não pode responder. Traga a sua própria chave nas Definições.", it: "Qui non è configurato alcun modello, quindi non può rispondere. Porta la tua chiave nelle Impostazioni.", ja: "ここではモデルが設定されていないため、応答できません。設定でご自身のキーを登録してください。", zh: "这里没有配置模型，因此无法回应。请在设置中填入你自己的密钥。", hi: "यहाँ कोई मॉडल कॉन्फ़िगर नहीं है, इसलिए यह उत्तर नहीं दे सकता। सेटिंग्स में अपनी कुंजी डालिए।", ar: "لا يوجد نموذج مُهيّأ هنا، لذا لا يمكنه الإجابة. أضِف مفتاحك الخاص من الإعدادات.",
+  },
+  "studio.reach.show": {
+    en: "What it can touch", es: "Qué puede tocar", fr: "Ce qu'il peut toucher", de: "Woran es darf", pt: "Ao que pode tocar", it: "Che cosa può toccare", ja: "触れられる範囲", zh: "它能动哪些东西", hi: "यह किन चीज़ों तक पहुँचता है", ar: "ما الذي يمكنه المساس به",
+  },
+  "studio.reach.hide": {
+    en: "Hide the list", es: "Ocultar la lista", fr: "Masquer la liste", de: "Liste ausblenden", pt: "Ocultar a lista", it: "Nascondi l'elenco", ja: "一覧を閉じる", zh: "收起列表", hi: "सूची छिपाएँ", ar: "إخفاء القائمة",
+  },
+  "studio.step": {
+    en: "{tool} — answered {code}", es: "{tool} — respondió {code}", fr: "{tool} — a répondu {code}", de: "{tool} — antwortete {code}", pt: "{tool} — respondeu {code}", it: "{tool} — ha risposto {code}", ja: "{tool} — 応答 {code}", zh: "{tool} — 返回 {code}", hi: "{tool} — उत्तर {code}", ar: "{tool} — أجاب {code}",
+  },
   "feed.autoplay": {
     en: "Play videos from other platforms automatically",
     es: "Reproducir automáticamente los vídeos de otras plataformas",

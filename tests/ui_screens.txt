@@ -105,6 +105,7 @@ Access          193
 Shops           187
 Corner          188
 Feed            189,190,191
+Studio          196
 ProviderTiles   22
 
 Problems        150
