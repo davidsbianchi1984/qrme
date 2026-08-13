@@ -4621,6 +4621,18 @@ const CHROME: Table = {
   "wp.party.note": {
     en: "An id is the private door — for jumping into a specific room somebody shared with you.", es: "Un id es la puerta privada — para entrar en una sala concreta que alguien compartió contigo.", fr: "Un id est la porte privée — pour rejoindre une séance précise que quelqu'un a partagée avec vous.", de: "Eine ID ist die private Tür — um in einen bestimmten Raum zu springen, den jemand mit dir geteilt hat.", pt: "Um id é a porta privada — para entrar numa sessão específica que alguém partilhou contigo.", it: "Un id è la porta privata — per entrare in una stanza precisa che qualcuno ha condiviso con te.", ja: "IDはプライベートな入口です — 誰かに共有された特定のルームに入るためのものです。", zh: "ID 是私密入口 — 用于进入别人分享给你的特定放映会。", hi: "आईडी निजी दरवाज़ा है — किसी के साझा किए गए खास कमरे में जाने के लिए।", ar: "المعرّف هو الباب الخاص — للدخول إلى جلسة محددة شاركها معك أحدهم.",
   },
+  "wp.announce": {
+    en: "Announce it", es: "Anunciarla", fr: "L'annoncer", de: "Ankündigen", pt: "Anunciá-la", it: "Annunciala", ja: "告知する", zh: "发布公告", hi: "घोषणा करें", ar: "أعلن عنها",
+  },
+  "wp.announce.ph": {
+    en: "the id of a profile you own", es: "el id de un perfil tuyo", fr: "l'id d'un de vos profils", de: "die ID eines deiner Profile", pt: "o id de um perfil teu", it: "l'id di un tuo profilo", ja: "自分のプロフィールのID", zh: "你拥有的档案 ID", hi: "आपकी अपनी प्रोफ़ाइल की आईडी", ar: "معرّف ملف تملكه",
+  },
+  "wp.announce.said": {
+    en: "Posted — the party's title and video are on that wall now.", es: "Publicado — el título y el vídeo de la sala ya están en ese muro.", fr: "Publié — le titre et la vidéo de la séance sont sur ce mur.", de: "Gepostet — Titel und Video der Party stehen jetzt auf dieser Pinnwand.", pt: "Publicado — o título e o vídeo da sessão já estão nesse mural.", it: "Pubblicato — il titolo e il video della festa sono ora su quella bacheca.", ja: "投稿しました — パーティのタイトルと動画がそのウォールに載りました。", zh: "已发布 — 放映会的标题和视频已在那面墙上。", hi: "पोस्ट हो गया — पार्टी का शीर्षक और वीडियो अब उस वॉल पर हैं।", ar: "نُشر — عنوان الجلسة وفيديوها الآن على ذلك الجدار.",
+  },
+  "wp.announce.note": {
+    en: "An announcement is an ordinary wall post: the party's title as the words, its video attached, through the same moderation and the same mark.", es: "Un anuncio es una publicación normal del muro: el título de la sala como texto, su vídeo adjunto, con la misma moderación y la misma marca.", fr: "Une annonce est un post de mur ordinaire : le titre de la séance comme texte, sa vidéo jointe, avec la même modération et la même marque.", de: "Eine Ankündigung ist ein gewöhnlicher Pinnwand-Post: der Titel der Party als Text, ihr Video angehängt, durch dieselbe Moderation und mit derselben Kennzeichnung.", pt: "Um anúncio é uma publicação normal do mural: o título da sessão como texto, o vídeo anexado, com a mesma moderação e a mesma marca.", it: "Un annuncio è un normale post in bacheca: il titolo della festa come testo, il suo video allegato, con la stessa moderazione e lo stesso contrassegno.", ja: "告知は普通のウォール投稿です。パーティのタイトルが本文、動画が添付され、同じモデレーションと同じマークを通ります。", zh: "公告就是一条普通的墙上帖子：放映会标题为正文，附带其视频，经过同样的审核、带同样的标记。", hi: "घोषणा एक सामान्य वॉल पोस्ट है: पार्टी का शीर्षक शब्दों के रूप में, उसका वीडियो संलग्न, उसी मॉडरेशन और उसी चिह्न के साथ।", ar: "الإعلان منشور جدار عادي: عنوان الجلسة نصًا وفيديوها مرفقًا، عبر الإشراف نفسه والعلامة نفسها.",
+  },
   "wp.pub.title": {
     en: "Open to everyone", es: "Abiertas a todos", fr: "Ouvertes à tous", de: "Offen für alle", pt: "Abertas a todos", it: "Aperte a tutti", ja: "誰でも参加できます", zh: "向所有人开放", hi: "सबके लिए खुली", ar: "مفتوحة للجميع",
   },

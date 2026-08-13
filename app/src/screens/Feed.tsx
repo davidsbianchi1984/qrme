@@ -26,7 +26,12 @@ import { useSession } from "../store";
  * Keyboard as well as pointer: this is a desktop console, and a stream you can
  * only use by dragging is a stream somebody on a keyboard cannot use at all.
  */
-export function Feed({ onPlans }: { onPlans: () => void }) {
+export function Feed({ onPlans, onParty }: {
+  onPlans: () => void;
+  /** Where a joined party opens. Joining from a card must land the person
+   *  in the room, not leave them in the feed having joined invisibly. */
+  onParty?: (partyId: string) => void;
+}) {
   const { session } = useSession();
   const lang = visitorLang();
   const [items, setItems] = useState<FeedItem[]>([]);
@@ -209,7 +214,9 @@ export function Feed({ onPlans }: { onPlans: () => void }) {
                       disabled={busy || !session.interactorId || !session.interactorToken}
                       onClick={() => api.joinWatchParty(item.id, {
                         member_id: session.interactorId!,
-                      }, session.interactorToken!).catch((e) => setError(e))}>
+                      }, session.interactorToken!)
+                        .then(() => onParty?.(item.id))
+                        .catch((e) => setError(e))}>
                 {tr("feed.joinparty", lang)}
               </button>
             </>

@@ -27,10 +27,12 @@ import { useSession } from "../store";
  * what keeps the embed promise from being broken twenty times at once. The
  * screen says so in the server's own words rather than ours.
  */
-export function WatchParty({ onPlans }: {
+export function WatchParty({ onPlans, start }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
   onPlans: () => void;
+  /** A party joined elsewhere — a feed card — that should open here. */
+  start?: string;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -48,6 +50,7 @@ export function WatchParty({ onPlans }: {
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState<PublicParty[]>([]);
+  const [announceTo, setAnnounceTo] = useState("");
 
   // The browse door: the parties whose hosts chose to be found. The id
   // stays the private door — these cards join without ever showing one.
@@ -55,6 +58,14 @@ export function WatchParty({ onPlans }: {
     api.publicWatchParties().then((r) => setOpen(r.parties))
       .catch(() => undefined);
   }, [party]);
+
+  // A party joined from a feed card opens here — the join already
+  // happened where the card was; this is the room it bought.
+  useEffect(() => {
+    if (!start || !token) return;
+    api.watchParty(start, token).then((p) => setParty(p))
+      .catch(() => undefined);
+  }, [start, token]);
 
   const fail = (e: unknown) => setError(e);
 
@@ -276,6 +287,34 @@ export function WatchParty({ onPlans }: {
                 )}
               </div>
               <p className="muted small">{tr("wp.pub.note", lang)}</p>
+              {party.public && (
+                <>
+                  {/* An announcement is an ordinary wall post — the party's
+                      own title as the words, the party's video attached —
+                      through the same moderation and mark as any post. The
+                      console writes nothing of its own into it. */}
+                  <div className="row">
+                    <input value={announceTo}
+                           onChange={(e) => setAnnounceTo(e.target.value)}
+                           placeholder={tr("wp.announce.ph", lang)}
+                           style={{ flex: 1 }} />
+                    <button disabled={!announceTo.trim() || !party.video?.url}
+                            onClick={async () => {
+                              setError(null); setNote(null);
+                              try {
+                                await api.publishPost(announceTo.trim(), {
+                                  body: party.title || "",
+                                  video_url: party.video!.url,
+                                }, session.ownerToken || token);
+                                setNote(tr("wp.announce.said", lang));
+                              } catch (e) { fail(e); }
+                            }}>
+                      {tr("wp.announce", lang)}
+                    </button>
+                  </div>
+                  <p className="muted small">{tr("wp.announce.note", lang)}</p>
+                </>
+              )}
             </div>
           )}
 

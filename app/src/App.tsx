@@ -128,6 +128,10 @@ export function App() {
   const toPlans = () => setTab("plans");
   // A join on the Rooms screen lands the person Inside, on that room.
   const [insideRoom, setInsideRoom] = useState("");
+  // A party joined from a feed card. The join succeeded where the person was
+  // — the feed — and the room is on another tab; this is how they land in it
+  // instead of having joined invisibly.
+  const [openParty, setOpenParty] = useState("");
   // The chrome follows the profile's language (server-side setting; the
   // content always did — this closes the frame around it).
   const [lang, setLang] = useState<string>("en");
@@ -215,7 +219,8 @@ export function App() {
         {tab === "shop" && <Shops onPlans={toPlans} />}
         {tab === "corner" && <Corner onPlans={toPlans} />}
         {tab === "wall" && <Wall onPlans={toPlans} />}
-        {tab === "feed" && <Feed onPlans={() => setTab("plans")} />}
+        {tab === "feed" && <Feed onPlans={() => setTab("plans")}
+          onParty={(id) => { setOpenParty(id); setTab("party"); }} />}
         {tab === "friends" && <Friends onPlans={toPlans} />}
         {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
@@ -237,7 +242,7 @@ export function App() {
         {tab === "guide" && <Guide onPlans={toPlans} />}
         {tab === "exchanges" && <Exchanges onPlans={toPlans} />}
         {tab === "grants" && <Grants onPlans={toPlans} />}
-        {tab === "party" && <WatchParty onPlans={toPlans} />}
+        {tab === "party" && <WatchParty onPlans={toPlans} start={openParty} />}
         {tab === "voice" && <Voice onPlans={toPlans} />}
         {tab === "workshop" && <Workshop onPlans={toPlans} />}
         {tab === "assist" && <Assist onPlans={toPlans} />}
