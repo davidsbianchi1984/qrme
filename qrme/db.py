@@ -2233,6 +2233,20 @@ CREATE TABLE IF NOT EXISTS homepages (
     updated_at  TEXT NOT NULL
 );
 
+-- Widgets: small programs a person writes for their own profile. The source
+-- is theirs and is never run anywhere but the box in `qrme/widgets.py` —
+-- no network, one directory, no child processes, capped CPU and memory.
+-- Scoped by profile_id at every read and write, not only at the door.
+CREATE TABLE IF NOT EXISTS widgets (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    name        TEXT NOT NULL,
+    source      TEXT NOT NULL,
+    version     INTEGER NOT NULL DEFAULT 1,
+    created_at  INTEGER NOT NULL,
+    updated_at  INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS friendships (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),
