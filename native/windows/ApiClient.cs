@@ -3800,6 +3800,48 @@ public sealed class ApiClient
                                                  string token) =>
         Send<ExchangeChannel>(Get($"/exchanges/{exchangeId}/channel", token));
 
+
+    // -- Widgets --------------------------------------------------------------
+    //
+    // Small programs somebody writes for their own profile. Owner-scoped at
+    // the door and again in the query behind it. The code runs on the backend
+    // in a box with no network, one directory, no child processes and finite
+    // time — never on this machine.
+
+    public Task<WidgetCaps> WidgetLimits() =>
+        Send<WidgetCaps>(Get("/studio/limits", null));
+
+    public async Task<WidgetRow[]> Widgets(string profileId, string token)
+    {
+        var box = await Send<WidgetBox>(Get($"/profiles/{profileId}/widgets",
+                                            token));
+        return box.Widgets;
+    }
+
+    public Task<WidgetRow> Widget(string profileId, string widgetId,
+                                  string token) =>
+        Send<WidgetRow>(Get($"/profiles/{profileId}/widgets/{widgetId}", token));
+
+    public Task<WidgetRow> CreateWidget(string profileId, string name,
+                                        string source, string token) =>
+        Send<WidgetRow>(Post($"/profiles/{profileId}/widgets",
+                             new { name, source }, token));
+
+    public Task<WidgetRow> UpdateWidget(string profileId, string widgetId,
+                                        string name, string source,
+                                        string token) =>
+        Send<WidgetRow>(Put($"/profiles/{profileId}/widgets/{widgetId}",
+                            new { name, source }, token));
+
+    public Task<WidgetRemoved> DeleteWidget(string profileId, string widgetId,
+                                            string token) =>
+        Send<WidgetRemoved>(Delete($"/profiles/{profileId}/widgets/{widgetId}",
+                                   token));
+
+    public Task<WidgetAnswer> RunWidget(string profileId, string widgetId,
+                                        string token) =>
+        Send<WidgetAnswer>(Post($"/profiles/{profileId}/widgets/{widgetId}/run",
+                                new { }, token));
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,
@@ -5059,3 +5101,36 @@ public record DeskJoinOut(
     [property: JsonPropertyName("mode")] string? Mode,
     [property: JsonPropertyName("status")] string? Status,
     [property: JsonPropertyName("room_id")] string? RoomId);
+
+
+/// <summary>A widget as its author keeps it.</summary>
+public sealed record WidgetRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("source")] string Source,
+    [property: JsonPropertyName("version")] int Version);
+
+public sealed record WidgetBox(
+    [property: JsonPropertyName("widgets")] WidgetRow[] Widgets);
+
+public sealed record WidgetRemoved(
+    [property: JsonPropertyName("removed")] string Removed);
+
+/// <summary>What a run said. `Status` is ok, error, timeout, killed or
+/// refused; `Said` is the sentence for the reader, in their language.
+/// The value stays JSON text because a widget's answer is its author's
+/// shape, and this shell shows it rather than interpreting it.</summary>
+public sealed record WidgetAnswer(
+    [property: JsonPropertyName("status")] string Status,
+    [property: JsonPropertyName("ms")] int Ms,
+    [property: JsonPropertyName("said")] string? Said,
+    [property: JsonPropertyName("message")] string? Message,
+    [property: JsonPropertyName("value")] JsonElement? Value);
+
+public sealed record WidgetCaps(
+    [property: JsonPropertyName("limits")] WidgetCapNumbers Limits,
+    [property: JsonPropertyName("available")] bool Available);
+
+public sealed record WidgetCapNumbers(
+    [property: JsonPropertyName("wall_seconds")] int WallSeconds,
+    [property: JsonPropertyName("heap_mb")] int HeapMb);

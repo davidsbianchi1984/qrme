@@ -1556,7 +1556,7 @@ fun StudioScreen(vm: StudioViewModel) {
     var seg by remember { mutableIntStateOf(0) }
     Column(Modifier.fillMaxSize()) {
         TabRow(selectedTabIndex = seg, containerColor = Qrme.Card, contentColor = Qrme.BrandA) {
-            listOf("tab.compose", "tab.posts", "tab.study").forEachIndexed { i, t ->
+            listOf("tab.compose", "tab.posts", "tab.study", "wdg.title").forEachIndexed { i, t ->
                 Tab(selected = seg == i, onClick = { seg = i },
                     text = { Text(L10n.t(t, vm.language), fontSize = 13.sp) })
             }
@@ -1565,7 +1565,8 @@ fun StudioScreen(vm: StudioViewModel) {
             when (seg) {
                 0 -> ComposeScreen(vm)
                 1 -> PostsScreen(vm)
-                else -> StudyScreen(vm)
+                2 -> StudyScreen(vm)
+                else -> WidgetsScreen(vm)
             }
         }
     }
