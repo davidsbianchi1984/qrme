@@ -3442,6 +3442,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'blurb': {'en': 'Blurb', 'es': 'Descripción breve', 'fr': 'Description courte', 'de': 'Kurzbeschreibung', 'pt': 'Descrição breve', 'it': 'Descrizione breve', 'ja': '紹介文', 'zh': '简介', 'hi': 'संक्षिप्त विवरण', 'ar': 'وصف موجز'},
     'body': {'en': 'Message', 'es': 'Mensaje', 'fr': 'Message', 'de': 'Nachricht', 'pt': 'Mensagem', 'it': 'Messaggio', 'ja': 'メッセージ', 'zh': '消息', 'hi': 'संदेश', 'ar': 'الرسالة'},
     'borrower_id': {'en': 'Borrower id', 'es': 'Id del prestatario', 'fr': 'Id de l’emprunteur', 'de': 'Ausleiher-ID', 'pt': 'Id do mutuário', 'it': 'Id del mutuatario', 'ja': '借り手ID', 'zh': '借用者 id', 'hi': 'उधारकर्ता आईडी', 'ar': 'معرّف المستعير'},
+    'inputs': {'en': 'Inputs', 'es': 'Entradas', 'fr': 'Entrées', 'de': 'Eingaben', 'pt': 'Entradas', 'it': 'Ingressi', 'ja': '入力', 'zh': '输入', 'hi': 'इनपुट', 'ar': 'المدخلات'},
     'caller_id': {'en': 'Caller id', 'es': 'Id del llamante', 'fr': 'Id de l’appelant', 'de': 'Anrufer-ID', 'pt': 'Id de quem chama', 'it': 'Id del chiamante', 'ja': '発信者ID', 'zh': '来电者 id', 'hi': 'कॉलर आईडी', 'ar': 'معرّف المتصل'},
     'callsign': {'en': 'Callsign', 'es': 'Indicativo', 'fr': 'Indicatif', 'de': 'Rufzeichen', 'pt': 'Indicativo', 'it': 'Nominativo', 'ja': 'コールサイン', 'zh': '呼号', 'hi': 'कॉलसाइन', 'ar': 'رمز النداء'},
     'category': {'en': 'Category', 'es': 'Categoría', 'fr': 'Catégorie', 'de': 'Kategorie', 'pt': 'Categoria', 'it': 'Categoria', 'ja': 'カテゴリー', 'zh': '类别', 'hi': 'श्रेणी', 'ar': 'الفئة'},
