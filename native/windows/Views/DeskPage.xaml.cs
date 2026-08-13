@@ -38,6 +38,7 @@ public sealed partial class DeskPage : Page
         OfferButton.Content = L10n.T("desk.counter.staff.offer");
         LookupHead.Text = L10n.T("ndsk");
         DeskIdBox.Header = L10n.T("ndsk.id");
+        DeskIdBox.PlaceholderText = "dsk_…";
         OpenButton.Content = L10n.T("nmg.open");
         NoteBox.Header = L10n.T("ndsk.note.ph");
         NoteBox.PlaceholderText = L10n.T("ndsk.needkey");

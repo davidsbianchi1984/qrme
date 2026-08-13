@@ -59,6 +59,7 @@ public sealed partial class SignaturesPage : Page
         NoCredsNote.Text = L10n.T("nsig.none", lang);
         LookupHead.Text = L10n.T("nsig.lookup", lang);
         SignatureIdBox.Header = L10n.T("nsig.sigid", lang);
+        SignatureIdBox.PlaceholderText = "sig_…";
         FetchButton.Content = L10n.T("nsig.fetch", lang);
         VerifyHead.Text = L10n.T("nsig.verify.other", lang);
         EvidenceNote.Text = L10n.T("nsig.evidence.sub", lang);

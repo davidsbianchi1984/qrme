@@ -45,6 +45,7 @@ public sealed partial class WithoutAnAccountPage : Page
         ObjectHeading.Text = L10n.T("pub.object.title", lang);
         ObjectRestricts.Text = L10n.T("pub.object.restricts", lang);
         ProfileBox.Header = L10n.T("pub.object.profileId", lang);
+        ProfileBox.PlaceholderText = "prf_…";
         RefBox.Header = L10n.T("pub.object.ref", lang);
         RefBox.PlaceholderText = L10n.T("pub.object.ref.ph", lang);
         ReasonBox.Header = L10n.T("pub.object.reason", lang);

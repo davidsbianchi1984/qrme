@@ -6632,8 +6632,10 @@ fun ProblemReportingCard(lang: String) {
                          style = MaterialTheme.typography.bodySmall)
                 } else {
                     owed.forEach { r ->
-                        Text("${r.optString("op")} → ${r.optInt("status")}  " +
-                             "×${r.optInt("count")}  ${r.optString("day")}",
+                        val problemLine = r.optString("op") + " \u2192 " +
+                            r.optInt("status") + "  \u00d7" + r.optInt("count") +
+                            "  " + r.optString("day")
+                        Text(problemLine,
                              style = MaterialTheme.typography.bodySmall)
                     }
                 }

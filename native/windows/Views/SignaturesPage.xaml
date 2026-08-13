@@ -67,7 +67,7 @@
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="LookupHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBox x:Name="SignatureIdBox" PlaceholderText="sig_…" />
+                    <TextBox x:Name="SignatureIdBox" />
                     <Button x:Name="FetchButton" Click="OnFetch"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                     <TextBlock x:Name="VerdictText" FontSize="14" FontWeight="Bold"

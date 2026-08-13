@@ -24,7 +24,7 @@
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="ObjectRestricts"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="12" TextWrapping="Wrap" />
-                    <TextBox x:Name="ProfileBox" PlaceholderText="prf_…" />
+                    <TextBox x:Name="ProfileBox" />
                     <TextBox x:Name="RefBox" />
                     <TextBox x:Name="ReasonBox"
                              AcceptsReturn="True" Height="70" TextWrapping="Wrap" />

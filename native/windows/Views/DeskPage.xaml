@@ -13,7 +13,7 @@
                 <StackPanel Spacing="10">
                     <TextBlock x:Name="LookupHead" FontWeight="Bold" FontSize="16"
                                Foreground="{StaticResource QrmeTxtBrush}" />
-                    <TextBox x:Name="DeskIdBox" PlaceholderText="dsk_…" />
+                    <TextBox x:Name="DeskIdBox" />
                     <Button x:Name="OpenButton" Click="OnOpen"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                 </StackPanel>

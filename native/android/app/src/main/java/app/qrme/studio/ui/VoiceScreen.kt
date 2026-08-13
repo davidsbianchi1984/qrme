@@ -182,7 +182,8 @@ fun VoiceScreen(vm: StudioViewModel) {
                         }
                     }
                     if (recording) {
-                        Text("%.0fs".format(elapsed), color = Qrme.Green,
+                        val elapsedLabel = "%.0fs".format(elapsed)
+                        Text(elapsedLabel, color = Qrme.Green,
                             fontSize = 15.sp, fontWeight = FontWeight.Bold)
                     }
                 }

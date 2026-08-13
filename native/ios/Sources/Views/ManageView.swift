@@ -677,7 +677,8 @@ private struct DeskSection: View {
         NavigationStack {
             Form {
                 Section(L10n.t("nmg.t.desk", state.language)) {
-                    TextField("dsk_…", text: $deskId)
+                    let deskHint = "dsk_…"
+                    TextField(deskHint, text: $deskId)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
                     Button(L10n.t("nmg.open", state.language)) { open = true }

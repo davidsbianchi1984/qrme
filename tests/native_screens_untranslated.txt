@@ -84,14 +84,16 @@
 # the bell** and **● LIVE / SAMPLE VIEW**; the scanner's **Point at a QRME
 # code**. On all three shells. The record said 68 and the truth was 125.
 #
-# The remaining seven contain no English at all: `dsk_…`, `sig_…` and `prf_…`
-# are identifier prefixes shown as placeholders, `%.0fs` is a duration format,
-# and two are the extractor's own truncation of an interpolated format string
-# — a quote inside `${…}` ends the match early. They are left in the count
-# rather than special-cased out, because a rule that excuses strings is a rule
-# that can be taught to excuse the wrong ones.
+# The last seven rows contained no English at all: `dsk_…`, `sig_…` and
+# `prf_…` were identifier prefixes shown as placeholders, `%.0fs` a duration
+# format, and two were the extractor's own truncation of an interpolated
+# format string. They sat in the count for two releases on the principle that
+# a rule that excuses strings can be taught to excuse the wrong ones; the
+# sibling products' run to zero showed the honest alternative — restructure
+# the code (placeholders assigned in code-behind, formats hoisted to locals)
+# so the scanner reads what a person reads, and the count means zero.
 
 # status: floor — no English left
-ios: 2
-android: 2
-windows: 3
+ios: 0
+android: 0
+windows: 0
