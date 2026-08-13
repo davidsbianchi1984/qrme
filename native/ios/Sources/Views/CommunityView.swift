@@ -89,6 +89,23 @@ private struct StrangerSection: View {
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
             }.padding(20)
         }
+        // Roulette. The match is made by whichever side arrives second —
+        // their join answers *them*, never the waiter — so while waiting we
+        // poll our own route and drop straight into the conversation the
+        // moment it exists. Never join again to ask: that re-queues us.
+        .task(id: waiting) {
+            while waiting && !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 2_500_000_000)
+                guard waiting, let token = state.interactorToken else { continue }
+                if let r = try? await ApiClient.shared.myConnection(token: token),
+                   r.status == "matched", let cid = r.connection_id {
+                    connectionId = cid
+                    matchedWith = r.matched_with
+                    waiting = false
+                    refresh(cid)
+                }
+            }
+        }
     }
 
     @ViewBuilder

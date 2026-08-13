@@ -1,4 +1,4 @@
-import { planGate } from "./api";
+import { planGate, RequestError } from "./api";
 import { t as tr, visitorLang } from "./l10n";
 
 /**
@@ -40,9 +40,20 @@ export function Refusal({ error, onPlans, variant = "card" }: {
 
   if (!gate) {
     const text = error instanceof Error ? error.message : String(error);
+    // A refusal that says "sign in" without a way to is a dead end — the
+    // field report read "authentication required" and had nowhere to tap.
+    // Branching on the status rather than the sentence, because the
+    // sentence arrives in the reader's language.
+    const signin = error instanceof RequestError && error.status === 401
+      ? (
+        <button onClick={() => {
+          window.location.hash = "";
+          window.location.reload();
+        }}>{tr("refusal.signin", visitorLang())}</button>
+      ) : null;
     return variant === "inline"
-      ? <div className="error">⚠ {text}</div>
-      : <div className="card error"><p className="small">{text}</p></div>;
+      ? <div className="error">⚠ {text} {signin}</div>
+      : <div className="card error"><p className="small">{text}</p>{signin}</div>;
   }
 
   // The muted line under the message used to repeat, in English, what the

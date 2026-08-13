@@ -828,6 +828,15 @@ object ApiClient {
             o.optString("matched_with", null))
     }
 
+    // What happened to my wait. A match is made by whichever side arrives
+    // second — their join answers *them*, never the waiter — so the waiter
+    // polls this. Never join again to ask: that re-queues the caller.
+    suspend fun myConnection(token: String): ConnJoin {
+        val o = JSONObject(request("/connections/mine", token = token))
+        return ConnJoin(o.getString("status"), o.optString("connection_id", null),
+            o.optString("matched_with", null))
+    }
+
     suspend fun connectionMessages(cid: String, interactorId: String,
                                    token: String): List<ConnMsg> {
         val arr = JSONArray(request("/connections/$cid/messages?interactor_id=$interactorId",

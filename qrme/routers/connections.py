@@ -114,6 +114,51 @@ def join_queue(body: ConnectionJoin, request: Request) -> dict:
     return {"status": "waiting", "tier": body.tier}
 
 
+@router.get("/connections/mine")
+def my_connection(request: Request) -> dict:
+    """What happened to my wait — the half of matchmaking join can't say.
+
+    A match is made by whichever side arrives *second*: their join deletes
+    the waiter's queue row and creates the connection, and the waiter is
+    never told. The consoles read "waiting for a partner" forever while the
+    partner was already in the room talking to nobody. A field report asked
+    for roulette — "just drop you with the next available person that's
+    already in" — and the drop needs this: something a waiting client can
+    poll that answers matched, still waiting, or neither.
+
+    Re-calling join would be the wrong poll. It re-queues the caller, so two
+    people both polling that way can be paired with each other twice.
+
+    Token only, no id in the path or query — "mine" is whoever the token
+    says, which is the one question a stranger can't answer.
+    """
+    who = auth.principal(request)
+    if who is None:
+        raise HTTPException(401, "authentication required")
+    if who["role"] != "interactor":
+        raise HTTPException(
+            403, "a connection is between two people, so this needs the token "
+                 "of one of them rather than a profile's owner token")
+    me = who["subject_id"]
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT * FROM connections WHERE status='active'"
+        " AND (interactor_a=? OR interactor_b=?)"
+        " ORDER BY created_at DESC, rowid DESC LIMIT 1", (me, me)).fetchone()
+    if row:
+        other_alias = (row["alias_b"] if me == row["interactor_a"]
+                       else row["alias_a"])
+        return {"status": "matched", "connection_id": row["id"],
+                "tier": row["tier"],
+                "matched_with": other_alias or "Stranger"}
+    queued = conn.execute(
+        "SELECT tier FROM connection_queue WHERE interactor_id=?",
+        (me,)).fetchone()
+    if queued:
+        return {"status": "waiting", "tier": queued["tier"]}
+    return {"status": "idle"}
+
+
 @router.post("/connections/{connection_id}/messages", status_code=201)
 def send_message(connection_id: str, body: ConnectionMessage,
                  request: Request) -> dict:

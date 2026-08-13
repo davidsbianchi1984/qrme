@@ -165,3 +165,26 @@ def test_a_stranger_can_neither_strike_nor_edit(client, profile_id,
         f"/profiles/{profile_id}/memory/{interactor_id}/turns/{turn['id']}",
         json={"content": "vandalism"}, headers=headers)
     assert r.status_code in (401, 403)
+
+
+# -- the keyless room keeps talking ------------------------------------------
+
+def test_the_stub_does_not_repeat_its_setup_speech(client, profile_id,
+                                                   interactor_id):
+    """A field report pressed "Let them talk" twice and read the same
+    apology twice. The instructions are said once; after that the keyless
+    reply stays honest but keeps the thread — shorter, and ending with a
+    question that references what was said."""
+    first = client.post(f"/profiles/{profile_id}/chat",
+                        json={"interactor_id": interactor_id,
+                              "message": "tell me about the workbench"})
+    second = client.post(f"/profiles/{profile_id}/chat",
+                         json={"interactor_id": interactor_id,
+                               "message": "are you still there"})
+    a = first.json()["profile_message"]["content"]
+    b = second.json()["profile_message"]["content"]
+    assert "no model answered" in a and "no model answered" in b
+    assert "Settings" in a          # the full instructions, once
+    assert "Settings" not in b      # never twice
+    assert "are you still there" in b   # holds the thread
+    assert "?" in b                     # a question back, in reference

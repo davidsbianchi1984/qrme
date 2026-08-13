@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, type ConnJoined, type ConnMessage,
          type Summoned } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -72,6 +72,30 @@ export function Stranger() {
     if (!cid) return;
     go(() => api.connectionMessages(cid, me, token), setMessages);
   };
+
+  // Roulette. The match is made by whichever side arrives second — their
+  // join deletes the waiter's queue row and answers *them*, so a waiter who
+  // never asks again reads "waiting" forever while their partner is already
+  // in the room. Poll the waiting half's own route (never join again, which
+  // would re-queue us) and drop straight in the moment it answers matched.
+  useEffect(() => {
+    if (joined?.status !== "waiting" || !token) return;
+    const timer = window.setInterval(async () => {
+      try {
+        const now = await api.myConnection(token);
+        if (now.status === "matched") setJoined(now);
+      } catch { /* still waiting; the next tick asks again */ }
+    }, 2500);
+    return () => window.clearInterval(timer);
+  }, [joined?.status, token]);
+
+  // Landing in the room loads the conversation without a press — being
+  // dropped all the way in is the point.
+  useEffect(() => {
+    if (!cid) return;
+    go(() => api.connectionMessages(cid, me, token), setMessages);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cid]);
 
   const cards = found
     ? (found.profiles ?? (found.profile ? [found.profile] : []))

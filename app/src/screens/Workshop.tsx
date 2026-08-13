@@ -64,6 +64,10 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
 
   const [domain, setDomain] = useState("");
   const [specialistId, setSpecialistId] = useState("");
+  // Profiles a domain can be handed to — a field report typed a display
+  // name into the id box and the attach went nowhere.
+  const [specialistPool, setSpecialistPool] = useState<
+    { profile_id: string; display_name: string }[]>([]);
 
   const [expTitle, setExpTitle] = useState("");
   const [expOrg, setExpOrg] = useState("");
@@ -82,6 +86,10 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
   const fail = (e: unknown) => setError(e);
 
   function load() {
+    api.marketplace().then((cards) => setSpecialistPool(
+      cards.map((c) => ({ profile_id: c.profile_id,
+                          display_name: c.display_name }))))
+      .catch(() => setSpecialistPool([]));
     if (!me) return;
     // Public, and the only thing here that does not need the owner token.
     api.embodimentConsistency(me).then(setSame).catch(() => setSame(null));
@@ -216,6 +224,30 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
                   // twice.
                   setSrcTitle(""); setSrcBody("");
                 }, "Added.")}>{tr("wsh.knows.add", lang)}</button>
+        {/* Files as source material, beside the text box — the field
+            report asked for a folder, not just a place to paste. Each
+            file goes through the same media door as any photo, and lands
+            as a source item pointing at it. */}
+        <label className="chip">
+          {tr("wsh.knows.files", lang)}
+          <input type="file" multiple hidden
+                 onChange={async (e) => {
+                   const files = Array.from(e.target.files || []);
+                   e.target.value = "";
+                   setError(null); setBusy(true);
+                   try {
+                     for (const f of files) {
+                       const saved = await api.uploadMedia(me, f, token);
+                       await api.addSource(me, {
+                         kind: f.type.startsWith("image/")
+                           ? "photo" : "knowledge",
+                         title: f.name, content: saved.url }, token);
+                     }
+                     load();
+                   } catch (err) { setError(err); }
+                   finally { setBusy(false); }
+                 }} />
+        </label>
         {sources.length === 0 && (
           <p className="muted small">{tr("wsh.knows.none", lang)}</p>
         )}
@@ -248,9 +280,17 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
         <div className="row">
           <input value={domain} onChange={(e) => setDomain(e.target.value)}
                  placeholder={tr("wsh.spec.domain.ph", lang)} style={{ flex: 1 }} />
-          <input value={specialistId}
-                 onChange={(e) => setSpecialistId(e.target.value)}
-                 placeholder={tr("wsh.spec.id.ph", lang)} style={{ flex: 1 }} />
+          <select value={specialistPool.some(
+                    (c) => c.profile_id === specialistId) ? specialistId : ""}
+                  onChange={(e) => setSpecialistId(e.target.value)}
+                  style={{ flex: 1 }}>
+            <option value="">{tr("wsh.spec.pick", lang)}</option>
+            {specialistPool.map((c) => (
+              <option key={c.profile_id} value={c.profile_id}>
+                {c.display_name}
+              </option>
+            ))}
+          </select>
           {/* One pair per call, despite the plural route. */}
           <button disabled={busy || !token || !domain.trim() || !specialistId.trim()}
                   onClick={act(async () => {
@@ -394,6 +434,26 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
             {tr("wsh.see.ask", lang)}
           </button>
         </div>
+        {/* Point the camera at it, or upload what is in front of you —
+            the photo uploads through the media door and its name joins
+            the list of what the profile is shown. */}
+        <label className="chip">
+          {tr("wsh.see.photo", lang)}
+          <input type="file" accept="image/*" capture="environment" hidden
+                 onChange={async (e) => {
+                   const f = e.target.files?.[0];
+                   e.target.value = "";
+                   if (!f) return;
+                   setError(null); setBusy(true);
+                   try {
+                     const saved = await api.uploadMedia(me, f, token);
+                     setScene((old_) => old_
+                       ? `${old_}, ${f.name} (${saved.url})`
+                       : `${f.name} (${saved.url})`);
+                   } catch (err) { setError(err); }
+                   finally { setBusy(false); }
+                 }} />
+        </label>
         {seen && (
           <>
             <p className="muted small">

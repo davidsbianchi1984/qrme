@@ -243,3 +243,72 @@ def test_the_route_publishes_its_own_rules(client):
     assert "any change to the manifest clears both signatures" in r["rules"]
     runs = {k["key"] for k in r["kinds"] if k["runs"]}
     assert runs == {"source", "build"}
+
+
+# -- the whole road, over HTTP, with every kind on the manifest --------------
+
+def test_the_whole_exchange_goes_through_over_http(client):
+    """A field report asked to "make sure the process completely goes
+    through as if they've agreed upon an exchange... across every one of
+    those variables". So: two real people with real tokens drive the full
+    lifecycle through the routes — propose, list one item of *every* kind
+    the vocabulary offers (both directions), both sign, the receiving side
+    accepts each item — and the exchange lands on `delivered` with nothing
+    left waiting.
+    """
+    from qrme import exchange as x
+    from tests.test_capabilities import as_interactor, make_interactor
+    host = make_interactor(client, "Host", "1990-01-01")
+    guest = make_interactor(client, "Guest", "1991-01-01")
+    hh, gh = as_interactor(host), as_interactor(guest)
+
+    kinds = client.get("/exchanges/vocabulary").json()["kinds"]
+    assert {k["key"] for k in kinds} == set(x.KINDS)
+
+    r = client.post("/exchanges", headers=hh, json={
+        "host_id": host, "guest_id": guest,
+        "work": "One of everything, both ways",
+        "industry": "software",
+        "includes": ["every kind the vocabulary names"],
+        "excludes": ["anything not on the manifest"]})
+    assert r.status_code == 201, r.text
+    xid = r.json()["id"]
+
+    directions = ["host_to_guest", "guest_to_host"]
+    for i, kind in enumerate(sorted(x.KINDS)):
+        r = client.post(f"/exchanges/{xid}/items", headers=hh, json={
+            "direction": directions[i % 2],
+            "name": f"the-{kind}", "kind": kind, "bytes": 1000 + i})
+        assert r.status_code == 201, (kind, r.text)
+
+    # Nothing moves on one signature; everything is offered on two.
+    client.post(f"/exchanges/{xid}/sign", headers=hh,
+                json={"actor_id": host})
+    assert client.get(f"/exchanges/{xid}/channel",
+                      headers=hh).json()["open"] is False
+    client.post(f"/exchanges/{xid}/sign", headers=gh,
+                json={"actor_id": guest})
+    chan = client.get(f"/exchanges/{xid}/channel", headers=gh).json()
+    assert chan["open"] is True and chan["auto_download"] is False
+    assert len(chan["items"]) == len(x.KINDS)
+
+    # The executable kinds carry their warning across the wire.
+    doc = client.get(f"/exchanges/{xid}", headers=gh).json()
+    assert sorted(doc["runs_on_your_machine"]) == ["the-build", "the-source"]
+    assert doc["runs_warning"] is not None
+
+    # Each item is accepted by the side receiving it — and only that side.
+    for item in chan["items"]:
+        receiver, their = ((guest, gh) if item["direction"] == "host_to_guest"
+                           else (host, hh))
+        sender, senders = (host, hh) if receiver == guest else (guest, gh)
+        r = client.post(f"/exchanges/{xid}/items/{item['id']}/accept",
+                        headers=senders, json={"actor_id": sender})
+        assert r.status_code == 422, "the sender accepted on their behalf"
+        r = client.post(f"/exchanges/{xid}/items/{item['id']}/accept",
+                        headers=their, json={"actor_id": receiver})
+        assert r.status_code == 200, (item["kind"], r.text)
+
+    done = client.get(f"/exchanges/{xid}", headers=hh).json()
+    assert done["state"] == "delivered"
+    assert all(i["accepted_at"] for i in done["items"])

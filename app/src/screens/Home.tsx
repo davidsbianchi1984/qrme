@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { api, getBase, type Avatar, type ProfilePage, type Stats } from "../api";
+import { api, getBase, type Avatar, type Homepage, type ProfilePage,
+         type Stats } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
 export function Home({ go }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
-        | "campaigns" | "org" | "plans" | "friends") => void;
+        | "campaigns" | "org" | "plans" | "friends"
+        | "identity" | "stranger" | "rooms") => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -14,11 +16,15 @@ export function Home({ go }: {
   const [face, setFace] = useState<Avatar | null>(null);
   const [pals, setPals] = useState<
     Awaited<ReturnType<typeof api.friends>>["friends"]>([]);
-  // The face you clicked, and their page as a visitor sees it. The field
-  // report behind it: tapping a friend's picture went to the whole
-  // friends list — a particular person's face led to a crowd.
+  // The face you clicked, and their page as a visitor sees it. Two field
+  // reports shaped this: tapping a friend's picture went to the whole
+  // friends list — a crowd instead of a person — and then the card that
+  // replaced it showed a name and a Close button, which reads as broken.
+  // So the tap now brings their actual homepage when they have made one
+  // public, and never renders emptier than a sentence.
   const [visiting, setVisiting] = useState<
-    { name: string; avatar: string | null; page: ProfilePage } | null>(null);
+    { name: string; avatar: string | null; page: ProfilePage;
+      home: Homepage | null } | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -98,9 +104,14 @@ export function Home({ go }: {
           <div className="friends-row">
             {pals.map((f) => (
               <button key={f.profile_id} onClick={() =>
-                api.page(f.profile_id)
-                  .then((page) => setVisiting(
-                    { name: f.display_name, avatar: f.avatar ?? null, page }))
+                Promise.all([
+                  api.page(f.profile_id),
+                  // A homepage kept private answers 404; that is a choice,
+                  // not an error, so it degrades to the plain page.
+                  api.homepage(f.profile_id).catch(() => null),
+                ]).then(([page, home]) => setVisiting(
+                  { name: f.display_name, avatar: f.avatar ?? null,
+                    page, home }))
                   .catch(setError)}>
                 {f.avatar ? (
                   <img className="presence-bubble" alt=""
@@ -140,16 +151,55 @@ export function Home({ go }: {
               {tr("hom.visit.close", lang)}
             </button>
           </div>
-          {visiting.page.about && (
-            <p className="small">{visiting.page.about}</p>
-          )}
-          {visiting.page.links.length > 0 && (
-            <p className="muted small">
-              {visiting.page.links.map((l) => (
-                <a key={l.url} href={l.url} target="_blank" rel="noreferrer"
-                   style={{ marginRight: 10 }}>{l.label || l.url}</a>
-              ))}
-            </p>
+          {visiting.home ? (
+            <>
+              {/* Their homepage, as they built it — headline, about, links,
+                  their own top friends — with its accent color kept. */}
+              {visiting.home.headline && (
+                <p className="small" style={{
+                  color: visiting.home.theme?.accent || undefined }}>
+                  <strong>{visiting.home.headline}</strong>
+                </p>
+              )}
+              {visiting.home.about && (
+                <p className="small">{visiting.home.about}</p>
+              )}
+              {visiting.home.links.length > 0 && (
+                <p className="muted small">
+                  {visiting.home.links.map((l) => (
+                    <a key={l.url} href={l.url} target="_blank"
+                       rel="noreferrer"
+                       style={{ marginRight: 10 }}>{l.label || l.url}</a>
+                  ))}
+                </p>
+              )}
+              {visiting.home.top_friends.length > 0 && (
+                <p className="muted small">
+                  {tr("hom.visit.theirfriends", lang)}{" "}
+                  {visiting.home.top_friends
+                    .map((t) => t.display_name).join(" · ")}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              {visiting.page.about && (
+                <p className="small">{visiting.page.about}</p>
+              )}
+              {visiting.page.links.length > 0 && (
+                <p className="muted small">
+                  {visiting.page.links.map((l) => (
+                    <a key={l.url} href={l.url} target="_blank"
+                       rel="noreferrer"
+                       style={{ marginRight: 10 }}>{l.label || l.url}</a>
+                  ))}
+                </p>
+              )}
+              {!visiting.page.about && !visiting.page.tagline
+                && visiting.page.links.length === 0 && (
+                <p className="muted small">{tr("hom.visit.empty", lang)}</p>
+              )}
+            </>
           )}
         </div>
       )}
@@ -180,14 +230,17 @@ export function Home({ go }: {
       </div>
 
       {/* The doors this release opened — the front page names them, or
-          testers never find them. */}
+          testers never find them. A field report noticed this list had
+          quietly stopped being true ("I don't think I've seen what's new
+          get updated"), which is the one failure a card with this heading
+          cannot afford: refresh it with every release, or retire it. */}
       <div className="card">
         <h3>{tr("hom.newinrelease", lang)}</h3>
         <div className="actions">
-          <button onClick={() => go("blend")}>{tr("hom.blend", lang)}</button>
-          <button onClick={() => go("simulate")}>{tr("hom.simulate", lang)}</button>
-          <button onClick={() => go("campaigns")}>{tr("hom.money", lang)}</button>
-          <button onClick={() => go("org")}>{tr("hom.departments", lang)}</button>
+          <button onClick={() => go("memory")}>{tr("hom.curate", lang)}</button>
+          <button onClick={() => go("identity")}>{tr("hom.exportqr", lang)}</button>
+          <button onClick={() => go("rooms")}>{tr("hom.roomscene", lang)}</button>
+          <button onClick={() => go("stranger")}>{tr("hom.roulette", lang)}</button>
         </div>
       </div>
     </div>

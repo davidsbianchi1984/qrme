@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, type Engagement, type FeedbackResult,
          type PersonaEmbedding, type ProactiveOutreach,
          type QuietHours } from "../api";
@@ -49,6 +49,12 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
   const interactorToken = session.interactorToken || "";
 
   const [person, setPerson] = useState("");
+  // The people this profile has actually talked to — a field report typed
+  // nothing into "a person's id" and found every button on the screen
+  // dead. The id field stays for ids from elsewhere; the list is for
+  // everyone else.
+  const [known, setKnown] = useState<
+    { interactor_id: string; interactor_name: string }[]>([]);
   const [state, setState] = useState<Engagement | null>(null);
   const [rated, setRated] = useState<FeedbackResult | null>(null);
   const [embedding, setEmbedding] = useState<PersonaEmbedding | null>(null);
@@ -63,6 +69,15 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
   const [busy, setBusy] = useState(false);
 
   const who = person.trim();
+
+  useEffect(() => {
+    if (!me || !token) return;
+    api.memories(me, token)
+      .then((rows) => setKnown(rows.map((r) => ({
+        interactor_id: r.interactor_id,
+        interactor_name: r.interactor_name }))))
+      .catch(() => setKnown([]));
+  }, [me, token]);
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -80,6 +95,18 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
 
       <div className="card">
         <h3>{tr("rch.who", lang)}</h3>
+        {known.length > 0 && (
+          <select value={known.some((k) => k.interactor_id === person)
+                    ? person : ""}
+                  onChange={(e) => setPerson(e.target.value)}>
+            <option value="">{tr("rch.pick", lang)}</option>
+            {known.map((k) => (
+              <option key={k.interactor_id} value={k.interactor_id}>
+                {k.interactor_name}
+              </option>
+            ))}
+          </select>
+        )}
         <div className="row">
           <input value={person} onChange={(e) => setPerson(e.target.value)}
                  placeholder={tr("rch.who.ph", lang)} style={{ flex: 1 }} />
@@ -88,6 +115,9 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
                     setState(await api.engagement(me, who, token));
                   })}>{tr("rch.how", lang)}</button>
         </div>
+        {!who && (
+          <p className="muted small">{tr("rch.pickfirst", lang)}</p>
+        )}
         {state && (
           <>
             <p className="small">

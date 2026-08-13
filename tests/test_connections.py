@@ -97,6 +97,46 @@ def test_friendly_tier_shields_minors(client):
     assert seen == []
 
 
+def test_the_waiting_side_discovers_its_match(client):
+    """The match is made by whoever arrives second — their join deletes the
+    waiter's queue row and answers *them*. The waiter's only honest poll is
+    /connections/mine: waiting before, matched after, with the partner's
+    alias and never their name."""
+    a = make_interactor(client, "Theo", "1990-01-01")
+    b = make_interactor(client, "Cat", "1992-02-02")
+
+    assert client.get("/connections/mine",
+                      headers=as_interactor(a)).json() == {"status": "idle"}
+    client.post("/connections/join", headers=as_interactor(a),
+                json={"interactor_id": a, "alias": "NightOwl"})
+    mid_wait = client.get("/connections/mine",
+                          headers=as_interactor(a)).json()
+    assert mid_wait == {"status": "waiting", "tier": "friendly"}
+
+    client.post("/connections/join", headers=as_interactor(b),
+                json={"interactor_id": b, "alias": "EarlyBird"})
+    after = client.get("/connections/mine", headers=as_interactor(a)).json()
+    assert after["status"] == "matched"
+    assert after["matched_with"] == "EarlyBird"
+    assert "Cat" not in str(after)
+    # And the id it hands over is a live room for the waiter.
+    r = client.post(f"/connections/{after['connection_id']}/messages",
+                    headers=as_interactor(a),
+                    json={"interactor_id": a, "message": "there you are"})
+    assert r.status_code == 201
+
+    # Once it ends, the answer goes back to idle rather than pointing at a
+    # closed door.
+    client.post(f"/connections/{after['connection_id']}/end",
+                headers=as_interactor(a))
+    assert client.get("/connections/mine",
+                      headers=as_interactor(a)).json() == {"status": "idle"}
+
+
+def test_mine_needs_a_person_not_an_id(client):
+    assert client.get("/connections/mine").status_code == 401
+
+
 def test_either_side_can_end_it(client):
     a = make_interactor(client, "A", "1990-01-01")
     b = make_interactor(client, "B", "1991-01-01")

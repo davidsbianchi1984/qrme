@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey, type PairInfo,
-         type WatermarkRecovery } from "../api";
+import { accountApi, api, getBase, getLlmKey, setBase, setLlmKey,
+         type PairInfo } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Problems } from "../Problems";
@@ -18,10 +18,7 @@ export function Settings({ onPlans }: {
   const [llmKey, setLlmKeyInput] = useState(getLlmKey());
   const [keySaved, setKeySaved] = useState(false);
   const [offline, setOffline] = useState<Record<string, unknown> | null>(null);
-  // "Who wrote this?" — the recoverable half of the watermark.
-  const [checkText, setCheckText] = useState("");
-  const [checked, setChecked] = useState<WatermarkRecovery | null>(null);
-  const [checking, setChecking] = useState(false);
+  const [copiedExport, setCopiedExport] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [pair, setPair] = useState<PairInfo | null>(null);
@@ -72,54 +69,57 @@ export function Settings({ onPlans }: {
         }}>{keySaved ? "Saved ✓" : llmKey.trim() ? "Save key" : "Clear key"}</button>
       </div>
 
+      {/* Plain sentences instead of a JSON dump — a field report read the
+          raw object and asked what the use was. What was useful in it stays;
+          it is just said. And the thing they wanted the space for is here
+          too: everything the profile is made of, copyable as one document,
+          for feeding to whatever model or tool they choose — it is their
+          material.
+
+          The "Who wrote this?" card that used to sit below this one is gone,
+          not moved: the accountless screen has the same verifier, and the
+          same control twice teaches people that neither is the real one. */}
       <div className="card">
         <h3>{tr("set.offline", lang)}</h3>
         {offline ? (
-          <pre className="mono">{JSON.stringify(offline, null, 2)}</pre>
+          <>
+            <p className="small">
+              {offline.offline
+                ? tr("set.offline.on", lang)
+                : tr("set.offline.off", lang)}
+            </p>
+            {typeof offline.provider === "string" && (
+              <p className="muted small">{offline.provider}</p>
+            )}
+            {typeof offline.data_locality === "string" && (
+              <p className="muted small">{offline.data_locality}</p>
+            )}
+            {Array.isArray(offline.guarantees)
+              && offline.guarantees.map((g, i) => (
+                <p className="muted small" key={i}>· {String(g)}</p>
+              ))}
+          </>
         ) : (
           <div className="muted">{tr("set.offline.unreachable", lang)}</div>
         )}
-      </div>
-
-      {/* The recoverable watermark: paste text, learn whether one of this
-          deployment's profiles wrote it — and it survives editing. */}
-      <div className="card">
-        <h3>{tr("set.who", lang)}</h3>
-        <p className="muted small">{tr("set.who.lead", lang)}</p>
-        <textarea rows={4} value={checkText} placeholder={tr("set.who.ph", lang)}
-                  onChange={(e) => setCheckText(e.target.value)} />
-        <button disabled={checking || !checkText.trim()}
-                onClick={async () => {
-                  setChecking(true);
-                  try { setChecked(await api.recoverWatermark(checkText)); }
-                  catch { setChecked(null); }
-                  finally { setChecking(false); }
-                }}>{checking ? "Checking…"
-                    : tr("asst.mark.go", lang)}</button>
-        {checked && (checked.recovered ? (
-          <div className="guidance">
-            <div className="guidance-src">
-              {fill(tr("set.who.by", lang),
-                    { mark: checked.display?.mark,
-                      pid: checked.profile_id, state: checked.state })}
-            </div>
-            <p>
-              {fill(tr("set.who.match", lang),
-                    { m: checked.matched_windows,
-                      s: checked.stored_windows,
-                      pct: Math.round((checked.similarity || 0) * 100) })}
-              {checked.verbatim
-                ? " The text is exactly what was stamped."
-                : " The text has been altered since it was written."}
-            </p>
-            <div className="muted small">{checked.method}</div>
-          </div>
-        ) : (
-          <div className="guidance">
-            <p>{tr("set.who.none", lang)}</p>
-            <div className="muted small">{checked.reason}</div>
-          </div>
-        ))}
+        {session.profileId && session.ownerToken && (
+          <>
+            <h4>{tr("set.export", lang)}</h4>
+            <p className="muted small">{tr("set.export.pitch", lang)}</p>
+            <button onClick={async () => {
+              try {
+                const bundle = await api.exportProfile(
+                  session.profileId!, session.ownerToken!);
+                await navigator.clipboard.writeText(
+                  JSON.stringify(bundle, null, 2));
+                setCopiedExport(true);
+                setTimeout(() => setCopiedExport(false), 2000);
+              } catch (e) { setError(e); }
+            }}>
+              {copiedExport ? "✓" : tr("set.export.copy", lang)}
+            </button>
+          </>
+        )}
       </div>
 
       {pair && (

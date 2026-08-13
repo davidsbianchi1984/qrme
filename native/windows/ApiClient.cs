@@ -1199,6 +1199,12 @@ public sealed class ApiClient
                 ? new { interactor_id = interactorId, tier, alias }
                 : (object)new { interactor_id = interactorId, tier }, token));
 
+    // What happened to my wait. A match is made by whichever side arrives
+    // second — their join answers *them*, never the waiter — so the waiter
+    // polls this. Never join again to ask: that re-queues the caller.
+    public Task<ConnJoin> MyConnection(string token) =>
+        Send<ConnJoin>(Get("/connections/mine", token));
+
     public Task<ConnMsg[]> ConnectionMessages(string cid, string interactorId,
                                               string token) =>
         Send<ConnMsg[]>(Get(

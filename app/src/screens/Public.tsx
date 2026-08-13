@@ -409,6 +409,10 @@ function MarkPane() {
           {found.recovered ? (
             <>
               <h3>{found.display?.mark} {found.display?.label}</h3>
+              {/* The plain verdict first — a field report wanted the human
+                  question answered in one sentence, not inferred from a
+                  credential id. */}
+              <p className="small"><strong>{L("pub.mark.synth")}</strong></p>
               <p className="small">
                 {fill(L("pub.mark.producedby"),
                       { state: <strong>{found.state}</strong> })}
@@ -432,6 +436,10 @@ function MarkPane() {
           ) : (
             <>
               <h3>{L("pub.mark.unknown")}</h3>
+              {/* Honest about what absence proves: no mark means no profile
+                  of this deployment wrote it — likely a person, possibly a
+                  machine that signs nothing. Certainty would be a lie. */}
+              <p className="small"><strong>{L("pub.mark.maybehuman")}</strong></p>
               <p className="small">{found.reason}</p>
               <p className="muted small">
                 {fill(L("pub.mark.unknown.explain"),

@@ -99,6 +99,7 @@ import app.qrme.studio.SignatureReceipt
 import app.qrme.studio.Signing
 import app.qrme.studio.SigningCredential
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -1915,6 +1916,25 @@ private fun StrangerPanel(vm: StudioViewModel) {
                 }.onFailure { error = it.message }
             }
         } else withInteractor(vm, { error = it }) { me -> joinAs(me, minted = false) }
+    }
+
+    // Roulette. The match is made by whichever side arrives second — their
+    // join answers *them*, never the waiter — so while waiting we poll our
+    // own route and drop straight into the conversation the moment it
+    // exists. Never join again to ask: that re-queues us.
+    LaunchedEffect(waiting) {
+        while (waiting) {
+            delay(2500)
+            val token = vm.interactorToken ?: continue
+            val r = runCatching { ApiClient.myConnection(token) }.getOrNull() ?: continue
+            val cid = r.connectionId
+            if (r.status == "matched" && cid != null) {
+                connectionId = cid
+                matchedWith = r.matchedWith
+                waiting = false
+                refresh(cid)
+            }
+        }
     }
 
     screenScroll {

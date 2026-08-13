@@ -76,26 +76,6 @@ export function Named({ onPlans }: { onPlans: () => void }) {
 
       <Refusal error={error} onPlans={onPlans} />
 
-      {lights && (
-        <div className="card">
-          <h3>{tr("nmd.lights", lang)}</h3>
-          <p className="muted small">{lights.question}</p>
-          {/* Built from the mapping, not written beside it. A legend kept
-              separately eventually describes a mapping the code does not
-              have — and it is the legend people trust. */}
-          {lights.legend.map((l) => (
-            <p className="small" key={l.light}>
-              <strong>{l.light}</strong> — {l.labels.join(", ")}
-              <br />
-              <span className="muted">
-                {fill(tr("nmd.from", lang), { list: l.statuses.join(", ") })}
-              </span>
-            </p>
-          ))}
-          <p className="muted small">{tr("nmd.noidnotoken", lang)}</p>
-        </div>
-      )}
-
       <div className="card">
         <h3>{tr("nmd.campaign", lang)}</h3>
         <p className="muted small">{tr("nmd.mostpublic", lang)}</p>
@@ -208,12 +188,31 @@ export function Named({ onPlans }: { onPlans: () => void }) {
 
       <div className="card">
         <h3>{tr("nmd.lending", lang)}</h3>
+        {/* This card used to answer with raw JSON — a field report read it
+            and could not tell what was going on. A grant is a sentence:
+            what, where, standing. */}
+        <p className="muted small">{tr("nmd.lending.pitch", lang)}</p>
         <button disabled={busy || !myself || !myToken}
                 onClick={act(async () =>
                   setMine(await api.grantsForPerson(myself, myToken)))}>
           {tr("nmd.showmine", lang)}
         </button>
-        {mine && <p className="small">{JSON.stringify(mine)}</p>}
+        {mine && (
+          <>
+            {(mine.lending || []).length === 0
+              && (mine.borrowing || []).length === 0 && (
+              <p className="muted small">{tr("nmd.nogrants", lang)}</p>
+            )}
+            {(mine.lending || []).length > 0 && (
+              <h4>{tr("nmd.lending.out", lang)}</h4>
+            )}
+            {(mine.lending || []).map((g, i) => <GrantRow g={g} key={i} />)}
+            {(mine.borrowing || []).length > 0 && (
+              <h4>{tr("nmd.borrowing", lang)}</h4>
+            )}
+            {(mine.borrowing || []).map((g, i) => <GrantRow g={g} key={i} />)}
+          </>
+        )}
         <p className="muted small">{tr("nmd.yoursonly", lang)}</p>
       </div>
 
@@ -240,9 +239,7 @@ export function Named({ onPlans }: { onPlans: () => void }) {
             {place.grants.length === 0 && (
               <p className="muted small">{tr("nmd.noneyours", lang)}</p>
             )}
-            {place.grants.map((g, i) => (
-              <p className="small" key={i}>{JSON.stringify(g)}</p>
-            ))}
+            {place.grants.map((g, i) => <GrantRow g={g} key={i} />)}
             {/* Verbatim. A short list here means *your* grants, not *no*
                 grants, and reading it the other way turns an access limit
                 into an empty room. */}
@@ -250,6 +247,48 @@ export function Named({ onPlans }: { onPlans: () => void }) {
           </>
         )}
       </div>
+
+      {/* The status lights live at the bottom, with a sentence about why a
+          legend is on a lookup screen at all — a field report met it at the
+          top and wondered what lights had to do with looking things up. */}
+      {lights && (
+        <div className="card">
+          <h3>{tr("nmd.lights", lang)}</h3>
+          <p className="muted small">{tr("nmd.lights.why", lang)}</p>
+          <p className="muted small">{lights.question}</p>
+          {/* Built from the mapping, not written beside it. A legend kept
+              separately eventually describes a mapping the code does not
+              have — and it is the legend people trust. */}
+          {lights.legend.map((l) => (
+            <p className="small" key={l.light}>
+              <strong>{l.light}</strong> — {l.labels.join(", ")}
+              <br />
+              <span className="muted">
+                {fill(tr("nmd.from", lang), { list: l.statuses.join(", ") })}
+              </span>
+            </p>
+          ))}
+          <p className="muted small">{tr("nmd.noidnotoken", lang)}</p>
+        </div>
+      )}
     </div>
+  );
+}
+
+/** One grant, as a sentence rather than as JSON: what is lent, where it is
+ *  usable, and where it stands. */
+function GrantRow({ g }: { g: unknown }) {
+  const r = g as { title?: string; skill_kind?: string; means?: string;
+                   where?: string; state?: string; used_count?: number };
+  return (
+    <p className="small">
+      <strong>{r.title || (r.skill_kind || "").replace(/_/g, " ")}</strong>
+      {r.means && <> — {r.means}</>}
+      {r.where && <span className="muted"> · {r.where}</span>}
+      {r.state && <span className="muted"> · {r.state}</span>}
+      {typeof r.used_count === "number" && r.used_count > 0 && (
+        <span className="muted"> · ×{r.used_count}</span>
+      )}
+    </p>
   );
 }

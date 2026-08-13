@@ -2742,9 +2742,9 @@ export type Summoned = {
  *  you are matched at once, or you wait. `matched_with` is the other side's
  *  chosen alias and never their name or id: anonymity is the feature. */
 export type ConnJoined = {
-  status: "matched" | "waiting";
+  status: "matched" | "waiting" | "idle";
   connection_id?: string;
-  tier: string;
+  tier?: string;
   matched_with?: string;
 };
 
@@ -3065,6 +3065,14 @@ export const api = {
   pair: () => req<PairInfo>("/pair"),
 
   offlineStatus: () => req<Record<string, unknown>>("/offline/status"),
+  // The failure aggregate this backend keeps (qrme/routers/problems.py).
+  // Reading is the operator's: QRME_PROBLEMS_KEY as the token, or nothing
+  // when asking from the machine the backend runs on.
+  problemRows: (key?: string) =>
+    req<{ rows: { source: string; app_version: string; platform: string;
+                  op: string; status: number; day: string; count: number;
+                  last_seen: string }[] }>(
+      "/v1/problems", key ? { token: key } : {}),
 
   // The help box. No token: a beacon scan lands a stranger on a page, and
   // requiring an account to ask "what is this?" gates the one question that
@@ -5141,6 +5149,11 @@ export const api = {
   joinQueue: (body: { interactor_id: string; tier: string; alias?: string },
               token: string) =>
     req<ConnJoined>("/connections/join", { method: "POST", body, token }),
+  // What happened to my wait. The match is made by whichever side arrives
+  // second, so the waiter polls this — never join again, which would
+  // re-queue them.
+  myConnection: (token: string) =>
+    req<ConnJoined>("/connections/mine", { token }),
   connectionMessages: (connectionId: string, interactorId: string,
                        token: string) =>
     req<ConnMessage[]>(

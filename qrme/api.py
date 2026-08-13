@@ -40,6 +40,7 @@ from .routers import (accounts as account_routes,
                       intelligence, interaction, licensing, models,
                       organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
+                      problems as problem_routes,
                       frontpage, profiles, research, revisions, robots,
                       sharing, shops as shop_routes, signatures,
                       socialdm,
@@ -142,6 +143,7 @@ def create_app(pdi_client: PDIClient | None = None,
             base_url=os.environ["QRME_CLOUD_URL"])
     app.state.cloud = None if offline.enabled() else cloud_client
 
+    app.include_router(problem_routes.router)
     app.include_router(profiles.router)
     app.include_router(frontpage.router)
     app.include_router(interaction.router)

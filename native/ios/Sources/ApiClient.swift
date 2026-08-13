@@ -522,9 +522,9 @@ struct InvokeResult: Decodable {
 }
 
 struct ConnJoin: Decodable {
-    let status: String                 // "matched" | "waiting"
+    let status: String                 // "matched" | "waiting" | "idle"
     let connection_id: String?
-    let tier: String
+    let tier: String?                  // absent when idle
     let matched_with: String?
 }
 
@@ -1270,6 +1270,13 @@ actor ApiClient {
         if let alias, !alias.isEmpty { body["alias"] = alias }
         return try await request("/connections/join", method: "POST",
                                  body: body, token: token)
+    }
+
+    // What happened to my wait. A match is made by whichever side arrives
+    // second — their join answers *them*, never the waiter — so the waiter
+    // polls this. Never join again to ask: that re-queues the caller.
+    func myConnection(token: String) async throws -> ConnJoin {
+        try await request("/connections/mine", token: token)
     }
 
     func connectionMessages(cid: String, interactorId: String,

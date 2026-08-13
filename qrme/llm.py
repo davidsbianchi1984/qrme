@@ -272,6 +272,31 @@ class StubProvider:
         nickname = _extract(system, "Address them as: ")
         tone = _extract(system, "Tone: ") or "warm"
         greeting = f"{nickname} — " if nickname else ""
+        # A field report pressed "Let them talk" twice and got the whole
+        # setup speech twice \u2014 a wall of the same apology, which reads as
+        # a broken room rather than an honest one. The instructions are
+        # said once. After that the stub keeps holding the thread: still
+        # honest that no model answered, but shorter, and ending with a
+        # question back that references what was said, so the conversation
+        # has somewhere to go.
+        said_already = any(
+            m.get("role") == "assistant"
+            and "no model answered" in m.get("content", "")
+            for m in messages)
+        if said_already:
+            if last_user:
+                return (
+                    f"{greeting}Still here, still without a model \u2014 no "
+                    "model answered this request either. But I'm holding "
+                    f"on to \u201c{last_user[:80]}\u201d: what would a "
+                    f"good answer to that need to get right? (tone: {tone})"
+                )
+            return (
+                f"{greeting}Nothing new to work from yet, and still no "
+                "model behind me \u2014 no model answered this request. Say "
+                "something and I will keep it for the day I can answer "
+                f"properly. What brought you in? (tone: {tone})"
+            )
         # The echo stays (moderation must be able to see user-influenced
         # text ride into the reply, end to end) but as a plain quotation,
         # not a stage direction: no brackets, no "stub reply in a warm

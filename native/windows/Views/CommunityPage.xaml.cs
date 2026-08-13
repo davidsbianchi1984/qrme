@@ -183,9 +183,42 @@ public sealed partial class CommunityPage : Page
             else
             {
                 JoinButton.Content = L10n.T("nc.match.waiting");
+                _waitingForMatch = true;
+                _ = PollForMatch();
             }
         }
         catch (Exception ex) { ShowStrangerError(ex.Message); }
+    }
+
+    // Roulette. The match is made by whichever side arrives second — their
+    // join answers *them*, never the waiter — so while waiting we poll our
+    // own route and drop straight into the conversation the moment it
+    // exists. Never join again to ask: that re-queues us.
+    private bool _waitingForMatch;
+
+    private async System.Threading.Tasks.Task PollForMatch()
+    {
+        while (_waitingForMatch)
+        {
+            await System.Threading.Tasks.Task.Delay(2500);
+            var token = AppState.Current.InteractorToken;
+            if (!_waitingForMatch || string.IsNullOrEmpty(token)) continue;
+            ConnJoin r;
+            try { r = await ApiClient.Shared.MyConnection(token!); }
+            catch { continue; }
+            if (r.Status == "matched" && r.ConnectionId is not null)
+            {
+                _waitingForMatch = false;
+                _connectionId = r.ConnectionId;
+                MatchTitle.Text = L10n.Fill("nc.talking", AppState.Current.Language,
+                                            ("who", r.MatchedWith
+                                                 ?? L10n.T("nc.stranger")));
+                JoinCard.Visibility = Visibility.Collapsed;
+                TalkCard.Visibility = Visibility.Visible;
+                JoinButton.Content = L10n.T("nc.match.find");
+                await RefreshStranger();
+            }
+        }
     }
 
     private async System.Threading.Tasks.Task RefreshStranger()

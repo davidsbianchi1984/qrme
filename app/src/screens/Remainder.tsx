@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, type AppConnector, type ConnectorCatalogue, type Excursion,
-         type FeedbackBoard, type GameSession, type PackDetail,
+import { api, uploadMedia, type AppConnector, type ConnectorCatalogue,
+         type Excursion, type FeedbackBoard, type GameSession, type PackDetail,
          type PackRegistry, type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -108,7 +108,15 @@ export function Remainder() {
   useEffect(reload, [me, token]);
   useEffect(() => { go(() => api.mediaLimits(), setLimits); }, []);
   useEffect(() => {
-    api.connectorCatalogue().then(setConnCatalog).catch(() => setConnCatalog(null));
+    api.connectorCatalogue().then((c) => {
+      setConnCatalog(c);
+      // The play card's platform picker draws from the catalog's gaming
+      // provider; land the selection on a real key the moment we know them.
+      const consoles = c.providers.find((p) => p.provider === "gaming")?.apps;
+      if (consoles?.length && !consoles.some((a) => a.app === "steam")) {
+        setPlatform(consoles[0].app);
+      }
+    }).catch(() => setConnCatalog(null));
   }, []);
 
   /* Eleven bindings existed for eleven single reads, each fetching one thing
@@ -249,30 +257,50 @@ export function Remainder() {
             <div className="row">
               <label>{tr("rem.apps.provider", lang)}
                 <select value={connProvider} onChange={(e) => {
-                  setConnProvider(e.target.value); setConnApp("");
+                  setConnProvider(e.target.value);
+                  // Every provider means every app — there is nothing
+                  // narrower to choose once the answer is "all of it".
+                  setConnApp(e.target.value === "*" ? "*" : "");
                 }}>
                   <option value="">{tr("rem.apps.pick", lang)}</option>
                   {connCatalog.providers.map((p) => (
                     <option key={p.provider} value={p.provider}>{p.label}</option>
                   ))}
+                  <option value="*">{tr("rem.apps.all", lang)}</option>
                 </select>
               </label>
               <label>{tr("rem.apps.app", lang)}
                 <select value={connApp} disabled={!connProvider}
                         onChange={(e) => setConnApp(e.target.value)}>
                   <option value="">{tr("rem.apps.pick", lang)}</option>
-                  {connCatalog.providers
+                  {connProvider !== "*" && connCatalog.providers
                     .find((p) => p.provider === connProvider)
                     ?.apps.map((a) => (
                       <option key={a.app} value={a.app}>{a.label}</option>
                     ))}
+                  <option value="*">{tr("rem.apps.all", lang)}</option>
                 </select>
               </label>
               <button className="ghost" disabled={!me || !token || !connApp}
-                      onClick={() => go(
-                        () => api.connectApp(
-                          me, { provider: connProvider, app: connApp }, token),
-                        () => { setSaid("Connected."); setConnApp(""); reload(); })}>
+                      onClick={() => go(async () => {
+                        // "All of the above" is a list, not a wildcard the
+                        // backend knows: connect each pair, one honest call
+                        // per app.
+                        const pairs = connCatalog.providers
+                          .filter((p) => connProvider === "*"
+                                         || p.provider === connProvider)
+                          .flatMap((p) => p.apps
+                            .filter((a) => connApp === "*" || a.app === connApp)
+                            .map((a) => ({ provider: p.provider, app: a.app })));
+                        for (const pair of pairs) {
+                          await api.connectApp(me, pair, token);
+                        }
+                        return pairs.length;
+                      }, (n) => {
+                        setSaid(tr("rem.apps.connected", lang)
+                          .replace("{n}", String(n)));
+                        setConnApp(""); reload();
+                      })}>
                 {tr("rem.apps.connect", lang)}
               </button>
             </div>
@@ -301,7 +329,15 @@ export function Remainder() {
         <button disabled={!me || !token || !topic || !question}
                 onClick={() => go(
                   () => api.startExcursion(me, { topic, question }, token),
-                  () => { setTopic(""); setQuestion(""); reload(); })}>
+                  (fresh) => {
+                    // The answer lands here, at once — a field report pressed
+                    // this and read nothing, because the result only joined a
+                    // list further down after a background reload.
+                    setTrips((old) => [fresh,
+                                       ...old.filter((t) => t.id !== fresh.id)]);
+                    setTopic(""); setQuestion("");
+                    setSaid(tr("rem.trip.back", lang));
+                  })}>
           {tr("rem.trip.go", lang)}
         </button>
         {trips.map((t) => (
@@ -359,8 +395,25 @@ export function Remainder() {
       <div className="card">
         <h3>{tr("rem.play", lang)}</h3>
         <p className="muted small">{tr("rem.play.pitch", lang)}</p>
-        <input value={platform} onChange={(e) => setPlatform(e.target.value)}
-               placeholder={tr("rem.play.platform.ph", lang)} />
+        {/* The platform is a closed set the backend already publishes under
+            its gaming provider — a field report typed into a bare text box
+            and asked for "a connector console or gaming account" instead. */}
+        {(() => {
+          const consoles = connCatalog?.providers
+            .find((p) => p.provider === "gaming")?.apps || [];
+          return consoles.length > 0 ? (
+            <select value={platform}
+                    onChange={(e) => setPlatform(e.target.value)}>
+              {consoles.map((c) => (
+                <option key={c.app} value={c.app}>{c.label}</option>
+              ))}
+            </select>
+          ) : (
+            <input value={platform}
+                   onChange={(e) => setPlatform(e.target.value)}
+                   placeholder={tr("rem.play.platform.ph", lang)} />
+          );
+        })()}
         <input value={game} onChange={(e) => setGame(e.target.value)}
                placeholder={tr("rem.play.game.ph", lang)} />
         <button disabled={!me || !token || !game} onClick={() => go(
@@ -424,12 +477,28 @@ export function Remainder() {
             .replace("{img}", String(Math.round(limits.image.max_bytes / 1e6)))
             .replace("{vid}", String(Math.round(limits.video.max_bytes / 1e6)))}
         </p>
+        {/* "An asset path" meant nothing to a person holding a phone. The
+            ordinary way in is a picture from the device; pasting an uploaded
+            file's url stays possible underneath. */}
+        <label className="chip">
+          <input type="file" accept="image/*,video/*" hidden
+                 onChange={(e) => {
+                   const f = e.target.files?.[0];
+                   e.target.value = "";
+                   if (!f || !me || !token) return;
+                   go(async () => {
+                     const saved = await uploadMedia(me, f, token);
+                     await api.setAvatar(me, saved.url, token);
+                   }, () => setSaid(tr("rem.avatar.done", lang)));
+                 }} />
+          {tr("rem.avatar.upload", lang)}
+        </label>
         <input value={avatarAsset}
                onChange={(e) => setAvatarAsset(e.target.value)}
                placeholder={tr("rem.avatar.asset.ph", lang)} />
         <button disabled={!me || !token || !avatarAsset} onClick={() => go(
           () => api.setAvatar(me, avatarAsset, token),
-          () => { setAvatarAsset(""); setSaid("Portrait set."); })}>
+          () => { setAvatarAsset(""); setSaid(tr("rem.avatar.done", lang)); })}>
           {tr("rem.avatar.set", lang)}
         </button>
       </div>

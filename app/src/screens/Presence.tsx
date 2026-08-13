@@ -161,9 +161,13 @@ export function Presence({ onPlans }: {
           <select value={layout} onChange={(e) => setLayout(e.target.value)}>
             {pages?.layouts.map((l) => <option key={l} value={l}>{l}</option>)}
           </select>
-          <input value={tagline} onChange={(e) => setTagline(e.target.value)}
-                 placeholder={tr("prs.tagline.ph", lang)} style={{ flex: 1 }} />
         </div>
+        {/* Its own row, and a box that grows: a one-line input clipped the
+            words as they were typed — "the topic cuts off what I have
+            written". */}
+        <textarea value={tagline} rows={2}
+                  onChange={(e) => setTagline(e.target.value)}
+                  placeholder={tr("prs.tagline.ph", lang)} />
         <p className="muted small">
           {pages?.themes.find((t) => t.id === theme)?.note}
         </p>

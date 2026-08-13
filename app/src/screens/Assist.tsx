@@ -295,6 +295,24 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
           <input value={deviceName}
                  onChange={(e) => setDeviceName(e.target.value)}
                  placeholder={tr("asst.worn.name", lang)} style={{ flex: 1 }} />
+          {/* A watch is a thing in the room, not a name you remember how to
+              spell — a field report expected to pick it from a scan. The
+              chooser is the browser's own; all that comes back is the name,
+              which is all the pairing record wants. Typing stays open for
+              browsers without Web Bluetooth. */}
+          <button className="chip" disabled={busy}
+                  onClick={act(async () => {
+                    const bt = (navigator as unknown as {
+                      bluetooth?: { requestDevice(o: object):
+                        Promise<{ name?: string }> };
+                    }).bluetooth;
+                    if (!bt) throw new Error(tr("asst.worn.nobt", lang));
+                    // Dismissing the chooser is a decision, not an error.
+                    const dev = await bt
+                      .requestDevice({ acceptAllDevices: true })
+                      .catch(() => null);
+                    if (dev?.name) setDeviceName(dev.name);
+                  })}>{tr("asst.worn.scan", lang)}</button>
           <select value={deviceKind}
                   onChange={(e) => setDeviceKind(e.target.value)}>
             {Object.entries(devices?.kinds_worn || {}).map(([k, where]) => (

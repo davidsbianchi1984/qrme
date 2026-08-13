@@ -1616,6 +1616,24 @@ CREATE TABLE IF NOT EXISTS export_tickets (
     used_at    TEXT
 );
 
+-- Error reports, folded into counters the moment they arrive. No report is
+-- stored as a report: the key is what triage needs and nothing narrower,
+-- because a row that identifies one install is the thing the whole
+-- content-free design exists to avoid. Same shape the Cloud Model Gateway
+-- keeps, so a deployment can point its consoles at either and read the same
+-- table of answers.
+CREATE TABLE IF NOT EXISTS problem_reports (
+    source      TEXT NOT NULL,
+    app_version TEXT NOT NULL,
+    platform    TEXT NOT NULL,
+    op          TEXT NOT NULL,
+    status      INTEGER NOT NULL,
+    day         TEXT NOT NULL,
+    count       INTEGER NOT NULL DEFAULT 0,
+    last_seen   TEXT NOT NULL,
+    PRIMARY KEY (source, app_version, platform, op, status)
+);
+
 -- The upper-torso form of an avatar: the figure that stands in a live feed
 -- or an AR scene at 1:1 scale. The circular bubble is only the form of a
 -- profile that has no avatar yet; a profile with a torso renders as one.

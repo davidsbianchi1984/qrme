@@ -24,11 +24,13 @@
 //
 // ── Sending ───────────────────────────────────────────────────────────────
 //
-// The buffer is sent once at launch, to a gateway whose address is compiled
-// into the build (`__PROBLEM_COLLECTOR__`). A build with no address has
-// nowhere to send and no code path that could acquire one at runtime beyond a
-// key the user sets themselves — which is a stronger "off by default" than a
-// flag, because it cannot be flipped by a mistake in a later release.
+// The buffer is sent once at launch — to the gateway compiled into the build
+// (`__PROBLEM_COLLECTOR__`) when there is one, and otherwise to the backend
+// this console already talks to, which now serves the same `/v1/problems`
+// intake. A field report met the old behavior ("no collector configured, so
+// nothing is sent anywhere") and asked why the failures don't funnel back to
+// where corrections get made; the answer was that they should. The first-run
+// notice and the switch still gate every send either way.
 //
 // Counts are sent as *deltas*, not totals. Each row remembers how much of it
 // has already been reported, so relaunching an app twenty times does not turn
@@ -38,6 +40,11 @@
 // The send is fire-and-forget and swallows every failure. A diagnostic that
 // can delay a launch, or produce an error of its own, has stopped being worth
 // having.
+
+// A deliberate cycle: `api.ts` imports `recordProblem` from here, and this
+// imports `getBase` back. Both are used strictly inside function bodies, so
+// the live bindings resolve long after both modules finish evaluating.
+import { getBase } from "./api";
 
 const KEY = "app.problems";
 const COLLECTOR_KEY = "app.problems.collector";
@@ -319,7 +326,13 @@ export type SendOutcome = "sent" | "nothing-to-send" | "turned-off"
  * the story of its own delivery and nothing else.
  */
 export async function sendProblems(appVersion: string): Promise<SendOutcome> {
-  const base = collectorUrl();
+  // No collector stamped in or stored? The backend this console already
+  // talks to serves the same intake at the same path, so the reports funnel
+  // back to whoever runs the deployment — which is where corrections get
+  // made. The notice and the switch gate this exactly as they gate an
+  // external collector; "content-free" is a property of the report, not of
+  // the address.
+  const base = collectorUrl() || getBase();
   if (!base) return "no-collector";
   if (!sendingEnabled()) return "turned-off";
   if (!noticeAnswered()) return "awaiting-notice";
