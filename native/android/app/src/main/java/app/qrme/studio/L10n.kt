@@ -165,6 +165,36 @@ object L10n {
             "en" to "Chat", "es" to "Chat", "fr" to "Discussion",
             "de" to "Chat", "pt" to "Conversa", "it" to "Chat",
             "ja" to "チャット", "zh" to "聊天", "hi" to "चैट", "ar" to "محادثة"),
+        "wdg.title" to mapOf(
+            "en" to "Widgets", "es" to "Widgets", "fr" to "Widgets", "de" to "Widgets", "pt" to "Widgets", "it" to "Widget", "ja" to "ウィジェット", "zh" to "小工具", "hi" to "विजेट", "ar" to "الأدوات"),
+        "wdg.yours" to mapOf(
+            "en" to "Your widgets", "es" to "Tus widgets", "fr" to "Vos widgets", "de" to "Ihre Widgets", "pt" to "Os seus widgets", "it" to "I tuoi widget", "ja" to "あなたのウィジェット", "zh" to "你的小工具", "hi" to "आपके विजेट", "ar" to "أدواتك"),
+        "wdg.none" to mapOf(
+            "en" to "None yet. Write one.", "es" to "Ninguno todavía. Escribe uno.", "fr" to "Aucun pour l'instant. Écrivez-en un.", "de" to "Noch keine. Schreiben Sie eines.", "pt" to "Ainda nenhum. Escreva um.", "it" to "Ancora nessuno. Scrivine uno.", "ja" to "まだありません。作ってみてください。", "zh" to "还没有。写一个吧。", "hi" to "अभी कोई नहीं। एक लिखें।", "ar" to "لا شيء بعد. اكتب واحدة."),
+        "wdg.remove" to mapOf(
+            "en" to "Remove", "es" to "Quitar", "fr" to "Retirer", "de" to "Entfernen", "pt" to "Remover", "it" to "Rimuovi", "ja" to "削除", "zh" to "移除", "hi" to "हटाएँ", "ar" to "إزالة"),
+        "wdg.name" to mapOf(
+            "en" to "Name", "es" to "Nombre", "fr" to "Nom", "de" to "Name", "pt" to "Nome", "it" to "Nome", "ja" to "名前", "zh" to "名称", "hi" to "नाम", "ar" to "الاسم"),
+        "wdg.code" to mapOf(
+            "en" to "Code", "es" to "Código", "fr" to "Code", "de" to "Code", "pt" to "Código", "it" to "Codice", "ja" to "コード", "zh" to "代码", "hi" to "कोड", "ar" to "الشيفرة"),
+        "wdg.save" to mapOf(
+            "en" to "Save", "es" to "Guardar", "fr" to "Enregistrer", "de" to "Speichern", "pt" to "Guardar", "it" to "Salva", "ja" to "保存", "zh" to "保存", "hi" to "सहेजें", "ar" to "حفظ"),
+        "wdg.run" to mapOf(
+            "en" to "Run", "es" to "Ejecutar", "fr" to "Exécuter", "de" to "Ausführen", "pt" to "Executar", "it" to "Esegui", "ja" to "実行", "zh" to "运行", "hi" to "चलाएँ", "ar" to "تشغيل"),
+        "wdg.walls" to mapOf(
+            "en" to "Your widget runs with no network, no files but its own, and no way to start another program.", "es" to "Tu widget se ejecuta sin red, sin más archivos que los suyos y sin poder iniciar otro programa.", "fr" to "Votre widget s'exécute sans réseau, sans autres fichiers que les siens, et sans pouvoir lancer un autre programme.", "de" to "Ihr Widget läuft ohne Netzwerk, ohne fremde Dateien und ohne die Möglichkeit, ein anderes Programm zu starten.", "pt" to "O seu widget corre sem rede, sem outros ficheiros além dos seus e sem poder iniciar outro programa.", "it" to "Il tuo widget gira senza rete, senza file che non siano i suoi e senza poter avviare un altro programma.", "ja" to "ウィジェットはネットワークなし、自分のファイル以外なし、別のプログラムを起動する手段なしで動きます。", "zh" to "你的小工具在没有网络、没有自身之外的文件、也无法启动其他程序的环境中运行。", "hi" to "आपका विजेट बिना नेटवर्क, अपनी फ़ाइलों के अलावा कुछ नहीं, और कोई दूसरा प्रोग्राम शुरू किए बिना चलता है।", "ar" to "تعمل أداتك دون شبكة، ودون ملفات غير ملفاتها، ودون القدرة على تشغيل برنامج آخر."),
+        "wdg.nobox" to mapOf(
+            "en" to "This deployment cannot build the box a widget runs in, so nothing will run here.", "es" to "Esta instalación no puede construir la caja donde se ejecuta un widget, así que aquí no se ejecutará nada.", "fr" to "Ce déploiement ne peut pas construire la boîte dans laquelle s'exécute un widget ; rien ne s'exécutera ici.", "de" to "Diese Installation kann die Box, in der ein Widget läuft, nicht bauen — hier läuft nichts.", "pt" to "Esta instalação não consegue construir a caixa onde um widget corre, por isso nada correrá aqui.", "it" to "Questa installazione non può costruire la scatola in cui gira un widget, quindi qui non girerà nulla.", "ja" to "この配備ではウィジェットを走らせる箱を作れないため、ここでは何も実行されません。", "zh" to "本部署无法构建运行小工具的沙箱，因此这里不会运行任何东西。", "hi" to "यह डिप्लॉयमेंट वह बॉक्स नहीं बना सकता जिसमें विजेट चलता है, इसलिए यहाँ कुछ नहीं चलेगा।", "ar" to "لا يستطيع هذا النشر بناء الصندوق الذي تعمل فيه الأداة، لذا لن يُشغَّل شيء هنا."),
+        "wdg.status.ok" to mapOf(
+            "en" to "It ran", "es" to "Se ejecutó", "fr" to "Exécuté", "de" to "Gelaufen", "pt" to "Executou", "it" to "Eseguito", "ja" to "実行しました", "zh" to "已运行", "hi" to "चल गया", "ar" to "عملت"),
+        "wdg.status.error" to mapOf(
+            "en" to "It stopped on an error", "es" to "Se detuvo por un error", "fr" to "Arrêté sur une erreur", "de" to "Mit einem Fehler gestoppt", "pt" to "Parou com um erro", "it" to "Si è fermato per un errore", "ja" to "エラーで止まりました", "zh" to "因错误停止", "hi" to "त्रुटि पर रुका", "ar" to "توقفت عند خطأ"),
+        "wdg.status.timeout" to mapOf(
+            "en" to "It ran too long", "es" to "Se ejecutó demasiado tiempo", "fr" to "Trop long à s'exécuter", "de" to "Zu lange gelaufen", "pt" to "Demorou demasiado", "it" to "Ha girato troppo a lungo", "ja" to "時間がかかりすぎました", "zh" to "运行时间过长", "hi" to "बहुत देर तक चला", "ar" to "استغرقت وقتًا أطول من المسموح"),
+        "wdg.status.killed" to mapOf(
+            "en" to "It was stopped", "es" to "Fue detenido", "fr" to "Il a été arrêté", "de" to "Es wurde gestoppt", "pt" to "Foi parado", "it" to "È stato fermato", "ja" to "停止されました", "zh" to "已被停止", "hi" to "रोक दिया गया", "ar" to "أُوقفت"),
+        "wdg.status.refused" to mapOf(
+            "en" to "It did not run", "es" to "No se ejecutó", "fr" to "Il n'a pas été exécuté", "de" to "Es lief nicht", "pt" to "Não foi executado", "it" to "Non è stato eseguito", "ja" to "実行されませんでした", "zh" to "未运行", "hi" to "चला ही नहीं", "ar" to "لم تُشغَّل"),
         "tab.studio" to mapOf(
             "en" to "Studio", "es" to "Estudio", "fr" to "Studio",
             "de" to "Studio", "pt" to "Estúdio", "it" to "Studio",

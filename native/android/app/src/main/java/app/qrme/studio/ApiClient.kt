@@ -4420,3 +4420,67 @@ data class GrantCard(val id: String, val title: String, val state: String,
 
 data class GrantUse(val usedAt: String, val what: String)
 
+
+// -- Widgets ------------------------------------------------------------------
+//
+// Small programs somebody writes for their own profile. Owner-scoped at the
+// door and again in the query behind it, so a widget id from another profile
+// is not found rather than refused. The code runs on the backend in a box
+// with no network, one directory, no child processes and finite time — never
+// on the phone.
+
+data class WidgetRow(val id: String, val name: String, val source: String, val version: Int)
+
+/** What a run said. `status` is ok, error, timeout, killed or refused; the
+ *  value is kept as text because a widget's answer is its author's shape. */
+data class WidgetAnswer(val status: String, val ms: Int, val said: String?,
+                        val message: String?, val value: String?)
+
+data class WidgetCaps(val wallSeconds: Int, val heapMb: Int, val available: Boolean)
+
+suspend fun ApiClient.widgetLimits(): WidgetCaps {
+    val o = JSONObject(request("/studio/limits"))
+    val caps = o.optJSONObject("limits")
+    return WidgetCaps(caps?.optInt("wall_seconds") ?: 0,
+        caps?.optInt("heap_mb") ?: 0, o.optBoolean("available"))
+}
+
+private fun widgetOf(o: JSONObject) = WidgetRow(
+    o.optString("id"), o.optString("name"), o.optString("source"),
+    o.optInt("version", 1))
+
+suspend fun ApiClient.widgets(profileId: String, token: String): List<WidgetRow> {
+    val rows = JSONObject(request("/profiles/$profileId/widgets", token = token))
+        .optJSONArray("widgets") ?: return emptyList()
+    return (0 until rows.length()).map { widgetOf(rows.getJSONObject(it)) }
+}
+
+suspend fun ApiClient.widget(profileId: String, widgetId: String, token: String) =
+    widgetOf(JSONObject(request("/profiles/$profileId/widgets/$widgetId", token = token)))
+
+suspend fun ApiClient.createWidget(profileId: String, name: String, source: String,
+                                   token: String): WidgetRow {
+    val body = JSONObject().put("name", name).put("source", source)
+    return widgetOf(JSONObject(request("/profiles/$profileId/widgets", "POST", body, token)))
+}
+
+suspend fun ApiClient.updateWidget(profileId: String, widgetId: String, name: String,
+                                   source: String, token: String): WidgetRow {
+    val body = JSONObject().put("name", name).put("source", source)
+    return widgetOf(JSONObject(
+        request("/profiles/$profileId/widgets/$widgetId", "PUT", body, token)))
+}
+
+suspend fun ApiClient.deleteWidget(profileId: String, widgetId: String, token: String): String =
+    JSONObject(request("/profiles/$profileId/widgets/$widgetId", "DELETE", token = token))
+        .optString("removed")
+
+suspend fun ApiClient.runWidget(profileId: String, widgetId: String,
+                                token: String): WidgetAnswer {
+    val o = JSONObject(request("/profiles/$profileId/widgets/$widgetId/run",
+        "POST", JSONObject(), token))
+    val value = if (o.isNull("value")) null else o.get("value").toString()
+    return WidgetAnswer(o.optString("status"), o.optInt("ms"),
+        o.optString("said").ifEmpty { null },
+        o.optString("message").ifEmpty { null }, value)
+}

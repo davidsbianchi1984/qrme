@@ -6794,3 +6794,117 @@ private fun YourSideCard(vm: StudioViewModel) {
         }
     }
 }
+
+/**
+ * Widgets: small programs somebody writes for their own profile.
+ *
+ * The code never runs on the phone. It goes to the backend and runs there
+ * in a box with no network, no files but its own, no child processes and
+ * finite time — which is what lets a person write whatever they like
+ * without reaching anybody else's profile.
+ *
+ * A run that throws, runs too long or is stopped by a limit comes back with
+ * a status rather than a refusal: the request was fine, the code was not.
+ */
+@Composable
+fun WidgetsScreen(state: AppState) {
+    val scope = rememberCoroutineScope()
+    var widgets by remember { mutableStateOf<List<WidgetRow>>(emptyList()) }
+    var open by remember { mutableStateOf<WidgetRow?>(null) }
+    var name by remember { mutableStateOf("") }
+    var source by remember { mutableStateOf("module.exports = () => 1;") }
+    var answer by remember { mutableStateOf<WidgetAnswer?>(null) }
+    var caps by remember { mutableStateOf<WidgetCaps?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val lang = state.language
+    val pid = state.profileId
+    val token = state.ownerToken
+
+    suspend fun reload() {
+        val id = pid ?: return
+        val bearer = token ?: return
+        widgets = runCatching { state.api.widgets(id, bearer) }
+            .onFailure { error = it.message }.getOrDefault(emptyList())
+    }
+
+    LaunchedEffect(pid) {
+        caps = runCatching { state.api.widgetLimits() }.getOrNull()
+        reload()
+    }
+
+    screenScroll {
+        Text(L10n.t("wdg.title", lang), color = Qrme.T1, fontSize = 20.sp,
+            fontWeight = FontWeight.Bold)
+        error?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
+        caps?.let { if (!it.available) Text(L10n.t("wdg.nobox", lang), color = Qrme.T2, fontSize = 12.sp) }
+
+        Text(L10n.t("wdg.yours", lang), color = Qrme.T1, fontWeight = FontWeight.Bold)
+        if (widgets.isEmpty()) Text(L10n.t("wdg.none", lang), color = Qrme.T2, fontSize = 12.sp)
+        widgets.forEach { row ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(row.name, color = Qrme.T1, modifier = Modifier.clickable {
+                    open = row; name = row.name; source = row.source; answer = null
+                    // Re-read rather than trust the list: a list fetched a
+                    // minute ago holds a draft from a minute ago.
+                    scope.launch {
+                        val id = pid ?: return@launch
+                        val bearer = token ?: return@launch
+                        runCatching { state.api.widget(id, row.id, bearer) }
+                            .onSuccess { open = it; name = it.name; source = it.source }
+                    }
+                })
+                Text(L10n.t("wdg.remove", lang), color = Qrme.T2, fontSize = 12.sp,
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            val id = pid ?: return@launch
+                            val bearer = token ?: return@launch
+                            runCatching { state.api.deleteWidget(id, row.id, bearer) }
+                                .onFailure { error = it.message }
+                            if (open?.id == row.id) open = null
+                            reload()
+                        }
+                    })
+            }
+        }
+
+        labeledField(L10n.t("wdg.name", lang), name, "") { name = it }
+        labeledField(L10n.t("wdg.code", lang), source, "") { source = it }
+
+        BrandButton(L10n.t("wdg.save", lang), enabled = name.isNotBlank(), busy = busy) {
+            scope.launch {
+                busy = true
+                val id = pid; val bearer = token
+                if (id != null && bearer != null) {
+                    runCatching {
+                        val held = open
+                        if (held == null) state.api.createWidget(id, name, source, bearer)
+                        else state.api.updateWidget(id, held.id, name, source, bearer)
+                    }.onSuccess { open = it; reload() }.onFailure { error = it.message }
+                }
+                busy = false
+            }
+        }
+        BrandButton(L10n.t("wdg.run", lang),
+            enabled = open != null && (caps?.available ?: true), busy = busy) {
+            scope.launch {
+                busy = true; answer = null
+                val id = pid; val bearer = token; val held = open
+                if (id != null && bearer != null && held != null) {
+                    runCatching { state.api.runWidget(id, held.id, bearer) }
+                        .onSuccess { answer = it }.onFailure { error = it.message }
+                }
+                busy = false
+            }
+        }
+        Text(L10n.t("wdg.walls", lang), color = Qrme.T2, fontSize = 12.sp)
+
+        answer?.let { ran ->
+            Text(L10n.t("wdg.status.${ran.status}", lang), color = Qrme.T1,
+                fontWeight = FontWeight.Bold)
+            ran.said?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+            ran.message?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+            ran.value?.let { Text(it, color = Qrme.T1, fontSize = 12.sp) }
+        }
+    }
+}
