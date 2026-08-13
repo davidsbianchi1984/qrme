@@ -8,7 +8,7 @@ import { useSession } from "../store";
 export function Home({ go }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
         | "campaigns" | "org" | "plans" | "friends"
-        | "identity" | "stranger" | "rooms") => void;
+        | "identity" | "stranger" | "rooms" | "studio") => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -241,6 +241,7 @@ export function Home({ go }: {
           <button onClick={() => go("identity")}>{tr("hom.exportqr", lang)}</button>
           <button onClick={() => go("rooms")}>{tr("hom.roomscene", lang)}</button>
           <button onClick={() => go("stranger")}>{tr("hom.roulette", lang)}</button>
+          <button onClick={() => go("studio")}>{tr("hom.studio", lang)}</button>
         </div>
       </div>
     </div>

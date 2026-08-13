@@ -56,6 +56,19 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
     setName(widget ? widget.name : "");
     setSource(widget ? widget.source : STARTER);
     setAnswer(null);
+    // Re-read the one being opened rather than trusting the list. A list
+    // fetched a minute ago is a draft from a minute ago, and the editor is
+    // where somebody's own words go — opening a stale copy and saving it is
+    // how an edit made on another device disappears.
+    if (widget && owner) {
+      api.readWidget(session.profileId!, widget.id, session.ownerToken!)
+        .then((fresh) => {
+          setOpen(fresh);
+          setName(fresh.name);
+          setSource(fresh.source);
+        })
+        .catch((e) => setError(e));
+    }
   }
 
   function save() {

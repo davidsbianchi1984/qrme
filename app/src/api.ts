@@ -3310,6 +3310,8 @@ export const api = {
           unavailable_because: string | null }>("/studio/limits"),
   listWidgets: (profileId: string, token: string) =>
     req<{ widgets: Widget[] }>(`/profiles/${profileId}/widgets`, { token }),
+  readWidget: (profileId: string, widgetId: string, token: string) =>
+    req<Widget>(`/profiles/${profileId}/widgets/${widgetId}`, { token }),
   createWidget: (profileId: string, body: { name: string; source: string },
                  token: string) =>
     req<Widget>(`/profiles/${profileId}/widgets`,

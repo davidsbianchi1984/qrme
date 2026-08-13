@@ -113,6 +113,7 @@ const CHROME: Table = {
   // it caught this one. This control moves one card up a stream; it does not
   // leave anything.
   "nav.studio": { en: "Studio", es: "Estudio", fr: "Studio", de: "Studio", pt: "Estúdio", it: "Studio", ja: "スタジオ", zh: "工作室", hi: "स्टूडियो", ar: "الاستوديو" },
+  "hom.studio": { en: "Write your own tool", es: "Escribe tu propia herramienta", fr: "Écrivez votre propre outil", de: "Schreiben Sie Ihr eigenes Werkzeug", pt: "Escreva a sua própria ferramenta", it: "Scrivi il tuo strumento", ja: "自分の道具を作る", zh: "写你自己的工具", hi: "अपना ख़ुद का उपकरण लिखें", ar: "اكتب أداتك الخاصة" },
   "studio.title": { en: "Studio", es: "Estudio", fr: "Studio", de: "Studio", pt: "Estúdio", it: "Studio", ja: "スタジオ", zh: "工作室", hi: "स्टूडियो", ar: "الاستوديو" },
   "studio.sub": { en: "tools you write, for your profile only", es: "herramientas que escribes, solo para tu perfil", fr: "des outils que vous écrivez, pour votre profil seul", de: "Werkzeuge, die Sie schreiben — nur für Ihr Profil", pt: "ferramentas que escreve, só para o seu perfil", it: "strumenti che scrivi, solo per il tuo profilo", ja: "あなたが書く、あなたのプロフィールだけの道具", zh: "你自己写的工具，只用于你的档案", hi: "आपके लिखे उपकरण, केवल आपकी प्रोफ़ाइल के लिए", ar: "أدوات تكتبها، لملفك وحده" },
   "studio.yours": { en: "Your widgets", es: "Tus widgets", fr: "Vos widgets", de: "Ihre Widgets", pt: "Os seus widgets", it: "I tuoi widget", ja: "あなたのウィジェット", zh: "你的小工具", hi: "आपके विजेट", ar: "أدواتك" },
