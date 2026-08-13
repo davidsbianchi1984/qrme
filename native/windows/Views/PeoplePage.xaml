@@ -817,8 +817,13 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button x:Name="RecExportButton" Click="OnRecExport" />
+                        <Button x:Name="RecExportQrButton" Click="OnRecExportQr" />
                         <Button x:Name="RecFeedButton" Click="OnRecFeed" />
                     </StackPanel>
+                    <!-- The QR handoff's redeeming side: a ticket pasted
+                         from another device's screen. -->
+                    <TextBox x:Name="RecTicketBox" />
+                    <Button x:Name="RecRedeemButton" Click="OnRecRedeem" />
                 </StackPanel>
             </Border>
 

@@ -3258,6 +3258,10 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'weight': {'en': 'Share of the blend', 'es': 'Parte de la mezcla', 'fr': 'Part du mélange', 'de': 'Anteil an der Mischung', 'pt': 'Parte da mistura', 'it': 'Quota della miscela', 'ja': 'ブレンドの割合', 'zh': '混合中的份额', 'hi': 'मिश्रण में हिस्सा', 'ar': 'الحصة في المزيج'},
     'aspect': {'en': 'Their aspect', 'es': 'Su rasgo', 'fr': 'Leur aspect', 'de': 'Ihr Aspekt', 'pt': 'O seu aspeto', 'it': 'Il loro aspetto', 'ja': 'その人の要素', 'zh': '他们的特质', 'hi': 'उनका पहलू', 'ar': 'ما يخصّه من سمات'},
     'minutes': {'en': 'Minutes', 'es': 'Minutos', 'fr': 'Minutes', 'de': 'Minuten', 'pt': 'Minutos', 'it': 'Minuti', 'ja': '分', 'zh': '分钟', 'hi': 'मिनट', 'ar': 'الدقائق'},
+    # The transcript-curation doors: the checkboxes' selection, and the
+    # mark a rewritten turn wears.
+    'message_ids': {'en': 'Selected turns', 'es': 'Turnos seleccionados', 'fr': 'Tours sélectionnés', 'de': 'Ausgewählte Beiträge', 'pt': 'Turnos selecionados', 'it': 'Turni selezionati', 'ja': '選択した発言', 'zh': '所选发言', 'hi': 'चुनी हुई बारियाँ', 'ar': 'المداخلات المحددة'},
+    'edited': {'en': 'Edited', 'es': 'Editado', 'fr': 'Modifié', 'de': 'Bearbeitet', 'pt': 'Editado', 'it': 'Modificato', 'ja': '編集済み', 'zh': '已编辑', 'hi': 'संपादित', 'ar': 'معدّل'},
     'lesson': {'en': 'Step', 'es': 'Paso', 'fr': 'Étape', 'de': 'Schritt', 'pt': 'Passo', 'it': 'Passo', 'ja': 'ステップ', 'zh': '步骤', 'hi': 'चरण', 'ar': 'الخطوة'},
     'position_s': {'en': 'Position, in seconds', 'es': 'Posición, en segundos', 'fr': 'Position, en secondes', 'de': 'Position, in Sekunden', 'pt': 'Posição, em segundos', 'it': 'Posizione, in secondi', 'ja': '位置（秒）', 'zh': '位置（秒）', 'hi': 'स्थिति, सेकंड में', 'ar': 'الموضع بالثواني'},
     'verification_ref': {'en': 'Verification reference', 'es': 'Referencia de verificación', 'fr': 'Référence de vérification', 'de': 'Verifizierungsnachweis', 'pt': 'Referência de verificação', 'it': 'Riferimento di verifica', 'ja': '確認書類の参照', 'zh': '核验凭证', 'hi': 'सत्यापन संदर्भ', 'ar': 'مرجع التحقق'},

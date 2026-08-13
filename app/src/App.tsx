@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "./api";
 import { t, visitorLang } from "./l10n";
 import { useSession } from "./store";
@@ -119,6 +119,11 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
 export function App() {
   const { session, signOut } = useSession();
   const [tab, setTab] = useState<Tab>("home");
+  // The scroll container. Every tab change lands at the top of the new
+  // screen — a field report opened menus "pinned in the middle somewhere",
+  // because the pane kept the previous screen's scroll position.
+  const contentRef = useRef<HTMLElement | null>(null);
+  useEffect(() => { contentRef.current?.scrollTo(0, 0); }, [tab]);
   // The two doors that open before a profile exists. Null is the sign-in
   // screen; the state lives here rather than inside Onboarding so the hash
   // link and the in-page link land in the same place.
@@ -210,7 +215,7 @@ export function App() {
         </button>
       </aside>
 
-      <main className="content">
+      <main className="content" ref={contentRef}>
         <ProblemNotice />
         {tab === "home" && <Home go={setTab} />}
         {tab === "chat" && <Chat onPlans={toPlans} />}

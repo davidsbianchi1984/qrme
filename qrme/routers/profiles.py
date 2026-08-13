@@ -4,9 +4,11 @@ marketplace, export, and erasure."""
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta, timezone
 
 from fastapi import (APIRouter, Depends, Header, HTTPException,
                      Request)
+from fastapi.responses import Response
 
 from .. import (auth, cardimport, companion, composite, db, i18n, identity,
                 persona, storage, terms, tiers)
@@ -430,13 +432,19 @@ def export_profile(profile_id: str, request: Request) -> dict:
     most to a person reading their own bundle should not be buried in an
     alphabetical map.
     """
-    profile = profile_or_404(profile_id)
+    profile_or_404(profile_id)
     require_owner(profile_id, request)
+    return _export_bundle(profile_id, request.app.state.pdi)
+
+
+def _export_bundle(profile_id: str, pdi) -> dict:
+    """The bundle itself, shared by the owner door and the handoff ticket."""
+    profile = profile_or_404(profile_id)
     conn = db.connect()
     grab = lambda q: [dict(r) for r in conn.execute(q, (profile_id,)).fetchall()]
     return {
         "profile": profile,
-        "sources": source_items(profile_id, request.app.state.pdi),
+        "sources": source_items(profile_id, pdi),
         "relationships": grab("SELECT * FROM relationships WHERE profile_id=?"),
         "messages": grab("SELECT * FROM messages WHERE profile_id=?"
                          " ORDER BY created_at, rowid"),
@@ -450,6 +458,92 @@ def export_profile(profile_id: str, request: Request) -> dict:
         "note": "every table in this deployment that names this profile, with "
                 "live credentials dropped per column — see EXPORT_REDACTS",
     }
+
+
+# How long a handoff ticket stands, and why it is short: the QR that
+# carries it is shown on a screen in a room, and anyone who photographs
+# the screen holds the ticket. Ten minutes and one use is enough to walk
+# it to the other device, and not enough to be a standing door.
+TICKET_MINUTES = 10
+
+
+@router.post("/profiles/{profile_id}/export/ticket", status_code=201)
+def mint_export_ticket(profile_id: str, request: Request) -> dict:
+    """A one-time, short-lived handoff of the export to another device.
+
+    The owner asked for this by pointing at the export card: "is this
+    where we could insert a button to click for export via QR code". The
+    owner token must never ride in a QR — a code on a screen is legible
+    to any camera in the room — so the QR carries a ticket instead: it
+    unlocks exactly one read of exactly this profile's export, then dies.
+    """
+    import secrets
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    ticket = secrets.token_urlsafe(24)
+    expires = (datetime.now(timezone.utc)
+               + timedelta(minutes=TICKET_MINUTES)).isoformat()
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO export_tickets (ticket, profile_id, expires_at,"
+        " used_at) VALUES (?,?,?,NULL)", (ticket, profile_id, expires))
+    conn.commit()
+    base = f"/profiles/{profile_id}/export/handoff/{ticket}"
+    return {
+        "ticket": ticket,
+        "url": base,
+        "qr_svg": base + "/qr.svg",
+        "expires_at": expires,
+        "single_use": True,
+        "note": ("scan the code on the other device — the link inside it "
+                 "serves this export once, then expires; your owner token "
+                 "never leaves this screen"),
+    }
+
+
+def _ticket_or_410(profile_id: str, ticket: str, consume: bool) -> None:
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT * FROM export_tickets WHERE ticket=? AND profile_id=?",
+        (ticket, profile_id)).fetchone()
+    if row is None:
+        raise HTTPException(404, "no such handoff — mint a fresh ticket")
+    expired = row["expires_at"] < datetime.now(timezone.utc).isoformat()
+    if row["used_at"] or expired:
+        raise HTTPException(
+            410, "this handoff has already been used or has expired — "
+                 "mint a fresh ticket")
+    if consume:
+        conn.execute("UPDATE export_tickets SET used_at=? WHERE ticket=?",
+                     (db.utcnow(), ticket))
+        conn.commit()
+
+
+@router.get("/profiles/{profile_id}/export/handoff/{ticket}")
+def export_handoff(profile_id: str, ticket: str, request: Request) -> dict:
+    """The ticketed read. Tokenless by design — the ticket is the whole
+    authority, which is why it is single-use and dies in minutes."""
+    profile_or_404(profile_id)
+    _ticket_or_410(profile_id, ticket, consume=True)
+    return _export_bundle(profile_id, request.app.state.pdi)
+
+
+@router.get("/profiles/{profile_id}/export/handoff/{ticket}/qr.svg")
+def export_handoff_qr(profile_id: str, ticket: str,
+                      request: Request) -> Response:
+    """The handoff URL as a QR code. Reading the code does not consume
+    the ticket — only the handoff itself does."""
+    import io
+
+    import segno
+    profile_or_404(profile_id)
+    _ticket_or_410(profile_id, ticket, consume=False)
+    url = str(request.base_url).rstrip("/") + \
+        f"/profiles/{profile_id}/export/handoff/{ticket}"
+    buf = io.BytesIO()
+    segno.make(url, error="q").save(buf, kind="svg", scale=8, border=2,
+                                    dark="#0d0a20", light="#ffffff")
+    return Response(content=buf.getvalue(), media_type="image/svg+xml")
 
 
 @router.delete("/profiles/{profile_id}")

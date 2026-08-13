@@ -4103,6 +4103,17 @@ export const api = {
   // is that leaving before you can take your things is not leaving.
   exportProfile: (profileId: string, token: string) =>
     req<Record<string, unknown>>(`/profiles/${profileId}/export`, { token }),
+  // A one-time, minutes-long handoff of the export to another device: the
+  // QR carries the ticket URL, never the owner token.
+  exportTicket: (profileId: string, token: string) =>
+    req<{ ticket: string; url: string; qr_svg: string; expires_at: string;
+          single_use: boolean; note: string }>(
+      `/profiles/${profileId}/export/ticket`, { method: "POST", token }),
+  // The redeeming side, on the device the QR was scanned into. Tokenless:
+  // the single-use ticket is the whole authority.
+  exportHandoff: (profileId: string, ticket: string) =>
+    req<Record<string, unknown>>(
+      `/profiles/${profileId}/export/handoff/${ticket}`),
 
   // Retire it rather than erase it: the profile departs, and what it meant
   // to the people who knew it stays readable.

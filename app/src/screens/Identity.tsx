@@ -173,6 +173,14 @@ export function Identity({ onPlans, onPassing }: {
   const [ended, setEnded] = useState<Sunset | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
+  // Which brief's full prompt is open, shown inline under its own row.
+  const [promptFor, setPromptFor] = useState<string | null>(null);
+  const [promptText, setPromptText] = useState("");
+  // The minted handoff, rendered as a scannable code under the button.
+  const [exportQr, setExportQr] =
+    useState<Awaited<ReturnType<typeof api.exportTicket>> | null>(null);
+  // A handoff link scanned or pasted on this device, waiting to redeem.
+  const [handoffLink, setHandoffLink] = useState("");
 
   const [level, setLevel] = useState("self_asserted");
   const [attestor, setAttestor] = useState("");
@@ -548,18 +556,29 @@ export function Identity({ onPlans, onPassing }: {
             <h4>{tr("idn.bubble.portrait", lang)}</h4>
             <p className="muted small">{tr("idn.bubble.brief", lang)}</p>
             {briefs.slice(0, 3).map((b) => (
-              <div key={b.handle} className="row">
-                <div style={{ flex: 1 }}>
-                  <strong>{b.handle}</strong>
-                  <div className="muted small">{b.portrait}</div>
+              <div key={b.handle}>
+                <div className="row">
+                  <div style={{ flex: 1 }}>
+                    <strong>{b.handle}</strong>
+                    <div className="muted small">{b.portrait}</div>
+                  </div>
+                  <button onClick={async () => {
+                    setError(null);
+                    if (promptFor === b.handle) { setPromptFor(null); return; }
+                    try {
+                      const full = await api.avatarBrief(b.handle);
+                      // Right here, under the button that asked — this used
+                      // to land in the note at the top of the screen, which
+                      // on a phone is above the fold: "I gotta show the
+                      // prompt and nothing happens."
+                      setPromptFor(b.handle);
+                      setPromptText(full.prompt || full.portrait);
+                    } catch (e) { fail(e); }
+                  }}>{tr("idn.bubble.prompt", lang)}</button>
                 </div>
-                <button onClick={async () => {
-                  setError(null); setNote(null);
-                  try {
-                    const full = await api.avatarBrief(b.handle);
-                    setNote(full.prompt || full.portrait);
-                  } catch (e) { fail(e); }
-                }}>{tr("idn.bubble.prompt", lang)}</button>
+                {promptFor === b.handle && (
+                  <p className="muted small">{promptText}</p>
+                )}
               </div>
             ))}
           </>
@@ -584,13 +603,51 @@ export function Identity({ onPlans, onPassing }: {
       <div className="card">
         <h3>{tr("idn.export", lang)}</h3>
         <p className="muted small">{tr("idn.export.pitch", lang)}</p>
-        <button onClick={async () => {
-          setError(null); setNote(null);
-          try {
-            const data = await api.exportProfile(me, token);
-            setNote(`Exported: ${Object.keys(data).join(", ")}.`);
-          } catch (e) { fail(e); }
-        }}>{tr("idn.export.go", lang)}</button>
+        <div className="row">
+          <button onClick={async () => {
+            setError(null); setNote(null);
+            try {
+              const data = await api.exportProfile(me, token);
+              setNote(`Exported: ${Object.keys(data).join(", ")}.`);
+            } catch (e) { fail(e); }
+          }}>{tr("idn.export.go", lang)}</button>
+          {/* The QR door a field report pointed at this card and asked
+              for. The code carries a single-use, minutes-long ticket —
+              the owner token never leaves this screen. */}
+          <button onClick={async () => {
+            setError(null); setNote(null); setExportQr(null);
+            try {
+              setExportQr(await api.exportTicket(me, token));
+            } catch (e) { fail(e); }
+          }}>{tr("idn.export.qr", lang)}</button>
+        </div>
+        {exportQr && (
+          <>
+            <img src={`${getBase()}/profiles/${me}/export/handoff/${exportQr.ticket}/qr.svg`}
+                 alt={tr("idn.export.qr", lang)}
+                 style={{ width: 220, height: 220, borderRadius: 12 }} />
+            <p className="muted small">{exportQr.note}</p>
+          </>
+        )}
+        {/* The redeeming side, for a link pasted from a scan on this
+            device. Tokenless — the single-use ticket is the authority. */}
+        <div className="row">
+          <input value={handoffLink} placeholder={tr("idn.export.redeem.ph", lang)}
+                 onChange={(e) => setHandoffLink(e.target.value)}
+                 style={{ flex: 1 }} />
+          <button disabled={!handoffLink.includes("/export/handoff/")}
+                  onClick={async () => {
+            setError(null); setNote(null);
+            try {
+              const m = handoffLink.match(
+                /\/profiles\/([^/]+)\/export\/handoff\/([^/?#]+)/);
+              if (!m) return;
+              const data = await api.exportHandoff(m[1], m[2]);
+              setNote(`Exported: ${Object.keys(data).join(", ")}.`);
+              setHandoffLink("");
+            } catch (e) { fail(e); }
+          }}>{tr("idn.export.redeem", lang)}</button>
+        </div>
       </div>
 
       {memorial && (

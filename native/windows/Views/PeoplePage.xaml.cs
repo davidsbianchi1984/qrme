@@ -314,6 +314,9 @@ public sealed partial class PeoplePage : Page
         RecTransparencyButton.Content = L10n.T("rec.transparency");
         RecStatsButton.Content = L10n.T("rec.stats");
         RecExportButton.Content = L10n.T("rec.export");
+        RecExportQrButton.Content = L10n.T("rec.export.qr");
+        RecTicketBox.PlaceholderText = L10n.T("rec.export.ticket");
+        RecRedeemButton.Content = L10n.T("rec.export.redeem");
         RecFeedButton.Content = L10n.T("rec.feed");
         VeilTitle.Text = L10n.T("veil.title");
         VeilShowButton.Content = L10n.T("veil.show");
@@ -1932,6 +1935,28 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Pid!, AppState.Current.Token!);
             StatusText.Text = $"{o.Messages.Length} \u00b7 "
                 + $"{o.Posts.Length} \u00b7 {o.Sources.Length}";
+        });
+
+    private async void OnRecExportQr(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // Mint the single-use handoff; the status line carries the
+            // scannable code's address — the owner token never rides in it.
+            var t = await ApiClient.Shared.ExportTicket(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = ApiClient.Shared.ExportHandoffQrUrl(
+                AppState.Current.Pid!, t.Ticket ?? "") + " — " + t.Note;
+        });
+
+    private async void OnRecRedeem(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // The redeeming side — tokenless, the ticket is the authority.
+            var o = await ApiClient.Shared.ExportHandoff(
+                AppState.Current.Pid!, RecTicketBox.Text.Trim());
+            RecTicketBox.Text = "";
+            StatusText.Text = $"{o.Messages.Length} · "
+                + $"{o.Posts.Length} · {o.Sources.Length}";
         });
 
     private async void OnRecFeed(object sender, RoutedEventArgs e) =>

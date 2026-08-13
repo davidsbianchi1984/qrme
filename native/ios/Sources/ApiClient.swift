@@ -4025,6 +4025,34 @@ extension ApiClient {
         try await request("/profiles/\(id)/export", token: token)
     }
 
+    struct ExportTicket: Decodable {
+        let ticket: String
+        let url: String
+        let qr_svg: String
+        let expires_at: String
+        let note: String
+    }
+
+    /// A one-time, minutes-long handoff of the export to another device:
+    /// the QR carries the ticket, never the owner token.
+    func exportTicket(id: String, token: String) async throws -> ExportTicket {
+        try await request("/profiles/\(id)/export/ticket", method: "POST",
+                          token: token)
+    }
+
+    /// The redeeming side — tokenless, the single-use ticket is the whole
+    /// authority.
+    func exportHandoff(id: String, ticket: String) async throws -> ExportOut {
+        try await request("/profiles/\(id)/export/handoff/\(ticket)")
+    }
+
+    /// Where the scannable code lives; reading it does not consume the
+    /// ticket.
+    func exportHandoffQrURL(id: String, ticket: String) -> URL {
+        base.appendingPathComponent(
+            "/profiles/\(id)/export/handoff/\(ticket)/qr.svg")
+    }
+
     func profileStats(id: String, token: String) async throws -> StatsCard {
         try await request("/profiles/\(id)/stats", token: token)
     }

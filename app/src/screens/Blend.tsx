@@ -23,7 +23,12 @@ export function Blend({ onPlans }: {
 }) {
   const { session, setSession } = useSession();
   const lang = visitorLang();
-  const [candidates, setCandidates] = useState<{ profile_id: string; display_name: string }[]>([]);
+  // Blurb and tags ride along: a field report picked from a list of bare
+  // names and asked what any of them were skilled at.
+  const [candidates, setCandidates] = useState<{
+    profile_id: string; display_name: string;
+    blurb?: string; tags?: string[] }[]>([]);
+  const [query, setQuery] = useState("");
   const [picks, setPicks] = useState<Pick[]>([]);
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
@@ -37,7 +42,11 @@ export function Blend({ onPlans }: {
         ? [{ profile_id: session.profileId, display_name: session.profile.display_name }]
         : [];
       const seen = new Set(own.map((o) => o.profile_id));
-      setCandidates([...own, ...cards.filter((c) => !seen.has(c.profile_id))]);
+      setCandidates([...own, ...cards
+        .filter((c) => !seen.has(c.profile_id))
+        .map((c) => ({ profile_id: c.profile_id,
+                       display_name: c.display_name,
+                       blurb: c.blurb, tags: c.tags }))]);
     }).catch((e) => setError(e));
   }, [session.profileId, session.profile]);
 
@@ -105,17 +114,33 @@ export function Blend({ onPlans }: {
           <div className="card">
             <h3>{tr("bld.whocan", lang)}</h3>
             <p className="muted small">{tr("bld.sources", lang)}</p>
+            <input value={query} placeholder={tr("bld.search.ph", lang)}
+                   onChange={(e) => setQuery(e.target.value)} />
             {candidates.length === 0 && (
               <p className="muted center">{tr("bld.nothingyet", lang)}</p>
             )}
-            {candidates.map((c) => {
+            {candidates.filter((c) => {
+              const q = query.trim().toLowerCase();
+              if (!q) return true;
+              return c.display_name.toLowerCase().includes(q)
+                || (c.blurb || "").toLowerCase().includes(q)
+                || (c.tags || []).some((t) => t.toLowerCase().includes(q));
+            }).map((c) => {
               const pick = picks.find((x) => x.profile_id === c.profile_id);
               const pct = pick && total > 0 ? Math.round((pick.weight / total) * 100) : null;
               return (
                 <div key={c.profile_id} className="friend-row">
                   <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <input type="checkbox" checked={!!pick} onChange={() => toggle(c)} />
-                    <b>{c.display_name}</b>
+                    <span>
+                      <b>{c.display_name}</b>
+                      {c.blurb && <span className="muted small"> — {c.blurb}</span>}
+                      {(c.tags || []).length > 0 && (
+                        <span className="muted small">
+                          {" "}· {(c.tags || []).slice(0, 4).join(" · ")}
+                        </span>
+                      )}
+                    </span>
                   </label>
                   {pick && (
                     <>

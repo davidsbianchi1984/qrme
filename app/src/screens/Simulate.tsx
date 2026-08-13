@@ -29,6 +29,10 @@ export function Simulate({ onPlans }: {
   const [latest, setLatest] = useState<SimulationOut | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  // Which past run is open. The rows carried the whole prediction all
+  // along and rendered one line of it — "I can't tap into it or
+  // anything", the field report said.
+  const [openRun, setOpenRun] = useState<string | null>(null);
 
   function load() {
     if (!session.profileId || !session.ownerToken) return;
@@ -73,6 +77,11 @@ export function Simulate({ onPlans }: {
         <span className="muted small">{tr("sim.pitch", lang)}</span>
       </header>
 
+      {/* Above the form, not under the history: a refusal rendered at the
+          bottom of the screen is invisible on a phone, and "Run" looks
+          like a button that does nothing. */}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
+
       <div className="card">
         <h3>
           {fill(tr("sim.runof", lang),
@@ -110,16 +119,27 @@ export function Simulate({ onPlans }: {
         <div className="card">
           <h3>{tr("sim.pastruns", lang)}</h3>
           {runs.slice().reverse().map((s) => (
-            <div key={s.id} className="friend-row">
-              <span className="tag">{s.confidence.toFixed(2)}</span>
-              <b>{s.scenario.length > 60 ? s.scenario.slice(0, 60) + "…" : s.scenario}</b>
-              <span className="muted small">{s.horizon.replace("_", " ")}</span>
+            <div key={s.id}>
+              <button className="friend-row" style={{ width: "100%",
+                        textAlign: "left", background: "none" }}
+                      onClick={() =>
+                        setOpenRun(openRun === s.id ? null : s.id)}>
+                <span className="tag">{s.confidence.toFixed(2)}</span>
+                <b>{s.scenario.length > 60 ? s.scenario.slice(0, 60) + "…" : s.scenario}</b>
+                <span className="muted small">{s.horizon.replace("_", " ")}</span>
+              </button>
+              {openRun === s.id && (
+                <div style={{ padding: "0 8px 10px" }}>
+                  <p style={{ whiteSpace: "pre-wrap" }}>{s.narrative}</p>
+                  <p className="muted small">{confidenceNote(s)}</p>
+                  <p className="muted small">{s.disclaimer}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
 
-      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }

@@ -7653,6 +7653,18 @@ const CHROME: Table = {
   "mem.kept.covers": {
     en: "{n} older turns folded into this remembrance", es: "{n} turnos antiguos plegados en este recuerdo", fr: "{n} tours plus anciens fondus dans ce souvenir", de: "{n} ältere Beiträge in diese Erinnerung eingefaltet", pt: "{n} turnos antigos condensados nesta lembrança", it: "{n} turni più vecchi condensati in questo ricordo", ja: "古い{n}件のやり取りをこの記憶に織り込み済み", zh: "已把 {n} 条较早的对话并入这段记忆", hi: "{n} पुराने संदेश इस स्मृति में समेटे गए", ar: "طُويت {n} من الأدوار الأقدم في هذه الذكرى",
   },
+  "bld.search.ph": {
+    en: "Search by name, skill or tag", es: "Buscar por nombre, habilidad o etiqueta", fr: "Rechercher par nom, compétence ou étiquette", de: "Nach Name, Fähigkeit oder Schlagwort suchen", pt: "Buscar por nome, habilidade ou etiqueta", it: "Cerca per nome, abilità o etichetta", ja: "名前・スキル・タグで検索", zh: "按名字、技能或标签搜索", hi: "नाम, कौशल या टैग से खोजें", ar: "ابحث بالاسم أو المهارة أو الوسم",
+  },
+  "idn.export.redeem.ph": {
+    en: "Paste a handoff link from another device", es: "Pega un enlace de traspaso de otro dispositivo", fr: "Collez un lien de transfert d'un autre appareil", de: "Übergabelink von einem anderen Gerät einfügen", pt: "Cole um link de repasse de outro dispositivo", it: "Incolla un link di passaggio da un altro dispositivo", ja: "別の端末からの受け渡しリンクを貼り付け", zh: "粘贴来自另一台设备的交接链接", hi: "दूसरे डिवाइस से सौंपा गया लिंक चिपकाएँ", ar: "الصق رابط التسليم من جهاز آخر",
+  },
+  "idn.export.redeem": {
+    en: "Redeem it", es: "Canjearlo", fr: "L'utiliser", de: "Einlösen", pt: "Resgatá-lo", it: "Riscattalo", ja: "受け取る", zh: "领取", hi: "प्राप्त करें", ar: "استرده",
+  },
+  "idn.export.qr": {
+    en: "Hand it to another device", es: "Pasarlo a otro dispositivo", fr: "Le passer à un autre appareil", de: "An ein anderes Gerät übergeben", pt: "Passar para outro dispositivo", it: "Passalo a un altro dispositivo", ja: "別の端末に渡す", zh: "交给另一台设备", hi: "दूसरे डिवाइस को सौंपें", ar: "سلّمه إلى جهاز آخر",
+  },
   "mem.curate": {
     en: "Edit", es: "Editar", fr: "Modifier", de: "Bearbeiten", pt: "Editar", it: "Modifica", ja: "編集", zh: "编辑", hi: "संपादित करें", ar: "تحرير",
   },

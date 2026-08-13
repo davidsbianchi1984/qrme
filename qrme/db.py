@@ -1606,6 +1606,16 @@ CREATE TABLE IF NOT EXISTS message_edits (
     edited_at  TEXT NOT NULL
 );
 
+-- A one-time, short-lived handoff of a profile's export to another
+-- device: the QR on the screen carries the ticket, never the owner
+-- token. Single use, minutes to live. qrme/routers/profiles.py.
+CREATE TABLE IF NOT EXISTS export_tickets (
+    ticket     TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    expires_at TEXT NOT NULL,
+    used_at    TEXT
+);
+
 -- The upper-torso form of an avatar: the figure that stands in a live feed
 -- or an AR scene at 1:1 scale. The circular bubble is only the form of a
 -- profile that has no avatar yet; a profile with a torso renders as one.

@@ -4745,6 +4745,7 @@ private fun SrcBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
 @Composable
 private fun RecBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     val lang = L10n.deviceLanguage()
+    var redeemTicket by remember { mutableStateOf("") }
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("rec.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
@@ -4767,6 +4768,25 @@ private fun RecBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 vm.call({ ApiClient.feed(vm.pid!!) }) { r ->
                     onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
             }
+        }
+        // The QR handoff: mint a single-use ticket (the note carries the
+        // scannable code's address — the owner token never rides in it),
+        // and redeem a ticket pasted from another device's screen.
+        BrandButton(L10n.t("rec.export.qr", lang)) {
+            vm.call({
+                val (ticket, note) = ApiClient.exportTicket(
+                    vm.pid!!, vm.token!!)
+                ApiClient.exportHandoffQrUrl(vm.pid!!, ticket) + " — " + note
+            }) { r ->
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        labeledField(L10n.t("rec.export.ticket", lang), redeemTicket,
+            "") { redeemTicket = it }
+        BrandButton(L10n.t("rec.export.redeem", lang),
+            enabled = redeemTicket.isNotBlank()) {
+            vm.call({ ApiClient.exportHandoff(vm.pid!!, redeemTicket) }) { r ->
+                redeemTicket = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
         }
     }
 }

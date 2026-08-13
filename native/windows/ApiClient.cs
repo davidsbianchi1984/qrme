@@ -2060,6 +2060,29 @@ public sealed class ApiClient
     public Task<ExportOut> ExportProfile(string profileId, string token) =>
         Send<ExportOut>(Get($"/profiles/{profileId}/export", token));
 
+    /// <summary>A one-time, minutes-long handoff of the export to another
+    /// device: the QR carries the ticket, never the owner token.</summary>
+    public Task<ExportTicketOut> ExportTicket(string profileId,
+        string token) =>
+        Send<ExportTicketOut>(Post(
+            $"/profiles/{profileId}/export/ticket", new { }, token));
+
+    /// <summary>The redeeming side — tokenless, the single-use ticket is
+    /// the whole authority.</summary>
+    public Task<ExportOut> ExportHandoff(string profileId, string ticket) =>
+        Send<ExportOut>(Get(
+            $"/profiles/{profileId}/export/handoff/{ticket}"));
+
+    /// <summary>Where the scannable code lives; reading it does not
+    /// consume the ticket. The address is built from the same request
+    /// helper's path so the door audit reads it.</summary>
+    public string ExportHandoffQrUrl(string profileId, string ticket)
+    {
+        var req = Get($"/profiles/{profileId}/export/handoff/{ticket}/qr.svg");
+        return (_http.BaseAddress?.ToString().TrimEnd('/') ?? "")
+            + req.RequestUri;
+    }
+
     public Task<StatsCard> ProfileStats(string profileId, string token) =>
         Send<StatsCard>(Get($"/profiles/{profileId}/stats", token));
 
@@ -4388,6 +4411,11 @@ public record MemoryAccountOut(
 public record ForgetOut(
     [property: JsonPropertyName("forgotten_turns")] int ForgottenTurns,
     [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
+
+public record ExportTicketOut(
+    [property: JsonPropertyName("ticket")] string? Ticket,
+    [property: JsonPropertyName("expires_at")] string? ExpiresAt,
+    [property: JsonPropertyName("note")] string? Note);
 
 public record MemoryTurn(
     [property: JsonPropertyName("id")] string? Id,

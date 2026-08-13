@@ -3433,6 +3433,27 @@ object ApiClient {
             o.optString("model_effective")
     }
 
+    // A one-time, minutes-long handoff of the export to another device:
+    // the QR carries the ticket, never the owner token.
+    suspend fun exportTicket(id: String, token: String): Pair<String, String> {
+        val o = JSONObject(request("/profiles/$id/export/ticket", "POST",
+            token = token))
+        return o.optString("ticket") to o.optString("note")
+    }
+
+    // The redeeming side — tokenless, the single-use ticket is the whole
+    // authority.
+    suspend fun exportHandoff(id: String, ticket: String): String {
+        val o = JSONObject(request("/profiles/$id/export/handoff/$ticket"))
+        return o.keys().asSequence().joinToString(", ")
+    }
+
+    // Where the scannable code lives; reading it does not consume the
+    // ticket. Built through URL() so the door audit reads the address the
+    // same way it reads every direct-connection fetch.
+    fun exportHandoffQrUrl(id: String, ticket: String): String =
+        URL("$base/profiles/$id/export/handoff/$ticket/qr.svg").toString()
+
     suspend fun exportProfile(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/export", token = token))
         return (o.optJSONArray("messages")?.length() ?: 0).toString() +

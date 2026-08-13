@@ -283,6 +283,8 @@ struct SourceSection: View {
 struct RecordSection: View {
     @EnvironmentObject var state: AppState
     @State private var line: String?
+    @State private var handoffQr: URL?
+    @State private var redeemTicket = ""
     @State private var busy = false
 
     var body: some View {
@@ -324,6 +326,39 @@ struct RecordSection: View {
                             + f.ranked_on.joined(separator: ", ")
                     }
                 }.font(.caption).disabled(busy)
+            }
+            // The QR handoff: mint a single-use ticket and show the code
+            // another device scans; redeem a pasted ticket from one. The
+            // owner token never rides in the code.
+            HStack {
+                Button(L10n.t("rec.export.qr", state.language)) {
+                    run {
+                        let t = try await ApiClient.shared.exportTicket(
+                            id: state.pid!, token: state.token!)
+                        handoffQr = ApiClient.shared.exportHandoffQrURL(
+                            id: state.pid!, ticket: t.ticket)
+                        line = t.note
+                    }
+                }.font(.caption).disabled(busy)
+                TextField(L10n.t("rec.export.ticket", state.language),
+                          text: $redeemTicket)
+                    .textFieldStyle(.roundedBorder)
+                Button(L10n.t("rec.export.redeem", state.language)) {
+                    run {
+                        let out = try await ApiClient.shared.exportHandoff(
+                            id: state.pid!, ticket: redeemTicket)
+                        redeemTicket = ""
+                        line = "\(out.messages.count) · "
+                            + "\(out.posts.count) · \(out.sources.count)"
+                    }
+                }.font(.caption).disabled(busy || redeemTicket.isEmpty)
+            }
+            if let handoffQr {
+                AsyncImage(url: handoffQr) { img in
+                    img.resizable().scaledToFit()
+                } placeholder: { ProgressView() }
+                .frame(width: 160, height: 160)
+                .cornerRadius(12)
             }
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)
